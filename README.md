@@ -1,1 +1,55 @@
 # Bumbusik
+
+A browser platformer set on a cruise ship. Design: [GAME_DESIGN.md](GAME_DESIGN.md).
+
+## Running it
+
+Browsers won't load the map from a `file://` page, so serve the folder:
+
+```
+python -m http.server
+```
+
+then open <http://localhost:8000>. GitHub Pages serves it the same way.
+
+URL flags, combinable (`?play&debug`):
+
+| Flag | Effect |
+|---|---|
+| `?play` | Skip the title screen |
+| `?reset` | Clear the saved progress |
+| `?debug` | Show collision boxes and her position/state |
+
+## Controls
+
+| Action | Keyboard | Xbox controller |
+|---|---|---|
+| Run | ← / → | Left stick / D-pad |
+| Jump (hold for higher) | Space | A |
+| Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
+| Кісюнічка dash (costs a tangerine) | Shift | B |
+| Activate | E | X |
+
+A controller is detected once a button is pressed on it.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `index.html`, `style.css` | Page shell |
+| `src/` | The game: `main.js` (Phaser config), `scenes/`, controls, sound, save, tuning in `config.js` |
+| `vendor/phaser.min.js` | Phaser 4.2.1, vendored (no npm, no build) |
+| `maps/ship.json` | The ship map, Tiled JSON format |
+| `assets/tiles/placeholder.png` | Placeholder tileset |
+| `tools/build_slice_map.py` | Generates the current first-slice map and tileset |
+| `tools/playtest.py` | Headless playtests in Chrome (needs `websocket-client`) |
+
+## Testing
+
+```
+python tools/playtest.py            # all scenarios
+python tools/playtest.py stairs     # one scenario
+```
+
+It drives the real game with key presses in headless Chrome and saves screenshots to the system
+temp folder.
