@@ -127,11 +127,11 @@ Reference photos never enter the repo.
   behind, hands alternating, and climbing out of a hatch (hands on the rim at head, shoulder,
   then waist height as she rises). Run, climb and the idles use PixelLab's skeleton mode, which moves her standing
   sprite rather than redrawing it, so her hair stays the length it is when standing still.
-- **Idle (Decided):** standing still is her plain side pose. After 4 seconds one of three idles plays
-  once, then another every 6 to 10 seconds, never the same twice in a row; any move ends it at
-  once. The three: hands on hips tapping a foot (the taps repeat), looking back over her shoulder,
-  and buffing her nails on one hand, then holding it out to admire them. More can join the
-  rotation as her quirks come up.
+- **Idle (Decided):** standing still is her plain side pose. After 4 seconds one idle plays once,
+  then another every 6 to 10 seconds, never the same twice in a row; any move ends it at once.
+  Two so far: hands on hips tapping a foot (the taps repeat), and looking back over her shoulder,
+  held for about a second. More can join the rotation as her quirks come up. Tried and dropped: a
+  nail-buffing idle, which read as checking her phone.
 
 ### 3.1 Controls
 
@@ -490,7 +490,7 @@ Nothing blocks the start of the build. These get settled along the way:
 **Next up** (as of 2026-10-31):
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
-- [x] Her idles: foot tap, look back, nails (§3)
+- [x] Her idles: foot tap, look back (§3)
 - [ ] Bumbot's sprite and his five idle activities (§4)
 - [ ] First real ship tiles and props: test PixelLab against Retro Diffusion before committing (§2.1)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on

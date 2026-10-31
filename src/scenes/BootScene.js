@@ -28,10 +28,9 @@ export class BootScene extends Phaser.Scene {
         // between putting her hands on her hips and taking them off.
         const tap = [0, 1, 2, 3, 4, 5, 2, 3, 4, 5, 2, 3, 4, 5, 6, 7];
         this.anims.create({ key: 'her-idle-tap', frames: frames('idle-tap', tap), frameRate: 7 });
-        this.anims.create({ key: 'her-idle-look', frames: frames('idle-look'), frameRate: 6 });
-        // The nails' generated last two frames drew a blot on her face, so she lowers her hands by
-        // playing the first two backwards.
-        this.anims.create({ key: 'her-idle-nails', frames: frames('idle-nails', [0, 1, 2, 3, 4, 5, 2, 3, 4, 5, 6, 7, 7, 1, 0]), frameRate: 7 });
+        // The look back holds on its turned frames (2-4) for about a second, or it is missed.
+        const look = [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7];
+        this.anims.create({ key: 'her-idle-look', frames: frames('idle-look', look), frameRate: 7 });
         const params = new URLSearchParams(location.search);
         this.scene.start(params.has('play') ? 'ship' : 'title');
     }
