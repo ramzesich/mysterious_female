@@ -87,6 +87,17 @@ everywhere.
 **Cheapest path:** placeholders first (free), a free editor, Retro Diffusion credits for tiles and
 props, and **one month** of PixelLab when the characters are drawn, ideally all of them at once.
 
+**Decided: PixelLab, connected to Claude Code** through its MCP server, so assets are generated,
+checked and dropped into the game from here. Started on the free trial (40 generations).
+
+**The palette is Resurrect 64** (`assets/palette/resurrect-64.hex`). PixelLab only draws in a fixed
+palette in its expensive Pro mode, so everything is generated freely and converted afterwards by
+`tools/palettize.py` (nearest colour by perceived difference, plus per-character colour swaps).
+
+**Asset pipeline:** raw PixelLab frames are kept in `assets/source/<character>/`, and
+`tools/build_sprites.py` converts and packs them into `assets/sprites/<character>.png` + `.json`.
+Reference photos never enter the repo.
+
 ---
 
 ## 3. The heroine — Bumbusik
@@ -107,8 +118,13 @@ props, and **one month** of PixelLab when the characters are drawn, ideally all 
 
 - The hair curl and the earrings are what make her recognisable at sprite size, so they get
   exaggerated slightly. Redone if it doesn't look right.
-- **Size:** **48px** tall at the 480×270 internal resolution, about 18% of the screen height. Bumbot
-  is stylised larger than a real cat would be next to her, or he would be a speck.
+- **Size:** **59px** tall at the 480×270 internal resolution, about 22% of the screen height: the
+  size her PixelLab sprite came out at, kept rather than shrunk, because downscaling pixel art ruins
+  it. Bumbot is stylised larger than a real cat would be next to her, or he would be a speck.
+- **Her sprite (Decided):** generated with PixelLab (natural proportions, the most detailed of four
+  tries), then edited for longer hair flipping outward at the ends and fair skin, and converted to
+  Resurrect 64. Animations so far: idle, run, jump (rise / apex / fall poses) and a ladder climb
+  from behind. The run's hair puffs up in some frames; re-roll later if it bothers us in motion.
 
 ### 3.1 Controls
 
@@ -265,13 +281,13 @@ Real-world figures ([NCL ship map](https://app.ncl.com/sites/default/files/Ship_
 
 That works out to (numbers to be tuned in testing):
 
-- One deck (~3 m real) ≈ **45% of the screen height**: ~240px at 960×540, ~120px at a 480×270
-  internal resolution.
-- So ~80px per metre at 960×540, and the 258 m ship is **~20,600px long**, about **21 screen widths**
-  per full-length deck. Including hull and funnel, it is roughly 4,500px tall.
-- She is drawn at about **two thirds of true scale** against the ship, so a deck's ceiling sits at
-  about 2.3× her height: close enough to feel like a ship's corridor, with room left to jump. (A first
-  try at half scale made the decks feel like halls.)
+- One deck (~3 m real) = **144px** at the 480×270 internal resolution, about 53% of the screen
+  height, so the deck above and below still show at the edges.
+- So 48px per metre, and the 258 m ship is **~12,400px long**, about **26 screen widths** per
+  full-length deck. Including hull and funnel, it is roughly 2,900px tall.
+- She is drawn at about **three quarters of true scale** against the ship, so a deck's ceiling sits
+  at about 2.2× her height: close enough to feel like a ship's corridor, with room left to jump. (A
+  first try at half scale made the decks feel like halls.)
 - **Everything human-sized is sized to her, never to the ship**: doors (~1.25× her height), furniture,
   railings, counters, signs. Sizing some props to the ship and others to her made a gangway door
   twice the height of the crew cabin door beside it. The ship's overall dimensions stay real.

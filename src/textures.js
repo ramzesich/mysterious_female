@@ -1,5 +1,6 @@
 // Placeholder sprites, drawn from text pixel maps at boot. They exist so the ship is playable and
-// tunable before the real pixel art is made (§2.1); swap them out, don't polish them.
+// tunable before the real pixel art is made (§2.1); swap them out, don't polish them. Bumbusik
+// herself is real art now: assets/sprites/her.png, built by tools/build_sprites.py.
 
 const PALETTE = {
     k: '#2a1f1d', // hair
@@ -28,88 +29,6 @@ const PALETTE = {
     t: '#b9ad97', // background furniture, muted
     T: '#a39780',
 };
-
-// Bumbusik, facing right, 16x48. The frames share everything above the hem.
-const HER_TOP = [
-    '......kkkk......',
-    '....kkkkkkkk....',
-    '...kkkkkkkkkk...',
-    '..kkkkkkkkkkkk..',
-    '..kkkkkkkkssss..',
-    '..kkkkkksssssk..',
-    '..kkkkksssksss..',
-    '..kkkkksssssss..',
-    '..kkkkksssssss..',
-    '..kkkkesssssss..',
-    '..kkkkkssssss...',
-    '..kkkkkksssss...',
-    '..kkkkkkkssss...',
-    '..kkkkk..sss....',
-    '.kkkkkk..sss....',
-    '.kkkkkgrrrrrg...',
-    '.kk.ewwwwwwwe...',
-    'k...wwwwwwwgw...',
-    '...wwwwwwwwgww..',
-    '...wwwwwwwwgww..',
-    '...swwwwwwwgws..',
-    '...swwwwwwwgws..',
-    '...swwwwwwwgws..',
-    '...swwwwwwwgws..',
-    '...swwwwwwwgws..',
-    '...snnnnnnnnns..',
-    '...snnnnnnnnns..',
-    '....nnnnnnnnn...',
-    '....nnnnnnnnn...',
-    '....nnnnnnnnn...',
-    '...nnnnnnnnnnn..',
-    '...nnnnnnnnnnn..',
-    '...nnnnnnnnnnn..',
-    '...nnnnnnnnnnn..',
-];
-
-const BLANK = '................';
-const LEGS = {
-    stand: [
-        ...Array(12).fill('.....ss..ss.....'),
-        '....bbb..bbb....', '....bbb..bbbb...',
-    ],
-    run1: [
-        '....ss....ss....', '....ss....ss....', '...ss......ss...', '...ss......ss...',
-        '..ss........ss..', '..ss........ss..', '..ss.........ss.', '.ss..........ss.',
-        '.ss..........ss.', '.ss...........ss', '.bb...........bb', 'bbb...........bb',
-        BLANK, BLANK,
-    ],
-    run2: [
-        '......ss.ss.....', '......ss.ss.....', '......sssss.....', '.......sss......',
-        '.......ss.......', '.......ss.......', '.......ss.......', '.......ss.......',
-        '.......sss......', '.......sss......', '.......bbb......', '.......bbbb.....',
-        BLANK, BLANK,
-    ],
-    jump: [
-        '.....ss..ss.....', '.....ss...ss....', '....ss.....ss...', '....ss.....ss...',
-        '....ss.....ss...', '....bbb....bbb..', '....bbb....bbb..',
-        ...Array(7).fill(BLANK),
-    ],
-};
-
-// Climbing, seen from behind: hair down her back, arms up on the rungs.
-const HER_CLIMB = [
-    '......kkkk......',
-    's...kkkkkkkk...s',
-    's..kkkkkkkkkk..s',
-    ...Array(10).fill('s.kkkkkkkkkkkk.s'),
-    'w.kkkkkkkkkkkk.w',
-    'w.ekkkkkkkkkke.w',
-    'w.kkkkkkkkkkkk.w',
-    'wkkkkkkkkkkkkkkw',
-    'wkwkkkkkkkkkkwkw',
-    '..wewwwwwwwwew..',
-    ...Array(6).fill('...wwwwwwwwww...'),
-    ...Array(5).fill('...nnnnnnnnnn...'),
-    ...Array(4).fill('..nnnnnnnnnnnn..'),
-    ...Array(12).fill('.....ss..ss.....'),
-    '.....bb..bb.....', '.....bb..bb.....',
-];
 
 const SPRITES = {
     tangerine: [
@@ -153,25 +72,25 @@ const SPRITES = {
         'TTTTTTTTTTTTTTTTTTTT',
         'tttttttttttttttttttt',
         'tttttttttttttttttttt',
-        ...Array(14).fill('..t..............t..'),
+        ...Array(18).fill('..t..............t..'),
         '..T..............T..',
     ],
 };
 
-// Crew cabin door, 24x60: sized to her, like every human-scale thing on board (§2.1). Closed until
+// Crew cabin door, 28x74: sized to her, like every human-scale thing on board (§2.1). Closed until
 // she passes it; activated, it stands ajar with warm light spilling out of the cabin, so an active
 // checkpoint reads from across the deck (§5.5).
 function doorRows(open) {
     const rows = [];
-    for (let y = 0; y < 60; y++) {
+    for (let y = 0; y < 74; y++) {
         let row = '';
-        for (let x = 0; x < 24; x++) {
-            const frame = x <= 1 || x >= 22 || y <= 1;
+        for (let x = 0; x < 28; x++) {
+            const frame = x <= 1 || x >= 26 || y <= 1;
             if (frame) row += 'd';
-            else if (open && x <= 8) row += x >= 7 ? 'L' : 'Y';                                                             // lit gap
-            else if (y >= 9 && y <= 13 && x >= 11 && x <= 19) row += y === 9 || y === 13 || x === 11 || x === 19 ? 'm' : 'W'; // number plate
-            else if (y >= 30 && y <= 31 && x >= (open ? 11 : 16) && x <= (open ? 13 : 19)) row += 'd';                     // handle
-            else row += open && x === 9 ? 'm' : 'p';                                                                         // door edge
+            else if (open && x <= 9) row += x >= 8 ? 'L' : 'Y';                                                             // lit gap
+            else if (y >= 11 && y <= 16 && x >= 13 && x <= 22) row += y === 11 || y === 16 || x === 13 || x === 22 ? 'm' : 'W'; // number plate
+            else if (y >= 37 && y <= 38 && x >= (open ? 12 : 19) && x <= (open ? 14 : 23)) row += 'd';                     // handle
+            else row += open && x === 10 ? 'm' : 'p';                                                                         // door edge
         }
         rows.push(row);
     }
@@ -200,31 +119,20 @@ function makeSingle(scene, key, rows) {
 }
 
 export function makeTextures(scene) {
-    // Bumbusik: one strip, five 16x48 frames.
-    const frames = ['stand', 'run1', 'run2', 'jump', 'climb'];
-    const her = scene.textures.createCanvas('her', 16 * frames.length, 48);
-    const ctx = her.getContext();
-    frames.forEach((name, i) => {
-        const rows = name === 'climb' ? HER_CLIMB : [...HER_TOP, ...LEGS[name]];
-        paint(ctx, rows, i * 16, 0);
-        her.add(name, 0, i * 16, 0, 16, 48);
-    });
-    her.refresh();
-
     for (const [key, rows] of Object.entries(SPRITES)) makeSingle(scene, key, rows);
     makeSingle(scene, 'door', doorRows(false));
     makeSingle(scene, 'door-on', doorRows(true));
     makeSingle(scene, 'lamp', LAMP.off);
     makeSingle(scene, 'lamp-on', LAMP.on);
 
-    // Life ring, 20x20 (about 75 cm across, at her scale): red and white quarters.
-    const ring = scene.textures.createCanvas('lifering', 20, 20);
+    // Life ring, 24x24 (about 75 cm across, at her scale): red and white quarters.
+    const ring = scene.textures.createCanvas('lifering', 24, 24);
     const rctx = ring.getContext();
-    rctx.lineWidth = 5;
+    rctx.lineWidth = 6;
     for (let q = 0; q < 4; q++) {
         rctx.strokeStyle = q % 2 ? '#f4f4f4' : '#e04848';
         rctx.beginPath();
-        rctx.arc(10, 10, 7, (q * Math.PI) / 2, ((q + 1) * Math.PI) / 2);
+        rctx.arc(12, 12, 8, (q * Math.PI) / 2, ((q + 1) * Math.PI) / 2);
         rctx.stroke();
     }
     ring.refresh();

@@ -15,7 +15,7 @@ const approach = (value, target, step) =>
     value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
 const HALF = PLAYER.height / 2;
-const LAMP_RISE = 66; // the checkpoint lamp sits just above the 60px door
+const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 
 // Each hazard gets its own fright (§5.6).
 const FRIGHTS = { vacuum: 'Іііі!' };
@@ -194,9 +194,10 @@ export class ShipScene extends Phaser.Scene {
     }
 
     buildPlayer() {
-        const p = this.physics.add.sprite(0, 0, 'her', 'stand').setOrigin(0.5, 1).setDepth(DEPTH.player);
+        this.herFrames = this.cache.json.get('her-meta').frames;
+        const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.idle).setOrigin(0.5, 1).setDepth(DEPTH.player);
         p.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
-        p.body.setOffset((PLAYER.width - PLAYER.bodyWidth) / 2, PLAYER.height - PLAYER.bodyHeight);
+        p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight);
         p.body.setMaxVelocity(10000, PLAYER.maxFall);
         this.worldLayer.add(p);
         this.player = p;
@@ -279,7 +280,8 @@ export class ShipScene extends Phaser.Scene {
 
     spawnAt(point, { emerge = false } = {}) {
         const p = this.player;
-        p.clearAlpha().setCrop().setDepth(DEPTH.player).setFrame('stand').setFlipX(false);
+        p.clearAlpha().setCrop().setDepth(DEPTH.player).setFlipX(false);
+        this.pose('idle');
         p.body.enable = true;
         p.body.reset(point.x, point.y);
         p.body.allowGravity = true;
@@ -377,9 +379,9 @@ export class ShipScene extends Phaser.Scene {
             }
         }
 
-        if (!onFloor) p.setFrame('jump');
-        else if (Math.abs(body.velocity.x) > 10) p.setFrame(Math.floor(time / (dashing ? 70 : 120)) % 2 ? 'run1' : 'run2');
-        else p.setFrame('stand');
+        if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
+        else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
+        else this.pose('idle');
     }
 
     // --- Ladders ---------------------------------------------------------------------------
@@ -407,7 +409,8 @@ export class ShipScene extends Phaser.Scene {
         this.mode = 'ladder';
         p.body.enable = false;
         p.x = this.ladder.x;
-        p.setFrame('climb').setFlipX(false);
+        p.setFlipX(false);
+        this.pose('climb');
         return true;
     }
 
@@ -416,7 +419,8 @@ export class ShipScene extends Phaser.Scene {
         const L = this.ladder;
         const v = (input.down ? 1 : 0) - (input.up ? 1 : 0);
         p.y = Phaser.Math.Clamp(p.y + v * PLAYER.climbSpeed * dt, L.topY, L.bottomY);
-        if (v) p.setFlipX(Math.floor(time / 160) % 2 === 0);
+        if (v) p.anims.resume();
+        else p.anims.pause();
 
         const atTop = p.y <= L.topY;
         const atBottom = p.y >= L.bottomY;
@@ -432,7 +436,8 @@ export class ShipScene extends Phaser.Scene {
     leaveLadderOrStairs() {
         const p = this.player;
         this.mode = 'play';
-        p.setDepth(DEPTH.player).setFrame('stand');
+        p.setDepth(DEPTH.player);
+        this.pose('idle');
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
@@ -478,12 +483,25 @@ export class ShipScene extends Phaser.Scene {
         this.placeOnStairs();
         if (v) {
             p.setFlipX(v * upward < 0);
-            p.setFrame(Math.floor(time / 120) % 2 ? 'run1' : 'run2');
+            this.pose('run', 0.8);
         } else {
-            p.setFrame('stand');
+            this.pose('idle');
         }
 
         if ((this.stairT >= 1 && v > 0) || (this.stairT <= 0 && v < 0)) this.leaveLadderOrStairs();
+    }
+
+    // Her pose: a looping animation (idle, run, climb) at an optional speed, or a single frame.
+    pose(name, speed = 1) {
+        const p = this.player;
+        const key = `her-${name}`;
+        if (this.anims.exists(key)) {
+            p.anims.play(key, true);
+            p.anims.timeScale = speed;
+        } else {
+            p.anims.stop();
+            p.setFrame(this.herFrames[name]);
+        }
     }
 
     // --- Pickups, checkpoints, hazards ---------------------------------------------------------
@@ -635,7 +653,8 @@ export class ShipScene extends Phaser.Scene {
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
         this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
-        p.setFrame('jump').setFlipX(away < 0);
+        this.pose('rise');
+        p.setFlipX(away < 0);
         this.script = null;
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
@@ -643,7 +662,7 @@ export class ShipScene extends Phaser.Scene {
                 sfx.whoosh();
                 this.script = (dt, time) => {
                     p.x += away * 260 * dt;
-                    p.setFrame(Math.floor(time / 60) % 2 ? 'run1' : 'run2');
+                    this.pose('run', 2);
                     const view = this.cameras.main.worldView;
                     if (p.x < view.x - 20 || p.x > view.right + 20) this.respawn();
                 };
@@ -657,7 +676,8 @@ export class ShipScene extends Phaser.Scene {
         let vy = p.body.velocity.y;
         this.beginScare();
         this.scareFrom = { x: p.x, y: this.takeoffY };
-        p.setDepth(DEPTH.fx).setFrame('jump');
+        p.setDepth(DEPTH.fx);
+        this.pose('fall');
         sfx.whoosh();
         this.script = (dt) => {
             vy = Math.min(vy + PLAYER.gravity * dt, PLAYER.maxFall * 1.5);
@@ -674,10 +694,13 @@ export class ShipScene extends Phaser.Scene {
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
         this.smash(p.x, this.waterY);
-        p.setFrame('stand').setCrop(0, 0, PLAYER.width, 30).setDepth(DEPTH.fx);
-        p.y = this.waterY + PLAYER.height - 30; // the crop's bottom edge sits on the water
-        const ring = this.add.image(p.x, this.waterY - 2, 'lifering').setDepth(DEPTH.fx + 0.5);
-        const wave = this.add.text(p.x + 12, this.waterY - 36, '👋', { fontSize: '12px', resolution: 4 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
+        // Facing the camera, smiling; only her top half shows above the water.
+        const shown = PLAYER.cell - PLAYER.height + 32;
+        this.pose('front');
+        p.setCrop(0, 0, PLAYER.cell, shown).setDepth(DEPTH.fx);
+        p.y = this.waterY + PLAYER.cell - shown; // the crop's bottom edge sits on the water
+        const ring = this.add.image(p.x, this.waterY - 3, 'lifering').setDepth(DEPTH.fx + 0.5);
+        const wave = this.add.text(p.x + 14, this.waterY - 40, '👋', { fontSize: '12px', resolution: 4 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
         this.worldLayer.add([ring, wave]);
         this.tweens.add({ targets: [p, ring, wave], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         this.tweens.add({ targets: wave, angle: { from: -20, to: 20 }, duration: 180, yoyo: true, repeat: -1 });

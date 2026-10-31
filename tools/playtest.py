@@ -153,8 +153,8 @@ class Browser:
 
 
 # --- Scenarios -----------------------------------------------------------------------------------
-# Coordinates come from tools/build_slice_map.py: floors at y 240 (deck 5), 368 (deck 4),
-# 496 (deck 3); the gangway spawn is x 712.
+# Coordinates come from tools/build_slice_map.py: floors at y 272 (deck 5), 416 (deck 4),
+# 560 (deck 3); the gangway spawn is x 712.
 
 def check(cond, label, detail=""):
     print(("  ok    " if cond else "  FAIL  ") + label + (f"  ({detail})" if detail else ""))
@@ -169,7 +169,7 @@ def scenario_boot(b):
     time.sleep(0.5)
     s = b.state()
     b.shot("spawn")
-    return check(s["mode"] == "play" and s["y"] == 368, "spawns standing on deck 4 at the gangway", s)
+    return check(s["mode"] == "play" and s["y"] == 416, "spawns standing on deck 4 at the gangway", s)
 
 
 def scenario_run_jump(b):
@@ -184,56 +184,56 @@ def scenario_run_jump(b):
     peak = b.state()["y"]
     b.key("space", False)
     time.sleep(0.8)
-    ok &= check(peak < 368 - 30, "jumps", f"y at 0.25s {peak}")
-    ok &= check(b.state()["y"] == 368, "lands back on deck 4", b.state())
+    ok &= check(peak < 416 - 30, "jumps", f"y at 0.25s {peak}")
+    ok &= check(b.state()["y"] == 416, "lands back on deck 4", b.state())
     return ok
 
 
 def scenario_stairs(b):
     b.open("?reset&play")
-    b.teleport(960, 368)
+    b.teleport(960, 416)
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
     b.hold("up", 1.6)
     s = b.state()
-    ok = check(s["mode"] == "play" and s["y"] == 240, "climbs the stairs to deck 5", s)
+    ok = check(s["mode"] == "play" and s["y"] == 272, "climbs the stairs to deck 5", s)
     time.sleep(0.2)
     b.hold("down", 1.5)
     b.hold("left", 2.0)  # ← also walks down this flight, and off it onto the deck 4 landing
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == 368 and s["x"] < 960, "walks back down to deck 4 and off along it", s)
-    b.teleport(1120, 240)
+    ok &= check(s["mode"] == "play" and s["y"] == 416 and s["x"] < 960, "walks back down to deck 4 and off along it", s)
+    b.teleport(1136, 272)
     b.hold("down", 6.0)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == 496, "holding down carries her through the landing to deck 3", s)
+    ok &= check(s["mode"] == "play" and s["y"] == 560, "holding down carries her through the landing to deck 3", s)
     return ok
 
 
 def scenario_ladder(b):
     b.open("?reset&play")
-    b.teleport(488, 368)
+    b.teleport(488, 416)
     b.hold("down", 2.6)
     s = b.state()
-    ok = check(s["y"] == 496, "climbs down the crew ladder to deck 3", s)
+    ok = check(s["y"] == 560, "climbs down the crew ladder to deck 3", s)
     b.hold("up", 2.6)
     s = b.state()
-    ok &= check(s["y"] == 368 and s["mode"] == "play", "climbs back up and stands on deck 4", s)
+    ok &= check(s["y"] == 416 and s["mode"] == "play", "climbs back up and stands on deck 4", s)
     b.hold("right", 0.4)
     s = b.state()
-    ok &= check(s["y"] == 368, "walks off the ladder top without falling through", s)
+    ok &= check(s["y"] == 416, "walks off the ladder top without falling through", s)
     return ok
 
 
 def scenario_falls(b):
     b.open("?reset&play")
     # One deck: walk off the edge of the deck 5 atrium well onto deck 4.
-    b.teleport(1265, 240)
+    b.teleport(1265, 272)
     b.hold("right", 0.35)
     time.sleep(1.0)
     s = b.state()
-    ok = check(s["mode"] == "play" and s["y"] == 368, "a one-deck fall is fine", s)
+    ok = check(s["mode"] == "play" and s["y"] == 416, "a one-deck fall is fine", s)
     # Two decks: drop through the middle of the well, where both decks are open.
-    b.teleport(1336, 240)
+    b.teleport(1336, 272)
     time.sleep(0.5)
     b.shot("long-fall")
     s = b.state()
@@ -258,7 +258,7 @@ def scenario_checkpoint(b):
 
 def scenario_vacuum(b):
     b.open("?reset&play")
-    b.teleport(730, 496)  # deck 3, the robot vacuum patrols x 704-1024
+    b.teleport(730, 560)  # deck 3, the robot vacuum patrols x 704-1024
     b.eval("window.__ship.vacuums[0].sprite.x = 760; window.__ship.vacuums[0].dir = -1")
     time.sleep(0.8)
     b.shot("vacuum-scare")
@@ -272,7 +272,7 @@ def scenario_vacuum(b):
 
 def scenario_dash(b):
     b.open("?reset&play")
-    b.teleport(1470, 496)  # the deck 3 tangerine is at x 1480
+    b.teleport(1470, 560)  # the deck 3 tangerine is at x 1480
     time.sleep(0.3)
     s = b.state()
     ok = check(s["tangerines"] == 1, "picks up a tangerine", s)
@@ -291,7 +291,7 @@ def scenario_dash(b):
 
 def scenario_overboard(b):
     b.open("?reset&play")
-    b.teleport(200, 240)  # the open aft deck, just inside the stern railing
+    b.teleport(200, 272)  # the open aft deck, just inside the stern railing
     b.key("left", True)
     b.key("space", True)
     time.sleep(0.5)

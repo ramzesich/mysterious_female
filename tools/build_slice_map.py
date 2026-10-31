@@ -15,17 +15,21 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
-COLS, ROWS = 100, 40
+COLS = 100
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT = range(1, 10)
 TILE_COUNT = 9
 
-# Deck layout: each deck is 7 rows of air over a 1-row floor slab, so one deck = 8 rows = 128px.
-DECK_PITCH = 8 * TILE
-FLOOR_ROW = {6: 7, 5: 15, 4: 23, 3: 31}  # row index of each deck's floor slab
+# Deck layout: each deck is 8 rows of air over a 1-row floor slab, so one deck = 9 rows = 144px,
+# which puts the ceiling at ~2.2x her 59px height (GAME_DESIGN.md §5.4).
+DECK_ROWS = 9
+DECK_PITCH = DECK_ROWS * TILE
+FLOOR_ROW = {d: (6 - d) * DECK_ROWS + DECK_ROWS - 1 for d in (6, 5, 4, 3)}  # row of each deck's floor slab
+ROWS = FLOOR_ROW[3] + 9                  # plus tanks and machinery below deck 3
 STERN = 10                               # hull column at the stern; everything left of it is sea and sky
-WATER_ROW = 30                           # sea surface (deck 3 sits below the waterline, as on a real ship)
+WATER_ROW = FLOOR_ROW[3] - 1             # sea surface (deck 3 sits below the waterline, as on a real ship)
+AFT_DECK_END = 23                        # last column of the open aft deck on deck 5
 
 
 def floor_y(deck):
@@ -44,29 +48,29 @@ def build_layers():
                 layer[r][c] = tile
 
     # Interior back wall behind every deck, except the open aft deck on deck 5.
-    fill(back, STERN + 1, COLS - 2, 0, 30, BACKWALL)
+    fill(back, STERN + 1, COLS - 2, 0, FLOOR_ROW[3] - 1, BACKWALL)
     for row in FLOOR_ROW.values():
         fill(back, STERN + 1, COLS - 2, row - 1, row - 1, WAINSCOT)
-    fill(back, STERN + 1, 23, 8, 14, 0)
+    fill(back, STERN + 1, AFT_DECK_END, FLOOR_ROW[6] + 1, FLOOR_ROW[5] - 1, 0)
 
     # Deck floors, stern to the slice's forward end.
     for deck, row in FLOOR_ROW.items():
         fill(solid, STERN, COLS - 1, row, row, FLOOR)
-    fill(solid, STERN, 23, FLOOR_ROW[5], FLOOR_ROW[5], TEAK)  # open aft deck
+    fill(solid, STERN, AFT_DECK_END, FLOOR_ROW[5], FLOOR_ROW[5], TEAK)  # open aft deck
 
     # Stern: deck 6 is closed off (scenery only); deck 5 ends in an open railing; decks 4 and 3 sit
     # inside the hull, which runs down into the sea.
-    fill(solid, STERN, STERN, 0, 6, STEEL)
-    fill(solid, STERN, STERN, 13, 14, RAILING)
-    fill(solid, STERN, STERN, 16, WATER_ROW - 1, STEEL)
+    fill(solid, STERN, STERN, 0, FLOOR_ROW[6] - 1, STEEL)
+    fill(solid, STERN, STERN, FLOOR_ROW[5] - 2, FLOOR_ROW[5] - 1, RAILING)
+    fill(solid, STERN, STERN, FLOOR_ROW[5] + 1, WATER_ROW - 1, STEEL)
     fill(solid, STERN, STERN, WATER_ROW, ROWS - 1, NAVY)
-    fill(solid, STERN + 1, COLS - 1, 32, ROWS - 1, STEEL)  # tanks and machinery below deck 3
+    fill(solid, STERN + 1, COLS - 1, FLOOR_ROW[3] + 1, ROWS - 1, STEEL)  # tanks and machinery below deck 3
 
-    # Wall between the open aft deck and the deck 5 interior, with a 64px doorway at floor level.
-    fill(solid, 24, 24, 8, 10, STEEL)
+    # Wall between the open aft deck and the deck 5 interior, with an 80px doorway at floor level.
+    fill(solid, AFT_DECK_END + 1, AFT_DECK_END + 1, FLOOR_ROW[6] + 1, FLOOR_ROW[5] - 6, STEEL)
 
     # Forward end of the slice.
-    fill(solid, COLS - 1, COLS - 1, 0, 31, STEEL)
+    fill(solid, COLS - 1, COLS - 1, 0, FLOOR_ROW[3], STEEL)
 
     # Atrium: a well through deck 5, and a narrower one through deck 4 underneath. The outer edges
     # are a one-deck drop; the middle drops two decks, which is a scare.
@@ -114,8 +118,8 @@ def build_objects():
         add({"id": 0, "name": name, "type": "stairs", "x": x0, "y": y0, "width": 0, "height": 0,
              "rotation": 0, "visible": True, "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}]})
 
-    stairs("stairs-4-5", 60 * TILE, floor_y(4), 70 * TILE, floor_y(5))
-    stairs("stairs-3-4", 70 * TILE, floor_y(3), 60 * TILE, floor_y(4))
+    stairs("stairs-4-5", 60 * TILE, floor_y(4), 71 * TILE, floor_y(5))
+    stairs("stairs-3-4", 71 * TILE, floor_y(3), 60 * TILE, floor_y(4))
 
     # Tangerines. One sits behind a crate stack that only the dash can break.
     add(point(0, "t-aft-deck", "tangerine", col_x(30), floor_y(5)))
@@ -129,18 +133,18 @@ def build_objects():
                  "visible": True})
 
     # Background signs and decor: muted, never interactive (GAME_DESIGN.md §2.1).
-    def sign(text, col, deck, rise=44):
+    def sign(text, col, deck, rise=52):
         add(point(0, f"sign-{text.lower().replace(' ', '-')}-{col}", "sign", col_x(col), floor_y(deck) - rise,
                   [{"name": "text", "type": "string", "value": text}]))
 
-    sign("GANGWAY", 44, 4, rise=74)
+    sign("GANGWAY", 44, 4, rise=90)
     sign("DECK 4", 57, 4)
     sign("DECK 5", 73, 5)
     sign("DECK 3", 73, 3)
     sign("CREW ONLY", 30, 4)
-    # Sized to her, like every human-scale thing (GAME_DESIGN.md §2.1): a double door ~1.3x her height.
-    add({"id": 0, "name": "shell-door", "type": "decor", "x": 42 * TILE + 8, "y": floor_y(4) - 64,
-         "width": 3 * TILE, "height": 64, "rotation": 0, "visible": True,
+    # Sized to her, like every human-scale thing (GAME_DESIGN.md §2.1): a double door ~1.35x her height.
+    add({"id": 0, "name": "shell-door", "type": "decor", "x": 42 * TILE + 4, "y": floor_y(4) - 80,
+         "width": 3 * TILE + 8, "height": 80, "rotation": 0, "visible": True,
          "properties": [{"name": "kind", "type": "string", "value": "shelldoor"}]})
 
     # A robot vacuum patrolling the deck 3 crew corridor.
