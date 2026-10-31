@@ -228,6 +228,32 @@ def scenario_ladder(b):
     return ok
 
 
+def scenario_idle(b):
+    b.open("?reset&play")
+    b.wait_for("window.__ship && window.__ship.player")
+    anim = "(window.__ship.player.anims.isPlaying ? window.__ship.player.anims.currentAnim.key : '')"
+    time.sleep(3.0)
+    ok = check(b.eval(anim) == "", "stands plainly for the first few seconds")
+    time.sleep(1.8)
+    first = b.eval(anim)
+    ok &= check(first.startswith("her-idle-"), "an idle plays after standing still", first)
+    b.shot("idle")
+    b.hold("right", 0.2)
+    ok &= check(not b.eval(anim).startswith("her-idle-"), "moving ends the idle at once")
+    b.wait_for(f"{anim}.startsWith('her-idle-')", timeout=20)
+    second = b.eval(anim)
+    ok &= check(second != first, "the next idle is a different one", f"{first} then {second}")
+    # Climbing out of the crew ladder's hatch: her hands are on the rim, not reaching for rungs.
+    b.teleport(488, 416)
+    b.hold("down", 1.2)
+    b.hold("up", 0.8)
+    frame = b.eval("window.__ship.player.frame.name")
+    out = b.eval("window.__ship.climbOutFrames")
+    ok &= check(frame in out, "climbing out of the hatch uses a climb-out frame", f"frame {frame}")
+    b.shot("climb-out")
+    return ok
+
+
 def scenario_falls(b):
     b.open("?reset&play")
     # One deck: walk off the edge of the deck 5 atrium well onto deck 4.

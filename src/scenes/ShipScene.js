@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -194,7 +194,10 @@ export class ShipScene extends Phaser.Scene {
     }
 
     buildPlayer() {
-        this.herFrames = this.cache.json.get('her-meta').frames;
+        const meta = this.cache.json.get('her-meta');
+        this.herFrames = meta.frames;
+        this.climbOutFrames = meta.anims['climb-out'];
+        this.idleAt = 0;
         const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);
         p.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
         p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight);
@@ -381,7 +384,26 @@ export class ShipScene extends Phaser.Scene {
 
         if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
-        else this.pose('stand');
+        else this.standStill(time, dir);
+    }
+
+    // Standing still is her plain side pose; after a while one of her idles plays once (§3).
+    standStill(time, dir) {
+        const p = this.player;
+        if (this.idle) {
+            if (p.anims.isPlaying && !dir) return;
+            this.idle = null;
+            this.idleAt = time + Phaser.Math.Between(IDLE.gapMs[0], IDLE.gapMs[1]);
+        }
+        if (dir || time < this.idleAt) {
+            if (dir) this.idleAt = Math.max(this.idleAt, time + IDLE.firstMs);
+            this.pose('stand');
+            return;
+        }
+        // Never the same one twice in a row.
+        const choices = IDLE.anims.filter(name => name !== this.lastIdle);
+        this.idle = this.lastIdle = Phaser.Utils.Array.GetRandom(choices);
+        p.anims.play(`her-${this.idle}`);
     }
 
     // --- Ladders ---------------------------------------------------------------------------
@@ -425,8 +447,12 @@ export class ShipScene extends Phaser.Scene {
         // to grab, so her hands come down: climbing out of the hatch, or starting down into it.
         const handsAboveLadder = p.y - PLAYER.height * 0.85 < L.topY;
         if (handsAboveLadder) {
-            if (this.ladderPose !== 'back') this.pose('back');
-            this.ladderPose = 'back';
+            // Her hands stay on the hatch rim as she rises: head, shoulder, then waist height.
+            const risen = (L.topY - (p.y - PLAYER.height * 0.85)) / (PLAYER.height * 0.85);
+            const frames = this.climbOutFrames;
+            this.pose('climb-out');
+            p.setFrame(frames[Math.min(frames.length - 1, Math.floor(risen * frames.length))]);
+            this.ladderPose = 'climb-out';
         } else {
             if (this.ladderPose !== 'climb') this.pose('climb');
             this.ladderPose = 'climb';
@@ -503,9 +529,14 @@ export class ShipScene extends Phaser.Scene {
         if ((this.stairT >= 1 && v > 0) || (this.stairT <= 0 && v < 0)) this.leaveLadderOrStairs();
     }
 
-    // Her pose: a looping animation (run, climb) at an optional speed, or a single frame.
+    // Her pose: a looping animation (run, climb) at an optional speed, or a single frame. Anything
+    // but standing still ends an idle and restarts the wait for the next one.
     pose(name, speed = 1) {
         const p = this.player;
+        if (name !== 'stand') {
+            this.idle = null;
+            this.idleAt = this.time.now + IDLE.firstMs;
+        }
         const key = `her-${name}`;
         if (this.anims.exists(key)) {
             p.anims.play(key, true);

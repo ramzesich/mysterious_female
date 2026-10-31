@@ -124,10 +124,14 @@ Reference photos never enter the repo.
 - **Her sprite (Decided):** generated with PixelLab (natural proportions, the most detailed of four
   tries), then edited for longer hair flipping outward at the ends and fair skin, and converted to
   Resurrect 64. Animations so far: run, jump (rise / apex / fall poses) and a ladder climb from
-  behind, hands alternating. Run and climb use PixelLab's skeleton mode, which moves her standing
+  behind, hands alternating, and climbing out of a hatch (hands on the rim at head, shoulder,
+  then waist height as she rises). Run, climb and the idles use PixelLab's skeleton mode, which moves her standing
   sprite rather than redrawing it, so her hair stays the length it is when standing still.
-- **Idle: Open.** The generated breathing idle looked wrong; for now standing still is her plain
-  side pose. A proper idle gets designed later, probably from one of her quirks.
+- **Idle (Decided):** standing still is her plain side pose. After 4 seconds one of three idles plays
+  once, then another every 6 to 10 seconds, never the same twice in a row; any move ends it at
+  once. The three: hands on hips tapping a foot (the taps repeat), looking back over her shoulder,
+  and buffing her nails on one hand, then holding it out to admire them. More can join the
+  rotation as her quirks come up.
 
 ### 3.1 Controls
 
@@ -485,13 +489,12 @@ Nothing blocks the start of the build. These get settled along the way:
 
 **Next up** (as of 2026-10-31):
 
-- [ ] A "climbing out" pose at the top of a ladder, hands on the hatch edge (~1 generation); for now
-      she uses her arms-down back pose there
-- [ ] Her proper idle (the generated one was parked; §3)
+- [x] Climbing out of a hatch at the top of a ladder (§3)
+- [x] Her idles: foot tap, look back, nails (§3)
 - [ ] Bumbot's sprite and his five idle activities (§4)
 - [ ] First real ship tiles and props: test PixelLab against Retro Diffusion before committing (§2.1)
-- [ ] PixelLab: trial nearly used up (5.75 generations left); subscribe for one month when the batch
-      of characters and tiles is ready
+- [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
+      2026-11-30. Skeleton-v3 clips cost 2 (3 frames), 3 (4-14 frames) or 4 (15 frames)
 
 - [ ] Art: which tools you pick (§2.1)
 - [ ] Deck list and which areas go where, from the real deck plans, as the map is laid out (§5.3, §5.7)

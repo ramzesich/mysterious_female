@@ -35,8 +35,8 @@ truth**: read the relevant section before any design or content work, and record
 
 ## Art: PixelLab (MCP)
 
-- Generations cost money (trial, then a short paid month). **State the cost and ask before spending
-  generations.** The trial runs one job at a time.
+- Generations cost money (Tier 1 month: 2000 generations until 2026-11-30). **State the cost and
+  ask before spending generations.** Several jobs can run at once.
 - For her animations use `skeleton-v3` mode: it moves her stored sprite instead of redrawing it, so
   hair and proportions stay consistent. Template mode redraws and drifts.
 - Save raw output to `assets/source/`, convert with the palette tools, never commit reference photos.

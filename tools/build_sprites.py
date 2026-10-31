@@ -28,10 +28,12 @@ HER = {
     # breathing bob, a running bounce) relative to the standing baseline; "feet" puts the frame's
     # lowest pixel on the bottom row, for airborne poses whose source includes the jump's height.
     "frames": {
-        # Standing still: her plain side pose. The generated breathing idle looked wrong and is
-        # parked until we design a proper one (GAME_DESIGN.md §3).
+        # Standing still: her plain side pose. Every so often one of her idles plays once
+        # (GAME_DESIGN.md §3); all three are skeleton-v3, starting and ending near "stand".
         "stand": [("rotations/east.png", "keep")],
-        "idle": [(f"idle/{i}.png", "keep") for i in range(4)],
+        "idle-tap": [(f"idle-tap-2/{i}.png", "keep") for i in range(8)],
+        "idle-look": [(f"idle-look/{i}.png", "keep") for i in range(8)],
+        "idle-nails": [(f"idle-nails/{i}.png", "keep") for i in range(8)],
         # skeleton-v3 run: moves her standing sprite instead of redrawing it, so her hair keeps its
         # standing length (the first, template run let it grow and puff up).
         "run": [(f"run-steady/{i}.png", "keep") for i in range(8)],
@@ -43,6 +45,9 @@ HER = {
         "climb": [(f"climb-alternating/{i}.png", "keep") for i in range(8)],
         "front": [("rotations/south.png", "keep")],
         "back": [("rotations/north.png", "keep")],
+        # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
+        # height, a knee coming up. The game picks the frame by how far she has risen.
+        "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

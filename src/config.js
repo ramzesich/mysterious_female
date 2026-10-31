@@ -25,6 +25,13 @@ export const PLAYER = {
     stairsBoardReach: 10, // how close to a flight's end she must be to step onto it
 };
 
+// Her idles (§3): after standing still for firstMs one plays once, then another every gapMs.
+export const IDLE = {
+    firstMs: 4000,
+    gapMs: [6000, 10000],
+    anims: ['idle-tap', 'idle-look', 'idle-nails'],
+};
+
 export const DASH = {
     durationMs: 10000,
     speedMultiplier: 2,
