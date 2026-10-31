@@ -1,4 +1,4 @@
-import { PLAYER } from '../config.js';
+import { PLAYER, BUMBOT } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -12,6 +12,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
+        this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
+        this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
     }
 
     create() {
@@ -31,6 +33,15 @@ export class BootScene extends Phaser.Scene {
         // The look back holds on its turned frames (2-4) for about a second, or it is missed.
         const look = [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7];
         this.anims.create({ key: 'her-idle-look', frames: frames('idle-look', look), frameRate: 7 });
+        // Bumbot: his spot activities loop until she comes close; the run is his escape.
+        const cat = this.cache.json.get('bumbot-meta');
+        const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>
+            order.map(i => ({ key: 'bumbot', frame: cat.anims[name][i] }));
+        for (const [name, fps, repeat] of [['run', 16, -1], ['wash', 7, -1], ['sit', 6, 0], ['eat', 7, -1], ['jump', 12, 0]]) {
+            this.anims.create({ key: `bumbot-${name}`, frames: catFrames(name), frameRate: fps, repeat });
+        }
+        // Batting: seated, paw down and up. Its frames 6 and 8 drew stray blobs, so they are skipped.
+        this.anims.create({ key: 'bumbot-bat', frames: catFrames('bat', [4, 5, 7, 5]), frameRate: 6, repeat: -1 });
         const params = new URLSearchParams(location.search);
         this.scene.start(params.has('play') ? 'ship' : 'title');
     }

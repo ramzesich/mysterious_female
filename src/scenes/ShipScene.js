@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -85,6 +85,7 @@ export class ShipScene extends Phaser.Scene {
         this.tangerines = [];
         this.flights = [];
         this.vacuums = [];
+        this.cats = [];
         this.crates = this.physics.add.staticGroup();
         const stairsGfx = this.add.graphics().setDepth(DEPTH.stairs);
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
@@ -144,6 +145,21 @@ export class ShipScene extends Phaser.Scene {
                         sprite, alive: true, dir: 1,
                         minX: prop(o, 'minX', o.x - 80), maxX: prop(o, 'maxX', o.x + 80), speed: prop(o, 'speed', 40),
                     });
+                    break;
+                }
+
+                case 'bumbot': {
+                    const activity = prop(o, 'activity', 'wash');
+                    const sprite = this.add.sprite(o.x, o.y, 'bumbot').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    if (activity === 'asleep') {
+                        // One still pose that breathes, slowly.
+                        sprite.setFrame(this.cache.json.get('bumbot-meta').frames.asleep);
+                        this.tweens.add({ targets: sprite, scaleY: 1.06, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                    } else {
+                        sprite.play(`bumbot-${activity}`);
+                    }
+                    this.worldLayer.add(sprite);
+                    this.cats.push({ sprite, escape: prop(o, 'escape', 1), gone: false });
                     break;
                 }
 
@@ -330,6 +346,7 @@ export class ShipScene extends Phaser.Scene {
             this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
+            this.checkBumbot();
         }
         this.updateDash(time);
         this.updateOverlays();
@@ -629,6 +646,64 @@ export class ShipScene extends Phaser.Scene {
                 return;
             }
         }
+    }
+
+    // --- Bumbot ------------------------------------------------------------------------------
+
+    checkBumbot() {
+        const p = this.player;
+        if (this.mode !== 'play') return;
+        for (const cat of this.cats) {
+            const s = cat.sprite;
+            if (cat.gone || Math.abs(p.y - s.y) > 8 || Math.abs(p.x - s.x) > BUMBOT.noticeReach) continue;
+            this.nearCatch(cat);
+            return;
+        }
+    }
+
+    // A near-catch (§4): input locked, she lunges, he startles and slips away. For now he runs off
+    // the screen toward his escape side and is gone; the real spots send him somewhere she can't
+    // follow yet.
+    nearCatch(cat) {
+        const p = this.player;
+        const s = cat.sprite;
+        cat.gone = true;
+        this.mode = 'scripted';
+        this.script = null;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        const toward = s.x >= p.x ? 1 : -1;
+        p.setFlipX(toward < 0);
+        this.pose('rise');
+        sfx.jump();
+        this.tweens.add({
+            targets: p, x: s.x - toward * 10, duration: BUMBOT.lungeMs, ease: 'Quad.easeOut',
+        });
+        this.tweens.add({
+            targets: p, y: p.y - 12, duration: BUMBOT.lungeMs / 2, yoyo: true, ease: 'Quad.easeOut',
+            onComplete: () => this.pose('front'),
+        });
+        // He hears her a beat before she lands: a startled hop, then gone.
+        this.tweens.killTweensOf(s);
+        s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
+        this.time.delayedCall(BUMBOT.lungeMs * 0.6, () => {
+            sfx.mrrp();
+            s.play('bumbot-run');
+            this.script = (dt) => {
+                s.x += cat.escape * BUMBOT.runSpeed * dt;
+                const view = this.cameras.main.worldView;
+                if (s.x < view.x - 40 || s.x > view.right + 40) {
+                    s.setVisible(false).stop();
+                    this.script = null;
+                    this.time.delayedCall(350, () => {
+                        p.body.enable = true;
+                        p.body.reset(p.x, p.y);
+                        this.pose('stand');
+                        this.mode = 'play';
+                    });
+                }
+            };
+        });
     }
 
     smash(x, y) {

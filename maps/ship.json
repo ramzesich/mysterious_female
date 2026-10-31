@@ -10,7 +10,7 @@
  "tilewidth": 16,
  "tileheight": 16,
  "nextlayerid": 5,
- "nextobjectid": 21,
+ "nextobjectid": 22,
  "properties": [
   {
    "name": "deckPitch",
@@ -13578,6 +13578,30 @@
     },
     {
      "id": 20,
+     "name": "bumbot-test",
+     "type": "bumbot",
+     "x": 616,
+     "y": 416,
+     "width": 0,
+     "height": 0,
+     "rotation": 0,
+     "visible": true,
+     "point": true,
+     "properties": [
+      {
+       "name": "activity",
+       "type": "string",
+       "value": "wash"
+      },
+      {
+       "name": "escape",
+       "type": "int",
+       "value": -1
+      }
+     ]
+    },
+    {
+     "id": 21,
      "name": "vacuum-1",
      "type": "vacuum",
      "x": 872,

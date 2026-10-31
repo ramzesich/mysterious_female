@@ -254,6 +254,26 @@ def scenario_idle(b):
     return ok
 
 
+def scenario_bumbot(b):
+    b.open("?reset&play")
+    b.wait_for("window.__ship && window.__ship.player")
+    cat = "window.__ship.cats[0]"
+    ok = check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash", "Bumbot is washing on deck 4")
+    b.shot("bumbot-wash")
+    b.key("left", True)
+    b.wait_for("window.__ship.mode === 'scripted'", timeout=5)
+    b.key("left", False)
+    time.sleep(0.15)
+    b.shot("bumbot-lunge")
+    ok &= check(b.eval(f"{cat}.gone"), "getting close starts a near-catch")
+    b.wait_for("window.__ship.mode === 'play'", timeout=6)
+    s = b.state()
+    ok &= check(not b.eval(f"{cat}.sprite.visible") and s["y"] == 416, "he gets away and she can play on", s)
+    b.hold("left", 0.3)
+    ok &= check(b.state()["mode"] == "play", "no second near-catch once he is gone")
+    return ok
+
+
 def scenario_falls(b):
     b.open("?reset&play")
     # One deck: walk off the edge of the deck 5 atrium well onto deck 4.

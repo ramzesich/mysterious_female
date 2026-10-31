@@ -56,6 +56,34 @@ HER = {
 }
 
 
+def seq(char, folder, anchor="keep"):
+    """Every frame in assets/source/<char>/<folder>/, in order."""
+    n = len(list((ROOT / "assets" / "source" / char / folder).glob("*.png")))
+    return [(f"{folder}/{i}.png", anchor) for i in range(n)]
+
+
+# Bumbot. Sources face east. His rotations are our own 2/3 shrink of PixelLab's 48px design
+# (GAME_DESIGN.md §4); the animations are PixelLab's, made from that shrunk sprite.
+BUMBOT = {
+    "name": "bumbot",
+    "cell": 64,
+    "remap": {},
+    "frames": {
+        "stand": [("rotations/east.png", "keep")],
+        "run": seq("bumbot", "run"),
+        "wash": seq("bumbot", "wash", "feet"),
+        "jump": seq("bumbot", "jump"),
+        "sit": seq("bumbot", "sit", "feet"),
+        "eat": seq("bumbot", "eat", "feet"),
+        "bat": seq("bumbot", "bat", "feet"),
+        # Asleep: the last frame of a v3 "lies down and curls up". The pro "curled up" state drew a
+        # featureless ball as tall as he stands, so it is kept in assets/source but not used.
+        "asleep": [("curl-up/8.png", "feet")],
+    },
+    "baseline": "rotations/east.png",
+}
+
+
 def lowest_row(img):
     return img.getbbox()[3] - 1
 
@@ -111,3 +139,4 @@ def build(spec):
 
 if __name__ == "__main__":
     build(HER)
+    build(BUMBOT)

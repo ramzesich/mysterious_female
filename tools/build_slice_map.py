@@ -147,6 +147,13 @@ def build_objects():
          "width": 3 * TILE + 8, "height": 80, "rotation": 0, "visible": True,
          "properties": [{"name": "kind", "type": "string", "value": "shelldoor"}]})
 
+    # Bumbot, for now: washing on deck 4 aft of the gangway. When she gets close he slips away
+    # toward the stern (a stand-in for the five near-catch spots, GAME_DESIGN.md §4).
+    add(point(0, "bumbot-test", "bumbot", col_x(38), floor_y(4), [
+        {"name": "activity", "type": "string", "value": "wash"},
+        {"name": "escape", "type": "int", "value": -1},
+    ]))
+
     # A robot vacuum patrolling the deck 3 crew corridor.
     add(point(0, "vacuum-1", "vacuum", col_x(54), floor_y(3), [
         {"name": "minX", "type": "float", "value": 44 * TILE},

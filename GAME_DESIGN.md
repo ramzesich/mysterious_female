@@ -212,6 +212,14 @@ it is her battle cry here.
   smaller redraws lost his look, so we shrank it ourselves (box resampling to 2/3, snapped back to
   Resurrect 64): about **28px tall standing**, a little above her knee. Faint grey streaks from
   each ear to the outer corner of the eye were added by hand, as on the real cat.
+- **His animations (Decided):** run (his escape), washing (theatre), a leap (the startle, and the
+  fly at the pool), sitting down and staying sat (the fish at the buffet), eating (the ice cream
+  machine, deck 11), batting with a paw (the bridge), and asleep (laundry), which breathes in code.
+  Asleep is lying down with eyes closed, not yet the round bagel: the curled-up pose PixelLab drew
+  was a featureless ball as tall as he stands. **Open:** whether to hand-wrap his tail round him.
+- **For now (test slice):** he washes on deck 4 aft of the gangway. When she comes within 60px she
+  lunges, he startles and runs off the screen toward the stern, and she turns to the camera. The
+  real near-catch spots and escapes come with the ship layout.
 
 **Decided:** between the five spots he also turns up in **background glimpses**: a tail vanishing
 round a corner, a cat silhouette on the deck above, a shape passing a window. He can't be reached
@@ -497,7 +505,9 @@ Nothing blocks the start of the build. These get settled along the way:
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
 - [x] Her idles: foot tap, look back (§3)
-- [ ] Bumbot's sprite and his five idle activities (§4)
+- [x] Bumbot's sprite and his five activities, plus run, leap and eating (§4)
+- [ ] The finale's art: her holding Bumbot (a state of her character, ~10 generations, or her
+      arms-out pose with his sprite on top), designed with the win sequence (§4)
 - [ ] First real ship tiles and props: test PixelLab against Retro Diffusion before committing (§2.1)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
       2026-11-30. Skeleton-v3 clips cost 2 (3 frames), 3 (4-14 frames) or 4 (15 frames)
