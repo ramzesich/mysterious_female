@@ -28,22 +28,38 @@ HER = {
     # breathing bob, a running bounce) relative to the standing baseline; "feet" puts the frame's
     # lowest pixel on the bottom row, for airborne poses whose source includes the jump's height.
     "frames": {
+        # Standing still: her plain side pose. The generated breathing idle looked wrong and is
+        # parked until we design a proper one (GAME_DESIGN.md §3).
+        "stand": [("rotations/east.png", "keep")],
         "idle": [(f"idle/{i}.png", "keep") for i in range(4)],
-        "run": [(f"run/{i}.png", "keep") for i in range(8)],
+        # skeleton-v3 run: moves her standing sprite instead of redrawing it, so her hair keeps its
+        # standing length (the first, template run let it grow and puff up).
+        "run": [(f"run-steady/{i}.png", "keep") for i in range(8)],
         "rise": [("jump/3.png", "feet")],
         "apex": [("jump/4.png", "feet")],
         "fall": [("jump/5.png", "feet")],
-        "climb": [(f"climb/{i}.png", "keep") for i in range(1, 9)],
+        # skeleton-v3 climb (PixelLab's built-in climb move): hands reach up in turn. The first,
+        # text-described climb moved both hands together.
+        "climb": [(f"climb-alternating/{i}.png", "keep") for i in range(8)],
         "front": [("rotations/south.png", "keep")],
         "back": [("rotations/north.png", "keep")],
     },
-    # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames.
+    # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
+    # of the same canvas size. Frames on another canvas use their own animation's lowest row.
     "baseline": "idle/0.png",
 }
 
 
 def lowest_row(img):
     return img.getbbox()[3] - 1
+
+
+def paste(dst, src, x, y):
+    """alpha_composite that clips a source larger than (or hanging off) the destination."""
+    left, top = max(0, -x), max(0, -y)
+    right, bottom = min(src.width, dst.width - x), min(src.height, dst.height - y)
+    if right > left and bottom > top:
+        dst.alpha_composite(src.crop((left, top, right, bottom)), (x + left, y + top))
 
 
 def build(spec):
@@ -61,15 +77,17 @@ def build(spec):
     cells, meta = [], {"cell": cell, "frames": {}, "anims": {}}
     for anim, sources in spec["frames"].items():
         indices = []
-        for path, anchor in sources:
-            img = palettize(Image.open(src_dir / path), remap)
-            feet = standing_feet(img.size) if anchor == "keep" else None
-            if feet is None:
+        images = [(palettize(Image.open(src_dir / path), remap), anchor) for path, anchor in sources]
+        anim_feet = max(lowest_row(img) for img, _ in images)
+        for img, anchor in images:
+            if anchor == "keep":
+                feet = standing_feet(img.size)
+                if feet is None:
+                    feet = anim_feet
+            else:
                 feet = lowest_row(img)
-            x = (cell - img.width) // 2
-            y = cell - 1 - feet
             frame = Image.new("RGBA", (cell, cell), (0, 0, 0, 0))
-            frame.alpha_composite(img, (x, y)) if y >= 0 else frame.alpha_composite(img.crop((0, -y, img.width, img.height)), (x, 0))
+            paste(frame, img, (cell - img.width) // 2, cell - 1 - feet)
             indices.append(len(cells))
             cells.append(frame)
         meta["anims"][anim] = indices

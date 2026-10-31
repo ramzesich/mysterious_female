@@ -16,9 +16,10 @@ export class BootScene extends Phaser.Scene {
 
     create() {
         makeTextures(this);
-        // Her looping animations; single poses (rise, apex, fall, front, back) are set as frames.
+        // Her looping animations; single poses (stand, rise, apex, fall, front, back) are set as
+        // frames. The generated idle is not used for now: standing still is the plain `stand` pose.
         const meta = this.cache.json.get('her-meta');
-        for (const [name, fps] of [['idle', 5], ['run', 14], ['climb', 10]]) {
+        for (const [name, fps] of [['run', 14], ['climb', 10]]) {
             this.anims.create({
                 key: `her-${name}`,
                 frames: meta.anims[name].map(frame => ({ key: 'her', frame })),

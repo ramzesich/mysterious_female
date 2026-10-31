@@ -123,8 +123,11 @@ Reference photos never enter the repo.
   it. Bumbot is stylised larger than a real cat would be next to her, or he would be a speck.
 - **Her sprite (Decided):** generated with PixelLab (natural proportions, the most detailed of four
   tries), then edited for longer hair flipping outward at the ends and fair skin, and converted to
-  Resurrect 64. Animations so far: idle, run, jump (rise / apex / fall poses) and a ladder climb
-  from behind. The run's hair puffs up in some frames; re-roll later if it bothers us in motion.
+  Resurrect 64. Animations so far: run, jump (rise / apex / fall poses) and a ladder climb from
+  behind, hands alternating. Run and climb use PixelLab's skeleton mode, which moves her standing
+  sprite rather than redrawing it, so her hair stays the length it is when standing still.
+- **Idle: Open.** The generated breathing idle looked wrong; for now standing still is her plain
+  side pose. A proper idle gets designed later, probably from one of her quirks.
 
 ### 3.1 Controls
 

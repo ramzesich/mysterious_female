@@ -212,7 +212,9 @@ def scenario_stairs(b):
 def scenario_ladder(b):
     b.open("?reset&play")
     b.teleport(488, 416)
-    b.hold("down", 2.6)
+    b.hold("down", 0.9)
+    b.shot("ladder-climbing")
+    b.hold("down", 1.7)
     s = b.state()
     ok = check(s["y"] == 560, "climbs down the crew ladder to deck 3", s)
     b.hold("up", 2.6)

@@ -195,7 +195,7 @@ export class ShipScene extends Phaser.Scene {
 
     buildPlayer() {
         this.herFrames = this.cache.json.get('her-meta').frames;
-        const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.idle).setOrigin(0.5, 1).setDepth(DEPTH.player);
+        const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);
         p.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
         p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight);
         p.body.setMaxVelocity(10000, PLAYER.maxFall);
@@ -281,7 +281,7 @@ export class ShipScene extends Phaser.Scene {
     spawnAt(point, { emerge = false } = {}) {
         const p = this.player;
         p.clearAlpha().setCrop().setDepth(DEPTH.player).setFlipX(false);
-        this.pose('idle');
+        this.pose('stand');
         p.body.enable = true;
         p.body.reset(point.x, point.y);
         p.body.allowGravity = true;
@@ -381,7 +381,7 @@ export class ShipScene extends Phaser.Scene {
 
         if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
-        else this.pose('idle');
+        else this.pose('stand');
     }
 
     // --- Ladders ---------------------------------------------------------------------------
@@ -437,7 +437,7 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         this.mode = 'play';
         p.setDepth(DEPTH.player);
-        this.pose('idle');
+        this.pose('stand');
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
@@ -485,13 +485,13 @@ export class ShipScene extends Phaser.Scene {
             p.setFlipX(v * upward < 0);
             this.pose('run', 0.8);
         } else {
-            this.pose('idle');
+            this.pose('stand');
         }
 
         if ((this.stairT >= 1 && v > 0) || (this.stairT <= 0 && v < 0)) this.leaveLadderOrStairs();
     }
 
-    // Her pose: a looping animation (idle, run, climb) at an optional speed, or a single frame.
+    // Her pose: a looping animation (run, climb) at an optional speed, or a single frame.
     pose(name, speed = 1) {
         const p = this.player;
         const key = `her-${name}`;
