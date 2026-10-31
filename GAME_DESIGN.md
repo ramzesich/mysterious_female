@@ -256,7 +256,8 @@ there; they only remind her he's on board.
   through a landing onto the next flight.
 - **Ladders** only where real ones exist: crew and technical areas, the pool, lifeboat stations, the
   mast and funnel, emergency escape shafts. Guests don't climb ladders on a real ship.
-- **Elevators:** guest elevators are free to use; crew service elevators need cards.
+- **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
+  never opens onto an area she can't reach yet.** How they are operated: **Open**.
 
 ### 5.2 At sea
 
@@ -281,7 +282,25 @@ Real-world figures ([NCL ship map](https://app.ncl.com/sites/default/files/Ship_
 - Passenger decks are numbered **4 to 12**; the decks below are crew and machinery.
 - Deck 11, aft: an open-air diner with a self-service ice cream machine (the final catch).
 
-**Deck list:** the starting point, corrected against the real deck plans as we lay out the map.
+**Decided (layout, 2026-10-31):** from NCL's side profile of the ship (the ship map PDF above).
+
+- **The bow is on the left**, the stern on the right.
+- Three stair-and-elevator cores: **forward** (~79 m from the bow), **midship** (~96 m) and **aft**
+  (~198 m). The **atrium** spans decks 5–9 between the forward and midship cores, with glass
+  elevators. The funnel stands over the aft half.
+- **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
+- **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
+  as it naturally would, but she can't get there. There are no crew or engine decks to explore.
+- **The map builder places venues by their real position** along the ship, deck by deck, from a
+  list (`tools/ship_layout.py`); the art is placeholder until the real tiles come.
+
+![The ship from the side, bow on the left](docs/ship-profile.svg)
+
+The schematic is drawn from `tools/ship_layout.py` (`python tools/draw_ship_profile.py`), the same
+list the map builder reads: edit positions there, not in this picture. Spans are approximate,
+true to the order and rough size of things on the real ship.
+
+**The earlier deck list** (before the profile), kept for reference:
 
 | Deck | Role in the game |
 |---|---|
