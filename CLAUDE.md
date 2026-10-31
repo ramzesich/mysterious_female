@@ -43,6 +43,9 @@ truth**: read the relevant section before any design or content work, and record
 - Her PixelLab character (all animations come from it): **"Bumbusik (final)"**,
   id `ebd5dadc-1318-4717-b0c0-6f429a7a58f0`, 4 directions, 64px. Earlier tries are kept on PixelLab
   for comparison; don't animate those.
+- Bumbot's PixelLab character: **"Bumbot (final)"**, id `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855`, 4
+  directions, 48px canvas: our hand-shrunk sprite imported, not generated. The 48px candidate it
+  came from (`assets/source/bumbot/pixellab/`) and the other tries are kept for comparison.
 
 ## Working with the user
 

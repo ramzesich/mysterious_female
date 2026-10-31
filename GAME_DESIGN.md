@@ -206,6 +206,12 @@ it is her battle cry here.
   where to go next. Whichever near-catch is her **fifth**, he runs toward deck 11 aft, and the diner
   opens.
 - He is a black Bombay cat, redrawn in the game's art style (§2.1).
+- **His sprite (Decided):** PixelLab pro mode designed him from a photo of the real Bumbot: slim,
+  glossy black, pale yellow-green eyes, a small grey patch below the throat where a bow tie would
+  be, no collar. It came out about 42px tall standing, too big next to her, and PixelLab's own
+  smaller redraws lost his look, so we shrank it ourselves (box resampling to 2/3, snapped back to
+  Resurrect 64): about **28px tall standing**, a little above her knee. Faint grey streaks from
+  each ear to the outer corner of the eye were added by hand, as on the real cat.
 
 **Decided:** between the five spots he also turns up in **background glimpses**: a tail vanishing
 round a corner, a cat silhouette on the deck above, a shape passing a window. He can't be reached
