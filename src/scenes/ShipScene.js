@@ -661,9 +661,9 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // A near-catch (§4): input locked, she lunges, he startles and slips away. For now he runs off
-    // the screen toward his escape side and is gone; the real spots send him somewhere she can't
-    // follow yet.
+    // A near-catch (§4): input locked, she walks up and bends down to pick him up, and just before
+    // her hands get there he leaps away. For now he runs off the screen toward his escape side and
+    // is gone; the real spots send him somewhere she can't follow yet.
     nearCatch(cat) {
         const p = this.player;
         const s = cat.sprite;
@@ -674,35 +674,54 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = false;
         const toward = s.x >= p.x ? 1 : -1;
         p.setFlipX(toward < 0);
-        this.pose('rise');
-        sfx.jump();
+        let catAway = false;
+        let herDone = false;
+        const finish = () => {
+            if (!catAway || !herDone) return;
+            p.body.enable = true;
+            p.body.reset(p.x, p.y);
+            this.pose('stand');
+            this.mode = 'play';
+        };
+
+        // Up to arm's length from him, at a walk.
+        const stopX = s.x - toward * BUMBOT.reachGap;
+        const walkMs = Math.max(0, (Math.abs(stopX - p.x) / (PLAYER.runSpeed * 0.6)) * 1000);
+        this.pose('run', 0.6);
         this.tweens.add({
-            targets: p, x: s.x - toward * 10, duration: BUMBOT.lungeMs, ease: 'Quad.easeOut',
-        });
-        this.tweens.add({
-            targets: p, y: p.y - 12, duration: BUMBOT.lungeMs / 2, yoyo: true, ease: 'Quad.easeOut',
-            onComplete: () => this.pose('front'),
-        });
-        // He hears her a beat before she lands: a startled hop, then gone.
-        this.tweens.killTweensOf(s);
-        s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
-        this.time.delayedCall(BUMBOT.lungeMs * 0.6, () => {
-            sfx.mrrp();
-            s.play('bumbot-run');
-            this.script = (dt) => {
-                s.x += cat.escape * BUMBOT.runSpeed * dt;
-                const view = this.cameras.main.worldView;
-                if (s.x < view.x - 40 || s.x > view.right + 40) {
-                    s.setVisible(false).stop();
-                    this.script = null;
-                    this.time.delayedCall(350, () => {
-                        p.body.enable = true;
-                        p.body.reset(p.x, p.y);
-                        this.pose('stand');
-                        this.mode = 'play';
+            targets: p, x: stopX, duration: walkMs,
+            onComplete: () => {
+                p.anims.play('her-reach');
+                // He hears her a beat before her hands arrive: a startled leap, then gone.
+                this.time.delayedCall(BUMBOT.startleMs, () => {
+                    this.tweens.killTweensOf(s);
+                    s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
+                    this.time.delayedCall(BUMBOT.leapMs, () => {
+                        sfx.mrrp();
+                        s.play('bumbot-run');
+                        this.script = (dt) => {
+                            s.x += cat.escape * BUMBOT.runSpeed * dt;
+                            const view = this.cameras.main.worldView;
+                            if (s.x < view.x - 40 || s.x > view.right + 40) {
+                                s.setVisible(false).stop();
+                                this.script = null;
+                                catAway = true;
+                                finish();
+                            }
+                        };
                     });
-                }
-            };
+                });
+                // Left reaching at nothing for a moment, then she straightens up and turns to us.
+                p.once('animationcomplete-her-reach', () => {
+                    this.time.delayedCall(BUMBOT.holdMs, () => {
+                        p.anims.play('her-straighten');
+                        p.once('animationcomplete-her-straighten', () => {
+                            this.pose('front');
+                            this.time.delayedCall(BUMBOT.frontMs, () => { herDone = true; finish(); });
+                        });
+                    });
+                });
+            },
         });
     }
 

@@ -46,6 +46,9 @@ HER = {
         "climb": [(f"climb-alternating/{i}.png", "keep") for i in range(8)],
         "front": [("rotations/south.png", "keep")],
         "back": [("rotations/north.png", "keep")],
+        # Bending down with her arms out to pick Bumbot up (a near-catch, GAME_DESIGN.md §4). Her
+        # back foot stays planted, so each frame's lowest pixel goes on the floor.
+        "reach": [(f"reach/{i}.png", "feet") for i in range(5)],
         # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
         # height, a knee coming up. The game picks the frame by how far she has risen.
         "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],

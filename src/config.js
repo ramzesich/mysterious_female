@@ -35,8 +35,12 @@ export const IDLE = {
 // Bumbot (§4): about 28px tall standing, stylised larger than a real cat beside her.
 export const BUMBOT = {
     cell: 64,           // his sprite sheet's frame size; the feet sit on its bottom row
-    noticeReach: 60,    // she lunges for him once she is this close on his deck
-    lungeMs: 260,
+    noticeReach: 60,    // she goes to pick him up once she is this close on his deck
+    reachGap: 34,       // where she stops: her hands, bent down, just short of him
+    startleMs: 280,     // into her reach, when he hears her and leaps
+    leapMs: 160,        // the leap before he runs
+    holdMs: 450,        // she stays bent, reaching at nothing
+    frontMs: 600,       // then turns to us before play goes on
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 

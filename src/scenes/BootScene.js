@@ -33,6 +33,9 @@ export class BootScene extends Phaser.Scene {
         // The look back holds on its turned frames (2-4) for about a second, or it is missed.
         const look = [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7];
         this.anims.create({ key: 'her-idle-look', frames: frames('idle-look', look), frameRate: 7 });
+        // Bending down to pick Bumbot up (a near-catch), and straightening up again.
+        this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
+        this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

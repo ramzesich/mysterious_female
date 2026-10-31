@@ -181,7 +181,7 @@ it is her battle cry here.
 - Bumbot appears at **five places** on the ship, each one a **near-catch moment**: a mini-scene where
   she almost grabs him and he slips away with a funny animation, then play continues.
 - Until she reaches him, he is **doing something cat-like** in his spot, and each spot gets something
-  different: sleeping curled in a bagel, washing himself, catching a fly, and so on.
+  different: asleep in the warm towels, washing himself, catching a fly, and so on.
 - A near-catch is a short scripted sequence with input locked: she lunges, he escapes — up a ladder
   she can't use yet, into a vent, onto a passing tray, behind a door that slams shut.
 - **Each near-catch spot is also a checkpoint** (§5.5).
@@ -189,7 +189,7 @@ it is her battle cry here.
 
   | Spot | What he is doing |
   |---|---|
-  | Laundry (crew decks) | Asleep in a bagel pose in the warm towels |
+  | Laundry (crew decks) | Asleep in the warm towels |
   | Theatre stage | Washing himself under a spotlight |
   | Buffet | Eyeing a fish |
   | Pool deck | Catching a fly over a sunbed |
@@ -215,11 +215,13 @@ it is her battle cry here.
 - **His animations (Decided):** run (his escape), washing (theatre), a leap (the startle, and the
   fly at the pool), sitting down and staying sat (the fish at the buffet), eating (the ice cream
   machine, deck 11), batting with a paw (the bridge), and asleep (laundry), which breathes in code.
-  Asleep is lying down with eyes closed, not yet the round bagel: the curled-up pose PixelLab drew
-  was a featureless ball as tall as he stands. **Open:** whether to hand-wrap his tail round him.
-- **For now (test slice):** he washes on deck 4 aft of the gangway. When she comes within 60px she
-  lunges, he startles and runs off the screen toward the stern, and she turns to the camera. The
-  real near-catch spots and escapes come with the ship layout.
+  Asleep is side-on, lying down with eyes closed and the tail out behind. A curled-up "bagel" was
+  dropped: from the side it barely reads, and PixelLab drew it as a ball seen from above.
+- **A near-catch (Decided):** she tries to **pick him up**: she walks up to him, bends down with
+  both arms out, and just before her hands reach him he leaps away and runs. She stays bent a
+  moment, straightens, and turns to the camera. Then play goes on.
+- **For now (test slice):** he washes on deck 4 aft of the gangway and runs off the screen toward
+  the stern. The real near-catch spots and escapes come with the ship layout.
 
 **Decided:** between the five spots he also turns up in **background glimpses**: a tail vanishing
 round a corner, a cat silhouette on the deck above, a shape passing a window. He can't be reached

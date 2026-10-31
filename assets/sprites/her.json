@@ -11,7 +11,8 @@
   "climb": 28,
   "front": 36,
   "back": 37,
-  "climb-out": 38
+  "reach": 38,
+  "climb-out": 43
  },
  "anims": {
   "stand": [
@@ -72,10 +73,17 @@
   "back": [
    37
   ],
-  "climb-out": [
+  "reach": [
    38,
    39,
-   40
+   40,
+   41,
+   42
+  ],
+  "climb-out": [
+   43,
+   44,
+   45
   ]
  }
 }
