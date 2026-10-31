@@ -411,6 +411,7 @@ export class ShipScene extends Phaser.Scene {
         p.x = this.ladder.x;
         p.setFlipX(false);
         this.pose('climb');
+        this.ladderPose = 'climb';
         return true;
     }
 
@@ -419,8 +420,19 @@ export class ShipScene extends Phaser.Scene {
         const L = this.ladder;
         const v = (input.down ? 1 : 0) - (input.up ? 1 : 0);
         p.y = Phaser.Math.Clamp(p.y + v * PLAYER.climbSpeed * dt, L.topY, L.bottomY);
-        if (v) p.anims.resume();
-        else p.anims.pause();
+
+        // Her hands reach to about head height. Once that is above the last rung there is nothing
+        // to grab, so her hands come down: climbing out of the hatch, or starting down into it.
+        const handsAboveLadder = p.y - PLAYER.height * 0.85 < L.topY;
+        if (handsAboveLadder) {
+            if (this.ladderPose !== 'back') this.pose('back');
+            this.ladderPose = 'back';
+        } else {
+            if (this.ladderPose !== 'climb') this.pose('climb');
+            this.ladderPose = 'climb';
+            if (v) p.anims.resume();
+            else p.anims.pause();
+        }
 
         const atTop = p.y <= L.topY;
         const atBottom = p.y >= L.bottomY;
