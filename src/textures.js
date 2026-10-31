@@ -22,6 +22,11 @@ const PALETTE = {
     R: '#e04848', // life ring red
     W: '#f4f4f4',
     y: '#3fbf5f', // green light
+    G: '#b8f5c4', // green light highlight
+    Y: '#ffd98a', // warm cabin light
+    L: '#fff1c9',
+    t: '#b9ad97', // background furniture, muted
+    T: '#a39780',
 };
 
 // Bumbusik, facing right, 12x32. The frames share everything above the hem.
@@ -136,6 +141,18 @@ const SPRITES = {
         'dddddddddddddddd',
         '.d............d.',
     ],
+    // A small side table, background furniture (muted, so it never reads as something to stand on).
+    sidetable: [
+        'TTTTTTTTTTTTTT',
+        'tttttttttttttt',
+        '.T..........T.',
+        '.t..........t.',
+        '.t..........t.',
+        '.t..........t.',
+        '.t..........t.',
+        '.t..........t.',
+        '.T..........T.',
+    ],
     lifering: [
         '....RRRRRR....',
         '..RRWWWWWWRR..',
@@ -151,23 +168,29 @@ const SPRITES = {
     ],
 };
 
-// Crew cabin door, 16x32, closed. The light above the handle turns green once activated.
-function doorRows(light) {
+// Crew cabin door, 16x32. Closed until she passes it; activated, it stands ajar with warm light
+// spilling out of the cabin, so an active checkpoint reads from across the deck (§5.5).
+function doorRows(open) {
     const rows = [];
     for (let y = 0; y < 32; y++) {
         let row = '';
         for (let x = 0; x < 16; x++) {
             const frame = x === 0 || x === 15 || y === 0;
             if (frame) row += 'd';
-            else if (y >= 5 && y <= 8 && x >= 4 && x <= 11) row += y === 5 || y === 8 || x === 4 || x === 11 ? 'm' : 'W'; // number plate
-            else if (y >= 16 && y <= 17 && x >= 11 && x <= 13) row += 'd';                                               // handle
-            else if (y === 13 && x >= 11 && x <= 12) row += light;                                                        // card reader light
-            else row += 'p';
+            else if (open && x <= 5) row += x >= 4 ? 'L' : 'Y';                                                          // lit gap
+            else if (y >= 5 && y <= 8 && x >= 7 && x <= 12) row += y === 5 || y === 8 || x === 7 || x === 12 ? 'm' : 'W'; // number plate
+            else if (y >= 16 && y <= 17 && x >= (open ? 7 : 11) && x <= (open ? 8 : 13)) row += 'd';                     // handle
+            else row += open && x === 6 ? 'm' : 'p';                                                                       // door edge
         }
         rows.push(row);
     }
     return rows;
 }
+
+const LAMP = {
+    off: ['.dddddd.', 'dmmmmmmd', 'dmmmmmmd', '.dddddd.'],
+    on: ['.dddddd.', 'dGyyyyGd', 'dyyyyyyd', '.dddddd.'],
+};
 
 function paint(ctx, rows, ox = 0, oy = 0) {
     rows.forEach((row, y) => {
@@ -198,8 +221,20 @@ export function makeTextures(scene) {
     her.refresh();
 
     for (const [key, rows] of Object.entries(SPRITES)) makeSingle(scene, key, rows);
-    makeSingle(scene, 'door', doorRows('R'));
-    makeSingle(scene, 'door-on', doorRows('y'));
+    makeSingle(scene, 'door', doorRows(false));
+    makeSingle(scene, 'door-on', doorRows(true));
+    makeSingle(scene, 'lamp', LAMP.off);
+    makeSingle(scene, 'lamp-on', LAMP.on);
+
+    // Soft round glow, used behind the lit checkpoint lamp.
+    const glow = scene.textures.createCanvas('glow', 32, 32);
+    const gctx = glow.getContext();
+    const rad = gctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    rad.addColorStop(0, 'rgba(120, 255, 150, 0.9)');
+    rad.addColorStop(1, 'rgba(120, 255, 150, 0)');
+    gctx.fillStyle = rad;
+    gctx.fillRect(0, 0, 32, 32);
+    glow.refresh();
 
     // Sky: a vertical gradient strip, stretched across the world.
     const sky = scene.textures.createCanvas('sky', 4, 256);

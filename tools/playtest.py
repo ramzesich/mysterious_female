@@ -247,6 +247,8 @@ def scenario_falls(b):
 def scenario_checkpoint(b):
     b.open("?reset&play")
     b.hold("right", 1.2)  # passes the deck 4 crew cabin door at x 808
+    time.sleep(0.15)
+    b.shot("checkpoint-lit")
     s = b.state()
     ok = check("cp-d4-gangway" in s["activated"], "passing a crew cabin door activates it", s)
     saved = b.eval("JSON.parse(localStorage.getItem('bumbusik-save-v1')).lastCheckpoint")

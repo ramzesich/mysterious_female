@@ -66,6 +66,9 @@ everywhere.
   tuned while the real art is made, then the art is swapped in.
 - **Background decoration layer:** props behind the action are drawn in **muted, greyed-out colours**,
   so they never read as interactive (§5.8, the wet floor sign).
+- **Everything is placed where it makes sense.** Nothing floats in the air: a tangerine sits on a
+  table, a counter, a tray or in a fruit bowl; a key hangs on a hook; a card lies on a desk. Same for
+  every object on the ship.
 
 **Tools to evaluate** (prices from third-party listings, unverified; check each site):
 
@@ -120,6 +123,8 @@ props, and **one month** of PixelLab when the characters are drawn, ideally all 
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
 
 Activate has its own key rather than ↑, so standing at a ladder next to a door is never ambiguous.
+
+**Controller testing waits until the rest of the game is done.** Keyboard is the reference until then.
 
 No pause and no map, at least for now.
 
@@ -207,8 +212,9 @@ there; they only remind her he's on board.
   ship from the side, so each deck shows one slice along its length. That slice follows the deck's
   **main route from bow to stern**, with venues at their real positions along it. **Doors** along
   the way lead into **small separate rooms** (cabins, offices, venues off that route).
-- **Stairs** are walked **diagonally**, like normal stairs, at the real stairwells' positions. If that
-  plays badly, we rethink it.
+- **Stairs** are walked **diagonally**, like normal stairs, at the real stairwells' positions. Tried
+  in the first slice; it feels natural. ↑/↓ steps onto a flight, and holding the key carries her
+  through a landing onto the next flight.
 - **Ladders** only where real ones exist: crew and technical areas, the pool, lifeboat stations, the
   mast and funnel, emergency escape shafts. Guests don't climb ladders on a real ship.
 - **Elevators:** guest elevators are free to use; crew service elevators need cards.
@@ -272,6 +278,10 @@ That works out to (numbers to be tuned in testing):
 
 - A checkpoint is a **crew cabin door**. She is activated at it by passing it, and when she comes
   back after a scare she **steps out of that door**.
+- **An activated checkpoint must be obvious** from across the deck, not a small indicator: the door
+  stands ajar with the cabin light spilling out, and a green lamp above it glows. Activating one
+  gives a short burst of light and a chime.
+- Checkpoints sit where a crew cabin door plausibly would, following the real layout.
 - There are a few across the ship, and **each Bumbot near-catch spot has one**.
 - She comes back at the **closest one** to where she was scared, among the checkpoints she has
   **already activated**. Otherwise she could come back somewhere she has never been, possibly past a
@@ -432,6 +442,9 @@ Tangerines go where a dash is genuinely useful: a breakable shortcut, a cluster 
 decks above and below, with placeholder art. It settles scale, jump feel, stairs, ladders, falls
 and controls (keyboard and Xbox controller) before the rest of the ship is laid out. Then the ship
 grows from there, area by area.
+
+The first slice's **layout and checkpoint placement are test geometry** for trying the mechanics,
+not the ship. The real layout, and everything placed in it, follows the Norwegian Sun's deck plans.
 
 ### 7.4 Alternatives considered
 

@@ -94,19 +94,25 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'checkpoint': {
-                    const active = this.save.activated.includes(o.name);
-                    const door = this.add.image(o.x, o.y, active ? 'door-on' : 'door').setOrigin(0.5, 1).setDepth(DEPTH.props);
-                    this.worldLayer.add(door);
-                    this.checkpoints.push({ id: o.name, x: o.x, y: o.y, door, active });
+                    const door = this.add.image(o.x, o.y, 'door').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    const glow = this.add.image(o.x, o.y - 37, 'glow').setDepth(DEPTH.props).setVisible(false);
+                    const lamp = this.add.image(o.x, o.y - 37, 'lamp').setDepth(DEPTH.props);
+                    this.worldLayer.add([door, glow, lamp]);
+                    const cp = { id: o.name, x: o.x, y: o.y, door, lamp, glow, active: false };
+                    this.checkpoints.push(cp);
+                    if (this.save.activated.includes(o.name)) this.lightCheckpoint(cp, false);
                     break;
                 }
 
                 case 'tangerine': {
                     if (this.save.collected.includes(o.name)) break;
-                    const sprite = this.add.image(o.x, o.y - 12, 'tangerine').setDepth(DEPTH.props);
-                    this.tweens.add({ targets: sprite, y: sprite.y - 3, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-                    this.worldLayer.add(sprite);
-                    this.tangerines.push({ id: o.name, sprite });
+                    // Everything rests on something (§6.3): here, a small side table.
+                    const table = this.add.image(o.x, o.y, 'sidetable').setOrigin(0.5, 1).setDepth(DEPTH.decor);
+                    const sprite = this.add.image(o.x, o.y - table.height, 'tangerine').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(DEPTH.props).setAlpha(0);
+                    this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
+                    this.worldLayer.add([table, sprite, glint]);
+                    this.tangerines.push({ id: o.name, sprite, glint });
                     break;
                 }
 
@@ -483,11 +489,11 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         for (const t of this.tangerines) {
             if (!t.sprite.active) continue;
-            if (Phaser.Math.Distance.Between(p.x, p.y - 16, t.sprite.x, t.sprite.y) < 14) {
+            if (Phaser.Math.Distance.Between(p.x, p.y - 16, t.sprite.x, t.sprite.y - 4) < 14) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);
                 sfx.pickup();
-                this.tweens.killTweensOf(t.sprite);
+                t.glint.destroy();
                 this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
                 t.sprite.active = false;
                 this.refreshHud();
@@ -500,16 +506,36 @@ export class ShipScene extends Phaser.Scene {
         for (const c of this.checkpoints) {
             if (Math.abs(p.x - c.x) > 8 || Math.abs(p.y - c.y) > 6) continue;
             if (!c.active) {
-                c.active = true;
-                c.door.setTexture('door-on');
+                this.lightCheckpoint(c, true);
                 this.save.activated.push(c.id);
-                sfx.checkpoint();
             }
             if (this.save.lastCheckpoint !== c.id || !c.saved) {
                 this.save.lastCheckpoint = c.id;
                 writeSave(this.save);
                 this.checkpoints.forEach(o => { o.saved = o === c; });
             }
+        }
+    }
+
+    // An active checkpoint has to read from across the deck: the door stands ajar with the cabin
+    // light on, and a green lamp above it glows.
+    lightCheckpoint(c, celebrate) {
+        c.active = true;
+        c.door.setTexture('door-on');
+        c.lamp.setTexture('lamp-on');
+        c.glow.setVisible(true).setAlpha(0.55);
+        this.tweens.add({ targets: c.glow, alpha: 0.25, scale: 0.8, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        if (!celebrate) return;
+        sfx.checkpoint();
+        this.tweens.add({ targets: c.lamp, scale: 1.8, duration: 160, yoyo: true, ease: 'Quad.easeOut' });
+        for (let i = 0; i < 14; i++) {
+            const angle = (Math.PI * 2 * i) / 14;
+            const spark = this.add.image(c.x, c.y - 37, 'dot').setTint(0x7dffa0).setDepth(DEPTH.fx);
+            this.worldLayer.add(spark);
+            this.tweens.add({
+                targets: spark, x: c.x + Math.cos(angle) * 22, y: c.y - 37 + Math.sin(angle) * 22, alpha: 0,
+                duration: 500, ease: 'Quad.easeOut', onComplete: () => spark.destroy(),
+            });
         }
     }
 
