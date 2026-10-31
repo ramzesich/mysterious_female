@@ -1,0 +1,382 @@
+"""Generates the whole ship's map (maps/ship.json, Tiled JSON format) and the placeholder tileset
+(assets/tiles/placeholder.png) from tools/ship_layout.py: every deck at its real length and
+position, the bow on the left (GAME_DESIGN.md §5.3).
+
+The art is placeholder: walls are tinted by what is there (venues, cabins, crew, the atrium) and
+venues carry a sign. Positions come from the layout list in metres from the bow; edit that list,
+not this file, to move things.
+
+Run from the repo root:  python tools/build_ship_map.py
+"""
+
+import json
+import struct
+import zlib
+from pathlib import Path
+
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, VENUES
+
+ROOT = Path(__file__).resolve().parent.parent
+TILE = 16
+PER_M = 3                                  # tiles per metre: 48px, so the ship is real length (§5.4)
+SEA = 30                                   # columns of open sea beyond the bow and the stern
+COLS = SEA + LENGTH * PER_M + SEA
+
+# Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
+(STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL) = range(1, 14)
+TILE_COUNT = 13
+
+# Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
+DECK_ROWS = 9
+DECK_PITCH = DECK_ROWS * TILE
+TOP_FLOOR_ROW = 3 * DECK_ROWS - 1          # deck 12's floor; above it, the roof, funnel and mast
+FLOOR_ROW = {d: TOP_FLOOR_ROW + (12 - d) * DECK_ROWS for d in DECKS}
+ROOF_ROW = FLOOR_ROW[12] - DECK_ROWS       # the roof over deck 12's indoor rooms
+WATER_ROW = FLOOR_ROW[3] - 1               # the sea surface: deck 3 sits at the waterline
+ROWS = FLOOR_ROW[3] + 10                   # the hull below deck 3, down past the keel
+
+# The card each flight of stairs needs, by the deck it climbs to: her own crew card covers decks
+# 4-6, the Hotel card everything above (§6.2).
+FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
+
+# Deck 12's open stretch over the pool, metres from the bow.
+POOL_OPENING = (115, 145)
+
+WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
+
+
+def col(m):
+    """The column at `m` metres from the bow."""
+    return SEA + round(m * PER_M)
+
+
+def metres(c):
+    """Metres from the bow at the middle of column `c`."""
+    return (c - SEA + 0.5) / PER_M
+
+
+def x_of(m):
+    """Pixel x at `m` metres from the bow (the middle of its column)."""
+    return col(m) * TILE + TILE // 2
+
+
+def floor_y(deck):
+    """Pixel y of the walkable top of a deck's floor."""
+    return FLOOR_ROW[deck] * TILE
+
+
+def in_core(m):
+    return any(a <= m < b for a, b in CORES.values())
+
+
+def in_atrium(deck, m):
+    (a, b), (lo, hi) = ATRIUM["span"], ATRIUM["decks"]
+    return a <= m < b and lo <= deck <= hi
+
+
+def venue_at(deck, m):
+    for d, a, b, name, kind in VENUES:
+        if d == deck and a <= m < b:
+            return name, kind
+    return None, None
+
+
+def covered(deck, m):
+    """Is this spot on `deck` indoors (under a ceiling), rather than an open terrace?"""
+    if deck == 12:
+        _, kind = venue_at(12, m)
+        return in_core(m) or kind in ("venue", "crew", "cabins")
+    above = EXTENT[deck + 1]
+    return above[0] <= m < above[1]
+
+
+def build_layers():
+    solid = [[0] * COLS for _ in range(ROWS)]
+    ladders = [[0] * COLS for _ in range(ROWS)]
+    back = [[0] * COLS for _ in range(ROWS)]
+
+    def fill(layer, c0, c1, r0, r1, tile):
+        for r in range(max(0, r0), min(ROWS - 1, r1) + 1):
+            for c in range(max(0, c0), min(COLS - 1, c1) + 1):
+                layer[r][c] = tile
+
+    for deck in DECKS:
+        fwd, aft = EXTENT[deck]
+        floor = FLOOR_ROW[deck]
+        c0, c1 = col(fwd), col(aft) - 1
+        fill(solid, c0, c1, floor, floor, FLOOR)
+
+        # The back wall, tinted by what is there; open sky on outdoor terraces.
+        for c in range(c0, c1 + 1):
+            m = metres(c)
+            _, kind = venue_at(deck, m)
+            if deck == 3:
+                tile = DIMWALL
+            elif in_atrium(deck, m):
+                tile = ATRIUMWALL
+            elif in_core(m):
+                tile = BACKWALL
+            elif not covered(deck, m) or kind in ("outdoor", "finale"):
+                tile = 0
+            else:
+                tile = WALL_FOR.get(kind, BACKWALL)
+            if tile:
+                fill(back, c, c, floor - DECK_ROWS + 1, floor - 1, tile)
+                if tile in (BACKWALL, VENUEWALL, CREWWALL):
+                    back[floor - 1][c] = WAINSCOT
+            if deck == 12 and covered(12, m):
+                solid[ROOF_ROW][c] = STEEL
+
+        # The deck's ends: a steel wall indoors, a railing on an open terrace.
+        for c, inward in ((c0, 1), (c1, -1)):
+            if covered(deck, metres(c + inward)):
+                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, STEEL)
+            else:
+                fill(solid, c, c, floor - 2, floor - 1, RAILING)
+
+        # Where a terrace meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
+        if 3 < deck < 12:
+            for c in range(c0 + 1, c1):
+                if covered(deck, metres(c - 1)) != covered(deck, metres(c)):
+                    wall = c if covered(deck, metres(c)) else c - 1
+                    fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
+
+    # The hull below deck 3, narrowing down into the sea.
+    fwd3, aft3 = EXTENT[3]
+    for r in range(FLOOR_ROW[3] + 1, ROWS):
+        k = r - FLOOR_ROW[3]
+        fill(solid, col(fwd3) + 4 * k, col(aft3) - 1 - k, r, r, STEEL if r <= WATER_ROW + 2 else NAVY)
+
+    # No floor opens in the middle of a deck indoors: the atrium is its look (the back wall), not a
+    # well to fall down. Outdoors, deck 12 is open over the middle of the Oasis Pool, as the real
+    # pool deck is open to the sky, with a railing round the edge: a one-deck drop to the pool.
+    a, b = POOL_OPENING
+    fill(solid, col(a), col(b) - 1, FLOOR_ROW[12], FLOOR_ROW[12], 0)
+    for c in (col(a) - 1, col(b)):
+        fill(solid, c, c, FLOOR_ROW[12] - 2, FLOOR_ROW[12] - 1, RAILING)
+
+    # Funnel and mast, standing on the roof.
+    fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, STEEL)
+    fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, STEEL)
+
+    # A technical ladder beside the funnel housing, deck 12 up to the roof (§5.1).
+    lc = col(FUNNEL[0]) - 3
+    solid[ROOF_ROW][lc] = LADDER_TOP
+    fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
+
+    return back, solid, ladders
+
+
+def point(name, obj_type, x, y, props=None):
+    obj = {"id": 0, "name": name, "type": obj_type, "x": x, "y": y, "width": 0, "height": 0,
+           "rotation": 0, "visible": True, "point": True}
+    if props:
+        obj["properties"] = props
+    return obj
+
+
+def prop(name, value, kind="string"):
+    return {"name": name, "type": kind, "value": value}
+
+
+def area(name, obj_type, x, y, width, height, props=None):
+    obj = {"id": 0, "name": name, "type": obj_type, "x": x, "y": y, "width": width, "height": height,
+           "rotation": 0, "visible": True}
+    if props:
+        obj["properties"] = props
+    return obj
+
+
+def build_objects():
+    objs = []
+
+    def add(obj):
+        obj["id"] = len(objs) + 1
+        objs.append(obj)
+
+    # The start: the gangway lobby on deck 4, forward, by the forward stairs (§5.3).
+    add(point("gangway", "spawn", x_of(67), floor_y(4)))
+    add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
+
+    # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
+    # from its lower end to its upper end; holding the key carries her on through a landing.
+    for core, (a, b) in CORES.items():
+        left, right = col(a) * TILE + 4 * TILE, col(a) * TILE + 15 * TILE
+        for deck in PLAYABLE[:-1]:
+            x0, x1 = (left, right) if deck % 2 == 0 else (right, left)
+            y0, y1 = floor_y(deck), floor_y(deck + 1)
+            add({"id": 0, "name": f"stairs-{core}-{deck}-{deck + 1}", "type": "stairs", "x": x0, "y": y0,
+                 "width": 0, "height": 0, "rotation": 0, "visible": True,
+                 "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
+                 "properties": [prop("card", FLIGHT_CARD[deck + 1])]})
+        for deck in PLAYABLE:
+            add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
+                      [prop("text", f"DECK {deck}")]))
+
+    # Venue signs; cabin doors along the corridors (background, muted).
+    for deck, a, b, name, kind in VENUES:
+        if kind == "cabins":
+            add(area(f"cabins-{deck}-{a}", "decor", col(a) * TILE, floor_y(deck), (col(b) - col(a)) * TILE, 0,
+                     [prop("kind", "cabindoors")]))
+        else:
+            add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
+                      [prop("text", name.split(" (")[0].upper())]))
+
+    # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
+    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 152),
+                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 110),
+                          ("d10-bridge", 10, 44), ("d11-pool", 11, 103), ("d11-buffet", 11, 191),
+                          ("d12-sports", 12, 104)]:
+        add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
+
+    # Bumbot at his five spots (§4): what he is doing, and which way he runs.
+    for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
+                                            ("pool", 11, 130, "fly", 1), ("bridge", 10, 24, "bat", -1),
+                                            ("linen", 9, 102, "asleep", 1)]:
+        add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
+                  [prop("activity", activity), prop("escape", escape, "int")]))
+
+    # Tangerines (§6.3): ten, each on a side table. One sits behind crates only the dash breaks.
+    for i, (deck, m) in enumerate([(4, 30), (4, 150), (4, 236), (5, 60), (5, 170), (6, 120), (6, 245),
+                                   (7, 30), (11, 215), (12, 110)]):
+        add(point(f"t-{i + 1}", "tangerine", x_of(m), floor_y(deck)))
+    for i in range(2):
+        for j in range(2):
+            add(area(f"crate-{i}-{j}", "breakable", (col(232) + i) * TILE, floor_y(4) - (j + 1) * TILE, TILE, TILE))
+
+    # A robot vacuum patrolling the deck 4 cabin corridor.
+    add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
+        prop("minX", x_of(104), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
+
+    return objs
+
+
+def tile_layer(layer_id, name, grid):
+    return {"id": layer_id, "name": name, "type": "tilelayer", "x": 0, "y": 0, "width": COLS,
+            "height": ROWS, "opacity": 1, "visible": True,
+            "data": [t for row in grid for t in row]}
+
+
+def build_map():
+    back, solid, ladders = build_layers()
+    objs = build_objects()
+    return {
+        "type": "map", "version": "1.10", "tiledversion": "1.11.0", "orientation": "orthogonal",
+        "renderorder": "right-down", "infinite": False, "width": COLS, "height": ROWS,
+        "tilewidth": TILE, "tileheight": TILE, "nextlayerid": 5, "nextobjectid": len(objs) + 1,
+        "properties": [
+            {"name": "deckPitch", "type": "int", "value": DECK_PITCH},
+            {"name": "hullMinX", "type": "int", "value": col(EXTENT[4][0]) * TILE},
+            {"name": "hullMaxX", "type": "int", "value": col(EXTENT[4][1]) * TILE},
+            {"name": "waterY", "type": "int", "value": WATER_ROW * TILE},
+        ],
+        "tilesets": [{
+            "firstgid": 1, "name": "placeholder", "image": "../assets/tiles/placeholder.png",
+            "imagewidth": TILE_COUNT * TILE, "imageheight": TILE, "tilewidth": TILE, "tileheight": TILE,
+            "tilecount": TILE_COUNT, "columns": TILE_COUNT, "margin": 0, "spacing": 0,
+        }],
+        "layers": [
+            tile_layer(1, "background", back),
+            tile_layer(2, "solid", solid),
+            tile_layer(3, "ladders", ladders),
+            {"id": 4, "name": "objects", "type": "objectgroup", "x": 0, "y": 0, "opacity": 1,
+             "visible": True, "draworder": "topdown", "objects": objs},
+        ],
+    }
+
+
+# --- Placeholder tileset ------------------------------------------------------------------------
+
+def hex_rgba(h, a=255):
+    h = h.lstrip("#")
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), a)
+
+
+CLEAR = (0, 0, 0, 0)
+
+
+def draw_tile(tile_id):
+    """Returns a 16x16 grid of RGBA tuples for one placeholder tile."""
+    px = [[CLEAR] * TILE for _ in range(TILE)]
+
+    def rect(x0, y0, x1, y1, color):
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                px[y][x] = color
+
+    if tile_id == STEEL:
+        rect(0, 0, 15, 15, hex_rgba("#c9ced3"))
+        rect(0, 0, 15, 0, hex_rgba("#e3e7ea"))
+        rect(0, 15, 15, 15, hex_rgba("#a9b0b7"))
+        px[3][3] = px[3][12] = px[12][3] = px[12][12] = hex_rgba("#a9b0b7")  # rivets
+    elif tile_id in (FLOOR, LADDER_TOP):
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))     # steel slab
+        rect(0, 0, 15, 3, hex_rgba("#b8434e"))      # carpet
+        rect(0, 0, 15, 0, hex_rgba("#d4626c"))
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+        if tile_id == LADDER_TOP:
+            rect(4, 0, 11, 15, hex_rgba("#3a3f47"))  # the hatch the ladder goes through
+            rect(3, 0, 3, 15, hex_rgba("#e0e0e0"))
+            rect(12, 0, 12, 15, hex_rgba("#e0e0e0"))
+            rect(3, 0, 12, 0, hex_rgba("#f2c14e"))   # yellow safety edge
+    elif tile_id == RAILING:
+        rect(0, 2, 15, 3, hex_rgba("#ffffff"))
+        rect(0, 9, 15, 9, hex_rgba("#e8e8e8"))
+        for x in (1, 7, 13):
+            rect(x, 2, x + 1, 15, hex_rgba("#f4f4f4"))
+    elif tile_id == LADDER:
+        rect(3, 0, 3, 15, hex_rgba("#d8dde2"))
+        rect(12, 0, 12, 15, hex_rgba("#d8dde2"))
+        for y in (2, 7, 12):
+            rect(4, y, 11, y, hex_rgba("#b8bec5"))
+    elif tile_id == BACKWALL:
+        rect(0, 0, 15, 15, hex_rgba("#e9dfcc"))
+    elif tile_id == WAINSCOT:
+        rect(0, 0, 15, 15, hex_rgba("#e9dfcc"))
+        rect(0, 6, 15, 15, hex_rgba("#dccfb8"))      # muted wainscot along the floor
+        rect(0, 6, 15, 6, hex_rgba("#cfc1a8"))
+    elif tile_id == TEAK:
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#b07a45"))
+        rect(0, 0, 15, 0, hex_rgba("#c8925c"))
+        rect(7, 0, 7, 3, hex_rgba("#7d5530"))
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id in (VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL):
+        rect(0, 0, 15, 15, hex_rgba({VENUEWALL: "#dfe6e8", CREWWALL: "#e8dccd",
+                                     ATRIUMWALL: "#f1e8cf", DIMWALL: "#b9b4aa"}[tile_id]))
+    elif tile_id == NAVY:
+        rect(0, 0, 15, 15, hex_rgba("#1d2b53"))
+        rect(0, 0, 15, 0, hex_rgba("#2b3d6e"))
+    return px
+
+
+def write_png(path, width, height, pixels):
+    raw = b"".join(b"\x00" + b"".join(bytes(p) for p in row) for row in pixels)
+
+    def chunk(kind, data):
+        body = kind + data
+        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body) & 0xFFFFFFFF)
+
+    png = (b"\x89PNG\r\n\x1a\n"
+           + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(raw, 9))
+           + chunk(b"IEND", b""))
+    path.write_bytes(png)
+
+
+def build_tileset():
+    tiles = [draw_tile(i) for i in range(1, TILE_COUNT + 1)]
+    rows = [[p for t in tiles for p in t[y]] for y in range(TILE)]
+    out = ROOT / "assets" / "tiles" / "placeholder.png"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    write_png(out, TILE_COUNT * TILE, TILE, rows)
+    return out
+
+
+if __name__ == "__main__":
+    map_path = ROOT / "maps" / "ship.json"
+    map_path.parent.mkdir(parents=True, exist_ok=True)
+    map_path.write_text(json.dumps(build_map(), separators=(",", ":")), encoding="utf-8")
+    print("wrote", map_path.relative_to(ROOT))
+    print("wrote", build_tileset().relative_to(ROOT))

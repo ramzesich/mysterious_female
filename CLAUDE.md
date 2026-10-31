@@ -9,7 +9,7 @@ truth**: read the relevant section before any design or content work, and record
 
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python -m http.server`, open <http://localhost:8000>. URL flags: `?play` skip title,
-  `?reset` clear save, `?debug` bodies + state.
+  `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (for testing).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
 ## Layout
@@ -17,12 +17,15 @@ truth**: read the relevant section before any design or content work, and record
 | Path | What |
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, scripted), scares, dash, checkpoints |
-| `maps/ship.json` | Tiled-format map, **generated** by `tools/build_slice_map.py`. The current slice is test geometry, not the real ship layout |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, scripted), scares, dash, checkpoints, card-locked stairs, Bumbot near-catches |
+| `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium and every venue in metres from the bow (bow on the left). Edit positions here |
+| `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
+| `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
+| `reference/` | **Git-ignored**: NCL's ship map PDF and its side profile (also flipped to bow-left), the source of real proportions. Copyrighted, never commit |
 | `assets/source/<char>/` | Raw PixelLab frames, kept so sprites can be rebuilt without regenerating |
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
-| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]` |
+| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
 
 ## Rules that are easy to break
 

@@ -189,7 +189,7 @@ it is her battle cry here.
 
   | Spot | What he is doing |
   |---|---|
-  | Laundry (crew decks) | Asleep in the warm towels |
+  | Housekeeping linen room (a cabin deck) | Asleep in the warm towels |
   | Theatre stage | Washing himself under a spotlight |
   | Buffet | Eyeing a fish |
   | Pool deck | Catching a fly over a sunbed |
@@ -257,7 +257,10 @@ there; they only remind her he's on board.
 - **Ladders** only where real ones exist: crew and technical areas, the pool, lifeboat stations, the
   mast and funnel, emergency escape shafts. Guests don't climb ladders on a real ship.
 - **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
-  never opens onto an area she can't reach yet.** How they are operated: **Open**.
+  never opens onto an area she can't reach yet.** She stands at the doors and presses ↑; they open
+  and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out. ↑/↓
+  picks a deck, jump confirms; the doors close, a floor indicator counts, and they open on that
+  deck.
 
 ### 5.2 At sea
 
@@ -302,6 +305,9 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   (~198 m). The **atrium** spans decks 5–9 between the forward and midship cores, with glass
   elevators. The funnel stands over the aft half.
 - **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
+- **Nothing falls through the middle of a deck.** Indoors, every floor is solid, the atrium
+  included (it is a look, not a well). Falls happen outdoors: jumping a railing overboard, or from
+  one open deck down onto another (a terrace below, the pool area from deck 12).
 - **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
   as it naturally would, but she can't get there. There are no crew or engine decks to explore.
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
@@ -438,13 +444,16 @@ colleague gives her.
 
 **Decided:**
 
-- She **starts with her own crew card**, which opens only her starting area.
+- She **starts with her own crew card**, which opens only her starting area: **decks 4–6**, the
+  whole lower ship (the gangway, the deck 5 restaurant corridor with its doors locked, the deck 6
+  promenade and lifeboats). The stairs and elevators above deck 6, and the venue doors, open with
+  the Hotel card.
 - Three more colour-coded **key cards**, one per tier:
 
   | Card | Opens |
   |---|---|
   | Hotel | Restaurants, theatre, galley, housekeeping |
-  | Technical | Engine room, machinery decks |
+  | Technical | The ship's technical spots: the mooring deck at the bow, the lifeboat winches, the funnel and mast ladders, the theatre's backstage and fly loft. (There are no engine decks to explore, §5.3.) |
   | Captain | The bridge |
 
 - 2–3 physical **keys** for one-off locks: a lifeboat winch, a storeroom, a theatre backstage door.
@@ -521,6 +530,23 @@ grows from there, area by area.
 The first slice's **layout and checkpoint placement are test geometry** for trying the mechanics,
 not the ship. The real layout, and everything placed in it, follows the Norwegian Sun's deck plans.
 
+**Done (2026-10-31): the whole ship as a blockout.** The slice is retired. `tools/build_ship_map.py`
+generates every deck 3–12 at real length (~13,300px) from `tools/ship_layout.py`, with placeholder
+art:
+
+- Floors per deck at their real extent; the upper decks step back into open **terraces** with
+  railings at the bow and stern, a steel outer wall with a doorway where a terrace meets the indoors.
+- **Stairs** zigzag through the three cores from deck 4 to 12. Flights up to decks 5–6 need only her
+  crew card; flights above deck 6 need the Hotel card and show "🔒 Hotel card" when she tries.
+- Back walls tinted by area (venues blue-grey, cabins cream, crew peach, atrium yellow, deck 3 dim);
+  outdoor stretches open to the sky. Venue name signs, DECK n signs at every core, muted cabin
+  doors every 4 m along cabin corridors.
+- A roof over deck 12's indoor rooms, the funnel and mast on top, and a technical ladder from deck 12
+  up to the roof beside the funnel. Deck 12 is open over the middle of the Oasis Pool.
+- Placed: the gangway spawn (deck 4, 67 m), 10 checkpoints, Bumbot at his five spots, 10
+  tangerines, a crate stack, the robot vacuum on deck 4.
+- The sea lies beyond both ends; overboard works at either end.
+
 ### 7.4 Alternatives considered
 
 | Option | Why not |
@@ -542,12 +568,20 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] Bumbot's sprite and his five activities, plus run, leap and eating (§4)
 - [ ] The finale's art: her holding Bumbot (a state of her character, ~10 generations, or her
       arms-out pose with his sprite on top), designed with the win sequence (§4)
-- [ ] First real ship tiles and props: test PixelLab against Retro Diffusion before committing (§2.1)
+- [x] The whole ship laid out as a blockout from the real profile (§5.3, §7.3)
+- [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
+- [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
+      on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
+- [ ] **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
+      somewhere, the diner opening after the fifth, the finale (§4)
+- [ ] Doors along the decks into small separate rooms (§5.1); hazards and people placed on the real
+      decks (§5.8); tangerines and checkpoints tuned in play
+- [ ] First real ship tiles and props: a PixelLab style test on 3–4 representative pieces (~10–15
+      generations); Retro Diffusion only if PixelLab disappoints (§2.1)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
       2026-11-30. Skeleton-v3 clips cost 2 (3 frames), 3 (4-14 frames) or 4 (15 frames)
 
 - [ ] Art: which tools you pick (§2.1)
-- [ ] Deck list and which areas go where, from the real deck plans, as the map is laid out (§5.3, §5.7)
 - [ ] The colleague's post and card, once the mid-game is laid out (§5.8)
 - [ ] Tangerine placement (§6.3)
 - [ ] Her quirks: added as we build (§3)

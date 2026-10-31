@@ -67,8 +67,10 @@
 <text x="1180.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="140" y="202" width="300" height="26" rx="2" fill="#ececec"/>
 <text x="290.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="202" width="470" height="26" rx="2" fill="#ececec"/>
-<text x="805.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="570" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
+<text x="585.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
+<rect x="600" y="202" width="440" height="26" rx="2" fill="#ececec"/>
+<text x="820.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="202" width="215" height="26" rx="2" fill="#ececec"/>
 <text x="1187.5" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="120" y="232" width="320" height="26" rx="2" fill="#ececec"/>

@@ -43,6 +43,8 @@ export class BootScene extends Phaser.Scene {
         for (const [name, fps, repeat] of [['run', 16, -1], ['wash', 7, -1], ['sit', 6, 0], ['eat', 7, -1], ['jump', 12, 0]]) {
             this.anims.create({ key: `bumbot-${name}`, frames: catFrames(name), frameRate: fps, repeat });
         }
+        // Catching a fly at the pool: the leap, over and over, with a pause on the ground.
+        this.anims.create({ key: 'bumbot-fly', frames: catFrames('jump'), frameRate: 12, repeat: -1, repeatDelay: 900 });
         // Batting: seated, paw down and up. Its frames 6 and 8 drew stray blobs, so they are skipped.
         this.anims.create({ key: 'bumbot-bat', frames: catFrames('bat', [4, 5, 7, 5]), frameRate: 6, repeat: -1 });
         const params = new URLSearchParams(location.search);

@@ -58,6 +58,7 @@ export class ShipScene extends Phaser.Scene {
             : map.properties || {};
         this.deckPitch = props.deckPitch;
         this.hullMinX = props.hullMinX;
+        this.hullMaxX = props.hullMaxX;
         this.waterY = props.waterY;
 
         const W = map.widthInPixels;
@@ -123,7 +124,10 @@ export class ShipScene extends Phaser.Scene {
                 case 'stairs': {
                     const [a, b] = o.polyline.map(p => ({ x: o.x + p.x, y: o.y + p.y }));
                     const [bottom, top] = a.y > b.y ? [a, b] : [b, a];
-                    const flight = { name: o.name, bottom, top, length: Phaser.Math.Distance.BetweenPoints(bottom, top) };
+                    const flight = {
+                        name: o.name, bottom, top, card: prop(o, 'card', null),
+                        length: Phaser.Math.Distance.BetweenPoints(bottom, top),
+                    };
                     this.flights.push(flight);
                     this.drawStairs(stairsGfx, flight);
                     break;
@@ -159,7 +163,7 @@ export class ShipScene extends Phaser.Scene {
                         sprite.play(`bumbot-${activity}`);
                     }
                     this.worldLayer.add(sprite);
-                    this.cats.push({ sprite, escape: prop(o, 'escape', 1), gone: false });
+                    this.cats.push({ name: o.name, sprite, escape: prop(o, 'escape', 1), gone: false });
                     break;
                 }
 
@@ -174,6 +178,7 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'decor':
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
+                    if (prop(o, 'kind') === 'cabindoors') this.drawCabinDoors(decorGfx, o);
                     break;
             }
         }
@@ -207,6 +212,19 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xa9c8d8, 1);
         g.fillCircle(o.x + o.width / 4, o.y + 16, 4);
         g.fillCircle(o.x + (o.width * 3) / 4, o.y + 16, 4);
+    }
+
+    // Cabin doors along a corridor, every 4 m (192px), muted so they never read as interactive.
+    drawCabinDoors(g, o) {
+        for (let x = o.x + 60; x + 30 < o.x + o.width; x += 192) {
+            g.fillStyle(0xd9cdb6, 1);
+            g.fillRect(x, o.y - 74, 30, 74);
+            g.lineStyle(1, 0xc2b497, 1);
+            g.strokeRect(x + 0.5, o.y - 73.5, 29, 73);
+            g.fillStyle(0xb9ab90, 1);
+            g.fillRect(x + 23, o.y - 38, 3, 2);
+            g.fillRect(x + 9, o.y - 66, 12, 5);   // the number plate
+        }
     }
 
     buildPlayer() {
@@ -392,7 +410,7 @@ export class ShipScene extends Phaser.Scene {
         }
 
         if (!onFloor) {
-            if (p.x < this.hullMinX) {
+            if (p.x < this.hullMinX || p.x > this.hullMaxX) {
                 if (p.y >= this.waterY) return this.scareOverboard();
             } else if (p.y - this.takeoffY > this.deckPitch + LONG_FALL_MARGIN) {
                 return this.scareFall();
@@ -504,9 +522,26 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const reach = PLAYER.stairsBoardReach;
         for (const f of this.flights) {
-            if (input.up && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) return this.enterStairs(f, 0);
+            if (input.up && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) {
+                if (!this.hasCard(f.card)) return this.showLocked(f.card);
+                return this.enterStairs(f, 0);
+            }
             if (input.down && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) return this.enterStairs(f, 1);
         }
+        return false;
+    }
+
+    // Her cards (§6.2): her own crew card from the start; ?cards=all unlocks everything for testing.
+    hasCard(card) {
+        return !card || this.save.cards.includes(card) || new URLSearchParams(location.search).get('cards') === 'all';
+    }
+
+    // A flight up that her cards don't open: the card it needs shows above her for a moment.
+    showLocked(card) {
+        if (this.time.now < (this.lockedUntil || 0)) return false;
+        this.lockedUntil = this.time.now + 900;
+        this.alert.setText(`🔒 ${card[0].toUpperCase()}${card.slice(1)} card`).setVisible(true);
+        this.time.delayedCall(900, () => { if (this.mode === 'play') this.alert.setVisible(false); });
         return false;
     }
 
@@ -827,7 +862,7 @@ export class ShipScene extends Phaser.Scene {
     scareOverboard() {
         const p = this.player;
         this.beginScare();
-        this.scareFrom = { x: this.hullMinX + 16, y: this.takeoffY };
+        this.scareFrom = { x: Phaser.Math.Clamp(this.player.x, this.hullMinX + 16, this.hullMaxX - 16), y: this.takeoffY };
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
         this.smash(p.x, this.waterY);

@@ -23,6 +23,8 @@ from pathlib import Path
 
 import websocket
 
+from build_ship_map import CORES, FUNNEL, ROOF_ROW, TILE, col, floor_y, x_of
+
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
 OUT = Path(tempfile.gettempdir()) / "bumbusik-playtest"
@@ -153,8 +155,14 @@ class Browser:
 
 
 # --- Scenarios -----------------------------------------------------------------------------------
-# Coordinates come from tools/build_slice_map.py: floors at y 272 (deck 5), 416 (deck 4),
-# 560 (deck 3); the gangway spawn is x 712.
+# Positions come from the map builder (tools/build_ship_map.py), in metres from the bow.
+
+D4, D5, D6, D7, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 10, 11, 12))
+SPAWN_X = x_of(67)
+CORE_L = col(CORES["forward"][0]) * TILE + 4 * TILE       # forward core: the 4-5 flight's foot
+LADDER_X = (col(FUNNEL[0]) - 3) * TILE + TILE // 2        # the funnel ladder, deck 12 to the roof
+ROOF_Y = ROOF_ROW * TILE
+
 
 def check(cond, label, detail=""):
     print(("  ok    " if cond else "  FAIL  ") + label + (f"  ({detail})" if detail else ""))
@@ -169,7 +177,8 @@ def scenario_boot(b):
     time.sleep(0.5)
     s = b.state()
     b.shot("spawn")
-    return check(s["mode"] == "play" and s["y"] == 416, "spawns standing on deck 4 at the gangway", s)
+    return check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
+                 "spawns standing on deck 4 at the gangway", s)
 
 
 def scenario_run_jump(b):
@@ -184,47 +193,52 @@ def scenario_run_jump(b):
     peak = b.state()["y"]
     b.key("space", False)
     time.sleep(0.8)
-    ok &= check(peak < 416 - 30, "jumps", f"y at 0.25s {peak}")
-    ok &= check(b.state()["y"] == 416, "lands back on deck 4", b.state())
+    ok &= check(peak < D4 - 30, "jumps", f"y at 0.25s {peak}")
+    ok &= check(b.state()["y"] == D4, "lands back on deck 4", b.state())
     return ok
 
 
 def scenario_stairs(b):
     b.open("?reset&play")
-    b.teleport(960, 416)
+    b.teleport(CORE_L, D4)
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
-    b.hold("up", 1.6)
+    b.key("up", True)
+    time.sleep(5.0)
     s = b.state()
-    ok = check(s["mode"] == "play" and s["y"] == 272, "climbs the stairs to deck 5", s)
-    time.sleep(0.2)
-    b.hold("down", 1.5)
-    b.hold("left", 2.0)  # ← also walks down this flight, and off it onto the deck 4 landing
+    ok = check(s["mode"] == "play" and s["y"] == D6, "holding up climbs through deck 5 to deck 6", s)
+    locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
+    b.shot("stairs-locked")
+    b.key("up", False)
+    ok &= check(bool(locked) and "Hotel" in locked, "and stops there: the flight up needs the Hotel card", locked)
+    b.hold("down", 5.5)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == 416 and s["x"] < 960, "walks back down to deck 4 and off along it", s)
-    b.teleport(1136, 272)
-    b.hold("down", 6.0)
+    ok &= check(s["mode"] == "play" and s["y"] == D4, "holding down carries her back to deck 4", s)
+    b.open("?reset&play&cards=all")
+    b.teleport(CORE_L, D4)
+    b.hold("up", 9.0)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == 560, "holding down carries her through the landing to deck 3", s)
+    ok &= check(s["y"] <= floor_y(8), "with every card she climbs on past deck 6", s)
     return ok
 
 
 def scenario_ladder(b):
     b.open("?reset&play")
-    b.teleport(488, 416)
+    b.teleport(LADDER_X, D12)
+    b.hold("up", 0.6)
+    b.shot("ladder-climbing")
+    b.hold("up", 2.0)
+    s = b.state()
+    ok = check(s["y"] == ROOF_Y and s["mode"] == "play", "climbs the funnel ladder onto the roof", s)
     b.hold("down", 0.3)
     b.shot("ladder-top")
-    b.hold("down", 0.8)
-    b.shot("ladder-climbing")
-    b.hold("down", 1.5)
+    b.hold("down", 2.2)
     s = b.state()
-    ok = check(s["y"] == 560, "climbs down the crew ladder to deck 3", s)
-    b.hold("up", 2.6)
-    s = b.state()
-    ok &= check(s["y"] == 416 and s["mode"] == "play", "climbs back up and stands on deck 4", s)
+    ok &= check(s["y"] == D12, "climbs back down to deck 12", s)
+    b.teleport(LADDER_X, ROOF_Y)
     b.hold("right", 0.4)
     s = b.state()
-    ok &= check(s["y"] == 416, "walks off the ladder top without falling through", s)
+    ok &= check(s["y"] == ROOF_Y, "walks off the ladder top without falling through", s)
     return ok
 
 
@@ -243,13 +257,13 @@ def scenario_idle(b):
     b.wait_for(f"{anim}.startsWith('her-idle-')", timeout=20)
     second = b.eval(anim)
     ok &= check(second != first, "the next idle is a different one", f"{first} then {second}")
-    # Climbing out of the crew ladder's hatch: her hands are on the rim, not reaching for rungs.
-    b.teleport(488, 416)
+    # Climbing out at the top of the funnel ladder: her hands are on the rim, not reaching for rungs.
+    b.teleport(LADDER_X, ROOF_Y)
     b.hold("down", 1.2)
     b.hold("up", 0.8)
     frame = b.eval("window.__ship.player.frame.name")
     out = b.eval("window.__ship.climbOutFrames")
-    ok &= check(frame in out, "climbing out of the hatch uses a climb-out frame", f"frame {frame}")
+    ok &= check(frame in out, "climbing out at a ladder top uses a climb-out frame", f"frame {frame}")
     b.shot("climb-out")
     return ok
 
@@ -257,35 +271,35 @@ def scenario_idle(b):
 def scenario_bumbot(b):
     b.open("?reset&play")
     b.wait_for("window.__ship && window.__ship.player")
-    cat = "window.__ship.cats[0]"
-    ok = check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash", "Bumbot is washing on deck 4")
+    cat = "window.__ship.cats.find(c => c.name === 'bumbot-theatre')"
+    ok = check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash", "Bumbot is washing in the theatre")
+    b.teleport(x_of(221), D6)
     b.shot("bumbot-wash")
-    b.key("left", True)
+    b.key("right", True)
     b.wait_for("window.__ship.mode === 'scripted'", timeout=5)
-    b.key("left", False)
+    b.key("right", False)
     b.wait_for("window.__ship.player.anims.currentAnim?.key === 'her-reach'", timeout=5)
     time.sleep(0.3)
     b.shot("bumbot-reach")
     ok &= check(b.eval(f"{cat}.gone"), "getting close starts a near-catch")
     b.wait_for("window.__ship.mode === 'play'", timeout=6)
     s = b.state()
-    ok &= check(not b.eval(f"{cat}.sprite.visible") and s["y"] == 416, "he gets away and she can play on", s)
-    b.hold("left", 0.3)
+    ok &= check(not b.eval(f"{cat}.sprite.visible") and s["y"] == D6, "he gets away and she can play on", s)
+    b.hold("right", 0.3)
     ok &= check(b.state()["mode"] == "play", "no second near-catch once he is gone")
     return ok
 
 
 def scenario_falls(b):
     b.open("?reset&play")
-    # One deck: walk off the edge of the deck 5 atrium well onto deck 4.
-    b.teleport(1265, 272)
-    b.hold("right", 0.35)
-    time.sleep(1.0)
+    # One deck: from deck 12 into the open pool area on deck 11.
+    b.teleport(x_of(140), D12)  # clear of Bumbot, who is at 130 m below
+    time.sleep(1.2)
     s = b.state()
-    ok = check(s["mode"] == "play" and s["y"] == 416, "a one-deck fall is fine", s)
-    # Two decks: drop through the middle of the well, where both decks are open.
-    b.teleport(1336, 272)
-    time.sleep(0.5)
+    ok = check(s["mode"] == "play" and s["y"] == D11, "a one-deck drop into the pool area is fine", s)
+    # Two decks: off deck 12's aft end, past deck 11, onto the deck 10 terrace below.
+    b.teleport(x_of(238), D12)
+    time.sleep(0.6)
     b.shot("long-fall")
     s = b.state()
     ok &= check(s["mode"] == "scripted", "a two-deck fall is a scare", s)
@@ -297,20 +311,20 @@ def scenario_falls(b):
 
 def scenario_checkpoint(b):
     b.open("?reset&play")
-    b.hold("right", 1.2)  # passes the deck 4 crew cabin door at x 808
+    b.hold("right", 1.6)  # passes the crew cabin door by the gangway, 4 m aft of the spawn
     time.sleep(0.15)
     b.shot("checkpoint-lit")
     s = b.state()
-    ok = check("cp-d4-gangway" in s["activated"], "passing a crew cabin door activates it", s)
+    ok = check("cp-gangway" in s["activated"], "passing a crew cabin door activates it", s)
     saved = b.eval("JSON.parse(localStorage.getItem('bumbusik-save-v1')).lastCheckpoint")
-    ok &= check(saved == "cp-d4-gangway", "the game auto-saves there", saved)
+    ok &= check(saved == "cp-gangway", "the game auto-saves there", saved)
     return ok
 
 
 def scenario_vacuum(b):
     b.open("?reset&play")
-    b.teleport(730, 560)  # deck 3, the robot vacuum patrols x 704-1024
-    b.eval("window.__ship.vacuums[0].sprite.x = 760; window.__ship.vacuums[0].dir = -1")
+    b.teleport(x_of(120), D4)  # the deck 4 corridor the robot vacuum patrols
+    b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(120) + 40}; window.__ship.vacuums[0].dir = -1")
     time.sleep(0.8)
     b.shot("vacuum-scare")
     s = b.state()
@@ -323,33 +337,34 @@ def scenario_vacuum(b):
 
 def scenario_dash(b):
     b.open("?reset&play")
-    b.teleport(1470, 560)  # the deck 3 tangerine is at x 1480
+    b.teleport(x_of(236) + 6, D4)  # the tangerine behind the crate stack on deck 4
     time.sleep(0.3)
     s = b.state()
     ok = check(s["tangerines"] == 1, "picks up a tangerine", s)
+    b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(228)}; window.__ship.vacuums[0].speed = 0")
     b.tap("shift")
     time.sleep(0.2)
     b.shot("dash-shout")
     s = b.state()
     ok &= check(s["dashing"] and s["tangerines"] == 0, "Shift spends it on a dash", s)
-    # Dash left down deck 3, through the vacuum and into the crates.
-    b.hold("left", 6.8)
+    # Dash forward along deck 4, through the crates and into the vacuum.
+    b.hold("left", 2.5)
     s = b.state()
-    ok &= check(b.eval("window.__ship.vacuums[0].alive") is False, "the dash smashes the vacuum")
-    ok &= check(s["x"] < 320, "and breaks through the crates", s)
+    ok &= check(s["x"] < x_of(231), "the dash breaks through the crates", s)
+    ok &= check(b.eval("window.__ship.vacuums[0].alive") is False, "and smashes the vacuum")
     return ok
 
 
 def scenario_overboard(b):
     b.open("?reset&play")
-    b.teleport(200, 272)  # the open aft deck, just inside the stern railing
-    b.key("left", True)
+    b.teleport((col(257) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing
+    b.key("right", True)
     b.key("space", True)
     time.sleep(0.5)
     b.key("space", False)
     time.sleep(0.6)
-    b.key("left", False)
-    time.sleep(0.6)
+    b.key("right", False)
+    time.sleep(1.2)
     b.shot("overboard")
     s = b.state()
     ok = check(s["mode"] == "scripted", "jumping the stern railing goes overboard", s)
@@ -363,6 +378,7 @@ SCENARIOS = {name[len("scenario_"):]: fn for name, fn in globals().items() if na
 
 
 def main():
+    sys.stdout.reconfigure(errors="replace")  # the Windows console can't print every emoji
     names = sys.argv[1:] or list(SCENARIOS)
     b = Browser()
     all_ok = True

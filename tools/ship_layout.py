@@ -23,7 +23,8 @@ EXTENT = {
 # Stair-and-elevator cores, (forward edge, aft edge), on every deck from 3 to 12.
 CORES = {"forward": (74, 82), "midship": (92, 100), "aft": (194, 202)}
 
-# The atrium: open from deck 5 up to deck 9, between the forward and midship cores.
+# The atrium, decks 5 to 9 between the forward and midship cores. In the game it is a look, not a
+# well: its floors are solid, so nothing falls through the middle of a deck (§5.3).
 ATRIUM = {"span": (82, 92), "decks": (5, 9)}
 
 # Above the top deck.
@@ -52,7 +53,8 @@ VENUES = [
     (10, 202, 242, "Cabins", "cabins"),
 
     (9, 14, 74, "Cabins", "cabins"),
-    (9, 100, 194, "Cabins", "cabins"),
+    (9, 100, 106, "Linen room (Bumbot: asleep)", "crew"),
+    (9, 106, 194, "Cabins", "cabins"),
     (9, 202, 245, "Cabins", "cabins"),
 
     (8, 10, 74, "Cabins", "cabins"),
