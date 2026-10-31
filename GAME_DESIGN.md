@@ -569,6 +569,9 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] The finale's art: her holding Bumbot (a state of her character, ~10 generations, or her
       arms-out pose with his sprite on top), designed with the win sequence (§4)
 - [x] The whole ship laid out as a blockout from the real profile (§5.3, §7.3)
+- [ ] **First: the user's playtest of the blockout.** It was merged on 2026-10-31 before the user
+      could try it; ask how it plays (`?play`, and `&cards=all` to roam above deck 6) and fix what
+      comes up before moving on
 - [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
 - [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
       on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
@@ -579,7 +582,8 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] First real ship tiles and props: a PixelLab style test on 3–4 representative pieces (~10–15
       generations); Retro Diffusion only if PixelLab disappoints (§2.1)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30. Skeleton-v3 clips cost 2 (3 frames), 3 (4-14 frames) or 4 (15 frames)
+      2026-11-30 (~1909 left at the end of 2026-10-31). Skeleton-v3 clips cost 2 (3 frames),
+      3 (4-14 frames) or 4 (15 frames)
 
 - [ ] Art: which tools you pick (§2.1)
 - [ ] The colleague's post and card, once the mid-game is laid out (§5.8)

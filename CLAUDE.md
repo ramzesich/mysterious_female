@@ -50,9 +50,29 @@ truth**: read the relevant section before any design or content work, and record
   directions, 48px canvas: our hand-shrunk sprite imported, not generated. The 48px candidate it
   came from (`assets/source/bumbot/pixellab/`) and the other tries are kept for comparison.
 
+Lessons learned (2026-10-31):
+
+- **Never name an object in an animation's `action_description`** unless it should be drawn:
+  "bends down to pick up a cat" drew a cat into her hands. Describe only the body.
+- Frame URLs come from `get_character` (the job reply has no animation id). Downloading them from
+  backblaze.pixellab.ai needs a `User-Agent` header and the URL's `?t=` token, or it returns 403.
+- Characters don't come out smaller than ~28px tall, and small redraws lose the likeness. To get a
+  smaller sprite, shrink a bigger design ourselves (box-resample, snap to Resurrect 64) and import
+  it with `create_character` v3 + `reference_image_url` + `direction_images` (0.25 generations).
+- skeleton-v3 custom poses are humanoid only; for Bumbot use template clips (`running-8-frames`,
+  `licking`, `jump`, `sitting`, `eating`) in skeleton-v3 mode, or v3 text mode.
+- Generated frames sit at slightly different heights: anchor planted-feet clips with `"feet"` in
+  `tools/build_sprites.py`, or the clip floats a pixel.
+- Upload local images with `get_upload_url` + curl, then pass `upload:<id>`; never inline base64.
+
 ## Working with the user
 
+- **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
+  user works from more than one computer, so progress lives in the repo (design doc, this file,
+  commits), never only in local memory or uncommitted files.
 - Design is settled by numbered question lists; the user answers by number.
+- When a generated piece doesn't read as intended, offer to drop or replace it rather than re-rolling
+  again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
