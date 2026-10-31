@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# NCL reference material: copyrighted, kept locally only (GAME_DESIGN.md §5.3)
+reference/

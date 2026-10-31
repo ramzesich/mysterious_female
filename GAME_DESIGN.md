@@ -282,7 +282,20 @@ Real-world figures ([NCL ship map](https://app.ncl.com/sites/default/files/Ship_
 - Passenger decks are numbered **4 to 12**; the decks below are crew and machinery.
 - Deck 11, aft: an open-air diner with a self-service ice cream machine (the final catch).
 
-**Decided (layout, 2026-10-31):** from NCL's side profile of the ship (the ship map PDF above).
+**The reference for real proportions** is NCL's ship map ([PDF](https://app.ncl.com/sites/default/files/Ship_Map_SUN_06142022.pdf)):
+its lower half is a **side profile** of every deck, with the stair cores, the atrium and each
+venue's position along the ship. Use it whenever a position or proportion needs checking.
+
+- **It is drawn with the bow on the right. The game flips it: bow on the left.**
+- A local copy is kept, not committed (it is NCL's artwork and the repo is public), in the
+  git-ignored `reference/` folder: `norwegian-sun-ship-map.pdf`, a render of the profile
+  (`norwegian-sun-profile.png`) and the same flipped to the game's orientation
+  (`norwegian-sun-profile-flipped.png`; its text reads mirrored). If the folder is missing,
+  download the PDF again and render the profile with PyMuPDF (`pip install pymupdf`), page 1,
+  clip y 425–585 pt.
+- Measured off the profile: the ship is ~1,620 px long at 150 dpi, so ~6.3 px per metre.
+
+**Decided (layout, 2026-10-31):** from that profile.
 
 - **The bow is on the left**, the stern on the right.
 - Three stair-and-elevator cores: **forward** (~79 m from the bow), **midship** (~96 m) and **aft**
