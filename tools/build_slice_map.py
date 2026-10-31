@@ -62,8 +62,8 @@ def build_layers():
     fill(solid, STERN, STERN, WATER_ROW, ROWS - 1, NAVY)
     fill(solid, STERN + 1, COLS - 1, 32, ROWS - 1, STEEL)  # tanks and machinery below deck 3
 
-    # Wall between the open aft deck and the deck 5 interior, with a doorway at floor level.
-    fill(solid, 24, 24, 8, 11, STEEL)
+    # Wall between the open aft deck and the deck 5 interior, with a 64px doorway at floor level.
+    fill(solid, 24, 24, 8, 10, STEEL)
 
     # Forward end of the slice.
     fill(solid, COLS - 1, COLS - 1, 0, 31, STEEL)
@@ -133,13 +133,14 @@ def build_objects():
         add(point(0, f"sign-{text.lower().replace(' ', '-')}-{col}", "sign", col_x(col), floor_y(deck) - rise,
                   [{"name": "text", "type": "string", "value": text}]))
 
-    sign("GANGWAY", 44, 4, rise=78)
+    sign("GANGWAY", 44, 4, rise=74)
     sign("DECK 4", 57, 4)
     sign("DECK 5", 73, 5)
     sign("DECK 3", 73, 3)
     sign("CREW ONLY", 30, 4)
-    add({"id": 0, "name": "shell-door", "type": "decor", "x": 41 * TILE, "y": floor_y(4) - 72,
-         "width": 6 * TILE, "height": 72, "rotation": 0, "visible": True,
+    # Sized to her, like every human-scale thing (GAME_DESIGN.md §2.1): a double door ~1.3x her height.
+    add({"id": 0, "name": "shell-door", "type": "decor", "x": 42 * TILE + 8, "y": floor_y(4) - 64,
+         "width": 3 * TILE, "height": 64, "rotation": 0, "visible": True,
          "properties": [{"name": "kind", "type": "string", "value": "shelldoor"}]})
 
     # A robot vacuum patrolling the deck 3 crew corridor.

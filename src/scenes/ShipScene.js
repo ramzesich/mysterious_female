@@ -14,6 +14,9 @@ const DEPTH = {
 const approach = (value, target, step) =>
     value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
+const HALF = PLAYER.height / 2;
+const LAMP_RISE = 66; // the checkpoint lamp sits just above the 60px door
+
 // Each hazard gets its own fright (§5.6).
 const FRIGHTS = { vacuum: 'Іііі!' };
 
@@ -95,8 +98,8 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'checkpoint': {
                     const door = this.add.image(o.x, o.y, 'door').setOrigin(0.5, 1).setDepth(DEPTH.props);
-                    const glow = this.add.image(o.x, o.y - 37, 'glow').setDepth(DEPTH.props).setVisible(false);
-                    const lamp = this.add.image(o.x, o.y - 37, 'lamp').setDepth(DEPTH.props);
+                    const glow = this.add.image(o.x, o.y - LAMP_RISE, 'glow').setDepth(DEPTH.props).setVisible(false);
+                    const lamp = this.add.image(o.x, o.y - LAMP_RISE, 'lamp').setDepth(DEPTH.props);
                     this.worldLayer.add([door, glow, lamp]);
                     const cp = { id: o.name, x: o.x, y: o.y, door, lamp, glow, active: false };
                     this.checkpoints.push(cp);
@@ -186,14 +189,14 @@ export class ShipScene extends Phaser.Scene {
         g.strokeRect(o.x + 2, o.y + 2, o.width - 4, o.height - 2);
         g.lineBetween(o.x + o.width / 2, o.y + 2, o.x + o.width / 2, o.y + o.height);
         g.fillStyle(0xa9c8d8, 1);
-        g.fillCircle(o.x + o.width / 4, o.y + 20, 6);
-        g.fillCircle(o.x + (o.width * 3) / 4, o.y + 20, 6);
+        g.fillCircle(o.x + o.width / 4, o.y + 16, 4);
+        g.fillCircle(o.x + (o.width * 3) / 4, o.y + 16, 4);
     }
 
     buildPlayer() {
         const p = this.physics.add.sprite(0, 0, 'her', 'stand').setOrigin(0.5, 1).setDepth(DEPTH.player);
         p.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
-        p.body.setOffset((12 - PLAYER.bodyWidth) / 2, 32 - PLAYER.bodyHeight);
+        p.body.setOffset((PLAYER.width - PLAYER.bodyWidth) / 2, PLAYER.height - PLAYER.bodyHeight);
         p.body.setMaxVelocity(10000, PLAYER.maxFall);
         this.worldLayer.add(p);
         this.player = p;
@@ -287,8 +290,8 @@ export class ShipScene extends Phaser.Scene {
 
         const cam = this.cameras.main;
         cam.startFollow(p, true, 0.15, 0.15);
-        cam.setFollowOffset(0, 16);
-        cam.centerOn(p.x, p.y - 16);
+        cam.setFollowOffset(0, HALF);
+        cam.centerOn(p.x, p.y - HALF);
 
         if (!emerge) {
             this.mode = 'play';
@@ -388,7 +391,7 @@ export class ShipScene extends Phaser.Scene {
 
     tryLadder(input) {
         const p = this.player;
-        const tile = input.up ? this.ladderTileAt(p.x, p.y - 16) : this.ladderTileAt(p.x, p.y + 2);
+        const tile = input.up ? this.ladderTileAt(p.x, p.y - HALF) : this.ladderTileAt(p.x, p.y + 2);
         if (!tile) return false;
 
         let top = tile.y;
@@ -489,7 +492,7 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         for (const t of this.tangerines) {
             if (!t.sprite.active) continue;
-            if (Phaser.Math.Distance.Between(p.x, p.y - 16, t.sprite.x, t.sprite.y - 4) < 14) {
+            if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);
                 sfx.pickup();
@@ -530,10 +533,10 @@ export class ShipScene extends Phaser.Scene {
         this.tweens.add({ targets: c.lamp, scale: 1.8, duration: 160, yoyo: true, ease: 'Quad.easeOut' });
         for (let i = 0; i < 14; i++) {
             const angle = (Math.PI * 2 * i) / 14;
-            const spark = this.add.image(c.x, c.y - 37, 'dot').setTint(0x7dffa0).setDepth(DEPTH.fx);
+            const spark = this.add.image(c.x, c.y - LAMP_RISE, 'dot').setTint(0x7dffa0).setDepth(DEPTH.fx);
             this.worldLayer.add(spark);
             this.tweens.add({
-                targets: spark, x: c.x + Math.cos(angle) * 22, y: c.y - 37 + Math.sin(angle) * 22, alpha: 0,
+                targets: spark, x: c.x + Math.cos(angle) * 22, y: c.y - LAMP_RISE + Math.sin(angle) * 22, alpha: 0,
                 duration: 500, ease: 'Quad.easeOut', onComplete: () => spark.destroy(),
             });
         }
@@ -671,10 +674,10 @@ export class ShipScene extends Phaser.Scene {
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
         this.smash(p.x, this.waterY);
-        p.setFrame('stand').setCrop(0, 0, 12, 20).setDepth(DEPTH.fx);
-        p.y = this.waterY + 12;
-        const ring = this.add.image(p.x, this.waterY - 1, 'lifering').setDepth(DEPTH.fx + 0.5);
-        const wave = this.add.text(p.x + 9, this.waterY - 26, '👋', { fontSize: '10px', resolution: 4 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
+        p.setFrame('stand').setCrop(0, 0, PLAYER.width, 30).setDepth(DEPTH.fx);
+        p.y = this.waterY + PLAYER.height - 30; // the crop's bottom edge sits on the water
+        const ring = this.add.image(p.x, this.waterY - 2, 'lifering').setDepth(DEPTH.fx + 0.5);
+        const wave = this.add.text(p.x + 12, this.waterY - 36, '👋', { fontSize: '12px', resolution: 4 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
         this.worldLayer.add([ring, wave]);
         this.tweens.add({ targets: [p, ring, wave], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         this.tweens.add({ targets: wave, angle: { from: -20, to: 20 }, duration: 180, yoyo: true, repeat: -1 });
@@ -712,7 +715,7 @@ export class ShipScene extends Phaser.Scene {
         const cam = this.cameras.main;
         const p = this.player;
         const sx = (p.x - cam.worldView.x) * cam.zoom;
-        const sy = (p.y - 36 - cam.worldView.y) * cam.zoom;
+        const sy = (p.y - PLAYER.height - 6 - cam.worldView.y) * cam.zoom;
         this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(sx, sy);
         this.alert.setPosition(sx, sy);
         if (this.debugText.visible) {

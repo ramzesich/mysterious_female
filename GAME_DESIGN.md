@@ -107,8 +107,8 @@ props, and **one month** of PixelLab when the characters are drawn, ideally all 
 
 - The hair curl and the earrings are what make her recognisable at sprite size, so they get
   exaggerated slightly. Redone if it doesn't look right.
-- **Size:** about 12% of the screen height (32px at a 480×270 internal resolution), so she reads
-  clearly. Bumbot is stylised larger than a real cat would be next to her, or he would be a speck.
+- **Size:** **48px** tall at the 480×270 internal resolution, about 18% of the screen height. Bumbot
+  is stylised larger than a real cat would be next to her, or he would be a speck.
 
 ### 3.1 Controls
 
@@ -269,8 +269,12 @@ That works out to (numbers to be tuned in testing):
   internal resolution.
 - So ~80px per metre at 960×540, and the 258 m ship is **~20,600px long**, about **21 screen widths**
   per full-length deck. Including hull and funnel, it is roughly 4,500px tall.
-- Characters are drawn at about half their true size relative to the ship, which is normal for a
-  platformer: at true scale she would fill half the deck height, with no room to jump.
+- She is drawn at about **two thirds of true scale** against the ship, so a deck's ceiling sits at
+  about 2.3× her height: close enough to feel like a ship's corridor, with room left to jump. (A first
+  try at half scale made the decks feel like halls.)
+- **Everything human-sized is sized to her, never to the ship**: doors (~1.25× her height), furniture,
+  railings, counters, signs. Sizing some props to the ship and others to her made a gangway door
+  twice the height of the crew cabin door beside it. The ship's overall dimensions stay real.
 
 ### 5.5 Checkpoints
 

@@ -29,79 +29,86 @@ const PALETTE = {
     T: '#a39780',
 };
 
-// Bumbusik, facing right, 12x32. The frames share everything above the hem.
+// Bumbusik, facing right, 16x48. The frames share everything above the hem.
 const HER_TOP = [
-    '....kkkk....',
-    '...kkkkkk...',
-    '..kkkkkkkk..',
-    '..kkksssss..',
-    '..kkssksks..',
-    '..kkssssss..',
-    '..kkesssss..',
-    '..kkkssss...',
-    '.kkkk.ss....',
-    'k.kkgrrrg...',
-    '..ewwwwwwe..',
-    '..wwwwwwww..',
-    '..wwwwwwgw..',
-    '.swwwwwwgws.',
-    '.swwwwwwgws.',
-    '.swwwwwwgws.',
-    '.snnnnnnnns.',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '.nnnnnnnnnn.',
-    '.nnnnnnnnnn.',
+    '......kkkk......',
+    '....kkkkkkkk....',
+    '...kkkkkkkkkk...',
+    '..kkkkkkkkkkkk..',
+    '..kkkkkkkkssss..',
+    '..kkkkkksssssk..',
+    '..kkkkksssksss..',
+    '..kkkkksssssss..',
+    '..kkkkksssssss..',
+    '..kkkkesssssss..',
+    '..kkkkkssssss...',
+    '..kkkkkksssss...',
+    '..kkkkkkkssss...',
+    '..kkkkk..sss....',
+    '.kkkkkk..sss....',
+    '.kkkkkgrrrrrg...',
+    '.kk.ewwwwwwwe...',
+    'k...wwwwwwwgw...',
+    '...wwwwwwwwgww..',
+    '...wwwwwwwwgww..',
+    '...swwwwwwwgws..',
+    '...swwwwwwwgws..',
+    '...swwwwwwwgws..',
+    '...swwwwwwwgws..',
+    '...swwwwwwwgws..',
+    '...snnnnnnnnns..',
+    '...snnnnnnnnns..',
+    '....nnnnnnnnn...',
+    '....nnnnnnnnn...',
+    '....nnnnnnnnn...',
+    '...nnnnnnnnnnn..',
+    '...nnnnnnnnnnn..',
+    '...nnnnnnnnnnn..',
+    '...nnnnnnnnnnn..',
 ];
 
+const BLANK = '................';
 const LEGS = {
     stand: [
-        '...ss..ss...', '...ss..ss...', '...ss..ss...', '...ss..ss...',
-        '...ss..ss...', '...ss..ss...', '...ss..ss...', '...bb..bbb..', '...bbb.bbb..',
+        ...Array(12).fill('.....ss..ss.....'),
+        '....bbb..bbb....', '....bbb..bbbb...',
     ],
     run1: [
-        '...ss...ss..', '..ss....ss..', '..ss.....ss.', '.ss......ss.',
-        '.ss.......ss', '.ss.......ss', 'bb........bb', 'bbb.......bb', '............',
+        '....ss....ss....', '....ss....ss....', '...ss......ss...', '...ss......ss...',
+        '..ss........ss..', '..ss........ss..', '..ss.........ss.', '.ss..........ss.',
+        '.ss..........ss.', '.ss...........ss', '.bb...........bb', 'bbb...........bb',
+        BLANK, BLANK,
     ],
     run2: [
-        '....ss.ss...', '....ss.ss...', '....sss.....', '.....ss.....',
-        '.....ss.....', '.....sss....', '.....bbb....', '.....bbbb...', '............',
+        '......ss.ss.....', '......ss.ss.....', '......sssss.....', '.......sss......',
+        '.......ss.......', '.......ss.......', '.......ss.......', '.......ss.......',
+        '.......sss......', '.......sss......', '.......bbb......', '.......bbbb.....',
+        BLANK, BLANK,
     ],
     jump: [
-        '...ss..ss...', '...ss...ss..', '..ss.....ss.', '..ss.....ss.',
-        '..bb.....bb.', '..bbb....bbb', '............', '............', '............',
+        '.....ss..ss.....', '.....ss...ss....', '....ss.....ss...', '....ss.....ss...',
+        '....ss.....ss...', '....bbb....bbb..', '....bbb....bbb..',
+        ...Array(7).fill(BLANK),
     ],
 };
 
 // Climbing, seen from behind: hair down her back, arms up on the rungs.
 const HER_CLIMB = [
-    's...kkkk...s',
-    's..kkkkkk..s',
-    's.kkkkkkkk.s',
-    's.kkkkkkkk.s',
-    's.kkkkkkkk.s',
-    's.kkkkkkkk.s',
-    'w.ekkkkkke.w',
-    'w.kkkkkkkk.w',
-    'wkkkkkkkkkkw',
-    'wkwkkkkkkwkw',
-    '.wewwwwwwew.',
-    '..wwwwwwww..',
-    '..wwwwwwww..',
-    '..wwwwwwww..',
-    '..wwwwwwww..',
-    '..wwwwwwww..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '..nnnnnnnn..',
-    '.nnnnnnnnnn.',
-    '.nnnnnnnnnn.',
-    '...ss..ss...', '...ss..ss...', '...ss..ss...', '...ss..ss...',
-    '...ss..ss...', '...ss..ss...', '...ss..ss...', '...bb..bb...', '...bb..bb...',
+    '......kkkk......',
+    's...kkkkkkkk...s',
+    's..kkkkkkkkkk..s',
+    ...Array(10).fill('s.kkkkkkkkkkkk.s'),
+    'w.kkkkkkkkkkkk.w',
+    'w.ekkkkkkkkkke.w',
+    'w.kkkkkkkkkkkk.w',
+    'wkkkkkkkkkkkkkkw',
+    'wkwkkkkkkkkkkwkw',
+    '..wewwwwwwwwew..',
+    ...Array(6).fill('...wwwwwwwwww...'),
+    ...Array(5).fill('...nnnnnnnnnn...'),
+    ...Array(4).fill('..nnnnnnnnnnnn..'),
+    ...Array(12).fill('.....ss..ss.....'),
+    '.....bb..bb.....', '.....bb..bb.....',
 ];
 
 const SPRITES = {
@@ -143,44 +150,28 @@ const SPRITES = {
     ],
     // A small side table, background furniture (muted, so it never reads as something to stand on).
     sidetable: [
-        'TTTTTTTTTTTTTT',
-        'tttttttttttttt',
-        '.T..........T.',
-        '.t..........t.',
-        '.t..........t.',
-        '.t..........t.',
-        '.t..........t.',
-        '.t..........t.',
-        '.T..........T.',
-    ],
-    lifering: [
-        '....RRRRRR....',
-        '..RRWWWWWWRR..',
-        '.RWWW....WWWR.',
-        '.RW........WR.',
-        'RW..........WR',
-        'RW..........WR',
-        'RR..........RR',
-        '.RR........RR.',
-        '.RRRW....WRRR.',
-        '..RRRWWWWRRR..',
-        '....RRRRRR....',
+        'TTTTTTTTTTTTTTTTTTTT',
+        'tttttttttttttttttttt',
+        'tttttttttttttttttttt',
+        ...Array(14).fill('..t..............t..'),
+        '..T..............T..',
     ],
 };
 
-// Crew cabin door, 16x32. Closed until she passes it; activated, it stands ajar with warm light
-// spilling out of the cabin, so an active checkpoint reads from across the deck (§5.5).
+// Crew cabin door, 24x60: sized to her, like every human-scale thing on board (§2.1). Closed until
+// she passes it; activated, it stands ajar with warm light spilling out of the cabin, so an active
+// checkpoint reads from across the deck (§5.5).
 function doorRows(open) {
     const rows = [];
-    for (let y = 0; y < 32; y++) {
+    for (let y = 0; y < 60; y++) {
         let row = '';
-        for (let x = 0; x < 16; x++) {
-            const frame = x === 0 || x === 15 || y === 0;
+        for (let x = 0; x < 24; x++) {
+            const frame = x <= 1 || x >= 22 || y <= 1;
             if (frame) row += 'd';
-            else if (open && x <= 5) row += x >= 4 ? 'L' : 'Y';                                                          // lit gap
-            else if (y >= 5 && y <= 8 && x >= 7 && x <= 12) row += y === 5 || y === 8 || x === 7 || x === 12 ? 'm' : 'W'; // number plate
-            else if (y >= 16 && y <= 17 && x >= (open ? 7 : 11) && x <= (open ? 8 : 13)) row += 'd';                     // handle
-            else row += open && x === 6 ? 'm' : 'p';                                                                       // door edge
+            else if (open && x <= 8) row += x >= 7 ? 'L' : 'Y';                                                             // lit gap
+            else if (y >= 9 && y <= 13 && x >= 11 && x <= 19) row += y === 9 || y === 13 || x === 11 || x === 19 ? 'm' : 'W'; // number plate
+            else if (y >= 30 && y <= 31 && x >= (open ? 11 : 16) && x <= (open ? 13 : 19)) row += 'd';                     // handle
+            else row += open && x === 9 ? 'm' : 'p';                                                                         // door edge
         }
         rows.push(row);
     }
@@ -209,14 +200,14 @@ function makeSingle(scene, key, rows) {
 }
 
 export function makeTextures(scene) {
-    // Bumbusik: one strip, five 12x32 frames.
+    // Bumbusik: one strip, five 16x48 frames.
     const frames = ['stand', 'run1', 'run2', 'jump', 'climb'];
-    const her = scene.textures.createCanvas('her', 12 * frames.length, 32);
+    const her = scene.textures.createCanvas('her', 16 * frames.length, 48);
     const ctx = her.getContext();
     frames.forEach((name, i) => {
         const rows = name === 'climb' ? HER_CLIMB : [...HER_TOP, ...LEGS[name]];
-        paint(ctx, rows, i * 12, 0);
-        her.add(name, 0, i * 12, 0, 12, 32);
+        paint(ctx, rows, i * 16, 0);
+        her.add(name, 0, i * 16, 0, 16, 48);
     });
     her.refresh();
 
@@ -225,6 +216,18 @@ export function makeTextures(scene) {
     makeSingle(scene, 'door-on', doorRows(true));
     makeSingle(scene, 'lamp', LAMP.off);
     makeSingle(scene, 'lamp-on', LAMP.on);
+
+    // Life ring, 20x20 (about 75 cm across, at her scale): red and white quarters.
+    const ring = scene.textures.createCanvas('lifering', 20, 20);
+    const rctx = ring.getContext();
+    rctx.lineWidth = 5;
+    for (let q = 0; q < 4; q++) {
+        rctx.strokeStyle = q % 2 ? '#f4f4f4' : '#e04848';
+        rctx.beginPath();
+        rctx.arc(10, 10, 7, (q * Math.PI) / 2, ((q + 1) * Math.PI) / 2);
+        rctx.stroke();
+    }
+    ring.refresh();
 
     // Soft round glow, used behind the lit checkpoint lamp.
     const glow = scene.textures.createCanvas('glow', 32, 32);
