@@ -29,10 +29,12 @@ HER = {
     # lowest pixel on the bottom row, for airborne poses whose source includes the jump's height.
     "frames": {
         # Standing still: her plain side pose. Every so often one of her idles plays once
-        # (GAME_DESIGN.md §3); both are skeleton-v3, starting and ending near "stand".
+        # (GAME_DESIGN.md §3); both are skeleton-v3, starting and ending near "stand". A foot
+        # stays planted throughout, so each frame's lowest pixel goes on the floor ("keep" lifted
+        # the tap a pixel: its last frame reaches one row lower than the rest).
         "stand": [("rotations/east.png", "keep")],
-        "idle-tap": [(f"idle-tap-2/{i}.png", "keep") for i in range(8)],
-        "idle-look": [(f"idle-look/{i}.png", "keep") for i in range(8)],
+        "idle-tap": [(f"idle-tap-2/{i}.png", "feet") for i in range(8)],
+        "idle-look": [(f"idle-look/{i}.png", "feet") for i in range(8)],
         # skeleton-v3 run: moves her standing sprite instead of redrawing it, so her hair keeps its
         # standing length (the first, template run let it grow and puff up).
         "run": [(f"run-steady/{i}.png", "keep") for i in range(8)],
