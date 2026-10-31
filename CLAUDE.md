@@ -40,6 +40,9 @@ truth**: read the relevant section before any design or content work, and record
 - For her animations use `skeleton-v3` mode: it moves her stored sprite instead of redrawing it, so
   hair and proportions stay consistent. Template mode redraws and drifts.
 - Save raw output to `assets/source/`, convert with the palette tools, never commit reference photos.
+- Her PixelLab character (all animations come from it): **"Bumbusik (final)"**,
+  id `ebd5dadc-1318-4717-b0c0-6f429a7a58f0`, 4 directions, 64px. Earlier tries are kept on PixelLab
+  for comparison; don't animate those.
 
 ## Working with the user
 

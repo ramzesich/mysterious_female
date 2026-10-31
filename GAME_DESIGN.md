@@ -483,6 +483,16 @@ not the ship. The real layout, and everything placed in it, follows the Norwegia
 
 Nothing blocks the start of the build. These get settled along the way:
 
+**Next up** (as of 2026-10-31):
+
+- [ ] A "climbing out" pose at the top of a ladder, hands on the hatch edge (~1 generation); for now
+      she uses her arms-down back pose there
+- [ ] Her proper idle (the generated one was parked; §3)
+- [ ] Bumbot's sprite and his five idle activities (§4)
+- [ ] First real ship tiles and props: test PixelLab against Retro Diffusion before committing (§2.1)
+- [ ] PixelLab: trial nearly used up (5.75 generations left); subscribe for one month when the batch
+      of characters and tiles is ready
+
 - [ ] Art: which tools you pick (§2.1)
 - [ ] Deck list and which areas go where, from the real deck plans, as the map is laid out (§5.3, §5.7)
 - [ ] The colleague's post and card, once the mid-game is laid out (§5.8)
