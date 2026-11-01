@@ -268,8 +268,9 @@ there; they only remind her he's on board.
     direction. A door closes by itself once she steps away from it.
   - **No cutaway and no fade:** inside, the walls and decks hide her naturally, seen only in an
     open doorway, and the camera follows her up or down.
-  - She can stop at **any door along the shaft**: ←/→ opens it from inside and she steps out.
-    Letting go of ↑/↓ just short of a door settles her level with it.
+  - She can stop at **any door along the shaft**: **reaching a door opens it** from inside, then
+    ←/→ steps out, or she climbs on and it shuts behind her. Letting go of ↑/↓ just short of a
+    door settles her level with it.
   - **One-way shortcuts, in a few places:** the lower doors stay shut from outside ("opens from
     the other side": the door rattles, its arrows unlit) until she has come down through the
     shaft once; from then on it works both ways for good.

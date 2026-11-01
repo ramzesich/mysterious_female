@@ -269,6 +269,8 @@ def scenario_trunk(b):
     s = b.state()
     ok &= check(s["mode"] == "trunk" and s["y"] == D5, "climbs the shaft up to deck 5", s)
     ok &= check(not trunk_door(b, "fwd-cabins", 4), "the deck 4 door shut behind her")
+    ok &= check(trunk_door(b, "fwd-cabins", 5), "and the deck 5 door opened as she reached it")
+    b.shot("trunk-arrived")
     b.hold("right", 0.5)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] > x + 20, "steps out onto deck 5", s)
@@ -291,6 +293,19 @@ def scenario_trunk(b):
     b.key("left", False)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] < x - 20, "steps out there", s)
+
+    # Climbing on past a door: it opens as she reaches it and shuts again once she has gone by.
+    b.teleport(x, D4)
+    b.tap("e")
+    b.key("up", True)
+    time.sleep(1.85)
+    passing = trunk_door(b, "midships", 5)
+    time.sleep(2.0)
+    b.key("up", False)
+    s = b.state()
+    ok &= check(passing and not trunk_door(b, "midships", 5) and trunk_door(b, "midships", 6)
+                and s["mode"] == "trunk" and s["y"] == D6,
+                "the deck 5 door opens and shuts as she climbs past it to deck 6", s)
 
     # One-way: shut from below until she has come down through it.
     x = trunk_x("theatre")

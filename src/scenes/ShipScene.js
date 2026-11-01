@@ -653,25 +653,26 @@ export class ShipScene extends Phaser.Scene {
         const t = this.inTrunk;
         const v = (input.down ? 1 : 0) - (input.up ? 1 : 0);
         const y0 = p.y;
-        const nearest = t.doors.reduce((a, b) => (Math.abs(p.y - b.y) < Math.abs(p.y - a.y) ? b : a));
-        const atDoor = Math.abs(p.y - nearest.y) < PLAYER.trunkSettle;
+        const doorNear = () => t.doors.find(d => Math.abs(p.y - d.y) < PLAYER.trunkSettle);
 
         if (v) p.y = Phaser.Math.Clamp(p.y + v * PLAYER.climbSpeed * dt, t.top, t.bottom);
-        else if (atDoor) p.y = approach(p.y, nearest.y, PLAYER.climbSpeed * dt); // settles level with it
+        else if (doorNear()) p.y = approach(p.y, doorNear().y, PLAYER.climbSpeed * dt); // settles level with it
         if (p.y !== y0) p.anims.resume();
         else p.anims.pause();
 
+        // Reaching a door opens it from inside: ←/→ steps out, or she climbs on and it shuts behind her.
+        const door = doorNear();
+        if (door && !door.open) this.openTrunkDoor(door);
         const side = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-        if (side && atDoor) this.stepOutOfTrunk(nearest, side);
+        if (side && door) this.stepOutOfTrunk(door, side);
         else this.showInDoorways();
     }
 
-    // ←/→ at a door opens it from inside and she steps out onto that deck. Coming out below the
-    // top of a one-way trunk opens it for good.
+    // She steps out of an open door onto that deck. Coming out below the top of a one-way trunk
+    // opens it for good.
     stepOutOfTrunk(door, side) {
         const p = this.player;
         const t = door.trunk;
-        if (!door.open) this.openTrunkDoor(door);
         if (!t.opened && door.y !== t.top) {
             t.opened = true;
             this.save.opened.push(t.id);
