@@ -635,10 +635,24 @@ Nothing blocks the start of the build. These get settled along the way:
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
       open and to confirm; the panel goes once a deck is chosen. Tried by the user 2026-11-01
-- [ ] **Next: populate the ship.** First real ship tiles and props: a PixelLab style test on 3–4
-      representative pieces (~10–15 generations, ask first); Retro Diffusion only if PixelLab
-      disappoints (§2.1). Then doors along the decks into small separate rooms (§5.1), hazards and
-      people placed on the real decks (§5.8)
+- [ ] **Next: populate the ship, starting with a style test.** Authenticity first, from the user's
+      own photos (summer 2026; §5.3 "The real ship's look"). **Start the next session by asking
+      the user for these photos** (pasted into the chat, or dropped into the git-ignored
+      `reference/photos/`):
+  1. A cabin corridor, looking along it: walls, carpet, ceiling, lights, doors
+  2. A cabin door close up: colour or wood grain, number plate, key-card slot
+  3. The promenade deck: floor, railing, bulkhead, lifeboats overhead
+  4. A lounge or bar with armchairs
+  - Later: a crew-only door, a stair and elevator lobby with its DECK sign, the atrium
+
+  Then the PixelLab style test, 4 pieces, ~10–15 generations (approved 2026-11-01; state the
+  exact cost before running): (a) a cabin corridor tileset (floor, wall, ceiling), (b) a crew
+  cabin door 28×74, closed and ajar, for checkpoints and trunks, (c) one muted background prop
+  (a lounge armchair or bar stool), (d) the promenade: deck floor and railing. Walls and
+  background **a little softer** than her, full colour only for interactive things. Drop them
+  into one stretch of deck 4 by the gangway and show the user a screenshot. Retro Diffusion only
+  if PixelLab disappoints (§2.1). After that: doors along the decks into small separate rooms
+  (§5.1), hazards and people placed on the real decks (§5.8)
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
