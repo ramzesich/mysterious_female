@@ -367,6 +367,24 @@ true to the order and rough size of things on the real ship.
 | Bridge | Forward, behind the captain's key card. A Bumbot near-catch. |
 | Top | Funnel and mast. |
 
+**The real ship's look** (research, 2026-11-01): **authenticity first**, the user decided; the
+ship should look and feel like the Norwegian Sun. Sources: public photo galleries
+([Cruise Deck Plans](https://www.cruisedeckplans.com/ships/pictures.php?ship=Norwegian-Sun)) and the
+user's own photos, asked for place by place. Downloaded copies stay in the git-ignored
+`reference/` folder, never committed.
+
+- **Public rooms:** dark mahogany panelling and brass, cream ceilings with warm cove lighting,
+  coffered dark-wood ceilings in the bars. Leather tub armchairs (tan in the Windjammer Bar,
+  bottle-green in the Havana Club), framed maritime prints, a ship model in a glass case.
+- **Atrium:** red-marble pillars with brass rings, glass elevators in brass frames, a curving
+  staircase with brass rails and blue patterned carpet, cream curved balcony fronts. The guest
+  services and shore excursions counters: dark vertical wood slats, a polished top.
+- **Promenade (deck 6):** not teak. A tan non-skid painted deck (blue in photos from 2015), white
+  steel bulkheads and frames, a white ceiling with fans. White railings with a **wooden
+  handrail**; one stretch is enclosed, with big rounded windows and a wooden rail along them.
+  Lifeboats hang overhead on yellow davits, with blue "LIFEBOAT 23" signs; the bulkhead carries
+  the usual ship clutter: fire hose box, life jacket locker, telephone, walking-track signs.
+
 ### 5.4 Scale
 
 **Decided:**
