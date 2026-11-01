@@ -367,6 +367,28 @@ true to the order and rough size of things on the real ship.
 | Bridge | Forward, behind the captain's key card. A Bumbot near-catch. |
 | Top | Funnel and mast. |
 
+**The real ship's look** (research, 2026-11-01): **authenticity first**, the user decided; the
+ship should look and feel like the Norwegian Sun. **Unconfirmed:** the user thinks the public
+photos below look different from the ship as they knew it. They date from 2015, August 2018 (after
+the dry dock of 31 March to 18 April 2018) and 2023, and user galleries can mix in the sister ship,
+Norwegian Sky. **Decided: the user's own photos come first** (they sailed on her in summer 2026);
+public photos only fill gaps, and only where they agree with the user's. Sources: public photo galleries
+([Cruise Deck Plans](https://www.cruisedeckplans.com/ships/pictures.php?ship=Norwegian-Sun)) and the
+user's own photos, asked for place by place. Downloaded copies stay in the git-ignored
+`reference/` folder, never committed.
+
+- **Public rooms:** dark mahogany panelling and brass, cream ceilings with warm cove lighting,
+  coffered dark-wood ceilings in the bars. Leather tub armchairs (tan in the Windjammer Bar,
+  bottle-green in the Havana Club), framed maritime prints, a ship model in a glass case.
+- **Atrium:** red-marble pillars with brass rings, glass elevators in brass frames, a curving
+  staircase with brass rails and blue patterned carpet, cream curved balcony fronts. The guest
+  services and shore excursions counters: dark vertical wood slats, a polished top.
+- **Promenade (deck 6):** not teak. A tan non-skid painted deck (blue in photos from 2015), white
+  steel bulkheads and frames, a white ceiling with fans. White railings with a **wooden
+  handrail**; one stretch is enclosed, with big rounded windows and a wooden rail along them.
+  Lifeboats hang overhead on yellow davits, with blue "LIFEBOAT 23" signs; the bulkhead carries
+  the usual ship clutter: fire hose box, life jacket locker, telephone, walking-track signs.
+
 ### 5.4 Scale
 
 **Decided:**
@@ -613,10 +635,24 @@ Nothing blocks the start of the build. These get settled along the way:
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
       open and to confirm; the panel goes once a deck is chosen. Tried by the user 2026-11-01
-- [ ] **Next: populate the ship.** First real ship tiles and props: a PixelLab style test on 3–4
-      representative pieces (~10–15 generations, ask first); Retro Diffusion only if PixelLab
-      disappoints (§2.1). Then doors along the decks into small separate rooms (§5.1), hazards and
-      people placed on the real decks (§5.8)
+- [ ] **Next: populate the ship, starting with a style test.** Authenticity first, from the user's
+      own photos (summer 2026; §5.3 "The real ship's look"). **Start the next session by asking
+      the user for these photos** (pasted into the chat, or dropped into the git-ignored
+      `reference/photos/`):
+  1. A cabin corridor, looking along it: walls, carpet, ceiling, lights, doors
+  2. A cabin door close up: colour or wood grain, number plate, key-card slot
+  3. The promenade deck: floor, railing, bulkhead, lifeboats overhead
+  4. A lounge or bar with armchairs
+  - Later: a crew-only door, a stair and elevator lobby with its DECK sign, the atrium
+
+  Then the PixelLab style test, 4 pieces, ~10–15 generations (approved 2026-11-01; state the
+  exact cost before running): (a) a cabin corridor tileset (floor, wall, ceiling), (b) a crew
+  cabin door 28×74, closed and ajar, for checkpoints and trunks, (c) one muted background prop
+  (a lounge armchair or bar stool), (d) the promenade: deck floor and railing. Walls and
+  background **a little softer** than her, full colour only for interactive things. Drop them
+  into one stretch of deck 4 by the gangway and show the user a screenshot. Retro Diffusion only
+  if PixelLab disappoints (§2.1). After that: doors along the decks into small separate rooms
+  (§5.1), hazards and people placed on the real decks (§5.8)
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
