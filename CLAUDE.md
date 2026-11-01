@@ -8,7 +8,8 @@ truth**: read the relevant section before any design or content work, and record
 ## Stack and running
 
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
-- Run: `python -m http.server`, open <http://localhost:8000>. URL flags: `?play` skip title,
+- Run: `python tools/serve.py` (caching off, so reloads are never stale), open
+  <http://localhost:8000>. URL flags: `?play` skip title,
   `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (for testing).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
@@ -17,8 +18,8 @@ truth**: read the relevant section before any design or content work, and record
 | Path | What |
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, scripted), scares, dash, checkpoints, card-locked stairs, Bumbot near-catches |
-| `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium and every venue in metres from the bow (bow on the left). Edit positions here |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, Bumbot near-catches |
+| `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
 | `reference/` | **Git-ignored**: NCL's ship map PDF and its side profile (also flipped to bow-left), the source of real proportions. Copyrighted, never commit |

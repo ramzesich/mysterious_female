@@ -21,6 +21,7 @@ export const PLAYER = {
     coyoteMs: 90,         // jump still allowed this long after walking off an edge
     jumpBufferMs: 110,    // a jump pressed this long before landing still happens
     climbSpeed: 80,
+    trunkSettle: 18,      // letting go of ↑/↓ this close to a trunk door settles her level with it
     stairsSpeed: 105,     // along the slope
     stairsBoardReach: 10, // how close to a flight's end she must be to step onto it
 };

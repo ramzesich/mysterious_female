@@ -7,10 +7,12 @@ A browser platformer set on a cruise ship. Design: [GAME_DESIGN.md](GAME_DESIGN.
 Browsers won't load the map from a `file://` page, so serve the folder:
 
 ```
-python -m http.server
+python tools/serve.py
 ```
 
-then open <http://localhost:8000>. GitHub Pages serves it the same way.
+then open <http://localhost:8000>. It turns browser caching off, so a reload always picks up the
+latest build (`python -m http.server` works too, but Chrome may keep stale copies). GitHub Pages
+serves it the same way.
 
 URL flags, combinable (`?play&debug`):
 
@@ -19,6 +21,7 @@ URL flags, combinable (`?play&debug`):
 | `?play` | Skip the title screen |
 | `?reset` | Clear the saved progress |
 | `?debug` | Show collision boxes and her position/state |
+| `?cards=all` | Every key card, for testing |
 
 ## Controls
 
@@ -28,7 +31,7 @@ URL flags, combinable (`?play&debug`):
 | Jump (hold for higher) | Space | A |
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | Кісюнічка dash (costs a tangerine) | Shift | B |
-| Activate | E | X |
+| Activate: open doors | E | X |
 
 A controller is detected once a button is pressed on it.
 
@@ -41,7 +44,9 @@ A controller is detected once a button is pressed on it.
 | `vendor/phaser.min.js` | Phaser 4.2.1, vendored (no npm, no build) |
 | `maps/ship.json` | The ship map, Tiled JSON format |
 | `assets/tiles/placeholder.png` | Placeholder tileset |
-| `tools/build_slice_map.py` | Generates the current first-slice map and tileset |
+| `tools/ship_layout.py` | The ship's layout in metres from the bow: edit positions here |
+| `tools/build_ship_map.py` | Generates the map and tileset from the layout |
+| `tools/serve.py` | Serves the game locally with caching off |
 | `tools/playtest.py` | Headless playtests in Chrome (needs `websocket-client`) |
 
 ## Testing

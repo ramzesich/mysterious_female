@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, VENUES
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -103,6 +103,14 @@ def build():
         dy = 52 if name == "midship" else 40
         out.append(text(cx, bottom + dy, f"{name} stairs + lifts", 9, weight="bold"))
 
+    # Escape trunks: the shaft, with a door mark on each deck that has one.
+    for name, m, decks, opts in TRUNKS:
+        out.append(f'<line x1="{x(m):.1f}" y1="{row_top(max(decks)) + 4}" x2="{x(m):.1f}" '
+                   f'y2="{row_top(min(decks)) + ROW - 4}" stroke="#e07a1f" stroke-width="2"/>')
+        for deck in decks:
+            out.append(f'<rect x="{x(m) - 3:.1f}" y="{row_top(deck) + ROW - 12}" width="6" height="8" '
+                       f'fill="#e07a1f"/>')
+
     # Ends, scale and legend.
     out.append(text(LEFT, 24, "◀ FORWARD (bow)", 13, "start", weight="bold"))
     out.append(text(x(LENGTH), 24, "AFT (stern) ▶", 13, "end", weight="bold"))
@@ -118,6 +126,9 @@ def build():
         out.append(text(lx + 17, 50, label, 10, "start"))
         lx += 110
     out.append(text(lx + 4, 50, "★ Bumbot near-catch", 10, "start", weight="bold"))
+    lx += 130
+    out.append(f'<rect x="{lx}" y="40" width="6" height="12" fill="#e07a1f"/>')
+    out.append(text(lx + 11, 50, "Escape trunk (ladder doors)", 10, "start"))
     out.append("</svg>")
 
     path = ROOT / "docs" / "ship-profile.svg"
