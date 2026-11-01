@@ -14,7 +14,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, VENUES
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -244,6 +244,19 @@ def build_objects():
     for i in range(2):
         for j in range(2):
             add(area(f"crate-{i}-{j}", "breakable", (col(232) + i) * TILE, floor_y(4) - (j + 1) * TILE, TILE, TILE))
+
+    # Escape trunks (§5.1): a door on each deck listed, top to bottom, all at the same x. Each door
+    # sits on an indoor wall, clear of the stair cores and the atrium.
+    for name, m, decks, opts in TRUNKS:
+        for deck in decks:
+            assert deck in PLAYABLE and covered(deck, m) and not in_core(m) and not in_atrium(deck, m), \
+                f"trunk {name}: no wall for a door on deck {deck} at {m} m"
+        props = [prop("floors", ",".join(str(floor_y(d)) for d in sorted(decks, reverse=True)))]
+        if opts.get("one_way"):
+            props.append(prop("oneWay", True, "bool"))
+        if opts.get("card"):
+            props.append(prop("card", opts["card"]))
+        add(point(f"trunk-{name}", "trunk", x_of(m), floor_y(max(decks)), props))
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [

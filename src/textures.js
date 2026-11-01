@@ -28,6 +28,10 @@ const PALETTE = {
     L: '#fff1c9',
     t: '#b9ad97', // background furniture, muted
     T: '#a39780',
+    D: '#33373e', // inside an escape trunk
+    M: '#6c737c',
+    a: '#f28c28', // trunk arrow lamp, lit
+    A: '#ffd98a',
 };
 
 const SPRITES = {
@@ -97,6 +101,46 @@ function doorRows(open) {
     return rows;
 }
 
+// An escape trunk's door, open (§5.1): the leaf swung out to one side, and the ladder in the dark
+// shaft behind it. Closed, it is the plain crew door.
+export const TRUNK_INSIDE = { x0: 5, x1: 26, y0: 2 }; // the doorway she shows through, door-local
+function trunkOpenRows() {
+    const rows = [];
+    for (let y = 0; y < 74; y++) {
+        let row = '';
+        for (let x = 0; x < 28; x++) {
+            if (x <= 1 || x >= 26 || y <= 1) row += 'd';                     // frame
+            else if (x <= 4) row += x === 4 ? 'm' : 'p';                     // the leaf, edge-on
+            else if (x === 8 || x === 23) row += 'M';                        // ladder rails
+            else if (x > 8 && x < 23 && y % 9 === 5) row += 'm';             // rungs
+            else row += 'D';
+        }
+        rows.push(row);
+    }
+    return rows;
+}
+
+// Arrow lamps above a trunk door, 9x7: amber when she can go that way, grey when she can't.
+function arrowRows(up, lit) {
+    const rows = [];
+    for (let y = 0; y < 7; y++) {
+        let row = '';
+        for (let x = 0; x < 9; x++) {
+            const corner = (x === 0 || x === 8) && (y === 0 || y === 6);
+            const step = up ? y - 2 : 4 - y;                                  // 0 at the arrow's tip
+            if (corner) row += '.';
+            else if (x === 0 || x === 8 || y === 0 || y === 6) row += 'd';
+            else if (step >= 0 && step <= 2 && Math.abs(x - 4) <= step) row += lit ? (step === 0 ? 'A' : 'a') : 'm';
+            else row += 'D';
+        }
+        rows.push(row);
+    }
+    return rows;
+}
+
+// A card reader beside a locked door, 6x10; its light is tinted to the card's colour (§6.2).
+const READER = ['dddddd', 'dppppd', 'dWWWWd', 'dWWWWd', 'dppppd', 'dpddpd', 'dppppd', 'dppppd', 'dppppd', 'dddddd'];
+
 const LAMP = {
     off: ['.dddddd.', 'dmmmmmmd', 'dmmmmmmd', '.dddddd.'],
     on: ['.dddddd.', 'dGyyyyGd', 'dyyyyyyd', '.dddddd.'],
@@ -124,6 +168,12 @@ export function makeTextures(scene) {
     makeSingle(scene, 'door-on', doorRows(true));
     makeSingle(scene, 'lamp', LAMP.off);
     makeSingle(scene, 'lamp-on', LAMP.on);
+    makeSingle(scene, 'trunk-open', trunkOpenRows());
+    for (const up of [true, false]) {
+        makeSingle(scene, `arrow-${up ? 'up' : 'down'}`, arrowRows(up, false));
+        makeSingle(scene, `arrow-${up ? 'up' : 'down'}-on`, arrowRows(up, true));
+    }
+    makeSingle(scene, 'reader', READER);
 
     // Life ring, 24x24 (about 75 cm across, at her scale): red and white quarters.
     const ring = scene.textures.createCanvas('lifering', 24, 24);

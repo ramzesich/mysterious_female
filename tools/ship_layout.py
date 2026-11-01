@@ -82,3 +82,14 @@ VENUES = [
     (4, 100, 194, "Cabins", "cabins"),
     (4, 202, 256, "Cabins", "cabins"),
 ]
+
+# Escape trunks (§5.1): crew doors onto a vertical ladder shaft. Each is (name, metres from the
+# bow, the decks with a door, options): "one_way" opens from the top door only until she has come
+# down through it once; "card" is the key card the doors need. For now, test trunks for the
+# blockout; the real ones are placed when the interiors are filled.
+TRUNKS = [
+    ("fwd-cabins", 50, [4, 5], {}),
+    ("midships", 125, [4, 5, 6], {}),
+    ("theatre", 240, [4, 6], {"one_way": True}),
+    ("magnums", 108, [6, 7], {"card": "hotel"}),
+]

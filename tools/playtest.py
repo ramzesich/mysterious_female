@@ -23,7 +23,7 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import CORES, FUNNEL, ROOF_ROW, TILE, col, floor_y, x_of
+from build_ship_map import CORES, FUNNEL, ROOF_ROW, TILE, TRUNKS, col, floor_y, x_of
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -239,6 +239,86 @@ def scenario_ladder(b):
     b.hold("right", 0.4)
     s = b.state()
     ok &= check(s["y"] == ROOF_Y, "walks off the ladder top without falling through", s)
+    return ok
+
+
+def trunk_x(name):
+    return next(x_of(m) for n, m, _, _ in TRUNKS if n == name)
+
+
+def trunk_door(b, name, deck, field="open"):
+    """A trunk door's state: `open`, or the texture of its `up` / `down` arrow lamp."""
+    door = f"window.__ship.trunks.find(t => t.id === 'trunk-{name}').doors.find(d => d.y === {floor_y(deck)})"
+    return b.eval(f"{door}.open" if field == "open" else f"{door}.{field}.texture.key")
+
+
+def scenario_trunk(b):
+    b.open("?reset&play")
+    x = trunk_x("fwd-cabins")
+    b.teleport(x, D4)
+    b.hold("up", 0.5)
+    s = b.state()
+    ok = check(s["mode"] == "play" and s["y"] == D4, "a shut trunk door doesn't take ↑", s)
+    b.tap("e")
+    time.sleep(0.1)
+    ok &= check(trunk_door(b, "fwd-cabins", 4), "E opens it")
+    b.shot("trunk-open")
+    b.hold("up", 0.4)
+    b.shot("trunk-entering")
+    b.hold("up", 2.0)
+    s = b.state()
+    ok &= check(s["mode"] == "trunk" and s["y"] == D5, "climbs the shaft up to deck 5", s)
+    ok &= check(not trunk_door(b, "fwd-cabins", 4), "the deck 4 door shut behind her")
+    b.hold("right", 0.5)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] > x + 20, "steps out onto deck 5", s)
+    ok &= check(not trunk_door(b, "fwd-cabins", 5), "and that door shuts once she is away")
+
+    # Three decks: letting go just short of the middle door settles her level with it.
+    x = trunk_x("midships")
+    b.teleport(x, D4)
+    b.tap("e")
+    b.hold("up", 1.7)
+    time.sleep(0.5)
+    s = b.state()
+    ok &= check(s["mode"] == "trunk" and s["y"] == D5, "settles at the middle door, deck 5", s)
+    ok &= check(trunk_door(b, "midships", 5, "up") == "arrow-up-on"
+                and trunk_door(b, "midships", 5, "down") == "arrow-down-on", "whose arrows show both ways")
+    b.key("left", True)
+    time.sleep(0.1)
+    b.shot("trunk-stepping-out")
+    time.sleep(0.3)
+    b.key("left", False)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] < x - 20, "steps out there", s)
+
+    # One-way: shut from below until she has come down through it.
+    x = trunk_x("theatre")
+    b.teleport(x, D4)
+    b.tap("e")
+    time.sleep(0.1)
+    ok &= check(not trunk_door(b, "theatre", 4) and trunk_door(b, "theatre", 4, "up") == "arrow-up",
+                "the one-way trunk won't open from below", trunk_door(b, "theatre", 4, "up"))
+    b.teleport(x, D6)
+    b.tap("e")
+    b.hold("down", 4.2)
+    s = b.state()
+    ok &= check(s["mode"] == "trunk" and s["y"] == D4, "comes down it from deck 6, past deck 5", s)
+    b.hold("right", 0.4)
+    ok &= check(trunk_door(b, "theatre", 4, "up") == "arrow-up-on", "and from then on it opens from below too")
+    b.teleport(x, D4)
+    b.tap("e")
+    time.sleep(0.1)
+    ok &= check(trunk_door(b, "theatre", 4), "it does")
+
+    # Card-locked.
+    b.teleport(trunk_x("magnums"), D6)
+    b.tap("e")
+    time.sleep(0.1)
+    locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
+    b.shot("trunk-locked")
+    ok &= check(not trunk_door(b, "magnums", 6) and bool(locked) and "Hotel" in locked,
+                "a card-locked trunk asks for the Hotel card", locked)
     return ok
 
 

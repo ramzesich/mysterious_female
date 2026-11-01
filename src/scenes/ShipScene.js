@@ -2,6 +2,7 @@ import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LONG_FALL_MARGIN } from '../config.js
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
+import { TRUNK_INSIDE } from '../textures.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -16,6 +17,10 @@ const approach = (value, target, step) =>
 
 const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
+const DOOR = { width: 28, height: 74 };
+
+// The key cards' colours, shown on the readers beside locked doors (§6.2, proposed).
+const CARD_COLOURS = { hotel: 0x2f9bd6, technical: 0xe04848, captain: 0xf2c14e };
 
 // Each hazard gets its own fright (§5.6).
 const FRIGHTS = { vacuum: 'Іііі!' };
@@ -37,7 +42,7 @@ export class ShipScene extends Phaser.Scene {
         this.buildCameras();
         this.buildHud();
 
-        this.mode = 'play'; // play | ladder | stairs | scripted
+        this.mode = 'play'; // play | ladder | stairs | trunk | scripted
         this.dashUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
@@ -87,12 +92,18 @@ export class ShipScene extends Phaser.Scene {
         this.flights = [];
         this.vacuums = [];
         this.cats = [];
+        this.trunks = [];
         this.crates = this.physics.add.staticGroup();
         const stairsGfx = this.add.graphics().setDepth(DEPTH.stairs);
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
         this.worldLayer.add([decorGfx, stairsGfx]);
 
-        for (const o of this.map.getObjectLayer('objects').objects) {
+        const objects = this.map.getObjectLayer('objects').objects;
+        // Trunk doors take the place of any cabin door drawn where they stand.
+        this.trunkDoorSpots = objects.filter(o => o.type === 'trunk')
+            .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
+
+        for (const o of objects) {
             switch (o.type) {
                 case 'spawn':
                     this.spawnPoint = { id: 'spawn', x: o.x, y: o.y };
@@ -167,6 +178,10 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'trunk':
+                    this.buildTrunk(o, prop(o, 'floors', ''), prop(o, 'oneWay', false), prop(o, 'card', null));
+                    break;
+
                 case 'sign': {
                     const text = this.add.text(o.x, o.y, prop(o, 'text', ''), {
                         fontFamily: 'Verdana, sans-serif', fontSize: '7px', color: '#8f846f',
@@ -217,6 +232,7 @@ export class ShipScene extends Phaser.Scene {
     // Cabin doors along a corridor, every 4 m (192px), muted so they never read as interactive.
     drawCabinDoors(g, o) {
         for (let x = o.x + 60; x + 30 < o.x + o.width; x += 192) {
+            if (this.trunkDoorSpots.some(t => t.y === o.y && x < t.x + 22 && x + 30 > t.x - 22)) continue;
             g.fillStyle(0xd9cdb6, 1);
             g.fillRect(x, o.y - 74, 30, 74);
             g.lineStyle(1, 0xc2b497, 1);
@@ -225,6 +241,48 @@ export class ShipScene extends Phaser.Scene {
             g.fillRect(x + 23, o.y - 38, 3, 2);
             g.fillRect(x + 9, o.y - 66, 12, 5);   // the number plate
         }
+    }
+
+    // An escape trunk (§5.1): a crew door on each deck it serves, top to bottom, with ▲/▼ lamps above
+    // and, if it needs a card, a reader beside it.
+    buildTrunk(o, floors, oneWay, card) {
+        const ys = String(floors).split(',').map(Number);
+        const trunk = {
+            id: o.name, x: o.x, top: ys[0], bottom: ys[ys.length - 1], oneWay, card,
+            opened: !oneWay || this.save.opened.includes(o.name), doors: [],
+        };
+        for (const y of ys) {
+            const door = {
+                trunk, y, open: false,
+                sprite: this.add.image(o.x, y, 'door').setOrigin(0.5, 1).setDepth(DEPTH.props),
+                up: this.add.image(o.x - 5, y - LAMP_RISE, 'arrow-up').setDepth(DEPTH.props),
+                down: this.add.image(o.x + 5, y - LAMP_RISE, 'arrow-down').setDepth(DEPTH.props),
+            };
+            this.worldLayer.add([door.sprite, door.up, door.down]);
+            if (card) {
+                const rx = o.x + DOOR.width / 2 + 6;
+                const reader = this.add.image(rx, y - 40, 'reader').setDepth(DEPTH.props);
+                const light = this.add.rectangle(rx, y - 42, 4, 2, CARD_COLOURS[card] ?? 0xffffff).setDepth(DEPTH.props);
+                this.worldLayer.add([reader, light]);
+            }
+            trunk.doors.push(door);
+        }
+        this.lightTrunk(trunk);
+        this.trunks.push(trunk);
+    }
+
+    // A lit arrow is a way she can go from that door. A one-way trunk's lower doors stay dark, and
+    // shut from outside, until she has come down through it once.
+    lightTrunk(trunk) {
+        trunk.doors.forEach((d, i) => {
+            const usable = this.trunkUsableFrom(d);
+            d.up.setTexture(usable && i > 0 ? 'arrow-up-on' : 'arrow-up');
+            d.down.setTexture(usable && i < trunk.doors.length - 1 ? 'arrow-down-on' : 'arrow-down');
+        });
+    }
+
+    trunkUsableFrom(door) {
+        return door.trunk.opened || door.y === door.trunk.top;
     }
 
     buildPlayer() {
@@ -317,7 +375,8 @@ export class ShipScene extends Phaser.Scene {
 
     spawnAt(point, { emerge = false } = {}) {
         const p = this.player;
-        p.clearAlpha().setCrop().setDepth(DEPTH.player).setFlipX(false);
+        p.clearAlpha().setCrop().setVisible(true).setDepth(DEPTH.player).setFlipX(false);
+        this.inTrunk = null;
         this.pose('stand');
         p.body.enable = true;
         p.body.reset(point.x, point.y);
@@ -358,9 +417,12 @@ export class ShipScene extends Phaser.Scene {
         if (this.mode === 'play') this.updatePlay(input, dt, time);
         else if (this.mode === 'ladder') this.updateLadder(input, dt, time);
         else if (this.mode === 'stairs') this.updateStairs(input, dt, time);
+        else if (this.mode === 'trunk') this.updateTrunk(input, dt);
         else if (this.script) this.script(dt, time);
+        this.closeTrunkDoors();
 
-        if (this.mode !== 'scripted') {
+        // Inside a trunk she is out of everyone's way.
+        if (this.mode !== 'scripted' && this.mode !== 'trunk') {
             this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
@@ -384,6 +446,8 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
+        if (onFloor && input.activatePressed) this.activateTrunkDoor();
+        if (onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
         if (onFloor && (input.up || input.down) && this.tryStairs(input)) return;
         if ((input.up || input.down) && this.tryLadder(input)) return;
@@ -514,6 +578,132 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
+    }
+
+    // --- Escape trunks (§5.1) -----------------------------------------------------------------
+
+    trunkDoorAt(x, y) {
+        for (const t of this.trunks) {
+            if (Math.abs(x - t.x) > 10) continue;
+            const door = t.doors.find(d => Math.abs(y - d.y) < 4);
+            if (door) return door;
+        }
+        return null;
+    }
+
+    // E at a trunk door opens it, if her cards and the trunk allow it from this side.
+    activateTrunkDoor() {
+        const door = this.trunkDoorAt(this.player.x, this.player.y);
+        if (!door || door.open) return;
+        if (!this.hasCard(door.trunk.card)) {
+            this.showLocked(door.trunk.card);
+        } else if (!this.trunkUsableFrom(door)) {
+            sfx.rattle();
+            this.tweens.add({ targets: door.sprite, x: door.trunk.x + 1, duration: 40, yoyo: true, repeat: 2 });
+        } else {
+            this.openTrunkDoor(door);
+        }
+    }
+
+    openTrunkDoor(door) {
+        door.open = true;
+        door.sprite.setTexture('trunk-open');
+        sfx.door();
+    }
+
+    // A door shuts by itself once she has stepped away from it, or climbed out of its doorway.
+    closeTrunkDoors() {
+        const p = this.player;
+        for (const t of this.trunks) {
+            for (const d of t.doors) {
+                if (!d.open) continue;
+                const keep = this.mode === 'trunk'
+                    ? this.inTrunk === t && p.y > d.y - DOOR.height && p.y - PLAYER.height < d.y
+                    : Math.abs(p.x - t.x) < 22 && Math.abs(p.y - d.y) < 40;
+                if (keep) continue;
+                d.open = false;
+                d.sprite.setTexture('door');
+                sfx.door();
+            }
+        }
+    }
+
+    // At an open door, ↑/↓ takes the ladder behind it, in a direction it goes from there.
+    tryTrunk(input) {
+        const p = this.player;
+        const door = this.trunkDoorAt(p.x, p.y);
+        if (!door?.open) return false;
+        const t = door.trunk;
+        if ((input.up && door.y === t.top) || (input.down && door.y === t.bottom)) return false;
+
+        this.mode = 'trunk';
+        this.inTrunk = t;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.x = t.x;
+        p.y = door.y;
+        p.setFlipX(false).setDepth(DEPTH.props + 0.5);
+        this.pose('climb');
+        this.showInDoorways();
+        return true;
+    }
+
+    updateTrunk(input, dt) {
+        const p = this.player;
+        const t = this.inTrunk;
+        const v = (input.down ? 1 : 0) - (input.up ? 1 : 0);
+        const y0 = p.y;
+        const nearest = t.doors.reduce((a, b) => (Math.abs(p.y - b.y) < Math.abs(p.y - a.y) ? b : a));
+        const atDoor = Math.abs(p.y - nearest.y) < PLAYER.trunkSettle;
+
+        if (v) p.y = Phaser.Math.Clamp(p.y + v * PLAYER.climbSpeed * dt, t.top, t.bottom);
+        else if (atDoor) p.y = approach(p.y, nearest.y, PLAYER.climbSpeed * dt); // settles level with it
+        if (p.y !== y0) p.anims.resume();
+        else p.anims.pause();
+
+        const side = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        if (side && atDoor) this.stepOutOfTrunk(nearest, side);
+        else this.showInDoorways();
+    }
+
+    // ←/→ at a door opens it from inside and she steps out onto that deck. Coming out below the
+    // top of a one-way trunk opens it for good.
+    stepOutOfTrunk(door, side) {
+        const p = this.player;
+        const t = door.trunk;
+        if (!door.open) this.openTrunkDoor(door);
+        if (!t.opened && door.y !== t.top) {
+            t.opened = true;
+            this.save.opened.push(t.id);
+            this.lightTrunk(t);
+        }
+        this.inTrunk = null;
+        p.y = door.y;
+        p.setCrop().setVisible(true).setFlipX(side < 0);
+        this.leaveLadderOrStairs();
+        this.grounded = true;
+    }
+
+    // Inside, the walls and decks hide her (no cutaway, §5.1): she shows only through an open
+    // doorway. Doorways are further apart than she is tall, so at most one shows her at a time.
+    showInDoorways() {
+        const p = this.player;
+        const cell = PLAYER.cell;
+        const left = p.x - cell / 2;
+        const top = p.y - cell;
+        for (const d of this.inTrunk.doors) {
+            if (!d.open) continue;
+            const doorLeft = d.trunk.x - DOOR.width / 2;
+            const x0 = Math.max(left, doorLeft + TRUNK_INSIDE.x0);
+            const x1 = Math.min(left + cell, doorLeft + TRUNK_INSIDE.x1);
+            const y0 = Math.max(top, d.y - DOOR.height + TRUNK_INSIDE.y0);
+            const y1 = Math.min(top + cell, d.y);
+            if (x1 > x0 && y1 > y0) {
+                p.setVisible(true).setCrop(x0 - left, y0 - top, x1 - x0, y1 - y0);
+                return;
+            }
+        }
+        p.setVisible(false);
     }
 
     // --- Stairs ----------------------------------------------------------------------------

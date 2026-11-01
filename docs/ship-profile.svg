@@ -122,6 +122,19 @@
 <text x="550.0" y="462.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">midship stairs + lifts</text>
 <rect x="1040" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
 <text x="1060.0" y="450.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">aft stairs + lifts</text>
+<line x1="320.0" y1="324" x2="320.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
+<rect x="317.0" y="368" width="6" height="8" fill="#e07a1f"/>
+<rect x="317.0" y="338" width="6" height="8" fill="#e07a1f"/>
+<line x1="695.0" y1="294" x2="695.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
+<rect x="692.0" y="368" width="6" height="8" fill="#e07a1f"/>
+<rect x="692.0" y="338" width="6" height="8" fill="#e07a1f"/>
+<rect x="692.0" y="308" width="6" height="8" fill="#e07a1f"/>
+<line x1="1270.0" y1="294" x2="1270.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
+<rect x="1267.0" y="368" width="6" height="8" fill="#e07a1f"/>
+<rect x="1267.0" y="308" width="6" height="8" fill="#e07a1f"/>
+<line x1="610.0" y1="264" x2="610.0" y2="316" stroke="#e07a1f" stroke-width="2"/>
+<rect x="607.0" y="308" width="6" height="8" fill="#e07a1f"/>
+<rect x="607.0" y="278" width="6" height="8" fill="#e07a1f"/>
 <text x="70.0" y="24.0" font-size="13" text-anchor="start" fill="#1d2b53" font-weight="bold">◀ FORWARD (bow)</text>
 <text x="1360.0" y="24.0" font-size="13" text-anchor="end" fill="#1d2b53" font-weight="bold">AFT (stern) ▶</text>
 <text x="715.0" y="24.0" font-size="13" text-anchor="middle" fill="#1d2b53" font-weight="bold">Norwegian Sun, as laid out in the game</text>
@@ -150,4 +163,6 @@
 <rect x="620" y="40" width="12" height="12" fill="#f7bdbd" stroke="#bbb"/>
 <text x="637.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Finale</text>
 <text x="734.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="bold">★ Bumbot near-catch</text>
+<rect x="860" y="40" width="6" height="12" fill="#e07a1f"/>
+<text x="871.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Escape trunk (ladder doors)</text>
 </svg>

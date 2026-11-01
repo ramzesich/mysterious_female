@@ -183,7 +183,8 @@ it is her battle cry here.
 - Until she reaches him, he is **doing something cat-like** in his spot, and each spot gets something
   different: asleep in the warm towels, washing himself, catching a fly, and so on.
 - A near-catch is a short scripted sequence with input locked: she lunges, he escapes — up a ladder
-  she can't use yet, into a vent, onto a passing tray, behind a door that slams shut.
+  she can't use yet, into a vent, onto a passing tray, behind a door that slams shut, or into an
+  escape trunk she can't open yet (§5.1).
 - **Each near-catch spot is also a checkpoint** (§5.5).
 - **The five spots:**
 
@@ -256,6 +257,29 @@ there; they only remind her he's on board.
   through a landing onto the next flight.
 - **Ladders** only where real ones exist: crew and technical areas, the pool, lifeboat stations, the
   mast and funnel, emergency escape shafts. Guests don't climb ladders on a real ship.
+- **Escape trunks (Decided, 2026-11-01):** some crew doors along the decks (not checkpoints) open
+  onto a vertical ladder shaft, as a real ship's emergency escape trunks do: shortcuts up and down
+  beside the stairs and elevators.
+  - One ladder runs up the shaft past a door on each deck it serves. Most link two decks; a few
+    link more, and a shaft may pass a deck with no door on it.
+  - **Two small amber arrow lamps above the door, ▲ and ▼**: a lit arrow is a way she can go from
+    that door, an unlit one a way she can't. They don't look like a checkpoint's green lamp.
+  - **E opens the door**, revealing the ladder behind it; then ↑/↓ takes the ladder in a lit
+    direction. A door closes by itself once she steps away from it.
+  - **No cutaway and no fade:** inside, the walls and decks hide her naturally, seen only in an
+    open doorway, and the camera follows her up or down.
+  - She can stop at **any door along the shaft**: ←/→ opens it from inside and she steps out.
+    Letting go of ↑/↓ just short of a door settles her level with it.
+  - **One-way shortcuts, in a few places:** the lower doors stay shut from outside ("opens from
+    the other side": the door rattles, its arrows unlit) until she has come down through the
+    shaft once; from then on it works both ways for good.
+  - **A few are card-locked**, like other locked doors: the card's colour shows on a reader beside
+    the door (§6.2).
+  - Bumbot can escape into one she can't use yet (§4).
+  - **For now (blockout):** four test trunks, to try the mechanic: a two-deck one (deck 4–5,
+    forward cabins), a three-deck one (decks 4–6, midships), a one-way shortcut from the theatre
+    on deck 6 down to deck 4 (passing deck 5 with no door) and a Hotel-card one (decks 6–7). The
+    real ones are placed when the interiors are filled. Listed in `tools/ship_layout.py`.
 - **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
   never opens onto an area she can't reach yet.** She stands at the doors and presses ↑; they open
   and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out. ↑/↓
@@ -462,6 +486,8 @@ colleague gives her.
 - Locked doors are visibly locked with the card colour on the reader, so she can remember where to
   return. With no map, this and Bumbot's escape routes are what keep her oriented, so each area
   needs a strong, distinct look.
+- **Proposed:** the card colours, as the placeholder readers show them: Hotel blue, Technical red,
+  Captain gold.
 
 ### 6.3 Tangerines
 
@@ -561,7 +587,7 @@ art:
 
 Nothing blocks the start of the build. These get settled along the way:
 
-**Next up** (as of 2026-10-31):
+**Next up** (as of 2026-11-01):
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
 - [x] Her idles: foot tap, look back (§3)
@@ -569,9 +595,12 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] The finale's art: her holding Bumbot (a state of her character, ~10 generations, or her
       arms-out pose with his sprite on top), designed with the win sequence (§4)
 - [x] The whole ship laid out as a blockout from the real profile (§5.3, §7.3)
-- [ ] **First: the user's playtest of the blockout.** It was merged on 2026-10-31 before the user
-      could try it; ask how it plays (`?play`, and `&cards=all` to roam above deck 6) and fix what
-      comes up before moving on
+- [x] The user's playtest of the blockout (2026-11-01): getting around, scale, venues, movement and
+      camera all good; it feels empty, as expected for now. Only the vacuum scare tried so far;
+      checkpoints get tuned once the interiors are filled
+- [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Built
+      on branch `ladder-doors`; **ask the user to try them** before merging (`?play&cards=all`; the
+      nearest is 17 m forward of the start: walk left from the gangway)
 - [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
 - [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
       on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
