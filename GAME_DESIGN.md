@@ -613,14 +613,20 @@ Nothing blocks the start of the build. These get settled along the way:
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
       open and to confirm; the panel goes once a deck is chosen. Tried by the user 2026-11-01
-- [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
-      on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
-- [ ] **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
-      somewhere, the diner opening after the fifth, the finale (§4)
-- [ ] Doors along the decks into small separate rooms (§5.1); hazards and people placed on the real
-      decks (§5.8); tangerines and checkpoints tuned in play
-- [ ] First real ship tiles and props: a PixelLab style test on 3–4 representative pieces (~10–15
-      generations); Retro Diffusion only if PixelLab disappoints (§2.1)
+- [ ] **Next: populate the ship.** First real ship tiles and props: a PixelLab style test on 3–4
+      representative pieces (~10–15 generations, ask first); Retro Diffusion only if PixelLab
+      disappoints (§2.1). Then doors along the decks into small separate rooms (§5.1), hazards and
+      people placed on the real decks (§5.8)
+- [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
+      travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
+  - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
+    readers on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens
+    everything
+  - **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
+    somewhere (into a trunk she can't open yet, among others), the diner opening after the fifth,
+    the finale (§4)
+  - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
+    checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
       2026-11-30 (~1909 left at the end of 2026-10-31). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames)
