@@ -865,12 +865,14 @@ export class ShipScene extends Phaser.Scene {
         this.takeoffY = p.y;
     }
 
-    // She steps in and turns to us, the doors close, the car goes, a ding, and they open.
+    // She steps in and turns to us, the doors close, the car goes, a ding, and they open. The panel
+    // goes once a deck is chosen: the camera following the car shows the ride.
     ride() {
         const run = this.liftRun;
         const { lift, here, cursor } = run;
         const p = this.player;
         run.choosing = false;
+        this.hideLiftPanel();
         p.setFlipX(lift.x < p.x);
         this.pose('run', 0.6);
         this.tweens.add({
