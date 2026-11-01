@@ -8,7 +8,8 @@ truth**: read the relevant section before any design or content work, and record
 ## Stack and running
 
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
-- Run: `python -m http.server`, open <http://localhost:8000>. URL flags: `?play` skip title,
+- Run: `python tools/serve.py` (caching off, so reloads are never stale), open
+  <http://localhost:8000>. URL flags: `?play` skip title,
   `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (for testing).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
