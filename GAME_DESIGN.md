@@ -282,10 +282,20 @@ there; they only remind her he's on board.
     on deck 6 down to deck 4 (passing deck 5 with no door) and a Hotel-card one (decks 6–7). The
     real ones are placed when the interiors are filled. Listed in `tools/ship_layout.py`.
 - **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
-  never opens onto an area she can't reach yet.** She stands at the doors and presses ↑; they open
-  and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out. ↑/↓
-  picks a deck, jump confirms; the doors close, a floor indicator counts, and they open on that
-  deck.
+  never opens onto an area she can't reach yet.** She stands at the doors and presses **E**; they
+  open and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out.
+  ↑/↓ picks a deck, **E confirms** (changed from jump, 2026-11-01); the doors close, a floor
+  indicator counts, and they open on that deck.
+- **Elevator details (Proposed, 2026-11-01):** one elevator door in each of the three cores, aft
+  of the stairs, with the deck number lit above it. ←/→ at the panel backs out, and the doors
+  close once she steps away. She steps in and turns to face us; the car travels out of sight (the
+  walls and decks hide it, as in an escape trunk) with the camera following, while the panel's
+  display counts the decks; a ding, and the doors open. For now the decks she can reach are the
+  same as the stairs': 4–6 with her crew card, the rest with the Hotel card.
+- **Glass elevators (Decided, 2026-11-01):** the atrium's glass elevator works like the others,
+  but its car is **seen**: it runs up and down rails on the atrium wall (decks 5–9), she rides
+  visible inside it, and if it's on another deck when she presses E, it comes down or up to fetch
+  her first.
 
 ### 5.2 At sea
 
@@ -601,7 +611,9 @@ Nothing blocks the start of the build. These get settled along the way:
       checkpoints get tuned once the interiors are filled
 - [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Tried
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
-- [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
+- [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
+      open and to confirm. Built on branch `elevators`; **ask the user to try them** before merging,
+      and to settle the Proposed elevator details in §5.1
 - [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
       on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
 - [ ] **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing

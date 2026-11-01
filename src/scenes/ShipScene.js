@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -8,8 +8,8 @@ import { TRUNK_INSIDE } from '../textures.js';
 const LADDER_TOP = 3;
 
 const DEPTH = {
-    sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5,
-    solid: 6, ladders: 7, props: 8, player: 9, fx: 10,
+    sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, glassCar: 4.4, inGlassCar: 4.6, glassDoors: 4.8,
+    playerBehind: 5, solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, player: 9, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -18,6 +18,7 @@ const approach = (value, target, step) =>
 const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
+const LEAF = 18; // each of an elevator's two sliding door leaves
 
 // The key cards' colours, shown on the readers beside locked doors (§6.2, proposed).
 const CARD_COLOURS = { hotel: 0x2f9bd6, technical: 0xe04848, captain: 0xf2c14e };
@@ -42,7 +43,7 @@ export class ShipScene extends Phaser.Scene {
         this.buildCameras();
         this.buildHud();
 
-        this.mode = 'play'; // play | ladder | stairs | trunk | scripted
+        this.mode = 'play'; // play | ladder | stairs | trunk | lift | scripted
         this.dashUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
@@ -93,6 +94,7 @@ export class ShipScene extends Phaser.Scene {
         this.vacuums = [];
         this.cats = [];
         this.trunks = [];
+        this.lifts = [];
         this.crates = this.physics.add.staticGroup();
         const stairsGfx = this.add.graphics().setDepth(DEPTH.stairs);
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
@@ -180,6 +182,10 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'trunk':
                     this.buildTrunk(o, prop(o, 'floors', ''), prop(o, 'oneWay', false), prop(o, 'card', null));
+                    break;
+
+                case 'lift':
+                    this.buildLift(o, prop(o, 'floors', ''), prop(o, 'decks', ''), prop(o, 'cards', ''), prop(o, 'glass', false));
                     break;
 
                 case 'sign': {
@@ -285,6 +291,66 @@ export class ShipScene extends Phaser.Scene {
         return door.trunk.opened || door.y === door.trunk.top;
     }
 
+    // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of
+    // sight; the atrium's glass one is a single car, seen on its rails. Floors run top to bottom.
+    buildLift(o, floors, decks, cards, glass) {
+        const ys = String(floors).split(',').map(Number);
+        const ds = String(decks).split(',').map(Number);
+        const cs = String(cards).split(',');
+        const lift = {
+            id: o.name, x: o.x, glass,
+            floors: ys.map((y, i) => ({ y, deck: ds[i], card: cs[i] })),
+            at: ys.length - 1, carY: ys[ys.length - 1],
+        };
+        if (glass) {
+            // Rails up the atrium wall, from the lowest floor to under the top deck's ceiling.
+            const top = ys[0] - this.deckPitch + 16;
+            const rails = this.add.graphics().setDepth(DEPTH.decor);
+            rails.fillStyle(0x9aa3ad, 1);
+            for (const dx of [-23, 21]) rails.fillRect(o.x + dx, top, 2, lift.carY - top);
+            lift.car = this.add.image(o.x, 0, 'glass-car').setOrigin(0.5, 1).setDepth(DEPTH.glassCar);
+            this.worldLayer.add([rails, lift.car]);
+            lift.leaves = this.makeLeaves(o.x, 'glass-leaf', DEPTH.glassDoors);
+            this.placeCar(lift);
+        } else {
+            for (const f of lift.floors) {
+                const car = this.add.image(o.x, f.y, 'lift-car').setOrigin(0.5, 1).setDepth(DEPTH.liftCar);
+                const frame = this.add.image(o.x, f.y, 'lift-frame').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.1);
+                const number = this.add.text(o.x, f.y - 82, String(f.deck), {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#f28c28', backgroundColor: '#14161c',
+                    padding: { x: 2, y: 1 }, resolution: 4,
+                }).setOrigin(0.5).setDepth(DEPTH.props);
+                this.worldLayer.add([car, frame, number]);
+                f.leaves = this.makeLeaves(o.x, 'lift-leaf', DEPTH.props);
+                this.setLeaves(f.leaves, f.y, 0);
+            }
+        }
+        this.lifts.push(lift);
+    }
+
+    makeLeaves(x, texture, depth) {
+        const left = this.add.image(x - LEAF, 0, texture).setOrigin(0, 1).setDepth(depth);
+        const right = this.add.image(x, 0, texture).setOrigin(0, 1).setDepth(depth);
+        this.worldLayer.add([left, right]);
+        return { left, right, open: 0 };
+    }
+
+    // Leaves slide apart into the wall: each shows only the part still in the doorway.
+    setLeaves(leaves, y, open) {
+        leaves.open = open;
+        const w = LEAF * (1 - open);
+        for (const [leaf, cropX] of [[leaves.left, 0], [leaves.right, LEAF - w]]) {
+            leaf.y = y;
+            leaf.setVisible(w >= 1);
+            if (w >= 1) leaf.setCrop(cropX, 0, w, DOOR.height);
+        }
+    }
+
+    placeCar(lift) {
+        lift.car.y = lift.carY + 3; // its floor sits just under the deck's floor line
+        this.setLeaves(lift.leaves, lift.carY, lift.leaves.open);
+    }
+
     buildPlayer() {
         const meta = this.cache.json.get('her-meta');
         this.herFrames = meta.frames;
@@ -377,6 +443,9 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         p.clearAlpha().setCrop().setVisible(true).setDepth(DEPTH.player).setFlipX(false);
         this.inTrunk = null;
+        this.liftRun = null;
+        this.liftMove = null;
+        this.hideLiftPanel();
         this.pose('stand');
         p.body.enable = true;
         p.body.reset(point.x, point.y);
@@ -418,11 +487,13 @@ export class ShipScene extends Phaser.Scene {
         else if (this.mode === 'ladder') this.updateLadder(input, dt, time);
         else if (this.mode === 'stairs') this.updateStairs(input, dt, time);
         else if (this.mode === 'trunk') this.updateTrunk(input, dt);
+        else if (this.mode === 'lift') this.updateLift(input, dt);
         else if (this.script) this.script(dt, time);
         this.closeTrunkDoors();
+        this.closeLiftDoors();
 
-        // Inside a trunk she is out of everyone's way.
-        if (this.mode !== 'scripted' && this.mode !== 'trunk') {
+        // Inside a trunk or an elevator she is out of everyone's way.
+        if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') {
             this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
@@ -446,6 +517,7 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
+        if (onFloor && input.activatePressed && this.callLift()) return;
         if (onFloor && input.activatePressed) this.activateTrunkDoor();
         if (onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
@@ -705,6 +777,205 @@ export class ShipScene extends Phaser.Scene {
             }
         }
         p.setVisible(false);
+    }
+
+    // --- Elevators (§5.1) ----------------------------------------------------------------------
+
+    liftAt(x, y) {
+        for (const lift of this.lifts) {
+            if (Math.abs(x - lift.x) > 14) continue;
+            const i = lift.floors.findIndex(f => Math.abs(y - f.y) < 4);
+            if (i >= 0) return { lift, i };
+        }
+        return null;
+    }
+
+    // The doors on floor i: a core elevator's landing doors, or the glass car's own when it is there.
+    leavesAt(lift, i) {
+        if (!lift.glass) return lift.floors[i].leaves;
+        return lift.at === i ? lift.leaves : null;
+    }
+
+    slideLeaves(leaves, y, to, done) {
+        this.tweens.killTweensOf(leaves);
+        if (leaves.open === to) {
+            done?.();
+            return;
+        }
+        sfx.door();
+        this.tweens.add({
+            targets: leaves, open: to, duration: LIFT.doorMs * Math.abs(to - leaves.open),
+            onUpdate: () => this.setLeaves(leaves, y, leaves.open),
+            onComplete: () => { this.setLeaves(leaves, y, to); done?.(); },
+        });
+    }
+
+    // E at the doors: they open and the button panel shows. The glass car, if it is on another
+    // deck, comes to fetch her first.
+    callLift() {
+        const p = this.player;
+        const spot = this.liftAt(p.x, p.y);
+        if (!spot) return false;
+        const { lift, i } = spot;
+        this.mode = 'lift';
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        this.pose('stand');
+        this.liftRun = { lift, here: i, cursor: i, choosing: false };
+        this.showLiftPanel();
+        const open = () => this.slideLeaves(this.leavesAt(lift, i), lift.floors[i].y, 1, () => { this.liftRun.choosing = true; });
+        if (lift.at !== i && lift.glass) this.moveCar(lift, i, false, open);
+        else open();
+        return true;
+    }
+
+    updateLift(input, dt) {
+        if (this.liftMove) {
+            this.stepCar(dt);
+            return;
+        }
+        const run = this.liftRun;
+        if (!run?.choosing) return;
+        const floors = run.lift.floors;
+        if (input.upPressed || input.downPressed) {
+            // Only the decks she can reach light up; the cursor skips the rest.
+            const step = input.upPressed ? -1 : 1;
+            let c = run.cursor + step;
+            while (c >= 0 && c < floors.length && !this.hasCard(floors[c].card)) c += step;
+            if (c >= 0 && c < floors.length) run.cursor = c;
+            this.refreshLiftPanel();
+        } else if (input.activatePressed) {
+            if (run.cursor === run.here) this.leaveLift();
+            else this.ride();
+        } else if (input.left || input.right) {
+            this.leaveLift();
+        }
+    }
+
+    // Back to play. The doors stay open until she steps away.
+    leaveLift() {
+        const p = this.player;
+        this.hideLiftPanel();
+        this.liftRun = null;
+        this.mode = 'play';
+        p.setDepth(DEPTH.player);
+        this.pose('stand');
+        p.body.enable = true;
+        p.body.reset(p.x, p.y);
+        this.takeoffY = p.y;
+    }
+
+    // She steps in and turns to us, the doors close, the car goes, a ding, and they open.
+    ride() {
+        const run = this.liftRun;
+        const { lift, here, cursor } = run;
+        const p = this.player;
+        run.choosing = false;
+        p.setFlipX(lift.x < p.x);
+        this.pose('run', 0.6);
+        this.tweens.add({
+            targets: p, x: lift.x, duration: 150,
+            onComplete: () => {
+                p.setDepth(lift.glass ? DEPTH.inGlassCar : DEPTH.inLift);
+                this.pose('front');
+                this.slideLeaves(this.leavesAt(lift, here), lift.floors[here].y, 0, () => {
+                    if (!lift.glass) p.setVisible(false); // a core car travels out of sight
+                    this.moveCar(lift, cursor, true, () => {
+                        p.setVisible(true);
+                        sfx.ding();
+                        this.slideLeaves(this.leavesAt(lift, cursor), lift.floors[cursor].y, 1, () => this.leaveLift());
+                    });
+                });
+            },
+        });
+    }
+
+    moveCar(lift, to, carriesHer, arrive) {
+        if (lift.glass) this.setLeaves(lift.leaves, lift.carY, 0);
+        this.liftMove = { lift, to, carriesHer, arrive };
+    }
+
+    stepCar(dt) {
+        const m = this.liftMove;
+        const lift = m.lift;
+        const target = lift.floors[m.to].y;
+        lift.carY = approach(lift.carY, target, LIFT.speed * dt);
+        if (lift.glass) this.placeCar(lift);
+        if (m.carriesHer) this.player.y = lift.carY;
+        this.refreshLiftPanel();
+        if (lift.carY !== target) return;
+        lift.at = m.to;
+        this.liftMove = null;
+        m.arrive();
+    }
+
+    // Doors left open shut once she has stepped away from them.
+    closeLiftDoors() {
+        if (this.mode === 'lift') return;
+        const p = this.player;
+        for (const lift of this.lifts) {
+            lift.floors.forEach((f, i) => {
+                const leaves = this.leavesAt(lift, i);
+                if (!leaves || leaves.open === 0 || this.tweens.isTweening(leaves)) return;
+                const near = this.mode === 'play' && Math.abs(p.x - lift.x) < 26 && Math.abs(p.y - f.y) < 40;
+                if (!near) this.slideLeaves(leaves, f.y, 0);
+            });
+        }
+    }
+
+    // The button panel: a display counting the decks, then a button per deck. The ones she can
+    // reach are lit, the rest greyed out; a dot marks where the car is.
+    showLiftPanel() {
+        this.hideLiftPanel();
+        const floors = this.liftRun.lift.floors;
+        const rowH = 32;
+        const w = 76;
+        const h = floors.length * rowH + 60;
+        const x = VIEW.width / 2 + 120;
+        const y = (VIEW.height - h) / 2;
+        const items = [this.add.rectangle(x, y, w, h, 0xc9ced3).setOrigin(0).setStrokeStyle(3, 0x5b6470)];
+        const display = this.add.text(x + w / 2, y + 26, '', {
+            fontFamily: 'monospace', fontSize: '22px', color: '#f28c28', backgroundColor: '#14161c',
+            padding: { x: 8, y: 2 },
+        }).setOrigin(0.5);
+        items.push(display);
+        const buttons = floors.map((f, i) => {
+            const by = y + 60 + i * rowH + rowH / 2;
+            const circle = this.add.circle(x + w / 2 + 6, by, 12);
+            const label = this.add.text(x + w / 2 + 6, by, String(f.deck), {
+                fontFamily: 'Verdana, sans-serif', fontSize: '13px', fontStyle: 'bold',
+            }).setOrigin(0.5);
+            const dot = this.add.circle(x + 14, by, 4, 0xf28c28);
+            items.push(circle, label, dot);
+            return { circle, label, dot };
+        });
+        this.uiLayer.add(items);
+        this.liftPanel = { items, buttons, display };
+        this.refreshLiftPanel();
+    }
+
+    refreshLiftPanel() {
+        const panel = this.liftPanel;
+        if (!panel || !this.liftRun) return;
+        const { lift, cursor } = this.liftRun;
+        const carAt = lift.floors.reduce((best, f, i) =>
+            (Math.abs(f.y - lift.carY) < Math.abs(lift.floors[best].y - lift.carY) ? i : best), 0);
+        panel.buttons.forEach((b, i) => {
+            const ok = this.hasCard(lift.floors[i].card);
+            const chosen = i === cursor;
+            b.circle.setFillStyle(chosen ? 0xf28c28 : ok ? 0x5b6470 : 0x9aa3ad)
+                .setStrokeStyle(2, chosen ? 0xffd98a : ok ? 0x2a2f36 : 0xb0b7be);
+            b.label.setColor(chosen ? '#1d2b53' : ok ? '#ffffff' : '#c9ced3');
+            b.dot.setVisible(i === carAt);
+        });
+        const target = this.liftMove ? lift.floors[this.liftMove.to].y : lift.carY;
+        const arrow = target < lift.carY ? '▲' : target > lift.carY ? '▼' : ' ';
+        panel.display.setText(`${arrow}${lift.floors[carAt].deck}`.padStart(3, ' '));
+    }
+
+    hideLiftPanel() {
+        this.liftPanel?.items.forEach(item => item.destroy());
+        this.liftPanel = null;
     }
 
     // --- Stairs ----------------------------------------------------------------------------

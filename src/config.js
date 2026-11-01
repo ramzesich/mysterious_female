@@ -45,6 +45,12 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
+// Elevators (§5.1): the car's speed between decks and how long the doors take to slide.
+export const LIFT = {
+    speed: 200,         // px/s, about 1.4 decks a second
+    doorMs: 260,
+};
+
 export const DASH = {
     durationMs: 10000,
     speedMultiplier: 2,
