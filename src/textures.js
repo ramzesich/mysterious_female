@@ -32,6 +32,8 @@ const PALETTE = {
     M: '#6c737c',
     a: '#f28c28', // trunk arrow lamp, lit
     A: '#ffd98a',
+    q: 'rgba(170, 220, 240, 0.35)', // glass
+    Q: 'rgba(220, 245, 255, 0.6)',
 };
 
 const SPRITES = {
@@ -141,6 +143,33 @@ function arrowRows(up, lit) {
 // A card reader beside a locked door, 6x10; its light is tinted to the card's colour (§6.2).
 const READER = ['dddddd', 'dppppd', 'dWWWWd', 'dWWWWd', 'dppppd', 'dpddpd', 'dppppd', 'dppppd', 'dppppd', 'dddddd'];
 
+// Elevators (§5.1). A doorway is 36x74, closed by two 18px leaves that slide apart (the scene crops
+// them, so they are plain all the way across).
+function grid(w, h, pick) {
+    const rows = [];
+    for (let y = 0; y < h; y++) {
+        let row = '';
+        for (let x = 0; x < w; x++) row += pick(x, y);
+        rows.push(row);
+    }
+    return rows;
+}
+
+// The steel frame round a core elevator's doorway, 40x76.
+const liftFrameRows = () => grid(40, 76, (x, y) => (x <= 1 || x >= 38 || y <= 1 ? (y === 0 || x === 0 || x === 39 ? 'd' : 'm') : '.'));
+// Inside the car, lit: warm walls and a handrail.
+const liftCarRows = () => grid(36, 74, (x, y) => (y === 44 || y === 45 ? 'm' : y < 3 ? 'L' : 'Y'));
+const liftLeafRows = () => grid(18, 74, (x, y) => (y === 0 || y === 73 ? 'm' : 'p'));
+
+// The glass car, 40x80: a slim steel frame, a roof, and glass all round. Its floor is the bottom
+// 3 rows, sitting just under the deck's floor line.
+const glassCarRows = () => grid(40, 80, (x, y) => {
+    if (y <= 2 || y >= 77) return 'd';
+    if (x <= 1 || x >= 38) return 'm';
+    return x === 6 || x === 33 ? 'Q' : 'q';
+});
+const glassLeafRows = () => grid(18, 74, (x, y) => (y === 0 ? 'm' : x === 9 ? 'Q' : 'q'));
+
 const LAMP = {
     off: ['.dddddd.', 'dmmmmmmd', 'dmmmmmmd', '.dddddd.'],
     on: ['.dddddd.', 'dGyyyyGd', 'dyyyyyyd', '.dddddd.'],
@@ -174,6 +203,11 @@ export function makeTextures(scene) {
         makeSingle(scene, `arrow-${up ? 'up' : 'down'}-on`, arrowRows(up, true));
     }
     makeSingle(scene, 'reader', READER);
+    makeSingle(scene, 'lift-frame', liftFrameRows());
+    makeSingle(scene, 'lift-car', liftCarRows());
+    makeSingle(scene, 'lift-leaf', liftLeafRows());
+    makeSingle(scene, 'glass-car', glassCarRows());
+    makeSingle(scene, 'glass-leaf', glassLeafRows());
 
     // Life ring, 24x24 (about 75 cm across, at her scale): red and white quarters.
     const ring = scene.textures.createCanvas('lifering', 24, 24);

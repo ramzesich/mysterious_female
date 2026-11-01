@@ -157,7 +157,7 @@ class Browser:
 # --- Scenarios -----------------------------------------------------------------------------------
 # Positions come from the map builder (tools/build_ship_map.py), in metres from the bow.
 
-D4, D5, D6, D7, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 10, 11, 12))
+D4, D5, D6, D7, D9, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 9, 10, 11, 12))
 SPAWN_X = x_of(67)
 CORE_L = col(CORES["forward"][0]) * TILE + 4 * TILE       # forward core: the 4-5 flight's foot
 LADDER_X = (col(FUNNEL[0]) - 3) * TILE + TILE // 2        # the funnel ladder, deck 12 to the roof
@@ -334,6 +334,67 @@ def scenario_trunk(b):
     b.shot("trunk-locked")
     ok &= check(not trunk_door(b, "magnums", 6) and bool(locked) and "Hotel" in locked,
                 "a card-locked trunk asks for the Hotel card", locked)
+    return ok
+
+
+LIFT_X = col(CORES["forward"][0]) * TILE + 18 * TILE     # the forward core's elevator
+GLASS_X = x_of(87)                                        # the atrium's glass elevator
+
+
+def lift_cursor(b):
+    return b.eval("window.__ship.liftRun && window.__ship.liftRun.lift.floors[window.__ship.liftRun.cursor].deck")
+
+
+def scenario_lift(b):
+    b.open("?reset&play")
+    b.teleport(LIFT_X, D4)
+    b.tap("e")
+    time.sleep(0.5)
+    ok = check(b.state()["mode"] == "lift" and b.eval("!!window.__ship.liftPanel"), "E opens the doors and shows the panel")
+    for _ in range(4):
+        b.tap("up")
+        time.sleep(0.1)  # separate presses, not one long one
+    ok &= check(lift_cursor(b) == 6, "with her crew card, ↑ picks no higher than deck 6", lift_cursor(b))
+    b.shot("lift-panel")
+    b.tap("e")
+    time.sleep(0.1)
+    ok &= check(not b.eval("window.__ship.liftPanel"), "the panel goes once the deck is chosen")
+    time.sleep(0.8)
+    b.shot("lift-riding")
+    time.sleep(1.8)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D6 and abs(s["x"] - LIFT_X) < 2, "E rides it up to deck 6", s)
+    b.shot("lift-arrived")
+    b.hold("right", 0.5)
+    time.sleep(0.4)
+    ok &= check(b.eval("window.__ship.lifts[0].floors.every(f => f.leaves.open === 0)"), "the doors shut once she steps away")
+
+    b.teleport(LIFT_X, D6)
+    b.tap("e")
+    time.sleep(0.5)
+    b.tap("left")
+    time.sleep(0.1)
+    ok &= check(b.state()["mode"] == "play" and not b.eval("window.__ship.liftPanel"), "←/→ backs out of the panel")
+
+    # The glass elevator: on deck 5 to start with, it comes up to fetch her on deck 7.
+    b.open("?reset&play&cards=all")
+    b.teleport(GLASS_X, D7)
+    b.tap("e")
+    time.sleep(0.6)
+    b.shot("glass-coming")
+    time.sleep(1.6)
+    ok &= check(b.eval("window.__ship.liftRun.choosing && window.__ship.lifts.find(l => l.glass).carY") == D7,
+                "the glass car comes up to her deck")
+    for _ in range(2):
+        b.tap("up")
+        time.sleep(0.1)
+    ok &= check(lift_cursor(b) == 9, "with every card she can pick deck 9", lift_cursor(b))
+    b.tap("e")
+    time.sleep(1.2)
+    b.shot("glass-riding")
+    time.sleep(1.8)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D9, "and rides it to deck 9", s)
     return ok
 
 

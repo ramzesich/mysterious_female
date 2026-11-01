@@ -18,7 +18,7 @@ truth**: read the relevant section before any design or content work, and record
 | Path | What |
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, Bumbot near-catches |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, Bumbot near-catches |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |

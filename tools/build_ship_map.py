@@ -214,6 +214,21 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
+    # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
+    # decks 5-9. Floors are listed top to bottom with each deck's number and the card it needs.
+    def lift(name, x, decks, glass=False):
+        decks = sorted(decks, reverse=True)
+        props = [prop("floors", ",".join(str(floor_y(d)) for d in decks)),
+                 prop("decks", ",".join(str(d) for d in decks)),
+                 prop("cards", ",".join(FLIGHT_CARD[d] for d in decks))]
+        if glass:
+            props.append(prop("glass", True, "bool"))
+        add(point(f"lift-{name}", "lift", x, floor_y(decks[0]), props))
+
+    for core, (a, b) in CORES.items():
+        lift(core, col(a) * TILE + 18 * TILE, PLAYABLE)
+    lift("atrium", x_of(sum(ATRIUM["span"]) / 2), range(ATRIUM["decks"][0], ATRIUM["decks"][1] + 1), glass=True)
+
     # Venue signs; cabin doors along the corridors (background, muted).
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":

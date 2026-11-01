@@ -282,10 +282,20 @@ there; they only remind her he's on board.
     on deck 6 down to deck 4 (passing deck 5 with no door) and a Hotel-card one (decks 6–7). The
     real ones are placed when the interiors are filled. Listed in `tools/ship_layout.py`.
 - **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
-  never opens onto an area she can't reach yet.** She stands at the doors and presses ↑; they open
-  and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out. ↑/↓
-  picks a deck, jump confirms; the doors close, a floor indicator counts, and they open on that
-  deck.
+  never opens onto an area she can't reach yet.** She stands at the doors and presses **E**; they
+  open and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out.
+  ↑/↓ picks a deck, **E confirms** (changed from jump, 2026-11-01); the panel goes (the camera
+  following the car shows the ride, 2026-11-01), the doors close, and they open on that deck.
+- **Elevator details (Decided, 2026-11-01):** one elevator door in each of the three cores, aft
+  of the stairs, with the deck number lit above it. ←/→ at the panel backs out, and the doors
+  close once she steps away. She steps in and turns to face us; the car travels out of sight (the
+  walls and decks hide it, as in an escape trunk) with the camera following; a ding, and the doors
+  open. While the glass car comes to fetch her, the panel's display counts its decks. For now the decks she can reach are the
+  same as the stairs': 4–6 with her crew card, the rest with the Hotel card.
+- **Glass elevators (Decided, 2026-11-01):** the atrium's glass elevator works like the others,
+  but its car is **seen**: it runs up and down rails on the atrium wall (decks 5–9), she rides
+  visible inside it, and if it's on another deck when she presses E, it comes down or up to fetch
+  her first.
 
 ### 5.2 At sea
 
@@ -601,15 +611,22 @@ Nothing blocks the start of the build. These get settled along the way:
       checkpoints get tuned once the interiors are filled
 - [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Tried
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
-- [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
-- [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
-      on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
-- [ ] **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
-      somewhere, the diner opening after the fifth, the finale (§4)
-- [ ] Doors along the decks into small separate rooms (§5.1); hazards and people placed on the real
-      decks (§5.8); tangerines and checkpoints tuned in play
-- [ ] First real ship tiles and props: a PixelLab style test on 3–4 representative pieces (~10–15
-      generations); Retro Diffusion only if PixelLab disappoints (§2.1)
+- [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
+      open and to confirm; the panel goes once a deck is chosen. Tried by the user 2026-11-01
+- [ ] **Next: populate the ship.** First real ship tiles and props: a PixelLab style test on 3–4
+      representative pieces (~10–15 generations, ask first); Retro Diffusion only if PixelLab
+      disappoints (§2.1). Then doors along the decks into small separate rooms (§5.1), hazards and
+      people placed on the real decks (§5.8)
+- [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
+      travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
+  - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
+    readers on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens
+    everything
+  - **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
+    somewhere (into a trunk she can't open yet, among others), the diner opening after the fifth,
+    the finale (§4)
+  - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
+    checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
       2026-11-30 (~1909 left at the end of 2026-10-31). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames)
