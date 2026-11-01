@@ -599,9 +599,8 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] The user's playtest of the blockout (2026-11-01): getting around, scale, venues, movement and
       camera all good; it feels empty, as expected for now. Only the vacuum scare tried so far;
       checkpoints get tuned once the interiors are filled
-- [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Built
-      on branch `ladder-doors`; **ask the user to try them** before merging (`?play&cards=all`; the
-      nearest is 17 m forward of the start: walk left from the gangway)
+- [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Tried
+      by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [ ] **Elevators**: the button-panel design (§5.1) at the three cores, opening only where she can go
 - [ ] **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card readers
       on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens everything
