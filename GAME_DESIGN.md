@@ -368,7 +368,10 @@ true to the order and rough size of things on the real ship.
 | Top | Funnel and mast. |
 
 **The real ship's look** (research, 2026-11-01): **authenticity first**, the user decided; the
-ship should look and feel like the Norwegian Sun. Sources: public photo galleries
+ship should look and feel like the Norwegian Sun. **Unconfirmed:** the user thinks the public
+photos below look different from the ship as they knew it. They date from 2015, August 2018 (after
+the dry dock of 31 March to 18 April 2018) and 2023, and user galleries can mix in the sister ship,
+Norwegian Sky. **The user's own photos and memory override them.** Sources: public photo galleries
 ([Cruise Deck Plans](https://www.cruisedeckplans.com/ships/pictures.php?ship=Norwegian-Sun)) and the
 user's own photos, asked for place by place. Downloaded copies stay in the git-ignored
 `reference/` folder, never committed.
