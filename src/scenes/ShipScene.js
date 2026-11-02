@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -19,6 +19,14 @@ const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
+
+// How a side walk looks (§5.3): the atrium's balconies, and deck 12's walk over the pools.
+const SIDEWALK_LOOKS = {
+    atrium: { floor: 0x484a77, fleck: 0x8fd3ff, front: 0xf1e8cf, edge: 0xd9a43b, riser: 0xb9a98a,
+              light: 0xfff1c9, rail: 0xd9a43b, post: 0xb08a2e },
+    deck: { floor: 0xab947a, fleck: 0x9a8469, front: 0xf4f4f4, edge: 0xc7cdd2, riser: 0xc7cdd2,
+            light: null, rail: 0xcd683d, post: 0xe3e7ea },
+};
 
 // The key cards' colours, shown on the readers beside locked doors (§6.2, proposed).
 const CARD_COLOURS = { hotel: 0x2f9bd6, technical: 0xe04848, captain: 0xf2c14e };
@@ -43,7 +51,7 @@ export class ShipScene extends Phaser.Scene {
         this.buildCameras();
         this.buildHud();
 
-        this.mode = 'play'; // play | ladder | stairs | trunk | lift | scripted
+        this.mode = 'play'; // play | ladder | stairs | trunk | lift | swim | scripted
         this.dashUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
@@ -96,6 +104,7 @@ export class ShipScene extends Phaser.Scene {
         this.trunks = [];
         this.lifts = [];
         this.walks = [];
+        this.pools = [];
         this.walkGroup = this.physics.add.staticGroup();
         this.railGroup = this.physics.add.staticGroup();
         this.crates = this.physics.add.staticGroup();
@@ -188,7 +197,15 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'atrium':
-                    this.buildAtrium(o, prop(o, 'walks', ''), prop(o, 'rise', 4));
+                    this.buildAtrium(o, prop(o, 'levels', ''));
+                    break;
+
+                case 'sidewalk':
+                    this.buildSidewalk(o, prop(o, 'rise', 8), prop(o, 'style', 'atrium'));
+                    break;
+
+                case 'pool':
+                    this.buildPool(o);
                     break;
 
                 case 'lift':
@@ -321,73 +338,86 @@ export class ShipScene extends Phaser.Scene {
         return door.trunk.opened || door.y === door.trunk.top;
     }
 
-    // The atrium (§5.3): open from its floor on deck 5 up to a skylight under deck 10. Decks 6-9
-    // cross it on side walks, balconies a step above the deck's floor behind a glass and brass
-    // railing; where a deck's floor ends there is a railing she can jump over.
-    buildAtrium(o, walks, rise) {
+    // The atrium (§5.3): open from its floor on deck 5 up to a skylight under deck 10, its decks
+    // crossing it on side walks. Behind them, burl-wood pillars with a brass ring at each level.
+    buildAtrium(o, levels) {
         const x0 = o.x;
         const x1 = o.x + o.width;
         const top = o.y;
         const bottom = o.y + o.height;
+        const g = this.add.graphics().setDepth(DEPTH.decor);
+        this.worldLayer.add(g);
+        // The skylight dome, seen from below, under deck 10.
+        const cx = (x0 + x1) / 2;
+        g.fillStyle(0xcfeeff, 1).fillEllipse(cx, top, 260, 52);
+        g.lineStyle(1, 0xffffff, 1);
+        for (let k = -4; k <= 4; k++) {
+            g.lineBetween(cx, top, cx + k * 30, top + 26 * Math.sqrt(Math.max(0, 1 - (k / 4.4) ** 2)));
+        }
+        // Burl-wood pillars, floor to ceiling, clear of the glass elevator's shaft.
+        for (const px of [x0 + 22, cx - 130, cx + 120, x1 - 32]) {
+            g.fillStyle(0x9e4539, 1).fillRect(px, top, 10, bottom - top);
+            g.fillStyle(0xcd683d, 1).fillRect(px + 2, top, 3, bottom - top);
+            for (const y of String(levels).split(',').map(Number)) g.fillStyle(0xd9a43b, 1).fillRect(px - 2, y + 4, 14, 3);
+        }
+    }
+
+    // A side walk (§5.3): a walkway a step above its deck's floor, across an open space, behind a
+    // glass railing. ↑ steps her up onto it, ↓ steps her down; where the deck's floor ends there
+    // is a railing she can jump over. Indoors in the atrium's colours, outdoors in the open deck's.
+    buildSidewalk(o, rise, style) {
+        const x0 = o.x;
+        const x1 = o.x + o.width;
+        const y = o.y;
         const reach = SIDEWALK.reach;
-        const back = this.add.graphics().setDepth(DEPTH.decor);
+        const look = SIDEWALK_LOOKS[style] || SIDEWALK_LOOKS.atrium;
+        const back = this.add.graphics().setDepth(DEPTH.decor + 0.2);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
         this.worldLayer.add([back, front]);
 
-        // The skylight dome, seen from below, under deck 10.
-        const cx = (x0 + x1) / 2;
-        back.fillStyle(0xcfeeff, 1).fillEllipse(cx, top, 260, 52);
-        back.lineStyle(1, 0xffffff, 1);
-        for (let k = -4; k <= 4; k++) {
-            back.lineBetween(cx, top, cx + k * 30, top + 26 * Math.sqrt(Math.max(0, 1 - (k / 4.4) ** 2)));
+        // The walkway: its floor on top, its front with an edge, a light under it.
+        back.fillStyle(look.front, 1).fillRect(x0, y, x1 - x0, 12);
+        back.fillStyle(look.floor, 1).fillRect(x0, y, x1 - x0, 3);
+        for (let px = x0 + 2; px < x1; px += 6) back.fillStyle(look.fleck, 1).fillRect(px, y + 1, 2, 1);
+        back.fillStyle(look.edge, 1).fillRect(x0, y + 3, x1 - x0, 1);
+        if (look.light) back.fillStyle(look.light, 1).fillRect(x0, y + 12, x1 - x0, 2);
+        // A step up at either end, out over the deck's floor: the same floor, a riser, a nosing.
+        for (const sx of [x0 - reach, x1]) {
+            back.fillStyle(look.riser, 1).fillRect(sx, y, reach, rise);
+            back.fillStyle(look.floor, 1).fillRect(sx, y, reach, 3);
+            back.fillStyle(look.edge, 1).fillRect(sx, y + 3, reach, 1);
         }
-        // Burl-wood pillars, floor to ceiling.
-        const pillars = [x0 + 22, cx - 130, cx + 120, x1 - 32]; // clear of the glass elevator's shaft
-        for (const px of pillars) {
-            back.fillStyle(0x9e4539, 1).fillRect(px, top, 10, bottom - top);
-            back.fillStyle(0xcd683d, 1).fillRect(px + 2, top, 3, bottom - top);
+        // The railing in front of it: glass panels between posts, a handrail along the top.
+        const railTop = y - SIDEWALK.railHeight;
+        front.fillStyle(0x8fd3ff, 0.22).fillRect(x0, railTop, x1 - x0, SIDEWALK.railHeight);
+        front.fillStyle(look.rail, 1).fillRect(x0, railTop, x1 - x0, 2);
+        for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
+        // Where the deck's floor stops, at either end: a post she can jump over.
+        for (const ex of [x0 - 4, x1]) {
+            const h = SIDEWALK.railHeight + rise;
+            front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
+            front.fillStyle(look.rail, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
+            const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
+            this.physics.add.existing(zone, true);
+            this.railGroup.add(zone);
         }
+        // The side walk itself: solid only while she is on it, from above.
+        const walk = { x0: x0 - reach, x1: x1 + reach, y, rise };
+        walk.zone = this.add.zone(walk.x0, y, walk.x1 - walk.x0, 6).setOrigin(0);
+        this.physics.add.existing(walk.zone, true);
+        this.walkGroup.add(walk.zone);
+        this.walks.push(walk);
+    }
 
-        for (const spec of JSON.parse(walks)) {
-            const { y } = spec;
-            // The balcony: blue patterned carpet on top, its cream front with a brass edge, a warm
-            // cove light under it.
-            back.fillStyle(0xf1e8cf, 1).fillRect(spec.x0, y, spec.x1 - spec.x0, 12);
-            back.fillStyle(0x484a77, 1).fillRect(spec.x0, y, spec.x1 - spec.x0, 3);
-            for (let px = spec.x0 + 2; px < spec.x1; px += 6) back.fillStyle(0x8fd3ff, 1).fillRect(px, y + 1, 2, 1);
-            back.fillStyle(0xd9a43b, 1).fillRect(spec.x0, y + 3, spec.x1 - spec.x0, 1);
-            back.fillStyle(0xfff1c9, 1).fillRect(spec.x0, y + 12, spec.x1 - spec.x0, 2);
-            for (const px of pillars) {
-                if (px > spec.x0 && px < spec.x1) back.fillStyle(0xd9a43b, 1).fillRect(px - 2, y + 4, 14, 3);
-            }
-            // The railing in front of it: glass panels between brass posts, a brass rail.
-            const railTop = y - SIDEWALK.railHeight;
-            front.fillStyle(0x8fd3ff, 0.22).fillRect(spec.x0, railTop, spec.x1 - spec.x0, SIDEWALK.railHeight);
-            front.fillStyle(0xd9a43b, 1).fillRect(spec.x0, railTop, spec.x1 - spec.x0, 2);
-            for (let px = spec.x0; px <= spec.x1; px += 40) front.fillStyle(0xb08a2e, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
-
-            // A step up at either end, out over the deck's floor: the same carpet, a riser face, a
-            // brass nosing. And the railing where the deck's floor stops, a post she can jump over.
-            const walk = { x0: spec.x0 - reach, x1: spec.x1 + reach, y, rise };
-            for (const sx of [spec.x0 - reach, spec.x1]) {
-                back.fillStyle(0xb9a98a, 1).fillRect(sx, y, reach, rise);
-                back.fillStyle(0x484a77, 1).fillRect(sx, y, reach, 3);
-                back.fillStyle(0xd9a43b, 1).fillRect(sx, y + 3, reach, 1);
-            }
-            for (const ex of [spec.x0 - 4, spec.x1]) {
-                const h = SIDEWALK.railHeight + rise;
-                front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
-                front.fillStyle(0xd9a43b, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
-                const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
-                this.physics.add.existing(zone, true);
-                this.railGroup.add(zone);
-            }
-            // The side walk itself: solid only while she is on it, from above.
-            walk.zone = this.add.zone(walk.x0, y, walk.x1 - walk.x0, 6).setOrigin(0);
-            this.physics.add.existing(walk.zone, true);
-            this.walkGroup.add(walk.zone);
-            this.walks.push(walk);
-        }
+    // A pool on deck 11 (§5.3): water she can jump into and swim in. Its front is drawn over her,
+    // a little see-through, so she is in it rather than on it.
+    buildPool(o) {
+        const water = this.add.graphics().setDepth(DEPTH.player + 0.4);
+        water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
+        water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
+        const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.player + 0.45);
+        this.worldLayer.add([water, ripples]);
+        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples });
     }
 
     // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of
@@ -594,7 +624,9 @@ export class ShipScene extends Phaser.Scene {
         else if (this.mode === 'stairs') this.updateStairs(input, dt, time);
         else if (this.mode === 'trunk') this.updateTrunk(input, dt);
         else if (this.mode === 'lift') this.updateLift(input, dt);
+        else if (this.mode === 'swim') this.updateSwim(input, dt);
         else if (this.script) this.script(dt, time);
+        for (const pool of this.pools) pool.ripples.tilePositionX += dt * 6;
         this.closeTrunkDoors();
         this.closeLiftDoors();
 
@@ -654,6 +686,9 @@ export class ShipScene extends Phaser.Scene {
         if (input.jumpReleased && body.velocity.y < -PLAYER.jumpCutVelocity) {
             body.velocity.y = -PLAYER.jumpCutVelocity;
         }
+
+        const pool = this.pools.find(w => p.x > w.x0 && p.x < w.x1 && p.y > w.y + SWIM.entry);
+        if (pool) return this.enterPool(pool);
 
         if (!onFloor) {
             if (p.x < this.hullMinX || p.x > this.hullMaxX) {
@@ -761,6 +796,41 @@ export class ShipScene extends Phaser.Scene {
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
         this.findWalk();
+    }
+
+    // --- Pools (§5.3): she swims, front crawl -------------------------------------------------
+
+    enterPool(pool) {
+        const p = this.player;
+        this.mode = 'swim';
+        this.pool = pool;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.y = pool.y + SWIM.float;
+        sfx.splash();
+        this.smash(p.x, pool.y);
+        this.pose('swim');
+    }
+
+    // ←/→ swims along the pool; jump climbs out, onto the deck at its edge or back in the water.
+    updateSwim(input, dt) {
+        const p = this.player;
+        const pool = this.pool;
+        const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        if (dir) p.setFlipX(dir < 0);
+        p.x = Phaser.Math.Clamp(p.x + dir * SWIM.speed * dt, pool.x0 + SWIM.margin, pool.x1 - SWIM.margin);
+        this.pose('swim', dir ? 1 : 0.4);
+        if (input.jumpPressed) {
+            this.mode = 'play';
+            this.pool = null;
+            p.y = pool.y - 2;
+            p.body.enable = true;
+            p.body.reset(p.x, p.y);
+            p.body.velocity.y = -PLAYER.jumpVelocity;
+            p.body.velocity.x = (p.flipX ? -1 : 1) * PLAYER.runSpeed * 0.6;
+            this.takeoffY = pool.y;
+            sfx.jump();
+        }
     }
 
     // --- The atrium's side walks (§5.3) -------------------------------------------------------

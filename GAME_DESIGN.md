@@ -365,8 +365,11 @@ venue's position along the ship. Use it whenever a position or proportion needs 
     overboard stays as it is.)
 - **Decks 11 and 12 have glass side walls**: glass windbreak panels with a handrail along the
   ship's side, instead of open railings.
-- **The pools:** she can jump into a pool, and swims (a swimming animation to make); maybe game
-  mechanics round the pools later. Not a scare.
+- **The pools:** she can jump into a pool, and swims: **front crawl** (the user's choice; a
+  skeleton-v3 clip written as poses, 3 generations). Two pools on deck 11 (119-131 m and
+  134-140 m), sunk two tiles into the deck; she walks or drops in with a splash, ←/→ swims, jump
+  climbs out. Maybe game mechanics round the pools later. Not a scare. Bumbot's fly-catching spot
+  moved beside them, to 146 m.
 - **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
   as it naturally would, but she can't get there. There are no crew or engine decks to explore.
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
@@ -696,7 +699,8 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
       order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
       `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
-      side walk over deck 11**, its glass side walls, and deck 11's pools with swimming; **(3) the
+      side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
+      2026-11-02 on `ship-structure`, placeholder art; ask the user to try it**; **(3) the
       stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
       dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
       stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's

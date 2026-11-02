@@ -39,6 +39,8 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
         // Waving from the life ring, overboard: the frames with her hand up, back and forth.
         this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
+        // Front crawl in a pool.
+        this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

@@ -23,7 +23,8 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import ATRIUM, CORES, FUNNEL, ROOF_ROW, TILE, TRUNKS, col, floor_y, walk_y, x_of
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, ROOF_ROW, SIDEWALK_RISE, TILE, TRUNKS,
+                            col, floor_y, walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -459,6 +460,41 @@ def scenario_atrium(b):
     ok &= check(landed and landed["y"] == walk_y(6) and landed["walk"],
                 "the curving staircase climbs to deck 6's side walk", landed)
 
+    return ok
+
+
+def scenario_pool(b):
+    b.open("?reset&play&cards=all")
+    a, z = POOLS[0]
+    # Deck 12's side walk over the pool area: up onto it, along, and down over the railing.
+    b.teleport(col(POOL_OPENING[0]) * TILE - 16, D12)
+    b.tap("up")
+    time.sleep(0.1)
+    s = b.state()
+    ok = check(s["y"] == D12 - SIDEWALK_RISE and on_walk(b), "deck 12 has a side walk over the pools", s)
+    b.hold("right", (x_of((a + z) / 2) - s["x"]) / 140)
+    b.tap("down")
+    time.sleep(1.0)
+    s = b.state()
+    ok &= check(s["mode"] == "swim", "↓ drops her from it into the pool below", s)
+    b.shot("pool-swimming")
+    x0 = s["x"]
+    b.hold("right", 1.0)
+    s = b.state()
+    ok &= check(s["mode"] == "swim" and s["x"] > x0 + 40, "she swims front crawl", s)
+    b.hold("right", 8.0)
+    b.key("right", True)
+    b.tap("space")
+    time.sleep(0.4)
+    b.key("right", False)
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D11 and col(z) * TILE < s["x"] < col(POOLS[1][0]) * TILE,
+                "jump climbs her out at the edge", s)
+    # Walking off the deck's edge into the water.
+    b.teleport(col(a) * TILE - 40, D11)
+    b.hold("right", 0.8)
+    ok &= check(b.state()["mode"] == "swim", "she can walk straight into a pool too", b.state())
     return ok
 
 
