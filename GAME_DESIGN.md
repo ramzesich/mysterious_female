@@ -353,12 +353,12 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   - **The atrium is 20 m long, two screens** (the user, 2026-11-02): NCL's profile draws it about
     10 m, which looked narrow next to its five levels, so the midship core stands 10 m further aft
     than on the profile. (The profile's mezzanine, deck 6a, was tried and dropped by the user.)
-  - **The atrium's side walks are level with their deck's floor** (the user, 2026-11-02): she
-    simply runs back and forth across the atrium, with the look kept (balcony fronts, the
-    glass-and-brass railing, the open space below). The step-up and jumping over the railings
-    there were tried and dropped: not intuitive, and ↓ near the top of the staircase dropped her
-    into the atrium. **Deck 12's walk over the pools keeps its step** (8px, ↑ up, ↓ down, a railing
-    to jump over into the pool) unless the user says otherwise.
+  - **Side walks are level with their deck's floor** (the user, 2026-11-02): she simply runs
+    along them, the look kept (balcony fronts, the glass railing, the open space below). A
+    step-up onto them, with ↑/↓ and railings to jump over, was tried and dropped: it worked
+    poorly in practice. **Deck 12's walk over the pools keeps the drop: ↓ there lets her down
+    through it** into a pool (the fun part). Nowhere else does ↓ drop her; in the atrium it only
+    ever takes the stairs.
   - **The curving staircase winds round the glass elevator** (the user): each flight sweeps from
     one side of it to the other, alternately behind it and in front of it, and the elevator's
     dark column hides her while she is behind it.
@@ -701,7 +701,7 @@ Nothing blocks the start of the build. These get settled along the way:
       a suitcase, ice cream, a pool ladder and more
 - [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
       order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
-      `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
+      `ship-structure`, placeholder art; 20 m long, its side walks level floor (the user)**; **(2) deck 12's
       side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
       2026-11-02 on `ship-structure`, placeholder art; approved by the user**; **(3) the
       stairs** (built 2026-11-02 on branch `stairs`, hand-drawn; looks accepted by the user), made to look real (blue diamond-pattern carpet on the treads, brass handrails on

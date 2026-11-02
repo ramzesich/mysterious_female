@@ -23,8 +23,8 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, ROOF_ROW, SIDEWALK_RISE, TILE, TRUNKS,
-                            col, floor_y, walk_y, x_of)
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, ROOF_ROW, TILE, TRUNKS, col, floor_y,
+                            walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -403,10 +403,6 @@ ATRIUM_X0 = col(ATRIUM["span"][0]) * TILE                 # where the atrium ope
 ATRIUM_X1 = col(ATRIUM["span"][1]) * TILE
 
 
-def on_walk(b):
-    return b.eval("!!window.__ship.onWalk")
-
-
 def scenario_atrium(b):
     b.open("?reset&play&cards=all")
     # The side walks are floor: she runs straight across the atrium.
@@ -435,13 +431,11 @@ def scenario_atrium(b):
 def scenario_pool(b):
     b.open("?reset&play&cards=all")
     a, z = POOLS[0]
-    # Deck 12's side walk over the pool area: up onto it, along, and down over the railing.
+    # Deck 12's side walk over the pool area: along it, and down through it with ↓.
     b.teleport(col(POOL_OPENING[0]) * TILE - 16, D12)
-    b.tap("up")
-    time.sleep(0.1)
+    b.hold("right", (x_of((a + z) / 2) - col(POOL_OPENING[0]) * TILE + 16) / 140)
     s = b.state()
-    ok = check(s["y"] == D12 - SIDEWALK_RISE and on_walk(b), "deck 12 has a side walk over the pools", s)
-    b.hold("right", (x_of((a + z) / 2) - s["x"]) / 140)
+    ok = check(s["mode"] == "play" and s["y"] == D12, "deck 12's side walk is floor over the pools", s)
     b.tap("down")
     time.sleep(1.0)
     s = b.state()
@@ -517,8 +511,10 @@ def scenario_bumbot(b):
 
 def scenario_falls(b):
     b.open("?reset&play")
-    # One deck: from deck 12 into the open pool area on deck 11.
-    b.teleport(x_of(140), D12)  # clear of Bumbot, who is at 130 m below
+    # One deck: down through deck 12's walk onto deck 11's pool area, between the pools.
+    b.teleport(x_of(132.5), D12)
+    time.sleep(0.3)
+    b.tap("down")
     time.sleep(1.2)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D11, "a one-deck drop into the pool area is fine", s)

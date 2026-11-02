@@ -46,9 +46,6 @@ POOL_OPENING = (115, 145)
 POOLS = [(119, 131), (134, 140)]
 POOL_DEPTH = 2 * TILE
 
-# The atrium's side walks (§5.3) stand a visible step above their deck's floor: she steps up onto
-# them.
-SIDEWALK_RISE = 8
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
@@ -269,17 +266,16 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
-    # Side walks (§5.3): each deck from 6 to 9 across the atrium, level with the deck's floor so she
-    # simply runs across (the user, 2026-11-02); and deck 12 over deck 11's pool area, a step up.
-    # The atrium's dressing (pillars, the skylight) is its own.
+    # Side walks (§5.3), level with their deck's floor so she simply runs along them (the user,
+    # 2026-11-02): each deck from 6 to 9 across the atrium, and deck 12 over deck 11's pool area,
+    # which she can drop through into a pool. The atrium's dressing (pillars, skylight) is its own.
     lo, hi = ATRIUM["decks"]
     ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
     for d in range(lo + 1, hi + 1):
-        add(area(f"sidewalk-atrium-{d}", "sidewalk", ax0, walk_y(d), ax1 - ax0, 0, [
-            prop("rise", 0, "int"), prop("style", "atrium")]))
+        add(area(f"sidewalk-atrium-{d}", "sidewalk", ax0, walk_y(d), ax1 - ax0, 0, [prop("style", "atrium")]))
     pa, pb = (col(m) * TILE for m in POOL_OPENING)
-    add(area("sidewalk-pool", "sidewalk", pa, floor_y(12) - SIDEWALK_RISE, pb - pa, 0, [
-        prop("rise", SIDEWALK_RISE, "int"), prop("style", "deck")]))
+    add(area("sidewalk-pool", "sidewalk", pa, floor_y(12), pb - pa, 0, [
+        prop("style", "deck"), prop("dropThrough", True, "bool")]))
     add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
         prop("levels", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1)))]))
     for a, b in POOLS:

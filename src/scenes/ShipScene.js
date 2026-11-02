@@ -118,7 +118,6 @@ export class ShipScene extends Phaser.Scene {
         this.walks = [];
         this.pools = [];
         this.walkGroup = this.physics.add.staticGroup();
-        this.railGroup = this.physics.add.staticGroup();
         this.crates = this.physics.add.staticGroup();
         // A flight's balustrade is in front of her while she climbs it, behind her when she passes.
         // The atrium's flights in front of the glass elevator are drawn on their own, over it.
@@ -226,7 +225,7 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'sidewalk':
-                    this.buildSidewalk(o, prop(o, 'rise', 8), prop(o, 'style', 'atrium'));
+                    this.buildSidewalk(o, prop(o, 'style', 'atrium'), prop(o, 'dropThrough', false));
                     break;
 
                 case 'pool':
@@ -437,14 +436,13 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // A side walk (§5.3): a walkway a step above its deck's floor, across an open space, behind a
-    // glass railing. ↑ steps her up onto it, ↓ steps her down; where the deck's floor ends there
-    // is a railing she can jump over. Indoors in the atrium's colours, outdoors in the open deck's.
-    buildSidewalk(o, rise, style) {
+    // A side walk (§5.3): a walkway level with its deck's floor, across an open space, behind a
+    // glass railing; she simply runs along it. Indoors in the atrium's colours, outdoors in the open
+    // deck's. Deck 12's, over the pools, lets her drop through with ↓.
+    buildSidewalk(o, style, dropThrough) {
         const x0 = o.x;
         const x1 = o.x + o.width;
         const y = o.y;
-        const reach = SIDEWALK.reach;
         const look = SIDEWALK_LOOKS[style] || SIDEWALK_LOOKS.atrium;
         const back = this.add.graphics().setDepth(DEPTH.walkFloor);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
@@ -461,27 +459,10 @@ export class ShipScene extends Phaser.Scene {
         front.fillStyle(0x8fd3ff, 0.22).fillRect(x0, railTop, x1 - x0, SIDEWALK.railHeight);
         front.fillStyle(look.rail, 1).fillRect(x0, railTop, x1 - x0, 2);
         for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
-        // A stepped side walk (deck 12's): a step up at either end, out over the deck's floor, and
-        // where the deck's floor stops, a post she can jump over. A level one (the atrium's) is
-        // just floor, and she runs across.
-        if (rise) {
-            for (const sx of [x0 - reach, x1]) {
-                back.fillStyle(look.riser, 1).fillRect(sx, y, reach, rise);
-                back.fillStyle(look.floor, 1).fillRect(sx, y, reach, 3);
-                back.fillStyle(look.edge, 1).fillRect(sx, y + 3, reach, 1);
-            }
-            for (const ex of [x0 - 4, x1]) {
-                const h = SIDEWALK.railHeight + rise;
-                front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
-                front.fillStyle(look.rail, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
-                const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
-                this.physics.add.existing(zone, true);
-                this.railGroup.add(zone);
-            }
-        }
-        // The side walk itself, from above: a level one always, a stepped one while she is on it.
-        const walk = rise ? { x0: x0 - reach, x1: x1 + reach, y, rise } : { x0, x1, y, rise };
-        walk.zone = this.add.zone(walk.x0, y, walk.x1 - walk.x0, 6).setOrigin(0);
+
+        // The walkway itself: floor from above.
+        const walk = { x0, x1, y, dropThrough };
+        walk.zone = this.add.zone(x0, y, x1 - x0, 6).setOrigin(0);
         walk.zone.walk = walk;
         this.physics.add.existing(walk.zone, true);
         this.walkGroup.add(walk.zone);
@@ -576,12 +557,10 @@ export class ShipScene extends Phaser.Scene {
         this.player = p;
 
         this.physics.add.collider(p, this.solidLayer);
-        // A side walk holds her only while she is on it and coming down onto it; the railings at
-        // its ends stop her only while she is not.
-        this.onWalk = null;
+        // A side walk holds her coming down onto it, unless she is dropping through it.
+        this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
-            (!zone.walk.rise || this.onWalk === zone.walk) && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
-        this.physics.add.collider(p, this.railGroup, null, () => !this.onWalk);
+            this.droppingThrough !== zone.walk && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
             if (!this.isDashing()) return true;
             this.smash(crate.x, crate.y);
@@ -670,7 +649,6 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = true;
         p.body.reset(point.x, point.y);
         p.body.allowGravity = true;
-        this.findWalk();
         this.grounded = true;
         this.takeoffY = point.y;
         this.lastGroundedAt = this.time.now;
@@ -746,10 +724,7 @@ export class ShipScene extends Phaser.Scene {
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
         if (onFloor && (input.up || input.down) && this.tryStairs(input)) return;
         if ((input.up || input.down) && this.tryLadder(input)) return;
-        if (onFloor && input.upPressed && this.stepUp()) return;
-        if (input.downPressed && this.onWalk) this.stepDown();
-        // Walking off a side walk's end steps her down onto the deck's floor.
-        if (this.onWalk && (p.x < this.onWalk.x0 || p.x > this.onWalk.x1)) this.onWalk = null;
+        if (onFloor && input.downPressed) this.dropThroughWalk();
 
         if (input.dashPressed) this.tryDash(time);
 
@@ -880,7 +855,6 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
-        this.findWalk();
     }
 
     // --- Pools (§5.3): she swims, breaststroke -------------------------------------------------
@@ -918,41 +892,18 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // --- The atrium's side walks (§5.3) -------------------------------------------------------
+    // --- Side walks (§5.3) -----------------------------------------------------------------------
 
-    // After stairs, an elevator or a respawn: is she standing on a side walk?
-    findWalk() {
+    // ↓ on deck 12's walk over the pools: she lets go over the railing and drops (into a pool, if
+    // she is over one). Nowhere else: in the atrium ↓ only ever takes the stairs.
+    dropThroughWalk() {
         const p = this.player;
-        this.onWalk = this.walks.find(w => w.rise && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2) || null;
-    }
-
-    // The side walk she could step up onto from where she stands: on the deck's floor below its end.
-    walkToStepOnto() {
-        const p = this.player;
-        if (this.onWalk || !p.body.blocked.down) return null;
-        return this.walks.find(w => w.rise && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y - w.rise) < 3) || null;
-    }
-
-    // ↑ by a side walk, on the deck's floor just below it: she steps up onto it.
-    stepUp() {
-        const p = this.player;
-        const walk = this.walkToStepOnto();
+        const walk = this.walks.find(w => w.dropThrough && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2);
         if (!walk) return false;
-        this.onWalk = walk;
-        p.body.reset(p.x, walk.y);
-        this.takeoffY = walk.y;
-        sfx.land();
+        this.droppingThrough = walk;
+        p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
+        this.time.delayedCall(450, () => { if (this.droppingThrough === walk) this.droppingThrough = null; });
         return true;
-    }
-
-    // ↓ on a side walk: at its ends she steps down onto the floor; out over the open space she
-    // climbs over the railing and drops.
-    stepDown() {
-        const p = this.player;
-        const w = this.onWalk;
-        const overOpen = p.x > w.x0 + SIDEWALK.reach && p.x < w.x1 - SIDEWALK.reach;
-        this.onWalk = null;
-        if (overOpen) p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------
@@ -1166,7 +1117,6 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.takeoffY = p.y;
-        this.findWalk();
     }
 
     // She steps in and turns to us, the doors close, the car goes, a ding, and they open. The panel
@@ -1316,7 +1266,6 @@ export class ShipScene extends Phaser.Scene {
 
     enterStairs(flight, t) {
         this.mode = 'stairs';
-        this.onWalk = null;
         this.flight = flight;
         this.stairT = t;
         this.player.body.enable = false;
