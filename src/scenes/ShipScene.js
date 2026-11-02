@@ -1179,7 +1179,8 @@ export class ShipScene extends Phaser.Scene {
         if (this.time.now < (this.lockedUntil || 0)) return false;
         this.lockedUntil = this.time.now + 900;
         this.alert.setText(`🔒 ${card[0].toUpperCase()}${card.slice(1)} card`).setVisible(true);
-        this.time.delayedCall(900, () => { if (this.mode === 'play') this.alert.setVisible(false); });
+        // Held at the lock, it shows again before this runs: hide it only once the last one is over.
+        this.time.delayedCall(900, () => { if (this.mode === 'play' && this.time.now >= this.lockedUntil) this.alert.setVisible(false); });
         return false;
     }
 
