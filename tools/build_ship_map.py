@@ -43,6 +43,9 @@ FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
 # Deck 12's open stretch over the pool, metres from the bow.
 POOL_OPENING = (115, 145)
 
+# The atrium's side walks (§5.3) stand this much above their deck's floor: she steps up onto them.
+SIDEWALK_RISE = 4
+
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
 
@@ -64,6 +67,12 @@ def x_of(m):
 def floor_y(deck):
     """Pixel y of the walkable top of a deck's floor."""
     return FLOOR_ROW[deck] * TILE
+
+
+def walk_y(deck):
+    """Where she stands on `deck` in the atrium: on its side walk above deck 5, the atrium floor."""
+    lo, hi = ATRIUM["decks"]
+    return floor_y(deck) - (SIDEWALK_RISE if lo < deck <= hi else 0)
 
 
 def in_core(m):
@@ -166,9 +175,12 @@ def build_layers():
         k = r - FLOOR_ROW[3]
         fill(solid, col(fwd3) + 4 * k, col(aft3) - 1 - k, r, r, STEEL if r <= WATER_ROW + 2 else NAVY)
 
-    # No floor opens in the middle of a deck indoors: the atrium is its look (the back wall), not a
-    # well to fall down. Outdoors, deck 12 is open over the middle of the Oasis Pool, as the real
-    # pool deck is open to the sky, with a railing round the edge: a one-deck drop to the pool.
+    # The atrium is open from its floor on deck 5 up through deck 9 (§5.3): above deck 5 its decks
+    # are side walks, built in the game, not floor tiles. Outdoors, deck 12 is open over the middle
+    # of the Oasis Pool, with a railing round the edge: a one-deck drop to the pool.
+    lo, hi = ATRIUM["decks"]
+    for deck in range(lo + 1, hi + 1):
+        fill(solid, col(ATRIUM["span"][0]), col(ATRIUM["span"][1]) - 1, FLOOR_ROW[deck], FLOOR_ROW[deck], 0)
     a, b = POOL_OPENING
     fill(solid, col(a), col(b) - 1, FLOOR_ROW[12], FLOOR_ROW[12], 0)
     for c in (col(a) - 1, col(b)):
@@ -232,11 +244,29 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
+    # The atrium (§5.3): its span, the side walks of decks 6-9 and how high they stand, for the game
+    # to build; and the curving staircase, up level by level beside the glass elevator.
+    lo, hi = ATRIUM["decks"]
+    ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
+    add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
+        prop("walks", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1))),
+        prop("rise", SIDEWALK_RISE, "int")]))
+    left, right = ax0 + 2 * TILE, ax0 + 12 * TILE
+    for deck in range(lo, hi):
+        x0, x1 = (left, right) if deck % 2 == 1 else (right, left)
+        y0, y1 = walk_y(deck), walk_y(deck + 1)
+        add({"id": 0, "name": f"stairs-atrium-{deck}-{deck + 1}", "type": "stairs", "x": x0, "y": y0,
+             "width": 0, "height": 0, "rotation": 0, "visible": True,
+             "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
+             "properties": [prop("card", FLIGHT_CARD[deck + 1])]})
+
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
-    # decks 5-9. Floors are listed top to bottom with each deck's number and the card it needs.
+    # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
+    # number and the card it needs.
     def lift(name, x, decks, glass=False):
         decks = sorted(decks, reverse=True)
-        props = [prop("floors", ",".join(str(floor_y(d)) for d in decks)),
+        stand = walk_y if glass else floor_y
+        props = [prop("floors", ",".join(str(stand(d)) for d in decks)),
                  prop("decks", ",".join(str(d) for d in decks)),
                  prop("cards", ",".join(FLIGHT_CARD[d] for d in decks))]
         if glass:

@@ -23,7 +23,7 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import CORES, FUNNEL, ROOF_ROW, TILE, TRUNKS, col, floor_y, x_of
+from build_ship_map import ATRIUM, CORES, FUNNEL, ROOF_ROW, TILE, TRUNKS, col, floor_y, walk_y, x_of
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -378,12 +378,12 @@ def scenario_lift(b):
 
     # The glass elevator: on deck 5 to start with, it comes up to fetch her on deck 7.
     b.open("?reset&play&cards=all")
-    b.teleport(GLASS_X, D7)
+    b.teleport(GLASS_X, walk_y(7))
     b.tap("e")
     time.sleep(0.6)
     b.shot("glass-coming")
     time.sleep(1.6)
-    ok &= check(b.eval("window.__ship.liftRun.choosing && window.__ship.lifts.find(l => l.glass).carY") == D7,
+    ok &= check(b.eval("window.__ship.liftRun.choosing && window.__ship.lifts.find(l => l.glass).carY") == walk_y(7),
                 "the glass car comes up to her deck")
     for _ in range(2):
         b.tap("up")
@@ -394,7 +394,70 @@ def scenario_lift(b):
     b.shot("glass-riding")
     time.sleep(1.8)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == D9, "and rides it to deck 9", s)
+    ok &= check(s["mode"] == "play" and s["y"] == walk_y(9) and b.eval("!!window.__ship.onWalk"),
+                "and rides it to deck 9's side walk", s)
+    return ok
+
+
+ATRIUM_X0 = col(ATRIUM["span"][0]) * TILE                 # where the atrium opens
+ATRIUM_X1 = col(ATRIUM["span"][1]) * TILE
+
+
+def on_walk(b):
+    return b.eval("!!window.__ship.onWalk")
+
+
+def scenario_atrium(b):
+    b.open("?reset&play&cards=all")
+    b.teleport(ATRIUM_X0 - 40, D7)
+    b.hold("right", 0.6)
+    s = b.state()
+    ok = check(s["y"] == D7 and s["x"] < ATRIUM_X0, "the railing stops her at the atrium's edge", s)
+    b.tap("up")
+    time.sleep(0.1)
+    s = b.state()
+    ok &= check(s["y"] == walk_y(7) and on_walk(b), "↑ steps her up onto the side walk", s)
+    b.shot("atrium-sidewalk")
+    b.hold("right", 4.2)
+    s = b.state()
+    ok &= check(s["y"] == D7 and s["x"] > ATRIUM_X1 and not on_walk(b), "she crosses and steps off at the far end", s)
+
+    # Off the side walk over the open space: one deck down is fine...
+    b.teleport(ATRIUM_X0 - 10, D6)
+    b.tap("up")
+    b.hold("right", 1.2)
+    b.tap("down")
+    time.sleep(1.2)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == floor_y(5), "↓ over the open space drops her to deck 5", s)
+    # ...and over the railing from the deck's floor, too.
+    b.teleport(ATRIUM_X0 - 30, D6)
+    b.key("right", True)
+    b.tap("space", 0.3)
+    time.sleep(1.2)
+    b.key("right", False)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == floor_y(5), "or she jumps the railing down to deck 5", s)
+    # From higher up it is a long fall: the camera lets her go and she comes back.
+    b.teleport(ATRIUM_X0 - 10, floor_y(8))
+    b.tap("up")
+    b.hold("right", 1.2)
+    b.tap("down")
+    time.sleep(3.0)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
+                "from deck 8 it is a long fall, and she comes back (at the gangway: no checkpoints yet)", s)
+
+    # The curving staircase, from the atrium floor up onto deck 6's side walk.
+    # Holding ↑ carries her on through the landing within a frame, so note where she first lands.
+    b.teleport(ATRIUM_X0 + 2 * TILE, floor_y(5))
+    b.eval("""(() => { const s = window.__ship, leave = s.leaveLadderOrStairs.bind(s); window.__landed = null;
+        s.leaveLadderOrStairs = () => { leave(); window.__landed = window.__landed || { y: s.player.y, walk: !!s.onWalk }; };
+    })()""")
+    b.hold("up", 2.4)
+    landed = b.eval("window.__landed")
+    ok &= check(landed and landed["y"] == walk_y(6) and landed["walk"],
+                "the curving staircase climbs to deck 6's side walk", landed)
     return ok
 
 

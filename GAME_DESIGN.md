@@ -344,17 +344,20 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   well"):** corridors and rooms have solid floors. Two places open up through the decks, as on
   the real ship, and both work the same way, as **side walks**:
   - **The atrium** is a real open space, its floor on deck 5 (Guest Services, the Atrium Café;
-    public sources say the Atlantic Deck, to confirm with the user), open up through deck 9 to a
+    the Atlantic Deck, confirmed by the user), open up through deck 9 to a
     domed skylight: oval balconies with cream fronts and glass-and-brass railings, burl-wood
     pillars with brass rings, the two glass elevators in the middle (§5.1), the curving
-    staircase. **Round stairs** wind round the glass elevators between the levels (the user's
-    idea).
+    staircase, which climbs level by level beside the glass elevator from deck 5 to deck 9.
   - **Deck 12 over deck 11's open area** is a side walk along the ship's side, its floor
     continuous (the hole in the blockout goes), with deck 11's pools below and behind it.
-  - **A side walk** is a raised walkway in the back plane, edged with a railing, so it reads as a
-    side walk. She **steps up onto it** to cross; if she doesn't, she meets the railing at the open
-    edge and can **jump over it and drop** into the space below. (Proposed, from the user's idea:
-    the exact controls and how far a drop may be before it is a scare, §5.6, are being settled.)
+  - **A side walk** is a balcony a step (4px) above its deck's floor, behind a glass-and-brass
+    railing, so it reads as a side walk. **↑ steps her up onto it, ↓ steps her down**: at its ends
+    onto the deck's floor, out over the open space over the railing and down. If she doesn't step
+    up, she meets the railing where the deck's floor ends and can **jump over it and drop**. The
+    glass elevator opens onto the side walks.
+  - **Drops keep the fall rule** (§5.6): one deck down is fine; longer, the camera lets her go,
+    she falls out of the frame and comes back at the nearest checkpoint. (It is not a fright;
+    overboard stays as it is.)
 - **Decks 11 and 12 have glass side walls**: glass windbreak panels with a handrail along the
   ship's side, instead of open railings.
 - **The pools:** she can jump into a pool, and swims (a swimming animation to make); maybe game
@@ -686,7 +689,9 @@ Nothing blocks the start of the build. These get settled along the way:
       atlas too: Bumbot's fish on a plate, a key card on a lanyard, a captain's hat, poker chips,
       a suitcase, ice cream, a pool ladder and more
 - [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
-      order: **(1) the atrium** as an open space with side walks and round stairs; **(2) deck 12's
+      order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
+      `ship-structure`, placeholder art (ask the user to try it: deck 5-9 between the forward and
+      midship cores)**; **(2) deck 12's
       side walk over deck 11**, its glass side walls, and deck 11's pools with swimming; **(3) the
       stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
       dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
