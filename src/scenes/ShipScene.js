@@ -101,6 +101,7 @@ export class ShipScene extends Phaser.Scene {
         this.flights = [];
         this.vacuums = [];
         this.cats = [];
+        this.places = {};
         this.trunks = [];
         this.lifts = [];
         this.walks = [];
@@ -121,6 +122,10 @@ export class ShipScene extends Phaser.Scene {
             switch (o.type) {
                 case 'spawn':
                     this.spawnPoint = { id: 'spawn', x: o.x, y: o.y };
+                    break;
+
+                case 'place':
+                    this.places[o.name] = { id: o.name, x: o.x, y: o.y };
                     break;
 
                 case 'checkpoint': {
@@ -554,8 +559,10 @@ export class ShipScene extends Phaser.Scene {
 
     // --- Spawning --------------------------------------------------------------------------
 
+    // ?at=<place> starts her at a named place, for testing (README); otherwise her last checkpoint.
     initialSpawn() {
-        return this.checkpoints.find(c => c.active && c.id === this.save.lastCheckpoint) || this.spawnPoint;
+        const at = this.places[new URLSearchParams(location.search).get('at')];
+        return at || this.checkpoints.find(c => c.active && c.id === this.save.lastCheckpoint) || this.spawnPoint;
     }
 
     // She always comes back at the activated checkpoint closest to where she was: same deck

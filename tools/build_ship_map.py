@@ -237,6 +237,12 @@ def build_objects():
 
     # The start: the gangway lobby on deck 4, forward, by the forward stairs (§5.3).
     add(point("gangway", "spawn", x_of(67), floor_y(4)))
+
+    # Named places to start at, for testing: ?at=<name> (README).
+    for name, deck, m in [("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
+                          ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
+                          ("buffet", 11, 170), ("diner", 11, 205)]:
+        add(point(name, "place", x_of(m), floor_y(deck)))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
