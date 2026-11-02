@@ -25,6 +25,7 @@ truth**: read the relevant section before any design or content work, and record
 | `reference/` | **Git-ignored**: NCL's ship map PDF and its side profile (also flipped to bow-left), the source of real proportions. Copyrighted, never commit |
 | `assets/source/<char>/` | Raw PixelLab frames, kept so sprites can be rebuilt without regenerating |
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
+| `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
 

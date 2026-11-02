@@ -10,6 +10,7 @@ export class BootScene extends Phaser.Scene {
         // Relative paths only: on GitHub Pages the game lives under /<repo>/ (§7.2).
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
         this.load.image('tiles', 'assets/tiles/placeholder.png');
+        this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
@@ -36,6 +37,8 @@ export class BootScene extends Phaser.Scene {
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
         this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
+        // Waving from the life ring, overboard: the frames with her hand up, back and forth.
+        this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>
