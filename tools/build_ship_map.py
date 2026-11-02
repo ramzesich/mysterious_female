@@ -46,9 +46,6 @@ POOL_OPENING = (115, 145)
 POOLS = [(119, 131), (134, 140)]
 POOL_DEPTH = 2 * TILE
 
-# The atrium's side walks (§5.3) stand a visible step above their deck's floor: she steps up onto
-# them.
-SIDEWALK_RISE = 8
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
@@ -74,9 +71,18 @@ def floor_y(deck):
 
 
 def walk_y(deck):
-    """Where she stands on `deck` in the atrium: on its side walk above deck 5, the atrium floor."""
-    lo, hi = ATRIUM["decks"]
-    return floor_y(deck) - (SIDEWALK_RISE if lo < deck <= hi else 0)
+    """Where she stands on `deck` in the atrium: its side walks are level with the deck's floor."""
+    return floor_y(deck)
+
+
+def funnel_ladder_col():
+    """The technical ladder beside the funnel housing, deck 12 up to the roof (§5.1)."""
+    return col(FUNNEL[0]) - 3
+
+
+def clear_of_ladders(deck, m):
+    """Is a door at `m` on `deck` clear of every ladder (doors and ladders must not overlap)?"""
+    return deck != 12 or abs(m - metres(funnel_ladder_col())) > 1.5
 
 
 def in_core(m):
@@ -201,7 +207,7 @@ def build_layers():
     fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, STEEL)
 
     # A technical ladder beside the funnel housing, deck 12 up to the roof (§5.1).
-    lc = col(FUNNEL[0]) - 3
+    lc = funnel_ladder_col()
     solid[ROOF_ROW][lc] = LADDER_TOP
     fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
 
@@ -260,30 +266,33 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
-    # Side walks (§5.3), with a step up at both ends: each deck from 6 to 9 across the atrium, and
-    # deck 12 over deck 11's pool area. The atrium's dressing (pillars, the skylight) is its own.
+    # Side walks (§5.3), level with their deck's floor so she simply runs along them (the user,
+    # 2026-11-02): each deck from 6 to 9 across the atrium, and deck 12 over deck 11's pool area,
+    # which she can drop through into a pool. The atrium's dressing (pillars, skylight) is its own.
     lo, hi = ATRIUM["decks"]
     ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
     for d in range(lo + 1, hi + 1):
-        add(area(f"sidewalk-atrium-{d}", "sidewalk", ax0, walk_y(d), ax1 - ax0, 0, [
-            prop("rise", SIDEWALK_RISE, "int"), prop("style", "atrium")]))
+        add(area(f"sidewalk-atrium-{d}", "sidewalk", ax0, walk_y(d), ax1 - ax0, 0, [prop("style", "atrium")]))
     pa, pb = (col(m) * TILE for m in POOL_OPENING)
-    add(area("sidewalk-pool", "sidewalk", pa, floor_y(12) - SIDEWALK_RISE, pb - pa, 0, [
-        prop("rise", SIDEWALK_RISE, "int"), prop("style", "deck")]))
+    add(area("sidewalk-pool", "sidewalk", pa, floor_y(12), pb - pa, 0, [
+        prop("style", "deck"), prop("dropThrough", True, "bool")]))
     add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
         prop("levels", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1)))]))
     for a, b in POOLS:
         add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(11) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4))
     walks = [{"deck": str(d), "y": walk_y(d)} for d in range(lo + 1, hi + 1)]
     levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks]
-    left, right = ax0 + 2 * TILE, ax0 + 12 * TILE
+    # The curving staircase winds round the glass elevator (the user's photos): each flight sweeps
+    # from one side of it to the other, alternately behind it and in front of it.
+    lift_x = x_of(sum(ATRIUM["span"]) / 2)
+    left, right = lift_x - 8 * TILE, lift_x + 8 * TILE
     for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
         x0, x1 = (left, right) if i % 2 == 0 else (right, left)
         card = FLIGHT_CARD[int(b)]
         add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
              "width": 0, "height": 0, "rotation": 0, "visible": True,
              "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
-             "properties": [prop("card", card)]})
+             "properties": [prop("card", card), prop("curve", True, "bool"), prop("front", i % 2 == 1, "bool")]})
 
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
     # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
@@ -325,8 +334,9 @@ def build_objects():
     for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
                           ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
-                          ("d12-sports", 12, 167)]:
+                          ("d12-sports", 12, 175)]:
         assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
+        assert clear_of_ladders(deck, m), f"checkpoint {name}: its door stands on a ladder"
         add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
@@ -348,7 +358,8 @@ def build_objects():
     # sits on an indoor wall, clear of the stair cores and the atrium.
     for name, m, decks, opts in TRUNKS:
         for deck in decks:
-            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m), \
+            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m) \
+                and clear_of_ladders(deck, m), \
                 f"trunk {name}: no wall for a door on deck {deck} at {m} m"
         props = [prop("floors", ",".join(str(floor_y(d)) for d in sorted(decks, reverse=True)))]
         if opts.get("one_way"):

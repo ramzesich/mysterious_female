@@ -51,10 +51,8 @@ export const LIFT = {
     doorMs: 260,
 };
 
-// The atrium's side walks (§5.3): how far past its edges she can step up onto one, and the height
-// of the glass railing in front of it. How high a side walk stands comes from the map.
+// Side walks (§5.3): the height of the glass railing in front of one.
 export const SIDEWALK = {
-    reach: 24,
     railHeight: 22,
 };
 

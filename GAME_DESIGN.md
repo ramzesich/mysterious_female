@@ -353,13 +353,19 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   - **The atrium is 20 m long, two screens** (the user, 2026-11-02): NCL's profile draws it about
     10 m, which looked narrow next to its five levels, so the midship core stands 10 m further aft
     than on the profile. (The profile's mezzanine, deck 6a, was tried and dropped by the user.)
-  - **A side walk** is a balcony a step (8px) above its deck's floor, behind a glass-and-brass
-    railing, so it reads as a side walk. Its blue carpet and brass nosing start at the step (the
-    user found a 4px step not obvious; a 2.5D walkway and a ▲ hint above her were tried and
-    dropped). **↑ steps her up onto it, ↓ steps her down**: at its ends
-    onto the deck's floor, out over the open space over the railing and down. If she doesn't step
-    up, she meets the railing where the deck's floor ends and can **jump over it and drop**. The
-    glass elevator opens onto the side walks.
+  - **Side walks are level with their deck's floor** (the user, 2026-11-02): she simply runs
+    along them, the look kept (balcony fronts, the glass railing, the open space below). A
+    step-up onto them, with ↑/↓ and railings to jump over, was tried and dropped: it worked
+    poorly in practice. **Deck 12's walk over the pools keeps the drop: ↓ there lets her down
+    through it** into a pool (the fun part). Nowhere else does ↓ drop her; in the atrium it only
+    ever takes the stairs.
+  - **Open (the user, 2026-11-02):** on the real ship, the upper decks' corridors run along the
+    ship's sides, while the middle above the atrium is the atrium itself and its glass dome. In
+    the game, deck 10's cabin corridor runs straight over the atrium, under which the dome hangs.
+    Revisit when the upper decks are laid out properly.
+  - **The curving staircase winds round the glass elevator** (the user): each flight sweeps from
+    one side of it to the other, alternately behind it and in front of it, and the elevator's
+    dark column hides her while she is behind it.
   - **Drops keep the fall rule** (§5.6): one deck down is fine; longer, the camera lets her go,
     she falls out of the frame and comes back at the nearest checkpoint. (It is not a fright;
     overboard stays as it is.)
@@ -665,7 +671,7 @@ art:
 
 Nothing blocks the start of the build. These get settled along the way:
 
-**Next up** (as of 2026-11-01):
+**Next up** (as of 2026-11-02):
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
 - [x] Her idles: foot tap, look back (§3)
@@ -697,17 +703,24 @@ Nothing blocks the start of the build. These get settled along the way:
       ring came from a second 32px props sheet (10 generations), whose other pieces went into the
       atlas too: Bumbot's fish on a plate, a key card on a lanyard, a captain's hat, poker chips,
       a suitcase, ice cream, a pool ladder and more
-- [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
-      order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
-      `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
-      side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
-      2026-11-02 on `ship-structure`, placeholder art; approved by the user**; **(3) the
-      stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
-      dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
-      stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's
-      `front_from_outside`, `aft_from_outside`, `side_view_from_outside`): a raked bow, the bridge
-      front, the rounded stern with its stepped aft terraces. The very front and back need not be
-      reachable
+- [x] **Ship structure, part 1** (2026-11-02, merged): **(1) the atrium**, an open space 20 m long
+      (the midship core moved 10 m aft), decks 6-9 crossing it on **side walks level with their
+      floor** (no step-up: tried and dropped), a skylight dome under deck 10, burl-wood pillars;
+      **(2) deck 12's side walk over deck 11**, where ↓ drops her through into a pool, glass side
+      walls on decks 11-12, **two pools with swimming** (a side-on breaststroke; a crawl is kept in
+      `assets/source/her/swim-crawl/`); **(3) the stairs** drawn from her photos (blue carpet,
+      glass and brass balustrades, wooden rails), the atrium's **curving staircase winding round
+      the wider glass elevator**, behind and in front of it. All approved by the user. Testing
+      aid: `?at=<place>` starts her at a named place (`README.md`)
+- [ ] **Next: (4) the bow and stern**, shaped from the real ship (NCL's side profile in
+      `reference/`, and the user's `front_from_outside`, `aft_from_outside`,
+      `side_view_from_outside`): a raked bow, the bridge front, the rounded stern with its stepped
+      aft terraces. The very front and back need not be reachable. **Start the next session
+      here**: look at those photos and the profile, then propose the shapes with numbered
+      questions
+- [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
+      corridors run along the sides, the middle above the atrium being the atrium and its dome
+      (§5.3); in the game deck 10's corridor runs straight over it
 - [ ] **Then: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
       cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
@@ -723,8 +736,9 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1909 left at the end of 2026-10-31). Skeleton-v3 clips cost 2 (3 frames),
-      3 (4-14 frames) or 4 (15 frames)
+      2026-11-30 (~1861 left at the end of 2026-11-02). Skeleton-v3 clips cost 2 (3 frames),
+      3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
+      (16 at 85px). Side-scroller tilesets came out unusable; draw floors by hand
 
 - [ ] Art: which tools you pick (§2.1)
 - [ ] The colleague's post and card, once the mid-game is laid out (§5.8)
