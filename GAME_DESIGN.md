@@ -340,9 +340,25 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   (~198 m). The **atrium** spans decks 5–9 between the forward and midship cores, with glass
   elevators. The funnel stands over the aft half.
 - **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
-- **Nothing falls through the middle of a deck.** Indoors, every floor is solid, the atrium
-  included (it is a look, not a well). Falls happen outdoors: jumping a railing overboard, or from
-  one open deck down onto another (a terrace below, the pool area from deck 12).
+- **Floors and open spaces (Decided, 2026-11-02, replacing "the atrium is a look, not a
+  well"):** corridors and rooms have solid floors. Two places open up through the decks, as on
+  the real ship, and both work the same way, as **side walks**:
+  - **The atrium** is a real open space, its floor on deck 5 (Guest Services, the Atrium Café;
+    public sources say the Atlantic Deck, to confirm with the user), open up through deck 9 to a
+    domed skylight: oval balconies with cream fronts and glass-and-brass railings, burl-wood
+    pillars with brass rings, the two glass elevators in the middle (§5.1), the curving
+    staircase. **Round stairs** wind round the glass elevators between the levels (the user's
+    idea).
+  - **Deck 12 over deck 11's open area** is a side walk along the ship's side, its floor
+    continuous (the hole in the blockout goes), with deck 11's pools below and behind it.
+  - **A side walk** is a raised walkway in the back plane, edged with a railing, so it reads as a
+    side walk. She **steps up onto it** to cross; if she doesn't, she meets the railing at the open
+    edge and can **jump over it and drop** into the space below. (Proposed, from the user's idea:
+    the exact controls and how far a drop may be before it is a scare, §5.6, are being settled.)
+- **Decks 11 and 12 have glass side walls**: glass windbreak panels with a handrail along the
+  ship's side, instead of open railings.
+- **The pools:** she can jump into a pool, and swims (a swimming animation to make); maybe game
+  mechanics round the pools later. Not a scare.
 - **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
   as it naturally would, but she can't get there. There are no crew or engine decks to explore.
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
@@ -669,7 +685,16 @@ Nothing blocks the start of the build. These get settled along the way:
       ring came from a second 32px props sheet (10 generations), whose other pieces went into the
       atlas too: Bumbot's fish on a plate, a key card on a lanyard, a captain's hat, poker chips,
       a suitcase, ice cream, a pool ladder and more
-- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
+- [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
+      order: **(1) the atrium** as an open space with side walks and round stairs; **(2) deck 12's
+      side walk over deck 11**, its glass side walls, and deck 11's pools with swimming; **(3) the
+      stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
+      dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
+      stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's
+      `front_from_outside`, `aft_from_outside`, `side_view_from_outside`): a raked bow, the bridge
+      front, the rounded stern with its stepped aft terraces. The very front and back need not be
+      reachable
+- [ ] **Then: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
       cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
       and people placed on the real decks (§5.8)
