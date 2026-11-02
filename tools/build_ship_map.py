@@ -91,6 +91,15 @@ def covered(deck, m):
     return above[0] <= m < above[1]
 
 
+def indoor(deck, m):
+    """Is there a wall behind this spot (a room, a corridor, a core), rather than open air? An
+    open deck under the deck above, like the promenade, is covered but not indoors."""
+    if in_atrium(deck, m) or in_core(m):
+        return True
+    _, kind = venue_at(deck, m)
+    return covered(deck, m) and kind not in ("outdoor", "finale")
+
+
 def build_layers():
     solid = [[0] * COLS for _ in range(ROWS)]
     ladders = [[0] * COLS for _ in range(ROWS)]
@@ -144,11 +153,11 @@ def build_layers():
             else:
                 fill(solid, c, c, floor - 2, floor - 1, RAILING)
 
-        # Where a terrace meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
+        # Where an open deck meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
         if 3 < deck < 12:
             for c in range(c0 + 1, c1):
-                if covered(deck, metres(c - 1)) != covered(deck, metres(c)):
-                    wall = c if covered(deck, metres(c)) else c - 1
+                if indoor(deck, metres(c - 1)) != indoor(deck, metres(c)):
+                    wall = c if indoor(deck, metres(c)) else c - 1
                     fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
 
     # The hull below deck 3, narrowing down into the sea.
@@ -257,10 +266,12 @@ def build_objects():
                       [prop("text", name.split(" (")[0].upper())]))
 
     # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
-    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 152),
+    # A door needs a wall: the ones by the open decks stand just inside.
+    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
                           ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 110),
-                          ("d10-bridge", 10, 44), ("d11-pool", 11, 103), ("d11-buffet", 11, 191),
-                          ("d12-sports", 12, 104)]:
+                          ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
+                          ("d12-sports", 12, 167)]:
+        assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
         add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
@@ -282,7 +293,7 @@ def build_objects():
     # sits on an indoor wall, clear of the stair cores and the atrium.
     for name, m, decks, opts in TRUNKS:
         for deck in decks:
-            assert deck in PLAYABLE and covered(deck, m) and not in_core(m) and not in_atrium(deck, m), \
+            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m), \
                 f"trunk {name}: no wall for a door on deck {deck} at {m} m"
         props = [prop("floors", ",".join(str(floor_y(d)) for d in sorted(decks, reverse=True)))]
         if opts.get("one_way"):

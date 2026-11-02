@@ -12,6 +12,11 @@ export class Controls {
         });
         this.prev = {};
         this.state = {};
+        // Shift is the dash, but not as part of a shortcut: Win+Shift+S takes a screenshot.
+        this.shiftAlone = false;
+        scene.input.keyboard.on('keydown-SHIFT', e => {
+            this.shiftAlone = !(e.metaKey || e.ctrlKey || e.altKey);
+        });
     }
 
     pad() {
@@ -30,7 +35,7 @@ export class Controls {
             up: k.up.isDown || (pad && (pad.up || stick.y < -STICK_DEADZONE)),
             down: k.down.isDown || (pad && (pad.down || stick.y > STICK_DEADZONE)),
             jump: k.jump.isDown || (pad && pad.A),
-            dash: k.dash.isDown || (pad && pad.B),
+            dash: (k.dash.isDown && this.shiftAlone) || (pad && pad.B),
             activate: k.activate.isDown || (pad && pad.X),
             start: k.start.isDown || k.jump.isDown || (pad && (pad.A || pad.buttons[9]?.pressed)),
         };
