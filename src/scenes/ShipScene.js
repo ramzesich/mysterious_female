@@ -20,6 +20,15 @@ const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
 
+// How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
+// staircase.
+const STAIR_LOOKS = {
+    core: { carpet: 0x0b5e65, fleck: 0x4d9be6, nosing: 0x2e222f, side: 0xd8cdb8, edge: 0xb9ab90, thickness: 8,
+            glass: true, brass: 0xd9a43b, rail: 0xcd683d, railLight: 0xe6904e },
+    atrium: { carpet: 0x0b5e65, fleck: 0x8ff8e2, nosing: 0x2e222f, side: 0xf4efe4, edge: 0xd9a43b, thickness: 10,
+              glass: false, brass: 0xd9a43b, rail: 0xcd683d, railLight: 0xe6904e },
+};
+
 // How a side walk looks (§5.3): the atrium's balconies, and deck 12's walk over the pools.
 const SIDEWALK_LOOKS = {
     atrium: { floor: 0x484a77, fleck: 0x8fd3ff, front: 0xf1e8cf, edge: 0xd9a43b, riser: 0xb9a98a,
@@ -110,8 +119,10 @@ export class ShipScene extends Phaser.Scene {
         this.railGroup = this.physics.add.staticGroup();
         this.crates = this.physics.add.staticGroup();
         const stairsGfx = this.add.graphics().setDepth(DEPTH.stairs);
+        // A flight's balustrade is in front of her while she climbs it, behind her when she passes.
+        const balustradeGfx = this.add.graphics().setDepth(DEPTH.playerBehind + 0.5);
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
-        this.worldLayer.add([decorGfx, stairsGfx]);
+        this.worldLayer.add([decorGfx, stairsGfx, balustradeGfx]);
 
         const objects = this.map.getObjectLayer('objects').objects;
         // Trunk doors take the place of any cabin door drawn where they stand.
@@ -154,12 +165,10 @@ export class ShipScene extends Phaser.Scene {
                 case 'stairs': {
                     const [a, b] = o.polyline.map(p => ({ x: o.x + p.x, y: o.y + p.y }));
                     const [bottom, top] = a.y > b.y ? [a, b] : [b, a];
-                    const flight = {
-                        name: o.name, bottom, top, card: prop(o, 'card', null),
-                        length: Phaser.Math.Distance.BetweenPoints(bottom, top),
-                    };
+                    const flight = { name: o.name, bottom, top, card: prop(o, 'card', null), curve: prop(o, 'curve', false) };
+                    flight.length = this.flightLength(flight);
                     this.flights.push(flight);
-                    this.drawStairs(stairsGfx, flight);
+                    this.drawStairs(stairsGfx, balustradeGfx, flight);
                     break;
                 }
 
@@ -242,23 +251,69 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // Stairs are in the background plane: she walks up them "behind" the floor slabs (§5.1).
-    drawStairs(g, { bottom, top }) {
-        const steps = Math.round((bottom.y - top.y) / 8);
-        const dx = (top.x - bottom.x) / steps;
-        const dy = (bottom.y - top.y) / steps;
+    // A point along a flight, t from 0 (its foot) to 1 (its top). The atrium's curving staircase
+    // (§5.3) sweeps: shallow at its foot, steeper toward the top; the cores' flights are straight.
+    stairPoint(f, t) {
+        const { bottom: a, top: b } = f;
+        if (!f.curve) return { x: Phaser.Math.Linear(a.x, b.x, t), y: Phaser.Math.Linear(a.y, b.y, t) };
+        const c = { x: a.x + (b.x - a.x) * 0.6, y: a.y - (a.y - b.y) * 0.35 }; // about 28° at the foot, 56° at the top
+        const u = 1 - t;
+        return { x: u * u * a.x + 2 * u * t * c.x + t * t * b.x, y: u * u * a.y + 2 * u * t * c.y + t * t * b.y };
+    }
+
+    flightLength(f) {
+        let length = 0;
+        for (let i = 1; i <= 24; i++) length += Phaser.Math.Distance.BetweenPoints(this.stairPoint(f, (i - 1) / 24), this.stairPoint(f, i / 24));
+        return length;
+    }
+
+    // Stairs are in the background plane: she walks up them "behind" the floor slabs (§5.1). Drawn
+    // from the user's photos (§5.3): blue carpet on the treads with a dark nosing, the flight's
+    // side face below them; in front, a glass balustrade in brass under a wooden handrail in the
+    // cores, gold ring scrollwork and a curled rail end on the atrium's curving staircase.
+    drawStairs(g, front, f) {
+        const look = f.curve ? STAIR_LOOKS.atrium : STAIR_LOOKS.core;
+        const steps = Math.max(2, Math.round((f.bottom.y - f.top.y) / 8));
+        const at = t => this.stairPoint(f, t);
         for (let i = 0; i < steps; i++) {
-            const x = bottom.x + dx * i;
-            const tread = bottom.y - dy * (i + 1);
-            g.fillStyle(0xd6c9ae, 1);
-            g.fillRect(Math.min(x, x + dx), tread, Math.abs(dx), bottom.y - tread);
-            g.fillStyle(0xe8dcc4, 1);
-            g.fillRect(Math.min(x, x + dx), tread, Math.abs(dx), 2);
+            const p0 = at(i / steps);
+            const p1 = at((i + 1) / steps);
+            const x = Math.min(p0.x, p1.x);
+            const w = Math.max(1, Math.abs(p1.x - p0.x));
+            // The step: its side face down to the flight's underside, its carpeted tread, its nosing.
+            g.fillStyle(look.side, 1).fillRect(x, p1.y, w, p0.y - p1.y + look.thickness);
+            g.fillStyle(look.carpet, 1).fillRect(x, p1.y, w, 3);
+            g.fillStyle(look.fleck, 1).fillRect(x + w / 2, p1.y + 1, 1, 1);
+            g.fillStyle(look.nosing, 1).fillRect(p1.x < p0.x ? x : x + w - 1, p1.y, 1, 4);
         }
-        g.lineStyle(1, 0xa89878, 1);
-        g.lineBetween(bottom.x, bottom.y - 24, top.x, top.y - 24);
-        g.lineBetween(bottom.x, bottom.y - 24, bottom.x, bottom.y);
-        g.lineBetween(top.x, top.y - 24, top.x, top.y);
+        // The underside's edge, along the flight.
+        g.lineStyle(1, look.edge, 1);
+        for (let i = 0; i < steps; i++) {
+            const p0 = at(i / steps);
+            const p1 = at((i + 1) / steps);
+            g.lineBetween(p0.x, p0.y + look.thickness, p1.x, p1.y + look.thickness);
+        }
+
+        // The balustrade, a rail height above the treads.
+        const h = SIDEWALK.railHeight;
+        const line = Array.from({ length: 25 }, (_, i) => at(i / 24));
+        if (look.glass) {
+            front.fillStyle(0x8fd3ff, 0.22);
+            front.fillPoints([...line.map(q => ({ x: q.x, y: q.y - 2 })), ...line.slice().reverse().map(q => ({ x: q.x, y: q.y - h }))], true);
+            for (let i = 0; i <= 24; i += 6) front.fillStyle(look.brass, 1).fillRect(line[i].x, line[i].y - h, 1, h - 2);
+        } else {
+            // Gold scrollwork: a row of rings between a gold bottom rail and the handrail.
+            front.lineStyle(1, look.brass, 1);
+            for (let i = 0; i < 24; i++) {
+                front.lineBetween(line[i].x, line[i].y - 3, line[i + 1].x, line[i + 1].y - 3);
+                front.strokeCircle(line[i].x, line[i].y - h / 2 - 1, 3);
+            }
+            front.fillStyle(look.rail, 1).fillCircle(line[0].x, line[0].y - h + 3, 3);  // the curl at its foot
+        }
+        for (let i = 0; i < 24; i++) {
+            front.lineStyle(2, look.rail, 1).lineBetween(line[i].x, line[i].y - h, line[i + 1].x, line[i + 1].y - h);
+            front.lineStyle(1, look.railLight, 1).lineBetween(line[i].x, line[i].y - h - 1, line[i + 1].x, line[i + 1].y - h - 1);
+        }
     }
 
     drawShellDoor(g, o) {
@@ -1248,9 +1303,9 @@ export class ShipScene extends Phaser.Scene {
     }
 
     placeOnStairs() {
-        const { bottom, top } = this.flight;
-        this.player.x = Phaser.Math.Linear(bottom.x, top.x, this.stairT);
-        this.player.y = Phaser.Math.Linear(bottom.y, top.y, this.stairT);
+        const q = this.stairPoint(this.flight, this.stairT);
+        this.player.x = q.x;
+        this.player.y = q.y;
     }
 
     updateStairs(input, dt, time) {

@@ -293,7 +293,7 @@ def build_objects():
         add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
              "width": 0, "height": 0, "rotation": 0, "visible": True,
              "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
-             "properties": [prop("card", card)]})
+             "properties": [prop("card", card), prop("curve", True, "bool")]})
 
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
     # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
