@@ -359,6 +359,10 @@ venue's position along the ship. Use it whenever a position or proportion needs 
     poorly in practice. **Deck 12's walk over the pools keeps the drop: ↓ there lets her down
     through it** into a pool (the fun part). Nowhere else does ↓ drop her; in the atrium it only
     ever takes the stairs.
+  - **Open (the user, 2026-11-02):** on the real ship, the upper decks' corridors run along the
+    ship's sides, while the middle above the atrium is the atrium itself and its glass dome. In
+    the game, deck 10's cabin corridor runs straight over the atrium, under which the dome hangs.
+    Revisit when the upper decks are laid out properly.
   - **The curving staircase winds round the glass elevator** (the user): each flight sweeps from
     one side of it to the other, alternately behind it and in front of it, and the elevator's
     dark column hides her while she is behind it.

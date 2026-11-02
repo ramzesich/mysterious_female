@@ -422,7 +422,7 @@ export class ShipScene extends Phaser.Scene {
         const g = this.add.graphics().setDepth(DEPTH.decor);
         this.worldLayer.add(g);
         // The skylight dome (the user's photo central_area (2)), seen from below: a shallow bowl of
-        // glass under deck 10's floor, ribbed in white, in a cream rim.
+        // glass right under deck 10's floor, ribbed in white, edged in brass.
         const cx = (x0 + x1) / 2;
         const rx = 130;
         const ry = 26;
@@ -437,8 +437,7 @@ export class ShipScene extends Phaser.Scene {
             const bx = cx + k * 30;
             g.lineBetween(cx, top + ry - 6, bx, top + Math.round(ry * Math.sqrt(Math.max(0, 1 - ((bx - cx) / rx) ** 2))));
         }
-        g.lineStyle(2, 0xf1e8cf, 1).strokePoints(bowl, false);
-        g.fillStyle(0xf1e8cf, 1).fillRect(cx - rx - 6, top, 2 * rx + 12, 3);
+        g.lineStyle(1, 0xd9a43b, 1).strokePoints(bowl, false);
         // Burl-wood pillars, floor to ceiling, clear of the staircase round the glass elevator.
         for (const px of [x0 + 22, cx - 250, cx + 240, x1 - 32]) {
             g.fillStyle(0x9e4539, 1).fillRect(px, top, 10, bottom - top);
