@@ -2,7 +2,7 @@ import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, LONG_FALL_MARGI
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
-import { TRUNK_INSIDE } from '../textures.js';
+import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -421,13 +421,24 @@ export class ShipScene extends Phaser.Scene {
         const bottom = o.y + o.height;
         const g = this.add.graphics().setDepth(DEPTH.decor);
         this.worldLayer.add(g);
-        // The skylight dome, seen from below, under deck 10.
+        // The skylight dome (the user's photo central_area (2)), seen from below: a shallow bowl of
+        // glass under deck 10's floor, ribbed in white, in a cream rim.
         const cx = (x0 + x1) / 2;
-        g.fillStyle(0xcfeeff, 1).fillEllipse(cx, top, 260, 52);
+        const rx = 130;
+        const ry = 26;
+        const bowl = [];
+        for (let i = 0; i <= 32; i++) {
+            const a = (Math.PI * i) / 32;
+            bowl.push({ x: Math.round(cx - rx * Math.cos(a)), y: Math.round(top + ry * Math.sin(a)) });
+        }
+        g.fillStyle(0xcfeeff, 1).fillPoints(bowl, true);
         g.lineStyle(1, 0xffffff, 1);
         for (let k = -4; k <= 4; k++) {
-            g.lineBetween(cx, top, cx + k * 30, top + 26 * Math.sqrt(Math.max(0, 1 - (k / 4.4) ** 2)));
+            const bx = cx + k * 30;
+            g.lineBetween(cx, top + ry - 6, bx, top + Math.round(ry * Math.sqrt(Math.max(0, 1 - ((bx - cx) / rx) ** 2))));
         }
+        g.lineStyle(2, 0xf1e8cf, 1).strokePoints(bowl, false);
+        g.fillStyle(0xf1e8cf, 1).fillRect(cx - rx - 6, top, 2 * rx + 12, 3);
         // Burl-wood pillars, floor to ceiling, clear of the staircase round the glass elevator.
         for (const px of [x0 + 22, cx - 250, cx + 240, x1 - 32]) {
             g.fillStyle(0x9e4539, 1).fillRect(px, top, 10, bottom - top);
@@ -496,14 +507,14 @@ export class ShipScene extends Phaser.Scene {
             const top = ys[0] - this.deckPitch + 16;
             const rails = this.add.graphics().setDepth(DEPTH.decor);
             rails.fillStyle(0x9aa3ad, 1);
-            for (const dx of [-23, 21]) rails.fillRect(o.x + dx, top, 2, lift.carY - top);
+            for (const dx of [-39, 37]) rails.fillRect(o.x + dx, top, 2, lift.carY - top);
             // The glass elevator's dark column, as in the user's photos: the curving staircase
             // passes behind it, and it hides her there.
-            rails.fillStyle(0x313638, 1).setDepth(DEPTH.glassShaft).fillRect(o.x - 18, top, 36, lift.carY - top);
-            rails.fillStyle(0x625565, 1).fillRect(o.x - 12, top, 2, lift.carY - top).fillRect(o.x + 9, top, 1, lift.carY - top);
+            rails.fillStyle(0x313638, 1).setDepth(DEPTH.glassShaft).fillRect(o.x - 36, top, 72, lift.carY - top);
+            rails.fillStyle(0x625565, 1).fillRect(o.x - 26, top, 2, lift.carY - top).fillRect(o.x + 22, top, 1, lift.carY - top);
             lift.car = this.add.image(o.x, 0, 'glass-car').setOrigin(0.5, 1).setDepth(DEPTH.glassCar);
             this.worldLayer.add([rails, lift.car]);
-            lift.leaves = this.makeLeaves(o.x, 'glass-leaf', DEPTH.glassDoors);
+            lift.leaves = this.makeLeaves(o.x, 'glass-leaf', DEPTH.glassDoors, GLASS_LEAF);
             this.placeCar(lift);
         } else {
             for (const f of lift.floors) {
@@ -521,18 +532,18 @@ export class ShipScene extends Phaser.Scene {
         this.lifts.push(lift);
     }
 
-    makeLeaves(x, texture, depth) {
-        const left = this.add.image(x - LEAF, 0, texture).setOrigin(0, 1).setDepth(depth);
+    makeLeaves(x, texture, depth, width = LEAF) {
+        const left = this.add.image(x - width, 0, texture).setOrigin(0, 1).setDepth(depth);
         const right = this.add.image(x, 0, texture).setOrigin(0, 1).setDepth(depth);
         this.worldLayer.add([left, right]);
-        return { left, right, open: 0 };
+        return { left, right, width, open: 0 };
     }
 
     // Leaves slide apart into the wall: each shows only the part still in the doorway.
     setLeaves(leaves, y, open) {
         leaves.open = open;
-        const w = LEAF * (1 - open);
-        for (const [leaf, cropX] of [[leaves.left, 0], [leaves.right, LEAF - w]]) {
+        const w = leaves.width * (1 - open);
+        for (const [leaf, cropX] of [[leaves.left, 0], [leaves.right, leaves.width - w]]) {
             leaf.y = y;
             leaf.setVisible(w >= 1);
             if (w >= 1) leaf.setCrop(cropX, 0, w, DOOR.height);

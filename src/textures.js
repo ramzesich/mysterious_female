@@ -161,14 +161,16 @@ const liftFrameRows = () => grid(40, 76, (x, y) => (x <= 1 || x >= 38 || y <= 1 
 const liftCarRows = () => grid(36, 74, (x, y) => (y === 44 || y === 45 ? 'm' : y < 3 ? 'L' : 'Y'));
 const liftLeafRows = () => grid(18, 74, (x, y) => (y === 0 || y === 73 ? 'm' : 'p'));
 
-// The glass car, 40x80: a slim steel frame, a roof, and glass all round. Its floor is the bottom
-// 3 rows, sitting just under the deck's floor line.
-const glassCarRows = () => grid(40, 80, (x, y) => {
+// The glass car, 64x80, about a 2 m cylinder at her scale (the user's photos): a slim steel frame,
+// a roof, and glass all round, its curve caught in two highlights. Its floor is the bottom 3 rows,
+// sitting just under the deck's floor line. Its doors are two 30px glass leaves.
+export const GLASS_LEAF = 30;
+const glassCarRows = () => grid(64, 80, (x, y) => {
     if (y <= 2 || y >= 77) return 'd';
-    if (x <= 1 || x >= 38) return 'm';
-    return x === 6 || x === 33 ? 'Q' : 'q';
+    if (x <= 1 || x >= 62) return 'm';
+    return x === 8 || x === 9 || x === 54 ? 'Q' : 'q';
 });
-const glassLeafRows = () => grid(18, 74, (x, y) => (y === 0 ? 'm' : x === 9 ? 'Q' : 'q'));
+const glassLeafRows = () => grid(GLASS_LEAF, 74, (x, y) => (y === 0 ? 'm' : x === 15 ? 'Q' : 'q'));
 
 const LAMP = {
     off: ['.dddddd.', 'dmmmmmmd', 'dmmmmmmd', '.dddddd.'],
