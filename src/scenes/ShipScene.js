@@ -1345,7 +1345,7 @@ export class ShipScene extends Phaser.Scene {
         };
     }
 
-    // Overboard: no drowning. A splash, then she bobs up smiling in a life ring, waving.
+    // Overboard: no drowning. A splash, then she bobs up smiling in a life ring (her wave: §8).
     scareOverboard() {
         const p = this.player;
         this.beginScare();
@@ -1359,16 +1359,13 @@ export class ShipScene extends Phaser.Scene {
         p.setCrop(0, 0, PLAYER.cell, shown).setDepth(DEPTH.fx);
         p.y = this.waterY + PLAYER.cell - shown; // the crop's bottom edge sits on the water
         const ring = this.add.image(p.x, this.waterY - 3, 'lifering').setDepth(DEPTH.fx + 0.5);
-        const wave = this.add.text(p.x + 14, this.waterY - 40, '👋', { fontSize: '12px', resolution: 4 }).setOrigin(0.5).setDepth(DEPTH.fx + 1);
-        this.worldLayer.add([ring, wave]);
-        this.tweens.add({ targets: [p, ring, wave], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-        this.tweens.add({ targets: wave, angle: { from: -20, to: 20 }, duration: 180, yoyo: true, repeat: -1 });
+        this.worldLayer.add(ring);
+        this.tweens.add({ targets: [p, ring], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         this.script = null;
         this.time.delayedCall(1300, () => {
             this.respawn(() => {
-                this.tweens.killTweensOf([p, ring, wave]);
+                this.tweens.killTweensOf([p, ring]);
                 ring.destroy();
-                wave.destroy();
             });
         });
     }

@@ -661,8 +661,12 @@ Nothing blocks the start of the build. These get settled along the way:
       rule), and a muted `-bg` twin of every piece. In the game: cabin corridors (muted doors, a
       few with stickers, pictures, handrail, ceiling lights, blue wave carpet), the crew door for
       checkpoints and trunks, the gangway lobby, a Windjammer-style corner in the deck 6 bars and
-      the promenade railing with life rings. **Ask the user** how it looks in play
-      (`python tools/serve.py`, `?play`), then merge
+      the promenade railing with life rings. **The user keeps the style** (2026-11-02), the
+      background fade is right as it is
+- [ ] **Overboard scare** (user, 2026-11-02): no 👋 emoji (removed); **she raises her hand and
+      waves** herself (a front-facing skeleton-v3 clip, ~3 generations), and the **life ring is
+      seen from the side**, a flat band round her at the waterline (a 32px PixelLab sheet, 10
+      generations, the rest of it filled with small pieces we'll need). Cost to be confirmed
 - [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
       cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
