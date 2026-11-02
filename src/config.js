@@ -58,13 +58,13 @@ export const SIDEWALK = {
     railHeight: 22,
 };
 
-// Swimming in the pools (§5.3): her crawl's speed, how far below the surface her feet must be
+// Swimming in the pools (§5.3): her breaststroke's speed, how far below the surface her feet must be
 // before she is in, where the swim pose sits against the surface, and how close to a pool's side
 // she can swim.
 export const SWIM = {
     speed: 70,
     entry: 6,
-    float: 14,
+    float: 21,          // the waterline at her shoulders, head above it
     margin: 18,
 };
 

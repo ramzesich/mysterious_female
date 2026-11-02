@@ -365,8 +365,9 @@ venue's position along the ship. Use it whenever a position or proportion needs 
     overboard stays as it is.)
 - **Decks 11 and 12 have glass side walls**: glass windbreak panels with a handrail along the
   ship's side, instead of open railings.
-- **The pools:** she can jump into a pool, and swims: **front crawl** (the user's choice; a
-  skeleton-v3 clip written as poses, 3 generations). Two pools on deck 11 (119-131 m and
+- **The pools:** she can jump into a pool, and swims a **side-on breaststroke, her head above the
+  water** (the user's choice; a skeleton-v3 clip written as poses, 3 generations; a front crawl
+  was made first by a misunderstanding and is kept in `assets/source/her/swim-crawl/`). Two pools on deck 11 (119-131 m and
   134-140 m), sunk two tiles into the deck; she walks or drops in with a splash, ←/→ swims, jump
   climbs out. Maybe game mechanics round the pools later. Not a scare. Bumbot's fly-catching spot
   moved beside them, to 146 m.

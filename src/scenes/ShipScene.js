@@ -798,7 +798,7 @@ export class ShipScene extends Phaser.Scene {
         this.findWalk();
     }
 
-    // --- Pools (§5.3): she swims, front crawl -------------------------------------------------
+    // --- Pools (§5.3): she swims, breaststroke -------------------------------------------------
 
     enterPool(pool) {
         const p = this.player;
