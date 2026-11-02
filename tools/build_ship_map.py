@@ -79,6 +79,16 @@ def walk_y(deck):
     return floor_y(deck) - (SIDEWALK_RISE if lo < deck <= hi else 0)
 
 
+def funnel_ladder_col():
+    """The technical ladder beside the funnel housing, deck 12 up to the roof (§5.1)."""
+    return col(FUNNEL[0]) - 3
+
+
+def clear_of_ladders(deck, m):
+    """Is a door at `m` on `deck` clear of every ladder (doors and ladders must not overlap)?"""
+    return deck != 12 or abs(m - metres(funnel_ladder_col())) > 1.5
+
+
 def in_core(m):
     return any(a <= m < b for a, b in CORES.values())
 
@@ -201,7 +211,7 @@ def build_layers():
     fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, STEEL)
 
     # A technical ladder beside the funnel housing, deck 12 up to the roof (§5.1).
-    lc = col(FUNNEL[0]) - 3
+    lc = funnel_ladder_col()
     solid[ROOF_ROW][lc] = LADDER_TOP
     fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
 
@@ -325,8 +335,9 @@ def build_objects():
     for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
                           ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
-                          ("d12-sports", 12, 167)]:
+                          ("d12-sports", 12, 175)]:
         assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
+        assert clear_of_ladders(deck, m), f"checkpoint {name}: its door stands on a ladder"
         add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
@@ -348,7 +359,8 @@ def build_objects():
     # sits on an indoor wall, clear of the stair cores and the atrium.
     for name, m, decks, opts in TRUNKS:
         for deck in decks:
-            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m), \
+            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m) \
+                and clear_of_ladders(deck, m), \
                 f"trunk {name}: no wall for a door on deck {deck} at {m} m"
         props = [prop("floors", ",".join(str(floor_y(d)) for d in sorted(decks, reverse=True)))]
         if opts.get("one_way"):
