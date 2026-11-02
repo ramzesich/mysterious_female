@@ -687,7 +687,7 @@ export class ShipScene extends Phaser.Scene {
             body.velocity.y = -PLAYER.jumpCutVelocity;
         }
 
-        const pool = this.pools.find(w => p.x > w.x0 && p.x < w.x1 && p.y > w.y + SWIM.entry);
+        const pool = this.pools.find(w => p.x > w.x0 && p.x < w.x1 && p.y > w.y + SWIM.entry && p.y < w.bottom + 16);
         if (pool) return this.enterPool(pool);
 
         if (!onFloor) {
