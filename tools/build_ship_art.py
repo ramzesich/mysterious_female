@@ -10,6 +10,7 @@ palette colour to a faded terracotta is a salmon pink, so they keep their faded 
 Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 2026-11-02):
     doors-1/   object d9b861cb-8039-4298-8c0f-7a1fc4c43861, 16 doors, 85px canvas
     props-1/   object 54a30b88-6f96-4b26-9999-a023a0f2a8e2, 64 props, 32px canvas
+    props-2/   object 96d63a62-142f-4bd2-bc2b-22f1232daf2f, 64 props, 32px canvas
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -62,6 +63,18 @@ PROPS = [
 for i, name in enumerate(PROPS):
     if name:
         PIECES[name] = ("props-1", i, None, {})
+# The second sheet: the side-view life ring for overboard (§5.6), and small pieces asked for with it.
+PROPS_2 = {
+    0: "life-ring-side", 1: "life-ring-side-2", 4: "fish-plate", 5: "fish-tray", 6: "pool-ladder",
+    7: "pool-towels", 8: "drinks-tray", 9: "plates", 10: "bollard", 11: "cleat", 12: "ice-cream",
+    13: "ice-cream-cup", 14: "towel-swan", 15: "rubber-duck", 17: "anchor", 19: "deck-chair-2",
+    20: "sunlounger-2", 23: "key-card", 24: "captain-hat", 25: "sailor-cap", 28: "compass",
+    30: "lantern", 34: "sunglasses", 36: "beach-ball", 37: "cocktail", 42: "cake", 43: "coffee",
+    45: "suitcase", 46: "duffel-bag", 47: "map", 55: "bar-stool-2", 60: "trophy", 61: "dartboard",
+    62: "poker", 63: "ship-cake",
+}
+for i, name in PROPS_2.items():
+    PIECES[name] = ("props-2", i, None, {})
 
 
 def load(sheet, frame):

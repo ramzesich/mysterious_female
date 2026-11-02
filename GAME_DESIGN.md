@@ -663,10 +663,12 @@ Nothing blocks the start of the build. These get settled along the way:
       checkpoints and trunks, the gangway lobby, a Windjammer-style corner in the deck 6 bars and
       the promenade railing with life rings. **The user keeps the style** (2026-11-02), the
       background fade is right as it is
-- [ ] **Overboard scare** (user, 2026-11-02): no 👋 emoji (removed); **she raises her hand and
-      waves** herself (a front-facing skeleton-v3 clip, ~3 generations), and the **life ring is
-      seen from the side**, a flat band round her at the waterline (a 32px PixelLab sheet, 10
-      generations, the rest of it filled with small pieces we'll need). Cost to be confirmed
+- [x] **Overboard scare** (user, 2026-11-02): no 👋 emoji; **she raises her hand and waves**
+      herself (skeleton-v3's `wave` move facing the camera, 3 generations; frames 1-5 loop) from a
+      **life ring seen from the side**, its far half behind her and its near half in front. The
+      ring came from a second 32px props sheet (10 generations), whose other pieces went into the
+      atlas too: Bumbot's fish on a plate, a key card on a lanyard, a captain's hat, poker chips,
+      a suitcase, ice cream, a pool ladder and more
 - [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
       cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards

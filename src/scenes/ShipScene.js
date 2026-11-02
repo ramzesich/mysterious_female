@@ -1345,7 +1345,7 @@ export class ShipScene extends Phaser.Scene {
         };
     }
 
-    // Overboard: no drowning. A splash, then she bobs up smiling in a life ring (her wave: §8).
+    // Overboard: no drowning. A splash, then she bobs up smiling in a life ring, waving to us.
     scareOverboard() {
         const p = this.player;
         this.beginScare();
@@ -1353,19 +1353,25 @@ export class ShipScene extends Phaser.Scene {
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
         this.smash(p.x, this.waterY);
-        // Facing the camera, smiling; only her top half shows above the water.
+        // Facing the camera, smiling and waving; only her top half shows above the water.
         const shown = PLAYER.cell - PLAYER.height + 32;
-        this.pose('front');
+        this.pose('wave');
         p.setCrop(0, 0, PLAYER.cell, shown).setDepth(DEPTH.fx);
         p.y = this.waterY + PLAYER.cell - shown; // the crop's bottom edge sits on the water
-        const ring = this.add.image(p.x, this.waterY - 3, 'lifering').setDepth(DEPTH.fx + 0.5);
+        // The ring, seen from the side, round her waist: its far half behind her, its near half in front.
+        const { width, height } = this.textures.getFrame('shipart', 'life-ring-side');
+        const half = Math.floor(height / 2);
+        const ring = [
+            this.add.image(p.x, this.waterY, 'shipart', 'life-ring-side').setCrop(0, 0, width, half).setDepth(DEPTH.fx - 0.5),
+            this.add.image(p.x, this.waterY, 'shipart', 'life-ring-side').setCrop(0, half, width, height - half).setDepth(DEPTH.fx + 0.5),
+        ];
         this.worldLayer.add(ring);
-        this.tweens.add({ targets: [p, ring], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        this.tweens.add({ targets: [p, ...ring], y: '-=2', duration: 300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         this.script = null;
         this.time.delayedCall(1300, () => {
             this.respawn(() => {
-                this.tweens.killTweensOf([p, ring]);
-                ring.destroy();
+                this.tweens.killTweensOf([p, ...ring]);
+                ring.forEach(r => r.destroy());
             });
         });
     }

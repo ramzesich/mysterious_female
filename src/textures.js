@@ -209,18 +209,6 @@ export function makeTextures(scene) {
     makeSingle(scene, 'glass-car', glassCarRows());
     makeSingle(scene, 'glass-leaf', glassLeafRows());
 
-    // Life ring, 24x24 (about 75 cm across, at her scale): red and white quarters.
-    const ring = scene.textures.createCanvas('lifering', 24, 24);
-    const rctx = ring.getContext();
-    rctx.lineWidth = 6;
-    for (let q = 0; q < 4; q++) {
-        rctx.strokeStyle = q % 2 ? '#f4f4f4' : '#e04848';
-        rctx.beginPath();
-        rctx.arc(12, 12, 8, (q * Math.PI) / 2, ((q + 1) * Math.PI) / 2);
-        rctx.stroke();
-    }
-    ring.refresh();
-
     // Soft round glow, used behind the lit checkpoint lamp.
     const glow = scene.textures.createCanvas('glow', 32, 32);
     const gctx = glow.getContext();

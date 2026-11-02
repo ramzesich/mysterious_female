@@ -45,6 +45,9 @@ HER = {
         # text-described climb moved both hands together.
         "climb": [(f"climb-alternating/{i}.png", "keep") for i in range(8)],
         "front": [("rotations/south.png", "keep")],
+        # Waving to us from the life ring, overboard (GAME_DESIGN.md §5.6): skeleton-v3's wave
+        # move, facing the camera. Frames 1-5 have the hand up; the game loops those.
+        "wave": [(f"wave/{i}.png", "feet") for i in range(8)],
         "back": [("rotations/north.png", "keep")],
         # Bending down with her arms out to pick Bumbot up (a near-catch, GAME_DESIGN.md §4). Her
         # back foot stays planted, so each frame's lowest pixel goes on the floor.
