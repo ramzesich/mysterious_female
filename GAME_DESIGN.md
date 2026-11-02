@@ -350,8 +350,14 @@ venue's position along the ship. Use it whenever a position or proportion needs 
     staircase, which climbs level by level beside the glass elevator from deck 5 to deck 9.
   - **Deck 12 over deck 11's open area** is a side walk along the ship's side, its floor
     continuous (the hole in the blockout goes), with deck 11's pools below and behind it.
-  - **A side walk** is a balcony a step (4px) above its deck's floor, behind a glass-and-brass
-    railing, so it reads as a side walk. **↑ steps her up onto it, ↓ steps her down**: at its ends
+  - **The atrium is 20 m long, two screens** (the user, 2026-11-02): NCL's profile draws it about
+    10 m, which looked narrow next to its five levels, so the midship core stands 10 m further aft
+    than on the profile. It has the profile's **mezzanine, deck 6a**: a balcony half a deck above
+    deck 6 over the atrium's forward half, railed at both ends, reached by the curving staircase.
+  - **A side walk** is a balcony a step (8px) above its deck's floor, behind a glass-and-brass
+    railing, so it reads as a side walk. Its blue carpet and brass nosing start at the step, and a
+    small amber ▲ pulses above her where ↑ would step her up (the user found the step not
+    obvious; a 2.5D walkway was considered and dropped). **↑ steps her up onto it, ↓ steps her down**: at its ends
     onto the deck's floor, out over the open space over the railing and down. If she doesn't step
     up, she meets the railing where the deck's floor ends and can **jump over it and drop**. The
     glass elevator opens onto the side walks.
@@ -690,8 +696,8 @@ Nothing blocks the start of the build. These get settled along the way:
       a suitcase, ice cream, a pool ladder and more
 - [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
       order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
-      `ship-structure`, placeholder art (ask the user to try it: deck 5-9 between the forward and
-      midship cores)**; **(2) deck 12's
+      `ship-structure`, placeholder art; widened to 20 m with the 6a mezzanine and a clearer step
+      (ask the user to try it again)**; **(2) deck 12's
       side walk over deck 11**, its glass side walls, and deck 11's pools with swimming; **(3) the
       stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
       dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and

@@ -14,7 +14,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, MEZZANINE, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -43,8 +43,10 @@ FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
 # Deck 12's open stretch over the pool, metres from the bow.
 POOL_OPENING = (115, 145)
 
-# The atrium's side walks (§5.3) stand this much above their deck's floor: she steps up onto them.
-SIDEWALK_RISE = 4
+# The atrium's side walks (§5.3) stand a visible step above their deck's floor: she steps up onto
+# them. The mezzanine ("6a") stands this far above deck 6's floor, so she fits under it.
+SIDEWALK_RISE = 8
+MEZZANINE_RISE = 80
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
@@ -244,21 +246,26 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
-    # The atrium (§5.3): its span, the side walks of decks 6-9 and how high they stand, for the game
-    # to build; and the curving staircase, up level by level beside the glass elevator.
+    # The atrium (§5.3): its span and its side walks, for the game to build. Each deck from 6 to 9
+    # crosses it on a side walk with a step up at both ends; the mezzanine, deck 6a, is a balcony
+    # over the forward half, railed at both ends and reached only by the stairs. The curving
+    # staircase climbs level by level beside the glass elevator.
     lo, hi = ATRIUM["decks"]
     ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
+    walks = [{"deck": str(d), "y": walk_y(d), "x0": ax0, "x1": ax1, "ends": "step"} for d in range(lo + 1, hi + 1)]
+    walks.append({"deck": f"{MEZZANINE}a", "y": floor_y(MEZZANINE) - MEZZANINE_RISE, "x0": ax0,
+                  "x1": (ax0 + ax1) // 2, "ends": "rail"})
     add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
-        prop("walks", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1))),
-        prop("rise", SIDEWALK_RISE, "int")]))
+        prop("walks", json.dumps(walks)), prop("rise", SIDEWALK_RISE, "int")]))
+    levels = [("5", floor_y(lo))] + sorted(((w["deck"], w["y"]) for w in walks), key=lambda w: -w[1])
     left, right = ax0 + 2 * TILE, ax0 + 12 * TILE
-    for deck in range(lo, hi):
-        x0, x1 = (left, right) if deck % 2 == 1 else (right, left)
-        y0, y1 = walk_y(deck), walk_y(deck + 1)
-        add({"id": 0, "name": f"stairs-atrium-{deck}-{deck + 1}", "type": "stairs", "x": x0, "y": y0,
+    for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
+        x0, x1 = (left, right) if i % 2 == 0 else (right, left)
+        card = FLIGHT_CARD[int(b.rstrip("a"))]
+        add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
              "width": 0, "height": 0, "rotation": 0, "visible": True,
              "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
-             "properties": [prop("card", FLIGHT_CARD[deck + 1])]})
+             "properties": [prop("card", card)]})
 
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
     # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
@@ -298,7 +305,7 @@ def build_objects():
     # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
     # A door needs a wall: the ones by the open decks stand just inside.
     for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
-                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 110),
+                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
                           ("d12-sports", 12, 167)]:
         assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
@@ -307,13 +314,13 @@ def build_objects():
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
                                             ("pool", 11, 130, "fly", 1), ("bridge", 10, 24, "bat", -1),
-                                            ("linen", 9, 102, "asleep", 1)]:
+                                            ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
 
     # Tangerines (§6.3): ten, each on a side table. One sits behind crates only the dash breaks.
     for i, (deck, m) in enumerate([(4, 30), (4, 150), (4, 236), (5, 60), (5, 170), (6, 120), (6, 245),
-                                   (7, 30), (11, 215), (12, 110)]):
+                                   (7, 30), (11, 215), (12, 113)]):
         add(point(f"t-{i + 1}", "tangerine", x_of(m), floor_y(deck)))
     for i in range(2):
         for j in range(2):
@@ -351,14 +358,14 @@ def build_objects():
     put(4, 69.4, "extinguisher-bg", 14)
     # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
     # dresser, bar stools along the bar.
-    put(6, 102, "club-chair-side-bg")
-    put(6, 103.2, "side-table-bg")
-    put(6, 104.4, "club-chair-side-bg", flip=True)
-    put(6, 106.5, "dresser-bg")
-    put(6, 106.5, "ship-model-bg", height("dresser-bg"))
-    put(6, 106.5, "sconce-round-bg", 52)
+    put(6, 112, "club-chair-side-bg")
+    put(6, 113.2, "side-table-bg")
+    put(6, 114.4, "club-chair-side-bg", flip=True)
+    put(6, 116.5, "dresser-bg")
+    put(6, 116.5, "ship-model-bg", height("dresser-bg"))
+    put(6, 116.5, "sconce-round-bg", 52)
     for i in range(4):
-        put(6, 110 + i * 1.1, "bar-stool-bg")
+        put(6, 120 + i * 1.1, "bar-stool-bg")
     # The promenade's outer railing along deck 6, with a life ring every 12 m.
     a, b = 150, 194
     for x in range(x_of(a) + 16, x_of(b) - 16, width("railing-bg")):
@@ -368,7 +375,7 @@ def build_objects():
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
-        prop("minX", x_of(104), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
+        prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
 
     return objs
 

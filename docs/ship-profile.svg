@@ -39,18 +39,18 @@
 <text x="1372.0" y="129.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">12</text>
 <rect x="215" y="112" width="195" height="26" rx="2" fill="#cfe3f0"/>
 <text x="312.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Chapel, kids' pool, Spinnaker Lounge</text>
-<rect x="570" y="112" width="325" height="26" rx="2" fill="#d6ecd0"/>
-<text x="732.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Sports court, shuffleboard, Champs Bar</text>
+<rect x="620" y="112" width="275" height="26" rx="2" fill="#d6ecd0"/>
+<text x="757.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Sports court, shuffleboard, Champs Bar</text>
 <rect x="895" y="112" width="145" height="26" rx="2" fill="#cfe3f0"/>
 <text x="967.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Speciality dining, golf nets</text>
 <rect x="1080" y="112" width="165" height="26" rx="2" fill="#cfe3f0"/>
 <text x="1162.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Le Bistro, Los Lobos</text>
 <rect x="215" y="142" width="225" height="26" rx="2" fill="#cfe3f0"/>
 <text x="327.5" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Spa and salon</text>
-<rect x="480" y="142" width="50" height="26" rx="2" fill="#cfe3f0"/>
-<text x="505.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Fitness</text>
-<rect x="570" y="142" width="300" height="26" rx="2" fill="#d6ecd0"/>
-<text x="720.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Oasis Pool, Topsiders, hot tubs</text>
+<rect x="480" y="142" width="100" height="26" rx="2" fill="#cfe3f0"/>
+<text x="530.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Fitness</text>
+<rect x="620" y="142" width="250" height="26" rx="2" fill="#d6ecd0"/>
+<text x="745.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Oasis Pool, Topsiders, hot tubs</text>
 <rect x="870" y="142" width="170" height="26" rx="2" fill="#cfe3f0"/>
 <text x="955.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Garden Café buffet, Ice Cream Bar</text>
 <rect x="1080" y="142" width="165" height="26" rx="2" fill="#f7bdbd"/>
@@ -59,46 +59,46 @@
 <text x="212.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
 <rect x="270" y="172" width="170" height="26" rx="2" fill="#ececec"/>
 <text x="355.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="480" y="172" width="50" height="26" rx="2" fill="#ececec"/>
-<text x="505.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="172" width="470" height="26" rx="2" fill="#ececec"/>
-<text x="805.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="480" y="172" width="100" height="26" rx="2" fill="#ececec"/>
+<text x="530.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="620" y="172" width="420" height="26" rx="2" fill="#ececec"/>
+<text x="830.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="172" width="200" height="26" rx="2" fill="#ececec"/>
 <text x="1180.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="140" y="202" width="300" height="26" rx="2" fill="#ececec"/>
 <text x="290.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
-<text x="585.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
+<rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
+<text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
 <rect x="600" y="202" width="440" height="26" rx="2" fill="#ececec"/>
 <text x="820.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="202" width="215" height="26" rx="2" fill="#ececec"/>
 <text x="1187.5" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="120" y="232" width="320" height="26" rx="2" fill="#ececec"/>
 <text x="280.0" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="232" width="470" height="26" rx="2" fill="#ececec"/>
-<text x="805.0" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="620" y="232" width="420" height="26" rx="2" fill="#ececec"/>
+<text x="830.0" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="232" width="225" height="26" rx="2" fill="#ececec"/>
 <text x="1192.5" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="110" y="262" width="260" height="26" rx="2" fill="#cfe3f0"/>
 <text x="240.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Kids' and teen clubs</text>
-<rect x="570" y="262" width="250" height="26" rx="2" fill="#cfe3f0"/>
-<text x="695.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Magnum's bar, art gallery</text>
+<rect x="620" y="262" width="200" height="26" rx="2" fill="#cfe3f0"/>
+<text x="720.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Magnum's bar, art gallery</text>
 <rect x="820" y="262" width="220" height="26" rx="2" fill="#cfe3f0"/>
 <text x="930.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Casino, duty-free shops</text>
 <rect x="1180" y="262" width="145" height="26" rx="2" fill="#cfe3f0"/>
 <text x="1252.5" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Theatre balcony</text>
 <rect x="110" y="292" width="300" height="26" rx="2" fill="#ececec"/>
 <text x="260.0" y="309.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins, internet café</text>
-<rect x="570" y="292" width="250" height="26" rx="2" fill="#cfe3f0"/>
-<text x="695.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Bars, shops, photo studio</text>
+<rect x="620" y="292" width="200" height="26" rx="2" fill="#cfe3f0"/>
+<text x="720.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Bars, shops, photo studio</text>
 <rect x="820" y="292" width="220" height="26" rx="2" fill="#d6ecd0"/>
 <text x="930.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Library, photo gallery; promenade, lifeboats</text>
 <rect x="1100" y="292" width="250" height="26" rx="2" fill="#cfe3f0"/>
 <text x="1225.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Stardust Lounge theatre</text>
 <rect x="90" y="322" width="350" height="26" rx="2" fill="#ececec"/>
 <text x="265.0" y="339.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="322" width="250" height="26" rx="2" fill="#cfe3f0"/>
-<text x="695.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Shore excursions, reservations</text>
+<rect x="620" y="322" width="200" height="26" rx="2" fill="#cfe3f0"/>
+<text x="720.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Shore excursions, reservations</text>
 <rect x="820" y="322" width="220" height="26" rx="2" fill="#cfe3f0"/>
 <text x="930.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">La Cucina, Four Seasons, Guest Services</text>
 <rect x="1095" y="322" width="255" height="26" rx="2" fill="#cfe3f0"/>
@@ -107,19 +107,19 @@
 <text x="227.5" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="370" y="352" width="70" height="26" rx="2" fill="#ffe08a"/>
 <text x="405.0" y="369.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Gangway (start)</text>
-<rect x="480" y="352" width="50" height="26" rx="2" fill="#ececec"/>
-<text x="505.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="570" y="352" width="470" height="26" rx="2" fill="#ececec"/>
-<text x="805.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="480" y="352" width="100" height="26" rx="2" fill="#ececec"/>
+<text x="530.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="620" y="352" width="420" height="26" rx="2" fill="#ececec"/>
+<text x="830.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="352" width="270" height="26" rx="2" fill="#ececec"/>
 <text x="1215.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="480" y="202" width="50" height="146" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
-<text x="505.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Atrium</text>
-<text x="505.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Café</text>
+<rect x="480" y="202" width="100" height="146" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
+<text x="530.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Atrium</text>
+<text x="530.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Café</text>
 <rect x="440" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
 <text x="460.0" y="450.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">forward stairs + lifts</text>
-<rect x="530" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
-<text x="550.0" y="462.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">midship stairs + lifts</text>
+<rect x="580" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
+<text x="600.0" y="462.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">midship stairs + lifts</text>
 <rect x="1040" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
 <text x="1060.0" y="450.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">aft stairs + lifts</text>
 <line x1="320.0" y1="324" x2="320.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
@@ -132,9 +132,9 @@
 <line x1="1270.0" y1="294" x2="1270.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
 <rect x="1267.0" y="368" width="6" height="8" fill="#e07a1f"/>
 <rect x="1267.0" y="308" width="6" height="8" fill="#e07a1f"/>
-<line x1="610.0" y1="264" x2="610.0" y2="316" stroke="#e07a1f" stroke-width="2"/>
-<rect x="607.0" y="308" width="6" height="8" fill="#e07a1f"/>
-<rect x="607.0" y="278" width="6" height="8" fill="#e07a1f"/>
+<line x1="660.0" y1="264" x2="660.0" y2="316" stroke="#e07a1f" stroke-width="2"/>
+<rect x="657.0" y="308" width="6" height="8" fill="#e07a1f"/>
+<rect x="657.0" y="278" width="6" height="8" fill="#e07a1f"/>
 <text x="70.0" y="24.0" font-size="13" text-anchor="start" fill="#1d2b53" font-weight="bold">◀ FORWARD (bow)</text>
 <text x="1360.0" y="24.0" font-size="13" text-anchor="end" fill="#1d2b53" font-weight="bold">AFT (stern) ▶</text>
 <text x="715.0" y="24.0" font-size="13" text-anchor="middle" fill="#1d2b53" font-weight="bold">Norwegian Sun, as laid out in the game</text>

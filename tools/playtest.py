@@ -23,7 +23,8 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import ATRIUM, CORES, FUNNEL, ROOF_ROW, TILE, TRUNKS, col, floor_y, walk_y, x_of
+from build_ship_map import (ATRIUM, CORES, FUNNEL, MEZZANINE_RISE, ROOF_ROW, TILE, TRUNKS, col, floor_y,
+                            walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -338,7 +339,7 @@ def scenario_trunk(b):
 
 
 LIFT_X = col(CORES["forward"][0]) * TILE + 18 * TILE     # the forward core's elevator
-GLASS_X = x_of(87)                                        # the atrium's glass elevator
+GLASS_X = x_of(sum(ATRIUM["span"]) / 2)             # the atrium's glass elevator
 
 
 def lift_cursor(b):
@@ -418,7 +419,7 @@ def scenario_atrium(b):
     s = b.state()
     ok &= check(s["y"] == walk_y(7) and on_walk(b), "↑ steps her up onto the side walk", s)
     b.shot("atrium-sidewalk")
-    b.hold("right", 4.2)
+    b.hold("right", 7.8)
     s = b.state()
     ok &= check(s["y"] == D7 and s["x"] > ATRIUM_X1 and not on_walk(b), "she crosses and steps off at the far end", s)
 
@@ -458,6 +459,19 @@ def scenario_atrium(b):
     landed = b.eval("window.__landed")
     ok &= check(landed and landed["y"] == walk_y(6) and landed["walk"],
                 "the curving staircase climbs to deck 6's side walk", landed)
+
+    # On up to the mezzanine, deck 6a: railed at both ends.
+    b.teleport(ATRIUM_X0 + 12 * TILE, walk_y(6))
+    b.eval("window.__ship.findWalk(); window.__landed = null")
+    b.hold("up", 2.2)
+    landed = b.eval("window.__landed")
+    ok &= check(landed and landed["y"] == floor_y(6) - MEZZANINE_RISE and landed["walk"],
+                "a short flight climbs to the mezzanine", landed)
+    b.teleport(ATRIUM_X0 + 100, floor_y(6) - MEZZANINE_RISE)  # holding ↑ carried her on up to deck 7
+    b.hold("right", 4.0)
+    s = b.state()
+    ok &= check(s["y"] == floor_y(6) - MEZZANINE_RISE and s["x"] < (ATRIUM_X0 + ATRIUM_X1) // 2,
+                "its railing stops her at its end", s)
     return ok
 
 
