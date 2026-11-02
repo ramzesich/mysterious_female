@@ -112,7 +112,7 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'checkpoint': {
-                    const door = this.add.image(o.x, o.y, 'door').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    const door = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props);
                     const glow = this.add.image(o.x, o.y - LAMP_RISE, 'glow').setDepth(DEPTH.props).setVisible(false);
                     const lamp = this.add.image(o.x, o.y - LAMP_RISE, 'lamp').setDepth(DEPTH.props);
                     this.worldLayer.add([door, glow, lamp]);
@@ -188,6 +188,14 @@ export class ShipScene extends Phaser.Scene {
                     this.buildLift(o, prop(o, 'floors', ''), prop(o, 'decks', ''), prop(o, 'cards', ''), prop(o, 'glass', false));
                     break;
 
+                case 'prop': {
+                    // Furniture and fittings (§5.3): on the floor, on another piece, or on the wall.
+                    const piece = this.add.image(o.x, o.y - prop(o, 'dy', 0), 'shipart', prop(o, 'frame', ''))
+                        .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1).setFlipX(prop(o, 'flip', false));
+                    this.worldLayer.add(piece);
+                    break;
+                }
+
                 case 'sign': {
                     const text = this.add.text(o.x, o.y, prop(o, 'text', ''), {
                         fontFamily: 'Verdana, sans-serif', fontSize: '7px', color: '#8f846f',
@@ -235,18 +243,33 @@ export class ShipScene extends Phaser.Scene {
         g.fillCircle(o.x + (o.width * 3) / 4, o.y + 16, 4);
     }
 
-    // Cabin doors along a corridor, every 4 m (192px), muted so they never read as interactive.
+    // A cabin corridor, as in the user's photos (§5.3): a white ceiling with round downlights, a
+    // wooden handrail, terracotta cabin doors every 4 m (192px), a few with vacation stickers, and
+    // now and then a framed picture. All muted, so none of it reads as interactive.
     drawCabinDoors(g, o) {
-        for (let x = o.x + 60; x + 30 < o.x + o.width; x += 192) {
+        const ceiling = o.y - this.deckPitch + 16;
+        g.fillStyle(0xf6f3ec, 1);
+        g.fillRect(o.x, ceiling, o.width, 3);
+        g.fillStyle(0xd8b29a, 1);
+        g.fillRect(o.x, o.y - 33, o.width, 2);     // the handrail, at about her hip
+        g.fillStyle(0xc49a80, 1);
+        g.fillRect(o.x, o.y - 31, o.width, 1);
+
+        const pictures = ['picture-sea-bg', 'picture-ship-bg', 'picture-art-bg'];
+        const parts = [];
+        for (let x = o.x + 60, n = Math.round(o.x / 192); x + 30 < o.x + o.width; x += 192, n++) {
+            const gap = x + 15 + 96;                 // halfway to the next door
+            g.fillStyle(0xfffbe8, 1);
+            g.fillEllipse(gap, ceiling + 3, 8, 3);
+            if (n % 3 === 1 && gap + 20 < o.x + o.width) {
+                parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
+            }
             if (this.trunkDoorSpots.some(t => t.y === o.y && x < t.x + 22 && x + 30 > t.x - 22)) continue;
-            g.fillStyle(0xd9cdb6, 1);
-            g.fillRect(x, o.y - 74, 30, 74);
-            g.lineStyle(1, 0xc2b497, 1);
-            g.strokeRect(x + 0.5, o.y - 73.5, 29, 73);
-            g.fillStyle(0xb9ab90, 1);
-            g.fillRect(x + 23, o.y - 38, 3, 2);
-            g.fillRect(x + 9, o.y - 66, 12, 5);   // the number plate
+            // Most doors are plain; about one in six has stickers, each its own.
+            const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
+            parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
         }
+        this.worldLayer.add(parts);
     }
 
     // An escape trunk (§5.1): a crew door on each deck it serves, top to bottom, with ▲/▼ lamps above
@@ -260,7 +283,7 @@ export class ShipScene extends Phaser.Scene {
         for (const y of ys) {
             const door = {
                 trunk, y, open: false,
-                sprite: this.add.image(o.x, y, 'door').setOrigin(0.5, 1).setDepth(DEPTH.props),
+                sprite: this.add.image(o.x, y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props),
                 up: this.add.image(o.x - 5, y - LAMP_RISE, 'arrow-up').setDepth(DEPTH.props),
                 down: this.add.image(o.x + 5, y - LAMP_RISE, 'arrow-down').setDepth(DEPTH.props),
             };
@@ -694,7 +717,7 @@ export class ShipScene extends Phaser.Scene {
                     : Math.abs(p.x - t.x) < 22 && Math.abs(p.y - d.y) < 40;
                 if (keep) continue;
                 d.open = false;
-                d.sprite.setTexture('door');
+                d.sprite.setTexture('shipart', 'door-crew');
                 sfx.door();
             }
         }
@@ -1101,7 +1124,7 @@ export class ShipScene extends Phaser.Scene {
     // light on, and a green lamp above it glows.
     lightCheckpoint(c, celebrate) {
         c.active = true;
-        c.door.setTexture('door-on');
+        c.door.setTexture('shipart', 'door-crew-ajar');
         c.lamp.setTexture('lamp-on');
         c.glow.setVisible(true).setAlpha(0.55);
         this.tweens.add({ targets: c.glow, alpha: 0.25, scale: 0.8, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

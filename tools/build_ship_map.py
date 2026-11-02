@@ -24,8 +24,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
- VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL) = range(1, 14)
-TILE_COUNT = 13
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT) = range(1, 16)
+TILE_COUNT = 15
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -127,6 +127,14 @@ def build_layers():
                     back[floor - 1][c] = WAINSCOT
             if deck == 12 and covered(12, m):
                 solid[ROOF_ROW][c] = STEEL
+
+            # The floor's surface, from the user's photos (§5.3): the cabin corridors' blue-grey
+            # wave carpet, the open decks' tan non-skid paint.
+            if deck > 3 and not in_core(m):
+                if kind == "cabins":
+                    solid[floor][c] = CABIN_CARPET
+                elif not covered(deck, m) or kind in ("outdoor", "finale"):
+                    solid[floor][c] = DECK_PAINT
 
         # The deck's ends: a steel wall indoors, a railing on an open terrace.
         for c, inward in ((c0, 1), (c1, -1)):
@@ -273,6 +281,40 @@ def build_objects():
             props.append(prop("card", opts["card"]))
         add(point(f"trunk-{name}", "trunk", x_of(m), floor_y(max(decks)), props))
 
+    # Furnishing, a first test from the art style test (§8): muted, so it never reads as
+    # interactive. Each piece stands on the floor, on another piece, or hangs on the wall `dy`
+    # pixels up. Sizes come from the art atlas (tools/build_ship_art.py).
+    art = json.loads((ROOT / "assets" / "ship" / "ship.json").read_text(encoding="utf-8"))["frames"]
+    height = lambda frame: art[frame]["frame"]["h"]
+    width = lambda frame: art[frame]["frame"]["w"]
+
+    def put(deck, m, frame, dy=0, flip=False, x=None):
+        props = [prop("frame", frame), prop("dy", dy, "int")]
+        if flip:
+            props.append(prop("flip", True, "bool"))
+        add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
+
+    # The gangway lobby, deck 4.
+    put(4, 61.5, "plant-bg")
+    put(4, 65, "picture-ship-bg", 44)
+    put(4, 69.4, "extinguisher-bg", 14)
+    # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
+    # dresser, bar stools along the bar.
+    put(6, 102, "club-chair-side-bg")
+    put(6, 103.2, "side-table-bg")
+    put(6, 104.4, "club-chair-side-bg", flip=True)
+    put(6, 106.5, "dresser-bg")
+    put(6, 106.5, "ship-model-bg", height("dresser-bg"))
+    put(6, 106.5, "sconce-round-bg", 52)
+    for i in range(4):
+        put(6, 110 + i * 1.1, "bar-stool-bg")
+    # The promenade's outer railing along deck 6, with a life ring every 12 m.
+    a, b = 150, 194
+    for x in range(x_of(a) + 16, x_of(b) - 16, width("railing-bg")):
+        put(6, 0, "railing-bg", x=x)
+    for m in range(a + 6, b - 3, 12):
+        put(6, m, "life-ring-rail-bg")
+
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
         prop("minX", x_of(104), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
@@ -349,10 +391,28 @@ def draw_tile(tile_id):
             rect(12, 0, 12, 15, hex_rgba("#e0e0e0"))
             rect(3, 0, 12, 0, hex_rgba("#f2c14e"))   # yellow safety edge
     elif tile_id == RAILING:
-        rect(0, 2, 15, 3, hex_rgba("#ffffff"))
-        rect(0, 9, 15, 9, hex_rgba("#e8e8e8"))
-        for x in (1, 7, 13):
-            rect(x, 2, x + 1, 15, hex_rgba("#f4f4f4"))
+        # White rails and posts under a varnished wooden handrail, as on the promenade (§5.3).
+        for x in (1, 9):
+            rect(x, 3, x + 1, 15, hex_rgba("#ffffff"))
+            rect(x + 1, 4, x + 1, 15, hex_rgba("#c7dcd0"))
+        rect(0, 8, 15, 8, hex_rgba("#ffffff"))
+        rect(0, 12, 15, 12, hex_rgba("#ffffff"))
+        rect(0, 0, 15, 2, hex_rgba("#cd683d"))
+        rect(0, 0, 15, 0, hex_rgba("#e6904e"))
+        rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == CABIN_CARPET:
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))      # steel slab
+        rect(0, 0, 15, 3, hex_rgba("#484a77"))       # blue-grey carpet
+        for x, y in ((1, 1), (2, 0), (3, 0), (4, 1), (5, 2), (6, 2), (7, 1),
+                     (9, 1), (10, 0), (11, 0), (12, 1), (13, 2), (14, 2), (15, 1)):
+            px[y][x] = hex_rgba("#c7dcd0")           # its thin white wave
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == DECK_PAINT:
+        rect(0, 0, 15, 15, hex_rgba("#c7cdd2"))      # white-painted steel slab
+        rect(0, 0, 15, 3, hex_rgba("#ab947a"))       # tan non-skid deck paint
+        rect(0, 0, 15, 0, hex_rgba("#c2ad92"))
+        px[2][4] = px[1][11] = px[3][14] = hex_rgba("#9a8469")  # the non-skid grit
+        rect(0, 15, 15, 15, hex_rgba("#a9b0b7"))
     elif tile_id == LADDER:
         rect(3, 0, 3, 15, hex_rgba("#d8dde2"))
         rect(12, 0, 12, 15, hex_rgba("#d8dde2"))

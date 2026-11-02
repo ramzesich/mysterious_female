@@ -10,6 +10,7 @@ export class BootScene extends Phaser.Scene {
         // Relative paths only: on GitHub Pages the game lives under /<repo>/ (§7.2).
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
         this.load.image('tiles', 'assets/tiles/placeholder.png');
+        this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });

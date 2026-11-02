@@ -652,16 +652,21 @@ Nothing blocks the start of the build. These get settled along the way:
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
       open and to confirm; the panel goes once a deck is chosen. Tried by the user 2026-11-01
-- [ ] **Next: populate the ship, starting with a style test.** Authenticity first, from the user's
-      own photos (received 2026-11-02, in `reference/photos/`; what they show is in §5.3 "The
-      real ship's look"). Then the PixelLab style test, 4 pieces, ~10–15 generations (approved 2026-11-01; state the
-  exact cost before running): (a) a cabin corridor tileset (floor, wall, ceiling), (b) a crew
-  cabin door 28×74, closed and ajar, for checkpoints and trunks, (c) one muted background prop
-  (a lounge armchair or bar stool), (d) the promenade: deck floor and railing. Walls and
-  background **a little softer** than her, full colour only for interactive things. Drop them
-  into one stretch of deck 4 by the gangway and show the user a screenshot. Retro Diffusion only
-  if PixelLab disappoints (§2.1). After that: doors along the decks into small separate rooms
-  (§5.1), hazards and people placed on the real decks (§5.8)
+- [x] **Art style test** (2026-11-02, 27 generations): two PixelLab object sheets in Resurrect 64,
+      sidescroller view. **Doors** (16 at 85px) and **props** (64 at 32px) came out well and the
+      user liked both; the two side-scroller **tilesets** did not (generic chunky platform blocks)
+      and were dropped: floors, walls, ceilings and railings are hand-drawn from her photos
+      instead. `tools/build_ship_art.py` packs the pieces into `assets/ship/ship.png`: doors fitted
+      to 74px without resampling, **every closed door's lever at the same height** (the user's
+      rule), and a muted `-bg` twin of every piece. In the game: cabin corridors (muted doors, a
+      few with stickers, pictures, handrail, ceiling lights, blue wave carpet), the crew door for
+      checkpoints and trunks, the gangway lobby, a Windjammer-style corner in the deck 6 bars and
+      the promenade railing with life rings. **Ask the user** how it looks in play
+      (`python tools/serve.py`, `?play`), then merge
+- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
+      more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
+      cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
+      and people placed on the real decks (§5.8)
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
