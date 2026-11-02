@@ -51,6 +51,23 @@ export const LIFT = {
     doorMs: 260,
 };
 
+// The atrium's side walks (§5.3): how far past its edges she can step up onto one, and the height
+// of the glass railing in front of it. How high a side walk stands comes from the map.
+export const SIDEWALK = {
+    reach: 24,
+    railHeight: 22,
+};
+
+// Swimming in the pools (§5.3): her breaststroke's speed, how far below the surface her feet must be
+// before she is in, where the swim pose sits against the surface, and how close to a pool's side
+// she can swim.
+export const SWIM = {
+    speed: 70,
+    entry: 6,
+    float: 21,          // the waterline at her shoulders, head above it
+    margin: 18,
+};
+
 export const DASH = {
     durationMs: 10000,
     speedMultiplier: 2,

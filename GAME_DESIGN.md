@@ -340,9 +340,37 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   (~198 m). The **atrium** spans decks 5–9 between the forward and midship cores, with glass
   elevators. The funnel stands over the aft half.
 - **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
-- **Nothing falls through the middle of a deck.** Indoors, every floor is solid, the atrium
-  included (it is a look, not a well). Falls happen outdoors: jumping a railing overboard, or from
-  one open deck down onto another (a terrace below, the pool area from deck 12).
+- **Floors and open spaces (Decided, 2026-11-02, replacing "the atrium is a look, not a
+  well"):** corridors and rooms have solid floors. Two places open up through the decks, as on
+  the real ship, and both work the same way, as **side walks**:
+  - **The atrium** is a real open space, its floor on deck 5 (Guest Services, the Atrium Café;
+    the Atlantic Deck, confirmed by the user), open up through deck 9 to a
+    domed skylight: oval balconies with cream fronts and glass-and-brass railings, burl-wood
+    pillars with brass rings, the two glass elevators in the middle (§5.1), the curving
+    staircase, which climbs level by level beside the glass elevator from deck 5 to deck 9.
+  - **Deck 12 over deck 11's open area** is a side walk along the ship's side, its floor
+    continuous (the hole in the blockout goes), with deck 11's pools below and behind it.
+  - **The atrium is 20 m long, two screens** (the user, 2026-11-02): NCL's profile draws it about
+    10 m, which looked narrow next to its five levels, so the midship core stands 10 m further aft
+    than on the profile. (The profile's mezzanine, deck 6a, was tried and dropped by the user.)
+  - **A side walk** is a balcony a step (8px) above its deck's floor, behind a glass-and-brass
+    railing, so it reads as a side walk. Its blue carpet and brass nosing start at the step (the
+    user found a 4px step not obvious; a 2.5D walkway and a ▲ hint above her were tried and
+    dropped). **↑ steps her up onto it, ↓ steps her down**: at its ends
+    onto the deck's floor, out over the open space over the railing and down. If she doesn't step
+    up, she meets the railing where the deck's floor ends and can **jump over it and drop**. The
+    glass elevator opens onto the side walks.
+  - **Drops keep the fall rule** (§5.6): one deck down is fine; longer, the camera lets her go,
+    she falls out of the frame and comes back at the nearest checkpoint. (It is not a fright;
+    overboard stays as it is.)
+- **Decks 11 and 12 have glass side walls**: glass windbreak panels with a handrail along the
+  ship's side, instead of open railings.
+- **The pools:** she can jump into a pool, and swims a **side-on breaststroke, her head above the
+  water** (the user's choice; a skeleton-v3 clip written as poses, 3 generations; a front crawl
+  was made first by a misunderstanding and is kept in `assets/source/her/swim-crawl/`). Two pools on deck 11 (119-131 m and
+  134-140 m), sunk two tiles into the deck; she walks or drops in with a splash, ←/→ swims, jump
+  climbs out. Maybe game mechanics round the pools later. Not a scare. Bumbot's fly-catching spot
+  moved beside them, to 146 m.
 - **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
   as it naturally would, but she can't get there. There are no crew or engine decks to explore.
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
@@ -669,7 +697,18 @@ Nothing blocks the start of the build. These get settled along the way:
       ring came from a second 32px props sheet (10 generations), whose other pieces went into the
       atlas too: Bumbot's fish on a plate, a key card on a lanyard, a captain's hat, poker chips,
       a suitcase, ice cream, a pool ladder and more
-- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
+- [ ] **Next: rework the ship's structure** (the user, 2026-11-02), before furnishing, in this
+      order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
+      `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
+      side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
+      2026-11-02 on `ship-structure`, placeholder art; approved by the user**; **(3) the
+      stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
+      dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
+      stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's
+      `front_from_outside`, `aft_from_outside`, `side_view_from_outside`): a raked bow, the bridge
+      front, the rounded stern with its stepped aft terraces. The very front and back need not be
+      reachable
+- [ ] **Then: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
       cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
       and people placed on the real decks (§5.8)

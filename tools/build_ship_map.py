@@ -24,8 +24,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
- VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT) = range(1, 16)
-TILE_COUNT = 15
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE) = range(1, 18)
+TILE_COUNT = 17
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -40,8 +40,15 @@ ROWS = FLOOR_ROW[3] + 10                   # the hull below deck 3, down past th
 # 4-6, the Hotel card everything above (§6.2).
 FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
 
-# Deck 12's open stretch over the pool, metres from the bow.
+# Deck 12's open stretch over deck 11's pool area, crossed by a side walk (§5.3), and deck 11's
+# pools under it, metres from the bow. A pool is sunk two tiles into the deck.
 POOL_OPENING = (115, 145)
+POOLS = [(119, 131), (134, 140)]
+POOL_DEPTH = 2 * TILE
+
+# The atrium's side walks (§5.3) stand a visible step above their deck's floor: she steps up onto
+# them.
+SIDEWALK_RISE = 8
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
@@ -64,6 +71,12 @@ def x_of(m):
 def floor_y(deck):
     """Pixel y of the walkable top of a deck's floor."""
     return FLOOR_ROW[deck] * TILE
+
+
+def walk_y(deck):
+    """Where she stands on `deck` in the atrium: on its side walk above deck 5, the atrium floor."""
+    lo, hi = ATRIUM["decks"]
+    return floor_y(deck) - (SIDEWALK_RISE if lo < deck <= hi else 0)
 
 
 def in_core(m):
@@ -146,12 +159,13 @@ def build_layers():
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
 
-        # The deck's ends: a steel wall indoors, a railing on an open terrace.
+        # The deck's ends: a steel wall indoors, a railing on an open terrace; decks 11 and 12 have
+        # glass side walls instead (§5.3).
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
                 fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, STEEL)
             else:
-                fill(solid, c, c, floor - 2, floor - 1, RAILING)
+                fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
         # Where an open deck meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
         if 3 < deck < 12:
@@ -166,13 +180,21 @@ def build_layers():
         k = r - FLOOR_ROW[3]
         fill(solid, col(fwd3) + 4 * k, col(aft3) - 1 - k, r, r, STEEL if r <= WATER_ROW + 2 else NAVY)
 
-    # No floor opens in the middle of a deck indoors: the atrium is its look (the back wall), not a
-    # well to fall down. Outdoors, deck 12 is open over the middle of the Oasis Pool, as the real
-    # pool deck is open to the sky, with a railing round the edge: a one-deck drop to the pool.
+    # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
+    # area (§5.3): their decks cross on side walks, built in the game, not floor tiles.
+    lo, hi = ATRIUM["decks"]
+    for deck in range(lo + 1, hi + 1):
+        fill(solid, col(ATRIUM["span"][0]), col(ATRIUM["span"][1]) - 1, FLOOR_ROW[deck], FLOOR_ROW[deck], 0)
     a, b = POOL_OPENING
     fill(solid, col(a), col(b) - 1, FLOOR_ROW[12], FLOOR_ROW[12], 0)
-    for c in (col(a) - 1, col(b)):
-        fill(solid, c, c, FLOOR_ROW[12] - 2, FLOOR_ROW[12] - 1, RAILING)
+
+    # Deck 11's pools, sunk into the deck: tiled sides and bottom, the water filled in by the game.
+    for a, b in POOLS:
+        top, bottom = FLOOR_ROW[11], FLOOR_ROW[11] + POOL_DEPTH // TILE
+        fill(solid, col(a), col(b) - 1, top, bottom - 1, 0)
+        fill(solid, col(a) - 1, col(a) - 1, top, bottom, POOL_TILE)
+        fill(solid, col(b), col(b), top, bottom, POOL_TILE)
+        fill(solid, col(a), col(b) - 1, bottom, bottom, POOL_TILE)
 
     # Funnel and mast, standing on the roof.
     fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, STEEL)
@@ -215,6 +237,12 @@ def build_objects():
 
     # The start: the gangway lobby on deck 4, forward, by the forward stairs (§5.3).
     add(point("gangway", "spawn", x_of(67), floor_y(4)))
+
+    # Named places to start at, for testing: ?at=<name> (README).
+    for name, deck, m in [("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
+                          ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
+                          ("buffet", 11, 170), ("diner", 11, 205)]:
+        add(point(name, "place", x_of(m), floor_y(deck)))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -232,11 +260,38 @@ def build_objects():
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}")]))
 
+    # Side walks (§5.3), with a step up at both ends: each deck from 6 to 9 across the atrium, and
+    # deck 12 over deck 11's pool area. The atrium's dressing (pillars, the skylight) is its own.
+    lo, hi = ATRIUM["decks"]
+    ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
+    for d in range(lo + 1, hi + 1):
+        add(area(f"sidewalk-atrium-{d}", "sidewalk", ax0, walk_y(d), ax1 - ax0, 0, [
+            prop("rise", SIDEWALK_RISE, "int"), prop("style", "atrium")]))
+    pa, pb = (col(m) * TILE for m in POOL_OPENING)
+    add(area("sidewalk-pool", "sidewalk", pa, floor_y(12) - SIDEWALK_RISE, pb - pa, 0, [
+        prop("rise", SIDEWALK_RISE, "int"), prop("style", "deck")]))
+    add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
+        prop("levels", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1)))]))
+    for a, b in POOLS:
+        add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(11) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4))
+    walks = [{"deck": str(d), "y": walk_y(d)} for d in range(lo + 1, hi + 1)]
+    levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks]
+    left, right = ax0 + 2 * TILE, ax0 + 12 * TILE
+    for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
+        x0, x1 = (left, right) if i % 2 == 0 else (right, left)
+        card = FLIGHT_CARD[int(b)]
+        add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
+             "width": 0, "height": 0, "rotation": 0, "visible": True,
+             "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
+             "properties": [prop("card", card)]})
+
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
-    # decks 5-9. Floors are listed top to bottom with each deck's number and the card it needs.
+    # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
+    # number and the card it needs.
     def lift(name, x, decks, glass=False):
         decks = sorted(decks, reverse=True)
-        props = [prop("floors", ",".join(str(floor_y(d)) for d in decks)),
+        stand = walk_y if glass else floor_y
+        props = [prop("floors", ",".join(str(stand(d)) for d in decks)),
                  prop("decks", ",".join(str(d) for d in decks)),
                  prop("cards", ",".join(FLIGHT_CARD[d] for d in decks))]
         if glass:
@@ -268,7 +323,7 @@ def build_objects():
     # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
     # A door needs a wall: the ones by the open decks stand just inside.
     for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
-                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 110),
+                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
                           ("d12-sports", 12, 167)]:
         assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
@@ -276,14 +331,14 @@ def build_objects():
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 130, "fly", 1), ("bridge", 10, 24, "bat", -1),
-                                            ("linen", 9, 102, "asleep", 1)]:
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 24, "bat", -1),
+                                            ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
 
     # Tangerines (§6.3): ten, each on a side table. One sits behind crates only the dash breaks.
     for i, (deck, m) in enumerate([(4, 30), (4, 150), (4, 236), (5, 60), (5, 170), (6, 120), (6, 245),
-                                   (7, 30), (11, 215), (12, 110)]):
+                                   (7, 30), (11, 215), (12, 113)]):
         add(point(f"t-{i + 1}", "tangerine", x_of(m), floor_y(deck)))
     for i in range(2):
         for j in range(2):
@@ -321,14 +376,14 @@ def build_objects():
     put(4, 69.4, "extinguisher-bg", 14)
     # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
     # dresser, bar stools along the bar.
-    put(6, 102, "club-chair-side-bg")
-    put(6, 103.2, "side-table-bg")
-    put(6, 104.4, "club-chair-side-bg", flip=True)
-    put(6, 106.5, "dresser-bg")
-    put(6, 106.5, "ship-model-bg", height("dresser-bg"))
-    put(6, 106.5, "sconce-round-bg", 52)
+    put(6, 112, "club-chair-side-bg")
+    put(6, 113.2, "side-table-bg")
+    put(6, 114.4, "club-chair-side-bg", flip=True)
+    put(6, 116.5, "dresser-bg")
+    put(6, 116.5, "ship-model-bg", height("dresser-bg"))
+    put(6, 116.5, "sconce-round-bg", 52)
     for i in range(4):
-        put(6, 110 + i * 1.1, "bar-stool-bg")
+        put(6, 120 + i * 1.1, "bar-stool-bg")
     # The promenade's outer railing along deck 6, with a life ring every 12 m.
     a, b = 150, 194
     for x in range(x_of(a) + 16, x_of(b) - 16, width("railing-bg")):
@@ -338,7 +393,7 @@ def build_objects():
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
-        prop("minX", x_of(104), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
+        prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
 
     return objs
 
@@ -421,6 +476,22 @@ def draw_tile(tile_id):
         rect(0, 0, 15, 2, hex_rgba("#cd683d"))
         rect(0, 0, 15, 0, hex_rgba("#e6904e"))
         rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == GLASS_RAIL:
+        # Decks 11 and 12: glass windbreak panels in white frames, a wooden handrail on top (§5.3).
+        rect(0, 3, 15, 15, hex_rgba("#bfe6f5", 150))
+        for x, y in ((4, 12), (5, 11), (6, 10), (10, 13), (11, 12)):
+            px[y][x] = hex_rgba("#ffffff", 200)          # a glint on the glass
+        rect(0, 3, 0, 15, hex_rgba("#ffffff"))
+        rect(15, 3, 15, 15, hex_rgba("#e3e7ea"))
+        rect(0, 0, 15, 2, hex_rgba("#cd683d"))
+        rect(0, 0, 15, 0, hex_rgba("#e6904e"))
+        rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == POOL_TILE:
+        # A pool's tiled side and bottom: pale blue tiles with white grout.
+        rect(0, 0, 15, 15, hex_rgba("#8fd3ff"))
+        for g in (0, 8):
+            rect(0, g, 15, g, hex_rgba("#e3f4fb"))
+            rect(g, 0, g, 15, hex_rgba("#e3f4fb"))
     elif tile_id == CABIN_CARPET:
         rect(0, 0, 15, 15, hex_rgba("#8e98a3"))      # steel slab
         rect(0, 0, 15, 3, hex_rgba("#484a77"))       # blue-grey carpet
