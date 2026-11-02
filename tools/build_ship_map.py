@@ -130,11 +130,12 @@ def build_layers():
 
             # The floor's surface, from the user's photos (§5.3): the cabin corridors' blue-grey
             # wave carpet, the open decks' tan non-skid paint.
+            # Open to the sky wins: a corridor's carpet stops where the deck above it ends.
             if deck > 3 and not in_core(m):
-                if kind == "cabins":
-                    solid[floor][c] = CABIN_CARPET
-                elif not covered(deck, m) or kind in ("outdoor", "finale"):
+                if not covered(deck, m) or kind in ("outdoor", "finale"):
                     solid[floor][c] = DECK_PAINT
+                elif kind == "cabins":
+                    solid[floor][c] = CABIN_CARPET
 
         # The deck's ends: a steel wall indoors, a railing on an open terrace.
         for c, inward in ((c0, 1), (c1, -1)):
@@ -240,8 +241,17 @@ def build_objects():
     # Venue signs; cabin doors along the corridors (background, muted).
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":
-            add(area(f"cabins-{deck}-{a}", "decor", col(a) * TILE, floor_y(deck), (col(b) - col(a)) * TILE, 0,
-                     [prop("kind", "cabindoors")]))
+            # Only under a ceiling: where the deck above ends, the corridor is an open terrace.
+            cols = [c for c in range(col(a), col(b)) if covered(deck, metres(c))]
+            runs = []
+            for c in cols:
+                if runs and runs[-1][1] == c:
+                    runs[-1][1] = c + 1
+                else:
+                    runs.append([c, c + 1])
+            for c0, c1 in runs:
+                add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0,
+                         [prop("kind", "cabindoors")]))
         else:
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
