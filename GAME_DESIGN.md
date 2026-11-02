@@ -701,7 +701,7 @@ Nothing blocks the start of the build. These get settled along the way:
       order: **(1) the atrium** as an open space with side walks: **built 2026-11-02 on branch
       `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
       side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
-      2026-11-02 on `ship-structure`, placeholder art; ask the user to try it**; **(3) the
+      2026-11-02 on `ship-structure`, placeholder art; approved by the user**; **(3) the
       stairs**, made to look real (blue diamond-pattern carpet on the treads, brass handrails on
       dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
       stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's
