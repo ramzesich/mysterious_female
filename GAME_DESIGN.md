@@ -380,7 +380,9 @@ From her photos:
 - **Cabin corridors** (`corridor`): light, not dark. Cream walls, a white panelled ceiling with
   round downlights, a wooden handrail along the wall, framed pictures. **Cabin doors: terracotta
   wood** (orange-brown) in a wood frame, a brass key-card lock and lever, a small number plate
-  (e.g. 8259). **Carpet: blue-grey with a white wave pattern.**
+  (e.g. 8259). **Carpet: blue-grey with a white wave pattern.** Occasional framed pictures on the
+  walls. **Most cabin doors are plain; a few carry vacation stickers**, different on each door
+  (the user's word, 2026-11-02).
 - **Modern corridors near the lounges** (`corridor_near_bliss_lounge`): grey 3D-geometric
   wallpaper, black door frames and trim, dark carpet with grey and white dots, large framed art.
 - **Crew area** (`view_via_an_open_door_into_the_crew_area`): white steel walls, pipes and ducts
