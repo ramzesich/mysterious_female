@@ -14,7 +14,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, MEZZANINE, PLAYABLE, TRUNKS, VENUES
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -44,9 +44,8 @@ FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
 POOL_OPENING = (115, 145)
 
 # The atrium's side walks (§5.3) stand a visible step above their deck's floor: she steps up onto
-# them. The mezzanine ("6a") stands this far above deck 6's floor, so she fits under it.
+# them.
 SIDEWALK_RISE = 8
-MEZZANINE_RISE = 80
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
 
@@ -247,21 +246,18 @@ def build_objects():
                       [prop("text", f"DECK {deck}")]))
 
     # The atrium (§5.3): its span and its side walks, for the game to build. Each deck from 6 to 9
-    # crosses it on a side walk with a step up at both ends; the mezzanine, deck 6a, is a balcony
-    # over the forward half, railed at both ends and reached only by the stairs. The curving
-    # staircase climbs level by level beside the glass elevator.
+    # crosses it on a side walk with a step up at both ends. The curving staircase climbs level by
+    # level beside the glass elevator.
     lo, hi = ATRIUM["decks"]
     ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
-    walks = [{"deck": str(d), "y": walk_y(d), "x0": ax0, "x1": ax1, "ends": "step"} for d in range(lo + 1, hi + 1)]
-    walks.append({"deck": f"{MEZZANINE}a", "y": floor_y(MEZZANINE) - MEZZANINE_RISE, "x0": ax0,
-                  "x1": (ax0 + ax1) // 2, "ends": "rail"})
+    walks = [{"deck": str(d), "y": walk_y(d), "x0": ax0, "x1": ax1} for d in range(lo + 1, hi + 1)]
     add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
         prop("walks", json.dumps(walks)), prop("rise", SIDEWALK_RISE, "int")]))
     levels = [("5", floor_y(lo))] + sorted(((w["deck"], w["y"]) for w in walks), key=lambda w: -w[1])
     left, right = ax0 + 2 * TILE, ax0 + 12 * TILE
     for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
         x0, x1 = (left, right) if i % 2 == 0 else (right, left)
-        card = FLIGHT_CARD[int(b.rstrip("a"))]
+        card = FLIGHT_CARD[int(b)]
         add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
              "width": 0, "height": 0, "rotation": 0, "visible": True,
              "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],

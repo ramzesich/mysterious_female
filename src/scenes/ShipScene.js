@@ -323,8 +323,7 @@ export class ShipScene extends Phaser.Scene {
 
     // The atrium (§5.3): open from its floor on deck 5 up to a skylight under deck 10. Decks 6-9
     // cross it on side walks, balconies a step above the deck's floor behind a glass and brass
-    // railing; where a deck's floor ends there is a railing she can jump over. The mezzanine (6a)
-    // is a balcony railed at both ends, reached by the stairs.
+    // railing; where a deck's floor ends there is a railing she can jump over.
     buildAtrium(o, walks, rise) {
         const x0 = o.x;
         const x1 = o.x + o.width;
@@ -334,16 +333,6 @@ export class ShipScene extends Phaser.Scene {
         const back = this.add.graphics().setDepth(DEPTH.decor);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
         this.worldLayer.add([back, front]);
-        const railZone = (x, y, h, forWalk) => {
-            const zone = this.add.zone(x, y, 4, h).setOrigin(0);
-            this.physics.add.existing(zone, true);
-            zone.forWalk = forWalk;
-            this.railGroup.add(zone);
-        };
-        const post = (x, y, h) => {
-            front.fillStyle(0x8fd3ff, 0.3).fillRect(x, y, 4, h);
-            front.fillStyle(0xd9a43b, 1).fillRect(x, y, 4, 2).fillRect(x + 1, y, 2, h);
-        };
 
         // The skylight dome, seen from below, under deck 10.
         const cx = (x0 + x1) / 2;
@@ -361,7 +350,6 @@ export class ShipScene extends Phaser.Scene {
 
         for (const spec of JSON.parse(walks)) {
             const { y } = spec;
-            const steps = spec.ends === 'step';
             // The balcony: blue patterned carpet on top, its cream front with a brass edge, a warm
             // cove light under it.
             back.fillStyle(0xf1e8cf, 1).fillRect(spec.x0, y, spec.x1 - spec.x0, 12);
@@ -378,27 +366,21 @@ export class ShipScene extends Phaser.Scene {
             front.fillStyle(0xd9a43b, 1).fillRect(spec.x0, railTop, spec.x1 - spec.x0, 2);
             for (let px = spec.x0; px <= spec.x1; px += 40) front.fillStyle(0xb08a2e, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
 
-            const walk = { x0: spec.x0, x1: spec.x1, y, rise: steps ? rise : null };
-            if (steps) {
-                // A step up at either end, out over the deck's floor: the same carpet, a riser
-                // face, a brass nosing. And the railing where the deck's floor stops.
-                walk.x0 -= reach;
-                walk.x1 += reach;
-                for (const sx of [spec.x0 - reach, spec.x1]) {
-                    back.fillStyle(0xb9a98a, 1).fillRect(sx, y, reach, rise);
-                    back.fillStyle(0x484a77, 1).fillRect(sx, y, reach, 3);
-                    back.fillStyle(0xd9a43b, 1).fillRect(sx, y + 3, reach, 1);
-                }
-                for (const ex of [spec.x0 - 4, spec.x1]) {
-                    post(ex, railTop, SIDEWALK.railHeight + rise);
-                    railZone(ex, railTop, SIDEWALK.railHeight + rise, null);
-                }
-            } else {
-                // A balcony with no way off but the stairs: railed at both ends.
-                for (const ex of [spec.x0 - 4, spec.x1]) {
-                    post(ex, railTop, SIDEWALK.railHeight);
-                    railZone(ex, railTop - 40, SIDEWALK.railHeight + 40, walk);
-                }
+            // A step up at either end, out over the deck's floor: the same carpet, a riser face, a
+            // brass nosing. And the railing where the deck's floor stops, a post she can jump over.
+            const walk = { x0: spec.x0 - reach, x1: spec.x1 + reach, y, rise };
+            for (const sx of [spec.x0 - reach, spec.x1]) {
+                back.fillStyle(0xb9a98a, 1).fillRect(sx, y, reach, rise);
+                back.fillStyle(0x484a77, 1).fillRect(sx, y, reach, 3);
+                back.fillStyle(0xd9a43b, 1).fillRect(sx, y + 3, reach, 1);
+            }
+            for (const ex of [spec.x0 - 4, spec.x1]) {
+                const h = SIDEWALK.railHeight + rise;
+                front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
+                front.fillStyle(0xd9a43b, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
+                const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
+                this.physics.add.existing(zone, true);
+                this.railGroup.add(zone);
             }
             // The side walk itself: solid only while she is on it, from above.
             walk.zone = this.add.zone(walk.x0, y, walk.x1 - walk.x0, 6).setOrigin(0);
@@ -486,11 +468,7 @@ export class ShipScene extends Phaser.Scene {
         this.onWalk = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
             this.onWalk?.zone === zone && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
-        this.physics.add.collider(p, this.railGroup, null, (_, zone) => (zone.forWalk ? this.onWalk === zone.forWalk : !this.onWalk));
-        // A small ▲ above her where ↑ would step her up onto a side walk.
-        this.stepHint = this.add.image(0, 0, 'arrow-up-on').setDepth(DEPTH.fx).setVisible(false);
-        this.worldLayer.add(this.stepHint);
-        this.tweens.add({ targets: this.stepHint, alpha: 0.35, duration: 450, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        this.physics.add.collider(p, this.railGroup, null, () => !this.onWalk);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
             if (!this.isDashing()) return true;
             this.smash(crate.x, crate.y);
@@ -611,7 +589,6 @@ export class ShipScene extends Phaser.Scene {
         this.sea.tilePositionX += dt * 12; // the ship is under way (§5.2)
 
         this.updateVacuums(dt);
-        if (this.mode !== 'play') this.stepHint.setVisible(false);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
         else if (this.mode === 'ladder') this.updateLadder(input, dt, time);
         else if (this.mode === 'stairs') this.updateStairs(input, dt, time);
@@ -656,8 +633,6 @@ export class ShipScene extends Phaser.Scene {
         if (input.downPressed && this.onWalk) this.stepDown();
         // Walking off a side walk's end steps her down onto the deck's floor.
         if (this.onWalk && (p.x < this.onWalk.x0 || p.x > this.onWalk.x1)) this.onWalk = null;
-        const hint = this.walkToStepOnto();
-        this.stepHint.setVisible(!!hint).setPosition(p.x, p.y - PLAYER.height - 10);
 
         if (input.dashPressed) this.tryDash(time);
 
@@ -800,7 +775,7 @@ export class ShipScene extends Phaser.Scene {
     walkToStepOnto() {
         const p = this.player;
         if (this.onWalk || !p.body.blocked.down) return null;
-        return this.walks.find(w => w.rise && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y - w.rise) < 3) || null;
+        return this.walks.find(w => p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y - w.rise) < 3) || null;
     }
 
     // ↑ by a side walk, on the deck's floor just below it: she steps up onto it.
@@ -820,7 +795,7 @@ export class ShipScene extends Phaser.Scene {
     stepDown() {
         const p = this.player;
         const w = this.onWalk;
-        const overOpen = !w.rise || (p.x > w.x0 + SIDEWALK.reach && p.x < w.x1 - SIDEWALK.reach);
+        const overOpen = p.x > w.x0 + SIDEWALK.reach && p.x < w.x1 - SIDEWALK.reach;
         this.onWalk = null;
         if (overOpen) p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
     }

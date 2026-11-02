@@ -27,9 +27,7 @@ CORES = {"forward": (74, 82), "midship": (102, 110), "aft": (194, 202)}
 # The atrium, open from its floor on deck 5 up through deck 9, between the forward and midship
 # cores, crossed by side walks (§5.3). The profile draws it about 10 m long; the game makes it 20 m,
 # two screens wide, the user's choice (2026-11-02): at 10 m it looked narrow next to its height.
-# MEZZANINE is the profile's "06a", a side walk half a deck above deck 6, in the atrium only.
 ATRIUM = {"span": (82, 102), "decks": (5, 9)}
-MEZZANINE = 6
 
 # Above the top deck.
 FUNNEL = (168, 196)
