@@ -815,7 +815,7 @@ export class ShipScene extends Phaser.Scene {
         p.body.enable = false;
         p.y = pool.y + SWIM.float;
         sfx.splash();
-        this.smash(p.x, pool.y);
+        this.splash(p.x, pool.y);
         this.pose('swim');
     }
 
@@ -1468,6 +1468,20 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // Water thrown up where she goes in: blue and white drops that rise and fall back.
+    splash(x, y) {
+        const colours = [0x8fd3ff, 0x4d9be6, 0xffffff];
+        for (let i = 0; i < 12; i++) {
+            const d = this.add.image(x, y, 'dot').setDepth(DEPTH.fx).setTint(colours[i % colours.length]);
+            this.worldLayer.add(d);
+            const dx = Phaser.Math.Between(-22, 22);
+            const rise = Phaser.Math.Between(10, 26);
+            this.tweens.add({ targets: d, x: x + dx, duration: 520, onComplete: () => d.destroy() });
+            this.tweens.add({ targets: d, y: y - rise, duration: 220, ease: 'Quad.easeOut', yoyo: true, hold: 20 });
+            this.tweens.add({ targets: d, alpha: 0, delay: 300, duration: 220 });
+        }
+    }
+
     // --- The dash --------------------------------------------------------------------------
 
     isDashing() {
@@ -1557,7 +1571,7 @@ export class ShipScene extends Phaser.Scene {
         this.scareFrom = { x: Phaser.Math.Clamp(this.player.x, this.hullMinX + 16, this.hullMaxX - 16), y: this.takeoffY };
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
-        this.smash(p.x, this.waterY);
+        this.splash(p.x, this.waterY);
         // Facing the camera, smiling and waving; only her top half shows above the water.
         const shown = PLAYER.cell - PLAYER.height + 32;
         this.pose('wave');

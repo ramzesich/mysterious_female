@@ -49,9 +49,10 @@ HER = {
         # move, facing the camera. Frames 1-5 have the hand up; the game loops those.
         "wave": [(f"wave/{i}.png", "feet") for i in range(8)],
         # Swimming in a pool (GAME_DESIGN.md §5.3): a side-on breaststroke, her head above the water,
-        # skeleton-v3 custom poses. Its lowest pixel goes on the bottom row; the game sets the
-        # waterline against it. (A front crawl was made first and is kept in swim-crawl/.)
-        "swim": [(f"swim-breaststroke/{i}.png", "feet") for i in range(8)],
+        # skeleton-v3 custom poses. Each frame keeps its place on the canvas: lining them up by their
+        # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A
+        # front crawl was made first and is kept in swim-crawl/.)
+        "swim": [(f"swim-breaststroke/{i}.png", "keep") for i in range(7)],
         "back": [("rotations/north.png", "keep")],
         # Bending down with her arms out to pick Bumbot up (a near-catch, GAME_DESIGN.md §4). Her
         # back foot stays planted, so each frame's lowest pixel goes on the floor.
