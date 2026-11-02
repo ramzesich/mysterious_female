@@ -353,13 +353,15 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   - **The atrium is 20 m long, two screens** (the user, 2026-11-02): NCL's profile draws it about
     10 m, which looked narrow next to its five levels, so the midship core stands 10 m further aft
     than on the profile. (The profile's mezzanine, deck 6a, was tried and dropped by the user.)
-  - **A side walk** is a balcony a step (8px) above its deck's floor, behind a glass-and-brass
-    railing, so it reads as a side walk. Its blue carpet and brass nosing start at the step (the
-    user found a 4px step not obvious; a 2.5D walkway and a ▲ hint above her were tried and
-    dropped). **↑ steps her up onto it, ↓ steps her down**: at its ends
-    onto the deck's floor, out over the open space over the railing and down. If she doesn't step
-    up, she meets the railing where the deck's floor ends and can **jump over it and drop**. The
-    glass elevator opens onto the side walks.
+  - **The atrium's side walks are level with their deck's floor** (the user, 2026-11-02): she
+    simply runs back and forth across the atrium, with the look kept (balcony fronts, the
+    glass-and-brass railing, the open space below). The step-up and jumping over the railings
+    there were tried and dropped: not intuitive, and ↓ near the top of the staircase dropped her
+    into the atrium. **Deck 12's walk over the pools keeps its step** (8px, ↑ up, ↓ down, a railing
+    to jump over into the pool) unless the user says otherwise.
+  - **The curving staircase winds round the glass elevator** (the user): each flight sweeps from
+    one side of it to the other, alternately behind it and in front of it, and the elevator's
+    dark column hides her while she is behind it.
   - **Drops keep the fall rule** (§5.6): one deck down is fine; longer, the camera lets her go,
     she falls out of the frame and comes back at the nearest checkpoint. (It is not a fright;
     overboard stays as it is.)
@@ -702,7 +704,7 @@ Nothing blocks the start of the build. These get settled along the way:
       `ship-structure`, placeholder art; 20 m long with a clearer step, fine for now (the user)**; **(2) deck 12's
       side walk over deck 11**, its glass side walls, and deck 11's pools with swimming: **built
       2026-11-02 on `ship-structure`, placeholder art; approved by the user**; **(3) the
-      stairs** (built 2026-11-02 on branch `stairs`, hand-drawn; ask the user to try them), made to look real (blue diamond-pattern carpet on the treads, brass handrails on
+      stairs** (built 2026-11-02 on branch `stairs`, hand-drawn; looks accepted by the user), made to look real (blue diamond-pattern carpet on the treads, brass handrails on
       dark wood, glass balustrades: `stairs_aft`, `round_stairs_central_area`); **(4) the bow and
       stern** shaped from the real ship (NCL's side profile in `reference/`, and the user's
       `front_from_outside`, `aft_from_outside`, `side_view_from_outside`): a raked bow, the bridge

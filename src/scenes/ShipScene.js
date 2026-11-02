@@ -8,8 +8,10 @@ import { TRUNK_INSIDE } from '../textures.js';
 const LADDER_TOP = 3;
 
 const DEPTH = {
-    sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, glassCar: 4.4, inGlassCar: 4.6, glassDoors: 4.8,
-    playerBehind: 5, solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, player: 9, fx: 10,
+    sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
+    glassShaft: 5.15, glassCar: 5.2, inGlassCar: 5.25, glassDoors: 5.3,
+    frontStairs: 5.4, onFrontStairs: 5.45, frontBalustrade: 5.5, walkFloor: 5.6,
+    solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, player: 9, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -118,11 +120,16 @@ export class ShipScene extends Phaser.Scene {
         this.walkGroup = this.physics.add.staticGroup();
         this.railGroup = this.physics.add.staticGroup();
         this.crates = this.physics.add.staticGroup();
-        const stairsGfx = this.add.graphics().setDepth(DEPTH.stairs);
         // A flight's balustrade is in front of her while she climbs it, behind her when she passes.
-        const balustradeGfx = this.add.graphics().setDepth(DEPTH.playerBehind + 0.5);
+        // The atrium's flights in front of the glass elevator are drawn on their own, over it.
+        const stairsGfx = {
+            back: this.add.graphics().setDepth(DEPTH.stairs),
+            backRail: this.add.graphics().setDepth(DEPTH.balustrade),
+            front: this.add.graphics().setDepth(DEPTH.frontStairs),
+            frontRail: this.add.graphics().setDepth(DEPTH.frontBalustrade),
+        };
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
-        this.worldLayer.add([decorGfx, stairsGfx, balustradeGfx]);
+        this.worldLayer.add([decorGfx, ...Object.values(stairsGfx)]);
 
         const objects = this.map.getObjectLayer('objects').objects;
         // Trunk doors take the place of any cabin door drawn where they stand.
@@ -165,10 +172,14 @@ export class ShipScene extends Phaser.Scene {
                 case 'stairs': {
                     const [a, b] = o.polyline.map(p => ({ x: o.x + p.x, y: o.y + p.y }));
                     const [bottom, top] = a.y > b.y ? [a, b] : [b, a];
-                    const flight = { name: o.name, bottom, top, card: prop(o, 'card', null), curve: prop(o, 'curve', false) };
+                    const flight = {
+                        name: o.name, bottom, top, card: prop(o, 'card', null),
+                        curve: prop(o, 'curve', false), front: prop(o, 'front', false),
+                    };
                     flight.length = this.flightLength(flight);
                     this.flights.push(flight);
-                    this.drawStairs(stairsGfx, balustradeGfx, flight);
+                    if (flight.front) this.drawStairs(stairsGfx.front, stairsGfx.frontRail, flight);
+                    else this.drawStairs(stairsGfx.back, stairsGfx.backRail, flight);
                     break;
                 }
 
@@ -274,7 +285,11 @@ export class ShipScene extends Phaser.Scene {
     drawStairs(g, front, f) {
         const look = f.curve ? STAIR_LOOKS.atrium : STAIR_LOOKS.core;
         const steps = Math.max(2, Math.round((f.bottom.y - f.top.y) / 8));
-        const at = t => this.stairPoint(f, t);
+        // On whole pixels, so nothing shimmers as the camera glides.
+        const at = t => {
+            const q = this.stairPoint(f, t);
+            return { x: Math.round(q.x), y: Math.round(q.y) };
+        };
         for (let i = 0; i < steps; i++) {
             const p0 = at(i / steps);
             const p1 = at((i + 1) / steps);
@@ -414,8 +429,8 @@ export class ShipScene extends Phaser.Scene {
         for (let k = -4; k <= 4; k++) {
             g.lineBetween(cx, top, cx + k * 30, top + 26 * Math.sqrt(Math.max(0, 1 - (k / 4.4) ** 2)));
         }
-        // Burl-wood pillars, floor to ceiling, clear of the glass elevator's shaft.
-        for (const px of [x0 + 22, cx - 130, cx + 120, x1 - 32]) {
+        // Burl-wood pillars, floor to ceiling, clear of the staircase round the glass elevator.
+        for (const px of [x0 + 22, cx - 250, cx + 240, x1 - 32]) {
             g.fillStyle(0x9e4539, 1).fillRect(px, top, 10, bottom - top);
             g.fillStyle(0xcd683d, 1).fillRect(px + 2, top, 3, bottom - top);
             for (const y of String(levels).split(',').map(Number)) g.fillStyle(0xd9a43b, 1).fillRect(px - 2, y + 4, 14, 3);
@@ -431,7 +446,7 @@ export class ShipScene extends Phaser.Scene {
         const y = o.y;
         const reach = SIDEWALK.reach;
         const look = SIDEWALK_LOOKS[style] || SIDEWALK_LOOKS.atrium;
-        const back = this.add.graphics().setDepth(DEPTH.decor + 0.2);
+        const back = this.add.graphics().setDepth(DEPTH.walkFloor);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
         this.worldLayer.add([back, front]);
 
@@ -441,29 +456,33 @@ export class ShipScene extends Phaser.Scene {
         for (let px = x0 + 2; px < x1; px += 6) back.fillStyle(look.fleck, 1).fillRect(px, y + 1, 2, 1);
         back.fillStyle(look.edge, 1).fillRect(x0, y + 3, x1 - x0, 1);
         if (look.light) back.fillStyle(look.light, 1).fillRect(x0, y + 12, x1 - x0, 2);
-        // A step up at either end, out over the deck's floor: the same floor, a riser, a nosing.
-        for (const sx of [x0 - reach, x1]) {
-            back.fillStyle(look.riser, 1).fillRect(sx, y, reach, rise);
-            back.fillStyle(look.floor, 1).fillRect(sx, y, reach, 3);
-            back.fillStyle(look.edge, 1).fillRect(sx, y + 3, reach, 1);
-        }
         // The railing in front of it: glass panels between posts, a handrail along the top.
         const railTop = y - SIDEWALK.railHeight;
         front.fillStyle(0x8fd3ff, 0.22).fillRect(x0, railTop, x1 - x0, SIDEWALK.railHeight);
         front.fillStyle(look.rail, 1).fillRect(x0, railTop, x1 - x0, 2);
         for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
-        // Where the deck's floor stops, at either end: a post she can jump over.
-        for (const ex of [x0 - 4, x1]) {
-            const h = SIDEWALK.railHeight + rise;
-            front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
-            front.fillStyle(look.rail, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
-            const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
-            this.physics.add.existing(zone, true);
-            this.railGroup.add(zone);
+        // A stepped side walk (deck 12's): a step up at either end, out over the deck's floor, and
+        // where the deck's floor stops, a post she can jump over. A level one (the atrium's) is
+        // just floor, and she runs across.
+        if (rise) {
+            for (const sx of [x0 - reach, x1]) {
+                back.fillStyle(look.riser, 1).fillRect(sx, y, reach, rise);
+                back.fillStyle(look.floor, 1).fillRect(sx, y, reach, 3);
+                back.fillStyle(look.edge, 1).fillRect(sx, y + 3, reach, 1);
+            }
+            for (const ex of [x0 - 4, x1]) {
+                const h = SIDEWALK.railHeight + rise;
+                front.fillStyle(0x8fd3ff, 0.3).fillRect(ex, railTop, 4, h);
+                front.fillStyle(look.rail, 1).fillRect(ex, railTop, 4, 2).fillRect(ex + 1, railTop, 2, h);
+                const zone = this.add.zone(ex, railTop, 4, h).setOrigin(0);
+                this.physics.add.existing(zone, true);
+                this.railGroup.add(zone);
+            }
         }
-        // The side walk itself: solid only while she is on it, from above.
-        const walk = { x0: x0 - reach, x1: x1 + reach, y, rise };
+        // The side walk itself, from above: a level one always, a stepped one while she is on it.
+        const walk = rise ? { x0: x0 - reach, x1: x1 + reach, y, rise } : { x0, x1, y, rise };
         walk.zone = this.add.zone(walk.x0, y, walk.x1 - walk.x0, 6).setOrigin(0);
+        walk.zone.walk = walk;
         this.physics.add.existing(walk.zone, true);
         this.walkGroup.add(walk.zone);
         this.walks.push(walk);
@@ -497,6 +516,10 @@ export class ShipScene extends Phaser.Scene {
             const rails = this.add.graphics().setDepth(DEPTH.decor);
             rails.fillStyle(0x9aa3ad, 1);
             for (const dx of [-23, 21]) rails.fillRect(o.x + dx, top, 2, lift.carY - top);
+            // The glass elevator's dark column, as in the user's photos: the curving staircase
+            // passes behind it, and it hides her there.
+            rails.fillStyle(0x313638, 1).setDepth(DEPTH.glassShaft).fillRect(o.x - 18, top, 36, lift.carY - top);
+            rails.fillStyle(0x625565, 1).fillRect(o.x - 12, top, 2, lift.carY - top).fillRect(o.x + 9, top, 1, lift.carY - top);
             lift.car = this.add.image(o.x, 0, 'glass-car').setOrigin(0.5, 1).setDepth(DEPTH.glassCar);
             this.worldLayer.add([rails, lift.car]);
             lift.leaves = this.makeLeaves(o.x, 'glass-leaf', DEPTH.glassDoors);
@@ -557,7 +580,7 @@ export class ShipScene extends Phaser.Scene {
         // its ends stop her only while she is not.
         this.onWalk = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
-            this.onWalk?.zone === zone && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
+            (!zone.walk.rise || this.onWalk === zone.walk) && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.railGroup, null, () => !this.onWalk);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
             if (!this.isDashing()) return true;
@@ -900,14 +923,14 @@ export class ShipScene extends Phaser.Scene {
     // After stairs, an elevator or a respawn: is she standing on a side walk?
     findWalk() {
         const p = this.player;
-        this.onWalk = this.walks.find(w => p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2) || null;
+        this.onWalk = this.walks.find(w => w.rise && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2) || null;
     }
 
     // The side walk she could step up onto from where she stands: on the deck's floor below its end.
     walkToStepOnto() {
         const p = this.player;
         if (this.onWalk || !p.body.blocked.down) return null;
-        return this.walks.find(w => p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y - w.rise) < 3) || null;
+        return this.walks.find(w => w.rise && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y - w.rise) < 3) || null;
     }
 
     // ↑ by a side walk, on the deck's floor just below it: she steps up onto it.
@@ -1297,7 +1320,7 @@ export class ShipScene extends Phaser.Scene {
         this.flight = flight;
         this.stairT = t;
         this.player.body.enable = false;
-        this.player.setDepth(DEPTH.playerBehind);
+        this.player.setDepth(flight.front ? DEPTH.onFrontStairs : DEPTH.playerBehind);
         this.placeOnStairs();
         return true;
     }

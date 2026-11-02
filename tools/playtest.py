@@ -395,8 +395,7 @@ def scenario_lift(b):
     b.shot("glass-riding")
     time.sleep(1.8)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == walk_y(9) and b.eval("!!window.__ship.onWalk"),
-                "and rides it to deck 9's side walk", s)
+    ok &= check(s["mode"] == "play" and s["y"] == walk_y(9), "and rides it to deck 9", s)
     return ok
 
 
@@ -410,56 +409,26 @@ def on_walk(b):
 
 def scenario_atrium(b):
     b.open("?reset&play&cards=all")
+    # The side walks are floor: she runs straight across the atrium.
     b.teleport(ATRIUM_X0 - 40, D7)
-    b.hold("right", 0.6)
+    b.hold("right", 7.6)
     s = b.state()
-    ok = check(s["y"] == D7 and s["x"] < ATRIUM_X0, "the railing stops her at the atrium's edge", s)
-    b.tap("up")
-    time.sleep(0.1)
-    s = b.state()
-    ok &= check(s["y"] == walk_y(7) and on_walk(b), "↑ steps her up onto the side walk", s)
-    b.shot("atrium-sidewalk")
-    b.hold("right", 7.8)
-    s = b.state()
-    ok &= check(s["y"] == D7 and s["x"] > ATRIUM_X1 and not on_walk(b), "she crosses and steps off at the far end", s)
+    ok = check(s["y"] == D7 and s["x"] > ATRIUM_X1, "she runs straight across the atrium on deck 7", s)
 
-    # Off the side walk over the open space: one deck down is fine...
-    b.teleport(ATRIUM_X0 - 10, D6)
-    b.tap("up")
-    b.hold("right", 1.2)
-    b.tap("down")
-    time.sleep(1.2)
-    s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == floor_y(5), "↓ over the open space drops her to deck 5", s)
-    # ...and over the railing from the deck's floor, too.
-    b.teleport(ATRIUM_X0 - 30, D6)
-    b.key("right", True)
-    b.tap("space", 0.3)
-    time.sleep(1.2)
-    b.key("right", False)
-    s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == floor_y(5), "or she jumps the railing down to deck 5", s)
-    # From higher up it is a long fall: the camera lets her go and she comes back.
-    b.teleport(ATRIUM_X0 - 10, floor_y(8))
-    b.tap("up")
-    b.hold("right", 1.2)
-    b.tap("down")
-    time.sleep(3.0)
-    s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
-                "from deck 8 it is a long fall, and she comes back (at the gangway: no checkpoints yet)", s)
-
-    # The curving staircase, from the atrium floor up onto deck 6's side walk.
-    # Holding ↑ carries her on through the landing within a frame, so note where she first lands.
-    b.teleport(ATRIUM_X0 + 2 * TILE, floor_y(5))
+    # The curving staircase, from the atrium floor up to deck 6 and back down.
+    flight = b.eval("window.__ship.flights.find(f => f.name === 'stairs-atrium-5-6').bottom")
+    b.teleport(flight["x"], floor_y(5))
     b.eval("""(() => { const s = window.__ship, leave = s.leaveLadderOrStairs.bind(s); window.__landed = null;
-        s.leaveLadderOrStairs = () => { leave(); window.__landed = window.__landed || { y: s.player.y, walk: !!s.onWalk }; };
+        s.leaveLadderOrStairs = () => { leave(); window.__landed = window.__landed || { y: s.player.y }; };
     })()""")
-    b.hold("up", 2.4)
+    b.hold("up", 3.2)
     landed = b.eval("window.__landed")
-    ok &= check(landed and landed["y"] == walk_y(6) and landed["walk"],
-                "the curving staircase climbs to deck 6's side walk", landed)
-
+    ok &= check(landed and landed["y"] == D6, "the curving staircase climbs to deck 6", landed)
+    top = b.eval("window.__ship.flights.find(f => f.name === 'stairs-atrium-5-6').top")
+    b.teleport(top["x"], D6)
+    b.hold("down", 3.2)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == floor_y(5), "and back down to the atrium floor", s)
     return ok
 
 
@@ -481,7 +450,7 @@ def scenario_pool(b):
     x0 = s["x"]
     b.hold("right", 1.0)
     s = b.state()
-    ok &= check(s["mode"] == "swim" and s["x"] > x0 + 40, "she swims front crawl", s)
+    ok &= check(s["mode"] == "swim" and s["x"] > x0 + 40, "she swims breaststroke", s)
     b.hold("right", 8.0)
     b.key("right", True)
     b.tap("space")
