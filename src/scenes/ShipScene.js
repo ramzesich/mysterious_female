@@ -218,6 +218,8 @@ export class ShipScene extends Phaser.Scene {
         // Trunk doors take the place of any cabin door drawn where they stand.
         this.trunkDoorSpots = objects.filter(o => o.type === 'trunk')
             .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
+        // So do crew doors (checkpoints): no cabin door crowds another door.
+        this.doorSpots = [...this.trunkDoorSpots, ...objects.filter(o => o.type === 'checkpoint').map(o => ({ x: o.x, y: o.y }))];
 
         for (const o of objects) {
             switch (o.type) {
@@ -357,7 +359,8 @@ export class ShipScene extends Phaser.Scene {
                     const last = stem[stem.length - 1];
                     const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
                     plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
-                    const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.solid + 0.1);
+                    // Over the shell: its bands run on onto the decks' fixed ends, which never cut away.
+                    const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.exterior + 0.02);
                     this.worldLayer.add([plating, sun]);
                     break;
                 }
@@ -370,6 +373,11 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
+                    if (prop(o, 'kind') === 'portico') this.drawPortico(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'dinewindows') this.drawDiningWindows(decorGfx, o, prop(o, 'xs', ''), prop(o, 'style', ''));
+                    if (prop(o, 'kind') === 'pillars') this.drawPillars(decorGfx, o, prop(o, 'xs', ''), prop(o, 'style', ''));
+                    if (prop(o, 'kind') === 'wavepanel') this.drawWavePanel(decorGfx, o);
+                    if (prop(o, 'kind') === 'downlights') this.drawDownlights(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -588,6 +596,106 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // --- Deck 5's rooms (§5.3, the user's photos) ------------------------------------------------
+
+    // La Cucina's entrance: a white marble portico, two columns under a pediment with its name.
+    drawPortico(g, o, text) {
+        const cx = o.x;
+        const y = o.y;
+        const marble = 0xefebe2, vein = 0xd6d0c3, edge = 0xb9b2a3;
+        for (const side of [-1, 1]) {
+            const x = cx + side * 23 - 5;
+            g.fillStyle(edge, 1).fillRect(x - 3, y - 9, 16, 9);
+            g.fillStyle(marble, 1).fillRect(x - 2, y - 8, 14, 7);
+            g.fillStyle(marble, 1).fillRect(x, y - 88, 10, 80);
+            g.fillStyle(vein, 1).fillRect(x + 3, y - 86, 1, 76).fillRect(x + 6, y - 86, 1, 76);
+            g.fillStyle(edge, 1).fillRect(x + 9, y - 88, 1, 80);
+            g.fillStyle(marble, 1).fillRect(x - 2, y - 93, 14, 5);
+            g.fillStyle(edge, 1).fillRect(x - 2, y - 89, 14, 1);
+        }
+        g.fillStyle(marble, 1).fillRect(cx - 38, y - 105, 76, 12);
+        g.fillStyle(edge, 1).fillRect(cx - 38, y - 94, 76, 1).fillRect(cx - 38, y - 105, 76, 1);
+        g.fillStyle(marble, 1).fillTriangle(cx - 40, y - 105, cx + 40, y - 105, cx, y - 121);
+        g.fillStyle(vein, 1).fillTriangle(cx - 30, y - 107, cx + 30, y - 107, cx, y - 118);
+        const name = this.add.text(cx, y - 99, text, {
+            fontFamily: 'Georgia, serif', fontSize: '8px', fontStyle: 'bold', color: '#4c3e24', resolution: 4,
+        }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+        this.worldLayer.add(name);
+    }
+
+    // Windows on the dining rooms' wall, the sea in them, with beige drapes (La Cucina) or white
+    // sheer curtains (the Four Seasons, the Seven Seas). Drawn on the back wall: the sea view is
+    // what those rooms are about (the user, 2026-11-03).
+    drawDiningWindows(g, o, xs, style) {
+        const y = o.y;
+        for (const cx of String(xs).split(',').filter(Boolean).map(Number)) {
+            const x = cx - 17, top = y - 100, w = 34, h = 50;
+            g.fillStyle(style === 'drapes' ? 0x46291f : 0xf4f4f4, 1).fillRect(x - 2, top - 2, w + 4, h + 4);
+            g.fillStyle(0x8fd3ff, 1).fillRect(x, top, w, h * 0.55);
+            g.fillStyle(0x4d9be6, 1).fillRect(x, top + h * 0.55, w, h * 0.45);
+            g.fillStyle(0xcfeeff, 1).fillRect(x + 3, top + 4, 8, 2);
+            g.fillStyle(0x8fd3ff, 1).fillRect(x, top + h * 0.55, w, 1);
+            if (style === 'drapes') {
+                g.fillStyle(0xd9c7a5, 1).fillRect(x - 6, top - 4, 9, h + 18).fillRect(x + w - 3, top - 4, 9, h + 18);
+                g.fillStyle(0xbfa985, 1).fillRect(x - 3, top - 4, 1, h + 18).fillRect(x + w + 1, top - 4, 1, h + 18);
+                g.fillStyle(0xc9b48f, 1).fillRect(x - 8, top - 8, w + 16, 6);
+            } else {
+                g.fillStyle(0xffffff, 0.6).fillRect(x - 3, top - 4, 8, h + 10).fillRect(x + w - 5, top - 4, 8, h + 10);
+                g.fillStyle(0xffffff, 1).fillRect(x - 6, top - 6, w + 12, 3);
+            }
+        }
+    }
+
+    // Pillars floor to ceiling: burl wood with a brass ring (the Four Seasons, like the atrium's), or
+    // white columns (the Seven Seas).
+    drawPillars(g, o, xs, style) {
+        const y = o.y, top = y - this.deckPitch + 16;
+        for (const cx of String(xs).split(',').filter(Boolean).map(Number)) {
+            if (style === 'burl') {
+                g.fillStyle(0x9e4539, 1).fillRect(cx - 5, top, 10, y - top);
+                g.fillStyle(0xcd683d, 1).fillRect(cx - 3, top, 3, y - top);
+                g.fillStyle(0xd9a43b, 1).fillRect(cx - 7, y - 96, 14, 3);
+            } else {
+                // Marble, like La Cucina's portico: fluted, outlined, a capital and a base.
+                const edge = 0xb9b2a3;
+                g.fillStyle(edge, 1).fillRect(cx - 8, top, 16, y - top);
+                g.fillStyle(0xefebe2, 1).fillRect(cx - 7, top + 8, 14, y - top - 17);
+                g.fillStyle(0xd6d0c3, 1).fillRect(cx - 3, top + 10, 1, y - top - 21).fillRect(cx + 1, top + 10, 1, y - top - 21);
+                g.fillStyle(0xd6d0c3, 1).fillRect(cx + 4, top + 8, 3, y - top - 17);
+                g.fillStyle(0xefebe2, 1).fillRect(cx - 10, top, 20, 7).fillRect(cx - 10, y - 9, 20, 9);
+                g.fillStyle(edge, 1).fillRect(cx - 10, top + 7, 20, 1).fillRect(cx - 10, y - 10, 20, 1);
+            }
+        }
+    }
+
+    // The Seven Seas' backlit glass panel: blue waves behind a lattice, in a gilded frame.
+    drawWavePanel(g, o) {
+        const x0 = o.x, x1 = o.x + o.width, top = o.y - 112, bottom = o.y - 14;
+        g.fillStyle(0xc9b48f, 1).fillRect(x0 - 3, top - 3, x1 - x0 + 6, bottom - top + 6);
+        const bands = [0x8fd3ff, 0x6fbcef, 0x4d9be6, 0x4d83cf, 0x4d65b4, 0x484a77];
+        const bandH = (bottom - top) / bands.length;
+        bands.forEach((c, i) => g.fillStyle(c, 1).fillRect(x0, top + i * bandH, x1 - x0, bandH + 1));
+        for (let k = 0; k < 7; k++) {
+            const base = top + 8 + k * 14;
+            for (let x = x0; x < x1; x += 1) {
+                const wy = base + Math.round(4 * Math.sin((x - x0) / 11 + k * 1.3));
+                g.fillStyle(k < 3 ? 0xffffff : 0xcfeeff, 0.75).fillRect(x, wy, 1, 2);
+            }
+        }
+        g.fillStyle(0xe8eaec, 0.7);
+        for (let x = x0 + 26; x < x1 - 4; x += 27) g.fillRect(x, top, 2, bottom - top);
+        for (let y = top + 24; y < bottom - 4; y += 25) g.fillRect(x0, y, x1 - x0, 2);
+    }
+
+    // Warm downlights along a room's ceiling.
+    drawDownlights(g, o) {
+        const y = o.y - this.deckPitch + 16;
+        for (let x = o.x + 24; x < o.x + o.width; x += 48) {
+            g.fillStyle(0xfbff86, 1).fillRect(x - 2, y, 4, 2);
+            g.fillStyle(0xfbff86, 0.18).fillRect(x - 5, y + 2, 10, 3);
+        }
+    }
+
     // Windows along a wall, looking out to sea: the bridge's.
     drawWindows(g, o) {
         for (let x = o.x; x + 18 <= o.x + o.width; x += 24) {
@@ -612,6 +720,7 @@ export class ShipScene extends Phaser.Scene {
     // wooden handrail, terracotta cabin doors every 4 m (192px), a few with vacation stickers, and
     // now and then a framed picture. All muted, so none of it reads as interactive.
     drawCabinDoors(g, o, first, last, coreBefore, coreAfter) {
+        const CABIN_DOOR_CLEAR = 100;    // px, centre to centre
         const ceiling = o.y - this.deckPitch + 16;
         g.fillStyle(0xf6f3ec, 1);
         g.fillRect(o.x, ceiling, o.width, 3);
@@ -632,7 +741,8 @@ export class ShipScene extends Phaser.Scene {
             // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
             if (n % 6 === 3 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
-            if (this.trunkDoorSpots.some(t => t.y === o.y && x < t.x + 22 && x + 30 > t.x - 22)) continue;
+            // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
+            if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));

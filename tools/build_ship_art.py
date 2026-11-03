@@ -11,6 +11,8 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
     doors-1/   object d9b861cb-8039-4298-8c0f-7a1fc4c43861, 16 doors, 85px canvas
     props-1/   object 54a30b88-6f96-4b26-9999-a023a0f2a8e2, 64 props, 32px canvas
     props-2/   object 96d63a62-142f-4bd2-bc2b-22f1232daf2f, 64 props, 32px canvas
+    props-3/   object a7fdf27e-6193-4767-a661-0a25d536c3df, 64 props, 32px canvas: restaurants,
+               café, lobby (2026-11-03, for deck 5)
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -75,6 +77,22 @@ PROPS_2 = {
 }
 for i, name in PROPS_2.items():
     PIECES[name] = ("props-2", i, None, {})
+# The third sheet: deck 5's restaurants, the atrium café, Guest Services (the user's photos).
+PROPS_3 = [
+    "table-dinner", "table-flowers", "table-long", "dining-chair", "dark-chair", "dark-table-lamp",
+    "cafe-table", "cafe-chair", "counter", "desk-screen", "brochure-stand", "menu-lectern", "easel-sign",
+    "rope-barrier", "service-station", "dessert-trolley", "wine-trolley", "palm", "orchid",
+    "espresso-machine", "pastry-case", "banquette", "armchair-cream", "bar-cart", "poster-beach",
+    "poster-fjord", "poster-city", "world-map", "wall-clock", "sconce-cream", "chandelier",
+    "lamp-pleated", "floor-lamp", "screen-divider", "high-chair", "breadsticks", "oil-vinegar",
+    "wine-glasses", "candle", "rose-vase", "wine-bottle", "luggage-trolley", "suitcases",
+    "info-screen", "info-kiosk", "water-dispenser", "sanitizer", "wet-floor-sign", "urn", "bust",
+    "olive-tree", "wine-barrel", "painting-ship", "mirror-gilt", "music-stand", "sideboard",
+    "ice-swan", "cake-stand", "coffee-tray", "fruit-bowl", "plate-stack", "flower-vase",
+    "umbrella-stand", "counter-bell",
+]
+for i, name in enumerate(PROPS_3):
+    PIECES[name] = ("props-3", i, None, {})
 
 
 def load(sheet, frame):
