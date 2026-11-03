@@ -582,18 +582,6 @@ def scenario_falls(b):
     return ok
 
 
-def scenario_checkpoint(b):
-    b.open("?reset&play")
-    b.hold("right", 1.6)  # passes the crew cabin door by the gangway, 4 m aft of the spawn
-    time.sleep(0.15)
-    b.shot("checkpoint-lit")
-    s = b.state()
-    ok = check("cp-gangway" in s["activated"], "passing a crew cabin door activates it", s)
-    saved = b.eval("JSON.parse(localStorage.getItem('bumbusik-save-v1')).lastCheckpoint")
-    ok &= check(saved == "cp-gangway", "the game auto-saves there", saved)
-    return ok
-
-
 def scenario_vacuum(b):
     b.open("?reset&play")
     b.teleport(x_of(120), D4)  # the deck 4 corridor the robot vacuum patrols

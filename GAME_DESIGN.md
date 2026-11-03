@@ -838,7 +838,7 @@ Nothing blocks the start of the build. These get settled along the way:
       the Art Gallery); Restaurant Reservations is on deck 5 (its desk there now has the look of
       the user's photo: burl-wood walls, a curved grey counter with a black top, brass letters).
       Bow to stern: the Internet Café (64-74), the Bliss Ultra Lounge (110-124: near-black, a
-      dotted carpet, a wooden dance floor, disco ball, DJ booth, purple velvet, a bar under a neon
+      dotted carpet throughout, disco ball, DJ booth, purple velvet, a bar under a neon
       sign), the Gift Shops and Perspectives Photo Studio (124-136), **the Windjammer Bar**
       (136-150, the user's photos: dark green walls, a coffered mahogany ceiling, brass lamps,
       planks, teal club chairs, the back bar, a chesterfield, the lit cabinet with a model ship
@@ -858,6 +858,12 @@ Nothing blocks the start of the build. These get settled along the way:
       "Windjammer Bar" plaque; **decks 3-7 all end at 254 m**, one straight wall at the stern (a
       deck sticking out past the one above left a strip of open terrace with half a wall), and the
       stage runs to it between its two curtains
+- [ ] **Open: checkpoints, removed for now** (the user, 2026-11-03): some sat too close together;
+      every checkpoint door is gone until the ship is split into unlockable areas (§5.5, key
+      cards), when they are placed again, spaced out. Until then a scare always brings her back
+      at the gangway. The last placements (deck, metres): gangway 4/71, d5-aft 5/250.2,
+      d6-promenade 6/193.4, d6-theatre 6/209, d7-casino 7/152, d9-linen 9/115, d10-bridge 10/44,
+      d11-pool 11/162, d11-buffet 11/191, d12-sports 12/175
 - [ ] **Next: populate the ship deck by deck, upward from deck 7** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small

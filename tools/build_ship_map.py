@@ -49,9 +49,8 @@ ROOM_LOOK = {
     "Library": (WALNUT, LIBRARY_CARPET),
     "Stardust Lounge theatre (Bumbot: washing)": (THEATRE_WALL, THEATRE_CARPET),
 }
-# Spans within a room with their own wall or floor: Bliss's wooden dance floor; the burl-wood wall
-# behind deck 5's Restaurant Reservations desk (the user's photo).
-DANCE_FLOOR = (6, 115.5, 121.0)
+# A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
+# (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
 FURNISHED = {4, 5, 6}     # decks furnished from the photos: no placeholder venue signs on them
@@ -254,8 +253,6 @@ def build_layers():
                     solid[floor][c] = DECK_PAINT
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
-                elif deck == DANCE_FLOOR[0] and DANCE_FLOOR[1] <= m < DANCE_FLOOR[2]:
-                    solid[floor][c] = WOOD_FLOOR
                 elif look:
                     solid[floor][c] = look[1]
                 elif deck == ATRIUM["decks"][0] and in_atrium(deck, m):
@@ -650,15 +647,9 @@ def build_objects():
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
-    # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
-    # A door needs a wall: the ones by the open decks stand just inside.
-    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 250.2), ("d6-promenade", 6, 193.4),
-                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
-                          ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
-                          ("d12-sports", 12, 175)]:
-        assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
-        assert clear_of_ladders(deck, m), f"checkpoint {name}: its door stands on a ladder"
-        add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
+    # Checkpoints (crew cabin doors, §5.5): none for now (the user, 2026-11-03): they come back
+    # when the ship is split into unlockable areas. Until then she always starts again at the
+    # gangway. The last placements are in GAME_DESIGN.md §8.
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
@@ -832,7 +823,7 @@ def build_objects():
         decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))
 
     # Deck 6, after NCL's plan and the user's photos (§5.3). Clear of its trunk doors (118, 125, 240),
-    # the promenade doors (111, 138, 162, 186) and the crew doors (193.4, 209).
+    # and the promenade doors (111, 138, 162, 186).
     # The Internet Café, at the end of the cabin corridor by the forward lobby.
     decor("cafe-doorway", "doorway", x_of(64) - 8, x_of(64) - 8, deck=6, text="Internet Café")
     for m in (65.6, 67.6, 69.6):
@@ -907,8 +898,7 @@ def build_objects():
     decor("stardust-stage", "stage", exact_x(244), stage_end, deck=6)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
-        if abs(m - 209) > 0.8:          # clear of the crew door
-            put(6, m, "theatre-seat-bg")
+        put(6, m, "theatre-seat-bg")
     put(6, 245.2, "drum-kit-bg")
     put(6, 246.7, "mic-stand-bg")
     put(6, 247.6, "guitar-bg")

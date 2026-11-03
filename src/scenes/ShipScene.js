@@ -455,8 +455,9 @@ export class ShipScene extends Phaser.Scene {
         front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
         boats.forEach((x, i) => {
             if (i % 3 !== 1) return;
-            // Hung from the handrail between two posts, over the rails.
-            const rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            // Hung from the handrail between two posts, over the rails, clear of the doors.
+            let rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            while (pr.doors.some(d => Math.abs(rx - d) < 60)) rx += 48;
             const ring = this.add.image(rx, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
             this.worldLayer.add(ring);
             this.shellSlopes.push({ deck: 6, gfx: ring });
@@ -749,15 +750,14 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // A room's open doorway off a corridor: a light wood frame, a brass plaque with its name beside.
+    // A room open off a corridor: a light wood post where the corridor's wall ends, the room's brass
+    // plaque on its own wall beside it.
     drawDoorway(g, o, text) {
-        const x = o.x, y = o.y, top = y - 92, ceiling = y - this.deckPitch + 16;
-        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, top, 6, y - top);
-        g.fillStyle(0xab947a, 1).fillRect(x + 2, top, 1, y - top);
-        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, top - ceiling);
-        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, top - 4, 40, 5);
+        const x = o.x, y = o.y, ceiling = y - this.deckPitch + 16;
+        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
+        g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
         if (text) {
-            const plaque = this.add.text(x + 22, top - 14, text, {
+            const plaque = this.add.text(x + 48, y - 96, text, {
                 fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',
                 backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
             }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
