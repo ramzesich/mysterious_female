@@ -25,8 +25,9 @@ COLS = SEA + LENGTH * PER_M + SEA
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
- VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL) = range(1, 19)
-TILE_COUNT = 18
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
+ LOBBY_CARPET, MAHOGANY) = range(1, 21)
+TILE_COUNT = 20
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -160,7 +161,7 @@ def build_layers():
             elif in_atrium(deck, m):
                 tile = ATRIUMWALL
             elif in_core(m):
-                tile = BACKWALL
+                tile = MAHOGANY  # the stair and elevator lobbies' panelling (the user's photos)
             elif not covered(deck, m) or kind in ("outdoor", "finale"):
                 tile = 0
             else:
@@ -175,7 +176,9 @@ def build_layers():
             # The floor's surface, from the user's photos (§5.3): the cabin corridors' blue-grey
             # wave carpet, the open decks' tan non-skid paint.
             # Open to the sky wins: a corridor's carpet stops where the deck above it ends.
-            if deck > 3 and not in_core(m):
+            if deck > 3 and (in_core(m) or kind == "start"):
+                solid[floor][c] = LOBBY_CARPET  # the lobbies' and the gangway's blue mosaic carpet
+            elif deck > 3:
                 if not covered(deck, m) or kind in ("outdoor", "finale"):
                     solid[floor][c] = DECK_PAINT
                 elif kind == "cabins":
@@ -285,7 +288,7 @@ def build_objects():
                  "properties": [prop("card", FLIGHT_CARD[deck + 1])]})
         for deck in PLAYABLE:
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
-                      [prop("text", f"DECK {deck}")]))
+                      [prop("text", f"DECK {deck}"), prop("style", "plaque")]))
 
     # Side walks (§5.3), level with their deck's floor so she simply runs along them (the user,
     # 2026-11-02): each deck from 6 to 9 across the atrium, and deck 12 over deck 11's pool area,
@@ -332,7 +335,8 @@ def build_objects():
         lift(core, col(a) * TILE + 18 * TILE, PLAYABLE)
     lift("atrium", x_of(sum(ATRIUM["span"]) / 2), range(ATRIUM["decks"][0], ATRIUM["decks"][1] + 1), glass=True)
 
-    # Venue signs; cabin doors along the corridors (background, muted).
+    # Venue signs; cabin doors along the corridors (background, muted), numbered from the bow.
+    cabins_before = {}
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":
             # Only under a ceiling: where the deck above ends, the corridor is an open terrace.
@@ -344,8 +348,12 @@ def build_objects():
                 else:
                     runs.append([c, c + 1])
             for c0, c1 in runs:
-                add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0,
-                         [prop("kind", "cabindoors")]))
+                doors = len(range(c0 * TILE + 60, c1 * TILE - 30, 192))
+                first = deck * 1000 + 1 + 2 * cabins_before.get(deck, 0)
+                cabins_before[deck] = cabins_before.get(deck, 0) + doors
+                add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
+                    prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + 2 * (doors - 1), "int"),
+                    prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))
         elif indoor(deck, (a + b) / 2):  # a sign needs a wall to hang on: none in the open air
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
@@ -423,10 +431,19 @@ def build_objects():
     add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
              [prop("kind", "windows")]))
 
-    # The gangway lobby, deck 4.
-    put(4, 61.5, "plant-bg")
-    put(4, 65, "picture-ship-bg", 44)
-    put(4, 69.4, "extinguisher-bg", 14)
+    # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
+    # end, a dark blue runner mat at the shell door, an exit sign over it, fire equipment.
+    add(area("gangway-lobby", "decor", x_of(60), floor_y(4), x_of(74) - x_of(60), 0, [prop("kind", "gangway"),
+        prop("matX0", x_of(61.3), "int"), prop("matX1", x_of(64.4), "int")]))
+    put(4, 62.85, "exit-sign-bg", 92)
+    put(4, 65.3, "picture-ship-bg", 44)
+    put(4, 66.6, "hose-cabinet-bg", 18)
+    put(4, 68.7, "plant-bg")
+    put(4, 70.1, "extinguisher-bg", 14)
+    # A framed picture in each stair and elevator lobby, left of its stairs.
+    for core, (a, _) in CORES.items():
+        for deck in PLAYABLE:
+            put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
     # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
     # dresser, bar stools along the bar.
     put(6, 112, "club-chair-side-bg")
@@ -539,6 +556,22 @@ def draw_tile(tile_id):
         rect(0, 0, 15, 2, hex_rgba("#cd683d"))
         rect(0, 0, 15, 0, hex_rgba("#e6904e"))
         rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == LOBBY_CARPET:
+        # The lobbies' carpet: deep blue with a mosaic of lighter triangles (the user's photos).
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#323353"))
+        for x in (1, 6, 11):
+            px[2][x] = px[2][x + 1] = px[2][x + 2] = hex_rgba("#4d9be6")
+            px[1][x + 1] = hex_rgba("#4d9be6")
+        for x in (4, 9, 14):
+            px[0][x] = hex_rgba("#0b8a8f")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == MAHOGANY:
+        # The lobbies' mahogany panelling: a dark red-brown with a faint grain.
+        rect(0, 0, 15, 15, hex_rgba("#7a3045"))
+        for x, y in ((3, 2), (3, 3), (3, 4), (9, 8), (9, 9), (12, 12), (12, 13), (6, 14)):
+            px[y][x] = hex_rgba("#6e2727")
+        rect(0, 0, 0, 15, hex_rgba("#6e2727"))
     elif tile_id == HULL:
         # The ship's white outer plating, a seam along its foot.
         rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))

@@ -32,6 +32,8 @@ const PALETTE = {
     M: '#6c737c',
     a: '#f28c28', // trunk arrow lamp, lit
     A: '#ffd98a',
+    Z: '#ab947a', // the elevators' bronze doors
+    z: '#966c6c',
     q: 'rgba(170, 220, 240, 0.35)', // glass
     Q: 'rgba(220, 245, 255, 0.6)',
 };
@@ -155,11 +157,12 @@ function grid(w, h, pick) {
     return rows;
 }
 
-// The steel frame round a core elevator's doorway, 40x76.
-const liftFrameRows = () => grid(40, 76, (x, y) => (x <= 1 || x >= 38 || y <= 1 ? (y === 0 || x === 0 || x === 39 ? 'd' : 'm') : '.'));
+// The brass frame round a core elevator's doorway, 40x76 (the user's photos).
+const liftFrameRows = () => grid(40, 76, (x, y) => (x <= 1 || x >= 38 || y <= 1 ? (y === 0 || x === 0 || x === 39 ? 'C' : 'e') : '.'));
 // Inside the car, lit: warm walls and a handrail.
 const liftCarRows = () => grid(36, 74, (x, y) => (y === 44 || y === 45 ? 'm' : y < 3 ? 'L' : 'Y'));
-const liftLeafRows = () => grid(18, 74, (x, y) => (y === 0 || y === 73 ? 'm' : 'p'));
+// Bronze leaves, brushed in vertical strokes.
+const liftLeafRows = () => grid(18, 74, (x, y) => (y === 0 || y === 73 ? 'C' : x % 6 === 2 ? 'z' : 'Z'));
 
 // The glass car, 64x80, about a 2 m cylinder at her scale (the user's photos): a slim steel frame,
 // a roof, and glass all round, its curve caught in two highlights. Its floor is the bottom 3 rows,

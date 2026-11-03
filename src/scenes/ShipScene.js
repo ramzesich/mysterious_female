@@ -254,9 +254,12 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'sign': {
+                    // A brass plaque in the lobbies (the deck number), a paper sign elsewhere.
+                    const plaque = prop(o, 'style', '') === 'plaque';
                     const text = this.add.text(o.x, o.y, prop(o, 'text', ''), {
-                        fontFamily: 'Verdana, sans-serif', fontSize: '7px', color: '#8f846f',
-                        backgroundColor: '#f3ecdd', padding: { x: 3, y: 2 }, resolution: 4,
+                        fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: plaque ? 'bold' : 'normal',
+                        color: plaque ? '#45293f' : '#8f846f', backgroundColor: plaque ? '#d9a43b' : '#f3ecdd',
+                        padding: { x: 3, y: 2 }, resolution: 4,
                     }).setOrigin(0.5).setDepth(DEPTH.decor);
                     this.worldLayer.add(text);
                     break;
@@ -286,8 +289,11 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
+                    if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o, prop(o, 'matX0', o.x), prop(o, 'matX1', o.x));
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
-                    if (prop(o, 'kind') === 'cabindoors') this.drawCabinDoors(decorGfx, o);
+                    if (prop(o, 'kind') === 'cabindoors') {
+                        this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
+                    }
                     break;
             }
         }
@@ -362,6 +368,19 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // The gangway lobby (the user's photo): cream panelling, a heavy fire door held open against
+    // the wall at either end, and a dark blue runner mat on the carpet by the shell door.
+    drawGangway(g, o, matX0, matX1) {
+        const top = o.y - this.deckPitch + 16;
+        for (let x = o.x + 24; x < o.x + o.width; x += 32) g.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
+        for (const [x, dir] of [[o.x + 8, 1], [o.x + o.width - 14, -1]]) {
+            g.fillStyle(0xd9cdb6, 1).fillRect(x, o.y - 76, 6, 76);
+            g.fillStyle(0xb9ab90, 1).fillRect(dir > 0 ? x + 5 : x, o.y - 76, 1, 76);
+            g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? x + 6 : x - 2, o.y - 30, 2, 2);  // the hook holding it
+        }
+        g.fillStyle(0x323353, 1).fillRect(matX0, o.y - 2, matX1 - matX0, 2);
+    }
+
     // Windows along a wall, looking out to sea: the bridge's.
     drawWindows(g, o) {
         for (let x = o.x; x + 18 <= o.x + o.width; x += 24) {
@@ -385,7 +404,7 @@ export class ShipScene extends Phaser.Scene {
     // A cabin corridor, as in the user's photos (§5.3): a white ceiling with round downlights, a
     // wooden handrail, terracotta cabin doors every 4 m (192px), a few with vacation stickers, and
     // now and then a framed picture. All muted, so none of it reads as interactive.
-    drawCabinDoors(g, o) {
+    drawCabinDoors(g, o, first, last, coreBefore, coreAfter) {
         const ceiling = o.y - this.deckPitch + 16;
         g.fillStyle(0xf6f3ec, 1);
         g.fillRect(o.x, ceiling, o.width, 3);
@@ -403,11 +422,32 @@ export class ShipScene extends Phaser.Scene {
             if (n % 3 === 1 && gap + 20 < o.x + o.width) {
                 parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
+            // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
+            if (n % 6 === 3 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             if (this.trunkDoorSpots.some(t => t.y === o.y && x < t.x + 22 && x + 30 > t.x - 22)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
+            // Now and then a housekeeping trolley or a room-service cart left by a door.
+            const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
+            if (cart && x + 64 < o.x + o.width) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
         }
+        // By a stair core, a brass plaque with the corridor's cabin numbers and an arrow along it.
+        // (The arrow is drawn: at this size the font's arrow comes out blank.)
+        const plaque = (x, dir) => {
+            const text = this.add.text(x, o.y - 96, `${first}\u2013${last}`, {
+                fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
+                backgroundColor: '#d9a43b', padding: { left: dir < 0 ? 8 : 2, right: dir > 0 ? 8 : 2, top: 1, bottom: 1 },
+                resolution: 4,
+            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.1);
+            const tip = x + (dir * text.width) / 2 - dir * 2;
+            const arrow = this.add.triangle(0, 0, tip, o.y - 96, tip - dir * 4, o.y - 99, tip - dir * 4, o.y - 93, 0x45293f)
+                .setOrigin(0).setDepth(DEPTH.decor + 0.2);
+            parts.push(text, arrow);
+        };
+        if (coreBefore) plaque(o.x + 36, 1);
+        if (coreAfter) plaque(o.x + o.width - 36, -1);
         this.worldLayer.add(parts);
     }
 
