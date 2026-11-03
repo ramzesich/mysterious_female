@@ -272,6 +272,10 @@ export class ShipScene extends Phaser.Scene {
                     };
                     break;
 
+                case 'deckends':
+                    this.drawDeckEnds(JSON.parse(prop(o, 'ends', '[]')));
+                    break;
+
                 case 'livery': {
                     // The bow's hull (§5.3): white plating with a smooth edge along the raked stem,
                     // over the tiles' steps, and the ship's sun on it, built with the map.
@@ -379,6 +383,20 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? x + 6 : x - 2, o.y - 30, 2, 2);  // the hook holding it
         }
         g.fillStyle(0x323353, 1).fillRect(matX0, o.y - 2, matX1 - matX0, 2);
+    }
+
+    // Where a deck's indoors meets the ship's outer plating (§5.3): the end wall recedes in a soft
+    // shadow along the corridor's end, and a dark cutaway line marks the hull.
+    drawDeckEnds(ends) {
+        const shade = this.add.graphics().setDepth(DEPTH.back + 0.5);
+        const cut = this.add.graphics().setDepth(DEPTH.solid + 0.2);
+        this.worldLayer.add([shade, cut]);
+        for (const { x, y0, y1, dir } of ends) {
+            for (let i = 0; i < 12; i++) {
+                shade.fillStyle(0x2e222f, 0.11 * (1 - i / 12)).fillRect(dir > 0 ? x + i : x - 1 - i, y0, 1, y1 - y0 - 16);
+            }
+            cut.fillStyle(0x3e3546, 1).fillRect(dir > 0 ? x : x - 2, y0 - 16, 2, y1 - y0 + 16);
+        }
     }
 
     // Windows along a wall, looking out to sea: the bridge's.
@@ -682,18 +700,21 @@ export class ShipScene extends Phaser.Scene {
         this.hudCount = this.add.text(62, 22, '', textStyle);
         this.dashBarBack = this.add.rectangle(24, 62, 164, 12, 0x1d2b53).setOrigin(0);
         this.dashBar = this.add.rectangle(26, 64, 160, 8, 0xf28c28).setOrigin(0);
+        // Her speech bubble and the messages over her live in the world, so they move exactly with
+        // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
         this.bubble = this.add.text(0, 0, DASH.shout, {
-            fontFamily: 'Verdana, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#c8343f',
-            backgroundColor: '#ffffff', padding: { x: 10, y: 6 },
-        }).setOrigin(0.5, 1);
+            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#c8343f',
+            backgroundColor: '#ffffff', padding: { x: 5, y: 3 }, resolution: 4,
+        }).setOrigin(0.5, 1).setDepth(DEPTH.fx + 1);
         this.alert = this.add.text(0, 0, '', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#1d2b53',
-            backgroundColor: '#ffffff', padding: { x: 8, y: 4 },
-        }).setOrigin(0.5, 1).setVisible(false);
+            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#1d2b53',
+            backgroundColor: '#ffffff', padding: { x: 4, y: 2 }, resolution: 4,
+        }).setOrigin(0.5, 1).setVisible(false).setDepth(DEPTH.fx + 1);
+        this.worldLayer.add([this.bubble, this.alert]);
         this.fade = this.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422).setOrigin(0).setAlpha(0);
         this.debugText = this.add.text(VIEW.width - 12, 12, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff' })
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
-        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.bubble, this.alert, this.fade, this.debugText]);
+        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText]);
         this.refreshHud();
     }
 
@@ -1796,13 +1817,11 @@ export class ShipScene extends Phaser.Scene {
     // --- Screen-space overlays ------------------------------------------------------------------
 
     updateOverlays() {
-        const cam = this.cameras.main;
         const p = this.player;
-        const sx = (p.x - cam.worldView.x) * cam.zoom;
-        const sy = (p.y - PLAYER.height - 6 - cam.worldView.y) * cam.zoom;
-        // On whole pixels: between them the text smears as she dashes.
-        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(Math.round(sx), Math.round(sy));
-        this.alert.setPosition(Math.round(sx), Math.round(sy));
+        const x = Math.round(p.x);
+        const y = Math.round(p.y - PLAYER.height - 3);
+        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(x, y);
+        this.alert.setPosition(x, y);
         if (this.debugText.visible) {
             this.debugText.setText(`${this.mode}  x ${p.x.toFixed(0)}  y ${p.y.toFixed(0)}  takeoff ${this.takeoffY?.toFixed(0)}`);
         }

@@ -26,8 +26,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
- LOBBY_CARPET, MAHOGANY) = range(1, 21)
-TILE_COUNT = 20
+ LOBBY_CARPET, MAHOGANY, CABIN_WALL) = range(1, 22)
+TILE_COUNT = 21
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -49,7 +49,7 @@ POOLS = [(119, 131), (134, 140)]
 POOL_DEPTH = 2 * TILE
 
 
-WALL_FOR = {"venue": VENUEWALL, "cabins": BACKWALL, "crew": CREWWALL, "start": BACKWALL}
+WALL_FOR = {"venue": VENUEWALL, "cabins": CABIN_WALL, "crew": CREWWALL, "start": BACKWALL}
 
 
 def col(m):
@@ -168,7 +168,7 @@ def build_layers():
                 tile = WALL_FOR.get(kind, BACKWALL)
             if tile:
                 fill(back, c, c, floor - DECK_ROWS + 1, floor - 1, tile)
-                if tile in (BACKWALL, VENUEWALL, CREWWALL):
+                if tile in (BACKWALL, VENUEWALL, CREWWALL, CABIN_WALL):
                     back[floor - 1][c] = WAINSCOT
             if deck == 12 and covered(12, m):
                 solid[ROOF_ROW][c] = STEEL
@@ -410,6 +410,17 @@ def build_objects():
             props.append(prop("flip", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
 
+    # Where each deck's indoors meets the outer plating: the game finishes the ends (§5.3).
+    ends = []
+    for deck in DECKS:
+        fwd, aft = EXTENT[deck]
+        c0, c1 = col(fwd), col(aft) - 1
+        for c, inward in ((c0, 1), (c1, -1)):
+            if covered(deck, metres(c + inward)):
+                ends.append({"x": (c + 1) * TILE if inward == 1 else c * TILE, "dir": inward,
+                             "y0": (FLOOR_ROW[deck] - DECK_ROWS + 1) * TILE, "y1": (FLOOR_ROW[deck] + 1) * TILE})
+    add(area("deck-ends", "deckends", 0, 0, 0, 0, [prop("ends", json.dumps(ends))]))
+
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
     lx0, ly0, lx1, ly1 = livery_box()
     stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
@@ -573,10 +584,14 @@ def draw_tile(tile_id):
             px[y][x] = hex_rgba("#6e2727")
         rect(0, 0, 0, 15, hex_rgba("#6e2727"))
     elif tile_id == HULL:
-        # The ship's white outer plating, a seam along its foot.
+        # The ship's white outer plating, clean (seams on every tile read as stripes).
         rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
-        rect(0, 15, 15, 15, hex_rgba("#e3e7ea"))
-        px[4][3] = px[12][11] = hex_rgba("#e3e7ea")
+    elif tile_id == CABIN_WALL:
+        # The cabin corridors' wallpaper: the cream wall with a faint diamond lattice, a shade off it.
+        rect(0, 0, 15, 15, hex_rgba("#e9dfcc"))
+        for i in range(8):
+            for x, y in ((i, 7 - i), (8 + i, i), (i, 8 + i), (8 + i, 15 - i)):
+                px[y][x] = hex_rgba("#e4d9c4")
     elif tile_id == POOL_TILE:
         # A pool's tiled side and bottom: pale blue tiles with white grout.
         rect(0, 0, 15, 15, hex_rgba("#8fd3ff"))
