@@ -320,6 +320,25 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'lifeboat': {
+                    // A lifeboat on the ship's side (§5.3), on deck 7's wall: it fades with the wall
+                    // when she is on deck 7. Two white davits stand behind it, their cables down to
+                    // the boat's hooks (52 and 268 px along it).
+                    const top = o.y - 118;
+                    const g = this.add.graphics().setDepth(DEPTH.exterior + 0.06);
+                    for (const hx of [52, 268]) {
+                        const x = o.x + hx;
+                        g.fillStyle(0xffffff, 1).fillRect(x - 3, o.y - 136, 6, 136);
+                        g.fillStyle(0xc7dcd0, 1).fillRect(x + 1, o.y - 136, 2, 136);
+                        g.fillStyle(0xffffff, 1).fillRect(x - 9, o.y - 140, 18, 6);
+                        g.fillStyle(0x3e3546, 1).fillRect(x - 1, o.y - 134, 1, top + 14 - (o.y - 134));
+                    }
+                    const boat = this.add.image(o.x, top, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+                    this.worldLayer.add([g, boat]);
+                    this.shellSlopes.push({ deck: 7, gfx: g }, { deck: 7, gfx: boat });
+                    break;
+                }
+
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o, prop(o, 'matX0', o.x), prop(o, 'matX1', o.x));

@@ -473,11 +473,15 @@ little shaded.
 - **Lifeboats:** the real ones (the user's photos) have a **red-orange canopy roof over a white
   hull**, hanging from white davits; seen from below on the promenade, white undersides with
   propellers. Three PixelLab tries from text (1 generation each, `create_map_object` 400x100 side
-  view, kept in `assets/source/ship/lifeboats/`) were all rejected. **Next try: from the user's
-  photos as reference** (the user asked: cut them out, zoom, send as a reference):
-  `reference/photos/lifeboat-ref.png` (three boats side-on, from `side_view_from_outside`) and
-  `reference/photos/lifeboat-ref-2.jpg` (overhead, from `deck_6_promenade (1)`, no people);
-  both git-ignored, never committed.
+  view, kept in `assets/source/ship/lifeboats/`) were all rejected; so were three
+  `image_to_pixelart` tries from the user's photo crop (`photo-try-4..6`, 1 generation each: the
+  crop is too soft, they came out as red and white stripes). **Approved (2026-11-03): drawn by
+  hand**, `tools/draw_lifeboat.py` (free; writes `assets/ship/lifeboat.png`): 300x100, red canopy
+  over a white hull, a row of small windows, the hatch amidships, the steering cupola aft, a
+  release hook at each end. **Size approved**: 300 px, about five times her height. They hang on
+  deck 7's wall every 9 m from 88 to 215 m (15 boats), on white davits (placeholder posts, to be
+  shaped with the promenade), and fade with deck 7's cut-away. The photo crops
+  (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
 - The sun livery stays on the bow for now (the user, "then we'll see"); on the real ship it sits
   about 40 m from the bow, low on the hull.
 
@@ -785,10 +789,8 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] **Elevators fetch smoothly** (2026-11-03, merged): a car on another deck comes to her
       first, out of sight in a core, the panel counting it in; no more jumps
 - [ ] **Now: the outer shell, branch `outer-shell`** (§5.3 "The outer shell"): steps 1 and 2 built
-      and committed (not merged; pushed for safety). **Start the next session with step 3: the
-      lifeboats** from the user's photo references (`reference/photos/lifeboat-ref*.png/jpg`;
-      PixelLab, state the cost first: e.g. `image_to_pixelart` or a map object with the crop as
-      reference), **then deck 6's two routes** (rooms and promenade, doors between, as decided
+      and committed (not merged; pushed for safety). Step 3: the lifeboats are drawn and
+      hang on the side (approved, size too); **next, deck 6's two routes** (rooms and promenade, doors between, as decided
       in §5.3). Then show the user, then merge
 - [ ] **Then: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
@@ -809,7 +811,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1852 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1849 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

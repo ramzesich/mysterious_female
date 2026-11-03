@@ -629,6 +629,10 @@ def build_objects():
     stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
+    # The lifeboats (§5.3), hanging high on the ship's side at deck 7's level along the promenade, each
+    # from a pair of white davits. The point is the boat's left end, at deck 7's floor.
+    for m in range(88, 216, 9):
+        add(point(f"lifeboat-{m}", "lifeboat", x_of(m), floor_y(7)))
     # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
     for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
         put(7, 0, "railing-bg", x=x)
