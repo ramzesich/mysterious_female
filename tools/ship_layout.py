@@ -19,8 +19,14 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
     3: (20, 254), 4: (20, 255), 5: (20, 255), 6: (20, 255), 7: (2.5, 254),
-    8: (20.5, 251.5), 9: (23, 249.5), 10: (24, 247), 11: (24, 244), 12: (31, 233),
+    8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
 }
+
+# The superstructure's front, measured row by row off the profile (2026-11-03): one steady slope
+# from deck 7's floor up to the bridge, which stands near-upright on deck 10. Where a deck's own
+# floor runs further forward than its front wall (deck 7's forecastle, deck 11's open roof over the
+# bridge), the wall's foot is given here; the shell slopes from it up to the deck above.
+FRONT_WALL = {7: 18.7, 11: 29.5}
 
 # The bow (§5.3): the raked stem, metres from the bow at each deck's floor and at the keel, leaning
 # forward as it rises to its tip at deck 7. Between it and `block`, the hull is drawn from outside:
@@ -55,23 +61,23 @@ VENUES = [
     (11, 160, 194, "Garden Café buffet, Ice Cream Bar (Bumbot: fish)", "venue"),
     (11, 202, 244, "Great Outdoors diner (finale)", "finale"),
 
-    (10, 24, 40, "Bridge (Bumbot: controls)", "crew"),
+    (10, 25, 40, "Bridge (Bumbot: controls)", "crew"),
     (10, 40, 74, "Cabins", "cabins"),
     (10, 82, 102, "Cabins", "cabins"),
     (10, 110, 194, "Cabins", "cabins"),
     (10, 202, 247, "Cabins", "cabins"),
 
-    (9, 23, 74, "Cabins", "cabins"),
+    (9, 23.6, 74, "Cabins", "cabins"),
     (9, 110, 116, "Linen room (Bumbot: asleep)", "crew"),
     (9, 106, 194, "Cabins", "cabins"),
     (9, 202, 249.5, "Cabins", "cabins"),
 
-    (8, 20.5, 74, "Cabins", "cabins"),
+    (8, 21.4, 74, "Cabins", "cabins"),
     (8, 110, 194, "Cabins", "cabins"),
     (8, 202, 251.5, "Cabins", "cabins"),
 
-    (7, 2.5, 20.5, "Mooring deck", "outdoor"),
-    (7, 20.5, 60, "Kids' and teen clubs", "venue"),
+    (7, 2.5, 21.4, "Mooring deck", "outdoor"),
+    (7, 21.4, 60, "Kids' and teen clubs", "venue"),
     (7, 110, 150, "Magnum's bar, art gallery", "venue"),
     (7, 150, 194, "Casino, duty-free shops", "venue"),
     (7, 222, 254, "Theatre balcony", "venue"),

@@ -15,7 +15,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -50,8 +50,11 @@ DECK_PITCH = DECK_ROWS * TILE
 TOP_FLOOR_ROW = 3 * DECK_ROWS - 1          # deck 12's floor; above it, the roof, funnel and mast
 FLOOR_ROW = {d: TOP_FLOOR_ROW + (12 - d) * DECK_ROWS for d in DECKS}
 ROOF_ROW = FLOOR_ROW[12] - DECK_ROWS       # the roof over deck 12's indoor rooms
-WATER_ROW = FLOOR_ROW[3] - 1               # the sea surface: deck 3 sits at the waterline
-ROWS = FLOOR_ROW[3] + 10                   # the hull below deck 3, down past the keel
+# The sea surface: two decks of hull (crew decks 1 and 2) show above it below deck 3, as in the
+# user's photo of the whole ship, where the hull below the promenade is nearly five decks tall.
+HULL_DECKS_BELOW = 2
+WATER_ROW = FLOOR_ROW[3] + HULL_DECKS_BELOW * DECK_ROWS - 1
+ROWS = WATER_ROW + 11                      # the hull below the waterline, down past the keel
 
 # The card each flight of stairs needs, by the deck it climbs to: her own crew card covers decks
 # 4-6, the Hotel card everything above (§6.2).
@@ -321,11 +324,10 @@ def shell_slopes():
     for deck in DECKS[:-1]:
         floor_end, top_end = EXTENT[deck], EXTENT[deck + 1]
         for end, i, sign in (("fwd", 0, 1), ("aft", 1, -1)):
-            step = (top_end[i] - floor_end[i]) * sign
-            if 0 < step <= SLOPE_MAX and not (deck == 7 and end == "fwd"):
-                slopes.append({"deck": deck, "end": end,
-                               "x0": col(floor_end[i]) * TILE if end == "fwd" else col(floor_end[i]) * TILE,
-                               "x1": col(top_end[i]) * TILE,
+            foot = FRONT_WALL.get(deck, floor_end[i]) if end == "fwd" else floor_end[i]
+            step = (top_end[i] - foot) * sign
+            if 0 < step <= SLOPE_MAX:
+                slopes.append({"deck": deck, "end": end, "x0": col(foot) * TILE, "x1": col(top_end[i]) * TILE,
                                "yTop": (FLOOR_ROW[deck] - DECK_ROWS + 1) * TILE, "yFloor": FLOOR_ROW[deck] * TILE})
     return slopes
 
@@ -462,7 +464,7 @@ def build_objects():
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 29, "bat", -1),
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 30, "bat", -1),
                                             ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
@@ -520,7 +522,7 @@ def build_objects():
         prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
         prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
     # The bridge's windows on deck 10, looking out to sea.
-    add(area("bridge-windows", "decor", x_of(27.6), floor_y(10) - 104, x_of(39) - x_of(27.6), 30,
+    add(area("bridge-windows", "decor", x_of(28.6), floor_y(10) - 104, x_of(39) - x_of(28.6), 30,
              [prop("kind", "windows")]))
 
     # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
@@ -801,7 +803,7 @@ def build_livery():
     # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
     # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
     # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
-    cx, cy = x_of(13) - x0, round(h * 0.3)
+    cx, cy = x_of(13) - x0, round((FLOOR_ROW[3] - FLOOR_ROW[7] - 1) * TILE * 0.3)  # high on the bow, as approved
     r = 72
 
     def ray(angle, base, tip, width, colour):
