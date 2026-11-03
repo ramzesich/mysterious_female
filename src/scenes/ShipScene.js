@@ -116,6 +116,18 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
             return { deck: s.deck, gfx: g };
         });
+        // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
+        // each on its deck's wall, fading with it, or always there ("fixed").
+        const colour = c => Phaser.Display.Color.HexStringToColor(c).color;
+        for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
+            const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
+            for (const s of shapes) {
+                if (s[0] === 'r') g.fillStyle(colour(s[5]), 1).fillRect(s[1], s[2], s[3], s[4]);
+                else if (s[0] === 'c') g.fillStyle(colour(s[4]), 1).fillCircle(s[1], s[2], s[3]);
+                else g.fillStyle(colour(s[2]), 1).fillPoints(s[1].map(([x, y]) => ({ x, y })), true);
+            }
+            this.shellSlopes.push({ deck: owner === 'fixed' ? null : Number(owner), gfx: g });
+        }
 
         this.solidLayer.setCollisionByExclusion([-1]);
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
@@ -1132,7 +1144,7 @@ export class ShipScene extends Phaser.Scene {
             for (const t of this.shellTiles[deck]) t.alpha = alpha;
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
-        for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(this.shellAlpha[deck] ?? 1);
+        for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(deck === null ? 1 : this.shellAlpha[deck] ?? 1);
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------

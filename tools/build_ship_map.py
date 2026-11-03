@@ -27,8 +27,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
  LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB,
- EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R) = range(1, 35)
-TILE_COUNT = 34
+ EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN) = range(1, 36)
+TILE_COUNT = 35
 
 # The outer shell (§5.3): the off-white plating seen from outside, its colour, and the line along
 # each deck's floor. Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -272,8 +272,9 @@ def build_layers():
         fill(solid, col(a), col(b) - 1, bottom, bottom, POOL_TILE)
 
     # Funnel and mast, standing on the roof.
-    fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, STEEL)
-    fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, STEEL)
+    # (Solid but drawn by the game's shell: the navy funnel and the white mast, §5.3.)
+    fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, HIDDEN)
+    fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, HIDDEN)
 
     # A technical ladder beside the funnel housing, deck 12 up to the roof (§5.1).
     lc = funnel_ladder_col()
@@ -316,6 +317,123 @@ def build_exterior():
             if ext[top][c] and not ext[top - 1][c] and end not in slope_ends:
                 ext[top][c] = tile
     return ext
+
+
+# --- The outer shell's details (§5.3, the user's photo of the whole ship) ---------------------------
+
+GLASS_DARK = "#323353"
+GLASS = "#484a77"
+FRAME = "#9babb2"
+
+
+def shell_details(ext, solid):
+    """What is on the outside of the shell, as shapes for the game to draw over it: each listed
+    under the deck whose wall it is on (it fades with that deck's cut-away) or under "fixed".
+    Portholes along the lower hull, square windows on the cabin decks, balconies higher up, big
+    windows on the public rooms, the bridge's window band, the open decks' bulwark and windscreen,
+    and on top the roof's edge, the funnel, the mast and the radar domes."""
+    out = {}
+
+    def put(owner, shape):
+        out.setdefault(str(owner), []).append(shape)
+
+    def owner_at(c, r, deck):
+        t = ext[r][c] if 0 <= r < ROWS and 0 <= c < COLS else 0
+        if t in EXT_CUT:
+            return deck
+        return "fixed" if t else None
+
+    def rect(owner, x, y, w, h, colour):
+        put(owner, ["r", round(x), round(y), round(w), round(h), colour])
+
+    def window(owner, x, y, w, h):
+        rect(owner, x - 1, y - 1, w + 2, h + 2, FRAME)
+        rect(owner, x, y, w, h, GLASS_DARK)
+        rect(owner, x + 1, y + 1, max(1, w // 3), 1, "#8fd3ff")
+
+    # The lower hull, crew decks 1-3: a row of round portholes along each deck.
+    for k in range(HULL_DECKS_BELOW + 1):
+        y = (FLOOR_ROW[3] - DECK_ROWS // 2 + k * DECK_ROWS) * TILE
+        for x in range(col(EXTENT[3][0]) * TILE + 40, col(EXTENT[3][1]) * TILE - 40, 144):
+            if solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]:
+                put("fixed", ["c", x, y, 5, FRAME])
+                put("fixed", ["c", x, y, 3, GLASS_DARK])
+    # The dark navy band along the waterline.
+    w0 = round(stem_x(WATER_ROW))
+    rect("fixed", w0, WATER_ROW * TILE - 14, col(EXTENT[3][1]) * TILE - w0, 14, "#1d2b53")
+
+    for deck in PLAYABLE:
+        fwd, aft = EXTENT[deck]
+        floor = FLOOR_ROW[deck] * TILE
+        mid_row = FLOOR_ROW[deck] - 4
+        x0, x1 = col(fwd) * TILE, col(aft) * TILE
+        # Square windows, balconies and big windows, laid out on fixed spacings from the bow so the
+        # rows line up deck over deck.
+        for unit, style in ((96, "square"), (144, "balcony"), (64, "venue"), (48, "bridge")):
+            for x in range(x0 - x0 % unit, x1, unit):
+                c = (x + unit // 2) // TILE
+                if not (x0 <= x and x + unit <= x1):
+                    continue
+                own = owner_at(c, mid_row, deck)
+                if own is None:
+                    continue
+                _, kind = venue_at(deck, metres(c))
+                # From outside the hull's side has windows all along, whatever lies behind it: by
+                # the stair cores and the atrium, the deck's usual ones.
+                if in_core(metres(c)) or in_atrium(deck, metres(c)) or kind is None:
+                    kind = "cabins" if deck in (4, 5, 8, 9, 10) else "venue"
+                balcony = kind == "cabins" and deck >= 8 and metres(c) >= 82
+                want = ("balcony" if balcony else "square") if kind == "cabins" else \
+                       "bridge" if kind == "crew" and deck == 10 else "venue" if kind == "venue" else None
+                if want != style:
+                    continue
+                if style == "square":
+                    window(own, x + 30, floor - 76, 11, 9)
+                    window(own, x + 56, floor - 76, 11, 9)
+                elif style == "venue":
+                    window(own, x + 12, floor - 94, 40, 30)
+                elif style == "bridge":
+                    rect(own, x, floor - 104, unit, 22, GLASS_DARK)
+                    rect(own, x, floor - 103, unit, 1, "#4d65b4")
+                else:
+                    # A balcony: the cabin's dark glass door, a white partition, a glass railing.
+                    rect(own, x, floor - 112, unit, 104, GLASS)
+                    rect(own, x + 18, floor - 100, unit - 36, 60, GLASS_DARK)
+                    rect(own, x, floor - 112, 6, 104, "#e8eaec")
+                    rect(own, x + 6, floor - 40, unit - 6, 32, "#7f9aa8")
+                    rect(own, x + 6, floor - 42, unit - 6, 2, "#e8eaec")
+        # The open decks up top: a white bulwark with a glass windscreen above it, all along.
+        if deck >= 11:
+            for x in range(x0, x1, TILE):
+                m = metres(x // TILE)
+                _, kind = venue_at(deck, m)
+                if indoor(deck, m) or in_core(m):
+                    continue
+                rect(deck, x, floor - 24, TILE, 24, "#e8eaec")
+                rect(deck, x, floor - 48, TILE, 24, "#bfe6f5")
+                rect(deck, x, floor - 50, TILE, 2, "#cd683d")
+            for x in range(x0, x1, 48):
+                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)):
+                    rect(deck, x, floor - 50, 2, 26, "#e8eaec")
+
+    # On top: the roof's white edge, the navy funnel with its dark grille, the white mast, the domes.
+    roof = ROOF_ROW * TILE
+    for c in range(COLS):
+        if solid[ROOF_ROW][c] == STEEL:
+            rect("fixed", c * TILE, roof, TILE, TILE, "#e8eaec")
+    fa, fb = x_of(FUNNEL[0]) - 8, x_of(FUNNEL[1]) + 8
+    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], GLASS_DARK])
+    put("fixed", ["p", [[fa + 46, roof - 12 * TILE + 14], [fb - 32, roof - 12 * TILE + 14], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], "#2e222f"])
+    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 4, roof - 22], [fa + 6, roof - 22]], "#e8eaec"])
+    ma, mb = x_of(MAST[0]), x_of(MAST[1])
+    mc = (ma + mb) / 2
+    put("fixed", ["p", [[mc - 22, roof], [mc + 22, roof], [mc + 5, roof - 14 * TILE], [mc - 5, roof - 14 * TILE]], "#e8eaec"])
+    rect("fixed", mc - 34, roof - 10 * TILE, 68, 6, "#e8eaec")
+    for m in (118, 124, 146):
+        rect("fixed", x_of(m) - 4, roof - 26, 8, 26, "#c7dcd0")
+        put("fixed", ["c", x_of(m), roof - 40, 18, "#e8eaec"])
+        put("fixed", ["c", x_of(m) + 5, roof - 45, 6, "#ffffff"])
+    return out
 
 
 def shell_slopes():
@@ -585,6 +703,7 @@ def build_map():
             {"name": "deckFloors", "type": "string", "value": json.dumps({d: FLOOR_ROW[d] for d in DECKS})},
             {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in EXT_CUT)},
             {"name": "shellSlopes", "type": "string", "value": json.dumps(shell_slopes())},
+            {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
             "firstgid": 1, "name": "placeholder", "image": "../assets/tiles/placeholder.png",
