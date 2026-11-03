@@ -407,6 +407,9 @@ def build_objects():
     stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
+    # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
+    for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
+        put(7, 0, "railing-bg", x=x)
     put(7, 6, "bollard-bg")
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
@@ -415,7 +418,7 @@ def build_objects():
     # the sea. `x0`-`x1` is where on deck 7 it can start.
     add(area("bow-view", "bowview", x_of(-1), floor_y(7) - 90, x_of(23) - x_of(-1), (WATER_ROW + 2) * TILE - floor_y(7) + 90, [
         prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
-        prop("tipX", x_of(BOW["stem"][7] + 1.5), "int"), prop("deckY", floor_y(7), "int")]))
+        prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
     # The bridge's windows on deck 10, looking out to sea.
     add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
              [prop("kind", "windows")]))
