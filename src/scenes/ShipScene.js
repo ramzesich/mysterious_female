@@ -384,6 +384,7 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
                     if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -796,6 +797,17 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Georgia, serif', fontSize: '9px', fontStyle: 'bold', color: '#fbff86', resolution: 4,
         }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
         this.worldLayer.add(name);
+    }
+
+    // A burl-wood panel on a wall (the atrium on deck 7, the user's photos), for the ports' plaques.
+    drawBurlPanel(g, o) {
+        const top = o.y - this.deckPitch + 22, bottom = o.y - 6;
+        g.fillStyle(0x9e4539, 1).fillRect(o.x - 2, top - 2, o.width + 4, bottom - top + 4);
+        g.fillStyle(0xb5653a, 1).fillRect(o.x, top, o.width, bottom - top);
+        for (let i = 0; i < o.width * (bottom - top) / 90; i++) {
+            const x = o.x + ((i * 37) % o.width), y = top + ((i * 53) % (bottom - top));
+            g.fillStyle(i % 3 ? 0x9e4539 : 0xcd683d, 1).fillRect(x, y, 2, 1);
+        }
     }
 
     // Warm downlights along a room's ceiling.

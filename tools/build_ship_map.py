@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, PROMENADE,
-                         TRUNKS, VENUES)
+                         STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -31,8 +31,9 @@ COLS = SEA + LENGTH * PER_M + SEA
  EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN,
  WALNUT, CUCINA_WALL, DINING_WALL, DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET,
  BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
- LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET) = range(1, 52)
-TILE_COUNT = 51
+ LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
+ KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET) = range(1, 59)
+TILE_COUNT = 58
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -48,12 +49,20 @@ ROOM_LOOK = {
     "Photo Gallery": (GALLERY_WALL, WOOD_FLOOR),
     "Library": (WALNUT, LIBRARY_CARPET),
     "Stardust Lounge theatre (Bumbot: washing)": (THEATRE_WALL, THEATRE_CARPET),
+    "Splash Academy": (KIDS_WALL, KIDS_CARPET),
+    "Entourage": (TEEN_WALL, ARCADE_CARPET),
+    "Magnum's": (WALNUT, DINING_CARPET),
+    "Art Gallery": (GALLERY_WALL, WOOD_FLOOR),
+    "Sun Club Casino": (CASINO_WALL, CASINO_CARPET),
+    "Tradewinds": (DINING_WALL, WOOD_FLOOR),
+    "Arcade": (ARCADE_WALL, ARCADE_CARPET),
+    "Stardust Lounge balcony": (THEATRE_WALL, THEATRE_CARPET),
 }
 # A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -304,6 +313,11 @@ def build_layers():
         fill(solid, col(ATRIUM["span"][0]), col(ATRIUM["span"][1]) - 1, FLOOR_ROW[deck], FLOOR_ROW[deck], 0)
     a, b = POOL_OPENING
     fill(solid, col(a), col(b) - 1, FLOOR_ROW[12], FLOOR_ROW[12], 0)
+    # The theatre's balcony, deck 7, ends in a railing over the stage; beyond it the stage's fly
+    # space is open down to deck 6 (§5.3).
+    fill(solid, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], 0)
+    fill(back, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], THEATRE_WALL)
+    fill(solid, col(STAGE) - 1, col(STAGE) - 1, FLOOR_ROW[7] - 2, FLOOR_ROW[7] - 1, RAILING)
 
     # Deck 11's pools, sunk into the deck: tiled sides and bottom, the water filled in by the game.
     for a, b in POOLS:
@@ -324,6 +338,11 @@ def build_layers():
     fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
 
     return back, solid, ladders, build_exterior()
+
+
+def stage_end_col():
+    """Where the theatre's inside ends at the stern wall (the cut-away's last column + 1)."""
+    return col(EXTENT[6][1]) - STRUCTURE_COLS - 2
 
 
 def build_exterior():
@@ -894,8 +913,7 @@ def build_objects():
     # The Stardust Lounge: deep navy, a red carpet, rows of red velvet seats facing the stage aft,
     # the stage with its red curtains, spotlights and the band's instruments.
     decor("stardust-entrance", "marquee", exact_x(203.4), exact_x(203.4), deck=6, text="STARDUST LOUNGE")
-    stage_end = (col(EXTENT[6][1]) - STRUCTURE_COLS - 2) * TILE    # where the cut-away ends: the wall
-    decor("stardust-stage", "stage", exact_x(244), stage_end, deck=6)
+    decor("stardust-stage", "stage", col(STAGE) * TILE, stage_end_col() * TILE, deck=6)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
         put(6, m, "theatre-seat-bg")
@@ -904,6 +922,109 @@ def build_objects():
     put(6, 247.6, "guitar-bg")
     put(6, 249.0, "grand-piano-bg", flip=True)
     put(6, 243.2, "speaker-stack-bg")
+
+    # Deck 7, after NCL's plan and the user's photos (§5.3). Clear of the Hotel trunk's door (118).
+    def plaque(name, m, text):
+        add(point(name, "sign", exact_x(m), floor_y(7) - 100, [prop("text", text), prop("style", "plaque")]))
+
+    # Splash Academy: sunny walls, a blue carpet with coloured dots, toys, a play kitchen, low tables.
+    plaque("sign-splash", 24.6, "Splash Academy")
+    put(7, 24.0, "kids-bookshelf-bg")
+    put(7, 26.4, "play-kitchen-bg")
+    for m in (29.0, 41.2):
+        around(7, m, "kids-table-bg", "kids-chair-bg")
+        put(7, m, "kids-drawing-bg", 52)
+    put(7, 31.4, "rocking-horse-bg")
+    put(7, 33.0, "toy-box-bg")
+    put(7, 34.0, "toy-blocks-bg")
+    put(7, 36.0, "beanbags-bg")
+    put(7, 36.0, "pin-map-bg", 54)
+    put(7, 38.0, "teddy-bg")
+    put(7, 39.2, "toy-train-bg")
+    put(7, 43.6, "cactus-bg")
+    # Entourage, the teen club: deep teal, a dark carpet with neon specks, games.
+    decor("entourage-doorway", "doorway", exact_x(45), exact_x(45), deck=7, text="Entourage")
+    put(7, 48.4, "tv-console-bg")
+    put(7, 51.0, "beanbags-bg")
+    put(7, 54.6, "foosball-bg")
+    put(7, 58.2, "air-hockey-bg")
+    put(7, 61.4, "dartboard-2-bg", 54)
+    put(7, 63.2, "arcade-cabinet-bg")
+    put(7, 65.0, "vending-machine-bg")
+    put(7, 67.8, "wall-tv-bg", 62)
+    put(7, 67.2, "beanbag-orange-bg")
+    put(7, 68.4, "beanbag-blue-bg")
+    put(7, 71.6, "monstera-bg")
+    # The atrium on deck 7 (the user's photos): burl-wood panels behind the side walk, covered in
+    # the ports' plaques, a ship's wheel and paintings among them.
+    plaques = ["plaque-shield", "plaque-medallion", "certificate", "plaque-lighthouse", "plaque-crown",
+               "plaque-red", "welcome-card", "painting-harbour", "ships-wheel"]
+    k = 0
+    for a, b in ((82.9, 86.5), (97.3, 101.0)):
+        decor(f"plaque-wall-{a}", "burlpanel", exact_x(a), exact_x(b), deck=7)
+        for m in [a + 0.45 + i * 0.68 for i in range(int((b - a - 0.4) / 0.68))]:
+            for dy in (44, 80):
+                put(7, m, plaques[k % len(plaques)] + "-bg", dy)
+                k += 1
+    # Magnum's Champagne & Whiskey Bar: dark wood, the back bar and chrome stools, leather club
+    # chairs round marble tables, art-deco lamps.
+    plaque("sign-magnums", 111.4, "Magnum's")
+    put(7, 113.6, "back-bar-bg")
+    put(7, 113.6, "bar-counter-bg")
+    for m in (112.6, 113.6, 114.6):
+        put(7, m, "chrome-stool-bg")
+    for m, painting in ((121.2, "painting-sea-bg"), (125.6, "painting-flowers-bg")):
+        around(7, m, "marble-table-bg", "leather-club-chair-bg", "deco-lamp-bg")
+        put(7, m, painting, 52)
+        put(7, m, "brass-ceiling-lamp-bg", DECK_PITCH - TILE - height("brass-ceiling-lamp-bg"))
+    put(7, 128.6, "decanter-bg")
+    # The Art Gallery: white, paintings on the walls and on easels, benches, a dancer in marble,
+    # spotlights on a track.
+    decor("gallery-doorway", "doorway", exact_x(130), exact_x(130), deck=7, text="Art Gallery")
+    for m in (132.4, 140.0, 147.4):
+        put(7, m, "easel-painting-bg")
+    for i, m in enumerate((134.2, 135.9, 137.6, 142.0, 143.7, 145.4)):
+        put(7, m, ("painting-abstract-bg", "painting-blue-bg", "painting-harbour-bg", "painting-sea-bg",
+                   "painting-flowers-bg", "painting-ship-bg")[i], 50)
+    for m in (135.9, 143.7):
+        put(7, m, "gallery-bench-bg")
+    put(7, 138.8, "dancer-statue-bg")
+    put(7, 149.2, "bronze-sculpture-bg")
+    for m in (134.2, 137.6, 142.0, 145.4):
+        put(7, m, "track-spot-bg", DECK_PITCH - TILE - height("track-spot-bg"))
+    # The Sun Club Casino: deep red and gold, rows of slot machines, the roulette and blackjack
+    # tables with stools, a jackpot sign, the ATM.
+    decor("casino-doorway", "doorway", exact_x(150), exact_x(150), deck=7, text="Sun Club Casino")
+    for m in (151.9, 153.1, 154.3, 165.6, 166.8, 168.0):
+        put(7, m, "slot-pair-bg")
+    put(7, 153.1, "jackpot-sign-bg", 72)
+    around(7, 158.0, "roulette-bg", "casino-stool-bg")
+    around(7, 162.4, "blackjack-bg", "casino-stool-bg")
+    put(7, 170.6, "atm-bg")
+    # Tradewinds duty-free: shelves of liquor and perfume, watches, chocolates, sunglasses, the till.
+    decor("tradewinds-doorway", "doorway", exact_x(172), exact_x(172), deck=7, text="Tradewinds")
+    put(7, 173.6, "shop-shelves-bg")
+    put(7, 175.4, "liquor-shelf-bg")
+    put(7, 176.6, "perfume-display-bg")
+    put(7, 178.2, "jewellery-counter-bg")
+    put(7, 179.6, "till-bg")
+    put(7, 181.0, "sunglasses-stand-bg")
+    put(7, 182.2, "shop-basket-bg")
+    put(7, 183.6, "handbag-shelf-bg")
+    put(7, 185.0, "chocolates-bg")
+    # The Arcade: night blue, cabinets, a claw machine, pinball.
+    decor("arcade-doorway", "doorway", exact_x(186), exact_x(186), deck=7, text="Arcade")
+    put(7, 187.4, "arcade-cabinet-bg")
+    put(7, 188.3, "arcade-cabinet-bg")
+    put(7, 189.8, "claw-machine-bg")
+    put(7, 191.4, "pinball-bg")
+    put(7, 192.9, "arcade-cabinet-bg")
+    # The Stardust Lounge's balcony: rows of red seats down to the railing over the stage.
+    decor("balcony-doorway", "doorway", exact_x(202), exact_x(202), deck=7, text="Stardust Lounge Balcony")
+    for k in range(int((STAGE - 1.6 - 204.2) / 0.95) + 1):
+        put(7, 204.2 + k * 0.95, "theatre-seat-bg")
+    for a, b in ((110, 150), (150, 194)):
+        decor(f"downlights-7-{a}", "downlights", x_of(a), x_of(b), deck=7)
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -1111,6 +1232,24 @@ def draw_tile(tile_id):
         else:
             for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
                 px[y][x] = hex_rgba(marks[i % len(marks)])
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id in (KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL):
+        # Splash Academy: sunny yellow; Entourage: deep teal; the casino: deep red; the arcade: night
+        # blue; each with a faint seam.
+        base, line = {KIDS_WALL: ("#fbe9a6", "#f4dd92"), TEEN_WALL: ("#0b4a50", "#0b5e65"),
+                      CASINO_WALL: ("#5a1d2a", "#652333"), ARCADE_WALL: ("#1d1f3a", "#262a4a")}[tile_id]
+        rect(0, 0, 15, 15, hex_rgba(base))
+        rect(0, 0, 0, 15, hex_rgba(line))
+    elif tile_id in (KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET):
+        # Splash Academy: bright blue with coloured dots; the casino: red and gold; the arcade and
+        # Entourage: dark with neon specks.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        base, marks = {KIDS_CARPET: ("#4d9be6", ("#f9c22b", "#e83b3b", "#1ebc73")),
+                       CASINO_CARPET: ("#7a3045", ("#f9c22b", "#e83b3b")),
+                       ARCADE_CARPET: ("#2e222f", ("#30e1b9", "#f04f78", "#a884f3"))}[tile_id]
+        rect(0, 0, 15, 3, hex_rgba(base))
+        for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
+            px[y][x] = hex_rgba(marks[i % len(marks)])
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == MAHOGANY:
         # The lobbies' mahogany panelling: a dark red-brown with a faint grain.

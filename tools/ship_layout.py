@@ -49,6 +49,10 @@ ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
              "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
 
+# The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
+# railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
+STAGE = 244
+
 # Above the top deck.
 FUNNEL = (168, 196)
 MAST = (54, 62)
@@ -84,10 +88,16 @@ VENUES = [
     (8, 202, 251.5, "Cabins", "cabins"),
 
     (7, 2.5, 21.4, "Mooring deck", "outdoor"),
-    (7, 21.4, 60, "Kids' and teen clubs", "venue"),
-    (7, 110, 150, "Magnum's bar, art gallery", "venue"),
-    (7, 150, 194, "Casino, duty-free shops", "venue"),
-    (7, 222, 254, "Theatre balcony", "venue"),
+    # Deck 7 as on NCL's plan (2026-11-03): the youth and teen clubs forward, Magnum's and the Art
+    # Gallery amidships, the casino, duty-free and arcade aft, the theatre's balcony at the stern.
+    (7, 21.4, 45, "Splash Academy", "venue"),
+    (7, 45, 74, "Entourage", "venue"),
+    (7, 110, 130, "Magnum's", "venue"),
+    (7, 130, 150, "Art Gallery", "venue"),
+    (7, 150, 172, "Sun Club Casino", "venue"),
+    (7, 172, 186, "Tradewinds", "venue"),
+    (7, 186, 194, "Arcade", "venue"),
+    (7, 202, 254, "Stardust Lounge balcony", "venue"),
 
     (6, 20, 64, "Cabins", "cabins"),
     (6, 64, 74, "Internet Café", "venue"),

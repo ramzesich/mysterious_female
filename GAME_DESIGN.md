@@ -865,7 +865,23 @@ Nothing blocks the start of the build. These get settled along the way:
       at the gangway. The last placements (deck, metres): gangway 4/71, d5-aft 5/250.2,
       d6-promenade 6/193.4, d6-theatre 6/209, d7-casino 7/152, d9-linen 9/115, d10-bridge 10/44,
       d11-pool 11/162, d11-buffet 11/191, d12-sports 12/175
-- [ ] **Next: populate the ship deck by deck, upward from deck 7** (the user: start at deck 4 and
+- [ ] **Deck 7 furnished** (2026-11-03, branch `deck-7`, shown, not yet merged): after NCL's plan
+      and the user's photos (`deck_7_central_area`). Bow to stern: **Splash Academy** (21-45:
+      sunny walls, a blue dotted carpet, a play kitchen, toys, low tables), **Entourage** (45-74:
+      deep teal, TV and console, beanbags, foosball, air hockey, darts, an arcade cabinet); **the
+      atrium on deck 7**: burl-wood panels behind the side walk covered in the ports' plaques
+      (her photos; the palm-leaf carpet is not drawn, the side walk has its own floor);
+      **Magnum's** (110-130: dark wood, the back bar with chrome stools, leather club chairs
+      round marble tables, art-deco lamps), **the Art Gallery** (130-150: white, paintings on
+      walls and easels, benches, a marble dancer, track spotlights), **the Sun Club Casino**
+      (150-172: deep red, slot machines, roulette and blackjack, a jackpot sign, the ATM),
+      **Tradewinds** duty-free (172-186), **the Arcade** (186-194), **the Stardust Lounge
+      balcony** (202-254: rows of red seats down to **a railing over the stage**: deck 7's floor
+      is open above the stage, so she can hop the railing and drop onto it, no scare; the user's
+      choice; a playtest, `balcony`). Rooms open off each other at wood posts with brass
+      plaques. Art: two PixelLab sheets (`props-5`, `tall-2`, 10 generations each) and the
+      roulette and blackjack tables (`create_map_object`, 1 each; the sheet's came out plain)
+- [ ] **Next: populate the ship deck by deck, upward from deck 8** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
@@ -884,7 +900,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1817 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1795 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

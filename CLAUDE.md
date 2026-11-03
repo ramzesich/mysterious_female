@@ -75,6 +75,9 @@ Lessons learned (2026-10-31):
   user works from more than one computer, so progress lives in the repo (design doc, this file,
   commits), never only in local memory or uncommitted files.
 - Design is settled by numbered question lists; the user answers by number.
+- **Before furnishing a deck, check NCL's plan** (`reference/norwegian-sun-ship-map.pdf`: its
+  profile lists each deck's rooms by part of the ship; `pdftotext -layout` or PyMuPDF's words) and
+  the user's photos of that deck, then propose the layout and the art cost.
 - When a generated piece doesn't read as intended, offer to drop or replace it rather than re-rolling
   again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
