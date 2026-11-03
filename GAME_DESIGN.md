@@ -793,7 +793,7 @@ Nothing blocks the start of the build. These get settled along the way:
       back. Bow only for now; other scenic spots (the stern terraces, deck 12 over the pools)
       maybe later
 - [x] **Deck 4 furnished** (2026-11-03, merged): the gangway lobby after the user's photo (cream
-      panelling, fire doors held open, a blue runner mat, exit sign, fire-hose cabinet); the stair
+      panelling, fire doors held open (folded flat against the wall, seen face on; the runner mat dropped, it read as a glitch side-on), exit sign, fire-hose cabinet); the stair
       and elevator lobbies on every deck (mahogany panelling, blue mosaic carpet, bronze elevator
       doors in brass frames, a brass deck plaque, a picture); cabin corridors on every deck
       (trolleys and room-service carts by doors, extinguishers, exit signs, brass cabin-number
