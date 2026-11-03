@@ -272,10 +272,6 @@ export class ShipScene extends Phaser.Scene {
                     };
                     break;
 
-                case 'deckends':
-                    this.drawDeckEnds(JSON.parse(prop(o, 'ends', '[]')));
-                    break;
-
                 case 'livery': {
                     // The bow's hull (§5.3): white plating with a smooth edge along the raked stem,
                     // over the tiles' steps, and the ship's sun on it, built with the map.
@@ -383,20 +379,6 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? x + 6 : x - 2, o.y - 30, 2, 2);  // the hook holding it
         }
         g.fillStyle(0x323353, 1).fillRect(matX0, o.y - 2, matX1 - matX0, 2);
-    }
-
-    // Where a deck's indoors meets the ship's outer plating (§5.3): the end wall recedes in a soft
-    // shadow along the corridor's end, and a dark cutaway line marks the hull.
-    drawDeckEnds(ends) {
-        const shade = this.add.graphics().setDepth(DEPTH.back + 0.5);
-        const cut = this.add.graphics().setDepth(DEPTH.solid + 0.2);
-        this.worldLayer.add([shade, cut]);
-        for (const { x, y0, y1, dir } of ends) {
-            for (let i = 0; i < 12; i++) {
-                shade.fillStyle(0x2e222f, 0.11 * (1 - i / 12)).fillRect(dir > 0 ? x + i : x - 1 - i, y0, 1, y1 - y0 - 16);
-            }
-            cut.fillStyle(0x3e3546, 1).fillRect(dir > 0 ? x : x - 2, y0 - 16, 2, y1 - y0 + 16);
-        }
     }
 
     // Windows along a wall, looking out to sea: the bridge's.

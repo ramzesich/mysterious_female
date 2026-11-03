@@ -26,8 +26,12 @@ COLS = SEA + LENGTH * PER_M + SEA
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
- LOBBY_CARPET, MAHOGANY, CABIN_WALL) = range(1, 22)
-TILE_COUNT = 21
+ LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB) = range(1, 26)
+TILE_COUNT = 25
+
+# A cabin corridor stops short of the outer plating (the user, 2026-11-03): this many columns of the
+# ship's structure (steel frames) lie between, then the corridor's end wall.
+STRUCTURE_COLS = 8
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -100,6 +104,20 @@ def stem_m(row):
         if r0 <= row <= r1:
             return m0 + (m1 - m0) * (row - r0) / (r1 - r0)
     return points[0][1] if row < points[0][0] else points[-1][1]
+
+
+def corridor_ends(deck):
+    """The deck's ends where a cabin corridor meets the outer plating: (plating column, inward)."""
+    fwd, aft = EXTENT[deck]
+    for c, inward in ((col(fwd), 1), (col(aft) - 1, -1)):
+        m = metres(c + inward * (STRUCTURE_COLS + 2))
+        if covered(deck, metres(c + inward)) and venue_at(deck, m)[1] == "cabins":
+            yield c, inward
+
+
+def in_structure(deck, c):
+    """Is column `c` on `deck` the structure or end wall at a corridor's end, not corridor?"""
+    return any(0 < (c - pc) * inward <= STRUCTURE_COLS + 1 for pc, inward in corridor_ends(deck))
 
 
 def in_core(m):
@@ -191,6 +209,16 @@ def build_layers():
                 fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, HULL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
+
+        # A cabin corridor ends short of the plating: the ship's structure, steel frames, fills the
+        # gap, and the corridor's end wall turns away from us at its edge.
+        for c, inward in corridor_ends(deck):
+            for k in range(1, STRUCTURE_COLS + 1):
+                tile = FRAMES_RIB if k % 2 == 0 else FRAMES  # a frame rib every second column
+                fill(solid, c + inward * k, c + inward * k, floor - DECK_ROWS + 1, floor - 1, tile)
+                solid[floor][c + inward * k] = STEEL
+            end = c + inward * (STRUCTURE_COLS + 1)
+            fill(solid, end, end, floor - DECK_ROWS + 1, floor - 1, END_WALL_L if inward == 1 else END_WALL_R)
 
         # Where an open deck meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
         if 3 < deck < 12:
@@ -340,7 +368,7 @@ def build_objects():
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":
             # Only under a ceiling: where the deck above ends, the corridor is an open terrace.
-            cols = [c for c in range(col(a), col(b)) if covered(deck, metres(c))]
+            cols = [c for c in range(col(a), col(b)) if covered(deck, metres(c)) and not in_structure(deck, c)]
             runs = []
             for c in cols:
                 if runs and runs[-1][1] == c:
@@ -409,17 +437,6 @@ def build_objects():
         if flip:
             props.append(prop("flip", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
-
-    # Where each deck's indoors meets the outer plating: the game finishes the ends (§5.3).
-    ends = []
-    for deck in DECKS:
-        fwd, aft = EXTENT[deck]
-        c0, c1 = col(fwd), col(aft) - 1
-        for c, inward in ((c0, 1), (c1, -1)):
-            if covered(deck, metres(c + inward)):
-                ends.append({"x": (c + 1) * TILE if inward == 1 else c * TILE, "dir": inward,
-                             "y0": (FLOOR_ROW[deck] - DECK_ROWS + 1) * TILE, "y1": (FLOOR_ROW[deck] + 1) * TILE})
-    add(area("deck-ends", "deckends", 0, 0, 0, 0, [prop("ends", json.dumps(ends))]))
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
     lx0, ly0, lx1, ly1 = livery_box()
@@ -586,6 +603,22 @@ def draw_tile(tile_id):
     elif tile_id == HULL:
         # The ship's white outer plating, clean (seams on every tile read as stripes).
         rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
+    elif tile_id in (FRAMES, FRAMES_RIB):
+        # The ship's structure between a corridor's end and the plating: plain grey steel, and on
+        # every second column a frame rib with its lit edge.
+        rect(0, 0, 15, 15, hex_rgba("#9babb2"))
+        if tile_id == FRAMES_RIB:
+            rect(6, 0, 7, 15, hex_rgba("#7f708a"))
+            rect(8, 0, 8, 15, hex_rgba("#b2ba90"))
+    elif tile_id in (END_WALL_L, END_WALL_R):
+        # A corridor's end wall, turning away from us: the cream wall in three darkening steps
+        # toward the structure behind it.
+        steps = ("#cdbfa6", "#d9cdb6", "#e2d7c2")
+        for i, colour in enumerate(steps):
+            x0, x1 = i * 5, i * 5 + 4 if i < 2 else 15
+            if tile_id == END_WALL_R:
+                x0, x1 = 15 - x1, 15 - x0
+            rect(x0, 0, x1, 15, hex_rgba(colour))
     elif tile_id == CABIN_WALL:
         # The cabin corridors' wallpaper: the cream wall with a faint diamond lattice, a shade off it.
         rect(0, 0, 15, 15, hex_rgba("#e9dfcc"))
