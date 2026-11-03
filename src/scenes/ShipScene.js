@@ -253,9 +253,12 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
-                case 'livery':
-                    this.drawLivery(o, prop(o, 'sunX', o.x), prop(o, 'sunY', o.y), prop(o, 'stem', ''));
+                case 'livery': {
+                    // The ship's sun on the bow's hull (§5.3), built with the map.
+                    const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.solid + 0.1);
+                    this.worldLayer.add(sun);
                     break;
+                }
 
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
@@ -332,48 +335,6 @@ export class ShipScene extends Phaser.Scene {
         for (let i = 0; i < 24; i++) {
             front.lineStyle(2, look.rail, 1).lineBetween(line[i].x, line[i].y - h, line[i + 1].x, line[i + 1].y - h);
             front.lineStyle(1, look.railLight, 1).lineBetween(line[i].x, line[i].y - h - 1, line[i + 1].x, line[i + 1].y - h - 1);
-        }
-    }
-
-    // The ship's sun, painted on the bow's hull (§5.3, the user's photos): a red sun with a ring of
-    // red and orange rays round an orange and yellow core, and swirls trailing aft and down. No
-    // lettering: the ship's name is never shown early (§5.1). Kept inside the hull's stem line.
-    drawLivery(o, sx, sy, stem) {
-        const g = this.add.graphics().setDepth(DEPTH.solid + 0.1);
-        this.worldLayer.add(g);
-        const edge = new Map(String(stem).split(',').map(pair => pair.split(':').map(Number)));
-        const inside = (x, y) => {
-            const row = Math.floor(y / 16) * 16;
-            return edge.has(row) && x >= edge.get(row) + 2 && x < o.x + o.width && y < o.y + o.height;
-        };
-        const dot = (x, y, colour) => {
-            if (inside(x, y)) g.fillStyle(colour, 1).fillRect(Math.round(x), Math.round(y), 2, 2);
-        };
-        // Swirls: bands sweeping aft and down from under the sun.
-        for (const [dy, colour] of [[34, 0xe83b3b], [46, 0xfb6b1d], [58, 0xf9c22b]]) {
-            for (let t = 0; t <= 1; t += 0.004) {
-                const x = sx - 150 + 330 * t;
-                const y = sy + dy + 40 * Math.sin(t * Math.PI * 0.9) - 26 * t;
-                for (let w = 0; w < 6; w += 2) dot(x, y + w, colour);
-            }
-        }
-        // The rays, then the sun.
-        for (let i = 0; i < 16; i++) {
-            const a = (Math.PI * 2 * i) / 16;
-            const colour = i % 2 ? 0xfb6b1d : 0xe83b3b;
-            for (let r = 40; r < 66; r += 1.5) {
-                const half = (66 - r) / 5;
-                for (let s = -half; s <= half; s += 1.5) {
-                    dot(sx + Math.cos(a) * r - Math.sin(a) * s, sy + Math.sin(a) * r + Math.cos(a) * s, colour);
-                }
-            }
-        }
-        for (const [radius, colour] of [[40, 0xe83b3b], [30, 0xfb6b1d], [18, 0xf9c22b]]) {
-            for (let y = -radius; y <= radius; y += 2) {
-                for (let x = -radius; x <= radius; x += 2) {
-                    if (x * x + y * y <= radius * radius) dot(sx + x, sy + y, colour);
-                }
-            }
         }
     }
 

@@ -395,13 +395,8 @@ def build_objects():
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
-    # The sun sits high on the bow, just under the forecastle, so it shows from the mooring deck.
-    sun_row = FLOOR_ROW[7] + 5
-    add(area("livery", "livery", col(BOW["stem"][7]) * TILE, (FLOOR_ROW[7] + 1) * TILE,
-             (col(BOW["block"]) - col(BOW["stem"][7])) * TILE, (WATER_ROW + 1 - FLOOR_ROW[7]) * TILE, [
-                 prop("sunX", x_of(BOW["block"] - 5.5), "int"), prop("sunY", sun_row * TILE, "int"),
-                 prop("stem", ",".join(f"{r * TILE}:{col(stem_m(r)) * TILE}"
-                                       for r in range(FLOOR_ROW[7] + 1, WATER_ROW + 2)))]))
+    lx0, ly0, lx1, ly1 = livery_box()
+    add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0))
     put(7, 6, "bollard-bg")
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
@@ -589,6 +584,79 @@ def write_png(path, width, height, pixels):
     path.write_bytes(png)
 
 
+# --- The ship's sun on the bow ---------------------------------------------------------------------
+
+def livery_box():
+    """The bow's hull block, in pixels: from the stem's tip back to the block's end, from under the
+    forecastle down to the waterline."""
+    x0, x1 = col(BOW["stem"][7]) * TILE, col(BOW["block"]) * TILE
+    y0, y1 = (FLOOR_ROW[7] + 1) * TILE, (WATER_ROW + 1) * TILE
+    return x0, y0, x1, y1
+
+
+def build_livery():
+    """The ship's sun, as painted on the real bow (the user's photos, §5.3), scaled to cover most of
+    the bow's side: concentric rings of deep red, red, orange and yellow round a white centre;
+    curved flame-like rays swirling round it, each red with orange and yellow inside and a grey
+    shadow on its trailing edge; and red, orange and yellow bands with a grey line sweeping aft
+    below it. Cut to the stem's line, as if wrapping round the bow. No lettering (§5.1)."""
+    import math
+    from PIL import Image, ImageDraw
+    from palettize import palettize
+
+    x0, y0, x1, y1 = livery_box()
+    w, h = x1 - x0, y1 - y0
+    img = Image.new("RGBA", (w, h))
+    d = ImageDraw.Draw(img)
+    # High and aft on the bow, where it is widest (the stem rakes back below), as on the real ship.
+    cx, cy = x_of(12.8) - x0, round(h * 0.34)
+    r = 100
+
+    def ray(angle, base, tip, width, colour):
+        """A curved flame: from `base` out to `tip` radii, `width` degrees wide at its base, its tip
+        swept round clockwise."""
+        left, right = [], []
+        for i in range(13):
+            t = i / 12
+            rad = base + (tip - base) * t
+            sweep = 20 * t ** 1.4
+            half = width * (1 - t) ** 0.8
+            for side, a in ((left, angle - half + sweep), (right, angle + half * 0.6 + sweep)):
+                side.append((cx + rad * math.cos(math.radians(a)), cy + rad * math.sin(math.radians(a))))
+        d.polygon(left + right[::-1], fill=colour)
+        return right
+
+    for i in range(12):
+        a = i * 30 - 75
+        edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
+        d.line([(x + 3, y + 3) for x, y in edge], fill="#9babb2", width=5)
+        ray(a + 2, r * 1.05, r * 1.72, 12, "#fb6b1d")
+        ray(a + 3, r * 1.15, r * 1.5, 6, "#f9c22b")
+    # The bands sweeping aft, from under the sun to the block's end.
+    for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
+        pts = []
+        for i in range(41):
+            t = i / 40
+            x = cx - r * 0.2 + (w - cx + r * 0.2) * t
+            y = cy + r * 0.75 + k * 13 + 40 * math.sin(math.pi * t * 0.85) - 10 * t
+            pts.append((x, y))
+        d.line(pts, fill=colour, width=13 if colour != "#9babb2" else 5)
+    for frac, colour in ((1.0, "#ae2334"), (0.84, "#e83b3b"), (0.66, "#fb6b1d"), (0.5, "#f9c22b"),
+                         (0.34, "#ffffff")):
+        rr = r * frac
+        d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), fill=colour)
+
+    # Cut to the stem: nothing forward of the hull's edge, row by row.
+    px = img.load()
+    for y in range(h):
+        edge = col(stem_m((y + y0) / TILE)) * TILE + 2 - x0
+        for x in range(min(max(edge, 0), w)):
+            px[x, y] = (0, 0, 0, 0)
+    out = ROOT / "assets" / "ship" / "livery.png"
+    palettize(img).save(out)
+    return out
+
+
 def build_tileset():
     tiles = [draw_tile(i) for i in range(1, TILE_COUNT + 1)]
     rows = [[p for t in tiles for p in t[y]] for y in range(TILE)]
@@ -604,3 +672,4 @@ if __name__ == "__main__":
     map_path.write_text(json.dumps(build_map(), separators=(",", ":")), encoding="utf-8")
     print("wrote", map_path.relative_to(ROOT))
     print("wrote", build_tileset().relative_to(ROOT))
+    print("wrote", build_livery().relative_to(ROOT))

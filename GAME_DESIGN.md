@@ -715,7 +715,9 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] **(4) The bow and stern** (2026-11-03, branch `bow-stern`; ask the user to look): every deck's
       ends **measured off NCL's profile** (`tools/ship_layout.py` EXTENT). **Bow:** a raked stem
       from the waterline up to its tip at deck 7; the hull forward of 20 m on decks 3-6 is drawn
-      from outside, white plating painted with **the ship's sun** (rays, swirls, no lettering:
+      from outside, white plating painted with **the ship's sun as on the real bow**: concentric rings
+      round a white centre, swirling flame rays with grey shadows, bands sweeping aft, scaled to
+      cover most of the bow's side (`assets/ship/livery.png`, built with the map; no lettering:
       the name stays hidden, §5.1); on top, the **open mooring deck** on deck 7 (2.5-20.5 m),
       reached through a doorway, with bollards and cleats; **card-locked later** (Technical
       card, §6.2). **Bridge:** deck 10's front at 24 m with windows; Bumbot's bridge spot at 27 m.
