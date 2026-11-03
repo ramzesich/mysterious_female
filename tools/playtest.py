@@ -595,6 +595,7 @@ def scenario_overboard(b):
     b.open("?reset&play")
     b.teleport((col(255) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing
     b.key("right", True)
+    time.sleep(0.4)  # up against the railing first: the terrace is only a metre deep
     b.key("space", True)
     time.sleep(0.5)
     b.key("space", False)
