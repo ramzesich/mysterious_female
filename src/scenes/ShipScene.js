@@ -745,7 +745,9 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
-        this.sea.tilePositionX += dt * 12; // the ship is under way (§5.2)
+        // The ship is under way bow first (§5.2): the bow is on the left, so the sea streams past
+        // toward the stern, to the right.
+        this.sea.tilePositionX -= dt * 12;
 
         this.updateVacuums(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);

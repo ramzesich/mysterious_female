@@ -338,7 +338,7 @@ def build_objects():
             for c0, c1 in runs:
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0,
                          [prop("kind", "cabindoors")]))
-        else:
+        elif indoor(deck, (a + b) / 2):  # a sign needs a wall to hang on: none in the open air
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
@@ -395,10 +395,11 @@ def build_objects():
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
-    sun_row = (FLOOR_ROW[5] + FLOOR_ROW[4]) // 2 - 2
+    # The sun sits high on the bow, just under the forecastle, so it shows from the mooring deck.
+    sun_row = FLOOR_ROW[7] + 5
     add(area("livery", "livery", col(BOW["stem"][7]) * TILE, (FLOOR_ROW[7] + 1) * TILE,
              (col(BOW["block"]) - col(BOW["stem"][7])) * TILE, (WATER_ROW + 1 - FLOOR_ROW[7]) * TILE, [
-                 prop("sunX", x_of(BOW["block"] - 3.6), "int"), prop("sunY", sun_row * TILE, "int"),
+                 prop("sunX", x_of(BOW["block"] - 5.5), "int"), prop("sunY", sun_row * TILE, "int"),
                  prop("stem", ",".join(f"{r * TILE}:{col(stem_m(r)) * TILE}"
                                        for r in range(FLOOR_ROW[7] + 1, WATER_ROW + 2)))]))
     put(7, 6, "bollard-bg")
