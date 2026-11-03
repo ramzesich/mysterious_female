@@ -437,9 +437,10 @@ export class ShipScene extends Phaser.Scene {
             front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
             const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
             const pier = (b - a - n * OPEN_W) / (n + 1);
-            // She stops at the inner edge of the end pier, in the first opening, partly behind it.
-            if (a === pr.x0) pr.minX = a + pier + PROMENADE.endStop;
-            if (b === pr.x1) pr.maxX = b - pier - PROMENADE.endStop;
+            // The promenade's ends are closed (back in only through the doors): a wall she runs into
+            // at the end pier's inner edge, so she stops in the first opening, partly behind it.
+            if (a === pr.x0) this.addPromenadeEnd(a + pier + PROMENADE.endStop, -1, floor);
+            if (b === pr.x1) this.addPromenadeEnd(b - pier - PROMENADE.endStop, 1, floor);
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
@@ -483,6 +484,16 @@ export class ShipScene extends Phaser.Scene {
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
+    }
+
+    // An invisible wall at one end of the promenade, there only while she is on it. `x` is where
+    // her middle stops; `side` is -1 at the fore end, 1 at the aft end.
+    addPromenadeEnd(x, side, floor) {
+        const w = 32;
+        const edge = x + side * PLAYER.bodyWidth / 2;
+        const zone = this.add.zone(edge + side * w / 2, floor - this.deckPitch / 2, w, this.deckPitch);
+        this.physics.add.existing(zone, true);
+        (this.promenadeEnds ||= []).push(zone);
     }
 
     promenadeDoorAt(x, y) {
@@ -1066,6 +1077,7 @@ export class ShipScene extends Phaser.Scene {
         this.player = p;
 
         this.physics.add.collider(p, this.solidLayer);
+        this.physics.add.collider(p, this.promenadeEnds || [], null, () => this.route === 'promenade');
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
@@ -1253,15 +1265,6 @@ export class ShipScene extends Phaser.Scene {
         const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
-        // The promenade's ends are closed: back in only through the doors.
-        if (!inside) {
-            const pr = this.promenade;
-            const x = Phaser.Math.Clamp(p.x, pr.minX ?? pr.x0 + 12, pr.maxX ?? pr.x1 - 12);
-            if (x !== p.x) {
-                p.x = x;
-                body.velocity.x = 0;
-            }
-        }
 
         if (input.jumpPressed) this.jumpBufferedAt = time;
         const canJump = onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs;
