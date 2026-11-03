@@ -237,7 +237,7 @@ def build_layers():
                 tile = WALL_FOR.get(kind, BACKWALL)
             if tile:
                 fill(back, c, c, floor - DECK_ROWS + 1, floor - 1, tile)
-                if tile in (BACKWALL, VENUEWALL, CREWWALL, CABIN_WALL):
+                if tile in (BACKWALL, VENUEWALL, CREWWALL, CABIN_WALL) and not look:
                     back[floor - 1][c] = WAINSCOT
             if deck == 12 and covered(12, m):
                 solid[ROOF_ROW][c] = STEEL
@@ -652,7 +652,7 @@ def build_objects():
 
     # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
     # A door needs a wall: the ones by the open decks stand just inside.
-    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 250.2), ("d6-promenade", 6, 148),
+    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 250.2), ("d6-promenade", 6, 193.4),
                           ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
                           ("d12-sports", 12, 175)]:
@@ -720,11 +720,10 @@ def build_objects():
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
     add(promenade())
-    # Inside, each promenade door on the rooms' wall, a paper sign over it.
+    # Inside, each promenade door on the rooms' wall, where E uses it (no sign: the door says it,
+    # the user, 2026-11-03).
     for m in PROMENADE["doors"]:
-        put(PROMENADE["deck"], m, "door-deck")
-        add(point(f"sign-promenade-{m}", "sign", x_of(m), floor_y(PROMENADE["deck"]) - 86,
-                  [prop("text", "Promenade")]))
+        put(PROMENADE["deck"], m, "door-deck", x=x_of(m))
     # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
     for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
         put(7, 0, "railing-bg", x=x)
@@ -833,8 +832,9 @@ def build_objects():
         decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))
 
     # Deck 6, after NCL's plan and the user's photos (§5.3). Clear of its trunk doors (118, 125, 240),
-    # the promenade doors (111, 138, 162, 186, 218) and the theatre's crew door (209).
+    # the promenade doors (111, 138, 162, 186) and the crew doors (193.4, 209).
     # The Internet Café, at the end of the cabin corridor by the forward lobby.
+    decor("cafe-doorway", "doorway", x_of(64) - 8, x_of(64) - 8, deck=6, text="Internet Café")
     for m in (65.6, 67.6, 69.6):
         put(6, m, "office-chair-bg")
         put(6, m + 0.55, "computer-desk-bg")
@@ -866,6 +866,8 @@ def build_objects():
     # round a bar table; the back bar and its counter with tan stools; the chesterfield sofa under
     # a green lamp; the lit cabinet with a model ship, by the gallery as in her photo.
     decor("windjammer-ceiling", "coffers", exact_x(136), exact_x(150), deck=6)
+    add(point("sign-windjammer", "sign", exact_x(137.4), floor_y(6) - 100,
+              [prop("text", "Windjammer Bar"), prop("style", "plaque")]))
     put(6, 136.8, "ships-wheel-bg", 50)
     around(6, 139.6, "bar-table-bg", "club-chair-side-bg")
     put(6, 139.6, "green-lamp-bg", height("bar-table-bg"))
@@ -894,23 +896,24 @@ def build_objects():
     for m in (168.0, 174.9, 181.0):
         around(6, m, "reading-table-bg", "reading-chair-bg")
     around(6, 187.9, "chess-table-bg", "chair-bg")
-    put(6, 192.6, "desk-bg")
-    put(6, 192.6, "bankers-lamp-bg", height("desk-bg"))
-    put(6, 193.3, "chair-bg", flip=True)
+    put(6, 191.9, "desk-bg")
+    put(6, 191.9, "bankers-lamp-bg", height("desk-bg"))
+    put(6, 192.55, "chair-bg", flip=True)
     put(6, 184.6, "globe-bg")
     # The Stardust Lounge: deep navy, a red carpet, rows of red velvet seats facing the stage aft,
     # the stage with its red curtains, spotlights and the band's instruments.
-    decor("stardust-stage", "stage", exact_x(244), exact_x(252.2), deck=6)
+    decor("stardust-entrance", "marquee", exact_x(203.4), exact_x(203.4), deck=6, text="STARDUST LOUNGE")
+    stage_end = (col(EXTENT[6][1]) - STRUCTURE_COLS - 2) * TILE    # where the cut-away ends: the wall
+    decor("stardust-stage", "stage", exact_x(244), stage_end, deck=6)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
-        if all(abs(m - d) > 0.8 for d in (209, 218)):
+        if abs(m - 209) > 0.8:          # clear of the crew door
             put(6, m, "theatre-seat-bg")
     put(6, 245.2, "drum-kit-bg")
-    put(6, 247.4, "mic-stand-bg")
-    put(6, 248.6, "guitar-bg")
-    put(6, 250.6, "grand-piano-bg", flip=True)
+    put(6, 246.7, "mic-stand-bg")
+    put(6, 247.6, "guitar-bg")
+    put(6, 249.0, "grand-piano-bg", flip=True)
     put(6, 243.2, "speaker-stack-bg")
-    put(6, 252.0, "spotlight-bg", flip=True)
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [

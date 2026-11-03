@@ -382,6 +382,8 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'coffers') this.drawCoffers(decorGfx, o);
                     if (prop(o, 'kind') === 'lettering') this.drawLettering(o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
+                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -745,6 +747,41 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0xfbff86, 1).fillRect(x - 2, top + 18, 4, 1);
             g.fillStyle(0xfbff86, 0.22).fillEllipse(x + 10, y - 9, 34, 4);   // its pool of light on the boards
         }
+    }
+
+    // A room's open doorway off a corridor: a light wood frame, a brass plaque with its name beside.
+    drawDoorway(g, o, text) {
+        const x = o.x, y = o.y, top = y - 92, ceiling = y - this.deckPitch + 16;
+        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, top, 6, y - top);
+        g.fillStyle(0xab947a, 1).fillRect(x + 2, top, 1, y - top);
+        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, top - ceiling);
+        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, top - 4, 40, 5);
+        if (text) {
+            const plaque = this.add.text(x + 22, top - 14, text, {
+                fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',
+                backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
+            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+            this.worldLayer.add(plaque);
+        }
+    }
+
+    // The theatre's entrance: a gilded portal, its name lit up in a marquee of bulbs over it.
+    drawMarquee(g, o, text) {
+        const cx = o.x, y = o.y, w = 96, top = y - 118;
+        for (const side of [-1, 1]) {
+            const x = cx + side * (w / 2 - 4) - 4;
+            g.fillStyle(0xd9a43b, 1).fillRect(x, top + 26, 8, y - top - 26);
+            g.fillStyle(0xf9c22b, 1).fillRect(x + 2, top + 26, 2, y - top - 26);
+        }
+        g.fillStyle(0x6e2727, 1).fillRect(cx - w / 2, top, w, 26);
+        g.fillStyle(0xd9a43b, 1).fillRect(cx - w / 2, top, w, 2).fillRect(cx - w / 2, top + 24, w, 2);
+        for (let x = cx - w / 2 + 4; x < cx + w / 2 - 2; x += 6) {
+            g.fillStyle(0xfbff86, 1).fillRect(x, top + 3, 2, 2).fillRect(x, top + 21, 2, 2);
+        }
+        const name = this.add.text(cx, top + 13, text, {
+            fontFamily: 'Georgia, serif', fontSize: '9px', fontStyle: 'bold', color: '#fbff86', resolution: 4,
+        }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+        this.worldLayer.add(name);
     }
 
     // Warm downlights along a room's ceiling.

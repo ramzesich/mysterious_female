@@ -18,7 +18,7 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # Measured off NCL's profile at each deck's floor (2026-11-03). Decks 3-6 start at the bow's hull
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
-    3: (20, 254), 4: (20, 255), 5: (20, 255), 6: (20, 255), 7: (2.5, 254),
+    3: (20, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (2.5, 254),  # the stern: one straight wall
     8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
 }
 
@@ -47,7 +47,7 @@ ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 # with large glassless openings; the open middle has a railing and the boats. She switches between
 # the rooms and the promenade through the doors (metres from the bow, each on both sides).
 PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
-             "doors": [111, 138, 162, 186, 218]}
+             "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
 
 # Above the top deck.
 FUNNEL = (168, 196)

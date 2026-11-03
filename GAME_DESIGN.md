@@ -481,7 +481,8 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   partly concealed there. Its ends are closed: back in only through the doors.
   **Built (2026-11-03, `PROMENADE` in `tools/ship_layout.py`):** 102-226 m, enclosed ends 102-116
   and 212-226 m (white wall, 80 px openings between piers, a 30 px sill hiding her legs), doors
-  at 111, 138, 162, 186 and 218 m ("Promenade" paper signs over them inside; E, a 140 ms fade).
+  at 111, 138, 162 and 186 m (E, a 140 ms fade; 218 m, in the theatre, removed by the user, as
+  were the paper signs over them).
   On the promenade nothing on the deck is cut away (`route`, "inside" or "promenade"); the rooms'
   stairs, elevators, trunks and ladders are out of reach. A beige deck strip, a white railing
   with a wooden handrail and life rings, in front of her; white columns from deck 6 up past deck
@@ -849,7 +850,14 @@ Nothing blocks the start of the build. These get settled along the way:
       6's lobbies: a purple-navy carpet with gold (her photo). Art: two PixelLab sheets (64 at
       32px, `props-4`; 16 at 64px, `tall-1`; 10 generations each) and a theatre seat
       (`create_map_object`, 2 tries, 1 generation each: both three-quarter views, try 1 used);
-      front-facing armchairs and seats left out
+      front-facing armchairs and seats left out. The user's corrections: the crew door moved
+      from the Windjammer to the Library's aft end by the lobby; **no "Promenade" signs** (the
+      doors say it); **no promenade door in the theatre** (four doors: 111, 138, 162, 186); the
+      Internet Café opens off the corridor through a wood doorway with a brass plaque; the
+      theatre's entrance is a gilded portal with "STARDUST LOUNGE" in a marquee of bulbs; a brass
+      "Windjammer Bar" plaque; **decks 3-7 all end at 254 m**, one straight wall at the stern (a
+      deck sticking out past the one above left a strip of open terrace with half a wall), and the
+      stage runs to it between its two curtains
 - [ ] **Next: populate the ship deck by deck, upward from deck 7** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
