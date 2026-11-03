@@ -857,7 +857,8 @@ Nothing blocks the start of the build. These get settled along the way:
       theatre's entrance is a gilded portal with "STARDUST LOUNGE" in a marquee of bulbs; a brass
       "Windjammer Bar" plaque; **decks 3-7 all end at 254 m**, one straight wall at the stern (a
       deck sticking out past the one above left a strip of open terrace with half a wall), and the
-      stage runs to it between its two curtains
+      stage runs to it between its two curtains; at the promenade's ends she stops in the first
+      opening, partly behind the end pier (she used to slip behind it with bits poking out)
 - [ ] **Open: checkpoints, removed for now** (the user, 2026-11-03): some sat too close together;
       every checkpoint door is gone until the ship is split into unlockable areas (§5.5, key
       cards), when they are placed again, spaced out. Until then a scare always brings her back

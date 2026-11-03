@@ -437,6 +437,9 @@ export class ShipScene extends Phaser.Scene {
             front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
             const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
             const pier = (b - a - n * OPEN_W) / (n + 1);
+            // She stops at the inner edge of the end pier, in the first opening, partly behind it.
+            if (a === pr.x0) pr.minX = a + pier + PROMENADE.endStop;
+            if (b === pr.x1) pr.maxX = b - pier - PROMENADE.endStop;
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
@@ -1253,7 +1256,7 @@ export class ShipScene extends Phaser.Scene {
         // The promenade's ends are closed: back in only through the doors.
         if (!inside) {
             const pr = this.promenade;
-            const x = Phaser.Math.Clamp(p.x, pr.x0 + 12, pr.x1 - 12);
+            const x = Phaser.Math.Clamp(p.x, pr.minX ?? pr.x0 + 12, pr.maxX ?? pr.x1 - 12);
             if (x !== p.x) {
                 p.x = x;
                 body.velocity.x = 0;
