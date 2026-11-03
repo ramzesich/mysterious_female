@@ -447,7 +447,9 @@ along its whole indoor length, like a cut-out in the wall; every other deck show
 The cut-away **crossfades with her height** on stairs, ladders, trunks and elevators, and eases
 when she lands on another deck. The ship's very front and back always show the wall: every
 indoor deck end stops short of the hull (2.7 m of structure, `STRUCTURE_COLS`), the cut's edge a
-little shaded.
+little shaded. **The cut-out's edges are in shadow** (the user, 2026-11-03: the cut wasn't
+apparent): a soft dark gradient inside the opening wherever the shell goes on, deepest under the
+deck above, fading in with the cut (`CUT_SHADOW` in `src/config.js`); no hard line.
 - **Built (branch `outer-shell`):** step 1, the shell and the cut-away (the `exterior` tile layer,
   `EXT` tiles cut, `EXT_FIXED` never; `updateCutaway` in the scene); the outline: where a deck
   steps back by up to 8 m the shell slopes across the step (`shell_slopes`), so the bow's
