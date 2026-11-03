@@ -77,5 +77,7 @@ Lessons learned (2026-10-31):
 - When a generated piece doesn't read as intended, offer to drop or replace it rather than re-rolling
   again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
+- **To approve a piece of art, show the user the image in the chat** (a preview or screenshot) and
+  ask; don't send them to launch the game for it.
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
