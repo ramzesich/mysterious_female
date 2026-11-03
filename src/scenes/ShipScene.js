@@ -820,8 +820,8 @@ export class ShipScene extends Phaser.Scene {
         return b && Math.abs(p.y - b.deckY) < 2 && p.x >= b.x0 && p.x <= b.x1;
     }
 
-    // She walks to the tip of the bow, turns to us and spreads her arms into the wind, and the
-    // camera draws back to show the whole bow, the ship's sun on it. Any key brings it back.
+    // She walks to the tip of the bow and spreads her arms into the wind, facing the sea ahead,
+    // and the camera draws back to show the whole bow, the ship's sun on it. Any key brings it back.
     startBowView() {
         const p = this.player;
         const b = this.bowView;
@@ -836,7 +836,8 @@ export class ShipScene extends Phaser.Scene {
         this.pose('run', 0.9);
         this.tweens.add({
             targets: p, x: b.tipX, duration: (Math.abs(p.x - b.tipX) / (PLAYER.runSpeed * 0.9)) * 1000,
-            onComplete: () => p.anims.play('her-arms-wide'),
+            // The pose is drawn facing the bow (west), not mirrored.
+            onComplete: () => p.setFlipX(false).anims.play('her-arms-wide'),
         });
         this.script = () => {
             const i = this.controls.state;

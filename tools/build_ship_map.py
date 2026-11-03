@@ -625,8 +625,8 @@ def build_livery():
     img = Image.new("RGBA", (w, h))
     d = ImageDraw.Draw(img)
     # High and aft on the bow, where it is widest (the stem rakes back below), as on the real ship.
-    cx, cy = x_of(12.8) - x0, round(h * 0.34)
-    r = 100
+    cx, cy = x_of(14.2) - x0, round(h * 0.3)
+    r = 85
 
     def ray(angle, base, tip, width, colour):
         """A curved flame: from `base` out to `tip` radii, `width` degrees wide at its base, its tip
@@ -642,21 +642,21 @@ def build_livery():
         d.polygon(left + right[::-1], fill=colour)
         return right
 
+    # The bands first, behind the sun: from its centre, sweeping aft to the block's end.
+    for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
+        pts = []
+        for i in range(41):
+            t = i / 40
+            x = cx + (w - cx) * t
+            y = cy - 12 + k * 9 + 34 * math.sin(math.pi * t * 0.85) - 6 * t
+            pts.append((x, y))
+        d.line(pts, fill=colour, width=9 if colour != "#9babb2" else 3)
     for i in range(12):
         a = i * 30 - 75
         edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
         d.line([(x + 3, y + 3) for x, y in edge], fill="#9babb2", width=5)
         ray(a + 2, r * 1.05, r * 1.72, 12, "#fb6b1d")
         ray(a + 3, r * 1.15, r * 1.5, 6, "#f9c22b")
-    # The bands sweeping aft, from under the sun to the block's end.
-    for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
-        pts = []
-        for i in range(41):
-            t = i / 40
-            x = cx - r * 0.2 + (w - cx + r * 0.2) * t
-            y = cy + r * 0.75 + k * 13 + 40 * math.sin(math.pi * t * 0.85) - 10 * t
-            pts.append((x, y))
-        d.line(pts, fill=colour, width=13 if colour != "#9babb2" else 5)
     for frac, colour in ((1.0, "#ae2334"), (0.84, "#e83b3b"), (0.66, "#fb6b1d"), (0.5, "#f9c22b"),
                          (0.34, "#ffffff")):
         rr = r * frac
