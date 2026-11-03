@@ -23,7 +23,7 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, ROOF_ROW, TILE, TRUNKS, col, floor_y,
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, TILE, TRUNKS, col, floor_y,
                             walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -485,6 +485,31 @@ def scenario_bow(b):
     s = b.state()
     zoom = b.eval("window.__ship.cameras.main.zoom")
     ok &= check(s["mode"] == "play" and zoom == 2, "a key brings it back", (s, zoom))
+    return ok
+
+
+def scenario_promenade(b):
+    # Deck 6's two routes (§5.3): E at a door crosses between the rooms and the promenade; the
+    # promenade's ends are closed.
+    door = x_of(PROMENADE["doors"][1])
+    route = lambda: b.eval("window.__ship.route")
+    b.open("?reset&play&at=promenade")
+    ok = check(route() == "promenade", "?at=promenade starts her on the promenade", route())
+    b.eval(f"window.__ship.spawnAt({{x: {door + 8}, y: {floor_y(6)}, route: 'promenade'}})")
+    b.tap("e")
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(route() == "inside" and s["mode"] == "play" and s["x"] == door, "E at a door takes her inside", (route(), s))
+    b.shot("promenade-inside")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(route() == "promenade", "and E again back out", route())
+    b.eval(f"window.__ship.spawnAt({{x: {x_of(PROMENADE['span'][0]) + 120}, y: {floor_y(6)}, route: 'promenade'}})")
+    b.hold(["left"], 1.5)
+    s = b.state()
+    ok &= check(route() == "promenade" and s["x"] >= x_of(PROMENADE["span"][0]) and s["y"] == floor_y(6),
+                "its fore end is closed", (route(), s))
+    b.shot("promenade-fore")
     return ok
 
 

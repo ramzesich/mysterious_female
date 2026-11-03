@@ -15,7 +15,8 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, PROMENADE,
+                         TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -369,7 +370,10 @@ def shell_details(ext, solid):
         x0, x1 = col(fwd) * TILE, col(aft) * TILE
         # Square windows, balconies and big windows, laid out on fixed spacings from the bow so the
         # rows line up deck over deck.
-        for unit, style in ((96, "square"), (144, "balcony"), (64, "venue"), (48, "bridge")):
+        prom_a, prom_b = PROMENADE["span"]
+        open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
+        doors = [x_of(m) for m in PROMENADE["doors"]]
+        for unit, style in ((96, "square"), (144, "balcony"), (64, "venue"), (48, "bridge"), (192, "promenade")):
             for x in range(x0 - x0 % unit, x1, unit):
                 c = (x + unit // 2) // TILE
                 if not (x0 <= x and x + unit <= x1):
@@ -385,13 +389,27 @@ def shell_details(ext, solid):
                 balcony = kind == "cabins" and deck >= 8 and metres(c) >= 82
                 want = ("balcony" if balcony else "square") if kind == "cabins" else \
                        "bridge" if kind == "crew" and deck == 10 else "venue" if kind == "venue" else None
+                # Along the promenade (the user, 2026-11-03): its wall has only a few windows, clear
+                # of the doors, and deck 7 has none where the boats hang in front of it.
+                if deck == PROMENADE["deck"] + 1 and open_a <= metres(c) < open_b:
+                    continue
+                if deck == PROMENADE["deck"] and prom_a <= metres(c) < prom_b:
+                    mid = x + unit // 2
+                    clear = all(abs(mid - d) > 70 for d in doors) and x_of(open_a) + 28 <= mid <= x_of(open_b) - 28
+                    want = "promenade" if clear else None
                 if want != style:
                     continue
-                if style == "square":
+                if deck == 5 and style in ("square", "venue"):
+                    # Deck 5's windows are round (the user's photos).
+                    for px in ((x + 35, x + 61) if style == "square" else (x + 32,)):
+                        put(own, ["c", px, floor - 72, 7, FRAME])
+                        put(own, ["c", px, floor - 72, 5, GLASS_DARK])
+                        rect(own, px - 3, floor - 75, 2, 1, "#8fd3ff")
+                elif style == "square":
                     window(own, x + 30, floor - 76, 11, 9)
                     window(own, x + 56, floor - 76, 11, 9)
-                elif style == "venue":
-                    window(own, x + 12, floor - 94, 40, 30)
+                elif style in ("venue", "promenade"):
+                    window(own, x + unit // 2 - 20, floor - 94, 40, 30)
                 elif style == "bridge":
                     rect(own, x, floor - 104, unit, 22, GLASS_DARK)
                     rect(own, x, floor - 103, unit, 1, "#4d65b4")
@@ -484,9 +502,10 @@ def build_objects():
 
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
-                          ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
+                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
+    add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -629,10 +648,12 @@ def build_objects():
     stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
-    # The lifeboats (§5.3), hanging high on the ship's side at deck 7's level along the promenade, each
-    # from a pair of white davits. The point is the boat's left end, at deck 7's floor.
-    for m in range(88, 216, 9):
-        add(point(f"lifeboat-{m}", "lifeboat", x_of(m), floor_y(7)))
+    add(promenade())
+    # Inside, each promenade door on the rooms' wall, a paper sign over it.
+    for m in PROMENADE["doors"]:
+        put(PROMENADE["deck"], m, "door-deck")
+        add(point(f"sign-promenade-{m}", "sign", x_of(m), floor_y(PROMENADE["deck"]) - 86,
+                  [prop("text", "Promenade")]))
     # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
     for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
         put(7, 0, "railing-bg", x=x)
@@ -672,18 +693,53 @@ def build_objects():
     put(6, 116.5, "sconce-round-bg", 52)
     for i in range(4):
         put(6, 120 + i * 1.1, "bar-stool-bg")
-    # The promenade's outer railing along deck 6, with a life ring every 12 m.
-    a, b = 150, 194
-    for x in range(x_of(a) + 16, x_of(b) - 16, width("railing-bg")):
-        put(6, 0, "railing-bg", x=x)
-    for m in range(a + 6, b - 3, 12):
-        put(6, m, "life-ring-rail-bg")
+    # The library (club chairs, reading lamps, a writing desk) and the photo gallery (the ship's
+    # photographers' pictures along the wall), deck 6, inside the promenade.
+    for m in (153, 158):
+        put(6, m, "club-chair-side-bg")
+        put(6, m + 1.2, "side-table-bg")
+        put(6, m + 1.2, "table-lamp-bg", height("side-table-bg"))
+        put(6, m + 2.4, "club-chair-side-bg", flip=True)
+    put(6, 166, "desk-bg")
+    put(6, 166, "table-lamp-bg", height("desk-bg"))
+    put(6, 167, "chair-bg", flip=True)
+    for i, m in enumerate(range(172, 192, 3)):
+        if abs(m - 186) > 1.5:
+            put(6, m, ("picture-sea-bg", "picture-ship-bg", "picture-art-bg")[i % 3], 46)
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
         prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
 
     return objs
+
+
+BOAT_W, BOAT_PITCH = 300, 9      # the lifeboat's drawn length (px) and their spacing (m)
+
+
+def promenade():
+    """Deck 6's promenade (§5.3), as one object for the game to draw and use: its span, the doors,
+    the enclosed ends, and the lifeboats hanging in pairs of davits over the open middle, a white
+    column between each two boats."""
+    deck, (a, b) = PROMENADE["deck"], PROMENADE["span"]
+    open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
+    span = x_of(open_b) - x_of(open_a)
+    pitch = BOAT_PITCH * PER_M * TILE
+    n = (span - BOAT_W) // pitch + 1
+    first = x_of(open_a) + (span - (n - 1) * pitch - BOAT_W) // 2
+    boats = [first + k * pitch for k in range(n)]
+    gap = (pitch - BOAT_W) // 2
+    columns = [x - gap for x in boats] + [boats[-1] + BOAT_W + gap]
+    doors = [x_of(m) for m in PROMENADE["doors"]]
+    for d in doors:
+        assert all(abs(d - c) > 30 for c in columns), ("a promenade door behind a column", metres(d // TILE))
+    return area("promenade", "promenade", x_of(a), floor_y(deck) - 2 * DECK_PITCH, x_of(b) - x_of(a), 2 * DECK_PITCH, [
+        prop("floor", floor_y(deck), "int"),
+        prop("doors", ",".join(map(str, doors))),
+        prop("enclosed", ",".join(f"{x_of(p)}:{x_of(q)}" for p, q in PROMENADE["enclosed"])),
+        prop("boats", ",".join(map(str, boats))),
+        prop("columns", ",".join(map(str, columns))),
+    ])
 
 
 def tile_layer(layer_id, name, grid):

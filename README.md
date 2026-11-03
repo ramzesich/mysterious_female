@@ -23,7 +23,7 @@ URL flags, combinable (`?play&debug`):
 | `?debug` | Show collision boxes and her position/state |
 | `?cards=all` | Every key card, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
-| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade`, `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` |
+| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` |
 
 ## Controls
 

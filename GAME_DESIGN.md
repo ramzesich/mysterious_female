@@ -470,6 +470,17 @@ little shaded.
   hanging high up** (deck 7's level), a white railing at the edge. Its fore and aft parts are
   enclosed by a wall with **large glassless window openings**, drawn in front of her, so she is
   partly concealed there. Its ends are closed: back in only through the doors.
+  **Built (2026-11-03, `PROMENADE` in `tools/ship_layout.py`):** 102-226 m, enclosed ends 102-116
+  and 212-226 m (white wall, 80 px openings between piers, a 30 px sill hiding her legs), doors
+  at 111, 138, 162, 186 and 218 m ("Promenade" paper signs over them inside; E, a 140 ms fade).
+  On the promenade nothing on the deck is cut away (`route`, "inside" or "promenade"); the rooms'
+  stairs, elevators, trunks and ladders are out of reach. A beige deck strip, a white railing
+  with a wooden handrail and life rings, in front of her; white columns from deck 6 up past deck
+  7, between the boats, holding the davit arms. The shell along it, the user's corrections: **only
+  a few windows on the promenade's wall** (one every 4 m, clear of the doors), **none on deck 7
+  where the boats hang**, and **deck 5's windows are round**. 150-194 m inside is now the library
+  and photo gallery (a few muted pieces; furnished properly with deck 6). `?at=promenade` starts
+  on it, `?at=library` inside.
 - **Lifeboats:** the real ones (the user's photos) have a **red-orange canopy roof over a white
   hull**, hanging from white davits; seen from below on the promenade, white undersides with
   propellers. Three PixelLab tries from text (1 generation each, `create_map_object` 400x100 side
@@ -478,9 +489,9 @@ little shaded.
   crop is too soft, they came out as red and white stripes). **Approved (2026-11-03): drawn by
   hand**, `tools/draw_lifeboat.py` (free; writes `assets/ship/lifeboat.png`): 300x100, red canopy
   over a white hull, a row of small windows, the hatch amidships, the steering cupola aft, a
-  release hook at each end. **Size approved**: 300 px, about five times her height. They hang on
-  deck 7's wall every 9 m from 88 to 215 m (15 boats), on white davits (placeholder posts, to be
-  shaped with the promenade), and fade with deck 7's cut-away. The photo crops
+  release hook at each end. **Size approved**: 300 px, about five times her height. Ten hang
+  over the promenade's open middle at deck 7's level, every 9 m, from davit arms on the white
+  columns; they fade when she is inside deck 6 or 7. The photo crops
   (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
 - The sun livery stays on the bow for now (the user, "then we'll see"); on the real ship it sits
   about 40 m from the bow, low on the hull.
@@ -789,9 +800,9 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] **Elevators fetch smoothly** (2026-11-03, merged): a car on another deck comes to her
       first, out of sight in a core, the panel counting it in; no more jumps
 - [ ] **Now: the outer shell, branch `outer-shell`** (§5.3 "The outer shell"): steps 1 and 2 built
-      and committed (not merged; pushed for safety). Step 3: the lifeboats are drawn and
-      hang on the side (approved, size too); **next, deck 6's two routes** (rooms and promenade, doors between, as decided
-      in §5.3). Then show the user, then merge
+      and committed (not merged; pushed for safety). Step 3: the lifeboats (approved, size
+      too) and deck 6's two routes, built (the promenade, its doors, the shell's windows as the
+      user corrected them). **Show the user step 3, then merge** to `main`
 - [ ] **Then: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small

@@ -42,6 +42,13 @@ CORES = {"forward": (74, 82), "midship": (102, 110), "aft": (194, 202)}
 # two screens wide, the user's choice (2026-11-02): at 10 m it looked narrow next to its height.
 ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 
+# Deck 6's promenade (§5.3, decided 2026-11-03): outside the rooms, along the ship's side, two
+# decks tall with the lifeboats hanging high over it. Its fore and aft ends are enclosed by a wall
+# with large glassless openings; the open middle has a railing and the boats. She switches between
+# the rooms and the promenade through the doors (metres from the bow, each on both sides).
+PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
+             "doors": [111, 138, 162, 186, 218]}
+
 # Above the top deck.
 FUNNEL = (168, 196)
 MAST = (54, 62)
@@ -84,7 +91,7 @@ VENUES = [
 
     (6, 20, 68, "Cabins, internet café", "cabins"),
     (6, 110, 150, "Bars, shops, photo studio", "venue"),
-    (6, 150, 194, "Library, photo gallery; promenade, lifeboats", "outdoor"),
+    (6, 150, 194, "Library, photo gallery", "venue"),
     (6, 206, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
 
     (5, 20, 74, "Cabins", "cabins"),
