@@ -6,6 +6,7 @@ import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
+const RAILING = 4;
 
 const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
@@ -97,12 +98,20 @@ export class ShipScene extends Phaser.Scene {
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
 
         this.solidLayer.setCollisionByExclusion([-1]);
-        // A ladder's top is a one-way floor: solid to stand on, open to climb through.
+        // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
+        // where an open deck ends stays solid but is drawn with the same railing as the decks'
+        // sides (white rails, a wooden handrail), one piece standing on its foot.
+        const railings = [];
         this.solidLayer.forEachTile(t => {
             if (t.index === LADDER_TOP) t.setCollision(false, false, true, false);
+            if (t.index !== RAILING) return;
+            t.setAlpha(0);
+            if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
+            railings.push(this.add.image(t.pixelX + t.width / 2, t.pixelY + t.height, 'shipart', 'railing-bg')
+                .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
         });
 
-        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer]);
+        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings]);
     }
 
     buildObjects() {
