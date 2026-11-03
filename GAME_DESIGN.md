@@ -832,7 +832,7 @@ Nothing blocks the start of the build. These get settled along the way:
       the map builder); **no cabin door right beside a trunk or crew door** (100 px apart, centre
       to centre); the livery's bands run on past the bow onto the decks' fixed ends and **taper to
       a tip**. Placeholder venue signs are gone from decks 4 and 5 (`FURNISHED`)
-- [ ] **Deck 6 furnished** (2026-11-03, branch `deck-6`, shown, not yet merged): laid out after
+- [x] **Deck 6 furnished** (2026-11-03, merged): laid out after
       **NCL's deck plan** (`reference/norwegian-sun-ship-map.pdf`: its profile lists each deck's
       rooms by part of the ship): the Photo Gallery is on deck 6 beside the Library (deck 7 has
       the Art Gallery); Restaurant Reservations is on deck 5 (its desk there now has the look of
