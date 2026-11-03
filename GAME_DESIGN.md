@@ -800,11 +800,11 @@ Nothing blocks the start of the build. These get settled along the way:
       `?tangerines=infinite`, `?at=gangway`
 - [x] **Elevators fetch smoothly** (2026-11-03, merged): a car on another deck comes to her
       first, out of sight in a core, the panel counting it in; no more jumps
-- [ ] **Now: the outer shell, branch `outer-shell`** (§5.3 "The outer shell"): steps 1 and 2 built
-      and committed (not merged; pushed for safety). Step 3: the lifeboats (approved, size
-      too) and deck 6's two routes, built (the promenade, its doors, the shell's windows as the
-      user corrected them). **Show the user step 3, then merge** to `main`
-- [ ] **Then: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
+- [x] **The outer shell** (2026-11-03, merged; §5.3 "The outer shell"): the ship seen from
+      outside, the current deck cut away; its outline from the profile; windows, balconies,
+      portholes, funnel, mast and domes; the hand-drawn lifeboats; deck 6's promenade with its
+      doors (two routes), as the user corrected it
+- [ ] **Next: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
