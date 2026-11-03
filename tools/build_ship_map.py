@@ -269,7 +269,7 @@ def build_objects():
     add(point("gangway", "spawn", x_of(67), floor_y(4)))
 
     # Named places to start at, for testing: ?at=<name> (README).
-    for name, deck, m in [("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
+    for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
