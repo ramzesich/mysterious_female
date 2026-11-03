@@ -654,19 +654,25 @@ def build_livery():
     def curve(f, n=80):
         return [f(i / n) for i in range(n + 1)]
 
-    # Forward of the sun, in the bow's wide upper part (the stem rakes back below): a red band
-    # above, sweeping down into the sun, and a red, orange and yellow band below, coming in level.
-    band(curve(lambda t: (cx * t, 24 + (cy - 40 - 24) * t ** 1.5)), ("#e83b3b",), 10)
-    band(curve(lambda t: (cx * t, cy + 6 + 14 * math.sin(math.pi * t))), ("#e83b3b", "#fb6b1d", "#f9c22b"), 7)
-    # Aft of it: the big red arc looping up and over, its foot under the sun's right.
-    ax, ay, ar = cx + r * 2.35, cy - 8, r * 1.4
-    band(curve(lambda t: (ax + ar * math.cos(math.radians(150 + 235 * t)),
-                          ay + ar * math.sin(math.radians(150 + 235 * t)))), ("#e83b3b", "#ae2334"), 10)
-    # The yellow swoop from under the arc, away aft; the red pinstripes on to the block's end.
-    band(curve(lambda t: (ax - ar * 0.6 + (w - ax + ar * 0.6) * t, ay + ar * 0.85 + 30 * math.sin(math.pi * t) - 26 * t)),
-         ("#f9c22b", "#fbb954"), 8, shadow=False)
-    for k in range(2):
-        d.line(curve(lambda t, k=k: (cx + r + (w - cx - r) * t, ay + ar * 1.3 + k * 8 - 16 * t)), fill="#e83b3b", width=3)
+    # Two bands, in the bow's wide upper part (the stem rakes back below): a red one sweeping down
+    # from the bow's top into the sun, and a red, orange and yellow one coming in level from the
+    # stem. Both run on behind the sun and, past it, part: the upper curving up, the lower down.
+    def upper(t):
+        if t <= 0.6:
+            u = t / 0.6
+            return cx * u, 24 + (cy - 64) * u ** 1.5
+        u = (t - 0.6) / 0.4
+        return cx + (w - cx) * u, cy - 40 + 40 * u - 110 * u * u
+
+    def lower(t):
+        if t <= 0.6:
+            u = t / 0.6
+            return cx * u, cy + 6 + 14 * math.sin(math.pi * u)
+        u = (t - 0.6) / 0.4
+        return cx + (w - cx) * u, cy + 6 - 10 * u + 90 * u * u
+
+    band(curve(upper, 160), ("#e83b3b",), 10)
+    band(curve(lower, 160), ("#e83b3b", "#fb6b1d", "#f9c22b"), 7)
     # A clear gap round the sun's rim, then the sun over it.
     gap = r * 1.12
     d.ellipse((cx - gap, cy - gap, cx + gap, cy + gap), fill=(0, 0, 0, 0))
