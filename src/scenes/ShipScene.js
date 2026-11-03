@@ -698,7 +698,7 @@ export class ShipScene extends Phaser.Scene {
     }
 
     refreshHud() {
-        this.hudCount.setText(`× ${this.save.tangerines}`);
+        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines}`);
         const left = Math.max(0, this.dashUntil - this.time.now);
         const dashing = left > 0;
         this.dashBarBack.setVisible(dashing);
@@ -1663,9 +1663,14 @@ export class ShipScene extends Phaser.Scene {
         return this.dashUntil > this.time.now;
     }
 
+    // ?tangerines=infinite: the dash never uses one up, for testing.
+    infiniteTangerines() {
+        return new URLSearchParams(location.search).get('tangerines') === 'infinite';
+    }
+
     tryDash(time) {
-        if (this.isDashing() || this.save.tangerines <= 0) return;
-        this.save.tangerines -= 1;
+        if (this.isDashing() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         this.dashUntil = time + DASH.durationMs;
         this.bubbleUntil = time + DASH.bubbleMs;
         sfx.dash();
@@ -1795,8 +1800,9 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const sx = (p.x - cam.worldView.x) * cam.zoom;
         const sy = (p.y - PLAYER.height - 6 - cam.worldView.y) * cam.zoom;
-        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(sx, sy);
-        this.alert.setPosition(sx, sy);
+        // On whole pixels: between them the text smears as she dashes.
+        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(Math.round(sx), Math.round(sy));
+        this.alert.setPosition(Math.round(sx), Math.round(sy));
         if (this.debugText.visible) {
             this.debugText.setText(`${this.mode}  x ${p.x.toFixed(0)}  y ${p.y.toFixed(0)}  takeoff ${this.takeoffY?.toFixed(0)}`);
         }

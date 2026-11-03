@@ -22,6 +22,7 @@ URL flags, combinable (`?play&debug`):
 | `?reset` | Clear the saved progress |
 | `?debug` | Show collision boxes and her position/state |
 | `?cards=all` | Every key card, for testing |
+| `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
 | `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade`, `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` |
 
 ## Controls
