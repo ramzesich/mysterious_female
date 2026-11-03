@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, CUT_SHADOW, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -110,6 +110,37 @@ export class ShipScene extends Phaser.Scene {
         });
         for (const deck of Object.keys(this.shellTiles)) this.shellAlpha[deck] = 1;
         this.viewDeck = null;
+        // The cut-out's edges in shadow (§5.3, the user, 2026-11-03), so the deck she is on reads
+        // as the inside of the ship: a soft dark band inside the opening wherever the shell goes on,
+        // deepest under the deck above. It shows as the deck is cut away.
+        this.cutShadows = {};
+        for (const [deck, list] of Object.entries(this.shellTiles)) {
+            const own = new Set(list.map(t => `${t.x},${t.y}`));
+            const g = this.add.graphics().setDepth(DEPTH.exterior + 0.01).setAlpha(0);
+            const band = (x, y, w, h, side, depth) => {
+                const steps = Math.ceil(depth / 2);
+                for (let i = 0; i < steps; i++) {
+                    g.fillStyle(CUT_SHADOW.colour, CUT_SHADOW.alpha * (1 - i / steps) ** 1.6);
+                    if (side === 'top') g.fillRect(x, y + i * 2, w, 2);
+                    else if (side === 'bottom') g.fillRect(x, y + h - (i + 1) * 2, w, 2);
+                    else if (side === 'left') g.fillRect(x + i * 2, y, 2, h);
+                    else g.fillRect(x + w - (i + 1) * 2, y, 2, h);
+                }
+            };
+            for (const t of list) {
+                const shell = (dx, dy) => {
+                    if (own.has(`${t.x + dx},${t.y + dy}`)) return false;
+                    const n = this.exteriorLayer.getTileAt(t.x + dx, t.y + dy);
+                    return !!n && n.index > 0;
+                };
+                const [x, y, w, h] = [t.pixelX, t.pixelY, t.width, t.height];
+                if (shell(0, -1)) band(x, y, w, h, 'top', CUT_SHADOW.top);
+                if (shell(0, 1)) band(x, y, w, h, 'bottom', CUT_SHADOW.bottom);
+                if (shell(-1, 0)) band(x, y, w, h, 'left', CUT_SHADOW.ends);
+                if (shell(1, 0)) band(x, y, w, h, 'right', CUT_SHADOW.ends);
+            }
+            this.cutShadows[deck] = g;
+        }
         // Where a deck steps back, the shell slopes across the step, so the outline runs smoothly.
         this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
             const g = this.add.graphics().setDepth(DEPTH.exterior);
@@ -144,7 +175,7 @@ export class ShipScene extends Phaser.Scene {
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
-            ...this.shellSlopes.map(s => s.gfx)]);
+            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx)]);
     }
 
     buildObjects() {
@@ -1277,6 +1308,7 @@ export class ShipScene extends Phaser.Scene {
             if (alpha === this.shellAlpha[deck]) continue;
             this.shellAlpha[deck] = alpha;
             for (const t of this.shellTiles[deck]) t.alpha = alpha;
+            this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
