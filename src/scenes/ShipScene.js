@@ -12,7 +12,8 @@ const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
     glassShaft: 5.15, glassCar: 5.2, inGlassCar: 5.25, glassDoors: 5.3,
     frontStairs: 5.4, onFrontStairs: 5.45, frontBalustrade: 5.5, walkFloor: 5.6,
-    solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, player: 9, fx: 10,
+    solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, exterior: 8.6,
+    swimmer: 8.62, poolWater: 8.65, player: 9, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -96,6 +97,25 @@ export class ShipScene extends Phaser.Scene {
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
+        // The outer shell over everything (§5.3): the deck she is on is cut away, its tiles faded.
+        this.exteriorLayer = map.createLayer('exterior', tiles).setDepth(DEPTH.exterior);
+        this.deckFloors = JSON.parse(props.deckFloors);
+        const cut = new Set(String(props.exteriorCut).split(',').map(Number));
+        this.shellTiles = {};
+        this.shellAlpha = {};
+        this.exteriorLayer.forEachTile(t => {
+            if (!cut.has(t.index)) return;
+            const deck = this.deckOfRow(t.y);
+            (this.shellTiles[deck] ||= []).push(t);
+        });
+        for (const deck of Object.keys(this.shellTiles)) this.shellAlpha[deck] = 1;
+        this.viewDeck = null;
+        // Where a deck steps back, the shell slopes across the step, so the outline runs smoothly.
+        this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
+            const g = this.add.graphics().setDepth(DEPTH.exterior);
+            g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
+            return { deck: s.deck, gfx: g };
+        });
 
         this.solidLayer.setCollisionByExclusion([-1]);
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
@@ -111,7 +131,8 @@ export class ShipScene extends Phaser.Scene {
                 .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
         });
 
-        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings]);
+        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+            ...this.shellSlopes.map(s => s.gfx)]);
     }
 
     buildObjects() {
@@ -281,7 +302,7 @@ export class ShipScene extends Phaser.Scene {
                     });
                     const last = stem[stem.length - 1];
                     const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
-                    plating.fillStyle(0xf4f4f4, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
+                    plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
                     const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.solid + 0.1);
                     this.worldLayer.add([plating, sun]);
                     break;
@@ -538,6 +559,7 @@ export class ShipScene extends Phaser.Scene {
         const back = this.add.graphics().setDepth(DEPTH.walkFloor);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
         this.worldLayer.add([back, front]);
+        (this.deckFronts ||= []).push({ deck: this.deckOfY(y), gfx: front });
 
         // The walkway: its floor on top, its front with an edge, a light under it.
         back.fillStyle(look.front, 1).fillRect(x0, y, x1 - x0, 12);
@@ -563,10 +585,10 @@ export class ShipScene extends Phaser.Scene {
     // A pool on deck 11 (§5.3): water she can jump into and swim in. Its front is drawn over her,
     // a little see-through, so she is in it rather than on it.
     buildPool(o) {
-        const water = this.add.graphics().setDepth(DEPTH.player + 0.4);
+        const water = this.add.graphics().setDepth(DEPTH.poolWater);
         water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
         water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
-        const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.player + 0.45);
+        const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.poolWater + 0.01);
         this.worldLayer.add([water, ripples]);
         this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples });
     }
@@ -788,6 +810,7 @@ export class ShipScene extends Phaser.Scene {
         for (const pool of this.pools) pool.ripples.tilePositionX += dt * 6;
         this.closeTrunkDoors();
         this.closeLiftDoors();
+        this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.
         if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') {
@@ -1017,6 +1040,7 @@ export class ShipScene extends Phaser.Scene {
         p.body.setVelocity(0, 0);
         p.body.enable = false;
         p.y = pool.y + SWIM.float;
+        p.setDepth(DEPTH.swimmer);
         sfx.splash();
         this.splash(p.x, pool.y);
         this.pose('swim');
@@ -1033,6 +1057,7 @@ export class ShipScene extends Phaser.Scene {
         if (input.jumpPressed) {
             this.mode = 'play';
             this.pool = null;
+            p.setDepth(DEPTH.player);
             p.y = pool.y - 2;
             p.body.enable = true;
             p.body.reset(p.x, p.y);
@@ -1055,6 +1080,59 @@ export class ShipScene extends Phaser.Scene {
         p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
         this.time.delayedCall(450, () => { if (this.droppingThrough === walk) this.droppingThrough = null; });
         return true;
+    }
+
+    // --- The outer shell's cut-away (§5.3) -----------------------------------------------------
+
+    deckOfRow(row) {
+        for (const [deck, floor] of Object.entries(this.deckFloors)) {
+            if (row <= floor && row > floor - this.deckPitch / 16) return Number(deck);
+        }
+        return null;
+    }
+
+    deckOfY(y) {
+        return this.deckOfRow(Math.floor((y - 1) / 16));
+    }
+
+    // Where she is, in decks, as a number: whole on a deck's floor, between two while she climbs
+    // stairs, a ladder or a trunk, or rides an elevator, so the cut-away crossfades with her.
+    deckAt(y) {
+        const floors = Object.entries(this.deckFloors).map(([d, r]) => [Number(d), r * 16]).sort((a, b) => b[1] - a[1]);
+        for (let i = 0; i < floors.length - 1; i++) {
+            const [d, f] = floors[i];
+            const above = floors[i + 1][1];
+            if (y <= f && y >= above) return d + (f - y) / (f - above);
+        }
+        return y > floors[0][1] ? floors[0][0] : floors[floors.length - 1][0];
+    }
+
+    updateCutaway(dt) {
+        const p = this.player;
+        const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
+            || (this.mode === 'lift' && this.liftMove?.carriesHer);
+        let target;
+        if (moving) target = this.deckAt(p.y);
+        else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
+        else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
+        else if (this.mode === 'play' && !(p.body.blocked.down || p.body.touching.down)) target = this.viewDeck;  // in the air
+        else target = Math.round(this.deckAt(p.y));
+        if (target === null || target === undefined) {
+            this.viewDeck = null;
+        } else if (this.viewDeck === null || moving) {
+            this.viewDeck = target;
+        } else {
+            this.viewDeck = approach(this.viewDeck, target, dt * 4);
+        }
+        for (const deck of Object.keys(this.shellTiles)) {
+            const alpha = this.viewDeck === null ? 1 : Phaser.Math.Clamp(Math.abs(Number(deck) - this.viewDeck), 0, 1);
+            if (Math.abs(alpha - this.shellAlpha[deck]) < 0.02 && alpha !== 0 && alpha !== 1) continue;
+            if (alpha === this.shellAlpha[deck]) continue;
+            this.shellAlpha[deck] = alpha;
+            for (const t of this.shellTiles[deck]) t.alpha = alpha;
+        }
+        for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
+        for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(this.shellAlpha[deck] ?? 1);
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------
