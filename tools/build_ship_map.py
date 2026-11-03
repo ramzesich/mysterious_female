@@ -31,14 +31,13 @@ COLS = SEA + LENGTH * PER_M + SEA
  EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN) = range(1, 36)
 TILE_COUNT = 35
 
-# The outer shell (§5.3): the off-white plating seen from outside, its colour, and the line along
-# each deck's floor. Where a deck steps back from the one below by less than SLOPE_MAX metres, the
+# The outer shell (§5.3): the off-white plating seen from outside, and its colour.
+# Where a deck steps back from the one below by less than SLOPE_MAX metres, the
 # shell slopes across the step, so the outline runs smoothly like the real ship's; bigger steps
 # (the mooring deck, the aft diner terrace) keep their open shape. EXT tiles are cut away while
 # she is on their deck; EXT_FIXED ones never are.
 SLOPE_MAX = 8
 PLATING = "#e8eaec"
-DECK_LINE = "#cfd4d8"
 EXT_CUT = (EXT, EXT_SLAB)
 
 # A cabin corridor stops short of the outer plating (the user, 2026-11-03): this many columns of the
@@ -304,13 +303,8 @@ def build_exterior():
                     ext[r][c] = EXT_FIXED if fixed else EXT
             ext[floor][c] = EXT_FIXED_SLAB if fixed else EXT_SLAB
         # (The cut's edges are shaded by the game now, a soft shadow inside the opening.)
-        # Rounded top corners where a deck's indoors steps out beyond the deck above, unless the
-        # shell slopes across that step.
-        top = floor - DECK_ROWS + 1
-        slope_ends = {s["end"] for s in shell_slopes() if s["deck"] == deck}
-        for c, tile, end in ((c0, EXT_CORNER_L, "fwd"), (c1, EXT_CORNER_R, "aft")):
-            if ext[top][c] and not ext[top - 1][c] and end not in slope_ends:
-                ext[top][c] = tile
+        # (No rounded corner tiles, nor a line along each deck's floor: the user, 2026-11-03; they
+        # read as stray marks on the plating.)
     return ext
 
 
@@ -322,6 +316,7 @@ FRAME = "#9babb2"
 
 
 PORTHOLE_PITCH = 160
+PORTHOLE_R = 12      # the round windows: 24 px across (the user, 2026-11-03)
 END_COVER = 32       # px of wall the game draws over her at each end of a cut-away deck
 
 
@@ -359,13 +354,16 @@ def shell_details(ext, solid):
         rect(owner, x, y, w, h, GLASS_DARK)
         rect(owner, x + 1, y + 1, max(1, w // 3), 1, "#8fd3ff")
 
-    # The lower hull, crew decks 1-3: a row of round portholes along each deck.
+    # The lower hull, crew decks 1-3: a row of round portholes along each deck, as big as deck 5's
+    # and in line under them (the user, 2026-11-03: small ones made no sense).
     for k in range(HULL_DECKS_BELOW + 1):
         y = (FLOOR_ROW[3] - DECK_ROWS // 2 + k * DECK_ROWS) * TILE
-        for x in range(col(EXTENT[3][0]) * TILE + 40, col(EXTENT[3][1]) * TILE - 40, 144):
-            if solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]:
-                put("fixed", ["c", x, y, 5, FRAME])
-                put("fixed", ["c", x, y, 3, GLASS_DARK])
+        a = col(EXTENT[3][0]) * TILE + 40
+        for x in range(a - a % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, col(EXTENT[3][1]) * TILE - 40, PORTHOLE_PITCH):
+            if x >= a and (solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]):
+                put("fixed", ["c", x, y, PORTHOLE_R, FRAME])
+                put("fixed", ["c", x, y, PORTHOLE_R - 2, GLASS_DARK])
+                rect("fixed", x - 5, y - 6, 3, 1, "#8fd3ff")
     # The dark navy band along the waterline.
     w0 = round(stem_x(WATER_ROW))
     rect("fixed", w0, WATER_ROW * TILE - 14, col(EXTENT[3][1]) * TILE - w0, 14, "#1d2b53")
@@ -380,12 +378,12 @@ def shell_details(ext, solid):
         # Deck 5's windows are round, fewer and bigger (the user, 2026-11-03).
         if deck == 5:
             for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
-                own = span_owner(x - 10, x + 10, mid_row, deck)
+                own = span_owner(x - PORTHOLE_R, x + PORTHOLE_R, mid_row, deck)
                 if own is None or x < x0 + 20:
                     continue
-                put(own, ["c", x, floor - 72, 10, FRAME])
-                put(own, ["c", x, floor - 72, 8, GLASS_DARK])
-                rect(own, x - 4, floor - 77, 3, 1, "#8fd3ff")
+                put(own, ["c", x, floor - 72, PORTHOLE_R, FRAME])
+                put(own, ["c", x, floor - 72, PORTHOLE_R - 2, GLASS_DARK])
+                rect(own, x - 5, floor - 78, 3, 1, "#8fd3ff")
         prom_a, prom_b = PROMENADE["span"]
         open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
         doors = [x_of(m) for m in PROMENADE["doors"]]
@@ -872,9 +870,8 @@ def draw_tile(tile_id):
         # The ship's off-white outer plating, clean (seams on every tile read as stripes).
         rect(0, 0, 15, 15, hex_rgba(PLATING))
     elif tile_id in (EXT_SLAB, EXT_FIXED_SLAB):
-        # The plating along a deck's floor, the deck's line at its foot.
+        # The plating along a deck's floor, plain like the rest.
         rect(0, 0, 15, 15, hex_rgba(PLATING))
-        rect(0, 15, 15, 15, hex_rgba(DECK_LINE))
     elif tile_id in (EXT_EDGE_L, EXT_EDGE_R):
         # The wall at the edge of the cut-away stretch, shaded toward the cut to show its thickness.
         rect(0, 0, 15, 15, hex_rgba(PLATING))
