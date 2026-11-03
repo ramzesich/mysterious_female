@@ -203,7 +203,9 @@ export class ShipScene extends Phaser.Scene {
             frontRail: this.add.graphics().setDepth(DEPTH.frontBalustrade),
         };
         const decorGfx = this.add.graphics().setDepth(DEPTH.decor);
-        this.worldLayer.add([decorGfx, ...Object.values(stairsGfx)]);
+        // The walls' own lines (panel seams), behind every door and fitting on them.
+        this.wallGfx = this.add.graphics().setDepth(DEPTH.decor - 0.05);
+        this.worldLayer.add([this.wallGfx, decorGfx, ...Object.values(stairsGfx)]);
 
         const objects = this.map.getObjectLayer('objects').objects;
         // Trunk doors take the place of any cabin door drawn where they stand.
@@ -557,11 +559,17 @@ export class ShipScene extends Phaser.Scene {
     // the wall at either end, and a dark blue runner mat on the carpet by the shell door.
     drawGangway(g, o) {
         const top = o.y - this.deckPitch + 16;
-        for (let x = o.x + 24; x < o.x + o.width; x += 32) g.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
+        for (let x = o.x + 24; x < o.x + o.width - 16; x += 32) this.wallGfx.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
         // A fire door at each end, held open: folded back flat against the wall, so seen face on,
         // a narrow vision panel in it, a kick plate, and the wall magnet holding its free edge.
-        for (const [x, dir] of [[o.x + 8, 1], [o.x + o.width - 38, -1]]) {
+        // Each stands in its frame where the lobby meets the next part of the deck, so the wall
+        // changes at a doorway.
+        const [left, right] = [o.x - 8, o.x + o.width - 8];
+        for (const [x, dir] of [[left + 3, 1], [right - 33, -1]]) {
             const w = 30, h = 76;
+            const post = dir > 0 ? left - 2 : right - 2;
+            g.fillStyle(0xcfc2a7, 1).fillRect(post, top, 4, o.y - top);
+            g.fillStyle(0xb9ab90, 1).fillRect(post + (dir > 0 ? 3 : 0), top, 1, o.y - top);
             g.fillStyle(0xb9ab90, 1).fillRect(x - 1, o.y - h - 1, w + 2, h + 1);
             g.fillStyle(0xddd2bb, 1).fillRect(x, o.y - h, w, h);
             g.fillStyle(0xcfc2a7, 1).fillRect(x, o.y - 10, w, 10);
