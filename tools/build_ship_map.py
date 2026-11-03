@@ -679,9 +679,9 @@ def build_objects():
              [prop("kind", "windows")]))
 
     # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
-    # end, a dark blue runner mat at the shell door, an exit sign over it, fire equipment.
-    add(area("gangway-lobby", "decor", x_of(60), floor_y(4), x_of(74) - x_of(60), 0, [prop("kind", "gangway"),
-        prop("matX0", x_of(61.3), "int"), prop("matX1", x_of(64.4), "int")]))
+    # end (folded flat against the wall), an exit sign over the shell door, fire equipment. (The
+    # photo's runner mat is left out: from the side a floor mat is only a sliver.)
+    add(area("gangway-lobby", "decor", x_of(60), floor_y(4), x_of(74) - x_of(60), 0, [prop("kind", "gangway")]))
     put(4, 62.85, "exit-sign-bg", 92)
     put(4, 65.3, "picture-ship-bg", 44)
     put(4, 66.6, "hose-cabinet-bg", 18)

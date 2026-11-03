@@ -359,7 +359,7 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
-                    if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o, prop(o, 'matX0', o.x), prop(o, 'matX1', o.x));
+                    if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
@@ -555,15 +555,22 @@ export class ShipScene extends Phaser.Scene {
 
     // The gangway lobby (the user's photo): cream panelling, a heavy fire door held open against
     // the wall at either end, and a dark blue runner mat on the carpet by the shell door.
-    drawGangway(g, o, matX0, matX1) {
+    drawGangway(g, o) {
         const top = o.y - this.deckPitch + 16;
         for (let x = o.x + 24; x < o.x + o.width; x += 32) g.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
-        for (const [x, dir] of [[o.x + 8, 1], [o.x + o.width - 14, -1]]) {
-            g.fillStyle(0xd9cdb6, 1).fillRect(x, o.y - 76, 6, 76);
-            g.fillStyle(0xb9ab90, 1).fillRect(dir > 0 ? x + 5 : x, o.y - 76, 1, 76);
-            g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? x + 6 : x - 2, o.y - 30, 2, 2);  // the hook holding it
+        // A fire door at each end, held open: folded back flat against the wall, so seen face on,
+        // a narrow vision panel in it, a kick plate, and the wall magnet holding its free edge.
+        for (const [x, dir] of [[o.x + 8, 1], [o.x + o.width - 38, -1]]) {
+            const w = 30, h = 76;
+            g.fillStyle(0xb9ab90, 1).fillRect(x - 1, o.y - h - 1, w + 2, h + 1);
+            g.fillStyle(0xddd2bb, 1).fillRect(x, o.y - h, w, h);
+            g.fillStyle(0xcfc2a7, 1).fillRect(x, o.y - 10, w, 10);
+            g.fillStyle(0x9babb2, 1).fillRect(x + w / 2 - 3, o.y - 64, 6, 22);
+            g.fillStyle(0xc7dcd0, 1).fillRect(x + w / 2 - 2, o.y - 63, 4, 20);
+            const edge = dir > 0 ? x + w : x - 1;
+            g.fillStyle(0x7f708a, 1).fillRect(dir > 0 ? edge + 1 : edge - 4, o.y - 36, 4, 6);  // the magnet
+            g.fillStyle(0x9babb2, 1).fillRect(dir > 0 ? edge - 3 : edge + 1, o.y - 35, 3, 4);   // its plate
         }
-        g.fillStyle(0x323353, 1).fillRect(matX0, o.y - 2, matX1 - matX0, 2);
     }
 
     // Windows along a wall, looking out to sea: the bridge's.
