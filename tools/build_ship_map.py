@@ -15,7 +15,8 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, PROMENADE,
+                         TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -26,8 +27,19 @@ COLS = SEA + LENGTH * PER_M + SEA
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
- LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB) = range(1, 27)
-TILE_COUNT = 26
+ LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB,
+ EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN) = range(1, 36)
+TILE_COUNT = 35
+
+# The outer shell (§5.3): the off-white plating seen from outside, its colour, and the line along
+# each deck's floor. Where a deck steps back from the one below by less than SLOPE_MAX metres, the
+# shell slopes across the step, so the outline runs smoothly like the real ship's; bigger steps
+# (the mooring deck, the aft diner terrace) keep their open shape. EXT tiles are cut away while
+# she is on their deck; EXT_FIXED ones never are.
+SLOPE_MAX = 8
+PLATING = "#e8eaec"
+DECK_LINE = "#cfd4d8"
+EXT_CUT = (EXT, EXT_SLAB)
 
 # A cabin corridor stops short of the outer plating (the user, 2026-11-03): this many columns of the
 # ship's structure (steel frames) lie between, then the corridor's end wall.
@@ -39,8 +51,11 @@ DECK_PITCH = DECK_ROWS * TILE
 TOP_FLOOR_ROW = 3 * DECK_ROWS - 1          # deck 12's floor; above it, the roof, funnel and mast
 FLOOR_ROW = {d: TOP_FLOOR_ROW + (12 - d) * DECK_ROWS for d in DECKS}
 ROOF_ROW = FLOOR_ROW[12] - DECK_ROWS       # the roof over deck 12's indoor rooms
-WATER_ROW = FLOOR_ROW[3] - 1               # the sea surface: deck 3 sits at the waterline
-ROWS = FLOOR_ROW[3] + 10                   # the hull below deck 3, down past the keel
+# The sea surface: two decks of hull (crew decks 1 and 2) show above it below deck 3, as in the
+# user's photo of the whole ship, where the hull below the promenade is nearly five decks tall.
+HULL_DECKS_BELOW = 2
+WATER_ROW = FLOOR_ROW[3] + HULL_DECKS_BELOW * DECK_ROWS - 1
+ROWS = WATER_ROW + 11                      # the hull below the waterline, down past the keel
 
 # The card each flight of stairs needs, by the deck it climbs to: her own crew card covers decks
 # 4-6, the Hotel card everything above (§6.2).
@@ -107,11 +122,11 @@ def stem_m(row):
 
 
 def corridor_ends(deck):
-    """The deck's ends where a cabin corridor meets the outer plating: (plating column, inward)."""
+    """The deck's indoor ends at the outer plating: (plating column, inward). The playable space
+    stops short of them, so the ship's ends always show its outer wall (the user, 2026-11-03)."""
     fwd, aft = EXTENT[deck]
     for c, inward in ((col(fwd), 1), (col(aft) - 1, -1)):
-        m = metres(c + inward * (STRUCTURE_COLS + 2))
-        if covered(deck, metres(c + inward)) and venue_at(deck, m)[1] == "cabins":
+        if covered(deck, metres(c + inward)) and indoor(deck, metres(c + inward * (STRUCTURE_COLS + 2))):
             yield c, inward
 
 
@@ -236,7 +251,9 @@ def build_layers():
     # line the game draws over the stem's edge.
     for r in range(FLOOR_ROW[7] + 1, ROWS):
         below = r - FLOOR_ROW[3]
-        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - below
+        # The stern goes straight down to the waterline, as the real transom does, and only rounds
+        # away under the water.
+        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - max(0, r - WATER_ROW)
         fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
@@ -256,15 +273,209 @@ def build_layers():
         fill(solid, col(a), col(b) - 1, bottom, bottom, POOL_TILE)
 
     # Funnel and mast, standing on the roof.
-    fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, STEEL)
-    fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, STEEL)
+    # (Solid but drawn by the game's shell: the navy funnel and the white mast, §5.3.)
+    fill(solid, col(FUNNEL[0]), col(FUNNEL[1]) - 1, ROOF_ROW - 12, ROOF_ROW - 1, HIDDEN)
+    fill(solid, col(MAST[0]) + 6, col(MAST[1]) - 7, ROOF_ROW - 14, ROOF_ROW - 1, HIDDEN)
 
     # A technical ladder beside the funnel housing, deck 12 up to the roof (§5.1).
     lc = funnel_ladder_col()
     solid[ROOF_ROW][lc] = LADDER_TOP
     fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
 
-    return back, solid, ladders
+    return back, solid, ladders, build_exterior()
+
+
+def build_exterior():
+    """The outer shell, a layer over everything (§5.3): every deck's indoor part and its floor's
+    edge, in off-white plating. The game cuts away the deck she is on (EXT tiles); the ship's ends,
+    deck 3 and the structure stay (EXT_FIXED), their edge at the cut a little shaded, their top
+    outer corners rounded."""
+    ext = [[0] * COLS for _ in range(ROWS)]
+    for deck in DECKS:
+        fwd, aft = EXTENT[deck]
+        c0, c1 = col(fwd), col(aft) - 1
+        floor = FLOOR_ROW[deck]
+        for c in range(c0, c1 + 1):
+            m = metres(c)
+            shell = c in (c0, c1) and covered(deck, metres(c + (1 if c == c0 else -1)))
+            fixed = deck == 3 or shell or in_structure(deck, c)
+            if indoor(deck, m) or fixed:
+                for r in range(floor - DECK_ROWS + 1, floor):
+                    ext[r][c] = EXT_FIXED if fixed else EXT
+            ext[floor][c] = EXT_FIXED_SLAB if fixed else EXT_SLAB
+        # The cut's edges: the fixed wall beside a cut-away stretch shows a little thickness.
+        for r in range(floor - DECK_ROWS + 1, floor):
+            for c in range(c0, c1 + 1):
+                if ext[r][c] == EXT_FIXED and ext[r][c + 1] == EXT:
+                    ext[r][c] = EXT_EDGE_R
+                elif ext[r][c] == EXT_FIXED and ext[r][c - 1] == EXT:
+                    ext[r][c] = EXT_EDGE_L
+        # Rounded top corners where a deck's indoors steps out beyond the deck above, unless the
+        # shell slopes across that step.
+        top = floor - DECK_ROWS + 1
+        slope_ends = {s["end"] for s in shell_slopes() if s["deck"] == deck}
+        for c, tile, end in ((c0, EXT_CORNER_L, "fwd"), (c1, EXT_CORNER_R, "aft")):
+            if ext[top][c] and not ext[top - 1][c] and end not in slope_ends:
+                ext[top][c] = tile
+    return ext
+
+
+# --- The outer shell's details (§5.3, the user's photo of the whole ship) ---------------------------
+
+GLASS_DARK = "#323353"
+GLASS = "#484a77"
+FRAME = "#9babb2"
+
+
+PORTHOLE_PITCH = 160
+
+
+def shell_details(ext, solid):
+    """What is on the outside of the shell, as shapes for the game to draw over it: each listed
+    under the deck whose wall it is on (it fades with that deck's cut-away) or under "fixed".
+    Portholes along the lower hull, square windows on the cabin decks, balconies higher up, big
+    windows on the public rooms, the bridge's window band, the open decks' bulwark and windscreen,
+    and on top the roof's edge, the funnel, the mast and the radar domes."""
+    out = {}
+
+    def put(owner, shape):
+        out.setdefault(str(owner), []).append(shape)
+
+    def owner_at(c, r, deck):
+        t = ext[r][c] if 0 <= r < ROWS and 0 <= c < COLS else 0
+        if t in EXT_CUT:
+            return deck
+        return "fixed" if t else None
+
+    def rect(owner, x, y, w, h, colour):
+        put(owner, ["r", round(x), round(y), round(w), round(h), colour])
+
+    def window(owner, x, y, w, h):
+        rect(owner, x - 1, y - 1, w + 2, h + 2, FRAME)
+        rect(owner, x, y, w, h, GLASS_DARK)
+        rect(owner, x + 1, y + 1, max(1, w // 3), 1, "#8fd3ff")
+
+    # The lower hull, crew decks 1-3: a row of round portholes along each deck.
+    for k in range(HULL_DECKS_BELOW + 1):
+        y = (FLOOR_ROW[3] - DECK_ROWS // 2 + k * DECK_ROWS) * TILE
+        for x in range(col(EXTENT[3][0]) * TILE + 40, col(EXTENT[3][1]) * TILE - 40, 144):
+            if solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]:
+                put("fixed", ["c", x, y, 5, FRAME])
+                put("fixed", ["c", x, y, 3, GLASS_DARK])
+    # The dark navy band along the waterline.
+    w0 = round(stem_x(WATER_ROW))
+    rect("fixed", w0, WATER_ROW * TILE - 14, col(EXTENT[3][1]) * TILE - w0, 14, "#1d2b53")
+
+    for deck in PLAYABLE:
+        fwd, aft = EXTENT[deck]
+        floor = FLOOR_ROW[deck] * TILE
+        mid_row = FLOOR_ROW[deck] - 4
+        x0, x1 = col(fwd) * TILE, col(aft) * TILE
+        # Square windows, balconies and big windows, laid out on fixed spacings from the bow so the
+        # rows line up deck over deck.
+        # Deck 5's windows are round, fewer and bigger (the user, 2026-11-03).
+        if deck == 5:
+            for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
+                own = owner_at(x // TILE, mid_row, deck)
+                if own is None or x < x0 + 20:
+                    continue
+                put(own, ["c", x, floor - 72, 10, FRAME])
+                put(own, ["c", x, floor - 72, 8, GLASS_DARK])
+                rect(own, x - 4, floor - 77, 3, 1, "#8fd3ff")
+        prom_a, prom_b = PROMENADE["span"]
+        open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
+        doors = [x_of(m) for m in PROMENADE["doors"]]
+        for unit, style in ((96, "square"), (144, "balcony"), (64, "venue"), (48, "bridge"), (192, "promenade")):
+            for x in range(x0 - x0 % unit, x1, unit):
+                c = (x + unit // 2) // TILE
+                if not (x0 <= x and x + unit <= x1):
+                    continue
+                own = owner_at(c, mid_row, deck)
+                if own is None:
+                    continue
+                _, kind = venue_at(deck, metres(c))
+                # From outside the hull's side has windows all along, whatever lies behind it: by
+                # the stair cores and the atrium, the deck's usual ones.
+                if in_core(metres(c)) or in_atrium(deck, metres(c)) or kind is None:
+                    kind = "cabins" if deck in (4, 5, 8, 9, 10) else "venue"
+                balcony = kind == "cabins" and deck >= 8 and metres(c) >= 82
+                want = ("balcony" if balcony else "square") if kind == "cabins" else \
+                       "bridge" if kind == "crew" and deck == 10 else "venue" if kind == "venue" else None
+                # Along the promenade (the user, 2026-11-03): its wall has only a few windows, clear
+                # of the doors, and deck 7 has none where the boats hang in front of it.
+                if deck == PROMENADE["deck"] + 1 and open_a <= metres(c) < open_b:
+                    continue
+                if deck == PROMENADE["deck"] and prom_a <= metres(c) < prom_b:
+                    mid = x + unit // 2
+                    clear = all(abs(mid - d) > 70 for d in doors) and x_of(open_a) + 28 <= mid <= x_of(open_b) - 28
+                    want = "promenade" if clear else None
+                if want != style:
+                    continue
+                if deck == 5:
+                    continue
+                if style == "square":
+                    window(own, x + 30, floor - 76, 11, 9)
+                    window(own, x + 56, floor - 76, 11, 9)
+                elif style in ("venue", "promenade"):
+                    window(own, x + unit // 2 - 20, floor - 94, 40, 30)
+                elif style == "bridge":
+                    rect(own, x, floor - 104, unit, 22, GLASS_DARK)
+                    rect(own, x, floor - 103, unit, 1, "#4d65b4")
+                else:
+                    # A balcony: the cabin's dark glass door, a white partition, a glass railing.
+                    rect(own, x, floor - 112, unit, 104, GLASS)
+                    rect(own, x + 18, floor - 100, unit - 36, 60, GLASS_DARK)
+                    rect(own, x, floor - 112, 6, 104, "#e8eaec")
+                    rect(own, x + 6, floor - 40, unit - 6, 32, "#7f9aa8")
+                    rect(own, x + 6, floor - 42, unit - 6, 2, "#e8eaec")
+        # The open decks up top: a white bulwark with a glass windscreen above it, all along.
+        if deck >= 11:
+            for x in range(x0, x1, TILE):
+                m = metres(x // TILE)
+                _, kind = venue_at(deck, m)
+                if indoor(deck, m) or in_core(m):
+                    continue
+                rect(deck, x, floor - 24, TILE, 24, "#e8eaec")
+                rect(deck, x, floor - 48, TILE, 24, "#bfe6f5")
+                rect(deck, x, floor - 50, TILE, 2, "#cd683d")
+            for x in range(x0, x1, 48):
+                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)):
+                    rect(deck, x, floor - 50, 2, 26, "#e8eaec")
+
+    # On top: the roof's white edge, the navy funnel with its dark grille, the white mast, the domes.
+    roof = ROOF_ROW * TILE
+    for c in range(COLS):
+        if solid[ROOF_ROW][c] == STEEL:
+            rect("fixed", c * TILE, roof, TILE, TILE, "#e8eaec")
+    fa, fb = x_of(FUNNEL[0]) - 8, x_of(FUNNEL[1]) + 8
+    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], GLASS_DARK])
+    put("fixed", ["p", [[fa + 46, roof - 12 * TILE + 14], [fb - 32, roof - 12 * TILE + 14], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], "#2e222f"])
+    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 4, roof - 22], [fa + 6, roof - 22]], "#e8eaec"])
+    ma, mb = x_of(MAST[0]), x_of(MAST[1])
+    mc = (ma + mb) / 2
+    put("fixed", ["p", [[mc - 22, roof], [mc + 22, roof], [mc + 5, roof - 14 * TILE], [mc - 5, roof - 14 * TILE]], "#e8eaec"])
+    rect("fixed", mc - 34, roof - 10 * TILE, 68, 6, "#e8eaec")
+    for m in (118, 124, 146):
+        rect("fixed", x_of(m) - 4, roof - 26, 8, 26, "#c7dcd0")
+        put("fixed", ["c", x_of(m), roof - 40, 18, "#e8eaec"])
+        put("fixed", ["c", x_of(m) + 5, roof - 45, 6, "#ffffff"])
+    return out
+
+
+def shell_slopes():
+    """Where the shell slopes across a deck's step back (§5.3): from the deck's own end at its floor
+    to where the deck above ends, at the top of its band. The game draws these, fading with the
+    deck."""
+    slopes = []
+    for deck in DECKS[:-1]:
+        floor_end, top_end = EXTENT[deck], EXTENT[deck + 1]
+        for end, i, sign in (("fwd", 0, 1), ("aft", 1, -1)):
+            foot = FRONT_WALL.get(deck, floor_end[i]) if end == "fwd" else floor_end[i]
+            step = (top_end[i] - foot) * sign
+            if 0 < step <= SLOPE_MAX:
+                slopes.append({"deck": deck, "end": end, "x0": col(foot) * TILE, "x1": col(top_end[i]) * TILE,
+                               "yTop": (FLOOR_ROW[deck] - DECK_ROWS + 1) * TILE, "yFloor": FLOOR_ROW[deck] * TILE})
+    return slopes
 
 
 def point(name, obj_type, x, y, props=None):
@@ -299,9 +510,10 @@ def build_objects():
 
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
-                          ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
+                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
+    add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -399,7 +611,7 @@ def build_objects():
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 27, "bat", -1),
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 30, "bat", -1),
                                             ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
@@ -444,6 +656,12 @@ def build_objects():
     stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
+    add(promenade())
+    # Inside, each promenade door on the rooms' wall, a paper sign over it.
+    for m in PROMENADE["doors"]:
+        put(PROMENADE["deck"], m, "door-deck")
+        add(point(f"sign-promenade-{m}", "sign", x_of(m), floor_y(PROMENADE["deck"]) - 86,
+                  [prop("text", "Promenade")]))
     # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
     for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
         put(7, 0, "railing-bg", x=x)
@@ -457,7 +675,7 @@ def build_objects():
         prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
         prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
     # The bridge's windows on deck 10, looking out to sea.
-    add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
+    add(area("bridge-windows", "decor", x_of(28.6), floor_y(10) - 104, x_of(39) - x_of(28.6), 30,
              [prop("kind", "windows")]))
 
     # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
@@ -483,18 +701,53 @@ def build_objects():
     put(6, 116.5, "sconce-round-bg", 52)
     for i in range(4):
         put(6, 120 + i * 1.1, "bar-stool-bg")
-    # The promenade's outer railing along deck 6, with a life ring every 12 m.
-    a, b = 150, 194
-    for x in range(x_of(a) + 16, x_of(b) - 16, width("railing-bg")):
-        put(6, 0, "railing-bg", x=x)
-    for m in range(a + 6, b - 3, 12):
-        put(6, m, "life-ring-rail-bg")
+    # The library (club chairs, reading lamps, a writing desk) and the photo gallery (the ship's
+    # photographers' pictures along the wall), deck 6, inside the promenade.
+    for m in (153, 158):
+        put(6, m, "club-chair-side-bg")
+        put(6, m + 1.2, "side-table-bg")
+        put(6, m + 1.2, "table-lamp-bg", height("side-table-bg"))
+        put(6, m + 2.4, "club-chair-side-bg", flip=True)
+    put(6, 166, "desk-bg")
+    put(6, 166, "table-lamp-bg", height("desk-bg"))
+    put(6, 167, "chair-bg", flip=True)
+    for i, m in enumerate(range(172, 192, 3)):
+        if abs(m - 186) > 1.5:
+            put(6, m, ("picture-sea-bg", "picture-ship-bg", "picture-art-bg")[i % 3], 46)
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
         prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
 
     return objs
+
+
+BOAT_W, BOAT_PITCH = 300, 9      # the lifeboat's drawn length (px) and their spacing (m)
+
+
+def promenade():
+    """Deck 6's promenade (§5.3), as one object for the game to draw and use: its span, the doors,
+    the enclosed ends, and the lifeboats hanging in pairs of davits over the open middle, a white
+    column between each two boats."""
+    deck, (a, b) = PROMENADE["deck"], PROMENADE["span"]
+    open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
+    span = x_of(open_b) - x_of(open_a)
+    pitch = BOAT_PITCH * PER_M * TILE
+    n = (span - BOAT_W) // pitch + 1
+    first = x_of(open_a) + (span - (n - 1) * pitch - BOAT_W) // 2
+    boats = [first + k * pitch for k in range(n)]
+    gap = (pitch - BOAT_W) // 2
+    columns = [x - gap for x in boats] + [boats[-1] + BOAT_W + gap]
+    doors = [x_of(m) for m in PROMENADE["doors"]]
+    for d in doors:
+        assert all(abs(d - c) > 30 for c in columns), ("a promenade door behind a column", metres(d // TILE))
+    return area("promenade", "promenade", x_of(a), floor_y(deck) - 2 * DECK_PITCH, x_of(b) - x_of(a), 2 * DECK_PITCH, [
+        prop("floor", floor_y(deck), "int"),
+        prop("doors", ",".join(map(str, doors))),
+        prop("enclosed", ",".join(f"{x_of(p)}:{x_of(q)}" for p, q in PROMENADE["enclosed"])),
+        prop("boats", ",".join(map(str, boats))),
+        prop("columns", ",".join(map(str, columns))),
+    ])
 
 
 def tile_layer(layer_id, name, grid):
@@ -504,17 +757,21 @@ def tile_layer(layer_id, name, grid):
 
 
 def build_map():
-    back, solid, ladders = build_layers()
+    back, solid, ladders, exterior = build_layers()
     objs = build_objects()
     return {
         "type": "map", "version": "1.10", "tiledversion": "1.11.0", "orientation": "orthogonal",
         "renderorder": "right-down", "infinite": False, "width": COLS, "height": ROWS,
-        "tilewidth": TILE, "tileheight": TILE, "nextlayerid": 5, "nextobjectid": len(objs) + 1,
+        "tilewidth": TILE, "tileheight": TILE, "nextlayerid": 6, "nextobjectid": len(objs) + 1,
         "properties": [
             {"name": "deckPitch", "type": "int", "value": DECK_PITCH},
             {"name": "hullMinX", "type": "int", "value": col(EXTENT[4][0]) * TILE},
             {"name": "hullMaxX", "type": "int", "value": col(EXTENT[4][1]) * TILE},
             {"name": "waterY", "type": "int", "value": WATER_ROW * TILE},
+            {"name": "deckFloors", "type": "string", "value": json.dumps({d: FLOOR_ROW[d] for d in DECKS})},
+            {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in EXT_CUT)},
+            {"name": "shellSlopes", "type": "string", "value": json.dumps(shell_slopes())},
+            {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
             "firstgid": 1, "name": "placeholder", "image": "../assets/tiles/placeholder.png",
@@ -525,6 +782,7 @@ def build_map():
             tile_layer(1, "background", back),
             tile_layer(2, "solid", solid),
             tile_layer(3, "ladders", ladders),
+            tile_layer(5, "exterior", exterior),
             {"id": 4, "name": "objects", "type": "objectgroup", "x": 0, "y": 0, "opacity": 1,
              "visible": True, "draworder": "topdown", "objects": objs},
         ],
@@ -601,9 +859,26 @@ def draw_tile(tile_id):
         for x, y in ((3, 2), (3, 3), (3, 4), (9, 8), (9, 9), (12, 12), (12, 13), (6, 14)):
             px[y][x] = hex_rgba("#6e2727")
         rect(0, 0, 0, 15, hex_rgba("#6e2727"))
-    elif tile_id == HULL:
-        # The ship's white outer plating, clean (seams on every tile read as stripes).
-        rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
+    elif tile_id in (HULL, EXT, EXT_FIXED):
+        # The ship's off-white outer plating, clean (seams on every tile read as stripes).
+        rect(0, 0, 15, 15, hex_rgba(PLATING))
+    elif tile_id in (EXT_SLAB, EXT_FIXED_SLAB):
+        # The plating along a deck's floor, the deck's line at its foot.
+        rect(0, 0, 15, 15, hex_rgba(PLATING))
+        rect(0, 15, 15, 15, hex_rgba(DECK_LINE))
+    elif tile_id in (EXT_EDGE_L, EXT_EDGE_R):
+        # The wall at the edge of the cut-away stretch, shaded toward the cut to show its thickness.
+        rect(0, 0, 15, 15, hex_rgba(PLATING))
+        for i, colour in enumerate(("#bfc5ca", "#c9ced3", "#d8dcdf")):
+            x = i if tile_id == EXT_EDGE_L else 15 - i
+            rect(x, 0, x, 15, hex_rgba(colour))
+    elif tile_id in (EXT_CORNER_L, EXT_CORNER_R):
+        # A rounded outer corner: plating inside a quarter circle.
+        for y in range(16):
+            for x in range(16):
+                dx = 15 - x if tile_id == EXT_CORNER_L else x
+                if dx * dx + (15 - y) * (15 - y) <= 16 * 16:
+                    px[y][x] = hex_rgba(PLATING)
     elif tile_id == SLAB:
         # The deck's steel slab with nothing laid on it: under the ship's structure.
         rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
@@ -717,7 +992,7 @@ def build_livery():
     # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
     # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
     # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
-    cx, cy = x_of(13) - x0, round(h * 0.3)
+    cx, cy = x_of(13) - x0, round((FLOOR_ROW[3] - FLOOR_ROW[7] - 1) * TILE * 0.3)  # high on the bow, as approved
     r = 72
 
     def ray(angle, base, tip, width, colour):

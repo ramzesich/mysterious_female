@@ -22,13 +22,13 @@
 <rect x="82" y="260" width="1257.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="279.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">7</text>
 <text x="1372.0" y="279.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">7</text>
-<rect x="172" y="230" width="1155.0" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="177" y="230" width="1150.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="249.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">8</text>
 <text x="1372.0" y="249.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">8</text>
-<rect x="185" y="200" width="1132.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="188" y="200" width="1129.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="219.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">9</text>
 <text x="1372.0" y="219.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">9</text>
-<rect x="190" y="170" width="1115" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="195" y="170" width="1110" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="189.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">10</text>
 <text x="1372.0" y="189.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">10</text>
 <rect x="190" y="140" width="1100" height="30" fill="#f7f7f7" stroke="#ffffff"/>
@@ -55,8 +55,8 @@
 <text x="955.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Garden Café buffet, Ice Cream Bar</text>
 <rect x="1080" y="142" width="210" height="26" rx="2" fill="#f7bdbd"/>
 <text x="1185.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Great Outdoors diner (finale)</text>
-<rect x="190" y="172" width="80" height="26" rx="2" fill="#f3d9c9"/>
-<text x="230.0" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
+<rect x="195" y="172" width="75" height="26" rx="2" fill="#f3d9c9"/>
+<text x="232.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
 <rect x="270" y="172" width="170" height="26" rx="2" fill="#ececec"/>
 <text x="355.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="480" y="172" width="100" height="26" rx="2" fill="#ececec"/>
@@ -65,24 +65,24 @@
 <text x="830.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="172" width="225" height="26" rx="2" fill="#ececec"/>
 <text x="1192.5" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="185" y="202" width="255" height="26" rx="2" fill="#ececec"/>
-<text x="312.5" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="188" y="202" width="252.0" height="26" rx="2" fill="#ececec"/>
+<text x="314.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
 <text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
 <rect x="600" y="202" width="440" height="26" rx="2" fill="#ececec"/>
 <text x="820.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="202" width="237.5" height="26" rx="2" fill="#ececec"/>
 <text x="1198.8" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="172" y="232" width="267.5" height="26" rx="2" fill="#ececec"/>
-<text x="306.2" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="177" y="232" width="263.0" height="26" rx="2" fill="#ececec"/>
+<text x="308.5" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="232" width="420" height="26" rx="2" fill="#ececec"/>
 <text x="830.0" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="232" width="247.5" height="26" rx="2" fill="#ececec"/>
 <text x="1203.8" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="82" y="262" width="90.0" height="26" rx="2" fill="#d6ecd0"/>
-<text x="127.5" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mooring deck</text>
-<rect x="172" y="262" width="197.5" height="26" rx="2" fill="#cfe3f0"/>
-<text x="271.2" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Kids' and teen clubs</text>
+<rect x="82" y="262" width="94.5" height="26" rx="2" fill="#d6ecd0"/>
+<text x="129.8" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mooring deck</text>
+<rect x="177" y="262" width="193.0" height="26" rx="2" fill="#cfe3f0"/>
+<text x="273.5" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Kids' and teen clubs</text>
 <rect x="620" y="262" width="200" height="26" rx="2" fill="#cfe3f0"/>
 <text x="720.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Magnum's bar, art gallery</text>
 <rect x="820" y="262" width="220" height="26" rx="2" fill="#cfe3f0"/>

@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -12,7 +12,8 @@ const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
     glassShaft: 5.15, glassCar: 5.2, inGlassCar: 5.25, glassDoors: 5.3,
     frontStairs: 5.4, onFrontStairs: 5.45, frontBalustrade: 5.5, walkFloor: 5.6,
-    solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, player: 9, fx: 10,
+    solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, exterior: 8.6,
+    swimmer: 8.62, poolWater: 8.65, player: 9, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -96,6 +97,37 @@ export class ShipScene extends Phaser.Scene {
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
+        // The outer shell over everything (§5.3): the deck she is on is cut away, its tiles faded.
+        this.exteriorLayer = map.createLayer('exterior', tiles).setDepth(DEPTH.exterior);
+        this.deckFloors = JSON.parse(props.deckFloors);
+        const cut = new Set(String(props.exteriorCut).split(',').map(Number));
+        this.shellTiles = {};
+        this.shellAlpha = {};
+        this.exteriorLayer.forEachTile(t => {
+            if (!cut.has(t.index)) return;
+            const deck = this.deckOfRow(t.y);
+            (this.shellTiles[deck] ||= []).push(t);
+        });
+        for (const deck of Object.keys(this.shellTiles)) this.shellAlpha[deck] = 1;
+        this.viewDeck = null;
+        // Where a deck steps back, the shell slopes across the step, so the outline runs smoothly.
+        this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
+            const g = this.add.graphics().setDepth(DEPTH.exterior);
+            g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
+            return { deck: s.deck, gfx: g };
+        });
+        // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
+        // each on its deck's wall, fading with it, or always there ("fixed").
+        const colour = c => Phaser.Display.Color.HexStringToColor(c).color;
+        for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
+            const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
+            for (const s of shapes) {
+                if (s[0] === 'r') g.fillStyle(colour(s[5]), 1).fillRect(s[1], s[2], s[3], s[4]);
+                else if (s[0] === 'c') g.fillStyle(colour(s[4]), 1).fillCircle(s[1], s[2], s[3]);
+                else g.fillStyle(colour(s[2]), 1).fillPoints(s[1].map(([x, y]) => ({ x, y })), true);
+            }
+            this.shellSlopes.push({ deck: owner === 'fixed' ? null : Number(owner), gfx: g });
+        }
 
         this.solidLayer.setCollisionByExclusion([-1]);
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
@@ -111,7 +143,8 @@ export class ShipScene extends Phaser.Scene {
                 .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
         });
 
-        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings]);
+        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+            ...this.shellSlopes.map(s => s.gfx)]);
     }
 
     buildObjects() {
@@ -122,6 +155,8 @@ export class ShipScene extends Phaser.Scene {
         this.vacuums = [];
         this.cats = [];
         this.places = {};
+        this.promenade = null;
+        this.route = 'inside';
         this.trunks = [];
         this.lifts = [];
         this.walks = [];
@@ -151,7 +186,7 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'place':
-                    this.places[o.name] = { id: o.name, x: o.x, y: o.y };
+                    this.places[o.name] = { id: o.name, x: o.x, y: o.y, route: prop(o, 'route', 'inside') };
                     break;
 
                 case 'checkpoint': {
@@ -281,11 +316,15 @@ export class ShipScene extends Phaser.Scene {
                     });
                     const last = stem[stem.length - 1];
                     const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
-                    plating.fillStyle(0xf4f4f4, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
+                    plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
                     const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.solid + 0.1);
                     this.worldLayer.add([plating, sun]);
                     break;
                 }
+
+                case 'promenade':
+                    this.buildPromenade(o, prop);
+                    break;
 
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
@@ -301,6 +340,121 @@ export class ShipScene extends Phaser.Scene {
 
     // A point along a flight, t from 0 (its foot) to 1 (its top). The atrium's curving staircase
     // (§5.3) sweeps: shallow at its foot, steeper toward the top; the cores' flights are straight.
+    // --- Deck 6's promenade (§5.3) ------------------------------------------------------------
+    // Outside the rooms along the ship's side, two decks tall. On it the deck is not cut away: she
+    // walks in front of the white wall, the railing, columns and enclosed ends in front of her, the
+    // lifeboats overhead. Each piece fades with the decks it stands across, like the shell.
+
+    buildPromenade(o, prop) {
+        const list = name => String(prop(o, name, '')).split(',').filter(Boolean);
+        const floor = prop(o, 'floor', 0);
+        const top7 = floor - this.deckPitch;        // deck 7's floor, where the boats hang
+        const pr = this.promenade = {
+            x0: o.x, x1: o.x + o.width, floor,
+            doors: list('doors').map(Number),
+        };
+        const enclosed = list('enclosed').map(pair => pair.split(':').map(Number));
+        const boats = list('boats').map(Number);
+        const columns = list('columns').map(Number);
+        const add = (deck, depth) => {
+            const g = this.add.graphics().setDepth(depth);
+            this.worldLayer.add(g);
+            this.shellSlopes.push({ deck, gfx: g });
+            return g;
+        };
+        const behind = add(6, DEPTH.exterior + 0.08);
+        const front = add(6, DEPTH.player + 0.3);
+        const high = add([6, 7], DEPTH.exterior + 0.06);
+        const columnsGfx = add([6, 7], DEPTH.player + 0.32);
+
+        // The deck underfoot, beige, and under the enclosed ends the wall in their shade.
+        behind.fillStyle(0xab947a, 1).fillRect(pr.x0, floor - 3, pr.x1 - pr.x0, 3);
+        for (const [a, b] of enclosed) behind.fillStyle(0xd5d9dc, 1).fillRect(a, floor - 128, b - a, 125);
+        // The doors back in, on the wall.
+        for (const x of pr.doors) {
+            const door = this.add.image(x, floor, 'shipart', 'door-deck').setOrigin(0.5, 1).setDepth(DEPTH.exterior + 0.09);
+            this.worldLayer.add(door);
+            this.shellSlopes.push({ deck: 6, gfx: door });
+        }
+
+        // The enclosed ends: a white wall in front of her with large glassless openings.
+        const OPEN_W = 80, PIER = 24, SILL = 30, LINTEL = 100;
+        for (const [a, b] of enclosed) {
+            front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
+            const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
+            const pier = (b - a - n * OPEN_W) / (n + 1);
+            for (let i = 0; i <= n; i++) {
+                front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
+            }
+            for (let i = 0; i < n; i++) {
+                const x = a + pier + i * (OPEN_W + pier);
+                front.fillStyle(0xc7dcd0, 1).fillRect(x, floor - LINTEL, OPEN_W, 2).fillRect(x, floor - SILL, OPEN_W, 2);
+            }
+        }
+
+        // The open middle: a white railing with a wooden handrail, a life ring every few bays.
+        const ra = enclosed[0][1], rb = enclosed[enclosed.length - 1][0];
+        front.fillStyle(0xffffff, 1);
+        for (const y of [floor - 9, floor - 19]) front.fillRect(ra, y, rb - ra, 2);
+        for (let x = ra; x <= rb; x += 48) front.fillRect(x - 1, floor - 30, 3, 30);
+        front.fillStyle(0xab947a, 1).fillRect(ra, floor - 31, rb - ra, 3);
+        front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
+        boats.forEach((x, i) => {
+            if (i % 3 !== 1) return;
+            // Hung from the handrail between two posts, over the rails.
+            const rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            const ring = this.add.image(rx, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
+            this.worldLayer.add(ring);
+            this.shellSlopes.push({ deck: 6, gfx: ring });
+        });
+
+        // White columns from the deck up past deck 7's floor, holding the davits; each boat hangs
+        // from two davit arms on its cables.
+        for (const x of columns) {
+            columnsGfx.fillStyle(0xffffff, 1).fillRect(x - 5, top7 - 142, 10, floor - top7 + 142);
+            columnsGfx.fillStyle(0xc7dcd0, 1).fillRect(x + 2, top7 - 142, 3, floor - top7 + 142);
+            columnsGfx.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
+        }
+        for (const x of boats) {
+            for (const [hook, column] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300)], [x + 268, columns.find(c => c > x + 268)]]) {
+                high.fillStyle(0xffffff, 1).fillRect(Math.min(hook, column) - 3, top7 - 142, Math.abs(hook - column) + 6, 6);
+                high.fillStyle(0xc7dcd0, 1).fillRect(Math.min(hook, column) - 3, top7 - 137, Math.abs(hook - column) + 6, 1);
+                high.fillStyle(0x3e3546, 1).fillRect(hook, top7 - 136, 1, 32);
+            }
+            const boat = this.add.image(x, top7 - 118, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+            this.worldLayer.add(boat);
+            this.shellSlopes.push({ deck: [6, 7], gfx: boat });
+        }
+    }
+
+    promenadeDoorAt(x, y) {
+        const pr = this.promenade;
+        if (!pr || Math.abs(y - pr.floor) > 4) return null;
+        return pr.doors.find(d => Math.abs(x - d) < 16) ?? null;
+    }
+
+    // E at a promenade door: a quick fade, and she is on the other side of it.
+    usePromenadeDoor() {
+        const p = this.player;
+        const door = this.promenadeDoorAt(p.x, p.y);
+        if (door === null) return false;
+        this.mode = 'scripted';
+        this.script = null;
+        p.body.setVelocity(0, 0);
+        this.pose('stand');
+        sfx.door();
+        const cam = this.cameras.main;
+        cam.fadeOut(PROMENADE.fadeMs, 0, 0, 0);
+        cam.once('camerafadeoutcomplete', () => {
+            this.route = this.route === 'promenade' ? 'inside' : 'promenade';
+            p.body.reset(door, p.y);
+            this.updateCutaway(0);
+            cam.fadeIn(PROMENADE.fadeMs * 1.3, 0, 0, 0);
+            this.mode = 'play';
+        });
+        return true;
+    }
+
     stairPoint(f, t) {
         const { bottom: a, top: b } = f;
         if (!f.curve) return { x: Phaser.Math.Linear(a.x, b.x, t), y: Phaser.Math.Linear(a.y, b.y, t) };
@@ -538,6 +692,7 @@ export class ShipScene extends Phaser.Scene {
         const back = this.add.graphics().setDepth(DEPTH.walkFloor);
         const front = this.add.graphics().setDepth(DEPTH.player + 0.5);
         this.worldLayer.add([back, front]);
+        (this.deckFronts ||= []).push({ deck: this.deckOfY(y), gfx: front });
 
         // The walkway: its floor on top, its front with an edge, a light under it.
         back.fillStyle(look.front, 1).fillRect(x0, y, x1 - x0, 12);
@@ -563,10 +718,10 @@ export class ShipScene extends Phaser.Scene {
     // A pool on deck 11 (§5.3): water she can jump into and swim in. Its front is drawn over her,
     // a little see-through, so she is in it rather than on it.
     buildPool(o) {
-        const water = this.add.graphics().setDepth(DEPTH.player + 0.4);
+        const water = this.add.graphics().setDepth(DEPTH.poolWater);
         water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
         water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
-        const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.player + 0.45);
+        const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.poolWater + 0.01);
         this.worldLayer.add([water, ripples]);
         this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples });
     }
@@ -736,6 +891,7 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         p.clearAlpha().setCrop().setVisible(true).setDepth(DEPTH.player).setFlipX(false);
         this.inTrunk = null;
+        this.route = point.route || 'inside';
         this.liftRun = null;
         this.liftMove = null;
         this.hideLiftPanel();
@@ -788,9 +944,10 @@ export class ShipScene extends Phaser.Scene {
         for (const pool of this.pools) pool.ripples.tilePositionX += dt * 6;
         this.closeTrunkDoors();
         this.closeLiftDoors();
+        this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.
-        if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') {
+        if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route !== 'promenade') {
             this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
@@ -814,13 +971,16 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
-        if (onFloor && input.activatePressed && this.callLift()) return;
-        if (onFloor && input.activatePressed) this.activateTrunkDoor();
-        if (onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
+        if (onFloor && input.activatePressed && this.usePromenadeDoor()) return;
+        // On the promenade the rooms' stairs, ladders, trunks and elevators are out of reach.
+        const inside = this.route !== 'promenade';
+        if (inside && onFloor && input.activatePressed && this.callLift()) return;
+        if (inside && onFloor && input.activatePressed) this.activateTrunkDoor();
+        if (inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
-        if (onFloor && (input.up || input.down) && this.tryStairs(input)) return;
-        if ((input.up || input.down) && this.tryLadder(input)) return;
-        if (onFloor && input.downPressed) this.dropThroughWalk();
+        if (inside && onFloor && (input.up || input.down) && this.tryStairs(input)) return;
+        if (inside && (input.up || input.down) && this.tryLadder(input)) return;
+        if (inside && onFloor && input.downPressed) this.dropThroughWalk();
 
         if (input.dashPressed) this.tryDash(time);
 
@@ -830,6 +990,15 @@ export class ShipScene extends Phaser.Scene {
         const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
+        // The promenade's ends are closed: back in only through the doors.
+        if (!inside) {
+            const pr = this.promenade;
+            const x = Phaser.Math.Clamp(p.x, pr.x0 + 12, pr.x1 - 12);
+            if (x !== p.x) {
+                p.x = x;
+                body.velocity.x = 0;
+            }
+        }
 
         if (input.jumpPressed) this.jumpBufferedAt = time;
         const canJump = onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs;
@@ -1017,6 +1186,7 @@ export class ShipScene extends Phaser.Scene {
         p.body.setVelocity(0, 0);
         p.body.enable = false;
         p.y = pool.y + SWIM.float;
+        p.setDepth(DEPTH.swimmer);
         sfx.splash();
         this.splash(p.x, pool.y);
         this.pose('swim');
@@ -1033,6 +1203,7 @@ export class ShipScene extends Phaser.Scene {
         if (input.jumpPressed) {
             this.mode = 'play';
             this.pool = null;
+            p.setDepth(DEPTH.player);
             p.y = pool.y - 2;
             p.body.enable = true;
             p.body.reset(p.x, p.y);
@@ -1055,6 +1226,61 @@ export class ShipScene extends Phaser.Scene {
         p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
         this.time.delayedCall(450, () => { if (this.droppingThrough === walk) this.droppingThrough = null; });
         return true;
+    }
+
+    // --- The outer shell's cut-away (§5.3) -----------------------------------------------------
+
+    deckOfRow(row) {
+        for (const [deck, floor] of Object.entries(this.deckFloors)) {
+            if (row <= floor && row > floor - this.deckPitch / 16) return Number(deck);
+        }
+        return null;
+    }
+
+    deckOfY(y) {
+        return this.deckOfRow(Math.floor((y - 1) / 16));
+    }
+
+    // Where she is, in decks, as a number: whole on a deck's floor, between two while she climbs
+    // stairs, a ladder or a trunk, or rides an elevator, so the cut-away crossfades with her.
+    deckAt(y) {
+        const floors = Object.entries(this.deckFloors).map(([d, r]) => [Number(d), r * 16]).sort((a, b) => b[1] - a[1]);
+        for (let i = 0; i < floors.length - 1; i++) {
+            const [d, f] = floors[i];
+            const above = floors[i + 1][1];
+            if (y <= f && y >= above) return d + (f - y) / (f - above);
+        }
+        return y > floors[0][1] ? floors[0][0] : floors[floors.length - 1][0];
+    }
+
+    updateCutaway(dt) {
+        const p = this.player;
+        const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
+            || (this.mode === 'lift' && this.liftMove?.carriesHer);
+        let target;
+        if (this.route === 'promenade') target = null;  // outside: every deck shows its shell
+        else if (moving) target = this.deckAt(p.y);
+        else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
+        else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
+        else if (this.mode === 'play' && !(p.body.blocked.down || p.body.touching.down)) target = this.viewDeck;  // in the air
+        else target = Math.round(this.deckAt(p.y));
+        if (target === null || target === undefined) {
+            this.viewDeck = null;
+        } else if (this.viewDeck === null || moving) {
+            this.viewDeck = target;
+        } else {
+            this.viewDeck = approach(this.viewDeck, target, dt * 4);
+        }
+        for (const deck of Object.keys(this.shellTiles)) {
+            const alpha = this.viewDeck === null ? 1 : Phaser.Math.Clamp(Math.abs(Number(deck) - this.viewDeck), 0, 1);
+            if (Math.abs(alpha - this.shellAlpha[deck]) < 0.02 && alpha !== 0 && alpha !== 1) continue;
+            if (alpha === this.shellAlpha[deck]) continue;
+            this.shellAlpha[deck] = alpha;
+            for (const t of this.shellTiles[deck]) t.alpha = alpha;
+        }
+        for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
+        const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
+        for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------

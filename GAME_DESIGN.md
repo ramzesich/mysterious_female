@@ -440,6 +440,63 @@ From her photos:
 - Not yet checked against her photos: the atrium (`central_area`, `glass_elevators_in_central_area`,
   `round_stairs_central_area`), the restaurants, deck 11 and 12, the outside of the ship.
 
+**The outer shell (Decided, 2026-11-03, the user's idea):** the ship is seen **from outside**: an
+off-white shell (plating `#e8eaec`, mostly white, a little grey) over every deck, its outline from
+NCL's profile and the user's photos, with no square corners. **The deck she is on is cut away**
+along its whole indoor length, like a cut-out in the wall; every other deck shows the outside.
+The cut-away **crossfades with her height** on stairs, ladders, trunks and elevators, and eases
+when she lands on another deck. The ship's very front and back always show the wall: every
+indoor deck end stops short of the hull (2.7 m of structure, `STRUCTURE_COLS`), the cut's edge a
+little shaded.
+- **Built (branch `outer-shell`):** step 1, the shell and the cut-away (the `exterior` tile layer,
+  `EXT` tiles cut, `EXT_FIXED` never; `updateCutaway` in the scene); the outline: where a deck
+  steps back by up to 8 m the shell slopes across the step (`shell_slopes`), so the bow's
+  superstructure front (measured row by row: 18.7 m at deck 7 to 25 m at the bridge; deck 11's
+  wall at 29.5 m behind its open roof, `FRONT_WALL`) and the stern's tiers run smoothly; **two
+  crew decks of hull (1-2) show above the waterline** (`HULL_DECKS_BELOW`), so the ship is ~7.6
+  times as long as tall, near the profile's 7.8; the stern goes straight down to the water.
+  Step 2, the details drawn on the shell (`shell_details`): round portholes on the lower hull, a
+  navy waterline band, square windows on the cabin decks, balconies on decks 8-10 midships and
+  aft, big windows on the public rooms, the bridge's window band, the white bulwark and glass
+  windscreen on the open parts of decks 11-12, the roof's edge, the navy funnel with its grille,
+  the white mast, three radar domes. The user approved the outline; step 2 shown.
+- **Step 3, next: deck 6's promenade, two routes (Decided, 2026-11-03):** along deck 6 from about
+  85 m to 225 m (the user's photo) she can walk **inside** (the rooms, cut away as on any deck;
+  the open stretch at 150-194 m becomes indoor rooms, the library and photo gallery) **or
+  outside on the promenade**, switching through varnished doors with porthole windows (the
+  user's `doors_to_outside_deck`) at about five places: **E** at a door, a quick fade. On the
+  promenade the rooms are hidden; she walks along the ship's white wall (its windows, the doors
+  back in). **The promenade is two decks tall**: white columns between bays, **the lifeboats
+  hanging high up** (deck 7's level), a white railing at the edge. Its fore and aft parts are
+  enclosed by a wall with **large glassless window openings**, drawn in front of her, so she is
+  partly concealed there. Its ends are closed: back in only through the doors.
+  **Built (2026-11-03, `PROMENADE` in `tools/ship_layout.py`):** 102-226 m, enclosed ends 102-116
+  and 212-226 m (white wall, 80 px openings between piers, a 30 px sill hiding her legs), doors
+  at 111, 138, 162, 186 and 218 m ("Promenade" paper signs over them inside; E, a 140 ms fade).
+  On the promenade nothing on the deck is cut away (`route`, "inside" or "promenade"); the rooms'
+  stairs, elevators, trunks and ladders are out of reach. A beige deck strip, a white railing
+  with a wooden handrail and life rings, in front of her; white columns from deck 6 up past deck
+  7, between the boats, holding the davit arms. The shell along it, the user's corrections: **only
+  a few windows on the promenade's wall** (one every 4 m, clear of the doors), **none on deck 7
+  where the boats hang**, and **deck 5's windows are round**, bigger (20 px) and few (every 160 px).
+  The life rings hang from the railing's handrail between two posts (plain `life-ring`). 150-194 m inside is now the library
+  and photo gallery (a few muted pieces; furnished properly with deck 6). `?at=promenade` starts
+  on it, `?at=library` inside.
+- **Lifeboats:** the real ones (the user's photos) have a **red-orange canopy roof over a white
+  hull**, hanging from white davits; seen from below on the promenade, white undersides with
+  propellers. Three PixelLab tries from text (1 generation each, `create_map_object` 400x100 side
+  view, kept in `assets/source/ship/lifeboats/`) were all rejected; so were three
+  `image_to_pixelart` tries from the user's photo crop (`photo-try-4..6`, 1 generation each: the
+  crop is too soft, they came out as red and white stripes). **Approved (2026-11-03): drawn by
+  hand**, `tools/draw_lifeboat.py` (free; writes `assets/ship/lifeboat.png`): 300x100, red canopy
+  over a white hull, a row of small windows, the hatch amidships, the steering cupola aft, a
+  release hook at each end. **Size approved**: 300 px, about five times her height. Ten hang
+  over the promenade's open middle at deck 7's level, every 9 m, from davit arms on the white
+  columns; they fade when she is inside deck 6 or 7. The photo crops
+  (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
+- The sun livery stays on the bow for now (the user, "then we'll see"); on the real ship it sits
+  about 40 m from the bow, low on the hull.
+
 ### 5.4 Scale
 
 **Decided:**
@@ -671,7 +728,7 @@ art:
 
 Nothing blocks the start of the build. These get settled along the way:
 
-**Next up** (as of 2026-11-02):
+**Next up** (as of 2026-11-03):
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
 - [x] Her idles: foot tap, look back (§3)
@@ -733,10 +790,25 @@ Nothing blocks the start of the build. These get settled along the way:
       and the camera draws back to frame the whole bow, its sun included; any key brings it
       back. Bow only for now; other scenic spots (the stern terraces, deck 12 over the pools)
       maybe later
-- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
-      more sheets where pieces are missing (lifeboats, restaurants, the pool deck), cost stated
-      first. Then doors along the decks into small separate rooms (§5.1), hazards and people
-      placed on the real decks (§5.8)
+- [x] **Deck 4 furnished** (2026-11-03, merged): the gangway lobby after the user's photo (cream
+      panelling, fire doors held open, a blue runner mat, exit sign, fire-hose cabinet); the stair
+      and elevator lobbies on every deck (mahogany panelling, blue mosaic carpet, bronze elevator
+      doors in brass frames, a brass deck plaque, a picture); cabin corridors on every deck
+      (trolleys and room-service carts by doors, extinguishers, exit signs, brass cabin-number
+      plaques by the cores, numbered from the bow; a faint diamond wallpaper, approved). Her
+      speech bubble lives in the world now (it smeared on the screen camera). Testing aids:
+      `?tangerines=infinite`, `?at=gangway`
+- [x] **Elevators fetch smoothly** (2026-11-03, merged): a car on another deck comes to her
+      first, out of sight in a core, the panel counting it in; no more jumps
+- [ ] **Now: the outer shell, branch `outer-shell`** (§5.3 "The outer shell"): steps 1 and 2 built
+      and committed (not merged; pushed for safety). Step 3: the lifeboats (approved, size
+      too) and deck 6's two routes, built (the promenade, its doors, the shell's windows as the
+      user corrected them). **Show the user step 3, then merge** to `main`
+- [ ] **Then: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
+      move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
+      (restaurants, the pool deck), cost stated first. Then doors along the decks into small
+      separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
+      character art: later
 - [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
       corridors run along the sides, the middle above the atrium being the atrium and its dome
       (§5.3); in the game deck 10's corridor runs straight over it
@@ -751,9 +823,10 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1861 left at the end of 2026-11-02). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1849 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
-      (16 at 85px). Side-scroller tilesets came out unusable; draw floors by hand
+      (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
+      unusable; draw floors by hand. **Show art for approval as pictures in the chat**
 
 - [ ] Art: which tools you pick (§2.1)
 - [ ] The colleague's post and card, once the mid-game is laid out (§5.8)

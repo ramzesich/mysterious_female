@@ -66,6 +66,11 @@ export const SIDEWALK = {
 // Swimming in the pools (§5.3): her breaststroke's speed, how far below the surface her feet must be
 // before she is in, where the swim pose sits against the surface, and how close to a pool's side
 // she can swim.
+// Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
+export const PROMENADE = {
+    fadeMs: 140,
+};
+
 export const SWIM = {
     speed: 70,
     entry: 6,

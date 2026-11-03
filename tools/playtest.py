@@ -23,7 +23,7 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, ROOF_ROW, TILE, TRUNKS, col, floor_y,
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, TILE, TRUNKS, col, floor_y,
                             walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -488,6 +488,31 @@ def scenario_bow(b):
     return ok
 
 
+def scenario_promenade(b):
+    # Deck 6's two routes (§5.3): E at a door crosses between the rooms and the promenade; the
+    # promenade's ends are closed.
+    door = x_of(PROMENADE["doors"][1])
+    route = lambda: b.eval("window.__ship.route")
+    b.open("?reset&play&at=promenade")
+    ok = check(route() == "promenade", "?at=promenade starts her on the promenade", route())
+    b.eval(f"window.__ship.spawnAt({{x: {door + 8}, y: {floor_y(6)}, route: 'promenade'}})")
+    b.tap("e")
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(route() == "inside" and s["mode"] == "play" and s["x"] == door, "E at a door takes her inside", (route(), s))
+    b.shot("promenade-inside")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(route() == "promenade", "and E again back out", route())
+    b.eval(f"window.__ship.spawnAt({{x: {x_of(PROMENADE['span'][0]) + 120}, y: {floor_y(6)}, route: 'promenade'}})")
+    b.hold(["left"], 1.5)
+    s = b.state()
+    ok &= check(route() == "promenade" and s["x"] >= x_of(PROMENADE["span"][0]) and s["y"] == floor_y(6),
+                "its fore end is closed", (route(), s))
+    b.shot("promenade-fore")
+    return ok
+
+
 def scenario_idle(b):
     b.open("?reset&play")
     b.wait_for("window.__ship && window.__ship.player")
@@ -613,7 +638,8 @@ def scenario_overboard(b):
     b.key("space", False)
     time.sleep(0.6)
     b.key("right", False)
-    time.sleep(1.2)
+    b.wait_for("window.__ship.mode === 'scripted'", timeout=4)  # a long drop: the hull stands two decks above the sea
+    time.sleep(0.6)
     b.shot("overboard")
     s = b.state()
     ok = check(s["mode"] == "scripted", "jumping the stern railing goes overboard", s)
