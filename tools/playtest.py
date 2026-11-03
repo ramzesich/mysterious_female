@@ -519,7 +519,7 @@ def scenario_falls(b):
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D11, "a one-deck drop into the pool area is fine", s)
     # Two decks: off deck 12's aft end, past deck 11, onto the deck 10 terrace below.
-    b.teleport(x_of(238), D12)
+    b.teleport(x_of(245.5), D12)  # past deck 12's (233 m) and deck 11's (244 m) aft ends
     time.sleep(0.6)
     b.shot("long-fall")
     s = b.state()
@@ -578,7 +578,7 @@ def scenario_dash(b):
 
 def scenario_overboard(b):
     b.open("?reset&play")
-    b.teleport((col(257) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing
+    b.teleport((col(255) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing
     b.key("right", True)
     b.key("space", True)
     time.sleep(0.5)

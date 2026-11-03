@@ -712,19 +712,22 @@ Nothing blocks the start of the build. These get settled along the way:
       glass and brass balustrades, wooden rails), the atrium's **curving staircase winding round
       the wider glass elevator**, behind and in front of it. All approved by the user. Testing
       aid: `?at=<place>` starts her at a named place (`README.md`)
-- [ ] **Next: (4) the bow and stern**, shaped from the real ship (NCL's side profile in
-      `reference/`, and the user's `front_from_outside`, `aft_from_outside`,
-      `side_view_from_outside`): a raked bow, the bridge front, the rounded stern with its stepped
-      aft terraces. The very front and back need not be reachable. **Start the next session
-      here**: look at those photos and the profile, then propose the shapes with numbered
-      questions
+- [x] **(4) The bow and stern** (2026-11-03, branch `bow-stern`; ask the user to look): every deck's
+      ends **measured off NCL's profile** (`tools/ship_layout.py` EXTENT). **Bow:** a raked stem
+      from the waterline up to its tip at deck 7; the hull forward of 20 m on decks 3-6 is drawn
+      from outside, white plating painted with **the ship's sun** (rays, swirls, no lettering:
+      the name stays hidden, §5.1); on top, the **open mooring deck** on deck 7 (2.5-20.5 m),
+      reached through a doorway, with bollards and cleats; **card-locked later** (Technical
+      card, §6.2). **Bridge:** deck 10's front at 24 m with windows; Bumbot's bridge spot at 27 m.
+      **Stern:** a near-upright transom on decks 3-6 (255 m), decks 7-11 stepping back in open
+      tiers (254 down to 244 m). Deck ends are white outer plating
+- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
+      more sheets where pieces are missing (lifeboats, restaurants, the pool deck), cost stated
+      first. Then doors along the decks into small separate rooms (§5.1), hazards and people
+      placed on the real decks (§5.8)
 - [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
       corridors run along the sides, the middle above the atrium being the atrium and its dome
       (§5.3); in the game deck 10's corridor runs straight over it
-- [ ] **Then: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
-      more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
-      cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
-      and people placed on the real decks (§5.8)
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card

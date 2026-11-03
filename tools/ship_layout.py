@@ -15,10 +15,17 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 # How far each deck reaches, (forward end, aft end): the superstructure steps back from the bow,
 # and the upper decks end short of the stern in terraces.
+# Measured off NCL's profile at each deck's floor (2026-11-03). Decks 3-6 start at the bow's hull
+# block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
-    3: (4, 256), 4: (2, 257), 5: (2, 257), 6: (3, 257), 7: (5, 251),
-    8: (10, 247), 9: (14, 245), 10: (17, 242), 11: (29, 235), 12: (29, 235),
+    3: (20, 254), 4: (20, 255), 5: (20, 255), 6: (20, 255), 7: (2.5, 254),
+    8: (20.5, 251.5), 9: (23, 249.5), 10: (24, 247), 11: (24, 244), 12: (31, 233),
 }
+
+# The bow (§5.3): the raked stem, metres from the bow at each deck's floor and at the keel, leaning
+# forward as it rises to its tip at deck 7. Between it and `block`, the hull is drawn from outside:
+# white plating, painted with the ship's sun.
+BOW = {"stem": {7: 2.5, 6: 7, 5: 11, 4: 15, 3: 17, "keel": 19}, "block": 20}
 
 # Stair-and-elevator cores, (forward edge, aft edge), on every deck from 3 to 12. The midship core
 # stands 10 m further aft than on the profile, to give the atrium room (below).
@@ -37,52 +44,53 @@ MAST = (54, 62)
 # "finale". A name with "Bumbot:" is one of his near-catch spots (§4).
 VENUES = [
     # deck, from, to, name, kind
-    (12, 29, 68, "Chapel, kids' pool, Spinnaker Lounge", "venue"),
+    (12, 31, 68, "Chapel, kids' pool, Spinnaker Lounge", "venue"),
     (12, 110, 165, "Sports court, shuffleboard, Champs Bar", "outdoor"),
     (12, 165, 194, "Speciality dining, golf nets", "venue"),
-    (12, 202, 235, "Le Bistro, Los Lobos", "venue"),
+    (12, 202, 233, "Le Bistro, Los Lobos", "venue"),
 
     (11, 29, 74, "Spa and salon", "venue"),
     (11, 82, 102, "Fitness", "venue"),
     (11, 110, 160, "Oasis Pool, Topsiders, hot tubs (Bumbot: fly)", "outdoor"),
     (11, 160, 194, "Garden Café buffet, Ice Cream Bar (Bumbot: fish)", "venue"),
-    (11, 202, 235, "Great Outdoors diner (finale)", "finale"),
+    (11, 202, 244, "Great Outdoors diner (finale)", "finale"),
 
-    (10, 17, 40, "Bridge (Bumbot: controls)", "crew"),
+    (10, 24, 40, "Bridge (Bumbot: controls)", "crew"),
     (10, 40, 74, "Cabins", "cabins"),
     (10, 82, 102, "Cabins", "cabins"),
     (10, 110, 194, "Cabins", "cabins"),
-    (10, 202, 242, "Cabins", "cabins"),
+    (10, 202, 247, "Cabins", "cabins"),
 
-    (9, 14, 74, "Cabins", "cabins"),
+    (9, 23, 74, "Cabins", "cabins"),
     (9, 110, 116, "Linen room (Bumbot: asleep)", "crew"),
     (9, 106, 194, "Cabins", "cabins"),
-    (9, 202, 245, "Cabins", "cabins"),
+    (9, 202, 249.5, "Cabins", "cabins"),
 
-    (8, 10, 74, "Cabins", "cabins"),
+    (8, 20.5, 74, "Cabins", "cabins"),
     (8, 110, 194, "Cabins", "cabins"),
-    (8, 202, 247, "Cabins", "cabins"),
+    (8, 202, 251.5, "Cabins", "cabins"),
 
-    (7, 8, 60, "Kids' and teen clubs", "venue"),
+    (7, 2.5, 20.5, "Mooring deck", "outdoor"),
+    (7, 20.5, 60, "Kids' and teen clubs", "venue"),
     (7, 110, 150, "Magnum's bar, art gallery", "venue"),
     (7, 150, 194, "Casino, duty-free shops", "venue"),
-    (7, 222, 251, "Theatre balcony", "venue"),
+    (7, 222, 254, "Theatre balcony", "venue"),
 
-    (6, 8, 68, "Cabins, internet café", "cabins"),
+    (6, 20, 68, "Cabins, internet café", "cabins"),
     (6, 110, 150, "Bars, shops, photo studio", "venue"),
     (6, 150, 194, "Library, photo gallery; promenade, lifeboats", "outdoor"),
-    (6, 206, 256, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
+    (6, 206, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
 
-    (5, 4, 74, "Cabins", "cabins"),
+    (5, 20, 74, "Cabins", "cabins"),
     (5, 110, 150, "Shore excursions, reservations", "venue"),
     (5, 150, 194, "La Cucina, Four Seasons, Guest Services", "venue"),
-    (5, 205, 256, "Seven Seas dining", "venue"),
+    (5, 205, 255, "Seven Seas dining", "venue"),
 
-    (4, 3, 60, "Cabins", "cabins"),
+    (4, 20, 60, "Cabins", "cabins"),
     (4, 60, 74, "Gangway (start)", "start"),
     (4, 82, 102, "Cabins", "cabins"),
     (4, 110, 194, "Cabins", "cabins"),
-    (4, 202, 256, "Cabins", "cabins"),
+    (4, 202, 255, "Cabins", "cabins"),
 ]
 
 # Escape trunks (§5.1): crew doors onto a vertical ladder shaft. Each is (name, metres from the

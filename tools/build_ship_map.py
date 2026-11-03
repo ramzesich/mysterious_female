@@ -14,7 +14,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -24,8 +24,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
- VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE) = range(1, 18)
-TILE_COUNT = 17
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL) = range(1, 19)
+TILE_COUNT = 18
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -83,6 +83,16 @@ def funnel_ladder_col():
 def clear_of_ladders(deck, m):
     """Is a door at `m` on `deck` clear of every ladder (doors and ladders must not overlap)?"""
     return deck != 12 or abs(m - metres(funnel_ladder_col())) > 1.5
+
+
+def stem_m(row):
+    """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3)."""
+    stem = BOW["stem"]
+    points = [(FLOOR_ROW[d], stem[d]) for d in (7, 6, 5, 4, 3)] + [(ROWS - 1, stem["keel"])]
+    for (r0, m0), (r1, m1) in zip(points, points[1:]):
+        if r0 <= row <= r1:
+            return m0 + (m1 - m0) * (row - r0) / (r1 - r0)
+    return points[0][1] if row < points[0][0] else points[-1][1]
 
 
 def in_core(m):
@@ -165,11 +175,11 @@ def build_layers():
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
 
-        # The deck's ends: a steel wall indoors, a railing on an open terrace; decks 11 and 12 have
-        # glass side walls instead (§5.3).
+        # The deck's ends: the ship's white outer plating indoors, a railing on an open terrace;
+        # decks 11 and 12 have glass side walls instead (§5.3).
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
-                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, STEEL)
+                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, HULL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
@@ -180,11 +190,14 @@ def build_layers():
                     wall = c if indoor(deck, metres(c)) else c - 1
                     fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
 
-    # The hull below deck 3, narrowing down into the sea.
+    # The bow's hull, seen from outside (§5.3): from the raked stem back to the block's end, from
+    # under the forecastle down to the waterline, white plating (the game paints the ship's sun on
+    # it). Below deck 3 the hull runs on aft, narrowing into the sea, navy under the waterline.
     fwd3, aft3 = EXTENT[3]
-    for r in range(FLOOR_ROW[3] + 1, ROWS):
-        k = r - FLOOR_ROW[3]
-        fill(solid, col(fwd3) + 4 * k, col(aft3) - 1 - k, r, r, STEEL if r <= WATER_ROW + 2 else NAVY)
+    for r in range(FLOOR_ROW[7] + 1, ROWS):
+        below = r - FLOOR_ROW[3]
+        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - below
+        fill(solid, col(stem_m(r)), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
     # area (§5.3): their decks cross on side walks, built in the game, not floor tiles.
@@ -341,7 +354,7 @@ def build_objects():
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 24, "bat", -1),
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 27, "bat", -1),
                                             ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
@@ -380,6 +393,20 @@ def build_objects():
         if flip:
             props.append(prop("flip", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
+
+    # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
+    sun_row = (FLOOR_ROW[5] + FLOOR_ROW[4]) // 2 - 2
+    add(area("livery", "livery", col(BOW["stem"][7]) * TILE, (FLOOR_ROW[7] + 1) * TILE,
+             (col(BOW["block"]) - col(BOW["stem"][7])) * TILE, (WATER_ROW + 1 - FLOOR_ROW[7]) * TILE, [
+                 prop("sunX", x_of(BOW["block"] - 3.6), "int"), prop("sunY", sun_row * TILE, "int"),
+                 prop("stem", ",".join(f"{r * TILE}:{col(stem_m(r)) * TILE}"
+                                       for r in range(FLOOR_ROW[7] + 1, WATER_ROW + 2)))]))
+    put(7, 6, "bollard-bg")
+    put(7, 10.5, "cleat-bg")
+    put(7, 15, "bollard-bg")
+    # The bridge's windows on deck 10, looking out to sea.
+    add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
+             [prop("kind", "windows")]))
 
     # The gangway lobby, deck 4.
     put(4, 61.5, "plant-bg")
@@ -497,6 +524,11 @@ def draw_tile(tile_id):
         rect(0, 0, 15, 2, hex_rgba("#cd683d"))
         rect(0, 0, 15, 0, hex_rgba("#e6904e"))
         rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == HULL:
+        # The ship's white outer plating, a seam along its foot.
+        rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
+        rect(0, 15, 15, 15, hex_rgba("#e3e7ea"))
+        px[4][3] = px[12][11] = hex_rgba("#e3e7ea")
     elif tile_id == POOL_TILE:
         # A pool's tiled side and bottom: pale blue tiles with white grout.
         rect(0, 0, 15, 15, hex_rgba("#8fd3ff"))
