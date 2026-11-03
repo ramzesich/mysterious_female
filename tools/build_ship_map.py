@@ -28,8 +28,20 @@ COLS = SEA + LENGTH * PER_M + SEA
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
  LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB,
- EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN) = range(1, 36)
-TILE_COUNT = 35
+ EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN,
+ WALNUT, CUCINA_WALL, DINING_WALL, DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET) = range(1, 42)
+TILE_COUNT = 41
+
+# The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
+# La Cucina's first metres are the grey-blue wall its marble portico stands on.
+ROOM_LOOK = {
+    "La Cucina": (WALNUT, DIAMOND_CARPET),
+    "Four Seasons": (DINING_WALL, DINING_CARPET),
+    "Seven Seas": (DINING_WALL, DINING_CARPET),
+    "Shore excursions, reservations": (VENUEWALL, LOBBY_CARPET),
+}
+CUCINA_FRONT = (150, 151.67)    # the dark wood starts in the middle of the portico (the user)
+FURNISHED = {4, 5}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -187,7 +199,8 @@ def build_layers():
         # The back wall, tinted by what is there; open sky on outdoor terraces.
         for c in range(c0, c1 + 1):
             m = metres(c)
-            _, kind = venue_at(deck, m)
+            name, kind = venue_at(deck, m)
+            look = ROOM_LOOK.get(name) if deck == 5 else None
             if deck == 3:
                 tile = DIMWALL
             elif in_atrium(deck, m):
@@ -196,6 +209,10 @@ def build_layers():
                 tile = MAHOGANY  # the stair and elevator lobbies' panelling (the user's photos)
             elif not covered(deck, m) or kind in ("outdoor", "finale"):
                 tile = 0
+            elif look and name == "La Cucina" and CUCINA_FRONT[0] <= m < CUCINA_FRONT[1]:
+                tile = CUCINA_WALL
+            elif look:
+                tile = look[0]
             else:
                 tile = WALL_FOR.get(kind, BACKWALL)
             if tile:
@@ -215,6 +232,10 @@ def build_layers():
                     solid[floor][c] = DECK_PAINT
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
+                elif look:
+                    solid[floor][c] = look[1]
+                elif deck == ATRIUM["decks"][0] and in_atrium(deck, m):
+                    solid[floor][c] = ATRIUM_CARPET  # the atrium's floor: a blue-green patterned carpet
 
         # The deck's ends: the ship's outer shell indoors, riveted grey steel through the floor slab
         # too (the user's choice, 2026-11-03), a railing on an open terrace; decks 11 and 12 have
@@ -601,7 +622,7 @@ def build_objects():
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
                     prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + 2 * (doors - 1), "int"),
                     prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))
-        elif indoor(deck, (a + b) / 2) and kind != "start":  # a sign needs a wall: none in the open air
+        elif indoor(deck, (a + b) / 2) and kind != "start" and deck not in FURNISHED:  # a wall to hang on
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
@@ -720,6 +741,84 @@ def build_objects():
     for i, m in enumerate(range(172, 192, 3)):
         if abs(m - 186) > 1.5:
             put(6, m, ("picture-sea-bg", "picture-ship-bg", "picture-art-bg")[i % 3], 46)
+
+    # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
+    # excursions and reservations desks, La Cucina, the Four Seasons and the Seven Seas.
+    def decor(name, kind, x0, x1, deck=5, **props):
+        add(area(name, "decor", x0, floor_y(deck), x1 - x0, 0,
+                 [prop("kind", kind)] + [prop(k, v) for k, v in props.items()]))
+
+    def dinner(m, table, chair, lamp=None):
+        """A table with a chair at each side, facing it."""
+        put(5, m - 0.42, chair)
+        put(5, m + 0.42, chair, flip=True)
+        put(5, m, table)
+        if lamp:
+            put(5, m, lamp, height(table))
+
+    # The atrium's floor: the café on the forward side, Guest Services aft (the user's photos).
+    for m in (83.6, 85.6):
+        put(5, m - 0.4, "cafe-chair-bg")
+        put(5, m + 0.4, "cafe-chair-bg", flip=True)
+        put(5, m, "cafe-table-bg")
+    put(5, 86.4, "pastry-case-bg")
+    put(5, 98.3, "palm-bg")
+    put(5, 99.2, "counter-bg")
+    put(5, 99.85, "desk-screen-bg")
+    add(point("sign-guest-services", "sign", x_of(99.5), floor_y(5) - 62,
+              [prop("text", "Guest Services"), prop("style", "plaque")]))
+    # Shore excursions and reservations: desks, brochures, travel posters (not in the photos).
+    put(5, 112.6, "brochure-stand-bg")
+    put(5, 114.0, "desk-screen-bg")
+    put(5, 114.0, "poster-beach-bg", 46, x=x_of(114.0) - 30)
+    put(5, 116.4, "poster-fjord-bg", 46)
+    put(5, 118.4, "poster-city-bg", 46)
+    put(5, 121.0, "orchid-bg")
+    put(5, 130.5, "world-map-bg", 48)
+    put(5, 132.6, "desk-screen-bg")
+    put(5, 134.0, "brochure-stand-bg")
+    put(5, 140.0, "counter-bg")
+    put(5, 140.65, "desk-screen-bg")
+    put(5, 143.4, "easel-sign-bg")
+    put(5, 146.5, "palm-bg")
+    # La Cucina: the marble portico on its grey-blue wall, then dark wood, dark tables with lamps,
+    # windows with beige drapes (the user's photos).
+    portico = col(CUCINA_FRONT[1]) * TILE    # on the line where the grey-blue wall meets the wood
+    decor("cucina-portico", "portico", portico, portico, text="La Cucina")
+    put(5, 150.5, "menu-lectern-bg")
+    cucina = [155.5, 159.8, 164.1]
+    decor("cucina-windows", "dinewindows", x_of(150), x_of(168), xs=",".join(str(x_of(m)) for m in cucina), style="drapes")
+    for m in cucina:
+        dinner(m, "dark-table-lamp-bg", "dark-chair-bg")
+    put(5, 157.65, "wine-barrel-bg")
+    put(5, 161.95, "olive-tree-bg")
+    put(5, 166.4, "wine-trolley-bg")
+    # The Four Seasons: cream, burl-wood pillars, white-cloth tables, beige chairs, sheer curtains,
+    # chandeliers.
+    seasons = [171.0, 175.4, 179.8, 184.2, 188.6]
+    decor("seasons-windows", "dinewindows", x_of(168), x_of(194), xs=",".join(str(x_of(m)) for m in seasons), style="sheers")
+    decor("seasons-pillars", "pillars", x_of(168), x_of(194), xs=",".join(str(x_of(m)) for m in (173.2, 182.0, 190.8)), style="burl")
+    for i, m in enumerate(seasons):
+        dinner(m, ("table-dinner-bg", "table-flowers-bg")[i % 2], "dining-chair-bg")
+        put(5, m, "chandelier-bg", DECK_PITCH - TILE - height("chandelier-bg"))
+    put(5, 168.9, "sideboard-bg")
+    put(5, 177.6, "ice-swan-bg")
+    put(5, 186.4, "dessert-trolley-bg")
+    put(5, 192.6, "service-station-bg")
+    # The Seven Seas: its backlit wave panel between white columns (the user's photo from the inner
+    # balcony), white-cloth tables either side under sheer curtains.
+    seas = [208.6, 213.0, 217.4, 221.8, 238.2, 242.6, 247.0]
+    decor("seas-windows", "dinewindows", x_of(205), x_of(252), xs=",".join(str(x_of(m)) for m in seas), style="sheers")
+    decor("seas-panel", "wavepanel", x_of(230) - 80, x_of(230) + 80)
+    decor("seas-columns", "pillars", x_of(205), x_of(252), xs=",".join(str(x_of(m)) for m in (227.6, 232.4)), style="white")
+    for i, m in enumerate(seas):
+        dinner(m, ("table-flowers-bg", "table-dinner-bg")[i % 2], "dining-chair-bg")
+    put(5, 225.2, "palm-bg")
+    put(5, 234.8, "palm-bg")
+    put(5, 250.4, "service-station-bg")
+    # Warm downlights along the public rooms' ceilings.
+    for a, b in ((110, 150), (150, 194), (205, 252)):
+        decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -860,6 +959,37 @@ def draw_tile(tile_id):
         for x in (4, 9, 14):
             px[0][x] = hex_rgba("#0b8a8f")
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == WALNUT:
+        # La Cucina's dark wood panelling (the user's photos): tall panels, a lighter edge.
+        rect(0, 0, 15, 15, hex_rgba("#5e3d2c"))
+        rect(0, 0, 0, 15, hex_rgba("#46291f"))
+        rect(1, 0, 1, 15, hex_rgba("#74503a"))
+        rect(8, 0, 8, 15, hex_rgba("#46291f"))
+        rect(9, 0, 9, 15, hex_rgba("#74503a"))
+    elif tile_id == CUCINA_WALL:
+        # The grey-blue wall by La Cucina's entrance, a faint diamond lattice on it.
+        rect(0, 0, 15, 15, hex_rgba("#66728c"))
+        for i in range(16):
+            px[i][i] = px[i][15 - i] = hex_rgba("#717d97")
+    elif tile_id == DINING_WALL:
+        # The dining rooms' cream walls.
+        rect(0, 0, 15, 15, hex_rgba("#efe6d2"))
+        rect(0, 0, 0, 15, hex_rgba("#e7dcc4"))
+    elif tile_id in (DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET):
+        # Carpets on the steel deck: the dining rooms' dark floral, La Cucina's dark diamonds, the
+        # atrium's blue-green.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        base, dots = {DINING_CARPET: ("#45293f", ("#cd683d", "#fbb954", "#4d65b4")),
+                      DIAMOND_CARPET: ("#2e222f", ("#9babb2",)),
+                      ATRIUM_CARPET: ("#0b5e65", ("#8fd3ff", "#0eaf9b"))}[tile_id]
+        rect(0, 0, 15, 3, hex_rgba(base))
+        if tile_id == DIAMOND_CARPET:
+            for x in (2, 10):
+                px[1][x] = px[0][x + 1] = px[1][x + 2] = px[2][x + 1] = hex_rgba(dots[0])
+        else:
+            for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
+                px[y][x] = hex_rgba(dots[i % len(dots)])
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == MAHOGANY:
         # The lobbies' mahogany panelling: a dark red-brown with a faint grain.
         rect(0, 0, 15, 15, hex_rgba("#7a3045"))
@@ -972,10 +1102,15 @@ def write_png(path, width, height, pixels):
 
 # --- The ship's sun on the bow ---------------------------------------------------------------------
 
+# The livery's bands run on past the bow's block onto the decks' fixed ends, tapering to a tip
+# before the cut-away corridors (and the wall drawn over her there) begin (the user, 2026-11-03).
+LIVERY_END = BOW["block"] + 1.8
+
+
 def livery_box():
     """The bow's hull block, in pixels: from the stem's tip back to the block's end, from under the
     forecastle down to the waterline."""
-    x0, x1 = col(BOW["stem"][7]) * TILE, col(BOW["block"]) * TILE
+    x0, x1 = col(BOW["stem"][7]) * TILE, col(LIVERY_END) * TILE
     y0, y1 = (FLOOR_ROW[7] + 1) * TILE, (WATER_ROW + 1) * TILE
     return x0, y0, x1, y1
 
@@ -1015,11 +1150,24 @@ def build_livery():
         d.polygon(left + right[::-1], fill=colour)
         return right
 
-    def band(points, colours, width=8, shadow=True):
-        for k, colour in enumerate(colours):
-            d.line([(x, y + k * width) for x, y in points], fill=colour, width=width, joint="curve")
+    def band(points, colours, width=8, shadow=True, taper=0.12):
+        """Stripes stacked under the line through `points`, the whole band narrowing to a point over
+        its last `taper` of the way (the stripes drawn as polygons, so they can narrow)."""
+        n = len(points)
+        mid = len(colours) * width / 2
+
+        def squeeze(i):
+            t = i / (n - 1)
+            return 1 if t < 1 - taper else max(0.0, (1 - t) / taper) ** 0.8
+
+        stripes = [(colour, k * width - width / 2, k * width + width / 2) for k, colour in enumerate(colours)]
         if shadow:
-            d.line([(x, y + len(colours) * width + 1) for x, y in points], fill="#9babb2", width=3, joint="curve")
+            top = len(colours) * width - width / 2 + 1
+            stripes.append(("#9babb2", top - 1, top + 2))
+        for colour, a, b in stripes:
+            upper = [(x, y + mid + (a - mid) * squeeze(i)) for i, (x, y) in enumerate(points)]
+            lower = [(x, y + mid + (b - mid) * squeeze(i)) for i, (x, y) in enumerate(points)]
+            d.polygon(upper + lower[::-1], fill=colour)
 
     def curve(f, n=80):
         return [f(i / n) for i in range(n + 1)]
