@@ -481,7 +481,8 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   partly concealed there. Its ends are closed: back in only through the doors.
   **Built (2026-11-03, `PROMENADE` in `tools/ship_layout.py`):** 102-226 m, enclosed ends 102-116
   and 212-226 m (white wall, 80 px openings between piers, a 30 px sill hiding her legs), doors
-  at 111, 138, 162, 186 and 218 m ("Promenade" paper signs over them inside; E, a 140 ms fade).
+  at 111, 138, 162 and 186 m (E, a 140 ms fade; 218 m, in the theatre, removed by the user, as
+  were the paper signs over them).
   On the promenade nothing on the deck is cut away (`route`, "inside" or "promenade"); the rooms'
   stairs, elevators, trunks and ladders are out of reach. A beige deck strip, a white railing
   with a wooden handrail and life rings, in front of her; white columns from deck 6 up past deck
@@ -831,7 +832,40 @@ Nothing blocks the start of the build. These get settled along the way:
       the map builder); **no cabin door right beside a trunk or crew door** (100 px apart, centre
       to centre); the livery's bands run on past the bow onto the decks' fixed ends and **taper to
       a tip**. Placeholder venue signs are gone from decks 4 and 5 (`FURNISHED`)
-- [ ] **Next: populate the ship deck by deck, upward from deck 6** (the user: start at deck 4 and
+- [x] **Deck 6 furnished** (2026-11-03, merged): laid out after
+      **NCL's deck plan** (`reference/norwegian-sun-ship-map.pdf`: its profile lists each deck's
+      rooms by part of the ship): the Photo Gallery is on deck 6 beside the Library (deck 7 has
+      the Art Gallery); Restaurant Reservations is on deck 5 (its desk there now has the look of
+      the user's photo: burl-wood walls, a curved grey counter with a black top, brass letters).
+      Bow to stern: the Internet Café (64-74), the Bliss Ultra Lounge (110-124: near-black, a
+      dotted carpet throughout, disco ball, DJ booth, purple velvet, a bar under a neon
+      sign), the Gift Shops and Perspectives Photo Studio (124-136), **the Windjammer Bar**
+      (136-150, the user's photos: dark green walls, a coffered mahogany ceiling, brass lamps,
+      planks, teal club chairs, the back bar, a chesterfield, the lit cabinet with a model ship
+      by the gallery), **the Photo Gallery** (150-160, white, its name in grey letters, photos in
+      two rows), **the Library** (160-194: lit dark-wood bookcases, the red-and-white striped
+      carpet, red reading chairs, a chess table, a globe), **the Stardust Lounge** (202-255:
+      deep navy, rows of red velvet seats in profile facing the stage, the stage with red
+      curtains, a valance, lamps and their pools of light, drums, piano, guitar, speakers). Deck
+      6's lobbies: a purple-navy carpet with gold (her photo). Art: two PixelLab sheets (64 at
+      32px, `props-4`; 16 at 64px, `tall-1`; 10 generations each) and a theatre seat
+      (`create_map_object`, 2 tries, 1 generation each: both three-quarter views, try 1 used);
+      front-facing armchairs and seats left out. The user's corrections: the crew door moved
+      from the Windjammer to the Library's aft end by the lobby; **no "Promenade" signs** (the
+      doors say it); **no promenade door in the theatre** (four doors: 111, 138, 162, 186); the
+      Internet Café opens off the corridor through a wood doorway with a brass plaque; the
+      theatre's entrance is a gilded portal with "STARDUST LOUNGE" in a marquee of bulbs; a brass
+      "Windjammer Bar" plaque; **decks 3-7 all end at 254 m**, one straight wall at the stern (a
+      deck sticking out past the one above left a strip of open terrace with half a wall), and the
+      stage runs to it between its two curtains; at the promenade's ends she stops in the first
+      opening, partly behind the end pier (she used to slip behind it with bits poking out)
+- [ ] **Open: checkpoints, removed for now** (the user, 2026-11-03): some sat too close together;
+      every checkpoint door is gone until the ship is split into unlockable areas (§5.5, key
+      cards), when they are placed again, spaced out. Until then a scare always brings her back
+      at the gangway. The last placements (deck, metres): gangway 4/71, d5-aft 5/250.2,
+      d6-promenade 6/193.4, d6-theatre 6/209, d7-casino 7/152, d9-linen 9/115, d10-bridge 10/44,
+      d11-pool 11/162, d11-buffet 11/191, d12-sports 12/175
+- [ ] **Next: populate the ship deck by deck, upward from deck 7** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
@@ -850,7 +884,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1839 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1817 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

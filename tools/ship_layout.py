@@ -18,7 +18,7 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # Measured off NCL's profile at each deck's floor (2026-11-03). Decks 3-6 start at the bow's hull
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
-    3: (20, 254), 4: (20, 255), 5: (20, 255), 6: (20, 255), 7: (2.5, 254),
+    3: (20, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (2.5, 254),  # the stern: one straight wall
     8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
 }
 
@@ -47,7 +47,7 @@ ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 # with large glassless openings; the open middle has a railing and the boats. She switches between
 # the rooms and the promenade through the doors (metres from the bow, each on both sides).
 PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
-             "doors": [111, 138, 162, 186, 218]}
+             "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
 
 # Above the top deck.
 FUNNEL = (168, 196)
@@ -89,10 +89,16 @@ VENUES = [
     (7, 150, 194, "Casino, duty-free shops", "venue"),
     (7, 222, 254, "Theatre balcony", "venue"),
 
-    (6, 20, 68, "Cabins, internet café", "cabins"),
-    (6, 110, 150, "Bars, shops, photo studio", "venue"),
-    (6, 150, 194, "Library, photo gallery", "venue"),
-    (6, 206, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
+    (6, 20, 64, "Cabins", "cabins"),
+    (6, 64, 74, "Internet Café", "venue"),
+    # Midships and aft as on NCL's plan (2026-11-03): Bliss, the shops and photo studio, the
+    # Windjammer; then the Photo Gallery beside it (the user's photo) and the Library.
+    (6, 110, 124, "Bliss Ultra Lounge", "venue"),
+    (6, 124, 136, "Gift Shops, Perspectives Photo Studio", "venue"),
+    (6, 136, 150, "Windjammer Bar", "venue"),
+    (6, 150, 160, "Photo Gallery", "venue"),
+    (6, 160, 194, "Library", "venue"),
+    (6, 202, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
 
     (5, 20, 74, "Cabins", "cabins"),
     (5, 110, 150, "Shore excursions, reservations", "venue"),

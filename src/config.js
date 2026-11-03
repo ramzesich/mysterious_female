@@ -79,6 +79,7 @@ export const CUT_SHADOW = {
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
 export const PROMENADE = {
     fadeMs: 140,
+    endStop: 10,      // px past the end pier's inner edge where she stops at the promenade's ends
 };
 
 export const SWIM = {

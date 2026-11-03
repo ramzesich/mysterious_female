@@ -378,6 +378,12 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'pillars') this.drawPillars(decorGfx, o, prop(o, 'xs', ''), prop(o, 'style', ''));
                     if (prop(o, 'kind') === 'wavepanel') this.drawWavePanel(decorGfx, o);
                     if (prop(o, 'kind') === 'downlights') this.drawDownlights(decorGfx, o);
+                    if (prop(o, 'kind') === 'resdesk') this.drawReservationsDesk(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'coffers') this.drawCoffers(decorGfx, o);
+                    if (prop(o, 'kind') === 'lettering') this.drawLettering(o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
+                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -431,6 +437,10 @@ export class ShipScene extends Phaser.Scene {
             front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
             const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
             const pier = (b - a - n * OPEN_W) / (n + 1);
+            // The promenade's ends are closed (back in only through the doors): a wall she runs into
+            // at the end pier's inner edge, so she stops in the first opening, partly behind it.
+            if (a === pr.x0) this.addPromenadeEnd(a + pier + PROMENADE.endStop, -1, floor);
+            if (b === pr.x1) this.addPromenadeEnd(b - pier - PROMENADE.endStop, 1, floor);
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
@@ -449,8 +459,9 @@ export class ShipScene extends Phaser.Scene {
         front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
         boats.forEach((x, i) => {
             if (i % 3 !== 1) return;
-            // Hung from the handrail between two posts, over the rails.
-            const rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            // Hung from the handrail between two posts, over the rails, clear of the doors.
+            let rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            while (pr.doors.some(d => Math.abs(rx - d) < 60)) rx += 48;
             const ring = this.add.image(rx, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
             this.worldLayer.add(ring);
             this.shellSlopes.push({ deck: 6, gfx: ring });
@@ -473,6 +484,16 @@ export class ShipScene extends Phaser.Scene {
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
+    }
+
+    // An invisible wall at one end of the promenade, there only while she is on it. `x` is where
+    // her middle stops; `side` is -1 at the fore end, 1 at the aft end.
+    addPromenadeEnd(x, side, floor) {
+        const w = 32;
+        const edge = x + side * PLAYER.bodyWidth / 2;
+        const zone = this.add.zone(edge + side * w / 2, floor - this.deckPitch / 2, w, this.deckPitch);
+        this.physics.add.existing(zone, true);
+        (this.promenadeEnds ||= []).push(zone);
     }
 
     promenadeDoorAt(x, y) {
@@ -685,6 +706,96 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xe8eaec, 0.7);
         for (let x = x0 + 26; x < x1 - 4; x += 27) g.fillRect(x, top, 2, bottom - top);
         for (let y = top + 24; y < bottom - 4; y += 25) g.fillRect(x0, y, x1 - x0, 2);
+    }
+
+    // Deck 5's Restaurant Reservations desk (the user's photo): a curved grey counter, a black top,
+    // brass letters on the burl-wood wall over it.
+    drawReservationsDesk(g, o, text) {
+        const cx = o.x, y = o.y, w = 56, h = 34;
+        g.fillStyle(0x7f8a92, 1).fillRoundedRect(cx - w / 2, y - h, w, h, { tl: 10, tr: 10, bl: 0, br: 0 });
+        g.fillStyle(0x9babb2, 1).fillRoundedRect(cx - w / 2 + 3, y - h + 4, w - 10, h - 4, { tl: 8, tr: 4, bl: 0, br: 0 });
+        for (let x = cx - w / 2 + 8; x < cx + w / 2 - 6; x += 8) g.fillStyle(0x8a959d, 1).fillRect(x, y - h + 6, 1, h - 6);
+        g.fillStyle(0x2e222f, 1).fillRoundedRect(cx - w / 2 - 3, y - h - 4, w + 6, 5, 2);
+        g.fillStyle(0x625565, 1).fillRect(cx - w / 2, y - h - 4, w, 1);
+        const name = this.add.text(cx, y - 92, text, {
+            fontFamily: 'Georgia, serif', fontSize: '8px', fontStyle: 'bold', color: '#e6b85c', resolution: 4,
+        }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+        this.worldLayer.add(name);
+    }
+
+    // The Windjammer's coffered ceiling: mahogany beams, dark green panels between.
+    drawCoffers(g, o) {
+        const top = o.y - this.deckPitch + 16;
+        g.fillStyle(0x46291f, 1).fillRect(o.x, top, o.width, 10);
+        for (let x = o.x; x < o.x + o.width; x += 40) {
+            g.fillStyle(0x163028, 1).fillRect(x + 5, top + 2, 30, 6);
+            g.fillStyle(0x5e3d2c, 1).fillRect(x, top, 5, 12);
+        }
+        g.fillStyle(0x5e3d2c, 1).fillRect(o.x, top + 10, o.width, 2);
+    }
+
+    // Big letters on a wall: the Photo Gallery's name.
+    drawLettering(o, text) {
+        const label = this.add.text(o.x, o.y - 117, text, {
+            fontFamily: 'Verdana, sans-serif', fontSize: '10px', color: '#9a9a96', resolution: 4,
+        }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+        label.setLetterSpacing?.(2);
+        this.worldLayer.add(label);
+    }
+
+    // The Stardust Lounge's stage: a low wooden front, the dark back, red curtains drawn to the
+    // sides under a red valance, spotlights in the flies.
+    drawStage(g, o) {
+        const x0 = o.x, x1 = o.x + o.width, y = o.y, top = y - this.deckPitch + 16;
+        g.fillStyle(0x1b1828, 1).fillRect(x0, top, x1 - x0, y - top);
+        g.fillStyle(0x5e3d2c, 1).fillRect(x0 - 6, y - 8, x1 - x0 + 6, 8);
+        g.fillStyle(0x74503a, 1).fillRect(x0 - 6, y - 8, x1 - x0 + 6, 2);
+        for (const [a, dir] of [[x0, 1], [x1 - 34, -1]]) {
+            g.fillStyle(0xae2334, 1).fillRect(a, top + 8, 34, y - top - 16);
+            for (let k = 4; k < 34; k += 7) g.fillStyle(0x831c5d, 1).fillRect(a + k, top + 8, 2, y - top - 16);
+            g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? a + 28 : a + 2, y - 64, 4, 3);
+        }
+        g.fillStyle(0xc32454, 1).fillRect(x0, top, x1 - x0, 12);
+        for (let x = x0; x < x1; x += 12) g.fillStyle(0xae2334, 1).fillTriangle(x, top + 12, x + 12, top + 12, x + 6, top + 18);
+        for (let x = x0 + 40; x < x1 - 30; x += 50) {
+            g.fillStyle(0x3e3546, 1).fillRect(x - 4, top + 12, 8, 6);
+            g.fillStyle(0xfbff86, 1).fillRect(x - 2, top + 18, 4, 1);
+            g.fillStyle(0xfbff86, 0.22).fillEllipse(x + 10, y - 9, 34, 4);   // its pool of light on the boards
+        }
+    }
+
+    // A room open off a corridor: a light wood post where the corridor's wall ends, the room's brass
+    // plaque on its own wall beside it.
+    drawDoorway(g, o, text) {
+        const x = o.x, y = o.y, ceiling = y - this.deckPitch + 16;
+        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
+        g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
+        if (text) {
+            const plaque = this.add.text(x + 48, y - 96, text, {
+                fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',
+                backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
+            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+            this.worldLayer.add(plaque);
+        }
+    }
+
+    // The theatre's entrance: a gilded portal, its name lit up in a marquee of bulbs over it.
+    drawMarquee(g, o, text) {
+        const cx = o.x, y = o.y, w = 96, top = y - 118;
+        for (const side of [-1, 1]) {
+            const x = cx + side * (w / 2 - 4) - 4;
+            g.fillStyle(0xd9a43b, 1).fillRect(x, top + 26, 8, y - top - 26);
+            g.fillStyle(0xf9c22b, 1).fillRect(x + 2, top + 26, 2, y - top - 26);
+        }
+        g.fillStyle(0x6e2727, 1).fillRect(cx - w / 2, top, w, 26);
+        g.fillStyle(0xd9a43b, 1).fillRect(cx - w / 2, top, w, 2).fillRect(cx - w / 2, top + 24, w, 2);
+        for (let x = cx - w / 2 + 4; x < cx + w / 2 - 2; x += 6) {
+            g.fillStyle(0xfbff86, 1).fillRect(x, top + 3, 2, 2).fillRect(x, top + 21, 2, 2);
+        }
+        const name = this.add.text(cx, top + 13, text, {
+            fontFamily: 'Georgia, serif', fontSize: '9px', fontStyle: 'bold', color: '#fbff86', resolution: 4,
+        }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+        this.worldLayer.add(name);
     }
 
     // Warm downlights along a room's ceiling.
@@ -966,6 +1077,7 @@ export class ShipScene extends Phaser.Scene {
         this.player = p;
 
         this.physics.add.collider(p, this.solidLayer);
+        this.physics.add.collider(p, this.promenadeEnds || [], null, () => this.route === 'promenade');
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
@@ -1153,15 +1265,6 @@ export class ShipScene extends Phaser.Scene {
         const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
-        // The promenade's ends are closed: back in only through the doors.
-        if (!inside) {
-            const pr = this.promenade;
-            const x = Phaser.Math.Clamp(p.x, pr.x0 + 12, pr.x1 - 12);
-            if (x !== p.x) {
-                p.x = x;
-                body.velocity.x = 0;
-            }
-        }
 
         if (input.jumpPressed) this.jumpBufferedAt = time;
         const canJump = onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs;

@@ -13,6 +13,10 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
     props-2/   object 96d63a62-142f-4bd2-bc2b-22f1232daf2f, 64 props, 32px canvas
     props-3/   object a7fdf27e-6193-4767-a661-0a25d536c3df, 64 props, 32px canvas: restaurants,
                café, lobby (2026-11-03, for deck 5)
+    props-4/   object 88f0ed0d-37b0-407f-ab67-523f0d24288a, 64 props, 32px canvas: bar, library,
+               photo studio, shops, nightclub, theatre (2026-11-03, for deck 6)
+    tall-1/    object 084f5932-777f-4804-93b7-6773efa99d7c, 16 tall pieces, 64px canvas (deck 6)
+    theatre-seat/  map object a388646f-b80d-403a-87ab-4446106a66dc, 48px (try-2 kept, unused)
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -93,6 +97,33 @@ PROPS_3 = [
 ]
 for i, name in enumerate(PROPS_3):
     PIECES[name] = ("props-3", i, None, {})
+# The fourth sheet and the first tall one: deck 6 (the user's photos and NCL's plan). The
+# front-facing armchairs and theatre seats are left out (the game sees things from the side).
+PROPS_4 = [
+    None, None, "bar-table", "green-lamp", "tan-bar-stool", "beer-taps", "whisky", "cocktail-glass",
+    "brass-ceiling-lamp", "nautical-chart", "ships-wheel", "telescope", "captain-portrait",
+    "ship-in-bottle", "ships-bell", "camera-tripod", "softbox", "photo-couple", "photo-sunset",
+    "photo-family", "reading-chair", "reading-table", "book-stack", "bankers-lamp", "magazine-rack",
+    "chess-table", "computer-desk", "office-chair", "printer", "jewellery-counter", "perfume-stand",
+    "sunglasses-stand", "handbag-shelf", "tshirt-rack", "souvenir-shelf", "till", "shopping-bag",
+    "watch-case", "teddy-sailor", "dj-decks", "disco-ball", "velvet-armchair", "cocktail-table",
+    "speaker-stand", "velvet-stool", "neon-bar", None, "mic-stand", "guitar", "bass-guitar",
+    "keyboard", "spotlight", "amplifier", "snare-drum", "red-rope", "podium", "leaflet-stand",
+    "popcorn", "champagne-bucket", "teal-bar-chair", "brass-lantern", "world-map-small", "fern",
+    "plaque-stand",
+]
+for i, name in enumerate(PROPS_4):
+    if name:
+        PIECES[name] = ("props-4", i, None, {})
+TALL_1 = [
+    "bookcase", "ship-cabinet", "back-bar", "chesterfield-sofa", "mannequin", "grand-piano",
+    "drum-kit", None, "photo-backdrop", "shop-shelves", "dress-rack", "dj-booth", "velvet-sofa",
+    "bar-counter", "speaker-stack", "palm-tall",
+]
+for i, name in enumerate(TALL_1):
+    if name:
+        PIECES[name] = ("tall-1", i, None, {})
+PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
 
 
 def load(sheet, frame):

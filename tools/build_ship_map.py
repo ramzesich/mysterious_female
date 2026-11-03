@@ -29,8 +29,10 @@ COLS = SEA + LENGTH * PER_M + SEA
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
  LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB,
  EXT, EXT_SLAB, EXT_FIXED, EXT_FIXED_SLAB, EXT_EDGE_L, EXT_EDGE_R, EXT_CORNER_L, EXT_CORNER_R, HIDDEN,
- WALNUT, CUCINA_WALL, DINING_WALL, DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET) = range(1, 42)
-TILE_COUNT = 41
+ WALNUT, CUCINA_WALL, DINING_WALL, DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET,
+ BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
+ LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET) = range(1, 52)
+TILE_COUNT = 51
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -39,9 +41,19 @@ ROOM_LOOK = {
     "Four Seasons": (DINING_WALL, DINING_CARPET),
     "Seven Seas": (DINING_WALL, DINING_CARPET),
     "Shore excursions, reservations": (VENUEWALL, LOBBY_CARPET),
+    "Internet Café": (VENUEWALL, CABIN_CARPET),
+    "Bliss Ultra Lounge": (BLISS_WALL, BLISS_CARPET),
+    "Gift Shops, Perspectives Photo Studio": (DINING_WALL, WOOD_FLOOR),
+    "Windjammer Bar": (WINDJAMMER_WALL, WOOD_FLOOR),
+    "Photo Gallery": (GALLERY_WALL, WOOD_FLOOR),
+    "Library": (WALNUT, LIBRARY_CARPET),
+    "Stardust Lounge theatre (Bumbot: washing)": (THEATRE_WALL, THEATRE_CARPET),
 }
+# A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
+# (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
+RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -205,7 +217,7 @@ def build_layers():
         for c in range(c0, c1 + 1):
             m = metres(c)
             name, kind = venue_at(deck, m)
-            look = ROOM_LOOK.get(name) if deck == 5 else None
+            look = ROOM_LOOK.get(name)
             if deck == 3:
                 tile = DIMWALL
             elif in_atrium(deck, m):
@@ -216,13 +228,15 @@ def build_layers():
                 tile = 0
             elif look and name == "La Cucina" and CUCINA_FRONT[0] <= m < CUCINA_FRONT[1]:
                 tile = CUCINA_WALL
+            elif deck == RESERVATIONS[0] and RESERVATIONS[1] <= m < RESERVATIONS[2]:
+                tile = BURL_WALL
             elif look:
                 tile = look[0]
             else:
                 tile = WALL_FOR.get(kind, BACKWALL)
             if tile:
                 fill(back, c, c, floor - DECK_ROWS + 1, floor - 1, tile)
-                if tile in (BACKWALL, VENUEWALL, CREWWALL, CABIN_WALL):
+                if tile in (BACKWALL, VENUEWALL, CREWWALL, CABIN_WALL) and not look:
                     back[floor - 1][c] = WAINSCOT
             if deck == 12 and covered(12, m):
                 solid[ROOF_ROW][c] = STEEL
@@ -230,7 +244,9 @@ def build_layers():
             # The floor's surface, from the user's photos (§5.3): the cabin corridors' blue-grey
             # wave carpet, the open decks' tan non-skid paint.
             # Open to the sky wins: a corridor's carpet stops where the deck above it ends.
-            if deck > 3 and (in_core(m) or kind == "start"):
+            if deck == 6 and in_core(m):
+                solid[floor][c] = LOBBY6_CARPET  # deck 6's lobbies: purple-navy with gold (her photo)
+            elif deck > 3 and (in_core(m) or kind == "start"):
                 solid[floor][c] = LOBBY_CARPET  # the lobbies' and the gangway's blue mosaic carpet
             elif deck > 3:
                 if not covered(deck, m) or kind in ("outdoor", "finale"):
@@ -631,15 +647,9 @@ def build_objects():
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
-    # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
-    # A door needs a wall: the ones by the open decks stand just inside.
-    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 250.2), ("d6-promenade", 6, 148),
-                          ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
-                          ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
-                          ("d12-sports", 12, 175)]:
-        assert indoor(deck, m) and not in_core(m), f"checkpoint {name}: no wall for its door"
-        assert clear_of_ladders(deck, m), f"checkpoint {name}: its door stands on a ladder"
-        add(point(f"cp-{name}", "checkpoint", x_of(m), floor_y(deck)))
+    # Checkpoints (crew cabin doors, §5.5): none for now (the user, 2026-11-03): they come back
+    # when the ship is split into unlockable areas. Until then she always starts again at the
+    # gangway. The last placements are in GAME_DESIGN.md §8.
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
@@ -701,11 +711,10 @@ def build_objects():
     add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
         prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
     add(promenade())
-    # Inside, each promenade door on the rooms' wall, a paper sign over it.
+    # Inside, each promenade door on the rooms' wall, where E uses it (no sign: the door says it,
+    # the user, 2026-11-03).
     for m in PROMENADE["doors"]:
-        put(PROMENADE["deck"], m, "door-deck")
-        add(point(f"sign-promenade-{m}", "sign", x_of(m), floor_y(PROMENADE["deck"]) - 86,
-                  [prop("text", "Promenade")]))
+        put(PROMENADE["deck"], m, "door-deck", x=x_of(m))
     # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
     for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
         put(7, 0, "railing-bg", x=x)
@@ -735,24 +744,6 @@ def build_objects():
     for core, (a, _) in CORES.items():
         for deck in PLAYABLE:
             put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
-    # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
-    # dresser, bar stools along the bar.
-    around(6, 113.2, "side-table-bg", "club-chair-side-bg", gap=58)
-    put(6, 116.5, "dresser-bg")
-    put(6, 116.5, "ship-model-bg", height("dresser-bg"))
-    put(6, 116.5, "sconce-round-bg", 52)
-    for i in range(4):
-        put(6, 120 + i * 1.1, "bar-stool-bg")
-    # The library (club chairs, reading lamps, a writing desk) and the photo gallery (the ship's
-    # photographers' pictures along the wall), deck 6, inside the promenade.
-    for m in (153, 158):
-        around(6, m + 1.2, "side-table-bg", "club-chair-side-bg", "table-lamp-bg", gap=58)
-    put(6, 166, "desk-bg")
-    put(6, 166, "table-lamp-bg", height("desk-bg"))
-    put(6, 167, "chair-bg", flip=True)
-    for i, m in enumerate(range(172, 192, 3)):
-        if abs(m - 186) > 1.5:
-            put(6, m, ("picture-sea-bg", "picture-ship-bg", "picture-art-bg")[i % 3], 46)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
     # excursions and reservations desks, La Cucina, the Four Seasons and the Seven Seas.
@@ -782,9 +773,10 @@ def build_objects():
     put(5, 130.5, "world-map-bg", 48)
     put(5, 132.6, "desk-screen-bg")
     put(5, 134.0, "brochure-stand-bg")
-    put(5, 140.0, "counter-bg")
-    put(5, 140.65, "desk-screen-bg")
-    put(5, 143.4, "easel-sign-bg")
+    # Restaurant Reservations (NCL's plan puts it here; the user's photo): burl-wood walls, a curved
+    # grey counter with a black top, brass lettering over it.
+    decor("reservations-desk", "resdesk", exact_x(140.3), exact_x(140.3), text="Restaurant Reservations")
+    put(5, 143.6, "easel-sign-bg")
     put(5, 146.5, "palm-bg")
     # La Cucina: the marble portico on its grey-blue wall, then dark wood, dark tables with lamps,
     # windows with beige drapes (the user's photos).
@@ -829,6 +821,89 @@ def build_objects():
     # Warm downlights along the public rooms' ceilings.
     for a, b in ((110, 150), (150, 194), (202, 252)):
         decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))
+
+    # Deck 6, after NCL's plan and the user's photos (§5.3). Clear of its trunk doors (118, 125, 240),
+    # and the promenade doors (111, 138, 162, 186).
+    # The Internet Café, at the end of the cabin corridor by the forward lobby.
+    decor("cafe-doorway", "doorway", x_of(64) - 8, x_of(64) - 8, deck=6, text="Internet Café")
+    for m in (65.6, 67.6, 69.6):
+        put(6, m, "office-chair-bg")
+        put(6, m + 0.55, "computer-desk-bg")
+    put(6, 71.6, "printer-bg")
+    put(6, 72.8, "fern-bg")
+    # The Bliss Ultra Lounge: near-black walls, a dotted carpet, a wooden dance floor under a disco
+    # ball, the DJ booth, purple velvet seats round cocktail tables, a bar with a neon sign.
+    put(6, 112.4, "velvet-sofa-bg")
+    around(6, 114.6, "cocktail-table-bg", "velvet-stool-bg")
+    put(6, 116.2, "speaker-stand-bg")
+    put(6, 119.4, "disco-ball-bg", DECK_PITCH - TILE - height("disco-ball-bg"))
+    put(6, 121.3, "dj-booth-bg")
+    put(6, 122.9, "neon-bar-bg", 62)
+    put(6, 122.9, "bar-counter-bg")
+    for m in (122.4, 123.4):
+        put(6, m, "velvet-stool-bg")
+    # The Gift Shops and the Perspectives Photo Studio.
+    put(6, 126.6, "shop-shelves-bg")
+    put(6, 127.8, "mannequin-bg")
+    put(6, 129.0, "jewellery-counter-bg")
+    put(6, 130.0, "till-bg")
+    put(6, 131.2, "dress-rack-bg")
+    put(6, 133.6, "photo-backdrop-bg")
+    put(6, 132.2, "softbox-bg")
+    put(6, 135.0, "softbox-bg", flip=True)
+    put(6, 134.3, "camera-tripod-bg", flip=True)
+    # The Windjammer Bar (the user's photos): dark green walls, a coffered mahogany ceiling with
+    # brass lamps, a plank floor; the ship's wheel and the captain on the walls; teal club chairs
+    # round a bar table; the back bar and its counter with tan stools; the chesterfield sofa under
+    # a green lamp; the lit cabinet with a model ship, by the gallery as in her photo.
+    decor("windjammer-ceiling", "coffers", exact_x(136), exact_x(150), deck=6)
+    add(point("sign-windjammer", "sign", exact_x(137.4), floor_y(6) - 100,
+              [prop("text", "Windjammer Bar"), prop("style", "plaque")]))
+    put(6, 136.8, "ships-wheel-bg", 50)
+    around(6, 139.6, "bar-table-bg", "club-chair-side-bg")
+    put(6, 139.6, "green-lamp-bg", height("bar-table-bg"))
+    put(6, 142.6, "back-bar-bg")
+    put(6, 142.6, "bar-counter-bg")
+    for m in (141.6, 142.6, 143.6):
+        put(6, m, "tan-bar-stool-bg")
+    put(6, 146.0, "chesterfield-sofa-bg")
+    put(6, 146.0, "captain-portrait-bg", 50)
+    put(6, 147.6, "bar-table-bg")
+    put(6, 147.6, "green-lamp-bg", height("bar-table-bg"))
+    put(6, 149.1, "ship-cabinet-bg")
+    for m in (139.6, 146.0):
+        put(6, m, "brass-ceiling-lamp-bg", DECK_PITCH - TILE - height("brass-ceiling-lamp-bg"))
+    # The Photo Gallery: white walls, its name in big grey letters, the ship's photographers'
+    # pictures in two rows.
+    decor("gallery-name", "lettering", exact_x(155), exact_x(155), deck=6, text="PHOTO GALLERY")
+    for i, m in enumerate((151.2, 152.6, 154.0, 156.0, 157.4, 158.8)):
+        put(6, m, ("photo-couple-bg", "photo-sunset-bg", "photo-family-bg")[i % 3], 44)
+        put(6, m, ("photo-family-bg", "photo-couple-bg", "photo-sunset-bg")[i % 3], 72)
+    put(6, 155.0, "leaflet-stand-bg")
+    # The Library (the user's photos): lit dark-wood bookcases with glass doors, the red-and-white
+    # striped carpet, red reading chairs round lamp tables, a chess table, a writing desk.
+    for m in (164.2, 165.5, 170.6, 171.9, 177.2, 178.5, 183.4, 189.4, 190.7):
+        put(6, m, "bookcase-bg")
+    for m in (168.0, 174.9, 181.0):
+        around(6, m, "reading-table-bg", "reading-chair-bg")
+    around(6, 187.9, "chess-table-bg", "chair-bg")
+    put(6, 191.9, "desk-bg")
+    put(6, 191.9, "bankers-lamp-bg", height("desk-bg"))
+    put(6, 192.55, "chair-bg", flip=True)
+    put(6, 184.6, "globe-bg")
+    # The Stardust Lounge: deep navy, a red carpet, rows of red velvet seats facing the stage aft,
+    # the stage with its red curtains, spotlights and the band's instruments.
+    decor("stardust-entrance", "marquee", exact_x(203.4), exact_x(203.4), deck=6, text="STARDUST LOUNGE")
+    stage_end = (col(EXTENT[6][1]) - STRUCTURE_COLS - 2) * TILE    # where the cut-away ends: the wall
+    decor("stardust-stage", "stage", exact_x(244), stage_end, deck=6)
+    for k in range(int((238.4 - 206.6) / 0.95) + 1):
+        m = 206.6 + k * 0.95
+        put(6, m, "theatre-seat-bg")
+    put(6, 245.2, "drum-kit-bg")
+    put(6, 246.7, "mic-stand-bg")
+    put(6, 247.6, "guitar-bg")
+    put(6, 249.0, "grand-piano-bg", flip=True)
+    put(6, 243.2, "speaker-stack-bg")
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -999,6 +1074,43 @@ def draw_tile(tile_id):
         else:
             for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
                 px[y][x] = hex_rgba(dots[i % len(dots)])
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id in (BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL):
+        # Bliss: near-black plum; the Windjammer: dark green; the gallery: white; the theatre: deep
+        # navy (the user's photos), each with a faint seam.
+        base, seam = {BLISS_WALL: ("#2b2433", "#342c3e"), WINDJAMMER_WALL: ("#1f3b35", "#25453e"),
+                      GALLERY_WALL: ("#f2f2f0", "#e8e8e5"), THEATRE_WALL: ("#262440", "#2e2c4c")}[tile_id]
+        rect(0, 0, 15, 15, hex_rgba(base))
+        rect(0, 0, 0, 15, hex_rgba(seam))
+    elif tile_id == BURL_WALL:
+        # Burl wood, orange-brown and mottled (the Restaurant Reservations desk, the user's photo).
+        rect(0, 0, 15, 15, hex_rgba("#b5653a"))
+        for x, y in ((2, 3), (3, 3), (9, 1), (12, 6), (13, 6), (5, 9), (6, 10), (10, 12), (1, 13), (14, 14)):
+            px[y][x] = hex_rgba("#9e4539")
+        for x, y in ((7, 4), (11, 9), (3, 12), (14, 2)):
+            px[y][x] = hex_rgba("#cd683d")
+    elif tile_id == WOOD_FLOOR:
+        # Warm wooden planks on the steel deck.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#9e4539"))
+        rect(0, 0, 15, 0, hex_rgba("#cd683d"))
+        px[1][5] = px[2][5] = px[1][13] = px[2][13] = hex_rgba("#6e2727")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id in (BLISS_CARPET, LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET):
+        # Bliss: dark with grey and white dots; the library: cream with red diagonal strokes; the
+        # theatre: deep red; deck 6's lobbies: purple-navy with gold.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        base, marks = {BLISS_CARPET: ("#2e222f", ("#9babb2", "#ffffff")),
+                       LIBRARY_CARPET: ("#e9e1d6", ("#9e4539", "#b33831")),
+                       THEATRE_CARPET: ("#6e2727", ("#7a3045",)),
+                       LOBBY6_CARPET: ("#323353", ("#f9c22b",))}[tile_id]
+        rect(0, 0, 15, 3, hex_rgba(base))
+        if tile_id == LIBRARY_CARPET:
+            for x in (0, 4, 8, 12):
+                px[0][x + 3] = px[1][x + 2] = px[2][x + 1] = px[3][x] = hex_rgba(marks[x // 4 % 2])
+        else:
+            for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
+                px[y][x] = hex_rgba(marks[i % len(marks)])
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == MAHOGANY:
         # The lobbies' mahogany panelling: a dark red-brown with a faint grain.
