@@ -1215,8 +1215,8 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
-    // E at the doors: they open and the button panel shows. The glass car, if it is on another
-    // deck, comes to fetch her first.
+    // E at the doors: they open and the button panel shows; first, if the car is on another deck,
+    // it comes to fetch her, the panel's display counting it in.
     callLift() {
         const p = this.player;
         const spot = this.liftAt(p.x, p.y);
@@ -1229,7 +1229,9 @@ export class ShipScene extends Phaser.Scene {
         this.liftRun = { lift, here: i, cursor: i, choosing: false };
         this.showLiftPanel();
         const open = () => this.slideLeaves(this.leavesAt(lift, i), lift.floors[i].y, 1, () => { this.liftRun.choosing = true; });
-        if (lift.at !== i && lift.glass) this.moveCar(lift, i, false, open);
+        // A car on another deck comes to fetch her first, seen or (in a core) out of sight, so every
+        // ride starts from where she stands.
+        if (lift.at !== i) this.moveCar(lift, i, false, open);
         else open();
         return true;
     }

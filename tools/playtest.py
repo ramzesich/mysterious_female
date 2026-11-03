@@ -370,9 +370,21 @@ def scenario_lift(b):
     time.sleep(0.4)
     ok &= check(b.eval("window.__ship.lifts[0].floors.every(f => f.leaves.open === 0)"), "the doors shut once she steps away")
 
+    # Called from deck 4 while it waits on deck 6, the car comes down to her: she stays put.
+    b.teleport(LIFT_X, D4)
+    b.tap("e")
+    ys = []
+    for _ in range(12):
+        time.sleep(0.15)
+        ys.append(b.state()["y"])
+    ok &= check(set(ys) == {D4} and b.eval("window.__ship.liftRun.choosing"),
+                "called from another deck, the car comes to her and she stays put", sorted(set(ys)))
+    b.tap("left")
+    time.sleep(0.6)
+
     b.teleport(LIFT_X, D6)
     b.tap("e")
-    time.sleep(0.5)
+    b.wait_for("window.__ship.liftRun && window.__ship.liftRun.choosing", timeout=4)  # it comes up first
     b.tap("left")
     time.sleep(0.1)
     ok &= check(b.state()["mode"] == "play" and not b.eval("window.__ship.liftPanel"), "←/→ backs out of the panel")
