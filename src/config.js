@@ -66,6 +66,16 @@ export const SIDEWALK = {
 // Swimming in the pools (§5.3): her breaststroke's speed, how far below the surface her feet must be
 // before she is in, where the swim pose sits against the surface, and how close to a pool's side
 // she can swim.
+// The shadow along the edges of the cut-away deck (§5.3): its colour, darkest alpha, and how deep
+// it reaches in (px) under the deck above, over the deck below, and at the ends.
+export const CUT_SHADOW = {
+    colour: 0x2e222f,
+    alpha: 0.6,
+    top: 20,
+    bottom: 8,
+    ends: 18,
+};
+
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
 export const PROMENADE = {
     fadeMs: 140,
