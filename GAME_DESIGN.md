@@ -831,7 +831,26 @@ Nothing blocks the start of the build. These get settled along the way:
       the map builder); **no cabin door right beside a trunk or crew door** (100 px apart, centre
       to centre); the livery's bands run on past the bow onto the decks' fixed ends and **taper to
       a tip**. Placeholder venue signs are gone from decks 4 and 5 (`FURNISHED`)
-- [ ] **Next: populate the ship deck by deck, upward from deck 6** (the user: start at deck 4 and
+- [ ] **Deck 6 furnished** (2026-11-03, branch `deck-6`, shown, not yet merged): laid out after
+      **NCL's deck plan** (`reference/norwegian-sun-ship-map.pdf`: its profile lists each deck's
+      rooms by part of the ship): the Photo Gallery is on deck 6 beside the Library (deck 7 has
+      the Art Gallery); Restaurant Reservations is on deck 5 (its desk there now has the look of
+      the user's photo: burl-wood walls, a curved grey counter with a black top, brass letters).
+      Bow to stern: the Internet Café (64-74), the Bliss Ultra Lounge (110-124: near-black, a
+      dotted carpet, a wooden dance floor, disco ball, DJ booth, purple velvet, a bar under a neon
+      sign), the Gift Shops and Perspectives Photo Studio (124-136), **the Windjammer Bar**
+      (136-150, the user's photos: dark green walls, a coffered mahogany ceiling, brass lamps,
+      planks, teal club chairs, the back bar, a chesterfield, the lit cabinet with a model ship
+      by the gallery), **the Photo Gallery** (150-160, white, its name in grey letters, photos in
+      two rows), **the Library** (160-194: lit dark-wood bookcases, the red-and-white striped
+      carpet, red reading chairs, a chess table, a globe), **the Stardust Lounge** (202-255:
+      deep navy, rows of red velvet seats in profile facing the stage, the stage with red
+      curtains, a valance, lamps and their pools of light, drums, piano, guitar, speakers). Deck
+      6's lobbies: a purple-navy carpet with gold (her photo). Art: two PixelLab sheets (64 at
+      32px, `props-4`; 16 at 64px, `tall-1`; 10 generations each) and a theatre seat
+      (`create_map_object`, 2 tries, 1 generation each: both three-quarter views, try 1 used);
+      front-facing armchairs and seats left out
+- [ ] **Next: populate the ship deck by deck, upward from deck 7** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
@@ -850,7 +869,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1839 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1817 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

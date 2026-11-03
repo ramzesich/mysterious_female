@@ -89,10 +89,16 @@ VENUES = [
     (7, 150, 194, "Casino, duty-free shops", "venue"),
     (7, 222, 254, "Theatre balcony", "venue"),
 
-    (6, 20, 68, "Cabins, internet café", "cabins"),
-    (6, 110, 150, "Bars, shops, photo studio", "venue"),
-    (6, 150, 194, "Library, photo gallery", "venue"),
-    (6, 206, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
+    (6, 20, 64, "Cabins", "cabins"),
+    (6, 64, 74, "Internet Café", "venue"),
+    # Midships and aft as on NCL's plan (2026-11-03): Bliss, the shops and photo studio, the
+    # Windjammer; then the Photo Gallery beside it (the user's photo) and the Library.
+    (6, 110, 124, "Bliss Ultra Lounge", "venue"),
+    (6, 124, 136, "Gift Shops, Perspectives Photo Studio", "venue"),
+    (6, 136, 150, "Windjammer Bar", "venue"),
+    (6, 150, 160, "Photo Gallery", "venue"),
+    (6, 160, 194, "Library", "venue"),
+    (6, 202, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
 
     (5, 20, 74, "Cabins", "cabins"),
     (5, 110, 150, "Shore excursions, reservations", "venue"),
