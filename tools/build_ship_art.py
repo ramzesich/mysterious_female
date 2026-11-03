@@ -21,7 +21,10 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
                paintings, bar, casino, shop, kids' club (2026-11-03, for deck 7)
     tall-2/    object 310360e6-4a51-4387-ab44-88d5cbecbeed, 16 tall pieces, 64px canvas (deck 7)
     casino/    map objects: roulette 4c864558-dfe5-47cc-b1df-eb529f809ceb, blackjack
-               aa1f888b-8206-42fc-88f3-5c50eb6adcad (the sheet's two came out as plain tables)
+               aa1f888b-8206-42fc-88f3-5c50eb6adcad: three-quarter views, replaced; casino-2/ and
+               balcony-rail/ hold four more table tries and two balcony tries, unused
+    casino-drawn/  drawn by tools/draw_casino.py in strict side view: the roulette and blackjack
+               tables, the Stardust balcony's front
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -155,8 +158,9 @@ TALL_2 = [
 for i, name in enumerate(TALL_2):
     if name:
         PIECES[name] = ("tall-2", i, None, {})
-PIECES["roulette"] = ("casino", 0, None, {})
-PIECES["blackjack"] = ("casino", 1, None, {})
+PIECES["roulette"] = ("casino-drawn", 0, None, {})
+PIECES["blackjack"] = ("casino-drawn", 1, None, {})
+PIECES["balcony-front"] = ("casino-drawn", 2, None, {})
 
 
 def load(sheet, frame):

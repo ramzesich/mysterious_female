@@ -15,8 +15,8 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, LENGTH, MAST, PLAYABLE, PROMENADE,
-                         STAGE, TRUNKS, VENUES)
+from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
+                         PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -32,8 +32,9 @@ COLS = SEA + LENGTH * PER_M + SEA
  WALNUT, CUCINA_WALL, DINING_WALL, DINING_CARPET, DIAMOND_CARPET, ATRIUM_CARPET,
  BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
  LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
- KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET) = range(1, 59)
-TILE_COUNT = 58
+ KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET,
+ BALCONY_RAIL) = range(1, 60)
+TILE_COUNT = 59
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -149,13 +150,11 @@ def stem_x(row):
 
 
 def stem_m(row):
-    """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3)."""
-    stem = BOW["stem"]
-    points = [(FLOOR_ROW[d], stem[d]) for d in (7, 6, 5, 4, 3)] + [(ROWS - 1, stem["keel"])]
-    for (r0, m0), (r1, m1) in zip(points, points[1:]):
-        if r0 <= row <= r1:
-            return m0 + (m1 - m0) * (row - r0) / (r1 - r0)
-    return points[0][1] if row < points[0][0] else points[-1][1]
+    """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3): the curve measured
+    off the user's photo (`BOW["rake"]`), in deck heights below deck 7's floor."""
+    a, b = BOW["rake"]
+    d = min(max(0.0, (row - FLOOR_ROW[7]) / DECK_ROWS), a / (2 * b))   # no further aft than its turn
+    return BOW["stem"][7] + (a * d - b * d * d) * DECK_PITCH / (PER_M * TILE)
 
 
 def corridor_ends(deck):
@@ -317,7 +316,7 @@ def build_layers():
     # space is open down to deck 6 (§5.3).
     fill(solid, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], 0)
     fill(back, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], THEATRE_WALL)
-    fill(solid, col(STAGE) - 1, col(STAGE) - 1, FLOOR_ROW[7] - 2, FLOOR_ROW[7] - 1, RAILING)
+    fill(solid, col(STAGE) - 1, col(STAGE) - 1, FLOOR_ROW[7] - 2, FLOOR_ROW[7] - 1, BALCONY_RAIL)
 
     # Deck 11's pools, sunk into the deck: tiled sides and bottom, the water filled in by the game.
     for a, b in POOLS:
@@ -340,6 +339,22 @@ def build_layers():
     return back, solid, ladders, build_exterior()
 
 
+# Deck 7's front wall, between the mooring deck and the youth club: the ship's white wall, as at
+# every deck's end, with a deck door through it (the user, 2026-11-03).
+BOW_WALL_M = 2.0
+
+
+def bow_wall_cols():
+    """The columns of deck 7's front wall: from the mooring deck's end, BOW_WALL_M thick."""
+    a = col(EXTENT[8][0])
+    return a, a + round(BOW_WALL_M * PER_M)
+
+
+def in_bow_wall(deck, c):
+    a, b = bow_wall_cols()
+    return deck == 7 and a <= c < b
+
+
 def stage_end_col():
     """Where the theatre's inside ends at the stern wall (the cut-away's last column + 1)."""
     return col(EXTENT[6][1]) - STRUCTURE_COLS - 2
@@ -358,7 +373,7 @@ def build_exterior():
         for c in range(c0, c1 + 1):
             m = metres(c)
             shell = c in (c0, c1) and covered(deck, metres(c + (1 if c == c0 else -1)))
-            fixed = deck == 3 or shell or in_structure(deck, c)
+            fixed = deck == 3 or shell or in_structure(deck, c) or in_bow_wall(deck, c)
             if indoor(deck, m) or fixed:
                 for r in range(floor - DECK_ROWS + 1, floor):
                     ext[r][c] = EXT_FIXED if fixed else EXT
@@ -407,9 +422,13 @@ def shell_details(ext, solid):
         owners = {owner_at(c, r, deck) for c in range((x0 - END_COVER) // TILE, (x1 + END_COVER) // TILE + 1)}
         return owners.pop() if len(owners) == 1 else None
 
+    def plain(x, y):
+        """The forward hull, below deck 7, is plain plating with the livery: no windows."""
+        return x < x_of(HULL_PLAIN_TO) and y > FLOOR_ROW[7] * TILE
+
     def window(deck, x, y, w, h):
         owner = span_owner(x - 1, x + w + 1, y // TILE, deck)
-        if owner is None:
+        if owner is None or plain(x, y):
             return
         rect(owner, x - 1, y - 1, w + 2, h + 2, FRAME)
         rect(owner, x, y, w, h, GLASS_DARK)
@@ -421,7 +440,7 @@ def shell_details(ext, solid):
         y = (FLOOR_ROW[3] - DECK_ROWS // 2 + k * DECK_ROWS) * TILE
         a = col(EXTENT[3][0]) * TILE + 40
         for x in range(a - a % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, col(EXTENT[3][1]) * TILE - 40, PORTHOLE_PITCH):
-            if x >= a and (solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]):
+            if x >= a and not plain(x, y) and (solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]):
                 put("fixed", ["c", x, y, PORTHOLE_R, FRAME])
                 put("fixed", ["c", x, y, PORTHOLE_R - 2, GLASS_DARK])
                 rect("fixed", x - 5, y - 6, 3, 1, "#8fd3ff")
@@ -440,7 +459,7 @@ def shell_details(ext, solid):
         if deck == 5:
             for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
                 own = span_owner(x - PORTHOLE_R, x + PORTHOLE_R, mid_row, deck)
-                if own is None or x < x0 + 20:
+                if own is None or x < x0 + 20 or plain(x, floor - 72):
                     continue
                 put(own, ["c", x, floor - 72, PORTHOLE_R, FRAME])
                 put(own, ["c", x, floor - 72, PORTHOLE_R - 2, GLASS_DARK])
@@ -927,6 +946,9 @@ def build_objects():
     def plaque(name, m, text):
         add(point(name, "sign", exact_x(m), floor_y(7) - 100, [prop("text", text), prop("style", "plaque")]))
 
+    # The door through deck 7's front wall to the mooring deck: it opens as she comes to it.
+    wa, wb = bow_wall_cols()
+    add(area("bow-door", "bowdoor", wa * TILE, floor_y(7), (wb - wa) * TILE, 0))
     # Splash Academy: sunny walls, a blue carpet with coloured dots, toys, a play kitchen, low tables.
     plaque("sign-splash", 24.6, "Splash Academy")
     put(7, 24.0, "kids-bookshelf-bg")
@@ -1023,6 +1045,9 @@ def build_objects():
     decor("balcony-doorway", "doorway", exact_x(202), exact_x(202), deck=7, text="Stardust Lounge Balcony")
     for k in range(int((STAGE - 1.6 - 204.2) / 0.95) + 1):
         put(7, 204.2 + k * 0.95, "theatre-seat-bg")
+    # Its front over the stage, seen end-on: a velvet-padded parapet with a brass rail, as tall as
+    # the solid railing she hops (the tile itself is invisible).
+    put(7, 0, "balcony-front", x=(col(STAGE) - 1) * TILE + TILE // 2)
     for a, b in ((110, 150), (150, 194)):
         decor(f"downlights-7-{a}", "downlights", x_of(a), x_of(b), deck=7)
 
@@ -1251,6 +1276,8 @@ def draw_tile(tile_id):
         for i, (x, y) in enumerate(((1, 1), (5, 2), (8, 0), (12, 1), (14, 3), (3, 3))):
             px[y][x] = hex_rgba(marks[i % len(marks)])
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == BALCONY_RAIL:
+        pass    # solid but unseen: the game draws the balcony's front over it
     elif tile_id == MAHOGANY:
         # The lobbies' mahogany panelling: a dark red-brown with a faint grain.
         rect(0, 0, 15, 15, hex_rgba("#7a3045"))
@@ -1394,7 +1421,7 @@ def build_livery():
     # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
     # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
     # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
-    cx, cy = x_of(13) - x0, round((FLOOR_ROW[3] - FLOOR_ROW[7] - 1) * TILE * 0.3)  # high on the bow, as approved
+    cx, cy = x_of(14.5) - x0, round((FLOOR_ROW[3] - FLOOR_ROW[7] - 1) * TILE * 0.3)  # high on the bow, clear of the stem
     r = 72
 
     def ray(angle, base, tip, width, colour):

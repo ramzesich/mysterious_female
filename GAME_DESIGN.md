@@ -881,6 +881,24 @@ Nothing blocks the start of the build. These get settled along the way:
       choice; a playtest, `balcony`). Rooms open off each other at wood posts with brass
       plaques. Art: two PixelLab sheets (`props-5`, `tall-2`, 10 generations each) and the
       roulette and blackjack tables (`create_map_object`, 1 each; the sheet's came out plain)
+      The user's corrections (2026-11-03): **deck 7's front wall**, the ship's white wall 2 m
+      thick between the mooring deck and Splash Academy, as at every deck's end, with a deck door
+      in its outer face that swings open as she comes to it and shuts behind her; she passes
+      behind the wall (`bowdoor`); **the casino tables and the balcony's front drawn by hand in
+      strict side view** (`tools/draw_casino.py`; PixelLab's tries, 6 generations in all, kept
+      tilting to three-quarters): the front is a velvet-padded parapet with a brass rail seen
+      end-on, as tall as the solid rail she hops
+- [x] **The bow, longer and from the user's photo** (2026-11-03): the stem is one smooth convex
+      curve measured in deck heights off her side-view photo (NCL's diagram draws it short): tip
+      at 0.5 m on deck 7, about 30 degrees below level there, steepening to about 60 at the
+      waterline, which it meets near 26.5 m (`BOW["rake"]`); deck 3 starts at 21.5 m behind it.
+      **The forward hull is plain white plating** with the livery, no windows forward of 30 m
+      (`HULL_PLAIN_TO`, her photos). The sun moved 1.5 m aft to stay clear of the stem; it is to
+      be moved and enlarged later (the user)
+- [ ] **Open: key cards are off for now** (the user, 2026-11-03): every flight, trunk and
+      elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
+      back on, and the playtests use it). They come back with the unlockable areas, with the
+      checkpoints
 - [ ] **Next: populate the ship deck by deck, upward from deck 8** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
@@ -900,7 +918,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1795 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1789 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

@@ -10,7 +10,7 @@ truth**: read the relevant section before any design or content work, and record
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip title,
-  `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card, `?tangerines=infinite`, `?at=pool` start at a
+  `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?at=pool` start at a
   named place (list in `README.md`; for testing).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 

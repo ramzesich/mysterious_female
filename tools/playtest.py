@@ -200,7 +200,7 @@ def scenario_run_jump(b):
 
 
 def scenario_stairs(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     b.teleport(CORE_L, D4)
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
@@ -254,7 +254,7 @@ def trunk_door(b, name, deck, field="open"):
 
 
 def scenario_trunk(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     x = trunk_x("fwd-cabins")
     b.teleport(x, D4)
     b.hold("up", 0.5)
@@ -347,7 +347,7 @@ def lift_cursor(b):
 
 
 def scenario_lift(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     b.teleport(LIFT_X, D4)
     b.tap("e")
     time.sleep(0.5)
