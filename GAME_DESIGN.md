@@ -454,6 +454,9 @@ Where a deck ends in the ship's wall, a 32 px strip of that wall is drawn over h
 so running into it she goes behind it; no window straddles or crowds the cut's edge, a cabin's
 pair of windows both or neither; the old shaded edge tiles are gone. The venue-name signs are
 placeholders: the gangway's is removed (2026-11-03), the rest go as each deck is furnished.
+No line along each deck's floor and no rounded corner tiles on the shell (they read as stray
+marks); all round windows (deck 5's and the lower hull's, in line) are 24 px across, every 160 px
+(`PORTHOLE_R`, `PORTHOLE_PITCH`).
 - **Built (branch `outer-shell`):** step 1, the shell and the cut-away (the `exterior` tile layer,
   `EXT` tiles cut, `EXT_FIXED` never; `updateCutaway` in the scene); the outline: where a deck
   steps back by up to 8 m the shell slopes across the step (`shell_slopes`), so the bow's
