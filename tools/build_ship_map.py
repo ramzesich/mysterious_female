@@ -624,9 +624,12 @@ def build_livery():
     w, h = x1 - x0, y1 - y0
     img = Image.new("RGBA", (w, h))
     d = ImageDraw.Draw(img)
-    # High and aft on the bow, where it is widest (the stem rakes back below), as on the real ship.
-    cx, cy = x_of(14.2) - x0, round(h * 0.3)
-    r = 85
+    # Laid out as on the real bow (the user's side-view photo), compressed into the bow's hull
+    # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
+    # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
+    # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
+    cx, cy = x_of(13) - x0, round(h * 0.3)
+    r = 72
 
     def ray(angle, base, tip, width, colour):
         """A curved flame: from `base` out to `tip` radii, `width` degrees wide at its base, its tip
@@ -642,17 +645,31 @@ def build_livery():
         d.polygon(left + right[::-1], fill=colour)
         return right
 
-    # Two sets of bands behind the sun, as on the real bow, from the stem back to the block's end:
-    # one through the sun's centre, rising aft; one sweeping under it.
-    def bands(y_of):
-        for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
-            pts = [(w * i / 120, y_of(i / 120) + k * 8) for i in range(121)]
-            d.line(pts, fill=colour, width=8 if colour != "#9babb2" else 3, joint="curve")
+    def band(points, colours, width=8, shadow=True):
+        for k, colour in enumerate(colours):
+            d.line([(x, y + k * width) for x, y in points], fill=colour, width=width, joint="curve")
+        if shadow:
+            d.line([(x, y + len(colours) * width + 1) for x, y in points], fill="#9babb2", width=3, joint="curve")
 
-    # The upper set climbs from low at the stem, through the sun, and on up aft in a long swell;
-    # the lower set sweeps up under the sun and dips away aft.
-    bands(lambda t: cy + 34 - 96 * t + 22 * math.sin(2 * math.pi * t))
-    bands(lambda t: cy + r * 1.1 + 70 * math.sin(math.pi * t) - 40 * t - 30 * math.sin(2 * math.pi * t))
+    def curve(f, n=80):
+        return [f(i / n) for i in range(n + 1)]
+
+    # Forward of the sun, in the bow's wide upper part (the stem rakes back below): a red band
+    # above, sweeping down into the sun, and a red, orange and yellow band below, coming in level.
+    band(curve(lambda t: (cx * t, 24 + (cy - 40 - 24) * t ** 1.5)), ("#e83b3b",), 10)
+    band(curve(lambda t: (cx * t, cy + 6 + 14 * math.sin(math.pi * t))), ("#e83b3b", "#fb6b1d", "#f9c22b"), 7)
+    # Aft of it: the big red arc looping up and over, its foot under the sun's right.
+    ax, ay, ar = cx + r * 2.35, cy - 8, r * 1.4
+    band(curve(lambda t: (ax + ar * math.cos(math.radians(150 + 235 * t)),
+                          ay + ar * math.sin(math.radians(150 + 235 * t)))), ("#e83b3b", "#ae2334"), 10)
+    # The yellow swoop from under the arc, away aft; the red pinstripes on to the block's end.
+    band(curve(lambda t: (ax - ar * 0.6 + (w - ax + ar * 0.6) * t, ay + ar * 0.85 + 30 * math.sin(math.pi * t) - 26 * t)),
+         ("#f9c22b", "#fbb954"), 8, shadow=False)
+    for k in range(2):
+        d.line(curve(lambda t, k=k: (cx + r + (w - cx - r) * t, ay + ar * 1.3 + k * 8 - 16 * t)), fill="#e83b3b", width=3)
+    # A clear gap round the sun's rim, then the sun over it.
+    gap = r * 1.12
+    d.ellipse((cx - gap, cy - gap, cx + gap, cy + gap), fill=(0, 0, 0, 0))
     for i in range(12):
         a = i * 30 - 75
         edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
