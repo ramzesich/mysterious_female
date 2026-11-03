@@ -40,7 +40,7 @@ ROOM_LOOK = {
     "Seven Seas": (DINING_WALL, DINING_CARPET),
     "Shore excursions, reservations": (VENUEWALL, LOBBY_CARPET),
 }
-CUCINA_FRONT = (150, 151.67)    # the dark wood starts in the middle of the portico (the user)
+CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
 FURNISHED = {4, 5}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
@@ -788,8 +788,7 @@ def build_objects():
     put(5, 146.5, "palm-bg")
     # La Cucina: the marble portico on its grey-blue wall, then dark wood, dark tables with lamps,
     # windows with beige drapes (the user's photos).
-    portico = col(CUCINA_FRONT[1]) * TILE    # on the line where the grey-blue wall meets the wood
-    decor("cucina-portico", "portico", portico, portico, text="La Cucina")
+    decor("cucina-portico", "portico", x_of(151.8), x_of(151.8), text="La Cucina")
     put(5, 150.5, "menu-lectern-bg")
     cucina = [155.5, 159.8, 164.1]
     decor("cucina-windows", "dinewindows", x_of(150), x_of(168), xs=",".join(str(x_of(m)) for m in cucina), style="drapes")

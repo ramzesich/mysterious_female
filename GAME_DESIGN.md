@@ -817,7 +817,8 @@ Nothing blocks the start of the build. These get settled along the way:
       carpet, the Atrium Café's marble tables and cane chairs, a pastry case; Guest Services: a
       counter, a desk, a brass plaque); shore excursions and reservations (desks, brochure stands,
       travel posters; no photo); **La Cucina** (the white marble portico with its name on a
-      grey-blue wall, the dark wood starting in the portico's middle; dark tables with lamps,
+      grey-blue wall, the dark wood beyond it (starting the wood in the portico's middle was tried;
+      the user preferred it as first built); dark tables with lamps,
       windows with beige drapes, a wine barrel, an olive tree, a dark diamond carpet); **the Four
       Seasons** (cream, burl pillars with brass rings, chandeliers, white-cloth tables, beige
       chairs, sheer curtains, the ice swan, a dark floral carpet); **the Seven Seas** (its backlit
