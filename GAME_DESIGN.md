@@ -450,6 +450,10 @@ indoor deck end stops short of the hull (2.7 m of structure, `STRUCTURE_COLS`), 
 little shaded. **The cut-out's edges are in shadow** (the user, 2026-11-03: the cut wasn't
 apparent): a soft dark gradient inside the opening wherever the shell goes on, deepest under the
 deck above, fading in with the cut (`CUT_SHADOW` in `src/config.js`); no hard line.
+Where a deck ends in the ship's wall, a 32 px strip of that wall is drawn over her (`END_COVER`),
+so running into it she goes behind it; no window straddles or crowds the cut's edge, a cabin's
+pair of windows both or neither; the old shaded edge tiles are gone. The venue-name signs are
+placeholders: the gangway's is removed (2026-11-03), the rest go as each deck is furnished.
 - **Built (branch `outer-shell`):** step 1, the shell and the cut-away (the `exterior` tile layer,
   `EXT` tiles cut, `EXT_FIXED` never; `updateCutaway` in the scene); the outline: where a deck
   steps back by up to 8 m the shell slopes across the step (`shell_slopes`), so the bow's
