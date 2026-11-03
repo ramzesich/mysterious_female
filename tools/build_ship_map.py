@@ -754,12 +754,14 @@ def build_objects():
     # the user, 2026-11-03).
     for m in PROMENADE["doors"]:
         put(PROMENADE["deck"], m, "door-deck", x=x_of(m))
-    # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
-    for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
-        put(7, 0, "railing-bg", x=x)
+    # The mooring deck: bollards and a cleat, the side railing in front of them (the user), from the
+    # tip all the way back to deck 7's front wall (its last piece runs on under the wall).
     put(7, 6, "bollard-bg")
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
+    rail_w = width("railing-bg")
+    for x in range(col(BOW["stem"][7]) * TILE + 30, bow_wall_cols()[0] * TILE + rail_w // 2, rail_w):
+        put(7, 0, "railing-bg", x=x)
     # The bow view (§5.3): standing still on the mooring deck, she goes to the tip and spreads her
     # arms, and the camera draws back to frame the whole bow, from above the forecastle down to
     # the sea. `x0`-`x1` is where on deck 7 it can start.

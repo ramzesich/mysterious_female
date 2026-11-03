@@ -132,6 +132,8 @@ export class ShipScene extends Phaser.Scene {
                 }
             };
             for (const t of list) {
+                // An open deck's floor edge (no indoors above it) casts no shadow: it isn't inside.
+                if (t.y === this.deckFloors[deck] && !own.has(`${t.x},${t.y - 1}`)) continue;
                 const shell = (dx, dy) => {
                     if (own.has(`${t.x + dx},${t.y + dy}`)) return false;
                     const n = this.exteriorLayer.getTileAt(t.x + dx, t.y + dy);
