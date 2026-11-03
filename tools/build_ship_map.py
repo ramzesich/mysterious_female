@@ -92,6 +92,11 @@ def metres(c):
     return (c - SEA + 0.5) / PER_M
 
 
+def exact_x(m):
+    """Pixel x at exactly `m` metres from the bow (not snapped to a column)."""
+    return SEA * TILE + round(m * PER_M * TILE)
+
+
 def x_of(m):
     """Pixel x at `m` metres from the bow (the middle of its column)."""
     return col(m) * TILE + TILE // 2
@@ -673,10 +678,22 @@ def build_objects():
     width = lambda frame: art[frame]["frame"]["w"]
 
     def put(deck, m, frame, dy=0, flip=False, x=None):
+        # At the exact spot, not snapped to a tile's middle: pieces set round each other stay even.
         props = [prop("frame", frame), prop("dy", dy, "int")]
         if flip:
             props.append(prop("flip", True, "bool"))
-        add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
+        add(point(f"prop-{len(objs)}", "prop", x if x is not None else exact_x(m), floor_y(deck), props))
+
+    def around(deck, m, middle, chair, on_top=None, gap=None):
+        """A table (or anything) with a chair at each side, facing it, the same distance away (the
+        user, 2026-11-03): by default each chair's seat tucked a little under the table's edge."""
+        cx = exact_x(m)
+        off = gap if gap is not None else (width(middle) + width(chair)) // 2 - 5
+        put(deck, 0, chair, x=cx - off)
+        put(deck, 0, chair, flip=True, x=cx + off)
+        put(deck, 0, middle, x=cx)
+        if on_top:
+            put(deck, 0, on_top, height(middle), x=cx)
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
     lx0, ly0, lx1, ly1 = livery_box()
@@ -720,9 +737,7 @@ def build_objects():
             put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
     # A Windjammer Bar corner in the deck 6 bars: club chairs round a table, a ship model on a
     # dresser, bar stools along the bar.
-    put(6, 112, "club-chair-side-bg")
-    put(6, 113.2, "side-table-bg")
-    put(6, 114.4, "club-chair-side-bg", flip=True)
+    around(6, 113.2, "side-table-bg", "club-chair-side-bg", gap=58)
     put(6, 116.5, "dresser-bg")
     put(6, 116.5, "ship-model-bg", height("dresser-bg"))
     put(6, 116.5, "sconce-round-bg", 52)
@@ -731,10 +746,7 @@ def build_objects():
     # The library (club chairs, reading lamps, a writing desk) and the photo gallery (the ship's
     # photographers' pictures along the wall), deck 6, inside the promenade.
     for m in (153, 158):
-        put(6, m, "club-chair-side-bg")
-        put(6, m + 1.2, "side-table-bg")
-        put(6, m + 1.2, "table-lamp-bg", height("side-table-bg"))
-        put(6, m + 2.4, "club-chair-side-bg", flip=True)
+        around(6, m + 1.2, "side-table-bg", "club-chair-side-bg", "table-lamp-bg", gap=58)
     put(6, 166, "desk-bg")
     put(6, 166, "table-lamp-bg", height("desk-bg"))
     put(6, 167, "chair-bg", flip=True)
@@ -749,18 +761,11 @@ def build_objects():
                  [prop("kind", kind)] + [prop(k, v) for k, v in props.items()]))
 
     def dinner(m, table, chair, lamp=None):
-        """A table with a chair at each side, facing it."""
-        put(5, m - 0.42, chair)
-        put(5, m + 0.42, chair, flip=True)
-        put(5, m, table)
-        if lamp:
-            put(5, m, lamp, height(table))
+        around(5, m, table, chair, lamp)
 
     # The atrium's floor: the café on the forward side, Guest Services aft (the user's photos).
     for m in (83.6, 85.6):
-        put(5, m - 0.4, "cafe-chair-bg")
-        put(5, m + 0.4, "cafe-chair-bg", flip=True)
-        put(5, m, "cafe-table-bg")
+        around(5, m, "cafe-table-bg", "cafe-chair-bg")
     put(5, 86.4, "pastry-case-bg")
     put(5, 98.3, "palm-bg")
     put(5, 99.2, "counter-bg")

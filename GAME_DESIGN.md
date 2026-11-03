@@ -813,7 +813,22 @@ Nothing blocks the start of the build. These get settled along the way:
       outside, the current deck cut away; its outline from the profile; windows, balconies,
       portholes, funnel, mast and domes; the hand-drawn lifeboats; deck 6's promenade with its
       doors (two routes), as the user corrected it
-- [ ] **Next: populate the ship deck by deck, upward from deck 5** (the user: start at deck 4 and
+- [x] **Deck 5 furnished** (2026-11-03): from the user's photos. The atrium floor (blue-green
+      carpet, the Atrium Café's marble tables and cane chairs, a pastry case; Guest Services: a
+      counter, a desk, a brass plaque); shore excursions and reservations (desks, brochure stands,
+      travel posters; no photo); **La Cucina** (the white marble portico with its name on a
+      grey-blue wall, the dark wood starting in the portico's middle; dark tables with lamps,
+      windows with beige drapes, a wine barrel, an olive tree, a dark diamond carpet); **the Four
+      Seasons** (cream, burl pillars with brass rings, chandeliers, white-cloth tables, beige
+      chairs, sheer curtains, the ice swan, a dark floral carpet); **the Seven Seas** (its backlit
+      blue wave panel between marble columns, white-cloth tables). Windows on the back wall in the
+      restaurants (the user: yes). A third PixelLab props sheet (64 at 32px, 10 generations,
+      `assets/source/ship/props-3/`). The user's corrections: **chairs sit the same distance from
+      their table on both sides** (props are placed exactly, not snapped to tiles; `around()` in
+      the map builder); **no cabin door right beside a trunk or crew door** (100 px apart, centre
+      to centre); the livery's bands run on past the bow onto the decks' fixed ends and **taper to
+      a tip**. Placeholder venue signs are gone from decks 4 and 5 (`FURNISHED`)
+- [ ] **Next: populate the ship deck by deck, upward from deck 6** (the user: start at deck 4 and
       move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
@@ -832,7 +847,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1849 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1839 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**
