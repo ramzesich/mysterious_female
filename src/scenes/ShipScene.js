@@ -254,9 +254,12 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'sign': {
+                    // A brass plaque in the lobbies (the deck number), a paper sign elsewhere.
+                    const plaque = prop(o, 'style', '') === 'plaque';
                     const text = this.add.text(o.x, o.y, prop(o, 'text', ''), {
-                        fontFamily: 'Verdana, sans-serif', fontSize: '7px', color: '#8f846f',
-                        backgroundColor: '#f3ecdd', padding: { x: 3, y: 2 }, resolution: 4,
+                        fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: plaque ? 'bold' : 'normal',
+                        color: plaque ? '#45293f' : '#8f846f', backgroundColor: plaque ? '#d9a43b' : '#f3ecdd',
+                        padding: { x: 3, y: 2 }, resolution: 4,
                     }).setOrigin(0.5).setDepth(DEPTH.decor);
                     this.worldLayer.add(text);
                     break;
@@ -286,8 +289,11 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
+                    if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o, prop(o, 'matX0', o.x), prop(o, 'matX1', o.x));
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
-                    if (prop(o, 'kind') === 'cabindoors') this.drawCabinDoors(decorGfx, o);
+                    if (prop(o, 'kind') === 'cabindoors') {
+                        this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
+                    }
                     break;
             }
         }
@@ -362,6 +368,19 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // The gangway lobby (the user's photo): cream panelling, a heavy fire door held open against
+    // the wall at either end, and a dark blue runner mat on the carpet by the shell door.
+    drawGangway(g, o, matX0, matX1) {
+        const top = o.y - this.deckPitch + 16;
+        for (let x = o.x + 24; x < o.x + o.width; x += 32) g.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
+        for (const [x, dir] of [[o.x + 8, 1], [o.x + o.width - 14, -1]]) {
+            g.fillStyle(0xd9cdb6, 1).fillRect(x, o.y - 76, 6, 76);
+            g.fillStyle(0xb9ab90, 1).fillRect(dir > 0 ? x + 5 : x, o.y - 76, 1, 76);
+            g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? x + 6 : x - 2, o.y - 30, 2, 2);  // the hook holding it
+        }
+        g.fillStyle(0x323353, 1).fillRect(matX0, o.y - 2, matX1 - matX0, 2);
+    }
+
     // Windows along a wall, looking out to sea: the bridge's.
     drawWindows(g, o) {
         for (let x = o.x; x + 18 <= o.x + o.width; x += 24) {
@@ -385,7 +404,7 @@ export class ShipScene extends Phaser.Scene {
     // A cabin corridor, as in the user's photos (§5.3): a white ceiling with round downlights, a
     // wooden handrail, terracotta cabin doors every 4 m (192px), a few with vacation stickers, and
     // now and then a framed picture. All muted, so none of it reads as interactive.
-    drawCabinDoors(g, o) {
+    drawCabinDoors(g, o, first, last, coreBefore, coreAfter) {
         const ceiling = o.y - this.deckPitch + 16;
         g.fillStyle(0xf6f3ec, 1);
         g.fillRect(o.x, ceiling, o.width, 3);
@@ -403,11 +422,32 @@ export class ShipScene extends Phaser.Scene {
             if (n % 3 === 1 && gap + 20 < o.x + o.width) {
                 parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
+            // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
+            if (n % 6 === 3 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             if (this.trunkDoorSpots.some(t => t.y === o.y && x < t.x + 22 && x + 30 > t.x - 22)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
+            // Now and then a housekeeping trolley or a room-service cart left by a door.
+            const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
+            if (cart && x + 64 < o.x + o.width) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
         }
+        // By a stair core, a brass plaque with the corridor's cabin numbers and an arrow along it.
+        // (The arrow is drawn: at this size the font's arrow comes out blank.)
+        const plaque = (x, dir) => {
+            const text = this.add.text(x, o.y - 96, `${first}\u2013${last}`, {
+                fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
+                backgroundColor: '#d9a43b', padding: { left: dir < 0 ? 8 : 2, right: dir > 0 ? 8 : 2, top: 1, bottom: 1 },
+                resolution: 4,
+            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.1);
+            const tip = x + (dir * text.width) / 2 - dir * 2;
+            const arrow = this.add.triangle(0, 0, tip, o.y - 96, tip - dir * 4, o.y - 99, tip - dir * 4, o.y - 93, 0x45293f)
+                .setOrigin(0).setDepth(DEPTH.decor + 0.2);
+            parts.push(text, arrow);
+        };
+        if (coreBefore) plaque(o.x + 36, 1);
+        if (coreAfter) plaque(o.x + o.width - 36, -1);
         this.worldLayer.add(parts);
     }
 
@@ -642,23 +682,26 @@ export class ShipScene extends Phaser.Scene {
         this.hudCount = this.add.text(62, 22, '', textStyle);
         this.dashBarBack = this.add.rectangle(24, 62, 164, 12, 0x1d2b53).setOrigin(0);
         this.dashBar = this.add.rectangle(26, 64, 160, 8, 0xf28c28).setOrigin(0);
+        // Her speech bubble and the messages over her live in the world, so they move exactly with
+        // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
         this.bubble = this.add.text(0, 0, DASH.shout, {
-            fontFamily: 'Verdana, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#c8343f',
-            backgroundColor: '#ffffff', padding: { x: 10, y: 6 },
-        }).setOrigin(0.5, 1);
+            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#c8343f',
+            backgroundColor: '#ffffff', padding: { x: 5, y: 3 }, resolution: 4,
+        }).setOrigin(0.5, 1).setDepth(DEPTH.fx + 1);
         this.alert = this.add.text(0, 0, '', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#1d2b53',
-            backgroundColor: '#ffffff', padding: { x: 8, y: 4 },
-        }).setOrigin(0.5, 1).setVisible(false);
+            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#1d2b53',
+            backgroundColor: '#ffffff', padding: { x: 4, y: 2 }, resolution: 4,
+        }).setOrigin(0.5, 1).setVisible(false).setDepth(DEPTH.fx + 1);
+        this.worldLayer.add([this.bubble, this.alert]);
         this.fade = this.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422).setOrigin(0).setAlpha(0);
         this.debugText = this.add.text(VIEW.width - 12, 12, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff' })
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
-        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.bubble, this.alert, this.fade, this.debugText]);
+        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText]);
         this.refreshHud();
     }
 
     refreshHud() {
-        this.hudCount.setText(`× ${this.save.tangerines}`);
+        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines}`);
         const left = Math.max(0, this.dashUntil - this.time.now);
         const dashing = left > 0;
         this.dashBarBack.setVisible(dashing);
@@ -1172,8 +1215,8 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
-    // E at the doors: they open and the button panel shows. The glass car, if it is on another
-    // deck, comes to fetch her first.
+    // E at the doors: they open and the button panel shows; first, if the car is on another deck,
+    // it comes to fetch her, the panel's display counting it in.
     callLift() {
         const p = this.player;
         const spot = this.liftAt(p.x, p.y);
@@ -1186,7 +1229,9 @@ export class ShipScene extends Phaser.Scene {
         this.liftRun = { lift, here: i, cursor: i, choosing: false };
         this.showLiftPanel();
         const open = () => this.slideLeaves(this.leavesAt(lift, i), lift.floors[i].y, 1, () => { this.liftRun.choosing = true; });
-        if (lift.at !== i && lift.glass) this.moveCar(lift, i, false, open);
+        // A car on another deck comes to fetch her first, seen or (in a core) out of sight, so every
+        // ride starts from where she stands.
+        if (lift.at !== i) this.moveCar(lift, i, false, open);
         else open();
         return true;
     }
@@ -1623,9 +1668,14 @@ export class ShipScene extends Phaser.Scene {
         return this.dashUntil > this.time.now;
     }
 
+    // ?tangerines=infinite: the dash never uses one up, for testing.
+    infiniteTangerines() {
+        return new URLSearchParams(location.search).get('tangerines') === 'infinite';
+    }
+
     tryDash(time) {
-        if (this.isDashing() || this.save.tangerines <= 0) return;
-        this.save.tangerines -= 1;
+        if (this.isDashing() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         this.dashUntil = time + DASH.durationMs;
         this.bubbleUntil = time + DASH.bubbleMs;
         sfx.dash();
@@ -1751,12 +1801,11 @@ export class ShipScene extends Phaser.Scene {
     // --- Screen-space overlays ------------------------------------------------------------------
 
     updateOverlays() {
-        const cam = this.cameras.main;
         const p = this.player;
-        const sx = (p.x - cam.worldView.x) * cam.zoom;
-        const sy = (p.y - PLAYER.height - 6 - cam.worldView.y) * cam.zoom;
-        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(sx, sy);
-        this.alert.setPosition(sx, sy);
+        const x = Math.round(p.x);
+        const y = Math.round(p.y - PLAYER.height - 3);
+        this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(x, y);
+        this.alert.setPosition(x, y);
         if (this.debugText.visible) {
             this.debugText.setText(`${this.mode}  x ${p.x.toFixed(0)}  y ${p.y.toFixed(0)}  takeoff ${this.takeoffY?.toFixed(0)}`);
         }
