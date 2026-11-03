@@ -642,15 +642,17 @@ def build_livery():
         d.polygon(left + right[::-1], fill=colour)
         return right
 
-    # The bands first, behind the sun: from its centre, sweeping aft to the block's end.
-    for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
-        pts = []
-        for i in range(41):
-            t = i / 40
-            x = cx + (w - cx) * t
-            y = cy - 12 + k * 9 + 34 * math.sin(math.pi * t * 0.85) - 6 * t
-            pts.append((x, y))
-        d.line(pts, fill=colour, width=9 if colour != "#9babb2" else 3)
+    # Two sets of bands behind the sun, as on the real bow, from the stem back to the block's end:
+    # one through the sun's centre, rising aft; one sweeping under it.
+    def bands(y_of):
+        for k, colour in enumerate(("#ae2334", "#e83b3b", "#fb6b1d", "#f9c22b", "#9babb2")):
+            pts = [(w * i / 120, y_of(i / 120) + k * 8) for i in range(121)]
+            d.line(pts, fill=colour, width=8 if colour != "#9babb2" else 3, joint="curve")
+
+    # The upper set climbs from low at the stem, through the sun, and on up aft in a long swell;
+    # the lower set sweeps up under the sun and dips away aft.
+    bands(lambda t: cy + 34 - 96 * t + 22 * math.sin(2 * math.pi * t))
+    bands(lambda t: cy + r * 1.1 + 70 * math.sin(math.pi * t) - 40 * t - 30 * math.sin(2 * math.pi * t))
     for i in range(12):
         a = i * 30 - 75
         edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
