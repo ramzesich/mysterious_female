@@ -23,7 +23,7 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, TILE, TRUNKS, col, floor_y,
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, STAGE, TILE, TRUNKS, col, floor_y,
                             walk_y, x_of)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -200,7 +200,7 @@ def scenario_run_jump(b):
 
 
 def scenario_stairs(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     b.teleport(CORE_L, D4)
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
@@ -254,7 +254,7 @@ def trunk_door(b, name, deck, field="open"):
 
 
 def scenario_trunk(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     x = trunk_x("fwd-cabins")
     b.teleport(x, D4)
     b.hold("up", 0.5)
@@ -347,7 +347,7 @@ def lift_cursor(b):
 
 
 def scenario_lift(b):
-    b.open("?reset&play")
+    b.open("?reset&play&cards=locked")
     b.teleport(LIFT_X, D4)
     b.tap("e")
     time.sleep(0.5)
@@ -511,6 +511,22 @@ def scenario_promenade(b):
                 "its fore end is closed", (route(), s))
     b.shot("promenade-fore")
     return ok
+
+
+def scenario_balcony(b):
+    # The Stardust Lounge's balcony (deck 7) ends in a railing over the stage: she can hop it and
+    # drop one deck onto the stage, no scare (§5.3).
+    b.open("?reset&play")
+    b.teleport(x_of(STAGE - 1.4), floor_y(7))
+    b.key("right", True)
+    b.tap("space")
+    time.sleep(1.4)
+    b.key("right", False)
+    time.sleep(0.8)
+    s = b.state()
+    b.shot("balcony-hop")
+    return check(s["mode"] == "play" and s["y"] == floor_y(6) and s["x"] > x_of(STAGE),
+                 "she hops the balcony railing and lands on the stage", s)
 
 
 def scenario_idle(b):

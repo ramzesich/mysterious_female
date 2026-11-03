@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, CUT_SHADOW, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -132,6 +132,8 @@ export class ShipScene extends Phaser.Scene {
                 }
             };
             for (const t of list) {
+                // An open deck's floor edge (no indoors above it) casts no shadow: it isn't inside.
+                if (t.y === this.deckFloors[deck] && !own.has(`${t.x},${t.y - 1}`)) continue;
                 const shell = (dx, dy) => {
                     if (own.has(`${t.x + dx},${t.y + dy}`)) return false;
                     const n = this.exteriorLayer.getTileAt(t.x + dx, t.y + dy);
@@ -369,6 +371,15 @@ export class ShipScene extends Phaser.Scene {
                     this.buildPromenade(o, prop);
                     break;
 
+                case 'bowdoor': {
+                    // Deck 7's front wall (§5.3): drawn over her as she passes straight through it to
+                    // the mooring deck, as if through a door hidden in it (the user, 2026-11-03).
+                    const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
+                    wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
+                    this.worldLayer.add(wall);
+                    break;
+                }
+
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
@@ -384,6 +395,7 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
                     if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -771,10 +783,10 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
         g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
         if (text) {
-            const plaque = this.add.text(x + 48, y - 96, text, {
+            const plaque = this.add.text(x + 12, y - 96, text, {
                 fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',
                 backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
-            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+            }).setOrigin(0, 0.5).setDepth(DEPTH.decor + 0.01);
             this.worldLayer.add(plaque);
         }
     }
@@ -796,6 +808,17 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Georgia, serif', fontSize: '9px', fontStyle: 'bold', color: '#fbff86', resolution: 4,
         }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
         this.worldLayer.add(name);
+    }
+
+    // A burl-wood panel on a wall (the atrium on deck 7, the user's photos), for the ports' plaques.
+    drawBurlPanel(g, o) {
+        const top = o.y - this.deckPitch + 22, bottom = o.y - 6;
+        g.fillStyle(0x9e4539, 1).fillRect(o.x - 2, top - 2, o.width + 4, bottom - top + 4);
+        g.fillStyle(0xb5653a, 1).fillRect(o.x, top, o.width, bottom - top);
+        for (let i = 0; i < o.width * (bottom - top) / 90; i++) {
+            const x = o.x + ((i * 37) % o.width), y = top + ((i * 53) % (bottom - top));
+            g.fillStyle(i % 3 ? 0x9e4539 : 0xcd683d, 1).fillRect(x, y, 2, 1);
+        }
     }
 
     // Warm downlights along a room's ceiling.
@@ -1896,8 +1919,12 @@ export class ShipScene extends Phaser.Scene {
     }
 
     // Her cards (§6.2): her own crew card from the start; ?cards=all unlocks everything for testing.
+    // Key cards (§5.5) are off for now (the user, 2026-11-03): every door, flight and elevator is
+    // open. `?cards=locked` turns them back on, for testing the locks.
     hasCard(card) {
-        return !card || this.save.cards.includes(card) || new URLSearchParams(location.search).get('cards') === 'all';
+        const flag = new URLSearchParams(location.search).get('cards');
+        if (!KEY_CARDS.required && flag !== 'locked') return true;
+        return !card || this.save.cards.includes(card) || flag === 'all';
     }
 
     // A flight up that her cards don't open: the card it needs shows above her for a moment.

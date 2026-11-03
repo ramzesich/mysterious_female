@@ -17,6 +17,14 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
                photo studio, shops, nightclub, theatre (2026-11-03, for deck 6)
     tall-1/    object 084f5932-777f-4804-93b7-6773efa99d7c, 16 tall pieces, 64px canvas (deck 6)
     theatre-seat/  map object a388646f-b80d-403a-87ab-4446106a66dc, 48px (try-2 kept, unused)
+    props-5/   object f8f4f1fa-4267-48b8-b9e6-725209ad5a70, 64 props, 32px canvas: plaques,
+               paintings, bar, casino, shop, kids' club (2026-11-03, for deck 7)
+    tall-2/    object 310360e6-4a51-4387-ab44-88d5cbecbeed, 16 tall pieces, 64px canvas (deck 7)
+    casino/    map objects: roulette 4c864558-dfe5-47cc-b1df-eb529f809ceb, blackjack
+               aa1f888b-8206-42fc-88f3-5c50eb6adcad: three-quarter views, replaced; casino-2/ and
+               balcony-rail/ hold four more table tries and two balcony tries, unused
+    casino-drawn/  drawn by tools/draw_casino.py in strict side view: the roulette and blackjack
+               tables, the Stardust balcony's front
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -124,6 +132,35 @@ for i, name in enumerate(TALL_1):
     if name:
         PIECES[name] = ("tall-1", i, None, {})
 PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
+# Deck 7's sheets (NCL's plan and the user's photos). Left out: the sheet's casino tables (no felt,
+# no wheel), a famous portrait, a garbled "welcome" sign.
+PROPS_5 = [
+    "plaque-shield", "plaque-medallion", "certificate", "plaque-lighthouse", "plaque-crown",
+    "plaque-red", "painting-harbour", "welcome-card", "painting-abstract", None, "painting-sea",
+    "painting-flowers", "painting-blue", "bronze-sculpture", "gallery-bench", "track-spot",
+    "champagne", "champagne-flutes", "decanter", "deco-lamp", "leather-club-chair", "marble-table",
+    "chrome-stool", "cigar-box", "chips", "dice", "cards", "casino-stool", "chip-rack",
+    "perfume-display", "liquor-shelf", "shop-basket", "watch-stand", "chocolates", "beanbag-orange",
+    "beanbag-blue", "kids-chair", "kids-table", "toy-blocks", "rocking-horse", "toy-train",
+    "teddy", "toy-box", "controller", "dartboard-2", "headphones", "cushion", "board-game",
+    "cactus", "kids-drawing", "pin-map", "lifebuoy-deco", "porthole-mirror", "wheel-clock",
+    "cruise-model", None, "table-sign", "jackpot-sign", "carpet-end", "rope-post", "monstera",
+    "wall-tv", "vending-machine", "ice-cream-sign",
+]
+for i, name in enumerate(PROPS_5):
+    if name:
+        PIECES[name] = ("props-5", i, None, {})
+TALL_2 = [
+    "slot-side", "slot-pair", None, None, "arcade-cabinet", "claw-machine", "pinball", "foosball",
+    "air-hockey", "atm", "easel-painting", "tv-console", "play-kitchen", "dancer-statue",
+    "beanbags", "kids-bookshelf",
+]
+for i, name in enumerate(TALL_2):
+    if name:
+        PIECES[name] = ("tall-2", i, None, {})
+PIECES["roulette"] = ("casino-drawn", 0, None, {})
+PIECES["blackjack"] = ("casino-drawn", 1, None, {})
+PIECES["balcony-front"] = ("casino-drawn", 2, None, {})
 
 
 def load(sheet, frame):

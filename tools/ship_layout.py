@@ -18,7 +18,7 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # Measured off NCL's profile at each deck's floor (2026-11-03). Decks 3-6 start at the bow's hull
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
-    3: (20, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (2.5, 254),  # the stern: one straight wall
+    3: (21.5, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (0.5, 254),  # the stern: one straight wall
     8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
 }
 
@@ -28,10 +28,15 @@ EXTENT = {
 # bridge), the wall's foot is given here; the shell slopes from it up to the deck above.
 FRONT_WALL = {7: 18.7, 11: 29.5}
 
-# The bow (§5.3): the raked stem, metres from the bow at each deck's floor and at the keel, leaning
-# forward as it rises to its tip at deck 7. Between it and `block`, the hull is drawn from outside:
+# The bow (§5.3): the raked stem, from its tip at deck 7's floor down past the waterline: one smooth
+# convex curve, measured in deck heights off the user's side-view photo (2026-11-03; NCL's diagram
+# draws it shorter): `d` decks below deck 7's floor it is `tip + a*d - b*d*d` deck heights aft of
+# the tip, shallow under the forecastle (about 30 degrees below level), steepening to about 60 at
+# the waterline, 6 decks down and 7.3 back. Between it and `block` the hull is drawn from outside:
 # white plating, painted with the ship's sun.
-BOW = {"stem": {7: 2.5, 6: 7, 5: 11, 4: 15, 3: 17, "keel": 19}, "block": 20}
+BOW = {"stem": {7: 0.5}, "rake": (2.15, 0.115), "block": 20}   # longer still (the user, 2026-11-03)
+# The hull forward of this is plain white plating, the livery on it, no windows (the user's photos).
+HULL_PLAIN_TO = 30
 
 # Stair-and-elevator cores, (forward edge, aft edge), on every deck from 3 to 12. The midship core
 # stands 10 m further aft than on the profile, to give the atrium room (below).
@@ -48,6 +53,10 @@ ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 # the rooms and the promenade through the doors (metres from the bow, each on both sides).
 PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
              "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
+
+# The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
+# railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
+STAGE = 244
 
 # Above the top deck.
 FUNNEL = (168, 196)
@@ -83,11 +92,17 @@ VENUES = [
     (8, 110, 194, "Cabins", "cabins"),
     (8, 202, 251.5, "Cabins", "cabins"),
 
-    (7, 2.5, 21.4, "Mooring deck", "outdoor"),
-    (7, 21.4, 60, "Kids' and teen clubs", "venue"),
-    (7, 110, 150, "Magnum's bar, art gallery", "venue"),
-    (7, 150, 194, "Casino, duty-free shops", "venue"),
-    (7, 222, 254, "Theatre balcony", "venue"),
+    (7, 0.5, 21.4, "Mooring deck", "outdoor"),
+    # Deck 7 as on NCL's plan (2026-11-03): the youth and teen clubs forward, Magnum's and the Art
+    # Gallery amidships, the casino, duty-free and arcade aft, the theatre's balcony at the stern.
+    (7, 21.4, 45, "Splash Academy", "venue"),
+    (7, 45, 74, "Entourage", "venue"),
+    (7, 110, 130, "Magnum's", "venue"),
+    (7, 130, 150, "Art Gallery", "venue"),
+    (7, 150, 172, "Sun Club Casino", "venue"),
+    (7, 172, 186, "Tradewinds", "venue"),
+    (7, 186, 194, "Arcade", "venue"),
+    (7, 202, 254, "Stardust Lounge balcony", "venue"),
 
     (6, 20, 64, "Cabins", "cabins"),
     (6, 64, 74, "Internet Café", "venue"),

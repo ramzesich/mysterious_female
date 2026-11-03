@@ -76,6 +76,12 @@ export const CUT_SHADOW = {
     ends: 18,
 };
 
+// Key cards (§5.5): off for now, until the ship is split into unlockable areas (the user,
+// 2026-11-03). With `required: false` nothing is locked; `?cards=locked` turns the locks back on.
+export const KEY_CARDS = {
+    required: false,
+};
+
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
 export const PROMENADE = {
     fadeMs: 140,
