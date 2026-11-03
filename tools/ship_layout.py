@@ -18,7 +18,7 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # Measured off NCL's profile at each deck's floor (2026-11-03). Decks 3-6 start at the bow's hull
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
-    3: (21.5, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (2.5, 254),  # the stern: one straight wall
+    3: (21.5, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (0.5, 254),  # the stern: one straight wall
     8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
 }
 
@@ -92,7 +92,7 @@ VENUES = [
     (8, 110, 194, "Cabins", "cabins"),
     (8, 202, 251.5, "Cabins", "cabins"),
 
-    (7, 2.5, 21.4, "Mooring deck", "outdoor"),
+    (7, 0.5, 21.4, "Mooring deck", "outdoor"),
     # Deck 7 as on NCL's plan (2026-11-03): the youth and teen clubs forward, Magnum's and the Art
     # Gallery amidships, the casino, duty-free and arcade aft, the theatre's balcony at the stern.
     (7, 21.4, 45, "Splash Academy", "venue"),

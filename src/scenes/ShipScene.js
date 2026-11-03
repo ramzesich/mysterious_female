@@ -370,13 +370,11 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'bowdoor': {
-                    // Deck 7's front wall (§5.3): drawn over her as she passes through it, a deck door
-                    // in its outer face that swings open as she comes to it and shuts behind her.
+                    // Deck 7's front wall (§5.3): drawn over her as she passes straight through it to
+                    // the mooring deck, as if through a door hidden in it (the user, 2026-11-03).
                     const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
                     wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
-                    const door = this.add.image(o.x + 20, o.y, 'shipart', 'door-deck').setOrigin(0.5, 1).setDepth(DEPTH.player + 0.07);
-                    this.worldLayer.add([wall, door]);
-                    this.bowDoor = { x0: o.x, x1: o.x + o.width, y: o.y, door, open: false };
+                    this.worldLayer.add(wall);
                     break;
                 }
 
@@ -506,17 +504,6 @@ export class ShipScene extends Phaser.Scene {
         const zone = this.add.zone(edge + side * w / 2, floor - this.deckPitch / 2, w, this.deckPitch);
         this.physics.add.existing(zone, true);
         (this.promenadeEnds ||= []).push(zone);
-    }
-
-    updateBowDoor() {
-        const d = this.bowDoor;
-        if (!d) return;
-        const p = this.player;
-        const near = Math.abs(p.y - d.y) < 8 && p.x > d.x0 - 40 && p.x < d.x1 + 8;
-        if (near === d.open) return;
-        d.open = near;
-        d.door.setFrame(near ? 'door-deck-open' : 'door-deck');
-        if (near) sfx.door();
     }
 
     promenadeDoorAt(x, y) {
@@ -794,10 +781,10 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
         g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
         if (text) {
-            const plaque = this.add.text(x + 48, y - 96, text, {
+            const plaque = this.add.text(x + 12, y - 96, text, {
                 fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',
                 backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
-            }).setOrigin(0.5).setDepth(DEPTH.decor + 0.01);
+            }).setOrigin(0, 0.5).setDepth(DEPTH.decor + 0.01);
             this.worldLayer.add(plaque);
         }
     }
@@ -1253,7 +1240,6 @@ export class ShipScene extends Phaser.Scene {
         for (const pool of this.pools) pool.ripples.tilePositionX += dt * 6;
         this.closeTrunkDoors();
         this.closeLiftDoors();
-        this.updateBowDoor();
         this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.

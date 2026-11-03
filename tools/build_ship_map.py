@@ -153,7 +153,8 @@ def stem_m(row):
     """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3): the curve measured
     off the user's photo (`BOW["rake"]`), in deck heights below deck 7's floor."""
     a, b = BOW["rake"]
-    d = min(max(0.0, (row - FLOOR_ROW[7]) / DECK_ROWS), a / (2 * b))   # no further aft than its turn
+    # From the underside of deck 7's floor, where the forecastle's deck edge meets the stem.
+    d = min(max(0.0, (row - FLOOR_ROW[7] - 1) / DECK_ROWS), a / (2 * b))   # no further aft than its turn
     return BOW["stem"][7] + (a * d - b * d * d) * DECK_PITCH / (PER_M * TILE)
 
 

@@ -883,14 +883,15 @@ Nothing blocks the start of the build. These get settled along the way:
       roulette and blackjack tables (`create_map_object`, 1 each; the sheet's came out plain)
       The user's corrections (2026-11-03): **deck 7's front wall**, the ship's white wall 2 m
       thick between the mooring deck and Splash Academy, as at every deck's end, with a deck door
-      in its outer face that swings open as she comes to it and shuts behind her; she passes
-      behind the wall (`bowdoor`); **the casino tables and the balcony's front drawn by hand in
+      and **no door drawn**: she passes straight through, hidden by the wall, a door implied (the
+      user: the drawn door was dropped) (`bowdoor`); **the casino tables and the balcony's front drawn by hand in
       strict side view** (`tools/draw_casino.py`; PixelLab's tries, 6 generations in all, kept
-      tilting to three-quarters): the front is a velvet-padded parapet with a brass rail seen
-      end-on, as tall as the solid rail she hops
+      tilting to three-quarters): the front is a padded parapet with a rail seen end-on, as tall
+      as the solid rail she hops, **in the floor's colours and contrast** (the user: the bright
+      gold and red stood out); doorway plaques start just right of their post
 - [x] **The bow, longer and from the user's photo** (2026-11-03): the stem is one smooth convex
       curve measured in deck heights off her side-view photo (NCL's diagram draws it short): tip
-      at 0.5 m on deck 7, about 30 degrees below level there, steepening to about 60 at the
+      at 0.5 m on deck 7, where the forecastle's deck edge meets it (the deck runs out to it), about 30 degrees below level there, steepening to about 60 at the
       waterline, which it meets near 26.5 m (`BOW["rake"]`); deck 3 starts at 21.5 m behind it.
       **The forward hull is plain white plating** with the livery, no windows forward of 30 m
       (`HULL_PLAIN_TO`, her photos). The sun moved 1.5 m aft to stay clear of the stem; it is to

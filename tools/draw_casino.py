@@ -78,17 +78,17 @@ def blackjack():
 
 
 def parapet():
+    # In the floor's own colours and contrast, so it sits back (the user, 2026-11-03): the theatre
+    # carpet's dark red, a darker fold, a muted rail.
     im = Image.new("RGBA", (22, 32), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rectangle([2, 6, 19, 31], fill="#ae2334")               # deep red velvet padding
+    d.rectangle([2, 6, 19, 31], fill="#6e2727")               # the dark red padding
     for x in (6, 10, 14):
-        d.line([(x, 8), (x, 29)], fill="#831c5d")             # its folds
-    d.rectangle([2, 6, 3, 31], fill="#d9a43b")                # gold trim
-    d.rectangle([18, 6, 19, 31], fill="#d9a43b")
-    d.line([(2, 29), (19, 29)], fill="#d9a43b")
-    d.rounded_rectangle([0, 1, 21, 5], radius=2, fill="#f9c22b")   # the brass handrail on top
-    d.line([(1, 5), (20, 5)], fill="#d9a43b")
-    d.line([(3, 2), (12, 2)], fill="#fbff86")
+        d.line([(x, 8), (x, 29)], fill="#5a1d2a")             # its folds
+    d.rectangle([2, 6, 2, 31], fill="#7a3045")                # a faint trim
+    d.rectangle([19, 6, 19, 31], fill="#7a3045")
+    d.rounded_rectangle([0, 2, 21, 5], radius=2, fill="#966c6c")   # the handrail on top
+    d.line([(1, 5), (20, 5)], fill="#694f62")
     return outlined(im)
 
 
