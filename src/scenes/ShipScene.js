@@ -114,6 +114,10 @@ export class ShipScene extends Phaser.Scene {
         // as the inside of the ship: a soft dark band inside the opening wherever the shell goes on,
         // deepest under the deck above. It shows as the deck is cut away.
         this.cutShadows = {};
+        // Where the deck ends in the ship's wall, a strip of that wall is drawn over her, so as she
+        // runs into it, she goes behind it (the user, 2026-11-03).
+        const endCover = this.add.graphics().setDepth(DEPTH.player + 0.05);
+        const coverW = props.endCover || 32;
         for (const [deck, list] of Object.entries(this.shellTiles)) {
             const own = new Set(list.map(t => `${t.x},${t.y}`));
             const g = this.add.graphics().setDepth(DEPTH.exterior + 0.01).setAlpha(0);
@@ -138,6 +142,9 @@ export class ShipScene extends Phaser.Scene {
                 if (shell(0, 1)) band(x, y, w, h, 'bottom', CUT_SHADOW.bottom);
                 if (shell(-1, 0)) band(x, y, w, h, 'left', CUT_SHADOW.ends);
                 if (shell(1, 0)) band(x, y, w, h, 'right', CUT_SHADOW.ends);
+                const air = t.y !== this.deckFloors[deck];
+                if (air && shell(-1, 0)) endCover.fillStyle(0xe8eaec, 1).fillRect(x - coverW, y, coverW, h);
+                if (air && shell(1, 0)) endCover.fillStyle(0xe8eaec, 1).fillRect(x + w, y, coverW, h);
             }
             this.cutShadows[deck] = g;
         }
@@ -175,7 +182,7 @@ export class ShipScene extends Phaser.Scene {
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
-            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx)]);
+            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover]);
     }
 
     buildObjects() {

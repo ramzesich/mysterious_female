@@ -303,13 +303,7 @@ def build_exterior():
                 for r in range(floor - DECK_ROWS + 1, floor):
                     ext[r][c] = EXT_FIXED if fixed else EXT
             ext[floor][c] = EXT_FIXED_SLAB if fixed else EXT_SLAB
-        # The cut's edges: the fixed wall beside a cut-away stretch shows a little thickness.
-        for r in range(floor - DECK_ROWS + 1, floor):
-            for c in range(c0, c1 + 1):
-                if ext[r][c] == EXT_FIXED and ext[r][c + 1] == EXT:
-                    ext[r][c] = EXT_EDGE_R
-                elif ext[r][c] == EXT_FIXED and ext[r][c - 1] == EXT:
-                    ext[r][c] = EXT_EDGE_L
+        # (The cut's edges are shaded by the game now, a soft shadow inside the opening.)
         # Rounded top corners where a deck's indoors steps out beyond the deck above, unless the
         # shell slopes across that step.
         top = floor - DECK_ROWS + 1
@@ -328,6 +322,7 @@ FRAME = "#9babb2"
 
 
 PORTHOLE_PITCH = 160
+END_COVER = 32       # px of wall the game draws over her at each end of a cut-away deck
 
 
 def shell_details(ext, solid):
@@ -350,7 +345,16 @@ def shell_details(ext, solid):
     def rect(owner, x, y, w, h, colour):
         put(owner, ["r", round(x), round(y), round(w), round(h), colour])
 
-    def window(owner, x, y, w, h):
+    def span_owner(x0, x1, r, deck):
+        """Whose wall a detail from x0 to x1 is on, or None if it would straddle the edge of the cut
+        or sit within END_COVER of it, where the game draws the wall over her as she reaches it."""
+        owners = {owner_at(c, r, deck) for c in range((x0 - END_COVER) // TILE, (x1 + END_COVER) // TILE + 1)}
+        return owners.pop() if len(owners) == 1 else None
+
+    def window(deck, x, y, w, h):
+        owner = span_owner(x - 1, x + w + 1, y // TILE, deck)
+        if owner is None:
+            return
         rect(owner, x - 1, y - 1, w + 2, h + 2, FRAME)
         rect(owner, x, y, w, h, GLASS_DARK)
         rect(owner, x + 1, y + 1, max(1, w // 3), 1, "#8fd3ff")
@@ -376,7 +380,7 @@ def shell_details(ext, solid):
         # Deck 5's windows are round, fewer and bigger (the user, 2026-11-03).
         if deck == 5:
             for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
-                own = owner_at(x // TILE, mid_row, deck)
+                own = span_owner(x - 10, x + 10, mid_row, deck)
                 if own is None or x < x0 + 20:
                     continue
                 put(own, ["c", x, floor - 72, 10, FRAME])
@@ -414,10 +418,14 @@ def shell_details(ext, solid):
                 if deck == 5:
                     continue
                 if style == "square":
-                    window(own, x + 30, floor - 76, 11, 9)
-                    window(own, x + 56, floor - 76, 11, 9)
+                    # A cabin's pair of windows, both or neither.
+                    if span_owner(x + 29, x + 68, (floor - 76) // TILE, deck) is not None:
+                        window(deck, x + 30, floor - 76, 11, 9)
+                        window(deck, x + 56, floor - 76, 11, 9)
                 elif style in ("venue", "promenade"):
-                    window(own, x + unit // 2 - 20, floor - 94, 40, 30)
+                    window(deck, x + unit // 2 - 20, floor - 94, 40, 30)
+                elif span_owner(x, x + unit, mid_row, deck) is None:
+                    continue
                 elif style == "bridge":
                     rect(own, x, floor - 104, unit, 22, GLASS_DARK)
                     rect(own, x, floor - 103, unit, 1, "#4d65b4")
@@ -595,7 +603,7 @@ def build_objects():
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
                     prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + 2 * (doors - 1), "int"),
                     prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))
-        elif indoor(deck, (a + b) / 2):  # a sign needs a wall to hang on: none in the open air
+        elif indoor(deck, (a + b) / 2) and kind != "start":  # a sign needs a wall: none in the open air
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
@@ -771,6 +779,7 @@ def build_map():
             {"name": "deckFloors", "type": "string", "value": json.dumps({d: FLOOR_ROW[d] for d in DECKS})},
             {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in EXT_CUT)},
             {"name": "shellSlopes", "type": "string", "value": json.dumps(shell_slopes())},
+            {"name": "endCover", "type": "int", "value": END_COVER},
             {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
