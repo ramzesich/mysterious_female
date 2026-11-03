@@ -327,6 +327,9 @@ GLASS = "#484a77"
 FRAME = "#9babb2"
 
 
+PORTHOLE_PITCH = 160
+
+
 def shell_details(ext, solid):
     """What is on the outside of the shell, as shapes for the game to draw over it: each listed
     under the deck whose wall it is on (it fades with that deck's cut-away) or under "fixed".
@@ -370,6 +373,15 @@ def shell_details(ext, solid):
         x0, x1 = col(fwd) * TILE, col(aft) * TILE
         # Square windows, balconies and big windows, laid out on fixed spacings from the bow so the
         # rows line up deck over deck.
+        # Deck 5's windows are round, fewer and bigger (the user, 2026-11-03).
+        if deck == 5:
+            for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
+                own = owner_at(x // TILE, mid_row, deck)
+                if own is None or x < x0 + 20:
+                    continue
+                put(own, ["c", x, floor - 72, 10, FRAME])
+                put(own, ["c", x, floor - 72, 8, GLASS_DARK])
+                rect(own, x - 4, floor - 77, 3, 1, "#8fd3ff")
         prom_a, prom_b = PROMENADE["span"]
         open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
         doors = [x_of(m) for m in PROMENADE["doors"]]
@@ -399,13 +411,9 @@ def shell_details(ext, solid):
                     want = "promenade" if clear else None
                 if want != style:
                     continue
-                if deck == 5 and style in ("square", "venue"):
-                    # Deck 5's windows are round (the user's photos).
-                    for px in ((x + 35, x + 61) if style == "square" else (x + 32,)):
-                        put(own, ["c", px, floor - 72, 7, FRAME])
-                        put(own, ["c", px, floor - 72, 5, GLASS_DARK])
-                        rect(own, px - 3, floor - 75, 2, 1, "#8fd3ff")
-                elif style == "square":
+                if deck == 5:
+                    continue
+                if style == "square":
                     window(own, x + 30, floor - 76, 11, 9)
                     window(own, x + 56, floor - 76, 11, 9)
                 elif style in ("venue", "promenade"):

@@ -478,7 +478,8 @@ little shaded.
   with a wooden handrail and life rings, in front of her; white columns from deck 6 up past deck
   7, between the boats, holding the davit arms. The shell along it, the user's corrections: **only
   a few windows on the promenade's wall** (one every 4 m, clear of the doors), **none on deck 7
-  where the boats hang**, and **deck 5's windows are round**. 150-194 m inside is now the library
+  where the boats hang**, and **deck 5's windows are round**, bigger (20 px) and few (every 160 px).
+  The life rings hang from the railing's handrail between two posts (plain `life-ring`). 150-194 m inside is now the library
   and photo gallery (a few muted pieces; furnished properly with deck 6). `?at=promenade` starts
   on it, `?at=library` inside.
 - **Lifeboats:** the real ones (the user's photos) have a **red-orange canopy roof over a white

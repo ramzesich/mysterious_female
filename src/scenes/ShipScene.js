@@ -401,7 +401,9 @@ export class ShipScene extends Phaser.Scene {
         front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
         boats.forEach((x, i) => {
             if (i % 3 !== 1) return;
-            const ring = this.add.image(x + 150, floor - 4, 'shipart', 'life-ring-rail').setOrigin(0.5, 1).setDepth(DEPTH.player + 0.31);
+            // Hung from the handrail between two posts, over the rails.
+            const rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
+            const ring = this.add.image(rx, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
             this.worldLayer.add(ring);
             this.shellSlopes.push({ deck: 6, gfx: ring });
         });
