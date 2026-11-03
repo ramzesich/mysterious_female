@@ -48,6 +48,9 @@ HER = {
         # Waving to us from the life ring, overboard (GAME_DESIGN.md §5.6): skeleton-v3's wave
         # move, facing the camera. Frames 1-5 have the hand up; the game loops those.
         "wave": [(f"wave/{i}.png", "feet") for i in range(8)],
+        # At the bow, facing the camera, she spreads her arms wide into the wind and holds it (the bow
+        # view, GAME_DESIGN.md §5.3): skeleton-v3 custom poses; frame 0 is her rest pose.
+        "arms-wide": [(f"arms-wide/{i}.png", "feet") for i in range(6)],
         # Swimming in a pool (GAME_DESIGN.md §5.3): a side-on breaststroke, her head above the water,
         # skeleton-v3 custom poses. Each frame keeps its place on the canvas: lining them up by their
         # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A

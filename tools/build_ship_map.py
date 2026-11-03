@@ -10,6 +10,7 @@ Run from the repo root:  python tools/build_ship_map.py
 """
 
 import json
+import math
 import struct
 import zlib
 from pathlib import Path
@@ -83,6 +84,11 @@ def funnel_ladder_col():
 def clear_of_ladders(deck, m):
     """Is a door at `m` on `deck` clear of every ladder (doors and ladders must not overlap)?"""
     return deck != 12 or abs(m - metres(funnel_ladder_col())) > 1.5
+
+
+def stem_x(row):
+    """The stem's exact x in pixels at a (fractional) tile row: the smooth line the game draws."""
+    return (SEA + stem_m(row) * PER_M) * TILE
 
 
 def stem_m(row):
@@ -194,10 +200,12 @@ def build_layers():
     # under the forecastle down to the waterline, white plating (the game paints the ship's sun on
     # it). Below deck 3 the hull runs on aft, narrowing into the sea, navy under the waterline.
     fwd3, aft3 = EXTENT[3]
+    # Tiles only where the stem has passed by the row's foot, so none sticks out past the smooth
+    # line the game draws over the stem's edge.
     for r in range(FLOOR_ROW[7] + 1, ROWS):
         below = r - FLOOR_ROW[3]
         end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - below
-        fill(solid, col(stem_m(r)), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
+        fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
     # area (§5.3): their decks cross on side walks, built in the game, not floor tiles.
@@ -396,10 +404,18 @@ def build_objects():
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
     lx0, ly0, lx1, ly1 = livery_box()
-    add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0))
+    stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
+    add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
+        prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
     put(7, 6, "bollard-bg")
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
+    # The bow view (§5.3): standing still on the mooring deck, she goes to the tip and spreads her
+    # arms, and the camera draws back to frame the whole bow, from above the forecastle down to
+    # the sea. `x0`-`x1` is where on deck 7 it can start.
+    add(area("bow-view", "bowview", x_of(-1), floor_y(7) - 90, x_of(23) - x_of(-1), (WATER_ROW + 2) * TILE - floor_y(7) + 90, [
+        prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
+        prop("tipX", x_of(BOW["stem"][7] + 1.5), "int"), prop("deckY", floor_y(7), "int")]))
     # The bridge's windows on deck 10, looking out to sea.
     add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
              [prop("kind", "windows")]))
@@ -646,10 +662,10 @@ def build_livery():
         rr = r * frac
         d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), fill=colour)
 
-    # Cut to the stem: nothing forward of the hull's edge, row by row.
+    # Cut to the stem: nothing forward of the hull's smooth edge.
     px = img.load()
     for y in range(h):
-        edge = col(stem_m((y + y0) / TILE)) * TILE + 2 - x0
+        edge = round(stem_x((y + y0) / TILE)) + 2 - x0
         for x in range(min(max(edge, 0), w)):
             px[x, y] = (0, 0, 0, 0)
     out = ROOT / "assets" / "ship" / "livery.png"

@@ -45,6 +45,13 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
+// The bow view (§5.3): how long she stands still on the mooring deck before it starts, and how
+// long the camera takes to draw back.
+export const BOW_VIEW = {
+    idleMs: 3000,
+    zoomMs: 1400,
+};
+
 // Elevators (§5.1): the car's speed between decks and how long the doors take to slide.
 export const LIFT = {
     speed: 200,         // px/s, about 1.4 decks a second

@@ -461,6 +461,21 @@ def scenario_pool(b):
     return ok
 
 
+def scenario_bow(b):
+    b.open("?reset&play&at=bow")
+    time.sleep(4.8)
+    s = b.state()
+    zoom = b.eval("window.__ship.cameras.main.zoom")
+    b.shot("bow-view")
+    ok = check(s["mode"] == "scripted" and zoom < 1.5, "standing still on the mooring deck draws the camera back", (s, zoom))
+    b.tap("right")
+    time.sleep(1.0)
+    s = b.state()
+    zoom = b.eval("window.__ship.cameras.main.zoom")
+    ok &= check(s["mode"] == "play" and zoom == 2, "a key brings it back", (s, zoom))
+    return ok
+
+
 def scenario_idle(b):
     b.open("?reset&play")
     b.wait_for("window.__ship && window.__ship.player")

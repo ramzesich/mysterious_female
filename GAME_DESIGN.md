@@ -723,6 +723,11 @@ Nothing blocks the start of the build. These get settled along the way:
       card, §6.2). **Bridge:** deck 10's front at 24 m with windows; Bumbot's bridge spot at 27 m.
       **Stern:** a near-upright transom on decks 3-6 (255 m), decks 7-11 stepping back in open
       tiers (254 down to 244 m). Deck ends are white outer plating
+- [x] **The bow view** (the user's idea, 2026-11-03): standing still on the mooring deck for 3 s,
+      she walks to the tip, turns to us and spreads her arms wide into the wind (a skeleton-v3
+      pose, 3 generations), and the camera draws back to frame the whole bow, its sun included;
+      any key brings it back. Bow only for now; other scenic spots (the stern terraces, deck 12
+      over the pools) maybe later. The stem's edge is a smooth line drawn over the tiles
 - [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
       more sheets where pieces are missing (lifeboats, restaurants, the pool deck), cost stated
       first. Then doors along the decks into small separate rooms (§5.1), hazards and people
