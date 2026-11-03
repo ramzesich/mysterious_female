@@ -900,11 +900,19 @@ Nothing blocks the start of the build. These get settled along the way:
       elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
       back on, and the playtests use it). They come back with the unlockable areas, with the
       checkpoints
-- [ ] **Next: populate the ship deck by deck, upward from deck 8** (the user: start at deck 4 and
-      move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
+- [ ] **Start the next session here: furnish deck 8**, then upward deck by deck (decks 4-7 are
+      done and merged, 2026-11-03). The way each deck went: read NCL's plan for it
+      (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
+      (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
+      and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
+      each; strict side views drawn by hand when PixelLab tilts to three-quarters), build on a
+      branch, show screenshots, take the user's circled corrections, merge when approved.
+      **Populate the ship deck by deck** (the user: start at deck 4 and move up, deck by deck), from her photos (§5.3); more sheets where pieces are missing
       (restaurants, the pool deck), cost stated first. Then doors along the decks into small
       separate rooms (§5.1), hazards and people placed on the real decks (§5.8). People need new
       character art: later
+- [ ] **Later: move and enlarge the sun emblem on the bow** (the user, 2026-11-03), now that the
+      bow is longer
 - [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
       corridors run along the sides, the middle above the atrium being the atrium and its dome
       (§5.3); in the game deck 10's corridor runs straight over it
