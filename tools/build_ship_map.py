@@ -26,8 +26,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
  VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL,
- LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB) = range(1, 26)
-TILE_COUNT = 25
+ LOBBY_CARPET, MAHOGANY, CABIN_WALL, FRAMES, END_WALL_L, END_WALL_R, FRAMES_RIB, SLAB) = range(1, 27)
+TILE_COUNT = 26
 
 # A cabin corridor stops short of the outer plating (the user, 2026-11-03): this many columns of the
 # ship's structure (steel frames) lie between, then the corridor's end wall.
@@ -202,11 +202,12 @@ def build_layers():
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
 
-        # The deck's ends: the ship's white outer plating indoors, a railing on an open terrace;
-        # decks 11 and 12 have glass side walls instead (§5.3).
+        # The deck's ends: the ship's outer shell indoors, riveted grey steel through the floor slab
+        # too (the user's choice, 2026-11-03), a railing on an open terrace; decks 11 and 12 have
+        # glass side walls instead (§5.3).
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
-                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, HULL)
+                fill(solid, c, c, floor - DECK_ROWS + 1, floor, STEEL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
@@ -216,7 +217,7 @@ def build_layers():
             for k in range(1, STRUCTURE_COLS + 1):
                 tile = FRAMES_RIB if k % 2 == 0 else FRAMES  # a frame rib every second column
                 fill(solid, c + inward * k, c + inward * k, floor - DECK_ROWS + 1, floor - 1, tile)
-                solid[floor][c + inward * k] = STEEL
+                solid[floor][c + inward * k] = SLAB  # the deck's slab, no carpet
             end = c + inward * (STRUCTURE_COLS + 1)
             fill(solid, end, end, floor - DECK_ROWS + 1, floor - 1, END_WALL_L if inward == 1 else END_WALL_R)
 
@@ -603,6 +604,10 @@ def draw_tile(tile_id):
     elif tile_id == HULL:
         # The ship's white outer plating, clean (seams on every tile read as stripes).
         rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
+    elif tile_id == SLAB:
+        # The deck's steel slab with nothing laid on it: under the ship's structure.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id in (FRAMES, FRAMES_RIB):
         # The ship's structure between a corridor's end and the plating: plain grey steel, and on
         # every second column a frame rib with its lit edge.
