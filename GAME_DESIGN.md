@@ -865,7 +865,7 @@ Nothing blocks the start of the build. These get settled along the way:
       at the gangway. The last placements (deck, metres): gangway 4/71, d5-aft 5/250.2,
       d6-promenade 6/193.4, d6-theatre 6/209, d7-casino 7/152, d9-linen 9/115, d10-bridge 10/44,
       d11-pool 11/162, d11-buffet 11/191, d12-sports 12/175
-- [ ] **Deck 7 furnished** (2026-11-03, branch `deck-7`, shown, not yet merged): after NCL's plan
+- [x] **Deck 7 furnished** (2026-11-03, merged): after NCL's plan
       and the user's photos (`deck_7_central_area`). Bow to stern: **Splash Academy** (21-45:
       sunny walls, a blue dotted carpet, a play kitchen, toys, low tables), **Entourage** (45-74:
       deep teal, TV and console, beanbags, foosball, air hockey, darts, an arcade cabinet); **the
