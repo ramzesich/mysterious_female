@@ -633,7 +633,7 @@ def build_objects():
 
     # Checkpoints: crew cabin doors, one at each near-catch spot and a few between (§5.5).
     # A door needs a wall: the ones by the open decks stand just inside.
-    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 204), ("d6-promenade", 6, 148),
+    for name, deck, m in [("gangway", 4, 71), ("d5-aft", 5, 250.2), ("d6-promenade", 6, 148),
                           ("d6-theatre", 6, 209), ("d7-casino", 7, 152), ("d9-linen", 9, 115),
                           ("d10-bridge", 10, 44), ("d11-pool", 11, 162), ("d11-buffet", 11, 191),
                           ("d12-sports", 12, 175)]:
@@ -811,6 +811,12 @@ def build_objects():
     put(5, 192.6, "service-station-bg")
     # The Seven Seas: its backlit wave panel between white columns (the user's photo from the inner
     # balcony), white-cloth tables either side under sheer curtains.
+    # Its entrance, straight off the aft lobby (the user, 2026-11-03: make it clear): a welcome
+    # station, the host's counter and the menu lectern, a brass plaque with the name over them.
+    put(5, 203.3, "counter-bg")
+    put(5, 204.3, "menu-lectern-bg")
+    add(point("sign-seven-seas", "sign", exact_x(203.6), floor_y(5) - 62,
+              [prop("text", "Seven Seas"), prop("style", "plaque")]))
     seas = [208.6, 213.0, 217.4, 221.8, 238.2, 242.6, 247.0]
     decor("seas-windows", "dinewindows", x_of(205), x_of(252), xs=",".join(str(x_of(m)) for m in seas), style="sheers")
     decor("seas-panel", "wavepanel", x_of(230) - 80, x_of(230) + 80)
@@ -819,9 +825,9 @@ def build_objects():
         dinner(m, ("table-flowers-bg", "table-dinner-bg")[i % 2], "dining-chair-bg")
     put(5, 225.2, "palm-bg")
     put(5, 234.8, "palm-bg")
-    put(5, 250.4, "service-station-bg")
+    put(5, 248.8, "service-station-bg")
     # Warm downlights along the public rooms' ceilings.
-    for a, b in ((110, 150), (150, 194), (205, 252)):
+    for a, b in ((110, 150), (150, 194), (202, 252)):
         decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))
 
     # A robot vacuum patrolling the deck 4 cabin corridor.

@@ -822,7 +822,9 @@ Nothing blocks the start of the build. These get settled along the way:
       windows with beige drapes, a wine barrel, an olive tree, a dark diamond carpet); **the Four
       Seasons** (cream, burl pillars with brass rings, chandeliers, white-cloth tables, beige
       chairs, sheer curtains, the ice swan, a dark floral carpet); **the Seven Seas** (its backlit
-      blue wave panel between marble columns, white-cloth tables). Windows on the back wall in the
+      blue wave panel between marble columns, white-cloth tables; it starts right off the aft lobby
+      at 202 m with a welcome station, the host's counter, the menu lectern and a brass "Seven
+      Seas" plaque (the user: make the entrance clear); the crew door at its far end). Windows on the back wall in the
       restaurants (the user: yes). A third PixelLab props sheet (64 at 32px, 10 generations,
       `assets/source/ship/props-3/`). The user's corrections: **chairs sit the same distance from
       their table on both sides** (props are placed exactly, not snapped to tiles; `around()` in

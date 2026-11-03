@@ -98,7 +98,7 @@ VENUES = [
     (5, 110, 150, "Shore excursions, reservations", "venue"),
     (5, 150, 168, "La Cucina", "venue"),
     (5, 168, 194, "Four Seasons", "venue"),
-    (5, 205, 255, "Seven Seas", "venue"),
+    (5, 202, 255, "Seven Seas", "venue"),
 
     (4, 20, 60, "Cabins", "cabins"),
     (4, 60, 74, "Gangway (start)", "start"),
