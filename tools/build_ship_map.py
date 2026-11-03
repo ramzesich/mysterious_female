@@ -250,7 +250,9 @@ def build_layers():
     # line the game draws over the stem's edge.
     for r in range(FLOOR_ROW[7] + 1, ROWS):
         below = r - FLOOR_ROW[3]
-        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - below
+        # The stern goes straight down to the waterline, as the real transom does, and only rounds
+        # away under the water.
+        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - max(0, r - WATER_ROW)
         fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool

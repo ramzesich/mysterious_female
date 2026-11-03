@@ -613,7 +613,8 @@ def scenario_overboard(b):
     b.key("space", False)
     time.sleep(0.6)
     b.key("right", False)
-    time.sleep(1.2)
+    b.wait_for("window.__ship.mode === 'scripted'", timeout=4)  # a long drop: the hull stands two decks above the sea
+    time.sleep(0.6)
     b.shot("overboard")
     s = b.state()
     ok = check(s["mode"] == "scripted", "jumping the stern railing goes overboard", s)
