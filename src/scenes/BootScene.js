@@ -11,6 +11,7 @@ export class BootScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
+        this.load.image('livery', 'assets/ship/livery.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
@@ -39,6 +40,8 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
         // Waving from the life ring, overboard: the frames with her hand up, back and forth.
         this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
+        // At the bow: arms spread wide into the wind, held (the bow view).
+        this.anims.create({ key: 'her-arms-wide', frames: frames('arms-wide', [1, 2, 3, 4, 5]), frameRate: 8 });
         // Breaststroke in a pool.
         this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.

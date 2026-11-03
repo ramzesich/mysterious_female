@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -6,6 +6,7 @@ import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
+const RAILING = 4;
 
 const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
@@ -97,12 +98,20 @@ export class ShipScene extends Phaser.Scene {
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
 
         this.solidLayer.setCollisionByExclusion([-1]);
-        // A ladder's top is a one-way floor: solid to stand on, open to climb through.
+        // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
+        // where an open deck ends stays solid but is drawn with the same railing as the decks'
+        // sides (white rails, a wooden handrail), one piece standing on its foot.
+        const railings = [];
         this.solidLayer.forEachTile(t => {
             if (t.index === LADDER_TOP) t.setCollision(false, false, true, false);
+            if (t.index !== RAILING) return;
+            t.setAlpha(0);
+            if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
+            railings.push(this.add.image(t.pixelX + t.width / 2, t.pixelY + t.height, 'shipart', 'railing-bg')
+                .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
         });
 
-        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer]);
+        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings]);
     }
 
     buildObjects() {
@@ -253,7 +262,30 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'bowview':
+                    this.bowView = {
+                        x: o.x, y: o.y, w: o.width, h: o.height, x0: prop(o, 'x0', 0), x1: prop(o, 'x1', 0),
+                        tipX: prop(o, 'tipX', o.x), deckY: prop(o, 'deckY', 0),
+                    };
+                    break;
+
+                case 'livery': {
+                    // The bow's hull (§5.3): white plating with a smooth edge along the raked stem,
+                    // over the tiles' steps, and the ship's sun on it, built with the map.
+                    const stem = String(prop(o, 'stem', '')).split(',').map(pair => {
+                        const [x, y] = pair.split(':').map(Number);
+                        return { x, y };
+                    });
+                    const last = stem[stem.length - 1];
+                    const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
+                    plating.fillStyle(0xf4f4f4, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
+                    const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.solid + 0.1);
+                    this.worldLayer.add([plating, sun]);
+                    break;
+                }
+
                 case 'decor':
+                    if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') this.drawCabinDoors(decorGfx, o);
                     break;
@@ -327,6 +359,15 @@ export class ShipScene extends Phaser.Scene {
         for (let i = 0; i < 24; i++) {
             front.lineStyle(2, look.rail, 1).lineBetween(line[i].x, line[i].y - h, line[i + 1].x, line[i + 1].y - h);
             front.lineStyle(1, look.railLight, 1).lineBetween(line[i].x, line[i].y - h - 1, line[i + 1].x, line[i + 1].y - h - 1);
+        }
+    }
+
+    // Windows along a wall, looking out to sea: the bridge's.
+    drawWindows(g, o) {
+        for (let x = o.x; x + 18 <= o.x + o.width; x += 24) {
+            g.fillStyle(0xf4f4f4, 1).fillRect(x, o.y, 18, o.height);
+            g.fillStyle(0x4d9be6, 1).fillRect(x + 2, o.y + 2, 14, o.height - 4);
+            g.fillStyle(0x8fd3ff, 1).fillRect(x + 3, o.y + 3, 4, o.height - 10);
         }
     }
 
@@ -689,7 +730,9 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
-        this.sea.tilePositionX += dt * 12; // the ship is under way (§5.2)
+        // The ship is under way bow first (§5.2): the bow is on the left, so the sea streams past
+        // toward the stern, to the right.
+        this.sea.tilePositionX -= dt * 12;
 
         this.updateVacuums(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
@@ -771,6 +814,61 @@ export class ShipScene extends Phaser.Scene {
         if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
         else this.standStill(time, dir);
+
+        // Standing still on the mooring deck long enough: the bow view.
+        const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
+        if (!still) this.stillSince = time;
+        else if (this.atBow() && time - (this.stillSince ?? time) > BOW_VIEW.idleMs) this.startBowView();
+    }
+
+    // --- The bow view (§5.3) --------------------------------------------------------------------
+
+    atBow() {
+        const b = this.bowView;
+        const p = this.player;
+        return b && Math.abs(p.y - b.deckY) < 2 && p.x >= b.x0 && p.x <= b.x1;
+    }
+
+    // She walks to the tip of the bow and spreads her arms into the wind, facing the sea ahead,
+    // and the camera draws back to show the whole bow, the ship's sun on it. Any key brings it back.
+    startBowView() {
+        const p = this.player;
+        const b = this.bowView;
+        const cam = this.cameras.main;
+        this.mode = 'scripted';
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        cam.stopFollow();
+        cam.pan(b.x + b.w / 2, b.y + b.h / 2, BOW_VIEW.zoomMs, 'Sine.easeInOut');
+        cam.zoomTo(Math.min(VIEW.width / b.w, VIEW.height / b.h), BOW_VIEW.zoomMs, 'Sine.easeInOut');
+        p.setFlipX(b.tipX < p.x);
+        this.pose('run', 0.9);
+        this.tweens.add({
+            targets: p, x: b.tipX, duration: (Math.abs(p.x - b.tipX) / (PLAYER.runSpeed * 0.9)) * 1000,
+            // The pose is drawn facing the bow (west), not mirrored.
+            onComplete: () => p.setFlipX(false).anims.play('her-arms-wide'),
+        });
+        this.script = () => {
+            const i = this.controls.state;
+            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) this.endBowView();
+        };
+    }
+
+    endBowView() {
+        const p = this.player;
+        const cam = this.cameras.main;
+        this.tweens.killTweensOf(p);
+        this.script = null;
+        cam.panEffect.reset();
+        cam.zoomEffect.reset();
+        cam.zoomTo(VIEW.zoom, 600, 'Sine.easeInOut');
+        cam.startFollow(p, true, 0.15, 0.15);
+        cam.setFollowOffset(0, HALF);
+        this.mode = 'play';
+        p.body.enable = true;
+        p.body.reset(p.x, p.y);
+        this.pose('stand');
+        this.stillSince = this.time.now;
     }
 
     // Standing still is her plain side pose; after a while one of her idles plays once (§3).

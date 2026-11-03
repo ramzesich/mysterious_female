@@ -712,19 +712,34 @@ Nothing blocks the start of the build. These get settled along the way:
       glass and brass balustrades, wooden rails), the atrium's **curving staircase winding round
       the wider glass elevator**, behind and in front of it. All approved by the user. Testing
       aid: `?at=<place>` starts her at a named place (`README.md`)
-- [ ] **Next: (4) the bow and stern**, shaped from the real ship (NCL's side profile in
-      `reference/`, and the user's `front_from_outside`, `aft_from_outside`,
-      `side_view_from_outside`): a raked bow, the bridge front, the rounded stern with its stepped
-      aft terraces. The very front and back need not be reachable. **Start the next session
-      here**: look at those photos and the profile, then propose the shapes with numbered
-      questions
+- [x] **(4) The bow and stern** (2026-11-03, merged; approved by the user): every deck's ends
+      **measured off NCL's profile** (`tools/ship_layout.py` EXTENT). **Bow:** a raked stem from
+      the waterline up to its tip at deck 7, its edge a smooth line; the hull forward of 20 m on
+      decks 3-6 is drawn from outside, white plating painted with **the ship's sun as on the real
+      bow**: concentric rings round a white centre, swirling flame rays with grey shadows, a gap
+      round its rim, and two bands from the stem (red above, red-orange-yellow below) running
+      behind it and parting after it, one up and one down; scaled to cover most of the bow's side
+      (`assets/ship/livery.png`, built with the map; no lettering: the name stays hidden, §5.1).
+      On top, the **open mooring deck** on deck 7 (2.5-20.5 m), reached through a doorway, with
+      bollards, cleats and a side railing; **card-locked later** (Technical card, §6.2).
+      **Bridge:** deck 10's front at 24 m with windows; Bumbot's bridge spot at 27 m. **Stern:** a
+      near-upright transom on decks 3-6 (255 m), decks 7-11 stepping back in open tiers (254 down
+      to 244 m). Deck ends are white outer plating; railings ending open decks look like the
+      decks' side railings
+- [x] **The bow view** (the user's idea, 2026-11-03): standing still on the mooring deck for 3 s,
+      she walks to the very tip and, **facing the sea ahead (her left side to us)**, spreads her
+      arms back into the wind, her hair blowing (a skeleton-v3 pose drawn facing west, 3
+      generations; a first try facing the camera is kept in `assets/source/her/arms-wide-front/`),
+      and the camera draws back to frame the whole bow, its sun included; any key brings it
+      back. Bow only for now; other scenic spots (the stern terraces, deck 12 over the pools)
+      maybe later
+- [ ] **Next: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
+      more sheets where pieces are missing (lifeboats, restaurants, the pool deck), cost stated
+      first. Then doors along the decks into small separate rooms (§5.1), hazards and people
+      placed on the real decks (§5.8)
 - [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
       corridors run along the sides, the middle above the atrium being the atrium and its dome
       (§5.3); in the game deck 10's corridor runs straight over it
-- [ ] **Then: populate the ship** with what the sheets gave, deck by deck, from her photos (§5.3);
-      more sheets where pieces are missing (lifeboats, the atrium, restaurants, the pool deck),
-      cost stated first. Then doors along the decks into small separate rooms (§5.1), hazards
-      and people placed on the real decks (§5.8)
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card

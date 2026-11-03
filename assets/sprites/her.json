@@ -11,10 +11,11 @@
   "climb": 28,
   "front": 36,
   "wave": 37,
-  "swim": 45,
-  "back": 52,
-  "reach": 53,
-  "climb-out": 58
+  "arms-wide": 45,
+  "swim": 51,
+  "back": 58,
+  "reach": 59,
+  "climb-out": 64
  },
  "anims": {
   "stand": [
@@ -82,29 +83,37 @@
    43,
    44
   ],
-  "swim": [
+  "arms-wide": [
    45,
    46,
    47,
    48,
    49,
-   50,
-   51
+   50
   ],
-  "back": [
-   52
-  ],
-  "reach": [
+  "swim": [
+   51,
+   52,
    53,
    54,
    55,
    56,
    57
   ],
-  "climb-out": [
-   58,
+  "back": [
+   58
+  ],
+  "reach": [
    59,
-   60
+   60,
+   61,
+   62,
+   63
+  ],
+  "climb-out": [
+   64,
+   65,
+   66
   ]
  }
 }

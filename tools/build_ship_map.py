@@ -10,11 +10,12 @@ Run from the repo root:  python tools/build_ship_map.py
 """
 
 import json
+import math
 import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
+from ship_layout import ATRIUM, BOW, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, PLAYABLE, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -24,8 +25,8 @@ COLS = SEA + LENGTH * PER_M + SEA
 
 # Tile ids (1-based, as stored in Tiled layer data; 0 = empty).
 (STEEL, FLOOR, LADDER_TOP, RAILING, LADDER, BACKWALL, TEAK, NAVY, WAINSCOT,
- VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE) = range(1, 18)
-TILE_COUNT = 17
+ VENUEWALL, CREWWALL, ATRIUMWALL, DIMWALL, CABIN_CARPET, DECK_PAINT, GLASS_RAIL, POOL_TILE, HULL) = range(1, 19)
+TILE_COUNT = 18
 
 # Each deck is 8 rows of air over a 1-row floor slab: 144px, a ceiling at ~2.2x her height (§5.4).
 DECK_ROWS = 9
@@ -83,6 +84,21 @@ def funnel_ladder_col():
 def clear_of_ladders(deck, m):
     """Is a door at `m` on `deck` clear of every ladder (doors and ladders must not overlap)?"""
     return deck != 12 or abs(m - metres(funnel_ladder_col())) > 1.5
+
+
+def stem_x(row):
+    """The stem's exact x in pixels at a (fractional) tile row: the smooth line the game draws."""
+    return (SEA + stem_m(row) * PER_M) * TILE
+
+
+def stem_m(row):
+    """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3)."""
+    stem = BOW["stem"]
+    points = [(FLOOR_ROW[d], stem[d]) for d in (7, 6, 5, 4, 3)] + [(ROWS - 1, stem["keel"])]
+    for (r0, m0), (r1, m1) in zip(points, points[1:]):
+        if r0 <= row <= r1:
+            return m0 + (m1 - m0) * (row - r0) / (r1 - r0)
+    return points[0][1] if row < points[0][0] else points[-1][1]
 
 
 def in_core(m):
@@ -165,11 +181,11 @@ def build_layers():
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
 
-        # The deck's ends: a steel wall indoors, a railing on an open terrace; decks 11 and 12 have
-        # glass side walls instead (§5.3).
+        # The deck's ends: the ship's white outer plating indoors, a railing on an open terrace;
+        # decks 11 and 12 have glass side walls instead (§5.3).
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
-                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, STEEL)
+                fill(solid, c, c, floor - DECK_ROWS + 1, floor - 1, HULL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
@@ -180,11 +196,16 @@ def build_layers():
                     wall = c if indoor(deck, metres(c)) else c - 1
                     fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
 
-    # The hull below deck 3, narrowing down into the sea.
+    # The bow's hull, seen from outside (§5.3): from the raked stem back to the block's end, from
+    # under the forecastle down to the waterline, white plating (the game paints the ship's sun on
+    # it). Below deck 3 the hull runs on aft, narrowing into the sea, navy under the waterline.
     fwd3, aft3 = EXTENT[3]
-    for r in range(FLOOR_ROW[3] + 1, ROWS):
-        k = r - FLOOR_ROW[3]
-        fill(solid, col(fwd3) + 4 * k, col(aft3) - 1 - k, r, r, STEEL if r <= WATER_ROW + 2 else NAVY)
+    # Tiles only where the stem has passed by the row's foot, so none sticks out past the smooth
+    # line the game draws over the stem's edge.
+    for r in range(FLOOR_ROW[7] + 1, ROWS):
+        below = r - FLOOR_ROW[3]
+        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - below
+        fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
     # area (§5.3): their decks cross on side walks, built in the game, not floor tiles.
@@ -247,7 +268,7 @@ def build_objects():
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("promenade", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
-                          ("buffet", 11, 170), ("diner", 11, 205)]:
+                          ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
@@ -325,7 +346,7 @@ def build_objects():
             for c0, c1 in runs:
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0,
                          [prop("kind", "cabindoors")]))
-        else:
+        elif indoor(deck, (a + b) / 2):  # a sign needs a wall to hang on: none in the open air
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
 
@@ -341,7 +362,7 @@ def build_objects():
 
     # Bumbot at his five spots (§4): what he is doing, and which way he runs.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 24, "bat", -1),
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 27, "bat", -1),
                                             ("linen", 9, 112, "asleep", 1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
@@ -380,6 +401,27 @@ def build_objects():
         if flip:
             props.append(prop("flip", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else x_of(m), floor_y(deck), props))
+
+    # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
+    lx0, ly0, lx1, ly1 = livery_box()
+    stem = [(round(stem_x(r / 4)), r * TILE // 4) for r in range(4 * (FLOOR_ROW[7] + 1), 4 * (WATER_ROW + 3) + 1)]
+    add(area("livery", "livery", lx0, ly0, lx1 - lx0, ly1 - ly0, [
+        prop("stem", ",".join(f"{x}:{y}" for x, y in stem))]))
+    # The mooring deck's side railing, behind the bollards, from the tip back to the superstructure.
+    for x in range(col(BOW["stem"][7]) * TILE + 30, col(EXTENT[8][0]) * TILE - 14, width("railing-bg")):
+        put(7, 0, "railing-bg", x=x)
+    put(7, 6, "bollard-bg")
+    put(7, 10.5, "cleat-bg")
+    put(7, 15, "bollard-bg")
+    # The bow view (§5.3): standing still on the mooring deck, she goes to the tip and spreads her
+    # arms, and the camera draws back to frame the whole bow, from above the forecastle down to
+    # the sea. `x0`-`x1` is where on deck 7 it can start.
+    add(area("bow-view", "bowview", x_of(-1), floor_y(7) - 90, x_of(23) - x_of(-1), (WATER_ROW + 2) * TILE - floor_y(7) + 90, [
+        prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
+        prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
+    # The bridge's windows on deck 10, looking out to sea.
+    add(area("bridge-windows", "decor", x_of(24.8), floor_y(10) - 104, x_of(39) - x_of(24.8), 30,
+             [prop("kind", "windows")]))
 
     # The gangway lobby, deck 4.
     put(4, 61.5, "plant-bg")
@@ -497,6 +539,11 @@ def draw_tile(tile_id):
         rect(0, 0, 15, 2, hex_rgba("#cd683d"))
         rect(0, 0, 15, 0, hex_rgba("#e6904e"))
         rect(0, 2, 15, 2, hex_rgba("#9e4539"))
+    elif tile_id == HULL:
+        # The ship's white outer plating, a seam along its foot.
+        rect(0, 0, 15, 15, hex_rgba("#f4f4f4"))
+        rect(0, 15, 15, 15, hex_rgba("#e3e7ea"))
+        px[4][3] = px[12][11] = hex_rgba("#e3e7ea")
     elif tile_id == POOL_TILE:
         # A pool's tiled side and bottom: pale blue tiles with white grout.
         rect(0, 0, 15, 15, hex_rgba("#8fd3ff"))
@@ -556,6 +603,104 @@ def write_png(path, width, height, pixels):
     path.write_bytes(png)
 
 
+# --- The ship's sun on the bow ---------------------------------------------------------------------
+
+def livery_box():
+    """The bow's hull block, in pixels: from the stem's tip back to the block's end, from under the
+    forecastle down to the waterline."""
+    x0, x1 = col(BOW["stem"][7]) * TILE, col(BOW["block"]) * TILE
+    y0, y1 = (FLOOR_ROW[7] + 1) * TILE, (WATER_ROW + 1) * TILE
+    return x0, y0, x1, y1
+
+
+def build_livery():
+    """The ship's sun, as painted on the real bow (the user's photos, §5.3), scaled to cover most of
+    the bow's side: concentric rings of deep red, red, orange and yellow round a white centre;
+    curved flame-like rays swirling round it, each red with orange and yellow inside and a grey
+    shadow on its trailing edge; and red, orange and yellow bands with a grey line sweeping aft
+    below it. Cut to the stem's line, as if wrapping round the bow. No lettering (§5.1)."""
+    import math
+    from PIL import Image, ImageDraw
+    from palettize import palettize
+
+    x0, y0, x1, y1 = livery_box()
+    w, h = x1 - x0, y1 - y0
+    img = Image.new("RGBA", (w, h))
+    d = ImageDraw.Draw(img)
+    # Laid out as on the real bow (the user's side-view photo), compressed into the bow's hull
+    # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
+    # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
+    # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
+    cx, cy = x_of(13) - x0, round(h * 0.3)
+    r = 72
+
+    def ray(angle, base, tip, width, colour):
+        """A curved flame: from `base` out to `tip` radii, `width` degrees wide at its base, its tip
+        swept round clockwise."""
+        left, right = [], []
+        for i in range(13):
+            t = i / 12
+            rad = base + (tip - base) * t
+            sweep = 20 * t ** 1.4
+            half = width * (1 - t) ** 0.8
+            for side, a in ((left, angle - half + sweep), (right, angle + half * 0.6 + sweep)):
+                side.append((cx + rad * math.cos(math.radians(a)), cy + rad * math.sin(math.radians(a))))
+        d.polygon(left + right[::-1], fill=colour)
+        return right
+
+    def band(points, colours, width=8, shadow=True):
+        for k, colour in enumerate(colours):
+            d.line([(x, y + k * width) for x, y in points], fill=colour, width=width, joint="curve")
+        if shadow:
+            d.line([(x, y + len(colours) * width + 1) for x, y in points], fill="#9babb2", width=3, joint="curve")
+
+    def curve(f, n=80):
+        return [f(i / n) for i in range(n + 1)]
+
+    # Two bands, in the bow's wide upper part (the stem rakes back below): a red one sweeping down
+    # from the bow's top into the sun, and a red, orange and yellow one coming in level from the
+    # stem. Both run on behind the sun and, past it, part: the upper curving up, the lower down.
+    def upper(t):
+        if t <= 0.6:
+            u = t / 0.6
+            return cx * u, 24 + (cy - 64) * u ** 1.5
+        u = (t - 0.6) / 0.4
+        return cx + (w - cx) * u, cy - 40 + 40 * u - 110 * u * u
+
+    def lower(t):
+        if t <= 0.6:
+            u = t / 0.6
+            return cx * u, cy + 6 + 14 * math.sin(math.pi * u)
+        u = (t - 0.6) / 0.4
+        return cx + (w - cx) * u, cy + 6 - 10 * u + 90 * u * u
+
+    band(curve(upper, 160), ("#e83b3b",), 10)
+    band(curve(lower, 160), ("#e83b3b", "#fb6b1d", "#f9c22b"), 7)
+    # A clear gap round the sun's rim, then the sun over it.
+    gap = r * 1.12
+    d.ellipse((cx - gap, cy - gap, cx + gap, cy + gap), fill=(0, 0, 0, 0))
+    for i in range(12):
+        a = i * 30 - 75
+        edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
+        d.line([(x + 3, y + 3) for x, y in edge], fill="#9babb2", width=5)
+        ray(a + 2, r * 1.05, r * 1.72, 12, "#fb6b1d")
+        ray(a + 3, r * 1.15, r * 1.5, 6, "#f9c22b")
+    for frac, colour in ((1.0, "#ae2334"), (0.84, "#e83b3b"), (0.66, "#fb6b1d"), (0.5, "#f9c22b"),
+                         (0.34, "#ffffff")):
+        rr = r * frac
+        d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), fill=colour)
+
+    # Cut to the stem: nothing forward of the hull's smooth edge.
+    px = img.load()
+    for y in range(h):
+        edge = round(stem_x((y + y0) / TILE)) + 2 - x0
+        for x in range(min(max(edge, 0), w)):
+            px[x, y] = (0, 0, 0, 0)
+    out = ROOT / "assets" / "ship" / "livery.png"
+    palettize(img).save(out)
+    return out
+
+
 def build_tileset():
     tiles = [draw_tile(i) for i in range(1, TILE_COUNT + 1)]
     rows = [[p for t in tiles for p in t[y]] for y in range(TILE)]
@@ -571,3 +716,4 @@ if __name__ == "__main__":
     map_path.write_text(json.dumps(build_map(), separators=(",", ":")), encoding="utf-8")
     print("wrote", map_path.relative_to(ROOT))
     print("wrote", build_tileset().relative_to(ROOT))
+    print("wrote", build_livery().relative_to(ROOT))
