@@ -929,8 +929,13 @@ Nothing blocks the start of the build. These get settled along the way:
       it on up over the deck (a first try leaned them out, mirroring it), drawn in front of her, so she
       stands behind them, stopping a little short of them, their outer foot where the floor ends
       (on every deck: the user, 2026-11-06); the walls before the other decks' terraces (deck 9
-      fore and aft, deck 10 aft) come as those decks are furnished; **the lifeboats hang from deck 7's ceiling**, the underside of deck 8's floor (their
-      davits had hung from deck 8's carpet). Cabins are numbered as on the real
+      fore and aft, deck 10 aft) come as those decks are furnished; **the lifeboats hang from
+      deck 7's ceiling**, the underside of deck 8's floor (their davits had hung from deck 8's
+      carpet), **washed out a little like every background piece**, boats, davits, cables and
+      columns alike, each cable down to its own hook. **Deck 7's stern strip** (dropping from deck
+      8's stern terrace lands on it): no way in to the theatre's balcony (a solid wall), and while
+      she is on it the ship's side stays closed, deck 7's sloped stern plating in front of her,
+      hiding her (see the reminder in "After the ship is populated"). Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
       lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
       (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
