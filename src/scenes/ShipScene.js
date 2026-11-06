@@ -1424,43 +1424,26 @@ export class ShipScene extends Phaser.Scene {
         return c && this.route === 'cabin' && Math.abs(this.player.y - c.bed.body.top) < 2;
     }
 
-    // She turns to us and bounces on the bed for joy, arms waving overhead, each hop carrying her
-    // to the other side; any key and she stops, standing where she landed.
+    // She turns to us and bounces on the bed for joy, in place, from one foot to the other, her
+    // arms waving up and down (the bounce is in her frames); any key and she stops.
     startBedJoy() {
         const p = this.player;
-        const bed = this.cabin.bed.body;
-        const y = p.y;
-        // Room on the mattress for her swing either way.
-        const x = Phaser.Math.Clamp(p.x, bed.left + BED_JOY.sway + 8, this.cabin.door - CABIN.doorX + CABIN.width - CABIN.stop - BED_JOY.sway);
         this.mode = 'scripted';
         p.body.setVelocity(0, 0);
         p.body.enable = false;
         p.setFlipX(false).anims.play('her-bed-joy');
-        this.cameras.main.stopFollow();          // the room holds still while she bounces
-        let t = 0;
-        this.script = dt => {
+        this.script = () => {
             const i = this.controls.state;
-            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) {
-                this.endBedJoy(y);
-                return;
-            }
-            t += dt * 1000;
-            const k = Math.floor(t / BED_JOY.hopMs), f = (t % BED_JOY.hopMs) / BED_JOY.hopMs;
-            const from = k % 2 ? 1 : -1;
-            p.x = x + BED_JOY.sway * (from + (-2 * from) * (0.5 - 0.5 * Math.cos(Math.PI * f)));
-            p.y = y - BED_JOY.hopHeight * Math.sin(Math.PI * f);
+            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) this.endBedJoy();
         };
     }
 
-    endBedJoy(y) {
+    endBedJoy() {
         const p = this.player;
         this.script = null;
-        this.cameras.main.startFollow(p, true, 0.15, 0.15);
-        this.cameras.main.setFollowOffset(0, HALF);
         this.mode = 'play';
-        p.y = y;
         p.body.enable = true;
-        p.body.reset(p.x, y);
+        p.body.reset(p.x, p.y);
         this.pose('stand');
         this.stillSince = this.time.now;
     }

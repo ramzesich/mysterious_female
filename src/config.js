@@ -52,14 +52,10 @@ export const BOW_VIEW = {
     zoomMs: 1400,
 };
 
-// Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it a second, she bounces on it
-// for joy, facing us, arms waving overhead, hopping from side to side. Each hop's length, height
-// and sideways swing (px).
+// Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it this long, she bounces on it
+// for joy, in place, from one foot to the other, her arms waving up and down.
 export const BED_JOY = {
     idleMs: 1000,
-    hopMs: 460,
-    hopHeight: 9,
-    sway: 9,
 };
 
 // Elevators (§5.1): the car's speed between decks and how long the doors take to slide.

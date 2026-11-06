@@ -517,13 +517,16 @@ def scenario_cabin(b):
     # Cabin 8206 on deck 8 (§5.3): E at its open door takes her in; its walls hold her; E again
     # takes her back out to the corridor.
     route = lambda: b.eval("window.__ship.route")
-    b.open("?reset&play")
+    b.open("?reset&play&at=cabin")
     door = b.eval("window.__ship.cabin.door")
+    s = b.state()
+    ok = check(route() == "cabin" and s["x"] == door and s["y"] == floor_y(8), "?at=cabin starts her inside, by its door", (route(), s))
+    b.eval("window.__ship.route = 'inside'")
     b.teleport(door + 6, floor_y(8))
     b.tap("e")
     time.sleep(0.8)
     s = b.state()
-    ok = check(route() == "cabin" and s["mode"] == "play" and s["x"] == door, "E at the open door takes her in", (route(), s))
+    ok &= check(route() == "cabin" and s["mode"] == "play" and s["x"] == door, "E at the open door takes her in", (route(), s))
     b.shot("cabin-desk")
     b.hold(["right"], 0.6)
     time.sleep(0.3)

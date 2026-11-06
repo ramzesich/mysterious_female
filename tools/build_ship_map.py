@@ -601,7 +601,6 @@ def build_objects():
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
-    add(point("cabin", "place", x_of(OUR_CABIN["m"]) + 40, floor_y(OUR_CABIN["deck"]), [prop("route", "cabin")]))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -687,6 +686,8 @@ def build_objects():
                     assert first + i == OUR_CABIN["number"], (first + i, OUR_CABIN)
                     add(point(f"cabin-{OUR_CABIN['number']}", "cabin", xs[i] + 17, floor_y(deck),
                               [prop("number", OUR_CABIN["number"], "int")]))
+                    # ?at=cabin: inside, where she comes in through its door.
+                    add(point("cabin", "place", xs[i] + 17, floor_y(deck), [prop("route", "cabin")]))
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
                     prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + len(xs) - 1, "int"),
                     prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))

@@ -53,10 +53,10 @@ HER = {
         # bow view, GAME_DESIGN.md §5.3): skeleton-v3 custom poses; frame 0 is her rest pose. A
         # first try facing the camera is kept in arms-wide-front/.
         "arms-wide": [(f"arms-wide-side/{i}.png", "feet") for i in range(6)],
-        # Bouncing on cabin 8206's bed for joy, facing us, arms waving overhead, eyes shut in a big
-        # smile (GAME_DESIGN.md §5.3): skeleton-v3's cheer move. The game loops frames 2-6, her arms
-        # up; the hops are the game's.
-        "bed-joy": [(f"bed-cheer/{i}.png", "feet") for i in range(8)],
+        # Bouncing on cabin 8206's bed for joy, facing us (GAME_DESIGN.md §5.3): in place, from one
+        # foot to the other, her arms waving up and down; skeleton-v3 custom poses. (A first try,
+        # skeleton-v3's cheer move with the game hopping her side to side, is kept in bed-cheer/.)
+        "bed-joy": [(f"bed-bounce/{i}.png", "feet") for i in range(8)],
         # Swimming in a pool (GAME_DESIGN.md §5.3): a side-on breaststroke, her head above the water,
         # skeleton-v3 custom poses. Each frame keeps its place on the canvas: lining them up by their
         # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A
