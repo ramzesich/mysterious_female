@@ -54,6 +54,11 @@ ATRIUM = {"span": (82, 102), "decks": (5, 9)}
 PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
              "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
 
+# Cabin 8206, the user's own cabin on the cruise (2026-11-06): an oceanview with a picture window on
+# the starboard side, forward on deck 8, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's
+# deck 8 plan, kept in reference/web/deck8/). Its door stands open and she can go in (§5.3).
+OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
+
 # The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
 # railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
 STAGE = 244

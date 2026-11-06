@@ -24,7 +24,7 @@ URL flags, combinable (`?play&debug`):
 | `?cards=all` | Every key card, for testing |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
-| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` |
+| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern`, `cabin` (inside cabin 8206, deck 8) |
 
 ## Controls
 

@@ -27,6 +27,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/source/<char>/` | Raw PixelLab frames, kept so sprites can be rebuilt without regenerating |
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
+| `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door |
 | `tools/draw_lifeboat.py` | The lifeboat, drawn by hand in code (PixelLab's tries didn't read): writes `assets/ship/lifeboat.png` |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |

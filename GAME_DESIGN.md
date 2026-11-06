@@ -900,8 +900,23 @@ Nothing blocks the start of the build. These get settled along the way:
       elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
       back on, and the playtests use it). They come back with the unlockable areas, with the
       checkpoints
-- [ ] **Start the next session here: furnish deck 8**, then upward deck by deck (decks 4-7 are
-      done and merged, 2026-11-03). The way each deck went: read NCL's plan for it
+- [ ] **Deck 8 furnished** (2026-11-06, branch `deck-8`, awaiting the user's look): NCL's plan has
+      only cabins there and the atrium. **Cabin 8206, the user's own cabin on the cruise**
+      (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
+      forward, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's deck 8 plan, kept in
+      `reference/web/deck8/`). Its door stands open with a brass "8206" and the steward's linen
+      cart; **E at it and she is inside** (a third route, like the promenade's): the ship's side
+      closes round the cabin, cut away only there, the room drawn by hand from her photo
+      (`tools/draw_cabin.py`: mirrored wardrobe, the door back out, the wood desk unit, TV and
+      pouf, the window in its wood surround with grey curtains, the grey sofa with teal cushions,
+      the blue lobster drawing, the bed with its teal runner). Cabins are numbered as on the real
+      ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
+      lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
+      (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
+      blue directory board and an exit sign over the stairs. The atrium's walk on deck 8:
+      downlights, a warm cove light, paintings. No generations
+- [ ] **Start the next session here: furnish deck 9**, then upward deck by deck (decks 4-8 are
+      done, 2026-11-06). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations

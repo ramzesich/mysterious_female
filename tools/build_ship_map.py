@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
-                         PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -63,7 +63,7 @@ ROOM_LOOK = {
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7, 8}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -601,6 +601,7 @@ def build_objects():
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
+    add(point("cabin", "place", x_of(OUR_CABIN["m"]) + 40, floor_y(OUR_CABIN["deck"]), [prop("route", "cabin")]))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -663,7 +664,9 @@ def build_objects():
         lift(core, col(a) * TILE + 18 * TILE, PLAYABLE)
     lift("atrium", x_of(sum(ATRIUM["span"]) / 2), range(ATRIUM["decks"][0], ATRIUM["decks"][1] + 1), glass=True)
 
-    # Venue signs; cabin doors along the corridors (background, muted), numbered from the bow.
+    # Venue signs; cabin doors along the corridors (background, muted), numbered from the bow. The
+    # corridor's back wall is the starboard side's cabins (the game looks from port), numbered as on
+    # the real ship: deck, then 2xx, one by one, so cabin 8206 lands where it is on deck 8.
     cabins_before = {}
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":
@@ -676,11 +679,16 @@ def build_objects():
                 else:
                     runs.append([c, c + 1])
             for c0, c1 in runs:
-                doors = len(range(c0 * TILE + 60, c1 * TILE - 30, 192))
-                first = deck * 1000 + 1 + 2 * cabins_before.get(deck, 0)
-                cabins_before[deck] = cabins_before.get(deck, 0) + doors
+                xs = list(range(c0 * TILE + 60, c1 * TILE - 30, 192))
+                first = deck * 1000 + 202 + cabins_before.get(deck, 0)
+                cabins_before[deck] = cabins_before.get(deck, 0) + len(xs)
+                if deck == OUR_CABIN["deck"] and c0 * TILE < x_of(OUR_CABIN["m"]) < c1 * TILE:
+                    i = min(range(len(xs)), key=lambda i: abs(xs[i] + 17 - x_of(OUR_CABIN["m"])))
+                    assert first + i == OUR_CABIN["number"], (first + i, OUR_CABIN)
+                    add(point(f"cabin-{OUR_CABIN['number']}", "cabin", xs[i] + 17, floor_y(deck),
+                              [prop("number", OUR_CABIN["number"], "int")]))
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
-                    prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + 2 * (doors - 1), "int"),
+                    prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + len(xs) - 1, "int"),
                     prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))
         elif indoor(deck, (a + b) / 2) and kind != "start" and deck not in FURNISHED:  # a wall to hang on
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
@@ -781,10 +789,12 @@ def build_objects():
     put(4, 66.6, "hose-cabinet-bg", 18)
     put(4, 68.7, "plant-bg")
     put(4, 70.1, "extinguisher-bg", 14)
-    # A framed picture in each stair and elevator lobby, left of its stairs.
+    # A framed picture in each stair and elevator lobby, left of its stairs; on deck 8 the deck's
+    # directory board hangs there instead (the user's photo).
     for core, (a, _) in CORES.items():
         for deck in PLAYABLE:
-            put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
+            if deck != 8:
+                put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
     # excursions and reservations desks, La Cucina, the Four Seasons and the Seven Seas.
@@ -1054,6 +1064,20 @@ def build_objects():
     for a, b in ((110, 150), (150, 194)):
         decor(f"downlights-7-{a}", "downlights", x_of(a), x_of(b), deck=7)
 
+    # Deck 8, cabins fore and aft and the atrium between (NCL's plan; the user's photos, 2026-11-06).
+    # The lobbies: the deck's directory board, blue in a brass frame, and an exit sign over the stairs.
+    for core, (a, _) in CORES.items():
+        x = col(a) * TILE + 30
+        add(area(f"directory-8-{core}", "decor", x - 13, floor_y(8), 26, 0, [prop("kind", "directory")]))
+        put(8, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
+    # The atrium's walk on deck 8: downlights and a warm cove along its ceiling, and paintings on its
+    # cream walls, clear of the pillars, the staircase and the glass elevator.
+    decor("downlights-8-atrium", "downlights", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=8)
+    decor("cove-8-atrium", "cove", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=8)
+    for m, painting in ((83.6, "painting-harbour-bg"), (99.0, "painting-sea-bg"), (100.6, "painting-blue-bg")):
+        put(8, m, painting, 50)
+    # Cabin 8206, the user's own (OUR_CABIN): its open door is placed with the corridor's doors.
+
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
         prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
@@ -1282,11 +1306,14 @@ def draw_tile(tile_id):
     elif tile_id == BALCONY_RAIL:
         pass    # solid but unseen: the game draws the balcony's front over it
     elif tile_id == MAHOGANY:
-        # The lobbies' mahogany panelling: a dark red-brown with a faint grain.
-        rect(0, 0, 15, 15, hex_rgba("#7a3045"))
+        # The lobbies' panelling: a warm terracotta wood with a faint lighter grain, as in the user's
+        # deck 8 photo (2026-11-06: lighter than the dark maroon first drawn).
+        rect(0, 0, 15, 15, hex_rgba("#b5604a"))
         for x, y in ((3, 2), (3, 3), (3, 4), (9, 8), (9, 9), (12, 12), (12, 13), (6, 14)):
-            px[y][x] = hex_rgba("#6e2727")
-        rect(0, 0, 0, 15, hex_rgba("#6e2727"))
+            px[y][x] = hex_rgba("#c4735a")
+        for x, y in ((7, 4), (13, 6), (1, 10)):
+            px[y][x] = hex_rgba("#a5543f")
+        rect(0, 0, 0, 15, hex_rgba("#9e4539"))
     elif tile_id in (HULL, EXT, EXT_FIXED):
         # The ship's off-white outer plating, clean (seams on every tile read as stripes).
         rect(0, 0, 15, 15, hex_rgba(PLATING))

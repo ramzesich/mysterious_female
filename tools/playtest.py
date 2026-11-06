@@ -513,6 +513,33 @@ def scenario_promenade(b):
     return ok
 
 
+def scenario_cabin(b):
+    # Cabin 8206 on deck 8 (§5.3): E at its open door takes her in; its walls hold her; E again
+    # takes her back out to the corridor.
+    route = lambda: b.eval("window.__ship.route")
+    b.open("?reset&play")
+    door = b.eval("window.__ship.cabin.door")
+    b.teleport(door + 6, floor_y(8))
+    b.tap("e")
+    time.sleep(0.8)
+    s = b.state()
+    ok = check(route() == "cabin" and s["mode"] == "play" and s["x"] == door, "E at the open door takes her in", (route(), s))
+    b.hold(["right"], 2.0)
+    s = b.state()
+    ok &= check(route() == "cabin" and door < s["x"] < door + 200 and s["y"] == floor_y(8), "the cabin's far wall holds her", s)
+    b.shot("cabin-inside")
+    b.hold(["left"], 2.0)
+    s = b.state()
+    ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(8), "and so does its near wall", s)
+    b.teleport(door, floor_y(8))
+    b.eval("window.__ship.route = 'cabin'")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(route() == "inside", "E at the door takes her back out", route())
+    b.shot("cabin-door")
+    return ok
+
+
 def scenario_balcony(b):
     # The Stardust Lounge's balcony (deck 7) ends in a railing over the stage: she can hop it and
     # drop one deck onto the stage, no scare (§5.3).

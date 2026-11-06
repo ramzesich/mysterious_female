@@ -23,6 +23,9 @@ const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
+// Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
+// over the floor, and how close to its side walls she can go.
+const CABIN = { width: 240, doorX: 59, height: 128, stop: 20 };
 
 // How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
 // staircase.
@@ -222,6 +225,8 @@ export class ShipScene extends Phaser.Scene {
             .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
         // So do crew doors (checkpoints): no cabin door crowds another door.
         this.doorSpots = [...this.trunkDoorSpots, ...objects.filter(o => o.type === 'checkpoint').map(o => ({ x: o.x, y: o.y }))];
+        // Cabin 8206's open door takes the place of its cabin door.
+        this.openCabinDoors = objects.filter(o => o.type === 'cabin').map(o => ({ x: o.x, y: o.y }));
 
         for (const o of objects) {
             switch (o.type) {
@@ -371,6 +376,10 @@ export class ShipScene extends Phaser.Scene {
                     this.buildPromenade(o, prop);
                     break;
 
+                case 'cabin':
+                    this.buildCabin(o, prop);
+                    break;
+
                 case 'bowdoor': {
                     // Deck 7's front wall (§5.3): drawn over her as she passes straight through it to
                     // the mooring deck, as if through a door hidden in it (the user, 2026-11-03).
@@ -396,6 +405,8 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
+                    if (prop(o, 'kind') === 'directory') this.drawDirectory(decorGfx, o);
+                    if (prop(o, 'kind') === 'cove') this.drawCove(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -451,8 +462,8 @@ export class ShipScene extends Phaser.Scene {
             const pier = (b - a - n * OPEN_W) / (n + 1);
             // The promenade's ends are closed (back in only through the doors): a wall she runs into
             // at the end pier's inner edge, so she stops in the first opening, partly behind it.
-            if (a === pr.x0) this.addPromenadeEnd(a + pier + PROMENADE.endStop, -1, floor);
-            if (b === pr.x1) this.addPromenadeEnd(b - pier - PROMENADE.endStop, 1, floor);
+            if (a === pr.x0) this.addRouteWall(a + pier + PROMENADE.endStop, -1, floor, 'promenade');
+            if (b === pr.x1) this.addRouteWall(b - pier - PROMENADE.endStop, 1, floor, 'promenade');
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
@@ -498,14 +509,46 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // An invisible wall at one end of the promenade, there only while she is on it. `x` is where
-    // her middle stops; `side` is -1 at the fore end, 1 at the aft end.
-    addPromenadeEnd(x, side, floor) {
+    // An invisible wall at one end of the promenade or of cabin 8206, there only while she is on that
+    // route. `x` is where her middle stops; `side` is -1 at the fore end, 1 at the aft end.
+    addRouteWall(x, side, floor, route) {
         const w = 32;
         const edge = x + side * PLAYER.bodyWidth / 2;
         const zone = this.add.zone(edge + side * w / 2, floor - this.deckPitch / 2, w, this.deckPitch);
         this.physics.add.existing(zone, true);
-        (this.promenadeEnds ||= []).push(zone);
+        zone.route = route;
+        (this.routeWalls ||= []).push(zone);
+    }
+
+    // --- Cabin 8206 (§5.3) --------------------------------------------------------------------
+    // The user's own cabin on the cruise, on deck 8: its door stands open, a brass number beside it
+    // and the steward's linen cart. E at the door and she is inside: the ship's side closes round
+    // the cabin, cut away only there, the room as in her photo.
+
+    buildCabin(o, prop) {
+        const x0 = o.x - CABIN.doorX;
+        const c = this.cabin = { door: o.x, floor: o.y, number: prop(o, 'number', 0) };
+        const door = this.add.image(o.x, o.y, 'cabin-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        const plate = this.add.text(o.x + 21, o.y - 50, String(c.number), {
+            fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
+            backgroundColor: '#d9a43b', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        const cart = this.add.image(o.x - 36, o.y, 'shipart', 'towel-trolley-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15);
+        c.room = this.add.image(x0, o.y - CABIN.height, 'cabin-8206').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
+        this.worldLayer.add([door, plate, cart, c.room]);
+        this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
+        this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
+    }
+
+    // A door at her feet to another route: the promenade's (deck 6), or cabin 8206's.
+    routeDoorAt(x, y) {
+        const door = this.promenadeDoorAt(x, y);
+        if (door !== null && this.route !== 'cabin') return { x: door, to: this.route === 'promenade' ? 'inside' : 'promenade' };
+        const c = this.cabin;
+        if (c && this.route !== 'promenade' && Math.abs(y - c.floor) <= 4 && Math.abs(x - c.door) < 16) {
+            return { x: c.door, to: this.route === 'cabin' ? 'inside' : 'cabin' };
+        }
+        return null;
     }
 
     promenadeDoorAt(x, y) {
@@ -514,10 +557,10 @@ export class ShipScene extends Phaser.Scene {
         return pr.doors.find(d => Math.abs(x - d) < 16) ?? null;
     }
 
-    // E at a promenade door: a quick fade, and she is on the other side of it.
-    usePromenadeDoor() {
+    // E at a promenade door or the cabin's: a quick fade, and she is on the other side of it.
+    useRouteDoor() {
         const p = this.player;
-        const door = this.promenadeDoorAt(p.x, p.y);
+        const door = this.routeDoorAt(p.x, p.y);
         if (door === null) return false;
         this.mode = 'scripted';
         this.script = null;
@@ -527,8 +570,8 @@ export class ShipScene extends Phaser.Scene {
         const cam = this.cameras.main;
         cam.fadeOut(PROMENADE.fadeMs, 0, 0, 0);
         cam.once('camerafadeoutcomplete', () => {
-            this.route = this.route === 'promenade' ? 'inside' : 'promenade';
-            p.body.reset(door, p.y);
+            this.route = door.to;
+            p.body.reset(door.x, p.y);
             this.updateCutaway(0);
             cam.fadeIn(PROMENADE.fadeMs * 1.3, 0, 0, 0);
             this.mode = 'play';
@@ -821,6 +864,29 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // A deck's directory board in a lobby (the user's deck 8 photo): blue in a brass frame, the
+    // deck's plan in white across its top, its rooms listed below.
+    drawDirectory(g, o) {
+        const top = o.y - 72, w = o.width, h = 42;
+        g.fillStyle(0xd9a43b, 1).fillRect(o.x, top, w, h);
+        g.fillStyle(0x323353, 1).fillRect(o.x + 2, top + 2, w - 4, h - 4);
+        g.fillStyle(0x4d65b4, 1).fillRect(o.x + 3, top + 3, w - 6, 6);
+        g.fillStyle(0xf28c28, 1).fillRect(o.x + 4, top + 4, 4, 4);
+        g.fillStyle(0xffffff, 1).fillRect(o.x + 10, top + 5, w - 14, 1);
+        g.fillStyle(0xffffff, 1).fillRect(o.x + 4, top + 12, w - 8, 5);
+        g.fillStyle(0x4d9be6, 1).fillRect(o.x + 6, top + 13, w - 12, 3);
+        for (let i = 0; i < 7; i++) {
+            g.fillStyle(i % 3 ? 0xc7dcd0 : 0xf9c22b, 1).fillRect(o.x + 4, top + 20 + i * 2.5, 3 + (i * 5) % 9 + 6, 1);
+        }
+    }
+
+    // A warm light hidden along the top of a wall, as round the atrium (the user's photos).
+    drawCove(g, o) {
+        const y = o.y - this.deckPitch + 16;
+        g.fillStyle(0xfbb954, 0.9).fillRect(o.x, y + 3, o.width, 1);
+        for (let i = 0; i < 6; i++) g.fillStyle(0xfbb954, 0.35 * (1 - i / 6)).fillRect(o.x, y + 4 + i, o.width, 1);
+    }
+
     // Warm downlights along a room's ceiling.
     drawDownlights(g, o) {
         const y = o.y - this.deckPitch + 16;
@@ -877,6 +943,7 @@ export class ShipScene extends Phaser.Scene {
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
             if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
+            if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
@@ -1056,6 +1123,12 @@ export class ShipScene extends Phaser.Scene {
                     fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#f28c28', backgroundColor: '#14161c',
                     padding: { x: 2, y: 1 }, resolution: 4,
                 }).setOrigin(0.5).setDepth(DEPTH.props);
+                // The deck's number on a red disc beside the doors (the user's deck 8 photo).
+                const disc = this.add.circle(o.x - 27, f.y - 46, 4, 0xae2334).setDepth(DEPTH.props);
+                const digit = this.add.text(o.x - 27, f.y - 46, String(f.deck), {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#ffffff', resolution: 4,
+                }).setOrigin(0.5).setDepth(DEPTH.props);
+                this.worldLayer.add([disc, digit]);
                 this.worldLayer.add([car, frame, number]);
                 f.leaves = this.makeLeaves(o.x, 'lift-leaf', DEPTH.props);
                 this.setLeaves(f.leaves, f.y, 0);
@@ -1100,7 +1173,7 @@ export class ShipScene extends Phaser.Scene {
         this.player = p;
 
         this.physics.add.collider(p, this.solidLayer);
-        this.physics.add.collider(p, this.promenadeEnds || [], null, () => this.route === 'promenade');
+        this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
@@ -1245,7 +1318,7 @@ export class ShipScene extends Phaser.Scene {
         this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.
-        if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route !== 'promenade') {
+        if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route === 'inside') {
             this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
@@ -1269,9 +1342,9 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
-        if (onFloor && input.activatePressed && this.usePromenadeDoor()) return;
-        // On the promenade the rooms' stairs, ladders, trunks and elevators are out of reach.
-        const inside = this.route !== 'promenade';
+        if (onFloor && input.activatePressed && this.useRouteDoor()) return;
+        // On the promenade, or in the cabin, the stairs, ladders, trunks and elevators are out of reach.
+        const inside = this.route === 'inside';
         if (inside && onFloor && input.activatePressed && this.callLift()) return;
         if (inside && onFloor && input.activatePressed) this.activateTrunkDoor();
         if (inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
@@ -1547,7 +1620,8 @@ export class ShipScene extends Phaser.Scene {
         const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
             || (this.mode === 'lift' && this.liftMove?.carriesHer);
         let target;
-        if (this.route === 'promenade') target = null;  // outside: every deck shows its shell
+        // Outside on the promenade every deck shows its shell; in the cabin too, but for the cabin.
+        if (this.route !== 'inside') target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -1569,6 +1643,7 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
+        this.cabin?.room.setVisible(this.route === 'cabin');
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
         for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
     }
