@@ -30,6 +30,11 @@ const LEAF = 18; // each of an elevator's two sliding door leaves
 // from the door (the user, 2026-11-06).
 const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
                 desk: { top: 40, tangerines: [53, 61] } };
+// The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels Bumbot
+// sleeps on (its middle and its top over the floor, from the room's left edge), and the vent he
+// gets away into (its opening's ends).
+const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
+const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
 
 // How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
 // staircase.
@@ -219,6 +224,7 @@ export class ShipScene extends Phaser.Scene {
         this.flights = [];
         this.vacuums = [];
         this.cats = [];
+        this.rooms = [];
         this.places = {};
         this.promenade = null;
         this.route = 'inside';
@@ -247,8 +253,8 @@ export class ShipScene extends Phaser.Scene {
             .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
         // So do crew doors (checkpoints): no cabin door crowds another door.
         this.doorSpots = [...this.trunkDoorSpots, ...objects.filter(o => o.type === 'checkpoint').map(o => ({ x: o.x, y: o.y }))];
-        // Cabin 8206's open door takes the place of its cabin door.
-        this.openCabinDoors = objects.filter(o => o.type === 'cabin').map(o => ({ x: o.x, y: o.y }));
+        // Cabin 8206's open door takes the place of its cabin door; so does the linen room's.
+        this.openCabinDoors = objects.filter(o => o.type === 'cabin' || o.type === 'linen').map(o => ({ x: o.x, y: o.y }));
 
         for (const o of objects) {
             switch (o.type) {
@@ -312,20 +318,9 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
-                case 'bumbot': {
-                    const activity = prop(o, 'activity', 'wash');
-                    const sprite = this.add.sprite(o.x, o.y, 'bumbot').setOrigin(0.5, 1).setDepth(DEPTH.props);
-                    if (activity === 'asleep') {
-                        // One still pose that breathes, slowly.
-                        sprite.setFrame(this.cache.json.get('bumbot-meta').frames.asleep);
-                        this.tweens.add({ targets: sprite, scaleY: 1.06, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-                    } else {
-                        sprite.play(`bumbot-${activity}`);
-                    }
-                    this.worldLayer.add(sprite);
-                    this.cats.push({ name: o.name, sprite, escape: prop(o, 'escape', 1), gone: false });
+                case 'bumbot':
+                    this.addCat(o.name, o.x, o.y, prop(o, 'activity', 'wash'), prop(o, 'escape', 1));
                     break;
-                }
 
                 case 'trunk':
                     this.buildTrunk(o, prop(o, 'floors', ''), prop(o, 'oneWay', false), prop(o, 'card', null));
@@ -398,8 +393,13 @@ export class ShipScene extends Phaser.Scene {
                     this.buildCabin(o, prop);
                     break;
 
-                // Outdoors with no way in (deck 7's stern strip, §5.3): while she is on it the ship's
-                // side stays closed, the deck's inside out of sight (the user, 2026-11-06).
+                case 'linen':
+                    this.buildLinenRoom(o);
+                    break;
+
+                // Outdoors with no way in (deck 7's stern strip, §5.3; the aft terraces behind decks
+                // 8-10's end walls): while she is on it the ship's side stays closed, the deck's
+                // inside out of sight (the user, 2026-11-06).
                 case 'outdoors': {
                     // A strip of plating over the wall's edge beside it, there only while she is on
                     // it, so nothing of her shows past the wall.
@@ -407,9 +407,13 @@ export class ShipScene extends Phaser.Scene {
                     cover.fillStyle(0xe8eaec, 1).fillRect(o.x - 16, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
                     this.worldLayer.add(cover);
                     (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
-                    // The sloped stern plating over it is drawn in front of her: she is hidden
-                    // behind it there (the user).
-                    this.shellSlopes.filter(s => s.deck === 7 && s.end === 'aft').forEach(s => s.gfx.setDepth(DEPTH.player + 0.05));
+                    // The sloped stern plating over it is drawn in front of her, and stays there at
+                    // all times, the deck cut open or not: she is always hidden behind it (the user).
+                    const deck = prop(o, 'deck', 7);
+                    this.shellSlopes.filter(s => s.deck === deck && s.end === 'aft').forEach(s => {
+                        s.gfx.setDepth(DEPTH.player + 0.05);
+                        s.always = true;
+                    });
                     break;
                 }
 
@@ -583,8 +587,9 @@ export class ShipScene extends Phaser.Scene {
 
     // --- Cabin 8206 (§5.3) --------------------------------------------------------------------
     // The user's own cabin on the cruise, on deck 8: its door stands open, a brass number beside it
-    // and the steward's linen cart. E at the door and she is inside: the ship's side closes round
-    // the cabin, cut away only there, the room as in her photo.
+    // and the steward's linen cart. E at the door and she is inside: the room as in her photo shows
+    // where the corridor was, the deck still cut open, everything round it dimmed almost to black
+    // (the user, 2026-11-06: as the linen room; it was first cut into the ship's side).
 
     buildCabin(o, prop) {
         const x0 = o.x - CABIN.doorX;
@@ -596,7 +601,9 @@ export class ShipScene extends Phaser.Scene {
         }).setOrigin(0, 0.5).setDepth(DEPTH.props);
         const cart = this.add.image(o.x - 36, o.y, 'shipart', 'towel-trolley-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15);
         c.room = this.add.image(x0, o.y - CABIN.height, 'cabin-8206').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
-        this.worldLayer.add([door, plate, cart, c.room]);
+        const dim = this.roomDim(c.room);
+        this.worldLayer.add([door, plate, cart, dim, c.room]);
+        this.rooms.push({ route: 'cabin', door: o.x, floor: o.y, room: c.room, dim, inDeck: true });
         this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
         this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
         // The bed holds her from above, like a side walk (the user, 2026-11-06: she can jump on it).
@@ -605,6 +612,61 @@ export class ShipScene extends Phaser.Scene {
         this.physics.add.existing(c.bed, true);
         // Two tangerines side by side on the desk under the TV (the user, 2026-11-06).
         CABIN.desk.tangerines.forEach((dx, i) => this.addTangerine(`t-cabin-${i + 1}`, o.x + dx, o.y - CABIN.desk.top + 1, 'cabin'));
+    }
+
+    // Bumbot at one of his spots (§4), doing `activity`; he runs off toward `escape` (1 aft, -1
+    // forward). One in a room behind a door (the linen room's) is drawn over that room and shows
+    // only there; he lies `lift` px up (on the towels), and gets away at `exitX`.
+    addCat(name, x, y, activity, escape, { route = 'inside', lift = 0, exitX = null } = {}) {
+        const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
+        const sprite = this.add.sprite(x, y - lift, 'bumbot').setOrigin(0.5, 1).setDepth(depth);
+        if (activity === 'asleep') {
+            // One still pose that breathes, slowly.
+            sprite.setFrame(this.cache.json.get('bumbot-meta').frames.asleep);
+            this.tweens.add({ targets: sprite, scaleY: 1.06, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        } else {
+            sprite.play(`bumbot-${activity}`);
+        }
+        if (route !== 'inside') sprite.setVisible(false);
+        this.worldLayer.add(sprite);
+        this.cats.push({ name, sprite, escape, gone: false, away: false, route, floor: y, exitX });
+    }
+
+    // --- The linen room (§4, §5.3) --------------------------------------------------------------
+    // Housekeeping's linen room on deck 9, off the cabin corridor (the user, 2026-11-06: she can go
+    // in): its crew door held open, a plate beside it. E at the door and she is inside: the room
+    // shows where the corridor was, the deck still cut open, everything round it dimmed almost to
+    // black (cabin 8206 opens in the ship's side instead). Racks of folded towels, and Bumbot asleep
+    // on a heap of them. He gets away into the vent.
+
+    buildLinenRoom(o) {
+        const x0 = o.x - LINEN.doorX;
+        const door = this.add.image(o.x, o.y, 'linen-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        const plate = this.add.text(o.x + 20, o.y - 50, 'LINEN', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#3e3546',
+            backgroundColor: '#ffffff', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        const room = this.add.image(x0, o.y - LINEN.height, 'linen-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
+        const dim = this.roomDim(room);
+        this.worldLayer.add([door, plate, dim, room]);
+        this.rooms.push({ route: 'linen', door: o.x, floor: o.y, room, dim, inDeck: true });
+        this.addRouteWall(x0 + LINEN.stop, -1, o.y, 'linen');
+        this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
+        this.addCat('bumbot-linen', x0 + LINEN.heap[0], o.y, 'asleep', 1,
+            { route: 'linen', lift: LINEN.heap[1] - 1, exitX: x0 + LINEN.vent[0] + 6 });
+    }
+
+    // The world round a room she is in (cabin 8206, the linen room), dimmed almost to black: four
+    // dark panels framing its picture.
+    roomDim(room) {
+        const dim = this.add.graphics().setDepth(DEPTH.exterior + 0.11).setVisible(false);
+        const far = 4000, { x, y, width, height } = room;
+        dim.fillStyle(0x0d0b14, ROOM_DIM);
+        dim.fillRect(x - far, y - far, width + 2 * far, far);
+        dim.fillRect(x - far, y + height, width + 2 * far, far);
+        dim.fillRect(x - far, y, far, height);
+        dim.fillRect(x + width, y, far, height);
+        return dim;
     }
 
     // A tangerine resting at (x, y), unless she has it already; one on another route (the cabin's)
@@ -619,13 +681,17 @@ export class ShipScene extends Phaser.Scene {
         this.tangerines.push({ id, sprite, glint, route });
     }
 
-    // A door at her feet to another route: the promenade's (deck 6), or cabin 8206's.
+    // A door at her feet to another route: the promenade's (deck 6), or a room's (cabin 8206, the
+    // linen room).
     routeDoorAt(x, y) {
         const door = this.promenadeDoorAt(x, y);
-        if (door !== null && this.route !== 'cabin') return { x: door, to: this.route === 'promenade' ? 'inside' : 'promenade' };
-        const c = this.cabin;
-        if (c && this.route !== 'promenade' && Math.abs(y - c.floor) <= 4 && Math.abs(x - c.door) < 16) {
-            return { x: c.door, to: this.route === 'cabin' ? 'inside' : 'cabin' };
+        if (door !== null && (this.route === 'inside' || this.route === 'promenade')) {
+            return { x: door, to: this.route === 'promenade' ? 'inside' : 'promenade' };
+        }
+        for (const r of this.rooms) {
+            if ((this.route === 'inside' || this.route === r.route) && Math.abs(y - r.floor) <= 4 && Math.abs(x - r.door) < 16) {
+                return { x: r.door, to: this.route === r.route ? 'inside' : r.route };
+            }
         }
         return null;
     }
@@ -636,7 +702,7 @@ export class ShipScene extends Phaser.Scene {
         return pr.doors.find(d => Math.abs(x - d) < 16) ?? null;
     }
 
-    // E at a promenade door or the cabin's: a quick fade, and she is on the other side of it.
+    // E at a promenade door or a room's: a quick fade, and she is on the other side of it.
     useRouteDoor() {
         const p = this.player;
         const door = this.routeDoorAt(p.x, p.y);
@@ -1406,8 +1472,9 @@ export class ShipScene extends Phaser.Scene {
         if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route === 'inside') {
             this.checkCheckpoints();
             this.checkVacuums();
-            this.checkBumbot();
         }
+        // Bumbot on her route: in the corridors, or asleep in the linen room.
+        if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkBumbot();
         this.updateDash(time);
         this.updateOverlays();
     }
@@ -1752,11 +1819,14 @@ export class ShipScene extends Phaser.Scene {
         const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
             || (this.mode === 'lift' && this.liftMove?.carriesHer);
         let target;
-        // Outside on the promenade every deck shows its shell; in the cabin too, but for the cabin;
-        // and outdoors where there is no way in (deck 7's stern strip).
+        // Outside on the promenade every deck shows its shell; and outdoors where there is no way in
+        // (deck 7's stern strip, the aft terraces). In a room (cabin 8206, the linen room) the deck
+        // stays cut open, the room over it.
         const outdoors = this.outdoors?.find(a => p.x >= a.x0 && p.x <= a.x1 && p.y <= a.floor + 4 && p.y > a.floor - this.deckPitch);
         for (const a of this.outdoors || []) a.cover.setVisible(a === outdoors);
-        if (this.route !== 'inside' || outdoors) target = null;
+        // A room shown in the deck's own place (the linen room) keeps the deck cut open.
+        const inDeck = this.route === 'inside' || this.rooms.some(r => r.route === this.route && r.inDeck);
+        if (!inDeck || outdoors) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -1778,12 +1848,20 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
-        this.cabin?.room.setVisible(this.route === 'cabin');
+        for (const r of this.rooms) {
+            r.room.setVisible(this.route === r.route);
+            r.dim?.setVisible(this.route === r.route);
+        }
+        for (const cat of this.cats) {
+            if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away);
+        }
         for (const t of this.tangerines) {
             if (t.route !== 'inside' && t.sprite.active) [t.sprite, t.glint].forEach(s => s.setVisible(t.route === this.route));
         }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
-        for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+        for (const { deck, gfx, always } of this.shellSlopes) {
+            gfx.setAlpha(always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+        }
 
     }
 
@@ -2296,7 +2374,7 @@ export class ShipScene extends Phaser.Scene {
         if (this.mode !== 'play') return;
         for (const cat of this.cats) {
             const s = cat.sprite;
-            if (cat.gone || Math.abs(p.y - s.y) > 8 || Math.abs(p.x - s.x) > BUMBOT.noticeReach) continue;
+            if (cat.gone || cat.route !== this.route || Math.abs(p.y - s.y) > 8 || Math.abs(p.x - s.x) > BUMBOT.noticeReach) continue;
             this.nearCatch(cat);
             return;
         }
@@ -2340,10 +2418,14 @@ export class ShipScene extends Phaser.Scene {
                     this.time.delayedCall(BUMBOT.leapMs, () => {
                         sfx.mrrp();
                         s.play('bumbot-run');
+                        s.y = cat.floor;
                         this.script = (dt) => {
                             s.x += cat.escape * BUMBOT.runSpeed * dt;
                             const view = this.cameras.main.worldView;
-                            if (s.x < view.x - 40 || s.x > view.right + 40) {
+                            const out = cat.exitX !== null ? (s.x - cat.exitX) * cat.escape >= 0
+                                : s.x < view.x - 40 || s.x > view.right + 40;
+                            if (out) {
+                                cat.away = true;
                                 s.setVisible(false).stop();
                                 this.script = null;
                                 catAway = true;

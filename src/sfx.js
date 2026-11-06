@@ -1,9 +1,13 @@
 // Synthesised sound effects (§7.1). No audio files. The context starts on the first user gesture,
-// which the title screen's Start always provides.
+// which the title screen's Start always provides. Silent unless SOUND.on, or `?sound` in the URL.
 
+import { SOUND } from './config.js';
+
+const on = SOUND.on || new URLSearchParams(location.search).has('sound');
 let ctx = null;
 
 function audio() {
+    if (!on) return null;
     if (!ctx) {
         const Ctx = window.AudioContext || window.webkitAudioContext;
         if (!Ctx) return null;

@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1430" height="505" viewBox="0 0 1430 505" font-family="Helvetica, Arial, sans-serif">
 <rect width="1430" height="505" fill="#ffffff"/>
 <rect x="0" y="424" width="1430" height="81" fill="#dceefa"/>
-<polygon points="170,410 1340,410 1320,436 240,436" fill="#8aa1b5"/>
+<polygon points="178,410 1340,410 1320,436 248,436" fill="#8aa1b5"/>
 <rect x="910" y="50" width="140" height="60" fill="#2b5d8a"/>
 <text x="980.0" y="84.0" font-size="10" text-anchor="middle" fill="#ffffff" font-weight="normal">Funnel</text>
 <rect x="340" y="70" width="40" height="40" fill="#7b8fa3"/>
 <text x="360.0" y="66.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mast</text>
-<rect x="170" y="380" width="1170" height="30" fill="#c9c9c9" stroke="#ffffff"/>
-<text x="755.0" y="399.0" font-size="9" text-anchor="middle" fill="#555555" font-weight="normal">Deck 3: visible below deck 4, not playable</text>
+<rect x="178" y="380" width="1162.5" height="30" fill="#c9c9c9" stroke="#ffffff"/>
+<text x="758.8" y="399.0" font-size="9" text-anchor="middle" fill="#555555" font-weight="normal">Deck 3: visible below deck 4, not playable</text>
 <text x="58.0" y="399.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">3</text>
 <text x="1372.0" y="399.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">3</text>
-<rect x="170" y="350" width="1175" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="170" y="350" width="1170" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="369.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">4</text>
 <text x="1372.0" y="369.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">4</text>
-<rect x="170" y="320" width="1175" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="170" y="320" width="1170" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="339.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">5</text>
 <text x="1372.0" y="339.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">5</text>
-<rect x="170" y="290" width="1175" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="170" y="290" width="1170" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="309.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">6</text>
 <text x="1372.0" y="309.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">6</text>
-<rect x="82" y="260" width="1257.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
+<rect x="72" y="260" width="1267.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
 <text x="58.0" y="279.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">7</text>
 <text x="1372.0" y="279.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">7</text>
 <rect x="177" y="230" width="1150.5" height="30" fill="#f7f7f7" stroke="#ffffff"/>
@@ -67,10 +67,8 @@
 <text x="1192.5" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="188" y="202" width="252.0" height="26" rx="2" fill="#ececec"/>
 <text x="314.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
-<text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
-<rect x="600" y="202" width="440" height="26" rx="2" fill="#ececec"/>
-<text x="820.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="620" y="202" width="420" height="26" rx="2" fill="#ececec"/>
+<text x="830.0" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="202" width="237.5" height="26" rx="2" fill="#ececec"/>
 <text x="1198.8" y="219.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="177" y="232" width="263.0" height="26" rx="2" fill="#ececec"/>
@@ -79,32 +77,50 @@
 <text x="830.0" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="232" width="247.5" height="26" rx="2" fill="#ececec"/>
 <text x="1203.8" y="249.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="82" y="262" width="94.5" height="26" rx="2" fill="#d6ecd0"/>
-<text x="129.8" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mooring deck</text>
-<rect x="177" y="262" width="193.0" height="26" rx="2" fill="#cfe3f0"/>
-<text x="273.5" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Kids' and teen clubs</text>
-<rect x="620" y="262" width="200" height="26" rx="2" fill="#cfe3f0"/>
-<text x="720.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Magnum's bar, art gallery</text>
-<rect x="820" y="262" width="220" height="26" rx="2" fill="#cfe3f0"/>
-<text x="930.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Casino, duty-free shops</text>
-<rect x="1180" y="262" width="160" height="26" rx="2" fill="#cfe3f0"/>
-<text x="1260.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Theatre balcony</text>
-<rect x="170" y="292" width="240" height="26" rx="2" fill="#ececec"/>
-<text x="290.0" y="309.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins, internet café</text>
-<rect x="620" y="292" width="200" height="26" rx="2" fill="#cfe3f0"/>
-<text x="720.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Bars, shops, photo studio</text>
-<rect x="820" y="292" width="220" height="26" rx="2" fill="#d6ecd0"/>
-<text x="930.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Library, photo gallery; promenade, lifeboats</text>
-<rect x="1100" y="292" width="245" height="26" rx="2" fill="#cfe3f0"/>
-<text x="1222.5" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Stardust Lounge theatre</text>
+<rect x="72" y="262" width="104.5" height="26" rx="2" fill="#d6ecd0"/>
+<text x="124.8" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mooring deck</text>
+<rect x="177" y="262" width="118.0" height="26" rx="2" fill="#cfe3f0"/>
+<text x="236.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Splash Academy</text>
+<rect x="295" y="262" width="145" height="26" rx="2" fill="#cfe3f0"/>
+<text x="367.5" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Entourage</text>
+<rect x="620" y="262" width="100" height="26" rx="2" fill="#cfe3f0"/>
+<text x="670.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Magnum's</text>
+<rect x="720" y="262" width="100" height="26" rx="2" fill="#cfe3f0"/>
+<text x="770.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Art Gallery</text>
+<rect x="820" y="262" width="110" height="26" rx="2" fill="#cfe3f0"/>
+<text x="875.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Sun Club Casino</text>
+<rect x="930" y="262" width="70" height="26" rx="2" fill="#cfe3f0"/>
+<text x="965.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Tradewinds</text>
+<rect x="1000" y="262" width="40" height="26" rx="2" fill="#cfe3f0"/>
+<text x="1020.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Arcade</text>
+<rect x="1080" y="262" width="260" height="26" rx="2" fill="#cfe3f0"/>
+<text x="1210.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Stardust Lounge balcony</text>
+<rect x="170" y="292" width="220" height="26" rx="2" fill="#ececec"/>
+<text x="280.0" y="309.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="390" y="292" width="50" height="26" rx="2" fill="#cfe3f0"/>
+<text x="415.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Internet Café</text>
+<rect x="620" y="292" width="70" height="26" rx="2" fill="#cfe3f0"/>
+<text x="655.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Bliss Ultra Lounge</text>
+<rect x="690" y="292" width="60" height="26" rx="2" fill="#cfe3f0"/>
+<text x="720.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Gift Shops, Perspectives Photo Studio</text>
+<rect x="750" y="292" width="70" height="26" rx="2" fill="#cfe3f0"/>
+<text x="785.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Windjammer Bar</text>
+<rect x="820" y="292" width="50" height="26" rx="2" fill="#cfe3f0"/>
+<text x="845.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Photo Gallery</text>
+<rect x="870" y="292" width="170" height="26" rx="2" fill="#cfe3f0"/>
+<text x="955.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Library</text>
+<rect x="1080" y="292" width="265" height="26" rx="2" fill="#cfe3f0"/>
+<text x="1212.5" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Stardust Lounge theatre</text>
 <rect x="170" y="322" width="270" height="26" rx="2" fill="#ececec"/>
 <text x="305.0" y="339.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="322" width="200" height="26" rx="2" fill="#cfe3f0"/>
 <text x="720.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Shore excursions, reservations</text>
-<rect x="820" y="322" width="220" height="26" rx="2" fill="#cfe3f0"/>
-<text x="930.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">La Cucina, Four Seasons, Guest Services</text>
-<rect x="1095" y="322" width="250" height="26" rx="2" fill="#cfe3f0"/>
-<text x="1220.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Seven Seas dining</text>
+<rect x="820" y="322" width="90" height="26" rx="2" fill="#cfe3f0"/>
+<text x="865.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">La Cucina</text>
+<rect x="910" y="322" width="130" height="26" rx="2" fill="#cfe3f0"/>
+<text x="975.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Four Seasons</text>
+<rect x="1080" y="322" width="265" height="26" rx="2" fill="#cfe3f0"/>
+<text x="1212.5" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Seven Seas</text>
 <rect x="170" y="352" width="200" height="26" rx="2" fill="#ececec"/>
 <text x="270.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="370" y="352" width="70" height="26" rx="2" fill="#ffe08a"/>
@@ -115,6 +131,8 @@
 <text x="830.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="352" width="265" height="26" rx="2" fill="#ececec"/>
 <text x="1212.5" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
+<text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
 <rect x="480" y="202" width="100" height="146" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
 <text x="530.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Atrium</text>
 <text x="530.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Café</text>

@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
-                         OUR_CABIN, PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, LINEN_ROOM, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -63,7 +63,7 @@ ROOM_LOOK = {
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7, 8}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7, 8, 9}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -350,10 +350,11 @@ def build_layers():
 # The ship's white wall where a deck's indoors end at an open stretch of deck, as at every deck's
 # end, END_WALL_M thick, a deck door through it implied: she passes behind it (the user,
 # 2026-11-03, deck 7's front to the mooring deck; 2026-11-06, deck 8's small terraces at its ends,
-# past the deck above). The other decks' terraces (deck 9 fore and aft, deck 10 aft) get theirs as
-# each deck is furnished (the user, 2026-11-06); deck 11's open ends are the pool deck's own.
+# past the deck above; decks 9 and 10, the same). Deck 11's open ends are the pool deck's own.
+# Behind the aft ones the deck's own small terrace is outdoors with no way in but the wall's: the
+# ship's side stays closed while she is on it, as on deck 7's stern strip (the user, 2026-11-06).
 END_WALL_M = 2.0
-END_WALL_DECKS = (8,)
+END_WALL_DECKS = (8, 9, 10)
 TERRACE_MIN_M = 1.0            # an open strip shorter than this is no terrace (the extents' rounding)
 
 
@@ -375,6 +376,14 @@ def end_walls():
 
 def in_end_wall(deck, c):
     return any(d == deck and a <= c < b for d, a, b in end_walls())
+
+
+def on_stern_terrace(deck, c):
+    """Past an aft end wall (decks 8-10), or on deck 7's stern strip: out of sight behind the stern
+    plating at all times, its floor's edge too (the user, 2026-11-06)."""
+    if deck == 7:
+        return bool(STERN_STRIP_7) and c * TILE >= STERN_STRIP_7[0]
+    return any(d == deck and d != 7 and metres(b) > sum(EXTENT[d]) / 2 and c >= b for d, a, b in end_walls())
 
 
 # Deck 7's stern strip, outside its solid wall (x from, x to): set as the solid layer is built; the
@@ -404,7 +413,7 @@ def build_exterior():
             if indoor(deck, m) or fixed:
                 for r in range(floor - DECK_ROWS + 1, floor):
                     ext[r][c] = EXT_FIXED if fixed else EXT
-            ext[floor][c] = EXT_FIXED_SLAB if fixed else EXT_SLAB
+            ext[floor][c] = EXT_FIXED_SLAB if fixed or on_stern_terrace(deck, c) else EXT_SLAB
         # (The cut's edges are shaded by the game now, a soft shadow inside the opening.)
         # (No rounded corner tiles, nor a line along each deck's floor: the user, 2026-11-03; they
         # read as stray marks on the plating.)
@@ -628,8 +637,14 @@ def build_objects():
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
+    # Nor are the aft terraces behind the end walls (decks 8-10): she is hidden behind the ship's side.
     x0, x1 = STERN_STRIP_7
-    add(area("stern-strip-7", "outdoors", x0, floor_y(7), x1 - x0, 0))
+    add(area("stern-strip-7", "outdoors", x0, floor_y(7), x1 - x0, 0, [prop("deck", 7, "int")]))
+    for deck, wa, wb in end_walls():
+        if deck != 7 and metres(wb) > (EXTENT[deck][0] + EXTENT[deck][1]) / 2:
+            x1 = col(EXTENT[deck][1]) * TILE
+            add(area(f"stern-terrace-{deck}", "outdoors", wb * TILE, floor_y(deck), x1 - wb * TILE, 0,
+                     [prop("deck", deck, "int")]))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline
@@ -718,6 +733,11 @@ def build_objects():
                               [prop("number", OUR_CABIN["number"], "int")]))
                     # ?at=cabin: inside, where she comes in through its door.
                     add(point("cabin", "place", xs[i] + 17, floor_y(deck), [prop("route", "cabin")]))
+                # The linen room's crew door, held open, in a cabin door's place (LINEN_ROOM).
+                if deck == LINEN_ROOM["deck"] and c0 * TILE < x_of(LINEN_ROOM["m"]) < c1 * TILE:
+                    i = min(range(len(xs)), key=lambda i: abs(xs[i] + 17 - x_of(LINEN_ROOM["m"])))
+                    add(point("linen-room", "linen", xs[i] + 17, floor_y(deck)))
+                    add(point("linen", "place", xs[i] + 17, floor_y(deck), [prop("route", "linen")]))
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
                     prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + len(xs) - 1, "int"),
                     prop("coreBefore", in_core(metres(c0 - 1)), "bool"), prop("coreAfter", in_core(metres(c1)), "bool")]))
@@ -729,10 +749,10 @@ def build_objects():
     # when the ship is split into unlockable areas. Until then she always starts again at the
     # gangway. The last placements are in GAME_DESIGN.md §8.
 
-    # Bumbot at his five spots (§4): what he is doing, and which way he runs.
+    # Bumbot at his five spots (§4): what he is doing, and which way he runs. The fifth, asleep in
+    # the linen room on deck 9, is placed by the game with the room.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 30, "bat", -1),
-                                            ("linen", 9, 112, "asleep", 1)]:
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 30, "bat", -1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
 
@@ -820,11 +840,11 @@ def build_objects():
     put(4, 66.6, "hose-cabinet-bg", 18)
     put(4, 68.7, "plant-bg")
     put(4, 70.1, "extinguisher-bg", 14)
-    # A framed picture in each stair and elevator lobby, left of its stairs; on deck 8 the deck's
-    # directory board hangs there instead (the user's photo).
+    # A framed picture in each stair and elevator lobby, left of its stairs; on decks 8 and 9 the
+    # deck's directory board hangs there instead (the user's photo of deck 8; deck 9 is like it).
     for core, (a, _) in CORES.items():
         for deck in PLAYABLE:
-            if deck != 8:
+            if deck not in (8, 9):
                 put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
@@ -1095,18 +1115,22 @@ def build_objects():
     for a, b in ((110, 150), (150, 194)):
         decor(f"downlights-7-{a}", "downlights", x_of(a), x_of(b), deck=7)
 
-    # Deck 8, cabins fore and aft and the atrium between (NCL's plan; the user's photos, 2026-11-06).
+    # Decks 8 and 9, cabins fore and aft and the atrium between (NCL's plan; the user's photos of deck
+    # 8, 2026-11-06; deck 9 is like it, the user remembers).
     # The lobbies: the deck's directory board, blue in a brass frame, and an exit sign over the stairs.
-    for core, (a, _) in CORES.items():
-        x = col(a) * TILE + 30
-        add(area(f"directory-8-{core}", "decor", x - 13, floor_y(8), 26, 0, [prop("kind", "directory")]))
-        put(8, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
-    # The atrium's walk on deck 8: downlights and a warm cove along its ceiling, and paintings on its
-    # cream walls, clear of the pillars, the staircase and the glass elevator.
-    decor("downlights-8-atrium", "downlights", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=8)
-    decor("cove-8-atrium", "cove", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=8)
+    for deck in (8, 9):
+        for core, (a, _) in CORES.items():
+            x = col(a) * TILE + 30
+            add(area(f"directory-{deck}-{core}", "decor", x - 13, floor_y(deck), 26, 0, [prop("kind", "directory")]))
+            put(deck, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
+        # The atrium's walk: downlights and a warm cove along its ceiling, and paintings on its cream
+        # walls, clear of the pillars, the staircase and the glass elevator.
+        decor(f"downlights-{deck}-atrium", "downlights", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=deck)
+        decor(f"cove-{deck}-atrium", "cove", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=deck)
     for m, painting in ((83.6, "painting-harbour-bg"), (99.0, "painting-sea-bg"), (100.6, "painting-blue-bg")):
         put(8, m, painting, 50)
+    for m, painting in ((83.6, "painting-ship-bg"), (99.0, "painting-flowers-bg"), (100.6, "painting-abstract-bg")):
+        put(9, m, painting, 50)
     # Cabin 8206, the user's own (OUR_CABIN): its open door is placed with the corridor's doors.
 
     # A robot vacuum patrolling the deck 4 cabin corridor.

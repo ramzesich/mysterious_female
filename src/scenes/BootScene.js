@@ -15,6 +15,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
         this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
+        this.load.image('linen-room', 'assets/ship/linen-room.png');
+        this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });

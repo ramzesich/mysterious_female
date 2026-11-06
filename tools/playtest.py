@@ -33,7 +33,7 @@ OUT = Path(tempfile.gettempdir()) / "bumbusik-playtest"
 KEYS = {
     "left": (37, "ArrowLeft", "ArrowLeft"), "right": (39, "ArrowRight", "ArrowRight"),
     "up": (38, "ArrowUp", "ArrowUp"), "down": (40, "ArrowDown", "ArrowDown"),
-    "space": (32, "Space", " "), "shift": (16, "ShiftLeft", "Shift"),
+    "space": (32, "Space", " "), "d": (68, "KeyD", "d"),
     "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"),
 }
 
@@ -571,6 +571,38 @@ def scenario_cabin(b):
     return ok
 
 
+def scenario_linen(b):
+    # The linen room on deck 9 (§4): E at its crew door takes her in; Bumbot sleeps there and gets
+    # away into the vent; E again takes her back out, and he is gone.
+    route = lambda: b.eval("window.__ship.route")
+    cat = "window.__ship.cats.find(c => c.name === 'bumbot-linen')"
+    b.open("?reset&play&at=linen")
+    door = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
+    b.eval("window.__ship.route = 'inside'")
+    b.teleport(door + 6, floor_y(9))
+    ok = check(not b.eval(f"{cat}.sprite.visible"), "from the corridor Bumbot is out of sight")
+    b.tap("e")
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(route() == "linen" and s["x"] == door and b.eval(f"{cat}.sprite.visible"),
+                "E at the crew door takes her in, Bumbot asleep inside", (route(), s))
+    b.shot("linen-inside")
+    b.key("right", True)
+    b.wait_for("window.__ship.mode === 'scripted'", timeout=5)
+    b.key("right", False)
+    b.wait_for("window.__ship.mode === 'play'", timeout=6)
+    ok &= check(b.eval(f"{cat}.away") and not b.eval(f"{cat}.sprite.visible"), "getting close, he gets away into the vent")
+    b.hold(["left"], 2.0)
+    s = b.state()
+    ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(9), "the room's near wall holds her", s)
+    b.teleport(door, floor_y(9))
+    b.eval("window.__ship.route = 'linen'")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(route() == "inside", "E at the door takes her back out", route())
+    return ok
+
+
 def scenario_balcony(b):
     # The Stardust Lounge's balcony (deck 7) ends in a railing over the stage: she can hop it and
     # drop one deck onto the stage, no scare (§5.3).
@@ -677,11 +709,11 @@ def scenario_dash(b):
     s = b.state()
     ok = check(s["tangerines"] == 1, "picks up a tangerine", s)
     b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(228)}; window.__ship.vacuums[0].speed = 0")
-    b.tap("shift")
+    b.tap("d")
     time.sleep(0.2)
     b.shot("dash-shout")
     s = b.state()
-    ok &= check(s["dashing"] and s["tangerines"] == 0, "Shift spends it on a dash", s)
+    ok &= check(s["dashing"] and s["tangerines"] == 0, "D spends it on a dash", s)
     # Dash forward along deck 4, through the crates and into the vacuum.
     b.hold("left", 2.5)
     s = b.state()

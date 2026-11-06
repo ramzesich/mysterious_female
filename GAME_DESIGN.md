@@ -142,7 +142,7 @@ Reference photos never enter the repo.
 | Run | ← / → | Left stick / D-pad |
 | Jump (hold for full height, tap for a hop) | Space | A |
 | Climb ladders | ↑ / ↓ | Left stick / D-pad up/down |
-| Кісюнічка dash (§3.2) | Shift | B |
+| Кісюнічка dash (§3.2) | D (Shift until 2026-11-06) | B |
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
 
 Activate has its own key rather than ↑, so standing at a ladder next to a door is never ambiguous.
@@ -190,7 +190,7 @@ it is her battle cry here.
 
   | Spot | What he is doing |
   |---|---|
-  | Housekeeping linen room (a cabin deck) | Asleep in the warm towels |
+  | Housekeeping linen room (a cabin deck) | Asleep in the warm towels; gets away into a vent (deck 9, a room off the corridor) |
   | Theatre stage | Washing himself under a spotlight |
   | Buffet | Eyeing a fish |
   | Pool deck | Catching a fly over a sunbed |
@@ -905,8 +905,9 @@ Nothing blocks the start of the build. These get settled along the way:
       (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
       forward, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's deck 8 plan, kept in
       `reference/web/deck8/`). Its door stands open with a brass "8206" and the steward's linen
-      cart; **E at it and she is inside** (a third route, like the promenade's): the ship's side
-      closes round the cabin, cut away only there, the room drawn by hand from her photo
+      cart; **E at it and she is inside** (a third route, like the promenade's): the room, drawn by hand
+      from her photo, shows where the corridor was, the deck around it dimmed almost to black (the
+      user, 2026-11-06, as deck 9's linen room; it was first shown in a hole cut in the ship's side)
       (`tools/draw_cabin.py`: mirrored wardrobe, the door back out, the wood desk unit, TV and
       pouf, the window in its wood surround with grey curtains, the grey sofa with teal cushions,
       the painting over it, the bed with its teal runner). The user's corrections: the door stands
@@ -941,11 +942,31 @@ Nothing blocks the start of the build. These get settled along the way:
       (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
       blue directory board and an exit sign over the stairs. The atrium's walk on deck 8:
       downlights, a warm cove light, paintings. 7 generations (the painting, two tries at the bounce)
-- [ ] **Start the next session here: furnish deck 9**, then upward deck by deck (decks 4-8 are
-      done, 2026-11-06). For deck 9: its terraces fore (1.6 m) and aft (2.3 m) get the ship's wall
-      before them, as deck 8's have (`END_WALL_DECKS` in the map builder; deck 10's aft one when
-      deck 10 comes). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do (deck 8's
-      is kept in `reference/web/deck8/`). The way each deck went: read NCL's plan for it
+- [x] **Deck 9 furnished** (2026-11-06): NCL's plan and cruisedeckplans.com's (kept in
+      `reference/web/deck9/`) have only cabins and the atrium's top there; no photos, the user
+      remembers it **like deck 8**, so it is built the same way: the lobbies' directory boards and
+      exit signs, the atrium walk's downlights, cove and paintings, the ship's wall before both
+      terraces. No extras (terrace furniture, a penthouse door, corridor details: offered, left out
+      for now). Deck 9's aft cabins start where the lobby ends (a cabin door had stood behind the
+      elevator). **The linen room is a room she can enter** (the user): a white crew door held
+      open off the corridor (`LINEN_ROOM` in `tools/ship_layout.py`) with a "LINEN" plate; E and she
+      is inside (`tools/draw_linen.py`, drawn by hand, no generations): pale painted steel, a
+      fluorescent tube, grey-green vinyl, a laundry cart, a clipboard, chrome racks of folded
+      towels, bath mats, sheets, pillows, toilet rolls and toiletries; **Bumbot asleep on a heap of
+      fresh towels** on the floor, who leaps away **into a low vent, its grille hanging open** (§4).
+      **A room she enters shows in the corridor's place, the deck around it dimmed almost to
+      black** (`ROOM_DIM`; the user chose this over a hole in the hull or a scene of its own, and
+      cabin 8206 changed to match). **The aft terraces of decks 8-10 and deck 7's stern strip**
+      (the user): the ship's side stays closed while she is on them, and the sloped stern plating
+      and the floor's edge stay drawn at all times, deck cut open or not: she is always hidden
+      behind them. Deck 10's aft terrace got its wall now too. Also (the user): **sound is off for
+      now** (`SOUND.on` in `src/config.js`; `?sound` turns it on), and **the dash is D** (was
+      Shift). `?at=linen` starts in the linen room; a `linen` playtest
+- [ ] **Start the next session here: furnish deck 10**, then upward deck by deck (decks 4-9 are
+      done, 2026-11-06). Deck 10 has the bridge forward (Bumbot's spot) and cabins; its aft terrace
+      already has its wall. NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
+      (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
+      and 9 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
