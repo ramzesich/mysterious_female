@@ -942,7 +942,10 @@ Nothing blocks the start of the build. These get settled along the way:
       blue directory board and an exit sign over the stairs. The atrium's walk on deck 8:
       downlights, a warm cove light, paintings. 7 generations (the painting, two tries at the bounce)
 - [ ] **Start the next session here: furnish deck 9**, then upward deck by deck (decks 4-8 are
-      done, 2026-11-06). The way each deck went: read NCL's plan for it
+      done, 2026-11-06). For deck 9: its terraces fore (1.6 m) and aft (2.3 m) get the ship's wall
+      before them, as deck 8's have (`END_WALL_DECKS` in the map builder; deck 10's aft one when
+      deck 10 comes). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do (deck 8's
+      is kept in `reference/web/deck8/`). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
@@ -954,6 +957,9 @@ Nothing blocks the start of the build. These get settled along the way:
       character art: later
 - [ ] **Later: move and enlarge the sun emblem on the bow** (the user, 2026-11-03), now that the
       bow is longer
+- [ ] **Open: the `stairs` playtest is flaky** ("with every card she climbs on past deck 6" fails
+      now and then, on `main` before deck 8 too): a timing margin in the test, not the game; fix
+      when convenient
 - [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
       corridors run along the sides, the middle above the atrium being the atrium and its dome
       (§5.3); in the game deck 10's corridor runs straight over it

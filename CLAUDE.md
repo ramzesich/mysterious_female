@@ -83,7 +83,17 @@ Lessons learned (2026-10-31):
   again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
 - **Every game link given to the user includes `&tangerines=infinite`** while we develop, e.g.
-  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish).
+  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish). **Whenever you
+  ask the user to try or check something, give the link**, starting as near the spot as `?at=`
+  allows, and say where to walk from there.
+- **After each change, show the result and stop for the user's review** (screenshots in the chat,
+  plus the link when there's something to try). Don't carry on into test runs, commits or the next
+  change before they answer (the user, 2026-11-06: iterations were too slow, and twice I went on
+  without asking). Don't run the whole `tools/playtest.py` suite after cosmetic tweaks; run it once
+  a round is approved if gameplay or layout changed (map builder, physics, routes, triggers), and
+  always before a merge. Commit and update `GAME_DESIGN.md` once per approved round.
+- Do only what was asked: when a request could reach further (another deck, a layout change),
+  ask first rather than assume (the user, 2026-11-06).
 - The user circles things on screenshots and numbers them; fix each, show the result as
   screenshots in the chat, and say plainly what changed.
 - **To approve a piece of art, show the user the image in the chat** (a preview or screenshot) and
