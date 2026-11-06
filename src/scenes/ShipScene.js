@@ -178,15 +178,21 @@ export class ShipScene extends Phaser.Scene {
         this.solidLayer.setCollisionByExclusion([-1]);
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
         // where an open deck ends stays solid but is drawn with the same railing as the decks'
-        // sides (white rails, a wooden handrail), one piece standing on its foot.
+        // sides (white rails, a wooden handrail), one piece standing on its foot. Where the ship's
+        // side slopes away under it, it leans out at the same angle, carrying the slope on up (the
+        // user, 2026-11-06).
+        const slopesBelow = JSON.parse(props.shellSlopes || '[]');
         const railings = [];
         this.solidLayer.forEachTile(t => {
             if (t.index === LADDER_TOP) t.setCollision(false, false, true, false);
             if (t.index !== RAILING) return;
             t.setAlpha(0);
             if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
-            railings.push(this.add.image(t.pixelX + t.width / 2, t.pixelY + t.height, 'shipart', 'railing-bg')
-                .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            const x = t.pixelX + t.width / 2, deck = this.deckOfRow(t.y);
+            const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
+            const img = s ? this.leaningRailing(x, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), s.x0 < s.x1 ? -1 : 1)
+                : this.add.image(x, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
+            railings.push(img.setDepth(DEPTH.decor + 0.1));
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
@@ -379,9 +385,10 @@ export class ShipScene extends Phaser.Scene {
                     this.buildCabin(o, prop);
                     break;
 
-                case 'bowdoor': {
-                    // Deck 7's front wall (§5.3): drawn over her as she passes straight through it to
-                    // the mooring deck, as if through a door hidden in it (the user, 2026-11-03).
+                case 'endwall': {
+                    // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
+                    // drawn over her as she passes straight through it, as if through a door hidden
+                    // in it (the user: deck 7's front, 2026-11-03; deck 8's ends, 2026-11-06).
                     const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
                     wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
                     this.worldLayer.add(wall);
@@ -424,7 +431,9 @@ export class ShipScene extends Phaser.Scene {
     buildPromenade(o, prop) {
         const list = name => String(prop(o, name, '')).split(',').filter(Boolean);
         const floor = prop(o, 'floor', 0);
-        const top7 = floor - this.deckPitch;        // deck 7's floor, where the boats hang
+        const top7 = floor - this.deckPitch;        // deck 7's floor
+        // The davits hang from deck 7's ceiling, the underside of deck 8's floor (the user, 2026-11-06).
+        const hang = top7 - this.deckPitch + 16;
         const pr = this.promenade = {
             x0: o.x, x1: o.x + o.width, floor,
             doors: list('doors').map(Number),
@@ -492,17 +501,17 @@ export class ShipScene extends Phaser.Scene {
         // White columns from the deck up past deck 7's floor, holding the davits; each boat hangs
         // from two davit arms on its cables.
         for (const x of columns) {
-            columnsGfx.fillStyle(0xffffff, 1).fillRect(x - 5, top7 - 142, 10, floor - top7 + 142);
-            columnsGfx.fillStyle(0xc7dcd0, 1).fillRect(x + 2, top7 - 142, 3, floor - top7 + 142);
+            columnsGfx.fillStyle(0xffffff, 1).fillRect(x - 5, hang, 10, floor - hang);
+            columnsGfx.fillStyle(0xc7dcd0, 1).fillRect(x + 2, hang, 3, floor - hang);
             columnsGfx.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
         for (const x of boats) {
             for (const [hook, column] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300)], [x + 268, columns.find(c => c > x + 268)]]) {
-                high.fillStyle(0xffffff, 1).fillRect(Math.min(hook, column) - 3, top7 - 142, Math.abs(hook - column) + 6, 6);
-                high.fillStyle(0xc7dcd0, 1).fillRect(Math.min(hook, column) - 3, top7 - 137, Math.abs(hook - column) + 6, 1);
-                high.fillStyle(0x3e3546, 1).fillRect(hook, top7 - 136, 1, 32);
+                high.fillStyle(0xffffff, 1).fillRect(Math.min(hook, column) - 3, hang, Math.abs(hook - column) + 6, 6);
+                high.fillStyle(0xc7dcd0, 1).fillRect(Math.min(hook, column) - 3, hang + 5, Math.abs(hook - column) + 6, 1);
+                high.fillStyle(0x3e3546, 1).fillRect(hook, hang + 6, 1, 32);
             }
-            const boat = this.add.image(x, top7 - 118, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+            const boat = this.add.image(x, hang + 24, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
@@ -517,6 +526,27 @@ export class ShipScene extends Phaser.Scene {
         this.physics.add.existing(zone, true);
         zone.route = route;
         (this.routeWalls ||= []).push(zone);
+    }
+
+    // The railing, leaning out, its foot at (x, y): each row up from its foot shifted `k` px per px
+    // of height toward `dir` (-1 forward, 1 aft). Its texture is made once per slope.
+    leaningRailing(x, y, k, dir) {
+        const key = `railing-lean-${dir}-${k.toFixed(2)}`;
+        const frame = this.textures.getFrame('shipart', 'railing-bg');
+        const { width: w, height: h } = frame;
+        const lean = Math.ceil(k * (h - 1));
+        if (!this.textures.exists(key)) {
+            const canvas = this.textures.createCanvas(key, w + lean, h);
+            const ctx = canvas.getContext();
+            for (let row = 0; row < h; row++) {
+                const shift = Math.round(k * (h - 1 - row));
+                ctx.drawImage(frame.source.image, frame.cutX, frame.cutY + row, w, 1, dir < 0 ? lean - shift : shift, row, w, 1);
+            }
+            canvas.refresh();
+        }
+        // The foot's middle is w/2 in from the foot's own side of the texture.
+        const footX = dir < 0 ? lean + w / 2 : w / 2;
+        return this.add.image(x, y, key).setOrigin(footX / (w + lean), 1);
     }
 
     // --- Cabin 8206 (§5.3) --------------------------------------------------------------------

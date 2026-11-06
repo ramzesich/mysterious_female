@@ -340,20 +340,23 @@ def build_layers():
     return back, solid, ladders, build_exterior()
 
 
-# Deck 7's front wall, between the mooring deck and the youth club: the ship's white wall, as at
-# every deck's end, with a deck door through it (the user, 2026-11-03).
-BOW_WALL_M = 2.0
+# The ship's white wall where a deck's indoors end at an open stretch of deck, as at every deck's
+# end, END_WALL_M thick, a deck door through it implied: she passes behind it (the user,
+# 2026-11-03, deck 7's front to the mooring deck; 2026-11-06, deck 8's ends to its terraces).
+END_WALL_M = 2.0
 
 
-def bow_wall_cols():
-    """The columns of deck 7's front wall: from the mooring deck's end, BOW_WALL_M thick."""
-    a = col(EXTENT[8][0])
-    return a, a + round(BOW_WALL_M * PER_M)
+def end_walls():
+    """(deck, first column, last column + 1) of each end wall, on the indoor side of the edge."""
+    w = round(END_WALL_M * PER_M)
+    a7 = col(EXTENT[8][0])
+    under9 = [c for c in range(col(EXTENT[8][0]), col(EXTENT[8][1])) if covered(8, metres(c))]
+    a8, b8 = under9[0], under9[-1] + 1
+    return [(7, a7, a7 + w), (8, a8, a8 + w), (8, b8 - w, b8)]
 
 
-def in_bow_wall(deck, c):
-    a, b = bow_wall_cols()
-    return deck == 7 and a <= c < b
+def in_end_wall(deck, c):
+    return any(d == deck and a <= c < b for d, a, b in end_walls())
 
 
 def stage_end_col():
@@ -374,7 +377,7 @@ def build_exterior():
         for c in range(c0, c1 + 1):
             m = metres(c)
             shell = c in (c0, c1) and covered(deck, metres(c + (1 if c == c0 else -1)))
-            fixed = deck == 3 or shell or in_structure(deck, c) or in_bow_wall(deck, c)
+            fixed = deck == 3 or shell or in_structure(deck, c) or in_end_wall(deck, c)
             if indoor(deck, m) or fixed:
                 for r in range(floor - DECK_ROWS + 1, floor):
                     ext[r][c] = EXT_FIXED if fixed else EXT
@@ -670,7 +673,8 @@ def build_objects():
     for deck, a, b, name, kind in VENUES:
         if kind == "cabins":
             # Only under a ceiling: where the deck above ends, the corridor is an open terrace.
-            cols = [c for c in range(col(a), col(b)) if covered(deck, metres(c)) and not in_structure(deck, c)]
+            cols = [c for c in range(col(a), col(b))
+                    if covered(deck, metres(c)) and not in_structure(deck, c) and not in_end_wall(deck, c)]
             runs = []
             for c in cols:
                 if runs and runs[-1][1] == c:
@@ -769,7 +773,7 @@ def build_objects():
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
     rail_w = width("railing-bg")
-    for x in range(col(BOW["stem"][7]) * TILE + 30, bow_wall_cols()[0] * TILE + rail_w // 2, rail_w):
+    for x in range(col(BOW["stem"][7]) * TILE + 30, end_walls()[0][1] * TILE + rail_w // 2, rail_w):
         put(7, 0, "railing-bg", x=x)
     # The bow view (§5.3): standing still on the mooring deck, she goes to the tip and spreads her
     # arms, and the camera draws back to frame the whole bow, from above the forecastle down to
@@ -960,9 +964,9 @@ def build_objects():
     def plaque(name, m, text):
         add(point(name, "sign", exact_x(m), floor_y(7) - 100, [prop("text", text), prop("style", "plaque")]))
 
-    # The door through deck 7's front wall to the mooring deck: it opens as she comes to it.
-    wa, wb = bow_wall_cols()
-    add(area("bow-door", "bowdoor", wa * TILE, floor_y(7), (wb - wa) * TILE, 0))
+    # The end walls she passes behind: deck 7's front, to the mooring deck; deck 8's two ends.
+    for deck, wa, wb in end_walls():
+        add(area(f"end-wall-{deck}-{wa}", "endwall", wa * TILE, floor_y(deck), (wb - wa) * TILE, 0))
     # Splash Academy: sunny walls, a blue carpet with coloured dots, toys, a play kitchen, low tables.
     plaque("sign-splash", 24.6, "Splash Academy")
     put(7, 24.0, "kids-bookshelf-bg")

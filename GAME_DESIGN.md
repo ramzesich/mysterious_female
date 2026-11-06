@@ -922,7 +922,12 @@ Nothing blocks the start of the build. These get settled along the way:
       kept her feet down, so the hops are the game's, frames and hops run off one clock, a hop on
       each foot every 0.64 s, `BED_JOY` in `src/config.js`). A first try, skeleton-v3's `cheer` with the game hopping her side to side,
       was not what the user meant (kept in `bed-cheer/`). `?at=cabin` starts her inside by its
-      door, where she comes in. Cabins are numbered as on the real
+      door, where she comes in. The user's corrections to the rest of the deck: **deck 8's two
+      terraces** (its ends past deck 9, fore and aft) are reached behind a stretch of the ship's
+      white wall, 2 m thick, as deck 7's mooring deck is (`end_walls()` in the map builder);
+      **railings at a deck's end lean out along the slope of the ship's side under them**, carrying
+      it on up; **the lifeboats hang from deck 7's ceiling**, the underside of deck 8's floor (their
+      davits had hung from deck 8's carpet). Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
       lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
       (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
