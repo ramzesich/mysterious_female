@@ -179,8 +179,8 @@ export class ShipScene extends Phaser.Scene {
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
         // where an open deck ends stays solid but is drawn with the same railing as the decks'
         // sides (white rails, a wooden handrail), one piece standing on its foot. Where the ship's
-        // side slopes away under it, it leans out at the same angle, carrying the slope on up (the
-        // user, 2026-11-06).
+        // side slopes in toward it from below, it leans on in at the same angle, carrying the slope
+        // on up over the deck (the user, 2026-11-06).
         const slopesBelow = JSON.parse(props.shellSlopes || '[]');
         const railings = [];
         this.solidLayer.forEachTile(t => {
@@ -190,7 +190,7 @@ export class ShipScene extends Phaser.Scene {
             if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
             const x = t.pixelX + t.width / 2, deck = this.deckOfRow(t.y);
             const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
-            const img = s ? this.leaningRailing(x, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), s.x0 < s.x1 ? -1 : 1)
+            const img = s ? this.leaningRailing(x, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), s.x0 < s.x1 ? 1 : -1)
                 : this.add.image(x, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
             railings.push(img.setDepth(DEPTH.decor + 0.1));
         });
@@ -528,8 +528,9 @@ export class ShipScene extends Phaser.Scene {
         (this.routeWalls ||= []).push(zone);
     }
 
-    // The railing, leaning out, its foot at (x, y): each row up from its foot shifted `k` px per px
-    // of height toward `dir` (-1 forward, 1 aft). Its texture is made once per slope.
+    // The railing, leaning, its foot at (x, y): each row up from its foot shifted `k` px per px of
+    // height toward `dir` (1 aft, at a deck's forward end; -1 forward, at its aft end). Its texture
+    // is made once per slope.
     leaningRailing(x, y, k, dir) {
         const key = `railing-lean-${dir}-${k.toFixed(2)}`;
         const frame = this.textures.getFrame('shipart', 'railing-bg');
