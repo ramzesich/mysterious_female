@@ -45,16 +45,24 @@
 <text x="967.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Speciality dining, golf nets</text>
 <rect x="1080" y="112" width="155" height="26" rx="2" fill="#cfe3f0"/>
 <text x="1157.5" y="129.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Le Bistro, Los Lobos</text>
-<rect x="215" y="142" width="225" height="26" rx="2" fill="#cfe3f0"/>
-<text x="327.5" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Spa and salon</text>
+<rect x="215" y="142" width="55" height="26" rx="2" fill="#cfe3f0"/>
+<text x="242.5" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Spa reception</text>
+<rect x="270" y="142" width="75" height="26" rx="2" fill="#cfe3f0"/>
+<text x="307.5" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Massage and sauna</text>
+<rect x="345" y="142" width="50" height="26" rx="2" fill="#cfe3f0"/>
+<text x="370.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Salon</text>
+<rect x="395" y="142" width="45" height="26" rx="2" fill="#cfe3f0"/>
+<text x="417.5" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Aerobics</text>
 <rect x="480" y="142" width="100" height="26" rx="2" fill="#cfe3f0"/>
 <text x="530.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Fitness</text>
 <rect x="620" y="142" width="250" height="26" rx="2" fill="#d6ecd0"/>
 <text x="745.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Oasis Pool, Topsiders, hot tubs</text>
 <rect x="870" y="142" width="170" height="26" rx="2" fill="#cfe3f0"/>
 <text x="955.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Garden Café buffet, Ice Cream Bar</text>
-<rect x="1080" y="142" width="210" height="26" rx="2" fill="#f7bdbd"/>
-<text x="1185.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Great Outdoors diner (finale)</text>
+<rect x="1080" y="142" width="40" height="26" rx="2" fill="#cfe3f0"/>
+<text x="1100.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Sports Bar</text>
+<rect x="1120" y="142" width="170" height="26" rx="2" fill="#f7bdbd"/>
+<text x="1205.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Great Outdoors diner (finale)</text>
 <rect x="195" y="172" width="75" height="26" rx="2" fill="#f3d9c9"/>
 <text x="232.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
 <rect x="270" y="172" width="170" height="26" rx="2" fill="#ececec"/>

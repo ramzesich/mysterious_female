@@ -46,8 +46,9 @@ CORES = {"forward": (74, 82), "midship": (102, 110), "aft": (194, 202)}
 # cores, crossed by side walks (§5.3). The profile draws it about 10 m long; the game makes it 20 m,
 # two screens wide, the user's choice (2026-11-02): at 10 m it looked narrow next to its height.
 # Deck 10 is open over it as on the real ship (the user, 2026-11-06; it had cabins over a dome under
-# deck 10); the curving staircase and the glass elevator still run from deck 5 to deck 9 (`lift`).
-ATRIUM = {"span": (82, 102), "decks": (5, 10), "lift": (5, 9)}
+# deck 10). The glass elevator's column runs up to deck 10 with it (the user); the curving staircase
+# still runs from deck 5 to deck 9.
+ATRIUM = {"span": (82, 102), "decks": (5, 10), "lift": (5, 10), "stairs": (5, 9)}
 
 # Deck 6's promenade (§5.3, decided 2026-11-03): outside the rooms, along the ship's side, two
 # decks tall with the lifeboats hanging high over it. Its fore and aft ends are enclosed by a wall
@@ -69,6 +70,10 @@ LINEN_ROOM = {"deck": 9, "m": 112}
 # crew door in it (the user, 2026-11-06); the Captain's card is to lock it later (§6.2).
 BRIDGE_WALL_M = 40
 
+# The spa's wall on deck 11, between it and the forward lobby, a door in it, as the bridge's (the
+# user, 2026-11-06).
+SPA_WALL_M = 74
+
 # The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
 # railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
 STAGE = 244
@@ -86,11 +91,17 @@ VENUES = [
     (12, 165, 194, "Speciality dining, golf nets", "venue"),
     (12, 202, 233, "Le Bistro, Los Lobos", "venue"),
 
-    (11, 29, 74, "Spa and salon", "venue"),
+    # The spa, after NCL's plan (2026-11-06): its reception, the massage and sauna rooms, the salon,
+    # the aerobics studio, opening one into the next.
+    (11, 29, 40, "Spa reception", "venue"),
+    (11, 40, 55, "Massage and sauna", "venue"),
+    (11, 55, 65, "Salon", "venue"),
+    (11, 65, 74, "Aerobics", "venue"),
     (11, 82, 102, "Fitness", "venue"),
     (11, 110, 160, "Oasis Pool, Topsiders, hot tubs (Bumbot: fly)", "outdoor"),
     (11, 160, 194, "Garden Café buffet, Ice Cream Bar (Bumbot: fish)", "venue"),
-    (11, 202, 244, "Great Outdoors diner (finale)", "finale"),
+    (11, 202, 210, "Sports Bar", "venue"),
+    (11, 210, 244, "Great Outdoors diner (finale)", "finale"),
 
     (10, 25, 40, "Bridge (Bumbot: controls)", "crew"),
     (10, 40, 74, "Cabins", "cabins"),

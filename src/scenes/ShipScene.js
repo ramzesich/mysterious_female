@@ -14,7 +14,7 @@ const DEPTH = {
     glassShaft: 5.15, glassCar: 5.2, inGlassCar: 5.25, glassDoors: 5.3,
     frontStairs: 5.4, onFrontStairs: 5.45, frontBalustrade: 5.5, walkFloor: 5.6,
     solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, exterior: 8.6,
-    swimmer: 8.62, poolWater: 8.65, player: 9, fx: 10,
+    poolTank: 8.66, swimmer: 8.67, poolWater: 8.68, player: 9, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -116,9 +116,23 @@ export class ShipScene extends Phaser.Scene {
         // Deck 11's pools' tiles below its floor (out of sight from deck 10).
         this.poolTile = props.poolTile;
         this.poolTiles = [];
+        // The whole tank drawn again over the shell and its windows, its tiled back wall, sides and
+        // floor, so the pools have their floor seen from deck 11 (the user); the water goes over it.
+        this.poolTanks = this.add.graphics().setDepth(DEPTH.poolTank);
+        const floor11 = JSON.parse(props.deckFloors)[11];
         this.solidLayer.forEachTile(t => {
-            if (t.index === props.poolTile && t.y > JSON.parse(props.deckFloors)[11]) this.poolTiles.push(t);
+            if (t.index !== props.poolTile || t.y <= floor11) return;
+            this.poolTiles.push(t);
         });
+        for (const [a, b] of JSON.parse(props.poolSpans || '[]')) {
+            for (let x = a; x < b; x += 8) {
+                for (let y = floor11 * 16 + 4; y < floor11 * 16 + 48; y += 8) {
+                    const edge = x < a + 16 || x >= b - 16 || y >= floor11 * 16 + 32;
+                    this.poolTanks.fillStyle(edge ? 0x8fd3ff : 0x4d9be6, 1).fillRect(x, y, 8, 8);
+                    this.poolTanks.fillStyle(edge ? 0xe3f4fb : 0x8fd3ff, 1).fillRect(x, y, 8, 1).fillRect(x, y, 1, 8);
+                }
+            }
+        }
         this.deckFloors = JSON.parse(props.deckFloors);
         const cut = new Set(String(props.exteriorCut).split(',').map(Number));
         this.shellTiles = {};
@@ -231,7 +245,7 @@ export class ShipScene extends Phaser.Scene {
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
-            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover]);
+            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, this.poolTanks]);
     }
 
     buildObjects() {
@@ -242,6 +256,7 @@ export class ShipScene extends Phaser.Scene {
         this.vacuums = [];
         this.cats = [];
         this.rooms = [];
+        this.bulkheads = [];
         this.places = {};
         this.promenade = null;
         this.route = 'inside';
@@ -417,7 +432,9 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'bulkhead':
-                    this.buildBulkhead(o, prop(o, 'x0', o.x - 600), prop(o, 'text', ''));
+                    this.buildBulkhead(o, prop(o, 'x0', o.x - 600), prop(o, 'key', ''), prop(o, 'text', ''),
+                        prop(o, 'sub', ''), prop(o, 'leaf', 'door-crew'), prop(o, 'colour', '#ae2334'),
+                        { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', '') });
                     break;
 
                 // Outdoors with no way in (deck 7's stern strip, §5.3; the aft terraces behind decks
@@ -426,17 +443,30 @@ export class ShipScene extends Phaser.Scene {
                 case 'outdoors': {
                     // A strip of plating over the wall's edge beside it, there only while she is on
                     // it, so nothing of her shows past the wall.
+                    const end = prop(o, 'end', 'aft');
                     const cover = this.add.graphics().setDepth(DEPTH.player + 0.05).setVisible(false);
-                    cover.fillStyle(0xe8eaec, 1).fillRect(o.x - 16, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
+                    cover.fillStyle(0xe8eaec, 1).fillRect(end === 'aft' ? o.x - 16 : o.x + o.width, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
                     this.worldLayer.add(cover);
                     (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
                     // The sloped stern plating over it is drawn in front of her, and stays there at
                     // all times, the deck cut open or not: she is always hidden behind it (the user).
                     const deck = prop(o, 'deck', 7);
-                    this.shellSlopes.filter(s => s.deck === deck && s.end === 'aft').forEach(s => {
+                    this.shellSlopes.filter(s => s.deck === deck && s.end === end).forEach(s => {
                         s.gfx.setDepth(DEPTH.player + 0.05);
                         s.always = true;
                     });
+                    break;
+                }
+
+                case 'bulwark': {
+                    // An open deck's white bulwark and glass windscreen, in front of her (deck 11's
+                    // front, the user): she is hidden behind the white and seen through the glass.
+                    const g = this.add.graphics().setDepth(DEPTH.player + 0.04);
+                    g.fillStyle(0xbfe6f5, 0.45).fillRect(o.x, o.y - 48, o.width, 24);
+                    g.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - 24, o.width, 24);
+                    g.fillStyle(0xcd683d, 1).fillRect(o.x, o.y - 50, o.width, 2);
+                    for (let x = o.x; x < o.x + o.width; x += 48) g.fillStyle(0xe8eaec, 1).fillRect(x, o.y - 50, 2, 26);
+                    this.worldLayer.add(g);
                     break;
                 }
 
@@ -453,6 +483,10 @@ export class ShipScene extends Phaser.Scene {
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'bridgewindows') this.drawBridgeWindows(decorGfx, o);
+                    if (prop(o, 'kind') === 'chess') this.drawChess(decorGfx, o);
+                    if (prop(o, 'kind') === 'canopy') this.drawCanopy(o);
+                    if (prop(o, 'kind') === 'sauna') this.drawSauna(decorGfx, o);
+                    if (prop(o, 'kind') === 'showerbox') this.drawShowerBox(o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
                     if (prop(o, 'kind') === 'portico') this.drawPortico(decorGfx, o, prop(o, 'text', ''));
@@ -680,68 +714,97 @@ export class ShipScene extends Phaser.Scene {
             { route: 'linen', lift: LINEN.heap[1] - 1, exitX: x0 + LINEN.vent[0] + 6 });
     }
 
-    // --- The bridge's door (§5.3) -------------------------------------------------------------
-    // A steel wall across deck 10 at the bridge's back, its crew door seen from the side: shut, a
-    // slab in the doorway; E opens it, swung flat against the wall on the bridge side, seen face on.
-    // The bridge has its own piece of the ship's side: from the corridor it is out of sight, and on
-    // the bridge only it is cut open (the user, 2026-11-06). The door shuts once she is away.
+    // --- Walls across a deck, with a door (§5.3) -----------------------------------------------
+    // A wall across the deck, its door seen from the side: shut, a slab in the doorway; E opens it,
+    // swung flat against the wall, seen face on. The door shuts once she is away. At the back of a
+    // part of the deck with its own piece of the ship's side (the bridge on deck 10, the spa on
+    // deck 11: `key`), from outside it is out of sight and inside it only it is cut open (the user,
+    // 2026-11-06). The sauna's two ends are such walls too, cedar, with glass doors.
 
-    buildBulkhead(o, x0, text) {
-        const x = o.x, floor = o.y, w = BULKHEAD.width;
+    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '' } = {}) {
+        const x = o.x, floor = o.y, w = width;
         const ceiling = floor - this.deckPitch + 16;
         const head = floor - DOOR.height - 2;
+        const glass = leaf === 'glass';
         const g = this.add.graphics().setDepth(DEPTH.props);
-        g.fillStyle(0x9babb2, 1).fillRect(x - w / 2, ceiling, w, head - ceiling);
-        g.fillStyle(0xc7dcd0, 1).fillRect(x - w / 2 + 2, ceiling, 2, head - ceiling);
-        g.fillStyle(0x625565, 1).fillRect(x - w / 2, head, w, 2);
-        // Shut: the door edge on, white steel, its lever sticking out on each side.
+        const tone = wall ? Phaser.Display.Color.HexStringToColor(wall).color : 0x9babb2;
+        g.fillStyle(tone, 1).fillRect(x - w / 2, ceiling, w, head - ceiling);
+        if (!wall) g.fillStyle(0xc7dcd0, 1).fillRect(x - w / 2 + 2, ceiling, 2, head - ceiling);
+        g.fillStyle(wall ? 0x46291f : 0x625565, 1).fillRect(x - w / 2, head, w, 2);
+        // Shut: the door edge on, its handle sticking out on each side: white steel, or glass.
         const shut = this.add.graphics().setDepth(DEPTH.props);
-        shut.fillStyle(0x9babb2, 1).fillRect(x - 3, head + 2, 6, floor - head - 2);
-        shut.fillStyle(0xffffff, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
-        shut.fillStyle(0x625565, 1).fillRect(x - 7, floor - 36, 14, 2);
-        // Open: swung back against the wall on the bridge side, seen face on.
-        const open = this.add.image(x - w / 2, floor, 'shipart', 'door-crew').setOrigin(1, 1).setDepth(DEPTH.decor + 0.2).setVisible(false);
-        // Its sign on the corridor side.
-        const plate = this.add.text(x + w / 2 + 6, floor - 52, text + '\nCREW ONLY', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#ffffff', align: 'center',
-            backgroundColor: '#ae2334', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
-        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        if (glass) {
+            shut.fillStyle(0x7a4528, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
+            shut.fillStyle(0xbfe6f5, 1).fillRect(x - 1, head + 4, 2, floor - head - 8);
+            shut.fillStyle(0x7a4528, 1).fillRect(x - 5, floor - 36, 10, 3);
+        } else {
+            shut.fillStyle(0x9babb2, 1).fillRect(x - 3, head + 2, 6, floor - head - 2);
+            shut.fillStyle(0xffffff, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
+            shut.fillStyle(0x625565, 1).fillRect(x - 7, floor - 36, 14, 2);
+        }
+        // Open: swung back against the wall (on the room's side), seen face on.
+        const edge = x + swing * w / 2;
+        let open;
+        if (glass) {
+            // A glass door in a cedar frame, a wooden handle.
+            open = this.add.graphics().setDepth(DEPTH.decor + 0.2).setVisible(false);
+            const lx = swing < 0 ? edge - 28 : edge;
+            open.fillStyle(0x7a4528, 1).fillRect(lx, head + 2, 28, floor - head - 2);
+            open.fillStyle(0xbfe6f5, 0.85).fillRect(lx + 3, head + 5, 22, floor - head - 10);
+            open.fillStyle(0xffffff, 0.6).fillRect(lx + 6, head + 8, 2, 30);
+            open.fillStyle(0x46291f, 1).fillRect(swing < 0 ? lx + 3 : lx + 22, floor - 40, 3, 10);
+        } else {
+            open = this.add.image(edge, floor, 'shipart', leaf).setOrigin(swing < 0 ? 1 : 0, 1).setDepth(DEPTH.decor + 0.2).setVisible(false);
+        }
+        const parts = [g, shut, open];
+        // Its sign on the outer side.
+        if (text) {
+            parts.push(this.add.text(x + w / 2 + 6, floor - 52, sub ? `${text}\n${sub}` : text, {
+                fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#ffffff', align: 'center',
+                backgroundColor: colour, padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+            }).setOrigin(0, 0.5).setDepth(DEPTH.props));
+        }
         const zone = this.add.zone(x, floor - this.deckPitch / 2, w, this.deckPitch);
         this.physics.add.existing(zone, true);
-        // The wall is where the bridge's piece of shell meets the deck's: drawn over the shell, so it
-        // shows from either side, while either is cut open.
-        g.setDepth(DEPTH.exterior + 0.02);
-        shut.setDepth(DEPTH.exterior + 0.02);
-        this.worldLayer.add([g, shut, open, plate]);
-        this.bulkhead = { x, x0, floor, open: false, shut, wall: g, openDoor: open, zone };
+        // A wall where a room's piece of shell meets the deck's: drawn over the shell, so it shows
+        // from either side, while either is cut open.
+        if (key) {
+            g.setDepth(DEPTH.exterior + 0.02);
+            shut.setDepth(DEPTH.exterior + 0.02);
+        }
+        this.worldLayer.add(parts);
+        const deck = key.split(':')[0];
+        this.bulkheads.push({ x, x0, floor, key, deck, open: false, shut, wall: g, openDoor: open, zone });
     }
 
-    // E at the bridge's shut door: it opens.
+    // E at a wall's shut door: it opens.
     useBulkheadDoor() {
-        const b = this.bulkhead, p = this.player;
-        if (!b || b.open || this.route !== 'inside' || Math.abs(p.y - b.floor) > 4 || Math.abs(p.x - b.x) > 24) return false;
-        this.setBulkheadOpen(true);
+        const p = this.player;
+        const b = this.bulkheads.find(b => !b.open && Math.abs(p.y - b.floor) <= 4 && Math.abs(p.x - b.x) <= 24);
+        if (!b || this.route !== 'inside') return false;
+        this.setBulkheadOpen(b, true);
         sfx.door();
         return true;
     }
 
-    setBulkheadOpen(open) {
-        const b = this.bulkhead;
+    setBulkheadOpen(b, open) {
         b.open = open;
         b.shut.setVisible(!open);
         b.openDoor.setVisible(open);
     }
 
-    // Each frame: the door shuts behind her once she is away from it; the wall shows while deck 10
-    // is cut open on either side of it.
+    // Each frame: a door shuts behind her once she is away from it; a wall shows while its deck is
+    // cut open on either side of it.
     updateBulkhead() {
-        const b = this.bulkhead, p = this.player;
-        if (!b) return;
-        const onDeck = this.route === 'inside' && p.y <= b.floor + 4 && p.y > b.floor - this.deckPitch;
-        if (b.open && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(false);
-        const open = 1 - Math.min(this.shellAlpha['10'] ?? 1, this.shellAlpha['10:bridge'] ?? 1);
-        b.wall.setAlpha(open);
-        b.shut.setAlpha(open);
+        const p = this.player;
+        for (const b of this.bulkheads) {
+            const onDeck = this.route === 'inside' && p.y <= b.floor + 4 && p.y > b.floor - this.deckPitch;
+            if (b.open && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
+            if (!b.key) continue;
+            const open = 1 - Math.min(this.shellAlpha[b.deck] ?? 1, this.shellAlpha[b.key] ?? 1);
+            b.wall.setAlpha(open);
+            b.shut.setAlpha(open);
+        }
     }
 
     // The world round a room she is in (cabin 8206, the linen room), dimmed almost to black: four
@@ -1157,6 +1220,81 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0x9babb2, 1).fillRect(o.x, o.y + o.height - 2, o.width, 2);
     }
 
+    // The giant chess set on deck 11 (the user's photo from deck 12): its board a checked mat on the
+    // deck, knee-high pieces standing on it, white and black, seen from the side.
+    drawChess(g, o) {
+        const y = o.y;
+        for (let x = o.x, i = 0; x < o.x + o.width; x += 8, i++) {
+            g.fillStyle(i % 2 ? 0x2e222f : 0xf4f4f4, 1).fillRect(x, y - 2, Math.min(8, o.x + o.width - x), 2);
+        }
+        const piece = (cx, kind, white) => {
+            const [fill, edge] = white ? [0xf4f4f4, 0x9babb2] : [0x2e222f, 0x625565];
+            const r = (x, yy, w, h) => g.fillStyle(fill, 1).fillRect(cx + x, y - 2 - yy - h, w, h);
+            g.fillStyle(edge, 1).fillRect(cx - 6, y - 4, 12, 2);
+            r(-5, 0, 10, 2);
+            if (kind === 'pawn') { r(-3, 2, 6, 8); g.fillStyle(fill, 1).fillCircle(cx, y - 16, 4); }
+            if (kind === 'rook') { r(-4, 2, 8, 14); r(-5, 16, 10, 3); r(-5, 19, 2, 2); r(-1, 19, 2, 2); r(3, 19, 2, 2); }
+            if (kind === 'knight') { r(-4, 2, 8, 10); r(-4, 12, 6, 8); r(-7, 15, 5, 4); r(0, 20, 2, 2); }
+            if (kind === 'bishop') { r(-3, 2, 6, 12); g.fillStyle(fill, 1).fillEllipse(cx, y - 19, 7, 10); r(-1, 23, 2, 2); }
+            if (kind === 'queen') { r(-3, 2, 6, 16); r(-5, 18, 10, 3); r(-5, 21, 2, 3); r(-1, 21, 2, 4); r(3, 21, 2, 3); }
+            if (kind === 'king') { r(-3, 2, 6, 18); r(-5, 20, 10, 3); r(-1, 23, 2, 6); r(-3, 25, 6, 2); }
+            g.fillStyle(edge, 1).fillRect(cx + (white ? 2 : -3), y - 8, 1, 4);
+        };
+        const set = ['rook', 'pawn', 'knight', 'king', 'pawn', 'queen', 'bishop', 'pawn'];
+        set.forEach((kind, i) => piece(o.x + 10 + i * ((o.width - 20) / (set.length - 1)), kind, i % 3 !== 1));
+    }
+
+    // The sauna, built into the spa (the user): a small room of dark cedar, its front cut away like
+    // every room's, a glass door at its near end, a warm lamp; its benches and stove are pieces.
+    drawSauna(g, o) {
+        const ceiling = o.y - this.deckPitch + 16, w = o.width;
+        g.fillStyle(0xb5703f, 1).fillRect(o.x, ceiling, w, o.y - ceiling);
+        for (let y = ceiling + 5; y < o.y; y += 6) g.fillStyle(0x9a5b33, 1).fillRect(o.x, y, w, 1);
+        g.fillStyle(0x7a4528, 1).fillRect(o.x, ceiling, w, 6);
+        // (Its two ends are walls across the deck with glass doors: see buildBulkhead.)
+        // A warm lamp in the corner, its glow kept within the sauna's walls (the user); a thermometer;
+        // a bucket and ladle on the floor.
+        for (let i = 4; i >= 1; i--) {
+            const r = 4 * i;
+            g.fillStyle(0xfbb954, 0.07).fillRect(o.x + w - 18 - r, ceiling + 6, Math.min(2 * r, 12 + r), r + 14);
+        }
+        g.fillStyle(0xfbff86, 1).fillRect(o.x + w - 21, ceiling + 18, 6, 4);
+        g.fillStyle(0xe6904e, 1).fillRect(o.x + 18, o.y - 70, 3, 12);
+        g.fillStyle(0xae2334, 1).fillRect(o.x + 19, o.y - 62, 1, 3);
+        g.fillStyle(0x7a4528, 1).fillRect(o.x + w - 30, o.y - 7, 8, 7);
+        g.fillStyle(0x9a5b33, 1).fillRect(o.x + w - 23, o.y - 13, 1, 7).fillRect(o.x + w - 24, o.y - 13, 4, 1);
+        // Its name on a wooden plaque over the door.
+        const name = this.add.text(o.x + 22, ceiling + 14, 'SAUNA', {
+            fontFamily: 'Georgia, serif', fontSize: '6px', fontStyle: 'bold', color: '#fbe9a6', resolution: 4,
+        }).setOrigin(0, 0.5).setDepth(DEPTH.decor + 0.05);
+        this.worldLayer.add(name);
+    }
+
+    // A white canopy on two posts over the hot tub (as on the real ship, the user).
+    drawCanopy(o) {
+        const g = this.add.graphics().setDepth(DEPTH.decor + 0.15);
+        const top = o.y - 84;
+        g.fillStyle(0xe8eaec, 1).fillRect(o.x - 4, top, 3, o.y - top);
+        g.fillStyle(0xe8eaec, 1).fillRect(o.x + o.width + 1, top, 3, o.y - top);
+        g.fillStyle(0xf4f4f4, 1).fillRect(o.x - 10, top - 6, o.width + 20, 6);
+        g.fillStyle(0xc7dcd0, 1).fillRect(o.x - 10, top - 1, o.width + 20, 1);
+        for (let x = o.x - 8; x < o.x + o.width + 10; x += 8) g.fillStyle(0xf4f4f4, 1).fillTriangle(x, top, x + 8, top, x + 4, top + 3);
+        this.worldLayer.add(g);
+    }
+
+    // The pool shower's cubicle: a roof on corner posts, frosted glass walls to shoulder height, the
+    // shower showing through them.
+    drawShowerBox(o) {
+        const g = this.add.graphics().setDepth(DEPTH.decor + 0.15);
+        const roof = o.y - 74;
+        g.fillStyle(0xffffff, 0.45).fillRect(o.x, o.y - 56, o.width, 52);
+        g.fillStyle(0xc7dcd0, 1).fillRect(o.x, o.y - 56, o.width, 1);
+        g.fillStyle(0x9babb2, 1).fillRect(o.x - 2, roof, 2, o.y - roof).fillRect(o.x + o.width, roof, 2, o.y - roof);
+        g.fillStyle(0xe8eaec, 1).fillRect(o.x - 5, roof - 4, o.width + 10, 5);
+        g.fillStyle(0x9babb2, 1).fillRect(o.x - 5, roof, o.width + 10, 1);
+        this.worldLayer.add(g);
+    }
+
     drawShellDoor(g, o) {
         g.fillStyle(0xd9cdb6, 1);
         g.fillRect(o.x, o.y, o.width, o.height);
@@ -1433,7 +1571,7 @@ export class ShipScene extends Phaser.Scene {
         // it, or jumping in it) they are not there (the user, 2026-11-06).
         this.physics.add.collider(p, this.solidLayer, null, (_, tile) => tile.index !== this.poolTile || !this.underPools());
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
-        if (this.bulkhead) this.physics.add.collider(p, this.bulkhead.zone, null, () => !this.bulkhead.open && this.route === 'inside');
+        for (const b of this.bulkheads) this.physics.add.collider(p, b.zone, null, () => !b.open && this.route === 'inside');
         this.physics.add.collider(p, this.railingStops || []);
         if (this.cabin) {
             this.physics.add.collider(p, this.cabin.bed, null, (_, bed) =>
@@ -1544,6 +1682,10 @@ export class ShipScene extends Phaser.Scene {
         cam.startFollow(p, true, 0.15, 0.15);
         cam.setFollowOffset(0, HALF);
         cam.centerOn(p.x, p.y - HALF);
+        // The cut-away goes straight to her deck, rather than sliding over from the deck she left
+        // (after a scare she stood in front of the hull for a moment, the user, 2026-11-06).
+        this.viewDeck = this.route === 'inside' ? Math.round(this.deckAt(point.y)) : null;
+        this.updateCutaway(0);
 
         if (!emerge) {
             this.mode = 'play';
@@ -1978,6 +2120,7 @@ export class ShipScene extends Phaser.Scene {
         if (under !== this.poolsHidden) {
             this.poolsHidden = under;
             for (const t of this.poolTiles) t.alpha = under ? 0 : 1;
+            this.poolTanks.setVisible(!under);
             for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!under));
         }
         for (const r of this.rooms) {
