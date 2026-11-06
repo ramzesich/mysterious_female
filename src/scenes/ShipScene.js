@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -1414,6 +1414,55 @@ export class ShipScene extends Phaser.Scene {
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
         else if (this.atBow() && time - (this.stillSince ?? time) > BOW_VIEW.idleMs) this.startBowView();
+        else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) this.startBedJoy();
+    }
+
+    // --- Bouncing on the cabin's bed (§5.3) ---------------------------------------------------
+
+    onBed() {
+        const c = this.cabin;
+        return c && this.route === 'cabin' && Math.abs(this.player.y - c.bed.body.top) < 2;
+    }
+
+    // She turns to us and bounces on the bed for joy, arms waving overhead, each hop carrying her
+    // to the other side; any key and she stops, standing where she landed.
+    startBedJoy() {
+        const p = this.player;
+        const bed = this.cabin.bed.body;
+        const y = p.y;
+        // Room on the mattress for her swing either way.
+        const x = Phaser.Math.Clamp(p.x, bed.left + BED_JOY.sway + 8, this.cabin.door - CABIN.doorX + CABIN.width - CABIN.stop - BED_JOY.sway);
+        this.mode = 'scripted';
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.setFlipX(false).anims.play('her-bed-joy');
+        this.cameras.main.stopFollow();          // the room holds still while she bounces
+        let t = 0;
+        this.script = dt => {
+            const i = this.controls.state;
+            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) {
+                this.endBedJoy(y);
+                return;
+            }
+            t += dt * 1000;
+            const k = Math.floor(t / BED_JOY.hopMs), f = (t % BED_JOY.hopMs) / BED_JOY.hopMs;
+            const from = k % 2 ? 1 : -1;
+            p.x = x + BED_JOY.sway * (from + (-2 * from) * (0.5 - 0.5 * Math.cos(Math.PI * f)));
+            p.y = y - BED_JOY.hopHeight * Math.sin(Math.PI * f);
+        };
+    }
+
+    endBedJoy(y) {
+        const p = this.player;
+        this.script = null;
+        this.cameras.main.startFollow(p, true, 0.15, 0.15);
+        this.cameras.main.setFollowOffset(0, HALF);
+        this.mode = 'play';
+        p.y = y;
+        p.body.enable = true;
+        p.body.reset(p.x, y);
+        this.pose('stand');
+        this.stillSince = this.time.now;
     }
 
     // --- The bow view (§5.3) --------------------------------------------------------------------
