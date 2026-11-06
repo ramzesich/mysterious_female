@@ -42,10 +42,12 @@ HULL_PLAIN_TO = 30
 # stands 10 m further aft than on the profile, to give the atrium room (below).
 CORES = {"forward": (74, 82), "midship": (102, 110), "aft": (194, 202)}
 
-# The atrium, open from its floor on deck 5 up through deck 9, between the forward and midship
+# The atrium, open from its floor on deck 5 up through deck 10, between the forward and midship
 # cores, crossed by side walks (§5.3). The profile draws it about 10 m long; the game makes it 20 m,
 # two screens wide, the user's choice (2026-11-02): at 10 m it looked narrow next to its height.
-ATRIUM = {"span": (82, 102), "decks": (5, 9)}
+# Deck 10 is open over it as on the real ship (the user, 2026-11-06; it had cabins over a dome under
+# deck 10); the curving staircase and the glass elevator still run from deck 5 to deck 9 (`lift`).
+ATRIUM = {"span": (82, 102), "decks": (5, 10), "lift": (5, 9)}
 
 # Deck 6's promenade (§5.3, decided 2026-11-03): outside the rooms, along the ship's side, two
 # decks tall with the lifeboats hanging high over it. Its fore and aft ends are enclosed by a wall
@@ -62,6 +64,10 @@ OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 # The housekeeping linen room on deck 9 (Bumbot asleep in the towels, §4): a crew door off the cabin
 # corridor, in a cabin door's place, that she can go through (the user, 2026-11-06).
 LINEN_ROOM = {"deck": 9, "m": 112}
+
+# The bridge's back wall on deck 10, across the deck where the bridge ends and the cabins begin, a
+# crew door in it (the user, 2026-11-06); the Captain's card is to lock it later (§6.2).
+BRIDGE_WALL_M = 40
 
 # The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
 # railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
@@ -88,7 +94,6 @@ VENUES = [
 
     (10, 25, 40, "Bridge (Bumbot: controls)", "crew"),
     (10, 40, 74, "Cabins", "cabins"),
-    (10, 82, 102, "Cabins", "cabins"),
     (10, 110, 194, "Cabins", "cabins"),
     (10, 202, 247, "Cabins", "cabins"),
 

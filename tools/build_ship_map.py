@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
-                         OUR_CABIN, LINEN_ROOM, PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, LINEN_ROOM, BRIDGE_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -33,8 +33,8 @@ COLS = SEA + LENGTH * PER_M + SEA
  BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
  LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
  KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET,
- BALCONY_RAIL) = range(1, 60)
-TILE_COUNT = 59
+ BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR) = range(1, 62)
+TILE_COUNT = 61
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -58,12 +58,13 @@ ROOM_LOOK = {
     "Tradewinds": (DINING_WALL, WOOD_FLOOR),
     "Arcade": (ARCADE_WALL, ARCADE_CARPET),
     "Stardust Lounge balcony": (THEATRE_WALL, THEATRE_CARPET),
+    "Bridge (Bumbot: controls)": (BRIDGE_WALL, BRIDGE_FLOOR),
 }
 # A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7, 8, 9}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7, 8, 9, 10}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -306,7 +307,7 @@ def build_layers():
         end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - max(0, r - WATER_ROW)
         fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
-    # The atrium is open from its floor on deck 5 up through deck 9, and deck 12 over deck 11's pool
+    # The atrium is open from its floor on deck 5 up through deck 10, and deck 12 over deck 11's pool
     # area (§5.3): their decks cross on side walks, built in the game, not floor tiles.
     lo, hi = ATRIUM["decks"]
     for deck in range(lo + 1, hi + 1):
@@ -432,6 +433,18 @@ PORTHOLE_R = 12      # the round windows: 24 px across (the user, 2026-11-03)
 END_COVER = 32       # px of wall the game draws over her at each end of a cut-away deck
 
 
+def shell_rooms():
+    """Stretches of a deck's outer shell cut away on their own (the user, 2026-11-06): the bridge on
+    deck 10, out of sight from the corridor, and cut open, the rest of the deck closed, while she is
+    on it."""
+    return [{"key": "10:bridge", "deck": 10, "x0": col(EXTENT[10][0]) * TILE, "x1": col(BRIDGE_WALL_M) * TILE}]
+
+
+def shell_owner(deck, c):
+    """Whose cut-away a shell tile of `deck` at column `c` follows: its deck's, or a room's."""
+    return next((r["key"] for r in shell_rooms() if r["deck"] == deck and r["x0"] <= c * TILE < r["x1"]), deck)
+
+
 def shell_details(ext, solid):
     """What is on the outside of the shell, as shapes for the game to draw over it: each listed
     under the deck whose wall it is on (it fades with that deck's cut-away) or under "fixed".
@@ -446,7 +459,7 @@ def shell_details(ext, solid):
     def owner_at(c, r, deck):
         t = ext[r][c] if 0 <= r < ROWS and 0 <= c < COLS else 0
         if t in EXT_CUT:
-            return deck
+            return shell_owner(deck, c)
         return "fixed" if t else None
 
     def rect(owner, x, y, w, h, colour):
@@ -632,7 +645,7 @@ def build_objects():
 
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
-                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 30),
+                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
@@ -663,7 +676,7 @@ def build_objects():
                       [prop("text", f"DECK {deck}"), prop("style", "plaque")]))
 
     # Side walks (§5.3), level with their deck's floor so she simply runs along them (the user,
-    # 2026-11-02): each deck from 6 to 9 across the atrium, and deck 12 over deck 11's pool area,
+    # 2026-11-02): each deck from 6 to 10 across the atrium, and deck 12 over deck 11's pool area,
     # which she can drop through into a pool. The atrium's dressing (pillars, skylight) is its own.
     lo, hi = ATRIUM["decks"]
     ax0, ax1 = col(ATRIUM["span"][0]) * TILE, col(ATRIUM["span"][1]) * TILE
@@ -677,9 +690,9 @@ def build_objects():
     for a, b in POOLS:
         add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(11) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4))
     walks = [{"deck": str(d), "y": walk_y(d)} for d in range(lo + 1, hi + 1)]
-    levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks]
+    levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks if int(w["deck"]) <= ATRIUM["lift"][1]]
     # The curving staircase winds round the glass elevator (the user's photos): each flight sweeps
-    # from one side of it to the other, alternately behind it and in front of it.
+    # from one side of it to the other, alternately behind it and in front of it, decks 5 to 9.
     lift_x = x_of(sum(ATRIUM["span"]) / 2)
     left, right = lift_x - 8 * TILE, lift_x + 8 * TILE
     for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
@@ -705,7 +718,7 @@ def build_objects():
 
     for core, (a, b) in CORES.items():
         lift(core, col(a) * TILE + 18 * TILE, PLAYABLE)
-    lift("atrium", x_of(sum(ATRIUM["span"]) / 2), range(ATRIUM["decks"][0], ATRIUM["decks"][1] + 1), glass=True)
+    lift("atrium", x_of(sum(ATRIUM["span"]) / 2), range(ATRIUM["lift"][0], ATRIUM["lift"][1] + 1), glass=True)
 
     # Venue signs; cabin doors along the corridors (background, muted), numbered from the bow. The
     # corridor's back wall is the starboard side's cabins (the game looks from port), numbered as on
@@ -752,7 +765,7 @@ def build_objects():
     # Bumbot at his five spots (§4): what he is doing, and which way he runs. The fifth, asleep in
     # the linen room on deck 9, is placed by the game with the room.
     for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 30, "bat", -1)]:
+                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 31.75, "bat", -1)]:
         add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
                   [prop("activity", activity), prop("escape", escape, "int")]))
 
@@ -828,8 +841,11 @@ def build_objects():
         prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
         prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
     # The bridge's windows on deck 10, looking out to sea.
-    add(area("bridge-windows", "decor", x_of(28.6), floor_y(10) - 104, x_of(39) - x_of(28.6), 30,
-             [prop("kind", "windows")]))
+    # Big panes in two runs, the sky and the sea in them, a stretch of wall between them and after
+    # them for the clock and the screens (the user, 2026-11-06).
+    for a, b in ((28.7, 33.0), (34.4, 37.6)):
+        add(area(f"bridge-windows-{a}", "decor", exact_x(a), floor_y(10) - 104, exact_x(b) - exact_x(a), 56,
+                 [prop("kind", "bridgewindows")]))
 
     # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
     # end (folded flat against the wall), an exit sign over the shell door, fire equipment. (The
@@ -840,11 +856,11 @@ def build_objects():
     put(4, 66.6, "hose-cabinet-bg", 18)
     put(4, 68.7, "plant-bg")
     put(4, 70.1, "extinguisher-bg", 14)
-    # A framed picture in each stair and elevator lobby, left of its stairs; on decks 8 and 9 the
-    # deck's directory board hangs there instead (the user's photo of deck 8; deck 9 is like it).
+    # A framed picture in each stair and elevator lobby, left of its stairs; on decks 8-10 the deck's
+    # directory board hangs there instead (the user's photo of deck 8; decks 9 and 10 are like it).
     for core, (a, _) in CORES.items():
         for deck in PLAYABLE:
-            if deck not in (8, 9):
+            if deck not in (8, 9, 10):
                 put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
@@ -1115,23 +1131,42 @@ def build_objects():
     for a, b in ((110, 150), (150, 194)):
         decor(f"downlights-7-{a}", "downlights", x_of(a), x_of(b), deck=7)
 
-    # Decks 8 and 9, cabins fore and aft and the atrium between (NCL's plan; the user's photos of deck
-    # 8, 2026-11-06; deck 9 is like it, the user remembers).
+    # Decks 8-10, cabins fore and aft and the atrium between (NCL's plan; the user's photos of deck 8,
+    # 2026-11-06; decks 9 and 10 are like it, the user remembers).
     # The lobbies: the deck's directory board, blue in a brass frame, and an exit sign over the stairs.
-    for deck in (8, 9):
+    for deck in (8, 9, 10):
         for core, (a, _) in CORES.items():
             x = col(a) * TILE + 30
             add(area(f"directory-{deck}-{core}", "decor", x - 13, floor_y(deck), 26, 0, [prop("kind", "directory")]))
             put(deck, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
-        # The atrium's walk: downlights and a warm cove along its ceiling, and paintings on its cream
-        # walls, clear of the pillars, the staircase and the glass elevator.
-        decor(f"downlights-{deck}-atrium", "downlights", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=deck)
+        # The atrium's walk: downlights and a warm cove along its ceiling (deck 10's is the dome:
+        # the cove only), and paintings on its cream walls, clear of the pillars, the staircase and
+        # the glass elevator.
+        if deck != 10:
+            decor(f"downlights-{deck}-atrium", "downlights", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=deck)
         decor(f"cove-{deck}-atrium", "cove", x_of(ATRIUM["span"][0]), x_of(ATRIUM["span"][1]), deck=deck)
     for m, painting in ((83.6, "painting-harbour-bg"), (99.0, "painting-sea-bg"), (100.6, "painting-blue-bg")):
         put(8, m, painting, 50)
     for m, painting in ((83.6, "painting-ship-bg"), (99.0, "painting-flowers-bg"), (100.6, "painting-abstract-bg")):
         put(9, m, painting, 50)
+    for m, painting in ((83.6, "painting-sea-bg"), (100.6, "painting-harbour-bg")):
+        put(10, m, painting, 50)
     # Cabin 8206, the user's own (OUR_CABIN): its open door is placed with the corridor's doors.
+
+    # Deck 10's bridge (§5.3; a PixelLab sheet, bridge-1, 2026-11-06): the consoles, the helm and the
+    # engine telegraph forward (Bumbot bats at the telegraph's levers), the captain's and an
+    # officer's chair, the compass binnacle, the radar and the chart display, the chart table and
+    # the alarm panel; screens and the clock with its barometer on the wall under the side windows.
+    # (Its inside starts about 28.5 m: the deck's front 3 m are the ship's structure.)
+    for m, frame in ((29.3, "bridge-console"), (30.55, "helm-console"), (32.1, "engine-telegraph"),
+                     (33.4, "captain-chair"), (34.5, "binnacle"), (35.5, "radar-pedestal"),
+                     (36.5, "ecdis-stand"), (37.8, "chart-table"), (38.9, "alarm-panel")):
+        put(10, m, frame + "-bg")
+    put(10, 33.7, "clock-barometer-bg", 62)
+    put(10, 38.6, "bridge-monitors-bg", 74)
+    # Its back wall, across the deck, with the crew door: the game draws it and opens it with E.
+    add(point("bridge-door", "bulkhead", exact_x(BRIDGE_WALL_M), floor_y(10), [
+        prop("x0", col(EXTENT[10][0]) * TILE, "int"), prop("text", "BRIDGE")]))
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -1190,6 +1225,8 @@ def build_map():
             {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in EXT_CUT)},
             {"name": "shellSlopes", "type": "string", "value": json.dumps(shell_slopes())},
             {"name": "endCover", "type": "int", "value": END_COVER},
+            {"name": "shellRooms", "type": "string", "value": json.dumps(shell_rooms())},
+            {"name": "poolTile", "type": "int", "value": POOL_TILE},
             {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
@@ -1360,6 +1397,17 @@ def draw_tile(tile_id):
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == BALCONY_RAIL:
         pass    # solid but unseen: the game draws the balcony's front over it
+    elif tile_id == BRIDGE_WALL:
+        # The bridge: pale grey-blue steel panels, a seam on each.
+        rect(0, 0, 15, 15, hex_rgba("#d3dde0"))
+        rect(0, 0, 0, 15, hex_rgba("#bfcbd0"))
+    elif tile_id == BRIDGE_FLOOR:
+        # The bridge's floor: dark grey non-slip vinyl, flecked.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#3e3546"))
+        for x, y in ((2, 1), (7, 2), (11, 1), (14, 2)):
+            px[y][x] = hex_rgba("#625565")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == MAHOGANY:
         # The lobbies' panelling: a warm terracotta wood with a faint lighter grain, as in the user's
         # deck 8 photo (2026-11-06: lighter than the dark maroon first drawn).

@@ -25,6 +25,8 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
                balcony-rail/ hold four more table tries and two balcony tries, unused
     casino-drawn/  drawn by tools/draw_casino.py in strict side view: the roulette and blackjack
                tables, the Stardust balcony's front
+    bridge-1/  object 1db4def9-4b46-4b61-8aa1-cc309ed5fed0, 16 bridge pieces, 64px canvas (deck 10,
+               2026-11-06), shrunk to her scale ("height")
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -47,7 +49,10 @@ MUTE = 0.35
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's
 # wood; "lever", the row of a closed door's lever in the source, so every handle on board ends up
-# at the same height (LEVER pixels above the floor).
+# at the same height (LEVER pixels above the floor); "height", shrink the piece to this many px tall
+# (box-resampled, then snapped back to the palette), when the sheet drew it too big for her;
+# "from_x", drop the frame's columns left of this (a neighbour's end drawn into it); "join", the
+# columns (from, to) of the next frame to add on the right, where the sheet drew one piece across two.
 DOOR = (28, 74)                        # sized to her, like every door on board (§5.4)
 LEVER = 36                             # about half the door's height, as on a real door
 PIECES = {
@@ -161,11 +166,41 @@ for i, name in enumerate(TALL_2):
 PIECES["roulette"] = ("casino-drawn", 0, None, {})
 PIECES["blackjack"] = ("casino-drawn", 1, None, {})
 PIECES["balcony-front"] = ("casino-drawn", 2, None, {})
+# Deck 10's bridge (2026-11-06): the sheet drew everything about her height; each is shrunk to its
+# real size next to her (59 px, about 1.65 m).
+BRIDGE_1 = [
+    ("bridge-console", 46), ("helm-console", 44), ("captain-chair", 50), ("officer-chair", 38),
+    ("engine-telegraph", 42), ("radar-pedestal", 46), ("chart-table", 34), ("ecdis-stand", 46),
+    ("binnacle", 44), ("bridge-monitors", None), ("radio-desk", 40), ("clock-barometer", None),
+    ("wing-console", 40), ("coffee-counter", 44), ("alarm-panel", 59), ("logbook-lectern", 42),
+]
+for i, (name, h) in enumerate(BRIDGE_1):
+    PIECES[name] = ("bridge-1", i, None, {"height": h} if h else {})
+# The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
+PIECES["bridge-console"][3]["join"] = (0, 18)
+PIECES["helm-console"][3]["from_x"] = 22
 
 
-def load(sheet, frame):
+def load(sheet, frame, from_x=0, join=None):
     img = Image.open(SRC / sheet / f"frame_{frame}.png").convert("RGBA")
+    img = img.crop((from_x, 0, img.width, img.height))
+    if join:
+        a, b = join
+        rest = Image.open(SRC / sheet / f"frame_{frame + 1}.png").convert("RGBA").crop((a, 0, b, img.height))
+        whole = Image.new("RGBA", (img.width + rest.width, img.height))
+        whole.paste(img, (0, 0))
+        whole.paste(rest, (img.width, 0))
+        img = whole
     return img.crop(img.getbbox())
+
+
+def shrink(img, height):
+    """Box-resample a piece down to `height` px tall, keeping its proportions; the edge pixels the
+    resample half-covers are either kept whole or dropped."""
+    w = max(1, round(img.width * height / img.height))
+    out = img.resize((w, height), Image.BOX)
+    out.putalpha(out.getchannel("A").point(lambda a: 255 if a >= 128 else 0))
+    return out
 
 
 def fill_body(img):
@@ -250,11 +285,13 @@ def build():
     pieces = {}
     for name, spec in PIECES.items():
         sheet, frame, size, opts = spec
-        img = load(sheet, frame)
+        img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"))
         if opts.get("fill"):
             img = fill_body(img)
         if size:
             img = fit(img, *size, lever=opts.get("lever"))
+        if opts.get("height"):
+            img = shrink(img, opts["height"])
         img = palettize(img)
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
