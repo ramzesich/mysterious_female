@@ -92,6 +92,11 @@ export const KEY_CARDS = {
     required: false,
 };
 
+// Sound (§7.1): off for now, while we test (the user, 2026-11-06). `?sound` turns it on.
+export const SOUND = {
+    on: false,
+};
+
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
 export const PROMENADE = {
     fadeMs: 140,

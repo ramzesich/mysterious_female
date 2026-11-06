@@ -195,17 +195,20 @@ def interior():
 
     im.alpha_composite(bed)
 
-    # The cut through the ship's side, its edges in shadow (as at every deck's cut, §5.3).
+    # The cabin shows where the corridor was, the deck around it dimmed by the game (the user,
+    # 2026-11-06, as the linen room): the ceiling's shadow as along the corridor, and its two side
+    # walls, plain.
     shade = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     sd = ImageDraw.Draw(shade)
-    for i in range(10):
-        a = int(0.6 * 255 * (1 - i / 10) ** 1.6)
+    for i in range(8):
+        a = int(0.45 * 255 * (1 - i / 8) ** 1.6)
         sd.rectangle([0, i * 2, W - 1, i * 2 + 1], fill=(0x2e, 0x22, 0x2f, a))
-    for i in range(9):
-        a = int(0.6 * 255 * (1 - i / 9) ** 1.6)
-        sd.rectangle([i * 2, 0, i * 2 + 1, FLOOR - 1], fill=(0x2e, 0x22, 0x2f, a))
-        sd.rectangle([W - 2 - i * 2, 0, W - 1 - i * 2, FLOOR - 1], fill=(0x2e, 0x22, 0x2f, a))
-    return Image.alpha_composite(im, shade)
+    im = Image.alpha_composite(im, shade)
+    d = ImageDraw.Draw(im)
+    for x0, x1 in ((0, 3), (W - 4, W - 1)):
+        d.rectangle([x0, 0, x1, H - 1], fill=WALL_SHADE)
+        d.rectangle([x0 + 1, 0, x1 - 1, H - 1], fill=WALL_SEAM)
+    return im
 
 
 def open_door():

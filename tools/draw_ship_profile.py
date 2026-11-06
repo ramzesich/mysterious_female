@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from xml.sax.saxutils import escape
 
-from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, MAST, TRUNKS, VENUES
+from ship_layout import ATRIUM, CORES, DECKS, EXTENT, FUNNEL, LENGTH, LINEN_ROOM, MAST, TRUNKS, VENUES
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -75,7 +75,9 @@ def build():
         out.append(text(LEFT - 12, y0 + 19, str(deck), 11, "end", weight="bold"))
         out.append(text(x(LENGTH) + 12, y0 + 19, str(deck), 11, "start", weight="bold"))
 
-    for deck, a, b, name, kind in VENUES:
+    # The linen room, behind its crew door off deck 9's corridor (6 m round the door).
+    linen = (LINEN_ROOM["deck"], LINEN_ROOM["m"] - 2, LINEN_ROOM["m"] + 4, "Linen room (Bumbot: asleep)", "crew")
+    for deck, a, b, name, kind in VENUES + [linen]:
         y0 = row_top(deck)
         out.append(f'<rect x="{x(a):.0f}" y="{y0 + 2}" width="{(b - a) * PX}" height="{ROW - 4}" '
                    f'rx="2" fill="{FILL[kind]}"/>')

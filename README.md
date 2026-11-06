@@ -24,7 +24,8 @@ URL flags, combinable (`?play&debug`):
 | `?cards=all` | Every key card, for testing |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
-| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern`, `cabin` (inside cabin 8206, deck 8) |
+| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9) |
+| `?sound` | Sound is off for now; this turns it on |
 
 ## Controls
 
@@ -33,7 +34,7 @@ URL flags, combinable (`?play&debug`):
 | Run | ← / → | Left stick / D-pad |
 | Jump (hold for higher) | Space | A |
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
-| Кісюнічка dash (costs a tangerine) | Shift | B |
+| Кісюнічка dash (costs a tangerine) | D | B |
 | Activate: open doors | E | X |
 
 A controller is detected once a button is pressed on it.

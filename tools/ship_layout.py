@@ -59,6 +59,10 @@ PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)]
 # deck 8 plan, kept in reference/web/deck8/). Its door stands open and she can go in (§5.3).
 OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 
+# The housekeeping linen room on deck 9 (Bumbot asleep in the towels, §4): a crew door off the cabin
+# corridor, in a cabin door's place, that she can go through (the user, 2026-11-06).
+LINEN_ROOM = {"deck": 9, "m": 112}
+
 # The Stardust Lounge's stage, deck 6, from here to the stern wall; over it deck 7's balcony ends in a
 # railing, the stage's fly space open below (the user: she can hop over and drop onto the stage).
 STAGE = 244
@@ -89,8 +93,7 @@ VENUES = [
     (10, 202, 247, "Cabins", "cabins"),
 
     (9, 23.6, 74, "Cabins", "cabins"),
-    (9, 110, 116, "Linen room (Bumbot: asleep)", "crew"),
-    (9, 106, 194, "Cabins", "cabins"),
+    (9, 110, 194, "Cabins", "cabins"),
     (9, 202, 249.5, "Cabins", "cabins"),
 
     (8, 21.4, 74, "Cabins", "cabins"),
