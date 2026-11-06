@@ -27,6 +27,15 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
                tables, the Stardust balcony's front
     bridge-1/  object 1db4def9-4b46-4b61-8aa1-cc309ed5fed0, 16 bridge pieces, 64px canvas (deck 10,
                2026-11-06), shrunk to her scale ("height")
+    tall-3/    object 4aa9472f-752f-47c8-888f-fb21a2d41c18, 16 spa, salon and gym pieces, 64px canvas
+               (deck 11, 2026-11-06)
+    tall-4/    object 38f8dc2d-2715-4873-bc7d-e22ba5a3f60e, 16 pool deck, buffet and outdoor café
+               pieces, 64px canvas (deck 11), the finale's ice cream machine among them
+    props-6/   object b0dbbf7a-10f0-4ee7-90c7-0a1f72a006c0, 64 props, 32px canvas: spa, gym, pool,
+               buffet (deck 11)
+    sauna/     map objects: try 1 c5ad8bd8-a350-4b8e-9635-eaa6b10ab2db (three-quarter view, unused),
+               try 2 b6055af6-53c6-4648-9c06-a87129189bae (flat side view): both unused, an outdoor cabin
+               (the user: the sauna is built into the spa; drawn by the game instead)
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -176,9 +185,58 @@ BRIDGE_1 = [
 ]
 for i, (name, h) in enumerate(BRIDGE_1):
     PIECES[name] = ("bridge-1", i, None, {"height": h} if h else {})
+# Deck 11's sheets (NCL's plan, the user's photos, 2026-11-06), the tall pieces shrunk to her scale.
+TALL_3 = [
+    ("treadmill", 50), ("exercise-bike", 44), ("rowing-machine", 30), ("weight-bench", 42),
+    ("dumbbell-rack", 34), ("cross-trainer", 56), ("massage-table", 30), ("sauna-bench", 36),
+    ("sauna-stove", 28), ("salon-chair", 40), ("hood-dryer", 52), ("salon-mirror", 36),
+    ("spa-desk", 40), ("manicure-table", 40), ("yoga-rack", 40), ("bamboo", 60),
+]
+TALL_4 = [
+    ("hot-tub", 40), ("pool-bar", None), ("parasol", None), ("pool-shower", None),
+    ("towel-cart", 36), ("buffet-hot", 44), ("buffet-salad", 44), ("juice-station", 42),
+    ("coffee-station", 40), ("ice-cream-machine", 44), ("ice-cream-counter", 40),
+    ("cafe-blue-chair", 34), ("cafe-wood-table", 27), ("wicker-chair", 32), ("round-white-table", 27),
+    ("planter-palm", None),
+]
+for sheet, pieces in (("tall-3", TALL_3), ("tall-4", TALL_4)):
+    for i, (name, h) in enumerate(pieces):
+        PIECES[name] = (sheet, i, None, {"height": h} if h else {})
+PROPS_6 = [
+    "spa-towels", "oil-bottles", "spa-candle", "spa-stones", "cucumber-water", "bathrobe",
+    "spa-slippers", "hair-dryer", "shampoo", "comb-jar", "nail-polish", "lotion", "dumbbells",
+    "kettlebell", "gym-bottle", "yoga-mat", "gym-towel", "medicine-ball", "sunscreen", "flip-flops",
+    "beach-bag", "swim-ring", "pool-noodle", "sun-hat", "striped-towel", "umbrella-cocktail",
+    "beer-bucket", "fruit-tray", "salad-bowl", "bread-basket", "cake-slice", "pizza", "sushi",
+    "eggs-bacon", "pancakes", "coffee-cup", "orange-juice", "water-glass", "cutlery-napkin",
+    "napkin-holder", "salt-pepper", "ketchup-mustard", "white-plates", "tray-stack", "cone", "sundae",
+    "cone-stack", "sprinkles", "chafing-dish", "soup-tureen", "fruit-bowl-2", "cheese-board",
+    "croissants", "lemonade", "iced-coffee", "teapot", "small-plant", "bud-vase", "life-ring-rope",
+    "whistle", "thermometer", "folded-umbrella", "chalkboard", "fish-lemon",
+]
+# Drawn about 28 px whatever they are: each shrunk to its real size next to her (a cup is a few px).
+PROPS_6_HEIGHT = {
+    "spa-towels": 10, "oil-bottles": 9, "spa-candle": 7, "spa-stones": 8, "cucumber-water": 10,
+    "bathrobe": 30, "spa-slippers": 5, "hair-dryer": 9, "shampoo": 9, "comb-jar": 9, "nail-polish": 5,
+    "lotion": 8, "dumbbells": 9, "kettlebell": 10, "gym-bottle": 9, "yoga-mat": 8, "gym-towel": 8,
+    "medicine-ball": 11, "sunscreen": 7, "flip-flops": 4, "beach-bag": 14, "swim-ring": 18,
+    "pool-noodle": 10, "sun-hat": 7, "striped-towel": 8, "umbrella-cocktail": 8, "beer-bucket": 11,
+    "fruit-tray": 6, "salad-bowl": 6, "bread-basket": 7, "cake-slice": 6, "pizza": 5, "sushi": 5,
+    "eggs-bacon": 4, "pancakes": 6, "coffee-cup": 5, "orange-juice": 6, "water-glass": 6,
+    "cutlery-napkin": 7, "napkin-holder": 5, "salt-pepper": 5, "ketchup-mustard": 7, "white-plates": 10,
+    "tray-stack": 9, "cone": 7, "sundae": 7, "cone-stack": 8, "sprinkles": 7, "chafing-dish": 8,
+    "soup-tureen": 8, "fruit-bowl-2": 7, "cheese-board": 6, "croissants": 5, "lemonade": 9,
+    "iced-coffee": 7, "teapot": 7, "small-plant": 12, "bud-vase": 9, "life-ring-rope": 22,
+    "whistle": 4, "thermometer": 12, "folded-umbrella": 30, "chalkboard": 30, "fish-lemon": 6,
+}
+for i, name in enumerate(PROPS_6):
+    PIECES[name] = ("props-6", i, None, {"height": PROPS_6_HEIGHT[name]})
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22
+# The hot tub was drawn with its bottom curving up as if seen from above: it stands flat on the deck
+# (the user saw it hang in the air).
+PIECES["hot-tub"][3]["flat"] = True
 
 
 def load(sheet, frame, from_x=0, join=None):
@@ -192,6 +250,18 @@ def load(sheet, frame, from_x=0, join=None):
         whole.paste(rest, (img.width, 0))
         img = whole
     return img.crop(img.getbbox())
+
+
+def flat_base(img):
+    """Run each column of a piece down to its bottom row in its lowest colour, so it stands flat."""
+    img = img.copy()
+    px = img.load()
+    for x in range(img.width):
+        ys = [y for y in range(img.height) if px[x, y][3] > 128]
+        if ys:
+            for y in range(ys[-1] + 1, img.height):
+                px[x, y] = px[x, ys[-1]]
+    return img
 
 
 def shrink(img, height):
@@ -286,6 +356,8 @@ def build():
     for name, spec in PIECES.items():
         sheet, frame, size, opts = spec
         img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"))
+        if opts.get("flat"):
+            img = flat_base(img)
         if opts.get("fill"):
             img = fill_body(img)
         if size:

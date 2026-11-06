@@ -985,13 +985,43 @@ Nothing blocks the start of the build. These get settled along the way:
       10**: their tanks reach below deck 11's floor into deck 10's ceiling; seen from deck 10 or
       below they are not drawn, and she passes through them (the user: not moved). A `bridge`
       playtest
-- [ ] **Start the next session here: furnish deck 11**, then deck 12 (decks 4-10 are done,
-      2026-11-06). Deck 11 is the pool deck: the spa and salon, fitness, the Oasis Pool with
-      Topsiders and the hot tubs (Bumbot catching a fly), the Garden Café buffet and the Ice Cream
-      Bar (Bumbot eyeing a fish), the Great Outdoors diner aft (the finale); the user has photos of
-      it (`deck_11_*` in `reference/photos/small/`). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
+- [x] **Deck 11 furnished** (2026-11-06): after NCL's plan, cruisedeckplans.com's
+      (`reference/web/deck11/`) and the user's photos; three PixelLab sheets (`tall-3`, `tall-4`,
+      `props-6`, 30 generations, all 96 pieces kept, each shrunk to its real size next to her) and
+      two sauna tries (2 generations, both outdoor huts, unused). Bow to stern: **the open front**
+      (teak; its white bulwark and glass windscreen drawn in front of her, she is hidden behind the
+      white and seen through the glass; like the stern terraces the ship's side stays closed while
+      she is on it, the sloped plating and the floor's edge always there), the ship's wall before
+      the spa (`END_WALL_FORE_ONLY`); **the Spa & Salon**: reception (orchid desk, bamboo, towel
+      shelf), massage & sauna (pine walls, massage tables, a robe and slippers by each sauna door;
+      **the sauna built into the spa**, drawn by the game: cedar, its front cut away, a lamp, the
+      two-tier benches and stove, **a glass door at each end opening with E**), the salon (lit
+      mirrors, salon chairs, hood dryer, manicure table), aerobics; rooms open at wood posts with
+      plaques; **its wall by the forward lobby with a door, its own piece of the ship's side**, as
+      the bridge's (`SPA_WALL_M`, `shell_rooms()`); **Fitness** over the atrium's dome (machines
+      before big windows); **the pool deck** (teak; the giant chess set from the user's photo,
+      loungers, a parasol, the hot tub between the pools under a canopy, ladders into the pools,
+      the towel cart, a shower in a frosted cubicle, palms, Topsiders' bar); the pools' tiled tanks
+      drawn over the hull so their floor shows from deck 11, still hidden and passable from deck 10;
+      **the Garden Café** (buffet counters, light blue chairs at wood tables, windows in runs,
+      Bumbot by a table with a fish, the Ice Cream Bar with its sign between windows, wicker window
+      seats); **the Sports Bar** inside by the aft lobby; **the Great Outdoors** (the self-service
+      station: coffee machines and **the soft serve ice cream machine, the finale's**, then round
+      white tables in wicker chairs, palms, parasols where the sky is open). The glass elevator
+      runs to deck 10 now, its column up to the dome (the user). **After a scare she reappears
+      with her deck already cut open** (the view no longer slides over from where she fell).
+      `?at=spa`, `?at=gym`; `?at=diner` is at the Great Outdoors' tables
+- [ ] **Later: walls with a door between every part of the ship** (the user, 2026-11-06): the
+      bridge's and the spa's rule (a wall across the deck, its door seen from the side, E to open
+      it, each part with its own piece of the ship's side, cut open only while she is in it) is to
+      be generalized to the rest of the ship
+- [ ] **Start the next session here: furnish deck 12** (decks 4-11 are done, 2026-11-06): the
+      chapel, the kids' pool and the Spinnaker Lounge forward, the sports court, shuffleboard and
+      Champs Bar over the pools, the speciality restaurants and golf nets, Le Bistro and Los Lobos
+      aft; the user has photos (`deck_12*`, `spinnaker_lounge*`, `the_chapel` in
+      `reference/photos/small/`). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
-      to 10 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
+      to 11 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
@@ -1024,7 +1054,7 @@ Nothing blocks the start of the build. These get settled along the way:
     Stardust balcony is solid. Maybe a secret place later. For now she can only leave it by
     jumping off the ship (a scare)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1772 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1740 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

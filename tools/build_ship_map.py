@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
-                         OUR_CABIN, LINEN_ROOM, BRIDGE_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, LINEN_ROOM, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -33,8 +33,8 @@ COLS = SEA + LENGTH * PER_M + SEA
  BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
  LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
  KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET,
- BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR) = range(1, 62)
-TILE_COUNT = 61
+ BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR, SPA_WALL, SAUNA_WALL, GYM_FLOOR, CAFE_WALL, CAFE_CARPET) = range(1, 67)
+TILE_COUNT = 66
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -59,12 +59,20 @@ ROOM_LOOK = {
     "Arcade": (ARCADE_WALL, ARCADE_CARPET),
     "Stardust Lounge balcony": (THEATRE_WALL, THEATRE_CARPET),
     "Bridge (Bumbot: controls)": (BRIDGE_WALL, BRIDGE_FLOOR),
+    # Deck 11 (NCL's plan, the user's photos, 2026-11-06).
+    "Spa reception": (SPA_WALL, WOOD_FLOOR),
+    "Massage and sauna": (SAUNA_WALL, WOOD_FLOOR),
+    "Salon": (SPA_WALL, WOOD_FLOOR),
+    "Aerobics": (VENUEWALL, WOOD_FLOOR),
+    "Fitness": (VENUEWALL, GYM_FLOOR),
+    "Garden Café buffet, Ice Cream Bar (Bumbot: fish)": (CAFE_WALL, CAFE_CARPET),
+    "Sports Bar": (WINDJAMMER_WALL, WOOD_FLOOR),
 }
 # A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7, 8, 9, 10}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7, 8, 9, 10, 11}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -260,7 +268,7 @@ def build_layers():
                 solid[floor][c] = LOBBY_CARPET  # the lobbies' and the gangway's blue mosaic carpet
             elif deck > 3:
                 if not covered(deck, m) or kind in ("outdoor", "finale"):
-                    solid[floor][c] = DECK_PAINT
+                    solid[floor][c] = TEAK if deck == 11 else DECK_PAINT  # deck 11: teak (her photos)
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
                 elif look:
@@ -274,6 +282,10 @@ def build_layers():
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
                 fill(solid, c, c, floor - DECK_ROWS + 1, floor, STEEL)
+            elif deck == 11 and inward == 1:
+                # Deck 11's front: its bulwark, drawn by the game, ends the deck (the user: no glass
+                # rail stub there); the rail stays, solid and unseen.
+                fill(solid, c, c, floor - 2, floor - 1, BALCONY_RAIL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
@@ -356,6 +368,7 @@ def build_layers():
 # ship's side stays closed while she is on it, as on deck 7's stern strip (the user, 2026-11-06).
 END_WALL_M = 2.0
 END_WALL_DECKS = (8, 9, 10)
+END_WALL_FORE_ONLY = (11,)     # deck 11's open front meets the spa (its open stern is the Great Outdoors)
 TERRACE_MIN_M = 1.0            # an open strip shorter than this is no terrace (the extents' rounding)
 
 
@@ -364,13 +377,13 @@ def end_walls():
     w = round(END_WALL_M * PER_M)
     a7 = col(EXTENT[8][0])
     walls = [(7, a7, a7 + w)]
-    for deck in END_WALL_DECKS:
+    for deck in END_WALL_DECKS + END_WALL_FORE_ONLY:
         fwd, aft = EXTENT[deck]
         under = [c for c in range(col(fwd), col(aft)) if covered(deck, metres(c))]
         a, b = under[0], under[-1] + 1
         if metres(a) - fwd >= TERRACE_MIN_M:
             walls.append((deck, a, a + w))
-        if aft - metres(b) >= TERRACE_MIN_M:
+        if aft - metres(b) >= TERRACE_MIN_M and deck not in END_WALL_FORE_ONLY:
             walls.append((deck, b - w, b))
     return walls
 
@@ -380,10 +393,13 @@ def in_end_wall(deck, c):
 
 
 def on_stern_terrace(deck, c):
-    """Past an aft end wall (decks 8-10), or on deck 7's stern strip: out of sight behind the stern
-    plating at all times, its floor's edge too (the user, 2026-11-06)."""
+    """Past an aft end wall (decks 8-10), on deck 7's stern strip, or on deck 11's open front: out
+    of sight behind the sloped plating at all times, its floor's edge too (the user, 2026-11-06)."""
     if deck == 7:
         return bool(STERN_STRIP_7) and c * TILE >= STERN_STRIP_7[0]
+    if deck == 11:
+        fa, fb = front_bulwark_11()
+        return fa <= c * TILE < fb
     return any(d == deck and d != 7 and metres(b) > sum(EXTENT[d]) / 2 and c >= b for d, a, b in end_walls())
 
 
@@ -437,7 +453,14 @@ def shell_rooms():
     """Stretches of a deck's outer shell cut away on their own (the user, 2026-11-06): the bridge on
     deck 10, out of sight from the corridor, and cut open, the rest of the deck closed, while she is
     on it."""
-    return [{"key": "10:bridge", "deck": 10, "x0": col(EXTENT[10][0]) * TILE, "x1": col(BRIDGE_WALL_M) * TILE}]
+    return [{"key": "10:bridge", "deck": 10, "x0": col(EXTENT[10][0]) * TILE, "x1": col(BRIDGE_WALL_M) * TILE},
+            {"key": "11:spa", "deck": 11, "x0": front_bulwark_11()[1], "x1": col(SPA_WALL_M) * TILE}]
+
+
+def front_bulwark_11():
+    """Deck 11's open front, (x from, x to): up to the ship's wall before the spa."""
+    a = next(wa for d, wa, wb in end_walls() if d == 11)
+    return col(EXTENT[11][0]) * TILE, a * TILE
 
 
 def shell_owner(deck, c):
@@ -565,16 +588,17 @@ def shell_details(ext, solid):
                     rect(own, x + 6, floor - 42, unit - 6, 2, "#e8eaec")
         # The open decks up top: a white bulwark with a glass windscreen above it, all along.
         if deck >= 11:
+            fa, fb = front_bulwark_11()
             for x in range(x0, x1, TILE):
                 m = metres(x // TILE)
                 _, kind = venue_at(deck, m)
-                if indoor(deck, m) or in_core(m):
+                if indoor(deck, m) or in_core(m) or (deck == 11 and fa <= x < fb):
                     continue
                 rect(deck, x, floor - 24, TILE, 24, "#e8eaec")
                 rect(deck, x, floor - 48, TILE, 24, "#bfe6f5")
                 rect(deck, x, floor - 50, TILE, 2, "#cd683d")
             for x in range(x0, x1, 48):
-                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)):
+                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)) and not (deck == 11 and fa <= x < fb):
                     rect(deck, x, floor - 50, 2, 26, "#e8eaec")
 
     # On top: the roof's white edge, the navy funnel with its dark grille, the white mast, the domes.
@@ -646,13 +670,17 @@ def build_objects():
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
-                          ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
+                          ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
     # Nor are the aft terraces behind the end walls (decks 8-10): she is hidden behind the ship's side.
     x0, x1 = STERN_STRIP_7
     add(area("stern-strip-7", "outdoors", x0, floor_y(7), x1 - x0, 0, [prop("deck", 7, "int")]))
+    # Deck 11's open front, the same (the user): the ship's side closed, the plating sloping up to deck
+    # 12 over it, and its floor's edge, there whether she is out on it or not.
+    fa, fb = front_bulwark_11()
+    add(area("front-11", "outdoors", fa, floor_y(11), fb - fa, 0, [prop("deck", 11, "int"), prop("end", "fwd")]))
     for deck, wa, wb in end_walls():
         if deck != 7 and metres(wb) > (EXTENT[deck][0] + EXTENT[deck][1]) / 2:
             x1 = col(EXTENT[deck][1]) * TILE
@@ -690,7 +718,7 @@ def build_objects():
     for a, b in POOLS:
         add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(11) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4))
     walks = [{"deck": str(d), "y": walk_y(d)} for d in range(lo + 1, hi + 1)]
-    levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks if int(w["deck"]) <= ATRIUM["lift"][1]]
+    levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks if int(w["deck"]) <= ATRIUM["stairs"][1]]
     # The curving staircase winds round the glass elevator (the user's photos): each flight sweeps
     # from one side of it to the other, alternately behind it and in front of it, decks 5 to 9.
     lift_x = x_of(sum(ATRIUM["span"]) / 2)
@@ -805,13 +833,16 @@ def build_objects():
             props.append(prop("flip", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else exact_x(m), floor_y(deck), props))
 
-    def around(deck, m, middle, chair, on_top=None, gap=None):
+    def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True)):
         """A table (or anything) with a chair at each side, facing it, the same distance away (the
-        user, 2026-11-03): by default each chair's seat tucked a little under the table's edge."""
+        user, 2026-11-03): by default each chair's seat tucked a little under the table's edge.
+        `faces_left`: the chair was drawn facing left; `sides`: which of the two chairs to put."""
         cx = exact_x(m)
         off = gap if gap is not None else (width(middle) + width(chair)) // 2 - 5
-        put(deck, 0, chair, x=cx - off)
-        put(deck, 0, chair, flip=True, x=cx + off)
+        if sides[0]:
+            put(deck, 0, chair, flip=faces_left, x=cx - off)
+        if sides[1]:
+            put(deck, 0, chair, flip=not faces_left, x=cx + off)
         put(deck, 0, middle, x=cx)
         if on_top:
             put(deck, 0, on_top, height(middle), x=cx)
@@ -1026,6 +1057,10 @@ def build_objects():
     def plaque(name, m, text):
         add(point(name, "sign", exact_x(m), floor_y(7) - 100, [prop("text", text), prop("style", "plaque")]))
 
+    # Deck 11's open front: its white bulwark and glass windscreen in front of her (the user): she
+    # is hidden behind the white, seen through the glass.
+    fa, fb = front_bulwark_11()
+    add(area("bulwark-11", "bulwark", fa, floor_y(11), fb - fa, 0))
     # The end walls she passes behind: deck 7's front, to the mooring deck; deck 8's two ends.
     for deck, wa, wb in end_walls():
         add(area(f"end-wall-{deck}-{wa}", "endwall", wa * TILE, floor_y(deck), (wb - wa) * TILE, 0))
@@ -1165,8 +1200,128 @@ def build_objects():
     put(10, 33.7, "clock-barometer-bg", 62)
     put(10, 38.6, "bridge-monitors-bg", 74)
     # Its back wall, across the deck, with the crew door: the game draws it and opens it with E.
+    add(point("spa-door", "bulkhead", exact_x(SPA_WALL_M), floor_y(11), [
+        prop("x0", col(EXTENT[11][0]) * TILE, "int"), prop("key", "11:spa"), prop("text", "SPA & SALON"),
+        prop("leaf", "door-deck"), prop("colour", "#0b5e65")]))
     add(point("bridge-door", "bulkhead", exact_x(BRIDGE_WALL_M), floor_y(10), [
-        prop("x0", col(EXTENT[10][0]) * TILE, "int"), prop("text", "BRIDGE")]))
+        prop("x0", col(EXTENT[10][0]) * TILE, "int"), prop("key", "10:bridge"), prop("text", "BRIDGE"),
+        prop("sub", "CREW ONLY")]))
+
+    # Deck 11, after NCL's plan and the user's photos (2026-11-06; three PixelLab sheets, tall-3,
+    # tall-4 and props-6, 30 generations). Bow to stern.
+    def at11(m, frame, dy=0, flip=False):
+        put(11, m, frame + "-bg", dy, flip)
+
+    # The spa: its reception, the massage and sauna rooms, the salon, the aerobics studio, opening one
+    # into the next at wood posts with brass plaques; she comes in from the forward lobby.
+    # (Each plaque names the room aft of its post, as on deck 7; the reception's is on its wall.)
+    for m, text in ((40, "Massage & Sauna"), (55, "Salon"), (65, "Aerobics")):
+        decor(f"spa-doorway-{m}", "doorway", exact_x(m), exact_x(m), deck=11, text=text)
+    add(point("sign-spa", "sign", exact_x(35.2), floor_y(11) - 100, [prop("text", "Spa & Salon"), prop("style", "plaque")]))
+    at11(33.8, "bamboo")
+    at11(35.6, "spa-desk")
+    at11(37.4, "towel-shelf")
+    at11(37.4, "spa-towels", height("towel-shelf-bg"))
+    at11(37.4, "painting-flowers", 56)
+    at11(38.9, "cucumber-water")
+    at11(42.2, "massage-table")
+    at11(43.8, "side-table")
+    at11(43.8, "spa-candle", height("side-table-bg"))
+    at11(45.4, "massage-table")
+    at11(47.2, "bathrobe", 34)
+    at11(47.2, "spa-slippers")
+    at11(53.6, "bathrobe", 34)          # and one by the sauna's far door (the user)
+    at11(53.6, "spa-slippers")
+    decor("sauna-11", "sauna", exact_x(47.9), exact_x(52.9), deck=11)
+    at11(49.6, "sauna-bench")
+    at11(50.7, "sauna-bench")
+    at11(51.7, "sauna-stove")
+    # Its ends: cedar walls across the deck, a glass door in each opening into it with E.
+    for m, swing in ((47.9, 1), (52.9, -1)):
+        add(point(f"sauna-door-{m}", "bulkhead", exact_x(m) + swing * 3, floor_y(11), [
+            prop("leaf", "glass"), prop("width", 6, "int"), prop("swing", swing, "int"), prop("wall", "#6e3a22")]))
+    for m in (57.0, 59.8):
+        at11(m, "salon-mirror", 44)
+        at11(m, "salon-chair")
+    at11(62.3, "hood-dryer")
+    at11(63.8, "manicure-table")
+    at11(66.6, "yoga-rack")
+    at11(68.0, "kettlebell")
+    at11(68.8, "medicine-ball")
+    at11(69.6, "gym-bottle")
+    at11(70.6, "yoga-mat")
+    at11(71.6, "dumbbells")
+    at11(73.0, "water-dispenser")
+    # The fitness centre over the atrium's dome: machines in a row before big windows.
+    add(area("fitness-windows", "decor", exact_x(83.2), floor_y(11) - 104, exact_x(100.8) - exact_x(83.2), 56,
+             [prop("kind", "bridgewindows")]))
+    for m, frame in ((84.4, "treadmill"), (86.6, "treadmill"), (88.8, "treadmill"), (90.8, "exercise-bike"),
+                     (92.6, "exercise-bike"), (94.6, "cross-trainer"), (96.8, "rowing-machine"),
+                     (99.0, "weight-bench"), (101.0, "dumbbell-rack")):
+        at11(m, frame)
+    # The pool deck (the user's photos): the giant chess set, sun loungers and parasols, the hot tub
+    # between the two pools, ladders into them, the towel cart and a shower, Topsiders' bar.
+    decor("chess-11", "chess", exact_x(110.4), exact_x(114.4), deck=11)
+    for m in (115.9, 117.6, 141.4, 144.6, 147.8):
+        at11(m, "sunlounger")
+    at11(143.0, "parasol")
+    at11(132.5, "hot-tub")
+    decor("hot-tub-canopy", "canopy", exact_x(131.1), exact_x(133.9), deck=11)
+    for m, flip in ((119.5, False), (139.5, True)):
+        at11(m, "pool-ladder", -12, flip=flip)   # feet in the water, within deck 11's slab (not into deck 10)
+    at11(150.0, "towel-cart")
+    at11(151.8, "pool-shower")
+    decor("shower-box", "showerbox", exact_x(151.1), exact_x(152.5), deck=11)
+    at11(153.4, "planter-palm")
+    at11(155.8, "pool-bar")
+    at11(157.6, "chalkboard")
+    at11(158.8, "planter-palm")
+    # The Garden Café (the user's photos): the buffet counters, light wood tables with light blue
+    # chairs, a painting between the windows, the Ice Cream Bar, window seats at round white tables
+    # in wicker chairs. Bumbot sits by a table with a fish on it (§4).
+    decor("cafe-doorway", "doorway", exact_x(160), exact_x(160), deck=11, text="Garden Café")
+    for a, b in ((160.8, 170.2), (172.8, 181.8), (184.2, 193.4)):
+        add(area(f"cafe-windows-{a}", "decor", exact_x(a), floor_y(11) - 104, exact_x(b) - exact_x(a), 56,
+                 [prop("kind", "bridgewindows")]))
+    at11(171.5, "painting-abstract", 66)
+    at11(162.0, "buffet-hot")
+    at11(164.1, "buffet-salad")
+    at11(166.2, "juice-station")
+    for m in (170.0, 174.2):
+        around(11, m, "cafe-wood-table-bg", "cafe-blue-chair-bg")
+        put(11, m, "coffee-cup-bg", height("cafe-wood-table-bg"))
+    around(11, 179.4, "cafe-wood-table-bg", "cafe-blue-chair-bg", sides=(False, True))
+    put(11, 179.4, "fish-lemon-bg", height("cafe-wood-table-bg"))
+    at11(183.0, "ice-cream-counter")
+    at11(183.0, "ice-cream-sign", 56)
+    for m in (187.2, 190.8):
+        around(11, m, "round-white-table-bg", "wicker-chair-bg")
+        put(11, m, "orange-juice-bg", height("round-white-table-bg"))
+    decor("downlights-11-cafe", "downlights", x_of(160), x_of(194), deck=11)
+    decor("downlights-11-gym", "downlights", x_of(82), x_of(102), deck=11)
+    # The Sports Bar, inside by the aft lobby: the back bar and its counter, stools, a TV, darts.
+    decor("sports-doorway", "doorway", exact_x(202), exact_x(202), deck=11, text="Sports Bar")
+    at11(204.6, "back-bar")
+    at11(204.6, "bar-counter")
+    for m in (203.6, 204.6, 205.6):
+        at11(m, "bar-stool")
+    at11(207.6, "wall-tv", 62)
+    at11(209.0, "dartboard", 54)
+    # The Great Outdoors, open aft (§4, the finale's place): the self-service station first, the
+    # coffee machines and the soft serve ice cream machine where she catches Bumbot at last; then
+    # round white tables and wicker chairs, parasols where the sky is open, palms.
+    decor("outdoors-doorway", "doorway", exact_x(210), exact_x(210), deck=11, text="The Great Outdoors")
+    at11(211.4, "chalkboard")
+    at11(212.8, "coffee-station")
+    at11(214.6, "ice-cream-machine")
+    at11(216.4, "juice-station")
+    for m in (220.0, 224.0, 228.0, 237.0, 241.0):
+        around(11, m, "round-white-table-bg", "wicker-chair-bg")
+        put(11, m, ("iced-coffee-bg", "sundae-bg", "lemonade-bg")[int(m) % 3], height("round-white-table-bg"))
+    for m in (237.0, 241.0):
+        at11(m, "parasol")
+    at11(231.4, "planter-palm")
+    at11(234.2, "planter-palm")
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -1227,6 +1382,7 @@ def build_map():
             {"name": "endCover", "type": "int", "value": END_COVER},
             {"name": "shellRooms", "type": "string", "value": json.dumps(shell_rooms())},
             {"name": "poolTile", "type": "int", "value": POOL_TILE},
+            {"name": "poolSpans", "type": "string", "value": json.dumps([[(col(a) - 1) * TILE, (col(b) + 1) * TILE] for a, b in POOLS])},
             {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
@@ -1397,6 +1553,31 @@ def draw_tile(tile_id):
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == BALCONY_RAIL:
         pass    # solid but unseen: the game draws the balcony's front over it
+    elif tile_id in (SPA_WALL, CAFE_WALL):
+        # The spa: a soft sage; the Garden Café: pale grey-white panels (the user's photo).
+        base, seam = {SPA_WALL: ("#dfe6d6", "#d2dbc7"), CAFE_WALL: ("#eef0ee", "#e0e4e2")}[tile_id]
+        rect(0, 0, 15, 15, hex_rgba(base))
+        rect(0, 0, 0, 15, hex_rgba(seam))
+    elif tile_id == SAUNA_WALL:
+        # The sauna and massage rooms: pale pine boards (a first, brighter orange stood out).
+        rect(0, 0, 15, 15, hex_rgba("#ead2ae"))
+        for y in (3, 7, 11, 15):
+            rect(0, y, 15, y, hex_rgba("#dcbf96"))
+        px[1][6] = px[9][13] = hex_rgba("#cfae82")
+    elif tile_id == GYM_FLOOR:
+        # The gym: black rubber flooring, flecked.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#313638"))
+        for x, y in ((1, 1), (5, 2), (9, 1), (13, 2)):
+            px[y][x] = hex_rgba("#625565")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == CAFE_CARPET:
+        # The Garden Café: a dark blue carpet with a small grey pattern (the user's photo).
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#323353"))
+        for x, y in ((2, 1), (6, 2), (10, 1), (14, 2)):
+            px[y][x] = hex_rgba("#7f708a")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == BRIDGE_WALL:
         # The bridge: pale grey-blue steel panels, a seam on each.
         rect(0, 0, 15, 15, hex_rgba("#d3dde0"))
