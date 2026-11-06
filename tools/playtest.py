@@ -513,6 +513,64 @@ def scenario_promenade(b):
     return ok
 
 
+def scenario_cabin(b):
+    # Cabin 8206 on deck 8 (§5.3): E at its open door takes her in; its walls hold her; E again
+    # takes her back out to the corridor.
+    route = lambda: b.eval("window.__ship.route")
+    b.open("?reset&play&at=cabin")
+    door = b.eval("window.__ship.cabin.door")
+    s = b.state()
+    ok = check(route() == "cabin" and s["x"] == door and s["y"] == floor_y(8), "?at=cabin starts her inside, by its door", (route(), s))
+    b.eval("window.__ship.route = 'inside'")
+    b.teleport(door + 6, floor_y(8))
+    b.tap("e")
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(route() == "cabin" and s["mode"] == "play" and s["x"] == door, "E at the open door takes her in", (route(), s))
+    b.shot("cabin-desk")
+    b.hold(["right"], 0.6)
+    time.sleep(0.3)
+    ok &= check(b.state()["tangerines"] == 2, "she picks up the two tangerines on the desk", b.state())
+    b.hold(["right"], 2.0)
+    s = b.state()
+    ok &= check(route() == "cabin" and door < s["x"] < door + 200 and s["y"] == floor_y(8), "the cabin's far wall holds her", s)
+    b.shot("cabin-inside")
+    b.hold(["left"], 2.0)
+    s = b.state()
+    ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(8), "and so does its near wall", s)
+    # She can jump onto the bed (its top 32px over the floor) and stand there.
+    b.eval(f"window.__ship.spawnAt({{x: {door + 50}, y: {floor_y(8)}, route: 'cabin'}})")
+    time.sleep(0.4)
+    b.key("right", True)
+    b.tap("space")
+    time.sleep(0.5)
+    b.key("right", False)
+    time.sleep(0.8)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == floor_y(8) - 32, "she jumps onto the bed and stands on it", s)
+    b.shot("cabin-bed")
+    # Standing still on it a second, she bounces for joy; any key and she stops, still on the bed.
+    time.sleep(1.4)
+    ys = []
+    for _ in range(12):
+        ys.append(b.state()["y"])
+        time.sleep(0.05)
+    ok &= check(b.state()["mode"] == "scripted" and min(ys) < floor_y(8) - 32 - 3 and max(ys) == floor_y(8) - 32,
+                "a second still on the bed: she bounces for joy, off it and back", ys)
+    b.shot("cabin-bed-joy")
+    b.tap("left")
+    time.sleep(0.5)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == floor_y(8) - 32, "a key stops it, her feet on the bed", s)
+    b.teleport(door, floor_y(8))
+    b.eval("window.__ship.route = 'cabin'")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(route() == "inside", "E at the door takes her back out", route())
+    b.shot("cabin-door")
+    return ok
+
+
 def scenario_balcony(b):
     # The Stardust Lounge's balcony (deck 7) ends in a railing over the stage: she can hop it and
     # drop one deck onto the stage, no scare (§5.3).

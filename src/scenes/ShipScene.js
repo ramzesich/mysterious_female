@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -7,6 +7,7 @@ import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
 const RAILING = 4;
+const RAILING_STOP = 10;   // px short of a leaning railing's foot that she stops
 
 const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
@@ -23,6 +24,12 @@ const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
+// Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
+// over the floor, how close to its side walls she can go, and the bed she can jump onto: its ends
+// and its top over the floor; the desk's top over the floor and where on it the two tangerines sit,
+// from the door (the user, 2026-11-06).
+const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
+                desk: { top: 40, tangerines: [53, 61] } };
 
 // How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
 // staircase.
@@ -154,7 +161,7 @@ export class ShipScene extends Phaser.Scene {
         this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
             const g = this.add.graphics().setDepth(DEPTH.exterior);
             g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
-            return { deck: s.deck, gfx: g };
+            return { deck: s.deck, end: s.end, gfx: g };
         });
         // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
         // each on its deck's wall, fading with it, or always there ("fixed").
@@ -172,15 +179,33 @@ export class ShipScene extends Phaser.Scene {
         this.solidLayer.setCollisionByExclusion([-1]);
         // A ladder's top is a one-way floor: solid to stand on, open to climb through. A railing
         // where an open deck ends stays solid but is drawn with the same railing as the decks'
-        // sides (white rails, a wooden handrail), one piece standing on its foot.
+        // sides (white rails, a wooden handrail), one piece standing on its foot. Where the ship's
+        // side slopes in toward it from below, it leans on in at the same angle, carrying the slope
+        // on up over the deck (the user, 2026-11-06).
+        const slopesBelow = JSON.parse(props.shellSlopes || '[]');
         const railings = [];
         this.solidLayer.forEachTile(t => {
             if (t.index === LADDER_TOP) t.setCollision(false, false, true, false);
             if (t.index !== RAILING) return;
             t.setAlpha(0);
             if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
-            railings.push(this.add.image(t.pixelX + t.width / 2, t.pixelY + t.height, 'shipart', 'railing-bg')
-                .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            const x = t.pixelX + t.width / 2, deck = this.deckOfRow(t.y);
+            const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
+            // Each stands in from the deck's end, its outer foot where the floor ends (the user,
+            // 2026-11-06): inward is the side the deck's floor goes on.
+            const inward = s ? (s.x0 < s.x1 ? 1 : -1) : (this.solidLayer.getTileAt(t.x + 1, t.y + 1)?.index > 0 ? 1 : -1);
+            const footX = t.pixelX + (inward > 0 ? 0 : t.width) + inward * this.textures.getFrame('shipart', 'railing-bg').width / 2;
+            const img = s ? this.leaningRailing(footX, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), inward)
+                : this.add.image(footX, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
+            // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
+            // stops a little short of its foot (the user, 2026-11-06).
+            railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
+            if (s) {
+                const edge = footX + inward * t.width / 2;
+                const stop = this.add.zone(edge + inward * RAILING_STOP / 2, t.pixelY, RAILING_STOP, 2 * t.height);
+                this.physics.add.existing(stop, true);
+                (this.railingStops ||= []).push(stop);
+            }
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
@@ -222,6 +247,8 @@ export class ShipScene extends Phaser.Scene {
             .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
         // So do crew doors (checkpoints): no cabin door crowds another door.
         this.doorSpots = [...this.trunkDoorSpots, ...objects.filter(o => o.type === 'checkpoint').map(o => ({ x: o.x, y: o.y }))];
+        // Cabin 8206's open door takes the place of its cabin door.
+        this.openCabinDoors = objects.filter(o => o.type === 'cabin').map(o => ({ x: o.x, y: o.y }));
 
         for (const o of objects) {
             switch (o.type) {
@@ -245,14 +272,10 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'tangerine': {
-                    if (this.save.collected.includes(o.name)) break;
                     // Everything rests on something (§6.3): here, a small side table.
                     const table = this.add.image(o.x, o.y, 'sidetable').setOrigin(0.5, 1).setDepth(DEPTH.decor);
-                    const sprite = this.add.image(o.x, o.y - table.height, 'tangerine').setOrigin(0.5, 1).setDepth(DEPTH.props);
-                    const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(DEPTH.props).setAlpha(0);
-                    this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
-                    this.worldLayer.add([table, sprite, glint]);
-                    this.tangerines.push({ id: o.name, sprite, glint });
+                    this.worldLayer.add(table);
+                    this.addTangerine(o.name, o.x, o.y - table.height);
                     break;
                 }
 
@@ -371,9 +394,29 @@ export class ShipScene extends Phaser.Scene {
                     this.buildPromenade(o, prop);
                     break;
 
-                case 'bowdoor': {
-                    // Deck 7's front wall (§5.3): drawn over her as she passes straight through it to
-                    // the mooring deck, as if through a door hidden in it (the user, 2026-11-03).
+                case 'cabin':
+                    this.buildCabin(o, prop);
+                    break;
+
+                // Outdoors with no way in (deck 7's stern strip, §5.3): while she is on it the ship's
+                // side stays closed, the deck's inside out of sight (the user, 2026-11-06).
+                case 'outdoors': {
+                    // A strip of plating over the wall's edge beside it, there only while she is on
+                    // it, so nothing of her shows past the wall.
+                    const cover = this.add.graphics().setDepth(DEPTH.player + 0.05).setVisible(false);
+                    cover.fillStyle(0xe8eaec, 1).fillRect(o.x - 16, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
+                    this.worldLayer.add(cover);
+                    (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
+                    // The sloped stern plating over it is drawn in front of her: she is hidden
+                    // behind it there (the user).
+                    this.shellSlopes.filter(s => s.deck === 7 && s.end === 'aft').forEach(s => s.gfx.setDepth(DEPTH.player + 0.05));
+                    break;
+                }
+
+                case 'endwall': {
+                    // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
+                    // drawn over her as she passes straight through it, as if through a door hidden
+                    // in it (the user: deck 7's front, 2026-11-03; deck 8's ends, 2026-11-06).
                     const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
                     wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
                     this.worldLayer.add(wall);
@@ -396,6 +439,8 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
+                    if (prop(o, 'kind') === 'directory') this.drawDirectory(decorGfx, o);
+                    if (prop(o, 'kind') === 'cove') this.drawCove(decorGfx, o);
                     if (prop(o, 'kind') === 'cabindoors') {
                         this.drawCabinDoors(decorGfx, o, prop(o, 'first', 0), prop(o, 'last', 0), prop(o, 'coreBefore', false), prop(o, 'coreAfter', false));
                     }
@@ -414,7 +459,9 @@ export class ShipScene extends Phaser.Scene {
     buildPromenade(o, prop) {
         const list = name => String(prop(o, name, '')).split(',').filter(Boolean);
         const floor = prop(o, 'floor', 0);
-        const top7 = floor - this.deckPitch;        // deck 7's floor, where the boats hang
+        const top7 = floor - this.deckPitch;        // deck 7's floor
+        // The davits hang from deck 7's ceiling, the underside of deck 8's floor (the user, 2026-11-06).
+        const hang = top7 - this.deckPitch + 16;
         const pr = this.promenade = {
             x0: o.x, x1: o.x + o.width, floor,
             doors: list('doors').map(Number),
@@ -451,8 +498,8 @@ export class ShipScene extends Phaser.Scene {
             const pier = (b - a - n * OPEN_W) / (n + 1);
             // The promenade's ends are closed (back in only through the doors): a wall she runs into
             // at the end pier's inner edge, so she stops in the first opening, partly behind it.
-            if (a === pr.x0) this.addPromenadeEnd(a + pier + PROMENADE.endStop, -1, floor);
-            if (b === pr.x1) this.addPromenadeEnd(b - pier - PROMENADE.endStop, 1, floor);
+            if (a === pr.x0) this.addRouteWall(a + pier + PROMENADE.endStop, -1, floor, 'promenade');
+            if (b === pr.x1) this.addRouteWall(b - pier - PROMENADE.endStop, 1, floor, 'promenade');
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
@@ -480,32 +527,107 @@ export class ShipScene extends Phaser.Scene {
         });
 
         // White columns from the deck up past deck 7's floor, holding the davits; each boat hangs
-        // from two davit arms on its cables.
+        // from two davit arms on its cables. All washed out a little, background like the boats (the
+        // user, 2026-11-06).
         for (const x of columns) {
-            columnsGfx.fillStyle(0xffffff, 1).fillRect(x - 5, top7 - 142, 10, floor - top7 + 142);
-            columnsGfx.fillStyle(0xc7dcd0, 1).fillRect(x + 2, top7 - 142, 3, floor - top7 + 142);
+            columnsGfx.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang);
+            columnsGfx.fillStyle(0xd3e1da, 1).fillRect(x + 2, hang, 3, floor - hang);
             columnsGfx.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
         for (const x of boats) {
-            for (const [hook, column] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300)], [x + 268, columns.find(c => c > x + 268)]]) {
-                high.fillStyle(0xffffff, 1).fillRect(Math.min(hook, column) - 3, top7 - 142, Math.abs(hook - column) + 6, 6);
-                high.fillStyle(0xc7dcd0, 1).fillRect(Math.min(hook, column) - 3, top7 - 137, Math.abs(hook - column) + 6, 1);
-                high.fillStyle(0x3e3546, 1).fillRect(hook, top7 - 136, 1, 32);
+            // Each cable runs down to its hook's eye: 13px into the boat's picture forward, 17 aft
+            // (tools/draw_lifeboat.py), the boat's top 24px under the arms.
+            for (const [hook, column, eye] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300), 13], [x + 268, columns.find(c => c > x + 268), 17]]) {
+                high.fillStyle(0xf7f8f8, 1).fillRect(Math.min(hook, column) - 3, hang, Math.abs(hook - column) + 6, 6);
+                high.fillStyle(0xd3e1da, 1).fillRect(Math.min(hook, column) - 3, hang + 5, Math.abs(hook - column) + 6, 1);
+                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, 24 + eye - 6 + 1);
             }
-            const boat = this.add.image(x, top7 - 118, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+            const boat = this.add.image(x, hang + 24, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
     }
 
-    // An invisible wall at one end of the promenade, there only while she is on it. `x` is where
-    // her middle stops; `side` is -1 at the fore end, 1 at the aft end.
-    addPromenadeEnd(x, side, floor) {
+    // An invisible wall at one end of the promenade or of cabin 8206, there only while she is on that
+    // route. `x` is where her middle stops; `side` is -1 at the fore end, 1 at the aft end.
+    addRouteWall(x, side, floor, route) {
         const w = 32;
         const edge = x + side * PLAYER.bodyWidth / 2;
         const zone = this.add.zone(edge + side * w / 2, floor - this.deckPitch / 2, w, this.deckPitch);
         this.physics.add.existing(zone, true);
-        (this.promenadeEnds ||= []).push(zone);
+        zone.route = route;
+        (this.routeWalls ||= []).push(zone);
+    }
+
+    // The railing, leaning, its foot at (x, y): each row up from its foot shifted `k` px per px of
+    // height toward `dir` (1 aft, at a deck's forward end; -1 forward, at its aft end). Its texture
+    // is made once per slope.
+    leaningRailing(x, y, k, dir) {
+        const key = `railing-lean-${dir}-${k.toFixed(2)}`;
+        const frame = this.textures.getFrame('shipart', 'railing-bg');
+        const { width: w, height: h } = frame;
+        const lean = Math.ceil(k * (h - 1));
+        if (!this.textures.exists(key)) {
+            const canvas = this.textures.createCanvas(key, w + lean, h);
+            const ctx = canvas.getContext();
+            for (let row = 0; row < h; row++) {
+                const shift = Math.round(k * (h - 1 - row));
+                ctx.drawImage(frame.source.image, frame.cutX, frame.cutY + row, w, 1, dir < 0 ? lean - shift : shift, row, w, 1);
+            }
+            canvas.refresh();
+        }
+        // The foot's middle is w/2 in from the foot's own side of the texture.
+        const footX = dir < 0 ? lean + w / 2 : w / 2;
+        return this.add.image(x, y, key).setOrigin(footX / (w + lean), 1);
+    }
+
+    // --- Cabin 8206 (§5.3) --------------------------------------------------------------------
+    // The user's own cabin on the cruise, on deck 8: its door stands open, a brass number beside it
+    // and the steward's linen cart. E at the door and she is inside: the ship's side closes round
+    // the cabin, cut away only there, the room as in her photo.
+
+    buildCabin(o, prop) {
+        const x0 = o.x - CABIN.doorX;
+        const c = this.cabin = { door: o.x, floor: o.y, number: prop(o, 'number', 0) };
+        const door = this.add.image(o.x, o.y, 'cabin-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        const plate = this.add.text(o.x + 21, o.y - 50, String(c.number), {
+            fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
+            backgroundColor: '#d9a43b', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        const cart = this.add.image(o.x - 36, o.y, 'shipart', 'towel-trolley-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15);
+        c.room = this.add.image(x0, o.y - CABIN.height, 'cabin-8206').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
+        this.worldLayer.add([door, plate, cart, c.room]);
+        this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
+        this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
+        // The bed holds her from above, like a side walk (the user, 2026-11-06: she can jump on it).
+        const [a, b] = CABIN.bed;
+        c.bed = this.add.zone(x0 + (a + b) / 2, o.y - CABIN.bedTop + 4, b - a, 8);
+        this.physics.add.existing(c.bed, true);
+        // Two tangerines side by side on the desk under the TV (the user, 2026-11-06).
+        CABIN.desk.tangerines.forEach((dx, i) => this.addTangerine(`t-cabin-${i + 1}`, o.x + dx, o.y - CABIN.desk.top + 1, 'cabin'));
+    }
+
+    // A tangerine resting at (x, y), unless she has it already; one on another route (the cabin's)
+    // is drawn over that route's room and shows only there.
+    addTangerine(id, x, y, route = 'inside') {
+        if (this.save.collected.includes(id)) return;
+        const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
+        const sprite = this.add.image(x, y, 'tangerine').setOrigin(0.5, 1).setDepth(depth);
+        const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
+        this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
+        this.worldLayer.add([sprite, glint]);
+        this.tangerines.push({ id, sprite, glint, route });
+    }
+
+    // A door at her feet to another route: the promenade's (deck 6), or cabin 8206's.
+    routeDoorAt(x, y) {
+        const door = this.promenadeDoorAt(x, y);
+        if (door !== null && this.route !== 'cabin') return { x: door, to: this.route === 'promenade' ? 'inside' : 'promenade' };
+        const c = this.cabin;
+        if (c && this.route !== 'promenade' && Math.abs(y - c.floor) <= 4 && Math.abs(x - c.door) < 16) {
+            return { x: c.door, to: this.route === 'cabin' ? 'inside' : 'cabin' };
+        }
+        return null;
     }
 
     promenadeDoorAt(x, y) {
@@ -514,10 +636,10 @@ export class ShipScene extends Phaser.Scene {
         return pr.doors.find(d => Math.abs(x - d) < 16) ?? null;
     }
 
-    // E at a promenade door: a quick fade, and she is on the other side of it.
-    usePromenadeDoor() {
+    // E at a promenade door or the cabin's: a quick fade, and she is on the other side of it.
+    useRouteDoor() {
         const p = this.player;
-        const door = this.promenadeDoorAt(p.x, p.y);
+        const door = this.routeDoorAt(p.x, p.y);
         if (door === null) return false;
         this.mode = 'scripted';
         this.script = null;
@@ -527,8 +649,8 @@ export class ShipScene extends Phaser.Scene {
         const cam = this.cameras.main;
         cam.fadeOut(PROMENADE.fadeMs, 0, 0, 0);
         cam.once('camerafadeoutcomplete', () => {
-            this.route = this.route === 'promenade' ? 'inside' : 'promenade';
-            p.body.reset(door, p.y);
+            this.route = door.to;
+            p.body.reset(door.x, p.y);
             this.updateCutaway(0);
             cam.fadeIn(PROMENADE.fadeMs * 1.3, 0, 0, 0);
             this.mode = 'play';
@@ -821,6 +943,29 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // A deck's directory board in a lobby (the user's deck 8 photo): blue in a brass frame, the
+    // deck's plan in white across its top, its rooms listed below.
+    drawDirectory(g, o) {
+        const top = o.y - 72, w = o.width, h = 42;
+        g.fillStyle(0xd9a43b, 1).fillRect(o.x, top, w, h);
+        g.fillStyle(0x323353, 1).fillRect(o.x + 2, top + 2, w - 4, h - 4);
+        g.fillStyle(0x4d65b4, 1).fillRect(o.x + 3, top + 3, w - 6, 6);
+        g.fillStyle(0xf28c28, 1).fillRect(o.x + 4, top + 4, 4, 4);
+        g.fillStyle(0xffffff, 1).fillRect(o.x + 10, top + 5, w - 14, 1);
+        g.fillStyle(0xffffff, 1).fillRect(o.x + 4, top + 12, w - 8, 5);
+        g.fillStyle(0x4d9be6, 1).fillRect(o.x + 6, top + 13, w - 12, 3);
+        for (let i = 0; i < 7; i++) {
+            g.fillStyle(i % 3 ? 0xc7dcd0 : 0xf9c22b, 1).fillRect(o.x + 4, top + 20 + i * 2.5, 3 + (i * 5) % 9 + 6, 1);
+        }
+    }
+
+    // A warm light hidden along the top of a wall, as round the atrium (the user's photos).
+    drawCove(g, o) {
+        const y = o.y - this.deckPitch + 16;
+        g.fillStyle(0xfbb954, 0.9).fillRect(o.x, y + 3, o.width, 1);
+        for (let i = 0; i < 6; i++) g.fillStyle(0xfbb954, 0.35 * (1 - i / 6)).fillRect(o.x, y + 4 + i, o.width, 1);
+    }
+
     // Warm downlights along a room's ceiling.
     drawDownlights(g, o) {
         const y = o.y - this.deckPitch + 16;
@@ -877,6 +1022,7 @@ export class ShipScene extends Phaser.Scene {
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
             if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
+            if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
@@ -1056,6 +1202,12 @@ export class ShipScene extends Phaser.Scene {
                     fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#f28c28', backgroundColor: '#14161c',
                     padding: { x: 2, y: 1 }, resolution: 4,
                 }).setOrigin(0.5).setDepth(DEPTH.props);
+                // The deck's number on a red disc beside the doors (the user's deck 8 photo).
+                const disc = this.add.circle(o.x - 27, f.y - 46, 4, 0xae2334).setDepth(DEPTH.props);
+                const digit = this.add.text(o.x - 27, f.y - 46, String(f.deck), {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#ffffff', resolution: 4,
+                }).setOrigin(0.5).setDepth(DEPTH.props);
+                this.worldLayer.add([disc, digit]);
                 this.worldLayer.add([car, frame, number]);
                 f.leaves = this.makeLeaves(o.x, 'lift-leaf', DEPTH.props);
                 this.setLeaves(f.leaves, f.y, 0);
@@ -1100,7 +1252,12 @@ export class ShipScene extends Phaser.Scene {
         this.player = p;
 
         this.physics.add.collider(p, this.solidLayer);
-        this.physics.add.collider(p, this.promenadeEnds || [], null, () => this.route === 'promenade');
+        this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
+        this.physics.add.collider(p, this.railingStops || []);
+        if (this.cabin) {
+            this.physics.add.collider(p, this.cabin.bed, null, (_, bed) =>
+                this.route === 'cabin' && p.body.velocity.y >= 0 && p.body.bottom <= bed.body.top + 10);
+        }
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
@@ -1245,8 +1402,8 @@ export class ShipScene extends Phaser.Scene {
         this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.
-        if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route !== 'promenade') {
-            this.checkPickups();
+        if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkPickups();
+        if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route === 'inside') {
             this.checkCheckpoints();
             this.checkVacuums();
             this.checkBumbot();
@@ -1269,9 +1426,9 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
-        if (onFloor && input.activatePressed && this.usePromenadeDoor()) return;
-        // On the promenade the rooms' stairs, ladders, trunks and elevators are out of reach.
-        const inside = this.route !== 'promenade';
+        if (onFloor && input.activatePressed && this.useRouteDoor()) return;
+        // On the promenade, or in the cabin, the stairs, ladders, trunks and elevators are out of reach.
+        const inside = this.route === 'inside';
         if (inside && onFloor && input.activatePressed && this.callLift()) return;
         if (inside && onFloor && input.activatePressed) this.activateTrunkDoor();
         if (inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
@@ -1320,6 +1477,54 @@ export class ShipScene extends Phaser.Scene {
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
         else if (this.atBow() && time - (this.stillSince ?? time) > BOW_VIEW.idleMs) this.startBowView();
+        else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) this.startBedJoy();
+    }
+
+    // --- Bouncing on the cabin's bed (§5.3) ---------------------------------------------------
+
+    onBed() {
+        const c = this.cabin;
+        return c && this.route === 'cabin' && Math.abs(this.player.y - c.bed.body.top) < 2;
+    }
+
+    // She turns to us and bounces on the bed for joy, in place, hopping from one foot to the other,
+    // her arms waving up and down; any key and she stops. Her frames and her hops run off one
+    // clock: off the bed with a foot up (frames 0 and 4), landing on both (2 and 6).
+    startBedJoy() {
+        const p = this.player;
+        const y = p.y;
+        const frames = this.anims.get('her-bed-joy').frames.map(f => f.frame.name);
+        this.mode = 'scripted';
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.anims.stop();
+        p.setFlipX(false);
+        let t = 0;
+        this.script = dt => {
+            const i = this.controls.state;
+            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) {
+                this.endBedJoy(y);
+                return;
+            }
+            t += dt * 1000;
+            const phase = (t % BED_JOY.cycleMs) / BED_JOY.cycleMs;
+            p.setFrame(frames[Math.floor(phase * frames.length)]);
+            // Each hop: on the bed a moment around the landing, in the air the rest, highest at its
+            // middle, a foot up.
+            const g = ((phase * 2) % 1 + 0.35) % 1;
+            p.y = g < BED_JOY.air ? y - Math.round(BED_JOY.hop * Math.sin(Math.PI * g / BED_JOY.air)) : y;
+        };
+    }
+
+    endBedJoy(y) {
+        const p = this.player;
+        this.script = null;
+        this.mode = 'play';
+        p.y = y;
+        p.body.enable = true;
+        p.body.reset(p.x, p.y);
+        this.pose('stand');
+        this.stillSince = this.time.now;
     }
 
     // --- The bow view (§5.3) --------------------------------------------------------------------
@@ -1547,7 +1752,11 @@ export class ShipScene extends Phaser.Scene {
         const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
             || (this.mode === 'lift' && this.liftMove?.carriesHer);
         let target;
-        if (this.route === 'promenade') target = null;  // outside: every deck shows its shell
+        // Outside on the promenade every deck shows its shell; in the cabin too, but for the cabin;
+        // and outdoors where there is no way in (deck 7's stern strip).
+        const outdoors = this.outdoors?.find(a => p.x >= a.x0 && p.x <= a.x1 && p.y <= a.floor + 4 && p.y > a.floor - this.deckPitch);
+        for (const a of this.outdoors || []) a.cover.setVisible(a === outdoors);
+        if (this.route !== 'inside' || outdoors) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -1569,8 +1778,13 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
+        this.cabin?.room.setVisible(this.route === 'cabin');
+        for (const t of this.tangerines) {
+            if (t.route !== 'inside' && t.sprite.active) [t.sprite, t.glint].forEach(s => s.setVisible(t.route === this.route));
+        }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
         for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------
@@ -1996,7 +2210,7 @@ export class ShipScene extends Phaser.Scene {
     checkPickups() {
         const p = this.player;
         for (const t of this.tangerines) {
-            if (!t.sprite.active) continue;
+            if (!t.sprite.active || t.route !== this.route) continue;
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);

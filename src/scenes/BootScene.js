@@ -13,6 +13,8 @@ export class BootScene extends Phaser.Scene {
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.image('livery', 'assets/ship/livery.png');
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
+        this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
+        this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
@@ -43,6 +45,9 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
         // At the bow: arms spread wide into the wind, held (the bow view).
         this.anims.create({ key: 'her-arms-wide', frames: frames('arms-wide', [1, 2, 3, 4, 5]), frameRate: 8 });
+        // Bouncing on the cabin's bed for joy, foot to foot, arms waving up and down (facing us): the
+        // game steps through its frames itself, in time with her hops.
+        this.anims.create({ key: 'her-bed-joy', frames: frames('bed-joy'), frameRate: 9, repeat: -1 });
         // Breaststroke in a pool.
         this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.

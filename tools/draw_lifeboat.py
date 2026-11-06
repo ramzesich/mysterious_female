@@ -3,7 +3,9 @@ the user's photo of the ship's side: a red-orange canopy over a white hull, a ro
 the steering cupola aft, and a release hook at each end where the davit's cable takes it. Resurrect
 64 colours only, a one-colour outline like the other pieces on board. Bow to the left.
 
-Writes assets/source/ship/lifeboats/drawn.png and the game's copy, assets/ship/lifeboat.png. Run from the repo root:
+Writes assets/source/ship/lifeboats/drawn.png and the game's copy, assets/ship/lifeboat.png, washed
+out a little toward the ship's white plating: it is background, like every muted prop (the user,
+2026-11-06). Run from the repo root:
     python tools/draw_lifeboat.py [--preview out.png]
 """
 
@@ -17,6 +19,7 @@ OUT = ROOT / "assets" / "source" / "ship" / "lifeboats" / "drawn.png"
 GAME = ROOT / "assets" / "ship" / "lifeboat.png"
 
 W, H = 300, 100
+PLATING, MUTE = (0xE8, 0xEA, 0xEC), 0.35     # what the boat fades toward, and how far (as the -bg props)
 OUTLINE = "#2e222f"
 HULL, HULL_SHADE, HULL_DARK = "#ffffff", "#c7dcd0", "#9babb2"
 RUB = "#3e3546"
@@ -82,11 +85,22 @@ def draw():
     return im
 
 
+def washed(im):
+    out = im.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (*(round(c + (t - c) * MUTE) for c, t in zip((r, g, b), PLATING)), a)
+    return out
+
+
 if __name__ == "__main__":
     im = draw()
     OUT.parent.mkdir(parents=True, exist_ok=True)
     im.save(OUT)
-    im.save(GAME)
+    washed(im).save(GAME)
     if "--preview" in sys.argv:
         out = sys.argv[sys.argv.index("--preview") + 1]
         bg = Image.new("RGBA", (W + 20, H + 20), "#e8eaec")

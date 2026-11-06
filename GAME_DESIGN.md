@@ -900,8 +900,49 @@ Nothing blocks the start of the build. These get settled along the way:
       elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
       back on, and the playtests use it). They come back with the unlockable areas, with the
       checkpoints
-- [ ] **Start the next session here: furnish deck 8**, then upward deck by deck (decks 4-7 are
-      done and merged, 2026-11-03). The way each deck went: read NCL's plan for it
+- [ ] **Deck 8 furnished** (2026-11-06, branch `deck-8`, awaiting the user's look): NCL's plan has
+      only cabins there and the atrium. **Cabin 8206, the user's own cabin on the cruise**
+      (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
+      forward, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's deck 8 plan, kept in
+      `reference/web/deck8/`). Its door stands open with a brass "8206" and the steward's linen
+      cart; **E at it and she is inside** (a third route, like the promenade's): the ship's side
+      closes round the cabin, cut away only there, the room drawn by hand from her photo
+      (`tools/draw_cabin.py`: mirrored wardrobe, the door back out, the wood desk unit, TV and
+      pouf, the window in its wood surround with grey curtains, the grey sofa with teal cushions,
+      the painting over it, the bed with its teal runner). The user's corrections: the door stands
+      on the same line as the wardrobe and desk; **the painting is the one in her photo**, cropped
+      from it and converted by PixelLab (`image_to_pixelart`, faithful, 1 generation; a version
+      remapped to blues was tried, the user preferred the first); everything but the bed washed
+      out a little; **she can jump onto the bed** and stand on it; **two tangerines side by side on
+      the desk** under the TV (extra to the ten of §6.3). **Standing still on the bed for a second,
+      she bounces on it for joy** (the user's idea): turned to us, in place, from one foot to the
+      other, hopping a little off the bed onto the other foot, her arms waving up and down; any
+      key stops it (skeleton-v3 custom poses facing the camera, 3 generations,
+      `assets/source/her/bed-bounce/`, drawn as PixelLab made them, the user's choice; PixelLab
+      kept her feet down, so the hops are the game's, frames and hops run off one clock, a hop on
+      each foot every 0.64 s, `BED_JOY` in `src/config.js`). A first try, skeleton-v3's `cheer` with the game hopping her side to side,
+      was not what the user meant (kept in `bed-cheer/`). `?at=cabin` starts her inside by its
+      door, where she comes in. The user's corrections to the rest of the deck: **deck 8's two
+      terraces** (its ends past deck 9, fore and aft) are reached behind a stretch of the ship's
+      white wall, 2 m thick, as deck 7's mooring deck is (`end_walls()` in the map builder);
+      **railings at a deck's end lean in along the slope of the ship's side under them**, carrying
+      it on up over the deck (a first try leaned them out, mirroring it), drawn in front of her, so she
+      stands behind them, stopping a little short of them, their outer foot where the floor ends
+      (on every deck: the user, 2026-11-06); the walls before the other decks' terraces (deck 9
+      fore and aft, deck 10 aft) come as those decks are furnished; **the lifeboats hang from
+      deck 7's ceiling**, the underside of deck 8's floor (their davits had hung from deck 8's
+      carpet), **washed out a little like every background piece**, boats, davits, cables and
+      columns alike, each cable down to its own hook. **Deck 7's stern strip** (dropping from deck
+      8's stern terrace lands on it): no way in to the theatre's balcony (a solid wall), and while
+      she is on it the ship's side stays closed, deck 7's sloped stern plating in front of her,
+      hiding her (see the reminder in "After the ship is populated"). Cabins are numbered as on the real
+      ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
+      lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
+      (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
+      blue directory board and an exit sign over the stairs. The atrium's walk on deck 8:
+      downlights, a warm cove light, paintings. 7 generations (the painting, two tries at the bounce)
+- [ ] **Start the next session here: furnish deck 9**, then upward deck by deck (decks 4-8 are
+      done, 2026-11-06). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
@@ -926,8 +967,13 @@ Nothing blocks the start of the build. These get settled along the way:
     the finale (§4)
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
+  - **Deck 7's stern strip** (the user, 2026-11-06; **remind the user when placing gameplay
+    items, NPCs and the like**): the open strip at deck 7's level behind deck 8's end, on the stern
+    structure, is kept, reachable only by dropping from deck 8's stern terrace; its wall into the
+    Stardust balcony is solid. Maybe a secret place later. For now she can only leave it by
+    jumping off the ship (a scare)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1789 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1782 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**
