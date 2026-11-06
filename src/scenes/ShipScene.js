@@ -1424,24 +1424,40 @@ export class ShipScene extends Phaser.Scene {
         return c && this.route === 'cabin' && Math.abs(this.player.y - c.bed.body.top) < 2;
     }
 
-    // She turns to us and bounces on the bed for joy, in place, from one foot to the other, her
-    // arms waving up and down (the bounce is in her frames); any key and she stops.
+    // She turns to us and bounces on the bed for joy, in place, hopping from one foot to the other,
+    // her arms waving up and down; any key and she stops. Her frames and her hops run off one
+    // clock: off the bed with a foot up (frames 0 and 4), landing on both (2 and 6).
     startBedJoy() {
         const p = this.player;
+        const y = p.y;
+        const frames = this.anims.get('her-bed-joy').frames.map(f => f.frame.name);
         this.mode = 'scripted';
         p.body.setVelocity(0, 0);
         p.body.enable = false;
-        p.setFlipX(false).anims.play('her-bed-joy');
-        this.script = () => {
+        p.anims.stop();
+        p.setFlipX(false);
+        let t = 0;
+        this.script = dt => {
             const i = this.controls.state;
-            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) this.endBedJoy();
+            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) {
+                this.endBedJoy(y);
+                return;
+            }
+            t += dt * 1000;
+            const phase = (t % BED_JOY.cycleMs) / BED_JOY.cycleMs;
+            p.setFrame(frames[Math.floor(phase * frames.length)]);
+            // Each hop: on the bed a moment around the landing, in the air the rest, highest at its
+            // middle, a foot up.
+            const g = ((phase * 2) % 1 + 0.35) % 1;
+            p.y = g < BED_JOY.air ? y - Math.round(BED_JOY.hop * Math.sin(Math.PI * g / BED_JOY.air)) : y;
         };
     }
 
-    endBedJoy() {
+    endBedJoy(y) {
         const p = this.player;
         this.script = null;
         this.mode = 'play';
+        p.y = y;
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.pose('stand');

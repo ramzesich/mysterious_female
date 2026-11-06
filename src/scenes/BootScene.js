@@ -45,7 +45,8 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
         // At the bow: arms spread wide into the wind, held (the bow view).
         this.anims.create({ key: 'her-arms-wide', frames: frames('arms-wide', [1, 2, 3, 4, 5]), frameRate: 8 });
-        // Bouncing on the cabin's bed for joy, foot to foot, arms waving up and down (facing us).
+        // Bouncing on the cabin's bed for joy, foot to foot, arms waving up and down (facing us): the
+        // game steps through its frames itself, in time with her hops.
         this.anims.create({ key: 'her-bed-joy', frames: frames('bed-joy'), frameRate: 9, repeat: -1 });
         // Breaststroke in a pool.
         this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });

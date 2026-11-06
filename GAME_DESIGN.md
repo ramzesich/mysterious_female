@@ -916,9 +916,11 @@ Nothing blocks the start of the build. These get settled along the way:
       out a little; **she can jump onto the bed** and stand on it; **two tangerines side by side on
       the desk** under the TV (extra to the ten of §6.3). **Standing still on the bed for a second,
       she bounces on it for joy** (the user's idea): turned to us, in place, from one foot to the
-      other, her arms waving up and down; any key stops it (skeleton-v3 custom poses facing the
-      camera, 3 generations, `assets/source/her/bed-bounce/`, used as PixelLab drew them, the
-      user's choice). A first try, skeleton-v3's `cheer` with the game hopping her side to side,
+      other, hopping a little off the bed onto the other foot, her arms waving up and down; any
+      key stops it (skeleton-v3 custom poses facing the camera, 3 generations,
+      `assets/source/her/bed-bounce/`, drawn as PixelLab made them, the user's choice; PixelLab
+      kept her feet down, so the hops are the game's, frames and hops run off one clock, a hop on
+      each foot every 0.64 s, `BED_JOY` in `src/config.js`). A first try, skeleton-v3's `cheer` with the game hopping her side to side,
       was not what the user meant (kept in `bed-cheer/`). `?at=cabin` starts her inside by its
       door, where she comes in. Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The

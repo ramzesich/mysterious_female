@@ -53,9 +53,13 @@ export const BOW_VIEW = {
 };
 
 // Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it this long, she bounces on it
-// for joy, in place, from one foot to the other, her arms waving up and down.
+// for joy, in place, hopping from one foot to the other, her arms waving up and down: one cycle
+// (a hop on each foot) this long, each hop this high (px), in the air for this share of it.
 export const BED_JOY = {
     idleMs: 1000,
+    cycleMs: 640,
+    hop: 7,
+    air: 0.7,
 };
 
 // Elevators (§5.1): the car's speed between decks and how long the doors take to slide.

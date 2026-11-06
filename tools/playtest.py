@@ -551,9 +551,12 @@ def scenario_cabin(b):
     b.shot("cabin-bed")
     # Standing still on it a second, she bounces for joy; any key and she stops, still on the bed.
     time.sleep(1.4)
-    anim = lambda: b.eval("window.__ship.player.anims.currentAnim?.key")
-    ok &= check(b.state()["mode"] == "scripted" and anim() == "her-bed-joy", "a second still on the bed: she bounces for joy",
-                (b.state(), anim()))
+    ys = []
+    for _ in range(12):
+        ys.append(b.state()["y"])
+        time.sleep(0.05)
+    ok &= check(b.state()["mode"] == "scripted" and min(ys) < floor_y(8) - 32 - 3 and max(ys) == floor_y(8) - 32,
+                "a second still on the bed: she bounces for joy, off it and back", ys)
     b.shot("cabin-bed-joy")
     b.tap("left")
     time.sleep(0.5)
