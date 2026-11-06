@@ -342,17 +342,28 @@ def build_layers():
 
 # The ship's white wall where a deck's indoors end at an open stretch of deck, as at every deck's
 # end, END_WALL_M thick, a deck door through it implied: she passes behind it (the user,
-# 2026-11-03, deck 7's front to the mooring deck; 2026-11-06, deck 8's ends to its terraces).
+# 2026-11-03, deck 7's front to the mooring deck; 2026-11-06, deck 8's small terraces at its ends,
+# past the deck above). The other decks' terraces (deck 9 fore and aft, deck 10 aft) get theirs as
+# each deck is furnished (the user, 2026-11-06); deck 11's open ends are the pool deck's own.
 END_WALL_M = 2.0
+END_WALL_DECKS = (8,)
+TERRACE_MIN_M = 1.0            # an open strip shorter than this is no terrace (the extents' rounding)
 
 
 def end_walls():
     """(deck, first column, last column + 1) of each end wall, on the indoor side of the edge."""
     w = round(END_WALL_M * PER_M)
     a7 = col(EXTENT[8][0])
-    under9 = [c for c in range(col(EXTENT[8][0]), col(EXTENT[8][1])) if covered(8, metres(c))]
-    a8, b8 = under9[0], under9[-1] + 1
-    return [(7, a7, a7 + w), (8, a8, a8 + w), (8, b8 - w, b8)]
+    walls = [(7, a7, a7 + w)]
+    for deck in END_WALL_DECKS:
+        fwd, aft = EXTENT[deck]
+        under = [c for c in range(col(fwd), col(aft)) if covered(deck, metres(c))]
+        a, b = under[0], under[-1] + 1
+        if metres(a) - fwd >= TERRACE_MIN_M:
+            walls.append((deck, a, a + w))
+        if aft - metres(b) >= TERRACE_MIN_M:
+            walls.append((deck, b - w, b))
+    return walls
 
 
 def in_end_wall(deck, c):

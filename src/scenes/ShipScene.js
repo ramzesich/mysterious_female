@@ -7,6 +7,7 @@ import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
 const RAILING = 4;
+const RAILING_STOP = 10;   // px short of a leaning railing's foot that she stops
 
 const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
@@ -190,11 +191,20 @@ export class ShipScene extends Phaser.Scene {
             if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
             const x = t.pixelX + t.width / 2, deck = this.deckOfRow(t.y);
             const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
-            const img = s ? this.leaningRailing(x, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), s.x0 < s.x1 ? 1 : -1)
+            // A leaning one stands in from the deck's end, its outer foot where the floor ends.
+            const inward = s && (s.x0 < s.x1 ? 1 : -1);
+            const footX = s ? t.pixelX + (inward > 0 ? 0 : t.width) + inward * this.textures.getFrame('shipart', 'railing-bg').width / 2 : x;
+            const img = s ? this.leaningRailing(footX, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), inward)
                 : this.add.image(x, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
-            // A leaning railing reaches in over the deck, in front of her: she stands behind it (the
-            // user, 2026-11-06).
+            // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
+            // stops a little short of its foot (the user, 2026-11-06).
             railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
+            if (s) {
+                const edge = footX + inward * t.width / 2;
+                const stop = this.add.zone(edge + inward * RAILING_STOP / 2, t.pixelY, RAILING_STOP, 2 * t.height);
+                this.physics.add.existing(stop, true);
+                (this.railingStops ||= []).push(stop);
+            }
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
@@ -1224,6 +1234,7 @@ export class ShipScene extends Phaser.Scene {
 
         this.physics.add.collider(p, this.solidLayer);
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
+        this.physics.add.collider(p, this.railingStops || []);
         if (this.cabin) {
             this.physics.add.collider(p, this.cabin.bed, null, (_, bed) =>
                 this.route === 'cabin' && p.body.velocity.y >= 0 && p.body.bottom <= bed.body.top + 10);

@@ -927,7 +927,9 @@ Nothing blocks the start of the build. These get settled along the way:
       white wall, 2 m thick, as deck 7's mooring deck is (`end_walls()` in the map builder);
       **railings at a deck's end lean in along the slope of the ship's side under them**, carrying
       it on up over the deck (a first try leaned them out, mirroring it), drawn in front of her, so she
-      stands behind them; **the lifeboats hang from deck 7's ceiling**, the underside of deck 8's floor (their
+      stands behind them, stopping a little short of them, their outer foot where the floor ends
+      (on every deck: the user, 2026-11-06); the walls before the other decks' terraces (deck 9
+      fore and aft, deck 10 aft) come as those decks are furnished; **the lifeboats hang from deck 7's ceiling**, the underside of deck 8's floor (their
       davits had hung from deck 8's carpet). Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
       lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
