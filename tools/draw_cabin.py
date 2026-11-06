@@ -125,7 +125,8 @@ def interior():
     r(108, 97, 112, 98, WOOD_LIGHT)
     r(96, 84, 104, 87, INK)                                       # the phone
     r(97, 83, 99, 83, INK)
-    r(110, 85, 122, 87, WHITE)                                    # papers, the daily programme
+    r(106, 85, 109, 87, WHITE)                                    # the daily programme; two tangerines
+                                                                  # sit beside it (ShipScene's CABIN.desk)
     r(93, 56, 95, 60, INK)                                        # the TV's arm, its screen
     r(96, 44, 124, 64, INK)
     r(98, 46, 122, 62, "#3e3546")

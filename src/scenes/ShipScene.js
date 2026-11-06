@@ -25,8 +25,10 @@ const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
 // Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
 // over the floor, how close to its side walls she can go, and the bed she can jump onto: its ends
-// and its top over the floor.
-const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32 };
+// and its top over the floor; the desk's top over the floor and where on it the two tangerines sit,
+// from the door (the user, 2026-11-06).
+const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
+                desk: { top: 40, tangerines: [53, 61] } };
 
 // How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
 // staircase.
@@ -251,14 +253,10 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'tangerine': {
-                    if (this.save.collected.includes(o.name)) break;
                     // Everything rests on something (§6.3): here, a small side table.
                     const table = this.add.image(o.x, o.y, 'sidetable').setOrigin(0.5, 1).setDepth(DEPTH.decor);
-                    const sprite = this.add.image(o.x, o.y - table.height, 'tangerine').setOrigin(0.5, 1).setDepth(DEPTH.props);
-                    const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(DEPTH.props).setAlpha(0);
-                    this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
-                    this.worldLayer.add([table, sprite, glint]);
-                    this.tangerines.push({ id: o.name, sprite, glint });
+                    this.worldLayer.add(table);
+                    this.addTangerine(o.name, o.x, o.y - table.height);
                     break;
                 }
 
@@ -543,6 +541,20 @@ export class ShipScene extends Phaser.Scene {
         const [a, b] = CABIN.bed;
         c.bed = this.add.zone(x0 + (a + b) / 2, o.y - CABIN.bedTop + 4, b - a, 8);
         this.physics.add.existing(c.bed, true);
+        // Two tangerines side by side on the desk under the TV (the user, 2026-11-06).
+        CABIN.desk.tangerines.forEach((dx, i) => this.addTangerine(`t-cabin-${i + 1}`, o.x + dx, o.y - CABIN.desk.top + 1, 'cabin'));
+    }
+
+    // A tangerine resting at (x, y), unless she has it already; one on another route (the cabin's)
+    // is drawn over that route's room and shows only there.
+    addTangerine(id, x, y, route = 'inside') {
+        if (this.save.collected.includes(id)) return;
+        const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
+        const sprite = this.add.image(x, y, 'tangerine').setOrigin(0.5, 1).setDepth(depth);
+        const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
+        this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
+        this.worldLayer.add([sprite, glint]);
+        this.tangerines.push({ id, sprite, glint, route });
     }
 
     // A door at her feet to another route: the promenade's (deck 6), or cabin 8206's.
@@ -1327,8 +1339,8 @@ export class ShipScene extends Phaser.Scene {
         this.updateCutaway(dt);
 
         // Inside a trunk or an elevator she is out of everyone's way.
+        if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkPickups();
         if ((this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') && this.route === 'inside') {
-            this.checkPickups();
             this.checkCheckpoints();
             this.checkVacuums();
             this.checkBumbot();
@@ -1653,6 +1665,9 @@ export class ShipScene extends Phaser.Scene {
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
         this.cabin?.room.setVisible(this.route === 'cabin');
+        for (const t of this.tangerines) {
+            if (t.route !== 'inside' && t.sprite.active) [t.sprite, t.glint].forEach(s => s.setVisible(t.route === this.route));
+        }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
         for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
     }
@@ -2080,7 +2095,7 @@ export class ShipScene extends Phaser.Scene {
     checkPickups() {
         const p = this.player;
         for (const t of this.tangerines) {
-            if (!t.sprite.active) continue;
+            if (!t.sprite.active || t.route !== this.route) continue;
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);

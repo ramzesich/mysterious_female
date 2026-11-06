@@ -913,7 +913,8 @@ Nothing blocks the start of the build. These get settled along the way:
       on the same line as the wardrobe and desk; **the painting is the one in her photo**, cropped
       from it and converted by PixelLab (`image_to_pixelart`, faithful, 1 generation; a version
       remapped to blues was tried, the user preferred the first); everything but the bed washed
-      out a little; **she can jump onto the bed** and stand on it. Cabins are numbered as on the real
+      out a little; **she can jump onto the bed** and stand on it; **two tangerines side by side on
+      the desk** under the TV (extra to the ten of §6.3). Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
       lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
       (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
