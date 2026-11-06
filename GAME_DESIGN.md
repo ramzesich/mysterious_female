@@ -337,7 +337,7 @@ venue's position along the ship. Use it whenever a position or proportion needs 
 
 - **The bow is on the left**, the stern on the right.
 - Three stair-and-elevator cores: **forward** (~79 m from the bow), **midship** (~96 m) and **aft**
-  (~198 m). The **atrium** spans decks 5–9 between the forward and midship cores, with glass
+  (~198 m). The **atrium** spans decks 5–10 (deck 10 open over it since 2026-11-06; its glass elevator and staircase 5–9) between the forward and midship cores, with glass
   elevators. The funnel stands over the aft half.
 - **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
 - **Floors and open spaces (Decided, 2026-11-02, replacing "the atrium is a look, not a
@@ -772,7 +772,7 @@ Nothing blocks the start of the build. These get settled along the way:
       a suitcase, ice cream, a pool ladder and more
 - [x] **Ship structure, part 1** (2026-11-02, merged): **(1) the atrium**, an open space 20 m long
       (the midship core moved 10 m aft), decks 6-9 crossing it on **side walks level with their
-      floor** (no step-up: tried and dropped), a skylight dome under deck 10, burl-wood pillars;
+      floor** (no step-up: tried and dropped), a skylight dome under deck 10 (under deck 11 since 2026-11-06, deck 10 opened over the atrium), burl-wood pillars;
       **(2) deck 12's side walk over deck 11**, where ↓ drops her through into a pool, glass side
       walls on decks 11-12, **two pools with swimming** (a side-on breaststroke; a crawl is kept in
       `assets/source/her/swim-crawl/`); **(3) the stairs** drawn from her photos (blue carpet,
@@ -962,11 +962,36 @@ Nothing blocks the start of the build. These get settled along the way:
       behind them. Deck 10's aft terrace got its wall now too. Also (the user): **sound is off for
       now** (`SOUND.on` in `src/config.js`; `?sound` turns it on), and **the dash is D** (was
       Shift). `?at=linen` starts in the linen room; a `linen` playtest
-- [ ] **Start the next session here: furnish deck 10**, then upward deck by deck (decks 4-9 are
-      done, 2026-11-06). Deck 10 has the bridge forward (Bumbot's spot) and cabins; its aft terrace
-      already has its wall. NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
+- [x] **Deck 10 furnished** (2026-11-06): cruisedeckplans.com's plan (`reference/web/deck10/`):
+      balcony cabins, inside cabins, aft-facing suites, the atrium open below; no photos, the user
+      remembers it like deck 8, so its lobbies and corridors are deck 8's. **The atrium is open
+      through deck 10** as on the real ship (the user's choice): a side walk with the glass railing,
+      the dome moved up under deck 11; the curving staircase and the glass elevator still run 5-9
+      (`ATRIUM["lift"]`). **The bridge** (25-40 m; its inside starts about 28.5 m, the deck's front
+      being structure): one PixelLab sheet (`bridge-1`, 16 at 64px, 10 generations, all kept),
+      shrunk to her scale in the art packer (a new `height` option; the main console was drawn
+      across two frames and is joined whole): the main console, the helm, the engine telegraph
+      (**Bumbot on the floor batting at its levers**), the captain's chair, the compass binnacle,
+      the radar, the chart display, the chart table, the alarm panel, the clock and barometer and
+      three monitors on the wall; real side windows, big panes with the sky over the sea, in two
+      runs; pale grey-blue steel walls, a dark grey floor. Spare for later: a radio desk, a joystick
+      console, a coffee counter, a logbook lectern. **Its back wall across the deck at 40 m** with a
+      crew door seen from the side (`BRIDGE_WALL_M`), a red "BRIDGE / CREW ONLY" sign: shut, it
+      stops her; **E opens it**, swung flat against the wall on the bridge side, seen face on; it
+      shuts once she is away (the Captain's card is to lock it later, §6.2). **The bridge has its
+      own piece of the ship's side** (`shell_rooms()` in the map builder): out of sight from the
+      corridor, and on the bridge only it is cut open, the rest of the deck closed, with the cut's
+      shadowed edges (the user chose this over dimming the deck there). **Deck 11's pools, from deck
+      10**: their tanks reach below deck 11's floor into deck 10's ceiling; seen from deck 10 or
+      below they are not drawn, and she passes through them (the user: not moved). A `bridge`
+      playtest
+- [ ] **Start the next session here: furnish deck 11**, then deck 12 (decks 4-10 are done,
+      2026-11-06). Deck 11 is the pool deck: the spa and salon, fitness, the Oasis Pool with
+      Topsiders and the hot tubs (Bumbot catching a fly), the Garden Café buffet and the Ice Cream
+      Bar (Bumbot eyeing a fish), the Great Outdoors diner aft (the finale); the user has photos of
+      it (`deck_11_*` in `reference/photos/small/`). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
-      and 9 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
+      to 10 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
@@ -981,9 +1006,8 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] **Open: the `stairs` playtest is flaky** ("with every card she climbs on past deck 6" fails
       now and then, on `main` before deck 8 too): a timing margin in the test, not the game; fix
       when convenient
-- [ ] **Open, for when the upper decks are laid out properly:** on the real ship the upper decks'
-      corridors run along the sides, the middle above the atrium being the atrium and its dome
-      (§5.3); in the game deck 10's corridor runs straight over it
+- [x] **Settled (2026-11-06):** on the real ship deck 10 is open over the atrium; in the game too
+      now, crossed on a side walk, the dome under deck 11
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
   - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
@@ -1000,7 +1024,7 @@ Nothing blocks the start of the build. These get settled along the way:
     Stardust balcony is solid. Maybe a secret place later. For now she can only leave it by
     jumping off the ship (a scare)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1782 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1772 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

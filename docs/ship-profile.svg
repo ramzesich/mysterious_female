@@ -59,8 +59,6 @@
 <text x="232.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
 <rect x="270" y="172" width="170" height="26" rx="2" fill="#ececec"/>
 <text x="355.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
-<rect x="480" y="172" width="100" height="26" rx="2" fill="#ececec"/>
-<text x="530.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="172" width="420" height="26" rx="2" fill="#ececec"/>
 <text x="830.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="172" width="225" height="26" rx="2" fill="#ececec"/>
@@ -133,7 +131,7 @@
 <text x="1212.5" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
 <text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
-<rect x="480" y="202" width="100" height="146" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
+<rect x="480" y="172" width="100" height="176" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
 <text x="530.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Atrium</text>
 <text x="530.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Café</text>
 <rect x="440" y="110" width="40" height="300" fill="#2b5d8a" opacity="0.85"/>
