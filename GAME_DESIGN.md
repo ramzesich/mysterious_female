@@ -900,7 +900,7 @@ Nothing blocks the start of the build. These get settled along the way:
       elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
       back on, and the playtests use it). They come back with the unlockable areas, with the
       checkpoints
-- [ ] **Deck 8 furnished** (2026-11-06, branch `deck-8`, awaiting the user's look): NCL's plan has
+- [x] **Deck 8 furnished** (2026-11-06, merged): NCL's plan has
       only cabins there and the atrium. **Cabin 8206, the user's own cabin on the cruise**
       (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
       forward, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's deck 8 plan, kept in
