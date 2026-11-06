@@ -192,7 +192,9 @@ export class ShipScene extends Phaser.Scene {
             const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
             const img = s ? this.leaningRailing(x, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), s.x0 < s.x1 ? 1 : -1)
                 : this.add.image(x, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
-            railings.push(img.setDepth(DEPTH.decor + 0.1));
+            // A leaning railing reaches in over the deck, in front of her: she stands behind it (the
+            // user, 2026-11-06).
+            railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
