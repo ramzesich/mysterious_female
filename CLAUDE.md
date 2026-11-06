@@ -72,6 +72,27 @@ Lessons learned (2026-10-31):
   `tools/build_sprites.py`, or the clip floats a pixel.
 - Upload local images with `get_upload_url` + curl, then pass `upload:<id>`; never inline base64.
 
+Lessons learned (2026-11-06, decks 9-11):
+
+- **Object sheets draw every piece about her height**, whatever it is: give each piece its real
+  size with the `height` option in `tools/build_ship_art.py` (a cup is a few px, a console ~46).
+  A piece can run across two frames (`join`), or a frame can hold a neighbour's end (`from_x`).
+- "Facing left" in a sheet's description is not reliable: check which way chairs face in the game
+  (`around()` in the map builder has `faces_left`).
+- `create_map_object` with `view: "side"` gives a strict side view when the description says
+  "completely flat front elevation, no depth" (1 generation a try); "seen from the side" alone
+  drifts to three-quarters.
+- **Room views, as the user settled them:** a small room behind a door shows in the corridor's
+  place with the deck around it dimmed (cabin 8206, the linen room: `rooms`, `ROOM_DIM`); a part
+  of a deck behind a wall across it has its own piece of the ship's side, cut open only while she
+  is in it (the bridge, the spa: `shell_rooms()`, `bulkhead` objects, E opens their side-on doors).
+  Open terraces past a wall keep the ship's side closed and their sloped plating and floor edge
+  always drawn (`outdoors` areas, `on_stern_terrace()`).
+- Things that reach below a deck's floor (deck 11's pool tanks, ladders) must not show in the deck
+  under it: check the deck below too after placing them.
+- Playtest screenshots: `spawnAt` now snaps the cut-away, but give fades a second after moving her
+  by hand in a script.
+
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
