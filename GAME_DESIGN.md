@@ -909,12 +909,16 @@ Nothing blocks the start of the build. These get settled along the way:
       closes round the cabin, cut away only there, the room drawn by hand from her photo
       (`tools/draw_cabin.py`: mirrored wardrobe, the door back out, the wood desk unit, TV and
       pouf, the window in its wood surround with grey curtains, the grey sofa with teal cushions,
-      the blue lobster drawing, the bed with its teal runner). Cabins are numbered as on the real
+      the painting over it, the bed with its teal runner). The user's corrections: the door stands
+      on the same line as the wardrobe and desk; **the painting is the one in her photo**, cropped
+      from it and converted by PixelLab (`image_to_pixelart`, faithful, 1 generation; a version
+      remapped to blues was tried, the user preferred the first); everything but the bed washed
+      out a little; **she can jump onto the bed** and stand on it. Cabins are numbered as on the real
       ship: the corridor's back wall is the starboard side, `d2xx` one by one from the bow. The
       lobbies (the user's deck 8 photo): the panelling lighter, a warm terracotta, on every deck
       (the user's choice); a red disc with the deck's number beside every elevator; on deck 8 the
       blue directory board and an exit sign over the stairs. The atrium's walk on deck 8:
-      downlights, a warm cove light, paintings. No generations
+      downlights, a warm cove light, paintings. 1 generation (the painting)
 - [ ] **Start the next session here: furnish deck 9**, then upward deck by deck (decks 4-8 are
       done, 2026-11-06). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
@@ -942,7 +946,7 @@ Nothing blocks the start of the build. These get settled along the way:
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1789 left on 2026-11-03). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1788 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

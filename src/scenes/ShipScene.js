@@ -24,8 +24,9 @@ const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
 // Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
-// over the floor, and how close to its side walls she can go.
-const CABIN = { width: 240, doorX: 59, height: 128, stop: 20 };
+// over the floor, how close to its side walls she can go, and the bed she can jump onto: its ends
+// and its top over the floor.
+const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32 };
 
 // How stairs look (§5.3, the user's photos): the stair cores' flights, and the atrium's curving
 // staircase.
@@ -538,6 +539,10 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add([door, plate, cart, c.room]);
         this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
         this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
+        // The bed holds her from above, like a side walk (the user, 2026-11-06: she can jump on it).
+        const [a, b] = CABIN.bed;
+        c.bed = this.add.zone(x0 + (a + b) / 2, o.y - CABIN.bedTop + 4, b - a, 8);
+        this.physics.add.existing(c.bed, true);
     }
 
     // A door at her feet to another route: the promenade's (deck 6), or cabin 8206's.
@@ -1174,6 +1179,10 @@ export class ShipScene extends Phaser.Scene {
 
         this.physics.add.collider(p, this.solidLayer);
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
+        if (this.cabin) {
+            this.physics.add.collider(p, this.cabin.bed, null, (_, bed) =>
+                this.route === 'cabin' && p.body.velocity.y >= 0 && p.body.bottom <= bed.body.top + 10);
+        }
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>

@@ -34,6 +34,34 @@ TEAL, TEAL_LIGHT = "#0b5e65", "#0b8a8f"
 SKY, SEA, SEA_DARK, SHORE = "#8fd3ff", "#4d65b4", "#484a77", "#547e64"
 
 
+BED_TOP = 96               # the mattress's top, where she stands on the bed (ShipScene's CABIN.bed)
+WASH = 0.3                 # how far the background fades toward the wall
+PAINTING = SOURCE / "lobster-pixellab.png"
+
+
+def wash(im, y0, y1):
+    """Fades a band of the picture toward the wall colour."""
+    px = im.load()
+    w = tuple(int(WALL[i:i + 2], 16) for i in (1, 3, 5))
+    for y in range(y0, y1):
+        for x in range(im.width):
+            c = px[x, y]
+            px[x, y] = (*(round(v + (t - v) * WASH) for v, t in zip(c[:3], w)), c[3])
+
+
+def painting():
+    """The painting from PixelLab as it came (the user preferred it to a version remapped to blues),
+    only the bits of the photo's frame it caught at the edges whitened."""
+    art = Image.open(PAINTING).convert("RGBA")
+    px = art.load()
+    for y in range(art.height):
+        for x in range(art.width):
+            r_, g, b, a = px[x, y]
+            if r_ > b + 12 or a < 128:
+                px[x, y] = (0xf4, 0xf4, 0xf0, 255)
+    return art
+
+
 def interior():
     im = Image.new("RGBA", (W, H), WALL)
     d = ImageDraw.Draw(im)
@@ -68,10 +96,11 @@ def interior():
 
     # The door back out to the corridor (its inside face): wood, a lever, the escape plan, and the
     # "do not disturb" card on the handle.
-    x0, top = 45, FLOOR - 76
-    r(x0, top, x0 + 28, FLOOR - 1, WOOD_DARK)
-    r(x0 + 2, top + 2, x0 + 26, FLOOR - 1, WOOD)
-    r(x0 + 3, top + 3, x0 + 3, FLOOR - 2, WOOD_LIGHT)
+    # It stands on the skirting's line, like the wardrobe and the desk (the user, 2026-11-06).
+    x0, top = 45, FLOOR - 80
+    r(x0, top, x0 + 28, FLOOR - 5, WOOD_DARK)
+    r(x0 + 2, top + 2, x0 + 26, FLOOR - 5, WOOD)
+    r(x0 + 3, top + 3, x0 + 3, FLOOR - 6, WOOD_LIGHT)
     r(x0 + 8, top + 12, x0 + 20, top + 28, WHITE)                # the escape plan
     r(x0 + 9, top + 14, x0 + 19, top + 14, "#1ebc73")
     d.line([(x0 + 10, top + 18), (x0 + 18, top + 24)], fill="#1ebc73")
@@ -125,23 +154,11 @@ def interior():
             r(x, 28, x, 86, "#7f708a" if (x - x0) % 6 else "#3e3546")
         r(x0, 86, x1, 86, "#3e3546")
 
-    # The lobster drawing: blue lines on white in a white frame.
-    r(196, 34, 230, 68, PALE)
-    r(197, 35, 229, 67, WHITE)
-    lob, lob2 = SEA, "#4d9be6"
-    for i, (x, y) in enumerate(((203, 62), (206, 59), (209, 56), (212, 53))):   # the tail's segments
-        d.ellipse([x - 2, y - 2, x + 2, y + 2], outline=lob, fill=WHITE if i else "#dbe9f2")
-    d.polygon([(199, 66), (203, 61), (204, 66)], outline=lob)                   # the tail fan
-    d.ellipse([212, 44, 221, 52], outline=lob)                                  # the shell
-    d.line([(214, 48), (219, 46)], fill=lob2)
-    d.line([(219, 45), (216, 40)], fill=lob)                                    # the claws
-    d.ellipse([212, 36, 218, 41], outline=lob)
-    d.line([(221, 48), (224, 46)], fill=lob)
-    d.ellipse([223, 42, 228, 48], outline=lob)
-    d.line([(221, 45), (227, 37)], fill=lob2)                                   # the feelers
-    d.line([(220, 44), (223, 36)], fill=lob2)
-    for i in range(3):                                                          # the legs
-        d.line([(212 + i * 3, 51), (210 + i * 3, 55)], fill=lob2)
+    # The painting over the sofa: the one in her photo, a feathery blue sea creature on white,
+    # converted by PixelLab (image_to_pixelart, faithful; 1 generation), in a thin silver frame.
+    r(197, 32, 228, 73, GREY)
+    r(198, 33, 227, 72, WHITE)
+    im.alpha_composite(painting(), (199, 33))
 
     # The sofa along the wall under the window, mostly behind the bed: its back and cushions.
     d.rounded_rectangle([144, 84, 210, 104], radius=3, fill="#576573")
@@ -152,10 +169,17 @@ def interior():
         d.rounded_rectangle([x0, 86, x0 + 12, 98], radius=2, fill=TEAL)
         r(x0 + 2, 88, x0 + 6, 88, TEAL_LIGHT)
 
+    r(236, 72, 239, FLOOR - 1, WOOD_DARK)                         # the bed's headboard panel
+
+    # All of that is background, washed out a little toward the wall (the user, 2026-11-06); the
+    # bed, drawn next, keeps its colours. The floor she stands on stays as it is.
+    wash(im, 0, FLOOR)
+    bed = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(bed)
+
     # The bed, its head against the right wall: white sheets falling to the floor, pillows, and the
-    # teal runner across its foot, patterned in grey.
-    r(236, 72, 239, FLOOR - 1, WOOD_DARK)                         # the headboard panel
-    d.rounded_rectangle([138, 96, 236, FLOOR - 1], radius=3, fill=WHITE)
+    # teal runner across its foot, patterned in grey. She can jump onto it (BED_TOP).
+    d.rounded_rectangle([138, BED_TOP, 236, FLOOR - 1], radius=3, fill=WHITE)
     r(140, 104, 236, 104, PALE)
     r(140, 112, 236, FLOOR - 1, "#e8eff0")
     r(140, FLOOR - 2, 236, FLOOR - 1, PALE)
@@ -167,6 +191,8 @@ def interior():
     for y in range(100, FLOOR - 6, 6):
         d.line([(156, y + 4), (165, y), (174, y + 4)], fill=GREY)
     r(154, FLOOR - 4, 176, FLOOR - 4, "#094a50")
+
+    im.alpha_composite(bed)
 
     # The cut through the ship's side, its edges in shadow (as at every deck's cut, §5.3).
     shade = Image.new("RGBA", (W, H), (0, 0, 0, 0))
