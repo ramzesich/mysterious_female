@@ -318,6 +318,13 @@ def build_layers():
     fill(solid, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], 0)
     fill(back, col(STAGE), stage_end_col() - 1, FLOOR_ROW[7], FLOOR_ROW[7], THEATRE_WALL)
     fill(solid, col(STAGE) - 1, col(STAGE) - 1, FLOOR_ROW[7] - 2, FLOOR_ROW[7] - 1, BALCONY_RAIL)
+    # Deck 7's stern: the open strip past deck 8's end, on the stern structure, stays (she can drop
+    # onto it from deck 8's terrace), but it has no way in to the theatre's balcony: the wall there
+    # is solid, no doorway (the user, 2026-11-06: maybe a secret place later, GAME_DESIGN.md §8).
+    wall = next(c - 1 for c in range(col(STAGE), col(EXTENT[7][1]))
+                if indoor(7, metres(c - 1)) and not indoor(7, metres(c)))
+    fill(solid, wall, wall, FLOOR_ROW[7] - DECK_ROWS + 1, FLOOR_ROW[7] - 1, STEEL)
+    STERN_STRIP_7[:] = [(wall + 1) * TILE, col(EXTENT[7][1]) * TILE]
 
     # Deck 11's pools, sunk into the deck: tiled sides and bottom, the water filled in by the game.
     for a, b in POOLS:
@@ -368,6 +375,11 @@ def end_walls():
 
 def in_end_wall(deck, c):
     return any(d == deck and a <= c < b for d, a, b in end_walls())
+
+
+# Deck 7's stern strip, outside its solid wall (x from, x to): set as the solid layer is built; the
+# game keeps the ship's side closed while she is on it, the deck's inside out of sight.
+STERN_STRIP_7 = []
 
 
 def stage_end_col():
@@ -615,6 +627,9 @@ def build_objects():
                           ("buffet", 11, 170), ("diner", 11, 205), ("bow", 7, 12), ("stern", 9, 247)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
+    # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
+    x0, x1 = STERN_STRIP_7
+    add(area("stern-strip-7", "outdoors", x0, floor_y(7), x1 - x0, 0))
     add(area("shell-door", "decor", x_of(62), floor_y(4) - 80, 3 * TILE + 8, 80, [prop("kind", "shelldoor")]))
 
     # Stairs: in each core, flights zigzag from deck 4 up to deck 12. Each is a two-point polyline

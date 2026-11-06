@@ -962,6 +962,11 @@ Nothing blocks the start of the build. These get settled along the way:
     the finale (§4)
   - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
     checkpoints tuned in play
+  - **Deck 7's stern strip** (the user, 2026-11-06; **remind the user when placing gameplay
+    items, NPCs and the like**): the open strip at deck 7's level behind deck 8's end, on the stern
+    structure, is kept, reachable only by dropping from deck 8's stern terrace; its wall into the
+    Stardust balcony is solid. Maybe a secret place later. For now she can only leave it by
+    jumping off the ship (a scare)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
       2026-11-30 (~1782 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15

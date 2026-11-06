@@ -161,7 +161,7 @@ export class ShipScene extends Phaser.Scene {
         this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
             const g = this.add.graphics().setDepth(DEPTH.exterior);
             g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
-            return { deck: s.deck, gfx: g };
+            return { deck: s.deck, end: s.end, gfx: g };
         });
         // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
         // each on its deck's wall, fading with it, or always there ("fixed").
@@ -191,11 +191,12 @@ export class ShipScene extends Phaser.Scene {
             if (this.solidLayer.getTileAt(t.x, t.y + 1)?.index === RAILING) return;
             const x = t.pixelX + t.width / 2, deck = this.deckOfRow(t.y);
             const s = slopesBelow.find(s => s.deck === deck - 1 && Math.abs(s.x1 - x) <= 24);
-            // A leaning one stands in from the deck's end, its outer foot where the floor ends.
-            const inward = s && (s.x0 < s.x1 ? 1 : -1);
-            const footX = s ? t.pixelX + (inward > 0 ? 0 : t.width) + inward * this.textures.getFrame('shipart', 'railing-bg').width / 2 : x;
+            // Each stands in from the deck's end, its outer foot where the floor ends (the user,
+            // 2026-11-06): inward is the side the deck's floor goes on.
+            const inward = s ? (s.x0 < s.x1 ? 1 : -1) : (this.solidLayer.getTileAt(t.x + 1, t.y + 1)?.index > 0 ? 1 : -1);
+            const footX = t.pixelX + (inward > 0 ? 0 : t.width) + inward * this.textures.getFrame('shipart', 'railing-bg').width / 2;
             const img = s ? this.leaningRailing(footX, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), inward)
-                : this.add.image(x, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
+                : this.add.image(footX, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
             // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
             // stops a little short of its foot (the user, 2026-11-06).
             railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
@@ -397,6 +398,21 @@ export class ShipScene extends Phaser.Scene {
                     this.buildCabin(o, prop);
                     break;
 
+                // Outdoors with no way in (deck 7's stern strip, §5.3): while she is on it the ship's
+                // side stays closed, the deck's inside out of sight (the user, 2026-11-06).
+                case 'outdoors': {
+                    // A strip of plating over the wall's edge beside it, there only while she is on
+                    // it, so nothing of her shows past the wall.
+                    const cover = this.add.graphics().setDepth(DEPTH.player + 0.05).setVisible(false);
+                    cover.fillStyle(0xe8eaec, 1).fillRect(o.x - 16, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
+                    this.worldLayer.add(cover);
+                    (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
+                    // The sloped stern plating over it is drawn in front of her: she is hidden
+                    // behind it there (the user).
+                    this.shellSlopes.filter(s => s.deck === 7 && s.end === 'aft').forEach(s => s.gfx.setDepth(DEPTH.player + 0.05));
+                    break;
+                }
+
                 case 'endwall': {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
@@ -511,17 +527,20 @@ export class ShipScene extends Phaser.Scene {
         });
 
         // White columns from the deck up past deck 7's floor, holding the davits; each boat hangs
-        // from two davit arms on its cables.
+        // from two davit arms on its cables. All washed out a little, background like the boats (the
+        // user, 2026-11-06).
         for (const x of columns) {
-            columnsGfx.fillStyle(0xffffff, 1).fillRect(x - 5, hang, 10, floor - hang);
-            columnsGfx.fillStyle(0xc7dcd0, 1).fillRect(x + 2, hang, 3, floor - hang);
+            columnsGfx.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang);
+            columnsGfx.fillStyle(0xd3e1da, 1).fillRect(x + 2, hang, 3, floor - hang);
             columnsGfx.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
         for (const x of boats) {
-            for (const [hook, column] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300)], [x + 268, columns.find(c => c > x + 268)]]) {
-                high.fillStyle(0xffffff, 1).fillRect(Math.min(hook, column) - 3, hang, Math.abs(hook - column) + 6, 6);
-                high.fillStyle(0xc7dcd0, 1).fillRect(Math.min(hook, column) - 3, hang + 5, Math.abs(hook - column) + 6, 1);
-                high.fillStyle(0x3e3546, 1).fillRect(hook, hang + 6, 1, 32);
+            // Each cable runs down to its hook's eye: 13px into the boat's picture forward, 17 aft
+            // (tools/draw_lifeboat.py), the boat's top 24px under the arms.
+            for (const [hook, column, eye] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300), 13], [x + 268, columns.find(c => c > x + 268), 17]]) {
+                high.fillStyle(0xf7f8f8, 1).fillRect(Math.min(hook, column) - 3, hang, Math.abs(hook - column) + 6, 6);
+                high.fillStyle(0xd3e1da, 1).fillRect(Math.min(hook, column) - 3, hang + 5, Math.abs(hook - column) + 6, 1);
+                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, 24 + eye - 6 + 1);
             }
             const boat = this.add.image(x, hang + 24, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
             this.worldLayer.add(boat);
@@ -1733,8 +1752,11 @@ export class ShipScene extends Phaser.Scene {
         const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
             || (this.mode === 'lift' && this.liftMove?.carriesHer);
         let target;
-        // Outside on the promenade every deck shows its shell; in the cabin too, but for the cabin.
-        if (this.route !== 'inside') target = null;
+        // Outside on the promenade every deck shows its shell; in the cabin too, but for the cabin;
+        // and outdoors where there is no way in (deck 7's stern strip).
+        const outdoors = this.outdoors?.find(a => p.x >= a.x0 && p.x <= a.x1 && p.y <= a.floor + 4 && p.y > a.floor - this.deckPitch);
+        for (const a of this.outdoors || []) a.cover.setVisible(a === outdoors);
+        if (this.route !== 'inside' || outdoors) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -1762,6 +1784,7 @@ export class ShipScene extends Phaser.Scene {
         }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
         for (const { deck, gfx } of this.shellSlopes) gfx.setAlpha(Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------
