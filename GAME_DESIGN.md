@@ -1081,9 +1081,42 @@ Nothing blocks the start of the build. These get settled along the way:
       The game follows NCL's 2022 map (the spa forward). Revisit when the user wants to
 - [ ] **Later: map Bumbot in again** (§4): his spots (deck 12 had none yet; the design's SUSHI sign
       secret, §5, is one idea), the finale's place, and his near-catches' tests
-- [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
-      2026-11-07, and every part has its wall and door). Candidates: deck 11's front after the
-      2025 plan (above); the ship's areas and their progression, which doors are locked with which
+- [ ] **The outside of the ship, after the user's photos and videos** (in progress, 2026-11-07,
+      branch `exterior`; references: the side photo `reference/photos/side-full.jpg`, two videos and
+      a photo in `reference/videos/`, frames in `reference/videos/frames/`). Done, zone by zone
+      from the bottom: **the hull** (no windows below deck 3; a few tiny portholes on deck 3; one
+      row of round portholes on deck 4; two-pane cabin windows with curtains in runs on deck 5;
+      the stern block's rows on decks 4-7); **the lifeboat deck** (a shaded recess two decks tall,
+      100-231 m, rounded at its ends, the promenade lengthened to match; the real boats, drawn by
+      hand at 85% of life: lifeboats, two tenders, a rescue boat, on davit arms and cables under deck
+      8's overhang; white columns, the walkway at deck 7's height, portholes and a glazed bay on its
+      back wall; life rings only on the open railing; the end columns behind the enclosed walls);
+      **the forward block** (single cabin windows in a grid on decks 6-10); **the balconies** on
+      decks 8-10 (about 2.6 m each: dark door in a shaded recess, pale blue glass front with a white
+      rail, white partitions; the rows stepped, starting about 73, 66 and 63 m). **O shows the whole
+      ship from outside** (paused, the window filled with sky and sea, the wheel zooms toward the
+      pointer, the movement keys do nothing there). **Tried and dropped:** moving the
+      superstructure's front aft into a slope as in the photos (decks 8-12 shortened at the front):
+      too much broke inside (the user); the fronts stay where NCL's profile has them, and the photos'
+      front face (its bridge band and window hoods) is not drawn on the side. **Decks 11 and 12:**
+      bands of tall dark panes between white mullions in runs by the rooms behind them (the spa,
+      fitness, the Garden Café, the Sports Bar; the Spinnaker, Champs Bar, the restaurants), the
+      open decks open. **On top:** the funnel after the photos (drawn by the game: a taller white
+      base with the NORWEGIAN SUN name board, a navy casing, the open navy lattice raked back at the
+      front, the NCL logo, exhaust pipes, white smoke drifting aft, still drifting in the outside
+      view); the real ship's angled radar mast on the Spinnaker's roof, the antenna mast moved to
+      the roof over the forward lobby (75 m). **Next:** the livery and the ship's movement and
+      background (the user)
+- [ ] **Start the next session here: the outside of the ship goes on, with the livery**
+      (2026-11-07; the outside work so far is merged into `main`, entry above). On the real ship
+      the sun is big, about 50-100 m on decks 4-9, its red, orange and yellow waves flowing aft
+      along the hull to about 180 m (the side photo and the videos' close-ups, `reference/`); ours
+      is a small sun at the bow (`livery_box()` in the map builder, `assets/ship/livery.png`).
+      Render the whole ship with `python tools/render_ship.py`, or press O in the game; compare
+      against the photo at the same scale (metres along the ship), and put every picture of the
+      outside work in `%TEMP%/bumbusik-playtest/exterior` (the user's wish). After the livery: the
+      ship's movement and the background (the user). Other candidates, after the outside: deck
+      11's front after the 2025 plan (above); the ship's areas and their progression, which doors are locked with which
       card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do

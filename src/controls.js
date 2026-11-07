@@ -9,6 +9,8 @@ export class Controls {
         this.keys = scene.input.keyboard.addKeys({
             left: 'LEFT', right: 'RIGHT', up: 'UP', down: 'DOWN',
             jump: 'SPACE', dash: 'D', activate: 'E', start: 'ENTER',
+            outside: 'O', escape: 'ESC', zoomIn: 'PLUS', zoomOut: 'MINUS',
+            zoomInPad: 'NUMPAD_ADD', zoomOutPad: 'NUMPAD_SUBTRACT',
         });
         this.prev = {};
         this.state = {};
@@ -33,6 +35,11 @@ export class Controls {
             dash: k.dash.isDown || (pad && pad.B),   // D for now (the user, 2026-11-06; it was Shift)
             activate: k.activate.isDown || (pad && pad.X),
             start: k.start.isDown || k.jump.isDown || (pad && (pad.A || pad.buttons[9]?.pressed)),
+            // The outside view of the whole ship (O; Esc leaves it too), and its zoom (+/-).
+            outside: k.outside.isDown,
+            escape: k.escape.isDown,
+            zoomIn: k.zoomIn.isDown || k.zoomInPad.isDown,
+            zoomOut: k.zoomOut.isDown || k.zoomOutPad.isDown,
         };
 
         const state = {};

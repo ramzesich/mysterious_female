@@ -56,8 +56,17 @@ ATRIUM = {"span": (82, 102), "decks": (5, 10), "lift": (5, 10), "stairs": (5, 9)
 # decks tall with the lifeboats hanging high over it. Its fore and aft ends are enclosed by a wall
 # with large glassless openings; the open middle has a railing and the boats. She switches between
 # the rooms and the promenade through the doors (metres from the bow, each on both sides).
-PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)],
-             "doors": [111, 138, 162, 186]}    # none from the theatre (the user, 2026-11-03)
+PROMENADE = {"deck": 6, "span": (100, 231), "enclosed": [(100, 116), (212, 231)],
+             "doors": [111, 138, 162, 186],    # none from the theatre (the user, 2026-11-03)
+             # Its boats and white columns as in the user's side photo (2026-11-07): where each boat's
+             # bow is (m) and what it is (clear of the recess's ends); the columns between them. Its
+             # opening, 100-231 m, too.
+             "boats": [(100.8, "lifeboat"), (113.0, "rescue-boat"), (143.0, "lifeboat"), (155.6, "lifeboat"),
+                       (166.6, "lifeboat"), (199.3, "tender"), (209.9, "tender"), (220.4, "lifeboat")],
+             "columns": [112.2, 122.8, 131.4, 142.3, 155.1, 178.9, 183.9, 196.0, 209.5, 220.1],
+             # Its back wall (the photo): round portholes on deck 6, a glazed bay two decks tall.
+             "portholes": [105.5, 156.0, 158.2, 168.3, 193.6, 200.9, 203.3],
+             "glazed": [(123.4, 131.0)]}
 
 # Cabin 8206, the user's own cabin on the cruise (2026-11-06): an oceanview with a picture window on
 # the starboard side, forward on deck 8, the fourth cabin aft of the Sky Suite (cruisedeckplans.com's
@@ -86,9 +95,10 @@ STAGE = 244
 
 # Above the top deck.
 FUNNEL = (168, 196)
-# The mast stands on the Spinnaker Lounge's roof (moved forward from 54-62 m, 2026-11-07: with the kids'
-# pool open to the sky there it stood on nothing, the user).
-MAST = (46, 54)
+# The antenna mast stands on the roof over the forward lobby (the user, 2026-11-07; it stood on the
+# Spinnaker Lounge's roof, where the real ship's angled radar mast is now drawn).
+MAST = (71, 79)
+RADAR_MAST = 46.5     # the angled radar mast's foot, forward end (m), on the Spinnaker Lounge's roof
 
 # Kinds: "venue" (an indoor public room), "outdoor", "cabins", "crew", "start" (the gangway),
 # "terrace" (an open deck that is a place of its own: the Great Outdoors' tables). (Bumbot's spots were

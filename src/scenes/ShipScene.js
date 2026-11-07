@@ -107,8 +107,13 @@ export class ShipScene extends Phaser.Scene {
         const H = map.heightInPixels;
         const tiles = map.addTilesetImage('placeholder', 'tiles');
 
-        const sky = this.add.image(0, 0, 'sky').setOrigin(0).setDisplaySize(W, this.waterY).setDepth(DEPTH.sky);
-        this.sea = this.add.tileSprite(0, this.waterY, W, H - this.waterY, 'sea').setOrigin(0).setDepth(DEPTH.sea);
+        // The sky and the sea reach far past the map on every side, so the outside view (O), zoomed
+        // right out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Over the
+        // sky's gradient, its top colour.
+        const OUT = 2 * W;
+        const sky = this.add.image(-OUT, 0, 'sky').setOrigin(0).setDisplaySize(W + 2 * OUT, this.waterY).setDepth(DEPTH.sky);
+        const skyTop = this.add.rectangle(-OUT, -OUT, W + 2 * OUT, OUT, 0x5fb8f0).setOrigin(0).setDepth(DEPTH.sky);
+        this.sea = this.add.tileSprite(-OUT, this.waterY, W + 2 * OUT, H - this.waterY + OUT, 'sea').setOrigin(0).setDepth(DEPTH.sea);
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -252,7 +257,7 @@ export class ShipScene extends Phaser.Scene {
             }
         });
 
-        this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+        this.worldLayer.add([sky, skyTop, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
@@ -507,6 +512,24 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'funnel':
+                    this.buildFunnel(o);
+                    break;
+
+                case 'nameboard': {
+                    // The ship's name under the funnel: white letters on a navy board, outside.
+                    const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
+                    g.fillStyle(0x1d2b53, 1).fillRect(o.x, o.y, o.width, o.height);
+                    g.fillStyle(0x9babb2, 1).fillRect(o.x, o.y, o.width, 1).fillRect(o.x, o.y + o.height - 1, o.width, 1);
+                    const t = this.add.text(o.x + o.width / 2, o.y + o.height / 2 + 1, prop(o, 'text', ''), {
+                        fontFamily: 'Verdana, sans-serif', fontSize: '18px', fontStyle: 'bold', color: '#ffffff', resolution: 4,
+                    }).setOrigin(0.5).setDepth(DEPTH.exterior + 0.06);
+                    t.setLetterSpacing?.(3);
+                    t.setScale(Math.min(1, (o.width - 16) / t.width));
+                    this.worldLayer.add([g, t]);
+                    break;
+                }
+
                 case 'endwall': {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
@@ -572,7 +595,11 @@ export class ShipScene extends Phaser.Scene {
             doors: list('doors').map(Number),
         };
         const enclosed = list('enclosed').map(pair => pair.split(':').map(Number));
-        const boats = list('boats').map(Number);
+        // Each boat: its x, its picture, its two hooks' x in it and their eyes' depth below its top.
+        const boats = list('boats').map(s => {
+            const [x, key, h1, h2, eye] = s.split(':');
+            return { x: Number(x), key, hooks: [Number(h1), Number(h2)], eye: Number(eye) };
+        });
         const columns = list('columns').map(Number);
         const add = (deck, depth) => {
             const g = this.add.graphics().setDepth(depth);
@@ -621,33 +648,62 @@ export class ShipScene extends Phaser.Scene {
         for (let x = ra; x <= rb; x += 48) front.fillRect(x - 1, floor - 30, 3, 30);
         front.fillStyle(0xab947a, 1).fillRect(ra, floor - 31, rb - ra, 3);
         front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
-        boats.forEach((x, i) => {
-            if (i % 3 !== 1) return;
-            // Hung from the handrail between two posts, over the rails, clear of the doors.
-            let rx = ra + 24 + Math.round((x + 150 - ra - 24) / 48) * 48;
-            while (pr.doors.some(d => Math.abs(rx - d) < 60)) rx += 48;
-            const ring = this.add.image(rx, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
+        // Life rings hung from the handrail between two posts, about every 12 m along the open
+        // railing, clear of the doors; never on the enclosed ends' wall (the user, 2026-11-07).
+        for (let rx = ra + 24 + 4 * 48; rx < rb - 48; rx += 12 * 48) {
+            let x = rx;
+            while (pr.doors.some(d => Math.abs(x - d) < 60)) x += 48;
+            if (x > rb - 48) break;
+            const ring = this.add.image(x, floor - 28, 'shipart', 'life-ring').setOrigin(0.5, 0).setDepth(DEPTH.player + 0.31);
             this.worldLayer.add(ring);
             this.shellSlopes.push({ deck: 6, gfx: ring });
-        });
-
-        // White columns from the deck up past deck 7's floor, holding the davits; each boat hangs
-        // from two davit arms on its cables. All washed out a little, background like the boats (the
-        // user, 2026-11-06).
-        for (const x of columns) {
-            columnsGfx.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang);
-            columnsGfx.fillStyle(0xd3e1da, 1).fillRect(x + 2, hang, 3, floor - hang);
-            columnsGfx.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
-        for (const x of boats) {
-            // Each cable runs down to its hook's eye: 13px into the boat's picture forward, 17 aft
-            // (tools/draw_lifeboat.py), the boat's top 24px under the arms.
-            for (const [hook, column, eye] of [[x + 52, columns.find(c => c < x + 52 && c > x - 300), 13], [x + 268, columns.find(c => c > x + 268), 17]]) {
-                high.fillStyle(0xf7f8f8, 1).fillRect(Math.min(hook, column) - 3, hang, Math.abs(hook - column) + 6, 6);
-                high.fillStyle(0xd3e1da, 1).fillRect(Math.min(hook, column) - 3, hang + 5, Math.abs(hook - column) + 6, 1);
-                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, 24 + eye - 6 + 1);
+
+        // The opening is a shaded recess, two decks tall, its ends rounded (the user's side photo,
+        // 2026-11-07): its back wall in shade, round portholes on it and a glazed bay.
+        const recess = add([6, 7], DEPTH.exterior + 0.055);
+        recess.fillStyle(0xc9ced3, 1).fillRoundedRect(pr.x0, hang, pr.x1 - pr.x0, floor - hang, 22);
+        recess.fillStyle(0xbdc3c9, 1).fillRect(pr.x0 + 10, hang, pr.x1 - pr.x0 - 20, 10);
+        for (const x of list('portholes').map(Number)) {
+            recess.fillStyle(0x9babb2, 1).fillCircle(x, floor - 72, 12);
+            recess.fillStyle(0x323353, 1).fillCircle(x, floor - 72, 10);
+            recess.fillStyle(0x8fd3ff, 1).fillRect(x - 6, floor - 78, 3, 1);
+        }
+        for (const [a, b] of list('glazed').map(s => s.split(':').map(Number))) {
+            recess.fillStyle(0x9babb2, 1).fillRect(a, hang + 16, b - a, floor - hang - 20);
+            for (let x = a + 3; x < b - 3; x += 32) {
+                const w = Math.min(28, b - 3 - x);
+                recess.fillStyle(0x484a77, 1).fillRect(x, hang + 19, w, top7 - hang - 30);
+                recess.fillStyle(0x484a77, 1).fillRect(x, top7 + 6, w, floor - top7 - 10);
+                recess.fillStyle(0x8fd3ff, 0.5).fillRect(x + 3, hang + 22, 2, top7 - hang - 40);
             }
-            const boat = this.add.image(x, hang + 24, 'lifeboat').setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+        }
+        // White columns from the deck up to deck 8's overhang; between them, behind the boats, the
+        // white walkway at deck 7's floor (the user's side photo, 2026-11-07). Each boat hangs high,
+        // under the overhang, from a short davit arm over each of its hooks, on its cables. All
+        // washed out a little, background like the boats (the user, 2026-11-06).
+        high.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 6, pr.x1 - pr.x0, 6);
+        high.fillStyle(0xc7dcd0, 1).fillRect(pr.x0, top7, pr.x1 - pr.x0, 1);
+        high.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 30, pr.x1 - pr.x0, 2);
+        for (let x = pr.x0 + 24; x < pr.x1; x += 48) high.fillRect(x, top7 - 30, 2, 24);
+        // A column within an enclosed end stands behind its wall, seen through its openings and over
+        // it (the user, 2026-11-07).
+        const behindWall = add([6, 7], DEPTH.player + 0.29);
+        for (const x of columns) {
+            const g = enclosed.some(([a, b]) => x > a && x < b) ? behindWall : columnsGfx;
+            g.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang);
+            g.fillStyle(0xd3e1da, 1).fillRect(x + 2, hang, 3, floor - hang);
+            g.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
+        }
+        const drop = 8;                              // the boats' tops under the overhang, their keels clear of the enclosed ends' walls
+        for (const { x, key, hooks, eye } of boats) {
+            for (const h of hooks) {
+                const hook = x + h;
+                high.fillStyle(0xf7f8f8, 1).fillRect(hook - 14, hang, 28, 6);
+                high.fillStyle(0xd3e1da, 1).fillRect(hook - 14, hang + 5, 28, 1);
+                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, drop + eye - 6 + 1);
+            }
+            const boat = this.add.image(x, hang + drop, key).setOrigin(0).setDepth(DEPTH.exterior + 0.07);
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
@@ -1485,6 +1541,158 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(g);
     }
 
+    // --- The funnel (the user's photos, 2026-11-07) ---------------------------------------------
+    // On its white base under the name board: a navy casing, then the open lattice, navy struts
+    // over its dark inside, raked back at the front; the NCL logo on its aft part, white letters
+    // over waves in three blues; grey exhaust pipes on top, and white smoke drifting aft from them.
+
+    buildFunnel(o) {
+        const fa = o.x, fb = o.x + o.width, base = o.y;
+        const g = this.add.graphics().setDepth(DEPTH.exterior + 0.04);
+        const navy = 0x323353, deep = 0x1d2040, strut = 0x404574;
+        g.fillStyle(0xe8eaec, 1).fillPoints([{ x: fa, y: base }, { x: fb, y: base }, { x: fb - 4, y: base - 64 }, { x: fa + 6, y: base - 64 }], true);
+        g.fillStyle(0xc7dcd0, 1).fillRect(fa + 6, base - 66, fb - fa - 10, 2);
+        // The casing.
+        const c0 = base - 64, c1 = base - 108;
+        g.fillStyle(navy, 1).fillPoints([{ x: fa + 14, y: c0 }, { x: fb - 8, y: c0 }, { x: fb - 18, y: c1 }, { x: fa + 60, y: c1 }], true);
+        g.fillStyle(strut, 1).fillRect(fa + 58, c1, fb - fa - 76, 3);
+        // The lattice: its outline points, bottom fore and aft, top aft and fore.
+        const top = base - 500;
+        const L = [{ x: fa + 150, y: c1 }, { x: fb - 90, y: c1 }, { x: fb - 150, y: top }, { x: fa + 560, y: top }];
+        g.fillStyle(deep, 1).fillPoints(L, true);
+        const edge = (t, side) => side === 0
+            ? { x: L[0].x + (L[3].x - L[0].x) * t, y: c1 + (top - c1) * t }
+            : { x: L[1].x + (L[2].x - L[1].x) * t, y: c1 + (top - c1) * t };
+        g.lineStyle(10, navy, 1).strokePoints(L, true);
+        for (let k = 1; k < 5; k++) {
+            const a = edge(k / 5, 0), b = edge(k / 5, 1);
+            g.lineStyle(6, navy, 1).lineBetween(a.x, a.y, b.x, b.y);
+        }
+        // Its struts: an X across each panel of each bay, inside the frame.
+        const lerp = (p, q, t) => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t });
+        g.lineStyle(3, strut, 1);
+        for (let k = 0; k < 5; k++) {
+            const a0 = edge(k / 5, 0), b0 = edge(k / 5, 1), a1 = edge((k + 1) / 5, 0), b1 = edge((k + 1) / 5, 1);
+            for (let j = 0; j < 4; j++) {
+                const bl = lerp(a0, b0, j / 4), br = lerp(a0, b0, (j + 1) / 4);
+                const tl = lerp(a1, b1, j / 4), tr = lerp(a1, b1, (j + 1) / 4);
+                g.lineBetween(bl.x, bl.y, tr.x, tr.y);
+                g.lineBetween(br.x, br.y, tl.x, tl.y);
+                g.lineBetween(tr.x, tr.y, br.x, br.y);
+            }
+        }
+        // The NCL logo on its aft part.
+        const lx = fb - 470, ly = top + 110, lw = 170, lh = 240;
+        g.fillStyle(0x8fb6dc, 1).fillRect(lx, ly, lw, lh);
+        g.fillStyle(0x6d93c4, 1).fillRect(lx, ly + lh * 0.58, lw, lh * 0.14);
+        g.fillStyle(0x4d65b4, 1).fillRect(lx, ly + lh * 0.72, lw, lh * 0.14);
+        g.fillStyle(0x323a72, 1).fillRect(lx, ly + lh * 0.86, lw, lh * 0.14);
+        g.fillStyle(0xd8e8f6, 1).fillRect(lx + 20, ly + lh * 0.52, lw - 40, 4);
+        const ncl = this.add.text(lx + lw / 2, ly + lh * 0.3, 'NCL', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '60px', fontStyle: 'bold', color: '#ffffff', resolution: 2,
+        }).setOrigin(0.5).setDepth(DEPTH.exterior + 0.045);
+        // The exhaust pipes on top.
+        const pipes = [];
+        for (const [dx, h, w] of [[30, 70, 34], [80, 90, 30], [126, 80, 36], [178, 96, 30], [300, 84, 34]]) {
+            const x = L[3].x + dx;
+            g.fillStyle(0x7a6e66, 1).fillRect(x, top - h, w, h);
+            g.fillStyle(0x9b8e84, 1).fillRect(x + 4, top - h, 6, h);
+            g.fillStyle(0x3e3546, 1).fillRect(x, top - h, w, 6);
+            pipes.push({ x: x + w / 2, y: top - h });
+        }
+        this.worldLayer.add([g, ncl]);
+        // A bit of white smoke: puffs rising from the pipes, drifting aft, swelling and fading.
+        if (!this.textures.exists('puff')) {
+            const pg = this.make.graphics({ x: 0, y: 0 }, false);
+            pg.fillStyle(0xffffff, 1).fillCircle(32, 32, 32);
+            pg.generateTexture('puff', 64, 64);
+            pg.destroy();
+        }
+        this.smoke = [];
+        pipes.forEach((p, i) => {
+            for (let k = 0; k < 3; k++) {
+                const puff = this.add.image(p.x, p.y, 'puff').setDepth(DEPTH.exterior + 0.03).setAlpha(0);
+                this.worldLayer.add(puff);
+                const tween = this.tweens.add({
+                    targets: puff, x: p.x + 260, y: p.y - 200, scale: { from: 0.5, to: 2.6 }, alpha: { from: 0.8, to: 0 },
+                    duration: 4200, delay: i * 500 + k * 1400, repeat: -1, ease: 'Sine.easeOut',
+                });
+                this.smoke.push(tween);
+            }
+        });
+    }
+
+    // --- The outside view (the user, 2026-11-07) ------------------------------------------------
+    // O: the camera draws back to show the whole ship from outside, every deck's side closed, her
+    // hidden and the game paused; +/- zoom on the middle, the mouse wheel toward the pointer; the
+    // movement keys do nothing there (the user, 2026-11-07); O or Esc and she is back where she was.
+
+    enterOverview() {
+        const cam = this.cameras.main;
+        const ov = this.overview = { zoom: cam.zoom, scrollX: cam.scrollX, scrollY: cam.scrollY };
+        this.physics.pause();
+        this.time.paused = true;
+        this.tweens.pauseAll();
+        for (const t of this.smoke || []) t.resume();       // the funnel's smoke keeps drifting
+        this.player.setVisible(false);
+        this.uiCam.setVisible(false);
+        // The canvas fills the whole window while it is open, sky and sea to its edges, no bars at
+        // its sides (the user, 2026-11-07); play keeps its 16:9 view.
+        this.scale.scaleMode = Phaser.Scale.EXPAND;
+        this.scale.displaySize.setAspectMode(Phaser.Structs.Size.NONE);   // (FIT's 16:9 lock off)
+        this.scale.refresh();
+        cam.setSize(this.scale.width, this.scale.height);
+        cam.stopFollow();
+        cam.removeBounds();
+        ov.fit = this.scale.width / (this.map.widthInPixels * 0.94);
+        cam.setZoom(ov.fit);
+        cam.centerOn(this.map.widthInPixels / 2, this.waterY - 4 * this.deckPitch);
+        ov.wheel = (pointer, objects, dx, dy) => this.zoomOverview(dy > 0 ? 1 / 1.25 : 1.25, pointer);
+        this.input.on('wheel', ov.wheel);
+        this.updateCutaway(1);
+    }
+
+    zoomOverview(factor, pointer = null) {
+        const cam = this.cameras.main;
+        // Toward the pointer: the world point under it stays under it.
+        const before = pointer ? cam.getWorldPoint(pointer.x, pointer.y) : null;
+        cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, this.overview.fit, VIEW.zoom));
+        if (before) {
+            cam.preRender();
+            const after = cam.getWorldPoint(pointer.x, pointer.y);
+            cam.scrollX += before.x - after.x;
+            cam.scrollY += before.y - after.y;
+        }
+    }
+
+    updateOverview(input, dt) {
+        if (input.zoomInPressed) this.zoomOverview(1.25);
+        if (input.zoomOutPressed) this.zoomOverview(1 / 1.25);
+        this.updateCutaway(dt);
+    }
+
+    leaveOverview() {
+        const cam = this.cameras.main, ov = this.overview;
+        this.input.off('wheel', ov.wheel);
+        this.overview = null;
+        this.scale.scaleMode = Phaser.Scale.FIT;
+        this.scale.displaySize.setAspectMode(Phaser.Structs.Size.FIT);
+        this.scale.displaySize.setAspectRatio(VIEW.width / VIEW.height);
+        this.scale.setGameSize(VIEW.width, VIEW.height);
+        this.scale.refresh();
+        cam.setSize(VIEW.width, VIEW.height);
+        cam.setZoom(ov.zoom);
+        cam.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+        cam.startFollow(this.player, true, 0.15, 0.15);
+        cam.setScroll(ov.scrollX, ov.scrollY);
+        this.player.setVisible(true);
+        this.uiCam.setVisible(true);
+        this.tweens.resumeAll();
+        this.time.paused = false;
+        this.physics.resume();
+        this.updateCutaway(1);
+    }
+
     // The top of the sun cover under x, or null past its ends.
     coverTopAt(x) {
         const c = this.cover;
@@ -1917,6 +2125,14 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
+        // The outside view (O): the whole ship from outside, every deck closed, the game paused.
+        if (input.outsidePressed || (this.overview && input.escapePressed)) {
+            if (this.overview) this.leaveOverview(); else this.enterOverview();
+        }
+        if (this.overview) {
+            this.updateOverview(input, dt);
+            return;
+        }
         // The ship is under way bow first (§5.2): the bow is on the left, so the sea streams past
         // toward the stern, to the right.
         this.sea.tilePositionX -= dt * 12;
@@ -2314,7 +2530,7 @@ export class ShipScene extends Phaser.Scene {
         for (const a of this.outdoors || []) a.cover.setVisible(a === outdoors);
         // A room shown in the deck's own place (the linen room) keeps the deck cut open.
         const inDeck = this.route === 'inside' || this.rooms.some(r => r.route === this.route && r.inDeck);
-        if (!inDeck || outdoors) target = null;
+        if (!inDeck || outdoors || this.overview) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -2328,7 +2544,7 @@ export class ShipScene extends Phaser.Scene {
             this.viewDeck = approach(this.viewDeck, target, dt * 4);
         }
         // In a room with its own shell (the bridge), only it is cut away; elsewhere it stays closed.
-        const room = this.route !== 'inside' ? null : this.shellRooms.find(r => p.x >= r.x0 && p.x < r.x1
+        const room = this.route !== 'inside' || this.overview ? null : this.shellRooms.find(r => p.x >= r.x0 && p.x < r.x1
             && p.y <= this.deckFloors[r.deck] * 16 + 4 && p.y > this.deckFloors[r.deck] * 16 - this.deckPitch);
         for (const deck of Object.keys(this.shellTiles)) {
             let alpha = this.viewDeck === null ? 1 : Phaser.Math.Clamp(Math.abs(parseInt(deck, 10) - this.viewDeck), 0, 1);
@@ -2353,8 +2569,8 @@ export class ShipScene extends Phaser.Scene {
             for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!this.underPools(pool.deck)));
         }
         for (const r of this.rooms) {
-            r.room.setVisible(this.route === r.route);
-            r.dim?.setVisible(this.route === r.route);
+            r.room.setVisible(this.route === r.route && !this.overview);
+            r.dim?.setVisible(this.route === r.route && !this.overview);
         }
         for (const cat of this.cats) {
             if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away);

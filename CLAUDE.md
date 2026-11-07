@@ -31,7 +31,8 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor), drawn by hand: its inside and its open crew door |
-| `tools/draw_lifeboat.py` | The lifeboat, drawn by hand in code (PixelLab's tries didn't read): writes `assets/ship/lifeboat.png` |
+| `tools/draw_lifeboat.py` | The ship's boats, drawn by hand in code (PixelLab's tries didn't read): the lifeboat, the tender, the rescue boat (`assets/ship/lifeboat.png`, `tender.png`, `rescue-boat.png`) |
+| `tools/render_ship.py` | The whole ship from outside at full size, every deck closed (`ship-full.png` in `%TEMP%/bumbusik-playtest/exterior`); in the game, O shows it too |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
 
@@ -93,6 +94,24 @@ Lessons learned (2026-11-06, decks 9-11):
   under it: check the deck below too after placing them.
 - Playtest screenshots: `spawnAt` now snaps the cut-away, but give fades a second after moving her
   by hand in a script.
+
+Lessons learned (2026-11-07, deck 12, doors, the outside):
+
+- **Photos of the ship's side are never quite side-on.** Taken from forward of the ship, they show
+  the superstructure's front face: its band of bridge windows and its hooded windows are the front's,
+  not the side's; don't draw them on the side (the user caught it). They also stretch the bow. A
+  trial moving decks 8-12's fronts aft into a slope as in the photos broke too much inside and was
+  dropped: the fronts stay where NCL's profile has them.
+- The outside's references: the side photo at full size `reference/photos/side-full.jpg` (from
+  `side_view_from_outside.heic`; HEIC opens with `pillow_heif`), the user's two videos and a photo
+  in `reference/videos/` (frames pulled with OpenCV into `reference/videos/frames/`). Map the photo
+  to metres (bow tip to stern) and compare with our render at the same scale, zone by zone.
+  Wikimedia Commons has almost no side-on photos of the ship (the user checked); its API rate-limits.
+- Don't take a deck's or an area's size from the photos without asking: the layout (deck lengths,
+  rooms) is the game's, and the user prefers keeping it to matching a photo.
+- Things drawn over the ship's side straddling the edge of a cut-away (a room's piece of shell, a
+  deck's end, the fixed stern plating) are skipped by `span_owner()`: end runs of windows short of
+  such edges, or draw a band piece by piece.
 
 ## Working with the user
 

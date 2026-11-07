@@ -36,6 +36,7 @@ URL flags, combinable (`?play&debug`):
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | Кісюнічка dash (costs a tangerine) | D | B |
 | Activate: open doors | E | X |
+| The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | |
 
 A controller is detected once a button is pressed on it.
 
@@ -52,6 +53,7 @@ A controller is detected once a button is pressed on it.
 | `tools/build_ship_map.py` | Generates the map and tileset from the layout |
 | `tools/serve.py` | Serves the game locally with caching off |
 | `tools/playtest.py` | Headless playtests in Chrome (needs `websocket-client`) |
+| `tools/render_ship.py` | Renders the whole ship from outside at full size, for work on the outer shell |
 
 ## Testing
 
