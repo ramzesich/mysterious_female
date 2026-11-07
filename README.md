@@ -53,6 +53,7 @@ A controller is detected once a button is pressed on it.
 | `tools/build_ship_map.py` | Generates the map and tileset from the layout |
 | `tools/serve.py` | Serves the game locally with caching off |
 | `tools/playtest.py` | Headless playtests in Chrome (needs `websocket-client`) |
+| `tools/render_ship.py` | Renders the whole ship from outside at full size, for work on the outer shell |
 
 ## Testing
 

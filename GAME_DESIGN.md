@@ -1107,9 +1107,16 @@ Nothing blocks the start of the build. These get settled along the way:
       view); the real ship's angled radar mast on the Spinnaker's roof, the antenna mast moved to
       the roof over the forward lobby (75 m). **Next:** the livery and the ship's movement and
       background (the user)
-- [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
-      2026-11-07, and every part has its wall and door). Candidates: deck 11's front after the
-      2025 plan (above); the ship's areas and their progression, which doors are locked with which
+- [ ] **Start the next session here: the outside of the ship goes on, with the livery**
+      (2026-11-07; the outside work so far is merged into `main`, entry above). On the real ship
+      the sun is big, about 50-100 m on decks 4-9, its red, orange and yellow waves flowing aft
+      along the hull to about 180 m (the side photo and the videos' close-ups, `reference/`); ours
+      is a small sun at the bow (`livery_box()` in the map builder, `assets/ship/livery.png`).
+      Render the whole ship with `python tools/render_ship.py`, or press O in the game; compare
+      against the photo at the same scale (metres along the ship), and put every picture of the
+      outside work in `%TEMP%/bumbusik-playtest/exterior` (the user's wish). After the livery: the
+      ship's movement and the background (the user). Other candidates, after the outside: deck
+      11's front after the 2025 plan (above); the ship's areas and their progression, which doors are locked with which
       card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
