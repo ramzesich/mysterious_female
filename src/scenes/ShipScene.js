@@ -3,6 +3,7 @@ import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
+import { Sea } from '../sea.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -113,7 +114,6 @@ export class ShipScene extends Phaser.Scene {
         const OUT = 2 * W;
         const sky = this.add.image(-OUT, 0, 'sky').setOrigin(0).setDisplaySize(W + 2 * OUT, this.waterY).setDepth(DEPTH.sky);
         const skyTop = this.add.rectangle(-OUT, -OUT, W + 2 * OUT, OUT, 0x5fb8f0).setOrigin(0).setDepth(DEPTH.sky);
-        this.sea = this.add.tileSprite(-OUT, this.waterY, W + 2 * OUT, H - this.waterY + OUT, 'sea').setOrigin(0).setDepth(DEPTH.sea);
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -251,8 +251,9 @@ export class ShipScene extends Phaser.Scene {
             const img = s ? this.leaningRailing(footX, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), inward)
                 : this.add.image(footX, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
             // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
-            // stops a little short of its foot (the user, 2026-11-06).
-            railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
+            // stops a little short of its foot (the user, 2026-11-06). An upright one, at deck 7's
+            // ends, is in front of her too (the user, 2026-11-07).
+            railings.push(img.setDepth(DEPTH.player + 0.04));
             // From outside, a leaning railing is behind its deck's wall: it shows only while she
             // is on its deck (in front of her, as above) or that deck is cut away (the user,
             // 2026-11-07).
@@ -265,7 +266,19 @@ export class ShipScene extends Phaser.Scene {
             }
         });
 
-        this.worldLayer.add([sky, skyTop, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+        // The sea (§5.2, the user, 2026-11-07): rows of waves in front of the hull's foot, foam
+        // along its waterline from the stem to the stern, the bow wave, the wake.
+        const hullRow = this.waterY / 16 - 1;
+        const hullCols = [];
+        for (const layer of [this.exteriorLayer, this.solidLayer]) {
+            layer.forEachTile(t => { if (t.index > 0 && t.y === hullRow) hullCols.push(t.x); });
+        }
+        this.seaView = new Sea(this, {
+            x0: -OUT, x1: W + OUT, y: this.waterY, bottom: H + OUT,
+            bowX: Math.min(...hullCols) * 16, sternX: (Math.max(...hullCols) + 1) * 16,
+            depth: DEPTH.exterior + 0.25, front: DEPTH.exterior + 0.3,     // the hull's foot under water
+        });
+        this.worldLayer.add([sky, skyTop, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
@@ -2145,6 +2158,9 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
+        // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
+        // the outside view.
+        this.seaView.update(Math.min(delta, 50) / 1000);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();
@@ -2153,9 +2169,6 @@ export class ShipScene extends Phaser.Scene {
             this.updateOverview(input, dt);
             return;
         }
-        // The ship is under way bow first (§5.2): the bow is on the left, so the sea streams past
-        // toward the stern, to the right.
-        this.sea.tilePositionX -= dt * 12;
 
         this.updateVacuums(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);

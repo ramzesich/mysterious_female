@@ -111,7 +111,8 @@ export const DASH = {
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus
-// a little rounding, well clear of the limit.
-export const LONG_FALL_MARGIN = 24;
+// a little rounding, well clear of the limit, even from the top of a deck's end bulwark, 32px over
+// its floor (the user fell from deck 9's stern bulwark to deck 8's terrace, 2026-11-07).
+export const LONG_FALL_MARGIN = 56;
 
 export const SAVE_KEY = 'bumbusik-save-v1';

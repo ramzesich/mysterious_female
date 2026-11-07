@@ -316,6 +316,13 @@ there; they only remind her he's on board.
 - Outside areas show open sea and sky behind the ship, the sea scrolling past slowly to sell the
   sailing. Indoors, portholes and windows show the same sea.
 - Sound: a soft sea and engine ambience outdoors, quieter inside (synthesised, like everything else).
+- **The sea, drawn in code** (`src/sea.js`; approved by the user 2026-11-07): six rows of waves
+  from the waterline down, the far ones small and slow, the near ones bigger and faster, each row
+  gently rising and falling, sun glints on the crests, the deep water darkening under them; white
+  foam along the waterline from the stem to the stern, **running on past the stern and breaking
+  up into the wake** (the user: not cut off square); a bow wave heaped against the stem, with
+  spray; the wake streaming aft from the stern, widening and fading. All of it streams toward the
+  stern, also in the outside view (O). **Decided**
 
 ### 5.3 The reference ship — Norwegian Sun
 
@@ -1131,10 +1138,12 @@ Nothing blocks the start of the build. These get settled along the way:
       **Railings:** the forecastle's side railing is in front of her; the leaning railings at the
       decks' fronts hide behind their sloped walls unless she is on that deck. **The bow view is
       removed** (entry above)
-- [ ] **Start the next session here: the outside of the ship goes on, with the sea and the
-      background** (the user, 2026-11-07, answers by number): (4) better rendered waves, moving:
-      layered rows (far small and slow, near bigger, rising and falling, glints), white foam along
-      the waterline, a bow wave, a wake from the stern, drawn in code; (5) the background is the
+- [x] **The sea** (2026-11-07, approved by the user): waves, foam, the bow wave and the wake,
+      drawn in code (§5.2). With it: the upright railings at deck 7's ends are in front of her; a
+      jump from a deck's end bulwark (32px over its floor) down one deck no longer counts as a long
+      fall (`LONG_FALL_MARGIN` 56, was 24: the user fell through at deck 9's stern)
+- [ ] **Start the next session here: the outside of the ship goes on, with the background** (the
+      user, 2026-11-07, answers by number; (4), the sea, is done): (5) the background is the
       **Baltic archipelago** (low rocky islands, pines, red cottages, lighthouses); (6) far away
       and washed out, drifting slowly aft as the ship sails, a little parallax when she runs, the
       horizon at a fixed height on screen so it shows through the open decks, the promenade and
