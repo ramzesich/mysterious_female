@@ -20,6 +20,7 @@ truth**: read the relevant section before any design or content work, and record
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (no spots placed for now: §4) |
+| `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2) |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
@@ -116,6 +117,13 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
   to the palette by rules, enlarge each colour smoothly, and fix the rest by hand-set filters
   (exact shapes, like the sun's disc, drawn exactly). Cleaning that deletes pixels makes holes:
   the user saw them at once. Check the result at 1:1 and in the game, not only scaled down.
+- **Close-ups for the user** (the sea at the stem or the stern, anything off her route): in a
+  playtest script, `cam.stopFollow()` then `cam.centerOn(x, y)` on the spot, wait a moment, shoot,
+  and crop and enlarge with PIL to check the pixels.
+- A long fall (§5.6) is measured from where she last stood, which can be a bulwark's top 32px over
+  its floor: a fall rule's margin must cover anything she can stand on (`LONG_FALL_MARGIN`; the user
+  fell through at deck 9's stern bulwark). A headless sweep of jumps from many spots finds such
+  "sometimes" bugs fast.
 - Things drawn over the ship's side straddling the edge of a cut-away (a room's piece of shell, a
   deck's end, the fixed stern plating) are skipped by `span_owner()`: end runs of windows short of
   such edges, or draw a band piece by piece.
