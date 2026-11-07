@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
-                         OUR_CABIN, LINEN_ROOM, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, LINEN_ROOM, CHAPEL, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -33,8 +33,9 @@ COLS = SEA + LENGTH * PER_M + SEA
  BLISS_WALL, WINDJAMMER_WALL, GALLERY_WALL, THEATRE_WALL, BURL_WALL, WOOD_FLOOR, BLISS_CARPET,
  LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
  KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET,
- BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR, SPA_WALL, SAUNA_WALL, GYM_FLOOR, CAFE_WALL, CAFE_CARPET) = range(1, 67)
-TILE_COUNT = 66
+ BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR, SPA_WALL, SAUNA_WALL, GYM_FLOOR, CAFE_WALL, CAFE_CARPET,
+ SPINNAKER_CARPET, SUSHI_WALL, TEPPAN_WALL, BISTRO_WALL, CANTINA_WALL, CANTINA_FLOOR) = range(1, 73)
+TILE_COUNT = 72
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
@@ -67,12 +68,21 @@ ROOM_LOOK = {
     "Fitness": (VENUEWALL, GYM_FLOOR),
     "Garden Café buffet, Ice Cream Bar (Bumbot: fish)": (CAFE_WALL, CAFE_CARPET),
     "Sports Bar": (WINDJAMMER_WALL, WOOD_FLOOR),
+    # Deck 12 (NCL's plan, the user's photos, 2026-11-07).
+    "Spinnaker Lounge": (DINING_WALL, SPINNAKER_CARPET),
+    "Chapel lobby": (DINING_WALL, LOBBY_CARPET),
+    "Champs Bar": (CAFE_WALL, WOOD_FLOOR),
+    "Cagney's Steakhouse": (WALNUT, DINING_CARPET),
+    "Sushi Bar": (SUSHI_WALL, WOOD_FLOOR),
+    "Teppanyaki": (TEPPAN_WALL, WOOD_FLOOR),
+    "Le Bistro": (BISTRO_WALL, DINING_CARPET),
+    "Los Lobos Cantina": (CANTINA_WALL, CANTINA_FLOOR),
 }
 # A span within a room with its own wall: the burl wood behind deck 5's Restaurant Reservations desk
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7, 8, 9, 10, 11}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {4, 5, 6, 7, 8, 9, 10, 11, 12}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -108,6 +118,19 @@ FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
 POOL_OPENING = (115, 145)
 POOLS = [(119, 131), (134, 140)]
 POOL_DEPTH = 2 * TILE
+# Every pool, (deck, from, to): deck 11's two, and deck 12's kids' pool (the user, 2026-11-07),
+# each out of sight and out of the way from the deck under it.
+ALL_POOLS = [(11, a, b) for a, b in POOLS] + [(12, 58.6, 62.4)]
+
+# Deck 12's passages between the indoors and an open deck with a deck door in them, seen from the
+# side, opened with E (the user, 2026-11-07), metres from the bow: which way each door swings open.
+DOOR_PASSAGES_12 = {44: 1, 57.5: -1, 67: 1, 110: -1, 164: 1, 214: -1}
+
+
+def passage_wall_col(m):
+    """The wall's column where the indoors meet an open deck at `m` metres (deck 12)."""
+    c = col(m)
+    return c if indoor(12, metres(c)) else c - 1
 
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": CABIN_WALL, "crew": CREWWALL, "start": BACKWALL}
@@ -282,9 +305,10 @@ def build_layers():
         for c, inward in ((c0, 1), (c1, -1)):
             if covered(deck, metres(c + inward)):
                 fill(solid, c, c, floor - DECK_ROWS + 1, floor, STEEL)
-            elif deck == 11 and inward == 1:
-                # Deck 11's front: its bulwark, drawn by the game, ends the deck (the user: no glass
-                # rail stub there); the rail stays, solid and unseen.
+            elif (deck in (11, 12) and inward == 1) or deck == 11:
+                # Deck 11's and 12's fronts: their bulwark, drawn by the game, ends the deck (the user:
+                # no glass rail stub there); so does the Great Outdoors' railing at deck 11's stern
+                # (the user, 2026-11-07). The rail stays, solid and unseen.
                 fill(solid, c, c, floor - 2, floor - 1, BALCONY_RAIL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
@@ -300,8 +324,10 @@ def build_layers():
             fill(solid, end, end, floor - DECK_ROWS + 1, floor - 1, END_WALL_L if inward == 1 else END_WALL_R)
 
         # Where an open deck meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
-        if 3 < deck < 12:
+        if 3 < deck:
             for c in range(c0 + 1, c1):
+                if deck == 12 and any(col(m) == c for m in DOOR_PASSAGES_12):
+                    continue    # a door in a wall across the deck, built by the game
                 if indoor(deck, metres(c - 1)) != indoor(deck, metres(c)):
                     wall = c if indoor(deck, metres(c)) else c - 1
                     fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
@@ -339,9 +365,9 @@ def build_layers():
     fill(solid, wall, wall, FLOOR_ROW[7] - DECK_ROWS + 1, FLOOR_ROW[7] - 1, STEEL)
     STERN_STRIP_7[:] = [(wall + 1) * TILE, col(EXTENT[7][1]) * TILE]
 
-    # Deck 11's pools, sunk into the deck: tiled sides and bottom, the water filled in by the game.
-    for a, b in POOLS:
-        top, bottom = FLOOR_ROW[11], FLOOR_ROW[11] + POOL_DEPTH // TILE
+    # The pools, sunk into their deck: tiled sides and bottom, the water filled in by the game.
+    for deck, a, b in ALL_POOLS:
+        top, bottom = FLOOR_ROW[deck], FLOOR_ROW[deck] + POOL_DEPTH // TILE
         fill(solid, col(a), col(b) - 1, top, bottom - 1, 0)
         fill(solid, col(a) - 1, col(a) - 1, top, bottom, POOL_TILE)
         fill(solid, col(b), col(b), top, bottom, POOL_TILE)
@@ -461,6 +487,35 @@ def front_bulwark_11():
     """Deck 11's open front, (x from, x to): up to the ship's wall before the spa."""
     a = next(wa for d, wa, wb in end_walls() if d == 11)
     return col(EXTENT[11][0]) * TILE, a * TILE
+
+
+def front_bulwark_12():
+    """Deck 12's open front, the Spinnaker's balcony (x from, x to): up to the lounge's wall."""
+    _, a, _, _, _ = next(v for v in VENUES if v[0] == 12 and v[3] == "Spinnaker Lounge")
+    return col(EXTENT[12][0]) * TILE, col(a) * TILE
+
+
+def on_front_bulwark(deck, x):
+    """Is pixel x on deck 11's or 12's open front, whose bulwark the game draws in front of her?"""
+    fa, fb = {11: front_bulwark_11, 12: front_bulwark_12}.get(deck, lambda: (0, 0))()
+    return fa <= x < fb
+
+
+def glass_walls_11(kind="outdoor"):
+    """Deck 11's pool deck, (x from, x to) each run: glass walls all along it, from the deck up to
+    deck 12's floor (the user's photo from deck 12, 2026-11-07). With kind "finale", the Great
+    Outdoors' runs: railings there (the user). Both on the far side, behind everything on the deck."""
+    runs, start = [], None
+    fwd, aft = EXTENT[11]
+    for c in range(col(fwd), col(aft) + 1):
+        m = metres(c)
+        open_ = c < col(aft) and venue_at(11, m)[1] == kind and not in_core(m) and not on_front_bulwark(11, c * TILE)
+        if open_ and start is None:
+            start = c
+        if not open_ and start is not None:
+            runs.append((start * TILE, c * TILE))
+            start = None
+    return runs
 
 
 def shell_owner(deck, c):
@@ -586,19 +641,21 @@ def shell_details(ext, solid):
                     rect(own, x, floor - 112, 6, 104, "#e8eaec")
                     rect(own, x + 6, floor - 40, unit - 6, 32, "#7f9aa8")
                     rect(own, x + 6, floor - 42, unit - 6, 2, "#e8eaec")
-        # The open decks up top: a white bulwark with a glass windscreen above it, all along.
+        # The open decks up top: a white bulwark with a glass windscreen above it, all along (deck
+        # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:
+        # glass_walls_11()).
         if deck >= 11:
-            fa, fb = front_bulwark_11()
+            walled = glass_walls_11() + glass_walls_11("finale") if deck == 11 else []
             for x in range(x0, x1, TILE):
                 m = metres(x // TILE)
                 _, kind = venue_at(deck, m)
-                if indoor(deck, m) or in_core(m) or (deck == 11 and fa <= x < fb):
+                if indoor(deck, m) or in_core(m) or on_front_bulwark(deck, x) or any(a <= x < b for a, b in walled):
                     continue
                 rect(deck, x, floor - 24, TILE, 24, "#e8eaec")
                 rect(deck, x, floor - 48, TILE, 24, "#bfe6f5")
                 rect(deck, x, floor - 50, TILE, 2, "#cd683d")
             for x in range(x0, x1, 48):
-                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)) and not (deck == 11 and fa <= x < fb):
+                if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)) and not on_front_bulwark(deck, x)                         and not any(a <= x < b for a, b in walled):
                     rect(deck, x, floor - 50, 2, 26, "#e8eaec")
 
     # On top: the roof's white edge, the navy funnel with its dark grille, the white mast, the domes.
@@ -614,7 +671,9 @@ def shell_details(ext, solid):
     mc = (ma + mb) / 2
     put("fixed", ["p", [[mc - 22, roof], [mc + 22, roof], [mc + 5, roof - 14 * TILE], [mc - 5, roof - 14 * TILE]], "#e8eaec"])
     rect("fixed", mc - 34, roof - 10 * TILE, 68, 6, "#e8eaec")
-    for m in (118, 124, 146):
+    # The radar domes on Champs Bar's roof (they stood over the open sun deck, on nothing, until deck
+    # 12 was furnished, 2026-11-07).
+    for m in (86, 93, 100):
         rect("fixed", x_of(m) - 4, roof - 26, 8, 26, "#c7dcd0")
         put("fixed", ["c", x_of(m), roof - 40, 18, "#e8eaec"])
         put("fixed", ["c", x_of(m) + 5, roof - 45, 6, "#ffffff"])
@@ -670,7 +729,9 @@ def build_objects():
     # Named places to start at, for testing: ?at=<name> (README).
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
-                          ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247)]:
+                          ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247),
+                          ("spinnaker", 12, 52), ("champs", 12, 92), ("court", 12, 150), ("sushi", 12, 178),
+                          ("bistro", 12, 205)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
@@ -715,8 +776,9 @@ def build_objects():
         prop("style", "deck"), prop("dropThrough", True, "bool")]))
     add(area("atrium", "atrium", ax0, floor_y(hi + 1) + TILE, ax1 - ax0, floor_y(lo) - floor_y(hi + 1) - TILE, [
         prop("levels", ",".join(str(walk_y(d)) for d in range(lo + 1, hi + 1)))]))
-    for a, b in POOLS:
-        add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(11) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4))
+    for deck, a, b in ALL_POOLS:
+        add(area(f"pool-{a}", "pool", col(a) * TILE, floor_y(deck) + 4, (col(b) - col(a)) * TILE, POOL_DEPTH - 4,
+                 [prop("deck", deck, "int")]))
     walks = [{"deck": str(d), "y": walk_y(d)} for d in range(lo + 1, hi + 1)]
     levels = [("5", floor_y(lo))] + [(w["deck"], w["y"]) for w in walks if int(w["deck"]) <= ATRIUM["stairs"][1]]
     # The curving staircase winds round the glass elevator (the user's photos): each flight sweeps
@@ -1061,6 +1123,17 @@ def build_objects():
     # is hidden behind the white, seen through the glass.
     fa, fb = front_bulwark_11()
     add(area("bulwark-11", "bulwark", fa, floor_y(11), fb - fa, 0))
+    # Deck 11's pool deck: glass walls in white frames all along it, from its floor up to deck 12's,
+    # behind everything on the deck (the user's photo from deck 12, 2026-11-07).
+    for i, (a, b) in enumerate(glass_walls_11()):
+        add(area(f"glass-wall-11-{i}", "glasswall", a, floor_y(11), b - a, 0))
+    # The Great Outdoors: a glass railing on the far side instead, behind everything, so it stays
+    # while she is out there (the user, 2026-11-07).
+    for i, (a, b) in enumerate(glass_walls_11("finale")):
+        add(area(f"rail-11-{i}", "glasswall", a, floor_y(11), b - a, 0, [prop("style", "railing")]))
+    # So is deck 12's, the Spinnaker's balcony (the user, 2026-11-07).
+    fa, fb = front_bulwark_12()
+    add(area("bulwark-12", "bulwark", fa, floor_y(12), fb - fa, 0))
     # The end walls she passes behind: deck 7's front, to the mooring deck; deck 8's two ends.
     for deck, wa, wb in end_walls():
         add(area(f"end-wall-{deck}-{wa}", "endwall", wa * TILE, floor_y(deck), (wb - wa) * TILE, 0))
@@ -1262,6 +1335,8 @@ def build_objects():
     # The pool deck (the user's photos): the giant chess set, sun loungers and parasols, the hot tub
     # between the two pools, ladders into them, the towel cart and a shower, Topsiders' bar.
     decor("chess-11", "chess", exact_x(110.4), exact_x(114.4), deck=11)
+    # Over it, white pipes on tall blue posts (the user's photo from deck 12).
+    decor("pergola-11", "pergola", exact_x(110.1), exact_x(114.9), deck=11)
     for m in (115.9, 117.6, 141.4, 144.6, 147.8):
         at11(m, "sunlounger")
     at11(143.0, "parasol")
@@ -1310,7 +1385,8 @@ def build_objects():
     # The Great Outdoors, open aft (§4, the finale's place): the self-service station first, the
     # coffee machines and the soft serve ice cream machine where she catches Bumbot at last; then
     # round white tables and wicker chairs, parasols where the sky is open, palms.
-    decor("outdoors-doorway", "doorway", exact_x(210), exact_x(210), deck=11, text="The Great Outdoors")
+    # (Its plaque hangs from the ceiling on cords: with deck 12 ending at 220 m the sky is behind it.)
+    decor("outdoors-doorway", "doorway", exact_x(210), exact_x(210), deck=11, text="The Great Outdoors", hang="1")
     at11(211.4, "chalkboard")
     at11(212.8, "coffee-station")
     at11(214.6, "ice-cream-machine")
@@ -1320,8 +1396,161 @@ def build_objects():
         put(11, m, ("iced-coffee-bg", "sundae-bg", "lemonade-bg")[int(m) % 3], height("round-white-table-bg"))
     for m in (237.0, 241.0):
         at11(m, "parasol")
+    # From where deck 12 ends, a large canvas sun cover over the first tables, on two posts between
+    # them (the user, 2026-11-07); the parasols beyond it, in the open sun.
+    decor("sun-cover-11", "suncover", col(EXTENT[12][1]) * TILE, exact_x(233.0), deck=11,
+          posts=",".join(str(exact_x(m)) for m in (226.0, 233.0)))
     at11(231.4, "planter-palm")
     at11(234.2, "planter-palm")
+
+    # Deck 12, after NCL's plan, cruisedeckplans.com's and the user's photos (2026-11-07; three
+    # PixelLab sheets, tall-5, tall-6 and props-7, 30 generations). Bow to stern.
+    def at12(m, frame, dy=0, flip=False):
+        put(12, m, frame + "-bg", dy, flip)
+
+    def hang12(m, frame):
+        # From the ceiling: its top against it.
+        at12(m, frame, DECK_PITCH - TILE - height(frame + "-bg"))
+
+    # Deck doors in the passages out to the open deck (the user): a wall across the deck, its door
+    # seen from the side, E to open it, as the spa's and the sauna's.
+    for m, swing in DOOR_PASSAGES_12.items():
+        add(point(f"deck-door-12-{m}", "bulkhead", passage_wall_col(m) * TILE + TILE // 2, floor_y(12), [
+            prop("leaf", "door-deck"), prop("swing", swing, "int")]))
+    # The Spinnaker's balcony, the curved open deck in front of the lounge (NCL's plan; the user,
+    # 2026-11-07): palms behind the white bulwark (loungers were lower than it, out of sight); the
+    # lounge's doors open onto it.
+    for m in (35.0, 39.0, 42.8):        # clear of the lounge's door (the user)
+        at12(m, "planter-palm")
+    # The Spinnaker Lounge, the observation lounge (the user's photos): tall windows, a wood ceiling
+    # with fans, a blue carpet, cream armchairs with dark wood arms at white marble tables, a dark
+    # sofa, a piano and a bar.
+    # Its own windows, from the user's photos: tall panes in white frames, beige curtains gathered
+    # at each, a white sill, a brass handrail along them (drawn by the game).
+    decor("spinnaker-windows", "spinnakerwindows", exact_x(46.4), exact_x(56.4), deck=12)
+    add(point("sign-spinnaker", "sign", exact_x(45.4), floor_y(12) - 96, [prop("text", "Spinnaker Lounge"), prop("style", "plaque")]))
+    around(12, 46.9, "marble-table-bg", "armchair-cream-bg", on_top="martini-bg")
+    at12(49.4, "navy-sofa")
+    at12(50.8, "marble-table")
+    at12(50.8, "olives", height("marble-table-bg"))
+    at12(52.1, "armchair-cream", flip=True)
+    at12(53.8, "grand-piano")
+    at12(55.7, "back-bar")
+    at12(55.7, "bar-counter")
+    for m in (55.2, 56.2):
+        at12(m, "bar-stool")
+    for m in (47.5, 51.5, 55.5):
+        hang12(m, "ceiling-fan")
+    # The kids' pool outside it, open to the sky: a splash pool sunk in the deck (the game fills
+    # it; out of sight from deck 11), the slide into it, a mushroom fountain, the hot tub, toys.
+    # The slide stands on the deck, the foot of its chute on the pool's rim (the user: it was off).
+    pool_a, pool_b = ALL_POOLS[-1][1:]
+    at12(58.3, "bucket-spade")
+    at12(60.4, "rubber-duck-2", -4)
+    put(12, 0, "kids-slide-bg", x=col(pool_b) * TILE + width("kids-slide-bg") // 2)
+    at12(63.9, "swim-ring")
+    at12(64.7, "mushroom-fountain")
+    at12(66.1, "hot-tub")
+    # The Chapel lobby: the Chapel's door (CHAPEL, built by the game), the restrooms.
+    add(point("chapel-room", "chapel", exact_x(CHAPEL["m"]), floor_y(12)))
+    add(point("chapel", "place", exact_x(CHAPEL["m"]), floor_y(12), [prop("route", "chapel")]))
+    at12(70.4, "side-table")
+    at12(70.4, "rose-glass", height("side-table-bg"))
+    at12(72.6, "door-cabin")
+    add(point("sign-restrooms", "sign", exact_x(72.6), floor_y(12) - 84, [prop("text", "Restrooms"), prop("style", "plaque")]))
+    # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
+    # high tables by the windows.
+    decor("champs-doorway", "doorway", exact_x(82), exact_x(82), deck=12, text="Champs Bar")
+    at12(83.4, "trophy-cabinet")
+    at12(84.8, "beer-fridge")
+    for a, b in ((86.2, 90.4), (95.6, 101.0)):
+        add(area(f"champs-windows-{a}", "decor", exact_x(a), floor_y(12) - 104, exact_x(b) - exact_x(a), 56,
+                 [prop("kind", "bridgewindows")]))
+    for m, top in ((88.3, "beer-pint-bg"), (98.3, "chicken-wings-bg")):
+        around(12, m, "bar-table-bg", "champs-stool-bg", on_top=top)
+    at12(92.6, "champs-bar")
+    at12(92.6, "beer-pint", height("champs-bar-bg"))
+    at12(91.3, "champs-stool")
+    at12(93.9, "champs-stool", flip=True)
+    at12(91.9, "sports-tv", 70)
+    at12(93.9, "sports-tv", 70)
+    decor("downlights-12-champs", "downlights", x_of(82), x_of(102), deck=12)
+    # The sun deck, round the walk over the pools: loungers and a palm.
+    at12(111.0, "sunlounger")
+    at12(112.8, "sunlounger")
+    at12(114.3, "planter-palm")
+    # Sports: the basketball and volleyball court in its net cage, shuffleboard courts painted on
+    # the deck, the golf driving net.
+    decor("court-12", "court", exact_x(146.3), exact_x(155.0), deck=12)
+    at12(146.9, "basketball-hoop")
+    at12(154.4, "basketball-hoop", flip=True)
+    at12(150.0, "basketball")
+    at12(151.3, "volleyball")
+    decor("shuffle-12", "shuffle", exact_x(155.6), exact_x(159.4), deck=12)
+    at12(156.4, "shuffle-disc")
+    at12(156.8, "shuffle-disc")
+    at12(158.9, "shuffle-disc")
+    at12(159.8, "cue-rack")
+    # (A golf driving net was tried: it read as a football goal, the user. A putting flag instead.)
+    at12(160.9, "golf-bag")
+    at12(162.2, "putting-flag")
+    at12(163.3, "golf-balls")
+    # Cagney's Steakhouse: dark wood, the wine cabinet, booths at a white-cloth table, the carving
+    # trolley. (The funnel's technical ladder comes down at 167.2.)
+    add(point("sign-cagneys", "sign", exact_x(165.0), floor_y(12) - 96, [prop("text", "Cagney's"), prop("style", "plaque")]))
+    at12(165.9, "wine-cabinet")
+    around(12, 170.0, "table-dinner-bg", "steak-booth-bg", on_top="steak-plate-bg")
+    at12(172.9, "carving-trolley")
+    decor("downlights-12-cagneys", "downlights", x_of(164), x_of(174), deck=12)
+    # The Sushi Bar: shoji screens, the counter with its fish, stools, red lanterns, a bonsai.
+    decor("sushi-doorway", "doorway", exact_x(174), exact_x(174), deck=12, text="Sushi Bar")
+    at12(175.2, "shoji-screen")
+    at12(178.0, "sushi-counter")
+    at12(177.6, "nigiri", height("sushi-counter-bg"))
+    at12(178.5, "sake-set", height("sushi-counter-bg"))
+    at12(176.7, "bar-stool")
+    at12(179.3, "bar-stool", flip=True)
+    for m in (176.5, 179.5):
+        hang12(m, "paper-lantern")
+    at12(181.0, "side-table")
+    at12(181.0, "bonsai", height("side-table-bg"))
+    # Teppanyaki: the griddles, diners round them, a lantern, a fan on the wall.
+    decor("teppan-doorway", "doorway", exact_x(182), exact_x(182), deck=12, text="Teppanyaki")
+    # (More of it, the user: it looked empty.) The host's menu stand, a shoji screen between the
+    # griddles, lanterns, fans on the wall, sake, a bonsai and a teapot, bamboo.
+    at12(182.9, "menu-lectern")
+    for m, top in ((185.4, "fried-rice-bg"), (190.4, "rice-bowl-bg")):
+        around(12, m, "teppanyaki-grill-bg", "dining-chair-bg", on_top=top)
+        at12(m + 0.45, "sake-set", height("teppanyaki-grill-bg"))
+    at12(187.9, "shoji-screen")
+    for m in (184.3, 187.9, 191.6):
+        hang12(m, "paper-lantern")
+    for m in (184.3, 191.6):
+        at12(m, "paper-fan", 62)
+    at12(191.9, "side-table")
+    at12(191.7, "bonsai", height("side-table-bg"))
+    at12(192.1, "iron-teapot", height("side-table-bg"))
+    at12(193.0, "bamboo")
+    # Le Bistro: its zinc bar, a candlelit table for two, a painting, a chandelier.
+    decor("bistro-doorway", "doorway", exact_x(202), exact_x(202), deck=12, text="Le Bistro")
+    at12(203.7, "bistro-bar")
+    around(12, 206.3, "bistro-table-bg", "bistro-chair-bg")
+    at12(206.3, "painting-flowers", 66)
+    hang12(206.3, "chandelier")
+    # Los Lobos Cantina: the tiled bar and the tequila barrel, a painted table, flags strung under
+    # the ceiling, a pinata, a cactus.
+    decor("lobos-doorway", "doorway", exact_x(208), exact_x(208), deck=12, text="Los Lobos")
+    decor("bunting-12", "bunting", exact_x(208.2), exact_x(213.8), deck=12)
+    at12(209.5, "cantina-bar")
+    at12(209.5, "margarita", height("cantina-bar-bg"))
+    around(12, 211.9, "mexican-table-bg", "mexican-chair-bg", on_top="tacos-bg")
+    at12(210.4, "chili-string", 70)
+    hang12(211.9, "pinata")
+    at12(213.4, "saguaro")
+    # The aft terrace over the Great Outdoors: deck chairs by the glass windscreen.
+    at12(215.6, "deck-chair")
+    at12(217.4, "deck-chair")
+    at12(219.0, "planter-palm")
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
@@ -1382,7 +1611,7 @@ def build_map():
             {"name": "endCover", "type": "int", "value": END_COVER},
             {"name": "shellRooms", "type": "string", "value": json.dumps(shell_rooms())},
             {"name": "poolTile", "type": "int", "value": POOL_TILE},
-            {"name": "poolSpans", "type": "string", "value": json.dumps([[(col(a) - 1) * TILE, (col(b) + 1) * TILE] for a, b in POOLS])},
+            {"name": "poolSpans", "type": "string", "value": json.dumps([[(col(a) - 1) * TILE, (col(b) + 1) * TILE, deck] for deck, a, b in ALL_POOLS])},
             {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
         ],
         "tilesets": [{
@@ -1577,6 +1806,41 @@ def draw_tile(tile_id):
         rect(0, 0, 15, 3, hex_rgba("#323353"))
         for x, y in ((2, 1), (6, 2), (10, 1), (14, 2)):
             px[y][x] = hex_rgba("#7f708a")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == SPINNAKER_CARPET:
+        # The Spinnaker Lounge: a blue carpet with a pale scrolling pattern (the user's photo).
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#4d65b4"))
+        for x, y in ((1, 1), (2, 2), (6, 1), (9, 2), (10, 1), (14, 2)):
+            px[y][x] = hex_rgba("#8fd3ff" if x % 2 else "#323353")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
+    elif tile_id == SUSHI_WALL:
+        # The Sushi Bar: shoji panels, white paper in a light wood grid.
+        rect(0, 0, 15, 15, hex_rgba("#f4efe2"))
+        rect(0, 0, 0, 15, hex_rgba("#c28d5a"))
+        rect(8, 0, 8, 15, hex_rgba("#d4a874"))
+        rect(0, 7, 15, 7, hex_rgba("#d4a874"))
+    elif tile_id == TEPPAN_WALL:
+        # Teppanyaki: deep red lacquer panels with black seams.
+        rect(0, 0, 15, 15, hex_rgba("#7a2a2a"))
+        rect(0, 0, 0, 15, hex_rgba("#2e222f"))
+        rect(1, 0, 1, 15, hex_rgba("#8a3232"))
+    elif tile_id == BISTRO_WALL:
+        # Le Bistro: warm golden damask.
+        rect(0, 0, 15, 15, hex_rgba("#d9b77a"))
+        for x, y in ((3, 3), (4, 2), (5, 3), (4, 4), (11, 11), (12, 10), (13, 11), (12, 12)):
+            px[y][x] = hex_rgba("#c79f5e")
+    elif tile_id == CANTINA_WALL:
+        # Los Lobos: sunny terracotta plaster, a little uneven.
+        rect(0, 0, 15, 15, hex_rgba("#e6904e"))
+        for x, y in ((2, 4), (9, 2), (13, 9), (5, 12), (11, 14)):
+            px[y][x] = hex_rgba("#d97f42")
+    elif tile_id == CANTINA_FLOOR:
+        # Los Lobos: terracotta floor tiles.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#b8583a"))
+        rect(0, 0, 15, 0, hex_rgba("#cd683d"))
+        px[1][7] = px[2][7] = px[1][15] = px[2][15] = hex_rgba("#7a3a26")
         rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == BRIDGE_WALL:
         # The bridge: pale grey-blue steel panels, a seam on each.
