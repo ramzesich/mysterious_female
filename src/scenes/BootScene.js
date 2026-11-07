@@ -11,7 +11,7 @@ export class BootScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
-        this.load.image('livery', 'assets/ship/livery.png');
+        this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');

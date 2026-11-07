@@ -1068,11 +1068,14 @@ def build_objects():
     height = lambda frame: art[frame]["frame"]["h"]
     width = lambda frame: art[frame]["frame"]["w"]
 
-    def put(deck, m, frame, dy=0, flip=False, x=None):
+    def put(deck, m, frame, dy=0, flip=False, x=None, front=False):
         # At the exact spot, not snapped to a tile's middle: pieces set round each other stay even.
+        # `front`: drawn in front of her (a railing on the deck's near side).
         props = [prop("frame", frame), prop("dy", dy, "int")]
         if flip:
             props.append(prop("flip", True, "bool"))
+        if front:
+            props.append(prop("front", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else exact_x(m), floor_y(deck), props))
 
     def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True)):
@@ -1099,20 +1102,15 @@ def build_objects():
     # the user, 2026-11-03).
     for m in PROMENADE["doors"]:
         put(PROMENADE["deck"], m, "door-deck", x=x_of(m))
-    # The mooring deck: bollards and a cleat, the side railing in front of them (the user), from the
-    # tip all the way back to deck 7's front wall (its last piece runs on under the wall).
+    # The mooring deck: bollards and a cleat, the side railing in front of them and of her (the
+    # user, 2026-11-07), from the tip all the way back to deck 7's front wall (its last piece runs
+    # on under the wall).
     put(7, 6, "bollard-bg")
     put(7, 10.5, "cleat-bg")
     put(7, 15, "bollard-bg")
     rail_w = width("railing-bg")
     for x in range(col(BOW["stem"][7]) * TILE + 30, end_walls()[0][1] * TILE + rail_w // 2, rail_w):
-        put(7, 0, "railing-bg", x=x)
-    # The bow view (§5.3): standing still on the mooring deck, she goes to the tip and spreads her
-    # arms, and the camera draws back to frame the whole bow, from above the forecastle down to
-    # the sea. `x0`-`x1` is where on deck 7 it can start.
-    add(area("bow-view", "bowview", x_of(-1), floor_y(7) - 90, x_of(23) - x_of(-1), (WATER_ROW + 2) * TILE - floor_y(7) + 90, [
-        prop("x0", x_of(BOW["stem"][7]), "int"), prop("x1", x_of(EXTENT[8][0]), "int"),
-        prop("tipX", (col(BOW["stem"][7]) + 1) * TILE + 9, "int"), prop("deckY", floor_y(7), "int")]))
+        put(7, 0, "railing-bg", x=x, front=True)
     # The bridge's windows on deck 10, looking out to sea.
     # Big panes in two runs, the sky and the sea in them, a stretch of wall between them and after
     # them for the clock and the screens (the user, 2026-11-06).
@@ -1796,6 +1794,8 @@ def tile_layer(layer_id, name, grid):
 def build_map():
     back, solid, ladders, exterior = build_layers()
     objs = build_objects()
+    livery = next(o for o in objs if o["type"] == "livery")
+    livery["properties"].append(prop("pieces", ",".join(livery_pieces(exterior, solid))))
     return {
         "type": "map", "version": "1.10", "tiledversion": "1.11.0", "orientation": "orthogonal",
         "renderorder": "right-down", "infinite": False, "width": COLS, "height": ROWS,
@@ -2166,10 +2166,9 @@ def write_png(path, width, height, pixels):
     path.write_bytes(png)
 
 
-# --- The ship's sun on the bow ---------------------------------------------------------------------
+# --- The ship's sun livery -------------------------------------------------------------------------
 
-# The livery's bands run on past the bow's block onto the decks' fixed ends, tapering to a tip
-# before the cut-away corridors (and the wall drawn over her there) begin (the user, 2026-11-03).
+# The bow's smooth white plating, drawn over the tiles' steps along the raked stem, runs back to here.
 LIVERY_END = BOW["block"] + 1.8
 
 
@@ -2181,104 +2180,84 @@ def livery_box():
     return x0, y0, x1, y1
 
 
-def build_livery():
-    """The ship's sun, as painted on the real bow (the user's photos, §5.3), scaled to cover most of
-    the bow's side: concentric rings of deep red, red, orange and yellow round a white centre;
-    curved flame-like rays swirling round it, each red with orange and yellow inside and a grey
-    shadow on its trailing edge; and red, orange and yellow bands with a grey line sweeping aft
-    below it. Cut to the stem's line, as if wrapping round the bow. No lettering (§5.1)."""
-    import math
-    from PIL import Image, ImageDraw
-    from palettize import palettize
+def livery_pieces(ext, solid):
+    """The ship's sun livery (§5.3), the real one after the user's side photo (`tools/build_livery.py`
+    builds it from PixelLab tiles), cut by the wall each part of it is painted on: each deck's piece
+    of the side fades with that deck's cut-away, a room's with its room's, the fixed ends never.
+    Nothing forward of the stem's smooth edge, nothing where there is no shell (the promenade's
+    opening). Writes the pieces into an atlas (assets/ship/livery.png and .json) and returns them
+    as "frame:x:y:owner" for the map."""
+    from PIL import Image
+    from build_livery import ORIGIN
 
-    x0, y0, x1, y1 = livery_box()
-    w, h = x1 - x0, y1 - y0
-    img = Image.new("RGBA", (w, h))
-    d = ImageDraw.Draw(img)
-    # Laid out as on the real bow (the user's side-view photo), compressed into the bow's hull
-    # block: the sun high on the bow; forward of it a red band above and a red, orange and yellow
-    # band below running in from the stem; aft of it a big red arc looping up and over, a yellow
-    # swoop under it, and thin red pinstripes on aft. The bands stop short of the sun's rim.
-    cx, cy = x_of(14.5) - x0, round((FLOOR_ROW[3] - FLOOR_ROW[7] - 1) * TILE * 0.3)  # high on the bow, clear of the stem
-    r = 72
+    src = Image.open(ROOT / "assets" / "source" / "livery" / "livery.png").convert("RGBA")
+    W, H = src.size
+    ox, oy = ORIGIN
+    import numpy as np
+    rgba = np.asarray(src)
+    plain_to = col(LIVERY_END) * TILE
 
-    def ray(angle, base, tip, width, colour):
-        """A curved flame: from `base` out to `tip` radii, `width` degrees wide at its base, its tip
-        swept round clockwise."""
-        left, right = [], []
-        for i in range(13):
-            t = i / 12
-            rad = base + (tip - base) * t
-            sweep = 20 * t ** 1.4
-            half = width * (1 - t) ** 0.8
-            for side, a in ((left, angle - half + sweep), (right, angle + half * 0.6 + sweep)):
-                side.append((cx + rad * math.cos(math.radians(a)), cy + rad * math.sin(math.radians(a))))
-        d.polygon(left + right[::-1], fill=colour)
-        return right
+    def tile_owner(r, c):
+        t = ext[r][c] if 0 <= r < ROWS and 0 <= c < COLS else 0
+        if t in EXT_CUT:
+            deck = next((d for d in DECKS if FLOOR_ROW[d] - DECK_ROWS < r <= FLOOR_ROW[d]), None)
+            return str(shell_owner(deck, c)) if deck is not None else "fixed"
+        # The hull below deck 3, and the walls at the decks' ends, never cut away.
+        if t or FLOOR_ROW[3] < r <= WATER_ROW or (0 <= r < ROWS and 0 <= c < COLS and solid[r][c]):
+            return "fixed"
+        return "fixed" if c * TILE < plain_to else None  # the bow's smooth plating, over the tiles' steps
 
-    def band(points, colours, width=8, shadow=True, taper=0.12):
-        """Stripes stacked under the line through `points`, the whole band narrowing to a point over
-        its last `taper` of the way (the stripes drawn as polygons, so they can narrow)."""
-        n = len(points)
-        mid = len(colours) * width / 2
-
-        def squeeze(i):
-            t = i / (n - 1)
-            return 1 if t < 1 - taper else max(0.0, (1 - t) / taper) ** 0.8
-
-        stripes = [(colour, k * width - width / 2, k * width + width / 2) for k, colour in enumerate(colours)]
-        if shadow:
-            top = len(colours) * width - width / 2 + 1
-            stripes.append(("#9babb2", top - 1, top + 2))
-        for colour, a, b in stripes:
-            upper = [(x, y + mid + (a - mid) * squeeze(i)) for i, (x, y) in enumerate(points)]
-            lower = [(x, y + mid + (b - mid) * squeeze(i)) for i, (x, y) in enumerate(points)]
-            d.polygon(upper + lower[::-1], fill=colour)
-
-    def curve(f, n=80):
-        return [f(i / n) for i in range(n + 1)]
-
-    # Two bands, in the bow's wide upper part (the stem rakes back below): a red one sweeping down
-    # from the bow's top into the sun, and a red, orange and yellow one coming in level from the
-    # stem. Both run on behind the sun and, past it, part: the upper curving up, the lower down.
-    def upper(t):
-        if t <= 0.6:
-            u = t / 0.6
-            return cx * u, 24 + (cy - 64) * u ** 1.5
-        u = (t - 0.6) / 0.4
-        return cx + (w - cx) * u, cy - 40 + 40 * u - 110 * u * u
-
-    def lower(t):
-        if t <= 0.6:
-            u = t / 0.6
-            return cx * u, cy + 6 + 14 * math.sin(math.pi * u)
-        u = (t - 0.6) / 0.4
-        return cx + (w - cx) * u, cy + 6 - 10 * u + 90 * u * u
-
-    band(curve(upper, 160), ("#e83b3b",), 10)
-    band(curve(lower, 160), ("#e83b3b", "#fb6b1d", "#f9c22b"), 7)
-    # A clear gap round the sun's rim, then the sun over it.
-    gap = r * 1.12
-    d.ellipse((cx - gap, cy - gap, cx + gap, cy + gap), fill=(0, 0, 0, 0))
-    for i in range(12):
-        a = i * 30 - 75
-        edge = ray(a, r * 0.95, r * 1.9, 19, "#e83b3b")
-        d.line([(x + 3, y + 3) for x, y in edge], fill="#9babb2", width=5)
-        ray(a + 2, r * 1.05, r * 1.72, 12, "#fb6b1d")
-        ray(a + 3, r * 1.15, r * 1.5, 6, "#f9c22b")
-    for frac, colour in ((1.0, "#ae2334"), (0.84, "#e83b3b"), (0.66, "#fb6b1d"), (0.5, "#f9c22b"),
-                         (0.34, "#ffffff")):
-        rr = r * frac
-        d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), fill=colour)
-
-    # Cut to the stem: nothing forward of the hull's smooth edge.
-    px = img.load()
-    for y in range(h):
-        edge = round(stem_x((y + y0) / TILE)) + 2 - x0
-        for x in range(min(max(edge, 0), w)):
-            px[x, y] = (0, 0, 0, 0)
-    out = ROOT / "assets" / "ship" / "livery.png"
-    palettize(img).save(out)
+    r0, c0 = oy // TILE, ox // TILE
+    rows, cols = (oy + H - 1) // TILE - r0 + 1, (ox + W - 1) // TILE - c0 + 1
+    names = sorted({o for r in range(rows) for c in range(cols) if (o := tile_owner(r0 + r, c0 + c))})
+    ids = np.zeros((rows, cols), np.int16)
+    for r in range(rows):
+        for c in range(cols):
+            o = tile_owner(r0 + r, c0 + c)
+            ids[r, c] = names.index(o) + 1 if o else 0
+    ys, xs = np.mgrid[0:H, 0:W]
+    own = ids[(ys + oy) // TILE - r0, (xs + ox) // TILE - c0]
+    stem = np.array([stem_x((y + oy) / TILE) for y in range(H)])
+    own[xs + ox < stem[:, None] + 2] = 0                   # nothing forward of the stem's smooth edge
+    own[rgba[..., 3] == 0] = 0
+    for deck, m in BALCONY_FROM.items():                   # none over the balconies: they are open
+        band = (ys + oy > floor_y(deck) - DECK_PITCH) & (ys + oy <= floor_y(deck))
+        own[band & (xs + ox >= exact_x(m) - 4)] = 0
+    # Each owner's paint, in chunks of at most CHUNK wide, trimmed.
+    CHUNK = 1024
+    pieces = []
+    for i, o in enumerate(names, 1):
+        layer = rgba.copy()
+        layer[own != i] = 0
+        for cx in range(0, W, CHUNK):
+            part = Image.fromarray(layer[:, cx:cx + CHUNK])
+            box = part.getbbox()
+            if box:
+                pieces.append((o, cx + box[0], box[1], part.crop(box)))
+    # Shelf-pack them into one atlas.
+    AW = 4096
+    pieces.sort(key=lambda p: -p[3].height)
+    x = y = shelf = 0
+    places = []
+    for o, px, py, im in pieces:
+        if x + im.width > AW:
+            x, y, shelf = 0, y + shelf + 1, 0
+        places.append((o, px, py, im, x, y))
+        x += im.width + 1
+        shelf = max(shelf, im.height)
+    atlas = Image.new("RGBA", (AW, y + shelf))
+    frames, out = {}, []
+    for i, (o, px, py, im, ax, ay) in enumerate(places):
+        atlas.paste(im, (ax, ay))
+        name = f"p{i}"
+        frames[name] = {"frame": {"x": ax, "y": ay, "w": im.width, "h": im.height}, "rotated": False,
+                        "trimmed": False, "spriteSourceSize": {"x": 0, "y": 0, "w": im.width, "h": im.height},
+                        "sourceSize": {"w": im.width, "h": im.height}}
+        out.append(f"{name}:{ox + px}:{oy + py}:{o}")
+    atlas.save(ROOT / "assets" / "ship" / "livery.png", optimize=True)
+    (ROOT / "assets" / "ship" / "livery.json").write_text(json.dumps(
+        {"frames": frames, "meta": {"image": "livery.png", "size": {"w": AW, "h": atlas.height}, "scale": "1"}}),
+        encoding="utf-8")
     return out
 
 
@@ -2297,4 +2276,3 @@ if __name__ == "__main__":
     map_path.write_text(json.dumps(build_map(), separators=(",", ":")), encoding="utf-8")
     print("wrote", map_path.relative_to(ROOT))
     print("wrote", build_tileset().relative_to(ROOT))
-    print("wrote", build_livery().relative_to(ROOT))

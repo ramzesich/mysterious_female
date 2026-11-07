@@ -1,8 +1,9 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BOW_VIEW, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
+import { Sea } from '../sea.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -113,7 +114,6 @@ export class ShipScene extends Phaser.Scene {
         const OUT = 2 * W;
         const sky = this.add.image(-OUT, 0, 'sky').setOrigin(0).setDisplaySize(W + 2 * OUT, this.waterY).setDepth(DEPTH.sky);
         const skyTop = this.add.rectangle(-OUT, -OUT, W + 2 * OUT, OUT, 0x5fb8f0).setOrigin(0).setDepth(DEPTH.sky);
-        this.sea = this.add.tileSprite(-OUT, this.waterY, W + 2 * OUT, H - this.waterY + OUT, 'sea').setOrigin(0).setDepth(DEPTH.sea);
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -201,8 +201,12 @@ export class ShipScene extends Phaser.Scene {
                 // (Not where a room's own shell meets its deck's: that is no end of the deck.)
                 const air = t.y !== this.deckFloors[deck];
                 const end = dx => shell(dx, 0) && !allCut.has(`${t.x + dx},${t.y}`);
-                if (air && end(-1)) endCover.fillStyle(0xe8eaec, 1).fillRect(x - coverW, y, coverW, h);
-                if (air && end(1)) endCover.fillStyle(0xe8eaec, 1).fillRect(x + w, y, coverW, h);
+                const cover = cx => {
+                    endCover.fillStyle(0xe8eaec, 1).fillRect(cx, y, coverW, h);
+                    (this.endCovers ||= []).push({ x: cx, y, w: coverW, h });
+                };
+                if (air && end(-1)) cover(x - coverW);
+                if (air && end(1)) cover(x + w);
             }
             this.cutShadows[key] = g;
         }
@@ -247,8 +251,13 @@ export class ShipScene extends Phaser.Scene {
             const img = s ? this.leaningRailing(footX, t.pixelY + t.height, Math.abs(s.x1 - s.x0) / (s.yFloor - s.yTop), inward)
                 : this.add.image(footX, t.pixelY + t.height, 'shipart', 'railing-bg').setOrigin(0.5, 1);
             // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
-            // stops a little short of its foot (the user, 2026-11-06).
-            railings.push(img.setDepth(s ? DEPTH.player + 0.04 : DEPTH.decor + 0.1));
+            // stops a little short of its foot (the user, 2026-11-06). An upright one, at deck 7's
+            // ends, is in front of her too (the user, 2026-11-07).
+            railings.push(img.setDepth(DEPTH.player + 0.04));
+            // From outside, a leaning railing is behind its deck's wall: it shows only while she
+            // is on its deck (in front of her, as above) or that deck is cut away (the user,
+            // 2026-11-07).
+            if (s) (this.leaningRailings ||= []).push({ deck, img });
             if (s) {
                 const edge = footX + inward * t.width / 2;
                 const stop = this.add.zone(edge + inward * RAILING_STOP / 2, t.pixelY, RAILING_STOP, 2 * t.height);
@@ -257,7 +266,19 @@ export class ShipScene extends Phaser.Scene {
             }
         });
 
-        this.worldLayer.add([sky, skyTop, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+        // The sea (§5.2, the user, 2026-11-07): rows of waves in front of the hull's foot, foam
+        // along its waterline from the stem to the stern, the bow wave, the wake.
+        const hullRow = this.waterY / 16 - 1;
+        const hullCols = [];
+        for (const layer of [this.exteriorLayer, this.solidLayer]) {
+            layer.forEachTile(t => { if (t.index > 0 && t.y === hullRow) hullCols.push(t.x); });
+        }
+        this.seaView = new Sea(this, {
+            x0: -OUT, x1: W + OUT, y: this.waterY, bottom: H + OUT,
+            bowX: Math.min(...hullCols) * 16, sternX: (Math.max(...hullCols) + 1) * 16,
+            depth: DEPTH.exterior + 0.25, front: DEPTH.exterior + 0.3,     // the hull's foot under water
+        });
+        this.worldLayer.add([sky, skyTop, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
@@ -392,7 +413,8 @@ export class ShipScene extends Phaser.Scene {
                 case 'prop': {
                     // Furniture and fittings (§5.3): on the floor, on another piece, or on the wall.
                     const piece = this.add.image(o.x, o.y - prop(o, 'dy', 0), 'shipart', prop(o, 'frame', ''))
-                        .setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1).setFlipX(prop(o, 'flip', false));
+                        .setOrigin(0.5, 1).setDepth(prop(o, 'front', false) ? DEPTH.player + 0.04 : DEPTH.decor + 0.1)
+                        .setFlipX(prop(o, 'flip', false));
                     this.worldLayer.add(piece);
                     break;
                 }
@@ -409,16 +431,10 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
-                case 'bowview':
-                    this.bowView = {
-                        x: o.x, y: o.y, w: o.width, h: o.height, x0: prop(o, 'x0', 0), x1: prop(o, 'x1', 0),
-                        tipX: prop(o, 'tipX', o.x), deckY: prop(o, 'deckY', 0),
-                    };
-                    break;
-
                 case 'livery': {
                     // The bow's hull (§5.3): white plating with a smooth edge along the raked stem,
-                    // over the tiles' steps, and the ship's sun on it, built with the map.
+                    // over the tiles' steps; and the ship's sun livery, the real one, in pieces by
+                    // the wall each is painted on, so each fades with its deck's cut-away.
                     const stem = String(prop(o, 'stem', '')).split(',').map(pair => {
                         const [x, y] = pair.split(':').map(Number);
                         return { x, y };
@@ -426,9 +442,26 @@ export class ShipScene extends Phaser.Scene {
                     const last = stem[stem.length - 1];
                     const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
                     plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
-                    // Over the shell: its bands run on onto the decks' fixed ends, which never cut away.
-                    const sun = this.add.image(o.x, o.y, 'livery').setOrigin(0).setDepth(DEPTH.exterior + 0.02);
-                    this.worldLayer.add([plating, sun]);
+                    this.worldLayer.add(plating);
+                    // Over the shell, under its windows and balconies.
+                    for (const piece of String(prop(o, 'pieces', '')).split(',').filter(Boolean)) {
+                        const [frame, x, y, owner] = piece.split(':');
+                        const img = this.add.image(Number(x), Number(y), 'livery', frame).setOrigin(0).setDepth(DEPTH.exterior + 0.02);
+                        this.worldLayer.add(img);
+                        const deck = owner === 'fixed' ? null : owner.includes(':') ? owner : Number(owner);
+                        this.shellSlopes.push({ deck, gfx: img });
+                        // Where the wall at a deck's end is drawn over her, its paint is drawn
+                        // over that strip too.
+                        for (const c of this.endCovers || []) {
+                            const cx = Math.max(c.x, img.x), cy = Math.max(c.y, img.y);
+                            const cw = Math.min(c.x + c.w, img.x + img.width) - cx, ch = Math.min(c.y + c.h, img.y + img.height) - cy;
+                            if (cw <= 0 || ch <= 0) continue;
+                            const top = this.add.image(img.x, img.y, 'livery', frame).setOrigin(0)
+                                .setCrop(cx - img.x, cy - img.y, cw, ch).setDepth(DEPTH.player + 0.051);
+                            this.worldLayer.add(top);
+                            this.shellSlopes.push({ deck, gfx: top });
+                        }
+                    }
                     break;
                 }
 
@@ -2125,6 +2158,9 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
+        // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
+        // the outside view.
+        this.seaView.update(Math.min(delta, 50) / 1000);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();
@@ -2133,9 +2169,6 @@ export class ShipScene extends Phaser.Scene {
             this.updateOverview(input, dt);
             return;
         }
-        // The ship is under way bow first (§5.2): the bow is on the left, so the sea streams past
-        // toward the stern, to the right.
-        this.sea.tilePositionX -= dt * 12;
 
         this.updateVacuums(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
@@ -2244,10 +2277,9 @@ export class ShipScene extends Phaser.Scene {
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
         else this.standStill(time, dir);
 
-        // Standing still on the mooring deck long enough: the bow view.
+        // Standing still on the bed long enough: she bounces on it.
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
-        else if (this.atBow() && time - (this.stillSince ?? time) > BOW_VIEW.idleMs) this.startBowView();
         else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) this.startBedJoy();
     }
 
@@ -2292,56 +2324,6 @@ export class ShipScene extends Phaser.Scene {
         this.script = null;
         this.mode = 'play';
         p.y = y;
-        p.body.enable = true;
-        p.body.reset(p.x, p.y);
-        this.pose('stand');
-        this.stillSince = this.time.now;
-    }
-
-    // --- The bow view (§5.3) --------------------------------------------------------------------
-
-    atBow() {
-        const b = this.bowView;
-        const p = this.player;
-        return b && Math.abs(p.y - b.deckY) < 2 && p.x >= b.x0 && p.x <= b.x1;
-    }
-
-    // She walks to the tip of the bow and spreads her arms into the wind, facing the sea ahead,
-    // and the camera draws back to show the whole bow, the ship's sun on it. Any key brings it back.
-    startBowView() {
-        const p = this.player;
-        const b = this.bowView;
-        const cam = this.cameras.main;
-        this.mode = 'scripted';
-        p.body.setVelocity(0, 0);
-        p.body.enable = false;
-        cam.stopFollow();
-        cam.pan(b.x + b.w / 2, b.y + b.h / 2, BOW_VIEW.zoomMs, 'Sine.easeInOut');
-        cam.zoomTo(Math.min(VIEW.width / b.w, VIEW.height / b.h), BOW_VIEW.zoomMs, 'Sine.easeInOut');
-        p.setFlipX(b.tipX < p.x);
-        this.pose('run', 0.9);
-        this.tweens.add({
-            targets: p, x: b.tipX, duration: (Math.abs(p.x - b.tipX) / (PLAYER.runSpeed * 0.9)) * 1000,
-            // The pose is drawn facing the bow (west), not mirrored.
-            onComplete: () => p.setFlipX(false).anims.play('her-arms-wide'),
-        });
-        this.script = () => {
-            const i = this.controls.state;
-            if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) this.endBowView();
-        };
-    }
-
-    endBowView() {
-        const p = this.player;
-        const cam = this.cameras.main;
-        this.tweens.killTweensOf(p);
-        this.script = null;
-        cam.panEffect.reset();
-        cam.zoomEffect.reset();
-        cam.zoomTo(VIEW.zoom, 600, 'Sine.easeInOut');
-        cam.startFollow(p, true, 0.15, 0.15);
-        cam.setFollowOffset(0, HALF);
-        this.mode = 'play';
         p.body.enable = true;
         p.body.reset(p.x, p.y);
         this.pose('stand');
@@ -2582,6 +2564,8 @@ export class ShipScene extends Phaser.Scene {
         for (const { deck, gfx, always } of this.shellSlopes) {
             gfx.setAlpha(always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
         }
+        const onDeck = this.deckOfY(p.y);
+        for (const { deck, img } of this.leaningRailings || []) img.setAlpha(onDeck === deck ? 1 : 1 - shown(deck));
 
     }
 

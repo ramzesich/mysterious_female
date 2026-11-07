@@ -32,6 +32,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor), drawn by hand: its inside and its open crew door |
 | `tools/draw_lifeboat.py` | The ship's boats, drawn by hand in code (PixelLab's tries didn't read): the lifeboat, the tender, the rescue boat (`assets/ship/lifeboat.png`, `tender.png`, `rescue-boat.png`) |
+| `tools/build_livery.py` | The ship's sun livery from its PixelLab tiles (`assets/source/livery/p2-*.png`) to one picture at full size (`assets/source/livery/livery.png`); then `build_ship_map.py` cuts it by deck into `assets/ship/livery.png` + `.json`. Its placement (`SHIFT`, `DROP`, `DISC`) is the user's. `tools/livery_photo.py` makes the tiles' generation inputs from the user's side photo |
 | `tools/render_ship.py` | The whole ship from outside at full size, every deck closed (`ship-full.png` in `%TEMP%/bumbusik-playtest/exterior`); in the game, O shows it too |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
@@ -109,6 +110,12 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
   Wikimedia Commons has almost no side-on photos of the ship (the user checked); its API rate-limits.
 - Don't take a deck's or an area's size from the photos without asking: the layout (deck lengths,
   rooms) is the game's, and the user prefers keeping it to matching a photo.
+- **Generated art far bigger than a generation (512 px max), like the livery:** straighten the
+  photo, cut it into tiles at a third of the game's scale, generate each (img2img), then a second
+  pass from the first with its leftovers (windows) painted over; snap each tile's few exact colours
+  to the palette by rules, enlarge each colour smoothly, and fix the rest by hand-set filters
+  (exact shapes, like the sun's disc, drawn exactly). Cleaning that deletes pixels makes holes:
+  the user saw them at once. Check the result at 1:1 and in the game, not only scaled down.
 - Things drawn over the ship's side straddling the edge of a cut-away (a room's piece of shell, a
   deck's end, the fixed stern plating) are skipped by `span_owner()`: end runs of windows short of
   such edges, or draw a band piece by piece.
