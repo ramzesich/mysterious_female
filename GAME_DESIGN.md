@@ -1081,6 +1081,26 @@ Nothing blocks the start of the build. These get settled along the way:
       The game follows NCL's 2022 map (the spa forward). Revisit when the user wants to
 - [ ] **Later: map Bumbot in again** (§4): his spots (deck 12 had none yet; the design's SUSHI sign
       secret, §5, is one idea), the finale's place, and his near-catches' tests
+- [ ] **The outside of the ship, after the user's photos and videos** (in progress, 2026-11-07,
+      branch `exterior`; references: the side photo `reference/photos/side-full.jpg`, two videos and
+      a photo in `reference/videos/`, frames in `reference/videos/frames/`). Done, zone by zone
+      from the bottom: **the hull** (no windows below deck 3; a few tiny portholes on deck 3; one
+      row of round portholes on deck 4; two-pane cabin windows with curtains in runs on deck 5;
+      the stern block's rows on decks 4-7); **the lifeboat deck** (a shaded recess two decks tall,
+      100-231 m, rounded at its ends, the promenade lengthened to match; the real boats, drawn by
+      hand at 85% of life: lifeboats, two tenders, a rescue boat, on davit arms and cables under deck
+      8's overhang; white columns, the walkway at deck 7's height, portholes and a glazed bay on its
+      back wall; life rings only on the open railing; the end columns behind the enclosed walls);
+      **the forward block** (single cabin windows in a grid on decks 6-10); **the balconies** on
+      decks 8-10 (about 2.6 m each: dark door in a shaded recess, pale blue glass front with a white
+      rail, white partitions; the rows stepped, starting about 73, 66 and 63 m). **O shows the whole
+      ship from outside** (paused, the window filled with sky and sea, the wheel zooms toward the
+      pointer, the movement keys do nothing there). **Tried and dropped:** moving the
+      superstructure's front aft into a slope as in the photos (decks 8-12 shortened at the front):
+      too much broke inside (the user); the fronts stay where NCL's profile has them, and the photos'
+      front face (its bridge band and window hoods) is not drawn on the side. **Next:** decks 11 and
+      12 (deck 11's long band of glass, deck 12's windows, the name board under the funnel), then
+      the livery and the ship's movement and background (the user)
 - [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
       2026-11-07, and every part has its wall and door). Candidates: deck 11's front after the
       2025 plan (above); the ship's areas and their progression, which doors are locked with which

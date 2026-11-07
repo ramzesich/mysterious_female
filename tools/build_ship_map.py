@@ -522,9 +522,11 @@ STERN_BLOCK = (231, 250.6)                          # the stern's own rows of wi
 # dark band of windows over the bridge; deck 5's dark rounded windows in the sun livery. (Bands of
 # windows under white "eyelid" hoods were tried at the front of decks 8-9: they are the front face's,
 # seen in the photo's perspective, not the side's: the user.)
-FORWARD_GRID = {10: (44, 83), 9: (44, 90), 8: (44, 100), 7: (46, 99), 6: (46, 99)}
+# (Decks 8-10: half their grid gave way to the balcony rows, run on forward, still stepped: the user,
+# 2026-11-07. The rows started at 104, 91 and 84 m.)
+FORWARD_GRID = {10: (44, 61.5), 9: (44, 65), 8: (44, 72), 7: (46, 99), 6: (46, 99)}
 GRID_ORIGIN, GRID_PITCH = 44.0, 3.4
-BALCONY_FROM = {8: 104, 9: 91, 10: 84}
+BALCONY_FROM = {8: 72.9, 9: 66.1, 10: 62.7}
 DECK5_OVALS = (58, 95, 3.2)
 # (They stop short of the stern's fixed plating, from 251 m, so none straddles its edge.)
 CURTAIN = "#b9b2a3"
@@ -726,7 +728,7 @@ def shell_details(ext, solid):
         prom_a, prom_b = PROMENADE["span"]
         open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
         doors = [x_of(m) for m in PROMENADE["doors"]]
-        for unit, style in ((96, "square"), (144, "balcony"), (64, "venue"), (48, "bridge"), (192, "promenade")):
+        for unit, style in ((96, "square"), (125, "balcony"), (64, "venue"), (48, "bridge"), (192, "promenade")):
             for x in range(x0 - x0 % unit, x1, unit):
                 c = (x + unit // 2) // TILE
                 if not (x0 <= x and x + unit <= x1):
@@ -770,12 +772,20 @@ def shell_details(ext, solid):
                     rect(own, x, floor - 104, unit, 22, GLASS_DARK)
                     rect(own, x, floor - 103, unit, 1, "#4d65b4")
                 else:
-                    # A balcony: the cabin's dark glass door, a white partition, a glass railing.
-                    rect(own, x, floor - 112, unit, 104, GLASS)
-                    rect(own, x + 18, floor - 100, unit - 36, 60, GLASS_DARK)
-                    rect(own, x, floor - 112, 6, 104, "#e8eaec")
-                    rect(own, x + 6, floor - 40, unit - 6, 32, "#7f9aa8")
-                    rect(own, x + 6, floor - 42, unit - 6, 2, "#e8eaec")
+                    # A balcony, after the user's photo and videos (2026-11-07), about 2.6 m: in its
+                    # shaded recess the cabin's dark glass door under the balcony's white ceiling
+                    # edge; its front pale blue glass reflecting the sky, a white rail on top; a
+                    # white partition from the next one.
+                    rect(own, x, floor - 116, unit, 108, "#5d6f86")
+                    rect(own, x + 14, floor - 104, unit - 26, 60, GLASS_DARK)
+                    rect(own, x + 16, floor - 102, 3, 56, "#4d65b4")
+                    rect(own, x, floor - 116, unit, 5, "#f4f4f4")
+                    rect(own, x, floor - 111, unit, 1, "#c7dcd0")
+                    rect(own, x + 6, floor - 48, unit - 6, 40, "#a3c4d4")
+                    rect(own, x + 6, floor - 36, unit - 6, 1, "#c7e4ef")
+                    rect(own, x + 6, floor - 50, unit - 6, 3, "#f4f4f4")
+                    rect(own, x, floor - 116, 6, 108, "#f4f4f4")
+                    rect(own, x + 5, floor - 116, 1, 108, "#c7dcd0")
         # The open decks up top: a white bulwark with a glass windscreen above it, all along (deck
         # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:
         # glass_walls_11()).
