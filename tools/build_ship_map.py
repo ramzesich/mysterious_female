@@ -15,7 +15,7 @@ import struct
 import zlib
 from pathlib import Path
 
-from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, PLAYABLE,
+from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, RADAR_MAST, PLAYABLE,
                          OUR_CABIN, LINEN_ROOM, CHAPEL, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -528,6 +528,13 @@ FORWARD_GRID = {10: (44, 61.5), 9: (44, 65), 8: (44, 72), 7: (46, 99), 6: (46, 9
 GRID_ORIGIN, GRID_PITCH = 44.0, 3.4
 BALCONY_FROM = {8: 72.9, 9: 66.1, 10: 62.7}
 DECK5_OVALS = (58, 95, 3.2)
+# Decks 11 and 12 (the user's photo): long bands of tall windows with white mullions, in runs by the
+# rooms behind them (metres); the open decks between stay open. The name board under the funnel.
+TOP_BANDS = {
+    11: [(40, 73), (83, 101), (161, 193), (203, 209)],
+    12: [(45, 57), (83, 101), (165, 173), (175, 181), (183, 193), (203, 207), (209, 213)],
+}
+NAME_BOARD = (182.5, 193.5)                         # on the aft part of the funnel's white base (our funnel stands 168-196 m)
 # (They stop short of the stern's fixed plating, from 251 m, so none straddles its edge.)
 CURTAIN = "#b9b2a3"
 FRAME_WHITE = "#f4f4f4"
@@ -702,6 +709,18 @@ def shell_details(ext, solid):
             rect(own, x - 22, y5 - 10, 44, 20, FRAME)
             rect(own, x - 18, y5 - 10, 36, 20, GLASS_DARK)
             rect(own, x - 20, y5 - 8, 40, 16, GLASS_DARK)
+    # Decks 11 and 12 (TOP_BANDS): tall dark panes between white mullions, a white sill and head.
+    for deck, runs in TOP_BANDS.items():
+        top, h = floor_y(deck) - 110, 76
+        for a, b in runs:
+            for x in range(exact_x(a), exact_x(b) - 39, 40):
+                own = span_owner(x, x + 40, (top + h // 2) // TILE, deck)
+                if own is None:
+                    continue
+                rect(own, x, top - 3, 40, h + 6, FRAME_WHITE)
+                rect(own, x + 3, top, 37, h, GLASS_DARK)
+                rect(own, x + 3, top + h // 3, 37, 1, "#484a77")
+                rect(own, x + 7, top + 4, 2, h // 2, "#4d65b4")
     y7 = floor_y(7) - 84
     a7, b7 = exact_x(sa + 13), exact_x(sb)
     own7 = span_owner(a7, b7, y7 // TILE, 7)
@@ -735,6 +754,8 @@ def shell_details(ext, solid):
                     continue
                 if deck in (6, 7) and metres(c) >= STERN_BLOCK[0] - 2:
                     continue                         # the stern block's own windows
+                if deck >= 11:
+                    continue                         # decks 11-12: their bands of windows (TOP_BANDS)
                 own = owner_at(c, mid_row, deck)
                 if own is None:
                     continue
@@ -808,10 +829,28 @@ def shell_details(ext, solid):
     for c in range(COLS):
         if solid[ROOF_ROW][c] == STEEL:
             rect("fixed", c * TILE, roof, TILE, TILE, "#e8eaec")
-    fa, fb = x_of(FUNNEL[0]) - 8, x_of(FUNNEL[1]) + 8
-    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], GLASS_DARK])
-    put("fixed", ["p", [[fa + 46, roof - 12 * TILE + 14], [fb - 32, roof - 12 * TILE + 14], [fb - 30, roof - 12 * TILE], [fa + 50, roof - 12 * TILE]], "#2e222f"])
-    put("fixed", ["p", [[fa, roof], [fb, roof], [fb - 4, roof - 22], [fa + 6, roof - 22]], "#e8eaec"])
+    # (The funnel is the game's to draw: a `funnel` object, its lattice, logo and smoke.)
+    # The angled radar mast on the Spinnaker Lounge's roof (the user's photos): a white beam rising
+    # aft from a broad foot, a platform with small antennas on its forward side, the dark radar
+    # scanner near the top, a thin yard with antennas at its tip.
+    r0 = exact_x(RADAR_MAST)
+    def P(*pts):
+        put("fixed", ["p", [[r0 + x, roof - y] for x, y in pts], "#e8eaec"])
+    P((0, 0), (190, 0), (300, 250), (262, 262))
+    P((262, 262), (300, 250), (318, 276), (290, 282))
+    put("fixed", ["p", [[r0 + 150, roof], [r0 + 190, roof], [r0 + 300, roof - 250], [r0 + 292, roof - 253]], "#d5dade"])
+    rect("fixed", r0 - 70, roof - 128, 190, 8, "#e8eaec")             # the forward platform
+    rect("fixed", r0 - 70, roof - 121, 190, 2, "#c7dcd0")
+    for x, h in ((-60, 22), (-30, 30), (0, 18), (40, 26)):              # its antennas and a small dish
+        rect("fixed", r0 + x, roof - 128 - h, 3, h, "#e8eaec")
+    put("fixed", ["c", r0 + 80, roof - 140, 9, "#e8eaec"])
+    rect("fixed", r0 + 150, roof - 196, 150, 8, "#c7cdd2")             # the radar scanner (light grey: the user)
+    rect("fixed", r0 + 222, roof - 188, 6, 14, "#9babb2")
+    put("fixed", ["p", [[r0 + 300, roof - 270], [r0 + 306, roof - 274], [r0 + 400, roof - 352], [r0 + 394, roof - 356]], "#e8eaec"])
+    for k in range(4):                                                  # the yard's antennas
+        x = r0 + 320 + k * 24
+        y = roof - 288 - k * 20
+        rect("fixed", x, y - 22, 2, 22, "#e8eaec")
     ma, mb = x_of(MAST[0]), x_of(MAST[1])
     mc = (ma + mb) / 2
     put("fixed", ["p", [[mc - 22, roof], [mc + 22, roof], [mc + 5, roof - 14 * TILE], [mc - 5, roof - 14 * TILE]], "#e8eaec"])
@@ -1703,6 +1742,14 @@ def build_objects():
     at12(215.6, "deck-chair")
     at12(217.4, "deck-chair")
     at12(219.0, "planter-palm")
+
+    # The funnel (the user's photos), drawn by the game: on its white base a navy casing, an open
+    # navy lattice raked back at the front, the NCL logo on its aft part, exhaust pipes and a bit of
+    # white smoke.
+    add(area("funnel", "funnel", x_of(FUNNEL[0]) - 8, ROOF_ROW * TILE, x_of(FUNNEL[1]) - x_of(FUNNEL[0]) + 16, 0))
+    # The ship's name on the white base under the funnel (the user's photo): white on navy.
+    add(area("name-board", "nameboard", exact_x(NAME_BOARD[0]), ROOF_ROW * TILE - 52,
+             exact_x(NAME_BOARD[1]) - exact_x(NAME_BOARD[0]), 30, [prop("text", "NORWEGIAN SUN")]))
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [

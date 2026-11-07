@@ -1098,9 +1098,15 @@ Nothing blocks the start of the build. These get settled along the way:
       pointer, the movement keys do nothing there). **Tried and dropped:** moving the
       superstructure's front aft into a slope as in the photos (decks 8-12 shortened at the front):
       too much broke inside (the user); the fronts stay where NCL's profile has them, and the photos'
-      front face (its bridge band and window hoods) is not drawn on the side. **Next:** decks 11 and
-      12 (deck 11's long band of glass, deck 12's windows, the name board under the funnel), then
-      the livery and the ship's movement and background (the user)
+      front face (its bridge band and window hoods) is not drawn on the side. **Decks 11 and 12:**
+      bands of tall dark panes between white mullions in runs by the rooms behind them (the spa,
+      fitness, the Garden Café, the Sports Bar; the Spinnaker, Champs Bar, the restaurants), the
+      open decks open. **On top:** the funnel after the photos (drawn by the game: a taller white
+      base with the NORWEGIAN SUN name board, a navy casing, the open navy lattice raked back at the
+      front, the NCL logo, exhaust pipes, white smoke drifting aft, still drifting in the outside
+      view); the real ship's angled radar mast on the Spinnaker's roof, the antenna mast moved to
+      the roof over the forward lobby (75 m). **Next:** the livery and the ship's movement and
+      background (the user)
 - [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
       2026-11-07, and every part has its wall and door). Candidates: deck 11's front after the
       2025 plan (above); the ship's areas and their progression, which doors are locked with which

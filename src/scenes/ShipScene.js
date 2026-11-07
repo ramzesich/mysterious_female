@@ -512,6 +512,24 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'funnel':
+                    this.buildFunnel(o);
+                    break;
+
+                case 'nameboard': {
+                    // The ship's name under the funnel: white letters on a navy board, outside.
+                    const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
+                    g.fillStyle(0x1d2b53, 1).fillRect(o.x, o.y, o.width, o.height);
+                    g.fillStyle(0x9babb2, 1).fillRect(o.x, o.y, o.width, 1).fillRect(o.x, o.y + o.height - 1, o.width, 1);
+                    const t = this.add.text(o.x + o.width / 2, o.y + o.height / 2 + 1, prop(o, 'text', ''), {
+                        fontFamily: 'Verdana, sans-serif', fontSize: '18px', fontStyle: 'bold', color: '#ffffff', resolution: 4,
+                    }).setOrigin(0.5).setDepth(DEPTH.exterior + 0.06);
+                    t.setLetterSpacing?.(3);
+                    t.setScale(Math.min(1, (o.width - 16) / t.width));
+                    this.worldLayer.add([g, t]);
+                    break;
+                }
+
                 case 'endwall': {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
@@ -1523,6 +1541,87 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(g);
     }
 
+    // --- The funnel (the user's photos, 2026-11-07) ---------------------------------------------
+    // On its white base under the name board: a navy casing, then the open lattice, navy struts
+    // over its dark inside, raked back at the front; the NCL logo on its aft part, white letters
+    // over waves in three blues; grey exhaust pipes on top, and white smoke drifting aft from them.
+
+    buildFunnel(o) {
+        const fa = o.x, fb = o.x + o.width, base = o.y;
+        const g = this.add.graphics().setDepth(DEPTH.exterior + 0.04);
+        const navy = 0x323353, deep = 0x1d2040, strut = 0x404574;
+        g.fillStyle(0xe8eaec, 1).fillPoints([{ x: fa, y: base }, { x: fb, y: base }, { x: fb - 4, y: base - 64 }, { x: fa + 6, y: base - 64 }], true);
+        g.fillStyle(0xc7dcd0, 1).fillRect(fa + 6, base - 66, fb - fa - 10, 2);
+        // The casing.
+        const c0 = base - 64, c1 = base - 108;
+        g.fillStyle(navy, 1).fillPoints([{ x: fa + 14, y: c0 }, { x: fb - 8, y: c0 }, { x: fb - 18, y: c1 }, { x: fa + 60, y: c1 }], true);
+        g.fillStyle(strut, 1).fillRect(fa + 58, c1, fb - fa - 76, 3);
+        // The lattice: its outline points, bottom fore and aft, top aft and fore.
+        const top = base - 500;
+        const L = [{ x: fa + 150, y: c1 }, { x: fb - 90, y: c1 }, { x: fb - 150, y: top }, { x: fa + 560, y: top }];
+        g.fillStyle(deep, 1).fillPoints(L, true);
+        const edge = (t, side) => side === 0
+            ? { x: L[0].x + (L[3].x - L[0].x) * t, y: c1 + (top - c1) * t }
+            : { x: L[1].x + (L[2].x - L[1].x) * t, y: c1 + (top - c1) * t };
+        g.lineStyle(10, navy, 1).strokePoints(L, true);
+        for (let k = 1; k < 5; k++) {
+            const a = edge(k / 5, 0), b = edge(k / 5, 1);
+            g.lineStyle(6, navy, 1).lineBetween(a.x, a.y, b.x, b.y);
+        }
+        // Its struts: an X across each panel of each bay, inside the frame.
+        const lerp = (p, q, t) => ({ x: p.x + (q.x - p.x) * t, y: p.y + (q.y - p.y) * t });
+        g.lineStyle(3, strut, 1);
+        for (let k = 0; k < 5; k++) {
+            const a0 = edge(k / 5, 0), b0 = edge(k / 5, 1), a1 = edge((k + 1) / 5, 0), b1 = edge((k + 1) / 5, 1);
+            for (let j = 0; j < 4; j++) {
+                const bl = lerp(a0, b0, j / 4), br = lerp(a0, b0, (j + 1) / 4);
+                const tl = lerp(a1, b1, j / 4), tr = lerp(a1, b1, (j + 1) / 4);
+                g.lineBetween(bl.x, bl.y, tr.x, tr.y);
+                g.lineBetween(br.x, br.y, tl.x, tl.y);
+                g.lineBetween(tr.x, tr.y, br.x, br.y);
+            }
+        }
+        // The NCL logo on its aft part.
+        const lx = fb - 470, ly = top + 110, lw = 170, lh = 240;
+        g.fillStyle(0x8fb6dc, 1).fillRect(lx, ly, lw, lh);
+        g.fillStyle(0x6d93c4, 1).fillRect(lx, ly + lh * 0.58, lw, lh * 0.14);
+        g.fillStyle(0x4d65b4, 1).fillRect(lx, ly + lh * 0.72, lw, lh * 0.14);
+        g.fillStyle(0x323a72, 1).fillRect(lx, ly + lh * 0.86, lw, lh * 0.14);
+        g.fillStyle(0xd8e8f6, 1).fillRect(lx + 20, ly + lh * 0.52, lw - 40, 4);
+        const ncl = this.add.text(lx + lw / 2, ly + lh * 0.3, 'NCL', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '60px', fontStyle: 'bold', color: '#ffffff', resolution: 2,
+        }).setOrigin(0.5).setDepth(DEPTH.exterior + 0.045);
+        // The exhaust pipes on top.
+        const pipes = [];
+        for (const [dx, h, w] of [[30, 70, 34], [80, 90, 30], [126, 80, 36], [178, 96, 30], [300, 84, 34]]) {
+            const x = L[3].x + dx;
+            g.fillStyle(0x7a6e66, 1).fillRect(x, top - h, w, h);
+            g.fillStyle(0x9b8e84, 1).fillRect(x + 4, top - h, 6, h);
+            g.fillStyle(0x3e3546, 1).fillRect(x, top - h, w, 6);
+            pipes.push({ x: x + w / 2, y: top - h });
+        }
+        this.worldLayer.add([g, ncl]);
+        // A bit of white smoke: puffs rising from the pipes, drifting aft, swelling and fading.
+        if (!this.textures.exists('puff')) {
+            const pg = this.make.graphics({ x: 0, y: 0 }, false);
+            pg.fillStyle(0xffffff, 1).fillCircle(32, 32, 32);
+            pg.generateTexture('puff', 64, 64);
+            pg.destroy();
+        }
+        this.smoke = [];
+        pipes.forEach((p, i) => {
+            for (let k = 0; k < 3; k++) {
+                const puff = this.add.image(p.x, p.y, 'puff').setDepth(DEPTH.exterior + 0.03).setAlpha(0);
+                this.worldLayer.add(puff);
+                const tween = this.tweens.add({
+                    targets: puff, x: p.x + 260, y: p.y - 200, scale: { from: 0.5, to: 2.6 }, alpha: { from: 0.8, to: 0 },
+                    duration: 4200, delay: i * 500 + k * 1400, repeat: -1, ease: 'Sine.easeOut',
+                });
+                this.smoke.push(tween);
+            }
+        });
+    }
+
     // --- The outside view (the user, 2026-11-07) ------------------------------------------------
     // O: the camera draws back to show the whole ship from outside, every deck's side closed, her
     // hidden and the game paused; +/- zoom on the middle, the mouse wheel toward the pointer; the
@@ -1534,6 +1633,7 @@ export class ShipScene extends Phaser.Scene {
         this.physics.pause();
         this.time.paused = true;
         this.tweens.pauseAll();
+        for (const t of this.smoke || []) t.resume();       // the funnel's smoke keeps drifting
         this.player.setVisible(false);
         this.uiCam.setVisible(false);
         // The canvas fills the whole window while it is open, sky and sea to its edges, no bars at

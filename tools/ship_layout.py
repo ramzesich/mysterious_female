@@ -95,9 +95,10 @@ STAGE = 244
 
 # Above the top deck.
 FUNNEL = (168, 196)
-# The mast stands on the Spinnaker Lounge's roof (moved forward from 54-62 m, 2026-11-07: with the kids'
-# pool open to the sky there it stood on nothing, the user).
-MAST = (46, 54)
+# The antenna mast stands on the roof over the forward lobby (the user, 2026-11-07; it stood on the
+# Spinnaker Lounge's roof, where the real ship's angled radar mast is now drawn).
+MAST = (71, 79)
+RADAR_MAST = 46.5     # the angled radar mast's foot, forward end (m), on the Spinnaker Lounge's roof
 
 # Kinds: "venue" (an indoor public room), "outdoor", "cabins", "crew", "start" (the gangway),
 # "terrace" (an open deck that is a place of its own: the Great Outdoors' tables). (Bumbot's spots were
