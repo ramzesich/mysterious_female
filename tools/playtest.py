@@ -620,7 +620,8 @@ def scenario_bridge(b):
     b.tap("e")
     time.sleep(0.2)
     ok &= check(b.eval(f"{bridge}.open"), "E opens it")
-    b.hold("left", 0.6)
+    # Well past the shutting distance (0.6 s left her right at it, and the door open: 2026-11-07).
+    b.hold("left", 0.9)
     time.sleep(1.0)
     s = b.state()
     ok &= check(s["x"] < door and shell("10:bridge") < 0.05 and shell("10") > 0.95,

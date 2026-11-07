@@ -1015,13 +1015,50 @@ Nothing blocks the start of the build. These get settled along the way:
       bridge's and the spa's rule (a wall across the deck, its door seen from the side, E to open
       it, each part with its own piece of the ship's side, cut open only while she is in it) is to
       be generalized to the rest of the ship
-- [ ] **Start the next session here: furnish deck 12** (decks 4-11 are done, 2026-11-06): the
-      chapel, the kids' pool and the Spinnaker Lounge forward, the sports court, shuffleboard and
-      Champs Bar over the pools, the speciality restaurants and golf nets, Le Bistro and Los Lobos
-      aft; the user has photos (`deck_12*`, `spinnaker_lounge*`, `the_chapel` in
-      `reference/photos/small/`). NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
+- [x] **Deck 12 furnished** (2026-11-07): after NCL's plan (the Spinnaker is on deck 12 there and
+      on cruisedeckplans.com's, `reference/web/deck12/`) and the user's photos; three PixelLab sheets
+      (`tall-5`, `tall-6`, `props-7`, 30 generations, all 96 pieces kept; `tall-5` wrote each piece's
+      name into its frame, blanked by `caption`). **Deck 12 now ends at 220 m** as on the plan, its
+      restaurants then a small open terrace; the Great Outdoors below is open to the sky past it.
+      Bow to stern: **the Spinnaker's balcony** (31-44 m), the curved open deck in front of the
+      lounge (the user remembered it), with deck 11's front's treatment: she is hidden behind the
+      white bulwark, seen through the glass; **the Spinnaker Lounge** (44-57.5 m): its own windows
+      from the user's photos (white-framed panes, beige curtains tied back under a wood pelmet, a
+      white sill, a brass handrail), ceiling fans, cream armchairs at marble tables, a navy sofa,
+      the piano (its far legs mended to the floor, `legs`), a bar; the mast moved onto its roof (it
+      stood on nothing over the kids' pool); **the kids' pool** (57.5-67 m), open to the sky: a
+      splash pool she can swim in (the pools are per deck now, each hidden and passable from the
+      deck under it), the slide's chute on its rim, a mushroom fountain, the hot tub, toys; **the
+      Chapel lobby** (67-74 m) with the restrooms and **the Chapel behind its door**, shown in the
+      lobby's place with the deck dimmed like the linen room (`tools/draw_chapel.py`, from the
+      user's photo: red carpet, cane-back chairs facing the round altar table, white flowers, amber
+      glass doors); **Champs Bar** over the atrium (the bar, TVs, trophies, high tables by the
+      windows; the radar domes on its roof); **the sun deck** round the walk over the pools;
+      **sports**: the basketball and volleyball court in its net cage, shuffleboard lanes, a
+      putting green (a golf driving net read as a football goal, dropped); **Cagney's**, **the
+      Sushi Bar**, **Teppanyaki** (more of it after the user found it empty), **Le Bistro**, **Los
+      Lobos Cantina** (paper flags, a pinata), **the aft terrace**. **Every passage between deck
+      12's indoors and an open deck has a deck door**, seen from the side, E to open it, as the
+      spa's (`DOOR_PASSAGES_12`). Deck 11, seen again from deck 12 (the user's photo): **glass walls
+      along the pool deck**, from its floor up to deck 12's, behind everything on it, and white pipes
+      on blue posts over the chess set; **the Great Outdoors keeps a glass railing** on its far side
+      (no stub at its end), and **a canvas sun cover** from deck 12's end over the first tables,
+      **which she can walk on**: from deck 12's terrace she hops the rail onto it, walks its curve
+      and drops off its end (a curved floor of its own, `coverTopAt`). `?at=spinnaker`, `chapel`,
+      `champs`, `court`, `sushi`, `bistro`
+- [ ] **Open: deck 11's front, after the 2025 plan** (2026-11-07): the user sailed in August 2026;
+      cruisedeckplans.com's deck 11 plan is the 2025 one (`deck11-2025`, kept in
+      `reference/web/deck11/`): suites forward with a curved hot-tub terrace, the spa further aft.
+      The game follows NCL's 2022 map (the spa forward). Revisit when the user wants to
+- [ ] **Later: a Bumbot spot on deck 12** (the user, 2026-11-07: to think about; the design's
+      SUSHI sign secret, §5, is one idea)
+- [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
+      2026-11-07). Candidates: deck 11's front after the 2025 plan (above); walls with a door
+      between every part of the ship (above); doors along the decks into small separate rooms
+      (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
+      NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
-      to 11 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
+      to 12 are kept in `reference/web/`). The way each deck went: read NCL's plan for it
       (`reference/norwegian-sun-ship-map.pdf`) and the user's photos of it
       (`reference/photos/small/`), propose the rooms bow to stern as a numbered list with the art
       and its cost (usually two PixelLab sheets, 64 pieces at 32px and 16 at 64px, 10 generations
@@ -1035,7 +1072,8 @@ Nothing blocks the start of the build. These get settled along the way:
       bow is longer
 - [ ] **Open: the `stairs` playtest is flaky** ("with every card she climbs on past deck 6" fails
       now and then, on `main` before deck 8 too): a timing margin in the test, not the game; fix
-      when convenient
+      when convenient. So is `balcony`, now and then (2026-11-07). (`bridge`'s "the door shuts behind
+      her" failed every time, on `main` too: it walked her to just the shutting distance; fixed.)
 - [x] **Settled (2026-11-06):** on the real ship deck 10 is open over the atrium; in the game too
       now, crossed on a side walk, the dome under deck 11
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
@@ -1054,7 +1092,7 @@ Nothing blocks the start of the build. These get settled along the way:
     Stardust balcony is solid. Maybe a secret place later. For now she can only leave it by
     jumping off the ship (a scare)
 - [x] PixelLab: Tier 1 subscription bought 2026-10-31, 2000 generations until it renews on
-      2026-11-30 (~1740 left on 2026-11-06). Skeleton-v3 clips cost 2 (3 frames),
+      2026-11-30 (~1710 left on 2026-11-07). Skeleton-v3 clips cost 2 (3 frames),
       3 (4-14 frames) or 4 (15 frames); a 1-direction object sheet 10 (64 pieces at 32px) or 15
       (16 at 85px); a map object up to 400x100 (transparent) 1. Side-scroller tilesets came out
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**

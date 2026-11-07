@@ -19,8 +19,10 @@ PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
 # block (BOW below); deck 7's floor runs out to the stem's tip as the open forecastle.
 EXTENT = {
     3: (21.5, 254), 4: (20, 254), 5: (20, 254), 6: (20, 254), 7: (0.5, 254),  # the stern: one straight wall
-    8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 233),
+    8: (21.4, 251.5), 9: (23.6, 249.5), 10: (25, 247), 11: (24, 244), 12: (31, 220),
 }
+# (Deck 12 ends at 220 m, as on NCL's plan: its restaurants, then a small open terrace looking down
+# on the Great Outdoors, open to the sky aft of it (the user, 2026-11-07).)
 
 # The superstructure's front, measured row by row off the profile (2026-11-03): one steady slope
 # from deck 7's floor up to the bridge, which stands near-upright on deck 10. Where a deck's own
@@ -66,6 +68,10 @@ OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 # corridor, in a cabin door's place, that she can go through (the user, 2026-11-06).
 LINEN_ROOM = {"deck": 9, "m": 112}
 
+# The Chapel on deck 12 (the user's photo, 2026-11-07): off the forward lobby, behind its door, shown
+# in the deck's place like the linen room; the door at `m`.
+CHAPEL = {"deck": 12, "m": 68.6}
+
 # The bridge's back wall on deck 10, across the deck where the bridge ends and the cabins begin, a
 # crew door in it (the user, 2026-11-06); the Captain's card is to lock it later (§6.2).
 BRIDGE_WALL_M = 40
@@ -80,16 +86,35 @@ STAGE = 244
 
 # Above the top deck.
 FUNNEL = (168, 196)
-MAST = (54, 62)
+# The mast stands on the Spinnaker Lounge's roof (moved forward from 54-62 m, 2026-11-07: with the kids'
+# pool open to the sky there it stood on nothing, the user).
+MAST = (46, 54)
 
 # Kinds: "venue" (an indoor public room), "outdoor", "cabins", "crew", "start" (the gangway),
 # "finale". A name with "Bumbot:" is one of his near-catch spots (§4).
 VENUES = [
     # deck, from, to, name, kind
-    (12, 31, 68, "Chapel, kids' pool, Spinnaker Lounge", "venue"),
-    (12, 110, 165, "Sports court, shuffleboard, Champs Bar", "outdoor"),
-    (12, 165, 194, "Speciality dining, golf nets", "venue"),
-    (12, 202, 233, "Le Bistro, Los Lobos", "venue"),
+    # Deck 12, after NCL's plan and cruisedeckplans.com's (2026-11-07): the Spinnaker Lounge forward,
+    # the kids' pool outside it, the Chapel off the forward lobby, Champs Bar, the open deck over the
+    # pools, the sports court, shuffleboard and golf nets, the speciality restaurants, Le Bistro and
+    # Los Lobos, and a terrace over the Great Outdoors.
+    # The Spinnaker's balcony: the curved open deck in front of the lounge, out to deck 12's front,
+    # through doors at the lounge's front corners (NCL's plan; the user, 2026-11-07).
+    # (The kids' pool and the Chapel's lobby made wider, the lounge a little shorter: the user,
+    # 2026-11-07, they looked cramped.)
+    (12, 31, 44, "Spinnaker balcony", "outdoor"),
+    (12, 44, 57.5, "Spinnaker Lounge", "venue"),
+    (12, 57.5, 67, "Kids' pool", "outdoor"),
+    (12, 67, 74, "Chapel lobby", "venue"),
+    (12, 82, 102, "Champs Bar", "venue"),
+    (12, 110, 146, "Sun deck", "outdoor"),
+    (12, 146, 164, "Sports court, shuffleboard, golf nets", "outdoor"),
+    (12, 164, 174, "Cagney's Steakhouse", "venue"),
+    (12, 174, 182, "Sushi Bar", "venue"),
+    (12, 182, 194, "Teppanyaki", "venue"),
+    (12, 202, 208, "Le Bistro", "venue"),
+    (12, 208, 214, "Los Lobos Cantina", "venue"),
+    (12, 214, 220, "Aft terrace", "outdoor"),
 
     # The spa, after NCL's plan (2026-11-06): its reception, the massage and sauna rooms, the salon,
     # the aerobics studio, opening one into the next.

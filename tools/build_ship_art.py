@@ -36,6 +36,12 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
     sauna/     map objects: try 1 c5ad8bd8-a350-4b8e-9635-eaa6b10ab2db (three-quarter view, unused),
                try 2 b6055af6-53c6-4648-9c06-a87129189bae (flat side view): both unused, an outdoor cabin
                (the user: the sauna is built into the spa; drawn by the game instead)
+    tall-5/    object bad65107-81b0-46cc-83a0-9bd72cf5f983, 16 sports, sports bar, kids' pool and
+               lounge pieces, 64px canvas (deck 12, 2026-11-07)
+    tall-6/    object a2f3d441-ee4b-4d22-beb9-27ea4a50efef, 16 restaurant pieces: steakhouse, sushi,
+               teppanyaki, bistro, cantina, 64px canvas (deck 12)
+    props-7/   object 3ddc73b3-825a-4e68-8a89-02182e1df110, 64 props, 32px canvas: restaurants,
+               sports, kids' pool, chapel (deck 12)
 
 Run from the repo root:  python tools/build_ship_art.py
 """
@@ -234,13 +240,58 @@ for i, name in enumerate(PROPS_6):
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22
+# Deck 12's sheets (NCL's plan, the user's photos, 2026-11-07), shrunk to her scale.
+TALL_5 = [
+    ("basketball-hoop", 118), ("golf-net", 80), ("cue-rack", 48), ("kids-slide", 46),
+    ("mushroom-fountain", 62), ("champs-bar", 40), ("sports-tv", 24), ("ceiling-fan", 12),
+    ("navy-sofa", 30), ("cane-chair", 34), ("flower-pedestal", 50), ("trophy-cabinet", 64),
+    ("beer-fridge", 60), ("champs-stool", 40), ("putting-flag", 30), ("deck-steps", 40),
+]
+TALL_6 = [
+    ("teppanyaki-grill", 32), ("sushi-counter", 40), ("paper-lantern", 18), ("shoji-screen", 62),
+    ("steak-booth", 42), ("wine-cabinet", 66), ("carving-trolley", 34), ("bistro-bar", 54),
+    ("bistro-chair", 36), ("bistro-table", 28), ("cantina-bar", 40), ("mexican-chair", 38),
+    ("saguaro", 54), ("pinata", 24), ("tequila-barrel", 30), ("mexican-table", 28),
+]
+for sheet, pieces in (("tall-5", TALL_5), ("tall-6", TALL_6)):
+    for i, (name, h) in enumerate(pieces):
+        PIECES[name] = (sheet, i, None, {"height": h})
+        # tall-5 wrote each piece's name in its frame's top rows (all but the stool's): blanked
+        # (`caption`, the rows to clear).
+        if sheet == "tall-5" and name != "champs-stool":
+            PIECES[name][3]["caption"] = 8
+# Two of its names ran onto a second line (the user saw the mushroom's).
+PIECES["cue-rack"][3]["caption"] = 13
+PIECES["mushroom-fountain"][3]["caption"] = 12
+PROPS_7 = [
+    ("margarita", 8), ("tacos", 5), ("nachos", 6), ("guacamole", 6), ("sombrero", 8), ("maracas", 9),
+    ("hot-sauce", 8), ("tequila", 10), ("sake-set", 8), ("chopsticks", 5), ("nigiri", 5),
+    ("miso-soup", 6), ("soy-sauce", 7), ("fried-rice", 6), ("bonsai", 12), ("lucky-cat", 10),
+    ("steak-plate", 5), ("red-wine", 8), ("creme-brulee", 5), ("macarons", 6), ("baguette", 6),
+    ("jar-candle", 6), ("rose-glass", 11), ("pepper-grinder", 9), ("bouquet", 12), ("ring-cushion", 5),
+    ("pillar-candle", 14), ("pew-bow", 10), ("basketball", 9), ("volleyball", 9), ("golf-bag", 32),
+    ("golf-balls", 9), ("shuffle-disc", 3), ("beer-pint", 8), ("chicken-wings", 6), ("peanuts", 5),
+    ("foam-finger", 12), ("football-scarf", 12), ("rubber-duck-2", 6), ("bucket-spade", 9),
+    ("arm-bands", 6), ("water-pistol", 8), ("toy-crocodile", 10), ("goggles", 4), ("martini", 8),
+    ("olives", 5), ("menu-card", 8), ("brass-lamp", 14), ("ice-bucket", 11), ("reserved-sign", 4),
+    ("folded-napkin", 6), ("butter-bread", 6), ("water-jug", 9), ("small-cactus", 10),
+    ("chili-string", 16), ("paper-fan", 8), ("iron-teapot", 7), ("rice-bowl", 5), ("knife-block", 9),
+    ("salt-shaker", 6), ("dessert-plate", 6), ("leafy-plant", 14), ("round-clock", 14), ("tissue-box", 6),
+]
+for i, (name, h) in enumerate(PROPS_7):
+    PIECES[name] = ("props-7", i, None, {"height": h})
 # The hot tub was drawn with its bottom curving up as if seen from above: it stands flat on the deck
 # (the user saw it hang in the air).
 PIECES["hot-tub"][3]["flat"] = True
+# The grand piano's far legs stopped short of the floor (the user saw it float, 2026-11-07).
+PIECES["grand-piano"][3]["legs"] = 8
 
 
-def load(sheet, frame, from_x=0, join=None):
+def load(sheet, frame, from_x=0, join=None, caption=0):
     img = Image.open(SRC / sheet / f"frame_{frame}.png").convert("RGBA")
+    if caption:
+        # The sheet wrote each piece's name across the frame's top rows: blanked.
+        img.paste((0, 0, 0, 0), (0, 0, img.width, caption))
     img = img.crop((from_x, 0, img.width, img.height))
     if join:
         a, b = join
@@ -259,6 +310,19 @@ def flat_base(img):
     for x in range(img.width):
         ys = [y for y in range(img.height) if px[x, y][3] > 128]
         if ys:
+            for y in range(ys[-1] + 1, img.height):
+                px[x, y] = px[x, ys[-1]]
+    return img
+
+
+def leg_base(img, reach):
+    """Run each leg down to the bottom row: columns that end within `reach` px of it (the piano drawn
+    a little in perspective, its far legs short of the floor); the rest stay as drawn."""
+    img = img.copy()
+    px = img.load()
+    for x in range(img.width):
+        ys = [y for y in range(img.height) if px[x, y][3] > 128]
+        if ys and img.height - 1 - reach <= ys[-1] < img.height - 1:
             for y in range(ys[-1] + 1, img.height):
                 px[x, y] = px[x, ys[-1]]
     return img
@@ -355,7 +419,9 @@ def build():
     pieces = {}
     for name, spec in PIECES.items():
         sheet, frame, size, opts = spec
-        img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"))
+        img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"), opts.get("caption", 0))
+        if opts.get("legs"):
+            img = leg_base(img, opts["legs"])
         if opts.get("flat"):
             img = flat_base(img)
         if opts.get("fill"):

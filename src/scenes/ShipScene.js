@@ -34,6 +34,8 @@ const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], b
 // sleeps on (its middle and its top over the floor, from the room's left edge), and the vent he
 // gets away into (its opening's ends).
 const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
+// The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
+const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
 // The bridge's back wall (deck 10): its thickness; how far she goes from its door before it shuts.
 const BULKHEAD = { width: 12, shutAway: 70 };
@@ -113,23 +115,30 @@ export class ShipScene extends Phaser.Scene {
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
         // The outer shell over everything (§5.3): the deck she is on is cut away, its tiles faded.
         this.exteriorLayer = map.createLayer('exterior', tiles).setDepth(DEPTH.exterior);
-        // Deck 11's pools' tiles below its floor (out of sight from deck 10).
+        // The pools' tiles below their deck's floor (deck 11's two, deck 12's kids' pool), each out
+        // of sight from the deck under it; each tile knows its pool's deck.
         this.poolTile = props.poolTile;
         this.poolTiles = [];
         // The whole tank drawn again over the shell and its windows, its tiled back wall, sides and
-        // floor, so the pools have their floor seen from deck 11 (the user); the water goes over it.
-        this.poolTanks = this.add.graphics().setDepth(DEPTH.poolTank);
-        const floor11 = JSON.parse(props.deckFloors)[11];
+        // floor, so the pools have their floor seen from their deck (the user); the water goes over it.
+        this.poolTanks = {};
+        const floors = JSON.parse(props.deckFloors);
+        const spans = JSON.parse(props.poolSpans || '[]');
         this.solidLayer.forEachTile(t => {
-            if (t.index !== props.poolTile || t.y <= floor11) return;
+            if (t.index !== props.poolTile) return;
+            const span = spans.find(([a, b, d]) => t.pixelX >= a && t.pixelX < b && t.y > floors[d] && t.y <= floors[d] + 3);
+            if (!span) return;
+            t.poolDeck = span[2];
             this.poolTiles.push(t);
         });
-        for (const [a, b] of JSON.parse(props.poolSpans || '[]')) {
+        for (const [a, b, deck] of spans) {
+            const g = this.poolTanks[deck] ??= this.add.graphics().setDepth(DEPTH.poolTank);
+            const top = floors[deck] * 16;
             for (let x = a; x < b; x += 8) {
-                for (let y = floor11 * 16 + 4; y < floor11 * 16 + 48; y += 8) {
-                    const edge = x < a + 16 || x >= b - 16 || y >= floor11 * 16 + 32;
-                    this.poolTanks.fillStyle(edge ? 0x8fd3ff : 0x4d9be6, 1).fillRect(x, y, 8, 8);
-                    this.poolTanks.fillStyle(edge ? 0xe3f4fb : 0x8fd3ff, 1).fillRect(x, y, 8, 1).fillRect(x, y, 1, 8);
+                for (let y = top + 4; y < top + 48; y += 8) {
+                    const edge = x < a + 16 || x >= b - 16 || y >= top + 32;
+                    g.fillStyle(edge ? 0x8fd3ff : 0x4d9be6, 1).fillRect(x, y, 8, 8);
+                    g.fillStyle(edge ? 0xe3f4fb : 0x8fd3ff, 1).fillRect(x, y, 8, 1).fillRect(x, y, 1, 8);
                 }
             }
         }
@@ -245,7 +254,7 @@ export class ShipScene extends Phaser.Scene {
         });
 
         this.worldLayer.add([sky, this.sea, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
-            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, this.poolTanks]);
+            ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
     buildObjects() {
@@ -369,7 +378,7 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'pool':
-                    this.buildPool(o);
+                    this.buildPool(o, prop(o, 'deck', 11));
                     break;
 
                 case 'lift':
@@ -427,6 +436,9 @@ export class ShipScene extends Phaser.Scene {
                     this.buildCabin(o, prop);
                     break;
 
+                case 'chapel':
+                    this.buildChapel(o);
+                    break;
                 case 'linen':
                     this.buildLinenRoom(o);
                     break;
@@ -470,6 +482,32 @@ export class ShipScene extends Phaser.Scene {
                     break;
                 }
 
+                case 'glasswall': {
+                    // Deck 11's glass walls along its open stretches, in white frames (the user's
+                    // photo from deck 12): from its floor up to deck 12's, behind everything on it.
+                    const g = this.add.graphics().setDepth(DEPTH.back + 0.5);
+                    const x1 = o.x + o.width;
+                    if (prop(o, 'style', '') === 'railing') {
+                        // The Great Outdoors' glass railing on the far side (the user): glass panes
+                        // between white posts, an orange handrail on top.
+                        const rail = o.y - 44;
+                        g.fillStyle(0xbfe6f5, 0.45).fillRect(o.x, rail, o.width, 44);
+                        for (let x = o.x; x < x1; x += 48) g.fillStyle(0xe8eaec, 1).fillRect(x, rail, 2, 44);
+                        g.fillStyle(0xe8eaec, 1).fillRect(x1 - 2, rail, 2, 44);
+                        g.fillStyle(0xcd683d, 1).fillRect(o.x, rail - 2, o.width, 3);
+                        this.worldLayer.add(g);
+                        break;
+                    }
+                    const top = o.y - this.deckPitch + 16, h = o.y - top;
+                    g.fillStyle(0xbfe6f5, 0.22).fillRect(o.x, top, o.width, h);
+                    g.fillStyle(0xffffff, 0.25).fillRect(o.x, top + 8, o.width, 2);
+                    g.fillStyle(0xe8eaec, 1).fillRect(o.x, top, o.width, 3);
+                    for (let x = o.x; x < x1; x += 48) g.fillStyle(0xe8eaec, 1).fillRect(x, top, 2, h);
+                    g.fillStyle(0xe8eaec, 1).fillRect(x1 - 2, top, 2, h);
+                    this.worldLayer.add(g);
+                    break;
+                }
+
                 case 'endwall': {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
@@ -483,8 +521,14 @@ export class ShipScene extends Phaser.Scene {
                 case 'decor':
                     if (prop(o, 'kind') === 'windows') this.drawWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'bridgewindows') this.drawBridgeWindows(decorGfx, o);
+                    if (prop(o, 'kind') === 'spinnakerwindows') this.drawSpinnakerWindows(decorGfx, o);
                     if (prop(o, 'kind') === 'chess') this.drawChess(decorGfx, o);
+                    if (prop(o, 'kind') === 'court') this.drawCourt(decorGfx, o);
+                    if (prop(o, 'kind') === 'pergola') this.drawPergola(decorGfx, o);
+                    if (prop(o, 'kind') === 'shuffle') this.drawShuffleboard(decorGfx, o);
+                    if (prop(o, 'kind') === 'bunting') this.drawBunting(decorGfx, o);
                     if (prop(o, 'kind') === 'canopy') this.drawCanopy(o);
+                    if (prop(o, 'kind') === 'suncover') this.drawSunCover(o, String(prop(o, 'posts', '')).split(',').map(Number));
                     if (prop(o, 'kind') === 'sauna') this.drawSauna(decorGfx, o);
                     if (prop(o, 'kind') === 'showerbox') this.drawShowerBox(o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
@@ -498,7 +542,7 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'coffers') this.drawCoffers(decorGfx, o);
                     if (prop(o, 'kind') === 'lettering') this.drawLettering(o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
-                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''));
+                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''), prop(o, 'hang', ''));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
                     if (prop(o, 'kind') === 'directory') this.drawDirectory(decorGfx, o);
@@ -712,6 +756,26 @@ export class ShipScene extends Phaser.Scene {
         this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
         this.addCat('bumbot-linen', x0 + LINEN.heap[0], o.y, 'asleep', 1,
             { route: 'linen', lift: LINEN.heap[1] - 1, exitX: x0 + LINEN.vent[0] + 6 });
+    }
+
+    // --- The Chapel (§5.3) ---------------------------------------------------------------------
+    // Off deck 12's forward lobby (the user, 2026-11-07: a room behind a door, like the linen room):
+    // its door held open, a plate beside it. E at the door and she is inside: the chapel, from the
+    // user's photo, shows where the lobby was, everything round it dimmed almost to black.
+
+    buildChapel(o) {
+        const x0 = o.x - CHAPEL.doorX;
+        const door = this.add.image(o.x, o.y, 'chapel-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        const plate = this.add.text(o.x + 21, o.y - 50, 'CHAPEL', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#45293f',
+            backgroundColor: '#d9a43b', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        const room = this.add.image(x0, o.y - CHAPEL.height, 'chapel-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
+        const dim = this.roomDim(room);
+        this.worldLayer.add([door, plate, dim, room]);
+        this.rooms.push({ route: 'chapel', door: o.x, floor: o.y, room, dim, inDeck: true });
+        this.addRouteWall(x0 + CHAPEL.stop, -1, o.y, 'chapel');
+        this.addRouteWall(x0 + CHAPEL.width - CHAPEL.stop, 1, o.y, 'chapel');
     }
 
     // --- Walls across a deck, with a door (§5.3) -----------------------------------------------
@@ -1117,7 +1181,7 @@ export class ShipScene extends Phaser.Scene {
 
     // A room open off a corridor: a light wood post where the corridor's wall ends, the room's brass
     // plaque on its own wall beside it.
-    drawDoorway(g, o, text) {
+    drawDoorway(g, o, text, hang) {
         const x = o.x, y = o.y, ceiling = y - this.deckPitch + 16;
         g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
         g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
@@ -1127,6 +1191,11 @@ export class ShipScene extends Phaser.Scene {
                 backgroundColor: '#d9a43b', padding: { x: 3, y: 2 }, resolution: 4,
             }).setOrigin(0, 0.5).setDepth(DEPTH.decor + 0.01);
             this.worldLayer.add(plaque);
+            // With open sky behind it, it hangs from the ceiling on two cords (nothing floats).
+            if (hang) {
+                const top = Math.round(plaque.y - plaque.height / 2);
+                for (const cx of [x + 15, x + 12 + plaque.width - 4]) g.fillStyle(0x625565, 1).fillRect(cx, ceiling, 1, top - ceiling);
+            }
         }
     }
 
@@ -1220,6 +1289,117 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0x9babb2, 1).fillRect(o.x, o.y + o.height - 2, o.width, 2);
     }
 
+    // Deck 12's sports court (NCL's plan): painted green with white lines, in a tall net cage on
+    // white posts, the net behind it (she plays in front of it).
+    drawCourt(g, o) {
+        const x0 = o.x, x1 = o.x + o.width, y = o.y, top = y - 120;
+        g.fillStyle(0x239063, 1).fillRect(x0, y - 2, o.width, 2);
+        for (const x of [x0 + 4, (x0 + x1) / 2 - 1, x1 - 6]) g.fillStyle(0xffffff, 1).fillRect(x, y - 2, 2, 2);
+        g.fillStyle(0x165a4c, 0.35);
+        for (let x = x0; x <= x1; x += 4) g.fillRect(x, top, 1, y - top - 2);
+        for (let yy = top; yy < y - 2; yy += 4) g.fillRect(x0, yy, o.width, 1);
+        const posts = Math.max(2, Math.round(o.width / 96) + 1);
+        for (let i = 0; i < posts; i++) {
+            const x = Math.round(x0 + i * (o.width - 3) / (posts - 1));
+            g.fillStyle(0xe8eaec, 1).fillRect(x, top, 3, y - top);
+            g.fillStyle(0x9babb2, 1).fillRect(x + 2, top, 1, y - top);
+        }
+        g.fillStyle(0xe8eaec, 1).fillRect(x0, top, o.width, 3);
+    }
+
+    // Over deck 11's chess set (the user's photo from deck 12): white pipes on tall blue posts.
+    drawPergola(g, o) {
+        const top = o.y - 112;
+        const posts = [o.x, o.x + o.width / 2, o.x + o.width - 4].map(Math.round);
+        for (const x of posts) {
+            g.fillStyle(0x4d65b4, 1).fillRect(x, top, 4, o.y - top);
+            g.fillStyle(0x4d9be6, 1).fillRect(x + 1, top, 1, o.y - top);
+        }
+        g.fillStyle(0xf4f4f4, 1).fillRect(o.x - 4, top - 3, o.width + 8, 3);
+        g.fillStyle(0xc7dcd0, 1).fillRect(o.x - 4, top, o.width + 8, 1);
+        g.fillStyle(0xf4f4f4, 1).fillRect(o.x - 4, top + 14, o.width + 8, 2);
+    }
+
+    // Shuffleboard courts painted along the deck: a blue lane, its scoring triangle's white lines.
+    drawShuffleboard(g, o) {
+        const y = o.y;
+        g.fillStyle(0x4d9be6, 1).fillRect(o.x, y - 2, o.width, 2);
+        for (let x = o.x + 20; x < o.x + o.width - 20; x += 22) g.fillStyle(0xffffff, 1).fillRect(x, y - 2, 1, 2);
+        for (const x of [o.x + 2, o.x + o.width - 4]) g.fillStyle(0xf9c22b, 1).fillRect(x, y - 2, 2, 2);
+    }
+
+    // Los Lobos' paper flags (papel picado), strung in swags under the ceiling.
+    drawBunting(g, o) {
+        const ceiling = o.y - this.deckPitch + 16;
+        const colours = [0xe83b3b, 0xf9c22b, 0x1ebc73, 0x4d9be6, 0xf04f78, 0xfb6b1d];
+        const swag = 96;
+        let i = 0;
+        for (let a = o.x; a < o.x + o.width - 8; a += swag) {
+            const b = Math.min(a + swag, o.x + o.width);
+            for (let x = a + 4; x < b - 4; x += 8, i++) {
+                const t = (x - a) / (b - a);
+                const sag = Math.round(4 + 14 * Math.sin(Math.PI * t));
+                g.fillStyle(0x3e3546, 1).fillRect(x, ceiling + sag, 8, 1);
+                g.fillStyle(colours[i % colours.length], 1).fillRect(x + 1, ceiling + sag + 1, 6, 5);
+                g.fillRect(x + 2, ceiling + sag + 6, 4, 1);
+            }
+        }
+    }
+
+    // The Spinnaker Lounge's windows (the user's photos): tall panes in white frames looking out to
+    // sea, beige curtains gathered at both sides of each under a wood pelmet, a white sill, and a
+    // brass handrail along them on brackets.
+    drawSpinnakerWindows(g, o) {
+        const y = o.y, x0 = o.x, x1 = o.x + o.width;
+        const top = y - 118, sill = y - 46;
+        const n = Math.max(1, Math.round(o.width / 80));
+        const unit = o.width / n;
+        // The panes: one white-framed window per unit, the sky over the sea's horizon in it.
+        for (let i = 0; i < n; i++) {
+            const a = Math.round(x0 + i * unit), b = Math.round(x0 + (i + 1) * unit);
+            g.fillStyle(0xf4f4f4, 1).fillRect(a, top, b - a, sill - top);
+            const gx = a + 4, gw = b - a - 8, gy = top + 4, gh = sill - top - 6;
+            const horizon = Math.round(gh * 0.58);
+            g.fillStyle(0x8fd3ff, 1).fillRect(gx, gy, gw, horizon);
+            g.fillStyle(0xc7f0ff, 1).fillRect(gx, gy, gw, Math.round(horizon / 3));
+            g.fillStyle(0x4d65b4, 1).fillRect(gx, gy + horizon, gw, gh - horizon);
+            g.fillStyle(0x4d9be6, 1).fillRect(gx, gy + horizon, gw, 1);
+            g.fillStyle(0xffffff, 0.45).fillRect(gx + 4, gy + 3, 2, gh - 8);
+            g.fillStyle(0xe8eaec, 1).fillRect(Math.round((a + b) / 2) - 1, top, 2, sill - top);   // the mullion
+        }
+        // The sill, white. (A dark ledge under it was dropped: it made no sense, the user.)
+        g.fillStyle(0xf4f4f4, 1).fillRect(x0 - 4, sill - 2, o.width + 8, 3);
+        // A wood pelmet along the top; under it the curtains, gathered at each window's sides and
+        // tied back at sill height, their folds in darker beige.
+        g.fillStyle(0x9e6a3f, 1).fillRect(x0 - 6, top - 6, o.width + 12, 6);
+        g.fillStyle(0xc28d5a, 1).fillRect(x0 - 6, top - 6, o.width + 12, 1);
+        const tie = 0.62;
+        for (let i = 0; i <= n; i++) {
+            const mid = Math.round(x0 + i * unit);
+            for (let yy = top; yy < sill + 1; yy++) {
+                // Full where it hangs from the pelmet, drawn in to the tie-back, flaring out below.
+                const t = (yy - top) / (sill - top);
+                const w = t < tie ? 6 + 16 * Math.pow(1 - t / tie, 1.4) : 6 + 8 * Math.pow((t - tie) / (1 - tie), 0.8);
+                const a = Math.round(mid - w / 2), ww = Math.max(2, Math.round(w));
+                g.fillStyle(0xe6d6b8, 1).fillRect(a, yy, ww, 1);
+                // Its folds follow the gathering: darker lines at fixed fractions of its width, the
+                // edges shaded.
+                for (const f of [0.3, 0.62]) g.fillStyle(0xc8b38e, 1).fillRect(a + Math.round(ww * f), yy, 1, 1);
+                g.fillStyle(0xd2bf9a, 1).fillRect(a + ww - 1, yy, 1, 1);
+                g.fillStyle(0xf4ead8, 1).fillRect(a, yy, 1, 1);
+            }
+            // The tie-back: a cord round it.
+            const ty = Math.round(top + (sill - top) * tie);
+            g.fillStyle(0xab947a, 1).fillRect(mid - 4, ty - 1, 8, 2);
+            g.fillStyle(0xf9c22b, 1).fillRect(mid - 1, ty - 1, 2, 2);
+        }
+        // The brass handrail along the windows, on brackets.
+        const rail = sill + 12;
+        g.fillStyle(0xf9c22b, 1).fillRect(x0 - 4, rail, o.width + 8, 2);
+        g.fillStyle(0xcd683d, 1).fillRect(x0 - 4, rail + 2, o.width + 8, 1);
+        for (let x = x0 + 10; x < x1; x += 64) g.fillStyle(0xab947a, 1).fillRect(x, rail + 2, 2, 5);
+    }
+
     // The giant chess set on deck 11 (the user's photo from deck 12): its board a checked mat on the
     // deck, knee-high pieces standing on it, white and black, seen from the side.
     drawChess(g, o) {
@@ -1280,6 +1460,50 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xc7dcd0, 1).fillRect(o.x - 10, top - 1, o.width + 20, 1);
         for (let x = o.x - 8; x < o.x + o.width + 10; x += 8) g.fillStyle(0xf4f4f4, 1).fillTriangle(x, top, x + 8, top, x + 4, top + 3);
         this.worldLayer.add(g);
+    }
+
+    // The Great Outdoors' sun cover (the user, 2026-11-07): cream canvas hooked to the aft edge of
+    // deck 12, running aft over the first tables on white posts, sagging a little between its
+    // supports, its near edge's valance all along it. Behind her; and she can walk on top of it (the
+    // user): from deck 12's aft terrace she hops the rail and drops onto it, landing from above, and
+    // walks off its end down to the tables. From below she jumps and walks through it.
+    drawSunCover(o, posts) {
+        const g = this.add.graphics().setDepth(DEPTH.decor + 0.15);
+        const ceiling = o.y - this.deckPitch + 16, postTop = o.y - 112;
+        for (const x of posts) {
+            g.fillStyle(0xe8eaec, 1).fillRect(x - 2, postTop, 4, o.y - postTop);
+            g.fillStyle(0x9babb2, 1).fillRect(x + 1, postTop, 1, o.y - postTop);
+            g.fillStyle(0x9babb2, 1).fillRect(x - 4, o.y - 3, 8, 3);
+        }
+        // Its supports, bow to stern: deck 12's edge, then each post's top.
+        const pts = [[o.x, ceiling], ...posts.map(x => [x, postTop])];
+        const surface = [];
+        this.cover = { x0: o.x, surface };
+        for (let i = 0; i < pts.length - 1; i++) {
+            const [a, ya] = pts[i], [b, yb] = pts[i + 1];
+            for (let x = a; x <= b; x++) {
+                const t = (x - a) / (b - a);
+                const y = Math.round(ya + (yb - ya) * t + 6 * Math.sin(Math.PI * t));
+                // The canvas, and its near edge's valance hanging all along it: soft stripes, a
+                // scalloped hem.
+                g.fillStyle(0xf4ead8, 1).fillRect(x, y, 1, 4);
+                // Its top holds her, its height kept for every x (coverTopAt).
+                surface[Math.round(x - o.x)] = y;
+                g.fillStyle(0xd8c8a8, 1).fillRect(x, y + 4, 1, 1);
+                const stripe = Math.floor((x - o.x) / 8) % 2 ? 0xf4ead8 : 0xbfe6f5;
+                const hem = 9 + Math.round(2 * Math.sin(((x - o.x) % 12) / 12 * Math.PI));
+                g.fillStyle(stripe, 1).fillRect(x, y + 5, 1, hem);
+                g.fillStyle(0xd8c8a8, 1).fillRect(x, y + 5 + hem, 1, 1);
+            }
+        }
+        this.worldLayer.add(g);
+    }
+
+    // The top of the sun cover under x, or null past its ends.
+    coverTopAt(x) {
+        const c = this.cover;
+        const y = c ? c.surface[Math.round(x - c.x0)] : undefined;
+        return y === undefined ? null : y;
     }
 
     // The pool shower's cubicle: a roof on corner posts, frosted glass walls to shoulder height, the
@@ -1469,20 +1693,20 @@ export class ShipScene extends Phaser.Scene {
         this.walks.push(walk);
     }
 
-    // A pool on deck 11 (§5.3): water she can jump into and swim in. Its front is drawn over her,
-    // a little see-through, so she is in it rather than on it.
-    // From deck 10 or below, deck 11's pools are out of sight and out of the way.
-    underPools() {
-        return this.viewDeck !== null && Math.round(this.viewDeck) <= 10;
+    // A pool on deck 11 or 12 (§5.3): water she can jump into and swim in. Its front is drawn over
+    // her, a little see-through, so she is in it rather than on it.
+    // From the deck under a pool's or lower, it is out of sight and out of the way.
+    underPools(deck = 11) {
+        return this.viewDeck !== null && Math.round(this.viewDeck) < deck;
     }
 
-    buildPool(o) {
+    buildPool(o, deck) {
         const water = this.add.graphics().setDepth(DEPTH.poolWater);
         water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
         water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
         const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.poolWater + 0.01);
         this.worldLayer.add([water, ripples]);
-        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples, water });
+        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples, water, deck });
     }
 
     // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of
@@ -1567,9 +1791,9 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(p);
         this.player = p;
 
-        // Deck 11's pools are sunk below its floor, into deck 10's ceiling: from deck 10 (seen from
-        // it, or jumping in it) they are not there (the user, 2026-11-06).
-        this.physics.add.collider(p, this.solidLayer, null, (_, tile) => tile.index !== this.poolTile || !this.underPools());
+        // The pools are sunk below their deck's floor, into the ceiling of the deck under it: from
+        // there (seen from it, or jumping in it) they are not there (the user, 2026-11-06).
+        this.physics.add.collider(p, this.solidLayer, null, (_, tile) => tile.index !== this.poolTile || !this.underPools(tile.poolDeck));
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
         for (const b of this.bulkheads) this.physics.add.collider(p, b.zone, null, () => !b.open && this.route === 'inside');
         this.physics.add.collider(p, this.railingStops || []);
@@ -1740,7 +1964,26 @@ export class ShipScene extends Phaser.Scene {
     updatePlay(input, dt, time) {
         const p = this.player;
         const body = p.body;
-        const onFloor = body.blocked.down || body.touching.down;
+        let onFloor = body.blocked.down || body.touching.down;
+        // The sun cover's top is a curved floor she lands on from above and walks along, its height
+        // known at every x: coming down onto it (her feet above it last frame, at or below it now)
+        // she stands exactly on it, so her walk never stumbles down its curve (the user saw it with
+        // stepped pieces). From below she passes through.
+        // Standing on it last frame, she follows it down its curve too (it can drop faster under her
+        // than she starts to fall).
+        const top = this.coverTopAt(p.x);
+        const was = this.feetWas ?? p.y;
+        const landing = was <= top + 2 && p.y >= top - 1;
+        const following = this.onCover && top - p.y >= 0 && top - p.y <= 6;
+        if (!onFloor && top !== null && this.route === 'inside' && body.velocity.y >= 0 && (landing || following)) {
+            const dy = top - p.y;
+            p.y += dy;
+            body.y += dy;
+            body.velocity.y = 0;
+            onFloor = true;
+        }
+        this.onCover = onFloor && top !== null && Math.abs(top - p.y) < 1;
+        this.feetWas = p.y;
 
         if (onFloor) {
             if (!this.grounded) sfx.land();
@@ -2116,12 +2359,12 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
-        const under = this.underPools();
+        const under = `${this.underPools(11)},${this.underPools(12)}`;
         if (under !== this.poolsHidden) {
             this.poolsHidden = under;
-            for (const t of this.poolTiles) t.alpha = under ? 0 : 1;
-            this.poolTanks.setVisible(!under);
-            for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!under));
+            for (const t of this.poolTiles) t.alpha = this.underPools(t.poolDeck) ? 0 : 1;
+            for (const [deck, g] of Object.entries(this.poolTanks)) g.setVisible(!this.underPools(Number(deck)));
+            for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!this.underPools(pool.deck)));
         }
         for (const r of this.rooms) {
             r.room.setVisible(this.route === r.route);
