@@ -30,9 +30,8 @@ const LEAF = 18; // each of an elevator's two sliding door leaves
 // from the door (the user, 2026-11-06).
 const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
                 desk: { top: 40, tangerines: [53, 61] } };
-// The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels Bumbot
-// sleeps on (its middle and its top over the floor, from the room's left edge), and the vent he
-// gets away into (its opening's ends).
+// The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels (its middle
+// and its top over the floor, from the room's left edge), and the vent (its opening's ends).
 const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
 // The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
 const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
@@ -446,7 +445,7 @@ export class ShipScene extends Phaser.Scene {
                 case 'bulkhead':
                     this.buildBulkhead(o, prop(o, 'x0', o.x - 600), prop(o, 'key', ''), prop(o, 'text', ''),
                         prop(o, 'sub', ''), prop(o, 'leaf', 'door-crew'), prop(o, 'colour', '#ae2334'),
-                        { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', '') });
+                        { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', ''), frame: prop(o, 'frame', '') });
                     break;
 
                 // Outdoors with no way in (deck 7's stern strip, §5.3; the aft terraces behind decks
@@ -542,7 +541,7 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'coffers') this.drawCoffers(decorGfx, o);
                     if (prop(o, 'kind') === 'lettering') this.drawLettering(o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'stage') this.drawStage(decorGfx, o);
-                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''), prop(o, 'hang', ''));
+                    if (prop(o, 'kind') === 'doorway') this.drawDoorway(decorGfx, o, prop(o, 'text', ''), prop(o, 'hang', ''), prop(o, 'post', true));
                     if (prop(o, 'kind') === 'marquee') this.drawMarquee(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'burlpanel') this.drawBurlPanel(decorGfx, o);
                     if (prop(o, 'kind') === 'directory') this.drawDirectory(decorGfx, o);
@@ -738,8 +737,8 @@ export class ShipScene extends Phaser.Scene {
     // Housekeeping's linen room on deck 9, off the cabin corridor (the user, 2026-11-06: she can go
     // in): its crew door held open, a plate beside it. E at the door and she is inside: the room
     // shows where the corridor was, the deck still cut open, everything round it dimmed almost to
-    // black (cabin 8206 opens in the ship's side instead). Racks of folded towels, and Bumbot asleep
-    // on a heap of them. He gets away into the vent.
+    // black. Racks of folded towels, a heap of them on the floor, a vent. (Bumbot slept there until
+    // his spots were taken out, 2026-11-07, §4.)
 
     buildLinenRoom(o) {
         const x0 = o.x - LINEN.doorX;
@@ -754,8 +753,6 @@ export class ShipScene extends Phaser.Scene {
         this.rooms.push({ route: 'linen', door: o.x, floor: o.y, room, dim, inDeck: true });
         this.addRouteWall(x0 + LINEN.stop, -1, o.y, 'linen');
         this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
-        this.addCat('bumbot-linen', x0 + LINEN.heap[0], o.y, 'asleep', 1,
-            { route: 'linen', lift: LINEN.heap[1] - 1, exitX: x0 + LINEN.vent[0] + 6 });
     }
 
     // --- The Chapel (§5.3) ---------------------------------------------------------------------
@@ -785,11 +782,14 @@ export class ShipScene extends Phaser.Scene {
     // deck 11: `key`), from outside it is out of sight and inside it only it is cut open (the user,
     // 2026-11-06). The sauna's two ends are such walls too, cedar, with glass doors.
 
-    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '' } = {}) {
+    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '', frame = '' } = {}) {
         const x = o.x, floor = o.y, w = width;
         const ceiling = floor - this.deckPitch + 16;
         const head = floor - DOOR.height - 2;
         const glass = leaf === 'glass';
+        // A glass door's frame and handle: cedar (the sauna's), or steel (between the ship's parts).
+        const steel = frame === 'steel';
+        const rim = steel ? 0x9babb2 : 0x7a4528, grip = steel ? 0x625565 : 0x46291f;
         const g = this.add.graphics().setDepth(DEPTH.props);
         const tone = wall ? Phaser.Display.Color.HexStringToColor(wall).color : 0x9babb2;
         g.fillStyle(tone, 1).fillRect(x - w / 2, ceiling, w, head - ceiling);
@@ -798,9 +798,9 @@ export class ShipScene extends Phaser.Scene {
         // Shut: the door edge on, its handle sticking out on each side: white steel, or glass.
         const shut = this.add.graphics().setDepth(DEPTH.props);
         if (glass) {
-            shut.fillStyle(0x7a4528, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
+            shut.fillStyle(rim, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
             shut.fillStyle(0xbfe6f5, 1).fillRect(x - 1, head + 4, 2, floor - head - 8);
-            shut.fillStyle(0x7a4528, 1).fillRect(x - 5, floor - 36, 10, 3);
+            shut.fillStyle(rim, 1).fillRect(x - 5, floor - 36, 10, 3);
         } else {
             shut.fillStyle(0x9babb2, 1).fillRect(x - 3, head + 2, 6, floor - head - 2);
             shut.fillStyle(0xffffff, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
@@ -810,13 +810,13 @@ export class ShipScene extends Phaser.Scene {
         const edge = x + swing * w / 2;
         let open;
         if (glass) {
-            // A glass door in a cedar frame, a wooden handle.
+            // A glass door in its frame, a handle.
             open = this.add.graphics().setDepth(DEPTH.decor + 0.2).setVisible(false);
             const lx = swing < 0 ? edge - 28 : edge;
-            open.fillStyle(0x7a4528, 1).fillRect(lx, head + 2, 28, floor - head - 2);
+            open.fillStyle(rim, 1).fillRect(lx, head + 2, 28, floor - head - 2);
             open.fillStyle(0xbfe6f5, 0.85).fillRect(lx + 3, head + 5, 22, floor - head - 10);
             open.fillStyle(0xffffff, 0.6).fillRect(lx + 6, head + 8, 2, 30);
-            open.fillStyle(0x46291f, 1).fillRect(swing < 0 ? lx + 3 : lx + 22, floor - 40, 3, 10);
+            open.fillStyle(grip, 1).fillRect(swing < 0 ? lx + 3 : lx + 22, floor - 40, 3, 10);
         } else {
             open = this.add.image(edge, floor, 'shipart', leaf).setOrigin(swing < 0 ? 1 : 0, 1).setDepth(DEPTH.decor + 0.2).setVisible(false);
         }
@@ -1011,25 +1011,8 @@ export class ShipScene extends Phaser.Scene {
     drawGangway(g, o) {
         const top = o.y - this.deckPitch + 16;
         for (let x = o.x + 24; x < o.x + o.width - 16; x += 32) this.wallGfx.fillStyle(0xe3dccb, 1).fillRect(x, top, 1, o.y - top);
-        // A fire door at each end, held open: folded back flat against the wall, so seen face on,
-        // a narrow vision panel in it, a kick plate, and the wall magnet holding its free edge.
-        // Each stands in its frame where the lobby meets the next part of the deck, so the wall
-        // changes at a doorway.
-        const [left, right] = [o.x - 8, o.x + o.width - 8];
-        for (const [x, dir] of [[left + 3, 1], [right - 33, -1]]) {
-            const w = 30, h = 76;
-            const post = dir > 0 ? left - 2 : right - 2;
-            g.fillStyle(0xcfc2a7, 1).fillRect(post, top, 4, o.y - top);
-            g.fillStyle(0xb9ab90, 1).fillRect(post + (dir > 0 ? 3 : 0), top, 1, o.y - top);
-            g.fillStyle(0xb9ab90, 1).fillRect(x - 1, o.y - h - 1, w + 2, h + 1);
-            g.fillStyle(0xddd2bb, 1).fillRect(x, o.y - h, w, h);
-            g.fillStyle(0xcfc2a7, 1).fillRect(x, o.y - 10, w, 10);
-            g.fillStyle(0x9babb2, 1).fillRect(x + w / 2 - 3, o.y - 64, 6, 22);
-            g.fillStyle(0xc7dcd0, 1).fillRect(x + w / 2 - 2, o.y - 63, 4, 20);
-            const edge = dir > 0 ? x + w : x - 1;
-            g.fillStyle(0x7f708a, 1).fillRect(dir > 0 ? edge + 1 : edge - 4, o.y - 36, 4, 6);  // the magnet
-            g.fillStyle(0x9babb2, 1).fillRect(dir > 0 ? edge - 3 : edge + 1, o.y - 35, 3, 4);   // its plate
-        }
+        // (A fire door held open at each end was drawn here; the lobby's ends are walls with real
+        // doors now, as between every part of the ship: the user, 2026-11-07.)
     }
 
     // --- Deck 5's rooms (§5.3, the user's photos) ------------------------------------------------
@@ -1181,10 +1164,13 @@ export class ShipScene extends Phaser.Scene {
 
     // A room open off a corridor: a light wood post where the corridor's wall ends, the room's brass
     // plaque on its own wall beside it.
-    drawDoorway(g, o, text, hang) {
+    drawDoorway(g, o, text, hang, post = true) {
         const x = o.x, y = o.y, ceiling = y - this.deckPitch + 16;
-        g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
-        g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
+        // (Where a wall with a door stands, its plaque only: the wall is the post.)
+        if (post) {
+            g.fillStyle(0xc9b48f, 1).fillRect(x - 3, ceiling, 6, y - ceiling);
+            g.fillStyle(0xab947a, 1).fillRect(x + 2, ceiling, 1, y - ceiling);
+        }
         if (text) {
             const plaque = this.add.text(x + 12, y - 96, text, {
                 fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#45293f',

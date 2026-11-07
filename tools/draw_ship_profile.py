@@ -5,7 +5,6 @@ editing the layout.
     python tools/draw_ship_profile.py
 """
 
-import re
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -20,7 +19,7 @@ TOP = 110       # room for the funnel, mast and core labels
 
 FILL = {
     "venue": "#cfe3f0", "outdoor": "#d6ecd0", "cabins": "#ececec", "crew": "#f3d9c9",
-    "start": "#ffe08a", "finale": "#f7bdbd",
+    "start": "#ffe08a", "terrace": "#f7bdbd",
 }
 
 
@@ -76,16 +75,15 @@ def build():
         out.append(text(x(LENGTH) + 12, y0 + 19, str(deck), 11, "start", weight="bold"))
 
     # The linen room, behind its crew door off deck 9's corridor (6 m round the door).
-    linen = (LINEN_ROOM["deck"], LINEN_ROOM["m"] - 2, LINEN_ROOM["m"] + 4, "Linen room (Bumbot: asleep)", "crew")
+    linen = (LINEN_ROOM["deck"], LINEN_ROOM["m"] - 2, LINEN_ROOM["m"] + 4, "Linen room", "crew")
     for deck, a, b, name, kind in VENUES + [linen]:
         y0 = row_top(deck)
         out.append(f'<rect x="{x(a):.0f}" y="{y0 + 2}" width="{(b - a) * PX}" height="{ROW - 4}" '
                    f'rx="2" fill="{FILL[kind]}"/>')
-        bumbot = re.search(r"\(Bumbot: [^)]*\)", name)
-        label = re.sub(r"\s*\(Bumbot: [^)]*\)", "", name)
-        weight = "bold" if bumbot or kind in ("start", "finale") else "normal"
+        label = name
+        weight = "bold" if kind == "start" else "normal"
         color = "#888888" if kind == "cabins" else "#1d2b53"
-        out.append(text((x(a) + x(b)) / 2, y0 + 19, ("★ " if bumbot else "") + label, 9, color=color,
+        out.append(text((x(a) + x(b)) / 2, y0 + 19, label, 9, color=color,
                         weight=weight))
 
     # The atrium, open through decks 5-9.
@@ -121,14 +119,12 @@ def build():
         out.append(f'<line x1="{x(m):.0f}" y1="{height - 30}" x2="{x(m):.0f}" y2="{height - 24}" stroke="#555"/>')
         out.append(text(x(m), height - 12, f"{m} m", 9, color="#555555"))
     legend = [("Indoor venue", FILL["venue"]), ("Outdoor", FILL["outdoor"]), ("Cabins", FILL["cabins"]),
-              ("Crew only", FILL["crew"]), ("Start", FILL["start"]), ("Finale", FILL["finale"])]
+              ("Crew only", FILL["crew"]), ("Start", FILL["start"]), ("Open terrace", FILL["terrace"])]
     lx = LEFT
     for label, color in legend:
         out.append(f'<rect x="{lx}" y="40" width="12" height="12" fill="{color}" stroke="#bbb"/>')
         out.append(text(lx + 17, 50, label, 10, "start"))
         lx += 110
-    out.append(text(lx + 4, 50, "★ Bumbot near-catch", 10, "start", weight="bold"))
-    lx += 130
     out.append(f'<rect x="{lx}" y="40" width="6" height="12" fill="#e07a1f"/>')
     out.append(text(lx + 11, 50, "Escape trunk (ladder doors)", 10, "start"))
     out.append("</svg>")

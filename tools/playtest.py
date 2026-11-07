@@ -417,9 +417,15 @@ ATRIUM_X1 = col(ATRIUM["span"][1]) * TILE
 
 def scenario_atrium(b):
     b.open("?reset&play&cards=all")
-    # The side walks are floor: she runs straight across the atrium.
-    b.teleport(ATRIUM_X0 - 40, D7)
-    b.hold("right", 7.6)
+    # The side walks are floor: she runs straight across the atrium, through the doors at its ends
+    # (E opens each: a wall with a door between every two parts of the ship, 2026-11-07).
+    b.teleport(ATRIUM_X0 - 20, D7)
+    b.tap("e")
+    time.sleep(0.3)
+    b.hold("right", 7.4)
+    b.tap("e")
+    time.sleep(0.3)
+    b.hold("right", 0.8)
     s = b.state()
     ok = check(s["y"] == D7 and s["x"] > ATRIUM_X1, "she runs straight across the atrium on deck 7", s)
 
@@ -572,26 +578,18 @@ def scenario_cabin(b):
 
 
 def scenario_linen(b):
-    # The linen room on deck 9 (§4): E at its crew door takes her in; Bumbot sleeps there and gets
-    # away into the vent; E again takes her back out, and he is gone.
+    # The linen room on deck 9 (§5.3): E at its crew door takes her in, its walls hold her, E again
+    # takes her back out. (Bumbot's checks went with his spots, 2026-11-07: they come back with him.)
     route = lambda: b.eval("window.__ship.route")
-    cat = "window.__ship.cats.find(c => c.name === 'bumbot-linen')"
     b.open("?reset&play&at=linen")
     door = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     b.eval("window.__ship.route = 'inside'")
     b.teleport(door + 6, floor_y(9))
-    ok = check(not b.eval(f"{cat}.sprite.visible"), "from the corridor Bumbot is out of sight")
     b.tap("e")
     time.sleep(0.8)
     s = b.state()
-    ok &= check(route() == "linen" and s["x"] == door and b.eval(f"{cat}.sprite.visible"),
-                "E at the crew door takes her in, Bumbot asleep inside", (route(), s))
+    ok = check(route() == "linen" and s["x"] == door, "E at the crew door takes her in", (route(), s))
     b.shot("linen-inside")
-    b.key("right", True)
-    b.wait_for("window.__ship.mode === 'scripted'", timeout=5)
-    b.key("right", False)
-    b.wait_for("window.__ship.mode === 'play'", timeout=6)
-    ok &= check(b.eval(f"{cat}.away") and not b.eval(f"{cat}.sprite.visible"), "getting close, he gets away into the vent")
     b.hold(["left"], 2.0)
     s = b.state()
     ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(9), "the room's near wall holds her", s)
@@ -669,28 +667,6 @@ def scenario_idle(b):
     out = b.eval("window.__ship.climbOutFrames")
     ok &= check(frame in out, "climbing out at a ladder top uses a climb-out frame", f"frame {frame}")
     b.shot("climb-out")
-    return ok
-
-
-def scenario_bumbot(b):
-    b.open("?reset&play")
-    b.wait_for("window.__ship && window.__ship.player")
-    cat = "window.__ship.cats.find(c => c.name === 'bumbot-theatre')"
-    ok = check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash", "Bumbot is washing in the theatre")
-    b.teleport(x_of(221), D6)
-    b.shot("bumbot-wash")
-    b.key("right", True)
-    b.wait_for("window.__ship.mode === 'scripted'", timeout=5)
-    b.key("right", False)
-    b.wait_for("window.__ship.player.anims.currentAnim?.key === 'her-reach'", timeout=5)
-    time.sleep(0.3)
-    b.shot("bumbot-reach")
-    ok &= check(b.eval(f"{cat}.gone"), "getting close starts a near-catch")
-    b.wait_for("window.__ship.mode === 'play'", timeout=6)
-    s = b.state()
-    ok &= check(not b.eval(f"{cat}.sprite.visible") and s["y"] == D6, "he gets away and she can play on", s)
-    b.hold("right", 0.3)
-    ok &= check(b.state()["mode"] == "play", "no second near-catch once he is gone")
     return ok
 
 

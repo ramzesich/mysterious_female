@@ -1,9 +1,9 @@
-"""Draws the housekeeping linen room by hand (GAME_DESIGN.md §4, §5.3, deck 9): Bumbot's spot where
-he sleeps in the warm towels. Inside, it shows in the corridor's place, the deck around it dimmed
+"""Draws the housekeeping linen room by hand (GAME_DESIGN.md §5.3, deck 9), a room she can go into
+(Bumbot slept in its towels until his spots were taken out, 2026-11-07; §4). Inside, it shows in the corridor's place, the deck around it dimmed
 (not cut into the ship's side as cabin 8206 is). A crew room behind a crew door held open: pale
 painted steel, a fluorescent tube, grey vinyl. A laundry cart by the door and the door back out,
 chrome wire racks stacked with folded towels, sheets and pillows, a heap of fresh towels on the floor
-(Bumbot sleeps on it; the game draws him), and low on the far wall a vent with its grille hanging
+(where Bumbot slept), and low on the far wall a vent with its grille hanging
 open, where he gets away.
 
 Also the open door seen from the corridor: a white crew door's frame, its leaf swung in, the racks
@@ -36,7 +36,7 @@ CANVAS, CANVAS_DARK = "#b2ba90", "#92a984"
 TUBE = "#fbff86"
 
 # Where things are, from the room's left edge (ShipScene's LINEN must agree): the door back out,
-# the heap of towels Bumbot sleeps on (its middle and its top over the floor), and the vent.
+# the heap of towels on the floor (its middle and its top over the floor), and the vent.
 DOOR_X = 59
 HEAP = (150, 6)
 VENT = (222, 236)

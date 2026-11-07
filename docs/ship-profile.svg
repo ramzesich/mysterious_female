@@ -74,15 +74,15 @@
 <rect x="480" y="142" width="100" height="26" rx="2" fill="#cfe3f0"/>
 <text x="530.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Fitness</text>
 <rect x="620" y="142" width="250" height="26" rx="2" fill="#d6ecd0"/>
-<text x="745.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Oasis Pool, Topsiders, hot tubs</text>
+<text x="745.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Oasis Pool, Topsiders, hot tubs</text>
 <rect x="870" y="142" width="170" height="26" rx="2" fill="#cfe3f0"/>
-<text x="955.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Garden Café buffet, Ice Cream Bar</text>
+<text x="955.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Garden Café buffet, Ice Cream Bar</text>
 <rect x="1080" y="142" width="40" height="26" rx="2" fill="#cfe3f0"/>
 <text x="1100.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Sports Bar</text>
 <rect x="1120" y="142" width="170" height="26" rx="2" fill="#f7bdbd"/>
-<text x="1205.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Great Outdoors diner (finale)</text>
+<text x="1205.0" y="159.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Great Outdoors</text>
 <rect x="195" y="172" width="75" height="26" rx="2" fill="#f3d9c9"/>
-<text x="232.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Bridge</text>
+<text x="232.5" y="189.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Bridge</text>
 <rect x="270" y="172" width="170" height="26" rx="2" fill="#ececec"/>
 <text x="355.0" y="189.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="172" width="420" height="26" rx="2" fill="#ececec"/>
@@ -134,7 +134,7 @@
 <rect x="870" y="292" width="170" height="26" rx="2" fill="#cfe3f0"/>
 <text x="955.0" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Library</text>
 <rect x="1080" y="292" width="265" height="26" rx="2" fill="#cfe3f0"/>
-<text x="1212.5" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Stardust Lounge theatre</text>
+<text x="1212.5" y="309.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Stardust Lounge theatre</text>
 <rect x="170" y="322" width="270" height="26" rx="2" fill="#ececec"/>
 <text x="305.0" y="339.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="322" width="200" height="26" rx="2" fill="#cfe3f0"/>
@@ -156,7 +156,7 @@
 <rect x="1080" y="352" width="265" height="26" rx="2" fill="#ececec"/>
 <text x="1212.5" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
-<text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">★ Linen room</text>
+<text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Linen room</text>
 <rect x="480" y="172" width="100" height="176" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
 <text x="530.0" y="279.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Atrium</text>
 <text x="530.0" y="339.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Café</text>
@@ -205,8 +205,7 @@
 <rect x="510" y="40" width="12" height="12" fill="#ffe08a" stroke="#bbb"/>
 <text x="527.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Start</text>
 <rect x="620" y="40" width="12" height="12" fill="#f7bdbd" stroke="#bbb"/>
-<text x="637.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Finale</text>
-<text x="734.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="bold">★ Bumbot near-catch</text>
-<rect x="860" y="40" width="6" height="12" fill="#e07a1f"/>
-<text x="871.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Escape trunk (ladder doors)</text>
+<text x="637.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Open terrace</text>
+<rect x="730" y="40" width="6" height="12" fill="#e07a1f"/>
+<text x="741.0" y="50.0" font-size="10" text-anchor="start" fill="#1d2b53" font-weight="normal">Escape trunk (ladder doors)</text>
 </svg>

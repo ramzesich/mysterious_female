@@ -19,7 +19,7 @@ truth**: read the relevant section before any design or content work, and record
 | Path | What |
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, Bumbot near-catches |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (no spots placed for now: §4) |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
@@ -30,7 +30,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
-| `tools/draw_linen.py` | The linen room (deck 9, Bumbot asleep in the towels), drawn by hand: its inside and its open crew door |
+| `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor), drawn by hand: its inside and its open crew door |
 | `tools/draw_lifeboat.py` | The lifeboat, drawn by hand in code (PixelLab's tries didn't read): writes `assets/ship/lifeboat.png` |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |

@@ -50,7 +50,7 @@ ROOM_LOOK = {
     "Windjammer Bar": (WINDJAMMER_WALL, WOOD_FLOOR),
     "Photo Gallery": (GALLERY_WALL, WOOD_FLOOR),
     "Library": (WALNUT, LIBRARY_CARPET),
-    "Stardust Lounge theatre (Bumbot: washing)": (THEATRE_WALL, THEATRE_CARPET),
+    "Stardust Lounge theatre": (THEATRE_WALL, THEATRE_CARPET),
     "Splash Academy": (KIDS_WALL, KIDS_CARPET),
     "Entourage": (TEEN_WALL, ARCADE_CARPET),
     "Magnum's": (WALNUT, DINING_CARPET),
@@ -59,14 +59,14 @@ ROOM_LOOK = {
     "Tradewinds": (DINING_WALL, WOOD_FLOOR),
     "Arcade": (ARCADE_WALL, ARCADE_CARPET),
     "Stardust Lounge balcony": (THEATRE_WALL, THEATRE_CARPET),
-    "Bridge (Bumbot: controls)": (BRIDGE_WALL, BRIDGE_FLOOR),
+    "Bridge": (BRIDGE_WALL, BRIDGE_FLOOR),
     # Deck 11 (NCL's plan, the user's photos, 2026-11-06).
     "Spa reception": (SPA_WALL, WOOD_FLOOR),
     "Massage and sauna": (SAUNA_WALL, WOOD_FLOOR),
     "Salon": (SPA_WALL, WOOD_FLOOR),
     "Aerobics": (VENUEWALL, WOOD_FLOOR),
     "Fitness": (VENUEWALL, GYM_FLOOR),
-    "Garden Café buffet, Ice Cream Bar (Bumbot: fish)": (CAFE_WALL, CAFE_CARPET),
+    "Garden Café buffet, Ice Cream Bar": (CAFE_WALL, CAFE_CARPET),
     "Sports Bar": (WINDJAMMER_WALL, WOOD_FLOOR),
     # Deck 12 (NCL's plan, the user's photos, 2026-11-07).
     "Spinnaker Lounge": (DINING_WALL, SPINNAKER_CARPET),
@@ -122,15 +122,50 @@ POOL_DEPTH = 2 * TILE
 # each out of sight and out of the way from the deck under it.
 ALL_POOLS = [(11, a, b) for a, b in POOLS] + [(12, 58.6, 62.4)]
 
-# Deck 12's passages between the indoors and an open deck with a deck door in them, seen from the
-# side, opened with E (the user, 2026-11-07), metres from the bow: which way each door swings open.
-DOOR_PASSAGES_12 = {44: 1, 57.5: -1, 67: 1, 110: -1, 164: 1, 214: -1}
+# Passages between the indoors and an open deck with a deck door in them, seen from the side,
+# opened with E (the user, 2026-11-07), by deck, metres from the bow: which way each door swings
+# open (into the indoors, or out onto the deck where inside it would cover a stair lobby's DECK sign
+# or the Sports Bar's dartboard). Deck 12's all; deck 11's to the pool deck, the Garden Café and the
+# Great Outdoors (the user chose these; the other ways out to open decks keep their white end walls).
+DOOR_PASSAGES = {12: {44: 1, 57.5: -1, 67: 1, 110: 1, 164: 1, 214: -1},
+                 11: {110: 1, 160: 1, 210: 1}}
 
 
-def passage_wall_col(m):
-    """The wall's column where the indoors meet an open deck at `m` metres (deck 12)."""
+def deck_parts(deck):
+    """The parts of a deck, bow to stern, (from, to, name, kind): its rooms and corridors (VENUES),
+    its stair lobbies, the atrium (one part over all its decks)."""
+    parts = [(a, b, f"{name} lobby", "core") for name, (a, b) in CORES.items()]
+    if in_atrium(deck, sum(ATRIUM["span"]) / 2):
+        parts.append((*ATRIUM["span"], "Atrium", "atrium"))
+    parts += [(a, b, name, kind) for d, a, b, name, kind in VENUES if d == deck]
+    return sorted(parts)
+
+
+# Boundaries that have their own wall and door already: the bridge's, the spa's.
+OWN_DOORS = {(10, BRIDGE_WALL_M), (11, SPA_WALL_M)}
+
+
+def part_doors():
+    """Every boundary between two indoor parts of a deck, (deck, metres, swing): a wall with a door
+    in it (the user, 2026-11-07). The door swings open away from a stair lobby, else aft."""
+    doors = []
+    for deck in PLAYABLE:
+        parts = deck_parts(deck)
+        for (a0, b0, _, k0), (a1, b1, _, k1) in zip(parts, parts[1:]):
+            m = a1
+            if b0 != a1 or (deck, m) in OWN_DOORS or m in DOOR_PASSAGES.get(deck, {}):
+                continue
+            if not (indoor(deck, m - 0.5) and indoor(deck, m + 0.5)):
+                continue
+            swing = -1 if k1 == "core" else 1
+            doors.append((deck, m, swing))
+    return doors
+
+
+def passage_wall_col(deck, m):
+    """The wall's column where the indoors meet an open deck at `m` metres on `deck`."""
     c = col(m)
-    return c if indoor(12, metres(c)) else c - 1
+    return c if indoor(deck, metres(c)) else c - 1
 
 
 WALL_FOR = {"venue": VENUEWALL, "cabins": CABIN_WALL, "crew": CREWWALL, "start": BACKWALL}
@@ -235,7 +270,7 @@ def indoor(deck, m):
     if in_atrium(deck, m) or in_core(m):
         return True
     _, kind = venue_at(deck, m)
-    return covered(deck, m) and kind not in ("outdoor", "finale")
+    return covered(deck, m) and kind not in ("outdoor", "terrace")
 
 
 def build_layers():
@@ -265,7 +300,7 @@ def build_layers():
                 tile = ATRIUMWALL
             elif in_core(m):
                 tile = MAHOGANY  # the stair and elevator lobbies' panelling (the user's photos)
-            elif not covered(deck, m) or kind in ("outdoor", "finale"):
+            elif not covered(deck, m) or kind in ("outdoor", "terrace"):
                 tile = 0
             elif look and name == "La Cucina" and CUCINA_FRONT[0] <= m < CUCINA_FRONT[1]:
                 tile = CUCINA_WALL
@@ -290,7 +325,7 @@ def build_layers():
             elif deck > 3 and (in_core(m) or kind == "start"):
                 solid[floor][c] = LOBBY_CARPET  # the lobbies' and the gangway's blue mosaic carpet
             elif deck > 3:
-                if not covered(deck, m) or kind in ("outdoor", "finale"):
+                if not covered(deck, m) or kind in ("outdoor", "terrace"):
                     solid[floor][c] = TEAK if deck == 11 else DECK_PAINT  # deck 11: teak (her photos)
                 elif kind == "cabins":
                     solid[floor][c] = CABIN_CARPET
@@ -326,7 +361,7 @@ def build_layers():
         # Where an open deck meets the indoors, an outer wall with a doorway 5 tiles (80px) high.
         if 3 < deck:
             for c in range(c0 + 1, c1):
-                if deck == 12 and any(col(m) == c for m in DOOR_PASSAGES_12):
+                if any(col(m) == c for m in DOOR_PASSAGES.get(deck, {})):
                     continue    # a door in a wall across the deck, built by the game
                 if indoor(deck, metres(c - 1)) != indoor(deck, metres(c)):
                     wall = c if indoor(deck, metres(c)) else c - 1
@@ -503,7 +538,7 @@ def on_front_bulwark(deck, x):
 
 def glass_walls_11(kind="outdoor"):
     """Deck 11's pool deck, (x from, x to) each run: glass walls all along it, from the deck up to
-    deck 12's floor (the user's photo from deck 12, 2026-11-07). With kind "finale", the Great
+    deck 12's floor (the user's photo from deck 12, 2026-11-07). With kind "terrace", the Great
     Outdoors' runs: railings there (the user). Both on the far side, behind everything on the deck."""
     runs, start = [], None
     fwd, aft = EXTENT[11]
@@ -645,7 +680,7 @@ def shell_details(ext, solid):
         # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:
         # glass_walls_11()).
         if deck >= 11:
-            walled = glass_walls_11() + glass_walls_11("finale") if deck == 11 else []
+            walled = glass_walls_11() + glass_walls_11("terrace") if deck == 11 else []
             for x in range(x0, x1, TILE):
                 m = metres(x // TILE)
                 _, kind = venue_at(deck, m)
@@ -852,12 +887,8 @@ def build_objects():
     # when the ship is split into unlockable areas. Until then she always starts again at the
     # gangway. The last placements are in GAME_DESIGN.md §8.
 
-    # Bumbot at his five spots (§4): what he is doing, and which way he runs. The fifth, asleep in
-    # the linen room on deck 9, is placed by the game with the room.
-    for name, deck, m, activity, escape in [("theatre", 6, 226, "wash", 1), ("buffet", 11, 178, "sit", 1),
-                                            ("pool", 11, 146, "fly", 1), ("bridge", 10, 31.75, "bat", -1)]:
-        add(point(f"bumbot-{name}", "bumbot", x_of(m), floor_y(deck),
-                  [prop("activity", activity), prop("escape", escape, "int")]))
+    # Bumbot's spots (§4): none for now (the user, 2026-11-07): they are mapped in again later, with
+    # his near-catches' tests. The game still places a `bumbot` point (activity, escape).
 
     # Tangerines (§6.3): ten, each on a side table. One sits behind crates only the dash breaks.
     for i, (deck, m) in enumerate([(4, 30), (4, 150), (4, 236), (5, 60), (5, 170), (6, 120), (6, 245),
@@ -940,8 +971,8 @@ def build_objects():
         add(area(f"bridge-windows-{a}", "decor", exact_x(a), floor_y(10) - 104, exact_x(b) - exact_x(a), 56,
                  [prop("kind", "bridgewindows")]))
 
-    # The gangway lobby, deck 4 (the user's photo): cream panelling, a fire door held open at each
-    # end (folded flat against the wall), an exit sign over the shell door, fire equipment. (The
+    # The gangway lobby, deck 4 (the user's photo): cream panelling, an exit sign over the shell door,
+    # fire equipment; its ends are walls with doors, as between all the ship's parts. (The
     # photo's runner mat is left out: from the side a floor mat is only a sliver.)
     add(area("gangway-lobby", "decor", x_of(60), floor_y(4), x_of(74) - x_of(60), 0, [prop("kind", "gangway")]))
     put(4, 62.85, "exit-sign-bg", 92)
@@ -959,8 +990,12 @@ def build_objects():
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
     # excursions and reservations desks, La Cucina, the Four Seasons and the Seven Seas.
     def decor(name, kind, x0, x1, deck=5, **props):
+        extra = []
+        doors = [(d, m) for d, m, _ in part_doors()] + [(d, m) for d, ps in DOOR_PASSAGES.items() for m in ps]
+        if kind == "doorway" and any(d == deck and abs(exact_x(m) - x0) <= 8 for d, m in doors):
+            extra = [prop("post", False, "bool")]      # the wall with its door is the post
         add(area(name, "decor", x0, floor_y(deck), x1 - x0, 0,
-                 [prop("kind", kind)] + [prop(k, v) for k, v in props.items()]))
+                 [prop("kind", kind)] + [prop(k, v) for k, v in props.items()] + extra))
 
     def dinner(m, table, chair, lamp=None):
         around(5, m, table, chair, lamp)
@@ -1129,7 +1164,7 @@ def build_objects():
         add(area(f"glass-wall-11-{i}", "glasswall", a, floor_y(11), b - a, 0))
     # The Great Outdoors: a glass railing on the far side instead, behind everything, so it stays
     # while she is out there (the user, 2026-11-07).
-    for i, (a, b) in enumerate(glass_walls_11("finale")):
+    for i, (a, b) in enumerate(glass_walls_11("terrace")):
         add(area(f"rail-11-{i}", "glasswall", a, floor_y(11), b - a, 0, [prop("style", "railing")]))
     # So is deck 12's, the Spinnaker's balcony (the user, 2026-11-07).
     fa, fb = front_bulwark_12()
@@ -1262,7 +1297,7 @@ def build_objects():
     # Cabin 8206, the user's own (OUR_CABIN): its open door is placed with the corridor's doors.
 
     # Deck 10's bridge (§5.3; a PixelLab sheet, bridge-1, 2026-11-06): the consoles, the helm and the
-    # engine telegraph forward (Bumbot bats at the telegraph's levers), the captain's and an
+    # engine telegraph forward, the captain's and an
     # officer's chair, the compass binnacle, the radar and the chart display, the chart table and
     # the alarm panel; screens and the clock with its barometer on the wall under the side windows.
     # (Its inside starts about 28.5 m: the deck's front 3 m are the ship's structure.)
@@ -1353,7 +1388,7 @@ def build_objects():
     at11(158.8, "planter-palm")
     # The Garden Café (the user's photos): the buffet counters, light wood tables with light blue
     # chairs, a painting between the windows, the Ice Cream Bar, window seats at round white tables
-    # in wicker chairs. Bumbot sits by a table with a fish on it (§4).
+    # in wicker chairs, a fish on one of the tables.
     decor("cafe-doorway", "doorway", exact_x(160), exact_x(160), deck=11, text="Garden Café")
     for a, b in ((160.8, 170.2), (172.8, 181.8), (184.2, 193.4)):
         add(area(f"cafe-windows-{a}", "decor", exact_x(a), floor_y(11) - 104, exact_x(b) - exact_x(a), 56,
@@ -1382,8 +1417,8 @@ def build_objects():
         at11(m, "bar-stool")
     at11(207.6, "wall-tv", 62)
     at11(209.0, "dartboard", 54)
-    # The Great Outdoors, open aft (§4, the finale's place): the self-service station first, the
-    # coffee machines and the soft serve ice cream machine where she catches Bumbot at last; then
+    # The Great Outdoors, open aft: the self-service station first, the coffee machines and the soft
+    # serve ice cream machine (the finale's place in §4's first plan, to be decided later); then
     # round white tables and wicker chairs, parasols where the sky is open, palms.
     # (Its plaque hangs from the ceiling on cords: with deck 12 ending at 220 m the sky is behind it.)
     decor("outdoors-doorway", "doorway", exact_x(210), exact_x(210), deck=11, text="The Great Outdoors", hang="1")
@@ -1412,11 +1447,18 @@ def build_objects():
         # From the ceiling: its top against it.
         at12(m, frame, DECK_PITCH - TILE - height(frame + "-bg"))
 
+    # A wall with a glass door between every two of the ship's indoor parts (the user, 2026-11-07):
+    # all of them open with E for now; some will be locked with key cards later, with the ship's
+    # areas (§6). Each swings open away from a stair lobby, into the other part.
+    for deck, m, swing in part_doors():
+        add(point(f"part-door-{deck}-{m:g}", "bulkhead", exact_x(m), floor_y(deck), [
+            prop("leaf", "glass"), prop("frame", "steel"), prop("swing", swing, "int")]))
     # Deck doors in the passages out to the open deck (the user): a wall across the deck, its door
     # seen from the side, E to open it, as the spa's and the sauna's.
-    for m, swing in DOOR_PASSAGES_12.items():
-        add(point(f"deck-door-12-{m}", "bulkhead", passage_wall_col(m) * TILE + TILE // 2, floor_y(12), [
-            prop("leaf", "door-deck"), prop("swing", swing, "int")]))
+    for deck, passages in DOOR_PASSAGES.items():
+        for m, swing in passages.items():
+            add(point(f"deck-door-{deck}-{m}", "bulkhead", passage_wall_col(deck, m) * TILE + TILE // 2, floor_y(deck), [
+                prop("leaf", "door-deck"), prop("swing", swing, "int")]))
     # The Spinnaker's balcony, the curved open deck in front of the lounge (NCL's plan; the user,
     # 2026-11-07): palms behind the white bulwark (loungers were lower than it, out of sight); the
     # lounge's doors open onto it.
