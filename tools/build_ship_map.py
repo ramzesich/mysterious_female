@@ -507,6 +507,28 @@ FRAME = "#9babb2"
 
 PORTHOLE_PITCH = 160
 PORTHOLE_R = 12      # the round windows: 24 px across (the user, 2026-11-03)
+
+# The hull's windows, after the user's side photo and videos (2026-11-07), metres from the bow: a few
+# tiny portholes on deck 3, one row of round portholes on deck 4, two-pane cabin windows in runs on
+# deck 5, and the stern block's rows (decks 4-7).
+HULL_WINDOWS = {
+    "deck3": (163, 216, 2.5),                       # from, to, every (m): tiny portholes
+    "deck4": (60, 240, 2.5),                        # round portholes
+    "deck5": [(108, 142, 3.0), (145, 180, 2.5)],    # two-pane cabin windows, in runs
+}
+STERN_BLOCK = (231, 250.6)                          # the stern's own rows of windows, decks 4-7
+# The forward block, after the user's side photo (2026-11-07): single cabin windows in a grid, its
+# columns in line deck over deck, by deck (from, to); where each deck's balconies start; the bridge's
+# dark band of windows over the bridge; deck 5's dark rounded windows in the sun livery. (Bands of
+# windows under white "eyelid" hoods were tried at the front of decks 8-9: they are the front face's,
+# seen in the photo's perspective, not the side's: the user.)
+FORWARD_GRID = {10: (44, 83), 9: (44, 90), 8: (44, 100), 7: (46, 99), 6: (46, 99)}
+GRID_ORIGIN, GRID_PITCH = 44.0, 3.4
+BALCONY_FROM = {8: 104, 9: 91, 10: 84}
+DECK5_OVALS = (58, 95, 3.2)
+# (They stop short of the stern's fixed plating, from 251 m, so none straddles its edge.)
+CURTAIN = "#b9b2a3"
+FRAME_WHITE = "#f4f4f4"
 END_COVER = 32       # px of wall the game draws over her at each end of a cut-away deck
 
 
@@ -596,16 +618,96 @@ def shell_details(ext, solid):
         rect(owner, x, y, w, h, GLASS_DARK)
         rect(owner, x + 1, y + 1, max(1, w // 3), 1, "#8fd3ff")
 
-    # The lower hull, crew decks 1-3: a row of round portholes along each deck, as big as deck 5's
-    # and in line under them (the user, 2026-11-03: small ones made no sense).
-    for k in range(HULL_DECKS_BELOW + 1):
-        y = (FLOOR_ROW[3] - DECK_ROWS // 2 + k * DECK_ROWS) * TILE
-        a = col(EXTENT[3][0]) * TILE + 40
-        for x in range(a - a % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, col(EXTENT[3][1]) * TILE - 40, PORTHOLE_PITCH):
-            if x >= a and not plain(x, y) and (solid[y // TILE][x // TILE] or ext[y // TILE][x // TILE]):
-                put("fixed", ["c", x, y, PORTHOLE_R, FRAME])
-                put("fixed", ["c", x, y, PORTHOLE_R - 2, GLASS_DARK])
-                rect("fixed", x - 5, y - 6, 3, 1, "#8fd3ff")
+    def porthole(owner, x, y, r):
+        put(owner, ["c", x, y, r, FRAME])
+        put(owner, ["c", x, y, r - 2, GLASS_DARK])
+        rect(owner, x - r // 2, y - r // 2, max(1, r // 4), 1, "#8fd3ff")
+
+    def cabin_window(deck, cx, cy, w, h):
+        """A cabin's window (the user's videos): two panes side by side in a white frame with
+        rounded corners, white curtains drawn back inside each pane."""
+        x, y = round(cx - w / 2), round(cy - h / 2)
+        owner = span_owner(x - 1, x + w + 1, cy // TILE, deck)
+        if owner is None or plain(x, y):
+            return
+        rect(owner, x + 1, y, w - 2, h, FRAME)
+        rect(owner, x, y + 1, w, h - 2, FRAME)
+        rect(owner, x + 1, y + 1, w - 2, h - 2, FRAME_WHITE)
+        rect(owner, x + 3, y + 3, w - 6, h - 6, GLASS_DARK)
+        rect(owner, round(cx) - 1, y + 3, 2, h - 6, FRAME_WHITE)       # between the panes
+        side = max(2, (w - 6) // 10)
+        for a in (x + 3, round(cx) + 1):
+            pane = round(cx) - 1 - (x + 3)
+            rect(owner, a, y + 3, side, h - 6, CURTAIN)
+            rect(owner, a + pane - side, y + 3, side, h - 6, CURTAIN)
+            rect(owner, a + side + 1, y + 4, 1, max(1, (h - 6) // 3), "#8fd3ff")
+
+    def run(deck, a, b, every):
+        """x of each window along a run from `a` to `b` metres, every `every` metres."""
+        n = int((b - a) // every)
+        return [exact_x(a + every * (i + 0.5)) for i in range(n)]
+
+    # The hull, after the user's side photo and videos (2026-11-07): low on it, deck 3's few tiny
+    # portholes; then deck 4's row of round portholes, all along; deck 5's cabin windows in runs. No
+    # windows below deck 3 (there were rows of them, the real hull has none).
+    y3 = floor_y(3) - 72
+    for x in run(3, *HULL_WINDOWS["deck3"]):
+        if not plain(x, y3):
+            porthole("fixed", x, y3, 6)
+    y4 = floor_y(4) - 72
+    for x in run(4, *HULL_WINDOWS["deck4"]):
+        own = span_owner(x - PORTHOLE_R, x + PORTHOLE_R, y4 // TILE, 4)
+        if own is not None and not plain(x, y4) and not (x_of(60) <= x <= x_of(66)):   # the gangway's door
+            porthole(own, x, y4, PORTHOLE_R)
+    for a, b, every in HULL_WINDOWS["deck5"]:
+        for x in run(5, a, b, every):
+            cabin_window(5, x, floor_y(5) - 70, 52, 46)
+    # The stern block (decks 4-7, aft of the lifeboats): wide windows low down on deck 4, cabin
+    # windows on deck 5, smaller ones on deck 6, and one long dark band on deck 7.
+    sa, sb = STERN_BLOCK
+    for x in run(4, sa + 9.2, sb, 3.1):         # (moved aft, clear of the last porthole: the user)
+        own = span_owner(x - 66, x + 66, y4 // TILE, 4)
+        if own is not None:
+            rect(own, x - 66, y4 - 15, 132, 30, FRAME)
+            rect(own, x - 64, y4 - 13, 128, 26, GLASS_DARK)
+            rect(own, x - 60, y4 - 11, 30, 1, "#8fd3ff")
+    for x in run(5, sa, sb, 2.1):
+        cabin_window(5, x, floor_y(5) - 70, 54, 46)
+    for x in run(6, sa + 3, sb, 2.1):
+        cabin_window(6, x, floor_y(6) - 72, 40, 34)
+    # The forward block (FORWARD_GRID): the grid of cabin windows, the bridge's band, deck 5's dark
+    # rounded windows.
+    for deck, (a, b) in FORWARD_GRID.items():
+        k0 = int((a - GRID_ORIGIN) // GRID_PITCH)
+        for k in range(k0, int((b - GRID_ORIGIN) / GRID_PITCH) + 1):
+            m = GRID_ORIGIN + k * GRID_PITCH
+            if a <= m <= b:
+                cabin_window(deck, exact_x(m), floor_y(deck) - 72, 46, 40)
+    yb = floor_y(10) - 104
+    x = col(EXTENT[10][0]) * TILE
+    while x + 48 <= exact_x(BRIDGE_WALL_M):
+        own = owner_at((x + 24) // TILE, yb // TILE, 10)     # on the bridge's side or the deck's: one band
+        if own is not None:
+            rect(own, x, yb, 48, 30, GLASS_DARK)
+            rect(own, x, yb + 1, 48, 1, "#4d65b4")
+            rect(own, x, yb, 2, 30, FRAME)
+        x += 48
+    y5 = floor_y(5) - 70
+    for x in run(5, *DECK5_OVALS):
+        own = span_owner(x - 22, x + 22, y5 // TILE, 5)
+        if own is not None and not plain(x, y5):
+            rect(own, x - 20, y5 - 12, 40, 24, FRAME)
+            rect(own, x - 22, y5 - 10, 44, 20, FRAME)
+            rect(own, x - 18, y5 - 10, 36, 20, GLASS_DARK)
+            rect(own, x - 20, y5 - 8, 40, 16, GLASS_DARK)
+    y7 = floor_y(7) - 84
+    a7, b7 = exact_x(sa + 13), exact_x(sb)
+    own7 = span_owner(a7, b7, y7 // TILE, 7)
+    if own7 is not None:
+        rect(own7, a7, y7, b7 - a7, 40, FRAME)
+        rect(own7, a7 + 2, y7 + 2, b7 - a7 - 4, 36, GLASS_DARK)
+        for x in range(a7 + 48, b7 - 8, 48):
+            rect(own7, x, y7 + 2, 2, 36, FRAME_WHITE)
     # The dark navy band along the waterline.
     w0 = round(stem_x(WATER_ROW))
     rect("fixed", w0, WATER_ROW * TILE - 14, col(EXTENT[3][1]) * TILE - w0, 14, "#1d2b53")
@@ -617,15 +719,10 @@ def shell_details(ext, solid):
         x0, x1 = col(fwd) * TILE, col(aft) * TILE
         # Square windows, balconies and big windows, laid out on fixed spacings from the bow so the
         # rows line up deck over deck.
-        # Deck 5's windows are round, fewer and bigger (the user, 2026-11-03).
-        if deck == 5:
-            for x in range(x0 - x0 % PORTHOLE_PITCH + PORTHOLE_PITCH // 2, x1 - 20, PORTHOLE_PITCH):
-                own = span_owner(x - PORTHOLE_R, x + PORTHOLE_R, mid_row, deck)
-                if own is None or x < x0 + 20 or plain(x, floor - 72):
-                    continue
-                put(own, ["c", x, floor - 72, PORTHOLE_R, FRAME])
-                put(own, ["c", x, floor - 72, PORTHOLE_R - 2, GLASS_DARK])
-                rect(own, x - 5, floor - 78, 3, 1, "#8fd3ff")
+        # Decks 4 and 5, and the stern block, have their windows above, after the user's photo and
+        # videos (2026-11-07).
+        if deck in (4, 5):
+            continue
         prom_a, prom_b = PROMENADE["span"]
         open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
         doors = [x_of(m) for m in PROMENADE["doors"]]
@@ -634,6 +731,8 @@ def shell_details(ext, solid):
                 c = (x + unit // 2) // TILE
                 if not (x0 <= x and x + unit <= x1):
                     continue
+                if deck in (6, 7) and metres(c) >= STERN_BLOCK[0] - 2:
+                    continue                         # the stern block's own windows
                 own = owner_at(c, mid_row, deck)
                 if own is None:
                     continue
@@ -642,17 +741,18 @@ def shell_details(ext, solid):
                 # the stair cores and the atrium, the deck's usual ones.
                 if in_core(metres(c)) or in_atrium(deck, metres(c)) or kind is None:
                     kind = "cabins" if deck in (4, 5, 8, 9, 10) else "venue"
-                balcony = kind == "cabins" and deck >= 8 and metres(c) >= 82
+                balcony = kind == "cabins" and deck >= 8 and metres(c) >= BALCONY_FROM[deck]
+                # Forward of them, the forward block's grid, eyelids and bridge band (above).
+                if 6 <= deck <= 10 and metres(c) < BALCONY_FROM.get(deck, 100):
+                    continue
                 want = ("balcony" if balcony else "square") if kind == "cabins" else \
                        "bridge" if kind == "crew" and deck == 10 else "venue" if kind == "venue" else None
                 # Along the promenade (the user, 2026-11-03): its wall has only a few windows, clear
                 # of the doors, and deck 7 has none where the boats hang in front of it.
-                if deck == PROMENADE["deck"] + 1 and open_a <= metres(c) < open_b:
+                if deck == PROMENADE["deck"] + 1 and prom_a <= metres(c) < prom_b:
                     continue
                 if deck == PROMENADE["deck"] and prom_a <= metres(c) < prom_b:
-                    mid = x + unit // 2
-                    clear = all(abs(mid - d) > 70 for d in doors) and x_of(open_a) + 28 <= mid <= x_of(open_b) - 28
-                    want = "promenade" if clear else None
+                    continue                 # the promenade's recess has its own back wall (the game)
                 if want != style:
                     continue
                 if deck == 5:
@@ -1601,22 +1701,21 @@ def build_objects():
     return objs
 
 
-BOAT_W, BOAT_PITCH = 300, 9      # the lifeboat's drawn length (px) and their spacing (m)
 
 
 def promenade():
     """Deck 6's promenade (§5.3), as one object for the game to draw and use: its span, the doors,
-    the enclosed ends, and the lifeboats hanging in pairs of davits over the open middle, a white
-    column between each two boats."""
+    the enclosed ends, the boats hanging high in it on their davits and the white columns, as in the
+    user's side photo (2026-11-07). Each boat: x, its picture, its two hooks' x and their eyes' depth
+    in the picture (tools/draw_lifeboat.py)."""
+    from draw_lifeboat import HOOKS, SIZES
     deck, (a, b) = PROMENADE["deck"], PROMENADE["span"]
-    open_a, open_b = PROMENADE["enclosed"][0][1], PROMENADE["enclosed"][-1][0]
-    span = x_of(open_b) - x_of(open_a)
-    pitch = BOAT_PITCH * PER_M * TILE
-    n = (span - BOAT_W) // pitch + 1
-    first = x_of(open_a) + (span - (n - 1) * pitch - BOAT_W) // 2
-    boats = [first + k * pitch for k in range(n)]
-    gap = (pitch - BOAT_W) // 2
-    columns = [x - gap for x in boats] + [boats[-1] + BOAT_W + gap]
+    boats = []
+    for m, kind in PROMENADE["boats"]:
+        (h1, h2), eye = HOOKS[kind]
+        w, h = SIZES[kind]
+        boats.append(f"{exact_x(m)}:{kind}:{round(h1 * w)}:{round(h2 * w)}:{round(eye * h)}")
+    columns = [exact_x(m) for m in PROMENADE["columns"]]
     doors = [x_of(m) for m in PROMENADE["doors"]]
     for d in doors:
         assert all(abs(d - c) > 30 for c in columns), ("a promenade door behind a column", metres(d // TILE))
@@ -1624,7 +1723,9 @@ def promenade():
         prop("floor", floor_y(deck), "int"),
         prop("doors", ",".join(map(str, doors))),
         prop("enclosed", ",".join(f"{x_of(p)}:{x_of(q)}" for p, q in PROMENADE["enclosed"])),
-        prop("boats", ",".join(map(str, boats))),
+        prop("boats", ",".join(boats)),
+        prop("portholes", ",".join(str(exact_x(m)) for m in PROMENADE["portholes"])),
+        prop("glazed", ",".join(f"{exact_x(p)}:{exact_x(q)}" for p, q in PROMENADE["glazed"])),
         prop("columns", ",".join(map(str, columns))),
     ])
 

@@ -34,7 +34,7 @@ KEYS = {
     "left": (37, "ArrowLeft", "ArrowLeft"), "right": (39, "ArrowRight", "ArrowRight"),
     "up": (38, "ArrowUp", "ArrowUp"), "down": (40, "ArrowDown", "ArrowDown"),
     "space": (32, "Space", " "), "d": (68, "KeyD", "d"),
-    "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"),
+    "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"), "o": (79, "KeyO", "o"),
 }
 
 

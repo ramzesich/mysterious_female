@@ -36,6 +36,7 @@ URL flags, combinable (`?play&debug`):
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | Кісюнічка dash (costs a tangerine) | D | B |
 | Activate: open doors | E | X |
+| The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | |
 
 A controller is detected once a button is pressed on it.
 
