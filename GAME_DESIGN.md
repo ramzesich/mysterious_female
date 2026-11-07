@@ -510,8 +510,8 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   over the promenade's open middle at deck 7's level, every 9 m, from davit arms on the white
   columns; they fade when she is inside deck 6 or 7. The photo crops
   (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
-- The sun livery stays on the bow for now (the user, "then we'll see"); on the real ship it sits
-  about 40 m from the bow, low on the hull.
+- The sun livery is the real one (2026-11-07, §8): generated with PixelLab from the user's side
+  photo, centred about 40 m from the bow on deck 6, its ribbons running aft to about 142 m.
 
 ### 5.4 Scale
 
@@ -814,7 +814,9 @@ Nothing blocks the start of the build. These get settled along the way:
       generations; a first try facing the camera is kept in `assets/source/her/arms-wide-front/`),
       and the camera draws back to frame the whole bow, its sun included; any key brings it
       back. Bow only for now; other scenic spots (the stern terraces, deck 12 over the pools)
-      maybe later
+      maybe later. **Removed (2026-11-07, the user):** drawn back to the whole ship after 2 s it
+      didn't work visually, so it is gone, its test too; the user may think of something else
+      **Later**. Her arms-wide pose stays in her sprites
 - [x] **Deck 4 furnished** (2026-11-03, merged): the gangway lobby after the user's photo (cream
       panelling, fire doors held open (folded flat against the wall, seen face on, each in its frame where the lobby meets the next part of the deck, so the wall changes at a doorway; the runner mat dropped, it read as a glitch side-on), exit sign, fire-hose cabinet); the stair
       and elevator lobbies on every deck (mahogany panelling, blue mosaic carpet, bronze elevator
@@ -1107,15 +1109,41 @@ Nothing blocks the start of the build. These get settled along the way:
       view); the real ship's angled radar mast on the Spinnaker's roof, the antenna mast moved to
       the roof over the forward lobby (75 m). **Next:** the livery and the ship's movement and
       background (the user)
-- [ ] **Start the next session here: the outside of the ship goes on, with the livery**
-      (2026-11-07; the outside work so far is merged into `main`, entry above). On the real ship
-      the sun is big, about 50-100 m on decks 4-9, its red, orange and yellow waves flowing aft
-      along the hull to about 180 m (the side photo and the videos' close-ups, `reference/`); ours
-      is a small sun at the bow (`livery_box()` in the map builder, `assets/ship/livery.png`).
-      Render the whole ship with `python tools/render_ship.py`, or press O in the game; compare
-      against the photo at the same scale (metres along the ship), and put every picture of the
-      outside work in `%TEMP%/bumbusik-playtest/exterior` (the user's wish). After the livery: the
-      ship's movement and the background (the user). Other candidates, after the outside: deck
+- [x] **The livery, the real one** (2026-11-07). The user's side photo (from across the water,
+      no quay in front) straightened into game pixels: calibrated on the deck rows, the boats and
+      the bow, the ship's name and its hull door painted out (`tools/livery_photo.py`; the photo
+      never leaves `reference/`). Cut into eight
+      tiles at a third of the game's scale and generated with PixelLab's `create_image_pixflux` in
+      two passes (img2img at 150 from the photo, which kept its windows; then at 120 from that,
+      the windows painted over from the paint round them): `assets/source/livery/gen-*`, `p2-*`
+      (24 generations with the tries). `python tools/build_livery.py` sorts each tile's few dozen
+      exact colours into the livery's (dark red, red, red-orange, orange, amber, yellow, lemon,
+      the grey strokes; Resurrect 64), enlarges each colour smoothly to full size, keeps grey only
+      as long strokes along the paint, merges spots left by windows into their band, smooths the
+      bow's swooshes hard, and draws the sun's disc as exact rings. **Placement (the user):** the
+      sun moved forward 30 m from where the photo has it, centred about 40 m on deck 6, filling the
+      forward block's plain side; the bow's bands squeezed between the stem and the sun; the whole
+      livery a deck lower than the photo. The map builder cuts it by the wall each part is painted
+      on (`livery_pieces()`: each deck's side, the fixed ends, the hull below deck 3, the walls at
+      the decks' ends; none over the balconies or the promenade's opening) into an atlas
+      (`assets/ship/livery.png` + `.json`), so it fades with each deck's cut-away like the windows,
+      which are drawn over it; the game draws it over the strips of wall at the decks' ends too.
+      **Railings:** the forecastle's side railing is in front of her; the leaning railings at the
+      decks' fronts hide behind their sloped walls unless she is on that deck. **The bow view is
+      removed** (entry above)
+- [ ] **Start the next session here: the outside of the ship goes on, with the sea and the
+      background** (the user, 2026-11-07, answers by number): (4) better rendered waves, moving:
+      layered rows (far small and slow, near bigger, rising and falling, glints), white foam along
+      the waterline, a bow wave, a wake from the stern, drawn in code; (5) the background is the
+      **Baltic archipelago** (low rocky islands, pines, red cottages, lighthouses); (6) far away
+      and washed out, drifting slowly aft as the ship sails, a little parallax when she runs, the
+      horizon at a fixed height on screen so it shows through the open decks, the promenade and
+      the windows, clouds drifting; in the outside view the horizon on the waterline; (7) cabin
+      8206's window and the other sea-view windows (the dining rooms, the bridge, the Spinnaker)
+      show the same live background; (8) gulls: far ones drawn in code and a few closer ones
+      generated after the user's herring gull photo (about 12 generations). The whole ship:
+      `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
+      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: deck
       11's front after the 2025 plan (above); the ship's areas and their progression, which doors are locked with which
       card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).

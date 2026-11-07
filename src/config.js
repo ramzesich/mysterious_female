@@ -45,13 +45,6 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
-// The bow view (§5.3): how long she stands still on the mooring deck before it starts, and how
-// long the camera takes to draw back.
-export const BOW_VIEW = {
-    idleMs: 3000,
-    zoomMs: 1400,
-};
-
 // Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it this long, she bounces on it
 // for joy, in place, hopping from one foot to the other, her arms waving up and down: one cycle
 // (a hop on each foot) this long, each hop this high (px), in the air for this share of it.
