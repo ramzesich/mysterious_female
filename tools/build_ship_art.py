@@ -30,7 +30,7 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
     tall-3/    object 4aa9472f-752f-47c8-888f-fb21a2d41c18, 16 spa, salon and gym pieces, 64px canvas
                (deck 11, 2026-11-06)
     tall-4/    object 38f8dc2d-2715-4873-bc7d-e22ba5a3f60e, 16 pool deck, buffet and outdoor café
-               pieces, 64px canvas (deck 11), the finale's ice cream machine among them
+               pieces, 64px canvas (deck 11), the soft serve ice cream machine among them
     props-6/   object b0dbbf7a-10f0-4ee7-90c7-0a1f72a006c0, 64 props, 32px canvas: spa, gym, pool,
                buffet (deck 11)
     sauna/     map objects: try 1 c5ad8bd8-a350-4b8e-9635-eaa6b10ab2db (three-quarter view, unused),

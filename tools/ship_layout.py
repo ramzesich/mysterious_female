@@ -64,7 +64,7 @@ PROMENADE = {"deck": 6, "span": (102, 226), "enclosed": [(102, 116), (212, 226)]
 # deck 8 plan, kept in reference/web/deck8/). Its door stands open and she can go in (§5.3).
 OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 
-# The housekeeping linen room on deck 9 (Bumbot asleep in the towels, §4): a crew door off the cabin
+# The housekeeping linen room on deck 9 (towels heaped on its floor, §5.3): a crew door off the cabin
 # corridor, in a cabin door's place, that she can go through (the user, 2026-11-06).
 LINEN_ROOM = {"deck": 9, "m": 112}
 
@@ -91,7 +91,8 @@ FUNNEL = (168, 196)
 MAST = (46, 54)
 
 # Kinds: "venue" (an indoor public room), "outdoor", "cabins", "crew", "start" (the gangway),
-# "finale". A name with "Bumbot:" is one of his near-catch spots (§4).
+# "terrace" (an open deck that is a place of its own: the Great Outdoors' tables). (Bumbot's spots were
+# marked in the names; all taken out on 2026-11-07, to be mapped in again later: §4.)
 VENUES = [
     # deck, from, to, name, kind
     # Deck 12, after NCL's plan and cruisedeckplans.com's (2026-11-07): the Spinnaker Lounge forward,
@@ -123,12 +124,12 @@ VENUES = [
     (11, 55, 65, "Salon", "venue"),
     (11, 65, 74, "Aerobics", "venue"),
     (11, 82, 102, "Fitness", "venue"),
-    (11, 110, 160, "Oasis Pool, Topsiders, hot tubs (Bumbot: fly)", "outdoor"),
-    (11, 160, 194, "Garden Café buffet, Ice Cream Bar (Bumbot: fish)", "venue"),
+    (11, 110, 160, "Oasis Pool, Topsiders, hot tubs", "outdoor"),
+    (11, 160, 194, "Garden Café buffet, Ice Cream Bar", "venue"),
     (11, 202, 210, "Sports Bar", "venue"),
-    (11, 210, 244, "Great Outdoors diner (finale)", "finale"),
+    (11, 210, 244, "Great Outdoors", "terrace"),
 
-    (10, 25, 40, "Bridge (Bumbot: controls)", "crew"),
+    (10, 25, 40, "Bridge", "crew"),
     (10, 40, 74, "Cabins", "cabins"),
     (10, 110, 194, "Cabins", "cabins"),
     (10, 202, 247, "Cabins", "cabins"),
@@ -162,7 +163,7 @@ VENUES = [
     (6, 136, 150, "Windjammer Bar", "venue"),
     (6, 150, 160, "Photo Gallery", "venue"),
     (6, 160, 194, "Library", "venue"),
-    (6, 202, 255, "Stardust Lounge theatre (Bumbot: washing)", "venue"),
+    (6, 202, 255, "Stardust Lounge theatre", "venue"),
 
     (5, 20, 74, "Cabins", "cabins"),
     (5, 110, 150, "Shore excursions, reservations", "venue"),

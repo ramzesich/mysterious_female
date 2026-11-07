@@ -15,7 +15,7 @@ rest of the game is done.
 |---|---|
 | **Hero** | Bumbusik — my wife (§3). **Decided** |
 | **World** | **The ship is the game.** One cruise ship, sailing on a sunny day over small waves, explored freely deck to deck. There are no levels. **Decided** |
-| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at five places on the ship and slips away each time; she finally catches him at the ice cream machine in the open diner on deck 11, aft. **Decided** |
+| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at places on the ship and slips away each time, until she finally catches him. **Decided.** Where he shows up and where she catches him are mapped in later (§4) |
 | **Discovery** | The goal is **never stated**. She works out that she is chasing Bumbot by playing. **Decided** |
 | **Player** | Her. It is a gift, and she wants a **real challenge** — Bumbot-level difficulty, not a gentle walk. **Decided** |
 | **Tone rule** | **No death and no negativity.** Failing is a *scare*: she runs off, or bobs in a life ring, and pops back out of a crew cabin door (§5.6). **Decided** |
@@ -176,9 +176,16 @@ it is her battle cry here.
 
 ## 4. Bumbot — the runaway cat
 
-**Decided:**
+**Status (the user, 2026-11-07): none of his spots are in the game.** They were taken out, the
+finale's place too, to be **mapped in again later**, when the ship's areas and their progression
+are designed (§6), with the tests of his near-catches. His sprite, his animations and the
+near-catch itself stay in the code (a `bumbot` map point: activity and escape direction). The
+spots, the finale and the diner's closing below are **the first plan, kept for reference**, not
+decided placements.
 
-- Bumbot appears at **five places** on the ship, each one a **near-catch moment**: a mini-scene where
+**Decided (the mechanic and the look):**
+
+- Bumbot appears at **a few places** on the ship (first plan: five), each one a **near-catch moment**: a mini-scene where
   she almost grabs him and he slips away with a funny animation, then play continues.
 - Until she reaches him, he is **doing something cat-like** in his spot, and each spot gets something
   different: asleep in the warm towels, washing himself, catching a fly, and so on.
@@ -186,7 +193,8 @@ it is her battle cry here.
   she can't use yet, into a vent, onto a passing tray, behind a door that slams shut, or into an
   escape trunk she can't open yet (§5.1).
 - **Each near-catch spot is also a checkpoint** (§5.5).
-- **The five spots:**
+- **Later: the spots.** The first plan's five (placed during the blockout and decks 4-11, all
+  taken out 2026-11-07):
 
   | Spot | What he is doing |
   |---|---|
@@ -198,7 +206,8 @@ it is her battle cry here.
 
 - **No fixed order.** The ship is freely explorable in any direction, more so as areas open up, so
   she can meet the five in whatever order her access allows.
-- **The final catch:** the open diner on **deck 11, aft**, at the self-service ice cream machine.
+- **Later: the final catch.** The first plan: the open diner on **deck 11, aft** (the Great
+  Outdoors), at the self-service ice cream machine.
   The diner is **inaccessible until she has seen all five near-catches**, so she never finds it
   early and wonders why it mattered. A proper win sequence: she scoops him up, hearts, purring, win
   screen, at sunset (§5.2).
@@ -221,8 +230,6 @@ it is her battle cry here.
 - **A near-catch (Decided):** she tries to **pick him up**: she walks up to him, bends down with
   both arms out, and just before her hands reach him he leaps away and runs. She stays bent a
   moment, straightens, and turns to the camera. Then play goes on.
-- **For now (test slice):** he washes on deck 4 aft of the gangway and runs off the screen toward
-  the stern. The real near-catch spots and escapes come with the ship layout.
 
 **Decided:** between the five spots he also turns up in **background glimpses**: a tail vanishing
 round a corner, a cat silhouette on the deck above, a shape passing a window. He can't be reached
@@ -276,7 +283,7 @@ there; they only remind her he's on board.
     shaft once; from then on it works both ways for good.
   - **A few are card-locked**, like other locked doors: the card's colour shows on a reader beside
     the door (§6.2).
-  - Bumbot can escape into one she can't use yet (§4).
+  - Bumbot can escape into one she can't use yet (§4, when his spots are mapped in).
   - **For now (blockout):** four test trunks, to try the mechanic: a two-deck one (deck 4–5,
     forward cabins), a three-deck one (decks 4–6, midships), a one-way shortcut from the theatre
     on deck 6 down to deck 4 (passing deck 5 with no door) and a Hotel-card one (decks 6–7). The
@@ -375,8 +382,7 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   water** (the user's choice; a skeleton-v3 clip written as poses, 3 generations; a front crawl
   was made first by a misunderstanding and is kept in `assets/source/her/swim-crawl/`). Two pools on deck 11 (119-131 m and
   134-140 m), sunk two tiles into the deck; she walks or drops in with a splash, ←/→ swims, jump
-  climbs out. Maybe game mechanics round the pools later. Not a scare. Bumbot's fly-catching spot
-  moved beside them, to 146 m.
+  climbs out. Maybe game mechanics round the pools later. Not a scare.
 - **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
   as it naturally would, but she can't get there. There are no crew or engine decks to explore.
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
@@ -396,9 +402,9 @@ true to the order and rough size of things on the real ship.
 | 4–5 | Lower guest decks: **gangway (start)**, reception, medical, cabins. |
 | 6–7 | Public decks: atrium, restaurants, theatre, shops, casino; the outdoor promenade and lifeboats. |
 | 8–10 | Cabin decks: long corridors, room-service and housekeeping carts. |
-| 11 | Pool deck, buffet, and **the open diner aft with the ice cream machine (finale)**. |
+| 11 | Pool deck, buffet, and **the open diner aft with the ice cream machine** (the first plan's finale, §4). |
 | 12 | Sun / sports deck. |
-| Bridge | Forward, behind the captain's key card. A Bumbot near-catch. |
+| Bridge | Forward, behind the captain's key card. (A Bumbot near-catch in the first plan, §4.) |
 | Top | Funnel and mast. |
 
 **The real ship's look** (Decided, 2026-11-02): **authenticity first**; the ship should look and
@@ -538,7 +544,7 @@ That works out to (numbers to be tuned in testing):
   stands ajar with the cabin light spilling out, and a green lamp above it glows. Activating one
   gives a short burst of light and a chime.
 - Checkpoints sit where a crew cabin door plausibly would, following the real layout.
-- There are a few across the ship, and **each Bumbot near-catch spot has one**.
+- There are a few across the ship, and **each Bumbot near-catch spot has one** (when they are mapped in, §4).
 - She comes back at the **closest one** to where she was scared, among the checkpoints she has
   **already activated**. Otherwise she could come back somewhere she has never been, possibly past a
   locked door.
@@ -578,9 +584,9 @@ The word is **"scare"**, never "death", on screen and in the code alike.
 | Theatre | Stage lights, curtains, rows of seats. |
 | Casino | Spinning lights, slot machines. |
 | Pool deck | Water, slides, sunbeds, slippery wet tiles. |
-| Open diner, deck 11 aft | The ice cream machine. The finale. |
+| Open diner, deck 11 aft | The ice cream machine. The finale, in the first plan (§4). |
 | Sun deck / funnel | Wind, seagulls. |
-| Bridge | Behind the captain's key card. Bumbot is here, and escapes. |
+| Bridge | Behind the captain's key card. (Bumbot here in the first plan, §4.) |
 | Outside: lifeboats, railings, bow | The ship's exterior and the sea. The overboard risk lives here. |
 
 ### 5.8 Enemies, hazards and other people
@@ -632,7 +638,15 @@ colleague gives her.
   | Captain | The bridge |
 
 - 2–3 physical **keys** for one-off locks: a lifeboat winch, a storeroom, a theatre backstage door.
-  (The diner is not key-locked; it opens after the fifth near-catch, §4.)
+  (In §4's first plan the diner is not key-locked; it opens after the fifth near-catch.)
+- **Doors between the ship's parts (Decided, the user, 2026-11-07):** a wall with a door, seen
+  from the side, stands between every two parts of the ship: each room, stair lobby, cabin corridor
+  stretch, the atrium (one part over all its decks; so is the theatre with its balcony), and the
+  ways out to open decks the user chose (§8). **All of them open with E for now.** Later, when the
+  ship's areas and the metroidvania-style progression are designed, **some of them are locked with
+  the key cards**. Then, too, a locked-out part gets its own piece of the ship's side, cut open only
+  while she is in it, as the bridge and the spa have now; until then the deck she is on is cut
+  open whole.
 - At least one card comes **from a colleague**, in exchange for bringing him lunch (§5.8).
 - Locked doors are visibly locked with the card colour on the reader, so she can remember where to
   return. With no map, this and Bumbot's escape routes are what keep her oriented, so each area
@@ -668,7 +682,8 @@ Tangerines go where a dash is genuinely useful: a breakable shortcut, a cluster 
 5. **Doors, locks and an inventory:** cards and keys she carries, and locked doors that check for them.
 6. **Breakables:** a solid type the dash destroys while walls stay solid.
 7. **The Кісюнічка dash:** a 10s timer, tangerine fuel.
-8. **Scripted Bumbot scenes:** five idle-then-escape scenes and the final catch.
+8. **Scripted Bumbot scenes:** idle-then-escape scenes and the final catch (the near-catch is
+   built; its spots and the final catch are mapped in later, §4).
 9. **Checkpoints and scares:** crew cabin doors, closest-activated respawn, the scare animations
    (run off, fall out of frame, life ring).
 10. **Keyboard + Xbox controller input**, both mapped to the same actions.
@@ -720,8 +735,8 @@ art:
   doors every 4 m along cabin corridors.
 - A roof over deck 12's indoor rooms, the funnel and mast on top, and a technical ladder from deck 12
   up to the roof beside the funnel. Deck 12 is open over the middle of the Oasis Pool.
-- Placed: the gangway spawn (deck 4, 67 m), 10 checkpoints, Bumbot at his five spots, 10
-  tangerines, a crate stack, the robot vacuum on deck 4.
+- Placed: the gangway spawn (deck 4, 67 m), 10 checkpoints, Bumbot at his five spots (taken out
+  2026-11-07, §4), 10 tangerines, a crate stack, the robot vacuum on deck 4.
 - The sea lies beyond both ends; overboard works at either end.
 
 ### 7.4 Alternatives considered
@@ -1011,10 +1026,24 @@ Nothing blocks the start of the build. These get settled along the way:
       runs to deck 10 now, its column up to the dome (the user). **After a scare she reappears
       with her deck already cut open** (the view no longer slides over from where she fell).
       `?at=spa`, `?at=gym`; `?at=diner` is at the Great Outdoors' tables
-- [ ] **Later: walls with a door between every part of the ship** (the user, 2026-11-06): the
-      bridge's and the spa's rule (a wall across the deck, its door seen from the side, E to open
-      it, each part with its own piece of the ship's side, cut open only while she is in it) is to
-      be generalized to the rest of the ship
+- [x] **Walls with a door between every part of the ship** (the user, 2026-11-06; done
+      2026-11-07): between every two indoor parts of decks 4-12 (rooms, stair lobbies, cabin
+      corridor stretches, the atrium as one part over its decks) a wall across the deck with a
+      **glass door in a steel frame** seen from the side, E to open it, shut again once she is away
+      (70 of them, `part_doors()`); each swings away from a stair lobby. Ways out to open decks:
+      **wooden deck doors** (with the porthole) on all of deck 12's and, the user's choice from
+      screenshots, deck 11's to the pool deck, the Garden Café and the Great Outdoors
+      (`DOOR_PASSAGES`); the others (deck 7's front, the small terraces of decks 8-10, deck 11's
+      open front) keep their white end walls she passes through. The bridge's crew door and the
+      spa's stay. Doorway posts gave way to the walls, their plaques kept; the gangway lobby's
+      drawn fire doors went. **All doors open for now; some are locked with key cards later**
+      (§6.2). The rest of the bridge and spa rule (each part's own piece of the ship's side, cut
+      open only while she is in it) waits for the locked-out areas (the user)
+- [x] **Bumbot's spots taken out** (the user, 2026-11-07): all five (the theatre, the bridge, the
+      pool deck, the Garden Café, the linen room) and the finale's place, to be mapped in later;
+      his tests went too, to come back with him. His sprite, animations and the near-catch stay in
+      the code. The layout's room names lost their "(Bumbot: ...)" marks; the Great Outdoors is a
+      plain `terrace`, no longer the `finale`
 - [x] **Deck 12 furnished** (2026-11-07): after NCL's plan (the Spinnaker is on deck 12 there and
       on cruisedeckplans.com's, `reference/web/deck12/`) and the user's photos; three PixelLab sheets
       (`tall-5`, `tall-6`, `props-7`, 30 generations, all 96 pieces kept; `tall-5` wrote each piece's
@@ -1050,11 +1079,12 @@ Nothing blocks the start of the build. These get settled along the way:
       cruisedeckplans.com's deck 11 plan is the 2025 one (`deck11-2025`, kept in
       `reference/web/deck11/`): suites forward with a curved hot-tub terrace, the spa further aft.
       The game follows NCL's 2022 map (the spa forward). Revisit when the user wants to
-- [ ] **Later: a Bumbot spot on deck 12** (the user, 2026-11-07: to think about; the design's
-      SUSHI sign secret, §5, is one idea)
+- [ ] **Later: map Bumbot in again** (§4): his spots (deck 12 had none yet; the design's SUSHI sign
+      secret, §5, is one idea), the finale's place, and his near-catches' tests
 - [ ] **Start the next session here: choose what comes next** (decks 4-12 are furnished,
-      2026-11-07). Candidates: deck 11's front after the 2025 plan (above); walls with a door
-      between every part of the ship (above); doors along the decks into small separate rooms
+      2026-11-07, and every part has its wall and door). Candidates: deck 11's front after the
+      2025 plan (above); the ship's areas and their progression, which doors are locked with which
+      card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
