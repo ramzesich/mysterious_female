@@ -337,7 +337,10 @@ there; they only remind her he's on board.
   glass; the islands drift slowly aft (the far layer slower), shift a little as she runs, the
   clouds slower still. **The sea-view windows show the same live background** (the bridge, the
   Spinnaker, the dining rooms, the buffet, cabin 8206's picture window): a copy of it cut to their
-  panes, its horizon level with the sea outside, curtains, mullions and glints over the glass. **In the outside view** the horizon lies on the waterline, the ship and the
+  panes, its horizon level with the sea outside, curtains, mullions and glints over the glass.
+  **Far gulls** (2026-11-08): four tiny dark "M"s, hazed, crossing the sky over the islands at
+  their own heights and paces (30-80 s across the screen), flapping, now and then gliding; the
+  same birds in the windows and the outside view. Closer, generated gulls: **Later**. **In the outside view** the horizon lies on the waterline, the ship and the
   horizon low in the frame (lowered by half the ship's height), the islands and clouds kept at a
   visible size on the screen, the clouds half way up the sky. **Decided**
 
@@ -1166,9 +1169,12 @@ Nothing blocks the start of the build. These get settled along the way:
       fixed with it: the outside view now returns with the camera as it was (its follow offset was
       lost), and a stray white wedge at deck 4's forward end (the bow plating's outline crossed
       itself) is gone
-- [ ] **Start the next session here: the outside of the ship goes on** (the user, 2026-11-07,
-      answers by number; (4) the sea, (5)-(6) the background and (7) the windows are done): (8) gulls: far ones drawn in code and a few closer ones
-      generated after the user's herring gull photo (about 12 generations). The whole ship:
+- [x] **Far gulls** (2026-11-08, approved by the user): drawn in code, crossing the sky (§5.2)
+- [ ] **Start the next session here: the outside of the ship is done** (the sea, the background,
+      the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
+      the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
+      a glide, a flap, perched on a railing; about 12 generations), and gulls as a hazard (§5.8).
+      Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
       `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: deck
       11's front after the 2025 plan (above); the ship's areas and their progression, which doors are locked with which

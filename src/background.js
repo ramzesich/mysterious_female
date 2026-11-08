@@ -193,6 +193,64 @@ function rippleStrip(scene) {
     tex.refresh();
 }
 
+// A far gull: a dark "M" a few pixels wide, in three frames, its wings up, level and down; a whole
+// flap is up, level, down, level. Hazed like everything out there.
+const GULL = [
+    ['X.....X', '.X...X.', '..XXX..', '.......'],
+    ['.......', 'XX...XX', '..X.X..', '...X...'],
+    ['.......', '...X...', '.XX.XX.', 'X.....X'],
+];
+function gullSheet(scene) {
+    const w = GULL[0][0].length, h = GULL[0].length;
+    const tex = scene.textures.createCanvas('bg-gull', w * GULL.length, h);
+    const ctx = tex.getContext();
+    ctx.fillStyle = hazed('#3e3546', 0.4);
+    GULL.forEach((rows, f) => {
+        rows.forEach((row, y) => [...row].forEach((c, x) => { if (c === 'X') ctx.fillRect(f * w + x, y, 1, 1); }));
+        tex.add(f, 0, f * w, 0, w, h);
+    });
+    tex.refresh();
+}
+
+// The far gulls (§5.2, the user, 2026-11-08): a few of them crossing the sky over the islands, each
+// at its own height and pace, flapping, now and then gliding a while; once off one side, another
+// comes in from either. Their places are kept here once for the scene and drawn by every Backdrop
+// (the sky outside and the windows' copies), so the same gull is in the same place in each.
+export class FarGulls {
+    constructor(count = 4) {
+        this.rand = rng(77);
+        this.time = 0;
+        this.birds = Array.from({ length: count }, () => this.spawn(true));
+    }
+
+    // `u`: how far across the view (0 its left edge, 1 its right), `up`: px over the horizon,
+    // `speed`: views a second, its sign the way it flies.
+    spawn(anywhere = false) {
+        const r = this.rand, dir = r() < 0.5 ? -1 : 1;
+        return {
+            u: anywhere ? r() : dir > 0 ? -0.03 : 1.03, up: 16 + r() * 70, speed: dir * (0.012 + r() * 0.02),
+            rate: 6 + r() * 3, phase: r() * 10, glide: 0, bobPhase: r() * 6,
+        };
+    }
+
+    update(dt) {
+        this.time += dt;
+        this.birds = this.birds.map(b => {
+            b.u += b.speed * dt;
+            if (b.glide > 0) b.glide -= dt;
+            else if (this.rand() < dt * 0.08) b.glide = 1 + this.rand() * 2.5;
+            return b.u < -0.05 || b.u > 1.05 ? this.spawn() : b;
+        });
+    }
+
+    // Each gull's frame and its rise and fall with the wingbeats.
+    pose(b) {
+        if (b.glide > 0) return { frame: 1, bob: 0 };
+        const step = Math.floor((this.time + b.phase) * b.rate) % 4;
+        return { frame: [0, 1, 2, 1][step], bob: Math.round(Math.sin((this.time + b.bobPhase) * 1.3) * 1.5) };
+    }
+}
+
 function gradient(scene, key, h, stops) {
     const tex = scene.textures.createCanvas(key, 4, h);
     const ctx = tex.getContext();
@@ -208,15 +266,17 @@ function makeTextures(scene) {
     for (const [name, [h, haze, , , , seed]] of Object.entries(LAYERS)) islandStrip(scene, `bg-${name}`, h, haze, seed);
     cloudStrip(scene);
     rippleStrip(scene);
+    gullSheet(scene);
     gradient(scene, 'bg-sky', SKY_FADE, [[0, SKY_TOP], [1, HAZE]]);
     gradient(scene, 'bg-sea', SEA_FADE, [[0, SEA_FAR], [1, SEA_NEAR]]);
 }
 
 export class Backdrop {
-    constructor(scene, { waterY, depth }) {
+    constructor(scene, { waterY, depth, gulls = null }) {
         makeTextures(scene);
         this.scene = scene;
         this.waterY = waterY;
+        this.gulls = gulls;
         const fixed = o => o.setOrigin(0).setScrollFactor(0);
         this.skyTop = fixed(scene.add.rectangle(0, 0, 4, 4, Number('0x' + SKY_TOP.slice(1)))).setDepth(depth);
         this.sky = fixed(scene.add.image(0, 0, 'bg-sky')).setDepth(depth);
@@ -228,8 +288,11 @@ export class Backdrop {
             s: fixed(scene.add.tileSprite(0, 0, 4, h, `bg-${name}`)).setDepth(depth + 0.03 + i * 0.001),
             h, drift, follow, base,
         }));
+        this.gullSprites = (gulls?.birds || []).map(() => scene.add.sprite(0, 0, 'bg-gull', 0)
+            .setOrigin(0.5, 1).setScrollFactor(0).setDepth(depth + 0.015));
         this.time = 0;
-        this.objects = [this.skyTop, this.sky, this.clouds, this.sea, this.seaDeep, this.ripples, ...this.layers.map(l => l.s)];
+        this.objects = [this.skyTop, this.sky, this.clouds, this.sea, this.seaDeep, this.ripples, ...this.layers.map(l => l.s),
+            ...this.gullSprites];
     }
 
     // Lay it all out for this frame, fixed to the camera: the horizon `horizonOnScreen` px from the
@@ -267,5 +330,10 @@ export class Backdrop {
             l.s.setScale(si).setPosition(left, hy - (l.h - 1 - l.base) * si).setSize(width / si, l.h);
             l.s.tilePositionX = Math.round(run * l.follow / si - this.time * l.drift);
         }
+        // The far gulls, over the islands.
+        this.gullSprites.forEach((g, i) => {
+            const b = this.gulls.birds[i], { frame, bob } = this.gulls.pose(b);
+            g.setFrame(frame).setScale(si).setPosition(Math.round(left + b.u * width), Math.round(hy - (b.up + bob) * si));
+        });
     }
 }
