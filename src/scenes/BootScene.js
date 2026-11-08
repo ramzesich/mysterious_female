@@ -23,8 +23,40 @@ export class BootScene extends Phaser.Scene {
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-meta', 'assets/sprites/her.json');
+        this.load.spritesheet('her-towel', 'assets/sprites/her-towel.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        this.load.json('her-towel-meta', 'assets/sprites/her-towel.json');
+        for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
+    }
+
+    // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
+    // cell down turned into a plain silhouette: the shape filled with one colour, its edge darker.
+    veilFrames(key, indices, chin) {
+        const cell = PLAYER.cell;
+        const src = this.textures.get('her').getSourceImage();
+        const tex = this.textures.createCanvas(key, cell * indices.length, cell);
+        const ctx = tex.getContext();
+        indices.forEach((n, i) => ctx.drawImage(src, n * cell, 0, cell, cell, i * cell, 0, cell, cell));
+        const img = ctx.getImageData(0, 0, tex.width, cell);
+        const d = img.data, w = tex.width;
+        const solid = (x, y) => x >= 0 && x < w && y < cell && d[(y * w + x) * 4 + 3] > 0;
+        const fill = [0xe8, 0xab, 0x9d], edge = [0xc7, 0x8a, 0x81];
+        const out = new Uint8ClampedArray(d);
+        for (let y = chin; y < cell; y++) {
+            for (let x = 0; x < w; x++) {
+                const k = (y * w + x) * 4;
+                if (!d[k + 3]) continue;
+                const rim = !solid(x - 1, y) || !solid(x + 1, y) || !solid(x, y + 1) || (x % cell === 0);
+                out.set(rim ? edge : fill, k);
+                out[k + 3] = 255;
+            }
+        }
+        img.data.set(out);
+        ctx.putImageData(img, 0, 0);
+        indices.forEach((_, i) => tex.add(i, 0, i * cell, 0, cell, cell));
+        tex.refresh();
+        return key;
     }
 
     create() {
@@ -56,6 +88,19 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-bed-joy', frames: frames('bed-joy'), frameRate: 9, repeat: -1 });
         // Breaststroke in a pool.
         this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
+        // Washing her hair in cabin 8206's shower, behind its frosted door: from her chin down only
+        // the shape of her, in one soft body colour with a slightly darker edge, never her clothes
+        // (the user, 2026-11-08), under the door's thick frosting.
+        const veil = this.veilFrames('her-shower-veil', meta.anims.shower, 40);
+        this.anims.create({ key: 'her-shower', frames: [0, 1, 2, 3, 4, 5, 4, 3, 2, 1].map(i => ({ key: veil, frame: i })), frameRate: 7, repeat: -1 });
+        // After the shower, a towel round her head (cabin 8206): the same clips, under 'her-towel-'.
+        const towel = this.cache.json.get('her-towel-meta');
+        const towelFrames = (name, order = towel.anims[name].map((_, i) => i)) =>
+            order.map(i => ({ key: 'her-towel', frame: towel.anims[name][i] }));
+        this.anims.create({ key: 'her-towel-run', frames: towelFrames('run'), frameRate: 14, repeat: -1 });
+        this.anims.create({ key: 'her-towel-idle-tap', frames: towelFrames('idle-tap', tap), frameRate: 7 });
+        this.anims.create({ key: 'her-towel-idle-look', frames: towelFrames('idle-look', look), frameRate: 7 });
+        this.anims.create({ key: 'her-towel-bed-joy', frames: towelFrames('bed-joy'), frameRate: 9, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

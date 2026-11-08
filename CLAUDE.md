@@ -29,7 +29,9 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/source/<char>/` | Raw PixelLab frames, kept so sprites can be rebuilt without regenerating |
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
-| `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door |
+| `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door, the shower room's door and the shower scene's pieces (stall, door slid open, see-through glass, the towel on its handle) |
+| `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
+| `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor), drawn by hand: its inside and its open crew door |
@@ -138,6 +140,23 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
 - Things drawn over the ship's side straddling the edge of a cut-away (a room's piece of shell, a
   deck's end, the fixed stern plating) are skipped by `span_owner()`: end runs of windows short of
   such edges, or draw a band piece by piece.
+
+Lessons learned (2026-11-08, the background, the windows, the cabin's shower):
+
+- **A new state of her character** (`create_character_state`, 10 generations) keeps her look but
+  can lose small features: check its profile against hers at the pixel level (the user caught a
+  missing far eye and a changed lower face) and mend it by hand. PixelLab keeps its own copy,
+  which template animations of the state use; skeleton-v3 redraws the head slightly in each
+  frame, so a fix can't be pasted onto those frames automatically.
+- **Giving a state the same motion as her existing clips:** templates (`running-8-frames`,
+  `jumping-1`) via `animate_character(mode="skeleton-v3")`; custom clips by estimating each frame's
+  skeleton (`tools/estimate_skeleton.py`) and passing them to `animate_with_skeleton_v3` with the
+  state's pose padded to the clip's canvas (64 px poses sit in 96 px frames, 16 px all round).
+  Check the estimates: one frame came back mirrored (left and right swapped) and was replaced by
+  its neighbours' average. The base character's animations can't be extended to a state.
+- skeleton-v3 may add things (lather on her hair while she washes it): look at every frame.
+- A long Python patch full of quotes, backticks and backslash escapes breaks a bash heredoc:
+  write it to a file in %TEMP% and run that.
 
 ## Working with the user
 

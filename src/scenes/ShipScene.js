@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN, SHOWER } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -31,7 +31,10 @@ const LEAF = 18; // each of an elevator's two sliding door leaves
 // and its top over the floor; the desk's top over the floor and where on it the two tangerines sit,
 // from the door (the user, 2026-11-06).
 const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
-                desk: { top: 40, tangerines: [53, 61] }, window: [143, 37, 35, 37] };   // its glass: x, y, w, h
+                desk: { top: 40, tangerines: [53, 61] }, window: [143, 37, 35, 37],   // its glass: x, y, w, h
+                doorWindow: [14, 17, 16, 19],     // the glass seen through its open door, in the door's image
+                shower: [6, 44, 40, 123],         // the shower room's door, x0, y0, x1, y1 (tools/draw_cabin.py's SHOWER)
+                towel: [28, 79], slide: 18 };     // her towel hung on its handle; how far the door slides open
 // The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels (its middle
 // and its top over the floor, from the room's left edge), and the vent (its opening's ends).
 const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
@@ -796,6 +799,9 @@ export class ShipScene extends Phaser.Scene {
         const x0 = o.x - CABIN.doorX;
         const c = this.cabin = { door: o.x, floor: o.y, number: prop(o, 'number', 0) };
         const door = this.add.image(o.x, o.y, 'cabin-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        // Through the open door, the window at the far wall shows the live sea too (the user).
+        const [dx, dy, dw, dh] = CABIN.doorWindow;
+        this.windowView.mask.fillRect(o.x - door.width / 2 + dx, o.y - door.height + dy, dw, dh);
         const plate = this.add.text(o.x + 21, o.y - 50, String(c.number), {
             fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
             backgroundColor: '#d9a43b', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
@@ -810,6 +816,12 @@ export class ShipScene extends Phaser.Scene {
         this.cabinView.mask.fillRect(x0 + wx, o.y - CABIN.height + wy, ww, wh);
         this.cabinView.view.setVisible(false);
         c.view = this.cabinView.view;
+        // Her towel, once she has hung it on the shower door's handle on her way out (the user,
+        // 2026-11-08); it stays there until her next shower.
+        const [tx, ty] = CABIN.towel;
+        c.towel = this.add.image(x0 + tx, o.y - CABIN.height + ty, 'cabin-shower-towel').setOrigin(0)
+            .setDepth(DEPTH.exterior + 0.125).setVisible(false);
+        this.worldLayer.add(c.towel);
         this.rooms.push({ route: 'cabin', door: o.x, floor: o.y, room: c.room, dim, inDeck: true });
         this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
         this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
@@ -1028,6 +1040,7 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const door = this.routeDoorAt(p.x, p.y);
         if (door === null) return false;
+        if (this.towel && this.route === 'cabin') return this.hangTowel();
         this.mode = 'scripted';
         this.script = null;
         p.body.setVelocity(0, 0);
@@ -1037,6 +1050,7 @@ export class ShipScene extends Phaser.Scene {
         cam.fadeOut(PROMENADE.fadeMs, 0, 0, 0);
         cam.once('camerafadeoutcomplete', () => {
             this.route = door.to;
+            if (door.to !== 'cabin') this.setTowel(false);  // hung up in the cabin
             p.body.reset(door.x, p.y);
             this.updateCutaway(0);
             cam.fadeIn(PROMENADE.fadeMs * 1.3, 0, 0, 0);
@@ -2042,6 +2056,7 @@ export class ShipScene extends Phaser.Scene {
     buildPlayer() {
         const meta = this.cache.json.get('her-meta');
         this.herFrames = meta.frames;
+        this.towelFrames = this.cache.json.get('her-towel-meta').frames;
         this.climbOutFrames = meta.anims['climb-out'];
         this.idleAt = 0;
         const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);
@@ -2160,6 +2175,7 @@ export class ShipScene extends Phaser.Scene {
         this.grounded = true;
         this.takeoffY = point.y;
         this.horizonOnScreen = undefined;               // the horizon snaps to her new floor
+        this.setTowel(false);
         this.lastGroundedAt = this.time.now;
         this.alert.setVisible(false);
 
@@ -2276,6 +2292,7 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
+        if (onFloor && input.activatePressed && this.tryShower()) return;
         if (onFloor && input.activatePressed && this.useRouteDoor()) return;
         if (onFloor && input.activatePressed && this.useBulkheadDoor()) return;
         // On the promenade, or in the cabin, the stairs, ladders, trunks and elevators are out of reach.
@@ -2330,6 +2347,151 @@ export class ShipScene extends Phaser.Scene {
         else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) this.startBedJoy();
     }
 
+    // --- Cabin 8206's shower (§5.3) ------------------------------------------------------------
+    // The user's secret (2026-11-08): E at the shower room's door and it slides open; she steps in,
+    // the door closes, and through its frosted glass she washes her hair, steam rising over it and
+    // small notes as she sings; then she steps out with a towel round her head.
+
+    tryShower() {
+        const c = this.cabin, p = this.player;
+        if (!c || this.route !== 'cabin') return false;
+        const [a, , b] = CABIN.shower;
+        if (p.x < c.room.x + a - SHOWER.reach || p.x > c.room.x + b + SHOWER.reach) return false;
+        this.startShower();
+        return true;
+    }
+
+    startShower() {
+        const c = this.cabin, p = this.player;
+        const [a, top, b, bottom] = CABIN.shower;
+        const x0 = c.room.x + a, y0 = c.room.y + top, floor = c.room.y + bottom - 2;
+        const depth = c.room.depth + 0.001;
+        const at = key => this.add.image(x0, y0, key).setOrigin(0).setDepth(depth).setVisible(false);
+        // The stall's inside, her behind the glass, the glass; the door slid open.
+        const s = this.showerScene = {
+            inside: at('cabin-shower-inside'), open: at('cabin-shower-open').setDepth(depth + 0.003),
+            glass: at('cabin-shower-glass').setDepth(depth + 0.002),
+            her: this.add.sprite(x0 + (b - a) / 2 + 1, floor, 'her', this.herFrames.front).setOrigin(0.5, 1)
+                .setDepth(depth + 0.001).setVisible(false),
+        };
+        this.worldLayer.add([s.inside, s.open, s.glass, s.her]);
+        this.mode = 'scripted';
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        // The opening, where the door slid from: its right half. A towel on the handle slides with it.
+        const doorway = x0 + (b - a) * 0.72;
+        const towelX = c.towel.x;
+        const shut = closed => {
+            s.open.setVisible(!closed);
+            c.towel.x = towelX - (closed ? 0 : CABIN.slide);
+            sfx.door();
+        };
+        shut(false);
+        let t = 0, phase = 'walk';
+        this.script = dt => {
+            t += dt * 1000;
+            if (phase === 'walk') {
+                const dx = doorway - p.x;
+                if (Math.abs(dx) > 1) {
+                    p.x += Math.sign(dx) * Math.min(Math.abs(dx), SHOWER.walkSpeed * dt);
+                    p.setFlipX(dx < 0);
+                    this.pose('run', 0.6);
+                    return;
+                }
+                // Her back to us, and in she goes.
+                this.pose('back');
+                this.tweens.add({ targets: p, alpha: 0, duration: SHOWER.stepMs });
+                phase = 'in';
+                t = 0;
+            } else if (phase === 'in' && t > SHOWER.stepMs) {
+                p.setVisible(false).setAlpha(1);
+                shut(true);
+                [s.inside, s.glass, s.her].forEach(o => o.setVisible(true));
+                s.her.anims.play('her-shower');
+                phase = 'shower';
+                t = 0;
+            } else if (phase === 'shower' && t > SHOWER.showerMs) {
+                shut(false);
+                [s.inside, s.glass, s.her].forEach(o => o.setVisible(false));
+                // Out she comes, facing us, the towel round her head (from the handle, if it was there).
+                this.setTowel(true);
+                c.towel.x = towelX;
+                p.x = doorway;
+                p.setFlipX(false).setVisible(true).setAlpha(0);
+                this.pose('front');
+                this.tweens.add({ targets: p, alpha: 1, duration: SHOWER.stepMs });
+                phase = 'out';
+                t = 0;
+            } else if (phase === 'out' && t > SHOWER.stepMs + 450) {
+                shut(true);
+                this.endShower();
+                return;
+            }
+            this.showerFx(x0, y0, b - a, phase === 'shower', dt);
+        };
+    }
+
+    // Steam curling up over the stall and small notes rising from it while she sings (`on`); both
+    // drift up and fade.
+    showerFx(x0, y0, w, on, dt) {
+        const s = this.showerScene;
+        s.steamAt = (s.steamAt ?? 0) - dt * 1000;
+        s.noteAt = (s.noteAt ?? SHOWER.noteEveryMs) - dt * 1000;
+        if (!on) return;
+        if (s.steamAt <= 0) {
+            s.steamAt = SHOWER.steamEveryMs;
+            const puff = this.add.circle(x0 + 4 + Math.random() * (w - 8), y0 + 2, 2 + Math.random() * 2, 0xffffff, 0.55)
+                .setDepth(s.open.depth + 0.001);
+            this.worldLayer.add(puff);
+            this.tweens.add({
+                targets: puff, y: puff.y - 18 - Math.random() * 10, x: puff.x + (Math.random() - 0.5) * 8,
+                scale: 2.2, alpha: 0, duration: 1400, onComplete: () => puff.destroy(),
+            });
+        }
+        if (s.noteAt <= 0) {
+            s.noteAt = SHOWER.noteEveryMs;
+            const note = this.add.text(x0 + w / 2 + (Math.random() - 0.5) * w * 0.6, y0 - 2, Math.random() < 0.5 ? '\u266a' : '\u266b', {
+                fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#45293f', resolution: 4,
+            }).setOrigin(0.5, 1).setDepth(s.open.depth + 0.002);
+            this.worldLayer.add(note);
+            const sway = (Math.random() < 0.5 ? -1 : 1) * (6 + Math.random() * 6);
+            this.tweens.add({ targets: note, y: note.y - 30, duration: 1800, ease: 'Sine.easeOut', onComplete: () => note.destroy() });
+            this.tweens.add({ targets: note, x: note.x + sway, duration: 900, yoyo: true, ease: 'Sine.easeInOut' });
+            this.tweens.add({ targets: note, alpha: 0, delay: 1000, duration: 800 });
+        }
+    }
+
+    // On her way out with the towel on: it goes from her head onto the shower door's handle, a moment
+    // to see it there, then out through the cabin's door as usual (the user, 2026-11-08: she doesn't
+    // walk over to it).
+    hangTowel() {
+        const c = this.cabin, p = this.player;
+        this.mode = 'scripted';
+        p.body.setVelocity(0, 0);
+        this.setTowel(false);
+        this.pose('stand');
+        c.towel.setAlpha(0);
+        this.tweens.add({ targets: c.towel, alpha: 1, duration: 250 });
+        this.script = null;
+        this.time.delayedCall(SHOWER.hangMs, () => {
+            this.mode = 'play';
+            this.useRouteDoor();
+        });
+        return true;
+    }
+
+    endShower() {
+        const p = this.player, s = this.showerScene;
+        [s.inside, s.open, s.glass, s.her].forEach(o => o.destroy());
+        this.showerScene = null;
+        this.script = null;
+        this.mode = 'play';
+        p.body.enable = true;
+        p.body.reset(p.x, p.y);
+        this.pose('stand');
+        this.stillSince = this.time.now;
+    }
+
     // --- Bouncing on the cabin's bed (§5.3) ---------------------------------------------------
 
     onBed() {
@@ -2343,7 +2505,9 @@ export class ShipScene extends Phaser.Scene {
     startBedJoy() {
         const p = this.player;
         const y = p.y;
-        const frames = this.anims.get('her-bed-joy').frames.map(f => f.frame.name);
+        const clip = this.anims.get(this.towel ? 'her-towel-bed-joy' : 'her-bed-joy');
+        const frames = clip.frames.map(f => f.frame.name);
+        p.setTexture(clip.frames[0].textureKey);
         this.mode = 'scripted';
         p.body.setVelocity(0, 0);
         p.body.enable = false;
@@ -2393,7 +2557,7 @@ export class ShipScene extends Phaser.Scene {
         // Never the same one twice in a row.
         const choices = IDLE.anims.filter(name => name !== this.lastIdle);
         this.idle = this.lastIdle = Phaser.Utils.Array.GetRandom(choices);
-        p.anims.play(`her-${this.idle}`);
+        p.anims.play(`${this.towel ? 'her-towel' : 'her'}-${this.idle}`);
     }
 
     // --- Ladders ---------------------------------------------------------------------------
@@ -2602,6 +2766,7 @@ export class ShipScene extends Phaser.Scene {
             r.dim?.setVisible(this.route === r.route && !this.overview);
         }
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
+        this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
         for (const cat of this.cats) {
             if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away);
         }
@@ -3025,14 +3190,24 @@ export class ShipScene extends Phaser.Scene {
             this.idle = null;
             this.idleAt = this.time.now + IDLE.firstMs;
         }
-        const key = `her-${name}`;
+        // With the towel on (after the shower), her towel clips where there is one.
+        const towel = this.towel && (this.anims.exists(`her-towel-${name}`) || this.towelFrames[name] !== undefined);
+        const key = `${towel ? 'her-towel' : 'her'}-${name}`;
         if (this.anims.exists(key)) {
             p.anims.play(key, true);
             p.anims.timeScale = speed;
         } else {
             p.anims.stop();
-            p.setFrame(this.herFrames[name]);
+            p.setTexture(towel ? 'her-towel' : 'her', (towel ? this.towelFrames : this.herFrames)[name]);
         }
+    }
+
+    // The towel round her head (cabin 8206's shower): on as she steps out, taken off and hung on the
+    // shower door's handle when she leaves the cabin (or starts again elsewhere), where it stays.
+    setTowel(on) {
+        if (this.towel && !on) this.save.towelHung = true;
+        if (on) this.save.towelHung = false;
+        this.towel = on;
     }
 
     // --- Pickups, checkpoints, hazards ---------------------------------------------------------
