@@ -4,7 +4,7 @@ import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
-import { Backdrop, HORIZON_ABOVE, HORIZON_SETTLE } from '../background.js';
+import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE } from '../background.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -113,7 +113,8 @@ export class ShipScene extends Phaser.Scene {
         // out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Behind it all,
         // the sky, the far sea and the archipelago, fixed to the screen (§5.2).
         const OUT = 2 * W;
-        this.backdrop = new Backdrop(this, { waterY: this.waterY, depth: DEPTH.sky });
+        this.farGulls = new FarGulls();
+        this.backdrop = new Backdrop(this, { waterY: this.waterY, depth: DEPTH.sky, gulls: this.farGulls });
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -1355,7 +1356,7 @@ export class ShipScene extends Phaser.Scene {
     // with window panes, in world space) is drawn; its horizon where it is outside, so the sea in
     // the windows lines up with the sea past the open decks (the user, 2026-11-08).
     addWindowView(depth) {
-        const backdrop = new Backdrop(this, { waterY: this.waterY, depth: 0 });
+        const backdrop = new Backdrop(this, { waterY: this.waterY, depth: 0, gulls: this.farGulls });
         const view = this.add.container(0, 0, backdrop.objects).setScrollFactor(0).setDepth(depth);
         const mask = this.make.graphics({ add: false }).fillStyle(0xffffff, 1);
         view.enableFilters();
@@ -2204,6 +2205,7 @@ export class ShipScene extends Phaser.Scene {
         else if (!this.overview && (this.mode === 'play' ? this.grounded : this.mode !== 'scripted')) {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
+        this.farGulls.update(dt);
         this.backdrop.update(dt, !!this.overview, this.horizonOnScreen);
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
