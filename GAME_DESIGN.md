@@ -1104,10 +1104,9 @@ Nothing blocks the start of the build. These get settled along the way:
       **which she can walk on**: from deck 12's terrace she hops the rail onto it, walks its curve
       and drops off its end (a curved floor of its own, `coverTopAt`). `?at=spinnaker`, `chapel`,
       `champs`, `court`, `sushi`, `bistro`
-- [ ] **Open: deck 11's front, after the 2025 plan** (2026-11-07): the user sailed in August 2026;
-      cruisedeckplans.com's deck 11 plan is the 2025 one (`deck11-2025`, kept in
-      `reference/web/deck11/`): suites forward with a curved hot-tub terrace, the spa further aft.
-      The game follows NCL's 2022 map (the spa forward). Revisit when the user wants to
+- [x] **Decided: deck 11's front stays as NCL's 2022 map has it** (the spa forward; the user,
+      2026-11-08). cruisedeckplans.com's 2025 plan (`deck11-2025`, kept in `reference/web/deck11/`:
+      suites forward with a curved hot-tub terrace, the spa further aft) is not followed
 - [ ] **Later: map Bumbot in again** (§4): his spots (deck 12 had none yet; the design's SUSHI sign
       secret, §5, is one idea), the finale's place, and his near-catches' tests
 - [ ] **The outside of the ship, after the user's photos and videos** (in progress, 2026-11-07,
@@ -1176,8 +1175,7 @@ Nothing blocks the start of the build. These get settled along the way:
       a glide, a flap, perched on a railing; about 12 generations), and gulls as a hazard (§5.8).
       Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
-      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: deck
-      11's front after the 2025 plan (above); the ship's areas and their progression, which doors are locked with which
+      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: the ship's areas and their progression, which doors are locked with which
       card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
