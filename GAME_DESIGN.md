@@ -1210,7 +1210,10 @@ Nothing blocks the start of the build. These get settled along the way:
       Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
       `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: the ship's areas and their progression, which doors are locked with which
-      card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
+      card (§6.2), with Bumbot mapped in again (§4); **still to decide with the user: how the ship
+      is split and which parts are locked** (when that is settled, `LOCKED_PARTS` in
+      `src/config.js` closes and dims a locked part; so far the bridge and the spa are set up for
+      it, §5.5); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
