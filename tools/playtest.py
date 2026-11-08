@@ -587,15 +587,15 @@ def scenario_linen(b):
 
 
 def scenario_bridge(b):
-    # The bridge on deck 10 (§5.3): its shut crew door stops her; E opens it; on the bridge only the
-    # bridge's piece of the ship's side is cut open, from the corridor only the corridor's.
+    # The bridge on deck 10 (§5.3): its shut crew door stops her; E opens it; its piece of the ship's
+    # side is cut open with the deck's, from either side (LOCKED_PARTS is off for now).
     shell = lambda key: b.eval(f"window.__ship.shellAlpha['{key}']")
     b.open("?reset&play")
     bridge = "window.__ship.bulkheads.find(b => b.key === '10:bridge')"
     door = b.eval(f"{bridge}.x")
     b.teleport(door + 60, floor_y(10))
     time.sleep(2.5)    # the cut-away fades over from deck 4
-    ok = check(shell("10") < 0.05 and shell("10:bridge") > 0.95, "from the corridor the bridge is out of sight",
+    ok = check(shell("10") < 0.05 and shell("10:bridge") < 0.05, "from the corridor the bridge is in sight",
                (shell("10"), shell("10:bridge")))
     b.hold("left", 0.8)
     s = b.state()
@@ -607,8 +607,8 @@ def scenario_bridge(b):
     b.hold("left", 0.9)
     time.sleep(1.0)
     s = b.state()
-    ok &= check(s["x"] < door and shell("10:bridge") < 0.05 and shell("10") > 0.95,
-                "on the bridge only the bridge is cut open", (s, shell("10"), shell("10:bridge")))
+    ok &= check(s["x"] < door and shell("10:bridge") < 0.05 and shell("10") < 0.05,
+                "on the bridge the deck is cut open too", (s, shell("10"), shell("10:bridge")))
     ok &= check(not b.eval(f"{bridge}.open"), "the door shuts behind her")
     return ok
 

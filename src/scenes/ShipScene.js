@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LONG_FALL_MARGIN, SHOWER } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
@@ -16,7 +16,7 @@ const DEPTH = {
     glassShaft: 5.15, glassCar: 5.2, inGlassCar: 5.25, glassDoors: 5.3,
     frontStairs: 5.4, onFrontStairs: 5.45, frontBalustrade: 5.5, walkFloor: 5.6,
     solid: 6, ladders: 7, liftCar: 7.4, inLift: 7.6, props: 8, exterior: 8.6,
-    poolTank: 8.66, swimmer: 8.67, poolWater: 8.68, player: 9, fx: 10,
+    poolTank: 8.66, swimmer: 8.67, poolWater: 8.68, player: 9, deckDim: 9.7, fx: 10,
 };
 
 const approach = (value, target, step) =>
@@ -284,6 +284,76 @@ export class ShipScene extends Phaser.Scene {
         });
         this.worldLayer.add([...this.backdrop.objects, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
+        this.buildDeckDim(coverW);
+    }
+
+    // The world round the deck she is on, dimmed as round a room she is in (the user, 2026-11-08),
+    // walls at the deck's ends included. One fixed panel for everything past the decks, and each
+    // deck's opening (its own piece of shell, a room's, and the strip `wall` wide each way where
+    // the two meet, with the door between them) dimmed as far as that part of the shell is closed.
+    buildDeckDim(wall) {
+        const far = 4000;
+        const panel = () => {
+            const g = this.add.graphics().setDepth(DEPTH.deckDim).setAlpha(0).setVisible(false);
+            this.worldLayer.add(g);
+            return g.fillStyle(0x0d0b14, ROOM_DIM);
+        };
+        const decks = {};
+        for (const [key, list] of Object.entries(this.shellTiles)) {
+            const deck = parseInt(key, 10), floor = this.deckFloors[deck];
+            const air = list.filter(t => t.y !== floor);
+            const floorAt = new Set(list.filter(t => t.y === floor).map(t => t.x));
+            let a = Math.min(...air.map(t => t.x)), b = Math.max(...air.map(t => t.x));
+            // An open part of the deck has a floor and no shell over it: it runs on to the floor's end.
+            while (floorAt.has(a - 1)) a--;
+            while (floorAt.has(b + 1)) b++;
+            (decks[deck] ||= []).push({ keys: [key], x0: a * 16, x1: (b + 1) * 16, y0: Math.min(...air.map(t => t.pixelY)), y1: (floor + 1) * 16 });
+        }
+        const pieces = [], outer = panel();
+        const bands = Object.values(decks).map(parts => {
+            parts.sort((p, q) => p.x0 - q.x0);
+            for (let i = parts.length - 1; i > 0; i--) {
+                const [l, r] = [parts[i - 1], parts[i]];
+                parts.push({ keys: [...l.keys, ...r.keys], x0: r.x0 - wall, x1: r.x0 + wall, y0: r.y0, y1: r.y1 });
+                l.x1 -= wall;
+                r.x0 += wall;
+            }
+            pieces.push(...parts);
+            return { x0: Math.min(...parts.map(p => p.x0)), x1: Math.max(...parts.map(p => p.x1)), y0: parts[0].y0, y1: parts[0].y1 };
+        }).sort((p, q) => p.y0 - q.y0);
+        for (const { x0, x1, y0, y1 } of bands) {
+            outer.fillRect(x0 - far, y0, far, y1 - y0);
+            outer.fillRect(x1, y0, far, y1 - y0);
+        }
+        const [top, bottom] = [bands[0].y0, bands[bands.length - 1].y1];
+        const [left, right] = [Math.min(...bands.map(b => b.x0)) - far, Math.max(...bands.map(b => b.x1)) + far];
+        outer.fillRect(left, top - far, right - left, far);
+        outer.fillRect(left, bottom, right - left, far);
+        for (const p of pieces) {
+            p.gfx = panel().fillRect(p.x0, p.y0, p.x1 - p.x0, p.y1 - p.y0);
+            p.dim = 1;
+        }
+        this.deckDim = { outer, pieces, shown: 0 };
+    }
+
+    // Each frame, with the cut-away. Never over her: a piece she is in stays clear (she is drawn
+    // under the dim, so that what stands in front of her on other decks goes dark with the rest).
+    updateDeckDim(dt) {
+        const d = this.deckDim, p = this.player;
+        // Out in the open, with no ship's side beside her at that deck's height, nothing is dimmed
+        // (the user, 2026-11-08).
+        const open = this.viewDeck !== null
+            && !this.exteriorLayer.getTileAt(Math.floor(p.x / 16), this.deckFloors[Math.round(this.viewDeck)] - 4);
+        const on = this.route === 'inside' && this.viewDeck !== null && !open ? 1 : 0;
+        const smooth = dt > 0 && this.route === 'inside';
+        d.shown = smooth ? approach(d.shown, on, dt * 6) : on;
+        d.outer.setVisible(d.shown > 0).setAlpha(d.shown);
+        for (const c of d.pieces) {
+            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1;
+            const dim = hers ? 0 : Math.min(...c.keys.map(k => this.shellAlpha[k]));
+            c.dim = smooth ? approach(c.dim, dim, dt * 8) : dim;
+            c.gfx.setVisible(d.shown > 0 && c.dim > 0).setAlpha(d.shown * c.dim);
+        }
     }
 
     buildObjects() {
@@ -2736,13 +2806,14 @@ export class ShipScene extends Phaser.Scene {
         } else {
             this.viewDeck = approach(this.viewDeck, target, dt * 4);
         }
-        // In a room with its own shell (the bridge), only it is cut away; elsewhere it stays closed.
+        // In a room with its own shell (the bridge), only it is cut away; elsewhere it stays closed
+        // (when the parts are locked: `LOCKED_PARTS`; for now it opens with its deck).
         const room = this.route !== 'inside' || this.overview ? null : this.shellRooms.find(r => p.x >= r.x0 && p.x < r.x1
             && p.y <= this.deckFloors[r.deck] * 16 + 4 && p.y > this.deckFloors[r.deck] * 16 - this.deckPitch);
         for (const deck of Object.keys(this.shellTiles)) {
             let alpha = this.viewDeck === null ? 1 : Phaser.Math.Clamp(Math.abs(parseInt(deck, 10) - this.viewDeck), 0, 1);
             const ownRoom = this.shellRooms.find(r => r.key === deck);
-            if (ownRoom ? ownRoom !== room : room && String(room.deck) === deck) alpha = 1;
+            if (LOCKED_PARTS.on && (ownRoom ? ownRoom !== room : room && String(room.deck) === deck)) alpha = 1;
             // A room's shell and its deck's swap with a quick fade as she goes through its door.
             if (dt > 0 && (ownRoom || this.shellRooms.some(r => String(r.deck) === deck))) {
                 alpha = approach(this.shellAlpha[deck], alpha, dt * 6);
@@ -2779,7 +2850,7 @@ export class ShipScene extends Phaser.Scene {
         }
         const onDeck = this.deckOfY(p.y);
         for (const { deck, img } of this.leaningRailings || []) img.setAlpha(onDeck === deck ? 1 : 1 - shown(deck));
-
+        this.updateDeckDim(dt);
     }
 
     // --- Escape trunks (§5.1) -----------------------------------------------------------------
