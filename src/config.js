@@ -55,6 +55,19 @@ export const BED_JOY = {
     air: 0.7,
 };
 
+// Cabin 8206's shower (§5.3, the user, 2026-11-08): E at its door and she showers, singing (small
+// notes rise, no sound), and comes out with a towel round her head, worn until she leaves the cabin.
+// Times in ms: her stepping in or out, the shower; how often a note and a puff of steam rise.
+export const SHOWER = {
+    walkSpeed: 70,       // px/s, to the opening
+    hangMs: 700,         // on her way out: the towel from her head to the door's handle, held this long
+    stepMs: 320,
+    showerMs: 4500,
+    noteEveryMs: 520,
+    steamEveryMs: 140,
+    reach: 14,           // how far past the door's sides she can be to use it
+};
+
 // Elevators (§5.1): the car's speed between decks and how long the doors take to slide.
 export const LIFT = {
     speed: 200,         // px/s, about 1.4 decks a second

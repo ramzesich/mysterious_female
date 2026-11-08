@@ -952,7 +952,7 @@ Nothing blocks the start of the build. These get settled along the way:
       cart; **E at it and she is inside** (a third route, like the promenade's): the room, drawn by hand
       from her photo, shows where the corridor was, the deck around it dimmed almost to black (the
       user, 2026-11-06, as deck 9's linen room; it was first shown in a hole cut in the ship's side)
-      (`tools/draw_cabin.py`: mirrored wardrobe, the door back out, the wood desk unit, TV and
+      (`tools/draw_cabin.py`: mirrored wardrobe (the shower room's door since 2026-11-08), the door back out, the wood desk unit, TV and
       pouf, the window in its wood surround with grey curtains, the grey sofa with teal cushions,
       the painting over it, the bed with its teal runner). The user's corrections: the door stands
       on the same line as the wardrobe and desk; **the painting is the one in her photo**, cropped
@@ -1169,6 +1169,27 @@ Nothing blocks the start of the build. These get settled along the way:
       lost), and a stray white wedge at deck 4's forward end (the bow plating's outline crossed
       itself) is gone
 - [x] **Far gulls** (2026-11-08, approved by the user): drawn in code, crossing the sky (§5.2)
+- [x] **Cabin 8206's shower, a secret** (2026-11-08, approved by the user): the mirrored wardrobe by
+      the cabin's door is now **the shower room's door**, frosted glass in an aluminium frame, a
+      lighter band across its top. **E at it**: it slides open, she walks to the opening, turns her
+      back and steps in; the door closes and through its glass **she washes her hair** (lather on
+      it), her head and hands softly seen through the top band, **from her chin down only a faint
+      body-coloured silhouette**, never her clothes (the user); steam curls up over the door and
+      **small notes rise as she sings**, no sound; 4.5 s (`SHOWER` in `src/config.js`). She steps
+      out facing us **with a towel wrapped round her head**, and keeps it in the cabin (walking,
+      jumping, both idles, the bed bounce). **On her way out (E at the cabin's door) the towel goes
+      from her head onto the shower door's handle**, a moment to see it, and she leaves as usual
+      (she doesn't walk over: the user); it stays there (in the save) until her next shower,
+      sliding aside with the door, and goes back to her head as she steps out. A respawn elsewhere
+      hangs it there too. No reward: the scene is the secret. Art (about 32 generations):
+      PixelLab's "Towel turban" state of her character (10; its profile's far eye and lower face
+      mended by hand to match hers, `assets/source/her-towel/rotations/east.png`, PixelLab's as
+      `east-raw.png`), her run and jump redone with the same skeleton-v3 templates, her idles and
+      bed bounce redone with their own poses read off their frames (`tools/estimate_skeleton.py`),
+      the shower clip (skeleton-v3 custom poses facing us); sheet `assets/sprites/her-towel.png`.
+      The door, the stall, the slid-open door, the see-through glass and the hung towel drawn by
+      hand (`tools/draw_cabin.py`). Also: the window seen through the cabin's open door, from the
+      corridor, shows the live sea (§5.2)
 - [ ] **Start the next session here: the outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;

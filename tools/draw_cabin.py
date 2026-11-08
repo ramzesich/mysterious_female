@@ -13,6 +13,7 @@ assets/ship/cabin-8206.png and assets/ship/cabin-door-open.png. Run from the rep
     python tools/draw_cabin.py [--preview out.png]
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -31,7 +32,6 @@ WOOD, WOOD_DARK, WOOD_LIGHT = "#cd683d", "#9e4539", "#e6904e"
 CARPET, CARPET_FLECK, CARPET_DARK = "#9babb2", "#7f708a", "#8e98a3"
 WHITE, PALE, GREY, SLATE = "#ffffff", "#c7dcd0", "#9babb2", "#625565"
 TEAL, TEAL_LIGHT = "#0b5e65", "#0b8a8f"
-SKY, SEA, SEA_DARK, SHORE = "#8fd3ff", "#4d65b4", "#484a77", "#547e64"
 
 
 BED_TOP = 96               # the mattress's top, where she stands on the bed (ShipScene's CABIN.bed)
@@ -62,6 +62,101 @@ def painting():
     return art
 
 
+# The shower room's door (x0, y0, x1, y1 in the room): a frosted glass door in an aluminium frame,
+# a chrome bar handle. Its pieces for the game's shower scene (ShipScene's CABIN.shower) are drawn
+# at its size: the stall's inside, tiled, its shower head over her; the door slid open over it;
+# and the frosted glass alone, see-through, laid over her while she showers.
+SHOWER = (6, 44, 40, FLOOR - 5)
+# Over her while she showers the glass is frosted thick from her chin down (BAND, px from the
+# door's top: her chin, standing on the stall's tray), only a faint figure showing through, and
+# lightly above it, her head and hands softly seen (the user, 2026-11-08: not her clothes).
+BAND = 33
+FROST, FROST_TOP = 232, 115
+HANDLE = (26, 34)        # the handle bar's top, in the door's piece; the towel hangs over it
+TOWEL = (22, 35)
+
+
+def shower_size():
+    x0, y0, x1, y1 = SHOWER
+    return x1 - x0 + 1, y1 - y0 + 1
+
+
+def shower_inside():
+    w, h = shower_size()
+    im = Image.new("RGBA", (w, h), "#eef3f4")
+    d = ImageDraw.Draw(im)
+    for y in range(4, h - 3, 7):                                   # tiles, white, pale grout
+        d.line([(2, y), (w - 3, y)], fill=PALE)
+    for x in range(5, w - 2, 7):
+        d.line([(x, 2), (x, h - 4)], fill=PALE)
+    d.rectangle([w - 9, 2, w - 8, 12], fill=GREY)                  # the shower's pipe and head
+    d.rectangle([w - 15, 11, w - 8, 12], fill=GREY)
+    d.rectangle([w - 18, 12, w - 13, 14], fill="#7f708a")
+    d.rectangle([4, 40, 12, 41], fill=GREY)                        # a shelf, a bottle on it
+    d.rectangle([6, 34, 8, 39], fill=TEAL)
+    d.rectangle([7, 33, 7, 33], fill=WHITE)
+    d.rectangle([2, h - 3, w - 3, h - 1], fill=GREY)               # the tray
+    d.rectangle([0, 0, w - 1, h - 1], outline=SLATE)
+    return im
+
+
+def shower_glass(alpha=255, slide=0, clear=None):
+    """The door: frame and handle solid, its glass `alpha` opaque, a lighter band across its top
+    (`clear` opaque, `alpha` if left out) down to BAND; `slide` px to the left."""
+    w, h = shower_size()
+    clear = alpha if clear is None else clear
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    a, b = 2 - slide, w - 3 - slide                                # the glass panel's sides
+    rgb = lambda c: tuple(int(c[i:i + 2], 16) for i in (1, 3, 5))
+    d.rectangle([max(2, a), BAND, b, h - 1], fill=(*rgb(PALE), alpha))
+    d.rectangle([max(2, a), 2, b, BAND - 1], fill=(*rgb("#e3eeea"), clear))
+    d.rectangle([max(2, a), BAND, b, BAND], fill=(*rgb(GREY), max(alpha, 200)))   # the band's edge
+    for i in range(0, 45, 14):                                     # the glints, on the frosted part
+        x = a + 4
+        if x >= 2:
+            d.line([(x, BAND + 12 + i), (x + 9, BAND + 3 + i)], fill=(255, 255, 255, max(alpha, 200)))
+    hx, hy = HANDLE
+    d.rectangle([hx - slide, hy, hx - slide, hy + 16], fill=WHITE)  # the handle
+    d.rectangle([hx + 1 - slide, hy, hx + 1 - slide, hy + 16], fill=GREY)
+    d.rectangle([max(2, a), 2, max(2, a), h - 1], fill=GREY)       # the panel's edges
+    d.rectangle([b, 2, b, h - 1], fill=GREY)
+    d.rectangle([0, 0, w - 1, h - 1], outline=GREY)                # the frame, round the opening
+    d.rectangle([1, 1, w - 2, 1], fill="#c9d1d6")
+    return im
+
+
+def towel():
+    """Her towel hung over the door's handle (the user, 2026-11-08): white, folded over the bar,
+    its two ends hanging, the back one a little longer, its folds shaded. Its top-left corner goes
+    at TOWEL in the door's piece."""
+    im = Image.new("RGBA", (9, 19), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.rectangle([1, 2, 7, 17], fill=WHITE)                         # the front end
+    d.rectangle([2, 0, 6, 1], fill=WHITE)                          # the fold over the bar
+    d.rectangle([1, 1, 7, 1], fill=WHITE)
+    d.rectangle([7, 3, 8, 18], fill="#e3eeea")                     # the back end, longer, in shade
+    for x in (3, 5):                                               # folds
+        d.line([(x, 4), (x, 16)], fill=PALE)
+    d.line([(1, 17), (7, 17)], fill=PALE)                          # its hem
+    d.line([(1, 2), (1, 17)], fill=GREY)
+    d.line([(8, 3), (8, 18)], fill=GREY)
+    d.line([(2, 0), (6, 0)], fill=GREY)
+    return im
+
+
+def shower_pieces():
+    """The scene's pieces, washed like the room."""
+    inside = shower_inside()
+    opened = shower_inside()
+    opened.alpha_composite(shower_glass(slide=18))
+    glass = shower_glass(FROST, clear=FROST_TOP)
+    hung = towel()
+    for piece in (inside, opened, glass, hung):
+        wash(piece, 0, piece.height)
+    return {"inside": inside, "open": opened, "glass": glass, "towel": hung}
+
+
 def interior():
     im = Image.new("RGBA", (W, H), WALL)
     d = ImageDraw.Draw(im)
@@ -84,15 +179,11 @@ def interior():
     r(0, FLOOR + 4, W - 1, H - 2, CARPET_DARK)
     r(0, H - 1, W - 1, H - 1, "#6f7882")
 
-    # A mirrored wardrobe by the door.
-    r(6, 30, 40, FLOOR - 5, WOOD_DARK)
-    r(8, 32, 38, FLOOR - 5, WOOD)
-    for x0 in (10, 24):
-        r(x0, 34, x0 + 12, FLOOR - 8, PALE)
-        for i in range(0, 60, 14):
-            d.line([(x0 + 1, 60 + i), (x0 + 8, 52 + i)], fill=WHITE)
-        r(x0 + 12 if x0 == 10 else x0, 34, x0 + 12 if x0 == 10 else x0, FLOOR - 8, GREY)
-    r(22, 70, 23, 76, GREY)
+    # The shower room's door by the cabin's door, closed: frosted glass (the user, 2026-11-08: E
+    # opens it and she showers; it was a mirrored wardrobe).
+    closed = shower_inside()
+    closed.alpha_composite(shower_glass())
+    im.alpha_composite(closed, SHOWER[:2])
 
     # The door back out to the corridor (its inside face): wood, a lever, the escape plan, and the
     # "do not disturb" card on the handle.
@@ -207,9 +298,11 @@ def interior():
 
 def open_door():
     """The cabin door, propped open, from the corridor: its frame from the atlas's cabin door, the
-    leaf swung in against the left, the cabin beyond: the wall, the window's light, the bed."""
+    leaf swung in against the left, the cabin beyond: the wall, the window, the bed. The window's
+    glass is left clear: the game shows the live sea and sky behind it (§5.2, 2026-11-08)."""
     atlas = Image.open(GAME / "ship.png").convert("RGBA")
-    door = atlas.crop((0, 0, 34, 74))                              # door-cabin (see build_ship_art)
+    f = json.loads((GAME / "ship.json").read_text())["frames"]["door-cabin"]["frame"]
+    door = atlas.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))   # see build_ship_art
     px = door.load()
     # The leaf: the door's own wood inside the frame.
     leaf = [(x, y) for y in range(74) for x in range(34) if px[x, y][:3] == (0xcd, 0x68, 0x3d)]
@@ -220,8 +313,7 @@ def open_door():
     r(x0, y0, x1, 73, WALL)
     r(x0, y0, x1, y0 + 2, CEILING)
     r(x0 + 9, y0 + 12, x1, y0 + 34, WOOD)                         # the window, at the far wall
-    r(x0 + 11, y0 + 14, x1, y0 + 24, SKY)
-    r(x0 + 11, y0 + 25, x1, y0 + 32, SEA)
+    r(x0 + 11, y0 + 14, x1, y0 + 32, (0, 0, 0, 0))
     r(x0 + 7, y0 + 10, x0 + 10, y0 + 40, SLATE)                   # a curtain
     r(x0 + 6, y0 + 50, x1, 73, WHITE)                             # the foot of the bed
     r(x0 + 12, y0 + 50, x0 + 17, 73, TEAL)
@@ -242,6 +334,9 @@ if __name__ == "__main__":
     door.save(SOURCE / "door-open.png")
     room.save(GAME / "cabin-8206.png")
     door.save(GAME / "cabin-door-open.png")
+    for name, piece in shower_pieces().items():
+        piece.save(SOURCE / f"shower-{name}.png")
+        piece.save(GAME / f"cabin-shower-{name}.png")
     if "--preview" in sys.argv:
         out = Path(sys.argv[sys.argv.index("--preview") + 1])
         sheet = Image.new("RGBA", (W + 50, H), "#2e222f")

@@ -69,10 +69,38 @@ HER = {
         # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
         # height, a knee coming up. The game picks the frame by how far she has risen.
         "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],
+        # In cabin 8206's shower, seen softened through its frosted door (GAME_DESIGN.md §5.3):
+        # facing us, washing her hair, lather on it; skeleton-v3 custom poses.
+        "shower": [(f"shower/{i}.png", "feet") for i in range(6)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.
     "baseline": "idle/0.png",
+}
+
+
+# Bumbusik after her shower in cabin 8206 (GAME_DESIGN.md §5.3): a towel wrapped round her head
+# like a turban, until she leaves the cabin. Only what she does there: PixelLab's "Towel turban"
+# state of her character, its profile's face mended by hand to match hers (rotations/east.png;
+# PixelLab's is east-raw.png). The run and the jump are the same skeleton-v3 templates as hers; the
+# idles and the bed bounce are skeleton-v3 with her own clips' poses, read off their frames.
+HER_TOWEL = {
+    "name": "her-towel",
+    "cell": 84,
+    "remap": HER["remap"],
+    "frames": {
+        "stand": [("rotations/east.png", "keep")],
+        "idle-tap": [(f"idle-tap/{i}.png", "feet") for i in range(8)],
+        "idle-look": [(f"idle-look/{i}.png", "feet") for i in range(8)],
+        "run": [(f"run/{i}.png", "keep") for i in range(8)],
+        "rise": [("jump/3.png", "feet")],
+        "apex": [("jump/4.png", "feet")],
+        "fall": [("jump/5.png", "feet")],
+        "front": [("rotations/south.png", "keep")],
+        "bed-joy": [(f"bed-bounce/{i}.png", "feet") for i in range(8)],
+        "back": [("rotations/north.png", "keep")],
+    },
+    "baseline": "idle-tap/0.png",
 }
 
 
@@ -159,4 +187,5 @@ def build(spec):
 
 if __name__ == "__main__":
     build(HER)
+    build(HER_TOWEL)
     build(BUMBOT)
