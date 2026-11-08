@@ -142,8 +142,9 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
-  user works from more than one computer, so progress lives in the repo (design doc, this file,
-  commits), never only in local memory or uncommitted files.
+  user works on one computer but often starts new sessions, and power outages have cut sessions
+  off (2026-11-07), so progress lives in the repo (design doc, this file, commits, pushed to
+  `main` once approved), never only in local memory or uncommitted files.
 - Design is settled by numbered question lists; the user answers by number.
 - **Before furnishing a deck, check NCL's plan** (`reference/norwegian-sun-ship-map.pdf`: its
   profile lists each deck's rooms by part of the ship; `pdftotext -layout` or PyMuPDF's words) and
