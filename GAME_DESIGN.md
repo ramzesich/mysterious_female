@@ -329,10 +329,15 @@ there; they only remind her he's on board.
   white corners in a clearing or a white lighthouse with a red band on a bare rock, surf at their
   feet. The far sea fades into the haze at the horizon, faint glints growing toward the near sea.
   Fair-weather clouds, heaps of round puffs with lumpy undersides, half see-through so they sit
-  back in the sky, standing well up in it. **The horizon stays at one height on the screen** (43%
-  from the top, her eye level), so it shows past the railings, over the open decks and through the
+  back in the sky, standing well up in it. **The horizon** is fixed to the screen from moment to
+  moment, far away as it is: while she is in the air it holds still, so a jump doesn't move it;
+  while she is on her feet (or on stairs, ladders, lifts) it glides to its place **58 px over the
+  floor she stands on**, about the top of her head, so the camera's slack never leaves it out of
+  place (the user, 2026-11-08). It shows past the railings, over the open decks and through the
   glass; the islands drift slowly aft (the far layer slower), shift a little as she runs, the
-  clouds slower still. **In the outside view** the horizon lies on the waterline, the ship and the
+  clouds slower still. **The sea-view windows show the same live background** (the bridge, the
+  Spinnaker, the dining rooms, the buffet, cabin 8206's picture window): a copy of it cut to their
+  panes, its horizon level with the sea outside, curtains, mullions and glints over the glass. **In the outside view** the horizon lies on the waterline, the ship and the
   horizon low in the frame (lowered by half the ship's height), the islands and clouds kept at a
   visible size on the screen, the clouds half way up the sky. **Decided**
 
@@ -1156,10 +1161,13 @@ Nothing blocks the start of the build. These get settled along the way:
       fall (`LONG_FALL_MARGIN` 56, was 24: the user fell through at deck 9's stern)
 - [x] **The background** (2026-11-08, approved by the user): the Baltic archipelago, the far sea,
       the clouds, the horizon fixed on the screen, the outside view's framing (§5.2)
+- [x] **The windows** (2026-11-08, approved by the user): every sea-view window shows the live
+      background, level with the sea outside; the horizon tied to her floor, still through jumps;
+      fixed with it: the outside view now returns with the camera as it was (its follow offset was
+      lost), and a stray white wedge at deck 4's forward end (the bow plating's outline crossed
+      itself) is gone
 - [ ] **Start the next session here: the outside of the ship goes on** (the user, 2026-11-07,
-      answers by number; (4) the sea and (5)-(6) the background are done): (7) cabin
-      8206's window and the other sea-view windows (the dining rooms, the bridge, the Spinnaker)
-      show the same live background; (8) gulls: far ones drawn in code and a few closer ones
+      answers by number; (4) the sea, (5)-(6) the background and (7) the windows are done): (8) gulls: far ones drawn in code and a few closer ones
       generated after the user's herring gull photo (about 12 generations). The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
       `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: deck

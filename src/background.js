@@ -14,7 +14,12 @@ const SKY_FADE = 220;             // px over the horizon the sky takes to deepen
 const SEA_FAR = '#9fd2f0';        // the sea at the horizon, in the haze
 const SEA_NEAR = '#5aa8e6';       // ...and further down, where it meets the near sea's first row
 const SEA_FADE = 70;
-export const HORIZON = 0.43;      // the horizon's height on the screen, from the top (her eyes)
+// Where the horizon settles: this high over the floor she last stood on, about the top of her head
+// (the user, 2026-11-08: a little over her eyes). It is fixed to the screen from moment to moment,
+// far away as it is, so a jump hardly moves it; but it glides to that height over her floor
+// (`HORIZON_SETTLE` s to go most of the way), so the camera's slack never leaves it out of place.
+export const HORIZON_ABOVE = 58;
+export const HORIZON_SETTLE = 1.0;
 const OUTSIDE_SIZE = { islands: 1.5, clouds: 1.2 };
 
 // Each layer: [texture height, how far into the haze (0-1), drift aft px/s, share of her running,
@@ -227,8 +232,9 @@ export class Backdrop {
         this.objects = [this.skyTop, this.sky, this.clouds, this.sea, this.seaDeep, this.ripples, ...this.layers.map(l => l.s)];
     }
 
-    // Lay it all out for this frame. `outside`: the outside view, the horizon on the waterline.
-    update(dt, outside = false) {
+    // Lay it all out for this frame, fixed to the camera: the horizon `horizonOnScreen` px from the
+    // top of the screen, or in the outside view (`outside`) on the waterline.
+    update(dt, outside = false, horizonOnScreen = 0) {
         this.time += dt;
         const cam = this.scene.cameras.main;
         const z = cam.zoom, W = cam.width, H = cam.height, cx = W / 2, cy = H / 2;
@@ -236,7 +242,7 @@ export class Backdrop {
         // the world spot for a screen spot, and the screen's size in world pixels.
         const wx = sx => cx + (sx - cx) / z, wy = sy => cy + (sy - cy) / z;
         const left = wx(0), top = wy(0), width = W / z, bottom = wy(H);
-        const horizonOnScreen = outside ? (this.waterY - cam.scrollY - cy) * z + cy : H * HORIZON;
+        if (outside) horizonOnScreen = (this.waterY - cam.scrollY - cy) * z + cy;
         const hy = Math.round(wy(horizonOnScreen));
 
         // Zoomed right out, the sky fades over most of its height, not into a thin line.
