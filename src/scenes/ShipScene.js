@@ -4,6 +4,7 @@ import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
+import { Backdrop } from '../background.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -108,12 +109,11 @@ export class ShipScene extends Phaser.Scene {
         const H = map.heightInPixels;
         const tiles = map.addTilesetImage('placeholder', 'tiles');
 
-        // The sky and the sea reach far past the map on every side, so the outside view (O), zoomed
-        // right out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Over the
-        // sky's gradient, its top colour.
+        // The sea reaches far past the map on every side, so the outside view (O), zoomed right
+        // out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Behind it all,
+        // the sky, the far sea and the archipelago, fixed to the screen (§5.2).
         const OUT = 2 * W;
-        const sky = this.add.image(-OUT, 0, 'sky').setOrigin(0).setDisplaySize(W + 2 * OUT, this.waterY).setDepth(DEPTH.sky);
-        const skyTop = this.add.rectangle(-OUT, -OUT, W + 2 * OUT, OUT, 0x5fb8f0).setOrigin(0).setDepth(DEPTH.sky);
+        this.backdrop = new Backdrop(this, { waterY: this.waterY, depth: DEPTH.sky });
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -278,7 +278,7 @@ export class ShipScene extends Phaser.Scene {
             bowX: Math.min(...hullCols) * 16, sternX: (Math.max(...hullCols) + 1) * 16,
             depth: DEPTH.exterior + 0.25, front: DEPTH.exterior + 0.3,     // the hull's foot under water
         });
-        this.worldLayer.add([sky, skyTop, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+        this.worldLayer.add([...this.backdrop.objects, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
@@ -1679,7 +1679,13 @@ export class ShipScene extends Phaser.Scene {
         cam.removeBounds();
         ov.fit = this.scale.width / (this.map.widthInPixels * 0.94);
         cam.setZoom(ov.fit);
-        cam.centerOn(this.map.widthInPixels / 2, this.waterY - 4 * this.deckPitch);
+        // The ship and the horizon low in the frame, by half the ship's height (waterline to the
+        // funnel's top), so the sky and its clouds have room over it (the user, 2026-11-08).
+        if (this.shipTop === undefined) {
+            this.shipTop = this.waterY;
+            this.solidLayer.forEachTile(t => { if (t.index > 0) this.shipTop = Math.min(this.shipTop, t.pixelY); });
+        }
+        cam.centerOn(this.map.widthInPixels / 2, this.waterY - 4 * this.deckPitch - (this.waterY - this.shipTop) / 2);
         ov.wheel = (pointer, objects, dx, dy) => this.zoomOverview(dy > 0 ? 1 / 1.25 : 1.25, pointer);
         this.input.on('wheel', ov.wheel);
         this.updateCutaway(1);
@@ -2161,6 +2167,7 @@ export class ShipScene extends Phaser.Scene {
         // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
         // the outside view.
         this.seaView.update(Math.min(delta, 50) / 1000);
+        this.backdrop.update(Math.min(delta, 50) / 1000, !!this.overview);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();

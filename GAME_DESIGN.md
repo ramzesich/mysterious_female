@@ -323,6 +323,18 @@ there; they only remind her he's on board.
   up into the wake** (the user: not cut off square); a bow wave heaped against the stem, with
   spray; the wake streaming aft from the stern, widening and fading. All of it streams toward the
   stern, also in the outside view (O). **Decided**
+- **The background, drawn in code** (`src/background.js`; approved by the user 2026-11-08): a
+  **Baltic archipelago** in two layers far away in the haze, the far one smaller and paler: low
+  smooth granite skerries, most under a dense dark pine forest, now and then a red cottage with
+  white corners in a clearing or a white lighthouse with a red band on a bare rock, surf at their
+  feet. The far sea fades into the haze at the horizon, faint glints growing toward the near sea.
+  Fair-weather clouds, heaps of round puffs with lumpy undersides, half see-through so they sit
+  back in the sky, standing well up in it. **The horizon stays at one height on the screen** (43%
+  from the top, her eye level), so it shows past the railings, over the open decks and through the
+  glass; the islands drift slowly aft (the far layer slower), shift a little as she runs, the
+  clouds slower still. **In the outside view** the horizon lies on the waterline, the ship and the
+  horizon low in the frame (lowered by half the ship's height), the islands and clouds kept at a
+  visible size on the screen, the clouds half way up the sky. **Decided**
 
 ### 5.3 The reference ship — Norwegian Sun
 
@@ -1142,12 +1154,10 @@ Nothing blocks the start of the build. These get settled along the way:
       drawn in code (§5.2). With it: the upright railings at deck 7's ends are in front of her; a
       jump from a deck's end bulwark (32px over its floor) down one deck no longer counts as a long
       fall (`LONG_FALL_MARGIN` 56, was 24: the user fell through at deck 9's stern)
-- [ ] **Start the next session here: the outside of the ship goes on, with the background** (the
-      user, 2026-11-07, answers by number; (4), the sea, is done): (5) the background is the
-      **Baltic archipelago** (low rocky islands, pines, red cottages, lighthouses); (6) far away
-      and washed out, drifting slowly aft as the ship sails, a little parallax when she runs, the
-      horizon at a fixed height on screen so it shows through the open decks, the promenade and
-      the windows, clouds drifting; in the outside view the horizon on the waterline; (7) cabin
+- [x] **The background** (2026-11-08, approved by the user): the Baltic archipelago, the far sea,
+      the clouds, the horizon fixed on the screen, the outside view's framing (§5.2)
+- [ ] **Start the next session here: the outside of the ship goes on** (the user, 2026-11-07,
+      answers by number; (4) the sea and (5)-(6) the background are done): (7) cabin
       8206's window and the other sea-view windows (the dining rooms, the bridge, the Spinnaker)
       show the same live background; (8) gulls: far ones drawn in code and a few closer ones
       generated after the user's herring gull photo (about 12 generations). The whole ship:

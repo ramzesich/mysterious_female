@@ -45,7 +45,7 @@ A controller is detected once a button is pressed on it.
 | Path | What |
 |---|---|
 | `index.html`, `style.css` | Page shell |
-| `src/` | The game: `main.js` (Phaser config), `scenes/`, controls, sound, save, the sea (`sea.js`), tuning in `config.js` |
+| `src/` | The game: `main.js` (Phaser config), `scenes/`, controls, sound, save, the sea (`sea.js`), the far background (`background.js`), tuning in `config.js` |
 | `vendor/phaser.min.js` | Phaser 4.2.1, vendored (no npm, no build) |
 | `maps/ship.json` | The ship map, Tiled JSON format |
 | `assets/tiles/placeholder.png` | Placeholder tileset |
