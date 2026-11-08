@@ -21,6 +21,7 @@ truth**: read the relevant section before any design or content work, and record
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (no spots placed for now: §4) |
 | `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2) |
+| `src/background.js` | The far background, drawn in code: the Baltic archipelago, the far sea, the clouds, fixed to the screen and laid out each frame, the horizon settling over her floor (`HORIZON_ABOVE`); in the outside view on the waterline. The sea-view windows show a masked copy of it (`addWindowView()` in ShipScene) (§5.2) |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
@@ -124,6 +125,16 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
   its floor: a fall rule's margin must cover anything she can stand on (`LONG_FALL_MARGIN`; the user
   fell through at deck 9's stern bulwark). A headless sweep of jumps from many spots finds such
   "sometimes" bugs fast.
+- **Phaser 4 has no `setMask` in WebGL**: use the Mask filter, `obj.enableFilters();
+  obj.filters.internal.addMask(gfx)`, with `gfx` from `this.make.graphics({ add: false })` in world
+  space (it is redrawn each frame). The windows' live view is a container masked that way.
+- `cam.startFollow()` clears the follow offset: set `setFollowOffset(0, HALF)` again after it (the
+  outside view lost it, and the camera sat half her height low after it).
+- `Graphics.fillPoints` can't fill an outline that crosses itself: it draws stray triangles
+  elsewhere (a white wedge over deck 4's corridor came from the bow plating's outline).
+- To tell whether a glitch is new, shoot the same spot on `main` from a worktree
+  (`git worktree add <temp> main`, run that copy's `tools/playtest.py` helpers); to find which
+  object draws a pixel, hide groups of objects in a playtest script and bisect.
 - Things drawn over the ship's side straddling the edge of a cut-away (a room's piece of shell, a
   deck's end, the fixed stern plating) are skipped by `span_owner()`: end runs of windows short of
   such edges, or draw a band piece by piece.
@@ -131,8 +142,9 @@ Lessons learned (2026-11-07, deck 12, doors, the outside):
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
-  user works from more than one computer, so progress lives in the repo (design doc, this file,
-  commits), never only in local memory or uncommitted files.
+  user works on one computer but often starts new sessions, and power outages have cut sessions
+  off (2026-11-07), so progress lives in the repo (design doc, this file, commits, pushed to
+  `main` once approved), never only in local memory or uncommitted files.
 - Design is settled by numbered question lists; the user answers by number.
 - **Before furnishing a deck, check NCL's plan** (`reference/norwegian-sun-ship-map.pdf`: its
   profile lists each deck's rooms by part of the ship; `pdftotext -layout` or PyMuPDF's words) and

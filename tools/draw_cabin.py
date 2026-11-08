@@ -135,18 +135,12 @@ def interior():
     r(105, 104, 119, 107, TEAL)
     r(106, 104, 118, 104, TEAL_LIGHT)
 
-    # The picture window in a wood surround: the sky, a far shore, the sea; grey curtains.
+    # The picture window in a wood surround, grey curtains. Its glass is left clear: the game shows
+    # the live sea and sky behind it (WINDOW in ShipScene.js's CABIN; §5.2, 2026-11-08).
     r(136, 30, 184, 80, WOOD_DARK)
     r(138, 32, 182, 78, WOOD)
     d.rounded_rectangle([141, 35, 179, 75], radius=4, fill=WHITE)
-    d.rounded_rectangle([143, 37, 177, 73], radius=3, fill=SKY)
-    r(143, 37, 177, 46, "#c7f0ff")
-    r(144, 55, 176, 56, SHORE)
-    r(150, 54, 160, 54, SHORE)
-    d.rounded_rectangle([143, 57, 177, 73], radius=3, fill=SEA)
-    r(143, 57, 177, 57, "#8fd3ff")
-    for y in (61, 66, 70):
-        r(146 + y % 5, y, 156 + y % 5, y, SEA_DARK)
+    d.rounded_rectangle([143, 37, 177, 73], radius=3, fill=(0, 0, 0, 0))
     r(159, 36, 161, 74, PALE)                                     # the window's middle bar
     r(130, 26, 190, 27, GREY)                                     # the curtain rail
     for x0, x1 in ((129, 141), (179, 191)):                       # the curtains, folded

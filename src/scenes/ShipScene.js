@@ -4,6 +4,7 @@ import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
+import { Backdrop, HORIZON_ABOVE, HORIZON_SETTLE } from '../background.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -30,7 +31,7 @@ const LEAF = 18; // each of an elevator's two sliding door leaves
 // and its top over the floor; the desk's top over the floor and where on it the two tangerines sit,
 // from the door (the user, 2026-11-06).
 const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
-                desk: { top: 40, tangerines: [53, 61] } };
+                desk: { top: 40, tangerines: [53, 61] }, window: [143, 37, 35, 37] };   // its glass: x, y, w, h
 // The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels (its middle
 // and its top over the floor, from the room's left edge), and the vent (its opening's ends).
 const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
@@ -108,12 +109,11 @@ export class ShipScene extends Phaser.Scene {
         const H = map.heightInPixels;
         const tiles = map.addTilesetImage('placeholder', 'tiles');
 
-        // The sky and the sea reach far past the map on every side, so the outside view (O), zoomed
-        // right out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Over the
-        // sky's gradient, its top colour.
+        // The sea reaches far past the map on every side, so the outside view (O), zoomed right
+        // out, shows sky, sea and the ship, never the void (the user, 2026-11-07). Behind it all,
+        // the sky, the far sea and the archipelago, fixed to the screen (§5.2).
         const OUT = 2 * W;
-        const sky = this.add.image(-OUT, 0, 'sky').setOrigin(0).setDisplaySize(W + 2 * OUT, this.waterY).setDepth(DEPTH.sky);
-        const skyTop = this.add.rectangle(-OUT, -OUT, W + 2 * OUT, OUT, 0x5fb8f0).setOrigin(0).setDepth(DEPTH.sky);
+        this.backdrop = new Backdrop(this, { waterY: this.waterY, depth: DEPTH.sky });
         const back = map.createLayer('background', tiles).setDepth(DEPTH.back);
         this.solidLayer = map.createLayer('solid', tiles).setDepth(DEPTH.solid);
         this.ladderLayer = map.createLayer('ladders', tiles).setDepth(DEPTH.ladders);
@@ -278,7 +278,7 @@ export class ShipScene extends Phaser.Scene {
             bowX: Math.min(...hullCols) * 16, sternX: (Math.max(...hullCols) + 1) * 16,
             depth: DEPTH.exterior + 0.25, front: DEPTH.exterior + 0.3,     // the hull's foot under water
         });
-        this.worldLayer.add([sky, skyTop, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
+        this.worldLayer.add([...this.backdrop.objects, ...this.seaView.objects, back, this.solidLayer, this.ladderLayer, ...railings, this.exteriorLayer,
             ...Object.values(this.cutShadows), ...this.shellSlopes.map(s => s.gfx), endCover, ...Object.values(this.poolTanks)]);
     }
 
@@ -312,6 +312,12 @@ export class ShipScene extends Phaser.Scene {
         // The walls' own lines (panel seams), behind every door and fitting on them.
         this.wallGfx = this.add.graphics().setDepth(DEPTH.decor - 0.05);
         this.worldLayer.add([this.wallGfx, decorGfx, ...Object.values(stairsGfx)]);
+        // The sea-view windows show the live background (§5.2, the user, 2026-11-07): a copy of it
+        // over the wall, cut to their panes; whatever is on the glass (glints, mullions, curtains)
+        // goes on `glassGfx` over it.
+        this.windowView = this.addWindowView(DEPTH.decor + 0.005);
+        this.glassGfx = this.add.graphics().setDepth(DEPTH.decor + 0.006);
+        this.worldLayer.add(this.glassGfx);
 
         const objects = this.map.getObjectLayer('objects').objects;
         // Trunk doors take the place of any cabin door drawn where they stand.
@@ -439,9 +445,13 @@ export class ShipScene extends Phaser.Scene {
                         const [x, y] = pair.split(':').map(Number);
                         return { x, y };
                     });
-                    const last = stem[stem.length - 1];
+                    // Its aft side the block's end, or two tiles aft of the stem where the stem, raking
+                    // aft toward the waterline, passes it: the outline must never cross itself, or
+                    // the fill strays over the decks (the user saw a wedge on deck 4, 2026-11-08).
+                    const right = o.x + o.width;
+                    const back = stem.map(q => ({ x: Math.max(right, q.x + 32), y: q.y })).reverse();
                     const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
-                    plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, { x: o.x + o.width, y: last.y }, { x: o.x + o.width, y: stem[0].y }], true);
+                    plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, ...back], true);
                     this.worldLayer.add(plating);
                     // Over the shell, under its windows and balconies.
                     for (const piece of String(prop(o, 'pieces', '')).split(',').filter(Boolean)) {
@@ -793,6 +803,12 @@ export class ShipScene extends Phaser.Scene {
         c.room = this.add.image(x0, o.y - CABIN.height, 'cabin-8206').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(c.room);
         this.worldLayer.add([door, plate, cart, dim, c.room]);
+        // Its picture window's glass is clear in the drawing: the live sea and sky behind it.
+        const [wx, wy, ww, wh] = CABIN.window;
+        this.cabinView = this.addWindowView(DEPTH.exterior + 0.115);
+        this.cabinView.mask.fillRect(x0 + wx, o.y - CABIN.height + wy, ww, wh);
+        this.cabinView.view.setVisible(false);
+        c.view = this.cabinView.view;
         this.rooms.push({ route: 'cabin', door: o.x, floor: o.y, room: c.room, dim, inDeck: true });
         this.addRouteWall(x0 + CABIN.stop, -1, o.y, 'cabin');
         this.addRouteWall(x0 + CABIN.width - CABIN.stop, 1, o.y, 'cabin');
@@ -1131,7 +1147,7 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(name);
     }
 
-    // Windows on the dining rooms' wall, the sea in them, with beige drapes (La Cucina) or white
+    // Windows on the dining rooms' wall, the live sea in them, with beige drapes (La Cucina) or white
     // sheer curtains (the Four Seasons, the Seven Seas). Drawn on the back wall: the sea view is
     // what those rooms are about (the user, 2026-11-03).
     drawDiningWindows(g, o, xs, style) {
@@ -1139,17 +1155,16 @@ export class ShipScene extends Phaser.Scene {
         for (const cx of String(xs).split(',').filter(Boolean).map(Number)) {
             const x = cx - 17, top = y - 100, w = 34, h = 50;
             g.fillStyle(style === 'drapes' ? 0x46291f : 0xf4f4f4, 1).fillRect(x - 2, top - 2, w + 4, h + 4);
-            g.fillStyle(0x8fd3ff, 1).fillRect(x, top, w, h * 0.55);
-            g.fillStyle(0x4d9be6, 1).fillRect(x, top + h * 0.55, w, h * 0.45);
-            g.fillStyle(0xcfeeff, 1).fillRect(x + 3, top + 4, 8, 2);
-            g.fillStyle(0x8fd3ff, 1).fillRect(x, top + h * 0.55, w, 1);
+            this.windowView.mask.fillRect(x, top, w, h);
+            const f = this.glassGfx;                    // on the glass and in front of it
+            f.fillStyle(0xffffff, 0.35).fillRect(x + 3, top + 4, 8, 2);
             if (style === 'drapes') {
-                g.fillStyle(0xd9c7a5, 1).fillRect(x - 6, top - 4, 9, h + 18).fillRect(x + w - 3, top - 4, 9, h + 18);
-                g.fillStyle(0xbfa985, 1).fillRect(x - 3, top - 4, 1, h + 18).fillRect(x + w + 1, top - 4, 1, h + 18);
-                g.fillStyle(0xc9b48f, 1).fillRect(x - 8, top - 8, w + 16, 6);
+                f.fillStyle(0xd9c7a5, 1).fillRect(x - 6, top - 4, 9, h + 18).fillRect(x + w - 3, top - 4, 9, h + 18);
+                f.fillStyle(0xbfa985, 1).fillRect(x - 3, top - 4, 1, h + 18).fillRect(x + w + 1, top - 4, 1, h + 18);
+                f.fillStyle(0xc9b48f, 1).fillRect(x - 8, top - 8, w + 16, 6);
             } else {
-                g.fillStyle(0xffffff, 0.6).fillRect(x - 3, top - 4, 8, h + 10).fillRect(x + w - 5, top - 4, 8, h + 10);
-                g.fillStyle(0xffffff, 1).fillRect(x - 6, top - 6, w + 12, 3);
+                f.fillStyle(0xffffff, 0.6).fillRect(x - 3, top - 4, 8, h + 10).fillRect(x + w - 5, top - 4, 8, h + 10);
+                f.fillStyle(0xffffff, 1).fillRect(x - 6, top - 6, w + 12, 3);
             }
         }
     }
@@ -1336,30 +1351,39 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // A copy of the live background (§5.2) at `depth`, shown only where `mask` (a graphics filled
+    // with window panes, in world space) is drawn; its horizon where it is outside, so the sea in
+    // the windows lines up with the sea past the open decks (the user, 2026-11-08).
+    addWindowView(depth) {
+        const backdrop = new Backdrop(this, { waterY: this.waterY, depth: 0 });
+        const view = this.add.container(0, 0, backdrop.objects).setScrollFactor(0).setDepth(depth);
+        const mask = this.make.graphics({ add: false }).fillStyle(0xffffff, 1);
+        view.enableFilters();
+        view.filters.internal.addMask(mask);
+        this.worldLayer.add(view);
+        return { backdrop, view, mask };
+    }
+
     // Windows along a wall, looking out to sea: the bridge's.
     drawWindows(g, o) {
         for (let x = o.x; x + 18 <= o.x + o.width; x += 24) {
             g.fillStyle(0xf4f4f4, 1).fillRect(x, o.y, 18, o.height);
-            g.fillStyle(0x4d9be6, 1).fillRect(x + 2, o.y + 2, 14, o.height - 4);
-            g.fillStyle(0x8fd3ff, 1).fillRect(x + 3, o.y + 3, 4, o.height - 10);
+            this.windowView.mask.fillRect(x + 2, o.y + 2, 14, o.height - 4);
+            this.glassGfx.fillStyle(0xffffff, 0.3).fillRect(x + 3, o.y + 3, 2, o.height - 10);
         }
     }
 
     // The bridge's side windows (the user, 2026-11-06): big panes in white frames, mullions between
-    // them, the sky over the sea's horizon in each.
+    // them, the live sea and sky in each.
     drawBridgeWindows(g, o) {
         const n = Math.max(1, Math.round(o.width / 66));
         const pane = (o.width - 4) / n;
         g.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y, o.width, o.height);
         for (let i = 0; i < n; i++) {
             const x = Math.round(o.x + 4 + i * pane), w = Math.round(pane) - 4, h = o.height - 8;
-            const horizon = Math.round(h * 0.62);
-            g.fillStyle(0x8fd3ff, 1).fillRect(x, o.y + 4, w, horizon);
-            g.fillStyle(0xc7f0ff, 1).fillRect(x, o.y + 4, w, Math.round(horizon / 3));
-            g.fillStyle(0x4d65b4, 1).fillRect(x, o.y + 4 + horizon, w, h - horizon);
-            g.fillStyle(0x4d9be6, 1).fillRect(x, o.y + 4 + horizon, w, 1);
-            g.fillStyle(0xffffff, 0.5).fillRect(x + 3, o.y + 7, 2, h - 12);
-            g.fillStyle(0x9babb2, 1).fillRect(x, o.y + 4 + h - 1, w, 1);
+            this.windowView.mask.fillRect(x, o.y + 4, w, h);
+            this.glassGfx.fillStyle(0xffffff, 0.35).fillRect(x + 3, o.y + 7, 2, h - 12);
+            this.glassGfx.fillStyle(0x9babb2, 1).fillRect(x, o.y + 4 + h - 1, w, 1);
         }
         g.fillStyle(0x9babb2, 1).fillRect(o.x, o.y + o.height - 2, o.width, 2);
     }
@@ -1429,19 +1453,16 @@ export class ShipScene extends Phaser.Scene {
         const top = y - 118, sill = y - 46;
         const n = Math.max(1, Math.round(o.width / 80));
         const unit = o.width / n;
-        // The panes: one white-framed window per unit, the sky over the sea's horizon in it.
+        // The panes: one white-framed window per unit, the live sea and sky in it.
         for (let i = 0; i < n; i++) {
             const a = Math.round(x0 + i * unit), b = Math.round(x0 + (i + 1) * unit);
             g.fillStyle(0xf4f4f4, 1).fillRect(a, top, b - a, sill - top);
             const gx = a + 4, gw = b - a - 8, gy = top + 4, gh = sill - top - 6;
-            const horizon = Math.round(gh * 0.58);
-            g.fillStyle(0x8fd3ff, 1).fillRect(gx, gy, gw, horizon);
-            g.fillStyle(0xc7f0ff, 1).fillRect(gx, gy, gw, Math.round(horizon / 3));
-            g.fillStyle(0x4d65b4, 1).fillRect(gx, gy + horizon, gw, gh - horizon);
-            g.fillStyle(0x4d9be6, 1).fillRect(gx, gy + horizon, gw, 1);
-            g.fillStyle(0xffffff, 0.45).fillRect(gx + 4, gy + 3, 2, gh - 8);
-            g.fillStyle(0xe8eaec, 1).fillRect(Math.round((a + b) / 2) - 1, top, 2, sill - top);   // the mullion
+            this.windowView.mask.fillRect(gx, gy, gw, gh);
+            this.glassGfx.fillStyle(0xffffff, 0.3).fillRect(gx + 4, gy + 3, 2, gh - 8);
+            this.glassGfx.fillStyle(0xe8eaec, 1).fillRect(Math.round((a + b) / 2) - 1, top, 2, sill - top);   // the mullion
         }
+        g = this.glassGfx;                              // the rest hangs in front of the glass
         // The sill, white. (A dark ledge under it was dropped: it made no sense, the user.)
         g.fillStyle(0xf4f4f4, 1).fillRect(x0 - 4, sill - 2, o.width + 8, 3);
         // A wood pelmet along the top; under it the curtains, gathered at each window's sides and
@@ -1679,7 +1700,13 @@ export class ShipScene extends Phaser.Scene {
         cam.removeBounds();
         ov.fit = this.scale.width / (this.map.widthInPixels * 0.94);
         cam.setZoom(ov.fit);
-        cam.centerOn(this.map.widthInPixels / 2, this.waterY - 4 * this.deckPitch);
+        // The ship and the horizon low in the frame, by half the ship's height (waterline to the
+        // funnel's top), so the sky and its clouds have room over it (the user, 2026-11-08).
+        if (this.shipTop === undefined) {
+            this.shipTop = this.waterY;
+            this.solidLayer.forEachTile(t => { if (t.index > 0) this.shipTop = Math.min(this.shipTop, t.pixelY); });
+        }
+        cam.centerOn(this.map.widthInPixels / 2, this.waterY - 4 * this.deckPitch - (this.waterY - this.shipTop) / 2);
         ov.wheel = (pointer, objects, dx, dy) => this.zoomOverview(dy > 0 ? 1 / 1.25 : 1.25, pointer);
         this.input.on('wheel', ov.wheel);
         this.updateCutaway(1);
@@ -1716,8 +1743,13 @@ export class ShipScene extends Phaser.Scene {
         cam.setSize(VIEW.width, VIEW.height);
         cam.setZoom(ov.zoom);
         cam.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+        // Centred on her at once (where following would take it anyway), and the horizon in its
+        // place with it, so nothing glides after the switch (the user, 2026-11-08).
+        // (startFollow clears the follow offset: set again, or the camera sits half her height low.)
         cam.startFollow(this.player, true, 0.15, 0.15);
-        cam.setScroll(ov.scrollX, ov.scrollY);
+        cam.setFollowOffset(0, HALF);
+        cam.centerOn(this.player.x, this.player.y - HALF);
+        this.horizonOnScreen = undefined;
         this.player.setVisible(true);
         this.uiCam.setVisible(true);
         this.tweens.resumeAll();
@@ -2126,6 +2158,7 @@ export class ShipScene extends Phaser.Scene {
         p.body.allowGravity = true;
         this.grounded = true;
         this.takeoffY = point.y;
+        this.horizonOnScreen = undefined;               // the horizon snaps to her new floor
         this.lastGroundedAt = this.time.now;
         this.alert.setVisible(false);
 
@@ -2161,6 +2194,18 @@ export class ShipScene extends Phaser.Scene {
         // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
         // the outside view.
         this.seaView.update(Math.min(delta, 50) / 1000);
+        // The horizon (§5.2): on the screen, gliding to its place over the floor she stands on (on
+        // stairs, ladders and lifts, over her feet); while she is in the air it holds still on the
+        // screen, as far things do, so a jump doesn't move it (the user, 2026-11-08).
+        const cam = this.cameras.main;
+        const ground = this.mode === 'play' || this.mode === 'scripted' ? this.takeoffY : this.player.y;
+        const target = (ground - HORIZON_ABOVE - cam.scrollY - cam.height / 2) * cam.zoom + cam.height / 2;
+        if (this.horizonOnScreen === undefined) this.horizonOnScreen = target;
+        else if (!this.overview && (this.mode === 'play' ? this.grounded : this.mode !== 'scripted')) {
+            this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
+        }
+        this.backdrop.update(dt, !!this.overview, this.horizonOnScreen);
+        for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();
@@ -2554,6 +2599,7 @@ export class ShipScene extends Phaser.Scene {
             r.room.setVisible(this.route === r.route && !this.overview);
             r.dim?.setVisible(this.route === r.route && !this.overview);
         }
+        this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         for (const cat of this.cats) {
             if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away);
         }
