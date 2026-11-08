@@ -98,6 +98,13 @@ export const KEY_CARDS = {
     required: false,
 };
 
+// The parts of a deck behind a wall across it (the bridge, the spa): with `on`, a part stays closed
+// and dimmed while she is on the other side of its wall. Off for now, each opens with its deck, until
+// we settle how the ship is split and what is locked (the user, 2026-11-08).
+export const LOCKED_PARTS = {
+    on: false,
+};
+
 // Sound (§7.1): off for now, while we test (the user, 2026-11-06). `?sound` turns it on.
 export const SOUND = {
     on: false,

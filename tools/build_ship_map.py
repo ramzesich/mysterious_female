@@ -1132,7 +1132,9 @@ def build_objects():
     for core, (a, _) in CORES.items():
         for deck in PLAYABLE:
             if deck not in (8, 9, 10):
-                put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + 30)
+                # (By the spa's wall on deck 11, clear of its sign.)
+                shift = 78 if deck == 11 and a == SPA_WALL_M else 30
+                put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + shift)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore
     # excursions and reservations desks, La Cucina, the Four Seasons and the Seven Seas.

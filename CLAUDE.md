@@ -157,6 +157,11 @@ Lessons learned (2026-11-08, the background, the windows, the cabin's shower):
 - skeleton-v3 may add things (lather on her hair while she washes it): look at every frame.
 - A long Python patch full of quotes, backticks and backslash escapes breaks a bash heredoc:
   write it to a file in %TEMP% and run that.
+- **Not every open deck is an `outdoors` area** (the bow's mooring deck, the open parts of decks 11
+  and 12 keep their deck cut open): to tell whether she is out in the open, look for a shell tile
+  at her column at that deck's height (`updateDeckDim()`). Things on other decks are drawn in front
+  of her (`DEPTH.player + ...`), so a dim that must cover them goes above her too and clears the
+  part she is in.
 
 ## Working with the user
 

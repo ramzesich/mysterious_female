@@ -483,6 +483,12 @@ indoor deck end stops short of the hull (2.7 m of structure, `STRUCTURE_COLS`), 
 little shaded. **The cut-out's edges are in shadow** (the user, 2026-11-03: the cut wasn't
 apparent): a soft dark gradient inside the opening wherever the shell goes on, deepest under the
 deck above, fading in with the cut (`CUT_SHADOW` in `src/config.js`); no hard line.
+**Around the deck she is on, the rest of the world is dimmed** (Decided, the user, 2026-11-08), as
+round a room she is in (`ROOM_DIM`): the other decks, the sky and the sea, and the walls at the
+deck's own ends, doorway walls included. **Out in the open nothing is dimmed**: wherever no ship's
+side stands beside her at that deck's height (the bow's mooring deck, the terraces, the open parts
+of decks 11 and 12, the pools), and on the promenade and in the outside view (O). It fades as she
+comes out from behind a wall, and never falls on her on stairs.
 Where a deck ends in the ship's wall, a 32 px strip of that wall is drawn over her (`END_COVER`),
 so running into it she goes behind it; no window straddles or crowds the cut's edge, a cabin's
 pair of windows both or neither; the old shaded edge tiles are gone. The venue-name signs are
@@ -672,8 +678,10 @@ colleague gives her.
   ways out to open decks the user chose (§8). **All of them open with E for now.** Later, when the
   ship's areas and the metroidvania-style progression are designed, **some of them are locked with
   the key cards**. Then, too, a locked-out part gets its own piece of the ship's side, cut open only
-  while she is in it, as the bridge and the spa have now; until then the deck she is on is cut
-  open whole.
+  while she is in it, and dimmed from the other side of its wall. The bridge and the spa have such
+  a piece already, **not in use for now** (`LOCKED_PARTS` in `src/config.js` is off; the user,
+  2026-11-08: open with their decks until we settle how the ship is split and what is locked);
+  until then the deck she is on is cut open whole.
 - At least one card comes **from a colleague**, in exchange for bringing him lunch (§5.8).
 - Locked doors are visibly locked with the card colour on the reader, so she can remember where to
   return. With no map, this and Bumbot's escape routes are what keep her oriented, so each area
@@ -1025,7 +1033,8 @@ Nothing blocks the start of the build. These get settled along the way:
       shuts once she is away (the Captain's card is to lock it later, §6.2). **The bridge has its
       own piece of the ship's side** (`shell_rooms()` in the map builder): out of sight from the
       corridor, and on the bridge only it is cut open, the rest of the deck closed, with the cut's
-      shadowed edges (the user chose this over dimming the deck there). **Deck 11's pools, from deck
+      shadowed edges (the user chose this over dimming the deck there; since 2026-11-08 the bridge
+      opens with its deck for now, `LOCKED_PARTS`, §5.5). **Deck 11's pools, from deck
       10**: their tanks reach below deck 11's floor into deck 10's ceiling; seen from deck 10 or
       below they are not drawn, and she passes through them (the user: not moved). A `bridge`
       playtest
@@ -1190,6 +1199,10 @@ Nothing blocks the start of the build. These get settled along the way:
       The door, the stall, the slid-open door, the see-through glass and the hung towel drawn by
       hand (`tools/draw_cabin.py`). Also: the window seen through the cabin's open door, from the
       corridor, shows the live sea (§5.2)
+- [x] **The world dimmed around the deck she is on** (2026-11-08, approved by the user; §5.3):
+      other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
+      open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
+      by the spa's wall on deck 11 moved clear of its sign
 - [ ] **Start the next session here: the outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
@@ -1197,7 +1210,10 @@ Nothing blocks the start of the build. These get settled along the way:
       Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
       `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: the ship's areas and their progression, which doors are locked with which
-      card (§6.2), with Bumbot mapped in again (§4); doors along the decks into small separate rooms
+      card (§6.2), with Bumbot mapped in again (§4); **still to decide with the user: how the ship
+      is split and which parts are locked** (when that is settled, `LOCKED_PARTS` in
+      `src/config.js` closes and dims a locked part; so far the bridge and the spa are set up for
+      it, §5.5); doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
