@@ -15,7 +15,7 @@ rest of the game is done.
 |---|---|
 | **Hero** | Bumbusik — my wife (§3). **Decided** |
 | **World** | **The ship is the game.** One cruise ship, sailing on a sunny day over small waves, explored freely deck to deck. There are no levels. **Decided** |
-| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at places on the ship and slips away each time, until she finally catches him. **Decided.** Where he shows up and where she catches him are mapped in later (§4) |
+| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at places on the ship and slips away each time, until she finally catches him. **Decided.** Where he shows up and where she catches him: being designed from scratch (§6) |
 | **Discovery** | The goal is **never stated**. She works out that she is chasing Bumbot by playing. **Decided** |
 | **Player** | Her. It is a gift, and she wants a **real challenge** — Bumbot-level difficulty, not a gentle walk. **Decided** |
 | **Tone rule** | **No death and no negativity.** Failing is a *scare*: she runs off, or bobs in a life ring, and pops back out of a crew cabin door (§5.6). **Decided** |
@@ -105,8 +105,8 @@ Reference photos never enter the repo.
 **Decided:**
 
 - **Name:** Bumbusik is what I sometimes call her.
-- **Story:** she **works on the ship**, and Bumbot has **stowed away**. That explains why she can use
-  crew key cards and crew-only areas, and why the passengers and machinery around her are obstacles
+- **Story:** she **works on the ship**, and Bumbot has **stowed away**. That explains why she can go into
+  crew-only areas, and why the passengers and machinery around her are obstacles
   rather than villains. It is true to life: she worked on cruise ships for 11 years, managing
   personnel and doing QA, which is a good source of in-jokes and quirks.
 - **Appearance:** Ukrainian, white skin. Dark straight hair, curled up at the ends, a little below
@@ -153,6 +153,10 @@ No pause and no map, at least for now.
 
 ### 3.2 Special move — the "Кісюнічка!!!" dash
 
+**Open (the user, 2026-11-09): whether the dash stays at all**, to be decided once the enemies,
+obstacles, people and the ways she deals with them are designed. It works in the code; there are
+no tangerines on the ship for now (§6.3).
+
 "Кісюнічка!!!" is what she happily screams every time she sees a random cat on the street, so
 it is her battle cry here.
 
@@ -165,8 +169,7 @@ it is her battle cry here.
 - **Speed:** ~2× run speed. Bumbot's cheat dash was 4×, which is fine on an empty rooftop but
   uncontrollable for 10 seconds inside a ship full of corridors and ladders.
 - **What it breaks:** enemies and anything marked *breakable* (crates, luggage, stacked deck chairs,
-  room-service carts). It never breaks walls, floors, locked doors or the ship's structure, because
-  those are what the key cards gate.
+  room-service carts). It never breaks walls, floors, locked doors or the ship's structure.
 - **What it doesn't change:** falls still count (§5.6); jumps still work as normal during the dash,
   and she still **lands on** floors she runs over (Bumbot's early dash fell through every ledge).
 - **Presentation:** a speech bubble with the exact text **"Кісюнічка!!!"** and a synthesised sound
@@ -176,45 +179,20 @@ it is her battle cry here.
 
 ## 4. Bumbot — the runaway cat
 
-**Status (the user, 2026-11-07): none of his spots are in the game.** They were taken out, the
-finale's place too, to be **mapped in again later**, when the ship's areas and their progression
-are designed (§6), with the tests of his near-catches. His sprite, his animations and the
-near-catch itself stay in the code (a `bumbot` map point: activity and escape direction). The
-spots, the finale and the diner's closing below are **the first plan, kept for reference**, not
-decided placements.
+**Status (the user, 2026-11-09): where he appears, how many times, in what order and where she
+finally catches him are being designed from scratch, with the ship's progression (§6).** None of
+it is in the game. His sprite, his animations and the near-catch itself stay in the code (a
+`bumbot` map point: activity and escape direction).
 
 **Decided (the mechanic and the look):**
 
-- Bumbot appears at **a few places** on the ship (first plan: five), each one a **near-catch moment**: a mini-scene where
+- Bumbot appears at **a few places** on the ship, each one a **near-catch moment**: a mini-scene where
   she almost grabs him and he slips away with a funny animation, then play continues.
 - Until she reaches him, he is **doing something cat-like** in his spot, and each spot gets something
-  different: asleep in the warm towels, washing himself, catching a fly, and so on.
+  different: asleep in warm towels, washing himself, catching a fly, and so on.
 - A near-catch is a short scripted sequence with input locked: she lunges, he escapes — up a ladder
   she can't use yet, into a vent, onto a passing tray, behind a door that slams shut, or into an
   escape trunk she can't open yet (§5.1).
-- **Each near-catch spot is also a checkpoint** (§5.5).
-- **Later: the spots.** The first plan's five (placed during the blockout and decks 4-11, all
-  taken out 2026-11-07):
-
-  | Spot | What he is doing |
-  |---|---|
-  | Housekeeping linen room (a cabin deck) | Asleep in the warm towels; gets away into a vent (deck 9, a room off the corridor) |
-  | Theatre stage | Washing himself under a spotlight |
-  | Buffet | Eyeing a fish |
-  | Pool deck | Catching a fly over a sunbed |
-  | Bridge (behind the captain's card) | Batting at the ship's controls |
-
-- **No fixed order.** The ship is freely explorable in any direction, more so as areas open up, so
-  she can meet the five in whatever order her access allows.
-- **Later: the final catch.** The first plan: the open diner on **deck 11, aft** (the Great
-  Outdoors), at the self-service ice cream machine.
-  The diner is **inaccessible until she has seen all five near-catches**, so she never finds it
-  early and wonders why it mattered. A proper win sequence: she scoops him up, hearts, purring, win
-  screen, at sunset (§5.2).
-- Until then the diner is **closed**: shutters down and a "Closed" sign.
-- Each escape **points somewhere**: he runs off into an area she can't reach yet, as a hint toward
-  where to go next. Whichever near-catch is her **fifth**, he runs toward deck 11 aft, and the diner
-  opens.
 - He is a black Bombay cat, redrawn in the game's art style (§2.1).
 - **His sprite (Decided):** PixelLab pro mode designed him from a photo of the real Bumbot: slim,
   glossy black, pale yellow-green eyes, a small grey patch below the throat where a bow tie would
@@ -222,16 +200,15 @@ decided placements.
   smaller redraws lost his look, so we shrank it ourselves (box resampling to 2/3, snapped back to
   Resurrect 64): about **28px tall standing**, a little above her knee. Faint grey streaks from
   each ear to the outer corner of the eye were added by hand, as on the real cat.
-- **His animations (Decided):** run (his escape), washing (theatre), a leap (the startle, and the
-  fly at the pool), sitting down and staying sat (the fish at the buffet), eating (the ice cream
-  machine, deck 11), batting with a paw (the bridge), and asleep (laundry), which breathes in code.
+- **His animations (Decided):** run (his escape), washing, a leap, sitting down and staying sat,
+  eating, batting with a paw, and asleep, which breathes in code.
   Asleep is side-on, lying down with eyes closed and the tail out behind. A curled-up "bagel" was
   dropped: from the side it barely reads, and PixelLab drew it as a ball seen from above.
 - **A near-catch (Decided):** she tries to **pick him up**: she walks up to him, bends down with
   both arms out, and just before her hands reach him he leaps away and runs. She stays bent a
   moment, straightens, and turns to the camera. Then play goes on.
 
-**Decided:** between the five spots he also turns up in **background glimpses**: a tail vanishing
+**Decided:** between his spots he also turns up in **background glimpses**: a tail vanishing
 round a corner, a cat silhouette on the deck above, a shape passing a window. He can't be reached
 there; they only remind her he's on board.
 
@@ -245,8 +222,8 @@ there; they only remind her he's on board.
 
 - The game is **one ship, with all its decks**. No levels. It is meant to be a big game.
 - **Free movement** in all directions: forward and back along a deck, up and down between decks.
-- Some areas and doors are **locked** and open only once she finds the matching **magnet key card**
-  or **key** (§6.2). It is the exploration/backtracking loop of a Metroidvania.
+- The ship opens up as she plays: the exploration/backtracking loop of a Metroidvania. How it is
+  split and locked is being designed from scratch (§6).
 - **The ship is the Norwegian Sun**, used as the reference for its dimensions, layout, venues,
   stairwells, elevators and ladders. We have both been on it, so she can find her way **without a
   map**, from memory.
@@ -281,14 +258,11 @@ there; they only remind her he's on board.
   - **One-way shortcuts, in a few places:** the lower doors stay shut from outside ("opens from
     the other side": the door rattles, its arrows unlit) until she has come down through the
     shaft once; from then on it works both ways for good.
-  - **A few are card-locked**, like other locked doors: the card's colour shows on a reader beside
-    the door (§6.2).
-  - Bumbot can escape into one she can't use yet (§4, when his spots are mapped in).
   - **For now (blockout):** four test trunks, to try the mechanic: a two-deck one (deck 4–5,
     forward cabins), a three-deck one (decks 4–6, midships), a one-way shortcut from the theatre
-    on deck 6 down to deck 4 (passing deck 5 with no door) and a Hotel-card one (decks 6–7). The
+    on deck 6 down to deck 4 (passing deck 5 with no door) and one between decks 6 and 7. The
     real ones are placed when the interiors are filled. Listed in `tools/ship_layout.py`.
-- **Elevators:** guest elevators are free to use; crew service elevators need cards. **An elevator
+- **Elevators:** guest elevators are free to use. **An elevator
   never opens onto an area she can't reach yet.** She stands at the doors and presses **E**; they
   open and a button panel shows decks 4–12, the ones she can reach lit and the rest greyed out.
   ↑/↓ picks a deck, **E confirms** (changed from jump, 2026-11-01); the panel goes (the camera
@@ -297,8 +271,7 @@ there; they only remind her he's on board.
   of the stairs, with the deck number lit above it. ←/→ at the panel backs out, and the doors
   close once she steps away. She steps in and turns to face us; the car travels out of sight (the
   walls and decks hide it, as in an escape trunk) with the camera following; a ding, and the doors
-  open. While the glass car comes to fetch her, the panel's display counts its decks. For now the decks she can reach are the
-  same as the stairs': 4–6 with her crew card, the rest with the Hotel card.
+  open. While the glass car comes to fetch her, the panel's display counts its decks.
 - **Glass elevators (Decided, 2026-11-01):** the atrium's glass elevator works like the others,
   but its car is **seen**: it runs up and down rails on the atrium wall (decks 5–9), she rides
   visible inside it, and if it's on another deck when she presses E, it comes down or up to fetch
@@ -352,7 +325,7 @@ Real-world figures ([NCL ship map](https://app.ncl.com/sites/default/files/Ship_
 
 - Length **258 m** (848 ft), gross tonnage 78,309, about 1,900 guests.
 - Passenger decks are numbered **4 to 12**; the decks below are crew and machinery.
-- Deck 11, aft: an open-air diner with a self-service ice cream machine (the final catch).
+- Deck 11, aft: an open-air diner with a self-service ice cream machine.
 
 **The reference for real proportions** is NCL's ship map ([PDF](https://app.ncl.com/sites/default/files/Ship_Map_SUN_06142022.pdf)):
 its lower half is a **side profile** of every deck, with the stair cores, the atrium and each
@@ -425,13 +398,13 @@ true to the order and rough size of things on the real ship.
 
 | Deck | Role in the game |
 |---|---|
-| 1–3 | Crew and engine decks: machinery, laundry, galley stores, crew corridors and cabins. Mostly key-card gated. |
+| 1–3 | Crew and engine decks: machinery, laundry, galley stores, crew corridors and cabins. |
 | 4–5 | Lower guest decks: **gangway (start)**, reception, medical, cabins. |
 | 6–7 | Public decks: atrium, restaurants, theatre, shops, casino; the outdoor promenade and lifeboats. |
 | 8–10 | Cabin decks: long corridors, room-service and housekeeping carts. |
-| 11 | Pool deck, buffet, and **the open diner aft with the ice cream machine** (the first plan's finale, §4). |
+| 11 | Pool deck, buffet, and the open diner aft with the ice cream machine. |
 | 12 | Sun / sports deck. |
-| Bridge | Forward, behind the captain's key card. (A Bumbot near-catch in the first plan, §4.) |
+| Bridge | Forward, on deck 10. |
 | Top | Funnel and mast. |
 
 **The real ship's look** (Decided, 2026-11-02): **authenticity first**; the ship should look and
@@ -577,7 +550,7 @@ That works out to (numbers to be tuned in testing):
   stands ajar with the cabin light spilling out, and a green lamp above it glows. Activating one
   gives a short burst of light and a chime.
 - Checkpoints sit where a crew cabin door plausibly would, following the real layout.
-- There are a few across the ship, and **each Bumbot near-catch spot has one** (when they are mapped in, §4).
+- **Where they go is being designed from scratch** (§6).
 - She comes back at the **closest one** to where she was scared, among the checkpoints she has
   **already activated**. Otherwise she could come back somewhere she has never been, possibly past a
   locked door.
@@ -610,16 +583,16 @@ The word is **"scare"**, never "death", on screen and in the code alike.
 | Area | Ideas |
 |---|---|
 | Gangway | The start, on deck 4. Ship's horn, luggage carts. |
-| Crew decks / engine room | Pipes, steam vents, machinery; dark and warm-lit. Key-card heavy. |
+| Crew decks / engine room | Pipes, steam vents, machinery; dark and warm-lit. |
 | Cabin corridors | Long, repetitive halls, numbered doors, room-service carts, housekeeping trolleys. |
 | Atrium / promenade | Multi-storey open space with glass elevators, shops, a grand staircase. |
 | Restaurant / buffet | Waiters with trays, tables, rolling dessert carts. |
 | Theatre | Stage lights, curtains, rows of seats. |
 | Casino | Spinning lights, slot machines. |
 | Pool deck | Water, slides, sunbeds, slippery wet tiles. |
-| Open diner, deck 11 aft | The ice cream machine. The finale, in the first plan (§4). |
+| Open diner, deck 11 aft | The ice cream machine. |
 | Sun deck / funnel | Wind, seagulls. |
-| Bridge | Behind the captain's key card. (Bumbot here in the first plan, §4.) |
+| Bridge | The ship's controls, forward on deck 10. |
 | Outside: lifeboats, railings, bow | The ship's exterior and the sea. The overboard risk lives here. |
 
 ### 5.8 Enemies, hazards and other people
@@ -636,67 +609,190 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   one of them unless she is paying attention.
 - **Passengers and machinery are the obstacles. Fellow crew are friendly**, background characters
   at most, to begin with.
-- **The colleague with the card:** an ordinary member of the ship's staff, not based on anyone real.
-  He cannot leave his post, so she brings him lunch, and he gives her his access card. A trial of the
-  mechanic; we see how it plays.
-  - He comes **somewhere in the middle of the game**, and gives whichever card makes the most sense
-    at that point.
-  - His lunch is **waiting on a tray in one of the restaurant areas**. Nobody tells her; working out
-    that the tray is his is part of the puzzle.
 - **Secrets** exist, like Bumbot's SUSHI sign. Designed **Later**.
 
 ---
 
 ## 6. Progression
 
-### 6.1 Overview
+### 6.1 Brainstorm in progress (2026-11-09)
 
-**Decided:** everything she needs is **found on the ship**, apart from at least one access card a
-colleague gives her.
+**Nothing in this section is decided** (the user: document it as a brainstorm in progress, not a
+decided design, and continue later). It was started from scratch once the ship was complete; the
+earlier plans for Bumbot's spots, checkpoint locations and the key-card tiers were removed from
+this document on purpose. "Agreed so far" means the user said yes in the discussion, and it can
+still change. The user likes the ideas so far.
 
-### 6.2 Keys and cards
+#### Agreed so far (still open to change)
 
-**Decided:**
+- All four kinds of lock below.
+- Staggered stairs.
+- New ways to move may be required to finish the game.
+- A locked part stays hidden behind the closed ship's side until she enters it: the first cut-away
+  is the reward (`LOCKED_PARTS`, §6.2).
+- She starts at the gangway.
+- No target for how long the game takes: progress is saved, it isn't meant for one sitting.
+- **Carrying things for colleagues** (the user's wish): they ask her to bring them something from
+  elsewhere on the ship; bringing lunch to a colleague who can't leave his post stays as the
+  example.
+- **A laundry chute back down to deck 4** (the user's idea): a fast way down to the start of the ship.
+- **Cabin 8206 stays unreachable until she unlocks its area**: a nostalgic surprise for her, so
+  nothing gives it away beforehand. It comes around the middle of her progress, maybe a bit after
+  it; it does not have to be the last region (the user).
+- The dash: whether it stays is decided once enemies, obstacles, people and the ways she deals
+  with them are designed (§3.2, §6.3).
 
-- She **starts with her own crew card**, which opens only her starting area: **decks 4–6**, the
-  whole lower ship (the gangway, the deck 5 restaurant corridor with its doors locked, the deck 6
-  promenade and lifeboats). The stairs and elevators above deck 6, and the venue doors, open with
-  the Hotel card.
-- Three more colour-coded **key cards**, one per tier:
+#### The ideas behind it
 
-  | Card | Opens |
-  |---|---|
-  | Hotel | Restaurants, theatre, galley, housekeeping |
-  | Technical | The ship's technical spots: the mooring deck at the bow, the lifeboat winches, the funnel and mast ladders, the theatre's backstage and fly loft. (There are no engine decks to explore, §5.3.) |
-  | Captain | The bridge |
+- **The cat is the map:** each time Bumbot escapes he goes somewhere she can't follow yet, which
+  shows her what to look for, with the goal never stated.
+- **Locks scattered, never deck by deck:** if a card opens "decks 7-9" she moves up and never comes
+  back; if each new thing opens small pieces on many decks she knows, the whole ship is worth
+  walking again.
+- **Staggered stairs:** with three cores she can reach any deck in a minute, so each core is closed
+  at different decks (wet paint, a fire door) and climbing means walking a long deck to the next
+  open flight. Those flights reopen later as shortcuts.
+- **The ship folding back on itself:** escape trunks and doors that only open from the far side
+  connect far places she has already walked.
+- **Wide in the middle:** narrow at both ends of the game, freer between them. (The step list below
+  is drawn as one order for clarity.)
+- **The glass elevator's panel as a progress meter:** more decks light up as she goes, since there
+  is no map.
 
-- 2–3 physical **keys** for one-off locks: a lifeboat winch, a storeroom, a theatre backstage door.
-  (In §4's first plan the diner is not key-locked; it opens after the fifth near-catch.)
-- **Doors between the ship's parts (Decided, the user, 2026-11-07):** a wall with a door, seen
-  from the side, stands between every two parts of the ship: each room, stair lobby, cabin corridor
-  stretch, the atrium (one part over all its decks; so is the theatre with its balcony), and the
-  ways out to open decks the user chose (§8). **All of them open with E for now.** Later, when the
-  ship's areas and the metroidvania-style progression are designed, **some of them are locked with
-  the key cards**. Then, too, a locked-out part gets its own piece of the ship's side, cut open only
-  while she is in it, and dimmed from the other side of its wall. The bridge and the spa have such
-  a piece already, **not in use for now** (`LOCKED_PARTS` in `src/config.js` is off; the user,
-  2026-11-08: open with their decks until we settle how the ship is split and what is locked);
-  until then the deck she is on is cut open whole.
-- At least one card comes **from a colleague**, in exchange for bringing him lunch (§5.8).
-- Locked doors are visibly locked with the card colour on the reader, so she can remember where to
-  return. With no map, this and Bumbot's escape routes are what keep her oriented, so each area
-  needs a strong, distinct look.
-- **Proposed:** the card colours, as the placeholder readers show them: Hotel blue, Technical red,
-  Captain gold.
+| Kind of lock | On our ship | Why she goes back |
+|---|---|---|
+| **Department cards** | Deck, Entertainment, Housekeeping, Officer's: pantries along the cabin decks, backstage, the casino cage, the mooring deck, the lifeboat winches | One card lights up doors on several decks |
+| **New ways to move** | Grip socks from the gym (wall jumps), a parasol from the Great Outdoors (glide, survive long drops) | Every old gap and drop looks different |
+| **Bumbot changes the ship** | He drains the pool, and a hatch appears in its tank; he hits the alarm panel on the bridge | Places she knows are no longer the same |
+| **People** | The old lady guarding her sunbed; colleagues who want something (new character art needed) | Small errands across the ship |
+
+#### The regions and the order they open in
+
+`python tools/draw_regions.py` draws these from its own lists (after `python tools/render_ship.py`).
+
+![The ship's regions](docs/ship-regions.png)
+
+![The order the ship opens up](docs/ship-unlock-order.png)
+
+| Step | Region | What it covers | What opens it | Why she goes there or back |
+|---|---|---|---|---|
+| 1 | Lower ship | Decks 4-5, deck 6 forward, the atrium's floor | The start, at the gangway | The first errand: lunch from a deck 5 restaurant to a colleague at the gangway, who gives her the Deck card |
+| 2 | Atrium + promenade | The atrium on decks 6-7, the promenade | Deck card | Back up from deck 4 past places she knows. Bumbot's first near-catch: he bolts through a door and leaves it open |
+| 3 | Showtime | Deck 6's rooms and theatre, deck 7 midships and aft | The door he left open | The stage manager needs something from deck 4; reward: the Entertainment card, and a one-way trunk from the theatre to deck 4 |
+| 4 | Cabin decks | Decks 8-10 from the atrium aft | Entertainment card, up a backstage ladder | The Housekeeping card in the linen room opens the laundry chute (deck 9 to deck 4) and pantry doors on decks 4-5 |
+| 5 | Deck 8 forward | Deck 8 forward of the atrium, **cabin 8206** | Housekeeping card, a door at that end of deck 8 | The surprise: her cabin, its door open, on her way through |
+| 6 | Lido | Deck 11 from the gym aft | Walking through deck 8 forward: the only stairs going on up to the pool deck | Grip socks and the parasol change the old decks (the atrium, the stern tiers, shafts). Bumbot drains the pool: a hatch in its tank |
+| 7 | Top deck + funnel top | Deck 12 from the atrium aft, the funnel's top | Grip socks: wall jumps up to deck 12 | The engineer's errand, then the ship's horn (below): the officer runs for the bridge and drops his card, the old lady leaves her sunbed, the gulls lift |
+| 8 | The bow | Deck 7 forward (kids' clubs), decks 9-12 forward: spa, bridge, Spinnaker | Officer's card, forward along deck 12 then down | At last the bridge: Bumbot hits the alarm, the hatch in its ceiling opens |
+| 9 | Sunset | The balcony forward of the spa, the mooring deck | The hatch | The ending (below) |
+
+Staggering the stairs means the forward core must let her climb from deck 8 to deck 11 at step 6,
+with its doors on decks 9 and 10 still shut.
+
+#### The ending (the end goal: catching Bumbot)
+
+![The tip of the bow at sunset, a mock-up](docs/brainstorm/ending-bow-sunset.png)
+
+1. **On the bridge** Bumbot hits the alarm, and an emergency hatch in the ceiling releases (it stays
+   shut until then, so she can't go early). He shoots up through it. A ladder at the bridge's
+   forward end leads to it; ladders and climbing out of a hatch are already in the game.
+2. **Out on the balcony forward of the spa**, right above the bridge, the sun starts to set: sunset
+   appears nowhere else in the game (§5.2). The camera slides forward and down at normal zoom to
+   show him settling at the tip of the bow, then comes back to her. So she can't get lost: there
+   is one way forward from the moment he escapes.
+3. **She glides down on the parasol**, about four decks, to the mooring deck. A miss is the overboard
+   scare, then back to the bridge to try again.
+4. **At the very tip of the bow** she stands in the wind, arms spread (the arms-wide pose stays in
+   her sprites from the user's earlier bow view, §8). All game she lunged and he ran. If she runs
+   at him he backs off; if she stands still he comes to her, and when she bends with her arms out,
+   the same pose as every near-catch, this time he jumps into them.
+5. **Optional, the way home:** a fade, then she carries him from deck 12 through the ship she opened
+   up, back to cabin 8206, where he curls up on the bed; the win screen and the personal message
+   (§6.4) come there. A fade is needed because she can't climb down with her arms full.
+
+What it takes: the balcony closed off from deck 12 by **a tall glass windscreen along the front of
+the Spinnaker balcony** (a real, visible barrier), the bridge's ladder and hatch, the sunset version
+of the sky and sea, her holding Bumbot (about 10 generations for a new state of her character, or
+free with his sprite on her arms-out pose). Bumbot must come through to her side of the railing
+in the scene: in the mock-up the railing hides him.
+
+Checked in the game (2026-11-09): the balcony forward of the spa
+(`docs/brainstorm/balcony-forward-of-the-spa.png`, deck 11's open strip, about 24-29.5 m) can only be
+reached today by jumping off the front of deck 12; she lands on it, and its back wall has no door.
+
+#### The funnel's top: for something else
+
+The user: a funnel with smoke coming out isn't a romantic place for the catch, but its top can
+serve another purpose that helps progress. Mock-ups from when it was the catch's place, with ladders
+that no longer apply: `docs/brainstorm/funnel-top-close.png`, `docs/brainstorm/funnel-top-where.png`.
+
+**Getting up there:** a steel stairway up the funnel's sloped front (about 45 degrees, so the game's
+normal stairs work), starting where the existing ladder from deck 12 comes up on the roof. Not
+ladders on the aft side as first drawn: the existing ladder is on the forward side and the funnel's
+base is solid, so she couldn't reach them. From deck 12 she can't see the top (it is about 640 px
+over the floor; the camera shows about 135 px over her).
+
+| Idea | What she does up there | What it does for progress |
+|---|---|---|
+| **The ship's horn** (Claude's pick) | Pulls the great horn's cord | One blast changes places she knows: the old lady leaves her sunbed, gulls lift off a spot they were blocking, the duty officer runs for the bridge and drops his card. Needs sound (off for now: until then, the screen shaking and everyone jumping) |
+| **The stranded engineer** | Brings lunch or a tool to a technician who can't leave the exhaust work | Another carrying errand; he hands over a card. Combines well with the horn: he lets her pull it |
+| **The lookout telescope** | Looks through it from the highest point on the ship | Shows a place she hasn't found yet, such as deck 7's hidden stern strip |
+| **The exhaust damper** | Turns a big valve | The smoke stops and steam vents elsewhere go quiet, opening a path |
+
+The maps above draw the horn and the engineer together.
+
+#### Considered and dropped
+
+- **The funnel's top as the place of the catch:** not romantic (the user). With it went its stairway
+  as a finale, a gold gate on the roof and a gold card on the bridge.
+- **Cabin 8206 as a home base, as the last region, or as the place of the catch:** it is a surprise
+  around the middle of the game. (The optional way home above ends there, after the catch.)
+- **A whole-ship camera pull-back to show where he went:** the same kind of pull-back was removed from
+  the bow view because it didn't work visually (§8).
+- **Other places for the catch:** the antenna mast (narrow, no room for a scene), the theatre stage
+  (she has been there since step 3), the ice cream machine at the Great Outdoors (little drama).
+- **Gliding down from the Spinnaker balcony:** replaced by the user's idea of the balcony reached from
+  inside the bridge.
+- **Fire doors dropping all over the ship after the alarm:** they were there to block routes and
+  steer her; with one way forward from the bridge they have no job. (Drawn out of the maps; the user
+  hasn't confirmed.)
+
+#### Still open
+
+1. The order of the nine steps.
+2. What the funnel's top is for: the horn, the engineer, both, or something else.
+3. Whether the fire doors are really gone.
+4. Whether the final glide should be harder, with wind or gulls, and whether the short finale (bridge,
+   hatch, glide, catch) is the right pace.
+5. Whether the mooring deck and the balcony stay shut until the finale, so she first sets foot there
+   at sunset (the maps assume so).
+6. The catch itself: she stands still and he comes to her.
+7. The way home to cabin 8206 as the ending.
+8. Whether her hands are full while carrying something, so no ladders or trunks, only stairs and
+   elevators (Claude's suggestion: it makes her plan a route through decks she knows).
+9. Deck 7's stern strip (§8) as a secret she glides down to with the parasol.
+10. How many near-catches there are, and where; where the checkpoints go; whether the dash stays, and
+    what the tangerines are then for.
+
+### 6.2 What the code can already do
+
+Mechanisms from the blockout, there to be used or dropped as the design needs. They are not plans.
+
+- **A wall with a door between every two parts of the ship:** each room, stair lobby, cabin
+  corridor stretch, the atrium (one part over all its decks; so is the theatre with its balcony),
+  and the ways out to open decks. All of them open with E for now.
+- **A locked-out part** can have its own piece of the ship's side, cut open only while she is in
+  it, and dimmed from the other side of its wall. The bridge and the spa have such a piece, not in
+  use for now (`LOCKED_PARTS` in `src/config.js` is off); until it is on, the deck she is on is cut
+  open whole.
+- **Card locks** on stairs, escape trunks and elevators, with a coloured reader beside them: off
+  for now (`KEY_CARDS.required`; `?cards=locked` turns them on, and the playtests use it).
 
 ### 6.3 Tangerines
 
-**Decided:** no carrying cap, but scarce.
-
-**Decided:** **10** on the ship to start with, tuned in testing.
-
-The game can be **finished without using special abilities**; they help, but are never required.
-Tangerines go where a dash is genuinely useful: a breakable shortcut, a cluster of enemies.
+**Open (the user, 2026-11-09):** none are on the ship for now, until it is decided whether the
+dash stays (§3.2). If it does: no carrying cap, but scarce, and the game can be finished without
+the dash.
 
 ### 6.4 Later
 
@@ -714,11 +810,11 @@ Tangerines go where a dash is genuinely useful: a breakable shortcut, a cluster 
 2. **A tile-based world:** the ship is decks, walls, floors and openings, not a ground line with pits.
 3. **Ladders:** a climbing state with no gravity, ↑/↓ movement, and jumping or stepping off.
 4. **Elevators:** moving platforms that carry her, with call/stop logic between decks.
-5. **Doors, locks and an inventory:** cards and keys she carries, and locked doors that check for them.
+5. **Doors, locks and an inventory:** things she carries, and locked doors that check for them.
 6. **Breakables:** a solid type the dash destroys while walls stay solid.
 7. **The Кісюнічка dash:** a 10s timer, tangerine fuel.
 8. **Scripted Bumbot scenes:** idle-then-escape scenes and the final catch (the near-catch is
-   built; its spots and the final catch are mapped in later, §4).
+   built; where he appears and the final catch are being designed, §6).
 9. **Checkpoints and scares:** crew cabin doors, closest-activated respawn, the scare animations
    (run off, fall out of frame, life ring).
 10. **Keyboard + Xbox controller input**, both mapped to the same actions.
@@ -763,15 +859,13 @@ art:
 
 - Floors per deck at their real extent; the upper decks step back into open **terraces** with
   railings at the bow and stern, a steel outer wall with a doorway where a terrace meets the indoors.
-- **Stairs** zigzag through the three cores from deck 4 to 12. Flights up to decks 5–6 need only her
-  crew card; flights above deck 6 need the Hotel card and show "🔒 Hotel card" when she tries.
+- **Stairs** zigzag through the three cores from deck 4 to 12.
 - Back walls tinted by area (venues blue-grey, cabins cream, crew peach, atrium yellow, deck 3 dim);
   outdoor stretches open to the sky. Venue name signs, DECK n signs at every core, muted cabin
   doors every 4 m along cabin corridors.
 - A roof over deck 12's indoor rooms, the funnel and mast on top, and a technical ladder from deck 12
   up to the roof beside the funnel. Deck 12 is open over the middle of the Oasis Pool.
-- Placed: the gangway spawn (deck 4, 67 m), 10 checkpoints, Bumbot at his five spots (taken out
-  2026-11-07, §4), 10 tangerines, a crate stack, the robot vacuum on deck 4.
+- Placed: the gangway spawn (deck 4, 67 m), a crate stack, the robot vacuum on deck 4.
 - The sea lies beyond both ends; overboard works at either end.
 
 ### 7.4 Alternatives considered
@@ -792,13 +886,12 @@ Nothing blocks the start of the build. These get settled along the way:
 
 - [x] Climbing out of a hatch at the top of a ladder (§3)
 - [x] Her idles: foot tap, look back (§3)
-- [x] Bumbot's sprite and his five activities, plus run, leap and eating (§4)
+- [x] Bumbot's sprite and his activities, plus run, leap and eating (§4)
 - [ ] The finale's art: her holding Bumbot (a state of her character, ~10 generations, or her
       arms-out pose with his sprite on top), designed with the win sequence (§4)
 - [x] The whole ship laid out as a blockout from the real profile (§5.3, §7.3)
 - [x] The user's playtest of the blockout (2026-11-01): getting around, scale, venues, movement and
-      camera all good; it feels empty, as expected for now. Only the vacuum scare tried so far;
-      checkpoints get tuned once the interiors are filled
+      camera all good; it feels empty, as expected for now. Only the vacuum scare tried so far
 - [x] **Escape trunks** (§5.1): ladder doors between decks, four test ones in the blockout. Tried
       by the user and merged 2026-11-01. Serve with `python tools/serve.py` (no stale caching)
 - [x] **Elevators** (§5.1): one per core (decks 4–12) and the atrium's glass one (decks 5–9), E to
@@ -838,8 +931,8 @@ Nothing blocks the start of the build. These get settled along the way:
       behind it and parting after it, one up and one down; scaled to cover most of the bow's side
       (`assets/ship/livery.png`, built with the map; no lettering: the name stays hidden, §5.1).
       On top, the **open mooring deck** on deck 7 (2.5-20.5 m), reached through a doorway, with
-      bollards, cleats and a side railing; **card-locked later** (Technical card, §6.2).
-      **Bridge:** deck 10's front at 24 m with windows; Bumbot's bridge spot at 27 m. **Stern:** a
+      bollards, cleats and a side railing.
+      **Bridge:** deck 10's front at 24 m with windows. **Stern:** a
       near-upright transom on decks 3-6 (255 m), decks 7-11 stepping back in open tiers (254 down
       to 244 m). Deck ends are white outer plating; railings ending open decks look like the
       decks' side railings
@@ -911,12 +1004,8 @@ Nothing blocks the start of the build. These get settled along the way:
       deck sticking out past the one above left a strip of open terrace with half a wall), and the
       stage runs to it between its two curtains; at the promenade's ends she stops in the first
       opening, partly behind the end pier (she used to slip behind it with bits poking out)
-- [ ] **Open: checkpoints, removed for now** (the user, 2026-11-03): some sat too close together;
-      every checkpoint door is gone until the ship is split into unlockable areas (§5.5, key
-      cards), when they are placed again, spaced out. Until then a scare always brings her back
-      at the gangway. The last placements (deck, metres): gangway 4/71, d5-aft 5/250.2,
-      d6-promenade 6/193.4, d6-theatre 6/209, d7-casino 7/152, d9-linen 9/115, d10-bridge 10/44,
-      d11-pool 11/162, d11-buffet 11/191, d12-sports 12/175
+- [ ] **Open: no checkpoints in the game for now** (the user, 2026-11-03): a scare always brings
+      her back at the gangway until they are placed, spaced well apart (§5.5, §6)
 - [x] **Deck 7 furnished** (2026-11-03, merged): after NCL's plan
       and the user's photos (`deck_7_central_area`). Bow to stern: **Splash Academy** (21-45:
       sunny walls, a blue dotted carpet, a play kitchen, toys, low tables), **Entourage** (45-74:
@@ -948,10 +1037,8 @@ Nothing blocks the start of the build. These get settled along the way:
       **The forward hull is plain white plating** with the livery, no windows forward of 30 m
       (`HULL_PLAIN_TO`, her photos). The sun moved 1.5 m aft to stay clear of the stem; it is to
       be moved and enlarged later (the user)
-- [ ] **Open: key cards are off for now** (the user, 2026-11-03): every flight, trunk and
-      elevator is open (`KEY_CARDS.required` in `src/config.js`; `?cards=locked` turns the locks
-      back on, and the playtests use it). They come back with the unlockable areas, with the
-      checkpoints
+- [ ] **Open: the locks are off for now** (the user, 2026-11-03): every flight, trunk and
+      elevator is open until the progression is designed (§6, §6.2)
 - [x] **Deck 8 furnished** (2026-11-06, merged): NCL's plan has
       only cabins there and the atrium. **Cabin 8206, the user's own cabin on the cruise**
       (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
@@ -966,8 +1053,7 @@ Nothing blocks the start of the build. These get settled along the way:
       on the same line as the wardrobe and desk; **the painting is the one in her photo**, cropped
       from it and converted by PixelLab (`image_to_pixelart`, faithful, 1 generation; a version
       remapped to blues was tried, the user preferred the first); everything but the bed washed
-      out a little; **she can jump onto the bed** and stand on it; **two tangerines side by side on
-      the desk** under the TV (extra to the ten of §6.3). **Standing still on the bed for a second,
+      out a little; **she can jump onto the bed** and stand on it. **Standing still on the bed for a second,
       she bounces on it for joy** (the user's idea): turned to us, in place, from one foot to the
       other, hopping a little off the bed onto the other foot, her arms waving up and down; any
       key stops it (skeleton-v3 custom poses facing the camera, 3 generations,
@@ -1004,8 +1090,8 @@ Nothing blocks the start of the build. These get settled along the way:
       open off the corridor (`LINEN_ROOM` in `tools/ship_layout.py`) with a "LINEN" plate; E and she
       is inside (`tools/draw_linen.py`, drawn by hand, no generations): pale painted steel, a
       fluorescent tube, grey-green vinyl, a laundry cart, a clipboard, chrome racks of folded
-      towels, bath mats, sheets, pillows, toilet rolls and toiletries; **Bumbot asleep on a heap of
-      fresh towels** on the floor, who leaps away **into a low vent, its grille hanging open** (§4).
+      towels, bath mats, sheets, pillows, toilet rolls and toiletries; a heap of
+      fresh towels on the floor and a low vent, its grille hanging open.
       **A room she enters shows in the corridor's place, the deck around it dimmed almost to
       black** (`ROOM_DIM`; the user chose this over a hole in the hull or a scene of its own, and
       cabin 8206 changed to match). **The aft terraces of decks 8-10 and deck 7's stern strip**
@@ -1022,15 +1108,15 @@ Nothing blocks the start of the build. These get settled along the way:
       (`ATRIUM["lift"]`). **The bridge** (25-40 m; its inside starts about 28.5 m, the deck's front
       being structure): one PixelLab sheet (`bridge-1`, 16 at 64px, 10 generations, all kept),
       shrunk to her scale in the art packer (a new `height` option; the main console was drawn
-      across two frames and is joined whole): the main console, the helm, the engine telegraph
-      (**Bumbot on the floor batting at its levers**), the captain's chair, the compass binnacle,
+      across two frames and is joined whole): the main console, the helm, the engine telegraph,
+      the captain's chair, the compass binnacle,
       the radar, the chart display, the chart table, the alarm panel, the clock and barometer and
       three monitors on the wall; real side windows, big panes with the sky over the sea, in two
       runs; pale grey-blue steel walls, a dark grey floor. Spare for later: a radio desk, a joystick
       console, a coffee counter, a logbook lectern. **Its back wall across the deck at 40 m** with a
       crew door seen from the side (`BRIDGE_WALL_M`), a red "BRIDGE / CREW ONLY" sign: shut, it
       stops her; **E opens it**, swung flat against the wall on the bridge side, seen face on; it
-      shuts once she is away (the Captain's card is to lock it later, §6.2). **The bridge has its
+      shuts once she is away. **The bridge has its
       own piece of the ship's side** (`shell_rooms()` in the map builder): out of sight from the
       corridor, and on the bridge only it is cut open, the rest of the deck closed, with the cut's
       shadowed edges (the user chose this over dimming the deck there; since 2026-11-08 the bridge
@@ -1057,9 +1143,9 @@ Nothing blocks the start of the build. These get settled along the way:
       the towel cart, a shower in a frosted cubicle, palms, Topsiders' bar); the pools' tiled tanks
       drawn over the hull so their floor shows from deck 11, still hidden and passable from deck 10;
       **the Garden Café** (buffet counters, light blue chairs at wood tables, windows in runs,
-      Bumbot by a table with a fish, the Ice Cream Bar with its sign between windows, wicker window
+      the Ice Cream Bar with its sign between windows, wicker window
       seats); **the Sports Bar** inside by the aft lobby; **the Great Outdoors** (the self-service
-      station: coffee machines and **the soft serve ice cream machine, the finale's**, then round
+      station: coffee machines and the soft serve ice cream machine, then round
       white tables in wicker chairs, palms, parasols where the sky is open). The glass elevator
       runs to deck 10 now, its column up to the dome (the user). **After a scare she reappears
       with her deck already cut open** (the view no longer slides over from where she fell).
@@ -1074,14 +1160,8 @@ Nothing blocks the start of the build. These get settled along the way:
       (`DOOR_PASSAGES`); the others (deck 7's front, the small terraces of decks 8-10, deck 11's
       open front) keep their white end walls she passes through. The bridge's crew door and the
       spa's stay. Doorway posts gave way to the walls, their plaques kept; the gangway lobby's
-      drawn fire doors went. **All doors open for now; some are locked with key cards later**
-      (§6.2). The rest of the bridge and spa rule (each part's own piece of the ship's side, cut
+      drawn fire doors went. **All doors open for now** (§6.2). The rest of the bridge and spa rule (each part's own piece of the ship's side, cut
       open only while she is in it) waits for the locked-out areas (the user)
-- [x] **Bumbot's spots taken out** (the user, 2026-11-07): all five (the theatre, the bridge, the
-      pool deck, the Garden Café, the linen room) and the finale's place, to be mapped in later;
-      his tests went too, to come back with him. His sprite, animations and the near-catch stay in
-      the code. The layout's room names lost their "(Bumbot: ...)" marks; the Great Outdoors is a
-      plain `terrace`, no longer the `finale`
 - [x] **Deck 12 furnished** (2026-11-07): after NCL's plan (the Spinnaker is on deck 12 there and
       on cruisedeckplans.com's, `reference/web/deck12/`) and the user's photos; three PixelLab sheets
       (`tall-5`, `tall-6`, `props-7`, 30 generations, all 96 pieces kept; `tall-5` wrote each piece's
@@ -1116,8 +1196,6 @@ Nothing blocks the start of the build. These get settled along the way:
 - [x] **Decided: deck 11's front stays as NCL's 2022 map has it** (the spa forward; the user,
       2026-11-08). cruisedeckplans.com's 2025 plan (`deck11-2025`, kept in `reference/web/deck11/`:
       suites forward with a curved hot-tub terrace, the spa further aft) is not followed
-- [ ] **Later: map Bumbot in again** (§4): his spots (deck 12 had none yet; the design's SUSHI sign
-      secret, §5, is one idea), the finale's place, and his near-catches' tests
 - [ ] **The outside of the ship, after the user's photos and videos** (in progress, 2026-11-07,
       branch `exterior`; references: the side photo `reference/photos/side-full.jpg`, two videos and
       a photo in `reference/videos/`, frames in `reference/videos/frames/`). Done, zone by zone
@@ -1203,17 +1281,19 @@ Nothing blocks the start of the build. These get settled along the way:
       other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
       open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
       by the spa's wall on deck 11 moved clear of its sign
-- [ ] **Start the next session here: the outside of the ship is done** (the sea, the background,
+- [ ] **Start the next session here: the progression brainstorm** (2026-11-09, §6.1), in progress,
+      **nothing decided yet**: the user will continue it. Its open questions are at the end of §6.1,
+      and its maps come from `python tools/draw_regions.py`. Work is on branch `progression-design`
+      (not merged to `main` yet)
+- [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
       a glide, a flap, perched on a railing; about 12 generations), and gulls as a hazard (§5.8).
       Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
-      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: the ship's areas and their progression, which doors are locked with which
-      card (§6.2), with Bumbot mapped in again (§4); **still to decide with the user: how the ship
-      is split and which parts are locked** (when that is settled, `LOCKED_PARTS` in
-      `src/config.js` closes and dims a locked part; so far the bridge and the spa are set up for
-      it, §5.5); doors along the decks into small separate rooms
+      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: **the progression, being brainstormed from scratch with
+      the user (2026-11-09, §6.1)**: how the ship is split, what locks it, Bumbot and the
+      checkpoints; doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
       (`https://www.cruisedeckplans.com/ships/deckbydeck.php?ship=Norwegian-Sun&deck=N`; decks 8
@@ -1237,14 +1317,7 @@ Nothing blocks the start of the build. These get settled along the way:
       now, crossed on a side walk, the dome under deck 11
 - [ ] **After the ship is populated** (decided 2026-11-01: these come more naturally once she can
       travel a furnished ship): the user tours it and decides, with suggestions from Claude welcome:
-  - **Key cards in the world**: where the Hotel, Technical and Captain cards are found, card
-    readers on venue doors, the colleague's lunch (§5.8, §6.2). Until then, `?cards=all` opens
-    everything
-  - **Near-catch progress**: remember which of the five she has seen, Bumbot's escapes pointing
-    somewhere (into a trunk she can't open yet, among others), the diner opening after the fifth,
-    the finale (§4)
-  - Where the real escape trunks go (the four in the blockout are tests, §5.1); tangerines and
-    checkpoints tuned in play
+  - Where the real escape trunks go (the four in the blockout are tests, §5.1)
   - **Deck 7's stern strip** (the user, 2026-11-06; **remind the user when placing gameplay
     items, NPCs and the like**): the open strip at deck 7's level behind deck 8's end, on the stern
     structure, is kept, reachable only by dropping from deck 8's stern terrace; its wall into the
@@ -1257,8 +1330,6 @@ Nothing blocks the start of the build. These get settled along the way:
       unusable; draw floors by hand. **Show art for approval as pictures in the chat**
 
 - [ ] Art: which tools you pick (§2.1)
-- [ ] The colleague's post and card, once the mid-game is laid out (§5.8)
-- [ ] Tangerine placement (§6.3)
 - [ ] Her quirks: added as we build (§3)
 - [ ] Secrets, ship name markings (§5.1, §5.8) — **Later**
 - [ ] Hidden extras, win screen (§6.4) — **Later**

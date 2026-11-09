@@ -28,10 +28,9 @@ const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
 // Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
 // over the floor, how close to its side walls she can go, and the bed she can jump onto: its ends
-// and its top over the floor; the desk's top over the floor and where on it the two tangerines sit,
-// from the door (the user, 2026-11-06).
+// and its top over the floor (the user, 2026-11-06).
 const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], bedTop: 32,
-                desk: { top: 40, tangerines: [53, 61] }, window: [143, 37, 35, 37],   // its glass: x, y, w, h
+                window: [143, 37, 35, 37],   // its glass: x, y, w, h
                 doorWindow: [14, 17, 16, 19],     // the glass seen through its open door, in the door's image
                 shower: [6, 44, 40, 123],         // the shower room's door, x0, y0, x1, y1 (tools/draw_cabin.py's SHOWER)
                 towel: [28, 79], slide: 18 };     // her towel hung on its handle; how far the door slides open
@@ -899,8 +898,6 @@ export class ShipScene extends Phaser.Scene {
         const [a, b] = CABIN.bed;
         c.bed = this.add.zone(x0 + (a + b) / 2, o.y - CABIN.bedTop + 4, b - a, 8);
         this.physics.add.existing(c.bed, true);
-        // Two tangerines side by side on the desk under the TV (the user, 2026-11-06).
-        CABIN.desk.tangerines.forEach((dx, i) => this.addTangerine(`t-cabin-${i + 1}`, o.x + dx, o.y - CABIN.desk.top + 1, 'cabin'));
     }
 
     // Bumbot at one of his spots (§4), doing `activity`; he runs off toward `escape` (1 aft, -1
