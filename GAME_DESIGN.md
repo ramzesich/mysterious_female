@@ -642,7 +642,9 @@ a sprite or an idea already met; and **the user himself on the ship**, with **me
 cream machine** at the Great Outdoors' entrance, which he loved. So everything in this section is
 **Decided as the plan**: the user steers during the build and can overrule any item; what then
 changes is recorded here. The maps come from `python tools/draw_regions.py` (after
-`python tools/render_ship.py`).
+`python tools/render_ship.py`). **Every entity in place, with its position and behaviour, is in
+`docs/population.md`** (2026-11-10): the spec the build populates the ship from; where it is finer
+than this section, it is the later word.
 
 Kept from the brainstorm, as agreed then: all four kinds of lock; staggered stairs; new ways to move
 required to finish; a locked part hidden behind the closed ship's side until she enters it, the first
@@ -727,7 +729,7 @@ a respawn door, not a hub: the "no home base" ruling stands). Listed per region 
 It is **learned, not given**: at her first sight of Bumbot she screams "Кісюнічка!!!", and from then
 on D dashes, fuelled by tangerines as §3.2 says. It is **never required**: breakables (stacked
 luggage, a jammed trolley, stacked deck chairs, crates, a piñata) hide shortcuts and secrets, never
-the way on; it also shoves the vacuum aside, scares the kid off and passes the sprinkler. **About 35
+the way on; it also shoves the vacuum aside, scares the kid off and passes the sprinkler. **About 40
 tangerines** on the ship, each where food plausibly is (fruit bowls, buffet counters, trays, pantry
 crates, a cabin's welcome basket), two of them a person's thanks. Scarce enough that each one counts.
 
@@ -752,7 +754,7 @@ opens full screen. Six places are fixed here (§6.1.11); the pictures come from 
 | 4 | Housekeeping | Deck 9 midships round the linen room, the atrium's walks and midship lobbies on 8-10 | The Entertainment card, on the crew trunk from Bliss up to deck 9 | Pushing carts, crawling | Asleep in the towels: near-catch 4, into the vent |
 | 5 | Deck 8 forward | Deck 8 forward of the atrium, cabin 8206 | The vent's duct, dropping her past the corridor's shut door | | A glimpse: his tail up the forward stairs |
 | 6 | Lido | Deck 11 from the forward lobby aft: gym, pool deck, Garden Café, Great Outdoors and his ice cream machine | The forward stairs on up from deck 8 | Grip socks (wall jumps) | Fishing at the pool: near-catch 5, he falls in and drains it; the hatch into deck 10 |
-| 7 | Outside | The balconies of decks 8-10, the boat walkway, the hallways inside | Grip socks, out through the balcony cabin on deck 9 or up from the boat walkway | | A glimpse: swiping at a gull on a rail two decks up; his balcony door is ajar |
+| 7 | Outside | The balconies of decks 8-10, the boat walkway, the hallways inside | Grip socks, out through the balcony cabin on deck 9 or up from the boat walkway | | A glimpse: swiping at a gull on a rail a deck up; his balcony door is ajar |
 | 8 | Top deck + funnel | Deck 12 from Champs aft, the roof, the funnel's stairway and top | Grip socks: a wall jump from the Great Outdoors onto the sun cover and up to deck 12's aft terrace | The parasol (a glide) | A silhouette on the funnel; at the horn he bolts for the bow |
 | 9 | The bow | Deck 12 forward (chapel, kids' pool, Spinnaker), the spa, the officers' cabins, the bridge, the kids' clubs | The wedding cake clears deck 12's forward lobby; the Officer's card opens the gold doors down the bow | | On the bridge: near-catch 6, the rival hits the alarm, the hatch opens |
 | 10 | Sunset | The balcony forward of the spa, the air, the mooring deck, the tip of the bow | The hatch | | The catch |
@@ -875,7 +877,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   and she takes their picture with it (they pose, the flash); their thanks is **the book** they found
   in their cabin. **The balcony cabin** (150 m): a cabin with a balcony, its door green, the card's
   first use; inside, a balcony door out: a view, and a dead end until the socks; from its balcony she
-  sees Bumbot two decks up. A cabin mid-cleanup (its door open, the vacuum inside, towels stacked in
+  sees Bumbot a deck up, on deck 10's rail. A cabin mid-cleanup (its door open, the vacuum inside, towels stacked in
   the doorway). A "Do Not Disturb" door (opening it, a startled guest: a scare). A cabin door that
   swings open as she passes (its handle turns first).
 - **The linen room:** **Bumbot asleep in the towel heap** (the heap is drawn). **Near-catch 4:** he
@@ -978,15 +980,17 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   socks).
 - **The way in:** the socks, out through the balcony cabin on deck 9, or up from the boat walkway (a
   wall jump up the recess's wall onto deck 8's balconies).
-- **The climb:** along a deck, she jumps onto a balcony's rail and along the rails from balcony to
-  balcony, between gusts; up a deck, a wall jump off a partition onto the balcony above. Down is a
+- **The climb:** the partitions between balconies are solid, taller than a jump and run to the
+  rail, so every move needs the socks: along a deck, a wall jump off the partition onto the next
+  balcony, between gusts; up a deck, a wall jump up the partition onto the balcony above. Down is a
   drop: one deck lands on the balcony or the walkway below; further is the long-fall scare onto the
-  promenade, or the overboard scare into the sea below deck 8.
+  promenade, or the overboard scare into the sea below deck 8. (So in region 4 the balcony cabin's
+  balcony is a true dead end, and a drop from it only leads down and out.)
 - **The hallways:** on each corridor stretch **one balcony door stands ajar**, housekeeping airing the
   cabin: in through the cabin, out its corridor door, and the hallway's lobby doors open from inside
   for good. With all of them open, decks 8-10 are the fast way fore and aft, through the cores' green
   doors.
-- **Bumbot:** a glimpse: **swiping at a gull on a rail** two decks up (the gull flaps off), then gone
+- **Bumbot:** a glimpse: **swiping at a gull on a rail** a deck up (the gull flaps off), then gone
   inside; when she reaches that balcony its door is ajar: his door is one of the hallway entries.
 - **People:** **a guest locked out on his own balcony** (deck 10 aft; his bubble: a door): she enters
   the hallway by another balcony, comes to his cabin door inside and opens it with the green card;
@@ -1020,8 +1024,9 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   glare, a book in her hands; passing her is a jump over the sunbed, or ↓ through the walk into the
   pool below, neither of which a tray allows: with a tray the way is the aft stairs. Her cocktail
   (optional: Topsiders' bar, a mojito on a tray): she dozes off, two tangerines, the only tangerines
-  anyone gives. **The engineer** at the "TECHNICAL, CREW ONLY" door by Teppanyaki (190 m, the roof
-  ladder's foot); his bubble: a steaming cup. **His coffee** comes from the coffee machines beside the
+  anyone gives. **The engineer** at the "TECHNICAL, CREW ONLY" door at Cagney's forward end (165 m, the
+  roof ladder's foot: the funnel's base is solid and its stairway climbs the forward face, so the
+  ladder comes up forward of it); his bubble: a steaming cup. **His coffee** comes from the coffee machines beside the
   ice cream at the Great Outdoors (deck 11, 212 m): a hot tray with a "keep it hot" meter, the opposite
   of the cone; the way is up the aft stairs and through Teppanyaki past the chef's flare. He drinks,
   waves her up, and climbs the ladder; she follows (no tray now): the roof, the stairway up the
@@ -1045,7 +1050,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   every few seconds (a "bonked" scare); **Teppanyaki's flare** (the chef's grill flames up every few
   seconds as she passes the counter: a "singed" scare, she pats her hair); the old lady (a block);
   gusts on the aft terrace.
-- **Checkpoints:** the crew door by Teppanyaki (the ladder's foot); the engineer's locker at the top.
+- **Checkpoints:** the technical door at 165 m (the ladder's foot); the engineer's locker at the top.
 - **The books:** the old lady's, after the horn; the engineer's, at the top.
 - **Secrets:** the telescope; Los Lobos' piñata (the dash breaks it: tangerines); the sports court (E with a
   ball: she scores, a quirk). Tangerines: the piñata (3), Cagney's (1), the old lady (2).
@@ -1344,9 +1349,9 @@ matters.
    balcony doors; the glass elevator's panel as the meter; the checkpoints; the tangerines; **the ten
    books, the trolley, the shelf and the reading chair; the ice cream machine's swirl, the canister
    and the cone as bait**; Bumbot's beats as scripted scenes with his existing clips; the horn's
-   cascade; the people as placeholder figures with bubbles; the finale's route. **A headless
-   golden-path playtest** from the gangway to the catch, and **a sweep for sequence breaks** (every
-   lock tried from the wrong side).
+   cascade; the people as placeholder figures with bubbles; the finale's route. Everything placed as
+   `docs/population.md` says, deck by deck. **A headless golden-path playtest** from the gangway to
+   the catch, and **a sweep for sequence breaks** (every lock tried from the wrong side).
 2. **Her new moves' art:** push, crawl, wall jump, glide, the tray clips, the swirl, the horn pull, the
    catch.
 3. **The people:** the crew, the rival and her husband first, then the passengers, then the block
@@ -1919,8 +1924,10 @@ Nothing blocks the start of the build. These get settled along the way:
       user asked Claude to settle the brainstorm's questions for the most fun and save the result as
       the plan). Its build order is §6.1.13: phase 1 first, the skeleton of the progression with
       placeholder art, ending in a headless golden-path playtest from the gangway to the catch and a
-      sweep for sequence breaks. The maps come from `python tools/draw_regions.py`. The plan is on
-      branch `progression-design`, committed, not merged to `main` yet: merge when the user approves
+      sweep for sequence breaks. **Every entity's place and behaviour is in `docs/population.md`**
+      (the population spec, 2026-11-10): build from it, deck by deck. The maps come from
+      `python tools/draw_regions.py`. The plan is on branch `progression-design`, committed, not
+      merged to `main` yet: merge when the user approves
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
