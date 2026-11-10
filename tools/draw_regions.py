@@ -63,19 +63,19 @@ FUNNEL_REGION = 8
 LABELS = [
     (4, 67, "Gangway (start)"), (4, 122, "Laundry"), (4, 165, "Crew corridors, cabins"),
     (4, 232, "Stage manager's cabin"),
-    (5, 47, "Cabins"), (5, 92, "Atrium Café"), (5, 130, "Reception"), (5, 172, "Restaurants"),
+    (5, 47, "Cabins"), (5, 92, "Atrium Café: a book"), (5, 130, "Reception"), (5, 172, "Restaurants"),
     (5, 228, "Seven Seas: lunch, Bumbot"),
-    (6, 47, "Cabins"), (6, 92, "Atrium"), ("prom", 170, "Promenade"), ("rooms", 130, "Bliss, shops"),
-    ("rooms", 176, "Library: Bumbot"), (6, 243, "Theatre: stage"),
-    (7, 9, "Mooring"), (7, 48, "Kids' clubs"), (7, 92, "Atrium"), ("out7", 165, "Boat walkway"),
+    (6, 47, "Cabins"), (6, 92, "Atrium"), ("prom", 170, "Promenade: the jogger"), ("rooms", 130, "Bliss, shops"),
+    ("rooms", 176, "Library: her books, Bumbot"), (6, 243, "Theatre: stage"),
+    (7, 9, "Mooring"), (7, 48, "Kids' clubs"), (7, 92, "Atrium"), ("out7", 165, "Boat walkway: the drill"),
     ("in7", 150, "Casino, gallery, arcade"), (7, 242, "Balcony"),
     (8, 50, "Cabin 8206"), ("out8", 175, "Balconies"), ("in8", 150, "Hallway"), ("in8", 228, "Hallway"),
     (9, 50, "Officers' cabins"), ("out9", 175, "Balconies"), ("in9", 121, "Linen room"),
-    ("in9", 162, "Corridor: steward, carts"), ("in9", 225, "Hallway"),
+    ("in9", 162, "Corridor: steward, honeymooners"), ("in9", 225, "Hallway"),
     (10, 32, "Bridge"), (10, 58, "Officers' cabins"), ("out10", 175, "Balconies"),
     ("in10", 165, "Hallway (the pool's hatch)"), ("in10", 225, "Hallway"),
     (11, 26.5, "Balcony"), (11, 52, "Spa"), (11, 92, "Gym: socks"), (11, 135, "Pool: Bumbot"),
-    (11, 177, "Garden Café"), (11, 226, "Great Outdoors"),
+    (11, 177, "Garden Café: the queue"), (11, 224, "Great Outdoors: ice cream, you"),
     (12, 50, "Spinnaker, Chapel"), (12, 92, "Champs"), (12, 128, "Sun deck: old lady"), (12, 155, "Sports"),
     (12, 190, "Restaurants"), ("funnel", 186, "Horn, engineer"),
 ]
@@ -114,15 +114,15 @@ STEPS = [
      "Bumbot is eating it: the first near-catch, and the dash is born. A fresh tray carried back to him: the Deck card.",
      [((5, 228), (4, 67), "errand")]),
     (2, "The Deck card opens the forward stairs' fire door up to deck 6.",
-     "The atrium, the bars and shops, the promenade, the boat walkway's gate. He rides the glass elevator up where she "
-     "can't; in the Library he bolts through a roped-off door and leaves it open.",
+     "The atrium, the promenade, the boat walkway's gate; the library, the librarian and her ten lost books. He rides "
+     "the glass elevator up where she can't; in the Library, asleep on her book, he bolts through a roped-off door.",
      [((4, 76), (6, 78), "back"), ((6, 92), ("prom", 175), "back"), (("prom", 125), ("out7", 125), "back")]),
     (3, "The door he left open leads into the theatre: the rehearsal, Bumbot in the spotlight.",
      "The stage manager's pills from his cabin on deck 4, down the theatre's trunk. His Entertainment card opens "
      "the way up through deck 7 and, from Bliss, the crew trunk to deck 9.",
      [(("rooms", 190), (7, 240), "back"), ((4, 232), (6, 240), "errand"), ((6, 240), (4, 240), "short")]),
     (4, "The Entertainment card: the crew trunk from Bliss up to deck 9's corridor.",
-     "The steward's cart (pushing: the Housekeeping card), a guest locked out, the balcony cabin. The linen room: "
+     "The steward's cart (pushing: the Housekeeping card), the honeymooners' picture, the balcony cabin. The linen room: "
      "Bumbot in the towels, into the vent; the laundry chute to deck 4; the pantries.",
      [(("rooms", 118), ("in9", 118), "back"), (("in9", 113), (4, 113), "short"), (("in9", 113), (5, 160), "back")]),
     (5, "The vent's duct: a crawl forward and down into deck 8 forward, past its shut door.",
@@ -130,25 +130,26 @@ STEPS = [
      [(("in9", 112), (8, 66), "back")]),
     (6, "The forward stairs on up: the gym's grip socks, wall jumps everywhere.",
      "Bumbot fishing at the pool: the kid squirts him, he falls in and drains it; the hatch into deck 10's hallway. "
-     "Ice cream for the kid: an ally against the gulls.",
-     [((8, 78), (11, 86), "back"), ((11, 135), ("in10", 135), "short"), ((11, 215), (11, 150), "errand")]),
+     "You at the ice cream machine: a cone for the kid, the mix from the cold room, a cone for you, his book.",
+     [((8, 78), (11, 86), "back"), ((11, 135), ("in10", 135), "short"), ((11, 212), (11, 150), "errand"),
+      ((11, 185), (11, 212), "errand")]),
     (7, "Grip socks: out through the balcony cabin, or up from the boat walkway (optional).",
-     "Balcony to balcony outside the ship, between gusts and gulls; each balcony door left ajar opens a hallway: "
-     "decks 8-10 become the fast way fore and aft. A guest locked out on his balcony.",
+     "Balcony to balcony outside the ship, between gusts, gulls and the boat drill; each balcony door left ajar opens "
+     "a hallway: decks 8-10 become the fast way fore and aft. A guest locked out on his balcony has a book.",
      [(("in9", 150), ("out9", 150), "back"), (("out7", 125), ("out8", 128), "back"),
       (("out9", 160), ("out10", 200), "back"), (("out10", 205), ("in10", 205), "short")]),
     (8, "Grip socks: a wall jump from the Great Outdoors onto the sun cover, up to deck 12.",
-     "The engineer's lunch from Topsiders, past the old lady; up the funnel: the horn. The rival drops his card, "
-     "the old lady leaves her parasol, the gulls lift off the bow.",
-     [((11, 232), (12, 217), "back"), ((11, 140), (12, 190), "errand"), ((12, 190), ("funnel", 186), "back"),
+     "The engineer's coffee from the machines by the ice cream, past Teppanyaki's flare; up the funnel: the horn. The "
+     "rival drops his card, the old lady leaves her parasol and her book, the gulls lift off the bow.",
+     [((11, 232), (12, 217), "back"), ((11, 212), (12, 190), "errand"), ((12, 190), ("funnel", 186), "back"),
       (("out8", 128), ("prom", 124), "glide")]),
     (9, "The wedding cake clears deck 12's forward lobby; the Officer's card opens the gold doors down the bow.",
-     "The chapel, the Spinnaker, the spa's steam, the officers' cabins, the bridge: the rival's net hits the alarm, "
-     "and the hatch in the ceiling opens.",
+     "The chapel, the Spinnaker, the spa's steam, the kids' clubs, the bridge: the captain's book, the tenth; the "
+     "rival's net hits the alarm, and the hatch in the ceiling opens.",
      [((12, 170), (12, 78), "errand"), ((12, 96), (10, 34), "back")]),
     (10, "The hatch: up from the bridge to the balcony forward of the spa, as the sun sets.",
      "She glides down on the parasol, through gusts and past two gulls, to the mooring deck. At the tip of the bow he "
-     "finally comes to her; then the way home to cabin 8206.",
+     "finally comes to her; then the way home to cabin 8206, where you are waiting.",
      [((10, 28), (11, 27), "back"), ((11, 26), (7, 5), "glide")]),
 ]
 
