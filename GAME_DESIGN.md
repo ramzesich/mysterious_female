@@ -669,22 +669,38 @@ still change. The user likes the ideas so far.
 #### The regions and the order they open in
 
 `python tools/draw_regions.py` draws these from its own lists (after `python tools/render_ship.py`).
+The region map shows the routes too: the way on into each region, the shortcuts, the parasol glides.
 
 ![The ship's regions](docs/ship-regions.png)
 
 ![The order the ship opens up](docs/ship-unlock-order.png)
+
+**The cabin decks, rethought (the user, 2026-11-10):** in the first draft decks 8-10 were one region,
+three corridors of about 170 m each (about a minute of the same doors per deck at her run speed),
+with little in them but the linen room, and a metroidvania crosses its ground again and again. So
+they are no longer a region of their own but the ship's long hallways, the fast way fore and aft:
+only deck 9 midships, round the linen room, is a region (4). The rest opens from **the balconies
+outside** (region 7): the rows of balconies on the ship's side, decks 8-10, climbed with the grip
+socks, a balcony door opened from outside unlocking a hallway inside (the way deck 6's promenade
+doors take her out and in). On the maps the rows of decks 8-10 are split in two, the outside on
+top and the inside below, as deck 6's promenade and rooms are. The corridors that remain get life
+from the hazards of §5.8 (carts, a cabin door swinging open as she passes, the robot vacuum),
+cabins she can enter (§5.1's doors into small rooms: a guest locked out, a cabin mid-cleanup, a
+"Do Not Disturb" sign that matters) and a look of their own per deck (a carpet colour, pictures),
+so she knows which deck she is on without a map.
 
 | Step | Region | What it covers | What opens it | Why she goes there or back |
 |---|---|---|---|---|
 | 1 | Lower ship | Decks 4-5, deck 6 forward, the atrium's floor | The start, at the gangway | The first errand: lunch from a deck 5 restaurant to a colleague at the gangway, who gives her the Deck card |
 | 2 | Atrium + promenade | The atrium on decks 6-7, the promenade | Deck card | Back up from deck 4 past places she knows. Bumbot's first near-catch: he bolts through a door and leaves it open |
 | 3 | Showtime | Deck 6's rooms and theatre, deck 7 midships and aft | The door he left open | The stage manager needs something from deck 4; reward: the Entertainment card, and a one-way trunk from the theatre to deck 4 |
-| 4 | Cabin decks | Decks 8-10 from the atrium aft | Entertainment card, up a backstage ladder | The Housekeeping card in the linen room opens the laundry chute (deck 9 to deck 4) and pantry doors on decks 4-5 |
+| 4 | Linen room | The atrium on decks 8-10, deck 9's midships corridor | Entertainment card: the glass elevator goes on up to decks 8-10 | A short corridor with life in it (carts, a guest locked out, a balcony cabin). The linen room: the Housekeeping card, the laundry chute to deck 4, pantry doors on decks 4-5 |
 | 5 | Deck 8 forward | Deck 8 forward of the atrium, **cabin 8206** | Housekeeping card, a door at that end of deck 8 | The surprise: her cabin, its door open, on her way through |
 | 6 | Lido | Deck 11 from the gym aft | Walking through deck 8 forward: the only stairs going on up to the pool deck | Grip socks and the parasol change the old decks (the atrium, the stern tiers, shafts). Bumbot drains the pool: a hatch in its tank |
-| 7 | Top deck + funnel top | Deck 12 from the atrium aft, the funnel's top | Grip socks: wall jumps up to deck 12 | The engineer's errand, then the ship's horn (below): the officer runs for the bridge and drops his card, the old lady leaves her sunbed, the gulls lift |
-| 8 | The bow | Deck 7 forward (kids' clubs), decks 9-12 forward: spa, bridge, Spinnaker | Officer's card, forward along deck 12 then down | At last the bridge: Bumbot hits the alarm, the hatch in its ceiling opens |
-| 9 | Sunset | The balcony forward of the spa, the mooring deck | The hatch | The ending (below) |
+| 7 | Balconies + hallways | The balconies outside decks 8-10, and their hallways inside | Grip socks: out through the balcony cabin on deck 9 | Climbing balcony to balcony outside the ship; each balcony door opened from outside unlocks a hallway. A slip is the overboard scare; the parasol glides down to the promenade |
+| 8 | Top deck + funnel top | Deck 12 from the atrium aft, the funnel's top | Grip socks again: a wall jump from the Great Outdoors up to deck 12's aft terrace | The engineer's errand, then the ship's horn (below): the officer runs for the bridge and drops his card, the old lady leaves her sunbed, the gulls lift |
+| 9 | The bow | Deck 7 forward (kids' clubs), decks 9-12 forward: spa, bridge, Spinnaker | Officer's card, forward along deck 12 then down | At last the bridge: Bumbot hits the alarm, the hatch in its ceiling opens |
+| 10 | Sunset | The balcony forward of the spa, the mooring deck | The hatch | The ending (below) |
 
 Staggering the stairs means the forward core must let her climb from deck 8 to deck 11 at step 6,
 with its doors on decks 9 and 10 still shut.
@@ -759,7 +775,8 @@ The maps above draw the horn and the engineer together.
 
 #### Still open
 
-1. The order of the nine steps.
+1. The order of the ten steps, and the cabin decks' new split: a short Linen room region, the
+   hallways opened from the balconies outside (2026-11-10, waiting for the user's review).
 2. What the funnel's top is for: the horn, the engineer, both, or something else.
 3. Whether the fire doors are really gone.
 4. Whether the final glide should be harder, with wind or gulls, and whether the short finale (bridge,
@@ -771,7 +788,9 @@ The maps above draw the horn and the engineer together.
 8. Whether her hands are full while carrying something, so no ladders or trunks, only stairs and
    elevators (Claude's suggestion: it makes her plan a route through decks she knows).
 9. Deck 7's stern strip (§8) as a secret she glides down to with the parasol.
-10. How many near-catches there are, and where; where the checkpoints go; whether the dash stays, and
+10. The drained pool's hatch (step 6) drops her into deck 10's hallway before the balconies open
+    the hallways (step 7): an early taste of them (Claude's suggestion), or somewhere else?
+11. How many near-catches there are, and where; where the checkpoints go; whether the dash stays, and
     what the tangerines are then for.
 
 ### 6.2 What the code can already do
