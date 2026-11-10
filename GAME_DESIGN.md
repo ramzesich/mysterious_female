@@ -15,7 +15,7 @@ rest of the game is done.
 |---|---|
 | **Hero** | Bumbusik — my wife (§3). **Decided** |
 | **World** | **The ship is the game.** One cruise ship, sailing on a sunny day over small waves, explored freely deck to deck. There are no levels. **Decided** |
-| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at places on the ship and slips away each time, until she finally catches him. **Decided.** Where he shows up and where she catches him: being designed from scratch (§6) |
+| **Goal** | Catch Bumbot, our cat, who has stowed away. He shows up at places on the ship and slips away each time, until she finally catches him. **Decided.** Where he shows up and where she catches him: §6.1.8 |
 | **Discovery** | The goal is **never stated**. She works out that she is chasing Bumbot by playing. **Decided** |
 | **Player** | Her. It is a gift, and she wants a **real challenge** — Bumbot-level difficulty, not a gentle walk. **Decided** |
 | **Tone rule** | **No death and no negativity.** Failing is a *scare*: she runs off, or bobs in a life ring, and pops back out of a crew cabin door (§5.6). **Decided** |
@@ -153,9 +153,9 @@ No pause and no map, at least for now.
 
 ### 3.2 Special move — the "Кісюнічка!!!" dash
 
-**Open (the user, 2026-11-09): whether the dash stays at all**, to be decided once the enemies,
-obstacles, people and the ways she deals with them are designed. It works in the code; there are
-no tangerines on the ship for now (§6.3).
+**Decided (the plan, 2026-11-10): the dash stays**, learned at her first sight of Bumbot and never
+required: breakables hide shortcuts and secrets, and it tames a few hazards (§6.1.2). About 30
+tangerines go back on the ship (§6.3).
 
 "Кісюнічка!!!" is what she happily screams every time she sees a random cat on the street, so
 it is her battle cry here.
@@ -179,10 +179,10 @@ it is her battle cry here.
 
 ## 4. Bumbot — the runaway cat
 
-**Status (the user, 2026-11-09): where he appears, how many times, in what order and where she
-finally catches him are being designed from scratch, with the ship's progression (§6).** None of
-it is in the game. His sprite, his animations and the near-catch itself stay in the code (a
-`bumbot` map point: activity and escape direction).
+**Status (the plan, 2026-11-10): his beats are decided in §6.1.8**: six near-catches, three glimpses
+and the catch, one per region, each at the lock she cannot pass yet. None of it is in the game yet.
+His sprite, his animations and the near-catch itself are in the code (a `bumbot` map point: activity
+and escape direction).
 
 **Decided (the mechanic and the look):**
 
@@ -223,7 +223,7 @@ there; they only remind her he's on board.
 - The game is **one ship, with all its decks**. No levels. It is meant to be a big game.
 - **Free movement** in all directions: forward and back along a deck, up and down between decks.
 - The ship opens up as she plays: the exploration/backtracking loop of a Metroidvania. How it is
-  split and locked is being designed from scratch (§6).
+  split and locked: the plan in §6.1.
 - **The ship is the Norwegian Sun**, used as the reference for its dimensions, layout, venues,
   stairwells, elevators and ladders. We have both been on it, so she can find her way **without a
   map**, from memory.
@@ -550,7 +550,8 @@ That works out to (numbers to be tuned in testing):
   stands ajar with the cabin light spilling out, and a green lamp above it glows. Activating one
   gives a short burst of light and a chime.
 - Checkpoints sit where a crew cabin door plausibly would, following the real layout.
-- **Where they go is being designed from scratch** (§6).
+- **Where they go: §6.1** (one at each region's entrance, a second at the foot of each long
+  gauntlet, cabin 8206's door for deck 8 forward).
 - She comes back at the **closest one** to where she was scared, among the checkpoints she has
   **already activated**. Otherwise she could come back somewhere she has never been, possibly past a
   locked door.
@@ -609,189 +610,676 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   one of them unless she is paying attention.
 - **Passengers and machinery are the obstacles. Fellow crew are friendly**, background characters
   at most, to begin with.
+- **The plan (2026-11-10, §6.1.6 and §6.1.7) places every one of them**, with its tell, its response
+  and the verb that tames it. Two changes to the list above: the security officer is not a touch
+  hazard but her comic rival, a cat-hunter whose blunders open the ship (crew never scare her); the
+  waiter only spills a tray she carries. Added: the porter's luggage cart, the photo flash, the stage
+  lights, the trap door, the chip cart, the swinging cabin door, gusts, basketballs, the sauna's
+  steam, a toy car, a sunbather behind a "Do Not Disturb" sign. Passengers who are hazards become
+  errand-givers.
 - **Secrets** exist, like Bumbot's SUSHI sign. Designed **Later**.
 
 ---
 
 ## 6. Progression
 
-### 6.1 Brainstorm in progress (2026-11-09)
+### 6.1 The plan (Decided, 2026-11-10)
 
-**Nothing in this section is decided** (the user: document it as a brainstorm in progress, not a
-decided design, and continue later). It was started from scratch once the ship was complete; the
-earlier plans for Bumbot's spots, checkpoint locations and the key-card tiers were removed from
-this document on purpose. "Agreed so far" means the user said yes in the discussion, and it can
-still change. The user likes the ideas so far.
+**How it came about.** The brainstorm of 2026-11-09/10 (ten regions, four kinds of lock, the cat as
+the map, the ending at the bow) was reviewed as a metroidvania by Claude on 2026-11-10. Its structure
+was sound: scattered locks, staggered stairs, the ship folding back on itself, the hidden parts, the
+sunset finale. Its first half was flat: five regions played with only run, jump and E; four of the
+nine transitions were key cards; both movement abilities came together at step 6; Bumbot had no
+moment in six of the ten regions; the hazards were listed but not placed, and none answered to an
+ability; the errands were walks. Claude proposed 24 changes, and **the user asked Claude to answer
+them itself for the most fun and engagement, with no limit on new art, and to save the result as the
+plan to build from.** So everything in this section is **Decided as the plan**: the user steers
+during the build and can overrule any item; what then changes is recorded here. The maps come from
+`python tools/draw_regions.py` (after `python tools/render_ship.py`).
 
-#### Agreed so far (still open to change)
+Kept from the brainstorm, as agreed then: all four kinds of lock; staggered stairs; new ways to move
+required to finish; a locked part hidden behind the closed ship's side until she enters it, the first
+cut-away being the reward (`LOCKED_PARTS`, §6.2); the start at the gangway; no target for how long the
+game takes; carrying things for colleagues; the laundry chute to deck 4; cabin 8206 unreachable until
+its region, around the middle; the glass elevator's panel as the progress meter; the ending.
 
-- All four kinds of lock below.
-- Staggered stairs.
-- New ways to move may be required to finish the game.
-- A locked part stays hidden behind the closed ship's side until she enters it: the first cut-away
-  is the reward (`LOCKED_PARTS`, §6.2).
-- She starts at the gangway.
-- No target for how long the game takes: progress is saved, it isn't meant for one sitting.
-- **Carrying things for colleagues** (the user's wish): they ask her to bring them something from
-  elsewhere on the ship; bringing lunch to a colleague who can't leave his post stays as the
-  example.
-- **A laundry chute back down to deck 4** (the user's idea): a fast way down to the start of the ship.
-- **Cabin 8206 stays unreachable until she unlocks its area**: a nostalgic surprise for her, so
-  nothing gives it away beforehand. It comes around the middle of her progress, maybe a bit after
-  it; it does not have to be the last region (the user).
-- The dash: whether it stays is decided once enemies, obstacles, people and the ways she deals
-  with them are designed (§3.2, §6.3).
+#### 6.1.1 The premise (never stated on screen)
 
-#### The ideas behind it
+A stowaway cat has been spotted at sea. The ship's **security officer**, a clumsy man with a net and a
+pet carrier, has the ship in a soft lockdown for his search: the fire doors in the stair cores are
+shut deck by deck, each department's card opens its own, and "SEARCH IN PROGRESS" signs hang on the
+ropes. Bumbusik is crew, doing her colleagues' rounds for them, and she wants the cat for herself.
+**Every way on into the ship is a crew way** (a card, a trunk, a pantry), **a cat way** (a door he
+leaves open, a hatch he trips) **or an outside way** (the balconies, the boats); **the guest stairs
+catch up behind her** and reopen as shortcuts as the ship goes on with its day. The security officer
+is her comic rival: his blunders open the ship, and at the end his card is the master key.
 
-- **The cat is the map:** each time Bumbot escapes he goes somewhere she can't follow yet, which
-  shows her what to look for, with the goal never stated.
-- **Locks scattered, never deck by deck:** if a card opens "decks 7-9" she moves up and never comes
-  back; if each new thing opens small pieces on many decks she knows, the whole ship is worth
-  walking again.
-- **Staggered stairs:** with three cores she can reach any deck in a minute, so each core is closed
-  at different decks (wet paint, a fire door) and climbing means walking a long deck to the next
-  open flight. Those flights reopen later as shortcuts.
-- **The ship folding back on itself:** escape trunks and doors that only open from the far side
-  connect far places she has already walked.
-- **Wide in the middle:** narrow at both ends of the game, freer between them. (The step list below
-  is drawn as one order for clarity.)
-- **The glass elevator's panel as a progress meter:** more decks light up as she goes, since there
-  is no map.
+#### 6.1.2 The rules of the world
 
-| Kind of lock | On our ship | Why she goes back |
+**The four kinds of lock:**
+
+| Kind | How it reads | The rule |
 |---|---|---|
-| **Department cards** | Deck, Entertainment, Housekeeping, Officer's: pantries along the cabin decks, backstage, the casino cage, the mooring deck, the lifeboat winches | One card lights up doors on several decks |
-| **New ways to move** | Grip socks from the gym (wall jumps), a parasol from the Great Outdoors (glide, survive long drops) | Every old gap and drop looks different |
-| **Bumbot changes the ship** | He drains the pool, and a hatch appears in its tank; he hits the alarm panel on the bridge | Places she knows are no longer the same |
-| **People** | The old lady guarding her sunbed; colleagues who want something (new character art needed) | Small errands across the ship |
+| **Department cards** | A coloured reader beside a fire door in a stair core, or on a crew door | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **A fire door opens freely from its escape side** (from above in a stairwell, from inside a corridor), so every card door is also a one-way shortcut once she has come through it the long way |
+| **New ways to move** | A pickup with a key glyph shown once | Four verbs, one per quarter: the dash (region 1), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
+| **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
+| **People and the ship's routine** | A person or a crowd on a flight, with a rope and a sign | A cleaner mopping, a photographer, an art auction, a yoga class, a painter, a crowd, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
 
-#### The regions and the order they open in
+**Carrying.** Two classes of thing. **Pocket items** (cards, pills, a key) have no rules. **Trays**
+(a lunch, a cone, a cocktail, a cake box) follow tray rules: **stairs and elevators only** (no
+ladders, trunks, wall jumps, crawling, swimming or the dash), **a low hop instead of a jump**, and **a
+bump from a hazard or a person spills it** with a clatter, never a scare: she fetches another from the
+same place, which always has more. Some trays **melt or cool** (a meter on the HUD) so her fastest
+known route is the test. E hands the thing over. Her hands full show in her sprite.
 
-`python tools/draw_regions.py` draws these from its own lists (after `python tools/render_ship.py`).
-The region map shows the routes too: the way on into each region, the shortcuts, the parasol glides.
+**People.** Fellow crew are friendly and never scare her. Passengers and machinery are the
+obstacles, and **a passenger who is a hazard can become an errand-giver**: service is a crew member's
+superpower, and each sprite is used twice. Every request is **a speech bubble with a pictogram** (a
+tray, a wrench, a pill bottle, a cake), never words, so the goal is never stated and nothing needs
+translating. People stand or walk where they plausibly would; blocks on flights have a rope and a sign.
+
+**Hazards.** Every hazard has **a tell** (a shadow before a swoop, a handle turning before a door
+swings, a wet-floor sign in the muted background), **a response** (jump, wait, crawl, go round) and
+**a verb that tames it** on the way back (§6.1.7). One hit is a scare that fits what got her (§5.6).
+The long cabin corridors are where risk lives: a gauntlet of a few hazards between two checkpoints.
+
+**Checkpoints.** One crew door at each region's entrance, a second at the foot of each long gauntlet,
+and **after region 5 the door she steps out of anywhere forward on deck 8 is cabin 8206's own** (it is
+a respawn door, not a hub: the "no home base" ruling stands). Listed per region below.
+
+**The dash and the tangerines (Decided, replacing the open point in §3.2 and §6.3).** The dash stays.
+It is **learned, not given**: at her first sight of Bumbot she screams "Кісюнічка!!!", and from then
+on D dashes, fuelled by tangerines as §3.2 says. It is **never required**: breakables (stacked
+luggage, a jammed trolley, stacked deck chairs, crates, a piñata) hide shortcuts and secrets, never
+the way on; it also shoves the vacuum aside, scares the kid off and passes the sprinkler. **About 30
+tangerines** on the ship, each where food plausibly is (fruit bowls, buffet counters, trays, pantry
+crates, a cabin's welcome basket), a few as rewards from people. Scarce enough that each one counts.
+
+**The glass elevator's panel is the progress meter:** it lights the decks she can reach (5 in region 1;
+5-7 in region 2; 5-10 from region 4). The cores' elevators do the same (4-5, then 4-7, 4-10, 4-11,
+4-12). An elevator never opens onto a place she can't reach yet (§5.1).
+
+**Hidden extras** (§6.4, the user's photos) get **slots**: a framed picture in a secret place that E
+opens full screen. The places are fixed here; the pictures come from the user, later.
+
+#### 6.1.3 The regions and the order they open in
 
 ![The ship's regions](docs/ship-regions.png)
 
 ![The order the ship opens up](docs/ship-unlock-order.png)
 
-**The cabin decks, rethought (the user, 2026-11-10):** in the first draft decks 8-10 were one region,
-three corridors of about 170 m each (about a minute of the same doors per deck at her run speed),
-with little in them but the linen room, and a metroidvania crosses its ground again and again. So
-they are no longer a region of their own but the ship's long hallways, the fast way fore and aft:
-only deck 9 midships, round the linen room, is a region (4). The rest opens from **the balconies
-outside** (region 7): the rows of balconies on the ship's side, decks 8-10, climbed with the grip
-socks, a balcony door opened from outside unlocking a hallway inside (the way deck 6's promenade
-doors take her out and in). On the maps the rows of decks 8-10 are split in two, the outside on
-top and the inside below, as deck 6's promenade and rooms are. The corridors that remain get life
-from the hazards of §5.8 (carts, a cabin door swinging open as she passes, the robot vacuum),
-cabins she can enter (§5.1's doors into small rooms: a guest locked out, a cabin mid-cleanup, a
-"Do Not Disturb" sign that matters) and a look of their own per deck (a carpet colour, pictures),
-so she knows which deck she is on without a map.
+| Step | Region | What it covers | What opens it | The verb it gives | Bumbot |
+|---|---|---|---|---|---|
+| 1 | Lower ship | Decks 4 and 5 | The start, at the gangway | The dash | Eating the officer's lunch at the Seven Seas: near-catch 1 |
+| 2 | Atrium + promenade | Deck 6 from the bow to the Library, the promenade, the atrium on 6-7, the boat walkway's gate | The Deck card, at the forward stairs' fire door 5-6 | | Rides the glass elevator up where she can't; in the Library, near-catch 2: he bolts through a roped-off door and leaves it open |
+| 3 | Showtime | The theatre, its balcony, deck 7 from Magnum's to the Arcade | The door he left open | | On stage in the spotlight: near-catch 3, up a fly rope |
+| 4 | Housekeeping | Deck 9 midships round the linen room, the atrium's walks and midship lobbies on 8-10 | The Entertainment card, on the crew trunk from Bliss up to deck 9 | Pushing carts, crawling | Asleep in the towels: near-catch 4, into the vent |
+| 5 | Deck 8 forward | Deck 8 forward of the atrium, cabin 8206 | The vent's duct, dropping her past the corridor's shut door | | A glimpse: his tail up the forward stairs |
+| 6 | Lido | Deck 11 from the forward lobby aft: gym, pool deck, Garden Café, Great Outdoors | The forward stairs on up from deck 8 | Grip socks (wall jumps) | Fishing at the pool: near-catch 5, he falls in and drains it; the hatch into deck 10 |
+| 7 | Outside | The balconies of decks 8-10, the boat walkway, the hallways inside | Grip socks, out through the balcony cabin on deck 9 or up from the boat walkway | | A glimpse: washing on a rail two decks up; his balcony door is ajar |
+| 8 | Top deck + funnel | Deck 12 from Champs aft, the roof, the funnel's stairway and top | Grip socks: a wall jump from the Great Outdoors onto the sun cover and up to deck 12's aft terrace | The parasol (a glide) | A silhouette on the funnel; at the horn he bolts for the bow |
+| 9 | The bow | Deck 12 forward (chapel, kids' pool, Spinnaker), the spa, the officers' cabins, the bridge, the kids' clubs | The wedding cake clears deck 12's forward lobby; the Officer's card opens the gold doors down the bow | | On the bridge: near-catch 6, the rival hits the alarm, the hatch opens |
+| 10 | Sunset | The balcony forward of the spa, the air, the mooring deck, the tip of the bow | The hatch | | The catch |
 
-| Step | Region | What it covers | What opens it | Why she goes there or back |
+Wide in the middle: region 6 opens regions 7 and 8 at once; **region 7 is optional** for the finish
+(its hallways are the fast way fore and aft, and its cat glimpse, guest and secrets are the lure).
+Everything else is in order. Each region below: what it covers, the way in, its blocks, the people,
+the hazards, the cat beat, the shortcuts it opens, its checkpoints and its secrets. Positions are in
+metres from the bow and approximate; the build sets them exactly.
+
+**Region 1: Lower ship (decks 4 and 5).**
+
+- **The way in:** the start, at the gangway (deck 4, 67 m), the shell door shut.
+- **The errand:** the **gangway officer** at his post by the shell door can't leave it; his bubble
+  shows a tray. His lunch waits at the pass by the Seven Seas' crew door (deck 5 aft, 250 m). **Bumbot
+  is on the counter eating it** (his `eating` clip). **Near-catch 1:** she lunges with the scream
+  that becomes her battle cry; he bolts along the counter, knocks the fruit bowl over (three
+  tangerines roll onto the floor, the D glyph shows: the dash is hers) and is out of the door forward.
+  She takes a fresh tray (the pass always has more) and carries it the length of deck 5 or deck 4 to
+  the gangway: the first carry, under tray rules. He eats and hands her his **Deck card**: she is
+  doing his rounds now. As the reader at the forward stairs lights, a glimpse: Bumbot's tail going up
+  those stairs.
+- **Blocks:** the forward core's 5-6 fire door (blue: the way on); the midship core's 5-6 flight (a
+  cleaner mopping, a cone); the aft core's 5-6 flight (a rope, "REHEARSAL IN PROGRESS"); the atrium's
+  staircase 5-6 (the photographer's session, a backdrop across the stairs). The glass elevator's panel
+  lights deck 5 only.
+- **Hazards:** the robot vacuum on deck 4's long corridor (110-194); the porter's luggage cart rolling
+  back and forth in the gangway lobby; the waiter in the Four Seasons' doorway (deck 5, 168-194), a
+  tray hazard only.
+- **Shortcuts:** the forward-cabins trunk (deck 4-5, 50 m) is free from the start: the trunk lesson.
+- **Checkpoints:** the gangway lobby's crew door (deck 4, 62 m); deck 4 aft (235 m).
+- **Secrets:** the galley pass behind the Seven Seas' crew door (a crate of tangerines, breakable);
+  the Four Seasons' ice swan (E: she shivers, a quirk). Tangerines: the bowl (3), the Atrium Café
+  (1), La Cucina (1), the crate (2).
+
+**Region 2: Atrium + promenade.**
+
+- **Covers:** deck 6 from the bow to the Library (cabins, the Internet Café, the forward lobby, the
+  atrium walk, the midship lobby, Bliss, the shops, the Windjammer, the Photo Gallery, the Library,
+  20-194 m); the promenade (100-231 m) through its four doors; deck 7's forward and midship lobbies
+  and its atrium walk (74-110 m); the glass elevator to deck 7; **the boat walkway's gate** on the
+  promenade (a lifeboat station's ladder at 125 m, blue), a dead-end foothold up at deck 7's height
+  under the boats, with the lifeboat secret, until the socks.
+- **The way in:** the Deck card at the forward stairs' fire door 5-6.
+- **Bumbot:** a glimpse in the atrium: **he rides the glass car up** past deck 7 to deck 9, seen
+  through the glass while the panel's upper decks are dark (the cat is the map). **Near-catch 2 in
+  the Library:** he is batting the chess pieces off the chess table; she lunges; he bolts aft through
+  the Library's aft door, knocking the "QUIET PLEASE" rope stand over into it, and the door stays
+  ajar: the way into region 3. The **rival** is glimpsed on the promenade peering under the lifeboats
+  with his net.
+- **Blocks:** the Library's aft door (the rope, until Bumbot); deck 7's midship lobby door into
+  Magnum's (red); deck 7's forward lobby door into Entourage (gold); the forward core's 7-8 door
+  (green); the atrium's staircase 7-8 (the art auction's easels on the landing).
+- **Hazards:** gentle. The vacuum in deck 6's forward cabins; the gulls on the promenade's railing
+  flap up (harmless, a lesson in their tell); **the Photo Studio's flash**: she stops and poses for a
+  second, the screen whites (a gag now, a hazard later when paired with a cart).
+- **Shortcuts opened:** the forward stairs 5-6 for good; the midships trunk's deck 6 door in Bliss
+  (125 m) opens from the Bliss side, then both ways.
+- **Checkpoints:** the Library's crew door (deck 6, 194 m); deck 6 forward (the cabins, 40 m).
+- **Secrets:** **a lifeboat** (E at a boat's hatch from the walkway: inside, benches, an oar, a photo
+  slot, two tangerines); Bliss's dance floor (standing still on it, she dances: a quirk). Tangerines:
+  the Windjammer's bar (1), the lifeboat (2).
+
+**Region 3: Showtime.**
+
+- **Covers:** the theatre (deck 6, 202-255 m) and its foyer, the Stardust balcony (deck 7, 202-254 m),
+  deck 7 from the Arcade forward to Magnum's (110-194 m), the aft core's flights 5-7, the theatre's
+  one-way trunk down to deck 4 (240 m).
+- **The way in:** the Library's aft door, left open by Bumbot.
+- **The rehearsal:** the **stage manager** (crew, a headset) and two dancers are rehearsing; Bumbot sits
+  centre stage in the spotlight washing himself; the stage manager sneezes and flaps (his allergy);
+  his bubble shows a pill bottle. **Near-catch 3 on the stage:** she lunges; the rival barges in from
+  the wings with his net and trips over a cable; the stage lights swing; Bumbot leaps onto a fly rope
+  and rides it up to the lighting bridge under deck 8, out of reach for good; the rival ends up in the
+  orchestra pit (a one-deck drop, so no harm). **The errand:** the pills are in his cabin on deck 4 aft
+  (a crew cabin door with his name plate, 232 m): down the theatre's trunk (she comes down it, so it
+  works both ways after) or the aft stairs 5-6, which open now, the rehearsal stopped; back with the
+  pills (a pocket item; the vacuum on deck 4 is the test). He hands her the **Entertainment card**
+  (he is cruise staff).
+- **Then:** the aft stairs 6-7 (open) to the balcony; forward through the Arcade, Tradewinds, the
+  casino, the Art Gallery, Magnum's; the midship lobby's red door opens with her card: the shortcut
+  back to the atrium on deck 7. **The way on to region 4:** the crew trunk at 118 m (the layout's
+  `magnums` trunk, now decks 6-7-9: doors in Bliss and Magnum's, none on 8, one in deck 9's corridor
+  beside the linen room), red.
+- **Blocks:** the aft core's 7-8 door (green).
+- **Hazards:** the stage lights swinging after the rival trips them (a timed hazard over the stage);
+  **the trap door** in the stage (hidden, a square seam: she drops one deck into the Seven Seas'
+  galley, no scare, and finds a shortcut out through its crew door); the croupier's chip cart in the
+  casino (a moving obstacle); the art auctioneer's easels (the atrium staircase block, 7-8).
+- **Checkpoints:** the theatre's foyer crew door (deck 6, 200 m); deck 7's aft lobby crew door (196 m).
+- **Secrets:** **the casino jackpot** (one slot machine with a glint; E: lights, a ding, tangerines
+  pour out); **the lighting bridge** (the balcony's lighting booth is a red crew door: a catwalk over
+  the stage, a photo slot, the view of the stage); the spotlight (standing centre stage for three
+  seconds, she bows: a quirk). Tangerines: the jackpot (3), Tradewinds (1).
+
+**Region 4: Housekeeping.**
+
+- **Covers:** deck 9's midships corridor (110-194 m) and the linen room (112 m); deck 9's midship lobby
+  and atrium walk; the atrium walks and midship lobbies of decks 8 and 10 (82-110 m); the atrium's
+  staircase up to 9 and its elevator to 10; the midship core's green doors 7-8, 8-9, 9-10 once she has
+  the card.
+- **The way in:** the Entertainment card on the Bliss/Magnum's trunk, up to deck 9.
+- **The corridor's life:** the **steward's cart** jammed in a cabin's doorway: the push glyph; she pushes
+  it free along the corridor (the push verb: E at a cart's end, then walk); he is grateful and hands
+  her the **Housekeeping card**. **A guest locked out** (his bubble: a key card): the green card's first
+  use, on his door; two tangerines from his welcome basket. **The balcony cabin** (150 m): a cabin
+  with a balcony, its door green; inside, a balcony door out: a view, and a dead end until the socks;
+  from its balcony she sees Bumbot washing on a rail two decks up. A cabin mid-cleanup (its door open,
+  the vacuum inside, towels stacked in the doorway). A "Do Not Disturb" door (opening it, a startled
+  guest: a scare). A cabin door that swings open as she passes (its handle turns first).
+- **The linen room:** **Bumbot asleep in the towel heap** (the heap is drawn). **Near-catch 4:** he
+  squeezes into the low vent whose grille hangs open. The laundry cart in the room: she pushes it under
+  the vent, climbs onto it and crawls in (the crawl glyph: ↓ then ←/→). **The duct** is a room of its
+  own shown in the corridor's place (as the linen room is): a dark crawlspace with grilles that show
+  the corridors' light and glimpses down into cabins, running forward and down for about twenty
+  seconds, ending at a grille she kicks out, dropping her into deck 8's forward corridor at 66 m, past
+  its lobby door, which then opens from inside for good (region 5).
+- **Also here:** **the laundry chute** (a hatch in the linen room's wall, green): a slide down to the
+  **laundry** on deck 4 (a new crew room at 112 m: machines, carts, steam; she lands in a cart of
+  towels; its door opens onto deck 4's corridor). One-way, down. **The pantries** (green crew doors
+  by the restaurants on decks 4 and 5): small rooms with tangerine crates, one of them a passage
+  between La Cucina's and the Four Seasons' kitchens, a shortcut past the waiter.
+- **Blocks:** the lobbies' doors into the corridors of decks 8 and 10 (shut from the lobby side); the
+  midship core's 10-11 flight (a yoga class on the landing); the forward lobbies of decks 9 and 10
+  (gold, the officers' area).
+- **Blocks lifted now:** the atrium staircase's art auction (7-8): the atrium's stairs run 5-9 for good.
+- **Hazards:** standing carts to hop; the swinging door; **the towel stack** (hidden: it falls on her
+  as she runs past the mid-cleanup cabin); **the sprinkler** (hidden, in a doorway, its wet-floor sign
+  in the muted background); the vacuum in the mid-cleanup cabin.
+- **Checkpoints:** deck 9, a crew door at the corridor's aft end (190 m); the laundry's door (deck 4).
+- **Secrets:** the duct's grilles (peeks into cabins: a snoring passenger, a cabin full of balloons);
+  the pantries' crates. Tangerines: the locked-out guest (2), the pantries (2 and 2), the balcony
+  cabin's basket (1).
+
+**Region 5: Deck 8 forward.**
+
+- **Covers:** deck 8's forward corridor (21.4-74 m), its forward lobby, the forward terrace at the bow
+  end, **cabin 8206** (41.4 m) with its door open and the steward's cart outside, its shower (§8).
+- **The way in:** the duct's grille. Then the lobby door from inside, the forward core's 7-8 door
+  (free from above) and the atrium walk on 8 all connect.
+- **Calm:** no hazards, no people. The cabin is the surprise, as agreed: nothing gives it away before.
+- **Bumbot:** a glimpse at the lobby: his tail up the forward stairs 8-9.
+- **The way on:** the forward core's flights 8-9, 9-10 and 10-11 are open; the lobbies of decks 9 and
+  10 are the officers' area (their doors fore and aft gold), so she passes through them on the stairs
+  without leaving the stairwell; deck 11's lobby opens aft onto the gym.
+- **Checkpoint:** cabin 8206's door.
+- **Secrets:** the shower (built). Tangerines: the cabin's welcome basket (2).
+
+**Region 6: Lido.**
+
+- **Covers:** deck 11 from the forward lobby aft (74-244 m): Fitness, the pool deck, the Garden Café,
+  the Sports Bar, the Great Outdoors; the pool's hatch into deck 10's midships corridor.
+- **The way in:** up the forward core from deck 8.
+- **Grip socks:** on the rack by the yoga mats in the gym (a glyph: jump at a wall). From now she
+  wall-jumps: up the atrium's pillars from deck 5 to 10 in the open shaft; up the stern tiers outside;
+  up the balcony partitions; off deck 12's end wall. Wet tiles no longer slide her.
+- **Bumbot:** **fishing at the pool's edge** (batting at the water); the kid squirts him; he falls in
+  (a splash), scrambles up the pool ladder onto the drain's lever, shakes himself (a new clip) and bolts
+  aft. The lever drops: **the pool drains** over five seconds, gurgling, and **a maintenance hatch
+  shows in the tank's floor**: E and she drops into deck 10's corridor at 135 m (one-way); its lobby
+  doors open from inside, so deck 10 midships is the first hallway, the early taste of region 7.
+  **Near-catch 5** is at the pool's edge before he falls: she lunges, he leaps, she topples into the
+  pool (a splash, a swim out, no scare).
+- **People:** **the kid with the water pistol** patrols the pool deck's aft half (135-160 m) and
+  squirts when she is in front of him within a few metres (the "splashed" scare); hop over him, or
+  the dash scares him off. His bubble: a soft serve. **The ice cream errand:** the machine at the
+  Great Outdoors (E: a cone on a tray; it melts in about 45 seconds, a meter on the HUD); the way
+  back along the Garden Café (waiters) and across the pool deck's open gap, where gulls dive at
+  food. He eats, and from then on **he squirts the gulls** on the pool deck for her: an ally. The
+  waiters in the Garden Café (a tray hazard). The rival, searching under the loungers: a glimpse,
+  and the kid squirts him too.
+- **Hazards:** **the wet patch** by the showers (its wet-floor sign in the muted background; she slides
+  with her momentum into the pool, fine, or into **the sliding deck chair**, which slides at her on
+  the wet patch: a scare); the kid; gulls over the Great Outdoors and the pool's open gap (they dive
+  at food, the shadow tells); the Sports Bar's crowd spilling onto the aft stairs (a block).
+- **Blocks:** the midship core's 11-12 flight (wet paint, a painter); the aft core's 10-11 and 11-12
+  flights (the Sports Bar's crowd); the forward core's 11-12 flight (the wedding party in deck 12's
+  forward lobby); the spa's door at 74 m (gold). **Lifted now:** the yoga class (midship 10-11).
+- **The ways on:** **region 7**, the balcony cabin on deck 9 or the boat walkway, with the socks;
+  **region 8**, from the Great Outdoors a wall jump off deck 12's end wall onto the canvas sun cover's
+  low end, then up its curve to deck 12's aft terrace.
+- **Checkpoints:** the gym's crew door (the forward lobby, 80 m); the Garden Café's service door (192 m).
+- **Secrets:** **the hot tub** (E: she sits in it, steam rising, a relax idle); **the ice cream
+  machine** with no errand on (E: she eats one, a quirk); the giant chess set (E: she moves a piece).
+  Tangerines: the Garden Café's fruit counter (2), Topsiders' bar (1), the Great Outdoors' service
+  station behind stacked crates (breakable, 2).
+
+**Region 7: Outside (optional).**
+
+- **Covers:** the balconies of decks 8-10, midships and aft (the rows start about 73, 66 and 63 m);
+  the boat walkway at deck 7's height (100-231 m) and the promenade below; **the hallways** inside:
+  deck 8 midships (110-194) and aft (202-251.5), deck 9 aft (202-249.5), deck 10 aft (202-247); the
+  decks' aft terraces, reached through the aft hallways; deck 7's stern strip (a secret, with the
+  socks).
+- **The way in:** the socks, out through the balcony cabin on deck 9, or up from the boat walkway (a
+  wall jump up the recess's wall onto deck 8's balconies).
+- **The climb:** along a deck, she jumps onto a balcony's rail and along the rails from balcony to
+  balcony, between gusts; up a deck, a wall jump off a partition onto the balcony above. Down is a
+  drop: one deck lands on the balcony or the walkway below; further is the long-fall scare onto the
+  promenade, or the overboard scare into the sea below deck 8.
+- **The hallways:** on each corridor stretch **one balcony door stands ajar**, housekeeping airing the
+  cabin: in through the cabin, out its corridor door, and the hallway's lobby doors open from inside
+  for good. With all of them open, decks 8-10 are the fast way fore and aft, through the cores' green
+  doors.
+- **Bumbot:** a glimpse: washing on a rail two decks up, then gone inside; when she reaches that
+  balcony its door is ajar: his door is one of the hallway entries.
+- **People:** **a guest locked out on his own balcony** (deck 10 aft; his bubble: a door): she enters
+  the hallway by another balcony, comes to his cabin door inside and opens it with the green card;
+  his balcony door becomes an entry too, and three tangerines. A sunbather behind a "Do Not Disturb"
+  sign (entering his balcony: the startled scare). The rival on the boat walkway, looking into a boat.
+- **Hazards:** **gusts** (every few seconds a gust sweeps aft along the ship's side: the towels on the
+  rails flap first, then a line of spray; in the air she is pushed aft about a metre: jump between
+  gusts); **gulls** perched on the rails, a swoop when she lingers (the shadow tells); the drop.
+- **Shortcuts opened:** the hallways; the boat walkway's ladder both ways once she has come down to
+  it; with the parasol, a glide from any balcony down to the promenade.
+- **Checkpoints:** the balcony cabin (deck 9); the station locker on the boat walkway (deck 7's height).
+- **Secrets:** the lifeboat (region 2); **deck 7's stern strip** (dropping from deck 8's stern terrace,
+  back up with a wall jump: a framed photo slot, and the funnel's telescope points at it). Tangerines:
+  the balcony guest (3), balcony tables (2).
+
+**Region 8: Top deck + funnel.**
+
+- **Covers:** deck 12 from Champs to the aft terrace (82-220 m); the roof over its rooms (the ladder
+  beside the funnel); **the funnel's stairway** up its sloped front and **its top**: the engineer's
+  platform, the horn's cord, the telescope.
+- **The way in:** the socks: the wall jump from the Great Outdoors onto the sun cover and up to the
+  aft terrace. **Lifted now:** the painter (midship 11-12) and the Sports Bar's crowd (aft 10-11,
+  11-12): shortcuts.
+- **People:** **the old lady** on the sun deck (128 m): her sunbed, towels and bags across the walk, a
+  glare; passing her is a jump over the sunbed, or ↓ through the walk into the pool below, neither of
+  which a tray allows: with a tray the way is the aft stairs. Her cocktail (optional: Topsiders' bar,
+  a mojito on a tray): she dozes off, two tangerines. **The engineer** at the "TECHNICAL, CREW ONLY"
+  door by Teppanyaki (190 m, the roof ladder's foot); his bubble: a tray. **His lunch** waits at
+  Topsiders' bar on the pool deck (140 m): the direct way up the midship stairs meets the old lady, so
+  the way is along deck 11 aft through the Garden Café and up the aft stairs. He eats, waves her up,
+  and climbs the ladder; she follows (no tray now): the roof, the stairway up the funnel's front, the
+  top. **The ship's horn:** he lets her pull the cord (E; the screen shakes, the smoke puffs, the sound
+  once sound is on). **The cascade**, shown from up there by the camera: the rival on the sun deck jumps,
+  **drops his card** and runs forward for the bridge; the old lady bolts, **her parasol left** at her
+  sunbed; the gulls lift off the kids' pool and the Spinnaker's windscreen in a cloud over the bow.
+  Also up there: **the telescope** (E: the view swings to deck 7's stern strip, the secret's hint).
+- **The card and the parasol:** the **Officer's card** glints on the sun deck where he dropped it;
+  the **parasol** stands at the empty sunbed (a glyph: hold jump in the air). The parasol **opens only
+  while she holds jump in the air**: she drifts down slowly and steers; gusts push her; falling without
+  it is still the long-fall scare. It shields her from gulls and sprinklers while open. New glides:
+  down the atrium from deck 10's walk to 5; from the balconies to the promenade; off deck 12's end
+  onto the Great Outdoors; the finale.
+- **Bumbot:** silhouetted on the funnel's lattice as she climbs (sitting); at the blast he shoots down
+  it and forward along the roof toward the bow.
+- **Hazards:** gusts and gulls on the funnel's stairway (a slip onto the roof is one storey, fine; from
+  the top, the long fall); **basketballs** bouncing out of the sports court's cage (146-164 m), one
+  every few seconds (a "bonked" scare); the old lady (a block); gusts on the aft terrace.
+- **Checkpoints:** the crew door by Teppanyaki (the ladder's foot); the engineer's locker at the top.
+- **Secrets:** the telescope; Los Lobos' piñata (the dash breaks it: tangerines); the Sushi Bar's SUSHI
+  sign (Bumbot's secret from the sister game; what it does is the user's); the sports court (E with a
+  ball: she scores, a quirk). Tangerines: the piñata (3), Cagney's (1), the old lady (2).
+
+**Region 9: The bow.**
+
+- **Covers:** deck 12 forward of Champs (31-82 m: the forward lobby, the chapel lobby and the chapel,
+  the kids' pool, the Spinnaker and its balcony); the forward core's gold doors 12-11-10-9; the spa
+  (deck 11, 29-74 m); the officers' cabins (deck 10, 40-74; deck 9, 23.6-74); **the bridge** (deck 10,
+  25-40 m); deck 7's kids' clubs (21.4-74 m) through the forward lobby's gold door.
+- **The way in:** **the wedding.** The party fills deck 12's forward lobby and the chapel lobby; the
+  **wedding planner** (crew, a clipboard) has a bubble with a cake. Cagney's kitchen (deck 12, 164-174
+  m; a crew door to the pass) has the cake box: tray rules, and a bump drops it (the pastry chef sighs
+  and brings another). The way: the sports court's balls, the sun deck (the old lady is gone), Champs,
+  the lobby. The party goes into the chapel; the lobby clears. Then **the Officer's card** opens the
+  gold doors: the forward core's lobbies on 11 (the spa's door at 74), 10 (the officers' corridor and
+  the bridge's door at 40) and 9, and the kids' clubs' door on deck 7.
+- **Bumbot:** **on the bridge, near-catch 6.** He sits on the main console; the rival, who ran up here
+  at the horn, creeps at him with the net from the other side; she lunges, the rival lunges, the cat
+  leaps, and **the net hits the alarm panel**: the alarm, and the emergency hatch in the ceiling
+  releases, its ladder at the bridge's forward end. Bumbot shoots up it and out. The rival, tangled in
+  his net on the captain's chair, waves her on.
+- **Hazards:** the sauna's steam puffing from its door every few seconds (a "fogged" scare, she fans
+  herself); the kids' clubs' toys (a toy car rolling underfoot: a slip); the Spinnaker and the
+  officers' corridor are calm.
+- **Checkpoints:** an officer's cabin door in deck 10's corridor (60 m); the chapel lobby's crew door.
+- **Secrets:** **the chapel** (E at its door: the ceremony seen from the back, a moment; a photo slot);
+  the Spinnaker's piano (E: she plays a few notes); the kids' pool's slide (she rides it); the
+  captain's cabin door (a name plate: the user's in-joke). Tangerines: the spa's reception (1), the
+  Spinnaker's bar (2), Splash Academy's snack table (1).
+
+**Region 10: Sunset.** The balcony forward of the spa (deck 11, 24-29.5 m) through the bridge's hatch;
+the air; the mooring deck (deck 7, 0.5-21.4 m); the tip of the bow. The ending (§6.1.9). The mooring
+deck's door into deck 7 opens from the mooring side after the catch, for the way home.
+
+#### 6.1.4 The stair cores, every flight
+
+Fire doors with readers open freely from above (the escape side). Routine blocks lift on the event
+named and stay open. "Open" flights are open from the start.
+
+| Flight | Forward core (74-82 m) | Midship core (102-110 m) | Aft core (194-202 m) | Atrium staircase (82-102 m) |
 |---|---|---|---|---|
-| 1 | Lower ship | Decks 4-5, deck 6 forward, the atrium's floor | The start, at the gangway | The first errand: lunch from a deck 5 restaurant to a colleague at the gangway, who gives her the Deck card |
-| 2 | Atrium + promenade | The atrium on decks 6-7, the promenade | Deck card | Back up from deck 4 past places she knows. Bumbot's first near-catch: he bolts through a door and leaves it open |
-| 3 | Showtime | Deck 6's rooms and theatre, deck 7 midships and aft | The door he left open | The stage manager needs something from deck 4; reward: the Entertainment card, and a one-way trunk from the theatre to deck 4 |
-| 4 | Linen room | The atrium on decks 8-10, deck 9's midships corridor | Entertainment card: the glass elevator goes on up to decks 8-10 | A short corridor with life in it (carts, a guest locked out, a balcony cabin). The linen room: the Housekeeping card, the laundry chute to deck 4, pantry doors on decks 4-5 |
-| 5 | Deck 8 forward | Deck 8 forward of the atrium, **cabin 8206** | Housekeeping card, a door at that end of deck 8 | The surprise: her cabin, its door open, on her way through |
-| 6 | Lido | Deck 11 from the gym aft | Walking through deck 8 forward: the only stairs going on up to the pool deck | Grip socks and the parasol change the old decks (the atrium, the stern tiers, shafts). Bumbot drains the pool: a hatch in its tank |
-| 7 | Balconies + hallways | The balconies outside decks 8-10, and their hallways inside | Grip socks: out through the balcony cabin on deck 9 | Climbing balcony to balcony outside the ship; each balcony door opened from outside unlocks a hallway. A slip is the overboard scare; the parasol glides down to the promenade |
-| 8 | Top deck + funnel top | Deck 12 from the atrium aft, the funnel's top | Grip socks again: a wall jump from the Great Outdoors up to deck 12's aft terrace | The engineer's errand, then the ship's horn (below): the officer runs for the bridge and drops his card, the old lady leaves her sunbed, the gulls lift |
-| 9 | The bow | Deck 7 forward (kids' clubs), decks 9-12 forward: spa, bridge, Spinnaker | Officer's card, forward along deck 12 then down | At last the bridge: Bumbot hits the alarm, the hatch in its ceiling opens |
-| 10 | Sunset | The balcony forward of the spa, the mooring deck | The hatch | The ending (below) |
+| 4-5 | Open | Open | Open | (floor on 5) |
+| 5-6 | **Blue** (region 1's way on) | The cleaner, lifts at region 3 | "REHEARSAL" rope, lifts at region 3 | The photographer, lifts at region 3 |
+| 6-7 | Open | Open | Open | Open |
+| 7-8 | Green | Green | Green | The art auction, lifts at region 4 |
+| 8-9 | Open (lobby doors gold) | Green | Green | Open |
+| 9-10 | Open (lobby doors gold) | Green | Green | (top at 9; the glass elevator to 10) |
+| 10-11 | Open | The yoga class, lifts at region 6 | The Sports Bar's crowd, lifts at region 8 | |
+| 11-12 | The wedding party, lifts at region 9 | Wet paint, lifts at region 8 | The Sports Bar's crowd, lifts at region 8 | |
 
-Staggering the stairs means the forward core must let her climb from deck 8 to deck 11 at step 6,
-with its doors on decks 9 and 10 still shut.
+The other vertical ways: the forward-cabins trunk (4-5, 50 m, free); the midships trunk (4-5-6, 125 m;
+its deck 6 door in Bliss opens from Bliss first); the theatre's trunk (6 to 4, 240 m, one-way then
+both ways); the Bliss/Magnum's trunk (6-7-9, 118 m, red, the way into region 4); the boat walkway's
+ladder (blue gate on the promenade, free from above); the laundry chute (9 to 4, green, down only);
+the vent's duct (9 to 8, one-way); the pool's hatch (11 to 10, one-way); the sun cover (11 to 12 with
+the socks, down any time); the bridge's hatch (10 to 11, after the alarm); the funnel's ladder and
+stairway (12 to the top). Elevators: free, each panel lighting the decks she can reach.
 
-#### The ending (the end goal: catching Bumbot)
+#### 6.1.5 The cards
+
+| Card | Colour | Who gives it | What it opens |
+|---|---|---|---|
+| Deck | Blue | The gangway officer, for his lunch (region 1) | The forward stairs' fire door 5-6; the boat walkway's gate on the promenade |
+| Entertainment | Red | The stage manager, for his pills (region 3) | The Bliss/Magnum's trunk up to deck 9; deck 7's midship lobby door into Magnum's; the lighting booth on the theatre's balcony |
+| Housekeeping | Green | The steward, for his cart (region 4) | The cabin decks' fire doors (7-8, 8-9, 9-10 at all three cores) from below; marked guest cabin doors (the locked-out guests, the balcony cabin); the pantries on decks 4 and 5; the laundry chute and the laundry's door |
+| Officer's | Gold | Dropped by the rival at the horn (region 8) | Every reader: the officers' lobbies on decks 9 and 10, the spa's door, the bridge's door, the kids' clubs' door |
+
+#### 6.1.6 The people
+
+Crew are friendly and never scare her; passengers and machinery are the obstacles. Every person needs
+new character art (a PixelLab character and a few clips each; the count is the art budget: about 25
+people, built in batches, the block people from two or three shared bodies recoloured).
+
+| Who | Where | Role | She brings | She gets | Clips |
+|---|---|---|---|---|---|
+| The gangway officer | Deck 4, the shell door | The first errand | Lunch (tray) | The Deck card | Idle, eat |
+| The stage manager | The theatre's stage | Errand | His pills from his cabin on deck 4 | The Entertainment card | Sneeze, flap, talk |
+| Two dancers | The stage | Rehearsal, scenery | | | A short dance loop |
+| The steward | Deck 9's corridor | Errand, the push lesson | His cart pushed free | The Housekeeping card | Push, idle |
+| The engineer | Deck 12's technical door, the funnel's top | Errand, the horn | His lunch from Topsiders (tray) | The horn; the telescope | Idle, eat, climb, wave |
+| The wedding planner | Deck 12's forward lobby | Errand | The cake from Cagney's (tray) | The lobby clears | Idle, clipboard |
+| The pastry chef | Cagney's pass | Hands out cakes | | | Sigh |
+| **The rival security officer** | Regions 2, 3, 6, 7, 8, 9 | The comic rival: his blunders open the ship | | His card, at the horn | Walk with net, lunge, trip, tangled, run, slump |
+| The kid with the water pistol | The pool deck | Hazard, then ally | A soft serve (melting tray) | Gulls squirted off the pool deck | Walk, squirt, run, eat |
+| The waiter | Deck 5's restaurants, the Garden Café | A tray hazard, walks a loop | | | Walk with tray |
+| The old lady | The sun deck, deck 12 | A block; leaves at the horn | A cocktail (optional, tray) | Two tangerines; her parasol after the horn | Sit, glare, doze, bolt |
+| The guest locked out | Deck 9's corridor | The green card's lesson | His door opened | Two tangerines | Idle, relief |
+| The balcony guest | Deck 10 aft, on his balcony | Errand | His door opened from inside | Three tangerines, his balcony door | Idle, wave |
+| The sunbather | A "Do Not Disturb" balcony | A startle | | | Lounge, sit up |
+| The cleaner | The midship stairs 5-6 | Block until region 3 | | | Mop |
+| The photographer | The atrium stairs 5-6 | Block until region 3 | | | Pose, flash |
+| The auctioneer | The atrium stairs 7-8 | Block until region 4 | | | Gesture |
+| The yoga instructor | The midship stairs 10-11 | Block until region 6 | | | A pose loop |
+| The painter | The midship stairs 11-12 | Block until region 8 | | | Paint |
+| Three fans | The aft stairs 10-12 | Block until region 8 | | | Cheer, drink |
+| Four wedding guests | Deck 12's forward lobby | Block until the cake | | | Chat |
+| The croupier | The casino | A moving obstacle (the chip cart) | | | Push cart |
+| The porter | The gangway lobby | A moving obstacle (the luggage cart) | | | Push cart |
+
+#### 6.1.7 The hazards and obstacles
+
+| Hazard | Where | How it gets her | The tell | The response | Tamed by | Fright |
+|---|---|---|---|---|---|---|
+| The robot vacuum | Decks 4 and 6 corridors, a cabin mid-cleanup | Contact | Its hum, its path | Jump over, wait in a doorway | The dash shoves it aside | "Іііі!" (built) |
+| The luggage cart | The gangway lobby | Contact | The porter pushing | Hop it | The dash topples the stack | Bumped |
+| The waiter | Deck 5, the Garden Café | A bump spills her tray | His loop | Step round, hop | | None (a spill) |
+| The photo flash | The Photo Studio, deck 6 | She stops to pose a second | The camera raised | Pass between flashes | | None (a pose) |
+| Swinging stage lights | The stage, after the rival trips | Contact | The swing | Time it | | Bonked |
+| The trap door | The stage | A drop of one deck into the galley | A square seam | None needed | | None (a shortcut) |
+| The chip cart | The casino | Contact | The croupier | Hop it | | Bumped |
+| Standing carts | Decks 8-10 corridors | An obstacle | | Hop | The push verb moves them | |
+| The swinging cabin door | Corridors | Contact | The handle turns | Wait or run past early | | Bonked |
+| The towel stack | A mid-cleanup doorway | Falls on her | A wobble | Walk, don't run, past it | The dash blows through it | Buried |
+| The sprinkler | A corridor doorway | A drench | A wet-floor sign in the background | Run through between bursts | The open parasol | Drenched |
+| The "Do Not Disturb" cabin | Corridors, balconies | A startled guest | The sign | Leave it shut | | Covers her eyes, backs out |
+| The wet patch | The pool deck, by the showers | An uncontrolled slide | The wet-floor sign | Walk onto it, or jump it | Grip socks | Slipped |
+| The sliding deck chair | On the wet patch | Slides into her | It rocks first | Keep clear of the patch | Grip socks | Bumped |
+| The kid with the water pistol | The pool deck | A squirt in range | He raises it | Hop over him | The dash scares him; the ice cream turns him | Splashed |
+| Gulls | Open decks, balconies, the funnel | A swoop; they snatch food | A shadow sweeps the deck | Move on; crawl under it where she can | The open parasol; the kid on the pool deck; the horn clears the bow | Swooped |
+| Gusts | The balconies, deck 12, the funnel's stairway, the finale | A push aft in the air | Towels flap, a line of spray | Jump between gusts | | None (a fall if unlucky) |
+| The Sports Bar's crowd | The aft stairs | A block | | Wait for region 8 | | |
+| Basketballs | The sports court, deck 12 | Contact | The bounce | Time it | | Bonked |
+| The sauna's steam | The spa | Contact with a puff | The door's hiss | Time it | | Fogged |
+| The toy car | The kids' clubs | A slip | It rolls | Hop it | | Slipped |
+| The old lady | The sun deck | A block | | Jump the sunbed, or drop into the pool; not with a tray | The horn moves her | |
+| A long fall, overboard | Everywhere open | §5.6 | | | The parasol, opened in time | Built |
+
+#### 6.1.8 Bumbot's beats
+
+Each region has one, placed at the lock she cannot pass yet, so that he is literally the map. Six
+near-catches, each with a different escape, three glimpses, and the catch. Between them, the
+background glimpses of §4 (a tail round a corner, a shape past a window) go on.
+
+| Region | Where | What he is doing (his clip) | The beat | His escape |
+|---|---|---|---|---|
+| 1 | The Seven Seas' pass | Eating the lunch (`eating`) | Near-catch 1; the scream; the fruit bowl | Along the counter and out forward; a tail up the forward stairs |
+| 2 | The atrium; the Library | Sitting in the glass car; batting the chess pieces (`batting`) | A glimpse up the glass elevator; near-catch 2 | Through the Library's aft door, knocking the rope over |
+| 3 | The stage | Washing in the spotlight (`washing`) | Near-catch 3, the rival trips | Up a fly rope to the lighting bridge (new clip: hanging on a rope) |
+| 4 | The linen room | Asleep in the towels (`asleep`) | Near-catch 4 | Into the vent (new clip: a squeeze) |
+| 5 | Deck 8's forward lobby | | A glimpse | A tail up the stairs |
+| 6 | The pool's edge | Fishing (`batting` over the rim) | Near-catch 5; the kid squirts him | Into the pool, up the ladder (new clip: the wet shake), the drain lever |
+| 7 | A balcony rail | Washing | A glimpse | Inside; his door is ajar |
+| 8 | The funnel's lattice | Sitting | A glimpse; the horn | Down the lattice, forward along the roof |
+| 9 | The bridge's console | Sitting, then a run across it | Near-catch 6; the rival's net hits the alarm | Up the hatch's ladder |
+| 10 | The tip of the bow | Sitting, looking out | The catch: she stands still, he comes; she bends, he jumps into her arms (new clip) | None |
+
+#### 6.1.9 The ending (the end goal: catching Bumbot)
 
 ![The tip of the bow at sunset, a mock-up](docs/brainstorm/ending-bow-sunset.png)
 
-1. **On the bridge** Bumbot hits the alarm, and an emergency hatch in the ceiling releases (it stays
-   shut until then, so she can't go early). He shoots up through it. A ladder at the bridge's
+1. **On the bridge** the rival's net hits the alarm; the emergency hatch in the ceiling releases (it
+   stays shut until then, so she can't go early). Bumbot shoots up through it. A ladder at the bridge's
    forward end leads to it; ladders and climbing out of a hatch are already in the game.
 2. **Out on the balcony forward of the spa**, right above the bridge, the sun starts to set: sunset
    appears nowhere else in the game (§5.2). The camera slides forward and down at normal zoom to
-   show him settling at the tip of the bow, then comes back to her. So she can't get lost: there
-   is one way forward from the moment he escapes.
-3. **She glides down on the parasol**, about four decks, to the mooring deck. A miss is the overboard
-   scare, then back to the bridge to try again.
-4. **At the very tip of the bow** she stands in the wind, arms spread (the arms-wide pose stays in
-   her sprites from the user's earlier bow view, §8). All game she lunged and he ran. If she runs
-   at him he backs off; if she stands still he comes to her, and when she bends with her arms out,
-   the same pose as every near-catch, this time he jumps into them.
-5. **Optional, the way home:** a fade, then she carries him from deck 12 through the ship she opened
-   up, back to cabin 8206, where he curls up on the bed; the win screen and the personal message
-   (§6.4) come there. A fade is needed because she can't climb down with her arms full.
+   show him settling at the tip of the bow, then comes back to her. So she can't get lost: there is
+   one way forward from the moment he escapes.
+3. **She glides down on the parasol**, about four decks, to the mooring deck, **through gusts and past
+   two gulls** that cross her path: the parasol's test. A miss is the overboard scare, then back at the
+   bridge's crew door to try again: a short loop.
+4. **At the very tip of the bow** she stands in the wind, arms spread (the arms-wide pose stays in her
+   sprites from the user's earlier bow view, §8). All game she lunged and he ran. If she runs at him
+   he backs off; if she stands still he comes to her, and when she bends with her arms out, the same
+   pose as every near-catch, this time he jumps into them.
+5. **The way home:** a fade, then she carries him from the mooring deck through its door into deck 7
+   (it opens from the mooring side now), up through the ship she opened, back to cabin 8206, where he
+   curls up on the bed; the win screen and the personal message (§6.4) come there. The walk is hers to
+   make, at her pace, with him on her arms (a new state of her character: holding him, walking,
+   standing); nothing can scare her on it.
 
-What it takes: the balcony closed off from deck 12 by **a tall glass windscreen along the front of
-the Spinnaker balcony** (a real, visible barrier), the bridge's ladder and hatch, the sunset version
-of the sky and sea, her holding Bumbot (about 10 generations for a new state of her character, or
-free with his sprite on her arms-out pose). Bumbot must come through to her side of the railing
-in the scene: in the mock-up the railing hides him.
+What it takes: the balcony closed off from deck 12 by the tall glass windscreen along the front of the
+Spinnaker balcony (a real, visible barrier); the bridge's ladder and hatch; the sunset version of the
+sky and sea; her holding Bumbot. Bumbot comes through to her side of the railing in the scene: in the
+mock-up the railing hides him.
 
 Checked in the game (2026-11-09): the balcony forward of the spa
 (`docs/brainstorm/balcony-forward-of-the-spa.png`, deck 11's open strip, about 24-29.5 m) can only be
 reached today by jumping off the front of deck 12; she lands on it, and its back wall has no door.
+The plan keeps it so: the windscreen stops the jump, and the hatch is the only way.
 
-#### The funnel's top: for something else
+#### 6.1.10 The funnel's top (Decided)
 
-The user: a funnel with smoke coming out isn't a romantic place for the catch, but its top can
-serve another purpose that helps progress. Mock-ups from when it was the catch's place, with ladders
-that no longer apply: `docs/brainstorm/funnel-top-close.png`, `docs/brainstorm/funnel-top-where.png`.
+A steel stairway up the funnel's sloped front (about 45 degrees, so the game's normal stairs work),
+starting where the existing ladder from deck 12 comes up on the roof. Up there: **the engineer** at
+the horn's cord, **the horn** (one blast that changes three places she knows: §6.1.3, region 8) and
+**the lookout telescope** (a look at deck 7's stern strip, the secret). From deck 12 she can't see the
+top (about 640 px over the floor; the camera shows about 135 px over her): the climb is a discovery.
+Mock-ups from when the top was the catch's place: `docs/brainstorm/funnel-top-close.png`,
+`docs/brainstorm/funnel-top-where.png`. The exhaust damper idea is dropped.
 
-**Getting up there:** a steel stairway up the funnel's sloped front (about 45 degrees, so the game's
-normal stairs work), starting where the existing ladder from deck 12 comes up on the roof. Not
-ladders on the aft side as first drawn: the existing ladder is on the forward side and the funnel's
-base is solid, so she couldn't reach them. From deck 12 she can't see the top (it is about 640 px
-over the floor; the camera shows about 135 px over her).
+#### 6.1.11 Secrets and quirks
 
-| Idea | What she does up there | What it does for progress |
+The hidden extras of §6.4 get slots here (a framed picture E opens full screen; the pictures are the
+user's, later): the lifeboat, the lighting bridge, deck 7's stern strip, the chapel. The rest are
+quirks: a moment that happens when she stands somewhere, her personality showing (§3). All free of
+reward except the tangerines named.
+
+| Place | What happens | Needs |
 |---|---|---|
-| **The ship's horn** (Claude's pick) | Pulls the great horn's cord | One blast changes places she knows: the old lady leaves her sunbed, gulls lift off a spot they were blocking, the duty officer runs for the bridge and drops his card. Needs sound (off for now: until then, the screen shaking and everyone jumping) |
-| **The stranded engineer** | Brings lunch or a tool to a technician who can't leave the exhaust work | Another carrying errand; he hands over a card. Combines well with the horn: he lets her pull it |
-| **The lookout telescope** | Looks through it from the highest point on the ship | Shows a place she hasn't found yet, such as deck 7's hidden stern strip |
-| **The exhaust damper** | Turns a big valve | The smoke stops and steam vents elsewhere go quiet, opening a path |
+| A lifeboat (from the boat walkway) | Inside: benches, an oar, a photo slot, two tangerines | The boat's inside, drawn by hand |
+| The lighting bridge over the stage | The catwalk, the view down onto the stage, a photo slot | The red card; drawn by hand |
+| Deck 7's stern strip | A framed photo slot on the stern structure; the telescope points at it | The socks to climb back |
+| The chapel | The ceremony seen from the back; a photo slot | After the cake |
+| The casino's jackpot | One machine with a glint: lights, a ding, three tangerines | |
+| Los Lobos' piñata | The dash breaks it: three tangerines | |
+| The galley pass, the pantries, the service station | Tangerine crates, some behind breakables | |
+| Cabin 8206's shower | Built (§8) | |
+| The hot tub | She sits in it, steam rising, a relax idle | A clip |
+| The ice cream machine | She eats a soft serve | A clip |
+| Bliss's dance floor | Standing still, she dances | A clip |
+| The spotlight, centre stage | Standing three seconds, she bows | A clip |
+| The Four Seasons' ice swan | She shivers | A clip |
+| The Spinnaker's piano | She plays a few notes | A clip |
+| The kids' pool's slide | She rides it into the pool | |
+| The sports court | E with a ball: she scores | A clip |
+| The giant chess set | She moves a piece | |
+| The duct's grilles | Peeks into cabins: a snoring passenger, a cabin full of balloons | Drawn by hand |
+| The captain's cabin door | A name plate: the user's in-joke | |
+| The Sushi Bar's SUSHI sign | Bumbot's secret from the sister game: the user decides | |
+| The tip of the bow | Standing still before he comes: the arms-wide pose | Built |
 
-The maps above draw the horn and the engineer together.
+#### 6.1.12 Art to make
 
-#### Considered and dropped
+No limit on art (the user, 2026-11-10), but generations are stated before they are spent, and the
+Tier 1 month renews on 2026-11-30 (§8). Rough counts; the build prices each batch.
 
-- **The funnel's top as the place of the catch:** not romantic (the user). With it went its stairway
-  as a finale, a gold gate on the roof and a gold card on the bridge.
+- **Her new moves** (skeleton-v3 clips, 2-4 generations each): push, crawl, wall jump and wall slide,
+  the parasol opening, gliding and closing, the tray walk and hop, the hand-over, the spill, the horn
+  pull, the wave; the frights: splashed, slipped, drenched, buried, bonked, startled, swooped, fogged,
+  posed; the quirks: the hot tub, the ice cream, the dance, the bow, the shiver, the piano, the
+  score. About 30 clips, about 90 generations. **A new state of her character holding Bumbot** (10),
+  with its walk and stand (6).
+- **Bumbot's new clips:** hanging on a rope, the squeeze into the vent, the wet shake, the jump into
+  her arms; the rest reuse his clips. About 12 generations.
+- **People:** about 25 characters (§6.1.6), the crew first; a character and its few clips each.
+  The block people from shared bodies, recoloured.
+- **Hazards and props:** the gulls (after the user's herring gull photo: perched, flap, swoop, glide),
+  the luggage and chip carts, the sliding deck chair, the toy car, the basketball, the parasol (an
+  object and her state), the grip socks, the tray and its loads (lunch, cone, cocktail, cake box),
+  the pill bottle, the net and the pet carrier, the telescope, the horn's cord. Hand-drawn: the
+  swinging door, the towel stack, the sprinkler, the stage lights, the trap door, the steam, the gusts.
+- **Rooms and places, drawn by hand or from sheets:** the laundry (deck 4), the pantries, the duct, the
+  lifeboat's inside, the galley pass, the stage's wings and the lighting bridge, the balcony cabins
+  (the cabin drawing reused), the funnel's stairway and top, the bridge's hatch and ladder, the pool's
+  hatch, the chapel's ceremony, the balcony rails as platforms.
+- **The finale:** the sunset sky and sea; her holding him.
+- **HUD and glyphs:** the card slots, the carried thing with its melt meter, the key glyphs, the
+  pictogram bubbles.
+
+#### 6.1.13 How we proceed: the build order
+
+Each phase ends with screenshots and the user's review, playtests once gameplay changes, a commit per
+approved round (the working rules in `CLAUDE.md`). Phases run bow to stern, deck by deck, where it
+matters.
+
+1. **The skeleton of the progression, placeholder art.** `LOCKED_PARTS` and the cards on; the regions'
+   walls, doors and readers; the lockdown's signs; the routine blocks as ropes and cones; every flight
+   as §6.1.4; the Bliss/Magnum's trunk to deck 9; the duct and the crawl; the push on carts; the socks'
+   wall jump; the parasol's glide; the carrying rules; the pool's drain and hatch; the chute and the
+   laundry; the bridge's hatch and ladder; the funnel's stairway and top; the sun cover's climb; the
+   balcony climb (rails as platforms, partitions as walls) and the hallways' balcony doors; the glass
+   elevator's panel as the meter; the checkpoints; the tangerines; Bumbot's beats as scripted scenes
+   with his existing clips; the horn's cascade; the people as placeholder figures with bubbles; the
+   finale's route. **A headless golden-path playtest** from the gangway to the catch, and **a sweep for
+   sequence breaks** (every lock tried from the wrong side).
+2. **Her new moves' art:** push, crawl, wall jump, glide, the tray clips, the horn pull, the catch.
+3. **The people:** the crew and the rival first, then the passengers, then the block people; their
+   clips; the pictograms.
+4. **The hazards and obstacles, region by region,** with their art and frights; the gulls.
+5. **The rooms and places the plan adds** (§6.1.12).
+6. **Secrets and quirks;** the photo slots (the user supplies the pictures).
+7. **The finale:** the sunset, the glide with gusts and gulls, the catch, the way home, the win screen.
+8. **Tuning and her playtest:** difficulty, the checkpoints' spacing, sound on, the controller.
+
+#### 6.1.14 Considered and dropped
+
+- **The funnel's top as the place of the catch:** not romantic (the user). With it went its stairway as
+  a finale, a gold gate on the roof and a gold card on the bridge.
 - **Cabin 8206 as a home base, as the last region, or as the place of the catch:** it is a surprise
-  around the middle of the game. (The optional way home above ends there, after the catch.)
+  around the middle of the game; it is a respawn door for deck 8 forward only.
 - **A whole-ship camera pull-back to show where he went:** the same kind of pull-back was removed from
   the bow view because it didn't work visually (§8).
 - **Other places for the catch:** the antenna mast (narrow, no room for a scene), the theatre stage
-  (she has been there since step 3), the ice cream machine at the Great Outdoors (little drama).
-- **Gliding down from the Spinnaker balcony:** replaced by the user's idea of the balcony reached from
-  inside the bridge.
-- **Fire doors dropping all over the ship after the alarm:** they were there to block routes and
-  steer her; with one way forward from the bridge they have no job. (Drawn out of the maps; the user
-  hasn't confirmed.)
+  (she has been there since region 3), the ice cream machine at the Great Outdoors (little drama).
+- **Gliding down from the Spinnaker balcony:** replaced by the balcony reached from inside the bridge.
+- **Fire doors dropping all over the ship after the alarm:** with one way forward from the bridge they
+  have no job; the routine blocks and the lockdown's card doors do it instead.
+- **Both abilities at step 6:** the parasol moved to region 8, from the old lady's sunbed.
+- **The parasol surviving any long drop:** it opens only while she holds jump, so the long fall stays.
+- **The Entertainment card driving the glass elevator up to decks 8-10:** an elevator mirrors her
+  access, it is never a lock; the red trunk from Bliss does it.
+- **Cards opening guest stairs by department logic:** every stair lock is a lockdown fire door with a
+  reader, or a person; the colour is the rule.
+- **The medical centre as the stage manager's pills' place:** NCL's plan has it on deck 3, which is not
+  playable; the pills are in his cabin on deck 4.
+- **The engineer's lunch carried up the funnel's ladder:** a tray can't take a ladder; he eats at the
+  ladder's foot and she follows him up empty-handed.
+- **The exhaust damper** (the funnel's top): dropped for the horn and the telescope.
+- **The strict security officer as a touch hazard:** crew never scare her; he is the rival instead.
+- **Wet paint as the reason for every closed flight:** kept once, as a joke, on the midship 11-12 flight.
 
-#### Still open
+#### 6.1.15 Still open (the user's)
 
-1. The order of the ten steps, and the cabin decks' new split: a short Linen room region, the
-   hallways opened from the balconies outside (2026-11-10, waiting for the user's review).
-2. What the funnel's top is for: the horn, the engineer, both, or something else.
-3. Whether the fire doors are really gone.
-4. Whether the final glide should be harder, with wind or gulls, and whether the short finale (bridge,
-   hatch, glide, catch) is the right pace.
-5. Whether the mooring deck and the balcony stay shut until the finale, so she first sets foot there
-   at sunset (the maps assume so).
-6. The catch itself: she stands still and he comes to her.
-7. The way home to cabin 8206 as the ending.
-8. Whether her hands are full while carrying something, so no ladders or trunks, only stairs and
-   elevators (Claude's suggestion: it makes her plan a route through decks she knows).
-9. Deck 7's stern strip (§8) as a secret she glides down to with the parasol.
-10. The drained pool's hatch (step 6) drops her into deck 10's hallway before the balconies open
-    the hallways (step 7): an early taste of them (Claude's suggestion), or somewhere else?
-11. How many near-catches there are, and where; where the checkpoints go; whether the dash stays, and
-    what the tangerines are then for.
+1. The pictures for the photo slots (the lifeboat, the lighting bridge, the stern strip, the chapel),
+   and whether the chapel's wedding is anyone in particular.
+2. What the SUSHI sign does; the name on the captain's cabin door; the names on crew doors.
+3. Whether the rival has a name.
+4. The win screen's message (§6.4, Later).
+5. Exact positions, set during the build; the user corrects from screenshots.
 
 ### 6.2 What the code can already do
 
@@ -809,9 +1297,9 @@ Mechanisms from the blockout, there to be used or dropped as the design needs. T
 
 ### 6.3 Tangerines
 
-**Open (the user, 2026-11-09):** none are on the ship for now, until it is decided whether the
-dash stays (§3.2). If it does: no carrying cap, but scarce, and the game can be finished without
-the dash.
+**Decided (the plan, 2026-11-10):** the dash stays (§3.2), so about 30 tangerines go back on the ship,
+each where food plausibly is, a few as rewards from people (listed per region in §6.1.3). No carrying
+cap, scarce, and the game can be finished without the dash.
 
 ### 6.4 Later
 
@@ -1024,7 +1512,7 @@ Nothing blocks the start of the build. These get settled along the way:
       stage runs to it between its two curtains; at the promenade's ends she stops in the first
       opening, partly behind the end pier (she used to slip behind it with bits poking out)
 - [ ] **Open: no checkpoints in the game for now** (the user, 2026-11-03): a scare always brings
-      her back at the gangway until they are placed, spaced well apart (§5.5, §6)
+      her back at the gangway until they are placed, spaced well apart (§5.5; their places: §6.1)
 - [x] **Deck 7 furnished** (2026-11-03, merged): after NCL's plan
       and the user's photos (`deck_7_central_area`). Bow to stern: **Splash Academy** (21-45:
       sunny walls, a blue dotted carpet, a play kitchen, toys, low tables), **Entourage** (45-74:
@@ -1057,7 +1545,7 @@ Nothing blocks the start of the build. These get settled along the way:
       (`HULL_PLAIN_TO`, her photos). The sun moved 1.5 m aft to stay clear of the stem; it is to
       be moved and enlarged later (the user)
 - [ ] **Open: the locks are off for now** (the user, 2026-11-03): every flight, trunk and
-      elevator is open until the progression is designed (§6, §6.2)
+      elevator is open until the plan's phase 1 turns them on (§6.1.4, §6.2)
 - [x] **Deck 8 furnished** (2026-11-06, merged): NCL's plan has
       only cabins there and the atrium. **Cabin 8206, the user's own cabin on the cruise**
       (`OUR_CABIN` in `tools/ship_layout.py`): an oceanview with a picture window, starboard,
@@ -1300,18 +1788,20 @@ Nothing blocks the start of the build. These get settled along the way:
       other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
       open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
       by the spa's wall on deck 11 moved clear of its sign
-- [ ] **Start the next session here: the progression brainstorm** (2026-11-09, §6.1), in progress,
-      **nothing decided yet**: the user will continue it. Its open questions are at the end of §6.1,
-      and its maps come from `python tools/draw_regions.py`. Work is on branch `progression-design`
-      (not merged to `main` yet)
+- [ ] **Start the next session here: build the progression plan** (§6.1, decided 2026-11-10: the
+      user asked Claude to settle the brainstorm's questions for the most fun and save the result as
+      the plan). Its build order is §6.1.13: phase 1 first, the skeleton of the progression with
+      placeholder art, ending in a headless golden-path playtest from the gangway to the catch and a
+      sweep for sequence breaks. The maps come from `python tools/draw_regions.py`. The plan is on
+      branch `progression-design`, committed, not merged to `main` yet: merge when the user approves
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
       a glide, a flap, perched on a railing; about 12 generations), and gulls as a hazard (§5.8).
       Pick the next piece of work from the candidates below with the user. The whole ship:
       `python tools/render_ship.py`, or O in the game; pictures of the outside work go in
-      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: **the progression, being brainstormed from scratch with
-      the user (2026-11-09, §6.1)**: how the ship is split, what locks it, Bumbot and the
+      `%TEMP%/bumbusik-playtest/exterior` (the user's wish). Other candidates, after the outside: **the progression plan
+      (§6.1, decided 2026-11-10)**: how the ship is split, what locks it, Bumbot and the
       checkpoints; doors along the decks into small separate rooms
       (§5.1); hazards and people placed on the real decks (§5.8; people need new character art).
       NCL's map has no cabin numbers: cruisedeckplans.com's deck plans do
