@@ -1034,15 +1034,13 @@ def build_objects():
 
     # Checkpoints (crew cabin doors, §5.5): none for now (the user, 2026-11-03): they come back
     # when the ship is split into unlockable areas. Until then she always starts again at the
-    # gangway. The last placements are in GAME_DESIGN.md §8.
+    # gangway.
 
     # Bumbot's spots (§4): none for now (the user, 2026-11-07): they are mapped in again later, with
     # his near-catches' tests. The game still places a `bumbot` point (activity, escape).
 
-    # Tangerines (§6.3): ten, each on a side table. One sits behind crates only the dash breaks.
-    for i, (deck, m) in enumerate([(4, 30), (4, 150), (4, 236), (5, 60), (5, 170), (6, 120), (6, 245),
-                                   (7, 30), (11, 215), (12, 113)]):
-        add(point(f"t-{i + 1}", "tangerine", x_of(m), floor_y(deck)))
+    # Tangerines (§6.3): none for now (the user, 2026-11-09), until it is decided whether the dash
+    # stays. The game still places a `tangerine` point, on a side table.
     for i in range(2):
         for j in range(2):
             add(area(f"crate-{i}-{j}", "breakable", (col(232) + i) * TILE, floor_y(4) - (j + 1) * TILE, TILE, TILE))

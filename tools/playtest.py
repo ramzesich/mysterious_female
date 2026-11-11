@@ -521,7 +521,6 @@ def scenario_cabin(b):
     b.shot("cabin-desk")
     b.hold(["right"], 0.6)
     time.sleep(0.3)
-    ok &= check(b.state()["tangerines"] == 2, "she picks up the two tangerines on the desk", b.state())
     b.hold(["right"], 2.0)
     s = b.state()
     ok &= check(route() == "cabin" and door < s["x"] < door + 200 and s["y"] == floor_y(8), "the cabin's far wall holds her", s)
@@ -692,16 +691,15 @@ def scenario_vacuum(b):
 
 def scenario_dash(b):
     b.open("?reset&play")
-    b.teleport(x_of(236) + 6, D4)  # the tangerine behind the crate stack on deck 4
+    b.teleport(x_of(236) + 6, D4)  # behind the crate stack on deck 4
     time.sleep(0.3)
-    s = b.state()
-    ok = check(s["tangerines"] == 1, "picks up a tangerine", s)
+    b.eval("window.__ship.save.tangerines = 1")  # none are placed on the ship for now (§6.3)
     b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(228)}; window.__ship.vacuums[0].speed = 0")
     b.tap("d")
     time.sleep(0.2)
     b.shot("dash-shout")
     s = b.state()
-    ok &= check(s["dashing"] and s["tangerines"] == 0, "D spends it on a dash", s)
+    ok = check(s["dashing"] and s["tangerines"] == 0, "D spends a tangerine on a dash", s)
     # Dash forward along deck 4, through the crates and into the vacuum.
     b.hold("left", 2.5)
     s = b.state()
