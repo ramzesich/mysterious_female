@@ -1336,32 +1336,14 @@ Tier 1 month renews on 2026-11-30 (§8). Rough counts; the build prices each bat
 
 #### 6.1.13 How we proceed: the build order
 
-Each phase ends with screenshots and the user's review, playtests once gameplay changes, a commit per
-approved round (the working rules in `CLAUDE.md`). Phases run bow to stern, deck by deck, where it
-matters.
-
-1. **The skeleton of the progression, placeholder art.** `LOCKED_PARTS` and the cards on; the regions'
-   walls, doors and readers; the lockdown's signs; the routine blocks as ropes and cones; every flight
-   as §6.1.4; the Bliss/Magnum's trunk to deck 9; the duct and the crawl; the push on carts; the socks'
-   wall jump; the parasol's glide; the carrying rules; the pool's drain and hatch; the chute and the
-   laundry; the bridge's hatch and ladder; the funnel's stairway and top; the climb from the machine
-   up the sun cover; the balcony climb (rails as platforms, partitions as walls) and the hallways'
-   balcony doors; the glass elevator's panel as the meter; the checkpoints; the tangerines; **the ten
-   books, the trolley, the shelf and the reading chair; the ice cream machine's swirl, the canister
-   and the cone as bait**; Bumbot's beats as scripted scenes with his existing clips; the horn's
-   cascade; the people as placeholder figures with bubbles; the finale's route. Everything placed as
-   `docs/population.md` says, deck by deck. **A headless golden-path playtest** from the gangway to
-   the catch, and **a sweep for sequence breaks** (every lock tried from the wrong side).
-2. **Her new moves' art:** push, crawl, wall jump, glide, the tray clips, the swirl, the horn pull, the
-   catch.
-3. **The people:** the crew, the rival and her husband first, then the passengers, then the block
-   people and crowds; their clips; the pictograms.
-4. **The hazards and obstacles, region by region,** with their art and frights; the gulls.
-5. **The rooms and places the plan adds** (§6.1.12), the library's pieces and the nook among them.
-6. **Secrets and quirks;** the books' pages; the photo slots (the user supplies the pictures).
-7. **The finale:** the sunset, the glide with gusts and gulls, the catch, the way home, the cabin with
-   the three of them, the win screen.
-8. **Tuning and her playtest:** difficulty, the checkpoints' spacing, sound on, the controller.
+**Decided (the user, 2026-11-11): the step-by-step plan is `docs/build-plan.md`.** A short skeleton
+step first (the locks, the new vertical ways, the verbs bare, the beats as flags, a golden-path
+playtest and a sequence-break sweep), then one step per region in play order, each populating its
+whole area from `docs/population.md` with the systems that first appear there, its art priced before
+spending, its own playtest, the user's review, a commit and a §8 update; the ambient figures built
+with each region; sound, the controller and the tuning after the regions. The earlier order by kind
+(all systems, then all art, then all people) was dropped for it: it would have left the whole ship
+half-dressed with nothing finished to review.
 
 #### 6.1.14 Considered and dropped
 
@@ -1920,14 +1902,12 @@ Nothing blocks the start of the build. These get settled along the way:
       other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
       open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
       by the spa's wall on deck 11 moved clear of its sign
-- [ ] **Start the next session here: build the progression plan** (§6.1, decided 2026-11-10: the
-      user asked Claude to settle the brainstorm's questions for the most fun and save the result as
-      the plan). Its build order is §6.1.13: phase 1 first, the skeleton of the progression with
-      placeholder art, ending in a headless golden-path playtest from the gangway to the catch and a
-      sweep for sequence breaks. **Every entity's place and behaviour is in `docs/population.md`**
-      (the population spec, 2026-11-10): build from it, deck by deck. The maps come from
-      `python tools/draw_regions.py`. The plan is on branch `progression-design`, committed, not
-      merged to `main` yet: merge when the user approves
+- [ ] **Start the next session here: step 0 of `docs/build-plan.md`, the skeleton** (the plan is
+      §6.1, decided 2026-11-10; every entity's place and behaviour is `docs/population.md`; the
+      step-by-step build plan is `docs/build-plan.md`, decided 2026-11-11, merged to `main`). Step 0
+      turns the locks on, adds the new vertical ways and the verbs bare, places the beats as flags,
+      and ends in the `golden` and `sweep` playtests. Then step 1, region 1, and on in play order;
+      mark each step done here as it lands. Work on a branch per step
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;
