@@ -108,6 +108,16 @@ export class BootScene extends Phaser.Scene {
         if (meta.anims.crawl) this.anims.create({ key: 'her-crawl', frames: frames('crawl'), frameRate: 11, repeat: -1 });
         if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 9, repeat: -1 });
         if (meta.anims.camera) this.anims.create({ key: 'her-camera', frames: frames('camera', [0, 1, 2, 3]), frameRate: 9 });
+        // Region 6: clinging to a wall, slipping on wet tiles, licking a cone, the canister held up,
+        // sitting down at the table and eating there.
+        if (meta.anims.wallslide) this.anims.create({ key: 'her-wallslide', frames: frames('wallslide'), frameRate: 7, repeat: -1 });
+        if (meta.anims.slip) this.anims.create({ key: 'her-slip', frames: frames('slip'), frameRate: 11, repeat: -1 });
+        if (meta.anims.lick) this.anims.create({ key: 'her-lick', frames: frames('lick'), frameRate: 5, repeat: -1 });
+        if (meta.anims.pour) this.anims.create({ key: 'her-pour', frames: frames('pour'), frameRate: 4 });
+        if (meta.anims['sit-eat']) {
+            this.anims.create({ key: 'her-sit-eat', frames: frames('sit-eat', [0, 1, 2, 3]), frameRate: 7 });
+            this.anims.create({ key: 'her-eat-sat', frames: frames('sit-eat', [3, 4, 5, 6, 5, 4]), frameRate: 5, repeat: -1 });
+        }
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
@@ -146,6 +156,8 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'bumbot-fly', frames: catFrames('jump'), frameRate: 12, repeat: -1, repeatDelay: 900 });
         // Batting: seated, paw down and up. Its frames 6 and 8 drew stray blobs, so they are skipped.
         this.anims.create({ key: 'bumbot-bat', frames: catFrames('bat', [4, 5, 7, 5]), frameRate: 6, repeat: -1 });
+        // Wet from the pool, he shakes himself dry.
+        if (cat.anims.shake) this.anims.create({ key: 'bumbot-shake', frames: catFrames('shake', [1, 2, 3, 4, 5, 6]), frameRate: 8 });
         const params = new URLSearchParams(location.search);
         this.scene.start(params.has('play') ? 'ship' : 'title');
     }

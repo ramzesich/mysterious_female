@@ -795,6 +795,69 @@ def adjoin(width):
     return R.save("adjoin")
 
 
+# --- Region 6's room (deck 11) ---------------------------------------------------------------------
+def coldroom(width):
+    """The Garden Cafe's cold room (`room_coldroom`): insulated panels with frost along their seams,
+    the cooler's unit on the ceiling with icicles under it, shelves of tubs and boxes, and on the low
+    shelf in the middle the place of the ice cream mix's canister (the game draws it, at 150)."""
+    ICE, ICE_SEAM, FROST = "#cfeaf5", "#8fd3ff", "#ffffff"
+    R = Room(width, ICE, ICE_SEAM, ceiling=PALE, skirting=GREY, floor=SLATE, fleck=DARK, pitch=40)
+    R.keep = [ICE]
+    R.tube(70, 30)
+    R.tube(180, 30)
+    # Frost: creeping down from the ceiling and up from the floor along the panels' seams.
+    for x in range(0, width, 40):
+        for k, h in enumerate((9, 6, 4, 2)):
+            R.r(x - k, 9, x + k, 9 + h, FROST)
+            R.r(x - k, FLOOR - 5 - h + 1, x + k, FLOOR - 5, FROST)
+    for x in range(6, width, 9):
+        R.r(x, 9, x + 1, 9 + (x * 7) % 4, FROST)
+    R.door()
+    # The cooler: a grey unit under the ceiling, its two fans, icicles along its lip.
+    R.box(104, 9, 168, 26, GREY)
+    R.r(105, 10, 167, 12, PALE)
+    for cx in (120, 152):
+        R.d.ellipse([cx - 7, 13, cx + 7, 25], fill=DARK, outline=INK)
+        R.r(cx - 5, 18, cx + 5, 19, GREY)
+        R.r(cx - 1, 14, cx, 24, GREY)
+    for i, x in enumerate(range(106, 168, 5)):
+        R.r(x, 27, x + 1, 28 + (i * 5) % 6, FROST)
+    # A thermometer by the door: well under zero.
+    R.box(84, 44, 90, 66, WHITE)
+    R.r(86, 58, 88, 64, BLUE)
+    R.r(87, 47, 87, 58, GREY)
+    # Shelves: tubs of ice cream in three flavours, boxes of cones; the canister's low shelf.
+    R.shelves(96, 130, [FLOOR - 92, FLOOR - 62], post=SLATE, board=GREY)
+    for i, x in enumerate(range(99, 126, 11)):
+        R.box(x, FLOOR - 92 - 12, x + 10, FLOOR - 92, [PINK, CREAM, "#7a4528"][i % 3])
+        R.r(x, FLOOR - 92 - 12, x + 10, FLOOR - 92 - 10, WHITE)
+        R.box(x, FLOOR - 62 - 12, x + 10, FLOOR - 62, [CREAM, "#7a4528", PINK][i % 3])
+        R.r(x, FLOOR - 62 - 12, x + 10, FLOOR - 62 - 10, WHITE)
+    R.shelves(136, 164, [FLOOR - 30], post=SLATE, board=GREY)
+    R.r(136, FLOOR - 30, 165, FLOOR - 28, GREY)
+    R.shelves(176, 230, [FLOOR - 96, FLOOR - 66, FLOOR - 36], post=SLATE, board=GREY)
+    R.boxes(180, 228, FLOOR - 96, [CREAM, ORANGE, CREAM])
+    R.boxes(180, 228, FLOOR - 66, [BLUE_LIGHT, CREAM, PINK])
+    for i, x in enumerate(range(180, 222, 15)):
+        R.box(x, FLOOR - 36 - 14, x + 12, FLOOR - 36, [WHITE, BLUE_LIGHT, WHITE][i % 3])
+        R.r(x + 2, FLOOR - 36 - 10, x + 10, FLOOR - 36 - 9, BLUE)
+    # On the floor: a crate of ice, a stack of cone boxes; hooks with a quilted jacket by the door.
+    R.box(182, FLOOR - 20, 212, FLOOR - 1, BLUE_LIGHT)
+    for x in range(185, 210, 6):
+        R.r(x, FLOOR - 18, x + 3, FLOOR - 15, WHITE)
+    R.box(100, FLOOR - 12, 120, FLOOR - 1, ORANGE)
+    R.box(102, FLOOR - 23, 118, FLOOR - 12, ORANGE)
+    R.r(104, FLOOR - 19, 116, FLOOR - 18, CREAM)
+    R.r(20, 40, 21, 44, SLATE)
+    R.d.rounded_rectangle([12, 44, 30, 78], radius=3, fill=NAVY, outline=INK)
+    for y in range(50, 76, 6):
+        R.r(13, y, 29, y, BLUE)
+    # Cold air along the floor.
+    for x in range(4, width, 13):
+        R.r(x, FLOOR - 7 - (x * 3) % 3, x + 7, FLOOR - 6 - (x * 3) % 3, FROST)
+    return R.save("coldroom")
+
+
 def fort():
     """The children's blanket fort (the adjoining cabins, 232-302): sheets pegged over two chairs, down
     to the floor, a way in at each end; a torch glows through the cloth, a teddy keeps guard on top
@@ -908,7 +971,7 @@ def peeks():
 
 DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
-        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin}
+        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom}
 
 
 def main():

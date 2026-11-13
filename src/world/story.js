@@ -4,6 +4,7 @@
 // region, in the order of docs/build-plan.md.
 
 import { sfx } from '../sfx.js';
+import { lido } from './lido.js';
 
 const M = 48;
 
@@ -40,14 +41,16 @@ export class Story {
         this.setupLift();
         this.setupStage();
         this.setupHousekeeping();
+        this.setupLido();
     }
 
     // E. True if something here took it.
     interact() {
-        return this.officer() || this.pills() || this.photo();
+        return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband();
     }
 
-    update(dt, time) {
+    update(dt, time, input) {
+        this.updateLido(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
         this.flash(time);
@@ -63,6 +66,7 @@ export class Story {
         if (name === 'bb3') this.showTrap();
         if (name === 'cart_free') this.stewardThanks();
         if (name === 'duct') this.outOfTheDuct();
+        this.refreshLido();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
@@ -711,3 +715,6 @@ export class Story {
         s.tweens.add({ targets: note, y: note.y - 34, x: note.x + Phaser.Math.Between(-14, 14), alpha: 0, duration: 1500, ease: 'Sine.easeOut', onComplete: () => note.destroy() });
     }
 }
+
+// Region 6 (Lido) has a file of its own.
+Object.assign(Story.prototype, lido);

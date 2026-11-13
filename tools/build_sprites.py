@@ -96,6 +96,17 @@ HER = {
         "crawl": [(f"crawl/{i}.png", "feet") for i in range(8)],
         "push": [(f"push/{i}.png", "feet") for i in range(8)],
         "camera": [(f"camera/{i}.png", "feet") for i in range(8)],
+        # Region 6 (skeleton-v3, custom poses): clinging to a wall in the grip socks, sliding down
+        # it; slipping on wet tiles; licking a cone held to her mouth (the game draws the cone);
+        # both hands up with the canister (the game draws it; the later frames grew a ghost of one,
+        # so only the first is used); sitting down and eating, at the table with her husband
+        # (sit_seat with a hand to her mouth: PixelLab drew a chair under her, taken out by
+        # tools/unchair.py; frame 2 kept a piece of its seat and is left out).
+        "wallslide": [(f"wallslide/{i}.png", "feet") for i in range(4)],
+        "slip": [(f"slip/{i}.png", "feet") for i in range(4)],
+        "lick": [(f"lick/{i}.png", "feet") for i in range(4)],
+        "pour": [("pour/0.png", "feet")],
+        "sit-eat": [(f"sit-eat-clean/{i}.png", "feet") for i in (0, 1, 3, 4, 5, 6, 7)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.
@@ -148,6 +159,8 @@ BUMBOT = {
         "sit": seq("bumbot", "sit", "feet"),
         "eat": seq("bumbot", "eat", "feet"),
         "bat": seq("bumbot", "bat", "feet"),
+        # Out of the pool (near-catch 5): he shakes himself dry, water flying off him (v3).
+        "shake": seq("bumbot", "shake", "feet"),
         # Asleep: the last frame of a v3 "lies down and curls up". The pro "curled up" state drew a
         # featureless ball as tall as he stands, so it is kept in assets/source but not used.
         "asleep": [("curl-up/8.png", "feet")],

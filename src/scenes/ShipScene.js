@@ -2506,12 +2506,16 @@ export class ShipScene extends Phaser.Scene {
         const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
+        // On wet tiles without the grip socks (src/world/hazards.js) she slides on the way she came.
+        const slipping = onFloor && !!this.slipDir;
+        if (slipping) dir = this.slipDir;
         const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
 
         if (input.jumpPressed) this.jumpBufferedAt = time;
-        const canJump = !crawling && (onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs);
+        // (The ice cream mix's canister is too heavy to hop with: §6.1.2.)
+        const canJump = !crawling && !this.world.carry?.heavy && (onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs);
         if (canJump && time - this.jumpBufferedAt < PLAYER.jumpBufferMs) {
             body.velocity.y = -PLAYER.jumpVelocity * this.jumpScale();
             this.jumpBufferedAt = -Infinity;
@@ -2541,8 +2545,10 @@ export class ShipScene extends Phaser.Scene {
         if (crawling) this.poseCrawl(body.velocity.x);
         else if (aside) this.pose('back');
         else if (gliding) this.pose('apex');
-        else if (sliding) this.pose('fall');
+        else if (sliding) this.pose(this.herFrames.wallslide !== undefined ? 'wallslide' : 'fall');
+        else if (!onFloor && time < this.kickUntil + 160 && this.herFrames.wallkick !== undefined) this.pose('wallkick');
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
+        else if (slipping) this.pose(this.herFrames.slip !== undefined ? 'slip' : 'apex');
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
         else this.standStill(time, dir);
 
@@ -3578,7 +3584,8 @@ export class ShipScene extends Phaser.Scene {
         if (this.mode !== 'play') return;
         for (const cat of this.cats) {
             const s = cat.sprite;
-            if (cat.gone || cat.hidden || cat.route !== this.route || Math.abs(p.y - cat.floor) > 8 || Math.abs(p.x - s.x) > BUMBOT.noticeReach) continue;
+            // (`custom`: a beat with its whole scene of its own: the pool's, src/world/lido.js.)
+            if (cat.gone || cat.hidden || cat.custom || cat.route !== this.route || Math.abs(p.y - cat.floor) > 8 || Math.abs(p.x - s.x) > BUMBOT.noticeReach) continue;
             this.nearCatch(cat);
             return;
         }

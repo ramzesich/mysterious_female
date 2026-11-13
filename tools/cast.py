@@ -16,7 +16,7 @@ the character; "stand" is its standing pose. Options: "flip": the sprite was dra
 CAST = {
     # Region 1.
     "officer": ("4d3e6422-a934-40e0-a47d-e841378610ae", {}, {}),
-    "rival": ("68ef5f08-d2be-4f41-ad76-5831039110c3", {"trip": 12}, {}),
+    "rival": ("68ef5f08-d2be-4f41-ad76-5831039110c3", {"trip": 12, "peek": 5}, {}),
     "porter": ("3ad54560-70f4-4b3c-8ab0-60b0be9ca97e", {}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
@@ -79,7 +79,7 @@ CAST = {
     "groom": ("0c16e385-6331-4d44-87dc-060e70835055", {"idle": 4, "kiss": 7}, {}),
     "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
     # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
-    "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4}, {"scale": 0.72}),
+    "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4, "walk": 8, "squirt": 11, "eat": 6}, {"scale": 0.72}),
     "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 8}, {}),
     "domeman": ("7a956cd3-6357-4fa6-a319-020144870524", {"idle": 4}, {}),
     "bagslady": ("1528b5cf-4225-4d4b-85f8-e6f67ed664df", {"walk": 8}, {}),
@@ -88,4 +88,32 @@ CAST = {
     "rival_towel": ("1f2d9528-cb0b-4cd0-9fdd-ae8665ef179e", {}, {"scale": 0.8}),
     # Region 5 (deck 8 forward): the party at the cabin with the balloons.
     "partygirl": ("805b5b9e-f9ba-4091-be45-4b4fb9619843", {"dance": 9}, {"scale": 0.75}),
+    # Region 6 (Lido, deck 11). The buffet queue's six, each carrying a tray of their own; the fans
+    # on the aft stairs.
+    "queue_a": ("7f5590e5-ce63-4740-a8fa-b5b0ddb79795", {"walk": 6}, {}),
+    "queue_b": ("ec3c837c-dde4-4147-a113-5ff683c14c9e", {"walk": 6}, {}),
+    "queue_c": ("25221bc8-5291-46c9-b1fe-a3ef2dfd5ba9", {"walk": 6}, {}),
+    "queue_d": ("4ae6c188-d115-4acb-9ca0-e2cc294966cf", {"walk": 6}, {}),
+    "queue_e": ("7d1f88c4-005b-4752-aad5-c86958b996bb", {"walk": 6}, {}),
+    "queue_f": ("096244bc-9c59-49bc-8d8d-e0d0483d5c60", {"walk": 6}, {}),
+    # Her husband, at the first table of the Great Outdoors. A STAND-IN until the user's photo comes:
+    # the linen-shirted diner's character. Replace this id with his own character's.
+    "husband": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {}),
+    "fan_a": ("91c28911-98b0-4167-8ca7-06edc793b5a8", {"cheer": 9}, {}),
+    "fan_b": ("23af878f-1c70-4d98-bf25-43f971781103", {"cheer": 9}, {}),
+    "fan_c": ("25aa68a6-c806-4f18-a5c4-cfc4a8fb5983", {"cheer": 7}, {}),
+    # The painter on the midship flight up; the gym's two; Topsiders' barman; guests at the Great
+    # Outdoors' far tables, each seated on a wicker chair of their own.
+    "painter": ("65140f65-b4ef-4826-9b38-f214bafbcbf6", {"paint": 7}, {}),
+    "runner": ("c63d9718-4141-45bd-a4f7-c2e637f8edfe", {"run": 12}, {}),
+    "lifter": ("f0fd3504-2ccd-4982-91a9-55e0f6ba4863", {"curl": 7}, {}),
+    "barman_top": ("9dca3658-e553-4840-8dc1-16f2be45f8e6", {"shake": 8}, {}),
+    "go_reader": ("5f4c8274-b10f-4549-9073-245277a981a5", {}, {"scale": 0.8}),
+    "go_her": ("33919b16-1c1c-42a3-a788-b3f0cc837078", {}, {"scale": 0.8}),
+    "go_him": ("cc92f5ad-c324-47c6-84da-97466fcd2f18", {}, {"scale": 0.8}),
+    # Deck 10's hallway under the pool: who is behind its two "Do Not Disturb" doors, and who throws
+    # the swinging one open.
+    "sleeper": ("977c3e8e-4a5b-4e97-b41b-3b09a4917960", {"shriek": 10}, {}),
+    "curlers": ("0be059cb-aed5-4750-aa55-acc699881d77", {"shriek": 10}, {}),
+    "hurry": ("c17f28af-31b2-4a7b-8094-b0dfde83b7ff", {"idle": 4}, {}),
 }

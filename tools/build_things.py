@@ -23,7 +23,9 @@ OUT = ROOT / "assets" / "sprites"
 # Heights in the game, px (she is 59): a herring gull stands about knee-high.
 SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # The towel animals on their table (deck 10's midship flight): a swan's size.
-         "towel-elephant": 19, "towel-monkey": 27, "towel-rabbit": 27}
+         "towel-elephant": 19, "towel-monkey": 27, "towel-rabbit": 27,
+         # Two sunbathers, each on a lounger of their own (the pool deck, by the first pool).
+         "sunbather-1": 33, "sunbather-2": 20}
 
 
 def piece(path):

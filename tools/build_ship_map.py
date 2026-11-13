@@ -1574,7 +1574,8 @@ def build_objects():
     decor("chess-11", "chess", exact_x(110.4), exact_x(114.4), deck=11)
     # Over it, white pipes on tall blue posts (the user's photo from deck 12).
     decor("pergola-11", "pergola", exact_x(110.1), exact_x(114.9), deck=11)
-    for m in (115.9, 117.6, 141.4, 144.6, 147.8):
+    # (By the first pool, at 115.9 and 117.6, two sunbathers lie on loungers of their own: population.)
+    for m in (141.4, 144.6, 147.8):
         at11(m, "sunlounger")
     at11(143.0, "parasol")
     at11(132.5, "hot-tub")
@@ -1584,7 +1585,7 @@ def build_objects():
     at11(150.0, "towel-cart")
     at11(151.8, "pool-shower")
     decor("shower-box", "showerbox", exact_x(151.1), exact_x(152.5), deck=11)
-    at11(153.4, "planter-palm")
+    at11(154.5, "planter-palm")      # (clear of the wet patch and its deck chair: docs/population.md)
     at11(155.8, "pool-bar")
     at11(157.6, "chalkboard")
     at11(158.8, "planter-palm")

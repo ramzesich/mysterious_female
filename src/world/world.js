@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, SWIM } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -13,6 +13,7 @@ import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
 import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor } from './movers.js';
+import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -29,7 +30,8 @@ const LOOKS = {
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
 const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
 const HINTS = {
-    dash: 'D: «Кісюнічка!!!»', crawl: '↓ then ← →: crawl', socks: 'Jump at a wall: kick off it', parasol: 'Hold jump in the air: glide',
+    dash: 'D: «Кісюнічка!!!»', crawl: '↓ then ← →: crawl', socks: 'In the air at a post or a wall, jump again: kick off it',
+    parasol: 'Hold jump in the air: glide',
 };
 
 export class World {
@@ -103,6 +105,23 @@ export class World {
             g.generateTexture(key, w, h);
             g.destroy();
         };
+        this.carryBox.textures();
+        // Region 6: the pool attendant's hut (a checkpoint's door stands in it); the painter's bucket.
+        make('pool-hut', 50, 96, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(3, 8, 44, 88);
+            g.fillStyle(0xf4f4f4, 1).fillRect(4, 9, 42, 87);
+            g.fillStyle(0xc7dcd0, 1).fillRect(4, 9, 3, 87).fillRect(43, 9, 3, 87);
+            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 50, 8);
+            g.fillStyle(0x4d9be6, 1).fillRect(1, 3, 48, 6);
+            for (let x = 1; x < 49; x += 12) g.fillStyle(0xffffff, 1).fillRect(x, 3, 6, 6);
+            g.fillStyle(0xe83b3b, 1).fillRect(21, 12, 8, 2).fillRect(24, 9, 2, 8);
+        });
+        make('paint-bucket', 14, 12, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(1, 3, 12, 9).fillRect(0, 2, 14, 2);
+            g.fillStyle(0x9babb2, 1).fillRect(2, 4, 10, 7);
+            g.fillStyle(0x4d9be6, 1).fillRect(1, 2, 12, 1).fillRect(4, 4, 3, 5);
+            g.fillStyle(0x2e222f, 1).fillRect(3, 0, 8, 1).fillRect(2, 1, 1, 1).fillRect(11, 1, 1, 1);
+        });
         BOOK_COLOURS.forEach((c, i) => make(`book-${i + 1}`, 10, 13, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 10, 13);
             g.fillStyle(c, 1).fillRect(1, 1, 8, 11);
@@ -804,12 +823,38 @@ export class World {
                     this.add(items);
                 }
                 this.things.push({ ...e, items, reach: 22, interact: () => {
-                    if (this.carry) return false;
+                    // (`when`: there to see, but hers to take only then.)
+                    if (this.carry || (e.when && !this.cond(e.when))) return false;
                     this.carryBox.take(e.gives);
                     return true;
                 } });
                 break;
             }
+            case 'platform': {
+                // A roof she can stand on, landing from above (the hot tub's canopy).
+                const walk = { x0: e.x0, x1: e.x1, y: e.y, dropThrough: false };
+                walk.zone = s.add.zone(e.x0, e.y, e.x1 - e.x0, 6).setOrigin(0);
+                walk.zone.walk = walk;
+                s.physics.add.existing(walk.zone, true);
+                s.walkGroup.add(walk.zone);
+                s.walks.push(walk);
+                break;
+            }
+            case 'wet':
+                this.movers.push(new WetPatch(this, e));
+                break;
+            case 'foodgull': {
+                const gulls = new FoodGulls(this, e);
+                this.movers.push(gulls);
+                (this.foodGulls ??= {})[e.id] = gulls;
+                break;
+            }
+            case 'queue':
+                this.movers.push(new Queue(this, e));
+                break;
+            case 'trays':
+                this.movers.push(new Trays(this, e));
+                break;
             case 'robot': {
                 const robot = new Robot(this, e);
                 this.movers.push(robot);
@@ -1127,6 +1172,18 @@ export class World {
                 g.fillStyle(0xc7dcd0, 1).fillRect(2, 3, 12, 8);
                 g.fillStyle(0x4d9be6, 1).fillRect(3, 4, 10, 2).fillRect(3, 8, 10, 2);
             },
+            softserve: () => {
+                g.fillStyle(ink, 1).fillTriangle(3, 8, 13, 8, 8, 16).fillRect(4, 5, 8, 4).fillRect(5, 2, 6, 3).fillRect(7, 0, 2, 2);
+                g.fillStyle(0xe6904e, 1).fillTriangle(5, 9, 11, 9, 8, 14);
+                g.fillStyle(0xf68181, 1).fillRect(5, 6, 6, 2).fillRect(6, 3, 4, 3).fillRect(7, 1, 2, 2);
+                g.fillStyle(0xffffff, 1).fillRect(6, 4, 1, 1).fillRect(5, 6, 2, 1);
+            },
+            canister: () => {
+                g.fillStyle(ink, 1).fillRect(3, 3, 10, 13).fillRect(6, 0, 4, 4);
+                g.fillStyle(0xc7dcd0, 1).fillRect(4, 4, 8, 11);
+                g.fillStyle(0xf68181, 1).fillRect(4, 8, 8, 4);
+                g.fillStyle(0xffffff, 1).fillRect(5, 5, 1, 9).fillRect(7, 1, 2, 2);
+            },
             camera: () => {
                 g.fillStyle(ink, 1).fillRect(1, 4, 14, 10).fillRect(4, 2, 5, 3);
                 g.fillStyle(0x625565, 1).fillRect(2, 5, 12, 8);
@@ -1311,7 +1368,7 @@ export class World {
         this.people.update(dt, time);
         for (const m of this.movers) m.update(dt, time);
         this.carryBox.update();
-        this.story.update(dt, time);
+        this.story.update(dt, time, input);
         this.updateQuirks(time);
         this.updateHud();
         if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -3 : 3), p.y - PLAYER.height + 12);
@@ -1387,18 +1444,49 @@ export class World {
         const s = this.scene, h = this.data.hatchPool;
         const pool = s.pools.find(w => h.x > w.x0 && h.x < w.x1 && w.deck === 11);
         if (!pool) return;
-        s.pools = s.pools.filter(w => w !== pool);
-        if (s.mode === 'swim' && s.pool === pool) {
-            // The water goes from under her: she stands in the tank.
-            s.mode = 'play';
-            s.pool = null;
-            s.player.setDepth(s.DEPTH.player);
-            s.player.body.enable = true;
-            s.player.body.reset(s.player.x, pool.y);
-        }
-        const gone = () => [pool.water, pool.ripples].forEach(o => o.setVisible(false));
-        if (atOnce) gone();
-        else s.tweens.add({ targets: [pool.water, pool.ripples], alpha: 0, duration: 5000, onComplete: gone });
+        const out = () => {
+            // No water left: no swimming; if she was in it, she stands in the tank.
+            s.pools = s.pools.filter(w => w !== pool);
+            if (s.mode === 'swim' && s.pool === pool) {
+                s.mode = 'play';
+                s.pool = null;
+                s.player.setDepth(s.DEPTH.player);
+                s.player.body.enable = true;
+                s.player.body.reset(s.player.x, pool.bottom);
+                s.takeoffY = pool.bottom;
+                s.pose('stand');
+            }
+            [pool.water, pool.ripples].forEach(o => o.setVisible(false));
+            pool.gurgle?.destroy();
+        };
+        if (atOnce) return out();
+        // Over five seconds its surface sinks to the tank's floor, and she sinks with it; a whirl
+        // of bubbles over the drain.
+        const top = pool.y, depth = pool.bottom - pool.y;
+        pool.gurgle = s.add.graphics().setDepth(s.DEPTH.poolWater + 0.02);
+        this.add([pool.gurgle]);
+        sfx.rattle();
+        s.tweens.addCounter({
+            from: 0, to: 1, duration: 5000,
+            onUpdate: tw => {
+                const k = tw.getValue(), y = top + depth * k;
+                pool.y = y;
+                pool.water.clear().fillStyle(0x4d9be6, 0.55).fillRect(pool.x0, y, pool.x1 - pool.x0, pool.bottom - y);
+                pool.water.fillStyle(0x8fd3ff, 0.9).fillRect(pool.x0, y, pool.x1 - pool.x0, 1);
+                pool.ripples.y = y + 1;
+                const g = pool.gurgle.clear(), t = s.time.now;
+                for (let i = 0; i < 5; i++) {
+                    const a = t / 140 + i * 1.26, r = 9 - i * 1.4;
+                    g.fillStyle(0xffffff, 0.8).fillRect(h.x + Math.cos(a) * r, Math.min(pool.bottom - 2, y + 2 + i), 2, 1);
+                }
+                if (s.mode === 'swim' && s.pool === pool) {
+                    // (Too shallow to swim: her feet find the floor.)
+                    if (pool.bottom - y < 16) out();
+                    else s.player.y = Math.min(y + SWIM.float, pool.bottom);
+                }
+            },
+            onComplete: out,
+        });
     }
 
     // What shows now: things whose flag has come, things in the room she is in; rooms that appear.

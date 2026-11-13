@@ -9,6 +9,7 @@ import json
 
 import build_ship_map as B
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
+from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -150,7 +151,7 @@ def build_world():
         x, y, route = spot(*d["at"])
         e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
                  idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
-                 pose=d.get("pose", ""), still=d.get("still", ""))
+                 pose=d.get("pose", ""), still=d.get("still", ""), dy=d.get("dy", 0))
         if "walk" in d:
             a, b, v, *clip = d["walk"]
             e["walk"] = dict(a=spot(d["at"][0], a)[0], b=spot(d["at"][0], b)[0], v=v, clip=clip[0] if clip else "walk",
@@ -177,9 +178,11 @@ def build_world():
     for bid, (where, at, pieces) in BREAKABLES.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="breakable", id=bid, x=x, y=y, route=route, pieces=pieces))
-    for sid, (where, at, gives, after, show) in SOURCES.items():
+    for sid, (where, at, gives, after, show, *rest) in SOURCES.items():
         x, y, route = spot(where, at)
-        ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show))
+        # (`when`: it is there to see, but hers to take only then; `until`: gone after.)
+        ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show,
+                         when=rest[0] if rest else "", until=rest[1] if len(rest) > 1 else ""))
     for qid, (where, at, trigger, clip, ms, opts) in QUIRKS.items():
         x, y, route = spot(where, at)
         opts = dict(opts)
@@ -197,9 +200,9 @@ def build_world():
     for gid, (where, at, up) in GULLS.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="gull", id=gid, x=x, y=y - up, route=route))
-    for sid, (where, at, up) in SLOTS.items():
+    for sid, (where, at, up, *after) in SLOTS.items():
         x, y, route = spot(where, at)
-        ents.append(dict(kind="slot", id=sid, x=x, y=y, route=route, dy=up))
+        ents.append(dict(kind="slot", id=sid, x=x, y=y, route=route, dy=up, after=after[0] if after else ""))
 
     for lid, (deck, m, flag, short, long, amp, period) in LIGHTS.items():
         ents.append(dict(kind="light", id=lid, x=B.exact_x(m), top=B.floor_y(deck) - 128, floor=B.floor_y(deck), route="inside",
@@ -229,6 +232,25 @@ def build_world():
         x0, y, route = spot(where, a)
         ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,
                          frame=frame or ""))
+
+    # Region 6's (src/world/movers.js, src/world/lido.js).
+    for pid, (deck, a, b, up) in PLATFORMS.items():
+        ents.append(dict(kind="platform", id=pid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, route="inside"))
+    for wid, (deck, a, b, chair) in WETS.items():
+        ents.append(dict(kind="wet", id=wid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
+                         chairX=B.exact_x(chair), route="inside"))
+    for gid, (deck, a, b, count, wait, off) in FOODGULLS.items():
+        e = dict(kind="foodgull", id=gid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
+                 count=count, off=off or "", route="inside")
+        if wait != "circle":
+            e["perch"] = dict(x=B.exact_x(wait[0]), y=B.floor_y(deck) - wait[1])
+        ents.append(e)
+    for qid, (deck, a, b, v, who) in QUEUES.items():
+        ents.append(dict(kind="queue", id=qid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,
+                         who=who, route="inside"))
+    for tid, (deck, a, b, door, flag) in TRAYS.items():
+        ents.append(dict(kind="trays", id=tid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
+                         door=door, flag=flag, route="inside"))
 
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
@@ -294,7 +316,15 @@ def build_world():
     gx = nearest_balcony(gdeck, slot_x(gdeck, gm))
     glimpse_balcony = dict(x0=gx, x1=gx + UNIT, y=B.floor_y(gdeck), topY=B.floor_y(gdeck) - PARTITION_H)
 
-    return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen,
+    ly = B.floor_y(LIDO["deck"])
+    pools = [dict(x0=B.col(a) * B.TILE, x1=B.col(b) * B.TILE) for a, b in B.POOLS]
+    lido = dict(y=ly, leverX=B.exact_x(LIDO["lever"]), ladderX=B.exact_x(LIDO["ladder"]), tubX=B.exact_x(LIDO["tub"]),
+                kidA=B.exact_x(LIDO["kid"][0]), kidB=B.exact_x(LIDO["kid"][1]), loungerX=B.exact_x(LIDO["lounger"]),
+                chessX=B.exact_x(LIDO["chess"]), machineX=B.exact_x(LIDO["machine"]), husbandX=B.exact_x(LIDO["husband"]),
+                tableX=B.exact_x(LIDO["table"]), pawsA=B.exact_x(LIDO["paws"][0]), pawsB=B.exact_x(LIDO["paws"][1]),
+                pools=pools, tankY=ly + B.POOL_DEPTH)
+
+    return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
                 glimpseBalcony=glimpse_balcony,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),

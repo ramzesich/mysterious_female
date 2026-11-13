@@ -74,6 +74,8 @@ CHECKPOINTS = {
     "cp_9_arrive": (9, 119.6, "inside", True),
     "cp_9_mid": (9, 190, "inside", True),
     "cp_gym": (11, 84, "inside", False),
+    # (The pool attendant's hut on pool 2's aft rim: the kid's and the wet patch's frights come back here.)
+    "cp_pool": (11, 140.6, "inside", False),
     "cp_garden": (11, 192, "inside", False),
     "cp_technical": (12, 165, "inside", False),
     "cp_officer": (10, 60, "inside", True),
@@ -111,9 +113,12 @@ TANGERINES = {
     "tan_9_balc": (9, 240, 1, "out", None),
     "tan_10_mid": (10, 182, 1, "table", None),
     "tan_11_spa": (11, 32, 1, "table", None),
-    "tan_11_topsiders": (11, 145, 1, "table", None),
-    "tan_11_fruit": (11, 176, 2, "table", None),
-    "tan_11_crates": (11, 208.2, 2, 0, None),
+    "tan_11_topsiders": (11, 156.35, 1, 30, None),
+    "tan_11_fruit": (11, 176.8, 2, "table", None),
+    "tan_11_crates": (11, 217.9, 2, 0, "broken:haz_crates_11"),
+    # On the hot tub's canopy: up by a wall jump off one of its posts, from under it.
+    "tan_11_canopy": (11, 132.5, 1, 90, None),
+    "tan_10_tray": (10, 129.6, 1, 0, "flag:trays_10m"),
     "tan_12_spinnaker": (12, 54, 2, "table", None),
     "tan_12_lady": (12, 128, 2, 0, "lady"),
     "tan_12_cagneys": (12, 167, 1, "table", None),
@@ -125,14 +130,13 @@ TANGERINES = {
 # id: (deck or room, m or x, what she gets, needs flag). `what`: "verb:<name>" a new way to move,
 # "book:<n>", "item:<name>" a pocket item. All taken with E (population §2.1, §2.2).
 ITEMS = {
-    "item_socks": (11, 96, "verb:socks", None),
+    "item_socks": (11, 95.75, "verb:socks", None, 40),
     "item_parasol": (12, 130, "verb:parasol", "horn"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
-    "book_6": (11, 216, "book:6", None),
     "book_7": ("guest10", 150, "book:7", None),
     "book_8": (12, 128.6, "book:8", "horn"),
     "book_9": ("funnel", 184, "book:9", "horn"),
@@ -147,7 +151,7 @@ BEATS = {
     "bb2": (6, 181.0, "asleep", 1, 193.6, None),
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
     "bb4": ("linen", 150, "asleep", 1, 226, None),
-    "bb5": (11, 131.8, "bat", 1, 160, None),
+    "bb5": (11, 131.27, "bat", 1, 160, None),
     "bb6": (10, 31, "sit", -1, 29.2, None),
 }
 # What a flag gives besides itself: a verb learned at a beat.
@@ -194,6 +198,8 @@ GRIPS = [
     ("outside", 100.6, 7, 0, 150, 1), ("outside", 230.4, 7, 0, 150, -1),
     # The Great Outdoors' sun cover: its aft post, the climb up to deck 12 (region 8's way in).
     ("inside", 233, 11, 0, 124, 1),
+    # The hot tub canopy's two posts (the socks' first use: a tangerine on its roof).
+    ("inside", 131.03, 11, 0, 84, 0), ("inside", 133.93, 11, 0, 84, 0),
 ]
 
 # --- People (GAME_DESIGN.md §6.1.6, docs/population.md §3 and §7) ----------------------------------
@@ -285,6 +291,26 @@ PEOPLE = {
     "riv_laundry": dict(at=("laundry", 124), who="rival_towel", face=1, after="region:4", until="region:6"),
     # Region 5 (deck 8 forward, "calm, hers"): the birthday girl at the door with the balloons.
     "amb_birthday": dict(at=(8, 71.95), who="partygirl", face=-1, idle="dance", layer="back"),
+    # Region 6 (Lido, deck 11). The gym's two; the kid with the water pistol, in the hot tub until
+    # Bumbot's beat and on the aft pool deck after (the story moves him: src/world/lido.js); the
+    # security officer on his knees at a lounger; Topsiders' barman; the painter and the fans on the
+    # flights up; her husband at the first table by the ice cream machine; guests at the far tables.
+    "amb_treadmill": dict(at=(11, 86.6), who="runner", face=1, idle="run", layer="back", dy=7),
+    "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
+    "npc_kid_tub": dict(at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
+    "npc_kid": dict(at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
+                    bubble=("softserve", "!flag:kid_fed", None, 5)),
+    "riv_loungers": dict(at=(11, 143.95), who="rival", face=1, idle="peek", layer="back", after="region:6", until="region:8"),
+    "amb_barman_top": dict(at=(11, 155.65), who="barman_top", face=-1, idle="shake", layer="behind"),
+    "blk_painter": dict(at=(11, 107.95), who="painter", face=-1, idle="paint", until="region:8"),
+    "blk_fan_a": dict(at=(11, 199.75), who="fan_a", face=-1, idle="cheer", until="region:8"),
+    "blk_fan_b": dict(at=(11, 200.55), who="fan_b", face=-1, idle="cheer", until="region:8"),
+    "blk_fan_c": dict(at=(10, 196.45), who="fan_c", face=-1, idle="cheer", until="region:8"),
+    "npc_husband": dict(at=(11, 219.52), who="husband", face=1, idle="idle",
+                        bubble=("canister", "flag:kid_fed", "flag:table", 5)),
+    "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
+    "amb_go_her": dict(at=(11, 240.52), who="go_her", face=1, layer="back"),
+    "amb_go_him": dict(at=(11, 241.48), who="go_him", face=-1, layer="back"),
     "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
     "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
     # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
@@ -347,6 +373,18 @@ PROPS = {
     "prop_grille_open": (8, 66.1667, "@grille-open", 98, dict(after="flag:duct", back=True)),
     "prop_paws_8": (8, 70.05, "@paws", 0, dict(after="flag:duct")),
     "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
+    # Region 6. The rack with the yoga mats, the socks on its top; two sunbathers on the loungers by
+    # the first pool; that pool's second ladder, at the end where Bumbot fishes; the attendant's hut
+    # (a checkpoint); the wet-floor sign by the showers; the painter's bucket; deck 10's wet-floor sign.
+    "prop_yoga_rack": (11, 95.75, "yoga-rack", 0, {}),
+    "amb_sun_1": (11, 115.9, "thing:sunbather-1", 0, dict(back=True)),
+    "amb_sun_2": (11, 117.6, "thing:sunbather-2", 0, dict(back=True)),
+    "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -12, dict(back=True, flip=True)),
+    "prop_pool_hut": (11, 140.6, "@pool-hut", 0, dict(back=True)),
+    "sign_wet_11": (11, 150.55, "wet-floor-sign-bg", 0, dict(back=True)),
+    "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
+    "sign_wet_10m": (10, 154.2, "wet-floor-sign", 0, {}),
+    "prop_tray_10": (10, 182, "@tray", 12, {}),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -355,6 +393,7 @@ SOLIDS = {
     "haz_cart_4_220": (4, 220, "service-cart"),
     "haz_cart_5_30": (5, 30, "towel-trolley"),
     "haz_cart_9_172": (9, 172.6, "service-cart"),
+    "haz_cart_10_118": (10, 118, "towel-trolley"),
 }
 # Things the dash goes through: id: (deck or room, m or x, [(atlas piece, dx, dy)]).
 BREAKABLES = {
@@ -363,6 +402,8 @@ BREAKABLES = {
     # Delivered luggage, stacked to the ceiling outside a cabin: no hopping it.
     "haz_luggage_9": (9, 180, [("suitcases", 0, 0), ("suitcases", 3, 25), ("suitcases", -2, 50), ("suitcases", 2, 75),
                                ("suitcases", -1, 100)]),
+    # Crates of cones and syrup behind the Great Outdoors' service station.
+    "haz_crates_11": (11, 217.9, [("@crate-big", 0, 0), ("@crate-big", 1, 26)]),
 }
 # Quirks (§6.1.11): a moment with no reward. id: (deck or room, m or x, trigger: "E" or "still:<s>",
 # her clip, ms it lasts, options: needs).
@@ -380,6 +421,8 @@ QUIRKS = {
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
     "src_lunch": (5, 248.8, "lunch", "flag:bb1", [("tray", 24), ("load-cloche", 27)]),
+    # The ice cream mix, on the cold room's shelf: taken once the machine has run empty.
+    "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
 }
 # Signs: id: (deck, m, text, style: plate / poster / note, dy px up, options: size, wrap).
 SIGNS = {
@@ -405,7 +448,8 @@ ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
 # Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
-SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62)}
+SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62),
+         "slot_table": (11, 220.0, 36, "flag:table")}
 # The Photo Studio's flash (`haz_flash`): deck, from m, to m (between its softboxes), every s.
 FLASH = (6, 132.45, 134.75, 6)
 # The promenade's porthole where two black ears show once (`bb_glimpse_window`): m, px up.
@@ -428,12 +472,12 @@ DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
 # dash, brings it down on her.
 STACKS = {"haz_towels_9": (9, 141.3)}
 # Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
-SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0)}
+SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5)}
 # A cabin door that flies open (`haz_swing`): id: (deck, m of the door, how near (m), after s, who
 # looks out). Takes a cabin door's place.
-SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid")}
+SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid"), "haz_swing_10m": (10, 143.6, 3.0, 0.6, "hurry")}
 # "Do Not Disturb" doors (`haz_dnd`): id: (deck, m of the door, who is in). E at one: "Startled".
-DND = {"haz_dnd_9": (9, 167.6, "spaguest")}
+DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"), "haz_dnd_10m2": (10, 171.6, "curlers")}
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort")}
@@ -447,3 +491,24 @@ OPENDOORS = {"amb_party": (8, 72, "party"), "amb_peek_sea": (8, 56, "sea")}
 # is on, the cabin's door (m). He sits on the top of its aft partition, and is gone up to the next deck.
 GLIMPSE_BALCONY = (9, 151.6)
 
+# --- Region 6's own things (docs/population.md, deck 11 "Lido" and deck 10's hallway under it) -------
+# Roofs she can stand on, landing from above: id: (deck, from m, to m, px up).
+PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90)}
+# The pool's beat (`bb5`, src/world/lido.js): the drain lever's housing on the first pool's aft rim,
+# the ladder Bumbot comes out by, the hot tub the kid squirts from, the kid's beat on the aft pool
+# deck after (from m, to m), the lounger the security officer peers under, the chess set.
+LIDO = dict(deck=11, lever=131.68, ladder=130.5, tub=132.5, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
+            machine=214.6, husband=219.52, table=220.0, paws=(141.2, 213.6))
+# A wet patch she slides on without the socks, a deck chair that slides at her across it
+# (`haz_wet`, `haz_deckchair`): id: (deck, from m, to m, where the chair stands (m)).
+WETS = {"haz_wet": (11, 150.9, 152.9, 153.35)}
+# Gulls that dive at food carried in the open (`gull_pool`, `gull_go`): id: (deck, from m, to m,
+# how many, where they wait: "circle" overhead or a perch (m, px up), the flag that keeps them off).
+FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
+             "gull_go": (11, 210.6, 219.2, 1, (213.9, 46), None)}
+# The buffet queue (`haz_queue`): id: (deck, from m, to m, m/s, who). They shuffle toward the
+# counter (forward) in threes, solid bodies that shove her back; for crew with a tray they turn aside.
+QUEUES = {"haz_queue": (11, 162.5, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
+# Room-service trays left on a hallway's floor (`haz_trays`): id: (deck, from m, to m, the "Do Not
+# Disturb" door their clatter opens, the flag set by the first clatter).
+TRAYS = {"haz_trays_10m": (10, 128.3, 130.9, "haz_dnd_10m", "trays_10m")}

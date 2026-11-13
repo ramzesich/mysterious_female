@@ -10,8 +10,8 @@ import { sfx } from '../sfx.js';
 // whether it runs out (`ms`: a melting cone, a cooling cup), whether it is too heavy to hop with.
 export const LOADS = {
     lunch: { draw: 'cloche' },
-    cone: { frame: 'cone', ms: 45000, bare: true },
-    stub: { frame: 'cone', bare: true, small: true },
+    cone: { draw: 'cone', ms: 45000, bare: true },
+    stub: { draw: 'stub', ms: 45000, bare: true },
     coffee: { frame: 'coffee-cup', ms: 50000 },
     cocktail: { frame: 'umbrella-cocktail' },
     cake: { draw: 'cakebox', fragile: true },
@@ -53,6 +53,20 @@ export class Carry {
             g.fillStyle(0xf68181, 1).fillRect(10, 3, 2, 12).fillRect(1, 8, 20, 2);
             g.fillStyle(0xf68181, 1).fillRect(8, 0, 6, 3);
         });
+        // A soft serve in its cone: a proper swirl, and a stub.
+        make('load-cone', 9, 17, g => {
+            g.fillStyle(0x2e222f, 1).fillTriangle(0, 8, 9, 8, 4.5, 17).fillRect(1, 5, 7, 4).fillRect(2, 2, 5, 3).fillRect(3, 0, 3, 2);
+            g.fillStyle(0xe6904e, 1).fillTriangle(1, 9, 8, 9, 4.5, 16);
+            g.fillStyle(0xab6f3a, 1).fillRect(3, 10, 1, 1).fillRect(5, 11, 1, 1).fillRect(4, 13, 1, 1);
+            g.fillStyle(0xffffff, 1).fillRect(2, 6, 5, 2).fillRect(3, 3, 3, 3).fillRect(4, 1, 1, 2);
+            g.fillStyle(0xf9d9c8, 1).fillRect(2, 7, 5, 1).fillRect(3, 5, 3, 1);
+        });
+        make('load-stub', 9, 12, g => {
+            g.fillStyle(0x2e222f, 1).fillTriangle(0, 3, 9, 3, 4.5, 12).fillRect(2, 1, 5, 3);
+            g.fillStyle(0xe6904e, 1).fillTriangle(1, 4, 8, 4, 4.5, 11);
+            g.fillStyle(0xab6f3a, 1).fillRect(3, 5, 1, 1).fillRect(5, 6, 1, 1).fillRect(4, 8, 1, 1);
+            g.fillStyle(0xffffff, 1).fillRect(3, 2, 3, 2);
+        });
         make('load-canister', 16, 22, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 2, 16, 20).fillRect(4, 0, 8, 3);
             g.fillStyle(0xc7dcd0, 1).fillRect(1, 3, 14, 18);
@@ -70,7 +84,6 @@ export class Carry {
         this.until = load.ms ? s.time.now + load.ms : null;
         const top = load.frame ? s.add.image(0, 0, 'shipart', load.frame) : s.add.image(0, 0, `load-${load.draw}`);
         top.setOrigin(0.5, 1).setDepth(D.player + 0.012);
-        if (load.small) top.setScale(1, 0.6);
         this.items = [top];
         if (!load.bare) this.items.unshift(s.add.image(0, 0, 'tray').setOrigin(0.5, 1).setDepth(D.player + 0.011));
         this.world.add(this.items);
@@ -134,7 +147,7 @@ export class Carry {
             // Melted, or gone cold: it is no use now.
             const kind = this.kind;
             this.drop();
-            this.world.say(kind === 'cone' ? '💧' : '❄', 900);
+            this.world.say(kind === 'cone' || kind === 'stub' ? '💧' : '❄', 900);
             this.world.refresh();
         }
     }
