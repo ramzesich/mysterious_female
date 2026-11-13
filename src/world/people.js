@@ -152,7 +152,7 @@ export class People {
                 p.bubbleItems[0].setVisible(show).setPosition(p.x, by);
                 p.bubbleItems[1].setVisible(show).setPosition(p.x, by - BUBBLE.h / 2);
             }
-            if (p.touch && playing && s.route === p.route && !p.aside && this.touching(p, her)) this.world.touched(p);
+            if (p.touch && playing && s.route === p.route && !p.aside && !s.aside && this.touching(p, her)) this.world.touched(p);
         }
     }
 

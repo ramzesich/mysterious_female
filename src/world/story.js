@@ -23,15 +23,19 @@ export class Story {
         return p && p.on && this.scene.route === p.route && Math.abs(her.x - p.x) < reach && Math.abs(her.y - p.y) < 8 ? p : null;
     }
 
-    // Once everything is built: hooks on Bumbot's beats.
+    // Once everything is built: hooks on Bumbot's beats, the scenes that wait for her.
     setup() {
         const s = this.scene;
-        const bb1 = s.cats.find(c => c.flag === 'bb1');
+        const cat = flag => s.cats.find(c => c.flag === flag);
+        const bb1 = cat('bb1');
         if (bb1) {
             // Near-catch 1 (population §6.1): the scream that becomes her battle cry; the fruit bowl goes over.
             bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.dash(); };
             bb1.onLeap = () => this.world.topple('prop_bowl_7s');
         }
+        const bb2 = cat('bb2');
+        if (bb2) bb2.onAway = () => this.ropeIntoDoor();
+        this.setupLift();
     }
 
     // E. True if something here took it.
@@ -41,6 +45,10 @@ export class Story {
 
     update(dt, time) {
         this.glimpseStairs(time);
+        this.glimpseLift(time);
+        this.flash(time);
+        this.rivalOnPromenade(dt, time);
+        this.glimpseWindow(time);
     }
 
     onFlag(name) {}
@@ -102,5 +110,148 @@ export class Story {
             },
             onComplete: () => cat.destroy(),
         });
+    }
+
+    // --- Region 2 -----------------------------------------------------------------------------
+
+    // Near-catch 2 (population §6.3): bolting out of the Library he knocks the "QUIET PLEASE" rope
+    // stand into its aft door, which swings ajar and stays so. (The flag opens the door; the rope
+    // lies where it fell: a prop that comes with the flag.)
+    ropeIntoDoor() {
+        const s = this.scene;
+        const door = s.bulkheads.find(b => b.id === 'part-door-6-194');
+        const rope = this.P.blockDrawings.filter(d => d.id === 'flag:bb2').flatMap(d => d.items);
+        sfx.smash();
+        s.tweens.add({ targets: rope, angle: 80, x: '+=12', y: '+=6', duration: 220, ease: 'Quad.easeIn' });
+        if (door) {
+            s.setBulkheadOpen(door, true);
+            door.heldOpenUntil = s.time.now + 2500;
+        }
+    }
+
+    // The glass elevator's glimpse (population §6.2): until she has seen it, the car waits at deck 6
+    // with Bumbot sitting in it, its doors open; as she comes near they close and it rises to deck
+    // 9, where she can't go yet, and comes back empty. Her input stays free.
+    setupLift() {
+        const s = this.scene;
+        const lift = s.lifts.find(l => l.glass);
+        if (!lift || this.P.has('bb_lift') || this.P.openAll) return;      // (?cards=all: the elevator is just an elevator)
+        const at = lift.floors.findIndex(f => f.deck === 6);
+        if (at < 0) return;
+        lift.busy = true;
+        lift.at = at;
+        lift.carY = lift.floors[at].y;
+        s.setLeaves(lift.leaves, lift.carY, 1);
+        s.placeCar(lift);
+        const cat = s.add.sprite(lift.x, lift.carY, 'bumbot').setOrigin(0.5, 1).setDepth(s.DEPTH.inGlassCar);
+        cat.play('bumbot-sit');
+        s.worldLayer.add(cat);
+        this.liftScene = { lift, cat, state: 'waiting' };
+    }
+
+    glimpseLift() {
+        const g = this.liftScene, s = this.scene;
+        if (!g || g.state !== 'waiting' || s.route !== 'inside') return;
+        const her = s.player, lift = g.lift;
+        if (Math.abs(her.y - lift.carY) > 6 || Math.abs(her.x - lift.x) > 4 * M) return;
+        g.state = 'going';
+        const top = lift.floors.find(f => f.deck === 9).y, home = lift.carY;
+        const ride = (to, ms, done) => s.tweens.addCounter({
+            from: lift.carY, to, duration: ms, ease: 'Sine.easeInOut',
+            onUpdate: tw => {
+                lift.carY = tw.getValue();
+                s.placeCar(lift);
+                g.cat?.setY(lift.carY);
+            },
+            onComplete: done,
+        });
+        // The doors slide shut on him, and up he goes.
+        s.tweens.addCounter({
+            from: 1, to: 0, duration: 320,
+            onUpdate: tw => s.setLeaves(lift.leaves, lift.carY, tw.getValue()),
+            onComplete: () => {
+                sfx.mrrp();
+                ride(top, 2600, () => {
+                    g.cat.destroy();
+                    g.cat = null;
+                    s.time.delayedCall(900, () => ride(home, 2600, () => {
+                        lift.busy = false;
+                        g.state = 'done';
+                        this.P.setFlag('bb_lift');
+                    }));
+                });
+            },
+        });
+    }
+
+    // The Photo Studio's flash (population: `haz_flash`): every few seconds the softboxes glow, then
+    // flash; caught in it she stops and poses for a second, the screen whites. No scare: a gag.
+    flash(time) {
+        const s = this.scene, f = this.world.data.flash;
+        if (!f) return;
+        const her = s.player;
+        if (Math.abs(her.x - (f.x0 + f.x1) / 2) > 700 || Math.abs(her.y - f.y) > 200) return;
+        this.flashAt ??= time + 2500;
+        if (!this.flashGlow) {
+            this.flashGlow = s.add.rectangle((f.x0 + f.x1) / 2, f.y - 60, f.x1 - f.x0, 120, 0xfff1c9, 0).setDepth(s.DEPTH.decor + 0.3);
+            this.world.add([this.flashGlow]);
+        }
+        const left = this.flashAt - time;
+        // The tell: the lamps warm up.
+        this.flashGlow.setFillStyle(0xfff1c9, left < 700 && left > 0 ? 0.25 * (1 - left / 700) : 0);
+        if (left > 0) return;
+        this.flashAt = time + f.period * 1000;
+        const white = s.add.rectangle((f.x0 + f.x1) / 2, f.y - 64, f.x1 - f.x0 + 60, 128, 0xffffff, 0.95).setDepth(s.DEPTH.fx + 2);
+        this.world.add([white]);
+        s.tweens.add({ targets: white, alpha: 0, duration: 500, onComplete: () => white.destroy() });
+        const caught = s.mode === 'play' && s.route === 'inside' && Math.abs(her.y - f.y) < 4 && her.x > f.x0 && her.x < f.x1 && !this.world.carry;
+        if (!caught) return;
+        s.cameras.main.flash(300, 255, 255, 255);
+        this.world.cut(async () => {
+            if (s.anims.exists('her-pose')) her.anims.play('her-pose');
+            else s.pose('front');
+            await this.world.wait(1000);
+            s.pose('stand');
+        });
+    }
+
+    // The rival on the promenade, peering under the boats with his net (population: `riv_prom`): a
+    // glimpse. As she comes near he hurries off aft and is gone.
+    rivalOnPromenade(dt, time) {
+        const r = this.who('riv_prom'), s = this.scene;
+        if (!r || !r.on || this.P.has('riv_prom')) return;
+        const her = s.player;
+        if (r.state !== 'fleeing') {
+            if (s.route !== r.route || Math.abs(her.y - r.y) > 8 || Math.abs(her.x - r.x) > 5.5 * M) return;
+            r.state = 'fleeing';
+            r.dir = 1;
+            this.people.anim(r, 'walk', { speed: 1.6 });
+            this.fleeTo = r.x + 7 * M;
+        }
+        r.x += 130 * dt;
+        this.people.place(r);
+        if (r.x > this.fleeTo) {
+            r.items.forEach(i => s.tweens.add({ targets: i, alpha: 0, duration: 300 }));
+            s.time.delayedCall(320, () => this.P.setFlag('riv_prom'));
+            r.state = 'gone';
+        }
+    }
+
+    // A black shape in a promenade porthole (population: `bb_glimpse_window`): two ears come up
+    // behind the glass as she passes, and duck.
+    glimpseWindow() {
+        const s = this.scene, g = this.world.data.glimpseWindow;
+        if (!g || this.P.has('glimpse_window') || s.route !== 'promenade' || s.mode !== 'play') return;
+        const her = s.player;
+        if (Math.abs(her.y - g.floor) > 4 || Math.abs(her.x - g.x) > 3.5 * M) return;
+        this.P.setFlag('glimpse_window');
+        const ears = s.add.graphics().setDepth(s.DEPTH.exterior + 0.09);
+        ears.fillStyle(0x14121a, 1).fillEllipse(0, 4, 14, 10).fillTriangle(-6, 2, -5, -6, -1, 0).fillTriangle(6, 2, 5, -6, 1, 0);
+        ears.fillStyle(0xb9e04c, 1).fillRect(-4, 2, 2, 1).fillRect(2, 2, 2, 1);
+        ears.setPosition(g.x, g.y + 14);
+        this.world.add([ears]);
+        // (Clipped to the porthole's glass by staying low in it.)
+        s.tweens.add({ targets: ears, y: g.y + 3, duration: 380, ease: 'Quad.easeOut', hold: 900, yoyo: true, onComplete: () => ears.destroy() });
+        sfx.mrrp();
     }
 }

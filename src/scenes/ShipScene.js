@@ -2500,9 +2500,10 @@ export class ShipScene extends Phaser.Scene {
         // The verbs (§6.1.2, src/world/verbs.js): crawling under things, a kick off a wall in grip
         // socks, a glide under the parasol.
         const crawling = this.updateCrawl(input, onFloor);
+        const aside = this.updateAside(input, onFloor);
         const dashing = this.isDashing();
         const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1);
-        let dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
         const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
@@ -2537,6 +2538,7 @@ export class ShipScene extends Phaser.Scene {
         }
 
         if (crawling) this.poseCrawl(body.velocity.x);
+        else if (aside) this.pose('back');
         else if (gliding) this.pose('apex');
         else if (sliding) this.pose('fall');
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
@@ -3139,7 +3141,7 @@ export class ShipScene extends Phaser.Scene {
 
     liftAt(x, y) {
         for (const lift of this.lifts) {
-            if (Math.abs(x - lift.x) > 14) continue;
+            if (Math.abs(x - lift.x) > 14 || lift.busy) continue;
             const i = lift.floors.findIndex(f => Math.abs(y - f.y) < 4);
             if (i >= 0) return { lift, i };
         }
@@ -3628,6 +3630,7 @@ export class ShipScene extends Phaser.Scene {
                                 : s.x < view.x - 40 || s.x > view.right + 40;
                             if (out) {
                                 cat.away = true;
+                                cat.onAway?.();
                                 s.setVisible(false).stop();
                                 this.script = null;
                                 catAway = true;

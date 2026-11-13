@@ -11,6 +11,8 @@ import { sfx } from '../sfx.js';
 import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
+import { Library } from './library.js';
+import { Robot, Gull } from './movers.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -46,6 +48,8 @@ export class World {
         this.people = new People(this);
         this.carryBox = new Carry(this);
         this.story = new Story(this);
+        this.library = new Library(this);
+        this.movers = [];           // the delivery robot, the gulls
         this.built = false;
     }
 
@@ -68,6 +72,7 @@ export class World {
         this.buildFunnel();
         this.buildDuct();
         for (const e of this.data.ents) this.buildEnt(e);
+        this.library.build(this.data.library);
         this.buildSpecials();
         this.story.setup();
         this.built = true;
@@ -523,7 +528,7 @@ export class World {
                 // A piece of the ship's atlas that the plan adds, in full colour: on the floor, `dy` up
                 // on something, in front of her or behind.
                 const d = e.front ? D.player + 0.04 : e.back ? D.decor + 0.11 : depth - 0.02;
-                const img = s.add.image(e.x, e.y - (e.dy ?? 0), 'shipart', e.frame).setOrigin(0.5, 1).setDepth(d).setFlipX(!!e.flip);
+                const img = this.image(e.x, e.y - (e.dy ?? 0), e.frame).setOrigin(0.5, 1).setDepth(d).setFlipX(!!e.flip).setAngle(e.angle ?? 0);
                 this.add([img]);
                 this.things.push({ ...e, items: [img], img });
                 break;
@@ -572,6 +577,32 @@ export class World {
                 this.things.push({ ...e, items, reach: 22, interact: () => {
                     if (this.carry) return false;
                     this.carryBox.take(e.gives);
+                    return true;
+                } });
+                break;
+            }
+            case 'robot': {
+                const robot = new Robot(this, e);
+                this.movers.push(robot);
+                this.robots = [...(this.robots ?? []), robot];
+                break;
+            }
+            case 'gull':
+                this.movers.push(new Gull(this, e));
+                break;
+            case 'slot': {
+                // A photo slot (§6.1.11): a framed picture in a secret place; E opens it full screen.
+                this.library.textures();
+                const img = s.add.image(e.x, e.y - (e.dy ?? 56), 'photo-frame').setDepth(depth + 0.01);
+                this.add([img]);
+                this.things.push({ ...e, items: [img], reach: 16, interact: () => {
+                    this.cut(async () => {
+                        await this.library.panel(`photo-${e.id}`);
+                        if (!this.save.seen.includes(e.id)) {
+                            this.save.seen.push(e.id);
+                            writeSave(this.save);
+                        }
+                    });
                     return true;
                 } });
                 break;
@@ -660,6 +691,7 @@ export class World {
             this.hint(HINTS[name]);
         } else if (type === 'book') {
             this.save.books[name] = 'held';
+            this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
         } else {
             this.save.items.push(name);
         }
@@ -747,6 +779,7 @@ export class World {
             case 'card': return save.cards.includes(v);
             case 'verb': return save.verbs.includes(v);
             case 'carry': return this.carry?.kind === v;
+            case 'books': return v === 'held' ? this.library.held().length > 0 : this.library.returned().length === 10;
             case 'broken': return save.broken.includes(v);
             case 'block': return this.progress.blockLifted(v) && !this.progress.openAll;
         }
@@ -787,6 +820,26 @@ export class World {
         g.generateTexture(key, 16, 16);
         g.destroy();
         return key;
+    }
+
+    // A picture: a piece of the ship's atlas, one of the plan's things ("thing:robot"), or one the
+    // game draws ("@tray").
+    image(x, y, frame) {
+        const s = this.scene;
+        if (frame.startsWith('@')) return s.add.image(x, y, frame.slice(1));
+        if (frame.startsWith('thing:')) return s.add.image(x, y, 'things', frame.slice(6));
+        return s.add.image(x, y, 'shipart', frame);
+    }
+
+    // A burst of gold sparks at a spot.
+    sparkle(x, y, tint = 0xf9c22b) {
+        const s = this.scene;
+        for (let i = 0; i < 10; i++) {
+            const a = (Math.PI * 2 * i) / 10;
+            const spark = s.add.image(x, y, 'dot').setTint(tint).setDepth(s.DEPTH.fx);
+            this.add([spark]);
+            s.tweens.add({ targets: spark, x: x + Math.cos(a) * 18, y: y + Math.sin(a) * 18, alpha: 0, duration: 450, onComplete: () => spark.destroy() });
+        }
     }
 
     // A word over her for a moment (her own exclamations).
@@ -924,6 +977,7 @@ export class World {
         this.updateSpecials(time);
         if (s.route !== this.lastRoute) this.refresh();
         this.people.update(dt, time);
+        for (const m of this.movers) m.update(dt, time);
         this.carryBox.update();
         this.story.update(dt, time);
         this.updateQuirks(time);
@@ -1027,6 +1081,7 @@ export class World {
             if (t.zone?.body && (t.until || t.after)) t.zone.body.enable = on;
         }
         this.people.refresh();
+        this.library.refresh();
         for (const r of Object.values(this.rooms)) {
             if (!r.def) continue;
             r.hidden = !!r.needs && !P.has(r.needs);
@@ -1043,6 +1098,7 @@ export class World {
             g.lid.setVisible(!open);
         }
         this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
+        this.hudBooks?.setAlpha(Object.keys(this.save.books).length ? 1 : 0.35);
     }
 
     addColliders(p) {
@@ -1053,6 +1109,7 @@ export class World {
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
         for (const t of this.pushables) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        for (const r of this.robots ?? []) r.addCollider(p);
         // The dash goes through a breakable, and it is gone for good.
         for (const t of this.breakables) {
             s.physics.add.collider(p, t.zone, null, () => {

@@ -11,6 +11,7 @@ export const verbs = {
         this.kickDir = 0;
         this.gliding = false;
         this.pushing = null;
+        this.aside = false;
         if (this.crawling) this.setCrawl(false);
         this.crawling = false;
         this.world?.showParasol(false);
@@ -97,6 +98,16 @@ export const verbs = {
             this.gliding = on;
             this.world.showParasol(on);
         }
+        return on;
+    },
+
+    // Standing aside (the promenade's WALKING lane, by the wall): ↑ held on the promenade's deck, she
+    // steps back against the wall and the jogger runs by.
+    updateAside(input, onFloor) {
+        const pr = this.promenade;
+        const on = !!pr && this.route === 'promenade' && onFloor && input.up && Math.abs(this.player.y - pr.floor) < 2
+            && !this.world.carry;
+        this.aside = on;
         return on;
     },
 

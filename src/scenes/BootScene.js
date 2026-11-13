@@ -37,6 +37,10 @@ export class BootScene extends Phaser.Scene {
         // The ship's people (tools/cast.py, tools/build_people.py): one sheet, a grid of equal cells.
         this.load.json('people-meta', 'assets/sprites/people.json');
         this.load.spritesheet('people', 'assets/sprites/people.png', { frameWidth: 80, frameHeight: 80 });
+        // The plan's own things (the delivery robot, the gulls: tools/build_things.py), and the ten
+        // books' pages (tools/draw_pages.py).
+        this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
+        for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
@@ -91,9 +95,11 @@ export class BootScene extends Phaser.Scene {
         }
         // A start at a bump; her quirks (§6.1.11), each a clip of its own.
         if (meta.anims.hit) this.anims.create({ key: 'her-hit', frames: frames('hit', [0, 1, 1, 2, 3]), frameRate: 10 });
-        for (const [name, fps] of [['shiver', 12]]) {
+        for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6]]) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
         }
+        // Reading in the library's chair: she sits down, and stays sat with the book.
+        if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
         this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });

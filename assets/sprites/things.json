@@ -1,0 +1,67 @@
+{
+ "frames": {
+  "gull-perched": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 20
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 20
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 20
+   }
+  },
+  "gull-up": {
+   "frame": {
+    "x": 22,
+    "y": 0,
+    "w": 30,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 30,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 30,
+    "h": 22
+   }
+  },
+  "robot": {
+   "frame": {
+    "x": 54,
+    "y": 0,
+    "w": 22,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 52
+   }
+  }
+ },
+ "meta": {
+  "image": "things.png"
+ }
+}
