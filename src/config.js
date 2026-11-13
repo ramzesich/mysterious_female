@@ -92,10 +92,10 @@ export const CUT_SHADOW = {
     ends: 18,
 };
 
-// Key cards (§5.5): off for now, until the ship is split into unlockable areas (the user,
-// 2026-11-03). With `required: false` nothing is locked; `?cards=locked` turns the locks back on.
+// The locks (§6.1, src/progression.js): on since step 0 of docs/build-plan.md (2026-11-11). With
+// `required: false` nothing is locked; `?cards=all` opens everything, for testing round the ship.
 export const KEY_CARDS = {
-    required: false,
+    required: true,
 };
 
 // The parts of a deck behind a wall across it (the bridge, the spa): with `on`, a part stays closed
@@ -135,4 +135,4 @@ export const DASH = {
 // its floor (the user fell from deck 9's stern bulwark to deck 8's terrace, 2026-11-07).
 export const LONG_FALL_MARGIN = 56;
 
-export const SAVE_KEY = 'bumbusik-save-v1';
+export const SAVE_KEY = 'bumbusik-save-v2';   // v2: the progression (§6.1)

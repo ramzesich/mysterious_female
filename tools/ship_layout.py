@@ -74,8 +74,9 @@ PROMENADE = {"deck": 6, "span": (100, 231), "enclosed": [(100, 116), (212, 231)]
 OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 
 # The housekeeping linen room on deck 9 (towels heaped on its floor, §5.3): a crew door off the cabin
-# corridor, in a cabin door's place, that she can go through (the user, 2026-11-06).
-LINEN_ROOM = {"deck": 9, "m": 112}
+# corridor, in a cabin door's place, that she can go through (the user, 2026-11-06); the Housekeeping
+# card opens it (§6.1.5).
+LINEN_ROOM = {"deck": 9, "m": 112, "lock": ("card", "hk", 0)}
 
 # The Chapel on deck 12 (the user's photo, 2026-11-07): off the forward lobby, behind its door, shown
 # in the deck's place like the linen room; the door at `m`.
@@ -194,7 +195,105 @@ VENUES = [
 # blockout; the real ones are placed when the interiors are filled.
 TRUNKS = [
     ("fwd-cabins", 50, [4, 5], {}),
-    ("midships", 125, [4, 5, 6], {}),
+    ("midships", 125, [4, 5, 6], {"card": "deck"}),      # the crew way up into region 2 (§6.1.4)
     ("theatre", 240, [4, 6], {"one_way": True}),
-    ("magnums", 118, [6, 7], {"card": "hotel"}),
+    # The Bliss/Magnum's trunk, up to deck 9 beside the linen room (no door on deck 8): the way into
+    # region 4 (§6.1.3).
+    ("magnums", 118, [6, 7, 9], {"card": "ent"}),
+]
+
+# --- Progression (GAME_DESIGN.md §6.1; every lock in docs/population.md §2.6) -------------------
+# Built step by step (docs/build-plan.md); step 0 is the skeleton: the locks, with plain pickups and
+# triggers standing in for the people and scenes that will open them.
+
+# The four department cards: id, colour on the readers and the HUD (§6.1.5).
+CARDS = {"deck": "blue", "ent": "red", "hk": "green", "off": "gold"}
+
+# The regions (§6.1.3), each as boxes (deck, from m, to m, route): she opens a region the first time
+# she stands in one of its boxes. Blocks lift and elevators light their landings by these; the route
+# is the game's ("inside", or "promenade" for deck 6's outside). Region 7's outside and the roof come
+# with their ways (step 0's second round).
+REGIONS = {
+    1: [(4, 0, 258, "inside"), (5, 0, 258, "inside")],
+    2: [(6, 0, 194, "inside"), (6, 100, 231, "promenade"), (7, 74, 110, "inside")],
+    3: [(6, 194, 258, "inside"), (7, 110, 258, "inside")],
+    4: [(8, 82, 110, "inside"), (9, 82, 194, "inside"), (10, 82, 110, "inside"),
+        (8, 194, 202, "inside"), (9, 194, 202, "inside"), (10, 194, 202, "inside")],
+    5: [(8, 0, 82, "inside"), (9, 74, 82, "inside"), (10, 74, 82, "inside")],
+    6: [(11, 74, 258, "inside"), (10, 110, 194, "inside")],
+    7: [(8, 110, 194, "inside"), (8, 202, 258, "inside"), (9, 202, 258, "inside"), (10, 202, 258, "inside")],
+    8: [(12, 82, 258, "inside")],
+    9: [(12, 0, 82, "inside"), (11, 29, 74, "inside"), (10, 25, 74, "inside"), (9, 0, 74, "inside"),
+        (7, 21.4, 74, "inside")],
+    10: [(11, 0, 29, "inside"), (7, 0, 21.4, "inside")],
+}
+
+# The stair cores' flights (§6.1.4), by core and the deck each climbs to: ("block", id) a person or
+# thing across the flight with a rope and a sign, both ways, until BLOCKS lifts it. Flights not listed
+# are open. Public stairs are never locked with a card (the user, 2026-11-11: a fire door can't appear
+# on a public staircase, and an escape route never locks); cards open crew ways only.
+FLIGHT_LOCKS = {
+    ("forward", 6): ("block", "search"), ("forward", 8): ("block", "florist"), ("forward", 12): ("block", "wedding"),
+    ("midship", 6): ("block", "cleaner"), ("midship", 8): ("block", "auction"),
+    ("midship", 11): ("block", "towels"), ("midship", 12): ("block", "paint"),
+    ("aft", 6): ("block", "rehearsal"), ("aft", 8): ("block", "scenery"),
+    ("aft", 11): ("block", "fans"), ("aft", 12): ("block", "fans"),
+    ("atrium", 6): ("block", "photographer"), ("atrium", 8): ("block", "carpet"),
+}
+
+# The blocks (population §2.6): what stands there, its sign, and what lifts it for good: ("region", n)
+# once region n opens, or ("flag", name) once that has happened.
+BLOCKS = {
+    "search": ("The security officer's rope", "SEARCH IN PROGRESS", ("region", 2)),
+    "florist": ("The florist's buckets of flowers for the wedding", "DELIVERY", ("region", 5)),
+    "auction": ("The Art Gallery's auction crates", "ART AUCTION", ("region", 4)),
+    "scenery": ("The theatre's scenery flats", "SCENERY MOVE", ("region", 4)),
+    "magnums": ("A rope at Magnum's door", "CLOSED", ("region", 3)),
+    "spa": ("A rope at the spa's door", "CLOSED", ("region", 9)),
+    "cleaner": ("The cleaner mopping", "WET FLOOR", ("region", 3)),
+    "rehearsal": ("A rope", "REHEARSAL IN PROGRESS", ("region", 3)),
+    "photographer": ("The photographer's backdrop", "PHOTO SESSION", ("region", 3)),
+    "carpet": ("A roll of carpet, the fitter", "CARPET WORKS", ("region", 4)),
+    "towels": ("A table of towel animals", "PLEASE DO NOT TOUCH", ("region", 6)),
+    "paint": ("The painter, cones", "WET PAINT", ("region", 8)),
+    "fans": ("Three fans with drinks", "BIG GAME", ("region", 8)),
+    "wedding": ("The wedding party", "PRIVATE EVENT", ("flag", "wedding")),
+}
+
+# The doors that lock, by (deck, metres) of their wall: ("card", id, free side) a reader on a crew
+# door, the free side -1 (bow) or 1 (stern) opening without the card, 0 none; ("oneway", free side) a
+# fire-exit door, its push bar on one side only, shut from the other until she has come through;
+# ("flag", name) shut until that has happened; ("block", id, side) a rope across the doorway on that
+# side. The spa's and the bridge's doors are keyed by their walls.
+DOOR_LOCKS = {
+    (6, 194): ("flag", "bb2"),                       # the Library's aft door, the rope until Bumbot
+    (7, 110): ("block", "magnums", -1),              # Magnum's, closed until region 3
+    (7, 74): ("card", "off", -1),                    # the kids' club's staff door from the forward lobby
+    (8, 74): ("oneway", -1),                         # deck 8's forward corridor into its lobby
+    # Open from the lobby only, or region 4's atrium walk on deck 8 would lead to the forward stairs and
+    # up to deck 11, past region 5 (approved by the user, 2026-11-11).
+    (8, 82): ("oneway", -1),
+    (9, 74): ("card", "off", -1), (9, 82): ("card", "off", 0),      # the officers' lobbies
+    (10, 74): ("card", "off", -1), (10, 82): ("card", "off", 0),
+    (11, 74): ("block", "spa", 1),                   # the spa, closed until region 9
+    (10, 40): ("card", "off", -1),                   # the bridge
+    (8, 110): ("oneway", 1), (8, 194): ("oneway", -1), (8, 202): ("oneway", 1),
+    (9, 202): ("oneway", 1),
+    (10, 110): ("oneway", 1), (10, 194): ("oneway", -1), (10, 202): ("oneway", 1),
+    (12, 82): ("block", "wedding", -1),              # Champs into the forward lobby
+}
+# The walls she passes straight through at a deck's end (no door drawn, §5.3), by deck and end, locked
+# the same way: the aft terraces' (region 7's hallways open from inside), deck 7's front onto the
+# mooring deck (opened after the catch), and deck 11's front, the spa's onto the balcony forward of
+# it (§6.1.9: the bridge's hatch is the only way out there; back in from the balcony only).
+END_WALL_LOCKS = {
+    (8, "aft"): ("oneway", -1), (9, "aft"): ("oneway", -1), (10, "aft"): ("oneway", -1),
+    (7, "fore"): ("flag", "catch"), (11, "fore"): ("oneway", -1),
+}
+
+# Step 0's stand-ins (docs/build-plan.md): the cards lie where their givers will be; standing in a
+# trigger sets its flag where a scene will. (deck, m, needs flag or None).
+CARD_SPOTS = {"deck": (4, 64, None), "ent": (6, 246, None), "hk": (9, 126, None), "off": (12, 136, "horn")}
+TRIGGERS = [
+    ("bb2", 6, 178, None),          # near-catch 2: Bumbot asleep on her book bolts through the aft door
 ]

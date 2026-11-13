@@ -156,25 +156,29 @@ Crew doors (§5.5), except the two cabins named. "Closest activated" per §5.5.
 
 ### 2.6 The locks
 
-Readers (`rdr_`) sit beside the door or at the flight's foot, lit in their colour; fire doors open
-freely from above or from inside (§6.1.2). Blocks (`blk_`) stand across the flight with a rope and a
-sign. Every stair core has its own: forward 74-82, midship 102-110, aft 194-202, the atrium 82-102.
+Readers (`rdr_`) sit beside crew doors and trunks only, lit in their colour: public stairs and doors
+are never card-locked (the user, 2026-11-11). Blocks (`blk_`) stand across a flight or a doorway with
+a rope and a sign. Every stair core has its own: forward 74-82, midship 102-110, aft 194-202, the
+atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, `BLOCKS`,
+`DOOR_LOCKS`, `END_WALL_LOCKS`).
 
 | Id | Where | Kind | Opens or lifts |
 |---|---|---|---|
-| `rdr_fwd_5_6` | Forward core, flight 5-6 | Blue | The Deck card |
+| `blk_search` | Forward core, flight 5-6 | The security officer's rope, "SEARCH IN PROGRESS", and the officer at it (`riv_rope`, deck 5) | Region 2 opens |
+| `rdr_midships_trunk` | Decks 4 and 5, 125, the midships crew trunk's doors | Blue | The Deck card: region 1's way up into Bliss |
 | `blk_cleaner` | Midship core, flight 5-6 | The cleaner mopping, a cone, "WET FLOOR" | Region 3 opens |
 | `blk_rehearsal` | Aft core, flight 5-6 | A rope, "REHEARSAL IN PROGRESS" | Region 3 opens |
 | `blk_photographer` | The atrium's stairs, 5-6, on deck 5 at 86 | The photographer, a backdrop across the stairs | Region 3 opens |
-| `rdr_fwd_7_8`, `rdr_mid_7_8`, `rdr_aft_7_8` | Each core, flight 7-8 | Green | The Housekeeping card from below; free from above |
+| `blk_florist` | Forward core, flight 7-8 | The florist's buckets of flowers for the wedding, "DELIVERY" | Region 5 opens |
+| `blk_auction` | Midship core, flight 7-8 | The Art Gallery's auction crates, "ART AUCTION" | Region 4 opens |
+| `blk_scenery` | Aft core, flight 7-8 | The theatre's scenery flats, "SCENERY MOVE" | Region 4 opens |
 | `blk_carpet` | The atrium's stairs, 7-8, on deck 7 at 88 | A roll of carpet across the flight, the fitter kneeling | Region 4 opens |
-| `rdr_mid_8_9`, `rdr_aft_8_9`, `rdr_mid_9_10`, `rdr_aft_9_10` | Midship and aft cores | Green | As above |
 | `rdr_fwd_9_lobby`, `rdr_fwd_10_lobby` | The forward lobbies of decks 9 and 10: their doors at 74 and 82 | Gold | The Officer's card; the flights pass through untouched |
 | `blk_towels` | Midship core, flight 10-11 | A table of towel animals across the landing, "PLEASE DO NOT TOUCH" | Region 6 opens |
 | `blk_fans` | Aft core, flights 10-11 and 11-12 | Three fans with drinks, a rope, "BIG GAME" | Region 8 opens |
 | `blk_paint` | Midship core, flight 11-12 | The painter, cones, "WET PAINT" | Region 8 opens |
 | `blk_wedding` | Forward core, flight 11-12, and deck 12's lobbies 67-82 | The wedding party | The cake |
-| `rdr_magnums` | Deck 7, 110, the midship lobby's door into Magnum's | Red | The Entertainment card; free from Magnum's side |
+| `blk_magnums` | Deck 7, 110, the midship lobby's door into Magnum's | A rope, "CLOSED" | Region 3 opens |
 | `rdr_entourage` | Deck 7, 74, the forward lobby's door into Entourage | Gold | The Officer's card |
 | `rdr_trunk_bliss` | Deck 6, 118 and deck 7, 118, the Bliss/Magnum's trunk's doors | Red | The Entertainment card |
 | `rdr_stagedoor` | Deck 6, 254, the stage door | Red | `room_dressing` |
@@ -185,9 +189,10 @@ sign. Every stair core has its own: forward 74-82, midship 102-110, aft 194-202,
 | `rdr_pantry_5a`, `rdr_pantry_5b` | Deck 5, 167 and 169 | Green | `room_pantry` (both ends) |
 | `rdr_store` | Deck 4, 165 | Green | `room_store` |
 | `rdr_laundry` | Deck 4, 112 | Green | `room_laundry` |
+| `rdr_linen` | Deck 9, 112, the linen room's crew door | Green | The linen room (the vent, the duct) |
 | `rdr_chute` | Deck 9, the linen room's hatch | Green | The chute |
 | `rdr_coldroom` | Deck 11, 185, the Garden Café's cold room | Green | `room_coldroom` |
-| `rdr_spa` | Deck 11, 74, the spa's door | Gold | The spa |
+| `blk_spa` | Deck 11, 74, the spa's door | A rope, "CLOSED" | Region 9 opens |
 | `rdr_bridge` | Deck 10, 40, the bridge's door | Gold | The bridge |
 | `door_library_aft` | Deck 6, 194 | Shut by `blk_quiet` (a rope, "QUIET PLEASE") | Bumbot knocks the rope into it (`bb_2`) |
 | `door_8_fwd_lobby` | Deck 8, 74 | `oneway(the corridor)` | The duct drops her inside |
@@ -272,6 +277,11 @@ or scare. Venues' spans are the layout's (`tools/ship_layout.py`).
 with a breakfast tray knocking at a door (ambient); 50 the trunk's upper door; 62 an open cabin door,
 a guest in a bathrobe at the window (`amb_robe_5`, a peek, no room).
 
+**The forward core 74-82.** `blk_search` across the 5-6 flight's foot; `riv_rope`: the rival security
+officer at his rope, net in hand, peering up the stairs (`static`; he shakes his head when she tries the
+flight; no bubble); gone once region 2 opens (`riv_prom` is his next appearance). Needs the rival's
+character, built in step 1 (the user, 2026-11-13).
+
 **The atrium floor 82-102.**
 
 | m | Id | What | Behaviour | Needs |
@@ -334,7 +344,7 @@ a shortcut past the waiter; built as a short room. Drawn by hand.
 | 117 | `sec_dance` | The dance floor | `quirk(still 3)`: she dances | A clip |
 | 118 | `rdr_trunk_bliss` | The crew trunk's deck 6 door, red (the way to region 4) | As built, decks 6-7-9 | Trunk art built |
 
-**The shops, Perspectives 124-136.** 125 the midships trunk's deck 6 door (`oneway(deck 6)`); 132
+**The shops, Perspectives 124-136.** 125 the midships crew trunk's deck 6 door (blue, where she comes up from region 1); 132
 `haz_flash`: the studio's camera on its tripod, `timed(6, 1, 130-134)`: in its flash she stops and
 poses for 1 s, the screen whites (no scare; `amb_photog_2` behind the camera).
 
@@ -406,7 +416,7 @@ leaving the frame (a wink, no trigger).
 **The forward lobby 74-82, the atrium walk 82-102 (region 2).** `blk_carpet` at 88 on the 7-8
 flight; `amb_couple_7` reading the ports' plaques.
 
-**Magnum's 110-130 (region 3).** `rdr_magnums` at 110 (red; free from inside); `rdr_trunk_bliss` at
+**Magnum's 110-130 (region 3).** `blk_magnums` at 110 (a "CLOSED" rope until region 3); `rdr_trunk_bliss` at
 118 (the trunk's deck 7 door); `amb_barman_mag`, `amb_pianist` at the bar's piano.
 
 **The Art Gallery 130-150.** Decor; `sec_cat_painting` at 140: a painting of a black cat on an
@@ -463,7 +473,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; the duct's peek above it | Balloons |
 | 74 | `door_8_fwd_lobby` | The lobby door | `oneway(the corridor)` | |
 
-**The atrium walk 82-102, the midship lobby 102-110 (region 4).** Built; `rdr_fwd_7_8`, `rdr_mid_7_8`.
+**The atrium walk 82-102, the midship lobby 102-110 (region 4).** Built; `blk_florist`, `blk_auction` at the flights' feet on deck 7.
 
 **The midships hallway 110-194 (region 7), "the hotel at full swing".** Entered from its balcony
 cabin at 150 or from the lobbies once opened.
@@ -608,7 +618,7 @@ along the Spinnaker balcony's front above bars the jump down from deck 12 (§6.1
 | 50 | `amb_masseuse` | At a massage table | | |
 | 58 | `amb_salon` | A stylist and a guest under the hood dryer | | |
 | 68 | `amb_aerobics` | Two in a step class | A loop | |
-| 74 | `rdr_spa` | The spa's door, gold | | Built door |
+| 74 | `blk_spa` | The spa's door, a "CLOSED" rope until region 9 | | Built door |
 
 **The forward lobby 74-82.** `cp_gym` at 80; `rdr_fwd_11` none (the flight from 10 is open; the
 lobby doors on 9 and 10 are the gold ones).
@@ -797,7 +807,8 @@ Input locked unless said; each sets its save flag.
    counter, the fruit bowl topples (three tangerines roll to 244-246), he runs out of the Seven Seas
    westward and is gone at the aft lobby; she straightens, turns to us; play resumes; the D glyph
    shows as she takes the first tangerine; `src_lunch` is now a source. Once, later, as she reaches
-   the forward stairs' reader with the card: `bb_glimpse_stairs`, a tail up the flight.
+   the midships crew trunk with the card: `bb_glimpse_stairs`, a tail up the forward stairs right
+   past `riv_rope`, who doesn't notice.
 2. **`bb_lift` the glass elevator (deck 6's atrium walk):** the first time she stands within 10 m of
    the glass elevator, the car waits at deck 6 with Bumbot sitting in it, doors open; when she is
    within 4 m the doors close and the car rises to deck 9, seen through the glass, and comes back
@@ -877,7 +888,7 @@ diners, Los Lobos' waiter. About 60 figures from about 12 bodies.
 
 People: the librarian, the honeymooners, her husband, the jogger, the boat drill crew, the
 teppanyaki chef, the carpet fitter, the steward on his rounds, the engineer's read, the kid's four
-states, the old lady's five, the rival's six; the ambient bodies. Things: the delivery robot, the
+states, the old lady's five, the rival's eight; the ambient bodies. Things: the delivery robot, the
 luggage stacks, the towel animals, the carpet roll, the rope stands and signs, the readers in four
 colours, the trays on the floor, the ice bucket, the laundry lines, the pillow fort, the ball pit,
 the swinging lifeboat, the gate and ladder, the station locker, the sprinkler's burst, the towel

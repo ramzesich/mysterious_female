@@ -23,8 +23,9 @@ from pathlib import Path
 
 import websocket
 
-from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, STAGE, TILE, TRUNKS, col, floor_y,
-                            walk_y, x_of)
+from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, STAGE, TILE, TRUNKS, col, exact_x,
+                            floor_y, region_at, walk_y, x_of)
+from ship_layout import CARD_SPOTS, DOOR_LOCKS, END_WALL_LOCKS, FLIGHT_LOCKS
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -158,7 +159,7 @@ class Browser:
 # --- Scenarios -----------------------------------------------------------------------------------
 # Positions come from the map builder (tools/build_ship_map.py), in metres from the bow.
 
-D4, D5, D6, D7, D9, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 9, 10, 11, 12))
+D4, D5, D6, D7, D8, D9, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 8, 9, 10, 11, 12))
 SPAWN_X = x_of(67)
 CORE_L = col(CORES["forward"][0]) * TILE + 4 * TILE       # forward core: the 4-5 flight's foot
 LADDER_X = (col(FUNNEL[0]) - 3) * TILE + TILE // 2        # the funnel ladder, deck 12 to the roof
@@ -200,19 +201,19 @@ def scenario_run_jump(b):
 
 
 def scenario_stairs(b):
-    b.open("?reset&play&cards=locked")
+    b.open("?reset&play")
     b.teleport(CORE_L, D4)
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
     b.key("up", True)
-    time.sleep(5.0)
+    time.sleep(3.0)
     s = b.state()
-    ok = check(s["mode"] == "play" and s["y"] == D6, "holding up climbs through deck 5 to deck 6", s)
+    ok = check(s["mode"] == "play" and s["y"] == D5, "holding up climbs to deck 5", s)
     locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
     b.shot("stairs-locked")
     b.key("up", False)
-    ok &= check(bool(locked) and "Hotel" in locked, "and stops there: the flight up needs the Hotel card", locked)
-    b.hold("down", 5.5)
+    ok &= check(bool(locked) and "SEARCH" in locked, "and stops there: the flight up is roped off", locked)
+    b.hold("down", 3.0)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D4, "holding down carries her back to deck 4", s)
     b.open("?reset&play&cards=all")
@@ -254,7 +255,7 @@ def trunk_door(b, name, deck, field="open"):
 
 
 def scenario_trunk(b):
-    b.open("?reset&play&cards=locked")
+    b.open("?reset&play")
     x = trunk_x("fwd-cabins")
     b.teleport(x, D4)
     b.hold("up", 0.5)
@@ -277,8 +278,10 @@ def scenario_trunk(b):
     ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] > x + 20, "steps out onto deck 5", s)
     ok &= check(not trunk_door(b, "fwd-cabins", 5), "and that door shuts once she is away")
 
-    # Three decks: letting go just short of the middle door settles her level with it.
+    # Three decks: letting go just short of the middle door settles her level with it. (The midships
+    # trunk wants the Deck card, §6.1.5.)
     x = trunk_x("midships")
+    b.eval("window.__ship.save.cards.push('deck')")
     b.teleport(x, D4)
     b.tap("e")
     b.hold("up", 1.7)
@@ -333,8 +336,8 @@ def scenario_trunk(b):
     time.sleep(0.1)
     locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
     b.shot("trunk-locked")
-    ok &= check(not trunk_door(b, "magnums", 6) and bool(locked) and "Hotel" in locked,
-                "a card-locked trunk asks for the Hotel card", locked)
+    ok &= check(not trunk_door(b, "magnums", 6) and bool(locked) and "Entertainment" in locked,
+                "a card-locked trunk asks for the Entertainment card", locked)
     return ok
 
 
@@ -347,7 +350,7 @@ def lift_cursor(b):
 
 
 def scenario_lift(b):
-    b.open("?reset&play&cards=locked")
+    b.open("?reset&play")
     b.teleport(LIFT_X, D4)
     b.tap("e")
     time.sleep(0.5)
@@ -355,7 +358,7 @@ def scenario_lift(b):
     for _ in range(4):
         b.tap("up")
         time.sleep(0.1)  # separate presses, not one long one
-    ok &= check(lift_cursor(b) == 6, "with her crew card, ↑ picks no higher than deck 6", lift_cursor(b))
+    ok &= check(lift_cursor(b) == 5, "in region 1, ↑ picks no higher than deck 5", lift_cursor(b))
     b.shot("lift-panel")
     b.tap("e")
     time.sleep(0.1)
@@ -364,13 +367,13 @@ def scenario_lift(b):
     b.shot("lift-riding")
     time.sleep(1.8)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["y"] == D6 and abs(s["x"] - LIFT_X) < 2, "E rides it up to deck 6", s)
+    ok &= check(s["mode"] == "play" and s["y"] == D5 and abs(s["x"] - LIFT_X) < 2, "E rides it up to deck 5", s)
     b.shot("lift-arrived")
     b.hold("right", 0.5)
     time.sleep(0.4)
     ok &= check(b.eval("window.__ship.lifts[0].floors.every(f => f.leaves.open === 0)"), "the doors shut once she steps away")
 
-    # Called from deck 4 while it waits on deck 6, the car comes down to her: she stays put.
+    # Called from deck 4 while it waits on deck 5, the car comes down to her: she stays put.
     b.teleport(LIFT_X, D4)
     b.tap("e")
     ys = []
@@ -382,7 +385,7 @@ def scenario_lift(b):
     b.tap("left")
     time.sleep(0.6)
 
-    b.teleport(LIFT_X, D6)
+    b.teleport(LIFT_X, D5)
     b.tap("e")
     b.wait_for("window.__ship.liftRun && window.__ship.liftRun.choosing", timeout=4)  # it comes up first
     b.tap("left")
@@ -565,7 +568,7 @@ def scenario_linen(b):
     # The linen room on deck 9 (§5.3): E at its crew door takes her in, its walls hold her, E again
     # takes her back out. (Bumbot's checks went with his spots, 2026-11-07: they come back with him.)
     route = lambda: b.eval("window.__ship.route")
-    b.open("?reset&play&at=linen")
+    b.open("?reset&play&at=linen&cards=all")      # its crew door is green (§6.1.5)
     door = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     b.eval("window.__ship.route = 'inside'")
     b.teleport(door + 6, floor_y(9))
@@ -589,7 +592,7 @@ def scenario_bridge(b):
     # The bridge on deck 10 (§5.3): its shut crew door stops her; E opens it; its piece of the ship's
     # side is cut open with the deck's, from either side (LOCKED_PARTS is off for now).
     shell = lambda key: b.eval(f"window.__ship.shellAlpha['{key}']")
-    b.open("?reset&play")
+    b.open("?reset&play&cards=all")      # its door is gold (§6.1.5)
     bridge = "window.__ship.bulkheads.find(b => b.key === '10:bridge')"
     door = b.eval(f"{bridge}.x")
     b.teleport(door + 60, floor_y(10))
@@ -632,9 +635,11 @@ def scenario_idle(b):
     b.open("?reset&play")
     b.wait_for("window.__ship && window.__ship.player")
     anim = "(window.__ship.player.anims.isPlaying ? window.__ship.player.anims.currentAnim.key : '')"
-    time.sleep(3.0)
-    ok = check(b.eval(anim) == "", "stands plainly for the first few seconds")
-    time.sleep(1.8)
+    # Timed by the game's own clock: a cold start's first frames are slow, so wall-clock seconds
+    # after loading drift (the test failed on main too, 2026-11-11).
+    ok = check(b.eval(anim) == "" and b.eval("window.__ship.idleAt - window.__ship.time.now") > 500,
+               "stands plainly for the first few seconds")
+    b.wait_for(f"{anim}.startsWith('her-idle-')", timeout=8)
     first = b.eval(anim)
     ok &= check(first.startswith("her-idle-"), "an idle plays after standing still", first)
     b.shot("idle")
@@ -726,6 +731,171 @@ def scenario_overboard(b):
     time.sleep(2.5)
     s = b.state()
     ok &= check(s["mode"] == "play", "she comes back afterwards", s)
+    return ok
+
+
+# --- The progression (§6.1, docs/build-plan.md step 0) --------------------------------------------
+# `golden` walks the intended route through every lock built so far; `sweep` tries every lock from
+# the wrong side. Both grow with each step of the build.
+
+def save_list(b, name):
+    return b.eval(f"window.__ship.save.{name}.slice()")
+
+
+def go(b, deck, m, route="inside"):
+    """Teleport, but only within a region she has already opened: the golden path never skips a lock."""
+    n = region_at(deck, m, route)
+    assert n in save_list(b, "regions"), f"golden: deck {deck} at {m} m is region {n}, not open yet"
+    b.teleport(x_of(m), floor_y(deck))
+
+
+def alert(b):
+    return b.eval("window.__ship.alert.visible && window.__ship.alert.text") or ""
+
+
+def flight_feet(name):
+    """A core flight's foot and top as (x, y): `stairs-<core>-<d>-<d+1>`."""
+    _, core, d, _ = name.split("-")
+    d = int(d)
+    left, right = col(CORES[core][0]) * TILE + 4 * TILE, col(CORES[core][0]) * TILE + 15 * TILE
+    x0, x1 = (left, right) if d % 2 == 0 else (right, left)
+    return (x0, floor_y(d)), (x1, floor_y(d + 1))
+
+
+def climb(b, name, seconds=2.6):
+    (x0, y0), _ = flight_feet(name)
+    b.teleport(x0, y0)
+    b.hold("up", seconds)
+    return b.state()
+
+
+def door_open(b, name):
+    return b.eval(f"window.__ship.bulkheads.find(d => d.id === '{name}').open")
+
+
+def use_door(b, deck, m, side):
+    """E at a door in a wall across the deck, from the bow side (-1) or the stern side (1)."""
+    b.teleport(exact_x(m) + side * 16, floor_y(deck))
+    b.tap("e")
+    time.sleep(0.15)
+    return door_open(b, f"part-door-{deck}-{m:g}")
+
+
+def take_card(b, card):
+    deck, m, _ = CARD_SPOTS[card]
+    go(b, deck, m)
+    b.tap("e")
+    time.sleep(0.2)
+    return card in save_list(b, "cards")
+
+
+def scenario_golden(b):
+    b.open("?reset&play")
+    ok = check(save_list(b, "regions") == [1] and save_list(b, "cards") == [], "starts in region 1 with no cards",
+               save_list(b, "regions"))
+    # Region 1: the guest stairs up are roped off; the crew trunk wants the Deck card.
+    s = climb(b, "stairs-forward-5-6", 0.6)
+    ok &= check(s["y"] == D5 and "SEARCH" in alert(b), "the forward stairs 5-6 are roped off for the search", alert(b))
+    go(b, 4, 125)
+    b.tap("e")
+    time.sleep(0.15)
+    ok &= check("Deck" in alert(b), "the midships crew trunk wants the Deck card", alert(b))
+    ok &= check(take_card(b, "deck"), "the Deck card, at the gangway")
+    # Region 2: up the crew trunk into Bliss.
+    go(b, 4, 125)
+    b.tap("e")
+    b.hold("up", 5.0)
+    b.hold("right", 0.6)
+    ok &= check(2 in save_list(b, "regions"), "with it, up the trunk to deck 6: region 2 opens", b.state())
+    s = climb(b, "stairs-forward-5-6", 2.6)
+    ok &= check(s["mode"] == "stairs", "and the forward stairs' rope is gone", s)
+    # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2, a trigger for now).
+    shut = not use_door(b, 6, 194, -1)
+    ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off", alert(b))
+    go(b, 6, 175)
+    b.hold("right", 1.3)
+    ok &= check("bb2" in save_list(b, "flags"), "near-catch 2 at the reading table", save_list(b, "flags"))
+    ok &= check(use_door(b, 6, 194, -1), "then the aft door opens")
+    b.hold("right", 1.2)
+    ok &= check(3 in save_list(b, "regions"), "region 3 beyond it", b.state())
+    # Region 3: the stage manager's card (on the stage for now); the trunk from Bliss up to deck 9.
+    ok &= check(take_card(b, "ent"), "the Entertainment card, on the stage")
+    go(b, 6, 118)
+    b.tap("e")
+    b.hold("up", 7.5)
+    s = b.state()
+    ok &= check(s["mode"] == "trunk" and s["y"] == D9, "the red trunk from Bliss climbs to deck 9", s)
+    b.hold("right", 0.6)
+    ok &= check(4 in save_list(b, "regions"), "region 4: deck 9's corridor", b.state())
+    go(b, 9, 112)
+    b.teleport(b.eval("window.__ship.rooms.find(r => r.route === 'linen').door"), D9)     # its door, as snapped
+    b.tap("e")
+    time.sleep(0.15)
+    ok &= check("Housekeeping" in alert(b) and b.eval("window.__ship.route") == "inside",
+                "the linen room's crew door wants the Housekeeping card", alert(b))
+    ok &= check(take_card(b, "hk"), "the Housekeeping card, from the steward")
+    go(b, 9, 112)
+    b.teleport(b.eval("window.__ship.rooms.find(r => r.route === 'linen').door"), D9)     # its door, as snapped
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(b.eval("window.__ship.route") == "linen", "with it, into the linen room")
+    b.shot("golden-end")
+    return ok
+
+
+def scenario_sweep(b):
+    b.open("?reset&play")
+    b.eval("window.__ship.progress.frozen = true")      # teleporting round the ship opens nothing
+    ok = True
+    # Every card flight is shut going up without its card, and free coming down (its escape side);
+    # every block stops her both ways.
+    for (core, deck), lock in FLIGHT_LOCKS.items():
+        if core == "atrium":
+            continue
+        name = f"stairs-{core}-{deck - 1}-{deck}"
+        s = climb(b, name, 0.5)
+        ok &= check(s["mode"] == "play" and s["y"] == floor_y(deck - 1), f"{name} shut going up ({lock[1]})", alert(b))
+        _, (x1, y1) = flight_feet(name)
+        b.teleport(x1, y1)
+        b.hold("down", 0.5)
+        s = b.state()
+        ok &= check(s["mode"] == "play", f"{name} coming down: blocked", s)
+    # The atrium's blocks, at the foot of each blocked flight.
+    for (core, deck), lock in FLIGHT_LOCKS.items():
+        if core != "atrium":
+            continue
+        foot = b.eval(f"(f => [f.bottom.x, f.bottom.y])(window.__ship.flights.find(f => f.name.startsWith('stairs-atrium-{deck - 1}-')))")
+        b.teleport(*foot)
+        b.hold("up", 0.5)
+        s = b.state()
+        ok &= check(s["mode"] == "play", f"the atrium's stairs {deck - 1}-{deck} blocked ({lock[1]})", alert(b))
+    # Every locked door, from its locked side; a card door opens from its free side.
+    for (deck, m), lock in DOOR_LOCKS.items():
+        if (deck, m) in ((11, 74), (10, 40)):
+            continue      # the spa's and the bridge's own doors, checked by their names below
+        sides = [-1, 1] if lock[0] in ("flag", "block") else [s for s in (-1, 1) if s != lock[-1]]
+        for side in sides:
+            ok &= check(not use_door(b, deck, m, side), f"the door on deck {deck} at {m} m shut from the {'bow' if side < 0 else 'stern'} side ({lock[0]})")
+        if lock[0] in ("oneway", "card") and lock[-1]:
+            ok &= check(use_door(b, deck, m, lock[-1]), f"and open from the other side")
+    for name, deck, m in (("spa-door", 11, 74), ("bridge-door", 10, 40)):
+        b.teleport(exact_x(m) + 16, floor_y(deck))
+        b.tap("e")
+        time.sleep(0.15)
+        ok &= check(not door_open(b, name), f"{name}: gold, shut", alert(b))
+    # The walls at the decks' ends: walking into a locked face, she stays out.
+    for (deck, end), lock in END_WALL_LOCKS.items():
+        bx = b.eval(f"window.__ship.progress.barriers.filter(b => b.id === 'end-wall-{deck}-{end}').map(b => b.x)")
+        side = 1 if lock[0] != "oneway" or lock[1] < 0 else -1      # the locked side
+        x = max(bx) + 40 if side > 0 else min(bx) - 40
+        b.teleport(x, floor_y(deck))
+        b.hold("left" if side > 0 else "right", 1.0)
+        s = b.state()
+        held = s["x"] >= max(bx) if side > 0 else s["x"] <= min(bx)
+        ok &= check(held, f"deck {deck}'s {end} end wall holds her on its locked side ({lock[0]})", s)
+    # The elevators light only region 1's landings at the start.
+    lit = b.eval("window.__ship.lifts.map(l => l.floors.filter(f => window.__ship.progress.regionOpen(f.region)).map(f => f.deck))")
+    ok &= check(all(sorted(x) in ([4, 5], [5]) for x in lit), "the elevators light only decks 4-5 at the start", lit)
     return ok
 
 

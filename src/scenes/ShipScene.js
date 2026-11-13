@@ -1,7 +1,8 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, KEY_CARDS, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
+import { Progression, CARD_COLOURS } from '../progression.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
 import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE } from '../background.js';
@@ -60,9 +61,6 @@ const SIDEWALK_LOOKS = {
             light: null, rail: 0xcd683d, post: 0xe3e7ea },
 };
 
-// The key cards' colours, shown on the readers beside locked doors (§6.2, proposed).
-const CARD_COLOURS = { hotel: 0x2f9bd6, technical: 0xe04848, captain: 0xf2c14e };
-
 // Each hazard gets its own fright (§5.6).
 const FRIGHTS = { vacuum: 'Іііі!' };
 
@@ -73,6 +71,8 @@ export class ShipScene extends Phaser.Scene {
 
     create() {
         this.save = loadSave();
+        // The regions, cards, flags and locks (§6.1, src/progression.js).
+        this.progress = new Progression(this);
         this.controls = new Controls(this);
         this.worldLayer = this.add.layer();
         this.uiLayer = this.add.layer();
@@ -393,6 +393,7 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(this.glassGfx);
 
         const objects = this.map.getObjectLayer('objects').objects;
+        const endWalls = [];
         // Trunk doors take the place of any cabin door drawn where they stand.
         this.trunkDoorSpots = objects.filter(o => o.type === 'trunk')
             .flatMap(o => String(prop(o, 'floors', '')).split(',').map(y => ({ x: o.x, y: Number(y) })));
@@ -411,6 +412,13 @@ export class ShipScene extends Phaser.Scene {
 
                 case 'place':
                     this.places[o.name] = { id: o.name, x: o.x, y: o.y, route: prop(o, 'route', 'inside') };
+                    break;
+
+                case 'progression':
+                case 'region':
+                case 'card':
+                case 'trigger':
+                    this.progress.addObject(o, prop);
                     break;
 
                 case 'checkpoint': {
@@ -436,7 +444,7 @@ export class ShipScene extends Phaser.Scene {
                     const [a, b] = o.polyline.map(p => ({ x: o.x + p.x, y: o.y + p.y }));
                     const [bottom, top] = a.y > b.y ? [a, b] : [b, a];
                     const flight = {
-                        name: o.name, bottom, top, card: prop(o, 'card', null),
+                        name: o.name, bottom, top, lock: prop(o, 'lock', ''),
                         curve: prop(o, 'curve', false), front: prop(o, 'front', false),
                     };
                     flight.length = this.flightLength(flight);
@@ -486,7 +494,7 @@ export class ShipScene extends Phaser.Scene {
                     break;
 
                 case 'lift':
-                    this.buildLift(o, prop(o, 'floors', ''), prop(o, 'decks', ''), prop(o, 'cards', ''), prop(o, 'glass', false));
+                    this.buildLift(o, prop(o, 'floors', ''), prop(o, 'decks', ''), prop(o, 'regions', ''), prop(o, 'glass', false));
                     break;
 
                 case 'prop': {
@@ -560,13 +568,14 @@ export class ShipScene extends Phaser.Scene {
                     this.buildChapel(o);
                     break;
                 case 'linen':
-                    this.buildLinenRoom(o);
+                    this.buildLinenRoom(o, prop);
                     break;
 
                 case 'bulkhead':
                     this.buildBulkhead(o, prop(o, 'x0', o.x - 600), prop(o, 'key', ''), prop(o, 'text', ''),
                         prop(o, 'sub', ''), prop(o, 'leaf', 'door-crew'), prop(o, 'colour', '#ae2334'),
-                        { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', ''), frame: prop(o, 'frame', '') });
+                        { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', ''), frame: prop(o, 'frame', ''),
+                          lock: prop(o, 'lock', '') });
                     break;
 
                 // Outdoors with no way in (deck 7's stern strip, §5.3; the aft terraces behind decks
@@ -653,6 +662,8 @@ export class ShipScene extends Phaser.Scene {
                     const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
                     wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
                     this.worldLayer.add(wall);
+                    // Some are locked (§6.1, `END_WALL_LOCKS`): the progression puts a barrier in them.
+                    endWalls.push({ id: o.name, x0: o.x, x1: o.x + o.width, floor: o.y, lock: prop(o, 'lock', '') });
                     break;
                 }
 
@@ -691,6 +702,8 @@ export class ShipScene extends Phaser.Scene {
                     break;
             }
         }
+        // The locks' readers, ropes and barriers, now that the flights, doors and walls are built.
+        this.progress.build(endWalls);
     }
 
     // A point along a flight, t from 0 (its foot) to 1 (its top). The atrium's curving staircase
@@ -925,7 +938,7 @@ export class ShipScene extends Phaser.Scene {
     // black. Racks of folded towels, a heap of them on the floor, a vent. (Bumbot slept there until
     // his spots were taken out, 2026-11-07, §4.)
 
-    buildLinenRoom(o) {
+    buildLinenRoom(o, prop) {
         const x0 = o.x - LINEN.doorX;
         const door = this.add.image(o.x, o.y, 'linen-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
         const plate = this.add.text(o.x + 20, o.y - 50, 'LINEN', {
@@ -935,7 +948,12 @@ export class ShipScene extends Phaser.Scene {
         const room = this.add.image(x0, o.y - LINEN.height, 'linen-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(room);
         this.worldLayer.add([door, plate, dim, room]);
-        this.rooms.push({ route: 'linen', door: o.x, floor: o.y, room, dim, inDeck: true });
+        const linen = { route: 'linen', door: o.x, floor: o.y, room, dim, inDeck: true };
+        this.rooms.push(linen);
+        // Its crew door shut until she has the Housekeeping card (§6.1.5).
+        const shut = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.01).setVisible(false);
+        this.worldLayer.add(shut);
+        this.progress.roomDoor(linen, prop(o, 'lock', ''), shut, o.x, o.y);
         this.addRouteWall(x0 + LINEN.stop, -1, o.y, 'linen');
         this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
     }
@@ -967,7 +985,7 @@ export class ShipScene extends Phaser.Scene {
     // deck 11: `key`), from outside it is out of sight and inside it only it is cut open (the user,
     // 2026-11-06). The sauna's two ends are such walls too, cedar, with glass doors.
 
-    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '', frame = '' } = {}) {
+    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '', frame = '', lock = '' } = {}) {
         const x = o.x, floor = o.y, w = width;
         const ceiling = floor - this.deckPitch + 16;
         const head = floor - DOOR.height - 2;
@@ -1023,7 +1041,7 @@ export class ShipScene extends Phaser.Scene {
         }
         this.worldLayer.add(parts);
         const deck = key.split(':')[0];
-        this.bulkheads.push({ x, x0, floor, key, deck, open: false, shut, wall: g, openDoor: open, zone });
+        this.bulkheads.push({ id: o.name, x, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone });
     }
 
     // E at a wall's shut door: it opens.
@@ -1031,6 +1049,12 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const b = this.bulkheads.find(b => !b.open && Math.abs(p.y - b.floor) <= 4 && Math.abs(p.x - b.x) <= 24);
         if (!b || this.route !== 'inside') return false;
+        // Its lock (§6.1): a card, a one-way door, a rope until something has happened.
+        const res = this.progress.doorPasses(b, p.x < b.x ? -1 : 1);
+        if (!res.ok) {
+            this.showLock(res);
+            return true;
+        }
         this.setBulkheadOpen(b, true);
         sfx.door();
         return true;
@@ -1090,7 +1114,7 @@ export class ShipScene extends Phaser.Scene {
         }
         for (const r of this.rooms) {
             if ((this.route === 'inside' || this.route === r.route) && Math.abs(y - r.floor) <= 4 && Math.abs(x - r.door) < 16) {
-                return { x: r.door, to: this.route === r.route ? 'inside' : r.route };
+                return { x: r.door, to: this.route === r.route ? 'inside' : r.route, room: r };
             }
         }
         return null;
@@ -1108,6 +1132,12 @@ export class ShipScene extends Phaser.Scene {
         const door = this.routeDoorAt(p.x, p.y);
         if (door === null) return false;
         if (this.towel && this.route === 'cabin') return this.hangTowel();
+        // A room whose crew door needs a card (the linen room), going in.
+        const lock = door.room?.lockSpec && door.to !== 'inside' ? this.progress.passes(door.room.lockSpec, 0, '') : { ok: true };
+        if (!lock.ok) {
+            this.showLock(lock);
+            return true;
+        }
         this.mode = 'scripted';
         this.script = null;
         p.body.setVelocity(0, 0);
@@ -2052,13 +2082,13 @@ export class ShipScene extends Phaser.Scene {
 
     // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of
     // sight; the atrium's glass one is a single car, seen on its rails. Floors run top to bottom.
-    buildLift(o, floors, decks, cards, glass) {
+    buildLift(o, floors, decks, regions, glass) {
         const ys = String(floors).split(',').map(Number);
         const ds = String(decks).split(',').map(Number);
-        const cs = String(cards).split(',');
+        const rs = String(regions).split(',').map(Number);
         const lift = {
             id: o.name, x: o.x, glass,
-            floors: ys.map((y, i) => ({ y, deck: ds[i], card: cs[i] })),
+            floors: ys.map((y, i) => ({ y, deck: ds[i], region: rs[i] })),
             at: ys.length - 1, carY: ys[ys.length - 1],
         };
         if (glass) {
@@ -2138,6 +2168,7 @@ export class ShipScene extends Phaser.Scene {
         this.physics.add.collider(p, this.solidLayer, null, (_, tile) => tile.index !== this.poolTile || !this.underPools(tile.poolDeck));
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
         for (const b of this.bulkheads) this.physics.add.collider(p, b.zone, null, () => !b.open && this.route === 'inside');
+        this.progress.addColliders(p);
         this.physics.add.collider(p, this.railingStops || []);
         if (this.cabin) {
             this.physics.add.collider(p, this.cabin.bed, null, (_, bed) =>
@@ -2192,6 +2223,7 @@ export class ShipScene extends Phaser.Scene {
         this.debugText = this.add.text(VIEW.width - 12, 12, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff' })
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
         this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText]);
+        this.progress.buildHud(this.uiLayer);
         this.refreshHud();
     }
 
@@ -2313,6 +2345,7 @@ export class ShipScene extends Phaser.Scene {
         this.closeLiftDoors();
         this.updateCutaway(dt);
         this.updateBulkhead();
+        this.progress.update();
 
         // Inside a trunk or an elevator she is out of everyone's way.
         if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkPickups();
@@ -2359,6 +2392,7 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
+        if (onFloor && input.activatePressed && this.progress.tryPickup()) return;
         if (onFloor && input.activatePressed && this.tryShower()) return;
         if (onFloor && input.activatePressed && this.useRouteDoor()) return;
         if (onFloor && input.activatePressed && this.useBulkheadDoor()) return;
@@ -3041,7 +3075,7 @@ export class ShipScene extends Phaser.Scene {
             // Only the decks she can reach light up; the cursor skips the rest.
             const step = input.upPressed ? -1 : 1;
             let c = run.cursor + step;
-            while (c >= 0 && c < floors.length && !this.hasCard(floors[c].card)) c += step;
+            while (c >= 0 && c < floors.length && !this.progress.regionOpen(floors[c].region)) c += step;
             if (c >= 0 && c < floors.length) run.cursor = c;
             this.refreshLiftPanel();
         } else if (input.activatePressed) {
@@ -3163,7 +3197,7 @@ export class ShipScene extends Phaser.Scene {
         const carAt = lift.floors.reduce((best, f, i) =>
             (Math.abs(f.y - lift.carY) < Math.abs(lift.floors[best].y - lift.carY) ? i : best), 0);
         panel.buttons.forEach((b, i) => {
-            const ok = this.hasCard(lift.floors[i].card);
+            const ok = this.progress.regionOpen(lift.floors[i].region);
             const chosen = i === cursor;
             b.circle.setFillStyle(chosen ? 0xf28c28 : ok ? 0x5b6470 : 0x9aa3ad)
                 .setStrokeStyle(2, chosen ? 0xffd98a : ok ? 0x2a2f36 : 0xb0b7be);
@@ -3187,30 +3221,39 @@ export class ShipScene extends Phaser.Scene {
         const reach = PLAYER.stairsBoardReach;
         for (const f of this.flights) {
             if (input.up && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) {
-                if (!this.hasCard(f.card)) return this.showLocked(f.card);
-                return this.enterStairs(f, 0);
+                const res = this.progress.flightPasses(f, true);
+                return res.ok ? this.enterStairs(f, 0) : this.showLock(res);
             }
-            if (input.down && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) return this.enterStairs(f, 1);
+            if (input.down && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) {
+                const res = this.progress.flightPasses(f, false);
+                return res.ok ? this.enterStairs(f, 1) : this.showLock(res);
+            }
         }
         return false;
     }
 
-    // Her cards (§6.2): her own crew card from the start; ?cards=all unlocks everything for testing.
-    // Key cards (§5.5) are off for now (the user, 2026-11-03): every door, flight and elevator is
-    // open. `?cards=locked` turns them back on, for testing the locks.
+    // Her cards (§6.1.5); ?cards=all opens every lock, for testing (src/progression.js).
     hasCard(card) {
-        const flag = new URLSearchParams(location.search).get('cards');
-        if (!KEY_CARDS.required && flag !== 'locked') return true;
-        return !card || this.save.cards.includes(card) || flag === 'all';
+        return this.progress.hasCard(card);
+    }
+
+    // A lock she can't pass: the card it needs, a block's sign, or just the lock.
+    showLock(res) {
+        if (res.card) return this.showLocked(res.card);
+        return this.showLocked(null, res.sign ? `🚧 ${res.sign}` : '🔒');
     }
 
     // A flight up that her cards don't open: the card it needs shows above her for a moment.
-    showLocked(card) {
+    showLocked(card, text = null) {
         if (this.time.now < (this.lockedUntil || 0)) return false;
         this.lockedUntil = this.time.now + 900;
-        this.alert.setText(`🔒 ${card[0].toUpperCase()}${card.slice(1)} card`).setVisible(true);
-        // Held at the lock, it shows again before this runs: hide it only once the last one is over.
-        this.time.delayedCall(900, () => { if (this.mode === 'play' && this.time.now >= this.lockedUntil) this.alert.setVisible(false); });
+        const shown = text ?? `🔒 ${this.progress.cardName(card)} card`;
+        this.alert.setText(shown).setVisible(true);
+        // Held at the lock, it shows again before this runs: hide it only once the last one is over,
+        // whatever she is doing by then (on the stairs, in a lift), unless a fright has taken it over.
+        this.time.delayedCall(900, () => {
+            if (this.time.now >= this.lockedUntil && this.alert.text === shown) this.alert.setVisible(false);
+        });
         return false;
     }
 

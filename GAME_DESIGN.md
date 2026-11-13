@@ -655,9 +655,9 @@ its region, around the middle; the glass elevator's panel as the progress meter;
 #### 6.1.1 The premise (never stated on screen)
 
 A stowaway cat has been spotted at sea. The ship's **security officer**, a clumsy man with a net and a
-pet carrier, has the ship in a soft lockdown for his search: the fire doors in the stair cores are
-shut deck by deck, each department's card opens its own, and "SEARCH IN PROGRESS" signs hang on the
-ropes. Bumbusik is crew, doing her colleagues' rounds for them, and she wants the cat for herself.
+pet carrier, has the ship in a soft lockdown for his search: "SEARCH IN PROGRESS" ropes across the
+guest stairs, while the crew go about by their own ways, each department's card opening its own.
+Bumbusik is crew, doing her colleagues' rounds for them, and she wants the cat for herself.
 **Every way on into the ship is a crew way** (a card, a trunk, a pantry), **a cat way** (a door he
 leaves open, a hatch he trips) **or an outside way** (the balconies, the boats); **the guest stairs
 catch up behind her** and reopen as shortcuts as the ship goes on with its day. The security officer
@@ -675,7 +675,7 @@ region 6). At the very end he is in the cabin when she brings the cat home.
 
 | Kind | How it reads | The rule |
 |---|---|---|
-| **Department cards** | A coloured reader beside a fire door in a stair core, or on a crew door | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **A fire door opens freely from its escape side** (from above in a stairwell, from inside a corridor), so every card door is also a one-way shortcut once she has come through it the long way |
+| **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors |
 | **New ways to move** | A pickup with a key glyph shown once | Four verbs, one per quarter: the dash (region 1), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
 | **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
 | **People and the ship's routine** | A person, a crowd or a thing on a flight, with a rope and a sign | A cleaner mopping, a photographer, a carpet being relaid, a table of towel animals, a painter, a crowd of fans, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
@@ -749,7 +749,7 @@ opens full screen. Six places are fixed here (§6.1.11); the pictures come from 
 | Step | Region | What it covers | What opens it | The verb it gives | Bumbot |
 |---|---|---|---|---|---|
 | 1 | Lower ship | Decks 4 and 5 | The start, at the gangway | The dash | Eating the officer's lunch at the Seven Seas: near-catch 1 |
-| 2 | Atrium + promenade | Deck 6 from the bow to the Library, the promenade, the atrium on 6-7, the boat walkway's gate | The Deck card, at the forward stairs' fire door 5-6 | | Rides the glass elevator up where she can't; in the Library, near-catch 2: asleep on her book, he bolts through a roped-off door and leaves it open |
+| 2 | Atrium + promenade | Deck 6 from the bow to the Library, the promenade, the atrium on 6-7, the boat walkway's gate | The Deck card, on the midships crew trunk up into Bliss | | Rides the glass elevator up where she can't; in the Library, near-catch 2: asleep on her book, he bolts through a roped-off door and leaves it open |
 | 3 | Showtime | The theatre, its balcony, deck 7 from Magnum's to the Arcade | The door he left open | | On stage in the spotlight: near-catch 3, up a fly rope |
 | 4 | Housekeeping | Deck 9 midships round the linen room, the atrium's walks and midship lobbies on 8-10 | The Entertainment card, on the crew trunk from Bliss up to deck 9 | Pushing carts, crawling | Asleep in the towels: near-catch 4, into the vent |
 | 5 | Deck 8 forward | Deck 8 forward of the atrium, cabin 8206 | The vent's duct, dropping her past the corridor's shut door | | A glimpse: his tail up the forward stairs |
@@ -775,11 +775,15 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   tangerines roll onto the floor, the D glyph shows: the dash is hers) and is out of the door forward.
   She takes a fresh tray (the pass always has more) and carries it the length of deck 5 or deck 4 to
   the gangway: the first carry, under tray rules. He eats and hands her his **Deck card**: she is
-  doing his rounds now. As the reader at the forward stairs lights, a glimpse: Bumbot's tail going up
-  those stairs.
+  doing his rounds now. As the midships crew trunk's reader lights, a glimpse: Bumbot's tail going up
+  the forward stairs, right past the security officer at his rope, who doesn't notice.
 - **The book:** on a table at the Atrium Café (deck 5), beside a half-drunk coffee: the first one,
   found before she knows what it is for; the HUD shows it, and the library explains it.
-- **Blocks:** the forward core's 5-6 fire door (blue: the way on); the midship core's 5-6 flight (a
+- **Blocks:** the forward core's 5-6 flight (the security officer's "SEARCH IN PROGRESS" rope, **with
+  him at it** (the user, 2026-11-13): net in hand, peering up the stairs, his first appearance, so the
+  sign means something; if she tries the flight he shakes his head. Once region 2 opens he has moved
+  on, and she next glimpses him on the promenade. The way on is the midships crew trunk, blue); the
+  midship core's 5-6 flight (a
   cleaner mopping, a cone); the aft core's 5-6 flight (a rope, "REHEARSAL IN PROGRESS"); the atrium's
   staircase 5-6 (the photographer's session, a backdrop across the stairs). The glass elevator's panel
   lights deck 5 only.
@@ -800,7 +804,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   and its atrium walk (74-110 m); the glass elevator to deck 7; **the boat walkway's gate** on the
   promenade (a lifeboat station's ladder at 125 m, blue), a dead-end foothold up at deck 7's height
   under the boats, with the lifeboat secret, until the socks.
-- **The way in:** the Deck card at the forward stairs' fire door 5-6.
+- **The way in:** the Deck card on the midships crew trunk (4-5-6, 125 m), up into Bliss.
 - **The library (160-194 m), her place on the ship:** the **librarian** at her desk, a shelf with ten
   gaps behind her, the return trolley with a "RETURN" pictogram, the red reading chair by the window,
   the rolling ladder on the bookcase, the chess table and the globe. Her bubble: a book and the gapped
@@ -821,8 +825,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   on the JOGGING lane without looking (a moving obstacle: hop him, or step onto the WALKING lane
   by the wall as he passes); **the Photo Studio's flash**: she stops and poses for a second, the
   screen whites (a gag now, a hazard later when paired with a cart).
-- **Shortcuts opened:** the forward stairs 5-6 for good; the midships trunk's deck 6 door in Bliss
-  (125 m) opens from the Bliss side, then both ways.
+- **Shortcuts opened:** the forward stairs 5-6 for good (the search rope lifts as region 2 opens).
 - **Checkpoints:** the Library's crew door (deck 6, 194 m); deck 6 forward (the cabins, 40 m).
 - **The book:** **in the lifeboat** (someone has been reading in there: a book on the bench).
 - **Secrets:** **a lifeboat** (E at a boat's hatch from the walkway: inside, benches, an oar, the book,
@@ -868,8 +871,8 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 
 - **Covers:** deck 9's midships corridor (110-194 m) and the linen room (112 m); deck 9's midship lobby
   and atrium walk; the atrium walks and midship lobbies of decks 8 and 10 (82-110 m); the atrium's
-  staircase up to 9 and its elevator to 10; the midship core's green doors 7-8, 8-9, 9-10 once she has
-  the card.
+  staircase up to 9 and its elevator to 10; the midship and aft cores' flights 7-10 (their 7-8 blocks
+  lift as region 4 opens).
 - **The way in:** the Entertainment card on the Bliss/Magnum's trunk, up to deck 9.
 - **The corridor's life:** the **steward's cart** jammed in a cabin's doorway: the push glyph; she pushes
   it free along the corridor (the push verb: E at a cart's end, then walk); he is grateful and hands
@@ -1091,22 +1094,22 @@ deck's door into deck 7 opens from the mooring side after the catch, for the way
 
 #### 6.1.4 The stair cores, every flight
 
-Fire doors with readers open freely from above (the escape side). Routine blocks lift on the event
-named and stay open. "Open" flights are open from the start.
+No flight is card-locked (the user, 2026-11-11). Routine blocks lift on the event named and stay open.
+"Open" flights are open from the start.
 
 | Flight | Forward core (74-82 m) | Midship core (102-110 m) | Aft core (194-202 m) | Atrium staircase (82-102 m) |
 |---|---|---|---|---|
 | 4-5 | Open | Open | Open | (floor on 5) |
-| 5-6 | **Blue** (region 1's way on) | The cleaner, lifts at region 3 | "REHEARSAL" rope, lifts at region 3 | The photographer, lifts at region 3 |
+| 5-6 | "SEARCH IN PROGRESS" rope, lifts at region 2 | The cleaner, lifts at region 3 | "REHEARSAL" rope, lifts at region 3 | The photographer, lifts at region 3 |
 | 6-7 | Open | Open | Open | Open |
-| 7-8 | Green | Green | Green | The carpet being relaid, lifts at region 4 |
-| 8-9 | Open (lobby doors gold) | Green | Green | Open |
-| 9-10 | Open (lobby doors gold) | Green | Green | (top at 9; the glass elevator to 10) |
+| 7-8 | The florist's buckets of flowers for the wedding, lift at region 5 | The Art Gallery's auction crates, lift at region 4 | The theatre's scenery flats, lift at region 4 | The carpet being relaid, lifts at region 4 |
+| 8-9 | Open (lobby doors gold) | Open | Open | Open |
+| 9-10 | Open (lobby doors gold) | Open | Open | (top at 9; the glass elevator to 10) |
 | 10-11 | Open | The towel animals, lift at region 6 | The Sports Bar's crowd, lifts at region 8 | |
 | 11-12 | The wedding party, lifts at region 9 | Wet paint, lifts at region 8 | The Sports Bar's crowd, lifts at region 8 | |
 
-The other vertical ways: the forward-cabins trunk (4-5, 50 m, free); the midships trunk (4-5-6, 125 m;
-its deck 6 door in Bliss opens from Bliss first); the theatre's trunk (6 to 4, 240 m, one-way then
+The other vertical ways: the forward-cabins trunk (4-5, 50 m, free); the midships crew trunk (4-5-6,
+125 m, blue: region 1's way on); the theatre's trunk (6 to 4, 240 m, one-way then
 both ways); the Bliss/Magnum's trunk (6-7-9, 118 m, red, the way into region 4); the boat walkway's
 ladder (blue gate on the promenade, free from above); the laundry chute (9 to 4, green, down only);
 the vent's duct (9 to 8, one-way); the pool's hatch (11 to 10, one-way); the sun cover (11 to 12 with
@@ -1118,10 +1121,13 @@ lighting the decks she can reach.
 
 | Card | Colour | Who gives it | What it opens |
 |---|---|---|---|
-| Deck | Blue | The gangway officer, for his lunch (region 1) | The forward stairs' fire door 5-6; the boat walkway's gate on the promenade |
-| Entertainment | Red | The stage manager, for his pills (region 3) | The Bliss/Magnum's trunk up to deck 9; deck 7's midship lobby door into Magnum's; the stage door to the dressing room; the lighting booth on the theatre's balcony |
-| Housekeeping | Green | The steward, for his cart (region 4) | The cabin decks' fire doors (7-8, 8-9, 9-10 at all three cores) from below; marked guest cabin doors (the balcony cabin, the balcony guest's); the pantries on decks 4 and 5; the laundry chute and the laundry's door; the Garden Café's cold room |
-| Officer's | Gold | Dropped by the rival at the horn (region 8) | Every reader: the officers' lobbies on decks 9 and 10, the spa's door, the bridge's door, the kids' clubs' door |
+| Deck | Blue | The gangway officer, for his lunch (region 1) | The midships crew trunk (4-5-6) up into Bliss; the boat walkway's gate on the promenade |
+| Entertainment | Red | The stage manager, for his pills (region 3) | The Bliss/Magnum's trunk up to deck 9; the stage door to the dressing room; the lighting booth on the theatre's balcony |
+| Housekeeping | Green | The steward, for his cart (region 4) | **The linen room's crew door** (so the duct and region 5 need it); guest cabin doors, a steward's master key (the balcony cabin, the balcony guest's); the pantries on decks 4 and 5; the laundry chute and the laundry's door; the Garden Café's cold room |
+| Officer's | Gold | Dropped by the rival at the horn (region 8) | Every reader: the officers' corridors on decks 9 and 10, the bridge's door, the kids' clubs' staff door |
+
+Public doors are roped, not carded (2026-11-11): Magnum's door from deck 7's midship lobby ("CLOSED",
+lifts at region 3) and the spa's door ("CLOSED", lifts at region 9).
 
 #### 6.1.6 The people
 
@@ -1142,7 +1148,7 @@ shared bodies recoloured).
 | The engineer | Deck 12's technical door, the funnel's top | Errand, the horn | His coffee from the machines by the ice cream (hot tray) | The horn; the telescope; a book | Idle, drink, climb, wave, read |
 | The wedding planner | Deck 12's forward lobby | Errand | The cake from Cagney's (tray) | The lobby clears | Idle, clipboard |
 | The pastry chef | Cagney's pass | Hands out cakes | | | Sigh |
-| **The rival security officer** | Regions 2, 3, 6, 7, 8, 9 | The comic rival: his blunders open the ship | | His card, at the horn | Walk with net, lunge, trip, tangled, run, slump |
+| **The rival security officer** | Regions 1 (at his search rope), 2, 3, 6, 7, 8, 9 | The comic rival: his blunders open the ship | | His card, at the horn | Peer, shake his head, walk with net, lunge, trip, tangled, run, slump |
 | The kid with the water pistol | The pool deck | Hazard, then ally | A perfect cone (melting tray) | Gulls squirted off the pool deck | Walk, squirt, run, eat |
 | The waiter | The Four Seasons' doorway, deck 5 | A tray hazard, walks a loop | | | Walk with tray |
 | **The jogger** | The promenade's JOGGING lane | A moving obstacle | | | Run |
@@ -1364,6 +1370,9 @@ half-dressed with nothing finished to review.
   access, it is never a lock; the red trunk from Bliss does it.
 - **Cards opening guest stairs by department logic:** every stair lock is a lockdown fire door with a
   reader, or a person; the colour is the rule.
+- **Lockdown fire doors with card readers on the guest stairs** (built in step 0 and taken out,
+  2026-11-11): a door can't appear on a public staircase, and an escape route never locks (the user).
+  Cards open crew ways only; public stairs and doors are roped off by people or routine.
 - **The medical centre as the stage manager's pills' place:** NCL's plan has it on deck 3, which is not
   playable; the pills are in his cabin on deck 4.
 - **The engineer's lunch carried up the funnel's ladder:** a tray can't take a ladder; he drinks at the
@@ -1406,8 +1415,8 @@ Mechanisms from the blockout, there to be used or dropped as the design needs. T
   it, and dimmed from the other side of its wall. The bridge and the spa have such a piece, not in
   use for now (`LOCKED_PARTS` in `src/config.js` is off); until it is on, the deck she is on is cut
   open whole.
-- **Card locks** on stairs, escape trunks and elevators, with a coloured reader beside them: off
-  for now (`KEY_CARDS.required`; `?cards=locked` turns them on, and the playtests use it).
+- **The locks of §6.1** (`src/progression.js`, data in `tools/ship_layout.py`): on since step 0
+  (`KEY_CARDS.required`; `?cards=all` opens everything, for testing round the ship).
 
 ### 6.3 Tangerines
 
@@ -1902,7 +1911,11 @@ Nothing blocks the start of the build. These get settled along the way:
       other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
       open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
       by the spa's wall on deck 11 moved clear of its sign
-- [ ] **Start the next session here: step 0 of `docs/build-plan.md`, the skeleton** (the plan is
+- [ ] **Start the next session here: step 0 of `docs/build-plan.md`, the skeleton**, in rounds on
+      branch `step-0-skeleton`: (1) the locks, **done 2026-11-13** (`src/progression.js`; cards on
+      crew ways only, public stairs and doors roped, the user's choice); (2) the new vertical ways and
+      bare rooms; (3) the verbs bare; (4) the flags, checkpoints, tangerines, books; (5) the golden path
+      to the catch and the user's walk. (The plan is
       §6.1, decided 2026-11-10; every entity's place and behaviour is `docs/population.md`; the
       step-by-step build plan is `docs/build-plan.md`, decided 2026-11-11, merged to `main`). Step 0
       turns the locks on, adds the new vertical ways and the verbs bare, places the beats as flags,

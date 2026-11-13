@@ -30,9 +30,10 @@ east, background props muted; a scare keeps everything collected; a tray never s
 The whole route proven before any polish. Everything that moves the layout goes in here.
 
 - **Locks on:** `LOCKED_PARTS` and `KEY_CARDS.required`; every reader of the spec's §2.6 in its
-  colour; the fire doors' escape-side rule (free from above, from inside); the routine blocks as rope
-  stands with their signs and no people yet; the one-way doors; the gold lobby doors of decks 9 and
-  10; the spa's and the bridge's gold doors; the mooring deck's door.
+  colour, on crew ways only (no card on a public stair or door, the user, 2026-11-11); the routine
+  blocks as rope stands with their signs and no people yet; the one-way fire-exit doors; the gold
+  lobby doors of decks 9 and 10; the bridge's gold door; the mooring deck's door. **Done (round 1,
+  2026-11-11)**, except `LOCKED_PARTS` (the hidden parts).
 - **The new vertical ways:** the Bliss/Magnum's trunk extended to deck 9 (red); the duct as a bare
   crawl passage from the linen room's vent to deck 8 at 66; the chute as a fade and a landing in a
   bare laundry; the pool's drained state and hatch into deck 10; the bridge's hatch and ladder; the
@@ -57,7 +58,7 @@ The whole route proven before any polish. Everything that moves the layout goes 
 ## Step 1: Lower ship (region 1, decks 4 and 5)
 
 - **Scope:** the spec's deck 4 and deck 5 tables; the gangway officer, the porter, the waiter, the
-  lost passenger, the bathrobe guest; the luggage stack, the vacuum, the standing carts; the
+  lost passenger, the bathrobe guest; the rival security officer at his search rope (`riv_rope`); the luggage stack, the vacuum, the standing carts; the
   laundry, the dry store, the pantry passage and the galley as real rooms; the stage manager's
   cabin; the Seven Seas' pass; near-catch 1; the first book; the tangerines; the crew notice board
   and name plates; the ambient figures of decks 4 and 5.
@@ -65,7 +66,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
   bubbles; the scream that gives the dash and the D glyph; breakables; the scare framework with
   frights per hazard; `loop` and `trap` behaviours; the routine block with a person; the card
   hand-over scene; the room kind for crew rooms.
-- **Art:** the officer (idle, eat, hand over), the porter and his cart, the waiter, two ambient
+- **Art:** the officer (idle, eat, hand over), the rival security officer (his character; idle with
+  the net, peer, shake his head; his other clips come in step 3), the porter and his cart, the waiter, two ambient
   passengers, the galley chef, the folder, the receptionist, diners; her tray walk, hop, hand-over
   and spill; the luggage stack; the frights "Bumped"; the rooms by hand. Priced before spending.
 - **Playtest:** `region1`: the lunch fetched past the waiter and the vacuum, the card, the forward
@@ -78,7 +80,7 @@ The whole route proven before any polish. Everything that moves the layout goes 
 - **Scope:** deck 6 from the bow to the Library, the promenade, deck 7's lobbies and atrium walk,
   the boat walkway's gate and foothold, the lifeboat's inside; the librarian, the jogger, the
   delivery robot, the photographer, the carpet fitter, the DJ and the other ambient figures; the
-  flash; near-catch 2 and the glass elevator glimpse; the rival's first glimpse; books 1 and 2
+  flash; near-catch 2 and the glass elevator glimpse; the rival's glimpse on the promenade; books 1 and 2
   returned and read; the gulls perched on the promenade.
 - **Systems first seen here:** the books (trolley, shelf, chair, pages), the glimpse kind, the
   `platform` behaviour, the gate and ladder, `quirk(still)`, the photo slot kind, the first proper

@@ -16,7 +16,8 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, RADAR_MAST, PLAYABLE,
-                         OUR_CABIN, LINEN_ROOM, CHAPEL, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES)
+                         OUR_CABIN, LINEN_ROOM, CHAPEL, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES,
+                         CARDS, REGIONS, FLIGHT_LOCKS, BLOCKS, DOOR_LOCKS, END_WALL_LOCKS, CARD_SPOTS, TRIGGERS)
 
 ROOT = Path(__file__).resolve().parent.parent
 TILE = 16
@@ -109,9 +110,20 @@ HULL_DECKS_BELOW = 2
 WATER_ROW = FLOOR_ROW[3] + HULL_DECKS_BELOW * DECK_ROWS - 1
 ROWS = WATER_ROW + 11                      # the hull below the waterline, down past the keel
 
-# The card each flight of stairs needs, by the deck it climbs to: her own crew card covers decks
-# 4-6, the Hotel card everything above (§6.2).
-FLIGHT_CARD = {d: ("crew" if d <= 6 else "hotel") for d in PLAYABLE}
+
+
+def lock_text(lock):
+    """A lock (ship_layout's FLIGHT_LOCKS, DOOR_LOCKS, END_WALL_LOCKS) as the game reads it:
+    "card:off:-1", "oneway:1", "flag:bb2", "block:wedding"; "" for none."""
+    return ":".join(str(v) for v in lock) if lock else ""
+
+
+def region_at(deck, m, route="inside"):
+    """The region (§6.1.3) a spot belongs to: the first whose boxes hold it."""
+    for n, boxes in REGIONS.items():
+        if any(d == deck and a <= m < b and rt == route for d, a, b, rt in boxes):
+            return n
+    return 0
 
 # Deck 12's open stretch over deck 11's pool area, crossed by a side walk (§5.3), and deck 11's
 # pools under it, metres from the bow. A pool is sunk two tiles into the deck.
@@ -943,7 +955,7 @@ def build_objects():
             add({"id": 0, "name": f"stairs-{core}-{deck}-{deck + 1}", "type": "stairs", "x": x0, "y": y0,
                  "width": 0, "height": 0, "rotation": 0, "visible": True,
                  "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
-                 "properties": [prop("card", FLIGHT_CARD[deck + 1])]})
+                 "properties": [prop("lock", lock_text(FLIGHT_LOCKS.get((core, deck + 1))))]})
         for deck in PLAYABLE:
             add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
                       [prop("text", f"DECK {deck}"), prop("style", "plaque")]))
@@ -971,21 +983,23 @@ def build_objects():
     left, right = lift_x - 8 * TILE, lift_x + 8 * TILE
     for i, ((a, y0), (b, y1)) in enumerate(zip(levels, levels[1:])):
         x0, x1 = (left, right) if i % 2 == 0 else (right, left)
-        card = FLIGHT_CARD[int(b)]
         add({"id": 0, "name": f"stairs-atrium-{a}-{b}", "type": "stairs", "x": x0, "y": y0,
              "width": 0, "height": 0, "rotation": 0, "visible": True,
              "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
-             "properties": [prop("card", card), prop("curve", True, "bool"), prop("front", i % 2 == 1, "bool")]})
+             "properties": [prop("lock", lock_text(FLIGHT_LOCKS.get(("atrium", int(b))))),
+                            prop("curve", True, "bool"), prop("front", i % 2 == 1, "bool")]})
 
     # Elevators (§5.1): one in each core, aft of the stairs, decks 4-12, and the atrium's glass one,
-    # decks 5-9, opening onto the side walks. Floors are listed top to bottom with each deck's
-    # number and the card it needs.
+    # decks 5-10, opening onto the side walks. Floors are listed top to bottom with each deck's
+    # number and the region its landing is in: a landing lights once its region is open, so an
+    # elevator never opens onto a place she can't reach yet (§6.1.2).
     def lift(name, x, decks, glass=False):
         decks = sorted(decks, reverse=True)
         stand = walk_y if glass else floor_y
+        m = metres(x // TILE)
         props = [prop("floors", ",".join(str(stand(d)) for d in decks)),
                  prop("decks", ",".join(str(d) for d in decks)),
-                 prop("cards", ",".join(FLIGHT_CARD[d] for d in decks))]
+                 prop("regions", ",".join(str(region_at(d, m)) for d in decks))]
         if glass:
             props.append(prop("glass", True, "bool"))
         add(point(f"lift-{name}", "lift", x, floor_y(decks[0]), props))
@@ -1023,7 +1037,7 @@ def build_objects():
                 # The linen room's crew door, held open, in a cabin door's place (LINEN_ROOM).
                 if deck == LINEN_ROOM["deck"] and c0 * TILE < x_of(LINEN_ROOM["m"]) < c1 * TILE:
                     i = min(range(len(xs)), key=lambda i: abs(xs[i] + 17 - x_of(LINEN_ROOM["m"])))
-                    add(point("linen-room", "linen", xs[i] + 17, floor_y(deck)))
+                    add(point("linen-room", "linen", xs[i] + 17, floor_y(deck), [prop("lock", lock_text(LINEN_ROOM.get("lock")))]))
                     add(point("linen", "place", xs[i] + 17, floor_y(deck), [prop("route", "linen")]))
                 add(area(f"cabins-{deck}-{c0}", "decor", c0 * TILE, floor_y(deck), (c1 - c0) * TILE, 0, [
                     prop("kind", "cabindoors"), prop("first", first, "int"), prop("last", first + len(xs) - 1, "int"),
@@ -1031,6 +1045,23 @@ def build_objects():
         elif indoor(deck, (a + b) / 2) and kind != "start" and deck not in FURNISHED:  # a wall to hang on
             add(point(f"sign-{deck}-{a}", "sign", (x_of(a) + x_of(b)) / 2, floor_y(deck) - 100,
                       [prop("text", name.split(" (")[0].upper())]))
+
+    # Progression (§6.1, docs/population.md): the regions' boxes, the blocks' signs and what lifts
+    # them, the cards' colours; the cards where their givers will stand, and the triggers standing in
+    # for scenes (step 0 of docs/build-plan.md).
+    for n, boxes in REGIONS.items():
+        for deck, a, b, route in boxes:
+            lo, hi = max(a, EXTENT[deck][0] - 3), min(b, LENGTH)
+            add(area(f"region-{n}-{deck}-{a:g}-{route}", "region", x_of(lo), floor_y(deck), x_of(hi) - x_of(lo), 0, [
+                prop("region", n, "int"), prop("deck", deck, "int"), prop("route", route)]))
+    add(point("progression", "progression", 0, 0, [
+        prop("cards", json.dumps(CARDS)),
+        prop("blocks", json.dumps({k: {"what": w, "sign": s, "lift": lock_text(lift)} for k, (w, s, lift) in BLOCKS.items()}))]))
+    for card, (deck, m, needs) in CARD_SPOTS.items():
+        add(point(f"card-{card}", "card", exact_x(m), floor_y(deck), [prop("card", card), prop("needs", needs or "")]))
+    for flag, deck, m, needs in TRIGGERS:
+        add(area(f"trigger-{flag}", "trigger", x_of(m - 1), floor_y(deck) - DECK_PITCH + TILE, x_of(m + 1) - x_of(m - 1),
+                 DECK_PITCH - TILE, [prop("flag", flag), prop("needs", needs or "")]))
 
     # Checkpoints (crew cabin doors, §5.5): none for now (the user, 2026-11-03): they come back
     # when the ship is split into unlockable areas. Until then she always starts again at the
@@ -1318,7 +1349,9 @@ def build_objects():
     add(area("bulwark-12", "bulwark", fa, floor_y(12), fb - fa, 0))
     # The end walls she passes behind: deck 7's front, to the mooring deck; deck 8's two ends.
     for deck, wa, wb in end_walls():
-        add(area(f"end-wall-{deck}-{wa}", "endwall", wa * TILE, floor_y(deck), (wb - wa) * TILE, 0))
+        end = "fore" if metres(wa) < sum(EXTENT[deck]) / 2 else "aft"
+        add(area(f"end-wall-{deck}-{end}", "endwall", wa * TILE, floor_y(deck), (wb - wa) * TILE, 0,
+                 [prop("lock", lock_text(END_WALL_LOCKS.get((deck, end))))]))
     # Splash Academy: sunny walls, a blue carpet with coloured dots, toys, a play kitchen, low tables.
     plaque("sign-splash", 24.6, "Splash Academy")
     put(7, 24.0, "kids-bookshelf-bg")
@@ -1457,10 +1490,10 @@ def build_objects():
     # Its back wall, across the deck, with the crew door: the game draws it and opens it with E.
     add(point("spa-door", "bulkhead", exact_x(SPA_WALL_M), floor_y(11), [
         prop("x0", col(EXTENT[11][0]) * TILE, "int"), prop("key", "11:spa"), prop("text", "SPA & SALON"),
-        prop("leaf", "door-deck"), prop("colour", "#0b5e65")]))
+        prop("leaf", "door-deck"), prop("colour", "#0b5e65"), prop("lock", lock_text(DOOR_LOCKS.get((11, SPA_WALL_M))))]))
     add(point("bridge-door", "bulkhead", exact_x(BRIDGE_WALL_M), floor_y(10), [
         prop("x0", col(EXTENT[10][0]) * TILE, "int"), prop("key", "10:bridge"), prop("text", "BRIDGE"),
-        prop("sub", "CREW ONLY")]))
+        prop("sub", "CREW ONLY"), prop("lock", lock_text(DOOR_LOCKS.get((10, BRIDGE_WALL_M))))]))
 
     # Deck 11, after NCL's plan and the user's photos (2026-11-06; three PixelLab sheets, tall-3,
     # tall-4 and props-6, 30 generations). Bow to stern.
@@ -1599,7 +1632,8 @@ def build_objects():
     # areas (§6). Each swings open away from a stair lobby, into the other part.
     for deck, m, swing in part_doors():
         add(point(f"part-door-{deck}-{m:g}", "bulkhead", exact_x(m), floor_y(deck), [
-            prop("leaf", "glass"), prop("frame", "steel"), prop("swing", swing, "int")]))
+            prop("leaf", "glass"), prop("frame", "steel"), prop("swing", swing, "int"),
+            prop("lock", lock_text(DOOR_LOCKS.get((deck, m))))]))
     # Deck doors in the passages out to the open deck (the user): a wall across the deck, its door
     # seen from the side, E to open it, as the spa's and the sauna's.
     for deck, passages in DOOR_PASSAGES.items():
