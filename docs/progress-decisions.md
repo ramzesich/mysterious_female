@@ -447,3 +447,105 @@ a thing can be taken from where it lies as well as from the floor under it (a bo
 
 **PixelLab spent on this step:** 5 generations (the birthday girl and her dance). 1,398 of 2,000
 left.
+
+## Step 6: Lido, region 6 (2026-11-13)
+
+Done: deck 11 from the forward lobby aft, and deck 10's hallway under the pool. The gym (a runner
+on a treadmill, a man with dumbbells, the grip socks on the yoga rack); the chess set; two
+sunbathers; near-catch 5 at the first pool and the pool draining; the hatch into deck 10's hallway
+(trays outside a "Do Not Disturb" door, a swinging door, a sprinkler, a second door not to knock
+at); the hot tub and the tangerine on its canopy; the kid with the water pistol on the aft pool
+deck, the security officer on his knees at a lounger, the wet patch and its deck chair, Topsiders'
+barman; the Garden Cafe's queue and its cold room; the painter and the fans on the flights up; the
+Great Outdoors: the soft serve machine and its swirl, the gulls, her husband at the first table,
+the canister, the table scene with the sixth book and the framed picture, a cone for herself; the
+crates. Playtest `region6` (from `enter_region6`).
+
+**New in the code:** `src/world/lido.js` (region 6's part of the story, mixed into the Story:
+the pool's scene, the kid, the machine, the table, the chess set, the hot tub, the paw prints) and
+`src/world/hazards.js` (`WetPatch`, `FoodGulls`, `Queue`, `Trays`); in the data `PLATFORMS` (a
+roof to stand on), `LIDO`, `WETS`, `FOODGULLS`, `QUEUES`, `TRAYS`; sources that are there to see
+but hers to take only `when` a condition holds; photo slots that come `after` a flag; a beat with a
+whole scene of its own (`cat.custom`); the pool drains over five seconds with her in it;
+`tools/unchair.py` (takes out a chair PixelLab drew under her in a seated clip).
+
+**Changes and additions to the plan, and why:**
+
+1. **The spec's metres follow the deck as built.** The pool deck and the Great Outdoors were built
+   before the plan (the user's photos): the hot tub stands between the two pools, the first pool's
+   ladder is at its forward end, the service station runs 211-217 m and the first table is at 220.
+   So: the machine is at 214.6 m, her husband at the first table's forward chair (219.5), the
+   crates at 217.9 (behind his chair, by the station), the kid's beat is 142.6-149.3 (aft of the
+   second pool), the wet patch 150.9-152.9 by the shower, Topsiders' tangerine on the bar (156.3).
+2. **Near-catch 5 comes to her in the water.** The first pool fills the deck from side to side, so
+   she can only come to Bumbot swimming: the scene starts when she is within about two metres of
+   the aft rim. He fishes on the rim; **the kid squirts from the hot tub** behind him (his cap
+   shows over its rim before; the plan had him 5 m off, on the far side of a pool); Bumbot goes up,
+   comes down in the pool, climbs out by a second ladder (added at the aft end) onto the drain
+   lever's housing on the rim, shakes himself dry (his new clip), throws the lever jumping off and
+   runs aft along the pools' far side. "She topples in too" happens only if she came along the rim.
+3. **The pool drains with her in it:** the surface sinks to the tank's floor over five seconds and
+   she sinks with it, to stand in the empty tank by the hatch. (Before: the water faded and she
+   was put on the deck.)
+4. **A checkpoint on the aft pool deck: the pool attendant's hut** (`cp_pool`, a striped white hut
+   on the second pool's aft rim). Without it the kid's and the deck chair's frights sent her back
+   to the gym, two pools away.
+5. **A tangerine on the hot tub's canopy** (`tan_11_canopy`), reached by a wall jump off one of its
+   posts from under it: the socks' first use, a few steps from where she gets them, long before
+   the climb to deck 12 that needs them.
+6. **The socks' hint says how:** "In the air at a post or a wall, jump again: kick off it" (the
+   posts and pillars are not walls she can press against).
+7. **The kid:** his jet is one shot after a tell (he brings the pistol up, about half a second),
+   three metres long at the height of his hands: a jump as he fires clears it; behind him she is
+   safe. The dash sends him to his beat's aft end, his back turned for ten seconds. With a cone in
+   her hands he stands and waits. A stub he drops on the deck (a gull comes for it) and he is
+   himself again in three seconds; a proper cone he eats, and from then on he squirts the gulls
+   over the pool deck (they wheel higher and never dive) and never her.
+8. **The buffet queue** is six passengers with full trays coming from the buffet along the aisle in
+   two threes, round and round (out from behind the buffet, in behind the ice cream counter). Each
+   is a body she can't walk through (no fright: she is held back) and hops one at a time. **For a
+   crew member with a tray they turn aside**: with a tray she can only hop 26 px, so the plan's
+   "hop it at a gap" would have made the cone's run impossible; and it is what passengers do.
+9. **Trays never cross a pool** (swimming spills one, and the tank is deeper than a tray's hop), so
+   nothing she must carry goes that way: the kid's cone goes from the machine through the cafe to
+   the aft pool deck, the canister from the cold room straight aft.
+10. **The gulls dive at where she will be:** while she carries food in the open, a gull's shadow
+    shows on the deck where she will be in a second if she keeps on as she goes, then it comes
+    down on that spot. In it, she loses the cone (never a fright). So the way past is to break her
+    stride, not to stand still (standing still, it has her). Two stretches: the aft pool deck's
+    open part (141-145.6 m, two gulls wheeling; off for good once the kid is fed) and the Great
+    Outdoors from its door to the first table (one gull on the rail). The plan's gulls over the
+    first pool had no food to dive at (see 9).
+11. **The machine:** hold E and the swirl grows on a meter; let go in the green for a proper cone,
+    early for a stub, late and it goes over onto the deck (the gull is on it at once). It works
+    until the kid is fed, then is empty (a red light, a cough) until the canister is poured in.
+    The canister is on the cold room's shelf from the start, but hers to take only once the
+    machine is empty.
+12. **The table scene:** his bubble (a soft serve, once the machine is refilled) asks her to make
+    one **for herself** and sit down: she keeps the cone, they eat together (the plan had her hand
+    it to him, and him already holding one). Then their framed picture stands on the table (the
+    photo slot) and he gives her the sixth book.
+13. **The wet patch is two metres long** (a jump clears it), and the palm that stood at its end
+    moved a metre aft, out of the deck chair's way. The chair rocks, slides the patch's length at
+    her, waits, and slides home.
+14. **The hot tub** takes her standing in it up to her shoulders (no new clip was needed).
+15. **Deck 10's hallway:** the trays' zone is under two metres so a jump clears it; their clatter
+    opens the door at 131.6 m; a tangerine rolls out from among them (one more, `tan_10_tray`).
+    New people behind the doors (no person is used twice): a man in pyjamas, a woman in curlers,
+    a man half-dressed for dinner at the swinging door.
+16. **The paw prints** run from the second pool to the machine and dry over a minute and a half.
+17. **Ambient people, each new:** the gym's runner and lifter, two sunbathers on loungers of their
+    own (PixelLab map objects; the two empty loungers there were taken out), Topsiders' barman,
+    the painter (with his bucket), three fans (two on deck 11's aft flight, one on deck 10's),
+    three guests at the Great Outdoors' far tables.
+18. **Her husband is a stand-in for now.** The plan draws him from the user's photo, and there is
+    none in `reference/` yet (asked for on 2026-11-13). Until it comes, `husband` in
+    `tools/cast.py` points at a seated guest's character; his own needs: seated on a dark wicker
+    armchair, and the clips `eat`, `wave`, `laugh`, `give`.
+19. **Left for later:** the coffee machines' source and the mojito at Topsiders (step 8, with the
+    engineer's and the old lady's errands); the Sports Bar's three at the TV (they are the fans,
+    until region 8); the wedding party itself (step 9; its rope and sign stand); a swoop at her
+    when she lingers on an open deck (step 7's rule).
+
+**PixelLab spent on this step:** 97 generations (twenty characters, their clips, her five
+clips, Bumbot's shake, two sunbathers). 1,301 of 2,000 left.

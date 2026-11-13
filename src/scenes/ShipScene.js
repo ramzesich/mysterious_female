@@ -3504,7 +3504,9 @@ export class ShipScene extends Phaser.Scene {
     checkCheckpoints() {
         const p = this.player;
         for (const c of this.checkpoints) {
-            if (c.route !== this.route || Math.abs(p.x - c.x) > 8 || Math.abs(p.y - c.y) > 6) continue;
+            // (Past its door on its floor, or in a jump over that floor: out of the second pool she
+            // comes down beyond the pool attendant's hut.)
+            if (c.route !== this.route || Math.abs(p.x - c.x) > 8 || p.y > c.y + 6 || p.y < c.y - 70) continue;
             if (!c.active) {
                 this.lightCheckpoint(c, true);
                 this.save.activated.push(c.id);

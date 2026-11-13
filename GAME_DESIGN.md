@@ -1968,10 +1968,19 @@ Nothing blocks the start of the build. These get settled along the way:
       cabin 8206: a checkpoint, the fifth book on the bed (standing still on the bed with it she
       sits and reads it there), the basket's tangerines; the swan's cart; the forward stairs on up
       to deck 11. Playtest `region5`
+- [x] **Step 6, region 6: Lido** (done 2026-11-13, branch `the-build`): the gym and the grip
+      socks; near-catch 5 from the water, the kid squirting from the hot tub, the pool draining
+      with her in it, the hatch into deck 10's hallway (trays, doors, a sprinkler); a tangerine on
+      the hot tub's canopy by a wall jump; the kid on the aft pool deck (a jet, the dash, the cone,
+      then an ally), the wet patch and its deck chair, the pool attendant's hut (a checkpoint); the
+      buffet queue (it turns aside for crew with a tray), the cold room; the soft serve machine's
+      swirl, the gulls that dive at food, the canister, the table scene with the sixth book and
+      the framed picture; the chess set, the hot tub, a cone for herself. Playtest `region6`.
+      **Open:** her husband's own character waits for the user's photo (a stand-in sits there)
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 6 of `docs/build-plan.md`, region 6 (Lido: deck 11 from the forward lobby aft, the socks, the pool's beat, the Great Outdoors)**; then on in play
+      step 7 of `docs/build-plan.md`, region 7 (Outside: the balconies of decks 8-10 and the hallways behind them, the boat walkway finished, the balcony guest and book 7)**; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

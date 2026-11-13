@@ -144,6 +144,9 @@ the duct, the cabin, the climb to deck 11 without leaving the stairwell.
 
 ## Step 6: Lido (region 6)
 
+**Done (2026-11-13),** but for her husband's own character, which waits for the user's photo (a
+stand-in sits at his table). What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** deck 11 from the forward lobby aft; the socks; the pool's beat and drain, the hatch and
   deck 10's midships hallway; the kid, the wet patch and the deck chair, the gulls over the gap, the
   buffet queue, the cold room; the Great Outdoors: the user's character, the machine, the canister,

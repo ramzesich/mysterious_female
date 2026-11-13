@@ -1282,31 +1282,103 @@
   },
   "barman_top": {
    "stand": 660,
-   "anims": {},
-   "fps": {},
+   "anims": {
+    "shake": [
+     663,
+     664,
+     665,
+     666,
+     667,
+     668,
+     669,
+     670,
+     671
+    ]
+   },
+   "fps": {
+    "shake": 8
+   },
    "front": 661,
    "back": 662
   },
   "go_reader": {
-   "stand": 663,
+   "stand": 672,
    "anims": {},
    "fps": {},
-   "front": 664,
-   "back": 665
+   "front": 673,
+   "back": 674
   },
   "go_her": {
-   "stand": 666,
+   "stand": 675,
    "anims": {},
    "fps": {},
-   "front": 667,
-   "back": 668
+   "front": 676,
+   "back": 677
   },
   "go_him": {
-   "stand": 669,
+   "stand": 678,
    "anims": {},
    "fps": {},
-   "front": 670,
-   "back": 671
+   "front": 679,
+   "back": 680
+  },
+  "sleeper": {
+   "stand": 681,
+   "anims": {
+    "shriek": [
+     684,
+     685,
+     686,
+     687,
+     688,
+     689,
+     690,
+     691,
+     692
+    ]
+   },
+   "fps": {
+    "shriek": 10
+   },
+   "front": 682,
+   "back": 683
+  },
+  "curlers": {
+   "stand": 693,
+   "anims": {
+    "shriek": [
+     696,
+     697,
+     698,
+     699,
+     700,
+     701,
+     702,
+     703,
+     704
+    ]
+   },
+   "fps": {
+    "shriek": 10
+   },
+   "front": 694,
+   "back": 695
+  },
+  "hurry": {
+   "stand": 705,
+   "anims": {
+    "idle": [
+     708,
+     709,
+     710,
+     711
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 706,
+   "back": 707
   }
  }
 }

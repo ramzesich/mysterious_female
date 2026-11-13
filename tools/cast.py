@@ -113,7 +113,10 @@ CAST = {
     "go_him": ("cc92f5ad-c324-47c6-84da-97466fcd2f18", {}, {"scale": 0.8}),
     # Deck 10's hallway under the pool: who is behind its two "Do Not Disturb" doors, and who throws
     # the swinging one open.
-    "sleeper": ("977c3e8e-4a5b-4e97-b41b-3b09a4917960", {"shriek": 10}, {}),
-    "curlers": ("0be059cb-aed5-4750-aa55-acc699881d77", {"shriek": 10}, {}),
+    # (First tries of the two behind the doors, 977c3e8e-4a5b-4e97-b41b-3b09a4917960 and
+    # 0be059cb-aed5-4750-aa55-acc699881d77, came with a doorway drawn into the sprite: their
+    # descriptions said "in the cabin doorway".)
+    "sleeper": ("071b5059-4fef-4ea8-abfd-0b6784aec60d", {"shriek": 10}, {}),
+    "curlers": ("2ad7be74-3c6d-4947-a58c-aafc96d29f82", {"shriek": 10}, {}),
     "hurry": ("c17f28af-31b2-4a7b-8094-b0dfde83b7ff", {"idle": 4}, {}),
 }

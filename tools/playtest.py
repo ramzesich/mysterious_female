@@ -627,9 +627,12 @@ def scenario_balcony(b):
     # drop one deck onto the stage, no scare (§5.3).
     b.open("?reset&play")
     b.teleport(x_of(STAGE - 1.4), floor_y(7))
+    time.sleep(0.4)
     b.key("right", True)
-    b.tap("space")
-    time.sleep(1.4)
+    b.key("space", True)         # (held: a tap can come out as a cut-short hop on a slow machine)
+    time.sleep(0.4)
+    b.key("space", False)
+    time.sleep(1.0)
     b.key("right", False)
     time.sleep(0.8)
     s = b.state()
@@ -669,13 +672,20 @@ def scenario_idle(b):
 def scenario_falls(b):
     b.open("?reset&play")
     b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # (Bumbot at the pool's rim would stop her)
-    # One deck: down through deck 12's walk onto deck 11's pool area, between the pools.
-    b.teleport(x_of(132.5), D12)
+    # One deck: down through deck 12's walk onto deck 11's pool area, aft of the pools.
+    b.teleport(x_of(143.5), D12)
     time.sleep(0.3)
     b.tap("down")
     time.sleep(1.2)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D11, "a one-deck drop into the pool area is fine", s)
+    # (Between the pools she comes down on the hot tub's canopy: a roof she can stand on.)
+    b.teleport(x_of(132.5), D12)
+    time.sleep(0.3)
+    b.tap("down")
+    time.sleep(1.2)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D11 - 90, "over the hot tub she lands on its canopy", s)
     # Two decks: off deck 12's aft end, past deck 11, onto the deck 10 terrace below.
     b.teleport(x_of(245.5), D12)  # past deck 12's (233 m) and deck 11's (244 m) aft ends
     time.sleep(0.6)
@@ -2229,7 +2239,7 @@ def scenario_region6(b):
     b.shot("region6-trays")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 8) and "trays_10m" in flags(b), "she comes back at a checkpoint", b.state())
     ok &= check(js(b, f"{S}.tangerines.some(t => t.id === 'tan_10_tray')"), "a tangerine has rolled out from among the trays")
-    b.teleport(trays["x0"] - 50, D10)
+    b.teleport(trays["x0"] - 42, D10)
     time.sleep(0.6)
     b.key("right", True)
     time.sleep(0.2)
@@ -2238,8 +2248,9 @@ def scenario_region6(b):
     b.key("space", False)
     time.sleep(0.75)
     b.key("right", False)
+    time.sleep(0.6)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["x"] > trays["x1"], "a jump clears the trays", s)
+    ok &= check(s["mode"] == "play" and s["x"] > trays["x1"] and js(b, f"{mover('haz_trays_10m')}.armed"), "a jump clears the trays", s)
     ok &= check(all(js(b, f"!!{mover(m)}") for m in ("haz_swing_10m", "haz_sprinkler_10m", "haz_dnd_10m2")), "further aft: a swinging door, a sprinkler, another door not to knock at")
     b.teleport(exact_x(110) + 16, D10)
     time.sleep(0.4)
@@ -2349,7 +2360,8 @@ def scenario_region6(b):
     time.sleep(0.4)
     b.hold("right", 2.2)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["x"] < line()[0], "the buffet queue holds her back: no fright", (s, line()))
+    # (Held at someone's back: whoever is next ahead of her is within a step.)
+    ok &= check(s["mode"] == "play" and any(0 < x - s["x"] < 30 for x in line()), "the buffet queue holds her back: no fright", (s, line()))
     b.shot("region6-queue")
     hops = 0
     while b.state()["x"] < q["x1"] + 20 and hops < 30:

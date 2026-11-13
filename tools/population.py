@@ -118,7 +118,7 @@ TANGERINES = {
     "tan_11_crates": (11, 217.9, 2, 0, "broken:haz_crates_11"),
     # On the hot tub's canopy: up by a wall jump off one of its posts, from under it.
     "tan_11_canopy": (11, 132.5, 1, 90, None),
-    "tan_10_tray": (10, 129.6, 1, 0, "flag:trays_10m"),
+    "tan_10_tray": (10, 129.8, 1, 0, "flag:trays_10m"),
     "tan_12_spinnaker": (12, 54, 2, "table", None),
     "tan_12_lady": (12, 128, 2, 0, "lady"),
     "tan_12_cagneys": (12, 167, 1, "table", None),
@@ -510,5 +510,5 @@ FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
 # counter (forward) in threes, solid bodies that shove her back; for crew with a tray they turn aside.
 QUEUES = {"haz_queue": (11, 162.5, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
 # Room-service trays left on a hallway's floor (`haz_trays`): id: (deck, from m, to m, the "Do Not
-# Disturb" door their clatter opens, the flag set by the first clatter).
-TRAYS = {"haz_trays_10m": (10, 128.3, 130.9, "haz_dnd_10m", "trays_10m")}
+# Disturb" door their clatter opens, the flag set by the first clatter). Under two metres: a jump clears them.
+TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m")}
