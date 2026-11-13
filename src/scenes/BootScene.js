@@ -9,6 +9,8 @@ export class BootScene extends Phaser.Scene {
     preload() {
         // Relative paths only: on GitHub Pages the game lives under /<repo>/ (§7.2).
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
+        // The plan's world (tools/population.py through the map builder): rooms, people, things.
+        this.load.json('world', 'maps/world.json');
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');

@@ -21,7 +21,7 @@ URL flags, combinable (`?play&debug`):
 | `?play` | Skip the title screen |
 | `?reset` | Clear the saved progress |
 | `?debug` | Show collision boxes and her position/state |
-| `?cards=all` | Every key card, for testing |
+| `?cards=all` | Every lock open and every verb known (crawl, wall jump, glide), for testing round the ship |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
 | `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro` (deck 12) |

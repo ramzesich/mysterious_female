@@ -1,0 +1,770 @@
+// The plan's world (GAME_DESIGN.md §6.1, docs/population.md): what tools/population.py puts on the
+// ship, read from maps/world.json: the rooms behind doors, the outside route (the promenade, the
+// boat walkway, the balconies), the funnel's top, the duct, and every thing in place: checkpoints,
+// tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
+// her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
+
+import { PLAYER } from '../config.js';
+import { parseLock } from '../progression.js';
+import { writeSave } from '../save.js';
+import { sfx } from '../sfx.js';
+
+export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
+const ROOM = { height: 128, stop: 20 };
+const OK = { ok: true };
+
+// How a bare room looks until it is drawn (tools/draw_rooms.py): wall, skirting, floor.
+const LOOKS = {
+    laundry: [0xdfe8e2, 0x9babb2, 0x92a984], store: [0xc9c2b0, 0x7f708a, 0x8e98a3], crewcabin: [0xe6dcc8, 0xab947a, 0x4d65b4],
+    pantry: [0xd9dee0, 0x9babb2, 0x8e98a3], galley: [0xeef2f2, 0x9babb2, 0xc7dcd0], nook: [0x6e4a3a, 0x45293f, 0xae2334],
+    dressing: [0xe8c4c0, 0xab6f7a, 0x7f708a], lighting: [0x2e222f, 0x45293f, 0x3e3546], lifeboat: [0xf28c28, 0xcd683d, 0x9babb2],
+    cabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], balcabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], adjoin: [0xefe6d2, 0xd8b29a, 0x4d65b4],
+    coldroom: [0xcfeaf5, 0x8fd3ff, 0x9babb2],
+};
+const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
+const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
+const HINTS = {
+    dash: 'D: «Кісюнічка!!!»', crawl: '↓ then ← →: crawl', socks: 'Jump at a wall: kick off it', parasol: 'Hold jump in the air: glide',
+};
+
+export class World {
+    constructor(scene) {
+        this.scene = scene;
+        this.data = scene.cache.json.get('world');
+        this.roofY = this.data.funnel.foot[1];
+        this.carry = null;          // what she has in her hands (a tray: §6.1.2), from step 1
+        this.things = [];           // everything placed: { id, x, y, route, needs, items, interact, done }
+        this.pushables = [];
+        this.low = [];              // things she must crawl under: { route, x0, x1, y }
+        this.grips = this.data.grips;
+        this.pending = [];          // tangerines that appear on a flag
+        this.built = false;
+    }
+
+    get save() { return this.scene.save; }
+    get progress() { return this.scene.progress; }
+
+    // Doors on the cabin corridors that take a cabin door's place (rooms, checkpoints).
+    doorSpots() {
+        const rooms = this.data.rooms.flatMap(r => r.doors.filter(d => d.outRoute === 'inside').map(d => ({ x: d.outX, y: d.outY })));
+        const cps = this.data.ents.filter(e => e.kind === 'checkpoint' && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
+        return [...rooms, ...cps];
+    }
+
+    // --- Building -----------------------------------------------------------------------------
+
+    build() {
+        this.makeTextures();
+        this.buildRooms();
+        this.buildOutside();
+        this.buildFunnel();
+        this.buildDuct();
+        for (const e of this.data.ents) this.buildEnt(e);
+        this.buildSpecials();
+        this.built = true;
+        if (this.progress.has('drain')) this.drainPool(true);
+        this.refresh();
+    }
+
+    depthFor(route) {
+        const D = this.scene.DEPTH;
+        return route === 'inside' ? D.props : D.exterior + 0.13;
+    }
+
+    add(items) {
+        this.scene.worldLayer.add(items);
+        return items;
+    }
+
+    // Small pictures drawn here until the real ones are made (the steps of docs/build-plan.md).
+    makeTextures() {
+        const s = this.scene;
+        const make = (key, w, h, draw) => {
+            if (s.textures.exists(key)) return;
+            const g = s.make.graphics({ x: 0, y: 0 }, false);
+            draw(g);
+            g.generateTexture(key, w, h);
+            g.destroy();
+        };
+        BOOK_COLOURS.forEach((c, i) => make(`book-${i + 1}`, 10, 13, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 10, 13);
+            g.fillStyle(c, 1).fillRect(1, 1, 8, 11);
+            g.fillStyle(0xf3ecdd, 1).fillRect(8, 2, 1, 9).fillRect(3, 3, 4, 1);
+        }));
+        make('icon-socks', 12, 12, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(2, 0, 6, 9).fillRect(2, 7, 10, 5);
+            g.fillStyle(0xf68181, 1).fillRect(3, 1, 4, 8).fillRect(3, 8, 8, 3);
+            g.fillStyle(0xffffff, 1).fillRect(3, 1, 4, 2).fillRect(5, 9, 1, 1).fillRect(8, 9, 1, 1);
+        });
+        make('icon-pills', 8, 12, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 8, 10).fillRect(1, 0, 6, 3);
+            g.fillStyle(0xf9c22b, 1).fillRect(1, 3, 6, 8);
+            g.fillStyle(0xffffff, 1).fillRect(2, 1, 4, 1).fillRect(2, 5, 4, 3);
+        });
+        make('icon-parasol', 14, 30, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(6, 0, 2, 30);
+            g.fillStyle(0xe83b3b, 1).fillRect(4, 2, 6, 16);
+            g.fillStyle(0xffffff, 1).fillRect(6, 2, 2, 16);
+            g.fillStyle(0xab947a, 1).fillRect(5, 27, 4, 3);
+        });
+        make('parasol-open', 46, 40, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(22, 8, 2, 32);
+            g.fillStyle(0xe83b3b, 1).fillEllipse(23, 12, 46, 22);
+            g.fillStyle(0xffffff, 1).fillEllipse(23, 12, 14, 22).fillEllipse(8, 13, 6, 12).fillEllipse(38, 13, 6, 12);
+            g.fillStyle(0x000000, 0).fillRect(0, 13, 46, 27);
+        });
+        make('switch-box', 14, 22, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 14, 22);
+            g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 12, 20);
+            g.fillStyle(0xae2334, 1).fillRect(5, 4, 4, 10);
+        });
+        make('hatch-lid', 28, 5, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 28, 5);
+            g.fillStyle(0x9babb2, 1).fillRect(1, 1, 26, 3);
+            g.fillStyle(0xf9c22b, 1).fillRect(12, 1, 4, 3);
+        });
+    }
+
+    // --- Rooms behind doors (population §1 `room`) ---------------------------------------------
+
+    buildRooms() {
+        const s = this.scene, D = s.DEPTH;
+        this.rooms = {};
+        for (const def of this.data.rooms) {
+            const key = s.textures.exists(`room-${def.id}`) ? `room-${def.id}` : this.bareRoom(def);
+            const img = s.add.image(def.x0, def.floor - ROOM.height, key).setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
+            const dim = s.roomDim(img);
+            this.add([dim, img]);
+            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, inDeck: true,
+                           doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
+            for (const d of def.doors) {
+                d.lockSpec = parseLock(d.lock);
+                const out = d.outRoute === OUTSIDE;
+                const art = DOOR_ART[d.kind];
+                if (art) {
+                    const door = s.add.image(d.outX, d.outY, 'shipart', art).setOrigin(0.5, 1).setDepth(out ? D.exterior + 0.1 : D.props);
+                    this.add([door]);
+                    room.outside.push(door);
+                    if (out) s.shellSlopes.push({ deck: [6, 7], gfx: door });
+                }
+                if (d.plate) {
+                    const plate = s.add.text(d.outX + 20, d.outY - 50, d.plate, {
+                        fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#3e3546',
+                        backgroundColor: '#ffffff', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
+                    }).setOrigin(0, 0.5).setDepth(D.props);
+                    this.add([plate]);
+                    room.outside.push(plate);
+                }
+                if (d.lockSpec?.kind === 'card') this.progress.reader(d.outX - 22, d.outY, d.lockSpec.card);
+            }
+            if (def.checkpoint) s.addCheckpoint(def.checkpoint, def.doors[0].outX, def.doors[0].outY, { door: null });
+            s.rooms.push(room);
+            s.addRouteWall(def.x0 + ROOM.stop, -1, def.floor, def.id);
+            s.addRouteWall(def.x0 + def.width - ROOM.stop, 1, def.floor, def.id);
+            this.rooms[def.id] = room;
+        }
+        // The ones built before the plan, by their routes, for things placed in them.
+        for (const r of s.rooms) if (!this.rooms[r.route]) this.rooms[r.route] = r;
+    }
+
+    // A bare room: its wall, ceiling, skirting and floor in its look's colours, a door at each way out.
+    bareRoom(def) {
+        const s = this.scene, key = `bare-${def.id}`;
+        const [wall, trim, floor] = LOOKS[def.look] || LOOKS.cabin;
+        const W = def.width, H = ROOM.height + 16;
+        const tex = s.textures.createCanvas(key, W, H);
+        const ctx = tex.getContext();
+        const hex = c => `#${c.toString(16).padStart(6, '0')}`;
+        const rect = (x, y, w, h, c) => { ctx.fillStyle = hex(c); ctx.fillRect(x, y, w, h); };
+        rect(0, 0, W, H, wall);
+        rect(0, 0, W, 8, 0xf4f6f3);
+        rect(0, 8, W, 1, trim);
+        for (let x = 0; x < W; x += 48) rect(x, 9, 1, ROOM.height - 13, trim);
+        rect(0, ROOM.height - 4, W, 4, trim);
+        rect(0, ROOM.height, W, 4, floor);
+        rect(0, ROOM.height + 4, W, 12, 0x8e98a3);
+        for (const d of def.doors) {
+            const x = Math.round(d.x - def.x0);
+            if (d.kind === 'balcony') {
+                // A glass door onto the balcony, the sky in it.
+                rect(x - 22, ROOM.height - 82, 44, 82, 0xf4f4f4);
+                rect(x - 19, ROOM.height - 79, 38, 79, 0x8fd3ff);
+                rect(x - 19, ROOM.height - 30, 38, 30, 0x4d9be6);
+                rect(x - 1, ROOM.height - 79, 2, 79, 0xf4f4f4);
+                continue;
+            }
+            const frame = s.textures.getFrame('shipart', DOOR_ART[d.kind] || 'door-crew');
+            ctx.drawImage(frame.source.image, frame.cutX, frame.cutY, frame.width, frame.height,
+                x - Math.round(frame.width / 2), ROOM.height - frame.height, frame.width, frame.height);
+        }
+        tex.refresh();
+        return key;
+    }
+
+    // Whether a door of one of the plan's rooms lets her through (the scene's routeDoorAt found it).
+    doorPasses({ d, leaving }) {
+        const P = this.progress, lock = d.lockSpec;
+        if (!lock || P.openAll) return OK;
+        switch (lock.kind) {
+            case 'card':
+                return leaving || P.hasCard(lock.card) ? OK : { ok: false, card: lock.card };
+            case 'oneway':
+                // Shut from the corridor until she has come out through it (an aired balcony cabin).
+                if (leaving) {
+                    P.markOpened(d.id);
+                    return OK;
+                }
+                return this.save.opened.includes(d.id) ? OK : { ok: false };
+            case 'flag':
+                if (P.has(lock.id)) return OK;
+                // From inside, opening it is the scene (the balcony guest let back in).
+                if (leaving) {
+                    P.setFlag(lock.id);
+                    return { ok: false, quiet: true };
+                }
+                return { ok: false };
+        }
+        return OK;
+    }
+
+    // --- The outside route (§6.1.3, region 7) ---------------------------------------------------
+    // The promenade's deck, the boat walkway at deck 7's height, the balconies of decks 8-10: floors
+    // she lands on from above (and drops through with ↓ and jump), partitions between balconies that
+    // only a wall jump gets over, the glass fronts drawn over her.
+
+    buildOutside() {
+        const s = this.scene, D = s.DEPTH, out = this.data.outside;
+        this.platZones = [];
+        this.wallZones = [];
+        for (const pl of out.platforms) {
+            const zone = s.add.zone(pl.x0, pl.y, pl.x1 - pl.x0, pl.solid ? 16 : 6).setOrigin(0);
+            s.physics.add.existing(zone, true);
+            zone.plat = pl;
+            this.platZones.push(zone);
+        }
+        for (const w of out.walls) {
+            const zone = s.add.zone(w.x, (w.y0 + w.y1) / 2, w.w, w.y1 - w.y0);
+            s.physics.add.existing(zone, true);
+            this.wallZones.push(zone);
+        }
+        // Each deck's balcony fronts, over her: pale glass she shows through, the white rail on top.
+        const fronts = {};
+        for (const gl of out.glass) {
+            const g = fronts[gl.deck] ??= s.add.graphics().setDepth(D.player + 0.3);
+            // (Thin: the fronts are drawn to the ship's scale and come up to her eyes.)
+            g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - 48, gl.x1 - gl.x0, 40);
+            g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - 36, gl.x1 - gl.x0, 1);
+            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 50, gl.x1 - gl.x0, 3);
+            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8);
+        }
+        for (const [deck, g] of Object.entries(fronts)) {
+            this.add([g]);
+            s.shellSlopes.push({ deck: Number(deck), gfx: g });
+        }
+        // Ladders between routes: the lifeboat station's, from the promenade's gate up its column.
+        this.ladders = this.data.ladders.map(L => {
+            const g = s.add.graphics().setDepth(D.exterior + 0.09);
+            g.fillStyle(0xe8eaec, 1).fillRect(L.x - 7, L.y1 - 6, 2, L.y0 - L.y1 + 6).fillRect(L.x + 5, L.y1 - 6, 2, L.y0 - L.y1 + 6);
+            for (let y = L.y0 - 6; y > L.y1; y -= 8) g.fillStyle(0xc7dcd0, 1).fillRect(L.x - 6, y, 12, 2);
+            this.add([g]);
+            s.shellSlopes.push({ deck: [6, 7], gfx: g });
+            const lock = parseLock(L.lock);
+            if (lock?.kind === 'card') {
+                const reader = s.add.image(L.x + 14, L.y0 - 40, 'reader').setDepth(D.exterior + 0.09);
+                const light = s.add.rectangle(L.x + 14, L.y0 - 42, 4, 2, this.cardColour(lock.card)).setDepth(D.exterior + 0.09);
+                this.add([reader, light]);
+                s.shellSlopes.push({ deck: [6, 7], gfx: reader }, { deck: [6, 7], gfx: light });
+            }
+            return { ...L, lockSpec: lock };
+        });
+        // The bridge's hatch and its like: ladders on the map shut until something has happened.
+        this.gates = this.data.ladderGates.map(g => {
+            const tiles = [];
+            s.ladderLayer.forEachTile(t => {
+                if (t.index > 0 && Math.abs(t.pixelX + 8 - g.x) < 2 && t.pixelY >= g.y0 - 2 && t.pixelY < g.y1) tiles.push(t);
+            });
+            const lid = s.add.image(g.x, g.y0 + 16, 'hatch-lid').setOrigin(0.5, 0).setDepth(D.props);
+            this.add([lid]);
+            return { ...g, tiles, lid };
+        });
+    }
+
+    cardColour(card) {
+        return { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b }[card] ?? 0xffffff;
+    }
+
+    // A balcony's floor at her feet that she can drop through.
+    dropFloorAt(x, y) {
+        return this.platZones.find(z => z.plat.drop && x >= z.plat.x0 && x <= z.plat.x1 && Math.abs(y - z.plat.y) < 2)?.plat ?? null;
+    }
+
+    // ↑/↓ at a ladder between routes.
+    tryLadder(input, onFloor) {
+        const s = this.scene, p = s.player;
+        if (this.carry || !onFloor) return false;
+        for (const L of this.ladders) {
+            if (Math.abs(p.x - L.x) > 10) continue;
+            const atFoot = input.up && s.route === L.routeBottom && Math.abs(p.y - L.y0) < 4;
+            const atTop = input.down && s.route === L.routeTop && Math.abs(p.y - L.y1) < 4;
+            if (!atFoot && !atTop) continue;
+            // Its gate: a card from below, free from above.
+            if (atFoot && L.lockSpec?.kind === 'card' && !this.progress.hasCard(L.lockSpec.card)) {
+                s.showLocked(L.lockSpec.card);
+                return true;
+            }
+            this.onLadder = L;
+            return s.enterLadder(L.x, L.y1, L.y0);
+        }
+        return false;
+    }
+
+    // A ladder on the map she can't take now: a tray in her hands, or its hatch still shut.
+    ladderShut(x, y) {
+        if (this.carry) return true;
+        return this.gates.some(g => Math.abs(x - g.x) < 9 && y >= g.y0 - 6 && y <= g.y1 + 6 && !this.progress.flagSet(g.needs));
+    }
+
+    // A grip beside her for a wall jump: { away } the side to kick to (0: either, a pillar).
+    gripAt(p) {
+        const s = this.scene, half = PLAYER.bodyWidth / 2;
+        for (const g of this.grips) {
+            if (g.route !== s.route) continue;
+            if (p.y < g.y0 + 4 || p.y - PLAYER.bodyHeight > g.y1) continue;
+            const dx = p.x - g.x;
+            if (Math.abs(dx) - (g.w / 2 + half) > 5) continue;
+            if (g.side && Math.sign(dx) !== g.side) continue;
+            return { away: Math.abs(dx) < 3 ? 0 : Math.sign(dx) };
+        }
+        return null;
+    }
+
+    lowAt(x, y) {
+        const route = this.scene.route;
+        return this.low.some(z => z.route === route && x > z.x0 && x < z.x1 && Math.abs(y - z.y) < 6);
+    }
+
+    // --- The funnel's top (§6.1.10) -------------------------------------------------------------
+
+    buildFunnel() {
+        const s = this.scene, D = s.DEPTH, f = this.data.funnel;
+        const x0 = f.x0 - 18, w = f.x1 - x0;
+        const back = s.add.graphics().setDepth(D.exterior + 0.07);
+        const front = s.add.graphics().setDepth(D.player + 0.3);
+        // A steel grating along the lattice's top, white rails behind and in front.
+        back.fillStyle(0x7f708a, 1).fillRect(x0, f.y, w, 5);
+        back.fillStyle(0x9babb2, 1).fillRect(x0, f.y, w, 2);
+        for (let x = x0 + 2; x < f.x1; x += 4) back.fillStyle(0x3e3546, 1).fillRect(x, f.y + 2, 1, 2);
+        for (const g of [back, front]) {
+            const top = g === back ? f.y - 34 : f.y - 30;
+            g.fillStyle(0xe8eaec, 1).fillRect(f.x0 + 14, top, f.x1 - f.x0 - 14, 2).fillRect(f.x0 + 14, top + 14, f.x1 - f.x0 - 14, 1);
+            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top);
+        }
+        this.add([back, front]);
+        const walk = { x0, x1: f.x1, y: f.y, dropThrough: false };
+        walk.zone = s.add.zone(x0, f.y, w, 6).setOrigin(0);
+        walk.zone.walk = walk;
+        s.physics.add.existing(walk.zone, true);
+        s.walkGroup.add(walk.zone);
+        s.walks.push(walk);
+        // She stops at its aft end's rail.
+        const stop = s.add.zone(f.x1 + 4, f.y - 40, 8, 80);
+        s.physics.add.existing(stop, true);
+        (s.railingStops ||= []).push(stop);
+        // The engineer's locker, the top's checkpoint (population §2.5).
+        s.addCheckpoint('cp_funnel', f.x0 + 60, f.y, { door: 'door-crew' }).items.forEach(i => i.setDepth(D.exterior + 0.08));
+    }
+
+    // --- The duct (population §6.5) -------------------------------------------------------------
+    // A crawl space at deck 9's floor, from the linen room's vent forward to a grille over deck 8's
+    // corridor. It shows in the deck's place, dimmed round it, like a room.
+
+    buildDuct() {
+        const s = this.scene, D = s.DEPTH, d = this.data.duct;
+        const W = d.x1 - d.x0, H = 60;
+        if (!s.textures.exists('room-duct')) {
+            const tex = s.textures.createCanvas('room-duct', W, H);
+            const ctx = tex.getContext();
+            ctx.fillStyle = '#1a141c';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#4a4458';
+            ctx.fillRect(0, 12, W, 34);
+            ctx.fillStyle = '#625565';
+            ctx.fillRect(0, 12, W, 2);
+            ctx.fillRect(0, 44, W, 2);
+            ctx.fillStyle = '#3e3546';
+            for (let x = 0; x < W; x += 64) ctx.fillRect(x, 12, 2, 34);
+            // Grilles in its floor, the light of what is below coming up through them.
+            const light = { lobby: '#fff1c9', dome: '#8fd3ff', balloons: '#f68181', snore: '#b9a98a' };
+            for (const g of [...d.grilles, { x: d.exitX, what: 'lobby' }]) {
+                const x = g.x - d.x0;
+                ctx.fillStyle = light[g.what];
+                ctx.fillRect(x - 14, 44, 28, 3);
+                ctx.globalAlpha = 0.25;
+                ctx.fillRect(x - 12, 20, 24, 24);
+                ctx.globalAlpha = 1;
+                ctx.fillStyle = '#2e222f';
+                for (let k = -12; k < 14; k += 5) ctx.fillRect(x + k, 44, 1, 3);
+            }
+            tex.refresh();
+        }
+        const img = s.add.image(d.x0, d.floor - 46, 'room-duct').setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
+        const dim = s.roomDim(img);
+        this.add([dim, img]);
+        s.rooms.push({ route: 'duct', door: -9999, floor: d.floor, room: img, dim, inDeck: true, doors: [] });
+        this.ductFloor = s.add.zone(d.x0, d.floor, W, 16).setOrigin(0);
+        s.physics.add.existing(this.ductFloor, true);
+        s.addRouteWall(d.x0 + 24, -1, d.floor, 'duct');
+        s.addRouteWall(d.x1 - 24, 1, d.floor, 'duct');
+    }
+
+    updateDuct(input) {
+        const s = this.scene, p = s.player, d = this.data.duct;
+        if (s.mode !== 'play') return;
+        const linen = this.rooms.linen;
+        // In: crawling into the linen room's vent. Out: back the same way, or down through the far grille.
+        // (→ held through the vent would carry her straight back out: it must be let go once.)
+        if (!input.right) this.ductLatch = false;
+        if (s.route === 'linen' && s.crawling && input.right && !this.ductLatch && p.x >= linen.room.x + 196) {
+            this.ductLatch = true;
+            s.travel(d.x1 - 60, d.floor, 'duct', () => p.setFlipX(true));
+        } else if (s.route === 'duct' && input.right && !this.ductLatch && p.x >= d.x1 - 44) {
+            this.ductLatch = true;
+            s.travel(linen.room.x + 180, linen.floor, 'linen', () => p.setFlipX(true));
+        } else if (s.route === 'duct' && input.downPressed && Math.abs(p.x - d.exitX) < 16) {
+            sfx.smash?.();
+            s.travel(d.dropX, d.floor + 30, 'inside', () => this.progress.setFlag('duct'));
+        }
+    }
+
+    // --- Things in place ------------------------------------------------------------------------
+
+    buildEnt(e) {
+        const s = this.scene, D = s.DEPTH;
+        const depth = this.depthFor(e.route);
+        switch (e.kind) {
+            case 'checkpoint': {
+                // The gangway's is lit from the start (population §2.5).
+                if (e.id === 'cp_gangway' && !this.save.activated.includes(e.id)) this.save.activated.push(e.id);
+                const cp = s.addCheckpoint(e.id, e.x, e.y, { route: e.route });
+                if (e.route === OUTSIDE) cp.items.forEach(i => s.shellSlopes.push({ deck: [6, 7], gfx: i }));
+                break;
+            }
+            case 'tangerine':
+                if (e.needs && !this.progress.has(e.needs)) this.pending.push(e);
+                else this.placeTangerine(e);
+                break;
+            case 'item': {
+                if (this.itemTaken(e)) break;
+                const [type, name] = e.what.split(':');
+                const key = type === 'book' ? `book-${name}` : `icon-${name}`;
+                const items = [];
+                let y = e.y;
+                if (e.route === 'inside') {
+                    const table = s.add.image(e.x, e.y, 'sidetable').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
+                    items.push(table);
+                    y -= table.height;
+                }
+                const img = s.add.image(e.x, y, key).setOrigin(0.5, 1).setDepth(depth + 0.01);
+                items.push(img);
+                this.add(items);
+                const thing = { ...e, items, pick: img, interact: () => this.take(thing) };
+                this.things.push(thing);
+                break;
+            }
+            case 'cat': {
+                const cat = s.addCat(e.id, e.x, e.y, e.activity, e.escape, { route: e.route, lift: e.lift ?? 0, exitX: e.exitX });
+                cat.flag = e.id;
+                cat.needs = e.needs;
+                if (this.progress.has(e.id)) {
+                    cat.gone = cat.away = true;
+                    cat.sprite.setVisible(false);
+                }
+                break;
+            }
+            case 'switch': {
+                const img = s.add.image(e.x, e.y, 'switch-box').setOrigin(0.5, 1).setDepth(depth);
+                const label = s.add.text(e.x, e.y - 26, e.label, {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#2e222f', backgroundColor: '#f9c22b',
+                    padding: { x: 1, y: 1 }, resolution: 4,
+                }).setOrigin(0.5).setDepth(depth);
+                this.add([img, label]);
+                const thing = { ...e, items: [img, label], interact: () => {
+                    if (this.progress.has(e.flag)) return false;
+                    this.progress.setFlag(e.flag);
+                    s.sparkle?.(e.x, e.y - 20);
+                    sfx.checkpoint();
+                    return true;
+                } };
+                this.things.push(thing);
+                break;
+            }
+            case 'push': {
+                const img = s.add.image(e.x, e.y, 'shipart', e.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
+                this.add([img]);
+                const done = () => !e.flag || this.progress.has(e.flag);
+                const x = done() ? e.max : e.x;
+                const zone = s.add.zone(x, e.y, img.width - 4, e.tall && !done() ? 128 : img.height - 4).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                img.x = x;
+                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0,
+                    moveTo: to => {
+                        thing.x = img.x = zone.x = to;
+                        if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
+                            // Free of the doorway: it stands in the corridor, low enough to hop.
+                            zone.setSize(img.width - 4, img.height - 4);
+                            this.progress.setFlag(e.flag);
+                            s.pushing = null;
+                            s.mode = 'play';
+                        }
+                        zone.body.updateFromGameObject();
+                    } };
+                this.pushables.push(thing);
+                this.things.push(thing);
+                break;
+            }
+        }
+    }
+
+    itemTaken(e) {
+        const [type, name] = e.what.split(':');
+        if (type === 'verb') return this.save.verbs.includes(name);
+        if (type === 'book') return !!this.save.books[name];
+        return this.save.items.includes(name) || this.save.seen.includes(e.id);
+    }
+
+    placeTangerine(e) {
+        const s = this.scene, D = s.DEPTH;
+        if (this.save.collected.includes(e.id)) return;
+        let y = e.y;
+        if (e.on === 'table') {
+            if (e.first) {
+                const out = e.route === OUTSIDE;
+                const table = out ? s.add.image(e.x + 4, e.y, 'shipart', 'outdoor-table').setOrigin(0.5, 1).setDepth(D.exterior + 0.1)
+                    : s.add.image(e.x + (e.id.includes('#') ? 4 : 0), e.y, 'sidetable').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
+                this.add([table]);
+                if (out) this.things.push({ id: `${e.id}-table`, x: e.x, y: e.y, route: OUTSIDE, items: [table] });
+            }
+            y -= e.route === OUTSIDE ? 24 : 12;
+        } else {
+            y -= e.on;
+        }
+        s.addTangerine(e.id, e.x, y, e.route);
+    }
+
+    // E at a pickup: a verb (with its key glyph, shown once), a book, a pocket item.
+    take(thing) {
+        const s = this.scene;
+        const [type, name] = thing.what.split(':');
+        if (type === 'verb') {
+            this.progress.learn(name);
+            this.hint(HINTS[name]);
+        } else if (type === 'book') {
+            this.save.books[name] = 'held';
+        } else {
+            this.save.items.push(name);
+        }
+        thing.done = true;
+        thing.pick.destroy();
+        thing.items = thing.items.filter(i => i !== thing.pick);
+        sfx.pickup();
+        writeSave(this.save);
+        this.refresh();
+        return true;
+    }
+
+    // A key glyph over her for a few seconds: how a new verb is used.
+    hint(text) {
+        const s = this.scene;
+        if (!text) return;
+        s.lockedUntil = s.time.now + 3200;
+        s.alert.setText(text).setVisible(true);
+        s.time.delayedCall(3200, () => { if (s.alert.text === text) s.alert.setVisible(false); });
+    }
+
+    // The scripted places that are not rooms: the pool's hatch, the stage's trap door, the linen
+    // room's chute, the tip of the bow.
+    buildSpecials() {
+        const s = this.scene, D = s.DEPTH;
+        const h = this.data.hatchPool;
+        const lid = s.add.image(h.x, h.y + 32, 'hatch-lid').setOrigin(0.5, 1).setDepth(D.poolTank + 0.005);
+        this.add([lid]);
+        this.things.push({ id: 'hatch_pool', x: h.x, y: h.y + 32, route: 'inside', needs: 'drain', items: [lid], reach: 16,
+            interact: () => { sfx.door(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
+        const linen = this.rooms.linen;
+        if (linen) {
+            const x = linen.room.x + 178, y = linen.floor;
+            const chute = s.add.image(x, y - 30, 'hatch-lid').setDepth(D.exterior + 0.13);
+            this.add([chute]);
+            this.things.push({ id: 'chute', x, y, route: 'linen', items: [chute], reach: 14,
+                interact: () => {
+                    const to = this.rooms.laundry;
+                    sfx.whoosh();
+                    s.travel(to.def.x0 + 150, to.floor - 60, 'laundry', () => this.progress.setFlag('chute'));
+                    return true;
+                } });
+        }
+    }
+
+    updateSpecials(time) {
+        const s = this.scene, p = s.player, P = this.progress;
+        if (s.mode !== 'play') return;
+        const onFloor = p.body.blocked.down || p.body.touching.down;
+        // The stage's trap door (population: `haz_trapdoor`): after the rehearsal's beat, standing on
+        // it drops her one deck into the galley; no scare.
+        const t = this.data.trapdoor;
+        if (s.route === 'inside' && onFloor && P.has('bb3') && Math.abs(p.x - t.x) < 7 && Math.abs(p.y - t.y) < 2) {
+            const to = this.rooms.galley;
+            sfx.whoosh();
+            s.travel(to.def.x0 + 250, to.floor - 80, 'galley', () => P.setFlag('trapdoor'));
+            return;
+        }
+        // The tip of the bow (§6.1.9): once he has run there, standing still, she has him.
+        const c = this.data.catch;
+        if (c && s.route === 'inside' && onFloor && P.has('alarm') && !P.has('catch') && Math.abs(p.y - c.y) < 2 && p.x < c.x) {
+            if (Math.abs(p.body.velocity.x) > 5) this.stillAt = time;
+            else if (time - (this.stillAt ?? time) > 3000) {
+                P.setFlag('catch');
+                this.hint('♥');
+            }
+        } else {
+            this.stillAt = time;
+        }
+    }
+
+    // --- Each frame -----------------------------------------------------------------------------
+
+    update(dt, time, input) {
+        const s = this.scene, p = s.player;
+        if (!this.built || !p) return;
+        // Off a ladder between routes: she is on the route of the end she left it at.
+        if (this.onLadder && s.mode !== 'ladder') {
+            const L = this.onLadder;
+            s.route = p.y <= L.y1 + 2 ? L.routeTop : L.routeBottom;
+            this.onLadder = null;
+        }
+        this.updateDuct(input);
+        this.updateSpecials(time);
+        if (s.route !== this.lastRoute) this.refresh();
+        if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -3 : 3), p.y - PLAYER.height + 12);
+    }
+
+    // Gusts along the ship's side push her aft while she is in the air (from region 7's step).
+    push() {}
+
+    // E: a cart's end, a pickup, a switch, a hatch.
+    interact() {
+        const s = this.scene, p = s.player;
+        for (const t of this.pushables) {
+            if (t.route !== s.route || Math.abs(p.y - t.y) > 4 || (t.flag && this.progress.has(t.flag) && !t.free)) continue;
+            const side = p.x < t.x ? -1 : 1;
+            if (t.sides && side !== t.sides) continue;
+            if (Math.abs(Math.abs(p.x - t.x) - (t.width / 2 + PLAYER.bodyWidth / 2)) < 10) return s.startPush(t);
+        }
+        for (const t of this.things) {
+            if (!t.interact || t.done || !this.shown(t)) continue;
+            if (Math.abs(p.x - t.x) > (t.reach ?? 18) || Math.abs(p.y - t.y) > 8) continue;
+            if (t.interact() !== false) return true;
+        }
+        return false;
+    }
+
+    shown(t) {
+        return !t.done && this.progress.has(t.needs) && (t.route === 'inside' || t.route === this.scene.route);
+    }
+
+    showParasol(on) {
+        const s = this.scene;
+        if (!this.parasol) {
+            if (!on) return;
+            this.parasol = s.add.image(0, 0, 'parasol-open').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.02);
+            this.add([this.parasol]);
+        }
+        this.parasol.setVisible(on);
+    }
+
+    // What a flag changes (the builder's `flagGives`): a verb learned at a beat, another flag.
+    onFlag(name) {
+        for (const g of this.data.flagGives[name] || []) {
+            const [type, what] = g.split(':');
+            if (type === 'verb') {
+                this.progress.learn(what);
+                this.hint(HINTS[what]);
+            } else {
+                this.progress.setFlag(what);
+            }
+        }
+        if (name === 'drain') this.drainPool(false);
+        this.refresh();
+    }
+
+    // The first pool drains (population §6.7): its water goes, and with it the swimming; the hatch
+    // in the tank's floor shows.
+    drainPool(atOnce) {
+        const s = this.scene, h = this.data.hatchPool;
+        const pool = s.pools.find(w => h.x > w.x0 && h.x < w.x1 && w.deck === 11);
+        if (!pool) return;
+        s.pools = s.pools.filter(w => w !== pool);
+        if (s.mode === 'swim' && s.pool === pool) {
+            // The water goes from under her: she stands in the tank.
+            s.mode = 'play';
+            s.pool = null;
+            s.player.setDepth(s.DEPTH.player);
+            s.player.body.enable = true;
+            s.player.body.reset(s.player.x, pool.y);
+        }
+        const gone = () => [pool.water, pool.ripples].forEach(o => o.setVisible(false));
+        if (atOnce) gone();
+        else s.tweens.add({ targets: [pool.water, pool.ripples], alpha: 0, duration: 5000, onComplete: gone });
+    }
+
+    // What shows now: things whose flag has come, things in the room she is in; rooms that appear.
+    refresh() {
+        if (!this.built) return;
+        const s = this.scene, P = this.progress;
+        this.lastRoute = s.route;
+        for (const e of this.pending.slice()) {
+            if (!P.has(e.needs)) continue;
+            this.pending.splice(this.pending.indexOf(e), 1);
+            this.placeTangerine(e);
+        }
+        for (const t of this.things) {
+            const on = this.shown(t);
+            for (const i of t.items) i.setVisible(on);
+        }
+        for (const r of Object.values(this.rooms)) {
+            if (!r.def) continue;
+            r.hidden = !!r.needs && !P.has(r.needs);
+            r.outside.forEach(o => o.setVisible(!r.hidden));
+        }
+        for (const cat of s.cats) {
+            if (!cat.flag) continue;
+            cat.hidden = !P.has(cat.needs);
+            if (cat.route === 'inside') cat.sprite.setVisible(!cat.hidden && !cat.away);
+        }
+        for (const g of this.gates || []) {
+            const open = P.flagSet(g.needs);
+            g.tiles.forEach(t => t.setAlpha(open ? 1 : 0));
+            g.lid.setVisible(!open);
+        }
+        this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
+    }
+
+    addColliders(p) {
+        const s = this.scene;
+        s.physics.add.collider(p, this.platZones, null, (_, z) => s.route === OUTSIDE
+            && (z.plat.solid || (s.droppingThrough !== z.plat && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
+        s.physics.add.collider(p, this.wallZones, null, () => s.route === OUTSIDE);
+        s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
+        for (const t of this.pushables) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+    }
+
+    // The books' count, under the card slots (population §2.8).
+    buildHud(layer) {
+        const s = this.scene;
+        this.hudBooks = s.add.text(24, 114, '', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
+        });
+        layer.add(this.hudBooks);
+        this.refresh();
+    }
+}

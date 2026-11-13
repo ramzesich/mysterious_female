@@ -42,6 +42,9 @@ truth**: read the relevant section before any design or content work, and record
 | `docs/population.md` | **The population spec**: every person, hazard, item, secret, room and scene in place (deck, metres, behaviour), the corridors designed beat by beat; the build populates the ship from it (§6.1.13, phase 1) |
 | `tools/draw_regions.py` | The progression plan (§6.1) drawn on the real ship (`docs/ship-regions.png`, `docs/ship-unlock-order.png`), from its own lists of regions, routes and steps; needs `tools/render_ship.py`'s picture |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
+| `tools/population.py` | **The plan's world as data**: rooms behind doors, checkpoints, tangerines, pickups, Bumbot's beats, pushables, grips; `tools/build_world.py` turns it into `maps/world.json` (written with the map by `python tools/build_ship_map.py`) |
+| `src/world/world.js`, `verbs.js` | The plan's world in the game: builds everything in `maps/world.json` (rooms, the outside route of promenade, boat walkway and balconies, the duct, the funnel's top, things in place), answers E, ladders and grips; her verbs (crawl, wall jump, glide, push), mixed into the ship scene |
+| `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
 
 ## Rules that are easy to break

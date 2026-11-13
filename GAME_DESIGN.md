@@ -1416,7 +1416,11 @@ Mechanisms from the blockout, there to be used or dropped as the design needs. T
   use for now (`LOCKED_PARTS` in `src/config.js` is off); until it is on, the deck she is on is cut
   open whole.
 - **The locks of §6.1** (`src/progression.js`, data in `tools/ship_layout.py`): on since step 0
-  (`KEY_CARDS.required`; `?cards=all` opens everything, for testing round the ship).
+  (`KEY_CARDS.required`; `?cards=all` opens everything and gives every verb, for testing round the
+  ship).
+- **The plan's world** (`src/world/`, data in `tools/population.py`, since step 0): rooms behind
+  doors with several ways out and their own locks; the outside route; grips for wall jumps; things
+  placed on decks and in rooms that appear on a flag; flags that give verbs or other flags.
 
 ### 6.3 Tangerines
 
@@ -1911,16 +1915,20 @@ Nothing blocks the start of the build. These get settled along the way:
       other decks, sky, sea and the deck's end walls, as round a room; nothing dimmed out in the
       open. The bridge and the spa open with their decks for now (`LOCKED_PARTS` off). The picture
       by the spa's wall on deck 11 moved clear of its sign
-- [ ] **Start the next session here: step 0 of `docs/build-plan.md`, the skeleton**, in rounds on
-      branch `step-0-skeleton`: (1) the locks, **done 2026-11-13** (`src/progression.js`; cards on
-      crew ways only, public stairs and doors roped, the user's choice); (2) the new vertical ways and
-      bare rooms; (3) the verbs bare; (4) the flags, checkpoints, tangerines, books; (5) the golden path
-      to the catch and the user's walk. (The plan is
-      §6.1, decided 2026-11-10; every entity's place and behaviour is `docs/population.md`; the
-      step-by-step build plan is `docs/build-plan.md`, decided 2026-11-11, merged to `main`). Step 0
-      turns the locks on, adds the new vertical ways and the verbs bare, places the beats as flags,
-      and ends in the `golden` and `sweep` playtests. Then step 1, region 1, and on in play order;
-      mark each step done here as it lands. Work on a branch per step
+- [x] **Step 0 of `docs/build-plan.md`, the skeleton** (done 2026-11-13, branch `the-build`): the
+      locks (`src/progression.js`); the plan's world as data (`tools/population.py` →
+      `maps/world.json` → `src/world/`): eighteen bare rooms behind doors, the outside route (the
+      promenade, the boat walkway up its gated ladder, the balconies with their partitions), the
+      duct, the chute, the pool's drain and hatch, the bridge's hatch, the funnel's stairway and
+      top, the checkpoints, the tangerines, the books and the verbs as pickups, Bumbot's six beats
+      with his built near-catch; the verbs bare (`src/world/verbs.js`: crawl, wall jump, glide,
+      push); the `golden` playtest walks the gangway to the catch, `sweep` tries every lock from the
+      wrong side. What changed against the plan on the way, and why: `docs/progress-decisions.md`
+- [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
+      the whole plan on branch `the-build` without stopping for review, deciding alone, recording
+      every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
+      step 1 of `docs/build-plan.md`, region 1 (decks 4 and 5)**; then on in play order. Mark each
+      step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;

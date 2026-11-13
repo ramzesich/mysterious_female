@@ -112,6 +112,10 @@ ROWS = WATER_ROW + 11                      # the hull below the waterline, down 
 
 
 
+WINDSCREEN_ROWS = 6              # the Spinnaker balcony's windscreen: 96 px, over her jump (68)
+BRIDGE_HATCH_COL = SEA + 86      # 28.8 m: just inside the bridge on deck 10, just forward of the spa's wall on 11
+
+
 def lock_text(lock):
     """A lock (ship_layout's FLIGHT_LOCKS, DOOR_LOCKS, END_WALL_LOCKS) as the game reads it:
     "card:off:-1", "oneway:1", "flag:bb2", "block:wedding"; "" for none."""
@@ -357,6 +361,11 @@ def build_layers():
                 # no glass rail stub there); so does the Great Outdoors' railing at deck 11's stern
                 # (the user, 2026-11-07). The rail stays, solid and unseen.
                 fill(solid, c, c, floor - 2, floor - 1, BALCONY_RAIL)
+                # Deck 12's front, the Spinnaker balcony's: a tall glass windscreen, too tall to jump,
+                # so the balcony forward of the spa below is reached only through the bridge's hatch
+                # (§6.1.9).
+                if deck == 12 and inward == 1:
+                    fill(solid, c, c, floor - WINDSCREEN_ROWS, floor - 1, BALCONY_RAIL)
             else:
                 fill(solid, c, c, floor - 2, floor - 1, GLASS_RAIL if deck >= 11 else RAILING)
 
@@ -429,6 +438,11 @@ def build_layers():
     lc = funnel_ladder_col()
     solid[ROOF_ROW][lc] = LADDER_TOP
     fill(ladders, lc, lc, ROOF_ROW, FLOOR_ROW[12] - 1, LADDER)
+
+    # The bridge's emergency hatch (§6.1.9): a ladder at its forward end up through deck 11's floor
+    # to the balcony forward of the spa; shut and out of sight until the alarm (the game).
+    solid[FLOOR_ROW[11]][BRIDGE_HATCH_COL] = LADDER_TOP
+    fill(ladders, BRIDGE_HATCH_COL, BRIDGE_HATCH_COL, FLOOR_ROW[11], FLOOR_ROW[10] - 1, LADDER)
 
     return back, solid, ladders, build_exterior()
 
@@ -601,6 +615,12 @@ def shell_owner(deck, c):
     return next((r["key"] for r in shell_rooms() if r["deck"] == deck and r["x0"] <= c * TILE < r["x1"]), deck)
 
 
+# Each balcony drawn on the shell, (deck, x of its forward partition): the outside route's floors and
+# partitions (tools/build_world.py). The partitions' height over the balcony's floor.
+BALCONY_UNITS = []
+PARTITION_H = 88
+
+
 def shell_details(ext, solid):
     """What is on the outside of the shell, as shapes for the game to draw over it: each listed
     under the deck whose wall it is on (it fades with that deck's cut-away) or under "fixed".
@@ -608,6 +628,7 @@ def shell_details(ext, solid):
     windows on the public rooms, the bridge's window band, the open decks' bulwark and windscreen,
     and on top the roof's edge, the funnel, the mast and the radar domes."""
     out = {}
+    BALCONY_UNITS.clear()
 
     def put(owner, shape):
         out.setdefault(str(owner), []).append(shape)
@@ -817,8 +838,12 @@ def shell_details(ext, solid):
                     rect(own, x + 6, floor - 48, unit - 6, 40, "#a3c4d4")
                     rect(own, x + 6, floor - 36, unit - 6, 1, "#c7e4ef")
                     rect(own, x + 6, floor - 50, unit - 6, 3, "#f4f4f4")
-                    rect(own, x, floor - 116, 6, 108, "#f4f4f4")
-                    rect(own, x + 5, floor - 116, 1, 108, "#c7dcd0")
+                    # The partition: taller than her jump, short of the ceiling (a wall jump gets
+                    # over it, §6.1.3, region 7); the game's outside route reads the units.
+                    rect(own, x, floor - PARTITION_H, 6, PARTITION_H - 8, "#f4f4f4")
+                    rect(own, x + 5, floor - PARTITION_H, 1, PARTITION_H - 8, "#c7dcd0")
+                    rect(own, x, floor - PARTITION_H, 6, 1, "#c7dcd0")
+                    BALCONY_UNITS.append((deck, x))
         # The open decks up top: a white bulwark with a glass windscreen above it, all along (deck
         # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:
         # glass_walls_11()).
@@ -1072,9 +1097,6 @@ def build_objects():
 
     # Tangerines (§6.3): none for now (the user, 2026-11-09), until it is decided whether the dash
     # stays. The game still places a `tangerine` point, on a side table.
-    for i in range(2):
-        for j in range(2):
-            add(area(f"crate-{i}-{j}", "breakable", (col(232) + i) * TILE, floor_y(4) - (j + 1) * TILE, TILE, TILE))
 
     # Escape trunks (§5.1): a door on each deck listed, top to bottom, all at the same x. Each door
     # sits on an indoor wall, clear of the stair cores and the atrium.
@@ -1346,7 +1368,7 @@ def build_objects():
         add(area(f"rail-11-{i}", "glasswall", a, floor_y(11), b - a, 0, [prop("style", "railing")]))
     # So is deck 12's, the Spinnaker's balcony (the user, 2026-11-07).
     fa, fb = front_bulwark_12()
-    add(area("bulwark-12", "bulwark", fa, floor_y(12), fb - fa, 0))
+    add(area("bulwark-12", "bulwark", fa, floor_y(12), fb - fa, 0, [prop("glass", WINDSCREEN_ROWS * TILE, "int")]))
     # The end walls she passes behind: deck 7's front, to the mooring deck; deck 8's two ends.
     for deck, wa, wb in end_walls():
         end = "fore" if metres(wa) < sum(EXTENT[deck]) / 2 else "aft"
@@ -1779,6 +1801,15 @@ def build_objects():
     # navy lattice raked back at the front, the NCL logo on its aft part, exhaust pipes and a bit of
     # white smoke.
     add(area("funnel", "funnel", x_of(FUNNEL[0]) - 8, ROOF_ROW * TILE, x_of(FUNNEL[1]) - x_of(FUNNEL[0]) + 16, 0))
+    # The funnel's stairway (§6.1.10): from the roof by the ladder's top up over the casing's
+    # shoulder, then up the lattice's raked front to the top (tools/build_world.py's funnel_top()).
+    from build_world import funnel_top
+    ft = funnel_top()
+    for name, (ax, ay), (bx, by) in (("a", ft["foot"], ft["shoulder"]), ("b", ft["shoulder"], ft["head"])):
+        add({"id": 0, "name": f"stairs-funnel-{name}", "type": "stairs", "x": ax, "y": ay,
+             "width": 0, "height": 0, "rotation": 0, "visible": True,
+             "polyline": [{"x": 0, "y": 0}, {"x": bx - ax, "y": by - ay}],
+             "properties": [prop("lock", ""), prop("look", "steel")]})
     # The ship's name on the white base under the funnel (the user's photo): white on navy.
     add(area("name-board", "nameboard", exact_x(NAME_BOARD[0]), ROOF_ROW * TILE - 52,
              exact_x(NAME_BOARD[1]) - exact_x(NAME_BOARD[0]), 30, [prop("text", "NORWEGIAN SUN")]))
@@ -2304,9 +2335,20 @@ def build_tileset():
     return out
 
 
-if __name__ == "__main__":
+def main():
     map_path = ROOT / "maps" / "ship.json"
     map_path.parent.mkdir(parents=True, exist_ok=True)
     map_path.write_text(json.dumps(build_map(), separators=(",", ":")), encoding="utf-8")
+    # The plan's world (tools/population.py), with this run's positions.
+    from build_world import build_world
+    world_path = ROOT / "maps" / "world.json"
+    world_path.write_text(json.dumps(build_world(), separators=(",", ":")), encoding="utf-8")
     print("wrote", map_path.relative_to(ROOT))
+    print("wrote", world_path.relative_to(ROOT))
     print("wrote", build_tileset().relative_to(ROOT))
+
+
+if __name__ == "__main__":
+    # Through the module as imported, so tools/build_world.py sees this run's state (the balconies).
+    import build_ship_map
+    build_ship_map.main()

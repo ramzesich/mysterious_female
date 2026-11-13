@@ -55,6 +55,7 @@ class Browser:
         self.http_port = free_port()
         handler = functools.partial(Quiet, directory=str(ROOT))
         self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", self.http_port), handler)
+        self.httpd.handle_error = lambda *a, **k: None      # Chrome dropping a connection is no news
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
         self.debug_port = free_port()
@@ -137,8 +138,8 @@ class Browser:
             return { mode: s.mode, x: Math.round(p.x), y: Math.round(p.y), tangerines: s.save.tangerines,
                      dashing: s.isDashing(), activated: s.save.activated.slice() }; })()""")
 
-    def teleport(self, x, y):
-        self.eval(f"window.__ship.spawnAt({{x: {x}, y: {y}}})")
+    def teleport(self, x, y, route="inside"):
+        self.eval(f"window.__ship.spawnAt({{x: {x}, y: {y}, route: '{route}'}})")
         time.sleep(0.3)
 
     def shot(self, name):
@@ -451,6 +452,7 @@ def scenario_atrium(b):
 
 def scenario_pool(b):
     b.open("?reset&play&cards=all")
+    b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # Bumbot's beat at the rim is not this test's
     a, z = POOLS[0]
     # Deck 12's side walk over the pool area: along it, and down through it with ↓.
     b.teleport(col(POOL_OPENING[0]) * TILE - 16, D12)
@@ -661,6 +663,7 @@ def scenario_idle(b):
 
 def scenario_falls(b):
     b.open("?reset&play")
+    b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # (Bumbot at the pool's rim would stop her)
     # One deck: down through deck 12's walk onto deck 11's pool area, between the pools.
     b.teleport(x_of(132.5), D12)
     time.sleep(0.3)
@@ -698,7 +701,7 @@ def scenario_dash(b):
     b.open("?reset&play")
     b.teleport(x_of(236) + 6, D4)  # behind the crate stack on deck 4
     time.sleep(0.3)
-    b.eval("window.__ship.save.tangerines = 1")  # none are placed on the ship for now (§6.3)
+    b.eval("window.__ship.save.tangerines = 1; window.__ship.save.verbs.push('dash')")  # the dash is learned at near-catch 1
     b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(228)}; window.__ship.vacuums[0].speed = 0")
     b.tap("d")
     time.sleep(0.2)
@@ -789,7 +792,46 @@ def take_card(b, card):
     return card in save_list(b, "cards")
 
 
+def flags(b):
+    return save_list(b, "flags")
+
+
+def route(b):
+    return b.eval("window.__ship.route")
+
+
+def wait_flag(b, flag, timeout=12):
+    """A scene sets its flag when it is over."""
+    end = time.time() + timeout
+    while time.time() < end:
+        if flag in flags(b) and b.state()["mode"] == "play":
+            return True
+        time.sleep(0.2)
+    return False
+
+
+def room(b, name):
+    return b.eval(f"(r => ({{ x0: r.def.x0, floor: r.floor, doors: r.doors }}))(window.__ship.world.rooms['{name}'])")
+
+
+def hold_until(b, keys, cond, timeout=10):
+    """Holds keys until `cond(state)`; the state it stopped at."""
+    keys = [keys] if isinstance(keys, str) else keys
+    for k in keys:
+        b.key(k, True)
+    end = time.time() + timeout
+    s = b.state()
+    while time.time() < end and not cond(s):
+        time.sleep(0.05)
+        s = b.state()
+    for k in keys:
+        b.key(k, False)
+    return s
+
+
 def scenario_golden(b):
+    """The whole route, the gangway to the catch, every lock opened the intended way (step 0 of
+    docs/build-plan.md): teleports only within regions she has opened, the mechanics with real keys."""
     b.open("?reset&play")
     ok = check(save_list(b, "regions") == [1] and save_list(b, "cards") == [], "starts in region 1 with no cards",
                save_list(b, "regions"))
@@ -800,6 +842,13 @@ def scenario_golden(b):
     b.tap("e")
     time.sleep(0.15)
     ok &= check("Deck" in alert(b), "the midships crew trunk wants the Deck card", alert(b))
+    # Near-catch 1 at the Seven Seas: the scream, and the dash is hers.
+    b.tap("d")
+    ok &= check(not b.state()["dashing"], "no dash before she has seen him")
+    go(b, 5, 244)
+    b.hold("right", 1.6)
+    ok &= check(wait_flag(b, "bb1"), "near-catch 1 at the Seven Seas' pass", flags(b))
+    ok &= check("dash" in save_list(b, "verbs"), "the dash is learned there", save_list(b, "verbs"))
     ok &= check(take_card(b, "deck"), "the Deck card, at the gangway")
     # Region 2: up the crew trunk into Bliss.
     go(b, 4, 125)
@@ -809,16 +858,19 @@ def scenario_golden(b):
     ok &= check(2 in save_list(b, "regions"), "with it, up the trunk to deck 6: region 2 opens", b.state())
     s = climb(b, "stairs-forward-5-6", 2.6)
     ok &= check(s["mode"] == "stairs", "and the forward stairs' rope is gone", s)
-    # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2, a trigger for now).
+    # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2).
     shut = not use_door(b, 6, 194, -1)
     ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off", alert(b))
-    go(b, 6, 175)
-    b.hold("right", 1.3)
-    ok &= check("bb2" in save_list(b, "flags"), "near-catch 2 at the reading table", save_list(b, "flags"))
+    go(b, 6, 174)
+    b.hold("right", 1.2)
+    ok &= check(wait_flag(b, "bb2"), "near-catch 2 at the reading table", flags(b))
     ok &= check(use_door(b, 6, 194, -1), "then the aft door opens")
     b.hold("right", 1.2)
     ok &= check(3 in save_list(b, "regions"), "region 3 beyond it", b.state())
-    # Region 3: the stage manager's card (on the stage for now); the trunk from Bliss up to deck 9.
+    # Region 3: the stage, near-catch 3; the card; the trunk from Bliss up to deck 9.
+    go(b, 6, 245.5)
+    b.hold("right", 1.0)
+    ok &= check(wait_flag(b, "bb3"), "near-catch 3 on the stage", flags(b))
     ok &= check(take_card(b, "ent"), "the Entertainment card, on the stage")
     go(b, 6, 118)
     b.tap("e")
@@ -827,18 +879,146 @@ def scenario_golden(b):
     ok &= check(s["mode"] == "trunk" and s["y"] == D9, "the red trunk from Bliss climbs to deck 9", s)
     b.hold("right", 0.6)
     ok &= check(4 in save_list(b, "regions"), "region 4: deck 9's corridor", b.state())
-    go(b, 9, 112)
-    b.teleport(b.eval("window.__ship.rooms.find(r => r.route === 'linen').door"), D9)     # its door, as snapped
+    # Region 4: the steward's cart fills the corridor until she pushes it free.
+    b.hold("right", 1.6)
+    s = b.state()
+    ok &= check(s["x"] < exact_x(122.6), "the steward's cart blocks the corridor", s)
+    b.hold(["right", "space"], 0.7)
+    ok &= check(b.state()["x"] < exact_x(122.6), "and can't be hopped where it is jammed", b.state())
+    time.sleep(0.5)
+    b.tap("e")
+    b.hold("right", 6.6)
+    ok &= check("cart_free" in flags(b), "pushed along to 130 m, it is free", b.state())
+    b.hold(["right", "space"], 0.7)
+    b.hold("right", 0.4)
+    ok &= check(b.state()["x"] > exact_x(130), "and she hops it there", b.state())
+    linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
+    b.teleport(linen, D9)
     b.tap("e")
     time.sleep(0.15)
-    ok &= check("Housekeeping" in alert(b) and b.eval("window.__ship.route") == "inside",
-                "the linen room's crew door wants the Housekeeping card", alert(b))
-    ok &= check(take_card(b, "hk"), "the Housekeeping card, from the steward")
-    go(b, 9, 112)
-    b.teleport(b.eval("window.__ship.rooms.find(r => r.route === 'linen').door"), D9)     # its door, as snapped
+    ok &= check("Housekeeping" in alert(b) and route(b) == "inside", "the linen room's crew door wants the Housekeeping card", alert(b))
+    ok &= check(take_card(b, "hk"), "the Housekeeping card, past the cart")
+    b.teleport(linen, D9)
     b.tap("e")
     time.sleep(0.8)
-    ok &= check(b.eval("window.__ship.route") == "linen", "with it, into the linen room")
+    ok &= check(route(b) == "linen", "with it, into the linen room")
+    # Near-catch 4 in the towels; crawling is learned; the vent, the duct, the drop into deck 8.
+    b.hold("right", 0.5)
+    ok &= check(wait_flag(b, "bb4"), "near-catch 4 in the towel heap", flags(b))
+    ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned there")
+    b.hold(["down", "right"], 2.2)
+    time.sleep(0.7)
+    ok &= check(route(b) == "duct", "crawling into the vent: the duct", b.state())
+    b.hold("left", 13.6)
+    b.tap("down")
+    time.sleep(1.6)
+    s = b.state()
+    ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"),
+                "out of its far grille, down into deck 8 forward: region 5", s)
+    # Region 5: the lobby door opens from inside; the forward stairs go on up to deck 11.
+    ok &= check(use_door(b, 8, 74, -1), "deck 8's lobby door opens from the corridor")
+    (x0, y0), _ = flight_feet("stairs-forward-8-9")
+    b.teleport(x0, y0)
+    b.hold("up", 9.5)
+    s = b.state()
+    ok &= check(s["y"] == D11 and 6 in save_list(b, "regions"), "up the forward stairs to deck 11: region 6", s)
+    # Region 6: the socks; near-catch 5 drains the pool; the hatch into deck 10.
+    go(b, 11, 96)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check("socks" in save_list(b, "verbs"), "the grip socks, in the gym")
+    go(b, 11, 133.4)
+    b.hold("left", 0.5)
+    ok &= check(wait_flag(b, "bb5"), "near-catch 5 at the pool's rim", flags(b))
+    ok &= check("drain" in flags(b), "and the pool drains")
+    time.sleep(0.5)
+    b.hold("left", 2.6)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D11 + 32, "she walks down into the empty tank", s)
+    b.teleport(x_of(125), D11 + 32)
+    b.tap("e")
+    time.sleep(1.6)
+    s = b.state()
+    ok &= check(s["y"] == D10, "the hatch in its floor drops her into deck 10's hallway", s)
+    # Region 8: with the socks, up the sun cover's post at the Great Outdoors, along it to deck 12.
+    b.teleport(exact_x(233) + 13, D11)
+    b.key("space", True)
+    time.sleep(0.34)
+    b.key("space", False)
+    time.sleep(0.02)
+    b.key("left", True)
+    b.key("space", True)
+    time.sleep(0.2)
+    b.key("space", False)
+    time.sleep(1.0)
+    b.key("left", False)
+    s = b.state()
+    ok &= check(s["y"] < D11 - 100, "a wall jump up the post lands her on the sun cover", s)
+    b.hold("left", 3.4)
+    b.hold(["left", "space"], 0.8)
+    b.hold("left", 0.5)
+    s = b.state()
+    ok &= check(s["y"] == D12 and 8 in save_list(b, "regions"), "along the cover and over the rail: deck 12, region 8", s)
+    # The funnel: the ladder to the roof, the stairway, the top, the horn.
+    b.teleport(LADDER_X, D12)
+    b.hold("up", 3.0)
+    b.hold("right", 0.5)
+    b.hold("up", 8.6)
+    s = b.state()
+    top = b.eval("window.__ship.world.data.funnel.y")
+    ok &= check(s["mode"] == "play" and s["y"] == top, "up the funnel's stairway to its top", s)
+    b.teleport(exact_x(186) - 6, top)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check("horn" in flags(b), "the horn", flags(b))
+    ok &= check(take_card(b, "off"), "the Officer's card, dropped on the sun deck")
+    go(b, 12, 130)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check("parasol" in save_list(b, "verbs"), "and the parasol, at the empty sunbed")
+    # Region 9: the cake clears the forward lobby; down the bow with the gold card to the bridge.
+    ok &= check(not use_door(b, 12, 82, 1), "Champs' door to the forward lobby is still shut: the wedding", alert(b))
+    go(b, 12, 84)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check("wedding" in flags(b) and use_door(b, 12, 82, 1), "the cake delivered, it opens")
+    b.hold("left", 1.0)
+    ok &= check(9 in save_list(b, "regions"), "region 9: deck 12's forward lobby", b.state())
+    _, (x1, y1) = flight_feet("stairs-forward-11-12")
+    b.teleport(x1, y1)
+    b.hold("down", 1.0)
+    ok &= check(b.state()["mode"] == "stairs", "the forward stairs down from deck 12 are clear of the party", b.state())
+    go(b, 10, 78)
+    ok &= check(use_door(b, 10, 74, 1), "the gold card opens the officers' corridor")
+    b.hold("left", 0.8)
+    b.teleport(exact_x(40) + 16, D10)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check(door_open(b, "bridge-door"), "and the bridge's door")
+    b.hold("left", 3.0)
+    ok &= check(wait_flag(b, "bb6"), "near-catch 6 on the bridge", flags(b))
+    ok &= check("alarm" in flags(b), "the alarm")
+    # Region 10: the hatch, the glide down to the bow, the catch.
+    hatch = b.eval("window.__ship.world.gates[0].x")
+    b.teleport(hatch, D10)
+    b.hold("up", 3.4)
+    b.hold("left", 0.3)
+    s = b.state()
+    ok &= check(s["y"] == D11 and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa", s)
+    b.hold("left", 1.6)          # to the front rail
+    b.key("left", True)
+    b.key("space", True)         # over it, and the parasol opens as she falls
+    time.sleep(2.4)
+    b.key("left", False)
+    s = hold_until(b, [], lambda s: s["y"] >= D7 or s["mode"] != "play", 14)
+    b.key("space", False)
+    time.sleep(0.5)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D7 and s["x"] < x_of(21), "the parasol carries her down to the mooring deck", s)
+    b.shot("golden-bow")
+    b.hold("left", 6.0)
+    time.sleep(3.6)
+    ok &= check("catch" in flags(b), "at the tip of the bow, standing still: the catch", (b.state(), flags(b)))
     b.shot("golden-end")
     return ok
 
@@ -893,6 +1073,65 @@ def scenario_sweep(b):
         s = b.state()
         held = s["x"] >= max(bx) if side > 0 else s["x"] <= min(bx)
         ok &= check(held, f"deck {deck}'s {end} end wall holds her on its locked side ({lock[0]})", s)
+    # The plan's rooms: a card door stays shut without its card; an aired balcony cabin's corridor
+    # door is shut from the corridor.
+    doors = b.eval("Object.values(window.__ship.world.rooms).filter(r => r.def).flatMap(r => r.doors.filter(d => d.lock).map(d => "
+                   "({ id: d.id, x: d.outX, y: d.outY, route: d.outRoute, lock: d.lock })))")
+    for d in doors:
+        if d["lock"].startswith("flag"):
+            continue          # the balcony guest's own door, opened from inside (region 7's step)
+        b.teleport(d["x"], d["y"], d["route"])
+        b.tap("e")
+        time.sleep(0.4)
+        ok &= check(route(b) == d["route"], f"the door of {d['id']} shut ({d['lock']})", route(b))
+    ok &= check(len(doors) >= 12, "every locked room door was tried", len(doors))
+    # The lifeboat station's ladder wants the Deck card from below.
+    gate = b.eval("window.__ship.world.ladders[0]")
+    b.teleport(gate["x"], gate["y0"], "promenade")
+    b.hold("up", 0.5)
+    ok &= check(b.state()["mode"] == "play" and "Deck" in alert(b), "the boat walkway's ladder wants the Deck card", alert(b))
+    # The bridge's hatch is shut until the alarm.
+    hatch = b.eval("window.__ship.world.gates[0].x")
+    b.teleport(hatch, D10)
+    b.hold("up", 0.6)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D10, "the bridge's hatch is shut before the alarm", s)
+    # The Spinnaker balcony's windscreen bars the jump down to the balcony forward of the spa.
+    b.teleport(x_of(34), D12)
+    b.hold("left", 1.0)
+    b.hold(["left", "space"], 0.8)
+    b.hold("left", 0.6)
+    s = b.state()
+    ok &= check(s["y"] == D12, "deck 12's windscreen can't be jumped", s)
+    # The verbs are learned: no wall jump without the socks, no glide without the parasol, no crawl
+    # before the linen room's beat, no dash before the first sight of him.
+    b.teleport(exact_x(233) + 13, D11)
+    b.key("space", True)
+    time.sleep(0.34)
+    b.key("space", False)
+    time.sleep(0.02)
+    b.hold(["left", "space"], 0.2)
+    b.hold("left", 1.0)
+    s = b.state()
+    ok &= check(s["y"] == D11, "no wall jump up the sun cover's post without the socks", s)
+    b.key("space", True)
+    b.teleport(x_of(238), D11 - 110)        # in the air over the Great Outdoors, jump held
+    time.sleep(0.4)
+    s = b.state()
+    b.key("space", False)
+    ok &= check(s["y"] == D11, "no glide without the parasol: she just falls", s)
+    linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
+    b.teleport(linen, D9, "linen")
+    b.hold(["down", "right"], 2.4)
+    time.sleep(0.6)
+    ok &= check(route(b) == "linen" and not b.eval("window.__ship.crawling"), "no crawling into the vent before the beat", route(b))
+    # The stage's trap door is shut before the rehearsal's beat.
+    trap = b.eval("window.__ship.world.data.trapdoor")
+    b.teleport(trap["x"] - 30, trap["y"])
+    b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # (he would stop her on the way)
+    b.hold("right", 0.5)
+    time.sleep(0.6)
+    ok &= check(route(b) == "inside", "the trap door holds before the beat", route(b))
     # The elevators light only region 1's landings at the start.
     lit = b.eval("window.__ship.lifts.map(l => l.floors.filter(f => window.__ship.progress.regionOpen(f.region)).map(f => f.deck))")
     ok &= check(all(sorted(x) in ([4, 5], [5]) for x in lit), "the elevators light only decks 4-5 at the start", lit)

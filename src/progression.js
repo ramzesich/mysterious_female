@@ -158,6 +158,20 @@ export class Progression {
         return this.openAll || !name || this.save.flags.includes(name);
     }
 
+    // Whether something has really happened (never opened by ?cards=all: the story's own state).
+    has(name) {
+        return !name || this.save.flags.includes(name);
+    }
+
+    // Her ways to move (§6.1.2): the dash, crawling, the grip socks, the parasol.
+    knows(verb) {
+        return this.openAll || this.save.verbs.includes(verb);
+    }
+
+    learn(verb) {
+        if (!this.save.verbs.includes(verb)) this.open('verbs', verb);
+    }
+
     blockLifted(id) {
         if (this.openAll) return true;
         if (id.startsWith('flag:')) return this.flagSet(id.slice(5));
@@ -247,7 +261,9 @@ export class Progression {
     }
 
     setFlag(name) {
-        if (!this.save.flags.includes(name)) this.open('flags', name);
+        if (this.save.flags.includes(name)) return;
+        this.open('flags', name);
+        this.scene.world?.onFlag(name);
     }
 
     // E by a card on its table: hers.
@@ -269,6 +285,7 @@ export class Progression {
             c.items.forEach(i => i.setVisible(there));
         }
         this.hudSlots?.forEach(({ card, rect }) => rect.setFillStyle(CARD_COLOURS[card], this.save.cards.includes(card) ? 1 : 0.15));
+        this.scene.world?.refresh();
     }
 
     // Four card slots under the tangerine count (§2.8 of the population spec), lit when held.

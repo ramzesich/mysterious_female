@@ -27,6 +27,8 @@ east, background props muted; a scare keeps everything collected; a tray never s
 
 ## Step 0: the skeleton
 
+**Done (2026-11-13).** What changed against this list on the way: `docs/progress-decisions.md`.
+
 The whole route proven before any polish. Everything that moves the layout goes in here.
 
 - **Locks on:** `LOCKED_PARTS` and `KEY_CARDS.required`; every reader of the spec's §2.6 in its

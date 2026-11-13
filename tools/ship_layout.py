@@ -215,13 +215,15 @@ CARDS = {"deck": "blue", "ent": "red", "hk": "green", "off": "gold"}
 # with their ways (step 0's second round).
 REGIONS = {
     1: [(4, 0, 258, "inside"), (5, 0, 258, "inside")],
-    2: [(6, 0, 194, "inside"), (6, 100, 231, "promenade"), (7, 74, 110, "inside")],
+    2: [(6, 0, 194, "inside"), (6, 100, 231, "promenade"), (7, 74, 110, "inside"),
+        (7, 100, 231, "promenade")],                      # the boat walkway, up the lifeboat station's ladder
     3: [(6, 194, 258, "inside"), (7, 110, 258, "inside")],
     4: [(8, 82, 110, "inside"), (9, 82, 194, "inside"), (10, 82, 110, "inside"),
         (8, 194, 202, "inside"), (9, 194, 202, "inside"), (10, 194, 202, "inside")],
     5: [(8, 0, 82, "inside"), (9, 74, 82, "inside"), (10, 74, 82, "inside")],
     6: [(11, 74, 258, "inside"), (10, 110, 194, "inside")],
-    7: [(8, 110, 194, "inside"), (8, 202, 258, "inside"), (9, 202, 258, "inside"), (10, 202, 258, "inside")],
+    7: [(8, 110, 194, "inside"), (8, 202, 258, "inside"), (9, 202, 258, "inside"), (10, 202, 258, "inside"),
+        (8, 0, 258, "promenade"), (9, 0, 258, "promenade"), (10, 0, 258, "promenade")],   # the balconies
     8: [(12, 82, 258, "inside")],
     9: [(12, 0, 82, "inside"), (11, 29, 74, "inside"), (10, 25, 74, "inside"), (9, 0, 74, "inside"),
         (7, 21.4, 74, "inside")],
@@ -293,7 +295,5 @@ END_WALL_LOCKS = {
 
 # Step 0's stand-ins (docs/build-plan.md): the cards lie where their givers will be; standing in a
 # trigger sets its flag where a scene will. (deck, m, needs flag or None).
-CARD_SPOTS = {"deck": (4, 64, None), "ent": (6, 246, None), "hk": (9, 126, None), "off": (12, 136, "horn")}
-TRIGGERS = [
-    ("bb2", 6, 178, None),          # near-catch 2: Bumbot asleep on her book bolts through the aft door
-]
+CARD_SPOTS = {"deck": (4, 64, None), "ent": (6, 246, None), "hk": (9, 132.5, None), "off": (12, 136, "horn")}
+TRIGGERS = []       # (flag, deck, m, needs): none left; Bumbot's beats are in tools/population.py

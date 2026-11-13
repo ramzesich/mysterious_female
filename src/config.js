@@ -123,6 +123,23 @@ export const SWIM = {
     margin: 18,
 };
 
+// The verbs of §6.1.2 (src/world/verbs.js). Crawling: her speed and her height on all fours. The
+// wall jump in grip socks: a kick up (a share of her jump) and away from the wall (px/s), her
+// steering held for kickMs; pressed to a wall she slides down it slowly. The parasol: how fast she
+// sinks under it. Pushing a cart. With a tray in her hands a jump is a low hop.
+export const VERBS = {
+    crawlSpeed: 88,
+    crawlHeight: 26,
+    kickUp: 0.96,
+    kickAway: 120,
+    kickMs: 110,
+    slideFall: 50,
+    gripReach: 5,
+    glideFall: 55,
+    pushSpeed: 60,
+    hop: 0.62,
+};
+
 export const DASH = {
     durationMs: 10000,
     speedMultiplier: 2,
@@ -135,4 +152,4 @@ export const DASH = {
 // its floor (the user fell from deck 9's stern bulwark to deck 8's terrace, 2026-11-07).
 export const LONG_FALL_MARGIN = 56;
 
-export const SAVE_KEY = 'bumbusik-save-v2';   // v2: the progression (§6.1)
+export const SAVE_KEY = 'bumbusik-save-v3';   // v2: the progression (§6.1); v3: the verbs, the books
