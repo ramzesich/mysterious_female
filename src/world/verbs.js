@@ -121,6 +121,7 @@ export const verbs = {
     startPush(thing) {
         const p = this.player;
         this.pushing = thing;
+        this.pushSince = this.time.now;
         this.mode = 'push';
         this.pushSide = p.x < thing.x ? -1 : 1;        // which side of it she stands on
         p.setFlipX(this.pushSide > 0);
@@ -132,7 +133,9 @@ export const verbs = {
         const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         const onFloor = body.blocked.down || body.touching.down;
         // Letting go: E again, a jump, stepping back from it, or the floor going from under her.
-        if (input.activatePressed || input.jumpPressed || dir === this.pushSide || !onFloor) {
+        // (Not in the first moment: stepping up to its end, her body has not met the floor again yet.)
+        const fresh = time - this.pushSince < 200;
+        if (!fresh && (input.activatePressed || input.jumpPressed || dir === this.pushSide || !onFloor)) {
             this.pushing = null;
             this.mode = 'play';
             return;

@@ -2549,7 +2549,10 @@ export class ShipScene extends Phaser.Scene {
         // Standing still on the bed long enough: she bounces on it.
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
-        else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) this.startBedJoy();
+        else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) {
+            // (With the book found on it, unread, she sits down on its edge and reads: population `book_5`.)
+            if (!this.world.library.readOnBed()) this.startBedJoy();
+        }
     }
 
     // --- Cabin 8206's shower (§5.3) ------------------------------------------------------------

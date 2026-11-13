@@ -8,7 +8,7 @@ funnel's top.
 import json
 
 import build_ship_map as B
-from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, SPRINKLERS, STACKS, SWINGDOORS)
+from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -223,6 +223,8 @@ def build_world():
                          reach=round(reach * 48), delay=delay, who=who))
     for did, (deck, m, who) in DND.items():
         ents.append(dict(kind="dnd", id=did, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", who=who))
+    for oid, (deck, m, what) in OPENDOORS.items():
+        ents.append(dict(kind="opendoor", id=oid, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", what=what))
     for lid, (where, a, b, frame) in LOWS.items():
         x0, y, route = spot(where, a)
         ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,

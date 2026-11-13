@@ -87,5 +87,5 @@ CAST = {
     # The security officer waiting for his uniform in the laundry (after the stage's flour).
     "rival_towel": ("1f2d9528-cb0b-4cd0-9fdd-ae8665ef179e", {}, {"scale": 0.8}),
     # Region 5 (deck 8 forward): the party at the cabin with the balloons.
-    "partygirl": ("805b5b9e-f9ba-4091-be45-4b4fb9619843", {"dance": 9}, {}),
+    "partygirl": ("805b5b9e-f9ba-4091-be45-4b4fb9619843", {"dance": 9}, {"scale": 0.75}),
 }

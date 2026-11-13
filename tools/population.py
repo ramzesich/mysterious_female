@@ -98,6 +98,7 @@ TANGERINES = {
     "tan_7_jackpot": (7, 153.1, 2, 0, "jackpot"),
     "tan_7_tradewinds": (7, 182.21, 1, 20, None),
     "tan_8_8206": ("cabin", 104, 2, 33, None),
+    "tan_8_fwd": (8, 49.3, 1, "table", None),
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
     "tan_8_balc_aft": (8, 245, 1, "out", None),
@@ -130,7 +131,7 @@ ITEMS = {
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
-    "book_5": ("cabin", 190, "book:5", None),
+    "book_5": ("cabin", 186, "book:5", None, 32),
     "book_6": (11, 216, "book:6", None),
     "book_7": ("guest10", 150, "book:7", None),
     "book_8": (12, 128.6, "book:8", "horn"),
@@ -282,6 +283,8 @@ PEOPLE = {
     "amb_bagslady": dict(at=(8, 86), who="bagslady", face=1, walk=(84.2, 90.4, 0.7), end_ms=1800, layer="back"),
     "amb_domeman": dict(at=(10, 86.6), who="domeman", face=1, idle="idle", layer="back"),
     "riv_laundry": dict(at=("laundry", 124), who="rival_towel", face=1, after="region:4", until="region:6"),
+    # Region 5 (deck 8 forward, "calm, hers"): the birthday girl at the door with the balloons.
+    "amb_birthday": dict(at=(8, 71.95), who="partygirl", face=-1, idle="dance", layer="back"),
     "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
     "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
     # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
@@ -335,6 +338,14 @@ PROPS = {
     "prop_towels_swan": (10, 104.85, "towel-swan", 25, dict(until="region:6")),
     "prop_towels_elephant": (10, 106.3, "thing:towel-elephant", 0, dict(until="region:6")),
     "prop_towels_monkey": (10, 105.6, "thing:towel-monkey", 0, dict(until="region:6")),
+    # Region 5. A steward's cart with a towel swan on it; the duct's grille in the ceiling where she
+    # drops out (shut until then, hanging open after), and his dusty paw prints from under it to the
+    # lobby's door.
+    "prop_swan_cart": (8, 29.3, "towel-trolley", 0, {}),
+    "prop_swan_cart_swan": (8, 29.3, "towel-swan", 28, {}),
+    "prop_grille_shut": (8, 66.1667, "@grille-shut", 120, dict(until="flag:duct", back=True)),
+    "prop_grille_open": (8, 66.1667, "@grille-open", 98, dict(after="flag:duct", back=True)),
+    "prop_paws_8": (8, 70.05, "@paws", 0, dict(after="flag:duct")),
     "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
@@ -363,6 +374,8 @@ QUIRKS = {
     "sec_spotlight": (6, 247.3, "still:3", "bow", 2000, dict(reach=14, needs="bb3", face=-1)),
     # The cat's portrait: a double-take.
     "sec_cat_look": (7, 140.0, "still:1.5", "idle-look", 1700, dict(reach=16)),
+    # An open cabin, the sea in its window: she looks in.
+    "sec_peek_sea": (8, 55.27, "still:2", "idle-look", 1700, dict(reach=14)),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
@@ -424,6 +437,12 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest")}
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort")}
+# --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
+# Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
+# door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window
+# (`amb_peek_sea`)).
+OPENDOORS = {"amb_party": (8, 72, "party"), "amb_peek_sea": (8, 56, "sea")}
+
 # Where Bumbot shows from the balcony cabin's balcony (`bb_glimpse_balcony`): the deck her balcony
 # is on, the cabin's door (m). He sits on the top of its aft partition, and is gone up to the next deck.
 GLIMPSE_BALCONY = (9, 151.6)

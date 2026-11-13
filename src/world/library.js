@@ -149,6 +149,41 @@ export class Library {
         return true;
     }
 
+    // On her own bed with the fifth book, not read yet: she sits down on its edge and reads it there,
+    // as in the Library's chair.
+    readOnBed() {
+        const w = this.world, s = this.scene, p = s.player;
+        if (this.save.books['5'] !== 'held' || this.save.read.includes(5) || w.carry || this.reading) return false;
+        this.reading = true;
+        this.textures();
+        const y = p.y;
+        w.cut(async () => {
+            p.setFlipX(false);
+            p.body.enable = false;
+            const seated = s.anims.exists('her-read');
+            if (seated) {
+                p.anims.play('her-read');
+                // (Her seat comes down onto the mattress; her legs hang over its side.)
+                await w.tween({ targets: p, y: y + 13, duration: 500, ease: 'Quad.easeOut' });
+                await w.wait(200);
+            }
+            const book = s.add.image(p.x + 10, p.y - (seated ? 24 : 32), 'book-open').setDepth(s.DEPTH.player + 0.02);
+            w.add([book]);
+            await w.wait(900);
+            await this.panel('page-5');
+            this.save.read.push(5);
+            writeSave(this.save);
+            book.destroy();
+            s.pose('stand');
+            p.y = y;
+            p.body.enable = true;
+            p.body.reset(p.x, y);
+            s.stillSince = s.time.now + 4000;       // no bounce right after
+            this.reading = false;
+        });
+        return true;
+    }
+
     // A picture over the whole screen (a book's page, a photo), until she presses a key.
     panel(key) {
         const s = this.scene;

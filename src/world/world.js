@@ -61,7 +61,7 @@ export class World {
     doorSpots() {
         const rooms = this.data.rooms.flatMap(r => r.doors.filter(d => d.outRoute === 'inside').map(d => ({ x: d.outX, y: d.outY })));
         // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb".)
-        const own = ['checkpoint', 'swingdoor', 'dnd'];
+        const own = ['checkpoint', 'swingdoor', 'dnd', 'opendoor'];
         const cps = this.data.ents.filter(e => own.includes(e.kind) && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
         return [...rooms, ...cps];
     }
@@ -199,6 +199,62 @@ export class World {
             g.fillStyle(0x7a4528, 1).fillRect(1, 7, 28, 1).fillRect(1, 18, 28, 1).fillRect(9, 1, 1, 24).fillRect(20, 1, 1, 24);
             g.fillStyle(0xf28c28, 1).fillRect(12, 10, 6, 6);
             g.fillStyle(0x1ebc73, 1).fillRect(14, 9, 2, 1);
+        });
+        // Region 5: the duct's grille in deck 8's ceiling, shut and hanging open; paw prints in dust;
+        // party balloons, one and a bunch on their strings; an open cabin with the sea in its window.
+        make('grille-shut', 32, 8, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 32, 8);
+            g.fillStyle(0x9babb2, 1).fillRect(1, 1, 30, 6);
+            g.fillStyle(0x3e3546, 1);
+            for (let x = 3; x < 30; x += 4) g.fillRect(x, 2, 2, 4);
+        });
+        make('grille-open', 34, 30, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 32, 8);
+            g.fillStyle(0x0d0b14, 1).fillRect(1, 1, 30, 6);
+            g.fillStyle(0x2e222f, 1).fillRect(27, 6, 7, 24);
+            g.fillStyle(0x9babb2, 1).fillRect(28, 7, 5, 22);
+            g.fillStyle(0x3e3546, 1);
+            for (let y = 9; y < 28; y += 4) g.fillRect(29, y, 3, 2);
+        });
+        make('paws', 346, 5, g => {
+            g.fillStyle(0x625565, 0.85);
+            for (let x = 4, n = 0; x < 340; x += 13, n++) {
+                const y = n % 2 ? 3 : 1;
+                g.fillRect(x, y, 3, 2).fillRect(x - 1, y - 1, 1, 1).fillRect(x + 1, y - 1, 1, 1).fillRect(x + 3, y - 1, 1, 1);
+            }
+        });
+        make('balloon', 16, 20, g => {
+            g.fillStyle(0x2e222f, 1).fillEllipse(8, 9, 16, 18).fillTriangle(6, 17, 10, 17, 8, 20);
+            g.fillStyle(0xffffff, 1).fillEllipse(8, 9, 14, 16);
+            g.fillStyle(0xffffff, 1).fillTriangle(7, 17, 9, 17, 8, 19);
+        });
+        make('balloons', 48, 58, g => {
+            const bunch = [[10, 13, 0xe83b3b], [24, 9, 0xf9c22b], [38, 14, 0x4d9be6], [16, 27, 0xf68181], [32, 26, 0x1ebc73], [24, 39, 0xf28c28]];
+            g.lineStyle(1, 0xf3ecdd, 1);
+            for (const [x, y] of bunch) g.lineBetween(x, y + 8, 24, 57);
+            for (const [x, y, c] of bunch) {
+                g.fillStyle(0x2e222f, 1).fillEllipse(x, y, 17, 19);
+                g.fillStyle(c, 1).fillEllipse(x, y, 15, 17);
+                g.fillStyle(0xffffff, 0.8).fillRect(x - 4, y - 5, 2, 3);
+            }
+        });
+        make('peek-sea', 34, 74, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
+            g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
+            g.fillStyle(0x7f708a, 1).fillRect(7, 9, 24, 2);
+            g.fillStyle(0xcd683d, 1).fillRect(10, 12, 20, 28);
+            g.fillStyle(0x8fd3ff, 1).fillRect(12, 14, 16, 24);
+            g.fillStyle(0x4d9be6, 1).fillRect(12, 27, 16, 11);
+            g.fillStyle(0xffffff, 1).fillRect(12, 26, 16, 1).fillRect(15, 17, 6, 2).fillRect(14, 31, 4, 1).fillRect(21, 34, 5, 1);
+            g.fillStyle(0x7f708a, 1).fillRect(8, 11, 3, 31).fillRect(29, 11, 3, 31);
+            g.fillStyle(0x9e4539, 1).fillRect(8, 66, 24, 6);
+            g.fillStyle(0xffffff, 1).fillRect(8, 52, 24, 14);
+            g.fillStyle(0xc7dcd0, 1).fillRect(8, 59, 24, 1);
+            g.fillStyle(0x0b5e65, 1).fillRect(15, 52, 8, 14);
+            g.fillStyle(0x9babb2, 1).fillRect(2, 72, 30, 2);
+            // The door's leaf, swung in against the wall.
+            g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
+            g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
         });
         make('hatch-lid', 28, 5, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 28, 5);
@@ -662,7 +718,8 @@ export class World {
                 const img = s.add.image(e.x, y, key).setOrigin(0.5, 1).setDepth(depth + 0.01);
                 items.push(img);
                 this.add(items);
-                const thing = { ...e, items, pick: img, interact: () => this.take(thing) };
+                // (`level`: where it lies, for her standing up there with it: a book on a bed.)
+                const thing = { ...e, level: y, items, pick: img, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -783,6 +840,26 @@ export class World {
             case 'dnd':
                 this.movers.push(new DndDoor(this, e));
                 break;
+            case 'opendoor': {
+                // A cabin door standing open, in a cabin door's place (region 5): a party's, with its
+                // balloons out in the corridor; a made-up cabin's, the sea in its window.
+                const items = [];
+                if (e.what === 'sea') {
+                    items.push(s.add.image(e.x, e.y, 'peek-sea').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
+                } else {
+                    items.push(s.add.image(e.x, e.y, 'shipart', 'door-cabin-ajar').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
+                    const tied = s.add.image(e.x + 9, e.y - 34, 'balloons').setOrigin(0.5, 1).setDepth(D.decor + 0.15);
+                    s.tweens.add({ targets: tied, y: tied.y - 2, angle: { from: -2, to: 2 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                    items.push(tied);
+                    // Loose ones: two on the floor, one up against the ceiling.
+                    for (const [dx, dy, tint] of [[-27, 0, 0xf68181], [-41, 0, 0x4d9be6], [-22, 108, 0xf9c22b], [52, 108, 0xb9e04c]]) {
+                        items.push(s.add.image(e.x + dx, e.y - dy, 'balloon').setOrigin(0.5, 1).setTint(tint).setDepth(D.decor + 0.14));
+                    }
+                }
+                this.add(items);
+                this.things.push({ ...e, items });
+                break;
+            }
             case 'low': {
                 // Something she must crawl under or through (a blanket fort): solid above her on
                 // hands and knees; its picture, if it has one, in front of her.
@@ -962,6 +1039,9 @@ export class World {
             interact: () => { sfx.door(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
         const linen = this.rooms.linen;
         if (linen) {
+            // (Her own cabin's door is a checkpoint: population §2.5, `cp_8206`.)
+            const own = s.rooms.find(r => r.route === 'cabin');
+            if (own) s.addCheckpoint('cp_8206', own.door, own.floor, { door: null });
             // The laundry chute's hatch, low in the wall by the door (drawn in the room's picture):
             // E, and down she goes to the laundry on deck 4 (population: `scn_chute`).
             this.things.push({ id: 'chute', x: this.data.linen.chuteX, y: linen.floor, route: 'linen', items: [], reach: 16,
@@ -1257,7 +1337,7 @@ export class World {
         }
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
-            if (Math.abs(p.x - t.x) > (t.reach ?? 18) || Math.abs(p.y - t.y) > 8) continue;
+            if (Math.abs(p.x - t.x) > (t.reach ?? 18) || (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
             if (t.interact() !== false) return true;
         }
         return false;

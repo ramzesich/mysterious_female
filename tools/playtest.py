@@ -2050,6 +2050,104 @@ def scenario_region4(b):
     return ok
 
 
+def enter_region5(b):
+    """A save at region 5's door: regions 1-4 done (three cards, the crawl), she has just dropped
+    out of the duct's far grille into deck 8's forward corridor."""
+    b.open("?reset&play")
+    b.eval("(P => { ['bb1', 'lunch', 'bb_lift', 'bb2', 'riv_prom', 'glimpse1', 'glimpse_window', 'bb3', 'pills', 'cart_free', 'steward',"
+           " 'photo', 'bb4', 'cart_linen', 'duct'].forEach(f => P.setFlag(f));"
+           " ['deck', 'ent', 'hk'].forEach(c => P.open('cards', c)); [2, 3, 4, 5].forEach(r => P.open('regions', r)); })(window.__ship.progress)")
+    b.eval("window.__ship.cats.filter(c => ['bb1', 'bb2', 'bb3', 'bb4'].includes(c.flag)).forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
+    b.eval("window.__ship.world.refresh()")
+    time.sleep(0.2)
+
+
+def scenario_region5(b):
+    """Region 5 (docs/build-plan.md, step 5): deck 8 forward, a breather: out of the duct's grille,
+    the party's door, the cabin with the sea in its window, her own cabin (a checkpoint, the fifth
+    book on the bed, read there), the swan's cart, the lobby door that opens from inside, and the
+    forward stairs on up to deck 11 past the officers' lobbies."""
+    enter_region5(b)
+    ok = True
+    W = "window.__ship.world"
+    thing = lambda tid: f"{W}.things.find(t => t.id === '{tid}')"
+    duct = js(b, f"{W}.data.duct")
+    b.teleport(duct["dropX"], D8)
+    time.sleep(0.5)
+    ok &= check(js(b, f"{thing('prop_grille_open')}.items[0].visible") and not js(b, f"{thing('prop_grille_shut')}.items[0].visible"),
+                "the grille she dropped out of hangs open in the ceiling")
+    ok &= check(js(b, f"{thing('prop_paws_8')}.items[0].visible"), "paw prints in the dust, toward the lobby's door")
+    b.shot("region5-grille")
+    # The party.
+    px = js(b, f"{thing('amb_party')}.x")
+    b.teleport(px - 60, D8)
+    time.sleep(1.2)
+    ok &= check(person(b, "amb_birthday")["on"], "the birthday girl dances at the door with the balloons")
+    ok &= check(js(b, f"{W}.story.noteAt > 0"), "its music comes out into the corridor")
+    b.shot("region5-party")
+    # The lobby's door opens from the corridor.
+    ok &= check(use_door(b, 8, 74, -1), "the lobby's door opens from the corridor")
+    # The cabin with the sea in its window: she looks in.
+    sx = js(b, f"{thing('amb_peek_sea')}.x")
+    b.teleport(sx, D8)
+    time.sleep(2.5)
+    b.shot("region5-sea")
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-idle-look",
+                "an open cabin, the sea in its window: she looks in", b.state())
+    time.sleep(1.9)
+    # Her own cabin: a checkpoint at its door; the basket; the fifth book on the bed, read there.
+    cabin = b.eval("window.__ship.rooms.find(r => r.route === 'cabin').door")
+    b.teleport(cabin - 30, D8)
+    b.hold("right", 0.4)
+    ok &= check("cp_8206" in save_list(b, "activated"), "her cabin's door: a checkpoint", save_list(b, "activated"))
+    b.teleport(cabin, D8)
+    b.tap("e")
+    time.sleep(1.0)
+    ok &= check(route(b) == "cabin", "into cabin 8206", route(b))
+    x0 = cabin - 59
+    b.teleport(x0 + 104, D8, "cabin")
+    time.sleep(0.4)
+    ok &= check(b.state()["tangerines"] == 2, "two tangerines in the welcome basket", b.state())
+    b.teleport(x0 + 186, D8, "cabin")
+    time.sleep(0.3)
+    b.shot("region5-bed")
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(js(b, "window.__ship.save.books['5']") == "held", "the fifth book, on her bed")
+    b.teleport(x0 + 186, D8 - 32, "cabin")
+    time.sleep(2.2)
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "!!window.__ship.world.library.reading"),
+                "standing still on the bed with it, she sits down and reads it there", b.state())
+    b.shot("region5-reading")
+    time.sleep(1.6)
+    b.tap("e")
+    time.sleep(1.0)
+    ok &= check(5 in save_list(b, "read") and b.state()["mode"] == "play", "its page read", (save_list(b, "read"), b.state()))
+    time.sleep(5.2)
+    ok &= check(b.state()["mode"] == "scripted" and not js(b, "!!window.__ship.world.library.reading"), "after that the bed is for bouncing again", b.state())
+    b.tap("e")
+    time.sleep(0.4)
+    b.teleport(cabin, D8, "cabin")
+    b.tap("e")
+    time.sleep(1.0)
+    ok &= check(route(b) == "inside", "and out again", route(b))
+    # The swan's cart.
+    ok &= check(js(b, f"{thing('prop_swan_cart_swan')}.items[0].visible"), "a steward's cart with a towel swan on it")
+    b.teleport(exact_x(31.5), D8)
+    time.sleep(0.4)
+    b.shot("region5-swan")
+    # The forward stairs on up: the officers' lobbies stay shut, deck 11 opens.
+    (x0, y0), _ = flight_feet("stairs-forward-8-9")
+    b.teleport(x0, y0)
+    s = hold_until(b, "up", lambda s: s["y"] == D11 and s["mode"] == "play", 12)
+    ok &= check(s["y"] == D11 and 6 in save_list(b, "regions"), "up the forward stairs, past decks 9 and 10, to deck 11: region 6", s)
+    (x9, y9), _ = flight_feet("stairs-forward-9-10")
+    b.teleport(x9, y9)
+    time.sleep(0.3)
+    ok &= check(not use_door(b, 9, 74, 1) and "Officer" in alert(b), "deck 9's forward lobby: its doors want the Officer's card", alert(b))
+    return ok
+
+
 SCENARIOS = {name[len("scenario_"):]: fn for name, fn in globals().items() if name.startswith("scenario_")}
 
 

@@ -135,6 +135,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
 
 ## Step 5: Deck 8 forward (region 5)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 A breather. **Scope:** the duct's exit, the one-way lobby door, cabin 8206's book and basket, the
 towel-swan cart, the peek cabin, the balloons; the stairs on up through the officers' lobbies;
 `cp_8206`. **Systems:** none new. **Art:** the balloons, the swan. **Playtest:** `region5`: out of

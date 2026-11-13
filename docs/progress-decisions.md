@@ -410,3 +410,40 @@ pushable that stands by the wall and is a step up (`"top"`); key caps that bob o
 
 **PixelLab spent on this step:** 45 generations (ten characters and their clips, her crawl, push
 and camera clips, three towel animals). 1,403 of 2,000 left.
+
+## Step 5: Deck 8 forward, region 5 (2026-11-13)
+
+Done: the breather between the duct and the pool deck. She drops out of the duct's grille into
+deck 8's forward corridor (the grille hangs open in the ceiling after, dust comes down with her);
+the party behind the door with the balloons; an open cabin with the sea in its window; her own
+cabin 8206 (a checkpoint at its door, the welcome basket's tangerines, the fifth book on the bed,
+read there); a steward's cart with a towel swan; the lobby's door, which opens from the corridor;
+the forward stairs on up past the officers' lobbies to deck 11. Playtest `region5` (from
+`enter_region5`).
+
+**New in the code:** cabin doors that stand open (`OPENDOORS`, kind `opendoor`: "party", "sea");
+a thing can be taken from where it lies as well as from the floor under it (a book on a bed).
+
+**Changes and additions to the plan, and why:**
+
+1. **Paw prints in the dust** run from under the grille to the lobby's door (once she is out of the
+   duct): the plan's paw prints start on deck 11; here they say which way he went, in a corridor
+   with nothing else to say it.
+2. **The party is a child's birthday:** the girl whose birthday it is (a new character: a party
+   hat, a paper horn) dances at the door; balloons are tied to its handle, lie on the floor and sit
+   against the ceiling; notes come out into the corridor while she is near. The balloons are drawn
+   by the game, as they are in the duct's look down at this cabin.
+3. **The cabin with the sea in its window is a doorway to look into, not a room:** an open door in
+   a cabin door's place, the window and the made bed drawn in it; standing still there two seconds
+   she looks in (a quirk).
+4. **The fifth book lies on her bed, and standing still on the bed with it she sits down on the
+   bed's edge and reads it**: its page shows as in the Library's chair, and it counts as read. After
+   that the bed is for bouncing again. (The spec: "she reads there instead of the bounce".)
+5. **Cabin 8206's door is a checkpoint** (`cp_8206`, the spec's exception to crew doors), lit by
+   walking past it.
+6. **One more tangerine** on a side table at 49.3 m: the region had only the basket's two.
+7. **The duct's grille is a thing in deck 8's ceiling** at 66 m: shut until she has come out of it,
+   hanging open after.
+
+**PixelLab spent on this step:** 5 generations (the birthday girl and her dance). 1,398 of 2,000
+left.

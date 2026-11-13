@@ -56,11 +56,13 @@ export class Story {
         this.shush(time);
         this.sneezes(time);
         this.updateHousekeeping(dt, time);
+        this.party(time);
     }
 
     onFlag(name) {
         if (name === 'bb3') this.showTrap();
         if (name === 'cart_free') this.stewardThanks();
+        if (name === 'duct') this.outOfTheDuct();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
@@ -678,5 +680,34 @@ export class Story {
             s.tweens.add({ targets: cat, x: cat.x + 26, y: g.topY - 70, duration: 420, ease: 'Quad.easeOut',
                 onComplete: () => s.tweens.add({ targets: cat, alpha: 0, y: g.topY - 84, duration: 160, onComplete: () => cat.destroy() }) });
         });
+    }
+
+    // --- Region 5 -----------------------------------------------------------------------------
+
+    // Out of the duct's far grille into deck 8's forward corridor (population: `door_duct_exit`):
+    // the grille swings open over her, dust comes down with her.
+    outOfTheDuct() {
+        const s = this.scene, w = this.world, d = w.data.duct;
+        for (let i = 0; i < 9; i++) {
+            const dot = s.add.image(d.dropX + Phaser.Math.Between(-12, 12), d.dropY - 118, 'dot').setTint(0xb9a98a).setDepth(s.DEPTH.fx).setScale(1.5);
+            w.add([dot]);
+            s.tweens.add({ targets: dot, y: d.dropY - Phaser.Math.Between(4, 60), x: dot.x + Phaser.Math.Between(-8, 8), alpha: 0, duration: Phaser.Math.Between(700, 1300), delay: i * 40, onComplete: () => dot.destroy() });
+        }
+    }
+
+    // The party behind the door with the balloons (population: `amb_party`): its music comes out
+    // into the corridor as notes while she is near.
+    party(time) {
+        const s = this.scene, w = this.world;
+        this.partyDoor ??= w.things.find(t => t.id === 'amb_party') ?? null;
+        const d = this.partyDoor, her = s.player;
+        if (!d || s.route !== 'inside' || Math.abs(her.y - d.y) > 8 || Math.abs(her.x - d.x) > 330) return;
+        if (time < (this.noteAt ?? 0)) return;
+        this.noteAt = time + 520;
+        const note = s.add.text(d.x + Phaser.Math.Between(-8, 14), d.y - 50, ['♪', '♫', '♪'][Math.floor(time / 520) % 3], {
+            fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: ['#e83b3b', '#4d9be6', '#905ea9'][Math.floor(time / 520) % 3], resolution: 4,
+        }).setOrigin(0.5).setDepth(s.DEPTH.decor + 0.3);
+        w.add([note]);
+        s.tweens.add({ targets: note, y: note.y - 34, x: note.x + Phaser.Math.Between(-14, 14), alpha: 0, duration: 1500, ease: 'Sine.easeOut', onComplete: () => note.destroy() });
     }
 }

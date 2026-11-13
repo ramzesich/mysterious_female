@@ -1962,10 +1962,16 @@ Nothing blocks the start of the build. These get settled along the way:
       chute to the laundry (a towel on her head; the security officer in a towel); the towel
       animals on the flight up from deck 10. Her crawl, push and camera clips; ten more people.
       Playtest `region4`
+- [x] **Step 5, region 5: deck 8 forward** (done 2026-11-13, branch `the-build`): out of the
+      duct's grille (it hangs open in the ceiling after; paw prints lead to the lobby's door); the
+      birthday party's door with its balloons and music; an open cabin with the sea in its window;
+      cabin 8206: a checkpoint, the fifth book on the bed (standing still on the bed with it she
+      sits and reads it there), the basket's tangerines; the swan's cart; the forward stairs on up
+      to deck 11. Playtest `region5`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 5 of `docs/build-plan.md`, region 5 (deck 8 forward: the duct's exit, cabin 8206, the stairs on up to deck 11)**; then on in play
+      step 6 of `docs/build-plan.md`, region 6 (Lido: deck 11 from the forward lobby aft, the socks, the pool's beat, the Great Outdoors)**; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
