@@ -10,6 +10,7 @@ import json
 import build_ship_map as B
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
+from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -18,6 +19,7 @@ from ship_layout import EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
 ROOM_DOOR_X = 59            # a room's door, in from its left edge (the drawings agree)
 PARTITION_H = 88            # a balcony partition: taller than her jump (68)
+POLE_H = 140                # the pole on a partition's top, up to the balcony above
 UNIT = 125                  # a balcony, px
 
 
@@ -122,6 +124,9 @@ def build_world():
         # Outside: the promenade's deck, the boat walkway over it.
         if where in ("prom", "walkway"):
             return B.exact_x(at), B.floor_y(6 if where == "prom" else 7), OUTSIDE
+        # On a balcony of deck 8, 9 or 10 ("b8"...).
+        if isinstance(where, str) and where[0] == "b" and where[1:].isdigit():
+            return B.exact_x(at), B.floor_y(int(where[1:])), OUTSIDE
         if isinstance(where, str):
             return room_x0[where] + at, room_floor[where], where
         return B.exact_x(at), B.floor_y(where), "inside"
@@ -129,6 +134,10 @@ def build_world():
     for cid, (deck, m, route, slot) in CHECKPOINTS.items():
         x = slot_x(deck, m) if slot else B.exact_x(m)
         ents.append(dict(kind="checkpoint", id=cid, x=x, y=B.floor_y(deck), route=route_of(route)))
+    # On the balconies: at each ajar balcony door, a lamp over it.
+    for cid, rid in BALCONY_CPS.items():
+        d = next(d for r in rooms if r["id"] == rid for d in r["doors"] if d["kind"] == "balcony")
+        ents.append(dict(kind="checkpoint", id=cid, x=d["outX"], y=d["outY"], route=OUTSIDE, bare=True))
 
     for tid, (where, at, count, on, needs) in TANGERINES.items():
         outside = on == "out"
@@ -251,6 +260,10 @@ def build_world():
     for tid, (deck, a, b, door, flag) in TRAYS.items():
         ents.append(dict(kind="trays", id=tid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
                          door=door, flag=flag, route="inside"))
+    # Region 7's (src/world/outside.js).
+    for rid, (deck, a, b, v, stops, wait, who) in ROUNDS.items():
+        ents.append(dict(kind="rounds", id=rid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,
+                         stops=[slot_x(deck, m) for m in stops], wait=wait, who=who, route="inside"))
 
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
@@ -275,20 +288,74 @@ def build_world():
                  dict(x0=pa, x1=pb, y=B.floor_y(7), solid=False, drop=False, id="walkway")]
     walls, grips, glass = [], [], []
     units = balcony_units()
+    # A laundry line: the partition nearest to it is folded open (no panel, no pole).
+    lines = {}
+    for lid, (deck, m) in LINES.items():
+        ux = min((u for d, u in units if d == deck and (deck, u - UNIT) in units), key=lambda u: abs(u + 3 - B.exact_x(m)))
+        lines[(deck, ux)] = lid
     for deck, ux in units:
         y = B.floor_y(deck)
         platforms.append(dict(x0=ux, x1=ux + UNIT, y=y, solid=False, drop=True, id=f"balcony-{deck}-{ux}"))
         glass.append(dict(x0=ux + 6, x1=ux + UNIT, y=y, deck=deck))
+        if (deck, ux) in lines:
+            glass.append(dict(x0=ux, x1=ux + 6, y=y, deck=deck))
+            continue
         walls.append(dict(x=ux + 3, y0=y - PARTITION_H, y1=y, w=6))
-        grips.append(dict(route=OUTSIDE, x=ux + 3, y0=y - PARTITION_H, y1=y, side=0, w=6))
+        # (The panel is solid; the pole on its top runs up to the balcony above, a grip all the way:
+        # a kick off the panel vaults it, kicks with up held climb the pole to the next deck.)
+        grips.append(dict(route=OUTSIDE, x=ux + 3, y0=y - POLE_H, y1=y, side=0, w=6, over=True, panel=PARTITION_H))
         # A row's last balcony ends in the ship's wall.
         if (deck, ux + UNIT) not in units:
             walls.append(dict(x=ux + UNIT + 3, y0=y - 128, y1=y, w=6))
         if (deck, ux - UNIT) not in units:
             walls.append(dict(x=ux - 3, y0=y - 128, y1=y, w=6))
-    # The recess's end walls: from the walkway up to deck 8's floor (the builder's GRIPS add the grip).
-    for m in PROMENADE["span"]:
+    # The recess's end walls: from the walkway up to deck 8's floor, each a grip on its open side;
+    # and the white columns between the boats, deck 7's height: kicks with up held climb any of them
+    # onto deck 8's balconies.
+    for m, side in zip(PROMENADE["span"], (1, -1)):
         walls.append(dict(x=B.x_of(m), y0=B.floor_y(8), y1=B.floor_y(7), w=8))
+        grips.append(dict(route=OUTSIDE, x=B.x_of(m), y0=B.floor_y(8) - 6, y1=B.floor_y(7), side=side, w=8))
+    for m in PROMENADE["columns"]:
+        grips.append(dict(route=OUTSIDE, x=B.exact_x(m), y0=B.floor_y(8) - 6, y1=B.floor_y(7), side=0, w=10))
+
+    # (No grips on the stern's tiers: on the aft terraces she is out of sight behind the stern's
+    # plating, the user's rule, so the plan's climb up the stern is left out.)
+
+    # The balconies' own things (src/world/outside.js): the laundry lines, the perched gulls, the
+    # balconies with someone on them; towels on the rails (they flap before a gust) and the
+    # furniture, by a rule that leaves the balconies with something on them clear.
+    def unit_at(deck, m):
+        return nearest_balcony(deck, B.exact_x(m))
+
+    perch = [dict(id=gid, x=unit_at(deck, m) + 88, y=B.floor_y(deck) - 50, floor=B.floor_y(deck), x0=unit_at(deck, m))
+             for gid, (deck, m) in PERCH.items()]
+    occupied = [dict(id=oid, x0=unit_at(deck, m), x1=unit_at(deck, m) + UNIT, y=B.floor_y(deck), frame=frame)
+                for oid, (deck, m, frame) in OCCUPIED.items()]
+    busy = {(B.floor_y(deck), ux) for (deck, ux) in lines} | {(B.floor_y(deck), ux - UNIT) for (deck, ux) in lines}
+    busy |= {(o["y"], o["x0"]) for o in occupied}
+    busy |= {(d["outY"], nearest_balcony(r["deck"], d["outX"])) for r in rooms for d in r["doors"] if d["kind"] == "balcony"}
+    busy |= {(e["y"], nearest_balcony(deck, e["x"])) for e in ents for deck in (8, 9, 10)
+             if e.get("route") == OUTSIDE and e["y"] == B.floor_y(deck) and e["kind"] in ("tangerine", "slot", "person")}
+    towels, furniture = [], []
+    sets = [[("cafe-chair-bg", 34, False), ("cafe-table-bg", 62, False), ("cafe-chair-bg", 90, True)],
+            [("sunlounger-bg", 60, False)], [("deck-chair-bg", 40, False), ("small-plant-bg", 104, False)],
+            [("bistro-table-bg", 84, False), ("bistro-chair-bg", 56, False)], [("plant-bg", 100, False)],
+            [("sunlounger-2-bg", 74, True), ("side-table-bg", 34, False)], [("deck-chair-2-bg", 82, True)]]
+    for deck, ux in units:
+        y = B.floor_y(deck)
+        h = (ux * 7919 + deck * 104729) % 1000
+        if (y, ux) in busy:
+            continue
+        if h % 10 < 3:
+            towels.append(dict(x=ux + 28 + h % 67, y=y - 50, tint=h % 5))
+        if (h // 10) % 10 < 6:
+            for frame, dx, flip in sets[(h // 100 + deck) % len(sets)]:
+                furniture.append(dict(x=ux + dx, y=y, frame=frame, flip=flip))
+    balcony = dict(gust=GUSTS, towels=towels, furniture=furniture, perch=perch, occupied=occupied,
+                   lines=[dict(id=lid, x=ux + 3, y=B.floor_y(deck)) for (deck, ux), lid in lines.items()],
+                   top=B.floor_y(10) - 144, bottom=B.floor_y(8), x0=min(u for _, u in units), x1=max(u for _, u in units) + UNIT)
+    drill = dict(x=B.exact_x(DRILL["m"]), y=B.floor_y(7), top=B.floor_y(8), period=DRILL["period"], down=DRILL["down"],
+                 tell=DRILL["tell"])
 
     for route, m, deck, y0, y1, side in GRIPS:
         fy = B.floor_y(deck)
@@ -325,7 +392,7 @@ def build_world():
                 pools=pools, tankY=ly + B.POOL_DEPTH)
 
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
-                glimpseBalcony=glimpse_balcony,
+                glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,

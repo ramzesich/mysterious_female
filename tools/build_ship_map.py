@@ -955,6 +955,9 @@ def build_objects():
                           ("bistro", 12, 205)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
+    # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
+    add(point("balcony", "place", 7815, floor_y(9), [prop("route", "promenade")]))
+    add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
     # Nor are the aft terraces behind the end walls (decks 8-10): she is hidden behind the ship's side.
     x0, x1 = STERN_STRIP_7

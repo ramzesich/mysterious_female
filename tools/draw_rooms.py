@@ -755,6 +755,150 @@ def balcabin9(width):
     return R.save("balcabin9")
 
 
+def balcony_door(R, ajar, curtain="#7f708a"):
+    """The glass door onto the balcony (262), floor to ceiling in a white frame: sky, sea, the rail
+    outside; the curtains drawn back. Ajar: its leaf slid aside, the forward curtain blowing in."""
+    r, box, d = R.r, R.box, R.d
+    box(240, FLOOR - 86, 284, FLOOR - 1, WHITE, GREY)
+    r(243, FLOOR - 83, 281, FLOOR - 2, BLUE_LIGHT)
+    r(243, FLOOR - 40, 281, FLOOR - 2, BLUE)
+    r(243, FLOOR - 41, 281, FLOOR - 41, WHITE)
+    for x, y in ((250, FLOOR - 30), (266, FLOOR - 22), (274, FLOOR - 33)):
+        r(x, y, x + 5, y, BLUE_LIGHT)
+    d.ellipse([248, FLOOR - 76, 262, FLOOR - 70], fill=WHITE)
+    d.ellipse([256, FLOOR - 79, 272, FLOOR - 71], fill=WHITE)
+    r(243, FLOOR - 34, 281, FLOOR - 33, WHITE)                             # the balcony's rail
+    for x in range(246, 282, 9):
+        r(x, FLOOR - 33, x, FLOOR - 2, WHITE)
+    if ajar:
+        # The leaf slid aft over the fixed pane: a doubled frame there, the opening clear.
+        r(262, FLOOR - 83, 263, FLOOR - 2, WHITE)
+        r(272, FLOOR - 83, 273, FLOOR - 2, WHITE)
+        r(264, FLOOR - 83, 271, FLOOR - 2, "#c7e4ef")
+        r(269, FLOOR - 46, 270, FLOOR - 38, GREY)
+    else:
+        r(261, FLOOR - 83, 262, FLOOR - 2, WHITE)
+        r(258, FLOOR - 46, 259, FLOOR - 38, GREY)                          # the handle
+    r(236, FLOOR - 90, 286, FLOOR - 88, GREY)                              # the curtain rail
+    box(281, FLOOR - 88, 287, FLOOR - 3, curtain, SLATE)
+    r(284, FLOOR - 86, 284, FLOOR - 5, SLATE)
+    if ajar:
+        d.polygon([(236, FLOOR - 88), (242, FLOOR - 88), (251, FLOOR - 30), (247, FLOOR - 8), (240, FLOOR - 14)], fill=curtain, outline=SLATE)
+        d.line([(239, FLOOR - 86), (246, FLOOR - 16)], fill=SLATE)
+    else:
+        box(236, FLOOR - 88, 242, FLOOR - 3, curtain, SLATE)
+        r(239, FLOOR - 86, 239, FLOOR - 5, SLATE)
+
+
+def suitcase(R, x, colour, open_=False):
+    r, box = R.r, R.box
+    box(x, FLOOR - 16, x + 22, FLOOR - 1, colour, INK)
+    r(x + 2, FLOOR - 9, x + 20, FLOOR - 8, INK)
+    r(x + 9, FLOOR - 19, x + 13, FLOOR - 17, INK)
+    if open_:
+        box(x, FLOOR - 30, x + 22, FLOOR - 17, colour, INK)
+        r(x + 3, FLOOR - 20, x + 8, FLOOR - 17, WHITE)
+        r(x + 10, FLOOR - 21, x + 18, FLOOR - 17, PINK)
+
+
+def balcabin8m(width):
+    """Deck 8 midships' balcony cabin, being aired (population: `room_balcabin_8m`): the bed
+    stripped, the fresh linen piled on it, a steward's trolley of towels, the wardrobe open, the
+    balcony door slid aside and its curtain blowing in."""
+    R = cabin_room(width, (60, 150, 230))
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110, open_=True)
+    desk(R, 126, 176)
+
+    stand(R.im, "towel-trolley", 160)
+    bed(R, 184, 236, head=-1, made=False)
+    for k in range(3):                                                    # the fresh linen, folded
+        R.box(206, FLOOR - 32 - k * 5, 228, FLOOR - 27 - k * 5, WHITE, GREY)
+    wall_lamp(R, 194, FLOOR - 70)
+    picture(R, 204, 34, 26, 20, (BLUE_LIGHT, BLUE, WHITE))
+    balcony_door(R, True, "#4d9be6")
+    return R.save("balcabin8m")
+
+
+def balcabin8a(width):
+    """Deck 8 aft's: honeymoon-tidy: a red runner, two suitcases by the wardrobe, flowers on the desk."""
+    R = cabin_room(width, (60, 150, 230))
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110)
+    suitcase(R, 112, RED)
+    desk(R, 138, 180)
+    stand(R.im, "rose-glass", 152, dy=26)
+    bed(R, 186, 236, head=-1, runner=RED)
+    wall_lamp(R, 196, FLOOR - 70)
+    picture(R, 206, 34, 26, 20, (PINK, MAUVE, YELLOW))
+    balcony_door(R, True, "#ae2334")
+    return R.save("balcabin8a")
+
+
+def balcabin9a(width):
+    """Deck 9 aft's: a family's: the wardrobe open, a beach bag and a swim ring on the bed, a
+    bucket and spade on the floor."""
+    R = cabin_room(width, (60, 150, 230))
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110, open_=True)
+    desk(R, 126, 176)
+    stand(R.im, "bucket-spade", 118)
+    stand(R.im, "orange-juice", 150, dy=26)
+    bed(R, 184, 236, head=-1, runner=ORANGE)
+    stand(R.im, "beach-bag", 222, dy=BED_UP)
+    stand(R.im, "swim-ring", 204, dy=BED_UP)
+    wall_lamp(R, 194, FLOOR - 70)
+    picture(R, 132, 36, 30, 20, (YELLOW, GREEN, WHITE))
+    balcony_door(R, True, "#1ebc73")
+    return R.save("balcabin9a")
+
+
+def balcabin10a(width):
+    """Deck 10 aft's: a celebration: champagne in its bucket by the desk, glasses and a cake slice
+    on it, a mauve runner."""
+    R = cabin_room(width, (60, 150, 230))
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110)
+    desk(R, 126, 176)
+    stand(R.im, "wine-glasses", 146, dy=26)
+    stand(R.im, "cake-slice", 164, dy=26)
+    stand(R.im, "champagne-bucket", 116)
+    bed(R, 184, 236, head=-1, runner=MAUVE)
+    wall_lamp(R, 194, FLOOR - 70)
+    picture(R, 204, 34, 26, 20, (NAVY, BLUE, YELLOW))
+    balcony_door(R, True, "#905ea9")
+    return R.save("balcabin10a")
+
+
+def guest10(width):
+    """The balcony guest's cabin, deck 10 aft (population: `room_guest_10`): a man travelling
+    alone: an open suitcase, his slippers, the reading lamp on, his hat on the bed; the balcony
+    door shut (it locked behind him)."""
+    R = cabin_room(width, (60, 150, 230))
+    r = R.r
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110)
+    suitcase(R, 114, GREEN, open_=True)
+    desk(R, 142, 180)
+    stand(R.im, "table-lamp", 152, dy=26)
+    R.box(162, FLOOR - 29, 174, FLOOR - 26, CREAM, INK)                    # a crossword, his pen
+    r(164, FLOOR - 30, 170, FLOOR - 30, RED)
+    bed(R, 186, 236, head=-1, runner=GREEN)
+    R.d.ellipse([210, FLOOR - 38, 228, FLOOR - 32], fill=CREAM, outline=INK)   # his panama
+    R.box(214, FLOOR - 42, 224, FLOOR - 35, CREAM, INK)
+    r(214, FLOOR - 37, 224, FLOOR - 36, NAVY)
+    for x in (190, 197):                                                  # slippers
+        R.box(x, FLOOR - 4, x + 5, FLOOR - 1, NAVY, INK)
+    wall_lamp(R, 196, FLOOR - 70)
+    picture(R, 206, 34, 26, 20, (BLUE_LIGHT, GREEN, WHITE))
+    balcony_door(R, False, "#0b5e65")
+    return R.save("guest10")
+
+
+def atlas_names():
+    return json.loads((ROOT / "assets" / "ship" / "ship.json").read_text(encoding="utf-8"))["frames"]
+
+
 def adjoin(width):
     """Two adjoining inside cabins, deck 9 (population: `room_adjoin`): a family's. The parents' (in
     at 59): a made bed, a desk, suitcases. The connecting door in the wall between them stands open
@@ -971,7 +1115,9 @@ def peeks():
 
 DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
-        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom}
+        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
+        "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,
+        "guest10": guest10}
 
 
 def main():

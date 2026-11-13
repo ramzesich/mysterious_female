@@ -14,6 +14,7 @@ import { Story } from './story.js';
 import { Library } from './library.js';
 import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
+import { Rounds } from './outside.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -490,7 +491,8 @@ export class World {
             const dx = p.x - g.x;
             if (Math.abs(dx) - (g.w / 2 + half) > 5) continue;
             if (g.side && Math.sign(dx) !== g.side) continue;
-            return { away: Math.abs(dx) < 3 ? 0 : Math.sign(dx) };
+            // (`over`: a balcony's partition: its panel's top, which a kick vaults.)
+            return { away: Math.abs(dx) < 3 ? 0 : Math.sign(dx), over: !!g.over, top: g.y1 - (g.panel ?? 0), x: g.x };
         }
         return null;
     }
@@ -713,8 +715,11 @@ export class World {
             case 'checkpoint': {
                 // The gangway's is lit from the start (population §2.5).
                 if (e.id === 'cp_gangway' && !this.save.activated.includes(e.id)) this.save.activated.push(e.id);
-                const cp = s.addCheckpoint(e.id, e.x, e.y, { route: e.route });
-                if (e.route === OUTSIDE) cp.items.forEach(i => s.shellSlopes.push({ deck: [6, 7], gfx: i }));
+                // (`bare`: on a balcony, at an ajar balcony door: only the lamp, over the door.)
+                const cp = e.bare ? s.addCheckpoint(e.id, e.x, e.y, { route: e.route, door: null, rise: 112 })
+                    : s.addCheckpoint(e.id, e.x, e.y, { route: e.route });
+                const deck = e.bare ? s.deckOfY(e.y) : [6, 7];
+                if (e.route === OUTSIDE) cp.items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
                 break;
             }
             case 'tangerine':
@@ -854,6 +859,9 @@ export class World {
                 break;
             case 'trays':
                 this.movers.push(new Trays(this, e));
+                break;
+            case 'rounds':
+                this.movers.push(new Rounds(this, e));
                 break;
             case 'robot': {
                 const robot = new Robot(this, e);
@@ -1184,6 +1192,12 @@ export class World {
                 g.fillStyle(0xf68181, 1).fillRect(4, 8, 8, 4);
                 g.fillStyle(0xffffff, 1).fillRect(5, 5, 1, 9).fillRect(7, 1, 2, 2);
             },
+            door: () => {
+                g.fillStyle(ink, 1).fillRect(3, 0, 10, 16);
+                g.fillStyle(0x8fd3ff, 1).fillRect(4, 1, 8, 14);
+                g.fillStyle(0xffffff, 1).fillRect(5, 2, 1, 9).fillRect(7, 2, 1, 5);
+                g.fillStyle(ink, 1).fillRect(9, 8, 2, 2);
+            },
             camera: () => {
                 g.fillStyle(ink, 1).fillRect(1, 4, 14, 10).fillRect(4, 2, 5, 3);
                 g.fillStyle(0x625565, 1).fillRect(2, 5, 12, 8);
@@ -1374,8 +1388,29 @@ export class World {
         if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -3 : 3), p.y - PLAYER.height + 12);
     }
 
-    // Gusts along the ship's side push her aft while she is in the air (from region 7's step).
-    push() {}
+    // Gusts along the ship's side push her aft while she is in the air (src/world/outside.js).
+    push(dt, onFloor) {
+        this.gusts?.push(dt, onFloor);
+        this.offPartition();
+    }
+
+    // A balcony's partition is a wall, never a ledge: coming down on its top she slips off it, to
+    // the side she is more on.
+    offPartition() {
+        const s = this.scene, p = s.player;
+        if (s.route !== OUTSIDE || p.body.velocity.y < 0) return;
+        const half = PLAYER.bodyWidth / 2;
+        for (const z of this.wallZones) {
+            const dx = p.x - z.x, reach = z.width / 2 + half;
+            if (z.width > 6 || Math.abs(dx) >= reach || p.body.bottom < z.body.top - 3 || p.body.bottom > z.body.top + 12) continue;
+            // (The way she is going, if she is going anywhere: a vault carries on over it.)
+            const vx = p.body.velocity.x;
+            const to = z.x + (Math.abs(vx) > 20 ? Math.sign(vx) : dx >= 0 ? 1 : -1) * (reach + 0.5);
+            p.body.x += to - p.x;
+            p.x = to;
+            return;
+        }
+    }
 
     // E: a cart's end, a pickup, a switch, a hatch.
     interact() {
@@ -1529,7 +1564,8 @@ export class World {
         const s = this.scene;
         s.physics.add.collider(p, this.platZones, null, (_, z) => s.route === OUTSIDE
             && (z.plat.solid || (s.droppingThrough !== z.plat && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
-        s.physics.add.collider(p, this.wallZones, null, () => s.route === OUTSIDE);
+        // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
+        s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
         for (const t of this.pushables) {
             s.physics.add.collider(p, t.zone, null, () => t.route === s.route

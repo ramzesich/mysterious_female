@@ -327,10 +327,10 @@ export class Trays {
         if (!this.armed) return;
         this.armed = false;
         sfx.smash();
-        this.world.progress.setFlag(d.flag);
+        if (d.flag) this.world.progress.setFlag(d.flag);
         this.items.forEach((img, i) => s.tweens.add({ targets: img, y: img.y - 5 - (i % 3) * 2, angle: (i % 2 ? 9 : -9), duration: 90, yoyo: true, repeat: 2 }));
         const door = this.world.movers.find(m => m.def?.id === d.door);
         // (If she is still there: gone at once, she only hears it.)
-        s.time.delayedCall(380, () => { if (here(s, d) && Math.abs(s.player.x - d.x) < 3 * M) door?.knock(); });
+        s.time.delayedCall(380, () => { if (here(s, d) && Math.abs(s.player.x - d.x) < 3 * M) door?.knock(true); });
     }
 }

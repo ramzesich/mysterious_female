@@ -218,6 +218,27 @@ stand-in sits at his table). What changed against this list: `docs/progress-deci
 - **Art:** her holding him (a state, its walk and stand), Bumbot's jump into her arms, the sunset.
 - **Playtest:** `finale`: the hatch, the glide made and missed, the catch, the walk home.
 
+## Step 11: The ship's side
+
+Asked for by the user on 2026-11-13, during step 7: "give the ship's outer body a texture refinement
+to make it look a bit more real, rather than just a white wall." Placed after the last region on
+purpose: steps 8-10 still add to the outside (the funnel, the roof, the sunset's palette), and the
+side is drawn once by the map builder, so one pass at the end covers everything and no region's
+checks have to be redone.
+
+- **Scope:** the closed shell as seen from outside and around the cut-away deck: plating seams and
+  weld lines along the decks, a slight shade under each overhang and balcony slab, streaks of
+  weathering below scuppers and portholes, the white broken into two or three near-whites from the
+  palette, rivets or panel joints on the stern's sloped plating and the bow's flare, the boot
+  topping at the waterline; the livery left as the user placed it. The balconies' recesses, the
+  promenade's back wall and the boat walkway get the same treatment.
+- **How:** in `tools/build_ship_map.py`'s shell drawing (and the pieces the game draws itself:
+  the stern plating, the sun cover), by rules, in the Resurrect 64 palette; no new PixelLab art
+  unless a rule-drawn texture reads flat. Checked at 1:1 in the game and on `tools/render_ship.py`'s
+  full picture, zone by zone against `reference/photos/side-full.jpg`.
+- **Playtest:** the whole suite (the map is rebuilt); close-ups of the bow, midships, the stern,
+  the balconies and the walkway shown to the user for approval before the commit.
+
 ## After the regions
 
 - **Sound on:** the synthesised effects for every entity, in the order of the regions; the horn and

@@ -39,15 +39,19 @@ ROOMS = [
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
     dict(id="adjoin", deck=9, m=176, slot=True, width=432, look="adjoin", door="cabin",
          doors=[dict(x=432 - 59, to="inside", deck=9, m=184, slot=True, door="cabin")]),
-    dict(id="balcabin8m", deck=8, m=150, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+    dict(id="balcabin8m", deck=8, m=159, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+         checkpoint="cp_hall_8m",
          doors=[dict(x=262, to="outside", deck=8, door="balcony")]),
     dict(id="balcabin8a", deck=8, m=230, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+         checkpoint="cp_hall_8a",
          doors=[dict(x=262, to="outside", deck=8, door="balcony")]),
     dict(id="balcabin9a", deck=9, m=225, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+         checkpoint="cp_hall_9a",
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
     dict(id="balcabin10a", deck=10, m=215, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+         checkpoint="cp_hall_10a",
          doors=[dict(x=262, to="outside", deck=10, door="balcony")]),
-    dict(id="guest10", deck=10, m=235, slot=True, width=288, look="balcabin", door="cabin", lock=("card", "hk", 0),
+    dict(id="guest10", deck=10, m=235, slot=True, width=288, look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
          doors=[dict(x=262, to="outside", deck=10, door="balcony", lock=("flag", "guest"))]),
     dict(id="coldroom", deck=11, m=185, width=240, look="coldroom", door="crew", plate="COLD ROOM",
          lock=("card", "hk", 0)),
@@ -119,6 +123,11 @@ TANGERINES = {
     # On the hot tub's canopy: up by a wall jump off one of its posts, from under it.
     "tan_11_canopy": (11, 132.5, 1, 90, None),
     "tan_10_tray": (10, 129.8, 1, 0, "flag:trays_10m"),
+    # Region 7: in the ice bucket's tray on deck 8 (the steward's rounds go by it), on deck 9 aft's
+    # cart, and on the balcony where Bumbot swiped at the gull.
+    "tan_8_mid": (8, 178.32, 1, 3, None),
+    "tan_9_aft": (9, 230, 1, 28, None),
+    "tan_10_balc": (10, 160.6, 1, "out", None),
     "tan_12_spinnaker": (12, 54, 2, "table", None),
     "tan_12_lady": (12, 128, 2, 0, "lady"),
     "tan_12_cagneys": (12, 167, 1, "table", None),
@@ -137,7 +146,6 @@ ITEMS = {
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
-    "book_7": ("guest10", 150, "book:7", None),
     "book_8": (12, 128.6, "book:8", "horn"),
     "book_9": ("funnel", 184, "book:9", "horn"),
     "book_10": (10, 37.5, "book:10", None),
@@ -194,8 +202,8 @@ SWITCHES = {
 GRIPS = [
     # The atrium's pillars, deck 5's floor to deck 10's walk.
     ("inside", 86, 5, 0, 5 * 144, 0), ("inside", 98, 5, 0, 5 * 144, 0),
-    # The boat walkway's recess, its end walls up to deck 8's balconies.
-    ("outside", 100.6, 7, 0, 150, 1), ("outside", 230.4, 7, 0, 150, -1),
+    # (The boat walkway's ways up to deck 8's balconies, its end walls and the white columns the
+    # boats hang between, are added by the builder from the promenade's layout.)
     # The Great Outdoors' sun cover: its aft post, the climb up to deck 12 (region 8's way in).
     ("inside", 233, 11, 0, 124, 1),
     # The hot tub canopy's two posts (the socks' first use: a tangerine on its roof).
@@ -324,6 +332,15 @@ PEOPLE = {
     "amb_teen": dict(at=(7, 188.29), who="teen", pose="back", layer="back"),
     "amb_balcony_1": dict(at=(7, 220.35), who="aud_girl", face=1, layer="back"),
     "amb_balcony_2": dict(at=(7, 232.71), who="aud_granny", face=1, layer="back"),
+    # Region 7 (Outside). The guest locked out on his own balcony, deck 10 aft (in his cabin once
+    # she has let him in: the story walks him in); the security officer looking into a tender on the
+    # boat walkway (a glimpse: the story takes him away); the boat drill's two.
+    "npc_balcony_guest": dict(at=("b10", 236.2), who="balcony_guest", face=-1, idle="idle", until="flag:guest",
+                              bubble=("door", None, "flag:guest", 5)),
+    "npc_guest_in": dict(at=("guest10", 196), who="balcony_guest", face=-1, idle="idle", after="flag:guest"),
+    "riv_walkway": dict(at=("walkway", 207.6), who="rival", face=1, idle="peek", after="region:7", until="flag:riv_walkway"),
+    "amb_drill_winch": dict(at=("walkway", 184.9), who="drill_winch", face=1, idle="crank", layer="back"),
+    "amb_drill_officer": dict(at=("walkway", 192.6), who="drill_officer", face=-1, idle="idle", layer="back"),
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -385,6 +402,17 @@ PROPS = {
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
     "sign_wet_10m": (10, 154.2, "wet-floor-sign", 0, {}),
     "prop_tray_10": (10, 182, "@tray", 12, {}),
+    # Region 7's hallways: the wet-floor signs under the sprinklers; an ice bucket and glasses on a
+    # tray outside a door (a tangerine in the tray).
+    "sign_wet_8m": (8, 146.2, "wet-floor-sign", 0, {}),
+    "sign_wet_9a": (9, 216.5, "wet-floor-sign", 0, {}),
+    "amb_ice_tray": (8, 178.0, "@tray", 0, {}),
+    "amb_ice": (8, 177.82, "ice-bucket", 3, {}),
+    "amb_ice_glasses": (8, 178.02, "wine-glasses", 3, {}),
+    # The drill's rope across the walkway's inboard side and its sign.
+    "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, dict(back=True)),
+    # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
+    "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -394,6 +422,9 @@ SOLIDS = {
     "haz_cart_5_30": (5, 30, "towel-trolley"),
     "haz_cart_9_172": (9, 172.6, "service-cart"),
     "haz_cart_10_118": (10, 118, "towel-trolley"),
+    "haz_cart_8_186": (8, 186, "service-cart"),
+    "haz_cart_9_230": (9, 230, "towel-trolley"),
+    "haz_cart_10_237": (10, 237.7, "service-cart"),
 }
 # Things the dash goes through: id: (deck or room, m or x, [(atlas piece, dx, dy)]).
 BREAKABLES = {
@@ -437,6 +468,7 @@ SIGNS = {
     "sign_lane_3": ("prom", 213.6, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
     # Region 4: the honeymooners' door.
     "sign_married": (9, 135.6, "JUST MARRIED", "note", 81, dict(size=4)),
+    "sign_drill": ("walkway", 183.2, "BOAT DRILL", "poster", 40, dict(size=4)),
 }
 
 # --- Region 2's own things (docs/population.md, deck 6) ---------------------------------------------
@@ -449,7 +481,10 @@ ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
 SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62),
-         "slot_table": (11, 220.0, 36, "flag:table")}
+         "slot_table": (11, 220.0, 36, "flag:table"),
+         # On the wall of deck 8's first balcony of all, at the forward end of the row (the plan's
+         # `slot_stern`: the stern's terraces are out of sight behind its plating).
+         "slot_balcony": ("b8", 74.9, 62)}
 # The Photo Studio's flash (`haz_flash`): deck, from m, to m (between its softboxes), every s.
 FLASH = (6, 132.45, 134.75, 6)
 # The promenade's porthole where two black ears show once (`bb_glimpse_window`): m, px up.
@@ -472,12 +507,19 @@ DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
 # dash, brings it down on her.
 STACKS = {"haz_towels_9": (9, 141.3)}
 # Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
-SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5)}
+SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5),
+              # Region 7: deck 8 midships' one; deck 9 aft's two, out of phase: a rhythm to run.
+              "haz_sprinkler_8m": (8, 148.0, 1.0, 5, 2, 0.7),
+              "haz_sprinkler_9a": (9, 213.0, 1.0, 5, 2, 0), "haz_sprinkler_9b": (9, 220.0, 1.0, 5, 2, 2.5)}
 # A cabin door that flies open (`haz_swing`): id: (deck, m of the door, how near (m), after s, who
 # looks out). Takes a cabin door's place.
-SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid"), "haz_swing_10m": (10, 143.6, 3.0, 0.6, "hurry")}
+SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid"), "haz_swing_10m": (10, 143.6, 3.0, 0.6, "hurry"),
+              "haz_swing_8m": (8, 135.6, 3.0, 0.6, "swing_hawaiian"), "haz_swing_8a": (8, 239.6, 3.0, 0.6, "swing_sunhat"),
+              "haz_swing_9a": (9, 207.6, 3.0, 0.6, "swing_ring"), "haz_swing_10a": (10, 223.6, 3.0, 0.6, "swing_suit")}
 # "Do Not Disturb" doors (`haz_dnd`): id: (deck, m of the door, who is in). E at one: "Startled".
-DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"), "haz_dnd_10m2": (10, 171.6, "curlers")}
+DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"), "haz_dnd_10m2": (10, 171.6, "curlers"),
+       "haz_dnd_8m": (8, 127.6, "dnd_shaver"), "haz_dnd_8a1": (8, 211.6, "dnd_facemask"),
+       "haz_dnd_8a2": (8, 223.6, "dnd_boxers"), "haz_dnd_10a": (10, 207.6, "dnd_toothbrush")}
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort")}
@@ -511,4 +553,37 @@ FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
 QUEUES = {"haz_queue": (11, 162.5, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
 # Room-service trays left on a hallway's floor (`haz_trays`): id: (deck, from m, to m, the "Do Not
 # Disturb" door their clatter opens, the flag set by the first clatter). Under two metres: a jump clears them.
-TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m")}
+TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),
+         "haz_trays_8m": (8, 125.4, 126.8, "haz_dnd_8m", ""),
+         # Deck 8 aft, "the breakfast rush": six lots along the hallway, two doors.
+         "haz_trays_8a1": (8, 204.9, 206.3, "haz_dnd_8a1", ""), "haz_trays_8a2": (8, 209.4, 210.8, "haz_dnd_8a1", ""),
+         "haz_trays_8a3": (8, 212.4, 213.8, "haz_dnd_8a1", ""), "haz_trays_8a4": (8, 216.9, 218.3, "haz_dnd_8a2", ""),
+         "haz_trays_8a5": (8, 221.4, 222.8, "haz_dnd_8a2", ""), "haz_trays_8a6": (8, 224.4, 225.8, "haz_dnd_8a2", ""),
+         "haz_trays_10a1": (10, 205.4, 206.8, "haz_dnd_10a", ""), "haz_trays_10a2": (10, 208.4, 209.8, "haz_dnd_10a", "")}
+
+# --- Region 7's own things (docs/population.md: the outside; src/world/outside.js) ------------------
+# Gusts along the ship's side, on the balconies: every s, for s, the tell before (s: the towels on
+# the rails and the laundry flap), px/s aft while she is in the air.
+GUSTS = dict(every=7.0, blow=1.5, tell=0.7, drift=60)
+# Gulls perched on the balconies' rails (`gull_8`...): id: (deck, m). She lingers within three
+# metres for two seconds: its shadow, then a swoop: "Swooped".
+PERCH = {"gull_8_1": (8, 120), "gull_8_2": (8, 166), "gull_8_3": (8, 200), "gull_8_4": (8, 240),
+         "gull_9_1": (9, 130), "gull_9_2": (9, 170), "gull_9_3": (9, 210),
+         "gull_10_1": (10, 150), "gull_10_2": (10, 190), "gull_10_3": (10, 231)}
+# Laundry lines (`haz_line`): id: (deck, m): the partition nearest is folded open (a family's two
+# balconies made one) and a line of washing hangs across the gap: no vault there, she crawls under.
+LINES = {"haz_line_8a": (8, 135), "haz_line_8b": (8, 215), "haz_line_9": (9, 195.7), "haz_line_10a": (10, 125.4),
+         "haz_line_10b": (10, 224.4)}
+# Balconies with someone on them behind a "Do Not Disturb" sign (`haz_sunbather`): id: (deck, m,
+# the picture). Landing on one: "Startled". The way past is by another deck.
+OCCUPIED = {"haz_sunbather": (8, 181.4, "thing:balc-sunbather"), "haz_breakfast": (10, 178.8, "thing:balc-breakfast")}
+# Checkpoints on balconies, each at an ajar balcony door (a lamp over it): id: the room.
+BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a": "balcabin8a",
+               "cp_balc_9a": "balcabin9a", "cp_balc_10a": "balcabin10a", "cp_balc_guest": "guest10"}
+# The boat drill on the walkway (`haz_drill`): a rescue boat on its falls in the gap between the
+# boats, its forward end (m); it hangs high (she walks under it), and every `period` s the crew
+# lower it onto the walkway for `down` s: under it as it comes: "Bumped".
+DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
+# The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
+# pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
+ROUNDS = {"haz_steward_rounds": (8, 162.0, 182.0, 0.9, [167.6, 175.6], 3.0, "steward_rounds")}

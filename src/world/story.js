@@ -5,6 +5,7 @@
 
 import { sfx } from '../sfx.js';
 import { lido } from './lido.js';
+import { outside } from './outside.js';
 
 const M = 48;
 
@@ -42,6 +43,7 @@ export class Story {
         this.setupStage();
         this.setupHousekeeping();
         this.setupLido();
+        this.setupOutside();
     }
 
     // E. True if something here took it.
@@ -51,6 +53,7 @@ export class Story {
 
     update(dt, time, input) {
         this.updateLido(dt, time, input);
+        this.updateOutside(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
         this.flash(time);
@@ -66,7 +69,9 @@ export class Story {
         if (name === 'bb3') this.showTrap();
         if (name === 'cart_free') this.stewardThanks();
         if (name === 'duct') this.outOfTheDuct();
+        if (name === 'guest') this.guestIn();
         this.refreshLido();
+        this.refreshOutside();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
@@ -716,5 +721,6 @@ export class Story {
     }
 }
 
-// Region 6 (Lido) has a file of its own.
+// Regions 6 (Lido) and 7 (Outside) have files of their own.
 Object.assign(Story.prototype, lido);
+Object.assign(Story.prototype, outside);

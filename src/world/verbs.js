@@ -9,6 +9,7 @@ export const verbs = {
     resetVerbs() {
         this.kickUntil = 0;
         this.kickDir = 0;
+        this.kickedAt = -Infinity;
         this.gliding = false;
         this.pushing = null;
         this.aside = false;
@@ -63,11 +64,28 @@ export const verbs = {
         if (!(time - this.jumpBufferedAt < PLAYER.jumpBufferMs)) return false;
         const grip = this.world.gripAt(p);
         if (!grip) return false;
-        const away = grip.away || (p.flipX ? 1 : -1);
-        body.velocity.y = -PLAYER.jumpVelocity * VERBS.kickUp;
-        body.velocity.x = away * VERBS.kickAway;
+        if (input.up) {
+            // With up held: straight up it (a pole, a pillar, the plating), kick after kick.
+            body.velocity.y = -PLAYER.jumpVelocity * VERBS.kickUp;
+            body.velocity.x = 0;
+            this.kickDir = 0;
+        } else if (grip.over) {
+            // A balcony's partition: up and over its panel, the way she is going.
+            if (p.y < grip.top + 8) return false;       // over its top already
+            const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0) || (p.flipX ? -1 : 1);
+            const rise = p.y - grip.top + VERBS.vaultClear;
+            body.velocity.y = -Math.max(Math.sqrt(2 * PLAYER.gravity * rise), VERBS.vaultMin);
+            body.velocity.x = dir * PLAYER.runSpeed;
+            this.kickDir = dir;
+        } else {
+            const away = grip.away || (p.flipX ? 1 : -1);
+            body.velocity.y = -PLAYER.jumpVelocity * VERBS.kickUp;
+            body.velocity.x = away * VERBS.kickAway;
+            this.kickDir = away;
+        }
+        const away = this.kickDir || (p.flipX ? -1 : 1);
         this.kickUntil = time + VERBS.kickMs;
-        this.kickDir = away;
+        this.kickedAt = time;           // (letting go of jump doesn't cut a kick short)
         this.takeoffY = p.y;           // a fall is measured from her last hold
         p.setFlipX(away < 0);
         sfx.jump();
@@ -80,6 +98,7 @@ export const verbs = {
         if (!this.progress.knows('socks') || this.world.carry || body.velocity.y <= 0 || !dir) return false;
         const grip = this.world.gripAt(p);
         if (!grip || (grip.away && grip.away !== -dir)) return false;
+        if (grip.over && p.y < grip.top) return false;      // over a partition's panel there is only its pole
         body.velocity.y = Math.min(body.velocity.y, VERBS.slideFall);
         this.takeoffY = p.y;
         return true;

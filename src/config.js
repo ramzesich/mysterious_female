@@ -133,6 +133,8 @@ export const VERBS = {
     kickUp: 0.96,
     kickAway: 120,
     kickMs: 110,
+    vaultClear: 16,       // a kick off a balcony's partition carries her feet this far over its panel
+    vaultMin: 210,        // and is never weaker than this (px/s up)
     slideFall: 50,
     gripReach: 5,
     glideFall: 55,

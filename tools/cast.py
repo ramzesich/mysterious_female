@@ -119,4 +119,19 @@ CAST = {
     "sleeper": ("071b5059-4fef-4ea8-abfd-0b6784aec60d", {"shriek": 10}, {}),
     "curlers": ("2ad7be74-3c6d-4947-a58c-aafc96d29f82", {"shriek": 10}, {}),
     "hurry": ("c17f28af-31b2-4a7b-8094-b0dfde83b7ff", {"idle": 4}, {}),
+    # Region 7 (Outside). Behind the hallways' "Do Not Disturb" doors (decks 8 and 10), none dressed
+    # for visitors; behind the doors that fly open; the steward on his rounds on deck 8; the guest
+    # locked out on his balcony on deck 10; the boat drill's two on the walkway.
+    "dnd_shaver": ("7f18618a-5d9e-461e-92fd-8062aa687486", {"shriek": 10}, {}),
+    "dnd_facemask": ("396c998d-0109-453e-81fe-b7b5a8f438c6", {"shriek": 10}, {}),
+    "dnd_boxers": ("d20a96a6-3001-461c-bf8c-b15a994e4480", {"shriek": 10}, {}),
+    "dnd_toothbrush": ("6f8bcf6b-b35d-4157-a071-c10ce0985344", {"shriek": 10}, {}),
+    "swing_hawaiian": ("528d7ec8-5ea6-4b74-955c-28036873ee2c", {"idle": 4}, {}),
+    "swing_sunhat": ("657f90b7-b6f6-4409-aaf9-2793bedcfd9f", {"idle": 4}, {}),
+    "swing_ring": ("659ad453-9baa-4b17-9fd1-6e9fbbfad3f8", {"idle": 4}, {"scale": 0.8}),
+    "swing_suit": ("c7651c6c-5c1d-46ed-9efa-74678b21a45b", {"idle": 4}, {}),
+    "steward_rounds": ("a36e1cc2-cfb0-4200-abee-a448648fd052", {"push": 8}, {}),
+    "balcony_guest": ("6771ef05-487c-4392-bafa-95fa964dc005", {"idle": 4, "wave": 8, "walk": 8, "thanks": 7}, {}),
+    "drill_winch": ("a9ac5ab7-cc28-4b90-94c8-a922be66a20d", {"crank": 8}, {}),
+    "drill_officer": ("3ed991ae-cf74-4ce1-a636-8549344290a6", {"idle": 4}, {}),
 }

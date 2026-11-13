@@ -437,7 +437,8 @@ export class Sprinkler {
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, g = this.rain.clear();
-        if (!nearby(s, d)) return;
+        // (Out on the ship's side the hallways are behind its plating.)
+        if (!nearby(s, d) || s.route === 'promenade') return;
         const phase = this.phase(time), top = d.top + 16;
         if (phase === 'tell') {
             // Three slow drops.
@@ -564,9 +565,10 @@ export class DndDoor {
         world.things.push({ ...def, items: [], reach: 16, interact: () => this.knock() });
     }
 
-    knock() {
+    // (`heard`: a clatter outside brought them to the door: a fright only if she is by it.)
+    knock(heard) {
         const s = this.scene, p = s.player, d = this.def;
-        if (this.busy || this.world.carry) return false;
+        if (this.busy || (this.world.carry && !heard)) return false;
         this.busy = true;
         sfx.door();
         this.shut.setVisible(false);
@@ -579,7 +581,8 @@ export class DndDoor {
             this.world.people.refresh();
             this.world.people.play(this.who, 'shriek');
         }
-        s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled');
+        const by = !heard || (Math.abs(p.x - d.x) < 2.2 * M && Math.abs(p.y - d.y) < 60);
+        if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled');
         s.time.delayedCall(1700, () => {
             this.shut.setVisible(true);
             this.card.setVisible(true);

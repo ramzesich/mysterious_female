@@ -2083,6 +2083,20 @@ def enter_region6(b):
     time.sleep(0.3)
 
 
+def enter_region7(b):
+    """A save at region 7's door: region 6 done (the socks, the pool drained, the kid fed, the table
+    with her husband), she stands on the balcony of deck 9's balcony cabin."""
+    enter_region6(b)
+    b.eval("(P => { P.learn('socks'); ['bb5', 'kid_fed', 'refilled', 'table', 'glimpse_balcony'].forEach(f => P.setFlag(f)); })(window.__ship.progress)")
+    b.eval("window.__ship.cats.filter(c => c.flag === 'bb5').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
+    time.sleep(0.3)
+    b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    bc = room(b, "balcabin9")
+    b.teleport(bc["doors"][1]["outX"], D9, "promenade")
+    time.sleep(0.4)
+    b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+
+
 def scenario_region5(b):
     """Region 5 (docs/build-plan.md, step 5): deck 8 forward, a breather: out of the duct's grille,
     the party's door, the cabin with the sea in its window, her own cabin (a checkpoint, the fifth
@@ -2495,6 +2509,297 @@ def scenario_region6(b):
     ok &= check("haz_crates_11" in save_list(b, "broken") and js(b, f"{S}.tangerines.some(t => t.id.startsWith('tan_11_crates'))"),
                 "the dash goes through the crates: two tangerines were behind them", save_list(b, "broken"))
     time.sleep(0.5)
+    return ok
+
+
+def scenario_region7(b):
+    """Region 7 (docs/build-plan.md, step 7): Outside: the balconies of decks 8-10 in the grip socks
+    (a vault over a partition, a climb up its pole, gusts, a perched gull, a laundry line, a balcony
+    with someone on it), an ajar balcony cabin and the hallway behind it, the guest locked out on
+    his balcony and his book, the steward on his rounds, the boat walkway (the drill, the security
+    officer, the columns up, the ladder down)."""
+    W = "window.__ship.world"
+    GUST = f"{W}.gusts.phase(window.__ship.time.now)"
+    D7, UNIT = floor_y(7), 125
+
+    def tap2(gap=0.2):
+        b.key("space", True); time.sleep(0.08); b.key("space", False)
+        time.sleep(gap)
+        b.key("space", True); time.sleep(0.08); b.key("space", False)
+
+    def calm(least=2.6):
+        """Waits for the lull after a gust."""
+        wait_js(b, f"{GUST} === 'calm' && (window.__ship.time.now / 1000) % 7 < {7 - 2.2 - least}", 9)
+
+    def lit():
+        return save_list(b, "activated")
+
+    # Without the socks the balcony cabin's balcony is region 4's dead end.
+    enter_region6(b)
+    bc = room(b, "balcabin9")
+    b.teleport(bc["doors"][1]["outX"], D9, "promenade")
+    time.sleep(0.4)
+    ok = check(7 not in save_list(b, "regions"), "without the socks the balcony is not region 7 yet", save_list(b, "regions"))
+    enter_region7(b)
+    ok &= check(7 in save_list(b, "regions") and "cp_balc_9" in lit(), "in the socks, out on the balcony: region 7; its door a checkpoint",
+                (save_list(b, "regions"), lit()))
+    home = b.state()["x"]
+    unit = home - home % UNIT - (3500 % UNIT)
+    # A vault: at the partition, jump and jump again.
+    calm()
+    b.key("right", True)
+    hold_until(b, [], lambda s: s["x"] > unit + 92, 3)
+    tap2()
+    time.sleep(1.0)
+    b.key("right", False)
+    s = b.state()
+    ok &= check(s["y"] == D9 and unit + UNIT < s["x"] < unit + 2 * UNIT, "a kick off the partition vaults it onto the next balcony", s)
+    b.shot("region7-vault")
+    # Up its pole to deck 10, with up held.
+    calm()
+    b.hold("left", 0.9)
+    b.key("up", True)
+    for _ in range(4):
+        b.key("space", True); time.sleep(0.08); b.key("space", False)
+        time.sleep(0.27)
+    time.sleep(0.9)
+    b.key("up", False)
+    s = b.state()
+    ok &= check(s["y"] == D10, "kicks with up held climb the pole to the balcony above", s)
+    # A gust: in the air she is carried aft.
+    b.teleport(unit + UNIT + 60, D10, "promenade")
+    wait_js(b, f"{GUST} === 'blow'", 9)
+    time.sleep(0.1)
+    x0 = b.state()["x"]
+    b.key("space", True); time.sleep(0.45); b.key("space", False)
+    time.sleep(0.6)
+    s = b.state()
+    ok &= check(s["x"] - x0 > 20 and s["mode"] == "play", "a gust carries her aft in the air", (x0, s))
+    b.shot("region7-gust")
+    # Down a deck: down and jump.
+    calm(1.5)
+    b.key("down", True); time.sleep(0.1)
+    b.key("space", True); time.sleep(0.08); b.key("space", False)
+    time.sleep(0.2)
+    b.key("down", False)
+    time.sleep(0.9)
+    ok &= check(b.state()["y"] == D9, "down and jump drops her to the balcony below", b.state())
+    # The balcony where Bumbot swiped at the gull: a tangerine.
+    n = len(save_list(b, "collected"))
+    t = js(b, "window.__ship.tangerines.find(t => t.id === 'tan_10_balc').sprite.x")
+    b.teleport(t - 30, D10, "promenade")
+    b.hold("right", 0.5)
+    ok &= check(len(save_list(b, "collected")) == n + 1, "a tangerine on the balcony table a deck up", save_list(b, "collected"))
+    # A balcony with someone on it: "Startled", and back at the lit balcony door.
+    o = js(b, f"{W}.data.balcony.occupied.find(o => o.id === 'haz_breakfast')")
+    b.teleport(o["x0"] - 50, o["y"], "promenade")
+    calm(1.2)
+    b.key("right", True)
+    hold_until(b, [], lambda s: s["x"] > o["x0"] - 30, 3)
+    tap2()
+    got = scared(b, "вибачте", 2.5)
+    b.shot("region7-occupied")
+    b.key("right", False)
+    ok &= check(got, "vaulting onto the breakfast couple's balcony: startled", (b.state(), alert(b)))
+    s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
+    ok &= check(s["mode"] == "play" and abs(s["x"] - home) < 3 and s["y"] == D9, "she comes to at the balcony cabin's door", s)
+    # A perched gull: lingering by it, its shadow and a swoop; moving on, nothing.
+    g = js(b, f"{W}.data.balcony.perch.find(p => p.id === 'gull_10_2')")
+    marked = f"{W}.movers.some(m => m.def && m.def.id === 'gull_10_2' && m.state === 'mark')"
+    b.teleport(g["x0"] + 50, g["floor"], "promenade")
+    ok &= check(wait_js(b, marked, 5), "lingering by a gull on the rail: it goes up, its shadow on her")
+    b.hold("left", 0.45)
+    time.sleep(1.6)
+    ok &= check(b.state()["mode"] == "play", "a step aside and it comes down on nothing", (b.state(), alert(b)))
+    time.sleep(3.2)
+    b.teleport(g["x0"] + 50, g["floor"], "promenade")
+    wait_js(b, marked, 6)
+    got = scared(b, "Киш", 3.0)
+    b.shot("region7-gull")
+    ok &= check(got, "standing where its shadow is: swooped", (b.state(), alert(b)))
+    hold_until(b, [], lambda s: s["mode"] == "play", 6)
+    # A laundry line across a folded partition: under it on hands and knees.
+    lx = js(b, f"{W}.data.balcony.lines.find(l => l.id === 'haz_line_10b').x")
+    b.teleport(lx - 70, D10, "promenade")
+    b.hold("right", 0.9)
+    b.hold(["right", "space"], 0.7)
+    ok &= check(b.state()["x"] < lx - 15, "the washing on the line stops her, walking or jumping", (b.state()["x"], lx))
+    b.key("down", True); time.sleep(0.15)
+    b.key("right", True); time.sleep(0.5)
+    b.shot("region7-line")
+    time.sleep(0.9)
+    b.key("right", False); b.key("down", False)
+    time.sleep(0.3)
+    ok &= check(b.state()["x"] > lx + 30, "she crawls under it", (b.state()["x"], lx))
+    # The guest locked out on his balcony: he waves, his bubble a door; his door is shut from outside.
+    gr = room(b, "guest10")
+    gx = gr["doors"][1]["outX"]
+    b.teleport(gx - 110, D10, "promenade")
+    time.sleep(0.8)
+    guest = person(b, "npc_balcony_guest")
+    ok &= check(guest["on"] and js(b, f"{W}.people.byId.npc_balcony_guest.bubbleItems[0].visible"), "the guest on his balcony: his bubble shows a door", guest)
+    b.shot("region7-guest-out")
+    b.teleport(gx, D10, "promenade")
+    b.tap("e")
+    time.sleep(0.6)
+    ok &= check(route(b) == "promenade" and "guest" not in flags(b), "his balcony door doesn't open from outside", route(b))
+    ok &= check("cp_balc_guest" in lit(), "(a checkpoint all the same)", lit())
+    # The ajar balcony cabin on deck 10 aft: in, and out of its corridor door into the hallway.
+    ar = room(b, "balcabin10a")
+    b.teleport(ar["doors"][1]["outX"], D10, "promenade")
+    time.sleep(0.3)
+    b.shot("region7-ajar")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "balcabin10a" and "cp_balc_10a" in lit(), "the ajar balcony door: into the cabin", (route(b), lit()))
+    b.shot("region7-cabin")
+    b.teleport(ar["doors"][0]["x"], D10, "balcabin10a")
+    b.tap("e")
+    time.sleep(0.9)
+    s = b.state()
+    ok &= check(route(b) == "inside" and s["y"] == D10 and "cp_hall_10a" in lit(), "out of its corridor door into deck 10's aft hallway", (route(b), s, lit()))
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "balcabin10a", "which opens from the hallway now", route(b))
+    b.tap("e")
+    time.sleep(0.9)
+    # The trays by the "Do Not Disturb" door: walked onto, a fright; and back at the cabin's door.
+    tr = js(b, f"{mover('haz_trays_10a2')}.def")
+    b.teleport(tr["x1"] + 40, D10)
+    b.hold("left", 0.5)
+    got = scared(b, "вибачте", 2.5)
+    b.shot("region7-trays")
+    ok &= check(got, "the trays clatter, the door opens on someone brushing her teeth: startled", (b.state(), alert(b)))
+    s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
+    ok &= check(abs(s["x"] - ar["doors"][0]["outX"]) < 3 and route(b) == "inside", "she comes to at the cabin's door in the hallway", s)
+    time.sleep(2.0)
+    b.teleport(tr["x1"] + 30, D10)
+    b.hold(["left", "space"], 0.5)
+    b.hold("left", 0.25)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["x"] < tr["x0"], "a jump clears them", s)
+    ok &= check(use_door(b, 10, 202, 1), "the lobby's door opens from the hallway")
+    # The door that flies open.
+    sw = mover("haz_swing_10a")
+    wx = js(b, f"{sw}.def.x")
+    b.teleport(wx - 100, D10)
+    ok &= check(wait_js(b, f"{sw}.state === 'burst' || {sw}.state === 'open'", 4), "a door flies open as she comes near", js(b, f"{sw}.state"))
+    b.shot("region7-swing")
+    ok &= check(b.state()["mode"] == "play", "short of it, no harm", b.state())
+    # The guest's cabin, with the green card; his balcony door opened from inside: he comes in, the book.
+    b.teleport(gr["doors"][0]["outX"], D10)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "guest10", "his cabin opens with the Housekeeping card", (route(b), alert(b)))
+    b.teleport(gr["doors"][1]["x"], D10, "guest10")
+    b.tap("e")
+    time.sleep(1.4)
+    b.shot("region7-guest-in")
+    ok &= check(wait_flag(b, "guest", 10), "E at his balcony door: he is let in", flags(b))
+    ok &= check(js(b, "window.__ship.save.books['7']") == "held", "his thanks: the seventh book", js(b, "JSON.stringify(window.__ship.save.books)"))
+    ok &= check(person(b, "npc_guest_in")["on"] and not person(b, "npc_balcony_guest")["on"], "he is at home in his cabin",
+                (person(b, "npc_guest_in"), person(b, "npc_balcony_guest")))
+    b.shot("region7-guest-home")
+    b.teleport(gr["doors"][1]["x"], D10, "guest10")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "promenade" and b.state()["y"] == D10, "and his balcony door is a way out, and in, for good", (route(b), b.state()))
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "guest10", "(in)", route(b))
+    # Deck 8 midships: its aired cabin, the steward on his rounds across the hallway.
+    mr = room(b, "balcabin8m")
+    b.teleport(mr["doors"][1]["outX"], D8, "promenade")
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.9)
+    b.teleport(mr["doors"][0]["x"], D8, "balcabin8m")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "inside" and b.state()["y"] == D8, "through deck 8's aired cabin into its hallway", (route(b), b.state()))
+    rd = mover("haz_steward_rounds")
+    js(b, f"(r => {{ r.x = r.def.stops[0] + 30; r.dir = 1; r.until = 0; r.aside = false; }})({rd})")
+    b.teleport(js(b, f"{rd}.x") - 60, D8)
+    b.hold("right", 1.6)
+    s = b.state()
+    rx = js(b, f"{rd}.x")
+    b.shot("region7-rounds")
+    ok &= check(s["x"] < rx and s["mode"] == "play", "the steward and his cart fill the hallway: she is held behind them", (s, rx))
+    stop = js(b, f"{rd}.def.stops[1]")
+    ok &= check(wait_js(b, f"{rd}.aside", 12), "at a door he pulls his cart in", js(b, f"{rd}.x"))
+    b.shot("region7-rounds-aside")
+    s = hold_until(b, "right", lambda s: s["x"] > stop + 20, 3)
+    ok &= check(s["x"] > stop + 20 and s["mode"] == "play", "and she is past him", (s, stop))
+    n = len(save_list(b, "collected"))
+    t = js(b, "window.__ship.tangerines.find(t => t.id === 'tan_8_mid').sprite.x")
+    b.teleport(t - 24, D8)
+    b.hold("right", 0.4)
+    ok &= check(len(save_list(b, "collected")) == n + 1, "a tangerine in the ice bucket's tray", save_list(b, "collected"))
+    # Deck 8 aft's trays far from a door: a clatter, a look out, no fright.
+    far = js(b, f"{mover('haz_trays_8a1')}.def")
+    b.teleport(far["x1"] + 30, D8)
+    b.hold("left", 0.5)
+    time.sleep(1.0)
+    ok &= check(b.state()["mode"] == "play", "trays far from their door: only a clatter", (b.state(), alert(b)))
+    # The first balcony of all: the framed picture.
+    sl = js(b, f"(t => ({{ x: t.x, y: t.y }}))({W}.things.find(t => t.id === 'slot_balcony'))")
+    b.teleport(sl["x"], D8, "promenade")
+    time.sleep(0.3)
+    b.shot("region7-slot")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(b.state()["mode"] == "scripted", "the photo on deck 8's first balcony opens", b.state())
+    b.tap("e")
+    time.sleep(0.6)
+    ok &= check(b.state()["mode"] == "play" and "slot_balcony" in save_list(b, "seen"), "and closes on a key", b.state())
+    # Down to the boat walkway, and up one of its columns again.
+    col_x = exact_x(142.3)
+    b.teleport(col_x - 40, D8, "promenade")
+    calm(1.0)
+    b.key("down", True); time.sleep(0.1)
+    b.key("space", True); time.sleep(0.08); b.key("space", False)
+    time.sleep(0.2)
+    b.key("down", False)
+    time.sleep(1.0)
+    s = b.state()
+    ok &= check(s["y"] == D7 and s["mode"] == "play", "from deck 8's balcony a drop to the boat walkway", s)
+    b.hold("right", 0.2)
+    b.key("up", True)
+    for _ in range(4):
+        b.key("space", True); time.sleep(0.08); b.key("space", False)
+        time.sleep(0.27)
+    time.sleep(1.0)
+    b.key("up", False)
+    ok &= check(b.state()["y"] == D8, "and up a white column again, kick after kick", b.state())
+    # The drill: under the boat as it comes down; and the security officer at the tender.
+    d = js(b, f"{W}.data.drill")
+    DR = f"{W}.story.drill"
+    cx = d["x"] + 126
+    b.teleport(d["x"] - 50, D7, "promenade")
+    wait_js(b, f"{DR}.at(window.__ship.time.now).k === 0 && (window.__ship.time.now / 1000) % 10 > 6.4 && (window.__ship.time.now / 1000) % 10 < 7.2", 12)
+    b.hold("right", 2.6)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["x"] > d["x"] + 252, "hoisted, the drill's boat lets her under it", (s, d))
+    b.teleport(cx, D7, "promenade")
+    got = scared(b, "Ой", 12.0)
+    b.shot("region7-drill")
+    ok &= check(got, "under it as the crew lower it: bumped", (b.state(), alert(b)))
+    s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
+    ok &= check(route(b) == "promenade", "(she comes to outside)", (route(b), s))
+    rv = person(b, "riv_walkway")
+    ok &= check(rv["on"], "the security officer looks into a tender on the walkway", rv)
+    b.teleport(rv["x"] - 200, D7, "promenade")
+    time.sleep(0.5)
+    b.shot("region7-rival")
+    b.hold("right", 0.6)
+    ok &= check(wait_flag(b, "riv_walkway", 6), "seen, he hurries off aft", flags(b))
+    # The station's ladder down to the promenade.
+    gate = js(b, f"{W}.ladders[0]")
+    b.teleport(gate["x"], gate["y1"], "promenade")
+    b.hold("down", 2.4)
+    s = b.state()
+    ok &= check(s["y"] == gate["y0"] and route(b) == "promenade", "down the station's ladder to the promenade", s)
     return ok
 
 

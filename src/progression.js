@@ -243,6 +243,9 @@ export class Progression {
         if (deck) {
             for (const r of this.regions) {
                 if (r.deck !== deck || r.route !== s.route || p.x < r.x0 || p.x >= r.x1) continue;
+                // (The balconies are region 7's only in the grip socks: before, the balcony cabin's
+                // balcony is a dead end of region 4's.)
+                if (r.n === 7 && r.route !== 'inside' && !this.knows('socks')) continue;
                 if (!this.save.regions.includes(r.n)) this.open('regions', r.n);
                 break;
             }

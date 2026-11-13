@@ -1117,13 +1117,13 @@ export class ShipScene extends Phaser.Scene {
 
     // A checkpoint (§5.5): a crew door with its lamp, on a deck or outside (the boat walkway's station
     // locker). `door: null`: at a door that is drawn already (a room's, cabin 8206's): the lamp only.
-    addCheckpoint(id, x, y, { route = 'inside', door = 'door-crew' } = {}) {
+    addCheckpoint(id, x, y, { route = 'inside', door = 'door-crew', rise = LAMP_RISE } = {}) {
         const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.1;
         const items = [];
         const sprite = door ? this.add.image(x, y, 'shipart', door).setOrigin(0.5, 1).setDepth(depth) : null;
         if (sprite) items.push(sprite);
-        const glow = this.add.image(x, y - LAMP_RISE, 'glow').setDepth(depth).setVisible(false);
-        const lamp = this.add.image(x, y - LAMP_RISE, 'lamp').setDepth(depth);
+        const glow = this.add.image(x, y - rise, 'glow').setDepth(depth).setVisible(false);
+        const lamp = this.add.image(x, y - rise, 'lamp').setDepth(depth);
         items.push(glow, lamp);
         this.worldLayer.add(items);
         const cp = { id, x, y, route, door: sprite, lamp, glow, active: false, items };
@@ -2334,7 +2334,9 @@ export class ShipScene extends Phaser.Scene {
         let bestScore = Infinity;
         for (const c of this.checkpoints) {
             if (!c.active) continue;
-            const score = Math.round(Math.abs(c.y - y) / this.deckPitch) * 1e6 + Math.abs(c.x - x);
+            // (One on the route she is on, a hallway's or a balcony's, before any other.)
+            const score = Math.round(Math.abs(c.y - y) / this.deckPitch) * 1e6 + Math.abs(c.x - x)
+                + (c.route !== this.route && (this.route === 'inside' || this.route === OUTSIDE) ? 3e6 : 0);
             if (score < bestScore) {
                 best = c;
                 bestScore = score;
@@ -2524,7 +2526,7 @@ export class ShipScene extends Phaser.Scene {
         } else if (!onFloor && this.tryWallJump(input, time)) {
             this.jumpBufferedAt = -Infinity;
         }
-        if (input.jumpReleased && body.velocity.y < -PLAYER.jumpCutVelocity && time >= this.kickUntil) {
+        if (input.jumpReleased && body.velocity.y < -PLAYER.jumpCutVelocity && !(time - this.kickedAt < 700)) {
             body.velocity.y = -PLAYER.jumpCutVelocity;
         }
         const sliding = !onFloor && this.updateWallSlide(dir);

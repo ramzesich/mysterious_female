@@ -24,7 +24,7 @@ URL flags, combinable (`?play&debug`):
 | `?cards=all` | Every lock open and every verb known (crawl, wall jump, glide), for testing round the ship |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
-| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `housekeeping` (deck 9, where the red trunk comes up), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro` (deck 12) |
+| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `walkway` (the boat walkway over it, at the station locker), `balcony` (outside, on the balcony of deck 9's balcony cabin; with `&cards=all` she has the grip socks), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `housekeeping` (deck 9, where the red trunk comes up), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro` (deck 12) |
 | `?sound` | Sound is off for now; this turns it on |
 
 ## Controls
