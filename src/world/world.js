@@ -32,7 +32,7 @@ const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-aja
 const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
 const HINTS = {
     dash: 'D: «Кісюнічка!!!»', crawl: '↓ then ← →: crawl', socks: 'In the air at a post or a wall, jump again: kick off it',
-    parasol: 'Hold jump in the air: glide',
+    parasol: 'Hold jump in the air: glide. ↓ + jump: over a railing',
 };
 
 export class World {
@@ -54,6 +54,8 @@ export class World {
         this.story = new Story(this);
         this.library = new Library(this);
         this.movers = [];           // the delivery robot, the gulls
+        this.winds = [];            // gusts, each over its own stretch (src/world/outside.js)
+        this.peek = null;           // a route whose things show from afar (the telescope's view)
         this.built = false;
     }
 
@@ -144,11 +146,18 @@ export class World {
             g.fillStyle(0xffffff, 1).fillRect(6, 2, 2, 16);
             g.fillStyle(0xab947a, 1).fillRect(5, 27, 4, 3);
         });
-        make('parasol-open', 46, 40, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(22, 8, 2, 32);
-            g.fillStyle(0xe83b3b, 1).fillEllipse(23, 12, 46, 22);
-            g.fillStyle(0xffffff, 1).fillEllipse(23, 12, 14, 22).fillEllipse(8, 13, 6, 12).fillEllipse(38, 13, 6, 12);
-            g.fillStyle(0x000000, 0).fillRect(0, 13, 46, 27);
+        // Open: a dome in red and white gores, a point on top, its shaft down to her hands.
+        make('parasol-open', 50, 44, g => {
+            const ink = 0x2e222f, cx = 25, base = 24;
+            g.fillStyle(ink, 1).fillRect(cx - 1, base, 2, 20).fillRect(cx - 1, 0, 2, 4);
+            g.fillStyle(ink, 1).slice(cx, base, 25, Math.PI, Math.PI * 2, false).fillPath();
+            g.fillStyle(0xe83b3b, 1).slice(cx, base, 24, Math.PI, Math.PI * 2, false).fillPath();
+            g.fillStyle(0xffffff, 1);
+            for (const [a, b] of [[-20, -12], [-4, 4], [12, 20]]) g.fillTriangle(cx, 2, cx + a, base, cx + b, base);
+            g.fillStyle(0xae2334, 1).fillRect(cx - 24, base - 1, 48, 1);
+            g.fillStyle(ink, 1).fillRect(cx - 25, base, 50, 1);
+            // (Scallops along its edge.)
+            for (let x = cx - 24; x < cx + 24; x += 8) g.fillStyle(x % 16 === (cx - 24) % 16 ? 0xe83b3b : 0xffffff, 1).fillRect(x + 1, base + 1, 6, 2);
         });
         make('switch-box', 14, 22, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 14, 22);
@@ -441,6 +450,20 @@ export class World {
             s.ladderLayer.forEachTile(t => {
                 if (t.index > 0 && Math.abs(t.pixelX + 8 - g.x) < 2 && t.pixelY >= g.y0 - 2 && t.pixelY < g.y1) tiles.push(t);
             });
+            if (!g.hide) {
+                // In plain sight, a chain across its foot with a sign on it (the technical ladder).
+                const chain = s.add.graphics().setDepth(D.props + 0.02);
+                for (let x = -12; x <= 12; x += 3) {
+                    chain.fillStyle(Math.abs(x) % 2 ? 0x625565 : 0x9babb2, 1).fillRect(g.x + x - 1, g.y1 - 36 + Math.round(4 - (x * x) / 36), 2, 2);
+                }
+                chain.fillStyle(0x625565, 1).fillRect(g.x - 14, g.y1 - 44, 2, 12).fillRect(g.x + 12, g.y1 - 44, 2, 12);
+                const sign = s.add.text(g.x, g.y1 - 23, g.sign ?? '', {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '4px', fontStyle: 'bold', color: '#ffffff', backgroundColor: '#ae2334', align: 'center',
+                    padding: { x: 1, y: 1 }, resolution: 4,
+                }).setOrigin(0.5).setDepth(D.props + 0.03);
+                this.add([chain, sign]);
+                return { ...g, tiles, extra: [chain, sign] };
+            }
             const lid = s.add.image(g.x, g.y0 + 16, 'hatch-lid').setOrigin(0.5, 0).setDepth(D.props);
             this.add([lid]);
             return { ...g, tiles, lid };
@@ -479,7 +502,12 @@ export class World {
     // A ladder on the map she can't take now: a tray in her hands, or its hatch still shut.
     ladderShut(x, y) {
         if (this.carry) return true;
-        return this.gates.some(g => Math.abs(x - g.x) < 9 && y >= g.y0 - 6 && y <= g.y1 + 6 && !this.progress.flagSet(g.needs));
+        const gate = this.gates.find(g => Math.abs(x - g.x) < 9 && y >= g.y0 - 6 && y <= g.y1 + 6 && !this.progress.flagSet(g.needs));
+        if (gate?.sign) {
+            this.scene.showLocked(null, `🚧 ${gate.sign.replace('\n', ': ')}`);
+            this.story.onBlocked(gate.needs);
+        }
+        return !!gate;
     }
 
     // A grip beside her for a wall jump: { away } the side to kick to (0: either, a pillar).
@@ -739,7 +767,7 @@ export class World {
                     items.push(table);
                     y -= table.height;
                 }
-                const img = s.add.image(e.x, y, key).setOrigin(0.5, 1).setDepth(depth + 0.01);
+                const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
                 items.push(img);
                 this.add(items);
                 // (`level`: where it lies, for her standing up there with it: a book on a bed.)
@@ -811,10 +839,18 @@ export class World {
                     w = Math.max(w, Math.abs(dx) * 2 + img.width);
                     h = Math.max(h, dy + img.height);
                 }
-                const zone = s.add.zone(e.x, e.y, w - 6, h - 3).setOrigin(0.5, 1);
+                // (`hang`: it hangs on a string, this many px up to its foot: only it is in the way,
+                // at head height; on hands and knees she passes under it.)
+                const zone = e.hang ? s.add.zone(e.x, e.y - e.hang, w - 4, h - e.hang - 2).setOrigin(0.5, 1)
+                    : s.add.zone(e.x, e.y, w - 6, h - 3).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
+                if (e.string) items.push(s.add.rectangle(e.x, e.y - ROOM.height, 1, ROOM.height - h + 2, 0xab947a).setOrigin(0.5, 0).setDepth(depth + 0.029));
                 this.add(items);
                 const thing = { ...e, items, zone };
+                if (e.hang) {
+                    thing.lowZone = { route: e.route, x0: e.x - w / 2 - 16, x1: e.x + w / 2 + 16, y: e.y };
+                    this.low.push(thing.lowZone);
+                }
                 this.breakables.push(thing);
                 this.things.push(thing);
                 break;
@@ -824,7 +860,11 @@ export class World {
                 const items = [];
                 if (e.show) {
                     this.carryBox.textures();
-                    for (const [key, dy] of e.show) items.push(s.add.image(e.x, e.y - dy, key).setOrigin(0.5, 1).setDepth(depth + 0.03));
+                    // (One of the game's own pictures, or a piece of the ship's atlas.)
+                    for (const [key, dy] of e.show) {
+                        const img = s.textures.exists(key) ? s.add.image(e.x, e.y - dy, key) : s.add.image(e.x, e.y - dy, 'shipart', key);
+                        items.push(img.setOrigin(0.5, 1).setDepth(depth + 0.03));
+                    }
                     this.add(items);
                 }
                 this.things.push({ ...e, items, reach: 22, interact: () => {
@@ -1205,6 +1245,29 @@ export class World {
                 g.fillStyle(0x8fd3ff, 1).fillCircle(8, 9, 3);
                 g.fillStyle(0xffffff, 1).fillRect(7, 7, 1, 1).fillRect(12, 6, 2, 1);
             },
+            // Region 8: a tall glass with mint and a straw; a steaming cup; the ship's horn.
+            cocktail: () => {
+                g.fillStyle(ink, 1).fillRect(4, 3, 8, 13).fillRect(10, 0, 2, 5);
+                g.fillStyle(0xc7dcd0, 1).fillRect(5, 4, 6, 11);
+                g.fillStyle(0xb9e04c, 1).fillRect(5, 7, 6, 8);
+                g.fillStyle(0x239063, 1).fillRect(6, 6, 2, 2).fillRect(8, 9, 2, 2).fillRect(6, 12, 2, 1);
+                g.fillStyle(0xffffff, 1).fillRect(5, 5, 1, 9);
+                g.fillStyle(0xe83b3b, 1).fillRect(10, 1, 1, 6);
+            },
+            coffee: () => {
+                g.fillStyle(ink, 1).fillRect(2, 7, 10, 9).fillRect(12, 9, 3, 5);
+                g.fillStyle(0xffffff, 1).fillRect(3, 8, 8, 7).fillRect(12, 10, 2, 3);
+                g.fillStyle(ink, 1).fillRect(12, 11, 1, 1);
+                g.fillStyle(0x7a4528, 1).fillRect(3, 8, 8, 2);
+                g.fillStyle(0x9babb2, 1).fillRect(4, 3, 1, 3).fillRect(5, 1, 1, 2).fillRect(8, 4, 1, 2).fillRect(9, 1, 1, 3);
+            },
+            horn: () => {
+                g.fillStyle(ink, 1).fillRect(5, 5, 9, 6).fillTriangle(6, 8, 0, 1, 0, 15);
+                g.fillStyle(0xf9c22b, 1).fillRect(6, 6, 7, 4).fillTriangle(6, 8, 1, 3, 1, 13);
+                g.fillStyle(0xfbff86, 1).fillRect(6, 6, 7, 1);
+                g.fillStyle(0xab947a, 1).fillRect(11, 11, 1, 3);
+                g.fillStyle(0xe83b3b, 1).fillRect(10, 13, 3, 3);
+            },
         }[name];
         (draw ?? (() => g.fillStyle(ink, 1).fillRect(6, 2, 4, 8).fillRect(6, 12, 4, 3)))();
         g.generateTexture(key, 16, 16);
@@ -1385,12 +1448,12 @@ export class World {
         this.story.update(dt, time, input);
         this.updateQuirks(time);
         this.updateHud();
-        if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -3 : 3), p.y - PLAYER.height + 12);
+        if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -6 : 6), p.y - PLAYER.height + 4).setDepth(p.depth + 0.02);
     }
 
     // Gusts along the ship's side push her aft while she is in the air (src/world/outside.js).
     push(dt, onFloor) {
-        this.gusts?.push(dt, onFloor);
+        for (const g of this.winds) g.push(dt, onFloor);
         this.offPartition();
     }
 
@@ -1444,7 +1507,7 @@ export class World {
         if (t.done || !this.met(t.needs)) return false;
         if (t.after && !this.cond(t.after)) return false;
         if (t.until && this.cond(t.until)) return false;
-        return t.route === 'inside' || t.route === this.scene.route;
+        return t.route === 'inside' || t.route === this.scene.route || t.route === this.peek;
     }
 
     showParasol(on) {
@@ -1553,8 +1616,9 @@ export class World {
         }
         for (const g of this.gates || []) {
             const open = P.flagSet(g.needs);
-            g.tiles.forEach(t => t.setAlpha(open ? 1 : 0));
-            g.lid.setVisible(!open);
+            if (g.hide) g.tiles.forEach(t => t.setAlpha(open ? 1 : 0));
+            g.lid?.setVisible(!open);
+            g.extra?.forEach(i => i.setVisible(!open));
         }
         this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
         this.hudBooks?.setAlpha(Object.keys(this.save.books).length ? 1 : 0.35);
@@ -1563,7 +1627,8 @@ export class World {
     addColliders(p) {
         const s = this.scene;
         s.physics.add.collider(p, this.platZones, null, (_, z) => s.route === OUTSIDE
-            && (z.plat.solid || (s.droppingThrough !== z.plat && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
+            && (z.plat.solid || (s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
+                && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
         s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
@@ -1580,7 +1645,9 @@ export class World {
                 if (t.route !== s.route || t.done) return false;
                 if (!s.isDashing()) return true;
                 t.done = true;
-                s.smash(t.x, t.y - 12);
+                s.smash(t.x, t.y - (t.hang ?? 0) - 12);
+                if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
+                if (t.lowZone) this.low = this.low.filter(z => z !== t.lowZone);
                 this.save.broken.push(t.id);
                 t.items.forEach(i => i.destroy());
                 t.items = [];
@@ -1588,6 +1655,20 @@ export class World {
                 this.refresh();
                 return false;
             });
+        }
+    }
+
+    // A burst of paper and sweets, coming down to the floor (the pinata).
+    confetti(x, y, floor) {
+        const s = this.scene, colours = [0xe83b3b, 0xf9c22b, 0x4d9be6, 0x1ebc73, 0xf68181, 0xffffff];
+        for (let i = 0; i < 26; i++) {
+            const bit = s.add.rectangle(x + Phaser.Math.Between(-6, 6), y, 2 + (i % 2), 2, colours[i % colours.length]).setDepth(s.DEPTH.fx);
+            this.add([bit]);
+            const dx = Phaser.Math.Between(-46, 46);
+            s.tweens.add({ targets: bit, x: bit.x + dx * 0.5, y: y - Phaser.Math.Between(8, 30), duration: 200, ease: 'Quad.easeOut',
+                onComplete: () => s.tweens.add({ targets: bit, x: bit.x + dx * 0.5, y: floor - 1, angle: Phaser.Math.Between(-200, 200),
+                    duration: Phaser.Math.Between(500, 900), ease: 'Quad.easeIn',
+                    onComplete: () => s.tweens.add({ targets: bit, alpha: 0, delay: 2500, duration: 600, onComplete: () => bit.destroy() }) }) });
         }
     }
 
@@ -1605,7 +1686,9 @@ export class World {
         const left = this.carryBox.left();
         this.hudCarry.back.setVisible(left !== null);
         this.hudCarry.bar.setVisible(left !== null);
-        if (left !== null) this.hudCarry.bar.setSize(100 * left, 6).setFillStyle(left > 0.35 ? 0x8fd3ff : 0xe83b3b);
+        // (A cone melts: blue, red when nearly gone. A cup cools: orange while hot, blue when nearly cold.)
+        const hot = this.carry?.kind === 'coffee';
+        if (left !== null) this.hudCarry.bar.setSize(100 * left, 6).setFillStyle(hot ? (left > 0.35 ? 0xf79617 : 0x4d9be6) : left > 0.35 ? 0x8fd3ff : 0xe83b3b);
     }
 
     // The books' count, under the card slots (population §2.8).

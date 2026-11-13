@@ -143,6 +143,13 @@ export class Carry {
             img.setPosition(x, top).setVisible(p.visible && s.mode !== 'lift');
             top -= img.texture.key === 'tray' ? 3 : 0;
         }
+        // A hot cup steams (less as it cools).
+        if (this.kind === 'coffee' && p.visible && s.time.now > (this.steamAt ?? 0)) {
+            this.steamAt = s.time.now + 260 + (1 - (this.left() ?? 1)) * 700;
+            const wisp = s.add.rectangle(x + Phaser.Math.Between(-1, 1), top - 6, 1, 3, 0xffffff, 0.8).setDepth(s.DEPTH.player + 0.013);
+            this.world.add([wisp]);
+            s.tweens.add({ targets: wisp, y: wisp.y - 12, x: wisp.x + Phaser.Math.Between(-3, 3), alpha: 0, duration: 700, onComplete: () => wisp.destroy() });
+        }
         if (this.until && s.time.now > this.until) {
             // Melted, or gone cold: it is no use now.
             const kind = this.kind;

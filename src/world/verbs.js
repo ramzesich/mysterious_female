@@ -11,6 +11,8 @@ export const verbs = {
         this.kickDir = 0;
         this.kickedAt = -Infinity;
         this.gliding = false;
+        this.stairSlip = false;
+        this.overRail = false;
         this.pushing = null;
         this.aside = false;
         if (this.crawling) this.setCrawl(false);

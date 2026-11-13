@@ -11,6 +11,7 @@ import build_ship_map as B
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
+from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -154,7 +155,7 @@ def build_world():
         x, y, route = spot(where, at)
         # `on`: px up, on a piece already there (a table); else on a side table of its own.
         ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
-                         on=on[0] if on else None))
+                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else ""))
 
     for pid, d in PEOPLE.items():
         x, y, route = spot(*d["at"])
@@ -184,9 +185,9 @@ def build_world():
     for sid, (where, at, frame) in SOLIDS.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="solid", id=sid, x=x, y=y, route=route, frame=frame))
-    for bid, (where, at, pieces) in BREAKABLES.items():
+    for bid, (where, at, pieces, *opts) in BREAKABLES.items():
         x, y, route = spot(where, at)
-        ents.append(dict(kind="breakable", id=bid, x=x, y=y, route=route, pieces=pieces))
+        ents.append(dict(kind="breakable", id=bid, x=x, y=y, route=route, pieces=pieces, **(opts[0] if opts else {})))
     for sid, (where, at, gives, after, show, *rest) in SOURCES.items():
         x, y, route = spot(where, at)
         # (`when`: it is there to see, but hers to take only then; `until`: gone after.)
@@ -366,6 +367,11 @@ def build_world():
                     lock="card:deck:1", gate=True)]
     # Ladders on the map that open on a flag (the bridge's hatch, after the alarm).
     gates = [dict(x=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2, y0=B.floor_y(11), y1=B.floor_y(10), needs="alarm", hide=True)]
+    # The technical ladder at Cagney's, up to the roof: chained off until the engineer has had his
+    # coffee and gone up it (population: `scn_engineer`).
+    ladder_x = B.funnel_ladder_col() * B.TILE + B.TILE // 2
+    gates.append(dict(x=ladder_x, y0=B.ROOF_ROW * B.TILE, y1=B.floor_y(12), needs="engineer", hide=False,
+                      sign="TECHNICAL\nCREW ONLY"))
 
     lib_y = B.floor_y(LIBRARY["deck"])
     library = dict(shelf=dict(x0=B.exact_x(LIBRARY["shelf"][0]), y=lib_y - LIBRARY["shelf"][1]),
@@ -391,7 +397,34 @@ def build_world():
                 tableX=B.exact_x(LIDO["table"]), pawsA=B.exact_x(LIDO["paws"][0]), pawsB=B.exact_x(LIDO["paws"][1]),
                 pools=pools, tankY=ly + B.POOL_DEPTH)
 
+    # Region 8's (src/world/topdeck.js): the old lady's sunbed, the court's balls, the flares, the
+    # pinata, the aft terrace's gusts and gull, the funnel's wind, gulls and top, the bow's flocks.
+    y12 = B.floor_y(12)
+    ft = funnel_top()
+    look = next(e for e in ents if e["id"] == FUNNEL_TOP["look"])
+    topdeck = dict(
+        y=y12,
+        lady=dict(x=B.exact_x(LADY["m"]), y=y12, half=LADY["half"], tall=LADY["tall"], rivalX=B.exact_x(LADY["rival"]),
+                  cardX=B.exact_x(LADY["card"])),
+        balls=[dict(id=bid, x=B.exact_x(m), y=B.floor_y(deck), dir=way, reach=round(reach * 48), period=period, offset=offset)
+               for bid, (deck, m, way, reach, period, offset) in BALLS.items()],
+        court=dict(ballX=B.exact_x(COURT["ball"]), hoopX=B.exact_x(COURT["hoop"]), y=B.floor_y(COURT["deck"])),
+        flares=[dict(id=fid, x=B.exact_x(m), y=B.floor_y(deck), half=round(half * 48), period=period, on=on, offset=offset,
+                     chef=chef) for fid, (deck, m, half, period, on, offset, chef) in FLARES.items()],
+        terrace=dict(gust=TERRACE["gust"], x0=B.exact_x(TERRACE["span"][0]), x1=B.exact_x(TERRACE["span"][1]),
+                     top=y12 - 260, bottom=B.floor_y(11), y=y12,
+                     towels=[dict(x=B.exact_x(m), y=y12 - up, tint=i + 1) for i, (m, up) in enumerate(TERRACE["towels"])],
+                     gull=dict(id="gull_terrace", x=B.exact_x(TERRACE["gull"][0]), y=y12 - TERRACE["gull"][1], floor=y12)),
+        funnel=dict(gust=FUNNEL_TOP["gust"], gulls=FUNNEL_TOP["gulls"], swoop=FUNNEL_TOP["swoop"],
+                    hornX=B.exact_x(FUNNEL_TOP["horn"]), toolboxX=B.exact_x(FUNNEL_TOP["toolbox"]),
+                    telescopeX=B.exact_x(FUNNEL_TOP["telescope"]), y=ft["y"], roofY=ft["foot"][1], ladderX=ladder_x,
+                    x0=ladder_x - 60, x1=ft["x1"] + 40,
+                    look=dict(x=look["x"], y=look["y"] - look["dy"], id=look["id"])),
+        flocks=[dict(id=fid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, n=n)
+                for fid, (deck, a, b, n, up) in FLOCKS.items()])
+
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
+                topdeck=topdeck,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),

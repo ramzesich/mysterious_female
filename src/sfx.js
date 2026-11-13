@@ -69,6 +69,8 @@ export const sfx = {
     whoosh: () => noise(0.35, { volume: 0.05, lowpass: 900 }),
     splash: () => { noise(0.4, { volume: 0.1, lowpass: 1400 }); tone(300, 0.2, { type: 'sine', slideTo: 120, volume: 0.05 }); },
     door: () => tone(330, 0.08, { type: 'triangle', volume: 0.05 }),
+    // The ship's horn: two low notes together, held.
+    horn: (seconds = 1.4) => { tone(110, seconds, { type: 'sawtooth', volume: 0.1 }); tone(139, seconds, { type: 'sawtooth', volume: 0.08 }); },
     ding: () => { tone(988, 0.3, { type: 'triangle', volume: 0.05 }); tone(784, 0.45, { type: 'triangle', volume: 0.05, delay: 0.14 }); },
     // A door that won't open from this side: two dull knocks of the handle.
     rattle: () => [0, 0.09].forEach(delay => noise(0.06, { volume: 0.07, lowpass: 500, delay })),

@@ -295,5 +295,6 @@ END_WALL_LOCKS = {
 
 # Step 0's stand-ins (docs/build-plan.md): the cards lie where their givers will be; standing in a
 # trigger sets its flag where a scene will. (deck, m, needs flag or None).
-CARD_SPOTS = {"off": (12, 136, "horn")}     # the Deck card: the gangway officer's
+# (The Officer's card lies on the sun deck where the security officer dropped it at the horn.)
+CARD_SPOTS = {"off": (12, 134, "horn")}
 TRIGGERS = []       # (flag, deck, m, needs): none left; Bumbot's beats are in tools/population.py

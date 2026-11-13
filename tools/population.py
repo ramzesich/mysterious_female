@@ -129,25 +129,26 @@ TANGERINES = {
     "tan_9_aft": (9, 230, 1, 28, None),
     "tan_10_balc": (10, 160.6, 1, "out", None),
     "tan_12_spinnaker": (12, 54, 2, "table", None),
-    "tan_12_lady": (12, 128, 2, 0, "lady"),
-    "tan_12_cagneys": (12, 167, 1, "table", None),
-    "tan_12_pinata": (12, 211, 2, 0, "pinata"),
-    "tan_funnel": ("funnel", 188, 1, 0, None),
+    "tan_12_lady": (12, 127.25, 2, 0, "lady"),
+    "tan_12_cagneys": (12, 172.9, 1, 34, None),
+    "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
+    "tan_funnel": ("funnel", 189.2, 1, 13, None),
 }
 
 # --- Pickups ---------------------------------------------------------------------------------------
-# id: (deck or room, m or x, what she gets, needs flag). `what`: "verb:<name>" a new way to move,
-# "book:<n>", "item:<name>" a pocket item. All taken with E (population §2.1, §2.2).
+# id: (deck or room, m or x, what she gets, needs flag[, px up on a piece already there[, the atlas
+# piece it is drawn as]]). `what`: "verb:<name>" a new way to move, "book:<n>", "item:<name>" a pocket
+# item. All taken with E (population §2.1, §2.2).
 ITEMS = {
     "item_socks": (11, 95.75, "verb:socks", None, 40),
-    "item_parasol": (12, 130, "verb:parasol", "horn"),
+    # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
+    "item_parasol": (12, 129.62, "verb:parasol", "horn", 0),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
-    "book_8": (12, 128.6, "book:8", "horn"),
-    "book_9": ("funnel", 184, "book:9", "horn"),
+    "book_8": (12, 128.2, "book:8", "horn", 13),
     "book_10": (10, 37.5, "book:10", None),
 }
 
@@ -192,7 +193,6 @@ CATCH_M = 6
 # --- Switches: E on a thing sets a flag (step 0's stand-ins for scenes) ----------------------------
 # id: (deck or room, m or x, flag, needs, label).
 SWITCHES = {
-    "sw_horn": ("funnel", 186, "horn", None, "HORN"),
     "sw_cake": (12, 84, "wedding", None, "CAKE"),
 }
 
@@ -341,6 +341,43 @@ PEOPLE = {
     "riv_walkway": dict(at=("walkway", 207.6), who="rival", face=1, idle="peek", after="region:7", until="flag:riv_walkway"),
     "amb_drill_winch": dict(at=("walkway", 184.9), who="drill_winch", face=1, idle="crank", layer="back"),
     "amb_drill_officer": dict(at=("walkway", 192.6), who="drill_officer", face=-1, idle="idle", layer="back"),
+    # Region 8 (deck 12 from Champs aft, the funnel). Champs' three at the TVs; the old lady on her
+    # sunbed across the sun deck's walk (src/world/topdeck.js: she glares, dozes over her mojito,
+    # bolts at the horn); the security officer on his knees at the loungers; the shuffleboard's two;
+    # the engineer at the technical ladder's foot, and on the funnel's top once he has had his
+    # coffee (by the cord until the horn, reading after); the restaurants' people; the fans in the
+    # Sports Bar once they are off the stairs.
+    "amb_champs_a": dict(at=(12, 90.3), who="champs_a", pose="back", layer="back"),
+    "amb_champs_b": dict(at=(12, 95.1), who="champs_b", pose="back", layer="back"),
+    "amb_champs_c": dict(at=(12, 97.88), who="champs_c", face=1, idle="cheer", layer="back"),
+    "npc_oldlady": dict(at=(12, 128.5), who="oldlady", face=1, idle="read", until="flag:horn", dy=11,
+                        bubble=("cocktail", "!flag:lady", None, 3.4)),
+    "riv_sundeck": dict(at=(12, 134.75), who="rival", face=1, idle="peek", until="flag:horn"),
+    "amb_shuffle_a": dict(at=(12, 156.05), who="shuffle_a", face=1, idle="push", layer="back"),
+    "amb_shuffle_b": dict(at=(12, 159.25), who="shuffle_b", face=-1, idle="idle", layer="back"),
+    "npc_engineer": dict(at=(12, 166.2), who="engineer", face=1, idle="idle", until="flag:engineer",
+                         bubble=("coffee", None, "flag:engineer", 4)),
+    "npc_engineer_cord": dict(at=("funnel", 187.25), who="engineer", face=-1, idle="idle", after="flag:engineer",
+                              until="flag:horn", bubble=("horn", None, "flag:horn", 5)),
+    "npc_engineer_read": dict(at=("funnel", 188.0), who="engineer", face=-1, idle="reading", after="flag:horn",
+                              bubble=("book", "!flag:book9", None, 4)),
+    "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_her", face=1, layer="back"),
+    "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_him", face=-1, layer="back"),
+    "amb_sushi_chef": dict(at=(12, 178.0), who="sushi_chef", face=-1, idle="slice", layer="behind"),
+    "amb_sushi_a": dict(at=(12, 176.71), who="sushi_a", face=1, layer="back"),
+    "amb_sushi_b": dict(at=(12, 179.29), who="sushi_b", face=-1, layer="back"),
+    "amb_teppan_chef_a": dict(at=(12, 185.4), who="teppan_chef_a", face=1, idle="idle", layer="behind"),
+    "amb_teppan_chef_b": dict(at=(12, 190.4), who="teppan_chef_b", face=-1, idle="idle", layer="behind"),
+    "amb_teppan_1": dict(at=(12, 184.88 - 0.17), who="teppan_1", face=1, layer="back"),
+    "amb_teppan_2": dict(at=(12, 185.92 + 0.17), who="teppan_2", face=-1, layer="back"),
+    "amb_teppan_3": dict(at=(12, 189.88 - 0.17), who="teppan_3", face=1, layer="back"),
+    "amb_teppan_4": dict(at=(12, 190.92 + 0.17), who="teppan_4", face=-1, layer="back"),
+    "amb_bistro_her": dict(at=(12, 205.88 - 0.1), who="bistro_her", face=1, layer="back"),
+    "amb_bistro_him": dict(at=(12, 206.71 + 0.1), who="bistro_him", face=-1, layer="back"),
+    "amb_lobos_waiter": dict(at=(12, 209.55), who="lobos_waiter", face=-1, idle="shake", layer="back"),
+    "amb_sportsbar_a": dict(at=(11, 205.9), who="fan_a", face=1, idle="cheer", after="region:8", layer="back"),
+    "amb_sportsbar_b": dict(at=(11, 206.75), who="fan_b", face=1, idle="cheer", after="region:8", layer="back"),
+    "amb_sportsbar_c": dict(at=(11, 208.5), who="fan_c", face=-1, idle="cheer", after="region:8", layer="back"),
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -413,6 +450,11 @@ PROPS = {
     "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, dict(back=True)),
     # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
     "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
+    # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under
+    # them); the old lady's parasol leaning on her sunbed while she is there (hers to take after).
+    "amb_sun_12a": (12, 136.7, "thing:sunbather-3", 0, dict(back=True)),
+    "amb_sun_12b": (12, 138.8, "thing:sunbather-4", 0, dict(back=True, flip=True)),
+    "prop_lady_parasol": (12, 129.62, "@icon-parasol", 0, dict(until="flag:horn")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -435,6 +477,9 @@ BREAKABLES = {
                                ("suitcases", -1, 100)]),
     # Crates of cones and syrup behind the Great Outdoors' service station.
     "haz_crates_11": (11, 217.9, [("@crate-big", 0, 0), ("@crate-big", 1, 26)]),
+    # Los Lobos' pinata (`sec_pinata`), hung on a string at head height across the way (`hang`: px
+    # up to its foot): under it on hands and knees, or the dash through it: its tangerines.
+    "sec_pinata": (12, 210.75, [("pinata", 0, 40)], dict(hang=40, string=True)),
 }
 # Quirks (§6.1.11): a moment with no reward. id: (deck or room, m or x, trigger: "E" or "still:<s>",
 # her clip, ms it lasts, options: needs).
@@ -452,6 +497,10 @@ QUIRKS = {
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
     "src_lunch": (5, 248.8, "lunch", "flag:bb1", [("tray", 24), ("load-cloche", 27)]),
+    # Region 8's two errands: the engineer's coffee from the Great Outdoors' coffee station (hot for
+    # 50 s), the old lady's mojito from Topsiders' bar.
+    "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),
+    "src_cocktail": (11, 155.38, "cocktail", "region:8", [("umbrella-cocktail", 30)], None, "flag:lady"),
     # The ice cream mix, on the cold room's shelf: taken once the machine has run empty.
     "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
 }
@@ -587,3 +636,33 @@ DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
 # The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
 ROUNDS = {"haz_steward_rounds": (8, 162.0, 182.0, 0.9, [167.6, 175.6], 3.0, "steward_rounds")}
+
+# --- Region 8's own things (docs/population.md: deck 12 from Champs aft, the roof, the funnel;
+# src/world/topdeck.js) ------------------------------------------------------------------------------
+# The old lady's sunbed across the sun deck's walk (`npc_oldlady`): deck, its middle (m), half its
+# width and its height with her on it (px): too wide and high for a tray's hop, a jump clears it.
+LADY = dict(deck=12, m=128.5, half=30, tall=36, rival=134.75, card=134.0)
+# Basketballs out of the sports court (`haz_balls`): id: (deck, the hoop (m), the way the ball
+# bounces: 1 aft, how far (m), every s, offset s). It comes off the rim (the tell), bounces twice
+# along the walk and rolls back: "Bonked".
+BALLS = {"haz_balls_a": (12, 146.9, 1, 2.2, 4.0, 0.0), "haz_balls_b": (12, 154.4, -1, 2.2, 4.0, 2.0)}
+# The court's quirk (`sec_court`): a ball lying at the court's side (m); E: she shoots at the hoop (m).
+COURT = dict(deck=12, ball=150.65, hoop=154.4)
+# Teppanyaki's flares (`haz_flare`): id: (deck, the grill (m), half the flame's reach (m), every s,
+# for s, offset s, the chef whose flourish is the tell). "Singed"; a tray is spilled.
+FLARES = {"haz_flare_a": (12, 185.4, 1.25, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
+          "haz_flare_b": (12, 190.4, 1.25, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
+# The aft terrace (`gust_terrace`, `gull_terrace`): gusts over it and the sun cover below (every s,
+# for s, the tell, px/s aft in the air), the span they blow over (m), towels on its rail (the tell),
+# a gull on the rail.
+TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 246),
+               towels=[(215.85, 24), (217.65, 24)], gull=(220.0, 40))
+# The funnel (`gust_funnel`, `gull_funnel`, `sec_horn`, `sec_telescope`): gusts on the roof and the
+# stairway (climbing in one she slips back down the flight), two gulls circling (one comes down at
+# her every `swoop` s, in a lull); on the top (m): the horn's post and cord, the engineer's toolbox
+# with his lunch box, the telescope (it looks at the photo slot `look`).
+FUNNEL_TOP = dict(gust=dict(every=5.0, blow=1.2, tell=0.7, drift=60), gulls=2, swoop=10.0,
+                  horn=185.0, toolbox=189.2, telescope=192.3, look="slot_balcony")
+# Flocks of gulls on the bow until the horn sends them off (`gull_bow_a`, `gull_bow_b`): id: (deck,
+# from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen).
+FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 6, 96)}

@@ -6,6 +6,7 @@
 import { sfx } from '../sfx.js';
 import { lido } from './lido.js';
 import { outside } from './outside.js';
+import { topdeck } from './topdeck.js';
 
 const M = 48;
 
@@ -44,16 +45,19 @@ export class Story {
         this.setupHousekeeping();
         this.setupLido();
         this.setupOutside();
+        this.setupTopdeck();
     }
 
     // E. True if something here took it.
     interact() {
-        return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband();
+        return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband()
+            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook();
     }
 
     update(dt, time, input) {
         this.updateLido(dt, time, input);
         this.updateOutside(dt, time, input);
+        this.updateTopdeck(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
         this.flash(time);
@@ -72,10 +76,16 @@ export class Story {
         if (name === 'guest') this.guestIn();
         this.refreshLido();
         this.refreshOutside();
+        this.refreshTopdeck();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
     onBlocked(id) {
+        // (The technical ladder's chain: the engineer shows what he would like first.)
+        if (id === 'engineer') {
+            const e = this.who('npc_engineer');
+            if (e?.on) this.world.nudge(e);
+        }
         if (id === 'search') {
             const rival = this.who('riv_rope');
             if (rival?.on && rival.state !== 'acting') this.people.play(rival, 'shake');
@@ -721,6 +731,7 @@ export class Story {
     }
 }
 
-// Regions 6 (Lido) and 7 (Outside) have files of their own.
+// Regions 6 (Lido), 7 (Outside) and 8 (Top deck + funnel) have files of their own.
 Object.assign(Story.prototype, lido);
 Object.assign(Story.prototype, outside);
+Object.assign(Story.prototype, topdeck);

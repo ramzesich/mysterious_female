@@ -135,7 +135,7 @@ export class People {
         if (p.gone) return false;
         if (p.until && this.world.cond(p.until)) return false;
         if (p.after && !this.world.cond(p.after)) return false;
-        return p.route === 'inside' || p.route === this.scene.route;
+        return p.route === 'inside' || p.route === this.scene.route || p.route === this.world.peek;
     }
 
     refresh() {

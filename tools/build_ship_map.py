@@ -958,6 +958,12 @@ def build_objects():
     # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
     add(point("balcony", "place", 7815, floor_y(9), [prop("route", "promenade")]))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
+    # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
+    # foot, the funnel's top.
+    for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):
+        add(point(name, "place", exact_x(m), floor_y(12)))
+    from build_world import funnel_top as _top
+    add(point("funnel", "place", _top()["x0"] + 20, _top()["y"]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
     # Nor are the aft terraces behind the end walls (decks 8-10): she is hidden behind the ship's side.
     x0, x1 = STERN_STRIP_7
@@ -1086,7 +1092,9 @@ def build_objects():
         prop("cards", json.dumps(CARDS)),
         prop("blocks", json.dumps({k: {"what": w, "sign": s, "lift": lock_text(lift)} for k, (w, s, lift) in BLOCKS.items()}))]))
     for card, (deck, m, needs) in CARD_SPOTS.items():
-        add(point(f"card-{card}", "card", exact_x(m), floor_y(deck), [prop("card", card), prop("needs", needs or "")]))
+        # (The Officer's card lies on the deck where it was dropped; a card with no giver yet, on a table.)
+        add(point(f"card-{card}", "card", exact_x(m), floor_y(deck), [prop("card", card), prop("needs", needs or ""),
+                                                                     prop("floor", card == "off", "bool")]))
     for flag, deck, m, needs in TRIGGERS:
         add(area(f"trigger-{flag}", "trigger", x_of(m - 1), floor_y(deck) - DECK_PITCH + TILE, x_of(m + 1) - x_of(m - 1),
                  DECK_PITCH - TILE, [prop("flag", flag), prop("needs", needs or "")]))
@@ -1794,7 +1802,7 @@ def build_objects():
     at12(209.5, "margarita", height("cantina-bar-bg"))
     around(12, 211.9, "mexican-table-bg", "mexican-chair-bg", on_top="tacos-bg")
     at12(210.4, "chili-string", 70)
-    hang12(211.9, "pinata")
+    # (The pinata hangs in the way, the game's own: tools/population.py `PINATA`.)
     at12(213.4, "saguaro")
     # The aft terrace over the Great Outdoors: deck chairs by the glass windscreen.
     at12(215.6, "deck-chair")

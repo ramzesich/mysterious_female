@@ -182,7 +182,7 @@ export class FoodGulls {
             b.sprite.setFrame('gull-down').setPosition(b.x, b.y);
             if (time > this.at) {
                 this.shadow.setVisible(false);
-                const got = this.world.carry && FOOD.includes(this.world.carry.kind) && here(s, d)
+                const got = this.world.carry && FOOD.includes(this.world.carry.kind) && here(s, d) && !s.gliding
                     && Math.abs(p.x - this.targetX) < 17 && p.y > d.y - 30;
                 if (got) {
                     const kind = this.world.carry.kind;

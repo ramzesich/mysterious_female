@@ -27,7 +27,9 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # Two sunbathers, each on a lounger of their own (the pool deck, by the first pool).
          "sunbather-1": 33, "sunbather-2": 20,
          # Region 7's balconies with someone on them: a man asleep on a lounger, a couple at breakfast.
-         "balc-sunbather": 32, "balc-breakfast": 46}
+         "balc-sunbather": 32, "balc-breakfast": 46,
+         # Region 8, deck 12's sun deck: two more, on loungers of their own.
+         "sunbather-3": 27, "sunbather-4": 22}
 
 
 def piece(path):

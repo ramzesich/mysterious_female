@@ -87,6 +87,11 @@ def build():
             entry["anims"][clip_dir.name] = list(range(len(cells), len(cells) + n))
             entry["fps"][clip_dir.name] = clips.get(clip_dir.name, DEFAULT_FPS)
             cells += [cell_of(f, base, flip) for f in frames]
+        # ("cut": {name: (clip, [frames])}: a loop made of some of a clip's frames, e.g. the frames
+        # where a book is already in his hands.)
+        for new, (clip, picks) in opts.get("cut", {}).items():
+            entry["anims"][new] = [entry["anims"][clip][i] for i in picks]
+            entry["fps"][new] = clips.get(new, DEFAULT_FPS)
         meta["people"][name] = entry
     rows = (len(cells) + COLS - 1) // COLS
     sheet = Image.new("RGBA", (COLS * CELL, rows * CELL), (0, 0, 0, 0))

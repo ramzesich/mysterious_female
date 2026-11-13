@@ -10,7 +10,8 @@ made with animate_character, east only: a template clip, or skeleton-v3 with one
 
 name: (character id, {clip: frames per second}, options). A clip is an animation of that name on
 the character; "stand" is its standing pose. Options: "flip": the sprite was drawn facing west;
-"scale": shrunk by that much (a seated figure that came out as tall as the standing ones).
+"scale": shrunk by that much (a seated figure that came out as tall as the standing ones); "cut":
+{name: (clip, [frames])} a loop made of some of a clip's frames.
 """
 
 CAST = {
@@ -134,4 +135,29 @@ CAST = {
     "balcony_guest": ("6771ef05-487c-4392-bafa-95fa964dc005", {"idle": 4, "wave": 8, "walk": 8, "thanks": 7}, {}),
     "drill_winch": ("a9ac5ab7-cc28-4b90-94c8-a922be66a20d", {"crank": 8}, {}),
     "drill_officer": ("3ed991ae-cf74-4ce1-a636-8549344290a6", {"idle": 4}, {}),
+    # Region 8 (deck 12 from Champs aft, the funnel). The old lady sits with her knees drawn up (the
+    # game draws her sunbed under her); the diners are drawn seated on chairs of their own.
+    "oldlady": ("78fa84ea-9f20-4f85-81f5-5043cd294920", {"read": 4, "glare": 9, "doze": 4, "bolt": 11, "dozing": 2, "fleeing": 9},
+                {"scale": 0.8, "cut": {"dozing": ("doze", [6, 7, 8, 7]), "fleeing": ("bolt", [7, 8])}}),
+    "engineer": ("819d8399-a91f-48d5-a2b1-47dfd0691eff", {"idle": 4, "walk": 8, "drink": 6, "wave": 8, "climb": 9, "read": 4, "reading": 3},
+                 {"cut": {"reading": ("read", [4, 5, 6, 7, 8, 7, 6, 5])}}),
+    "teppan_chef_a": ("9190cb8c-6aae-4d16-8a38-a2a81f8973ec", {"flourish": 10}, {}),
+    "teppan_chef_b": ("0ed63716-52c2-41e8-af6c-92b069690a24", {"flourish": 10}, {}),
+    "sushi_chef": ("1114fd50-c3d7-43f8-9641-0aa91b6f4e49", {"slice": 10}, {}),
+    "lobos_waiter": ("64db2435-6028-4c5e-9acb-872151602a96", {"shake": 9}, {}),
+    "shuffle_a": ("6f8f13f9-7b6d-41de-950f-a548cd4f1449", {"push": 6}, {}),
+    "shuffle_b": ("a52e43f1-5bb8-437c-856e-c650ccfc8a5b", {"idle": 4}, {}),
+    "champs_a": ("5f10becb-41fb-4efc-a5e3-9a7c88563c9b", {}, {}),
+    "champs_b": ("81fa22b4-2fcc-4f67-b30f-9163f4e7cd66", {}, {}),
+    "champs_c": ("65193a43-d567-4270-85ef-74b2632f7861", {"cheer": 8}, {"scale": 0.8}),
+    "cagneys_her": ("c3fb03be-54f7-4b0e-aade-1d7134d3b66f", {}, {"scale": 0.8}),
+    "cagneys_him": ("cbf3d679-01a3-4ab8-9be2-b4c56be18426", {}, {"scale": 0.8}),
+    "sushi_a": ("ab3f381b-f5ba-4c2b-8568-a20a81ed36f3", {}, {"scale": 0.8}),
+    "sushi_b": ("e0b56bbe-4964-45bf-94ef-8c8d36c2fd2e", {}, {"scale": 0.8}),
+    "bistro_her": ("566ef581-e206-4bc1-a9e5-918e67ac899d", {}, {"scale": 0.8}),
+    "bistro_him": ("5c3df12a-4623-482f-adeb-053a4ba12f6c", {}, {"scale": 0.8}),
+    "teppan_1": ("5b40cf7b-a23f-41f6-b508-0c35c43fcf42", {}, {"scale": 0.72}),
+    "teppan_2": ("d53dac58-6a4f-4439-8030-3226887dba5c", {}, {"scale": 0.8}),
+    "teppan_3": ("4e0eae20-2959-4b1b-abeb-a9f188b22326", {}, {"scale": 0.8}),
+    "teppan_4": ("42920244-2e84-460a-ab33-36635732b3b1", {}, {"scale": 0.8}),
 }

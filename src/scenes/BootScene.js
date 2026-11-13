@@ -118,6 +118,11 @@ export class BootScene extends Phaser.Scene {
             this.anims.create({ key: 'her-sit-eat', frames: frames('sit-eat', [0, 1, 2, 3]), frameRate: 7 });
             this.anims.create({ key: 'her-eat-sat', frames: frames('sit-eat', [3, 4, 5, 6, 5, 4]), frameRate: 5, repeat: -1 });
         }
+        // Region 8: the horn's cord pulled, held at its lowest; a shot at the hoop; hanging from the
+        // open parasol's handle.
+        if (meta.anims.pull) this.anims.create({ key: 'her-pull', frames: frames('pull', [0, 1, 2, 3, 4]), frameRate: 10 });
+        if (meta.anims.throw) this.anims.create({ key: 'her-throw', frames: frames('throw'), frameRate: 12 });
+        if (meta.anims.glide) this.anims.create({ key: 'her-glide', frames: frames('glide'), frameRate: 2, repeat: -1 });
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.

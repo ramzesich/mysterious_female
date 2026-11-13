@@ -457,7 +457,7 @@ export class Sprinkler {
                 const x = d.x - d.half + ((time * 0.11 + i * 41) % (d.half * 2));
                 g.fillStyle(0xffffff, 0.8).fillRect(x, d.y - 2 - (Math.floor(time / 70 + i) % 2), 2, 1);
             }
-            if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5) {
+            if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
                 if (this.world.carry) this.world.carryBox.spill(d.x);
                 else s.scareContact(d.x, 'drenched');
             }

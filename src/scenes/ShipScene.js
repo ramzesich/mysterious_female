@@ -357,7 +357,7 @@ export class ShipScene extends Phaser.Scene {
         // (the user, 2026-11-08).
         const open = this.viewDeck !== null
             && !this.exteriorLayer.getTileAt(Math.floor(p.x / 16), this.deckFloors[Math.round(this.viewDeck)] - 4);
-        const on = this.route === 'inside' && this.viewDeck !== null && !open ? 1 : 0;
+        const on = this.route === 'inside' && this.viewDeck !== null && !open && this.viewOverride == null ? 1 : 0;
         const smooth = dt > 0 && this.route === 'inside';
         d.shown = smooth ? approach(d.shown, on, dt * 6) : on;
         d.outer.setVisible(d.shown > 0).setAlpha(d.shown);
@@ -2131,7 +2131,7 @@ export class ShipScene extends Phaser.Scene {
         for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
 
         // The walkway itself: floor from above.
-        const walk = { x0, x1, y, dropThrough };
+        const walk = { x0, x1, y, dropThrough, atrium: style === 'atrium' };
         walk.zone = this.add.zone(x0, y, x1 - x0, 6).setOrigin(0);
         walk.zone.walk = walk;
         this.physics.add.existing(walk.zone, true);
@@ -2260,8 +2260,10 @@ export class ShipScene extends Phaser.Scene {
         }
         // A side walk holds her coming down onto it, unless she is dropping through it.
         this.droppingThrough = null;
+        // (Out over the atrium under the open parasol, she floats down in front of its walks.)
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
-            this.droppingThrough !== zone.walk && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
+            this.droppingThrough !== zone.walk && !(zone.walk.atrium && this.overRail && this.gliding)
+            && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
             if (!this.isDashing()) return true;
             this.smash(crate.x, crate.y);
@@ -2474,6 +2476,15 @@ export class ShipScene extends Phaser.Scene {
 
         if (onFloor) {
             if (!this.grounded) sfx.land();
+            // (Not in the hop's first moment: her body can still report the floor she has just left.)
+            if (this.overRail && time - this.overRailAt > 250) {
+                this.overRail = false;
+                p.setDepth(DEPTH.player);
+            }
+            if (this.gliding) {
+                this.gliding = false;
+                this.world.showParasol(false);
+            }
             this.grounded = true;
             this.lastGroundedAt = time;
             this.takeoffY = p.y;
@@ -2495,6 +2506,8 @@ export class ShipScene extends Phaser.Scene {
         if (inside && onFloor && (input.up || input.down) && this.tryStairs(input)) return;
         if (inside && (input.up || input.down) && this.tryLadder(input)) return;
         if ((input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
+        // With the parasol: over an atrium walk's railing with ↓ and jump, to float down the atrium.
+        if (onFloor && inside && input.down && input.jumpPressed && this.overTheRail()) return;
         // Through a side walk with ↓; through a balcony's floor outside with ↓ and jump (↓ alone crawls).
         if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
 
@@ -2546,7 +2559,7 @@ export class ShipScene extends Phaser.Scene {
 
         if (crawling) this.poseCrawl(body.velocity.x);
         else if (aside) this.pose('back');
-        else if (gliding) this.pose('apex');
+        else if (gliding) this.pose(this.anims.exists('her-glide') ? 'glide' : 'apex');
         else if (sliding) this.pose(this.herFrames.wallslide !== undefined ? 'wallslide' : 'fall');
         else if (!onFloor && time < this.kickUntil + 160 && this.herFrames.wallkick !== undefined) this.pose('wallkick');
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
@@ -2914,8 +2927,33 @@ export class ShipScene extends Phaser.Scene {
             : this.walks.find(w => w.dropThrough && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2);
         if (!walk) return false;
         this.droppingThrough = walk;
+        // (Outside with the parasol: over the balcony's rail, so that under it she floats on down
+        // past the balconies below, and lands on one when she closes it.)
+        this.overRail = this.route === OUTSIDE && this.progress.knows('parasol');
+        this.overRailAt = this.time.now;
         p.body.velocity.y = -PLAYER.jumpVelocity * 0.35;
         this.time.delayedCall(450, () => { if (this.droppingThrough === walk) this.droppingThrough = null; });
+        return true;
+    }
+
+    // With the parasol, ↓ and jump on one of the atrium's walks: a hop over its glass railing, out
+    // over the atrium. Under the open parasol she floats down in front of the walks below, all the
+    // way to the atrium's floor; closing it, she comes down on the next walk.
+    overTheRail() {
+        const p = this.player;
+        if (!this.progress.knows('parasol') || this.world.carry) return false;
+        const walk = this.walks.find(w => w.atrium && p.x >= w.x0 + 24 && p.x <= w.x1 - 24 && Math.abs(p.y - w.y) < 2);
+        if (!walk) return false;
+        this.overRail = true;
+        this.overRailAt = this.time.now;
+        this.droppingThrough = walk;
+        if (this.crawling) this.setCrawl(false);
+        p.setDepth(DEPTH.fx - 0.5);
+        p.body.velocity.y = -PLAYER.jumpVelocity * 0.5;
+        this.jumpBufferedAt = -Infinity;
+        this.lastGroundedAt = -Infinity;
+        this.time.delayedCall(900, () => { if (this.droppingThrough === walk) this.droppingThrough = null; });
+        sfx.jump();
         return true;
     }
 
@@ -2947,7 +2985,7 @@ export class ShipScene extends Phaser.Scene {
     updateCutaway(dt) {
         const p = this.player;
         const moving = this.mode === 'stairs' || this.mode === 'ladder' || this.mode === 'trunk'
-            || (this.mode === 'lift' && this.liftMove?.carriesHer);
+            || (this.mode === 'lift' && this.liftMove?.carriesHer) || (this.mode === 'play' && this.overRail && this.route === 'inside');
         let target;
         // Outside on the promenade every deck shows its shell; and outdoors where there is no way in
         // (deck 7's stern strip, the aft terraces). In a room (cabin 8206, the linen room) the deck
@@ -2956,7 +2994,9 @@ export class ShipScene extends Phaser.Scene {
         for (const a of this.outdoors || []) a.cover.setVisible(a === outdoors);
         // A room shown in the deck's own place (the linen room) keeps the deck cut open.
         const inDeck = this.route === 'inside' || this.rooms.some(r => r.route === this.route && r.inDeck);
-        if (!inDeck || outdoors || this.overview || p.y <= this.world.roofY + 2) target = null;
+        // (`viewOverride`: the camera is away from her, looking at a deck: the horn's scene.)
+        if (this.viewOverride != null) target = this.viewOverride;
+        else if (!inDeck || outdoors || this.overview || p.y <= this.world.roofY + 2) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -3416,6 +3456,16 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const f = this.flight;
         const upward = Math.sign(f.top.x - f.bottom.x); // which horizontal direction climbs
+        // Caught climbing by a gust on the funnel's stairway (src/world/topdeck.js): her feet go,
+        // and she slides back down the flight on the rail.
+        if (this.stairSlip) {
+            this.stairT = Math.max(0, this.stairT - (PLAYER.stairsSpeed * 3.2 * dt) / f.length);
+            this.placeOnStairs();
+            p.setFlipX(upward < 0);
+            this.pose(this.herFrames.slip !== undefined ? 'slip' : 'fall');
+            if (this.stairT <= 0) this.stairSlip = false;
+            return;
+        }
         let v = 0;
         if (input.up || (upward > 0 ? input.right : input.left)) v = 1;
         else if (input.down || (upward > 0 ? input.left : input.right)) v = -1;

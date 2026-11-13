@@ -25,12 +25,14 @@ export class Gusts {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // maps/world.json `balcony`
+        this.def = def;             // maps/world.json `balcony`; or a stretch of its own: { gust, towels, x0, x1, top, bottom, route }
+        this.route = def.route ?? OUT;
         this.flappers = [];         // what the wind moves: { img, k: how freely, i }
         def.towels.forEach((t, i) => {
-            const img = s.add.image(t.x, t.y, 'rail-towel').setOrigin(0.5, 0).setTint(TOWELS[t.tint % TOWELS.length]).setDepth(D.player + 0.31);
+            const img = s.add.image(t.x, t.y, 'rail-towel').setOrigin(0.5, 0).setTint(TOWELS[t.tint % TOWELS.length])
+                .setDepth(this.route === OUT ? D.player + 0.31 : D.props + 0.04);
             world.add([img]);
-            s.shellSlopes.push({ deck: deckOf(def, t.y + 50), gfx: img });
+            if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(def, t.y + 50), gfx: img });
             this.flappers.push({ img, k: 1, i });
         });
         this.streaks = s.add.graphics().setDepth(D.player + 0.45);
@@ -46,7 +48,7 @@ export class Gusts {
     // On the balconies (or in the air over one).
     out() {
         const s = this.scene, p = s.player, d = this.def;
-        return s.route === OUT && p.y <= d.bottom + 2 && p.y > d.top - 80 && p.x > d.x0 - 40 && p.x < d.x1 + 40;
+        return s.route === this.route && p.y <= d.bottom + 2 && p.y > d.top - 80 && p.x > d.x0 - 40 && p.x < d.x1 + 40;
     }
 
     update(dt, time) {
@@ -94,11 +96,12 @@ export class PerchGull {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x, y: the rail's top, floor }
+        this.def = def;             // { x, y: the rail's top, floor[, route: where it is, if not on a balcony] }
+        this.route = def.route ?? OUT;
         this.sprite = s.add.image(def.x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setDepth(D.player + 0.34);
-        this.shadow = s.add.ellipse(def.x, def.floor - 1, 22, 5, 0x2e222f, 0.45).setDepth(D.exterior + 0.14).setVisible(false);
+        this.shadow = s.add.ellipse(def.x, def.floor - 1, 22, 5, 0x2e222f, 0.45).setDepth(this.route === OUT ? D.exterior + 0.14 : D.props + 0.01).setVisible(false);
         world.add([this.sprite, this.shadow]);
-        s.shellSlopes.push({ deck: deckOf(world.data.balcony, def.floor), gfx: this.sprite });
+        if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(world.data.balcony, def.floor), gfx: this.sprite });
         this.state = 'perched';
         this.linger = 0;
         this.at = 0;
@@ -111,7 +114,7 @@ export class PerchGull {
         if (!nearby(s, d)) return;
         const frames = s.textures.get('things');
         const flap = Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up';
-        const near = s.route === OUT && s.mode === 'play' && Math.abs(p.y - d.floor) < 70 && Math.abs(p.x - d.x) < 2.6 * M;
+        const near = s.route === this.route && s.mode === 'play' && Math.abs(p.y - d.floor) < 70 && Math.abs(p.x - d.x) < 2.6 * M;
         if (this.state === 'perched') {
             this.linger = near ? this.linger + dt : Math.max(0, this.linger - dt * 2);
             this.sprite.setFrame('gull-perched').setPosition(d.x, d.y - (this.linger > 1.2 ? Math.floor(time / 110) % 2 : 0));
@@ -141,7 +144,8 @@ export class PerchGull {
             this.sprite.setFrame('gull-down').setPosition(this.x, this.y);
             if (time > this.at) {
                 this.shadow.setVisible(false);
-                const hit = s.route === OUT && s.mode === 'play' && Math.abs(p.x - this.targetX) < 17
+                // (Under the open parasol she is out of its reach.)
+                const hit = s.route === this.route && s.mode === 'play' && !s.gliding && Math.abs(p.x - this.targetX) < 17
                     && p.y > d.floor - 30 && p.y < d.floor + 8;
                 if (hit) {
                     const carry = this.world.carry;
@@ -426,6 +430,7 @@ export const outside = {
         this.outsideTextures();
         this.gusts = w.gusts = new Gusts(w, B);
         w.movers.push(this.gusts);
+        w.winds.push(this.gusts);
         for (const f of B.furniture) {
             const img = s.add.image(f.x, f.y, 'shipart', f.frame).setOrigin(0.5, 1).setFlipX(!!f.flip).setDepth(D.exterior + 0.09);
             w.add([img]);

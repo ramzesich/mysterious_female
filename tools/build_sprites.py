@@ -107,6 +107,12 @@ HER = {
         "lick": [(f"lick/{i}.png", "feet") for i in range(4)],
         "pour": [("pour/0.png", "feet")],
         "sit-eat": [(f"sit-eat-clean/{i}.png", "feet") for i in (0, 1, 3, 4, 5, 6, 7)],
+        # Region 8 (skeleton-v3, custom poses): both hands up to the horn's cord and down with her
+        # weight; a two-handed shot at the court's hoop; under the open parasol she hangs from its
+        # handle by both hands (the pull's first frames: a "hover" clip kept her hands down).
+        "pull": [(f"pull/{i}.png", "feet") for i in range(8)],
+        "throw": [(f"throw/{i}.png", "feet") for i in range(8)],
+        "glide": [(f"pull/{i}.png", "feet") for i in (0, 1)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.
