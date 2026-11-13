@@ -31,7 +31,8 @@ export class People {
         const inside = def.route === 'inside';
         const depth = !inside ? D.exterior + 0.135 : def.layer === 'behind' ? D.decor + 0.09 : def.layer === 'back' ? D.decor + 0.12
             : def.layer === 'front' ? D.player + 0.02 : D.props + 0.05;
-        const sprite = s.add.sprite(def.x, def.y - (def.dy ?? 0), 'people', meta.stand).setOrigin(0.5, 1).setDepth(depth);
+        // (`pose`: turned to us at a rail ("front"), or away, reading a wall ("back").)
+        const sprite = s.add.sprite(def.x, def.y - (def.dy ?? 0), 'people', meta[def.pose] ?? meta.stand).setOrigin(0.5, 1).setDepth(depth);
         sprite.setFlipX((def.face ?? 1) < 0);
         this.world.add([sprite]);
         const p = { ...def, sprite, meta, items: [sprite], dir: def.face ?? 1, x: def.x, pausedUntil: 0, attached: [], state: 'idle' };
@@ -44,6 +45,11 @@ export class People {
             this.world.add([img]);
             p.attached.push({ ...a, img });
             p.items.push(img);
+        }
+        // Built furniture they stand behind, drawn again in front of them (a bar's counter).
+        for (const c of def.cover ?? []) {
+            const img = s.add.image(c.x, def.y - (c.dy ?? 0), 'shipart', c.frame).setOrigin(0.5, 1).setDepth(depth + 0.005);
+            this.world.add([img]);
         }
         if (def.bubble) {
             const g = s.add.graphics().setDepth(D.fx + 0.5);
@@ -81,7 +87,7 @@ export class People {
         p.state = 'idle';
         if (!p.idle || !this.anim(p, p.idle)) {
             p.sprite.anims.stop();
-            p.sprite.setFrame(p.meta.stand);
+            p.sprite.setFrame(p.meta[p.pose] ?? p.meta.stand);
         }
     }
 

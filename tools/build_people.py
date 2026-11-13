@@ -26,6 +26,24 @@ def lowest_row(img):
     return (box[3] - 1) if box else img.height - 1
 
 
+def shrunk(img, scale):
+    """A figure drawn too big next to the others, smaller: box-resampled, hard-edged, on the palette again."""
+    box = img.getbbox()
+    if not box:
+        return img
+    part = img.crop(box)
+    small = part.resize((max(1, round(part.width * scale)), max(1, round(part.height * scale))), Image.BOX)
+    px = small.load()
+    for y in range(small.height):
+        for x in range(small.width):
+            r, g, b, a = px[x, y]
+            px[x, y] = (r, g, b, 255 if a >= 128 else 0)
+    out = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    # Its feet stay on the row they stood on, its middle where it was.
+    out.alpha_composite(palettize(small), ((box[0] + box[2] - small.width) // 2, box[3] - small.height))
+    return out
+
+
 def cell_of(img, feet, flip):
     """The frame in a cell: centred as its canvas is, the row `feet` on the cell's bottom row."""
     if flip:
@@ -47,17 +65,20 @@ def build():
             print("  (not fetched yet:", name + ")")
             continue
         flip = opts.get("flip", False)
-        stand = palettize(Image.open(src / "stand.png"))
+        scale = opts.get("scale")
+        load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale)) if scale else (lambda path: palettize(Image.open(path)))
+        stand = load(src / "stand.png")
         feet = lowest_row(stand)
         entry = {"stand": len(cells), "anims": {}, "fps": {}}
         cells.append(cell_of(stand, feet, flip))
-        if (src / "front.png").exists():
-            front = palettize(Image.open(src / "front.png"))
-            entry["front"] = len(cells)
-            cells.append(cell_of(front, lowest_row(front), False))
+        for turned in ("front", "back"):
+            if (src / f"{turned}.png").exists():
+                pic = load(src / f"{turned}.png")
+                entry[turned] = len(cells)
+                cells.append(cell_of(pic, lowest_row(pic), False))
         for clip_dir in sorted(p for p in src.iterdir() if p.is_dir()):
             n = len(list(clip_dir.glob("*.png")))
-            frames = [palettize(Image.open(clip_dir / f"{i}.png")) for i in range(n)]
+            frames = [load(clip_dir / f"{i}.png") for i in range(n)]
             if not frames:
                 continue
             # On the standing pose's canvas the feet stay where they stand; on another canvas the

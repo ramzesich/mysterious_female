@@ -21,7 +21,7 @@ SRC = ROOT / "assets" / "source" / "things"
 OUT = ROOT / "assets" / "sprites"
 
 # Heights in the game, px (she is 59): a herring gull stands about knee-high.
-SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 20, "robot": 52}
+SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52}
 
 
 def piece(path):

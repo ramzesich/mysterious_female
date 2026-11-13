@@ -46,74 +46,67 @@
      25,
      26,
      27
+    ],
+    "walk": [
+     28,
+     29,
+     30,
+     31,
+     32,
+     33
     ]
    },
    "fps": {
     "idle": 8,
-    "shake": 8
+    "shake": 8,
+    "walk": 8
    },
    "front": 15
   },
   "porter": {
-   "stand": 28,
+   "stand": 34,
    "anims": {
     "cart": [
-     30,
-     31,
-     32,
-     33,
-     34,
-     35,
      36,
-     37
-    ],
-    "push": [
+     37,
      38,
      39,
      40,
      41,
      42,
      43
+    ],
+    "push": [
+     44,
+     45,
+     46,
+     47,
+     48,
+     49
     ]
    },
    "fps": {
     "cart": 8,
     "push": 8
    },
-   "front": 29
+   "front": 35
   },
   "waiter": {
-   "stand": 44,
+   "stand": 50,
    "anims": {
     "serve": [
-     46,
-     47,
-     48,
-     49,
-     50,
-     51,
      52,
-     53
-    ],
-    "walk": [
+     53,
      54,
      55,
      56,
      57,
      58,
      59
-    ]
-   },
-   "fps": {
-    "serve": 8,
-    "walk": 8
-   },
-   "front": 45
-  },
-  "tourist": {
-   "stand": 60,
-   "anims": {
-    "idle": [
+    ],
+    "walk": [
+     60,
+     61,
      62,
      63,
      64,
@@ -121,11 +114,12 @@
     ]
    },
    "fps": {
-    "idle": 8
+    "serve": 8,
+    "walk": 8
    },
-   "front": 61
+   "front": 51
   },
-  "robe": {
+  "tourist": {
    "stand": 66,
    "anims": {
     "idle": [
@@ -140,7 +134,7 @@
    },
    "front": 67
   },
-  "stewardess": {
+  "robe": {
    "stand": 72,
    "anims": {
     "idle": [
@@ -155,7 +149,7 @@
    },
    "front": 73
   },
-  "receptionist": {
+  "stewardess": {
    "stand": 78,
    "anims": {
     "idle": [
@@ -170,7 +164,7 @@
    },
    "front": 79
   },
-  "photographer": {
+  "receptionist": {
    "stand": 84,
    "anims": {
     "idle": [
@@ -185,7 +179,7 @@
    },
    "front": 85
   },
-  "gentleman": {
+  "photographer": {
    "stand": 90,
    "anims": {
     "idle": [
@@ -200,7 +194,7 @@
    },
    "front": 91
   },
-  "lady": {
+  "gentleman": {
    "stand": 96,
    "anims": {
     "idle": [
@@ -215,29 +209,29 @@
    },
    "front": 97
   },
-  "cleaner": {
+  "lady": {
    "stand": 102,
    "anims": {
-    "mop": [
+    "idle": [
      104,
      105,
      106,
-     107,
-     108,
-     109,
-     110,
-     111
+     107
     ]
    },
    "fps": {
-    "mop": 8
+    "idle": 8
    },
    "front": 103
   },
-  "agent": {
-   "stand": 112,
+  "cleaner": {
+   "stand": 108,
    "anims": {
-    "idle": [
+    "mop": [
+     110,
+     111,
+     112,
+     113,
      114,
      115,
      116,
@@ -245,11 +239,11 @@
     ]
    },
    "fps": {
-    "idle": 8
+    "mop": 8
    },
-   "front": 113
+   "front": 109
   },
-  "maitre": {
+  "agent": {
    "stand": 118,
    "anims": {
     "idle": [
@@ -264,7 +258,7 @@
    },
    "front": 119
   },
-  "chef": {
+  "maitre": {
    "stand": 124,
    "anims": {
     "idle": [
@@ -279,7 +273,7 @@
    },
    "front": 125
   },
-  "folder": {
+  "chef": {
    "stand": 130,
    "anims": {
     "idle": [
@@ -294,29 +288,256 @@
    },
    "front": 131
   },
-  "diner_red": {
+  "folder": {
    "stand": 136,
-   "anims": {},
-   "fps": {},
+   "anims": {
+    "idle": [
+     138,
+     139,
+     140,
+     141
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
    "front": 137
   },
-  "diner_suit": {
-   "stand": 138,
-   "anims": {},
-   "fps": {},
-   "front": 139
-  },
-  "diner_teal": {
-   "stand": 140,
-   "anims": {},
-   "fps": {},
-   "front": 141
-  },
-  "diner_linen": {
+  "diner_red": {
    "stand": 142,
    "anims": {},
    "fps": {},
    "front": 143
+  },
+  "diner_suit": {
+   "stand": 144,
+   "anims": {},
+   "fps": {},
+   "front": 145
+  },
+  "diner_teal": {
+   "stand": 146,
+   "anims": {},
+   "fps": {},
+   "front": 147
+  },
+  "diner_linen": {
+   "stand": 148,
+   "anims": {},
+   "fps": {},
+   "front": 149
+  },
+  "librarian": {
+   "stand": 150,
+   "anims": {
+    "idle": [
+     153,
+     154,
+     155,
+     156
+    ],
+    "shelve": [
+     157,
+     158,
+     159,
+     160,
+     161,
+     162
+    ],
+    "shush": [
+     163,
+     164,
+     165,
+     166,
+     167,
+     168
+    ]
+   },
+   "fps": {
+    "idle": 4,
+    "shelve": 7,
+    "shush": 6
+   },
+   "front": 151,
+   "back": 152
+  },
+  "jogger": {
+   "stand": 169,
+   "anims": {
+    "run": [
+     171,
+     172,
+     173,
+     174,
+     175,
+     176,
+     177,
+     178
+    ]
+   },
+   "fps": {
+    "run": 12
+   },
+   "front": 170
+  },
+  "fitter": {
+   "stand": 179,
+   "anims": {
+    "work": [
+     182,
+     183,
+     184,
+     185,
+     186,
+     187,
+     188,
+     189
+    ]
+   },
+   "fps": {
+    "work": 6
+   },
+   "front": 180,
+   "back": 181
+  },
+  "dj": {
+   "stand": 190,
+   "anims": {
+    "bob": [
+     193,
+     194,
+     195,
+     196,
+     197,
+     198,
+     199,
+     200
+    ]
+   },
+   "fps": {
+    "bob": 9
+   },
+   "front": 191,
+   "back": 192
+  },
+  "barmaid": {
+   "stand": 201,
+   "anims": {
+    "idle": [
+     204,
+     205,
+     206,
+     207
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 202,
+   "back": 203
+  },
+  "studio": {
+   "stand": 208,
+   "anims": {
+    "idle": [
+     211,
+     212,
+     213,
+     214
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 209,
+   "back": 210
+  },
+  "railwoman": {
+   "stand": 215,
+   "anims": {
+    "idle": [
+     218,
+     219,
+     220,
+     221
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 216,
+   "back": 217
+  },
+  "surfer": {
+   "stand": 222,
+   "anims": {},
+   "fps": {},
+   "front": 223,
+   "back": 224
+  },
+  "atriumwoman": {
+   "stand": 225,
+   "anims": {},
+   "fps": {},
+   "front": 226,
+   "back": 227
+  },
+  "railman": {
+   "stand": 228,
+   "anims": {},
+   "fps": {},
+   "front": 229,
+   "back": 230
+  },
+  "maid": {
+   "stand": 231,
+   "anims": {
+    "make": [
+     234,
+     235,
+     236,
+     237,
+     238,
+     239,
+     240,
+     241
+    ]
+   },
+   "fps": {
+    "make": 6
+   },
+   "front": 232,
+   "back": 233
+  },
+  "modelguest": {
+   "stand": 242,
+   "anims": {
+    "idle": [
+     245,
+     246,
+     247,
+     248
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 243,
+   "back": 244
+  },
+  "plaquewoman": {
+   "stand": 249,
+   "anims": {},
+   "fps": {},
+   "front": 250,
+   "back": 251
+  },
+  "plaqueman": {
+   "stand": 252,
+   "anims": {},
+   "fps": {},
+   "front": 253,
+   "back": 254
   }
  }
 }

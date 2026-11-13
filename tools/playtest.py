@@ -861,8 +861,8 @@ def scenario_golden(b):
     # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2).
     shut = not use_door(b, 6, 194, -1)
     ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off", alert(b))
-    go(b, 6, 174)
-    b.hold("right", 1.2)
+    go(b, 6, 177)
+    b.hold("right", 1.5)
     ok &= check(wait_flag(b, "bb2"), "near-catch 2 at the reading table", flags(b))
     ok &= check(use_door(b, 6, 194, -1), "then the aft door opens")
     b.hold("right", 1.2)
@@ -1155,6 +1155,219 @@ def lunch_for_the_officer(b):
         time.sleep(0.2)
     time.sleep(0.8)
     return "deck" in save_list(b, "cards")
+
+
+def enter_region2(b):
+    """A save at region 2's door: near-catch 1 done, the Deck card, region 2 opened (as the golden
+    path leaves it), so a region's own playtest need not replay the one before."""
+    b.open("?reset&play")
+    b.eval("(P => { P.setFlag('bb1'); P.setFlag('lunch'); P.open('cards', 'deck'); P.open('regions', 2); })(window.__ship.progress)")
+    b.eval("window.__ship.cats.filter(c => c.flag === 'bb1').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
+    time.sleep(0.2)
+
+
+def js(b, text):
+    return b.eval(text)
+
+
+def scenario_region2(b):
+    """Region 2 (docs/build-plan.md, step 2): deck 6 from the bow to the Library, the promenade and
+    the boat walkway's foothold, deck 7's lobbies: the robot, the flash, the jogger, the gulls, the
+    glimpses, the lifeboat's book and photo, the books returned and read, near-catch 2 and the door
+    it leaves ajar, the blocks on the ways up."""
+    enter_region2(b)
+    ok = True
+    # The glass elevator: Bumbot rides up in it as she comes near, and it comes back empty.
+    busy = "window.__ship.lifts.find(l => l.glass).busy"
+    ok &= check(js(b, busy) is True, "the glass elevator waits at deck 6, taken")
+    b.teleport(exact_x(97), D6)
+    b.hold("left", 0.6)
+    ok &= check(wait_flag(b, "bb_lift", 10) and js(b, busy) is False, "he rides up in it as she comes near; it comes back hers", flags(b))
+    # The delivery robot: it waits while she is in its way, and carries her on its top.
+    robot = "window.__ship.world.robots[0]"
+    b.teleport(exact_x(34), D6)
+    js(b, f"(r => {{ r.x = {exact_x(32)}; r.dir = 1; r.pausedUntil = 0; }})({robot})")
+    time.sleep(0.5)
+    x0 = js(b, f"{robot}.x")
+    time.sleep(0.6)
+    ok &= check(abs(js(b, f"{robot}.x") - x0) < 1 and js(b, f"{robot}.beep.visible") is not None, "the robot stops while she stands in its way", x0)
+    b.shot("region2-robot")
+    b.teleport(exact_x(31), D6)
+    time.sleep(0.5)
+    x1 = js(b, f"{robot}.x")
+    ok &= check(x1 > x0 + 4, "and trundles on when she is behind it", (x0, x1))
+    b.hold("right", 0.5)
+    ok &= check(b.state()["x"] < js(b, f"{robot}.x"), "it is in the way like a cart", b.state())
+    # Onto its top with a hop, and along with it to the tangerine on the hose cabinet.
+    js(b, f"(r => {{ r.x = {exact_x(29.5)}; r.dir = -1; r.pausedUntil = 0; }})({robot})")
+    top = js(b, f"{robot}.def.y - {robot}.h")
+    b.teleport(js(b, f"{robot}.x"), top)
+    time.sleep(0.3)
+    xa = b.state()["x"]
+    time.sleep(1.0)
+    s = b.state()
+    ok &= check(s["y"] == top and xa - s["x"] > 20, "she rides on its top", (xa, s))
+    end = time.time() + 8
+    while time.time() < end and b.state()["x"] > exact_x(26.94) + 6:
+        time.sleep(0.05)
+    b.tap("space")
+    time.sleep(0.5)
+    ok &= check("tan_6_high" in save_list(b, "collected"), "a hop from its top takes the tangerine on the fire-hose cabinet", b.state())
+    # The cabin being made up: a peek.
+    maid = room(b, "maid6")
+    b.teleport(maid["doors"][0]["outX"], D6)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "maid6" and person(b, "amb_maid")["on"], "the cabin being made up: in through its open door", route(b))
+    b.shot("region2-cabin")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "inside", "and out again", route(b))
+    # Bliss: standing still on the dance floor, she dances.
+    b.teleport(exact_x(117.2), D6)
+    time.sleep(3.6)
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-dance",
+                "three seconds still on Bliss's dance floor: she dances", b.state())
+    b.shot("region2-dance")
+    time.sleep(3.4)
+    ok &= check(b.state()["mode"] == "play", "and stops", b.state())
+    # The Photo Studio's flash: caught in it she poses; no scare.
+    b.teleport(exact_x(133.6), D6)
+    end = time.time() + 9
+    posed = False
+    while time.time() < end and not posed:
+        posed = b.state()["mode"] == "scripted"
+        time.sleep(0.05)
+    ok &= check(posed, "caught in the studio's flash she poses")
+    b.shot("region2-flash")
+    time.sleep(1.4)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and abs(s["x"] - exact_x(133.6)) < 4, "and that is all: no scare", s)
+    # The promenade: the jogger bumps her; standing aside (↑) lets him by.
+    jog = "window.__ship.world.people.byId.haz_jogger"
+    js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
+    b.teleport(exact_x(150), D6, "promenade")
+    b.key("up", True)
+    time.sleep(0.2)
+    js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
+    time.sleep(1.8)
+    s = b.state()
+    b.key("up", False)
+    ok &= check(s["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "standing aside by the wall (↑), the jogger runs by", (s, person(b, "haz_jogger")))
+    b.shot("region2-jogger")
+    js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
+    time.sleep(1.6)
+    ok &= check(b.state()["mode"] == "scripted" and "Ой" in alert(b), "in his lane, he bumps her", alert(b))
+    time.sleep(2.6)
+    ok &= check(b.state()["mode"] == "play", "a scare: she is back at a checkpoint", b.state())
+    # He can be hopped.
+    js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
+    b.teleport(exact_x(150), D6, "promenade")
+    js(b, f"(p => {{ p.x = {exact_x(152.2)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
+    time.sleep(0.58)         # (standing still, the hop wants timing; running at him it is easy)
+    b.hold("space", 0.8)
+    ok &= check(b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "or hopped", (b.state(), person(b, "haz_jogger")))
+    js(b, f"(p => {{ p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
+    # The gulls on the rail fly up as she comes near, and settle again.
+    gull = "window.__ship.world.movers.filter(m => m.rise !== undefined)[1]"
+    b.teleport(exact_x(170), D6, "promenade")
+    time.sleep(0.4)
+    ok &= check(js(b, f"{gull}.rise") == 0, "a gull sits on the rail")
+    # (On the way: two black ears in a porthole.)
+    b.hold("right", 1.6)
+    ok &= check("glimpse_window" in flags(b), "two black ears show in a porthole as she passes", flags(b))
+    b.teleport(exact_x(174), D6, "promenade")
+    time.sleep(0.7)
+    ok &= check(js(b, f"{gull}.rise") > 0.5, "and flies up as she comes near", js(b, f"{gull}.rise"))
+    b.shot("region2-gull")
+    b.teleport(exact_x(185), D6, "promenade")
+    time.sleep(3.2)
+    ok &= check(js(b, f"{gull}.rise") == 0, "then settles again", js(b, f"{gull}.rise"))
+    # The rival under the boats: he hurries off as she comes.
+    ok &= check(person(b, "riv_prom")["on"], "the security officer peers under a boat on the promenade", person(b, "riv_prom"))
+    b.teleport(exact_x(193.6), D6, "promenade")
+    b.shot("region2-rival")
+    ok &= check(wait_flag(b, "riv_prom", 6) and not person(b, "riv_prom")["on"], "and hurries off, in at a promenade door, as she comes near", flags(b))
+    # The lifeboat station's gate and ladder (the Deck card), the locker, the lifeboat's inside.
+    gate = js(b, "window.__ship.world.ladders[0]")
+    b.teleport(gate["x"], gate["y0"], "promenade")
+    s = hold_until(b, "up", lambda s: s["y"] <= gate["y1"] and s["mode"] == "play", 6)
+    ok &= check(s["y"] == gate["y1"] and route(b) == "promenade", "with the Deck card, up the station's ladder to the boat walkway", s)
+    boat = room(b, "lifeboat")
+    b.teleport(boat["doors"][0]["outX"], boat["floor"], "promenade")
+    b.shot("region2-walkway")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "lifeboat", "the one lifeboat with its hatch open: inside", route(b))
+    b.teleport(boat["x0"] + 112, boat["floor"], "lifeboat")
+    b.shot("region2-lifeboat")
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(js(b, "window.__ship.save.books['2']") == "held", "the second book, on its bench", js(b, "JSON.stringify(window.__ship.save.books)"))
+    b.teleport(boat["x0"] + 184, boat["floor"], "lifeboat")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(b.state()["mode"] == "scripted", "the photo in its frame opens over the screen", b.state())
+    b.shot("region2-photo")
+    b.tap("e")
+    time.sleep(0.6)
+    ok &= check(b.state()["mode"] == "play" and "slot_lifeboat" in save_list(b, "seen"), "and closes on a key", b.state())
+    b.teleport(boat["doors"][0]["x"], boat["floor"], "lifeboat")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "promenade" and b.state()["y"] == boat["floor"], "out onto the walkway again", (route(b), b.state()))
+    # The Library: her bubble while a book is out, the trolley, the shelf, the chair.
+    lib = js(b, "window.__ship.world.data.library")
+    b.teleport(lib["trolley"]["x"] - 40, D6)
+    time.sleep(0.4)
+    ok &= check(js(b, "window.__ship.world.people.byId.npc_librarian.bubbleItems[0].visible"), "the librarian shows a book while she carries one")
+    b.shot("region2-librarian")
+    b.teleport(lib["trolley"]["x"], D6)
+    b.tap("e")
+    end = time.time() + 6
+    while time.time() < end and js(b, "window.__ship.save.books['2']") != "returned":
+        time.sleep(0.1)
+    time.sleep(0.8)
+    ok &= check(js(b, "window.__ship.save.books['2']") == "returned" and b.state()["mode"] == "play", "E at the return trolley: she shelves it",
+                js(b, "JSON.stringify(window.__ship.save.books)"))
+    ok &= check(not js(b, "window.__ship.world.people.byId.npc_librarian.bubbleItems[0].visible"), "and her bubble is gone")
+    b.shot("region2-shelf")
+    b.teleport(lib["chair"]["x"], D6)
+    b.tap("e")
+    time.sleep(2.4)
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-read", "in the red chair she reads it", b.state())
+    b.shot("region2-page")
+    b.tap("e")
+    time.sleep(0.8)
+    ok &= check(b.state()["mode"] == "play" and 2 in save_list(b, "read"), "its page shows, and closes on a key", save_list(b, "read"))
+    # Running past her desk: a finger to her lips.
+    b.teleport(exact_x(188.5), D6)
+    b.hold("right", 0.7)
+    ok &= check(person(b, "npc_librarian")["state"] == "acting", "she runs past the desk: the librarian's finger goes to her lips", person(b, "npc_librarian"))
+    # Near-catch 2: asleep on the reading table; he knocks the rope stand into the aft door.
+    shut = not use_door(b, 6, 194, -1)
+    ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off: QUIET PLEASE", alert(b))
+    go(b, 6, 177)
+    b.hold("right", 1.5)
+    ok &= check(wait_flag(b, "bb2"), "near-catch 2: he bolts from the reading table", flags(b))
+    b.teleport(exact_x(191), D6)
+    time.sleep(0.5)
+    ok &= check(door_open(b, "part-door-6-194") and js(b, "window.__ship.world.things.find(t => t.id === 'prop_rope_down').img.visible"),
+                "the rope stand lies where he knocked it; the door stands ajar")
+    b.shot("region2-door")
+    time.sleep(2.0)
+    ok &= check(door_open(b, "part-door-6-194"), "and stays so")
+    b.hold("right", 1.6)
+    ok &= check(3 in save_list(b, "regions"), "through it: region 3", b.state())
+    # Deck 7's lobbies: the ways up are busy, each with its own thing.
+    for core, sign in (("forward", "DELIVERY"), ("atrium", "CARPET"), ("midship", "ART AUCTION")):
+        f = js(b, f"(f => [f.bottom.x, f.bottom.y])(window.__ship.flights.find(g => g.name === 'stairs-{core}-7-8'))")
+        b.teleport(f[0], f[1])
+        b.hold("up", 0.5)
+        ok &= check(b.state()["y"] == f[1] and sign in alert(b), f"deck 7, the {core} flight up: {sign}", alert(b))
+    ok &= check(person(b, "blk_fitter")["on"], "the carpet fitter is at his roll")
+    b.shot("region2-carpet")
+    return ok
 
 
 def scenario_sweep(b):

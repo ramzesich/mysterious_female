@@ -1,5 +1,5 @@
 """Downloads the people's frames from PixelLab (tools/cast.py) into assets/source/people/<name>/:
-the standing pose as stand.png, each animation's east frames as <animation>/<i>.png.
+the standing pose as stand.png (turned to us: front.png, away: back.png), each animation's east frames as <animation>/<i>.png.
 
     python tools/fetch_people.py [name ...]      (no names: everyone not fetched yet; --all: everyone)
 
@@ -29,8 +29,8 @@ def fetch(name, facing="east"):
     clips = {}
     for entry in z.namelist():
         parts = entry.split("/")
-        if len(parts) == 3 and parts[1] == "rotations" and parts[2] in (f"{facing}.png", "south.png"):
-            (out / ("stand.png" if parts[2] != "south.png" else "front.png")).write_bytes(z.read(entry))
+        if len(parts) == 3 and parts[1] == "rotations" and parts[2] in (f"{facing}.png", "south.png", "north.png"):
+            (out / {"south.png": "front.png", "north.png": "back.png"}.get(parts[2], "stand.png")).write_bytes(z.read(entry))
         elif len(parts) == 5 and parts[1] == "animations" and parts[3] == facing:
             clip = parts[2]
             (out / clip).mkdir(exist_ok=True)

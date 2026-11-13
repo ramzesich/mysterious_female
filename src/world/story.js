@@ -35,6 +35,8 @@ export class Story {
         }
         const bb2 = cat('bb2');
         if (bb2) bb2.onAway = () => this.ropeIntoDoor();
+        // The Library's aft door, once he has knocked the rope stand into it: ajar for good.
+        if (this.P.has('bb2')) this.leaveAjar();
         this.setupLift();
     }
 
@@ -49,6 +51,7 @@ export class Story {
         this.flash(time);
         this.rivalOnPromenade(dt, time);
         this.glimpseWindow(time);
+        this.shush(time);
     }
 
     onFlag(name) {}
@@ -119,14 +122,33 @@ export class Story {
     // lies where it fell: a prop that comes with the flag.)
     ropeIntoDoor() {
         const s = this.scene;
-        const door = s.bulkheads.find(b => b.id === 'part-door-6-194');
         const rope = this.P.blockDrawings.filter(d => d.id === 'flag:bb2').flatMap(d => d.items);
         sfx.smash();
-        s.tweens.add({ targets: rope, angle: 80, x: '+=12', y: '+=6', duration: 220, ease: 'Quad.easeIn' });
-        if (door) {
-            s.setBulkheadOpen(door, true);
-            door.heldOpenUntil = s.time.now + 2500;
-        }
+        s.tweens.add({ targets: rope, angle: 90, x: '+=14', duration: 220, ease: 'Quad.easeIn' });
+        this.leaveAjar();
+    }
+
+    leaveAjar() {
+        const s = this.scene;
+        const door = s.bulkheads.find(b => b.id === 'part-door-6-194');
+        if (!door) return;
+        door.ajar = true;
+        s.setBulkheadOpen(door, true);
+    }
+
+    // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk.
+    shush(time) {
+        const l = this.who('npc_librarian'), s = this.scene, her = s.player;
+        if (!l?.on || l.state === 'acting' || s.mode !== 'play' || s.route !== 'inside' || time < (this.shushAt ?? 0)) return;
+        if (Math.abs(her.y - l.y) > 8 || Math.abs(her.x - l.x) > 3 * M) return;
+        if (Math.abs(her.body.velocity.x) < 120 && !s.isDashing()) return;
+        this.shushAt = time + 6000;
+        l.dir = her.x < l.x ? -1 : 1;
+        this.people.place(l);
+        this.people.play(l, 'shush', { hold: 300 }).then(() => {
+            l.dir = -1;
+            this.people.place(l);
+        });
     }
 
     // The glass elevator's glimpse (population §6.2): until she has seen it, the car waits at deck 6
@@ -216,24 +238,28 @@ export class Story {
     }
 
     // The rival on the promenade, peering under the boats with his net (population: `riv_prom`): a
-    // glimpse. As she comes near he hurries off aft and is gone.
+    // glimpse. When she is near enough to see him well he hurries off, away from her, faster than
+    // she runs: in at the first promenade door on his way, or out of sight along the deck.
     rivalOnPromenade(dt, time) {
         const r = this.who('riv_prom'), s = this.scene;
-        if (!r || !r.on || this.P.has('riv_prom')) return;
+        if (!r || !r.on || this.P.has('riv_prom') || r.state === 'gone') return;
         const her = s.player;
         if (r.state !== 'fleeing') {
-            if (s.route !== r.route || Math.abs(her.y - r.y) > 8 || Math.abs(her.x - r.x) > 5.5 * M) return;
+            if (s.route !== r.route || Math.abs(her.y - r.y) > 8 || Math.abs(her.x - r.x) > 4.2 * M) return;
             r.state = 'fleeing';
-            r.dir = 1;
-            this.people.anim(r, 'walk', { speed: 1.6 });
-            this.fleeTo = r.x + 7 * M;
+            r.dir = her.x < r.x ? 1 : -1;
+            this.people.anim(r, 'walk', { speed: 1.9 });
+            this.fleeFrom = r.x;
         }
-        r.x += 130 * dt;
+        r.x += r.dir * 185 * dt;
         this.people.place(r);
-        if (r.x > this.fleeTo) {
-            r.items.forEach(i => s.tweens.add({ targets: i, alpha: 0, duration: 300 }));
-            s.time.delayedCall(320, () => this.P.setFlag('riv_prom'));
+        const run = Math.abs(r.x - this.fleeFrom);
+        const door = (s.promenade?.doors ?? []).some(d => Math.abs(d - r.x) < 6) && run > 40;
+        if (door || run > 9 * M) {
             r.state = 'gone';
+            if (door) sfx.door();
+            r.items.forEach(i => s.tweens.add({ targets: i, alpha: 0, duration: door ? 160 : 300 }));
+            s.time.delayedCall(320, () => this.P.setFlag('riv_prom'));
         }
     }
 

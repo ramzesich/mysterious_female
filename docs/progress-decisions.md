@@ -157,3 +157,97 @@ functions (`world.cut`, `wait`, `tween`, `handOver`).
 17. **The Deck card's stand-in pickup is gone**: the officer hands the card over in his scene.
 
 **PixelLab spent on this step:** about 90 generations (22 characters, their clips, three of hers).
+
+## Step 2: Atrium + promenade, region 2 (2026-11-13)
+
+Done: deck 6 from the bow to the Library, the promenade, the boat walkway's foothold and deck 7's
+lobbies populated and playable from the crew trunk to the door into region 3. The delivery robot
+she rides; a cabin being made up; the Internet Café's surfer; the couple at the atrium's rail and
+the glass elevator's glimpse; Bliss's DJ and the dance floor; the Photo Studio's flash; the
+Windjammer's barmaid and the guest at the model ship; the cat's tail in the Photo Gallery; the
+Library (the librarian, the shelf with ten gaps, the return trolley, the red reading chair, ten
+pages, near-catch 2 on the reading table and the door it leaves ajar); the jogger, the gulls, the
+rival's glimpse and the porthole's on the promenade; the gate's ladder, the lifeboat's inside with
+the second book and the first photo slot; the fitter, the florist's flowers and the auction's
+crates on deck 7's ways up. Playtest `region2` (it starts from a save at region 2's door:
+`enter_region2`); `golden` still walks the whole route.
+
+**New systems:** the books (`src/world/library.js`: trolley, shelf, chair, a full-screen panel for
+a page or a photo); things that move by themselves (`src/world/movers.js`: the robot as a platform,
+gulls that are shy of her); photo slots; glimpses and the region's scenes in `src/world/story.js`;
+standing aside (`verbs.updateAside`); quirks set off by standing still; scenery people turned to
+us or away (`pose`), and built furniture drawn again in front of someone (`cover`).
+`tools/build_things.py` packs PixelLab map objects (the robot, the gulls) into
+`assets/sprites/things.png`; `tools/draw_pages.py` draws the ten pages.
+
+**Changes and additions to the plan, and why:**
+
+1. **The Library is laid out on what is built.** Its desk stands at the aft door (191.9 m; the spec
+   put the librarian at 164), so: the librarian behind that desk, the shelf with ten gaps on the
+   wall beside her over the bookcase (190-192 m), the return trolley by her desk (191 m), the red
+   chair and its lamp at 166.75 m, Bumbot asleep on the reading table at 181 m (spec: 178, between
+   tables), and `cp_library` by the forward door at 160.85 m (the spec's 193 m is the desk). The
+   basic layout is not to change, and this way a book's return ends beside the door Bumbot opens.
+2. **A book always stands in its own gap** (book n in gap n), so the shelf shows which are missing,
+   not only how many. The librarian shelves them one at a time (her `shelve` clip).
+3. **The chair reads the lowest-numbered book she has found and not yet read**, whether it is still
+   in her pocket or back on the shelf: finding a book is enough to read its hint. The ten pages are
+   drawn in code, each a picture of one hidden thing (no words).
+4. **The door Bumbot knocks open stays open for good** (`ajar`), with the rope stand lying where it
+   fell (a drawing of its own, `rope-down`): the way into region 3 can be seen from across the room.
+5. **The robot makes the high tangerine easy, it is not the only way to it.** Her jump (68 px) plus
+   her height reaches 127 px and a deck's ceiling is at 128: nothing under a ceiling is out of a
+   full jump's reach. The tangerine sits on the fire-hose cabinet at 118 px: a small hop from the
+   robot's top takes it, and so does a full jump from exactly under it.
+6. **Standing aside is ↑ on the promenade's deck** (she turns her back to us against the wall, the
+   jogger runs by). The view is side-on, so the two lanes cannot be painted as lanes: signs on the
+   wall say it ("JOGGING TRACK by the rail", "WALKERS: keep to the wall ↑"). Hopping him works too:
+   standing still it wants timing, running at him it is easy. His touch is 14 x 40 px.
+7. **The rival's glimpse is tuned to the view's width** (about 12.5 m): he peers under a boat at
+   190 m as the spec says, notices her at 4.2 m (at 5.5 m he was still off screen and left unseen),
+   and hurries off away from her faster than she runs: in at a promenade door if one is on his way
+   (the door at 186 m when she comes from aft), otherwise out of sight along the deck.
+8. **The porthole glimpse is at 168.3 m** (the spec's 150 m has no porthole): two black ears and
+   green eyes rise behind the glass and duck.
+9. **The flash is between the studio's softboxes** (132.45-134.75 m), every six seconds, the lamps
+   warming for 0.7 s as its tell; caught, she turns to the camera with a thumbs-up for a second.
+   Not with a tray in her hands.
+10. **The cabin being made up is a room she can step into** (`maid6`, drawn: the stewardess
+    smoothing the bed, a towel swan, a suitcase on the rack), not only a peek through a door.
+11. **The open lifeboat is at 147.5 m** (spec: 140 m), where a tender hangs with a door at the
+    walkway's height. Inside: the second book on the bench, the first photo slot between the
+    portholes. **Photo slots show a placeholder (a heart in a frame) until the user's pictures are
+    in:** a texture named `photo-<slot id>` replaces it.
+12. **The dance floor's spot is 117.2 m** (spec: 117; kept clear of the crew trunk's door at
+    118.2 m), **and the disco ball throws its lights while she dances** (an addition).
+13. **A stand-still quirk counts from when she stopped at the spot.** It used to count her stillness
+    from wherever it began, so arriving by a door or a lift could set it off at once (the playtest
+    found it: the dance swallowed the E meant for the trunk).
+14. **Scenery people can face us or away** (`pose`): the couple at the atrium's balustrade look down
+    into it, toward us; the couple at the ports' plaques on deck 7 have their backs to us.
+    **Furniture can be drawn again in front of someone** (`cover`): the Windjammer's barmaid stands
+    between the back bar and the counter. (The tangerine on her counter reads as hers to offer.)
+15. **Two characters were replaced.** The first surfer came out a grey figure with a monitor in the
+    air; the second is seated on his own chair and shrunk to 0.8 (PixelLab draws seated figures as
+    tall as standing ones: `tools/cast.py` has a `scale` option now). The "woman at the rail" came
+    with a rail and a life ring drawn into her: she is kept for an open deck, where the rail is
+    behind the people, and the atrium has another woman.
+16. **The Windjammer's barman is a barmaid; the guest "with the model ship" is an old gentleman in a
+    captain's cap** admiring the ship in its cabinet (the cabinet is built).
+17. **`sec_cat_photo` is drawn by the game** (an empty deck, a black tail leaving the frame) and
+    hangs in the gallery's upper row at 157.4 m.
+18. **What stands on deck 7's ways up:** the florist's vases stand in front of the forward flight
+    (the elevator's door is right behind its foot: no floor there); the fitter kneels at his roll
+    by the atrium flight; the auction's crates and a canvas on an easel stand under the midship
+    flight.
+19. **The gulls** are three PixelLab map objects (perched, wings up, wings level) on the rail's top
+    at 150.5, 175 and 200 m; one flies up when she is within 3 m and settles when she has gone.
+20. **The librarian's finger goes to her lips whenever she passes the desk at speed** (she has no
+    walk, so: any run within 3 m), at most every six seconds.
+21. **Left to later steps:** the Library's rolling ladder and the odd book (the push verb is region
+    4's; the nook is step 9's), the theatre's audience (step 3), the boat drill and the rival on
+    the walkway (region 7). The librarian's bubble shows a book, not "a book and the gapped shelf":
+    the shelf is right beside her.
+
+**PixelLab spent on this step:** about 55 generations (13 characters and their clips, her dance,
+pose and reading clips, the robot and the gulls). 1,509 of 2,000 left (renews 2026-11-30).

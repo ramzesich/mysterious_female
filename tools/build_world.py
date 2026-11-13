@@ -8,8 +8,9 @@ funnel's top.
 import json
 
 import build_ship_map as B
-from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, DUCT, FLAG_GIVES, GRIPS, ITEMS, PEOPLE, PROPS,
-                        PUSHABLES, QUIRKS, ROOMS, SIGNS, SOLIDS, SOURCES, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
+from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW, GRIPS,
+                        GULLS, ITEMS, LIBRARY, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS, SLOTS, SOLIDS, SOURCES,
+                        SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
@@ -103,6 +104,9 @@ def build_world():
         """(x, y, route) of a thing on a deck at `at` m, or in a room `at` px from its left edge."""
         if where == "funnel":
             return B.exact_x(at), funnel_top()["y"], "inside"
+        # Outside: the promenade's deck, the boat walkway over it.
+        if where in ("prom", "walkway"):
+            return B.exact_x(at), B.floor_y(6 if where == "prom" else 7), OUTSIDE
         if isinstance(where, str):
             return room_x0[where] + at, room_floor[where], where
         return B.exact_x(at), B.floor_y(where), "inside"
@@ -131,7 +135,8 @@ def build_world():
     for pid, d in PEOPLE.items():
         x, y, route = spot(*d["at"])
         e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
-                 idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""))
+                 idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
+                 pose=d.get("pose", ""))
         if "walk" in d:
             a, b, v, *clip = d["walk"]
             e["walk"] = dict(a=spot(d["at"][0], a)[0], b=spot(d["at"][0], b)[0], v=v, clip=clip[0] if clip else "walk",
@@ -142,6 +147,8 @@ def build_world():
             e["touch"] = dict(kind=kind, w=w, h=h, fright=rest[0] if rest else "", dx=rest[1] if len(rest) > 1 else 0)
         if "carry" in d:
             e["carry"] = [dict(frame=f, dx=dx, dy=dy, front=front) for f, dx, dy, front in d["carry"]]
+        if "cover" in d:
+            e["cover"] = [dict(frame=f, x=spot(d["at"][0], m)[0], dy=dy) for f, m, dy in d["cover"]]
         if "bubble" in d:
             icon, when, unless, *rng = d["bubble"]
             e["bubble"] = dict(icon=icon, when=when or "", unless=unless or "", range=rng[0] if rng else 4)
@@ -161,10 +168,24 @@ def build_world():
         ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show))
     for qid, (where, at, trigger, clip, ms, opts) in QUIRKS.items():
         x, y, route = spot(where, at)
+        opts = dict(opts)
+        if "glitter" in opts:
+            gm, up = opts["glitter"]
+            opts["glitter"] = [spot(where, gm)[0], y - up]
         ents.append(dict(kind="quirk", id=qid, x=x, y=y, route=route, trigger=trigger, clip=clip, ms=ms, **opts))
     for sid, (where, at, text, style, dy, opts) in SIGNS.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="sign", id=sid, x=x, y=y, route=route, text=text, style=style, dy=dy, **opts))
+
+    for rid, (deck, a, b, v) in ROBOTS.items():
+        ents.append(dict(kind="robot", id=rid, x=B.exact_x(a), y=B.floor_y(deck), route="inside", x0=B.exact_x(a),
+                         x1=B.exact_x(b), v=v))
+    for gid, (where, at, up) in GULLS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="gull", id=gid, x=x, y=y - up, route=route))
+    for sid, (where, at, up) in SLOTS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="slot", id=sid, x=x, y=y, route=route, dy=up))
 
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
@@ -224,7 +245,14 @@ def build_world():
                 grilles=[dict(x=round(dx1 - 120 - (i + 1) * (DUCT["length"] - 250) / n), what=what)
                          for i, what in enumerate(DUCT["grilles"])])
 
+    lib_y = B.floor_y(LIBRARY["deck"])
+    library = dict(shelf=dict(x0=B.exact_x(LIBRARY["shelf"][0]), y=lib_y - LIBRARY["shelf"][1]),
+                   trolley=dict(x=B.exact_x(LIBRARY["trolley"]), y=lib_y), chair=dict(x=B.exact_x(LIBRARY["chair"]), y=lib_y))
+    flash = dict(x0=B.exact_x(FLASH[1]), x1=B.exact_x(FLASH[2]), y=B.floor_y(FLASH[0]), period=FLASH[3])
+    window = dict(x=B.exact_x(GLIMPSE_WINDOW[0]), y=B.floor_y(6) - GLIMPSE_WINDOW[1], floor=B.floor_y(6))
+
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct,
+                library=library, flash=flash, glimpseWindow=window,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.x_of(125), y=B.floor_y(11), toY=B.floor_y(10)),

@@ -81,6 +81,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
 
 ## Step 2: Atrium + promenade (region 2)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** deck 6 from the bow to the Library, the promenade, deck 7's lobbies and atrium walk,
   the boat walkway's gate and foothold, the lifeboat's inside; the librarian, the jogger, the
   delivery robot, the photographer, the carpet fitter, the DJ and the other ambient figures; the

@@ -1932,10 +1932,21 @@ Nothing blocks the start of the build. These get settled along the way:
       manager's cabin, the pantry and the galley drawn (`tools/draw_rooms.py`); twenty-one people
       drawn with PixelLab (`tools/cast.py`, `assets/sprites/people.png`); carrying with the tray
       rules, pictogram bubbles, quirks (the ice swan). Playtest `region1`
+- [x] **Step 2, region 2: the atrium and the promenade** (done 2026-11-13, branch `the-build`):
+      deck 6 from the bow to the Library, the promenade, the boat walkway's foothold and deck 7's
+      lobbies populated. The delivery robot she rides; a cabin being made up; the glass elevator's
+      glimpse; Bliss's dance floor; the Photo Studio's flash; the Library (the librarian, the shelf
+      with ten gaps, the return trolley, the red chair and the books' ten pages; near-catch 2 on
+      the reading table, the rope stand knocked into the aft door, which stays ajar); the jogger
+      (hop him, or stand aside with ↑), shy gulls, the rival's glimpse and a porthole's on the
+      promenade; the gate's ladder, the lifeboat's inside with the second book and the first photo
+      slot (a placeholder until the user's pictures: a texture `photo-<slot id>`); the blocks'
+      things on deck 7's ways up. Thirteen more people drawn; her dance, pose and reading clips.
+      Playtest `region2`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 2 of `docs/build-plan.md`, region 2 (the atrium and the promenade)**; then on in play
+      step 3 of `docs/build-plan.md`, region 3 (Showtime: the theatre and deck 7 aft)**; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

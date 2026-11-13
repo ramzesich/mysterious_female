@@ -25,6 +25,8 @@ ROOMS = [
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
     # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY"),
+    # A cabin being made up, its door held open (population: `amb_maid`): a peek.
+    dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
     dict(id="nook", deck=6, m=189, width=240, look="nook", door="bookcase", needs="nook"),
     dict(id="dressing", deck=6, m=242.5, width=240, look="dressing", door="crew", plate="STAGE DOOR",
          lock=("card", "ent", 0)),
@@ -65,7 +67,7 @@ CHECKPOINTS = {
     "cp_gangway": (4, 72, "inside", False),
     "cp_4_aft": (4, 212, "inside", True),
     "cp_6_fwd": (6, 40, "inside", True),
-    "cp_library": (6, 192.4, "inside", False),
+    "cp_library": (6, 160.85, "inside", False),
     "cp_foyer": (6, 204.4, "inside", False),
     "cp_7_aft": (7, 191.6, "inside", False),
     "cp_station": (7, 128, "outside", False),
@@ -90,8 +92,8 @@ TANGERINES = {
     "tan_5_dessert": (5, 186.4, 1, 26, None),
     "tan_5_bowl": (5, 245, 3, 0, "bb1"),
     "tan_5_galley": ("galley", 36, 2, 0, "broken:haz_crate_galley"),
-    "tan_6_high": (6, 26, 1, 106, None),
-    "tan_6_windjammer": (6, 142, 1, "table", None),
+    "tan_6_high": (6, 26.94, 1, 118, None),
+    "tan_6_windjammer": (6, 142.2, 1, 32, None),
     "tan_7_jackpot": (7, 160, 2, 0, "jackpot"),
     "tan_7_tradewinds": (7, 180, 1, "table", None),
     "tan_8_8206": ("cabin", 104, 2, 33, None),
@@ -122,7 +124,7 @@ ITEMS = {
     "item_parasol": (12, 130, "verb:parasol", "horn"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
     "book_1": (5, 85.5, "book:1", None, 23),
-    "book_2": ("lifeboat", 150, "book:2", None),
+    "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 150, "book:3", None),
     "book_4": (9, 134, "book:4", None),
     "book_5": ("cabin", 190, "book:5", None),
@@ -138,7 +140,7 @@ ITEMS = {
 # Each sets its own flag when he is away. Step 0: his built near-catch, no choreography yet.
 BEATS = {
     "bb1": (5, 248.8, "eat", -1, 203, None),
-    "bb2": (6, 178, "asleep", 1, 193.6, None),
+    "bb2": (6, 181.0, "asleep", 1, 193.6, None),
     "bb3": (6, 249, "wash", 1, 250.6, None),
     "bb4": ("linen", 150, "asleep", 1, 226, None),
     "bb5": (11, 131.8, "bat", 1, 160, None),
@@ -147,7 +149,7 @@ BEATS = {
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
-BEAT_LIFT = {"bb4": 6, "bb1": "service-station-bg"}      # px, or the piece he is on
+BEAT_LIFT = {"bb4": 6, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
 
 # --- Things she pushes (the push verb, region 4) ----------------------------------------------------
 # id: (deck or room, m or x, how far it rolls (m or x), the atlas piece, flag set when it gets there,
@@ -189,7 +191,9 @@ GRIPS = [
 #   picture the game draws, dx, dy, front)] what goes along with them; bubble=(pictogram, when,
 #   unless[, range m]) their request; until / after: a condition (src/world/world.js `cond`) that
 #   takes them away / brings them; layer: "behind" furniture (a desk), "back" (scenery people,
-#   behind her), default beside her.
+#   behind her), default beside her; cover=[(atlas piece, m, px up)] built furniture drawn again in
+#   front of them (a bar's counter, when its back bar must stay behind them); pose: "front" turned
+#   to us (at a rail), "back" turned away (reading a wall).
 PEOPLE = {
     # Region 1, deck 4.
     "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
@@ -219,6 +223,28 @@ PEOPLE = {
     "amb_cucina_him": dict(at=(5, 164.1 + 0.17), who="diner_linen", face=-1, layer="back"),
     "amb_7s_her": dict(at=(5, 213.0 - 0.17), who="diner_red", face=1, layer="back"),
     "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
+    # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
+    "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make"),
+    "amb_surfer": dict(at=(6, 67.45), who="surfer", face=1, layer="back"),
+    "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
+    "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
+    "amb_dj": dict(at=(6, 121.3), who="dj", face=-1, idle="bob", layer="behind"),
+    "amb_photog_2": dict(at=(6, 135.45), who="studio", face=-1, idle="idle", layer="back"),
+    "amb_barman_wj": dict(at=(6, 142.6), who="barmaid", face=-1, idle="idle", layer="back",
+                          cover=[("bar-counter-bg", 142.6, 0), ("tan-bar-stool-bg", 142.6, 0)]),
+    "amb_model_ship": dict(at=(6, 148.3), who="modelguest", face=1, idle="idle", layer="back"),
+    # The Library: she stands behind her desk; her bubble while any book is in her pocket.
+    "npc_librarian": dict(at=(6, 192.3), who="librarian", face=-1, idle="idle", layer="behind",
+                          bubble=("book", "books:held", None, 4)),
+    # The promenade: the jogger's loop on the JOGGING lane (she hops him or stands aside, ↑), the
+    # rival peering under a boat (a glimpse: the story takes him away).
+    "haz_jogger": dict(at=("prom", 150), who="jogger", face=1, walk=(116.5, 211.5, 2.2, "run"), end_ms=400,
+                       touch=("scare", 14, 40, "bumped")),
+    "riv_prom": dict(at=("prom", 190), who="rival", face=1, idle="idle", after="region:2", until="flag:riv_prom"),
+    # Deck 7's lobbies and atrium walk: the carpet fitter on the 7-8 flight's foot, a couple at the plaques.
+    "blk_fitter": dict(at=(7, 87.9), who="fitter", face=1, idle="work", until="region:4"),
+    "amb_couple_7_her": dict(at=(7, 83.75), who="plaquewoman", pose="back", layer="back"),
+    "amb_couple_7_him": dict(at=(7, 84.6), who="plaqueman", pose="back", layer="back"),
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -231,6 +257,20 @@ PROPS = {
     "prop_bowl_cafe": (5, 83.6, "fruit-bowl-2", 23, {}),
     "prop_bowl_7s": (5, 247.0, "fruit-bowl", 27, {}),
     "prop_board": (4, 190.6, "notice-board", 40, {}),
+    # Region 2. The fire-hose cabinet high on the wall (a tangerine on its top), the photo with a
+    # black tail leaving the frame (`sec_cat_photo`), the rope stand Bumbot knocked over.
+    "prop_hose": (6, 26.94, "hose-cabinet", 91, dict(back=True)),
+    "sec_cat_photo": (6, 157.4, "@photo-cat", 72, dict(back=True)),
+    "prop_rope_down": (6, 193.1, "@rope-down", 0, dict(after="flag:bb2")),
+    # What stands in the way on deck 7's flights up: the carpet's roll, the florist's flowers for
+    # the wedding, the auction's crates and a canvas.
+    "prop_carpet": (7, 88.75, "carpet-end", 0, dict(until="region:4")),
+    "prop_florist_1": (7, 78.4, "flower-vase", 0, dict(until="region:5")),
+    "prop_florist_2": (7, 77.95, "rose-vase", 0, dict(until="region:5")),
+    "prop_florist_3": (7, 77.45, "flower-vase", 0, dict(until="region:5", flip=True)),
+    "prop_auction_1": (7, 106.25, "@crate-big", 0, dict(until="region:4")),
+    "prop_auction_2": (7, 105.55, "@crate-big", 0, dict(until="region:4")),
+    "prop_auction_3": (7, 104.6, "easel-painting", 0, dict(until="region:4")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -248,6 +288,8 @@ BREAKABLES = {
 # her clip, ms it lasts, options: needs).
 QUIRKS = {
     "sec_swan": (5, 177.6, "E", "shiver", 1700, {}),
+    # (While she dances the disco ball over the floor throws its lights: `glitter` = m, px up.)
+    "sec_dance": (6, 117.2, "still:3", "dance", 3200, dict(reach=36, glitter=(119.4, 113))),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
@@ -260,4 +302,24 @@ SIGNS = {
     "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
     "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
     "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),
+    # The promenade's two lanes, painted on its wall: the track by the rail, the walk by the wall.
+    "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
+    "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall  ↑", "note", 58, dict(size=4)),
+    "sign_lane_3": ("prom", 213.6, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
 }
+
+# --- Region 2's own things (docs/population.md, deck 6) ---------------------------------------------
+# The library (GAME_DESIGN.md §6.1.2): the shelf with ten gaps on the wall over the librarian's desk
+# (its forward end, m; px up to its board), the return trolley, the red reading chair.
+LIBRARY = dict(deck=6, shelf=(190.1, 60), trolley=191.04, chair=166.75)
+# The delivery robot (`haz_robot`): id: (deck, from m, to m, m/s). She rides on its top.
+ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
+# Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
+GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
+# Photo slots (population §2.4): id: (where, m or x, px up).
+SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85)}
+# The Photo Studio's flash (`haz_flash`): deck, from m, to m (between its softboxes), every s.
+FLASH = (6, 132.45, 134.75, 6)
+# The promenade's porthole where two black ears show once (`bb_glimpse_window`): m, px up.
+GLIMPSE_WINDOW = (168.3, 72)
+

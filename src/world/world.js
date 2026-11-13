@@ -132,6 +132,29 @@ export class World {
             g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 12, 20);
             g.fillStyle(0xae2334, 1).fillRect(5, 4, 4, 10);
         });
+        // One photo in the gallery's rows (`sec_cat_photo`): an empty deck, a black tail leaving the frame.
+        make('photo-cat', 26, 25, g => {
+            g.fillStyle(0x7a4528, 1).fillRect(0, 0, 26, 25);
+            g.fillStyle(0xd8cdb8, 1).fillRect(2, 2, 22, 21);
+            g.fillStyle(0x9fc4d6, 1).fillRect(3, 3, 20, 10);
+            g.fillStyle(0x7fa8bd, 1).fillRect(3, 11, 20, 2);
+            g.fillStyle(0xc9b79a, 1).fillRect(3, 13, 20, 9);
+            g.fillStyle(0xab947a, 1).fillRect(3, 16, 20, 1).fillRect(3, 19, 20, 1);
+            g.fillStyle(0x2e222f, 1).fillRect(20, 14, 3, 6).fillRect(18, 9, 2, 6).fillRect(19, 8, 2, 2).fillRect(19, 13, 3, 2);
+        });
+        // The Library's "QUIET PLEASE" rope stand as Bumbot left it: both posts down, the rope slack
+        // between them, the sign face up on the floor.
+        make('rope-down', 46, 9, g => {
+            const ink = 0x2e222f, gold = 0xd9a43b, pale = 0xf9c22b;
+            for (const x of [0, 26]) {
+                g.fillStyle(ink, 1).fillRect(x, 1, 4, 8).fillRect(x + 3, 3, 16, 4).fillRect(x + 18, 2, 3, 6);
+                g.fillStyle(gold, 1).fillRect(x + 1, 2, 2, 6).fillRect(x + 4, 4, 14, 2);
+                g.fillStyle(pale, 1).fillRect(x + 19, 3, 1, 4).fillRect(x + 4, 4, 14, 1);
+            }
+            g.fillStyle(0xae2334, 1).fillRect(17, 7, 4, 1).fillRect(20, 8, 8, 1).fillRect(27, 7, 3, 1);
+            g.fillStyle(ink, 1).fillRect(8, 0, 13, 3);
+            g.fillStyle(0xf3ecdd, 1).fillRect(9, 0, 11, 2);
+        });
         make('crate-big', 30, 26, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 30, 26);
             g.fillStyle(0xab947a, 1).fillRect(1, 1, 28, 24);
@@ -609,7 +632,7 @@ export class World {
             }
             case 'quirk': {
                 // A moment of hers with no reward (§6.1.11): E on the thing, or standing still by it.
-                const thing = { ...e, items: [], reach: 20, quirk: true };
+                const thing = { reach: 20, ...e, items: [], quirk: true };
                 if (e.trigger === 'E') thing.interact = () => this.quirk(thing);
                 this.things.push(thing);
                 break;
@@ -624,7 +647,7 @@ export class World {
                 const text = s.add.text(e.x, e.y - (e.dy ?? 52), e.text, {
                     fontFamily: 'Verdana, sans-serif', fontSize: `${e.size ?? 5}px`, fontStyle: 'bold', align: 'center', ...style,
                     padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4, wordWrap: e.wrap ? { width: e.wrap } : undefined,
-                }).setOrigin(0.5).setDepth(D.decor + 0.25);
+                }).setOrigin(0.5).setDepth(e.route === OUTSIDE ? D.exterior + 0.09 : D.decor + 0.25);
                 this.add([text]);
                 this.things.push({ ...e, items: [text] });
                 break;
@@ -923,6 +946,13 @@ export class World {
         this.cut(async () => {
             p.setFlipX(thing.x < p.x);
             p.anims.play(`her-${thing.clip}`);
+            // (Something near joins in: the disco ball throws its lights while she dances.)
+            if (thing.glitter) {
+                const [gx, gy] = thing.glitter;
+                for (let i = 0; i * 400 < thing.ms; i++) {
+                    s.time.delayedCall(i * 400, () => this.sparkle(gx + Phaser.Math.Between(-8, 8), gy + Phaser.Math.Between(-5, 5), [0xffffff, 0xf9c22b, 0x8fd3ff, 0xf68181][i % 4]));
+                }
+            }
             if (thing.say) this.say(thing.say, thing.ms);
             await this.wait(thing.ms);
             s.pose('stand');
@@ -939,12 +969,17 @@ export class World {
         const s = this.scene, p = s.player;
         if (s.mode !== 'play') return;
         const still = Math.abs(p.body.velocity.x) < 5 && (p.body.blocked.down || p.body.touching.down);
-        if (!still) this.quirkStill = time;
         for (const t of this.things) {
             if (!t.quirk || !t.trigger.startsWith('still') || !this.shown(t)) continue;
-            if (Math.abs(p.x - t.x) > (t.reach ?? 20) || Math.abs(p.y - t.y) > 8) continue;
-            if (still && time - (this.quirkStill ?? time) > Number(t.trigger.split(':')[1]) * 1000 && time > (t.again ?? 0)) {
+            // (Still at the spot: counted from when she stopped there, not from before she came.)
+            if (!still || Math.abs(p.x - t.x) > (t.reach ?? 20) || Math.abs(p.y - t.y) > 8) {
+                t.stillSince = null;
+                continue;
+            }
+            t.stillSince ??= time;
+            if (time - t.stillSince > Number(t.trigger.split(':')[1]) * 1000 && time > (t.again ?? 0)) {
                 t.again = time + 15000;
+                t.stillSince = null;
                 this.quirk(t);
             }
         }

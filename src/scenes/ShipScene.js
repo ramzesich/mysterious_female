@@ -1093,7 +1093,8 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         for (const b of this.bulkheads) {
             const onDeck = this.route === 'inside' && p.y <= b.floor + 4 && p.y > b.floor - this.deckPitch;
-            if (b.open && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
+            // (One left ajar stays so: the Library's aft door, after Bumbot.)
+            if (b.open && !b.ajar && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
             if (!b.key) continue;
             const open = 1 - Math.min(this.shellAlpha[b.deck] ?? 1, this.shellAlpha[b.key] ?? 1);
             b.wall.setAlpha(open);

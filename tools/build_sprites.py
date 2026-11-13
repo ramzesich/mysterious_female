@@ -81,6 +81,14 @@ HER = {
         "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
         # Her quirks (§6.1.11). The Four Seasons' ice swan: she shivers, hugging herself.
         "shiver": [(f"shiver/{i}.png", "feet") for i in range(8)],
+        # Bliss's dance floor: standing still on it, she dances (skeleton-v3's dance move).
+        "dance": [(f"dance/{i}.png", "feet") for i in range(8)],
+        # The Photo Studio's flash catches her: a pose to the camera, facing us (skeleton-v3's
+        # thumbs-up move).
+        "pose": [(f"pose/{i}.png", "feet") for i in range(4)],
+        # Reading in the Library's red chair: she sits down and holds her hands up for the book (the
+        # game puts it there); skeleton-v3's sit_seat move with her hands posed on top.
+        "read": [(f"read/{i}.png", "feet") for i in range(6)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

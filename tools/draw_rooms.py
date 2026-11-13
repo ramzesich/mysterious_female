@@ -346,7 +346,108 @@ def galley(width):
     return R.save("galley")
 
 
-DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley}
+# --- Region 2's rooms (deck 6, the boat walkway) ----------------------------------------------------
+
+def maid6(width):
+    """A cabin being made up, deck 6 (population: `amb_maid`): the bed half made, a towel swan on it,
+    the curtains open on the sea, a guest's suitcase on the rack. The stewardess stands at the bed's
+    foot (150)."""
+    R = Room(width, "#e6dcc8", "#d8cdb8", ceiling=CREAM, skirting=WOOD, floor="#0b8a8f", fleck=TEAL, pitch=240)
+    r, box, d = R.r, R.box, R.d
+    r(100, 5, 128, 8, CREAM_SHADE)
+    r(104, 8, 124, 9, TUBE)
+    R.door(frame="door-cabin-ajar")
+    # The window on the sea, its curtains drawn back.
+    box(176, 34, 226, 72, BLUE_LIGHT)
+    r(177, 56, 225, 71, BLUE)
+    r(177, 55, 225, 55, WHITE)
+    for x in (184, 204, 215):
+        r(x, 61 + x % 5, x + 5, 61 + x % 5, BLUE_LIGHT)
+    r(200, 35, 201, 71, CREAM)
+    for x0, x1 in ((168, 180), (222, 234)):
+        box(x0, 30, x1, 78, MAUVE)
+        r(x0 + 3, 32, x0 + 3, 76, PINK)
+        r(x0 + 8, 32, x0 + 8, 76, "#6b3e75")
+    r(164, 28, 238, 30, WOOD_DARK)
+    # The luggage rack by the door, a suitcase on it; a picture over it.
+    stand(R.im, "luggage-rack", 104)
+    stand(R.im, "suitcase", 104, dy=20)
+    stand(R.im, "picture-sea", 110, dy=74)
+    # The bed, its foot toward the door: the duvet folded back half way, pillows, the towel swan.
+    box(160, FLOOR - 13, 236, FLOOR - 1, WOOD_DARK)
+    box(228, FLOOR - 40, 236, FLOOR - 1, WOOD)
+    box(160, FLOOR - 21, 229, FLOOR - 13, WHITE)
+    r(161, FLOOR - 14, 228, FLOOR - 14, PALE)
+    box(160, FLOOR - 24, 196, FLOOR - 19, BLUE_LIGHT)
+    r(161, FLOOR - 20, 195, FLOOR - 20, BLUE)
+    d.rounded_rectangle([211, FLOOR - 28, 228, FLOOR - 21], radius=3, fill=WHITE, outline=GREY)
+    d.rounded_rectangle([214, FLOOR - 33, 228, FLOOR - 27], radius=3, fill=PALE, outline=GREY)
+    stand(R.im, "towel-swan", 190, dy=21)
+    # A bedside lamp on the wall over the pillows; fresh towels folded on a stool by the bed's foot.
+    r(224, FLOOR - 62, 232, FLOOR - 55, YELLOW)
+    r(227, FLOOR - 55, 229, FLOOR - 50, WOOD_DARK)
+    box(126, FLOOR - 16, 142, FLOOR - 13, WOOD)
+    for x in (128, 139):
+        r(x, FLOOR - 13, x + 1, FLOOR - 1, WOOD_DARK)
+    for k in range(3):
+        d.rounded_rectangle([128, FLOOR - 21 - k * 4, 140, FLOOR - 17 - k * 4], radius=1, fill=(WHITE, BLUE_LIGHT, WHITE)[k], outline=GREY)
+    return R.save("maid6")
+
+
+def lifeboat(width):
+    """Inside the one lifeboat whose hatch is open, on the boat walkway (population: `room_lifeboat`):
+    the orange hull's ribs, a bench with harnesses along its side, an oar in its brackets, portholes
+    on the sea, life jackets, a ration box; the second book lies on the bench (112, 17 px up), the
+    photo slot hangs between the portholes (184)."""
+    R = Room(width, "#f79617", "#cd683d", ceiling="#fbb954", skirting="#cd683d", floor=GREY, fleck=SLATE, pitch=30)
+    r, box, d = R.r, R.box, R.d
+    # The hull closes in at both ends: dark rounded corners under the canopy.
+    for x0, x1, a0, a1 in ((-40, 40, 180, 270), (width - 41, width + 39, 270, 360)):
+        d.pieslice([x0, 8, x1, 88], a0, a1, fill="#fbb954")
+    r(0, 9, 3, FLOOR - 5, "#cd683d")
+    r(width - 4, 9, width - 1, FLOOR - 5, "#cd683d")
+    # A grab line along the canopy, a lamp in its cage.
+    r(20, 14, width - 21, 14, WHITE)
+    for x in range(24, width - 20, 30):
+        r(x, 12, x, 16, GREY)
+    box(114, 9, 126, 15, DARK)
+    r(116, 11, 124, 13, TUBE)
+    R.door(frame="door-watertight")
+    # Portholes on the sea.
+    for x in (96, 150, 218):
+        d.ellipse([x - 9, 34, x + 9, 52], fill=DARK, outline=INK)
+        d.ellipse([x - 7, 36, x + 7, 50], fill=BLUE_LIGHT)
+        d.chord([x - 7, 36, x + 7, 50], 10, 170, fill=BLUE)
+        r(x - 5, 41, x - 2, 41, WHITE)
+    # The oar in its brackets over the bench: the shaft, a red-tipped blade.
+    r(88, 66, 176, 68, WOOD)
+    r(88, 68, 176, 68, WOOD_DARK)
+    box(176, 62, 204, 72, WOOD_LIGHT)
+    r(198, 63, 203, 71, RED)
+    for x in (104, 160):
+        r(x, 63, x + 2, 72, DARK)
+    # The bench along the side, 17 px up, harness straps hung over it.
+    box(84, FLOOR - 17, 236, FLOOR - 13, PALE)
+    box(86, FLOOR - 13, 234, FLOOR - 1, STEEL_SHADE)
+    for x in range(100, 232, 28):
+        r(x, FLOOR - 12, x, FLOOR - 2, GREY)
+    for x in (100, 156, 212):
+        r(x, FLOOR - 44, x + 1, FLOOR - 18, SLATE)
+        r(x + 7, FLOOR - 44, x + 8, FLOOR - 18, SLATE)
+        r(x, FLOOR - 32, x + 8, FLOOR - 30, SLATE)
+        r(x + 3, FLOOR - 33, x + 5, FLOOR - 29, YELLOW)
+    # A life jacket on its hook, the ration box and a water can on the bench's end.
+    stand(R.im, "life-jacket", 72 + 104, dy=17)
+    box(214, FLOOR - 29, 232, FLOOR - 17, WHITE)
+    r(221, FLOOR - 26, 225, FLOOR - 20, RED)
+    r(219, FLOOR - 24, 227, FLOOR - 22, RED)
+    box(140, FLOOR - 27, 150, FLOOR - 17, BLUE)
+    r(143, FLOOR - 30, 147, FLOOR - 27, WHITE)
+    return R.save("lifeboat")
+
+
+DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
+        "maid6": maid6, "lifeboat": lifeboat}
 
 
 def main():
