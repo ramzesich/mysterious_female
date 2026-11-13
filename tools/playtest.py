@@ -868,10 +868,10 @@ def scenario_golden(b):
     b.hold("right", 1.2)
     ok &= check(3 in save_list(b, "regions"), "region 3 beyond it", b.state())
     # Region 3: the stage, near-catch 3; the card; the trunk from Bliss up to deck 9.
-    go(b, 6, 245.5)
-    b.hold("right", 1.0)
-    ok &= check(wait_flag(b, "bb3"), "near-catch 3 on the stage", flags(b))
-    ok &= check(take_card(b, "ent"), "the Entertainment card, on the stage")
+    go(b, 6, 246.9)
+    b.hold("right", 0.5)
+    ok &= check(wait_flag(b, "bb3", 16), "near-catch 3 on the stage", flags(b))
+    ok &= check(pills_for_the_stage_manager(b), "his pills from his cabin on deck 4: the Entertainment card")
     go(b, 6, 118)
     b.tap("e")
     b.hold("up", 7.5)
@@ -1370,6 +1370,215 @@ def scenario_region2(b):
     return ok
 
 
+def enter_region3(b):
+    """A save at region 3's door: regions 1 and 2 done (the Deck card, the Library's door ajar)."""
+    b.open("?reset&play")
+    b.eval("(P => { ['bb1', 'lunch', 'bb_lift', 'bb2', 'riv_prom', 'glimpse1', 'glimpse_window'].forEach(f => P.setFlag(f));"
+           " P.open('cards', 'deck'); P.open('regions', 2); P.open('regions', 3); })(window.__ship.progress)")
+    b.eval("window.__ship.cats.filter(c => c.flag === 'bb1' || c.flag === 'bb2').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
+    time.sleep(0.2)
+
+
+def pills_for_the_stage_manager(b):
+    """The second errand, start to end (the golden path's): down the theatre's trunk to deck 4, his
+    pills from his cabin, back up, into his hands: the Entertainment card."""
+    tx = trunk_x("theatre")
+    b.teleport(tx, D6)
+    b.tap("e")
+    s = hold_until(b, "down", lambda s: s["y"] == D4, 8)
+    b.hold("left", 0.5)
+    if b.state()["y"] != D4 or b.state()["mode"] != "play":
+        return False
+    cabin = room(b, "smcabin")
+    b.teleport(cabin["doors"][0]["outX"], D4)
+    b.tap("e")
+    time.sleep(0.9)
+    b.teleport(cabin["x0"] + 172, D4, "smcabin")
+    b.tap("e")
+    time.sleep(0.4)
+    if "pills" not in save_list(b, "items"):
+        return False
+    b.teleport(cabin["doors"][0]["x"], D4, "smcabin")
+    b.tap("e")
+    time.sleep(0.9)
+    b.teleport(tx, D4)
+    b.tap("e")
+    hold_until(b, "up", lambda s: s["y"] == D6, 8)
+    b.hold("left", 0.4)
+    b.teleport(exact_x(244.5), D6)
+    b.tap("e")
+    end = time.time() + 12
+    while time.time() < end and "ent" not in save_list(b, "cards"):
+        time.sleep(0.2)
+    time.sleep(0.8)
+    return "ent" in save_list(b, "cards") and b.state()["mode"] == "play"
+
+
+def scenario_region3(b):
+    """Region 3 (docs/build-plan.md, step 3): the theatre and deck 7 aft: the casino's chips, the
+    jackpot, the drop onto the stage, near-catch 3 (the rival down the trap door, Bumbot up the fly
+    rope), the swinging light, the bow, the pills from deck 4 and the Entertainment card, the
+    dressing room's book, the lighting booth's photo, the red trunk to deck 9."""
+    enter_region3(b)
+    ok = True
+    # The ways that open with region 3.
+    s = climb(b, "stairs-aft-5-6", 2.6)
+    ok &= check(s["mode"] == "stairs", "the aft stairs 5-6: the rehearsal's rope is gone", s)
+    ok &= check(use_door(b, 7, 110, -1), "Magnum's door opens from the midship lobby")
+    # The casino: a machine pays out over the floor; running on the chips she slips.
+    spill = "window.__ship.world.movers.filter(m => m.pour)[0]"
+    x = js(b, f"{spill}.def.x")
+    b.teleport(x - 150, D7)
+    js(b, f"(m => {{ m.state = 'idle'; m.at = 0; }})({spill})")
+    time.sleep(0.5)
+    ok &= check(js(b, f"{spill}.state") == "tell", "a slot machine's lights race: the tell", js(b, f"{spill}.state"))
+    time.sleep(1.4)
+    ok &= check(js(b, f"{spill}.state") == "spilled", "then its chips are all over the floor")
+    b.shot("region3-chips")
+    b.teleport(x - 20, D7)
+    time.sleep(0.5)
+    ok &= check(b.state()["mode"] == "play", "standing still on them is nothing", b.state())
+    half = js(b, f"{spill}.def.half")
+    b.teleport(x - half - 50, D7)
+    hold_until(b, "right", lambda s: s["x"] >= x - half - 14, 3)
+    b.hold(["right", "space"], 0.85)
+    ok &= check(b.state()["mode"] == "play" and b.state()["x"] > x + half, "nor is a running jump over them", b.state())
+    b.teleport(x + 20, D7)
+    js(b, f"(m => {{ m.at = window.__ship.time.now + 4000; }})({spill})")
+    b.hold("left", 0.5)
+    ok &= check(b.state()["mode"] == "scripted" and "Ой-йой" in alert(b), "running on them: slipped", alert(b))
+    time.sleep(2.8)
+    js(b, "window.__ship.world.movers.filter(m => m.pour).forEach(m => { m.state = 'idle'; m.chips.clear(); m.at = window.__ship.time.now + 600000; })")
+    # The machine with a glint pays her.
+    jx = js(b, "window.__ship.world.things.find(t => t.id === 'sec_jackpot').x")
+    b.teleport(jx, D7)
+    b.tap("e")
+    ok &= check(wait_flag(b, "jackpot", 5), "E at the machine with a glint: jackpot", flags(b))
+    time.sleep(0.4)
+    ok &= check(b.state()["tangerines"] >= 2, "it pays out two tangerines", b.state())
+    b.shot("region3-jackpot")
+    # The Art Gallery's cat: a double-take.
+    b.teleport(exact_x(140.0), D7)
+    time.sleep(1.9)
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-idle-look",
+                "a painting of a black cat: she looks twice", b.state())
+    b.shot("region3-painting")
+    time.sleep(1.9)
+    # The lighting booth and the stage door want the Entertainment card.
+    booth = room(b, "lighting")
+    b.teleport(booth["doors"][0]["outX"], D7)
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(route(b) == "inside" and "Entertainment" in alert(b), "the lighting booth wants the Entertainment card", alert(b))
+    # Off the balcony's end, down onto the stage: no scare.
+    st = js(b, "window.__ship.world.data.stage")
+    b.teleport(exact_x(243.0), D7)
+    b.hold("right", 0.8)
+    ok &= check(b.state()["y"] == D7, "the balcony's front holds her", b.state())
+    hold_until(b, ["right", "space"], lambda s: s["y"] == D6, 4)
+    time.sleep(0.3)
+    s = b.state()
+    ok &= check(s["y"] == D6 and s["mode"] == "play", "hopped, she drops onto the stage: no scare", s)
+    b.teleport(exact_x(244.4), D6)
+    time.sleep(0.4)
+    ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_sat")["on"],
+                "the stage manager at the curtain, the dancers rehearsing")
+    b.shot("region3-stage")
+    b.teleport(st["trapX"], D6)
+    time.sleep(0.5)
+    ok &= check(b.state()["y"] == D6 and route(b) == "inside", "the trap door holds before the beat", b.state())
+    # Near-catch 3.
+    b.teleport(exact_x(246.9), D6)
+    b.hold("right", 0.5)
+    time.sleep(1.5)
+    b.shot("region3-rival")
+    ok &= check(wait_flag(b, "bb3", 16), "near-catch 3: the rival goes down the trap door, Bumbot up the fly rope", flags(b))
+    ok &= check(js(b, "window.__ship.world.story.trapHole.visible") and not js(b, "window.__ship.world.story.trapSeam.visible"),
+                "the trap door stays open")
+    ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_sat")["on"], "the dancers sit it out in front of the stage")
+    light = "window.__ship.world.movers.find(m => m.lamp)"
+    time.sleep(1.2)
+    ok &= check(js(b, f"{light}.lamp.swinging"), "and the stage light swings")
+    time.sleep(4.0)
+    ok &= check(b.state()["mode"] == "play", "where the scene left her it does not reach her", b.state())
+    b.shot("region3-after")
+    # He wants his pills; she has none yet.
+    b.teleport(exact_x(244.5), D6)
+    time.sleep(0.4)
+    ok &= check(js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "the stage manager shows a pill bottle")
+    b.tap("e")
+    time.sleep(0.5)
+    ok &= check("ent" not in save_list(b, "cards") and b.state()["mode"] == "play", "E without them: nothing yet")
+    # The bow, between the open trap door and the swinging light.
+    b.teleport(exact_x(247.3), D6)
+    time.sleep(3.5)
+    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-bow",
+                "three seconds still at centre stage: she bows to the house", b.state())
+    b.shot("region3-bow")
+    time.sleep(2.2)
+    # The light at the bottom of its swing.
+    b.teleport(js(b, f"{light}.def.x"), D6)
+    end = time.time() + 4
+    hit = False
+    while time.time() < end and not hit:
+        hit = b.state()["mode"] == "scripted"
+        time.sleep(0.05)
+    ok &= check(hit and "Ай" in alert(b), "under the swinging light: bonked", alert(b))
+    time.sleep(2.8)
+    # The open trap door: one deck down onto the galley's flour sacks, beside the rival.
+    b.teleport(st["trapX"], D6)
+    time.sleep(1.6)
+    ok &= check(route(b) == "galley" and b.state()["mode"] == "play", "into the open trap door: the galley, no scare", (route(b), b.state()))
+    ok &= check(person(b, "riv_galley")["on"], "where the security officer sits in the flour")
+    b.shot("region3-galley")
+    g = room(b, "galley")
+    b.teleport(g["doors"][0]["x"], D5, "galley")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "inside" and b.state()["y"] == D5, "out of the galley on deck 5", b.state())
+    # The pills, down the theatre's trunk and back; his card.
+    ok &= check(pills_for_the_stage_manager(b), "his pills from his cabin on deck 4: he hands over the Entertainment card", save_list(b, "cards"))
+    time.sleep(0.5)
+    ok &= check(not js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "his bubble is gone")
+    b.shot("region3-card")
+    # With the card: the dressing room's book, the lighting booth's photo.
+    dr = room(b, "dressing")
+    b.teleport(dr["doors"][0]["outX"], D6)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "dressing", "the stage door opens", route(b))
+    b.teleport(dr["x0"] + 118, D6, "dressing")
+    b.shot("region3-dressing")
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(js(b, "window.__ship.save.books['3']") == "held", "the third book, on the make-up table")
+    b.teleport(dr["doors"][0]["x"], D6, "dressing")
+    b.tap("e")
+    time.sleep(0.9)
+    b.teleport(booth["doors"][0]["outX"], D7)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "lighting", "the lighting booth opens", route(b))
+    b.teleport(booth["x0"] + 446, D7, "lighting")
+    b.shot("region3-catwalk")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(b.state()["mode"] == "scripted", "the photo at the catwalk's end", b.state())
+    b.tap("e")
+    time.sleep(0.6)
+    ok &= check("slot_lighting" in save_list(b, "seen"), "seen")
+    b.teleport(booth["doors"][0]["x"], D7, "lighting")
+    b.tap("e")
+    time.sleep(0.9)
+    # The way on: the red trunk from Bliss up to deck 9.
+    b.teleport(trunk_x("magnums"), D6)
+    b.tap("e")
+    hold_until(b, "up", lambda s: s["y"] == D9, 9)
+    b.hold("right", 0.6)
+    ok &= check(4 in save_list(b, "regions"), "up the red trunk from Bliss to deck 9: region 4", b.state())
+    return ok
+
+
 def scenario_sweep(b):
     b.open("?reset&play")
     b.eval("window.__ship.progress.frozen = true")      # teleporting round the ship opens nothing
@@ -1461,9 +1670,12 @@ def scenario_sweep(b):
     b.hold("left", 1.0)
     s = b.state()
     ok &= check(s["y"] == D11, "no wall jump up the sun cover's post without the socks", s)
+    # (Jump is pressed once she is in the air: pressed on the floor first, she would jump, and
+    # could come down on the sun cover's top.)
+    b.eval(f"window.__ship.spawnAt({{x: {x_of(238)}, y: {D11 - 110}, route: 'inside'}})")       # in the air over the Great Outdoors
+    time.sleep(0.15)
     b.key("space", True)
-    b.teleport(x_of(238), D11 - 110)        # in the air over the Great Outdoors, jump held
-    time.sleep(0.4)
+    time.sleep(0.75)
     s = b.state()
     b.key("space", False)
     ok &= check(s["y"] == D11, "no glide without the parasol: she just falls", s)

@@ -89,6 +89,8 @@ HER = {
         # Reading in the Library's red chair: she sits down and holds her hands up for the book (the
         # game puts it there); skeleton-v3's sit_seat move with her hands posed on top.
         "read": [(f"read/{i}.png", "feet") for i in range(6)],
+        # Centre stage, in the theatre: a deep bow to the house (skeleton-v3, custom poses).
+        "bow": [(f"bow/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

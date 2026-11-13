@@ -3615,13 +3615,31 @@ export class ShipScene extends Phaser.Scene {
             onComplete: () => {
                 p.anims.play('her-reach');
                 cat.onReach?.();
-                // He hears her a beat before her hands arrive: a startled leap, then gone.
-                this.time.delayedCall(BUMBOT.startleMs, () => {
+                const away = () => {
+                    cat.away = true;
+                    cat.onAway?.();
+                    s.setVisible(false).stop();
+                    this.script = null;
+                    catAway = true;
+                    finish();
+                };
+                let leapt = false, onLeapt = null;
+                // He hears her a beat before her hands arrive: a startled leap, then gone. (One of
+                // the plan's beats may have something happen first, `before`, and his own way out,
+                // `flee`: the stage's, src/world/story.js.)
+                this.time.delayedCall(BUMBOT.startleMs, async () => {
+                    if (cat.before) await cat.before();
                     this.tweens.killTweensOf(s);
                     cat.onLeap?.();
                     s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
+                    leapt = true;
+                    onLeapt?.();
                     this.time.delayedCall(BUMBOT.leapMs, () => {
                         sfx.mrrp();
+                        if (cat.flee) {
+                            cat.flee(s, away);
+                            return;
+                        }
                         s.play('bumbot-run');
                         s.y = cat.floor;
                         this.script = (dt) => {
@@ -3629,19 +3647,13 @@ export class ShipScene extends Phaser.Scene {
                             const view = this.cameras.main.worldView;
                             const out = cat.exitX !== null ? (s.x - cat.exitX) * cat.escape >= 0
                                 : s.x < view.x - 40 || s.x > view.right + 40;
-                            if (out) {
-                                cat.away = true;
-                                cat.onAway?.();
-                                s.setVisible(false).stop();
-                                this.script = null;
-                                catAway = true;
-                                finish();
-                            }
+                            if (out) away();
                         };
                     });
                 });
-                // Left reaching at nothing for a moment, then she straightens up and turns to us.
-                p.once('animationcomplete-her-reach', () => {
+                // Left reaching at nothing for a moment (from his leap), then she straightens up and turns to us.
+                p.once('animationcomplete-her-reach', async () => {
+                    if (!leapt) await new Promise(resolve => { onLeapt = resolve; });
                     this.time.delayedCall(BUMBOT.holdMs, () => {
                         p.anims.play('her-straighten');
                         p.once('animationcomplete-her-straighten', () => {

@@ -12,7 +12,7 @@ import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
-import { Robot, Gull } from './movers.js';
+import { Robot, Gull, SwingLight, Spill } from './movers.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -154,6 +154,41 @@ export class World {
             g.fillStyle(0xae2334, 1).fillRect(17, 7, 4, 1).fillRect(20, 8, 8, 1).fillRect(27, 7, 3, 1);
             g.fillStyle(ink, 1).fillRect(8, 0, 13, 3);
             g.fillStyle(0xf3ecdd, 1).fillRect(9, 0, 11, 2);
+        });
+        // The stage: the microphone's cable, coiled on the boards.
+        make('cable', 24, 5, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 3, 24, 2).fillRect(8, 1, 9, 2).fillRect(6, 2, 2, 2).fillRect(17, 2, 2, 2);
+            g.fillStyle(0x625565, 1).fillRect(9, 2, 7, 1);
+        });
+        // The Art Gallery's painting of a black cat on its easel (`sec_cat_painting`).
+        make('easel-cat', 36, 61, g => {
+            const ink = 0x2e222f, wood = 0x7a4528;
+            g.fillStyle(wood, 1).fillRect(17, 0, 2, 8).fillRect(6, 40, 2, 21).fillRect(28, 40, 2, 21).fillRect(17, 40, 2, 16).fillRect(4, 38, 28, 3);
+            g.fillStyle(ink, 1).fillRect(3, 6, 30, 33);
+            g.fillStyle(0xd9a43b, 1).fillRect(4, 7, 28, 31);
+            g.fillStyle(0xf68181, 1).fillRect(6, 9, 24, 27);
+            g.fillStyle(0xf9c22b, 1).fillCircle(24, 15, 4);
+            // The sitter: a black cat, its back to us, its tail curled, one ear turned.
+            g.fillStyle(0x14121a, 1).fillEllipse(16, 29, 12, 13).fillCircle(16, 20, 5).fillTriangle(11, 18, 12, 12, 15, 17).fillTriangle(21, 18, 20, 12, 17, 17);
+            g.fillRect(21, 32, 6, 2).fillRect(26, 28, 2, 5);
+            g.fillStyle(0xb9e04c, 1).fillRect(13, 19, 2, 2).fillRect(17, 19, 2, 2);
+        });
+        // The theatre's scenery flats, leaning by the aft flight (`blk_scenery`): a palm, a setting sun.
+        make('flat-palm', 30, 62, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 30, 62);
+            g.fillStyle(0x8fd3ff, 1).fillRect(1, 1, 28, 60);
+            g.fillStyle(0xf9c22b, 1).fillRect(1, 48, 28, 13);
+            g.fillStyle(0x7a4528, 1).fillRect(13, 20, 4, 30);
+            g.fillStyle(0x1ebc73, 1).fillEllipse(8, 18, 14, 6).fillEllipse(22, 18, 14, 6).fillEllipse(15, 13, 8, 12).fillEllipse(6, 24, 8, 5).fillEllipse(24, 24, 8, 5);
+            g.fillStyle(0xab947a, 1).fillRect(1, 30, 28, 1).fillRect(14, 1, 1, 60);
+        });
+        make('flat-sun', 36, 46, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 36, 46);
+            g.fillStyle(0xf68181, 1).fillRect(1, 1, 34, 44);
+            g.fillStyle(0xf9c22b, 1).fillCircle(18, 26, 10);
+            g.fillStyle(0x4d65b4, 1).fillRect(1, 27, 34, 18);
+            g.fillStyle(0xf9c22b, 1).fillRect(12, 30, 12, 1).fillRect(14, 34, 8, 1).fillRect(16, 38, 4, 1);
+            g.fillStyle(0xab947a, 1).fillRect(1, 22, 34, 1).fillRect(17, 1, 1, 44);
         });
         make('crate-big', 30, 26, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 30, 26);
@@ -613,6 +648,33 @@ export class World {
             case 'gull':
                 this.movers.push(new Gull(this, e));
                 break;
+            case 'light':
+                this.movers.push(new SwingLight(this, e));
+                break;
+            case 'spill':
+                this.movers.push(new Spill(this, e));
+                break;
+            case 'jackpot': {
+                // The slot machine with a glint (population: `sec_jackpot`): E, once: its lights, a
+                // ding, and what it pays out (tangerines that need its flag).
+                const glint = s.add.image(e.x + 9, e.y - (e.dy ?? 40), 'dot').setTint(0xfbff86).setDepth(depth + 0.02);
+                this.add([glint]);
+                s.tweens.add({ targets: glint, alpha: { from: 0.1, to: 1 }, scale: { from: 0.6, to: 1.6 }, duration: 500, yoyo: true, repeat: -1, repeatDelay: 900 });
+                const thing = { ...e, items: [glint], reach: 16, until: `flag:${e.flag}`, interact: () => {
+                    this.cut(async () => {
+                        sfx.ding();
+                        for (let i = 0; i < 5; i++) {
+                            this.sparkle(e.x + Phaser.Math.Between(-14, 14), e.y - 30 - i * 9, [0xfbff86, 0xe83b3b, 0xffffff][i % 3]);
+                            await this.wait(140);
+                        }
+                        sfx.checkpoint();
+                        this.progress.setFlag(e.flag);
+                    });
+                    return true;
+                } };
+                this.things.push(thing);
+                break;
+            }
             case 'slot': {
                 // A photo slot (§6.1.11): a framed picture in a secret place; E opens it full screen.
                 this.library.textures();
@@ -767,7 +829,7 @@ export class World {
         // The stage's trap door (population: `haz_trapdoor`): after the rehearsal's beat, standing on
         // it drops her one deck into the galley; no scare.
         const t = this.data.trapdoor;
-        if (s.route === 'inside' && onFloor && P.has('bb3') && Math.abs(p.x - t.x) < 7 && Math.abs(p.y - t.y) < 2) {
+        if (s.route === 'inside' && onFloor && P.has('bb3') && Math.abs(p.x - t.x) < 10 && Math.abs(p.y - t.y) < 2) {
             const to = this.rooms[t.room];
             sfx.whoosh();
             s.travel(t.landX, to.floor - 80, t.room, () => P.setFlag('trapdoor'));
@@ -911,9 +973,10 @@ export class World {
     }
 
     // Someone hands her a thing: it crosses from their hands to hers, sparkles, and `then` it is hers.
-    async handOver(person, frame, then) {
+    async handOver(person, frame, then, tint) {
         const s = this.scene, p = s.player;
         const img = s.add.image(person.x + person.dir * 12, person.y - 34, 'shipart', frame).setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
+        if (tint) img.setTint(tint);
         this.add([img]);
         if (person.meta.anims.give) this.people.play(person, 'give');
         await this.wait(350);
@@ -944,7 +1007,7 @@ export class World {
         const s = this.scene, p = s.player;
         if (this.carry || !s.anims.exists(`her-${thing.clip}`)) return false;
         this.cut(async () => {
-            p.setFlipX(thing.x < p.x);
+            p.setFlipX(thing.face ? thing.face < 0 : thing.x < p.x);
             p.anims.play(`her-${thing.clip}`);
             // (Something near joins in: the disco ball throws its lights while she dances.)
             if (thing.glitter) {

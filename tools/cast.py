@@ -16,7 +16,7 @@ the character; "stand" is its standing pose. Options: "flip": the sprite was dra
 CAST = {
     # Region 1.
     "officer": ("4d3e6422-a934-40e0-a47d-e841378610ae", {}, {}),
-    "rival": ("68ef5f08-d2be-4f41-ad76-5831039110c3", {}, {}),
+    "rival": ("68ef5f08-d2be-4f41-ad76-5831039110c3", {"trip": 12}, {}),
     "porter": ("3ad54560-70f4-4b3c-8ab0-60b0be9ca97e", {}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
@@ -56,4 +56,21 @@ CAST = {
     # A couple reading the ports' plaques on deck 7, their backs to us.
     "plaquewoman": ("da2e0888-a560-4557-9f72-ad92e4f5e772", {}, {}),
     "plaqueman": ("e41a23e9-edd4-4784-8de8-33b29d2de61e", {}, {}),
+    # Region 3.
+    "stagemanager": ("0c00142e-0038-4dcc-8c93-7c0741317385", {"sneeze": 9, "flap": 10, "idle": 4}, {}),
+    "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9}, {}),
+    "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9}, {}),
+    "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
+    "cowboy": ("9aa4a55c-aea0-46aa-80fb-8642f6d13c99", {}, {}),
+    "barman": ("ac5b9c77-3083-4b2b-9615-e7a3a98dc860", {"idle": 4}, {}),
+    "shopper": ("21e8d182-fdfa-41ac-ba94-f7f0ef3df251", {"idle": 4}, {}),
+    "teen": ("f761c927-d14c-4e1a-b0a8-ed090f28ae99", {}, {}),
+    # Seated, each on a seat of their own (they take a built seat's place), shrunk to the others' size.
+    "pianist": ("f3cc44c3-8f12-4e1f-95af-3e95eb44c59f", {"play": 8}, {"scale": 0.8}),
+    "casinolady": ("1e62b76d-ee89-41aa-adba-a443c7b5d23f", {}, {"scale": 0.8}),
+    "aud_gent": ("7a1005bb-985f-4463-87e0-a07a75b1da48", {}, {"scale": 0.8}),
+    "aud_lady": ("5b1a8280-b981-4f70-9520-fece33d9532b", {}, {"scale": 0.8}),
+    "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {}, {"scale": 0.8}),
+    "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"scale": 0.8}),
+    "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"scale": 0.8}),
 }

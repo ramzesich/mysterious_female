@@ -251,3 +251,72 @@ us or away (`pose`), and built furniture drawn again in front of someone (`cover
 
 **PixelLab spent on this step:** about 55 generations (13 characters and their clips, her dance,
 pose and reading clips, the robot and the gulls). 1,509 of 2,000 left (renews 2026-11-30).
+
+## Step 3: Showtime, region 3 (2026-11-13)
+
+Done: the theatre (deck 6) and deck 7 from Magnum's to the Stardust balcony populated and playable
+from the Library's door to the red trunk up to deck 9. Near-catch 3 with its own staging (the rival
+runs in, trips and goes down the trap door; Bumbot rides the fly rope up); the stage manager's
+errand (his pills from his cabin on deck 4, his sneezes, the Entertainment card handed over); the
+swinging stage light ("Bonked"); the open trap door down to the galley, where the rival sits in
+the flour; the dancers; the bow at centre stage; the casino's chip spills ("Slipped") and the
+jackpot; the cat's portrait and her double-take; the dressing room with the third book; the
+lighting booth and its catwalk with the second photo slot; Magnum's barman and pianist, the
+croupier and players, the shopper, the teen at the arcade, five in the audience; the theatre's
+scenery flats on the aft flight up. Playtest `region3` (from `enter_region3`); `golden` now does
+the pills errand for real.
+
+**New systems:** a near-catch can have something happen first and its own way out (`cat.before`,
+`cat.flee`: `nearCatch` in the ship scene); hazards that keep their own time
+(`src/world/movers.js`: `SwingLight`, a pendulum; `Spill`, a tell then a spill); a thing that pays
+out once (`jackpot`); people held in a clip's last frame (`still`: sat on the floor).
+
+**Changes and additions to the plan, and why:**
+
+1. **The stage as built is 6.7 m wide (244-250.67 m), not the spec's 244-254:** the deck's last
+   metres are structure. Everything on it is laid out again in that width, from the curtain aft:
+   the stage manager (245.0), the trap door (246.3), centre stage (247.3), Bumbot in the spotlight
+   in front of the piano (248.75), the light (249.1), the fly rope (249.7).
+2. **The rival goes down the trap door, not into an orchestra pit.** A pit would need a hole in
+   deck 6 showing in the Seven Seas below; the trap door is already a one-deck drop onto the
+   galley's flour sacks. He bursts in through the curtain behind her, trips on the microphone's
+   cable, lands on the trap door, it gives way, flour puffs up out of the hole. The gag shows what
+   the seam in the boards is, and **the trap door stays open after**: a visible hole she hops or
+   uses (a quick way down toward deck 4). **He sits in the galley's flour until region 4.**
+3. **One swinging light, not two.** Two alternating arcs do not fit a 6.7 m stage with a hole in
+   it and leave anywhere to stand. The one light is a real pendulum from the ceiling (period
+   3.2 s): at the bottom of its arc it is at her head's height, at the ends it is over it. Before
+   the beat it is hauled up short and is Bumbot's spotlight; the rival's crash lets it down, and it
+   swings out away from her first. Where the scene leaves her standing it does not reach her
+   (the playtest checks it).
+4. **Centre stage is the safe spot between the open trap door and the light,** and standing still
+   there for three seconds is the bow (`sec_spotlight`, her own clip, to the house).
+5. **The stage door is by the curtain at 242.5 m** (spec: 254, in structure; decided in step 0); the
+   dressing room behind it is drawn (the mirror ringed with bulbs, the third book on the make-up
+   table).
+6. **The dancers rehearse on the stage until the beat, then sit on the floor in front of it** (the
+   flat stage has no edge to sit on): two people each, one until `bb3`, one after.
+7. **The stage manager's allergy is the story:** he sneezes every five seconds from the start
+   (the cat is on his stage), flaps when the rival appears, wants his pills after, sneezes once
+   more with the bottle in his hand, and stops for good. The Entertainment card is his to hand
+   over (its stand-in pickup on the stage is gone).
+8. **The pills can be fetched two ways:** down the theatre's one-way trunk (which then opens from
+   deck 4 too), or down the trap door and back up the aft stairs, whose rehearsal rope has lifted.
+9. **The chip spills are 1.8 m wide on three machines** (151.9, 154.3 and 166.8 m), and **a slip
+   needs her to be running on them**: standing still is safe, and a running jump clears them.
+   The jackpot machine (the one under the JACKPOT sign, 153.1 m) stands between two of them.
+10. **The cat's portrait replaces the easel at 140 m** (drawn by the game), and the double-take is
+    her own idle look, set off by a second and a half of standing still.
+11. **Magnum's had no piano:** one is added by the bar (116.6 m) with the pianist at it. **The
+    casino's seated player and the audience are drawn on seats of their own** and shrunk to 0.8,
+    like the surfer; the croupier faces us from behind her table, the cowboy and the teen have
+    their backs to us.
+12. **The lighting booth and the catwalk are one room** (480 px): the console under a window on
+    the stage, then the catwalk in the flies with the hatch Bumbot went through and the photo slot
+    at its end.
+13. **The scenery flats on the aft flight 7-8** (a palm, a setting sun) are drawn by the game.
+14. **Left for later:** the rival's lunge (he runs in and trips: no lunge needed), the stage
+    manager's talk clip, a fright clip per hazard.
+
+**PixelLab spent on this step:** about 61 generations (15 characters and their clips, the rival's
+trip and sit, her bow). 1,448 of 2,000 left.

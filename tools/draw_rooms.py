@@ -446,8 +446,131 @@ def lifeboat(width):
     return R.save("lifeboat")
 
 
+# --- Region 3's rooms (the theatre) ------------------------------------------------------------------
+
+def dressing(width):
+    """The dressing room behind the stage door, deck 6 (population: `room_dressing`): a make-up table
+    under a mirror ringed with bulbs (the third book lies on it, 118, 31 px up), a stool, costumes on
+    a rail, hat boxes, wig stands on a shelf, a star on the wall."""
+    R = Room(width, "#f6c0a0", "#e9a58c", ceiling=CREAM, skirting=WOOD_DARK, floor="#905ea9", fleck="#6b3e75", pitch=240)
+    r, box, d = R.r, R.box, R.d
+    r(100, 5, 128, 8, CREAM_SHADE)
+    r(104, 8, 124, 9, TUBE)
+    R.door()
+    # The mirror, bulbs all round it.
+    box(92, 30, 146, 78, WOOD_DARK)
+    box(98, 36, 140, 72, BLUE_LIGHT)
+    r(100, 38, 112, 70, WHITE)
+    d.line([(116, 70), (132, 38)], fill=WHITE)
+    for x in range(95, 146, 8):
+        for y in (33, 75):
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=TUBE, outline=ORANGE)
+    for y in range(41, 72, 8):
+        for x in (95, 143):
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=TUBE, outline=ORANGE)
+    # The table under it, 30 px up: brushes in a pot, powder, a lipstick; a stool.
+    box(90, FLOOR - 30, 148, FLOOR - 27, WOOD)
+    for x in (92, 145):
+        r(x, FLOOR - 27, x + 1, FLOOR - 1, WOOD_DARK)
+    box(94, FLOOR - 26, 112, FLOOR - 16, WOOD_LIGHT)
+    r(102, FLOOR - 22, 104, FLOOR - 21, WOOD_DARK)
+    box(94, FLOOR - 37, 100, FLOOR - 31, PINK)
+    for x, c in ((95, WOOD_DARK), (97, DARK), (99, WOOD)):
+        r(x, FLOOR - 43, x, FLOOR - 37, c)
+    d.ellipse([132, FLOOR - 35, 142, FLOOR - 30], fill=WHITE, outline=GREY)
+    r(127, FLOOR - 36, 128, FLOOR - 31, RED)
+    stand(R.im, "velvet-stool", 164)
+    # Costumes on a rail, hat boxes under them, a feather boa over the rail's end.
+    stand(R.im, "dress-rack", 206)
+    for x, c, w in ((186, MAUVE, 16), (204, YELLOW, 14)):
+        d.rounded_rectangle([x, FLOOR - 12, x + w, FLOOR - 1], radius=2, fill=c, outline=INK)
+        r(x, FLOOR - 9, x + w, FLOOR - 8, WHITE)
+    for k in range(7):
+        d.ellipse([228 + (k % 2) * 3, FLOOR - 50 + k * 5, 233 + (k % 2) * 3, FLOOR - 45 + k * 5], fill=PINK)
+    # A shelf of wig stands, and a gold star on the wall.
+    r(160, 44, 196, 46, WOOD)
+    r(160, 46, 196, 46, WOOD_DARK)
+    for x, c in ((164, ORANGE), (176, YELLOW), (188, NAVY)):
+        d.ellipse([x - 4, 30, x + 4, 40], fill=c, outline=INK)
+        d.ellipse([x - 3, 34, x + 3, 42], fill=WOOD_LIGHT)
+        r(x - 1, 42, x + 1, 44, WOOD_LIGHT)
+    d.polygon([(214, 22), (217, 29), (224, 29), (219, 34), (221, 41), (214, 37), (207, 41), (209, 34), (204, 29), (211, 29)], fill=YELLOW, outline=ORANGE)
+    R.poster(20, 34, 22, 30, [RED, YELLOW, WHITE])
+    return R.save("dressing")
+
+
+def lighting(width):
+    """The lighting booth and the catwalk over the stage, deck 7 (population: `room_lighting`): the
+    console under a window on the stage, then out through a frame onto the catwalk in the flies:
+    lamps on a bar, ropes and sandbags, the hatch in the ceiling Bumbot went through, and a photo
+    slot at its far end (446)."""
+    R = Room(width, "#3e3546", "#2e222f", ceiling=DARK, skirting=SLATE, floor=SLATE, fleck=DARK, pitch=48)
+    r, box, d = R.r, R.box, R.d
+    r(96, 5, 124, 8, SLATE)
+    r(100, 8, 120, 9, "#f9c22b")
+    R.door()
+    # The window on the stage: far below, the boards lit, the red curtains.
+    box(88, 28, 200, 70, INK)
+    r(90, 30, 198, 68, "#1b1828")
+    r(90, 58, 198, 68, WOOD_DARK)
+    r(90, 58, 198, 59, WOOD)
+    r(90, 30, 100, 68, RED)
+    r(188, 30, 198, 68, RED)
+    d.polygon([(150, 30), (136, 58), (164, 58)], fill="#4a4460")
+    d.ellipse([138, 56, 162, 62], fill=TUBE)
+    r(144, 30, 144, 68, INK)
+    # The console: faders, lit keys, two screens; the operator's chair.
+    box(86, FLOOR - 34, 202, FLOOR - 28, GREY)
+    box(90, FLOOR - 28, 198, FLOOR - 1, SLATE)
+    for x in range(94, 160, 6):
+        r(x, FLOOR - 33, x + 1, FLOOR - 30, INK)
+        r(x - 1, FLOOR - 33 + (x * 7) % 3, x + 2, FLOOR - 32 + (x * 7) % 3, (RED, YELLOW, GREEN, BLUE_LIGHT)[(x // 6) % 4])
+    for x, c in ((166, GREEN), (172, RED), (178, YELLOW), (184, BLUE)):
+        r(x, FLOOR - 32, x + 3, FLOOR - 30, c)
+    for x in (100, 128):
+        box(x, FLOOR - 52, x + 22, FLOOR - 36, INK)
+        r(x + 2, FLOOR - 50, x + 20, FLOOR - 38, TEAL)
+        r(x + 4, FLOOR - 47, x + 14, FLOOR - 46, GREEN)
+        r(x + 4, FLOOR - 43, x + 17, FLOOR - 42, GREEN)
+        r(x + 10, FLOOR - 36, x + 12, FLOOR - 34, INK)
+    stand(R.im, "office-chair", 176)
+    # Out onto the catwalk: a frame, and beyond it the dark of the flies.
+    r(232, 9, width - 1, FLOOR - 1, "#1b1828")
+    box(228, 9, 236, FLOOR - 1, SLATE)
+    r(230, 9, 233, FLOOR - 1, GREY)
+    # The catwalk: a grating to walk on, a handrail on posts.
+    r(236, FLOOR, width - 1, FLOOR + 3, GREY)
+    for x in range(238, width, 4):
+        r(x, FLOOR, x, FLOOR + 3, DARK)
+    r(236, FLOOR + 4, width - 1, H - 1, "#1b1828")
+    for x in range(240, width, 40):
+        r(x, FLOOR + 4, x + 1, H - 1, SLATE)
+    r(236, FLOOR - 34, width - 1, FLOOR - 33, GREY)
+    r(236, FLOOR - 18, width - 1, FLOOR - 18, SLATE)
+    for x in range(250, width, 36):
+        r(x, FLOOR - 34, x + 1, FLOOR - 1, GREY)
+    # A bar of lamps overhead, their beams falling to the stage.
+    r(244, 16, width - 12, 17, GREY)
+    for x, c in ((262, YELLOW), (300, PINK), (338, BLUE_LIGHT)):
+        r(x + 3, 17, x + 4, 22, GREY)
+        box(x, 22, x + 9, 31, INK)
+        r(x + 2, 31, x + 7, 32, c)
+        d.polygon([(x + 2, 33), (x + 7, 33), (x + 16, FLOOR - 35), (x - 7, FLOOR - 35)], fill="#2c2840")
+    # Ropes and sandbags.
+    for x, y in ((372, 70), (384, 54)):
+        r(x, 9, x, y, WOOD)
+        d.rounded_rectangle([x - 4, y, x + 4, y + 12], radius=3, fill=WOOD_LIGHT, outline=INK)
+    # The hatch in the ceiling he went through: open, its lid hanging, a rope up into it.
+    box(404, 8, 430, 14, INK)
+    r(406, 9, 428, 13, "#0d0b14")
+    r(430, 9, 432, 30, SLATE)
+    r(416, 13, 416, 46, WOOD)
+    d.ellipse([413, 46, 419, 54], outline=WOOD)
+    return R.save("lighting")
+
+
 DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
-        "maid6": maid6, "lifeboat": lifeboat}
+        "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting}
 
 
 def main():

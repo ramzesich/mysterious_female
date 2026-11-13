@@ -95,7 +95,7 @@ export class BootScene extends Phaser.Scene {
         }
         // A start at a bump; her quirks (§6.1.11), each a clip of its own.
         if (meta.anims.hit) this.anims.create({ key: 'her-hit', frames: frames('hit', [0, 1, 1, 2, 3]), frameRate: 10 });
-        for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6]]) {
+        for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6], ['bow', 8]]) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
         }
         // Reading in the library's chair: she sits down, and stays sat with the book.

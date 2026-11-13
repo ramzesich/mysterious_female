@@ -32,325 +32,348 @@
    "stand": 14,
    "anims": {
     "idle": [
-     16,
      17,
      18,
-     19
+     19,
+     20
     ],
     "shake": [
-     20,
      21,
      22,
      23,
      24,
      25,
      26,
-     27
+     27,
+     28
     ],
-    "walk": [
-     28,
+    "sit": [
      29,
      30,
      31,
      32,
-     33
-    ]
-   },
-   "fps": {
-    "idle": 8,
-    "shake": 8,
-    "walk": 8
-   },
-   "front": 15
-  },
-  "porter": {
-   "stand": 34,
-   "anims": {
-    "cart": [
-     36,
+     33,
+     34,
+     35,
+     36
+    ],
+    "trip": [
      37,
      38,
      39,
      40,
      41,
      42,
-     43
+     43,
+     44
     ],
-    "push": [
-     44,
+    "walk": [
      45,
      46,
      47,
      48,
-     49
+     49,
+     50
     ]
    },
    "fps": {
-    "cart": 8,
-    "push": 8
+    "idle": 8,
+    "shake": 8,
+    "sit": 8,
+    "trip": 12,
+    "walk": 8
    },
-   "front": 35
+   "front": 15,
+   "back": 16
   },
-  "waiter": {
-   "stand": 50,
+  "porter": {
+   "stand": 51,
    "anims": {
-    "serve": [
-     52,
+    "cart": [
      53,
      54,
      55,
      56,
      57,
      58,
-     59
+     59,
+     60
     ],
-    "walk": [
-     60,
+    "push": [
      61,
      62,
      63,
      64,
-     65
+     65,
+     66
+    ]
+   },
+   "fps": {
+    "cart": 8,
+    "push": 8
+   },
+   "front": 52
+  },
+  "waiter": {
+   "stand": 67,
+   "anims": {
+    "serve": [
+     69,
+     70,
+     71,
+     72,
+     73,
+     74,
+     75,
+     76
+    ],
+    "walk": [
+     77,
+     78,
+     79,
+     80,
+     81,
+     82
     ]
    },
    "fps": {
     "serve": 8,
     "walk": 8
    },
-   "front": 51
+   "front": 68
   },
   "tourist": {
-   "stand": 66,
+   "stand": 83,
    "anims": {
     "idle": [
-     68,
-     69,
-     70,
-     71
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 67
-  },
-  "robe": {
-   "stand": 72,
-   "anims": {
-    "idle": [
-     74,
-     75,
-     76,
-     77
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 73
-  },
-  "stewardess": {
-   "stand": 78,
-   "anims": {
-    "idle": [
-     80,
-     81,
-     82,
-     83
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 79
-  },
-  "receptionist": {
-   "stand": 84,
-   "anims": {
-    "idle": [
+     85,
      86,
      87,
-     88,
-     89
+     88
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 85
+   "front": 84
   },
-  "photographer": {
-   "stand": 90,
+  "robe": {
+   "stand": 89,
    "anims": {
     "idle": [
+     91,
      92,
      93,
-     94,
-     95
+     94
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 91
+   "front": 90
   },
-  "gentleman": {
-   "stand": 96,
+  "stewardess": {
+   "stand": 95,
    "anims": {
     "idle": [
+     97,
      98,
      99,
-     100,
-     101
+     100
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 97
+   "front": 96
   },
-  "lady": {
-   "stand": 102,
+  "receptionist": {
+   "stand": 101,
    "anims": {
     "idle": [
+     103,
      104,
      105,
-     106,
-     107
+     106
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 103
+   "front": 102
   },
-  "cleaner": {
-   "stand": 108,
+  "photographer": {
+   "stand": 107,
    "anims": {
-    "mop": [
+    "idle": [
+     109,
      110,
      111,
-     112,
-     113,
-     114,
+     112
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 108
+  },
+  "gentleman": {
+   "stand": 113,
+   "anims": {
+    "idle": [
      115,
      116,
-     117
+     117,
+     118
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 114
+  },
+  "lady": {
+   "stand": 119,
+   "anims": {
+    "idle": [
+     121,
+     122,
+     123,
+     124
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 120
+  },
+  "cleaner": {
+   "stand": 125,
+   "anims": {
+    "mop": [
+     127,
+     128,
+     129,
+     130,
+     131,
+     132,
+     133,
+     134
     ]
    },
    "fps": {
     "mop": 8
    },
-   "front": 109
+   "front": 126
   },
   "agent": {
-   "stand": 118,
+   "stand": 135,
    "anims": {
     "idle": [
-     120,
-     121,
-     122,
-     123
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 119
-  },
-  "maitre": {
-   "stand": 124,
-   "anims": {
-    "idle": [
-     126,
-     127,
-     128,
-     129
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 125
-  },
-  "chef": {
-   "stand": 130,
-   "anims": {
-    "idle": [
-     132,
-     133,
-     134,
-     135
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 131
-  },
-  "folder": {
-   "stand": 136,
-   "anims": {
-    "idle": [
+     137,
      138,
      139,
-     140,
-     141
+     140
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 137
+   "front": 136
   },
-  "diner_red": {
-   "stand": 142,
-   "anims": {},
-   "fps": {},
-   "front": 143
-  },
-  "diner_suit": {
-   "stand": 144,
-   "anims": {},
-   "fps": {},
-   "front": 145
-  },
-  "diner_teal": {
-   "stand": 146,
-   "anims": {},
-   "fps": {},
-   "front": 147
-  },
-  "diner_linen": {
-   "stand": 148,
-   "anims": {},
-   "fps": {},
-   "front": 149
-  },
-  "librarian": {
-   "stand": 150,
+  "maitre": {
+   "stand": 141,
    "anims": {
     "idle": [
-     153,
-     154,
+     143,
+     144,
+     145,
+     146
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 142
+  },
+  "chef": {
+   "stand": 147,
+   "anims": {
+    "idle": [
+     149,
+     150,
+     151,
+     152
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 148
+  },
+  "folder": {
+   "stand": 153,
+   "anims": {
+    "idle": [
      155,
-     156
+     156,
+     157,
+     158
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 154
+  },
+  "diner_red": {
+   "stand": 159,
+   "anims": {},
+   "fps": {},
+   "front": 160
+  },
+  "diner_suit": {
+   "stand": 161,
+   "anims": {},
+   "fps": {},
+   "front": 162
+  },
+  "diner_teal": {
+   "stand": 163,
+   "anims": {},
+   "fps": {},
+   "front": 164
+  },
+  "diner_linen": {
+   "stand": 165,
+   "anims": {},
+   "fps": {},
+   "front": 166
+  },
+  "librarian": {
+   "stand": 167,
+   "anims": {
+    "idle": [
+     170,
+     171,
+     172,
+     173
     ],
     "shelve": [
-     157,
-     158,
-     159,
-     160,
-     161,
-     162
+     174,
+     175,
+     176,
+     177,
+     178,
+     179
     ],
     "shush": [
-     163,
-     164,
-     165,
-     166,
-     167,
-     168
+     180,
+     181,
+     182,
+     183,
+     184,
+     185
     ]
    },
    "fps": {
@@ -358,186 +381,395 @@
     "shelve": 7,
     "shush": 6
    },
-   "front": 151,
-   "back": 152
+   "front": 168,
+   "back": 169
   },
   "jogger": {
-   "stand": 169,
+   "stand": 186,
    "anims": {
     "run": [
-     171,
-     172,
-     173,
-     174,
-     175,
-     176,
-     177,
-     178
+     188,
+     189,
+     190,
+     191,
+     192,
+     193,
+     194,
+     195
     ]
    },
    "fps": {
     "run": 12
    },
-   "front": 170
+   "front": 187
   },
   "fitter": {
-   "stand": 179,
+   "stand": 196,
    "anims": {
     "work": [
-     182,
-     183,
-     184,
-     185,
-     186,
-     187,
-     188,
-     189
+     199,
+     200,
+     201,
+     202,
+     203,
+     204,
+     205,
+     206
     ]
    },
    "fps": {
     "work": 6
    },
-   "front": 180,
-   "back": 181
+   "front": 197,
+   "back": 198
   },
   "dj": {
-   "stand": 190,
+   "stand": 207,
    "anims": {
     "bob": [
-     193,
-     194,
-     195,
-     196,
-     197,
-     198,
-     199,
-     200
+     210,
+     211,
+     212,
+     213,
+     214,
+     215,
+     216,
+     217
     ]
    },
    "fps": {
     "bob": 9
    },
-   "front": 191,
-   "back": 192
+   "front": 208,
+   "back": 209
   },
   "barmaid": {
-   "stand": 201,
+   "stand": 218,
    "anims": {
     "idle": [
-     204,
-     205,
-     206,
-     207
+     221,
+     222,
+     223,
+     224
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 202,
-   "back": 203
+   "front": 219,
+   "back": 220
   },
   "studio": {
-   "stand": 208,
-   "anims": {
-    "idle": [
-     211,
-     212,
-     213,
-     214
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 209,
-   "back": 210
-  },
-  "railwoman": {
-   "stand": 215,
-   "anims": {
-    "idle": [
-     218,
-     219,
-     220,
-     221
-    ]
-   },
-   "fps": {
-    "idle": 8
-   },
-   "front": 216,
-   "back": 217
-  },
-  "surfer": {
-   "stand": 222,
-   "anims": {},
-   "fps": {},
-   "front": 223,
-   "back": 224
-  },
-  "atriumwoman": {
    "stand": 225,
-   "anims": {},
-   "fps": {},
+   "anims": {
+    "idle": [
+     228,
+     229,
+     230,
+     231
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
    "front": 226,
    "back": 227
   },
-  "railman": {
-   "stand": 228,
-   "anims": {},
-   "fps": {},
-   "front": 229,
-   "back": 230
-  },
-  "maid": {
-   "stand": 231,
+  "railwoman": {
+   "stand": 232,
    "anims": {
-    "make": [
-     234,
+    "idle": [
      235,
      236,
      237,
-     238,
-     239,
-     240,
-     241
+     238
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 233,
+   "back": 234
+  },
+  "surfer": {
+   "stand": 239,
+   "anims": {},
+   "fps": {},
+   "front": 240,
+   "back": 241
+  },
+  "atriumwoman": {
+   "stand": 242,
+   "anims": {},
+   "fps": {},
+   "front": 243,
+   "back": 244
+  },
+  "railman": {
+   "stand": 245,
+   "anims": {},
+   "fps": {},
+   "front": 246,
+   "back": 247
+  },
+  "maid": {
+   "stand": 248,
+   "anims": {
+    "make": [
+     251,
+     252,
+     253,
+     254,
+     255,
+     256,
+     257,
+     258
     ]
    },
    "fps": {
     "make": 6
    },
-   "front": 232,
-   "back": 233
+   "front": 249,
+   "back": 250
   },
   "modelguest": {
-   "stand": 242,
+   "stand": 259,
    "anims": {
     "idle": [
-     245,
-     246,
-     247,
-     248
+     262,
+     263,
+     264,
+     265
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 243,
-   "back": 244
+   "front": 260,
+   "back": 261
   },
   "plaquewoman": {
-   "stand": 249,
+   "stand": 266,
    "anims": {},
    "fps": {},
-   "front": 250,
-   "back": 251
+   "front": 267,
+   "back": 268
   },
   "plaqueman": {
-   "stand": 252,
+   "stand": 269,
    "anims": {},
    "fps": {},
-   "front": 253,
-   "back": 254
+   "front": 270,
+   "back": 271
+  },
+  "stagemanager": {
+   "stand": 272,
+   "anims": {
+    "flap": [
+     275,
+     276,
+     277,
+     278,
+     279,
+     280
+    ],
+    "idle": [
+     281,
+     282,
+     283,
+     284
+    ],
+    "sneeze": [
+     285,
+     286,
+     287,
+     288,
+     289,
+     290
+    ]
+   },
+   "fps": {
+    "flap": 10,
+    "idle": 4,
+    "sneeze": 9
+   },
+   "front": 273,
+   "back": 274
+  },
+  "dancer_her": {
+   "stand": 291,
+   "anims": {
+    "dance": [
+     294,
+     295,
+     296,
+     297,
+     298,
+     299,
+     300,
+     301
+    ],
+    "sit": [
+     302,
+     303,
+     304,
+     305,
+     306,
+     307,
+     308,
+     309
+    ]
+   },
+   "fps": {
+    "dance": 9,
+    "sit": 8
+   },
+   "front": 292,
+   "back": 293
+  },
+  "dancer_him": {
+   "stand": 310,
+   "anims": {
+    "dance": [
+     313,
+     314,
+     315,
+     316,
+     317,
+     318,
+     319,
+     320
+    ],
+    "sit": [
+     321,
+     322,
+     323,
+     324,
+     325,
+     326,
+     327,
+     328
+    ]
+   },
+   "fps": {
+    "dance": 9,
+    "sit": 8
+   },
+   "front": 311,
+   "back": 312
+  },
+  "croupier": {
+   "stand": 329,
+   "anims": {},
+   "fps": {},
+   "front": 330,
+   "back": 331
+  },
+  "cowboy": {
+   "stand": 332,
+   "anims": {},
+   "fps": {},
+   "front": 333,
+   "back": 334
+  },
+  "barman": {
+   "stand": 335,
+   "anims": {
+    "idle": [
+     338,
+     339,
+     340,
+     341
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 336,
+   "back": 337
+  },
+  "shopper": {
+   "stand": 342,
+   "anims": {
+    "idle": [
+     345,
+     346,
+     347,
+     348
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 343,
+   "back": 344
+  },
+  "teen": {
+   "stand": 349,
+   "anims": {},
+   "fps": {},
+   "front": 350,
+   "back": 351
+  },
+  "pianist": {
+   "stand": 352,
+   "anims": {
+    "play": [
+     355,
+     356,
+     357,
+     358,
+     359,
+     360
+    ]
+   },
+   "fps": {
+    "play": 8
+   },
+   "front": 353,
+   "back": 354
+  },
+  "casinolady": {
+   "stand": 361,
+   "anims": {},
+   "fps": {},
+   "front": 362,
+   "back": 363
+  },
+  "aud_gent": {
+   "stand": 364,
+   "anims": {},
+   "fps": {},
+   "front": 365,
+   "back": 366
+  },
+  "aud_lady": {
+   "stand": 367,
+   "anims": {},
+   "fps": {},
+   "front": 368,
+   "back": 369
+  },
+  "aud_popcorn": {
+   "stand": 370,
+   "anims": {},
+   "fps": {},
+   "front": 371,
+   "back": 372
+  },
+  "aud_girl": {
+   "stand": 373,
+   "anims": {},
+   "fps": {},
+   "front": 374,
+   "back": 375
+  },
+  "aud_granny": {
+   "stand": 376,
+   "anims": {},
+   "fps": {},
+   "front": 377,
+   "back": 378
   }
  }
 }

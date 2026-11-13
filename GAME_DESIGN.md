@@ -1943,10 +1943,18 @@ Nothing blocks the start of the build. These get settled along the way:
       slot (a placeholder until the user's pictures: a texture `photo-<slot id>`); the blocks'
       things on deck 7's ways up. Thirteen more people drawn; her dance, pose and reading clips.
       Playtest `region2`
+- [x] **Step 3, region 3: Showtime** (done 2026-11-13, branch `the-build`): the theatre and deck 7
+      from Magnum's to the Stardust balcony populated. Near-catch 3 staged (the rival runs in,
+      trips on a cable and goes down the stage's trap door into the galley's flour; Bumbot rides
+      the fly rope up); the stage manager's errand (he sneezes until she brings his pills from his
+      cabin on deck 4, then hands over the Entertainment card); the stage light that swings after
+      ("Bonked"), the trap door left open, the bow at centre stage; the casino's chip spills
+      ("Slipped") and the jackpot; the cat's portrait; the dressing room (book 3) and the lighting
+      booth with its catwalk (the second photo slot); fifteen more people. Playtest `region3`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 3 of `docs/build-plan.md`, region 3 (Showtime: the theatre and deck 7 aft)**; then on in play
+      step 4 of `docs/build-plan.md`, region 4 (Housekeeping: decks 8-10's lobbies and deck 9's corridor)**; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

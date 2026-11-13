@@ -38,11 +38,12 @@ export class Story {
         // The Library's aft door, once he has knocked the rope stand into it: ajar for good.
         if (this.P.has('bb2')) this.leaveAjar();
         this.setupLift();
+        this.setupStage();
     }
 
     // E. True if something here took it.
     interact() {
-        return this.officer();
+        return this.officer() || this.pills();
     }
 
     update(dt, time) {
@@ -52,9 +53,12 @@ export class Story {
         this.rivalOnPromenade(dt, time);
         this.glimpseWindow(time);
         this.shush(time);
+        this.sneezes(time);
     }
 
-    onFlag(name) {}
+    onFlag(name) {
+        if (name === 'bb3') this.showTrap();
+    }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
     onBlocked(id) {
@@ -279,5 +283,146 @@ export class Story {
         // (Clipped to the porthole's glass by staying low in it.)
         s.tweens.add({ targets: ears, y: g.y + 3, duration: 380, ease: 'Quad.easeOut', hold: 900, yoyo: true, onComplete: () => ears.destroy() });
         sfx.mrrp();
+    }
+
+    // --- Region 3 -----------------------------------------------------------------------------
+
+    // The stage (population §6.4, as built: `world.data.stage`): the trap door's seam, the fly rope,
+    // and near-catch 3's own way of going: the rival bursts in, trips, and goes down the trap door;
+    // Bumbot rides the fly rope up into the flies.
+    setupStage() {
+        const s = this.scene, st = this.world.data.stage, D = s.DEPTH;
+        if (!st) return;
+        // The trap door: a seam in the stage's front until it has given way, then a hole, its lid up.
+        this.trapSeam = s.add.graphics().setDepth(D.decor + 0.3);
+        this.trapSeam.lineStyle(1, 0x3b2a20, 1).strokeRect(st.trapX - 12.5, st.floor - 7.5, 25, 7);
+        this.trapSeam.fillStyle(0xd9a43b, 1).fillRect(st.trapX - 2, st.floor - 5, 4, 2);
+        this.trapHole = s.add.graphics().setDepth(D.decor + 0.3);
+        this.trapHole.fillStyle(0x0d0b14, 1).fillRect(st.trapX - 13, st.floor - 8, 26, 8);
+        this.trapHole.fillStyle(0x2e222f, 1).fillRect(st.trapX - 13, st.floor - 8, 26, 1);
+        this.trapHole.fillStyle(0x3b2a20, 1).fillRect(st.trapX - 17, st.floor - 30, 4, 30);
+        this.trapHole.fillStyle(0x74503a, 1).fillRect(st.trapX - 16, st.floor - 29, 2, 28);
+        // The fly rope, a loop at its end: he rides it up, and it stays hauled up after.
+        this.rope = s.add.graphics().setDepth(D.props + 0.02);
+        this.world.add([this.trapSeam, this.trapHole, this.rope]);
+        this.drawRope(this.P.has('bb3') ? st.top + 34 : st.floor - 40);
+        this.showTrap();
+        const bb3 = s.cats.find(c => c.flag === 'bb3');
+        if (bb3) {
+            bb3.before = () => this.rivalTrips();
+            bb3.flee = (sprite, done) => this.upTheRope(sprite, done);
+        }
+    }
+
+    showTrap() {
+        const open = this.P.has('bb3') || this.trapOpen;
+        this.trapSeam?.setVisible(!open);
+        this.trapHole?.setVisible(!!open);
+    }
+
+    drawRope(endY) {
+        const st = this.world.data.stage, g = this.rope.clear();
+        g.fillStyle(0x7a4528, 1).fillRect(st.ropeX - 1, st.top + 12, 2, endY - st.top - 12);
+        g.fillStyle(0xab947a, 1);
+        for (let y = st.top + 14; y < endY; y += 4) g.fillRect(st.ropeX - 1, y, 1, 2);
+        g.lineStyle(2, 0x7a4528, 1).strokeEllipse(st.ropeX, endY + 5, 8, 10);
+        this.ropeEnd = endY;
+    }
+
+    // The rival runs in through the curtain behind her with his net, trips on the microphone's
+    // cable, and goes head first onto the trap door, which gives way under him.
+    async rivalTrips() {
+        const s = this.scene, w = this.world, st = w.data.stage;
+        const sm = this.who('npc_stagemanager');
+        if (sm?.on) this.people.play(sm, 'flap', { times: 2 });
+        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1 });
+        if (!r) return;
+        r.on = true;
+        const place = () => this.people.place(r);
+        this.people.anim(r, 'walk', { speed: 2.4 });
+        await w.tween({ targets: r, x: st.cableX, duration: (Math.abs(st.cableX - st.wingX) / 230) * 1000, onUpdate: place });
+        this.people.play(r, 'trip');
+        sfx.dash();
+        await w.tween({ targets: r, x: st.trapX - 4, duration: 440, ease: 'Quad.easeOut', onUpdate: place });
+        this.trapOpen = true;
+        this.showTrap();
+        sfx.smash();
+        s.cameras.main.shake(200, 0.004);
+        await w.tween({ targets: r.sprite, y: st.floor + 56, alpha: 0, duration: 340, ease: 'Quad.easeIn' });
+        r.gone = true;
+        r.items.forEach(i => i.setVisible(false));
+        // Flour comes up out of the hole: he has found the galley's sacks.
+        for (let i = 0; i < 12; i++) {
+            const dot = s.add.image(st.trapX + Phaser.Math.Between(-9, 9), st.floor - 4, 'dot').setTint(0xf3ecdd).setDepth(s.DEPTH.fx).setScale(2);
+            w.add([dot]);
+            s.tweens.add({ targets: dot, y: dot.y - Phaser.Math.Between(16, 40), x: dot.x + Phaser.Math.Between(-10, 10), alpha: 0, duration: 700, delay: i * 25, onComplete: () => dot.destroy() });
+        }
+        await w.wait(420);
+    }
+
+    // Bumbot's way out: a leap onto the fly rope's loop, and up with it into the flies.
+    upTheRope(sprite, done) {
+        const s = this.scene, st = this.world.data.stage;
+        sprite.setFlipX(st.ropeX < sprite.x).play('bumbot-jump');
+        s.tweens.add({
+            targets: sprite, x: st.ropeX, y: st.floor - 30, duration: 240, ease: 'Quad.easeOut',
+            onComplete: () => {
+                sprite.anims.pause();
+                const from = this.ropeEnd, to = st.top + 34;
+                s.tweens.addCounter({
+                    from: 0, to: 1, duration: 950, ease: 'Sine.easeIn',
+                    onUpdate: tw => {
+                        const k = tw.getValue();
+                        this.drawRope(from + (to - from) * k);
+                        sprite.y = this.ropeEnd + 10;
+                        sprite.setAlpha(k > 0.8 ? (1 - k) * 5 : 1);
+                    },
+                    onComplete: () => { sprite.setAlpha(1); done(); },
+                });
+            },
+        });
+    }
+
+    // The stage manager (population: `npc_stagemanager`): allergic to the cat on his stage, he
+    // sneezes every few seconds until he has his pills.
+    sneezes(time) {
+        const m = this.who('npc_stagemanager'), s = this.scene;
+        if (!m?.on || m.state === 'acting' || this.P.save.cards.includes('ent') || s.mode !== 'play') return;
+        if (Math.abs(s.player.x - m.x) > 700 || Math.abs(s.player.y - m.y) > 200) return;
+        this.sneezeAt ??= time + 2500;
+        if (time < this.sneezeAt) return;
+        this.sneezeAt = time + 5000;
+        this.people.play(m, 'sneeze');
+    }
+
+    // E at him after the beat: his pills from his cabin on deck 4, then his card (`scn_card_ent`).
+    pills() {
+        const m = this.near('npc_stagemanager', 44);
+        if (!m || !this.P.has('bb3') || this.P.save.cards.includes('ent')) return false;
+        const w = this.world, s = this.scene, save = this.P.save;
+        if (!save.items.includes('pills')) {
+            w.nudge(m);
+            return true;
+        }
+        w.cut(async () => {
+            const her = s.player;
+            her.setFlipX(m.x < her.x);
+            m.dir = her.x < m.x ? -1 : 1;
+            this.people.place(m);
+            await w.wait(250);
+            // The bottle crosses from her hands to his.
+            const bottle = s.add.image(her.x, her.y - 34, 'icon-pills').setDepth(s.DEPTH.player + 0.05);
+            w.add([bottle]);
+            sfx.pickup();
+            await w.tween({ targets: bottle, x: m.x + m.dir * 10, y: m.y - 36, duration: 380, ease: 'Sine.easeInOut' });
+            bottle.destroy();
+            save.items = save.items.filter(i => i !== 'pills');
+            // One more sneeze, the last; then his card: she is running his errands now.
+            await this.people.play(m, 'sneeze');
+            await w.wait(250);
+            await w.handOver(m, 'key-card', () => this.P.open('cards', 'ent'), 0xff7a7a);
+            this.P.setFlag('pills');
+        });
+        return true;
     }
 }

@@ -8,9 +8,9 @@ funnel's top.
 import json
 
 import build_ship_map as B
-from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW, GRIPS,
-                        GULLS, ITEMS, LIBRARY, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS, SLOTS, SOLIDS, SOURCES,
-                        SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
+from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
+                        SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
@@ -136,7 +136,7 @@ def build_world():
         x, y, route = spot(*d["at"])
         e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
                  idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
-                 pose=d.get("pose", ""))
+                 pose=d.get("pose", ""), still=d.get("still", ""))
         if "walk" in d:
             a, b, v, *clip = d["walk"]
             e["walk"] = dict(a=spot(d["at"][0], a)[0], b=spot(d["at"][0], b)[0], v=v, clip=clip[0] if clip else "walk",
@@ -186,6 +186,14 @@ def build_world():
     for sid, (where, at, up) in SLOTS.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="slot", id=sid, x=x, y=y, route=route, dy=up))
+
+    for lid, (deck, m, flag, short, long, amp, period) in LIGHTS.items():
+        ents.append(dict(kind="light", id=lid, x=B.exact_x(m), top=B.floor_y(deck) - 128, floor=B.floor_y(deck), route="inside",
+                         flag=flag, short=short, long=long, amp=amp, period=period))
+    for cid, (deck, m, half) in CHIPS.items():
+        ents.append(dict(kind="spill", id=cid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", half=round(half * 48), top=64))
+    for jid, (deck, m, flag, up) in JACKPOTS.items():
+        ents.append(dict(kind="jackpot", id=jid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", flag=flag, dy=up))
 
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
@@ -251,12 +259,16 @@ def build_world():
     flash = dict(x0=B.exact_x(FLASH[1]), x1=B.exact_x(FLASH[2]), y=B.floor_y(FLASH[0]), period=FLASH[3])
     window = dict(x=B.exact_x(GLIMPSE_WINDOW[0]), y=B.floor_y(6) - GLIMPSE_WINDOW[1], floor=B.floor_y(6))
 
+    stage_y = B.floor_y(STAGE["deck"])
+    stage = dict(floor=stage_y, top=stage_y - 128, wingX=B.exact_x(STAGE["wing"]), cableX=B.exact_x(STAGE["cable"]),
+                 trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]))
+
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct,
-                library=library, flash=flash, glimpseWindow=window,
+                library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.x_of(125), y=B.floor_y(11), toY=B.floor_y(10)),
-                trapdoor=dict(x=B.x_of(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],
+                trapdoor=dict(x=B.exact_x(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],
                               landX=room_x0[TRAPDOOR_LANDS[0]] + TRAPDOOR_LANDS[1]),
                 catch=dict(x=B.x_of(CATCH_M), y=B.floor_y(7)),
                 waterY=(B.WATER_ROW + 1) * B.TILE)

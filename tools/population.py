@@ -94,8 +94,8 @@ TANGERINES = {
     "tan_5_galley": ("galley", 36, 2, 0, "broken:haz_crate_galley"),
     "tan_6_high": (6, 26.94, 1, 118, None),
     "tan_6_windjammer": (6, 142.2, 1, 32, None),
-    "tan_7_jackpot": (7, 160, 2, 0, "jackpot"),
-    "tan_7_tradewinds": (7, 180, 1, "table", None),
+    "tan_7_jackpot": (7, 153.1, 2, 0, "jackpot"),
+    "tan_7_tradewinds": (7, 182.21, 1, 20, None),
     "tan_8_8206": ("cabin", 104, 2, 33, None),
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
@@ -125,7 +125,7 @@ ITEMS = {
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
-    "book_3": ("dressing", 150, "book:3", None),
+    "book_3": ("dressing", 118, "book:3", None, 31),
     "book_4": (9, 134, "book:4", None),
     "book_5": ("cabin", 190, "book:5", None),
     "book_6": (11, 216, "book:6", None),
@@ -141,7 +141,7 @@ ITEMS = {
 BEATS = {
     "bb1": (5, 248.8, "eat", -1, 203, None),
     "bb2": (6, 181.0, "asleep", 1, 193.6, None),
-    "bb3": (6, 249, "wash", 1, 250.6, None),
+    "bb3": (6, 248.75, "wash", 1, 250.6, None),
     "bb4": ("linen", 150, "asleep", 1, 226, None),
     "bb5": (11, 131.8, "bat", 1, 160, None),
     "bb6": (10, 31, "sit", -1, 29.2, None),
@@ -159,8 +159,11 @@ PUSHABLES = {
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
-TRAPDOOR_M = 250
+TRAPDOOR_M = 246.3
 TRAPDOOR_LANDS = ("galley", 86)     # on the flour sacks
+# The stage as built (deck 6, 244-250.67 m): where the rival runs in, the cable he trips on, the fly
+# rope Bumbot rides up. (The trap door is TRAPDOOR_M; the swinging light is in LIGHTS.)
+STAGE = dict(deck=6, wing=244.3, cable=245.75, rope=249.7)
 CATCH_M = 6
 
 # --- Switches: E on a thing sets a flag (step 0's stand-ins for scenes) ----------------------------
@@ -245,6 +248,30 @@ PEOPLE = {
     "blk_fitter": dict(at=(7, 87.9), who="fitter", face=1, idle="work", until="region:4"),
     "amb_couple_7_her": dict(at=(7, 83.75), who="plaquewoman", pose="back", layer="back"),
     "amb_couple_7_him": dict(at=(7, 84.6), who="plaqueman", pose="back", layer="back"),
+    # Region 3, the theatre (deck 6). The stage manager at the curtain; two dancers rehearsing on
+    # the stage until Bumbot's beat, sat on the floor in front of it after; the rival where the trap
+    # door dropped him, on the galley's flour sacks; three in the stalls.
+    "npc_stagemanager": dict(at=(6, 245.0), who="stagemanager", face=1, idle="idle",
+                             bubble=("pills", "flag:bb3", "card:ent", 4)),
+    "amb_dancer_her": dict(at=(6, 245.9), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
+    "amb_dancer_him": dict(at=(6, 247.15), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
+    "amb_dancer_her_sat": dict(at=(6, 241.05), who="dancer_her", face=1, still="sit", after="flag:bb3", layer="back"),
+    "amb_dancer_him_sat": dict(at=(6, 241.75), who="dancer_him", face=-1, still="sit", after="flag:bb3", layer="back"),
+    "riv_galley": dict(at=("galley", 62), who="rival", face=1, still="sit", after="flag:bb3", until="region:4"),
+    "amb_audience_1": dict(at=(6, 212.29), who="aud_gent", face=1, layer="back"),
+    "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
+    "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
+    # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
+    "amb_barman_mag": dict(at=(7, 113.6), who="barman", face=1, idle="idle", layer="back",
+                           cover=[("bar-counter-bg", 113.6, 0), ("chrome-stool-bg", 113.6, 0)]),
+    "amb_pianist": dict(at=(7, 115.55), who="pianist", face=1, idle="play", layer="back"),
+    "amb_croupier": dict(at=(7, 158.0), who="croupier", pose="front", layer="behind"),
+    "amb_player_lady": dict(at=(7, 157.29), who="casinolady", face=1, layer="back"),
+    "amb_player_cowboy": dict(at=(7, 162.4), who="cowboy", pose="back", layer="back"),
+    "amb_shopper": dict(at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
+    "amb_teen": dict(at=(7, 188.29), who="teen", pose="back", layer="back"),
+    "amb_balcony_1": dict(at=(7, 220.35), who="aud_girl", face=1, layer="back"),
+    "amb_balcony_2": dict(at=(7, 232.71), who="aud_granny", face=1, layer="back"),
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -271,6 +298,13 @@ PROPS = {
     "prop_auction_1": (7, 106.25, "@crate-big", 0, dict(until="region:4")),
     "prop_auction_2": (7, 105.55, "@crate-big", 0, dict(until="region:4")),
     "prop_auction_3": (7, 104.6, "easel-painting", 0, dict(until="region:4")),
+    # Region 3. The microphone's cable the rival trips on; Magnum's piano; the painting of a black
+    # cat on an easel (`sec_cat_painting`); the theatre's scenery flats across the aft flight up.
+    "prop_cable": (6, 245.75, "@cable", 0, {}),
+    "prop_piano_mag": (7, 116.6, "grand-piano-bg", 0, dict(back=True)),
+    "sec_cat_painting": (7, 140.0, "@easel-cat", 0, dict(back=True)),
+    "prop_flat_1": (7, 198.15, "@flat-palm", 0, dict(until="region:4")),
+    "prop_flat_2": (7, 197.3, "@flat-sun", 0, dict(until="region:4")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -290,6 +324,10 @@ QUIRKS = {
     "sec_swan": (5, 177.6, "E", "shiver", 1700, {}),
     # (While she dances the disco ball over the floor throws its lights: `glitter` = m, px up.)
     "sec_dance": (6, 117.2, "still:3", "dance", 3200, dict(reach=36, glitter=(119.4, 113))),
+    # Centre stage, between the open trap door and the swinging light: she bows to the house.
+    "sec_spotlight": (6, 247.3, "still:3", "bow", 2000, dict(reach=14, needs="bb3", face=-1)),
+    # The cat's portrait: a double-take.
+    "sec_cat_look": (7, 140.0, "still:1.5", "idle-look", 1700, dict(reach=16)),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
@@ -317,9 +355,18 @@ ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
 # Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
-SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85)}
+SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62)}
 # The Photo Studio's flash (`haz_flash`): deck, from m, to m (between its softboxes), every s.
 FLASH = (6, 132.45, 134.75, 6)
 # The promenade's porthole where two black ears show once (`bb_glimpse_window`): m, px up.
 GLIMPSE_WINDOW = (168.3, 72)
+
+# --- Region 3's own things (docs/population.md, decks 6 and 7) --------------------------------------
+# Stage lights that swing once their flag is set (`haz_lights`): id: (deck, m, flag, cable px while
+# hauled up, cable px let down, swing in degrees, period s). From the ceiling.
+LIGHTS = {"haz_light": (6, 249.1, "bb3", 30, 74, 55, 3.2)}
+# Slot machines that pay out over the floor (`haz_chips`): id: (deck, m, half the spill's width m).
+CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_chips_3": (7, 166.79, 0.9)}
+# The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).
+JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 

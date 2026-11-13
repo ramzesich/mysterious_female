@@ -100,6 +100,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
 
 ## Step 3: Showtime (region 3)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** the theatre, its balcony, deck 7 from Magnum's to the Arcade, the dressing room and the
   lighting bridge; the stage manager, the dancers, the rival on stage; the stage lights, the trap
   door, the pit, the chip spills, the jackpot; the pills' errand; the Entertainment card; book 3;

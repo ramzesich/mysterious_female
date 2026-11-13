@@ -85,6 +85,12 @@ export class People {
 
     idle(p) {
         p.state = 'idle';
+        // (`still`: held in a clip's last frame: sat down on the floor.)
+        if (p.still && p.meta.anims[p.still]) {
+            p.sprite.anims.stop();
+            p.sprite.setFrame(p.meta.anims[p.still].at(-1));
+            return;
+        }
         if (!p.idle || !this.anim(p, p.idle)) {
             p.sprite.anims.stop();
             p.sprite.setFrame(p.meta[p.pose] ?? p.meta.stand);
