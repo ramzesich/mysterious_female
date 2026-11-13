@@ -73,4 +73,19 @@ CAST = {
     "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {}, {"scale": 0.8}),
     "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"scale": 0.8}),
     "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"scale": 0.8}),
+    # Region 4 (Housekeeping): deck 9's corridor, the atrium walks, the laundry.
+    "steward": ("f2cc7401-693f-4f93-8915-f3f040c2658c", {"idle": 4, "tug": 8, "walk": 9, "thanks": 8}, {}),
+    "bride": ("70b0bc20-aef9-46aa-bd9d-35f56c4c0008", {"idle": 4, "kiss": 7}, {}),
+    "groom": ("0c16e385-6331-4d44-87dc-060e70835055", {"idle": 4, "kiss": 7}, {}),
+    "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
+    # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
+    "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4}, {"scale": 0.72}),
+    "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 8}, {}),
+    "domeman": ("7a956cd3-6357-4fa6-a319-020144870524", {"idle": 4}, {}),
+    "bagslady": ("1528b5cf-4225-4d4b-85f8-e6f67ed664df", {"walk": 8}, {}),
+    "planman": ("3bccf530-3e86-4a11-b6de-c7a049b9572c", {}, {}),
+    # The security officer waiting for his uniform in the laundry (after the stage's flour).
+    "rival_towel": ("1f2d9528-cb0b-4cd0-9fdd-ae8665ef179e", {}, {"scale": 0.8}),
+    # Region 5 (deck 8 forward): the party at the cabin with the balloons.
+    "partygirl": ("805b5b9e-f9ba-4091-be45-4b4fb9619843", {"dance": 9}, {}),
 }

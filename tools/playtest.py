@@ -219,7 +219,12 @@ def scenario_stairs(b):
     ok &= check(s["mode"] == "play" and s["y"] == D4, "holding down carries her back to deck 4", s)
     b.open("?reset&play&cards=all")
     b.teleport(CORE_L, D4)
-    b.hold("up", 9.0)
+    # (Held until she is there: the climb takes about nine seconds, a little more on a slow machine.)
+    b.key("up", True)
+    end = time.time() + 14
+    while time.time() < end and b.state()["y"] > floor_y(8):
+        time.sleep(0.05)
+    b.key("up", False)
     s = b.state()
     ok &= check(s["y"] <= floor_y(8), "with every card she climbs on past deck 6", s)
     return ok
@@ -886,29 +891,47 @@ def scenario_golden(b):
     b.hold(["right", "space"], 0.7)
     ok &= check(b.state()["x"] < exact_x(122.6), "and can't be hopped where it is jammed", b.state())
     time.sleep(0.5)
-    b.tap("e")
-    b.hold("right", 6.6)
-    ok &= check("cart_free" in flags(b), "pushed along to 130 m, it is free", b.state())
-    b.hold(["right", "space"], 0.7)
-    b.hold("right", 0.4)
-    ok &= check(b.state()["x"] > exact_x(130), "and she hops it there", b.state())
+    b.hold("right", 0.3)
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
+    back = b.state()["x"]
     b.teleport(linen, D9)
     b.tap("e")
     time.sleep(0.15)
     ok &= check("Housekeeping" in alert(b) and route(b) == "inside", "the linen room's crew door wants the Housekeeping card", alert(b))
-    ok &= check(take_card(b, "hk"), "the Housekeeping card, past the cart")
+    time.sleep(0.5)
+    b.teleport(back - 6, D9)
+    b.hold("right", 0.3)
+    b.tap("e")
+    b.hold("right", 6.6)
+    ok &= check("cart_free" in flags(b), "pushed along to 130 m, it is free", b.state())
+    end = time.time() + 12
+    while time.time() < end and not ("hk" in save_list(b, "cards") and b.state()["mode"] == "play"):
+        time.sleep(0.2)
+    ok &= check("hk" in save_list(b, "cards"), "the steward's thanks: the Housekeeping card", save_list(b, "cards"))
+    b.hold(["right", "space"], 0.7)
+    b.hold("right", 0.4)
+    ok &= check(b.state()["x"] > exact_x(130), "and she hops the cart there", b.state())
     b.teleport(linen, D9)
     b.tap("e")
     time.sleep(0.8)
     ok &= check(route(b) == "linen", "with it, into the linen room")
-    # Near-catch 4 in the towels; crawling is learned; the vent, the duct, the drop into deck 8.
-    b.hold("right", 0.5)
-    ok &= check(wait_flag(b, "bb4"), "near-catch 4 in the towel heap", flags(b))
+    # Near-catch 4 in the towels; crawling is learned; the laundry cart under the vent, the duct,
+    # the drop into deck 8.
+    b.hold("right", 0.9)
+    ok &= check(wait_flag(b, "bb4"), "near-catch 4 in the towel heap: he is gone into the vent", flags(b))
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned there")
-    b.hold(["down", "right"], 2.2)
-    time.sleep(0.7)
-    ok &= check(route(b) == "duct", "crawling into the vent: the duct", b.state())
+    lc = "window.__ship.world.pushables.find(t => t.id === 'cart_linen')"
+    b.teleport(b.eval(f"{lc}.x") - 32, D9, "linen")
+    time.sleep(0.2)
+    b.tap("e")
+    ok &= check(b.state()["mode"] == "push", "E at the laundry cart's end: she takes hold", b.state())
+    b.hold("right", 2.8)
+    ok &= check("cart_linen" in flags(b), "the laundry cart pushed under the vent", b.state())
+    b.hold(["right", "space"], 0.45)
+    time.sleep(0.5)
+    b.hold("down", 0.5)
+    time.sleep(0.9)
+    ok &= check(route(b) == "duct", "from the cart's top, down on hands and knees: the duct", b.state())
     b.hold("left", 13.6)
     b.tap("down")
     time.sleep(1.6)
@@ -1379,6 +1402,17 @@ def enter_region3(b):
     time.sleep(0.2)
 
 
+def enter_region4(b):
+    """A save at region 4's door: regions 1-3 done (the Deck and Entertainment cards, the stage's
+    beat), she has just come up the red trunk to deck 9."""
+    b.open("?reset&play")
+    b.eval("(P => { ['bb1', 'lunch', 'bb_lift', 'bb2', 'riv_prom', 'glimpse1', 'glimpse_window', 'bb3', 'pills'].forEach(f => P.setFlag(f));"
+           " P.open('cards', 'deck'); P.open('cards', 'ent'); [2, 3, 4].forEach(r => P.open('regions', r)); })(window.__ship.progress)")
+    b.eval("window.__ship.cats.filter(c => ['bb1', 'bb2', 'bb3'].includes(c.flag)).forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
+    b.eval("window.__ship.world.refresh()")
+    time.sleep(0.2)
+
+
 def pills_for_the_stage_manager(b):
     """The second errand, start to end (the golden path's): down the theatre's trunk to deck 4, his
     pills from his cabin, back up, into his hands: the Entertainment card."""
@@ -1694,6 +1728,325 @@ def scenario_sweep(b):
     # The elevators light only region 1's landings at the start.
     lit = b.eval("window.__ship.lifts.map(l => l.floors.filter(f => window.__ship.progress.regionOpen(f.region)).map(f => f.deck))")
     ok &= check(all(sorted(x) in ([4, 5], [5]) for x in lit), "the elevators light only decks 4-5 at the start", lit)
+    return ok
+
+
+def mover(mid):
+    return f"window.__ship.world.movers.find(m => m.def && m.def.id === '{mid}')"
+
+
+def wait_js(b, text, timeout=8):
+    """Waits until an expression is true in the game."""
+    end = time.time() + timeout
+    while time.time() < end:
+        if b.eval(text):
+            return True
+        time.sleep(0.04)
+    return False
+
+
+def scared(b, word, within=3.0):
+    """A fright with `word` in it comes within a while."""
+    end = time.time() + within
+    while time.time() < end:
+        if b.state()["mode"] == "scripted" and word in alert(b):
+            return True
+        time.sleep(0.04)
+    return False
+
+
+def scenario_region4(b):
+    """Region 4 (docs/build-plan.md, step 4): Housekeeping, deck 9's corridor: the steward's cart and
+    his card, the honeymooners' picture and the fourth book, the vacuum that darts out, the towel
+    stack, the sprinkler, the balcony cabin and the glimpse from its balcony, the door that flies
+    open, "Do Not Disturb", the luggage and the adjoining cabins' fort, near-catch 4 into the vent,
+    the laundry cart under it, the duct with its grilles down into deck 8, the chute to the laundry."""
+    enter_region4(b)
+    ok = True
+    W = "window.__ship.world"
+    now = "window.__ship.time.now"
+    tangerines = lambda: b.state()["tangerines"]
+    # Up the red trunk: the crew door by it is her checkpoint here.
+    b.teleport(trunk_x("magnums"), D9)
+    b.hold("right", 0.7)
+    ok &= check("cp_9_arrive" in save_list(b, "activated"), "the crew door by the trunk: a checkpoint as she arrives", save_list(b, "activated"))
+    # The steward and his jammed cart.
+    cart = f"{W}.pushables.find(t => t.id === 'cart_steward')"
+    cx = js(b, f"{cart}.x")
+    st = person(b, "npc_steward")
+    ok &= check(st["on"] and abs(st["x"] - (cx + 35)) < 2, "the steward at his cart's far end", st)
+    ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("tug"), "pulling at it")
+    b.hold("right", 1.5)
+    ok &= check(b.state()["x"] < cx, "the cart fills the corridor", b.state())
+    ok &= check(js(b, f"{W}.people.byId.npc_steward.bubbleItems[0].visible"), "his bubble shows a cart")
+    b.shot("region4-steward")
+    b.hold(["right", "space"], 0.7)
+    ok &= check(b.state()["x"] < cx, "and can't be hopped where it is jammed", b.state())
+    linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
+    b.teleport(linen, D9)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check("Housekeeping" in alert(b) and route(b) == "inside", "the linen room wants the Housekeeping card", alert(b))
+    time.sleep(0.5)
+    b.teleport(cx - 26, D9)
+    b.hold("right", 0.3)
+    b.tap("e")
+    b.hold("right", 6.8)
+    ok &= check("cart_free" in flags(b), "pushed along to 130 m, the cart is free", b.state())
+    time.sleep(1.0)
+    b.shot("region4-thanks")
+    ok &= check(wait_js(b, "window.__ship.save.cards.includes('hk') && window.__ship.mode === 'play'", 10),
+                "he thanks her and hands over the Housekeeping card", save_list(b, "cards"))
+    st = person(b, "npc_steward")
+    ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("idle") and st["x"] > exact_x(130),
+                "and stands by his cart", st)
+    b.hold(["right", "space"], 0.7)
+    b.hold("right", 0.5)
+    ok &= check(b.state()["x"] > exact_x(130) and b.state()["mode"] == "play", "she hops the cart there", b.state())
+    # The honeymooners.
+    b.teleport(exact_x(133.6), D9)
+    time.sleep(0.4)
+    ok &= check(js(b, f"{W}.people.byId.npc_bride.bubbleItems[0].visible"), "the honeymooners hold out a camera")
+    b.shot("region4-honeymooners")
+    b.tap("e")
+    time.sleep(1.75)
+    b.shot("region4-photo")
+    ok &= check(js(b, "window.__ship.player.anims.currentAnim.key") == "her-camera", "E: she takes their picture", b.state())
+    ok &= check(wait_flag(b, "photo", 16), "the flash, their kiss, and in they go", flags(b))
+    ok &= check(js(b, "window.__ship.save.books['4']") == "held", "the fourth book is their thanks")
+    ok &= check(not person(b, "npc_bride")["on"] and not person(b, "npc_groom")["on"], "they have gone in")
+    # The vacuum in the open cabin's doorway.
+    vac = mover("haz_vacuum_9")
+    vx = js(b, f"{vac}.def.x")
+    b.teleport(vx - 160, D9)
+    time.sleep(0.3)
+    ok &= check(js(b, f"{vac}.state") == "in" and js(b, f"{vac}.armed"), "the vacuum waits in the cabin's doorway")
+    b.key("right", True)
+    hit = scared(b, "Іііі", 2.5)
+    b.key("right", False)
+    b.shot("region4-vacuum")
+    ok &= check(hit, "running at the doorway: it darts out at her", alert(b))
+    time.sleep(2.8)
+    ok &= check(b.state()["mode"] == "play" and abs(b.state()["x"] - exact_x(119.6)) < 30, "and she is back at the crew door by the trunk", b.state())
+    # A jump as it rattles clears it.
+    b.teleport(vx - 160, D9)
+    wait_js(b, f"{vac}.state === 'in' && {vac}.armed", 6)
+    b.key("right", True)
+    wait_js(b, f"{vac}.state === 'wait'", 3)
+    b.key("space", True)
+    time.sleep(0.75)
+    b.key("space", False)
+    b.key("right", False)
+    time.sleep(0.3)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["x"] > vx - 30, "a jump as it rattles clears it", s)
+    stk = mover("haz_towels_9")
+    sx = js(b, f"{stk}.def.x")
+    ok &= check(js(b, f"{stk}.state") == "up", "and the towel stack still stands", js(b, f"{stk}.state"))
+    # Back in, it does nothing while she stands at the door; the cabin being cleaned.
+    time.sleep(1.6)
+    cl = room(b, "cleanup")
+    b.teleport(cl["doors"][0]["outX"], D9)
+    time.sleep(0.5)
+    ok &= check(b.state()["mode"] == "play", "back in its doorway it leaves her alone", b.state())
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "cleanup" and person(b, "amb_bedmaker")["on"], "the cabin being cleaned: the bedmaker at the stripped bed", route(b))
+    b.shot("region4-cleanup")
+    b.teleport(cl["doors"][0]["x"], D9, "cleanup")
+    b.tap("e")
+    time.sleep(0.9)
+    # The towel stack: walked past, it wobbles; a jump landed by it brings it down on her.
+    # (The vacuum is kept in its doorway for this: beside the stack she is within its reach.)
+    wait_js(b, f"{vac}.state === 'in'", 6)
+    js(b, f"{vac}.update = () => {{}}")
+    b.teleport(sx - 70, D9)
+    b.hold("right", 1.0)
+    ok &= check(js(b, f"{stk}.state") == "up" and b.state()["mode"] == "play" and b.state()["x"] > sx + 40, "walked past, the towel stack only wobbles", b.state())
+    b.teleport(sx - 26, D9)
+    time.sleep(0.3)
+    b.hold("space", 0.2)
+    hit = scared(b, "Мммф", 2.5)
+    b.shot("region4-buried")
+    ok &= check(hit, "a jump landed beside it: buried", alert(b))
+    time.sleep(2.8)
+    # The sprinkler: its drip is the tell; under it while it rains she is drenched.
+    spr = mover("haz_sprinkler_9")
+    px = js(b, f"{spr}.def.x")
+    wait_js(b, f"{spr}.phase({now}) === 'on'", 6)
+    wait_js(b, f"{spr}.phase({now}) === 'off'", 6)
+    b.teleport(px - 80, D9)
+    b.hold("right", 1.15)
+    ok &= check(b.state()["mode"] == "play" and b.state()["x"] > px + 48, "between its showers she runs under the sprinkler", b.state())
+    wait_js(b, f"{spr}.phase({now}) === 'tell'", 6)
+    b.teleport(px, D9)
+    hit = scared(b, "Бррр", 2.5)
+    b.shot("region4-drenched")
+    ok &= check(hit, "under it when it rains: drenched", alert(b))
+    time.sleep(2.8)
+    # The balcony cabin: the green card's door, a checkpoint, the basket, the balcony and who is up there.
+    bc = room(b, "balcabin9")
+    n = tangerines()
+    b.teleport(bc["doors"][0]["outX"], D9)
+    time.sleep(0.2)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "balcabin9" and "cp_balcabin" in save_list(b, "activated"), "the balcony cabin opens with the card: a checkpoint", route(b))
+    b.teleport(bc["x0"] + 150, D9, "balcabin9")
+    time.sleep(0.4)
+    b.shot("region4-balcabin")
+    b.hold("space", 0.3)
+    time.sleep(0.6)
+    ok &= check(tangerines() == n + 1, "a tangerine in its fruit basket", tangerines())
+    b.teleport(bc["doors"][1]["x"], D9, "balcabin9")
+    b.tap("e")
+    time.sleep(1.5)
+    b.shot("region4-balcony")
+    ok &= check(route(b) == "promenade" and "glimpse_balcony" in flags(b), "out on its balcony: Bumbot on the rail a deck up", (route(b), flags(b)))
+    b.tap("e")
+    time.sleep(1.0)
+    ok &= check(route(b) == "balcabin9", "and back in", route(b))
+    b.teleport(bc["doors"][0]["x"], D9, "balcabin9")
+    b.tap("e")
+    time.sleep(0.9)
+    # The door that flies open.
+    sw = mover("haz_swing_9")
+    wx = js(b, f"{sw}.def.x")
+    b.teleport(wx - 200, D9)
+    time.sleep(0.2)
+    b.key("right", True)
+    hit = scared(b, "Ай", 3.0)
+    b.key("right", False)
+    b.shot("region4-bonked")
+    ok &= check(hit, "running past the door that flies open: bonked", alert(b))
+    ok &= check(person(b, "haz_swing_9_who")["on"], "the kid with the water pistol looks out")
+    time.sleep(2.8)
+    ok &= check(abs(b.state()["x"] - bc["doors"][0]["outX"]) < 30, "back at the balcony cabin's door", b.state())
+    wait_js(b, f"{sw}.state === 'shut' && {sw}.armed", 6)
+    b.teleport(wx - 200, D9)
+    b.key("right", True)
+    wait_js(b, f"{sw}.state === 'rattle'", 3)
+    b.key("right", False)
+    wait_js(b, f"{sw}.state === 'open'", 3)
+    b.hold("right", 1.6)
+    ok &= check(b.state()["mode"] == "play" and b.state()["x"] > wx + 40, "stopping when its handle rattles, then on past it", b.state())
+    # "Do Not Disturb".
+    dx = js(b, f"{mover('haz_dnd_9')}.def.x")
+    b.teleport(dx - 8, D9)
+    time.sleep(0.3)
+    ok &= check(b.state()["mode"] == "play", "the Do Not Disturb door: left alone, nothing")
+    b.tap("e")
+    time.sleep(0.35)
+    b.shot("region4-startled")
+    ok &= check(b.state()["mode"] == "scripted" and "вибачте" in alert(b), "E at it: startled", alert(b))
+    time.sleep(3.0)
+    # The standing cart and its tangerine; the luggage to the ceiling.
+    b.teleport(exact_x(172.6) - 44, D9)
+    b.hold(["right", "space"], 0.4)
+    time.sleep(0.5)
+    b.hold("left", 0.08)
+    time.sleep(0.2)
+    ok &= check("tan_9_cart" in save_list(b, "collected") and b.state()["mode"] == "play", "onto the standing cart for its tangerine", b.state())
+    b.teleport(exact_x(178.4), D9)
+    b.hold("right", 1.0)
+    b.hold(["right", "space"], 0.8)
+    ok &= check(b.state()["x"] < exact_x(180), "the stack of luggage can't be hopped", b.state())
+    b.shot("region4-luggage")
+    # The adjoining cabins: in at 176; the children's fort bars the way through until she can crawl.
+    ad = room(b, "adjoin")
+    b.teleport(ad["doors"][0]["outX"], D9)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "adjoin", "into the first of the adjoining cabins", route(b))
+    b.hold("right", 2.2)
+    ok &= check(b.state()["x"] < ad["x0"] + 236, "the blanket fort across the way through stops her", b.state()["x"] - ad["x0"])
+    b.shot("region4-fort")
+    b.teleport(ad["doors"][0]["x"], D9, "adjoin")
+    b.tap("e")
+    time.sleep(0.9)
+    # The dash goes through the luggage.
+    b.teleport(exact_x(178.6), D9)
+    time.sleep(0.2)
+    b.key("right", True)
+    b.tap("d")
+    time.sleep(1.0)
+    b.key("right", False)
+    ok &= check("haz_luggage_9" in save_list(b, "broken") and b.state()["x"] > exact_x(180), "the dash goes through the luggage", b.state())
+    ok &= check("tan_9_luggage" in save_list(b, "collected"), "and she has the tangerine behind it", save_list(b, "collected"))
+    b.teleport(exact_x(191.0), D9)
+    b.hold("right", 0.5)
+    ok &= check("cp_9_mid" in save_list(b, "activated"), "the crew door before the aft lobby: a checkpoint")
+    # The linen room: near-catch 4, into the vent.
+    b.teleport(linen, D9)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "linen", "with the card, into the linen room", route(b))
+    b.shot("region4-linen")
+    lc = f"{W}.pushables.find(t => t.id === 'cart_linen')"
+    b.hold("right", 0.9)
+    ok &= check(b.state()["x"] > js(b, f"{lc}.x"), "she walks past the laundry cart", b.state())
+    time.sleep(0.9)
+    b.shot("region4-vent")
+    ok &= check(wait_flag(b, "bb4", 12), "near-catch 4: Bumbot leaps from the towels into the vent", flags(b))
+    ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned")
+    time.sleep(0.5)
+    ok &= check(js(b, f"{W}.story.cartKey.visible"), "the cart shows its key")
+    # The cart under the vent, onto it, down on hands and knees: the duct.
+    b.teleport(js(b, f"{lc}.x") - 36, D9, "linen")
+    b.tap("e")
+    ok &= check(b.state()["mode"] == "push", "E by the cart's end: she takes hold", b.state())
+    b.hold("right", 2.6)
+    ok &= check("cart_linen" in flags(b), "pushed under the vent", flags(b))
+    time.sleep(0.3)
+    b.shot("region4-cart")
+    ok &= check(js(b, f"{W}.story.ventKey.visible"), "and the vent's key shows over it")
+    b.hold(["right", "space"], 0.45)
+    time.sleep(0.5)
+    s = b.state()
+    ok &= check(s["y"] == D9 - 36, "she jumps up onto it", s)
+    b.shot("region4-on-cart")
+    b.hold("down", 0.5)
+    time.sleep(0.9)
+    ok &= check(route(b) == "duct", "down on hands and knees on it: into the vent", route(b))
+    duct = js(b, f"{W}.data.duct")
+    time.sleep(0.3)
+    ok &= check(js(b, f"{W}.eyesX != null && !{W}.eyesGone && {W}.eyesX < window.__ship.player.x - 100"), "his eyes in the dark ahead of her")
+    b.shot("region4-duct")
+    ok &= check(js(b, "window.__ship.player.anims.currentAnim.key") == "her-crawl", "crawling has its own clip")
+    n = tangerines()
+    g = duct["grilles"][3]
+    s = hold_until(b, "left", lambda s: s["x"] < g["x"] + 6, 16)
+    time.sleep(0.5)
+    b.shot("region4-peek")
+    ok &= check(js(b, f"{W}.peeks.find(k => k.what === 'snore').items[1].alpha") > 0.9, "over a grille: a look down at who snores below")
+    ok &= check(tangerines() == n + 1, "a tangerine lost in the duct", tangerines())
+    s = hold_until(b, "left", lambda s: s["x"] < duct["exitX"] + 6, 8)
+    ok &= check(js(b, f"{W}.ductKey.visible"), "the far grille shows its key")
+    b.tap("down")
+    time.sleep(1.7)
+    s = b.state()
+    ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"), "kicked out, she drops into deck 8 forward: region 5", s)
+    # Now that she crawls: the fort, and what is in it.
+    n = tangerines()
+    b.teleport(ad["x0"] + 200, D9, "adjoin")
+    time.sleep(0.3)
+    s = hold_until(b, ["down", "right"], lambda s: s["x"] > ad["x0"] + 330, 5)
+    ok &= check(s["x"] > ad["x0"] + 330 and tangerines() == n + 2, "crawling through the blanket fort: two tangerines hidden in it", (s["x"] - ad["x0"], tangerines() - n))
+    b.teleport(ad["doors"][1]["x"], D9, "adjoin")
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "inside" and abs(b.state()["x"] - exact_x(183.6)) < 12, "and out of the second cabin's door, past the luggage", b.state())
+    # The chute.
+    b.teleport(js(b, f"{W}.data.linen.chuteX"), D9, "linen")
+    time.sleep(0.4)
+    b.tap("e")
+    time.sleep(1.5)
+    b.shot("region4-chute")
+    ok &= check(wait_flag(b, "chute", 8) and route(b) == "laundry", "E at the chute's hatch: down to the laundry on deck 4", route(b))
+    ok &= check(js(b, f"!!{W}.story.hat"), "a towel on her head")
+    ok &= check(person(b, "riv_laundry")["on"], "the security officer in a towel, his uniform in the wash")
+    b.shot("region4-laundry")
     return ok
 
 

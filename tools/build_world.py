@@ -8,6 +8,7 @@ funnel's top.
 import json
 
 import build_ship_map as B
+from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -100,10 +101,23 @@ def build_world():
                           art=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}.png").exists(),
                           needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors))
 
+    # The duct, drawn shorter than the way it stands for (a crawl of about a quarter of a minute):
+    # from the linen room's end forward, its grilles evenly along it, the last one the way out.
+    dx1 = B.x_of(DUCT["m_in"]) + 40
+    dx0 = dx1 - DUCT["length"]
+    n = len(DUCT["grilles"]) + 1
+    duct = dict(x0=dx0, x1=dx1, floor=B.floor_y(DUCT["deck"]), exitX=dx0 + 70,
+                dropX=B.x_of(DUCT["m_out"]), dropY=B.floor_y(DUCT["drop_deck"]),
+                grilles=[dict(x=round(dx1 - 120 - (i + 1) * (DUCT["length"] - 250) / n), what=what)
+                         for i, what in enumerate(DUCT["grilles"])])
+
     def spot(where, at):
-        """(x, y, route) of a thing on a deck at `at` m, or in a room `at` px from its left edge."""
+        """(x, y, route) of a thing on a deck at `at` m, or in a room `at` px from its left edge (in
+        the duct: px along it from the linen room's end)."""
         if where == "funnel":
             return B.exact_x(at), funnel_top()["y"], "inside"
+        if where == "duct":
+            return duct["x1"] - at, duct["floor"], "duct"
         # Outside: the promenade's deck, the boat walkway over it.
         if where in ("prom", "walkway"):
             return B.exact_x(at), B.floor_y(6 if where == "prom" else 7), OUTSIDE
@@ -195,16 +209,35 @@ def build_world():
     for jid, (deck, m, flag, up) in JACKPOTS.items():
         ents.append(dict(kind="jackpot", id=jid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", flag=flag, dy=up))
 
+    # Region 4's hazards (src/world/movers.js).
+    for did, (deck, m, reach, dart) in DARTERS.items():
+        ents.append(dict(kind="darter", id=did, x=slot_x(deck, m), y=B.floor_y(deck), route="inside",
+                         reach=round(reach * 48), dart=round(dart * 48)))
+    for sid, (deck, m) in STACKS.items():
+        ents.append(dict(kind="stack", id=sid, x=B.exact_x(m), y=B.floor_y(deck), route="inside"))
+    for sid, (deck, m, half, period, on, offset) in SPRINKLERS.items():
+        ents.append(dict(kind="sprinkler", id=sid, x=B.exact_x(m), y=B.floor_y(deck), top=B.floor_y(deck) - 128, route="inside",
+                         half=round(half * 48), period=period, on=on, offset=offset))
+    for sid, (deck, m, reach, delay, who) in SWINGDOORS.items():
+        ents.append(dict(kind="swingdoor", id=sid, x=slot_x(deck, m), y=B.floor_y(deck), route="inside",
+                         reach=round(reach * 48), delay=delay, who=who))
+    for did, (deck, m, who) in DND.items():
+        ents.append(dict(kind="dnd", id=did, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", who=who))
+    for lid, (where, a, b, frame) in LOWS.items():
+        x0, y, route = spot(where, a)
+        ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,
+                         frame=frame or ""))
+
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
         exit_x = spot(where, gone)[0]
         ents.append(dict(kind="cat", id=bid, x=x, y=y, route=route, activity=activity, escape=escape, exitX=exit_x,
                          needs=needs or "", lift=lift_of(BEAT_LIFT.get(bid, 0))))
 
-    for pid, (where, at, to, frame, flag, tall, sides) in PUSHABLES.items():
+    for pid, (where, at, to, frame, flag, tall, sides, *needs) in PUSHABLES.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="push", id=pid, x=x, y=y, route=route, min=x, max=spot(where, to)[0], frame=frame,
-                         flag=flag or "", tall=tall, sides=sides))
+                         flag=flag or "", tall=tall, sides=sides, needs=needs[0] if needs else ""))
 
     for sid, (where, at, flag, needs, label) in SWITCHES.items():
         x, y, route = spot(where, at)
@@ -243,16 +276,6 @@ def build_world():
     # Ladders on the map that open on a flag (the bridge's hatch, after the alarm).
     gates = [dict(x=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2, y0=B.floor_y(11), y1=B.floor_y(10), needs="alarm", hide=True)]
 
-    # The duct, drawn shorter than the way it stands for (a crawl of about a quarter of a minute):
-    # from the linen room's end forward, its grilles evenly along it, the last one the way out.
-    dx1 = B.x_of(DUCT["m_in"]) + 40
-    dx0 = dx1 - DUCT["length"]
-    n = len(DUCT["grilles"]) + 1
-    duct = dict(x0=dx0, x1=dx1, floor=B.floor_y(DUCT["deck"]), exitX=dx0 + 70,
-                dropX=B.x_of(DUCT["m_out"]), dropY=B.floor_y(DUCT["drop_deck"]),
-                grilles=[dict(x=round(dx1 - 120 - (i + 1) * (DUCT["length"] - 250) / n), what=what)
-                         for i, what in enumerate(DUCT["grilles"])])
-
     lib_y = B.floor_y(LIBRARY["deck"])
     library = dict(shelf=dict(x0=B.exact_x(LIBRARY["shelf"][0]), y=lib_y - LIBRARY["shelf"][1]),
                    trolley=dict(x=B.exact_x(LIBRARY["trolley"]), y=lib_y), chair=dict(x=B.exact_x(LIBRARY["chair"]), y=lib_y))
@@ -263,7 +286,14 @@ def build_world():
     stage = dict(floor=stage_y, top=stage_y - 128, wingX=B.exact_x(STAGE["wing"]), cableX=B.exact_x(STAGE["cable"]),
                  trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]))
 
-    return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct,
+    linen = dict(ventX=room_x0["linen"] + LINEN["vent"], sill=LINEN["sill"], chuteX=room_x0["linen"] + LINEN["chute"],
+                 cartTop=LINEN["cart_top"], laundryCartX=room_x0["laundry"] + LINEN["laundry_cart"])
+    gdeck, gm = GLIMPSE_BALCONY
+    gx = nearest_balcony(gdeck, slot_x(gdeck, gm))
+    glimpse_balcony = dict(x0=gx, x1=gx + UNIT, y=B.floor_y(gdeck), topY=B.floor_y(gdeck) - PARTITION_H)
+
+    return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen,
+                glimpseBalcony=glimpse_balcony,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,

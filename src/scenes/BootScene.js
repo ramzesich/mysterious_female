@@ -25,6 +25,11 @@ export class BootScene extends Phaser.Scene {
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.image('linen-room', 'assets/ship/linen-room.png');
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
+        // The linen room's laundry cart (she pushes it), the adjoining cabins' blanket fort (in front
+        // of her), and what shows under the duct's grilles (tools/draw_rooms.py).
+        this.load.image('linen-cart', 'assets/ship/linen-cart.png');
+        this.load.image('fort', 'assets/ship/rooms/adjoin-fort.png');
+        for (const what of ['lobby', 'dome', 'balloons', 'snore']) this.load.image(`peek-${what}`, `assets/ship/peeks/${what}.png`);
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
@@ -98,6 +103,11 @@ export class BootScene extends Phaser.Scene {
         for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6], ['bow', 8]]) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
         }
+        // Her verbs' own clips (§6.1.2): on hands and knees, pushing a cart; the honeymooners' camera
+        // raised to her eye and held.
+        if (meta.anims.crawl) this.anims.create({ key: 'her-crawl', frames: frames('crawl'), frameRate: 11, repeat: -1 });
+        if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 9, repeat: -1 });
+        if (meta.anims.camera) this.anims.create({ key: 'her-camera', frames: frames('camera', [0, 1, 2, 3]), frameRate: 9 });
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.

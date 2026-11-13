@@ -320,3 +320,93 @@ out once (`jackpot`); people held in a clip's last frame (`still`: sat on the fl
 
 **PixelLab spent on this step:** about 61 generations (15 characters and their clips, the rival's
 trip and sit, her bow). 1,448 of 2,000 left.
+
+## Step 4: Housekeeping, region 4 (2026-11-13)
+
+Done: deck 9's midships corridor ("housekeeping hour") populated and playable from the red trunk's
+door to the duct's drop into deck 8, with decks 8-10's lobbies and atrium walks. The steward and
+his jammed cart (he pulls, she pushes, his thanks and the Housekeeping card); the honeymooners'
+picture (her camera clip, the flash, their kiss, the fourth book); the cabin being cleaned with the
+vacuum that darts out of its doorway and the towel stack beside it ("Buried"); the sprinkler
+("Drenched"); the balcony cabin (drawn; a checkpoint, a tangerine, Bumbot's glimpse from its
+balcony); the door that flies open ("Bonked") with the kid behind it; the "Do Not Disturb" door
+("Startled"); the standing cart, the luggage stacked to the ceiling, the adjoining cabins round it
+with a blanket fort; near-catch 4 in the linen room with its own way out (he leaps into the vent),
+the laundry cart pushed under the vent, the duct with its grilles and what is under them, the
+chute down to the laundry; the towel animals on the flight up from deck 10. Her crawl, push and
+camera clips. Playtest `region4` (from `enter_region4`); `golden` does the new flow for real.
+
+**New systems:** hazards that react to her coming (`src/world/movers.js`: `Darter`, `SwingDoor`,
+each armed again only once she has gone away), a trap with a tell (`TowelStack`), a timed one
+(`Sprinkler`), a door that answers E with a fright (`DndDoor`); things she must crawl under or
+through (`LOWS`, kind `low`: solid above her on hands and knees, its picture in front of her); a
+pushable that stands by the wall and is a step up (`"top"`); key caps that bob over a spot
+(`world.glyph`); looks down through the duct's grilles (`peeks`); a book handed over
+(`world.giveBook`); a fright's own clip (drenched: she shivers).
+
+**Changes and additions to the plan, and why:**
+
+1. **A checkpoint where she arrives** (`cp_9_arrive`, the crew door by the trunk, 119.6 m). A
+   fright sends her to the nearest lit checkpoint, and deck 9 had none before 150 m: the first
+   fright of the gauntlet would have sent her back down to deck 7.
+2. **The Housekeeping card is the steward's to hand over** (its stand-in pickup at 132.5 m is
+   gone). He stands at his cart's far end and pulls while she pushes, so the cart never runs over
+   him and the push reads as help; at 130 m he mops his brow, bows, and passes the card across the
+   cart. (The spec had him walk to her: the cart is between them.)
+3. **The linen room's vent is high on the wall** (the room's drawing changed: it was low, from
+   before the plan). The laundry cart, now a thing of its own, stands by the wall: she walks past
+   it to Bumbot; he leaps from the towels up into the vent; an E key shows at the cart's end, she
+   pushes it under the vent, jumps onto it, and ↓ there takes her in. This is the spec's scene; the
+   cart is not in her way because only its rim holds her (a step up, not a wall).
+4. **The chute's hatch is drawn in the linen room's wall by the door** (a steel flap, the green
+   card's colour), and **she lands in the laundry's cart of towels with a towel on her head**; she
+   climbs out, and the towel stays on her head a few steps before it slides off.
+5. **The security officer waits in the laundry in a towel** (a new sprite of him), his uniform
+   going round in the third washer, from region 4 until region 6. Region 4 had no appearance of
+   his; this follows the stage's flour (he sat in the galley until now) and is what she finds at
+   the bottom of the chute.
+6. **The duct is a place, not a tunnel:** steel with flanges, rivets and hangers, cobwebs, a fan in
+   a branch, Bumbot's paw prints in the dust, and his eyes in the dark ahead of her the first time
+   through (they keep their distance and are gone at the far grille). Over each grille a framed
+   look down fades in under it (the lobby's chandelier, the atrium's dome, a cabin full of
+   balloons, a passenger snoring), drawn by hand. A tangerine lies half way. The far grille shows
+   its key (↓) and answers from the duct's end wall too.
+7. **The vacuum's rule:** its red eye blinks while she is coming (within 4.6 m); as she comes
+   within 2 m it rattles for 0.3 s and darts 2 m along the corridor at her. A jump as it rattles
+   clears it; the dash sends it spinning. On its way back in it is harmless, and it stays in until
+   she has gone away and come again: so she can stand at the door and go into the cabin.
+8. **The towel stack falls when the floor is shaken, not at "running speed":** the game has one
+   speed on foot. It sways as its tell (harder when she is near); a jump landed within a metre of
+   it, or the dash, brings it down on her side: "Buried" if she is still under it a third of a
+   second later (the dash is through by then). It stands by the vacuum's doorway on purpose: a late
+   jump over the vacuum lands beside it.
+9. **The door that flies open has the pool's kid behind it** (his character, made now, shrunk to a
+   child's height): he looks out with his water pistol and shuts it again. Stopping when the
+   handle rattles is safe; the door only hurts as it swings.
+10. **"Do Not Disturb": a guest in a bathrobe, a towel turban and a face mask** shrieks in the
+    doorway; her fright is the apology ("Ой, вибачте!").
+11. **The adjoining cabins are a family's, and the children have built a blanket fort across the
+    way through:** the loop round the luggage needs the crawl (learned at the linen room); the dash
+    goes through the luggage without it. Two tangerines are hidden inside the fort. The cabins are
+    drawn (cabin 8206's colours), as are the cabin being cleaned and the balcony cabin.
+12. **Bumbot's glimpse from the balcony is on the partition's top at the balcony's aft end**, not
+    on deck 10's rail at 160 m: a deck up and eight metres aft is outside her view (about 12 m wide,
+    7 m tall). He sits there washing, looks at her, and jumps up to the balcony above.
+13. **The honeymooners stand at their own door** (135.6 m, a "JUST MARRIED" note over it), turn to
+    each other for the picture, and go in after. Their camera is the bubble's pictogram and crosses
+    to her hands; her clip raises her hands to her eye and the game draws the camera there.
+14. **The standing cart is at 172.6 m** (an extinguisher hangs on the wall at 173.6), its tangerine
+    on its cloche: she hops onto the cart for it. **The luggage is five suitcases high**, to the
+    ceiling.
+15. **The towel animals** on deck 10's midship flight: the atlas's swan on a table of towels, and
+    three new ones (an elephant in sunglasses, a monkey, a rabbit).
+16. **Strollers:** a man frowning at a deck plan by deck 9's directory, a lady with shopping bags
+    walking deck 8's atrium walk, an old man photographing the dome from deck 10's; a bedmaker
+    shaking out a sheet in the cabin being cleaned. A tangerine in the pantry (on a crate): the
+    green card opens it now.
+17. **Left for later:** the two officers (step 9 draws them where they stand); a fright clip of
+    her own for "Buried" and "Startled" (the towels over her and her start do it); deck 9's aft
+    hallway and the other balcony cabins (regions 7 and on).
+
+**PixelLab spent on this step:** 45 generations (ten characters and their clips, her crawl, push
+and camera clips, three towel animals). 1,403 of 2,000 left.

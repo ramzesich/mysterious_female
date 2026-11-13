@@ -12,7 +12,7 @@ import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
-import { Robot, Gull, SwingLight, Spill } from './movers.js';
+import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor } from './movers.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -41,6 +41,7 @@ export class World {
         this.things = [];           // everything placed: { id, x, y, route, needs, items, interact, done }
         this.pushables = [];
         this.low = [];              // things she must crawl under: { route, x0, x1, y }
+        this.lows = [];             // and what stands over each: its zone, its picture
         this.grips = this.data.grips;
         this.pending = [];          // tangerines that appear on a flag
         this.solids = [];           // things to hop: standing carts
@@ -59,7 +60,9 @@ export class World {
     // Doors on the cabin corridors that take a cabin door's place (rooms, checkpoints).
     doorSpots() {
         const rooms = this.data.rooms.flatMap(r => r.doors.filter(d => d.outRoute === 'inside').map(d => ({ x: d.outX, y: d.outY })));
-        const cps = this.data.ents.filter(e => e.kind === 'checkpoint' && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
+        // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb".)
+        const own = ['checkpoint', 'swingdoor', 'dnd'];
+        const cps = this.data.ents.filter(e => own.includes(e.kind) && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
         return [...rooms, ...cps];
     }
 
@@ -463,55 +466,166 @@ export class World {
         if (!s.textures.exists('room-duct')) {
             const tex = s.textures.createCanvas('room-duct', W, H);
             const ctx = tex.getContext();
-            ctx.fillStyle = '#1a141c';
-            ctx.fillRect(0, 0, W, H);
-            ctx.fillStyle = '#4a4458';
-            ctx.fillRect(0, 12, W, 34);
-            ctx.fillStyle = '#625565';
-            ctx.fillRect(0, 12, W, 2);
-            ctx.fillRect(0, 44, W, 2);
-            ctx.fillStyle = '#3e3546';
-            for (let x = 0; x < W; x += 64) ctx.fillRect(x, 12, 2, 34);
+            const rect = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+            rect(0, 0, W, H, '#1a141c');
+            // Its steel: a lit band along the top, a shadow along the floor, a flange at each joint
+            // with its rivets, a hanger up to the deck above at every other one.
+            rect(0, 12, W, 34, '#4a4458');
+            rect(0, 12, W, 2, '#7f708a');
+            rect(0, 14, W, 1, '#625565');
+            rect(0, 40, W, 6, '#3e3546');
+            rect(0, 44, W, 2, '#625565');
+            for (let x = 0, n = 0; x < W; x += 64, n++) {
+                rect(x, 12, 3, 34, '#3e3546');
+                rect(x + 3, 12, 1, 34, '#625565');
+                for (const y of [17, 27, 37]) rect(x + 1, y, 1, 1, '#9babb2');
+                if (n % 2) rect(x + 1, 0, 1, 12, '#3e3546');
+            }
+            // Dust along the floor, cobwebs in a few corners, and his paw prints going forward.
+            for (let x = 5; x < W; x += 11) rect(x + (x * 7) % 5, 43, 2, 1, '#7f708a');
+            ctx.strokeStyle = '#9babb2';
+            ctx.lineWidth = 1;
+            for (const x of [196.5, 452.5, 772.5, 1028.5]) {
+                ctx.beginPath();
+                ctx.moveTo(x, 14.5); ctx.lineTo(x + 9, 14.5);
+                ctx.moveTo(x, 14.5); ctx.lineTo(x, 23.5);
+                ctx.moveTo(x, 20.5); ctx.quadraticCurveTo(x + 4, 19.5, x + 6, 14.5);
+                ctx.moveTo(x, 17.5); ctx.quadraticCurveTo(x + 2, 17, x + 3, 14.5);
+                ctx.stroke();
+            }
+            for (let x = W - 40, n = 0; x > 90; x -= 21, n++) {
+                const y = n % 2 ? 42 : 40;
+                rect(x, y, 3, 2, '#2e222f');
+                rect(x - 1, y - 1, 1, 1, '#2e222f');
+                rect(x + 1, y - 2, 1, 1, '#2e222f');
+                rect(x + 3, y - 1, 1, 1, '#2e222f');
+            }
+            // A branch going up, with a fan in it (too small for her; a draught).
+            rect(672, 0, 30, 13, '#4a4458');
+            rect(672, 0, 1, 13, '#3e3546');
+            rect(701, 0, 1, 13, '#3e3546');
+            rect(676, 3, 22, 2, '#2e222f');
+            rect(676, 7, 22, 2, '#2e222f');
             // Grilles in its floor, the light of what is below coming up through them.
-            const light = { lobby: '#fff1c9', dome: '#8fd3ff', balloons: '#f68181', snore: '#b9a98a' };
-            for (const g of [...d.grilles, { x: d.exitX, what: 'lobby' }]) {
+            const light = { lobby: '#fff1c9', dome: '#8fd3ff', balloons: '#f68181', snore: '#b9a98a', exit: '#fff1c9' };
+            for (const g of [...d.grilles, { x: d.exitX, what: 'exit' }]) {
                 const x = g.x - d.x0;
+                rect(x - 15, 43, 30, 4, '#2e222f');
+                rect(x - 14, 44, 28, 3, light[g.what]);
+                ctx.globalAlpha = 0.22;
                 ctx.fillStyle = light[g.what];
-                ctx.fillRect(x - 14, 44, 28, 3);
-                ctx.globalAlpha = 0.25;
-                ctx.fillRect(x - 12, 20, 24, 24);
+                ctx.beginPath();
+                ctx.moveTo(x - 13, 44); ctx.lineTo(x + 13, 44); ctx.lineTo(x + 9, 14); ctx.lineTo(x - 9, 14);
+                ctx.fill();
                 ctx.globalAlpha = 1;
-                ctx.fillStyle = '#2e222f';
-                for (let k = -12; k < 14; k += 5) ctx.fillRect(x + k, 44, 1, 3);
+                for (let k = -12; k < 14; k += 5) rect(x + k, 44, 1, 3, '#2e222f');
             }
             tex.refresh();
         }
         const img = s.add.image(d.x0, d.floor - 46, 'room-duct').setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
         const dim = s.roomDim(img);
         this.add([dim, img]);
-        s.rooms.push({ route: 'duct', door: -9999, floor: d.floor, room: img, dim, inDeck: true, doors: [] });
+        const room = { route: 'duct', door: -9999, floor: d.floor, room: img, dim, inDeck: true, doors: [] };
+        s.rooms.push(room);
         this.ductFloor = s.add.zone(d.x0, d.floor, W, 16).setOrigin(0);
         s.physics.add.existing(this.ductFloor, true);
         s.addRouteWall(d.x0 + 24, -1, d.floor, 'duct');
         s.addRouteWall(d.x1 - 24, 1, d.floor, 'duct');
+        // What is under each grille (tools/draw_rooms.py `peeks`): a framed look down, shown while
+        // she is over it; and what comes up through it.
+        this.peeks = d.grilles.filter(g => s.textures.exists(`peek-${g.what}`)).map(g => {
+            const frame = s.add.rectangle(g.x, d.floor + 20, 68, 48, 0x2e222f).setOrigin(0.5, 0).setDepth(D.exterior + 0.124);
+            const pic = s.add.image(g.x, d.floor + 22, `peek-${g.what}`).setOrigin(0.5, 0).setDepth(D.exterior + 0.125);
+            const beam = s.add.triangle(0, 0, g.x - 13, d.floor + 1, g.x + 13, d.floor + 1, g.x, d.floor + 20, 0xfff1c9, 0.35)
+                .setOrigin(0).setDepth(D.exterior + 0.123);
+            const items = [frame, pic, beam];
+            items.forEach(i => i.setAlpha(0));
+            this.add(items);
+            return { ...g, items, shown: 0 };
+        });
+        // The fan in the branch: two blades turning.
+        this.ductFan = s.add.rectangle(d.x0 + 687, d.floor - 40, 20, 2, 0x9babb2).setDepth(D.exterior + 0.125).setVisible(false);
+        // His eyes in the dark ahead of her (the first time through): two green points that keep
+        // their distance, and are gone at the far grille.
+        this.ductEyes = s.add.graphics().setDepth(D.exterior + 0.126).setVisible(false);
+        this.ductEyes.fillStyle(0xb9e04c, 1).fillRect(-4, -1, 2, 2).fillRect(2, -1, 2, 2);
+        this.ductEyes.fillStyle(0xffffff, 1).fillRect(-4, -1, 1, 1).fillRect(2, -1, 1, 1);
+        // The key at the way out.
+        this.ductKey = this.glyph(d.exitX, d.floor - 40, '↓', D.exterior + 0.127);
+        this.add([this.ductFan, this.ductEyes]);
     }
 
-    updateDuct(input) {
-        const s = this.scene, p = s.player, d = this.data.duct;
+    // A key's cap bobbing over a spot: what to press here. Hidden until shown.
+    glyph(x, y, text, depth) {
+        const s = this.scene;
+        const cap = s.add.text(x, y, text, {
+            fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#2e222f', backgroundColor: '#ffffff',
+            padding: { left: 3, right: 3, top: 1, bottom: 1 }, resolution: 4,
+        }).setOrigin(0.5).setDepth(depth ?? s.DEPTH.fx + 0.4).setVisible(false);
+        this.add([cap]);
+        s.tweens.add({ targets: cap, y: y - 3, duration: 420, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+        return cap;
+    }
+
+    // The linen room's laundry cart, once it stands under the vent; and whether she is on it.
+    onLinenCart() {
+        const s = this.scene, p = s.player, cart = this.pushables.find(t => t.id === 'cart_linen');
+        if (!cart || s.route !== 'linen' || cart.x < cart.max) return null;
+        const onFloor = p.body.blocked.down || p.body.touching.down;
+        return onFloor && Math.abs(p.x - cart.x) < 18 && Math.abs(p.y - (cart.y - cart.rim)) < 4 ? cart : null;
+    }
+
+    updateDuct(input, time) {
+        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress;
+        const inDuct = s.route === 'duct';
+        // (The duct runs where the atrium's walk is: its glass railing, drawn in front of her, hides.)
+        if (inDuct !== this.wasInDuct) {
+            this.wasInDuct = inDuct;
+            for (const f of s.deckFronts ?? []) f.gfx.setVisible(!inDuct);
+        }
+        // The fan, the peeks, his eyes.
+        this.ductFan.setVisible(inDuct);
+        if (inDuct) this.ductFan.setAngle((time / 3) % 360);
+        for (const k of this.peeks) {
+            const want = inDuct && Math.abs(p.x - k.x) < 34 ? 1 : 0;
+            if (want !== k.shown) {
+                k.shown = want;
+                s.tweens.add({ targets: k.items, alpha: want, duration: 260 });
+                if (want && k.what === 'snore') sfx.rattle();
+                if (want && k.what === 'balloons') sfx.ding();
+            }
+        }
+        this.ductKey.setVisible(inDuct && s.mode === 'play' && Math.abs(p.x - d.exitX) < 60);
+        const eyes = this.ductEyes;
+        if (inDuct && !P.has('duct') && !this.eyesGone) {
+            this.eyesX = Math.min(this.eyesX ?? p.x - 170, p.x - 150);
+            if (this.eyesX <= d.exitX + 6) {
+                this.eyesGone = true;
+                eyes.setVisible(false);
+                sfx.mrrp();
+            } else {
+                eyes.setVisible(Math.floor(time / 2600) % 5 !== 4 || (time % 2600) > 160).setPosition(this.eyesX, d.floor - 9);
+            }
+        } else {
+            eyes.setVisible(false);
+        }
         if (s.mode !== 'play') return;
-        const linen = this.rooms.linen;
-        // In: crawling into the linen room's vent. Out: back the same way, or down through the far grille.
-        // (→ held through the vent would carry her straight back out: it must be let go once.)
+        // In: on the laundry cart under the vent, down on hands and knees. Out: back the same way,
+        // or down through the far grille. (A key held through a way in or out would carry her
+        // straight back: it must be let go once.)
         if (!input.right) this.ductLatch = false;
-        if (s.route === 'linen' && s.crawling && input.right && !this.ductLatch && p.x >= linen.room.x + 196) {
-            this.ductLatch = true;
+        if (!input.down) this.ventLatch = false;
+        const cart = this.onLinenCart();
+        if (cart && s.crawling && !this.ventLatch) {
+            this.ductLatch = this.ventLatch = true;
             s.travel(d.x1 - 60, d.floor, 'duct', () => p.setFlipX(true));
-        } else if (s.route === 'duct' && input.right && !this.ductLatch && p.x >= d.x1 - 44) {
-            this.ductLatch = true;
-            s.travel(linen.room.x + 180, linen.floor, 'linen', () => p.setFlipX(true));
-        } else if (s.route === 'duct' && input.downPressed && Math.abs(p.x - d.exitX) < 16) {
-            sfx.smash?.();
-            s.travel(d.dropX, d.floor + 30, 'inside', () => this.progress.setFlag('duct'));
+        } else if (inDuct && input.right && !this.ductLatch && p.x >= d.x1 - 44) {
+            this.ductLatch = this.ventLatch = true;
+            const back = this.pushables.find(t => t.id === 'cart_linen'), linen = this.rooms.linen;
+            s.travel(back.x, linen.floor - back.rim - 1, 'linen', () => p.setFlipX(true));
+        } else if (inDuct && input.downPressed && Math.abs(p.x - d.exitX) < 30) {
+            sfx.smash();
+            s.travel(d.dropX, d.floor + 30, 'inside', () => P.setFlag('duct'));
         }
     }
 
@@ -654,6 +768,34 @@ export class World {
             case 'spill':
                 this.movers.push(new Spill(this, e));
                 break;
+            case 'darter':
+                this.movers.push(new Darter(this, e));
+                break;
+            case 'stack':
+                this.movers.push(new TowelStack(this, e));
+                break;
+            case 'sprinkler':
+                this.movers.push(new Sprinkler(this, e));
+                break;
+            case 'swingdoor':
+                this.movers.push(new SwingDoor(this, e));
+                break;
+            case 'dnd':
+                this.movers.push(new DndDoor(this, e));
+                break;
+            case 'low': {
+                // Something she must crawl under or through (a blanket fort): solid above her on
+                // hands and knees; its picture, if it has one, in front of her.
+                const zone = s.add.zone(e.x, e.y - 30, e.x1 - e.x0, 98).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                this.low.push({ route: e.route, x0: e.x0 - 18, x1: e.x1 + 18, y: e.y });
+                const items = e.frame ? [this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04)] : [];
+                this.add(items);
+                const thing = { ...e, items, zone };
+                this.lows.push(thing);
+                this.things.push(thing);
+                break;
+            }
             case 'jackpot': {
                 // The slot machine with a glint (population: `sec_jackpot`): E, once: its lights, a
                 // ding, and what it pays out (tangerines that need its flag).
@@ -715,19 +857,23 @@ export class World {
                 break;
             }
             case 'push': {
-                const img = s.add.image(e.x, e.y, 'shipart', e.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
+                const img = this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
                 this.add([img]);
                 const done = () => !e.flag || this.progress.has(e.flag);
                 const x = done() ? e.max : e.x;
-                const zone = s.add.zone(x, e.y, img.width - 4, e.tall && !done() ? 128 : img.height - 4).setOrigin(0.5, 1);
+                // (`tall`: jammed in a doorway, it fills it until it is free; "top": it stands by the
+                // wall, she walks past it, and only its rim holds her when she jumps onto it.)
+                const top = e.tall === 'top';
+                const rim = top ? (this.data.linen?.cartTop ?? 36) : img.height - 4;
+                const zone = s.add.zone(x, e.y, img.width - 4, e.tall === true && !done() ? 128 : rim).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 img.x = x;
-                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0,
+                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, rim,
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
                         if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
                             // Free of the doorway: it stands in the corridor, low enough to hop.
-                            zone.setSize(img.width - 4, img.height - 4);
+                            zone.setSize(img.width - 4, rim);
                             this.progress.setFlag(e.flag);
                             s.pushing = null;
                             s.mode = 'play';
@@ -789,6 +935,13 @@ export class World {
         return true;
     }
 
+    // A book given to her (the honeymooners' thanks): hers to carry to the Library.
+    giveBook(n) {
+        this.save.books[n] = 'held';
+        writeSave(this.save);
+        this.refresh();
+    }
+
     // A key glyph over her for a few seconds: how a new verb is used.
     hint(text) {
         const s = this.scene;
@@ -809,16 +962,10 @@ export class World {
             interact: () => { sfx.door(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
         const linen = this.rooms.linen;
         if (linen) {
-            const x = linen.room.x + 178, y = linen.floor;
-            const chute = s.add.image(x, y - 30, 'hatch-lid').setDepth(D.exterior + 0.13);
-            this.add([chute]);
-            this.things.push({ id: 'chute', x, y, route: 'linen', items: [chute], reach: 14,
-                interact: () => {
-                    const to = this.rooms.laundry;
-                    sfx.whoosh();
-                    s.travel(to.def.x0 + 150, to.floor - 60, 'laundry', () => this.progress.setFlag('chute'));
-                    return true;
-                } });
+            // The laundry chute's hatch, low in the wall by the door (drawn in the room's picture):
+            // E, and down she goes to the laundry on deck 4 (population: `scn_chute`).
+            this.things.push({ id: 'chute', x: this.data.linen.chuteX, y: linen.floor, route: 'linen', items: [], reach: 16,
+                interact: () => this.story.chute() });
         }
     }
 
@@ -900,6 +1047,13 @@ export class World {
                 g.fillStyle(0xc7dcd0, 1).fillRect(2, 3, 12, 8);
                 g.fillStyle(0x4d9be6, 1).fillRect(3, 4, 10, 2).fillRect(3, 8, 10, 2);
             },
+            camera: () => {
+                g.fillStyle(ink, 1).fillRect(1, 4, 14, 10).fillRect(4, 2, 5, 3);
+                g.fillStyle(0x625565, 1).fillRect(2, 5, 12, 8);
+                g.fillStyle(ink, 1).fillCircle(8, 9, 4);
+                g.fillStyle(0x8fd3ff, 1).fillCircle(8, 9, 3);
+                g.fillStyle(0xffffff, 1).fillRect(7, 7, 1, 1).fillRect(12, 6, 2, 1);
+            },
         }[name];
         (draw ?? (() => g.fillStyle(ink, 1).fillRect(6, 2, 4, 8).fillRect(6, 12, 4, 3)))();
         g.generateTexture(key, 16, 16);
@@ -975,7 +1129,7 @@ export class World {
     // Someone hands her a thing: it crosses from their hands to hers, sparkles, and `then` it is hers.
     async handOver(person, frame, then, tint) {
         const s = this.scene, p = s.player;
-        const img = s.add.image(person.x + person.dir * 12, person.y - 34, 'shipart', frame).setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
+        const img = this.image(person.x + person.dir * 12, person.y - 34, frame).setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
         if (tint) img.setTint(tint);
         this.add([img]);
         if (person.meta.anims.give) this.people.play(person, 'give');
@@ -1071,7 +1225,7 @@ export class World {
             s.route = p.y <= L.y1 + 2 ? L.routeTop : L.routeBottom;
             this.onLadder = null;
         }
-        this.updateDuct(input);
+        this.updateDuct(input, time);
         this.updateSpecials(time);
         if (s.route !== this.lastRoute) this.refresh();
         this.people.update(dt, time);
@@ -1093,9 +1247,13 @@ export class World {
         for (const t of this.pushables) {
             if (this.carry) break;          // her hands are full
             if (t.route !== s.route || Math.abs(p.y - t.y) > 4 || (t.flag && this.progress.has(t.flag) && !t.free)) continue;
+            if (!this.met(t.needs)) continue;
             const side = p.x < t.x ? -1 : 1;
             if (t.sides && side !== t.sides) continue;
-            if (Math.abs(Math.abs(p.x - t.x) - (t.width / 2 + PLAYER.bodyWidth / 2)) < 10) return s.startPush(t);
+            const end = t.width / 2 + PLAYER.bodyWidth / 2;
+            // (A cart by the wall: she steps to its end and takes hold.)
+            if (t.top && Math.abs(Math.abs(p.x - t.x) - end) < 18) p.body.reset(t.x + side * (end + 1), p.y);
+            if (Math.abs(Math.abs(p.x - t.x) - end) < 10) return s.startPush(t);
         }
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
@@ -1205,7 +1363,11 @@ export class World {
             && (z.plat.solid || (s.droppingThrough !== z.plat && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         s.physics.add.collider(p, this.wallZones, null, () => s.route === OUTSIDE);
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
-        for (const t of this.pushables) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        for (const t of this.pushables) {
+            s.physics.add.collider(p, t.zone, null, () => t.route === s.route
+                && (!t.top || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));
+        }
+        for (const t of this.lows) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         for (const r of this.robots ?? []) r.addCollider(p);
         // The dash goes through a breakable, and it is gone for good.

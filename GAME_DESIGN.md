@@ -1951,10 +1951,21 @@ Nothing blocks the start of the build. These get settled along the way:
       ("Bonked"), the trap door left open, the bow at centre stage; the casino's chip spills
       ("Slipped") and the jackpot; the cat's portrait; the dressing room (book 3) and the lighting
       booth with its catwalk (the second photo slot); fifteen more people. Playtest `region3`
+- [x] **Step 4, region 4: Housekeeping** (done 2026-11-13, branch `the-build`): deck 9's midships
+      corridor and decks 8-10's lobbies populated. The steward's jammed cart (he pulls, she pushes;
+      his thanks is the Housekeeping card); the honeymooners' picture (the fourth book); the vacuum
+      that darts out of a doorway, the towel stack ("Buried"), the sprinkler ("Drenched"), the door
+      that flies open ("Bonked"), "Do Not Disturb" ("Startled"); the balcony cabin and Bumbot's
+      glimpse from its balcony; the adjoining cabins with a blanket fort to crawl through, the
+      luggage to dash through; near-catch 4 (he leaps into the linen room's vent, now high on the
+      wall), the laundry cart pushed under it, the duct with looks down through its grilles, the
+      chute to the laundry (a towel on her head; the security officer in a towel); the towel
+      animals on the flight up from deck 10. Her crawl, push and camera clips; ten more people.
+      Playtest `region4`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 4 of `docs/build-plan.md`, region 4 (Housekeeping: decks 8-10's lobbies and deck 9's corridor)**; then on in play
+      step 5 of `docs/build-plan.md`, region 5 (deck 8 forward: the duct's exit, cabin 8206, the stairs on up to deck 11)**; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

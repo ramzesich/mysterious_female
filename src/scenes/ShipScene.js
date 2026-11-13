@@ -3752,7 +3752,8 @@ export class ShipScene extends Phaser.Scene {
         sfx.scare();
         this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
         // A recoil from what got her (the vacuum: a jump, as it always was).
-        if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
+        if (kind === 'drenched' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
+        else if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
         else this.pose('rise');
         p.setFlipX(kind !== 'vacuum' && this.anims.exists('her-hit') ? away > 0 : away < 0);
         this.script = null;

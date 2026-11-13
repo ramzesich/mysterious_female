@@ -71,6 +71,7 @@ CHECKPOINTS = {
     "cp_foyer": (6, 204.4, "inside", False),
     "cp_7_aft": (7, 191.6, "inside", False),
     "cp_station": (7, 128, "outside", False),
+    "cp_9_arrive": (9, 119.6, "inside", True),
     "cp_9_mid": (9, 190, "inside", True),
     "cp_gym": (11, 84, "inside", False),
     "cp_garden": (11, 192, "inside", False),
@@ -100,9 +101,12 @@ TANGERINES = {
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
     "tan_8_balc_aft": (8, 245, 1, "out", None),
+    "tan_5_pantry": ("pantry", 190, 1, 22, None),
     "tan_9_balcabin": ("balcabin9", 150, 1, 30, None),
-    "tan_9_cart": (9, 172, 1, "table", None),
+    "tan_9_cart": (9, 172.6, 1, 28, None),
     "tan_9_luggage": (9, 181.5, 1, "table", None),
+    "tan_9_fort": ("adjoin", 267, 2, 0, None),
+    "tan_9_duct": ("duct", 540, 1, 0, None),
     "tan_9_balc": (9, 240, 1, "out", None),
     "tan_10_mid": (10, 182, 1, "table", None),
     "tan_11_spa": (11, 32, 1, "table", None),
@@ -126,7 +130,6 @@ ITEMS = {
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
-    "book_4": (9, 134, "book:4", None),
     "book_5": ("cabin", 190, "book:5", None),
     "book_6": (11, 216, "book:6", None),
     "book_7": ("guest10", 150, "book:7", None),
@@ -150,12 +153,19 @@ BEATS = {
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
 BEAT_LIFT = {"bb4": 6, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
+# The linen room (tools/draw_linen.py): the vent high on its far wall (its middle, and its sill px
+# up), the chute's hatch by the door, where the laundry's cart stands under the chute's mouth.
+LINEN = dict(vent=220, sill=42, chute=24, cart_top=36, laundry_cart=200)
 
 # --- Things she pushes (the push verb, region 4) ----------------------------------------------------
 # id: (deck or room, m or x, how far it rolls (m or x), the atlas piece, flag set when it gets there,
-# tall: it fills the doorway until then, the side she pushes from: -1 forward of it).
+# tall: it fills the doorway until then, the side she pushes from: -1 forward of it[, needs: the
+# flag before which it is not hers to push]).
 PUSHABLES = {
     "cart_steward": (9, 122.6, 130, "service-cart", "cart_free", True, -1),
+    # The linen room's laundry cart: by the wall (she walks past it), pushed under the vent she
+    # climbs onto it ("top": only its rim holds her).
+    "cart_linen": ("linen", 108, 216, "@linen-cart", "cart_linen", "top", -1, "bb4"),
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
@@ -259,6 +269,19 @@ PEOPLE = {
     "amb_dancer_him_sat": dict(at=(6, 241.75), who="dancer_him", face=-1, still="sit", after="flag:bb3", layer="back"),
     "riv_galley": dict(at=("galley", 62), who="rival", face=1, still="sit", after="flag:bb3", until="region:4"),
     "amb_audience_1": dict(at=(6, 212.29), who="aud_gent", face=1, layer="back"),
+    # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the
+    # honeymooners at their door, the bedmaker in the cabin being cleaned; strollers on the atrium's
+    # walks; the security officer in the laundry, waiting for his uniform.
+    "npc_steward": dict(at=(9, 123.4), who="steward", face=-1, idle="tug",
+                        bubble=("cart", "!flag:cart_free", None, 4)),
+    "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
+                      bubble=("camera", None, "flag:photo", 3)),
+    "npc_groom": dict(at=(9, 135.75), who="groom", face=-1, idle="idle", until="flag:photo"),
+    "amb_bedmaker": dict(at=("cleanup", 166), who="bedmaker", face=1, idle="make"),
+    "amb_planman": dict(at=(9, 104.7), who="planman", face=-1, layer="back"),
+    "amb_bagslady": dict(at=(8, 86), who="bagslady", face=1, walk=(84.2, 90.4, 0.7), end_ms=1800, layer="back"),
+    "amb_domeman": dict(at=(10, 86.6), who="domeman", face=1, idle="idle", layer="back"),
+    "riv_laundry": dict(at=("laundry", 124), who="rival_towel", face=1, after="region:4", until="region:6"),
     "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
     "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
     # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
@@ -305,6 +328,14 @@ PROPS = {
     "sec_cat_painting": (7, 140.0, "@easel-cat", 0, dict(back=True)),
     "prop_flat_1": (7, 198.15, "@flat-palm", 0, dict(until="region:4")),
     "prop_flat_2": (7, 197.3, "@flat-sun", 0, dict(until="region:4")),
+    # Region 4. The wet-floor sign under the sprinkler; the "Do Not Disturb" card; the towel animals
+    # on their table across the midship flight up from deck 10 (`blk_towels`).
+    "prop_wet_9": (9, 146.2, "wet-floor-sign", 0, {}),
+    "prop_towels_table": (10, 104.85, "towel-table", 0, dict(until="region:6")),
+    "prop_towels_swan": (10, 104.85, "towel-swan", 25, dict(until="region:6")),
+    "prop_towels_elephant": (10, 106.3, "thing:towel-elephant", 0, dict(until="region:6")),
+    "prop_towels_monkey": (10, 105.6, "thing:towel-monkey", 0, dict(until="region:6")),
+    "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -312,11 +343,15 @@ SOLIDS = {
     "haz_cart_4_182": (4, 182, "towel-trolley"),
     "haz_cart_4_220": (4, 220, "service-cart"),
     "haz_cart_5_30": (5, 30, "towel-trolley"),
+    "haz_cart_9_172": (9, 172.6, "service-cart"),
 }
 # Things the dash goes through: id: (deck or room, m or x, [(atlas piece, dx, dy)]).
 BREAKABLES = {
     "haz_luggage_4": (4, 30, [("suitcases", -13, 0), ("suitcases", 14, 0), ("beach-bag", 2, 25)]),
     "haz_crate_galley": ("galley", 36, [("@crate-big", 0, 0)]),
+    # Delivered luggage, stacked to the ceiling outside a cabin: no hopping it.
+    "haz_luggage_9": (9, 180, [("suitcases", 0, 0), ("suitcases", 3, 25), ("suitcases", -2, 50), ("suitcases", 2, 75),
+                               ("suitcases", -1, 100)]),
 }
 # Quirks (§6.1.11): a moment with no reward. id: (deck or room, m or x, trigger: "E" or "still:<s>",
 # her clip, ms it lasts, options: needs).
@@ -344,6 +379,8 @@ SIGNS = {
     "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
     "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall  ↑", "note", 58, dict(size=4)),
     "sign_lane_3": ("prom", 213.6, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
+    # Region 4: the honeymooners' door.
+    "sign_married": (9, 135.6, "JUST MARRIED", "note", 81, dict(size=4)),
 }
 
 # --- Region 2's own things (docs/population.md, deck 6) ---------------------------------------------
@@ -369,4 +406,25 @@ LIGHTS = {"haz_light": (6, 249.1, "bb3", 30, 74, 55, 3.2)}
 CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_chips_3": (7, 166.79, 0.9)}
 # The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).
 JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
+
+# --- Region 4's own things (docs/population.md, deck 9: "housekeeping hour") ------------------------
+# The robot vacuum that darts out of the cabin being cleaned (`haz_vacuum_9`): id: (deck, m of the
+# doorway, how near she comes before it goes (m), how far it darts (m)).
+DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
+# A stack of towels that topples (`haz_towels_9`): id: (deck, m). A jump landed beside it, or the
+# dash, brings it down on her.
+STACKS = {"haz_towels_9": (9, 141.3)}
+# Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
+SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0)}
+# A cabin door that flies open (`haz_swing`): id: (deck, m of the door, how near (m), after s, who
+# looks out). Takes a cabin door's place.
+SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid")}
+# "Do Not Disturb" doors (`haz_dnd`): id: (deck, m of the door, who is in). E at one: "Startled".
+DND = {"haz_dnd_9": (9, 167.6, "spaguest")}
+# Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
+# in front of her or None).
+LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort")}
+# Where Bumbot shows from the balcony cabin's balcony (`bb_glimpse_balcony`): the deck her balcony
+# is on, the cabin's door (m). He sits on the top of its aft partition, and is gone up to the next deck.
+GLIMPSE_BALCONY = (9, 151.6)
 

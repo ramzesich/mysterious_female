@@ -91,6 +91,11 @@ HER = {
         "read": [(f"read/{i}.png", "feet") for i in range(6)],
         # Centre stage, in the theatre: a deep bow to the house (skeleton-v3, custom poses).
         "bow": [(f"bow/{i}.png", "feet") for i in range(8)],
+        # On hands and knees (the duct, under a laundry line); pushing a cart, her walk with both
+        # hands out; a camera raised to her eye, held (the game draws the camera): skeleton-v3.
+        "crawl": [(f"crawl/{i}.png", "feet") for i in range(8)],
+        "push": [(f"push/{i}.png", "feet") for i in range(8)],
+        "camera": [(f"camera/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

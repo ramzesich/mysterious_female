@@ -117,6 +117,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
 
 ## Step 4: Housekeeping (region 4)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** deck 9 midships, the linen room's beat, the duct as a real room with its grilles, the
   chute and the laundry finished, the pantries' tangerines; the steward and his cart, the
   honeymooners, the mid-cleanup cabin, the sprinkler, the swinging door, the towel stack, the

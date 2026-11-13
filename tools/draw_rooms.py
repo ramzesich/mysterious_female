@@ -132,9 +132,19 @@ class Room:
         self.r(x + 3, y + h - 3, x + w - 6, y + h - 3, colours[2])
 
     def save(self, name):
+        """Snapped to the palette, but for the colours in `keep` (a passenger cabin's cream wall, which
+        is the corridors' and cabin 8206's, and is not in the palette)."""
         OUT.mkdir(parents=True, exist_ok=True)
-        palettize(self.im).save(OUT / f"{name}.png")
-        return self.im
+        out = palettize(self.im)
+        keep = {tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in getattr(self, "keep", ())}
+        if keep:
+            src, dst = self.im.load(), out.load()
+            for y in range(out.height):
+                for x in range(out.width):
+                    if src[x, y][:3] in keep:
+                        dst[x, y] = src[x, y]
+        out.save(OUT / f"{name}.png")
+        return out
 
 
 # --- Region 1's rooms (decks 4 and 5) --------------------------------------------------------------
@@ -569,8 +579,336 @@ def lighting(width):
     return R.save("lighting")
 
 
+# --- Region 4's rooms (deck 9's cabins) --------------------------------------------------------------
+# Passenger cabins in cabin 8206's colours (tools/draw_cabin.py): cream panels under a wood cornice,
+# grey carpet, wood furniture, teal runners.
+
+CAB_WALL, CAB_SEAM = "#ece3cf", "#ddd2bb"
+CAB_WOOD, CAB_WOOD_DARK, CAB_WOOD_LIGHT = "#cd683d", "#9e4539", "#e6904e"
+CAB_TEAL, CAB_TEAL_LIGHT = "#0b5e65", "#0b8a8f"
+BED_UP = 32                 # a made bed's top over the floor
+
+
+def cabin_room(width, lights):
+    R = Room(width, CAB_WALL, CAB_SEAM, ceiling="#f6f3ec", skirting=GREY, floor="#9babb2", fleck="#7f708a", pitch=48)
+    R.r(0, 6, width - 1, 7, CAB_WOOD)
+    R.r(0, 8, width - 1, 8, CAB_WOOD_DARK)
+    R.r(0, FLOOR - 4, width - 1, FLOOR - 4, SLATE)
+    for x in lights:
+        R.r(x - 3, 5, x + 3, 5, TUBE)
+    R.keep = (CAB_WALL, CAB_SEAM, "#f6f3ec")
+    return R
+
+
+def cabin_door(R, x):
+    """A cabin door's inside face: wood, a lever, the escape plan."""
+    r, x0, top = R.r, x - 14, FLOOR - 80
+    r(x0, top, x0 + 28, FLOOR - 5, CAB_WOOD_DARK)
+    r(x0 + 2, top + 2, x0 + 26, FLOOR - 5, CAB_WOOD)
+    r(x0 + 3, top + 3, x0 + 3, FLOOR - 6, CAB_WOOD_LIGHT)
+    r(x0 + 8, top + 12, x0 + 20, top + 28, WHITE)
+    r(x0 + 9, top + 14, x0 + 19, top + 14, GREEN)
+    R.d.line([(x0 + 10, top + 18), (x0 + 18, top + 24)], fill=GREEN)
+    r(x0 + 21, top + 40, x0 + 25, top + 41, GREY)
+
+
+def bed(R, x0, x1, head=1, made=True, runner=CAB_TEAL):
+    """A bed side on, its headboard at the `head` end (1: aft, right): the base, the mattress, the
+    duvet falling toward the floor, pillows, a runner across its foot. Unmade: the bare mattress."""
+    r, d, box = R.r, R.d, R.box
+    hx = x1 if head > 0 else x0
+    box(min(hx, hx - head * 6), FLOOR - 50, max(hx, hx - head * 6), FLOOR - 1, CAB_WOOD, CAB_WOOD_DARK)
+    a, b = (x0, x1 - 7) if head > 0 else (x0 + 7, x1)
+    box(a, FLOOR - 12, b, FLOOR - 1, CAB_WOOD_DARK, INK)
+    if made:
+        d.rounded_rectangle([a - 1, FLOOR - BED_UP, b, FLOOR - 4], radius=3, fill=WHITE, outline=GREY)
+        r(a, FLOOR - 24, b - 1, FLOOR - 24, PALE)
+        fx = a + 8 if head > 0 else b - 22
+        r(fx, FLOOR - BED_UP, fx + 14, FLOOR - 5, runner)
+        for y in range(FLOOR - BED_UP + 3, FLOOR - 7, 5):
+            d.line([(fx + 2, y + 2), (fx + 7, y), (fx + 12, y + 2)], fill=CAB_TEAL_LIGHT)
+        px = b - 22 if head > 0 else a + 4
+        d.rounded_rectangle([px, FLOOR - BED_UP - 7, px + 18, FLOOR - BED_UP], radius=3, fill=WHITE, outline=GREY)
+    else:
+        box(a, FLOOR - 26, b, FLOOR - 12, "#f2f6f6", GREY)
+        for x in range(a + 4, b - 2, 6):
+            r(x, FLOOR - 25, x, FLOOR - 13, BLUE_LIGHT)
+        r(a + 1, FLOOR - 19, b - 1, FLOOR - 19, PALE)
+
+
+def wall_lamp(R, x, y):
+    R.r(x - 4, y, x + 4, y + 6, YELLOW)
+    R.r(x - 3, y + 7, x + 3, y + 7, ORANGE)
+    R.r(x - 1, y + 8, x + 1, y + 11, CAB_WOOD_DARK)
+
+
+def picture(R, x, y, w, h, colours):
+    R.box(x, y, x + w, y + h, CAB_WOOD_LIGHT, CAB_WOOD_DARK)
+    R.r(x + 2, y + 2, x + w - 2, y + h - 2, colours[0])
+    R.r(x + 2, y + h // 2, x + w - 2, y + h - 2, colours[1])
+    R.d.ellipse([x + w - 9, y + 4, x + w - 5, y + 8], fill=colours[2])
+
+
+def desk(R, x0, x1, up=26):
+    """A wood desk with a drawer, and a stool pushed under it."""
+    r, box = R.r, R.box
+    box(x0, FLOOR - up, x1, FLOOR - up + 3, CAB_WOOD, CAB_WOOD_DARK)
+    box(x0 + 2, FLOOR - up + 3, x0 + 18, FLOOR - 1, CAB_WOOD, CAB_WOOD_DARK)
+    r(x0 + 8, FLOOR - up + 8, x0 + 12, FLOOR - up + 9, CAB_WOOD_LIGHT)
+    r(x1 - 2, FLOOR - up + 3, x1 - 1, FLOOR - 1, CAB_WOOD_DARK)
+    box(x0 + 24, FLOOR - 14, x1 - 6, FLOOR - 11, CAB_TEAL, INK)
+    for x in (x0 + 26, x1 - 9):
+        r(x, FLOOR - 11, x + 1, FLOOR - 1, CAB_WOOD_DARK)
+
+
+def wardrobe(R, x0, x1, open_=False):
+    r, box = R.r, R.box
+    box(x0, FLOOR - 92, x1, FLOOR - 5, CAB_WOOD, CAB_WOOD_DARK)
+    mid = (x0 + x1) // 2
+    if open_:
+        r(x0 + 2, FLOOR - 90, x1 - 2, FLOOR - 7, "#45293f")
+        r(x0 + 2, FLOOR - 82, x1 - 2, FLOOR - 81, GREY)
+        for x, c in ((x0 + 5, WHITE), (x0 + 10, BLUE_LIGHT), (x0 + 15, WHITE)):
+            r(x, FLOOR - 80, x + 3, FLOOR - 52, c)
+            r(x + 1, FLOOR - 84, x + 1, FLOOR - 81, GREY)
+        box(x0 + 4, FLOOR - 22, x1 - 4, FLOOR - 8, ORANGE, INK)           # the life jackets' box
+    else:
+        r(mid, FLOOR - 90, mid, FLOOR - 7, CAB_WOOD_DARK)
+        r(x0 + 3, FLOOR - 88, mid - 3, FLOOR - 9, "#d9e6e2")
+        R.d.line([(x0 + 5, FLOOR - 60), (mid - 6, FLOOR - 84)], fill=WHITE)
+        r(mid + 3, FLOOR - 50, mid + 4, FLOOR - 42, GREY)
+
+
+def cleanup(width):
+    """The cabin mid-cleanup, deck 9 (population: `room_cleanup`), an inside cabin with its door held
+    open: the bed stripped to its mattress, the sheets in a heap, the pillows piled on the chair, the
+    wardrobe open, the housekeeping trolley in the middle of the room, a spray bottle and a bucket.
+    The bedmaker shakes out a sheet at the bed's foot (176); the robot vacuum's dock by the door."""
+    R = cabin_room(width, (60, 130, 200))
+    r, box, d = R.r, R.box, R.d
+    cabin_door(R, DOOR_X)
+    # The vacuum's dock by the door: a low grey wedge, a green light.
+    box(22, FLOOR - 7, 38, FLOOR - 1, SLATE)
+    r(24, FLOOR - 5, 26, FLOOR - 4, GREEN)
+    wardrobe(R, 80, 108, open_=True)
+    picture(R, 122, 36, 30, 22, (BLUE_LIGHT, BLUE, WHITE))
+    stand(R.im, "towel-trolley", 132)
+    # A bucket and a spray bottle.
+    box(150, FLOOR - 11, 159, FLOOR - 1, BLUE, INK)
+    r(151, FLOOR - 13, 158, FLOOR - 12, GREY)
+    r(163, FLOOR - 9, 166, FLOOR - 1, PINK)
+    r(163, FLOOR - 12, 167, FLOOR - 10, WHITE)
+    # The stripped bed, the old sheets heaped at its foot on the floor; the wall lamp over its head.
+    bed(R, 186, 236, made=False)
+    d.rounded_rectangle([176, FLOOR - 9, 198, FLOOR], radius=4, fill=WHITE, outline=GREY)
+    d.rounded_rectangle([170, FLOOR - 5, 186, FLOOR], radius=3, fill="#f2f6f6", outline=GREY)
+    d.line([(180, FLOOR - 6), (192, FLOOR - 4)], fill=PALE)
+    for k in range(3):                                                    # the pillows, piled on the bed's head
+        d.rounded_rectangle([210 - k, FLOOR - 33 - k * 6, 228 - k, FLOOR - 27 - k * 6], radius=3, fill=WHITE, outline=GREY)
+    wall_lamp(R, 222, FLOOR - 70)
+    return R.save("cleanup")
+
+
+def balcabin9(width):
+    """The balcony cabin, deck 9 (population: `room_balcabin_9`): a mirrored wardrobe, the desk with
+    the fruit basket (its tangerine at 150, 30 px up), the bed with a towel swan on it, and the glass
+    door onto the balcony (262): sea and sky in it, the curtains drawn back."""
+    R = cabin_room(width, (60, 150, 230))
+    r, box, d = R.r, R.box, R.d
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 82, 110)
+    # The desk under a mirror, the fruit basket on it (the tangerine lies in the basket).
+    box(128, 34, 172, 66, CAB_WOOD_LIGHT, CAB_WOOD_DARK)
+    r(131, 37, 169, 63, "#d9e6e2")
+    d.line([(134, 60), (150, 40)], fill=WHITE)
+    desk(R, 126, 176)
+    box(142, FLOOR - 31, 158, FLOOR - 26, WOOD, INK)
+    for x in range(144, 158, 3):
+        r(x, FLOOR - 30, x, FLOOR - 27, WOOD_DARK)
+    d.ellipse([139, FLOOR - 33, 144, FLOOR - 28], fill=GREEN, outline=INK)
+    d.ellipse([155, FLOOR - 34, 161, FLOOR - 28], fill=RED, outline=INK)
+    r(164, FLOOR - 36, 166, FLOOR - 27, CAB_TEAL)                          # a bottle of water
+    r(164, FLOOR - 38, 166, FLOOR - 37, WHITE)
+    # The bed, its head forward so the pillows are away from the glass; a towel swan on the duvet.
+    bed(R, 184, 236, head=-1)
+    stand(R.im, "towel-swan", 220, dy=BED_UP)
+    wall_lamp(R, 194, FLOOR - 70)
+    picture(R, 204, 34, 26, 20, (YELLOW, ORANGE, WHITE))
+    # The balcony door: floor-to-ceiling glass in a white frame, sky, sea, the rail outside.
+    box(240, FLOOR - 86, 284, FLOOR - 1, WHITE, GREY)
+    r(243, FLOOR - 83, 281, FLOOR - 2, BLUE_LIGHT)
+    r(243, FLOOR - 40, 281, FLOOR - 2, BLUE)
+    r(243, FLOOR - 41, 281, FLOOR - 41, WHITE)
+    for x, y in ((250, FLOOR - 30), (266, FLOOR - 22), (274, FLOOR - 33)):
+        r(x, y, x + 5, y, BLUE_LIGHT)
+    d.ellipse([248, FLOOR - 76, 262, FLOOR - 70], fill=WHITE)
+    d.ellipse([256, FLOOR - 79, 272, FLOOR - 71], fill=WHITE)
+    r(243, FLOOR - 34, 281, FLOOR - 33, WHITE)                             # the balcony's rail
+    for x in range(246, 282, 9):
+        r(x, FLOOR - 33, x, FLOOR - 2, WHITE)
+    r(261, FLOOR - 83, 262, FLOOR - 2, WHITE)
+    r(258, FLOOR - 46, 259, FLOOR - 38, GREY)                              # the handle
+    r(236, FLOOR - 90, 286, FLOOR - 88, GREY)                              # the curtain rail
+    for x0 in (236, 281):
+        box(x0, FLOOR - 88, x0 + 6, FLOOR - 3, "#7f708a", SLATE)
+        r(x0 + 3, FLOOR - 86, x0 + 3, FLOOR - 5, SLATE)
+    return R.save("balcabin9")
+
+
+def adjoin(width):
+    """Two adjoining inside cabins, deck 9 (population: `room_adjoin`): a family's. The parents' (in
+    at 59): a made bed, a desk, suitcases. The connecting door in the wall between them stands open
+    (216). The children's (out at 373): two beds end to end and, across the way through, a blanket
+    fort (232-300, crawl): sheets pegged over two chairs, a torch glowing inside, a teddy on guard."""
+    R = cabin_room(width, (60, 150, 280, 372))
+    r, box, d = R.r, R.box, R.d
+    cabin_door(R, DOOR_X)
+    cabin_door(R, width - DOOR_X)
+    # The parents' cabin.
+    wardrobe(R, 82, 108)
+    stand(R.im, "luggage-rack", 128)
+    stand(R.im, "suitcases", 128, dy=20)
+    picture(R, 118, 34, 26, 20, (BLUE_LIGHT, GREEN, WHITE))
+    bed(R, 150, 204, runner=RED)
+    wall_lamp(R, 192, FLOOR - 70)
+    # The wall between the cabins, seen end on, its doorway open; the door's leaf swung back flat
+    # against the children's wall.
+    box(213, 9, 219, FLOOR - 80, CAB_WALL, CAB_SEAM)
+    r(213, FLOOR - 81, 219, FLOOR - 80, CAB_WOOD_DARK)
+    box(220, FLOOR - 79, 228, FLOOR - 5, CAB_WOOD, CAB_WOOD_DARK)
+    r(226, FLOOR - 42, 227, FLOOR - 36, GREY)
+    # The children's cabin: drawings taped to the wall, a bed, toys.
+    for x, y, c in ((246, 30, PINK), (262, 36, YELLOW), (278, 28, BLUE_LIGHT)):
+        box(x, y, x + 12, y + 14, WHITE, GREY)
+        d.ellipse([x + 3, y + 3, x + 9, y + 9], fill=c)
+        r(x + 5, y - 1, x + 7, y, RED)
+    wall_lamp(R, 326, FLOOR - 70)
+    bed(R, 306, 346, head=-1, runner=ORANGE)
+    d.ellipse([350, FLOOR - 9, 358, FLOOR - 1], fill=RED, outline=INK)     # a ball
+    r(351, FLOOR - 6, 357, FLOOR - 5, WHITE)
+    box(392, FLOOR - 26, 414, FLOOR - 1, CAB_WOOD, CAB_WOOD_DARK)          # a toy chest
+    r(393, FLOOR - 18, 413, FLOOR - 18, CAB_WOOD_DARK)
+    d.ellipse([398, FLOOR - 34, 408, FLOOR - 26], fill=YELLOW, outline=INK)  # a rubber duck on it
+    r(407, FLOOR - 31, 410, FLOOR - 30, ORANGE)
+    # (The blanket fort across the way through is a picture of its own, in front of her: `fort()`.)
+    fort()
+    return R.save("adjoin")
+
+
+def fort():
+    """The children's blanket fort (the adjoining cabins, 232-302): sheets pegged over two chairs, down
+    to the floor, a way in at each end; a torch glows through the cloth, a teddy keeps guard on top
+    under a crayon notice. Drawn in front of her: she crawls through behind the sheet.
+    assets/ship/rooms/adjoin-fort.png, 76 x 76, its foot on the floor."""
+    W2, H2 = 76, 76
+    im = Image.new("RGBA", (W2, H2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    B2 = H2 - 1
+    # The chairs' backs, standing up through the sheet at each end.
+    for x in (6, 66):
+        d.rectangle([x, B2 - 46, x + 3, B2], fill=CAB_WOOD, outline=CAB_WOOD_DARK)
+    # The sheet: a white one and a blue one, sagging between the chairs, flaps held open at the ends.
+    d.polygon([(2, B2), (6, B2 - 46), (38, B2 - 40), (38, B2)], fill="#f2f6f6", outline=GREY)
+    d.polygon([(38, B2), (38, B2 - 40), (69, B2 - 46), (73, B2)], fill=BLUE_LIGHT, outline=GREY)
+    for x in range(42, 70, 7):
+        d.line([(x, B2 - 40 - (x - 38) // 6), (x + 1, B2 - 1)], fill=BLUE)
+    for x in range(10, 36, 9):
+        d.line([(x, B2 - 44 + (x - 6) // 6), (x - 1, B2 - 1)], fill=PALE)
+    # The torch inside, glowing through the cloth.
+    d.ellipse([26, B2 - 26, 50, B2 - 6], fill="#fbff86")
+    d.ellipse([31, B2 - 22, 45, B2 - 10], fill=WHITE)
+    # The ways in: dark flaps at the ends.
+    d.polygon([(2, B2), (5, B2 - 24), (13, B2)], fill="#3e3546")
+    d.polygon([(73, B2), (70, B2 - 24), (62, B2)], fill="#3e3546")
+    # Clothes pegs along the ridge; the teddy; the notice.
+    for x in (12, 62):
+        d.rectangle([x, B2 - 49, x + 1, B2 - 44], fill=RED)
+    d.ellipse([32, B2 - 54, 44, B2 - 40], fill=WOOD, outline=INK)
+    d.ellipse([34, B2 - 63, 42, B2 - 53], fill=WOOD, outline=INK)
+    for x in (34, 41):
+        d.ellipse([x - 1, B2 - 65, x + 2, B2 - 62], fill=WOOD, outline=INK)
+    d.point((36, B2 - 58), fill=INK)
+    d.point((40, B2 - 58), fill=INK)
+    d.rectangle([37, B2 - 56, 39, B2 - 55], fill=WOOD_LIGHT)
+    d.rectangle([16, B2 - 36, 30, B2 - 28], fill=WHITE, outline=INK)
+    d.line([(18, B2 - 34), (28, B2 - 34)], fill=RED)
+    d.line([(18, B2 - 31), (25, B2 - 31)], fill=RED)
+    palettize(im).save(OUT / "adjoin-fort.png")
+    return im
+
+
+def peeks():
+    """What shows under the duct's grilles as she crawls over them (population: `scn_duct`): the
+    midship lobby's chandelier, the atrium's glass dome, a cabin full of balloons, a passenger
+    snoring. Small pictures, assets/ship/peeks/<what>.png, each as if looked down into."""
+    out = ROOT / "assets" / "ship" / "peeks"
+    out.mkdir(parents=True, exist_ok=True)
+    W2, H2 = 64, 44
+
+    def card(bg):
+        im = Image.new("RGBA", (W2, H2), bg)
+        return im, ImageDraw.Draw(im)
+
+    # The lobby: warm light, the chandelier from above, the carpet's pattern, two heads going by.
+    im, d = card("#7a3045")
+    for x in range(-8, W2, 16):
+        d.polygon([(x, 30), (x + 8, 22), (x + 16, 30), (x + 8, 38)], outline="#ae2334")
+    d.ellipse([18, 4, 46, 26], fill="#f9c22b", outline=INK)
+    d.ellipse([23, 8, 41, 22], fill=TUBE)
+    for a in range(8):
+        x, y = 32 + round(12 * __import__("math").cos(a * 0.785)), 15 + round(9 * __import__("math").sin(a * 0.785))
+        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=WHITE, outline="#d9a43b")
+    for x, c in ((10, "#3e3546"), (52, "#cd683d")):
+        d.ellipse([x - 4, 30, x + 4, 38], fill=c, outline=INK)
+        d.ellipse([x - 6, 36, x + 6, 46], fill=WHITE if x < 30 else "#4d9be6", outline=INK)
+    palettize(im).save(out / "lobby.png")
+
+    # The dome: the atrium's skylight from above its rim: blue glass ribs, the sun in it.
+    im, d = card("#323353")
+    d.ellipse([4, -20, 60, 40], fill="#4d9be6", outline=INK)
+    d.ellipse([10, -14, 54, 34], fill="#8fd3ff")
+    for x in (20, 32, 44):
+        d.line([(32, -14), (x - (32 - x) // 2, 36)], fill=WHITE)
+    for y in (4, 16, 28):
+        d.arc([10 - (y // 3), y - 14, 54 + (y // 3), y + 10], 20, 160, fill=WHITE)
+    d.ellipse([38, 2, 48, 12], fill=TUBE)
+    d.rectangle([0, 38, W2, H2], fill="#d9a43b")
+    d.rectangle([0, 38, W2, 38], fill=INK)
+    palettize(im).save(out / "dome.png")
+
+    # The party: a cabin's ceiling full of balloons, streamers, a paper garland.
+    im, d = card("#45293f")
+    for x, y, c in ((10, 12, RED), (24, 8, YELLOW), (38, 14, BLUE), (52, 9, GREEN), (16, 26, PINK), (32, 28, ORANGE), (48, 27, MAUVE)):
+        d.ellipse([x - 7, y - 8, x + 7, y + 8], fill=c, outline=INK)
+        d.ellipse([x - 4, y - 5, x - 1, y - 2], fill=WHITE)
+        d.line([(x, y + 8), (x + 1, y + 16)], fill=WHITE)
+    for x in range(0, W2, 8):
+        d.polygon([(x, 36), (x + 8, 36), (x + 4, 43)], fill=(YELLOW, RED, BLUE_LIGHT, GREEN)[(x // 8) % 4])
+    palettize(im).save(out / "balloons.png")
+
+    # The snorer: a bed from above the pillow: a round face, eyes shut, a big moustache, his mouth
+    # open; a z or two.
+    im, d = card("#323353")
+    d.rounded_rectangle([4, 8, 56, 44], radius=4, fill=WHITE, outline=INK)
+    d.rounded_rectangle([10, 3, 50, 20], radius=5, fill="#f2f6f6", outline=GREY)
+    d.rectangle([4, 28, 56, 44], fill="#4d65b4")
+    d.rectangle([4, 28, 56, 29], fill=WHITE)
+    d.ellipse([20, 5, 40, 27], fill="#e6904e", outline=INK)
+    d.line([(24, 13), (27, 13)], fill=INK)
+    d.line([(33, 13), (36, 13)], fill=INK)
+    d.rectangle([23, 18, 37, 19], fill="#7a4528")
+    d.rectangle([23, 20, 25, 20], fill="#7a4528")
+    d.rectangle([35, 20, 37, 20], fill="#7a4528")
+    d.ellipse([28, 20, 32, 24], fill=INK)
+    for x, y, k in ((44, 12, 3), (50, 6, 4), (57, 0, 5)):
+        d.line([(x, y), (x + k, y), (x, y + k), (x + k, y + k)], fill=TUBE)
+    palettize(im).save(out / "snore.png")
+    return ["lobby", "dome", "balloons", "snore"]
+
+
 DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
-        "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting}
+        "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
+        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin}
 
 
 def main():
@@ -584,6 +922,8 @@ def main():
             continue
         done.append((name, fn(widths[name])))
         print("wrote", (OUT / f"{name}.png").relative_to(ROOT))
+    if not args:
+        print("wrote the duct's peeks:", ", ".join(peeks()))
     if preview:
         out = preview
         sheet = Image.new("RGBA", (max(im.width for _, im in done), H * len(done) + 4 * len(done)), "#1a141c")

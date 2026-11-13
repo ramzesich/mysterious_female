@@ -22,7 +22,8 @@ export const verbs = {
     // something over her.
     updateCrawl(input, onFloor) {
         const p = this.player;
-        const low = this.route === 'duct' || this.world.lowAt(p.x, p.y);
+        // (Under something low she stays down; standing, it stops her like a wall.)
+        const low = this.route === 'duct' || (this.crawling && this.world.lowAt(p.x, p.y));
         const can = this.progress.knows('crawl') && !this.world.carry && !this.isDashing();
         // (Once down she stays down while ↓ is held: changing her body's size unsettles the floor a frame.)
         const want = low || (input.down && can && (onFloor || this.crawling));
