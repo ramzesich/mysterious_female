@@ -652,10 +652,11 @@ COURT = dict(deck=12, ball=150.65, hoop=154.4)
 # for s, offset s, the chef whose flourish is the tell). "Singed"; a tray is spilled.
 FLARES = {"haz_flare_a": (12, 185.4, 1.25, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
           "haz_flare_b": (12, 190.4, 1.25, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
-# The aft terrace (`gust_terrace`, `gull_terrace`): gusts over it and the sun cover below (every s,
-# for s, the tell, px/s aft in the air), the span they blow over (m), towels on its rail (the tell),
-# a gull on the rail.
-TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 246),
+# The aft terrace (`gust_terrace`, `gull_terrace`): gusts over it and the sun cover's upper end, the
+# jump over its rail (every s, for s, the tell, px/s aft in the air), the span they blow over (m:
+# no further aft than the towels can be seen from), towels on its deck chairs (the tell), a gull on
+# the end rail.
+TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 225),
                towels=[(215.85, 24), (217.65, 24)], gull=(220.0, 40))
 # The funnel (`gust_funnel`, `gull_funnel`, `sec_horn`, `sec_telescope`): gusts on the roof and the
 # stairway (climbing in one she slips back down the flight), two gulls circling (one comes down at

@@ -992,6 +992,8 @@ def scenario_golden(b):
     s = b.state()
     ok &= check(s["y"] < D11 - 100, "a wall jump up the post lands her on the sun cover", s)
     b.hold("left", 3.4)
+    # (Over the rail early in a lull of the terrace's gusts: a jump in one falls short.)
+    wait_js(b, "(window.__ship.time.now / 1000) % window.__ship.world.data.topdeck.terrace.gust.every < 2.2", 9)
     b.hold(["left", "space"], 0.8)
     b.hold("left", 0.5)
     s = b.state()

@@ -184,6 +184,8 @@ What changed against this list: `docs/progress-decisions.md`.
 
 ## Step 8: Top deck + funnel (region 8)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** deck 12 from Champs aft; the old lady, the cocktail, the engineer and the coffee,
   Teppanyaki's flare, the basketballs, the piñata, the court quirk; the roof, the stairway, the top:
   the horn, the telescope, the engineer's locker; the cascade: the card, the parasol, the gulls off

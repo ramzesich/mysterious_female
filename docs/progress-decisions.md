@@ -642,3 +642,99 @@ builder's `balcony` and `drill` in `maps/world.json`; checkpoints that are only 
 
 **PixelLab spent on this step:** 42 generations (twelve characters, their clips, two map
 objects). 1,259 of 2,000 left.
+
+## Step 8: Top deck + funnel, region 8 (2026-11-13)
+
+Done: deck 12 from Champs aft (Champs' three at the TVs; the old lady on her sunbed across the sun
+deck's walk, her mojito from Topsiders, the security officer at the loungers, two sunbathers; the
+court's basketballs and its quirk, the shuffleboard's two; the engineer at the technical ladder and
+his coffee from the Great Outdoors; Cagney's diners; the sushi chef and two diners; Teppanyaki's
+two chefs, four diners and their flares; Le Bistro's couple; Los Lobos' waiter and pinata; the aft
+terrace's gusts and gull), the roof, the funnel's stairway (gusts, two circling gulls) and its top
+(the horn, the engineer's toolbox and lunch box, the telescope, his locker), the horn's scene and
+what it sets off, books 8 and 9, the Officer's card, the parasol and the glide, the blocks lifted
+(the painter gone, the fans in the Sports Bar), the gulls on the bow that the horn sends off.
+Playtest `region8` (from `enter_region8`); `?at=terrace`, `sundeck`, `technical`, `teppanyaki`,
+`funnel` start there. The golden path now carries the coffee and climbs in the lulls.
+
+**New in the code:** `src/world/topdeck.js`: `OldLady`, `Balls`, `Flare`, `FunnelWind`, `Flock`, and
+region 8's part of the story (the mojito, the coffee, the horn and its cascade, the engineer's
+book, the telescope, the court's shot); in the data `LADY`, `BALLS`, `COURT`, `FLARES`, `TERRACE`,
+`FUNNEL_TOP`, `FLOCKS`, the builder's `topdeck` in `maps/world.json`; `Gusts` and `PerchGull` take a
+place of their own (`world.winds`); a ladder gate in plain sight (a chain and a sign); a breakable
+that hangs (`hang`); an item drawn as an atlas piece; `"cut"` in `tools/cast.py` (a loop made of
+some of a clip's frames); the scene's `viewOverride` (the cut-away while the camera is away from
+her), `stairSlip`, `overRail`.
+
+**Changes and additions to the plan, and why:**
+
+1. **The old lady's sunbed is a block 60 px wide and 36 high.** A jump clears it; landing on it she
+   slides on over, the way she was going (nobody stands on the old lady), and the old lady glares.
+   A tray's hop (26 px) does not, and ↓ drops through the walk into the pool below, as planned. A
+   hint says so the first time the sunbed stops her. The sunbed is drawn in code and stays when she
+   has gone; she sits on it with her knees drawn up (PixelLab drew her so, without furniture).
+2. **Her mojito:** two sips, a heart, and she dozes (a loop of the doze clip's last frames, "z"s);
+   two tangerines by her tipped bag. She stays a block until the horn.
+3. **The security officer stands 6 m aft of her, not 10,** and his card falls 0.75 m forward of
+   him: the view is 10 m wide, and the horn's scene has to show both at once. The two sunbathers
+   he looks under are new pictures, just aft of him.
+4. **Two teppanyaki chefs at the two grills as built, flaring in turn** (every 6 s each, 3 s
+   apart, a flourish and sparks 0.9 s before): the plan had one flare 4 m wide; two of 2.5 m with
+   the screen between them is a rhythm, like deck 9 aft's sprinklers. With a tray a flare spills
+   it and does not frighten.
+5. **The pinata hangs in the way,** on a string at head height in Los Lobos (the plan: under the
+   ceiling, "the dash breaks it", where the dash could not reach it). Walking, it stops her; on
+   hands and knees she goes under; the dash goes through it: paper, sweets, three tangerines
+   (`GAME_DESIGN.md` says three, the spec's table two). It is the first thing after the climb.
+6. **The basketballs come off the two hoops as built** (146.9 and 154.4 m), in turn every 4 s: a
+   rattle on the rim, the drop, two bounces 2.2 m along the walk, a roll back under the net. The
+   court's own ball lies between their reaches (150.65 m): E, and she shoots (a new clip of hers)
+   and scores.
+7. **The engineer's ladder has a chain across its foot and a sign, "TECHNICAL / CREW ONLY",** in
+   plain sight (the bridge's hatch was the only gated ladder, hidden). ↑ at it shows the sign and
+   his bubble hops. His scene lights the technical door's checkpoint: she stands by it, 1.2 m aft
+   of where walking past would have lit it.
+8. **The coffee is taken from the coffee station itself** (a steaming cup on its counter, no
+   table), the mojito from Topsiders' bar top. The cup steams less as it cools; its meter on the
+   HUD is orange and turns blue for its last third. Gone cold, she puts it down.
+9. **Gusts on the funnel's stairway: no climbing in one.** On stairs she cannot be pushed aside, so
+   the wind (every 5 s for 1.2 s, three windsocks lifting 0.7 s before) takes her feet if she is
+   moving in it: she slides back down the flight she is on. Standing still she holds on. On the
+   roof and the top the gusts carry a jump aft, as on the balconies.
+10. **The funnel's gulls come down only in a lull, every other one** (10 s; the plan: every 6 s):
+    one marks where she stands on the stairway and dives a second later: moving on is the way,
+    and a gust (stand still) never asks the opposite at the same moment.
+11. **Bumbot sits on the horn's bracket, not on the lattice:** a black cat on the navy lattice does
+    not show. Up there he is against the sky, out of reach, seen from the last metres of the
+    climb; the horn goes off under him.
+12. **The horn's scene:** the pull (a new clip), the shake, rings of sound, smoke; Bumbot straight
+    up, down the stairway and forward along the roof; the camera to the sun deck (he streaks
+    through, the officer jumps, his card flies out, he runs forward and hurdles the sunbed; the
+    old lady is up and away with her bags), then to the bow (he streaks past, the twelve gulls go
+    up in a cloud), and back: about 12 s. Its flag is set at the end, so a scene cut short can be
+    pulled again. **After that the cord gives a toot** (a short shake and smoke): a quirk.
+13. **The gulls on the bow are placed now** (the kids' pool's rims, the Spinnaker balcony's
+    windscreen), since the scene shows them leaving; that they bar the way before the horn is
+    region 9's (step 9).
+14. **The telescope shows a round view** of deck 8's first balcony and the frame on its wall (the
+    new place of the plan's stern slot): the view swings along the balconies to it, a glint on the
+    frame, and back.
+15. **The glide:** hold jump in the air, as planned; the open parasol keeps perched gulls, food
+    gulls and sprinklers off her. **New: ↓ and jump takes her over a railing.** The atrium's walks
+    are floors from side to side, so "a glide down the atrium" had no way in: with the parasol,
+    ↓ + jump on an atrium walk hops its glass railing, and under the open parasol she floats down
+    in front of the walks below to the atrium's floor; closing it, she comes down on the next
+    walk. Outside the same keys (they already drop her a balcony) let her float on past the
+    balconies below while the parasol is open. A plain jump with the key held never falls through.
+    Her gliding pose is the first frames of the pull clip (both hands up on the handle).
+16. **The Officer's card lies on the deck with a glint,** not on a table.
+17. **The Sports Bar has its three fans** once they are off the stairs (the same three).
+18. **Places moved to what is built:** the top's things (the top runs 179.7-193.2 m: locker 180.9,
+    horn 185, engineer 187-188, toolbox 189.2, telescope 192.3); Cagney's tangerine on the carving
+    trolley (the ladder comes down at 167.2); Los Lobos' waiter in front of his bar.
+19. **Left for later:** the pastry chef and the cake (step 9: `sw_cake` still stands in); the
+    restaurants' people are still (one clip each for the chefs, the waiter, a shuffleboard player
+    and one of Champs' three).
+
+**PixelLab spent on this step:** 74 generations (21 characters, 16 clips of theirs, two map
+objects, three clips of hers of which the "hover" one was not used). 1,185 of 2,000 left.

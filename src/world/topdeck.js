@@ -498,7 +498,6 @@ export const topdeck = {
         if (!this.T) return;
         const horn = this.P.has('horn');
         this.hornCat?.setVisible(!horn && !this.hornCatGone);
-        // The parts of the top that stand over her deck show only from outside.
     },
 
     updateTopdeck(dt, time) {
@@ -753,7 +752,7 @@ export const topdeck = {
     // E at the horn's cord (population: `scn_horn`). The first time, with the engineer's leave:
     // the blast, and what it sets off, shown from up here by the camera. After that, a toot.
     horn() {
-        const s = this.scene, w = this.world, P = this.P, her = s.player, F = this.T.funnel, top = w.data.funnel.y;
+        const s = this.scene, w = this.world, P = this.P, her = s.player, F = this.T.funnel;
         if (w.carry) return false;
         if (!P.has('engineer') && !P.openAll) return false;
         const first = !P.has('horn');

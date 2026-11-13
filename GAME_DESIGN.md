@@ -1985,10 +1985,19 @@ Nothing blocks the start of the build. These get settled along the way:
       and the seventh book; the boat walkway's columns as ways up, the boat drill, the security
       officer at a tender; a photo slot on deck 8's first balcony (the stern stays out of sight,
       so its climb and slot are not there). Playtest `region7`; `?at=balcony`, `?at=walkway`
+- [x] **Step 8, region 8: Top deck + funnel** (done 2026-11-13, branch `the-build`): deck 12 from
+      Champs aft with its people (the old lady on her sunbed and her mojito, the security officer at
+      the loungers, the restaurants' chefs and diners), the court's basketballs, Teppanyaki's two
+      flares, Los Lobos' pinata (crawl under, or dash through: three tangerines); the engineer's
+      coffee and the chained technical ladder; the funnel's stairway (no climbing in a gust; the
+      gulls), its top, the horn and what it sets off (shown by the camera: the card dropped, the
+      old lady gone, the gulls off the bow), books 8 and 9, the telescope; the parasol: hold jump
+      to glide, ↓ + jump over a railing (down the atrium, past the balconies). Playtest `region8`;
+      `?at=terrace`, `sundeck`, `technical`, `teppanyaki`, `funnel`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 8 of `docs/build-plan.md`, region 8 (Top deck + funnel: deck 12 from Champs aft, the old lady, the engineer and his coffee, the funnel's top and the horn, the card and the parasol)**; a step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
+      step 9 of `docs/build-plan.md`, region 9 (The bow: the wedding and the cake, the chapel, the Spinnaker, the kids' pool, the spa, the officers' corridors, the kids' clubs, the bridge and near-catch 6)**; a step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

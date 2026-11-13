@@ -24,7 +24,7 @@ URL flags, combinable (`?play&debug`):
 | `?cards=all` | Every lock open and every verb known (crawl, wall jump, glide), for testing round the ship |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
 | `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
-| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `walkway` (the boat walkway over it, at the station locker), `balcony` (outside, on the balcony of deck 9's balcony cabin; with `&cards=all` she has the grip socks), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `housekeeping` (deck 9, where the red trunk comes up), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro` (deck 12) |
+| `?at=<place>` | Start at a named place, for testing: `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `walkway` (the boat walkway over it, at the station locker), `balcony` (outside, on the balcony of deck 9's balcony cabin; with `&cards=all` she has the grip socks), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `housekeeping` (deck 9, where the red trunk comes up), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro`, `sundeck` (by the old lady), `technical` (the technical ladder's foot at Cagney's), `teppanyaki`, `terrace` (the aft terrace) (deck 12), `funnel` (the funnel's top) |
 | `?sound` | Sound is off for now; this turns it on |
 
 ## Controls
@@ -38,6 +38,7 @@ URL flags, combinable (`?play&debug`):
 | Activate: open doors | E | X |
 | In the grip socks: at a balcony's partition, jump again in the air to vault it; with ↑ held, each jump at a partition's pole, a pillar or a column is a kick straight up | Space, ↑ + Space | A, ↑ + A |
 | Down through a balcony's floor to the one below | ↓ + Space | ↓ + A |
+| With the parasol: glide (hold in the air); over an atrium walk's railing, then hold to float down | Space (held), ↓ + Space | A (held), ↓ + A |
 | The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | |
 
 A controller is detected once a button is pressed on it.
