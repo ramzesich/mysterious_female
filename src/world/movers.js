@@ -581,7 +581,7 @@ export class DndDoor {
             this.world.people.refresh();
             this.world.people.play(this.who, 'shriek');
         }
-        const by = !heard || (Math.abs(p.x - d.x) < 2.2 * M && Math.abs(p.y - d.y) < 60);
+        const by = !heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60);
         if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled');
         s.time.delayedCall(1700, () => {
             this.shut.setVisible(true);

@@ -549,3 +549,96 @@ whole scene of its own (`cat.custom`); the pool drains over five seconds with he
 
 **PixelLab spent on this step:** 97 generations (twenty characters, their clips, her five
 clips, Bumbot's shake, two sunbathers). 1,301 of 2,000 left.
+
+## Step 7: Outside, region 7 (2026-11-13)
+
+Done: the balconies of decks 8-10 (the vault over a partition, the climb up its pole, gusts, ten
+perched gulls, five laundry lines, two balconies with someone on them, towels on the rails, the
+balconies' furniture, six ajar balcony doors, each a checkpoint); the five balcony cabins drawn;
+the four hallways behind them (deck 8 midships: trays and a "Do Not Disturb" door, a door that
+flies open, a sprinkler, the steward on his rounds, an ice bucket's tray; deck 8 aft: six lots of
+trays and two doors; deck 9 aft: a door, two sprinklers out of phase, a cart; deck 10 aft: trays
+and a door, a door that flies open, the guest's cabin, a cart); the guest locked out on his balcony
+and his book, the seventh; the boat walkway: the columns and end walls as ways up to deck 8, the
+boat drill and its two crew, the security officer at a tender; a photo slot on deck 8's first
+balcony. Playtest `region7` (from `enter_region7`); `?at=balcony` and `?at=walkway` start there.
+
+**New in the code:** `src/world/outside.js`: `Gusts`, `PerchGull`, `Laundry`, `Occupied`,
+`DrillBoat`, `Rounds`, and region 7's part of the story (the ajar doors, the guest's scene, the
+security officer on the walkway, the hint); in the data `GUSTS`, `PERCH`, `LINES`, `OCCUPIED`,
+`BALCONY_CPS`, `DRILL`, `ROUNDS`, and places "b8"/"b9"/"b10" (on a balcony of that deck); the
+builder's `balcony` and `drill` in `maps/world.json`; checkpoints that are only a lamp (`bare`).
+
+**Changes and additions to the plan, and why:**
+
+1. **How the partitions are crossed.** The plan's wall jump kicked her away from the wall, so a
+   partition took a kick back and a steer round: awkward 66 times a deck, and the balcony above was
+   2 px out of reach. Now: at a partition, **jump and jump again vaults it** the way she is going
+   (the kick is as strong as the panel's top still needs); **with ↑ held, each jump is a kick
+   straight up**, and the partition has a pole on its top up to the balcony above, a grip all the
+   way, so three or four kicks climb a deck. ↑ works on every grip (pillars, the sun cover's post).
+   Letting go of jump no longer cuts a kick short. A hint says so the first time she is out on a
+   balcony in the socks. Down is ↓ and jump, as before.
+2. **A partition is a wall, never a ledge:** coming down on its 6 px top she slips off it, the way
+   she is going (the playtest found her standing on one, her head in the balcony above).
+3. **Ways up from the boat walkway:** the plan had "the recess's wall" (it is behind her, nothing
+   to kick). Now the recess's two end walls and **the ten white columns** the boats hang between
+   are grips: kicks with ↑ held climb any of them onto deck 8's balconies. (The end walls' grips
+   stood 20 px off the walls and never worked.)
+4. **Gusts:** every 7 s, for 1.5 s, after 0.7 s of the towels on the rails, the laundry and the
+   curtains flapping; streaks of spray cross the view; in the air she is carried aft at 60 px/s.
+   A vault aft goes further; a vault forward or a climb falls short: wait for the lull.
+5. **Gulls:** ten, on the rails. Lingering 2 s within 2.6 m: it goes up, its shadow shows where
+   she stands, a second later it comes down there: "Swooped". A step aside and it misses. If she
+   carries food it takes that, no fright.
+6. **Laundry lines are folded partitions.** A line across a balcony runs along her way in a side
+   view, and a vault would land her in it. So at a line the partition is folded back (a family's
+   two balconies made one: ships do that) and the washing hangs across the gap from the ceiling's
+   edge: nothing to kick off, so no vault there: under it on hands and knees.
+7. **A second balcony with someone on it** (a couple at breakfast, deck 10, next to the
+   sunbather's column on deck 8), so that the way aft has to change decks: over, under, round.
+   Each has "Do Not Disturb" cards on both its partitions.
+8. **Every ajar balcony door is a checkpoint** (a lamp over it; hers on deck 9, the four aired
+   cabins', the guest's), and each of those cabins' corridor doors is one too: a fright on the
+   balconies or in a hallway costs a few balconies or metres, not a deck. A fright now brings her
+   back on the route she is on (a hallway's checkpoint in a hallway, a balcony's on the balconies)
+   before the nearest by distance.
+9. **Deck 8 midships' aired cabin is three balconies aft of the plan's place** (cabin door 159.6):
+   at 150 it was straight under region 4's balcony cabin, and a drop from there (no socks) would
+   have let her into region 7's hallway. And **the balconies count as region 7 only in the socks**:
+   stepping out of the balcony cabin in region 4 opened it.
+10. **The steward on his rounds** has the stretch between the aired cabin's door and the standing
+    cart (162-182 m, two doors where he pulls in for 3 s), not the whole hallway: the trays, the
+    sprinkler and the carts were in his way. He and his cart hold her back and carry her along,
+    never a fright.
+11. **The trays' clatter frightens only by the door:** it opens the nearest "Do Not Disturb" door,
+    and she is startled if she is within 3 m of it; further off, whoever it is only looks out.
+    Deck 8 aft has six lots (1.4 m each, a jump clears one), four of them in pairs round its two
+    doors: jump, land between, jump.
+12. **The boat drill is a rescue boat lowered onto the walkway** (the plan: a boat swinging out
+    across it, which in a side view is toward us). It hangs in the gap between the boats at
+    186-191 m, hoisted high enough to walk under; every 10 s, after a second of its lamp and a
+    jolt, the crew lower it for 3 s. Under it as it comes: "Bumped"; down, it is in the way.
+13. **The guest:** in a bathrobe, his book in his hand; he waves when she is in sight; his door
+    won't open from outside (his bubble: a door). Inside, E at his balcony door: he comes in, bows,
+    hands her the book, goes to his bed's side. The item `book_7` on his table is gone.
+14. **The stern: left as the user settled it.** On the aft terraces and deck 7's stern strip she is
+    out of sight behind the stern's plating (the user, 2026-11-06), so the plan's climb up the
+    stern's tiers can't be played and is left out (a try with grips there didn't work either), and
+    **the photo slot `slot_stern` is now `slot_balcony`: on the wall of deck 8's first balcony of
+    all** (73 m, the forward end of the row, over the sea: thirty-odd vaults forward of the aired
+    cabin, or ten from the walkway's first column). Step 8's telescope will point there.
+15. **Three more tangerines:** in the ice bucket's tray on deck 8 (inside the steward's beat), on
+    deck 9 aft's cart, and on the balcony where Bumbot swiped at the gull (his paw prints there).
+16. **Twelve new people, none used twice:** four behind "Do Not Disturb" doors (shaving, a face
+    mask, in his underwear, brushing her teeth), four behind the doors that fly open (a tourist
+    with a camera, a lady in a sun hat, a boy in a swim ring, a businessman on the phone), the
+    steward, the guest, the drill's deckhand and safety officer; two pictures for the balconies
+    with someone on them.
+17. **A step added by the user:** "Step 11: The ship's side" in `docs/build-plan.md` (a texture for
+    the ship's outer body), after the last region.
+18. **Left for later:** the per-deck pictures and plaque bands in the hallways; a second look for
+    the sunbather when startled; with the parasol, the glide from a balcony (step 8).
+
+**PixelLab spent on this step:** 42 generations (twelve characters, their clips, two map
+objects). 1,259 of 2,000 left.

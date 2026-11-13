@@ -1977,10 +1977,18 @@ Nothing blocks the start of the build. These get settled along the way:
       swirl, the gulls that dive at food, the canister, the table scene with the sixth book and
       the framed picture; the chess set, the hot tub, a cone for herself. Playtest `region6`.
       **Open:** her husband's own character waits for the user's photo (a stand-in sits there)
+- [x] **Step 7, region 7: Outside** (done 2026-11-13, branch `the-build`): the balconies of decks
+      8-10 in the grip socks (jump twice at a partition to vault it, ↑ held to climb its pole; gusts,
+      perched gulls, laundry lines to crawl under, two balconies with someone on them); six ajar
+      balcony doors, each a checkpoint; the four hallways (trays and "Do Not Disturb" doors, doors
+      that fly open, sprinklers, the steward on his rounds); the guest locked out on his balcony
+      and the seventh book; the boat walkway's columns as ways up, the boat drill, the security
+      officer at a tender; a photo slot on deck 8's first balcony (the stern stays out of sight,
+      so its climb and slot are not there). Playtest `region7`; `?at=balcony`, `?at=walkway`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 7 of `docs/build-plan.md`, region 7 (Outside: the balconies of decks 8-10 and the hallways behind them, the boat walkway finished, the balcony guest and book 7)**; then on in play
+      step 8 of `docs/build-plan.md`, region 8 (Top deck + funnel: deck 12 from Champs aft, the old lady, the engineer and his coffee, the funnel's top and the horn, the card and the parasol)**; a step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
       order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after

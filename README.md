@@ -36,6 +36,8 @@ URL flags, combinable (`?play&debug`):
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | Кісюнічка dash (costs a tangerine) | D | B |
 | Activate: open doors | E | X |
+| In the grip socks: at a balcony's partition, jump again in the air to vault it; with ↑ held, each jump at a partition's pole, a pillar or a column is a kick straight up | Space, ↑ + Space | A, ↑ + A |
+| Down through a balcony's floor to the one below | ↓ + Space | ↓ + A |
 | The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | |
 
 A controller is detected once a button is pressed on it.

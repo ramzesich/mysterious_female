@@ -166,6 +166,10 @@ stand-in sits at his table). What changed against this list: `docs/progress-deci
 
 ## Step 7: Outside (region 7)
 
+**Done (2026-11-13),** but for the stern's tiers and deck 7's stern strip's slot: she is out of
+sight there by the user's rule, so the climb is left out and the slot is on deck 8's first balcony.
+What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** the balconies of decks 8-10 with partitions, rails, gusts, perched gulls, laundry lines,
   the sunbather; the ajar cabins and the four hallways with their beats (the steward on his rounds,
   the trays and the "Do Not Disturb" chain, the two sprinklers, the swinging doors); the balcony
