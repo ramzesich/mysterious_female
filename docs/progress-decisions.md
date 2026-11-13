@@ -700,7 +700,11 @@ her), `stairSlip`, `overRail`.
 9. **Gusts on the funnel's stairway: no climbing in one.** On stairs she cannot be pushed aside, so
    the wind (every 5 s for 1.2 s, three windsocks lifting 0.7 s before) takes her feet if she is
    moving in it: she slides back down the flight she is on. Standing still she holds on. On the
-   roof and the top the gusts carry a jump aft, as on the balconies.
+   roof and the top the gusts carry a jump aft, as on the balconies. **The aft terrace's gusts**
+   (every 7 s; towels on its two deck chairs flap first) blow over the terrace and the sun cover's
+   upper end only, where the towels are in sight: the jump from the cover over the rail waits for
+   a lull; the kick up the cover's post, a deck down and 13 m aft, is out of them (the whole
+   suite found the golden path failing there when they reached it).
 10. **The funnel's gulls come down only in a lull, every other one** (10 s; the plan: every 6 s):
     one marks where she stands on the stairway and dives a second later: moving on is the way,
     and a gust (stand still) never asks the opposite at the same moment.
