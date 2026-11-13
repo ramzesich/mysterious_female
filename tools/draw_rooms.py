@@ -1,0 +1,372 @@
+"""Draws the plan's rooms by hand (GAME_DESIGN.md §6.1.12; docs/population.md): the small rooms
+behind doors, each shown in the corridor's place with the deck dimmed round it (the user's rule for
+rooms, CLAUDE.md). One picture per room, assets/ship/rooms/<id>.png, as wide as tools/population.py's
+ROOMS says and 144 px tall (128 of wall, 16 of floor slab); each door back out is where the room's
+`doors` put it (the first at 59 px), cut from the ship's atlas.
+
+    python tools/draw_rooms.py [id ...] [--preview out.png]
+
+Run after tools/build_ship_art.py (it uses the atlas). A room with no drawing here stays bare in
+the game (src/world/world.js draws walls and doors).
+"""
+
+import json
+import sys
+from pathlib import Path
+
+from PIL import Image, ImageDraw
+
+from palettize import palettize
+from population import ROOMS
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / "assets" / "ship" / "rooms"
+H, FLOOR = 144, 128
+DOOR_X = 59
+
+INK = "#2e222f"
+WHITE, PALE, GREY, SLATE, DARK = "#ffffff", "#c7dcd0", "#9babb2", "#625565", "#3e3546"
+STEEL, STEEL_SEAM, STEEL_SHADE = "#dfe8e2", "#c7dcd0", "#b8c9bf"
+TUBE = "#fbff86"
+WOOD, WOOD_DARK, WOOD_LIGHT = "#ab947a", "#7a4528", "#d8b29a"
+CREAM, CREAM_SHADE = "#f3ecdd", "#d8cdb8"
+BLUE, BLUE_LIGHT, NAVY = "#4d9be6", "#8fd3ff", "#323353"
+RED, ORANGE, YELLOW, GREEN, TEAL = "#ae2334", "#f28c28", "#f9c22b", "#1ebc73", "#0b5e65"
+PINK, MAUVE = "#f68181", "#905ea9"
+SLAB = "#8e98a3"
+
+_atlas = None
+
+
+def atlas(frame):
+    """A piece of the ship's atlas (tools/build_ship_art.py)."""
+    global _atlas
+    if _atlas is None:
+        _atlas = (Image.open(ROOT / "assets" / "ship" / "ship.png").convert("RGBA"),
+                  json.loads((ROOT / "assets" / "ship" / "ship.json").read_text(encoding="utf-8"))["frames"])
+    img, frames = _atlas
+    f = frames[frame]["frame"]
+    return img.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))
+
+
+def stand(im, frame, x, dy=0, flip=False):
+    """A piece standing at x (its middle), its foot `dy` px over the floor."""
+    piece = atlas(frame)
+    if flip:
+        piece = piece.transpose(Image.FLIP_LEFT_RIGHT)
+    im.alpha_composite(piece, (x - piece.width // 2, FLOOR - dy - piece.height))
+    return piece.size
+
+
+class Room:
+    def __init__(self, width, wall, seam, ceiling=WHITE, skirting=GREY, floor=GREY, fleck=SLATE, pitch=48):
+        self.w = width
+        self.im = Image.new("RGBA", (width, H), wall)
+        self.d = ImageDraw.Draw(self.im)
+        r = self.r
+        r(0, 0, width - 1, 7, ceiling)
+        r(0, 8, width - 1, 8, seam)
+        for x in range(0, width, pitch):
+            r(x, 9, x, FLOOR - 5, seam)
+        r(0, FLOOR - 4, width - 1, FLOOR - 1, skirting)
+        r(0, FLOOR, width - 1, FLOOR + 3, floor)
+        for x in range(2, width, 7):
+            self.d.point((x, FLOOR + 1 + (x * 5) % 3), fill=fleck)
+        r(0, FLOOR + 4, width - 1, H - 2, SLAB)
+        r(0, H - 1, width - 1, H - 1, "#6f7882")
+
+    def r(self, x0, y0, x1, y1, c):
+        self.d.rectangle([x0, y0, x1, y1], fill=c)
+
+    def box(self, x0, y0, x1, y1, fill, edge=INK):
+        self.d.rectangle([x0, y0, x1, y1], fill=fill, outline=edge)
+
+    def tube(self, x, w=40):
+        """A fluorescent tube in its fitting on the ceiling."""
+        self.r(x, 5, x + w, 7, GREY)
+        self.r(x + 2, 7, x + w - 2, 8, TUBE)
+
+    def pipe(self, y=11, c=GREY):
+        self.r(0, y, self.w - 1, y + 1, c)
+        self.r(0, y, self.w - 1, y, PALE)
+
+    def door(self, x=DOOR_X, frame="door-crew"):
+        stand(self.im, frame, x)
+
+    def shelves(self, x0, x1, ys, post=SLATE, board=GREY):
+        """An open shelf unit: two uprights, a board at each y (its top)."""
+        for x in (x0, x1):
+            self.r(x, ys[0] - 14, x + 1, FLOOR - 1, post)
+        for y in ys:
+            self.r(x0, y, x1 + 1, y + 2, board)
+            self.r(x0, y + 2, x1 + 1, y + 2, post)
+
+    def crate(self, x, bottom, w=22, h=16, fill=WOOD, slat=WOOD_DARK):
+        self.box(x, bottom - h, x + w, bottom, fill, INK)
+        self.r(x + 1, bottom - h + 4, x + w - 1, bottom - h + 4, slat)
+        self.r(x + 1, bottom - 5, x + w - 1, bottom - 5, slat)
+        self.r(x + w // 2, bottom - h + 1, x + w // 2, bottom - 1, slat)
+
+    def sack(self, x, bottom, w=16, h=14, fill=CREAM_SHADE):
+        self.d.rounded_rectangle([x, bottom - h, x + w, bottom], radius=4, fill=fill, outline=INK)
+        self.r(x + w // 2 - 2, bottom - h - 2, x + w // 2 + 2, bottom - h + 1, WOOD)
+
+    def jars(self, x0, x1, bottom, colours, step=7):
+        for i, x in enumerate(range(x0, x1 - 4, step)):
+            c = colours[i % len(colours)]
+            self.r(x, bottom - 8, x + 4, bottom, c)
+            self.r(x, bottom - 9, x + 4, bottom - 8, WHITE)
+            self.d.point((x + 1, bottom - 6), fill=WHITE)
+
+    def boxes(self, x0, x1, bottom, colours, w=12, h=10):
+        for i, x in enumerate(range(x0, x1 - w, w + 2)):
+            c = colours[i % len(colours)]
+            hh = h + (i * 3) % 4
+            self.box(x, bottom - hh, x + w, bottom, c, INK)
+            self.r(x + 2, bottom - hh + 3, x + w - 2, bottom - hh + 4, WHITE)
+
+    def poster(self, x, y, w, h, colours):
+        self.box(x, y, x + w, y + h, colours[0], INK)
+        self.r(x + 2, y + 2, x + w - 2, y + h // 2, colours[1])
+        self.r(x + 3, y + h - 6, x + w - 3, y + h - 5, colours[2])
+        self.r(x + 3, y + h - 3, x + w - 6, y + h - 3, colours[2])
+
+    def save(self, name):
+        OUT.mkdir(parents=True, exist_ok=True)
+        palettize(self.im).save(OUT / f"{name}.png")
+        return self.im
+
+
+# --- Region 1's rooms (decks 4 and 5) --------------------------------------------------------------
+
+def laundry(width):
+    """The laundry, deck 4 (population: `room_laundry`): washers and dryers, the chute's mouth in the
+    ceiling over a cart of towels (she lands in it), a folding table, a shelf with a tangerine."""
+    R = Room(width, STEEL, STEEL_SEAM, floor="#92a984", fleck="#547e64", pitch=40)
+    r, box, d = R.r, R.box, R.d
+    R.pipe()
+    R.pipe(15, PALE)
+    for x in (30, 150, 262):
+        R.tube(x)
+    R.door()
+    # Three washers, round glass doors with blue water behind; a dryer stacked on the last two.
+    for i, x in enumerate((84, 112, 140)):
+        box(x, FLOOR - 34, x + 26, FLOOR - 5, WHITE)
+        r(x + 2, FLOOR - 32, x + 24, FLOOR - 28, PALE)
+        r(x + 19, FLOOR - 31, x + 22, FLOOR - 29, (GREEN, YELLOW, RED)[i])
+        d.ellipse([x + 5, FLOOR - 25, x + 21, FLOOR - 9], fill=SLATE, outline=INK)
+        d.ellipse([x + 7, FLOOR - 23, x + 19, FLOOR - 11], fill=BLUE)
+        d.arc([x + 8, FLOOR - 22, x + 18, FLOOR - 12], 200, 300, fill=BLUE_LIGHT)
+        r(x, FLOOR - 5, x + 26, FLOOR - 5, GREY)
+    for x in (112, 140):
+        box(x, FLOOR - 64, x + 26, FLOOR - 35, PALE)
+        d.ellipse([x + 5, FLOOR - 59, x + 21, FLOOR - 43], fill=DARK, outline=INK)
+        d.ellipse([x + 8, FLOOR - 56, x + 18, FLOOR - 46], fill=SLATE)
+        r(x + 2, FLOOR - 63, x + 24, FLOOR - 61, GREY)
+    # Steam from a pipe joint over them.
+    for x, y in ((120, 22), (124, 18), (130, 21), (152, 20), (156, 17)):
+        d.ellipse([x, y, x + 5, y + 4], fill=WHITE)
+    # The chute's mouth in the ceiling, a square steel hood, and under it a canvas cart heaped with towels.
+    box(184, 8, 216, 22, GREY)
+    r(187, 20, 213, 22, DARK)
+    for k in range(4):
+        r(188 + k * 7, 10, 190 + k * 7, 18, STEEL_SHADE)
+    box(178, FLOOR - 26, 222, FLOOR - 6, "#b2ba90")
+    for x in range(184, 222, 8):
+        r(x, FLOOR - 24, x, FLOOR - 8, "#92a984")
+    for x in (182, 214):
+        d.ellipse([x, FLOOR - 6, x + 5, FLOOR - 1], fill=DARK)
+    for x, y, c in ((180, 33, WHITE), (192, 37, BLUE_LIGHT), (203, 34, WHITE), (211, 31, PALE), (186, 30, PALE)):
+        d.rounded_rectangle([x, FLOOR - y, x + 12, FLOOR - y + 8], radius=2, fill=c, outline=GREY)
+    # A shelf of detergent on the wall (the tangerine sits on it, 46 px up), and the folding table.
+    r(236, FLOOR - 46, 268, FLOOR - 44, GREY)
+    r(236, FLOOR - 44, 268, FLOOR - 44, SLATE)
+    for x, c in ((238, BLUE), (258, ORANGE)):
+        r(x, FLOOR - 56, x + 6, FLOOR - 47, c)
+        r(x + 1, FLOOR - 58, x + 4, FLOOR - 56, WHITE)
+    box(270, FLOOR - 30, 326, FLOOR - 27, WHITE)
+    for x in (273, 322):
+        r(x, FLOOR - 27, x + 1, FLOOR - 1, GREY)
+    for x, n in ((276, 4), (290, 3), (306, 5)):
+        for k in range(n):
+            d.rounded_rectangle([x, FLOOR - 35 - k * 4, x + 11, FLOOR - 31 - k * 4], radius=1,
+                                fill=(WHITE, BLUE_LIGHT)[(x + k) % 2], outline=GREY)
+    return R.save("laundry")
+
+
+def store(width):
+    """The dry store, deck 4 (`room_store`): shelves of boxes, jars and sacks, crates of tangerines."""
+    R = Room(width, "#c9c2b0", "#b3a995", ceiling=CREAM, skirting=WOOD_DARK, floor=SLAB, fleck=SLATE, pitch=60)
+    R.tube(60)
+    R.tube(160)
+    R.door()
+    R.shelves(84, 232, [FLOOR - 96, FLOOR - 68, FLOOR - 40], post=WOOD_DARK, board=WOOD)
+    R.boxes(88, 150, FLOOR - 96, [ORANGE, BLUE, CREAM])
+    R.jars(156, 230, FLOOR - 96, [RED, YELLOW, GREEN])
+    R.jars(88, 130, FLOOR - 68, [YELLOW, ORANGE])
+    R.boxes(136, 230, FLOOR - 68, [CREAM, TEAL, PINK])
+    # The shelf at 40 px: sacks, and the two crates the tangerines lie on (at 150 and 159).
+    R.sack(90, FLOOR - 40)
+    R.sack(108, FLOOR - 40, fill=CREAM)
+    R.crate(194, FLOOR - 40, w=30, h=14)
+    # On the floor under the shelves: big crates and a sack trolley's load.
+    R.crate(90, FLOOR - 1, w=28, h=22)
+    R.crate(122, FLOOR - 1, w=24, h=18)
+    R.sack(184, FLOOR - 1, w=20, h=18)
+    R.sack(206, FLOOR - 1, w=20, h=16, fill=CREAM)
+    # A low crate standing out from the shelves, its top 40 px up... no: the tangerines rest on the
+    # 40 px shelf between the sacks and the crate.
+    R.poster(20, 40, 22, 28, [WHITE, "#f3ecdd", SLATE])
+    return R.save("store")
+
+
+def smcabin(width):
+    """The stage manager's cabin, deck 4 (`room_sm_cabin`): a bunk, show posters, a desk with his
+    headset's charger, a shelf (50 px up) where his pills stand."""
+    R = Room(width, "#e6dcc8", "#d8cdb8", ceiling=CREAM, skirting=WOOD, floor="#4d65b4", fleck=NAVY, pitch=240)
+    r, box, d = R.r, R.box, R.d
+    r(98, 5, 126, 8, CREAM_SHADE)
+    r(102, 8, 122, 9, TUBE)
+    R.door(frame="door-cabin")
+    # Show posters over the desk.
+    R.poster(84, 30, 24, 32, [RED, YELLOW, WHITE])
+    R.poster(112, 26, 24, 32, [NAVY, PINK, WHITE])
+    R.poster(140, 34, 20, 26, [TEAL, ORANGE, WHITE])
+    # The desk: a lamp, papers, a mug.
+    box(86, FLOOR - 30, 134, FLOOR - 27, WOOD)
+    for x in (88, 131):
+        r(x, FLOOR - 27, x + 1, FLOOR - 1, WOOD_DARK)
+    r(92, FLOOR - 32, 106, FLOOR - 31, WHITE)
+    r(118, FLOOR - 36, 122, FLOOR - 31, RED)
+    r(110, FLOOR - 40, 111, FLOOR - 31, DARK)
+    r(106, FLOOR - 43, 114, FLOOR - 40, YELLOW)
+    stand(R.im, "office-chair", 112)
+    # The shelf, 50 px up, books on it; the pills stand at 170.
+    r(150, FLOOR - 50, 196, FLOOR - 48, WOOD)
+    r(150, FLOOR - 48, 196, FLOOR - 48, WOOD_DARK)
+    for x, c, hh in ((152, RED, 12), (156, BLUE, 10), (160, GREEN, 13), (182, MAUVE, 11), (186, ORANGE, 12), (190, NAVY, 9)):
+        r(x, FLOOR - 50 - hh, x + 3, FLOOR - 51, c)
+    # The bunk: two berths, curtains drawn back, a ladder.
+    box(162, FLOOR - 44, 232, FLOOR - 1, WOOD_DARK)
+    r(164, FLOOR - 42, 230, FLOOR - 24, "#e6dcc8")
+    r(164, FLOOR - 21, 230, FLOOR - 3, "#e6dcc8")
+    for y in (FLOOR - 28, FLOOR - 8):
+        r(166, y, 228, y + 4, BLUE)
+        r(166, y - 5, 182, y - 1, WHITE)
+    r(164, FLOOR - 24, 230, FLOOR - 22, WOOD)
+    r(214, FLOOR - 42, 215, FLOOR - 3, GREY)
+    r(220, FLOOR - 42, 221, FLOOR - 3, GREY)
+    for y in range(FLOOR - 38, FLOOR - 4, 8):
+        r(214, y, 221, y, GREY)
+    return R.save("smcabin")
+
+
+def pantry(width):
+    """The pantry between the kitchens, deck 5 (`room_pantry`): a passage of shelves, jars and crates,
+    a crew door at each end."""
+    R = Room(width, "#d9dee0", "#c0c8cc", floor=SLAB, fleck=SLATE, pitch=36)
+    R.pipe()
+    R.tube(100)
+    R.tube(190)
+    R.door(DOOR_X)
+    R.door(236)
+    R.shelves(84, 210, [FLOOR - 100, FLOOR - 74, FLOOR - 48], post=SLATE, board=GREY)
+    R.jars(88, 140, FLOOR - 100, [RED, YELLOW, GREEN, ORANGE])
+    R.boxes(146, 208, FLOOR - 100, [CREAM, BLUE])
+    R.boxes(88, 130, FLOOR - 74, [ORANGE, CREAM, TEAL])
+    R.jars(136, 208, FLOOR - 74, [YELLOW, MAUVE, RED])
+    R.sack(90, FLOOR - 48)
+    R.jars(112, 150, FLOOR - 48, [GREEN, ORANGE])
+    R.crate(160, FLOOR - 48, w=26, h=14)
+    R.crate(88, FLOOR - 1, w=26, h=20)
+    R.crate(118, FLOOR - 1, w=22, h=16)
+    R.sack(150, FLOOR - 1, w=20, h=18)
+    R.crate(176, FLOOR - 1, w=28, h=22)
+    # Strings of onions and peppers hung from the pipe.
+    for x, c in ((30, ORANGE), (36, RED), (260, RED), (268, YELLOW)):
+        R.r(x, 13, x, 20, WOOD)
+        for k in range(4):
+            R.d.ellipse([x - 2, 20 + k * 5, x + 2, 24 + k * 5], fill=c)
+    return R.save("pantry")
+
+
+def galley(width):
+    """The Seven Seas' galley, deck 5 (`room_galley`): white tiles, the pass's counter, a range with
+    pans hung over it, sacks of flour where the stage's trap door drops her."""
+    R = Room(width, "#eef2f2", "#d9dee0", floor="#c7dcd0", fleck=GREY, pitch=16)
+    r, box, d = R.r, R.box, R.d
+    for y in range(24, FLOOR - 8, 16):
+        r(0, y, width - 1, y, "#d9dee0")
+    R.pipe()
+    for x in (70, 170, 270):
+        R.tube(x)
+    R.door()
+    # The pass: a steel counter with a heat lamp and plates under cloches.
+    box(84, FLOOR - 32, 150, FLOOR - 28, GREY)
+    box(86, FLOOR - 28, 148, FLOOR - 1, PALE)
+    r(86, FLOOR - 16, 148, FLOOR - 15, GREY)
+    for x in (92, 112, 132):
+        d.pieslice([x, FLOOR - 42, x + 12, FLOOR - 24], 180, 360, fill=PALE, outline=INK)
+        r(x - 1, FLOOR - 33, x + 13, FLOOR - 32, WHITE)
+    r(84, 30, 150, 33, GREY)
+    for x in (96, 116, 136):
+        r(x, 33, x + 6, 36, ORANGE)
+    # The range: burners, a stock pot, a hood, pans hung on a rail.
+    box(160, FLOOR - 34, 226, FLOOR - 1, SLATE)
+    r(162, FLOOR - 36, 224, FLOOR - 34, DARK)
+    for x in (166, 186, 206):
+        r(x, FLOOR - 26, x + 12, FLOOR - 20, DARK)
+        d.ellipse([x + 3, FLOOR - 25, x + 9, FLOOR - 21], fill=ORANGE)
+    box(170, FLOOR - 52, 188, FLOOR - 37, GREY)
+    r(168, FLOOR - 53, 190, FLOOR - 51, PALE)
+    for x, y in ((174, 62), (180, 66), (177, 71)):
+        d.ellipse([x, FLOOR - y, x + 4, FLOOR - y + 3], fill=WHITE)
+    d.polygon([(156, 22), (230, 22), (220, 36), (166, 36)], fill=GREY, outline=INK)
+    r(160, 44, 226, 45, DARK)
+    for x, w in ((196, 10), (210, 12)):
+        r(x + w // 2, 45, x + w // 2, 50, DARK)
+        d.ellipse([x, 50, x + w, 50 + w], fill=WOOD_DARK, outline=INK)
+    # Flour sacks heaped by the wall (her soft landing from the trap door, at 200... the heap is at 240).
+    R.sack(232, FLOOR - 1, w=22, h=16, fill=CREAM)
+    R.sack(250, FLOOR - 1, w=22, h=16)
+    R.sack(240, FLOOR - 15, w=22, h=14, fill=CREAM)
+    # The trap door's shaft in the ceiling over them.
+    box(232, 8, 268, 16, DARK)
+    r(234, 14, 266, 16, INK)
+    # A rack of ladles and a clock at the far end.
+    r(290, 40, 326, 41, DARK)
+    for x in range(294, 326, 8):
+        r(x, 41, x, 54, GREY)
+        d.ellipse([x - 2, 54, x + 2, 58], fill=GREY)
+    d.ellipse([300, 20, 314, 34], fill=WHITE, outline=INK)
+    r(307, 24, 307, 27, INK)
+    r(307, 27, 310, 27, INK)
+    # Its door is at its aft end (the deck's last metres are structure): the whole room is mirrored.
+    R.im = R.im.transpose(Image.FLIP_LEFT_RIGHT)
+    return R.save("galley")
+
+
+DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley}
+
+
+def main():
+    argv = sys.argv[1:]
+    preview = argv[argv.index("--preview") + 1] if "--preview" in argv else None
+    args = [a for a in argv if not a.startswith("--") and a != preview]
+    widths = {r["id"]: r["width"] for r in ROOMS}
+    done = []
+    for name, fn in DRAW.items():
+        if args and name not in args:
+            continue
+        done.append((name, fn(widths[name])))
+        print("wrote", (OUT / f"{name}.png").relative_to(ROOT))
+    if preview:
+        out = preview
+        sheet = Image.new("RGBA", (max(im.width for _, im in done), H * len(done) + 4 * len(done)), "#1a141c")
+        for i, (_, im) in enumerate(done):
+            sheet.alpha_composite(im, (0, i * (H + 4)))
+        sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(out)
+
+
+if __name__ == "__main__":
+    main()

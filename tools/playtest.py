@@ -712,7 +712,7 @@ def scenario_dash(b):
     b.hold("left", 2.5)
     s = b.state()
     ok &= check(s["x"] < x_of(231), "the dash breaks through the crates", s)
-    ok &= check(b.eval("window.__ship.vacuums[0].alive") is False, "and smashes the vacuum")
+    ok &= check(b.eval("window.__ship.vacuums[0].asideUntil > 0"), "and shoves the vacuum aside, spinning")
     return ok
 
 
@@ -849,7 +849,7 @@ def scenario_golden(b):
     b.hold("right", 1.6)
     ok &= check(wait_flag(b, "bb1"), "near-catch 1 at the Seven Seas' pass", flags(b))
     ok &= check("dash" in save_list(b, "verbs"), "the dash is learned there", save_list(b, "verbs"))
-    ok &= check(take_card(b, "deck"), "the Deck card, at the gangway")
+    ok &= check(lunch_for_the_officer(b), "his lunch carried to the gangway officer: the Deck card")
     # Region 2: up the crew trunk into Bliss.
     go(b, 4, 125)
     b.tap("e")
@@ -1021,6 +1021,140 @@ def scenario_golden(b):
     ok &= check("catch" in flags(b), "at the tip of the bow, standing still: the catch", (b.state(), flags(b)))
     b.shot("golden-end")
     return ok
+
+
+def carrying(b):
+    return b.eval("window.__ship.world.carry && window.__ship.world.carry.kind")
+
+
+def person(b, pid):
+    return b.eval(f"(p => p && ({{ x: Math.round(p.x), on: p.on, state: p.state, aside: !!p.aside }}))(window.__ship.world.people.byId['{pid}'])")
+
+
+def take_lunch(b):
+    """A tray of lunch from the Seven Seas' pass."""
+    b.teleport(exact_x(248.8) - 12, D5)
+    b.tap("e")
+    time.sleep(0.2)
+    return carrying(b) == "lunch"
+
+
+def scenario_region1(b):
+    """Region 1 (docs/build-plan.md, step 1): the officer's lunch past the waiter, his card, the
+    porter, the luggage, the rival at his rope."""
+    b.open("?reset&play")
+    ok = check(person(b, "npc_officer")["on"] and b.eval("window.__ship.world.people.byId.npc_officer.bubbleItems[0].visible"),
+               "the gangway officer shows what he wants: a tray")
+    # The Seven Seas' pass has no tray to take until Bumbot has been at it.
+    b.teleport(exact_x(248.8) - 70, D5)
+    ok &= check(not take_lunch(b), "no lunch at the pass before the beat")
+    b.open("?reset&play")
+    go(b, 5, 244)
+    b.hold("right", 1.6)
+    ok &= check(wait_flag(b, "bb1"), "near-catch 1: he bolts from the pass")
+    ok &= check(b.eval("window.__ship.tangerines.filter(t => t.id.startsWith('tan_5_bowl') && t.sprite.active).length") == 3,
+                "three tangerines from the fruit bowl he knocked over")
+    b.shot("region1-pass")
+    ok &= check(take_lunch(b), "a tray of lunch from the pass")
+    # Tray rules: a low hop, no trunk, no dash; the waiter spills it.
+    b.hold("space", 0.5)
+    top = b.eval("window.__ship.player.y")
+    b.teleport(exact_x(240), D5)
+    y0 = b.state()["y"]
+    b.key("space", True)
+    time.sleep(0.22)
+    lifted = y0 - b.state()["y"]
+    b.key("space", False)
+    time.sleep(0.5)
+    ok &= check(0 < lifted < 40 and carrying(b) == "lunch", "with a tray a jump is a low hop", lifted)
+    b.eval("window.__ship.save.tangerines = 2")
+    b.tap("d")
+    ok &= check(not b.state()["dashing"], "and there is no dash")
+    waiter = person(b, "haz_waiter")
+    b.eval("(p => { p.pausedUntil = 0; p.aside = false; })(window.__ship.world.people.byId.haz_waiter)")
+    b.teleport(person(b, "haz_waiter")["x"] + 60, D5)
+    b.hold("left", 0.8)
+    time.sleep(0.4)
+    ok &= check(carrying(b) is None and b.state()["mode"] == "play", "the waiter bumps the tray out of her hands: a spill, no scare", b.state())
+    b.shot("region1-spill")
+    # At a table he is out of the aisle: she slips past behind him.
+    ok &= check(take_lunch(b), "the pass has another")
+    b.teleport(person(b, "haz_waiter")["x"] + 300, D5)       # (people only move near her)
+    b.eval("(p => { p.x = p.walk.stops[0] - 4; p.dir = 1; p.pausedUntil = 0; })(window.__ship.world.people.byId.haz_waiter)")
+    time.sleep(0.4)
+    ok &= check(person(b, "haz_waiter")["aside"], "the waiter turns to a table", person(b, "haz_waiter"))
+    b.teleport(person(b, "haz_waiter")["x"] + 50, D5)
+    b.hold("left", 0.9)
+    ok &= check(carrying(b) == "lunch", "and she passes him with the tray")
+    # The glimpse at the forward stairs; the rival shakes his head at his rope.
+    go(b, 5, 84)
+    b.hold("left", 0.6)
+    ok &= check("glimpse1" in flags(b), "a glimpse: his tail up the forward stairs", flags(b))
+    s = climb(b, "stairs-forward-5-6", 0.5)
+    ok &= check(s["y"] == D5 and person(b, "riv_rope")["state"] == "acting", "the security officer shakes his head at his rope",
+                person(b, "riv_rope"))
+    # Down the stairs with the tray, and to the officer.
+    (x0, y0), _ = flight_feet("stairs-forward-4-5")
+    _, (x1, y1) = flight_feet("stairs-forward-4-5")
+    b.teleport(x1, y1)
+    s = hold_until(b, "down", lambda s: s["y"] == D4 and s["mode"] == "play", 6)
+    ok &= check(s["y"] == D4 and carrying(b) == "lunch", "stairs are fine with a tray", s)
+    b.eval("(p => { p.x = p.walk.a; p.dir = -1; p.pausedUntil = window.__ship.time.now + 60000; })(window.__ship.world.people.byId.haz_porter)")
+    b.teleport(exact_x(65.6) + 30, D4)
+    b.tap("e")
+    end = time.time() + 12
+    while time.time() < end and "deck" not in save_list(b, "cards"):
+        time.sleep(0.2)
+    ok &= check("deck" in save_list(b, "cards") and carrying(b) is None, "he eats, and hands her the Deck card", save_list(b, "cards"))
+    time.sleep(0.6)
+    ok &= check(not b.eval("window.__ship.world.people.byId.npc_officer.bubbleItems[0].visible"), "his bubble is gone")
+    b.shot("region1-card")
+    # The porter's cart is a bump without a tray; hopped, it is nothing.
+    b.eval("(p => { p.pausedUntil = 0; p.dir = 1; })(window.__ship.world.people.byId.haz_porter)")
+    b.teleport(person(b, "haz_porter")["x"] + 90, D4)
+    b.hold("left", 0.9)
+    time.sleep(0.2)
+    ok &= check(b.state()["mode"] == "scripted" and "Ой" in alert(b), "the porter's cart: bumped", alert(b))
+    time.sleep(2.5)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and abs(s["x"] - exact_x(72)) < 30, "and she steps out of the gangway's crew door", s)
+    # The luggage stack: hopped, or broken by the dash.
+    b.teleport(exact_x(30) + 60, D4)
+    b.hold("left", 0.8)
+    ok &= check(b.state()["x"] > exact_x(30), "the luggage stack is in the way", b.state())
+    b.eval("window.__ship.save.tangerines = 1")
+    b.tap("d")
+    b.hold("left", 0.6)
+    ok &= check("haz_luggage_4" in save_list(b, "broken"), "the dash goes through it", save_list(b, "broken"))
+    # A standing cart is hopped.
+    b.teleport(exact_x(90) + 50, D4)
+    b.hold("left", 0.5)
+    ok &= check(b.state()["x"] > exact_x(90), "a room-service cart stands in the way", b.state())
+    b.hold(["left", "space"], 0.7)
+    ok &= check(b.state()["x"] < exact_x(90), "and is hopped", b.state())
+    # The way on: the crew trunk opens with his card; the guest stairs stay roped.
+    s = climb(b, "stairs-midship-5-6", 0.5)
+    ok &= check(s["y"] == D5 and "WET FLOOR" in alert(b), "the midship stairs: the cleaner's wet floor", alert(b))
+    go(b, 4, 125)
+    b.tap("e")
+    b.hold("up", 5.0)
+    b.hold("right", 0.6)
+    ok &= check(2 in save_list(b, "regions"), "up the crew trunk with the Deck card: region 2", b.state())
+    return ok
+
+
+def lunch_for_the_officer(b):
+    """The first errand, start to end (the golden path's): a tray from the pass, to the gangway, his card."""
+    if not take_lunch(b):
+        return False
+    b.eval("(p => { p.x = p.walk.a; p.dir = -1; p.pausedUntil = window.__ship.time.now + 60000; })(window.__ship.world.people.byId.haz_porter)")
+    b.teleport(exact_x(65.6) + 30, D4)
+    b.tap("e")
+    end = time.time() + 12
+    while time.time() < end and "deck" not in save_list(b, "cards"):
+        time.sleep(0.2)
+    time.sleep(0.8)
+    return "deck" in save_list(b, "cards")
 
 
 def scenario_sweep(b):

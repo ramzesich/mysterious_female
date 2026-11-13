@@ -23,7 +23,8 @@ ROOMS = [
     dict(id="smcabin", deck=4, m=232, slot=True, width=240, look="crewcabin", door="cabin", plate="STAGE MGR"),
     dict(id="pantry", deck=5, m=166, width=288, look="pantry", door="crew", plate="PANTRY", lock=("card", "hk", 0),
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
-    dict(id="galley", deck=5, m=250.1, width=336, look="galley", door="crew", plate="GALLEY"),
+    # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
+    dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY"),
     dict(id="nook", deck=6, m=189, width=240, look="nook", door="bookcase", needs="nook"),
     dict(id="dressing", deck=6, m=242.5, width=240, look="dressing", door="crew", plate="STAGE DOOR",
          lock=("card", "ent", 0)),
@@ -85,10 +86,10 @@ TANGERINES = {
     "tan_4_30": (4, 31.2, 1, "table", None),
     "tan_4_laundry": ("laundry", 250, 1, 46, None),
     "tan_4_store": ("store", 150, 2, 40, None),
-    "tan_5_cafe": (5, 90, 1, "table", None),
-    "tan_5_dessert": (5, 190, 1, "table", None),
+    "tan_5_cafe": (5, 83.6, 1, 28, None),
+    "tan_5_dessert": (5, 186.4, 1, 26, None),
     "tan_5_bowl": (5, 245, 3, 0, "bb1"),
-    "tan_5_galley": ("galley", 250, 2, 0, None),
+    "tan_5_galley": ("galley", 36, 2, 0, "broken:haz_crate_galley"),
     "tan_6_high": (6, 26, 1, 106, None),
     "tan_6_windjammer": (6, 142, 1, "table", None),
     "tan_7_jackpot": (7, 160, 2, 0, "jackpot"),
@@ -119,8 +120,8 @@ TANGERINES = {
 ITEMS = {
     "item_socks": (11, 96, "verb:socks", None),
     "item_parasol": (12, 130, "verb:parasol", "horn"),
-    "item_pills": ("smcabin", 170, "item:pills", "bb3"),
-    "book_1": (5, 96, "book:1", None),
+    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
+    "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 150, "book:2", None),
     "book_3": ("dressing", 150, "book:3", None),
     "book_4": (9, 134, "book:4", None),
@@ -157,6 +158,7 @@ PUSHABLES = {
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
 TRAPDOOR_M = 250
+TRAPDOOR_LANDS = ("galley", 86)     # on the flour sacks
 CATCH_M = 6
 
 # --- Switches: E on a thing sets a flag (step 0's stand-ins for scenes) ----------------------------
@@ -177,3 +179,85 @@ GRIPS = [
     # The Great Outdoors' sun cover: its aft post, the climb up to deck 12 (region 8's way in).
     ("inside", 233, 11, 0, 124, 1),
 ]
+
+# --- People (GAME_DESIGN.md §6.1.6, docs/population.md §3 and §7) ----------------------------------
+# id: dict(at=(deck or room, m or x), who=<tools/cast.py name>, face=1 east / -1 west, ...):
+#   idle: the clip she or he loops standing; walk=(from m, to m, m/s[, clip]) a loop, with
+#   stops=[m...] where they turn aside for stop_ms (out of her way meanwhile), end_ms at each end;
+#   touch=(kind, width px, height px[, fright, dx]) what running into them does: "scare" (a fright,
+#   or a spill if she carries a tray), "spill" (only ever a spill); carry=[(atlas piece or "@" a
+#   picture the game draws, dx, dy, front)] what goes along with them; bubble=(pictogram, when,
+#   unless[, range m]) their request; until / after: a condition (src/world/world.js `cond`) that
+#   takes them away / brings them; layer: "behind" furniture (a desk), "back" (scenery people,
+#   behind her), default beside her.
+PEOPLE = {
+    # Region 1, deck 4.
+    "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
+    "haz_porter": dict(at=(4, 58), who="porter", face=1, walk=(53.5, 64, 1.0, "cart"), end_ms=1500,
+                       touch=("scare", 46, 44, "bumped", 12),
+                       carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
+    "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
+                        bubble=("tray", "!card:deck", None, 4)),
+    "amb_robe": dict(at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
+    "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
+    # Region 1, deck 5.
+    "amb_breakfast": dict(at=(5, 44.4), who="stewardess", face=1, idle="idle", layer="back"),
+    "riv_rope": dict(at=(5, 79.55), who="rival", face=-1, idle="idle", until="region:2"),
+    "amb_reception": dict(at=(5, 99.55), who="receptionist", face=-1, idle="idle", layer="behind"),
+    "blk_photographer": dict(at=(5, 87.9), who="photographer", face=1, idle="idle", until="region:3"),
+    "amb_poser_him": dict(at=(5, 90.35), who="gentleman", face=-1, idle="idle", until="region:3"),
+    "amb_poser_her": dict(at=(5, 91.25), who="lady", face=-1, idle="idle", until="region:3"),
+    "blk_cleaner": dict(at=(5, 106.1), who="cleaner", face=1, idle="mop", until="region:3"),
+    "amb_agent": dict(at=(5, 115.3), who="agent", face=-1, idle="idle", layer="back"),
+    "haz_waiter": dict(at=(5, 172), who="waiter", face=1, walk=(170.2, 192.2, 1.5, "serve"), stops=[175.4, 184.2],
+                       stop_ms=2400, end_ms=900, touch=("spill", 22, 56),
+                       carry=[("@tray", 9, 42, True), ("@load-cloche", 9, 45, True)]),
+    "amb_host": dict(at=(5, 205.3), who="maitre", face=-1, idle="idle", layer="back"),
+    "amb_chef_7s": dict(at=("galley", 182), who="chef", face=-1, idle="idle"),
+    # Diners (drawn seated, each on a chair of their own, in a dining chair's place at a table).
+    "amb_cucina_her": dict(at=(5, 159.8 - 0.17), who="diner_teal", face=1, layer="back"),
+    "amb_cucina_him": dict(at=(5, 164.1 + 0.17), who="diner_linen", face=-1, layer="back"),
+    "amb_7s_her": dict(at=(5, 213.0 - 0.17), who="diner_red", face=1, layer="back"),
+    "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
+}
+
+# --- Things the plan adds to the decks -------------------------------------------------------------
+# Props: id: (deck or room, m or x, atlas piece, dy px up, options: until/after a condition, front,
+# back (behind furniture), flip).
+PROPS = {
+    "prop_backdrop": (5, 90.9, "photo-backdrop", 0, dict(until="region:3")),
+    "prop_wetfloor": (5, 107.7, "wet-floor-sign", 0, dict(until="region:3")),
+    "prop_coffee_cafe": (5, 85.72, "coffee-cup", 23, {}),
+    "prop_bowl_cafe": (5, 83.6, "fruit-bowl-2", 23, {}),
+    "prop_bowl_7s": (5, 247.0, "fruit-bowl", 27, {}),
+    "prop_board": (4, 190.6, "notice-board", 40, {}),
+}
+# Things standing in the way that she hops: id: (deck, m, atlas piece).
+SOLIDS = {
+    "haz_cart_4_90": (4, 90, "service-cart"),
+    "haz_cart_4_182": (4, 182, "towel-trolley"),
+    "haz_cart_4_220": (4, 220, "service-cart"),
+    "haz_cart_5_30": (5, 30, "towel-trolley"),
+}
+# Things the dash goes through: id: (deck or room, m or x, [(atlas piece, dx, dy)]).
+BREAKABLES = {
+    "haz_luggage_4": (4, 30, [("suitcases", -13, 0), ("suitcases", 14, 0), ("beach-bag", 2, 25)]),
+    "haz_crate_galley": ("galley", 36, [("@crate-big", 0, 0)]),
+}
+# Quirks (§6.1.11): a moment with no reward. id: (deck or room, m or x, trigger: "E" or "still:<s>",
+# her clip, ms it lasts, options: needs).
+QUIRKS = {
+    "sec_swan": (5, 177.6, "E", "shiver", 1700, {}),
+}
+# Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
+SOURCES = {
+    "src_lunch": (5, 248.8, "lunch", "flag:bb1", [("tray", 24), ("load-cloche", 27)]),
+}
+# Signs: id: (deck, m, text, style: plate / poster / note, dy px up, options: size, wrap).
+SIGNS = {
+    "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "poster", 56, dict(size=5)),
+    "sign_lostcat": (4, 190.6, "LOST:\nCAT", "note", 54, dict(size=4)),
+    "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
+    "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
+    "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),
+}

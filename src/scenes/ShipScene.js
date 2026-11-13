@@ -67,7 +67,10 @@ const SIDEWALK_LOOKS = {
 };
 
 // Each hazard gets its own fright (§5.6).
-const FRIGHTS = { vacuum: 'Іііі!' };
+const FRIGHTS = {
+    vacuum: 'Іііі!', bumped: 'Ой!', bonked: 'Ай!', slipped: 'Ой-йой!', drenched: 'Бррр!', buried: 'Мммф!',
+    startled: 'Ой, вибачте!', splashed: 'Ааа!', swooped: 'Киш!', fogged: 'Пхх!', singed: 'Гаряче!',
+};
 
 export class ShipScene extends Phaser.Scene {
     constructor() {
@@ -183,7 +186,7 @@ export class ShipScene extends Phaser.Scene {
         this.cutShadows = {};
         // Where the deck ends in the ship's wall, a strip of that wall is drawn over her, so as she
         // runs into it, she goes behind it (the user, 2026-11-03).
-        const endCover = this.add.graphics().setDepth(DEPTH.player + 0.05);
+        const endCover = this.endCoverGfx = this.add.graphics().setDepth(DEPTH.player + 0.05);
         const coverW = props.endCover || 32;
         for (const [key, list] of Object.entries(this.shellTiles)) {
             const deck = parseInt(key, 10);
@@ -2238,8 +2241,14 @@ export class ShipScene extends Phaser.Scene {
         // there (seen from it, or jumping in it) they are not there (the user, 2026-11-06).
         // Outside (the promenade, the boat walkway, the balconies) she is in front of the ship's side:
         // only the outside's own floors and walls hold her (src/world/).
-        this.physics.add.collider(p, this.solidLayer, null, (_, tile) =>
-            this.route !== OUTSIDE && this.route !== 'duct' && (tile.index !== this.poolTile || !this.underPools(tile.poolDeck)));
+        // In one of the plan's rooms only the deck's floor holds her: a room by a deck's end lies over
+        // the ship's structure there.
+        this.physics.add.collider(p, this.solidLayer, null, (_, tile) => {
+            if (this.route === OUTSIDE || this.route === 'duct') return false;
+            const room = this.world.rooms[this.route];
+            if (room?.def && tile.pixelY < room.floor) return false;
+            return tile.index !== this.poolTile || !this.underPools(tile.poolDeck);
+        });
         this.physics.add.collider(p, this.routeWalls || [], null, (_, zone) => zone.route === this.route);
         for (const b of this.bulkheads) this.physics.add.collider(p, b.zone, null, () => !b.open && this.route === 'inside');
         this.progress.addColliders(p);
@@ -2742,7 +2751,7 @@ export class ShipScene extends Phaser.Scene {
             this.idle = null;
             this.idleAt = time + Phaser.Math.Between(IDLE.gapMs[0], IDLE.gapMs[1]);
         }
-        if (dir || time < this.idleAt) {
+        if (dir || time < this.idleAt || this.world.carry) {
             if (dir) this.idleAt = Math.max(this.idleAt, time + IDLE.firstMs);
             this.pose('stand');
             return;
@@ -2847,6 +2856,7 @@ export class ShipScene extends Phaser.Scene {
 
     enterPool(pool) {
         const p = this.player;
+        if (this.world.carry) this.world.carryBox.spill(p.x - (p.flipX ? -1 : 1));
         this.mode = 'swim';
         this.pool = pool;
         p.body.setVelocity(0, 0);
@@ -2971,6 +2981,8 @@ export class ShipScene extends Phaser.Scene {
             for (const [deck, g] of Object.entries(this.poolTanks)) g.setVisible(!this.underPools(Number(deck)));
             for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!this.underPools(pool.deck)));
         }
+        // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
+        this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);
         for (const r of this.rooms) {
             r.room.setVisible(this.route === r.route && !this.overview);
             r.dim?.setVisible(this.route === r.route && !this.overview);
@@ -3007,6 +3019,10 @@ export class ShipScene extends Phaser.Scene {
     activateTrunkDoor() {
         const door = this.trunkDoorAt(this.player.x, this.player.y);
         if (!door || door.open) return;
+        if (this.world.carry) {
+            this.world.say('🪜 ✋');           // a ladder: not with her hands full
+            return;
+        }
         if (!this.hasCard(door.trunk.card)) {
             this.showLocked(door.trunk.card);
         } else if (!this.trunkUsableFrom(door)) {
@@ -3330,6 +3346,7 @@ export class ShipScene extends Phaser.Scene {
         for (const f of this.flights) {
             if (input.up && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) {
                 const res = this.progress.flightPasses(f, true);
+                if (!res.ok && f.lockSpec?.kind === 'block') this.world.story.onBlocked(f.lockSpec.id);
                 return res.ok ? this.enterStairs(f, 0) : this.showLock(res);
             }
             if (input.down && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) {
@@ -3422,6 +3439,19 @@ export class ShipScene extends Phaser.Scene {
         }
         // With the towel on (after the shower), her towel clips where there is one.
         const towel = this.towel && (this.anims.exists(`her-towel-${name}`) || this.towelFrames[name] !== undefined);
+        // With a tray in her hands (§6.1.2), her carrying clips where there is one.
+        if (this.world?.carry && !towel) {
+            if (this.anims.exists(`her-carry-${name}`)) {
+                p.anims.play(`her-carry-${name}`, true);
+                p.anims.timeScale = speed;
+                return;
+            }
+            if (this.herFrames[`carry-${name}`] !== undefined) {
+                p.anims.stop();
+                p.setTexture('her', this.herFrames[`carry-${name}`]);
+                return;
+            }
+        }
         const key = `${towel ? 'her-towel' : 'her'}-${name}`;
         if (this.anims.exists(key)) {
             p.anims.play(key, true);
@@ -3449,6 +3479,7 @@ export class ShipScene extends Phaser.Scene {
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);
+                this.world.onTangerine();
                 sfx.pickup();
                 t.glint.destroy();
                 this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
@@ -3499,6 +3530,11 @@ export class ShipScene extends Phaser.Scene {
     updateVacuums(dt) {
         for (const v of this.vacuums) {
             if (!v.alive) continue;
+            if (v.asideUntil) {
+                if (this.time.now < v.asideUntil) continue;
+                v.asideUntil = 0;
+                v.sprite.setAngle(0).setAlpha(1);
+            }
             v.sprite.x += v.dir * v.speed * dt;
             if (v.sprite.x > v.maxX) v.dir = -1;
             else if (v.sprite.x < v.minX) v.dir = 1;
@@ -3513,10 +3549,15 @@ export class ShipScene extends Phaser.Scene {
             const s = v.sprite;
             const hit = Math.abs(p.x - s.x) < (PLAYER.bodyWidth / 2 + 6) && p.y > s.y - 6 && p.y - PLAYER.bodyHeight < s.y;
             if (!hit) continue;
+            if (v.asideUntil) continue;
             if (this.isDashing()) {
-                v.alive = false;
+                // Shoved aside, spinning, into a doorway for a while (population: `haz_vacuum_4`).
+                v.asideUntil = this.time.now + 6000;
                 this.smash(s.x, s.y - 3);
-                s.destroy();
+                s.setAlpha(0.6);
+                this.tweens.add({ targets: s, angle: 720, duration: 900, ease: 'Quad.easeOut' });
+            } else if (this.world.carry) {
+                this.world.touched({ x: s.x, touch: { kind: 'spill' } });
             } else {
                 this.scareContact(s.x, 'vacuum');
                 return;
@@ -3570,9 +3611,11 @@ export class ShipScene extends Phaser.Scene {
             targets: p, x: stopX, duration: walkMs,
             onComplete: () => {
                 p.anims.play('her-reach');
+                cat.onReach?.();
                 // He hears her a beat before her hands arrive: a startled leap, then gone.
                 this.time.delayedCall(BUMBOT.startleMs, () => {
                     this.tweens.killTweensOf(s);
+                    cat.onLeap?.();
                     s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
                     this.time.delayedCall(BUMBOT.leapMs, () => {
                         sfx.mrrp();
@@ -3692,8 +3735,10 @@ export class ShipScene extends Phaser.Scene {
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
         this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
-        this.pose('rise');
-        p.setFlipX(away < 0);
+        // A recoil from what got her (the vacuum: a jump, as it always was).
+        if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
+        else this.pose('rise');
+        p.setFlipX(kind !== 'vacuum' && this.anims.exists('her-hit') ? away > 0 : away < 0);
         this.script = null;
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
@@ -3766,6 +3811,7 @@ export class ShipScene extends Phaser.Scene {
             targets: this.fade, alpha: 1, duration: 220,
             onComplete: () => {
                 cleanup?.();
+                this.world.carryBox.drop();          // a tray is not hers to keep through a scare
                 this.tweens.killTweensOf(this.player);
                 this.spawnAt(target, { emerge: true });
                 this.tweens.add({ targets: this.fade, alpha: 0, duration: 260 });

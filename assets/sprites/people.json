@@ -1,0 +1,322 @@
+{
+ "cell": 80,
+ "cols": 24,
+ "people": {
+  "officer": {
+   "stand": 0,
+   "anims": {
+    "eat": [
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "idle": [
+     10,
+     11,
+     12,
+     13
+    ]
+   },
+   "fps": {
+    "eat": 8,
+    "idle": 8
+   },
+   "front": 1
+  },
+  "rival": {
+   "stand": 14,
+   "anims": {
+    "idle": [
+     16,
+     17,
+     18,
+     19
+    ],
+    "shake": [
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26,
+     27
+    ]
+   },
+   "fps": {
+    "idle": 8,
+    "shake": 8
+   },
+   "front": 15
+  },
+  "porter": {
+   "stand": 28,
+   "anims": {
+    "cart": [
+     30,
+     31,
+     32,
+     33,
+     34,
+     35,
+     36,
+     37
+    ],
+    "push": [
+     38,
+     39,
+     40,
+     41,
+     42,
+     43
+    ]
+   },
+   "fps": {
+    "cart": 8,
+    "push": 8
+   },
+   "front": 29
+  },
+  "waiter": {
+   "stand": 44,
+   "anims": {
+    "serve": [
+     46,
+     47,
+     48,
+     49,
+     50,
+     51,
+     52,
+     53
+    ],
+    "walk": [
+     54,
+     55,
+     56,
+     57,
+     58,
+     59
+    ]
+   },
+   "fps": {
+    "serve": 8,
+    "walk": 8
+   },
+   "front": 45
+  },
+  "tourist": {
+   "stand": 60,
+   "anims": {
+    "idle": [
+     62,
+     63,
+     64,
+     65
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 61
+  },
+  "robe": {
+   "stand": 66,
+   "anims": {
+    "idle": [
+     68,
+     69,
+     70,
+     71
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 67
+  },
+  "stewardess": {
+   "stand": 72,
+   "anims": {
+    "idle": [
+     74,
+     75,
+     76,
+     77
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 73
+  },
+  "receptionist": {
+   "stand": 78,
+   "anims": {
+    "idle": [
+     80,
+     81,
+     82,
+     83
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 79
+  },
+  "photographer": {
+   "stand": 84,
+   "anims": {
+    "idle": [
+     86,
+     87,
+     88,
+     89
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 85
+  },
+  "gentleman": {
+   "stand": 90,
+   "anims": {
+    "idle": [
+     92,
+     93,
+     94,
+     95
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 91
+  },
+  "lady": {
+   "stand": 96,
+   "anims": {
+    "idle": [
+     98,
+     99,
+     100,
+     101
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 97
+  },
+  "cleaner": {
+   "stand": 102,
+   "anims": {
+    "mop": [
+     104,
+     105,
+     106,
+     107,
+     108,
+     109,
+     110,
+     111
+    ]
+   },
+   "fps": {
+    "mop": 8
+   },
+   "front": 103
+  },
+  "agent": {
+   "stand": 112,
+   "anims": {
+    "idle": [
+     114,
+     115,
+     116,
+     117
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 113
+  },
+  "maitre": {
+   "stand": 118,
+   "anims": {
+    "idle": [
+     120,
+     121,
+     122,
+     123
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 119
+  },
+  "chef": {
+   "stand": 124,
+   "anims": {
+    "idle": [
+     126,
+     127,
+     128,
+     129
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 125
+  },
+  "folder": {
+   "stand": 130,
+   "anims": {
+    "idle": [
+     132,
+     133,
+     134,
+     135
+    ]
+   },
+   "fps": {
+    "idle": 8
+   },
+   "front": 131
+  },
+  "diner_red": {
+   "stand": 136,
+   "anims": {},
+   "fps": {},
+   "front": 137
+  },
+  "diner_suit": {
+   "stand": 138,
+   "anims": {},
+   "fps": {},
+   "front": 139
+  },
+  "diner_teal": {
+   "stand": 140,
+   "anims": {},
+   "fps": {},
+   "front": 141
+  },
+  "diner_linen": {
+   "stand": 142,
+   "anims": {},
+   "fps": {},
+   "front": 143
+  }
+ }
+}

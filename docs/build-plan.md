@@ -59,6 +59,8 @@ The whole route proven before any polish. Everything that moves the layout goes 
 
 ## Step 1: Lower ship (region 1, decks 4 and 5)
 
+**Done (2026-11-13).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** the spec's deck 4 and deck 5 tables; the gangway officer, the porter, the waiter, the
   lost passenger, the bathrobe guest; the rival security officer at his search rope (`riv_rope`); the luggage stack, the vacuum, the standing carts; the
   laundry, the dry store, the pantry passage and the galley as real rooms; the stage manager's

@@ -11,6 +11,10 @@ export class BootScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('ship', 'maps/ship.json');
         // The plan's world (tools/population.py through the map builder): rooms, people, things.
         this.load.json('world', 'maps/world.json');
+        // Its rooms that are drawn (tools/draw_rooms.py); the others the game draws bare.
+        this.load.once('filecomplete-json-world', (_key, _type, world) => {
+            for (const r of world.rooms) if (r.art) this.load.image(`room-${r.id}`, `assets/ship/rooms/${r.id}.png`);
+        });
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
@@ -30,6 +34,9 @@ export class BootScene extends Phaser.Scene {
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
+        // The ship's people (tools/cast.py, tools/build_people.py): one sheet, a grid of equal cells.
+        this.load.json('people-meta', 'assets/sprites/people.json');
+        this.load.spritesheet('people', 'assets/sprites/people.png', { frameWidth: 80, frameHeight: 80 });
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
@@ -78,6 +85,15 @@ export class BootScene extends Phaser.Scene {
         // The look back holds on its turned frames (2-4) for about a second, or it is missed.
         const look = [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7];
         this.anims.create({ key: 'her-idle-look', frames: frames('idle-look', look), frameRate: 7 });
+        // With a tray in her hands (§6.1.2): her walk with her forearms out, if it is drawn yet.
+        if (meta.anims['carry-run']) {
+            this.anims.create({ key: 'her-carry-run', frames: frames('carry-run'), frameRate: 11, repeat: -1 });
+        }
+        // A start at a bump; her quirks (§6.1.11), each a clip of its own.
+        if (meta.anims.hit) this.anims.create({ key: 'her-hit', frames: frames('hit', [0, 1, 1, 2, 3]), frameRate: 10 });
+        for (const [name, fps] of [['shiver', 12]]) {
+            if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
+        }
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
         this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });

@@ -8,6 +8,9 @@ import { PLAYER } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
+import { People } from './people.js';
+import { Carry } from './carry.js';
+import { Story } from './story.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -38,6 +41,11 @@ export class World {
         this.low = [];              // things she must crawl under: { route, x0, x1, y }
         this.grips = this.data.grips;
         this.pending = [];          // tangerines that appear on a flag
+        this.solids = [];           // things to hop: standing carts
+        this.breakables = [];       // things the dash goes through: stacked luggage, crates
+        this.people = new People(this);
+        this.carryBox = new Carry(this);
+        this.story = new Story(this);
         this.built = false;
     }
 
@@ -61,6 +69,7 @@ export class World {
         this.buildDuct();
         for (const e of this.data.ents) this.buildEnt(e);
         this.buildSpecials();
+        this.story.setup();
         this.built = true;
         if (this.progress.has('drain')) this.drainPool(true);
         this.refresh();
@@ -117,6 +126,13 @@ export class World {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 14, 22);
             g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 12, 20);
             g.fillStyle(0xae2334, 1).fillRect(5, 4, 4, 10);
+        });
+        make('crate-big', 30, 26, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 30, 26);
+            g.fillStyle(0xab947a, 1).fillRect(1, 1, 28, 24);
+            g.fillStyle(0x7a4528, 1).fillRect(1, 7, 28, 1).fillRect(1, 18, 28, 1).fillRect(9, 1, 1, 24).fillRect(20, 1, 1, 24);
+            g.fillStyle(0xf28c28, 1).fillRect(12, 10, 6, 6);
+            g.fillStyle(0x1ebc73, 1).fillRect(14, 9, 2, 1);
         });
         make('hatch-lid', 28, 5, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 28, 5);
@@ -450,7 +466,7 @@ export class World {
                 break;
             }
             case 'tangerine':
-                if (e.needs && !this.progress.has(e.needs)) this.pending.push(e);
+                if (e.needs && !this.met(e.needs)) this.pending.push(e);
                 else this.placeTangerine(e);
                 break;
             case 'item': {
@@ -459,7 +475,9 @@ export class World {
                 const key = type === 'book' ? `book-${name}` : `icon-${name}`;
                 const items = [];
                 let y = e.y;
-                if (e.route === 'inside') {
+                if (e.on != null) {
+                    y -= e.on;              // on a piece already there
+                } else if (e.route === 'inside') {
                     const table = s.add.image(e.x, e.y, 'sidetable').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
                     items.push(table);
                     y -= table.height;
@@ -496,6 +514,88 @@ export class World {
                     return true;
                 } };
                 this.things.push(thing);
+                break;
+            }
+            case 'person':
+                this.people.add(e);
+                break;
+            case 'prop': {
+                // A piece of the ship's atlas that the plan adds, in full colour: on the floor, `dy` up
+                // on something, in front of her or behind.
+                const d = e.front ? D.player + 0.04 : e.back ? D.decor + 0.11 : depth - 0.02;
+                const img = s.add.image(e.x, e.y - (e.dy ?? 0), 'shipart', e.frame).setOrigin(0.5, 1).setDepth(d).setFlipX(!!e.flip);
+                this.add([img]);
+                this.things.push({ ...e, items: [img], img });
+                break;
+            }
+            case 'solid': {
+                // Something standing in the way that she hops (a room-service cart).
+                const img = s.add.image(e.x, e.y, 'shipart', e.frame).setOrigin(0.5, 1).setDepth(depth - 0.01).setFlipX(!!e.flip);
+                const zone = s.add.zone(e.x, e.y, img.width - 6, img.height - 3).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                this.add([img]);
+                const thing = { ...e, items: [img], zone };
+                this.solids.push(thing);
+                this.things.push(thing);
+                break;
+            }
+            case 'breakable': {
+                // Stacked luggage, crates: the dash goes through them; otherwise they are in the way
+                // (low ones can be hopped).
+                if (this.save.broken.includes(e.id)) break;
+                const items = [];
+                let w = 0, h = 0;
+                for (const [frame, dx, dy] of e.pieces) {
+                    // ("@name": drawn by the game, not a piece of the atlas.) In front of what it hides.
+                    const img = (frame.startsWith('@') ? s.add.image(e.x + dx, e.y - dy, frame.slice(1)) : s.add.image(e.x + dx, e.y - dy, 'shipart', frame))
+                        .setOrigin(0.5, 1).setDepth(depth + 0.03);
+                    items.push(img);
+                    w = Math.max(w, Math.abs(dx) * 2 + img.width);
+                    h = Math.max(h, dy + img.height);
+                }
+                const zone = s.add.zone(e.x, e.y, w - 6, h - 3).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                this.add(items);
+                const thing = { ...e, items, zone };
+                this.breakables.push(thing);
+                this.things.push(thing);
+                break;
+            }
+            case 'source': {
+                // A tray to take (population §1 `source`): it always has more.
+                const items = [];
+                if (e.show) {
+                    this.carryBox.textures();
+                    for (const [key, dy] of e.show) items.push(s.add.image(e.x, e.y - dy, key).setOrigin(0.5, 1).setDepth(depth + 0.03));
+                    this.add(items);
+                }
+                this.things.push({ ...e, items, reach: 22, interact: () => {
+                    if (this.carry) return false;
+                    this.carryBox.take(e.gives);
+                    return true;
+                } });
+                break;
+            }
+            case 'quirk': {
+                // A moment of hers with no reward (§6.1.11): E on the thing, or standing still by it.
+                const thing = { ...e, items: [], reach: 20, quirk: true };
+                if (e.trigger === 'E') thing.interact = () => this.quirk(thing);
+                this.things.push(thing);
+                break;
+            }
+            case 'sign': {
+                // A plate by a door, a poster, a notice.
+                const style = {
+                    plate: { color: '#45293f', backgroundColor: '#d9a43b' },
+                    poster: { color: '#ae2334', backgroundColor: '#f3ecdd' },
+                    note: { color: '#3e3546', backgroundColor: '#ffffff' },
+                }[e.style ?? 'plate'];
+                const text = s.add.text(e.x, e.y - (e.dy ?? 52), e.text, {
+                    fontFamily: 'Verdana, sans-serif', fontSize: `${e.size ?? 5}px`, fontStyle: 'bold', align: 'center', ...style,
+                    padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4, wordWrap: e.wrap ? { width: e.wrap } : undefined,
+                }).setOrigin(0.5).setDepth(D.decor + 0.25);
+                this.add([text]);
+                this.things.push({ ...e, items: [text] });
                 break;
             }
             case 'push': {
@@ -613,9 +713,9 @@ export class World {
         // it drops her one deck into the galley; no scare.
         const t = this.data.trapdoor;
         if (s.route === 'inside' && onFloor && P.has('bb3') && Math.abs(p.x - t.x) < 7 && Math.abs(p.y - t.y) < 2) {
-            const to = this.rooms.galley;
+            const to = this.rooms[t.room];
             sfx.whoosh();
-            s.travel(to.def.x0 + 250, to.floor - 80, 'galley', () => P.setFlag('trapdoor'));
+            s.travel(t.landX, to.floor - 80, t.room, () => P.setFlag('trapdoor'));
             return;
         }
         // The tip of the bow (§6.1.9): once he has run there, standing still, she has him.
@@ -628,6 +728,184 @@ export class World {
             }
         } else {
             this.stillAt = time;
+        }
+    }
+
+    // --- What the story and the people use ------------------------------------------------------
+
+    // A condition from the data: "flag:bb1", "region:2", "card:deck", "carry:lunch", "verb:dash",
+    // "block:cleaner" (lifted), "broken:<id>"; "!" in front turns it round. What has really happened:
+    // ?cards=all fakes none of it.
+    cond(text) {
+        if (!text) return true;
+        if (text.startsWith('!')) return !this.cond(text.slice(1));
+        const [kind, v] = text.split(':');
+        const save = this.save;
+        switch (kind) {
+            case 'flag': return save.flags.includes(v);
+            case 'region': return save.regions.includes(Number(v));
+            case 'card': return save.cards.includes(v);
+            case 'verb': return save.verbs.includes(v);
+            case 'carry': return this.carry?.kind === v;
+            case 'broken': return save.broken.includes(v);
+            case 'block': return this.progress.blockLifted(v) && !this.progress.openAll;
+        }
+        return false;
+    }
+
+    // A pictogram for a speech bubble (requests are never words: §6.1.2), drawn here.
+    icon(name) {
+        const s = this.scene, key = `pict-${name}`;
+        if (s.textures.exists(key)) return key;
+        const g = s.make.graphics({ x: 0, y: 0 }, false);
+        const ink = 0x2e222f;
+        const draw = {
+            tray: () => {
+                g.fillStyle(ink, 1).fillRect(0, 10, 16, 3).fillEllipse(8, 10, 14, 16).fillRect(7, 0, 2, 3);
+                g.fillStyle(0xc7dcd0, 1).fillRect(1, 11, 14, 1).fillEllipse(8, 10, 12, 14);
+                g.fillStyle(0xffffff, 1).fillRect(4, 5, 2, 2);
+                g.fillStyle(0xffffff, 1).fillRect(0, 13, 16, 3);
+            },
+            pills: () => {
+                g.fillStyle(ink, 1).fillRect(3, 3, 10, 12).fillRect(4, 0, 8, 4);
+                g.fillStyle(0xf9c22b, 1).fillRect(4, 4, 8, 10);
+                g.fillStyle(0xffffff, 1).fillRect(5, 1, 6, 2).fillRect(5, 7, 6, 4);
+                g.fillStyle(0xe83b3b, 1).fillRect(7, 7, 2, 4).fillRect(6, 8, 4, 2);
+            },
+            book: () => {
+                g.fillStyle(ink, 1).fillRect(2, 1, 12, 14);
+                g.fillStyle(0xae2334, 1).fillRect(3, 2, 10, 12);
+                g.fillStyle(0xf3ecdd, 1).fillRect(11, 3, 1, 10).fillRect(5, 4, 5, 1).fillRect(5, 6, 4, 1);
+            },
+            cart: () => {
+                g.fillStyle(ink, 1).fillRect(1, 2, 14, 10).fillRect(2, 12, 3, 3).fillRect(11, 12, 3, 3);
+                g.fillStyle(0xc7dcd0, 1).fillRect(2, 3, 12, 8);
+                g.fillStyle(0x4d9be6, 1).fillRect(3, 4, 10, 2).fillRect(3, 8, 10, 2);
+            },
+        }[name];
+        (draw ?? (() => g.fillStyle(ink, 1).fillRect(6, 2, 4, 8).fillRect(6, 12, 4, 3)))();
+        g.generateTexture(key, 16, 16);
+        g.destroy();
+        return key;
+    }
+
+    // A word over her for a moment (her own exclamations).
+    say(text, ms = 900) {
+        const s = this.scene;
+        s.lockedUntil = s.time.now + ms;
+        s.alert.setText(text).setVisible(true);
+        s.time.delayedCall(ms, () => { if (s.alert.text === text) s.alert.setVisible(false); });
+    }
+
+    // Someone who wants something shows it again: their bubble hops.
+    nudge(person) {
+        const s = this.scene;
+        if (!person.bubbleItems) return;
+        s.tweens.add({ targets: person.bubbleItems, y: '-=5', duration: 110, yoyo: true, repeat: 1 });
+    }
+
+    // A scripted moment: her input is off while `fn` runs (an async function), then play goes on.
+    cut(fn) {
+        const s = this.scene, p = s.player;
+        s.mode = 'scripted';
+        s.script = null;
+        p.body.setVelocity(0, 0);
+        s.pose('stand');
+        const done = () => {
+            if (s.mode === 'scripted') s.mode = 'play';
+            this.refresh();
+        };
+        Promise.resolve().then(fn).then(done, err => { console.error(err); done(); });
+    }
+
+    wait(ms) {
+        return new Promise(resolve => this.scene.time.delayedCall(ms, resolve));
+    }
+
+    tween(config) {
+        return new Promise(resolve => this.scene.tweens.add({ ...config, onComplete: resolve }));
+    }
+
+    // Loose pictures at a spot, bottom to top (a tray and its load in someone's hands).
+    prop(x, y, ...keys) {
+        const s = this.scene;
+        const items = keys.map((key, i) => s.add.image(x, y - i * 3, key).setOrigin(0.5, 1).setDepth(s.DEPTH.props + 0.1 + i * 0.01));
+        this.add(items);
+        return items;
+    }
+
+    // Someone hands her a thing: it crosses from their hands to hers, sparkles, and `then` it is hers.
+    async handOver(person, frame, then) {
+        const s = this.scene, p = s.player;
+        const img = s.add.image(person.x + person.dir * 12, person.y - 34, 'shipart', frame).setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
+        this.add([img]);
+        if (person.meta.anims.give) this.people.play(person, 'give');
+        await this.wait(350);
+        await this.tween({ targets: img, x: p.x, y: p.y - 40, duration: 420, ease: 'Sine.easeInOut' });
+        sfx.checkpoint();
+        for (let i = 0; i < 10; i++) {
+            const a = (Math.PI * 2 * i) / 10;
+            const spark = s.add.image(img.x, img.y - 8, 'dot').setTint(0xf9c22b).setDepth(s.DEPTH.fx);
+            this.add([spark]);
+            s.tweens.add({ targets: spark, x: img.x + Math.cos(a) * 20, y: img.y - 8 + Math.sin(a) * 20, alpha: 0, duration: 450, onComplete: () => spark.destroy() });
+        }
+        await this.tween({ targets: img, y: img.y - 14, alpha: 0, duration: 380 });
+        img.destroy();
+        then?.();
+    }
+
+    // A prop knocked over (the Seven Seas' fruit bowl, by Bumbot).
+    topple(id) {
+        const t = this.things.find(x => x.id === id);
+        if (!t?.img || t.toppled) return;
+        t.toppled = true;
+        this.scene.tweens.add({ targets: t.img, angle: -100, x: t.img.x - 10, y: t.img.y + 4, duration: 260, ease: 'Quad.easeIn' });
+        sfx.smash();
+    }
+
+    // One of her quirks: she turns to the thing and does her bit; any key after a moment ends it.
+    quirk(thing) {
+        const s = this.scene, p = s.player;
+        if (this.carry || !s.anims.exists(`her-${thing.clip}`)) return false;
+        this.cut(async () => {
+            p.setFlipX(thing.x < p.x);
+            p.anims.play(`her-${thing.clip}`);
+            if (thing.say) this.say(thing.say, thing.ms);
+            await this.wait(thing.ms);
+            s.pose('stand');
+            if (!this.save.seen.includes(thing.id)) {
+                this.save.seen.push(thing.id);
+                writeSave(this.save);
+            }
+        });
+        return true;
+    }
+
+    // Standing still by a quirk's spot long enough sets it off.
+    updateQuirks(time) {
+        const s = this.scene, p = s.player;
+        if (s.mode !== 'play') return;
+        const still = Math.abs(p.body.velocity.x) < 5 && (p.body.blocked.down || p.body.touching.down);
+        if (!still) this.quirkStill = time;
+        for (const t of this.things) {
+            if (!t.quirk || !t.trigger.startsWith('still') || !this.shown(t)) continue;
+            if (Math.abs(p.x - t.x) > (t.reach ?? 20) || Math.abs(p.y - t.y) > 8) continue;
+            if (still && time - (this.quirkStill ?? time) > Number(t.trigger.split(':')[1]) * 1000 && time > (t.again ?? 0)) {
+                t.again = time + 15000;
+                this.quirk(t);
+            }
+        }
+    }
+
+    // She has run into someone (the people's `touch`): a fright that fits, or with a tray a spill.
+    touched(person) {
+        const s = this.scene, t = person.touch;
+        if (s.time.now < (this.touchCool ?? 0) || s.mode !== 'play') return;
+        if (this.carry) {
+            this.touchCool = s.time.now + 1200;
+            this.carryBox.spill(person.x);
+        } else if (t.kind === 'scare') {
+            s.scareContact(person.x, t.fright);
         }
     }
 
@@ -645,6 +923,11 @@ export class World {
         this.updateDuct(input);
         this.updateSpecials(time);
         if (s.route !== this.lastRoute) this.refresh();
+        this.people.update(dt, time);
+        this.carryBox.update();
+        this.story.update(dt, time);
+        this.updateQuirks(time);
+        this.updateHud();
         if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -3 : 3), p.y - PLAYER.height + 12);
     }
 
@@ -654,7 +937,9 @@ export class World {
     // E: a cart's end, a pickup, a switch, a hatch.
     interact() {
         const s = this.scene, p = s.player;
+        if (this.story.interact()) return true;
         for (const t of this.pushables) {
+            if (this.carry) break;          // her hands are full
             if (t.route !== s.route || Math.abs(p.y - t.y) > 4 || (t.flag && this.progress.has(t.flag) && !t.free)) continue;
             const side = p.x < t.x ? -1 : 1;
             if (t.sides && side !== t.sides) continue;
@@ -668,8 +953,16 @@ export class World {
         return false;
     }
 
+    // `needs`: a flag's name, or a condition ("broken:<id>").
+    met(needs) {
+        return !needs || (needs.includes(':') ? this.cond(needs) : this.progress.has(needs));
+    }
+
     shown(t) {
-        return !t.done && this.progress.has(t.needs) && (t.route === 'inside' || t.route === this.scene.route);
+        if (t.done || !this.met(t.needs)) return false;
+        if (t.after && !this.cond(t.after)) return false;
+        if (t.until && this.cond(t.until)) return false;
+        return t.route === 'inside' || t.route === this.scene.route;
     }
 
     showParasol(on) {
@@ -688,12 +981,13 @@ export class World {
             const [type, what] = g.split(':');
             if (type === 'verb') {
                 this.progress.learn(what);
-                this.hint(HINTS[what]);
+                if (what !== 'dash') this.hint(HINTS[what]);
             } else {
                 this.progress.setFlag(what);
             }
         }
         if (name === 'drain') this.drainPool(false);
+        this.story.onFlag(name);
         this.refresh();
     }
 
@@ -723,14 +1017,16 @@ export class World {
         const s = this.scene, P = this.progress;
         this.lastRoute = s.route;
         for (const e of this.pending.slice()) {
-            if (!P.has(e.needs)) continue;
+            if (!this.met(e.needs)) continue;
             this.pending.splice(this.pending.indexOf(e), 1);
             this.placeTangerine(e);
         }
         for (const t of this.things) {
             const on = this.shown(t);
             for (const i of t.items) i.setVisible(on);
+            if (t.zone?.body && (t.until || t.after)) t.zone.body.enable = on;
         }
+        this.people.refresh();
         for (const r of Object.values(this.rooms)) {
             if (!r.def) continue;
             r.hidden = !!r.needs && !P.has(r.needs);
@@ -756,6 +1052,39 @@ export class World {
         s.physics.add.collider(p, this.wallZones, null, () => s.route === OUTSIDE);
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
         for (const t of this.pushables) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        // The dash goes through a breakable, and it is gone for good.
+        for (const t of this.breakables) {
+            s.physics.add.collider(p, t.zone, null, () => {
+                if (t.route !== s.route || t.done) return false;
+                if (!s.isDashing()) return true;
+                t.done = true;
+                s.smash(t.x, t.y - 12);
+                this.save.broken.push(t.id);
+                t.items.forEach(i => i.destroy());
+                t.items = [];
+                t.zone.destroy();
+                this.refresh();
+                return false;
+            });
+        }
+    }
+
+    // The first tangerine after the scream: the dash's key (population §6.1).
+    onTangerine() {
+        if (this.progress.knows('dash') && !this.save.seen.includes('hint-dash')) {
+            this.save.seen.push('hint-dash');
+            this.hint(HINTS.dash);
+        }
+    }
+
+    // What she carries, on the HUD, with how much of it is left (a melting cone, a cooling cup).
+    updateHud() {
+        if (!this.hudCarry) return;
+        const left = this.carryBox.left();
+        this.hudCarry.back.setVisible(left !== null);
+        this.hudCarry.bar.setVisible(left !== null);
+        if (left !== null) this.hudCarry.bar.setSize(100 * left, 6).setFillStyle(left > 0.35 ? 0x8fd3ff : 0xe83b3b);
     }
 
     // The books' count, under the card slots (population §2.8).
@@ -764,7 +1093,10 @@ export class World {
         this.hudBooks = s.add.text(24, 114, '', {
             fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
         });
-        layer.add(this.hudBooks);
+        const back = s.add.rectangle(24, 146, 104, 10, 0x1d2b53).setOrigin(0).setVisible(false);
+        const bar = s.add.rectangle(26, 148, 100, 6, 0x8fd3ff).setOrigin(0).setVisible(false);
+        this.hudCarry = { back, bar };
+        layer.add([this.hudBooks, back, bar]);
         this.refresh();
     }
 }

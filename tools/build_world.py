@@ -8,8 +8,8 @@ funnel's top.
 import json
 
 import build_ship_map as B
-from population import (BEAT_LIFT, BEATS, CATCH_M, CHECKPOINTS, DUCT, FLAG_GIVES, GRIPS, ITEMS, PUSHABLES, ROOMS, SWITCHES,
-                        TANGERINES, TRAPDOOR_M)
+from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, DUCT, FLAG_GIVES, GRIPS, ITEMS, PEOPLE, PROPS,
+                        PUSHABLES, QUIRKS, ROOMS, SIGNS, SOLIDS, SOURCES, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
@@ -81,7 +81,7 @@ def build_world():
     for r in ROOMS:
         deck = r["deck"]
         door = slot_x(deck, r["m"]) if r.get("slot") else B.exact_x(r["m"])
-        x0 = door - ROOM_DOOR_X
+        x0 = door - r.get("door_x", ROOM_DOOR_X)
         floor = B.floor_y(deck)
         room_x0[r["id"]], room_floor[r["id"]] = x0, floor
         doors = [dict(id=r["id"], x=door, outX=door, outY=floor, outRoute=route_of(r.get("route", "inside")),
@@ -96,6 +96,7 @@ def build_world():
             doors.append(dict(id=f"{r['id']}-{i + 2}", x=x0 + d["x"], outX=out_x, outY=out_y, outRoute=route_of(d["to"]),
                               kind=d.get("door", "crew"), plate=d.get("plate", ""), lock=lock(d.get("lock"))))
         rooms.append(dict(id=r["id"], deck=deck, x0=x0, floor=floor, width=r["width"], look=r["look"],
+                          art=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}.png").exists(),
                           needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors))
 
     def spot(where, at):
@@ -121,9 +122,49 @@ def build_world():
                              route=route, on="table" if on in ("table", "out") else int(on), needs=needs or "",
                              first=k == 0))
 
-    for iid, (where, at, what, needs) in ITEMS.items():
+    for iid, (where, at, what, needs, *on) in ITEMS.items():
         x, y, route = spot(where, at)
-        ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or ""))
+        # `on`: px up, on a piece already there (a table); else on a side table of its own.
+        ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
+                         on=on[0] if on else None))
+
+    for pid, d in PEOPLE.items():
+        x, y, route = spot(*d["at"])
+        e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
+                 idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""))
+        if "walk" in d:
+            a, b, v, *clip = d["walk"]
+            e["walk"] = dict(a=spot(d["at"][0], a)[0], b=spot(d["at"][0], b)[0], v=v, clip=clip[0] if clip else "walk",
+                             stops=[spot(d["at"][0], m)[0] for m in d.get("stops", [])],
+                             stopMs=d.get("stop_ms", 2200), endMs=d.get("end_ms", 600))
+        if "touch" in d:
+            kind, w, h, *rest = d["touch"]
+            e["touch"] = dict(kind=kind, w=w, h=h, fright=rest[0] if rest else "", dx=rest[1] if len(rest) > 1 else 0)
+        if "carry" in d:
+            e["carry"] = [dict(frame=f, dx=dx, dy=dy, front=front) for f, dx, dy, front in d["carry"]]
+        if "bubble" in d:
+            icon, when, unless, *rng = d["bubble"]
+            e["bubble"] = dict(icon=icon, when=when or "", unless=unless or "", range=rng[0] if rng else 4)
+        ents.append(e)
+
+    for pid, (where, at, frame, dy, opts) in PROPS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="prop", id=pid, x=x, y=y, route=route, frame=frame, dy=dy, **opts))
+    for sid, (where, at, frame) in SOLIDS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="solid", id=sid, x=x, y=y, route=route, frame=frame))
+    for bid, (where, at, pieces) in BREAKABLES.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="breakable", id=bid, x=x, y=y, route=route, pieces=pieces))
+    for sid, (where, at, gives, after, show) in SOURCES.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show))
+    for qid, (where, at, trigger, clip, ms, opts) in QUIRKS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="quirk", id=qid, x=x, y=y, route=route, trigger=trigger, clip=clip, ms=ms, **opts))
+    for sid, (where, at, text, style, dy, opts) in SIGNS.items():
+        x, y, route = spot(where, at)
+        ents.append(dict(kind="sign", id=sid, x=x, y=y, route=route, text=text, style=style, dy=dy, **opts))
 
     for bid, (where, at, activity, escape, gone, needs) in BEATS.items():
         x, y, route = spot(where, at)
@@ -187,7 +228,8 @@ def build_world():
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.x_of(125), y=B.floor_y(11), toY=B.floor_y(10)),
-                trapdoor=dict(x=B.x_of(TRAPDOOR_M), y=B.floor_y(6)),
+                trapdoor=dict(x=B.x_of(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],
+                              landX=room_x0[TRAPDOOR_LANDS[0]] + TRAPDOOR_LANDS[1]),
                 catch=dict(x=B.x_of(CATCH_M), y=B.floor_y(7)),
                 waterY=(B.WATER_ROW + 1) * B.TILE)
 

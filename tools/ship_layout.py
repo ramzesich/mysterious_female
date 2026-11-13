@@ -295,5 +295,5 @@ END_WALL_LOCKS = {
 
 # Step 0's stand-ins (docs/build-plan.md): the cards lie where their givers will be; standing in a
 # trigger sets its flag where a scene will. (deck, m, needs flag or None).
-CARD_SPOTS = {"deck": (4, 64, None), "ent": (6, 246, None), "hk": (9, 132.5, None), "off": (12, 136, "horn")}
+CARD_SPOTS = {"ent": (6, 246, None), "hk": (9, 132.5, None), "off": (12, 136, "horn")}     # the Deck card: the gangway officer's
 TRIGGERS = []       # (flag, deck, m, needs): none left; Bumbot's beats are in tools/population.py

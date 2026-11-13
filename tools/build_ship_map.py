@@ -1816,7 +1816,7 @@ def build_objects():
 
     # A robot vacuum patrolling the deck 4 cabin corridor.
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
-        prop("minX", x_of(113), "float"), prop("maxX", x_of(186), "float"), prop("speed", 40, "float")]))
+        prop("minX", x_of(118), "float"), prop("maxX", x_of(150), "float"), prop("speed", 58, "float")]))
 
     return objs
 

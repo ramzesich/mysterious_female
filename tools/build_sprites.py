@@ -72,6 +72,15 @@ HER = {
         # In cabin 8206's shower, seen softened through its frosted door (GAME_DESIGN.md §5.3):
         # facing us, washing her hair, lather on it; skeleton-v3 custom poses.
         "shower": [(f"shower/{i}.png", "feet") for i in range(6)],
+        # With a tray in her hands (§6.1.2): her walk with both forearms held out in front, empty (the
+        # game puts the tray and its load there); skeleton-v3's walk with her hands posed on top.
+        # Standing with it: the frame with her feet together.
+        "carry-run": [(f"carry-walk/{i}.png", "feet") for i in range(8)],
+        "carry-stand": [("carry-walk/2.png", "feet")],
+        # A start: she recoils from what bumped her (skeleton-v3's hit move), before she runs off.
+        "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
+        # Her quirks (§6.1.11). The Four Seasons' ice swan: she shivers, hugging herself.
+        "shiver": [(f"shiver/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

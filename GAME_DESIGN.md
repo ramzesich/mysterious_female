@@ -1924,11 +1924,19 @@ Nothing blocks the start of the build. These get settled along the way:
       with his built near-catch; the verbs bare (`src/world/verbs.js`: crawl, wall jump, glide,
       push); the `golden` playtest walks the gangway to the catch, `sweep` tries every lock from the
       wrong side. What changed against the plan on the way, and why: `docs/progress-decisions.md`
+- [x] **Step 1, region 1: the lower ship** (done 2026-11-13, branch `the-build`): decks 4 and 5
+      populated from `docs/population.md`. The gangway officer's lunch (near-catch 1 at the Seven
+      Seas' pass, the scream and the dash, a tray carried past the waiter, his Deck card); the
+      rival at his search rope; the porter, the luggage stack, the carts, the vacuum; the blocks'
+      people (the photographer and his posers, the cleaner); the laundry, the dry store, the stage
+      manager's cabin, the pantry and the galley drawn (`tools/draw_rooms.py`); twenty-one people
+      drawn with PixelLab (`tools/cast.py`, `assets/sprites/people.png`); carrying with the tray
+      rules, pictogram bubbles, quirks (the ice swan). Playtest `region1`
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 1 of `docs/build-plan.md`, region 1 (decks 4 and 5)**; then on in play order. Mark each
-      step done here as it lands
+      step 2 of `docs/build-plan.md`, region 2 (the atrium and the promenade)**; then on in play
+      order. Mark each step done here as it lands
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;

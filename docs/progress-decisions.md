@@ -87,3 +87,73 @@ switches (yellow boxes) until their scenes exist.
 **Left for the steps:** every person and scene, all art, hazards, carrying, the HUD's carried
 thing, the glimpses, the elevators' panels beyond the regions' rule, `LOCKED_PARTS`, cabin 8206's
 checkpoint, sound.
+
+## Step 1: Lower ship, region 1 (2026-11-13)
+
+Done: decks 4 and 5 populated and playable from the start to the way into region 2. The first
+errand end to end (near-catch 1 at the Seven Seas' pass, the scream, the fruit bowl, a tray of
+lunch carried past the waiter and down the stairs, the officer eats and hands over the Deck card),
+the rival at his search rope, the glimpse up the forward stairs, the porter and his cart, the
+luggage stack, the standing carts, the vacuum, the blocks on the 5-6 flights with their people,
+five rooms drawn, twenty-one people drawn, the first quirk (the ice swan), the first book and the
+tangerines. Playtest `region1`; `golden` now does the errand for real.
+
+**New systems** (all data-driven from `tools/population.py`): people (`src/world/people.js`:
+standing, walking loops with stops, things carried along, pictogram bubbles, what touching them
+does); carrying (`src/world/carry.js`: the tray rules, the spill, loads that melt or cool with a
+HUD meter); the story's own moments (`src/world/story.js`: one part per region); props, things to
+hop, things the dash breaks, tray sources, signs, quirks; scripted moments written as plain async
+functions (`world.cut`, `wait`, `tween`, `handOver`).
+
+**The art pipeline for people:** `tools/cast.py` lists each person's PixelLab character;
+`python tools/fetch_people.py` downloads their frames (PixelLab's ZIP of a character needs no key);
+`python tools/build_people.py` packs `assets/sprites/people.png`. Her own new clips:
+`python tools/fetch_her.py <animation>` then `tools/build_sprites.py`. Rooms:
+`python tools/draw_rooms.py` (drawn by hand in code, `assets/ship/rooms/`).
+
+**Changes and additions to the plan, and why:**
+
+1. **People are PixelLab v3 characters at 64 px, side view** (2 generations each; clips east only:
+   a template clip 1 generation, a skeleton-v3 move with poses on top 3). A calibration pair showed
+   v3 comes out at her height (61 px) and nearest her look; "standard" came out 71 px tall and
+   realistic. skeleton-v3's library moves (walk, eat, hit, sit...) with a few hand poses on top give
+   the special clips: her walk with a tray is its `walk` with both forearms held out.
+2. **The porter works forward of the officer** (53.5-64 m, was 62-72): his loop had the officer
+   inside it, so the errand's last metres, with a tray that cannot hop a cart, came after a 180 m
+   walk from the only place trays come from. Now the tray's test is the waiter, 20 m from the pass,
+   where a spill costs seconds; the porter guards the forward cabins' luggage and tangerine instead.
+3. **The waiter serves his tables:** twice on his loop he turns to a table for 2.4 s, and is out of
+   the aisle while he does. A tray's low hop cannot clear him and a corridor has no way round, so
+   this is how she passes: wait for him to serve, slip behind him. His tell is the turn.
+4. **Deck 4 is not a tray route:** its standing carts cannot be hopped with a tray. The lunch goes
+   along deck 5 and down the forward stairs. (The spec offered either deck.)
+5. **The glimpse of Bumbot's tail is at the forward stairs the first time she comes by after the
+   Seven Seas**, not "as she reaches the crew trunk" (45 m away: nobody would have seen it). She
+   passes there with the tray, the rival at his rope beside it.
+6. **The rival shakes his head** when she tries his flight (his own clip); he is gone once she has
+   been in region 2.
+7. **Diners are drawn seated on chairs of their own** (the seated test came out with its chair) and
+   take a dining chair's place, **one to a table**: two facing each other overlapped across the
+   small tables.
+8. **`amb_lost` is a tourist in a Hawaiian shirt with a map**, not a second passenger in a bathrobe
+   (the spec had two robes on deck 4: variety).
+9. **Left out for now:** the string trio on the atrium floor (the spec's own doubt), the open cabin
+   with a guest at its window on deck 5 (`amb_robe_5`; needs an open cabin drawing). Both can come
+   back in a polish pass.
+10. **The waiter's sprite came without a tray**, so the game draws the tray and cloche in his raised
+    hand (the same pictures as hers).
+11. **Her frights are her own words** («Ой!», «Ай!», «Бррр!»...) over one recoil clip (skeleton-v3's
+    `hit`) for now; the vacuum keeps its jump and «Іііі!». A clip per fright is art for later.
+12. **A tray is lost in a scare** (a fall, overboard): it is not hers to keep. People and hazards
+    never scare her while she carries one, they spill it.
+13. **The dash shoves the vacuum aside for six seconds** (it used to destroy it), as the spec says.
+14. **The galley lies forward of its door** (the door is at the room's aft end): a deck's last
+    metres are structure, and a room there would reach past the hull. In the plan's rooms only the
+    deck's floor holds her, so a room can lie over structure.
+15. **Crew name plates are placeholders** (BOSUN, PURSER, DJ; STAGE MGR on his door) until the
+    user's in-jokes (§6.1.15).
+16. **The notice board is at 190.6 m** (188 m is a cabin door); the galley's tangerines are in a
+    crate that the dash breaks (they appear when it is broken).
+17. **The Deck card's stand-in pickup is gone**: the officer hands the card over in his scene.
+
+**PixelLab spent on this step:** about 90 generations (22 characters, their clips, three of hers).
