@@ -17,10 +17,17 @@ user's review. `GAME_DESIGN.md` §8 "Next up" names the current step; a new sess
    figures from shared bodies recoloured.
 4. **Playtest:** a headless scenario for the region (its route, its scares, its errand, its beat),
    added to `tools/playtest.py` and kept; the golden path re-run at the end of every step.
-5. **Review:** screenshots in the chat and a link (`?play&at=<place>&tangerines=infinite`), one
+5. **Looking closely** (added 2026-11-13, after the user found faults the tests could not):
+   every person and thing the step places is shot enlarged next to her
+   (`tools/shoot_people.py`, `Browser.close_up()`, `tools/check_people.py`) and checked for
+   proportions, whether it reads, which way it faces, what it overlaps, how it is held, what
+   holds it up, in each state the story gives the spot: the list is in `CLAUDE.md`, "Looking
+   closely". New people are checked against her before their clips are made.
+6. **Review:** screenshots in the chat and a link (`?play&at=<place>&tangerines=infinite`), one
    change at a time, the user's circled corrections fixed and shown again.
-6. **Exit:** the region plays from its entrance to its exit with the real locks; every scare, errand,
-   secret and beat in it works; its playtest and the golden path pass; a commit; §8 updated.
+7. **Exit:** the region plays from its entrance to its exit with the real locks; every scare, errand,
+   secret and beat in it works; its playtest and the golden path pass; the close look has been
+   done and its faults fixed; a commit; §8 updated.
 
 Rules that hold throughout: no death, nothing floats, human-sized things sized to her, sprites face
 east, background props muted; a scare keeps everything collected; a tray never scares, only spills.

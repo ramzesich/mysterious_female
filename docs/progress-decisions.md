@@ -742,3 +742,87 @@ her), `stairSlip`, `overRail`.
 
 **PixelLab spent on this step:** 74 generations (21 characters, 16 clips of theirs, two map
 objects, three clips of hers of which the "hover" one was not used). 1,185 of 2,000 left.
+
+## Between steps 8 and 9: the people's proportions, the parasol (the user's review, 2026-11-13)
+
+The user, looking at step 8's screenshots: the people are not drawn to one set of proportions
+(the security officer against the others on decks 11 and 12), and the parasol does not read as a
+parasol. "Do a visual inspection and fix any weird-looking characters by aligning them to a same
+proportional standard... You are free to use as many generations as needed."
+
+**What the inspection found** (all 113 side by side with her, `python tools/check_people.py`):
+
+- **The standard is hers:** a head of 17 px (hair in) on a figure 59 px tall, about three and a
+  half heads. Most of the cast is within 14 to 20 px. **Twenty-four were not:** heads of 21 to
+  25 px on a squat body (the security officer the worst: 22 px tall and 26 wide), or a figure
+  bigger all over (the photographer).
+- **The four diners of Seven Seas and La Cucina, and her husband's stand-in, sat as tall as the
+  others stand:** PixelLab draws a seated figure to the same height as a standing one, and these
+  five had been left out of the 0.8 that every other seated figure has.
+- A template clip (breathing-idle) had shrunk the photographer by half a head against his
+  standing pose.
+
+**What was done:**
+
+1. **Twenty-four people redrawn** from their own descriptions: the security officer (still stout,
+   with his net in his hand), the porter, the lady posing for the photographer, the photographer,
+   the cleaner, the receptionist, the librarian, the DJ, the stage manager, deck 9's steward, the
+   groom, two of the buffet queue (the polka dots, the kaftan), the three fans, the gym's runner,
+   the two behind deck 10's "Do Not Disturb" doors, both teppanyaki chefs, Los Lobos' waiter, two
+   of Champs' three. All the clips the game plays of them were made again with the same motions (38 clips).
+2. **How: PixelLab's "pro" mode with a style character** (`style_character_id`): the new figure
+   takes its proportions and strict side view from one that has them (the boat drill's officer
+   for men, the cabin maid for women). Ten generations a figure against two, but it holds: a
+   plain v3 figure asked in words for "realistic adult proportions, small head, about four heads
+   tall" still came out with a 24 px head. The rule and the two style ids are in `tools/cast.py`.
+3. **The five seated ones shrunk to 0.8** like the rest (`"scale"` in the cast).
+4. **The photographer's idle made again on his own skeleton** (skeleton-v3 with the template),
+   which keeps his size; the same for the librarian's and the receptionist's.
+5. Two clips made twice: the stage manager's flap (from poses, his arms hardly left the clipboard:
+   now a panicked jog on the spot) and the first chef's flourish (he turned to face us and sparks
+   were drawn into the frames).
+6. **`tools/check_people.py`** is the inspection as a tool: everyone next to her, heads against a
+   ruler, every clip of a figure frame by frame.
+7. **For steps 9 and 10:** a new figure is made in v3 first (two generations), checked with the
+   tool before any clip is made, and made again in pro (ten) only if its head is over 20 px.
+
+**The parasol.** Drawn in code it was a flat red disc with white ovals, and furled a red bar on a
+stick. Both are now PixelLab's (two map objects): an open parasol with gores, a scalloped edge, a
+shaft and a crook handle, and the same one furled; their maroon and pink turned to the life
+rings' red and white in `tools/build_things.py` (`RECOLOUR`), their length cut by taking rows out
+(`CUT_ROWS`) rather than shrinking, which blurs stripes. She holds it by the shaft just above the
+crook, and it turns with her.
+
+**Two more from the same review** (the user: "check her hand placement when she's holding the
+parasol"; "check the woman running on a treadmill... visual overlaps, and the direction she
+faces"):
+
+- **Her hand on the parasol.** It was drawn over her, its shaft across her hair and its crook
+  beside her fist. Her fist was found in the glide's two frames (6 to 9 px in front of her
+  middle, 49 to 53 px over her feet); the shaft now comes up out of it, the crook hangs under
+  it, and the parasol is drawn behind her so the hand is on the shaft. Furled, it leans on the
+  sunbed's foot (it stood by itself once the old lady's bags had gone).
+- **The gym's runner** faced aft, her back to her treadmill's console, and covered its handrail.
+  She faces the console now, stands on the belt behind it, and the machine is drawn again in
+  front of her (`cover`), its handrail across her.
+
+**A change to the plan's method, so that this is found by the build and not by the user** (the
+user: "I want us to learn from the recent corrections"): the faults above passed every check
+the steps had, because those were wide screenshots and tests of behaviour. `docs/build-plan.md`
+"The shape of every step" has a new step 5, **Looking closely**: every person and thing a step
+places is shot enlarged beside her and asked seven things (proportions, does it read, which way
+it faces, what it overlaps, how it is held, what holds it up, each state of the spot). The list
+is in `CLAUDE.md`; the tools are `tools/shoot_people.py`, `tools/check_people.py` and
+`Browser.close_up()` in `tools/playtest.py`. Steps 9 to 11 follow it, and step 8's and earlier
+steps' people are covered by this review's sweep.
+
+**PixelLab spent:** 332 generations (26 figures in pro mode, two of them tries that were not
+used, 260; one v3 try, 2; 38 clips, 68; two map objects, 2). 853 of 2,000 left.
+
+**Where this review stopped (2026-11-13, the day's end, at the user's word):** the whole suite
+passed (582 checks) with the redrawn people, the new parasol and the shrunk diners in. After it
+came three small changes (the furled parasol leaning on the sunbed's foot at 129.12 m, the
+runner's place, her grip on the open parasol), and after those only `region8` was run: it failed once at the gust-timed climb onto the aft terrace at its start (a known flaky jump, not near these changes) and passed on the second run (55 checks).
+What is left of the review is listed in `GAME_DESIGN.md` §8 ("First next time"): the golden path
+and `region6` again, the grip and the leaning parasol seen in the game, the porter and the stage
+manager seen in place, and the sweep of everyone with `tools/shoot_people.py`.

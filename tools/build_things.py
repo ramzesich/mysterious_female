@@ -31,10 +31,31 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # Region 8, deck 12's sun deck: two more, on loungers of their own.
          "sunbather-3": 27, "sunbather-4": 22}
 
+# Colours changed after the palette: PixelLab drew the parasol's stripes maroon and pink; in the
+# game they are the life rings' red and white. name -> {from: to}.
+RECOLOUR = {
+    "parasol-open": {"7a3045": "e83b3b", "9e4539": "e83b3b", "6e2727": "ae2334", "966c6c": "c7dcd0",
+                     "9babb2": "ffffff"},
+    "parasol-closed": {"c32454": "e83b3b", "7a3045": "ae2334", "831c5d": "ae2334", "966c6c": "c7dcd0",
+                       "fdcbb0": "ffffff", "9babb2": "ffffff"},
+}
+# Rows taken out of a piece (its own rows, top to bottom, after trimming) rather than shrinking it,
+# which would blur its stripes: the old lady's parasol came as long as she is tall, open and furled.
+CUT_ROWS = {"parasol-open": [(30, 44)], "parasol-closed": [(16, 28), (45, 50)]}
+# A piece leaning (nothing stands by itself on a crook handle): its rows pushed sideways, one px
+# for every so many rows up from its foot, to the left. The furled parasol leans on the sunbed.
+LEAN = {"parasol-closed": 3}
+
 
 def piece(path):
     img = Image.open(path).convert("RGBA")
     img = img.crop(img.getbbox())
+    if path.stem in CUT_ROWS:
+        for y0, y1 in reversed(CUT_ROWS[path.stem]):
+            cut = Image.new("RGBA", (img.width, img.height - (y1 - y0)), (0, 0, 0, 0))
+            cut.alpha_composite(img.crop((0, 0, img.width, y0)), (0, 0))
+            cut.alpha_composite(img.crop((0, y1, img.width, img.height)), (0, y0))
+            img = cut
     h = SCALE.get(path.stem)
     if h and h != img.height:
         w = max(1, round(img.width * h / img.height))
@@ -45,7 +66,23 @@ def piece(path):
             for x in range(img.width):
                 r, g, b, a = px[x, y]
                 px[x, y] = (r, g, b, 255 if a >= 128 else 0)
-    return palettize(img)
+    img = palettize(img)
+    if path.stem in LEAN:
+        every = LEAN[path.stem]
+        reach = (img.height - 1) // every
+        leant = Image.new("RGBA", (img.width + reach, img.height), (0, 0, 0, 0))
+        for y in range(img.height):
+            leant.alpha_composite(img.crop((0, y, img.width, y + 1)), (reach - (img.height - 1 - y) // every, y))
+        img = leant
+    swaps = {tuple(bytes.fromhex(k)): tuple(bytes.fromhex(v)) for k, v in RECOLOUR.get(path.stem, {}).items()}
+    if swaps:
+        px = img.load()
+        for y in range(img.height):
+            for x in range(img.width):
+                r, g, b, a = px[x, y]
+                if a and (r, g, b) in swaps:
+                    px[x, y] = swaps[(r, g, b)] + (a,)
+    return img
 
 
 def build():

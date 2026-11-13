@@ -140,25 +140,8 @@ export class World {
             g.fillStyle(0xf9c22b, 1).fillRect(1, 3, 6, 8);
             g.fillStyle(0xffffff, 1).fillRect(2, 1, 4, 1).fillRect(2, 5, 4, 3);
         });
-        make('icon-parasol', 14, 30, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(6, 0, 2, 30);
-            g.fillStyle(0xe83b3b, 1).fillRect(4, 2, 6, 16);
-            g.fillStyle(0xffffff, 1).fillRect(6, 2, 2, 16);
-            g.fillStyle(0xab947a, 1).fillRect(5, 27, 4, 3);
-        });
-        // Open: a dome in red and white gores, a point on top, its shaft down to her hands.
-        make('parasol-open', 50, 44, g => {
-            const ink = 0x2e222f, cx = 25, base = 24;
-            g.fillStyle(ink, 1).fillRect(cx - 1, base, 2, 20).fillRect(cx - 1, 0, 2, 4);
-            g.fillStyle(ink, 1).slice(cx, base, 25, Math.PI, Math.PI * 2, false).fillPath();
-            g.fillStyle(0xe83b3b, 1).slice(cx, base, 24, Math.PI, Math.PI * 2, false).fillPath();
-            g.fillStyle(0xffffff, 1);
-            for (const [a, b] of [[-20, -12], [-4, 4], [12, 20]]) g.fillTriangle(cx, 2, cx + a, base, cx + b, base);
-            g.fillStyle(0xae2334, 1).fillRect(cx - 24, base - 1, 48, 1);
-            g.fillStyle(ink, 1).fillRect(cx - 25, base, 50, 1);
-            // (Scallops along its edge.)
-            for (let x = cx - 24; x < cx + 24; x += 8) g.fillStyle(x % 16 === (cx - 24) % 16 ? 0xe83b3b : 0xffffff, 1).fillRect(x + 1, base + 1, 6, 2);
-        });
+        // (The old lady's parasol, furled and open, is PixelLab's: `parasol-closed`, `parasol-open`
+        // among the things.)
         make('switch-box', 14, 22, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 14, 22);
             g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 12, 20);
@@ -1448,7 +1431,10 @@ export class World {
         this.story.update(dt, time, input);
         this.updateQuirks(time);
         this.updateHud();
-        if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -6 : 6), p.y - PLAYER.height + 4).setDepth(p.depth + 0.02);
+        // (Her raised fist is 6 to 9 px in front of her middle, 49 to 53 px over her feet, in both
+        // frames of the glide: the shaft comes up out of it, the crook hangs under it, and the
+        // parasol is drawn behind her so that the hand is on the shaft, not under it.)
+        if (this.parasol?.visible) this.parasol.setPosition(p.x + (p.flipX ? -8 : 8), p.y - PLAYER.height + 18).setFlipX(p.flipX).setDepth(p.depth - 0.01);
     }
 
     // Gusts along the ship's side push her aft while she is in the air (src/world/outside.js).
@@ -1514,7 +1500,7 @@ export class World {
         const s = this.scene;
         if (!this.parasol) {
             if (!on) return;
-            this.parasol = s.add.image(0, 0, 'parasol-open').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.02);
+            this.parasol = s.add.image(0, 0, 'things', 'parasol-open').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.02);
             this.add([this.parasol]);
         }
         this.parasol.setVisible(on);

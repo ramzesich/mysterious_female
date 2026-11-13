@@ -1131,6 +1131,11 @@ lifts at region 3) and the spa's door ("CLOSED", lifts at region 9).
 
 #### 6.1.6 The people
 
+**Decided (the user, 2026-11-13): everyone is drawn to her proportions**, about three and a half
+heads tall (a head of 14 to 20 px on a figure about 60 px; hers is 17 of 59), seated figures
+shrunk so that a seated head comes to her shoulder. Twenty-four of the first 113 were redrawn for
+it; how it is kept and checked is in `tools/cast.py` and `tools/check_people.py`.
+
 Crew are friendly and never scare her; passengers and machinery are the obstacles. Nobody appears
 twice in the same role. Every person needs new character art (a PixelLab character and a few clips
 each; the count is the art budget: about 35 people, built in batches, the crowds from two or three
@@ -1994,11 +1999,39 @@ Nothing blocks the start of the build. These get settled along the way:
       old lady gone, the gulls off the bow), books 8 and 9, the telescope; the parasol: hold jump
       to glide, ↓ + jump over a railing (down the atrium, past the balconies). Playtest `region8`;
       `?at=terrace`, `sundeck`, `technical`, `teppanyaki`, `funnel`
+- [ ] **First next time: finish the art review of 2026-11-13** (the people's proportions, the
+      parasol, the runner: `docs/progress-decisions.md`, "Between steps 8 and 9"). Done and
+      committed: 24 people redrawn with their clips, five seated ones shrunk, the parasol's two
+      pictures, her hand on it, the runner turned to her console, the check "Looking closely"
+      (`CLAUDE.md`) and its tools. The whole suite passed (582 checks) before the last three small
+      changes (the furled parasol moved to lean on the sunbed's foot, the runner's place, her
+      grip); after them only `region8` was run: it failed once at the gust-timed climb onto the aft terrace at its start (a known flaky jump, not near these changes) and passed on the second run (55 checks). **Still to do, in this order:**
+      1. Run `python tools/playtest.py golden region6 region8` (the parasol's pickup moved to
+         129.12 m and the tests' stop to the old lady + 40 px; the gym is on region 6's deck). If
+         `region8` fails at "along the cover and over the rail", it is the gust-timed jump at the
+         test's start: make it wait for a fresh lull as the golden path does.
+      2. See in the game, enlarged (`Browser.close_up()`), what was only composed from the sprites:
+         her fist on the open parasol in the glide, facing each way; the furled parasol leaning on
+         the sunbed with the old lady there and after the horn.
+      3. See the porter with his cart and the stage manager in place: `tools/shoot_people.py`
+         put her in a doorway for the one and the stage was dark for the other. Also not seen in
+         place, only as clips: the buffet queue's two redrawn (the kaftan, the polka dots) and the
+         two behind deck 10's doors (they are not in `world.people.byId`).
+      4. **The sweep:** `python tools/shoot_people.py` over everyone, and look at each sheet for
+         the runner's kind of fault: someone facing away from what they use, covering furniture
+         they should be behind, standing on nothing. Fix what it finds.
+      5. Then commit, and go on to step 9.
+      (Housekeeping, optional: the redrawn people's old frames are in `%TEMP%/bumbusik-old-people/`
+      and their old characters are still on PixelLab, listed in `tools/cast.py`; three tries on
+      PixelLab were not used: `1ea5f29d` and `542c46c0` (the security officer), `896187c3` (the
+      stage manager without his headset).)
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
       step 9 of `docs/build-plan.md`, region 9 (The bow: the wedding and the cake, the chapel, the Spinnaker, the kids' pool, the spa, the officers' corridors, the kids' clubs, the bridge and near-catch 6)**; a step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
-      order. Mark each step done here as it lands
+      order. Mark each step done here as it lands. From step 9 on every new person is checked against
+      her proportions before its clips are made, and every step ends with the close look
+      (`CLAUDE.md`, "Looking closely")
 - [ ] **The outside of the ship is done** (the sea, the background,
       the windows, the far gulls). **Later** (the user, 2026-11-08): closer gulls generated after
       the user's herring gull photo (`reference/photos/european_herring_gull_on_a_railing.heic`;

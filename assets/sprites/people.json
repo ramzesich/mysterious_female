@@ -102,290 +102,293 @@
    "stand": 60,
    "anims": {
     "cart": [
-     62,
      63,
      64,
      65,
      66,
      67,
      68,
-     69
-    ],
-    "push": [
-     70,
-     71,
-     72,
-     73,
-     74,
-     75
+     69,
+     70
     ]
    },
    "fps": {
-    "cart": 8,
-    "push": 8
+    "cart": 8
    },
-   "front": 61
+   "front": 61,
+   "back": 62
   },
   "waiter": {
-   "stand": 76,
+   "stand": 71,
    "anims": {
     "serve": [
+     73,
+     74,
+     75,
+     76,
+     77,
      78,
      79,
-     80,
+     80
+    ],
+    "walk": [
      81,
      82,
      83,
      84,
-     85
-    ],
-    "walk": [
-     86,
-     87,
-     88,
-     89,
-     90,
-     91
+     85,
+     86
     ]
    },
    "fps": {
     "serve": 8,
     "walk": 8
    },
-   "front": 77
+   "front": 72
   },
   "tourist": {
-   "stand": 92,
+   "stand": 87,
    "anims": {
     "idle": [
-     94,
-     95,
-     96,
-     97
+     89,
+     90,
+     91,
+     92
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 93
+   "front": 88
   },
   "robe": {
-   "stand": 98,
+   "stand": 93,
    "anims": {
     "idle": [
-     100,
-     101,
-     102,
-     103
+     95,
+     96,
+     97,
+     98
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 99
+   "front": 94
   },
   "stewardess": {
-   "stand": 104,
+   "stand": 99,
    "anims": {
     "idle": [
-     106,
-     107,
-     108,
-     109
+     101,
+     102,
+     103,
+     104
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 105
+   "front": 100
   },
   "receptionist": {
-   "stand": 110,
+   "stand": 105,
    "anims": {
     "idle": [
-     112,
-     113,
-     114,
-     115
+     108,
+     109,
+     110,
+     111
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 111
+   "front": 106,
+   "back": 107
   },
   "photographer": {
-   "stand": 116,
+   "stand": 112,
    "anims": {
     "idle": [
-     118,
      119,
      120,
-     121
+     121,
+     122
+    ],
+    "idle2": [
+     119,
+     120,
+     121,
+     122
     ]
    },
    "fps": {
-    "idle": 8
+    "idle": 4,
+    "idle2": 8
    },
-   "front": 117
+   "front": 113,
+   "back": 114
   },
   "gentleman": {
-   "stand": 122,
+   "stand": 123,
    "anims": {
     "idle": [
-     124,
      125,
      126,
-     127
+     127,
+     128
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 123
+   "front": 124
   },
   "lady": {
-   "stand": 128,
+   "stand": 129,
    "anims": {
     "idle": [
-     130,
-     131,
      132,
-     133
+     133,
+     134,
+     135
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 129
+   "front": 130,
+   "back": 131
   },
   "cleaner": {
-   "stand": 134,
+   "stand": 136,
    "anims": {
     "mop": [
-     136,
-     137,
-     138,
      139,
      140,
      141,
      142,
-     143
+     143,
+     144,
+     145,
+     146
     ]
    },
    "fps": {
     "mop": 8
    },
-   "front": 135
+   "front": 137,
+   "back": 138
   },
   "agent": {
-   "stand": 144,
+   "stand": 147,
    "anims": {
     "idle": [
-     146,
-     147,
-     148,
-     149
+     149,
+     150,
+     151,
+     152
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 145
+   "front": 148
   },
   "maitre": {
-   "stand": 150,
+   "stand": 153,
    "anims": {
     "idle": [
-     152,
-     153,
-     154,
-     155
+     155,
+     156,
+     157,
+     158
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 151
+   "front": 154
   },
   "chef": {
-   "stand": 156,
+   "stand": 159,
    "anims": {
     "idle": [
-     158,
-     159,
-     160,
-     161
+     161,
+     162,
+     163,
+     164
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 157
+   "front": 160
   },
   "folder": {
-   "stand": 162,
+   "stand": 165,
    "anims": {
     "idle": [
-     164,
-     165,
-     166,
-     167
+     167,
+     168,
+     169,
+     170
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 163
+   "front": 166
   },
   "diner_red": {
-   "stand": 168,
+   "stand": 171,
    "anims": {},
    "fps": {},
-   "front": 169
+   "front": 172
   },
   "diner_suit": {
-   "stand": 170,
+   "stand": 173,
    "anims": {},
    "fps": {},
-   "front": 171
+   "front": 174
   },
   "diner_teal": {
-   "stand": 172,
+   "stand": 175,
    "anims": {},
    "fps": {},
-   "front": 173
+   "front": 176
   },
   "diner_linen": {
-   "stand": 174,
+   "stand": 177,
    "anims": {},
    "fps": {},
-   "front": 175
+   "front": 178
   },
   "librarian": {
-   "stand": 176,
+   "stand": 179,
    "anims": {
     "idle": [
-     179,
-     180,
-     181,
-     182
-    ],
-    "shelve": [
+     182,
      183,
      184,
-     185,
+     185
+    ],
+    "shelve": [
      186,
      187,
-     188
-    ],
-    "shush": [
+     188,
      189,
      190,
-     191,
+     191
+    ],
+    "shush": [
      192,
      193,
-     194
+     194,
+     195,
+     196,
+     197
     ]
    },
    "fps": {
@@ -393,431 +396,441 @@
     "shelve": 7,
     "shush": 6
    },
-   "front": 177,
-   "back": 178
+   "front": 180,
+   "back": 181
   },
   "jogger": {
-   "stand": 195,
+   "stand": 198,
    "anims": {
     "run": [
-     197,
-     198,
-     199,
      200,
      201,
      202,
      203,
-     204
+     204,
+     205,
+     206,
+     207
     ]
    },
    "fps": {
     "run": 12
    },
-   "front": 196
+   "front": 199
   },
   "fitter": {
-   "stand": 205,
+   "stand": 208,
    "anims": {
     "work": [
-     208,
-     209,
-     210,
      211,
      212,
      213,
      214,
-     215
+     215,
+     216,
+     217,
+     218
     ]
    },
    "fps": {
     "work": 6
    },
-   "front": 206,
-   "back": 207
+   "front": 209,
+   "back": 210
   },
   "dj": {
-   "stand": 216,
+   "stand": 219,
    "anims": {
     "bob": [
-     219,
-     220,
-     221,
      222,
      223,
      224,
      225,
-     226
+     226,
+     227,
+     228,
+     229
     ]
    },
    "fps": {
     "bob": 9
    },
-   "front": 217,
-   "back": 218
+   "front": 220,
+   "back": 221
   },
   "barmaid": {
-   "stand": 227,
+   "stand": 230,
    "anims": {
     "idle": [
-     230,
-     231,
-     232,
-     233
+     233,
+     234,
+     235,
+     236
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 228,
-   "back": 229
+   "front": 231,
+   "back": 232
   },
   "studio": {
-   "stand": 234,
+   "stand": 237,
    "anims": {
     "idle": [
-     237,
-     238,
-     239,
-     240
+     240,
+     241,
+     242,
+     243
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 235,
-   "back": 236
+   "front": 238,
+   "back": 239
   },
   "railwoman": {
-   "stand": 241,
+   "stand": 244,
    "anims": {
     "idle": [
-     244,
-     245,
-     246,
-     247
+     247,
+     248,
+     249,
+     250
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 242,
-   "back": 243
+   "front": 245,
+   "back": 246
   },
   "surfer": {
-   "stand": 248,
-   "anims": {},
-   "fps": {},
-   "front": 249,
-   "back": 250
-  },
-  "atriumwoman": {
    "stand": 251,
    "anims": {},
    "fps": {},
    "front": 252,
    "back": 253
   },
-  "railman": {
+  "atriumwoman": {
    "stand": 254,
    "anims": {},
    "fps": {},
    "front": 255,
    "back": 256
   },
-  "maid": {
+  "railman": {
    "stand": 257,
+   "anims": {},
+   "fps": {},
+   "front": 258,
+   "back": 259
+  },
+  "maid": {
+   "stand": 260,
    "anims": {
     "make": [
-     260,
-     261,
-     262,
      263,
      264,
      265,
      266,
-     267
+     267,
+     268,
+     269,
+     270
     ]
    },
    "fps": {
     "make": 6
    },
-   "front": 258,
-   "back": 259
+   "front": 261,
+   "back": 262
   },
   "modelguest": {
-   "stand": 268,
+   "stand": 271,
    "anims": {
     "idle": [
-     271,
-     272,
-     273,
-     274
+     274,
+     275,
+     276,
+     277
     ]
    },
    "fps": {
     "idle": 8
    },
-   "front": 269,
-   "back": 270
+   "front": 272,
+   "back": 273
   },
   "plaquewoman": {
-   "stand": 275,
-   "anims": {},
-   "fps": {},
-   "front": 276,
-   "back": 277
-  },
-  "plaqueman": {
    "stand": 278,
    "anims": {},
    "fps": {},
    "front": 279,
    "back": 280
   },
-  "stagemanager": {
+  "plaqueman": {
    "stand": 281,
+   "anims": {},
+   "fps": {},
+   "front": 282,
+   "back": 283
+  },
+  "stagemanager": {
+   "stand": 284,
    "anims": {
     "flap": [
-     284,
-     285,
-     286,
-     287,
-     288,
-     289
-    ],
-    "idle": [
-     290,
-     291,
-     292,
-     293
-    ],
-    "sneeze": [
      294,
      295,
      296,
      297,
      298,
      299
-    ]
-   },
-   "fps": {
-    "flap": 10,
-    "idle": 4,
-    "sneeze": 9
-   },
-   "front": 282,
-   "back": 283
-  },
-  "dancer_her": {
-   "stand": 300,
-   "anims": {
-    "dance": [
-     303,
+    ],
+    "flap2": [
+     293,
+     294,
+     295,
+     296,
+     297,
+     298,
+     299
+    ],
+    "idle": [
+     300,
+     301,
+     302,
+     303
+    ],
+    "sneeze": [
      304,
      305,
      306,
      307,
      308,
-     309,
-     310
-    ],
-    "sit": [
-     311,
-     312,
+     309
+    ]
+   },
+   "fps": {
+    "flap": 10,
+    "flap2": 8,
+    "idle": 4,
+    "sneeze": 9
+   },
+   "front": 285,
+   "back": 286
+  },
+  "dancer_her": {
+   "stand": 310,
+   "anims": {
+    "dance": [
      313,
      314,
      315,
      316,
      317,
-     318
-    ]
-   },
-   "fps": {
-    "dance": 9,
-    "sit": 8
-   },
-   "front": 301,
-   "back": 302
-  },
-  "dancer_him": {
-   "stand": 319,
-   "anims": {
-    "dance": [
+     318,
+     319,
+     320
+    ],
+    "sit": [
+     321,
      322,
      323,
      324,
      325,
      326,
      327,
-     328,
-     329
-    ],
-    "sit": [
-     330,
-     331,
-     332,
-     333,
-     334,
-     335,
-     336,
-     337
+     328
     ]
    },
    "fps": {
     "dance": 9,
     "sit": 8
    },
-   "front": 320,
-   "back": 321
+   "front": 311,
+   "back": 312
+  },
+  "dancer_him": {
+   "stand": 329,
+   "anims": {
+    "dance": [
+     332,
+     333,
+     334,
+     335,
+     336,
+     337,
+     338,
+     339
+    ],
+    "sit": [
+     340,
+     341,
+     342,
+     343,
+     344,
+     345,
+     346,
+     347
+    ]
+   },
+   "fps": {
+    "dance": 9,
+    "sit": 8
+   },
+   "front": 330,
+   "back": 331
   },
   "croupier": {
-   "stand": 338,
+   "stand": 348,
    "anims": {},
    "fps": {},
-   "front": 339,
-   "back": 340
+   "front": 349,
+   "back": 350
   },
   "cowboy": {
-   "stand": 341,
+   "stand": 351,
    "anims": {},
    "fps": {},
-   "front": 342,
-   "back": 343
-  },
-  "barman": {
-   "stand": 344,
-   "anims": {
-    "idle": [
-     347,
-     348,
-     349,
-     350
-    ]
-   },
-   "fps": {
-    "idle": 4
-   },
-   "front": 345,
-   "back": 346
-  },
-  "shopper": {
-   "stand": 351,
-   "anims": {
-    "idle": [
-     354,
-     355,
-     356,
-     357
-    ]
-   },
-   "fps": {
-    "idle": 4
-   },
    "front": 352,
    "back": 353
   },
-  "teen": {
-   "stand": 358,
-   "anims": {},
-   "fps": {},
-   "front": 359,
-   "back": 360
+  "barman": {
+   "stand": 354,
+   "anims": {
+    "idle": [
+     357,
+     358,
+     359,
+     360
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 355,
+   "back": 356
   },
-  "pianist": {
+  "shopper": {
    "stand": 361,
    "anims": {
-    "play": [
+    "idle": [
      364,
      365,
      366,
-     367,
-     368,
-     369
+     367
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 362,
+   "back": 363
+  },
+  "teen": {
+   "stand": 368,
+   "anims": {},
+   "fps": {},
+   "front": 369,
+   "back": 370
+  },
+  "pianist": {
+   "stand": 371,
+   "anims": {
+    "play": [
+     374,
+     375,
+     376,
+     377,
+     378,
+     379
     ]
    },
    "fps": {
     "play": 8
    },
-   "front": 362,
-   "back": 363
+   "front": 372,
+   "back": 373
   },
   "casinolady": {
-   "stand": 370,
+   "stand": 380,
    "anims": {},
    "fps": {},
-   "front": 371,
-   "back": 372
+   "front": 381,
+   "back": 382
   },
   "aud_gent": {
-   "stand": 373,
+   "stand": 383,
    "anims": {},
    "fps": {},
-   "front": 374,
-   "back": 375
+   "front": 384,
+   "back": 385
   },
   "aud_lady": {
-   "stand": 376,
+   "stand": 386,
    "anims": {},
    "fps": {},
-   "front": 377,
-   "back": 378
+   "front": 387,
+   "back": 388
   },
   "aud_popcorn": {
-   "stand": 379,
+   "stand": 389,
    "anims": {},
    "fps": {},
-   "front": 380,
-   "back": 381
+   "front": 390,
+   "back": 391
   },
   "aud_girl": {
-   "stand": 382,
+   "stand": 392,
    "anims": {},
    "fps": {},
-   "front": 383,
-   "back": 384
+   "front": 393,
+   "back": 394
   },
   "aud_granny": {
-   "stand": 385,
+   "stand": 395,
    "anims": {},
    "fps": {},
-   "front": 386,
-   "back": 387
+   "front": 396,
+   "back": 397
   },
   "steward": {
-   "stand": 388,
+   "stand": 398,
    "anims": {
     "idle": [
-     391,
-     392,
-     393,
-     394
-    ],
-    "thanks": [
-     395,
-     396,
-     397,
-     398,
-     399,
-     400,
      401,
      402,
-     403
+     403,
+     404
     ],
-    "tug": [
-     404,
+    "thanks": [
      405,
      406,
      407,
      408,
-     409
-    ],
-    "walk": [
+     409,
      410,
      411,
      412,
-     413,
+     413
+    ],
+    "tug": [
      414,
-     415
+     415,
+     416,
+     417,
+     418,
+     419
+    ],
+    "walk": [
+     420,
+     421,
+     422,
+     423,
+     424,
+     425
     ]
    },
    "fps": {
@@ -826,90 +839,71 @@
     "tug": 8,
     "walk": 9
    },
-   "front": 389,
-   "back": 390
+   "front": 399,
+   "back": 400
   },
   "bride": {
-   "stand": 416,
+   "stand": 426,
    "anims": {
     "idle": [
-     419,
-     420,
-     421,
-     422
-    ],
-    "kiss": [
-     423,
-     424,
-     425,
-     426,
-     427,
-     428,
      429,
      430,
-     431
-    ]
-   },
-   "fps": {
-    "idle": 4,
-    "kiss": 7
-   },
-   "front": 417,
-   "back": 418
-  },
-  "groom": {
-   "stand": 432,
-   "anims": {
-    "idle": [
+     431,
+     432
+    ],
+    "kiss": [
+     433,
+     434,
      435,
      436,
      437,
-     438
-    ],
-    "kiss": [
+     438,
      439,
      440,
-     441,
-     442,
-     443,
-     444,
-     445,
-     446,
-     447
+     441
     ]
    },
    "fps": {
     "idle": 4,
     "kiss": 7
    },
-   "front": 433,
-   "back": 434
+   "front": 427,
+   "back": 428
   },
-  "spaguest": {
-   "stand": 448,
+  "groom": {
+   "stand": 442,
    "anims": {
-    "shriek": [
+    "idle": [
+     445,
+     446,
+     447,
+     448
+    ],
+    "kiss": [
+     449,
+     450,
      451,
      452,
      453,
      454,
      455,
      456,
-     457,
-     458,
-     459
+     457
     ]
    },
    "fps": {
-    "shriek": 10
+    "idle": 4,
+    "kiss": 7
    },
-   "front": 449,
-   "back": 450
+   "front": 443,
+   "back": 444
   },
-  "kid": {
-   "stand": 460,
+  "spaguest": {
+   "stand": 458,
    "anims": {
-    "eat": [
+    "shriek": [
+     461,
+     462,
      463,
      464,
      465,
@@ -917,29 +911,48 @@
      467,
      468,
      469
-    ],
-    "idle": [
-     470,
-     471,
-     472,
-     473
-    ],
-    "squirt": [
+    ]
+   },
+   "fps": {
+    "shriek": 10
+   },
+   "front": 459,
+   "back": 460
+  },
+  "kid": {
+   "stand": 470,
+   "anims": {
+    "eat": [
+     473,
      474,
      475,
      476,
      477,
      478,
-     479,
-     480
+     479
     ],
-    "walk": [
+    "idle": [
+     480,
      481,
      482,
-     483,
+     483
+    ],
+    "squirt": [
      484,
      485,
-     486
+     486,
+     487,
+     488,
+     489,
+     490
+    ],
+    "walk": [
+     491,
+     492,
+     493,
+     494,
+     495,
+     496
     ]
    },
    "fps": {
@@ -948,645 +961,645 @@
     "squirt": 11,
     "walk": 8
    },
-   "front": 461,
-   "back": 462
+   "front": 471,
+   "back": 472
   },
   "bedmaker": {
-   "stand": 487,
+   "stand": 497,
    "anims": {
     "make": [
-     490,
-     491,
-     492,
-     493,
-     494,
-     495,
-     496,
-     497,
-     498
+     500,
+     501,
+     502,
+     503,
+     504,
+     505,
+     506,
+     507,
+     508
     ]
    },
    "fps": {
     "make": 8
    },
-   "front": 488,
-   "back": 489
+   "front": 498,
+   "back": 499
   },
   "domeman": {
-   "stand": 499,
+   "stand": 509,
    "anims": {
     "idle": [
-     502,
-     503,
-     504,
-     505
+     512,
+     513,
+     514,
+     515
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 500,
-   "back": 501
+   "front": 510,
+   "back": 511
   },
   "bagslady": {
-   "stand": 506,
+   "stand": 516,
    "anims": {
     "walk": [
-     509,
-     510,
-     511,
-     512,
-     513,
-     514
+     519,
+     520,
+     521,
+     522,
+     523,
+     524
     ]
    },
    "fps": {
     "walk": 8
    },
-   "front": 507,
-   "back": 508
+   "front": 517,
+   "back": 518
   },
   "planman": {
-   "stand": 515,
+   "stand": 525,
    "anims": {},
    "fps": {},
-   "front": 516,
-   "back": 517
+   "front": 526,
+   "back": 527
   },
   "rival_towel": {
-   "stand": 518,
+   "stand": 528,
    "anims": {},
    "fps": {},
-   "front": 519,
-   "back": 520
+   "front": 529,
+   "back": 530
   },
   "partygirl": {
-   "stand": 521,
+   "stand": 531,
    "anims": {
     "dance": [
-     524,
-     525,
-     526,
-     527,
-     528,
-     529,
-     530,
-     531
-    ]
-   },
-   "fps": {
-    "dance": 9
-   },
-   "front": 522,
-   "back": 523
-  },
-  "queue_a": {
-   "stand": 532,
-   "anims": {
-    "walk": [
+     534,
      535,
      536,
      537,
      538,
      539,
-     540
+     540,
+     541
     ]
    },
    "fps": {
-    "walk": 6
+    "dance": 9
    },
-   "front": 533,
-   "back": 534
+   "front": 532,
+   "back": 533
   },
-  "queue_b": {
-   "stand": 541,
+  "queue_a": {
+   "stand": 542,
    "anims": {
     "walk": [
-     544,
      545,
      546,
      547,
      548,
-     549
+     549,
+     550
     ]
    },
    "fps": {
     "walk": 6
    },
-   "front": 542,
-   "back": 543
+   "front": 543,
+   "back": 544
   },
-  "queue_c": {
-   "stand": 550,
+  "queue_b": {
+   "stand": 551,
    "anims": {
     "walk": [
-     553,
      554,
      555,
      556,
      557,
-     558
+     558,
+     559
     ]
    },
    "fps": {
     "walk": 6
    },
-   "front": 551,
-   "back": 552
+   "front": 552,
+   "back": 553
   },
-  "queue_d": {
-   "stand": 559,
+  "queue_c": {
+   "stand": 560,
    "anims": {
     "walk": [
-     562,
      563,
      564,
      565,
      566,
-     567
+     567,
+     568
     ]
    },
    "fps": {
     "walk": 6
    },
-   "front": 560,
-   "back": 561
+   "front": 561,
+   "back": 562
   },
-  "queue_e": {
-   "stand": 568,
+  "queue_d": {
+   "stand": 569,
    "anims": {
     "walk": [
-     571,
      572,
      573,
      574,
      575,
-     576
+     576,
+     577
     ]
    },
    "fps": {
     "walk": 6
    },
-   "front": 569,
-   "back": 570
+   "front": 570,
+   "back": 571
   },
-  "queue_f": {
-   "stand": 577,
+  "queue_e": {
+   "stand": 578,
    "anims": {
     "walk": [
-     580,
      581,
      582,
      583,
      584,
-     585
+     585,
+     586
     ]
    },
    "fps": {
     "walk": 6
    },
-   "front": 578,
-   "back": 579
+   "front": 579,
+   "back": 580
   },
-  "husband": {
-   "stand": 586,
-   "anims": {},
-   "fps": {},
-   "front": 587,
-   "back": 588
-  },
-  "fan_a": {
-   "stand": 589,
+  "queue_f": {
+   "stand": 587,
    "anims": {
-    "cheer": [
+    "walk": [
+     590,
+     591,
      592,
      593,
      594,
-     595,
-     596,
-     597,
-     598,
-     599,
-     600
+     595
     ]
    },
    "fps": {
-    "cheer": 9
+    "walk": 6
    },
-   "front": 590,
-   "back": 591
+   "front": 588,
+   "back": 589
   },
-  "fan_b": {
-   "stand": 601,
+  "husband": {
+   "stand": 596,
+   "anims": {},
+   "fps": {},
+   "front": 597,
+   "back": 598
+  },
+  "fan_a": {
+   "stand": 599,
    "anims": {
     "cheer": [
+     602,
+     603,
      604,
      605,
      606,
      607,
      608,
      609,
-     610,
-     611,
-     612
+     610
     ]
    },
    "fps": {
     "cheer": 9
    },
-   "front": 602,
-   "back": 603
+   "front": 600,
+   "back": 601
   },
-  "fan_c": {
-   "stand": 613,
+  "fan_b": {
+   "stand": 611,
    "anims": {
     "cheer": [
+     614,
+     615,
      616,
      617,
      618,
      619,
      620,
      621,
-     622,
-     623,
-     624
+     622
     ]
    },
    "fps": {
-    "cheer": 7
+    "cheer": 9
    },
-   "front": 614,
-   "back": 615
+   "front": 612,
+   "back": 613
   },
-  "painter": {
-   "stand": 625,
+  "fan_c": {
+   "stand": 623,
    "anims": {
-    "paint": [
+    "cheer": [
+     626,
+     627,
      628,
      629,
      630,
      631,
      632,
      633,
-     634,
-     635,
-     636
+     634
     ]
    },
    "fps": {
-    "paint": 7
+    "cheer": 7
    },
-   "front": 626,
-   "back": 627
+   "front": 624,
+   "back": 625
   },
-  "runner": {
-   "stand": 637,
+  "painter": {
+   "stand": 635,
    "anims": {
-    "run": [
+    "paint": [
+     638,
+     639,
      640,
      641,
      642,
      643,
      644,
      645,
-     646,
-     647
+     646
     ]
    },
    "fps": {
-    "run": 12
+    "paint": 7
    },
-   "front": 638,
-   "back": 639
+   "front": 636,
+   "back": 637
   },
-  "lifter": {
-   "stand": 648,
+  "runner": {
+   "stand": 647,
    "anims": {
-    "curl": [
+    "run": [
+     650,
      651,
      652,
      653,
      654,
      655,
      656,
-     657,
-     658,
-     659
+     657
     ]
    },
    "fps": {
-    "curl": 7
+    "run": 12
    },
-   "front": 649,
-   "back": 650
+   "front": 648,
+   "back": 649
   },
-  "barman_top": {
-   "stand": 660,
+  "lifter": {
+   "stand": 658,
    "anims": {
-    "shake": [
+    "curl": [
+     661,
+     662,
      663,
      664,
      665,
      666,
      667,
      668,
-     669,
-     670,
-     671
+     669
+    ]
+   },
+   "fps": {
+    "curl": 7
+   },
+   "front": 659,
+   "back": 660
+  },
+  "barman_top": {
+   "stand": 670,
+   "anims": {
+    "shake": [
+     673,
+     674,
+     675,
+     676,
+     677,
+     678,
+     679,
+     680,
+     681
     ]
    },
    "fps": {
     "shake": 8
    },
-   "front": 661,
-   "back": 662
+   "front": 671,
+   "back": 672
   },
   "go_reader": {
-   "stand": 672,
+   "stand": 682,
    "anims": {},
    "fps": {},
-   "front": 673,
-   "back": 674
+   "front": 683,
+   "back": 684
   },
   "go_her": {
-   "stand": 675,
+   "stand": 685,
    "anims": {},
    "fps": {},
-   "front": 676,
-   "back": 677
+   "front": 686,
+   "back": 687
   },
   "go_him": {
-   "stand": 678,
+   "stand": 688,
    "anims": {},
    "fps": {},
-   "front": 679,
-   "back": 680
+   "front": 689,
+   "back": 690
   },
   "sleeper": {
-   "stand": 681,
+   "stand": 691,
    "anims": {
     "shriek": [
-     684,
-     685,
-     686,
-     687,
-     688,
-     689,
-     690,
-     691,
-     692
-    ]
-   },
-   "fps": {
-    "shriek": 10
-   },
-   "front": 682,
-   "back": 683
-  },
-  "curlers": {
-   "stand": 693,
-   "anims": {
-    "shriek": [
+     694,
+     695,
      696,
      697,
      698,
      699,
      700,
      701,
-     702,
-     703,
-     704
+     702
     ]
    },
    "fps": {
     "shriek": 10
    },
-   "front": 694,
-   "back": 695
+   "front": 692,
+   "back": 693
   },
-  "hurry": {
-   "stand": 705,
+  "curlers": {
+   "stand": 703,
    "anims": {
-    "idle": [
+    "shriek": [
+     706,
+     707,
      708,
      709,
      710,
-     711
+     711,
+     712,
+     713,
+     714
+    ]
+   },
+   "fps": {
+    "shriek": 10
+   },
+   "front": 704,
+   "back": 705
+  },
+  "hurry": {
+   "stand": 715,
+   "anims": {
+    "idle": [
+     718,
+     719,
+     720,
+     721
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 706,
-   "back": 707
+   "front": 716,
+   "back": 717
   },
   "dnd_shaver": {
-   "stand": 712,
+   "stand": 722,
    "anims": {
     "shriek": [
-     715,
-     716,
-     717,
-     718,
-     719,
-     720,
-     721,
-     722,
-     723
-    ]
-   },
-   "fps": {
-    "shriek": 10
-   },
-   "front": 713,
-   "back": 714
-  },
-  "dnd_facemask": {
-   "stand": 724,
-   "anims": {
-    "shriek": [
+     725,
+     726,
      727,
      728,
      729,
      730,
      731,
      732,
-     733,
-     734,
-     735
+     733
     ]
    },
    "fps": {
     "shriek": 10
    },
-   "front": 725,
-   "back": 726
+   "front": 723,
+   "back": 724
   },
-  "dnd_boxers": {
-   "stand": 736,
+  "dnd_facemask": {
+   "stand": 734,
    "anims": {
     "shriek": [
+     737,
+     738,
      739,
      740,
      741,
      742,
      743,
      744,
-     745,
-     746,
-     747
+     745
     ]
    },
    "fps": {
     "shriek": 10
    },
-   "front": 737,
-   "back": 738
+   "front": 735,
+   "back": 736
   },
-  "dnd_toothbrush": {
-   "stand": 748,
+  "dnd_boxers": {
+   "stand": 746,
    "anims": {
     "shriek": [
+     749,
+     750,
      751,
      752,
      753,
      754,
      755,
      756,
-     757,
-     758,
-     759
+     757
     ]
    },
    "fps": {
     "shriek": 10
    },
-   "front": 749,
-   "back": 750
+   "front": 747,
+   "back": 748
   },
-  "swing_hawaiian": {
-   "stand": 760,
+  "dnd_toothbrush": {
+   "stand": 758,
    "anims": {
-    "idle": [
+    "shriek": [
+     761,
+     762,
      763,
      764,
      765,
-     766
+     766,
+     767,
+     768,
+     769
+    ]
+   },
+   "fps": {
+    "shriek": 10
+   },
+   "front": 759,
+   "back": 760
+  },
+  "swing_hawaiian": {
+   "stand": 770,
+   "anims": {
+    "idle": [
+     773,
+     774,
+     775,
+     776
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 761,
-   "back": 762
+   "front": 771,
+   "back": 772
   },
   "swing_sunhat": {
-   "stand": 767,
+   "stand": 777,
    "anims": {
     "idle": [
-     770,
-     771,
-     772,
-     773
+     780,
+     781,
+     782,
+     783
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 768,
-   "back": 769
+   "front": 778,
+   "back": 779
   },
   "swing_ring": {
-   "stand": 774,
+   "stand": 784,
    "anims": {
     "idle": [
-     777,
-     778,
-     779,
-     780
+     787,
+     788,
+     789,
+     790
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 775,
-   "back": 776
+   "front": 785,
+   "back": 786
   },
   "swing_suit": {
-   "stand": 781,
+   "stand": 791,
    "anims": {
     "idle": [
-     784,
-     785,
-     786,
-     787
-    ]
-   },
-   "fps": {
-    "idle": 4
-   },
-   "front": 782,
-   "back": 783
-  },
-  "steward_rounds": {
-   "stand": 788,
-   "anims": {
-    "push": [
-     791,
-     792,
-     793,
      794,
      795,
      796,
-     797,
-     798,
-     799
+     797
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 792,
+   "back": 793
+  },
+  "steward_rounds": {
+   "stand": 798,
+   "anims": {
+    "push": [
+     801,
+     802,
+     803,
+     804,
+     805,
+     806,
+     807,
+     808,
+     809
     ]
    },
    "fps": {
     "push": 8
    },
-   "front": 789,
-   "back": 790
+   "front": 799,
+   "back": 800
   },
   "balcony_guest": {
-   "stand": 800,
+   "stand": 810,
    "anims": {
     "idle": [
-     803,
-     804,
-     805,
-     806
-    ],
-    "thanks": [
-     807,
-     808,
-     809,
-     810,
-     811,
-     812,
      813,
      814,
-     815
+     815,
+     816
     ],
-    "walk": [
-     816,
+    "thanks": [
      817,
      818,
      819,
      820,
-     821
-    ],
-    "wave": [
+     821,
      822,
      823,
      824,
-     825,
+     825
+    ],
+    "walk": [
      826,
      827,
      828,
      829,
-     830
+     830,
+     831
+    ],
+    "wave": [
+     832,
+     833,
+     834,
+     835,
+     836,
+     837,
+     838,
+     839,
+     840
     ]
    },
    "fps": {
@@ -1595,62 +1608,50 @@
     "walk": 8,
     "wave": 8
    },
-   "front": 801,
-   "back": 802
+   "front": 811,
+   "back": 812
   },
   "drill_winch": {
-   "stand": 831,
+   "stand": 841,
    "anims": {
     "crank": [
-     834,
-     835,
-     836,
-     837,
-     838,
-     839,
-     840,
-     841,
-     842
+     844,
+     845,
+     846,
+     847,
+     848,
+     849,
+     850,
+     851,
+     852
     ]
    },
    "fps": {
     "crank": 8
    },
-   "front": 832,
-   "back": 833
+   "front": 842,
+   "back": 843
   },
   "drill_officer": {
-   "stand": 843,
+   "stand": 853,
    "anims": {
     "idle": [
-     846,
-     847,
-     848,
-     849
+     856,
+     857,
+     858,
+     859
     ]
    },
    "fps": {
     "idle": 4
    },
-   "front": 844,
-   "back": 845
+   "front": 854,
+   "back": 855
   },
   "oldlady": {
-   "stand": 850,
+   "stand": 860,
    "anims": {
     "bolt": [
-     853,
-     854,
-     855,
-     856,
-     857,
-     858,
-     859,
-     860,
-     861
-    ],
-    "doze": [
-     862,
      863,
      864,
      865,
@@ -1658,10 +1659,10 @@
      867,
      868,
      869,
-     870
+     870,
+     871
     ],
-    "glare": [
-     871,
+    "doze": [
      872,
      873,
      874,
@@ -1669,10 +1670,10 @@
      876,
      877,
      878,
-     879
+     879,
+     880
     ],
-    "read": [
-     880,
+    "glare": [
      881,
      882,
      883,
@@ -1680,17 +1681,29 @@
      885,
      886,
      887,
-     888
+     888,
+     889
+    ],
+    "read": [
+     890,
+     891,
+     892,
+     893,
+     894,
+     895,
+     896,
+     897,
+     898
     ],
     "dozing": [
-     868,
-     869,
-     870,
-     869
+     878,
+     879,
+     880,
+     879
     ],
     "fleeing": [
-     860,
-     861
+     870,
+     871
     ]
    },
    "fps": {
@@ -1701,25 +1714,13 @@
     "dozing": 2,
     "fleeing": 9
    },
-   "front": 851,
-   "back": 852
+   "front": 861,
+   "back": 862
   },
   "engineer": {
-   "stand": 889,
+   "stand": 899,
    "anims": {
     "climb": [
-     892,
-     893,
-     894,
-     895,
-     896,
-     897,
-     898,
-     899,
-     900
-    ],
-    "drink": [
-     901,
      902,
      903,
      904,
@@ -1727,53 +1728,65 @@
      906,
      907,
      908,
-     909
+     909,
+     910
     ],
-    "idle": [
-     910,
+    "drink": [
      911,
      912,
-     913
-    ],
-    "read": [
+     913,
      914,
      915,
      916,
      917,
      918,
-     919,
+     919
+    ],
+    "idle": [
      920,
      921,
-     922
+     922,
+     923
     ],
-    "walk": [
-     923,
+    "read": [
      924,
      925,
      926,
      927,
-     928
-    ],
-    "wave": [
+     928,
      929,
      930,
      931,
-     932,
+     932
+    ],
+    "walk": [
      933,
      934,
      935,
      936,
-     937
+     937,
+     938
+    ],
+    "wave": [
+     939,
+     940,
+     941,
+     942,
+     943,
+     944,
+     945,
+     946,
+     947
     ],
     "reading": [
-     918,
-     919,
-     920,
-     921,
-     922,
-     921,
-     920,
-     919
+     928,
+     929,
+     930,
+     931,
+     932,
+     931,
+     930,
+     929
     ]
    },
    "fps": {
@@ -1785,118 +1798,92 @@
     "wave": 8,
     "reading": 3
    },
-   "front": 890,
-   "back": 891
+   "front": 900,
+   "back": 901
   },
   "teppan_chef_a": {
-   "stand": 938,
+   "stand": 948,
    "anims": {
     "flourish": [
-     941,
-     942,
-     943,
-     944,
-     945,
-     946,
-     947,
-     948,
-     949
-    ]
-   },
-   "fps": {
-    "flourish": 10
-   },
-   "front": 939,
-   "back": 940
-  },
-  "teppan_chef_b": {
-   "stand": 950,
-   "anims": {
-    "flourish": [
-     953,
-     954,
-     955,
-     956,
-     957,
-     958,
-     959,
-     960,
-     961
-    ]
-   },
-   "fps": {
-    "flourish": 10
-   },
-   "front": 951,
-   "back": 952
-  },
-  "sushi_chef": {
-   "stand": 962,
-   "anims": {
-    "slice": [
+     961,
+     962,
+     963,
+     964,
      965,
      966,
      967,
-     968,
-     969,
-     970,
-     971,
+     968
+    ],
+    "flourish2": [
+     960,
+     961,
+     962,
+     963,
+     964,
+     965,
+     966,
+     967,
+     968
+    ]
+   },
+   "fps": {
+    "flourish": 10,
+    "flourish2": 8
+   },
+   "front": 949,
+   "back": 950
+  },
+  "teppan_chef_b": {
+   "stand": 969,
+   "anims": {
+    "flourish": [
      972,
-     973
+     973,
+     974,
+     975,
+     976,
+     977,
+     978,
+     979,
+     980
+    ]
+   },
+   "fps": {
+    "flourish": 10
+   },
+   "front": 970,
+   "back": 971
+  },
+  "sushi_chef": {
+   "stand": 981,
+   "anims": {
+    "slice": [
+     984,
+     985,
+     986,
+     987,
+     988,
+     989,
+     990,
+     991,
+     992
     ]
    },
    "fps": {
     "slice": 10
    },
-   "front": 963,
-   "back": 964
+   "front": 982,
+   "back": 983
   },
   "lobos_waiter": {
-   "stand": 974,
+   "stand": 993,
    "anims": {
     "shake": [
-     977,
-     978,
-     979,
-     980,
-     981,
-     982,
-     983,
-     984,
-     985
-    ]
-   },
-   "fps": {
-    "shake": 9
-   },
-   "front": 975,
-   "back": 976
-  },
-  "shuffle_a": {
-   "stand": 986,
-   "anims": {
-    "push": [
-     989,
-     990,
-     991,
-     992,
-     993,
-     994,
-     995,
      996,
-     997
-    ]
-   },
-   "fps": {
-    "push": 6
-   },
-   "front": 987,
-   "back": 988
-  },
-  "shuffle_b": {
-   "stand": 998,
-   "anims": {
-    "idle": [
+     997,
+     998,
+     999,
+     1000,
      1001,
      1002,
      1003,
@@ -1904,115 +1891,152 @@
     ]
    },
    "fps": {
-    "idle": 4
+    "shake": 9
    },
-   "front": 999,
-   "back": 1000
+   "front": 994,
+   "back": 995
   },
-  "champs_a": {
+  "shuffle_a": {
    "stand": 1005,
-   "anims": {},
-   "fps": {},
+   "anims": {
+    "push": [
+     1008,
+     1009,
+     1010,
+     1011,
+     1012,
+     1013,
+     1014,
+     1015,
+     1016
+    ]
+   },
+   "fps": {
+    "push": 6
+   },
    "front": 1006,
    "back": 1007
   },
-  "champs_b": {
-   "stand": 1008,
-   "anims": {},
-   "fps": {},
-   "front": 1009,
-   "back": 1010
-  },
-  "champs_c": {
-   "stand": 1011,
+  "shuffle_b": {
+   "stand": 1017,
    "anims": {
-    "cheer": [
-     1014,
-     1015,
-     1016,
-     1017,
-     1018,
-     1019,
+    "idle": [
      1020,
      1021,
-     1022
+     1022,
+     1023
+    ]
+   },
+   "fps": {
+    "idle": 4
+   },
+   "front": 1018,
+   "back": 1019
+  },
+  "champs_a": {
+   "stand": 1024,
+   "anims": {},
+   "fps": {},
+   "front": 1025,
+   "back": 1026
+  },
+  "champs_b": {
+   "stand": 1027,
+   "anims": {},
+   "fps": {},
+   "front": 1028,
+   "back": 1029
+  },
+  "champs_c": {
+   "stand": 1030,
+   "anims": {
+    "cheer": [
+     1033,
+     1034,
+     1035,
+     1036,
+     1037,
+     1038,
+     1039,
+     1040,
+     1041
     ]
    },
    "fps": {
     "cheer": 8
    },
-   "front": 1012,
-   "back": 1013
+   "front": 1031,
+   "back": 1032
   },
   "cagneys_her": {
-   "stand": 1023,
+   "stand": 1042,
    "anims": {},
    "fps": {},
-   "front": 1024,
-   "back": 1025
+   "front": 1043,
+   "back": 1044
   },
   "cagneys_him": {
-   "stand": 1026,
+   "stand": 1045,
    "anims": {},
    "fps": {},
-   "front": 1027,
-   "back": 1028
+   "front": 1046,
+   "back": 1047
   },
   "sushi_a": {
-   "stand": 1029,
+   "stand": 1048,
    "anims": {},
    "fps": {},
-   "front": 1030,
-   "back": 1031
+   "front": 1049,
+   "back": 1050
   },
   "sushi_b": {
-   "stand": 1032,
+   "stand": 1051,
    "anims": {},
    "fps": {},
-   "front": 1033,
-   "back": 1034
+   "front": 1052,
+   "back": 1053
   },
   "bistro_her": {
-   "stand": 1035,
+   "stand": 1054,
    "anims": {},
    "fps": {},
-   "front": 1036,
-   "back": 1037
+   "front": 1055,
+   "back": 1056
   },
   "bistro_him": {
-   "stand": 1038,
+   "stand": 1057,
    "anims": {},
    "fps": {},
-   "front": 1039,
-   "back": 1040
+   "front": 1058,
+   "back": 1059
   },
   "teppan_1": {
-   "stand": 1041,
+   "stand": 1060,
    "anims": {},
    "fps": {},
-   "front": 1042,
-   "back": 1043
+   "front": 1061,
+   "back": 1062
   },
   "teppan_2": {
-   "stand": 1044,
+   "stand": 1063,
    "anims": {},
    "fps": {},
-   "front": 1045,
-   "back": 1046
+   "front": 1064,
+   "back": 1065
   },
   "teppan_3": {
-   "stand": 1047,
+   "stand": 1066,
    "anims": {},
    "fps": {},
-   "front": 1048,
-   "back": 1049
+   "front": 1067,
+   "back": 1068
   },
   "teppan_4": {
-   "stand": 1050,
+   "stand": 1069,
    "anims": {},
    "fps": {},
-   "front": 1051,
-   "back": 1052
+   "front": 1070,
+   "back": 1071
   }
  }
 }

@@ -149,6 +149,23 @@ class Browser:
         path.write_bytes(base64.b64decode(data))
         return path
 
+    def close_up(self, name, x, y, w=240, h=120, zoom=4, deck=None):
+        """A close look at a spot (`name`-z.png): the camera on (x, y), the middle w x h game px of
+        the view enlarged `zoom` times, hard-edged. `deck`: cut that deck open though she is not on
+        it. What every placed person and thing is checked in (CLAUDE.md, "Looking closely")."""
+        from PIL import Image
+        cut = "null" if deck is None else str(deck)
+        self.eval(f"(() => {{ const s = window.__ship, c = s.cameras.main; s.viewOverride = {cut}; c.stopFollow(); c.centerOn({x}, {y}); }})()")
+        time.sleep(0.8 if deck is not None else 0.4)
+        img = Image.open(self.shot(name))
+        k = img.width / 480                     # the view is 480 game px wide
+        mx, my = img.width / 2, img.height / 2
+        out = OUT / f"{name}-z.png"
+        img.crop((int(mx - w / 2 * k), int(my - h / 2 * k), int(mx + w / 2 * k), int(my + h / 2 * k)))            .resize((w * zoom, h * zoom), Image.NEAREST).save(out)
+        self.eval("(() => { const s = window.__ship, c = s.cameras.main; s.viewOverride = null;"
+                  " c.startFollow(s.player, true, 0.15, 0.15); c.setFollowOffset(0, s.player.height / 2); })()")
+        return out
+
     def close(self):
         try:
             self.ws.close()
@@ -1026,7 +1043,7 @@ def scenario_golden(b):
     ok &= check(take_card(b, "off"), "the Officer's card, dropped on the sun deck")
     lady = b.eval("window.__ship.world.data.topdeck.lady.x")
     b.teleport(lady + 100, D12)
-    hold_until(b, "left", lambda s: s["x"] < lady + 56, 3)
+    hold_until(b, "left", lambda s: s["x"] < lady + 40, 3)
     b.tap("e")
     time.sleep(0.2)
     ok &= check("parasol" in save_list(b, "verbs"), "and the parasol, at the empty sunbed")
@@ -3121,7 +3138,7 @@ def scenario_region8(b):
     # On the sun deck: the card where he dropped it, the parasol and the book at the empty sunbed.
     ok &= check(take_card(b, "off"), "the Officer's card lies on the sun deck")
     b.teleport(L["x"] + 100, D12)
-    s = hold_until(b, "left", lambda s: s["x"] < L["x"] + 56, 3)
+    s = hold_until(b, "left", lambda s: s["x"] < L["x"] + 40, 3)
     b.tap("e")
     time.sleep(0.3)
     ok &= check("parasol" in save_list(b, "verbs"), "her parasol, left leaning on the sunbed", save_list(b, "verbs"))

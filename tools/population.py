@@ -142,7 +142,7 @@ TANGERINES = {
 ITEMS = {
     "item_socks": (11, 95.75, "verb:socks", None, 40),
     # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
-    "item_parasol": (12, 129.62, "verb:parasol", "horn", 0),
+    "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
@@ -303,7 +303,10 @@ PEOPLE = {
     # Bumbot's beat and on the aft pool deck after (the story moves him: src/world/lido.js); the
     # security officer on his knees at a lounger; Topsiders' barman; the painter and the fans on the
     # flights up; her husband at the first table by the ice cream machine; guests at the far tables.
-    "amb_treadmill": dict(at=(11, 86.6), who="runner", face=1, idle="run", layer="back", dy=7),
+    # (The treadmills' consoles are at their forward ends: she faces it, on the belt behind it, and
+    # the machine is drawn again in front of her, its near handrail across her.)
+    "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
+                          cover=[("treadmill-bg", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
     "npc_kid_tub": dict(at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
     "npc_kid": dict(at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
@@ -454,7 +457,7 @@ PROPS = {
     # them); the old lady's parasol leaning on her sunbed while she is there (hers to take after).
     "amb_sun_12a": (12, 136.7, "thing:sunbather-3", 0, dict(back=True)),
     "amb_sun_12b": (12, 138.8, "thing:sunbather-4", 0, dict(back=True, flip=True)),
-    "prop_lady_parasol": (12, 129.62, "@icon-parasol", 0, dict(until="flag:horn")),
+    "prop_lady_parasol": (12, 129.12, "thing:parasol-closed", 0, dict(until="flag:horn")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {

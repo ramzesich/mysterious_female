@@ -51,6 +51,8 @@ truth**: read the relevant section before any design or content work, and record
 | `src/world/topdeck.js` | Region 8: deck 12's and the funnel's own things (the old lady's sunbed, the court's basketballs, Teppanyaki's flares, the funnel's wind and circling gulls, the flocks on the bow) and its part of the story, mixed into the Story (the mojito, the engineer's coffee, the horn and what it sets off, the telescope, the court's shot). The glide's rules are in `verbs.js` and the ship scene (`overTheRail`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
 | `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
+| `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
+| `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
@@ -64,6 +66,42 @@ truth**: read the relevant section before any design or content work, and record
   the word death, in code or on screen.
 - Nothing floats: every object rests on or hangs from something plausible.
 - Sprites face east; west is `flipX`. Background props are muted so they never read as interactive.
+
+## Looking closely: the check on everything placed
+
+The user found three things in step 8's screenshots that the build's own checks had passed (the
+people's mixed proportions, a parasol that did not read as one and was not in her hand, a runner
+with her back to her treadmill's console): the checks had been wide screenshots and tests of
+behaviour, and none of these shows in either (2026-11-13). **So every person and thing a step
+places is looked at enlarged, next to her, before the step is called done,** and these are asked
+of each:
+
+1. **Proportions:** is it drawn to her standard (a person: `python tools/check_people.py`, the
+   head ruler; a thing: its real size next to her 59 px)? The same in every frame of its clips?
+2. **Does it read?** Shown alone at the game's size, would the user name it without being told?
+   A thing drawn in code that is only a few rectangles usually would not: draw it properly or
+   make it a PixelLab map object.
+3. **Which way does it face?** A person using something faces the end they use (a treadmill's
+   console, a bar's counter, a screen, a table's middle). Look at the piece's art to see which
+   end that is: the data's `face` is a guess until it is seen.
+4. **What does it overlap, and in what order?** Someone inside or at a piece of furniture has
+   the part nearer to us drawn in front of them (`cover` in `tools/population.py`: a handrail, a
+   counter). A body through a post, a head through a sign, feet in a table are wrong.
+5. **Is it held?** For anything in a hand, hers or theirs: find the fist's pixels in every frame
+   of the clip, put the thing's grip there, and draw the hand over it (the thing behind the
+   figure), not the thing over the hand. Compose the sprite and the thing at the game's offsets
+   and look at it at 8x before trusting it.
+6. **What holds it up?** Nothing floats, and nothing stands that could not: a furled parasol
+   leans on something, a cup is on a surface, a seated person has a seat under them.
+7. **Before and after:** look at the spot in each state the story gives it (the old lady there
+   and gone), since what a thing leaned on may leave.
+
+Tools: `Browser.close_up()` in `tools/playtest.py` (a spot enlarged, a deck cut open while she is
+elsewhere); `python tools/shoot_people.py [ids]` (every person in place, tiled);
+`python tools/check_people.py` (proportions, heads, clips). Composing sprites offline with PIL at
+the game's offsets is exact and needs no browser. When one instance of a fault is found, look
+for the rest of its kind at once (one chibi figure meant twenty-four; one seated figure too big
+meant five).
 
 ## Art: PixelLab (MCP)
 
@@ -177,6 +215,34 @@ Lessons learned (2026-11-08, the background, the windows, the cabin's shower):
   at her column at that deck's height (`updateDeckDim()`). Things on other decks are drawn in front
   of her (`DEPTH.player + ...`), so a dim that must cover them goes above her too and clears the
   part she is in.
+
+Lessons learned (2026-11-13, the people's proportions):
+
+- **Everyone is drawn to her proportions** (the user): a head of 14 to 20 px, hair in and hats out,
+  on a figure about 60 px tall (hers: 17 of 59). v3 characters from text come out chibi about one
+  time in five (a 22 to 25 px head on a squat body), and no wording prevents it. Check each new
+  figure with `python tools/check_people.py --heads <name>` before making clips.
+- **What holds the proportions: `create_character(mode="pro", style_character_id=...)`**, size 64,
+  view "side" (ten generations): the drill's officer `3ed991ae-cf74-4ce1-a636-8549344290a6` for
+  men, the cabin maid `4677d8f1-5586-41e1-b13e-53d9bdd49ffc` for women. Build and things asked
+  for in the description still come ("stout, round belly", "holding a net").
+- **A seated figure comes as tall as a standing one:** give it `"scale": 0.8` in `tools/cast.py`.
+- A template clip (breathing-idle, walking) redraws the figure and may shrink it by half a head;
+  `mode="skeleton-v3"` with the same `template_animation_id` (three generations) keeps its size.
+- v3 text clips may turn the figure to face us or draw effects (sparks) into the frames: look at
+  every frame (`check_people.py --clips`), and ask for "seen from the side the whole time".
+- The game plays clips that `tools/cast.py` does not name (its dict is only their speeds): before
+  replacing a character, list the clip folders in `assets/source/people/<name>/` and what
+  `tools/population.py` and `src/world/*.js` ask of it. The download of a character is refused
+  (HTTP 423) while one of its animations is still being made.
+- **A held thing is placed by her fist, not by eye:** the parasol sat 8 px off her hand and was
+  drawn over it. Her fist in the glide's frames is 6 to 9 px in front of her middle and 49 to 53 px
+  over her feet; the shaft comes out of it and the parasol is drawn behind her.
+- **A person on a machine:** the gym's runner faced away from her treadmill's console and covered
+  its handrail. Check each piece's working end in its art, and give the person `cover` so the
+  near part of the machine is in front of them.
+- **A thing with stripes is cut shorter, not shrunk** (`CUT_ROWS` in `tools/build_things.py`), and
+  PixelLab's muddy reds are swapped for the palette's after the conversion (`RECOLOUR`).
 
 ## Working with the user
 

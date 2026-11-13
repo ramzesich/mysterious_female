@@ -8,6 +8,20 @@ height and nearest her look (2026-11-13; a "standard" one was 71 px tall and rea
 made with animate_character, east only: a template clip, or skeleton-v3 with one of its moves
 (walk, eat, talk, sit_seat...) and poses on top.
 
+**Proportions (the user, 2026-11-13): everyone is drawn to her standard,** a head (hair in, hats
+and buns out) of 14 to 20 px on a figure about 60 px tall: hers is 17 of 59. v3 from text does not
+keep to it whatever the description says ("realistic proportions, small head" still came out with
+a 24 px head): twenty-four of the first hundred came out chibi or near it and were redrawn. **What keeps it:
+mode="pro" with style_character_id** = a figure that has it (the drill's officer
+3ed991ae-cf74-4ce1-a636-8549344290a6 for men, the cabin maid 4677d8f1-5586-41e1-b13e-53d9bdd49ffc
+for women), size 64, view "side": ten generations each, a strict side view. Check a new figure
+with `python tools/check_people.py` before placing it. The first characters of those, kept on
+PixelLab: rival 68ef5f08, porter 3ad54560, lady 45a8f48c, stagemanager 0c00142e, steward f2cc7401, groom 0c16e385, queue_d 4ae6c188, sleeper 071b5059, curlers 2ad7be74, teppan_chef_b 0ed63716, champs_b 81fa22b4, photographer 89836c72, fan_a 91c28911, fan_b 23af878f, runner c63d9718, cleaner 47c5aa91, dj d1ef2972, fan_c 25aa68a6, receptionist b0851098, librarian 10f3bef9, queue_b ec3c837c, teppan_chef_a 9190cb8c, lobos_waiter 64db2435, champs_a 5f10becb.
+
+A template clip (breathing-idle, walking) redraws the figure and can shrink it by half a head: for a
+figure that is seen both standing and in the clip, make it with mode="skeleton-v3" and the same
+template_animation_id (three generations), which keeps its size (the photographer's "idle2").
+
 name: (character id, {clip: frames per second}, options). A clip is an animation of that name on
 the character; "stand" is its standing pose. Options: "flip": the sprite was drawn facing west;
 "scale": shrunk by that much (a seated figure that came out as tall as the standing ones); "cut":
@@ -17,31 +31,32 @@ the character; "stand" is its standing pose. Options: "flip": the sprite was dra
 CAST = {
     # Region 1.
     "officer": ("4d3e6422-a934-40e0-a47d-e841378610ae", {}, {}),
-    "rival": ("68ef5f08-d2be-4f41-ad76-5831039110c3", {"trip": 12, "peek": 5}, {}),
-    "porter": ("3ad54560-70f4-4b3c-8ab0-60b0be9ca97e", {}, {}),
+    "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5}, {}),
+    "porter": ("00c30095-76c1-4898-a423-34f740532970", {}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
     "robe": ("9d68ff5f-80b7-4187-86a9-7cd9eff01bed", {}, {}),
     "stewardess": ("29866bd3-ce11-4319-8e99-7d6de7ffaef8", {}, {}),
-    "receptionist": ("b0851098-7398-456a-a950-c1b5367d4d53", {}, {}),
-    "photographer": ("89836c72-c724-4013-a128-46519a7a8976", {}, {}),
+    "receptionist": ("8adf75c5-2558-4a05-aa70-b0f9749f1348", {}, {}),
+    "photographer": ("5e90962a-b76e-453f-a096-265ee177de4f", {"idle": 4}, {"cut": {"idle": ("idle2", [0, 1, 2, 3])}}),
     "gentleman": ("4a0085ce-78f1-476c-8863-3f3fc461190f", {}, {}),
-    "lady": ("45a8f48c-7fd9-4067-9173-7cb7d82c21d7", {}, {}),
-    "cleaner": ("47c5aa91-e4f6-471b-bc77-280aeba5feb8", {}, {}),
+    "lady": ("e321871f-7108-427e-bd99-c4e260ed9428", {}, {}),
+    "cleaner": ("efe40b7d-0352-4356-bf82-dc77f19def4d", {}, {}),
     "agent": ("4f239177-54ca-4b07-b1e6-7d9475c8d35b", {}, {}),
     "maitre": ("8336eefc-5d4f-452c-b70d-d3ca545505c8", {}, {}),
     "chef": ("6ca50f05-0ef1-4094-af3c-9ec00846cd36", {}, {}),
     "folder": ("fe49270a-7cd3-4f5d-84ee-3e47316bc16f", {}, {}),
-    # Diners, drawn seated on their own dining chairs (they stand in a chair's place at a table).
-    "diner_red": ("6dc96ff4-58fc-4a8d-b5c7-1bb111a772fc", {}, {}),
-    "diner_suit": ("126b575d-bac9-4369-a721-7aa957e0bb5f", {}, {}),
-    "diner_teal": ("f2700aec-2d7f-48b8-8025-4313be63f2ce", {}, {}),
-    "diner_linen": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {}),
+    # Diners, drawn seated on their own dining chairs (they stand in a chair's place at a table),
+    # shrunk like every seated figure: PixelLab draws a seated one as tall as a standing one.
+    "diner_red": ("6dc96ff4-58fc-4a8d-b5c7-1bb111a772fc", {}, {"scale": 0.8}),
+    "diner_suit": ("126b575d-bac9-4369-a721-7aa957e0bb5f", {}, {"scale": 0.8}),
+    "diner_teal": ("f2700aec-2d7f-48b8-8025-4313be63f2ce", {}, {"scale": 0.8}),
+    "diner_linen": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
     # Region 2.
-    "librarian": ("10f3bef9-74d9-47f9-af84-f36ec73cb625", {"shelve": 7, "idle": 4, "shush": 6}, {}),
+    "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6}, {}),
     "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12}, {}),
     "fitter": ("e0de11f2-246a-40cc-b9e6-3f374eb03d66", {"work": 6}, {}),
-    "dj": ("d1ef2972-5ac8-41fe-9a95-09bc4c9a7bc3", {"bob": 9}, {}),
+    "dj": ("68e66eb2-4d14-48c8-9acc-37bb6d1001aa", {"bob": 9}, {}),
     "barmaid": ("a0121f2c-c4ee-4b9f-a230-c20e513d118f", {}, {}),
     "studio": ("c8b8807b-8583-4513-9db2-c3066f6d172e", {}, {}),
     # (Drawn leaning back on a rail of her own, a life ring behind her: for an open deck, where the
@@ -58,7 +73,10 @@ CAST = {
     "plaquewoman": ("da2e0888-a560-4557-9f72-ad92e4f5e772", {}, {}),
     "plaqueman": ("e41a23e9-edd4-4784-8de8-33b29d2de61e", {}, {}),
     # Region 3.
-    "stagemanager": ("0c00142e-0038-4dcc-8c93-7c0741317385", {"sneeze": 9, "flap": 10, "idle": 4}, {}),
+    # (The stage manager's "flap" is his second, "flap2": the first, from poses, hardly moved the arms
+    # that hold his clipboard.)
+    "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4},
+                     {"cut": {"flap": ("flap2", [1, 2, 3, 4, 5, 6])}}),
     "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9}, {}),
     "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9}, {}),
     "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
@@ -75,9 +93,9 @@ CAST = {
     "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"scale": 0.8}),
     "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"scale": 0.8}),
     # Region 4 (Housekeeping): deck 9's corridor, the atrium walks, the laundry.
-    "steward": ("f2cc7401-693f-4f93-8915-f3f040c2658c", {"idle": 4, "tug": 8, "walk": 9, "thanks": 8}, {}),
+    "steward": ("88741662-8a90-437a-bca4-c996663761ff", {"idle": 4, "tug": 8, "walk": 9, "thanks": 8}, {}),
     "bride": ("70b0bc20-aef9-46aa-bd9d-35f56c4c0008", {"idle": 4, "kiss": 7}, {}),
-    "groom": ("0c16e385-6331-4d44-87dc-060e70835055", {"idle": 4, "kiss": 7}, {}),
+    "groom": ("146b63d6-6f03-4675-9b0a-5d79914315ba", {"idle": 4, "kiss": 7}, {}),
     "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
     # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
     "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4, "walk": 8, "squirt": 11, "eat": 6}, {"scale": 0.72}),
@@ -92,21 +110,21 @@ CAST = {
     # Region 6 (Lido, deck 11). The buffet queue's six, each carrying a tray of their own; the fans
     # on the aft stairs.
     "queue_a": ("7f5590e5-ce63-4740-a8fa-b5b0ddb79795", {"walk": 6}, {}),
-    "queue_b": ("ec3c837c-dde4-4147-a113-5ff683c14c9e", {"walk": 6}, {}),
+    "queue_b": ("84bf7071-becd-4d3a-8f93-686affe25c02", {"walk": 6}, {}),
     "queue_c": ("25221bc8-5291-46c9-b1fe-a3ef2dfd5ba9", {"walk": 6}, {}),
-    "queue_d": ("4ae6c188-d115-4acb-9ca0-e2cc294966cf", {"walk": 6}, {}),
+    "queue_d": ("709fc84f-77bc-4693-bb48-4a1de35ba6e5", {"walk": 6}, {}),
     "queue_e": ("7d1f88c4-005b-4752-aad5-c86958b996bb", {"walk": 6}, {}),
     "queue_f": ("096244bc-9c59-49bc-8d8d-e0d0483d5c60", {"walk": 6}, {}),
     # Her husband, at the first table of the Great Outdoors. A STAND-IN until the user's photo comes:
     # the linen-shirted diner's character. Replace this id with his own character's.
-    "husband": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {}),
-    "fan_a": ("91c28911-98b0-4167-8ca7-06edc793b5a8", {"cheer": 9}, {}),
-    "fan_b": ("23af878f-1c70-4d98-bf25-43f971781103", {"cheer": 9}, {}),
-    "fan_c": ("25aa68a6-c806-4f18-a5c4-cfc4a8fb5983", {"cheer": 7}, {}),
+    "husband": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
+    "fan_a": ("dc207d50-0515-4a17-b85e-03130517536d", {"cheer": 9}, {}),
+    "fan_b": ("76e60a27-a813-4456-8d85-e7830eb21730", {"cheer": 9}, {}),
+    "fan_c": ("beeb5d2c-2cc0-4145-98d0-b570504269aa", {"cheer": 7}, {}),
     # The painter on the midship flight up; the gym's two; Topsiders' barman; guests at the Great
     # Outdoors' far tables, each seated on a wicker chair of their own.
     "painter": ("65140f65-b4ef-4826-9b38-f214bafbcbf6", {"paint": 7}, {}),
-    "runner": ("c63d9718-4141-45bd-a4f7-c2e637f8edfe", {"run": 12}, {}),
+    "runner": ("134f92ce-a8aa-42a8-9a03-ec6539e27d08", {"run": 12}, {}),
     "lifter": ("f0fd3504-2ccd-4982-91a9-55e0f6ba4863", {"curl": 7}, {}),
     "barman_top": ("9dca3658-e553-4840-8dc1-16f2be45f8e6", {"shake": 8}, {}),
     "go_reader": ("5f4c8274-b10f-4549-9073-245277a981a5", {}, {"scale": 0.8}),
@@ -117,8 +135,8 @@ CAST = {
     # (First tries of the two behind the doors, 977c3e8e-4a5b-4e97-b41b-3b09a4917960 and
     # 0be059cb-aed5-4750-aa55-acc699881d77, came with a doorway drawn into the sprite: their
     # descriptions said "in the cabin doorway".)
-    "sleeper": ("071b5059-4fef-4ea8-abfd-0b6784aec60d", {"shriek": 10}, {}),
-    "curlers": ("2ad7be74-3c6d-4947-a58c-aafc96d29f82", {"shriek": 10}, {}),
+    "sleeper": ("99d9d8bf-34fc-4265-86b5-1f5f6a176657", {"shriek": 10}, {}),
+    "curlers": ("08f18b17-7aeb-4779-b22f-038849dff7d3", {"shriek": 10}, {}),
     "hurry": ("c17f28af-31b2-4a7b-8094-b0dfde83b7ff", {"idle": 4}, {}),
     # Region 7 (Outside). Behind the hallways' "Do Not Disturb" doors (decks 8 and 10), none dressed
     # for visitors; behind the doors that fly open; the steward on his rounds on deck 8; the guest
@@ -141,14 +159,17 @@ CAST = {
                 {"scale": 0.8, "cut": {"dozing": ("doze", [6, 7, 8, 7]), "fleeing": ("bolt", [7, 8])}}),
     "engineer": ("819d8399-a91f-48d5-a2b1-47dfd0691eff", {"idle": 4, "walk": 8, "drink": 6, "wave": 8, "climb": 9, "read": 4, "reading": 3},
                  {"cut": {"reading": ("read", [4, 5, 6, 7, 8, 7, 6, 5])}}),
-    "teppan_chef_a": ("9190cb8c-6aae-4d16-8a38-a2a81f8973ec", {"flourish": 10}, {}),
-    "teppan_chef_b": ("0ed63716-52c2-41e8-af6c-92b069690a24", {"flourish": 10}, {}),
+    # (The first chef's "flourish" is his second, "flourish2": in the first he turned to face us and
+    # sparks were drawn into the frames.)
+    "teppan_chef_a": ("64b21a54-a081-444c-8ab3-c911eb069453", {"flourish": 10},
+                      {"cut": {"flourish": ("flourish2", [1, 2, 3, 4, 5, 6, 7, 8])}}),
+    "teppan_chef_b": ("2598efbb-c8a0-4125-a731-7c43ec6f8a26", {"flourish": 10}, {}),
     "sushi_chef": ("1114fd50-c3d7-43f8-9641-0aa91b6f4e49", {"slice": 10}, {}),
-    "lobos_waiter": ("64db2435-6028-4c5e-9acb-872151602a96", {"shake": 9}, {}),
+    "lobos_waiter": ("0d3e8eeb-65c4-42e6-8367-ee902890f063", {"shake": 9}, {}),
     "shuffle_a": ("6f8f13f9-7b6d-41de-950f-a548cd4f1449", {"push": 6}, {}),
     "shuffle_b": ("a52e43f1-5bb8-437c-856e-c650ccfc8a5b", {"idle": 4}, {}),
-    "champs_a": ("5f10becb-41fb-4efc-a5e3-9a7c88563c9b", {}, {}),
-    "champs_b": ("81fa22b4-2fcc-4f67-b30f-9163f4e7cd66", {}, {}),
+    "champs_a": ("0f1e2f4d-b920-48a0-af67-78c769d69054", {}, {}),
+    "champs_b": ("3d41e4f4-0058-47d8-bf6a-03c3e82226b4", {}, {}),
     "champs_c": ("65193a43-d567-4270-85ef-74b2632f7861", {"cheer": 8}, {"scale": 0.8}),
     "cagneys_her": ("c3fb03be-54f7-4b0e-aade-1d7134d3b66f", {}, {"scale": 0.8}),
     "cagneys_him": ("cbf3d679-01a3-4ab8-9be2-b4c56be18426", {}, {"scale": 0.8}),
