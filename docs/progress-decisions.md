@@ -1343,7 +1343,10 @@ be built until they say so.
      as good. We need to fix Bumbot's face a little bit", "Smooth up his outline on the left",
      "Above the eye": the ear's outer edge stood a pixel in from the cheek's and left a notch
      at the eye; three pixels close it (in `bumbot_picture()`). Shown before and after; the
-     user: "Keep". Its door is the start's checkpoint (`cp_crew`), lit from the start; the
+     user: "Keep". And of the bowl on her desk: "a nice touch, but they don't read as
+     tangerines as clearly if you don't know that they are supposed to be tangerines": the
+     three fruit are the game's own tangerine now, the sprite she picks up and the HUD counts,
+     pixel for pixel with its leaf, in a shallower bowl (`game_tangerine()`). Its door is the start's checkpoint (`cp_crew`), lit from the start; the
      gangway's (`cp_gangway`) lights when she first passes it, like any other.
    - **The ladder is an escape trunk** (decks 3 and 4, no card), the game's own way of putting a
      ladder behind a door. On deck 4 it comes out at 95.6 m in the place of one cabin door.

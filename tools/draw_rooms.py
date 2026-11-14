@@ -279,7 +279,7 @@ def crewcabin(width):
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
     R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
-    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2", BUMBOT_EYES, BUMBOT_GROUND)
+    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2", BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
     r, box, d = R.r, R.box, R.d
     # The wallpaper: a pinstripe every 8 px, a sprig between them every 12 px down, row about.
     for x in range(4, width, 8):
@@ -317,11 +317,17 @@ def crewcabin(width):
     r(108, FLOOR - 40, 109, FLOOR - 31, DARK)                  # the lamp
     r(105, FLOOR - 44, 113, FLOOR - 40, YELLOW)
     r(106, FLOOR - 39, 112, FLOOR - 39, ORANGE)
-    box(121, FLOOR - 34, 133, FLOOR - 31, BLUE, INK)           # the bowl
-    for x in (123, 127, 130):
-        d.ellipse([x - 2, FLOOR - 38, x + 2, FLOOR - 34], fill=ORANGE, outline=INK)
-    d.ellipse([125 - 2, FLOOR - 41, 125 + 2, FLOOR - 37], fill=ORANGE, outline=INK)
-    d.point((125, FLOOR - 42), fill=GREEN)
+    # The bowl of tangerines (the user: they must read as tangerines to someone not told): the
+    # game's own tangerine, the one she picks up and the HUD counts, pixel for pixel, each with
+    # its leaf; two in the bowl and one on top of them.
+    for x, y in ((117, FLOOR - 41), (124, FLOOR - 41), (121, FLOOR - 46)):
+        game_tangerine(R, x, y)
+    r(117, FLOOR - 35, 132, FLOOR - 35, BLUE_LIGHT)            # the bowl's rim
+    r(117, FLOOR - 34, 132, FLOOR - 33, BLUE)
+    r(119, FLOOR - 32, 130, FLOOR - 31, BLUE)
+    r(118, FLOOR - 32, 118, FLOOR - 32, BLUE)
+    r(131, FLOOR - 32, 131, FLOOR - 32, BLUE)
+    r(119, FLOOR - 31, 130, FLOOR - 31, "#4d65b4")
     box(136, FLOOR - 36, 139, FLOOR - 31, RED, INK)            # the mug
     stand(R.im, "chair", 128)
     # The porthole: brass, the sky and the sea in it, the horizon a little under its middle.
@@ -363,6 +369,17 @@ def crewcabin(width):
 
 
 BUMBOT_EYES, BUMBOT_GROUND = "#cdd38a", "#f3ecdd"
+# The game's tangerine (`SPRITES.tangerine` in src/textures.js) and its three colours.
+TANGERINE = ["....ll..", "...lll..", "..oooo..", ".oooooo.", ".oooooO.", ".ooooOO.", "..oOOO.."]
+TANGERINE_COLOURS = {"o": "#f28c28", "O": "#d9711a", "l": "#4c9a2a"}
+
+
+def game_tangerine(R, x, y):
+    """The game's own tangerine, its 8 px cell's top left at (x, y)."""
+    for j, row in enumerate(TANGERINE):
+        for i, ch in enumerate(row):
+            if ch != ".":
+                R.d.point((x + i, y + j), fill=TANGERINE_COLOURS[ch])
 
 
 def bumbot_picture():
