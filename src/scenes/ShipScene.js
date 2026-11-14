@@ -91,6 +91,15 @@ export class ShipScene extends Phaser.Scene {
         this.buildMap();
         this.buildObjects();
         this.world.build();
+        // What the plan puts inside a deck in front of her (the ball pit's front wall, the pillow
+        // fort) is behind the ship's side from outside: it shows only as its deck is cut open
+        // (found in step 11's render of the whole ship: both showed through the closed side).
+        for (const t of this.world.things) {
+            if (t.route !== 'inside') continue;
+            for (const i of t.items || []) {
+                if (i.depth > DEPTH.exterior && i.depth < DEPTH.deckDim) this.behindShell(i, t.x ?? i.x, t.y ?? i.y);
+            }
+        }
         this.buildPlayer();
         this.world.addColliders(this.player);
         this.buildCameras();
@@ -116,6 +125,7 @@ export class ShipScene extends Phaser.Scene {
         const props = Array.isArray(map.properties)
             ? Object.fromEntries(map.properties.map(p => [p.name, p.value]))
             : map.properties || {};
+        this.mapProps = props;
         this.deckPitch = props.deckPitch;
         this.hullMinX = props.hullMinX;
         this.hullMaxX = props.hullMaxX;
@@ -164,7 +174,7 @@ export class ShipScene extends Phaser.Scene {
             }
         }
         this.deckFloors = JSON.parse(props.deckFloors);
-        const cut = new Set(String(props.exteriorCut).split(',').map(Number));
+        const cut = this.cutIds = new Set(String(props.exteriorCut).split(',').map(Number));
         this.shellTiles = {};
         this.shellAlpha = {};
         // A room with its own piece of shell (the bridge): cut away while she is in it, the rest of
@@ -186,8 +196,10 @@ export class ShipScene extends Phaser.Scene {
         this.cutShadows = {};
         // Where the deck ends in the ship's wall, a strip of that wall is drawn over her, so as she
         // runs into it, she goes behind it (the user, 2026-11-03).
-        const endCover = this.endCoverGfx = this.add.graphics().setDepth(DEPTH.player + 0.05);
+        const endCover = this.endCoverGfx = this.add.container(0, 0).setDepth(DEPTH.player + 0.05);
         const coverW = props.endCover || 32;
+        // The plating's seams (tools/shell_paint.py), for the white walls the game draws itself.
+        this.seams = JSON.parse(props.plateSeams || 'null');
         for (const [key, list] of Object.entries(this.shellTiles)) {
             const deck = parseInt(key, 10);
             const own = new Set(list.map(t => `${t.x},${t.y}`));
@@ -219,7 +231,7 @@ export class ShipScene extends Phaser.Scene {
                 const air = t.y !== this.deckFloors[deck];
                 const end = dx => shell(dx, 0) && !allCut.has(`${t.x + dx},${t.y}`);
                 const cover = cx => {
-                    endCover.fillStyle(0xe8eaec, 1).fillRect(cx, y, coverW, h);
+                    this.plateTiles(endCover, cx, y, coverW, h);
                     (this.endCovers ||= []).push({ x: cx, y, w: coverW, h });
                 };
                 if (air && end(-1)) cover(x - coverW);
@@ -228,14 +240,16 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[key] = g;
         }
         // Where a deck steps back, the shell slopes across the step, so the outline runs smoothly.
+        // Its plating is painted as the side's tiles are (step 11): the seams run on across it.
+        const colour = c => Phaser.Display.Color.HexStringToColor(c).color;
         this.shellSlopes = JSON.parse(props.shellSlopes || '[]').map(s => {
             const g = this.add.graphics().setDepth(DEPTH.exterior);
             g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
+            for (const [x, y, w, h, c] of s.marks || []) g.fillStyle(colour(c), 1).fillRect(x, y, w, h);
             return { deck: s.deck, end: s.end, gfx: g };
         });
         // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
         // each on its deck's wall, fading with it, or always there ("fixed").
-        const colour = c => Phaser.Display.Color.HexStringToColor(c).color;
         for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
             const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
             for (const s of shapes) {
@@ -547,8 +561,14 @@ export class ShipScene extends Phaser.Scene {
                     // the fill strays over the decks (the user saw a wedge on deck 4, 2026-11-08).
                     const right = o.x + o.width;
                     const back = stem.map(q => ({ x: Math.max(right, q.x + 32), y: q.y })).reverse();
-                    const plating = this.add.graphics().setDepth(DEPTH.solid + 0.05);
+                    // Under the hull's tiles, which carry the plating's seams and marks (step 11): it
+                    // shows only along the stem, forward of the first tiles; the seams run on
+                    // across it there as marks.
+                    const plating = this.add.graphics().setDepth(DEPTH.solid - 0.05);
                     plating.fillStyle(0xe8eaec, 1).fillPoints([...stem, ...back], true);
+                    for (const [x, y, w, h, c] of JSON.parse(this.mapProps.stemMarks || '[]')) {
+                        plating.fillStyle(Phaser.Display.Color.HexStringToColor(c).color, 1).fillRect(x, y, w, h);
+                    }
                     this.worldLayer.add(plating);
                     // Over the shell, under its windows and balconies.
                     for (const piece of String(prop(o, 'pieces', '')).split(',').filter(Boolean)) {
@@ -601,9 +621,8 @@ export class ShipScene extends Phaser.Scene {
                     // A strip of plating over the wall's edge beside it, there only while she is on
                     // it, so nothing of her shows past the wall.
                     const end = prop(o, 'end', 'aft');
-                    const cover = this.add.graphics().setDepth(DEPTH.player + 0.05).setVisible(false);
-                    cover.fillStyle(0xe8eaec, 1).fillRect(end === 'aft' ? o.x - 16 : o.x + o.width, o.y - this.deckPitch + 16, 16, this.deckPitch - 16);
-                    this.worldLayer.add(cover);
+                    const cover = this.plateCopy(end === 'aft' ? o.x - 16 : o.x + o.width, o.y - this.deckPitch + 16, 16, this.deckPitch - 16,
+                        DEPTH.player + 0.05).setVisible(false);
                     (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
                     // The sloped stern plating over it is drawn in front of her, and stays there at
                     // all times, the deck cut open or not: she is always hidden behind it (the user).
@@ -678,9 +697,7 @@ export class ShipScene extends Phaser.Scene {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
                     // in it (the user: deck 7's front, 2026-11-03; deck 8's ends, 2026-11-06).
-                    const wall = this.add.graphics().setDepth(DEPTH.player + 0.06);
-                    wall.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16);
-                    this.worldLayer.add(wall);
+                    this.plateCopy(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16, DEPTH.player + 0.06);
                     // Some are locked (§6.1, `END_WALL_LOCKS`): the progression puts a barrier in them.
                     endWalls.push({ id: o.name, x0: o.x, x1: o.x + o.width, floor: o.y, lock: prop(o, 'lock', '') });
                     break;
@@ -723,6 +740,61 @@ export class ShipScene extends Phaser.Scene {
         }
         // The locks' readers, ropes and barriers, now that the flights, doors and walls are built.
         this.progress.build(endWalls);
+    }
+
+    // A piece of the ship's side drawn again (over her at a deck's end, over a wall she passes
+    // behind): the side's own painted tiles there (step 11, tools/shell_paint.py), so its seams and
+    // marks run on across it; plain plating where the side has no tile.
+    plateTiles(box, x, y, w, h) {
+        const ts = this.map.tilesets[0], tex = this.textures.get('tiles');
+        let flat = null;
+        for (let ty = Math.floor(y / 16) * 16; ty < y + h; ty += 16) {
+            for (let tx = Math.floor(x / 16) * 16; tx < x + w; tx += 16) {
+                const cx = Math.max(tx, x), cy = Math.max(ty, y);
+                const cw = Math.min(tx + 16, x + w) - cx, ch = Math.min(ty + 16, y + h) - cy;
+                const t = this.exteriorLayer.getTileAt(tx / 16, ty / 16);
+                const at = t && t.index > 0 ? ts.getTileTextureCoordinates(t.index) : null;
+                if (!at) {
+                    if (!flat) box.add(flat = this.add.graphics());
+                    flat.fillStyle(0xe8eaec, 1).fillRect(cx, cy, cw, ch);
+                    continue;
+                }
+                const name = `t${t.index}`;
+                if (!tex.has(name)) tex.add(name, 0, at.x, at.y, 16, 16);
+                const img = this.add.image(tx, ty, 'tiles', name).setOrigin(0);
+                if (cw < 16 || ch < 16) img.setCrop(cx - tx, cy - ty, cw, ch);
+                box.add(img);
+            }
+        }
+        return box;
+    }
+
+    // Something inside a deck drawn in front of her: from outside it is behind the ship's side, so
+    // it is there only as far as its deck (or its room's own piece of the side) is cut open.
+    behindShell(item, x, y) {
+        const t = this.exteriorLayer.getTileAt(Math.floor(x / 16), Math.floor((y - 24) / 16));
+        if (!t || !this.cutIds.has(t.index)) return;
+        const deck = this.deckOfY(y);
+        const room = this.shellRooms.find(r => r.deck === deck && x >= r.x0 && x < r.x1);
+        (this.insideFronts ||= []).push({ key: room ? room.key : deck, item });
+    }
+
+    plateCopy(x, y, w, h, depth) {
+        const box = this.plateTiles(this.add.container(0, 0).setDepth(depth), x, y, w, h);
+        this.worldLayer.add(box);
+        return box;
+    }
+
+    // The plating's seams across a white wall the game draws itself (the promenade's closed ends),
+    // in line with the side's own beside it.
+    plateSeams(g, x, y, w, h, colours = this.seams) {
+        if (!this.seams) return;
+        const { first, pitch } = this.seams, { seam, lit } = colours;
+        const hex = c => Phaser.Display.Color.HexStringToColor(c).color;
+        for (let sy = first + Math.ceil((y - first) / pitch) * pitch; sy < y + h; sy += pitch) {
+            g.fillStyle(hex(seam), 1).fillRect(x, sy, w, 1);
+            if (sy + 1 < y + h) g.fillStyle(hex(lit), 1).fillRect(x, sy + 1, w, 1);
+        }
     }
 
     // A point along a flight, t from 0 (its foot) to 1 (its top). The atrium's curving staircase
@@ -774,6 +846,7 @@ export class ShipScene extends Phaser.Scene {
         const OPEN_W = 80, PIER = 24, SILL = 30, LINTEL = 100;
         for (const [a, b] of enclosed) {
             front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
+            this.plateSeams(front, a, floor - 128, b - a, 128 - LINTEL);
             const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
             const pier = (b - a - n * OPEN_W) / (n + 1);
             // The promenade's ends are closed (back in only through the doors): a wall she runs into
@@ -782,6 +855,7 @@ export class ShipScene extends Phaser.Scene {
             if (b === pr.x1) this.addRouteWall(b - pier - PROMENADE.endStop, 1, floor, 'promenade');
             for (let i = 0; i <= n; i++) {
                 front.fillStyle(0xe8eaec, 1).fillRect(a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
+                this.plateSeams(front, a + i * (OPEN_W + pier), floor - LINTEL, pier, LINTEL - SILL);
             }
             for (let i = 0; i < n; i++) {
                 const x = a + pier + i * (OPEN_W + pier);
@@ -811,7 +885,21 @@ export class ShipScene extends Phaser.Scene {
         // 2026-11-07): its back wall in shade, round portholes on it and a glazed bay.
         const recess = add([6, 7], DEPTH.exterior + 0.055);
         recess.fillStyle(0xc9ced3, 1).fillRoundedRect(pr.x0, hang, pr.x1 - pr.x0, floor - hang, 22);
-        recess.fillStyle(0xbdc3c9, 1).fillRect(pr.x0 + 10, hang, pr.x1 - pr.x0 - 20, 10);
+        // Its plating as the side's (step 11), in the recess's shade: the same seams, panel joints
+        // staggered between them, the shade deepest right under the overhang and under the walkway.
+        const SHADED = { seam: '#bcc2c8', lit: '#cfd4d8' };
+        this.plateSeams(recess, pr.x0 + 24, hang + 22, pr.x1 - pr.x0 - 48, floor - hang - 44, SHADED);
+        const { first = 0, pitch = 72 } = this.seams || {};
+        for (let y = first + Math.ceil((hang + 22 - first) / pitch) * pitch, row = 0; y < floor - 22; y += pitch, row++) {
+            for (let x = pr.x0 + 150 + (row % 2) * 168; x < pr.x1 - 30; x += 336) {
+                recess.fillStyle(0xbfc5cb, 1).fillRect(x, y + 2, 1, Math.min(pitch - 2, floor - 3 - y - 2));
+            }
+        }
+        recess.fillStyle(0xb6bcc3, 1).fillRect(pr.x0 + 14, hang, pr.x1 - pr.x0 - 28, 4);
+        recess.fillStyle(0xbdc3c9, 1).fillRect(pr.x0 + 10, hang + 4, pr.x1 - pr.x0 - 20, 7);
+        recess.fillStyle(0xc3c9ce, 1).fillRect(pr.x0 + 6, hang + 11, pr.x1 - pr.x0 - 12, 5);
+        recess.fillStyle(0xbdc3c9, 1).fillRect(pr.x0 + 2, top7 + 1, pr.x1 - pr.x0 - 4, 2);
+        recess.fillStyle(0xc3c9ce, 1).fillRect(pr.x0 + 2, top7 + 3, pr.x1 - pr.x0 - 4, 2);
         for (const x of list('portholes').map(Number)) {
             recess.fillStyle(0x9babb2, 1).fillCircle(x, floor - 72, 12);
             recess.fillStyle(0x323353, 1).fillCircle(x, floor - 72, 10);
@@ -1877,6 +1965,8 @@ export class ShipScene extends Phaser.Scene {
         for (const t of this.smoke || []) t.resume();       // the funnel's smoke keeps drifting
         this.player.setVisible(false);
         this.uiCam.setVisible(false);
+        // (A bubble over someone by her would hang on the closed side: away; the game brings it back.)
+        for (const q of this.world.people.list) q.bubbleItems?.forEach(i => i.setVisible(false));
         // The canvas fills the whole window while it is open, sky and sea to its edges, no bars at
         // its sides (the user, 2026-11-07); play keeps its 16:9 view.
         this.scale.scaleMode = Phaser.Scale.EXPAND;
@@ -3077,6 +3167,7 @@ export class ShipScene extends Phaser.Scene {
             this.cutShadows[deck].setAlpha(1 - alpha);
         }
         for (const { deck, gfx } of this.deckFronts || []) gfx.setAlpha(1 - (this.shellAlpha[deck] ?? 0));
+        for (const { key, item } of this.insideFronts || []) item.setAlpha(1 - (this.shellAlpha[key] ?? 0));
         const under = `${this.underPools(11)},${this.underPools(12)}`;
         if (under !== this.poolsHidden) {
             this.poolsHidden = under;

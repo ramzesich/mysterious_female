@@ -1063,3 +1063,89 @@ two clapping clips 2, the pillow pile 1); about 653 of 2,000 left.
 uses the stand-in too: his own will want a pose for the cabin and a wave); the sound of the wind,
 the gulls and a purr, with "Sound on"; the glide's numbers (the gulls' speed, the gusts) from her
 playtest.
+
+## Step 11: The ship's side (2026-11-14)
+
+Built: the ship's side painted by rules instead of one flat white: the plating in strakes with
+its seams and butts, shade under what stands out over it, weathering, and the marks and openings
+a hull carries; the same on the pieces the game draws itself (the slopes at the decks' ends, the
+stem's edge, the walls drawn over her, the promenade's recess and closed ends, the balconies'
+fascia and recesses). And, asked for by the user while it was being built, **the livery's ragged
+lines smoothed.** Code: `tools/shell_paint.py` (new), the map builder, the ship scene,
+`tools/build_livery.py`. No PixelLab art: 0 generations (about 653 of 2,000 left). The whole suite: 687 checks, all passing (`boot` gained three: the side's tiles are of many kinds, nothing inside shows through the closed side in the outside view, O again is back in the game); after it two small fixes (the bow wave, the galley's plate), then `boot` and `region1` again and the overlap audit, which lists nothing.
+
+**How it is done, and why so:**
+
+1. **The side is painted as a picture and cut into the map's tiles.** `tools/shell_paint.py`
+   paints every pixel of plating (palette indexes, by rules, a steady random number for each
+   choice so the ship is the same every build), then every 16 px tile that is not plain plating
+   becomes a tile of its own in the tileset, the same ones shared (760 new tiles; the tileset is
+   laid out in rows of 64 now). So the game draws the side exactly as before, a tile layer that is
+   culled to the view and fades deck by deck with the cut-away: nothing new is drawn each frame.
+   (Thousands of rectangles in a `Graphics`, as the windows are drawn, would have been redrawn
+   every frame; one big picture would not fit a texture.)
+2. **Seams sit between the floors and the windows, and the plates are long.** Twice before, the
+   user had lines taken off the side: a line along each deck's floor and seams on every tile
+   ("stray marks", "stripes", 2026-11-03). So: a seam along the side every 72 px (a metre and a
+   half), 36 and 108 px over each deck's floor, which is clear of every row of windows and of the
+   floors themselves; a lit edge under each; the plates' butts across them about every eight
+   metres, staggered strake by strake, fainter than the seams, moved off any window they would
+   graze; one plate in four a shade lighter or darker. The first try (six-metre plates, stronger
+   butts and shades) read as brickwork and was toned down.
+3. **Above the hull the panels are three times longer and all one white:** the superstructure's
+   sides are smooth on the real ship; only the hull (up to the forecastle and the promenade) is
+   plated in the full pattern.
+4. **The near-whites keep to the side's own white, not to the palette.** The plan asked for "two
+   or three near-whites from the palette"; the side's white (`#e8eaec`) is not Resurrect 64's,
+   whose whites are `#ffffff` and the green-grey `#c7dcd0`, both far off it. The plating's shades
+   are a few steps either side of its own white; the marks and openings use the palette's greys.
+5. **Weathering is faint and sparse:** a streak under about four portholes in ten, under each
+   scupper along the promenade's foot (small slots, new), under each overboard outlet low on the
+   hull (new, rust-tinted); a dull band with a ragged top where the sea washes the side over the
+   boot topping; a few smudges low down. The first streaks were solid two-pixel lines and read as
+   pipes; they start strong and break up now.
+6. **What a hull carries, as additions:** two shell doors on deck 3 as outlines in the plating
+   (150 m and 224 m), the draught marks at the stem and the stern, the bow thrusters' two marks,
+   the load line amidships. **No anchor:** on the real ship it sits in the livery's red band, and
+   the livery is the user's placement. **No rivets:** at this scale a rivet is under a pixel; the
+   seams and butts stand for them.
+7. **Nothing is painted over the livery:** seams run under its paint and are hidden by it, every
+   mark and streak keeps clear of it.
+8. **The pieces the game draws itself carry the same plating:** the slopes at the decks' ends and
+   the stem's smooth edge get their painted pixels from the builder as marks; the strips of wall
+   drawn over her at a deck's ends, the end walls she passes behind and the terraces' covers are
+   now the side's own tiles drawn again (`plateTiles()`), where they were flat white rectangles
+   that would have blanked the seams; the bow's smooth plating went under the hull's tiles (it
+   was over them) and shows only along the stem.
+9. **The promenade, the walkway and the balconies** (the plan's list): the promenade's recess has
+   the seams and staggered joints in its own shade, the shade deepest right under the overhang
+   and a soft shadow under the boat walkway; its closed ends carry the seams across in line with
+   the side's; each balcony's recess has the slab's shade under its ceiling, and the white fascia
+   between two rows a joint under every partition and a fine line at the foot of the glass.
+10. **The livery's lines smoothed (the user, 2026-11-14).** Blurring harder rounded the ribbons'
+    pointed ends away, so each outline is smoothed along its own length instead: cut at its sharp
+    turns (a turn counts only if it is still one at twice the reach, so a drip's notch does not),
+    and each stretch between two tips evened out as a curve pinned at both ends (`sleek()` in
+    `tools/build_livery.py`, `SLEEK` 30 px). The paint's outline and each colour's own are done
+    the same way. Its placement, size and colours are untouched.
+
+**Found on the way, and fixed for good:**
+
+- **`tools/render_ship.py` no longer rendered the ship** (it predated the HUD's and the evening
+  light's cameras and shot deck 4's corridor forty times). It uses the game's own outside view
+  (O) now, at one pixel to a pixel.
+- **The kids' ball pit and pillow fort showed through the closed side** in the outside view: they
+  are drawn in front of her, so in front of the side too. What the plan puts inside a deck in
+  front of her now fades with its deck's cut-away (`behindShell()`); a bubble over someone by her
+  is put away while the outside view is open. `boot` checks it.
+
+- **The bow wave stopped at its highest, a straight edge** (the user, on this step's close-up of
+  the waterline: "this water looks cut off"). Aft of the stem it now falls away along the side
+  and breaks up into the foam there (`BOW_TAIL` in `src/sea.js`).
+- **The galley's plate was half behind the wall drawn over her at deck 5's aft end.** The overlap
+  audit had never seen it: that strip of wall was a flat rectangle, which the audit does not
+  look at; as the side's own tiles it does. The plate is forward of its door now (`plate_side`).
+
+**Left for later:** the funnel's white base, the open decks' bulwarks and the sun cover stay
+plain (small, and no seam lines up with them); two round spots in the livery where the photo's
+portholes were painted over; sound has no part in this step.

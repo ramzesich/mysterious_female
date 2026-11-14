@@ -517,7 +517,16 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   columns; they fade when she is inside deck 6 or 7. The photo crops
   (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
 - The sun livery is the real one (2026-11-07, §8): generated with PixelLab from the user's side
-  photo, centred about 40 m from the bow on deck 6, its ribbons running aft to about 142 m.
+  photo, centred about 40 m from the bow on deck 6, its ribbons running aft to about 142 m. Its
+  ragged lines were smoothed on 2026-11-14 (the user): each outline evened out along its length,
+  the ribbons' tips kept.
+- **The side is plated, not one flat white (step 11, 2026-11-14, the user's wish):** seams along
+  it every metre and a half, between the floors and the windows; the plates' butts staggered
+  across them, a plate here and there a shade off the rest; shade under the forecastle and the
+  roofs; faint streaks under some portholes, under the scuppers along the promenade's foot and
+  the outlets low on the hull; a dull band over the boot topping; two shell doors on deck 3, the
+  draught marks, the bow thrusters' marks, the load line. Painted by rules
+  (`tools/shell_paint.py`) and cut into the map's tiles; nothing over the livery.
 
 ### 5.4 Scale
 
@@ -2047,12 +2056,13 @@ Nothing blocks the start of the build. These get settled along the way:
       on everything placed is in `CLAUDE.md`, "Looking closely" (nine questions and four tools)
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
-      every change to the plan in `docs/progress-decisions.md`, committing after each step). Steps 0-10 are
+      every change to the plan in `docs/progress-decisions.md`, committing after each step). Steps 0-11 are
       done: the game plays from the gangway to the win screen (step 10, 2026-11-14: the sunset,
-      the glide to the mooring deck, the catch, the way home, cabin 8206, the day after). **Next:
-      step 11 of `docs/build-plan.md` (the ship's side: a texture for its outer body, the user's
-      wish)**; then "After the regions" (sound, the controller, tuning, her playtest and the
-      hidden extras). Mark each step done here as it lands. From step 9 on every new person is checked against
+      the glide to the mooring deck, the catch, the way home, cabin 8206, the day after), and the
+      ship's side is plated and weathered (step 11, 2026-11-14; the livery's lines smoothed with
+      it). **The plan's steps are all built. Next: "After the regions"** in
+      `docs/build-plan.md` (sound, the controller, tuning, her playtest and the hidden extras),
+      which is not part of the autonomous order: ask the user what comes first. Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")
 - [ ] **The outside of the ship is done** (the sea, the background,

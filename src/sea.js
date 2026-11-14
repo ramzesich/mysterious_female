@@ -94,10 +94,12 @@ function foamTexture(scene) {
 
 // The bow wave: white water heaped against the stem, highest there and sloping forward down to
 // the sea, spilling a little under the waterline, spray over it; a few frames. `BOW_UNDER` px of it
-// lie under the waterline.
-const BOW_UNDER = 9;
+// lie under the waterline. Aft of the stem it falls away along the ship's side and breaks up into
+// the foam there (the user, 2026-11-14: it stopped at its highest, a straight edge, "cut off"):
+// `BOW_FORE` px of the frame lie forward of its peak, `BOW_TAIL` aft.
+const BOW_UNDER = 9, BOW_FORE = 96, BOW_TAIL = 80;
 function bowWaveTextures(scene) {
-    const w = 96, h = 44, frames = 4, peak = 30;
+    const w = BOW_FORE + BOW_TAIL, h = 44, frames = 4, peak = 30;
     const tex = scene.textures.createCanvas('sea-bow', w * frames, h);
     const ctx = tex.getContext();
     const water = h - BOW_UNDER;                         // the waterline's row in the frame
@@ -105,12 +107,15 @@ function bowWaveTextures(scene) {
         const rand = rng(31 + f);
         const ox = f * w;
         for (let x = 0; x < w; x++) {
-            const t = x / (w - 1);                       // 0 ahead, 1 at the stem
-            const top = Math.round(water - 2 - peak * t ** 2.2 - Math.sin((x + f * 6) / 4) * (0.5 + t));
-            const bottom = Math.round(water + 1 + (BOW_UNDER - 2) * t ** 1.5 + rand() * 2);
+            const aft = x >= BOW_FORE;
+            const s = aft ? (x - BOW_FORE) / (BOW_TAIL - 1) : 0;     // aft of the stem: 0 at it, 1 where it has run out
+            const t = aft ? (1 - s) ** 1.7 : x / (BOW_FORE - 1);     // its height: 0 ahead, 1 at the stem, 0 again aft
+            const top = Math.round(water - 2 - peak * (aft ? t : t ** 2.2) - Math.sin((x + f * 6) / 4) * (0.5 + t));
+            const bottom = Math.round(water + 1 + (BOW_UNDER - 2) * (aft ? (1 - s) ** 1.2 : t ** 1.5) + rand() * 2);
             for (let y = top; y < Math.min(h, bottom); y++) {
                 const under = y >= water;                // churned water under the line
-                if (t < 0.25 && rand() < 0.5 - t) continue;       // the leading edge breaking up
+                if (!aft && t < 0.25 && rand() < 0.5 - t) continue;       // the leading edge breaking up
+                if (aft && s > 0.55 && rand() < (s - 0.55) * 1.6) continue;   // and the tail, into the foam along the side
                 if (under && rand() < 0.3) continue;
                 const u = rand();
                 ctx.fillStyle = under ? (u < 0.5 ? '#c7f0ff' : '#8fd3ff') : (u < 0.82 ? '#ffffff' : '#c7f0ff');
@@ -266,7 +271,8 @@ export class Sea {
         // Foam along the waterline, from the stem to the stern.
         this.foam = scene.add.tileSprite(bowX, y - 2, sternX - bowX, 10, 'sea-foam').setOrigin(0).setDepth(front);
         // The bow wave against the stem.
-        this.bow = scene.add.sprite(bowX + 10, y + BOW_UNDER, 'sea-bow', 0).setOrigin(1, 1).setDepth(front + 0.001);
+        this.bow = scene.add.sprite(bowX + 10, y + BOW_UNDER, 'sea-bow', 0)
+            .setOrigin(BOW_FORE / (BOW_FORE + BOW_TAIL), 1).setDepth(front + 0.001);
         // The wake: churned white water trailing aft from the stern.
         this.wake = new Wake(scene, sternX - 4, y, front - 0.001);
         // The foam runs on past the stern, breaking up into the wake (the user, 2026-11-07: it was

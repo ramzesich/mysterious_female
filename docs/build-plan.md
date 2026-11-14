@@ -239,6 +239,10 @@ What changed against this list: `docs/progress-decisions.md`.
 
 ## Step 11: The ship's side
 
+**Done (2026-11-14).** How it was done and what changed against this list:
+`docs/progress-decisions.md` (the side is painted by `tools/shell_paint.py` and cut into tiles; the
+livery's lines were smoothed too, at the user's wish).
+
 Asked for by the user on 2026-11-13, during step 7: "give the ship's outer body a texture refinement
 to make it look a bit more real, rather than just a white wall." Placed after the last region on
 purpose: steps 8-10 still add to the outside (the funnel, the roof, the sunset's palette), and the

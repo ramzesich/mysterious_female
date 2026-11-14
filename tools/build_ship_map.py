@@ -835,6 +835,8 @@ def shell_details(ext, solid):
                     rect(own, x + 16, floor - 102, 3, 56, "#4d65b4")
                     rect(own, x, floor - 116, unit, 5, "#f4f4f4")
                     rect(own, x, floor - 111, unit, 1, "#c7dcd0")
+                    rect(own, x, floor - 110, unit, 3, "#506178")     # the slab's shade on the back wall (step 11)
+                    rect(own, x, floor - 107, unit, 2, "#566880")
                     rect(own, x + 6, floor - 48, unit - 6, 40, "#a3c4d4")
                     rect(own, x + 6, floor - 36, unit - 6, 1, "#c7e4ef")
                     rect(own, x + 6, floor - 50, unit - 6, 3, "#f4f4f4")
@@ -1881,11 +1883,31 @@ def tile_layer(layer_id, name, grid):
             "data": [t for row in grid for t in row]}
 
 
+# The side's painted tiles (tools/shell_paint.py), after the placeholder ones in the tileset: their
+# pixels, kept from the map's build for the tileset's. The tileset is laid out in rows this wide.
+SHELL_TILES = []
+TILESET_COLS = 64
+
+
 def build_map():
+    import shell_paint
+
     back, solid, ladders, exterior = build_layers()
     objs = build_objects()
     livery = next(o for o in objs if o["type"] == "livery")
     livery["properties"].append(prop("pieces", ",".join(livery_pieces(exterior, solid))))
+    details = shell_details(exterior, solid)
+    slopes = shell_slopes()
+    # The side painted (step 11): the plating's tiles take their pixels from the picture; the parts
+    # the game draws itself (the slopes, the stem's smooth edge) get theirs as marks to draw.
+    picture, plating, extra = shell_paint.paint(build_ship_map_module(), exterior, solid, details, slopes)
+    kinds_before = (exterior, solid)
+    exterior, solid, SHELL_TILES[:], kinds = shell_paint.cut(build_ship_map_module(), picture, plating, *kinds_before,
+                                                             TILE_COUNT + 1)
+    cut_ids = list(EXT_CUT) + [TILE_COUNT + 1 + i for i, k in enumerate(kinds) if k in EXT_CUT]
+    for i, s in enumerate(slopes):
+        s["marks"] = shell_paint.marks(picture, extra == 2 + i)
+    count = TILE_COUNT + len(SHELL_TILES)
     return {
         "type": "map", "version": "1.10", "tiledversion": "1.11.0", "orientation": "orthogonal",
         "renderorder": "right-down", "infinite": False, "width": COLS, "height": ROWS,
@@ -1896,18 +1918,21 @@ def build_map():
             {"name": "hullMaxX", "type": "int", "value": col(EXTENT[4][1]) * TILE},
             {"name": "waterY", "type": "int", "value": WATER_ROW * TILE},
             {"name": "deckFloors", "type": "string", "value": json.dumps({d: FLOOR_ROW[d] for d in DECKS})},
-            {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in EXT_CUT)},
-            {"name": "shellSlopes", "type": "string", "value": json.dumps(shell_slopes())},
+            {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in cut_ids)},
+            {"name": "shellSlopes", "type": "string", "value": json.dumps(slopes)},
+            {"name": "stemMarks", "type": "string", "value": json.dumps(shell_paint.marks(picture, extra == 1))},
+            {"name": "plateSeams", "type": "string", "value": json.dumps(shell_paint.seams(build_ship_map_module()))},
             {"name": "endCover", "type": "int", "value": END_COVER},
             {"name": "shellRooms", "type": "string", "value": json.dumps(shell_rooms())},
             {"name": "poolTile", "type": "int", "value": POOL_TILE},
             {"name": "poolSpans", "type": "string", "value": json.dumps([[(col(a) - 1) * TILE, (col(b) + 1) * TILE, deck] for deck, a, b in ALL_POOLS])},
-            {"name": "shellDetails", "type": "string", "value": json.dumps(shell_details(exterior, solid))},
+            {"name": "shellDetails", "type": "string", "value": json.dumps(details)},
         ],
         "tilesets": [{
             "firstgid": 1, "name": "placeholder", "image": "../assets/tiles/placeholder.png",
-            "imagewidth": TILE_COUNT * TILE, "imageheight": TILE, "tilewidth": TILE, "tileheight": TILE,
-            "tilecount": TILE_COUNT, "columns": TILE_COUNT, "margin": 0, "spacing": 0,
+            "imagewidth": TILESET_COLS * TILE, "imageheight": -(-count // TILESET_COLS) * TILE,
+            "tilewidth": TILE, "tileheight": TILE,
+            "tilecount": count, "columns": TILESET_COLS, "margin": 0, "spacing": 0,
         }],
         "layers": [
             tile_layer(1, "background", back),
@@ -2352,12 +2377,27 @@ def livery_pieces(ext, solid):
 
 
 def build_tileset():
+    """The tileset: the placeholder tiles, then the side's painted ones (after build_map()), in rows
+    of TILESET_COLS."""
+    import shell_paint
+
+    colours = [shell_paint.rgba(i) for i in range(len(shell_paint.PALETTE))]
     tiles = [draw_tile(i) for i in range(1, TILE_COUNT + 1)]
-    rows = [[p for t in tiles for p in t[y]] for y in range(TILE)]
+    tiles += [[[colours[i] for i in row] for row in block] for block in SHELL_TILES]
+    tiles += [[[CLEAR] * TILE for _ in range(TILE)]] * (-len(tiles) % TILESET_COLS)
+    rows = []
+    for k in range(0, len(tiles), TILESET_COLS):
+        rows += [[p for t in tiles[k:k + TILESET_COLS] for p in t[y]] for y in range(TILE)]
     out = ROOT / "assets" / "tiles" / "placeholder.png"
     out.parent.mkdir(parents=True, exist_ok=True)
-    write_png(out, TILE_COUNT * TILE, TILE, rows)
+    write_png(out, TILESET_COLS * TILE, len(rows), rows)
     return out
+
+
+def build_ship_map_module():
+    """This module as the painter needs it: the one imported, not `__main__`."""
+    import build_ship_map
+    return build_ship_map
 
 
 def main():

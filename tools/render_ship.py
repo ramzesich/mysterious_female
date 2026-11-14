@@ -20,9 +20,6 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from playtest import Browser  # noqa: E402
 
-VIEW_W, VIEW_H = 960, 540
-
-
 def main():
     out = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(os.environ["TEMP"]) / "bumbusik-playtest" / "exterior"
     out.mkdir(parents=True, exist_ok=True)
@@ -31,21 +28,23 @@ def main():
         b.open("?play&tangerines=infinite")
         time.sleep(1.0)
         W, H = b.eval("[window.__ship.map.widthInPixels, window.__ship.map.heightInPixels]")
-        # Outside (as on the promenade): every deck's side closed; her and the HUD hidden.
-        b.eval("""(() => { const s = window.__ship; s.route = 'promenade'; s.player.setVisible(false);
-          s.uiLayer.setVisible(false); s.uiCam.setVisible(false);
-          const c = s.cameras.main; c.stopFollow(); c.removeBounds(); c.setZoom(1); })()""")
+        # The game's own outside view (O): every deck's side closed, her and the HUD hidden, the game
+        # paused; at one image pixel to a game pixel, stepped across the world.
+        b.eval("""(() => { const s = window.__ship; s.enterOverview();
+          s.uiLayer.setVisible(false); s.cameras.main.setZoom(1); })()""")
         time.sleep(1.5)
+        vw, vh = b.eval("[window.__ship.cameras.main.width, window.__ship.cameras.main.height]")
+        vw, vh = int(vw), int(vh)
         sheet = Image.new("RGB", (W, H))
-        for y in range(0, H, VIEW_H):
-            for x in range(0, W, VIEW_W):
+        for y in range(0, H, vh):
+            for x in range(0, W, vw):
                 b.eval(f"window.__ship.cameras.main.setScroll({x}, {y})")
                 time.sleep(0.25)
                 b.eval("window.__snap = null; window.__ship.game.renderer.snapshot(img => { window.__snap = img.src; })")
                 b.wait_for("window.__snap", timeout=10)
                 data = b.eval("window.__snap").split(",", 1)[1]
                 im = Image.open(io.BytesIO(base64.b64decode(data))).convert("RGB")
-                sheet.paste(im.crop((0, 0, min(VIEW_W, W - x), min(VIEW_H, H - y))), (x, y))
+                sheet.paste(im.crop((0, 0, min(vw, W - x), min(vh, H - y))), (x, y))
         sheet.save(out / "ship-full.png")
         sheet.resize((1600, round(H * 1600 / W)), Image.LANCZOS).save(out / "ship-full-preview.png")
         print("wrote", out / "ship-full.png", "errors:", b.errors)

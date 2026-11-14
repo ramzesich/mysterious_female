@@ -36,8 +36,9 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor, the vent high on its far wall, the chute's hatch by the door), drawn by hand: its inside, its open crew door, and the laundry cart she pushes under the vent (`assets/ship/linen-cart.png`) |
 | `tools/draw_lifeboat.py` | The ship's boats, drawn by hand in code (PixelLab's tries didn't read): the lifeboat, the tender, the rescue boat (`assets/ship/lifeboat.png`, `tender.png`, `rescue-boat.png`) |
-| `tools/build_livery.py` | The ship's sun livery from its PixelLab tiles (`assets/source/livery/p2-*.png`) to one picture at full size (`assets/source/livery/livery.png`); then `build_ship_map.py` cuts it by deck into `assets/ship/livery.png` + `.json`. Its placement (`SHIFT`, `DROP`, `DISC`) is the user's. `tools/livery_photo.py` makes the tiles' generation inputs from the user's side photo |
-| `tools/render_ship.py` | The whole ship from outside at full size, every deck closed (`ship-full.png` in `%TEMP%/bumbusik-playtest/exterior`); in the game, O shows it too |
+| `tools/build_livery.py` | The ship's sun livery from its PixelLab tiles (`assets/source/livery/p2-*.png`) to one picture at full size (`assets/source/livery/livery.png`); then `build_ship_map.py` cuts it by deck into `assets/ship/livery.png` + `.json`. Its placement (`SHIFT`, `DROP`, `DISC`) is the user's. Its outlines are smoothed along their length with the tips kept (`sleek()`, `SLEEK`; the user, 2026-11-14). `tools/livery_photo.py` makes the tiles' generation inputs from the user's side photo |
+| `tools/render_ship.py` | The whole ship from outside at full size, every deck closed (`ship-full.png` in `%TEMP%/bumbusik-playtest/exterior`, or the folder given), through the game's own outside view; in the game, O shows it too |
+| `tools/shell_paint.py` | **The ship's side painted by rules** (step 11): the plating's seams, butts and shades, the shade under overhangs, weathering, the hull's marks and openings, as a picture the map builder cuts into tiles (after the placeholder ones in `assets/tiles/placeholder.png`, rows of 64); the parts the game draws itself get their pixels as marks (`shellSlopes`' `marks`, `stemMarks`, `plateSeams` in the map). Its colours and spacings are at its top |
 | `docs/build-plan.md` | **The build plan**: step 0 the skeleton, then one step per region in play order, each with its scope, systems, art, playtest and exit; §8 names the current step |
 | `docs/population.md` | **The population spec**: every person, hazard, item, secret, room and scene in place (deck, metres, behaviour), the corridors designed beat by beat; the build populates the ship from it (§6.1.13, phase 1) |
 | `tools/draw_regions.py` | The progression plan (§6.1) drawn on the real ship (`docs/ship-regions.png`, `docs/ship-unlock-order.png`), from its own lists of regions, routes and steps; needs `tools/render_ship.py`'s picture |
@@ -313,6 +314,27 @@ Lessons learned (2026-11-14, step 10):
   scene under test overlaps it (`world.cut` now counts overlapping moments).
 - **A gust carries her twice the px a second its data says** (body and picture are both moved):
   tune by what the playtest measures, not by the number.
+
+Lessons learned (2026-11-14, step 11, the ship's side):
+
+- **A texture over the whole ship is painted in the builder and cut into tiles** (identical ones
+  shared), not drawn as shapes: the tile layer is culled and costs nothing more. Whatever the game
+  draws in the plating's flat white over or beside the tiles (the strips of wall over her at a
+  deck's ends, the end walls, the slopes, the stem's edge) must then carry the same pixels:
+  `plateTiles()` draws the side's own tiles again; the slopes and the stem get marks from the
+  builder.
+- **Faint is not enough; the pattern's scale decides how it reads.** Six-metre plates with every
+  butt drawn read as brickwork, a solid two-pixel streak read as a pipe. Longer plates, butts
+  fainter than seams, streaks that start strong and break up. Look at it at the game's zoom and
+  at the whole ship's, not only at 1:1.
+- **Smoothing a painted shape by blurring rounds its points away:** smooth each outline along
+  its own length, pinned at its sharp turns (`sleek_outline()` in `tools/build_livery.py`).
+- **What is drawn in front of her inside a deck is in front of the ship's side too:** it must
+  fade with its deck's cut-away (`behindShell()`), or it shows through the closed side from
+  outside. The render of the whole ship (`tools/render_ship.py`) shows such things at once: look
+  at all of it after a step that adds things drawn over her.
+- A tool that drives the game by its internals (cameras, routes) breaks silently as the game
+  grows: `render_ship.py` shot the wrong thing for weeks. Drive the game's own modes instead.
 
 ## Working with the user
 

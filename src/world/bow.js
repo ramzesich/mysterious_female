@@ -139,6 +139,7 @@ export class BallPit {
             world.solids.push({ id: `${def.id}_wall`, x: ex, y, route: 'inside', items: [], zone });
         }
         world.things.push({ id: def.id, x: (x0 + x1) / 2, y, route: 'inside', items: [back, front] });
+        s.behindShell(this.odd, def.tanX, y);       // (behind the ship's side from outside, as the pit's front is)
         this.popAt = 0;
     }
 

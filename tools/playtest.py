@@ -206,8 +206,23 @@ def scenario_boot(b):
     big = b.eval("""Object.values(window.__ship.textures.list).flatMap(t => t.source.map(s => [t.key, s.width, s.height]))
         .filter(([k, w, h]) => w > 8192 || h > 8192)""")
     check(not big, "no texture is larger than 8192 px a side", big)
-    return (not big) and check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
+    ok = (not big) and check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
                  "spawns standing on deck 4 at the gangway", s)
+    # The side is painted (step 11): its tiles are many different ones, and each of them that is
+    # cut away with its deck is known to the game as one that is.
+    kinds = b.eval("""(s => { const ids = new Set(); s.exteriorLayer.forEachTile(t => { if (t.index > 0) ids.add(t.index); });
+        return [ids.size, s.cutIds.size, s.map.tilesets[0].total]; })(window.__ship)""")
+    ok &= check(kinds[0] > 300 and kinds[1] > 100 and kinds[2] >= kinds[0], "the ship's side is painted: its tiles are of many kinds", kinds)
+    # From outside (O), what stands inside a deck in front of her is behind the closed side.
+    b.tap("o")
+    time.sleep(0.8)
+    fronts = b.eval("(s => [!!s.overview, (s.insideFronts || []).length, (s.insideFronts || []).filter(f => f.item.alpha > 0.01).length])(window.__ship)")
+    b.shot("outside-view")
+    ok &= check(fronts[0] and fronts[1] >= 2 and fronts[2] == 0, "in the outside view nothing inside shows through the closed side", fronts)
+    b.tap("o")
+    time.sleep(0.5)
+    ok &= check(not b.eval("!!window.__ship.overview") and b.state()["mode"] == "play", "and O again is back in the game")
+    return ok
 
 
 def scenario_run_jump(b):

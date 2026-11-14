@@ -302,10 +302,12 @@ export class World {
                     if (out) s.shellSlopes.push({ deck: [6, 7], gfx: door });
                 }
                 if (d.plate) {
-                    const plate = s.add.text(d.outX + 20, d.outY - 50, d.plate, {
+                    // (Aft of its door, or forward of it where the deck ends just aft: `plateSide`.)
+                    const side = d.plateSide ?? 1;
+                    const plate = s.add.text(d.outX + 20 * side, d.outY - 50, d.plate, {
                         fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#3e3546',
                         backgroundColor: '#ffffff', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
-                    }).setOrigin(0, 0.5).setDepth(D.props);
+                    }).setOrigin(side > 0 ? 0 : 1, 0.5).setDepth(D.props);
                     this.add([plate]);
                     room.outside.push(plate);
                 }

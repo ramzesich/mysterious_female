@@ -24,7 +24,8 @@ ROOMS = [
     dict(id="pantry", deck=5, m=166, width=288, look="pantry", door="crew", plate="PANTRY", lock=("card", "hk", 0),
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
     # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
-    dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY"),
+    dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
+         plate_side=-1),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
     dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
