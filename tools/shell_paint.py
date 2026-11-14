@@ -58,6 +58,9 @@ LAP = PLATE // 2     # each strake's butts stand this far from the next strake's
 HOUSE = 3            # the superstructure's panels are this many times longer, and all one white
 
 
+STERN = 250                   # in `paint()`'s `extra`: the sliver along the stern's counter
+
+
 def rgba(i):
     h = PALETTE[i].lstrip("#")
     return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16), 255)
@@ -99,6 +102,9 @@ def paint(B, ext, solid, details, slopes):
             a, b = sorted((xe, s["x1"]))
             a, b = int(np.ceil(a)) + (2 if s["x0"] < s["x1"] else 0), int(b) - (0 if s["x0"] < s["x1"] else 2)
             extra[y, a:b] = 2 + i
+    # And the sliver along the stern's counter, aft of the hull's last tiles in each row.
+    for y in range((B.FLOOR_ROW[3] + 1) * TILE, B.WATER_ROW * TILE + 8):
+        extra[y, (B.stern_tiles_end(y // TILE) + 1) * TILE:int(B.stern_x(y + 0.5))] = STERN
     extra[plating] = 0
     region = plating | (extra > 0)
 
@@ -282,7 +288,7 @@ def paint(B, ext, solid, details, slopes):
 
     stem_at = int(B.stem_x((water - 30) / TILE))
     draught(stem_at + 40)
-    draught(x_stern - 70)
+    draught(int(B.stern_x(water + 14)) - 46)
     # The bow thrusters' marks: a ring with a cross, twice, over the waterline.
     def ring(cx, cy, r=6, cross=True):
         if not clear(cx - r - 1, cy - r - 1, cx + r + 2, cy + r + 2):

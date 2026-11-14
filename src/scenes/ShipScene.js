@@ -573,6 +573,20 @@ export class ShipScene extends Phaser.Scene {
                     for (const [x, y, w, h, c] of JSON.parse(this.mapProps.stemMarks || '[]')) {
                         plating.fillStyle(Phaser.Display.Color.HexStringToColor(c).color, 1).fillRect(x, y, w, h);
                     }
+                    // The stern's counter (the user, 2026-11-14): under deck 3 the transom curves
+                    // forward down to the waterline. Its smooth edge, aft of the hull's last tiles
+                    // in each row, is drawn the same way, the plating's marks across it.
+                    const edge = String(this.mapProps.sternEdge || '').split(',').filter(Boolean).map(pair => {
+                        const [x, y] = pair.split(':').map(Number);
+                        return { x, y };
+                    });
+                    if (edge.length) {
+                        const inner = edge.map(q => ({ x: q.x - 40, y: q.y })).reverse();
+                        plating.fillStyle(0xe8eaec, 1).fillPoints([...edge, ...inner], true);
+                        for (const [x, y, w, h, c] of JSON.parse(this.mapProps.sternMarks || '[]')) {
+                            plating.fillStyle(Phaser.Display.Color.HexStringToColor(c).color, 1).fillRect(x, y, w, h);
+                        }
+                    }
                     this.worldLayer.add(plating);
                     // Over the shell, under its windows and balconies.
                     for (const piece of String(prop(o, 'pieces', '')).split(',').filter(Boolean)) {
@@ -1962,9 +1976,11 @@ export class ShipScene extends Phaser.Scene {
     // hidden and the game paused; +/- zoom on the middle, the mouse wheel toward the pointer; the
     // movement keys do nothing there (the user, 2026-11-07); O or Esc and she is back where she was.
 
-    enterOverview() {
+    // (`still`: the sea, the sky and the gulls hold still too, for a picture stitched from many
+    // views: tools/render_ship.py.)
+    enterOverview(still = false) {
         const cam = this.cameras.main;
-        const ov = this.overview = { zoom: cam.zoom, scrollX: cam.scrollX, scrollY: cam.scrollY };
+        const ov = this.overview = { zoom: cam.zoom, scrollX: cam.scrollX, scrollY: cam.scrollY, still };
         this.physics.pause();
         this.time.paused = true;
         this.tweens.pauseAll();
@@ -2541,7 +2557,8 @@ export class ShipScene extends Phaser.Scene {
         const input = this.controls.update();
         // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
         // the outside view.
-        this.seaView.update(Math.min(delta, 50) / 1000);
+        const flow = this.overview?.still ? 0 : dt;
+        this.seaView.update(flow);
         // The horizon (§5.2): on the screen, gliding to its place over the floor she stands on (on
         // stairs, ladders and lifts, over her feet); while she is in the air it holds still on the
         // screen, as far things do, so a jump doesn't move it (the user, 2026-11-08).
@@ -2552,8 +2569,8 @@ export class ShipScene extends Phaser.Scene {
         else if (!this.overview && (this.mode === 'play' ? this.grounded : this.mode !== 'scripted')) {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
-        this.farGulls.update(dt);
-        this.backdrop.update(dt, !!this.overview, this.horizonOnScreen);
+        this.farGulls.update(flow);
+        this.backdrop.update(flow, !!this.overview, this.horizonOnScreen);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);

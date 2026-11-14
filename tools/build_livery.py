@@ -217,6 +217,26 @@ def fill_spots(label, largest=2000):
     return label
 
 
+# Two round spots left where the photo's portholes were painted over, too big or too near a
+# band's edge for `fill_spots` (the user, 2026-11-14: "fill the two round spots"): a point inside
+# each, in map pixels. One in the lower red band, one in the loop.
+SPOTS = [(3010, 1667), (3366, 1379)]
+
+
+def fill_at(label, spots=SPOTS):
+    """The patch of one colour at each of `spots` takes the colour most present round it."""
+    for mx, my in spots:
+        x, y = mx - ORIGIN[0], my - ORIGIN[1]
+        c = label[y, x]
+        n, comp = cv2.connectedComponents((label == c).astype(np.uint8), connectivity=8)
+        sub = comp == comp[y, x]
+        assert c >= 2 and sub.sum() < 3000, ("the livery's spot is not where it was", (mx, my), int(c), int(sub.sum()))
+        ring = cv2.dilate(sub.astype(np.uint8), np.ones((7, 7), np.uint8)).astype(bool) & ~sub
+        around = label[ring]
+        label[sub] = np.bincount(around[around >= 2]).argmax()
+    return label
+
+
 def moved(X):
     """Where in the photo's layout the livery's column X (map pixels) is taken from: the sun and all
     aft of it SHIFT pixels forward of where the photo has it (the user: it sat too far back), the
@@ -269,7 +289,7 @@ def build(path=None, edge=None, sleeked=True):
     label[(label == 1) & (weight > 0)] = 0
     label = fill_spots(label)
     if sleeked:
-        label = fill_spots(sleek(label))
+        label = fill_at(fill_spots(sleek(label)))
     cx, cy, r = DISC[0] - ORIGIN[0], DISC[1] - ORIGIN[1], DISC[2]
     ys, xs = np.ogrid[0:H, 0:W]
     d = np.hypot(xs - cx, ys - cy)

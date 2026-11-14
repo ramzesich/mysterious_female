@@ -29,8 +29,9 @@ def main():
         time.sleep(1.0)
         W, H = b.eval("[window.__ship.map.widthInPixels, window.__ship.map.heightInPixels]")
         # The game's own outside view (O): every deck's side closed, her and the HUD hidden, the game
-        # paused; at one image pixel to a game pixel, stepped across the world.
-        b.eval("""(() => { const s = window.__ship; s.enterOverview();
+        # paused, the sea and the sky held still too (`enterOverview(true)`), so the views fit each
+        # other; at one image pixel to a game pixel, stepped across the world.
+        b.eval("""(() => { const s = window.__ship; s.enterOverview(true);
           s.uiLayer.setVisible(false); s.cameras.main.setZoom(1); })()""")
         time.sleep(1.5)
         vw, vh = b.eval("[window.__ship.cameras.main.width, window.__ship.cameras.main.height]")

@@ -232,6 +232,33 @@ def stem_x(row):
     return (SEA + stem_m(row) * PER_M) * TILE
 
 
+# The stern's counter (the user, 2026-11-14: "it is a straight vertical line now. Make it similar to
+# the real ship. Without touching the playable decks"): under deck 3's floor, where no deck is
+# played, the transom curves forward down to the waterline as in the user's side photo, plumb at
+# its top and raking in more and more toward the water. How far forward of the transom the hull
+# meets the water (px), and how sharply the curve bends.
+COUNTER = (152, 1.7)
+
+
+def stern_x(y):
+    """The stern's exact x in pixels at pixel row `y`: the transom, the counter's curve under deck
+    3, and on down under the water."""
+    cut, bend = COUNTER
+    x = col(EXTENT[3][1]) * TILE
+    top, water = (FLOOR_ROW[3] + 1) * TILE, WATER_ROW * TILE
+    if y <= top:
+        return x
+    if y <= water:
+        return x - cut * ((y - top) / (water - top)) ** bend
+    return x - cut - (y - water) * cut * bend / (water - top)       # on at the slope it met the water with
+
+
+def stern_tiles_end(r):
+    """The last column of hull tiles in tile row `r` under deck 3: none sticks out past the stern's
+    smooth line (the game draws the sliver between them, as along the stem)."""
+    return int(stern_x((r + 1) * TILE) // TILE) - 1
+
+
 def stem_m(row):
     """Where the raked stem is, in metres from the bow, at tile row `row` (§5.3): the curve measured
     off the user's photo (`BOW["rake"]`), in deck heights below deck 7's floor."""
@@ -396,9 +423,8 @@ def build_layers():
     # line the game draws over the stem's edge.
     for r in range(FLOOR_ROW[7] + 1, ROWS):
         below = r - FLOOR_ROW[3]
-        # The stern goes straight down to the waterline, as the real transom does, and only rounds
-        # away under the water.
-        end = col(BOW["block"]) - 1 if below <= 0 else col(aft3) - 1 - max(0, r - WATER_ROW)
+        # The stern: the counter's curve under deck 3 (`stern_x`), on down under the water.
+        end = col(BOW["block"]) - 1 if below <= 0 else stern_tiles_end(r)
         fill(solid, math.ceil(stem_x(r + 1) / TILE), end, r, r, HULL if r <= WATER_ROW + 2 else NAVY)
 
     # The atrium is open from its floor on deck 5 up through deck 10, and deck 12 over deck 11's pool
@@ -763,8 +789,10 @@ def shell_details(ext, solid):
         for x in range(a7 + 48, b7 - 8, 48):
             rect(own7, x, y7 + 2, 2, 36, FRAME_WHITE)
     # The dark navy band along the waterline.
-    w0 = round(stem_x(WATER_ROW))
-    rect("fixed", w0, WATER_ROW * TILE - 14, col(EXTENT[3][1]) * TILE - w0, 14, "#1d2b53")
+    w0, w1 = round(stem_x(WATER_ROW)), int(stern_x(WATER_ROW * TILE))
+    rect("fixed", w0, WATER_ROW * TILE - 14, w1 - w0, 14, "#1d2b53")
+    for y in range(WATER_ROW * TILE - 14, WATER_ROW * TILE):       # and on along the counter's curve
+        rect("fixed", w1, y, int(stern_x(y + 0.5)) - w1, 1, "#1d2b53")
 
     for deck in PLAYABLE:
         fwd, aft = EXTENT[deck]
@@ -1921,6 +1949,11 @@ def build_map():
             {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in cut_ids)},
             {"name": "shellSlopes", "type": "string", "value": json.dumps(slopes)},
             {"name": "stemMarks", "type": "string", "value": json.dumps(shell_paint.marks(picture, extra == 1))},
+            # The stern's counter: its smooth edge from under deck 3 to just under the waterline
+            # ("x:y,..."), and the plating's pixels on the sliver aft of the hull's last tiles.
+            {"name": "sternEdge", "type": "string", "value": ",".join(
+                f"{stern_x(y):.1f}:{y}" for y in range((FLOOR_ROW[3] + 1) * TILE, WATER_ROW * TILE + 9, 4))},
+            {"name": "sternMarks", "type": "string", "value": json.dumps(shell_paint.marks(picture, extra == shell_paint.STERN))},
             {"name": "plateSeams", "type": "string", "value": json.dumps(shell_paint.seams(build_ship_map_module()))},
             {"name": "endCover", "type": "int", "value": END_COVER},
             {"name": "shellRooms", "type": "string", "value": json.dumps(shell_rooms())},
@@ -2305,7 +2338,12 @@ def livery_pieces(ext, solid):
     from PIL import Image
     from build_livery import ORIGIN
 
-    src = Image.open(ROOT / "assets" / "source" / "livery" / "livery.png").convert("RGBA")
+    # (The user's own touches come first: `livery-by-hand.png`, a copy of `livery.png` edited by
+    # hand, is used in its place while it is there; `tools/build_livery.py` never writes it.)
+    by_hand = ROOT / "assets" / "source" / "livery" / "livery-by-hand.png"
+    src = Image.open(by_hand if by_hand.exists() else ROOT / "assets" / "source" / "livery" / "livery.png").convert("RGBA")
+    if by_hand.exists():
+        print("the livery: from livery-by-hand.png (the user's own)")
     W, H = src.size
     ox, oy = ORIGIN
     import numpy as np

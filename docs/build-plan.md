@@ -281,7 +281,9 @@ first"); how it was done: `docs/progress-decisions.md`.
 ## After the regions
 
 - **The hull, refined** (the user, 2026-11-14, during step 12: "I want to refine the hull, when
-  we finish with sound"): from the full-size render of the ship; what to change is theirs to say.
+  we finish with sound"). **Done the same day:** the livery's two spots, the stern's counter, the
+  outside view's sky (`docs/progress-decisions.md`); the user's own touches to the livery go into
+  `assets/source/livery/livery-by-hand.png`.
 - **The controller:** the mapping of §3.1 tested on the Xbox pad through the whole route.
 - **Tuning:** the checkpoints' spacing, the hazards' periods and the carries' meters from her
   playtest; the tangerine count.

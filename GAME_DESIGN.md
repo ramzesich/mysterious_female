@@ -308,7 +308,11 @@ there; they only remind her he's on board.
   white corners in a clearing or a white lighthouse with a red band on a bare rock, surf at their
   feet. The far sea fades into the haze at the horizon, faint glints growing toward the near sea.
   Fair-weather clouds, heaps of round puffs with lumpy undersides, half see-through so they sit
-  back in the sky, standing well up in it. **The horizon** is fixed to the screen from moment to
+  back in the sky, standing well up in it. **From outside (O) the sky stands in the world, not
+  on the screen** (the user, 2026-11-14, on a picture of the whole ship stitched from many
+  views, which had a strip of sky and a row of clouds for each row of views): it deepens over a
+  fixed stretch up from the horizon, and the clouds are in three rows, small and faint low over
+  the horizon, bigger higher up. **The horizon** is fixed to the screen from moment to
   moment, far away as it is: while she is in the air it holds still, so a jump doesn't move it;
   while she is on her feet (or on stairs, ladders, lifts) it glides to its place **58 px over the
   floor she stands on**, about the top of her head, so the camera's slack never leaves it out of
@@ -481,7 +485,11 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   superstructure front (measured row by row: 18.7 m at deck 7 to 25 m at the bridge; deck 11's
   wall at 29.5 m behind its open roof, `FRONT_WALL`) and the stern's tiers run smoothly; **two
   crew decks of hull (1-2) show above the waterline** (`HULL_DECKS_BELOW`), so the ship is ~7.6
-  times as long as tall, near the profile's 7.8; the stern goes straight down to the water.
+  times as long as tall, near the profile's 7.8; the stern went straight down to the water until 2026-11-14, when the
+  user asked for it to be like the real ship's without touching the playable decks: **under
+  deck 3's floor the transom curves forward down to the waterline** (a counter, as in the side
+  photo: plumb at its top, raking in more toward the water; `COUNTER`, `stern_x` in the map
+  builder).
   Step 2, the details drawn on the shell (`shell_details`): round portholes on the lower hull, a
   navy waterline band, square windows on the cabin decks, balconies on decks 8-10 midships and
   aft, big windows on the public rooms, the bridge's window band, the white bulwark and glass
@@ -523,7 +531,10 @@ marks); all round windows (deck 5's and the lower hull's, in line) are 24 px acr
   columns; they fade when she is inside deck 6 or 7. The photo crops
   (`reference/photos/lifeboat-ref*.png/jpg`) stay git-ignored.
 - The sun livery is the real one (2026-11-07, §8): generated with PixelLab from the user's side
-  photo, centred about 40 m from the bow on deck 6, its ribbons running aft to about 142 m. Its
+  photo, centred about 40 m from the bow on deck 6, its ribbons running aft to about 142 m. Two round
+  spots left where the photo's portholes had been painted over were filled on 2026-11-14 (the
+  user), and **the user's own touches to it go into `assets/source/livery/livery-by-hand.png`**,
+  a hand-edited copy of `livery.png` that the map builder uses in its place while it is there. Its
   ragged lines were smoothed on 2026-11-14 (the user): each outline evened out along its length,
   the ribbons' tips kept.
 - **The side is plated, not one flat white (step 11, 2026-11-14, the user's wish):** seams along
@@ -2071,9 +2082,11 @@ Nothing blocks the start of the build. These get settled along the way:
       the glide to the mooring deck, the catch, the way home, cabin 8206, the day after), and the
       ship's side is plated and weathered (step 11, 2026-11-14; the livery's lines smoothed with
       it). **Sound is in** (step 12, 2026-11-14: an effect for every entity, the
-      ambience, M to mute; waiting for the user's ears on `tools/soundboard.html`). **Next (the
-      user, 2026-11-14): refining the hull**, from the full-size render; then the rest of "After
-      the regions" in `docs/build-plan.md` (the controller, tuning, her playtest and the hidden
+      ambience, M to mute; waiting for the user's ears on `tools/soundboard.html`). **The hull was refined after it** (the user, 2026-11-14:
+      the livery's two spots filled, the stern's counter under deck 3, the outside view's sky laid
+      out in the world; `docs/progress-decisions.md`). **Next:** the user's word on the sounds,
+      their own touches to the livery (`livery-by-hand.png`, §5.3), then the rest of "After the
+      regions" in `docs/build-plan.md` (the controller, tuning, her playtest and the hidden
       extras). Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")

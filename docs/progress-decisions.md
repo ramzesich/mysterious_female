@@ -1228,3 +1228,43 @@ Photo Studio whines as it charges; a cake about to go over warns with two anxiou
 `src/config.js` has the whole volume, the effects' and the ambience's; each effect's own is in
 its line in `src/sfx.js`); a held sound that can be stopped (the soft serve machine's motor is
 short pieces end to end); eating and drinking are mostly silent; the controller has no mute.
+
+## After step 12: the hull refined (2026-11-14)
+
+Asked for by the user on a full-size render of the ship made during step 12, three points:
+
+1. **"Livery: fill the two round spots left where the photo's portholes were painted over."** A
+   dark red drop in the lower red band and a red-orange disc in the loop, both too near their
+   band's edge for the rule that fills such spots. Each is named by a point inside it (`SPOTS` in
+   `tools/build_livery.py`) and takes the colour round it; the builder stops if a spot is no
+   longer where it was.
+2. **"Stern: it is a straight vertical line now. Make it similar to the real ship. Without
+   touching the playable decks."** The side photo shows the real stern plumb for most of its
+   height and curving forward to the waterline under it (a counter). The playable decks reach
+   down to deck 4, so the curve lives **under deck 3's floor**: 256 px of hull in which the
+   transom rakes in by 152 px, more and more toward the water (`COUNTER`, `stern_x()` in the map
+   builder). Nothing of a deck is touched. The hull's tiles stop short of the curve and the game
+   draws the smooth sliver between, as it does along the stem (`sternEdge`, `sternMarks`); the
+   boot topping follows the curve; the stern's draught marks moved forward with the waterline's
+   end; the foam and the wake start where the hull now meets the water. The tiers above (decks
+   7 to 12) are as they were: they are decks she plays on.
+3. **"Background: why are there two rows of clouds with a weird blue area above the sea? Make
+   it look more real."** The picture is stitched from four rows of screens, and the sky was laid
+   out for each screen: every row brought its own strip of sky and its own clouds. In the game's
+   outside view there was one, but it too was tied to the screen. Now **from outside the sky
+   stands in the world**: it deepens over a fixed stretch up from the horizon, the islands and
+   the clouds have a fixed size against the ship (what they had on a 1920 px wide screen) and
+   grow with it when the view is zoomed, and the clouds are in three rows (small and faint low
+   over the horizon, bigger higher up) instead of one. `tools/render_ship.py` holds the sea and
+   the sky still while it takes its views (`enterOverview(true)`), so they fit each other. Play
+   is as it was.
+
+And, asked with it ("the best and easiest way for me to do the final touches to the livery by
+myself"): **the user's own touches have a file of their own**,
+`assets/source/livery/livery-by-hand.png`, a copy of `livery.png` edited by hand, which the map
+builder uses in its place while it is there and the generator never writes. Recommended:
+Paint.NET, antialiasing off, the bucket's tolerance at 0, colours picked from the picture.
+
+Checked: `boot`, `overboard`, `falls` and `sound` pass; the render and the game's outside view
+looked at. The whole suite was not run again after these (cosmetic, and it had passed an hour
+before, with the sound): it runs before the next merge.
