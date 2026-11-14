@@ -496,5 +496,11 @@ Lessons learned (2026-11-14, the intro shown to the user):
   background's drift aft looked wrong in the intro's wide views, where the camera stands still
   and a sun stands in the world (the user saw islands and clouds slide past it). In a view from
   afar, far things hold.
+- **Two states of one thing share one frame:** a sheet draws an open door and a closed door as
+  two pictures, each fitted to a door's height by itself, and their frames come out different
+  (the open crew door's 5 px lower and off the floor; the open cabin door's dark and narrower).
+  The user sees it the moment one replaces the other. Build the second state from the first's
+  frame (`level_frame`, `reframe` in `tools/build_ship_art.py`), and lay the two over each other
+  at the game's placing before calling them a pair.
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

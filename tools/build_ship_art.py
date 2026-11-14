@@ -68,7 +68,8 @@ MUTE = 0.35
 # (box-resampled, then snapped back to the palette), when the sheet drew it too big for her;
 # "from_x", drop the frame's columns left of this (a neighbour's end drawn into it); "join", the
 # columns (from, to) of the next frame to add on the right, where the sheet drew one piece across two.
-# "level", for an open door drawn with its leaf swung toward us (see `level_frame`).
+# "level", for an open door drawn with its leaf swung toward us (see `level_frame`). "reframe", for
+# an open door that must stand in its closed twin's frame (see `reframe`).
 DOOR = (28, 74)                        # sized to her, like every door on board (§5.4)
 LEVER = 36                             # about half the door's height, as on a real door
 PIECES = {
@@ -76,7 +77,9 @@ PIECES = {
     "door-cabin-stickers-1": ("doors-1", 3, DOOR, {"fill": True, "lever": 36}),
     "door-cabin-stickers-2": ("doors-1", 12, DOOR, {"lever": 36}),
     "door-cabin-stickers-3": ("doors-1", 14, DOOR, {"fill": True, "lever": 36}),
-    "door-cabin-ajar": ("doors-1", 5, DOOR, {}),
+    # (The sheet drew it in a dark frame, narrower than the closed cabin door's: `reframe`.)
+    "door-cabin-ajar": ("doors-1", 5, DOOR, {"reframe": {"of": "door-cabin", "opening": (5, 5, 28, 72), "inner": (5, 5, 24, 72),
+                                                         "wider": (9, 10, 24, 24)}}),
     "door-crew": ("doors-1", 6, DOOR, {"lever": 37}),
     # (Its frame came lower and wider than the closed door's, and 3 px off the floor: `level`.)
     "door-crew-ajar": ("doors-1", 7, DOOR, {"level": {"frame": (2, 70), "cut": (6, 7, 8, 9), "more": (9, 27, 31, 50, 58)}}),
@@ -443,6 +446,30 @@ def level_frame(img, frame, cut, more):
     return out
 
 
+def reframe(img, closed, opening, inner, wider):
+    """An open door put into its closed twin's frame (the user, 2026-11-14, on seeing the two
+    side by side: "the frames differ now, also in color. Fix that"). The sheet drew the open cabin
+    door in a dark frame 30 px wide; the closed one's is the corridor's warm wood, 34 px. The
+    result is the closed door's picture with what shows in its `opening` (x0, y0, x1, y1) replaced
+    by what shows in the open door's own (`inner`): its leaf and the light behind it, made as
+    wide as the opening by drawing the columns `wider` twice (plain ones of the leaf, and the
+    strip of light at its edge, so the door stands a little further open)."""
+    ox0, oy0, ox1, oy1 = opening
+    ix0, iy0, ix1, iy1 = inner
+    cols = [x for x in range(ix0, ix1 + 1) for _ in range(1 + wider.count(x))]
+    assert len(cols) == ox1 - ox0 + 1 and iy1 - iy0 == oy1 - oy0, (len(cols), opening, inner)
+    out = closed.copy()
+    for j in range(oy1 - oy0 + 1):
+        for i, x in enumerate(cols):
+            out.putpixel((ox0 + i, oy0 + j), img.getpixel((x, iy0 + j)))
+    # (The threshold under the opening: the light falls on it, as the sheet drew.)
+    for i, x in enumerate(cols):
+        px = img.getpixel((x, iy1 + 1))
+        if px[3]:
+            out.putpixel((ox0 + i, oy1 + 1), px)
+    return out
+
+
 def build():
     pieces = {}
     for name, spec in PIECES.items():
@@ -463,6 +490,12 @@ def build():
             img = level_frame(img, **opts["level"])
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
+    # (Once every piece is made: the ones that take another's frame.)
+    for name, (_, _, _, opts) in PIECES.items():
+        if opts.get("reframe"):
+            r = opts["reframe"]
+            pieces[name] = reframe(pieces[name], pieces[r["of"]], r["opening"], r["inner"], r["wider"])
+            pieces[f"{name}-bg"] = muted(pieces[name])
 
     # Shelf packing, tallest first, one pixel apart.
     order = sorted(pieces, key=lambda n: -pieces[n].height)

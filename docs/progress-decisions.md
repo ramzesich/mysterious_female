@@ -1559,3 +1559,13 @@ foot and draws the leaf's foot level with the floor; the leaf's corner still ris
 frame. It is the door of every lit checkpoint on board, so all of them changed. No tests were
 run, at the user's word ("this is just a leveling"); the two doors were laid over each other at
 the game's placing and their frames coincide.
+
+**And the open cabin door** (the user, on the picture of the doors side by side: "the two doors
+on the right (the orange ones) represent the same door in two states? If so, the frames differ
+now, also in color. Fix that"). They are: the guest cabin door closed, and ajar (the cabins held
+open on decks 6 and 9, and the one that stands ajar in a hallway). The sheet drew the ajar one in
+a dark frame 30 px wide; the closed one's is the corridor's warm wood, 34 px. `reframe()` in
+`tools/build_ship_art.py` now builds the ajar door as the closed door's own picture with its
+opening filled by the ajar door's leaf and light (two plain columns of the leaf and the strip of
+light drawn wider to fill it, so it stands a little further open). Same frame, same colours, same
+size, same level. No tests run; the pieces were compared side by side.
