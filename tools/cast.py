@@ -77,8 +77,8 @@ CAST = {
     # that hold his clipboard.)
     "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4},
                      {"cut": {"flap": ("flap2", [1, 2, 3, 4, 5, 6])}}),
-    "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9}, {}),
-    "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9}, {}),
+    "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9, "idle": 4}, {}),
+    "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9, "idle": 4}, {}),
     "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
     "cowboy": ("9aa4a55c-aea0-46aa-80fb-8642f6d13c99", {}, {}),
     "barman": ("ac5b9c77-3083-4b2b-9615-e7a3a98dc860", {"idle": 4}, {}),
@@ -181,4 +181,30 @@ CAST = {
     "teppan_2": ("d53dac58-6a4f-4439-8030-3226887dba5c", {}, {"scale": 0.8}),
     "teppan_3": ("4e0eae20-2959-4b1b-abeb-a9f188b22326", {}, {"scale": 0.8}),
     "teppan_4": ("42920244-2e84-460a-ab33-36635732b3b1", {}, {"scale": 0.8}),
+    # Region 9 (The bow). The wedding party in deck 12's forward lobbies: the planner, the couple,
+    # four guests; Cagney's pastry chef; the Spinnaker's barman; the kids' pool's two; the spa's
+    # receptionist, masseuse, stylist and step class; the officers of decks 9 and 10; the kids'
+    # club's counsellor. (Loops are cut from the frames before a clip turns the figure to face us
+    # or drops what it holds; the planner's "fret" and a guest's "laugh" did both and were dropped.)
+    # (Six came out with heads of 21 to 25 px from text and were made again
+    # with mode="pro": the first ones, kept on PixelLab: wed_groom 8e25f1ec, wed_guest_a b5c89fa2, wed_guest_c 08532590, pastrychef 69bb0340, barman_sp e01475fd, counsellor b3ee4e51.)
+    "planner": ("cc307b42-5ec9-4c95-a846-76882b67ab75", {"idle": 4, "walk": 8}, {}),
+    "wed_bride": ("ab0e8199-c60d-402d-a5d4-186f33bc3793", {"idle": 4, "walk": 7, "kiss": 7}, {}),
+    "wed_groom": ("cd8f0a2b-e837-48aa-8c6a-f613ddc8befe", {"fuss": 7, "walk": 8, "kiss": 7}, {"cut": {"fuss": ("fidget", [0, 1, 2, 3, 2, 1])}}),
+    "wed_guest_a": ("d311befd-5e0e-4d64-b63a-a9d8dd7c8ea0", {"sip": 6, "walk": 8}, {}),
+    "wed_guest_b": ("7875101f-fbc8-4a40-8a53-b0987fc26e98", {"walk": 8}, {}),
+    "wed_guest_c": ("3560d751-4dd5-441e-b6ac-fe17c9251393", {"walk": 8}, {}),
+    "wed_guest_d": ("9d99e1c2-7611-4536-bb0b-0ea545ee1635", {"walk": 8}, {}),
+    "pastrychef": ("4bdd435f-84cb-4f3a-bd36-2106d0b693be", {"idle": 4, "sigh": 7}, {}),
+    "barman_sp": ("8a4fd600-d655-4810-bced-3fcc89f29d61", {"shine": 7}, {"cut": {"shine": ("polish", [0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 4, 2])}}),
+    "spa_reception": ("d45cc830-9766-4229-a74f-c950873b6e0f", {"bow": 8}, {}),
+    "masseuse": ("2fefa59f-b6af-4f92-8133-41d5c5256da8", {"knead": 7}, {}),
+    "stylist": ("42d60ae5-b735-40b6-b118-5cb62efa8577", {"work": 6}, {"cut": {"work": ("snip", [0, 1, 2, 3, 2, 1])}}),
+    "stepper_a": ("b360c69a-412b-45aa-a318-38495b31dde9", {"steps": 9}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
+    "stepper_b": ("6be4ce88-e432-45d4-9efe-84d79ad27e4e", {"steps": 8}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
+    "officer_9": ("62e25632-167d-4c88-b585-04d3e606dd4e", {"walk": 8}, {}),
+    "officer_10": ("3c827584-0209-4260-8e66-2982801bb0d9", {"walk": 8}, {}),
+    "counsellor": ("2a5a0882-b53f-4069-af2a-92b877c3305a", {"cheer": 9}, {"cut": {"cheer": ("clap", [3, 4, 5, 6, 7, 8, 7, 6, 5, 4])}}),
+    "poolkid_a": ("7638cecb-28a1-4d16-b1ca-f32388314e3b", {"hop": 9}, {"scale": 0.62, "cut": {"hop": ("jump", [3, 4, 5, 6, 7, 8])}}),
+    "poolkid_b": ("8c73e72a-ca99-49ed-861f-12b4314638de", {"hop": 9}, {"scale": 0.66, "cut": {"hop": ("bounce", [3, 4, 5, 6, 7, 8])}}),
 }

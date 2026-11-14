@@ -826,3 +826,39 @@ runner's place, her grip on the open parasol), and after those only `region8` wa
 What is left of the review is listed in `GAME_DESIGN.md` §8 ("First next time"): the golden path
 and `region6` again, the grip and the leaning parasol seen in the game, the porter and the stage
 manager seen in place, and the sweep of everyone with `tools/shoot_people.py`.
+
+**The review finished (2026-11-14).** What the last looks and two more of the user's corrections
+changed:
+
+1. **Seen in the game, enlarged:** her fist on the open parasol in the glide, facing each way
+   (right); the furled parasol at the sunbed with the old lady there, after the horn and taken
+   (right); the porter with his cart (right).
+2. **The stage manager stood in the drum kit, black on the dark stage.** He is in front of the
+   red curtain's leg at the stage's forward edge now (244.42 m).
+3. **The user, from that picture: "the door is on top of the speakers, the sign is on top of the
+   speakers."** The stage door moved forward to 241.3 m, clear of the speaker stack with its
+   plate. I had looked at that picture for the stage manager only.
+4. **So overlaps are checked by rule now:** `tools/check_overlaps.py` reads every picture's and
+   text's real bounds in the running game, in two states of the story, and lists doors, plates,
+   signs and wall pictures that cross furniture or each other. Its first run found six more of
+   the plan's doors on built things, all from step 0's "nearest free metre": the pantry's door on
+   the wine trolley (the trolley moved 0.3 m), the aft checkpoint on deck 7 on the pinball table
+   (now at 189.15 m, between the cabinets and the claw machine, which moved 0.2 m), the lighting
+   booth's door on a balcony seat (that seat left out, the door at 206.1 m), the gym's checkpoint
+   on a treadmill and in the window wall (now on the strip of wall at 82.72 m), the chapel
+   lobby's checkpoint on the side table (the table moved to 69.75 m). The list is empty but for
+   the cake's stand-in switch, which step 9 removes.
+5. **The sweep of every person in place** (`tools/shoot_people.py`, eight sheets) found one
+   fault of the runner's kind: the boat drill's crewman cranked the air. A winch stands at his
+   hands now (a PixelLab map object). On the way: the drill's rope had `back`, a depth that is
+   behind the ship's side outside, and had never been seen; it shows now.
+6. **The user: "What are they doing? They look weird and out of place"** (the two dancers sat on
+   the floor by the stalls after the stage's beat, my addition in step 3). They stand by the
+   front row now, facing each other, with a breathing idle each (6 generations). The check has
+   a new question for this: what is this person doing, and would the user know why here?
+7. **`region8`'s flaky first climb was the test's:** it walked along the sun cover for a fixed
+   3.2 s and sometimes jumped a few steps short of the rail, into its side. It walks until she
+   is at the rail now (the golden path too). A jump from the rail's foot clears it every time.
+
+PixelLab for this: the winch (1), the dancers' idles (6).
+

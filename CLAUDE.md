@@ -53,6 +53,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
+| `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in two states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
@@ -95,10 +96,22 @@ of each:
    leans on something, a cup is on a surface, a seated person has a seat under them.
 7. **Before and after:** look at the spot in each state the story gives it (the old lady there
    and gone), since what a thing leaned on may leave.
+8. **What are they doing?** Would the user, shown this person alone, say what they are doing
+   and why here? Two dancers sat on the floor of an aisle read as two people fallen over ("they
+   look weird and out of place", the user, 2026-11-14); a crewman cranked a winch that was not
+   drawn. A pose needs its reason in the picture: the seat, the tool, the person they talk to.
+9. **Doors, plates and signs clear of everything:** a door with furniture on it, a plate across
+   a speaker stack, a checkpoint's door in a window wall are wrong whichever is drawn on top
+   (the user, 2026-11-14: the stage door and its plate on the speakers). This one is checked by
+   rule, not by eye: `python tools/check_overlaps.py` must list nothing.
 
 Tools: `Browser.close_up()` in `tools/playtest.py` (a spot enlarged, a deck cut open while she is
 elsewhere); `python tools/shoot_people.py [ids]` (every person in place, tiled);
-`python tools/check_people.py` (proportions, heads, clips). Composing sprites offline with PIL at
+`python tools/check_people.py` (proportions, heads, clips); `python tools/check_overlaps.py
+[--shots]` (every door, plate, sign and wall picture against what stands by it, from the real
+bounds in the running game; what is meant is listed in its `ALLOWED`, each with its reason).
+**When a picture is looked at for one thing, look at all of it:** the stage door's overlap was
+in a close-up taken to check the stage manager, and was missed. Composing sprites offline with PIL at
 the game's offsets is exact and needs no browser. When one instance of a fault is found, look
 for the rest of its kind at once (one chibi figure meant twenty-four; one seated figure too big
 meant five).
@@ -243,6 +256,21 @@ Lessons learned (2026-11-13, the people's proportions):
   near part of the machine is in front of them.
 - **A thing with stripes is cut shorter, not shrunk** (`CUT_ROWS` in `tools/build_things.py`), and
   PixelLab's muddy reds are swapped for the palette's after the conversion (`RECOLOUR`).
+
+Lessons learned (2026-11-14, the end of the art review):
+
+- **A door the plan adds is placed against what is built there, not by its metre alone:** seven
+  of the plan's doors (rooms, checkpoints) stood on built furniture or in a window wall. Before
+  placing one, list the builder's pieces within a metre of it; after, run
+  `tools/check_overlaps.py`. Where no wall is free, move the furniture a little or take one
+  piece out (a seat in a row), rather than squeeze the door in.
+- **On the outside route a prop never takes `back`:** that depth is behind the ship's side, and
+  the boat drill's rope was never seen. Outside, a thing is behind a person by default.
+- **A playtest walks until she is there, not for a time:** `region8`'s climb failed one run in
+  three because a fixed 3.2 s walk sometimes ended a few steps short of the rail
+  (`hold_until`, not `hold`).
+- A person all in dark clothes is not placed on a dark set: the stage manager in black stood
+  on the dark stage, in the drum kit; he is in front of the red curtain now.
 
 ## Working with the user
 

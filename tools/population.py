@@ -28,9 +28,10 @@ ROOMS = [
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
     dict(id="nook", deck=6, m=189, width=240, look="nook", door="bookcase", needs="nook"),
-    dict(id="dressing", deck=6, m=242.5, width=240, look="dressing", door="crew", plate="STAGE DOOR",
+    # (At 242.5 m its door and its plate lay on the speaker stack by the stage: the user, 2026-11-14.)
+    dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR",
          lock=("card", "ent", 0)),
-    dict(id="lighting", deck=7, m=206, width=480, look="lighting", door="crew", plate="LIGHTING",
+    dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING",
          lock=("card", "ent", 0)),
     dict(id="lifeboat", deck=7, m=147.5, route="outside", width=240, look="lifeboat", door="hatch"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
@@ -73,11 +74,14 @@ CHECKPOINTS = {
     "cp_6_fwd": (6, 40, "inside", True),
     "cp_library": (6, 160.85, "inside", False),
     "cp_foyer": (6, 204.4, "inside", False),
-    "cp_7_aft": (7, 191.6, "inside", False),
+    # (In the Arcade, between its cabinets and the claw machine: at 191.6 m it stood on the pinball table.)
+    "cp_7_aft": (7, 189.15, "inside", False),
     "cp_station": (7, 128, "outside", False),
     "cp_9_arrive": (9, 119.6, "inside", True),
     "cp_9_mid": (9, 190, "inside", True),
-    "cp_gym": (11, 84, "inside", False),
+    # (On the strip of wall between the lobby's door and the gym's windows: at 84 m it stood on a
+    # treadmill, in the windows.)
+    "cp_gym": (11, 82.72, "inside", False),
     # (The pool attendant's hut on pool 2's aft rim: the kid's and the wet patch's frights come back here.)
     "cp_pool": (11, 140.6, "inside", False),
     "cp_garden": (11, 192, "inside", False),
@@ -274,14 +278,18 @@ PEOPLE = {
     "amb_couple_7_her": dict(at=(7, 83.75), who="plaquewoman", pose="back", layer="back"),
     "amb_couple_7_him": dict(at=(7, 84.6), who="plaqueman", pose="back", layer="back"),
     # Region 3, the theatre (deck 6). The stage manager at the curtain; two dancers rehearsing on
-    # the stage until Bumbot's beat, sat on the floor in front of it after; the rival where the trap
+    # the stage until Bumbot's beat, standing by the front row after; the rival where the trap
     # door dropped him, on the galley's flour sacks; three in the stalls.
-    "npc_stagemanager": dict(at=(6, 245.0), who="stagemanager", face=1, idle="idle",
+    # (He is all in black: in front of the red curtain's leg at the stage's forward edge, where he
+    # shows; at 245 m he stood in the drum kit, black on the dark stage.)
+    "npc_stagemanager": dict(at=(6, 244.42), who="stagemanager", face=1, idle="idle",
                              bubble=("pills", "flag:bb3", "card:ent", 4)),
     "amb_dancer_her": dict(at=(6, 245.9), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
     "amb_dancer_him": dict(at=(6, 247.15), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
-    "amb_dancer_her_sat": dict(at=(6, 241.05), who="dancer_her", face=1, still="sit", after="flag:bb3", layer="back"),
-    "amb_dancer_him_sat": dict(at=(6, 241.75), who="dancer_him", face=-1, still="sit", after="flag:bb3", layer="back"),
+    # (Off the stage they stand by the front row, talking. They sat on the floor there at first: the
+    # user, 2026-11-14: "What are they doing? They look weird and out of place.")
+    "amb_dancer_her_off": dict(at=(6, 238.55), who="dancer_her", face=1, idle="idle", after="flag:bb3", layer="back"),
+    "amb_dancer_him_off": dict(at=(6, 239.33), who="dancer_him", face=-1, idle="idle", after="flag:bb3", layer="back"),
     "riv_galley": dict(at=("galley", 62), who="rival", face=1, still="sit", after="flag:bb3", until="region:4"),
     "amb_audience_1": dict(at=(6, 212.29), who="aud_gent", face=1, layer="back"),
     # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the
@@ -450,7 +458,11 @@ PROPS = {
     "amb_ice": (8, 177.82, "ice-bucket", 3, {}),
     "amb_ice_glasses": (8, 178.02, "wine-glasses", 3, {}),
     # The drill's rope across the walkway's inboard side and its sign.
-    "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, dict(back=True)),
+    # (No `back` outside: that depth is behind the ship's side, and the rope was never seen.)
+    "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, {}),
+    # The winch its crewman cranks (he cranked the air: found in the sweep of 2026-11-14). Its
+    # handle is where his hands go round, 12 px in front of his middle; he is drawn over it.
+    "prop_drill_winch": ("walkway", 184.9 + 24 / 48, "thing:winch", 0, {}),
     # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
     "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
     # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under

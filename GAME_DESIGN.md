@@ -1999,32 +1999,13 @@ Nothing blocks the start of the build. These get settled along the way:
       old lady gone, the gulls off the bow), books 8 and 9, the telescope; the parasol: hold jump
       to glide, ↓ + jump over a railing (down the atrium, past the balconies). Playtest `region8`;
       `?at=terrace`, `sundeck`, `technical`, `teppanyaki`, `funnel`
-- [ ] **First next time: finish the art review of 2026-11-13** (the people's proportions, the
-      parasol, the runner: `docs/progress-decisions.md`, "Between steps 8 and 9"). Done and
-      committed: 24 people redrawn with their clips, five seated ones shrunk, the parasol's two
-      pictures, her hand on it, the runner turned to her console, the check "Looking closely"
-      (`CLAUDE.md`) and its tools. The whole suite passed (582 checks) before the last three small
-      changes (the furled parasol moved to lean on the sunbed's foot, the runner's place, her
-      grip); after them only `region8` was run: it failed once at the gust-timed climb onto the aft terrace at its start (a known flaky jump, not near these changes) and passed on the second run (55 checks). **Still to do, in this order:**
-      1. Run `python tools/playtest.py golden region6 region8` (the parasol's pickup moved to
-         129.12 m and the tests' stop to the old lady + 40 px; the gym is on region 6's deck). If
-         `region8` fails at "along the cover and over the rail", it is the gust-timed jump at the
-         test's start: make it wait for a fresh lull as the golden path does.
-      2. See in the game, enlarged (`Browser.close_up()`), what was only composed from the sprites:
-         her fist on the open parasol in the glide, facing each way; the furled parasol leaning on
-         the sunbed with the old lady there and after the horn.
-      3. See the porter with his cart and the stage manager in place: `tools/shoot_people.py`
-         put her in a doorway for the one and the stage was dark for the other. Also not seen in
-         place, only as clips: the buffet queue's two redrawn (the kaftan, the polka dots) and the
-         two behind deck 10's doors (they are not in `world.people.byId`).
-      4. **The sweep:** `python tools/shoot_people.py` over everyone, and look at each sheet for
-         the runner's kind of fault: someone facing away from what they use, covering furniture
-         they should be behind, standing on nothing. Fix what it finds.
-      5. Then commit, and go on to step 9.
-      (Housekeeping, optional: the redrawn people's old frames are in `%TEMP%/bumbusik-old-people/`
-      and their old characters are still on PixelLab, listed in `tools/cast.py`; three tries on
-      PixelLab were not used: `1ea5f29d` and `542c46c0` (the security officer), `896187c3` (the
-      stage manager without his headset).)
+- [x] **The art review of 2026-11-13, finished 2026-11-14** (`docs/progress-decisions.md`,
+      "Between steps 8 and 9"): 24 people redrawn to her proportions, the parasol, her grip, the
+      runner; then, seen close in the game: the stage manager out of the drum kit, the stage
+      door and its plate off the speakers (the user), six more doors off built furniture (found
+      by the new audit, `tools/check_overlaps.py`), a winch for the boat drill's crewman, the
+      two dancers standing by the front row instead of sat on the floor (the user). The check
+      on everything placed is in `CLAUDE.md`, "Looking closely" (nine questions and four tools)
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:

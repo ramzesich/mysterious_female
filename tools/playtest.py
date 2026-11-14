@@ -1008,8 +1008,9 @@ def scenario_golden(b):
     b.key("left", False)
     s = b.state()
     ok &= check(s["y"] < D11 - 100, "a wall jump up the post lands her on the sun cover", s)
-    b.hold("left", 3.4)
-    # (Over the rail early in a lull of the terrace's gusts: a jump in one falls short.)
+    # (Up the cover to the rail's foot, however long that takes: a jump begun short of it meets the
+    # rail's side. Then over the rail early in a lull of the terrace's gusts: a jump in one falls short.)
+    hold_until(b, "left", lambda s: s["x"] < exact_x(220) + 9, 6)
     wait_js(b, "(window.__ship.time.now / 1000) % window.__ship.world.data.topdeck.terrace.gust.every < 2.2", 9)
     b.hold(["left", "space"], 0.8)
     b.hold("left", 0.5)
@@ -1564,7 +1565,7 @@ def scenario_region3(b):
     ok &= check(s["y"] == D6 and s["mode"] == "play", "hopped, she drops onto the stage: no scare", s)
     b.teleport(exact_x(244.4), D6)
     time.sleep(0.4)
-    ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_sat")["on"],
+    ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_off")["on"],
                 "the stage manager at the curtain, the dancers rehearsing")
     b.shot("region3-stage")
     b.teleport(st["trapX"], D6)
@@ -1578,7 +1579,7 @@ def scenario_region3(b):
     ok &= check(wait_flag(b, "bb3", 16), "near-catch 3: the rival goes down the trap door, Bumbot up the fly rope", flags(b))
     ok &= check(js(b, "window.__ship.world.story.trapHole.visible") and not js(b, "window.__ship.world.story.trapSeam.visible"),
                 "the trap door stays open")
-    ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_sat")["on"], "the dancers sit it out in front of the stage")
+    ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_off")["on"], "the dancers wait by the front row")
     light = "window.__ship.world.movers.find(m => m.lamp)"
     time.sleep(1.2)
     ok &= check(js(b, f"{light}.lamp.swinging"), "and the stage light swings")
@@ -2924,7 +2925,8 @@ def scenario_region8(b):
     b.key("left", False)
     s = b.state()
     ok &= check(s["y"] < D11 - 100, "a kick off the sun cover's post lands her on the cover", s)
-    b.hold("left", 3.2)
+    # (To the rail's foot, however long that takes: a jump begun short of it meets the rail's side.)
+    hold_until(b, "left", lambda s: s["x"] < exact_x(220) + 9, 6)
     wait_js(b, tg, 9)
     b.hold(["left", "space"], 0.8)
     b.hold("left", 0.4)

@@ -1245,7 +1245,7 @@ def build_objects():
         dinner(m, "dark-table-lamp-bg", "dark-chair-bg")
     put(5, 157.65, "wine-barrel-bg")
     put(5, 161.95, "olive-tree-bg")
-    put(5, 166.4, "wine-trolley-bg")
+    put(5, 166.7, "wine-trolley-bg")      # (clear of the pantry's crew door at 166 m)
     # The Four Seasons: cream, burl-wood pillars, white-cloth tables, beige chairs, sheer curtains,
     # chandeliers.
     seasons = [171.0, 175.4, 179.8, 184.2, 188.6]
@@ -1474,13 +1474,14 @@ def build_objects():
     decor("arcade-doorway", "doorway", exact_x(186), exact_x(186), deck=7, text="Arcade")
     put(7, 187.4, "arcade-cabinet-bg")
     put(7, 188.3, "arcade-cabinet-bg")
-    put(7, 189.8, "claw-machine-bg")
+    put(7, 190.0, "claw-machine-bg")      # (the aft checkpoint's crew door stands at 189.15 m)
     put(7, 191.4, "pinball-bg")
     put(7, 192.9, "arcade-cabinet-bg")
     # The Stardust Lounge's balcony: rows of red seats down to the railing over the stage.
     decor("balcony-doorway", "doorway", exact_x(202), exact_x(202), deck=7, text="Stardust Lounge Balcony")
     for k in range(int((STAGE - 1.6 - 204.2) / 0.95) + 1):
-        put(7, 204.2 + k * 0.95, "theatre-seat-bg")
+        if k != 2:      # (no seat at 206.1 m: the lighting booth's door is in the wall there)
+            put(7, 204.2 + k * 0.95, "theatre-seat-bg")
     # Its front over the stage, seen end-on: a velvet-padded parapet with a brass rail, as tall as
     # the solid railing she hops (the tile itself is invisible).
     put(7, 0, "balcony-front", x=(col(STAGE) - 1) * TILE + TILE // 2)
@@ -1711,8 +1712,8 @@ def build_objects():
     # The Chapel lobby: the Chapel's door (CHAPEL, built by the game), the restrooms.
     add(point("chapel-room", "chapel", exact_x(CHAPEL["m"]), floor_y(12)))
     add(point("chapel", "place", exact_x(CHAPEL["m"]), floor_y(12), [prop("route", "chapel")]))
-    at12(70.4, "side-table")
-    at12(70.4, "rose-glass", height("side-table-bg"))
+    at12(69.75, "side-table")       # (clear of the lobby's crew door at 70.7 m)
+    at12(69.75, "rose-glass", height("side-table-bg"))
     at12(72.6, "door-cabin")
     add(point("sign-restrooms", "sign", exact_x(72.6), floor_y(12) - 84, [prop("text", "Restrooms"), prop("style", "plaque")]))
     # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
