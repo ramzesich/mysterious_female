@@ -1327,7 +1327,19 @@ be built until they say so.
      are."** So it is a head now, in a frame of 28 x 33 px where the first was 41 x 36: a
      PixelLab map object, 32 px, two tries for 2 generations, the blacker one with whiskers
      kept (`assets/source/rooms/bumbot-head.png`), cut close, its pale yellow eyes given the two
-     colours of his sprite's (yellow-green and its darker shade). Its door is the start's checkpoint (`cp_crew`), lit from the start; the
+     colours of his sprite's (yellow-green and its darker shade). **Then the user put four
+     photos of the real Bumbot into `reference/photos/Bumbot/` ("use that in order to generate
+     a Bumbot picture in her cabin"; "Ask me if I like the picture before placing it in the
+     game"; "Try his photo with the fruit bowl as a reference, too").** Six candidates were
+     shown side by side, framed and enlarged: the Bombay head, three conversions of his
+     close-up, and two of the fruit-bowl photo. **The user chose "4": him lying by the bowl of
+     fruit**, 48 x 24 px in a 52 x 28 frame over the bed (`bumbot_picture()` in
+     `tools/draw_rooms.py`; source `assets/source/rooms/bumbot-by-the-bowl.png`; the Bombay
+     head is gone). What PixelLab was sent each time was a cutout only, the cat (and the bowl)
+     on a flat ground, nothing of the room; the photos stay in the git-ignored `reference/`.
+     The conversions come back charcoal or navy with orange eyes whatever the photo shows:
+     his fur is brought to his sprite's blacks and his eyes to the photo's pale yellow-green by
+     rule. Nine conversions at 1 generation each. Its door is the start's checkpoint (`cp_crew`), lit from the start; the
      gangway's (`cp_gangway`) lights when she first passes it, like any other.
    - **The ladder is an escape trunk** (decks 3 and 4, no card), the game's own way of putting a
      ladder behind a door. On deck 4 it comes out at 95.6 m in the place of one cabin door.
@@ -1337,7 +1349,7 @@ be built until they say so.
    - **The look:** a working corridor, plainer than the guests' (panels over a green dado, a
      steel handrail, pipes and a cable tray overhead, tube lights, vinyl). One new tile (the
      floor); the rest drawn by the game and dressed from the atlas. No generations spent on
-     the corridor; 2 on the picture of Bumbot in her cabin (above).
+     the corridor; 11 on the picture of Bumbot in her cabin (above: 2 + 9).
    - **The basic layout is as it was** (the user's standing rule): no deck's length, no room and
      no stair moved. Deck 3 was already in the map, closed; a part of it opens.
    - **Region 1** takes deck 3 in. The first errand is unchanged: up the ladder, forward through

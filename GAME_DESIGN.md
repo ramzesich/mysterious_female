@@ -403,7 +403,7 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   Bow to stern: the fire point (hose cabinet, extinguisher), **the Medical Center's door** with
   its plaque, a first-aid cabinet and a seat to wait on, the crew's notice board, **the door
   marked CREW** (her cabin, a room she can go into: patterned wallpaper, a desk under a
-  mirror, a porthole, her bed, for one, and over it a small picture of Bumbot's head, as the user set them
+  mirror, a porthole, her bed, for one, and over it a picture of Bumbot lying by a bowl of fruit, made from the user's own photo of him, as the user set them
   the same day; its door is the first checkpoint, lit from the start), a clock and the water
   cooler, the way out's sign, **the service ladder's door** (an escape trunk, decks 3 and 4) and
   the deck's plaque. It is a working corridor, plainer than the guests' decks: painted panels
@@ -412,8 +412,8 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   and lifts do not come down to it: the ladder is the only way up. The rest of deck 3 stays
   closed, and shows at the bottom of the screen when she is on deck 4, as it naturally would.
   There are no other crew or engine decks to explore. All of it from art already in the atlas
-  and drawn in code, but for the picture in her cabin: Bumbot's head, a generated Bombay cat's
-  with his own eyes (the user's wish; 2 generations for two tries).
+  and drawn in code, but for the picture in her cabin, which is PixelLab's pixel art of the
+  user's photo (11 generations in all for the tries the user chose from).
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
   list (`tools/ship_layout.py`); the art is placeholder until the real tiles come.
 

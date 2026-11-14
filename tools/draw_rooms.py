@@ -275,11 +275,11 @@ def crewcabin(width):
     """Her own crew cabin, deck 3 (the user, 2026-11-14: where the game starts): small and plain. By
     the door her spare uniform and the life jackets' shelf; a desk under a mirror, tangerines in a
     bowl on it; a porthole low over the sea; her bed, for one, an orange blanket on it, a suitcase
-    under it; over the bed a picture of Bumbot. The wallpaper has a small pattern (the user: "add
+    under it; over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
     R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
-    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2")
+    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2", BUMBOT_EYES, BUMBOT_GROUND)
     r, box, d = R.r, R.box, R.d
     # The wallpaper: a pinstripe every 8 px, a sprig between them every 12 px down, row about.
     for x in range(4, width, 8):
@@ -333,12 +333,11 @@ def crewcabin(width):
     d.point((cx - 3, cy - 3), fill=WHITE)
     for a, b in ((-8, -8), (8, -8), (-8, 8), (8, 8)):
         d.point((cx + a * 7 // 8, cy + b * 7 // 8), fill=YELLOW)
-    # Over the bed, a picture of Bumbot (the user: in the orange cat's place; then "smaller and
-    # only place his head there"): his head, close, on a warm ground in a wooden frame.
-    cat = bumbot_head()
+    # Over the bed, a picture of Bumbot (the user): him lying by a bowl of fruit, from their own
+    # photo of him, in a wooden frame.
+    cat = bumbot_picture()
     px, py = 198 - (cat.width + 4) // 2, 46
     box(px, py, px + cat.width + 3, py + cat.height + 3, WOOD, WOOD_DARK)
-    r(px + 2, py + 2, px + cat.width + 1, py + cat.height + 1, YELLOW)
     R.im.alpha_composite(cat, (px + 2, py + 2))
     r(px + cat.width // 2 + 1, py - 3, px + cat.width // 2 + 2, py - 1, SLATE)            # its nail
     # Her bed, for one (the user), its head aft: head and foot boards, the mattress on its rail, a
@@ -363,24 +362,45 @@ def crewcabin(width):
     return R.save("crewcabin")
 
 
-def bumbot_head():
-    """Bumbot's head for the picture in her cabin: a Bombay cat's, generated (PixelLab map object
-    5f958028-655b-4c85-a44b-b55ce068d531, `assets/source/rooms/bumbot-head.png`), cut close, its
-    eyes given his own colours (the user: "Eyes not orange, but how his eyes are": the pale
-    yellow-green of his sprite and its darker shade)."""
-    im = Image.open(ROOT / "assets" / "source" / "rooms" / "bumbot-head.png").convert("RGBA").crop((4, 1, 28, 30))
-    eyes = {(0xf2, 0xed, 0xae): (0xa2, 0xa9, 0x47), (0xa4, 0x95, 0x4d): (0x67, 0x66, 0x33)}
-    px = im.load()
-    for y in range(im.height):
-        for x in range(im.width):
-            c = px[x, y]
-            if c[3] < 128:
-                px[x, y] = (0, 0, 0, 0)
-            elif c[:3] in eyes:
-                px[x, y] = (*eyes[c[:3]], 255)
-            else:
-                px[x, y] = (*c[:3], 255)
-    return im
+BUMBOT_EYES, BUMBOT_GROUND = "#cdd38a", "#f3ecdd"
+
+
+def bumbot_picture():
+    """The picture of Bumbot in her cabin, chosen by the user from six (2026-11-14): him lying by a
+    bowl of fruit, PixelLab's pixel art (`image_to_pixelart`, 48 x 24, job 9597f74a) of the user's
+    own photo of him, cut out of its room first (`assets/source/rooms/bumbot-by-the-bowl.png`; the
+    photo itself stays in `reference/`). Brought to his own colours here: his fur to his sprite's
+    blacks, his eyes (the two warm dots in his face) to the pale yellow-green of the photo, the
+    wall behind him to one plain colour."""
+    import colorsys
+    src = Image.open(ROOT / "assets" / "source" / "rooms" / "bumbot-by-the-bowl.png").convert("RGB")
+    blacks = [(0.0, (0x1b, 0x16, 0x1f)), (0.10, (0x2e, 0x22, 0x2f)), (0.26, (0x3e, 0x35, 0x46)), (0.5, (0x62, 0x55, 0x65)),
+              (9.9, (0x62, 0x55, 0x65))]
+
+    def black(l):
+        for (a, ca), (b, cb) in zip(blacks, blacks[1:]):
+            if l <= b:
+                return tuple(round(ca[i] + (cb[i] - ca[i]) * (l - a) / (b - a)) for i in range(3))
+
+    out, eyes = src.convert("RGBA"), []
+    for y in range(src.height):
+        for x in range(src.width):
+            r, g, b = src.getpixel((x, y))
+            hue, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+            lum = (0.3 * r + 0.59 * g + 0.11 * b) / 255
+            if 12 <= x <= 21 and 7 <= y <= 10 and 15 <= hue * 360 <= 75 and s > 0.5 and v > 0.6:
+                eyes.append((x, y))
+            elif lum < 0.2:
+                out.putpixel((x, y), (*black(lum * 1.6), 255))
+    out = palettize(out)
+    rgb = lambda c: tuple(int(c[i:i + 2], 16) for i in (1, 3, 5))
+    for y in range(out.height):
+        for x in range(out.width):
+            if min(out.getpixel((x, y))[:3]) > 190:
+                out.putpixel((x, y), (*rgb(BUMBOT_GROUND), 255))
+    for x, y in eyes:
+        out.putpixel((x, y), (*rgb(BUMBOT_EYES), 255))
+    return out
 
 
 def pantry(width):

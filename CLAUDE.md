@@ -421,6 +421,13 @@ Lessons learned (2026-11-14, the prep before the intro: deck 3, the languages):
 - **Moving the start moves every playtest's start:** twenty-six scenarios opened the game and
   walked from the gangway. `Browser.open()` starts them there still (`start="gangway"`, its
   checkpoint lit as it was); only `boot` and `deck3` use the game's own start.
+- **A photo to pixel art (`image_to_pixelart`, 1 generation, the size is ours to choose):** cut
+  the subject out first (OpenCV's GrabCut with a rough mask) onto a flat pale ground, which also
+  keeps the user's room out of what is sent; the default mode redraws cleanly, `faithful` at
+  120 to 200 keeps the photo's look but blurs at 32 px. A black cat comes back charcoal or navy
+  with orange eyes, and a yellow ground bleeds into yellow eyes: recolour by rule afterwards.
+  **Show the user the candidates framed and enlarged, side by side and numbered, before placing
+  one** (the user: "Ask me if I like the picture before placing it in the game").
 - **A walk in a playtest that must end at a door ends by teleport or by `hold_until` with a few
   px to spare:** polled every fifth of a second, she overshot the ladder's door by 11 px and E
   found nothing.
