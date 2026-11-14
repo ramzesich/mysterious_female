@@ -1,6 +1,20 @@
 # Welcome screen
 
-# Menu
+Bumbusik in the center of the screen.
+In the dimmed and out-of-focus background:
+The sun shining in the center of the screen, surrounded by a few clouds.
+
+Below, a two big buttons, one below the other:
+PLAY
+LANGUAGE
+
+PLAY triggers the sequense described in the **Start sequence** below.
+LANGUAGE let's player swtich between English (default choice) and Ukrainian.
+
+## Start sequence
+
+Start menu dissipates and dimmed background comes into focus while gaining the gameplay level of brightness.
+It smoothly transitions into **Game intro** described below.
 
 # Game intro
 
