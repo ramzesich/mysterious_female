@@ -288,8 +288,9 @@ Lessons learned (2026-11-14, step 9):
   furniture comes at the right size when the canvas is about what it should measure (a seated
   adult: 40 x 52).
 - A scratch script must not be named after a standard module (`bisect.py` broke every script
-  beside it); and `git add` takes paths by name, never `-A` (it swept the user's own draft
-  `docs/intro.md` into a commit).
+  beside it); and `git add` takes `-u` plus the new paths by name, never `-A`, which takes in
+  files that are not this work's (the user's `docs/intro.md` went into a commit that way; they
+  kept it there).
 
 ## Working with the user
 
