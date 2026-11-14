@@ -1533,3 +1533,9 @@ nothing that is still in the game.
 **Checked:** `intro` (rewritten: the stop on the corridor, the door, her coming out, the badge
 clip, the hint and its going, the mirror's wall, her hair once or twice and again on coming
 back), `lang`, `boot`, `deck3`, `region1`, `sound`. Not run: the rest.
+
+**Two adjustments after the user watched it** ("Overall, much better"): the camera held the sea
+for two and a half seconds before going right, and now holds it half a second ("Make it move
+right earlier"); and the dark round deck 3 came on as she stepped out, and now comes on with the
+opening of the deck's side, as the corridor shows (`dimOverride`, driven by the same measure as
+the cut-away). The intro is about 28 s. Checked: `intro`, `deck3`.

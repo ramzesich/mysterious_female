@@ -38,9 +38,10 @@ import { pixelText } from './pixeltext.js';
 const HALF = PLAYER.height / 2;
 // The parts, in order, and the seconds each takes: a new game's, and a game's under way.
 export const PARTS = {
-    full: [['focus', 2.4], ['sky', 0.8], ['down', 4.6], ['sea', 2.4], ['right', 6.6], ['ship', 1.3], ['dive', 5.6],
+    // (The sea is held only a moment before the camera goes right: the user, on seeing it wait.)
+    full: [['focus', 2.4], ['sky', 0.8], ['down', 4.6], ['sea', 0.5], ['right', 6.6], ['ship', 1.3], ['dive', 5.6],
            ['corridor', 1.0], ['step', 1.6], ['badge', 2.4], ['turn', 0.6]],
-    back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 1.2], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
+    back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 0.4], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
 // The menu: where the name and the two plates stand on the screen, and the lettering's colours
@@ -345,14 +346,16 @@ export class Intro {
         cam.centerOn(cx, cy);
         this.zoom = z;
 
-        // The ship: closed from afar; then deck 3's side opens on the corridor (a new game), and
-        // once the camera has stopped there the game's own cut-away takes over (the rest of the
-        // ship goes dim round her deck as she comes out); or it does where she is (a game under way).
+        // The ship: closed from afar; then deck 3's side opens on the corridor (a new game), the
+        // rest of the ship going dim round it as it does, and once the camera has stopped there
+        // the game's own cut-away takes over; or it does where she is (a game under way).
         s.fromAfar = z < 0.6;
         s.horizonOnScreen = undefined;
         if (this.full) {
             const open = clamp01(Math.log(z / 0.7) / Math.log(1.7 / 0.7));
             s.viewOverride = s.fromAfar || this.p('corridor') >= 1 ? null : 2 + smooth(open);
+            // (The dark round her deck comes with the corridor's opening, not after it: the user.)
+            s.dimOverride = s.fromAfar ? 0 : smooth(open);
             this.arrive(this.p('step'), this.p('badge'), this.p('turn'));
         }
 
@@ -442,6 +445,7 @@ export class Intro {
         for (const o of [...this.dressing, ...this.menu]) o.destroy();
         s.fromAfar = false;
         s.viewOverride = null;
+        s.dimOverride = null;
         // (Coming in through the dark, everything is set at once; at the intro's own end it is
         // as the game has it already, and nothing may jump.)
         if (through) s.viewDeck = null;

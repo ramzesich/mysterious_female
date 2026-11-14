@@ -380,7 +380,8 @@ export class ShipScene extends Phaser.Scene {
             && !this.exteriorLayer.getTileAt(Math.floor(p.x / 16), this.deckFloors[Math.round(this.viewDeck)] - 4);
         const on = this.route === 'inside' && this.viewDeck !== null && !open && this.viewOverride == null ? 1 : 0;
         const smooth = dt > 0 && this.route === 'inside';
-        d.shown = smooth ? approach(d.shown, on, dt * 6) : on;
+        // (`dimOverride`: the intro brings the dark on with the opening of deck 3's side.)
+        d.shown = this.dimOverride != null ? this.dimOverride : smooth ? approach(d.shown, on, dt * 6) : on;
         d.outer.setVisible(d.shown > 0).setAlpha(d.shown);
         for (const c of d.pieces) {
             const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1;

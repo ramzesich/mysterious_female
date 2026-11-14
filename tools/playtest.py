@@ -338,12 +338,19 @@ def scenario_intro(b):
     ship = at("ship")
     ok &= check(ship["x"] > sea["x"] + 8000 and abs(ship["y"] - sea["y"]) < 20, "then right, to the ship", (sea, ship))
     whole = b.eval(f"(v => v.x < {S}.hullMinX && v.right > {S}.hullMaxX)({S}.cameras.main.worldView)")
-    ok &= check(whole and b.eval(f"{S}.fromAfar && {S}.shellAlpha['3']") == 1, "the whole ship is in view, every deck closed")
+    ok &= check(whole and b.eval(f"{S}.fromAfar && {S}.shellAlpha['3']") == 1 and b.eval(f"{S}.deckDim.shown") == 0,
+                "the whole ship is in view, every deck closed, nothing dimmed")
+    t_sea, t_right = b.eval(f"{I}.parts.find(q => q.name === 'sea').len"), b.eval(f"{I}.parts.find(q => q.name === 'right').from")
+    ok &= check(t_sea <= 0.6, "the camera goes right soon after the sea has come into view", (t_sea, t_right))
+    at("dive", 0.72)         # (its side is opening while the zoom goes from 0.7 to 1.7)
+    mid = b.eval(f"[{S}.shellAlpha['3'], {S}.deckDim.shown]")
+    ok &= check(0 < mid[0] < 1 and abs((1 - mid[0]) - mid[1]) < 0.25, "the dark round deck 3 comes on as its side opens", mid)
     b.shot("intro-ship")
     corridor = at("corridor")
     ok &= check(abs(corridor["z"] - 2) < 0.01 and abs(corridor["x"] - SPAWN_X) < 2 and abs(corridor["y"] - (D3 - 29.5)) < 1
-                and b.eval(f"{S}.shellAlpha['3']") == 0,
-                "the camera zooms in on deck 3 and stops at the game's scale, on her cabin's door", (corridor, b.eval(f"{S}.shellAlpha['3']")))
+                and b.eval(f"{S}.shellAlpha['3']") == 0 and b.eval(f"{S}.deckDim.shown") == 1,
+                "the camera zooms in on deck 3 and stops at the game's scale, on her cabin's door, the ship dim round the deck",
+                (corridor, b.eval(f"{S}.shellAlpha['3']"), b.eval(f"{S}.deckDim.shown")))
     door = f"{S}.world.rooms.crewcabin.outside[0].frame.name"
     ok &= check(b.eval(f"{S}.route") == "inside" and not b.eval(f"{S}.player.visible") and b.eval(door) == "door-crew",
                 "the door marked CREW, shut, nobody about")

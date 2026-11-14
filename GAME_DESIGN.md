@@ -1551,9 +1551,10 @@ cap, scarce, and the game can be finished without the dash.
       and the Ukrainian capitals are built from its shapes (`tools/build_menu.py`).
     - **The start sequence:** the menu melts away, the sky comes into focus and to the game's
       brightness.
-    - **The intro** (about 30 s): the camera moves down to the sea and the Baltic shore (gulls,
+    - **The intro** (about 28 s): the camera moves down to the sea and the Baltic shore (gulls,
       the sun's glitter on the water), then right until the whole ship has come in from the
-      right; it zooms in on deck 3, whose side opens on the crew corridor, and **stops there at
+      right; it zooms in on deck 3, whose side opens on the crew corridor (the rest of the
+      ship going dim round it as it opens), and **stops there at
       the game's own scale, on the door marked CREW**. The door opens, she steps out and stands
       by it, straightens her name badge, and turns to go; the HUD comes up, the controls are
       the player's, and a word over her says **"E to interact"** for a few seconds (item 15).
