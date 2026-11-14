@@ -383,9 +383,16 @@ Lessons learned (2026-11-14, step 12, sound):
 - **After each change, show the result and stop for the user's review** (screenshots in the chat,
   plus the link when there's something to try). Don't carry on into test runs, commits or the next
   change before they answer (the user, 2026-11-06: iterations were too slow, and twice I went on
-  without asking). Don't run the whole `tools/playtest.py` suite after cosmetic tweaks; run it once
-  a round is approved if gameplay or layout changed (map builder, physics, routes, triggers), and
-  always before a merge. Commit and update `GAME_DESIGN.md` once per approved round.
+  without asking). Commit and update `GAME_DESIGN.md` once per approved round.
+- **The whole `tools/playtest.py` suite is not required, not after a change and not before a
+  merge** (the user, 2026-11-14). It had been the rule before every merge; it was about 35
+  minutes long by step 11 and about 65 after step 12, and the user had it cancelled before a
+  merge: "an impractical amount of time". It was already too long before the sound came (the
+  user), so switching the sound off in the tests is no answer: the suite itself has to become
+  shorter (it has grown by a scenario of some fifty checks with every region). Until a way is found to
+  make it practical again (the user: "we'll have to find a solution for that"), run the scenarios
+  a change can touch (`python tools/playtest.py boot sound region6 ...`), and say plainly which
+  were run and that the rest were not. Never start the whole of it unasked.
 - Do only what was asked: when a request could reach further (another deck, a layout change),
   ask first rather than assume (the user, 2026-11-06).
 - The user circles things on screenshots and numbers them; fix each, show the result as
