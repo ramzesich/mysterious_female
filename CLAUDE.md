@@ -20,8 +20,8 @@ truth**: read the relevant section before any design or content work, and record
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
-| `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2) |
-| `src/background.js` | The far background, drawn in code: the Baltic archipelago, the far sea, the clouds, the far gulls (`FarGulls`, shared by every view), fixed to the screen and laid out each frame, the horizon settling over her floor (`HORIZON_ABOVE`); in the outside view on the waterline. The sea-view windows show a masked copy of it (`addWindowView()` in ShipScene) (§5.2) |
+| `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2); its sunset rows (`setDusk`) |
+| `src/background.js` | The far background, drawn in code: the Baltic archipelago, the far sea, the clouds, the far gulls (`FarGulls`, shared by every view), fixed to the screen and laid out each frame, the horizon settling over her floor (`HORIZON_ABOVE`); in the outside view on the waterline. The sea-view windows show a masked copy of it (`addWindowView()` in ShipScene) (§5.2). The sunset (§6.1.9): a second sky and sea faded over the day's (`setDusk(k)`), the sun and its path; its colours are drawn divided by the evening light (`DUSK_LIGHT`, the ship scene's multiply wash) so that they look themselves under it |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
@@ -50,11 +50,12 @@ truth**: read the relevant section before any design or content work, and record
 | `src/world/outside.js` | Region 7: the balconies' own things (gusts, the gulls perched on the rails, laundry lines across a folded partition, balconies with someone on them), the boat drill on the walkway, the steward on his rounds; and its part of the story, mixed into the Story (the ajar balcony doors, the guest locked out on his balcony, the security officer at a tender). The vault over a partition and the climb up its pole are in `verbs.js` |
 | `src/world/topdeck.js` | Region 8: deck 12's and the funnel's own things (the old lady's sunbed, the court's basketballs, Teppanyaki's flares, the funnel's wind and circling gulls, the flocks on the bow) and its part of the story, mixed into the Story (the mojito, the engineer's coffee, the horn and what it sets off, the telescope, the court's shot). The glide's rules are in `verbs.js` and the ship scene (`overTheRail`) |
 | `src/world/bow.js` | Region 9: the bow's own things (the sauna's steam, the kids' club's ball pit, the step class's boards, the bridge's alarm) and its part of the story, mixed into the Story (the wedding planner and the cake, the party into the chapel and the ceremony, the piano, the slide, the captain's door, near-catch 6 with the net on the alarm panel and the hatch's ladder, the Library's odd book and the nook). A fragile load's sway is in `carry.js` (`SWAY`) |
+| `src/world/finale.js` | Region 10 and the end: the wind over the bow and the two crossing gulls; and its part of the story, mixed into the Story (the sunset's scene, Bumbot at the tip who backs off and comes to her standing still, the catch, where a miss puts her back, those who clap her home, cabin 8206's scene, the win screen, the day after). Her look and rules with Bumbot in her arms are the ship scene's `holding` (`HOLDING` in `src/config.js`; her sheet `assets/sprites/her-cat.png` from `assets/source/her-cat/`, PixelLab state `6905f308-15b1-4a44-ad97-a38a7ad17dff`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
 | `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
-| `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in two states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
+| `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
@@ -291,6 +292,27 @@ Lessons learned (2026-11-14, step 9):
   beside it); and `git add` takes `-u` plus the new paths by name, never `-A`, which takes in
   files that are not this work's (the user's `docs/intro.md` went into a commit that way; they
   kept it there).
+
+Lessons learned (2026-11-14, step 10):
+
+- **A light over the whole picture is one multiply rectangle on a camera of its own**
+  (`duskWash`, `washCam`), not a tint on thousands of pieces; what must keep its own colours
+  under it (the sunset's sky and sea) is drawn divided by the light (`dusk()` in
+  `src/background.js`). `Phaser.BlendModes.MULTIPLY` works in this Phaser.
+- **Something behind a piece drawn in front of her is hidden:** Bumbot behind the mooring deck's
+  railing could hardly be seen; he sits on our side of it. Check a new small thing against the
+  `front` pieces where it stands.
+- **A fright comes back at the checkpoint nearest by deck:** for a fall through several decks
+  that is the wrong place. A stretch with its own way back gives it by rule (`respawnFor` in
+  `src/world/finale.js`).
+- **A new look of hers needs every pose the game can ask for** (`pose()` falls back to her
+  standing with him): list what play uses (stand, run, rise, apex, fall, front, back, the idles)
+  before making clips; a template jump may mangle what she holds, and two strides of the walk
+  read as a hop.
+- **A test that sets a story flag by hand may start that flag's own scene:** wait it out, or the
+  scene under test overlaps it (`world.cut` now counts overlapping moments).
+- **A gust carries her twice the px a second its data says** (body and picture are both moved):
+  tune by what the playtest measures, not by the number.
 
 ## Working with the user
 

@@ -966,6 +966,10 @@ def build_objects():
     add(point("cagneys", "place", exact_x(168.9), floor_y(12)))
     add(point("kids", "place", exact_x(43), floor_y(7)))
     add(point("captain", "place", exact_x(30.4), floor_y(9)))
+    # Region 10's: the balcony forward of the spa (the hatch's top), deck 8 a few doors from
+    # cabin 8206 ("home"; "cabin" is inside it). (The mooring deck is "bow".)
+    add(point("sunset", "place", exact_x(28.0), floor_y(11)))
+    add(point("home", "place", exact_x(52.0), floor_y(8)))
     from build_world import funnel_top as _top
     add(point("funnel", "place", _top()["x0"] + 20, _top()["y"]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.

@@ -1,7 +1,7 @@
 """Overlaps that make no sense, found by rule in the running game (the user, 2026-11-14: a door and
 its plate drawn on a speaker stack had passed every check by eye). Every picture and text the game
-has on the decks is read with its real bounds, in three states of the story (the start; late, after
-the horn; the end, after the bow), and these pairs are listed:
+has on the decks is read with its real bounds, in four states of the story (the start; late, after
+the horn; the end, after the bow; the evening of the catch), and these pairs are listed:
 
     door / furniture    a door with something standing in front of it or behind it
     door / door         two doors in one place
@@ -151,16 +151,19 @@ def main():
     b = P.Browser()
     seen, rows = set(), []
     try:
-        for state in ("start", "late", "end"):
+        for state in ("start", "late", "end", "evening"):
             if state == "start":
                 b.open("?reset&play")
             elif state == "late":
                 P.enter_region8(b)
                 b.eval("(P => { ['engineer', 'horn', 'lady'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
-            else:
+            elif state == "end":
                 # After the bow: the wedding over, the ceremony seen, the alarm, the nook open.
                 P.enter_region9(b)
                 b.eval("(P => { ['wedding', 'ceremony', 'bb6', 'alarm', 'books_all', 'nook'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
+            else:
+                # The evening of the catch (the same save): the way home, with what is put out for it.
+                b.eval("(P => { ['sunset', 'catch'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
             time.sleep(1.0)
             for row in audit(json.loads(b.eval(DUMP))):
                 if row[:5] not in seen:

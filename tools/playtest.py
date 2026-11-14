@@ -1078,27 +1078,17 @@ def scenario_golden(b):
     b.hold("left", 3.0)
     ok &= check(wait_flag(b, "bb6"), "near-catch 6 on the bridge", flags(b))
     ok &= check("alarm" in flags(b), "the alarm")
-    # Region 10: the hatch, the glide down to the bow, the catch.
-    hatch = b.eval("window.__ship.world.gates[0].x")
-    b.teleport(hatch, D10)
-    b.hold("up", 3.4)
-    b.hold("left", 0.3)
-    s = b.state()
-    ok &= check(s["y"] == D11 and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa", s)
-    b.hold("left", 1.6)          # to the front rail
-    b.key("left", True)
-    b.key("space", True)         # over it, and the parasol opens as she falls
-    time.sleep(2.4)
-    b.key("left", False)
-    s = hold_until(b, [], lambda s: s["y"] >= D7 or s["mode"] != "play", 14)
-    b.key("space", False)
-    time.sleep(0.5)
-    s = b.state()
+    # Region 10 and the end: the hatch, the sunset, the glide down to the bow, the catch, home.
+    ok &= check(out_of_the_hatch(b) and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa: the sunset", b.state())
+    s = glide_to_the_bow(b)
     ok &= check(s["mode"] == "play" and s["y"] == D7 and s["x"] < x_of(21), "the parasol carries her down to the mooring deck", s)
     b.shot("golden-bow")
-    b.hold("left", 6.0)
-    time.sleep(3.6)
-    ok &= check("catch" in flags(b), "at the tip of the bow, standing still: the catch", (b.state(), flags(b)))
+    ok &= check(catch_him(b), "at the tip of the bow, standing still: the catch", (b.state(), flags(b)))
+    time.sleep(1.8)
+    b.eval("window.__ship.lockedUntil = 0")
+    s = hold_until(b, "right", lambda s: s["x"] > exact_x(27), 16)
+    ok &= check(s["x"] > exact_x(27), "the mooring deck's door is open: into deck 7 with Bumbot in her arms", s)
+    ok &= check(home_with_him(b), "cabin 8206: home, the win screen, and the game goes on", flags(b))
     b.shot("golden-end")
     return ok
 
@@ -3459,6 +3449,231 @@ def scenario_region9(b):
     b.shot("region9-nook")
     ok &= check(route(b) == "nook", "E in the doorway: the reading nook", route(b))
     ok &= check(b.eval(f"!!{W}.things.find(t => t.id === 'slot_nook')"), "a frame on its wall")
+    ok &= check(not b.errors, "no errors", b.errors[:3])
+    return ok
+
+
+def enter_region10(b):
+    """A save at region 10's door: region 9 done (the wedding, the bridge's beat, the alarm), she
+    stands on the bridge by the hatch's ladder."""
+    enter_region9(b)
+    b.eval("(P => { ['cake_asked', 'wedding', 'ceremony', 'bb6', 'alarm'].forEach(f => P.setFlag(f)); })(window.__ship.progress)")
+    time.sleep(1.2)
+    b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    b.teleport(b.eval("window.__ship.world.gates[0].x") + 40, D10)
+    time.sleep(0.4)
+
+
+def out_of_the_hatch(b):
+    """Up the bridge's hatch onto the balcony forward of the spa, and the sunset's scene watched
+    to its end."""
+    b.teleport(b.eval("window.__ship.world.gates[0].x"), D10)
+    b.hold("up", 3.4)
+    b.hold("left", 0.3)
+    if b.state()["y"] != D11:
+        return False
+    return wait_flag(b, "sunset", 30)
+
+
+def glide_to_the_bow(b):
+    """From the balcony forward of the spa: over its front rail and down under the parasol to the
+    mooring deck, the two gulls kept out of her way (`finale` flies into one)."""
+    F = b.eval("window.__ship.world.data.finale")
+    b.eval("(c => { c.parked = true; c.birds.forEach(g => { g.x = 0; }); })(window.__ship.world.story.crossers)")
+    hold_until(b, "left", lambda s: s["x"] < F["balcony"]["x0"] + 10, 5)
+    b.key("left", True)
+    b.key("space", True)         # over the rail, and the parasol opens as she falls
+    hold_until(b, [], lambda s: s["x"] < exact_x(12) or s["mode"] != "play", 16)
+    b.key("left", False)
+    hold_until(b, [], lambda s: s["mode"] != "play" or (s["y"] >= D7 - 34 and b.eval("window.__ship.grounded")), 16)
+    b.key("space", False)
+    time.sleep(0.4)
+    return b.state()
+
+
+def catch_him(b):
+    """On the mooring deck: up to a few metres from Bumbot, and then still, until he is in her arms."""
+    cat = "window.__ship.world.story.tipCat"
+    hold_until(b, "left", lambda s: s["x"] - b.eval(f"{cat}.x") < 4.5 * 48, 8)
+    return wait_flag(b, "catch", 30)
+
+
+def home_with_him(b):
+    """The end of the way home: along deck 8 to cabin 8206, in, the scene, the win screen and a
+    key; true once the day after has come."""
+    H = b.eval("window.__ship.world.data.finale.home")
+    b.teleport(exact_x(52), D8)
+    time.sleep(0.5)
+    hold_until(b, "left", lambda s: s["x"] < H["x0"] + 59 + 3, 10)
+    time.sleep(0.3)
+    b.tap("e")
+    if not wait_js(b, "!!window.__ship.world.story.winItems", 25):
+        return False
+    time.sleep(2.8)
+    b.shot("finale-win")
+    b.tap("e")
+    return wait_flag(b, "home", 8)
+
+
+def scenario_finale(b):
+    """Region 10 and the end (docs/build-plan.md, step 10): out of the hatch and the sunset; a
+    glide into a gull and a jump past the tip, each back to the balcony; a glide made; Bumbot backs
+    off, darts past her, and comes when she stands still; the catch; the way home with him in her
+    arms (the mooring deck's door, the fort gone, nothing that scares, no hands for anything); the
+    cabin, the win screen, the day after."""
+    W = "window.__ship.world"
+    S = f"{W}.story"
+    ok = True
+    enter_region10(b)
+    F = b.eval(f"{W}.data.finale")
+    B, Mo, H = F["balcony"], F["mooring"], F["home"]
+    ok &= check(b.eval("window.__ship.dusk") == 0 and not b.eval(f"{S}.tipCat.visible"), "midday on the bridge; nobody at the tip of the bow yet")
+    # Out of the hatch: the sky turns, the camera goes to the tip and back.
+    b.teleport(b.eval(f"{W}.gates[0].x"), D10)
+    b.hold("up", 3.4)
+    b.hold("left", 0.3)
+    s = b.state()
+    ok &= check(s["y"] == D11 and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa", s)
+    ok &= check(wait_js(b, "window.__ship.mode === 'scripted'", 3), "the sunset's scene begins", b.state())
+    time.sleep(6.0)
+    b.shot("finale-sunset")
+    ok &= check(b.eval("window.__ship.dusk") > 0.9, "the sky has turned", b.eval("window.__ship.dusk"))
+    ok &= check(abs(b.eval("window.__ship.cameras.main.midPoint.y") - D7) < 80, "the camera is down at the tip of the bow")
+    ok &= check(wait_flag(b, "sunset", 20), "and comes back to her", flags(b))
+    ok &= check(b.state()["mode"] == "play" and b.eval(f"{S}.tipCat.visible") and abs(b.eval(f"{S}.tipCat.x") - Mo["catX"]) < 3,
+                "Bumbot sits at the tip", b.eval(f"[{S}.tipCat.x, {S}.tipCat.visible]"))
+    ok &= check(b.eval(f"{S}.crossers.birds.every(g => g.sprite.visible)"), "two gulls cross the air under the balcony")
+    b.eval("window.__ship.lockedUntil = 0")
+
+    def fresh_lull():
+        wait_js(b, f"({W}.scene.time.now / 1000) % {F['gust']['every']} < 0.4", 6)
+
+    # The wind: in the air, a gust carries her aft.
+    wait_js(b, f"{S}.finaleWind.phase({W}.scene.time.now) === 'blow'", 6)
+    b.eval("window.__ship.player.body.velocity.y = -330")
+    x0 = b.state()["x"]
+    time.sleep(0.45)
+    ok &= check(b.state()["x"] > x0 + 12, "a gust carries her aft in the air", (x0, b.state()["x"]))
+    time.sleep(1.2)
+    # A glide into a gull: "Swooped", and back on the balcony.
+    b.eval(f"(c => {{ c.parked = true; c.birds[1].x = 0; window.__iv = setInterval(() => {{ c.birds[0].x = window.__ship.player.x; }}, 16); }})({S}.crossers)")
+    fresh_lull()
+    hold_until(b, "left", lambda s: s["x"] < B["x0"] + 10, 5)
+    b.key("left", True)
+    b.key("space", True)
+    s = hold_until(b, [], lambda s: s["mode"] != "play", 9)
+    b.key("left", False)
+    b.key("space", False)
+    ok &= check(s["mode"] == "scripted" and alert(b) == "Киш!" and s["y"] > D11 + 100, "flown into a gull: the parasol is knocked from her hands", (s, alert(b)))
+    b.shot("finale-gull")
+    b.eval(f"(c => {{ clearInterval(window.__iv); c.birds[0].x = 0; }})({S}.crossers)")
+    time.sleep(2.8)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and she is back on the balcony", s)
+    # Over the rail at the tip: the sea; back on the balcony too.
+    b.teleport(Mo["x0"] + 60, D7)
+    time.sleep(0.4)
+    b.key("left", True)
+    for _ in range(8):
+        b.tap("space", 0.25)
+        time.sleep(0.35)
+        if b.state()["mode"] != "play":
+            break
+    b.key("left", False)
+    s = hold_until(b, [], lambda s: s["mode"] != "play", 6)
+    ok &= check(s["mode"] == "scripted" and s["x"] < exact_x(0.5), "past the tip: overboard", s)
+    time.sleep(4.5)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and back on the balcony", s)
+    # (That jump at the tip sent Bumbot off already: back to his place, as if she had not been.)
+    b.eval(f"(st => {{ st.tip.spooks = 0; st.tipCat.x = {Mo['catX']}; st.tipCat.setFlipX(true); const seen = {W}.save.seen, i = seen.indexOf('hint-still'); if (i >= 0) seen.splice(i, 1); }})({S})")
+    # The glide made.
+    fresh_lull()
+    s = glide_to_the_bow(b)
+    ok &= check(s["mode"] == "play" and s["y"] == D7 and s["x"] < Mo["wallX"], "the parasol carries her down to the mooring deck", s)
+    b.shot("finale-landed")
+    ok &= check("catch" not in flags(b), "Bumbot is not hers yet")
+    # Coming at him, he backs off; cornered at the tip, he darts past her.
+    cat = lambda: b.eval(f"Math.round({S}.tipCat.x)")
+    hold_until(b, "left", lambda s: b.eval(f"{S}.tip.spooks") >= 1, 12)
+    time.sleep(0.6)
+    ok &= check(b.eval(f"{S}.tip.spooks") >= 1 and cat() < Mo["catX"] - 20, "she comes at him: he backs off along the deck", (cat(), b.state()))
+    hold_until(b, "left", lambda s: cat() > s["x"], 8)
+    time.sleep(1.2)
+    s = b.state()
+    ok &= check(cat() > s["x"] + 100, "cornered at the tip, he darts past her", (cat(), s))
+    ok &= check("Stand still" in (alert(b) or ""), "and the game says how", alert(b))
+    b.shot("finale-dart")
+    b.eval("window.__ship.lockedUntil = 0")
+    # Standing still: he comes; three seconds of it and the catch.
+    b.hold("right", 0.25)
+    c0 = cat()
+    time.sleep(2.2)
+    ok &= check(cat() < c0 - 15 and "catch" not in flags(b), "she stands still: he comes, a few steps at a time", (c0, cat()))
+    ok &= check(wait_js(b, "window.__ship.mode === 'scripted'", 4), "three seconds of it: the catch's scene")
+    time.sleep(2.0)
+    b.shot("finale-arms")
+    ok &= check(wait_js(b, "window.__ship.holding", 12), "he jumps into her arms")
+    b.shot("finale-catch")
+    ok &= check(wait_flag(b, "catch", 12), "the catch", flags(b))
+    time.sleep(1.6)
+    ok &= check(b.state()["mode"] == "play" and b.eval("window.__ship.player.texture.key") == "her-cat", "she stands with Bumbot in her arms", b.state())
+    ok &= check(not b.eval(f"{S}.tipCat.visible") and not b.eval(f"{S}.crossers.birds[0].sprite.visible"), "nobody at the tip, no gulls in the air")
+    ok &= check("8206" in (alert(b) or ""), "where to: her cabin", alert(b))
+    b.shot("finale-held")
+    # The way home: the mooring deck's door, the kids' club with its fort put away; nothing scares.
+    b.eval("window.__ship.lockedUntil = 0")
+    s = hold_until(b, "right", lambda s: s["x"] > exact_x(27), 16)
+    ok &= check(s["x"] > exact_x(27) and s["y"] == D7, "through the mooring deck's door into deck 7", s)
+    ok &= check(not b.eval(f"{W}.things.find(t => t.id === 'amb_toddler_blocks').items[0].visible"), "the toddlers have gone to bed")
+    s = hold_until(b, "right", lambda s: s["x"] > exact_x(35), 10)
+    ok &= check(s["x"] > exact_x(35), "the pillow fort is put away: she walks through where it was", s)
+    b.shot("finale-kids")
+    v = b.eval("window.__ship.player.body.velocity.x")
+    b.key("right", True)
+    time.sleep(0.5)
+    v = b.eval("window.__ship.player.body.velocity.x")
+    b.tap("d")
+    time.sleep(0.2)
+    ok &= check(90 < v < 125 and not b.state()["dashing"], "a calm walk with him, and no dash", (v, b.state()))
+    b.key("right", False)
+    b.hold("down", 0.4)
+    ok &= check(not b.eval("window.__ship.crawling"), "no crawling with him in her arms")
+    b.eval("window.__ship.scareContact(window.__ship.player.x + 10, 'bumped')")
+    time.sleep(0.3)
+    ok &= check(b.state()["mode"] == "play", "nothing scares her on the way home", b.state())
+    # Deck 8: those she helped clap her in; the cabin; the win screen; the day after.
+    b.teleport(exact_x(52), D8)
+    time.sleep(0.6)
+    ok &= check(all(person(b, p) and person(b, p)["on"] for p in ("amb_home_steward", "amb_home_manager", "amb_home_engineer", "amb_home_planner")),
+                "four of those she helped wait outside her cabin")
+    hold_until(b, "left", lambda s: s["x"] < exact_x(47.2), 8)
+    b.shot("finale-welcome")
+    ok &= check(b.eval(f"!!{W}.people.byId['amb_home_manager'].welcoming"), "they clap her in as she comes by")
+    hold_until(b, "left", lambda s: s["x"] < H["x0"] + 59 + 3, 8)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(1.2)
+    ok &= check(route(b) == "cabin" and b.state()["mode"] == "scripted", "into cabin 8206: the scene", (route(b), b.state()))
+    ok &= check(person(b, "npc_husband_home") and person(b, "npc_husband_home")["on"], "her husband is waiting there")
+    ok &= check(wait_js(b, f"!!{S}.winItems", 25), "Bumbot curls up on the bed; the win screen")
+    time.sleep(2.8)
+    b.shot("finale-win")
+    ok &= check(not b.eval("window.__ship.holding") and b.eval(f"{S}.bedCat.visible"), "he is on the bed, out of her arms")
+    b.tap("e")
+    ok &= check(wait_flag(b, "home", 8), "a key: the game goes on", flags(b))
+    time.sleep(2.2)
+    b.shot("finale-next-day")
+    s = b.state()
+    ok &= check(s["mode"] == "play" and b.eval("window.__ship.dusk") == 0 and b.eval("window.__ship.player.texture.key") == "her",
+                "the day after: midday, she is up, on her own", (s, b.eval("window.__ship.dusk")))
+    ok &= check(b.eval(f"{S}.bedCat.visible") and not person(b, "npc_husband_home")["on"] and person(b, "npc_husband")["on"],
+                "Bumbot sleeps on the bed; her husband is back at his table")
+    ok &= check(b.eval(f"{W}.things.find(t => t.id === 'haz_fort_7').items[0].visible"), "and the kids' fort is up again")
+    b.hold("left", 0.2)
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(b.state()["mode"] == "play", "E by him: a purr")
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
 

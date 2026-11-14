@@ -142,6 +142,16 @@ export const VERBS = {
     hop: 0.62,
 };
 
+// With Bumbot in her arms, on the way home (§6.1.9): a calm walk, a lower jump; and nothing she
+// needs her hands for (ladders, trunks, the crawl, the dash, the parasol, E at things).
+export const HOLDING = {
+    speed: 0.8,
+    jump: 0.86,
+};
+
+// The win screen's own message (§6.4, Later: the user's to write). Empty, nothing is shown.
+export const WIN_MESSAGE = '';
+
 export const DASH = {
     durationMs: 10000,
     speedMultiplier: 2,

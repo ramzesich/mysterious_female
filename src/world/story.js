@@ -8,6 +8,7 @@ import { lido } from './lido.js';
 import { outside } from './outside.js';
 import { topdeck } from './topdeck.js';
 import { bow } from './bow.js';
+import { finale } from './finale.js';
 
 const M = 48;
 
@@ -48,6 +49,7 @@ export class Story {
         this.setupOutside();
         this.setupTopdeck();
         this.setupBow();
+        this.setupFinale();
     }
 
     // E. True if something here took it.
@@ -61,6 +63,7 @@ export class Story {
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
         this.updateBow(dt, time, input);
+        this.updateFinale(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
         this.flash(time);
@@ -81,6 +84,7 @@ export class Story {
         this.refreshOutside();
         this.refreshTopdeck();
         this.refreshBow();
+        this.refreshFinale();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
@@ -740,3 +744,4 @@ Object.assign(Story.prototype, lido);
 Object.assign(Story.prototype, outside);
 Object.assign(Story.prototype, topdeck);
 Object.assign(Story.prototype, bow);
+Object.assign(Story.prototype, finale);

@@ -330,7 +330,8 @@ PEOPLE = {
     "blk_fan_a": dict(at=(11, 199.75), who="fan_a", face=-1, idle="cheer", until="region:8"),
     "blk_fan_b": dict(at=(11, 200.55), who="fan_b", face=-1, idle="cheer", until="region:8"),
     "blk_fan_c": dict(at=(10, 196.45), who="fan_c", face=-1, idle="cheer", until="region:8"),
-    "npc_husband": dict(at=(11, 219.52), who="husband", face=1, idle="idle",
+    # (On the evening of the catch he waits in cabin 8206: `npc_husband_home`, region 10.)
+    "npc_husband": dict(at=(11, 219.52), who="husband", face=1, idle="idle", until="flag:catch&!flag:home",
                         bubble=("canister", "flag:kid_fed", "flag:table", 5)),
     "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
     "amb_go_her": dict(at=(11, 240.52), who="go_her", face=1, layer="back"),
@@ -521,9 +522,10 @@ PROPS = {
     "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
     "prop_massage_client": (11, 45.45, "thing:massage-client", 0, {}),
     "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),
-    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True)),
-    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True)),
-    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True)),
+    # (Gone to bed on the evening of the catch: she comes through with Bumbot in her arms.)
+    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True, until="flag:catch&!flag:home")),
+    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True, until="flag:catch&!flag:home")),
+    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True, until="flag:catch&!flag:home")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -649,8 +651,9 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
-        # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long).
-        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort")}
+        # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long). (Taken
+        # down for the night on the evening of the catch: with Bumbot in her arms she cannot crawl.)
+        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort", "flag:catch&!flag:home")}
 # --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
 # Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
 # door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window
@@ -767,3 +770,37 @@ BOW = dict(
     bridge=dict(deck=10, swat=30.55, panel=31.85, sit=30.7, a=28.4, b=40.0),
 )
 
+# --- Region 10: the sunset, the glide, the catch, the way home (docs/population.md §6.11;
+# src/world/finale.js) ---------------------------------------------------------------------------
+# The balcony forward of the spa (`scn_sunset`): its ends, and where she is put back after a miss.
+# Deck 8's forward terrace, under it: where a fright on the mooring deck sends her before the alarm.
+# The air between the balcony's rail and the tip: `gust_finale` (every `every` s it blows aft for
+# `blow` s, after a tell), the windsocks that show it (deck, m), and the two gulls that cross her
+# path: each flies level `drop` px under the balcony's floor, to and fro between two metres, `v`
+# m/s. The mooring deck (`scn_catch`): how far she and Bumbot can go on it, where he sits looking
+# out. The way home (`scn_home`): in cabin 8206 (px from its left edge) where she steps onto the
+# bed, where she sits, where he curls up.
+FINALE = dict(
+    balcony=dict(deck=11, a=24.5, b=29.5, back=27.6),
+    terrace=dict(deck=8, m=23.2),
+    # (`drift`: as on the balconies, she is carried about twice this many px a second: here, back
+    # by two metres a gust if she does not steer, and still forward, slowly, if she does.)
+    gust=dict(every=4.0, tell=0.7, blow=1.1, drift=48),
+    socks=[(11, 25.1), (7, 1.05)],
+    gulls=[dict(drop=190, a=9.0, b=23.2, v=2.3), dict(drop=395, a=2.5, b=19.5, v=2.0)],
+    mooring=dict(deck=7, a=1.4, b=20.4, cat=4.0, wall=21.4),
+    home=dict(step=128, sit=206, cat=178, husband=118),
+)
+PEOPLE.update({
+    # Her husband, waiting in the cabin on the evening of the catch (the stand-in, as at his table).
+    "npc_husband_home": dict(at=("cabin", FINALE["home"]["husband"]), who="husband", face=1, after="flag:catch", until="flag:home"),
+    # The way home: those she helped, outside her cabin, clapping her in (deck 8, between the doors).
+    "amb_home_steward": dict(at=(8, 50.1), who="steward", face=1, idle="idle", after="flag:catch", until="flag:home"),
+    "amb_home_manager": dict(at=(8, 48.2), who="stagemanager", face=1, idle="idle", after="flag:catch", until="flag:home"),
+    "amb_home_engineer": dict(at=(8, 46.1), who="engineer", face=1, idle="idle", after="flag:catch", until="flag:home"),
+    "amb_home_planner": dict(at=(8, 44.42), who="planner", face=1, idle="idle", after="flag:catch", until="flag:home"),
+})
+PROPS.update({
+    # The kids' club's fort, taken down for the night.
+    "prop_pillow_pile": (7, 33.4, "thing:pillow-pile", 0, dict(back=True, after="flag:catch", until="flag:home")),
+})

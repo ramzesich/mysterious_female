@@ -36,6 +36,9 @@ export class BootScene extends Phaser.Scene {
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('her-towel', 'assets/sprites/her-towel.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-towel-meta', 'assets/sprites/her-towel.json');
+        // With Bumbot in her arms (the way home, §6.1.9).
+        this.load.spritesheet('her-cat', 'assets/sprites/her-cat.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        this.load.json('her-cat-meta', 'assets/sprites/her-cat.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
@@ -153,6 +156,12 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-towel-idle-tap', frames: towelFrames('idle-tap', tap), frameRate: 7 });
         this.anims.create({ key: 'her-towel-idle-look', frames: towelFrames('idle-look', look), frameRate: 7 });
         this.anims.create({ key: 'her-towel-bed-joy', frames: towelFrames('bed-joy'), frameRate: 9, repeat: -1 });
+        // With Bumbot in her arms: her walk, and her head bent to him now and then as she stands.
+        const held = this.cache.json.get('her-cat-meta');
+        const heldFrames = (name, order = held.anims[name].map((_, i) => i)) =>
+            order.map(i => ({ key: 'her-cat', frame: held.anims[name][i] }));
+        this.anims.create({ key: 'her-cat-run', frames: heldFrames('run'), frameRate: 11, repeat: -1 });
+        this.anims.create({ key: 'her-cat-stroke', frames: heldFrames('stroke', [0, 1, 2, 3, 4, 4, 4, 3, 4, 4, 3, 2, 1, 0]), frameRate: 6 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

@@ -2,7 +2,7 @@
 // in grip socks, the glide under the parasol, pushing a cart. Each is learned on the way (the
 // progression's `knows`), and none of them works with a tray in her hands.
 
-import { PLAYER, VERBS } from '../config.js';
+import { PLAYER, VERBS, HOLDING } from '../config.js';
 import { sfx } from '../sfx.js';
 
 export const verbs = {
@@ -27,7 +27,7 @@ export const verbs = {
         const p = this.player;
         // (Under something low she stays down; standing, it stops her like a wall.)
         const low = this.route === 'duct' || (this.crawling && this.world.lowAt(p.x, p.y));
-        const can = this.progress.knows('crawl') && !this.world.carry && !this.isDashing();
+        const can = this.progress.knows('crawl') && !this.world.carry && !this.isDashing() && !this.holding;
         // (Once down she stays down while ↓ is held: changing her body's size unsettles the floor a frame.)
         const want = low || (input.down && can && (onFloor || this.crawling));
         if (want !== this.crawling) this.setCrawl(want);
@@ -62,7 +62,7 @@ export const verbs = {
     // her up and away; she can steer back and kick again, so one wall is enough to climb.
     tryWallJump(input, time) {
         const p = this.player, body = p.body;
-        if (!this.progress.knows('socks') || this.world.carry) return false;
+        if (!this.progress.knows('socks') || this.world.carry || this.holding) return false;
         if (!(time - this.jumpBufferedAt < PLAYER.jumpBufferMs)) return false;
         const grip = this.world.gripAt(p);
         if (!grip) return false;
@@ -97,7 +97,7 @@ export const verbs = {
     // Pressed against a grip while falling, she slides down it slowly.
     updateWallSlide(dir) {
         const p = this.player, body = p.body;
-        if (!this.progress.knows('socks') || this.world.carry || body.velocity.y <= 0 || !dir) return false;
+        if (!this.progress.knows('socks') || this.world.carry || this.holding || body.velocity.y <= 0 || !dir) return false;
         const grip = this.world.gripAt(p);
         if (!grip || (grip.away && grip.away !== -dir)) return false;
         if (grip.over && p.y < grip.top) return false;      // over a partition's panel there is only its pole
@@ -111,7 +111,7 @@ export const verbs = {
     // measured from where she closes it, so letting go high up is still a long fall.
     updateGlide(input) {
         const p = this.player, body = p.body;
-        const on = this.progress.knows('parasol') && !this.world.carry && input.jump && body.velocity.y > 0 && !this.crawling;
+        const on = this.progress.knows('parasol') && !this.world.carry && !this.holding && input.jump && body.velocity.y > 0 && !this.crawling;
         if (on) {
             body.velocity.y = Math.min(body.velocity.y, VERBS.glideFall);
             this.takeoffY = p.y;
@@ -133,9 +133,9 @@ export const verbs = {
         return on;
     },
 
-    // A jump with a tray is a low hop (§6.1.2).
+    // A jump with a tray is a low hop (§6.1.2); with Bumbot in her arms, a careful one.
     jumpScale() {
-        return this.world.carry ? VERBS.hop : 1;
+        return this.world.carry ? VERBS.hop : this.holding ? HOLDING.jump : 1;
     },
 
     // --- Pushing: E at a cart's end, then walk ----------------------------------------------------

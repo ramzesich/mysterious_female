@@ -7,6 +7,13 @@
 //
 // Everything here is fixed to the camera (scroll factor 0) and laid out on the screen each frame,
 // so it never lags behind the camera; the near sea, the foam and the wake are the world's (sea.js).
+//
+// The sunset (§5.2, §6.1.9: only for the final catch and the way home): a second sky and sea in
+// bands of dusk colours, the sun half sunk at the horizon ahead of the bow with its path of light
+// on the water, faded in over the day's by `setDusk(k)`; the clouds, the islands and the ripples
+// take a tint. The ship's own evening light is a warm wash over the whole picture (the ship
+// scene's `duskWash`, a multiply by `DUSK_LIGHT`), so the dusk colours here are written as they
+// should look and divided by that light before they are drawn (`dusk()`).
 
 const HAZE = '#cdeeff';           // the sky at the horizon; distance fades everything toward it
 const SKY_TOP = '#5fb8f0';
@@ -18,6 +25,15 @@ const SEA_FADE = 70;
 // (the user, 2026-11-08: a little over her eyes). It is fixed to the screen from moment to moment,
 // far away as it is, so a jump hardly moves it; but it glides to that height over her floor
 // (`HORIZON_SETTLE` s to go most of the way), so the camera's slack never leaves it out of place.
+// The evening light on everything (a multiply: 1 leaves a channel as it is).
+export const DUSK_LIGHT = [1, 0.84, 0.74];
+// The sky at sunset from the top down to the horizon, in bands; the sea under it, far and near.
+const DUSK_SKY = ['#584c78', '#7b5586', '#a65d88', '#d36c7c', '#ee8a76', '#f8a771', '#fcc47f', '#fde09a'];
+const DUSK_SEA_FAR = '#c08aa0';
+const DUSK_SEA_NEAR = '#7a6699';
+const DUSK_TINTS = { clouds: '#ff9c9c', ripples: '#ffb08a', islands: '#7a5f86', gulls: '#6a4f6e' };
+const DUSK_BAND = 14;                       // px a band
+const SUN = { at: 0.2, r: 17, up: 5 };      // how far across the view, its radius, its middle over the horizon
 export const HORIZON_ABOVE = 58;
 export const HORIZON_SETTLE = 1.0;
 const OUTSIDE_SIZE = { islands: 1.5, clouds: 1.2 };
@@ -37,6 +53,18 @@ function rng(seed) {
 
 function hex(c) {
     return [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+}
+
+// A dusk colour as it has to be drawn to look itself under the evening light.
+export function dusk(c) {
+    return `rgb(${hex(c).map((v, i) => Math.min(255, Math.round(v / DUSK_LIGHT[i]))).join(',')})`;
+}
+
+const num = c => Number('0x' + c.slice(1));
+// White at k = 0, `c` at k = 1: a tint coming on.
+function tintTo(c, k) {
+    const [r, g, b] = hex(c).map(v => Math.round(255 + (v - 255) * k));
+    return (r << 16) | (g << 8) | b;
 }
 
 // A colour faded `w` of the way into the haze.
@@ -261,6 +289,61 @@ function gradient(scene, key, h, stops) {
     tex.refresh();
 }
 
+// The sunset's own pictures: the sky in flat bands (the lowest and brightest at the horizon), the
+// sea under it, the sun's disc and its glow, and its path on the water: short bright dashes, most
+// of them under the sun, spreading as they come nearer, in two frames that take turns (a glitter).
+const PATH = { w: 150, h: SEA_FADE + RIPPLES_H };
+function duskTextures(scene) {
+    const sky = scene.textures.createCanvas('bg-sky-dusk', 4, DUSK_BAND * DUSK_SKY.length);
+    let ctx = sky.getContext();
+    DUSK_SKY.forEach((c, i) => {
+        ctx.fillStyle = dusk(c);
+        ctx.fillRect(0, i * DUSK_BAND, 4, DUSK_BAND);
+    });
+    sky.refresh();
+    gradient(scene, 'bg-sea-dusk', SEA_FADE, [[0, dusk(DUSK_SEA_FAR)], [1, dusk(DUSK_SEA_NEAR)]]);
+    const d = SUN.r * 2 + 1;
+    const sun = scene.textures.createCanvas('bg-sun', d, d);
+    ctx = sun.getContext();
+    for (let y = 0; y < d; y++) {
+        const half = Math.floor(Math.sqrt(Math.max(0, SUN.r ** 2 - (y - SUN.r) ** 2)));
+        if (!half) continue;
+        ctx.fillStyle = dusk('#fde9a8');
+        ctx.fillRect(SUN.r - half, y, half * 2 + 1, 1);
+        if (half > 2) {
+            ctx.fillStyle = dusk('#fff6cf');
+            ctx.fillRect(SUN.r - half + 2, y, half * 2 - 3, 1);
+        }
+    }
+    sun.refresh();
+    const G = 150;
+    const glow = scene.textures.createCanvas('bg-sunglow', G, G);
+    ctx = glow.getContext();
+    const g = ctx.createRadialGradient(G / 2, G / 2, SUN.r - 2, G / 2, G / 2, G / 2);
+    g.addColorStop(0, 'rgba(255,236,170,0.75)');
+    g.addColorStop(0.35, 'rgba(255,214,150,0.3)');
+    g.addColorStop(1, 'rgba(255,200,140,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, G, G);
+    glow.refresh();
+    for (const f of [0, 1]) {
+        const tex = scene.textures.createCanvas(`bg-sunpath-${f}`, PATH.w, PATH.h);
+        ctx = tex.getContext();
+        const rand = rng(91 + f * 7);
+        for (let y = 1; y < PATH.h; y += 1 + Math.floor(rand() * 2)) {
+            const t = y / PATH.h, spread = 10 + (PATH.w / 2 - 12) * t ** 0.7;
+            const n = 2 + Math.round(3 * (1 - t));
+            for (let i = 0; i < n; i++) {
+                const off = (rand() + rand() - 1) * spread;
+                const len = 2 + Math.floor(rand() * (3 + 7 * t));
+                ctx.fillStyle = dusk(Math.abs(off) < spread * 0.35 ? (rand() < 0.5 ? '#fff6cf' : '#fde09a') : '#fca790');
+                ctx.fillRect(Math.round(PATH.w / 2 + off - len / 2), y, len, 1);
+            }
+        }
+        tex.refresh();
+    }
+}
+
 function makeTextures(scene) {
     if (scene.textures.exists('bg-far')) return;
     for (const [name, [h, haze, , , , seed]] of Object.entries(LAYERS)) islandStrip(scene, `bg-${name}`, h, haze, seed);
@@ -269,6 +352,7 @@ function makeTextures(scene) {
     gullSheet(scene);
     gradient(scene, 'bg-sky', SKY_FADE, [[0, SKY_TOP], [1, HAZE]]);
     gradient(scene, 'bg-sea', SEA_FADE, [[0, SEA_FAR], [1, SEA_NEAR]]);
+    duskTextures(scene);
 }
 
 export class Backdrop {
@@ -290,9 +374,31 @@ export class Backdrop {
         }));
         this.gullSprites = (gulls?.birds || []).map(() => scene.add.sprite(0, 0, 'bg-gull', 0)
             .setOrigin(0.5, 1).setScrollFactor(0).setDepth(depth + 0.015));
+        // The sunset's twins, each just over the day's (see the top of this file).
+        this.duskTop = fixed(scene.add.rectangle(0, 0, 4, 4, Phaser.Display.Color.ValueToColor(dusk(DUSK_SKY[0])).color)).setDepth(depth + 0.001);
+        this.duskSky = fixed(scene.add.image(0, 0, 'bg-sky-dusk')).setDepth(depth + 0.001);
+        this.sunGlow = scene.add.image(0, 0, 'bg-sunglow').setScrollFactor(0).setDepth(depth + 0.004);
+        this.sun = scene.add.image(0, 0, 'bg-sun').setScrollFactor(0).setDepth(depth + 0.005);
+        this.duskSea = fixed(scene.add.image(0, 0, 'bg-sea-dusk')).setDepth(depth + 0.021);
+        this.duskDeep = fixed(scene.add.rectangle(0, 0, 4, 4, Phaser.Display.Color.ValueToColor(dusk(DUSK_SEA_NEAR)).color)).setDepth(depth + 0.021);
+        this.sunPath = scene.add.image(0, 0, 'bg-sunpath-0').setOrigin(0.5, 0).setScrollFactor(0).setDepth(depth + 0.026);
+        this.duskOnly = [this.duskTop, this.duskSky, this.sunGlow, this.sun, this.duskSea, this.duskDeep, this.sunPath];
         this.time = 0;
-        this.objects = [this.skyTop, this.sky, this.clouds, this.sea, this.seaDeep, this.ripples, ...this.layers.map(l => l.s),
+        // (In drawing order: the windows' copies are drawn as a container, which keeps the list's.)
+        this.objects = [this.skyTop, this.duskTop, this.sky, this.duskSky, this.sunGlow, this.sun, this.clouds,
+            this.sea, this.duskSea, this.seaDeep, this.duskDeep, this.ripples, this.sunPath, ...this.layers.map(l => l.s),
             ...this.gullSprites];
+        this.setDusk(0);
+    }
+
+    // The sunset coming on: 0 the day, 1 the full sunset.
+    setDusk(k) {
+        this.dusk = k;
+        for (const o of this.duskOnly) o.setAlpha(k).setVisible(k > 0);
+        this.clouds.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(CLOUD_ALPHA + 0.25 * k);
+        this.ripples.setTint(tintTo(DUSK_TINTS.ripples, k));
+        for (const l of this.layers) l.s.setTint(tintTo(DUSK_TINTS.islands, k));
+        for (const g of this.gullSprites) g.setTint(tintTo(DUSK_TINTS.gulls, k));
     }
 
     // Lay it all out for this frame, fixed to the camera: the horizon `horizonOnScreen` px from the
@@ -314,6 +420,20 @@ export class Backdrop {
         this.skyTop.setPosition(left, top).setSize(width, Math.max(0, hy - fade - top));
         this.sea.setPosition(left, hy).setDisplaySize(width, SEA_FADE);
         this.seaDeep.setPosition(left, hy + SEA_FADE).setSize(width, Math.max(0, bottom - hy - SEA_FADE));
+        if (this.dusk > 0) {
+            // (Its bands keep their height in play; zoomed right out they stretch with the day's sky.)
+            const bands = outside ? fade : DUSK_BAND * DUSK_SKY.length;
+            this.duskSky.setPosition(left, hy - bands).setDisplaySize(width, bands);
+            this.duskTop.setPosition(left, top).setSize(width, Math.max(0, hy - bands - top));
+            this.duskSea.setPosition(left, hy).setDisplaySize(width, SEA_FADE);
+            this.duskDeep.setPosition(left, hy + SEA_FADE).setSize(width, Math.max(0, bottom - hy - SEA_FADE));
+            // The sun ahead of the bow, half sunk; its path of light on the water under it.
+            const k = outside ? Math.max(1, OUTSIDE_SIZE.islands / z) : 1;
+            const sx = Math.round(left + width * SUN.at);
+            this.sun.setScale(k).setPosition(sx, hy - SUN.up * k);
+            this.sunGlow.setScale(k).setPosition(sx, hy - SUN.up * k);
+            this.sunPath.setScale(k).setPosition(sx, hy).setTexture(`bg-sunpath-${Math.floor(this.time * 3.2) % 2}`);
+        }
         const run = cam.scrollX;
         // Zoomed right out (the outside view), the islands and the clouds keep a size on the
         // screen rather than shrinking to nothing with the ship, and the clouds stand up in the

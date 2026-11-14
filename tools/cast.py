@@ -78,8 +78,10 @@ CAST = {
     # Region 3.
     # (The stage manager's "flap" is his second, "flap2": the first, from poses, hardly moved the arms
     # that hold his clipboard.)
-    "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4},
-                     {"cut": {"flap": ("flap2", [1, 2, 3, 4, 5, 6])}}),
+    # ("applaud", cut from "clap": he and the planner clap her home, step 10: src/world/finale.js.
+    # Each claps against the clipboard in the other hand.)
+    "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4, "applaud": 9},
+                     {"cut": {"flap": ("flap2", [1, 2, 3, 4, 5, 6]), "applaud": ("clap", [3, 4, 5, 6, 7, 6, 5, 4])}}),
     "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9, "idle": 4}, {}),
     "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9, "idle": 4}, {}),
     "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
@@ -191,7 +193,8 @@ CAST = {
     # or drops what it holds; the planner's "fret" and a guest's "laugh" did both and were dropped.)
     # (Six came out with heads of 21 to 25 px from text and were made again
     # with mode="pro": the first ones, kept on PixelLab: wed_groom 8e25f1ec, wed_guest_a b5c89fa2, wed_guest_c 08532590, pastrychef 69bb0340, barman_sp e01475fd, counsellor b3ee4e51.)
-    "planner": ("cc307b42-5ec9-4c95-a846-76882b67ab75", {"idle": 4, "walk": 8}, {}),
+    "planner": ("cc307b42-5ec9-4c95-a846-76882b67ab75", {"idle": 4, "walk": 8, "applaud": 9},
+                {"cut": {"applaud": ("clap", [3, 4, 5, 6, 7, 6, 5, 4])}}),
     "wed_bride": ("ab0e8199-c60d-402d-a5d4-186f33bc3793", {"idle": 4, "walk": 7, "kiss": 7}, {}),
     "wed_groom": ("cd8f0a2b-e837-48aa-8c6a-f613ddc8befe", {"fuss": 7, "walk": 8, "kiss": 7}, {"cut": {"fuss": ("fidget", [0, 1, 2, 3, 2, 1])}}),
     "wed_guest_a": ("d311befd-5e0e-4d64-b63a-a9d8dd7c8ea0", {"sip": 6, "walk": 8}, {}),

@@ -264,8 +264,9 @@ export const bow = {
         // In the chapel, the first time after the party has gone in: the ceremony.
         if (play && s.route === 'chapel' && P.has('wedding') && !P.has('ceremony') && !this.inCeremony) this.ceremony();
         // The alarm, from near-catch 6 until Bumbot is caught.
-        const on = (this.alarmOn || P.has('alarm')) && !P.has('catch');
+        // (Seen only from deck 10 itself: from the balcony above, the bridge is behind the ship's side.)
         const R = B.bridge;
+        const on = (this.alarmOn || P.has('alarm')) && !P.has('catch') && her.y > R.y - 132 && her.y <= R.y + 2;
         if (on && near(s, (R.x0 + R.x1) / 2, R.y, 900, 200)) {
             const k = (Math.sin(time / 260) + 1) / 2;
             this.alarmWash.setFillStyle(0xe83b3b, 0.05 + 0.13 * k);

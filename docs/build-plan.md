@@ -227,6 +227,8 @@ What changed against this list: `docs/progress-decisions.md`.
 
 ## Step 10: Sunset (region 10) and the end
 
+**Done (2026-11-14).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** the balcony forward of the spa, the sunset sky and sea, the glide with its gusts and two
   gulls, the mooring deck's catch, the way home with the user's character in the cabin, the win
   screen (its message: Later, §6.4), the mooring door.

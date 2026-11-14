@@ -968,3 +968,94 @@ tries at the piano 9, the security officer's two swings 2, pieces 12); 673 of 2,
 security officer does not wave her on from the floor; sound for the alarm and the horn comes with
 "Sound on" (after the regions).
 
+## Step 10: Sunset and the end, region 10 (2026-11-14)
+
+Built: the sunset; the scene on the balcony forward of the spa; the glide down to the mooring deck
+through the wind and past two gulls; Bumbot at the tip and the catch; her with him in her arms; the
+way home; cabin 8206, the win screen, and the day after. Code: `src/world/finale.js`, the dusk in
+`src/background.js` and `src/sea.js`, her look and its rules in the ship scene (`holding`). Playtest
+`finale` (43 checks); the golden path now ends at home. The whole suite: 683 checks, all passing.
+
+**Changes against the plan, and why:**
+
+1. **The sunset is a second sky and sea faded over the day's** (`setDusk(k)`): the mock-up's bands
+   of colour, 14 px each, so the whole of it shows over her head; the sun half sunk ahead of the
+   bow with its path of light on the water; the clouds, the islands and the ripples take a tint.
+   **The ship's own evening light is one warm multiply over the whole picture,** drawn by a camera
+   of its own between the world's and the HUD's (so the whole-ship view, O, keeps it); the sky's
+   and the sea's dusk colours are written as they should look and drawn divided by that light
+   (`dusk()`), or the wash would have dulled them. The windows show the sunset too. It lasts from
+   the balcony's scene until the day after the catch.
+2. **A miss brings her back onto the balcony itself, not to the bridge's crew door** (`cp_bridge`
+   in the plan): a shorter loop, a few steps from the rail. It had to be a rule of its own anyway
+   (`respawnFor`): a fright is sent to the checkpoint nearest by deck, and a fall towards deck 7
+   would have come back at deck 7's far checkpoints.
+3. **The two gulls fly level, to and fro, each at its own height** under the balcony; flown into
+   in the air, one knocks the parasol from her hands ("Киш!") and down she goes (`scareAir`).
+   **The wind** blows aft every 4 s for a second, after a tell: two windsocks (on the balcony's
+   rail, at the stem) lift, and thin streaks come in at the forward edge of the view. Steering
+   into it she still makes way, slowly; not steering she is carried back two metres a gust.
+4. **A short glide is not a miss:** deck 8's forward terrace and deck 9's front bulwark catch
+   her, and she hops on down from there. A miss is a gull, the parasol closed too high, or the
+   sea past the tip.
+5. **Found: the mooring deck could be reached since region 5,** from deck 8's forward terrace
+   (a jump down), and its door is shut until the catch: before the alarm she was stuck there but
+   for the sea. The terrace is the user's and the layout stays, so it is left open and made
+   kind: nothing happens there before the sunset; after nine seconds a hint ("No way back up from
+   here. Over the rail, then!"); and that fright puts her back on the terrace. After the sunset's
+   scene the same way is a way round the glide (the stairs, deck 8, the terrace): left in, a
+   crew member's shortcut. Bumbot is at the tip only from the sunset's scene on.
+6. **Bumbot sits on our side of the mooring deck's railing,** on the deck's very edge: the
+   railing is drawn in front of her, and behind it he could hardly be seen. At the catch he
+   comes through it to her (GAME_DESIGN.md §6.1.9 asked for exactly that).
+7. **The catch, as rules** (`TIP` in `finale.js`): coming within 2.3 m of him she sends him back
+   along the deck, and with no deck left behind him he darts past her; the second time, a hint
+   ("Stand still. Let him come to you"). Standing still within 7.5 m: after a second he comes, a
+   few steps at a time, a heart a second; three seconds and the scene: she turns to the sea,
+   arms wide in the wind (the pose kept from the bow view); he comes round to her front; she
+   bends as at every near-catch; he jumps into her arms; a fade.
+8. **Her with Bumbot in her arms** is a new state of her PixelLab character ("Holding the cat",
+   6905f308): its walk (skeleton-v3 "walking", arms still), her head bent to him now and then as
+   she stands (a v3 clip's first frames; in its last the cat was gone); in the air, two strides
+   of the walk (a skeleton-v3 jump drew him as a dark blob, kept unused). **The rules with him**
+   (`HOLDING`): a calm walk (0.8 of her run), a lower jump, and no hands: no ladders, trunks,
+   crawl, dash, parasol, wall kick or E at people and things; doors, stairs and elevators work.
+   Nothing scares her (`scareContact` does nothing); at a pool's rim Bumbot will not have it
+   ("Мяу!") and she stays out.
+9. **What the way home needed of the ship:** the kids' pillow fort is put away for the night (she
+   cannot crawl with him: a pile of pillows, a PixelLab piece, stands by where it was), the
+   toddlers are in bed, her husband has left his table. Conditions can now be joined
+   (`flag:catch&!flag:home`: the evening of the catch).
+10. **An addition: those she helped clap her in.** The steward, the stage manager, the engineer
+    and the wedding planner stand in deck 8's corridor between the doors next to cabin 8206, turn
+    to her as she comes, and clap, bow or wave while she is near; a heart from each. (The plan
+    had an empty walk; a welcome is a warmer end to a game given as a present.)
+11. **`scn_home`:** her husband (the stand-in: a seated figure with his chair) sits by the desk;
+    she steps up onto the bed, Bumbot goes from her arms onto it and curls up between them, she
+    sits down by him. **The win screen** comes over the scene: "Bumbusik", "Bumbot is home.", what
+    she found (tangerines, books back on the shelf, pictures), a place for the user's own message
+    (`WIN_MESSAGE` in `src/config.js`: empty for now, §6.4), and "Press E".
+12. **An addition: the day after.** A key, a fade, and the game goes on at midday: Bumbot asleep
+    on the cabin's bed for good (E by him: a purr), her husband back at his table (his book and
+    the table's picture can still be had), the fort up again. So nothing left to find is lost by
+    finishing.
+13. **Start places `sunset` and `home`** (README); `tools/check_overlaps.py` audits a fourth
+    state, the evening of the catch.
+
+**Found on the way, and fixed for good:**
+
+- **The alarm's red light showed on the ship's side** from the balcony above the bridge (a wash
+  drawn over a deck that was not cut open): it is drawn only while she is on deck 10 now.
+- **Two scripted moments could end each other:** `world.cut` gave play back as soon as either was
+  over. It counts them now. (Met in a test that set the horn's flag by hand.)
+- **A gust carries her twice the px a second its data says** (the push moves her body and her
+  picture, and the physics adds the body's move again): so it has been since region 7, whose
+  numbers were tuned by feel; noted at `FINALE` in `tools/population.py`, not changed.
+
+PixelLab: 20 generations (her state 10, its walk 3, a jump not used 3, her head bent to him 1,
+two clapping clips 2, the pillow pile 1); about 653 of 2,000 left.
+
+**Left for later:** the win screen's message (the user's); her husband's own character (the cabin
+uses the stand-in too: his own will want a pose for the cabin and a wave); the sound of the wind,
+the gulls and a purr, with "Sound on"; the glide's numbers (the gulls' speed, the gusts) from her
+playtest.

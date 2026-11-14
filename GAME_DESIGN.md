@@ -284,7 +284,7 @@ there; they only remind her he's on board.
 - The ship is **sailing** throughout the game. It is **sunny**, with **small waves**.
 - The waves are **visual only**: a gentle swell on the water and a little sparkle. The ship does
   **not** rock under her, because tilting floors would fight precise platforming.
-- **Midday sun** for the whole game. **Sunset only for the final catch scene.**
+- **Midday sun** for the whole game. **Sunset only for the final catch scene.** (Built, step 10: it comes on the balcony forward of the spa, and lasts through the catch and the way home, until the day after.)
 
 - Outside areas show open sea and sky behind the ship, the sea scrolling past slowly to sell the
   sailing. Indoors, portholes and windows show the same sea.
@@ -1269,6 +1269,27 @@ Checked in the game (2026-11-09): the balcony forward of the spa
 reached today by jumping off the front of deck 12; she lands on it, and its back wall has no door.
 The plan keeps it so: the windscreen stops the jump, and the hatch is the only way.
 
+**As built (2026-11-14, step 10; the changes and their reasons: `docs/progress-decisions.md`):**
+
+- The sunset is a second sky and sea faded over the day's, the sun half sunk ahead of the bow,
+  and one warm light over the whole ship; from the balcony's scene until the day after the catch.
+- A miss (a gull flown into, the parasol closed too high, the sea past the tip) brings her back
+  onto the balcony itself. A short glide is caught by deck 8's forward terrace: not a miss.
+- Bumbot sits on our side of the mooring deck's railing. Coming at him she drives him back along
+  the deck, and cornered he darts past her; standing still within a few metres, he comes, and
+  after three seconds the scene plays (arms wide, he comes to her feet, she bends, he jumps).
+- With him in her arms: a calm walk, a lower jump, no hands for anything but doors and
+  elevators, and nothing scares her. The kids' fort is put away for the night; four of those she
+  helped stand outside cabin 8206 and clap her in.
+- In the cabin her husband (still the stand-in) sits by the desk; she steps onto the bed, Bumbot
+  curls up on it between them, she sits by him; the win screen comes over the scene, with a place
+  for the personal message (`WIN_MESSAGE` in `src/config.js`, §6.4).
+- **The day after (an addition):** a key, a fade, and the game goes on at midday, Bumbot asleep
+  on the bed for good, so everything left to find can still be found.
+- The mooring deck can be reached from deck 8's forward terrace (a jump down) at any time: before
+  the sunset there is nothing there and the only way off is over the rail, which puts her back
+  on the terrace; after it, that is a way round the glide.
+
 #### 6.1.10 The funnel's top (Decided)
 
 A steel stairway up the funnel's sloped front (about 45 degrees, so the game's normal stairs work),
@@ -1444,7 +1465,8 @@ cap, scarce, and the game can be finished without the dash.
 ### 6.4 Later
 
 - **Hidden extras** (photos/memories of the two of you). **Later**
-- **Win screen** content, a personal message. **Later**
+- **Win screen** content, a personal message. **Later** (the screen itself is built, step 10:
+  the message goes into `WIN_MESSAGE` in `src/config.js`)
 
 ---
 
@@ -2025,9 +2047,12 @@ Nothing blocks the start of the build. These get settled along the way:
       on everything placed is in `CLAUDE.md`, "Looking closely" (nine questions and four tools)
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
-      every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 10 of `docs/build-plan.md`, region 10 (Sunset and the end: the balcony forward of the spa, the sunset, the glide to the mooring deck, the catch, the way home, the win screen)**; then step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
-      order. Mark each step done here as it lands. From step 9 on every new person is checked against
+      every change to the plan in `docs/progress-decisions.md`, committing after each step). Steps 0-10 are
+      done: the game plays from the gangway to the win screen (step 10, 2026-11-14: the sunset,
+      the glide to the mooring deck, the catch, the way home, cabin 8206, the day after). **Next:
+      step 11 of `docs/build-plan.md` (the ship's side: a texture for its outer body, the user's
+      wish)**; then "After the regions" (sound, the controller, tuning, her playtest and the
+      hidden extras). Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")
 - [ ] **The outside of the ship is done** (the sea, the background,

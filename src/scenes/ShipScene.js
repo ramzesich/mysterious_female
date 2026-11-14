@@ -1,11 +1,11 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS } from '../config.js';
+import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { loadSave, writeSave } from '../save.js';
 import { Progression, CARD_COLOURS } from '../progression.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
-import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE } from '../background.js';
+import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '../background.js';
 import { World, OUTSIDE } from '../world/world.js';
 import { verbs } from '../world/verbs.js';
 
@@ -1883,6 +1883,8 @@ export class ShipScene extends Phaser.Scene {
         this.scale.displaySize.setAspectMode(Phaser.Structs.Size.NONE);   // (FIT's 16:9 lock off)
         this.scale.refresh();
         cam.setSize(this.scale.width, this.scale.height);
+        this.washCam.setSize(this.scale.width, this.scale.height);      // the evening light, over all of it
+        this.duskWash.setSize(this.scale.width, this.scale.height);
         cam.stopFollow();
         cam.removeBounds();
         ov.fit = this.scale.width / (this.map.widthInPixels * 0.94);
@@ -1928,6 +1930,8 @@ export class ShipScene extends Phaser.Scene {
         this.scale.setGameSize(VIEW.width, VIEW.height);
         this.scale.refresh();
         cam.setSize(VIEW.width, VIEW.height);
+        this.washCam.setSize(VIEW.width, VIEW.height);
+        this.duskWash.setSize(VIEW.width, VIEW.height);
         cam.setZoom(ov.zoom);
         cam.setBounds(0, -560, this.map.widthInPixels, this.map.heightInPixels + 560);   // above the map: the funnel's top
         // Centred on her at once (where following would take it anyway), and the horizon in its
@@ -2229,6 +2233,9 @@ export class ShipScene extends Phaser.Scene {
         const meta = this.cache.json.get('her-meta');
         this.herFrames = meta.frames;
         this.towelFrames = this.cache.json.get('her-towel-meta').frames;
+        // With Bumbot in her arms (§6.1.9, src/world/finale.js): her own sheet of it.
+        this.catFrames = this.cache.json.get('her-cat-meta').frames;
+        this.holding = false;
         this.climbOutFrames = meta.anims['climb-out'];
         this.idleAt = 0;
         const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);
@@ -2280,9 +2287,22 @@ export class ShipScene extends Phaser.Scene {
         cam.setDeadzone(40, 24);
         cam.ignore(this.uiLayer);
 
+        // The sunset's light on the ship (§6.1.9): the whole picture multiplied by a warm colour,
+        // by a camera of its own between the world's and the HUD's (so the outside view, which
+        // hides the HUD, keeps it); the sky and the sea are drawn to look themselves under it
+        // (background.js).
+        this.washLayer = this.add.layer();
+        this.duskWash = this.add.rectangle(0, 0, VIEW.width, VIEW.height, 0xffffff).setOrigin(0)
+            .setBlendMode(Phaser.BlendModes.MULTIPLY).setVisible(false);
+        this.washLayer.add(this.duskWash);
+        cam.ignore(this.washLayer);
+        this.washCam = this.cameras.add(0, 0, VIEW.width, VIEW.height);
+        this.washCam.ignore([this.worldLayer, this.uiLayer]);
+        this.setDusk(this.dusk ?? 0);       // (the story may have set it already: a game saved at sunset)
+
         // The HUD gets its own unzoomed camera, so its text stays crisp.
         this.uiCam = this.cameras.add(0, 0, VIEW.width, VIEW.height);
-        this.uiCam.ignore(this.worldLayer);
+        this.uiCam.ignore([this.worldLayer, this.washLayer]);
     }
 
     buildHud() {
@@ -2311,6 +2331,17 @@ export class ShipScene extends Phaser.Scene {
         this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText]);
         this.progress.buildHud(this.uiLayer);
         this.refreshHud();
+    }
+
+    // The sunset coming on (0 the day, 1 the full sunset): the sky, the sea, the windows' copies of
+    // them, and the evening light on everything.
+    setDusk(k) {
+        this.dusk = k;
+        this.backdrop.setDusk(k);
+        this.seaView.setDusk(k);
+        for (const w of [this.windowView, this.cabinView]) w?.backdrop.setDusk(k);
+        const [r, g, b] = DUSK_LIGHT.map(v => Math.round(255 * (1 + (v - 1) * k)));
+        this.duskWash?.setFillStyle((r << 16) | (g << 8) | b).setVisible(k > 0);
     }
 
     refreshHud() {
@@ -2493,19 +2524,21 @@ export class ShipScene extends Phaser.Scene {
         }
 
         if (onFloor && input.activatePressed && this.world.interact()) return;
-        if (onFloor && input.activatePressed && this.progress.tryPickup()) return;
-        if (onFloor && input.activatePressed && this.tryShower()) return;
+        if (onFloor && input.activatePressed && !this.holding && this.progress.tryPickup()) return;
+        if (onFloor && input.activatePressed && !this.holding && this.tryShower()) return;
         if (onFloor && input.activatePressed && this.useRouteDoor()) return;
         if (onFloor && input.activatePressed && this.useBulkheadDoor()) return;
         // On the promenade, or in the cabin, the stairs, ladders, trunks and elevators are out of reach.
         const inside = this.route === 'inside';
         if (inside && onFloor && input.activatePressed && this.callLift()) return;
-        if (inside && onFloor && input.activatePressed) this.activateTrunkDoor();
-        if (inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
+        // (With Bumbot in her arms: no trunks, no ladders, no hop over a rail.)
+        const hands = !this.holding;
+        if (hands && inside && onFloor && input.activatePressed) this.activateTrunkDoor();
+        if (hands && inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
         if (inside && onFloor && (input.up || input.down) && this.tryStairs(input)) return;
-        if (inside && (input.up || input.down) && this.tryLadder(input)) return;
-        if ((input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
+        if (hands && inside && (input.up || input.down) && this.tryLadder(input)) return;
+        if (hands && (input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
         // With the parasol: over an atrium walk's railing with ↓ and jump, to float down the atrium.
         if (onFloor && inside && input.down && input.jumpPressed && this.overTheRail()) return;
         // Through a side walk with ↓; through a balcony's floor outside with ↓ and jump (↓ alone crawls).
@@ -2519,7 +2552,8 @@ export class ShipScene extends Phaser.Scene {
         const aside = this.updateAside(input, onFloor);
         const dashing = this.isDashing();
         // (Waist deep in the kids' club's ball pit she wades: src/world/bow.js.)
-        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1) * (this.wading ? 0.5 : 1);
+        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1) * (this.wading ? 0.5 : 1)
+            * (this.holding ? HOLDING.speed : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
         // On wet tiles without the grip socks (src/world/hazards.js) she slides on the way she came.
@@ -2548,7 +2582,15 @@ export class ShipScene extends Phaser.Scene {
         this.world.push(dt, onFloor);
 
         const pool = this.pools.find(w => p.x > w.x0 && p.x < w.x1 && p.y > w.y + SWIM.entry && p.y < w.bottom + 16);
-        if (pool) return this.enterPool(pool);
+        if (pool && this.holding) {
+            // (Bumbot will not have it: back onto the side she came from.)
+            const back = p.x - pool.x0 < pool.x1 - p.x ? pool.x0 - PLAYER.bodyWidth / 2 - 1 : pool.x1 + PLAYER.bodyWidth / 2 + 1;
+            p.body.reset(back, pool.y);
+            if (time > (this.mewAt ?? 0)) {
+                this.mewAt = time + 2500;
+                this.world.say('Мяу!', 900);
+            }
+        } else if (pool) return this.enterPool(pool);
 
         if (!onFloor) {
             if (p.x < this.hullMinX || p.x > this.hullMaxX) {
@@ -2571,7 +2613,7 @@ export class ShipScene extends Phaser.Scene {
         // Standing still on the bed long enough: she bounces on it.
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
-        else if (this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) {
+        else if (!this.holding && this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) {
             // (With the book found on it, unread, she sits down on its edge and reads: population `book_5`.)
             if (!this.world.library.readOnBed()) this.startBedJoy();
         }
@@ -2784,6 +2826,12 @@ export class ShipScene extends Phaser.Scene {
             this.pose('stand');
             return;
         }
+        // (With Bumbot in her arms: she bends her head to him.)
+        if (this.holding) {
+            this.idle = 'stroke';
+            p.anims.play('her-cat-stroke');
+            return;
+        }
         // Never the same one twice in a row.
         const choices = IDLE.anims.filter(name => name !== this.lastIdle);
         this.idle = this.lastIdle = Phaser.Utils.Array.GetRandom(choices);
@@ -2942,7 +2990,7 @@ export class ShipScene extends Phaser.Scene {
     // way to the atrium's floor; closing it, she comes down on the next walk.
     overTheRail() {
         const p = this.player;
-        if (!this.progress.knows('parasol') || this.world.carry) return false;
+        if (!this.progress.knows('parasol') || this.world.carry || this.holding) return false;
         const walk = this.walks.find(w => w.atrium && p.x >= w.x0 + 24 && p.x <= w.x1 - 24 && Math.abs(p.y - w.y) < 2);
         if (!walk) return false;
         this.overRail = true;
@@ -3502,6 +3550,18 @@ export class ShipScene extends Phaser.Scene {
             this.idle = null;
             this.idleAt = this.time.now + IDLE.firstMs;
         }
+        // With Bumbot in her arms (the way home): her clips with him, and her standing with him
+        // for anything she has none for.
+        if (this.holding) {
+            if (this.anims.exists(`her-cat-${name}`)) {
+                p.anims.play(`her-cat-${name}`, true);
+                p.anims.timeScale = speed;
+            } else {
+                p.anims.stop();
+                p.setTexture('her-cat', this.catFrames[name] ?? this.catFrames.stand);
+            }
+            return;
+        }
         // With the towel on (after the shower), her towel clips where there is one.
         const towel = this.towel && (this.anims.exists(`her-towel-${name}`) || this.towelFrames[name] !== undefined);
         // With a tray in her hands (§6.1.2), her carrying clips where there is one.
@@ -3773,7 +3833,7 @@ export class ShipScene extends Phaser.Scene {
     }
 
     tryDash(time) {
-        if (!this.progress.knows('dash') || this.crawling || this.world.carry) return;
+        if (!this.progress.knows('dash') || this.crawling || this.world.carry || this.holding) return;
         if (this.isDashing() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         this.dashUntil = time + DASH.durationMs;
@@ -3811,6 +3871,7 @@ export class ShipScene extends Phaser.Scene {
     // A fright that fits what got her, then she runs off the screen.
     scareContact(fromX, kind) {
         const p = this.player;
+        if (this.holding) return;           // nothing scares her on the way home (§6.1.9)
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
@@ -3834,6 +3895,20 @@ export class ShipScene extends Phaser.Scene {
                 };
             },
         });
+    }
+
+    // Hit in the air under the parasol (a gull across her way down to the bow): it is knocked out
+    // of her hands, and down she goes out of the bottom of the screen.
+    scareAir(kind) {
+        const p = this.player;
+        if (this.mode !== 'play') return;
+        this.gliding = false;
+        this.world.showParasol(false);
+        this.takeoffY = p.y;
+        sfx.scare();
+        this.scareFall();
+        this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
+        if (this.anims.exists('her-hit')) p.anims.play('her-hit');
     }
 
     // Longer than one deck: the camera lets go and she drops out of the bottom of the screen.
@@ -3888,7 +3963,8 @@ export class ShipScene extends Phaser.Scene {
         this.respawning = true;
         this.script = null;
         const from = this.scareFrom || { x: this.player.x, y: this.player.y };
-        const target = this.closestCheckpoint(from.x, from.y);
+        // (Over the bow she comes back where the glide starts: src/world/finale.js.)
+        const target = this.world.story.respawnFor?.(from) || this.closestCheckpoint(from.x, from.y);
         this.tweens.add({
             targets: this.fade, alpha: 1, duration: 220,
             onComplete: () => {

@@ -151,6 +151,29 @@ HER_TOWEL = {
 }
 
 
+# Bumbusik with Bumbot in her arms (GAME_DESIGN.md §6.1.9: the way home): PixelLab's "Holding the
+# cat" state of her character, 6905f308-15b1-4a44-ad97-a38a7ad17dff. Her walk is skeleton-v3's
+# "walking" with the arms held still; standing, she bends her head to him now and then (a v3
+# clip: its first frames; in the last three the cat is gone). In the air: two strides of the walk
+# (a skeleton-v3 jump, kept in jump/, drew him as a dark blob).
+HER_CAT = {
+    "name": "her-cat",
+    "cell": 84,
+    "remap": HER["remap"],
+    "frames": {
+        "stand": [("rotations/east.png", "keep")],
+        "run": [(f"walk/{i}.png", "feet") for i in range(6)],
+        "stroke": [(f"stroke/{i}.png", "feet") for i in range(1, 6)],
+        "rise": [("walk/1.png", "feet")],
+        "apex": [("walk/1.png", "feet")],
+        "fall": [("walk/4.png", "feet")],
+        "front": [("rotations/south.png", "keep")],
+        "back": [("rotations/north.png", "keep")],
+    },
+    "baseline": "rotations/east.png",
+}
+
+
 def seq(char, folder, anchor="keep"):
     """Every frame in assets/source/<char>/<folder>/, in order."""
     n = len(list((ROOT / "assets" / "source" / char / folder).glob("*.png")))
@@ -241,4 +264,5 @@ def build(spec):
 if __name__ == "__main__":
     build(HER)
     build(HER_TOWEL)
+    build(HER_CAT)
     build(BUMBOT)

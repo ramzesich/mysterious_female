@@ -4,6 +4,8 @@
 // the wake streaming from the stern. The ship is under way bow first, the bow on the left, so the
 // water streams past toward the stern, to the right.
 
+import { dusk } from './background.js';
+
 // From the waterline down: [height, crest colour, water colour, trough colour, speed px/s, wave
 // length px, bob px]. The last row runs on to the bottom.
 const BANDS = [
@@ -15,6 +17,19 @@ const BANDS = [
     [64, '#6fb6e6', '#2c63a8', '#265597', 54, 150, 2],
 ];
 const DEEP = ['#265597', '#1f4a87', '#1b4178'];   // the rest, darkening down
+// At sunset (§6.1.9; background.js has the sky's side of it): each row's crest, water and trough,
+// and the deep water; laid over the day's rows and faded in by `setDusk(k)`. Written as they should
+// look, and drawn divided by the evening light (`dusk()`).
+const DUSK_BANDS = [
+    ['#fdcbb0', '#7a6699', '#6e5c90'],
+    ['#fca790', '#735f95', '#67558a'],
+    ['#fca790', '#6b5890', '#5f4d84'],
+    ['#f68181', '#62508a', '#57467e'],
+    ['#ed8099', '#594882', '#4e3f76'],
+    ['#cf657f', '#50407a', '#45376d'],
+];
+const DUSK_DEEP = ['#45376d', '#3a2f60', '#322853'];
+const DUSK_FOAM = [0xff, 0xd9, 0xc8];
 
 // A small fixed random sequence, so the sea looks the same every time.
 function rng(seed) {
@@ -24,7 +39,7 @@ function rng(seed) {
 
 // One row's texture: water with crests along its top, a trough under each, glints; it tiles
 // across (whole wave lengths over its width).
-function bandTexture(scene, key, h, [crest, water, trough], waveLen, seed) {
+function bandTexture(scene, key, h, [crest, water, trough], waveLen, seed, glint = '#ffffff') {
     const w = waveLen * Math.max(4, Math.round(256 / waveLen));
     const tex = scene.textures.createCanvas(key, w, h);
     const ctx = tex.getContext();
@@ -48,7 +63,7 @@ function bandTexture(scene, key, h, [crest, water, trough], waveLen, seed) {
             }
             // A glint now and then on the crest.
             if (rand() < 0.5) {
-                ctx.fillStyle = '#ffffff';
+                ctx.fillStyle = glint;
                 const gx = (start + Math.round(len * (0.3 + rand() * 0.4))) % w;
                 ctx.fillRect(gx, row - Math.max(1, Math.round(h * 0.12)), Math.max(1, Math.round(waveLen / 16)), 1);
             }
@@ -213,13 +228,17 @@ class FoamTail {
 export function makeSeaTextures(scene) {
     if (scene.textures.exists('sea-band-0')) return;
     BANDS.forEach(([h, crest, water, trough, , len], i) => bandTexture(scene, `sea-band-${i}`, h, [crest, water, trough], len, 11 + i));
-    const deep = scene.textures.createCanvas('sea-deep', 4, 256);
-    const ctx = deep.getContext();
-    const grad = ctx.createLinearGradient(0, 0, 0, 256);
-    DEEP.forEach((c, i) => grad.addColorStop(i / (DEEP.length - 1), c));
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 4, 256);
-    deep.refresh();
+    // (The same waves in the sunset's colours: the same seed, so each crest keeps its place.)
+    BANDS.forEach(([h, , , , , len], i) => bandTexture(scene, `sea-dusk-${i}`, h, DUSK_BANDS[i].map(dusk), len, 11 + i, dusk('#fff6cf')));
+    for (const [key, colours] of [['sea-deep', DEEP], ['sea-deep-dusk', DUSK_DEEP.map(dusk)]]) {
+        const deep = scene.textures.createCanvas(key, 4, 256);
+        const ctx = deep.getContext();
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        colours.forEach((c, i) => grad.addColorStop(i / (colours.length - 1), c));
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 4, 256);
+        deep.refresh();
+    }
     foamTexture(scene);
     bowWaveTextures(scene);
 }
@@ -238,10 +257,12 @@ export class Sea {
         BANDS.forEach(([h, , , , speed, , bob], i) => {
             // Each row reaches a little under the next, so its rising and falling leaves no gap.
             const s = scene.add.tileSprite(x0, top, w, h + 3, `sea-band-${i}`).setOrigin(0).setDepth(depth + i * 0.001);
-            this.rows.push({ s, top, speed, bob, phase: i * 1.3 });
+            const d = scene.add.tileSprite(x0, top, w, h + 3, `sea-dusk-${i}`).setOrigin(0).setDepth(depth + i * 0.001 + 0.0005);
+            this.rows.push({ s, d, top, speed, bob, phase: i * 1.3 });
             top += h;
         });
         this.deep = scene.add.image(x0, top, 'sea-deep').setOrigin(0).setDisplaySize(w, Math.max(1, bottom - top)).setDepth(depth - 0.001);
+        this.deepDusk = scene.add.image(x0, top, 'sea-deep-dusk').setOrigin(0).setDisplaySize(w, Math.max(1, bottom - top)).setDepth(depth - 0.0005);
         // Foam along the waterline, from the stem to the stern.
         this.foam = scene.add.tileSprite(bowX, y - 2, sternX - bowX, 10, 'sea-foam').setOrigin(0).setDepth(front);
         // The bow wave against the stem.
@@ -252,7 +273,17 @@ export class Sea {
         // cut off square at the stern).
         this.tail = new FoamTail(scene, this.foam, sternX, y - 2, front);
         this.time = 0;
-        this.objects = [...this.rows.map(r => r.s), this.deep, this.foam, this.bow, this.wake.img, this.tail.img];
+        this.objects = [...this.rows.flatMap(r => [r.s, r.d]), this.deep, this.deepDusk, this.foam, this.bow, this.wake.img, this.tail.img];
+        this.setDusk(0);
+    }
+
+    // The sunset coming on (0 the day, 1 the full sunset): its rows over the day's, the foam warmer.
+    setDusk(k) {
+        this.dusk = k;
+        for (const r of this.rows) r.d.setAlpha(k).setVisible(k > 0);
+        this.deepDusk.setAlpha(k).setVisible(k > 0);
+        const [r, g, b] = DUSK_FOAM.map(v => Math.round(255 + (v - 255) * k));
+        for (const o of [this.foam, this.bow, this.wake.img, this.tail.img]) o.setTint((r << 16) | (g << 8) | b);
     }
 
     update(dt) {
@@ -260,6 +291,10 @@ export class Sea {
         for (const r of this.rows) {
             r.s.tilePositionX -= r.speed * dt;
             r.s.y = Math.round(r.top + Math.sin(this.time * 1.4 + r.phase) * r.bob);
+            if (this.dusk > 0) {
+                r.d.tilePositionX = r.s.tilePositionX;
+                r.d.y = r.s.y;
+            }
         }
         this.foam.tilePositionX -= 70 * dt;
         this.tail.update();

@@ -12,7 +12,7 @@ from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, S
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
-from population import BOW
+from population import BOW, FINALE
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -241,10 +241,10 @@ def build_world():
         ents.append(dict(kind="dnd", id=did, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", who=who))
     for oid, (deck, m, what) in OPENDOORS.items():
         ents.append(dict(kind="opendoor", id=oid, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", what=what))
-    for lid, (where, a, b, frame) in LOWS.items():
+    for lid, (where, a, b, frame, *until) in LOWS.items():
         x0, y, route = spot(where, a)
         ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,
-                         frame=frame or ""))
+                         frame=frame or "", until=until[0] if until else ""))
 
     # Region 6's (src/world/movers.js, src/world/lido.js).
     for pid, (deck, a, b, up) in PLATFORMS.items():
@@ -450,8 +450,26 @@ def build_world():
                     sitX=B.exact_x(br["sit"]), x0=B.exact_x(br["a"]), x1=B.exact_x(br["b"]),
                     helmX=B.exact_x(30.55), consoleX=B.exact_x(29.3)))
 
+    # Region 10 (src/world/finale.js): the sunset's balcony, the air down to the mooring deck, the
+    # catch, the cabin.
+    F = FINALE
+    fb, fm, fh = F["balcony"], F["mooring"], F["home"]
+    by, my = B.floor_y(fb["deck"]), B.floor_y(fm["deck"])
+    hatch = next(g for g in gates if g["needs"] == "alarm")
+    finale = dict(
+        balcony=dict(y=by, x0=B.exact_x(fb["a"]), x1=B.exact_x(fb["b"]), backX=B.exact_x(fb["back"]), hatchX=hatch["x"]),
+        terrace=dict(x=B.exact_x(F["terrace"]["m"]), y=B.floor_y(F["terrace"]["deck"])),
+        gust=F["gust"],
+        socks=[dict(x=B.exact_x(m), y=B.floor_y(deck)) for deck, m in F["socks"]],
+        gulls=[dict(y=by + g["drop"], x0=B.exact_x(g["a"]), x1=B.exact_x(g["b"]), v=round(g["v"] * 48)) for g in F["gulls"]],
+        mooring=dict(y=my, x0=B.exact_x(fm["a"]), x1=B.exact_x(fm["b"]), catX=B.exact_x(fm["cat"]), wallX=B.exact_x(fm["wall"])),
+        home=dict(x0=room_x0["cabin"], y=room_floor["cabin"], stepX=room_x0["cabin"] + fh["step"], sitX=room_x0["cabin"] + fh["sit"],
+                  catX=room_x0["cabin"] + fh["cat"], husbandX=room_x0["cabin"] + fh["husband"]),
+        totals=dict(tangerines=sum(e.get("count", 1) for e in ents if e["kind"] == "tangerine"),
+                    slots=sum(1 for e in ents if e["kind"] == "slot")))
+
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
-                topdeck=topdeck, bow=bow,
+                topdeck=topdeck, bow=bow, finale=finale,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),

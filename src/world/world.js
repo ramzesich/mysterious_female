@@ -1109,7 +1109,7 @@ export class World {
     }
 
     // The scripted places that are not rooms: the pool's hatch, the stage's trap door, the linen
-    // room's chute, the tip of the bow.
+    // room's chute.
     buildSpecials() {
         const s = this.scene, D = s.DEPTH;
         const h = this.data.hatchPool;
@@ -1142,17 +1142,7 @@ export class World {
             s.travel(t.landX, to.floor - 80, t.room, () => P.setFlag('trapdoor'));
             return;
         }
-        // The tip of the bow (§6.1.9): once he has run there, standing still, she has him.
-        const c = this.data.catch;
-        if (c && s.route === 'inside' && onFloor && P.has('alarm') && !P.has('catch') && Math.abs(p.y - c.y) < 2 && p.x < c.x) {
-            if (Math.abs(p.body.velocity.x) > 5) this.stillAt = time;
-            else if (time - (this.stillAt ?? time) > 3000) {
-                P.setFlag('catch');
-                this.hint('♥');
-            }
-        } else {
-            this.stillAt = time;
-        }
+        // (The tip of the bow, §6.1.9: src/world/finale.js.)
     }
 
     // --- What the story and the people use ------------------------------------------------------
@@ -1162,6 +1152,8 @@ export class World {
     // ?cards=all fakes none of it.
     cond(text) {
         if (!text) return true;
+        // ("a&b": both; the evening of the catch is "flag:catch&!flag:home".)
+        if (text.includes('&')) return text.split('&').every(t => this.cond(t));
         if (text.startsWith('!')) return !this.cond(text.slice(1));
         const [kind, v] = text.split(':');
         const save = this.save;
@@ -1311,8 +1303,11 @@ export class World {
         s.script = null;
         p.body.setVelocity(0, 0);
         s.pose('stand');
+        // (One moment may begin before another has quite ended: play goes on after the last.)
+        this.cuts = (this.cuts ?? 0) + 1;
         const done = () => {
-            if (s.mode === 'scripted') s.mode = 'play';
+            this.cuts--;
+            if (s.mode === 'scripted' && !this.cuts) s.mode = 'play';
             this.refresh();
         };
         Promise.resolve().then(fn).then(done, err => { console.error(err); done(); });
@@ -1475,6 +1470,7 @@ export class World {
     // E: a cart's end, a pickup, a switch, a hatch.
     interact() {
         const s = this.scene, p = s.player;
+        if (s.holding) return false;        // Bumbot in her arms: no hand for anything
         if (this.story.interact()) return true;
         for (const t of this.pushables) {
             if (this.carry) break;          // her hands are full

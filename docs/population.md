@@ -864,6 +864,10 @@ Input locked unless said; each sets its save flag.
     arms-wide pose; he comes; she bends; he jumps into her arms. **`scn_home`:** a fade; she carries
     him through `door_mooring`, the kids' clubs, the forward core up to deck 8, into 8206, where her
     husband waits; Bumbot curls up on the bed between them; the win screen.
+    *As built (step 10, `docs/progress-decisions.md`): a miss comes back onto the balcony, not to
+    `cp_bridge`; the gulls fly level, to and fro; Bumbot backs off and darts past her until she
+    stands still; the fort is put away and four of those she helped clap her in on deck 8; after
+    the win screen the game goes on, the day after.*
 12. **`scn_nook`:** E at the odd book with all ten shelved: the bookcase swings open; `room_nook`.
     **`scn_shelve`:** each return: the librarian takes the book to its gap.
 
