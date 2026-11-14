@@ -51,13 +51,6 @@ export class BootScene extends Phaser.Scene {
         for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
-        // The intro's close-up (src/intro.js; tools/build_closeup.py): the finer piece of her mirror,
-        // and her portrait when one is drawn.
-        this.load.image('close-mirror', 'assets/sprites/close-mirror.png');
-        this.load.json('her-close-meta', 'assets/sprites/her-close.json');
-        this.load.once('filecomplete-json-her-close-meta', (_key, _type, meta) => {
-            if (meta.portrait) this.load.spritesheet('her-close', 'assets/sprites/her-close.png', { frameWidth: meta.cell, frameHeight: meta.cell });
-        });
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
@@ -129,6 +122,8 @@ export class BootScene extends Phaser.Scene {
         // Region 9: her fingers on the Spinnaker's piano; her knock at the captain's door, her back to us.
         if (meta.anims.keys) this.anims.create({ key: 'her-keys', frames: frames('keys'), frameRate: 9 });
         if (meta.anims.knock) this.anims.create({ key: 'her-knock', frames: frames('knock'), frameRate: 9 });
+        // At her cabin's mirror: a hand over her hair (the intro plays her `badge` clip frame by frame).
+        if (meta.anims.hair) this.anims.create({ key: 'her-hair', frames: frames('hair'), frameRate: 8 });
         if (meta.anims['sit-eat']) {
             this.anims.create({ key: 'her-sit-eat', frames: frames('sit-eat', [0, 1, 2, 3]), frameRate: 7 });
             this.anims.create({ key: 'her-eat-sat', frames: frames('sit-eat', [3, 4, 5, 6, 5, 4]), frameRate: 5, repeat: -1 });

@@ -22,8 +22,7 @@ new one added there should be added here too.
 | The welcome screen, then the whole intro (a new game: the save is cleared) | <http://localhost:8000/?reset&tangerines=infinite> |
 | The welcome screen with the save kept (a game under way gets the short way in) | <http://localhost:8000/?tangerines=infinite> |
 | The intro from the whole ship in view | <http://localhost:8000/?reset&intro=ship&tangerines=infinite> |
-| The intro from the corridor, just before her door | <http://localhost:8000/?reset&intro=corridor&tangerines=infinite> |
-| The intro from the close-up on her (the badge) | <http://localhost:8000/?reset&intro=badge&tangerines=infinite> |
+| The intro from the corridor, just before her door opens | <http://localhost:8000/?reset&intro=corridor&tangerines=infinite> |
 
 ## Deck 3
 

@@ -23,6 +23,8 @@ const TEXTS = {
         'title': 'Bumbusik',
         'menu.play': 'PLAY',
         'menu.language': 'LANGUAGE',
+        // The one hint (the user asked for it, 2026-11-14): over her as the intro hands her over.
+        'hint.interact': 'E to interact',
         // The win screen (§6.4).
         'win.line': 'Bumbot is home.',
         'win.tally': (found, tangerines, books, photos, slots) =>
@@ -44,6 +46,7 @@ const TEXTS = {
         'title': 'Бумбусік',
         'menu.play': 'ГРАТИ',
         'menu.language': 'МОВА',
+        'hint.interact': 'E — взаємодіяти',
         'win.line': 'Бумбот удома.',
         'win.tally': (found, tangerines, books, photos, slots) =>
             `Мандаринки: ${found} з ${tangerines}      Книжки на полиці: ${books} з 10      Знайдені світлини: ${photos} з ${slots}`,

@@ -108,7 +108,8 @@ def build_world():
                               kind=d.get("door", "crew"), plate=d.get("plate", ""), lock=lock(d.get("lock"))))
         rooms.append(dict(id=r["id"], deck=deck, x0=x0, floor=floor, width=r["width"], look=r["look"],
                           art=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}.png").exists(),
-                          needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors))
+                          needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors,
+                          **({"mirror": r["mirror"]} if "mirror" in r else {})))
 
     # The duct, drawn shorter than the way it stands for (a crawl of about a quarter of a minute):
     # from the linen room's end forward, its grilles evenly along it, the last one the way out.

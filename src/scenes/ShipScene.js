@@ -3004,10 +3004,24 @@ export class ShipScene extends Phaser.Scene {
     // Standing still is her plain side pose; after a while one of her idles plays once (§3).
     standStill(time, dir) {
         const p = this.player;
+        // Stopped at her cabin's mirror, turned to it, she fixes her hair: once or twice, then no
+        // more until she has walked away or turned from it and come back (the user, 2026-11-14:
+        // "Don't do it in a constant loop").
+        const mirror = this.world.rooms[this.route]?.mirror;
+        const atMirror = mirror !== undefined && !dir && p.flipX && Math.abs(p.x - mirror) < 4 && !this.holding && !this.world.carry;
+        if (!atMirror) this.mirrorLooks = null;
+        else this.mirrorLooks ??= { left: Phaser.Math.Between(1, 2), at: time + 450 };
         if (this.idle) {
             if (p.anims.isPlaying && !dir) return;
             this.idle = null;
             this.idleAt = time + Phaser.Math.Between(IDLE.gapMs[0], IDLE.gapMs[1]);
+            if (atMirror) this.mirrorLooks.at = time + 500;
+        }
+        if (atMirror && this.mirrorLooks.left > 0 && time >= this.mirrorLooks.at && this.anims.exists('her-hair')) {
+            this.mirrorLooks.left--;
+            this.idle = 'hair';
+            p.anims.play('her-hair');
+            return;
         }
         if (dir || time < this.idleAt || this.world.carry) {
             if (dir) this.idleAt = Math.max(this.idleAt, time + IDLE.firstMs);

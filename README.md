@@ -19,7 +19,7 @@ URL flags, combinable (`?play&debug`):
 | Flag | Effect |
 |---|---|
 | `?play` | Skip the welcome screen and the intro: straight into the game |
-| `?intro=<part>` | Start the intro at one of its parts, for a look at it: `focus`, `sky`, `down`, `sea`, `right`, `ship`, `dive`, `corridor`, `door`, `her`, `badge`, `out`, `turn` (with `?reset`: the whole intro is a new game's). Esc ends the intro at once |
+| `?intro=<part>` | Start the intro at one of its parts, for a look at it: `focus`, `sky`, `down`, `sea`, `right`, `ship`, `dive`, `corridor`, `step`, `badge`, `turn` (with `?reset`: the whole intro is a new game's). Esc ends the intro at once |
 | `?reset` | Clear the saved progress |
 | `?debug` | Show collision boxes and her position/state |
 | `?cards=all` | Every lock open and every verb known (crawl, wall jump, glide), for testing round the ship |

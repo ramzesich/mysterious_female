@@ -1,6 +1,6 @@
 // Words set in the game's own pixel lettering (the welcome screen's menu: src/intro.js). The
 // letters' shapes are in the `menu` atlas (tools/build_menu.py: two generated letterings, `T` the
-// name's, 32 px high, and `S` the signs', 16 px, with the Ukrainian capitals built from the Latin
+// name's, 24 px high, and `S` the signs', 12 px, with the Ukrainian capitals built from the Latin
 // ones); here they get their look: filled in bands of colour from the top down, an outline round
 // them, a shadow under. The picture is drawn once into a texture; show it at twice its size, as a
 // pixel of the game's is two of the screen's.
@@ -19,20 +19,20 @@ export function missing(scene, font, text) {
 export function pixelText(scene, key, font, text, { bands = ['#ffffff'], outline = '#323353', thick = 1, shadow = 1 } = {}) {
     const tex = scene.textures.get('menu');
     const glyphs = [];
-    let w = 0, cell = 0;
+    const cell = tex.get(`${font}-0048`).height;        // (every letter of a lettering is as high as its H's cell)
+    let w = 0;
     for (const ch of text.toUpperCase()) {
         const name = `${font}-${ch.codePointAt(0).toString(16).padStart(4, '0')}`;
         if (ch === ' ' || !tex.has(name)) {
-            w += ch === ' ' ? Math.round((font === 'T' ? 32 : 16) / 3) : 0;
+            w += ch === ' ' ? Math.round(cell / 3) : 0;
             continue;
         }
         const f = tex.get(name);
-        cell = f.height;
         glyphs.push({ f, x: w });
         w += f.width + Math.max(1, cell >> 4);
     }
     w = Math.max(1, w - Math.max(1, cell >> 4));
-    const pad = thick + shadow + 1, W = w + 2 * pad, H = (cell || 16) + 2 * pad;
+    const pad = thick + shadow + 1, W = w + 2 * pad, H = cell + 2 * pad;
     const layer = () => {
         const c = document.createElement('canvas');
         c.width = W;
@@ -57,7 +57,7 @@ export function pixelText(scene, key, font, text, { bands = ['#ffffff'], outline
     const [fill, f] = layer();
     f.drawImage(mask, 0, 0);
     f.globalCompositeOperation = 'source-atop';         // (each band only where the letters are, the rest kept)
-    const top = pad + Math.round((cell || 16) * 0.12), high = Math.round((cell || 16) * 0.76);
+    const top = pad + Math.round(cell * 0.12), high = Math.round(cell * 0.76);
     bands.forEach((c, i) => {
         f.fillStyle = c;
         const y = i ? top + Math.round(high * i / bands.length) : 0;

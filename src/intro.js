@@ -1,6 +1,6 @@
 // The welcome screen, the start sequence and the game's intro (docs/intro.md, the user's own
-// document; built 2026-11-14). All of it is the ship scene's own picture, so one runs into the next
-// with no cut:
+// document; built 2026-11-14, its ending redone the same day on their word). All of it is the ship
+// scene's own picture, so one runs into the next with no cut:
 //
 //   The welcome screen: the sun in the middle of the sky with a few clouds round it, dimmed and out
 //   of focus; over it the game's name and two big buttons, PLAY and LANGUAGE (English or
@@ -9,13 +9,12 @@
 //   The start sequence: the menu melts away, the sky comes into focus and to its full brightness.
 //   The intro: the camera tilts down to the sea and the Baltic shore (gulls, the sun's glitter on
 //   the water), pans right until the whole ship has come in from the right, then zooms in on
-//   deck 3: its side opens on the crew corridor, the door marked CREW, her cabin behind it, and
-//   her at her standing mirror. Close on her (the user: "only her profile up from her waist
-//   together with a part of the mirror"), drawn bigger and finer, and the mirror with her (the
-//   `her-close` sheet and `close-mirror`: tools/build_closeup.py): she straightens her name badge,
-//   which says BUMBUSIK. The camera draws back to the game's own view, her usual figure in the
-//   bigger one's place; she turns from the mirror to the door, the HUD comes up and she is the
-//   player's.
+//   deck 3: its side opens on the crew corridor, and the camera stops there at the game's own
+//   scale, on the door marked CREW. The door opens, she steps out and stands by it, straightens
+//   her name badge (her `badge` clip), and turns to go: the HUD comes up, she is the player's,
+//   and a word over her says what E is for (the one hint in the game: the user asked for it).
+//   (A first ending went on in through the door to a close-up of her at her mirror; the user saw
+//   it and had it dropped: "The transition scene doesn't work at all".)
 //
 // A game already under way (a save past the start) gets the same welcome and the same sky, sea and
 // ship, a little quicker, and then the camera closes in on wherever she is and the picture fades
@@ -29,7 +28,7 @@
 // src/background.js) with the islands at the game's own pixel size; the sun, its clouds, the gulls
 // and the glitter are the intro's own, at that size too, and fade away as the camera goes in.
 
-import { VIEW, PLAYER } from './config.js';
+import { VIEW, PLAYER, IDLE } from './config.js';
 import { sfx } from './sfx.js';
 import { t, nextLanguage } from './lang.js';
 import { writeSave } from './save.js';
@@ -40,28 +39,20 @@ const HALF = PLAYER.height / 2;
 // The parts, in order, and the seconds each takes: a new game's, and a game's under way.
 export const PARTS = {
     full: [['focus', 2.4], ['sky', 0.8], ['down', 4.6], ['sea', 2.4], ['right', 6.6], ['ship', 1.3], ['dive', 5.6],
-           ['corridor', 0.9], ['door', 2.8], ['her', 3.0], ['badge', 3.6], ['out', 3.2], ['turn', 0.8]],
+           ['corridor', 1.0], ['step', 1.6], ['badge', 2.4], ['turn', 0.6]],
     back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 1.2], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
 // The menu: where the name and the two plates stand on the screen, and the lettering's colours
 // from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen).
-const MENU = { title: 150, first: 338, step: 112,
+const MENU = { title: 178, first: 336, step: 90,
                sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
-const CLOSE_BLUR = 2.6;           // the cabin behind her in the close-up
-// The close-up: its zoom (her finer portrait is eight pixels to one of the game's, so two of the
-// screen's to each of its own), the view's middle from where she stands (px forward of her, px
-// over the floor: her profile from the waist up, the mirror's edge beside her), and the zooms
-// between which her portrait comes in over her game figure (it ends at her waist: it is whole
-// only once the view's foot has come up to there).
-const CLOSE = { zoom: 16, forward: 5, up: 46, from: 12.6, full: 15.4 };
+const HINT_MS = 6000;             // how long "E to interact" stays over her
 const SUN_UP = 365;               // the sun over the horizon, in screen px of the wide view
 const HORIZON = 140;               // the horizon under the middle of the screen in the wide views
 const PAN = 960;                  // how far left of the ship the sea's view is, in screen px
-const DOOR_ZOOM = 5;              // how close the camera is as the cabin shows
-const MIRROR_X = 34;              // where she stands at her mirror, from the cabin's left edge
 // The few clouds round the sun: [px right of it, px under it, texels wide, screen px a texel, seed].
 const CLOUDS = [[-250, 56, 96, 3, 5], [228, -74, 84, 3, 12], [150, 110, 60, 2, 23], [-190, -112, 52, 2, 31], [372, 62, 70, 2, 44],
                 [-420, -30, 64, 2, 57]];
@@ -71,7 +62,6 @@ const GULLS = [[-330, 96, 26, 2], [-60, 150, -18, 2], [210, 60, 22, 2], [380, 12
 const clamp01 = v => Math.min(1, Math.max(0, v));
 const smooth = k => k * k * (3 - 2 * k);
 const smoother = k => k * k * k * (k * (k * 6 - 15) + 10);
-const lerp = (a, b, k) => a + (b - a) * k;
 
 function rng(seed) {
     let s = seed >>> 0;
@@ -187,7 +177,6 @@ export class Intro {
         s.fromAfar = true;
 
         this.buildDressing();
-        this.buildCloseUp();
         this.buildMenu();
         const part = this.parts.find(p => p.name === params.get('intro'));
         if (part) this.play(part.from);
@@ -225,39 +214,21 @@ export class Intro {
         });
     }
 
-    // Her finer portrait and the finer piece of her mirror for the close-up, on a camera of their
-    // own over the world's, so the cabin behind them can go out of focus while they stay sharp.
-    // (With no portrait drawn, tools/build_closeup.py says so, and her game figure stays.)
-    buildCloseUp() {
-        const s = this.s, room = s.world.rooms.crewcabin;
-        this.heroLayer = s.add.layer();
-        this.heroCam = s.cameras.add(0, 0, VIEW.width, VIEW.height).setVisible(false);
-        const meta = s.cache.json.get('her-close-meta');
-        this.close = this.full && meta?.portrait && s.textures.exists('her-close') ? meta : null;
-        if (!this.close) return;
-        const k = 1 / meta.perWorld;
-        this.glass = s.add.image(room.def.x0 + meta.mirror.at[0], room.floor + meta.mirror.at[1], 'close-mirror').setOrigin(0).setScale(k).setAlpha(0);
-        this.hero = s.add.image(room.def.x0 + MIRROR_X + meta.at[0], room.floor + meta.at[1], 'her-close', meta.frames.stand)
-            .setOrigin(0).setScale(k).setAlpha(0);
-        this.heroLayer.add([this.glass, this.hero]);
-    }
-
     // --- The welcome screen -----------------------------------------------------------------------
 
     buildMenu() {
         const s = this.s, { width: W, height: H } = VIEW;
         this.menuLayer = s.add.layer();
         this.menuCam = s.cameras.add(0, 0, W, H);
-        for (const c of [s.cameras.main, s.washCam, s.uiCam]) c.ignore([this.menuLayer, this.heroLayer]);
-        this.heroCam.ignore([s.worldLayer, s.washLayer, s.uiLayer, this.menuLayer]);
-        this.menuCam.ignore([s.worldLayer, s.washLayer, s.uiLayer, this.heroLayer]);
+        for (const c of [s.cameras.main, s.washCam, s.uiCam]) c.ignore(this.menuLayer);
+        this.menuCam.ignore([s.worldLayer, s.washLayer, s.uiLayer]);
         this.shade = s.add.rectangle(0, 0, W, H, 0x0d1422).setOrigin(0).setAlpha(DIM);
         // The game's name in the sun livery's colours; two ship's name plates, brass round navy
         // enamel, for PLAY and LANGUAGE; a tangerine by the one chosen (the user chose the style
         // from three, 2026-11-14: tools/build_menu.py, src/pixeltext.js). All at two screen
         // pixels to one of the art's.
         this.title = s.add.image(W / 2, MENU.title, 'menu', 'plate').setScale(2);
-        this.marker = s.add.image(0, 0, 'tangerine').setScale(4);
+        this.marker = s.add.image(0, 0, 'tangerine').setScale(3);
         this.buttons = ['play', 'language'].map((id, i) => {
             const y = MENU.first + i * MENU.step;
             const plate = s.add.image(W / 2, y, 'menu', 'plate').setScale(2);
@@ -285,7 +256,7 @@ export class Intro {
             b.plate.setTint(on ? 0xffffff : 0xcfcfd6);
         });
         const b = this.buttons[this.selected];
-        this.marker.setPosition(VIEW.width / 2 - b.plate.displayWidth / 2 - 30, b.y);
+        this.marker.setPosition(VIEW.width / 2 - b.plate.displayWidth / 2 - 24, b.y);
     }
 
     select(i) {
@@ -368,41 +339,21 @@ export class Intro {
             cx = to.x + (cx - to.x) * off;
             cy = to.y + (cy - to.y) * off;
         }
-        let reveal = 0, hero = 0;
-        if (this.full) {
-            const door = this.p('door'), her = this.p('her'), out = this.p('out');
-            const room = s.world.rooms.crewcabin, herX = room.def.x0 + MIRROR_X;
-            const mid = { x: herX - CLOSE.forward, y: room.floor - CLOSE.up };
-            const play = { x: herX, y: room.floor - HALF };
-            if (door > 0) z = VIEW.zoom * (DOOR_ZOOM / VIEW.zoom) ** smooth(door);
-            if (her > 0) {
-                z = DOOR_ZOOM * (CLOSE.zoom / DOOR_ZOOM) ** smooth(her);
-                cx = lerp(to.x, mid.x, smooth(her));
-                cy = lerp(to.y, mid.y, smooth(her));
-            }
-            if (out > 0) {
-                z = CLOSE.zoom * (VIEW.zoom / CLOSE.zoom) ** smooth(out);
-                cx = lerp(mid.x, play.x, smooth(out));
-                cy = lerp(mid.y, play.y, smooth(out));
-            }
-            reveal = door >= 1 ? 1 : clamp01((door - 0.55) / 0.45);
-            hero = this.close && her > 0 ? clamp01((z - CLOSE.from) / (CLOSE.full - CLOSE.from)) : 0;
-        }
         // (The blur first: it changes the camera's size, and the camera is centred after.)
-        this.setBlur(BLUR * (1 - smooth(focus)) + CLOSE_BLUR * hero);
+        this.setBlur(BLUR * (1 - smooth(focus)));
         cam.setZoom(z);
         cam.centerOn(cx, cy);
         this.zoom = z;
 
-        // The ship: closed from afar; then deck 3's side opens on the corridor (a new game), or
-        // the game's own cut-away takes over where she is.
+        // The ship: closed from afar; then deck 3's side opens on the corridor (a new game), and
+        // once the camera has stopped there the game's own cut-away takes over (the rest of the
+        // ship goes dim round her deck as she comes out); or it does where she is (a game under way).
         s.fromAfar = z < 0.6;
         s.horizonOnScreen = undefined;
         if (this.full) {
             const open = clamp01(Math.log(z / 0.7) / Math.log(1.7 / 0.7));
-            s.viewOverride = s.fromAfar ? null : 2 + smooth(open);
-            this.cabin(reveal);
-            this.closeUp(hero, cx, cy, z);
+            s.viewOverride = s.fromAfar || this.p('corridor') >= 1 ? null : 2 + smooth(open);
+            this.arrive(this.p('step'), this.p('badge'), this.p('turn'));
         }
 
         // The welcome's shade and blur, lifting; the menu melting away; at a short intro's end
@@ -435,45 +386,27 @@ export class Intro {
         }
     }
 
-    // The middle of the corridor's view: the door marked CREW, from its floor to its sign.
+    // The door marked CREW: where the camera stops, at the game's own framing of her standing there.
     door() {
         const d = this.s.world.rooms.crewcabin.def.doors[0];
-        return { x: d.outX, y: d.outY - 50 };
+        return { x: d.outX, y: d.outY - HALF };
     }
 
-    // Her cabin showing in the corridor's place, and her in it at her mirror, as `k` goes 0 to 1.
-    cabin(k) {
+    // Her coming out: the door opens, she is in it, facing us (`step` 0 to 1); she straightens her
+    // badge (`badge`); she turns to go (`turn`). Each by the clock, so any moment can be shown.
+    arrive(step, badge, turn) {
         const s = this.s, p = s.player, room = s.world.rooms.crewcabin;
-        const inside = k > 0;
-        if (inside !== (s.route === room.route)) {
-            s.route = inside ? room.route : 'inside';
-            p.body.reset(inside ? room.def.x0 + MIRROR_X : room.def.doors[0].outX, room.floor);
-            s.takeoffY = room.floor;
-            s.pose('stand');
-        }
-        room.room.setAlpha(k);
-        room.dim.setAlpha(k);
-        // At her mirror she is turned to it; back at the game's scale she turns to the door, by
-        // way of facing us.
-        const turn = this.p('turn'), pose = turn > 0.3 && turn < 0.65 ? 'front' : 'stand';
-        if (pose !== this.posed) s.pose(this.posed = pose);
-        p.setVisible(inside).setAlpha(k).setFlipX(turn < 0.65);
-    }
-
-    // Her portrait and the mirror's finer piece over the game's own, as `k` goes 0 to 1 and back;
-    // the portrait's frame by the clock: still, then her hand to her badge and down again.
-    closeUp(k, cx, cy, z) {
-        const s = this.s, c = this.close;
-        this.heroCam.setVisible(!!c && k > 0);
-        if (!c) return;
-        this.hero.setAlpha(k);
-        this.glass.setAlpha(k);
-        if (k <= 0) return;
-        this.heroCam.setZoom(z);
-        this.heroCam.centerOn(cx, cy);
-        const badge = this.p('badge'), list = c.frames.badge;
-        this.hero.setFrame(badge <= 0 ? c.frames.stand : list[Math.min(list.length - 1, Math.floor(badge * list.length))]);
-        s.player.setAlpha(1 - k);
+        const open = step > 0.06 && step < 0.82;
+        room.outside[0].setFrame(open ? 'door-crew-ajar' : 'door-crew');
+        if (open && !this.doorHeard && this.stage === 'running' && !this.held) sfx.at(p.x, p.y).door();
+        this.doorHeard = open || this.doorHeard && step > 0;
+        const shown = clamp01((step - 0.16) / 0.34);
+        p.setVisible(shown > 0).setAlpha(shown).setFlipX(false);
+        const clip = s.herFrames && s.cache.json.get('her-meta').anims.badge;
+        let frame = turn >= 0.5 ? s.herFrames.stand : s.herFrames.front;
+        if (clip && badge > 0 && badge < 1) frame = clip[Math.min(clip.length - 1, Math.floor(badge * clip.length))];
+        if (p.anims.isPlaying) p.anims.stop();
+        p.setTexture('her', frame);
     }
 
     setBlur(amount) {
@@ -503,25 +436,28 @@ export class Intro {
         this.stage = 'done';
         this.T = this.length;
         this.setBlur(0);
-        if (this.full) this.cabin(1);
+        if (this.full) this.arrive(1, 1, 1);
         p.setVisible(true).setAlpha(1);
+        s.pose('stand');
         for (const o of [...this.dressing, ...this.menu]) o.destroy();
-        this.hero?.destroy();
-        this.glass?.destroy();
-        s.cameras.remove(this.heroCam);
         s.fromAfar = false;
         s.viewOverride = null;
-        s.viewDeck = null;
+        // (Coming in through the dark, everything is set at once; at the intro's own end it is
+        // as the game has it already, and nothing may jump.)
+        if (through) s.viewDeck = null;
         s.horizonOnScreen = undefined;
         cam.setZoom(VIEW.zoom);
         cam.setBounds(0, -560, s.map.widthInPixels, s.map.heightInPixels + 560);
         cam.startFollow(p, true, 0.15, 0.15);
         cam.setFollowOffset(0, HALF);
         cam.centerOn(p.x, p.y - HALF);
-        s.updateCutaway(0);
+        if (through) s.updateCutaway(0);
         s.mode = 'play';
         s.grounded = true;
         s.lastGroundedAt = s.time.now;
+        // (Her idles wait their usual while from now: she had begun to tap her foot at once.)
+        s.idle = null;
+        s.idleAt = s.time.now + IDLE.firstMs;
         s.uiCam.setVisible(true).setAlpha(0);
         s.tweens.add({ targets: s.uiCam, alpha: 1, duration: 700, delay: through ? 300 : 0 });
         this.shade.setAlpha(through ? 1 : 0);
@@ -530,6 +466,9 @@ export class Intro {
             s.cameras.remove(this.menuCam);
             s.intro = null;
         } });
+        // The one hint in the game (the user, 2026-11-14: "Add a hint popup, saying 'E to
+        // interact'"), over her as she is handed over at a new game's start.
+        if (this.full) s.time.delayedCall(through ? 700 : 250, () => s.world.say(t('hint.interact'), HINT_MS));
         if (!s.save.intro) {
             s.save.intro = true;
             writeSave(s.save);

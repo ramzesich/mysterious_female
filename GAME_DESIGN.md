@@ -1551,22 +1551,20 @@ cap, scarce, and the game can be finished without the dash.
       and the Ukrainian capitals are built from its shapes (`tools/build_menu.py`).
     - **The start sequence:** the menu melts away, the sky comes into focus and to the game's
       brightness.
-    - **The intro** (about 38 s): the camera moves down to the sea and the Baltic shore (gulls,
+    - **The intro** (about 30 s): the camera moves down to the sea and the Baltic shore (gulls,
       the sun's glitter on the water), then right until the whole ship has come in from the
-      right; it zooms in on deck 3, whose side opens on the crew corridor, goes on to the door
-      marked CREW until her cabin shows with her at her standing mirror, and on until only her
-      profile from the waist up and part of the mirror are in view (the user), she and the
-      mirror drawn finer. She straightens her name badge, which says BUMBUSIK. The camera
-      draws back to the game's scale, her usual figure in the portrait's place; she turns from
-      the mirror to the door; the HUD comes up and the controls are the player's.
+      right; it zooms in on deck 3, whose side opens on the crew corridor, and **stops there at
+      the game's own scale, on the door marked CREW**. The door opens, she steps out and stands
+      by it, straightens her name badge, and turns to go; the HUD comes up, the controls are
+      the player's, and a word over her says **"E to interact"** for a few seconds (item 15).
+      (The doc's close-up of her at her mirror was built first, with a finer portrait; the user
+      saw it and had it dropped: "The transition scene doesn't work at all".)
     - A game already under way gets the same welcome and a shorter way in (sky, sea, ship, then
       in toward wherever she is and over to the game through a short fade). Esc ends the intro
       at once. `?play` goes past both; `?intro=<part>` starts at a part of it.
-    - **Her portrait in the close-up is a stand-in for now**, redrawn finer from her own game
-      figure; the user asked whether her photos could make it more like her (they can: it
-      waits for photos in `reference/photos/Bumbusik/`). **Open:** the doc has her turn to the
-      door in the close-up; built, she turns once the camera is back (the user's later telling:
-      "She adjusts her badge. Then it zooms out").
+    - **Her cabin's mirror** (the user): she stops in front of it (an unseen wall), and when she
+      stands there turned to it she runs a hand over her hair, once or twice, and not again
+      until she has walked away or turned from it and come back.
 12. **Save:** auto-save at checkpoints to localStorage.
 13. **The sea:** scrolling water and sky behind the ship, visible outside and through windows.
 14. **Sound effects only**, synthesised. No music for now. **Built (step 12, 2026-11-14):**
@@ -1581,7 +1579,8 @@ cap, scarce, and the game can be finished without the dash.
     is after it. What stays: the ship's own signs and plates, the people's pictogram bubbles, a
     lock's popup naming the card it wants, her own exclamations, and the win screen's "Press E"
     line (the popup and that line asked about and kept by the user, 2026-11-14). The controls
-    are in `README.md`.
+    are in `README.md`. **One hint, by the user's own word the same day:** "E to interact", over
+    her for a few seconds as the intro hands her over at a new game's start (item 11). No other.
 16. **Two languages** (Decided, the user, 2026-11-14): **English, the default, and Ukrainian**;
     "every text shall have two versions. The art text (e.g. La Cucina) stays as it is". All of
     the game's own words are in `src/lang.js` (`t(key)`): the title, the win screen, a lock's
@@ -2164,9 +2163,10 @@ Nothing blocks the start of the build. These get settled along the way:
       start moved to a crew corridor on deck 3 with her cabin and a service ladder up to deck 4
       (§5.3, §7.1 items 15 and 16; `docs/progress-decisions.md`). **The intro (the welcome
       screen, the start sequence, the intro's scene): built 2026-11-14 on the user's word**
-      (§7.1 item 11, `src/intro.js`, `docs/progress-decisions.md` "The intro"); her cabin got a
-      standing mirror and Ukraine's flag with it. **Waiting for the user:** photos of her for
-      the close-up's portrait (a stand-in is in), and their eyes on the whole of it in motion.
+      (§7.1 item 11, `src/intro.js`, `docs/progress-decisions.md` "The intro"), its menu styled
+      and its ending redone the same day on their word (no close-up: she steps out of her
+      door); her cabin got a standing mirror and Ukraine's flag with it. **Waiting for the
+      user:** their eyes on the new ending in motion.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

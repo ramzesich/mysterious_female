@@ -6,7 +6,7 @@ menu out).
     python tools/build_menu.py
 
 The sources, in `assets/source/menu/`, are PixelLab's:
-- `font-title.png` (cells of 32) and `font-sign.png` (cells of 16): two generated pixel letterings
+- `font-title.png` (cells of 32) and `font-sign.png` (cells of 16; both made smaller here: `SCALE`): two generated pixel letterings
   (`create_font`, 15 generations each), each an atlas of 80 glyphs, eight to a row, in the order
   `ORDER`. Only the shapes are used: the game gives them their colours, outline and shadow.
 - `plates.png`: a generated ship's name plate (`create_ui_asset`, 10 generations), a riveted brass
@@ -26,13 +26,19 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from palettize import palettize
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "menu"
 OUT = ROOT / "assets" / "sprites"
 ORDER = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?:;'\"-+()0123456789/%*=_$"
 SAME = dict(zip("АВЕІКМНОРСТУХ", "ABEIKMHOPCTYX"))
-# The plate: where it is in its sheet, and the rows taken out of it (it came 58 px high).
+# The plate: where it is in its sheet, and the rows taken out of it (it came 62 px high).
 PLATE = {"box": (0, 0, 256, 128), "cut": [(14, 20), (38, 44)]}
+# Everything is made three quarters of the size it was drawn at (the user, on seeing the menu in
+# the game: "Make the initial menu smaller, but still big. Now it is oversized"): the name's
+# letters 24 px, the plates' 12, the plate 166 x 38; each two screen pixels to one in the game.
+SCALE = 0.75
 
 
 def glyphs(path, cell):
@@ -71,7 +77,8 @@ def glyphs(path, cell):
         x0 = round(mid + side * (dot * 0.5 + 1) - dot / 2)
         d.rectangle([x0, top, x0 + dot - 1, top + dot - 1], fill=255)
     g["Ї"] = yi
-    return {ch: m for ch, m in g.items() if m.getbbox()}
+    small = round(cell * SCALE)
+    return {ch: m.resize((small, small), Image.LANCZOS).point(lambda v: 255 if v > 118 else 0) for ch, m in g.items() if m.getbbox()}
 
 
 def plate():
@@ -81,7 +88,11 @@ def plate():
     out = Image.new("RGBA", (a.width, len(keep)), (0, 0, 0, 0))
     for i, y in enumerate(keep):
         out.paste(a.crop((0, y, a.width, y + 1)), (0, i))
-    return out
+    # Smaller, and back to the game's palette and a hard edge.
+    size = (round(out.width * SCALE), round(out.height * SCALE))
+    small = palettize(out.resize(size, Image.LANCZOS))
+    small.putalpha(out.getchannel("A").resize(size, Image.LANCZOS).point(lambda v: 255 if v > 127 else 0))
+    return small
 
 
 def main():
@@ -89,8 +100,8 @@ def main():
     for font, name, cell in (("T", "font-title.png", 32), ("S", "font-sign.png", 16)):
         for ch, mask in glyphs(SRC / name, cell).items():
             box = mask.getbbox()
-            white = Image.new("RGBA", (box[2] - box[0], cell), (255, 255, 255, 0))
-            white.putalpha(mask.crop((box[0], 0, box[2], cell)))
+            white = Image.new("RGBA", (box[2] - box[0], mask.height), (255, 255, 255, 0))
+            white.putalpha(mask.crop((box[0], 0, box[2], mask.height)))
             pieces.append((f"{font}-{ord(ch):04x}", white))
     # Packed in rows, a pixel between pieces.
     W, x, y, row = 512, 0, 0, 0

@@ -291,8 +291,9 @@ def scenario_deck3(b):
 
 def scenario_intro(b):
     """The welcome screen, the start sequence and the intro (docs/intro.md, src/intro.js): the
-    menu and its two buttons, the camera's way from the sun to her cabin, the game handed over;
-    the short one for a game under way; Esc; `?play` past it all."""
+    menu and its two buttons, the camera's way from the sun to her cabin's door, her coming out
+    and the game handed over with its one hint; her cabin's mirror; the short one for a game
+    under way; Esc; `?play` past it all."""
     S, I = "window.__ship", "window.__ship.intro"
     menu = f"[{I}.titleText, ...{I}.buttons.map(q => q.text)]"
     b.open("?reset", start=None)
@@ -340,58 +341,73 @@ def scenario_intro(b):
     ok &= check(whole and b.eval(f"{S}.fromAfar && {S}.shellAlpha['3']") == 1, "the whole ship is in view, every deck closed")
     b.shot("intro-ship")
     corridor = at("corridor")
-    ok &= check(abs(corridor["z"] - 2) < 0.01 and abs(corridor["x"] - SPAWN_X) < 2 and b.eval(f"{S}.shellAlpha['3']") == 0,
-                "the camera zooms in on deck 3, its side open on the corridor", (corridor, b.eval(f"{S}.shellAlpha['3']")))
-    ok &= check(b.eval(f"{S}.route") == "inside" and not b.eval(f"{S}.player.visible"), "the door marked CREW, shut, nobody about")
+    ok &= check(abs(corridor["z"] - 2) < 0.01 and abs(corridor["x"] - SPAWN_X) < 2 and abs(corridor["y"] - (D3 - 29.5)) < 1
+                and b.eval(f"{S}.shellAlpha['3']") == 0,
+                "the camera zooms in on deck 3 and stops at the game's scale, on her cabin's door", (corridor, b.eval(f"{S}.shellAlpha['3']")))
+    door = f"{S}.world.rooms.crewcabin.outside[0].frame.name"
+    ok &= check(b.eval(f"{S}.route") == "inside" and not b.eval(f"{S}.player.visible") and b.eval(door) == "door-crew",
+                "the door marked CREW, shut, nobody about")
     b.shot("intro-corridor")
-    cabin = at("door", 1)
-    ok &= check(cabin["z"] > 4 and b.eval(f"{S}.route") == "crewcabin" and b.eval(f"{S}.world.rooms.crewcabin.room.alpha") > 0.99,
-                "closer, and her cabin shows", cabin)
-    her = b.eval(f"(p => ({{ x: p.x - {S}.world.rooms.crewcabin.def.x0, shown: p.visible && p.alpha > 0.99, left: p.flipX }}))({S}.player)")
-    ok &= check(her["shown"] and her["left"] and 26 < her["x"] < 44, "she stands at her mirror, turned to it", her)
-    b.shot("intro-cabin")
-    close = at("badge")
-    drawn = b.eval(f"!!{I}.close")
-    view = b.eval(f"(v => [({S}.player.y - v.bottom), v.height, ({S}.player.x - 12 - v.x) / v.width])({S}.cameras.main.worldView)")
-    # (Out of focus, the camera draws 48 px more all round: 3 of the game's at this zoom.)
-    ok &= check(close["z"] == 16 and 24 < view[0] < 32 and view[1] < 40 and 0.3 < view[2] < 0.7,
-                "the camera goes on in: her profile from the waist up, the mirror's edge beside her", (close, view))
-    if drawn:
-        ok &= check(b.eval(f"{I}.hero.alpha === 1 && {I}.glass.alpha === 1 && {I}.heroCam.visible && {S}.player.alpha === 0 && !!{I}.blur"),
-                    "her finer portrait and the mirror's are in the game's own place, the cabin behind out of focus")
-        frames = set()
-        for k in (0.1, 0.3, 0.5, 0.7, 0.9):
-            at("badge", k)
-            frames.add(b.eval(f"{I}.hero.frame.name"))
-        ok &= check(len(frames) >= 4, "she straightens her name badge", sorted(frames))
-        b.shot("intro-badge")
-    else:
-        print("  (no portrait is drawn for the close-up yet: her game figure stays in it)")
-    at("out", 1)
-    ok &= check(b.eval(f"{S}.player.alpha === 1 && {S}.player.flipX && !{I}.heroCam.visible && !{I}.blur"),
-                "the camera draws back: her usual figure in the portrait's place, still turned to the mirror")
-    at("turn", 0.5)
-    front = b.eval(f"{S}.player.frame.name === {S}.herFrames.front")
+    at("step", 0.6)
+    her = b.eval(f"(p => ({{ shown: p.visible && p.alpha > 0.8, front: p.frame.name === {S}.herFrames.front, x: p.x }}))({S}.player)")
+    ok &= check(b.eval(door) == "door-crew-ajar" and her["shown"] and her["front"] and abs(her["x"] - SPAWN_X) < 2,
+                "her door opens and she steps out", (b.eval(door), her))
+    b.shot("intro-step")
+    at("step", 1)
+    ok &= check(b.eval(door) == "door-crew" and b.eval(f"{S}.player.alpha") == 1, "the door shuts behind her; she stands by it")
+    clip, frames = b.eval(f"{S}.cache.json.get('her-meta').anims.badge"), set()
+    for k in (0.1, 0.3, 0.5, 0.7, 0.9):
+        at("badge", k)
+        frames.add(b.eval(f"{S}.player.frame.name"))
+    ok &= check(len(frames) >= 4 and frames <= set(clip), "she straightens her name badge", sorted(frames))
+    b.shot("intro-badge")
     at("turn", 0.9)
-    ok &= check(front and not b.eval(f"{S}.player.flipX"), "and she turns from the mirror to the door")
-    b.eval(f"{I}.seek('turn', 0.8, false)")
+    ok &= check(b.eval(f"{S}.player.frame.name === {S}.herFrames.stand && !{S}.player.flipX"), "and turns to go")
+    ok &= check(b.eval(f"{S}.cameras.cameras.length") == 4 and abs(b.eval(f"{S}.cameras.main.midPoint.y") - (D3 - 29.5)) < 1,
+                "the camera has not moved since it stopped: no close-up")
+    b.eval(f"{I}.seek('turn', 0.5, false)")
     b.wait_for(f"!{I}", timeout=6)
     time.sleep(0.9)
     s = b.state()
     ok &= check(b.eval(f"{S}.mode") == "play" and b.eval(f"{S}.cameras.main.zoom") == 2 and b.eval(f"{S}.uiCam.visible && {S}.uiCam.alpha === 1"),
-                "the camera is back at the game's scale, the HUD up, the controls hers", b.eval(f"{S}.mode"))
-    ok &= check(b.eval(f"{S}.route") == "crewcabin" and b.eval(f"{S}.player.visible && {S}.player.alpha === 1 && !{S}.player.flipX"),
-                "her usual figure, in her cabin, facing the door")
+                "the HUD comes up and the controls are hers", b.eval(f"{S}.mode"))
+    ok &= check(b.eval(f"{S}.route") == "inside" and abs(s["x"] - SPAWN_X) < 2 and s["y"] == D3
+                and b.eval(f"{S}.player.visible && {S}.player.alpha === 1 && !{S}.player.flipX"),
+                "she stands in the corridor by her door", s)
+    ok &= check(alert(b) == "E to interact", "a word over her says what E is for", alert(b))
     ok &= check(b.eval(f"{S}.cameras.cameras.length") == 3 and b.eval(f"{S}.save.intro") is True, "nothing of the intro is left; it is saved as seen",
                 b.eval(f"{S}.cameras.cameras.length"))
     b.shot("intro-play")
     b.hold("right", 0.4)
     ok &= check(b.state()["x"] > s["x"] + 20, "she walks", (s["x"], b.state()["x"]))
-    b.eval(f"{S}.spawnAt({{ x: {S}.world.rooms.crewcabin.def.doors[0].x, y: {D3}, route: 'crewcabin' }})")
+    time.sleep(6.2)
+    ok &= check(not alert(b), "the hint goes after a few seconds")
+
+    # Her cabin: she stops in front of her mirror and, turned to it, fixes her hair once or twice.
+    b.eval(f"{S}.spawnAt({{ x: {SPAWN_X}, y: {D3} }})")
     time.sleep(0.3)
     b.tap("e")
     time.sleep(1.2)
-    ok &= check(b.eval(f"{S}.route") == "inside" and abs(b.state()["x"] - SPAWN_X) < 4, "and out of her door into the corridor", b.state())
+    x0 = b.eval(f"{S}.world.rooms.crewcabin.def.x0")
+    ok &= check(b.eval(f"{S}.route") == "crewcabin", "E at her door: into her cabin")
+    b.eval(f"window.__hair = 0; {S}.player.on('animationstart', a => {{ if (a.key === 'her-hair') window.__hair++; }})")
+    b.hold("left", 1.2)
+    stop = b.state()["x"] - x0
+    ok &= check(35 <= stop <= 37, "she stops in front of her mirror", stop)
+    time.sleep(1.0)
+    ok &= check(b.eval("window.__hair") == 1 and b.eval(f"{S}.player.flipX"), "turned to it, she fixes her hair", b.eval("window.__hair"))
+    b.shot("mirror-hair")
+    time.sleep(7.0)
+    first = b.eval("window.__hair")
+    ok &= check(first in (1, 2), "once or twice, and no more", first)
+    b.hold("right", 0.5)
+    time.sleep(0.2)
+    b.hold("left", 1.0)
+    time.sleep(1.2)
+    ok &= check(b.eval("window.__hair") == first + 1, "again when she comes back to it", b.eval("window.__hair"))
+    b.tap("right")
+    time.sleep(3.0)
+    ok &= check(b.eval("window.__hair") == first + 1 and not b.eval(f"{S}.player.flipX"), "turned away, she leaves it alone")
     ok &= check(b.errors == [], "no errors", b.errors)
 
     # A game under way: the same welcome, a shorter way in, to wherever she is.

@@ -1489,3 +1489,47 @@ corridor's inside), and none of it has been heard.
 **Tests are silent from now on** (the user, during this work: "When you're testing, please test
 with sound off"): the test browser is muted at the browser, so the sound still runs and is
 still checked, and nothing comes out of the speakers.
+
+## The intro's ending redone, the menu smaller (2026-11-14)
+
+The user, on seeing the intro in motion: "1. Make the initial menu smaller, but still big. Now it
+is oversized. 2. The transition scene doesn't work at all: a) Drop the zoomed in profile sequence
+entirely. b) When the deck 3 corridor is shown at its gameplay scale, stop there, centered on her
+cabin door. c) Then, her cabin door opens and she steps out and stands by her door. d) Make her
+adjust her badge. Then, the controls are given. Add a hint popup, saying "E to interact". e) When
+she's in her crew cabin, make an invisible barrier (make her stop, basically) in front of her
+mirror. If she stops facing her mirror, she automatically fixes her hair once or twice. Don't do
+it in a constant loop." And on d): "make an animation when she kinda adjusts her badge. Don't add
+an additional badge or anything."
+
+- **The menu** is three quarters of what it was: the build makes the lettering and the plate
+  smaller (the name's letters 24 px, the plates' 12, the plate 166 x 38, each two screen pixels
+  to one), rather than the game scaling them by one and a half, which would have made the
+  pixels uneven.
+- **The close-up is gone**, with everything made for it: the portrait and its animation, the
+  finer mirror, `tools/build_closeup.py`, the second camera and the blur behind her. The sections
+  above on it are history. The question of her photos went with it.
+- **The camera stops on the corridor** at the game's own framing of her standing at her door, so
+  nothing moves when the game takes over. Once it has stopped the game's own cut-away takes the
+  deck, and the rest of the ship goes dim round it as she comes out.
+- **She comes out facing us**: the door stands ajar (the ship's own ajar crew door), she shows
+  in it, it shuts. Facing us is also where her badge is seen, so **the badge clip is drawn from
+  the front** (a new clip of her game figure, skeleton-v3 by poses: both hands to her badge, her
+  head bent to it, and down; nothing added to her). Then she turns to the side, as she stands
+  in play.
+- **The hint.** "No hint popups" stood since the prep; this one the user asked for by name. It is
+  the game's own word over her (`world.say`), in both languages, six seconds, at a new game's
+  start only. It stays the only one.
+- **The mirror.** The cabin's forward wall for her is now 36 px in (`mirror` in the room's data),
+  in front of the mirror. Stopped there and turned to it, she plays a new clip (a hand over her
+  hair) once or twice (the number is drawn each time she arrives), then stands; walking away or
+  turning from it arms it again. Her ordinary idles go on as anywhere.
+- At the hand-over her idles now wait their usual four seconds: she had begun to tap her foot at
+  once.
+
+**Generations:** 6 more (the two clips, 3 each). Of the 95 before, the 35 for the close-up made
+nothing that is still in the game.
+
+**Checked:** `intro` (rewritten: the stop on the corridor, the door, her coming out, the badge
+clip, the hint and its going, the mirror's wall, her hair once or twice and again on coming
+back), `lang`, `boot`, `deck3`, `region1`, `sound`. Not run: the rest.

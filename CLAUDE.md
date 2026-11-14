@@ -22,9 +22,8 @@ truth**: read the relevant section before any design or content work, and record
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
 | `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the welcome screen's LANGUAGE button switches it |
 | `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Built 2026-11-14 on the user's word |
-| `src/intro.js` | **The welcome screen, the start sequence and the intro**, all in the ship scene's own picture: one clock (`T`) and everything a function of it (the camera, what is open, what is shown), its parts and their lengths in `PARTS`; `intro.seek(part, k)` shows any moment, Esc ends it, `?play` skips it, `?intro=<part>` starts at a part. A new game gets all of it; a game under way a short way in. While it runs the game holds still (`scene.intro`, `scene.fromAfar`: the ship closed and the sky laid out in the world) |
+| `src/intro.js` | **The welcome screen, the start sequence and the intro** (it ends on deck 3's corridor: her door opens, she steps out, straightens her badge, the hint; a close-up at her mirror was built first and dropped by the user), all in the ship scene's own picture: one clock (`T`) and everything a function of it (the camera, what is open, what is shown), its parts and their lengths in `PARTS`; `intro.seek(part, k)` shows any moment, Esc ends it, `?play` skips it, `?intro=<part>` starts at a part. A new game gets all of it; a game under way a short way in. While it runs the game holds still (`scene.intro`, `scene.fromAfar`: the ship closed and the sky laid out in the world) |
 | `src/pixeltext.js`, `tools/build_menu.py` | **The welcome screen's menu art** (the user chose brass plates from three mock-ups, 2026-11-14): `assets/source/menu/` (two generated pixel letterings and a generated plate) to the atlas `assets/sprites/menu.png`; `pixelText(scene, key, font, text, style)` sets a word in it (`T` the name's lettering, `S` the plates'), filled in bands, outlined, shadowed. **The lettering is Latin; the Ukrainian capitals are built from its shapes in the build tool, so the menu is in capitals.** A new menu word needs its letters there (`missing()`; the `lang` playtest fails otherwise) |
-| `tools/build_closeup.py` | The intro's close-up: her finer portrait (`assets/source/her-close/` to `assets/sprites/her-close.png`), the badge that says BUMBUSIK drawn on every frame (crooked, then straight, her hand kept over it), and the finer piece of her standing mirror drawn in code (`close-mirror.png`). Both are eight pixels to one of the game's. The mirror's measures are the cabin's in `tools/draw_rooms.py`: change both together |
 | `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and the dash free: add a line when the builder gets a new `place` |
 | `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
 | `src/world/soundscape.js` | What nothing in particular makes: the ambience's levels from where she stands (out on deck, inside, how high in the ship, by a pool), her footsteps by what is under her (`floor()`), rungs, a cart's wheels, strokes; the small steady sounds of a few places (`PLACES`) |
@@ -406,7 +405,9 @@ Lessons learned (2026-11-14, step 12, sound):
   a browser for a test any other way.
 - **No hint popups** (the user, 2026-11-14: "Part of the game is figuring things out. Labels and
   namings are not considered hints"): never add a text or a key's cap that says what to press or
-  what to do. Signs, plates and the people's pictogram bubbles are fine.
+  what to do. Signs, plates and the people's pictogram bubbles are fine. **One exception, which
+  the user asked for by name the same day: "E to interact"** over her as the intro hands her
+  over (`hint.interact` in `src/lang.js`). It is not a licence for a second one.
 - Do only what was asked: when a request could reach further (another deck, a layout change),
   ask first rather than assume (the user, 2026-11-06).
 - The user circles things on screenshots and numbers them; fix each, show the result as
@@ -477,3 +478,19 @@ Lessons learned (2026-11-14, the intro):
   candidates and two animations (27 generations) before the user described the close-up they
   had in mind (a waist-up profile). A rough frame of the composition first would have saved
   them.
+
+Lessons learned (2026-11-14, the intro shown to the user):
+
+- **A cutscene is judged in motion, and I only see stills:** the close-up at her mirror looked
+  right frame by frame, and the user's word on seeing it run was "doesn't work at all". For a
+  sequence, build the plainest version that runs end to end and show that first; make its
+  special art (35 generations here) only after the user has watched the plain one.
+- **UI scale is changed in the art, not in the game:** a menu "smaller" by a factor of 0.75 was
+  rebuilt at that size (letter shapes resampled and thresholded, the plate resampled and snapped
+  to the palette) and still shown at two screen pixels to one; scaling by 1.5 in the game makes
+  pixels of two sizes.
+- **A clip of her that shows something on her front is drawn facing us:** her badge is only in
+  her south view. skeleton-v3 by poses kept her look; hands in front of the body need their
+  elbows pointed down.
+- **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
+  disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

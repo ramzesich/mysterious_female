@@ -112,6 +112,11 @@ HER = {
         # frame: kept in piano/.) At the captain's door: a knock, her back to us (north).
         "keys": [(f"keys/{i}.png", "feet") for i in range(8)],
         "knock": [(f"knock/{i}.png", "feet") for i in range(8)],
+        # The intro's end and her crew cabin (the user, 2026-11-14; skeleton-v3, custom poses): come
+        # out of her door, she straightens her name badge with both hands, facing us (south); at
+        # her cabin's mirror she runs a hand over her hair.
+        "badge": [(f"badge/{i}.png", "feet") for i in range(8)],
+        "hair": [(f"hair/{i}.png", "feet") for i in range(8)],
         "sit-eat": [(f"sit-eat-clean/{i}.png", "feet") for i in (0, 1, 3, 4, 5, 6, 7)],
         # Region 8 (skeleton-v3, custom poses): both hands up to the horn's cord and down with her
         # weight; a two-handed shot at the court's hoop; under the open parasol she hangs from its

@@ -315,7 +315,9 @@ export class World {
             if (def.checkpoint === START_CHECKPOINT && !this.save.activated.includes(def.checkpoint)) this.save.activated.push(def.checkpoint);
             if (def.checkpoint) s.addCheckpoint(def.checkpoint, def.doors[0].outX, def.doors[0].outY, { door: null });
             s.rooms.push(room);
-            s.addRouteWall(def.x0 + ROOM.stop, -1, def.floor, def.id);
+            // (Her crew cabin's forward end is her standing mirror: she stops in front of it.)
+            if (def.mirror) room.mirror = def.x0 + def.mirror;
+            s.addRouteWall(def.x0 + (def.mirror ?? ROOM.stop), -1, def.floor, def.id);
             s.addRouteWall(def.x0 + def.width - ROOM.stop, 1, def.floor, def.id);
             this.rooms[def.id] = room;
         }
