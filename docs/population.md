@@ -250,7 +250,7 @@ stairs and no lift come down to it.
 | 83.3, 84.1 | | The fire point: a hose cabinet, an extinguisher | Dressing | Atlas |
 | 85.5 | | The Medical Center's door (NCL's plan), its plaque over it; a first-aid cabinet, a seat to wait on | Dressing, shut | Atlas |
 | 88.5 | | The crew's notice board | Dressing | Atlas |
-| 90 | `room_crewcabin`, `cp_crew` | The door marked CREW: her own crew cabin (patterned wallpaper, a desk, a porthole, a bed for one, over it a picture of Bumbot by a bowl of fruit, from the user's photo) | The start; `room`; checkpoint, lit from the start | Drawn |
+| 90 | `room_crewcabin`, `cp_crew` | The door marked CREW: her own crew cabin (patterned wallpaper; her standing mirror forward of the door, where the intro finds her; a desk under Ukraine's flag with the trident; a bed for one, over it a picture of Bumbot by a bowl of fruit, from the user's photo) | The start; `room`; checkpoint, lit from the start | Drawn |
 | 91.3, 92.3 | | A clock, the water cooler | Dressing | Atlas |
 | 93.2 | | The way out's sign, toward the ladder | Dressing | Atlas |
 | 95.6 | `trunk-crew` | The service ladder's door, up to deck 4 (it comes out among deck 4's cabins, between the forward and the midship stairs) | An escape trunk, decks 3 and 4, no card | Built |

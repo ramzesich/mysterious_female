@@ -1,6 +1,5 @@
 import { VIEW, PLAYER } from './config.js';
 import { BootScene } from './scenes/BootScene.js';
-import { TitleScene } from './scenes/TitleScene.js';
 import { ShipScene } from './scenes/ShipScene.js';
 import * as lang from './lang.js';
 
@@ -21,5 +20,5 @@ window.__game = new Phaser.Game({
         default: 'arcade',
         arcade: { gravity: { y: PLAYER.gravity }, debug: params.has('debug') },
     },
-    scene: [BootScene, TitleScene, ShipScene],
+    scene: [BootScene, ShipScene],
 });

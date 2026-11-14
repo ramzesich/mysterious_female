@@ -273,13 +273,18 @@ def smcabin(width):
 
 def crewcabin(width):
     """Her own crew cabin, deck 3 (the user, 2026-11-14: where the game starts): small and plain. By
-    the door her spare uniform and the life jackets' shelf; a desk under a mirror, tangerines in a
-    bowl on it; a porthole low over the sea; her bed, for one, an orange blanket on it, a suitcase
-    under it; over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
+    the wall forward of the door her standing mirror, turned to the room (the user, with the
+    intro: she stands by it as the game opens); by the door her spare uniform and the life
+    jackets' shelf; a desk under Ukraine's flag with the trident (the user: in the wall mirror's
+    place, over the desk's middle, its colours a little muted so it sits back on the wall),
+    tangerines in a bowl on it; her bed, for one, an orange blanket on it, a suitcase under it
+    (the porthole that was between them is gone: the user); over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
+    # (The flag's blue and gold, each a third of the way to the wall's colour.)
+    GLASS, FLAG_BLUE, FLAG_YELLOW = "#b7dff2", "#4580bd", "#ead05c"
     R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
-    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2", BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
+    R.keep = (WALL, STRIPE, SPRIG, GLASS, FLAG_BLUE, FLAG_YELLOW, BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
     r, box, d = R.r, R.box, R.d
     # The wallpaper: a pinstripe every 8 px, a sprig between them every 12 px down, row about.
     for x in range(4, width, 8):
@@ -305,10 +310,38 @@ def crewcabin(width):
     r(86, 44, 88, 52, PALE)
     r(96, 44, 98, 52, PALE)
     r(89, 50, 91, 51, NAVY)                                    # her name badge
-    # The desk: a mirror over it, a lamp, a bowl of tangerines, a mug; the chair pushed in.
-    box(108, 34, 130, 60, "#b7dff2", WOOD_DARK)            # the mirror
-    d.line([(111, 54), (120, 38)], fill=WHITE)
-    d.line([(116, 56), (125, 40)], fill=WHITE)
+    # Her standing mirror, by the wall forward of the door: a tall glass in a wooden frame,
+    # hung between two posts on feet, seen a little from its side (its far edge, the right one,
+    # a touch shorter: the user had it turned this way, made taller and its slant gentler).
+    top, foot = FLOOR - 69, FLOOR - 8
+    for x in (5, 22):                                          # the posts, a knob on each
+        r(x, FLOOR - 44, x + 1, FLOOR - 3, WOOD_DARK)
+        r(x - 2, FLOOR - 2, x + 3, FLOOR - 1, WOOD_DARK)       # its foot
+        r(x, FLOOR - 46, x + 1, FLOOR - 45, WOOD)
+    r(7, FLOOR - 4, 21, FLOOR - 4, WOOD_DARK)                  # the stretcher between them
+    d.polygon([(8, top), (20, top + 2), (20, foot - 2), (8, foot)], fill=WOOD, outline=WOOD_DARK)
+    d.polygon([(10, top + 3), (18, top + 4), (18, foot - 4), (10, foot - 3)], fill=GLASS)
+    for x, y in ((8, top), (20, top + 2), (20, foot - 2), (8, foot)):
+        d.point((x, y), fill=WALL)                             # its corners rounded
+    d.line([(12, top + 30), (16, top + 12)], fill=WHITE)       # the light on the glass
+    d.line([(11, top + 44), (15, top + 32)], fill=WHITE)
+    d.line([(10, foot - 4), (18, foot - 5)], fill=BLUE_LIGHT)
+    for x in (6, 21):
+        d.point((x, FLOOR - 38), fill=YELLOW)                  # the pivots' brass
+    # The desk: over it Ukraine's flag with the trident, pinned flat to the wall; a lamp, a bowl
+    # of tangerines, a mug; the chair pushed in.
+    fx, fy = 107, 34
+    box(fx, fy, fx + 31, fy + 21, FLAG_BLUE, SLATE)
+    r(fx + 1, fy + 11, fx + 30, fy + 20, FLAG_YELLOW)
+    # (The small coat of arms in its middle: a blue shield edged in gold, the gold trident on it.)
+    for j, row in enumerate(["ggggggggggg", "gbbbbbbbbbg", "gbgbbgbbgbg", "gbgbbgbbgbg", "gbgbgggbgbg", "gbggbgbggbg",
+                             "gbgggggggbg", "gbbgbgbgbbg", "gbbbgggbbbg", ".gbbbgbbbg.", "..gbbbbbg..", "...ggggg..."]):
+        for i, ch in enumerate(row):
+            if ch != ".":
+                colour = FLAG_YELLOW if ch == "g" else FLAG_BLUE
+                d.point((fx + 11 + i, fy + 5 + j), fill=colour)
+    for x in (fx + 1, fx + 30):
+        d.point((x, fy + 1), fill=GREY)                        # its pins
     box(104, FLOOR - 30, 142, FLOOR - 27, WOOD, WOOD_DARK)
     for x in (106, 139):
         r(x, FLOOR - 26, x + 1, FLOOR - 1, WOOD_DARK)
@@ -330,17 +363,8 @@ def crewcabin(width):
     r(119, FLOOR - 31, 130, FLOOR - 31, "#4d65b4")
     box(136, FLOOR - 36, 139, FLOOR - 31, RED, INK)            # the mug
     stand(R.im, "chair", 128)
-    # The porthole: brass, the sky and the sea in it, the horizon a little under its middle.
-    cx, cy = 152, 46
-    d.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill="#b9722c", outline=INK)
-    d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=BLUE_LIGHT, outline=WOOD_DARK)
-    d.chord([cx - 6, cy - 6, cx + 6, cy + 6], 5, 175, fill=BLUE)
-    r(cx - 4, cy + 1, cx + 4, cy + 1, WHITE)
-    d.point((cx - 3, cy - 3), fill=WHITE)
-    for a, b in ((-8, -8), (8, -8), (-8, 8), (8, 8)):
-        d.point((cx + a * 7 // 8, cy + b * 7 // 8), fill=YELLOW)
     # Over the bed, a picture of Bumbot (the user): him lying by a bowl of fruit, from their own
-    # photo of him, in a wooden frame.
+    # photo of him, in a wooden frame (tried a little smaller and put back as it was: the user).
     cat = bumbot_picture()
     px, py = 198 - (cat.width + 4) // 2, 46
     box(px, py, px + cat.width + 3, py + cat.height + 3, WOOD, WOOD_DARK)

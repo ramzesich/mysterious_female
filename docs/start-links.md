@@ -1,7 +1,7 @@
 # Start links
 
 Every place the game can be started at on this computer, for testing. Run `python tools/serve.py`
-first. Each link skips the title, opens every lock and gives her every verb (`cards=all`), and makes
+first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`), and makes
 the dash free (`tangerines=infinite`).
 
 Useful additions to any link:
@@ -19,7 +19,11 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | Where the game starts: deck 3, her crew cabin's door (with a fresh save) | <http://localhost:8000/?play&reset&cards=all&tangerines=infinite> |
-| The title screen | <http://localhost:8000/?cards=all&tangerines=infinite> |
+| The welcome screen, then the whole intro (a new game: the save is cleared) | <http://localhost:8000/?reset&tangerines=infinite> |
+| The welcome screen with the save kept (a game under way gets the short way in) | <http://localhost:8000/?tangerines=infinite> |
+| The intro from the whole ship in view | <http://localhost:8000/?reset&intro=ship&tangerines=infinite> |
+| The intro from the corridor, just before her door | <http://localhost:8000/?reset&intro=corridor&tangerines=infinite> |
+| The intro from the close-up on her (the badge) | <http://localhost:8000/?reset&intro=badge&tangerines=infinite> |
 
 ## Deck 3
 

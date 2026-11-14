@@ -211,6 +211,33 @@ function cloudStrip(scene) {
     tex.refresh();
 }
 
+// One cloud by itself, `w` px wide, drawn as the strip's are (the few round the sun in the intro:
+// src/intro.js).
+export function cloudTexture(scene, key, w, seed) {
+    const h = Math.round(w * 0.5) + 8;
+    const tex = scene.textures.createCanvas(key, w + 12, h);
+    const ctx = tex.getContext();
+    const rand = rng(seed);
+    const blob = (cx, cy, rx, ry) => {
+        for (let yy = -Math.ceil(ry); yy <= Math.ceil(ry); yy++) {
+            const half = Math.floor(rx * Math.sqrt(Math.max(0, 1 - (yy / ry) ** 2)));
+            if (half > 0) ctx.fillRect(Math.round(cx - half), Math.round(cy + yy), half * 2, 1);
+        }
+    };
+    const n = 5 + Math.floor(rand() * 3), base = h - 8;
+    const puffs = [];
+    for (let p = 0; p < n; p++) {
+        const t = (p + 0.5) / n, mid = 1 - Math.abs(t - 0.5) * 2;
+        const r = (w / n) * (0.62 + 0.55 * mid + rand() * 0.3);
+        puffs.push([6 + w * t + (rand() - 0.5) * 4, base - r * (0.25 + 0.5 * mid) + (rand() - 0.5) * 3, r]);
+    }
+    ctx.fillStyle = '#c7dcd0';
+    for (const [cx, cy, r] of puffs) blob(cx, cy, r, r * 0.8);
+    ctx.fillStyle = '#ffffff';
+    for (const [cx, cy, r] of puffs) blob(cx, cy - Math.max(1, r * 0.22), r * 0.95, r * 0.75);
+    tex.refresh();
+}
+
 // The far sea's ripples: faint short dashes, finer and fewer toward the horizon, so it reads as
 // the same water as the near sea's rows of waves (sea.js) where they meet.
 const RIPPLES_H = 160;
@@ -414,8 +441,9 @@ export class Backdrop {
     }
 
     // Lay it all out for this frame, fixed to the camera: the horizon `horizonOnScreen` px from the
-    // top of the screen, or in the outside view (`outside`) on the waterline.
-    update(dt, outside = false, horizonOnScreen = 0) {
+    // top of the screen, or in the outside view (`outside`) on the waterline. `far`: the outside
+    // view's sizes for this one (the intro's wide views: `{ islands }`, world px to a pixel).
+    update(dt, outside = false, horizonOnScreen = 0, far = null) {
         this.time += dt;
         const cam = this.scene.cameras.main;
         const z = cam.zoom, W = cam.width, H = cam.height, cx = W / 2, cy = H / 2;
@@ -452,7 +480,7 @@ export class Backdrop {
         // the world: `shown` is the world x of the screen's left edge, which each strip starts
         // from. In play they are fixed to the screen and only shift a little as she runs, and the
         // clouds stand well up in the sky (the user, 2026-11-08).
-        const sc = outside ? OUTSIDE_SIZE.clouds : 1, si = outside ? OUTSIDE_SIZE.islands : 1;
+        const sc = outside ? OUTSIDE_SIZE.clouds : 1, si = outside ? far?.islands ?? OUTSIDE_SIZE.islands : 1;
         const shown = run + left;
         this.ripples.setPosition(left, hy).setSize(width, RIPPLES_H);
         this.ripples.tilePositionX = Math.round((outside ? shown : run * 0.05) - this.time * 8);

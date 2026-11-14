@@ -49,6 +49,13 @@ export class BootScene extends Phaser.Scene {
         // books' pages (tools/draw_pages.py).
         this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
         for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
+        // The intro's close-up (src/intro.js; tools/build_closeup.py): the finer piece of her mirror,
+        // and her portrait when one is drawn.
+        this.load.image('close-mirror', 'assets/sprites/close-mirror.png');
+        this.load.json('her-close-meta', 'assets/sprites/her-close.json');
+        this.load.once('filecomplete-json-her-close-meta', (_key, _type, meta) => {
+            if (meta.portrait) this.load.spritesheet('her-close', 'assets/sprites/her-close.png', { frameWidth: meta.cell, frameHeight: meta.cell });
+        });
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
@@ -175,7 +182,7 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'bumbot-bat', frames: catFrames('bat', [4, 5, 7, 5]), frameRate: 6, repeat: -1 });
         // Wet from the pool, he shakes himself dry.
         if (cat.anims.shake) this.anims.create({ key: 'bumbot-shake', frames: catFrames('shake', [1, 2, 3, 4, 5, 6]), frameRate: 8 });
-        const params = new URLSearchParams(location.search);
-        this.scene.start(params.has('play') ? 'ship' : 'title');
+        // (The welcome screen and the intro are the ship scene's own: src/intro.js.)
+        this.scene.start('ship');
     }
 }

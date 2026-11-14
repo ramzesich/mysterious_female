@@ -7,7 +7,7 @@
 // exact text), and everything said without words (the pictogram bubbles, ♥, ♪, !).
 //
 // The choice is kept in the browser (`bumbusik-lang`); `?lang=uk` or `?lang=en` sets it for one
-// session without keeping it. The welcome screen's LANGUAGE button (docs/intro.md) will call
+// session without keeping it. The welcome screen's LANGUAGE button (src/intro.js) calls
 // `nextLanguage()`.
 
 const KEY = 'bumbusik-lang';
@@ -17,8 +17,10 @@ export const LANGUAGES = ['en', 'uk'];
 const TEXTS = {
     en: {
         'language.name': 'English',
+        // The welcome screen (docs/intro.md): the game's name and its two buttons.
         'title': 'Bumbusik',
-        'title.start': 'Start',
+        'menu.play': 'PLAY',
+        'menu.language': 'LANGUAGE',
         // The win screen (§6.4).
         'win.line': 'Bumbot is home.',
         'win.tally': (found, tangerines, books, photos, slots) =>
@@ -38,7 +40,8 @@ const TEXTS = {
     uk: {
         'language.name': 'Українська',
         'title': 'Бумбусік',
-        'title.start': 'Почати',
+        'menu.play': 'ГРАТИ',
+        'menu.language': 'МОВА',
         'win.line': 'Бумбот удома.',
         'win.tally': (found, tangerines, books, photos, slots) =>
             `Мандаринки: ${found} з ${tangerines}      Книжки на полиці: ${books} з 10      Знайдені світлини: ${photos} з ${slots}`,

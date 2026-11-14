@@ -1380,3 +1380,91 @@ Of the older scenarios, those the changes can touch most were run, not the whole
 (`CLAUDE.md`): `boot`, `run_jump`, `trunk`, `golden`, `region1`, `region4`, `region7`, `finale`,
 `sound`. Not run: the rest, among them `region2`, `region3`, `region5`, `region6`, `region8`,
 `region9` and `sweep`, whose fright checks had their words changed the same mechanical way.
+
+## The intro (2026-11-14)
+
+The user: "Read the intro document and implement it. Readjust her crew cabin to include a
+standing mirror. Replace the mirror on the wall with a Ukrainian flag (which includes a trident
+on it)". `docs/intro.md` is theirs; what follows is what I decided where it left room, and what
+they said on the way.
+
+**How it is built.** Not a title scene and an intro scene: both are the ship scene's own
+picture (`src/intro.js`), because the doc wants each to run into the next (the menu melts, the
+same sky comes into focus, the camera that leaves the sun is the one that ends on her). One
+clock, and everything a function of it: the camera, what is open, what is shown. So any moment
+can be shown by itself (`?intro=<part>`, `intro.seek()` in the playtest) and Esc is the clock
+set to its end. The old `TitleScene` is gone.
+
+**The welcome screen.** "Bumbusik" in the middle is the game's name, not her figure (asked
+myself, and the user said so before I asked them; they put quotes round it in the doc). The
+LANGUAGE button shows the language chosen ("LANGUAGE: English", "МОВА: Українська"), so a
+press shows at once what it did. PLAY is "ГРАТИ". Keys as well as the mouse (↑/↓, Enter, Space
+or E), for the controller's sake later. Out of focus is a blur on the world's camera; the
+camera draws 48 px more all round while blurred, or the blur darkens the picture's edges.
+
+**The wide views** use the outside view's sky (laid out in the world), with the islands at the
+game's own pixel size (two screen pixels to one of theirs) so that the "Baltic shoreline" is
+there to see; the day had no sun, so the intro has its own (a disc, a glow, rays that take
+turns), a few clouds of its own round it, gulls, and the sun's glitter on the water for the
+doc's "sunbeams shimmer on the sea waves". All of it is at the game's pixel size, stands in the
+world, and fades as the camera goes in. The sun is ahead of the bow, where the sunset's sun is
+at the end of the game. Far off the camera moves by whole screen pixels, so the small ship does
+not shimmer.
+
+**The way in.** Deck 3's side opens as the camera comes close (the cut-away's own fade, driven
+through `viewOverride`), the corridor holds a moment with the door and its CREW sign, the cabin
+comes up over the corridor as rooms do, and she is there at the mirror.
+
+**The close-up.** I first read "a zoomed in and more detailed character" as her whole figure
+drawn finer, and made candidates (a figure from a description: unlike her; one redrawn from her
+own game figure: like her). Shown them, the user described the shot instead: "the entire scene
+zoomed as much as to show her up from her waist. She adjusts her badge (which says Bumbusik).
+Then it zooms out smoothly transitioning into the playable scene", and "only her profile up
+from her waist together with a part of the mirror is visible in the center of the frame". So:
+- The camera goes to 16 times; her portrait (256 px, her profile from the waist up) and a finer
+  piece of the mirror are eight pixels to one of the game's, two of the screen's each, as a
+  pixel of the game's is in play. They are on a camera of their own, and the cabin behind them
+  goes out of focus, which also hides its sixteen-pixel blocks.
+- The portrait comes in over her game figure only as the view's foot reaches her waist (it ends
+  there), and goes the same way.
+- **The badge says BUMBUSIK** and is drawn by the build (`tools/build_closeup.py`), not by the
+  generator, on every frame: crooked until her hand has been on it, straight after, her hand
+  kept on top wherever a frame has it there. It is bigger than a real badge would be on her
+  (35 px of her 40 px chest): eight letters do not fit in less.
+- **The portrait is a stand-in**: PixelLab's finer redraw of her own game figure (her game
+  figure to 256 px, that to a character in eight directions, its west view from the waist up
+  to 256 px again, then animated). The user asked, seeing it: "Can you use her photos in order
+  to make the character look more similar to her?" Yes, and there are none of her in
+  `reference/` yet: it waits for them (`reference/photos/Bumbusik/`; only a cutout of her on a
+  plain ground would be sent, as with Bumbot).
+- **Her turn to the door** is not in the close-up, as the doc has it, but at the game's scale
+  once the camera is back (her game figure turns by way of facing us). The user's later telling
+  left it out of the close-up, and a turn there needs four more portraits. Open: theirs to say.
+
+**A game already under way** is not in the doc. It gets the same welcome, the same sky, sea
+and ship a little quicker, then the camera closes in on wherever she is and the picture goes
+over to the game through a short fade (her deck may be open to the sky, where the far
+background of the outside view and the game's own would not meet). A new game is one with
+nothing saved past its start; the intro, once seen, is marked in the save. `?play` goes past
+the welcome and the intro, so every start link and every playtest is as it was.
+
+**Her cabin.** The standing mirror stands by the wall forward of the door (the one free piece
+of wall), she at it turned from the door, which is then what she turns to. The user, on seeing
+it: flipped, taller, its slant gentler. The flag is where the wall mirror was, then (the user)
+over the desk's middle and a little muted; the porthole between desk and bed went (the user);
+Bumbot's picture was tried a little smaller and put back (the user).
+
+**Generations:** 42 (two whole-figure candidates 9 and 8, the one from her figure 8, five
+finer redraws 5, two whole-figure animations made before the shot was described 10, the
+portrait's animation 2).
+
+**Checked:** the new `intro` scenario (the menu and both buttons, each part of the camera's way,
+the close-up, the hand-over, the short way in, Esc, `?play`), `lang`, `boot`, `deck3`; the
+whole intro run in real time for jumps and frame rate (38 s, never under 40 frames a second);
+and of the older scenarios `run_jump`, `trunk`, `sound`, `region1`, `finale`. Not run: the
+rest. No sound was added: the ambience follows the view (the sea and wind from afar, the
+corridor's inside), and none of it has been heard.
+
+**Tests are silent from now on** (the user, during this work: "When you're testing, please test
+with sound off"): the test browser is muted at the browser, so the sound still runs and is
+still checked, and nothing comes out of the speakers.

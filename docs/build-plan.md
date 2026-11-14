@@ -290,8 +290,10 @@ first"); how it was done: `docs/progress-decisions.md`.
   to deck 4 (`docs/progress-decisions.md`). `docs/start-links.md` lists a link for every place
   the game can be started at.
 - **The intro** (`docs/intro.md`: the welcome screen with PLAY and LANGUAGE, the start sequence,
-  the intro's scene from the sun down to the Crew door). **Not to be built until the user says
-  so** (2026-11-14).
+  the intro's scene from the sun down to her at her mirror). **Built 2026-11-14 on the user's
+  word** (`src/intro.js`, `tools/build_closeup.py`, the `intro` playtest;
+  `docs/progress-decisions.md` "The intro"). Waiting for the user: photos of her for the
+  close-up's portrait, their eyes on it in motion.
 - **The controller:** the mapping of §3.1 tested on the Xbox pad through the whole route.
 - **Tuning:** the checkpoints' spacing, the hazards' periods and the carries' meters from her
   playtest; the tangerine count.

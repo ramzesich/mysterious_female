@@ -1,6 +1,6 @@
 # Welcome screen
 
-Bumbusik in the center of the screen.
+"Bumbusik" in the center of the screen.
 In the dimmed and out-of-focus background:
 The sun shining in the center of the screen, surrounded by a few clouds.
 

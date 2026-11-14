@@ -10,6 +10,7 @@ import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '.
 import { World, OUTSIDE } from '../world/world.js';
 import { Soundscape } from '../world/soundscape.js';
 import { verbs } from '../world/verbs.js';
+import { Intro } from '../intro.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -117,6 +118,10 @@ export class ShipScene extends Phaser.Scene {
         this.soundscape = new Soundscape(this);
         window.__ship = this; // handle for headless tests and the console
         window.__sfx = sfx;
+        // The welcome screen and the intro (docs/intro.md; src/intro.js), in this scene's own
+        // picture; `?play` goes straight to the game, as it skipped the title.
+        this.fromAfar = false;
+        this.intro = new URLSearchParams(location.search).has('play') ? null : new Intro(this);
     }
 
     // --- Building --------------------------------------------------------------------------
@@ -2590,6 +2595,8 @@ export class ShipScene extends Phaser.Scene {
     update(time, delta) {
         const dt = Math.min(delta, 50) / 1000;
         const input = this.controls.update();
+        // The welcome screen and the intro move the camera: before the sky is laid out for it.
+        this.intro?.update(input, dt);
         // The ship is under way bow first (§5.2): the sea streams past toward the stern, even in
         // the outside view.
         const flow = this.overview?.still ? 0 : dt;
@@ -2605,10 +2612,15 @@ export class ShipScene extends Phaser.Scene {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
         this.farGulls.update(flow);
-        this.backdrop.update(flow, !!this.overview, this.horizonOnScreen);
+        this.backdrop.update(flow, !!this.overview || this.fromAfar, this.horizonOnScreen, this.fromAfar ? this.intro?.look : null);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
+        // (Under the intro the game itself holds still: only the ship's side opens and shuts.)
+        if (this.intro) {
+            this.updateCutaway(dt);
+            return;
+        }
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();
@@ -3222,7 +3234,7 @@ export class ShipScene extends Phaser.Scene {
         const inDeck = this.route === 'inside' || this.rooms.some(r => r.route === this.route && r.inDeck);
         // (`viewOverride`: the camera is away from her, looking at a deck: the horn's scene.)
         if (this.viewOverride != null) target = this.viewOverride;
-        else if (!inDeck || outdoors || this.overview || p.y <= this.world.roofY + 2) target = null;
+        else if (!inDeck || outdoors || this.overview || this.fromAfar || p.y <= this.world.roofY + 2) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
@@ -3265,8 +3277,8 @@ export class ShipScene extends Phaser.Scene {
         // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
         this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);
         for (const r of this.rooms) {
-            r.room.setVisible(this.route === r.route && !this.overview);
-            r.dim?.setVisible(this.route === r.route && !this.overview);
+            r.room.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
+            r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
         }
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);

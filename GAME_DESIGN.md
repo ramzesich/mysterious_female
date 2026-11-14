@@ -1536,9 +1536,32 @@ cap, scarce, and the game can be finished without the dash.
 9. **Checkpoints and scares:** crew cabin doors, closest-activated respawn, the scare animations
    (run off, fall out of frame, life ring).
 10. **Keyboard + Xbox controller input**, both mapped to the same actions.
-11. **Screens:** title ("Bumbusik" and Start, nothing else), play, win. (The welcome screen and
-    the intro of `docs/intro.md` come later, on the user's word; the prep for them was done on
-    2026-11-14: items 15 and 16, and deck 3's crew corridor, §5.3.)
+11. **Screens:** the welcome screen, play, win. **The welcome screen and the intro** (Decided,
+    the user's `docs/intro.md`; built 2026-11-14, `src/intro.js`), all of it the ship scene's own
+    picture, so one runs into the next without a cut:
+    - **The welcome screen:** "Bumbusik" (the game's name, not her figure: the user) in the
+      middle; behind it, dimmed and out of focus, the sun in the middle of the sky with a few
+      clouds; under it two big buttons, PLAY and LANGUAGE (the second shows the language chosen
+      and switches between English, the default, and Ukrainian). ↑/↓ and Enter, Space or E, or
+      the mouse.
+    - **The start sequence:** the menu melts away, the sky comes into focus and to the game's
+      brightness.
+    - **The intro** (about 38 s): the camera moves down to the sea and the Baltic shore (gulls,
+      the sun's glitter on the water), then right until the whole ship has come in from the
+      right; it zooms in on deck 3, whose side opens on the crew corridor, goes on to the door
+      marked CREW until her cabin shows with her at her standing mirror, and on until only her
+      profile from the waist up and part of the mirror are in view (the user), she and the
+      mirror drawn finer. She straightens her name badge, which says BUMBUSIK. The camera
+      draws back to the game's scale, her usual figure in the portrait's place; she turns from
+      the mirror to the door; the HUD comes up and the controls are the player's.
+    - A game already under way gets the same welcome and a shorter way in (sky, sea, ship, then
+      in toward wherever she is and over to the game through a short fade). Esc ends the intro
+      at once. `?play` goes past both; `?intro=<part>` starts at a part of it.
+    - **Her portrait in the close-up is a stand-in for now**, redrawn finer from her own game
+      figure; the user asked whether her photos could make it more like her (they can: it
+      waits for photos in `reference/photos/Bumbusik/`). **Open:** the doc has her turn to the
+      door in the close-up; built, she turns once the camera is back (the user's later telling:
+      "She adjusts her badge. Then it zooms out").
 12. **Save:** auto-save at checkpoints to localStorage.
 13. **The sea:** scrolling water and sky behind the ship, visible outside and through windows.
 14. **Sound effects only**, synthesised. No music for now. **Built (step 12, 2026-11-14):**
@@ -1563,8 +1586,8 @@ cap, scarce, and the game can be finished without the dash.
     text", asked about and answered "Ok" by the user, 2026-11-14), her «Кісюнічка!!!» (§3.2, the
     exact text), and everything
     said without words. The choice is kept in the browser; `?lang=uk` sets it for a session.
-    The LANGUAGE button that switches it is the welcome screen's (`docs/intro.md`), not built
-    yet. `WIN_MESSAGE` in `src/config.js` takes both versions.
+    The welcome screen's LANGUAGE button switches it (item 11). `WIN_MESSAGE` in
+    `src/config.js` takes both versions.
 
 ### 7.2 Stack
 
@@ -2134,8 +2157,11 @@ Nothing blocks the start of the build. These get settled along the way:
       extras). **The prep before the intro** (the user, 2026-11-14, on `docs/intro.md`): every
       hint popup taken out, the game's texts in English and Ukrainian (`src/lang.js`), and the
       start moved to a crew corridor on deck 3 with her cabin and a service ladder up to deck 4
-      (§5.3, §7.1 items 15 and 16; `docs/progress-decisions.md`). **The intro itself (the welcome
-      screen, the start sequence, the intro scene) is not to be built until the user says so.**
+      (§5.3, §7.1 items 15 and 16; `docs/progress-decisions.md`). **The intro (the welcome
+      screen, the start sequence, the intro's scene): built 2026-11-14 on the user's word**
+      (§7.1 item 11, `src/intro.js`, `docs/progress-decisions.md` "The intro"); her cabin got a
+      standing mirror and Ukraine's flag with it. **Waiting for the user:** photos of her for
+      the close-up's portrait (a stand-in is in), and their eyes on the whole of it in motion.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

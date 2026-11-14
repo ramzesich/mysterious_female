@@ -9,7 +9,7 @@ truth**: read the relevant section before any design or content work, and record
 
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
-  <http://localhost:8000>. URL flags: `?play` skip title,
+  <http://localhost:8000>. URL flags: `?play` skip the welcome screen and the intro, `?intro=<part>` start the intro at a part,
   `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?at=pool` start at a
   named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=uk` (Ukrainian for a session). Dash is D.
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
@@ -20,8 +20,10 @@ truth**: read the relevant section before any design or content work, and record
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
-| `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the LANGUAGE button is the welcome screen's (`docs/intro.md`, not built) |
-| `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Not to be built until the user says so (2026-11-14); its prep is done (no hints, two languages, deck 3's crew corridor) |
+| `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the welcome screen's LANGUAGE button switches it |
+| `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Built 2026-11-14 on the user's word |
+| `src/intro.js` | **The welcome screen, the start sequence and the intro**, all in the ship scene's own picture: one clock (`T`) and everything a function of it (the camera, what is open, what is shown), its parts and their lengths in `PARTS`; `intro.seek(part, k)` shows any moment, Esc ends it, `?play` skips it, `?intro=<part>` starts at a part. A new game gets all of it; a game under way a short way in. While it runs the game holds still (`scene.intro`, `scene.fromAfar`: the ship closed and the sky laid out in the world) |
+| `tools/build_closeup.py` | The intro's close-up: her finer portrait (`assets/source/her-close/` to `assets/sprites/her-close.png`), the badge that says BUMBUSIK drawn on every frame (crooked, then straight, her hand kept over it), and the finer piece of her standing mirror drawn in code (`close-mirror.png`). Both are eight pixels to one of the game's. The mirror's measures are the cabin's in `tools/draw_rooms.py`: change both together |
 | `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and the dash free: add a line when the builder gets a new `place` |
 | `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
 | `src/world/soundscape.js` | What nothing in particular makes: the ambience's levels from where she stands (out on deck, inside, how high in the ship, by a pool), her footsteps by what is under her (`floor()`), rungs, a cart's wheels, strokes; the small steady sounds of a few places (`PLACES`) |
@@ -396,6 +398,11 @@ Lessons learned (2026-11-14, step 12, sound):
   make it practical again (the user: "we'll have to find a solution for that"), run the scenarios
   a change can touch (`python tools/playtest.py boot sound region6 ...`), and say plainly which
   were run and that the rest were not. Never start the whole of it unasked.
+- **Tests run with the sound off** (the user, 2026-11-14: "When you're testing, please test with
+  sound off": every headless run had been playing through their speakers). The test browser is
+  muted at the browser (`--mute-audio` in `tools/playtest.py`'s `Browser`, which every tool
+  uses), so the game's sound still runs and the `sound` scenario still checks it. Never launch
+  a browser for a test any other way.
 - **No hint popups** (the user, 2026-11-14: "Part of the game is figuring things out. Labels and
   namings are not considered hints"): never add a text or a key's cap that says what to press or
   what to do. Signs, plates and the people's pictogram bubbles are fine.
@@ -431,3 +438,32 @@ Lessons learned (2026-11-14, the prep before the intro: deck 3, the languages):
 - **A walk in a playtest that must end at a door ends by teleport or by `hold_until` with a few
   px to spare:** polled every fifth of a second, she overshot the ladder's door by 11 px and E
   found nothing.
+
+Lessons learned (2026-11-14, the intro):
+
+- **A sequence of camera moves is one clock and pure functions of it**, not tweens chained on
+  each other: any moment can be shown alone (pictures for the user, a playtest's checks), a skip
+  is the clock set to its end, and nothing is left half-done. Keep states that a part switches
+  (a route, a pose) set from the clock too, each frame, so seeking back undoes them.
+- **Phaser 4's blur is a camera filter** (`cam.filters.internal.addBlur(quality, x, y, strength,
+  colour, steps)`, removed with `.remove()`); it darkens the picture's edges, so the camera is
+  made 48 px bigger all round while it is on. **Change a camera's size before centring it**, or
+  the picture jumps for a frame. What must stay sharp over a blurred world goes on a layer and a
+  camera of its own, kept at the main one's zoom and centre.
+- **Things with scroll factor 0 laid out by hand, and anything else that reads the camera, run
+  after the camera is moved**: the intro moves it at the top of `update()`, before the sky.
+- **A float that should reach 1 often stops at 0.9999999**: `(1 - 0.55) / 0.45` did, and her
+  alpha was never 1. Snap the end.
+- **A finer drawing of an existing sprite:** `image_to_pixelart` of the sprite enlarged smoothly
+  (64 px to 512, output 256) keeps the likeness and adds the detail; from a description alone
+  the figure came out someone else. `create_character` v3 with a reference keeps the reference's
+  own size whatever `size` says (hers came back at 64 px, in eight directions, 8 generations).
+  `animate_image_pixminimax` animates a loose 256 px picture for 2 generations (16 frames) and
+  holds the look well; one frame in sixteen had a stray thing in her fingers (left out).
+- **Text in generated art is drawn by us:** the badge's letters are stamped on every frame
+  after the generator, over its own try (painted out first), with her hand kept on top by its
+  colours. Slant small text by whole letters, never through one.
+- **Show the user the shot, not only the figure, before making its art:** I made whole-figure
+  candidates and two animations (27 generations) before the user described the close-up they
+  had in mind (a waist-up profile). A rough frame of the composition first would have saved
+  them.

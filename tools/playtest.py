@@ -37,7 +37,7 @@ KEYS = {
     "up": (38, "ArrowUp", "ArrowUp"), "down": (40, "ArrowDown", "ArrowDown"),
     "space": (32, "Space", " "), "d": (68, "KeyD", "d"),
     "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"), "o": (79, "KeyO", "o"),
-    "m": (77, "KeyM", "m"),
+    "m": (77, "KeyM", "m"), "escape": (27, "Escape", "Escape"),
 }
 
 
@@ -65,7 +65,9 @@ class Browser:
         self.proc = subprocess.Popen([
             CHROME, "--headless=new", f"--remote-debugging-port={self.debug_port}",
             f"--user-data-dir={self.profile}", "--window-size=960,540", "--no-first-run",
-            "--autoplay-policy=no-user-gesture-required", "--enable-unsafe-swiftshader", "about:blank",
+            # (Muted: the user heard every test run through their speakers, 2026-11-14: "please test
+            # with sound off". The game's sound still runs and is checked; nothing comes out.)
+            "--autoplay-policy=no-user-gesture-required", "--enable-unsafe-swiftshader", "--mute-audio", "about:blank",
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         for _ in range(50):
@@ -105,8 +107,8 @@ class Browser:
             query += f"&at={start}"
         self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
         time.sleep(0.3)
-        ready = "window.__ship && window.__ship.player" if "play" in query else "document.querySelector('canvas')"
-        self.wait_for(ready, timeout=15)
+        # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
+        self.wait_for("window.__ship && window.__ship.player && window.__ship.soundscape", timeout=15)
         time.sleep(0.5)
         if old:
             self.eval("""(s => { const c = s.checkpoints.find(c => c.id === 'cp_gangway');
@@ -207,10 +209,8 @@ def check(cond, label, detail=""):
 
 
 def scenario_boot(b):
-    b.open("?reset")
-    b.shot("title")
-    b.tap("enter")
-    b.wait_for("window.__ship && window.__ship.player")
+    # (Straight into the game: the welcome screen and the intro have their own scenario, `intro`.)
+    b.open("?reset&play", start=None)
     time.sleep(0.5)
     s = b.state()
     b.shot("spawn")
@@ -289,19 +289,150 @@ def scenario_deck3(b):
     return ok
 
 
+def scenario_intro(b):
+    """The welcome screen, the start sequence and the intro (docs/intro.md, src/intro.js): the
+    menu and its two buttons, the camera's way from the sun to her cabin, the game handed over;
+    the short one for a game under way; Esc; `?play` past it all."""
+    S, I = "window.__ship", "window.__ship.intro"
+    menu = f"[{I}.title.text, ...{I}.buttons.map(q => q.label.text)]"
+    b.open("?reset", start=None)
+    ok = check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.full"), "a new game opens on the welcome screen", b.eval(f"{I}.stage"))
+    ok &= check(b.eval(menu) == ["Bumbusik", "PLAY", "LANGUAGE: English"], "the game's name and two buttons, PLAY and LANGUAGE", b.eval(menu))
+    ok &= check(b.eval(f"!{S}.uiCam.visible && !{S}.player.visible && {S}.mode") == "scripted", "no HUD, no player, no controls yet")
+    ok &= check(b.eval(f"!!{I}.blur && {I}.shade.alpha > 0.2"), "the sky behind is dimmed and out of focus")
+    sun = b.eval(f"(c => [Math.abs(c.midPoint.x - {I}.sunX) < 30, Math.abs(c.midPoint.y - {I}.sunY) < 30])({S}.cameras.main)")
+    ok &= check(sun == [True, True], "the sun is in the middle of the screen", sun)
+    b.shot("intro-welcome")
+    b.hold("right", 0.5)
+    ok &= check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.T") == 0, "the movement keys start nothing")
+    b.tap("down")
+    b.tap("enter")
+    time.sleep(0.2)
+    ok &= check(b.eval(menu) == ["Бумбусік", "ГРАТИ", "МОВА: Українська"], "LANGUAGE switches to Ukrainian", b.eval(menu))
+    b.shot("intro-welcome-uk")
+    b.tap("enter")
+    time.sleep(0.2)
+    ok &= check(b.eval(menu)[1:] == ["PLAY", "LANGUAGE: English"] and b.eval("window.__lang.language()") == "en", "and back to English", b.eval(menu))
+    b.tap("up")
+    b.tap("enter")
+    time.sleep(1.2)
+    ok &= check(b.eval(f"{I}.stage") == "running" and b.eval(f"{I}.T") > 0.8, "PLAY starts the sequence")
+    ok &= check(b.eval(f"{I}.title.alpha") == 0 and b.eval(f"{I}.shade.alpha") < 0.36, "the menu is gone, the shade lifting", b.eval(f"{I}.shade.alpha"))
+    time.sleep(1.6)
+    ok &= check(b.eval(f"!{I}.blur && {I}.shade.alpha === 0"), "the sky is in focus and at its full brightness")
+
+    def at(part, k=0.5):
+        b.eval(f"{I}.seek('{part}', {k})")
+        time.sleep(0.5)
+        return b.eval(f"(c => ({{ x: c.midPoint.x, y: c.midPoint.y, z: c.zoom }}))({S}.cameras.main)")
+
+    sky, sea = at("sky"), at("sea")
+    ok &= check(sea["y"] > sky["y"] + 2000 and abs(sea["x"] - sky["x"]) < 20, "the camera moves down to the sea", (sky, sea))
+    water = b.eval(f"(c => ({S}.waterY - c.worldView.y) / c.worldView.height)({S}.cameras.main)")
+    ok &= check(0.55 < water < 0.9, "the horizon and the sea are in the picture", water)
+    b.shot("intro-sea")
+    ship = at("ship")
+    ok &= check(ship["x"] > sea["x"] + 8000 and abs(ship["y"] - sea["y"]) < 20, "then right, to the ship", (sea, ship))
+    whole = b.eval(f"(v => v.x < {S}.hullMinX && v.right > {S}.hullMaxX)({S}.cameras.main.worldView)")
+    ok &= check(whole and b.eval(f"{S}.fromAfar && {S}.shellAlpha['3']") == 1, "the whole ship is in view, every deck closed")
+    b.shot("intro-ship")
+    corridor = at("corridor")
+    ok &= check(abs(corridor["z"] - 2) < 0.01 and abs(corridor["x"] - SPAWN_X) < 2 and b.eval(f"{S}.shellAlpha['3']") == 0,
+                "the camera zooms in on deck 3, its side open on the corridor", (corridor, b.eval(f"{S}.shellAlpha['3']")))
+    ok &= check(b.eval(f"{S}.route") == "inside" and not b.eval(f"{S}.player.visible"), "the door marked CREW, shut, nobody about")
+    b.shot("intro-corridor")
+    cabin = at("door", 1)
+    ok &= check(cabin["z"] > 4 and b.eval(f"{S}.route") == "crewcabin" and b.eval(f"{S}.world.rooms.crewcabin.room.alpha") > 0.99,
+                "closer, and her cabin shows", cabin)
+    her = b.eval(f"(p => ({{ x: p.x - {S}.world.rooms.crewcabin.def.x0, shown: p.visible && p.alpha > 0.99, left: p.flipX }}))({S}.player)")
+    ok &= check(her["shown"] and her["left"] and 26 < her["x"] < 44, "she stands at her mirror, turned to it", her)
+    b.shot("intro-cabin")
+    close = at("badge")
+    drawn = b.eval(f"!!{I}.close")
+    view = b.eval(f"(v => [({S}.player.y - v.bottom), v.height, ({S}.player.x - 12 - v.x) / v.width])({S}.cameras.main.worldView)")
+    # (Out of focus, the camera draws 48 px more all round: 3 of the game's at this zoom.)
+    ok &= check(close["z"] == 16 and 24 < view[0] < 32 and view[1] < 40 and 0.3 < view[2] < 0.7,
+                "the camera goes on in: her profile from the waist up, the mirror's edge beside her", (close, view))
+    if drawn:
+        ok &= check(b.eval(f"{I}.hero.alpha === 1 && {I}.glass.alpha === 1 && {I}.heroCam.visible && {S}.player.alpha === 0 && !!{I}.blur"),
+                    "her finer portrait and the mirror's are in the game's own place, the cabin behind out of focus")
+        frames = set()
+        for k in (0.1, 0.3, 0.5, 0.7, 0.9):
+            at("badge", k)
+            frames.add(b.eval(f"{I}.hero.frame.name"))
+        ok &= check(len(frames) >= 4, "she straightens her name badge", sorted(frames))
+        b.shot("intro-badge")
+    else:
+        print("  (no portrait is drawn for the close-up yet: her game figure stays in it)")
+    at("out", 1)
+    ok &= check(b.eval(f"{S}.player.alpha === 1 && {S}.player.flipX && !{I}.heroCam.visible && !{I}.blur"),
+                "the camera draws back: her usual figure in the portrait's place, still turned to the mirror")
+    at("turn", 0.5)
+    front = b.eval(f"{S}.player.frame.name === {S}.herFrames.front")
+    at("turn", 0.9)
+    ok &= check(front and not b.eval(f"{S}.player.flipX"), "and she turns from the mirror to the door")
+    b.eval(f"{I}.seek('turn', 0.8, false)")
+    b.wait_for(f"!{I}", timeout=6)
+    time.sleep(0.9)
+    s = b.state()
+    ok &= check(b.eval(f"{S}.mode") == "play" and b.eval(f"{S}.cameras.main.zoom") == 2 and b.eval(f"{S}.uiCam.visible && {S}.uiCam.alpha === 1"),
+                "the camera is back at the game's scale, the HUD up, the controls hers", b.eval(f"{S}.mode"))
+    ok &= check(b.eval(f"{S}.route") == "crewcabin" and b.eval(f"{S}.player.visible && {S}.player.alpha === 1 && !{S}.player.flipX"),
+                "her usual figure, in her cabin, facing the door")
+    ok &= check(b.eval(f"{S}.cameras.cameras.length") == 3 and b.eval(f"{S}.save.intro") is True, "nothing of the intro is left; it is saved as seen",
+                b.eval(f"{S}.cameras.cameras.length"))
+    b.shot("intro-play")
+    b.hold("right", 0.4)
+    ok &= check(b.state()["x"] > s["x"] + 20, "she walks", (s["x"], b.state()["x"]))
+    b.eval(f"{S}.spawnAt({{ x: {S}.world.rooms.crewcabin.def.doors[0].x, y: {D3}, route: 'crewcabin' }})")
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(1.2)
+    ok &= check(b.eval(f"{S}.route") == "inside" and abs(b.state()["x"] - SPAWN_X) < 4, "and out of her door into the corridor", b.state())
+    ok &= check(b.errors == [], "no errors", b.errors)
+
+    # A game under way: the same welcome, a shorter way in, to wherever she is.
+    b.eval(f"""(s => {{ const c = s.checkpoints.find(c => c.id === 'cp_gangway'); s.progress.openAll = true; s.spawnAt(c); }})({S})""")
+    time.sleep(0.6)
+    b.wait_for(f"{S}.save.lastCheckpoint === 'cp_gangway'", timeout=4)
+    b.open("", start=None)
+    ok &= check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.full") is False, "a game under way: the welcome screen, and the short way in")
+    b.tap("enter")
+    time.sleep(0.5)
+    b.eval(f"{I}.seek('near', 0.5, false)")
+    b.wait_for(f"!{I}", timeout=8)
+    time.sleep(1.0)
+    s = b.state()
+    ok &= check(b.eval(f"{S}.mode") == "play" and abs(s["y"] - D4) < 2 and b.eval(f"{S}.shellAlpha['4']") == 0,
+                "it ends where she was: the gangway lobby, deck 4 open", s)
+    b.shot("intro-back")
+    # Esc ends it at once.
+    b.open("", start=None)
+    b.tap("enter")
+    time.sleep(0.6)
+    b.tap("escape")
+    time.sleep(1.0)
+    ok &= check(b.eval(f"!{I} && {S}.mode") == "play" and b.eval(f"{S}.uiCam.visible"), "Esc ends the intro at once")
+    # And ?play goes past the welcome and the intro.
+    b.open("?reset&play", start=None)
+    ok &= check(b.eval(f"{I}") is None and b.eval(f"{S}.mode") == "play" and b.eval(f"{S}.cameras.cameras.length") == 3, "?play goes straight into the game")
+    ok &= check(b.errors == [], "no errors", b.errors)
+    return ok
+
+
 def scenario_lang(b):
     """The two languages (the user, 2026-11-14): every text the game says has an English and a
     Ukrainian version; `?lang=` sets one for a session. And no hint is left to translate."""
     L, S = "window.__lang", "window.__ship"
-    texts = "window.__game.scene.getScene('title').children.list.filter(o => o.type === 'Text').map(o => o.text)"
+    texts = "[window.__ship.intro.title.text, ...window.__ship.intro.buttons.map(q => q.label.text)]"
     b.open("?reset")
     keys = b.eval(f"{L}.KEYS")
     ok = check(sorted(keys["en"]) == sorted(keys["uk"]) and len(keys["en"]) > 20, "every text has both versions",
                sorted(set(keys["en"]) ^ set(keys["uk"])))
-    ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["Bumbusik", "Start"], "English is the default: the title", b.eval(texts))
+    ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["Bumbusik", "PLAY", "LANGUAGE: English"], "English is the default: the welcome screen", b.eval(texts))
     b.shot("lang-title-en")
     b.open("?reset&lang=uk")
-    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["Бумбусік", "Почати"], "?lang=uk: the title in Ukrainian", b.eval(texts))
+    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["Бумбусік", "ГРАТИ", "МОВА: Українська"], "?lang=uk: the welcome screen in Ukrainian", b.eval(texts))
     b.shot("lang-title-uk")
     said = {}
     for code in ("en", "uk"):

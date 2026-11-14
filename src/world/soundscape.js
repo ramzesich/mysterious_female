@@ -32,7 +32,7 @@ export class Soundscape {
     // Out in the open: on the outside route, or on a deck with no ship's side beside her.
     open() {
         const s = this.scene, p = s.player;
-        if (s.overview || s.route === OUTSIDE) return true;
+        if (s.overview || s.fromAfar || s.route === OUTSIDE) return true;
         if (s.route !== 'inside') return false;
         const deck = s.deckOfY(p.y);
         if (deck === null) return true;             // over deck 12: the roof, the funnel
@@ -61,7 +61,7 @@ export class Soundscape {
             this.levelsAt = this.clock + 0.15;
             sfx.ambience(this.levels());
         }
-        if (s.overview) return;
+        if (s.overview || s.intro) return;
         this.steps();
         this.places(dt);
         // Out on deck, a gull somewhere off the ship now and then.
@@ -76,7 +76,7 @@ export class Soundscape {
     levels() {
         const s = this.scene, p = s.player;
         // From outside (O) the whole ship is in front of us: the sea and the wind.
-        if (s.overview) return { sea: 1, wind: 0.5, engine: 0.15 };
+        if (s.overview || s.fromAfar) return { sea: 1, wind: 0.5, engine: 0.15 };
         const high = Phaser.Math.Clamp((s.deckAt(p.y) - 4) / 8, 0, 1);        // 0 on deck 4, 1 on deck 12
         const open = this.open();
         const inRoom = s.route !== 'inside' && s.route !== OUTSIDE;       // a room behind a door, the duct
