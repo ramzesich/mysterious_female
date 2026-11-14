@@ -1539,3 +1539,11 @@ for two and a half seconds before going right, and now holds it half a second ("
 right earlier"); and the dark round deck 3 came on as she stepped out, and now comes on with the
 opening of the deck's side, as the corridor shows (`dimOverride`, driven by the same measure as
 the cut-away). The intro is about 28 s. Checked: `intro`, `deck3`.
+
+**And a third:** "the background moves right, but the sun stays in place. It looks weird". The
+islands, the clouds and the ripples I had laid on the sea drifted aft, as the far background does
+in play, where it is seen from the ship under way; the intro's camera is not on the ship, and its
+sun stands in the world. In the wide views nothing far off drifts now: the islands and clouds
+hold (the sky is laid out with no time passing while the view is from afar), the intro's own
+clouds stand, the water only sways a little in place. The gulls and the glitter are what moves.
+Checked: `intro`, `boot`.

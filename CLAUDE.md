@@ -492,5 +492,9 @@ Lessons learned (2026-11-14, the intro shown to the user):
 - **A clip of her that shows something on her front is drawn facing us:** her badge is only in
   her south view. skeleton-v3 by poses kept her look; hands in front of the body need their
   elbows pointed down.
+- **Motion that stands for the ship being under way belongs to views from the ship:** the far
+  background's drift aft looked wrong in the intro's wide views, where the camera stands still
+  and a sun stands in the world (the user saw islands and clouds slide past it). In a view from
+  afar, far things hold.
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

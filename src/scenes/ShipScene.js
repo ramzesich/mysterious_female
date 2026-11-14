@@ -2613,7 +2613,10 @@ export class ShipScene extends Phaser.Scene {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
         this.farGulls.update(flow);
-        this.backdrop.update(flow, !!this.overview || this.fromAfar, this.horizonOnScreen, this.fromAfar ? this.intro?.look : null);
+        // (In the intro's wide views the far background holds still: its drift aft is how it looks
+        // from the ship under way, and that camera is not on the ship. The user saw the islands
+        // and clouds slide past a sun that stood still.)
+        this.backdrop.update(this.fromAfar ? 0 : flow, !!this.overview || this.fromAfar, this.horizonOnScreen, this.fromAfar ? this.intro?.look : null);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);

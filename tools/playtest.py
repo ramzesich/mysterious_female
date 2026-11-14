@@ -335,6 +335,10 @@ def scenario_intro(b):
     water = b.eval(f"(c => ({S}.waterY - c.worldView.y) / c.worldView.height)({S}.cameras.main)")
     ok &= check(0.55 < water < 0.9, "the horizon and the sea are in the picture", water)
     b.shot("intro-sea")
+    still = f"[...{S}.backdrop.layers.map(l => l.s.tilePositionX), {S}.backdrop.clouds.tilePositionX, ...{I}.clouds.map(c => c.img.x), {I}.sun.x]"
+    before = b.eval(still)
+    time.sleep(1.2)
+    ok &= check(b.eval(still) == before, "the islands, the clouds and the sun hold still together: nothing drifts past the sun")
     ship = at("ship")
     ok &= check(ship["x"] > sea["x"] + 8000 and abs(ship["y"] - sea["y"]) < 20, "then right, to the ship", (sea, ship))
     whole = b.eval(f"(v => v.x < {S}.hullMinX && v.right > {S}.hullMaxX)({S}.cameras.main.worldView)")

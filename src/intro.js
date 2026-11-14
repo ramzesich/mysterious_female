@@ -27,6 +27,8 @@
 // clock set to its end. The wide views use the outside view's sky (laid out in the world:
 // src/background.js) with the islands at the game's own pixel size; the sun, its clouds, the gulls
 // and the glitter are the intro's own, at that size too, and fade away as the camera goes in.
+// Nothing far off drifts in these views (in play the islands and clouds drift aft, the ship being
+// under way; this camera stands still): only the gulls fly and the water glitters.
 
 import { VIEW, PLAYER, IDLE } from './config.js';
 import { sfx } from './sfx.js';
@@ -194,7 +196,7 @@ export class Intro {
         this.sun = add(s.add.image(this.sunX, this.sunY, 'intro-sun').setScale(2 * u).setDepth(D.sky + 0.008));
         this.clouds = CLOUDS.map(([dx, dy, , size], i) => {
             const img = add(s.add.image(0, this.sunY + dy * u, `intro-cloud-${i}`).setScale(size * u).setDepth(D.sky + 0.012).setAlpha(0.92));
-            return { img, x: this.sunX + dx * u, drift: (size === 3 ? 2.2 : 1.3) * u };
+            return { img, x: this.sunX + dx * u };
         });
         // On the water, over the sea's own rows and under the hull's foam: the far sea's ripples
         // at the game's pixel size, and the sun's glitter.
@@ -375,8 +377,10 @@ export class Intro {
             this.sun.setAlpha(far);
             this.glow.setAlpha(far * (0.9 + 0.1 * Math.sin(now * 1.7)));
             this.rays.forEach((r, f) => r.setAlpha(far * (0.5 + 0.5 * Math.sin(now * 1.3 + f * Math.PI))));
-            for (const c of this.clouds) c.img.setX(c.x + now * c.drift).setAlpha(0.92 * far);
-            this.ripples.setAlpha(0.6 * far).tilePositionX = -now * 7;
+            // (Nothing here drifts: the sun stands still, and whatever slid past it looked wrong.
+            // The water only sways a little in place; the gulls and the glitter are the life in it.)
+            for (const c of this.clouds) c.img.setX(c.x).setAlpha(0.92 * far);
+            this.ripples.setAlpha(0.6 * far).tilePositionX = Math.round(Math.sin(now * 0.9) * 2);
             this.glitter.setAlpha(far).setTexture(`intro-glitter-${Math.floor(now * 3.2) % 2}`);
             for (const k of this.sparks) k.spark.setAlpha(far * Math.max(0, Math.sin(now * k.rate + k.phase)) ** 3);
             const span = 1500;
