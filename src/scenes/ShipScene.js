@@ -2235,7 +2235,7 @@ export class ShipScene extends Phaser.Scene {
         this.towelFrames = this.cache.json.get('her-towel-meta').frames;
         // With Bumbot in her arms (§6.1.9, src/world/finale.js): her own sheet of it.
         this.catFrames = this.cache.json.get('her-cat-meta').frames;
-        this.holding = false;
+        this.holding ??= false;             // (the story has set it already in a game saved on the way home)
         this.climbOutFrames = meta.anims['climb-out'];
         this.idleAt = 0;
         const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);

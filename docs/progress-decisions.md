@@ -974,7 +974,8 @@ Built: the sunset; the scene on the balcony forward of the spa; the glide down t
 through the wind and past two gulls; Bumbot at the tip and the catch; her with him in her arms; the
 way home; cabin 8206, the win screen, and the day after. Code: `src/world/finale.js`, the dusk in
 `src/background.js` and `src/sea.js`, her look and its rules in the ship scene (`holding`). Playtest
-`finale` (43 checks); the golden path now ends at home. The whole suite: 683 checks, all passing.
+`finale` (44 checks); the golden path now ends at home. The whole suite: 683 checks, all passing
+(run before the last fix below, after which `finale` was run again alone).
 
 **Changes against the plan, and why:**
 
@@ -1048,6 +1049,9 @@ way home; cabin 8206, the win screen, and the day after. Code: `src/world/finale
   drawn over a deck that was not cut open): it is drawn only while she is on deck 10 now.
 - **Two scripted moments could end each other:** `world.cut` gave play back as soon as either was
   over. It counts them now. (Met in a test that set the horn's flag by hand.)
+- **A game opened again on the way home had lost Bumbot from her arms:** the player's set-up
+  reset `holding` after the story had set it from the save. Found by opening the links meant for
+  the user; `finale` now closes and opens the game on the way home.
 - **A gust carries her twice the px a second its data says** (the push moves her body and her
   picture, and the physics adds the body's move again): so it has been since region 7, whose
   numbers were tuned by feel; noted at `FINALE` in `tools/population.py`, not changed.

@@ -3642,6 +3642,12 @@ def scenario_finale(b):
     b.eval("window.__ship.scareContact(window.__ship.player.x + 10, 'bumped')")
     time.sleep(0.3)
     ok &= check(b.state()["mode"] == "play", "nothing scares her on the way home", b.state())
+    # The game closed and opened again on the way home: still evening, he is still in her arms.
+    b.open("?play")
+    time.sleep(1.2)
+    ok &= check(b.eval("window.__ship.holding") and b.eval("window.__ship.dusk") == 1 and b.eval("window.__ship.player.texture.key") == "her-cat",
+                "the game opened again on the way home: evening still, Bumbot still in her arms",
+                (b.eval("window.__ship.holding"), b.eval("window.__ship.dusk")))
     # Deck 8: those she helped clap her in; the cabin; the win screen; the day after.
     b.teleport(exact_x(52), D8)
     time.sleep(0.6)
