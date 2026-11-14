@@ -404,7 +404,7 @@ export class Intro {
     arrive(step, badge, turn) {
         const s = this.s, p = s.player, room = s.world.rooms.crewcabin;
         const open = step > 0.06 && step < 0.82;
-        room.outside[0].setFrame(open ? 'door-crew-ajar' : 'door-crew');
+        s.setDoorArt(room.outside[0], open ? 'door-crew-ajar' : 'door-crew');
         if (open && !this.doorHeard && this.stage === 'running' && !this.held) sfx.at(p.x, p.y).door();
         this.doorHeard = open || this.doorHeard && step > 0;
         const shown = clamp01((step - 0.16) / 0.34);

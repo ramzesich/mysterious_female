@@ -501,6 +501,8 @@ Lessons learned (2026-11-14, the intro shown to the user):
   (the open crew door's 5 px lower and off the floor; the open cabin door's dark and narrower).
   The user sees it the moment one replaces the other. Build the second state from the first's
   frame (`level_frame`, `reframe` in `tools/build_ship_art.py`), and lay the two over each other
-  at the game's placing before calling them a pair.
+  at the game's placing before calling them a pair. A piece may reach under the floor line (an
+  open door's leaf swung toward us: the user likes it, "more real"): it says by how much in the
+  atlas (`foot`), and the game stands it by its frame (`setDoorArt()`), never by cutting it.
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

@@ -427,23 +427,24 @@ def level_frame(img, frame, cut, more):
     swung toward us, so its free edge hangs over the frame's top and under its foot, and the
     whole was fitted to a door's height: the frame itself came 69 px high where the closed one is
     74, 3 px off the floor, and 33 px wide where the closed one is 29. Here the frame is made
-    74 x 29: `more`, plain rows drawn twice; `cut`, plain columns of the leaf taken out; what hangs
-    under the frame's foot (rows after `frame`'s second) is left off, the leaf's foot drawn level
-    with the floor instead. The leaf's corner over the frame's top stays (2 px), so the piece is
-    76 px high, and its frame is where the closed door's is when both stand on the same spot."""
+    74 x 29: `more`, plain rows drawn twice; `cut`, plain columns of the leaf taken out. The leaf
+    keeps its corners over the frame's top (2 px) and under its foot (3 px: the user, "It is ok
+    that they cross the red line here, that makes them look more real"; a first try cut it off
+    level with the floor), so the piece is 79 px high and its last 3 rows are under the floor
+    line. Returns the piece and that number: it goes into the atlas as the frame's `foot`, and the
+    game stands the piece by it (`setDoorArt` in the ship scene), so that its frame is exactly
+    where the closed door's is."""
     top, foot = frame
     assert img.size == (33, 74), img.size
     cols = [x for x in range(img.width) if x not in cut]
-    rows = [y for y in range(foot + 1) for _ in range(2 if y in more else 1)]
+    rows = [y for y in range(img.height) for _ in range(2 if y in more else 1)]
     out = Image.new("RGBA", (len(cols), len(rows)), (0, 0, 0, 0))
     for j, y in enumerate(rows):
         for i, x in enumerate(cols):
             out.putpixel((i, j), img.getpixel((x, y)))
-    for x in range(out.width):                      # the foot: one dark line, frame and leaf
-        if out.getpixel((x, out.height - 1))[3]:
-            out.putpixel((x, out.height - 1), (0x2E, 0x22, 0x2F, 255))
-    assert out.size == (DOOR[0] + 1, DOOR[1] + top), out.size
-    return out
+    under = img.height - 1 - foot
+    assert out.size == (DOOR[0] + 1, top + DOOR[1] + under), out.size
+    return out, under
 
 
 def reframe(img, closed, opening, inner, wider):
@@ -470,6 +471,9 @@ def reframe(img, closed, opening, inner, wider):
     return out
 
 
+FEET = {}           # pieces that reach under the floor line, and by how many px (the atlas's `foot`)
+
+
 def build():
     pieces = {}
     for name, spec in PIECES.items():
@@ -487,7 +491,8 @@ def build():
             img = shrink(img, opts["height"])
         img = palettize(img)
         if opts.get("level"):
-            img = level_frame(img, **opts["level"])
+            img, FEET[name] = level_frame(img, **opts["level"])
+            FEET[f"{name}-bg"] = FEET[name]
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
     # (Once every piece is made: the ones that take another's frame.)
@@ -514,7 +519,8 @@ def build():
     OUT.mkdir(parents=True, exist_ok=True)
     atlas.save(OUT / "ship.png")
     meta = {"frames": {n: {"frame": {"x": x, "y": y, "w": w, "h": h}, "rotated": False, "trimmed": False,
-                           "spriteSourceSize": {"x": 0, "y": 0, "w": w, "h": h}, "sourceSize": {"w": w, "h": h}}
+                           "spriteSourceSize": {"x": 0, "y": 0, "w": w, "h": h}, "sourceSize": {"w": w, "h": h},
+                           **({"foot": FEET[n]} if n in FEET else {})}
                        for n, (x, y, w, h) in frames.items()},
             "meta": {"image": "ship.png", "size": {"w": atlas.width, "h": atlas.height}, "scale": "1"}}
     (OUT / "ship.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")

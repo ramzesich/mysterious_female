@@ -3842,11 +3842,19 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // A door's picture changed for another (shut, ajar), standing where it stood. A piece whose
+    // leaf reaches under the floor line (the open crew door: its `foot` in the atlas,
+    // tools/build_ship_art.py) is stood by its frame, not by its lowest pixel.
+    setDoorArt(door, frame) {
+        const f = this.textures.getFrame('shipart', frame);
+        return door.setTexture('shipart', frame).setOrigin(0.5, 1 - (f.customData?.foot || 0) / f.height);
+    }
+
     // An active checkpoint has to read from across the deck: the door stands ajar with the cabin
     // light on, and a green lamp above it glows.
     lightCheckpoint(c, celebrate) {
         c.active = true;
-        c.door?.setTexture('shipart', 'door-crew-ajar');
+        if (c.door) this.setDoorArt(c.door, 'door-crew-ajar');
         c.lamp.setTexture('lamp-on');
         c.glow.setVisible(true).setAlpha(0.55);
         this.tweens.add({ targets: c.glow, alpha: 0.25, scale: 0.8, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

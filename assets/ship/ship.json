@@ -85,7 +85,7 @@
     "x": 334,
     "y": 0,
     "w": 29,
-    "h": 76
+    "h": 79
    },
    "rotated": false,
    "trimmed": false,
@@ -93,19 +93,20 @@
     "x": 0,
     "y": 0,
     "w": 29,
-    "h": 76
+    "h": 79
    },
    "sourceSize": {
     "w": 29,
-    "h": 76
-   }
+    "h": 79
+   },
+   "foot": 3
   },
   "door-crew-ajar-bg": {
    "frame": {
     "x": 364,
     "y": 0,
     "w": 29,
-    "h": 76
+    "h": 79
    },
    "rotated": false,
    "trimmed": false,
@@ -113,12 +114,13 @@
     "x": 0,
     "y": 0,
     "w": 29,
-    "h": 76
+    "h": 79
    },
    "sourceSize": {
     "w": 29,
-    "h": 76
-   }
+    "h": 79
+   },
+   "foot": 3
   },
   "door-cabin": {
    "frame": {

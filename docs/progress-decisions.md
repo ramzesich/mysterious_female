@@ -1569,3 +1569,12 @@ a dark frame 30 px wide; the closed one's is the corridor's warm wood, 34 px. `r
 opening filled by the ajar door's leaf and light (two plain columns of the leaf and the strip of
 light drawn wider to fill it, so it stands a little further open). Same frame, same colours, same
 size, same level. No tests run; the pieces were compared side by side.
+
+**The open crew door's leaf reaches under the floor line again** (the user, on the levelled
+doors: "the open doors are cut off on the bottom. It is ok that they cross the red line here,
+that makes them look more real"). I had cut the swung leaf off level with the floor to keep the
+frame standing on it. Now the leaf keeps its 3 px under the frame's foot; the piece carries that
+number in the atlas (`foot`), and the game stands such a piece by its frame, not by its lowest
+pixel (`setDoorArt()` in the ship scene: the lit checkpoints' doors, and her cabin's as it opens
+in the intro). The frame is still the closed door's equal and on the floor. Looked at in the
+running game at her door, shut and open; no playtests run.
