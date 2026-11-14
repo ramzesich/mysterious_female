@@ -1339,7 +1339,11 @@ be built until they say so.
      on a flat ground, nothing of the room; the photos stay in the git-ignored `reference/`.
      The conversions come back charcoal or navy with orange eyes whatever the photo shows:
      his fur is brought to his sprite's blacks and his eyes to the photo's pale yellow-green by
-     rule. Nine conversions at 1 generation each. Its door is the start's checkpoint (`cp_crew`), lit from the start; the
+     rule. Nine conversions at 1 generation each. Seen in the game, the user: "it doesn't look
+     as good. We need to fix Bumbot's face a little bit", "Smooth up his outline on the left",
+     "Above the eye": the ear's outer edge stood a pixel in from the cheek's and left a notch
+     at the eye; three pixels close it (in `bumbot_picture()`). Shown before and after; the
+     user: "Keep". Its door is the start's checkpoint (`cp_crew`), lit from the start; the
      gangway's (`cp_gangway`) lights when she first passes it, like any other.
    - **The ladder is an escape trunk** (decks 3 and 4, no card), the game's own way of putting a
      ladder behind a door. On deck 4 it comes out at 95.6 m in the place of one cabin door.

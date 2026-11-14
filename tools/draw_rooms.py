@@ -400,6 +400,10 @@ def bumbot_picture():
                 out.putpixel((x, y), (*rgb(BUMBOT_GROUND), 255))
     for x, y in eyes:
         out.putpixel((x, y), (*rgb(BUMBOT_EYES), 255))
+    # His outline on the left, above the eye, smoothed (the user, 2026-11-14): the ear's outer edge
+    # runs down into the cheek's, where it stood a pixel in and left a notch at the eye.
+    for y in (4, 5, 6):
+        out.putpixel((12, y), (0x2e, 0x22, 0x2f, 255))
     return out
 
 
