@@ -48,7 +48,7 @@ export class WetPatch {
         if (on && !socks) {
             if (!this.slip) {
                 this.slip = p.body.velocity.x < -5 ? -1 : p.body.velocity.x > 5 ? 1 : (p.flipX ? -1 : 1);
-                sfx.whoosh();
+                sfx.slip();
             }
         } else if (onFloor || !here(s, d)) {
             this.slip = 0;
@@ -59,14 +59,14 @@ export class WetPatch {
             if (this.slip) {
                 this.state = 'rock';
                 this.at = time + 450;
-                sfx.rattle();
+                sfx.at(c.x, d.y).scrape();
             }
         } else if (this.state === 'rock') {
             c.setAngle(Math.sin(time / 38) * 7);
             if (time > this.at) {
                 c.setAngle(0);
                 this.state = 'slide';
-                sfx.whoosh();
+                sfx.at(c.x, d.y).scrape();
             }
         } else if (this.state === 'slide') {
             c.x -= 235 * dt;
@@ -136,6 +136,7 @@ export class FoodGulls {
         this.state = 'pounce';
         this.targetX = x;
         this.at = this.scene.time.now + 2600;
+        sfx.at(x, this.def.y).gull();
     }
 
     update(dt, time) {
@@ -163,7 +164,7 @@ export class FoodGulls {
                 this.targetX = Phaser.Math.Clamp(p.x + p.body.velocity.x * 0.95, d.x0 + 6, d.x1 - 6);
                 this.shadow.setPosition(this.targetX, d.y - 1).setVisible(true).setScale(0.4);
                 s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 950 });
-                sfx.whoosh();
+                sfx.at(b.x, d.y).gull();
             }
         } else if (this.state === 'mark') {
             // It hangs over the spot.
@@ -174,6 +175,7 @@ export class FoodGulls {
                 this.state = 'dive';
                 this.at = time + 230;
                 this.from = { x: b.x, y: b.y };
+                sfx.at(this.targetX, d.y).gullDive();
             }
         } else if (this.state === 'dive') {
             const k = 1 - Math.max(0, this.at - time) / 230;
@@ -189,9 +191,10 @@ export class FoodGulls {
                     this.world.carryBox.give();
                     this.loot.setTexture(kind === 'stub' ? 'load-stub' : kind === 'cone' ? 'load-cone' : 'tray').setVisible(true);
                     this.world.say('Гей!', 900);
-                    sfx.pickup();
                     this.stolen = (this.stolen ?? 0) + 1;
                 }
+                // (Up and away, with her cone or without.)
+                sfx.at(this.targetX, d.y).flap();
                 this.state = 'up';
                 this.at = time + 900;
             }
@@ -284,8 +287,8 @@ export class Queue {
                 her.x = to;
                 if (her.body.velocity.x * side < 0) her.body.velocity.x = 0;
                 if (time > (this.bumpAt ?? 0)) {
-                    this.bumpAt = time + 700;
-                    sfx.land();
+                    this.bumpAt = time + 1500;
+                    sfx.at(p.x, d.y).grumble();
                 }
             }
         }
@@ -326,7 +329,7 @@ export class Trays {
         }
         if (!this.armed) return;
         this.armed = false;
-        sfx.smash();
+        sfx.crash();
         if (d.flag) this.world.progress.setFlag(d.flag);
         this.items.forEach((img, i) => s.tweens.add({ targets: img, y: img.y - 5 - (i % 3) * 2, angle: (i % 2 ? 9 : -9), duration: 90, yoyo: true, repeat: 2 }));
         const door = this.world.movers.find(m => m.def?.id === d.door);

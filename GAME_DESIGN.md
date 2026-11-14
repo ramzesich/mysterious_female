@@ -149,6 +149,8 @@ Activate has its own key rather than ↑, so standing at a ladder next to a door
 
 **Controller testing waits until the rest of the game is done.** Keyboard is the reference until then.
 
+**M** switches the sound off and on (step 12, 2026-11-14); the choice is remembered in the browser.
+
 No pause and no map, at least for now.
 
 ### 3.2 Special move — the "Кісюнічка!!!" dash
@@ -289,6 +291,10 @@ there; they only remind her he's on board.
 - Outside areas show open sea and sky behind the ship, the sea scrolling past slowly to sell the
   sailing. Indoors, portholes and windows show the same sea.
 - Sound: a soft sea and engine ambience outdoors, quieter inside (synthesised, like everything else).
+  **Built (step 12, 2026-11-14):** five layers set by where she stands (`src/world/soundscape.js`):
+  the sea's wash (out on deck, most on the low open decks), the engines' throb (most low in the
+  ship), the wind (the open decks, more the higher), the ventilation's hush indoors, water lapping
+  by a full pool. Not heard by anyone yet: the user's ears decide.
 - **The sea, drawn in code** (`src/sea.js`; approved by the user 2026-11-07): six rows of waves
   from the waterline down, the far ones small and slow, the near ones bigger and faster, each row
   gently rising and falling, sun glints on the crests, the deep water darkening under them; white
@@ -1499,7 +1505,11 @@ cap, scarce, and the game can be finished without the dash.
 11. **Screens:** title ("Bumbusik" and Start, nothing else), play, win.
 12. **Save:** auto-save at checkpoints to localStorage.
 13. **The sea:** scrolling water and sky behind the ship, visible outside and through windows.
-14. **Sound effects only**, synthesised. No music for now.
+14. **Sound effects only**, synthesised. No music for now. **Built (step 12, 2026-11-14):**
+    `src/sfx.js`, about 130 effects, one for each entity, each heard from where its source is
+    (`sfx.at(x, y)`), and the ambience of §5.2; on by default, M mutes. Every one of them is
+    written from a recipe and measured (`tools/check_sound.py`), none has been heard: the user
+    listens on `tools/soundboard.html`.
 
 ### 7.2 Stack
 
@@ -2060,9 +2070,11 @@ Nothing blocks the start of the build. These get settled along the way:
       done: the game plays from the gangway to the win screen (step 10, 2026-11-14: the sunset,
       the glide to the mooring deck, the catch, the way home, cabin 8206, the day after), and the
       ship's side is plated and weathered (step 11, 2026-11-14; the livery's lines smoothed with
-      it). **The plan's steps are all built. Next: "After the regions"** in
-      `docs/build-plan.md` (sound, the controller, tuning, her playtest and the hidden extras),
-      which is not part of the autonomous order: ask the user what comes first. Mark each step done here as it lands. From step 9 on every new person is checked against
+      it). **Sound is in** (step 12, 2026-11-14: an effect for every entity, the
+      ambience, M to mute; waiting for the user's ears on `tools/soundboard.html`). **Next (the
+      user, 2026-11-14): refining the hull**, from the full-size render; then the rest of "After
+      the regions" in `docs/build-plan.md` (the controller, tuning, her playtest and the hidden
+      extras). Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")
 - [ ] **The outside of the ship is done** (the sea, the background,

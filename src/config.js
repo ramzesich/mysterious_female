@@ -105,9 +105,20 @@ export const LOCKED_PARTS = {
     on: false,
 };
 
-// Sound (§7.1): off for now, while we test (the user, 2026-11-06). `?sound` turns it on.
+// Sound (§7.1, src/sfx.js): on since the sound step (2026-11-14); M mutes it in the game, and
+// `?sound=off` silences a session. `volume` is the whole of it, `effects` and `ambience` (the sea, the
+// engines, the wind) its two halves. An effect from a place in the world (`sfx.at(x, y)`) is at its
+// full loudness within `near` px of her and gone at `far`; a pixel up or down counts as
+// `deckWeight` along (a deck away is another room).
 export const SOUND = {
-    on: false,
+    on: true,
+    volume: 0.9,
+    effects: 2,
+    ambience: 0.4,
+    near: 260,
+    far: 980,
+    deckWeight: 2.2,
+    stride: 30,        // px of floor to one footstep
 };
 
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.

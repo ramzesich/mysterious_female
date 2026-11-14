@@ -11,7 +11,7 @@ truth**: read the relevant section before any design or content work, and record
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip title,
   `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?at=pool` start at a
-  named place (list in `README.md`; for testing), `?sound` (sound is off for now). Dash is D.
+  named place (list in `README.md`; for testing), `?sound=off` (sound is on; M mutes it in the game). Dash is D.
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
 ## Layout
@@ -20,6 +20,9 @@ truth**: read the relevant section before any design or content work, and record
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
+| `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
+| `src/world/soundscape.js` | What nothing in particular makes: the ambience's levels from where she stands (out on deck, inside, how high in the ship, by a pool), her footsteps by what is under her (`floor()`), rungs, a cart's wheels, strokes; the small steady sounds of a few places (`PLACES`) |
+| `tools/check_sound.py`, `tools/soundboard.html` | Every effect rendered by the browser without playing it and measured (loudness, length, a spectrogram each on sheets in `%TEMP%/bumbusik-playtest/sound`): must end "all within bounds". The soundboard plays each by a button and has the ambience on sliders: <http://localhost:8000/tools/soundboard.html>, where the user listens |
 | `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2); its sunset rows (`setDusk`) |
 | `src/background.js` | The far background, drawn in code: the Baltic archipelago, the far sea, the clouds, the far gulls (`FarGulls`, shared by every view), fixed to the screen and laid out each frame, the horizon settling over her floor (`HORIZON_ABOVE`); in the outside view on the waterline. The sea-view windows show a masked copy of it (`addWindowView()` in ShipScene) (§5.2). The sunset (§6.1.9): a second sky and sea faded over the day's (`setDusk(k)`), the sun and its path; its colours are drawn divided by the evening light (`DUSK_LIGHT`, the ship scene's multiply wash) so that they look themselves under it |
 | `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
@@ -335,6 +338,30 @@ Lessons learned (2026-11-14, step 11, the ship's side):
   at all of it after a step that adds things drawn over her.
 - A tool that drives the game by its internals (cameras, routes) breaks silently as the game
   grows: `render_ship.py` shot the wrong thing for weeks. Drive the game's own modes instead.
+
+Lessons learned (2026-11-14, step 12, sound):
+
+- **I cannot hear.** A sound is written from what it is made of, rendered offline
+  (`sfx.render()`, an `OfflineAudioContext`) and measured and drawn (`tools/check_sound.py`):
+  that catches silence, clipping, a length or a balance that is off, and a shape that is not
+  what was meant. Whether it sounds right is the user's to say, on the soundboard: say so
+  plainly whenever sound is shown, and never call a sound good.
+- **A note that dies away to nothing is mostly unheard:** an exponential fall to 0.0001 over a
+  sound's length left a third of it audible and every effect three times fainter than its
+  number. They fall to a fiftieth and are cut. Noise through a narrow filter is far fainter than
+  a tone of the same number: balance by measuring, not by the numbers.
+- **The Web Audio compressor adds gain of its own** (about a quarter more at these settings):
+  measure after it.
+- **A new effect goes in three places:** its line in `src/sfx.js` (in its group, with a comment
+  saying what it is for), the call (`sfx.at(x, y)` for anything on a clock of its own), and
+  nothing else: the soundboard, the checker and the `sound` playtest (which fails on a name that
+  does not exist) read the groups themselves.
+- **Never a sound each frame:** a state that lasts re-triggers on a timer of its own; a sound
+  that takes a length gets the real one in seconds.
+- **Work that is the same judgment many times over in files that do not touch** (which effect
+  fits each of 250 moments in eleven files) goes well to helpers in parallel from one written
+  brief that names what they may not do (no browser, no tools, no other files); read their
+  doubts, they found a fault in the engine.
 
 ## Working with the user
 

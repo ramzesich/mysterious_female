@@ -103,7 +103,7 @@ export class Library {
         if (!books.length) return false;
         const librarian = w.people.byId.npc_librarian;
         w.cut(async () => {
-            sfx.pickup();
+            sfx.give();
             for (const n of books) {
                 if (librarian?.on) await w.people.play(librarian, 'shelve');
                 else await w.wait(300);
@@ -111,10 +111,11 @@ export class Library {
                 this.refresh();
                 const { x0, y } = this.data.shelf;
                 w.sparkle(x0 + 7 + (n - 1) * SLOT, y - 7);
-                sfx.checkpoint();
+                sfx.at(x0 + 7 + (n - 1) * SLOT, y).book();
                 await w.wait(250);
             }
             writeSave(this.save);
+            if (this.returned().length === 10) sfx.done();
             if (this.returned().length === 10) w.progress.setFlag('books_all');
         });
         return true;
@@ -137,6 +138,7 @@ export class Library {
             }
             const book = s.add.image(p.x + 10, p.y - (seated ? 24 : 32), 'book-open').setDepth(s.DEPTH.player + 0.02);
             w.add([book]);
+            sfx.page();
             await w.wait(next ? 900 : 1800);
             if (next) {
                 await this.panel(`page-${next}`);
@@ -169,6 +171,7 @@ export class Library {
             }
             const book = s.add.image(p.x + 10, p.y - (seated ? 24 : 32), 'book-open').setDepth(s.DEPTH.player + 0.02);
             w.add([book]);
+            sfx.page();
             await w.wait(900);
             await this.panel('page-5');
             this.save.read.push(5);
@@ -194,7 +197,7 @@ export class Library {
             pic.setScale(Math.floor(Math.min((VIEW.width - 160) / pic.width, (VIEW.height - 100) / pic.height)));
             s.uiLayer.add([dim, pic]);
             s.tweens.add({ targets: [dim, pic], alpha: { from: 0, to: 1 }, duration: 220 });
-            sfx.pickup();
+            sfx.page();
             const close = () => {
                 s.tweens.add({ targets: [dim, pic], alpha: 0, duration: 180, onComplete: () => { dim.destroy(); pic.destroy(); resolve(); } });
             };

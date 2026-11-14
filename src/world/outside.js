@@ -65,7 +65,12 @@ export class Gusts {
         if (phase === 'calm') this.told = false;
         else if (out && !this.told) {
             this.told = true;
-            sfx.whoosh();
+            // (The wind, to the end of its blow; and whatever flaps nearest her.)
+            const gust = this.def.gust, p = s.player;
+            sfx.gust(Math.max(0.3, gust.every - (time / 1000) % gust.every));
+            const far = f => Math.abs(f.img.x - p.x) + Math.abs(f.img.y - p.y) * 2;
+            const flap = this.flappers.reduce((a, f) => (!a || far(f) < far(a) ? f : a), null);
+            if (flap) sfx.at(flap.img.x, flap.img.y).cloth();
         }
         if (phase !== 'blow' || !out) return;
         // The wind itself: streaks of spray going aft across the view.
@@ -125,7 +130,7 @@ export class PerchGull {
                 this.targetX = p.x;
                 this.shadow.setPosition(this.targetX, d.floor - 1).setVisible(true).setScale(0.4);
                 s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 1000 });
-                sfx.whoosh();
+                sfx.at(d.x, d.y).gull();
             }
         } else if (this.state === 'mark') {
             // It hangs over the spot.
@@ -136,6 +141,7 @@ export class PerchGull {
                 this.state = 'dive';
                 this.at = time + 230;
                 this.from = { x: this.x, y: this.y };
+                sfx.at(this.x, this.y).gullDive();
             }
         } else if (this.state === 'dive') {
             const k = 1 - Math.max(0, this.at - time) / 230;
@@ -152,7 +158,7 @@ export class PerchGull {
                     if (carry && FOOD.includes(carry.kind)) {
                         this.world.carryBox.give();
                         this.world.say('Гей!', 900);
-                        sfx.pickup();
+                        sfx.at(this.x, this.y).flap();
                     } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'swooped');
                 }
                 this.state = 'back';
@@ -253,6 +259,7 @@ export class Occupied {
         this.hit = true;
         this.bang.setVisible(true);
         s.time.delayedCall(1300, () => this.bang.setVisible(false));
+        sfx.at(this.d.x, this.d.y).hey();
         s.scareContact(this.d.x, 'startled');
     }
 }
@@ -315,8 +322,16 @@ export class DrillBoat {
         for (const hx of this.hooks) g.fillStyle(0x7a7480, 1).fillRect(hx, d.top + 22, 1, Math.max(0, y + 6 - d.top - 22));
         if (a.tell && !this.rang) {
             this.rang = true;
-            sfx.rattle();
+            if (s.route === OUT) sfx.at(this.cx, d.y).whistle();
         } else if (!a.tell) this.rang = false;
+        // (The winch: its pawl while the boat is under way, its falls taking the weight to hoist it.)
+        const hoisting = !a.coming && a.k > 0 && a.k < 1;
+        if (s.route === OUT && a.k > 0 && a.k < 1 && time > (this.winchAt ?? 0)) {
+            this.winchAt = time + 220;
+            sfx.at(this.cx, y).ratchet();
+        }
+        if (s.route === OUT && hoisting && !this.hoisting) sfx.at(this.cx, y).creak();
+        this.hoisting = hoisting;
         // Her under it.
         if (s.route !== OUT || s.mode !== 'play' || Math.abs(p.y - d.y) > 30) return;
         const keel = y + this.h - 4, head = p.y - PLAYER.bodyHeight;
@@ -365,7 +380,7 @@ export class Rounds {
             if (this.aside) {
                 this.aside = false;
                 this.dark.setVisible(false);
-                sfx.door();
+                if (s.route === 'inside') sfx.at(this.dark.x, d.y).doorShut();
             }
             const before = this.x;
             this.x += this.dir * d.v * M * dt;
@@ -379,7 +394,12 @@ export class Rounds {
                     this.until = time + d.wait * 1000;
                     this.aside = true;
                     this.dark.setPosition(stop, d.y - 2).setVisible(true);
-                    sfx.door();
+                    // (He knocks, and has it open.)
+                    if (s.route === 'inside') {
+                        sfx.at(stop, d.y).knock();
+                        s.time.delayedCall(170, () => sfx.at(stop, d.y).knock());
+                        s.time.delayedCall(420, () => sfx.at(stop, d.y).door());
+                    }
                     break;
                 }
             }
@@ -415,8 +435,8 @@ export class Rounds {
         her.x = to;
         if (her.body.velocity.x * side < 0) her.body.velocity.x = 0;
         if (time > (this.bumpAt ?? 0)) {
-            this.bumpAt = time + 900;
-            sfx.land();
+            this.bumpAt = time + 1600;
+            sfx.at(this.x, d.y).grumble();
         }
     }
 }
@@ -527,6 +547,11 @@ export const outside = {
                 if (time > (this.guestWaveAt ?? 0)) {
                     this.guestWaveAt = time + 3400;
                     this.people.play(g, 'wave');
+                    // (His call with it, every other wave.)
+                    if (time > (this.guestHeyAt ?? 0)) {
+                        this.guestHeyAt = time + 6000;
+                        sfx.at(g.x, g.y).hey();
+                    }
                 }
             }
         }
@@ -554,6 +579,7 @@ export const outside = {
             fontFamily: 'Verdana, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 3, resolution: 4,
         }).setOrigin(0.5, 1).setDepth(s.DEPTH.fx);
         this.world.add([bang]);
+        sfx.at(r.x, r.y).oh();
         s.time.delayedCall(700, () => {
             bang.destroy();
             r.dir = 1;
@@ -579,7 +605,7 @@ export const outside = {
         }
         const door = room.doors.find(d => d.kind === 'balcony').x, rest = g.x;
         w.cut(async () => {
-            sfx.door();
+            sfx.doorSlide();
             g.state = 'acting';
             g.x = door + 6;
             g.dir = -1;
@@ -594,6 +620,7 @@ export const outside = {
             this.people.anim(g, 'walk');
             await w.tween({ targets: g.sprite, alpha: 1, duration: 200 });
             await w.tween({ targets: g, x: door - 14, duration: 500, onUpdate: () => this.people.place(g) });
+            sfx.at(g.x, g.y).aah();
             await this.people.play(g, 'thanks');
             await w.wait(150);
             await w.handOver(g, '@book-7', () => w.giveBook(7));

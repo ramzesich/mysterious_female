@@ -6,6 +6,7 @@
 
 import { KEY_CARDS } from './config.js';
 import { writeSave } from './save.js';
+import { sfx } from './sfx.js';
 
 // The readers' and the HUD's colours (Resurrect 64).
 export const CARD_COLOURS = { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b };
@@ -179,7 +180,9 @@ export class Progression {
     }
 
     learn(verb) {
-        if (!this.save.verbs.includes(verb)) this.open('verbs', verb);
+        if (this.save.verbs.includes(verb)) return;
+        this.open('verbs', verb);
+        sfx.verb();
     }
 
     blockLifted(id) {
@@ -286,6 +289,7 @@ export class Progression {
         if (!c) return false;
         this.open('cards', c.card);
         s.sparkle?.(c.x, c.y - 30);
+        sfx.card();
         return true;
     }
 

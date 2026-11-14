@@ -12,6 +12,7 @@ import functools
 import http.server
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -36,6 +37,7 @@ KEYS = {
     "up": (38, "ArrowUp", "ArrowUp"), "down": (40, "ArrowDown", "ArrowDown"),
     "space": (32, "Space", " "), "d": (68, "KeyD", "d"),
     "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"), "o": (79, "KeyO", "o"),
+    "m": (77, "KeyM", "m"),
 }
 
 
@@ -3695,6 +3697,93 @@ def scenario_finale(b):
     b.tap("e")
     time.sleep(0.4)
     ok &= check(b.state()["mode"] == "play", "E by him: a purr")
+    ok &= check(not b.errors, "no errors", b.errors[:3])
+    return ok
+
+
+def scenario_sound(b):
+    """Step 12, the sound. Nobody hears anything here: what the game asked to be played is counted
+    (`sfx.counts`), and what the ambience is set to where she stands is read."""
+    S, SC = "window.__sfx", "window.__ship.soundscape"
+
+    def count(name):
+        return b.eval(f"{S}.counts[{json.dumps(name)}] || 0")
+
+    b.open("?reset&play")
+    time.sleep(0.5)
+    if b.eval(f"{S}.muted"):                    # (left muted by a run that broke off)
+        b.eval(f"{S}.toggle()")
+    # Every effect the code names is one that exists.
+    names = set(sum(b.eval(f"Object.values({S}.groups)"), []))
+    api = {"at", "listen", "ambience", "toggle", "unlock", "render", "counts", "log", "groups", "layers", "demos", "muted",
+           "enabled", "running"}
+    used = {}
+    for path in (ROOT / "src").rglob("*.js"):
+        if path.name == "sfx.js":
+            continue
+        for m in re.finditer(r"\bsfx(?:\.at\((?:[^()]|\([^()]*\))*\))?\s*\??\.(\w+)\s*(?:\?\.)?\(", path.read_text(encoding="utf-8")):
+            used.setdefault(m.group(1), path.name)
+    unknown = {n: f for n, f in used.items() if n not in names and n not in api}
+    ok = check(not unknown, "every effect the game asks for exists", unknown)
+    spare = sorted(names - set(used))
+    print(f"        ({len(names)} effects, {len(names) - len(spare)} of them used; not used: {', '.join(spare) or 'none'})")
+    ok &= check(b.eval(f"{S}.enabled") and not b.eval(f"{S}.muted"), "sound is on")
+    n = count("step")
+    b.hold("right", 1.0)
+    time.sleep(0.2)
+    ok &= check(b.eval(f"{S}.running"), "the audio runs once a key has been pressed")
+    ok &= check(count("step") - n >= 3, "her footsteps as she runs", count("step") - n)
+    ok &= check(b.eval(f"{SC}.floor()") == "carpet", "inside, on carpet", b.eval(f"{SC}.floor()"))
+    j, l = count("jump"), count("land")
+    b.tap("space", 0.2)
+    time.sleep(0.9)
+    ok &= check(count("jump") == j + 1 and count("land") == l + 1, "a jump and its landing", (count("jump") - j, count("land") - l))
+    lv = b.eval(f"{SC}.levels()")
+    ok &= check(lv["engine"] > 0.8 and lv["sea"] < 0.2 and lv.get("air", 0) > 0.5,
+                "low in the ship: the engines and the ventilation, hardly any sea", lv)
+    # M mutes, and M again brings it back.
+    b.tap("m")
+    time.sleep(0.2)
+    ok &= check(b.eval(f"{S}.muted") and b.eval("window.__ship.soundSign.alpha") > 0.9, "M mutes it, and its sign shows")
+    b.shot("sound-muted")
+    b.tap("m")
+    time.sleep(0.2)
+    ok &= check(not b.eval(f"{S}.muted") and count("soundOn") == 1, "M again brings it back")
+    # An elevator's ride: its doors, its car, its bell.
+    b.teleport(LIFT_X, D4)
+    b.tap("e")
+    time.sleep(0.5)
+    b.tap("up")
+    time.sleep(0.1)
+    b.tap("e")
+    time.sleep(3.2)
+    got = [count(k) for k in ("doorSlide", "liftMove", "liftDing")]
+    ok &= check(b.state()["y"] == D5 and got[0] >= 2 and got[1] == 1 and got[2] == 1, "an elevator: its doors, its car, its bell", got)
+    # From outside, the sea.
+    b.tap("o")
+    time.sleep(0.5)
+    lv = b.eval(f"{SC}.levels()")
+    ok &= check(lv["sea"] == 1 and lv["wind"] > 0.3, "from outside: the sea and the wind", lv)
+    b.tap("o")
+    time.sleep(0.4)
+    # Up on deck 12, out in the open: planks under her, the wind, less of the engines.
+    b.open("?reset&play&at=sundeck&cards=all")
+    time.sleep(0.6)
+    lv = b.eval(f"{SC}.levels()")
+    ok &= check(b.eval(f"{SC}.floor()") == "deck" and lv["wind"] > 0.6 and lv["sea"] > 0.3 and lv["engine"] < 0.2,
+                "on deck 12 in the open: planks, the wind, the sea below", (b.eval(f"{SC}.floor()"), lv))
+    # A ladder's rungs, and the roof's metal.
+    b.teleport(LADDER_X, D12)
+    n = count("rung")
+    hold_until(b, "up", lambda s: s["mode"] == "play" and s["y"] <= ROOF_Y, 6)
+    time.sleep(0.3)
+    ok &= check(count("rung") - n >= 3 and b.eval(f"{SC}.floor()") == "metal", "a ladder's rungs, then the roof's metal",
+                (count("rung") - n, b.eval(f"{SC}.floor()"), b.state()))
+    # And the tools' way: an effect rendered without being played is not silence.
+    res = b.send("Runtime.evaluate", awaitPromise=True, returnByValue=True,
+                 expression=f"{S}.render('horn', [1], 1.5, 22050).then(([l]) => l.reduce((m, v) => Math.max(m, Math.abs(v)), 0))")
+    peak = res.get("result", {}).get("value", 0)
+    ok &= check(0.1 < peak < 0.95, "the horn, rendered, is loud and not clipped", peak)
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
 

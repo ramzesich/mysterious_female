@@ -44,13 +44,14 @@ export class Steam {
         const [phase, k] = this.phase(time);
         if (phase === 'calm') {
             this.told = false;
+            this.blown = false;
             return;
         }
         const top = d.y - 112;
         if (phase === 'tell') {
             if (!this.told) {
                 this.told = true;
-                sfx.whoosh();
+                sfx.at(d.x, d.y).steam(0.3);
             }
             // Wisps curling out over the door's top.
             for (let i = 0; i < 5; i++) {
@@ -60,6 +61,10 @@ export class Steam {
             return;
         }
         // The cloud: out of the door, rolling aft and up, thinning.
+        if (!this.blown) {
+            this.blown = true;
+            sfx.at(d.x, d.y).steam(Math.max(0.3, d.on * (1 - k)));
+        }
         const env = k < 0.15 ? k / 0.15 : k > 0.7 ? Math.max(0, (1 - k) / 0.3) : 1;
         const reach = (d.x1 - d.x) * Math.min(1, k * 2.4 + 0.25);
         for (let i = 0; i < 16; i++) {
@@ -154,6 +159,10 @@ export class BallPit {
         if (!inside || Math.abs(p.body.velocity.x) < 10 || time < this.popAt) return;
         // Balls pop up round her as she pushes through.
         this.popAt = time + 110;
+        if (time > (this.soundAt ?? 0)) {
+            this.soundAt = time + 330;
+            sfx.balls();
+        }
         const g = s.add.graphics().setDepth(s.DEPTH.player + 0.05);
         const c = BALLS[Math.floor(time / 110) % BALLS.length];
         g.fillStyle(0x2e222f, 1).fillCircle(0, 0, 4);
@@ -254,6 +263,7 @@ export const bow = {
         if (this.sighDue && chef?.on && chef.state !== 'acting' && play && Math.abs(her.y - chef.y) < 8 && Math.abs(her.x - chef.x) < 3 * M) {
             this.sighDue = false;
             this.people.play(chef, 'sigh');
+            sfx.at(chef.x, chef.y).grumble();
         }
         // The spa's receptionist bows to whoever comes in.
         const rec = this.who('amb_spa_reception');
@@ -270,6 +280,13 @@ export const bow = {
         const on = (this.alarmOn || P.has('alarm')) && !P.has('catch') && her.y > R.y - 132 && her.y <= R.y + 2;
         if (on && near(s, (R.x0 + R.x1) / 2, R.y, 900, 200)) {
             const k = (Math.sin(time / 260) + 1) / 2;
+            // (Whoop after whoop for its first seconds; after that, and whenever she comes back to
+            // the bridge, only now and then: it would wear.)
+            if (time > (this.alarmSoundAt ?? 0)) {
+                this.alarmLoudUntil ??= time + (this.alarmOn ? 7000 : 0);
+                this.alarmSoundAt = time + (time < this.alarmLoudUntil ? 1000 : 6000);
+                sfx.at(R.panelX, R.y).alarm(2);
+            }
             this.alarmWash.setFillStyle(0xe83b3b, 0.05 + 0.13 * k);
             const g = this.alarmBeam.clear(), bx = R.panelX, by = R.y - 62, a = time / 300;
             g.fillStyle(0xfbff86, 0.9).fillCircle(bx, by, 2 + k);
@@ -304,9 +321,10 @@ export const bow = {
             w.carryBox.give();
             const cake = s.add.image(her.x + (her.flipX ? -14 : 14), her.y - 34, 'things', 'wedding-cake').setOrigin(0.5, 1).setDepth(D.player + 0.05);
             w.add([cake]);
-            sfx.pickup();
+            sfx.give();
             await w.tween({ targets: cake, x: pl.x + pl.dir * 13, y: pl.y - 30, duration: 420, ease: 'Sine.easeInOut' });
-            sfx.checkpoint();
+            sfx.at(pl.x, pl.y).aah();
+            sfx.done();
             w.sparkle(cake.x, cake.y - 20);
             await w.wait(350);
             // The rope off, the doors open, and in they go: the couple first, the guests, the planner
@@ -320,6 +338,7 @@ export const bow = {
                     s.setBulkheadOpen(d, true);
                 }
             }
+            sfx.doorHeavy();
             cam.stopFollow();
             s.viewOverride = 12;
             const party = ['amb_wed_d', 'amb_wed_c', 'amb_wed_b', 'amb_wed_a', 'amb_wed_groom', 'amb_wed_bride'].map(id => this.who(id)).filter(p => p?.on);
@@ -341,6 +360,7 @@ export const bow = {
             };
             const going = party.map((p, i) => walkIn(p, 400 + i * 300));
             going.push(walkIn(pl, 400 + party.length * 300 + 200, cake));
+            sfx.bells();
             await pan(W.lookX, W.y - HALF - 20, 1300);
             await pan(W.chapelX + 150, W.y - HALF - 20, 2600);
             await Promise.all(going);
@@ -383,7 +403,9 @@ export const bow = {
             await w.wait(900);
             this.people.play(groom, 'kiss');
             await this.people.play(bride, 'kiss');
-            sfx.checkpoint();
+            sfx.at(mid, y).kiss();
+            sfx.at(mid, y).bells();
+            sfx.at(mid, y).cheer(2.6);
             for (let i = 0; i < 5; i++) {
                 const heart = s.add.text(mid + Phaser.Math.Between(-10, 10), y - 62, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 }).setOrigin(0.5).setDepth(D.fx);
                 w.add([heart]);
@@ -396,6 +418,7 @@ export const bow = {
             this.P.setFlag('ceremony');
             const slot = w.things.find(t => t.id === 'slot_chapel');
             if (slot) w.sparkle(slot.x, slot.y - (slot.dy ?? 60));
+            if (slot) sfx.at(slot.x, slot.y).sparkle();
         });
     },
 
@@ -409,8 +432,9 @@ export const bow = {
             her.x = B.x;
             her.body.reset(her.x, her.y);
             await w.wait(150);
+            let key = 0;
             const notes = s.time.addEvent({ delay: 330, loop: true, callback: () => {
-                sfx.ding();
+                sfx.piano(key++);
                 const n = s.add.text(B.x + 22 + Phaser.Math.Between(-6, 10), B.y - 58, Phaser.Math.Between(0, 1) ? '♪' : '♫', { fontFamily: 'Verdana, sans-serif', fontSize: '10px', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
                 w.add([n]);
@@ -421,6 +445,7 @@ export const bow = {
             notes.remove();
             s.pose('stand');
             if (!w.save.seen.includes('sec_piano')) {
+                sfx.secret();
                 w.save.seen.push('sec_piano');
                 writeSave(w.save);
             }
@@ -440,10 +465,11 @@ export const bow = {
             her.setFlipX(true);
             her.x = S.ladderX;
             if (s.anims.exists('her-climb')) her.anims.play('her-climb');
+            s.time.addEvent({ delay: 150, repeat: 3, callback: () => sfx.rung() });
             await w.tween({ targets: her, y: S.y - S.top, x: S.topX, duration: 620 });
             s.pose('rise');
             await w.wait(180);
-            sfx.whoosh();
+            sfx.slide();
             s.pose('fall');
             await w.tween({ targets: her, x: S.x0 + 4, y: S.y - 8, duration: 420, ease: 'Quad.easeIn' });
             // Off the chute's foot, over the rim.
@@ -452,6 +478,7 @@ export const bow = {
             her.body.reset(her.x, her.y);
             her.body.setVelocity(-60, 40);
             if (!w.save.seen.includes('sec_slide')) {
+                sfx.secret();
                 w.save.seen.push('sec_slide');
                 writeSave(w.save);
             }
@@ -472,7 +499,7 @@ export const bow = {
             else s.pose('back');
             for (let i = 0; i < 3; i++) {
                 await w.wait(i ? 230 : 380);
-                sfx.land();
+                sfx.knock();
                 const t = s.add.text(C.x + 12 + i * 5, C.y - 52 - i * 4, 'тук', { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
                 w.add([t]);
@@ -506,22 +533,22 @@ export const bow = {
             await w.tween({ targets: this.oddBook, angle: -24, duration: 160 });
             if (!this.P.has('books_all')) {
                 // It will not come: there are gaps on the shelf yet.
-                sfx.land();
+                sfx.book();
                 await w.tween({ targets: this.oddBook, angle: 0, duration: 200 });
                 s.pose('stand');
                 w.say('?', 800);
                 this.pulling = false;
                 return;
             }
-            sfx.rattle();
+            sfx.at(N.x, N.y).lever();
             await w.wait(350);
             s.cameras.main.shake(260, 0.004);
-            sfx.door();
+            sfx.at(N.x, N.y).rumble();
             this.nookWay.setVisible(true).setAlpha(0);
             this.oddGlint.setVisible(false);
             await w.tween({ targets: this.nookWay, alpha: 1, duration: 700 });
             w.sparkle(N.x, N.y - 30);
-            sfx.checkpoint();
+            sfx.secret();
             s.pose('stand');
             this.pulling = false;
             this.P.setFlag('nook');
@@ -540,16 +567,18 @@ export const bow = {
             r.dir = 1;
             this.people.anim(r, 'walk', { speed: 1.8 });
             await w.tween({ targets: r, x: R.swatX, duration: Math.abs(R.swatX - r.x) * 7 + 60, onUpdate: () => this.people.place(r) });
-            sfx.dash();
+            sfx.at(r.x, r.y).hey();
+            s.time.delayedCall(340, () => sfx.at(r.x, r.y).net());
             this.people.play(r, 'swing', { hold: 60000 });
             await w.wait(520);
         }
         // The net on the panel.
-        sfx.smash();
+        sfx.at(R.panelX, R.y).clang();
         s.cameras.main.shake(260, 0.006);
         w.sparkle(R.panelX - 14, R.y - 22, 0xfbff86);
         this.alarmOn = true;
-        sfx.horn?.(0.5);
+        this.alarmSoundAt = s.time.now + 1000;
+        sfx.at(R.panelX, R.y).alarm(2);
         await w.wait(250);
     },
 
@@ -563,17 +592,18 @@ export const bow = {
         if (gate) {
             const tiles = [...gate.tiles].sort((a, b) => a.pixelY - b.pixelY);
             tiles.forEach(t => t.setAlpha(0));
-            tiles.forEach((t, i) => s.time.delayedCall(60 + i * 55, () => { t.setAlpha(1); if (i % 2 === 0) sfx.land(); }));
+            tiles.forEach((t, i) => s.time.delayedCall(60 + i * 55, () => { t.setAlpha(1); if (i % 2 === 0) sfx.at(ladderX, top).ratchet(); }));
         }
         const ladderX = gate?.x ?? R.x0 + 20, top = gate?.y0 ?? R.y - 144;
+        sfx.at(ladderX, top).hatch();
         sprite.setFlipX(true).play('bumbot-jump');
         s.tweens.chain({
             targets: sprite,
             tweens: [
                 { x: R.helmX, y: R.y - 44, duration: 260, ease: 'Quad.easeOut' },
-                { x: R.consoleX, y: R.y - 46, duration: 240, onStart: () => sprite.play('bumbot-run') },
+                { x: R.consoleX, y: R.y - 46, duration: 240, onStart: () => { sprite.play('bumbot-run'); sfx.at(sprite.x, sprite.y).scramble(); } },
                 { x: ladderX, y: R.y - 60, duration: 200, ease: 'Quad.easeOut', onStart: () => sprite.play('bumbot-jump') },
-                { y: top - 6, duration: 620, onComplete: () => sprite.setAlpha(0) },
+                { y: top - 6, duration: 620, onStart: () => sfx.at(sprite.x, sprite.y).scramble(), onComplete: () => sprite.setAlpha(0) },
             ],
             onComplete: () => {
                 sprite.setAlpha(1);
@@ -581,6 +611,7 @@ export const bow = {
                 const r = this.who('riv_bridge');
                 if (r?.on) {
                     this.people.play(r, 'sit', { hold: 60000 });
+                    sfx.at(r.x, r.y).grumble();
                     s.tweens.add({ targets: r, x: R.sitX, duration: 300, onUpdate: () => this.people.place(r) });
                 }
                 s.time.delayedCall(700, done);

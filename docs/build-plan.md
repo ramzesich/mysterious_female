@@ -262,10 +262,26 @@ checks have to be redone.
 - **Playtest:** the whole suite (the map is rebuilt); close-ups of the bow, midships, the stern,
   the balconies and the walkway shown to the user for approval before the commit.
 
+## Step 12: Sound
+
+**Done (2026-11-14), waiting for the user's ears.** It was the first item of "After the regions"
+("the synthesised effects for every entity, in the order of the regions; the horn and the alarm
+first"); how it was done: `docs/progress-decisions.md`.
+
+- **Scope:** an effect of its own for every entity (about 130, where 17 generic ones had served);
+  each from where its source is; the ambience of §5.2 (the sea, the engines, the wind, the
+  ventilation, a pool's water) by where she stands; her footsteps by what is under her; sound on
+  by default, M to mute.
+- **How:** all synthesised in `src/sfx.js`, no audio files; `src/world/soundscape.js` for the
+  ambience and her steps.
+- **Checked:** `python tools/check_sound.py` renders every effect without playing it and measures
+  it (nobody hears anything in the build); the `sound` playtest counts what the game asks for.
+  **The user listens to them all on `tools/soundboard.html`** and says what to change.
+
 ## After the regions
 
-- **Sound on:** the synthesised effects for every entity, in the order of the regions; the horn and
-  the alarm first.
+- **The hull, refined** (the user, 2026-11-14, during step 12: "I want to refine the hull, when
+  we finish with sound"): from the full-size render of the ship; what to change is theirs to say.
 - **The controller:** the mapping of §3.1 tested on the Xbox pad through the whole route.
 - **Tuning:** the checkpoints' spacing, the hazards' periods and the carries' meters from her
   playtest; the tangerine count.

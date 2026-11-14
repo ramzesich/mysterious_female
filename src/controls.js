@@ -9,7 +9,7 @@ export class Controls {
         this.keys = scene.input.keyboard.addKeys({
             left: 'LEFT', right: 'RIGHT', up: 'UP', down: 'DOWN',
             jump: 'SPACE', dash: 'D', activate: 'E', start: 'ENTER',
-            outside: 'O', escape: 'ESC', zoomIn: 'PLUS', zoomOut: 'MINUS',
+            outside: 'O', escape: 'ESC', zoomIn: 'PLUS', zoomOut: 'MINUS', mute: 'M',
             zoomInPad: 'NUMPAD_ADD', zoomOutPad: 'NUMPAD_SUBTRACT',
         });
         this.prev = {};
@@ -38,6 +38,7 @@ export class Controls {
             // The outside view of the whole ship (O; Esc leaves it too), and its zoom (+/-).
             outside: k.outside.isDown,
             escape: k.escape.isDown,
+            mute: k.mute.isDown,        // the sound, off and on
             zoomIn: k.zoomIn.isDown || k.zoomInPad.isDown,
             zoomOut: k.zoomOut.isDown || k.zoomOutPad.isDown,
         };

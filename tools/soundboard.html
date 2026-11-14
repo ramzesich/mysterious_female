@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<!-- Every sound of the game by a button (src/sfx.js). Open it from the game's server:
+     python tools/serve.py, then http://localhost:8000/tools/soundboard.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bumbusik: the soundboard</title>
+<style>
+    body { font: 15px Verdana, sans-serif; background: #1d2b53; color: #fff; margin: 24px; }
+    h1 { font: 28px Georgia, serif; margin: 0 0 4px; }
+    h2 { font: 18px Georgia, serif; margin: 22px 0 8px; color: #fbff86; }
+    p { margin: 4px 0 12px; color: #c7dcd0; max-width: 900px; }
+    button { font: inherit; margin: 3px; padding: 6px 12px; border: 0; border-radius: 4px; background: #fff; color: #1d2b53; cursor: pointer; }
+    button:hover { background: #fbff86; }
+    button.on { background: #f28c28; color: #fff; }
+    label { display: inline-block; width: 300px; margin: 3px 0; }
+    input[type=range] { width: 170px; vertical-align: middle; }
+    .name { display: inline-block; width: 70px; }
+</style>
+</head>
+<body>
+<h1>Bumbusik: the soundboard</h1>
+<p>Every effect of the game, made in code (<code>src/sfx.js</code>). A click plays one as she would hear it standing by it.
+   <button id="mute"></button> <button id="all">Play this whole page, one after another</button></p>
+<div id="groups"></div>
+<h2>The ambience</h2>
+<p>The layers that run all the time; the game sets each by where she is (out on deck, inside, low in the ship, by a pool).
+   <button data-mix='{"sea":1,"engine":0.25,"wind":0.5}'>Out on the promenade</button>
+   <button data-mix='{"sea":0.5,"engine":0.12,"wind":1}'>Up on deck 12</button>
+   <button data-mix='{"sea":0.12,"engine":0.45,"air":1}'>In a corridor</button>
+   <button data-mix='{"sea":0.05,"engine":1,"air":0.8}'>Low in the ship</button>
+   <button data-mix='{"sea":0.5,"engine":0.15,"wind":0.5,"water":1}'>By the pool</button>
+   <button data-mix='{}'>Silence</button></p>
+<div id="layers"></div>
+<script type="module">
+import { sfx } from '../src/sfx.js';
+
+const groups = document.getElementById('groups');
+const buttons = [];
+for (const [title, names] of Object.entries(sfx.groups)) {
+    const h = document.createElement('h2');
+    h.textContent = title;
+    groups.append(h);
+    for (const name of names) {
+        for (const args of sfx.demos[name] || [[]]) {
+            const b = document.createElement('button');
+            b.textContent = name + (args.length ? ` (${args.join(', ')})` : '');
+            b.onclick = () => sfx[name](...args);
+            groups.append(b);
+            buttons.push(b);
+        }
+    }
+}
+
+const mute = document.getElementById('mute');
+const showMute = () => { mute.textContent = sfx.muted ? 'Sound is muted (M in the game): switch it on' : 'Mute'; };
+mute.onclick = () => { sfx.toggle(); showMute(); };
+showMute();
+
+document.getElementById('all').onclick = async () => {
+    for (const b of buttons) {
+        b.classList.add('on');
+        b.click();
+        await new Promise(done => setTimeout(done, 1400));
+        b.classList.remove('on');
+    }
+};
+
+const levels = {};
+const layers = document.getElementById('layers');
+const sliders = {};
+for (const name of sfx.layers) {
+    const l = document.createElement('label');
+    l.innerHTML = `<span class="name">${name}</span> <input type="range" min="0" max="1" step="0.01" value="0">`;
+    sliders[name] = l.querySelector('input');
+    sliders[name].oninput = () => { levels[name] = +sliders[name].value; sfx.ambience(levels); };
+    layers.append(l);
+}
+for (const b of document.querySelectorAll('button[data-mix]')) {
+    b.onclick = () => {
+        const mix = JSON.parse(b.dataset.mix);
+        for (const name of sfx.layers) { levels[name] = mix[name] ?? 0; sliders[name].value = levels[name]; }
+        sfx.ambience(levels);
+    };
+}
+window.sfx = sfx;
+</script>
+</body>
+</html>

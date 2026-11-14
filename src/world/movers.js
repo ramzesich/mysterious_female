@@ -45,7 +45,11 @@ export class Robot {
         const ahead = (p.x - this.x) * this.dir;
         const blocked = !riding && s.route === 'inside' && Math.abs(p.y - d.y) < 30 && ahead > 0 && ahead < 2 * M + this.w / 2;
         this.beep.setVisible(blocked && Math.floor(time / 300) % 2 === 0).setPosition(this.x, d.y - this.h - 6);
-        if (blocked && !this.wasBlocked) sfx.pickup();
+        // (Its beep: as she gets in its way, and again every so often while she stays there.)
+        if (blocked && (!this.wasBlocked || time > this.beepAt)) {
+            this.beepAt = time + 1200;
+            sfx.at(this.x, d.y).robotBeep();
+        }
         this.wasBlocked = blocked;
         if (blocked || time < this.pausedUntil) return;
         let to = this.x + this.dir * d.v * M * dt;
@@ -88,7 +92,7 @@ export class Gull {
         const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90;
         if (near) this.awaySince = time;
         const up = near || time - this.awaySince < 1400;
-        if (up && this.rise === 0) sfx.whoosh?.();
+        if (up && this.rise === 0) sfx.at(d.x, d.y).flap();
         this.rise = Phaser.Math.Clamp(this.rise + (up ? 2.2 : -1.3) * dt, 0, 1);
         if (this.rise === 0) {
             this.sprite.setFrame('gull-perched').setPosition(d.x, d.y);
@@ -133,6 +137,12 @@ export class SwingLight {
         let len = d.short, angle = 0;
         if (on) {
             const e = time - this.t0;
+            // (Its cable creaks as it drops out, and once each swing.)
+            const turn = e < DROP ? -1 : Math.floor((e - DROP) / (d.period * 1000));
+            if (turn !== this.turn) {
+                this.turn = turn;
+                sfx.at(d.x, d.floor).creak();
+            }
             if (e < DROP) {
                 const k = Phaser.Math.Easing.Sine.InOut(e / DROP);
                 len = d.short + (d.long - d.short) * k;
@@ -160,7 +170,10 @@ export class SwingLight {
         if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
             if (this.world.carry) this.world.carryBox.spill(x);
-            else s.scareContact(x, 'bonked');
+            else {
+                sfx.bonk();
+                s.scareContact(x, 'bonked');
+            }
         }
     }
 }
@@ -188,7 +201,7 @@ export class Spill {
         if (this.state === 'idle' && time > this.at) {
             this.state = 'tell';
             this.at = time + 1500;
-            sfx.ding();
+            sfx.at(d.x, d.y).slot();
         } else if (this.state === 'tell') {
             // The lights race along its top.
             const g = this.lights.clear(), lit = Math.floor(time / 90) % 6;
@@ -198,7 +211,7 @@ export class Spill {
                 this.at = time + 4000;
                 this.lights.clear();
                 this.pour();
-                sfx.smash();
+                sfx.at(d.x, d.y).chips();
             }
         } else if (this.state === 'spilled') {
             const left = this.at - time;
@@ -207,7 +220,10 @@ export class Spill {
             if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(p.y - d.y) < 3 && Math.abs(p.x - d.x) < d.half
                 && Math.abs(p.body.velocity.x) > 20) {
                 if (this.world.carry) this.world.carryBox.spill(d.x);
-                else s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'slipped');
+                else {
+                    sfx.slip();
+                    s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'slipped');
+                }
             }
             if (left <= 0) {
                 this.state = 'idle';
@@ -274,14 +290,14 @@ export class Darter {
                 this.state = 'wait';
                 this.at = time + 300;
                 this.dir = dx < 0 ? -1 : 1;
-                sfx.rattle();
+                sfx.at(d.x, d.y).vacRev();
             }
         } else if (this.state === 'wait') {
             v.x = d.x + (Math.floor(time / 40) % 2 ? 1 : -1);
             if (time > this.at) {
                 this.state = 'out';
                 v.setScale(1).clearTint().setFlipX(this.dir < 0);
-                sfx.whoosh();
+                sfx.at(d.x, d.y).vacDart();
                 // Out fast, a breath, and back in slowly: only on its way out is it a fright.
                 s.tweens.add({
                     targets: v, x: d.x + this.dir * d.dart, duration: 400, ease: 'Quad.easeOut', hold: 160,
@@ -381,7 +397,7 @@ export class TowelStack {
             if (on && Math.abs(dx) < 48 && (landed || s.isDashing())) {
                 this.state = 'falling';
                 this.dir = dx < 0 ? -1 : 1;
-                sfx.rattle();
+                sfx.at(d.x, d.y).cloth();
                 s.tweens.add({
                     targets: this.stack, angle: this.dir * 86, duration: 360, ease: 'Quad.easeIn',
                     onComplete: () => this.down(),
@@ -401,7 +417,7 @@ export class TowelStack {
         const cx = d.x + this.dir * 36;
         this.stack.setVisible(false);
         this.heap.setVisible(true).setPosition(cx, d.y);
-        sfx.smash();
+        sfx.at(cx, d.y).towelFall();
         if (here(s, d) && Math.abs(p.x - cx) < 38 && p.y > d.y - 40) {
             // Under it: only her hair shows for a moment.
             this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
@@ -440,6 +456,13 @@ export class Sprinkler {
         // (Out on the ship's side the hallways are behind its plating.)
         if (!nearby(s, d) || s.route === 'promenade') return;
         const phase = this.phase(time), top = d.top + 16;
+        // (Its sound, once in each round: the ticks of the tell, then its rain for what is left of it.)
+        const round = (time / 1000 + d.offset) / d.period, key = phase + Math.floor(round);
+        if (key !== this.sounded) {
+            this.sounded = key;
+            if (phase === 'tell') sfx.at(d.x, d.y).tick();
+            else if (phase === 'on') sfx.at(d.x, d.y).spray(Math.max(0.2, 0.8 + d.on - (round % 1) * d.period));
+        }
         if (phase === 'tell') {
             // Three slow drops.
             const y = top + ((time * 0.3) % (d.y - top));
@@ -499,7 +522,8 @@ export class SwingDoor {
                 this.armed = false;
                 this.state = 'rattle';
                 this.at = time + d.delay * 1000;
-                sfx.rattle();
+                this.rattleAt = time + 300;
+                sfx.at(d.x, d.y).rattle();
             }
         } else if (this.state === 'rattle') {
             this.shut.x = d.x + (Math.floor(time / 45) % 2 ? 1 : -1);
@@ -511,13 +535,17 @@ export class SwingDoor {
                 this.dark.setVisible(true);
                 this.leaf.setVisible(true).setScale(0.2, 1);
                 s.tweens.add({ targets: this.leaf, scaleX: 0.42, duration: 220, ease: 'Back.easeOut' });
-                sfx.smash();
+                sfx.at(d.x, d.y).doorBang();
                 if (this.who) {
                     this.who.gone = false;
                     this.who.dir = dx < 0 ? -1 : 1;
                     this.world.people.place(this.who);
                     this.world.people.refresh();
                 }
+            } else if (time > this.rattleAt) {
+                // (The handle again, while it shakes.)
+                this.rattleAt = time + 300;
+                sfx.at(d.x, d.y).rattle();
             }
         } else if (this.state === 'burst') {
             if (here(s, d) && Math.abs(p.y - d.y) < 40 && dx > -18 && dx < 34) {
@@ -539,7 +567,7 @@ export class SwingDoor {
                 this.who.gone = true;
                 this.world.people.refresh();
             }
-            sfx.door();
+            sfx.at(d.x, d.y).doorShut();
         }
     }
 }
@@ -570,7 +598,10 @@ export class DndDoor {
         const s = this.scene, p = s.player, d = this.def;
         if (this.busy || (this.world.carry && !heard)) return false;
         this.busy = true;
-        sfx.door();
+        // Her knuckles on it (E), the door, and whoever is in.
+        if (!heard) sfx.knock();
+        sfx.at(d.x, d.y).door();
+        if (this.who) sfx.at(d.x, d.y).oh();
         this.shut.setVisible(false);
         this.card.setVisible(false);
         this.dark.setVisible(true);
@@ -591,7 +622,7 @@ export class DndDoor {
                 this.who.gone = true;
                 this.world.people.refresh();
             }
-            sfx.rattle();
+            sfx.at(d.x, d.y).doorShut();
             this.busy = false;
         });
         return true;

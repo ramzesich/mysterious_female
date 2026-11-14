@@ -1149,3 +1149,82 @@ lines smoothed.** Code: `tools/shell_paint.py` (new), the map builder, the ship 
 **Left for later:** the funnel's white base, the open decks' bulwarks and the sun cover stay
 plain (small, and no seam lines up with them); two round spots in the livery where the photo's
 portholes were painted over; sound has no part in this step.
+
+## Step 12: Sound (2026-11-14)
+
+The first item of the plan's "After the regions" ("Sound on: the synthesised effects for every
+entity, in the order of the regions; the horn and the alarm first"), built as a step of its own
+when the user said "Let's continue" after step 11. **Sound is on now** (`SOUND.on`); **M mutes it**
+and the choice is remembered. Code: `src/sfx.js` (rewritten), `src/world/soundscape.js` (new),
+sound lines in every file of `src/world/` and in the ship scene; tools `tools/check_sound.py` and
+`tools/soundboard.html` (new). No PixelLab art or audio: 0 generations (about 653 of 2,000 left).
+The whole suite passes (702 checks, the new `sound` scenario's thirteen among them); `python tools/check_sound.py` ends "all within bounds".
+
+**Nobody has heard any of it yet.** I cannot hear: every effect was written from what such a
+sound is made of (a struck bell's overtones, a voice's buzz through an opening mouth, noise
+through a moving filter), then rendered by the browser without playing it and measured: how
+loud, how long, where its weight lies, and its picture (a spectrogram each), which shows whether
+it has the shape it was written to have. That finds a sound that is silent, clipped or far out
+of balance; it does not tell whether a meow sounds like a cat. **So the whole set waits for the
+user's ears:** `http://localhost:8000/tools/soundboard.html` plays every one by a button and has
+the ambience's layers on sliders.
+
+**How it is done, and why so:**
+
+1. **About 130 effects where there were 17.** The game had used a handful of generic ones for
+   everything (one rattle for a snore, a vacuum's tell and the soft serve machine; one smash for
+   towels falling, a lever and a door flying open). Each entity has its own now, in seven groups
+   in `src/sfx.js`: hers (her steps on four kinds of floor, the parasol, the socks' squeak on a
+   wall, the shower and the song she hums in it, the bed's springs), the ship's (five kinds of
+   door, the elevators, the chute, the hatch, the horn, the alarm), finds and signs, Bumbot's
+   (mrrp, meow, purr, his claws), people's (voices without words: a shout, a startled "oh", a
+   giggle, a grumble, a sneeze, a "shh"; clapping, a kiss, the wedding's bells, the piano's
+   tune), things' (the robot, the vacuum, towels, the sprinkler, gulls, gusts, the pool
+   draining, the soft serve machine, chips, the court's ball, Teppanyaki's flare, steam, the
+   net, the slide, the radar) and the end's (the sunset's chord, the catch, the win screen).
+2. **The horn and the alarm, as the plan asked first:** the horn is three low notes together,
+   each a pair a little out of tune so that they beat, opened and closed through a filter like
+   steam, with a sub note and the breath under it, for exactly as long as the blast shown; the
+   loudest thing in the game. The bridge's alarm is a rising whoop, half a second each, every
+   second for its first seven seconds and then only every six (it stays on until the catch, and
+   would wear).
+3. **A sound comes from where its source is** (`sfx.at(x, y).name()`): full within about five
+   metres, gone at twenty, a deck up or down counting for more than twice the same way along (a
+   deck away is another room), a little to its side in stereo. Everything on a clock of its own
+   uses it (hazards, people, gulls, machines), so the ship is not a wall of noise and a tell can
+   be heard coming from its side. Her ears are where she is; while a scene shows somewhere else
+   (the horn's cascade), where the camera is.
+4. **The ambience** (§5.2, decided long ago: "a soft sea and engine ambience outdoors, quieter
+   inside") is five layers that run all the time, each as loud as the place makes it
+   (`src/world/soundscape.js`): the sea's wash and hiss (out on deck, most on the low open
+   decks), the engines' low throb (most low in the ship, little on deck 12), the wind (the open
+   decks, more the higher), the ventilation's hush indoors (more in the duct), water lapping by
+   a full pool. From outside (O): the sea and the wind.
+5. **Her own going is heard:** a step for every 30 px on the floor (carpet inside, planks on the
+   open decks, metal on the roof and the funnel, the duct's hollow tin), a rung under her hand
+   on ladders and in the trunks, a cart's wheels, her strokes in the pool; in scenes that walk
+   her too, since it goes by the ground she covers and not by the keys.
+6. **A few places have a small steady sound of their own:** the casino (chips, a machine
+   paying out), the bridge (the radar's ping), the birthday party's beat through its door, a
+   gull somewhere off the ship now and then while she is out on deck.
+7. **No music, as decided** (§7.1): the nearest things to it are sounds of the world or short
+   signs: the piano she picks a tune out on, the wedding's bells, the song she hums in the
+   shower, a chord as the sun goes down, the win screen's four chords.
+8. **Several loud things at once never clip:** everything goes through one compressor; the
+   same effect twice within a thirtieth of a second counts as one.
+9. **The wiring was split:** the engine, her own sounds, the ambience and the tools are mine;
+   which effect fits each of about 250 moments in the eleven files of `src/world/` was worked
+   out by four helpers in parallel, one group of files each, from one written brief
+   (`%TEMP%/bumbusik-plan/sound_brief.md`), and their notes folded in after (a fault in the
+   engine one of them found: a far, unheard sound took the turn of a near one in the same
+   moment; a dozen missing effects they asked for: a sneeze, a "shh", a soft splat, the hot
+   tub's bubbles, a wobbling cake's warning).
+
+**Additions nobody asked for:** her bow on the stage is answered by a house that claps; her
+dance has a beat; a secret found for the first time has its own little sign; the flash in the
+Photo Studio whines as it charges; a cake about to go over warns with two anxious notes.
+
+**Left for the user's ears and for later:** every sound's character and loudness (`SOUND` in
+`src/config.js` has the whole volume, the effects' and the ambience's; each effect's own is in
+its line in `src/sfx.js`); a held sound that can be stopped (the soft serve machine's motor is
+short pieces end to end); eating and drinking are mostly silent; the controller has no mute.

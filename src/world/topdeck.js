@@ -59,6 +59,7 @@ export class OldLady {
             }
             if (time > this.zAt) {
                 this.zAt = time + 1500;
+                if (this.snored = !this.snored) sfx.at(L.x, d.y).snore();       // (every other "z")
                 const z = s.add.text(L.x + 8, d.y - 58, 'z', { fontFamily: 'Verdana, sans-serif', fontSize: '8px', fontStyle: 'bold', color: '#4d65b4', resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
                 this.world.add([z]);
@@ -79,6 +80,7 @@ export class OldLady {
             body.velocity.x = this.way * 170;
             if (!this.world.progress.has('lady') && time > (this.hmphAt ?? 0)) {
                 this.hmphAt = time + 1600;
+                sfx.creak();
                 this.glare();
             }
         } else {
@@ -91,6 +93,7 @@ export class OldLady {
         this.glaring = true;
         L.still = 'glare';
         this.world.people.play(L, 'glare');
+        sfx.at(L.x, L.y).grumble();
     }
 }
 
@@ -147,9 +150,13 @@ export class Balls {
         if (!q) return;
         if (q.tell && !this.told) {
             this.told = true;
-            sfx.rattle();
+            sfx.at(this.rim.x, this.rim.y).ratchet();
         }
         if (!q.tell) this.told = false;
+        // (Each time it comes down on the walk.)
+        const bounces = t < 0.92 ? 0 : t < 1.48 ? 1 : t < 1.9 ? 2 : 3;
+        if (bounces > this.bounces) sfx.at(q.x, d.y).bounce();
+        this.bounces = bounces;
         const y = d.y - 5 - q.y;
         this.ball.setPosition(q.x, y).setAlpha(q.a).setAngle((q.x * 6) % 360);
         this.shadow.setPosition(q.x, d.y - 1).setAlpha(q.a * Math.max(0.15, 0.45 - q.y / 200));
@@ -157,6 +164,7 @@ export class Balls {
         const hit = Math.abs(p.x - q.x) < PLAYER.bodyWidth / 2 + 5 && y > p.y - PLAYER.height - 3 && y < p.y + 2 && Math.abs(p.y - d.y) < 80;
         if (!hit) return;
         this.hitAt = time + 1500;
+        sfx.bounce();
         if (this.world.carry) this.world.carryBox.spill(q.x);
         else s.scareContact(q.x, 'bonked');
     }
@@ -203,7 +211,7 @@ export class Flare {
                 this.told = true;
                 const chef = this.world.people.byId[d.chef];
                 if (chef?.on && chef.state !== 'acting') this.world.people.play(chef, 'flourish');
-                sfx.rattle();
+                sfx.at(d.x, d.y).tick();
             }
             this.glow.setFillStyle(0xf9c22b, 0.1 * k);
             for (let i = 0; i < 7; i++) {
@@ -227,7 +235,7 @@ export class Flare {
         blob(0xf79617, 0.9, 0.8, 0.82, 5);
         blob(0xf9c22b, 0.95, 0.6, 0.62, 10);
         blob(0xfbff86, 1, 0.36, 0.4, 15);
-        if (k < 0.1 && !this.lit) sfx.whoosh();
+        if (k < 0.1 && !this.lit) sfx.at(d.x, d.y).flare();
         this.lit = k < 0.9;
         if (env < 0.7 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         if (Math.abs(p.x - d.x) > d.half - 8 || Math.abs(p.y - d.y) > 90 || p.y < d.y - 100) return;
@@ -276,7 +284,7 @@ export class FunnelWind {
         if (on && !s.stairSlip && this.gusts.phase(time) === 'blow' && this.lastFlight === s.flight && Math.abs(s.stairT - this.lastT) > 1e-5 && s.stairT > 0.02) {
             s.stairSlip = true;
             this.world.say('Ой-йой!', 800);
-            sfx.whoosh();
+            sfx.slip();
         }
         this.lastFlight = on ? s.flight : null;
         this.lastT = s.stairT;
@@ -301,7 +309,7 @@ export class FunnelWind {
                 this.target = { x: p.x, y: p.y };
                 this.mark.setPosition(p.x, p.y - 1).setVisible(true).setScale(0.4);
                 s.tweens.add({ targets: this.mark, scale: 1.2, duration: 1000 });
-                sfx.whoosh();
+                sfx.at(diver.x, diver.y).gull();
             }
         } else if (this.state === 'mark') {
             diver.x += (this.target.x - diver.x) * Math.min(1, dt * 5);
@@ -311,6 +319,7 @@ export class FunnelWind {
                 this.state = 'dive';
                 this.at = time + 230;
                 this.from = { x: diver.x, y: diver.y };
+                sfx.at(diver.x, diver.y).gullDive();
             }
         } else if (this.state === 'dive') {
             const k = 1 - Math.max(0, this.at - time) / 230;
@@ -362,6 +371,8 @@ export class Flock {
     liftOff() {
         const s = this.scene, d = this.def;
         this.gone = true;
+        sfx.gull();
+        sfx.flap();
         return Promise.all(this.birds.map((b, i) => new Promise(resolve => {
             b.up = true;
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
@@ -541,7 +552,7 @@ export const topdeck = {
             w.carryBox.give();
             const glass = s.add.image(her.x + (her.flipX ? -12 : 12), her.y - 34, 'shipart', 'umbrella-cocktail').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
             w.add([glass]);
-            sfx.pickup();
+            sfx.give();
             await w.tween({ targets: glass, x: L.x + 13, y: L.y - 34, duration: 380, ease: 'Sine.easeInOut' });
             // A long sip, and another; a sigh.
             L.still = '';
@@ -556,11 +567,13 @@ export const topdeck = {
             }
             const heart = s.add.text(L.x + 4, L.y - 62, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 }).setOrigin(0.5).setDepth(s.DEPTH.fx);
             w.add([heart]);
+            sfx.at(L.x, L.y).aah();
             s.tweens.add({ targets: heart, y: heart.y - 16, alpha: 0, duration: 1000, onComplete: () => heart.destroy() });
             await w.tween({ targets: glass, x: L.x + 30, y: L.y - 23, duration: 300 });
+            sfx.at(glass.x, glass.y).clink();
             this.ladyGlass = glass;
             L.state = 'idle';
-            sfx.checkpoint();
+            sfx.done();
             // (Her bag has tipped: what was in it.)
             w.sparkle(this.T.lady.x - 39, L.y - 10);
             this.P.setFlag('lady');
@@ -588,7 +601,7 @@ export const topdeck = {
             w.carryBox.give();
             const cup = s.add.image(her.x + (her.flipX ? -12 : 12), her.y - 34, 'shipart', 'coffee-cup').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
             w.add([cup]);
-            sfx.pickup();
+            sfx.give();
             await w.tween({ targets: cup, x: e.x + e.dir * 11, y: e.y - 36, duration: 380, ease: 'Sine.easeInOut' });
             cup.setVisible(!e.meta.anims.drink);
             await this.people.play(e, 'drink', { times: 2 });
@@ -596,8 +609,10 @@ export const topdeck = {
             e.state = 'acting';
             const steam = s.add.text(e.x + e.dir * 4, e.y - 66, '♨', { fontFamily: 'Verdana, sans-serif', fontSize: '10px', color: '#cd683d', resolution: 4 }).setOrigin(0.5).setDepth(s.DEPTH.fx);
             w.add([steam]);
+            sfx.at(e.x, e.y).aah();
             s.tweens.add({ targets: steam, y: steam.y - 14, alpha: 0, duration: 900, onComplete: () => steam.destroy() });
             await w.wait(300);
+            sfx.done();
             await this.people.play(e, 'wave');
             e.state = 'acting';
             // The chain off its hook, and up he goes.
@@ -606,11 +621,12 @@ export const topdeck = {
             this.people.place(e);
             this.people.anim(e, 'walk');
             await w.tween({ targets: e, x: F.ladderX - e.dir * 10, duration: Math.abs(F.ladderX - e.x) * 12 + 80, onUpdate: () => this.people.place(e) });
-            sfx.rattle();
+            sfx.at(F.ladderX, e.y).ratchet();
             if (gate?.extra) await w.tween({ targets: gate.extra, alpha: 0, duration: 260 });
             e.x = F.ladderX;
             this.people.place(e);
             if (!this.people.anim(e, 'climb')) this.people.anim(e, 'walk');
+            s.time.addEvent({ delay: 280, repeat: 5, callback: () => sfx.at(e.x, e.sprite.y).rung() });
             await w.tween({ targets: e.sprite, y: e.y - 150, duration: 1700 });
             await w.tween({ targets: e.sprite, alpha: 0, duration: 200 });
             e.gone = true;
@@ -656,12 +672,12 @@ export const topdeck = {
             const dir = C.hoopX < her.x ? -1 : 1;
             const rim = { x: C.hoopX - dir * 24, y: C.y - 93 };
             her.setFlipX(dir < 0);
-            sfx.pickup();
+            sfx.take();
             await w.tween({ targets: ball, x: her.x + dir * 8, y: her.y - 40, duration: 220 });
             if (s.anims.exists('her-throw')) her.anims.play('her-throw');
             else s.pose('rise');
             await w.tween({ targets: ball, y: her.y - 62, duration: 240, ease: 'Quad.easeOut' });
-            sfx.jump();
+            sfx.toss();
             // Up, over, and through.
             const from = { x: ball.x, y: ball.y }, peak = rim.y - 34;
             await new Promise(resolve => s.tweens.addCounter({
@@ -674,12 +690,14 @@ export const topdeck = {
                 onComplete: resolve,
             }));
             s.pose('stand');
-            sfx.ding();
+            sfx.at(rim.x, rim.y).swish();
+            if (!w.save.seen.includes('sec_court')) sfx.secret();
             w.sparkle(rim.x, rim.y + 6, 0xfbff86);
             await w.tween({ targets: ball, y: C.y - 5, duration: 330, ease: 'Quad.easeIn' });
-            sfx.land();
+            sfx.at(ball.x, C.y).bounce();
             await w.tween({ targets: ball, y: C.y - 30, x: ball.x - dir * 20, duration: 220, ease: 'Quad.easeOut' });
             await w.tween({ targets: ball, y: C.y - 5, x: ball.x - dir * 20, duration: 220, ease: 'Quad.easeIn' });
+            sfx.at(ball.x, C.y).bounce();
             await w.tween({ targets: ball, x: C.ballX, angle: 0, duration: 700, ease: 'Sine.easeOut' });
             if (!w.save.seen.includes('sec_court')) {
                 w.save.seen.push('sec_court');
@@ -699,6 +717,7 @@ export const topdeck = {
             her.setFlipX(this.T.funnel.telescopeX < her.x);
             if (s.anims.exists('her-idle-look')) her.anims.play('her-idle-look');
             await w.wait(350);
+            sfx.scope();
             await w.tween({ targets: s.fade, alpha: 1, duration: 200 });
             if (!s.textures.exists('scope-mask')) {
                 const W = s.scale.width, H = s.scale.height;
@@ -730,6 +749,8 @@ export const topdeck = {
             await w.tween({ targets: s.fade, alpha: 0, duration: 250 });
             // It swings along the balconies to the frame.
             await new Promise(resolve => cam.pan(look.x, look.y - 10, 1300, 'Sine.easeInOut', true, (_, k) => { if (k === 1) resolve(); }));
+            if (w.save.seen.includes('sec_telescope')) sfx.sparkle();
+            else sfx.secret();
             await w.wait(1900);
             await w.tween({ targets: s.fade, alpha: 1, duration: 200 });
             glint.destroy();
@@ -777,7 +798,7 @@ export const topdeck = {
     // The blast: the top shakes, rings of sound leave the trumpets, the pipes cough smoke.
     blast(ms) {
         const s = this.scene, w = this.world, F = this.T.funnel, top = w.data.funnel.y;
-        sfx.horn?.(ms / 1000);
+        sfx.horn(ms / 1000);
         s.cameras.main.shake(ms, 0.006);
         for (let i = 0; i * 170 < ms; i++) {
             s.time.delayedCall(i * 170, () => {
@@ -799,13 +820,13 @@ export const topdeck = {
         const s = this.scene, w = this.world, cat = this.hornCat, f = w.data.funnel;
         if (!cat?.visible) return;
         this.hornCatGone = true;
-        sfx.mrrp();
+        sfx.at(cat.x, cat.y).meow();
         cat.play('bumbot-jump');
         s.tweens.chain({
             targets: cat,
             tweens: [
                 { y: cat.y - 34, duration: 200, ease: 'Quad.easeOut' },
-                { x: f.head[0] + 4, y: f.head[1], duration: 280, ease: 'Quad.easeIn', onComplete: () => cat.play('bumbot-run') },
+                { x: f.head[0] + 4, y: f.head[1], duration: 280, ease: 'Quad.easeIn', onComplete: () => { cat.play('bumbot-run'); sfx.at(cat.x, cat.y).scramble(); } },
                 { x: f.shoulder[0], y: f.shoulder[1], duration: 620 },
                 { x: f.foot[0], y: f.foot[1], duration: 240 },
                 { x: f.foot[0] - 260, duration: 520, onComplete: () => cat.setVisible(false) },
@@ -823,7 +844,7 @@ export const topdeck = {
             const cat = s.add.sprite(fromX, y, 'bumbot').setOrigin(0.5, 1).setDepth(D.player + 0.05).setFlipX(toX < fromX);
             cat.play('bumbot-run');
             w.add([cat]);
-            s.tweens.add({ targets: cat, x: toX, duration: ms, delay, onStart: () => sfx.mrrp(), onComplete: () => cat.destroy() });
+            s.tweens.add({ targets: cat, x: toX, duration: ms, delay, onStart: () => sfx.scramble(), onComplete: () => cat.destroy() });
         };
         const L = T.lady, lady = this.who('npc_oldlady'), rival = this.who('riv_sundeck');
         cam.stopFollow();
@@ -840,8 +861,9 @@ export const topdeck = {
                 await w.wait(350);
                 const card = s.add.image(rival.x + 6, rival.y - 30, 'shipart', 'key-card').setScale(0.5).setTint(0xfbe38a).setDepth(D.props + 0.09);
                 w.add([card]);
+                sfx.yelp();
                 await w.tween({ targets: rival.sprite, y: rival.y - 22, duration: 170, ease: 'Quad.easeOut', yoyo: true });
-                s.tweens.add({ targets: card, x: L.cardX, y: L.y - 5, angle: 360, duration: 520, ease: 'Quad.easeIn' });
+                s.tweens.add({ targets: card, x: L.cardX, y: L.y - 5, angle: 360, duration: 520, ease: 'Quad.easeIn', onComplete: () => sfx.sparkle() });
                 this.dropped = card;
                 await w.wait(300);
                 rival.dir = -1;
@@ -867,10 +889,12 @@ export const topdeck = {
                 const bang = s.add.text(lady.x, lady.y - 70, '!', { fontFamily: 'Verdana, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 3, resolution: 4 })
                     .setOrigin(0.5, 1).setDepth(D.fx);
                 w.add([bang]);
+                sfx.oh();
                 s.tweens.add({ targets: bang, alpha: 0, delay: 500, duration: 200, onComplete: () => bang.destroy() });
                 await w.tween({ targets: lady.sprite, y: lady.sprite.y - 12, duration: 150, ease: 'Quad.easeOut', yoyo: true });
                 // Her bags under her arm, and off, forward.
                 const bags = w.things.find(t => t.id === 'blk_oldlady')?.items ?? [];
+                sfx.scrape();
                 await this.people.play(lady, 'bolt');
                 lady.state = 'acting';
                 lady.sprite.y = lady.y;

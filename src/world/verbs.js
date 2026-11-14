@@ -90,7 +90,7 @@ export const verbs = {
         this.kickedAt = time;           // (letting go of jump doesn't cut a kick short)
         this.takeoffY = p.y;           // a fall is measured from her last hold
         p.setFlipX(away < 0);
-        sfx.jump();
+        sfx.wallKick();
         return true;
     },
 
@@ -119,6 +119,7 @@ export const verbs = {
         if (on !== this.gliding) {
             this.gliding = on;
             this.world.showParasol(on);
+            if (on) sfx.parasolOpen(); else sfx.parasolShut();
         }
         return on;
     },

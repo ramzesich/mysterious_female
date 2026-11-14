@@ -166,22 +166,23 @@ export const lido = {
         if (tub) {
             tub.dir = -1;
             this.people.place(tub);
+            sfx.at(tub.x, tub.y).giggle();
             await w.tween({ targets: tub.sprite, y: this.tubBase() - 17, duration: 240, ease: 'Back.easeOut' });
             this.people.play(tub, 'squirt');
         }
         await w.wait(300);
-        sfx.splash();
+        sfx.at(L.tubX - 15, L.y - 44).jet();
         this.jet(L.tubX - 15, L.y - 44, c.x + 5, L.y - 15, 420);
         await w.wait(200);
         // Hit: he goes straight up, and comes down in the pool.
         s.tweens.killTweensOf(c);
         c.setScale(1).setFlipX(true).play('bumbot-jump');
-        sfx.mrrp();
+        sfx.at(c.x, c.y).meow();
         const inX = Math.max(L.pools[0].x0 + 30, L.pools[0].x1 - 84);
         await w.tween({ targets: c, x: (c.x + inX) / 2 + 6, y: L.y - 56, duration: 300, ease: 'Quad.easeOut' });
         await w.tween({ targets: c, x: inX, y: surface + 6, duration: 260, ease: 'Quad.easeIn' });
         s.splash(inX, surface);
-        sfx.splash();
+        sfx.at(inX, surface).splash();
         c.setVisible(false);
         if (!swimming && pool) {
             // And she, reaching after him, goes in too.
@@ -200,6 +201,7 @@ export const lido = {
         await w.wait(650);
         // Up the ladder beside her, dripping, onto the lever's housing; he shakes himself dry.
         c.setVisible(true).setFlipX(false).setPosition(L.ladderX, surface + 12).play('bumbot-run');
+        sfx.at(L.ladderX, surface).splashSmall();
         await w.tween({ targets: c, y: L.y, duration: 420 });
         if (swimming) her.setFlipX(false);
         c.play('bumbot-jump');
@@ -213,16 +215,18 @@ export const lido = {
             s.tweens.add({ targets: d, x: d.x + Math.cos(a) * Phaser.Math.Between(16, 40), y: d.y + Math.sin(a) * Phaser.Math.Between(8, 26) + 14,
                 alpha: 0, duration: 520, delay: i * 30, onComplete: () => d.destroy() });
         }
-        sfx.splash();
+        sfx.at(c.x, c.y).splashSmall();
         await w.wait(820);
         c.setScale(1);
         // His jump off it throws the lever. Then aft along the pools' far side, and gone.
         c.play('bumbot-jump').setFlipX(false);
         this.lever.setTexture('lever-down');
-        sfx.smash();
+        sfx.at(L.leverX, L.y).lever();
         s.cameras.main.shake(180, 0.003);
         await w.tween({ targets: c, x: L.leverX + 30, y: L.y, duration: 200, ease: 'Quad.easeIn' });
         c.play('bumbot-run').setDepth(s.DEPTH.decor + 0.05);
+        sfx.at(c.x, c.y).scramble();
+        sfx.at(c.x, c.y).mrrp();
         const view = s.cameras.main.worldView;
         await w.tween({ targets: c, x: view.right + 60, duration: ((view.right + 60 - c.x) / 300) * 1000 });
         cat.away = true;
@@ -325,11 +329,12 @@ export const lido = {
             k.nextSquirt = time + KID.every;
             const end = k.x + k.dir * KID.jet;
             this.jet(k.x + k.dir * 13, k.y - 25, end, k.y - 22, 380);
-            sfx.splash();
+            sfx.at(k.x, k.y).jet();
             s.time.delayedCall(110, () => {
                 const ahead = (her.x - k.x) * k.dir;
                 const hit = s.mode === 'play' && s.route === 'inside' && ahead > 4 && ahead < KID.jet && her.y > k.y - 20 && Math.abs(her.y - k.y) < 40;
                 if (!hit || P.has('kid_fed')) return;
+                sfx.splashSmall();
                 if (w.carry) w.carryBox.spill(k.x);
                 else s.scareContact(k.x, 'splashed');
             });
@@ -338,7 +343,7 @@ export const lido = {
         // Her shout sends him running.
         if (!fed && playing && level && s.isDashing() && Math.abs(dx) < KID.sees) {
             k.mode = 'flee';
-            sfx.rattle();
+            sfx.at(k.x, k.y).oh();
             return;
         }
         // A cone for him: he waits for it, turned to her.
@@ -356,7 +361,7 @@ export const lido = {
             k.waitUntil = time + KID.tell;
             k.pose = 'aim';
             if (!this.people.anim(k, 'squirt')) k.sprite.setFrame(k.meta.stand);
-            sfx.rattle();
+            sfx.at(k.x, k.y).giggle();
             return;
         }
         // The security officer on his knees at a lounger gets it too, now and then; and, once the
@@ -367,7 +372,8 @@ export const lido = {
             k.pauseUntil = time + 700;
             stand();
             this.jet(k.x + k.dir * 13, k.y - 25, riv.x, riv.y - 20, 380);
-            sfx.splash();
+            sfx.at(k.x, k.y).jet();
+            s.time.delayedCall(200, () => sfx.at(riv.x, riv.y).grumble());
             this.people.play(riv, 'shake');
             return;
         }
@@ -376,7 +382,7 @@ export const lido = {
             k.pauseUntil = time + 800;
             stand();
             this.jet(k.x + k.dir * 10, k.y - 30, k.x + k.dir * 46, k.y - 118, 420);
-            sfx.splash();
+            sfx.at(k.x, k.y).jet();
             return;
         }
         step(KID.walk);
@@ -410,7 +416,7 @@ export const lido = {
             w.carryBox.give();
             const img = s.add.image(her.x + (her.flipX ? -12 : 12), her.y - 31, kind === 'cone' ? 'load-cone' : 'load-stub').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
             w.add([img]);
-            sfx.pickup();
+            sfx.give();
             await w.tween({ targets: img, x: k.x + k.dir * 9, y: k.y - 22, duration: 340, ease: 'Sine.easeInOut' });
             if (kind === 'stub') {
                 // He looks at it, and at her.
@@ -424,6 +430,7 @@ export const lido = {
                     await w.wait(170);
                 }
                 await w.tween({ targets: img, y: k.y - 1, x: img.x + k.dir * 8, angle: 100, duration: 300, ease: 'Quad.easeIn' });
+                sfx.at(img.x, k.y).plop();
                 s.tweens.add({ targets: img, alpha: 0, delay: 900, duration: 500, onComplete: () => img.destroy() });
                 w.foodGulls?.gull_pool?.pounce(img.x);
                 k.state = state === 'acting' ? 'idle' : state;
@@ -433,7 +440,7 @@ export const lido = {
             }
             img.setPosition(k.x + k.dir * 8, k.y - 27).setDepth(k.sprite.depth + 0.01);
             const eating = this.people.play(k, 'eat', { times: 3 });
-            for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 800, () => img.active && img.setScale(1, 1 - i * 0.28));
+            for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 800, () => { if (img.active) { img.setScale(1, 1 - i * 0.28); sfx.at(k.x, k.y).munch(); } });
             await eating;
             img.destroy();
             k.state = 'acting';
@@ -443,11 +450,12 @@ export const lido = {
                 w.add([heart]);
                 s.tweens.add({ targets: heart, y: heart.y - 18 - i * 4, alpha: 0, duration: 1000, delay: i * 130, onComplete: () => heart.destroy() });
             }
-            sfx.checkpoint();
+            sfx.at(k.x, k.y).heart();
             await w.wait(700);
             k.state = 'idle';
             k.pose = null;
             // The machine has given its last: that is the next thing.
+            sfx.done();
             this.P.setFlag('kid_fed');
         });
         return true;
@@ -466,7 +474,8 @@ export const lido = {
                 w.carryBox.give();
                 const can = s.add.image(L.machineX - 2, L.y - 58, 'load-canister').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05).setAngle(150);
                 w.add([can]);
-                sfx.rattle();
+                sfx.pour();
+                s.time.delayedCall(650, () => sfx.pour());
                 for (let i = 0; i < 12; i++) {
                     const d = s.add.rectangle(can.x + 2, can.y - 2, 2, 3, 0xfdf2e3).setDepth(s.DEPTH.fx);
                     w.add([d]);
@@ -475,7 +484,7 @@ export const lido = {
                 await w.wait(1300);
                 can.destroy();
                 s.pose('stand');
-                sfx.checkpoint();
+                sfx.done();
                 w.sparkle(L.machineX, L.y - 34, 0x1ebc73);
                 P.setFlag('refilled');
             });
@@ -484,7 +493,7 @@ export const lido = {
         if (w.carry) return false;
         if (P.has('kid_fed') && !P.has('refilled')) {
             // Empty: a cough, a puff. Her husband knows what it wants.
-            sfx.rattle();
+            sfx.at(L.machineX, L.y).cough();
             const puff = s.add.image(L.machineX + 3, L.y - 24, 'dot').setTint(0xc7dcd0).setScale(2).setDepth(s.DEPTH.fx);
             w.add([puff]);
             s.tweens.add({ targets: puff, y: puff.y - 14, alpha: 0, scale: 4, duration: 600, onComplete: () => puff.destroy() });
@@ -503,7 +512,6 @@ export const lido = {
             her.anims.pause();
         } else s.pose('stand');
         this.swirl = { k: 0 };
-        sfx.rattle();
         return true;
     },
 
@@ -517,6 +525,11 @@ export const lido = {
             return;
         }
         if (input.activate && sw.k < SWIRL.max) sw.k += (dt * 1000) / SWIRL.ms;
+        // (Its motor, for as long as it runs: a stretch of it, begun again as the last one ends.)
+        if (input.activate && sw.k < SWIRL.max && time >= (sw.soundAt ?? 0)) {
+            sw.soundAt = time + 280;
+            sfx.at(L.machineX, L.y).whirr(0.4);
+        }
         const k = sw.k;
         // The cone under the spout, its swirl rising; and the meter: grey, green, red.
         const cx = L.machineX + 3, cy = L.y - 21, h = Math.round(k * 13);
@@ -554,7 +567,7 @@ export const lido = {
         const kind = k < SWIRL.perfect ? 'stub' : k <= SWIRL.over ? 'cone' : 'toppled';
         this.lastSwirl = kind;
         if (kind === 'toppled') return this.toppled(cx, cy);
-        if (kind === 'cone') sfx.checkpoint();
+        if (kind === 'cone') sfx.done();
         // With every errand done, it is hers: she eats it where she stands (population: `sec_cone`).
         if (this.P.has('table')) return this.forHerself(kind);
         this.world.carryBox.take(kind);
@@ -567,7 +580,7 @@ export const lido = {
         w.add([img]);
         w.say('Ой!', 700);
         s.tweens.add({ targets: img, x: x - 16, y: L.y, angle: -110, duration: 380, ease: 'Quad.easeIn', onComplete: () => {
-            sfx.smash();
+            sfx.at(img.x, L.y).plop();
             w.foodGulls?.gull_go?.pounce(img.x - 4);
             s.tweens.add({ targets: img, alpha: 0, delay: 1700, duration: 700, onComplete: () => img.destroy() });
         } });
@@ -591,6 +604,7 @@ export const lido = {
             await w.wait(200);
             s.pose('stand');
             if (!this.P.save.seen.includes('sec_cone')) {
+                sfx.secret();
                 this.P.save.seen.push('sec_cone');
                 writeSave(this.P.save);
             }
@@ -614,7 +628,10 @@ export const lido = {
         }
         if (w.carry && kind !== 'stub' && kind !== 'cone') return false;
         // Not yet, or not that one: he shows again what is wanted (once the machine has run empty).
-        if (kind === 'stub' && P.has('refilled')) this.people.play(h, 'laugh');
+        if (kind === 'stub' && P.has('refilled')) {
+            this.people.play(h, 'laugh');
+            sfx.at(h.x, h.y).laugh();
+        }
         w.nudge(h);
         return true;
     },
@@ -646,6 +663,7 @@ export const lido = {
                 const heart = s.add.text(L.tableX + (i % 2 ? 5 : -5), L.y - 52, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
                 w.add([heart]);
+                sfx.heart();
                 s.tweens.add({ targets: heart, y: heart.y - 22, alpha: 0, duration: 1100, onComplete: () => heart.destroy() });
             }
             await w.wait(500);
@@ -653,7 +671,7 @@ export const lido = {
             // The picture, on the table between them.
             this.P.setFlag('table');
             w.sparkle(L.tableX, L.y - 40);
-            sfx.checkpoint();
+            sfx.done();
             await w.wait(700);
             this.people.idle(h);
             await w.handOver(h, '@book-6', () => w.giveBook(6));
@@ -677,13 +695,15 @@ export const lido = {
             await w.tween({ targets: her, x: stand, duration: Math.abs(stand - her.x) * 9 + 40 });
             her.setFlipX(to < her.x);
             if (s.anims.exists('her-push')) her.anims.play('her-push');
+            sfx.scrape();
             await w.tween({ targets: [p, her], x: `+=${to - from}`, duration: 520, ease: 'Sine.easeInOut' });
             this.pawnOut = !this.pawnOut;
-            sfx.land();
+            sfx.knock();
             s.pose('stand');
             her.body.reset(her.x, her.y);
             await w.wait(250);
             if (!this.P.save.seen.includes('sec_chess')) {
+                sfx.secret();
                 this.P.save.seen.push('sec_chess');
                 writeSave(this.P.save);
             }
@@ -704,7 +724,7 @@ export const lido = {
             s.pose('front');
             await w.tween({ targets: her, y: L.y + 2, duration: 200, ease: 'Quad.easeIn' });
             s.splash(L.tubX, L.y - 38);
-            sfx.splash();
+            sfx.splashSmall();
             const t0 = s.time.now;
             const steam = s.time.addEvent({ delay: 170, loop: true, callback: () => {
                 const d = s.add.image(L.tubX + Phaser.Math.Between(-18, 18), L.y - 40, 'dot').setTint(0xffffff).setAlpha(0.7).setScale(2).setDepth(s.DEPTH.props + 0.3);
@@ -714,11 +734,16 @@ export const lido = {
             } });
             // (Any key, after a moment: `soaking` is read each frame, in updateLido.)
             this.soaking = { from: t0 + 1800, out: false };
-            while (!this.soaking.out && s.time.now - t0 < 12000) await w.wait(60);
+            for (let at = 0; !this.soaking.out && s.time.now - t0 < 12000; await w.wait(60)) {
+                if (s.time.now < at) continue;
+                at = s.time.now + 1100;
+                sfx.bubbles(1.3);
+            }
             this.soaking = null;
             steam.remove();
             her.setDepth(back.depth);
             s.pose('rise');
+            sfx.splashSmall();
             await w.tween({ targets: her, y: L.y - 34, duration: 220, ease: 'Quad.easeOut' });
             s.pose('fall');
             await w.tween({ targets: her, x: back.x, y: L.y, duration: 220, ease: 'Quad.easeIn' });
@@ -726,6 +751,7 @@ export const lido = {
             her.body.reset(her.x, L.y);
             s.pose('stand');
             if (!this.P.save.seen.includes('sec_hottub')) {
+                sfx.secret();
                 this.P.save.seen.push('sec_hottub');
                 writeSave(this.P.save);
             }

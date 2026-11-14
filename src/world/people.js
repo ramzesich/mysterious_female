@@ -5,6 +5,7 @@
 // (tools/cast.py, tools/build_people.py).
 
 import { PLAYER } from '../config.js';
+import { sfx } from '../sfx.js';
 
 const M = 48;                           // px per metre
 const BUBBLE = { w: 22, h: 20, rise: 8 };
@@ -161,6 +162,10 @@ export class People {
                     && (!b.when || this.world.cond(b.when)) && (!b.unless || !this.world.cond(b.unless));
                 const bob = Math.round(Math.sin(time / 300) * 1.5);
                 const by = p.y - (p.dy ?? 0) - PLAYER.height - BUBBLE.rise + bob;
+                // (Its pop, but not again each time a scene or her going to and fro hides it a moment.)
+                if (show && !p.bubbleShown && time > (p.bubbleQuietUntil ?? 0)) sfx.at(p.x, p.y).bubble();
+                if (show) p.bubbleQuietUntil = time + 6000;
+                p.bubbleShown = show;
                 p.bubbleItems[0].setVisible(show).setPosition(p.x, by);
                 p.bubbleItems[1].setVisible(show).setPosition(p.x, by - BUBBLE.h / 2);
             }

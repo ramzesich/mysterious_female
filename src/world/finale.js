@@ -96,11 +96,14 @@ export class Crossers {
         for (const b of this.birds) {
             b.sprite.setVisible(on);
             if (!on) continue;
+            const was = b.dir;
             if (!this.parked) Object.assign(b, this.at(b, time));
+            if (b.dir !== was) sfx.at(b.x, b.y).gull();
             const y = b.y + Math.round(Math.sin(time / 420 + b.i * 2) * 3);
             b.sprite.setPosition(b.x, y).setFrame(Math.floor(time / 130) % 2 ? 'gull-down' : 'gull-up').setFlipX(b.dir < 0);
             // (Only in the air: on a deck she is under its flight.)
             const hit = s.mode === 'play' && s.route === 'inside' && !s.grounded && Math.abs(p.x - b.x) < 14 && y > p.y - PLAYER.height + 2 && y < p.y - 4;
+            if (hit) sfx.at(b.x, y).gull();
             if (hit) s.scareAir('swooped');
         }
     }
@@ -185,6 +188,7 @@ export const finale = {
 
     heart(x, y, n = 1) {
         const s = this.scene;
+        sfx.at(x, y).heart();
         for (let i = 0; i < n; i++) {
             const h = s.add.text(x + (n > 1 ? Phaser.Math.Between(-12, 12) : 0), y, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
                 .setOrigin(0.5).setDepth(s.DEPTH.fx);
@@ -203,6 +207,7 @@ export const finale = {
             const pan = (x, y, ms) => new Promise(resolve => cam.pan(x, y, ms, 'Sine.easeInOut', true, (_, k) => { if (k === 1) resolve(); }));
             her.setFlipX(true);
             await w.wait(500);
+            sfx.sunset(4.5);
             s.tweens.addCounter({ from: 0, to: 1, duration: 4500, ease: 'Sine.easeInOut', onUpdate: t => s.setDusk(t.getValue()) });
             await w.wait(2200);
             // He trots the last of the way to the tip and sits, looking out.
@@ -214,6 +219,7 @@ export const finale = {
             await w.tween({ targets: cat, x: Mo.catX, duration: 1900 });
             cat.anims.timeScale = 1;
             cat.play('bumbot-sit');
+            sfx.meow();
             await there;
             await w.wait(1700);
             await pan(her.x, her.y - HALF, 2800);
@@ -264,6 +270,7 @@ export const finale = {
                 T.coming = true;
                 cat.play('bumbot-run');
                 cat.anims.timeScale = 0.45;
+                sfx.at(cat.x, cat.y).meow();
             }
             cat.x -= Math.sign(dx) * TIP.come * dt;
         } else {
@@ -285,7 +292,7 @@ export const finale = {
         T.hearts = 0;
         T.coming = false;
         cat.anims.timeScale = 1;
-        sfx.mrrp();
+        sfx.at(cat.x, cat.y).mrrp();
         const limit = dir < 0 ? Mo.x0 : Mo.x1, room = Math.abs(limit - cat.x);
         const settle = () => {
             cat.setFlipX(cat.x > her.x).play('bumbot-sit');
@@ -298,6 +305,7 @@ export const finale = {
         } else {
             const to = Phaser.Math.Clamp(her.x - dir * TIP.dart, Mo.x0 + 30, Mo.x1 - 30);
             cat.setFlipX(dir > 0).play('bumbot-jump');
+            sfx.at(cat.x, cat.y).scramble();
             s.time.delayedCall(140, () => cat.play('bumbot-run'));
             s.tweens.add({ targets: cat, x: to, duration: Math.abs(to - cat.x) / 0.32, onComplete: settle });
         }
@@ -327,7 +335,7 @@ export const finale = {
             await w.tween({ targets: cat, x: front, duration: Math.max(350, Math.abs(cat.x - front) / 0.07) });
             cat.anims.timeScale = 1;
             cat.setFlipX(side > 0).play('bumbot-sit');
-            sfx.mrrp();
+            sfx.at(cat.x, cat.y).meow();
             this.heart(cat.x, cat.y - 28);
             await w.wait(1000);
             her.setFlipX(side < 0);
@@ -338,7 +346,8 @@ export const finale = {
             cat.setVisible(false).setY(Mo.y);
             s.holding = true;
             s.pose('stand');
-            sfx.checkpoint();
+            sfx.caught();
+            sfx.purr(2.8);
             this.heart(her.x, her.y - PLAYER.height - 2, 6);
             await w.wait(1500);
             s.pose('front');
@@ -366,6 +375,7 @@ export const finale = {
                 if (d < 2 * M && !p.hearted) {
                     p.hearted = true;
                     this.heart(p.x, p.y - PLAYER.height - 4);
+                    if (id === 'amb_counsellor') sfx.at(p.x, p.y).cheer(2.2);
                 }
                 continue;
             }
@@ -375,6 +385,12 @@ export const finale = {
                 p.dir = her.x < p.x ? -1 : 1;
                 this.people.place(p);
                 if (!this.people.anim(p, clip)) this.people.idle(p);
+                if (!p.greeted) {
+                    p.greeted = true;
+                    if (clip === 'applaud') sfx.at(p.x, p.y).clap(2.2);
+                    else if (clip === 'wave') sfx.at(p.x, p.y).hey();
+                    else sfx.at(p.x, p.y).aah();
+                }
                 p.welcoming = true;
                 if (!p.hearted && d < 1.6 * M) {
                     p.hearted = true;
@@ -414,6 +430,7 @@ export const finale = {
             await w.wait(600);
             // Out of her arms, onto the bed; round once, and down in a ball.
             cat.setVisible(true).setPosition(her.x - 10, her.y - 24).setFlipX(true).play('bumbot-jump');
+            sfx.at(cat.x, cat.y).mrrp();
             s.holding = false;
             s.pose('stand');
             await w.tween({ targets: cat, x: H.catX, y: top, duration: 320, ease: 'Quad.easeIn' });
@@ -427,7 +444,7 @@ export const finale = {
             cat.anims.stop();
             cat.anims.timeScale = 1;
             cat.setFrame(s.cache.json.get('bumbot-meta').frames.asleep);
-            sfx.mrrp();
+            sfx.at(cat.x, cat.y).purr(2.9);
             // She sits down by him, her legs over the bed's side.
             if (s.anims.exists('her-read')) {
                 her.anims.play('her-read');
@@ -435,7 +452,6 @@ export const finale = {
             }
             this.heart(cat.x, cat.y - 16, 4);
             if (husband?.on) this.heart(husband.x, husband.y - 50, 2);
-            sfx.checkpoint();
             await w.wait(2400);
             await this.winScreen();
             // The next day: he sleeps on, she is up.
@@ -456,8 +472,11 @@ export const finale = {
 
     // E by him, asleep on the bed, any day after: a purr.
     purr() {
-        const cat = this.bedCat;
-        sfx.mrrp();
+        const cat = this.bedCat, now = this.scene.time.now;
+        if (now > (this.purrAt ?? 0)) {
+            this.purrAt = now + 1600;
+            sfx.at(cat.x, cat.y).purr(1.6);
+        }
         this.heart(cat.x, cat.y - 14, 3);
         this.scene.tweens.add({ targets: cat, scaleY: 1.06, duration: 260, yoyo: true, repeat: 1 });
         return true;
@@ -486,7 +505,7 @@ export const finale = {
             s.uiLayer.add(items);
             this.winItems = items;
             s.tweens.add({ targets: [band, title, line, tally, note], alpha: { from: 0, to: 1 }, duration: 900 });
-            sfx.checkpoint();
+            sfx.win();
             s.time.delayedCall(2200, () => {
                 go.setVisible(true);
                 s.tweens.add({ targets: go, alpha: { from: 0.4, to: 1 }, duration: 700, yoyo: true, repeat: -1 });

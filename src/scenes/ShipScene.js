@@ -7,6 +7,7 @@ import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
 import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '../background.js';
 import { World, OUTSIDE } from '../world/world.js';
+import { Soundscape } from '../world/soundscape.js';
 import { verbs } from '../world/verbs.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
@@ -114,7 +115,10 @@ export class ShipScene extends Phaser.Scene {
         this.script = null;
 
         this.spawnAt(this.initialSpawn());
+        // The ambience and her footsteps (src/world/soundscape.js).
+        this.soundscape = new Soundscape(this);
         window.__ship = this; // handle for headless tests and the console
+        window.__sfx = sfx;
     }
 
     // --- Building --------------------------------------------------------------------------
@@ -1165,7 +1169,7 @@ export class ShipScene extends Phaser.Scene {
             return true;
         }
         this.setBulkheadOpen(b, true);
-        sfx.door();
+        sfx.doorHeavy();
         return true;
     }
 
@@ -1284,6 +1288,8 @@ export class ShipScene extends Phaser.Scene {
             if (!lock.quiet) this.showLock(lock);
             return true;
         }
+        // (A crew door that her card opens: the reader's beep first.)
+        if (door.room?.lockSpec?.kind === 'card' && door.to !== 'inside') sfx.beep();
         sfx.door();
         this.travel(door.x, door.y ?? p.y, door.to);
         return true;
@@ -2418,9 +2424,25 @@ export class ShipScene extends Phaser.Scene {
         this.fade = this.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422).setOrigin(0).setAlpha(0);
         this.debugText = this.add.text(VIEW.width - 12, 12, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff' })
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
-        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText]);
+        // The sound's sign, shown a moment when M switches it: a loudspeaker, crossed out when muted.
+        this.soundSign = this.add.graphics().setAlpha(0);
+        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText, this.soundSign]);
         this.progress.buildHud(this.uiLayer);
         this.refreshHud();
+    }
+
+    showSoundSign(muted) {
+        const g = this.soundSign, x = VIEW.width - 64, y = 26;
+        g.clear();
+        g.fillStyle(0x1d2b53, 0.85).fillRoundedRect(x - 12, y - 10, 62, 44, 6);
+        g.fillStyle(0xffffff, 1).fillRect(x, y + 6, 10, 12);
+        g.fillTriangle(x + 8, y + 12, x + 20, y, x + 20, y + 24);
+        g.lineStyle(3, muted ? 0xe83b3b : 0xffffff, 1);
+        if (muted) g.lineBetween(x + 26, y + 4, x + 42, y + 20).lineBetween(x + 42, y + 4, x + 26, y + 20);
+        else g.beginPath().arc(x + 22, y + 12, 8, -0.9, 0.9).strokePath().beginPath().arc(x + 22, y + 12, 15, -0.9, 0.9).strokePath();
+        this.tweens.killTweensOf(g);
+        g.setAlpha(1);
+        this.tweens.add({ targets: g, alpha: 0, delay: 1300, duration: 400 });
     }
 
     // The sunset coming on (0 the day, 1 the full sunset): the sky, the sea, the windows' copies of
@@ -2532,6 +2554,8 @@ export class ShipScene extends Phaser.Scene {
         }
         this.farGulls.update(dt);
         this.backdrop.update(dt, !!this.overview, this.horizonOnScreen);
+        this.soundscape.update(dt);
+        if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
         if (input.outsidePressed || (this.overview && input.escapePressed)) {
@@ -2596,7 +2620,7 @@ export class ShipScene extends Phaser.Scene {
         this.feetWas = p.y;
 
         if (onFloor) {
-            if (!this.grounded) sfx.land();
+            if (!this.grounded) sfx.land(this.soundscape.floor());
             // (Not in the hop's first moment: her body can still report the floor she has just left.)
             if (this.overRail && time - this.overRailAt > 250) {
                 this.overRail = false;
@@ -2605,6 +2629,7 @@ export class ShipScene extends Phaser.Scene {
             if (this.gliding) {
                 this.gliding = false;
                 this.world.showParasol(false);
+                sfx.parasolShut();
             }
             this.grounded = true;
             this.lastGroundedAt = time;
@@ -2660,7 +2685,7 @@ export class ShipScene extends Phaser.Scene {
             body.velocity.y = -PLAYER.jumpVelocity * this.jumpScale();
             this.jumpBufferedAt = -Infinity;
             this.lastGroundedAt = -Infinity;
-            sfx.jump();
+            if (this.jumpScale() < 1) sfx.hop(); else sfx.jump();
         } else if (!onFloor && this.tryWallJump(input, time)) {
             this.jumpBufferedAt = -Infinity;
         }
@@ -2668,6 +2693,10 @@ export class ShipScene extends Phaser.Scene {
             body.velocity.y = -PLAYER.jumpCutVelocity;
         }
         const sliding = !onFloor && this.updateWallSlide(dir);
+        if (sliding && time > (this.slideSoundAt ?? 0)) {
+            this.slideSoundAt = time + 170;
+            sfx.wallSlide();
+        }
         const gliding = !onFloor && this.updateGlide(input, dt);
         this.world.push(dt, onFloor);
 
@@ -2679,6 +2708,7 @@ export class ShipScene extends Phaser.Scene {
             if (time > (this.mewAt ?? 0)) {
                 this.mewAt = time + 2500;
                 this.world.say('Мяу!', 900);
+                sfx.meow();
             }
         } else if (pool) return this.enterPool(pool);
 
@@ -2746,7 +2776,7 @@ export class ShipScene extends Phaser.Scene {
         const shut = closed => {
             s.open.setVisible(!closed);
             c.towel.x = towelX - (closed ? 0 : CABIN.slide);
-            sfx.door();
+            sfx.doorSlide();
         };
         shut(false);
         let t = 0, phase = 'walk';
@@ -2770,6 +2800,7 @@ export class ShipScene extends Phaser.Scene {
                 shut(true);
                 [s.inside, s.glass, s.her].forEach(o => o.setVisible(true));
                 s.her.anims.play('her-shower');
+                sfx.shower(SHOWER.showerMs / 1000);
                 phase = 'shower';
                 t = 0;
             } else if (phase === 'shower' && t > SHOWER.showerMs) {
@@ -2812,6 +2843,7 @@ export class ShipScene extends Phaser.Scene {
         }
         if (s.noteAt <= 0) {
             s.noteAt = SHOWER.noteEveryMs;
+            sfx.hum(s.notes = (s.notes ?? -1) + 1);
             const note = this.add.text(x0 + w / 2 + (Math.random() - 0.5) * w * 0.6, y0 - 2, Math.random() < 0.5 ? '\u266a' : '\u266b', {
                 fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#45293f', resolution: 4,
             }).setOrigin(0.5, 1).setDepth(s.open.depth + 0.002);
@@ -2888,6 +2920,8 @@ export class ShipScene extends Phaser.Scene {
             // Each hop: on the bed a moment around the landing, in the air the rest, highest at its
             // middle, a foot up.
             const g = ((phase * 2) % 1 + 0.35) % 1;
+            if (g >= BED_JOY.air && !(this.bedG >= BED_JOY.air)) sfx.boing();       // each landing: the springs
+            this.bedG = g;
             p.y = g < BED_JOY.air ? y - Math.round(BED_JOY.hop * Math.sin(Math.PI * g / BED_JOY.air)) : y;
         };
     }
@@ -3052,6 +3086,7 @@ export class ShipScene extends Phaser.Scene {
             p.body.velocity.y = -PLAYER.jumpVelocity;
             p.body.velocity.x = (p.flipX ? -1 : 1) * PLAYER.runSpeed * 0.6;
             this.takeoffY = pool.y;
+            sfx.splashSmall();
             sfx.jump();
         }
     }
@@ -3230,7 +3265,7 @@ export class ShipScene extends Phaser.Scene {
     openTrunkDoor(door) {
         door.open = true;
         door.sprite.setTexture('trunk-open');
-        sfx.door();
+        sfx.doorHeavy();
     }
 
     // A door shuts by itself once she has stepped away from it, or climbed out of its doorway.
@@ -3245,7 +3280,7 @@ export class ShipScene extends Phaser.Scene {
                 if (keep) continue;
                 d.open = false;
                 d.sprite.setTexture('shipart', 'door-crew');
-                sfx.door();
+                sfx.at(d.sprite.x, d.y).doorShut();
             }
         }
     }
@@ -3352,7 +3387,7 @@ export class ShipScene extends Phaser.Scene {
             done?.();
             return;
         }
-        sfx.door();
+        sfx.at(leaves.right.x, y).doorSlide();
         this.tweens.add({
             targets: leaves, open: to, duration: LIFT.doorMs * Math.abs(to - leaves.open),
             onUpdate: () => this.setLeaves(leaves, y, leaves.open),
@@ -3436,7 +3471,7 @@ export class ShipScene extends Phaser.Scene {
                     if (!lift.glass) p.setVisible(false); // a core car travels out of sight
                     this.moveCar(lift, cursor, true, () => {
                         p.setVisible(true);
-                        sfx.ding();
+                        sfx.liftDing();
                         this.slideLeaves(this.leavesAt(lift, cursor), lift.floors[cursor].y, 1, () => this.leaveLift());
                     });
                 });
@@ -3447,6 +3482,8 @@ export class ShipScene extends Phaser.Scene {
     moveCar(lift, to, carriesHer, arrive) {
         if (lift.glass) this.setLeaves(lift.leaves, lift.carY, 0);
         this.liftMove = { lift, to, carriesHer, arrive };
+        const s = Math.abs(lift.floors[to].y - lift.carY) / LIFT.speed;
+        if (s > 0.2) (carriesHer ? sfx : sfx.at(lift.x, lift.carY)).liftMove(s);
     }
 
     stepCar(dt) {
@@ -3567,6 +3604,7 @@ export class ShipScene extends Phaser.Scene {
         if (this.time.now < (this.lockedUntil || 0)) return false;
         this.lockedUntil = this.time.now + 900;
         const shown = text ?? `🔒 ${this.progress.cardName(card)} card`;
+        if (card) sfx.deny(); else sfx.rattle();
         this.alert.setText(shown).setVisible(true);
         // Held at the lock, it shows again before this runs: hide it only once the last one is over,
         // whatever she is doing by then (on the stairs, in a lift), unless a fright has taken it over.
@@ -3696,7 +3734,7 @@ export class ShipScene extends Phaser.Scene {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);
                 this.world.onTangerine();
-                sfx.pickup();
+                sfx.tangerine();
                 t.glint.destroy();
                 this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
                 t.sprite.active = false;
@@ -3882,8 +3920,8 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
-    smash(x, y) {
-        sfx.smash();
+    smash(x, y, sound = true) {
+        if (sound) sfx.at(x, y).smash();
         for (let i = 0; i < 10; i++) {
             const b = this.add.image(x, y, 'dot').setDepth(DEPTH.fx).setTint(0xc9a26a);
             this.worldLayer.add(b);
@@ -3977,7 +4015,7 @@ export class ShipScene extends Phaser.Scene {
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
             onComplete: () => {
-                sfx.whoosh();
+                sfx.runOff();
                 this.script = (dt, time) => {
                     p.x += away * 260 * dt;
                     this.pose('run', 2);
@@ -4010,7 +4048,7 @@ export class ShipScene extends Phaser.Scene {
         this.scareFrom = { x: p.x, y: this.takeoffY };
         p.setDepth(DEPTH.fx);
         this.pose('fall');
-        sfx.whoosh();
+        sfx.fall();
         this.script = (dt) => {
             vy = Math.min(vy + PLAYER.gravity * dt, PLAYER.maxFall * 1.5);
             p.y += vy * dt;

@@ -117,12 +117,14 @@ export class Story {
             await w.wait(250);
             w.carryBox.give();
             const plate = w.prop(o.x + o.dir * 13, o.y - 30, 'tray', 'load-cloche');
+            for (let i = 0; i < 3; i++) s.time.delayedCall(300 + i * 700, () => sfx.at(o.x, o.y).munch());
             await this.people.play(o, 'eat', { times: 3 });
             plate.forEach(i => i.destroy());
             await w.wait(200);
             // His card: she is doing his rounds now.
             await w.handOver(o, 'key-card', () => this.P.open('cards', 'deck'));
             this.P.setFlag('lunch');
+            sfx.done();
         });
         return true;
     }
@@ -140,7 +142,7 @@ export class Story {
         const cat = s.add.sprite(f.bottom.x, f.bottom.y, 'bumbot').setOrigin(0.5, 1).setDepth(s.DEPTH.playerBehind);
         cat.play('bumbot-run').setFlipX(f.top.x < f.bottom.x);
         s.worldLayer.add(cat);
-        sfx.mrrp();
+        sfx.at(f.bottom.x, f.bottom.y).scramble();
         s.tweens.addCounter({
             from: 0, to: 1, duration: 1500,
             onUpdate: tw => {
@@ -159,7 +161,7 @@ export class Story {
     ropeIntoDoor() {
         const s = this.scene;
         const rope = this.P.blockDrawings.filter(d => d.id === 'flag:bb2').flatMap(d => d.items);
-        sfx.smash();
+        sfx.whip();
         s.tweens.add({ targets: rope, angle: 90, x: '+=14', duration: 220, ease: 'Quad.easeIn' });
         this.leaveAjar();
     }
@@ -181,6 +183,7 @@ export class Story {
         this.shushAt = time + 6000;
         l.dir = her.x < l.x ? -1 : 1;
         this.people.place(l);
+        sfx.at(l.x, l.y).shush();
         this.people.play(l, 'shush', { hold: 300 }).then(() => {
             l.dir = -1;
             this.people.place(l);
@@ -224,19 +227,25 @@ export class Story {
             onComplete: done,
         });
         // The doors slide shut on him, and up he goes.
+        sfx.at(lift.x, home).doorSlide();
         s.tweens.addCounter({
             from: 1, to: 0, duration: 320,
             onUpdate: tw => s.setLeaves(lift.leaves, lift.carY, tw.getValue()),
             onComplete: () => {
-                sfx.mrrp();
+                sfx.at(lift.x, home).mrrp();
+                sfx.at(lift.x, home).liftMove(2.6);
                 ride(top, 2600, () => {
                     g.cat.destroy();
                     g.cat = null;
-                    s.time.delayedCall(900, () => ride(home, 2600, () => {
-                        lift.busy = false;
-                        g.state = 'done';
-                        this.P.setFlag('bb_lift');
-                    }));
+                    s.time.delayedCall(900, () => {
+                        sfx.at(lift.x, home).liftMove(2.6);
+                        ride(home, 2600, () => {
+                            sfx.at(lift.x, home).liftDing();
+                            lift.busy = false;
+                            g.state = 'done';
+                            this.P.setFlag('bb_lift');
+                        });
+                    });
                 });
             },
         });
@@ -257,10 +266,13 @@ export class Story {
         const left = this.flashAt - time;
         // The tell: the lamps warm up.
         this.flashGlow.setFillStyle(0xfff1c9, left < 700 && left > 0 ? 0.25 * (1 - left / 700) : 0);
+        if (left < 700 && !this.flashCharged) sfx.at((f.x0 + f.x1) / 2, f.y).flashCharge(0.7);
+        this.flashCharged = left < 700;
         if (left > 0) return;
         this.flashAt = time + f.period * 1000;
         const white = s.add.rectangle((f.x0 + f.x1) / 2, f.y - 64, f.x1 - f.x0 + 60, 128, 0xffffff, 0.95).setDepth(s.DEPTH.fx + 2);
         this.world.add([white]);
+        sfx.at((f.x0 + f.x1) / 2, f.y).shutter();
         s.tweens.add({ targets: white, alpha: 0, duration: 500, onComplete: () => white.destroy() });
         const caught = s.mode === 'play' && s.route === 'inside' && Math.abs(her.y - f.y) < 4 && her.x > f.x0 && her.x < f.x1 && !this.world.carry;
         if (!caught) return;
@@ -285,6 +297,7 @@ export class Story {
             r.state = 'fleeing';
             r.dir = her.x < r.x ? 1 : -1;
             this.people.anim(r, 'walk', { speed: 1.9 });
+            sfx.at(r.x, r.y).oh();
             this.fleeFrom = r.x;
         }
         r.x += r.dir * 185 * dt;
@@ -293,7 +306,7 @@ export class Story {
         const door = (s.promenade?.doors ?? []).some(d => Math.abs(d - r.x) < 6) && run > 40;
         if (door || run > 9 * M) {
             r.state = 'gone';
-            if (door) sfx.door();
+            if (door) sfx.at(r.x, r.y).door();
             r.items.forEach(i => s.tweens.add({ targets: i, alpha: 0, duration: door ? 160 : 300 }));
             s.time.delayedCall(320, () => this.P.setFlag('riv_prom'));
         }
@@ -314,7 +327,7 @@ export class Story {
         this.world.add([ears]);
         // (Clipped to the porthole's glass by staying low in it.)
         s.tweens.add({ targets: ears, y: g.y + 3, duration: 380, ease: 'Quad.easeOut', hold: 900, yoyo: true, onComplete: () => ears.destroy() });
-        sfx.mrrp();
+        sfx.at(g.x, g.floor).meow();
     }
 
     // --- Region 3 -----------------------------------------------------------------------------
@@ -374,13 +387,14 @@ export class Story {
         this.people.anim(r, 'walk', { speed: 2.4 });
         await w.tween({ targets: r, x: st.cableX, duration: (Math.abs(st.cableX - st.wingX) / 230) * 1000, onUpdate: place });
         this.people.play(r, 'trip');
-        sfx.dash();
+        sfx.at(r.x, r.y).yelp();
         await w.tween({ targets: r, x: st.trapX - 4, duration: 440, ease: 'Quad.easeOut', onUpdate: place });
         this.trapOpen = true;
         this.showTrap();
-        sfx.smash();
+        sfx.at(st.trapX, st.floor).trapdoor();
         s.cameras.main.shake(200, 0.004);
         await w.tween({ targets: r.sprite, y: st.floor + 56, alpha: 0, duration: 340, ease: 'Quad.easeIn' });
+        sfx.at(st.trapX, st.floor).flump();
         r.gone = true;
         r.items.forEach(i => i.setVisible(false));
         // Flour comes up out of the hole: he has found the galley's sacks.
@@ -400,6 +414,7 @@ export class Story {
             targets: sprite, x: st.ropeX, y: st.floor - 30, duration: 240, ease: 'Quad.easeOut',
             onComplete: () => {
                 sprite.anims.pause();
+                sfx.at(st.ropeX, st.floor).whip();
                 const from = this.ropeEnd, to = st.top + 34;
                 s.tweens.addCounter({
                     from: 0, to: 1, duration: 950, ease: 'Sine.easeIn',
@@ -424,6 +439,7 @@ export class Story {
         this.sneezeAt ??= time + 2500;
         if (time < this.sneezeAt) return;
         this.sneezeAt = time + 5000;
+        sfx.at(m.x, m.y).sneeze();
         this.people.play(m, 'sneeze');
     }
 
@@ -445,15 +461,17 @@ export class Story {
             // The bottle crosses from her hands to his.
             const bottle = s.add.image(her.x, her.y - 34, 'icon-pills').setDepth(s.DEPTH.player + 0.05);
             w.add([bottle]);
-            sfx.pickup();
+            sfx.give();
             await w.tween({ targets: bottle, x: m.x + m.dir * 10, y: m.y - 36, duration: 380, ease: 'Sine.easeInOut' });
             bottle.destroy();
             save.items = save.items.filter(i => i !== 'pills');
             // One more sneeze, the last; then his card: she is running his errands now.
+            sfx.at(m.x, m.y).sneeze();
             await this.people.play(m, 'sneeze');
             await w.wait(250);
             await w.handOver(m, 'key-card', () => this.P.open('cards', 'ent'), 0xff7a7a);
             this.P.setFlag('pills');
+            sfx.done();
         });
         return true;
     }
@@ -519,6 +537,7 @@ export class Story {
             if (off && !this.hatGoing) {
                 this.hatGoing = true;
                 const hat = this.hat;
+                sfx.cloth();
                 s.tweens.add({ targets: hat, y: her.y - 2, x: her.x - 12, angle: -80, alpha: 0.9, duration: 420, ease: 'Quad.easeIn',
                     onComplete: () => s.tweens.add({ targets: hat, alpha: 0, duration: 1500, delay: 2500, onComplete: () => hat.destroy() }) });
                 this.hat = null;
@@ -534,7 +553,7 @@ export class Story {
         s.tweens.add({
             targets: sprite, x: L.ventX - 10, y: floor - L.sill + 1, duration: 320, ease: 'Quad.easeOut',
             onComplete: () => {
-                sfx.mrrp();
+                sfx.at(sprite.x, floor).scramble();
                 s.tweens.add({
                     targets: sprite, x: L.ventX + 6, scaleX: 0.3, scaleY: 0.8, alpha: 0, duration: 460, ease: 'Sine.easeIn',
                     onComplete: () => { sprite.setScale(1).setAlpha(1); done(); },
@@ -556,10 +575,12 @@ export class Story {
             st.dir = her.x < st.x ? -1 : 1;
             this.people.place(st);
             await w.wait(200);
+            sfx.at(st.x, st.y).aah();
             await this.people.play(st, 'thanks');
             await w.wait(150);
             await w.handOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'));
             this.P.setFlag('steward');
+            sfx.done();
             this.thanking = false;
         });
     }
@@ -579,7 +600,7 @@ export class Story {
             // Their camera crosses to her.
             const cam = s.add.image(bride.x, bride.y - 34, w.icon('camera')).setDepth(s.DEPTH.player + 0.05).setScale(0.7);
             w.add([cam]);
-            sfx.pickup();
+            sfx.take();
             await w.tween({ targets: cam, x: her.x + face * 9, y: her.y - 30, duration: 380, ease: 'Sine.easeInOut' });
             // They turn to each other; she raises it.
             bride.dir = 1;
@@ -590,8 +611,10 @@ export class Story {
             await w.tween({ targets: cam, x: her.x + face * 10, y: her.y - 49, duration: 300 });
             this.people.play(bride, 'kiss');
             this.people.play(groom, 'kiss');
+            sfx.at(mid, bride.y).kiss();
             await w.wait(620);
-            sfx.ding();
+            sfx.shutter();
+            sfx.at(mid, bride.y).heart();
             s.cameras.main.flash(260, 255, 255, 255);
             for (let i = 0; i < 3; i++) {
                 const heart = s.add.text(mid + (i - 1) * 9, bride.y - 62, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
@@ -605,6 +628,7 @@ export class Story {
             bride.dir = groom.dir = side;
             this.people.place(bride);
             this.people.place(groom);
+            sfx.give();
             await w.tween({ targets: cam, x: bride.x + side * 10, y: bride.y - 34, duration: 380, ease: 'Sine.easeInOut' });
             cam.destroy();
             await w.handOver(bride, '@book-4', () => w.giveBook(4));
@@ -614,10 +638,11 @@ export class Story {
                 p.dir = door < p.x ? -1 : 1;
                 this.people.anim(p, 'idle');
                 await w.tween({ targets: p, x: door, duration: Math.abs(door - p.x) * 9 + 60, onUpdate: () => this.people.place(p) });
-                sfx.door();
+                sfx.at(door, p.y).door();
                 await w.tween({ targets: p.sprite, alpha: 0, scale: 0.92, duration: 220 });
             }
             this.P.setFlag('photo');
+            sfx.done();
             for (const p of [groom, bride]) p.sprite.setAlpha(1).setScale(1);
         });
         return true;
@@ -628,7 +653,7 @@ export class Story {
     chute() {
         const s = this.scene, w = this.world, to = w.rooms.laundry, L = w.data.linen;
         if (!to || w.carry) return false;
-        sfx.whoosh();
+        sfx.chute();
         s.travel(L.laundryCartX, to.floor - 60, 'laundry', () => this.outOfTheChute());
         return true;
     }
@@ -646,7 +671,7 @@ export class Story {
             w.add([cover]);
             s.pose('fall');
             await w.tween({ targets: her, y: floor - 16, duration: 300, ease: 'Quad.easeIn' });
-            sfx.smash();
+            sfx.flump();
             for (let i = 0; i < 7; i++) {
                 const t = s.add.rectangle(x + Phaser.Math.Between(-12, 12), floor - 34, 7, 4, i % 3 ? 0xffffff : 0x8fd3ff).setDepth(s.DEPTH.fx);
                 w.add([t]);
@@ -702,7 +727,7 @@ export class Story {
         cat.play('bumbot-wash');
         this.world.add([cat]);
         s.time.delayedCall(1500, () => {
-            sfx.mrrp();
+            sfx.at(cat.x, g.y).mrrp();
             cat.play('bumbot-jump');
             s.tweens.add({ targets: cat, x: cat.x + 26, y: g.topY - 70, duration: 420, ease: 'Quad.easeOut',
                 onComplete: () => s.tweens.add({ targets: cat, alpha: 0, y: g.topY - 84, duration: 160, onComplete: () => cat.destroy() }) });
@@ -731,6 +756,9 @@ export class Story {
         if (!d || s.route !== 'inside' || Math.abs(her.y - d.y) > 8 || Math.abs(her.x - d.x) > 330) return;
         if (time < (this.noteAt ?? 0)) return;
         this.noteAt = time + 520;
+        // Its beat through the door, and now and then a party horn.
+        sfx.at(d.x, d.y).thump();
+        if (Math.floor(time / 520) % 12 === 0) sfx.at(d.x, d.y).toot();
         const note = s.add.text(d.x + Phaser.Math.Between(-8, 14), d.y - 50, ['♪', '♫', '♪'][Math.floor(time / 520) % 3], {
             fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: ['#e83b3b', '#4d9be6', '#905ea9'][Math.floor(time / 520) % 3], resolution: 4,
         }).setOrigin(0.5).setDepth(s.DEPTH.decor + 0.3);

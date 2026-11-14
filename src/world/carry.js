@@ -92,7 +92,7 @@ export class Carry {
         if (!load.bare) this.items.unshift(s.add.image(0, 0, 'tray').setOrigin(0.5, 1).setDepth(D.player + 0.011));
         this.world.add(this.items);
         this.world.carry = { kind, ...load };
-        sfx.pickup();
+        sfx.take();
         this.world.refresh();
         this.update();
     }
@@ -118,17 +118,20 @@ export class Carry {
         const s = this.scene, p = s.player;
         const away = p.x >= fromX ? 1 : -1;
         const flying = this.items;
+        // (The steel canister rings; anything else is crockery, or lands like it.)
+        if (this.kind === 'canister') sfx.clang();
+        else if (['cake', 'cone', 'stub'].includes(this.kind)) sfx.splat();
+        else sfx.crash();
         this.items = [];
         this.kind = null;
         this.world.carry = null;
-        sfx.smash();
         flying.forEach((img, k) => {
             s.tweens.add({ targets: img, x: img.x + away * (26 + k * 10), angle: away * (140 + k * 60), duration: 520 });
             s.tweens.add({ targets: img, y: img.y - 18, duration: 180, ease: 'Quad.easeOut', yoyo: false,
                 onComplete: () => s.tweens.add({ targets: img, y: p.y - 2, duration: 300, ease: 'Quad.easeIn',
                     onComplete: () => s.tweens.add({ targets: img, alpha: 0, delay: 700, duration: 300, onComplete: () => img.destroy() }) }) });
         });
-        s.smash(p.x + away * 20, p.y - 8);
+        s.smash(p.x + away * 20, p.y - 8, false);      // (its own sound is above)
         // A start, no more: she is knocked back a step.
         p.body.velocity.x = away * 120;
         p.body.velocity.y = -90;
@@ -191,6 +194,9 @@ export class Carry {
             }
         }
         this.wobble = Math.max(0, this.wobble - SWAY.settle * dt);
+        // (Its warning, once each time it passes two thirds of the way over.)
+        if (this.wobble > 0.66 && !this.warned) sfx.wobble();
+        this.warned = this.wobble > 0.66;
         const top = this.items.at(-1), k = Math.min(1, this.wobble);
         top.setAngle(Math.sin(s.time.now / (110 - 50 * k)) * 13 * k).setX(x + Math.sin(s.time.now / (110 - 50 * k)) * 2 * k);
         if (this.wobble < 1) return false;

@@ -685,8 +685,12 @@ export class World {
             if (want !== k.shown) {
                 k.shown = want;
                 s.tweens.add({ targets: k.items, alpha: want, duration: 260 });
-                if (want && k.what === 'snore') sfx.rattle();
-                if (want && k.what === 'balloons') sfx.ding();
+                if (want && k.what === 'balloons') sfx.at(k.x, d.floor).toot();
+            }
+            // (The sleeper under the grille snores on for as long as she looks down at him.)
+            if (k.shown && k.what === 'snore' && time > (k.snoreAt ?? 0)) {
+                k.snoreAt = time + 2600;
+                sfx.at(k.x, d.floor).snore();
             }
         }
         this.ductKey.setVisible(inDuct && s.mode === 'play' && Math.abs(p.x - d.exitX) < 60);
@@ -696,7 +700,7 @@ export class World {
             if (this.eyesX <= d.exitX + 6) {
                 this.eyesGone = true;
                 eyes.setVisible(false);
-                sfx.mrrp();
+                sfx.at(this.eyesX, d.floor).mrrp();
             } else {
                 eyes.setVisible(Math.floor(time / 2600) % 5 !== 4 || (time % 2600) > 160).setPosition(this.eyesX, d.floor - 9);
             }
@@ -718,7 +722,7 @@ export class World {
             const back = this.pushables.find(t => t.id === 'cart_linen'), linen = this.rooms.linen;
             s.travel(back.x, linen.floor - back.rim - 1, 'linen', () => p.setFlipX(true));
         } else if (inDuct && input.downPressed && Math.abs(p.x - d.exitX) < 30) {
-            sfx.smash();
+            sfx.clang();
             s.travel(d.dropX, d.floor + 30, 'inside', () => P.setFlag('duct'));
         }
     }
@@ -785,7 +789,7 @@ export class World {
                     if (this.progress.has(e.flag)) return false;
                     this.progress.setFlag(e.flag);
                     s.sparkle?.(e.x, e.y - 20);
-                    sfx.checkpoint();
+                    sfx.lever();
                     return true;
                 } };
                 this.things.push(thing);
@@ -963,12 +967,13 @@ export class World {
                 s.tweens.add({ targets: glint, alpha: { from: 0.1, to: 1 }, scale: { from: 0.6, to: 1.6 }, duration: 500, yoyo: true, repeat: -1, repeatDelay: 900 });
                 const thing = { ...e, items: [glint], reach: 16, until: `flag:${e.flag}`, interact: () => {
                     this.cut(async () => {
-                        sfx.ding();
+                        sfx.slot();
                         for (let i = 0; i < 5; i++) {
                             this.sparkle(e.x + Phaser.Math.Between(-14, 14), e.y - 30 - i * 9, [0xfbff86, 0xe83b3b, 0xffffff][i % 3]);
                             await this.wait(140);
                         }
-                        sfx.checkpoint();
+                        sfx.chips();
+                        sfx.secret();
                         this.progress.setFlag(e.flag);
                     });
                     return true;
@@ -983,6 +988,7 @@ export class World {
                 this.add([img]);
                 this.things.push({ ...e, items: [img], reach: 16, interact: () => {
                     this.cut(async () => {
+                        if (!this.save.seen.includes(e.id)) sfx.secret();
                         await this.library.panel(`photo-${e.id}`);
                         if (!this.save.seen.includes(e.id)) {
                             this.save.seen.push(e.id);
@@ -1088,7 +1094,7 @@ export class World {
         thing.done = true;
         thing.pick.destroy();
         thing.items = thing.items.filter(i => i !== thing.pick);
-        sfx.pickup();
+        if (type !== 'verb') sfx.take();
         writeSave(this.save);
         this.refresh();
         return true;
@@ -1118,7 +1124,7 @@ export class World {
         const lid = s.add.image(h.x, h.y + 32, 'hatch-lid').setOrigin(0.5, 1).setDepth(D.poolTank + 0.005);
         this.add([lid]);
         this.things.push({ id: 'hatch_pool', x: h.x, y: h.y + 32, route: 'inside', needs: 'drain', items: [lid], reach: 16,
-            interact: () => { sfx.door(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
+            interact: () => { sfx.hatch(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
         const linen = this.rooms.linen;
         if (linen) {
             // (Her own cabin's door is a checkpoint: population §2.5, `cp_8206`.)
@@ -1140,7 +1146,7 @@ export class World {
         const t = this.data.trapdoor;
         if (s.route === 'inside' && onFloor && P.has('bb3') && Math.abs(p.x - t.x) < 10 && Math.abs(p.y - t.y) < 2) {
             const to = this.rooms[t.room];
-            sfx.whoosh();
+            sfx.trapdoor();
             s.travel(t.landX, to.floor - 80, t.room, () => P.setFlag('trapdoor'));
             return;
         }
@@ -1288,6 +1294,7 @@ export class World {
         const s = this.scene;
         s.lockedUntil = s.time.now + ms;
         s.alert.setText(text).setVisible(true);
+        sfx.bubble();
         s.time.delayedCall(ms, () => { if (s.alert.text === text) s.alert.setVisible(false); });
     }
 
@@ -1295,6 +1302,7 @@ export class World {
     nudge(person) {
         const s = this.scene;
         if (!person.bubbleItems) return;
+        sfx.at(person.x, person.y).bubble();
         s.tweens.add({ targets: person.bubbleItems, y: '-=5', duration: 110, yoyo: true, repeat: 1 });
     }
 
@@ -1339,8 +1347,10 @@ export class World {
         this.add([img]);
         if (person.meta.anims.give) this.people.play(person, 'give');
         await this.wait(350);
+        sfx.at(person.x, person.y).give();
         await this.tween({ targets: img, x: p.x, y: p.y - 40, duration: 420, ease: 'Sine.easeInOut' });
-        sfx.checkpoint();
+        if (frame === 'key-card') sfx.card();
+        else sfx.take();
         for (let i = 0; i < 10; i++) {
             const a = (Math.PI * 2 * i) / 10;
             const spark = s.add.image(img.x, img.y - 8, 'dot').setTint(0xf9c22b).setDepth(s.DEPTH.fx);
@@ -1358,7 +1368,7 @@ export class World {
         if (!t?.img || t.toppled) return;
         t.toppled = true;
         this.scene.tweens.add({ targets: t.img, angle: -100, x: t.img.x - 10, y: t.img.y + 4, duration: 260, ease: 'Quad.easeIn' });
-        sfx.smash();
+        sfx.at(t.x, t.y).crash();
     }
 
     // One of her quirks: she turns to the thing and does her bit; any key after a moment ends it.
@@ -1376,9 +1386,13 @@ export class World {
                 }
             }
             if (thing.say) this.say(thing.say, thing.ms);
+            // (Her bow on the stage is to a house that claps; her dance has a beat to it.)
+            if (thing.clip === 'bow') sfx.clap(thing.ms / 1000);
+            if (thing.clip === 'dance') for (let i = 0; i * 500 < thing.ms; i++) s.time.delayedCall(i * 500, () => sfx.thump());
             await this.wait(thing.ms);
             s.pose('stand');
             if (!this.save.seen.includes(thing.id)) {
+                sfx.secret();
                 this.save.seen.push(thing.id);
                 writeSave(this.save);
             }
@@ -1413,8 +1427,10 @@ export class World {
         if (s.time.now < (this.touchCool ?? 0) || s.mode !== 'play') return;
         if (this.carry) {
             this.touchCool = s.time.now + 1200;
+            sfx.at(person.x, person.y).oh();
             this.carryBox.spill(person.x);
         } else if (t.kind === 'scare') {
+            if (!s.holding) sfx.at(person.x, person.y).hey();
             s.scareContact(person.x, t.fright);
         }
     }
@@ -1558,7 +1574,7 @@ export class World {
         const top = pool.y, depth = pool.bottom - pool.y;
         pool.gurgle = s.add.graphics().setDepth(s.DEPTH.poolWater + 0.02);
         this.add([pool.gurgle]);
-        sfx.rattle();
+        sfx.at(h.x, top).drain(5);
         s.tweens.addCounter({
             from: 0, to: 1, duration: 5000,
             onUpdate: tw => {
