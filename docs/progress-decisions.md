@@ -1454,9 +1454,30 @@ it: flipped, taller, its slant gentler. The flag is where the wall mirror was, t
 over the desk's middle and a little muted; the porthole between desk and bed went (the user);
 Bumbot's picture was tried a little smaller and put back (the user).
 
-**Generations:** 42 (two whole-figure candidates 9 and 8, the one from her figure 8, five
-finer redraws 5, two whole-figure animations made before the shot was described 10, the
-portrait's animation 2).
+**The menu's look.** With the intro built the user wrote: "Can you use generations in order to
+create menu items? The text looks too plain now. Think of appropriate style to decorate the menu
+entries." Three styles were generated as plates (ship's brass name plates; white boards in a rope
+border with anchors; white plates with the sun livery's wave) and shown as mock-ups of the whole
+screen in both languages; **the user chose the brass plates.** With them:
+- **The lettering is generated too** (PixelLab's `create_font`: a 32 px one for the name, a
+  16 px one for the plates), and only its shapes are used: the game fills them in bands of
+  colour, outlines and shadows them (`src/pixeltext.js`). The name is in the sun livery's
+  yellows and oranges; a plate's word is cream, gold when chosen.
+- **A generated lettering is Latin only**, and a second font for Ukrainian would have been
+  another hand. So the Ukrainian capitals are built from the Latin shapes (thirteen are the
+  same; Г is L upside down, И is N mirrored, Ь is P upside down, Б that with a top bar, Ї is I
+  with two dots), and the menu is in capitals in both languages: BUMBUSIK / БУМБУСІК, PLAY /
+  ГРАТИ, LANGUAGE / МОВА.
+- **The LANGUAGE button no longer spells the language out** ("LANGUAGE: English" was too long
+  for a plate, and pressing it changes every word on the screen at once).
+- The plate came 58 px high; rows were taken out over and under its middle to make it 46, so
+  two fit under the name with the sun between.
+- A tangerine, the game's own, marks the chosen entry.
+
+**Generations:** 95. The close-up 35 (a whole-figure candidate from a description 9, her game
+figure in eight directions 1, the same at 256 px 8, five finer redraws 5, two whole-figure
+animations made before the shot was described 10, the portrait's animation 2); the menu 60
+(three plates 30, two letterings 30). 547 are left.
 
 **Checked:** the new `intro` scenario (the menu and both buttons, each part of the camera's way,
 the close-up, the hand-over, the short way in, Esc, `?play`), `lang`, `boot`, `deck3`; the

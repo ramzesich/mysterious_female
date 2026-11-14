@@ -23,6 +23,7 @@ truth**: read the relevant section before any design or content work, and record
 | `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the welcome screen's LANGUAGE button switches it |
 | `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Built 2026-11-14 on the user's word |
 | `src/intro.js` | **The welcome screen, the start sequence and the intro**, all in the ship scene's own picture: one clock (`T`) and everything a function of it (the camera, what is open, what is shown), its parts and their lengths in `PARTS`; `intro.seek(part, k)` shows any moment, Esc ends it, `?play` skips it, `?intro=<part>` starts at a part. A new game gets all of it; a game under way a short way in. While it runs the game holds still (`scene.intro`, `scene.fromAfar`: the ship closed and the sky laid out in the world) |
+| `src/pixeltext.js`, `tools/build_menu.py` | **The welcome screen's menu art** (the user chose brass plates from three mock-ups, 2026-11-14): `assets/source/menu/` (two generated pixel letterings and a generated plate) to the atlas `assets/sprites/menu.png`; `pixelText(scene, key, font, text, style)` sets a word in it (`T` the name's lettering, `S` the plates'), filled in bands, outlined, shadowed. **The lettering is Latin; the Ukrainian capitals are built from its shapes in the build tool, so the menu is in capitals.** A new menu word needs its letters there (`missing()`; the `lang` playtest fails otherwise) |
 | `tools/build_closeup.py` | The intro's close-up: her finer portrait (`assets/source/her-close/` to `assets/sprites/her-close.png`), the badge that says BUMBUSIK drawn on every frame (crooked, then straight, her hand kept over it), and the finer piece of her standing mirror drawn in code (`close-mirror.png`). Both are eight pixels to one of the game's. The mirror's measures are the cabin's in `tools/draw_rooms.py`: change both together |
 | `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and the dash free: add a line when the builder gets a new `place` |
 | `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
@@ -463,6 +464,15 @@ Lessons learned (2026-11-14, the intro):
 - **Text in generated art is drawn by us:** the badge's letters are stamped on every frame
   after the generator, over its own try (painted out first), with her hand kept on top by its
   colours. Slant small text by whole letters, never through one.
+- **UI art from PixelLab:** `create_ui_asset` (10 generations at 256 x 256) draws plates and
+  panels to a template of shapes, in the game's palette when it is passed; `create_font` (15)
+  gives an atlas of 80 Latin glyphs, eight to a row, and nothing else (no Cyrillic). Use the
+  glyphs as shapes and colour them in the game; build what is missing from them by flips where
+  the shapes allow (flat shapes only: a flip turns a shaded letter's light upside down).
+  Canvas compositing: `source-in` clears everything outside the new shape, so a second band
+  wipes the first; bands go on with `source-atop`.
+- **A style is chosen from mock-ups of the whole screen**, composed offline over a real
+  screenshot, in both languages and with an entry chosen, not from the loose pieces.
 - **Show the user the shot, not only the figure, before making its art:** I made whole-figure
   candidates and two animations (27 generations) before the user described the close-up they
   had in mind (a waist-up profile). A rough frame of the composition first would have saved

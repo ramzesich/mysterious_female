@@ -294,10 +294,13 @@ def scenario_intro(b):
     menu and its two buttons, the camera's way from the sun to her cabin, the game handed over;
     the short one for a game under way; Esc; `?play` past it all."""
     S, I = "window.__ship", "window.__ship.intro"
-    menu = f"[{I}.title.text, ...{I}.buttons.map(q => q.label.text)]"
+    menu = f"[{I}.titleText, ...{I}.buttons.map(q => q.text)]"
     b.open("?reset", start=None)
     ok = check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.full"), "a new game opens on the welcome screen", b.eval(f"{I}.stage"))
-    ok &= check(b.eval(menu) == ["Bumbusik", "PLAY", "LANGUAGE: English"], "the game's name and two buttons, PLAY and LANGUAGE", b.eval(menu))
+    ok &= check(b.eval(menu) == ["BUMBUSIK", "PLAY", "LANGUAGE"], "the game's name and two buttons, PLAY and LANGUAGE", b.eval(menu))
+    drawn = b.eval(f"[{I}.title, ...{I}.buttons.map(q => q.label)].map(o => o.texture.key + ':' + (o.width > 20))")
+    ok &= check(drawn == ["menu-title:true", "menu-play:true", "menu-language:true"] and b.eval(f"{I}.buttons[0].plate.frame.name") == "plate",
+                "in the menu's own lettering, on its plates", drawn)
     ok &= check(b.eval(f"!{S}.uiCam.visible && !{S}.player.visible && {S}.mode") == "scripted", "no HUD, no player, no controls yet")
     ok &= check(b.eval(f"!!{I}.blur && {I}.shade.alpha > 0.2"), "the sky behind is dimmed and out of focus")
     sun = b.eval(f"(c => [Math.abs(c.midPoint.x - {I}.sunX) < 30, Math.abs(c.midPoint.y - {I}.sunY) < 30])({S}.cameras.main)")
@@ -308,11 +311,11 @@ def scenario_intro(b):
     b.tap("down")
     b.tap("enter")
     time.sleep(0.2)
-    ok &= check(b.eval(menu) == ["Бумбусік", "ГРАТИ", "МОВА: Українська"], "LANGUAGE switches to Ukrainian", b.eval(menu))
+    ok &= check(b.eval(menu) == ["БУМБУСІК", "ГРАТИ", "МОВА"], "LANGUAGE switches to Ukrainian", b.eval(menu))
     b.shot("intro-welcome-uk")
     b.tap("enter")
     time.sleep(0.2)
-    ok &= check(b.eval(menu)[1:] == ["PLAY", "LANGUAGE: English"] and b.eval("window.__lang.language()") == "en", "and back to English", b.eval(menu))
+    ok &= check(b.eval(menu)[1:] == ["PLAY", "LANGUAGE"] and b.eval("window.__lang.language()") == "en", "and back to English", b.eval(menu))
     b.tap("up")
     b.tap("enter")
     time.sleep(1.2)
@@ -424,15 +427,17 @@ def scenario_lang(b):
     """The two languages (the user, 2026-11-14): every text the game says has an English and a
     Ukrainian version; `?lang=` sets one for a session. And no hint is left to translate."""
     L, S = "window.__lang", "window.__ship"
-    texts = "[window.__ship.intro.title.text, ...window.__ship.intro.buttons.map(q => q.label.text)]"
+    texts = "[window.__ship.intro.titleText, ...window.__ship.intro.buttons.map(q => q.text)]"
+    # (Every letter of the menu's words has its shape in the menu's lettering: src/pixeltext.js.)
+    lost = "(i => [['T', i.titleText], ...i.buttons.map(q => ['S', q.text])].flatMap(([f, s]) => window.__pixeltext.missing(window.__ship, f, s)))(window.__ship.intro)"
     b.open("?reset")
     keys = b.eval(f"{L}.KEYS")
     ok = check(sorted(keys["en"]) == sorted(keys["uk"]) and len(keys["en"]) > 20, "every text has both versions",
                sorted(set(keys["en"]) ^ set(keys["uk"])))
-    ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["Bumbusik", "PLAY", "LANGUAGE: English"], "English is the default: the welcome screen", b.eval(texts))
+    ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["BUMBUSIK", "PLAY", "LANGUAGE"] and b.eval(lost) == [], "English is the default: the welcome screen", (b.eval(texts), b.eval(lost)))
     b.shot("lang-title-en")
     b.open("?reset&lang=uk")
-    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["Бумбусік", "ГРАТИ", "МОВА: Українська"], "?lang=uk: the welcome screen in Ukrainian", b.eval(texts))
+    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["БУМБУСІК", "ГРАТИ", "МОВА"] and b.eval(lost) == [], "?lang=uk: the welcome screen in Ukrainian, every letter drawn", (b.eval(texts), b.eval(lost)))
     b.shot("lang-title-uk")
     said = {}
     for code in ("en", "uk"):

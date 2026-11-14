@@ -9,7 +9,7 @@ PLAY
 LANGUAGE
 
 PLAY triggers the sequense described in the **Start sequence** below.
-LANGUAGE let's player swtich between English (default choice) and Ukrainian.
+LANGUAGE lets player swtich between English (default choice) and Ukrainian.
 
 ## Start sequence
 

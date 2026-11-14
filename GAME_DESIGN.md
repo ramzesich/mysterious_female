@@ -1541,9 +1541,14 @@ cap, scarce, and the game can be finished without the dash.
     picture, so one runs into the next without a cut:
     - **The welcome screen:** "Bumbusik" (the game's name, not her figure: the user) in the
       middle; behind it, dimmed and out of focus, the sun in the middle of the sky with a few
-      clouds; under it two big buttons, PLAY and LANGUAGE (the second shows the language chosen
-      and switches between English, the default, and Ukrainian). ↑/↓ and Enter, Space or E, or
-      the mouse.
+      clouds; under it two big buttons, PLAY and LANGUAGE (the second switches between
+      English, the default, and Ukrainian: every word on the screen changes with it, so it does
+      not spell the language out). ↑/↓ and Enter, Space or E, or the mouse. **Its look** (the
+      user: "The text looks too plain now", then chose from three mock-ups): the name in
+      generated pixel lettering in the sun livery's yellows and oranges with a navy outline;
+      the buttons ship's name plates, riveted brass round navy enamel, their letters cream and
+      gold on the one chosen, a tangerine beside it. All in capitals: the lettering is Latin,
+      and the Ukrainian capitals are built from its shapes (`tools/build_menu.py`).
     - **The start sequence:** the menu melts away, the sky comes into focus and to the game's
       brightness.
     - **The intro** (about 38 s): the camera moves down to the sea and the Baltic shore (gulls,

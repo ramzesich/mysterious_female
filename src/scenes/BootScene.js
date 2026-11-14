@@ -49,6 +49,8 @@ export class BootScene extends Phaser.Scene {
         // books' pages (tools/draw_pages.py).
         this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
         for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
+        // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
+        this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
         // The intro's close-up (src/intro.js; tools/build_closeup.py): the finer piece of her mirror,
         // and her portrait when one is drawn.
         this.load.image('close-mirror', 'assets/sprites/close-mirror.png');

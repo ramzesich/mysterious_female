@@ -17,7 +17,9 @@ export const LANGUAGES = ['en', 'uk'];
 const TEXTS = {
     en: {
         'language.name': 'English',
-        // The welcome screen (docs/intro.md): the game's name and its two buttons.
+        // The welcome screen (docs/intro.md): the game's name and its two buttons. They are set in
+        // capitals in the menu's own lettering, which has the letters these need and not every
+        // other (tools/build_menu.py; the `lang` playtest says when one is missing).
         'title': 'Bumbusik',
         'menu.play': 'PLAY',
         'menu.language': 'LANGUAGE',

@@ -4,7 +4,8 @@
 //
 //   The welcome screen: the sun in the middle of the sky with a few clouds round it, dimmed and out
 //   of focus; over it the game's name and two big buttons, PLAY and LANGUAGE (English or
-//   Ukrainian: src/lang.js). ↑/↓ and Enter, Space or E, or the mouse.
+//   Ukrainian: src/lang.js), in pixel lettering on brass plates (src/pixeltext.js). ↑/↓ and
+//   Enter, Space or E, or the mouse.
 //   The start sequence: the menu melts away, the sky comes into focus and to its full brightness.
 //   The intro: the camera tilts down to the sea and the Baltic shore (gulls, the sun's glitter on
 //   the water), pans right until the whole ship has come in from the right, then zooms in on
@@ -33,6 +34,7 @@ import { sfx } from './sfx.js';
 import { t, nextLanguage } from './lang.js';
 import { writeSave } from './save.js';
 import { cloudTexture } from './background.js';
+import { pixelText } from './pixeltext.js';
 
 const HALF = PLAYER.height / 2;
 // The parts, in order, and the seconds each takes: a new game's, and a game's under way.
@@ -42,6 +44,11 @@ export const PARTS = {
     back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 1.2], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
+// The menu: where the name and the two plates stand on the screen, and the lettering's colours
+// from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen).
+const MENU = { title: 150, first: 338, step: 112,
+               sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
+               cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
 const CLOSE_BLUR = 2.6;           // the cabin behind her in the close-up
 // The close-up: its zoom (her finer portrait is eight pixels to one of the game's, so two of the
@@ -245,34 +252,40 @@ export class Intro {
         this.heroCam.ignore([s.worldLayer, s.washLayer, s.uiLayer, this.menuLayer]);
         this.menuCam.ignore([s.worldLayer, s.washLayer, s.uiLayer, this.heroLayer]);
         this.shade = s.add.rectangle(0, 0, W, H, 0x0d1422).setOrigin(0).setAlpha(DIM);
-        this.title = s.add.text(W / 2, 196, '', {
-            fontFamily: 'Georgia, serif', fontSize: '96px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 9,
-        }).setOrigin(0.5);
+        // The game's name in the sun livery's colours; two ship's name plates, brass round navy
+        // enamel, for PLAY and LANGUAGE; a tangerine by the one chosen (the user chose the style
+        // from three, 2026-11-14: tools/build_menu.py, src/pixeltext.js). All at two screen
+        // pixels to one of the art's.
+        this.title = s.add.image(W / 2, MENU.title, 'menu', 'plate').setScale(2);
+        this.marker = s.add.image(0, 0, 'tangerine').setScale(4);
         this.buttons = ['play', 'language'].map((id, i) => {
-            const y = 352 + i * 82, w = 372, h = 64;
-            const box = s.add.graphics();
-            const label = s.add.text(W / 2, y, '', { fontFamily: 'Georgia, serif', fontSize: '32px', fontStyle: 'bold', color: '#1d2b53' }).setOrigin(0.5);
-            const zone = s.add.zone(W / 2, y, w, h).setInteractive({ useHandCursor: true });
+            const y = MENU.first + i * MENU.step;
+            const plate = s.add.image(W / 2, y, 'menu', 'plate').setScale(2);
+            const label = s.add.image(W / 2, y, 'menu', 'plate').setScale(2);
+            const zone = s.add.zone(W / 2, y, plate.displayWidth, plate.displayHeight).setInteractive({ useHandCursor: true });
             zone.on('pointerover', () => this.select(i));
             zone.on('pointerdown', () => { this.select(i); this.press(); });
-            return { id, y, w, h, box, label, zone };
+            return { id, y, plate, label, zone, text: '' };
         });
-        this.menu = [this.title, ...this.buttons.flatMap(b => [b.box, b.label, b.zone])];
+        this.menu = [this.title, this.marker, ...this.buttons.flatMap(b => [b.plate, b.label, b.zone])];
         this.menuLayer.add([this.shade, ...this.menu]);
         this.refreshMenu();
     }
 
+    // The menu's words in the language chosen, the chosen entry lit: its letters gold, its plate
+    // bright, the tangerine beside it.
     refreshMenu() {
-        const W = VIEW.width;
-        this.title.setText(t('title'));
+        const s = this.s;
+        this.titleText = t('title').toUpperCase();
+        this.title.setTexture(pixelText(s, 'menu-title', 'T', this.titleText, { bands: MENU.sunny, thick: 2 }));
         this.buttons.forEach((b, i) => {
             const on = i === this.selected;
-            b.label.setText(b.id === 'play' ? t('menu.play') : `${t('menu.language')}: ${t('language.name')}`);
-            b.box.clear();
-            b.box.fillStyle(0x1d2b53, 0.55).fillRoundedRect(W / 2 - b.w / 2 + 3, b.y - b.h / 2 + 5, b.w, b.h, 14);
-            b.box.fillStyle(on ? 0xffffff : 0xe6edf2, 1).fillRoundedRect(W / 2 - b.w / 2, b.y - b.h / 2, b.w, b.h, 14);
-            b.box.lineStyle(on ? 5 : 3, on ? 0xf28c28 : 0x1d2b53, 1).strokeRoundedRect(W / 2 - b.w / 2, b.y - b.h / 2, b.w, b.h, 14);
+            b.text = t(`menu.${b.id}`).toUpperCase();
+            b.label.setTexture(pixelText(s, `menu-${b.id}`, 'S', b.text, { bands: on ? MENU.gold : MENU.cream, outline: '#2e222f' }));
+            b.plate.setTint(on ? 0xffffff : 0xcfcfd6);
         });
+        const b = this.buttons[this.selected];
+        this.marker.setPosition(VIEW.width / 2 - b.plate.displayWidth / 2 - 30, b.y);
     }
 
     select(i) {
@@ -396,7 +409,8 @@ export class Intro {
         // the picture going over to the game through the dark.
         const melt = this.stage === 'welcome' ? 1 : 1 - clamp01(this.T / 0.6);
         for (const o of this.menu) o.setAlpha(melt);
-        this.title.setY(196 - (1 - melt) * 26);
+        this.title.setY(MENU.title - (1 - melt) * 26);
+        if (melt > 0) this.marker.setY(this.buttons[this.selected].y + Math.round(Math.sin(this.clock * 4) * 1.5) * 2);
         this.shade.setAlpha(this.full ? DIM * (1 - smooth(focus)) : Math.max(DIM * (1 - smooth(focus)), clamp01((this.p('near') - 0.62) / 0.38)));
 
         // The sun, its clouds, the glitter, the gulls: all gone by the time the ship fills the view.
