@@ -210,6 +210,8 @@ What changed against this list: `docs/progress-decisions.md`.
 
 ## Step 9: The bow (region 9)
 
+**Done (2026-11-14).** What changed against this list: `docs/progress-decisions.md`.
+
 - **Scope:** deck 12 forward: the wedding party, the planner, the cake and the pastry chef, the
   chapel's ceremony and slot, the Spinnaker's piano, the kids' pool's slide; the spa with its steam
   and staff; the officers' corridors and the captain's door; the kids' clubs with the fort and the

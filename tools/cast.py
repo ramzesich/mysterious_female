@@ -31,7 +31,10 @@ the character; "stand" is its standing pose. Options: "flip": the sprite was dra
 CAST = {
     # Region 1.
     "officer": ("4d3e6422-a934-40e0-a47d-e841378610ae", {}, {}),
-    "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5}, {}),
+    # (On the bridge, region 9: "swing" is the net brought down, cut from "swat"; a first try,
+    # "lunge", ran with the net over his shoulder.)
+    "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5, "swing": 10},
+              {"cut": {"swing": ("swat", [2, 3, 4, 5, 7, 8])}}),
     "porter": ("00c30095-76c1-4898-a423-34f740532970", {}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),

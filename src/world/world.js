@@ -74,6 +74,10 @@ export class World {
     // --- Building -----------------------------------------------------------------------------
 
     build() {
+        // ?did=horn,wedding: story flags set from the start, to look at a later state without
+        // playing to it (README; for testing).
+        const did = new URLSearchParams(location.search).get('did');
+        for (const f of (did ?? '').split(',')) if (f && !this.save.flags.includes(f)) this.save.flags.push(f);
         this.makeTextures();
         this.buildRooms();
         this.buildOutside();
@@ -845,7 +849,7 @@ export class World {
                     this.carryBox.textures();
                     // (One of the game's own pictures, or a piece of the ship's atlas.)
                     for (const [key, dy] of e.show) {
-                        const img = s.textures.exists(key) ? s.add.image(e.x, e.y - dy, key) : s.add.image(e.x, e.y - dy, 'shipart', key);
+                        const img = s.textures.exists(key) ? s.add.image(e.x, e.y - dy, key) : this.image(e.x, e.y - dy, key);
                         items.push(img.setOrigin(0.5, 1).setDepth(depth + 0.03));
                     }
                     this.add(items);
@@ -1243,6 +1247,13 @@ export class World {
                 g.fillStyle(ink, 1).fillRect(12, 11, 1, 1);
                 g.fillStyle(0x7a4528, 1).fillRect(3, 8, 8, 2);
                 g.fillStyle(0x9babb2, 1).fillRect(4, 3, 1, 3).fillRect(5, 1, 1, 2).fillRect(8, 4, 1, 2).fillRect(9, 1, 1, 3);
+            },
+            // Region 9: a wedding cake, three tiers.
+            cake: () => {
+                g.fillStyle(ink, 1).fillRect(1, 10, 14, 6).fillRect(3, 5, 10, 6).fillRect(5, 1, 6, 5);
+                g.fillStyle(0xffffff, 1).fillRect(2, 11, 12, 4).fillRect(4, 6, 8, 4).fillRect(6, 2, 4, 3);
+                g.fillStyle(0xf68181, 1).fillRect(2, 13, 12, 1).fillRect(4, 8, 8, 1).fillRect(6, 3, 4, 1);
+                g.fillStyle(0xe83b3b, 1).fillRect(7, 0, 2, 2);
             },
             horn: () => {
                 g.fillStyle(ink, 1).fillRect(5, 5, 9, 6).fillTriangle(6, 8, 0, 1, 0, 15);

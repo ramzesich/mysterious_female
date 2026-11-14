@@ -1087,6 +1087,14 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   the Spinnaker's piano (E: she plays a few notes); the kids' pool's slide (she rides it); the
   captain's cabin door (a name plate: the user's in-joke). Tangerines: the spa's reception (1), the
   Spinnaker's bar (2), Splash Academy's snack table (1).
+- **As built (Decided by the build, 2026-11-14; the reasons are in `docs/progress-decisions.md`,
+  "Step 9"):** the planner stands at the rope on Champs' side of the lobby's door, the bride and
+  groom wait with the guests behind its glass; the cake is a three-tier cake on a tray that
+  **sways** with every start, stop, turn and landing and goes over if it sways too far (no
+  clock: patience); on the bridge the alarm panel stands by the helm and the security officer
+  comes at Bumbot from the forward end, and ends sat on the floor; the ball pit is a padded box
+  she hops into, with one tangerine among its balls; the reading nook opens by an odd book on
+  the Library's bookcase once all ten are back.
 
 **Region 10: Sunset.** The balcony forward of the spa (deck 11, 24-29.5 m) through the bridge's hatch;
 the air; the mooring deck (deck 7, 0.5-21.4 m); the tip of the bow. The ending (§6.1.9). The mooring
@@ -1999,6 +2007,15 @@ Nothing blocks the start of the build. These get settled along the way:
       old lady gone, the gulls off the bow), books 8 and 9, the telescope; the parasol: hold jump
       to glide, ↓ + jump over a railing (down the atrium, past the balconies). Playtest `region8`;
       `?at=terrace`, `sundeck`, `technical`, `teppanyaki`, `funnel`
+- [x] **Step 9, region 9: The bow** (done 2026-11-14, branch `the-build`): the wedding at
+      Champs' door and the cake from Cagney's (a fragile load: it sways with every start, stop and
+      turn), the party into the chapel and the ceremony; the Spinnaker's piano, the kids' pool's
+      slide; the spa and its steam; the officers' corridors and the captain's door; the bridge:
+      near-catch 6, the net on the alarm panel, the hatch's ladder, book 10; the kids' clubs: the
+      ball pit and the pillow fort; the Library's odd book and the reading nook. What changed
+      against the plan: `docs/progress-decisions.md`, "Step 9". Playtest `region9`;
+      `?play&at=champs&cards=all&did=engineer,horn,lady&tangerines=infinite` starts at the
+      planner, `&at=bridge`, `spa`, `kids`, `captain`, `spinnaker` elsewhere in the region
 - [x] **The art review of 2026-11-13, finished 2026-11-14** (`docs/progress-decisions.md`,
       "Between steps 8 and 9"): 24 people redrawn to her proportions, the parasol, her grip, the
       runner; then, seen close in the game: the stage manager out of the drum kit, the stage
@@ -2009,7 +2026,7 @@ Nothing blocks the start of the build. These get settled along the way:
 - [ ] **Start the next session here: the autonomous build** (the user's order, 2026-11-13: build
       the whole plan on branch `the-build` without stopping for review, deciding alone, recording
       every change to the plan in `docs/progress-decisions.md`, committing after each step). **Next:
-      step 9 of `docs/build-plan.md`, region 9 (The bow: the wedding and the cake, the chapel, the Spinnaker, the kids' pool, the spa, the officers' corridors, the kids' clubs, the bridge and near-catch 6)**; a step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
+      step 10 of `docs/build-plan.md`, region 10 (Sunset and the end: the balcony forward of the spa, the sunset, the glide to the mooring deck, the catch, the way home, the win screen)**; then step 11 (the ship's side: a texture for its outer body, the user's wish) follows the regions; then on in play
       order. Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")

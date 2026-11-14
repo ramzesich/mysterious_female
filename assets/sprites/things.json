@@ -200,9 +200,29 @@
     "h": 46
    }
   },
-  "robot": {
+  "pillow-fort": {
    "frame": {
     "x": 433,
+    "y": 0,
+    "w": 169,
+    "h": 32
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 169,
+    "h": 32
+   },
+   "sourceSize": {
+    "w": 169,
+    "h": 32
+   }
+  },
+  "robot": {
+   "frame": {
+    "x": 604,
     "y": 0,
     "w": 22,
     "h": 52
@@ -222,27 +242,27 @@
   },
   "salon-client": {
    "frame": {
-    "x": 457,
+    "x": 628,
     "y": 0,
-    "w": 32,
-    "h": 39
+    "w": 31,
+    "h": 44
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 32,
-    "h": 39
+    "w": 31,
+    "h": 44
    },
    "sourceSize": {
-    "w": 32,
-    "h": 39
+    "w": 31,
+    "h": 44
    }
   },
   "sunbather-1": {
    "frame": {
-    "x": 491,
+    "x": 661,
     "y": 0,
     "w": 63,
     "h": 33
@@ -262,7 +282,7 @@
   },
   "sunbather-2": {
    "frame": {
-    "x": 556,
+    "x": 726,
     "y": 0,
     "w": 62,
     "h": 20
@@ -282,7 +302,7 @@
   },
   "sunbather-3": {
    "frame": {
-    "x": 620,
+    "x": 790,
     "y": 0,
     "w": 58,
     "h": 27
@@ -302,7 +322,7 @@
   },
   "sunbather-4": {
    "frame": {
-    "x": 680,
+    "x": 850,
     "y": 0,
     "w": 50,
     "h": 22
@@ -320,9 +340,69 @@
     "h": 22
    }
   },
+  "toddler-blocks": {
+   "frame": {
+    "x": 902,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 28
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 28
+   }
+  },
+  "toddler-cook": {
+   "frame": {
+    "x": 928,
+    "y": 0,
+    "w": 25,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 36
+   }
+  },
+  "toddler-crawl": {
+   "frame": {
+    "x": 955,
+    "y": 0,
+    "w": 25,
+    "h": 26
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 26
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 26
+   }
+  },
   "towel-elephant": {
    "frame": {
-    "x": 732,
+    "x": 982,
     "y": 0,
     "w": 29,
     "h": 19
@@ -342,7 +422,7 @@
   },
   "towel-monkey": {
    "frame": {
-    "x": 763,
+    "x": 1013,
     "y": 0,
     "w": 24,
     "h": 27
@@ -362,7 +442,7 @@
   },
   "towel-rabbit": {
    "frame": {
-    "x": 789,
+    "x": 1039,
     "y": 0,
     "w": 16,
     "h": 27
@@ -382,27 +462,27 @@
   },
   "wedding-cake": {
    "frame": {
-    "x": 807,
+    "x": 1057,
     "y": 0,
-    "w": 30,
-    "h": 37
+    "w": 20,
+    "h": 25
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 30,
-    "h": 37
+    "w": 20,
+    "h": 25
    },
    "sourceSize": {
-    "w": 30,
-    "h": 37
+    "w": 20,
+    "h": 25
    }
   },
   "winch": {
    "frame": {
-    "x": 839,
+    "x": 1079,
     "y": 0,
     "w": 24,
     "h": 36

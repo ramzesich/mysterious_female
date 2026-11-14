@@ -158,8 +158,12 @@ class Browser:
         self.eval(f"(() => {{ const s = window.__ship, c = s.cameras.main; s.viewOverride = {cut}; c.stopFollow(); c.centerOn({x}, {y}); }})()")
         time.sleep(0.8 if deck is not None else 0.4)
         img = Image.open(self.shot(name))
-        k = img.width / 480                     # the view is 480 game px wide
-        mx, my = img.width / 2, img.height / 2
+        # (The canvas is fitted into the window, smaller than it: a game px is its width / 480 on
+        # the screenshot, about 1.7 px, and its middle is the canvas's, not the window's.)
+        r = self.eval("(r => [r.left, r.top, r.width, r.height, window.innerWidth])(document.querySelector('canvas').getBoundingClientRect())")
+        s = img.width / r[4]
+        k = r[2] * s / 480
+        mx, my = (r[0] + r[2] / 2) * s, (r[1] + r[3] / 2) * s
         out = OUT / f"{name}-z.png"
         img.crop((int(mx - w / 2 * k), int(my - h / 2 * k), int(mx + w / 2 * k), int(my + h / 2 * k)))            .resize((w * zoom, h * zoom), Image.NEAREST).save(out)
         self.eval("(() => { const s = window.__ship, c = s.cameras.main; s.viewOverride = null;"
@@ -197,7 +201,12 @@ def scenario_boot(b):
     time.sleep(0.5)
     s = b.state()
     b.shot("spawn")
-    return check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
+    # (A sheet wider or taller than a texture may be is drawn as a black box, and nothing else
+    # fails: her own sheet did, at 17,472 px, with every test passing. 8,192 is safe everywhere.)
+    big = b.eval("""Object.values(window.__ship.textures.list).flatMap(t => t.source.map(s => [t.key, s.width, s.height]))
+        .filter(([k, w, h]) => w > 8192 || h > 8192)""")
+    check(not big, "no texture is larger than 8192 px a side", big)
+    return (not big) and check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
                  "spawns standing on deck 4 at the gangway", s)
 
 
@@ -1051,10 +1060,8 @@ def scenario_golden(b):
     b.eval("window.__ship.lockedUntil = 0")
     # Region 9: the cake clears the forward lobby; down the bow with the gold card to the bridge.
     ok &= check(not use_door(b, 12, 82, 1), "Champs' door to the forward lobby is still shut: the wedding", alert(b))
-    go(b, 12, 84)
-    b.tap("e")
-    time.sleep(0.2)
-    ok &= check("wedding" in flags(b) and use_door(b, 12, 82, 1), "the cake delivered, it opens")
+    ok &= check(cake_for_the_planner(b), "the wedding cake from Cagney's to the planner: the party goes into the chapel", flags(b)[-3:])
+    ok &= check(use_door(b, 12, 82, 1), "and Champs' door opens")
     b.hold("left", 1.0)
     ok &= check(9 in save_list(b, "regions"), "region 9: deck 12's forward lobby", b.state())
     _, (x1, y1) = flight_feet("stairs-forward-11-12")
@@ -1991,8 +1998,10 @@ def scenario_region4(b):
     ok &= check(b.state()["mode"] == "scripted" and "вибачте" in alert(b), "E at it: startled", alert(b))
     time.sleep(3.0)
     # The standing cart and its tangerine; the luggage to the ceiling.
+    # (Until she is over it, not for a time: the cart's top is 21 px wide, and 0.4 s carried her a
+    # hair past it whenever the machine was quick.)
     b.teleport(exact_x(172.6) - 44, D9)
-    b.hold(["right", "space"], 0.4)
+    hold_until(b, ["right", "space"], lambda s: s["x"] >= exact_x(172.6) - 6, 2)
     time.sleep(0.5)
     b.hold("left", 0.08)
     time.sleep(0.2)
@@ -3177,6 +3186,279 @@ def scenario_region8(b):
     s = b.state()
     ok &= check(s["y"] == D5 and s["mode"] == "play", "and she floats down past five decks to the atrium's floor", s)
     b.shot("region8-atrium-floor")
+    ok &= check(not b.errors, "no errors", b.errors[:3])
+    return ok
+
+
+def cake_for_the_planner(b):
+    """Region 9's errand (the golden path's): the wedding cake from the pastry chef in Cagney's to
+    the planner at Champs' door. (The steady walk past the court is `region9`'s.)"""
+    pl = person(b, "npc_planner")
+    b.teleport(pl["x"] + 80, D12)
+    time.sleep(0.5)
+    if "cake_asked" not in flags(b):
+        return False
+    src = b.eval("window.__ship.world.things.find(t => t.id === 'src_cake').x")
+    b.teleport(src + 8, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    if carrying(b) != "cake":
+        return False
+    b.teleport(pl["x"] + 34, D12)
+    time.sleep(0.4)
+    b.tap("e")
+    return wait_flag(b, "wedding", 30)
+
+
+def enter_region9(b):
+    """A save at region 9's door: region 8 done (the engineer's coffee, the horn, the Officer's card,
+    the parasol), she stands in Champs, aft of the wedding planner."""
+    enter_region8(b)
+    b.eval("(P => { ['engineer', 'horn', 'lady'].forEach(f => P.setFlag(f)); P.open('cards', 'off'); P.learn('parasol'); })(window.__ship.progress)")
+    time.sleep(0.8)
+    b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    b.teleport(exact_x(95), D12)
+    time.sleep(0.4)
+    b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+
+
+def scenario_region9(b):
+    """Region 9 (docs/build-plan.md, step 9): the wedding at Champs' door, the cake from Cagney's
+    (it sways and goes over; carried steadily it arrives), the party into the chapel and the
+    ceremony there, the Spinnaker's bar and piano, the kids' pool's slide, the spa's steam, the
+    officers' corridors, the bridge's beat with the alarm and the hatch, the captain's door, the
+    kids' clubs' ball pit and fort, and the Library's odd book that opens the nook."""
+    enter_region9(b)
+    ok = True
+    S, W = "window.__ship", "window.__ship.world"
+    B = b.eval(f"{W}.data.bow")
+    seen = lambda: save_list(b, "seen")
+    got = lambda tid: any(t == tid or t.startswith(tid + "#") for t in save_list(b, "collected"))
+    # The wedding: the door is roped off, the party beyond it; no cake to take before she is asked.
+    src = b.eval(f"{W}.things.find(t => t.id === 'src_cake').x")
+    b.teleport(src + 8, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check(not carrying(b), "the cake is not hers to take before the planner has asked", carrying(b))
+    pl = person(b, "npc_planner")
+    # (From the lobby's side: at Champs' side the planner is in reach, and E is hers.)
+    b.teleport(exact_x(82) + 60, D12)
+    time.sleep(0.3)
+    b.hold("left", 0.6)
+    s = b.state()
+    ok &= check(s["x"] > exact_x(82) and not door_open(b, "part-door-12-82"), "Champs' door to the forward lobby: shut, the wedding's rope across it", s["x"] - exact_x(82))
+    ok &= check(person(b, "amb_wed_bride")["on"] and not person(b, "amb_cer_bride")["on"], "the party waits in the lobby", person(b, "amb_wed_bride"))
+    b.teleport(pl["x"] + 110, D12)
+    time.sleep(0.5)
+    ok &= check("cake_asked" in flags(b) and b.eval(f"{W}.people.byId.npc_planner.bubbleItems[0].visible"), "near the planner: her bubble, a cake", flags(b)[-3:])
+    b.teleport(pl["x"] + 34, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.5)
+    ok &= check("wedding" not in flags(b) and b.state()["mode"] == "play", "E without it: nothing yet")
+    b.shot("region9-planner")
+    # The cake: every start and stop sets it swaying; too much and it goes over.
+    b.teleport(src + 8, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check(carrying(b) == "cake", "E at the cake on its table: in her hands", carrying(b))
+    b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    sigh = False
+    for _ in range(5):
+        b.hold("right", 0.2)
+        time.sleep(0.16)
+    end = time.time() + 2.5
+    while time.time() < end and not sigh:
+        sigh = b.eval(f"{W}.people.byId.npc_pastrychef.sprite.anims.currentAnim?.key") == "people-pastrychef-sigh"
+        time.sleep(0.05)
+    ok &= check(not carrying(b), "starts and stops in a row: it goes over", (carrying(b), b.eval(f"{W}.carryBox.wobble")))
+    ok &= check(sigh, "the pastry chef sighs", b.eval(f"{W}.people.byId.npc_pastrychef.sprite.anims.currentAnim?.key"))
+    time.sleep(1.8)
+    # Carried steadily it arrives: one go to the court, a wait while it settles, on to the planner.
+    b.teleport(src + 8, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    b.key("left", True)
+    time.sleep(0.3)
+    w1 = b.eval(f"{W}.carryBox.wobble")
+    b.shot("region9-cake")
+    s = hold_until(b, "left", lambda s: s["x"] < exact_x(162), 6)
+    w2 = b.eval(f"{W}.carryBox.wobble")
+    ok &= check(carrying(b) == "cake" and 0.1 < w1 < 0.5, "setting off sets it swaying", w1)
+    ok &= check(carrying(b) == "cake" and w2 < w1, "a steady walk to the court settles it", (w1, w2))
+    time.sleep(1.2)
+    b.teleport(pl["x"] + 200, D12)
+    time.sleep(0.3)
+    s = hold_until(b, "left", lambda s: s["x"] < pl["x"] + 36, 6)
+    ok &= check(carrying(b) == "cake", "and on through Champs to the planner", (carrying(b), b.eval(f"{W}.carryBox.wobble")))
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(3.5)
+    b.shot("region9-wedding")
+    ok &= check(wait_flag(b, "wedding", 30), "E with the cake: the party files into the chapel", flags(b)[-3:])
+    ok &= check(not person(b, "amb_wed_bride")["on"] and not person(b, "npc_planner")["on"], "the lobby is clear")
+    ok &= check(use_door(b, 12, 82, 1), "and Champs' door opens")
+    b.hold("left", 1.0)
+    ok &= check(9 in save_list(b, "regions"), "region 9: deck 12's forward lobby", b.state())
+    # The chapel: the ceremony, the first time she looks in; then a frame on its wall.
+    cp = b.eval(f"{S}.checkpoints.find(c => c.id === 'cp_chapel').x")
+    b.teleport(cp + 40, D12)
+    hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
+    ok &= check("cp_chapel" in save_list(b, "activated"), "the chapel lobby's crew door: a checkpoint")
+    b.teleport(B["wedding"]["chapelX"], D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(2.6)
+    ok &= check(route(b) == "chapel" and person(b, "amb_cer_bride")["on"], "E at the chapel's door: the couple at the altar, the guests", route(b))
+    b.shot("region9-ceremony")
+    ok &= check(wait_flag(b, "ceremony", 12), "the ceremony: a kiss", flags(b)[-3:])
+    ok &= check(b.eval(f"{W}.things.find(t => t.id === 'slot_chapel').items[0].visible"), "and a frame on the chapel's wall that was not there")
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(route(b) == "inside", "out again", route(b))
+    # The Spinnaker: two tangerines on the bar, a few notes on the piano.
+    b.teleport(exact_x(57), D12)
+    hold_until(b, "left", lambda s: s["x"] < exact_x(54.8), 4)
+    ok &= check(got("tan_12_spinnaker"), "the Spinnaker's bar: its tangerines", save_list(b, "collected")[-3:])
+    b.teleport(B["piano"]["x"] + 5, D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.9)
+    ok &= check(b.state()["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key") == "her-keys", "E at the grand piano: she plays", b.eval(f"{S}.player.anims.currentAnim?.key"))
+    b.shot("region9-piano")
+    time.sleep(2.4)
+    ok &= check("sec_piano" in seen() and b.state()["mode"] == "play", "a few notes, and back")
+    # The kids' pool: up the slide's ladder, down its chute, into the water.
+    b.teleport(B["slide"]["ladderX"], D12)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.9)
+    b.shot("region9-slide")
+    s = hold_until(b, [], lambda s: s["mode"] == "swim", 5)
+    ok &= check(s["mode"] == "swim" and "sec_slide" in seen(), "E at the slide: down it and into the kids' pool", s)
+    # The spa (deck 11): open now; the steam at the sauna's aft door.
+    b.teleport(exact_x(74) + 16, D11)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check(door_open(b, "spa-door"), "the spa's door opens from the lobby now")
+    st = B["steam"]
+    b.teleport(st["x"] + 30, D11)
+    ok &= check(scared(b, "Пхх", 7.0), "in the way of the sauna's steam: fogged")
+    time.sleep(2.6)
+    b.eval("window.__ship.lockedUntil = 0")
+    rec = person(b, "amb_spa_reception")
+    b.teleport(rec["x"] + 60, D11)
+    time.sleep(0.6)
+    ok &= check(b.eval(f"{W}.people.byId.amb_spa_reception.sprite.anims.currentAnim?.key") == "people-spa_reception-bow", "the spa's receptionist bows")
+    hold_until(b, "left", lambda s: s["x"] < rec["x"] - 34, 3)
+    ok &= check(got("tan_11_spa"), "the tangerine on her desk", save_list(b, "collected")[-3:])
+    b.shot("region9-spa")
+    # Deck 10: the officers' corridor behind its gold door, an officer walking it, the bridge.
+    go(b, 10, 78)
+    ok &= check(use_door(b, 10, 74, 1), "the Officer's card opens the officers' corridor on deck 10")
+    ok &= check(person(b, "amb_officer_10")["on"], "an officer walks it", person(b, "amb_officer_10"))
+    cp = b.eval(f"{S}.checkpoints.find(c => c.id === 'cp_officer').x")
+    b.teleport(cp + 40, D10)
+    hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
+    ok &= check("cp_officer" in save_list(b, "activated"), "an officer's cabin door: a checkpoint")
+    ok &= check(person(b, "riv_bridge")["on"], "on the bridge the security officer is creeping up on him", person(b, "riv_bridge"))
+    b.teleport(exact_x(40) + 16, D10)
+    b.tap("e")
+    time.sleep(0.2)
+    ok &= check(door_open(b, "bridge-door"), "the bridge's door")
+    b.hold("left", 1.2)
+    b.shot("region9-bridge")
+    b.hold("left", 2.0)
+    time.sleep(1.6)
+    b.shot("region9-alarm")
+    ok &= check(wait_flag(b, "bb6", 20), "near-catch 6: his net comes down on the alarm panel", flags(b)[-3:])
+    ok &= check("alarm" in flags(b) and b.eval(f"{W}.gates.find(g => g.needs === 'alarm').tiles.every(t => t.alpha === 1)"), "the alarm; the hatch's ladder is down")
+    ok &= check(person(b, "riv_bridge_sat")["on"] and not person(b, "riv_bridge")["on"], "the security officer sits on the floor, done for the day")
+    b.teleport(exact_x(37.5) + 4, D10)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.4)
+    ok &= check(b.eval(f"{S}.save.books['10']") == "held", "the captain's book on the chart table: the tenth", b.eval(f"{S}.save.books"))
+    b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    # Deck 9: the officers' corridor, the captain's door.
+    go(b, 9, 78)
+    ok &= check(use_door(b, 9, 74, 1), "the Officer's card opens deck 9's officers' corridor")
+    b.teleport(B["captain"]["x"] + 6, D9)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.7)
+    ok &= check(b.state()["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key") == "her-knock", "E at the captain's door: a polite knock", b.eval(f"{S}.player.anims.currentAnim?.key"))
+    b.shot("region9-knock")
+    time.sleep(3.6)
+    ok &= check("sec_captain" in seen() and b.state()["mode"] == "play", "nobody answers")
+    # Deck 7: the kids' clubs behind the lobby's gold door: the ball pit, the fort.
+    go(b, 7, 78)
+    ok &= check(use_door(b, 7, 74, 1), "the Officer's card opens the kids' clubs")
+    pit = B["pit"]
+    b.teleport(pit["x1"] + 40, D7)
+    time.sleep(0.3)
+    b.hold("left", 0.5)
+    s = b.state()
+    ok &= check(s["x"] > pit["x1"] - 2, "the ball pit's padded wall stops her feet", s["x"] - pit["x1"])
+    b.key("left", True)
+    b.tap("space", 0.25)
+    time.sleep(0.7)
+    x0 = b.state()["x"]
+    time.sleep(0.5)
+    x1 = b.state()["x"]
+    b.shot("region9-ballpit")
+    ok &= check(b.eval(f"{S}.wading") and 25 < x0 - x1 < 60, "over it with a hop: she wades, at half her speed", (b.eval(f"{S}.wading"), x0 - x1))
+    b.key("left", False)
+    # (The hop may carry her over it: back to it through the balls.)
+    time.sleep(0.2)
+    s = b.state()
+    hold_until(b, "right" if s["x"] < pit["tanX"] else "left", lambda s: abs(s["x"] - pit["tanX"]) < 6, 5)
+    ok &= check(got("tan_7_ballpit"), "one of the balls is a tangerine", save_list(b, "collected")[-3:])
+    hold_until(b, "left", lambda s: s["x"] < pit["x0"] + 16, 5)
+    b.key("left", True)
+    b.tap("space", 0.25)
+    time.sleep(0.8)
+    b.key("left", False)
+    s = b.state()
+    ok &= check(s["x"] < pit["x0"] and not b.eval(f"{S}.wading"), "and out over the far wall", s["x"] - pit["x0"])
+    fort = b.eval(f"(t => ({{ x0: t.x0, x1: t.x1 }}))({W}.lows.find(t => t.id === 'haz_fort_7'))")
+    b.teleport(fort["x1"] + 60, D7)
+    time.sleep(0.3)
+    b.hold("left", 0.8)
+    s = b.state()
+    ok &= check(s["x"] > fort["x1"] - 4, "the pillow fort across Splash Academy stops her", s["x"] - fort["x1"])
+    s = hold_until(b, ["down", "left"], lambda s: s["x"] < fort["x0"] - 24, 8)
+    b.shot("region9-fort")
+    ok &= check(s["x"] < fort["x0"], "on hands and knees she is through it", s["x"] - fort["x0"])
+    b.teleport(exact_x(41.2) + 30, D7)
+    hold_until(b, "left", lambda s: s["x"] < exact_x(41.2) - 10, 3)
+    ok &= check(got("tan_7_splash"), "a tangerine on the kids' table", save_list(b, "collected")[-3:])
+    ok &= check(person(b, "amb_counsellor")["on"], "the counsellor cheers the toddlers on")
+    # The Library's odd book: stuck while there are gaps on the shelf; with all ten back, the nook.
+    N = B["nook"]
+    b.teleport(N["x"] + 16, D6)
+    time.sleep(0.4)
+    b.tap("e")
+    time.sleep(0.25)
+    pulled = b.state()["mode"] == "scripted"
+    time.sleep(1.6)
+    ok &= check(pulled and "nook" not in flags(b) and b.state()["mode"] == "play", "the odd book on the Library's bookcase: she pulls, it is stuck", (pulled, flags(b)[-2:]))
+    b.eval("(s => { for (let n = 1; n <= 10; n++) s.save.books[n] = 'returned'; s.world.library.refresh(); s.progress.setFlag('books_all'); })(window.__ship)")
+    time.sleep(0.4)
+    b.tap("e")
+    b.shot("region9-oddbook")
+    ok &= check(wait_flag(b, "nook", 8), "with all ten books back: it tips, and the bookcase swings open", flags(b)[-2:])
+    b.teleport(N["x"], D6)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(1.0)
+    b.shot("region9-nook")
+    ok &= check(route(b) == "nook", "E in the doorway: the reading nook", route(b))
+    ok &= check(b.eval(f"!!{W}.things.find(t => t.id === 'slot_nook')"), "a frame on its wall")
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
 

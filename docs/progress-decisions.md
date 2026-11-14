@@ -862,3 +862,109 @@ changed:
 
 PixelLab for this: the winch (1), the dancers' idles (6).
 
+## Step 9: The bow, region 9 (2026-11-14)
+
+Done: the wedding at Champs' door (the planner, the couple and four guests in the forward lobby),
+the cake from Cagney's pastry chef, the party's walk into the chapel and the ceremony there with
+its photo slot; the Spinnaker (its barman, two guests in armchairs, the piano's quirk, the bar's
+tangerines, a bench on the balcony); the kids' pool (two kids, the slide's quirk); the spa (the
+receptionist, the masseuse and her guest, the stylist and his client, the step class, the sauna's
+steam: "Fogged", the desk's tangerine); deck 10's and deck 9's officers' corridors (an officer
+walking each, the checkpoints, the captain's door and its knock); the bridge: near-catch 6, the
+alarm, the hatch's ladder, book 10; deck 7's kids' clubs behind the gold door (three toddlers, the
+counsellor, the pillow fort, the ball pit, two tangerines); the Library's odd book and the reading
+nook, drawn. Playtest `region9` (from `enter_region9`); the golden path carries the cake.
+`src/world/bow.js` is the region's code.
+
+**Changes and additions to the plan, and why:**
+
+1. **The planner stands on Champs' side of the door (83.25 m), the rope on that side; the couple
+   are in the party.** The spec had her at 76 m, inside the lobby she is keeping shut, where E
+   could never reach her; and four guests alone did not say "wedding": a bride in her gown and a
+   groom in his tuxedo do, seen through the glass door. The lock at (12, 82) is `("block",
+   "wedding", 1)` now.
+2. **The cake is a three-tier wedding cake on a tray, not a box, and "fragile" means it sways.**
+   A box is a few rectangles and carries like any tray. The cake (a PixelLab piece, 25 px, its
+   top level with her head) sways with what her feet do: each start and each stop adds 0.26, a
+   turn on the move 0.42, a landing 0.5; it settles by 0.24 a second; at 1 it goes over (the
+   meter on the HUD is how steady it stands; the cake's tilt shows it too). So the errand is
+   patience at the court's balls, where the other trays are a race against a clock. A bump still
+   spills it. `SWAY` in `src/world/carry.js`. (A start or a stop counts once it has lasted 70 ms,
+   a landing after 120 ms in the air: her speed and footing flicker for a frame now and then,
+   which toppled it on a steady walk at first.)
+3. **The cake waits on a table by the pastry chef at 167.75 m, in the open** (spec: behind a crew
+   door at 173 m). Cagney's has no room for another door, and a cake in plain sight on the way
+   in from the ladder is its own signpost. It is hers to take once the planner has shown her
+   bubble (`cake_asked`, within 4.5 m of her); a cake gone over makes the chef sigh.
+4. **The wedding is a camera scene:** the cake crosses to the planner, the ropes come off, the
+   lobby's two doors open, and the camera goes with the party through the lobbies to the chapel's
+   door (the couple first, the planner last with the cake), about seven seconds.
+5. **The ceremony plays the first time she steps into the chapel after** (spec: E at its door,
+   "seen from the back"): the game is side-on, so the party stands in the chapel as it is drawn,
+   the couple at the altar; a kiss, hearts, confetti, then the frame (`slot_chapel`) on the wall,
+   hung above the guests' heads (at 64 px it sat on a guest's hat).
+6. **The Spinnaker's tangerines are on its bar** (54 m, the spec's place, is the grand piano; a
+   side table stood in front of it). Its two guests are PixelLab pieces, each in an armchair of
+   their own facing us, in two built armchairs' places.
+7. **The slide is ridden with E at its ladder** (spec: "walk onto the slide's top": there is no
+   way up but the ladder): up, down the chute, into the pool, where she swims.
+8. **The gulls on the bow need no "Swooped" block:** the cake cannot pass the old lady's sunbed
+   before the horn, so the bow cannot be reached while they are there. They are scenery for the
+   horn's scene, as built in step 8.
+9. **The spa:** its tangerine is on the reception's desk (32 m is inside the deck's front wall);
+   the receptionist bows; the masseuse works on a guest lying on the second table (a piece); the
+   stylist stands behind a client in the second salon chair (the plan's "guest under the hood
+   dryer": PixelLab's first came with a lamp stand and child-sized, the second sits in a chair
+   of her own, which reads better; the built hood dryer stays); the step class has two boards;
+   the steam comes out of the sauna's aft door at 52.9 m (the sauna moved since the spec's 48 m).
+10. **The bridge's beat, laid out for the bridge as built:** the alarm panel and the engine
+    telegraph changed places, so the panel stands by the helm; Bumbot washes on the floor between
+    them; the security officer, who ran up here at the horn, stands at the forward end and is
+    seen from the door (spec: at 26 m, which is in the deck's structure); as she reaches, he
+    runs in and swings: his net lands on the alarm panel. Red light over the whole bridge and
+    the panel's beacon turning, until the catch; the hatch's ladder comes down rung by rung and
+    Bumbot is up it. The officer ends sat on the floor by the helm (spec: slumped in the
+    captain's chair, waving: a seated clip brings its own chair, and his "sit" was made already).
+11. **Book 10 lies on the chart table** (it stood on a side table of its own in front of it).
+12. **The captain's cabin is deck 9's first door, 28.6 m;** E: a knock, her back to us, and
+    nobody answers. Its plate says CAPTAIN until the user gives the name (§6.4).
+13. **The ball pit is a padded box of balls, 49.3-53.7 m,** standing on the floor with a low
+    wall at each end (a hop takes her over), the balls drawn in front of her to the waist; she
+    wades at half speed (`scene.wading`). One ball is a tangerine (`tan_7_ballpit`, an orange one
+    with a leaf): a secret the spec did not have. The first beanbags went.
+14. **The pillow fort is a PixelLab piece, 169 px, across Splash Academy at 30.85-34.4 m**
+    (`LOWS`): the rocking horse, the toy box and the blocks moved out of its way. The three
+    toddlers are pieces too (stacking blocks, cooking, crawling); the counsellor cheers them on.
+    A tangerine on the low table (`tan_7_splash`, the plan's snack table).
+15. **The odd book stands on the Library's bookcase at 189.4 m.** E: she pulls; it is stuck
+    until all ten books are back (`books_all`); then it tips, and the bookcase swings open on
+    the nook (flag `nook`; the room's door is the bookcase). The nook is drawn: the red chair,
+    a lamp, books to the ceiling, a small picture of a black cat asleep on a book, the frame.
+16. **A testing option, `?did=`** (README): story flags set from the start, so a later state can
+    be looked at without playing to it (`?play&at=champs&cards=all&did=engineer,horn,lady`).
+    Start places `cagneys`, `kids`, `captain`.
+
+**Found on the way, and fixed for good:**
+
+- **Her sprite sheet was one strip, and with two more clips it was 17,472 px wide:** over what a
+  WebGL texture may be, so she drew as a black box, and every test passed. The sheets are packed
+  in rows of 48 cells now (`tools/build_sprites.py`), and the `boot` playtest fails if any
+  texture is over 8,192 px a side. I saw it only because I looked at the scenario's screenshots.
+- **`Browser.close_up()` was 19 % off:** the game's canvas is fitted into the window smaller
+  than it; it measures the canvas now, and the metre marks of a strip are true.
+- **PixelLab draws what an action names, again:** her "plays piano keys" came with a piano in
+  every frame; "taps both hands in the air" is the clip used (`keys`). A fort asked for at
+  200x80 came as two small tents; "one long low ... filling the whole picture from the left
+  edge to the right edge" at 176x64 gave one. Several v3 text clips turned the figure to face
+  us halfway or dropped what it held: their loops are cut from the frames before
+  (`"cut"` in `tools/cast.py`); the planner's "fret" and a guest's "laugh" were dropped.
+- Six of the nineteen new figures came out with heads of 21 to 25 px from text and were made
+  again in pro mode before any clip was made (the rule from the review).
+
+PixelLab: 173 generations (19 figures 38, six again in pro 60, their clips 52, her knock and two
+tries at the piano 9, the security officer's two swings 2, pieces 12); 673 of 2,000 left.
+
+**Left for later:** the wedding's guests have no talk or laugh clips (they stand, one sips); the
+security officer does not wave her on from the floor; sound for the alarm and the horn comes with
+"Sound on" (after the regions).
+

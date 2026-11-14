@@ -509,6 +509,51 @@ def dressing(width):
     return R.save("dressing")
 
 
+def nook(width):
+    """The reading nook behind the Library's bookcase, deck 6 (population: `room_nook`, the reward
+    for bringing all ten books back): dark red walls over wood panelling, a red reading chair under
+    a floor lamp, a cup on a side table, a wall of books, a rug; its way out is the gap the swung
+    bookcase left. A frame hangs over the bookcase (`slot_nook`, 176, 70 px up)."""
+    R = Room(width, "#7a3045", "#6e2740", ceiling=CREAM_SHADE, skirting=WOOD_DARK, floor="#9e4539", fleck="#7a3045", pitch=240)
+    r, box, d = R.r, R.box, R.d
+    # Panelling to waist height, a rail on it.
+    r(0, FLOOR - 40, width - 1, FLOOR - 5, "#7a4528")
+    r(0, FLOOR - 41, width - 1, FLOOR - 40, WOOD)
+    for x in range(8, width, 24):
+        r(x, FLOOR - 38, x, FLOOR - 6, "#5e3320")
+    # The way out: the gap in the wall, the Library's light in it, the bookcase's back at its side.
+    box(41, FLOOR - 62, 77, FLOOR - 1, "#2e222f")
+    r(43, FLOOR - 60, 75, FLOOR - 1, "#46291f")
+    r(47, FLOOR - 56, 71, FLOOR - 1, WOOD_LIGHT)
+    r(52, FLOOR - 52, 66, FLOOR - 1, CREAM)
+    box(72, FLOOR - 62, 79, FLOOR - 1, WOOD_DARK)
+    # A lamp, the chair, a table with a cup; a rug under them.
+    r(86, FLOOR, 166, FLOOR + 2, "#f9c22b")
+    for x in range(88, 166, 8):
+        r(x, FLOOR, x + 3, FLOOR + 2, "#ae2334")
+    stand(R.im, "floor-lamp", 100)
+    stand(R.im, "reading-chair", 124)
+    w, h = stand(R.im, "side-table", 152)
+    stand(R.im, "coffee-cup", 152, dy=h)
+    # Books to the ceiling: a bookcase, a shelf over it, stacks on the floor.
+    stand(R.im, "bookcase", 206)
+    stand(R.im, "book-stack", 172)
+    r(176, 40, 238, 42, WOOD_DARK)
+    for i, x in enumerate(range(196, 236, 5)):
+        c = (RED, BLUE, GREEN, YELLOW, MAUVE, TEAL, ORANGE, PINK)[i % 8]
+        hh = 9 + (i * 5) % 5
+        box(x, 40 - hh, x + 4, 40, c)
+    # A sconce, and a small picture of a black cat asleep on a book.
+    box(22, 40, 34, 56, WOOD_DARK)
+    r(24, 42, 32, 54, CREAM)
+    d.ellipse([25, 47, 31, 52], fill=INK)
+    d.polygon([(25, 48), (26, 45), (27, 48)], fill=INK)
+    r(24, 52, 32, 54, RED)
+    box(110, 18, 118, 24, YELLOW, ORANGE)
+    r(112, 24, 116, 26, TUBE)
+    return R.save("nook")
+
+
 def lighting(width):
     """The lighting booth and the catwalk over the stage, deck 7 (population: `room_lighting`): the
     console under a window on the stage, then out through a frame onto the catwalk in the flies:
@@ -1117,7 +1162,7 @@ DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
         "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
         "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,
-        "guest10": guest10}
+        "guest10": guest10, "nook": nook}
 
 
 def main():

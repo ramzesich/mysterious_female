@@ -2,7 +2,7 @@
 
 For each character: every frame is converted to Resurrect 64 (tools/palettize.py, plus that
 character's colour swaps), placed in a fixed-size cell with the feet on the cell's bottom row, and
-packed into one strip, assets/sprites/<name>.png, with assets/sprites/<name>.json naming the frames
+packed into one sheet (rows of 48 cells), assets/sprites/<name>.png, with assets/sprites/<name>.json naming the frames
 and animations. Re-run after replacing any source frame.
 
     python tools/build_sprites.py
@@ -16,6 +16,7 @@ from PIL import Image
 from palettize import palettize, hex_rgb
 
 ROOT = Path(__file__).resolve().parent.parent
+COLS = 48           # cells in a row of a sheet
 
 # Bumbusik. Sources face east (the game mirrors her for west); the climb faces north.
 HER = {
@@ -106,6 +107,11 @@ HER = {
         "slip": [(f"slip/{i}.png", "feet") for i in range(4)],
         "lick": [(f"lick/{i}.png", "feet") for i in range(4)],
         "pour": [("pour/0.png", "feet")],
+        # Region 9. At the Spinnaker's piano: both hands tapping in front of her, skeleton-v3 custom
+        # poses. (A first clip, asked to "play piano keys", came with a piano drawn into every
+        # frame: kept in piano/.) At the captain's door: a knock, her back to us (north).
+        "keys": [(f"keys/{i}.png", "feet") for i in range(8)],
+        "knock": [(f"knock/{i}.png", "feet") for i in range(8)],
         "sit-eat": [(f"sit-eat-clean/{i}.png", "feet") for i in (0, 1, 3, 4, 5, 6, 7)],
         # Region 8 (skeleton-v3, custom poses): both hands up to the horn's cord and down with her
         # weight; a two-handed shot at the court's hoop; under the open parasol she hangs from its
@@ -218,9 +224,13 @@ def build(spec):
         meta["anims"][anim] = indices
         meta["frames"][anim] = indices[0]
 
-    sheet = Image.new("RGBA", (cell * len(cells), cell), (0, 0, 0, 0))
+    # In rows of COLS cells, numbered row by row as Phaser's spritesheets are: one strip of her 208
+    # frames was 17,472 px wide, over the 16,384 a WebGL texture may be, and she drew as a black box.
+    rows = (len(cells) + COLS - 1) // COLS
+    sheet = Image.new("RGBA", (cell * min(len(cells), COLS), cell * rows), (0, 0, 0, 0))
+    meta["cols"] = COLS
     for i, frame in enumerate(cells):
-        sheet.alpha_composite(frame, (i * cell, 0))
+        sheet.alpha_composite(frame, ((i % COLS) * cell, (i // COLS) * cell))
     out = ROOT / "assets" / "sprites"
     out.mkdir(parents=True, exist_ok=True)
     sheet.save(out / f"{spec['name']}.png")

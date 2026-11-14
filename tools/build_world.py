@@ -12,10 +12,11 @@ from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, S
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
+from population import BOW
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
-from ship_layout import EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
+from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
 ROOM_DOOR_X = 59            # a room's door, in from its left edge (the drawings agree)
@@ -83,6 +84,8 @@ def build_world():
     room_floor["cabin"] = B.floor_y(OUR_CABIN["deck"])
     room_x0["linen"] = slot_x(LINEN_ROOM["deck"], LINEN_ROOM["m"]) - ROOM_DOOR_X
     room_floor["linen"] = B.floor_y(LINEN_ROOM["deck"])
+    room_x0["chapel"] = B.exact_x(CHAPEL["m"]) - ROOM_DOOR_X
+    room_floor["chapel"] = B.floor_y(CHAPEL["deck"])
 
     for r in ROOMS:
         deck = r["deck"]
@@ -423,8 +426,32 @@ def build_world():
         flocks=[dict(id=fid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, n=n)
                 for fid, (deck, a, b, n, up) in FLOCKS.items()])
 
+    # Region 9's (src/world/bow.js).
+    wd, br, st, pit = BOW["wedding"], BOW["bridge"], BOW["steam"], BOW["pit"]
+    slide_x0 = B.col(B.ALL_POOLS[-1][2]) * B.TILE
+    cap_deck, cap_m = BOW["captain"]
+    bow = dict(
+        wedding=dict(y=B.floor_y(wd["deck"]), plannerX=B.exact_x(wd["planner"]), chapelX=B.exact_x(wd["chapel"]),
+                     lookX=B.exact_x(wd["look"]), doors=["part-door-12-82", "part-door-12-74"]),
+        piano=dict(x=B.exact_x(BOW["piano"][1]), y=B.floor_y(BOW["piano"][0])),
+        # The slide stands on the deck, its chute's foot on the kids' pool's aft rim, its ladder at
+        # its aft end (the builder's piece, 63 px long, 46 tall).
+        slide=dict(x0=slide_x0, ladderX=slide_x0 + 55, topX=slide_x0 + 44, y=B.floor_y(BOW["slide"]["deck"]), top=42,
+                   poolX=slide_x0 - 30),
+        captain=dict(x=slot_x(cap_deck, cap_m), y=B.floor_y(cap_deck)),
+        nook=dict(x=B.exact_x(BOW["nook"]["m"]), y=B.floor_y(BOW["nook"]["deck"]), up=BOW["nook"]["up"]),
+        steam=dict(id="haz_steam", x=B.exact_x(st["door"]), y=B.floor_y(st["deck"]), x1=B.exact_x(st["door"] + st["reach"]),
+                   period=st["every"], on=st["on"], tell=st["tell"]),
+        steps=[dict(x=B.exact_x(m), y=B.floor_y(deck)) for deck, m in BOW["steps"]],
+        pit=dict(id="haz_ballpit", x0=B.exact_x(pit["a"]), x1=B.exact_x(pit["b"]), y=B.floor_y(pit["deck"]),
+                 tangerine=pit["tangerine"],
+                 tanX=next(e["x"] for e in ents if e["id"] == pit["tangerine"])),
+        bridge=dict(y=B.floor_y(br["deck"]), swatX=B.exact_x(br["swat"]), panelX=B.exact_x(br["panel"]),
+                    sitX=B.exact_x(br["sit"]), x0=B.exact_x(br["a"]), x1=B.exact_x(br["b"]),
+                    helmX=B.exact_x(30.55), consoleX=B.exact_x(29.3)))
+
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
-                topdeck=topdeck,
+                topdeck=topdeck, bow=bow,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),

@@ -27,7 +27,7 @@ ROOMS = [
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY"),
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
-    dict(id="nook", deck=6, m=189, width=240, look="nook", door="bookcase", needs="nook"),
+    dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
     # (At 242.5 m its door and its plate lay on the speaker stack by the stage: the user, 2026-11-14.)
     dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR",
          lock=("card", "ent", 0)),
@@ -120,7 +120,8 @@ TANGERINES = {
     "tan_9_duct": ("duct", 540, 1, 0, None),
     "tan_9_balc": (9, 240, 1, "out", None),
     "tan_10_mid": (10, 182, 1, "table", None),
-    "tan_11_spa": (11, 32, 1, "table", None),
+    # (On the reception's desk: 32 m, the spec's place, is inside the deck's front wall.)
+    "tan_11_spa": (11, 35.3, 1, 40, None),
     "tan_11_topsiders": (11, 156.35, 1, 30, None),
     "tan_11_fruit": (11, 176.8, 2, "table", None),
     "tan_11_crates": (11, 217.9, 2, 0, "broken:haz_crates_11"),
@@ -132,11 +133,16 @@ TANGERINES = {
     "tan_8_mid": (8, 178.32, 1, 3, None),
     "tan_9_aft": (9, 230, 1, 28, None),
     "tan_10_balc": (10, 160.6, 1, "out", None),
-    "tan_12_spinnaker": (12, 54, 2, "table", None),
+    # (On the bar: 54 m is the grand piano.)
+    "tan_12_spinnaker": (12, 55.45, 2, 32, None),
     "tan_12_lady": (12, 127.25, 2, 0, "lady"),
     "tan_12_cagneys": (12, 172.9, 1, 34, None),
     "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
     "tan_funnel": ("funnel", 189.2, 1, 13, None),
+    # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
+    # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
+    "tan_7_splash": (7, 41.2, 1, 20, None),
+    "tan_7_ballpit": (7, 52.4, 1, 0, None),
 }
 
 # --- Pickups ---------------------------------------------------------------------------------------
@@ -153,7 +159,7 @@ ITEMS = {
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
-    "book_10": (10, 37.5, "book:10", None),
+    "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
 }
 
 # --- Bumbot's beats (GAME_DESIGN.md §6.1.8) --------------------------------------------------------
@@ -165,7 +171,7 @@ BEATS = {
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
     "bb4": ("linen", 150, "asleep", 1, 226, None),
     "bb5": (11, 131.27, "bat", 1, 160, None),
-    "bb6": (10, 31, "sit", -1, 29.2, None),
+    "bb6": (10, 31.15, "wash", -1, 29.2, None),
 }
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
@@ -197,7 +203,6 @@ CATCH_M = 6
 # --- Switches: E on a thing sets a flag (step 0's stand-ins for scenes) ----------------------------
 # id: (deck or room, m or x, flag, needs, label).
 SWITCHES = {
-    "sw_cake": (12, 84, "wedding", None, "CAKE"),
 }
 
 # --- Wall jumps (GAME_DESIGN.md §6.1.3, region 6) --------------------------------------------------
@@ -389,6 +394,42 @@ PEOPLE = {
     "amb_sportsbar_a": dict(at=(11, 205.9), who="fan_a", face=1, idle="cheer", after="region:8", layer="back"),
     "amb_sportsbar_b": dict(at=(11, 206.75), who="fan_b", face=1, idle="cheer", after="region:8", layer="back"),
     "amb_sportsbar_c": dict(at=(11, 208.5), who="fan_c", face=-1, idle="cheer", after="region:8", layer="back"),
+    # Region 9 (The bow). The wedding party across deck 12's forward lobby, the planner at the rope
+    # on Champs' side of its door (the story takes them into the chapel: src/world/bow.js), and in
+    # the chapel after; Cagney's pastry chef by the cake; the Spinnaker's barman; two kids at the
+    # kids' pool; the spa's receptionist, masseuse, stylist and step class; an officer walking each
+    # officers' corridor; the kids' club's counsellor; the security officer on the bridge, creeping
+    # up on Bumbot from the forward end, and sat on its floor after.
+    "npc_planner": dict(at=(12, 83.25), who="planner", face=1, idle="idle", until="flag:wedding",
+                        bubble=("cake", None, "flag:wedding", 4.5)),
+    "amb_wed_groom": dict(at=(12, 80.4), who="wed_groom", face=1, idle="fuss", until="flag:wedding"),
+    "amb_wed_bride": dict(at=(12, 81.2), who="wed_bride", face=-1, idle="idle", until="flag:wedding"),
+    "amb_wed_a": dict(at=(12, 79.1), who="wed_guest_a", face=-1, idle="sip", until="flag:wedding"),
+    "amb_wed_b": dict(at=(12, 78.3), who="wed_guest_b", face=1, until="flag:wedding"),
+    "amb_wed_c": dict(at=(12, 77.2), who="wed_guest_c", face=-1, until="flag:wedding"),
+    "amb_wed_d": dict(at=(12, 76.4), who="wed_guest_d", face=1, until="flag:wedding"),
+    "amb_cer_planner": dict(at=("chapel", 88), who="planner", face=1, idle="idle", after="flag:wedding"),
+    "amb_cer_a": dict(at=("chapel", 108), who="wed_guest_a", face=1, after="flag:wedding"),
+    "amb_cer_b": dict(at=("chapel", 128), who="wed_guest_b", face=1, after="flag:wedding"),
+    "amb_cer_c": dict(at=("chapel", 148), who="wed_guest_c", face=1, after="flag:wedding"),
+    "amb_cer_groom": dict(at=("chapel", 192), who="wed_groom", face=1, after="flag:wedding"),
+    "amb_cer_bride": dict(at=("chapel", 218), who="wed_bride", face=-1, idle="idle", after="flag:wedding"),
+    "amb_cer_d": dict(at=("chapel", 254), who="wed_guest_d", face=-1, after="flag:wedding"),
+    "npc_pastrychef": dict(at=(12, 168.5), who="pastrychef", face=-1, idle="idle"),
+    "amb_barman_sp": dict(at=(12, 55.7), who="barman_sp", face=-1, idle="shine", layer="back",
+                          cover=[("bar-counter-bg", 55.7, 0), ("bar-stool-bg", 55.2, 0), ("bar-stool-bg", 56.2, 0)]),
+    "amb_poolkid_a": dict(at=(12, 58.05), who="poolkid_a", face=1, idle="hop", layer="back"),
+    "amb_poolkid_b": dict(at=(12, 64.7), who="poolkid_b", face=-1, idle="hop", layer="back"),
+    "amb_spa_reception": dict(at=(11, 35.8), who="spa_reception", face=1, layer="behind"),
+    "amb_masseuse": dict(at=(11, 44.95), who="masseuse", face=1, idle="knead", layer="back"),
+    "amb_stylist": dict(at=(11, 59.2), who="stylist", face=1, idle="work", layer="back"),
+    "amb_stepper_a": dict(at=(11, 67.7), who="stepper_a", face=1, idle="steps", layer="back"),
+    "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="steps", layer="back"),
+    "amb_officer_10": dict(at=(10, 60), who="officer_10", face=1, walk=(50, 70, 1.0), end_ms=1500, layer="back"),
+    "amb_officer_9": dict(at=(9, 55), who="officer_9", face=-1, walk=(40, 70, 1.0), end_ms=1500, layer="back"),
+    "amb_counsellor": dict(at=(7, 30.15), who="counsellor", face=-1, idle="cheer", layer="back"),
+    "riv_bridge": dict(at=(10, 28.9), who="rival", face=1, idle="idle", after="flag:horn", until="flag:bb6"),
+    "riv_bridge_sat": dict(at=(10, 30.7), who="rival", face=1, still="sit", after="flag:bb6", until="flag:catch"),
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -470,6 +511,19 @@ PROPS = {
     "amb_sun_12a": (12, 136.7, "thing:sunbather-3", 0, dict(back=True)),
     "amb_sun_12b": (12, 138.8, "thing:sunbather-4", 0, dict(back=True, flip=True)),
     "prop_lady_parasol": (12, 129.12, "thing:parasol-closed", 0, dict(until="flag:horn")),
+    # Region 9. The cake's table in Cagney's; the guests in two of the Spinnaker's armchairs (each
+    # drawn in an armchair of its own, in a built one's place); a bench on its balcony; in the spa a
+    # guest on the second massage table and a client in the second salon chair; three toddlers at
+    # Splash Academy's play kitchen.
+    "prop_cake_table": (12, 167.75, "side-table", 0, {}),
+    "amb_lounge_her": (12, 46.9 - 22 / 48, "thing:lounge-her", 0, dict(back=True)),
+    "amb_lounge_him": (12, 52.1, "thing:lounge-him", 0, dict(back=True)),
+    "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
+    "prop_massage_client": (11, 45.45, "thing:massage-client", 0, {}),
+    "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),
+    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True)),
+    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True)),
+    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True)),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -518,6 +572,9 @@ SOURCES = {
     "src_cocktail": (11, 155.38, "cocktail", "region:8", [("umbrella-cocktail", 30)], None, "flag:lady"),
     # The ice cream mix, on the cold room's shelf: taken once the machine has run empty.
     "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
+    # Region 9: the wedding cake on its table by the pastry chef, hers to take once the planner
+    # has shown what she wants, until the wedding has it.
+    "src_cake": (12, 167.75, "cake", "region:8", [("thing:wedding-cake", 25)], "flag:cake_asked", "flag:wedding"),
 }
 # Signs: id: (deck, m, text, style: plate / poster / note, dy px up, options: size, wrap).
 SIGNS = {
@@ -533,6 +590,9 @@ SIGNS = {
     # Region 4: the honeymooners' door.
     "sign_married": (9, 135.6, "JUST MARRIED", "note", 81, dict(size=4)),
     "sign_drill": ("walkway", 183.2, "BOAT DRILL", "poster", 40, dict(size=4)),
+    # Region 9: the captain's cabin, the first door of deck 9's officers' corridor. (The name on
+    # its plate is the user's to give: GAME_DESIGN.md §6.4.)
+    "sign_captain": (9, 28.604 + 0.68, "CAPTAIN", "plate", 52, {}),
 }
 
 # --- Region 2's own things (docs/population.md, deck 6) ---------------------------------------------
@@ -545,6 +605,8 @@ ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
 SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62),
+         # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
+         "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 176, 70),
          "slot_table": (11, 220.0, 36, "flag:table"),
          # On the wall of deck 8's first balcony of all, at the forward end of the row (the plan's
          # `slot_stern`: the stern's terraces are out of sight behind its plating).
@@ -586,7 +648,9 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"
        "haz_dnd_8a2": (8, 223.6, "dnd_boxers"), "haz_dnd_10a": (10, 207.6, "dnd_toothbrush")}
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
-LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort")}
+LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
+        # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long).
+        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort")}
 # --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
 # Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
 # door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window
@@ -682,3 +746,24 @@ FUNNEL_TOP = dict(gust=dict(every=5.0, blow=1.2, tell=0.7, drift=60), gulls=2, s
 # Flocks of gulls on the bow until the horn sends them off (`gull_bow_a`, `gull_bow_b`): id: (deck,
 # from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen).
 FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 6, 96)}
+
+# --- Region 9's own things (docs/population.md: deck 12 forward, the spa, the officers' corridors,
+# the bridge, the kids' clubs; src/world/bow.js) -----------------------------------------------------
+# The wedding (`scn_wedding`): the planner's place, the chapel's door the party files into, the
+# lobby's middle the camera goes to.
+# The Spinnaker's piano (`sec_piano`: where she stands at its keys); the kids' pool's slide
+# (`sec_slide`); the captain's door (`sec_captain`: deck, m of a cabin door); the odd book on the
+# Library's bookcase (`scn_nook`: deck, m, px up).
+# The sauna's steam (`haz_steam`): out of its aft door every `every` s for `on` s, over `reach` m.
+# The step class's boards (m, in front of each stepper). The ball pit (`haz_ballpit`: from, to).
+# The bridge's beat (`bb_6`): where the security officer swings from, the alarm panel his net
+# lands on, where he sits after.
+BOW = dict(
+    wedding=dict(deck=12, planner=83.25, chapel=68.6, look=76.6),
+    piano=(12, 53.02), slide=dict(deck=12), captain=(9, 30), nook=dict(deck=6, m=189.4, up=44),
+    steam=dict(deck=11, door=52.9, reach=1.6, every=5.0, on=1.5, tell=0.7),
+    steps=[(11, 68.2), (11, 69.8)],
+    pit=dict(deck=7, a=49.3, b=53.7, tangerine="tan_7_ballpit"),
+    bridge=dict(deck=10, swat=30.55, panel=31.85, sit=30.7, a=28.4, b=40.0),
+)
+

@@ -962,6 +962,10 @@ def build_objects():
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):
         add(point(name, "place", exact_x(m), floor_y(12)))
+    # Region 9's: by the wedding cake in Cagney's, in Splash Academy, at the captain's door.
+    add(point("cagneys", "place", exact_x(168.9), floor_y(12)))
+    add(point("kids", "place", exact_x(43), floor_y(7)))
+    add(point("captain", "place", exact_x(30.4), floor_y(9)))
     from build_world import funnel_top as _top
     add(point("funnel", "place", _top()["x0"] + 20, _top()["y"]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
@@ -1392,9 +1396,11 @@ def build_objects():
     for m in (29.0, 41.2):
         around(7, m, "kids-table-bg", "kids-chair-bg")
         put(7, m, "kids-drawing-bg", 52)
-    put(7, 31.4, "rocking-horse-bg")
-    put(7, 33.0, "toy-box-bg")
-    put(7, 34.0, "toy-blocks-bg")
+    # (The pillow fort is across the room at 30.8-34.4 m, tools/population.py: the rocking horse,
+    # the toy box and the blocks moved out of its way.)
+    put(7, 39.95, "rocking-horse-bg")
+    put(7, 44.3, "toy-box-bg")
+    put(7, 37.15, "toy-blocks-bg")
     put(7, 36.0, "beanbags-bg")
     put(7, 36.0, "pin-map-bg", 54)
     put(7, 38.0, "teddy-bg")
@@ -1403,7 +1409,7 @@ def build_objects():
     # Entourage, the teen club: deep teal, a dark carpet with neon specks, games.
     decor("entourage-doorway", "doorway", exact_x(45), exact_x(45), deck=7, text="Entourage")
     put(7, 48.4, "tv-console-bg")
-    put(7, 51.0, "beanbags-bg")
+    # (49.3-53.7 m: the ball pit, src/world/bow.js.)
     put(7, 54.6, "foosball-bg")
     put(7, 58.2, "air-hockey-bg")
     put(7, 61.4, "dartboard-2-bg", 54)
@@ -1515,9 +1521,11 @@ def build_objects():
     # officer's chair, the compass binnacle, the radar and the chart display, the chart table and
     # the alarm panel; screens and the clock with its barometer on the wall under the side windows.
     # (Its inside starts about 28.5 m: the deck's front 3 m are the ship's structure.)
-    for m, frame in ((29.3, "bridge-console"), (30.55, "helm-console"), (32.1, "engine-telegraph"),
+    # (The alarm panel stands by the helm, where the net comes down on it in near-catch 6; the
+    # engine telegraph took its place aft.)
+    for m, frame in ((29.3, "bridge-console"), (30.55, "helm-console"), (31.85, "alarm-panel"),
                      (33.4, "captain-chair"), (34.5, "binnacle"), (35.5, "radar-pedestal"),
-                     (36.5, "ecdis-stand"), (37.8, "chart-table"), (38.9, "alarm-panel")):
+                     (36.5, "ecdis-stand"), (37.8, "chart-table"), (38.95, "engine-telegraph")):
         put(10, m, frame + "-bg")
     put(10, 33.7, "clock-barometer-bg", 62)
     put(10, 38.6, "bridge-monitors-bg", 74)
@@ -1549,7 +1557,7 @@ def build_objects():
     at11(42.2, "massage-table")
     at11(43.8, "side-table")
     at11(43.8, "spa-candle", height("side-table-bg"))
-    at11(45.4, "massage-table")
+    # (45.4 m: the table with a guest on it, tools/population.py.)
     at11(47.2, "bathrobe", 34)
     at11(47.2, "spa-slippers")
     at11(53.6, "bathrobe", 34)          # and one by the sauna's far door (the user)
@@ -1564,15 +1572,16 @@ def build_objects():
             prop("leaf", "glass"), prop("width", 6, "int"), prop("swing", swing, "int"), prop("wall", "#6e3a22")]))
     for m in (57.0, 59.8):
         at11(m, "salon-mirror", 44)
-        at11(m, "salon-chair")
+    at11(57.0, "salon-chair")       # (59.8 m: the chair with a client in it, tools/population.py)
     at11(62.3, "hood-dryer")
     at11(63.8, "manicure-table")
     at11(66.6, "yoga-rack")
-    at11(68.0, "kettlebell")
-    at11(68.8, "medicine-ball")
-    at11(69.6, "gym-bottle")
-    at11(70.6, "yoga-mat")
-    at11(71.6, "dumbbells")
+    # (67-70 m: the step class.)
+    at11(70.3, "gym-bottle")
+    at11(70.8, "yoga-mat")
+    at11(71.3, "medicine-ball")
+    at11(71.9, "dumbbells")
+    at11(72.4, "kettlebell")
     at11(73.0, "water-dispenser")
     # The fitness centre over the atrium's dome: machines in a row before big windows.
     add(area("fitness-windows", "decor", exact_x(83.2), floor_y(11) - 104, exact_x(100.8) - exact_x(83.2), 56,
@@ -1687,11 +1696,11 @@ def build_objects():
     # at each, a white sill, a brass handrail along them (drawn by the game).
     decor("spinnaker-windows", "spinnakerwindows", exact_x(46.4), exact_x(56.4), deck=12)
     add(point("sign-spinnaker", "sign", exact_x(45.4), floor_y(12) - 96, [prop("text", "Spinnaker Lounge"), prop("style", "plaque")]))
-    around(12, 46.9, "marble-table-bg", "armchair-cream-bg", on_top="martini-bg")
+    around(12, 46.9, "marble-table-bg", "armchair-cream-bg", on_top="martini-bg", sides=(False, True))
     at12(49.4, "navy-sofa")
     at12(50.8, "marble-table")
     at12(50.8, "olives", height("marble-table-bg"))
-    at12(52.1, "armchair-cream", flip=True)
+    # (46.44 and 52.1 m: armchairs with guests in them, tools/population.py.)
     at12(53.8, "grand-piano")
     at12(55.7, "back-bar")
     at12(55.7, "bar-counter")
@@ -1706,7 +1715,6 @@ def build_objects():
     at12(58.3, "bucket-spade")
     at12(60.4, "rubber-duck-2", -4)
     put(12, 0, "kids-slide-bg", x=col(pool_b) * TILE + width("kids-slide-bg") // 2)
-    at12(63.9, "swim-ring")
     at12(64.7, "mushroom-fountain")
     at12(66.1, "hot-tub")
     # The Chapel lobby: the Chapel's door (CHAPEL, built by the game), the restrooms.
@@ -1719,7 +1727,7 @@ def build_objects():
     # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
     # high tables by the windows.
     decor("champs-doorway", "doorway", exact_x(82), exact_x(82), deck=12, text="Champs Bar")
-    at12(83.4, "trophy-cabinet")
+    at12(83.65, "trophy-cabinet")      # (clear of the wedding's rope at the door)
     at12(84.8, "beer-fridge")
     for a, b in ((86.2, 90.4), (95.6, 101.0)):
         add(area(f"champs-windows-{a}", "decor", exact_x(a), floor_y(12) - 104, exact_x(b) - exact_x(a), 56,

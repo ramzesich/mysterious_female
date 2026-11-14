@@ -29,7 +29,9 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # Region 7's balconies with someone on them: a man asleep on a lounger, a couple at breakfast.
          "balc-sunbather": 32, "balc-breakfast": 46,
          # Region 8, deck 12's sun deck: two more, on loungers of their own.
-         "sunbather-3": 27, "sunbather-4": 22}
+         "sunbather-3": 27, "sunbather-4": 22,
+         # Region 9: the wedding cake, carried at her hands: its top about level with her head.
+         "wedding-cake": 25}
 
 # Colours changed after the palette: PixelLab drew the parasol's stripes maroon and pink; in the
 # game they are the life rings' red and white. name -> {from: to}.
@@ -45,11 +47,16 @@ CUT_ROWS = {"parasol-open": [(30, 44)], "parasol-closed": [(16, 28), (45, 50)]}
 # A piece leaning (nothing stands by itself on a crook handle): its rows pushed sideways, one px
 # for every so many rows up from its foot, to the left. The furled parasol leans on the sunbed.
 LEAN = {"parasol-closed": 3}
+# A part of a piece cut off (its own px after trimming: left, top, right, bottom).
+CROP = {}
 
 
 def piece(path):
     img = Image.open(path).convert("RGBA")
     img = img.crop(img.getbbox())
+    if path.stem in CROP:
+        img = img.crop(CROP[path.stem])
+        img = img.crop(img.getbbox())
     if path.stem in CUT_ROWS:
         for y0, y1 in reversed(CUT_ROWS[path.stem]):
             cut = Image.new("RGBA", (img.width, img.height - (y1 - y0)), (0, 0, 0, 0))

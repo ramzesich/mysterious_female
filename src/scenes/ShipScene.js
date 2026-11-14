@@ -2518,7 +2518,8 @@ export class ShipScene extends Phaser.Scene {
         const crawling = this.updateCrawl(input, onFloor);
         const aside = this.updateAside(input, onFloor);
         const dashing = this.isDashing();
-        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1);
+        // (Waist deep in the kids' club's ball pit she wades: src/world/bow.js.)
+        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1) * (this.wading ? 0.5 : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
         // On wet tiles without the grip socks (src/world/hazards.js) she slides on the way she came.

@@ -7,6 +7,7 @@ import { sfx } from '../sfx.js';
 import { lido } from './lido.js';
 import { outside } from './outside.js';
 import { topdeck } from './topdeck.js';
+import { bow } from './bow.js';
 
 const M = 48;
 
@@ -46,18 +47,20 @@ export class Story {
         this.setupLido();
         this.setupOutside();
         this.setupTopdeck();
+        this.setupBow();
     }
 
     // E. True if something here took it.
     interact() {
         return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband()
-            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook();
+            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake();
     }
 
     update(dt, time, input) {
         this.updateLido(dt, time, input);
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
+        this.updateBow(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
         this.flash(time);
@@ -77,6 +80,7 @@ export class Story {
         this.refreshLido();
         this.refreshOutside();
         this.refreshTopdeck();
+        this.refreshBow();
     }
 
     // A lock stopped her (a block's id): whoever keeps it reacts.
@@ -735,3 +739,4 @@ export class Story {
 Object.assign(Story.prototype, lido);
 Object.assign(Story.prototype, outside);
 Object.assign(Story.prototype, topdeck);
+Object.assign(Story.prototype, bow);

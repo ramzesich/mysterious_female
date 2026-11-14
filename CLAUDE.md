@@ -49,6 +49,7 @@ truth**: read the relevant section before any design or content work, and record
 | `src/world/lido.js`, `hazards.js` | Region 6's part of the story, mixed into the Story (the pool's scene and its draining, the kid with the water pistol, the soft serve machine's swirl, the table with her husband, the chess set, the hot tub); the pool deck's and the hallways' hazards (the wet patch and its deck chair, the gulls that dive at food, the buffet queue, the trays outside a "Do Not Disturb" door) |
 | `src/world/outside.js` | Region 7: the balconies' own things (gusts, the gulls perched on the rails, laundry lines across a folded partition, balconies with someone on them), the boat drill on the walkway, the steward on his rounds; and its part of the story, mixed into the Story (the ajar balcony doors, the guest locked out on his balcony, the security officer at a tender). The vault over a partition and the climb up its pole are in `verbs.js` |
 | `src/world/topdeck.js` | Region 8: deck 12's and the funnel's own things (the old lady's sunbed, the court's basketballs, Teppanyaki's flares, the funnel's wind and circling gulls, the flocks on the bow) and its part of the story, mixed into the Story (the mojito, the engineer's coffee, the horn and what it sets off, the telescope, the court's shot). The glide's rules are in `verbs.js` and the ship scene (`overTheRail`) |
+| `src/world/bow.js` | Region 9: the bow's own things (the sauna's steam, the kids' club's ball pit, the step class's boards, the bridge's alarm) and its part of the story, mixed into the Story (the wedding planner and the cake, the party into the chapel and the ceremony, the piano, the slide, the captain's door, near-catch 6 with the net on the alarm panel and the hatch's ladder, the Library's odd book and the nook). A fragile load's sway is in `carry.js` (`SWAY`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
 | `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
@@ -271,6 +272,24 @@ Lessons learned (2026-11-14, the end of the art review):
   (`hold_until`, not `hold`).
 - A person all in dark clothes is not placed on a dark set: the stage manager in black stood
   on the dark stage, in the drum kit; he is in front of the red curtain now.
+
+Lessons learned (2026-11-14, step 9):
+
+- **A sprite sheet is packed in rows, never one strip:** her strip passed 16,384 px with two new
+  clips and she drew as a black box while every test passed. `tools/build_sprites.py` packs rows
+  of 48 cells; the `boot` playtest fails on any texture over 8,192 px a side.
+- **Look at a scenario's screenshots before calling it passed:** that black box, a rope the
+  wedding party walked through and a photo frame on a guest's hat were all in pictures of a
+  scenario whose checks were green.
+- **A close-up's scale comes from the canvas, not the window** (`Browser.close_up()` measures
+  it): the game is fitted into the headless window at about 1.7 px a game px, not 2.
+- PixelLab map objects: ask for "one ... filling the whole picture from the left edge to the
+  right edge" when a long thing must be one piece (a fort came as two tents); a person on
+  furniture comes at the right size when the canvas is about what it should measure (a seated
+  adult: 40 x 52).
+- A scratch script must not be named after a standard module (`bisect.py` broke every script
+  beside it); and `git add` takes paths by name, never `-A` (it swept the user's own draft
+  `docs/intro.md` into a commit).
 
 ## Working with the user
 

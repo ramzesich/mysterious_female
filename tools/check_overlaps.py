@@ -1,12 +1,14 @@
 """Overlaps that make no sense, found by rule in the running game (the user, 2026-11-14: a door and
 its plate drawn on a speaker stack had passed every check by eye). Every picture and text the game
-has on the decks is read with its real bounds, in two states of the story (the start; late, after
-the horn), and these pairs are listed:
+has on the decks is read with its real bounds, in three states of the story (the start; late, after
+the horn; the end, after the bow), and these pairs are listed:
 
     door / furniture    a door with something standing in front of it or behind it
     door / door         two doors in one place
     text / anything     a plate, sign or poster across a door, a piece of furniture, a picture
     text / text         two signs across each other
+    table / furniture   a pickup's own side table standing in or in front of a piece of furniture
+                        (the Spinnaker's tangerines stood in front of its piano)
     wall / furniture    a picture, clock or screen on the wall behind something standing (listed
                         last: a few are meant, a TV over its console)
 
@@ -71,6 +73,8 @@ def classify(o):
     n = name_of(o)
     if n.startswith(SKIP_NAMES):
         return None
+    if o["k"] == "sidetable":
+        return "table"
     bottom = o["y"] + o["h"]
     decks = [d for d in PLAYABLE if -4 <= floor_y(d) - bottom < 140]
     if not decks:
@@ -120,7 +124,8 @@ def audit(objs):
             pair = tuple(sorted((ka, kb)))
             rule = {("door", "stand"): "door / furniture", ("door", "door"): "door / door", ("door", "text"): "text / door",
                     ("stand", "text"): "text / furniture", ("text", "wall"): "text / wall", ("text", "text"): "text / text",
-                    ("stand", "wall"): "wall / furniture"}.get(pair)
+                    ("stand", "wall"): "wall / furniture", ("stand", "table"): "table / furniture",
+                    ("door", "table"): "table / furniture"}.get(pair)
             if not rule:
                 continue
             w, h = ov
@@ -146,18 +151,23 @@ def main():
     b = P.Browser()
     seen, rows = set(), []
     try:
-        for state in ("start", "late"):
+        for state in ("start", "late", "end"):
             if state == "start":
                 b.open("?reset&play")
-            else:
+            elif state == "late":
                 P.enter_region8(b)
                 b.eval("(P => { ['engineer', 'horn', 'lady'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
+            else:
+                # After the bow: the wedding over, the ceremony seen, the alarm, the nook open.
+                P.enter_region9(b)
+                b.eval("(P => { ['wedding', 'ceremony', 'bb6', 'alarm', 'books_all', 'nook'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
             time.sleep(1.0)
             for row in audit(json.loads(b.eval(DUMP))):
                 if row[:5] not in seen:
                     seen.add(row[:5])
                     rows.append(row + (state,))
-        order = ["door / furniture", "door / door", "text / door", "text / furniture", "text / wall", "text / text", "wall / furniture"]
+        order = ["door / furniture", "door / door", "text / door", "text / furniture", "text / wall", "text / text",
+                 "table / furniture", "wall / furniture"]
         rows.sort(key=lambda r: (order.index(r[0]), r[1], r[2]))
         for rule, deck, m, na, nb, w, h, cx, cy, state in rows:
             print(f"{rule:17} deck {deck:2} {m:6.1f} m  {na}  x  {nb}  ({w}x{h} px, {state})")

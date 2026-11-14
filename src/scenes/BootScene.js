@@ -114,6 +114,9 @@ export class BootScene extends Phaser.Scene {
         if (meta.anims.slip) this.anims.create({ key: 'her-slip', frames: frames('slip'), frameRate: 11, repeat: -1 });
         if (meta.anims.lick) this.anims.create({ key: 'her-lick', frames: frames('lick'), frameRate: 5, repeat: -1 });
         if (meta.anims.pour) this.anims.create({ key: 'her-pour', frames: frames('pour'), frameRate: 4 });
+        // Region 9: her fingers on the Spinnaker's piano; her knock at the captain's door, her back to us.
+        if (meta.anims.keys) this.anims.create({ key: 'her-keys', frames: frames('keys'), frameRate: 9 });
+        if (meta.anims.knock) this.anims.create({ key: 'her-knock', frames: frames('knock'), frameRate: 9 });
         if (meta.anims['sit-eat']) {
             this.anims.create({ key: 'her-sit-eat', frames: frames('sit-eat', [0, 1, 2, 3]), frameRate: 7 });
             this.anims.create({ key: 'her-eat-sat', frames: frames('sit-eat', [3, 4, 5, 6, 5, 4]), frameRate: 5, repeat: -1 });

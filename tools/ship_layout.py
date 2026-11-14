@@ -282,7 +282,7 @@ DOOR_LOCKS = {
     (8, 110): ("oneway", 1), (8, 194): ("oneway", -1), (8, 202): ("oneway", 1),
     (9, 202): ("oneway", 1),
     (10, 110): ("oneway", 1), (10, 194): ("oneway", -1), (10, 202): ("oneway", 1),
-    (12, 82): ("block", "wedding", -1),              # Champs into the forward lobby
+    (12, 82): ("block", "wedding", 1),               # Champs into the forward lobby (the rope on Champs' side)
 }
 # The walls she passes straight through at a deck's end (no door drawn, §5.3), by deck and end, locked
 # the same way: the aft terraces' (region 7's hallways open from inside), deck 7's front onto the
