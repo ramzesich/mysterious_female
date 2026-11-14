@@ -155,6 +155,12 @@ No pause and no map, at least for now.
 
 ### 3.2 Special move — the "Кісюнічка!!!" dash
 
+**Open (the user, 2026-11-14: "I'm not sure if it makes sense"):** the dash, the tangerines and
+what effort is rewarded with are being rethought. The analysis, the proposal on the table (the
+cry as the power, a tangerine thrown, a tangerine that forgives a hit; a second collection as
+the reward) and the questions still to answer are in `docs/brainstorm/dash-rework.md`. Until it
+is decided, what follows stands and is what the game does.
+
 **Decided (the plan, 2026-11-10): the dash stays**, learned at her first sight of Bumbot and never
 required: breakables hide shortcuts and secrets, and it tames a few hazards (§6.1.2). About 30
 tangerines go back on the ship (§6.3).
@@ -2168,6 +2174,9 @@ Nothing blocks the start of the build. These get settled along the way:
       and its ending redone the same day on their word (no close-up: she steps out of her
       door); her cabin got a standing mirror and Ukraine's flag with it. **Waiting for the
       user:** their eyes on the new ending in motion.
+      **In progress with the user (2026-11-14): a brainstorm on the dash, the tangerines and
+      the rewards** (§3.2), stopped for the day with four questions asked:
+      `docs/brainstorm/dash-rework.md`, "Where we stopped". Nothing of it is built.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
