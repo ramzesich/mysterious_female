@@ -503,6 +503,8 @@ Lessons learned (2026-11-14, the intro shown to the user):
   frame (`level_frame`, `reframe` in `tools/build_ship_art.py`), and lay the two over each other
   at the game's placing before calling them a pair. A piece may reach under the floor line (an
   open door's leaf swung toward us: the user likes it, "more real"): it says by how much in the
-  atlas (`foot`), and the game stands it by its frame (`setDoorArt()`), never by cutting it.
+  atlas (`foot`), and the game stands it by its frame (`setDoorArt()`), never by cutting it. And
+  check what the two states share besides the frame: which side the handle and the hinges are
+  on (both open doors came mirrored against their closed ones), where a plate sits.
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

@@ -444,7 +444,9 @@ def level_frame(img, frame, cut, more):
             out.putpixel((i, j), img.getpixel((x, y)))
     under = img.height - 1 - foot
     assert out.size == (DOOR[0] + 1, top + DOOR[1] + under), out.size
-    return out, under
+    # (Mirrored: the sheet hinged the open door on the left, its handle at the right; the closed
+    # door's handle is at the left, and both are seen from the corridor. The user saw it.)
+    return out.transpose(Image.FLIP_LEFT_RIGHT), under
 
 
 def reframe(img, closed, opening, inner, wider):
@@ -457,7 +459,9 @@ def reframe(img, closed, opening, inner, wider):
     strip of light at its edge, so the door stands a little further open)."""
     ox0, oy0, ox1, oy1 = opening
     ix0, iy0, ix1, iy1 = inner
-    cols = [x for x in range(ix0, ix1 + 1) for _ in range(1 + wider.count(x))]
+    # (Right to left: the sheet hinged the open door on the left, its handle at the right, and the
+    # closed door's handle is at the left. Seen from the same side, the leaf is mirrored.)
+    cols = [x for x in range(ix1, ix0 - 1, -1) for _ in range(1 + wider.count(x))]
     assert len(cols) == ox1 - ox0 + 1 and iy1 - iy0 == oy1 - oy0, (len(cols), opening, inner)
     out = closed.copy()
     for j in range(oy1 - oy0 + 1):

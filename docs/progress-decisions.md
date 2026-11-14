@@ -1578,3 +1578,11 @@ number in the atlas (`foot`), and the game stands such a piece by its frame, not
 pixel (`setDoorArt()` in the ship scene: the lit checkpoints' doors, and her cabin's as it opens
 in the intro). The frame is still the closed door's equal and on the floor. Looked at in the
 running game at her door, shut and open; no playtests run.
+
+**The open doors hinged on the closed doors' side** (the user: "the open door has its handle on
+the other side. Is it a look from the other side of the door? If not, then the handle has to be
+on the same side"). It is the same side, the corridor's: the sheet drew each open door hinged on
+the left with its handle at the right, and each closed door with its handle at the left. The
+open leaves are mirrored now, the cabin door's inside its frame and the crew door's whole piece
+(its plate comes to the closed door's side with it): handle at the left, hinges at the right,
+the light in the gap at the left. Compared side by side; no playtests run.
