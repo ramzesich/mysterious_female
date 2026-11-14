@@ -5,6 +5,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 
 const M = 48;
 const here = (s, d) => s.route === 'inside' && s.mode === 'play' && Math.abs(s.player.y - d.y) < 100;
@@ -190,7 +191,7 @@ export class FoodGulls {
                     const kind = this.world.carry.kind;
                     this.world.carryBox.give();
                     this.loot.setTexture(kind === 'stub' ? 'load-stub' : kind === 'cone' ? 'load-cone' : 'tray').setVisible(true);
-                    this.world.say('Гей!', 900);
+                    this.world.say(t('say.hey'), 900);
                     this.stolen = (this.stolen ?? 0) + 1;
                 }
                 // (Up and away, with her cone or without.)

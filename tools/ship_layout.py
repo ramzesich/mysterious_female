@@ -9,9 +9,19 @@ and rough size of things rather than to the metre. Edit this list to move things
 
 LENGTH = 258  # metres, bow to stern
 
-# Decks from the bottom up. Deck 3 shows below deck 4 but is not playable.
+# Decks from the bottom up. Deck 3 shows below deck 4; only its crew corridor (CREW_DECK below) is
+# played, the rest of it is closed.
 DECKS = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]
+PLAYABLE = [4, 5, 6, 7, 8, 9, 10, 11, 12]      # the decks the stairs, the lifts and the lobbies serve
+
+# Deck 3's crew corridor, where the game starts (the user, 2026-11-14: "a relatively small section
+# of deck 3", her crew cabin in it, "a service ladder (with the door) to the deck 4"). NCL's plan
+# names one place on deck 3, the Medical Center, just aft of the forward stairs: the corridor is
+# there, the Medical Center's door in it. A bulkhead closes each end; the forward stairs and lifts
+# do not come down to it, the ladder shaft (TRUNKS, "crew") is its only way up. Metres from the bow:
+# its span, the Medical Center's door, her cabin's door (the room is in tools/population.py), the
+# ladder's (in the place of a cabin door of deck 4's corridor above).
+CREW_DECK = {"deck": 3, "span": (82, 98), "medical": 85.5, "cabin": 90, "ladder": 95.6}
 
 # How far each deck reaches, (forward end, aft end): the superstructure steps back from the bow,
 # and the upper decks end short of the stern in terraces.
@@ -183,10 +193,13 @@ VENUES = [
     (5, 202, 255, "Seven Seas", "venue"),
 
     (4, 20, 60, "Cabins", "cabins"),
-    (4, 60, 74, "Gangway (start)", "start"),
+    # (The game started here until 2026-11-14; now in deck 3's crew corridor, below.)
+    (4, 60, 74, "Gangway", "start"),
     (4, 82, 102, "Cabins", "cabins"),
     (4, 110, 194, "Cabins", "cabins"),
     (4, 202, 255, "Cabins", "cabins"),
+
+    (3, *CREW_DECK["span"], "Crew corridor (start)", "crew"),
 ]
 
 # Escape trunks (§5.1): crew doors onto a vertical ladder shaft. Each is (name, metres from the
@@ -200,6 +213,8 @@ TRUNKS = [
     # The Bliss/Magnum's trunk, up to deck 9 beside the linen room (no door on deck 8): the way into
     # region 4 (§6.1.3).
     ("magnums", 118, [6, 7, 9], {"card": "ent"}),
+    # The service ladder from deck 3's crew corridor up to deck 4 (the user, 2026-11-14).
+    ("crew", CREW_DECK["ladder"], [3, 4], {}),
 ]
 
 # --- Progression (GAME_DESIGN.md §6.1; every lock in docs/population.md §2.6) -------------------
@@ -214,7 +229,7 @@ CARDS = {"deck": "blue", "ent": "red", "hk": "green", "off": "gold"}
 # is the game's ("inside", or "promenade" for deck 6's outside). Region 7's outside and the roof come
 # with their ways (step 0's second round).
 REGIONS = {
-    1: [(4, 0, 258, "inside"), (5, 0, 258, "inside")],
+    1: [(3, 0, 258, "inside"), (4, 0, 258, "inside"), (5, 0, 258, "inside")],
     2: [(6, 0, 194, "inside"), (6, 100, 231, "promenade"), (7, 74, 110, "inside"),
         (7, 100, 231, "promenade")],                      # the boat walkway, up the lifeboat station's ladder
     3: [(6, 194, 258, "inside"), (7, 110, 258, "inside")],

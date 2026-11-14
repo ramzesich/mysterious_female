@@ -9,6 +9,7 @@
 
 import { PLAYER, VIEW, WIN_MESSAGE } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t, pick } from '../lang.js';
 import { writeSave } from '../save.js';
 import { Gusts } from './outside.js';
 
@@ -159,17 +160,8 @@ export const finale = {
         if (play && P.has('alarm') && !P.has('sunset') && !this.turning && s.route === 'inside' && s.grounded
             && Math.abs(her.y - B.y) < 2 && her.x > B.x0 && her.x < B.x1 - 6) this.sunsetScene();
         if (P.has('sunset') && !P.has('catch')) this.updateTip(dt, time);
-        // Someone on the mooring deck before any of it (down from deck 8's terrace): nothing to do
-        // there, and the only way off is over the rail.
-        if (play && !P.has('sunset') && s.route === 'inside' && s.grounded && Math.abs(her.y - F.mooring.y) < 2 && her.x < F.mooring.wallX) {
-            this.strandedAt ??= time;
-            if (time - this.strandedAt > 9000 && !this.strandedTold) {
-                this.strandedTold = true;
-                this.world.hint('No way back up from here. Over the rail, then!');
-            }
-        } else if (!play || her.x > F.mooring.wallX + 200) {
-            this.strandedAt = null;
-        }
+        // (Someone on the mooring deck before any of it, down from deck 8's terrace, has nothing to
+        // do there, and the only way off is over the rail: hers to find out.)
         // Home: the cabin, with him in her arms.
         if (play && s.holding && s.route === 'cabin' && !this.homing) this.homeScene();
         if (s.holding && play) this.updateWelcome(time);
@@ -309,10 +301,6 @@ export const finale = {
             s.time.delayedCall(140, () => cat.play('bumbot-run'));
             s.tweens.add({ targets: cat, x: to, duration: Math.abs(to - cat.x) / 0.32, onComplete: settle });
         }
-        if (T.spooks >= 2 && !w.save.seen.includes('hint-still')) {
-            w.save.seen.push('hint-still');
-            w.hint('Stand still. Let him come to you');
-        }
     },
 
     // The catch: she has stopped chasing. She turns to the sea and spreads her arms in the wind;
@@ -359,7 +347,6 @@ export const finale = {
             s.pose('stand');
             await w.tween({ targets: s.fade, alpha: 0, duration: 700 });
             this.catching = false;
-            w.hint('Home now: cabin 8206, deck 8');
         });
     },
 
@@ -491,16 +478,17 @@ export const finale = {
             const cx = VIEW.width / 2;
             const serif = { fontFamily: 'Georgia, serif', color: '#ffffff', stroke: '#1d2b53' };
             const band = s.add.rectangle(0, 0, VIEW.width, 178, 0x0d0b14, 0.62).setOrigin(0);
-            const title = s.add.text(cx, 50, 'Bumbusik', { ...serif, fontSize: '72px', strokeThickness: 8 }).setOrigin(0.5);
-            const line = s.add.text(cx, 108, 'Bumbot is home.', { ...serif, fontSize: '30px', strokeThickness: 5 }).setOrigin(0.5);
+            const title = s.add.text(cx, 50, t('title'), { ...serif, fontSize: '72px', strokeThickness: 8 }).setOrigin(0.5);
+            const line = s.add.text(cx, 108, t('win.line'), { ...serif, fontSize: '30px', strokeThickness: 5 }).setOrigin(0.5);
             const found = save.collected.filter(id => id.startsWith('tan_')).length;
             const books = Object.values(save.books).filter(b => b === 'returned').length;
             const photos = save.seen.filter(id => id.startsWith('slot_')).length;
-            const tally = s.add.text(cx, 148, `Tangerines ${found} of ${T.tangerines}      Books back on the shelf ${books} of 10      Pictures found ${photos} of ${T.slots}`,
+            const tally = s.add.text(cx, 148, t('win.tally', found, T.tangerines, books, photos, T.slots),
                 { fontFamily: 'Verdana, sans-serif', fontSize: '15px', color: '#fdcbb0' }).setOrigin(0.5);
-            const note = s.add.text(cx, 176, WIN_MESSAGE, { ...serif, fontSize: '22px', strokeThickness: 4, fontStyle: 'italic', align: 'center', wordWrap: { width: VIEW.width - 160 } }).setOrigin(0.5, 0);
-            const go = s.add.text(cx, VIEW.height - 34, 'Press E: the ship is still yours to wander', { fontFamily: 'Verdana, sans-serif', fontSize: '15px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4 }).setOrigin(0.5).setVisible(false);
-            if (WIN_MESSAGE) band.setSize(VIEW.width, 176 + note.height + 16);
+            const message = pick(WIN_MESSAGE);
+            const note = s.add.text(cx, 176, message, { ...serif, fontSize: '22px', strokeThickness: 4, fontStyle: 'italic', align: 'center', wordWrap: { width: VIEW.width - 160 } }).setOrigin(0.5, 0);
+            const go = s.add.text(cx, VIEW.height - 34, t('win.go'), { fontFamily: 'Verdana, sans-serif', fontSize: '15px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4 }).setOrigin(0.5).setVisible(false);
+            if (message) band.setSize(VIEW.width, 176 + note.height + 16);
             const items = [band, title, line, tally, note, go];
             s.uiLayer.add(items);
             this.winItems = items;

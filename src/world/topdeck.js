@@ -9,6 +9,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 import { Gusts, PerchGull } from './outside.js';
 
@@ -283,7 +284,7 @@ export class FunnelWind {
         const on = this.onStairs();
         if (on && !s.stairSlip && this.gusts.phase(time) === 'blow' && this.lastFlight === s.flight && Math.abs(s.stairT - this.lastT) > 1e-5 && s.stairT > 0.02) {
             s.stairSlip = true;
-            this.world.say('Ой-йой!', 800);
+            this.world.say(t('say.whoa'), 800);
             sfx.slip();
         }
         this.lastFlight = on ? s.flight : null;
@@ -514,14 +515,7 @@ export const topdeck = {
     updateTopdeck(dt, time) {
         const s = this.scene, w = this.world, her = s.player, T = this.T;
         if (!T) return;
-        // How the old lady is passed, the first time she is stopped by the sunbed.
         const L = T.lady;
-        if (s.mode === 'play' && s.route === 'inside' && !this.P.has('horn') && !w.save.seen.includes('hint-sunbed')
-            && Math.abs(her.y - L.y) < 4 && Math.abs(Math.abs(her.x - L.x) - L.half - PLAYER.bodyWidth / 2) < 3 && her.body.velocity.x === 0
-            && (her.body.blocked.left || her.body.blocked.right || her.body.touching.left || her.body.touching.right)) {
-            w.save.seen.push('hint-sunbed');
-            w.hint(w.carry ? 'No way past her with a tray' : 'Jump over, or ↓ to drop through the walk');
-        }
         // The engineer on his break turns to her.
         const e = this.who('npc_engineer_read');
         if (e?.on && e.state !== 'acting' && Math.abs(her.y - e.y) < 8 && Math.abs(her.x - e.x) < 3 * M) {

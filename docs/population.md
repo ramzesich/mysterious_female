@@ -54,11 +54,14 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 | `item_card_ent` | Entertainment card, red | Deck 6, 246, the stage manager | Given for his pills | §6.1.5 |
 | `item_card_hk` | Housekeeping card, green | Deck 9, 126, the steward | Given for his cart | §6.1.5 |
 | `item_card_off` | Officer's card, gold | Deck 12, 136, on the sun deck | Dropped by the rival at the horn; a glint; E | Every reader |
-| `item_dash` | The dash | Deck 5, 247, the fruit bowl | The scream at near-catch 1, the D glyph as she takes the first tangerine | §3.2 |
-| `item_push` | Pushing carts | Deck 9, 122, the steward's cart | The E glyph at the cart's end | Carts, the laundry cart, the library's ladder |
-| `item_crawl` | Crawling | Deck 9, the linen room's vent | The ↓ glyph on the cart under the vent | The duct, laundry lines, the pillow fort |
-| `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E; the glyph: jump at a wall | Wall jumps |
-| `item_parasol` | The parasol | Deck 12, 130, the old lady's sunbed, after the horn | E; the glyph: hold jump in the air | The glide |
+| `item_dash` | The dash | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
+| `item_push` | Pushing carts | Deck 9, 122, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
+| `item_crawl` | Crawling | Deck 9, the linen room's vent | ↓ on the cart under the vent | The duct, laundry lines, the pillow fort |
+| `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E | Wall jumps |
+| `item_parasol` | The parasol | Deck 12, 130, the old lady's sunbed, after the horn | E | The glide |
+
+(No glyph and no hint shows how any of them is used, here or in the tables and scenes below that
+still name one: the user, 2026-11-14, "part of the game is figuring things out". GAME_DESIGN.md §7.1.)
 
 ### 2.2 The ten books
 
@@ -135,7 +138,8 @@ Crew doors (§5.5), except the two cabins named. "Closest activated" per §5.5.
 
 | Id | Deck | m | Door | Region |
 |---|---|---|---|---|
-| `cp_gangway` | 4 | 62 | The gangway lobby's crew door (the start) | 1 |
+| `cp_crew` | 3 | 90 | Her crew cabin's door, deck 3's crew corridor (the start, lit from the start: the user, 2026-11-14) | 1 |
+| `cp_gangway` | 4 | 72 | The gangway lobby's crew door (the start until 2026-11-14) | 1 |
 | `cp_4_aft` | 4 | 212 | A crew cabin door by the aft lobby | 1 |
 | `cp_laundry` | 4 | 112 | The laundry's door | 4 |
 | `cp_6_fwd` | 6 | 40 | A crew door among the forward cabins | 2 |
@@ -216,8 +220,8 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 ### 2.8 The HUD and the save
 
 The HUD: four card slots (lit when held); the tangerine count; the dash's countdown; the books'
-count; the carried thing with its meter (a melting cone, a cooling cup); a key glyph the first time a
-verb is possible. The save keeps: the cards, the verbs, the regions opened, each block lifted, each
+count; the carried thing with its meter (a melting cone, a cooling cup). (No key glyph: every hint
+was taken out on 2026-11-14.) The save keeps: the cards, the verbs, the regions opened, each block lifted, each
 one-way door opened, each book (found, returned, read), each tangerine taken, each secret and quirk
 seen, each errand's state, each Bumbot beat done, the machine refilled, the kid's ally state, the old
 lady's doze, the wedding, the horn, the alarm, the catch, the way home; the towel's place (§8).
@@ -238,11 +242,24 @@ or scare. Venues' spans are the layout's (`tools/ship_layout.py`).
 | 50 | trunk `fwd-cabins` | The trunk's door, decks 4-5, free | As built | |
 | 56 | `sign_lockdown_1` | A "SEARCH IN PROGRESS" poster | Decor | A sign |
 
-**The gangway lobby 60-74 (the start).**
+**Deck 3's crew corridor 82-98 (the start; the user, 2026-11-14).** A bulkhead at each end; no
+stairs and no lift come down to it.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 62 | `cp_gangway` | The crew door | Checkpoint, lit from the start | Built |
+| 83.3, 84.1 | | The fire point: a hose cabinet, an extinguisher | Dressing | Atlas |
+| 85.5 | | The Medical Center's door (NCL's plan), its plaque over it; a first-aid cabinet, a seat to wait on | Dressing, shut | Atlas |
+| 88.5 | | The crew's notice board | Dressing | Atlas |
+| 90 | `room_crewcabin`, `cp_crew` | The door marked CREW: her own crew cabin (patterned wallpaper, a desk, a porthole, a bed for one, a picture of Bumbot over it) | The start; `room`; checkpoint, lit from the start | Drawn |
+| 91.3, 92.3 | | A clock, the water cooler | Dressing | Atlas |
+| 93.2 | | The way out's sign, toward the ladder | Dressing | Atlas |
+| 95.6 | `trunk-crew` | The service ladder's door, up to deck 4 (it comes out among deck 4's cabins, between the forward and the midship stairs) | An escape trunk, decks 3 and 4, no card | Built |
+
+**The gangway lobby 60-74 (the start until 2026-11-14).**
+
+| m | Id | What | Behaviour | Needs |
+|---|---|---|---|---|
+| 72 | `cp_gangway` | The crew door | Checkpoint | Built |
 | 66 | `npc_officer` | The gangway security officer at his post by the shell door | `static`; bubble (a tray) within 4 m; E with the lunch tray: he eats (3 s), hands `item_card_deck` (`scn_card_deck`) | Idle, eat, hand over |
 | 67 | spawn | Her start | As built | |
 | 62-72 | `haz_porter` | The porter pushing a loaded luggage cart | `loop(62, 72, 1.0)`; a bump: "Bumped"; hop it (the cart is 1 m high) | The porter, the cart |

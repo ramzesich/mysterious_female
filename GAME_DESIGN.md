@@ -231,8 +231,9 @@ there; they only remind her he's on board.
   map**, from memory.
 - **The name is never stated at the start.** She has to recognise the ship herself. Name markings
   may appear in areas she unlocks later. **Later**
-- **She starts on the gangway, on deck 4**: in the gangway lobby, with the shell door closed, because
-  the ship is already at sea.
+- **She starts on deck 3, at her crew cabin's door** (the user, 2026-11-14; until then on the
+  gangway, on deck 4): in the crew corridor, the ship already at sea. The service ladder behind
+  its door takes her up to deck 4, where the gangway lobby is, its shell door closed.
 - **She can go outside:** open decks, railings, the promenade, lifeboats.
 - **Side view of a top-down plan:** the real deck plans are seen from above, but the game shows the
   ship from the side, so each deck shows one slice along its length. That slice follows the deck's
@@ -356,7 +357,8 @@ venue's position along the ship. Use it whenever a position or proportion needs 
 - Three stair-and-elevator cores: **forward** (~79 m from the bow), **midship** (~96 m) and **aft**
   (~198 m). The **atrium** spans decks 5–10 (deck 10 open over it since 2026-11-06; its glass elevator and staircase 5–9) between the forward and midship cores, with glass
   elevators. The funnel stands over the aft half.
-- **The gangway is on deck 4, forward**, beside the forward stairs. The game starts there.
+- **The gangway is on deck 4, forward**, beside the forward stairs. The game started there until
+  2026-11-14; it starts a deck below now, in deck 3's crew corridor (below).
 - **Floors and open spaces (Decided, 2026-11-02, replacing "the atrium is a look, not a
   well"):** corridors and rooms have solid floors. Two places open up through the decks, as on
   the real ship, and both work the same way, as **side walks**:
@@ -393,8 +395,25 @@ venue's position along the ship. Use it whenever a position or proportion needs 
   was made first by a misunderstanding and is kept in `assets/source/her/swim-crawl/`). Two pools on deck 11 (119-131 m and
   134-140 m), sunk two tiles into the deck; she walks or drops in with a splash, ←/→ swims, jump
   climbs out. Maybe game mechanics round the pools later. Not a scare.
-- **Below deck 4 is not playable.** Deck 3 shows at the bottom of the screen when she is on deck 4,
-  as it naturally would, but she can't get there. There are no crew or engine decks to explore.
+- **Below deck 4 only deck 3's crew corridor is played** (Decided, the user, 2026-11-14: "a
+  relatively small section of deck 3 where the game will now start", her crew cabin in it and
+  "a service ladder (with the door) to the deck 4"). NCL's plan names one place on deck 3, the
+  Medical Center, just aft of the forward stairs: the corridor is there, 82 to 98 m, under deck
+  4's cabins between the forward and the midship stairs (`CREW_DECK` in `tools/ship_layout.py`).
+  Bow to stern: the fire point (hose cabinet, extinguisher), **the Medical Center's door** with
+  its plaque, a first-aid cabinet and a seat to wait on, the crew's notice board, **the door
+  marked CREW** (her cabin, a room she can go into: patterned wallpaper, a desk under a
+  mirror, a porthole, her bed, for one, and over it a small picture of Bumbot's head, as the user set them
+  the same day; its door is the first checkpoint, lit from the start), a clock and the water
+  cooler, the way out's sign, **the service ladder's door** (an escape trunk, decks 3 and 4) and
+  the deck's plaque. It is a working corridor, plainer than the guests' decks: painted panels
+  over a green dado, a steel handrail, a pipe, the fire main and a cable tray under the deck
+  above, tube lights, vinyl on the floor. A bulkhead closes each end, and the forward stairs
+  and lifts do not come down to it: the ladder is the only way up. The rest of deck 3 stays
+  closed, and shows at the bottom of the screen when she is on deck 4, as it naturally would.
+  There are no other crew or engine decks to explore. All of it from art already in the atlas
+  and drawn in code, but for the picture in her cabin: Bumbot's head, a generated Bombay cat's
+  with his own eyes (the user's wish; 2 generations for two tries).
 - **The map builder places venues by their real position** along the ship, deck by deck, from a
   list (`tools/ship_layout.py`); the art is placeholder until the real tiles come.
 
@@ -409,7 +428,8 @@ true to the order and rough size of things on the real ship.
 | Deck | Role in the game |
 |---|---|
 | 1–3 | Crew and engine decks: machinery, laundry, galley stores, crew corridors and cabins. |
-| 4–5 | Lower guest decks: **gangway (start)**, reception, medical, cabins. |
+| 3 | Closed but for its crew corridor: **the start**, her crew cabin, the Medical Center's door, the service ladder up. |
+| 4–5 | Lower guest decks: gangway, reception, cabins. |
 | 6–7 | Public decks: atrium, restaurants, theatre, shops, casino; the outdoor promenade and lifeboats. |
 | 8–10 | Cabin decks: long corridors, room-service and housekeeping carts. |
 | 11 | Pool deck, buffet, and the open diner aft with the ice cream machine. |
@@ -609,7 +629,7 @@ The word is **"scare"**, never "death", on screen and in the code alike.
 
 | Area | Ideas |
 |---|---|
-| Gangway | The start, on deck 4. Ship's horn, luggage carts. |
+| Gangway | On deck 4 (the start until 2026-11-14; it is on deck 3 now). Ship's horn, luggage carts. |
 | Crew decks / engine room | Pipes, steam vents, machinery; dark and warm-lit. |
 | Cabin corridors | Long, repetitive halls, numbered doors, room-service carts, housekeeping trolleys. |
 | Atrium / promenade | Multi-storey open space with glass elevators, shops, a grand staircase. |
@@ -702,7 +722,7 @@ region 6). At the very end he is in the cabin when she brings the cat home.
 | Kind | How it reads | The rule |
 |---|---|---|
 | **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors |
-| **New ways to move** | A pickup with a key glyph shown once | Four verbs, one per quarter: the dash (region 1), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
+| **New ways to move** | A pickup (no glyph and no hint since 2026-11-14: how a verb is used is hers to find out) | Four verbs, one per quarter: the dash (region 1), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
 | **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
 | **People and the ship's routine** | A person, a crowd or a thing on a flight, with a rope and a sign | A cleaner mopping, a photographer, a carpet being relaid, a table of towel animals, a painter, a crowd of fans, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
 
@@ -774,7 +794,7 @@ opens full screen. Six places are fixed here (§6.1.11); the pictures come from 
 
 | Step | Region | What it covers | What opens it | The verb it gives | Bumbot |
 |---|---|---|---|---|---|
-| 1 | Lower ship | Decks 4 and 5 | The start, at the gangway | The dash | Eating the officer's lunch at the Seven Seas: near-catch 1 |
+| 1 | Lower ship | Decks 4 and 5, deck 3's crew corridor | The start, at her crew cabin's door on deck 3 | The dash | Eating the officer's lunch at the Seven Seas: near-catch 1 |
 | 2 | Atrium + promenade | Deck 6 from the bow to the Library, the promenade, the atrium on 6-7, the boat walkway's gate | The Deck card, on the midships crew trunk up into Bliss | | Rides the glass elevator up where she can't; in the Library, near-catch 2: asleep on her book, he bolts through a roped-off door and leaves it open |
 | 3 | Showtime | The theatre, its balcony, deck 7 from Magnum's to the Arcade | The door he left open | | On stage in the spotlight: near-catch 3, up a fly rope |
 | 4 | Housekeeping | Deck 9 midships round the linen room, the atrium's walks and midship lobbies on 8-10 | The Entertainment card, on the crew trunk from Bliss up to deck 9 | Pushing carts, crawling | Asleep in the towels: near-catch 4, into the vent |
@@ -793,7 +813,9 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 
 **Region 1: Lower ship (decks 4 and 5).**
 
-- **The way in:** the start, at the gangway (deck 4, 67 m), the shell door shut.
+- **The way in:** the start, at her crew cabin's door on deck 3 (90 m), and up the service
+  ladder (95.6 m) to deck 4; forward through the stair lobby to the gangway (67 m), the shell
+  door shut.
 - **The errand:** the **gangway officer** at his post by the shell door can't leave it; his bubble
   shows a tray. His lunch waits at the pass by the Seven Seas' crew door (deck 5 aft, 250 m). **Bumbot
   is on the counter eating it** (his `eating` clip). **Near-catch 1:** she lunges with the scream
@@ -817,7 +839,8 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   back and forth in the gangway lobby; the waiter in the Four Seasons' doorway (deck 5, 168-194), a
   tray hazard only, the only waiter in the game.
 - **Shortcuts:** the forward-cabins trunk (deck 4-5, 50 m) is free from the start: the trunk lesson.
-- **Checkpoints:** the gangway lobby's crew door (deck 4, 62 m); deck 4 aft (235 m).
+- **Checkpoints:** her crew cabin's door (deck 3, 90 m), lit from the start; the gangway
+  lobby's crew door (deck 4, 72 m); deck 4 aft (212 m).
 - **Secrets:** the galley pass behind the Seven Seas' crew door (a crate of tangerines, breakable);
   the Four Seasons' ice swan (E: she shivers, a quirk). Tangerines: the bowl (3), the Atrium Café
   (1), La Cucina (1), the crate (2).
@@ -1397,8 +1420,8 @@ Tier 1 month renews on 2026-11-30 (§8). Rough counts; the build prices each bat
   stairway and top, the bridge's hatch and ladder, the pool's hatch, the chapel's ceremony, the
   balcony rails as platforms.
 - **The finale:** the sunset sky and sea; her holding him; her husband in the cabin.
-- **HUD and glyphs:** the card slots, the carried thing with its melt or heat meter, the books' count,
-  the key glyphs, the pictogram bubbles.
+- **HUD:** the card slots, the carried thing with its melt or heat meter, the books' count,
+  the pictogram bubbles. (The key glyphs were taken out with every hint, 2026-11-14: §7.1.)
 
 #### 6.1.13 How we proceed: the build order
 
@@ -1513,7 +1536,9 @@ cap, scarce, and the game can be finished without the dash.
 9. **Checkpoints and scares:** crew cabin doors, closest-activated respawn, the scare animations
    (run off, fall out of frame, life ring).
 10. **Keyboard + Xbox controller input**, both mapped to the same actions.
-11. **Screens:** title ("Bumbusik" and Start, nothing else), play, win.
+11. **Screens:** title ("Bumbusik" and Start, nothing else), play, win. (The welcome screen and
+    the intro of `docs/intro.md` come later, on the user's word; the prep for them was done on
+    2026-11-14: items 15 and 16, and deck 3's crew corridor, §5.3.)
 12. **Save:** auto-save at checkpoints to localStorage.
 13. **The sea:** scrolling water and sky behind the ship, visible outside and through windows.
 14. **Sound effects only**, synthesised. No music for now. **Built (step 12, 2026-11-14):**
@@ -1521,6 +1546,25 @@ cap, scarce, and the game can be finished without the dash.
     (`sfx.at(x, y)`), and the ambience of §5.2; on by default, M mutes. Every one of them is
     written from a recipe and measured (`tools/check_sound.py`), none has been heard: the user
     listens on `tools/soundboard.html`.
+15. **No hints** (Decided, the user, 2026-11-14: "Remove every hint popup with text that we have
+    in the game. Part of the game is figuring things out. Labels and namings are not considered
+    hints"). Nothing pops up to say what to press or what to do: not how a new verb is used, not
+    a key's cap over a cart, a vent or a machine, not "stand still" at the catch nor where home
+    is after it. What stays: the ship's own signs and plates, the people's pictogram bubbles, a
+    lock's popup naming the card it wants, her own exclamations, and the win screen's "Press E"
+    line (the popup and that line asked about and kept by the user, 2026-11-14). The controls
+    are in `README.md`.
+16. **Two languages** (Decided, the user, 2026-11-14): **English, the default, and Ukrainian**;
+    "every text shall have two versions. The art text (e.g. La Cucina) stays as it is". All of
+    the game's own words are in `src/lang.js` (`t(key)`): the title, the win screen, a lock's
+    popup and the cards' names, her frights and exclamations (which were Ukrainian only until
+    then). The same in both: the ship's signs and plates, which are part of the picture of an
+    English-speaking ship (La Cucina, DECK 5, LINEN, a rope's QUIET PLEASE: my reading of "art
+    text", asked about and answered "Ok" by the user, 2026-11-14), her «Кісюнічка!!!» (§3.2, the
+    exact text), and everything
+    said without words. The choice is kept in the browser; `?lang=uk` sets it for a session.
+    The LANGUAGE button that switches it is the welcome screen's (`docs/intro.md`), not built
+    yet. `WIN_MESSAGE` in `src/config.js` takes both versions.
 
 ### 7.2 Stack
 
@@ -2087,7 +2131,13 @@ Nothing blocks the start of the build. These get settled along the way:
       out in the world; `docs/progress-decisions.md`). **Next:** the user's word on the sounds,
       their own touches to the livery (`livery-by-hand.png`, §5.3), then the rest of "After the
       regions" in `docs/build-plan.md` (the controller, tuning, her playtest and the hidden
-      extras). Mark each step done here as it lands. From step 9 on every new person is checked against
+      extras). **The prep before the intro** (the user, 2026-11-14, on `docs/intro.md`): every
+      hint popup taken out, the game's texts in English and Ukrainian (`src/lang.js`), and the
+      start moved to a crew corridor on deck 3 with her cabin and a service ladder up to deck 4
+      (§5.3, §7.1 items 15 and 16; `docs/progress-decisions.md`). **The intro itself (the welcome
+      screen, the start sequence, the intro scene) is not to be built until the user says so.**
+      Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
+      Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")
 - [ ] **The outside of the ship is done** (the sea, the background,

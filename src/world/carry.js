@@ -8,6 +8,7 @@
 // goes over: the meter on the HUD is how steady it stands.
 
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 
 // What a tray can hold: how it is drawn (a piece of the ship's atlas on the tray, or drawn here),
 // whether it runs out (`ms`: a melting cone, a cooling cup), whether it is too heavy to hop with.
@@ -135,7 +136,7 @@ export class Carry {
         // A start, no more: she is knocked back a step.
         p.body.velocity.x = away * 120;
         p.body.velocity.y = -90;
-        this.world.say('Ой!', 700);
+        this.world.say(t('say.oops'), 700);
         this.world.refresh();
     }
 
@@ -200,7 +201,7 @@ export class Carry {
         const top = this.items.at(-1), k = Math.min(1, this.wobble);
         top.setAngle(Math.sin(s.time.now / (110 - 50 * k)) * 13 * k).setX(x + Math.sin(s.time.now / (110 - 50 * k)) * 2 * k);
         if (this.wobble < 1) return false;
-        this.world.say('Ой-ой-ой!', 900);
+        this.world.say(t('say.ohno'), 900);
         this.spill(p.x - (p.flipX ? -1 : 1) * 10);
         return true;
     }

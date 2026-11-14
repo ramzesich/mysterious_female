@@ -66,7 +66,7 @@ def build():
         if deck == 3:
             out.append(f'<rect x="{x(fwd):.0f}" y="{y0}" width="{(aft - fwd) * PX}" height="{ROW}" '
                        f'fill="#c9c9c9" stroke="#ffffff"/>')
-            out.append(text((x(fwd) + x(aft)) / 2, y0 + 19, "Deck 3: visible below deck 4, not playable",
+            out.append(text(x(fwd) + 190, y0 + 19, "Deck 3: closed but for its crew corridor (the start)",
                             9, color="#555555"))
         else:
             out.append(f'<rect x="{x(fwd):.0f}" y="{y0}" width="{(aft - fwd) * PX}" height="{ROW}" '

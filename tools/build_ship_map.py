@@ -16,7 +16,7 @@ import zlib
 from pathlib import Path
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, RADAR_MAST, PLAYABLE,
-                         OUR_CABIN, LINEN_ROOM, CHAPEL, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES,
+                         OUR_CABIN, LINEN_ROOM, CHAPEL, CREW_DECK, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES,
                          CARDS, REGIONS, FLIGHT_LOCKS, BLOCKS, DOOR_LOCKS, END_WALL_LOCKS, CARD_SPOTS, TRIGGERS)
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,12 +35,14 @@ COLS = SEA + LENGTH * PER_M + SEA
  LIBRARY_CARPET, THEATRE_CARPET, LOBBY6_CARPET,
  KIDS_WALL, TEEN_WALL, CASINO_WALL, ARCADE_WALL, KIDS_CARPET, CASINO_CARPET, ARCADE_CARPET,
  BALCONY_RAIL, BRIDGE_WALL, BRIDGE_FLOOR, SPA_WALL, SAUNA_WALL, GYM_FLOOR, CAFE_WALL, CAFE_CARPET,
- SPINNAKER_CARPET, SUSHI_WALL, TEPPAN_WALL, BISTRO_WALL, CANTINA_WALL, CANTINA_FLOOR) = range(1, 73)
-TILE_COUNT = 72
+ SPINNAKER_CARPET, SUSHI_WALL, TEPPAN_WALL, BISTRO_WALL, CANTINA_WALL, CANTINA_FLOOR,
+ CREW_FLOOR) = range(1, 74)
+TILE_COUNT = 73
 
 # The furnished rooms' own walls and carpets (the user's photos, §5.3): the wall, and the carpet.
 # La Cucina's first metres are the grey-blue wall its marble portico stands on.
 ROOM_LOOK = {
+    "Crew corridor (start)": (CREWWALL, CREW_FLOOR),
     "La Cucina": (WALNUT, DIAMOND_CARPET),
     "Four Seasons": (DINING_WALL, DINING_CARPET),
     "Seven Seas": (DINING_WALL, DINING_CARPET),
@@ -83,7 +85,7 @@ ROOM_LOOK = {
 # (the user's photo). (Bliss's wooden dance floor was tried: one carpet reads better, the user.)
 RESERVATIONS = (5, 137.6, 143.0)
 CUCINA_FRONT = (150, 153.5)     # the portico stands on the grey-blue wall (tried in its middle: the user preferred this)
-FURNISHED = {4, 5, 6, 7, 8, 9, 10, 11, 12}     # decks furnished from the photos: no placeholder venue signs on them
+FURNISHED = {3, 4, 5, 6, 7, 8, 9, 10, 11, 12}     # decks furnished from the photos: no placeholder venue signs on them
 
 # The outer shell (§5.3): the off-white plating seen from outside, and its colour.
 # Where a deck steps back from the one below by less than SLOPE_MAX metres, the
@@ -282,6 +284,12 @@ def in_structure(deck, c):
     return any(0 < (c - pc) * inward <= STRUCTURE_COLS + 1 for pc, inward in corridor_ends(deck))
 
 
+def on_crew_deck(deck, m):
+    """Is this spot in deck 3's crew corridor, the one part of that deck that is played?"""
+    a, b = CREW_DECK["span"]
+    return deck == CREW_DECK["deck"] and a <= m < b
+
+
 def in_core(m):
     return any(a <= m < b for a, b in CORES.values())
 
@@ -337,8 +345,10 @@ def build_layers():
             m = metres(c)
             name, kind = venue_at(deck, m)
             look = ROOM_LOOK.get(name)
-            if deck == 3:
+            if deck == 3 and not on_crew_deck(deck, m):
                 tile = DIMWALL
+            elif deck == 3:
+                tile = look[0]
             elif in_atrium(deck, m):
                 tile = ATRIUMWALL
             elif in_core(m):
@@ -365,6 +375,8 @@ def build_layers():
             # Open to the sky wins: a corridor's carpet stops where the deck above it ends.
             if deck == 6 and in_core(m):
                 solid[floor][c] = LOBBY6_CARPET  # deck 6's lobbies: purple-navy with gold (her photo)
+            elif on_crew_deck(deck, m):
+                solid[floor][c] = look[1]       # the crew corridor's vinyl
             elif deck > 3 and (in_core(m) or kind == "start"):
                 solid[floor][c] = LOBBY_CARPET  # the lobbies' and the gangway's blue mosaic carpet
             elif deck > 3:
@@ -414,6 +426,15 @@ def build_layers():
                 if indoor(deck, metres(c - 1)) != indoor(deck, metres(c)):
                     wall = c if indoor(deck, metres(c)) else c - 1
                     fill(solid, wall, wall, floor - DECK_ROWS + 1, floor - 6, STEEL)
+
+    # Deck 3's crew corridor (CREW_DECK): a bulkhead at each end, turning away from us as the cabin
+    # corridors' end walls do; the rest of the deck behind them is never seen.
+    a, b = CREW_DECK["span"]
+    floor = FLOOR_ROW[CREW_DECK["deck"]]
+    fill(solid, col(a), col(a), floor - DECK_ROWS + 1, floor - 1, END_WALL_L)
+    fill(solid, col(b) - 1, col(b) - 1, floor - DECK_ROWS + 1, floor - 1, END_WALL_R)
+    for c in (col(a), col(b) - 1):
+        solid[floor][c] = SLAB
 
     # The bow's hull, seen from outside (§5.3): from the raked stem back to the block's end, from
     # under the forecastle down to the waterline, white plating (the game paints the ship's sun on
@@ -539,7 +560,8 @@ def build_exterior():
         for c in range(c0, c1 + 1):
             m = metres(c)
             shell = c in (c0, c1) and covered(deck, metres(c + (1 if c == c0 else -1)))
-            fixed = deck == 3 or shell or in_structure(deck, c) or in_end_wall(deck, c)
+            # (Deck 3 stays closed but for its crew corridor, cut away while she is in it.)
+            fixed = (deck == 3 and not on_crew_deck(deck, m)) or shell or in_structure(deck, c) or in_end_wall(deck, c)
             if indoor(deck, m) or fixed:
                 for r in range(floor - DECK_ROWS + 1, floor):
                     ext[r][c] = EXT_FIXED if fixed else EXT
@@ -720,8 +742,9 @@ def shell_details(ext, solid):
     # windows below deck 3 (there were rows of them, the real hull has none).
     y3 = floor_y(3) - 72
     for x in run(3, *HULL_WINDOWS["deck3"]):
-        if not plain(x, y3):
-            porthole("fixed", x, y3, 6)
+        own = span_owner(x - 6, x + 6, y3 // TILE, 3)      # (the crew corridor's fade with its cut-away)
+        if own is not None and not plain(x, y3):
+            porthole(own, x, y3, 6)
     y4 = floor_y(4) - 72
     for x in run(4, *HULL_WINDOWS["deck4"]):
         own = span_owner(x - PORTHOLE_R, x + PORTHOLE_R, y4 // TILE, 4)
@@ -974,10 +997,13 @@ def build_objects():
         obj["id"] = len(objs) + 1
         objs.append(obj)
 
-    # The start: the gangway lobby on deck 4, forward, by the forward stairs (§5.3).
-    add(point("gangway", "spawn", x_of(67), floor_y(4)))
+    # The start: deck 3's crew corridor, at her cabin's door (the user, 2026-11-14; it was the
+    # gangway lobby on deck 4, forward, by the forward stairs: §5.3).
+    crew = CREW_DECK["deck"]
+    add(point("crew", "spawn", exact_x(CREW_DECK["cabin"]), floor_y(crew)))
 
     # Named places to start at, for testing: ?at=<name> (README).
+    add(point("crew", "place", exact_x(CREW_DECK["cabin"]), floor_y(crew)))
     for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
                           ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117),
@@ -1151,7 +1177,7 @@ def build_objects():
     # sits on an indoor wall, clear of the stair cores and the atrium.
     for name, m, decks, opts in TRUNKS:
         for deck in decks:
-            assert deck in PLAYABLE and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m) \
+            assert (deck in PLAYABLE or on_crew_deck(deck, m)) and indoor(deck, m) and not in_core(m) and not in_atrium(deck, m) \
                 and clear_of_ladders(deck, m), \
                 f"trunk {name}: no wall for a door on deck {deck} at {m} m"
         props = [prop("floors", ",".join(str(floor_y(d)) for d in sorted(decks, reverse=True)))]
@@ -1227,6 +1253,28 @@ def build_objects():
     put(4, 66.6, "hose-cabinet-bg", 18)
     put(4, 68.7, "plant-bg")
     put(4, 70.1, "extinguisher-bg", 14)
+    # Deck 3's crew corridor (the user, 2026-11-14), plainer than the guests' decks: painted panels
+    # over a green dado, pipes and a cable tray under the deck above, tube lights, a steel handrail
+    # (the game draws these: `crewdeck`); the Medical Center's door (NCL's plan), a seat to wait on by
+    # it; the fire point; the crew's notice board, a clock and the water cooler by her cabin's door;
+    # the way out shown toward the ladder's door. Her cabin's door and its sign are the plan's room's
+    # (tools/population.py, `crewcabin`), the ladder's door the trunk's.
+    a, b = CREW_DECK["span"]
+    add(area("crew-deck", "decor", col(a) * TILE + TILE, floor_y(crew), (col(b) - col(a) - 2) * TILE, 0,
+             [prop("kind", "crewdeck")]))
+    put(crew, 83.3, "hose-cabinet-bg", 20)
+    put(crew, 84.1, "extinguisher-bg", 14)
+    put(crew, CREW_DECK["medical"], "door-crew-bg")
+    add(point("sign-medical", "sign", exact_x(CREW_DECK["medical"]), floor_y(crew) - 84,
+              [prop("text", "Medical Center"), prop("style", "plaque")]))
+    put(crew, 86.45, "first-aid-bg", 46)
+    put(crew, 87.35, "gallery-bench-bg")
+    put(crew, 88.5, "notice-board-bg", 44)
+    put(crew, 91.3, "wall-clock-bg", 50)
+    put(crew, 92.3, "water-dispenser-bg")
+    put(crew, 93.2, "exit-sign-bg", 90)      # (between two tube lights, not on one)
+    add(point("sign-deck-3", "sign", exact_x(97.0), floor_y(crew) - 56, [prop("text", "DECK 3"), prop("style", "plaque")]))
+
     # A framed picture in each stair and elevator lobby, left of its stairs; on decks 8-10 the deck's
     # directory board hangs there instead (the user's photo of deck 8; decks 9 and 10 are like it).
     for core, (a, _) in CORES.items():
@@ -2229,6 +2277,14 @@ def draw_tile(tile_id):
                 dx = 15 - x if tile_id == EXT_CORNER_L else x
                 if dx * dx + (15 - y) * (15 - y) <= 16 * 16:
                     px[y][x] = hex_rgba(PLATING)
+    elif tile_id == CREW_FLOOR:
+        # Deck 3's crew corridor: grey-blue vinyl on the slab, speckled, no carpet.
+        rect(0, 0, 15, 15, hex_rgba("#8e98a3"))
+        rect(0, 0, 15, 3, hex_rgba("#7c93a0"))
+        rect(0, 0, 15, 0, hex_rgba("#9db2bd"))
+        px[1][3] = px[2][9] = px[1][13] = hex_rgba("#c7dcd0")
+        px[2][5] = px[3][11] = px[3][1] = hex_rgba("#625565")
+        rect(0, 15, 15, 15, hex_rgba("#6f7882"))
     elif tile_id == SLAB:
         # The deck's steel slab with nothing laid on it: under the ship's structure.
         rect(0, 0, 15, 15, hex_rgba("#8e98a3"))

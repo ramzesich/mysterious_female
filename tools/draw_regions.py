@@ -24,7 +24,7 @@ FONT_B = "C:/Windows/Fonts/arialbd.ttf"
 
 DECK_H = 144
 TOP_WORLD = -335                           # over the funnel's pipes: above the map's top edge
-BOTTOM_WORLD = floor_y(4) + 110            # a little hull and sea
+BOTTOM_WORLD = floor_y(3) + 90             # deck 3 (its crew corridor: the start), a little hull and sea
 FUNNEL_FA, FUNNEL_TOP = 8544, -228         # the funnel's fore edge and top, as buildFunnel() draws them
 
 
@@ -35,7 +35,7 @@ FUNNEL_FA, FUNNEL_TOP = 8544, -228         # the funnel's fore edge and top, as 
 # (region 7) or by the pool's hatch; only deck 9 midships, round the linen room, is a region (4).
 REGIONS = [
     (1, "Lower ship", (240, 190, 70), [
-        (4, 20, 255), (5, 20, 255)]),
+        (3, 82, 98), (4, 20, 255), (5, 20, 255)]),
     (2, "Atrium + promenade", (90, 200, 120), [
         (6, 20, 100), ("rooms", 100, 194), ("prom", 100, 231), (7, 74, 110)]),
     (3, "Showtime", (235, 95, 130), [
@@ -61,7 +61,7 @@ FUNNEL_REGION = 8
 
 # Names on the big map: (deck, metre, text).
 LABELS = [
-    (4, 67, "Gangway (start)"), (4, 122, "Laundry"), (4, 165, "Crew corridors, cabins"),
+    (3, 90, "Crew corridor: the start"), (4, 67, "Gangway"), (4, 122, "Laundry"), (4, 165, "Crew corridors, cabins"),
     (4, 232, "Stage manager's cabin"),
     (5, 47, "Cabins"), (5, 92, "Atrium Café: a book"), (5, 130, "Reception"), (5, 172, "Restaurants"),
     (5, 228, "Seven Seas: lunch, Bumbot"),
@@ -110,7 +110,7 @@ ROUTES = [
 # (from (deck, m), to (deck, m), kind). "errand": hands full; "short": a shortcut; "back": a new
 # way into a place she knows; "glide": with the parasol.
 STEPS = [
-    (1, "Start at the gangway. The officer there can't leave his post: his lunch, from the Seven Seas.",
+    (1, "Start on deck 3, at her crew cabin: up the service ladder. The gangway officer can't leave his post: his lunch, from the Seven Seas.",
      "Bumbot is eating it: the first near-catch, and the dash is born. A fresh tray carried back to him: the Deck card.",
      [((5, 228), (4, 67), "errand")]),
     (2, "The Deck card opens the forward stairs' fire door up to deck 6.",

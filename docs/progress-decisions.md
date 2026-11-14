@@ -1268,3 +1268,96 @@ Paint.NET, antialiasing off, the bucket's tolerance at 0, colours picked from th
 Checked: `boot`, `overboard`, `falls` and `sound` pass; the render and the game's outside view
 looked at. The whole suite was not run again after these (cosmetic, and it had passed an hour
 before, with the sound): it runs before the next merge.
+
+## The prep before the intro (2026-11-14)
+
+The user wrote `docs/intro.md` (the welcome screen, the start sequence, the intro's scene) and
+asked for three things before it, "the prep", and later made clear that the intro itself is not to
+be built until they say so.
+
+1. **"Remove every hint popup with text that we have in the game. Part of the game is figuring
+   things out. Labels and namings are not considered hints."** Taken out: the line shown when a
+   verb is learned (the dash's key, crawl, the wall kick, the glide), the keys' caps that bobbed
+   over the laundry cart, the vent, the duct's far grille and the soft serve machine ("hold E"),
+   and the one-time lines at the old lady's sunbed, on the balconies, with the cake, on the
+   mooring deck when stranded there, at the catch ("Stand still. Let him come to you") and after
+   it ("Home now: cabin 8206, deck 8"). `world.hint()` and `world.glyph()` are gone.
+   **Kept, as my reading of the line drawn:** the ship's signs and plates (labels); the people's
+   pictogram bubbles and her own (they have no text); a lock's popup, which names the card the
+   lock wants (a naming); her exclamations; the win screen's "Press E: the ship is still yours to
+   wander", which is the screen's way on rather than a hint about the game. **Asked; the user
+   (2026-11-14): the lock's popup and the win screen's line are kept.**
+2. **"Support two languages in the game: English and Ukrainian. Every text shall have two
+   versions. The art text (e.g. La Cucina) stays as it is."** `src/lang.js` holds every text the
+   game says, in both; English is the default (`docs/intro.md`). It turned out to be a short
+   list once the hints were gone: the title, the win screen (its line, its tally, the "Press E"
+   line, the user's own message when it is written: `WIN_MESSAGE` takes both), a lock's popup and
+   the four cards' names, eleven frights and six exclamations. **Her frights and exclamations
+   were Ukrainian only** ("Ой!", "Гей!", "тук"): they are the Ukrainian version now, and English
+   got its own ("Oops!", "Hey!", "knock"). Her «Кісюнічка!!!» stays in both (§3.2: the exact
+   text). **The ship's own signs and plates are left as they are in both languages**, all of
+   them, not only the venues' names: DECK 5, LINEN, Restrooms, a rope's QUIET PLEASE, the LOST:
+   CAT poster. Reason: they are part of the picture of an English-speaking ship, as La Cucina's
+   sign is, and Ukrainian words would not fit most of the plates. This is a reading of "art
+   text" that the user might not have shared: **asked ("should the functional ones get
+   Ukrainian versions, with only venue names staying?"); the user answered "Ok", which I take
+   as leaving them as they are** (said so in the report, for them to correct). The choice is kept in the browser;
+   `?lang=uk` sets it for a session. No button switches it yet: the LANGUAGE button is the
+   welcome screen's, which is the intro's.
+3. **"Add a relatively small section of deck 3 (check the official ship documentation) where the
+   game will now start. Place the crew cabin there (described in the intro doc), decorate the
+   deck 3 corridor accordingly, and add a service ladder (with the door) to the deck 4."**
+   - **Where.** NCL's plan names one place on deck 3, the Medical Center, just aft of the forward
+     stairs (the user's photo of deck 3's gangway exit is of the guests' part of that deck). The
+     corridor is there: 82 to 98 m, two screens long, under deck 4's cabins between the forward
+     and the midship stairs. The Medical Center's door is in it, shut, as dressing.
+   - **What is in it** (bow to stern): the fire point; the Medical Center's door, a first-aid
+     cabinet, a seat; the notice board; **the door marked CREW, her cabin**; a clock, the water
+     cooler; the way out's sign; **the service ladder's door**; the deck's plaque.
+   - **Her cabin is a room she can enter**, like the plan's other rooms: "place the crew cabin
+     there" was read as the cabin, not only its door. Drawn in code: a desk with a bowl of
+     tangerines under a mirror, a porthole, her spare shirt, her bed. **The user, on its first
+     picture (a plain wall, a ginger cat's poster, a bunk for two): "1. Add some texture to the
+     wallpaper in her crew cabin. 2. Replace the picture of an orange cat with the picture of
+     Bumbot. 3. Make the bed for a single person."** So: wallpaper with pinstripes and small
+     sprigs, a shade off the wall each way; a framed picture of Bumbot over the bed; a single
+     bed with head and foot boards, her suitcase still under it. The picture was first his own
+     sat frame from his sheet; **the user, on that: "Make Bumbot picture smaller and only place
+     his head there. Use generation of a bombay black cat. Eyes not orange, but how his eyes
+     are."** So it is a head now, in a frame of 28 x 33 px where the first was 41 x 36: a
+     PixelLab map object, 32 px, two tries for 2 generations, the blacker one with whiskers
+     kept (`assets/source/rooms/bumbot-head.png`), cut close, its pale yellow eyes given the two
+     colours of his sprite's (yellow-green and its darker shade). Its door is the start's checkpoint (`cp_crew`), lit from the start; the
+     gangway's (`cp_gangway`) lights when she first passes it, like any other.
+   - **The ladder is an escape trunk** (decks 3 and 4, no card), the game's own way of putting a
+     ladder behind a door. On deck 4 it comes out at 95.6 m in the place of one cabin door.
+   - **The forward stairs and lifts do not come down to deck 3**, though on the real ship they
+     do: the user asked for a service ladder as the way up, and a second way would make it
+     pointless. A bulkhead closes each end of the corridor. (Asked; the user: "You did fine".)
+   - **The look:** a working corridor, plainer than the guests' (panels over a green dado, a
+     steel handrail, pipes and a cable tray overhead, tube lights, vinyl). One new tile (the
+     floor); the rest drawn by the game and dressed from the atlas. No generations spent on
+     the corridor; 2 on the picture of Bumbot in her cabin (above).
+   - **The basic layout is as it was** (the user's standing rule): no deck's length, no room and
+     no stair moved. Deck 3 was already in the map, closed; a part of it opens.
+   - **Region 1** takes deck 3 in. The first errand is unchanged: up the ladder, forward through
+     the stair lobby to the gangway officer.
+   - Not done, and not asked: Bumbot, people or tangerines on deck 3; the intro's zoomed-in door
+     and the more detailed figure of her (the intro's own art).
+
+Also asked meanwhile: **`docs/start-links.md`**, a localhost link for every place the game can be
+started at, everything open (`cards=all`) and the dash free.
+
+**The playtests after it.** Twenty-six scenarios opened the game and walked from the gangway:
+`Browser.open()` still starts them there, its checkpoint lit as it was (`start="gangway"`); only
+`boot` and `deck3` take the game's own start. The checks that looked for her frights by their
+Ukrainian words look for the English ones now (English is the default), word for word by the
+table in `src/lang.js`.
+
+Checked: the new `deck3` scenario (the start, the cabin in and out, both bulkheads, the ladder
+up, the cut-away) and `lang` (both languages have every key, the title, a lock, her words, the
+tally, `?lang=`); the corridor and the cabin looked at enlarged next to her; the overlap audit.
+Of the older scenarios, those the changes can touch most were run, not the whole suite
+(`CLAUDE.md`): `boot`, `run_jump`, `trunk`, `golden`, `region1`, `region4`, `region7`, `finale`,
+`sound`. Not run: the rest, among them `region2`, `region3`, `region5`, `region6`, `region8`,
+`region9` and `sweep`, whose fright checks had their words changed the same mechanical way.

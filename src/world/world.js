@@ -28,12 +28,9 @@ const LOOKS = {
     cabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], balcabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], adjoin: [0xefe6d2, 0xd8b29a, 0x4d65b4],
     coldroom: [0xcfeaf5, 0x8fd3ff, 0x9babb2],
 };
+const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the user, 2026-11-14; it was the gangway's)
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
 const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
-const HINTS = {
-    dash: 'D: «Кісюнічка!!!»', crawl: '↓ then ← →: crawl', socks: 'In the air at a post or a wall, jump again: kick off it',
-    parasol: 'Hold jump in the air: glide. ↓ + jump: over a railing',
-};
 
 export class World {
     constructor(scene) {
@@ -303,16 +300,19 @@ export class World {
                 }
                 if (d.plate) {
                     // (Aft of its door, or forward of it where the deck ends just aft: `plateSide`.)
+                    // (`plateUp`: a sign over the door, above a checkpoint's lamp: her crew cabin's.)
                     const side = d.plateSide ?? 1;
-                    const plate = s.add.text(d.outX + 20 * side, d.outY - 50, d.plate, {
-                        fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#3e3546',
-                        backgroundColor: '#ffffff', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
-                    }).setOrigin(side > 0 ? 0 : 1, 0.5).setDepth(D.props);
+                    const plate = s.add.text(d.plateUp ? d.outX : d.outX + 20 * side, d.outY - (d.plateUp ? 93 : 50), d.plate, {
+                        fontFamily: 'Verdana, sans-serif', fontSize: d.plateUp ? '7px' : '5px', fontStyle: 'bold', color: '#3e3546',
+                        backgroundColor: '#ffffff', padding: { left: d.plateUp ? 4 : 2, right: d.plateUp ? 4 : 2, top: 1, bottom: 1 }, resolution: 4,
+                    }).setOrigin(d.plateUp ? 0.5 : side > 0 ? 0 : 1, 0.5).setDepth(D.props);
                     this.add([plate]);
                     room.outside.push(plate);
                 }
                 if (d.lockSpec?.kind === 'card') this.progress.reader(d.outX - 22, d.outY, d.lockSpec.card);
             }
+            // (Her crew cabin's door, where the game starts, is lit from the start: population §2.5.)
+            if (def.checkpoint === START_CHECKPOINT && !this.save.activated.includes(def.checkpoint)) this.save.activated.push(def.checkpoint);
             if (def.checkpoint) s.addCheckpoint(def.checkpoint, def.doors[0].outX, def.doors[0].outY, { door: null });
             s.rooms.push(room);
             s.addRouteWall(def.x0 + ROOM.stop, -1, def.floor, def.id);
@@ -644,21 +644,7 @@ export class World {
         this.ductEyes = s.add.graphics().setDepth(D.exterior + 0.126).setVisible(false);
         this.ductEyes.fillStyle(0xb9e04c, 1).fillRect(-4, -1, 2, 2).fillRect(2, -1, 2, 2);
         this.ductEyes.fillStyle(0xffffff, 1).fillRect(-4, -1, 1, 1).fillRect(2, -1, 1, 1);
-        // The key at the way out.
-        this.ductKey = this.glyph(d.exitX, d.floor - 40, '↓', D.exterior + 0.127);
         this.add([this.ductFan, this.ductEyes]);
-    }
-
-    // A key's cap bobbing over a spot: what to press here. Hidden until shown.
-    glyph(x, y, text, depth) {
-        const s = this.scene;
-        const cap = s.add.text(x, y, text, {
-            fontFamily: 'Verdana, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#2e222f', backgroundColor: '#ffffff',
-            padding: { left: 3, right: 3, top: 1, bottom: 1 }, resolution: 4,
-        }).setOrigin(0.5).setDepth(depth ?? s.DEPTH.fx + 0.4).setVisible(false);
-        this.add([cap]);
-        s.tweens.add({ targets: cap, y: y - 3, duration: 420, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-        return cap;
     }
 
     // The linen room's laundry cart, once it stands under the vent; and whether she is on it.
@@ -693,7 +679,6 @@ export class World {
                 sfx.at(k.x, d.floor).snore();
             }
         }
-        this.ductKey.setVisible(inDuct && s.mode === 'play' && Math.abs(p.x - d.exitX) < 60);
         const eyes = this.ductEyes;
         if (inDuct && !P.has('duct') && !this.eyesGone) {
             this.eyesX = Math.min(this.eyesX ?? p.x - 170, p.x - 150);
@@ -734,8 +719,6 @@ export class World {
         const depth = this.depthFor(e.route);
         switch (e.kind) {
             case 'checkpoint': {
-                // The gangway's is lit from the start (population §2.5).
-                if (e.id === 'cp_gangway' && !this.save.activated.includes(e.id)) this.save.activated.push(e.id);
                 // (`bare`: on a balcony, at an ajar balcony door: only the lamp, over the door.)
                 const cp = e.bare ? s.addCheckpoint(e.id, e.x, e.y, { route: e.route, door: null, rise: 112 })
                     : s.addCheckpoint(e.id, e.x, e.y, { route: e.route });
@@ -1078,13 +1061,13 @@ export class World {
         s.addTangerine(e.id, e.x, y, e.route);
     }
 
-    // E at a pickup: a verb (with its key glyph, shown once), a book, a pocket item.
+    // E at a pickup: a verb, a book, a pocket item. (Nothing says how a verb is used: no hint
+    // pops up anywhere in the game, finding out is part of it: the user, 2026-11-14.)
     take(thing) {
         const s = this.scene;
         const [type, name] = thing.what.split(':');
         if (type === 'verb') {
             this.progress.learn(name);
-            this.hint(HINTS[name]);
         } else if (type === 'book') {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
@@ -1105,15 +1088,6 @@ export class World {
         this.save.books[n] = 'held';
         writeSave(this.save);
         this.refresh();
-    }
-
-    // A key glyph over her for a few seconds: how a new verb is used.
-    hint(text) {
-        const s = this.scene;
-        if (!text) return;
-        s.lockedUntil = s.time.now + 3200;
-        s.alert.setText(text).setVisible(true);
-        s.time.delayedCall(3200, () => { if (s.alert.text === text) s.alert.setVisible(false); });
     }
 
     // The scripted places that are not rooms: the pool's hatch, the stage's trap door, the linen
@@ -1537,7 +1511,6 @@ export class World {
             const [type, what] = g.split(':');
             if (type === 'verb') {
                 this.progress.learn(what);
-                if (what !== 'dash') this.hint(HINTS[what]);
             } else {
                 this.progress.setFlag(what);
             }
@@ -1680,14 +1653,6 @@ export class World {
                 onComplete: () => s.tweens.add({ targets: bit, x: bit.x + dx * 0.5, y: floor - 1, angle: Phaser.Math.Between(-200, 200),
                     duration: Phaser.Math.Between(500, 900), ease: 'Quad.easeIn',
                     onComplete: () => s.tweens.add({ targets: bit, alpha: 0, delay: 2500, duration: 600, onComplete: () => bit.destroy() }) }) });
-        }
-    }
-
-    // The first tangerine after the scream: the dash's key (population §6.1).
-    onTangerine() {
-        if (this.progress.knows('dash') && !this.save.seen.includes('hint-dash')) {
-            this.save.seen.push('hint-dash');
-            this.hint(HINTS.dash);
         }
     }
 

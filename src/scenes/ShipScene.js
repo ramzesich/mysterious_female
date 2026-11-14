@@ -1,6 +1,7 @@
 import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
+import { t, has } from '../lang.js';
 import { loadSave, writeSave } from '../save.js';
 import { Progression, CARD_COLOURS } from '../progression.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
@@ -67,11 +68,8 @@ const SIDEWALK_LOOKS = {
             light: null, rail: 0xcd683d, post: 0xe3e7ea },
 };
 
-// Each hazard gets its own fright (§5.6).
-const FRIGHTS = {
-    vacuum: 'Іііі!', bumped: 'Ой!', bonked: 'Ай!', slipped: 'Ой-йой!', drenched: 'Бррр!', buried: 'Мммф!',
-    startled: 'Ой, вибачте!', splashed: 'Ааа!', swooped: 'Киш!', fogged: 'Пхх!', singed: 'Гаряче!',
-};
+// Each hazard gets its own fright (§5.6): her word for it, in the game's language (src/lang.js).
+const fright = kind => has(`fright.${kind}`) ? t(`fright.${kind}`) : '!';
 
 export class ShipScene extends Phaser.Scene {
     constructor() {
@@ -735,6 +733,7 @@ export class ShipScene extends Phaser.Scene {
                     if (prop(o, 'kind') === 'sauna') this.drawSauna(decorGfx, o);
                     if (prop(o, 'kind') === 'showerbox') this.drawShowerBox(o);
                     if (prop(o, 'kind') === 'gangway') this.drawGangway(decorGfx, o);
+                    if (prop(o, 'kind') === 'crewdeck') this.drawCrewDeck(o);
                     if (prop(o, 'kind') === 'shelldoor') this.drawShellDoor(decorGfx, o);
                     if (prop(o, 'kind') === 'portico') this.drawPortico(decorGfx, o, prop(o, 'text', ''));
                     if (prop(o, 'kind') === 'dinewindows') this.drawDiningWindows(decorGfx, o, prop(o, 'xs', ''), prop(o, 'style', ''));
@@ -2081,6 +2080,42 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(g);
     }
 
+    // Deck 3's crew corridor, where the game starts (the user, 2026-11-14): a working corridor,
+    // plainer than the guests'. Painted panels over a green dado and a grey kick strip, a steel
+    // handrail on brackets; under the deck above a grey pipe, the red fire main and a cable tray
+    // on hangers, tube lights under them. All on the wall, behind every door and fitting.
+    drawCrewDeck(o) {
+        const g = this.wallGfx;
+        const top = o.y - this.deckPitch + 16, x0 = o.x, x1 = o.x + o.width, w = o.width;
+        for (let x = x0 + 40; x < x1 - 8; x += 48) g.fillStyle(0xd9cdb6, 1).fillRect(x, top, 1, o.y - top - 40);
+        g.fillStyle(0xc5d0b4, 1).fillRect(x0, o.y - 40, w, 40);
+        g.fillStyle(0x9aa888, 1).fillRect(x0, o.y - 40, w, 1);
+        g.fillStyle(0x9babb2, 1).fillRect(x0, o.y - 4, w, 4);
+        g.fillStyle(0x7f708a, 1).fillRect(x0, o.y - 4, w, 1);
+        // The handrail, at about her hip, a bracket under it every metre and a half.
+        for (let x = x0 + 16; x < x1 - 4; x += 72) g.fillStyle(0x7f708a, 1).fillRect(x, o.y - 32, 1, 4);
+        g.fillStyle(0xe3e7ea, 1).fillRect(x0, o.y - 34, w, 1);
+        g.fillStyle(0x9babb2, 1).fillRect(x0, o.y - 33, w, 2);
+        // Under the deck above: the pipes and the tray, a hanger every two metres.
+        g.fillStyle(0xf6f3ec, 1).fillRect(x0, top, w, 2);
+        g.fillStyle(0xc7dcd0, 1).fillRect(x0, top + 4, w, 1);
+        g.fillStyle(0x9babb2, 1).fillRect(x0, top + 5, w, 3);
+        g.fillStyle(0xe83b3b, 1).fillRect(x0, top + 10, w, 1);
+        g.fillStyle(0xae2334, 1).fillRect(x0, top + 11, w, 2);
+        g.fillStyle(0x625565, 1).fillRect(x0, top + 16, w, 1);
+        for (let x = x0 + 6; x < x1; x += 6) g.fillStyle(0x625565, 1).fillRect(x, top + 15, 1, 1);
+        for (let x = x0 + 30; x < x1 - 4; x += 96) {
+            g.fillStyle(0x7f708a, 1).fillRect(x, top + 2, 1, 15);
+            g.fillStyle(0x9babb2, 1).fillRect(x - 1, top + 4, 3, 5);        // a flange on the pipe
+            g.fillStyle(0x7a2634, 1).fillRect(x - 1, top + 10, 3, 3);       // and on the main
+        }
+        // The tube lights, between the hangers.
+        for (let x = x0 + 62; x + 32 < x1; x += 96) {
+            g.fillStyle(0x9babb2, 1).fillRect(x, top + 18, 32, 2);
+            g.fillStyle(0xfbff86, 1).fillRect(x + 2, top + 20, 28, 1);
+        }
+    }
+
     drawShellDoor(g, o) {
         g.fillStyle(0xd9cdb6, 1);
         g.fillRect(o.x, o.y, o.width, o.height);
@@ -2724,7 +2759,7 @@ export class ShipScene extends Phaser.Scene {
             p.body.reset(back, pool.y);
             if (time > (this.mewAt ?? 0)) {
                 this.mewAt = time + 2500;
-                this.world.say('Мяу!', 900);
+                this.world.say(t('say.meow'), 900);
                 sfx.meow();
             }
         } else if (pool) return this.enterPool(pool);
@@ -3620,7 +3655,7 @@ export class ShipScene extends Phaser.Scene {
     showLocked(card, text = null) {
         if (this.time.now < (this.lockedUntil || 0)) return false;
         this.lockedUntil = this.time.now + 900;
-        const shown = text ?? `🔒 ${this.progress.cardName(card)} card`;
+        const shown = text ?? t('lock.card', this.progress.cardName(card));
         if (card) sfx.deny(); else sfx.rattle();
         this.alert.setText(shown).setVisible(true);
         // Held at the lock, it shows again before this runs: hide it only once the last one is over,
@@ -3750,7 +3785,6 @@ export class ShipScene extends Phaser.Scene {
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.tangerines += 1;
                 this.save.collected.push(t.id);
-                this.world.onTangerine();
                 sfx.tangerine();
                 t.glint.destroy();
                 this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
@@ -4022,7 +4056,7 @@ export class ShipScene extends Phaser.Scene {
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
-        this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
+        this.alert.setText(fright(kind)).setVisible(true);
         // A recoil from what got her (the vacuum: a jump, as it always was).
         if (kind === 'drenched' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
         else if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
@@ -4053,7 +4087,7 @@ export class ShipScene extends Phaser.Scene {
         this.takeoffY = p.y;
         sfx.scare();
         this.scareFall();
-        this.alert.setText(FRIGHTS[kind] || '!').setVisible(true);
+        this.alert.setText(fright(kind)).setVisible(true);
         if (this.anims.exists('her-hit')) p.anims.play('her-hit');
     }
 

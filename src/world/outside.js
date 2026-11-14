@@ -8,6 +8,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 import { FOOD } from './hazards.js';
 
 const M = 48;
@@ -157,7 +158,7 @@ export class PerchGull {
                     const carry = this.world.carry;
                     if (carry && FOOD.includes(carry.kind)) {
                         this.world.carryBox.give();
-                        this.world.say('Гей!', 900);
+                        this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
                     } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'swooped');
                 }
@@ -554,12 +555,6 @@ export const outside = {
                     }
                 }
             }
-        }
-        // How the partitions are crossed, the first time she is out on a balcony in the socks.
-        if (s.route === OUT && s.mode === 'play' && this.P.knows('socks') && !w.save.seen.includes('hint-balcony')
-            && her.y <= w.data.balcony.bottom + 2 && (her.body.blocked.down || her.body.touching.down)) {
-            w.save.seen.push('hint-balcony');
-            w.hint('Partition: jump, jump again to vault it. With ↑ held: up its pole');
         }
     },
 

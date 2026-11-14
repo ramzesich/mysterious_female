@@ -7,7 +7,7 @@
 <rect x="425" y="70" width="40" height="40" fill="#7b8fa3"/>
 <text x="445.0" y="66.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Mast</text>
 <rect x="178" y="380" width="1162.5" height="30" fill="#c9c9c9" stroke="#ffffff"/>
-<text x="758.8" y="399.0" font-size="9" text-anchor="middle" fill="#555555" font-weight="normal">Deck 3: visible below deck 4, not playable</text>
+<text x="367.5" y="399.0" font-size="9" text-anchor="middle" fill="#555555" font-weight="normal">Deck 3: closed but for its crew corridor (the start)</text>
 <text x="58.0" y="399.0" font-size="11" text-anchor="end" fill="#1d2b53" font-weight="bold">3</text>
 <text x="1372.0" y="399.0" font-size="11" text-anchor="start" fill="#1d2b53" font-weight="bold">3</text>
 <rect x="170" y="350" width="1170" height="30" fill="#f7f7f7" stroke="#ffffff"/>
@@ -148,13 +148,15 @@
 <rect x="170" y="352" width="200" height="26" rx="2" fill="#ececec"/>
 <text x="270.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="370" y="352" width="70" height="26" rx="2" fill="#ffe08a"/>
-<text x="405.0" y="369.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Gangway (start)</text>
+<text x="405.0" y="369.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="bold">Gangway</text>
 <rect x="480" y="352" width="100" height="26" rx="2" fill="#ececec"/>
 <text x="530.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="620" y="352" width="420" height="26" rx="2" fill="#ececec"/>
 <text x="830.0" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
 <rect x="1080" y="352" width="265" height="26" rx="2" fill="#ececec"/>
 <text x="1212.5" y="369.0" font-size="9" text-anchor="middle" fill="#888888" font-weight="normal">Cabins</text>
+<rect x="480" y="382" width="80" height="26" rx="2" fill="#f3d9c9"/>
+<text x="520.0" y="399.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Crew corridor (start)</text>
 <rect x="620" y="202" width="30" height="26" rx="2" fill="#f3d9c9"/>
 <text x="635.0" y="219.0" font-size="9" text-anchor="middle" fill="#1d2b53" font-weight="normal">Linen room</text>
 <rect x="480" y="172" width="100" height="176" fill="#fff1c2" stroke="#e0c060" stroke-dasharray="3,2"/>
@@ -176,9 +178,13 @@
 <line x1="1270.0" y1="294" x2="1270.0" y2="376" stroke="#e07a1f" stroke-width="2"/>
 <rect x="1267.0" y="368" width="6" height="8" fill="#e07a1f"/>
 <rect x="1267.0" y="308" width="6" height="8" fill="#e07a1f"/>
-<line x1="660.0" y1="264" x2="660.0" y2="316" stroke="#e07a1f" stroke-width="2"/>
+<line x1="660.0" y1="204" x2="660.0" y2="316" stroke="#e07a1f" stroke-width="2"/>
 <rect x="657.0" y="308" width="6" height="8" fill="#e07a1f"/>
 <rect x="657.0" y="278" width="6" height="8" fill="#e07a1f"/>
+<rect x="657.0" y="218" width="6" height="8" fill="#e07a1f"/>
+<line x1="548.0" y1="354" x2="548.0" y2="406" stroke="#e07a1f" stroke-width="2"/>
+<rect x="545.0" y="398" width="6" height="8" fill="#e07a1f"/>
+<rect x="545.0" y="368" width="6" height="8" fill="#e07a1f"/>
 <text x="70.0" y="24.0" font-size="13" text-anchor="start" fill="#1d2b53" font-weight="bold">◀ FORWARD (bow)</text>
 <text x="1360.0" y="24.0" font-size="13" text-anchor="end" fill="#1d2b53" font-weight="bold">AFT (stern) ▶</text>
 <text x="715.0" y="24.0" font-size="13" text-anchor="middle" fill="#1d2b53" font-weight="bold">Norwegian Sun, as laid out in the game</text>

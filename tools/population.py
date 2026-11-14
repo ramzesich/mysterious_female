@@ -16,6 +16,10 @@ recorded in docs/progress-decisions.md.
 # corridor ("crew", "cabin", "open": held open, "hatch", "bookcase"). `doors`: more ways out, each
 # (x in the room, where it leads: route, deck, m, lock). `checkpoint`: she comes back at its door.
 ROOMS = [
+    # Her own crew cabin on deck 3, where the game starts (the user, 2026-11-14): its door in the crew
+    # corridor, the sign "Crew" over it (`plate_up`), lit as a checkpoint from the start.
+    dict(id="crewcabin", deck=3, m=90, width=240, look="crewcabin", door="crew", plate="CREW", plate_up=True,
+         checkpoint="cp_crew"),
     dict(id="laundry", deck=4, m=112, slot=True, width=336, look="laundry", door="crew", plate="LAUNDRY",
          lock=("card", "hk", 0), checkpoint="cp_laundry"),
     dict(id="store", deck=4, m=165, slot=True, width=240, look="store", door="crew", plate="DRY STORE",

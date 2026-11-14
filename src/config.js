@@ -160,8 +160,9 @@ export const HOLDING = {
     jump: 0.86,
 };
 
-// The win screen's own message (§6.4, Later: the user's to write). Empty, nothing is shown.
-export const WIN_MESSAGE = '';
+// The win screen's own message (§6.4, Later: the user's to write), in the game's two languages
+// (src/lang.js). Empty, nothing is shown.
+export const WIN_MESSAGE = { en: '', uk: '' };
 
 export const DASH = {
     durationMs: 10000,

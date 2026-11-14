@@ -2,10 +2,12 @@ import { VIEW, PLAYER } from './config.js';
 import { BootScene } from './scenes/BootScene.js';
 import { TitleScene } from './scenes/TitleScene.js';
 import { ShipScene } from './scenes/ShipScene.js';
+import * as lang from './lang.js';
 
 const params = new URLSearchParams(location.search);
+window.__lang = lang;       // for the playtests (tools/playtest.py, `lang`)
 
-new Phaser.Game({
+window.__game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     width: VIEW.width,

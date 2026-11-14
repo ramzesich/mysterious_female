@@ -271,6 +271,118 @@ def smcabin(width):
     return R.save("smcabin")
 
 
+def crewcabin(width):
+    """Her own crew cabin, deck 3 (the user, 2026-11-14: where the game starts): small and plain. By
+    the door her spare uniform and the life jackets' shelf; a desk under a mirror, tangerines in a
+    bowl on it; a porthole low over the sea; her bed, for one, an orange blanket on it, a suitcase
+    under it; over the bed a picture of Bumbot. The wallpaper has a small pattern (the user: "add
+    some texture"): pinstripes and sprigs, a shade off the wall each way."""
+    WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
+    R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
+    R.keep = (WALL, STRIPE, SPRIG, "#b7dff2")
+    r, box, d = R.r, R.box, R.d
+    # The wallpaper: a pinstripe every 8 px, a sprig between them every 12 px down, row about.
+    for x in range(4, width, 8):
+        r(x, 9, x, FLOOR - 5, STRIPE)
+    for i, x in enumerate(range(8, width, 8)):
+        for y in range(14 + (i % 2) * 6, FLOOR - 8, 12):
+            d.point((x, y), fill=SPRIG)
+            d.point((x - 1, y + 1), fill=SPRIG)
+            d.point((x + 1, y + 1), fill=SPRIG)
+            d.point((x, y + 2), fill=STRIPE)
+    R.pipe(11)
+    R.tube(96, 36)
+    R.door(frame="door-crew")
+    # Hooks by the door: her spare uniform shirt on a hanger, the life jackets on their shelf above.
+    r(82, 30, 100, 31, SLATE)
+    for x, c in ((84, ORANGE), (92, ORANGE)):
+        box(x, 21, x + 6, 29, c, INK)
+        r(x + 2, 24, x + 4, 25, WHITE)
+    r(86, 40, 98, 41, SLATE)                                   # the rail
+    d.line([(88, 44), (92, 41), (96, 44)], fill=SLATE)         # the hanger
+    box(86, 44, 98, 66, WHITE, GREY)                           # the shirt
+    r(91, 44, 93, 47, PALE)
+    r(86, 44, 88, 52, PALE)
+    r(96, 44, 98, 52, PALE)
+    r(89, 50, 91, 51, NAVY)                                    # her name badge
+    # The desk: a mirror over it, a lamp, a bowl of tangerines, a mug; the chair pushed in.
+    box(108, 34, 130, 60, "#b7dff2", WOOD_DARK)            # the mirror
+    d.line([(111, 54), (120, 38)], fill=WHITE)
+    d.line([(116, 56), (125, 40)], fill=WHITE)
+    box(104, FLOOR - 30, 142, FLOOR - 27, WOOD, WOOD_DARK)
+    for x in (106, 139):
+        r(x, FLOOR - 26, x + 1, FLOOR - 1, WOOD_DARK)
+    box(106, FLOOR - 26, 120, FLOOR - 16, WOOD, WOOD_DARK)     # its drawer
+    r(111, FLOOR - 22, 115, FLOOR - 21, WOOD_LIGHT)
+    r(108, FLOOR - 40, 109, FLOOR - 31, DARK)                  # the lamp
+    r(105, FLOOR - 44, 113, FLOOR - 40, YELLOW)
+    r(106, FLOOR - 39, 112, FLOOR - 39, ORANGE)
+    box(121, FLOOR - 34, 133, FLOOR - 31, BLUE, INK)           # the bowl
+    for x in (123, 127, 130):
+        d.ellipse([x - 2, FLOOR - 38, x + 2, FLOOR - 34], fill=ORANGE, outline=INK)
+    d.ellipse([125 - 2, FLOOR - 41, 125 + 2, FLOOR - 37], fill=ORANGE, outline=INK)
+    d.point((125, FLOOR - 42), fill=GREEN)
+    box(136, FLOOR - 36, 139, FLOOR - 31, RED, INK)            # the mug
+    stand(R.im, "chair", 128)
+    # The porthole: brass, the sky and the sea in it, the horizon a little under its middle.
+    cx, cy = 152, 46
+    d.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill="#b9722c", outline=INK)
+    d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=BLUE_LIGHT, outline=WOOD_DARK)
+    d.chord([cx - 6, cy - 6, cx + 6, cy + 6], 5, 175, fill=BLUE)
+    r(cx - 4, cy + 1, cx + 4, cy + 1, WHITE)
+    d.point((cx - 3, cy - 3), fill=WHITE)
+    for a, b in ((-8, -8), (8, -8), (-8, 8), (8, 8)):
+        d.point((cx + a * 7 // 8, cy + b * 7 // 8), fill=YELLOW)
+    # Over the bed, a picture of Bumbot (the user: in the orange cat's place; then "smaller and
+    # only place his head there"): his head, close, on a warm ground in a wooden frame.
+    cat = bumbot_head()
+    px, py = 198 - (cat.width + 4) // 2, 46
+    box(px, py, px + cat.width + 3, py + cat.height + 3, WOOD, WOOD_DARK)
+    r(px + 2, py + 2, px + cat.width + 1, py + cat.height + 1, YELLOW)
+    R.im.alpha_composite(cat, (px + 2, py + 2))
+    r(px + cat.width // 2 + 1, py - 3, px + cat.width // 2 + 2, py - 1, SLATE)            # its nail
+    # Her bed, for one (the user), its head aft: head and foot boards, the mattress on its rail, a
+    # pillow, the orange blanket turned back at the top; her suitcase under it, her slippers by it.
+    x0, x1 = 160, 234
+    box(x1 - 5, FLOOR - 42, x1, FLOOR - 1, WOOD, WOOD_DARK)                # the head board
+    box(x0, FLOOR - 30, x0 + 4, FLOOR - 1, WOOD, WOOD_DARK)                # the foot board
+    box(x0 + 4, FLOOR - 17, x1 - 5, FLOOR - 13, WOOD, WOOD_DARK)           # the rail
+    box(x0 + 5, FLOOR - 24, x1 - 6, FLOOR - 17, "#f2f6f6", GREY)           # the mattress
+    d.rounded_rectangle([x1 - 25, FLOOR - 30, x1 - 7, FLOOR - 23], radius=3, fill=WHITE, outline=GREY)   # the pillow
+    box(x0 + 5, FLOOR - 26, x1 - 28, FLOOR - 15, ORANGE, "#cd683d")        # the blanket, over the side
+    r(x0 + 6, FLOOR - 25, x1 - 29, FLOOR - 25, YELLOW)
+    box(x1 - 32, FLOOR - 26, x1 - 26, FLOOR - 15, YELLOW, "#cd683d")       # turned back
+    for x in range(x0 + 12, x1 - 34, 10):
+        r(x, FLOOR - 23, x, FLOOR - 17, "#cd683d")                          # its folds
+    r(x0 + 5, FLOOR - 12, x1 - 6, FLOOR - 12, "#a9bdb2")                    # the shadow under the rail
+    box(170, FLOOR - 11, 192, FLOOR - 2, TEAL, INK)
+    r(172, FLOOR - 7, 190, FLOOR - 7, INK)
+    r(180, FLOOR - 13, 183, FLOOR - 12, INK)
+    for x in (200, 207):
+        r(x, FLOOR - 2, x + 4, FLOOR - 1, PINK)
+    return R.save("crewcabin")
+
+
+def bumbot_head():
+    """Bumbot's head for the picture in her cabin: a Bombay cat's, generated (PixelLab map object
+    5f958028-655b-4c85-a44b-b55ce068d531, `assets/source/rooms/bumbot-head.png`), cut close, its
+    eyes given his own colours (the user: "Eyes not orange, but how his eyes are": the pale
+    yellow-green of his sprite and its darker shade)."""
+    im = Image.open(ROOT / "assets" / "source" / "rooms" / "bumbot-head.png").convert("RGBA").crop((4, 1, 28, 30))
+    eyes = {(0xf2, 0xed, 0xae): (0xa2, 0xa9, 0x47), (0xa4, 0x95, 0x4d): (0x67, 0x66, 0x33)}
+    px = im.load()
+    for y in range(im.height):
+        for x in range(im.width):
+            c = px[x, y]
+            if c[3] < 128:
+                px[x, y] = (0, 0, 0, 0)
+            elif c[:3] in eyes:
+                px[x, y] = (*eyes[c[:3]], 255)
+            else:
+                px[x, y] = (*c[:3], 255)
+    return im
+
+
 def pantry(width):
     """The pantry between the kitchens, deck 5 (`room_pantry`): a passage of shelves, jars and crates,
     a crew door at each end."""
@@ -1158,7 +1270,7 @@ def peeks():
     return ["lobby", "dome", "balloons", "snore"]
 
 
-DRAW = {"laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
+DRAW = {"crewcabin": crewcabin, "laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
         "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
         "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,

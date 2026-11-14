@@ -11,7 +11,7 @@ truth**: read the relevant section before any design or content work, and record
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip title,
   `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?at=pool` start at a
-  named place (list in `README.md`; for testing), `?sound=off` (sound is on; M mutes it in the game). Dash is D.
+  named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=uk` (Ukrainian for a session). Dash is D.
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
 ## Layout
@@ -20,12 +20,15 @@ truth**: read the relevant section before any design or content work, and record
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, dash |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
+| `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the LANGUAGE button is the welcome screen's (`docs/intro.md`, not built) |
+| `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Not to be built until the user says so (2026-11-14); its prep is done (no hints, two languages, deck 3's crew corridor) |
+| `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and the dash free: add a line when the builder gets a new `place` |
 | `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
 | `src/world/soundscape.js` | What nothing in particular makes: the ambience's levels from where she stands (out on deck, inside, how high in the ship, by a pool), her footsteps by what is under her (`floor()`), rungs, a cart's wheels, strokes; the small steady sounds of a few places (`PLACES`) |
 | `tools/check_sound.py`, `tools/soundboard.html` | Every effect rendered by the browser without playing it and measured (loudness, length, a spectrogram each on sheets in `%TEMP%/bumbusik-playtest/sound`): must end "all within bounds". The soundboard plays each by a button and has the ambience on sliders: <http://localhost:8000/tools/soundboard.html>, where the user listens |
 | `src/sea.js` | The sea, drawn in code: rows of moving waves, foam along the waterline running on past the stern into the wake, the bow wave, the wake (§5.2); its sunset rows (`setDusk`) |
 | `src/background.js` | The far background, drawn in code: the Baltic archipelago, the far sea, the clouds, the far gulls (`FarGulls`, shared by every view), fixed to the screen and laid out each frame, the horizon settling over her floor (`HORIZON_ABOVE`); in the outside view on the waterline. The sea-view windows show a masked copy of it (`addWindowView()` in ShipScene) (§5.2). The sunset (§6.1.9): a second sky and sea faded over the day's (`setDusk(k)`), the sun and its path; its colours are drawn divided by the evening light (`DUSK_LIGHT`, the ship scene's multiply wash) so that they look themselves under it |
-| `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here |
+| `tools/ship_layout.py` | **The ship's layout**: decks, stair cores, atrium, escape trunks and every venue in metres from the bow (bow on the left). Edit positions here. `CREW_DECK`: deck 3's crew corridor, the one played part of that deck, where the game starts (her cabin's door, the Medical Center's, the service ladder's); `PLAYABLE` stays decks 4 to 12, the ones the stairs and lifts serve |
 | `maps/ship.json` | Tiled-format map of the whole ship (placeholder art), **generated** from the layout by `python tools/build_ship_map.py` |
 | `docs/ship-profile.svg` | Side schematic of the ship, drawn from the layout by `python tools/draw_ship_profile.py`; shown in `GAME_DESIGN.md` §5.3 |
 | `reference/` | **Git-ignored**: NCL's ship map PDF and its side profile (also flipped to bow-left), the source of real proportions. Copyrighted, never commit |
@@ -393,6 +396,9 @@ Lessons learned (2026-11-14, step 12, sound):
   make it practical again (the user: "we'll have to find a solution for that"), run the scenarios
   a change can touch (`python tools/playtest.py boot sound region6 ...`), and say plainly which
   were run and that the rest were not. Never start the whole of it unasked.
+- **No hint popups** (the user, 2026-11-14: "Part of the game is figuring things out. Labels and
+  namings are not considered hints"): never add a text or a key's cap that says what to press or
+  what to do. Signs, plates and the people's pictogram bubbles are fine.
 - Do only what was asked: when a request could reach further (another deck, a layout change),
   ask first rather than assume (the user, 2026-11-06).
 - The user circles things on screenshots and numbers them; fix each, show the result as
@@ -401,3 +407,20 @@ Lessons learned (2026-11-14, step 12, sound):
   ask; don't send them to launch the game for it.
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
+
+Lessons learned (2026-11-14, the prep before the intro: deck 3, the languages):
+
+- **A new played part of a closed deck is a few lines in the builder**, because every piece of the
+  ship's side follows the owner of its tiles: make the part's shell tiles cuttable
+  (`on_crew_deck()` in `build_exterior()`), wall its ends in the solid layer, and the cut-away, its
+  shadows, the livery's piece over it and the portholes on it all follow. Give a porthole or a
+  window its owner by `span_owner()`, never `"fixed"`, or it stays drawn over the opening.
+- **A door in a cabin corridor takes a cabin door's place:** any door within 100 px of a cabin
+  door removes it (`CABIN_DOOR_CLEAR`), and the doors are 192 px apart, so a door between two
+  removes both. The service ladder's door on deck 4 stands exactly on a cabin door's slot.
+- **Moving the start moves every playtest's start:** twenty-six scenarios opened the game and
+  walked from the gangway. `Browser.open()` starts them there still (`start="gangway"`, its
+  checkpoint lit as it was); only `boot` and `deck3` use the game's own start.
+- **A walk in a playtest that must end at a door ends by teleport or by `hold_until` with a few
+  px to spare:** polled every fifth of a second, she overshot the ladder's door by 11 px and E
+  found nothing.

@@ -26,7 +26,7 @@ import websocket
 
 from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, STAGE, TILE, TRUNKS, col, exact_x,
                             floor_y, region_at, walk_y, x_of)
-from ship_layout import CARD_SPOTS, DOOR_LOCKS, END_WALL_LOCKS, FLIGHT_LOCKS
+from ship_layout import CARD_SPOTS, CREW_DECK, DOOR_LOCKS, END_WALL_LOCKS, FLIGHT_LOCKS
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
@@ -95,12 +95,22 @@ class Browser:
             if msg.get("id") == my_id:
                 return msg.get("result", {})
 
-    def open(self, query=""):
+    def open(self, query="", start="gangway"):
+        """Opens the game. A scenario that goes straight into play begins where the game began when
+        most of them were written: in the gangway lobby on deck 4, its crew door's checkpoint lit
+        (`start`). The game's own start, deck 3's crew corridor (the user, 2026-11-14), is
+        `start=None`: the `boot` and `deck3` scenarios."""
+        old = bool(start) and "play" in query and "at=" not in query
+        if old:
+            query += f"&at={start}"
         self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
         time.sleep(0.3)
         ready = "window.__ship && window.__ship.player" if "play" in query else "document.querySelector('canvas')"
         self.wait_for(ready, timeout=15)
         time.sleep(0.5)
+        if old:
+            self.eval("""(s => { const c = s.checkpoints.find(c => c.id === 'cp_gangway');
+                if (c && !c.active) { s.lightCheckpoint(c, false); s.save.activated.push(c.id); } })(window.__ship)""")
 
     def eval(self, expr):
         res = self.send("Runtime.evaluate", expression=expr, returnByValue=True)
@@ -184,7 +194,8 @@ class Browser:
 # Positions come from the map builder (tools/build_ship_map.py), in metres from the bow.
 
 D4, D5, D6, D7, D8, D9, D10, D11, D12 = (floor_y(d) for d in (4, 5, 6, 7, 8, 9, 10, 11, 12))
-SPAWN_X = x_of(67)
+D3 = floor_y(3)
+SPAWN_X = exact_x(CREW_DECK["cabin"])       # the start: her crew cabin's door on deck 3
 CORE_L = col(CORES["forward"][0]) * TILE + 4 * TILE       # forward core: the 4-5 flight's foot
 LADDER_X = (col(FUNNEL[0]) - 3) * TILE + TILE // 2        # the funnel ladder, deck 12 to the roof
 ROOF_Y = ROOF_ROW * TILE
@@ -208,8 +219,8 @@ def scenario_boot(b):
     big = b.eval("""Object.values(window.__ship.textures.list).flatMap(t => t.source.map(s => [t.key, s.width, s.height]))
         .filter(([k, w, h]) => w > 8192 || h > 8192)""")
     check(not big, "no texture is larger than 8192 px a side", big)
-    ok = (not big) and check(s["mode"] == "play" and s["y"] == D4 and abs(s["x"] - SPAWN_X) < 4,
-                 "spawns standing on deck 4 at the gangway", s)
+    ok = (not big) and check(s["mode"] == "play" and s["y"] == D3 and abs(s["x"] - SPAWN_X) < 4,
+                 "spawns standing on deck 3 at her crew cabin's door", s)
     # The side is painted (step 11): its tiles are many different ones, and each of them that is
     # cut away with its deck is known to the game as one that is.
     kinds = b.eval("""(s => { const ids = new Set(); s.exteriorLayer.forEachTile(t => { if (t.index > 0) ids.add(t.index); });
@@ -224,6 +235,90 @@ def scenario_boot(b):
     b.tap("o")
     time.sleep(0.5)
     ok &= check(not b.eval("!!window.__ship.overview") and b.state()["mode"] == "play", "and O again is back in the game")
+    return ok
+
+
+def scenario_deck3(b):
+    """The start (the user, 2026-11-14): deck 3's crew corridor, her cabin behind the door marked
+    Crew, the service ladder up to deck 4. Nothing says what to do."""
+    S = "window.__ship"
+    a, z = (exact_x(m) for m in CREW_DECK["span"])
+    ladder = x_of(CREW_DECK["ladder"])
+    b.open("?reset&play", start=None)
+    time.sleep(0.8)
+    s = b.state()
+    ok = check(s["mode"] == "play" and s["y"] == D3 and abs(s["x"] - SPAWN_X) < 4, "the game starts on deck 3 at her cabin's door", s)
+    ok &= check(s["activated"] == ["cp_crew"], "that door is the first checkpoint, lit from the start", s["activated"])
+    ok &= check(b.eval(f"{S}.viewDeck") == 3 and b.eval(f"{S}.shellAlpha[3]") < 0.05, "the corridor's side is cut open round her")
+    ok &= check(1 in save_list(b, "regions"), "deck 3 is region 1's", save_list(b, "regions"))
+    ok &= check(not alert(b), "nothing pops up to say what to do", alert(b))
+    b.shot("deck3-start")
+    # Her cabin: in with E, out with E.
+    b.tap("e")
+    time.sleep(1.0)
+    ok &= check(route(b) == "crewcabin", "E at the door marked Crew: her cabin", route(b))
+    b.shot("deck3-cabin")
+    b.tap("e")
+    time.sleep(1.0)
+    s = b.state()
+    ok &= check(route(b) == "inside" and s["y"] == D3 and s["mode"] == "play", "and E at its door again: back in the corridor", s)
+    # A bulkhead at each end; no stairs and no lift come down here.
+    b.hold("left", 5.0)
+    s = b.state()
+    ok &= check(a + 16 <= s["x"] < a + 40 and s["y"] == D3, "the forward bulkhead stops her", (s["x"], a))
+    b.shot("deck3-forward")
+    hold_until(b, "right", lambda s: s["x"] >= ladder + 60, 12)
+    b.hold("right", 1.2)
+    s = b.state()
+    ok &= check(z - 40 < s["x"] <= z - 16 and s["y"] == D3, "and the aft one", (s["x"], z))
+    b.shot("deck3-aft")
+    ok &= check(b.eval(f"{S}.lifts.every(l => l.floors.every(f => f.deck >= 4))"), "no lift comes down to deck 3")
+    # The way up: the service ladder behind its door.
+    b.teleport(ladder, D3)
+    b.tap("e")
+    time.sleep(0.4)
+    b.hold("up", 0.3)
+    ok &= check(b.state()["mode"] == "trunk", "E at the ladder's door, then up: she is on the ladder", b.state())
+    hold_until(b, "up", lambda s: s["y"] <= D4, 6)
+    b.hold("left", 0.5)
+    time.sleep(0.9)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == D4, "up the ladder and out of its door on deck 4", s)
+    ok &= check(b.eval(f"{S}.shellAlpha[3]") > 0.95 and b.eval(f"{S}.shellAlpha[4]") < 0.05, "deck 3 is closed again under her, deck 4 open")
+    b.shot("deck3-up-on-4")
+    return ok
+
+
+def scenario_lang(b):
+    """The two languages (the user, 2026-11-14): every text the game says has an English and a
+    Ukrainian version; `?lang=` sets one for a session. And no hint is left to translate."""
+    L, S = "window.__lang", "window.__ship"
+    texts = "window.__game.scene.getScene('title').children.list.filter(o => o.type === 'Text').map(o => o.text)"
+    b.open("?reset")
+    keys = b.eval(f"{L}.KEYS")
+    ok = check(sorted(keys["en"]) == sorted(keys["uk"]) and len(keys["en"]) > 20, "every text has both versions",
+               sorted(set(keys["en"]) ^ set(keys["uk"])))
+    ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["Bumbusik", "Start"], "English is the default: the title", b.eval(texts))
+    b.shot("lang-title-en")
+    b.open("?reset&lang=uk")
+    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["Бумбусік", "Почати"], "?lang=uk: the title in Ukrainian", b.eval(texts))
+    b.shot("lang-title-uk")
+    said = {}
+    for code in ("en", "uk"):
+        b.open(f"?reset&play&lang={code}")
+        time.sleep(0.4)
+        b.eval(f"{S}.lockedUntil = 0; {S}.showLocked('deck')")
+        lock = alert(b)
+        b.eval(f"{S}.alert.setVisible(false); {S}.lockedUntil = 0; {S}.world.say({L}.t('say.oops'), 600)")
+        said[code] = (lock, alert(b), b.eval(f"{L}.t('fright.startled')"), b.eval(f"{L}.t('win.tally', 1, 2, 3, 4, 5)"))
+        time.sleep(0.7)
+    ok &= check(said["en"][:3] == ("🔒 Deck card", "Oops!", "Oh, sorry!"), "a lock, her word, a fright: in English", said["en"])
+    ok &= check(said["uk"][:3] == ("🔒 Палубна картка", "Ой!", "Ой, вибачте!"), "and in Ukrainian", said["uk"])
+    ok &= check("1 of 2" in said["en"][3] and "1 з 2" in said["uk"][3], "the win screen's tally takes its numbers in both", (said["en"][3], said["uk"][3]))
+    ok &= check(b.eval(f"{S}.bubble.text") == "Кісюнічка!!!", "her shout is hers in both")
+    ok &= check(b.eval(f"typeof {S}.world.hint + typeof {S}.world.glyph") == "undefinedundefined", "no hint and no key's cap is left in the game")
+    b.open("?reset")
+    ok &= check(b.eval(f"{L}.language()") == "en", "a language set by the link is not kept")
     return ok
 
 
@@ -1201,7 +1296,7 @@ def scenario_region1(b):
     b.teleport(person(b, "haz_porter")["x"] + 90, D4)
     b.hold("left", 0.9)
     time.sleep(0.2)
-    ok &= check(b.state()["mode"] == "scripted" and "Ой" in alert(b), "the porter's cart: bumped", alert(b))
+    ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "the porter's cart: bumped", alert(b))
     time.sleep(2.5)
     s = b.state()
     ok &= check(s["mode"] == "play" and abs(s["x"] - exact_x(72)) < 30, "and she steps out of the gangway's crew door", s)
@@ -1344,7 +1439,7 @@ def scenario_region2(b):
     b.shot("region2-jogger")
     js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
     time.sleep(1.6)
-    ok &= check(b.state()["mode"] == "scripted" and "Ой" in alert(b), "in his lane, he bumps her", alert(b))
+    ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "in his lane, he bumps her", alert(b))
     time.sleep(2.6)
     ok &= check(b.state()["mode"] == "play", "a scare: she is back at a checkpoint", b.state())
     # He can be hopped.
@@ -1544,7 +1639,7 @@ def scenario_region3(b):
     b.teleport(x + 20, D7)
     js(b, f"(m => {{ m.at = window.__ship.time.now + 4000; }})({spill})")
     b.hold("left", 0.5)
-    ok &= check(b.state()["mode"] == "scripted" and "Ой-йой" in alert(b), "running on them: slipped", alert(b))
+    ok &= check(b.state()["mode"] == "scripted" and "Whoa" in alert(b), "running on them: slipped", alert(b))
     time.sleep(2.8)
     js(b, "window.__ship.world.movers.filter(m => m.pour).forEach(m => { m.state = 'idle'; m.chips.clear(); m.at = window.__ship.time.now + 600000; })")
     # The machine with a glint pays her.
@@ -1621,7 +1716,7 @@ def scenario_region3(b):
     while time.time() < end and not hit:
         hit = b.state()["mode"] == "scripted"
         time.sleep(0.05)
-    ok &= check(hit and "Ай" in alert(b), "under the swinging light: bonked", alert(b))
+    ok &= check(hit and "Ouch" in alert(b), "under the swinging light: bonked", alert(b))
     time.sleep(2.8)
     # The open trap door: one deck down onto the galley's flour sacks, beside the rival.
     b.teleport(st["trapX"], D6)
@@ -1886,7 +1981,7 @@ def scenario_region4(b):
     time.sleep(0.3)
     ok &= check(js(b, f"{vac}.state") == "in" and js(b, f"{vac}.armed"), "the vacuum waits in the cabin's doorway")
     b.key("right", True)
-    hit = scared(b, "Іііі", 2.5)
+    hit = scared(b, "Eeek", 2.5)
     b.key("right", False)
     b.shot("region4-vacuum")
     ok &= check(hit, "running at the doorway: it darts out at her", alert(b))
@@ -1930,7 +2025,7 @@ def scenario_region4(b):
     b.teleport(sx - 26, D9)
     time.sleep(0.3)
     b.hold("space", 0.2)
-    hit = scared(b, "Мммф", 2.5)
+    hit = scared(b, "Mmmph", 2.5)
     b.shot("region4-buried")
     ok &= check(hit, "a jump landed beside it: buried", alert(b))
     time.sleep(2.8)
@@ -1944,7 +2039,7 @@ def scenario_region4(b):
     ok &= check(b.state()["mode"] == "play" and b.state()["x"] > px + 48, "between its showers she runs under the sprinkler", b.state())
     wait_js(b, f"{spr}.phase({now}) === 'tell'", 6)
     b.teleport(px, D9)
-    hit = scared(b, "Бррр", 2.5)
+    hit = scared(b, "Brrr", 2.5)
     b.shot("region4-drenched")
     ok &= check(hit, "under it when it rains: drenched", alert(b))
     time.sleep(2.8)
@@ -1979,7 +2074,7 @@ def scenario_region4(b):
     b.teleport(wx - 200, D9)
     time.sleep(0.2)
     b.key("right", True)
-    hit = scared(b, "Ай", 3.0)
+    hit = scared(b, "Ouch", 3.0)
     b.key("right", False)
     b.shot("region4-bonked")
     ok &= check(hit, "running past the door that flies open: bonked", alert(b))
@@ -2002,7 +2097,7 @@ def scenario_region4(b):
     b.tap("e")
     time.sleep(0.35)
     b.shot("region4-startled")
-    ok &= check(b.state()["mode"] == "scripted" and "вибачте" in alert(b), "E at it: startled", alert(b))
+    ok &= check(b.state()["mode"] == "scripted" and "sorry" in alert(b), "E at it: startled", alert(b))
     time.sleep(3.0)
     # The standing cart and its tangerine; the luggage to the ceiling.
     # (Until she is over it, not for a time: the cart's top is 21 px wide, and 0.4 s carried her a
@@ -2056,7 +2151,6 @@ def scenario_region4(b):
     ok &= check(wait_flag(b, "bb4", 12), "near-catch 4: Bumbot leaps from the towels into the vent", flags(b))
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned")
     time.sleep(0.5)
-    ok &= check(js(b, f"{W}.story.cartKey.visible"), "the cart shows its key")
     # The cart under the vent, onto it, down on hands and knees: the duct.
     b.teleport(js(b, f"{lc}.x") - 36, D9, "linen")
     b.tap("e")
@@ -2065,7 +2159,6 @@ def scenario_region4(b):
     ok &= check("cart_linen" in flags(b), "pushed under the vent", flags(b))
     time.sleep(0.3)
     b.shot("region4-cart")
-    ok &= check(js(b, f"{W}.story.ventKey.visible"), "and the vent's key shows over it")
     b.hold(["right", "space"], 0.45)
     time.sleep(0.5)
     s = b.state()
@@ -2087,7 +2180,6 @@ def scenario_region4(b):
     ok &= check(js(b, f"{W}.peeks.find(k => k.what === 'snore').items[1].alpha") > 0.9, "over a grille: a look down at who snores below")
     ok &= check(tangerines() == n + 1, "a tangerine lost in the duct", tangerines())
     s = hold_until(b, "left", lambda s: s["x"] < duct["exitX"] + 6, 8)
-    ok &= check(js(b, f"{W}.ductKey.visible"), "the far grille shows its key")
     b.tap("down")
     time.sleep(1.7)
     s = b.state()
@@ -2132,7 +2224,6 @@ def enter_region6(b):
     """A save at region 6's door: regions 1-5 done, she has come up the forward stairs to deck 11."""
     enter_region5(b)
     b.eval("(P => { P.open('regions', 6); })(window.__ship.progress)")
-    # (The hints of the verbs learned on the way are not on the screen any more.)
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(exact_x(79.5), D11)
     time.sleep(0.3)
@@ -2158,7 +2249,7 @@ def enter_region8(b):
     enter_region7(b)
     b.eval("(P => { ['guest', 'riv_walkway'].forEach(f => P.setFlag(f)); P.open('regions', 7); P.open('regions', 8); })(window.__ship.progress)")
     time.sleep(1.2)
-    b.eval("window.__ship.world.refresh(); window.__ship.save.seen.push('hint-balcony'); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(exact_x(216.6), floor_y(12))
     time.sleep(0.4)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
@@ -2316,7 +2407,7 @@ def scenario_region6(b):
     ok &= check(s["y"] == D10 and abs(s["x"] - hx) < 4, "the hatch drops her into deck 10's hallway", s)
     trays = js(b, f"{W}.data.ents.find(e => e.kind === 'trays')")
     hold_until(b, "right", lambda s: s["x"] > trays["x0"] + 6, 5)
-    ok &= check(scared(b, "вибачте", 3), "the trays clatter under her feet, and their door flies open: startled", alert(b))
+    ok &= check(scared(b, "sorry", 3), "the trays clatter under her feet, and their door flies open: startled", alert(b))
     b.shot("region6-trays")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 8) and "trays_10m" in flags(b), "she comes back at a checkpoint", b.state())
     ok &= check(js(b, f"{S}.tangerines.some(t => t.id === 'tan_10_tray')"), "a tangerine has rolled out from among the trays")
@@ -2386,7 +2477,7 @@ def scenario_region6(b):
     ok &= check(person(b, "riv_loungers")["on"], "the security officer on his knees at a lounger")
     b.eval(f"{kid}.x = {L['kidA'] + 190}; {kid}.dir = -1; {kid}.mode = 'patrol'; {kid}.nextSquirt = 0; {kid}.pauseUntil = 0")
     b.teleport(L["kidA"] + 70, D11)
-    ok &= check(scared(b, "Ааа", 4), "in front of the kid within four metres: splashed", alert(b))
+    ok &= check(scared(b, "Aaah", 4), "in front of the kid within four metres: splashed", alert(b))
     b.shot("region6-kid")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 8) and abs(b.state()["x"] - js(b, f"{S}.checkpoints.find(c => c.id === 'cp_pool').x")) < 30,
                 "and back at the hut", b.state())
@@ -2416,7 +2507,7 @@ def scenario_region6(b):
     x1 = b.state()["x"]
     time.sleep(0.2)
     ok &= check(b.state()["x"] - x1 > 18, "without them she slides on across them", (x1, b.state()))
-    ok &= check(scared(b, "Ой", 2), "and the deck chair slides at her: bumped", alert(b))
+    ok &= check(scared(b, "Oops", 2), "and the deck chair slides at her: bumped", alert(b))
     b.shot("region6-wet")
     wait_js(b, f"{S}.mode === 'play'", 8)
     time.sleep(2.5)
@@ -2664,7 +2755,7 @@ def scenario_region7(b):
     b.key("right", True)
     hold_until(b, [], lambda s: s["x"] > o["x0"] - 30, 3)
     tap2()
-    got = scared(b, "вибачте", 2.5)
+    got = scared(b, "sorry", 2.5)
     b.shot("region7-occupied")
     b.key("right", False)
     ok &= check(got, "vaulting onto the breakfast couple's balcony: startled", (b.state(), alert(b)))
@@ -2681,7 +2772,7 @@ def scenario_region7(b):
     time.sleep(3.2)
     b.teleport(g["x0"] + 50, g["floor"], "promenade")
     wait_js(b, marked, 6)
-    got = scared(b, "Киш", 3.0)
+    got = scared(b, "Shoo", 3.0)
     b.shot("region7-gull")
     ok &= check(got, "standing where its shadow is: swooped", (b.state(), alert(b)))
     hold_until(b, [], lambda s: s["mode"] == "play", 6)
@@ -2734,7 +2825,7 @@ def scenario_region7(b):
     tr = js(b, f"{mover('haz_trays_10a2')}.def")
     b.teleport(tr["x1"] + 40, D10)
     b.hold("left", 0.5)
-    got = scared(b, "вибачте", 2.5)
+    got = scared(b, "sorry", 2.5)
     b.shot("region7-trays")
     ok &= check(got, "the trays clatter, the door opens on someone brushing her teeth: startled", (b.state(), alert(b)))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
@@ -2849,7 +2940,7 @@ def scenario_region7(b):
     s = b.state()
     ok &= check(s["mode"] == "play" and s["x"] > d["x"] + 252, "hoisted, the drill's boat lets her under it", (s, d))
     b.teleport(cx, D7, "promenade")
-    got = scared(b, "Ой", 12.0)
+    got = scared(b, "Oops", 12.0)
     b.shot("region7-drill")
     ok &= check(got, "under it as the crew lower it: bumped", (b.state(), alert(b)))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
@@ -2908,7 +2999,7 @@ def scenario_region8(b):
     enter_region7(b)
     b.eval("(P => { ['guest', 'riv_walkway'].forEach(f => P.setFlag(f)); P.open('regions', 7); })(window.__ship.progress)")
     time.sleep(1.0)
-    b.eval("window.__ship.save.seen.push('hint-balcony'); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+    b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     W, T = "window.__ship.world", "window.__ship.world.data.topdeck"
     NOW = "window.__ship.time.now"
     lit = lambda: save_list(b, "activated")
@@ -2955,7 +3046,7 @@ def scenario_region8(b):
     # The terrace's gull: lingering by it, a swoop.
     g = b.eval(f"{T}.terrace.gull")
     b.teleport(g["x"] - 40, D12)
-    got = scared(b, "Киш", 6.0)
+    got = scared(b, "Shoo", 6.0)
     ok &= check(got, "lingering by the gull on the terrace's rail: swooped")
     time.sleep(3.0)
     s = b.state()
@@ -2996,7 +3087,7 @@ def scenario_region8(b):
     s = hold_until(b, "left", lambda s: s["x"] < f["x"] - f["half"] - 10, 4)
     ok &= check(s["mode"] == "play" and s["x"] < f["x"] - f["half"], "in the lull she walks past the grill", s)
     b.teleport(f["x"] + 14, D12)
-    got = scared(b, "Гаряче", 8.0)
+    got = scared(b, "Hot", 8.0)
     ok &= check(got, "at the grill when it flares: singed")
     time.sleep(3.0)
     b.eval(f"{W}.carryBox.take('coffee')")
@@ -3062,7 +3153,7 @@ def scenario_region8(b):
     # The court: a ball off the rim; her own shot.
     bl = b.eval(f"{T}.balls[0]")
     b.teleport(bl["x"] + 80, D12)
-    got = scared(b, "Ай", 9.0)
+    got = scared(b, "Ouch", 9.0)
     ok &= check(got, "in the way of a ball off the hoop: bonked")
     time.sleep(3.0)
     c = b.eval(f"{T}.court")
@@ -3082,7 +3173,7 @@ def scenario_region8(b):
     b.key("up", True)
     wait_js(b, G + " === 'blow'", 8)
     time.sleep(0.3)
-    slipped = b.eval("window.__ship.stairSlip") or "Ой" in alert(b)
+    slipped = b.eval("window.__ship.stairSlip") or "Whoa" in alert(b)
     b.shot("region8-slip")
     time.sleep(0.5)
     b.key("up", False)
@@ -3095,7 +3186,7 @@ def scenario_region8(b):
         ph = b.eval(G)
         st = b.eval(f"{W}.story.funnelWind.state")
         b.key("up", ph == "calm" and st == "circle" and b.state()["y"] > fn["shoulder"][1] - 120)
-        got = "Киш" in alert(b)
+        got = "Shoo" in alert(b)
         time.sleep(0.05)
     b.key("up", False)
     ok &= check(got, "standing where a gull has marked her on the stairway: swooped", b.state())
@@ -3354,7 +3445,7 @@ def scenario_region9(b):
     ok &= check(door_open(b, "spa-door"), "the spa's door opens from the lobby now")
     st = B["steam"]
     b.teleport(st["x"] + 30, D11)
-    ok &= check(scared(b, "Пхх", 7.0), "in the way of the sauna's steam: fogged")
+    ok &= check(scared(b, "Pfff", 7.0), "in the way of the sauna's steam: fogged")
     time.sleep(2.6)
     b.eval("window.__ship.lockedUntil = 0")
     rec = person(b, "amb_spa_reception")
@@ -3581,7 +3672,7 @@ def scenario_finale(b):
     s = hold_until(b, [], lambda s: s["mode"] != "play", 9)
     b.key("left", False)
     b.key("space", False)
-    ok &= check(s["mode"] == "scripted" and alert(b) == "Киш!" and s["y"] > D11 + 100, "flown into a gull: the parasol is knocked from her hands", (s, alert(b)))
+    ok &= check(s["mode"] == "scripted" and alert(b) == "Shoo!" and s["y"] > D11 + 100, "flown into a gull: the parasol is knocked from her hands", (s, alert(b)))
     b.shot("finale-gull")
     b.eval(f"(c => {{ clearInterval(window.__iv); c.birds[0].x = 0; }})({S}.crossers)")
     time.sleep(2.8)
@@ -3603,7 +3694,7 @@ def scenario_finale(b):
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and back on the balcony", s)
     # (That jump at the tip sent Bumbot off already: back to his place, as if she had not been.)
-    b.eval(f"(st => {{ st.tip.spooks = 0; st.tipCat.x = {Mo['catX']}; st.tipCat.setFlipX(true); const seen = {W}.save.seen, i = seen.indexOf('hint-still'); if (i >= 0) seen.splice(i, 1); }})({S})")
+    b.eval(f"(st => {{ st.tip.spooks = 0; st.tipCat.x = {Mo['catX']}; st.tipCat.setFlipX(true); }})({S})")
     # The glide made.
     fresh_lull()
     s = glide_to_the_bow(b)
@@ -3619,7 +3710,7 @@ def scenario_finale(b):
     time.sleep(1.2)
     s = b.state()
     ok &= check(cat() > s["x"] + 100, "cornered at the tip, he darts past her", (cat(), s))
-    ok &= check("Stand still" in (alert(b) or ""), "and the game says how", alert(b))
+    ok &= check(not alert(b), "and nothing says how he is caught: hers to find out", alert(b))
     b.shot("finale-dart")
     b.eval("window.__ship.lockedUntil = 0")
     # Standing still: he comes; three seconds of it and the catch.
@@ -3636,7 +3727,7 @@ def scenario_finale(b):
     time.sleep(1.6)
     ok &= check(b.state()["mode"] == "play" and b.eval("window.__ship.player.texture.key") == "her-cat", "she stands with Bumbot in her arms", b.state())
     ok &= check(not b.eval(f"{S}.tipCat.visible") and not b.eval(f"{S}.crossers.birds[0].sprite.visible"), "nobody at the tip, no gulls in the air")
-    ok &= check("8206" in (alert(b) or ""), "where to: her cabin", alert(b))
+    ok &= check(not alert(b), "and nothing says where to", alert(b))
     b.shot("finale-held")
     # The way home: the mooring deck's door, the kids' club with its fort put away; nothing scares.
     b.eval("window.__ship.lockedUntil = 0")

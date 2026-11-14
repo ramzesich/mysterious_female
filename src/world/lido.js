@@ -6,6 +6,7 @@
 
 import { PLAYER, SWIM } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 
 const M = 48;
@@ -42,7 +43,6 @@ export const lido = {
         this.mLight = s.add.rectangle(L.machineX + 9, L.y - 39, 3, 2, 0x1ebc73).setDepth(D.decor + 0.3);
         this.mCone = s.add.graphics().setDepth(D.props + 0.04).setVisible(false);
         this.mMeter = s.add.graphics().setDepth(D.fx + 0.4).setVisible(false);
-        this.mKey = w.glyph(L.machineX, L.y - 62, 'hold E');
         w.add([this.lever, this.jetG, this.paws, this.pawn, this.mLight, this.mCone, this.mMeter]);
         w.things.push({ id: 'src_icecream', x: L.machineX, y: L.y, route: 'inside', items: [], reach: 22, interact: () => this.machine() });
         w.things.push({ id: 'sec_chess', x: L.chessX, y: L.y, route: 'inside', items: [], reach: 26, interact: () => this.chess() });
@@ -121,8 +121,6 @@ export const lido = {
             this.paws.setAlpha(Phaser.Math.Clamp(k * 1.6, 0, 0.85));
             if (k <= 0) this.pawsAt = 0;
         }
-        this.mKey.setVisible(s.mode === 'play' && s.route === 'inside' && !this.world.carry && !this.P.save.seen.includes('swirl')
-            && Math.abs(her.y - L.y) < 4 && Math.abs(her.x - L.machineX) < 60 && !(this.P.has('kid_fed') && !this.P.has('refilled')));
     },
 
     // --- Near-catch 5 (population §6.7) ---------------------------------------------------------
@@ -578,7 +576,7 @@ export const lido = {
         const s = this.scene, w = this.world, L = this.L;
         const img = s.add.image(x, y + 8, 'load-cone').setOrigin(0.5, 1).setDepth(s.DEPTH.props + 0.05);
         w.add([img]);
-        w.say('Ой!', 700);
+        w.say(t('say.oops'), 700);
         s.tweens.add({ targets: img, x: x - 16, y: L.y, angle: -110, duration: 380, ease: 'Quad.easeIn', onComplete: () => {
             sfx.at(img.x, L.y).plop();
             w.foodGulls?.gull_go?.pounce(img.x - 4);

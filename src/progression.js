@@ -7,10 +7,10 @@
 import { KEY_CARDS } from './config.js';
 import { writeSave } from './save.js';
 import { sfx } from './sfx.js';
+import { t } from './lang.js';
 
 // The readers' and the HUD's colours (Resurrect 64).
 export const CARD_COLOURS = { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b };
-const CARD_NAMES = { deck: 'Deck', ent: 'Entertainment', hk: 'Housekeeping', off: "Officer's" };
 const CARD_ORDER = ['deck', 'ent', 'hk', 'off'];
 
 // "card:off:-1", "oneway:1", "flag:bb2", "block:wedding", "region:3", "" (none).
@@ -317,6 +317,6 @@ export class Progression {
     }
 
     cardName(card) {
-        return CARD_NAMES[card] ?? card;
+        return t(`card.${card}`);
     }
 }

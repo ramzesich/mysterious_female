@@ -485,10 +485,6 @@ export class Story {
         const bb4 = s.cats.find(c => c.flag === 'bb4');
         if (bb4) bb4.flee = (sprite, done) => this.intoTheVent(sprite, done);
         this.linenCart = w.pushables.find(t => t.id === 'cart_linen');
-        if (this.linenCart) {
-            this.cartKey = w.glyph(0, this.linenCart.y - 54, 'E');
-            this.ventKey = w.glyph(0, this.linenCart.y - L.cartTop - 72, '↓');
-        }
         this.stewardCart = w.pushables.find(t => t.id === 'cart_steward');
         // The security officer's uniform, going round in the laundry's third washer while he waits.
         const laundry = w.rooms.laundry;
@@ -521,14 +517,6 @@ export class Story {
             // (His card, if the thanks were cut short: loaded after the cart was freed.)
             if (free && !P.save.cards.includes('hk') && s.mode === 'play' && s.route === 'inside'
                 && Math.abs(her.y - st.y) < 4 && Math.abs(her.x - st.x) < 110) this.stewardThanks();
-        }
-        // The keys in the linen room: E at the cart's end once he is in the vent, ↓ on it under the vent.
-        const lc = this.linenCart;
-        if (lc) {
-            const inRoom = s.route === 'linen' && s.mode === 'play';
-            const under = lc.x >= lc.max;
-            this.cartKey.setVisible(inRoom && P.has('bb4') && !under).setX(lc.x - 22);
-            this.ventKey.setVisible(inRoom && under && !P.has('duct')).setX(lc.x);
         }
         // Out of the chute with a towel on her head: it stays a few steps, then slides off.
         if (this.hat) {

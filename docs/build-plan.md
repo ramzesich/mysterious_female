@@ -284,6 +284,14 @@ first"); how it was done: `docs/progress-decisions.md`.
   we finish with sound"). **Done the same day:** the livery's two spots, the stern's counter, the
   outside view's sky (`docs/progress-decisions.md`); the user's own touches to the livery go into
   `assets/source/livery/livery-by-hand.png`.
+- **The prep before the intro** (the user, 2026-11-14, on `docs/intro.md`). **Done the same
+  day:** every hint popup taken out; the game's texts in English and Ukrainian (`src/lang.js`,
+  `?lang=uk`); deck 3's crew corridor, the start, with her crew cabin and the service ladder up
+  to deck 4 (`docs/progress-decisions.md`). `docs/start-links.md` lists a link for every place
+  the game can be started at.
+- **The intro** (`docs/intro.md`: the welcome screen with PLAY and LANGUAGE, the start sequence,
+  the intro's scene from the sun down to the Crew door). **Not to be built until the user says
+  so** (2026-11-14).
 - **The controller:** the mapping of §3.1 tested on the Xbox pad through the whole route.
 - **Tuning:** the checkpoints' spacing, the hazards' periods and the carries' meters from her
   playtest; the tangerine count.

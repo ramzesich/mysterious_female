@@ -9,6 +9,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 
 const M = 48;
@@ -249,11 +250,6 @@ export const bow = {
         const pl = this.who('npc_planner');
         if (pl?.on && play && !P.has('cake_asked') && s.route === 'inside' && Math.abs(her.y - pl.y) < 8 && Math.abs(her.x - pl.x) < 4.5 * M) {
             P.setFlag('cake_asked');
-        }
-        // The cake in her hands the first time: how it is carried.
-        if (w.carry?.kind === 'cake' && !w.save.seen.includes('hint-cake')) {
-            w.save.seen.push('hint-cake');
-            w.hint('Steady! Every start, stop and turn sets the cake swaying');
         }
         // A cake gone over: the pastry chef's sigh, the next time she stands before him.
         const has = w.carry?.kind === 'cake';
@@ -500,7 +496,7 @@ export const bow = {
             for (let i = 0; i < 3; i++) {
                 await w.wait(i ? 230 : 380);
                 sfx.knock();
-                const t = s.add.text(C.x + 12 + i * 5, C.y - 52 - i * 4, 'тук', { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
+                const t = s.add.text(C.x + 12 + i * 5, C.y - 52 - i * 4, t('say.knock'), { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
                 w.add([t]);
                 s.tweens.add({ targets: t, y: t.y - 10, alpha: 0, duration: 700, onComplete: () => t.destroy() });
