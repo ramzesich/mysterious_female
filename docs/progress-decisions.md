@@ -1547,3 +1547,15 @@ sun stands in the world. In the wide views nothing far off drifts now: the islan
 hold (the sky is laid out with no time passing while the view is from afar), the intro's own
 clouds stand, the water only sways a little in place. The gulls and the glitter are what moves.
 Checked: `intro`, `boot`.
+
+**The open crew door levelled with the closed one** (the user, on watching her door open: "A
+closed door frame is leveled correctly with the floor. An open door's frame is not on the same
+level. Make both frames equal. Both in height and in ground level"). The sheet drew the open door
+with its leaf swung toward us, hanging over the frame's top and under its foot, and the whole was
+fitted to a door's 74 px: its frame came 69 px high, 3 px off the floor, and 33 px wide against
+the closed door's 29. `level_frame()` in `tools/build_ship_art.py` makes the frame 74 x 29 (five
+plain rows drawn twice, four plain columns of the leaf taken out), leaves off what hung under the
+foot and draws the leaf's foot level with the floor; the leaf's corner still rises 2 px over the
+frame. It is the door of every lit checkpoint on board, so all of them changed. No tests were
+run, at the user's word ("this is just a leveling"); the two doors were laid over each other at
+the game's placing and their frames coincide.

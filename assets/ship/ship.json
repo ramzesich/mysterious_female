@@ -80,9 +80,49 @@
     "h": 80
    }
   },
-  "door-cabin": {
+  "door-crew-ajar": {
    "frame": {
     "x": 334,
+    "y": 0,
+    "w": 29,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 29,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 29,
+    "h": 76
+   }
+  },
+  "door-crew-ajar-bg": {
+   "frame": {
+    "x": 364,
+    "y": 0,
+    "w": 29,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 29,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 29,
+    "h": 76
+   }
+  },
+  "door-cabin": {
+   "frame": {
+    "x": 394,
     "y": 0,
     "w": 34,
     "h": 74
@@ -102,7 +142,7 @@
   },
   "door-cabin-bg": {
    "frame": {
-    "x": 369,
+    "x": 429,
     "y": 0,
     "w": 34,
     "h": 74
@@ -122,7 +162,7 @@
   },
   "door-cabin-stickers-1": {
    "frame": {
-    "x": 404,
+    "x": 464,
     "y": 0,
     "w": 36,
     "h": 74
@@ -142,8 +182,8 @@
   },
   "door-cabin-stickers-1-bg": {
    "frame": {
-    "x": 441,
-    "y": 0,
+    "x": 0,
+    "y": 119,
     "w": 36,
     "h": 74
    },
@@ -162,8 +202,8 @@
   },
   "door-cabin-stickers-2": {
    "frame": {
-    "x": 478,
-    "y": 0,
+    "x": 37,
+    "y": 119,
     "w": 33,
     "h": 74
    },
@@ -182,7 +222,7 @@
   },
   "door-cabin-stickers-2-bg": {
    "frame": {
-    "x": 0,
+    "x": 71,
     "y": 119,
     "w": 33,
     "h": 74
@@ -202,7 +242,7 @@
   },
   "door-cabin-stickers-3": {
    "frame": {
-    "x": 34,
+    "x": 105,
     "y": 119,
     "w": 28,
     "h": 74
@@ -222,7 +262,7 @@
   },
   "door-cabin-stickers-3-bg": {
    "frame": {
-    "x": 63,
+    "x": 134,
     "y": 119,
     "w": 28,
     "h": 74
@@ -242,7 +282,7 @@
   },
   "door-cabin-ajar": {
    "frame": {
-    "x": 92,
+    "x": 163,
     "y": 119,
     "w": 30,
     "h": 74
@@ -262,7 +302,7 @@
   },
   "door-cabin-ajar-bg": {
    "frame": {
-    "x": 123,
+    "x": 194,
     "y": 119,
     "w": 30,
     "h": 74
@@ -282,7 +322,7 @@
   },
   "door-crew": {
    "frame": {
-    "x": 154,
+    "x": 225,
     "y": 119,
     "w": 29,
     "h": 74
@@ -302,7 +342,7 @@
   },
   "door-crew-bg": {
    "frame": {
-    "x": 184,
+    "x": 255,
     "y": 119,
     "w": 29,
     "h": 74
@@ -317,52 +357,12 @@
    },
    "sourceSize": {
     "w": 29,
-    "h": 74
-   }
-  },
-  "door-crew-ajar": {
-   "frame": {
-    "x": 214,
-    "y": 119,
-    "w": 33,
-    "h": 74
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 33,
-    "h": 74
-   },
-   "sourceSize": {
-    "w": 33,
-    "h": 74
-   }
-  },
-  "door-crew-ajar-bg": {
-   "frame": {
-    "x": 248,
-    "y": 119,
-    "w": 33,
-    "h": 74
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 33,
-    "h": 74
-   },
-   "sourceSize": {
-    "w": 33,
     "h": 74
    }
   },
   "door-deck": {
    "frame": {
-    "x": 282,
+    "x": 285,
     "y": 119,
     "w": 40,
     "h": 74
@@ -382,7 +382,7 @@
   },
   "door-deck-bg": {
    "frame": {
-    "x": 323,
+    "x": 326,
     "y": 119,
     "w": 40,
     "h": 74
@@ -402,7 +402,7 @@
   },
   "door-deck-open": {
    "frame": {
-    "x": 364,
+    "x": 367,
     "y": 119,
     "w": 42,
     "h": 74
@@ -422,7 +422,7 @@
   },
   "door-deck-open-bg": {
    "frame": {
-    "x": 407,
+    "x": 410,
     "y": 119,
     "w": 42,
     "h": 74
@@ -442,7 +442,7 @@
   },
   "door-crew-exit": {
    "frame": {
-    "x": 450,
+    "x": 453,
     "y": 119,
     "w": 42,
     "h": 73

@@ -68,6 +68,7 @@ MUTE = 0.35
 # (box-resampled, then snapped back to the palette), when the sheet drew it too big for her;
 # "from_x", drop the frame's columns left of this (a neighbour's end drawn into it); "join", the
 # columns (from, to) of the next frame to add on the right, where the sheet drew one piece across two.
+# "level", for an open door drawn with its leaf swung toward us (see `level_frame`).
 DOOR = (28, 74)                        # sized to her, like every door on board (§5.4)
 LEVER = 36                             # about half the door's height, as on a real door
 PIECES = {
@@ -77,7 +78,8 @@ PIECES = {
     "door-cabin-stickers-3": ("doors-1", 14, DOOR, {"fill": True, "lever": 36}),
     "door-cabin-ajar": ("doors-1", 5, DOOR, {}),
     "door-crew": ("doors-1", 6, DOOR, {"lever": 37}),
-    "door-crew-ajar": ("doors-1", 7, DOOR, {}),
+    # (Its frame came lower and wider than the closed door's, and 3 px off the floor: `level`.)
+    "door-crew-ajar": ("doors-1", 7, DOOR, {"level": {"frame": (2, 70), "cut": (6, 7, 8, 9), "more": (9, 27, 31, 50, 58)}}),
     "door-crew-exit": ("doors-1", 13, None, {}),
     "door-deck": ("doors-1", 8, DOOR, {"lever": 35}),
     "door-deck-open": ("doors-1", 15, DOOR, {}),
@@ -415,6 +417,32 @@ def muted(img):
     return out
 
 
+def level_frame(img, frame, cut, more):
+    """An open door's frame made the closed door's equal (the user, 2026-11-14: "A closed door
+    frame is leveled correctly with the floor. An open door's frame is not on the same level. Make
+    both frames equal. Both in height and in ground level"). The sheet drew the open door's leaf
+    swung toward us, so its free edge hangs over the frame's top and under its foot, and the
+    whole was fitted to a door's height: the frame itself came 69 px high where the closed one is
+    74, 3 px off the floor, and 33 px wide where the closed one is 29. Here the frame is made
+    74 x 29: `more`, plain rows drawn twice; `cut`, plain columns of the leaf taken out; what hangs
+    under the frame's foot (rows after `frame`'s second) is left off, the leaf's foot drawn level
+    with the floor instead. The leaf's corner over the frame's top stays (2 px), so the piece is
+    76 px high, and its frame is where the closed door's is when both stand on the same spot."""
+    top, foot = frame
+    assert img.size == (33, 74), img.size
+    cols = [x for x in range(img.width) if x not in cut]
+    rows = [y for y in range(foot + 1) for _ in range(2 if y in more else 1)]
+    out = Image.new("RGBA", (len(cols), len(rows)), (0, 0, 0, 0))
+    for j, y in enumerate(rows):
+        for i, x in enumerate(cols):
+            out.putpixel((i, j), img.getpixel((x, y)))
+    for x in range(out.width):                      # the foot: one dark line, frame and leaf
+        if out.getpixel((x, out.height - 1))[3]:
+            out.putpixel((x, out.height - 1), (0x2E, 0x22, 0x2F, 255))
+    assert out.size == (DOOR[0] + 1, DOOR[1] + top), out.size
+    return out
+
+
 def build():
     pieces = {}
     for name, spec in PIECES.items():
@@ -431,6 +459,8 @@ def build():
         if opts.get("height"):
             img = shrink(img, opts["height"])
         img = palettize(img)
+        if opts.get("level"):
+            img = level_frame(img, **opts["level"])
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
 
