@@ -2300,11 +2300,10 @@ Nothing blocks the start of the build. These get settled along the way:
       new ladder, no rounds, nothing that strengthens her uses. **Building it on the branch
       `three-uses` (2026-11-15). Steps 1 and 2 done (D: the cry and the lunge, §3.2; the crew
       cabin's bowl, §6.3; the pocket, and the tangerine a real thing that rolls, §3.2, §5.6).
-      Step 3 built (the throw, F: the roll and the lob, and what each thing does with it, §3.2),
-      waiting for the user's review**; their record is in `docs/progress-decisions.md`, "The
+      Step 3 done (the throw, F: the roll and the lob, and what each thing does with it, §3.2),
+      committed `6a494b2`**; their record is in `docs/progress-decisions.md`, "The
       plan for the three uses, step 1", "..., step 2" and "..., step 3". **Next: step 4**
-      (region 1's decks and the first things to find; about 45 generations, asked item by item),
-      once step 3 is approved.
+      (region 1's decks and the first things to find; about 45 generations, asked item by item).
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
