@@ -33,6 +33,13 @@ export const IDLE = {
     anims: ['idle-tap', 'idle-look'],
 };
 
+// The people's idle clips (`idle`, `idle2`: breathing on the spot), on a clock of their own: every
+// one plays at this many frames a second, whatever its sheet says (4 or 8), so that standing people
+// breathe instead of shaking (the user, 2026-11-15). Every other clip of theirs keeps its own speed.
+export const PEOPLE_IDLE = {
+    fps: 1,
+};
+
 // Bumbot (§4): about 28px tall standing, stylised larger than a real cat beside her.
 export const BUMBOT = {
     cell: 64,           // his sprite sheet's frame size; the feet sit on its bottom row

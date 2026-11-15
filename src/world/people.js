@@ -4,11 +4,14 @@
 // may do something when she touches them: a fright, a spilled tray. Sprites: assets/sprites/people
 // (tools/cast.py, tools/build_people.py).
 
-import { PLAYER, CRY } from '../config.js';
+import { PLAYER, CRY, PEOPLE_IDLE } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;                           // px per metre
 const BUBBLE = { w: 22, h: 20, rise: 8 };
+
+// A clip's frames a second: an idle clip on the idles' own clock (`PEOPLE_IDLE`), any other its sheet's.
+const clipFps = (p, clip) => (/^idle\d*$/.test(clip) ? PEOPLE_IDLE.fps : p.meta.fps[clip] ?? 8);
 
 export class People {
     constructor(world) {
@@ -77,7 +80,7 @@ export class People {
         const key = `people-${p.who}-${clip}`;
         const s = this.scene;
         if (!s.anims.exists(key)) {
-            s.anims.create({ key, frames: frames.map(f => ({ key: 'people', frame: f })), frameRate: p.meta.fps[clip] ?? 8, repeat: -1 });
+            s.anims.create({ key, frames: frames.map(f => ({ key: 'people', frame: f })), frameRate: clipFps(p, clip), repeat: -1 });
         }
         if (p.sprite.anims.currentAnim?.key !== key || !p.sprite.anims.isPlaying) p.sprite.anims.play({ key, repeat: loop ? -1 : 0 });
         p.sprite.anims.timeScale = speed;
@@ -108,7 +111,7 @@ export class People {
             }
             const key = `people-${p.who}-${clip}`;
             if (!this.scene.anims.exists(key)) {
-                this.scene.anims.create({ key, frames: frames.map(f => ({ key: 'people', frame: f })), frameRate: p.meta.fps[clip] ?? 8, repeat: -1 });
+                this.scene.anims.create({ key, frames: frames.map(f => ({ key: 'people', frame: f })), frameRate: clipFps(p, clip), repeat: -1 });
             }
             p.state = 'acting';
             p.sprite.anims.play({ key, repeat: times - 1 });
