@@ -9,6 +9,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { rumble } from '../rumble.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 
@@ -496,10 +497,10 @@ export const bow = {
             for (let i = 0; i < 3; i++) {
                 await w.wait(i ? 230 : 380);
                 sfx.knock();
-                const t = s.add.text(C.x + 12 + i * 5, C.y - 52 - i * 4, t('say.knock'), { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
+                const knock = s.add.text(C.x + 12 + i * 5, C.y - 52 - i * 4, t('say.knock'), { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
                     .setOrigin(0.5).setDepth(s.DEPTH.fx);
-                w.add([t]);
-                s.tweens.add({ targets: t, y: t.y - 10, alpha: 0, duration: 700, onComplete: () => t.destroy() });
+                w.add([knock]);
+                s.tweens.add({ targets: knock, y: knock.y - 10, alpha: 0, duration: 700, onComplete: () => knock.destroy() });
             }
             await w.wait(900);
             s.pose('back');
@@ -573,6 +574,7 @@ export const bow = {
         s.cameras.main.shake(260, 0.006);
         w.sparkle(R.panelX - 14, R.y - 22, 0xfbff86);
         this.alarmOn = true;
+        rumble('alarm');
         this.alarmSoundAt = s.time.now + 1000;
         sfx.at(R.panelX, R.y).alarm(2);
         await w.wait(250);

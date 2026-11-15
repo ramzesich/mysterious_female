@@ -9,6 +9,7 @@
 
 import { PLAYER } from '../config.js';
 import { sfx } from '../sfx.js';
+import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 import { Gusts, PerchGull } from './outside.js';
@@ -287,6 +288,8 @@ export class FunnelWind {
             this.world.say(t('say.whoa'), 800);
             sfx.slip();
         }
+        // A gust on the funnel's stairway: a faint tremor while it blows.
+        if (on && this.gusts.phase(time) === 'blow') rumbleNow('gust', 400);
         this.lastFlight = on ? s.flight : null;
         this.lastT = s.stairT;
         // The gulls: round the lattice, the diver out of its circle.
@@ -299,10 +302,10 @@ export class FunnelWind {
             b.y += (ty - b.y) * Math.min(1, dt * 3);
             b.sprite.setFrame(flap).setPosition(b.x, b.y).setFlipX(Math.sin(a) > 0);
         }
-        const t = (time / 1000) % g.every, cycle = Math.floor(time / 1000 / g.every);
+        const inCycle = (time / 1000) % g.every, cycle = Math.floor(time / 1000 / g.every);
         if (this.state === 'circle') {
             // In a lull, with time to get clear before the next gust.
-            const due = cycle !== this.cycle && cycle % Math.max(1, Math.round(d.swoop / g.every)) === 0 && t > 0.3 && t < 1.0;
+            const due = cycle !== this.cycle && cycle % Math.max(1, Math.round(d.swoop / g.every)) === 0 && inCycle > 0.3 && inCycle < 1.0;
             if (due && on && !s.stairSlip) {
                 this.cycle = cycle;
                 this.state = 'mark';
@@ -793,6 +796,7 @@ export const topdeck = {
     blast(ms) {
         const s = this.scene, w = this.world, F = this.T.funnel, top = w.data.funnel.y;
         sfx.horn(ms / 1000);
+        rumble('horn', ms);
         s.cameras.main.shake(ms, 0.006);
         for (let i = 0; i * 170 < ms; i++) {
             s.time.delayedCall(i * 170, () => {

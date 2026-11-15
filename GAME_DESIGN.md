@@ -144,10 +144,30 @@ Reference photos never enter the repo.
 | Climb ladders | ↑ / ↓ | Left stick / D-pad up/down |
 | Кісюнічка dash (§3.2) | D (Shift until 2026-11-06) | B |
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
+| The welcome menu: choose, press | ↑ / ↓, Enter or Space | Left stick / D-pad, A or Menu |
+| Skip the intro | Esc | Menu or B |
+| The whole ship from outside (§5.3) | O; Esc leaves it | Right stick click; again or B leaves it |
+| Zoom in that view | + / − | RT / LT |
+| Sound off and on | M | (keyboard only, the user, 2026-11-15) |
 
 Activate has its own key rather than ↑, so standing at a ladder next to a door is never ambiguous.
 
-**Controller testing waits until the rest of the game is done.** Keyboard is the reference until then.
+**The Xbox controller in full (the user, 2026-11-15; `src/controls.js`):** the mapping above; on
+the stick, up and down count only while it points mostly up or down, so running with it tilted a
+little down never crawls her or drops her through a walk; whichever connected controller was
+touched last is read, whatever slot the browser gives it. The `gamepad` playtest drives a fake one
+(headless Chrome has none); the user's real one is the final check. Browsers start a page's sound
+only after a key or a click: with the controller alone the game may stay silent until one.
+
+**Rumble (the user, 2026-11-15; `src/rumble.js`):** only while she plays with the controller, and
+only at these moments, so that a rumble always means something: a scare (a bump, bonk or splash: a
+short sharp jolt; a long fall: a heavy thud; overboard: a big splash that fades); landing on her
+feet a deck or so down (a tiny thud; not after a glide); the dash starting (a short burst); a tray
+spilled (a light tick); Bumbot bolting at a near-catch (two quick light pulses); the ship's horn (a
+deep rumble for the length of the blast); the bridge's alarm (four pulses with its lights); the
+pool draining (a faint low rumble for its five seconds); a gust pushing her on the balconies, the
+funnel's stairway and over the bow (a faint tremor while it blows); the catch (two soft pulses, a
+heartbeat).
 
 **M** switches the sound off and on (step 12, 2026-11-14); the choice is remembered in the browser.
 

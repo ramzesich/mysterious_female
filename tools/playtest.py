@@ -147,6 +147,46 @@ class Browser:
     def tap(self, name, seconds=0.08):
         self.hold(name, seconds)
 
+    # --- A fake Xbox controller (headless Chrome has none) -----------------------------------
+    # Installed before the page's own scripts: `navigator.getGamepads()` returns it, and Phaser
+    # polls that every frame, as it does a real one. Buttons by name, in the standard layout.
+    PAD = {"A": 0, "B": 1, "X": 2, "Y": 3, "LB": 4, "RB": 5, "LT": 6, "RT": 7, "VIEW": 8, "MENU": 9,
+           "LS": 10, "RS": 11, "UP": 12, "DOWN": 13, "LEFT": 14, "RIGHT": 15}
+
+    def fake_pad(self, on=True, index=0):
+        if not on:
+            if getattr(self, "pad_script", None):
+                self.send("Page.removeScriptToEvaluateOnNewDocument", identifier=self.pad_script)
+                self.pad_script = None
+            return
+        self.pad_script = self.send("Page.addScriptToEvaluateOnNewDocument", source=f"""
+            window.__pad = {{ id: 'Xbox Wireless Controller (STANDARD GAMEPAD)', index: {index},
+                connected: true, mapping: 'standard', axes: [0, 0, 0, 0],
+                buttons: Array.from({{ length: 17 }}, () => ({{ pressed: false, touched: false, value: 0 }})),
+                get timestamp() {{ return performance.now(); }},
+                vibrationActuator: {{ type: 'dual-rumble', playEffect(type, p) {{
+                    window.__rumbles.push([type, p.duration, p.strongMagnitude, p.weakMagnitude]);
+                    return Promise.resolve('complete'); }} }} }};
+            window.__rumbles = [];
+            navigator.getGamepads = () => {{ const a = [null, null, null, null]; a[window.__pad.index] = window.__pad; return a; }};
+        """)["identifier"]
+
+    def pad(self, name, down):
+        self.eval(f"(b => {{ b.pressed = {str(down).lower()}; b.touched = b.pressed; b.value = b.pressed ? 1 : 0; }})"
+                  f"(window.__pad.buttons[{self.PAD[name]}])")
+
+    def pad_tap(self, name, seconds=0.1):
+        self.pad(name, True)
+        time.sleep(seconds)
+        self.pad(name, False)
+        time.sleep(0.05)
+
+    def stick(self, x, y):
+        self.eval(f"window.__pad.axes[0] = {x}; window.__pad.axes[1] = {y};")
+
+    def controls(self):
+        return self.eval("window.__ship.controls.state")
+
     def state(self):
         return self.eval("""(() => { const s = window.__ship, p = s.player;
             return { mode: s.mode, x: Math.round(p.x), y: Math.round(p.y), tangerines: s.save.tangerines,
@@ -4039,6 +4079,106 @@ def scenario_sound(b):
     peak = res.get("result", {}).get("value", 0)
     ok &= check(0.1 < peak < 0.95, "the horn, rendered, is loud and not clipped", peak)
     ok &= check(not b.errors, "no errors", b.errors[:3])
+    return ok
+
+
+def scenario_gamepad(b):
+    # The Xbox controller (§3.1), a fake one: everything the keyboard does in play, the welcome
+    # menu, the intro's skip and the whole-ship view.
+    b.fake_pad()
+    try:
+        b.open("?reset&play&tangerines=infinite")
+        s0 = b.state()
+        b.stick(1, 0)
+        time.sleep(0.6)
+        s = b.state()
+        ok = check(s["x"] > s0["x"] + 40, "the left stick runs her", s)
+        b.stick(0.9, 0.45)            # tilted a little down while running
+        time.sleep(0.2)
+        c = b.controls()
+        ok &= check(c["right"] and not c["down"], "running with the stick tilted down isn't 'down'", c)
+        b.stick(0.3, 0.9)
+        time.sleep(0.2)
+        ok &= check(b.controls()["down"], "pointed down, it is")
+        b.stick(0, 0)
+        time.sleep(0.3)
+        y0 = b.state()["y"]
+        b.pad("A", True)
+        time.sleep(0.25)
+        ok &= check(b.state()["y"] < y0 - 20, "A jumps", b.state())
+        b.pad("A", False)
+        time.sleep(0.8)
+        door = "part-door-4-74"
+        b.teleport(b.eval(f"window.__ship.bulkheads.find(d => d.id === '{door}').x") - 16, D4)
+        b.pad_tap("X")
+        ok &= check(b.eval(f"window.__ship.bulkheads.find(d => d.id === '{door}').open"), "X opens a door")
+        b.eval("window.__ship.save.verbs.push('dash')")      # the dash is learned at near-catch 1
+        b.pad_tap("B")
+        ok &= check(b.eval("window.__ship.isDashing()"), "B dashes")
+        # The rumble (§3.1): the dash's burst on the controller in use.
+        time.sleep(0.1)
+        ok &= check([120, 0.3] in [r[1:3] for r in b.eval("window.__rumbles")], "and the controller rumbles with it",
+                    b.eval("window.__rumbles"))
+        n = len(b.eval("window.__rumbles"))
+        b.tap("left")                  # back on the keyboard: no rumble
+        b.eval("window.__ship.scareFall()")
+        time.sleep(0.2)
+        ok &= check(len(b.eval("window.__rumbles")) == n, "playing on the keyboard, nothing rumbles", b.eval("window.__rumbles")[n:])
+        time.sleep(3.0)
+        b.pad_tap("Y")                 # the controller again
+        b.eval("window.__ship.scareFall()")
+        time.sleep(0.2)
+        ok &= check([260, 1] in [r[1:3] for r in b.eval("window.__rumbles")[n:]], "a scare's fall rumbles hard",
+                    b.eval("window.__rumbles")[n:])
+        time.sleep(3.0)
+        time.sleep(0.4)
+        b.pad_tap("RS")
+        time.sleep(0.4)
+        ok &= check(bool(b.eval("!!window.__ship.overview")), "the right stick's click shows the whole ship")
+        z0 = b.eval("window.__ship.cameras.main.zoom")
+        b.pad_tap("RT")
+        time.sleep(0.3)
+        ok &= check(b.eval("window.__ship.cameras.main.zoom") > z0, "RT zooms in")
+        b.pad_tap("LT")
+        time.sleep(0.3)
+        ok &= check(b.eval("window.__ship.cameras.main.zoom") < z0 * 1.2, "LT zooms out")
+        b.pad_tap("B")
+        time.sleep(0.4)
+        ok &= check(not b.eval("!!window.__ship.overview"), "B leaves it")
+        b.pad_tap("RS")
+        time.sleep(0.4)
+        b.pad_tap("RS")
+        time.sleep(0.4)
+        ok &= check(not b.eval("!!window.__ship.overview"), "and so does the right stick's click again")
+        b.pad_tap("RS", 0.1)
+        # Mute stays on the keyboard only (the user, 2026-11-15): no button changes the sound.
+        muted = b.eval("window.__ship.controls.state.mute")
+        ok &= check(not muted, "no button mutes")
+        b.pad_tap("B")
+
+        # The welcome menu and the intro: A picks PLAY, Menu skips the intro.
+        b.open("?reset", start=None)
+        stage = "(window.__ship.intro ? window.__ship.intro.stage : 'none')"
+        ok &= check(b.eval(stage) == "welcome", "the welcome screen", b.eval(stage))
+        b.pad_tap("A")
+        time.sleep(0.6)
+        ok &= check(b.eval(stage) == "running", "A starts the game: the intro runs", b.eval(stage))
+        b.pad_tap("MENU")
+        time.sleep(1.0)
+        ok &= check(b.eval(stage) in ("done", "none"), "Menu skips the intro", b.eval(stage))
+
+        # A controller the browser puts in another slot still plays.
+        b.fake_pad(False)
+        b.fake_pad(index=1)
+        b.open("?reset&play")
+        s0 = b.state()
+        b.stick(-1, 0)
+        time.sleep(0.6)
+        b.stick(0, 0)
+        s = b.state()
+        ok &= check(s["x"] < s0["x"] - 40, "a pad in the second slot runs her too", s)
+    finally:
+        b.fake_pad(False)
     return ok
 
 
