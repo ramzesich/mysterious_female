@@ -8,6 +8,7 @@ import { PLAYER, SWIM } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
+import { rumble, rumbleNow } from '../rumble.js';
 import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
@@ -1439,7 +1440,10 @@ export class World {
 
     // Gusts along the ship's side push her aft while she is in the air (src/world/outside.js).
     push(dt, onFloor) {
+        const x = this.scene.player.x;
         for (const g of this.winds) g.push(dt, onFloor);
+        // A gust carrying her (the balconies, the bow): a faint tremor while it does.
+        if (this.scene.player.x !== x) rumbleNow('gust', 400);
         this.offPartition();
     }
 
@@ -1550,6 +1554,7 @@ export class World {
         pool.gurgle = s.add.graphics().setDepth(s.DEPTH.poolWater + 0.02);
         this.add([pool.gurgle]);
         sfx.at(h.x, top).drain(5);
+        rumble('drain');
         s.tweens.addCounter({
             from: 0, to: 1, duration: 5000,
             onUpdate: tw => {

@@ -8,6 +8,7 @@
 // goes over: the meter on the HUD is how steady it stands.
 
 import { sfx } from '../sfx.js';
+import { rumble } from '../rumble.js';
 import { t } from '../lang.js';
 
 // What a tray can hold: how it is drawn (a piece of the ship's atlas on the tray, or drawn here),
@@ -119,6 +120,7 @@ export class Carry {
         const s = this.scene, p = s.player;
         const away = p.x >= fromX ? 1 : -1;
         const flying = this.items;
+        rumble('spill');
         // (The steel canister rings; anything else is crockery, or lands like it.)
         if (this.kind === 'canister') sfx.clang();
         else if (['cake', 'cone', 'stub'].includes(this.kind)) sfx.splat();

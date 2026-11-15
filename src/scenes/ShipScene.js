@@ -4,6 +4,7 @@ import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
 import { loadSave, writeSave } from '../save.js';
 import { Progression, CARD_COLOURS } from '../progression.js';
+import { rumble, rumbleWith } from '../rumble.js';
 import { GLASS_LEAF, TRUNK_INSIDE } from '../textures.js';
 import { Sea } from '../sea.js';
 import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '../background.js';
@@ -82,6 +83,7 @@ export class ShipScene extends Phaser.Scene {
         // The regions, cards, flags and locks (§6.1, src/progression.js).
         this.progress = new Progression(this);
         this.controls = new Controls(this);
+        rumbleWith(this.controls);
         this.worldLayer = this.add.layer();
         this.uiLayer = this.add.layer();
         this.DEPTH = DEPTH;
@@ -2688,7 +2690,11 @@ export class ShipScene extends Phaser.Scene {
         this.feetWas = p.y;
 
         if (onFloor) {
-            if (!this.grounded) sfx.land(this.soundscape.floor());
+            if (!this.grounded) {
+                sfx.land(this.soundscape.floor());
+                // Down a deck or so on her feet (not a glide's soft landing): a small thud.
+                if (!this.gliding && p.y - this.takeoffY > this.deckPitch * 0.6) rumble('land');
+            }
             // (Not in the hop's first moment: her body can still report the floor she has just left.)
             if (this.overRail && time - this.overRailAt > 250) {
                 this.overRail = false;
@@ -3974,6 +3980,7 @@ export class ShipScene extends Phaser.Scene {
                     if (cat.before) await cat.before();
                     this.tweens.killTweensOf(s);
                     cat.onLeap?.();
+                    rumble('bolt');
                     s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
                     leapt = true;
                     onLeapt?.();
@@ -4057,6 +4064,7 @@ export class ShipScene extends Phaser.Scene {
         this.dashUntil = time + DASH.durationMs;
         this.bubbleUntil = time + DASH.bubbleMs;
         sfx.dash();
+        rumble('dash');
         this.refreshHud();
     }
 
@@ -4094,6 +4102,7 @@ export class ShipScene extends Phaser.Scene {
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
+        rumble('bump');
         this.alert.setText(fright(kind)).setVisible(true);
         // A recoil from what got her (the vacuum: a jump, as it always was).
         if (kind === 'drenched' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
@@ -4124,6 +4133,7 @@ export class ShipScene extends Phaser.Scene {
         this.world.showParasol(false);
         this.takeoffY = p.y;
         sfx.scare();
+        rumble('bump');
         this.scareFall();
         this.alert.setText(fright(kind)).setVisible(true);
         if (this.anims.exists('her-hit')) p.anims.play('her-hit');
@@ -4138,6 +4148,7 @@ export class ShipScene extends Phaser.Scene {
         p.setDepth(DEPTH.fx);
         this.pose('fall');
         sfx.fall();
+        rumble('fall');
         this.script = (dt) => {
             vy = Math.min(vy + PLAYER.gravity * dt, PLAYER.maxFall * 1.5);
             p.y += vy * dt;
@@ -4152,6 +4163,7 @@ export class ShipScene extends Phaser.Scene {
         this.scareFrom = { x: Phaser.Math.Clamp(this.player.x, this.hullMinX + 16, this.hullMaxX - 16), y: this.takeoffY };
         this.cameras.main.startFollow(p, true, 0.15, 0.15);
         sfx.splash();
+        rumble('overboard');
         this.splash(p.x, this.waterY);
         // Facing the camera, smiling and waving; only her top half shows above the water.
         const shown = PLAYER.cell - PLAYER.height + 32;

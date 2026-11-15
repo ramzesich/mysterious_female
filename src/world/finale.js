@@ -9,6 +9,7 @@
 
 import { PLAYER, VIEW, WIN_MESSAGE } from '../config.js';
 import { sfx } from '../sfx.js';
+import { rumble } from '../rumble.js';
 import { t, pick } from '../lang.js';
 import { writeSave } from '../save.js';
 import { Gusts } from './outside.js';
@@ -335,6 +336,7 @@ export const finale = {
             s.holding = true;
             s.pose('stand');
             sfx.caught();
+            rumble('catch');
             sfx.purr(2.8);
             this.heart(her.x, her.y - PLAYER.height - 2, 6);
             await w.wait(1500);
