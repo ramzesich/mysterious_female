@@ -290,6 +290,11 @@ for i, (name, h) in enumerate(PROPS_7):
 PIECES["hot-tub"][3]["flat"] = True
 # The grand piano's far legs stopped short of the floor (the user saw it float, 2026-11-07).
 PIECES["grand-piano"][3]["legs"] = 8
+# The notice board's red notice with a white cat on it read as a lost-cat poster, a hint (the user,
+# 2026-11-15: "I don't want such hints"): painted over as a plain notice of text lines, like the
+# others pinned beside it (`paint`: boxes x0, y0, x1, y1 inclusive, in the finished piece's pixels).
+PIECES["notice-board"][3]["paint"] = [(4, 7, 9, 13, "#ffffff"), (4, 8, 8, 8, "#7f708a"),
+                                      (4, 10, 8, 10, "#7f708a"), (4, 12, 7, 12, "#7f708a")]
 
 
 def load(sheet, frame, from_x=0, join=None, caption=0):
@@ -494,6 +499,8 @@ def build():
         if opts.get("height"):
             img = shrink(img, opts["height"])
         img = palettize(img)
+        for x0, y0, x1, y1, colour in opts.get("paint", ()):
+            img.paste(colour, (x0, y0, x1 + 1, y1 + 1))
         if opts.get("level"):
             img, FEET[name] = level_frame(img, **opts["level"])
             FEET[f"{name}-bg"] = FEET[name]
