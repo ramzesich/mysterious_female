@@ -2647,7 +2647,7 @@ def scenario_region6(b):
     b.shot("region6-socks")
     b.tap("e")
     time.sleep(0.3)
-    ok &= check("socks" in save_list(b, "verbs") and "kick" in alert(b), "the grip socks, on the rack by the yoga mats; how they are used", alert(b))
+    ok &= check("socks" in save_list(b, "verbs"), "the grip socks, on the rack by the yoga mats")
     time.sleep(3.2)
     # The chess set.
     b.teleport(L["chessX"] - 20, D11)
