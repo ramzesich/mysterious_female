@@ -1428,6 +1428,9 @@ export class World {
             if (!s.holding) sfx.at(person.x, person.y).hey();
             s.scareContact(person.x, t.fright);
         }
+        // The pocket took it (docs/plan-three-uses.md §1.3): whoever walked into her stops and
+        // stands aside, as at her cry, so as not to walk into her again.
+        if (s.mode === 'play' && s.isSafe() && person.walk) this.people.standAside(person);
     }
 
     // --- D: the cry and the lunge (docs/plan-three-uses.md §1.1, §2) ----------------------------
@@ -1461,6 +1464,13 @@ export class World {
         const head = p.y - PLAYER.height + 6;
         if (kind === 'drenched') this.drops(p.x, head, 0x8fd3ff, 1);
         else if (kind === 'singed' || kind === 'fogged') this.drops(p.x, head, kind === 'singed' ? 0x625565 : 0xffffff, -1);
+    }
+
+    // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:
+    // whoever takes it has it (`offered(t)` true; it calls `this.scene.loose.remove(t)` or keeps it).
+    offered(t) {
+        for (const m of this.movers) if (m.offered?.(t)) return true;
+        return !!this.people.offered?.(t) || !!this.story.offered?.(t);
     }
 
     // A few drops off her (`dir` 1: falling, water), or a wisp off her hair (-1: rising, smoke).

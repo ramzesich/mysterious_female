@@ -185,6 +185,33 @@ export const LUNGE = {
     safeTailMs: 300,
 };
 
+// The pocket (docs/plan-three-uses.md §1.3): a hit that would be a fright or a spilled tray, with a
+// tangerine on her, is forgiven. She flinches for `flinchMs` (the her-hit clip), pushed back at
+// `push` px a second (slowed by `slow`), and blinks for `safeMs`, untouchable; she keeps her
+// place and her tray. The tangerine is knocked out of her pocket (LOOSE.knock). `?pocket=off`
+// switches it off.
+export const POCKET = {
+    flinchMs: 340,
+    safeMs: 1500,
+    push: 120,
+    hop: 90,
+    slow: 300,
+};
+
+// A tangerine loose in the world (src/world/tangerine.js): how it bounces (`bounce`, a share of
+// its speed kept), how fast a floor slows its roll (px a second, each second), below what speed
+// it lies still, how near her feet she picks it up, the speed it leaves her pocket at, how long
+// before she can catch it again, and from what speed down onto a floor it makes a sound.
+export const LOOSE = {
+    bounce: 0.35,
+    rollDecel: 200,
+    rest: 10,
+    reach: 12,
+    knock: { vx: 220, vy: 200 },
+    pickDelayMs: 600,
+    thudAt: 60,
+};
+
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus
 // a little rounding, well clear of the limit, even from the top of a deck's end bulwark, 32px over
 // its floor (the user fell from deck 9's stern bulwark to deck 8's terrace, 2026-11-07).

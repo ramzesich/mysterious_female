@@ -114,10 +114,13 @@ export class Carry {
         return kind;
     }
 
-    // A bump: the tray goes flying, with a clatter. Never a scare.
-    spill(fromX) {
+    // A bump: the tray goes flying, with a clatter. Never a scare. With a tangerine on her the pocket
+    // takes the hit and she keeps the tray (docs/plan-three-uses.md §1.3), unless it is `own`: her
+    // own feet (a load swayed over, into a pool with it).
+    spill(fromX, own = false) {
         if (!this.kind) return;
         const s = this.scene, p = s.player;
+        if (!own && (s.isSafe() || s.pocket(fromX))) return;
         const away = p.x >= fromX ? 1 : -1;
         const flying = this.items;
         rumble('spill');
@@ -204,7 +207,7 @@ export class Carry {
         top.setAngle(Math.sin(s.time.now / (110 - 50 * k)) * 13 * k).setX(x + Math.sin(s.time.now / (110 - 50 * k)) * 2 * k);
         if (this.wobble < 1) return false;
         this.world.say(t('say.ohno'), 900);
-        this.spill(p.x - (p.flipX ? -1 : 1) * 10);
+        this.spill(p.x - (p.flipX ? -1 : 1) * 10, true);
         return true;
     }
 

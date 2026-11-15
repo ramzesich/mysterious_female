@@ -7,9 +7,9 @@ function emptySave() {
     // beats, the horn, the wedding...), the one-way doors and trunks `opened` both ways.
     // Her `verbs` (the dash, crawling, the grip socks, the parasol: §6.1.2), the library's `books`
     // (number -> "held", "returned"; `read` the ones she has read), her pocket `items`, the quirks
-    // and secrets she has `seen`.
+    // and secrets she has `seen`; the tangerines lying `loose` where they stopped (src/world/tangerine.js).
     return { activated: [], collected: [], broken: [], opened: [], cards: [], regions: [], flags: [], verbs: [], books: {}, read: [],
-             items: [], seen: [], tangerines: 0, lastCheckpoint: null };
+             items: [], seen: [], tangerines: 0, loose: [], lastCheckpoint: null };
 }
 
 export function loadSave() {

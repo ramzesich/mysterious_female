@@ -1670,3 +1670,45 @@ implementation plan"). No art.
   all pass but one check in `region6`, "the grip socks ... how they are used", which looks for a
   hint ("kick") taken out on 2026-11-14 and fails on `main` as well (the socks are taken: later
   checks see them). Not fixed here. The rest of the suite was not run.
+  **Since (the user, 2026-11-15: "Drop the check (fix the test)"):** the check asks only that the
+  socks are taken; `region6` passes.
+
+## The plan for the three uses, step 2: the pocket, and the tangerine a real thing (2026-11-15)
+
+Built on `three-uses` from `docs/plan-three-uses.md` §5, step 2, after step 1 was approved (the
+user: "continue the plan"). No art.
+
+- **The pocket** (`pocket(fromX)` in the ship scene; `POCKET` in `src/config.js`): at the top of
+  `scareContact` (after the lunge, which still comes first) and of `Carry.spill`; also under the
+  parasol (`scareAir`, the two gulls over the bow), where she keeps gliding and only blinks (the
+  plan's table forgives the bow's flocks; a hit there was a fall). Not for a load gone over by her
+  own feet (the cake's sway, a tray carried into a pool: `spill(fromX, own)`), falls or the sea.
+  The flinch is her `her-hit` clip for 340 ms while she is slowed from a push of 120 px a second
+  (about half a metre back); the blink is her alpha between 1 and 0.5 (the soundscape takes her
+  under 0.5 for gone and would drop her steps).
+- **A walker who bumped into her stands aside** as at her cry (`people.standAside()`, taken out
+  of `heard()`): my addition. Without it the porter walked on through her while she blinked and
+  hit her again the moment it ended, a second tangerine for one meeting.
+- **The loose tangerine** (`src/world/tangerine.js`, `LOOSE` in the config): an 8 px body in a
+  physics group with the same floors and walls as hers by its own route (the solid layer, rooms,
+  side walks from above, the outside's platforms and partitions, the duct, carts, crates,
+  pushables, breakables, the robot, closed bulkheads, the ropes and fire doors that hold her).
+  Phaser hands a group against a single body to the callback in the other order: each callback
+  finds the tangerine first. It leaves her hip at 220 px a second, 200 up, bounces at 0.35, a
+  floor slows it 200 px a second each second: about 4 m in all, then rest. It turns a quarter at
+  a time about its middle (by degrees an 8 px fruit only blurs). She cannot catch it for 0.6 s
+  (it leaves from inside her). At rest it is kept in `save.loose` (written with the save at a
+  checkpoint, as her count is); picked up by walking over it, as any tangerine.
+- **Sounds**: `pocket` new (a soft knock and a pop; the user's to judge on the soundboard). The
+  plan's `roll` and `plop` were names taken already (a cart's wheels, a small soft thing dropped):
+  its bounces use `plop`, its fall into a pool or the sea `splashSmall`, and it rolls silently. No
+  new rumble: the spill's light tick.
+- **The playtests run with the pocket off** unless a scenario names it (`Browser.open()` adds
+  `&pocket=off`): a scenario that picks up a tangerine on its way and then checks a fright still
+  sees the fright, as the plan wanted of them. A new scenario, `pocket`: the porter walks into her
+  with her tray and two tangerines; forgiven, one less, the tray kept, he stands aside, it flies
+  off the way she was pushed, rests on the floor some way off, is in the save, there after a
+  reload, hers again walked over; with none, a fright; a long fall is a fright with three.
+- **Playtests run, sound off:** `pocket`, `dash`, `vacuum`, `falls`, `overboard`, `region1`,
+  `sound`, `boot`: all pass. `tools/check_sound.py`: all within bounds. The rest of the suite was
+  not run.

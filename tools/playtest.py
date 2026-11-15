@@ -101,10 +101,14 @@ class Browser:
         """Opens the game. A scenario that goes straight into play begins where the game began when
         most of them were written: in the gangway lobby on deck 4, its crew door's checkpoint lit
         (`start`). The game's own start, deck 3's crew corridor (the user, 2026-11-14), is
-        `start=None`: the `boot` and `deck3` scenarios."""
+        `start=None`: the `boot` and `deck3` scenarios.
+        The pocket (docs/plan-three-uses.md §1.3) is off unless the query names it (`&pocket=on`): a
+        scenario that picks up a tangerine on its way and then checks a fright sees the fright."""
         old = bool(start) and "play" in query and "at=" not in query
         if old:
             query += f"&at={start}"
+        if "pocket=" not in query:
+            query += ("&" if "?" in query else "?") + "pocket=off"
         self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
         time.sleep(0.3)
         # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
@@ -190,7 +194,7 @@ class Browser:
     def state(self):
         return self.eval("""(() => { const s = window.__ship, p = s.player;
             return { mode: s.mode, x: Math.round(p.x), y: Math.round(p.y), tangerines: s.save.tangerines,
-                     lunging: s.isLunging(), activated: s.save.activated.slice() }; })()""")
+                     lunging: s.isLunging(), safe: s.isSafe(), activated: s.save.activated.slice() }; })()""")
 
     def teleport(self, x, y, route="inside"):
         self.eval(f"window.__ship.spawnAt({{x: {x}, y: {y}, route: '{route}'}})")
@@ -1144,6 +1148,71 @@ def scenario_dash(b):
     s = b.state()
     ok &= check(not s["lunging"] and s["tangerines"] == 0 and not b.eval(f"{S}.time.now < {S}.bubbleUntil"),
                 "with none: D does nothing", s)
+    return ok
+
+
+def scenario_pocket(b):
+    """The pocket (docs/plan-three-uses.md §1.3): a hit with a tangerine on her is forgiven. The
+    porter walks into her with her tray: she keeps her place and the tray, one less, and the
+    tangerine rolls off the way she was pushed, comes to rest on the floor, is kept in the save, and
+    is hers again by walking over it. With none: the fright as before. A fall is never forgiven."""
+    S, P = "window.__ship", "window.__ship.world.people.byId.haz_porter"
+    b.open("?reset&play&pocket=on")
+    b.teleport(x_of(50), D4)
+    time.sleep(0.3)
+    b.eval(f"{S}.save.tangerines = 2; {S}.refreshHud(); {S}.world.carryBox.take('lunch')")
+    # The porter at his aft end, walking forward her way; she stands in his path.
+    b.eval(f"(p => {{ p.x = p.walk.b; p.dir = -1; p.pausedUntil = 0; window.__ship.world.people.place(p); }})({P})")
+    b.teleport(person(b, "haz_porter")["x"] - 70, D4)
+    b.eval(f"{S}.world.carryBox.take('lunch'); {S}.player.setFlipX(false)")
+    x0 = b.state()["x"]
+    b.wait_for(f"{S}.isSafe() || {S}.mode !== 'play'", timeout=8)
+    time.sleep(0.05)
+    b.shot("pocket-hit")
+    s = b.state()
+    ok = check(s["mode"] == "play" and s["safe"], "the porter's hit is forgiven: she blinks, still in play", s)
+    ok &= check(s["tangerines"] == 1, "one less", s)
+    ok &= check(b.eval(f"{S}.world.carry?.kind === 'lunch'"), "and she keeps her tray", b.eval(f"{S}.world.carry"))
+    ok &= check(b.eval(f"{S}.loose.all.length") == 1, "the tangerine is knocked out of her pocket")
+    ok &= check(person(b, "haz_porter")["aside"], "the porter stops and stands aside", person(b, "haz_porter"))
+    lx = b.eval(f"{S}.loose.all[0].img.body.velocity.x")
+    ok &= check(lx < -50, "and flies off the way she is pushed (away from him)", lx)
+    b.wait_for(f"!{S}.isSafe()", timeout=4)
+    s = b.state()
+    ok &= check(abs(s["x"] - x0) < 60, "she has kept her place, a step back", (x0, s["x"]))
+    # (Out of the porter's way while the tangerine settles.)
+    b.eval(f"{P}.pausedUntil = {S}.time.now + 60000")
+    b.wait_for(f"{S}.loose.all.length === 0 || {S}.loose.all[0].resting", timeout=6)
+    t = b.eval(f"(t => t && {{ x: Math.round(t.img.x), y: Math.round(t.img.body.bottom), resting: t.resting }})({S}.loose.all[0])")
+    b.shot("pocket-rest")
+    ok &= check(t and t["resting"] and abs(t["y"] - D4) <= 2, "it comes to rest on the corridor's floor", t)
+    ok &= check(t and t["x"] < x0 - 40, "some way off", (x0, t))
+    saved = b.eval(f"{S}.save.loose.map(e => [e.x, e.y, e.route])")
+    ok &= check(len(saved) == 1 and saved[0][2] == "inside", "it is in the save, where it lies", saved)
+    # Kept through a reload: the save written as a checkpoint would, the game opened again.
+    b.eval(f"{S}.world.carryBox.drop(); localStorage.setItem('bumbusik-save-v3', JSON.stringify({S}.save))")
+    b.open("?play&pocket=on")
+    again = b.eval(f"{S}.loose.all.map(t => [Math.round(t.img.x), Math.round(t.img.body.bottom), t.resting])")
+    ok &= check(len(again) == 1 and again[0][2] and abs(again[0][0] - t["x"]) <= 1, "and there after a reload", again)
+    # Hers again by walking over it.
+    n = b.state()["tangerines"]
+    b.teleport(t["x"] + 60, D4)
+    hold_until(b, "left", lambda st: st["tangerines"] > n, timeout=4)
+    s = b.state()
+    ok &= check(b.eval(f"{S}.loose.all.length") == 0 and s["tangerines"] == n + 1, "walked over, it is hers again", s)
+    ok &= check(b.eval(f"{S}.save.loose.length") == 0, "and gone from the save")
+    # With none: the fright as before.
+    b.eval(f"{S}.save.tangerines = 0")
+    b.eval(f"{S}.scareContact({S}.player.x + 10, 'bumped')")
+    time.sleep(0.1)
+    ok &= check(b.state()["mode"] == "scripted", "with none, a bump is a fright", b.state())
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    # A fall is never forgiven: two decks off deck 12's aft end, with three on her.
+    b.eval(f"{S}.save.tangerines = 3")
+    b.teleport(x_of(245.5), D12)
+    time.sleep(0.6)
+    s = b.state()
+    ok &= check(s["mode"] == "scripted" and s["tangerines"] == 3, "a long fall is a fright, tangerines or not", s)
     return ok
 
 

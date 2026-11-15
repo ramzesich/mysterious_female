@@ -189,8 +189,8 @@ it is her battle cry here.
 
 **Decided (the user, 2026-11-15; `docs/plan-three-uses.md` §1 and §2, which has what each
 person, animal and hazard does): a tangerine has three uses**, and the ten-second dash is gone.
-D (B on the controller) is the first; the throw (F) and the pocket come with the plan's steps 2
-and 3. **Built (step 1, 2026-11-15):**
+D (B on the controller) is the first, the pocket the second (step 2); the throw (F) comes with
+the plan's step 3. **Built (step 1, 2026-11-15):**
 
 - **Every D costs one tangerine, whatever it does.** With none on her nothing happens, and the
   HUD's count blinks once. (`?tangerines=infinite` never uses one up, for testing.)
@@ -218,6 +218,21 @@ and 3. **Built (step 1, 2026-11-15):**
   tangerine. Not while she crawls, climbs, swims, or holds Bumbot.
 - Numbers in `src/config.js` (`CRY`, `LUNGE`), to be tuned in play. The lunge stays under
   Bumbot's 300 px a second.
+
+**Built (step 2, 2026-11-15): the pocket, and the tangerine a real thing.**
+
+- **A hit that would be a fright or a spilled tray, with a tangerine on her, is forgiven**: she
+  flinches (her `her-hit` clip, a third of a second), is pushed back a step, and blinks for a
+  second and a half during which nothing touches her; she keeps her place and her tray. A walker
+  who bumped into her stops and stands aside, as at her cry. Falls, the sea, and a load that
+  goes over by her own feet (the cake swayed over, a tray into a pool) are never forgiven.
+- **The tangerine is knocked out of her pocket** and flies off the way she was pushed: it
+  bounces, rolls about four metres, off steps and edges, against anything solid it bounces back,
+  and lies where it stops, kept in the save (`save.loose`), hers again by walking over it. Off
+  the hull it falls into the sea, gone; in a pool it floats, to be swum to. Whatever wants it
+  may take it first (`world.offered()`; the takers come with step 3).
+- `?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
+  it off unless a scenario names it. Numbers: `POCKET` and `LOOSE` in `src/config.js`.
 
 **Superseded:** the dash of 2026-11-10 (ten seconds at twice her speed, a HUD countdown), and
 before it the open question of 2026-11-14 (`docs/brainstorm/dash-rework.md`).
@@ -669,6 +684,10 @@ Then she steps out of the closest activated crew cabin door (§5.5).
 **In a lunge** (§3.2, since 2026-11-15) nothing frightens her by contact, for its second and a
 breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
 Disturb" door is no contact: that fright stands, lunge or not.
+
+**With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a fright by contact, or a hit
+under the parasol, is forgiven for one tangerine, which is knocked out of her pocket; she
+flinches and keeps her place. Falls and the sea are never forgiven.
 
 The word is **"scare"**, never "death", on screen and in the code alike.
 
@@ -2254,10 +2273,11 @@ Nothing blocks the start of the build. These get settled along the way:
       decks filled (a runaway suitcase, a dog on a lead, a climb, a knitting lady, a paper
       round); five look-outs; three deliveries; each deck its own plaque band and pictures. No
       new ladder, no rounds, nothing that strengthens her uses. **Building it on the branch
-      `three-uses` (2026-11-15). Step 1 built (D: the cry and the lunge, §3.2; the crew cabin's
-      bowl, §6.3), waiting for the user's review**; its record is in
-      `docs/progress-decisions.md`, "The plan for the three uses, step 1". **Next: step 2** (the
-      real tangerine, and the pocket; no art), once step 1 is approved.
+      `three-uses` (2026-11-15). Step 1 done (D: the cry and the lunge, §3.2; the crew cabin's
+      bowl, §6.3). Step 2 built (the pocket, and the tangerine a real thing that rolls, §3.2,
+      §5.6), waiting for the user's review**; their record is in `docs/progress-decisions.md`,
+      "The plan for the three uses, step 1" and "..., step 2". **Next: step 3** (the throw; one
+      clip of hers, about 5 generations, asked first), once step 2 is approved.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

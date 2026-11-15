@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
@@ -10,6 +10,7 @@ import { Sea } from '../sea.js';
 import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '../background.js';
 import { World, OUTSIDE } from '../world/world.js';
 import { Soundscape } from '../world/soundscape.js';
+import { LooseTangerines } from '../world/tangerine.js';
 import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
 
@@ -104,12 +105,17 @@ export class ShipScene extends Phaser.Scene {
         }
         this.buildPlayer();
         this.world.addColliders(this.player);
+        // Tangerines loose in the world: knocked out of her pocket (src/world/tangerine.js).
+        this.loose = new LooseTangerines(this);
+        this.loose.addColliders();
         this.buildCameras();
         this.buildHud();
         this.world.buildHud(this.uiLayer);
 
         this.mode = 'play'; // play | ladder | stairs | trunk | lift | swim | scripted
         this.lungeUntil = 0;
+        this.safeUntil = 0;
+        this.flinchUntil = 0;
         this.cryGapUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
@@ -2644,6 +2650,7 @@ export class ShipScene extends Phaser.Scene {
 
         this.updateVacuums(dt);
         this.world.update(dt, time, input);
+        this.loose.update(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
         else if (this.mode === 'push') this.updatePush(input, dt, time);
         else if (this.mode === 'ladder') this.updateLadder(input, dt, time);
@@ -2668,6 +2675,7 @@ export class ShipScene extends Phaser.Scene {
         // Bumbot on her route: in the corridors, or asleep in the linen room.
         if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkBumbot();
         this.updateLunge(time);
+        this.updatePocket(time);
         this.updateOverlays();
     }
 
@@ -2716,6 +2724,12 @@ export class ShipScene extends Phaser.Scene {
             this.takeoffY = p.y;
         } else {
             this.grounded = false;
+        }
+
+        // A hit forgiven by the pocket: a flinch, pushed back a step, the her-hit clip playing.
+        if (time < this.flinchUntil) {
+            body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
+            return;
         }
 
         if (onFloor && input.activatePressed && this.world.interact()) return;
@@ -3152,7 +3166,7 @@ export class ShipScene extends Phaser.Scene {
 
     enterPool(pool) {
         const p = this.player;
-        if (this.world.carry) this.world.carryBox.spill(p.x - (p.flipX ? -1 : 1));
+        if (this.world.carry) this.world.carryBox.spill(p.x - (p.flipX ? -1 : 1), true);   // her own doing
         this.mode = 'swim';
         this.pool = pool;
         p.body.setVelocity(0, 0);
@@ -4109,10 +4123,55 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // --- The pocket (docs/plan-three-uses.md §1.3) ---------------------------------------------
+
+    // `?pocket=off`: every hit is what it was, whatever she has on her (for testing frights).
+    pocketOn() {
+        return new URLSearchParams(location.search).get('pocket') !== 'off';
+    }
+
+    // Blinking after a hit forgiven: nothing can touch her.
+    isSafe() {
+        return this.safeUntil > this.time.now;
+    }
+
+    // A hit that would be a fright or a spilled tray, with a tangerine on her: one less, knocked out
+    // of her pocket and rolling away the way she is pushed; a flinch, a step back, a blink. True if
+    // it was forgiven. (Falls, the sea and her own feet never come here.)
+    pocket(fromX) {
+        if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
+        const p = this.player, time = this.time.now;
+        const away = p.x >= fromX ? 1 : -1;
+        this.safeUntil = time + POCKET.safeMs;
+        sfx.pocket();
+        rumble('spill');
+        this.loose.knock(p.x, p.y - 24, away);
+        // (Under the parasol she keeps on gliding: only the blink.)
+        if (this.mode === 'play' && !this.gliding) {
+            this.flinchUntil = time + POCKET.flinchMs;
+            p.setFlipX(away > 0);                // facing what hit her
+            if (this.anims.exists('her-hit')) p.anims.play('her-hit');
+            p.body.velocity.x = away * POCKET.push;
+            p.body.velocity.y = -POCKET.hop;
+        }
+        this.refreshHud();
+        return true;
+    }
+
+    updatePocket(time) {
+        const safe = this.isSafe();
+        if (safe) this.player.setAlpha(Math.floor(time / 70) % 2 ? 0.5 : 1);
+        else if (this.wasSafe) this.player.setAlpha(1);
+        this.wasSafe = safe;
+    }
+
     // --- Scares (never death, §5.6) ------------------------------------------------------------
 
     beginScare() {
         this.mode = 'scripted';
+        this.safeUntil = 0;
+        this.flinchUntil = 0;
         this.lungeUntil = 0;
         this.bubbleUntil = 0;
         this.player.body.enable = false;
@@ -4129,6 +4188,8 @@ export class ShipScene extends Phaser.Scene {
             this.world.lunged(kind, fromX);
             return;
         }
+        // Blinking after a hit forgiven, nothing touches her; a tangerine on her forgives this one.
+        if (this.isSafe() || this.pocket(fromX)) return;
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
@@ -4160,6 +4221,7 @@ export class ShipScene extends Phaser.Scene {
     scareAir(kind) {
         const p = this.player;
         if (this.mode !== 'play') return;
+        if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10)) return;
         this.gliding = false;
         this.world.showParasol(false);
         this.takeoffY = p.y;

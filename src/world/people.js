@@ -185,19 +185,7 @@ export class People {
             p.deafUntil = time + CRY.deafMs;
             const top = p.y - (p.dy ?? 0) - PLAYER.height - 6;
             if (p.walk) {
-                if (!p.aside) {
-                    p.aside = true;
-                    p.sprite.setDepth(p.sprite.depth - 0.2);
-                }
-                // (Against the wall, out of her way: a little further from us, as the steward at a door.)
-                p.cried = true;
-                for (const i of p.items) i.setScale(0.94);
-                p.pausedUntil = Math.max(p.pausedUntil, time + CRY.startleMs);
-                // (The jogger jogs on the spot, looking round; the others freeze mid-step, holding
-                // what they carry as they were: their standing frame would leave a tray in the air.)
-                if (p.walk.clip !== 'run') p.sprite.anims.pause();
-                this.world.pop(p.x, top, 'alert', 1200);
-                sfx.at(p.x, p.y).oh();
+                this.standAside(p);
                 continue;
             }
             if (p.hear === '♥' || p.hear === 'shh') this.world.pop(p.x, top, p.hear === '♥' ? 'heart' : 'shh', 1500);
@@ -215,6 +203,25 @@ export class People {
                 });
             }
         }
+    }
+
+    // A walker startled (by her cry, or by walking into her when the pocket took the hit): he stops
+    // and stands aside for a while, a "!" over him.
+    standAside(p) {
+        const time = this.scene.time.now;
+        if (!p.aside) {
+            p.aside = true;
+            p.sprite.setDepth(p.sprite.depth - 0.2);
+        }
+        // (Against the wall, out of her way: a little further from us, as the steward at a door.)
+        p.cried = true;
+        for (const i of p.items) i.setScale(0.94);
+        p.pausedUntil = Math.max(p.pausedUntil, time + CRY.startleMs);
+        // (The jogger jogs on the spot, looking round; the others freeze mid-step, holding
+        // what they carry as they were: their standing frame would leave a tray in the air.)
+        if (p.walk.clip !== 'run') p.sprite.anims.pause();
+        this.world.pop(p.x, p.y - (p.dy ?? 0) - PLAYER.height - 6, 'alert', 1200);
+        sfx.at(p.x, p.y).oh();
     }
 
     // In a lunge she went through someone (`touch`): the porter's cart knocked rolling, he after
