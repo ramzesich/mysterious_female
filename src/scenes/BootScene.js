@@ -60,7 +60,13 @@ export class BootScene extends Phaser.Scene {
         const src = this.textures.get('her').getSourceImage();
         const tex = this.textures.createCanvas(key, cell * indices.length, cell);
         const ctx = tex.getContext();
-        indices.forEach((n, i) => ctx.drawImage(src, n * cell, 0, cell, cell, i * cell, 0, cell, cell));
+        // (Each frame from where it is on her sheet: it is packed in rows since step 9, so frame n is
+        // not at n cells along; read as one strip, the shower's frames came out empty and she was
+        // hidden behind the glass.)
+        indices.forEach((n, i) => {
+            const f = this.textures.getFrame('her', n);
+            ctx.drawImage(src, f.cutX, f.cutY, cell, cell, i * cell, 0, cell, cell);
+        });
         const img = ctx.getImageData(0, 0, tex.width, cell);
         const d = img.data, w = tex.width;
         const solid = (x, y) => x >= 0 && x < w && y < cell && d[(y * w + x) * 4 + 3] > 0;

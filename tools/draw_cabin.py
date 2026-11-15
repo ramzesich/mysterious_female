@@ -36,15 +36,19 @@ TEAL, TEAL_LIGHT = "#0b5e65", "#0b8a8f"
 
 BED_TOP = 96               # the mattress's top, where she stands on the bed (ShipScene's CABIN.bed)
 WASH = 0.3                 # how far the background fades toward the wall
+# What she uses keeps its full colours, standing out a little (the user, 2026-11-15, the rule for
+# every door she can use): the shower room's door and the door back out (x0, y0, x1, y1).
 PAINTING = SOURCE / "lobster-pixellab.png"
 
 
-def wash(im, y0, y1):
-    """Fades a band of the picture toward the wall colour."""
+def wash(im, y0, y1, keep=()):
+    """Fades a band of the picture toward the wall colour, but for the boxes in `keep`."""
     px = im.load()
     w = tuple(int(WALL[i:i + 2], 16) for i in (1, 3, 5))
     for y in range(y0, y1):
         for x in range(im.width):
+            if any(a <= x <= b and c0 <= y <= c1 for a, c0, b, c1 in keep):
+                continue
             c = px[x, y]
             px[x, y] = (*(round(v + (t - v) * WASH) for v, t in zip(c[:3], w)), c[3])
 
@@ -146,14 +150,15 @@ def towel():
 
 
 def shower_pieces():
-    """The scene's pieces, washed like the room."""
+    """The scene's pieces: the stall's inside and the towel washed like the room, the door itself
+    (its glass, slid open or seen through) in its full colours, as in the room."""
     inside = shower_inside()
-    opened = shower_inside()
+    hung = towel()
+    for piece in (inside, hung):
+        wash(piece, 0, piece.height)
+    opened = inside.copy()
     opened.alpha_composite(shower_glass(slide=18))
     glass = shower_glass(FROST, clear=FROST_TOP)
-    hung = towel()
-    for piece in (inside, opened, glass, hung):
-        wash(piece, 0, piece.height)
     return {"inside": inside, "open": opened, "glass": glass, "towel": hung}
 
 
@@ -259,7 +264,7 @@ def interior():
 
     # All of that is background, washed out a little toward the wall (the user, 2026-11-06); the
     # bed, drawn next, keeps its colours. The floor she stands on stays as it is.
-    wash(im, 0, FLOOR)
+    wash(im, 0, FLOOR, keep=(SHOWER, (45, FLOOR - 80, 73, FLOOR - 5)))
     bed = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(bed)
 
