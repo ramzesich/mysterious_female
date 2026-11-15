@@ -2185,6 +2185,13 @@ Nothing blocks the start of the build. These get settled along the way:
       (the user's own run of deck 4: "almost completely empty... a major design flaw"), every
       cabin corridor alike, nine ends that hold nothing, optional hallways that pay one
       tangerine. Its suggestions and five questions wait for the user; nothing of it is built.
+      **Then (the user, 2026-11-15): "I want to implement... the 'three uses' one", the one-second
+      dash still costing a tangerine, the 53 tangerines unchanged, no path hints, the corridors
+      "fun, enriched and varied".** The plan for their review: `docs/plan-three-uses.md` (D: the
+      cry free, the lunge one tangerine; F: the throw, a roll or a lob; the pocket forgives a
+      hit; the tangerine a real thing that rolls and is taken; the ship answering the cry;
+      keepsakes for Bumbot; region 1's decks filled; look-outs, deliveries, each deck its own
+      look; seven steps; nine questions). Nothing of it is built until they answer.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
