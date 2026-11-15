@@ -2177,6 +2177,14 @@ Nothing blocks the start of the build. These get settled along the way:
       **In progress with the user (2026-11-14): a brainstorm on the dash, the tangerines and
       the rewards** (§3.2), stopped for the day with four questions asked:
       `docs/brainstorm/dash-rework.md`, "Where we stopped". Nothing of it is built.
+      **Before it goes on (the user, 2026-11-15): an audit**, since the game must play well and
+      be finishable with no superpower first: `docs/audit-2026-11-15.md`. Five visual faults
+      (a note hidden behind its board, a sign behind a lift's door, a reader on a notice board,
+      and two places where she cannot be seen: the Spinnaker's balcony and the promenade's
+      enclosed ends); every popup on top; and the decks: region 1 the emptiest part of the game
+      (the user's own run of deck 4: "almost completely empty... a major design flaw"), every
+      cabin corridor alike, nine ends that hold nothing, optional hallways that pay one
+      tangerine. Its suggestions and five questions wait for the user; nothing of it is built.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
