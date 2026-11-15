@@ -2187,15 +2187,19 @@ Nothing blocks the start of the build. These get settled along the way:
       tangerine. Its suggestions and five questions wait for the user; nothing of it is built.
       **Then (the user, 2026-11-15): "I want to implement... the 'three uses' one", the one-second
       dash still costing a tangerine, the 53 tangerines unchanged, no path hints, the corridors
-      "fun, enriched and varied".** The plan: `docs/plan-three-uses.md`, **reviewed and answered
-      by the user the same day (its §7):** every D costs one tangerine (the cry, "to startle
-      obstacles", and with it the one-second lunge, learned at the Seven Seas; the cry is hers
-      from the start); F: the throw, a roll or a lob; the pocket forgives every hit; the
-      tangerine a real thing that rolls and is taken; keepsakes for Bumbot (left to my
-      judgement); region 1's decks filled (the laundry stays locked); look-outs, deliveries,
-      each deck its own look; no new ladder, the rounds later; what to drop from the lists is
-      asked again with prices at steps 4 and 5. **Next: its step 1** (D: the cry and the lunge;
-      no art), on a branch of its own in a worktree of its own. Nothing of it is built yet.
+      "fun, enriched and varied".** **The plan: `docs/plan-three-uses.md`, settled with the user
+      the same day, every question closed (its §8 has their words); it opens with a "Start
+      here" for whichever session builds it.** In short: every D costs one tangerine (the cry,
+      "to startle obstacles", and with it the one-second lunge, learned at the Seven Seas; the
+      cry is hers from the start); F: the throw, a roll or a lob; the pocket forgives every
+      hit; the tangerine a real thing that rolls and is taken; 56 tangerines (the 53 unmoved,
+      and the three in her crew cabin's bowl made real); twenty things to find of four kinds
+      (8 for Bumbot, 4 more books, 4 of hers, 4 of her husband's after the table scene, hers and
+      his shown on cabin 8206's desk; each count on the HUD from its first find); region 1's
+      decks filled (a runaway suitcase, a dog on a lead, a climb, a knitting lady, a paper
+      round); five look-outs; three deliveries; each deck its own plaque band and pictures. No
+      new ladder, no rounds, nothing that strengthens her uses. **Next: its step 1** (D: the
+      cry and the lunge, and the cabin's bowl; no art). Nothing of it is built yet.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
