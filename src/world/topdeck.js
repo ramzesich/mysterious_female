@@ -31,7 +31,8 @@ export class OldLady {
         // The sunbed stays when she has gone; her bags and her towel go with her.
         const bed = s.add.image(def.x, def.y, 'sunbed').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         const bag = s.add.image(def.x - 39, def.y, 'shipart', 'beach-bag').setOrigin(0.5, 1).setDepth(D.props + 0.06);
-        const duffel = s.add.image(def.x + 30, def.y, 'shipart', 'duffel-bag').setOrigin(0.5, 1).setDepth(D.props + 0.02);
+        // (Clear of the bed's foot, beside her parasol, not under the bed: the audit, 2026-11-15.)
+        const duffel = s.add.image(def.x + 46, def.y, 'shipart', 'duffel-bag').setOrigin(0.5, 1).setDepth(D.props + 0.02);
         const towel = s.add.image(def.x + 22, def.y - 11, 'rail-towel').setOrigin(0.5, 0).setTint(0xfbb954).setAngle(-90).setDepth(D.props + 0.04);
         world.add([bed, bag, duffel, towel]);
         const zone = s.add.zone(def.x, def.y, def.half * 2, def.tall).setOrigin(0.5, 1);

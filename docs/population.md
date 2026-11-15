@@ -295,7 +295,8 @@ with a breakfast tray knocking at a door (ambient); 50 the trunk's upper door; 6
 a guest in a bathrobe at the window (`amb_robe_5`, a peek, no room).
 
 **The forward core 74-82.** `blk_search` across the 5-6 flight's foot; `riv_rope`: the rival security
-officer at his rope, net in hand, peering up the stairs (`static`; he shakes his head when she tries the
+officer, net in hand, peering up the stairs from aft of the lift, under the DECK 5 plaque (81.05 m: by
+the rope he stood in front of the lift's door; the user, 2026-11-15) (`static`; he shakes his head when she tries the
 flight; no bubble); gone once region 2 opens (`riv_prom` is his next appearance). Needs the rival's
 character, built in step 1 (the user, 2026-11-13).
 

@@ -251,7 +251,7 @@ PEOPLE = {
     "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
     "amb_breakfast": dict(at=(5, 44.4), who="stewardess", face=1, idle="idle", layer="back"),
-    "riv_rope": dict(at=(5, 79.55), who="rival", face=-1, idle="idle", until="region:2"),
+    "riv_rope": dict(at=(5, 81.05), who="rival", face=-1, idle="idle", until="region:2"),
     "amb_reception": dict(at=(5, 99.55), who="receptionist", face=-1, idle="idle", layer="behind"),
     "blk_photographer": dict(at=(5, 87.9), who="photographer", face=1, idle="idle", until="region:3"),
     "amb_poser_him": dict(at=(5, 90.35), who="gentleman", face=-1, idle="idle", until="region:3"),
@@ -446,11 +446,11 @@ PEOPLE = {
 # back (behind furniture), flip).
 PROPS = {
     "prop_backdrop": (5, 90.9, "photo-backdrop", 0, dict(until="region:3")),
-    "prop_wetfloor": (5, 107.7, "wet-floor-sign", 0, dict(until="region:3")),
+    "prop_wetfloor": (5, 109.2, "wet-floor-sign", 0, dict(until="region:3")),
     "prop_coffee_cafe": (5, 85.72, "coffee-cup", 23, {}),
     "prop_bowl_cafe": (5, 83.6, "fruit-bowl-2", 23, {}),
     "prop_bowl_7s": (5, 247.0, "fruit-bowl", 27, {}),
-    "prop_board": (4, 190.6, "notice-board", 40, {}),
+    "prop_board": (4, 190.6, "notice-board", 40, dict(back=True)),
     # Region 2. The fire-hose cabinet high on the wall (a tangerine on its top), the photo with a
     # black tail leaving the frame (`sec_cat_photo`), the rope stand Bumbot knocked over.
     "prop_hose": (6, 26.94, "hose-cabinet", 91, dict(back=True)),
@@ -589,7 +589,6 @@ SOURCES = {
 # Signs: id: (deck, m, text, style: plate / poster / note, dy px up, options: size, wrap).
 SIGNS = {
     "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "poster", 56, dict(size=5)),
-    "sign_lostcat": (4, 190.6, "LOST:\nCAT", "note", 54, dict(size=4)),
     "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
     "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
     "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),

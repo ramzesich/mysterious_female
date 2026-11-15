@@ -1586,3 +1586,29 @@ the left with its handle at the right, and each closed door with its handle at t
 open leaves are mirrored now, the cabin door's inside its frame and the crew door's whole piece
 (its plate comes to the closed door's side with it): handle at the left, hinges at the right,
 the light in the gap at the left. Compared side by side; no playtests run.
+
+## The audit's visual overlaps fixed (2026-11-15)
+
+From `docs/plan-visual-fixes.md` (the audit's V1, V2, V3, V6, V7), each a number in the builders'
+data, and one the user found while checking them.
+
+- **F1, the "LOST: CAT" note on deck 4's crew notice board (190.6 m)** was drawn under its own
+  board. The board now hangs at the wall's depth (`prop_board`, `back=True`), and the note showed,
+  but its 4 px letters read "LOS II / CAI" and it covered the board's own picture. **The user had
+  the note removed from the game** ("I don't want such hints"): `sign_lostcat` is gone.
+- **F2, the wet-floor sign in the midship lift's doorway (deck 5):** `prop_wetfloor` from 107.7 to
+  109.2 m, on the free floor aft of the lift.
+- **F3, the card readers on the directory boards (decks 9 and 10, forward lobby):** the board
+  hangs 50 px from the wall, not 30, where that wall has a card reader on the lobby's side
+  (`DOOR_LOCKS`, in the directory loop of `tools/build_ship_map.py`).
+- **F4, people over the lobbies' "DECK n" plaques:** every plaque, deck 3's too, hangs 80 px over
+  the floor, not 56: over head height, level with the lift's number plate. All 28 looked at.
+- **F5, the old lady's duffel under her sunbed (deck 12):** from `def.x + 30` to `+ 46`, clear of
+  the bed's foot (`src/world/topdeck.js`).
+- **The rival officer at the search rope (deck 5's forward lobby; the user's screenshot)** stood
+  in front of the forward lift's door frame and its floor button: `riv_rope` from 79.55 to
+  81.05 m, aft of the lift under the DECK 5 plaque, facing the stairs. Inside the rope (78.6) his
+  leg covered the rope's sign.
+
+`tools/check_overlaps.py`: 0 overlaps. Playtests run: boot, region1, region4, region8, region9,
+stairs, lift (the rest not run).
