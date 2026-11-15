@@ -1055,7 +1055,7 @@ def build_objects():
                  "polyline": [{"x": 0, "y": 0}, {"x": x1 - x0, "y": y1 - y0}],
                  "properties": [prop("lock", lock_text(FLIGHT_LOCKS.get((core, deck + 1))))]})
         for deck in PLAYABLE:
-            add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 56,
+            add(point(f"sign-deck-{deck}-{core}", "sign", col(b) * TILE - 3 * TILE, floor_y(deck) - 80,
                       [prop("text", f"DECK {deck}"), prop("style", "plaque")]))
 
     # Side walks (§5.3), level with their deck's floor so she simply runs along them (the user,
@@ -1273,7 +1273,7 @@ def build_objects():
     put(crew, 91.3, "wall-clock-bg", 50)
     put(crew, 92.3, "water-dispenser-bg")
     put(crew, 93.2, "exit-sign-bg", 90)      # (between two tube lights, not on one)
-    add(point("sign-deck-3", "sign", exact_x(97.0), floor_y(crew) - 56, [prop("text", "DECK 3"), prop("style", "plaque")]))
+    add(point("sign-deck-3", "sign", exact_x(97.0), floor_y(crew) - 80, [prop("text", "DECK 3"), prop("style", "plaque")]))
 
     # A framed picture in each stair and elevator lobby, left of its stairs; on decks 8-10 the deck's
     # directory board hangs there instead (the user's photo of deck 8; decks 9 and 10 are like it).
@@ -1581,7 +1581,10 @@ def build_objects():
     # The lobbies: the deck's directory board, blue in a brass frame, and an exit sign over the stairs.
     for deck in (8, 9, 10):
         for core, (a, _) in CORES.items():
-            x = col(a) * TILE + 30
+            # Hung 20 px further aft where the wall has a card reader on the lobby's side (decks 9
+            # and 10 forward: the reader sits 20 px from the wall, 40 px up; the audit, 2026-11-15).
+            lock = DOOR_LOCKS.get((deck, a))
+            x = col(a) * TILE + (50 if lock and lock[0] == "card" else 30)
             add(area(f"directory-{deck}-{core}", "decor", x - 13, floor_y(deck), 26, 0, [prop("kind", "directory")]))
             put(deck, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
         # The atrium's walk: downlights and a warm cove along its ceiling (deck 10's is the dome:
