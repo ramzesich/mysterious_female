@@ -328,7 +328,10 @@ export class ShipScene extends Phaser.Scene {
     // deck's opening (its own piece of shell, a room's, and the strip `wall` wide each way where
     // the two meet, with the door between them) dimmed as far as that part of the shell is closed.
     buildDeckDim(wall) {
-        const far = 4000;
+        // Past a deck's open stretch the panels reach the whole ship's length: deck 3's is only its
+        // crew corridor (82-98 m), and a fixed 4000 px left its hull aft of 181 m undimmed (the
+        // user saw it from deck 4, 2026-11-15).
+        const far = this.map.widthInPixels + 4000;
         const panel = () => {
             const g = this.add.graphics().setDepth(DEPTH.deckDim).setAlpha(0).setVisible(false);
             this.worldLayer.add(g);
