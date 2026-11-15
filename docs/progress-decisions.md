@@ -1612,3 +1612,9 @@ data, and one the user found while checking them.
 
 `tools/check_overlaps.py`: 0 overlaps. Playtests run: boot, region1, region4, region8, region9,
 stairs, lift (the rest not run).
+
+**The notice board's cat notice painted out** (the user, after the note went: yes to taking out the
+board's own red notice with a white cat on it, which read as a lost-cat poster too). The piece is
+repainted as a plain notice of text lines when the atlas is built (`paint` in
+`tools/build_ship_art.py`); both boards that use it changed, deck 4's at 190.6 m and deck 3's muted
+one at 88.5 m. Looked at in the game; no playtests run (art only).
