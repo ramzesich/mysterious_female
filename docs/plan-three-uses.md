@@ -263,7 +263,21 @@ now; his things fill his table; hers and Bumbot's are in their scenes in the cab
 makes her three uses stronger** ("Drop the stronger uses idea, I don't like it").
 
 **The HUD shows, for each kind, how many are found of how many there are** (the user): four
-counts, books 3/14 and so on.
+counts, books 3/14 and so on. **A kind's count is not on the HUD until its first thing is
+found** (the user, later the same day: "the HUD only starts showing a collectible category when
+a first item is found"): nothing tells her beforehand that a kind exists, or how many kinds
+there are. This holds for the books too, which are counted from the start today.
+
+**Her husband's four things can be found only after she has first met him** (the user: "Place
+husband's collectibles in such a way, that they can only be found after she first meets him in
+cabin 8206"). Each of the four is `after` that meeting's flag: not lying there before it, not
+merely locked. **Open, asked of the user: which meeting.** As built he is never in cabin 8206
+before the ending: he sits at his table at the Great Outdoors from region 6 (`npc_husband`, deck
+11), and is in cabin 8206 only on the evening of the catch (`npc_husband_home`, the scene
+`scn_home`, then the win screen and the day after). So either his things are for the day after
+(found once the game is won), or a new meeting in cabin 8206 is wanted earlier (region 5, when
+she first comes to the cabin: a scene, and his figure there, to be designed), or the meeting
+meant is the one at his table.
 
 To settle when step 5 comes, before any picture is made: which eight of Bumbot's stay, which
 place each of the twenty takes (the places and the ways of getting them in the table below
@@ -460,7 +474,10 @@ Eight things for Bumbot, four for her, four for her husband, four more books (§
 - `src/world/library.js`, `tools/draw_pages.py`: fourteen everywhere ten is written (the shelf's
   gaps, `books_all`, the colours, the pages); the four new pages a picture only.
 - `src/progression.js` (`buildHud`): four counts, found of total, each with its small icon (a
-  book, a paw, hers, his).
+  book, a paw, hers, his), each shown only from its first find on (the books' too).
+- His four: `after` the flag of her first meeting with him (which meeting: open, §4.2), so
+  that none can be come upon before it; the `keeps` playtest walks to each of his places
+  before the meeting and finds nothing there.
 - `src/world/lido.js`: his things on his table, each `after` its flag. `src/world/finale.js`
   and the cabin: hers and Bumbot's laid out in cabin 8206's scenes.
 - Playtests: a new scenario `keeps`; `region2` (the Library, the shelf), `region9` (the nook),
@@ -547,3 +564,4 @@ own.
 | Their things | "Bumbusik: A bookmark (cat-shaped on top of the bookmark), a small Ukraine flag (meant to stand on a writing desk), a diary notepad, a small plant in a pot. Husband: his handheld gaming device (Asus ROG Xbox Ally X), his ice-cream spoon, his mediation/sleep mask, a pick for his electric guitar" | §4.2 |
 | What each kind pays | "Drop the stronger uses idea, I don't like it. Otherwise, as you suggested. Also, the HUD shows number of items found vs total per category" | The nook, his table, the cabin's scenes; four counts on the HUD; nothing strengthens her uses |
 | (The user's own addition) | "In her initial crew cabin there's a bowl with three tangerines. Make the tangerines collectible (which increases the total number by 3). Add it to the plan" | §1.5; 56 tangerines; built in step 1 |
+| (The user's own additions) | "Also, the HUD only starts showing a collectible category when a first item is found. Place husband's collectibles in such a way, that they can only be found after she first meets him in cabin 8206" | §4.2, step 5. Which meeting is open: as built he is in cabin 8206 only at the ending |
