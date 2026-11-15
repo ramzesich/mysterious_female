@@ -256,10 +256,10 @@ husband." So there are **four kinds of thing to find, twenty in all:**
 | Things for Bumbot | 8 | Mine to choose from the table below (each picture shown first) | With him in cabin 8206, the day after |
 | Books | 4 more, 14 in all | **The titles come later**, with the photos and the other missing things, "when the game is fully tested and verified": until then the four have stand-in covers like the ten | The Library's shelf (fourteen gaps), the nook when all fourteen are home |
 | Things for her | 4 | **A bookmark with a cat on its top; a small flag of Ukraine on a stand, for a writing desk; a diary notepad; a small plant in a pot** (the user's list) | In cabin 8206: on her desk, by the bed |
-| Things for her husband | 4 | **His handheld gaming device (an Asus ROG Xbox Ally X); his ice cream spoon; his meditation and sleep mask; a pick for his electric guitar** (the user's list) | On his table at the Great Outdoors, each there once she has brought it |
+| Things for her husband | 4 | **His handheld gaming device (an Asus ROG Xbox Ally X); his ice cream spoon; his meditation and sleep mask; a pick for his electric guitar** (the user's list) | **On the desk in cabin 8206, each from the moment it is picked up** (the user) |
 
 **What they pay** (the user: "as you suggested", less one thing): the books open the nook, as
-now; his things fill his table; hers and Bumbot's are in their scenes in the cabin. **Nothing
+now; his things gather on cabin 8206's desk; hers and Bumbot's are in the cabin too. **Nothing
 makes her three uses stronger** ("Drop the stronger uses idea, I don't like it").
 
 **The HUD shows, for each kind, how many are found of how many there are** (the user): four
@@ -268,16 +268,18 @@ found** (the user, later the same day: "the HUD only starts showing a collectibl
 a first item is found"): nothing tells her beforehand that a kind exists, or how many kinds
 there are. This holds for the books too, which are counted from the start today.
 
-**Her husband's four things can be found only after she has first met him** (the user: "Place
-husband's collectibles in such a way, that they can only be found after she first meets him in
-cabin 8206"). Each of the four is `after` that meeting's flag: not lying there before it, not
-merely locked. **Open, asked of the user: which meeting.** As built he is never in cabin 8206
-before the ending: he sits at his table at the Great Outdoors from region 6 (`npc_husband`, deck
-11), and is in cabin 8206 only on the evening of the catch (`npc_husband_home`, the scene
-`scn_home`, then the win screen and the day after). So either his things are for the day after
-(found once the game is won), or a new meeting in cabin 8206 is wanted earlier (region 5, when
-she first comes to the cabin: a scene, and his figure there, to be designed), or the meeting
-meant is the one at his table.
+**Her husband's four things can be found only after she has first met him, and the meeting is
+the one at his table** (the user: "Yes, this is the meeting, at the table there"): the table
+scene at the Great Outdoors on deck 11, where she brings him a perfect cone and they eat
+looking at the wake (`tableScene` in `src/world/lido.js`, the flag `table`, region 6). Each of
+his four is `after` `flag:table`: not lying there before it, not merely locked. So his count
+cannot come onto the HUD before she has sat with him.
+
+**His things, once picked up, are shown in cabin 8206, on the desk** (the user: "his things,
+when picked up, are shown in the cabin 8206 on the desk"): from the moment each is found, not
+only at the end, and not on his table. Hers go by the same rule in the same cabin (on the desk
+where there is room beside his, else by the bed: shown as a picture of the desk with all eight
+before it is built); Bumbot's are with him there the day after.
 
 To settle when step 5 comes, before any picture is made: which eight of Bumbot's stay, which
 place each of the twenty takes (the places and the ways of getting them in the table below
@@ -475,13 +477,14 @@ Eight things for Bumbot, four for her, four for her husband, four more books (§
   gaps, `books_all`, the colours, the pages); the four new pages a picture only.
 - `src/progression.js` (`buildHud`): four counts, found of total, each with its small icon (a
   book, a paw, hers, his), each shown only from its first find on (the books' too).
-- His four: `after` the flag of her first meeting with him (which meeting: open, §4.2), so
-  that none can be come upon before it; the `keeps` playtest walks to each of his places
-  before the meeting and finds nothing there.
-- `src/world/lido.js`: his things on his table, each `after` its flag. `src/world/finale.js`
-  and the cabin: hers and Bumbot's laid out in cabin 8206's scenes.
+- His four: `after` `flag:table` (the table scene, §4.2), so that none can be come upon before
+  it; the `keeps` playtest walks to each of his places before the scene and finds nothing
+  there, then after it finds each, and sees each on the cabin's desk.
+- Cabin 8206 (the room `cabin`; `tools/draw_cabin.py` for where its desk's top is): his things
+  on the desk, each a prop shown `after` its own flag, from the moment it is found; hers the
+  same. `src/world/finale.js`: Bumbot's laid out with him the day after.
 - Playtests: a new scenario `keeps`; `region2` (the Library, the shelf), `region9` (the nook),
-  `region6` (his table), `finale`, and each region's scenario where one is placed.
+  `region6` (the table scene and what it brings), `region5` and `cabin` (cabin 8206's desk), `finale`, and each region's scenario where one is placed.
 
 ### Step 6. The ends and the hallways (art: three loads, about 3)
 
@@ -565,3 +568,4 @@ own.
 | What each kind pays | "Drop the stronger uses idea, I don't like it. Otherwise, as you suggested. Also, the HUD shows number of items found vs total per category" | The nook, his table, the cabin's scenes; four counts on the HUD; nothing strengthens her uses |
 | (The user's own addition) | "In her initial crew cabin there's a bowl with three tangerines. Make the tangerines collectible (which increases the total number by 3). Add it to the plan" | §1.5; 56 tangerines; built in step 1 |
 | (The user's own additions) | "Also, the HUD only starts showing a collectible category when a first item is found. Place husband's collectibles in such a way, that they can only be found after she first meets him in cabin 8206" | §4.2, step 5. Which meeting is open: as built he is in cabin 8206 only at the ending |
+| Which meeting? (As built he is in cabin 8206 only at the ending) | "Yes, this is the meeting, at the table there. But his things, when picked up, are shown in the cabin 8206 on the desk" | His four exist only after the table scene (`flag:table`); each shows on cabin 8206's desk from the moment it is found |
