@@ -157,7 +157,7 @@ export const lido = {
         }
         await w.wait(250);
         s.bubbleUntil = s.time.now + 1500;
-        sfx.dash();
+        sfx.cry();
         await w.wait(700);
         // The kid comes up out of the hot tub behind him, and lets fly.
         this.tubBusy = true;
@@ -339,7 +339,7 @@ export const lido = {
             return;
         }
         // Her shout sends him running.
-        if (!fed && playing && level && s.isDashing() && Math.abs(dx) < KID.sees) {
+        if (!fed && playing && level && s.isLunging() && Math.abs(dx) < KID.sees) {
             k.mode = 'flee';
             sfx.at(k.x, k.y).oh();
             return;
@@ -388,6 +388,20 @@ export const lido = {
             face(k.x <= L.kidA ? 1 : -1);
             k.pauseUntil = time + 500;
         }
+    },
+
+    // Her cry draws his fire: he turns and squirts at her at once (in a lunge he runs and hides
+    // instead: kidOnDeck). Once he is on her side, nothing.
+    kidHeard(cry) {
+        const k = this.who('npc_kid'), s = this.scene, her = s.player;
+        if (!k?.on || k.state === 'acting' || this.P.has('kid_fed') || s.isLunging()) return;
+        if (k.mode === 'flee' || k.mode === 'hide' || k.mode === 'tell' || !this.world.hears(k.x, k.y)) return;
+        k.dir = her.x < k.x ? -1 : 1;
+        this.people.place(k);
+        k.mode = 'tell';
+        k.waitUntil = s.time.now + 160;
+        k.pose = 'aim';
+        if (!this.people.anim(k, 'squirt')) k.sprite.setFrame(k.meta.stand);
     },
 
     // E at him with what she has made: a stub he hands back to the deck, with a face; a proper

@@ -167,7 +167,7 @@ def build_world():
         x, y, route = spot(*d["at"])
         e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
                  idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
-                 pose=d.get("pose", ""), still=d.get("still", ""), dy=d.get("dy", 0))
+                 pose=d.get("pose", ""), still=d.get("still", ""), dy=d.get("dy", 0), hear=d.get("hear", ""))
         if "walk" in d:
             a, b, v, *clip = d["walk"]
             e["walk"] = dict(a=spot(d["at"][0], a)[0], b=spot(d["at"][0], b)[0], v=v, clip=clip[0] if clip else "walk",

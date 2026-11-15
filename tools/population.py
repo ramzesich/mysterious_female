@@ -104,6 +104,11 @@ CHECKPOINTS = {
 # table of its own; a number: that many px up, on a piece already there. `needs`: a flag (the bowl
 # Bumbot knocks over) or "break:<id>" (behind a breakable).
 TANGERINES = {
+    # Her crew cabin's bowl on deck 3 (the user, 2026-11-15): the three painted tangerines made
+    # real, each exactly where it was painted (tools/draw_rooms.py `crewcabin`), the third on top.
+    "tan_3_bowl_1": ("crewcabin", 121, 1, 33, None),
+    "tan_3_bowl_2": ("crewcabin", 128, 1, 33, None),
+    "tan_3_bowl_3": ("crewcabin", 125, 1, 38, None),
     "tan_4_30": (4, 31.2, 1, "table", None),
     "tan_4_laundry": ("laundry", 250, 1, 46, None),
     "tan_4_store": ("store", 150, 2, 40, None),
@@ -238,7 +243,9 @@ GRIPS = [
 #   takes them away / brings them; layer: "behind" furniture (a desk), "back" (scenery people,
 #   behind her), default beside her; cover=[(atlas piece, m, px up)] built furniture drawn again in
 #   front of them (a bar's counter, when its back bar must stay behind them); pose: "front" turned
-#   to us (at a rail), "back" turned away (reading a wall).
+#   to us (at a rail), "back" turned away (reading a wall); hear: what her cry (D) shows over them,
+#   "♥" (one who likes cats) or "shh" (a quiet place), or "own" (their part of the story answers it;
+#   docs/plan-three-uses.md §2); walkers stop and stand aside, the rest standing about turn to look.
 PEOPLE = {
     # Region 1, deck 4.
     "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
@@ -247,7 +254,7 @@ PEOPLE = {
                        carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
     "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
                         bubble=("tray", "!card:deck", None, 4)),
-    "amb_robe": dict(at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
+    "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
     "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
     "amb_breakfast": dict(at=(5, 44.4), who="stewardess", face=1, idle="idle", layer="back"),
@@ -270,16 +277,16 @@ PEOPLE = {
     "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
     # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
     "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make"),
-    "amb_surfer": dict(at=(6, 67.45), who="surfer", face=1, layer="back"),
+    "amb_surfer": dict(hear="shh", at=(6, 67.45), who="surfer", face=1, layer="back"),
     "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
     "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
     "amb_dj": dict(at=(6, 121.3), who="dj", face=-1, idle="bob", layer="behind"),
     "amb_photog_2": dict(at=(6, 135.45), who="studio", face=-1, idle="idle", layer="back"),
     "amb_barman_wj": dict(at=(6, 142.6), who="barmaid", face=-1, idle="idle", layer="back",
                           cover=[("bar-counter-bg", 142.6, 0), ("tan-bar-stool-bg", 142.6, 0)]),
-    "amb_model_ship": dict(at=(6, 148.3), who="modelguest", face=1, idle="idle", layer="back"),
+    "amb_model_ship": dict(hear="♥", at=(6, 148.3), who="modelguest", face=1, idle="idle", layer="back"),
     # The Library: she stands behind her desk; her bubble while any book is in her pocket.
-    "npc_librarian": dict(at=(6, 192.3), who="librarian", face=-1, idle="idle", layer="behind",
+    "npc_librarian": dict(hear="own", at=(6, 192.3), who="librarian", face=-1, idle="idle", layer="behind",
                           bubble=("book", "books:held", None, 4)),
     # The promenade: the jogger's loop on the JOGGING lane (she hops him or stands aside, ↑), the
     # rival peering under a boat (a glimpse: the story takes him away).
@@ -329,8 +336,8 @@ PEOPLE = {
     "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
                           cover=[("treadmill-bg", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
-    "npc_kid_tub": dict(at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
-    "npc_kid": dict(at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
+    "npc_kid_tub": dict(hear="own", at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
+    "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
                     bubble=("softserve", "!flag:kid_fed", None, 5)),
     "riv_loungers": dict(at=(11, 143.95), who="rival", face=1, idle="peek", layer="back", after="region:6", until="region:8"),
     "amb_barman_top": dict(at=(11, 155.65), who="barman_top", face=-1, idle="shake", layer="behind"),
@@ -344,7 +351,7 @@ PEOPLE = {
     "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
     "amb_go_her": dict(at=(11, 240.52), who="go_her", face=1, layer="back"),
     "amb_go_him": dict(at=(11, 241.48), who="go_him", face=-1, layer="back"),
-    "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
+    "amb_audience_2": dict(hear="shh", at=(6, 213.25), who="aud_lady", face=1, layer="back"),
     "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
     # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
     "amb_barman_mag": dict(at=(7, 113.6), who="barman", face=1, idle="idle", layer="back",
@@ -353,10 +360,10 @@ PEOPLE = {
     "amb_croupier": dict(at=(7, 158.0), who="croupier", pose="front", layer="behind"),
     "amb_player_lady": dict(at=(7, 157.29), who="casinolady", face=1, layer="back"),
     "amb_player_cowboy": dict(at=(7, 162.4), who="cowboy", pose="back", layer="back"),
-    "amb_shopper": dict(at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
+    "amb_shopper": dict(hear="♥", at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
     "amb_teen": dict(at=(7, 188.29), who="teen", pose="back", layer="back"),
     "amb_balcony_1": dict(at=(7, 220.35), who="aud_girl", face=1, layer="back"),
-    "amb_balcony_2": dict(at=(7, 232.71), who="aud_granny", face=1, layer="back"),
+    "amb_balcony_2": dict(hear="♥", at=(7, 232.71), who="aud_granny", face=1, layer="back"),
     # Region 7 (Outside). The guest locked out on his own balcony, deck 10 aft (in his cabin once
     # she has let him in: the story walks him in); the security officer looking into a tender on the
     # boat walkway (a glimpse: the story takes him away); the boat drill's two.

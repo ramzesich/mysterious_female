@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
@@ -109,7 +109,8 @@ export class ShipScene extends Phaser.Scene {
         this.world.buildHud(this.uiLayer);
 
         this.mode = 'play'; // play | ladder | stairs | trunk | lift | swim | scripted
-        this.dashUntil = 0;
+        this.lungeUntil = 0;
+        this.cryGapUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
         this.jumpBufferedAt = -Infinity;
@@ -2430,7 +2431,7 @@ export class ShipScene extends Phaser.Scene {
             this.droppingThrough !== zone.walk && !(zone.walk.atrium && this.overRail && this.gliding)
             && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
-            if (!this.isDashing()) return true;
+            if (!this.isLunging()) return true;
             this.smash(crate.x, crate.y);
             this.save.broken.push(crate.name);
             crate.disableBody(true, true);
@@ -2470,11 +2471,9 @@ export class ShipScene extends Phaser.Scene {
         };
         const icon = this.add.image(24, 20, 'tangerine').setOrigin(0).setScale(4);
         this.hudCount = this.add.text(62, 22, '', textStyle);
-        this.dashBarBack = this.add.rectangle(24, 62, 164, 12, 0x1d2b53).setOrigin(0);
-        this.dashBar = this.add.rectangle(26, 64, 160, 8, 0xf28c28).setOrigin(0);
         // Her speech bubble and the messages over her live in the world, so they move exactly with
         // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
-        this.bubble = this.add.text(0, 0, DASH.shout, {
+        this.bubble = this.add.text(0, 0, CRY.shout, {
             fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#c8343f',
             backgroundColor: '#ffffff', padding: { x: 5, y: 3 }, resolution: 4,
         }).setOrigin(0.5, 1).setDepth(DEPTH.fx + 1);
@@ -2488,7 +2487,7 @@ export class ShipScene extends Phaser.Scene {
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
         // The sound's sign, shown a moment when M switches it: a loudspeaker, crossed out when muted.
         this.soundSign = this.add.graphics().setAlpha(0);
-        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText, this.soundSign]);
+        this.uiLayer.add([icon, this.hudCount, this.fade, this.debugText, this.soundSign]);
         this.progress.buildHud(this.uiLayer);
         this.refreshHud();
     }
@@ -2520,10 +2519,14 @@ export class ShipScene extends Phaser.Scene {
 
     refreshHud() {
         this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines}`);
-        const left = Math.max(0, this.dashUntil - this.time.now);
-        const dashing = left > 0;
-        this.dashBarBack.setVisible(dashing);
-        this.dashBar.setVisible(dashing).setSize(160 * (left / DASH.durationMs), 8);
+    }
+
+    // D with none on her: the count blinks once, and that is all.
+    blinkCount() {
+        const c = this.hudCount;
+        this.tweens.killTweensOf(c);
+        c.setAlpha(1);
+        this.tweens.add({ targets: c, alpha: 0.15, duration: 110, yoyo: true, repeat: 1, onComplete: () => c.setAlpha(1) });
     }
 
     // --- Spawning --------------------------------------------------------------------------
@@ -2664,7 +2667,7 @@ export class ShipScene extends Phaser.Scene {
         }
         // Bumbot on her route: in the corridors, or asleep in the linen room.
         if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkBumbot();
-        this.updateDash(time);
+        this.updateLunge(time);
         this.updateOverlays();
     }
 
@@ -2736,22 +2739,24 @@ export class ShipScene extends Phaser.Scene {
         // Through a side walk with ↓; through a balcony's floor outside with ↓ and jump (↓ alone crawls).
         if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
 
-        if (input.dashPressed) this.tryDash(time);
+        if (input.dashPressed) this.tryCry(time);
 
         // The verbs (§6.1.2, src/world/verbs.js): crawling under things, a kick off a wall in grip
         // socks, a glide under the parasol.
         const crawling = this.updateCrawl(input, onFloor);
         const aside = this.updateAside(input, onFloor);
-        const dashing = this.isDashing();
+        const lunging = this.isLunging();
         // (Waist deep in the kids' club's ball pit she wades: src/world/bow.js.)
-        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1) * (this.wading ? 0.5 : 1)
+        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (lunging ? LUNGE.speed : 1) * (this.wading ? 0.5 : 1)
             * (this.holding ? HOLDING.speed : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        // (The lunge carries her on the way she faces whether a way is held or not.)
+        if (lunging && !dir && !aside) dir = p.flipX ? -1 : 1;
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
         // On wet tiles without the grip socks (src/world/hazards.js) she slides on the way she came.
         const slipping = onFloor && !!this.slipDir;
         if (slipping) dir = this.slipDir;
-        const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
+        const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (lunging ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
 
@@ -2804,7 +2809,7 @@ export class ShipScene extends Phaser.Scene {
         else if (!onFloor && time < this.kickUntil + 160 && this.herFrames.wallkick !== undefined) this.pose('wallkick');
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (slipping) this.pose(this.herFrames.slip !== undefined ? 'slip' : 'apex');
-        else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
+        else if (Math.abs(body.velocity.x) > 10) this.pose('run', lunging ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
         else this.standStill(time, dir);
 
         // Standing still on the bed long enough: she bounces on it.
@@ -3904,7 +3909,7 @@ export class ShipScene extends Phaser.Scene {
             const hit = Math.abs(p.x - s.x) < (PLAYER.bodyWidth / 2 + 6) && p.y > s.y - 6 && p.y - PLAYER.bodyHeight < s.y;
             if (!hit) continue;
             if (v.asideUntil) continue;
-            if (this.isDashing()) {
+            if (this.isLunging()) {
                 // Shoved aside, spinning, into a doorway for a while (population: `haz_vacuum_4`).
                 v.asideUntil = this.time.now + 6000;
                 this.smash(s.x, s.y - 3);
@@ -4049,35 +4054,52 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // --- The dash --------------------------------------------------------------------------
+    // --- D: the cry, and the lunge with it (docs/plan-three-uses.md §1.1) -------------------------
 
-    isDashing() {
-        return this.dashUntil > this.time.now;
+    isLunging() {
+        return this.lungeUntil > this.time.now;
     }
 
-    // ?tangerines=infinite: the dash never uses one up, for testing.
+    // During the lunge and a breath after it nothing frightens her by contact.
+    lungeSafe() {
+        return this.lungeUntil + LUNGE.safeTailMs > this.time.now;
+    }
+
+    // ?tangerines=infinite: D never uses one up, for testing.
     infiniteTangerines() {
         return new URLSearchParams(location.search).get('tangerines') === 'infinite';
     }
 
-    tryDash(time) {
-        if (!this.progress.knows('dash') || this.crawling || this.world.carry || this.holding) return;
-        if (this.isDashing() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return;
+    // Every D costs one tangerine, whatever it does. The cry startles what is in her way; with the
+    // lunge learned (near-catch 1) and her hands free, the lunge goes with it. Not crawling, nor
+    // with Bumbot in her arms (ladders, stairs, the pool are modes of their own: no D there).
+    tryCry(time) {
+        if (this.crawling || this.holding || time < this.cryGapUntil || this.isLunging()) return;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
+            this.blinkCount();
+            return;
+        }
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
-        this.dashUntil = time + DASH.durationMs;
-        this.bubbleUntil = time + DASH.bubbleMs;
-        sfx.dash();
-        rumble('dash');
+        this.cryGapUntil = time + CRY.gapMs;
+        this.bubbleUntil = time + CRY.bubbleMs;
+        sfx.cry();
+        const lunge = this.progress.knows('dash') && !this.world.carry;
+        if (lunge) {
+            this.lungeUntil = time + LUNGE.ms;
+            sfx.lunge();
+            rumble('lunge');
+        }
+        const p = this.player;
+        this.world.shout(p.x, p.y, this.route);
         this.refreshHud();
     }
 
-    updateDash(time) {
-        const dashing = this.isDashing();
-        if (this.wasDashing && !dashing) sfx.dashEnd();
-        this.wasDashing = dashing;
-        if (dashing || this.dashBar.visible) this.refreshHud();
+    updateLunge(time) {
+        const lunging = this.isLunging();
+        if (this.wasLunging && !lunging) sfx.lungeEnd();
+        this.wasLunging = lunging;
 
-        if (dashing && this.mode === 'play' && time - this.lastTrailAt > 45 && Math.abs(this.player.body.velocity.x) > 10) {
+        if (lunging && this.mode === 'play' && time - this.lastTrailAt > 45 && Math.abs(this.player.body.velocity.x) > 10) {
             this.lastTrailAt = time;
             const p = this.player;
             const ghost = this.add.image(p.x, p.y, 'her', p.frame.name).setOrigin(0.5, 1)
@@ -4091,16 +4113,22 @@ export class ShipScene extends Phaser.Scene {
 
     beginScare() {
         this.mode = 'scripted';
-        this.dashUntil = 0;
+        this.lungeUntil = 0;
         this.bubbleUntil = 0;
         this.player.body.enable = false;
         this.cameras.main.stopFollow();
     }
 
-    // A fright that fits what got her, then she runs off the screen.
-    scareContact(fromX, kind) {
+    // A fright that fits what got her, then she runs off the screen. (`force`: one that is no
+    // contact, her own cry at a "Do Not Disturb" door: a lunge does not help.)
+    scareContact(fromX, kind, force = false) {
         const p = this.player;
         if (this.holding) return;           // nothing scares her on the way home (§6.1.9)
+        // In a lunge she is through: what touched her gives way in its own manner.
+        if (this.lungeSafe() && !force) {
+            this.world.lunged(kind, fromX);
+            return;
+        }
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;

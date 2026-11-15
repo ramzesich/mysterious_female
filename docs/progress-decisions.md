@@ -1618,3 +1618,55 @@ board's own red notice with a white cat on it, which read as a lost-cat poster t
 repainted as a plain notice of text lines when the atlas is built (`paint` in
 `tools/build_ship_art.py`); both boards that use it changed, deck 4's at 190.6 m and deck 3's muted
 one at 88.5 m. Looked at in the game; no playtests run (art only).
+
+## The plan for the three uses, step 1: the cry and the lunge, the cabin's bowl (2026-11-15)
+
+Built on the branch `three-uses` from `docs/plan-three-uses.md` §5, step 1 (the user: "Start the
+implementation plan"). No art.
+
+- **D is the cry, and the lunge with it once learned** (`tryCry` in the ship scene; `CRY`, `LUNGE`
+  in `src/config.js`); the ten-second dash, its HUD bar and `DASH` are gone. Every press costs one
+  tangerine; with none, the count blinks. A second D within 0.6 s (`CRY.gapMs`) or during a lunge
+  does nothing, so a double tap does not spend two by accident (my addition, not in the plan).
+- **The lunge carries her the way she faces** whether a way is held or not (a lunge, not a faster
+  run); the arrows still steer it. Twice her speed and twice her acceleration, as the dash had.
+- **What the cry reaches** (`world.shout()`, `world.hears()`: 4.5 m, on her route, within 70 px of
+  her height) and what each does: as GAME_DESIGN.md §3.2 lists, from the plan's §2. Choices made
+  where the plan left room:
+  - A startled walker freezes mid-step (`anims.pause()`), a little smaller, as the steward at a
+    door: his standing frame left the waiter's tray in the air over his face (seen in the
+    close-up). The jogger jogs on the spot.
+  - Only those standing about with the plain `idle` clip turn to look: one at work (the runner on
+    the treadmill, the chefs, the pianist) or seated keeps facing what they do ("Looking closely",
+    question 3).
+  - The few with a mark (`hear` in `tools/population.py`): a heart over four who like cats (the
+    lady in the robe on deck 4, the guest at the model ship, the shopper, the granny on the
+    Stardust's balcony); a finger to the lips over two in quiet places (the Internet Cafe's surfer,
+    a lady in the theatre's stalls). "own": the kid, the kid in the hot tub, the librarian, whose
+    story code answers. People the movers own (the queue, the steward on his rounds, the faces
+    behind the swinging and "Do Not Disturb" doors, the rival on the stage) are left to them.
+  - The "Do Not Disturb" door answers within 3 m, 0.3 s after the cry, and its fright is not
+    forgiven by the lunge (`scareContact(..., force)`): it is no contact. With a tray, a spill.
+  - Bumbot at a near-catch: he turns to her for half a second with a small hop (his ears are not
+    drawn separately). The funnel's gulls only mark her on its stairway, where D does not work
+    (stairs are a mode of their own): their answer is built but will rarely be heard.
+- **What the lunge does** (`world.lunged(kind, fromX)`, once per thing): the porter's cart rolls
+  two metres within his loop and he runs after it; the jogger spins; a basketball is headed back
+  onto the court and that turn's ball is gone; trays on a hallway's floor scatter (set straight
+  once she is 8 m away) and their door opens 0.9 s later; a sprinkler leaves drops on her, a flare
+  or the sauna's steam a wisp. The swinging light and the chips no longer play their bonk and slip
+  sounds when she is through them; the towels do not bury her.
+- **The bowl**: the crew cabin's three painted tangerines are `tan_3_bowl_1` to `_3`, each with
+  its 8 px cell where it was painted (`tools/draw_rooms.py` keeps the bowl and drops them). Laid
+  over the old picture pixel for pixel: the same places; the real ones are a little brighter (the
+  painted ones were washed with the room) and their bottom row now covers 4 px of the bowl's rim.
+  56 tangerines in all.
+- **Sounds**: `dash` became `cry` (unchanged), `lunge` (a rush of air, new: the user's to judge on
+  the soundboard) and `lungeEnd`; the rumble's "the dash starting" is "the lunge starting".
+- **The `dash` playtest** found that deck 4's crates it broke no longer exist (the check passed
+  because she ran past where they had been); it now lunges through deck 4's luggage at 30 m.
+- **Playtests run, sound off:** `boot`, `dash`, `deck3` (the bowl added to it: three taken, the count
+  3), `vacuum`, `gamepad`, `sound`, `lang`, `intro`, `region1`, `region4`, `region6`, `region8`:
+  all pass but one check in `region6`, "the grip socks ... how they are used", which looks for a
+  hint ("kick") taken out on 2026-11-14 and fails on `main` as well (the socks are taken: later
+  checks see them). Not fixed here. The rest of the suite was not run.

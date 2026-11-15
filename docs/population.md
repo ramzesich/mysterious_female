@@ -54,7 +54,7 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 | `item_card_ent` | Entertainment card, red | Deck 6, 246, the stage manager | Given for his pills | §6.1.5 |
 | `item_card_hk` | Housekeeping card, green | Deck 9, 126, the steward | Given for his cart | §6.1.5 |
 | `item_card_off` | Officer's card, gold | Deck 12, 136, on the sun deck | Dropped by the rival at the horn; a glint; E | Every reader |
-| `item_dash` | The dash | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
+| `item_dash` | The lunge (with the cry, which is hers from the start; the save's verb is still `dash`) | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
 | `item_push` | Pushing carts | Deck 9, 122, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
 | `item_crawl` | Crawling | Deck 9, the linen room's vent | ↓ on the cart under the vent | The duct, laundry lines, the pillow fort |
 | `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E | Wall jumps |
@@ -82,12 +82,15 @@ thing named (drawn, no words).
 | `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
 | `book_10` | 9 | Deck 10, 38, the bridge's chart table | Pickup | The odd book on the library's top shelf |
 
-### 2.3 The tangerines (41)
+### 2.3 The tangerines (41 here; 56 in the game)
 
-Placed where food is; by touch. Trim to taste; §6.1 says about 40.
+Placed where food is; by touch. Trim to taste; §6.1 says about 40. (The table is the plan as first
+written; `TANGERINES` in `tools/population.py` is what the game has: 53, and since 2026-11-15 the
+three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md §3.2.)
 
 | Deck | m | Id | On what | Count |
 |---|---|---|---|---|
+| 3 | 90 | `tan_3_bowl_1` to `_3` | The bowl on her crew cabin's desk, each where it was painted (the user, 2026-11-15) | 3 |
 | 4 | 30 | `tan_4_30` | Behind the breakable luggage stack | 1 |
 | 4 | 112 | `tan_4_laundry` | A shelf in the laundry (`room_laundry`) | 1 |
 | 4 | 165 | `tan_4_store` | Crates in the dry store (`room_store`) | 2 |
@@ -115,7 +118,7 @@ Placed where food is; by touch. Trim to taste; §6.1 says about 40.
 | 12 | 54 | `tan_12_spinnaker` | The Spinnaker's bar | 2 |
 | 12 | 128 | `tan_12_lady` | The old lady's thanks for her cocktail | 2 |
 | 12 | 166 | `tan_12_cagneys` | Cagney's bread basket | 1 |
-| 12 | 211 | `tan_12_pinata` | Los Lobos' piñata, broken by the dash | 2 |
+| 12 | 211 | `tan_12_pinata` | Los Lobos' piñata, broken by the lunge | 2 |
 | The funnel | 186 | `tan_funnel` | The engineer's lunch box | 1 |
 | | | | **Total** | **41** |
 

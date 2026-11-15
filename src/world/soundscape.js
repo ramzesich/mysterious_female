@@ -124,7 +124,7 @@ export class Soundscape {
             if (this.rolled >= 20) { this.rolled = 0; sfx.roll(); }
         } else if ((s.mode === 'play' && s.grounded && !s.wading && !s.slipDir) || (s.mode === 'scripted' && dy === 0 && dx > 0)) {
             this.walked += dx;
-            const each = s.crawling ? stride * 0.8 : s.isDashing() ? stride * 1.35 : stride;
+            const each = s.crawling ? stride * 0.8 : s.isLunging() ? stride * 1.35 : stride;
             if (this.walked >= each) { this.walked = 0; sfx.step(s.crawling && s.route !== 'duct' ? 'crawl' : this.floor()); }
         }
     }

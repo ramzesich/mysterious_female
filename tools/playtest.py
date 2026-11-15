@@ -190,7 +190,7 @@ class Browser:
     def state(self):
         return self.eval("""(() => { const s = window.__ship, p = s.player;
             return { mode: s.mode, x: Math.round(p.x), y: Math.round(p.y), tangerines: s.save.tangerines,
-                     dashing: s.isDashing(), activated: s.save.activated.slice() }; })()""")
+                     lunging: s.isLunging(), activated: s.save.activated.slice() }; })()""")
 
     def teleport(self, x, y, route="inside"):
         self.eval(f"window.__ship.spawnAt({{x: {x}, y: {y}, route: '{route}'}})")
@@ -298,6 +298,18 @@ def scenario_deck3(b):
     time.sleep(1.0)
     ok &= check(route(b) == "crewcabin", "E at the door marked Crew: her cabin", route(b))
     b.shot("deck3-cabin")
+    # The bowl on her desk (the user, 2026-11-15): its three tangerines are real, hers to take.
+    bowl = b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_3_bowl') && t.sprite.visible && t.route === 'crewcabin').map(t => ({{ id: t.id, x: t.sprite.x }}))")
+    ok &= check(len(bowl) == 3, "three tangerines in the bowl on her desk", bowl)
+    door = b.state()["x"]
+    bx = sum(e["x"] for e in bowl) / max(1, len(bowl))
+    way = "right" if bx > door else "left"
+    hold_until(b, way, lambda s: abs(s["x"] - bx) < 3, 6)
+    time.sleep(0.3)
+    s = b.state()
+    ok &= check(s["tangerines"] == 3 and all(e["id"] in save_list(b, "collected") for e in bowl), "walked to them: all three taken, the count 3", s)
+    b.shot("deck3-bowl-empty")
+    hold_until(b, "left" if way == "right" else "right", lambda s: abs(s["x"] - door) < 4, 6)
     b.tap("e")
     time.sleep(1.0)
     s = b.state()
@@ -1057,21 +1069,81 @@ def scenario_vacuum(b):
 
 
 def scenario_dash(b):
+    """D (docs/plan-three-uses.md §1.1): every press costs one tangerine. Before the lunge is learned,
+    and with a tray, the cry alone: the porter stops and stands aside, and is deaf to a second cry a
+    while. Learned, the lunge with it: through the luggage, the vacuum sent spinning, about a second
+    long; a fright by contact refused during it, not after. With none on her, nothing."""
+    S, P = "window.__ship", "window.__ship.world.people.byId.haz_porter"
     b.open("?reset&play")
-    b.teleport(x_of(236) + 6, D4)  # behind the crate stack on deck 4
+    b.teleport(x_of(50), D4)
     time.sleep(0.3)
-    b.eval("window.__ship.save.tangerines = 1; window.__ship.save.verbs.push('dash')")  # the dash is learned at near-catch 1
-    b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(228)}; window.__ship.vacuums[0].speed = 0")
+    b.eval(f"{S}.save.tangerines = 4; {S}.refreshHud()")
+    # The porter held at his forward end, facing her; she two metres from him.
+    b.eval(f"(p => {{ p.x = p.walk.a; p.dir = -1; p.pausedUntil = 0; window.__ship.world.people.place(p); }})({P})")
+    b.teleport(person(b, "haz_porter")["x"] - 100, D4)
+    b.eval(f"{P}.pausedUntil = 0")
     b.tap("d")
-    time.sleep(0.2)
-    b.shot("dash-shout")
+    time.sleep(0.15)
+    b.shot("dash-cry-porter")
     s = b.state()
-    ok = check(s["dashing"] and s["tangerines"] == 0, "D spends a tangerine on a dash", s)
-    # Dash forward along deck 4, through the crates and into the vacuum.
-    b.hold("left", 2.5)
+    ok = check(s["tangerines"] == 3 and not s["lunging"], "before the lunge is learned D is the cry alone, for one", s)
+    ok &= check(b.eval(f"{S}.bubble.visible"), "her bubble: the cry")
+    aside = b.eval(f"({P}.aside === true) && {P}.pausedUntil > {S}.time.now + 2000")
+    ok &= check(aside, "the porter stops and stands aside", b.eval(f"[{P}.aside, {P}.pausedUntil - {S}.time.now]"))
+    until = b.eval(f"{P}.pausedUntil")
+    time.sleep(0.8)
+    b.tap("d")
+    time.sleep(0.15)
+    ok &= check(b.state()["tangerines"] == 2, "a second cry costs another", b.state())
+    ok &= check(b.eval(f"{P}.pausedUntil") == until, "and the porter is deaf to it", b.eval(f"{P}.pausedUntil - {until}"))
+    # With a tray in her hands: the cry alone, even once the lunge is learned.
+    b.eval(f"{S}.save.verbs.push('dash'); {S}.world.carryBox.take('lunch')")
+    time.sleep(0.8)
+    b.tap("d")
+    time.sleep(0.15)
     s = b.state()
-    ok &= check(s["x"] < x_of(231), "the dash breaks through the crates", s)
-    ok &= check(b.eval("window.__ship.vacuums[0].asideUntil > 0"), "and shoves the vacuum aside, spinning")
+    ok &= check(s["tangerines"] == 1 and not s["lunging"], "with a tray: the cry alone, for one", s)
+    b.eval(f"{S}.world.carryBox.drop()")
+    # The lunge: deck 4's stacked luggage (30 m) ahead of her, the vacuum standing beyond it, both
+    # within the second of it.
+    b.teleport(x_of(33), D4)
+    time.sleep(0.3)
+    b.eval(f"{S}.save.tangerines = 1; {S}.player.setFlipX(true)")
+    b.eval(f"{S}.vacuums[0].sprite.x = {x_of(29)}; {S}.vacuums[0].speed = 0")
+    t0 = b.eval(f"{S}.time.now")
+    b.tap("d")
+    time.sleep(0.1)
+    b.shot("dash-lunge")
+    s = b.state()
+    ok &= check(s["lunging"] and s["tangerines"] == 0, "learned: D cries out and lunges, for one", s)
+    length = b.eval(f"{S}.lungeUntil") - t0
+    ok &= check(900 <= length <= 1100, "the lunge lasts about a second", length)
+    b.hold("left", 1.2)
+    s = b.state()
+    ok &= check("haz_luggage_4" in save_list(b, "broken") and s["x"] < x_of(29.5), "the lunge breaks through the luggage", (s, save_list(b, "broken")))
+    ok &= check(b.eval(f"{S}.vacuums[0].asideUntil > 0") and s["mode"] == "play", "and sends the vacuum spinning", s)
+    ok &= check(not s["lunging"], "and is over", s)
+    # A fright by contact refused during it; none refused after.
+    b.teleport(x_of(200), D4)
+    b.eval(f"{S}.save.tangerines = 1")
+    b.tap("d")
+    time.sleep(0.1)
+    b.eval(f"{S}.scareContact({S}.player.x + 10, 'bumped')")
+    time.sleep(0.1)
+    ok &= check(b.state()["mode"] == "play", "in a lunge a bump is nothing", b.state())
+    time.sleep(1.5)
+    b.eval(f"{S}.scareContact({S}.player.x + 10, 'bumped')")
+    time.sleep(0.1)
+    ok &= check(b.state()["mode"] == "scripted", "after it, a bump is a fright again", b.state())
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    # With none on her: nothing.
+    b.eval(f"{S}.save.tangerines = 0")
+    time.sleep(0.7)
+    b.tap("d")
+    time.sleep(0.1)
+    s = b.state()
+    ok &= check(not s["lunging"] and s["tangerines"] == 0 and not b.eval(f"{S}.time.now < {S}.bubbleUntil"),
+                "with none: D does nothing", s)
     return ok
 
 
@@ -1203,11 +1275,11 @@ def scenario_golden(b):
     ok &= check("Deck" in alert(b), "the midships crew trunk wants the Deck card", alert(b))
     # Near-catch 1 at the Seven Seas: the scream, and the dash is hers.
     b.tap("d")
-    ok &= check(not b.state()["dashing"], "no dash before she has seen him")
+    ok &= check(not b.state()["lunging"], "no lunge before she has seen him (the cry alone)")
     go(b, 5, 244)
     b.hold("right", 1.6)
     ok &= check(wait_flag(b, "bb1"), "near-catch 1 at the Seven Seas' pass", flags(b))
-    ok &= check("dash" in save_list(b, "verbs"), "the dash is learned there", save_list(b, "verbs"))
+    ok &= check("dash" in save_list(b, "verbs"), "the lunge is learned there", save_list(b, "verbs"))
     ok &= check(lunch_for_the_officer(b), "his lunch carried to the gangway officer: the Deck card")
     # Region 2: up the crew trunk into Bliss.
     go(b, 4, 125)
@@ -1454,7 +1526,7 @@ def scenario_region1(b):
     ok &= check(0 < lifted < 40 and carrying(b) == "lunch", "with a tray a jump is a low hop", lifted)
     b.eval("window.__ship.save.tangerines = 2")
     b.tap("d")
-    ok &= check(not b.state()["dashing"], "and there is no dash")
+    ok &= check(not b.state()["lunging"], "and there is no lunge (the cry alone)")
     waiter = person(b, "haz_waiter")
     b.eval("(p => { p.pausedUntil = 0; p.aside = false; })(window.__ship.world.people.byId.haz_waiter)")
     b.teleport(person(b, "haz_waiter")["x"] + 60, D5)
@@ -3946,7 +4018,7 @@ def scenario_finale(b):
     v = b.eval("window.__ship.player.body.velocity.x")
     b.tap("d")
     time.sleep(0.2)
-    ok &= check(90 < v < 125 and not b.state()["dashing"], "a calm walk with him, and no dash", (v, b.state()))
+    ok &= check(90 < v < 125 and not b.state()["lunging"], "a calm walk with him, and no lunge", (v, b.state()))
     b.key("right", False)
     b.hold("down", 0.4)
     ok &= check(not b.eval("window.__ship.crawling"), "no crawling with him in her arms")
@@ -4112,10 +4184,10 @@ def scenario_gamepad(b):
         b.teleport(b.eval(f"window.__ship.bulkheads.find(d => d.id === '{door}').x") - 16, D4)
         b.pad_tap("X")
         ok &= check(b.eval(f"window.__ship.bulkheads.find(d => d.id === '{door}').open"), "X opens a door")
-        b.eval("window.__ship.save.verbs.push('dash')")      # the dash is learned at near-catch 1
+        b.eval("window.__ship.save.verbs.push('dash')")      # the lunge is learned at near-catch 1
         b.pad_tap("B")
-        ok &= check(b.eval("window.__ship.isDashing()"), "B dashes")
-        # The rumble (§3.1): the dash's burst on the controller in use.
+        ok &= check(b.eval("window.__ship.isLunging()"), "B cries out and lunges")
+        # The rumble (§3.1): the lunge's burst on the controller in use.
         time.sleep(0.1)
         ok &= check([120, 0.3] in [r[1:3] for r in b.eval("window.__rumbles")], "and the controller rumbles with it",
                     b.eval("window.__rumbles"))

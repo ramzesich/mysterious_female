@@ -27,7 +27,7 @@ export const verbs = {
         const p = this.player;
         // (Under something low she stays down; standing, it stops her like a wall.)
         const low = this.route === 'duct' || (this.crawling && this.world.lowAt(p.x, p.y));
-        const can = this.progress.knows('crawl') && !this.world.carry && !this.isDashing() && !this.holding;
+        const can = this.progress.knows('crawl') && !this.world.carry && !this.isLunging() && !this.holding;
         // (Once down she stays down while ↓ is held: changing her body's size unsettles the floor a frame.)
         const want = low || (input.down && can && (onFloor || this.crawling));
         if (want !== this.crawling) this.setCrawl(want);

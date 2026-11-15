@@ -280,12 +280,14 @@ const her = {
     // The parasol snapping open over her, and folding.
     parasolOpen: () => { noise(0.16, { band: [450, 1500], q: 0.9, vol: 0.2, attack: 0.06 }); thud(210, 0.06, 0.14, 0.14); },
     parasolShut: () => noise(0.1, { band: [1300, 420], q: 0.9, vol: 0.3 }),
-    // "Кісюнічка!!!": a bright rising cry, then its four syllables.
-    dash: () => {
+    // "Кісюнічка!!!" (D): a bright rising cry, then its four syllables.
+    cry: () => {
         tone(620, 0.18, { type: 'sawtooth', to: 1250, vol: 0.09, lp: 3200 });
         [1000, 1250, 1000, 1400].forEach((f, i) => tone(f, 0.09, { type: 'square', vol: 0.06, t: 0.18 + i * 0.07, lp: 3600 }));
     },
-    dashEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),
+    // The lunge with it: a rush of air past her, and its end, a breath out.
+    lunge: () => { noise(0.32, { band: [700, 2600], q: 0.8, vol: 0.16, attack: 0.04 }); thud(160, 0.05, 0.1, 0.1); },
+    lungeEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),
     // A fright: her yelp.
     scare: () => { tone(760, 0.11, { type: 'square', to: 1480, vol: 0.08, lp: 3400 }); tone(1480, 0.14, { type: 'square', to: 1000, vol: 0.07, t: 0.11, lp: 3400 }); },
     // Running off after one.

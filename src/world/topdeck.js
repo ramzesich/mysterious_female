@@ -116,6 +116,19 @@ export class Balls {
         this.hitAt = 0;
     }
 
+    // In a lunge she meets the ball: headed back onto the court, over the cage.
+    lunged(kind, fromX) {
+        const s = this.scene, d = this.def;
+        if (kind !== 'bonked' || !this.ball.visible || Math.abs(this.ball.x - fromX) > 12) return false;
+        this.headed = Math.floor((s.time.now / 1000 + d.offset) / d.period);
+        const b = s.add.image(this.ball.x, this.ball.y, 'shipart', 'basketball').setDepth(this.ball.depth);
+        this.world.add([b]);
+        sfx.at(b.x, b.y).bounce();
+        s.tweens.add({ targets: b, x: this.rim.x, duration: 700, ease: 'Sine.easeOut' });
+        s.tweens.add({ targets: b, y: this.rim.y - 30, duration: 350, ease: 'Quad.easeOut', yoyo: true, onComplete: () => b.destroy() });
+        return true;
+    }
+
     // Where the ball is `t` s into its turn: { x, y: px over the floor, a: alpha } or null.
     at(t) {
         const d = this.def, x0 = this.rim.x + d.dir * 8, R = d.reach * d.dir, drop = d.y - this.rim.y - 5;
@@ -148,6 +161,12 @@ export class Balls {
         }
         const t = ((time / 1000 + d.offset) % d.period);
         const q = this.at(t);
+        // (Headed back onto the court in a lunge: this turn's ball is gone.)
+        if (Math.floor((time / 1000 + d.offset) / d.period) === this.headed) {
+            this.ball.setVisible(false);
+            this.shadow.setVisible(false);
+            return;
+        }
         this.ball.setVisible(!!q);
         this.shadow.setVisible(!!q && !q.tell);
         if (!q) return;
@@ -188,9 +207,18 @@ export class Flare {
         this.hitAt = 0;
     }
 
+    // Her cry startles the chef: his next flare comes late (not one already alight).
+    heard() {
+        const s = this.scene, d = this.def;
+        if (!this.world.hears(d.x, d.y) || this.phase(s.time.now)[0] === 'on') return;
+        this.late = (this.late ?? 0) + 1500;
+        const chef = this.world.people.byId[d.chef];
+        if (chef?.on) this.world.pop(chef.x, chef.y - PLAYER.height - 6, 'alert', 1000);
+    }
+
     // 'calm', 'tell' (how far into it, 0-1) or 'on' (0-1).
     phase(time) {
-        const d = this.def, t = (time / 1000 + d.offset) % d.period;
+        const d = this.def, t = ((time - (this.late ?? 0)) / 1000 + d.offset) % d.period;
         if (t >= d.period - d.on) return ['on', (t - (d.period - d.on)) / d.on];
         if (t >= d.period - d.on - 0.9) return ['tell', (t - (d.period - d.on - 0.9)) / 0.9];
         return ['calm', 0];
@@ -271,6 +299,17 @@ export class FunnelWind {
         this.state = 'circle';
         this.cycle = -1;
         this.turn = 0;
+    }
+
+    // Her cry: a gull marking her breaks off.
+    heard() {
+        if (this.state !== 'mark') return;
+        const t = this.target;
+        if (!this.world.hears(t.x, t.y, this.scene.route)) return;
+        this.scene.tweens.killTweensOf(this.mark);
+        this.mark.setVisible(false);
+        this.state = 'circle';
+        this.turn++;
     }
 
     onStairs() {
@@ -370,6 +409,21 @@ export class Flock {
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
             b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
         }
+    }
+
+    // Her cry: the flock lifts a little, all at once, and settles again.
+    heard() {
+        const s = this.scene, d = this.def;
+        if (this.gone || !this.birds.some(b => this.world.hears(b.x, d.y))) return;
+        sfx.at((d.x0 + d.x1) / 2, d.y).flap();
+        this.birds.forEach((b, i) => {
+            if (b.up) return;
+            b.up = true;
+            const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
+            b.sprite.setFrame('gull-up');
+            s.tweens.add({ targets: b.sprite, y: d.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
+                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched').setY(d.y); b.up = false; } });
+        });
     }
 
     // Up and away over the bow, all at once. Resolves when the sky is clear.

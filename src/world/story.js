@@ -35,7 +35,7 @@ export class Story {
         const bb1 = cat('bb1');
         if (bb1) {
             // Near-catch 1 (population §6.1): the scream that becomes her battle cry; the fruit bowl goes over.
-            bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.dash(); };
+            bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.cry(); };
             bb1.onLeap = () => this.world.topple('prop_bowl_7s');
         }
         const bb2 = cat('bb2');
@@ -174,12 +174,42 @@ export class Story {
         s.setBulkheadOpen(door, true);
     }
 
-    // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk.
-    shush(time) {
+    // Her cry, where the story answers it (docs/plan-three-uses.md §2): the librarian's shush and
+    // her rope's sign rattling, Bumbot looking up at his spot, the kid with the water pistol (lido),
+    // Bumbot at the tip of the bow (finale).
+    heard(cry) {
+        const w = this.world, s = this.scene, her = s.player;
+        const l = this.who('npc_librarian');
+        if (l?.on && w.hears(l.x, l.y)) {
+            this.shushAt = 0;
+            this.shush(s.time.now, true);
+        }
+        const rope = this.P.blockDrawings?.find(b => b.id === 'flag:bb2');
+        const sign = rope?.items[1];
+        if (sign?.visible && w.hears(sign.x, rope.items[0].y)) {
+            s.tweens.add({ targets: sign, angle: { from: -8, to: 8 }, duration: 70, yoyo: true, repeat: 4, onComplete: () => sign.setAngle(0) });
+            sfx.at(sign.x, sign.y).rattle();
+        }
+        // Bumbot at one of his spots: ears up, a look at her for half a second; the beat is what it was.
+        for (const cat of s.cats) {
+            const c = cat.sprite;
+            if (cat.gone || cat.hidden || !c.visible || !w.hears(c.x, cat.floor, cat.route)) continue;
+            const was = c.flipX;
+            c.setFlipX(her.x < c.x);
+            s.tweens.add({ targets: c, y: c.y - 2, duration: 90, yoyo: true });
+            s.time.delayedCall(500, () => { if (!cat.gone) c.setFlipX(was); });
+        }
+        this.kidHeard(cry);
+        this.tipHeard(cry);
+    }
+
+    // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk,
+    // or cries out near it (`cried`).
+    shush(time, cried = false) {
         const l = this.who('npc_librarian'), s = this.scene, her = s.player;
         if (!l?.on || l.state === 'acting' || s.mode !== 'play' || s.route !== 'inside' || time < (this.shushAt ?? 0)) return;
-        if (Math.abs(her.y - l.y) > 8 || Math.abs(her.x - l.x) > 3 * M) return;
-        if (Math.abs(her.body.velocity.x) < 120 && !s.isDashing()) return;
+        if (!cried && (Math.abs(her.y - l.y) > 8 || Math.abs(her.x - l.x) > 3 * M)) return;
+        if (!cried && Math.abs(her.body.velocity.x) < 120 && !s.isLunging()) return;
         this.shushAt = time + 6000;
         l.dir = her.x < l.x ? -1 : 1;
         this.people.place(l);
@@ -380,7 +410,7 @@ export class Story {
         const s = this.scene, w = this.world, st = w.data.stage;
         const sm = this.who('npc_stagemanager');
         if (sm?.on) this.people.play(sm, 'flap', { times: 2 });
-        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1 });
+        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1, owned: true });
         if (!r) return;
         r.on = true;
         const place = () => this.people.place(r);

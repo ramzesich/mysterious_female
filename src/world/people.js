@@ -4,7 +4,7 @@
 // may do something when she touches them: a fright, a spilled tray. Sprites: assets/sprites/people
 // (tools/cast.py, tools/build_people.py).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, CRY } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;                           // px per metre
@@ -169,8 +169,94 @@ export class People {
                 p.bubbleItems[0].setVisible(show).setPosition(p.x, by);
                 p.bubbleItems[1].setVisible(show).setPosition(p.x, by - BUBBLE.h / 2);
             }
-            if (p.touch && playing && s.route === p.route && !p.aside && !s.aside && this.touching(p, her)) this.world.touched(p);
+            if (p.touch && playing && s.route === p.route && !p.aside && !p.busy && !s.aside && this.touching(p, her)) this.world.touched(p);
         }
+    }
+
+    // Her cry (src/world/world.js `shout`): within its reach on her deck, a walker in her way stops
+    // and turns aside for a while, a "!" over him; anyone else standing about turns to look, a heart
+    // over the few who like cats, a finger to the lips in a quiet place (`hear` in the data; "own":
+    // their part of the story answers it). Each is deaf to the next cry for a while.
+    heard(cry) {
+        const time = this.scene.time.now, her = this.scene.player;
+        for (const p of this.list) {
+            if (!p.on || p.owned || p.hear === 'own' || p.state === 'acting' || p.busy || time < (p.deafUntil ?? 0)) continue;
+            if (!this.world.hears(p.x, p.y, p.route)) continue;
+            p.deafUntil = time + CRY.deafMs;
+            const top = p.y - (p.dy ?? 0) - PLAYER.height - 6;
+            if (p.walk) {
+                if (!p.aside) {
+                    p.aside = true;
+                    p.sprite.setDepth(p.sprite.depth - 0.2);
+                }
+                // (Against the wall, out of her way: a little further from us, as the steward at a door.)
+                p.cried = true;
+                for (const i of p.items) i.setScale(0.94);
+                p.pausedUntil = Math.max(p.pausedUntil, time + CRY.startleMs);
+                // (The jogger jogs on the spot, looking round; the others freeze mid-step, holding
+                // what they carry as they were: their standing frame would leave a tray in the air.)
+                if (p.walk.clip !== 'run') p.sprite.anims.pause();
+                this.world.pop(p.x, top, 'alert', 1200);
+                sfx.at(p.x, p.y).oh();
+                continue;
+            }
+            if (p.hear === '♥' || p.hear === 'shh') this.world.pop(p.x, top, p.hear === '♥' ? 'heart' : 'shh', 1500);
+            // Turned to her a moment: only those standing about (not one at work at something, sat
+            // down, or turned to us or to a wall, who must keep facing what they do).
+            if (p.idle === 'idle' && !p.pose && !p.still) {
+                const was = p.dir, to = her.x < p.x ? -1 : 1;
+                if (to === was) continue;
+                p.dir = to;
+                this.place(p);
+                this.scene.time.delayedCall(CRY.startleMs, () => {
+                    if (p.dir !== to || p.state === 'acting') return;
+                    p.dir = was;
+                    this.place(p);
+                });
+            }
+        }
+    }
+
+    // In a lunge she went through someone (`touch`): the porter's cart knocked rolling, he after
+    // it; the jogger spun round like a top. True if it was one of them.
+    lunged(kind, fromX) {
+        const s = this.scene, her = s.player;
+        const p = this.list.find(q => q.touch && q.on && Math.abs(q.x - fromX) < 1);
+        if (!p) return false;
+        const away = her.x < p.x ? 1 : -1;
+        if (p.attached.length && p.walk) {
+            // The cart goes rolling two metres the way she was going; he runs after it.
+            const roll = Phaser.Math.Clamp(p.x + away * 2 * M, p.walk.a, p.walk.b) - p.x;
+            p.busy = true;
+            p.state = 'acting';
+            sfx.at(p.x, p.y).oh();
+            this.world.pop(p.x, p.y - (p.dy ?? 0) - PLAYER.height - 6, 'alert', 1000);
+            for (const a of p.attached) s.tweens.add({ targets: a.img, x: a.img.x + roll, duration: 650, ease: 'Quad.easeOut' });
+            s.time.delayedCall(350, () => {
+                this.anim(p, p.walk.clip ?? 'walk', { speed: 1.8 });
+                s.tweens.add({ targets: p, x: p.x + roll, duration: 700, ease: 'Sine.easeInOut',
+                    onUpdate: () => { p.sprite.x = p.x; },
+                    onComplete: () => { p.busy = false; this.place(p); this.idle(p); } });
+            });
+            return true;
+        }
+        if (p.walk) {
+            // Spun round, and on again.
+            p.busy = true;
+            p.state = 'acting';
+            sfx.at(p.x, p.y).oh();
+            let n = 0;
+            s.time.addEvent({ delay: 90, repeat: 7, callback: () => {
+                p.sprite.setFlipX(!p.sprite.flipX);
+                if (++n === 8) {
+                    p.busy = false;
+                    this.place(p);
+                    this.idle(p);
+                }
+            } });
+            return true;
+        }
+        return false;
     }
 
     // A loop between two ends, with a pause at each end and at the stops on the way (the waiter at his
@@ -181,6 +267,11 @@ export class People {
         if (p.aside) {
             p.aside = false;
             p.sprite.setDepth(p.sprite.depth + 0.2);
+        }
+        if (p.cried) {
+            p.cried = false;
+            for (const i of p.items) i.setScale(1);
+            p.sprite.anims.resume();
         }
         const before = p.x;
         p.x += p.dir * w.v * M * dt;

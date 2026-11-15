@@ -24,7 +24,7 @@ URL flags, combinable (`?play&debug`):
 | `?debug` | Show collision boxes and her position/state |
 | `?cards=all` | Every lock open and every verb known (crawl, wall jump, glide), for testing round the ship |
 | `?cards=locked` | Key cards are off for now (everything is open); this turns the locks back on, for testing |
-| `?tangerines=infinite` | The dash never uses up a tangerine, for testing |
+| `?tangerines=infinite` | D never uses up a tangerine, for testing |
 | `?at=<place>` | Start at a named place, for testing (a link for each: [docs/start-links.md](docs/start-links.md)): `crew` (deck 3's crew corridor, at her cabin's door: where the game starts), `gangway`, `pool`, `deck12`, `atrium`, `atrium-floor`, `promenade` (outside, on deck 6's promenade), `walkway` (the boat walkway over it, at the station locker), `balcony` (outside, on the balcony of deck 9's balcony cabin; with `&cards=all` she has the grip socks), `library` (inside it), `bar`, `theatre`, `bridge`, `buffet`, `diner`, `bow` (the mooring deck), `stern` (deck 9's aft terrace), `cabin` (inside cabin 8206, deck 8), `linen` (inside the linen room, deck 9), `housekeeping` (deck 9, where the red trunk comes up), `spa` and `gym` (deck 11), `spinnaker`, `chapel` (inside it), `champs`, `court`, `sushi`, `bistro`, `sundeck` (by the old lady), `technical` (the technical ladder's foot at Cagney's), `teppanyaki`, `terrace` (the aft terrace), `cagneys` (by the wedding cake) (deck 12), `funnel` (the funnel's top), `kids` (Splash Academy, deck 7), `captain` (the captain's door, deck 9), `sunset` (the balcony forward of the spa, where the last glide starts), `home` (deck 8, a few doors from cabin 8206) |
 | `?did=<flags>` | Start with things already done, for testing: story flags, comma-separated (`engineer,horn,lady` the top deck's errands; `wedding`; `bb6,alarm` the bridge's scene; `books_all` every book back; `alarm,sunset` the finale's glide; `alarm,sunset,catch` the way home with Bumbot in her arms; `...,home` the day after). E.g. `?play&at=champs&cards=all&did=engineer,horn,lady&tangerines=infinite` |
 | `?lang=uk` | The game in Ukrainian for this session (`?lang=en`: in English, the default). The choice made in the game is remembered; this one is not |
@@ -37,7 +37,7 @@ URL flags, combinable (`?play&debug`):
 | Run | ← / → | Left stick / D-pad |
 | Jump (hold for higher) | Space | A |
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
-| Кісюнічка dash (costs a tangerine) | D | B |
+| "Кісюнічка!!!": the cry, and the lunge once learned (one tangerine each) | D | B |
 | Activate: open doors | E | X |
 | In the grip socks: at a balcony's partition, jump again in the air to vault it; with ↑ held, each jump at a partition's pole, a pillar or a column is a kick straight up | Space, ↑ + Space | A, ↑ + A |
 | Down through a balcony's floor to the one below | ↓ + Space | ↓ + A |

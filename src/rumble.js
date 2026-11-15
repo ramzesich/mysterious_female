@@ -8,7 +8,7 @@ const EFFECTS = {
     fall: [[0, 260, 1, 0.5]],                                     // a scare: a long fall, the heavy thud
     overboard: [[0, 220, 1, 0.7], [220, 200, 0.45, 0.25]],         // a scare: the big splash, fading
     land: [[0, 80, 0.4, 0.1]],                                    // down a deck on her feet
-    dash: [[0, 120, 0.3, 0.7]],                                   // the dash starting
+    lunge: [[0, 120, 0.3, 0.7]],                                  // the lunge starting
     spill: [[0, 100, 0, 0.45]],                                   // a tray spilled: a light tick
     bolt: [[0, 80, 0.2, 0.45], [160, 80, 0.2, 0.45]],              // Bumbot bolting at a near-catch
     alarm: [0, 500, 1000, 1500].map(t => [t, 250, 0.5, 0.6]),     // the bridge's alarm, with its lights

@@ -3,7 +3,7 @@
 // the gulls that dive at food carried in the open, the buffet queue, the room-service trays left on
 // a hallway's floor. Like src/world/movers.js, each takes its place from maps/world.json.
 
-import { PLAYER } from '../config.js';
+import { PLAYER, CRY } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 
@@ -126,9 +126,24 @@ export class FoodGulls {
     // Where a bird waits: wheeling over the stretch, or on its perch.
     home(b, time) {
         const d = this.def;
-        if (d.perch) return { x: d.perch.x, y: d.perch.y, perched: true };
+        const scared = time < (this.scaredUntil ?? 0);
+        if (d.perch && !scared) return { x: d.perch.x, y: d.perch.y, perched: true };
         const t = time / 1900 + b.phase, r = (d.x1 - d.x0) / 2 + 60;
-        return { x: d.x + Math.cos(t) * r, y: this.top - (this.off() ? 34 : 0) + Math.sin(t * 2) * 9, dir: -Math.sin(t) };
+        return { x: d.x + Math.cos(t) * r, y: this.top - (this.off() ? 34 : 0) - (scared ? 50 : 0) + Math.sin(t * 2) * 9, dir: -Math.sin(t) };
+    }
+
+    // Her cry: they scatter higher a while, and a dive still in its tell is called off.
+    heard() {
+        const d = this.def, s = this.scene, c = this.world.cry;
+        if (!this.world.hears(Phaser.Math.Clamp(c.x, d.x0, d.x1), d.y)) return;
+        this.scaredUntil = s.time.now + CRY.startleMs;
+        if (this.state === 'mark') {
+            s.tweens.killTweensOf(this.shadow);
+            this.shadow.setVisible(false);
+            sfx.at(this.diver.x, this.diver.y).flap();
+            this.state = 'up';
+            this.at = s.time.now + 900;
+        }
     }
 
     // A cone dropped on the deck: one comes down for it, stays a moment, and goes.
@@ -237,7 +252,7 @@ export class Queue {
         this.len = def.x1 - def.x0;
         const offsets = [0, 46, 92, 300, 346, 392];
         this.people = def.who.map((who, i) => {
-            const p = world.people.add({ id: `${def.id}_${i + 1}`, who, x: def.x0, y: def.y, route: 'inside', face: 1 });
+            const p = world.people.add({ id: `${def.id}_${i + 1}`, who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
             if (p) {
                 p.along = (this.len * 0.2 + offsets[i % offsets.length] + Math.floor(i / offsets.length) * 520) % this.len;
                 p.depth0 = p.sprite.depth;
@@ -245,6 +260,12 @@ export class Queue {
             return p;
         }).filter(Boolean);
         this.span = 392;
+    }
+
+    // Her cry: they turn aside against the tables, as for a tray, a while.
+    heard() {
+        const time = this.scene.time.now;
+        if (this.people.some(p => this.world.hears(p.x, this.def.y))) this.criedUntil = time + CRY.startleMs;
     }
 
     update(dt, time) {
@@ -260,7 +281,7 @@ export class Queue {
             const edge = Math.min(p.along, this.len - p.along);
             const hidden = edge < 26;
             // For crew with a tray: turned aside, against the tables.
-            const yields = tray && here(s, d) && Math.abs(her.y - d.y) < 60 && Math.abs(her.x - p.x) < 62;
+            const yields = (tray && here(s, d) && Math.abs(her.y - d.y) < 60 && Math.abs(her.x - p.x) < 62) || time < (this.criedUntil ?? 0);
             if (yields !== p.aside) {
                 p.aside = yields;
                 p.sprite.setDepth(p.depth0 - (yields ? 5 : 0));
@@ -326,14 +347,31 @@ export class Trays {
         const on = here(s, d) && Math.abs(p.y - d.y) < 2 && onFloor && p.x > d.x0 && p.x < d.x1;
         if (!on) {
             if (Math.abs(p.x - d.x) > 3 * M) this.armed = true;
+            // (Scattered in a lunge: set straight again once she is well away.)
+            if (this.scattered && Math.abs(p.x - d.x) > 8 * M) {
+                this.scattered = false;
+                this.items.forEach(img => img.setPosition(img.getData('x'), img.getData('y')).setAngle(0));
+            }
             return;
         }
         if (!this.armed) return;
         this.armed = false;
         sfx.crash();
         if (d.flag) this.world.progress.setFlag(d.flag);
-        this.items.forEach((img, i) => s.tweens.add({ targets: img, y: img.y - 5 - (i % 3) * 2, angle: (i % 2 ? 9 : -9), duration: 90, yoyo: true, repeat: 2 }));
         const door = this.world.movers.find(m => m.def?.id === d.door);
+        if (s.isLunging()) {
+            // Through them in a lunge: scattered with a clatter, and the door flies open after she
+            // has gone.
+            this.scattered = true;
+            const away = p.body.velocity.x < 0 ? -1 : 1;
+            this.items.forEach(img => {
+                if (img.getData('x') === undefined) img.setData({ x: img.x, y: img.y });
+                s.tweens.add({ targets: img, x: img.x + away * Phaser.Math.Between(8, 26), angle: Phaser.Math.Between(-40, 40), duration: 260, ease: 'Quad.easeOut' });
+            });
+            s.time.delayedCall(900, () => door?.knock(true));
+            return;
+        }
+        this.items.forEach((img, i) => s.tweens.add({ targets: img, y: img.y - 5 - (i % 3) * 2, angle: (i % 2 ? 9 : -9), duration: 90, yoyo: true, repeat: 2 }));
         // (If she is still there: gone at once, she only hears it.)
         s.time.delayedCall(380, () => { if (here(s, d) && Math.abs(s.player.x - d.x) < 3 * M) door?.knock(true); });
     }

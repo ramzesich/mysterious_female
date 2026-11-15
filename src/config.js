@@ -164,11 +164,25 @@ export const HOLDING = {
 // (src/lang.js). Empty, nothing is shown.
 export const WIN_MESSAGE = { en: '', uk: '' };
 
-export const DASH = {
-    durationMs: 10000,
-    speedMultiplier: 2,
+// D (B on the controller): every press costs one tangerine, whatever it does (docs/plan-three-uses.md
+// §1.1). The cry, "Кісюнічка!!!", startles the people and animals within `reach` px on her deck
+// for `startleMs`; each is deaf to the next for `deafMs`. `gapMs`: no second D sooner.
+export const CRY = {
+    reach: 4.5 * 48,
+    startleMs: 3000,
+    deafMs: 8000,
     bubbleMs: 1600,
+    gapMs: 600,
     shout: 'Кісюнічка!!!',
+};
+
+// With the cry, once she has learned it at the Seven Seas (near-catch 1), the lunge: `ms` at
+// `speed` times her run the way she faces; nothing frightens her by contact during it and for
+// `safeTailMs` after. (Under Bumbot's 300 px a second.)
+export const LUNGE = {
+    ms: 1000,
+    speed: 2,
+    safeTailMs: 300,
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus

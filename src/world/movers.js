@@ -84,12 +84,18 @@ export class Gull {
         this.awaySince = 0;
     }
 
+    // Her cry: up and away for a while.
+    heard() {
+        const d = this.def;
+        if (this.world.hears(d.x, d.y + 40, d.route ?? 'inside')) this.scaredUntil = this.scene.time.now + 4000;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
         const on = d.route === 'inside' || d.route === s.route;
         this.sprite.setVisible(on);
         if (!on) return;
-        const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90;
+        const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90 || time < (this.scaredUntil ?? 0);
         if (near) this.awaySince = time;
         const up = near || time - this.awaySince < 1400;
         if (up && this.rise === 0) sfx.at(d.x, d.y).flap();
@@ -170,6 +176,7 @@ export class SwingLight {
         if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
             if (this.world.carry) this.world.carryBox.spill(x);
+            else if (s.lungeSafe()) this.world.lunged('bonked', x);
             else {
                 sfx.bonk();
                 s.scareContact(x, 'bonked');
@@ -220,6 +227,7 @@ export class Spill {
             if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(p.y - d.y) < 3 && Math.abs(p.x - d.x) < d.half
                 && Math.abs(p.body.velocity.x) > 20) {
                 if (this.world.carry) this.world.carryBox.spill(d.x);
+                else if (s.lungeSafe()) this.world.lunged('slipped', d.x);
                 else {
                     sfx.slip();
                     s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'slipped');
@@ -313,7 +321,7 @@ export class Darter {
             const hit = here(s, d) && Math.abs(v.x - d.x) > 14 && Math.abs(p.x - v.x) < PLAYER.bodyWidth / 2 + 6
                 && p.y > v.y - 6 && p.y - PLAYER.bodyHeight < v.y;
             if (!hit) return;
-            if (s.isDashing()) {
+            if (s.isLunging()) {
                 // Sent spinning; it creeps home after a while.
                 s.tweens.killTweensOf(v);
                 this.state = 'spun';
@@ -394,7 +402,7 @@ export class TowelStack {
             // The tell: it sways, more the nearer she is.
             const close = on && Math.abs(dx) < 130;
             this.stack.setAngle(Math.sin(time / (close ? 150 : 520)) * (close ? 3.2 : 1));
-            if (on && Math.abs(dx) < 48 && (landed || s.isDashing())) {
+            if (on && Math.abs(dx) < 48 && (landed || s.isLunging())) {
                 this.state = 'falling';
                 this.dir = dx < 0 ? -1 : 1;
                 sfx.at(d.x, d.y).cloth();
@@ -418,7 +426,7 @@ export class TowelStack {
         this.stack.setVisible(false);
         this.heap.setVisible(true).setPosition(cx, d.y);
         sfx.at(cx, d.y).towelFall();
-        if (here(s, d) && Math.abs(p.x - cx) < 38 && p.y > d.y - 40) {
+        if (here(s, d) && Math.abs(p.x - cx) < 38 && p.y > d.y - 40 && !s.lungeSafe()) {
             // Under it: only her hair shows for a moment.
             this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
             s.tweens.add({ targets: this.heap, y: d.y, scaleY: 1, duration: 900, delay: 500, ease: 'Bounce.easeOut' });
@@ -505,7 +513,7 @@ export class SwingDoor {
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
         this.leaf = s.add.image(def.x + 14, def.y, 'shipart', 'door-cabin').setOrigin(0, 1).setDepth(D.props + 0.2).setTint(0xd9c4b8).setVisible(false);
         world.add([this.shut, this.dark, this.leaf]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y - 2, route: 'inside', face: -1, idle: 'idle', layer: 'back' });
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y - 2, route: 'inside', face: -1, idle: 'idle', layer: 'back', owned: true });
         if (this.who) this.who.gone = true;
         this.state = 'shut';
         this.armed = true;
@@ -587,14 +595,23 @@ export class DndDoor {
         this.card.fillStyle(0xffffff, 1).fillRect(def.x + 9, def.y - 39, 3, 2).fillRect(def.x + 9, def.y - 34, 3, 1).fillRect(def.x + 9, def.y - 32, 3, 1);
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
         world.add([this.shut, this.card, this.dark]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y - 2, route: 'inside', face: -1, layer: 'back' });
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y - 2, route: 'inside', face: -1, layer: 'back', owned: true });
         if (this.who) this.who.gone = true;
         this.busy = false;
         world.things.push({ ...def, items: [], reach: 16, interact: () => this.knock() });
     }
 
-    // (`heard`: a clatter outside brought them to the door: a fright only if she is by it.)
-    knock(heard) {
+    // Her cry within three metres of it brings them to the door, and that is a fright even in a
+    // lunge (it is no contact); with a tray, a spill.
+    heard() {
+        const d = this.def;
+        if (!this.world.hears(d.x, d.y, 'inside', 3 * M)) return;
+        this.scene.time.delayedCall(300, () => this.knock(true, true));
+    }
+
+    // (`heard`: a clatter outside, or her cry, brought them to the door: a fright only if she is by
+    // it; `cried`: her own cry did, and nothing forgives it.)
+    knock(heard, cried = false) {
         const s = this.scene, p = s.player, d = this.def;
         if (this.busy || (this.world.carry && !heard)) return false;
         this.busy = true;
@@ -613,7 +630,8 @@ export class DndDoor {
             this.world.people.play(this.who, 'shriek');
         }
         const by = !heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60);
-        if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled');
+        if (by && cried && this.world.carry) this.world.carryBox.spill(d.x);
+        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled', cried);
         s.time.delayedCall(1700, () => {
             this.shut.setVisible(true);
             this.card.setVisible(true);

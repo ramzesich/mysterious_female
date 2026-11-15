@@ -304,7 +304,7 @@ def crewcabin(width):
     intro: she stands by it as the game opens); by the door her spare uniform and the life
     jackets' shelf; a desk under Ukraine's flag with the trident (the user: in the wall mirror's
     place, over the desk's middle, its colours a little muted so it sits back on the wall),
-    tangerines in a bowl on it; her bed, for one, an orange blanket on it, a suitcase under it
+    a bowl on it (its three tangerines are the game's own, to take); her bed, for one, an orange blanket on it, a suitcase under it
     (the porthole that was between them is gone: the user); over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
@@ -380,11 +380,10 @@ def crewcabin(width):
     r(108, FLOOR - 40, 109, FLOOR - 31, DARK)                  # the lamp
     r(105, FLOOR - 44, 113, FLOOR - 40, YELLOW)
     r(106, FLOOR - 39, 112, FLOOR - 39, ORANGE)
-    # The bowl of tangerines (the user: they must read as tangerines to someone not told): the
-    # game's own tangerine, the one she picks up and the HUD counts, pixel for pixel, each with
-    # its leaf; two in the bowl and one on top of them.
-    for x, y in ((117, FLOOR - 41), (124, FLOOR - 41), (121, FLOOR - 46)):
-        game_tangerine(R, x, y)
+    # The bowl. Its three tangerines (two in it, one on top of them) are real ones now, hers to
+    # take (the user, 2026-11-15: `tan_3_bowl_*` in tools/population.py, each where it was painted:
+    # its 8 px cell's top left at (117, FLOOR - 41), (124, FLOOR - 41), (121, FLOOR - 46)); the
+    # picture keeps the bowl, empty once they are taken.
     r(117, FLOOR - 35, 132, FLOOR - 35, BLUE_LIGHT)            # the bowl's rim
     r(117, FLOOR - 34, 132, FLOOR - 33, BLUE)
     r(119, FLOOR - 32, 130, FLOOR - 31, BLUE)

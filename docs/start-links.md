@@ -2,7 +2,7 @@
 
 Every place the game can be started at on this computer, for testing. Run `python tools/serve.py`
 first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`), and makes
-the dash free (`tangerines=infinite`).
+D free: the cry and the lunge never use up a tangerine (`tangerines=infinite`).
 
 Useful additions to any link:
 

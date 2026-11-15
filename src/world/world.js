@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM } from '../config.js';
+import { PLAYER, SWIM, CRY } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -1232,6 +1232,19 @@ export class World {
                 g.fillStyle(0xf68181, 1).fillRect(2, 13, 12, 1).fillRect(4, 8, 8, 1).fillRect(6, 3, 4, 1);
                 g.fillStyle(0xe83b3b, 1).fillRect(7, 0, 2, 2);
             },
+            // The cry's answers: a heart (one who likes cats), a finger to the lips (a quiet place).
+            heart: () => {
+                g.fillStyle(ink, 1).fillCircle(5, 6, 4).fillCircle(11, 6, 4).fillTriangle(1, 7, 15, 7, 8, 15);
+                g.fillStyle(0xe83b3b, 1).fillCircle(5, 6, 3).fillCircle(11, 6, 3).fillTriangle(2, 7, 14, 7, 8, 13);
+                g.fillStyle(0xffffff, 1).fillRect(4, 4, 2, 1);
+            },
+            shh: () => {
+                g.fillStyle(ink, 1).fillRect(2, 9, 12, 3);
+                g.fillStyle(0xe83b3b, 1).fillRect(3, 10, 10, 1);
+                g.fillStyle(ink, 1).fillRect(6, 1, 5, 15);
+                g.fillStyle(0xf5d6b4, 1).fillRect(7, 2, 3, 13);
+                g.fillStyle(0xffffff, 1).fillRect(7, 2, 3, 2);
+            },
             horn: () => {
                 g.fillStyle(ink, 1).fillRect(5, 5, 9, 6).fillTriangle(6, 8, 0, 1, 0, 15);
                 g.fillStyle(0xf9c22b, 1).fillRect(6, 6, 7, 4).fillTriangle(6, 8, 1, 3, 1, 13);
@@ -1402,6 +1415,11 @@ export class World {
     touched(person) {
         const s = this.scene, t = person.touch;
         if (s.time.now < (this.touchCool ?? 0) || s.mode !== 'play') return;
+        // (In a lunge she is through them: src/world/people.js has what each does about it.)
+        if (!this.carry && s.lungeSafe()) {
+            this.lunged(t.fright || 'bumped', person.x);
+            return;
+        }
         if (this.carry) {
             this.touchCool = s.time.now + 1200;
             sfx.at(person.x, person.y).oh();
@@ -1410,6 +1428,67 @@ export class World {
             if (!s.holding) sfx.at(person.x, person.y).hey();
             s.scareContact(person.x, t.fright);
         }
+    }
+
+    // --- D: the cry and the lunge (docs/plan-three-uses.md §1.1, §2) ----------------------------
+
+    // "Кісюнічка!!!": everyone and everything within the cry's reach on her deck and route hears
+    // it (`heard()`), each in its own manner; machines do not.
+    shout(x, y, route) {
+        this.cry = { x, y, route, time: this.scene.time.now };
+        this.people.heard(this.cry);
+        for (const m of this.movers) m.heard?.(this.cry);
+        this.story.heard(this.cry);
+    }
+
+    // Whether a thing at (x, y) on `route` is within the last cry's reach: on her deck, near her.
+    hears(x, y, route = 'inside', reach = CRY.reach) {
+        const c = this.cry;
+        return !!c && c.route === route && Math.abs(x - c.x) < reach && Math.abs(y - c.y) < 70;
+    }
+
+    // In a lunge something would have frightened her by contact: she is through. What touched her
+    // gives way in its own manner (each mover's and person's `lunged()`); a few leave a mark on her.
+    // Once for each thing, however many frames she is in it.
+    lunged(kind, fromX) {
+        const s = this.scene, p = s.player, time = s.time.now;
+        const key = `${kind}@${Math.round(fromX / 24)}`;
+        this.lungedAt ??= {};
+        if (time < (this.lungedAt[key] ?? 0)) return;
+        this.lungedAt[key] = time + 1500;
+        for (const m of this.movers) if (m.lunged?.(kind, fromX)) return;
+        if (this.people.lunged(kind, fromX)) return;
+        const head = p.y - PLAYER.height + 6;
+        if (kind === 'drenched') this.drops(p.x, head, 0x8fd3ff, 1);
+        else if (kind === 'singed' || kind === 'fogged') this.drops(p.x, head, kind === 'singed' ? 0x625565 : 0xffffff, -1);
+    }
+
+    // A few drops off her (`dir` 1: falling, water), or a wisp off her hair (-1: rising, smoke).
+    drops(x, y, colour, dir) {
+        const s = this.scene;
+        for (let i = 0; i < 6; i++) {
+            const d = s.add.image(x + Phaser.Math.Between(-7, 7), y + Phaser.Math.Between(-3, 3), 'dot').setTint(colour).setDepth(s.DEPTH.fx);
+            this.add([d]);
+            s.tweens.add({ targets: d, y: d.y + dir * Phaser.Math.Between(12, 22), x: d.x + Phaser.Math.Between(-4, 4), alpha: 0,
+                duration: Phaser.Math.Between(380, 620), delay: i * 50, onComplete: () => d.destroy() });
+        }
+    }
+
+    // A pictogram over a spot for a moment (a "!" startled, a heart, a finger to the lips).
+    pop(x, y, icon, ms = 1500) {
+        const s = this.scene, D = s.DEPTH, w = 22, h = 20;
+        const g = s.add.graphics().setDepth(D.fx + 0.5).setPosition(x, y);
+        g.fillStyle(0x2e222f, 1).fillRoundedRect(-w / 2 - 1, -h - 1, w + 2, h + 2, 4);
+        g.fillStyle(0xffffff, 1).fillRoundedRect(-w / 2, -h, w, h, 3);
+        g.fillStyle(0x2e222f, 1).fillTriangle(-4, 1, 4, 1, 0, 6);
+        g.fillStyle(0xffffff, 1).fillTriangle(-3, 0, 3, 0, 0, 4);
+        const img = s.add.image(x, y - h / 2, this.icon(icon)).setDepth(D.fx + 0.51);
+        this.add([g, img]);
+        s.tweens.add({ targets: [g, img], y: '-=4', duration: 120, yoyo: true });
+        s.time.delayedCall(ms, () => {
+            s.tweens.add({ targets: [g, img], alpha: 0, duration: 200, onComplete: () => { g.destroy(); img.destroy(); } });
+        });
+        return [g, img];
     }
 
     // --- Each frame -----------------------------------------------------------------------------
@@ -1630,11 +1709,11 @@ export class World {
         for (const t of this.lows) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         for (const r of this.robots ?? []) r.addCollider(p);
-        // The dash goes through a breakable, and it is gone for good.
+        // The lunge goes through a breakable, and it is gone for good.
         for (const t of this.breakables) {
             s.physics.add.collider(p, t.zone, null, () => {
                 if (t.route !== s.route || t.done) return false;
-                if (!s.isDashing()) return true;
+                if (!s.isLunging()) return true;
                 t.done = true;
                 s.smash(t.x, t.y - (t.hang ?? 0) - 12);
                 if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
