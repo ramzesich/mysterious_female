@@ -228,21 +228,32 @@ she has** (jump, cry, roll, lob, lunge, carry) and with a second thing to find.
 
 ### 4.2 The keepsakes: things for Bumbot (answer 4: left to my judgement)
 
-> **Changed by the user (2026-11-15), after asking how the things for Bumbot affect progress
-> (as written below: not at all):** "I would reduce the number of collectibles for Bumbot and
-> introduce instead a few more books, and some other items for her and her husband."
-> **So the table below is no longer the list.** What is to be found becomes four kinds: fewer
-> things for Bumbot, a few more books (the titles are the user's; the Library's shelf, the
-> pages and the nook's "all ten" grow with them: `src/world/library.js`, `tools/draw_pages.py`),
-> things for her, things for her husband (he is at his table at the Great Outdoors). My
-> proposal, waiting for the user: 8 for Bumbot, 4 more books (14), 4 for her, 4 for him, in the
-> places and by the ways of the table below; hers and his named by the user. Still open: what
-> each kind pays (nothing but its scene; the ending growing; the catch gentler; her three uses
-> made stronger at thresholds).
+**Decided by the user (2026-11-15).** Asked how the things for Bumbot affect progress (as first
+written: not at all), they changed the collection: "I would reduce the number of collectibles
+for Bumbot and introduce instead a few more books, and some other items for her and her
+husband." So there are **four kinds of thing to find, twenty in all:**
 
-Proposed as the brainstorm recommended: small things a cat would want, the HUD counting them
-beside the books, **each one lying about cabin 8206 with him in the day-after scene.** The list
-is a proposal; each picture is shown first, and any of them can go.
+| Kind | How many | What | Where they end up |
+|---|---|---|---|
+| Things for Bumbot | 8 | Mine to choose from the table below (each picture shown first) | With him in cabin 8206, the day after |
+| Books | 4 more, 14 in all | **The titles come later**, with the photos and the other missing things, "when the game is fully tested and verified": until then the four have stand-in covers like the ten | The Library's shelf (fourteen gaps), the nook when all fourteen are home |
+| Things for her | 4 | **A bookmark with a cat on its top; a small flag of Ukraine on a stand, for a writing desk; a diary notepad; a small plant in a pot** (the user's list) | In cabin 8206: on her desk, by the bed |
+| Things for her husband | 4 | **His handheld gaming device (an Asus ROG Xbox Ally X); his ice cream spoon; his meditation and sleep mask; a pick for his electric guitar** (the user's list) | On his table at the Great Outdoors, each there once she has brought it |
+
+**What they pay** (the user: "as you suggested", less one thing): the books open the nook, as
+now; his things fill his table; hers and Bumbot's are in their scenes in the cabin. **Nothing
+makes her three uses stronger** ("Drop the stronger uses idea, I don't like it").
+
+**The HUD shows, for each kind, how many are found of how many there are** (the user): four
+counts, books 3/14 and so on.
+
+To settle when step 5 comes, before any picture is made: which eight of Bumbot's stay, which
+place each of the twenty takes (the places and the ways of getting them in the table below
+stand; what lies there changes), and where the four new books hide. The new books' pages are a
+picture only, no hint (the user's "no path hint"). The handheld is drawn as a plain white
+handheld, no maker's mark.
+
+The first list, kept for its places and its ways:
 
 | # | What | Where | How it is got | Audit |
 |---|---|---|---|---|
@@ -347,8 +358,8 @@ felt like a slog to go back through, name it and I will look at that one.
 **The rounds** (the audit's I8: a watchman's point at each corridor's end, counted on the HUD)
 are left out of the first build, as a thing to decide after the steps below have been played:
 with keepsakes, look-outs and doors at the ends, a box to press at each may be one thing too
-many. If wanted, what they would pay is the three uses made stronger (a bigger voice: the cry
-reaches further; a better arm: the roll goes further): progress that is hers.
+many. What they would pay is open: the first idea, her three uses made stronger, is dropped
+(the user, 2026-11-15: "I don't like it").
 
 ---
 
@@ -419,12 +430,22 @@ New classes in `src/world/movers.js`: `Roller` (the suitcase), `Fetcher` (the do
 "Looking closely"), `tools/check_overlaps.py` empty, `tools/check_corridors.py` (new) run.
 Playtests: `region1`, `boot`, `deck3`, `trunk`, `ladder`, and a new scenario `deck4`.
 
-### Step 5. The keepsakes (art: about 16 small things, a generation each, shown first)
+### Step 5. The four collections (art: about 16 small things, a generation each, shown first)
 
-`KEEPS` in `tools/population.py`; a kind `keep` in `world.js` (taken with E, or handed over by
-what §4.2 says); `save.keeps`; the HUD's count beside the books (`Progression.buildHud`); the
-day-after scene in cabin 8206 lays out those she found (`src/world/finale.js`). Playtests: a new
-scenario `keeps`, `finale`, and each region's scenario where one is placed.
+Eight things for Bumbot, four for her, four for her husband, four more books (§4.2).
+
+- `tools/population.py`: `KEEPS` (id: place, what, whose: `cat`, `her`, `him`, how it is got);
+  four more `book_*` in `ITEMS` or with their own situations, as the ten have.
+- `src/world/world.js`: a kind `keep` (taken with E, or handed over, knocked down, fetched, as
+  its row says); `save.keeps`.
+- `src/world/library.js`, `tools/draw_pages.py`: fourteen everywhere ten is written (the shelf's
+  gaps, `books_all`, the colours, the pages); the four new pages a picture only.
+- `src/progression.js` (`buildHud`): four counts, found of total, each with its small icon (a
+  book, a paw, hers, his).
+- `src/world/lido.js`: his things on his table, each `after` its flag. `src/world/finale.js`
+  and the cabin: hers and Bumbot's laid out in cabin 8206's scenes.
+- Playtests: a new scenario `keeps`; `region2` (the Library, the shelf), `region9` (the nook),
+  `region6` (his table), `finale`, and each region's scenario where one is placed.
 
 ### Step 6. The ends and the hallways (art: three loads, about 3)
 
@@ -496,3 +517,13 @@ roll) is the user's to judge on the soundboard.
 
 **Next: step 1** (D: the cry and the lunge; no art), on a branch of its own in a worktree of its
 own.
+
+**Later the same day, on the collection (§4.2):**
+
+| The question | The answer, in their words | What it did |
+|---|---|---|
+| How do the things for Bumbot affect progress? (Asked by the user; as planned, not at all) | "I would reduce the number of collectibles for Bumbot and introduce instead a few more books, and some other items for her and her husband" | Four kinds of thing to find |
+| 8 for Bumbot, 4 more books, 4 for her, 4 for him? | "Ok" | §4.2 |
+| The four titles | "I will provide all the titles later, when the game is fully tested and verified. Together with photos and other missing things" | Stand-in covers until then |
+| Their things | "Bumbusik: A bookmark (cat-shaped on top of the bookmark), a small Ukraine flag (meant to stand on a writing desk), a diary notepad, a small plant in a pot. Husband: his handheld gaming device (Asus ROG Xbox Ally X), his ice-cream spoon, his mediation/sleep mask, a pick for his electric guitar" | §4.2 |
+| What each kind pays | "Drop the stronger uses idea, I don't like it. Otherwise, as you suggested. Also, the HUD shows number of items found vs total per category" | The nook, his table, the cabin's scenes; four counts on the HUD; nothing strengthens her uses |
