@@ -2187,11 +2187,15 @@ Nothing blocks the start of the build. These get settled along the way:
       tangerine. Its suggestions and five questions wait for the user; nothing of it is built.
       **Then (the user, 2026-11-15): "I want to implement... the 'three uses' one", the one-second
       dash still costing a tangerine, the 53 tangerines unchanged, no path hints, the corridors
-      "fun, enriched and varied".** The plan for their review: `docs/plan-three-uses.md` (D: the
-      cry free, the lunge one tangerine; F: the throw, a roll or a lob; the pocket forgives a
-      hit; the tangerine a real thing that rolls and is taken; the ship answering the cry;
-      keepsakes for Bumbot; region 1's decks filled; look-outs, deliveries, each deck its own
-      look; seven steps; nine questions). Nothing of it is built until they answer.
+      "fun, enriched and varied".** The plan: `docs/plan-three-uses.md`, **reviewed and answered
+      by the user the same day (its §7):** every D costs one tangerine (the cry, "to startle
+      obstacles", and with it the one-second lunge, learned at the Seven Seas; the cry is hers
+      from the start); F: the throw, a roll or a lob; the pocket forgives every hit; the
+      tangerine a real thing that rolls and is taken; keepsakes for Bumbot (left to my
+      judgement); region 1's decks filled (the laundry stays locked); look-outs, deliveries,
+      each deck its own look; no new ladder, the rounds later; what to drop from the lists is
+      asked again with prices at steps 4 and 5. **Next: its step 1** (D: the cry and the lunge;
+      no art), on a branch of its own in a worktree of its own. Nothing of it is built yet.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

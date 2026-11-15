@@ -1,6 +1,9 @@
 # Plan: three uses for a tangerine, and decks worth walking (2026-11-15)
 
-**A proposal for the user's review. Nothing here is built.** It follows
+**Reviewed and answered by the user on 2026-11-15 (§7); the text below has their answers worked
+in. Nothing here is built yet: the build starts at step 1 (§5).**
+
+It began as a proposal. It follows
 `docs/brainstorm/dash-rework.md` (the "shout, throw, pocket" proposal) and
 `docs/audit-2026-11-15.md` (findings C1 to C10; the visual faults V1 to V7 are another session's,
 `docs/plan-visual-fixes.md`).
@@ -46,30 +49,31 @@ Read from the code for this plan (so the steps below name real places):
 A tangerine can do three things. Each has its own job, and **a tangerine used well can come
 back**: that is what lets 53 serve three uses.
 
-### 1.1 D: the cry, and the lunge (B on the controller)
+### 1.1 D: the cry with the lunge, one tangerine (B on the controller)
 
-- **Standing still, or with her hands full: the cry alone.** "Кісюнічка!!!" in her bubble, her
-  sound, and everything alive within 4.5 m on her deck hears it (§2). **Free**, one cry every
-  2.5 s (pressed sooner: nothing).
-- **On the move (a direction held), one tangerine: the cry with the lunge.** One second at twice
-  her speed (280 px a second, about six metres), the trail behind her. During it:
+- **Every D costs one tangerine** (the user, 2026-11-15: "Every D cost one"). With none on her:
+  nothing happens, and the HUD's count blinks once.
+- **The cry is to startle what is in her way** (the user: "The cry is to startle obstacles").
+  "Кісюнічка!!!" in her bubble, her sound, and the people and animals within 4.5 m on her deck
+  are startled for three seconds (§2, and §3.1 for where it reaches).
+- **With it, once she has learned it (§1.4), the lunge:** one second at twice her speed (280 px a
+  second, about six metres) the way she faces, the trail behind her. During it:
   - what the dash broke breaks (the five breakables), the vacuums spin, the towels topple;
   - **nothing can frighten her by contact**: the second is hers. A swinging door, a sprinkler,
     a basketball, the porter's cart: she is through. Each gives way in its own manner (§2);
   - **in the air it is a leap**: a jump taken in a lunge carries about 4.5 m against 2.3 m (the
     wet patch by the pool, the casino's chips, the trays on the floor are cleared in one);
   - falls and the sea are what they are. Solid things stay solid (carts, the queue, walls, ropes).
-- No tangerine and on the move: the cry alone, and the HUD's count blinks once.
-- Not while she crawls, climbs, swims, or holds Bumbot. With a tray: the cry only (as the
-  design's tray rules say: no dash).
+- **With a tray in her hands, and before the lunge is learned: the cry alone, still one
+  tangerine.** (My reading of "every D costs one": with a tray the cry is the one thing that
+  stops the porter and the waiter, so it is worth its fruit. To be confirmed when step 1 is
+  shown.)
+- Not while she crawls, climbs, swims, or holds Bumbot.
 
-**Why the cry alone is free (question 1):** it is the toy. If every "Кісюнічка!!!" costs fruit
-she will keep it for emergencies and the ship will never answer her (§3.1). The tangerine buys
-the legs.
-
-Numbers (all in `src/config.js`, to be tuned by play): `CRY = { reach: 4.5 m, breathMs: 2500,
-startleMs: 3000, deafMs: 8000 }`, `LUNGE = { ms: 1000, speed: 2, safeTailMs: 300 }`. The speed
-stays under Bumbot's 300, so "faster than she can ever run" stays true.
+Numbers (all in `src/config.js`, to be tuned by play): `CRY = { reach: 4.5 m, startleMs: 3000,
+deafMs: 8000 }`, `LUNGE = { ms: 1000, speed: 2, safeTailMs: 300 }`. The speed stays under
+Bumbot's 300, so "faster than she can ever run" stays true. No breath to wait for: the
+tangerine is the limit.
 
 ### 1.2 F: the throw (Y on the controller), one tangerine
 
@@ -96,13 +100,13 @@ stays under Bumbot's 300, so "faster than she can ever run" stays true.
   everything and no fright would ever be seen. A flag `&pocket=off` switches it off; the
   playtests that check frights start with no tangerines, as they do now.
 
-### 1.4 When she has each (question 2)
+### 1.4 When she has each (answered: as proposed)
 
-Proposed: **the throw and the pocket from the first tangerine** (deck 4's is at 31 m), **the cry
-from the start** (she is looking for a cat: calling him is what one does), **the lunge from the
-Seven Seas** (near-catch 1, where "she lunges with the scream", as the design says). That gives
-region 1, the thinnest part of the game, two of the three uses and the free one. Today's rule
-(§6.1.2: all of D learned at near-catch 1) is the alternative.
+**The throw and the pocket from the first tangerine** (deck 4's is at 31 m), **the cry from the
+start** (she is looking for a cat: calling him is what one does), **the lunge from the Seven
+Seas** (near-catch 1, where "she lunges with the scream", as the design says). Region 1, the
+thinnest part of the game, has all but the lunge. §6.1.2's "learned, not given" now speaks of
+the lunge.
 
 ---
 
@@ -119,20 +123,19 @@ librarian's shush. The rest is new.
 | The steward on his rounds (8) | Pulls his cart in at once, as at a knock | · (solid) | Stops and puts it on his cart, to be taken back with E. Not spent | · |
 | The buffet queue (11) | They turn aside against the tables, as for a tray | · (solid) | · | · |
 | The kid with the water pistol (11) | **Draws his fire**: he turns and squirts at once | Runs and hides (built) | Catches it, eats it, back turned 15 s. Spent | Forgiven |
-| The old lady on her sunbed (12) | Glares; her glasses slide down | · (solid) | · | · |
-| Anyone else (the ambient cast) | Turns to look; one small mark over them, by the person: `!`, `?`, `♥` for those who like cats, a finger to the lips in quiet places | · | Looks at it | · |
+| Anyone else (the ambient cast) | Turns to look; a `♥` over the few who like cats, a finger to the lips in quiet places | · | Looks at it | · |
 | The librarian | The shush (built), and the "QUIET PLEASE" sign rattles | The same | · | · |
 | "Do Not Disturb" doors (7) | **Within 3 m the door opens on someone not dressed for visitors: "Startled".** Hallways want her quiet | · | · | Forgiven |
 | Trays on the floor (10 places) | · | Scattered with a clatter; the door flies open after she has gone | Rolled into them from a distance: the clatter, the door opens on nobody, and the trays are safe to cross while the guest looks about | Forgiven |
-| Swinging doors (6) | The one inside looks out early: the door is spent for this pass | She is past before it swings | · | Forgiven |
+| Swinging doors (6) | · | She is past before it swings | · | Forgiven |
 | Sprinklers (5) | · | Through, with a few drops | · | Forgiven |
 | The casino's chips, the wet patch | · | She skates across upright; or leaps the lot | · | Forgiven |
 | Basketballs (12) | · | Headed back onto the court | A lob through a hoop scores (a cheer; it comes down again) | Forgiven |
-| Teppanyaki's flares, the sauna's steam | The chef misses his beat: the next flare comes late | Through, a wisp of smoke on her hair | · | Forgiven |
+| Teppanyaki's flares, the sauna's steam | The chef is startled: his next flare comes late | Through, a wisp of smoke on her hair | · | Forgiven |
 | The boat drill (walkway) | The winchman looks round: the boat holds one beat longer | Out from under it | · | Forgiven |
 | The stage's swinging light | · | Under it | · | Forgiven |
 | Robot vacuums (4, 9) | · (machines do not hear) | Sent spinning (built) | **Swallowed: it chokes, smokes and stands dead until she has left the deck.** Spent | Forgiven, and it usually eats what she dropped |
-| The delivery robot (6) | Beeps back | · | Lands on its tray and rides with it; hers to take back | · |
+| The delivery robot (6) | · | · | Lands on its tray and rides with it; hers to take back | · |
 | Shy gulls (promenade) | Up and away for 4 s | · | They come down to it and squabble: the rail is clear for 8 s. Spent | · |
 | Gulls that dive at food (pool, Great Outdoors) | Scatter; a dive in its tell is called off | · | One takes it and leaves her cone alone for 10 s. Spent | Her cone saved |
 | Gulls on the balcony rails | Off the rail for 6 s without swooping | Missed | Goes for it: that balcony is safe until she is past. Spent | Forgiven |
@@ -141,9 +144,8 @@ librarian's shush. The rest is new.
 | Breakables: luggage, crates | · | Smashed (built) | Bounces off | · |
 | The piñata | · | Smashed (built) | **A lob brings it down: three for one** | · |
 | Things on a shelf or a ledge (new, §4.2) | · | · | A lob knocks them down | · |
-| A pool; the sea | An echo over the water | · | Floats and bobs, to swim to; in the sea, gone | · |
+| A pool; the sea | · | · | Floats and bobs, to swim to; in the sea, gone | · |
 | The Spinnaker's piano | · | · | A note where it lands on the keys | · |
-| Empty halls (the Stardust, the atrium) | Her echo comes back | · | · | · |
 | **Bumbot at a near-catch** | Ears up, a look at her for half a second; the beat is what it was | · | **He bats it straight back to her**, sniffs his paw, pulls a face (cats and citrus). Not spent | · |
 | **Bumbot at the tip of the bow** | **He backs off**, as when she moves: the end asks her to be quiet and still | · (she holds no lunge there if she is still) | He backs off | · |
 
@@ -154,25 +156,25 @@ every one of them now has at least one answer besides, and none of the answers i
 
 ## 3. What makes it more than the brainstorm had
 
-### 3.1 The ship answers her
+### 3.1 Where the cry reaches (my judgement, as the user asked)
 
-The cry is free, so she will try it everywhere, and **somewhere new answers every time**. None
-of it says where anything is; it is the ship being alive. About twenty answers, each used once:
+The user: "The cry is to startle obstacles. Take your best judgment where crying in joy
+'Кісюнічка' should affect things." And each one costs a tangerine, so it is a tool to use on
+purpose, not a toy to try on every door. **The first draft's ten doors that answered and the
+venues' own answers are dropped**, and the BOSUN's, the PURSER's and the DJ's doors are left
+alone. What the cry does:
 
-- **Cabin doors that answer** (a sound from behind the door, a small mark, sometimes a head
-  round it), each at one fixed door, ten in all: the BOSUN's parrot repeats her, badly; the
-  PURSER's coins spill; a bass drop behind the DJ's door; a chain of three dogs barking one after
-  another down deck 5; a baby cries, then a lullaby starts; a snore stops, and starts again; an
-  opera singer answers a note higher; a newspaper is lowered and a "shh" comes over it; a child
-  looks out and a paper plane follows; the honeymooners' door ("JUST MARRIED") throws a slipper.
-  A few of these hand her something (§4.2). Those with a sound of their own are heard faintly
-  through the door as she walks by (a snore, a whistle, a bass thump): a sound, not a sign.
-- **Every venue's people have their own answer** (answers C8, the venues that are a walk past
-  people), set against the cast that is built there. For example: a dealer drops his cards;
-  Magnum's waiter pops a cork; the Spinnaker's pianist plays a sting; the gym's runner stumbles
-  on her treadmill and waves; the chapel's guests all turn; the kids' club claps.
-- **It costs her in places:** "Do Not Disturb" hallways, the Library, the kid, the tip of the
-  bow. So it is a choice, not a button to hold.
+- **People in her way** stop and step aside for three seconds (the porter, the waiter, the
+  jogger, the steward on his rounds, the queue): the obstacle is startled, and she is past.
+  Each is deaf to the next cry for eight seconds, so two tangerines never hold a corridor.
+- **Animals:** gulls go up, the dog on the lead howls back, and Bumbot's ears come up for half a
+  second (it is his name she is calling; the beat goes on as written).
+- **Those it wakes:** a "Do Not Disturb" door within 3 m, the kid with the pistol, the
+  librarian, Bumbot at the tip of the bow. There the cry is a mistake that also cost a fruit:
+  hallways and the ending want her quiet.
+- **Bystanders in reach only turn their heads**, and the few drawn as cat people get a `♥` over
+  them: a mark, no new art. So the joy in it is seen to land, and nothing is promised by it.
+- **Machines and things** (vacuums, doors, sprinklers, balls) do not hear.
 
 ### 3.2 The tangerine is a real thing
 
@@ -197,7 +199,7 @@ to a hit costs a flinch and a chase.**
 
 | Spent on | What it buys | Comes back? |
 |---|---|---|
-| A lunge | A second of speed and safety, a smash, a leap | No |
+| D | The cry: those in her way startled for three seconds. With it the lunge: a second of speed and safety, a smash, a leap | No |
 | A throw that is taken | A hazard out of play, a thing knocked down, a trade | No (the piñata pays three) |
 | A throw that is not | Nothing | Yes, by walking to it |
 | A hit | Her place and her tray | If she catches it before something else does |
@@ -217,7 +219,6 @@ she has** (jump, cry, roll, lob, lunge, carry) and with a second thing to find.
 | Piece | What it is | Answers |
 |---|---|---|
 | **Keepsakes** (§4.2) | The second collection: about fourteen small things, each got a different way | C3, C5, C6, C7, C8, C9 |
-| **Doors that answer** (§3.1) | Ten doors in the cabin corridors | C2, C9 |
 | **A deck's own resident** | One new moving thing each on decks 4 and 5, found nowhere else | C1 |
 | **Something to climb** | A parked cart, a linen cage and a shelf as three steps up: the jump gets a use in a corridor | C1 |
 | **Look-outs** | At an end with a window or a rail, standing still eases the camera out to the view (the intro's own camera work). Pleasure only, no count | C3 |
@@ -225,7 +226,7 @@ she has** (jump, cry, roll, lob, lunge, carry) and with a second thing to find.
 | **Each deck its own look** | The plan's own answer, never built: a coloured band on each deck's plaques, each deck its own framed pictures, a tint to the wallpaper | C2 |
 | **A check that stays** | `tools/check_corridors.py`: the longest walk with nothing to do, per deck, from the data. The audit's scratch script made permanent; a step is not done while a stretch over 30 m is empty | C9 |
 
-### 4.2 The keepsakes: things for Bumbot (question 4)
+### 4.2 The keepsakes: things for Bumbot (answer 4: left to my judgement)
 
 Proposed as the brainstorm recommended: small things a cat would want, the HUD counting them
 beside the books, **each one lying about cabin 8206 with him in the day-after scene.** The list
@@ -235,19 +236,19 @@ is a proposal; each picture is shown first, and any of them can go.
 |---|---|---|---|---|
 | 1 | A toy mouse | Deck 4, the service deck, on the shelf above the linen cage | Climb to it, or lob it down | C1 |
 | 2 | An old tennis ball | Deck 4, the dog on the lead (§4.3) | Three fetches, and its owner hands the dog's spare over | C1 |
-| 3 | A ball of wool | Deck 5, the forward end: a lady knitting in an open cabin | The cry: she jumps, the ball rolls out into the corridor | C1, C3 |
+| 3 | A ball of wool | Deck 5, the forward end: a lady knitting in an open cabin, her basket by the door | E at the basket: she nods | C1, C3 |
 | 4 | A paper boat | Deck 5, Shore excursions, the far end of its desk | E | C1, C9 |
 | 5 | A feather duster | Deck 6, the maid's cabin | E | C7 |
 | 6 | A collar bell | The promenade, in the beak of a gull on a lamp | A lob: it drops the bell for the fruit | C5 |
 | 7 | A knotted rope's end | The boat walkway, the last bollard beyond the drill | E | C5 |
 | 8 | A ping-pong ball | Deck 7, Entourage, past the ball pit | E | C3 |
 | 9 | A feather on a stick | Deck 7, the Stardust balcony's far end, by the look-out over the stage | E | C3 |
-| 10 | A paper plane | Deck 8 midships, the child's door | The cry | C4 |
-| 11 | A slipper | Deck 9, the honeymooners' door | The cry | C4 |
+| 10 | A paper plane | Deck 8 midships, stuck in a ceiling light | A lob brings it down | C4 |
+| 11 | A slipper | Deck 9, outside the honeymooners' door ("JUST MARRIED"), one of a pair | E | C4 |
 | 12 | A cardboard box | Deck 9, the cabin being cleaned | E | C7 |
 | 13 | A cushion | Deck 10, the far balcony | E, after the vaults | C6 |
 | 14 | A sardine tin | Deck 9 forward, the end of the officers' corridor | E | C3 |
-| 15 to 17 | A cork; a prize ball; a slice of tuna | Magnum's (the cry pops it); a hoop game at Champs, a new piece (a lob); the Sushi Bar (the chef takes a tangerine for it: his bubble shows one) | | C8 |
+| 15 to 17 | A cork; a prize ball; a slice of tuna | Magnum's (on the bar, by an opened bottle: E); a hoop game at Champs, a new piece (a lob); the Sushi Bar (the chef takes a tangerine for it: his bubble shows one) | | C8 |
 | 18 to 20 | One each from the three deliveries (§4.5) | Decks 8, 9, 10 | A thank-you from the door | C4 |
 
 The five breakables and the jackpot keep their tangerines and get nothing more: they pay already.
@@ -257,7 +258,7 @@ The five breakables and the jackpot keep their tangerines and get nothing more: 
 Today: from the ladder to the stern, 158 m with a vacuum and two carts. Proposed, bow to stern
 (every place is "about": each is set against what is built there, by the lesson of 2026-11-14):
 
-**Deck 4.**
+**Deck 4.** (The laundry stays behind its green card: the user's answer 5.)
 
 | m | What | Kind |
 |---|---|---|
@@ -265,21 +266,17 @@ Today: from the ladder to the stern, 158 m with a vacuum and two carts. Proposed
 | 38 to 46 | **A runaway suitcase**: on its wheels, rolling to and fro between two door frames with the ship's slow roll; a creak before it turns. Hop it. A lunge sends it to the corridor's end, where it stays | New hazard, deck 4's own |
 | 53 to 64 | The porter, with his three new answers (§2) | Built, enriched |
 | 86 | **A small dog on a long lead** across the corridor, its owner in the doorway. The lead is a line to hop. The cry: it howls back and winds the lead round the owner's legs (the line lies flat for 5 s). **A rolled tangerine: it fetches it and brings it back.** Three fetches: keepsake 2. It barks at the vacuum when it comes near | New resident. It teaches the throw for nothing |
-| 112 | **The laundry opens without a card in region 1** (question 5): its steam, its folder, a first room. Its tangerine is where it was | A lock moved, nothing else |
 | 118 to 150 | The vacuum, with its new answer (a rolled tangerine) | Built, enriched |
 | 140 to 146 | **The climb**: a service cart, a linen cage, a shelf under the ceiling with keepsake 1, the vacuum passing underneath | New |
-| 172 | A door that answers (the cook's radio turns up) | §3.1 |
-| 224 to 236 | The BOSUN's parrot, the PURSER's coins, the DJ's beat (question 6: the plates are the user's in-jokes) | §3.1 |
 | 250 | **A look-out**: a porthole at the corridor's end, the wake at the waterline | New |
 
 **Deck 5.**
 
 | m | What | Kind |
 |---|---|---|
-| 22 | The lady knitting in an open cabin (keepsake 3); the end of the corridor | New |
-| 34 to 46 | **The paper round** (optional: it needs a new figure): a steward skims folded newspapers along the carpet to each door; he licks a finger first. Hop them. The cry: he drops the bundle | New hazard, deck 5's own |
-| 56 to 70 | The chain of three barking doors | §3.1 |
-| 110 to 150 | Shore excursions: the agent's brochures go flying at the cry; the paper boat at the desk's far end (keepsake 4) | Enriched |
+| 22 | The lady knitting in an open cabin, her basket by the door (keepsake 3); the end of the corridor | New |
+| 34 to 46 | **The paper round** (optional: it needs a new figure): a steward skims folded newspapers along the carpet to each door; he licks a finger first. Hop them. The cry: he drops the bundle and stands aside | New hazard, deck 5's own |
+| 110 to 150 | Shore excursions: the paper boat at the desk's far end (keepsake 4) | Enriched |
 | 170 to 192 | The waiter, with his answers: **on the lunch errand the cry is what gets her tray past him** | Built, enriched |
 
 The lunch errand's walk back with the tray then has the cry to use on the porter and the waiter,
@@ -289,16 +286,16 @@ which is the first time it earns its keep.
 
 | End | What it gets |
 |---|---|
-| Deck 4 aft | The look-out at the waterline; the three doors that answer |
+| Deck 4 aft | The look-out at the waterline |
 | Deck 5 forward | The knitting lady |
-| Deck 7, the Stardust balcony | The look-out over the whole house; the feather; her echo |
+| Deck 7, the Stardust balcony | The look-out over the whole house; the feather |
 | Deck 7, Entourage | The ping-pong ball |
 | Deck 9 forward | The sardine tin; a look-out through the front windows over the bow |
-| Deck 9 aft, deck 10 aft | A door that answers each (the opera singer; the snorer) |
+| Deck 9 aft, deck 10 aft | Nothing in the first build (each ends at its terrace's wall); the first places for a keepsake if the list grows |
 | Deck 11, the Great Outdoors' stern half | The look-out over the wake from the rail |
 | The walkway beyond the boat drill | The rope's end |
 | The promenade | The gull with the bell |
-| Teppanyaki's flares | Nothing behind them: they stay a thing on the way. The cry gives them a tell to play with |
+| Teppanyaki's flares | Nothing behind them: they stay a thing on the way |
 | The Spinnaker's balcony | Nothing (the user: leave it) |
 
 ### 4.5 The optional hallways (C4): deliveries
@@ -338,7 +335,7 @@ felt like a slog to go back through, name it and I will look at that one.
 **The rounds** (the audit's I8: a watchman's point at each corridor's end, counted on the HUD)
 are left out of the first build, as a thing to decide after the steps below have been played:
 with keepsakes, look-outs and doors at the ends, a box to press at each may be one thing too
-many. If wanted, what they would pay is the three uses made stronger (a deeper breath: the cry
+many. If wanted, what they would pay is the three uses made stronger (a bigger voice: the cry
 reaches further; a better arm: the roll goes further): progress that is hers.
 
 ---
@@ -359,13 +356,13 @@ the map (`maps/ship.json`, `maps/world.json`): they wait until the visual fixes 
 | File | Change |
 |---|---|
 | `src/config.js` | `DASH` becomes `CRY` and `LUNGE` (§1.1) |
-| `src/scenes/ShipScene.js` | `tryDash` → `tryCry(time, input)`: the breath, then `world.shout()`; with a direction held, the lunge learned, a tangerine and free hands, the lunge as well. `isDashing` → `isLunging` (the five callers follow). The HUD's ten-second bar goes; the count blinks when a lunge is asked for with none. `scareContact`: `if (this.isLunging()) return` at its top, after telling the thing (`this.world.lunged(kind, fromX)`). The longer leap needs nothing: the air already takes the lunge's speed |
+| `src/scenes/ShipScene.js` | `tryDash` → `tryCry(time)`: one tangerine, then `world.shout()`; with the lunge learned and her hands free, the lunge as well (with a tray, or before it is learned, the cry alone). `isDashing` → `isLunging` (the five callers follow). The HUD's ten-second bar goes; the count blinks when D is pressed with none. `scareContact`: `if (this.isLunging()) return` at its top, after telling the thing (`this.world.lunged(kind, fromX)`). The longer leap needs nothing: the air already takes the lunge's speed |
 | `src/world/world.js` | `shout(x, y, route)`: everyone and everything within reach on her deck and route gets `heard(dx)`; `lunged()` passes the word to the thing that touched her. The breakables' collider asks `isLunging()` |
-| `src/world/people.js` | `heard(p, dx)`: a walker with `touch` stops, turns aside (the built `aside`) for `startleMs`, a `!` over him, deaf to the next cry for `deafMs`; anyone else turns to her with their mark (`hear` in the data: `!`, `?`, `♥`, `shh`). The porter's `lunged`: his cart rolls off and he after it |
+| `src/world/people.js` | `heard(p, dx)`: a walker with `touch` stops, turns aside (the built `aside`) for `startleMs`, a `!` over him, deaf to the next cry for `deafMs`; anyone else turns to her (`hear="♥"` or `"shh"` in the data for the few with a mark). The porter's `lunged`: his cart rolls off and he after it |
 | `src/world/movers.js`, `hazards.js`, `outside.js`, `topdeck.js`, `bow.js`, `lido.js`, `library.js`, `finale.js` | `heard()` on the gulls' four classes, `DndDoor`, `SwingDoor`, `Flare`, `DrillBoat`, `Queue`, `Rounds`, `OldLady`, the kid, the librarian, Bumbot's beats and the tip of the bow; `lunged()` where §2 says more than "through" |
-| `tools/population.py` | `hear=` on the people who get a mark of their own; `FLAG_GIVES` unchanged (the save's verb keeps the name `dash`; question 2 decides whether the cry asks for it) |
+| `tools/population.py` | `hear=` on the few people who get a mark; `FLAG_GIVES` unchanged: the save's verb `dash` now means the lunge, and the cry asks for nothing |
 | `src/sfx.js`, `src/rumble.js` | `dash` splits into `cry` and `lunge`; the rumble's "the dash starting" becomes the lunge |
-| `tools/playtest.py` | `dash` rewritten (the cry free and its breath; the lunge spends one, breaks the luggage, spins the vacuum, lasts a second; a fright refused during it; none after); `vacuum`, `gamepad`, `sound` and `lang` run; `region1` (near-catch 1), `region4` (the darting vacuum, the towels), `region6` (the kid, the crates), `region8` (the piñata) run for the parts that used the dash |
+| `tools/playtest.py` | `dash` rewritten (D spends one whatever it does; before the lunge is learned and with a tray, the cry alone; the porter steps aside and is deaf to a second cry; the lunge breaks the luggage, spins the vacuum, lasts a second; a fright refused during it; none after; D with none does nothing); `vacuum`, `gamepad`, `sound` and `lang` run; `region1` (near-catch 1), `region4` (the darting vacuum, the towels), `region6` (the kid, the crates), `region8` (the piñata) run for the parts that used the dash |
 | Docs | `GAME_DESIGN.md` §3.1, §3.2, §5.6, §6.1.2, §6.1.7, §6.3 rewritten; `docs/progress-decisions.md`; `CLAUDE.md`'s table |
 
 Shown: stills of the cry at the porter, the waiter and a gull; the lunge through the luggage and
@@ -400,16 +397,15 @@ Shown: her throw's frames for approval before anything else; then each target as
 
 The runaway suitcase (1 generation, or the atlas's suitcase on wheels drawn in code), the dog
 (a character with a walk, a sit and a run: about 20), the lady knitting (a seated figure: about
-10), the paper round's steward (about 13, optional), the climb (atlas pieces), the laundry's lock
-(question 5), the first six doors that answer (sounds and marks; heads from the people's sheet
-where one fits), the look-out at deck 4's stern (a porthole piece and the camera).
+10), the paper round's steward (about 13, optional), the climb (atlas pieces), the look-out at
+deck 4's stern (a porthole piece and the camera). The user skipped the question of what to drop
+("Skip this for now"): it is asked again here, with each piece's price, before any is made.
 
 New classes in `src/world/movers.js`: `Roller` (the suitcase), `Fetcher` (the dog), `Skimmer`
-(the papers), `Answer` (a door that answers), `Lookout`. Data in `tools/population.py`
-(`ROLLERS`, `DOGS`, `ANSWERS`, `LOOKOUTS`), built by `tools/build_world.py`. Each new thing looked
-at enlarged beside her (the nine questions of "Looking closely"), `tools/check_overlaps.py`
-empty, `tools/check_corridors.py` (new) run. Playtests: `region1`, `boot`, `deck3`, `trunk`,
-`ladder`, and a new scenario `deck4`.
+(the papers), `Lookout`. Data in `tools/population.py` (`ROLLERS`, `DOGS`, `LOOKOUTS`), built by
+`tools/build_world.py`. Each new thing looked at enlarged beside her (the nine questions of
+"Looking closely"), `tools/check_overlaps.py` empty, `tools/check_corridors.py` (new) run.
+Playtests: `region1`, `boot`, `deck3`, `trunk`, `ladder`, and a new scenario `deck4`.
 
 ### Step 5. The keepsakes (art: about 16 small things, a generation each, shown first)
 
@@ -418,12 +414,11 @@ what §4.2 says); `save.keeps`; the HUD's count beside the books (`Progression.b
 day-after scene in cabin 8206 lays out those she found (`src/world/finale.js`). Playtests: a new
 scenario `keeps`, `finale`, and each region's scenario where one is placed.
 
-### Step 6. The ends and the hallways (art: three loads, about 3; heads for doors as needed)
+### Step 6. The ends and the hallways (art: three loads, about 3)
 
-The other look-outs; the rest of the doors that answer; the venues' answers; the three
-deliveries (`LOADS` in `src/world/carry.js`, a source at each pantry end with `when` the fire
-door is opened, the door that takes it). Playtests: `region5`, `region7`, `region4`, `region9`,
-`sound`, and a new scenario `deliveries`.
+The other look-outs; the three deliveries (`LOADS` in `src/world/carry.js`, a source at each
+pantry end with `when` the fire door is opened, the door that takes it). Playtests: `region5`,
+`region7`, `region4`, `region9`, `sound`, and a new scenario `deliveries`.
 
 ### Step 7. Each deck its own look (art: one sheet of pictures, about 10, or drawn in code)
 
@@ -440,26 +435,28 @@ whole ship rendered and looked at; `boot`, `stairs`, `lift`, `tools/check_overla
 | Step 3 | about 5 |
 | Step 4 | about 31, or 44 with the paper round |
 | Step 5 | about 16 |
-| Step 6 | about 3 to 9 |
+| Step 6 | about 3 |
 | Step 7 | 0 to 10 |
-| **All** | **about 55 to 85 of the 540 left** |
+| **All** | **about 55 to 80 of the 540 left** |
 
 Each is an estimate; the real price is stated before each spend. Sounds are synthesised and
 cost nothing, and **I cannot hear them**: every new one (the cry, the lunge, the flinch, the
-roll, each door's answer) is the user's to judge on the soundboard.
+roll) is the user's to judge on the soundboard.
 
 ---
 
 ## 6. Risks
 
-- **She may run dry.** 53, three uses, and nothing grows back. Softened by the cry being free
-  and by tangerines that roll being hers to pick up again; and the game is finishable with none
-  (audit C10). If play shows her at zero for long, the lever is the lunge's and the pocket's
-  price, not more fruit (which the user has ruled out for now).
+- **She may run dry, more than in the first draft.** 53, three uses, every cry now one of them,
+  and nothing grows back. Softened only by tangerines that roll being hers to pick up again;
+  and the game is finishable with none (audit C10). If play shows her at zero for long, the
+  levers are how easily a dropped one is caught again and what the pocket costs, not more fruit
+  (which the user has ruled out for now). To be watched from step 2 on.
 - **The pocket may make frights rare.** That is its purpose, but it is the first thing to tune:
   how fast and how far the dropped one rolls decides how often it is lost.
-- **The cry may be held down.** Each listener is deaf for eight seconds after being startled,
-  and it costs her in four kinds of place.
+- **A cry bought and wasted.** A tangerine spent on a cry where nothing hears it is a dear
+  lesson with no word of warning: the plain fact that nobody turned is all she gets. If the
+  user finds that harsh in play, a cry that startles nobody could cost nothing.
 - **Motion.** I see stills. The lunge, the flinch, the roll and the camera at a look-out are all
   judged in motion: each is shown plain first, and the user's eye is the test.
 - **The story's tests.** Several scenarios use the dash (`dash`, `region1`, `region4`, `region6`,
@@ -471,21 +468,19 @@ roll, each door's answer) is the user's to judge on the soundboard.
 
 ---
 
-## 7. Questions for the user
+## 7. The user's answers (2026-11-15)
 
-1. **The cry alone: free** (D standing still, or with her hands full; a tangerine only for the
-   lunge, D on the move), which is what the plan assumes; **or every D costs one?**
-2. **The cry from the start of the game**, the lunge still learned at the Seven Seas (assumed);
-   or all of D from the Seven Seas, as today?
-3. **The pocket on every hit** (assumed), or only when it saves a tray?
-4. **The second collection: things for Bumbot** (assumed, §4.2), his loot returned, or more
-   books with your titles? And is that what you meant by "the quest items should become
-   rewards"?
-5. May **the laundry on deck 4 open without a card** in region 1 (its tangerine not moved, only
-   reachable sooner)?
-6. May **the BOSUN's, the PURSER's and the DJ's doors answer the cry** (a parrot, coins, a
-   beat)? The plates are your in-jokes.
-7. **The throw on F, and Y on the controller?**
-8. **No new ladder, and the rounds left for later** (§4.7): agreed?
-9. Anything in §4.2's list or §4.3's two decks to drop before pictures are made (the dog and the
-   paper round are the dear ones)?
+| # | The question | The answer, in their words | What it did to the plan |
+|---|---|---|---|
+| 1 | The cry alone free, or every D costs one? | "Every D cost one" | §1.1 rewritten: no free cry, no breath; D is the cry with the lunge. §3.1's toy is gone. With a tray, and before the lunge is learned, the cry alone still costs one: my reading, to confirm at step 1 |
+| 2 | The cry from the start, the lunge from the Seven Seas? | "As assumed" | §1.4 |
+| 3 | The pocket on every hit? | "As assumed" | §1.3 |
+| 4 | The second collection | "Take you best judgement here in order to make the game fun and varied" | Things for Bumbot (§4.2), each got a different way: found, climbed to, lobbed down, fetched, traded, delivered |
+| 5 | The laundry open in region 1? | "No" | It stays behind its green card; deck 4 has no room open on a first visit |
+| 6 | The BOSUN's, PURSER's and DJ's doors answering? | "The cry is to startle obstacles. Take your best judgment where crying in joy 'Кісюнічка' should affect things." | §3.1: the cry works on what is in her way and on animals, wakes four kinds of place, turns bystanders' heads; no door answers it, those three included |
+| 7 | F and Y for the throw? | "Yes" | §1.2 |
+| 8 | No new ladder, the rounds later? | "Ok" | §4.7 |
+| 9 | Anything to drop from the lists? | "Skip this for now" | The lists stand as proposals; asked again with prices at steps 4 and 5, before any picture is made |
+
+**Next: step 1** (D: the cry and the lunge; no art), on a branch of its own in a worktree of its
+own.
