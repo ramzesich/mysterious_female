@@ -66,6 +66,15 @@ everywhere.
   tuned while the real art is made, then the art is swapped in.
 - **Background decoration layer:** props behind the action are drawn in **muted, greyed-out colours**,
   so they never read as interactive (§5.8, the wet floor sign).
+- **Rooms she enters are washed out a little, and every door she can use stands out** (Decided, the
+  user, 2026-11-15, after cabin 8206): inside every enterable room (the cabins, the crew rooms, the
+  linen room, the chapel, the lifeboat, the nook) everything above the floor is faded 30% toward the
+  room's wall, as in 8206. **Every door she can use is drawn in its full colours, never washed or
+  muted**, so it stands out a little as something to use, the way her crew cabin's door does: the
+  doors back out of rooms, 8206's shower door, the balcony doors, the rooms' doors in the corridors,
+  the side-on doors in the walls across the decks. What else in a room she uses keeps its colours
+  too (her mirror, the linen room's vent and chute hatch, the nook's way out). The drawing tools
+  carry it (`Room.full` in `tools/draw_rooms.py`, `keep` in the others).
 - **Everything is placed where it makes sense.** Nothing floats in the air: a tangerine sits on a
   table, a counter, a tray or in a fruit bowl; a key hangs on a hook; a card lies on a desk. Same for
   every object on the ship.

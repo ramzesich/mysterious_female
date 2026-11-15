@@ -37,7 +37,7 @@ LIGHT = "#fbff86"
 
 # Where things are, from the room's left edge (ShipScene's CHAPEL must agree): the door back out.
 DOOR_X = 59
-WASH = 0.18              # how far the background fades toward the wall
+WASH = 0.3               # how far the background fades toward the wall (cabin 8206's, the user, 2026-11-15)
 
 
 def piece(name):
@@ -47,12 +47,15 @@ def piece(name):
     return atlas.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))
 
 
-def wash(im, y0, y1):
-    """Fades a band of the picture toward the wall colour."""
+def wash(im, y0, y1, keep=()):
+    """Fades a band of the picture toward the wall colour, but for the boxes in `keep` (its door
+    back out: the rule for every door she can use, the user, 2026-11-15)."""
     px = im.load()
     w = tuple(int(WALL[i:i + 2], 16) for i in (1, 3, 5))
     for y in range(y0, y1):
         for x in range(im.width):
+            if any(a <= x <= b and c0 <= y <= c1 for a, c0, b, c1 in keep):
+                continue
             c = px[x, y]
             px[x, y] = (*(round(v + (t - v) * WASH) for v, t in zip(c[:3], w)), c[3])
 
@@ -116,7 +119,7 @@ def interior():
     r(W - 11, FLOOR - 24, W - 10, FLOOR - 5, WOOD_DARK)
     r(W - 20, FLOOR - 38, W - 17, FLOOR - 27, WHITE)
     r(W - 19, FLOOR - 41, W - 18, FLOOR - 39, "#f79617")
-    wash(im, 0, FLOOR)
+    wash(im, 0, FLOOR, keep=((DOOR_X - 15, FLOOR - 81, DOOR_X + 15, FLOOR - 4),))
 
     # The altar: a round table on a fluted cream pedestal (the photo's), flowers on stands either side.
     d = ImageDraw.Draw(im)

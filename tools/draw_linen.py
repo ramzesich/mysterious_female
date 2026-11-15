@@ -45,15 +45,19 @@ HEAP = (150, 6)
 VENT = (208, 232)
 VENT_UP = (42, 64)
 CHUTE_X = 24
-WASH = 0.25              # how far the background fades toward the wall
+WASH = 0.3               # how far the background fades toward the wall (cabin 8206's, the user, 2026-11-15)
+# What she uses keeps its full colours: the door back out, the chute's hatch, the vent and its
+# hanging grille (x0, y0, x1, y1).
 
 
-def wash(im, y0, y1):
-    """Fades a band of the picture toward the wall colour."""
+def wash(im, y0, y1, keep=()):
+    """Fades a band of the picture toward the wall colour, but for the boxes in `keep`."""
     px = im.load()
     w = tuple(int(WALL[i:i + 2], 16) for i in (1, 3, 5))
     for y in range(y0, y1):
         for x in range(im.width):
+            if any(a <= x <= b and c0 <= y <= c1 for a, c0, b, c1 in keep):
+                continue
             c = px[x, y]
             px[x, y] = (*(round(v + (t - v) * WASH) for v, t in zip(c[:3], w)), c[3])
 
@@ -175,7 +179,9 @@ def interior():
 
     # All of that is background, washed out a little toward the wall, as in the cabin; the floor
     # she stands on and the heap Bumbot sleeps on keep their colours.
-    wash(im, 0, FLOOR)
+    wash(im, 0, FLOOR, keep=((DOOR_X - 15, FLOOR - 81, DOOR_X + 15, FLOOR - 1),
+                             (CHUTE_X - 16, FLOOR - 45, CHUTE_X + 16, FLOOR - 11),
+                             (VENT[0] - 6, FLOOR - VENT_UP[1] - 3, VENT[1] + 3, FLOOR - VENT_UP[0] + 26)))
     d = ImageDraw.Draw(im)
 
     # The heap of fresh towels on the floor, in front of the second rack: Bumbot sleeps on it.

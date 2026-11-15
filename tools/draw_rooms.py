@@ -58,9 +58,20 @@ def stand(im, frame, x, dy=0, flip=False):
     return piece.size
 
 
+# Every room she can enter is washed out a little toward its wall above the floor, as cabin 8206 is
+# (tools/draw_cabin.py's WASH; the user, 2026-11-15): its furniture is background, never to read as
+# something to use. What she does use keeps its full colours, every door above all, which stands out
+# a little as something to use: the doors, the balcony doors and their curtains, the nook's way out,
+# her mirror (`Room.full`).
+WASH = 0.3
+
+
 class Room:
     def __init__(self, width, wall, seam, ceiling=WHITE, skirting=GREY, floor=GREY, fleck=SLATE, pitch=48):
         self.w = width
+        self.wall = wall
+        self.washed = True          # washed as above
+        self.full = []              # boxes (x0, y0, x1, y1) kept in full colour
         self.im = Image.new("RGBA", (width, H), wall)
         self.d = ImageDraw.Draw(self.im)
         r = self.r
@@ -91,7 +102,8 @@ class Room:
         self.r(0, y, self.w - 1, y, PALE)
 
     def door(self, x=DOOR_X, frame="door-crew"):
-        stand(self.im, frame, x)
+        w, h = stand(self.im, frame, x)
+        self.full.append((x - w // 2 - 1, FLOOR - h - 1, x + w // 2 + 1, FLOOR - 1))
 
     def shelves(self, x0, x1, ys, post=SLATE, board=GREY):
         """An open shelf unit: two uprights, a board at each y (its top)."""
@@ -143,8 +155,22 @@ class Room:
                 for x in range(out.width):
                     if src[x, y][:3] in keep:
                         dst[x, y] = src[x, y]
+        if self.washed:
+            self.wash(out)
         out.save(OUT / f"{name}.png")
         return out
+
+    def wash(self, out):
+        """Fades everything above the floor toward the wall, after the palette (which would pull the
+        faded colours back), but for the boxes in `full`."""
+        px = out.load()
+        w = tuple(int(self.wall[i:i + 2], 16) for i in (1, 3, 5))
+        for y in range(FLOOR):
+            for x in range(out.width):
+                if any(x0 <= x <= x1 and y0 <= y <= y1 for x0, y0, x1, y1 in self.full):
+                    continue
+                c = px[x, y]
+                px[x, y] = (*(round(v + (k - v) * WASH) for v, k in zip(c[:3], w)), c[3])
 
 
 # --- Region 1's rooms (decks 4 and 5) --------------------------------------------------------------
@@ -234,6 +260,7 @@ def smcabin(width):
     """The stage manager's cabin, deck 4 (`room_sm_cabin`): a bunk, show posters, a desk with his
     headset's charger, a shelf (50 px up) where his pills stand."""
     R = Room(width, "#e6dcc8", "#d8cdb8", ceiling=CREAM, skirting=WOOD, floor="#4d65b4", fleck=NAVY, pitch=240)
+    R.washed = True
     r, box, d = R.r, R.box, R.d
     r(98, 5, 126, 8, CREAM_SHADE)
     r(102, 8, 122, 9, TUBE)
@@ -285,6 +312,8 @@ def crewcabin(width):
     GLASS, FLAG_BLUE, FLAG_YELLOW = "#b7dff2", "#4580bd", "#ead05c"
     R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
     R.keep = (WALL, STRIPE, SPRIG, GLASS, FLAG_BLUE, FLAG_YELLOW, BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
+    R.washed = True
+    R.full += [(3, FLOOR - 70, 24, FLOOR - 1)]           # her mirror (`mirror` in tools/population.py)
     r, box, d = R.r, R.box, R.d
     # The wallpaper: a pinstripe every 8 px, a sprig between them every 12 px down, row about.
     for x in range(4, width, 8):
@@ -331,6 +360,7 @@ def crewcabin(width):
     # The desk: over it Ukraine's flag with the trident, pinned flat to the wall; a lamp, a bowl
     # of tangerines, a mug; the chair pushed in.
     fx, fy = 107, 34
+    R.full.append((fx, fy, fx + 31, fy + 21))          # the flag, muted already (above)
     box(fx, fy, fx + 31, fy + 21, FLAG_BLUE, SLATE)
     r(fx + 1, fy + 11, fx + 30, fy + 20, FLAG_YELLOW)
     # (The small coat of arms in its middle: a blue shield edged in gold, the gold trident on it.)
@@ -530,6 +560,7 @@ def galley(width):
     r(307, 27, 310, 27, INK)
     # Its door is at its aft end (the deck's last metres are structure): the whole room is mirrored.
     R.im = R.im.transpose(Image.FLIP_LEFT_RIGHT)
+    R.full = [(width - 1 - x1, y0, width - 1 - x0, y1) for x0, y0, x1, y1 in R.full]
     return R.save("galley")
 
 
@@ -540,6 +571,7 @@ def maid6(width):
     the curtains open on the sea, a guest's suitcase on the rack. The stewardess stands at the bed's
     foot (150)."""
     R = Room(width, "#e6dcc8", "#d8cdb8", ceiling=CREAM, skirting=WOOD, floor="#0b8a8f", fleck=TEAL, pitch=240)
+    R.washed = True
     r, box, d = R.r, R.box, R.d
     r(100, 5, 128, 8, CREAM_SHADE)
     r(104, 8, 124, 9, TUBE)
@@ -699,6 +731,7 @@ def nook(width):
     for x in range(8, width, 24):
         r(x, FLOOR - 38, x, FLOOR - 6, "#5e3320")
     # The way out: the gap in the wall, the Library's light in it, the bookcase's back at its side.
+    R.full.append((41, FLOOR - 62, 79, FLOOR - 1))
     box(41, FLOOR - 62, 77, FLOOR - 1, "#2e222f")
     r(43, FLOOR - 60, 75, FLOOR - 1, "#46291f")
     r(47, FLOOR - 56, 71, FLOOR - 1, WOOD_LIGHT)
@@ -819,12 +852,14 @@ def cabin_room(width, lights):
     for x in lights:
         R.r(x - 3, 5, x + 3, 5, TUBE)
     R.keep = (CAB_WALL, CAB_SEAM, "#f6f3ec")
+    R.washed = True
     return R
 
 
 def cabin_door(R, x):
     """A cabin door's inside face: wood, a lever, the escape plan."""
     r, x0, top = R.r, x - 14, FLOOR - 80
+    R.full.append((x0, top, x0 + 28, FLOOR - 5))
     r(x0, top, x0 + 28, FLOOR - 5, CAB_WOOD_DARK)
     r(x0 + 2, top + 2, x0 + 26, FLOOR - 5, CAB_WOOD)
     r(x0 + 3, top + 3, x0 + 3, FLOOR - 6, CAB_WOOD_LIGHT)
@@ -957,6 +992,7 @@ def balcabin9(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 204, 34, 26, 20, (YELLOW, ORANGE, WHITE))
     # The balcony door: floor-to-ceiling glass in a white frame, sky, sea, the rail outside.
+    R.full.append((236, FLOOR - 91, R.w - 1, FLOOR - 1))       # the way out onto the balcony
     box(240, FLOOR - 86, 284, FLOOR - 1, WHITE, GREY)
     r(243, FLOOR - 83, 281, FLOOR - 2, BLUE_LIGHT)
     r(243, FLOOR - 40, 281, FLOOR - 2, BLUE)
@@ -981,6 +1017,7 @@ def balcony_door(R, ajar, curtain="#7f708a"):
     """The glass door onto the balcony (262), floor to ceiling in a white frame: sky, sea, the rail
     outside; the curtains drawn back. Ajar: its leaf slid aside, the forward curtain blowing in."""
     r, box, d = R.r, R.box, R.d
+    R.full.append((236, FLOOR - 91, R.w - 1, FLOOR - 1))       # the way out onto the balcony
     box(240, FLOOR - 86, 284, FLOOR - 1, WHITE, GREY)
     r(243, FLOOR - 83, 281, FLOOR - 2, BLUE_LIGHT)
     r(243, FLOOR - 40, 281, FLOOR - 2, BLUE)

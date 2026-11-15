@@ -79,6 +79,11 @@ truth**: read the relevant section before any design or content work, and record
   the word death, in code or on screen.
 - Nothing floats: every object rests on or hangs from something plausible.
 - Sprites face east; west is `flipX`. Background props are muted so they never read as interactive.
+- **Every door she can use is drawn in its full colours**, never washed or muted, so it stands out a
+  little as something to use (the user, 2026-11-15): in rooms, in corridors, side-on in the walls
+  across the decks. Inside every room she enters, the rest above the floor is washed 30% toward the
+  wall, as in cabin 8206 (`Room.full` in `tools/draw_rooms.py`, `keep` in `draw_cabin.py`,
+  `draw_linen.py`, `draw_chapel.py`): a new room or door follows it (GAME_DESIGN.md §2.1).
 
 ## Looking closely: the check on everything placed
 
