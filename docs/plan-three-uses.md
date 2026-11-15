@@ -228,6 +228,18 @@ she has** (jump, cry, roll, lob, lunge, carry) and with a second thing to find.
 
 ### 4.2 The keepsakes: things for Bumbot (answer 4: left to my judgement)
 
+> **Changed by the user (2026-11-15), after asking how the things for Bumbot affect progress
+> (as written below: not at all):** "I would reduce the number of collectibles for Bumbot and
+> introduce instead a few more books, and some other items for her and her husband."
+> **So the table below is no longer the list.** What is to be found becomes four kinds: fewer
+> things for Bumbot, a few more books (the titles are the user's; the Library's shelf, the
+> pages and the nook's "all ten" grow with them: `src/world/library.js`, `tools/draw_pages.py`),
+> things for her, things for her husband (he is at his table at the Great Outdoors). My
+> proposal, waiting for the user: 8 for Bumbot, 4 more books (14), 4 for her, 4 for him, in the
+> places and by the ways of the table below; hers and his named by the user. Still open: what
+> each kind pays (nothing but its scene; the ending growing; the catch gentler; her three uses
+> made stronger at thresholds).
+
 Proposed as the brainstorm recommended: small things a cat would want, the HUD counting them
 beside the books, **each one lying about cabin 8206 with him in the day-after scene.** The list
 is a proposal; each picture is shown first, and any of them can go.
