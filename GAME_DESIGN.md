@@ -184,6 +184,12 @@ No pause and no map, at least for now.
 
 ### 3.2 Special move — the "Кісюнічка!!!" dash
 
+**Open (the user, 2026-11-14: "I'm not sure if it makes sense"):** the dash, the tangerines and
+what effort is rewarded with are being rethought. The analysis, the proposal on the table (the
+cry as the power, a tangerine thrown, a tangerine that forgives a hit; a second collection as
+the reward) and the questions still to answer are in `docs/brainstorm/dash-rework.md`. Until it
+is decided, what follows stands and is what the game does.
+
 **Decided (the plan, 2026-11-10): the dash stays**, learned at her first sight of Bumbot and never
 required: breakables hide shortcuts and secrets, and it tames a few hazards (§6.1.2). About 30
 tangerines go back on the ship (§6.3).
@@ -2197,6 +2203,32 @@ Nothing blocks the start of the build. These get settled along the way:
       and its ending redone the same day on their word (no close-up: she steps out of her
       door); her cabin got a standing mirror and Ukraine's flag with it. **Waiting for the
       user:** their eyes on the new ending in motion.
+      **In progress with the user (2026-11-14): a brainstorm on the dash, the tangerines and
+      the rewards** (§3.2), stopped for the day with four questions asked:
+      `docs/brainstorm/dash-rework.md`, "Where we stopped". Nothing of it is built.
+      **Before it goes on (the user, 2026-11-15): an audit**, since the game must play well and
+      be finishable with no superpower first: `docs/audit-2026-11-15.md`. Five visual faults
+      (a note hidden behind its board, a sign behind a lift's door, a reader on a notice board,
+      and two places where she cannot be seen: the Spinnaker's balcony and the promenade's
+      enclosed ends); every popup on top; and the decks: region 1 the emptiest part of the game
+      (the user's own run of deck 4: "almost completely empty... a major design flaw"), every
+      cabin corridor alike, nine ends that hold nothing, optional hallways that pay one
+      tangerine. Its suggestions and five questions wait for the user; nothing of it is built.
+      **Then (the user, 2026-11-15): "I want to implement... the 'three uses' one", the one-second
+      dash still costing a tangerine, the 53 tangerines unchanged, no path hints, the corridors
+      "fun, enriched and varied".** **The plan: `docs/plan-three-uses.md`, settled with the user
+      the same day, every question closed (its §8 has their words); it opens with a "Start
+      here" for whichever session builds it.** In short: every D costs one tangerine (the cry,
+      "to startle obstacles", and with it the one-second lunge, learned at the Seven Seas; the
+      cry is hers from the start); F: the throw, a roll or a lob; the pocket forgives every
+      hit; the tangerine a real thing that rolls and is taken; 56 tangerines (the 53 unmoved,
+      and the three in her crew cabin's bowl made real); twenty things to find of four kinds
+      (8 for Bumbot, 4 more books, 4 of hers, 4 of her husband's after the table scene, hers and
+      his shown on cabin 8206's desk; each count on the HUD from its first find); region 1's
+      decks filled (a runaway suitcase, a dog on a lead, a climb, a knitting lady, a paper
+      round); five look-outs; three deliveries; each deck its own plaque band and pictures. No
+      new ladder, no rounds, nothing that strengthens her uses. **Next: its step 1** (D: the
+      cry and the lunge, and the cabin's bowl; no art). Nothing of it is built yet.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
