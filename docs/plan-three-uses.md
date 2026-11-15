@@ -19,7 +19,7 @@ implementation plan, and I will review it."
 
 | The user's word | What it means here |
 |---|---|
-| "For now, I want to leave their number and their location unchanged" | The 53 tangerines stay where they are. None added, none moved. Everything new on the decks is something else |
+| "For now, I want to leave their number and their location unchanged" | The 53 tangerines stay where they are. None moved; everything new on the decks is something else. **One addition, the user's own (later the same day): the bowl in her crew cabin, three more, 56 in all** (§1.5) |
 | "Spend a tangerine... for the one-second dash itself" | The lunge costs one tangerine |
 | "No path hint" | No trail, no far meow answering the cry (the brainstorm's question 4 is dropped), nothing that points to where something is |
 | Ends: "They can be both" | An end may pay in pleasure or in progress |
@@ -47,7 +47,7 @@ Read from the code for this plan (so the steps below name real places):
 ## 1. The three uses
 
 A tangerine can do three things. Each has its own job, and **a tangerine used well can come
-back**: that is what lets 53 serve three uses.
+back**: that is what lets 56 serve three uses.
 
 ### 1.1 D: the cry with the lunge, one tangerine (B on the controller)
 
@@ -102,11 +102,29 @@ tangerine is the limit.
 
 ### 1.4 When she has each (answered: as proposed)
 
-**The throw and the pocket from the first tangerine** (deck 4's is at 31 m), **the cry from the
+**The throw and the pocket from the first tangerine** (the bowl in her own cabin, §1.5; the
+next is deck 4's at 31 m), **the cry from the
 start** (she is looking for a cat: calling him is what one does), **the lunge from the Seven
 Seas** (near-catch 1, where "she lunges with the scream", as the design says). Region 1, the
 thinnest part of the game, has all but the lunge. §6.1.2's "learned, not given" now speaks of
 the lunge.
+
+### 1.5 The bowl in her crew cabin: three tangerines to take (the user, 2026-11-15)
+
+"In her initial crew cabin there's a bowl with three tangerines. Make the tangerines
+collectible (which increases the total number by 3)."
+
+- The bowl stands on her desk in the crew cabin on deck 3 (`tools/draw_rooms.py`, the
+  `crewcabin` room): two tangerines in it and one on top, painted into the room's picture, and
+  already drawn as the game's own tangerine pixel for pixel.
+- **They become three real ones** (`tan_3_bowl` in `tools/population.py`'s `TANGERINES`, in the
+  room `crewcabin`), each exactly where it is painted now; the picture keeps the bowl, empty
+  once they are taken. The data's "count" lays tangerines side by side: a pile of two and one
+  needs a place given for each.
+- **56 on the ship.** The intro leaves her in the corridor outside her door, so they are for
+  whoever goes back in: the game's first small find, and with them the cry, the throw and the
+  pocket are hers from the first minute (§1.4).
+- Built in step 1.
 
 ---
 
@@ -383,9 +401,10 @@ the map (`maps/ship.json`, `maps/world.json`): they wait until the visual fixes 
 | `src/world/world.js` | `shout(x, y, route)`: everyone and everything within reach on her deck and route gets `heard(dx)`; `lunged()` passes the word to the thing that touched her. The breakables' collider asks `isLunging()` |
 | `src/world/people.js` | `heard(p, dx)`: a walker with `touch` stops, turns aside (the built `aside`) for `startleMs`, a `!` over him, deaf to the next cry for `deafMs`; anyone else turns to her (`hear="♥"` or `"shh"` in the data for the few with a mark). The porter's `lunged`: his cart rolls off and he after it |
 | `src/world/movers.js`, `hazards.js`, `outside.js`, `topdeck.js`, `bow.js`, `lido.js`, `library.js`, `finale.js` | `heard()` on the gulls' four classes, `DndDoor`, `SwingDoor`, `Flare`, `DrillBoat`, `Queue`, `Rounds`, `OldLady`, the kid, the librarian, Bumbot's beats and the tip of the bow; `lunged()` where §2 says more than "through" |
-| `tools/population.py` | `hear=` on the few people who get a mark; `FLAG_GIVES` unchanged: the save's verb `dash` now means the lunge, and the cry asks for nothing |
+| `tools/population.py` | `hear=` on the few people who get a mark; `FLAG_GIVES` unchanged: the save's verb `dash` now means the lunge, and the cry asks for nothing. **`tan_3_bowl`: the crew cabin's three (§1.5)** |
+| `tools/draw_rooms.py`, `tools/build_ship_map.py` | The crew cabin's picture without the three tangerines (the bowl stays); the world's data rebuilt (`maps/world.json`); the cabin looked at enlarged, full and emptied, against the picture as it is now; `docs/population.md` §2.3 and `GAME_DESIGN.md` §6.3: 56 |
 | `src/sfx.js`, `src/rumble.js` | `dash` splits into `cry` and `lunge`; the rumble's "the dash starting" becomes the lunge |
-| `tools/playtest.py` | `dash` rewritten (D spends one whatever it does; before the lunge is learned and with a tray, the cry alone; the porter steps aside and is deaf to a second cry; the lunge breaks the luggage, spins the vacuum, lasts a second; a fright refused during it; none after; D with none does nothing); `vacuum`, `gamepad`, `sound` and `lang` run; `region1` (near-catch 1), `region4` (the darting vacuum, the towels), `region6` (the kid, the crates), `region8` (the piñata) run for the parts that used the dash |
+| `tools/playtest.py` | `dash` rewritten (D spends one whatever it does; before the lunge is learned and with a tray, the cry alone; the porter steps aside and is deaf to a second cry; the lunge breaks the luggage, spins the vacuum, lasts a second; a fright refused during it; none after; D with none does nothing); `vacuum`, `gamepad`, `sound` and `lang` run; `boot`, `deck3` and `intro` for the crew cabin's bowl (three taken, the count 3, the bowl empty); `region1` (near-catch 1), `region4` (the darting vacuum, the towels), `region6` (the kid, the crates), `region8` (the piñata) run for the parts that used the dash |
 | Docs | `GAME_DESIGN.md` §3.1, §3.2, §5.6, §6.1.2, §6.1.7, §6.3 rewritten; `docs/progress-decisions.md`; `CLAUDE.md`'s table |
 
 Shown: stills of the cry at the porter, the waiter and a gull; the lunge through the luggage and
@@ -480,7 +499,7 @@ roll) is the user's to judge on the soundboard.
 
 ## 6. Risks
 
-- **She may run dry, more than in the first draft.** 53, three uses, every cry now one of them,
+- **She may run dry, more than in the first draft.** 56, three uses, every cry now one of them,
   and nothing grows back. Softened only by tangerines that roll being hers to pick up again;
   and the game is finishable with none (audit C10). If play shows her at zero for long, the
   levers are how easily a dropped one is caught again and what the pocket costs, not more fruit
@@ -527,3 +546,4 @@ own.
 | The four titles | "I will provide all the titles later, when the game is fully tested and verified. Together with photos and other missing things" | Stand-in covers until then |
 | Their things | "Bumbusik: A bookmark (cat-shaped on top of the bookmark), a small Ukraine flag (meant to stand on a writing desk), a diary notepad, a small plant in a pot. Husband: his handheld gaming device (Asus ROG Xbox Ally X), his ice-cream spoon, his mediation/sleep mask, a pick for his electric guitar" | §4.2 |
 | What each kind pays | "Drop the stronger uses idea, I don't like it. Otherwise, as you suggested. Also, the HUD shows number of items found vs total per category" | The nook, his table, the cabin's scenes; four counts on the HUD; nothing strengthens her uses |
+| (The user's own addition) | "In her initial crew cabin there's a bowl with three tangerines. Make the tangerines collectible (which increases the total number by 3). Add it to the plan" | §1.5; 56 tangerines; built in step 1 |
