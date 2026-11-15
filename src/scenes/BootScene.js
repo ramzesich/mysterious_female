@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT } from '../config.js';
+import { PLAYER, BUMBOT, THROW } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -138,6 +138,8 @@ export class BootScene extends Phaser.Scene {
         // open parasol's handle.
         if (meta.anims.pull) this.anims.create({ key: 'her-pull', frames: frames('pull', [0, 1, 2, 3, 4]), frameRate: 10 });
         if (meta.anims.throw) this.anims.create({ key: 'her-throw', frames: frames('throw'), frameRate: 12 });
+        // F: her underarm toss (docs/plan-three-uses.md §1.2); THROW.releaseMs is its fifth frame.
+        if (meta.anims.toss) this.anims.create({ key: 'her-toss', frames: frames('toss'), frameRate: THROW.fps });
         if (meta.anims.glide) this.anims.create({ key: 'her-glide', frames: frames('glide'), frameRate: 2, repeat: -1 });
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });

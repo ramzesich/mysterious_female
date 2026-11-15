@@ -152,6 +152,7 @@ Reference photos never enter the repo.
 | Jump (hold for full height, tap for a hop) | Space | A |
 | Climb ladders | ↑ / ↓ | Left stick / D-pad up/down |
 | "Кісюнічка!!!": the cry, and the lunge with it once learned (§3.2); one tangerine each press | D (Shift until 2026-11-06) | B |
+| Throw a tangerine (§3.2): a roll; with ↑ held, a lob | F, ↑ + F | Y, ↑ + Y |
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
 | The welcome menu: choose, press | ↑ / ↓, Enter or Space | Left stick / D-pad, A or Menu |
 | Skip the intro | Esc | Menu or B |
@@ -189,8 +190,8 @@ it is her battle cry here.
 
 **Decided (the user, 2026-11-15; `docs/plan-three-uses.md` §1 and §2, which has what each
 person, animal and hazard does): a tangerine has three uses**, and the ten-second dash is gone.
-D (B on the controller) is the first, the pocket the second (step 2); the throw (F) comes with
-the plan's step 3. **Built (step 1, 2026-11-15):**
+D (B on the controller) is the first, the pocket the second (step 2), the throw (F, Y on the
+controller) the third (step 3). **Built (step 1, 2026-11-15):**
 
 - **Every D costs one tangerine, whatever it does.** With none on her nothing happens, and the
   HUD's count blinks once. (`?tangerines=infinite` never uses one up, for testing.)
@@ -233,6 +234,30 @@ the plan's step 3. **Built (step 1, 2026-11-15):**
   may take it first (`world.offered()`; the takers come with step 3).
 - `?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
   it off unless a scenario names it. Numbers: `POCKET` and `LOOSE` in `src/config.js`.
+
+**Built (step 3, 2026-11-15): the throw.**
+
+- **F throws one tangerine underarm the way she faces: a roll**, low, one bounce, about six
+  metres. **With ↑ held, a lob**, high and short: its top is about 2.3 m ahead, a hand under a
+  corridor's ceiling. On her feet only, hands free (not with a tray, crawling, gliding, in a lunge
+  or with Bumbot); with none on her the count blinks. She stands for half a second while she
+  throws (her `toss` clip, the tangerine in her fist until it leaves her hand).
+- **What it meets answers it** (`plan-three-uses.md` §2's fourth column, every one built today):
+  the porter stops for it and peels it by the wall (10 s clear), the waiter pockets it, the
+  jogger hops it; the steward on his rounds puts it on his cart, hers again with E; the kid
+  catches it and eats it, his back turned 15 s; anyone standing about turns to look. Deck 4's
+  and deck 9's vacuums swallow it and choke, dead until she has left the deck. Gulls go for it:
+  at the pool (her cone left alone 10 s), on a balcony's rail (that balcony safe until she is
+  past), on the promenade's rail (clear 8 s), round the funnel (no swoop 10 s), in the bow's
+  flocks. Rolled into the trays outside a "Do Not Disturb" door: the clatter, the door opens,
+  the guest looks about at nobody, and the trays are safe to cross meanwhile. A lob brings the
+  piñata down (three for one), scores through the court's hoop, plays a note on the
+  Spinnaker's keys. On the delivery robot's top it rides along. **Bumbot at a spot bats it
+  straight back to her**; at the tip of the bow he backs off. What nothing takes lies where it
+  stops, hers again by walking over it.
+- The things of later steps (the dog, the paper round, the runaway suitcase, the gull with the
+  bell, the shelf of the climb) answer it when they are built. Numbers: `THROW` in
+  `src/config.js`.
 
 **Superseded:** the dash of 2026-11-10 (ten seconds at twice her speed, a HUD countdown), and
 before it the open question of 2026-11-14 (`docs/brainstorm/dash-rework.md`).
@@ -2273,11 +2298,13 @@ Nothing blocks the start of the build. These get settled along the way:
       decks filled (a runaway suitcase, a dog on a lead, a climb, a knitting lady, a paper
       round); five look-outs; three deliveries; each deck its own plaque band and pictures. No
       new ladder, no rounds, nothing that strengthens her uses. **Building it on the branch
-      `three-uses` (2026-11-15). Step 1 done (D: the cry and the lunge, §3.2; the crew cabin's
-      bowl, §6.3). Step 2 built (the pocket, and the tangerine a real thing that rolls, §3.2,
-      §5.6), waiting for the user's review**; their record is in `docs/progress-decisions.md`,
-      "The plan for the three uses, step 1" and "..., step 2". **Next: step 3** (the throw; one
-      clip of hers, about 5 generations, asked first), once step 2 is approved.
+      `three-uses` (2026-11-15). Steps 1 and 2 done (D: the cry and the lunge, §3.2; the crew
+      cabin's bowl, §6.3; the pocket, and the tangerine a real thing that rolls, §3.2, §5.6).
+      Step 3 built (the throw, F: the roll and the lob, and what each thing does with it, §3.2),
+      waiting for the user's review**; their record is in `docs/progress-decisions.md`, "The
+      plan for the three uses, step 1", "..., step 2" and "..., step 3". **Next: step 4**
+      (region 1's decks and the first things to find; about 45 generations, asked item by item),
+      once step 3 is approved.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

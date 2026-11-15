@@ -39,6 +39,7 @@ URL flags, combinable (`?play&debug`):
 | Jump (hold for higher) | Space | A |
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | "Кісюнічка!!!": the cry, and the lunge once learned (one tangerine each) | D | B |
+| Throw a tangerine: a roll; with ↑, a lob | F, ↑ + F | Y, ↑ + Y |
 | Activate: open doors | E | X |
 | In the grip socks: at a balcony's partition, jump again in the air to vault it; with ↑ held, each jump at a partition's pole, a pillar or a column is a kick straight up | Space, ↑ + Space | A, ↑ + A |
 | Down through a balcony's floor to the one below | ↓ + Space | ↓ + A |

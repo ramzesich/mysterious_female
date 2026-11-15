@@ -227,6 +227,63 @@ export class People {
         sfx.at(p.x, p.y).oh();
     }
 
+    // A tangerine loose at someone's feet (docs/plan-three-uses.md §2). The porter stops to pick it
+    // up and peels it by the wall (10 s clear); the waiter stops and pockets it; both spent. The
+    // jogger hops it without a look. Anyone else standing about turns to look at it a moment.
+    // True if it was taken.
+    offered(t) {
+        const s = this.scene, time = s.time.now, loose = s.loose;
+        for (const p of this.list) {
+            if (!p.on || p.owned || p.hear === 'own' || p.state === 'acting' || p.busy || p.gone) continue;
+            if (p.walk && p.touch) {
+                // (Anywhere along what she would bump into: his cart's front too, so that he stops
+                // for it before his cart reaches her.)
+                if (!loose.near(t, p.x + p.dir * (p.touch.dx ?? 0), p.y, p.touch.w / 2 + 4, 14, p.route)) continue;
+                if (p.walk.clip === 'run') {
+                    if (time < (p.hopUntil ?? 0)) continue;
+                    p.hopUntil = time + 700;
+                    s.tweens.add({ targets: p.sprite, y: p.y - 10, duration: 170, yoyo: true, ease: 'Quad.easeOut' });
+                    continue;
+                }
+                this.takeFruit(p, t, p.touch.kind === 'spill' ? 'pocket' : 'peel');
+                return true;
+            }
+            // Standing about: a look at it, a while.
+            if (t.resting || p.walk || p.idle !== 'idle' || p.pose || p.still || time < (p.lookUntil ?? 0)) continue;
+            if (t.route !== p.route || Math.abs(t.img.x - p.x) > 2 * M || Math.abs(t.img.y - p.y) > 50) continue;
+            p.lookUntil = time + 4000;
+            const was = p.dir, to = t.img.x < p.x ? -1 : 1;
+            if (to === was) continue;
+            p.dir = to;
+            this.place(p);
+            s.time.delayedCall(1800, () => {
+                if (p.dir !== to || p.state === 'acting') return;
+                p.dir = was;
+                this.place(p);
+            });
+        }
+        return false;
+    }
+
+    // A walker takes it: `peel`, stood by the wall eating it 10 s; `pocket`, in his pocket and on.
+    takeFruit(p, t, how) {
+        const s = this.scene, time = s.time.now;
+        const img = s.loose.claim(t);
+        this.standAside(p);
+        p.pausedUntil = time + (how === 'peel' ? 10000 : 2000);
+        sfx.at(p.x, p.y).take();
+        // (Up into his hand, at his front.)
+        img.setDepth(p.sprite.depth + 0.01);
+        s.tweens.add({ targets: img, x: p.x + p.dir * 9, y: p.y - 27, duration: 260, ease: 'Sine.easeOut', onComplete: () => {
+            if (how === 'pocket') {
+                s.tweens.add({ targets: img, y: img.y + 6, alpha: 0, duration: 300, delay: 250, onComplete: () => img.destroy() });
+                return;
+            }
+            for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 2200, () => { if (img.active) { img.setScale(1, 1 - i * 0.28); sfx.at(p.x, p.y).munch(); } });
+            s.time.delayedCall(9000, () => img.destroy());
+        } });
+    }
+
     // In a lunge she went through someone (`touch`): the porter's cart knocked rolling, he after
     // it; the jogger spun round like a top. True if it was one of them.
     lunged(kind, fromX) {

@@ -35,7 +35,7 @@ OUT = Path(tempfile.gettempdir()) / "bumbusik-playtest"
 KEYS = {
     "left": (37, "ArrowLeft", "ArrowLeft"), "right": (39, "ArrowRight", "ArrowRight"),
     "up": (38, "ArrowUp", "ArrowUp"), "down": (40, "ArrowDown", "ArrowDown"),
-    "space": (32, "Space", " "), "d": (68, "KeyD", "d"),
+    "space": (32, "Space", " "), "d": (68, "KeyD", "d"), "f": (70, "KeyF", "f"),
     "e": (69, "KeyE", "e"), "enter": (13, "Enter", "Enter"), "o": (79, "KeyO", "o"),
     "m": (77, "KeyM", "m"), "escape": (27, "Escape", "Escape"),
 }
@@ -1213,6 +1213,104 @@ def scenario_pocket(b):
     time.sleep(0.6)
     s = b.state()
     ok &= check(s["mode"] == "scripted" and s["tangerines"] == 3, "a long fall is a fright, tangerines or not", s)
+    return ok
+
+
+def scenario_throw(b):
+    """The throw (docs/plan-three-uses.md §1.2, §2): F rolls a tangerine, ↑ and F lob it. A roll that
+    nothing takes lies where it stops and is hers again by walking over it; deck 4's vacuum swallows
+    one and chokes, dead until she has left the deck; a gull at the pool takes one; a lob brings the
+    piñata down (three for one); Bumbot at his spot bats one back, and his beat is what it was."""
+    S = "window.__ship"
+    b.open("?reset&play&cards=all")
+
+    def throw(x, y, face=1, lob=False):
+        b.teleport(x, y)
+        time.sleep(0.4)
+        b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud(); {S}.player.setFlipX({'true' if face < 0 else 'false'})")
+        if lob:
+            b.key("up", True)
+        b.tap("f")
+        if lob:
+            b.key("up", False)
+
+    def loose():
+        return b.eval(f"{S}.loose.all.map(t => ({{ x: Math.round(t.img.x), y: Math.round(t.img.y), resting: t.resting }}))")
+
+    # A roll nothing takes: one less, it lies on the floor some metres off, and is hers again.
+    throw(x_of(150), D4)
+    x0 = b.state()["x"]
+    b.wait_for(f"{S}.loose.all.length === 1 && {S}.loose.all[0].resting", timeout=6)
+    t = loose()[0]
+    b.shot("throw-roll")
+    ok = check(b.state()["tangerines"] == 2, "F throws one: one less", b.state())
+    ok &= check(5 * 48 < t["x"] - x0 < 7.5 * 48 and abs(t["y"] + 3 - D4) <= 2, "it rolls about six metres and lies on the floor", (x0, t))
+    ok &= check(b.eval(f"{S}.save.loose.length") == 1, "kept in the save where it lies")
+    hold_until(b, "right", lambda st: st["tangerines"] == 3, timeout=5)
+    ok &= check(b.state()["tangerines"] == 3 and not loose(), "walked over, it is hers again", b.state())
+
+    # A lob: high and short.
+    throw(x_of(150), D4, lob=True)
+    top = D4
+    for _ in range(30):
+        y = b.eval(f"(t => t ? t.img.y : null)({S}.loose.all[0])")
+        if y is not None:
+            top = min(top, y)
+        time.sleep(0.03)
+    ok &= check(80 < D4 - top < 125, "↑ and F lob it, high", D4 - top)
+    b.eval(f"{S}.loose.all.slice().forEach(t => {S}.loose.remove(t))")
+
+    # Deck 4's vacuum: it swallows it and chokes, dead, no fright; alive again once she has left.
+    b.eval(f"(v => {{ v.sprite.x = {x_of(150) + 150}; v.dir = 1; v.speed = 0; }})({S}.vacuums[0])")
+    throw(x_of(150), D4)
+    b.wait_for(f"!{S}.vacuums[0].alive", timeout=5)
+    b.shot("throw-vacuum")
+    ok &= check(not loose() and b.state()["tangerines"] == 2, "deck 4's vacuum swallows it", loose())
+    vx = b.eval(f"{S}.vacuums[0].sprite.x")
+    b.teleport(vx, D4)
+    time.sleep(0.5)
+    ok &= check(b.state()["mode"] == "play", "choked, it frightens nobody", b.state())
+    b.teleport(x_of(150), D5)
+    time.sleep(0.3)
+    ok &= check(b.eval(f"{S}.vacuums[0].alive"), "and it is going again once she has left the deck")
+    b.eval(f"{S}.vacuums[0].speed = 40")
+
+    # A gull at the pool: one comes down for it and goes off with it.
+    g = f"{S}.world.foodGulls.gull_pool"
+    # (From the deck past them, facing back: short of them is the pool.)
+    gx1 = b.eval(f"{g}.def.x1")
+    throw(gx1 + 150, D11, face=-1)
+    b.wait_for(f"{g}.fed || {g}.fruit", timeout=6)
+    ok &= check(b.eval(f"!!({g}.fruit || {g}.fed)"), "a gull at the pool comes down for it", b.eval(f"{g}.state"))
+    time.sleep(0.5)
+    b.shot("throw-gull")
+    b.wait_for(f"{g}.fed", timeout=5)
+    ok &= check(not loose() and b.state()["tangerines"] == 2, "and goes off with it", loose())
+
+    # The piñata, by a lob from under it (it hangs in a small room past a wall): down it comes, three
+    # for one.
+    pin = f"{S}.world.breakables.find(t => t.id === 'sec_pinata')"
+    px = b.eval(f"{pin}.x")
+    throw(px - 34, D12, lob=True)
+    b.wait_for(f"{pin}.done", timeout=5)
+    time.sleep(0.4)
+    b.shot("throw-pinata")
+    ok &= check(b.eval(f"{S}.save.broken.includes('sec_pinata')"), "a lob brings the piñata down")
+    ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_12_pinata')).length") == 3,
+                "and its three tangerines are there", b.eval(f"{S}.tangerines.map(t => t.id).filter(i => i.startsWith('tan_12'))"))
+
+    # Bumbot at his first spot: he bats it straight back to her, and his beat is what it was.
+    cat = f"{S}.cats.find(c => c.name === 'bb1')"
+    cx, cf = b.eval(f"[{cat}.sprite.x, {cat}.floor]")
+    throw(cx - 150, cf)
+    b.wait_for(f"{cat}.batting", timeout=5)
+    vx = b.eval(f"(t => t ? t.img.body.velocity.x : 0)({S}.loose.all[0])")
+    b.shot("throw-bumbot")
+    ok &= check(vx < -50, "Bumbot bats it straight back to her", vx)
+    ok &= check(not b.eval(f"{cat}.gone"), "and stays at his spot")
+    b.wait_for(f"{S}.loose.all.length === 0 || {S}.loose.all[0].resting", timeout=5)
+    hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=6)
+    ok &= check(b.eval(f"{cat}.gone"), "walking up to him, the near-catch goes as it always did")
     return ok
 
 

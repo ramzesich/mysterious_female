@@ -124,6 +124,10 @@ HER = {
         "pull": [(f"pull/{i}.png", "feet") for i in range(8)],
         "throw": [(f"throw/{i}.png", "feet") for i in range(8)],
         "glide": [(f"pull/{i}.png", "feet") for i in (0, 1)],
+        # The throw (docs/plan-three-uses.md §1.2; skeleton-v3, custom poses, 2026-11-15): an
+        # underarm toss, the arm back low, a step, the swing forward past the hip, the follow-through;
+        # the tangerine put in her fist by tools/hold_tangerine.py.
+        "toss": [(f"toss-held/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

@@ -419,6 +419,22 @@ export const bow = {
         });
     },
 
+    // A tangerine coming down on the Spinnaker's keys: a note where it lands (docs/plan-three-uses.md
+    // §2). It rolls on. (Her hands are on the keys a little ahead of where she stands to play.)
+    pianoOffered(t) {
+        const B = this.B?.piano, s = this.scene;
+        if (!B || t.route !== 'inside' || t.img.body.velocity.y <= 0 || s.time.now < (t.noteAt ?? 0)) return false;
+        const x = t.img.x, y = t.img.y;
+        if (x < B.x + 6 || x > B.x + 40 || y < B.y - 34 || y > B.y - 18) return false;
+        t.noteAt = s.time.now + 400;
+        sfx.at(x, y).piano(Phaser.Math.Between(0, 15));
+        const n = s.add.text(x, y - 12, '♪', { fontFamily: 'Verdana, sans-serif', fontSize: '10px', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
+            .setOrigin(0.5).setDepth(s.DEPTH.fx);
+        this.world.add([n]);
+        s.tweens.add({ targets: n, y: n.y - 22, alpha: 0, duration: 900, onComplete: () => n.destroy() });
+        return false;
+    },
+
     // E at the Spinnaker's grand piano (population: `sec_piano`): a few notes.
     piano() {
         const s = this.scene, w = this.world, her = s.player, B = this.B.piano;

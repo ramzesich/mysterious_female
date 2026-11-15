@@ -126,8 +126,32 @@ export class PerchGull {
         this.awayUntil = s.time.now + 6000;
     }
 
+    // A tangerine on its balcony: it goes for it, and off with it; that balcony is safe until she
+    // is past (docs/plan-three-uses.md §2).
+    offered(t) {
+        const d = this.def, s = this.scene;
+        if ((this.state !== 'perched' && this.state !== 'mark') || t.route !== this.route
+            || Math.abs(t.img.y + 3 - d.floor) > 14 || Math.abs(t.img.x - d.x) > 2.6 * M) return false;
+        s.tweens.killTweensOf(this.shadow);
+        this.shadow.setVisible(false);
+        this.state = 'taking';
+        this.world.gullTakes(this.sprite, t, () => { this.state = 'gone'; });
+        return true;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
+        if (this.state === 'taking') return;
+        if (this.state === 'gone') {
+            // (Back once she is well past it, or gone from here.)
+            if (s.route !== this.route || Math.abs(p.x - d.x) > 4 * M || Math.abs(p.y - d.floor) > 100) {
+                this.state = 'back';
+                this.x = d.x + 80;
+                this.y = d.y - 120;
+                this.sprite.setVisible(true);
+            }
+            return;
+        }
         if (!nearby(s, d)) return;
         const frames = s.textures.get('things');
         const flap = Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up';
@@ -394,6 +418,27 @@ export class Rounds {
         this.d = { x: (def.x0 + def.x1) / 2, y: def.y };
     }
 
+    // A tangerine at his cart's wheels: he stops, puts it on his cart, and goes on; hers to take
+    // back with E. Not spent (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (!this.p || this.aside || this.fruit || !s.loose.near(t, this.x + this.dir * 26, d.y, 22, 14)) return false;
+        const img = this.fruit = s.loose.claim(t).setDepth(this.swan.depth + 0.001);
+        this.until = s.time.now + 900;
+        sfx.at(this.x, d.y).take();
+        const cart = this.cart;
+        const entry = { id: `${d.id}_fruit`, get x() { return cart.x; }, y: d.y, route: 'inside', items: [], reach: 24, interact: () => {
+            entry.done = true;
+            this.fruit = null;
+            img.destroy();
+            s.save.tangerines += 1;
+            sfx.tangerine();
+            s.refreshHud();
+        } };
+        this.world.things.push(entry);
+        return true;
+    }
+
     // Her cry: he pulls his cart in against the wall at once, as at a knock, a while.
     heard() {
         const time = this.scene.time.now;
@@ -457,6 +502,8 @@ export class Rounds {
         }
         this.swan.setPosition(this.cart.x, this.cart.y - 28 * this.cart.scaleY).setDepth(this.cart.depth + 0.001).setScale(this.cart.scaleX)
             .setFlipX(this.dir < 0);
+        // (Her tangerine on the cart's top, beside the swan.)
+        this.fruit?.setPosition(this.cart.x - this.dir * 8, this.cart.y - 31 * this.cart.scaleY).setDepth(this.swan.depth + 0.001);
         P.place(p);
         if (this.aside || s.route !== 'inside' || (s.mode !== 'play' && s.mode !== 'push') || Math.abs(her.y - d.y) > 100) return;
         // Across the hallway: his back to the cart's nose.

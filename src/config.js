@@ -217,6 +217,22 @@ export const LOOSE = {
     knock: { vx: 220, vy: 200 },
     pickDelayMs: 600,
     thudAt: 60,
+    landKeep: 0.45,     // of its speed along the floor kept when it comes down hard (a lob stops near where it lands)
+    hardAt: 260,        // px/s down that is a hard landing
+};
+
+// F (Y on the controller): the throw (docs/plan-three-uses.md §1.2), one tangerine, underarm from
+// her hand (`hand` px ahead of her middle, `handY` over her feet). The roll: low, it bounces once
+// and rolls about six metres. With ↑, the lob: high and short, its top about 2.3 m ahead and just
+// under a corridor's ceiling. She stands for `ms` while she throws; it leaves her hand at `releaseMs`.
+export const THROW = {
+    roll: { vx: 240, vy: 60 },
+    lob: { vx: 250, vy: 355 },
+    hand: 18,
+    handY: 32,
+    ms: 440,
+    releaseMs: 250,
+    fps: 16,
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus

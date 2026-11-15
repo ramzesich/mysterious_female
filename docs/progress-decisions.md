@@ -1712,3 +1712,76 @@ user: "continue the plan"). No art.
 - **Playtests run, sound off:** `pocket`, `dash`, `vacuum`, `falls`, `overboard`, `region1`,
   `sound`, `boot`: all pass. `tools/check_sound.py`: all within bounds. The rest of the suite was
   not run.
+
+## The plan for the three uses, step 3: the throw (2026-11-15)
+
+- **Her clip** (`toss`, 3 generations, approved by the user's price word: the plan said about 5,
+  I quoted 3.1): `animate_character` in skeleton-v3 mode with eight poses written by hand (arm
+  back low, a step, the swing past the hip, the let-go at chest height, the follow-through), east
+  only, on her stored character, so no pose estimate was needed. Her existing `throw` (the
+  two-handed overhead shot at the court) would not do for a roll. The tangerine is put in her
+  fist in frames 0 to 3 by `tools/hold_tangerine.py` (the game's own fruit, her fingers' skin put
+  back over it), into `toss-held/`; the raw frames are kept as they came. One frame has her fist
+  a little smeared as it swings past her hip: it reads as a hand at the game's size, left.
+- **The throw** (`tryThrow`, `releaseThrow` in the ship scene; `THROW` in the config): on her
+  feet only, hands free (not with a tray, crawling, gliding, in a lunge, holding Bumbot; the
+  ladders, stairs and pool are modes of their own). She stands for 440 ms; it leaves her hand at
+  250 ms (the clip's fifth frame, at 16 a second), 18 px ahead of her middle, 32 over her feet,
+  and is spent only then: a fright or the pocket's flinch before it drops the throw and keeps the
+  tangerine. The roll: 240 px/s, 60 up: 6.1 m measured. The lob: 250 px/s, 355 up: its top 99 px
+  over the floor 2.5 m ahead (the plan's 2.3). With none, the count blinks, as for D.
+- **A hard landing keeps 45% of its speed along the floor** (`LOOSE.landKeep`, from 260 px/s
+  down): a lob rolled on 9 m after landing without it. It applies to a knocked-out tangerine too.
+- **Lying tangerines are offered too**, each frame (step 2 offered only moving ones): a vacuum
+  passing one, a gull coming down to one. `loose.near(t, x, y, dx, dy, route)` is every taker's
+  test; `loose.claim(t)` hands over one a taker carries off itself.
+- **The takers, as built** (the plan's §2, fourth column, for everything there is today):
+  - Porter: he stops for it anywhere along his touch box, his cart's front included (at first
+    only his feet counted, and his cart reached her first: a fright), picks it up, stands by the
+    wall 10 s and eats it. Waiter: stops 2 s and pockets it. Both spent. Jogger: a little hop
+    over it, which rolls on.
+  - Anyone else standing about (the ones who turn at her cry) turns to look at a moving one
+    for 1.8 s.
+  - The steward on his rounds: on his cart's top beside the swan, hers again with E (a thing
+    whose x is the cart's). Not spent; **but it is not in the save while it is on the cart**:
+    lost if the game is closed then. My simplification.
+  - The kid: catches one that reaches his hands (he faces where it came from), eats it in two
+    bites, his back turned 15 s (`KID.fruit`). One that lands short of him at the pool is the
+    gulls'.
+  - Deck 4's vacuum (the scene's `offeredHere`) and deck 9's darting one: swallowed, a choke
+    (`vacChoke`, a new sound, the user's to judge), tinted dead and tilted, a wisp of smoke now
+    and then, harmless, until she has left the deck.
+  - Gulls (`world.gullTakes`: down to it, four pecks, off with it in its beak): the pool's and the
+    Great Outdoors' (their own `pounce`; no dive at her cone for 10 s after), a balcony's (gone
+    until she is 4 m away), the promenade's shy ones (8 s), the funnel's (no swoop 10 s), the
+    bow's flocks (one goes, and flies back to its place).
+  - The trays outside a "Do Not Disturb" door: the clatter, the door opens, the guest looks this
+    way and that (a third way of `knock`, `look`: no shriek, no fright wherever she is), and the
+    trays stay quiet until she is 3 m off them again. The tangerine lies there, hers again.
+  - The piñata: a lob that meets it brings it down by the lunge's own code, taken out into
+    `world.breakThing()`. It hangs in a small room past a wall, so the lob that does it is the
+    one thrown from under it, rising through it.
+  - The court's hoop: a lob coming down through the rim, a swish, a cheer, a sparkle; it falls
+    on through.
+  - The Spinnaker's piano: one coming down over its keys (a box guessed from where she stands to
+    play, not from the art) plays a random note of its tune and a ♪.
+  - The delivery robot: one that comes down on its top stays there (a bounce would take it off
+    so small a top) and rides along, its place in the save kept up.
+  - Bumbot at a spot: a thrown one that reaches him is batted straight back to her (his `bat`
+    clip, then a wash: "sniffs his paw"); his spot and his near-catch are what they were. At the
+    tip of the bow: he backs off (`spook`), and it rolls on.
+- **Not tried in the game:** the funnel's gulls and Bumbot at the tip (both need the story far
+  along); written by their own code's patterns.
+- **The `gamepad` scenario taps Y** to take the controller up again before a fright: Y is the
+  throw now; harmless there (the fright drops it).
+- **A new playtest scenario `throw`**: the roll (one less, about six metres, in the save, hers
+  again walked over), the lob's height, deck 4's vacuum choking and harmless and going again off
+  the deck, a pool gull taking one, the piñata by a lob and its three tangerines, Bumbot batting
+  one back and his near-catch after.
+- **Looked at closely** (the targets at their moment, enlarged): the porter's fruit in his hand,
+  on the steward's cart by the swan, the choked vacuum, the kid eating it and his back turned.
+  The pool's gull came down exactly on the fruit and hid it; it lands short of it now, facing it.
+- **Playtests run, sound off:** `throw`, `pocket`, `vacuum`, `gamepad`, `region2`, `region6`,
+  `region7`, `region8`: all pass (`throw` again after the gull's fix); `tools/check_sound.py`: all
+  within bounds. The rest of the suite was
+  not run.

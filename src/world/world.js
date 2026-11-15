@@ -1469,8 +1469,48 @@ export class World {
     // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:
     // whoever takes it has it (`offered(t)` true; it calls `this.scene.loose.remove(t)` or keeps it).
     offered(t) {
+        if (this.scene.offeredHere?.(t) || this.lobbedInto(t)) return true;
         for (const m of this.movers) if (m.offered?.(t)) return true;
         return !!this.people.offered?.(t) || !!this.story.offered?.(t);
+    }
+
+    // A gull comes down to a tangerine, pecks at it and flies off with it in its beak
+    // (docs/plan-three-uses.md §2). The bird's sprite is the caller's: left hidden at the end, its
+    // origin as it was, for the caller to bring back; `done()` then.
+    gullTakes(sprite, t, done) {
+        const s = this.scene, img = s.loose.claim(t);
+        const ox = sprite.originX, oy = sprite.originY;
+        const x = img.x, foot = img.y + 3, off = x < sprite.x ? -1 : 1;
+        const down = s.textures.get('things').has('gull-down');
+        img.setDepth(sprite.depth + 0.01);
+        sprite.setOrigin(0.5, 1).setVisible(true).setAlpha(1).setFlipX(off < 0);
+        const flap = s.time.addEvent({ delay: 120, loop: true, callback: () => sprite.setFrame(sprite.frame.name === 'gull-up' && down ? 'gull-down' : 'gull-up') });
+        sfx.at(x, foot).gull();
+        // (It lands just short of it, the fruit before its beak; a few pecks; away with it.)
+        s.tweens.add({ targets: sprite, x: x - off * 6, y: foot, duration: 520, ease: 'Sine.easeIn', onComplete: () => {
+            flap.paused = true;
+            sprite.setFrame('gull-perched');
+            s.tweens.add({ targets: sprite, y: foot - 1, duration: 140, yoyo: true, repeat: 3, onComplete: () => {
+                flap.paused = false;
+                sfx.at(x, foot).flap();
+                s.tweens.add({ targets: sprite, x: x + off * 90, y: foot - 140, alpha: 0, duration: 1000, ease: 'Quad.easeIn',
+                    onUpdate: () => img.setPosition(sprite.x + (sprite.flipX ? -6 : 6), sprite.y - 5).setAlpha(sprite.alpha),
+                    onComplete: () => {
+                        flap.remove();
+                        img.destroy();
+                        sprite.setVisible(false).setAlpha(1).setOrigin(ox, oy);
+                        done?.();
+                    } });
+            } });
+        } });
+    }
+
+    // A machine that has swallowed a tangerine (a vacuum): dead where it stands, a wisp of smoke off
+    // it now and then (each caller on its own clock), until she has left the deck.
+    choke(sprite) {
+        sprite.setTint(0x6b6e72).setAngle(-8);
+        sfx.at(sprite.x, sprite.y).vacChoke();
+        this.drops(sprite.x, sprite.y - 10, 0x8a8a8a, -1);
     }
 
     // A few drops off her (`dir` 1: falling, water), or a wisp off her hair (-1: rising, smoke).
@@ -1724,18 +1764,40 @@ export class World {
             s.physics.add.collider(p, t.zone, null, () => {
                 if (t.route !== s.route || t.done) return false;
                 if (!s.isLunging()) return true;
-                t.done = true;
-                s.smash(t.x, t.y - (t.hang ?? 0) - 12);
-                if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
-                if (t.lowZone) this.low = this.low.filter(z => z !== t.lowZone);
-                this.save.broken.push(t.id);
-                t.items.forEach(i => i.destroy());
-                t.items = [];
-                t.zone.destroy();
-                this.refresh();
+                this.breakThing(t);
                 return false;
             });
         }
+    }
+
+    // A breakable smashed (by her lunge; the piñata by a lob too): gone for good.
+    breakThing(t) {
+        const s = this.scene;
+        t.done = true;
+        s.smash(t.x, t.y - (t.hang ?? 0) - 12);
+        if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
+        if (t.lowZone) this.low = this.low.filter(z => z !== t.lowZone);
+        this.save.broken.push(t.id);
+        t.items.forEach(i => i.destroy());
+        t.items = [];
+        t.zone.destroy();
+        this.refresh();
+    }
+
+    // A lobbed tangerine that meets a thing hung up (the piñata) brings it down: three for one
+    // (docs/plan-three-uses.md §2). Anything else breakable it only bounces off.
+    lobbedInto(t) {
+        if (!t.thrown || !t.lob) return false;
+        const x = t.img.x, y = t.img.y;
+        for (const b of this.breakables) {
+            if (!b.hang || b.done || b.route !== t.route) continue;
+            const z = b.zone.body;
+            if (x < z.left - 4 || x > z.right + 4 || y < z.top - 4 || y > z.bottom + 4) continue;
+            this.scene.loose.remove(t);
+            this.breakThing(b);
+            return true;
+        }
+        return false;
     }
 
     // A burst of paper and sweets, coming down to the floor (the pinata).

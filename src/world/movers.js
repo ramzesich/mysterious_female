@@ -36,6 +36,25 @@ export class Robot {
         this.scene.physics.add.collider(p, this.zone, null, () => this.scene.route === 'inside');
     }
 
+    // A tangerine come to rest on its top rides along with it, hers to take back (walking over it
+    // on the robot); docs/plan-three-uses.md §2. Never taken: it stays a loose tangerine.
+    offered(t) {
+        const d = this.def, top = d.y - this.h;
+        if (t.route !== 'inside' || Math.abs(t.img.y + 3 - top) > (t.rider === this ? 1 : 8)) return false;
+        if (t.rider !== this) {
+            if (Math.abs(t.img.x - this.x) > this.w / 2 + 4 || t.img.body.velocity.y < 0) return false;
+            // (Come down on its top, it stays there: a bounce would have it off so small a top.)
+            t.rider = this;
+            t.rideDx = Phaser.Math.Clamp(t.img.x - this.x, -this.w / 2 + 6, this.w / 2 - 6);
+            t.img.y = top - 3;
+            this.scene.loose.rest(t);
+        }
+        t.img.x = this.x + t.rideDx;
+        const e = this.scene.save.loose.find(o => o.id === t.id);
+        if (e) e.x = Math.round(t.img.x);
+        return false;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
         if (Math.abs(p.x - this.x) > 900 || Math.abs(p.y - d.y) > 300) return;
@@ -90,9 +109,25 @@ export class Gull {
         if (this.world.hears(d.x, d.y + 40, d.route ?? 'inside')) this.scaredUntil = this.scene.time.now + 4000;
     }
 
+    // A tangerine on the deck below its rail: down to it, and off with it; the rail clear 8 s
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (this.taking || s.time.now < (this.goneUntil ?? 0) || t.route !== (d.route ?? 'inside')) return false;
+        if (Math.abs(t.img.x - d.x) > 3 * M || t.img.y < d.y - 10 || t.img.y > d.y + 80) return false;
+        this.taking = true;
+        this.world.gullTakes(this.sprite, t, () => {
+            this.taking = false;
+            this.goneUntil = s.time.now + 8000;
+            this.rise = 1;
+        });
+        return true;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
-        const on = d.route === 'inside' || d.route === s.route;
+        if (this.taking) return;
+        const on = (d.route === 'inside' || d.route === s.route) && time >= (this.goneUntil ?? 0);
         this.sprite.setVisible(on);
         if (!on) return;
         const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90 || time < (this.scaredUntil ?? 0);
@@ -285,8 +320,31 @@ export class Darter {
         this.sprite.setPosition(this.def.x, this.def.y).setScale(0.8).setTint(0x9babb2).setAngle(0).setAlpha(1);
     }
 
+    // A tangerine under it, thrown or lying: swallowed, and it chokes (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, v = this.sprite;
+        if (this.state === 'dead' || this.state === 'spun' || !s.loose.near(t, v.x, this.def.y, 12, 12)) return false;
+        s.loose.remove(t);
+        s.tweens.killTweensOf(v);
+        this.state = 'dead';
+        this.eye.setVisible(false);
+        v.setScale(1).clearTint();
+        this.world.choke(v);
+        this.at = s.time.now + 700;
+        return true;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, v = this.sprite;
+        // Choked: dead where it stands, smoking, until she has left the deck.
+        if (this.state === 'dead') {
+            if (s.route !== 'inside' || Math.abs(p.y - d.y) > s.deckPitch / 2) this.home(time);
+            else if (time > this.at) {
+                this.at = time + 900;
+                this.world.drops(v.x, v.y - 10, 0x8a8a8a, -1);
+            }
+            return;
+        }
         if (!nearby(s, d)) return;
         const dx = p.x - d.x, on = here(s, d) && Math.abs(p.y - d.y) < 40;
         const within = on && Math.abs(dx) < d.reach;
@@ -610,8 +668,9 @@ export class DndDoor {
     }
 
     // (`heard`: a clatter outside, or her cry, brought them to the door: a fright only if she is by
-    // it; `cried`: her own cry did, and nothing forgives it.)
-    knock(heard, cried = false) {
+    // it; `cried`: her own cry did, and nothing forgives it; `look`: a tangerine in the trays did,
+    // and they look about and see nobody: no fright, wherever she is.)
+    knock(heard, cried = false, look = false) {
         const s = this.scene, p = s.player, d = this.def;
         if (this.busy || (this.world.carry && !heard)) return false;
         this.busy = true;
@@ -627,12 +686,16 @@ export class DndDoor {
             this.who.dir = p.x < d.x ? -1 : 1;
             this.world.people.place(this.who);
             this.world.people.refresh();
-            this.world.people.play(this.who, 'shriek');
+            if (look) {
+                // (This way and that, at the empty corridor.)
+                this.world.people.idle(this.who);
+                for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 420, () => { this.who.dir = -this.who.dir; this.world.people.place(this.who); });
+            } else this.world.people.play(this.who, 'shriek');
         }
-        const by = !heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60);
+        const by = !look && (!heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60));
         if (by && cried && this.world.carry) this.world.carryBox.spill(d.x);
         else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled', cried);
-        s.time.delayedCall(1700, () => {
+        s.time.delayedCall(look ? 1900 : 1700, () => {
             this.shut.setVisible(true);
             this.card.setVisible(true);
             this.dark.setVisible(false);

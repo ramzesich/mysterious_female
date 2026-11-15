@@ -1,5 +1,5 @@
 // A tangerine loose in the world (docs/plan-three-uses.md §1.2, §1.3, §3): knocked out of her
-// pocket by a hit (and, from step 3, thrown). One real thing, whichever it was: it bounces and
+// pocket by a hit, or thrown (F: `throw`). One real thing, whichever it was: it bounces and
 // rolls, off steps and edges, stops against anything solid, and lies where it stopped until she
 // walks over it, today or next week (`save.loose`). Off the hull it goes into the sea, gone; in a
 // pool it floats. While it is loose it is offered each frame to whatever is near
@@ -61,6 +61,17 @@ export class LooseTangerines {
         return t;
     }
 
+    // Thrown from her hand at (x, y) (§1.2): a roll, or a lob. `thrown` while it flies and rolls,
+    // for whatever answers only a throw (Bumbot bats it back).
+    throw(x, y, vx, vy, lob) {
+        const t = this.make({ x, y, route: this.scene.route }, false);
+        t.img.body.setVelocity(vx, vy);
+        t.thrown = true;
+        t.lob = lob;
+        t.pickableAt = this.scene.time.now + LOOSE.pickDelayMs;
+        return t;
+    }
+
     make(e, resting) {
         const s = this.scene;
         const id = e.id ?? `loose_${Date.now().toString(36)}_${made++}`;
@@ -84,6 +95,7 @@ export class LooseTangerines {
     // At rest: a tangerine on the floor like any other, kept where it lies.
     rest(t) {
         t.resting = true;
+        t.thrown = false;
         t.img.body.setVelocity(0, 0);
         t.img.disableBody(false, false);
         const e = this.scene.save.loose.find(o => o.id === t.id);
@@ -95,11 +107,18 @@ export class LooseTangerines {
 
     // Gone: picked up, taken by something, or lost to the sea.
     remove(t) {
+        this.claim(t).destroy();
+    }
+
+    // Taken by something that carries it off itself (a gull in its beak): no longer loose nor
+    // saved, its picture handed over, the taker's to move and destroy.
+    claim(t) {
         const s = this.scene;
         this.all = this.all.filter(o => o !== t);
         s.save.loose = s.save.loose.filter(o => o.id !== t.id);
         s.tweens.killTweensOf(t.img);
-        t.img.destroy();
+        t.img.disableBody(false, false);
+        return t.img.setAngle(0);
     }
 
     update(dt) {
@@ -109,8 +128,9 @@ export class LooseTangerines {
             // (Shown on its own route; one inside shows wherever the deck does, as the others.)
             img.setVisible(t.route === 'inside' || t.route === s.route);
             if (this.pickedUp(t, p, time)) continue;
-            if (t.resting) continue;
+            // (Lying still too: a vacuum comes by, a gull comes down to it.)
             if (s.world.offered?.(t)) continue;
+            if (t.resting) continue;
             // Over the side: into the sea, gone. Off the bottom of the map: gone.
             if ((img.x < s.hullMinX || img.x > s.hullMaxX) && img.y >= s.waterY) {
                 s.splash(img.x, s.waterY);
@@ -133,6 +153,7 @@ export class LooseTangerines {
             }
             const onFloor = b.blocked.down || b.touching.down;
             if (onFloor && t.vyWas > LOOSE.thudAt) sfx.at(img.x, img.y).plop();
+            if (onFloor && t.vyWas > LOOSE.hardAt) b.velocity.x *= LOOSE.landKeep;
             if (onFloor) b.velocity.x = approachZero(b.velocity.x, LOOSE.rollDecel * dt);
             t.vyWas = b.velocity.y;
             // It turns as it rolls, a quarter at a time (an 8 px fruit turned by degrees only blurs).
@@ -143,6 +164,12 @@ export class LooseTangerines {
                 if (t.still > 0.15) this.rest(t);
             } else t.still = 0;
         }
+    }
+
+    // Is it at (x, y) on `route`, give or take `dx` and `dy`? `y` is a floor (feet), as people's are:
+    // what its own foot is measured against (a taker's test).
+    near(t, x, y, dx, dy, route = 'inside') {
+        return t.route === route && Math.abs(t.img.x - x) < dx && Math.abs(t.img.y + 3 - y) < dy;
     }
 
     // She walks over it (or swims to it), as she would any tangerine.

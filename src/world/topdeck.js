@@ -116,6 +116,19 @@ export class Balls {
         this.hitAt = 0;
     }
 
+    // A lobbed tangerine coming down through the rim: it scores, a cheer, and it comes down again
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, r = this.rim, b = t.img.body;
+        if (!t.thrown || !t.lob || t.scored || b.velocity.y <= 0 || Math.abs(t.img.x - r.x) > 8 || Math.abs(t.img.y - r.y) > 8) return false;
+        t.scored = true;
+        b.velocity.x *= 0.2;
+        sfx.at(r.x, r.y).swish();
+        sfx.at(r.x, r.y).cheer(1.4);
+        this.world.sparkle(r.x, r.y + 6, 0xfbff86);
+        return false;
+    }
+
     // In a lunge she meets the ball: headed back onto the court, over the cage.
     lunged(kind, fromX) {
         const s = this.scene, d = this.def;
@@ -317,6 +330,20 @@ export class FunnelWind {
         return s.mode === 'stairs' && s.flight?.outside;
     }
 
+    // A tangerine on the deck round the funnel: one goes after it, and none swoops for 10 s
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const c = this.centre, s = this.scene;
+        if (this.state !== 'circle' || this.taker || Math.abs(t.img.x - c.x) > 300 || t.img.y < c.y - 100 || t.img.y > c.y + 400) return false;
+        const b = this.taker = this.gulls[(this.turn + 1) % this.gulls.length];
+        this.quietUntil = s.time.now + 10000;
+        this.world.gullTakes(b.sprite, t, () => {
+            this.taker = null;
+            b.sprite.setVisible(true);
+        });
+        return true;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, g = this.def.gust;
         if (!near(s, this.centre.x, this.centre.y, 1100, 700)) return;
@@ -335,7 +362,7 @@ export class FunnelWind {
         // The gulls: round the lattice, the diver out of its circle.
         const diver = this.gulls[this.turn % this.gulls.length];
         for (const b of this.gulls) {
-            if (b === diver && this.state !== 'circle') continue;
+            if ((b === diver && this.state !== 'circle') || b === this.taker) continue;
             const a = time / 1700 + b.i * Math.PI;
             const tx = this.centre.x + Math.cos(a) * 170, ty = this.centre.y + Math.sin(a) * 70 + Math.sin(a * 2.3) * 12;
             b.x += (tx - b.x) * Math.min(1, dt * 3);
@@ -346,7 +373,7 @@ export class FunnelWind {
         if (this.state === 'circle') {
             // In a lull, with time to get clear before the next gust.
             const due = cycle !== this.cycle && cycle % Math.max(1, Math.round(d.swoop / g.every)) === 0 && inCycle > 0.3 && inCycle < 1.0;
-            if (due && on && !s.stairSlip) {
+            if (due && on && !s.stairSlip && time > (this.quietUntil ?? 0)) {
                 this.cycle = cycle;
                 this.state = 'mark';
                 this.at = time + 1000;
@@ -409,6 +436,23 @@ export class Flock {
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
             b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
         }
+    }
+
+    // A tangerine by the flock: the nearest goes after it, and flies back (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60 || Math.abs(t.img.y + 3 - d.y) > 12) return false;
+        const free = this.birds.filter(b => !b.up);
+        if (!free.length) return false;
+        const b = free.reduce((a, c) => Math.abs(c.x - t.img.x) < Math.abs(a.x - t.img.x) ? c : a);
+        b.up = true;
+        this.world.gullTakes(b.sprite, t, () => {
+            const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
+            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, d.y - 110);
+            s.tweens.add({ targets: b.sprite, x: b.x, y: d.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
+                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched'); b.up = false; } });
+        });
+        return true;
     }
 
     // Her cry: the flock lifts a little, all at once, and settles again.

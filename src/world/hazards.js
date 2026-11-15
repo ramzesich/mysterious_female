@@ -146,6 +146,21 @@ export class FoodGulls {
         }
     }
 
+    // A tangerine on the deck under them: one comes down for it and goes off with it, and they
+    // leave her cone alone for 10 s (docs/plan-three-uses.md §2).
+    offered(t) {
+        const d = this.def, s = this.scene;
+        if (this.state !== 'idle' || this.off() || t.route !== 'inside' || t.img.x < d.x0 - 40 || t.img.x > d.x1 + 40
+            || Math.abs(t.img.y + 3 - d.y) > 12) return false;
+        this.fruit = s.loose.claim(t);
+        // (Down just short of it, facing it, the fruit before its beak.)
+        const side = this.diver.x < this.fruit.x ? -1 : 1;
+        this.diver.sprite.setFlipX(side > 0);
+        this.pounce(this.fruit.x + side * 7);
+        this.at = s.time.now + 1600;
+        return true;
+    }
+
     // A cone dropped on the deck: one comes down for it, stays a moment, and goes.
     pounce(x) {
         if (this.state !== 'idle') return;
@@ -222,7 +237,8 @@ export class FoodGulls {
             if (time > this.at) {
                 this.loot.setVisible(false);
                 this.state = 'idle';
-                this.at = time + 2800;
+                this.at = time + (this.fed ? 10000 : 2800);
+                this.fed = false;
             }
         } else if (this.state === 'pounce') {
             // Down beside the mess on the deck; a few pecks; away.
@@ -230,7 +246,16 @@ export class FoodGulls {
             b.x += (this.targetX - b.x) * Math.min(1, dt * 5);
             b.y += (d.y - b.y) * Math.min(1, dt * 5);
             b.sprite.setFrame(landed ? 'gull-perched' : flap).setPosition(b.x, landed ? d.y - (Math.floor(time / 160) % 2) : b.y);
-            if (time > this.at) {
+            if (time > this.at && this.fruit) {
+                // (Off with the tangerine in its beak.)
+                this.fruit.destroy();
+                this.fruit = null;
+                this.fed = true;
+                this.loot.setTexture('tangerine').setVisible(true);
+                sfx.at(this.targetX, d.y).flap();
+                this.state = 'up';
+                this.at = time + 900;
+            } else if (time > this.at) {
                 this.state = 'idle';
                 this.at = time + 1500;
             }
@@ -338,6 +363,19 @@ export class Trays {
         }
         world.add(this.items);
         this.armed = true;
+    }
+
+    // A tangerine rolled into them: the clatter, and the door opens on nobody; the trays are safe to
+    // cross while the guest looks about (docs/plan-three-uses.md §2). It lies there, hers again.
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (!this.armed || this.scattered || t.route !== 'inside' || t.img.x < d.x0 || t.img.x > d.x1 || Math.abs(t.img.y + 3 - d.y) > 10) return false;
+        this.armed = false;
+        sfx.at(t.img.x, d.y).crash();
+        this.items.forEach((img, i) => s.tweens.add({ targets: img, y: img.y - 4 - (i % 3), angle: (i % 2 ? 7 : -7), duration: 90, yoyo: true, repeat: 1 }));
+        const door = this.world.movers.find(m => m.def?.id === d.door);
+        s.time.delayedCall(380, () => door?.knock(true, false, true));
+        return false;
     }
 
     update(dt, time) {

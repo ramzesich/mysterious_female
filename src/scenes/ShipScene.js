@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
@@ -116,6 +116,8 @@ export class ShipScene extends Phaser.Scene {
         this.lungeUntil = 0;
         this.safeUntil = 0;
         this.flinchUntil = 0;
+        this.throwUntil = 0;
+        this.throwing = null;
         this.cryGapUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
@@ -2731,6 +2733,12 @@ export class ShipScene extends Phaser.Scene {
             body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
             return;
         }
+        // Throwing (F): she stands for it, and the tangerine leaves her hand on the swing.
+        if (time < this.throwUntil) {
+            body.velocity.x = approach(body.velocity.x, 0, PLAYER.groundDecel * dt);
+            if (this.throwing && time >= this.throwing.at) this.releaseThrow();
+            return;
+        }
 
         if (onFloor && input.activatePressed && this.world.interact()) return;
         if (onFloor && input.activatePressed && !this.holding && this.progress.tryPickup()) return;
@@ -2754,6 +2762,7 @@ export class ShipScene extends Phaser.Scene {
         if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
 
         if (input.dashPressed) this.tryCry(time);
+        if (input.throwPressed && this.tryThrow(input, time, onFloor)) return;
 
         // The verbs (§6.1.2, src/world/verbs.js): crawling under things, a kick off a wall in grip
         // socks, a glide under the parasol.
@@ -3900,9 +3909,34 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    updateVacuums(dt) {
+    // Something here of the scene's own takes a tangerine loose near it (docs/plan-three-uses.md §2):
+    // deck 4's vacuum swallows it and chokes.
+    offeredHere(t) {
         for (const v of this.vacuums) {
-            if (!v.alive) continue;
+            if (!v.alive || !this.loose.near(t, v.sprite.x, v.sprite.y, 10, 12)) continue;
+            this.loose.remove(t);
+            v.alive = false;
+            v.puffAt = this.time.now + 700;
+            this.world.choke(v.sprite);
+            return true;
+        }
+        return false;
+    }
+
+    updateVacuums(dt) {
+        const p = this.player;
+        for (const v of this.vacuums) {
+            // Choked on a tangerine: dead, smoking now and then, until she has left the deck.
+            if (!v.alive) {
+                if (this.route !== 'inside' || Math.abs(p.y - v.sprite.y) > this.deckPitch / 2) {
+                    v.alive = true;
+                    v.sprite.clearTint().setAngle(0).setAlpha(1);
+                } else if (this.time.now > v.puffAt) {
+                    v.puffAt = this.time.now + 900;
+                    this.world.drops(v.sprite.x, v.sprite.y - 10, 0x8a8a8a, -1);
+                }
+                continue;
+            }
             if (v.asideUntil) {
                 if (this.time.now < v.asideUntil) continue;
                 v.asideUntil = 0;
@@ -4123,6 +4157,37 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // --- The throw (docs/plan-three-uses.md §1.2) ----------------------------------------------
+
+    // F: one tangerine thrown underarm the way she faces: a roll, or with ↑ a lob. On her feet,
+    // hands free: not with a tray, crawling, gliding, in a lunge or holding Bumbot (ladders,
+    // stairs, the pool are modes of their own). No cursor: she aims by where she stands.
+    tryThrow(input, time, onFloor) {
+        if (!onFloor || this.crawling || this.holding || this.gliding || this.world.carry || this.isLunging()) return false;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
+            this.blinkCount();
+            return false;
+        }
+        const p = this.player;
+        this.throwing = { at: time + THROW.releaseMs, lob: !!input.up, dir: p.flipX ? -1 : 1 };
+        this.throwUntil = time + THROW.ms;
+        // (Until her clip is made, her reach stands in.)
+        p.anims.play(this.anims.exists('her-toss') ? 'her-toss' : 'her-reach');
+        return true;
+    }
+
+    // It leaves her hand: one less, a real thing in the world (src/world/tangerine.js).
+    releaseThrow() {
+        const p = this.player, { lob, dir } = this.throwing;
+        this.throwing = null;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) return;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
+        const k = lob ? THROW.lob : THROW.roll;
+        this.loose.throw(p.x + dir * THROW.hand, p.y - THROW.handY, dir * k.vx, -k.vy, lob);
+        sfx.toss();
+        this.refreshHud();
+    }
+
     // --- The pocket (docs/plan-three-uses.md §1.3) ---------------------------------------------
 
     // `?pocket=off`: every hit is what it was, whatever she has on her (for testing frights).
@@ -4147,8 +4212,10 @@ export class ShipScene extends Phaser.Scene {
         sfx.pocket();
         rumble('spill');
         this.loose.knock(p.x, p.y - 24, away);
-        // (Under the parasol she keeps on gliding: only the blink.)
+        // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
         if (this.mode === 'play' && !this.gliding) {
+            this.throwUntil = 0;
+            this.throwing = null;
             this.flinchUntil = time + POCKET.flinchMs;
             p.setFlipX(away > 0);                // facing what hit her
             if (this.anims.exists('her-hit')) p.anims.play('her-hit');
@@ -4172,6 +4239,8 @@ export class ShipScene extends Phaser.Scene {
         this.mode = 'scripted';
         this.safeUntil = 0;
         this.flinchUntil = 0;
+        this.throwUntil = 0;
+        this.throwing = null;
         this.lungeUntil = 0;
         this.bubbleUntil = 0;
         this.player.body.enable = false;

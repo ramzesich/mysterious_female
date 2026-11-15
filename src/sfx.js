@@ -468,6 +468,8 @@ const things = {
     robotBeep: () => [0, 0.13].forEach(t => tone(1400, 0.07, { type: 'square', vol: 0.042, lp: 4000, t })),
     // Housekeeping's vacuum: its motor winding up (the tell), and its dart.
     vacRev: () => tone(170, 0.32, { type: 'sawtooth', to: 560, vol: 0.112, lp: 1500 }),
+    // A vacuum that has swallowed a tangerine: the motor chokes, sputters and winds down.
+    vacChoke: () => { tone(420, 0.8, { type: 'sawtooth', path: [[0, 420], [0.25, 560], [1, 80]], vol: 0.08, lp: 1400, trem: [16, 0.6] }); [0.12, 0.34, 0.58].forEach(t => noise(0.08, { lo: [900, 300], vol: 0.22, t })); },
     vacDart: () => { tone(560, 0.5, { type: 'sawtooth', path: [[0, 560], [0.2, 720], [1, 420]], vol: 0.07, lp: 1700 }); noise(0.5, { band: 1100, vol: 0.12, attack: 0.05 }); },
     // Cloth: a stack of towels leaning, and coming down; a sheet in the wind.
     cloth: () => { noise(0.1, { lo: 900, vol: 0.2, attack: 0.03 }); noise(0.1, { lo: 900, vol: 0.16, attack: 0.03, t: 0.13 }); },

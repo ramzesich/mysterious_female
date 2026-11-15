@@ -12,7 +12,7 @@ import { writeSave } from '../save.js';
 const M = 48;
 // The swirl: how long a full one takes (ms), and where it is a stub, perfect, or too much.
 const SWIRL = { ms: 2400, none: 0.14, perfect: 0.58, over: 0.84, max: 1.08 };
-const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000 };
+const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000, fruit: 15000 };
 
 export const lido = {
     setupLido() {
@@ -402,6 +402,32 @@ export const lido = {
         k.waitUntil = s.time.now + 160;
         k.pose = 'aim';
         if (!this.people.anim(k, 'squirt')) k.sprite.setFrame(k.meta.stand);
+    },
+
+    // A tangerine thrown to him: he catches it and eats it, and stands with his back turned 15 s
+    // (docs/plan-three-uses.md §2). Spent.
+    kidOffered(t) {
+        const k = this.who('npc_kid'), s = this.scene, w = this.world;
+        if (!t.thrown || !k?.on || k.state === 'acting' || k.mode === 'flee' || !s.loose.near(t, k.x, k.y, 14, 50)) return false;
+        // (Facing where it came from.)
+        k.dir = t.img.body.velocity.x > 0 ? -1 : 1;
+        k.state = 'acting';
+        k.mode = 'patrol';
+        this.people.place(k);
+        const img = s.loose.claim(t).setPosition(k.x + k.dir * 8, k.y - 27).setDepth(k.sprite.depth + 0.01);
+        sfx.at(k.x, k.y).take();
+        const eating = this.people.play(k, 'eat', { times: 2 });
+        for (let i = 1; i <= 2; i++) s.time.delayedCall(i * 800, () => { if (img.active) { img.setScale(1, 1 - i * 0.4); sfx.at(k.x, k.y).munch(); } });
+        eating.then(() => {
+            img.destroy();
+            k.state = 'idle';
+            k.pose = null;
+            k.mode = 'hide';
+            k.waitUntil = s.time.now + KID.fruit;
+            k.sprite.anims.stop();
+            k.sprite.setFrame(k.meta.back ?? k.meta.stand);
+        });
+        return true;
     },
 
     // E at him with what she has made: a stub he hands back to the deck, with a face; a proper

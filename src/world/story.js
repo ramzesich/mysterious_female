@@ -203,6 +203,43 @@ export class Story {
         this.tipHeard(cry);
     }
 
+    // A tangerine loose near something the story answers (docs/plan-three-uses.md §2): Bumbot at a
+    // spot bats a thrown one back; Bumbot at the tip of the bow backs off (finale); the kid catches
+    // and eats it (lido); one over the Spinnaker's keys plays a note (bow). True if it was taken.
+    offered(t) {
+        return this.catBats(t) || !!this.tipOffered?.(t) || !!this.kidOffered?.(t) || !!this.pianoOffered?.(t);
+    }
+
+    // Bumbot at one of his spots, a thrown tangerine coming at him: he bats it straight back to her,
+    // sniffs his paw and pulls a face. Not spent; the beat is what it was.
+    catBats(t) {
+        const s = this.scene, her = s.player;
+        if (!t.thrown) return false;
+        for (const cat of s.cats) {
+            const c = cat.sprite;
+            if (cat.gone || cat.hidden || cat.batting || !c.visible || !c.anims.isPlaying
+                || !s.loose.near(t, c.x, c.y, 14, 24, cat.route)) continue;
+            cat.batting = true;
+            const back = her.x < c.x ? -1 : 1, was = c.anims.currentAnim.key, flip = c.flipX;
+            c.setFlipX(back < 0).play('bumbot-bat');
+            t.thrown = false;
+            t.pickableAt = s.time.now + 300;
+            t.img.body.setVelocity(back * 210, -170);
+            sfx.at(c.x, c.y).plop();
+            s.time.delayedCall(450, () => {
+                if (cat.gone) return;
+                c.play('bumbot-wash');
+                sfx.at(c.x, c.y).mrrp();
+            });
+            s.time.delayedCall(1700, () => {
+                cat.batting = false;
+                if (!cat.gone) c.setFlipX(flip).play(was);
+            });
+            return true;
+        }
+        return false;
+    }
+
     // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk,
     // or cries out near it (`cried`).
     shush(time, cried = false) {

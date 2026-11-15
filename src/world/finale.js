@@ -283,6 +283,15 @@ export const finale = {
         this.spook(cat.x < her.x ? -1 : 1);
     },
 
+    // A thrown tangerine coming at him at the tip: he backs off, as when she moves. It rolls on.
+    tipOffered(t) {
+        const cat = this.tipCat, T = this.tip, her = this.scene.player;
+        if (!t.thrown || !cat || !T || T.busy || this.catching || !cat.visible) return false;
+        if (Math.abs(t.img.x - cat.x) > 2 * M || Math.abs(t.img.y + 3 - this.F.mooring.y) > 30) return false;
+        this.spook(cat.x < her.x ? -1 : 1);
+        return false;
+    },
+
     // He goes: back along the deck away from her, or, with no deck left behind him, past her.
     spook(dir) {
         const s = this.scene, w = this.world, her = s.player, Mo = this.F.mooring, cat = this.tipCat, T = this.tip;
