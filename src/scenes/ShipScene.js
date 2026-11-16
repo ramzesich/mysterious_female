@@ -4399,6 +4399,7 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
+        if (sc.gag && this.anims.exists(GAGS[sc.gag].fall)) return this.fallGag(sc, ride);
         if (sc.down) return this.scareDown(sc);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
@@ -4474,6 +4475,27 @@ export class ShipScene extends Phaser.Scene {
             // (Her word over her head goes with her.)
             p.x = s.x + dir * (sc.gag === 'vacuum' ? 0 : 4);
         };
+    }
+
+    // Her gag where she stands, one picture of her with the thing (§1.6: the papers, 4a and 4b),
+    // facing her way; the world's own is taken away (`ride.hide()`, when it passes one). She stays
+    // down a while, then her checkpoint.
+    fallGag(sc, ride) {
+        const p = this.player, g = GAGS[sc.gag];
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        ride?.hide?.();
+        const s = this.add.sprite(p.x, p.y, 'her-mishaps').setOrigin(0.5, 1)
+            .setFlipX(p.flipX).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
+        s.play(g.fall);
+        s.once(`animationcomplete-${g.fall}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
     }
 
     // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her

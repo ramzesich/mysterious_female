@@ -42,6 +42,7 @@ new one added there should be added here too.
 
 | Place | Link |
 |---|---|
+| `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all&tangerines=infinite> |
 | `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all&tangerines=infinite> |
 
 ## Deck 6

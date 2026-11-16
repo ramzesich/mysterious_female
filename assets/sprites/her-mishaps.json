@@ -5,7 +5,9 @@
   "vacuum-ride": 6,
   "suitcase-sit": 14,
   "suitcase-ride": 20,
-  "suitcase-tip": 28
+  "suitcase-tip": 28,
+  "paper-tent": 37,
+  "paper-blanket": 45
  },
  "anims": {
   "vacuum-sit": [
@@ -54,6 +56,26 @@
    34,
    35,
    36
+  ],
+  "paper-tent": [
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44
+  ],
+  "paper-blanket": [
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52
   ]
  },
  "cols": 48

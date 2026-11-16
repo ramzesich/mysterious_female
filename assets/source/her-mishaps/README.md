@@ -15,6 +15,18 @@ character "Bumbusik (final)" (`ebd5dadc-1318-4717-b0c0-6f429a7a58f0`) with the t
 | `suitcase-sit/` | 6b: bumped at the knees, she sits back onto it | its animation `sit-on-suitcase`, as the vacuum's |
 | `suitcase-ride/` | 6b: the ride, clutching her hands | its animation `ride` |
 | `suitcase-tip/` | 6b: at the end of the roll it tips; she lands sitting on the floor | its animation `tip-off` |
+| `paper-tent/` | 4a, first version (approved as a clip, then dropped by the user once seen in the game, 2026-11-16): a paper slid her way, she sits down hard and it flutters over her head (a tent) | animation `paper-tent-end` of her base character, v3 from `paper-start/start-4a.png` (her own standing sprite) toward `end-4a.png` |
+| `paper-blanket/` | 4b, first version: onto her belly, the paper floating down in front of her onto her back | `paper-blanket-end`, v3 from `start-4b.png` toward `end-4b.png` |
+| `paper-blanket-behind/` | 4b, the same with the paper coming from behind her (the user's pick of the two; in the game in this commit, then dropped with 4a) | `paper-blanket-behind` |
+| `paper-behind-sit/` | **Candidate (2026-11-16, not yet approved):** the paper slides in from behind under her heel, her leg kicks up forward with it on her sole, she sits down hard, it circles over and lands on her head as a tent (the user's brief: from behind, on her bottom) | `paper-behind-sit-1`, v3 from `start2-4a.png` (her standing on the sliding newspaper B at 10 px) toward `end-4a.png` |
+| `paper-front-belly/` | **Candidate:** the paper under her front foot skids it back, that leg flies up behind her, she topples onto her belly, the paper carried up and dropped on her back (the user's brief: from the front, on her belly) | `paper-front-belly-3`, v3 from `start2-4b.png` toward `end-4b.png` |
+| `paper-front-kick/` | Not used: the first try at the one above, the leg kicked up in front | `paper-front-belly-1` |
+| `paper-start/` | The pictures the paper clips were made from: her own standing sprite in an 80 px frame (`start-*`; `start2-*` with the sliding newspaper under her foot), and the targets (`end-*`: the first stills shrunk to her size) | made here |
+
+The first two stills of the paper gags (states `7902a37e-18bc-40f0-a669-a788ff8dadfd` "Paper tent" and
+`71676d85-d4ae-466c-8b6e-d3cdbf5545ca` "Paper blanket") came out a quarter bigger than her (the user saw
+it at once); they are only the targets, shrunk, for clips made from her own sprite, which keep her size.
+The sliding newspaper's candidates are in `assets/source/things/newspaper-sliding/`.
 
 The world's own vacuum and suitcase are cut from these same pictures (where she sits on them,
 each row filled from its own colours, or the column below it), so that the one that hits her is

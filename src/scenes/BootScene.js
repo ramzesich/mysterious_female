@@ -194,10 +194,11 @@ export class BootScene extends Phaser.Scene {
             order.map(i => ({ key: 'her-cat', frame: held.anims[name][i] }));
         this.anims.create({ key: 'her-cat-run', frames: heldFrames('run'), frameRate: 11, repeat: -1 });
         this.anims.create({ key: 'her-cat-stroke', frames: heldFrames('stroke', [0, 1, 2, 3, 4, 4, 4, 3, 4, 4, 3, 2, 1, 0]), frameRate: 6 });
-        // Her gags with a thing (§1.6): sitting down onto it, the ride, the end of it (`gag-<clip>`).
+        // Her gags with a thing (§1.6): sitting down onto it, the ride, the end of it; the papers' (`gag-<clip>`).
         const gag = this.cache.json.get('her-mishaps-meta');
         for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
-                                           ['suitcase-sit', 10, 0], ['suitcase-ride', 8, -1], ['suitcase-tip', 10, 0]]) {
+                                           ['suitcase-sit', 10, 0], ['suitcase-ride', 8, -1], ['suitcase-tip', 10, 0],
+                                           ['paper-tent', 10, 0], ['paper-blanket', 10, 0]]) {
             if (!gag.anims[name]) continue;
             this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map(f => ({ key: 'her-mishaps', frame: f })), frameRate: fps, repeat });
         }

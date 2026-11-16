@@ -242,8 +242,8 @@ export const MISHAP_SCENES = {
     '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
     '2': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // into the dog's lead
     '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // onto the trays
-    '4a': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },    // a paper slides her way
-    '4b': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },     // it slides against her
+    '4a': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit', gag: 'paperTent' },      // a paper slides her way
+    '4b': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', gag: 'paperBlanket' },  // it slides against her
     '4c': { nothing: true },                                                    // it stops at her shoe
     '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly', gag: 'vacuum' }, // the vacuum, head-on
     '5b': { word: 'ride', react: 'stumble', toss: 'on', down: 'sit', gag: 'vacuum' },   // it catches her from behind
@@ -290,10 +290,14 @@ export const MISHAP_SCENES = {
 // starts where she stood. The vacuum (5b) carries her off out of the screen, gathering speed to
 // `speed` px/s by `accel`; the suitcase (6b) rolls on to the end of its roll (from an end, to the
 // other) at up to `top` px/s with her on it, slowing (`slow`: its speed per px left, at least
-// `least`), tips her off, and she sits there `holdMs`.
+// `least`), tips her off, and she sits there `holdMs`. A gag with `fall` plays where she stands
+// (the papers, 4a and 4b: the paper that hit her is the one on her, the world's own taken away),
+// her middle on the cell's middle, facing her way; she stays so `holdMs`, then her checkpoint.
 export const GAG_CELL = 112;
 export const GAGS = {
     vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
+    paperTent: { fall: 'gag-paper-tent', holdMs: 2000 },
+    paperBlanket: { fall: 'gag-paper-blanket', holdMs: 2000 },
     suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', top: 80, slow: 1.4, least: 16, holdMs: 1300 },
 };
 

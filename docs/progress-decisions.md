@@ -2098,3 +2098,27 @@ here" 7); each built step is gone back over under its "Revision".
   place), `vacuum` (head-on and from behind she rides it off; back; no smoke from a ridden one),
   `pocket`, `boot`; `region1` before the vacuum was made smaller. The rest not run.
 
+## Step 4's revision, the papers: a first try in the game, then the user's own brief (2026-11-16)
+
+- **The first stills** (two states of her character with the open newspaper, 20 generations) were
+  a quarter bigger than her: the user saw it at once. Clips from her own standing sprite in an 80
+  px frame, aimed at those stills shrunk to her size (v3 with an end frame), keep her size: the
+  clip's last frame is the still. Kept in `assets/source/her-mishaps/` (README).
+- **4a and 4b, the first version:** 4a sat with the paper over her head (a tent), 4b on her belly
+  with it on her back (the user chose the paper from behind over in front, both kept). Built onto
+  the gag sheet (frames stood on a fixed floor row; 4b's lying frames 2 px up, set down, the
+  paper's edge under the floor cut), played where she stands (`fallGag` in the ship scene; the
+  paper that hit her taken away), and 4c made: a paper stopped at her shoe lies a second and
+  fades, no hand takes it. A start place `?at=deck5`, between deck 5's two paper rounds.
+- **The user tried it: "It doesn't work at all".** Their brief: the sliding paper too small,
+  generated, near the open one's size; she slips even standing; from behind, the same paper
+  slides on under her foot, that leg goes up with the paper following it round in a circle, she
+  sits and it covers her as a tent; from the front, on her belly, that leg up behind her, the
+  paper round after it and over her. Candidates: two sliding newspapers (map objects; their
+  greys put on the palette as white, since plain palettizing turned them pale green), and the two
+  clips from her standing on the paper. The first try from the front kicked the leg up in front
+  (kept, not used). **Saved at the user's word, to decide the next day** which paper and whether
+  the clips go in. The game still has the first version; the `deck4` playtest's paper check
+  expects the old rules (not run).
+- Generations: 36 (the two oversized stills 20; clips 6 + 2 + 6; the two papers 2).
+

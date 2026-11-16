@@ -191,6 +191,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 4a | A sliding paper | It slides her way | She sits down; the paper flutters open over her head like a tent |
 | 4b | | It slides against her | Down on her belly, chin on her hands; the paper settles on her back like a blanket |
 | 4c | | She stands still | **Nothing: it stops against her shoe.** Stopped short of its door it is not taken in by the hand: it fades away a moment later, harmless while it lies there (the user: "a stopped [paper] would not be collected, if it stops not by the door. It just disappears shortly after") |
+| | | **The user's revision (2026-11-16, after trying the first 4a and 4b in the game: "It doesn't work at all")** | **From behind: the paper slides on under her foot, that leg goes up with the paper following it round in a circle, she falls on her bottom and it covers her as a tent. From the front: she falls on her belly, that leg up behind her, the paper following it round and covering her from above. She slips on a paper even standing (no more 4c). The sliding paper is generated, near the size of the open one.** Candidates made, the user to decide (see step 4's progress) |
 | 5a | Robot vacuums (decks 4 and 9) | It comes at her front, or she runs into it | ~~Forward over it, on her belly across it; it bumps her side twice and trundles home. "Eeek!"~~ **As 5b: she rides it off** (the user, 2026-11-16: "I prefer the ride in all cases"), turned round onto it, the way it was going |
 | 5b | | It catches her from behind | **She sits down on it and it carries her off down the corridor**, like a cat on one. **"Weeeee!"** (see the words, below) |
 | 6a | The runaway suitcase | She runs into it | ~~Over it; it pops open; she sits up in someone's sun hat~~ **As 6b: she rides it** (the user, 2026-11-16); standing at an end of its roll, it sets off for the other end with her |
@@ -623,7 +624,14 @@ Shown: her throw's frames for approval before anything else; then each target as
   6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations.
   **Done (2026-11-16): 5b and 6b, and with them 5a, 6a and 6c, which ride too** (the user's
   word after trying it); the vacuum, made smaller, and the suitcase are cut from the same pictures.
-  Left: 4a, 4b, 8a to 8d, 10a, 10b, the dog's lick, the porter's cap. The
+  Left: 4a, 4b, 8a to 8d, 10a, 10b, the dog's lick, the porter's cap. **The papers (2026-11-16,
+  under way):** a first 4a (sat, a tent) and 4b (on her belly, a blanket, the paper from behind)
+  were approved as clips and put in the game (`fallGag` in the ship scene, a stopped paper fading
+  for 4c, the start place `deck5`); the user tried them and asked for them again by the paper's
+  side (the revision under the table above). Candidates for that are made and kept
+  (`assets/source/her-mishaps/paper-behind-sit/`, `paper-front-belly/`; the sliding newspaper,
+  `assets/source/things/newspaper-sliding/`, A or B, 14 or 10 px tall): the user decides which.
+  The
   first to be made and shown are 5b and 6b (her on the vacuum, her on the suitcase): they tell
   whether a picture of her riding a thing holds up.
 - Her gags go on a sheet of their own (`assets/sprites/her-mishaps.png`, its own cell, her

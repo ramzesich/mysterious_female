@@ -547,5 +547,13 @@ Lessons learned (2026-11-14, the intro shown to the user):
   atlas (`foot`), and the game stands it by its frame (`setDoorArt()`), never by cutting it. And
   check what the two states share besides the frame: which side the handle and the hinges are
   on (both open doors came mirrored against their closed ones), where a plate sits.
+- **A state of her character on a bigger canvas can come out bigger than her** (the paper gags'
+  stills, a quarter bigger on 80 px; the suitcase's came right): set it beside her standing
+  sprite before showing it. **A clip v3 from her own sprite padded into the bigger frame keeps her
+  size**, and an end frame (the state's still shrunk to her size, roughly) steers its last pose;
+  a thing she meets can be put in that start picture (the paper under her foot). The clip's frames
+  are then the stills shown for approval (1 to 2 generations a try).
+- **Palettizing white paper turns it pale green** (Resurrect 64 has no light neutral grey): put a
+  paper's greys on the palette by lightness (`assets/source/things/newspaper-sliding/README.md`).
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.

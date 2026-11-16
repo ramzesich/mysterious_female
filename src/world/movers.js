@@ -1066,7 +1066,7 @@ export class Skimmer {
                 if (!q.hit && !q.taking && this.under(q, her)) {
                     q.hit = true;
                     if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: q.v <= 0 });
-                    else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: q.v <= 0 });
+                    else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: q.v <= 0, ride: this.onHer(q) });
                 }
                 continue;
             }
@@ -1081,9 +1081,10 @@ export class Skimmer {
             // Stepped on while it slides: she slips (once), and it shoots on to its door.
             if (!q.hit && this.under(q, her)) {
                 q.hit = true;
+                const v = q.v;
                 q.v = Math.max(q.v, Math.sqrt(2 * q.a * Math.max(1, Math.abs(q.door - q.img.x))));
                 if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: !(q.v > 0) });
-                else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: !(q.v > 0) });
+                else if (s.scareContact(q.img.x, 'papers', { vx: q.dir * v, lying: !(v > 0), ride: this.onHer(q) }) === '4c') this.stopped(q, her);
             }
         }
     }
@@ -1094,9 +1095,36 @@ export class Skimmer {
         return here(s, d) && !s.isLunging() && Math.abs(her.x - q.img.x) < PLAYER.bodyWidth / 2 + 5 && her.y > d.y - 4;
     }
 
+    // The paper that hit her is the one in her gag (4a, 4b: over her head, on her back): the
+    // world's own is taken away (the ship scene's `fallGag` calls `hide`).
+    onHer(q) {
+        return {
+            hide: () => {
+                q.gone = true;
+                q.img.destroy();
+                this.papers = this.papers.filter(o => o !== q);
+            },
+        };
+    }
+
+    // One sliding at her as she stands looking at it stops against her shoe (4c), short of its
+    // door: no hand takes it in; it lies there harmless a moment and fades away (the user).
+    stopped(q, her) {
+        const s = this.scene;
+        q.v = 0;
+        q.done = true;
+        q.gone = true;
+        q.img.x = her.x - q.dir * (PLAYER.bodyWidth / 2 + 4);
+        s.tweens.add({
+            targets: q.img, alpha: 0, delay: 1000, duration: 700,
+            onComplete: () => { q.img.destroy(); this.papers = this.papers.filter(o => o !== q); },
+        });
+    }
+
     // A paper at its door taken in (`world.handTakes`).
     takeIn(q) {
         const s = this.scene, d = this.def;
+        if (q.gone) return;
         this.world.handTakes(q.door, d.y, [q.img], d.y - 2);
         q.taking = true;
         s.time.delayedCall(560, () => { this.papers = this.papers.filter(o => o !== q); });
