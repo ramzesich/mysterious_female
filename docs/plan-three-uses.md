@@ -1,7 +1,19 @@
 # Plan: three uses for a tangerine, and decks worth walking
 
 **Settled with the user on 2026-11-15: every design question below is answered (§8 has their
-words). Nothing of it is built. The build starts at step 1 (§5).**
+words).**
+
+**Revised with the user on 2026-11-16:** how she takes a hit (§1.6, "mishaps": each obstacle its
+own, by the side it comes from and by who was moving), the tangerine's own picture and its
+flight to the count (§1.7), and a general rule on art (Start here, 7). **Each step of §5 has
+what the revision adds to it under "Revision (2026-11-16)", the built steps too: whoever builds
+goes back over what is built, revises it and completes it** (the user: "You update each step
+with their relevant additions. Even the built steps. The other session should revise what it
+already built and complete it").
+
+**Where the build stood when this was written (2026-11-16, branch `three-uses`):** steps 1 to 4
+committed (the last `2ee244b`). **Next: the revisions of steps 1 to 4, then step 4a, then step
+5.** `GAME_DESIGN.md` §8 has the latest.
 
 It follows `docs/brainstorm/dash-rework.md` (the "shout, throw, pocket" proposal) and
 `docs/audit-2026-11-15.md` (findings C1 to C10; its visual faults were fixed separately,
@@ -20,8 +32,9 @@ It follows `docs/brainstorm/dash-rework.md` (the "shout, throw, pocket" proposal
    the user's review.** Commit once a step is approved; merge to `main` and push only on the
    user's word.
 4. Standing rules that matter here: never the whole playtest suite unasked; every test browser
-   muted (`tools/playtest.py`'s `Browser`); every generation's price stated and approved before
-   it is spent; every picture shown to the user, enlarged, before it is placed; no hint popups
+   muted (`tools/playtest.py`'s `Browser`); what the generations cost said in each report (no
+   asking first for pictures: `CLAUDE.md`, "Art"); every picture shown to the user, enlarged,
+   before it is placed; no hint popups
    and nothing that points to where something is; no person, hazard, errand or reward used
    twice; nothing floats; failures are "scares"; every text in `src/lang.js` in both languages;
    record each change of plan with its reason in `docs/progress-decisions.md`.
@@ -30,6 +43,14 @@ It follows `docs/brainstorm/dash-rework.md` (the "shout, throw, pocket" proposal
    line, easy to move.
 6. Numbers (speeds, reaches, times) are first guesses to be tuned by play, all in
    `src/config.js`.
+7. **Art is generated (the user, 2026-11-16): "use generations instead of attempting to draw by
+   itself, or reuse part of props from other scenarios."** A new thing, figure, pose or gag is
+   made with PixelLab: not drawn in code, and not put together from pieces of props that were
+   made for another scene. A person with a thing is one generated clip or picture (`CLAUDE.md`,
+   "Art"). Drawing in code stays for what is flat by nature (a coloured band, a wash, a rope's
+   line, a jet of water) and for the rooms already drawn that way. Add the rule to `CLAUDE.md`'s
+   "Art". What steps 1 to 4 drew in code or put together from other props is listed, shown to
+   the user and made again (step 4's revision).
 
 Read from the code for this plan, so that the steps name real places:
 
@@ -46,7 +67,8 @@ Read from the code for this plan, so that the steps name real places:
   `src/progression.js`, `save.opened`).
 - Her husband sits at the first table of the Great Outdoors (deck 11, about 220 m) from region
   6; the table scene is `tableScene` in `src/world/lido.js` and sets the flag `table`.
-- PixelLab: 540 generations were left on 2026-11-15, until 2026-11-30.
+- PixelLab: 4,939 generations left on 2026-11-16 (the user upgraded the subscription; the
+  allowance refills on 2026-12-16). There were 540 on 2026-11-15.
 
 ---
 
@@ -88,14 +110,17 @@ safeTailMs: 300 }`. The speed stays under Bumbot's 300 px a second.
 
 ### 1.3 The pocket (automatic, on every hit), one tangerine
 
-- A hit that would be a fright or a spilled tray, with a tangerine on her: she flinches (the
-  `her-hit` clip, a third of a second), is pushed a step back, blinks for a second and a half
-  during which nothing can touch her, **and keeps her place and her tray.**
-- **The tangerine is knocked out of her pocket and rolls away fast**, the way she was pushed. It
-  is the same real thing as a thrown one: she can run after it, and whatever wants it may get
-  there first.
-- With none on her, a hit is what it is today. Falls, the sea and a cake that wobbles over by her
-  own feet are never forgiven.
+- A hit that would send her back or spill her tray, with a tangerine on her: she takes it with
+  a short reaction that fits the hit and the side it came from (§1.6; about half a second),
+  blinks for a second and a half during which nothing can touch her, **and keeps her place and
+  her tray.**
+- **The tangerine is knocked out of her pocket and rolls away fast, the way she is thrown**
+  (§1.6): on ahead of her after a hit from behind, back the way she came after a hit from the
+  front. It is the same real thing as a thrown one: she can run after it, and whatever wants it
+  may get there first. Two hits take it for good: a gull that comes down on her flies off with
+  it, and at a "Do Not Disturb" door she holds it out as an apology and a hand takes it.
+- With none on her, a hit is a mishap with a gag of its own, and then her checkpoint (§1.6).
+  Falls, the sea and a cake that wobbles over by her own feet are never forgiven.
 - **Testing:** with `?tangerines=infinite` the pocket would forgive everything. `&pocket=off`
   switches it off; the playtests that check frights start with no tangerines, as they do now.
 
@@ -115,12 +140,169 @@ keeps the bowl, empty once they are taken. The intro leaves her in the corridor 
 door, so they are for whoever steps back in, and with them all but the lunge is hers from the
 first minute.
 
+### 1.6 Mishaps: how she takes a hit (the user, 2026-11-16)
+
+The user, while step 4 was being built: "replace some frights with slips, trips, and falls";
+then "replace frights with more proper mechanics leading to either a respawn or to a tangerine
+loss"; on a first proposal, "You're reusing the slips too much. We have a lot of PixelLab
+generations ... and I want us to use them. Add more variety"; and on the second, "What happens
+when she is facing a moving object, versus when she is hit with it from behind (like: fall
+forward vs fall backwards on her bottom). What happens when she stumbles on an object while
+moving, versus when an object hits her while she's standing".
+
+**The outcome does not change:** with a tangerine on her, one is lost and she keeps her place
+(§1.3); with none, she goes back to her checkpoint. **What changes is what is seen.** "A fright,
+then she runs off the screen" stays only where she is truly embarrassed (the "Do Not Disturb"
+doors, the occupied balcony). Everywhere else:
+
+- **with a tangerine on her: a short reaction** (about half a second) by the kind of hit and
+  its side;
+- **with none: the obstacle's own gag** (about two seconds), then the fade and her checkpoint.
+  **During a gag the keys do nothing and it cannot be cut short** (the user: "No, during the gag
+  the movement keys have no effect").
+
+**What decides how she goes down.** Two facts are read at every hit: **which side of her it is
+on** (front is the way she faces) and **who was moving** (she ran into it, it came at her, or
+both).
+
+| The hit | She goes |
+|---|---|
+| She runs into a low thing that holds | Forward, over it |
+| She steps on a thing that slides her way | Backward: her foot goes on ahead |
+| A thing slides against her foot | Forward: her foot is taken back |
+| A waist-high thing, and she runs into it | Forward, onto it: the momentum is hers |
+| A waist-high thing hits her as she stands facing it | Backward, on her bottom: the momentum is its |
+| A seat-high thing reaches her from behind | She sits down onto it, and it carries her |
+| A head-high thing from the front | Backward |
+| A head-high thing from behind | Forward |
+| From above, a cloud, or an embarrassment | No side: one gag |
+
+She runs at 140 px a second or stands. Slow things (the porter's cart 48, the jogger 106, the
+suitcase 53 at its fastest) reach her back only while she stands; fast ones (the deck chair
+235, the vacuum's dart, the light, the door, the balls, the jet) can catch her running.
+
+**Each obstacle with a side, by scenario** (the gag is what plays with none on her):
+
+| # | Obstacle | Scenario | The gag |
+|---|---|---|---|
+| 1 | Casino chips (3) | She runs onto them | On her bottom, butterflies (built). Standing on them: nothing (built) |
+| 2 | The dog's lead | She runs into it | On her belly, butterflies (built); **the dog comes and licks her face** |
+| 3 | Trays on the floor (10) | She runs onto them | **A tray shoots on ahead with her on it**, arms wheeling, out of the screen; a crash; the door opens on the guest looking after her |
+| 4a | A sliding paper | It slides her way | She sits down; the paper flutters open over her head like a tent |
+| 4b | | It slides against her | Down on her belly, chin on her hands; the paper settles on her back like a blanket |
+| 4c | | She stands still | **Nothing: it stops against her shoe.** Stopped short of its door it is not taken in by the hand: it fades away a moment later, harmless while it lies there (the user: "a stopped [paper] would not be collected, if it stops not by the door. It just disappears shortly after") |
+| 5a | Robot vacuums (decks 4 and 9) | It comes at her front, or she runs into it | Forward over it, on her belly across it; it bumps her side twice and trundles home. "Eeek!" |
+| 5b | | It catches her from behind | **She sits down on it and it carries her off down the corridor**, like a cat on one. **"Weeeee!"** (see the words, below) |
+| 6a | The runaway suitcase | She runs into it | Over it; it pops open; she sits up in someone's sun hat |
+| 6b | | It rolls into her back as she stands | She sits on it and rides to the end of its roll, where it creaks and tips her off |
+| 6c | | She stands facing it | **Nothing: she stops it with her hands and it rolls back** |
+| 7a | The deck chair on the wet patch | Head-on (she slid in from the forward end) | Face first onto it; it folds flat and she sledges on it across the tiles |
+| 7b | | From behind (she slid in from the aft end) | Scooped up seated; it folds shut on her, her feet out |
+| 8a | The porter's cart | She runs into the cart | Folded over its bar, draped on the bags, legs kicking |
+| 8b | | It pushes into her as she stands facing it (he cannot see over the bags) | She back-pedals before it and sits down |
+| 8c | | It reaches her back as she stands | She sits into the luggage with a bag on her lap; he wheels her two metres, sees her, tips his cap |
+| 8d | | She runs into his back | She bounces off him and sits; he turns round |
+| 9a | The jogger | Head-on, both running | Twirled like a top, spirals over her head, she sits |
+| 9b | | He runs into her as she stands facing him | Bowled back onto her bottom; he jogs on the spot, sorry |
+| 9c | | He runs into her back | Shoved into three flailing steps and a belly-flop |
+| 9d | | She runs into his back | She bounces off and sits (8d's clip); he never notices |
+| 10a | The breakfast stewardess with a tray | She runs into the tray | She sits back with the breakfast on her: toast on her head, the flower behind her ear |
+| 10b | | The tray meets her back as she stands | Juice down her collar: she arches and dances on the spot, pulling her shirt off her back, and squelches off |
+| 11a | The kid's water jet | In her face | Sat back, spluttering, wringing her hair; he points and laughs |
+| 11b | | In her back | As 10b: she arches, dances, squelches off |
+| 12a | The stage's swinging light | From the front | Her head back, two spins on the spot, stars circling, she sits |
+| 12b | | From behind | Three stumbling steps, down on her hands and knees, stars |
+| 13a | A swinging door (6) | It opens in her face (she faces the door) | **Flattened against the wall behind it;** it swings shut, she peels off and flutters down |
+| 13b | | It catches her just past it (her back to it) | Swatted forward: a belly-slide along the carpet, chin first |
+| 14a | A basketball | In her face | She tips over backward, stiff as a skittle |
+| 14b | | On the back of her head | She topples forward, stiff as a plank |
+| 15 | The boat drill's boat | From above | Pressed down to half her height, a waddle, she springs back up and sits |
+
+**Those with no side, one gag each:**
+
+| # | Obstacle | With a tangerine | The gag |
+|---|---|---|---|
+| 16 | Sprinklers (5) | She shivers (built); it slips from her wet fingers | Her hair plastered over her face, a sneeze, she squelches off to change |
+| 17 | The sauna's steam | She coughs and fans it away | Out of the cloud with her hair frizzed into a huge puff; she fans herself and swoons |
+| 18 | The towel stack | She bats the towels off | Buried; her head comes up in a towel turban, a towel swan sitting on top |
+| 19 | Teppanyaki's flares | She yelps and pats out a smoking sleeve | A sooty face, her hair on end and smoking, two white eyes blink, a puff of smoke coughed |
+| 20 | The gulls on the balcony rails | She ducks; **the gull takes the tangerine and is gone** | The gull lands on her head and stays; she runs off flailing with it sitting there |
+| 21 | The funnel's gulls, on the stairway | She ducks; the gull takes it | She bumps down the flight on her bottom, step by step, to its foot |
+| 22 | The gulls across her glide | She ducks; the gull takes it | The parasol turns inside out, and she falls (the fall as built) |
+| 23 | "Do Not Disturb" doors (7) | **She holds a tangerine out in both hands, her head bowed; a hand takes it and the door shuts** (spent, not rolling) | "Oh, sorry!": both hands over her eyes, blushing, she tiptoes off fast, out of the screen |
+| 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23 |
+
+**Unchanged:** a fall of more than a deck, the sea and its life ring, a tray spilled (it flies,
+she fetches another; the pocket saves it), and everything that never sent her back (the
+delivery robot, the steward on his rounds, the buffet queue, the old lady, the ball pit, the
+gusts, the laundry lines, the gulls that take food, the waiter).
+
+**The rules that go with the tables:**
+
+- **With a tangerine on her, the same side picks her short reaction:** thrown back, she reels a
+  step (a slip: her caught-backwards, built); pushed on, she stumbles a step (built). A door in
+  her face: she rubs her nose. Water in her face: a splutter; on her back: she arches. Heat: a
+  yelp. From above: she ducks. **The tangerine flies the way she is thrown.**
+- **With a tangerine on her she is never sat onto a thing or carried by it:** a ride is only
+  for the gag with none.
+- **A hit while she is in the air** uses the same rule; the gag starts when she lands.
+- **With a tray in her hands** nothing changes (the tray flies, no checkpoint); with a
+  tangerine on her the reaction follows the same rule.
+- **In a lunge** nothing changes (§1.1, §2): she is through, and there is no mishap.
+- **The four gags that carry her off** (3, 5b, 6b, 20) are each one picture of her with the
+  thing: the world's own tray, vacuum, suitcase or gull is hidden while the clip moves, and is
+  back in its place when she steps out of her door.
+- **6c and 4c make the suitcase and the papers gentler on purpose:** a slow thing she is
+  looking at does not knock her over. She still has to hop them to get past.
+- **The words over her head** stay as they are for each kind of hit, in both languages. One
+  changes, the user's: "Update the wording with fright/excitement, like 'Weeeee!' or
+  something": the vacuum's ride (5b) is **"Weeeee!"** («Віііі!»); over it on her belly (5a) she
+  keeps "Eeek!". A gag that needs a word of its own gets one in `src/lang.js`, in both.
+
+**In the code** (names are suggestions):
+
+- `scareContact(fromX, what, { vx = 0, force = false })`: `what` is the obstacle's own name (a
+  key of `MISHAPS`), no longer a word shared by several; `vx` its speed along the deck, so that
+  who was moving can be told. `Carry.spill` passes both on.
+- One helper for the two facts: the side from her facing and `fromX`; she is moving when her own
+  speed toward it is over 20 px a second, it is when `vx` toward her is over 5.
+- `MISHAPS` in `src/config.js`: per obstacle, which scenario each side and mover gives; per
+  scenario its word, her reaction's clip, her gag's clip, how the gag ends (a fade where she
+  is; out of the screen; a fall) and what the other party does (the dog's lick, the porter's
+  cap). One line each, as everything in this plan.
+- One function plays a gag in place of the run-off and of `scareDown`; `pocket()` takes the
+  reaction from the same table.
+- `world.lunged()` gets the same names.
+
+### 1.7 The tangerine itself (the user's own two, 2026-11-16)
+
+- **"Rework the tangerine sprite to make it a bit more detailed and look like a tangerine."**
+  It is 8 px today, drawn from rows of letters (`tangerine` and its two bitten states in
+  `src/textures.js`; a copy in `tools/draw_rooms.py`, `TANGERINE`). A new one is generated
+  (Start here, 7): a fruit a little flatter than round, the dimple and a small green leaf at
+  its stalk, a highlight, a speck or two of the peel's pores; about 10 to 12 px, so that it
+  still sits in her fist. **The user chooses from candidates shown enlarged and numbered:** on
+  a floor beside her, in her fist, in the HUD. Everything that shows a tangerine then follows
+  the chosen one: the pickups, the loose one (it turns as it rolls), the HUD's icon, her toss's
+  fist (`tools/hold_tangerine.py`), the two bitten states, the ones painted into rooms
+  (`game_tangerine()`), the people's bubbles that show one, the ball pit's and the piñata's.
+- **"Collected tangerines should fly into her tangerine meter above."** On every pick-up (one
+  in its place, a loose one, one handed back, the piñata's three, the bowl's): its picture
+  flies from where it was to the HUD's tangerine in about 0.4 s, along a small arc, coming down
+  to the icon's size; **the number changes when it lands** (the save changes at once: only what
+  is shown waits), and the icon gives a small bump. It flies on the HUD's own layer, fixed to
+  the screen, from the screen's point where it lay. Several at once follow each other 80 ms
+  apart. With `?tangerines=infinite` it flies all the same. A tangerine spent does nothing new.
+
 ---
 
 ## 2. What each thing does
 
 `·` = nothing. Built today: the breakables, both vacuums' spin, the towels, the kid's flight, the
 librarian's shush. The rest is new.
+
+**The last column** says whether the pocket forgives the hit. How she takes it, with one on her
+and with none, by its side and by who was moving, is §1.6 (2026-11-16).
 
 | Thing (where) | The cry | The lunge | A tangerine rolled or lobbed at it | A hit with one in her pocket |
 |---|---|---|---|---|
@@ -130,12 +312,12 @@ librarian's shush. The rest is new.
 | The steward on his rounds (8) | Pulls his cart in at once, as at a knock | · (solid) | Stops and puts it on his cart, hers to take back with E. Not spent | · |
 | The buffet queue (11) | They turn aside against the tables, as for a tray | · (solid) | · | · |
 | The kid with the water pistol (11) | **Draws his fire**: he turns and squirts at once | Runs and hides (built) | Catches it, eats it, back turned 15 s. Spent | Forgiven |
-| The dog on the lead (4, new) | Howls back and winds the lead round its owner's legs: the line lies flat 5 s | Jumps aside | **Fetches it and brings it back.** Not spent | · (the lead is no fright) |
+| The dog on the lead (4, new) | Howls back and winds the lead round its owner's legs: the line lies flat 5 s | Jumps aside | **Fetches it and brings it back.** Not spent | Forgiven: a stumble, and the dog fetches the tangerine back (§1.6, 2) |
 | The paper round's steward (5, new) | Drops the bundle and stands aside | Through the papers | Catches it, stands aside to eat it. Spent | Forgiven |
 | Anyone else (the ambient cast) | Turns to look; a `♥` over the few who like cats, a finger to the lips in quiet places | · | Looks at it | · |
 | The librarian | The shush (built), and the "QUIET PLEASE" sign rattles | The same | · | · |
-| "Do Not Disturb" doors (7) | **Within 3 m the door opens on someone not dressed for visitors: "Startled"** | · | · | Forgiven |
-| Trays on the floor (10 places) | · | Scattered with a clatter; the door flies open after she has gone | Rolled into them: the clatter, the door opens on nobody, the trays safe to cross while the guest looks about | Forgiven |
+| "Do Not Disturb" doors (7) | **Within 3 m the door opens on someone not dressed for visitors: "Startled"** | · | · | Forgiven: she holds it out as an apology and a hand takes it (§1.6, 23). Spent |
+| Trays on the floor (10 places) | · | Scattered with a clatter; the door flies open after she has gone | Rolled into them: the clatter, the door opens on nobody, the trays safe to cross while the guest looks about | Forgiven: a stumble with a clatter. The door is no longer the fright (§1.6, 3) |
 | Swinging doors (6) | · | She is past before it swings | · | Forgiven |
 | Sprinklers (5) | · | Through, with a few drops | · | Forgiven |
 | The casino's chips, the wet patch | · | She skates across upright; or leaps the lot | · | Forgiven |
@@ -149,8 +331,8 @@ librarian's shush. The rest is new.
 | Shy gulls (promenade) | Up and away for 4 s | · | They come down to it and squabble: the rail is clear 8 s. Spent | · |
 | The gull with the bell (promenade, new) | Flaps, keeps the bell | · | **A lob: it drops the bell for the fruit.** Spent | · |
 | Gulls that dive at food (pool, Great Outdoors) | Scatter; a dive in its tell is called off | · | One takes it and leaves her cone alone 10 s. Spent | Her cone saved |
-| Gulls on the balcony rails | Off the rail 6 s without swooping | Missed | Goes for it: that balcony is safe until she is past. Spent | Forgiven |
-| The funnel's gulls; the bow's flocks | Break off; the flock lifts and settles | Missed | One goes after it: no swoop for 10 s. Spent | Forgiven |
+| Gulls on the balcony rails | Off the rail 6 s without swooping | Missed | Goes for it: that balcony is safe until she is past. Spent | Forgiven: the gull takes it (§1.6, 20). Spent |
+| The funnel's gulls; the bow's flocks | Break off; the flock lifts and settles | Missed | One goes after it: no swoop for 10 s. Spent | Forgiven: the gull takes it (§1.6, 21, 22). Spent |
 | Gusts, laundry lines, partitions | · | · | · | · |
 | Breakables: luggage, crates | · | Smashed (built) | Bounces off | · |
 | The piñata | · | Smashed (built) | **A lob brings it down: three for one** | · |
@@ -248,9 +430,9 @@ their tangerines and get nothing more.
 
 | m | What |
 |---|---|
-| 38 to 46 | **A runaway suitcase** on its wheels, rolling to and fro between two door frames with the ship's slow roll; a creak before it turns. Hop it |
+| 38 to 46 | **A runaway suitcase** on its wheels, rolling to and fro between two door frames with the ship's slow roll; a creak before it turns. Hop it (§1.6, 6) |
 | 53 to 64 | The porter (built), with his new answers (§2) |
-| 86 | **A small dog on a long lead** across the corridor, its owner in the doorway (an existing figure). The lead is a line to hop. It fetches a rolled tangerine and brings it back; three fetches and the owner hands over the tennis ball. It barks at the vacuum when it comes near |
+| 86 | **A small dog on a long lead** across the corridor, its owner in the doorway (an existing figure). The lead is a line to hop: run into, a trip (§1.6, 2). It fetches a rolled tangerine and brings it back; three fetches and the owner hands over the tennis ball. It barks at the vacuum when it comes near |
 | 118 to 150 | The vacuum (built), with its new answer |
 | 140 to 146 | **The climb:** a service cart, a linen cage and a shelf under the ceiling as three steps up, the feather on the shelf, the vacuum passing underneath |
 | 250 | A look-out (§4.3) |
@@ -263,9 +445,14 @@ The laundry and the dry store stay behind the green card (the user: "No").
 |---|---|
 | 20 | A look-out (§4.3) |
 | 22 | **A lady knitting in an open cabin**, her basket by the door with the ball of wool |
-| 34 to 46 | **The paper round:** a steward skims folded newspapers along the carpet to each door; he licks a finger first. Hop them |
+| 34 to 46 | **The paper round:** a steward skims folded newspapers along the carpet to each door; he licks a finger first. Hop them (§1.6, 4) |
 | 146 | Her flag at Shore excursions' desk |
 | 170 to 192 | The waiter (built): on the lunch errand the cry is what gets her tray past him |
+
+Built in step 4 beyond these tables, on the user's rounds of review (`docs/progress-decisions.md`
+has each): a second paper round where deck 5's forward cabins meet the stair hall (57.5 to
+72 m), and the breakfast round (deck 5, 44.9 to 52.9 m: a room-service stewardess with a
+trolley, carrying a tray to each door). Their mishaps: §1.6, 4 and 10.
 
 ### 4.3 The look-outs (C3): five
 
@@ -302,7 +489,7 @@ Deck 8 aft keeps its six trays and its tangerine and gets no delivery.
 
 - **A coloured band on each deck's cabin number plaques:** deck 4 grey-blue, 5 warm yellow, 8
   blue, 9 green, 10 terracotta.
-- **Each deck its own framed pictures between the doors, drawn in code:** deck 4 safety posters
+- **Each deck its own framed pictures between the doors, generated** (revised 2026-11-16: they were to be drawn in code; step 7's revision)**:** deck 4 safety posters
   and rosters, 5 paintings of the ship, 6 (forward cabins) old port maps, 8 seascapes as built,
   9 botanical prints, 10 old liners' posters.
 - **No tint on the wallpaper** for now. If a deck still looks like its neighbour, one deck is
@@ -349,6 +536,17 @@ after the user has seen it in motion.
 Shown: the cry at the porter, the waiter and a gull; the lunge through the luggage and through
 a swinging door; the cabin's bowl full and empty.
 
+**Revision (2026-11-16); step 1 is built, so this is gone back over:**
+
+- `world.lunged(kind, fromX)` and every `lunged()` take the obstacle's own name (§1.6's
+  `MISHAPS` keys) where they took the shared word. The lunge's rule is what it was: she is
+  through, no mishap.
+- The cabin's bowl: its three follow the new tangerine (§1.7), and so does every tangerine
+  painted into a room (`game_tangerine()` in `tools/draw_rooms.py`); the rooms' pictures built
+  again and the crew cabin looked at enlarged, full and emptied.
+- `src/lang.js`: the vacuum's ride, "Weeeee!" / «Віііі!» (§1.6).
+- Run again: `dash`, `deck3`, `intro`, `lang`.
+
 ### Step 2. The real tangerine, and the pocket (no art)
 
 | File | Change |
@@ -362,6 +560,21 @@ a swinging door; the cabin's bowl full and empty.
 
 Shown: the flinch frame by frame beside the porter; the tangerine rolling off.
 
+**Revision (2026-11-16); step 2 is built, so this is gone back over:**
+
+| File | Change |
+|---|---|
+| `src/config.js` | `MISHAPS` (§1.6): one line per scenario. The dazed wait and each gag's length with it |
+| `src/scenes/ShipScene.js` | `scareContact(fromX, what, { vx, force })`; the helper for side and mover; `pocket()` takes her reaction from the table and throws the tangerine the way she is thrown; one function plays a gag (it takes the place of the run-off and of `scareDown`), ends it as its line says, and keeps the keys dead until the fade. The run-off stays for 23 and 24 only |
+| Every caller of `scareContact` and `Carry.spill` (28 places in `movers.js`, `hazards.js`, `outside.js`, `topdeck.js`, `bow.js`, `lido.js`, `world.js`, the ship scene) | Its own name and its speed passed. Their gags come with steps 4 and 4a: until a gag's clip is approved the built fall on that side stands in (on her bottom, on her belly) |
+| The gulls' classes, `DndDoor`, `Occupied` | With a tangerine on her the gull takes it (`world.gullTakes()`), and at a door or the balcony it is handed over: spent, never loose |
+| `assets/source/her/`, `tools/build_sprites.py` | **Her six new reactions** (reel, rub her nose, splutter, arch, yelp, duck) **and the apology** (a tangerine held out in both hands, head bowed): seven clips, about 25 generations; each shown enlarged first |
+| `src/textures.js`, `tools/draw_rooms.py`, `tools/hold_tangerine.py`, `tools/build_things.py` | **The new tangerine** (§1.7): candidates to the user (about 5 generations), then everything that shows one follows |
+| `src/scenes/ShipScene.js` (the HUD), `src/world/tangerine.js`, `src/world/outside.js` | **The flight to the count** (§1.7) at the three places a tangerine is added to her (`save.tangerines += 1`) and wherever else one is given |
+| `src/sfx.js` | A reaction's and a landing tangerine's sounds, each in its group with its line; the user judges them on the soundboard |
+| `tools/playtest.py` | `pocket` grown: a hit from the front and one from behind give the reaction and the tangerine's way of §1.6; a gull takes it; at a "Do Not Disturb" door it is handed over and not on the floor; with none a gag plays, the keys do nothing during it, and she is at her checkpoint after; the number changes when the flying tangerine lands. Run with it: `vacuum`, `dash`, `lang`, `boot`, `sound`, `gamepad` |
+| Docs | `GAME_DESIGN.md` §5.6 written again (mishaps in place of "a fright, then she runs off"), §3.2; `CLAUDE.md`'s table and its "Art" (Start here, 7); `docs/progress-decisions.md` |
+
 ### Step 3. The throw (art: one clip of hers, about 5 generations, asked first)
 
 | File | Change |
@@ -373,6 +586,14 @@ Shown: the flinch frame by frame beside the porter; the tangerine rolling off.
 | `tools/playtest.py` | A new scenario `throw` (a roll nothing takes is picked up again; the vacuum chokes; a gull takes one; the piñata by a lob; Bumbot bats it back and the beat goes on). Run with it: `gamepad`, `region2`, `region6`, `region7`, `region8` |
 
 Shown: her throw's frames for approval before anything else; then each target as a short strip.
+
+**Revision (2026-11-16); step 3 is built, so this is gone back over:**
+
+- The new tangerine (§1.7) in her fist in the toss's frames (`tools/hold_tangerine.py` run
+  again; her clip itself stays) and as the thrown one, turning as it rolls.
+- A thrown tangerine picked up again flies to the count like any other (§1.7).
+- Where §2's fourth column has someone catch or take it, nothing changes.
+- Run again: `throw`, `gamepad`.
 
 ### Step 4. Region 1's decks, and the first things to find (art: about 45, asked item by item)
 
@@ -390,6 +611,70 @@ Shown: her throw's frames for approval before anything else; then each target as
   `tools/check_overlaps.py` empty; `tools/check_corridors.py` (new) run.
 - Playtests: a new scenario `deck4`; `region1`, `boot`, `deck3`, `trunk`, `ladder`.
 
+**Revision (2026-11-16); step 4 is built, so this is gone back over:**
+
+- **Region 1's mishaps, each by its scenarios (§1.6):** the dog's lead (2, and the dog's lick),
+  the papers of both rounds (4a, 4b, 4c: a paper stopped by her shoe short of its door fades
+  away, no hand takes it), deck 4's vacuum (5a, 5b), the suitcase (6a, 6b, 6c), the porter and
+  his cart (8a to 8d, and his tip of the cap), the breakfast stewardess (10a, 10b).
+- **Art, each shown enlarged before it is placed:** twelve gags of hers (4a, 4b, 5a, 5b, 6a,
+  6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations. The
+  first to be made and shown are 5b and 6b (her on the vacuum, her on the suitcase): they tell
+  whether a picture of her riding a thing holds up.
+- Her gags go on a sheet of their own (`assets/sprites/her-mishaps.png`, its own cell, her
+  feet at its bottom row as on her sheet), so that her main sheet stays within a texture's
+  size (`boot` checks it).
+- **The art rule looked back over (Start here, 7):** list what steps 1 to 4 drew in code or put
+  together from parts of other props (the things on the climb, the knitting lady's basket, the
+  breakfast trolley and its tray, the papers, anything else found), show the list to the user
+  with a close-up of each, and make again with PixelLab what they point at.
+- `deck4` grown: each scenario above set up by where she stands, which way she faces and
+  whether she moves, the right gag asked for, her checkpoint after; 6c and 4c cost nothing; with
+  a tangerine the reaction and the tangerine's way. Run with it: `region1`, `pocket`, `boot`.
+
+### Step 4a. The mishaps on the rest of the ship (art: about 125, in three batches)
+
+Everything of §1.6 that step 4 does not reach. No new obstacle, no placement moved: only what
+is seen when she is hit.
+
+| Obstacle | Where its code is | Scenarios |
+|---|---|---|
+| The casino's chips | `Spill` in `movers.js` | 1: as built |
+| The trays on the floor | `Trays` in `hazards.js` | 3: the trip and the ride are the fright now; the door opens after, on the guest looking after her |
+| Deck 9's vacuum | `Darter` in `movers.js` | 5a, 5b (step 4's clips) |
+| The wet patch's deck chair | `WetPatch` in `hazards.js` | 7a, 7b, by the end she slid in from |
+| The jogger | `haz_jogger`, `world.touched()` | 9a to 9d; his sorry on the spot |
+| The kid's jet | `lido.js` | 11a, 11b; his laugh |
+| The stage's light | `SwingLight` in `movers.js` | 12a, 12b, by the way it swings |
+| The swinging doors | `SwingDoor` in `movers.js` | 13a, 13b, by her facing |
+| The basketballs | `Balls` in `topdeck.js` | 14a, 14b |
+| The boat drill | `DrillBoat` in `outside.js` | 15 |
+| Sprinklers, the steam, the towels, the flares | `Sprinkler`, `Steam`, `TowelStack`, `Flare` | 16 to 19 |
+| The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22 |
+| "Do Not Disturb" doors, the occupied balcony | `DndDoor` in `movers.js`, `Occupied` in `outside.js` | 23, 24 |
+
+- **Art:** twenty-two gags of hers (3, 7a, 7b, 9a, 9b, 9c, 11a, 12a, 12b, 13a, 13b, 14a, 14b,
+  15 to 23), the kid's laugh, the jogger's sorry. **Three batches of about eight, each shown to
+  the user enlarged and numbered before anything of it is placed.** The first: 13a (flat behind
+  the door), 7b (folded in the chair), 3 (on the tray), 20 (the gull on her head): the hardest
+  to get right. One that will not read after two tries is shown to the user with what could
+  take its place, not re-rolled on and on.
+- **Each gag looked at as "Looking closely" asks:** her proportions held in every frame, the
+  thing the size it is in the world, what holds it up, the same spot before and after (the
+  thing back in its place when she returns).
+- **Sounds:** each gag its own few, in `src/sfx.js` with their lines; `tools/check_sound.py`
+  must end "all within bounds"; the user judges them on the soundboard.
+- **Playtests:** a new scenario `mishaps` (every scenario of §1.6 outside region 1 set up and
+  the gag it asks for checked, her checkpoint after, the thing back in its place; with a
+  tangerine the reaction and where the tangerine goes); the checks that expect the run-off
+  changed in `vacuum`, `pocket`, `dash`, `region2`, `region4`, `region6`, `region7`, `region8`,
+  `region9`, `finale`; `lang`, `sound`, `boot`.
+- **Docs:** `docs/population.md`'s hazards, each with its scenarios; `GAME_DESIGN.md` §5.6 and
+  §5.8; `docs/progress-decisions.md`; `CLAUDE.md`'s table (the new sheet).
+
+Shown: each gag as a strip of its frames in place, and the link to its spot with
+`&tangerines=infinite&pocket=off`.
+
 ### Step 5. The rest of the twenty (art: about 12 small pictures, shown first)
 
 - The other placements of §4.1 (those not paid by a delivery).
@@ -405,6 +690,14 @@ Shown: her throw's frames for approval before anything else; then each target as
   its first find); `region2`, `region6`, `region9`, `region5`, `cabin`, `finale`, and each
   region's scenario where something is placed.
 
+**Revision (2026-11-16):**
+
+- The small pictures are generated, none drawn in code (Start here, 7); the four new books'
+  stand-in covers too.
+- At the Sushi Bar the tangerine is handed over with the apology's clip (step 2's revision): it
+  is the same act.
+- Nothing of the twenty flies to its count: only tangerines fly (§1.7).
+
 ### Step 6. The look-outs and the deliveries (art: about 5)
 
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data: the Stardust's first, shown to the
@@ -414,24 +707,38 @@ Shown: her throw's frames for approval before anything else; then each target as
   the door that takes it; books 18 and 19.
 - Playtests: a new scenario `deliveries`; `region3`, `region5`, `region7`, `region4`, `region9`.
 
+**Revision (2026-11-16):**
+
+- With a delivery in her hands a hit is a spill, as with any tray; with a tangerine on her the
+  reaction follows §1.6.
+- The loads (the vase of flowers, the teapot, the pillows) and the look-outs' porthole and
+  window are generated (Start here, 7). Where a load hides her or changes how she stands (the
+  vase before her face, the pillows in both arms), her with it is one generated clip.
+
 ### Step 7. Each deck its own look (no art)
 
 `tools/build_ship_map.py`: the plaques' bands, the pictures by deck, drawn in code. The whole
 ship rendered and looked at; `boot`, `stairs`, `lift`, `tools/check_overlaps.py`.
 
+**Revision (2026-11-16):** the framed pictures of each deck are generated, not drawn in code
+(Start here, 7, which is newer than answer 10 of §8; the plaques' bands, a flat colour, stay in
+code): six sets of three or four, about 20 generations, each set shown to the user first.
+
 ### Cost
 
-| | Generations |
-|---|---|
-| Steps 1 and 2 | 0 |
-| Step 3 | about 5 |
-| Step 4 | about 45 |
-| Step 5 | about 12 |
-| Step 6 | about 5 |
-| Step 7 | 0 |
-| **All** | **about 67 of the 540 left** |
+| | As planned on 2026-11-15 | Added on 2026-11-16 |
+|---|---|---|
+| Step 1 | 0 | 0 |
+| Step 2 | 0 | about 30 (the tangerine, her seven reactions) |
+| Step 3 | about 5 | 0 |
+| Step 4 | about 45 (more was spent on the user's rounds of review) | about 70 (twelve gags, two clips of others) and what the look back over the art rule asks |
+| Step 4a | | about 125 (twenty-two gags, two clips of others) |
+| Step 5 | about 12 | a few (stand-in covers) |
+| Step 6 | about 5 | about 10 (the loads, her with two of them) |
+| Step 7 | 0 | about 20 |
+| **All** | **about 67** | **about 260, of 4,939 left on 2026-11-16** |
 
-Estimates: the real price is stated before each spend. Sounds are synthesised and cost nothing;
+Estimates, re-rolls counted in: what was spent is said in each report. Sounds are synthesised and cost nothing;
 whoever builds cannot hear them: every new one is the user's to judge on the soundboard.
 
 ---
@@ -449,6 +756,15 @@ whoever builds cannot hear them: every new one is the user's to judge on the sou
   cost nothing.
 - **Motion.** The lunge, the flinch, the roll and the look-outs' camera are judged in motion:
   each is shown plain first, and the user's eye is the test.
+- **A gag is longer than a run-off** (about two seconds against one) **and cannot be cut
+  short** (the user's choice). If going back feels slow in play, the lever is each gag's length
+  in `MISHAPS`, not a key.
+- **Her drawn with a thing** (riding the vacuum, flat behind a door, folded in a deck chair) is
+  the hardest art in the plan: those are made first, and one that will not read is shown to the
+  user with a replacement, not re-rolled on and on.
+- **Sides must be told right.** A hit read as from the front when she had just turned gives the
+  wrong fall, and the user will see it at once: the side is taken from her facing at the moment
+  of the hit, and each scenario has its own check in the playtests.
 - **"Nothing twice."** The three deliveries are one kind of errand with three loads and three
   rules: the closest the plan comes to the line.
 
@@ -518,3 +834,21 @@ promenade's enclosed ends: "Leave as they are for now."
 | 10 | Each deck's look: bands and pictures in code; by PixelLab; with a tint; bands only; none? | 1: bands and pictures drawn in code, no tint |
 | 11 | The rounds: drop, later, build? | 1: dropped for good |
 | 12 | Finish the plan, merge into `main`, push? | 1: yes |
+
+**The revision of 2026-11-16 (mishaps, the tangerine, the art rule):**
+
+| The question | The answer |
+|---|---|
+| (The user's own, opening it) | "While implementing the three-uses plan (in another session), I came up with an idea to replace some frights with slips, trips, and falls ... propose an update to the plan, to replace frights with more proper mechanics leading to either a respawn or to a tangerine loss" |
+| The first proposal (most hits a slip, a trip or a knock) | "You're reusing the slips too much. We have a lot of PixelLab generations (I upgraded my subscription), and I want us to use them. Add more variety to the current frights" |
+| The second (a gag per obstacle) | "Better ... think about specific scenarios from it where she interacts with moving objects. What happens when she is facing a moving object, versus when she is hit with it from behind (like: fall forward vs fall backwards on her bottom). What happens when she stumbles on an object while moving, versus when an object hits her while she's standing" |
+| 4c and 6c (standing still and watching, nothing happens): keep both, one, neither? | "Your suggestions accepted, although, a stopped [paper] would not be collected, if it stops not by the door. It just disappears shortly after" |
+| Four gags have her sit onto the thing: a family, or too alike? | "Accepted" |
+| Any rows to change or drop? | "All accepted" |
+| The vacuum's ride in place of her squeal and run-off, the "Eeek!" kept? | "Update the wording with fright/excitement, like 'Weeeee!' or something" |
+| "Do Not Disturb" doors with a tangerine on her: (a) held out as an apology, (b) knocked out? | "a" |
+| Any key cuts a gag short? | "No, during the gag the movement keys have no effect" |
+| Who builds it? | "You update the plan with this update in detail, and my other session implements it. You update each step with their relevant additions. Even the built steps. The other session should revise what it already built and complete it" |
+| (The user's own) | "Also, add a general rule: use generations instead of attempting to draw by itself, or reuse part of props from other scenarios" |
+| (The user's own) | "Rework the tangerine sprite to make it a bit more detailed and look like a tangerine" |
+| (The user's own) | "Collected tangerines should fly into her tangerine meter above" |

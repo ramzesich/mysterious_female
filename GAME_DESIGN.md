@@ -2324,7 +2324,12 @@ Nothing blocks the start of the build. These get settled along the way:
       committed `6a494b2`. Step 4 committed (region 1's decks and the first four things to find,
       §6.1.11, after six rounds of the user's fixes on decks 4 and 5: the falls, the paper and
       breakfast rounds, the knitting lady)**; their record is in `docs/progress-decisions.md`,
-      "The plan for the three uses, step 1" to "..., step 4". **Next: step 5** (the rest of the
+      "The plan for the three uses, step 1" to "..., step 4". **Next (the user, 2026-11-16): the plan's revision of that day, before step 5**
+      (`docs/plan-three-uses.md`: how she takes a hit, each obstacle its own mishap by the side
+      it comes from and by who was moving, §1.6; a new picture of the tangerine and its flight
+      to the count, §1.7; art generated, never drawn in code or put together from other props;
+      each built step gone back over under its "Revision", then the new step 4a). Only the plan
+      is written: nothing of the revision is built. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened.
