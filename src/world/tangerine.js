@@ -53,10 +53,10 @@ export class LooseTangerines {
     }
 
     // Knocked out of her pocket at (x, y), flying off the way `away` says (§1.3).
-    knock(x, y, away) {
+    knock(x, y, away, f = 1) {
         const k = LOOSE.knock;
         const t = this.make({ x, y, route: this.scene.route }, false);
-        t.img.body.setVelocity(away * k.vx, -k.vy);
+        t.img.body.setVelocity(away * k.vx * f, -k.vy);
         t.pickableAt = this.scene.time.now + LOOSE.pickDelayMs;
         return t;
     }
@@ -183,8 +183,7 @@ export class LooseTangerines {
             ? Math.abs(p.x - img.x) < 14 && Math.abs(p.y - img.y) < 60
             : Math.abs(p.x - img.x) < LOOSE.reach && foot > p.y - PLAYER.height && foot - 8 < p.y;
         if (!near) return false;
-        s.save.tangerines += 1;
-        sfx.tangerine();
+        s.gainTangerine(img.x, img.y);
         s.tweens.killTweensOf(img);
         this.all = this.all.filter(o => o !== t);
         s.save.loose = s.save.loose.filter(o => o.id !== t.id);

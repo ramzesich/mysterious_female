@@ -109,6 +109,10 @@ class Browser:
             query += f"&at={start}"
         if "pocket=" not in query:
             query += ("&" if "?" in query else "?") + "pocket=off"
+        # (The game as she will get it, whatever `DEV_FRESH` in src/config.js says: its save kept
+        # between loads, which some scenarios use.)
+        if "real" not in query:
+            query += ("&" if "?" in query else "?") + "real"
         self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
         time.sleep(0.3)
         # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
@@ -1066,7 +1070,8 @@ def scenario_vacuum(b):
     b.shot("vacuum-scare")
     s = b.state()
     ok = check(s["mode"] == "scripted", "touching the vacuum is a scare", s)
-    time.sleep(2.5)
+    # (Her mishap: down on her front over it, dazed, then her checkpoint: docs/plan-three-uses.md §1.6.)
+    b.wait_for("window.__ship.mode === 'play'", timeout=6)
     s = b.state()
     ok &= check(s["mode"] == "play", "she comes back afterwards", s)
     return ok
@@ -1201,12 +1206,54 @@ def scenario_pocket(b):
     s = b.state()
     ok &= check(b.eval(f"{S}.loose.all.length") == 0 and s["tangerines"] == n + 1, "walked over, it is hers again", s)
     ok &= check(b.eval(f"{S}.save.loose.length") == 0, "and gone from the save")
-    # With none: the fright as before.
-    b.eval(f"{S}.save.tangerines = 0")
+    # By side and mover (§1.6): the porter's cart pushing into her as she stands facing it, she is
+    # thrown back (reels a step), the tangerine behind her; reaching her back, she stumbles on, the
+    # tangerine ahead of her.
+    def hit(js, n=2):
+        b.eval(f"{S}.save.tangerines = {n}; {S}.safeUntil = 0; {S}.flinchUntil = 0; {S}.loose.all.slice().forEach(t => {S}.loose.remove(t)); {S}.player.setFlipX(false)")
+        time.sleep(0.15)
+        got = b.eval(f"{S}.scareContact({js})")
+        time.sleep(0.08)
+        return got, b.eval(f"[{S}.player.anims.currentAnim?.key, {S}.loose.all.map(t => Math.round(t.img.body.velocity.x)), {S}.save.tangerines, {S}.mode]")
+    b.eval(f"{P}.pausedUntil = {S}.time.now + 600000")
+    b.teleport(x_of(48), D4)
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'cart', {{ vx: -48, dir: -1 }}")
+    ok &= check(got == "8b" and clip == "her-reel" and flying and flying[0] < -50 and n == 1 and mode == "play",
+                "the cart into her front as she stands: thrown back, the tangerine behind her", (got, clip, flying, n))
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x - 12, 'cart', {{ vx: 48, dir: 1 }}")
+    ok &= check(got == "8c" and clip == "her-stumble" and flying and flying[0] > 30,
+                "into her back: pushed on, the tangerine ahead of her", (got, clip, flying))
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x + 14, 'door'")
+    ok &= check(got == "13a" and clip == "her-rubnose", "a door in her face: she rubs her nose", (got, clip))
+    # A gull takes it: not on the floor.
+    b.eval(f"window.__gull = {S}.add.image({S}.player.x + 30, {S}.player.y - 60, 'tangerine')")
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x + 8, 'railgull', {{ snatch: window.__gull }}")
+    ok &= check(got == "20" and clip == "her-duck" and not flying and n == 1, "a gull: she ducks and it takes the tangerine", (got, clip, flying, n))
+    # At a "Do Not Disturb" door it is handed over, her apology, and not on the floor.
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'dnd'")
+    ok &= check(got == "23" and clip == "her-apology" and not flying and n == 1, "a door's hand takes it as she bows", (got, clip, flying, n))
+    b.shot("pocket-apology")
+    time.sleep(1.6)
+    # The papers she stands watching stop at her shoe: nothing at all.
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'papers', {{ vx: -60 }}")
+    ok &= check(got == "4c" and n == 2 and not flying, "a paper sliding at her as she stands: nothing", (got, n))
+    # A tangerine she gets flies to the count, which changes as it lands.
+    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {S}.gainTangerine({S}.player.x + 40, {S}.player.y - 10)")
+    shown = b.eval(f"[{S}.save.tangerines, {S}.hudCount.text]")
+    time.sleep(0.7)
+    landed = b.eval(f"{S}.hudCount.text")
+    ok &= check(shown == [1, "× 0"] and landed == "× 1", "picked up: hers at once, counted when it lands", (shown, landed))
+    # With none: her mishap, the keys dead through it, then her checkpoint.
+    b.eval(f"{S}.save.tangerines = 0; {S}.safeUntil = 0; {S}.flinchUntil = 0")
+    x1 = b.state()["x"]
     b.eval(f"{S}.scareContact({S}.player.x + 10, 'cart')")
     time.sleep(0.1)
-    ok &= check(b.state()["mode"] == "scripted", "with none, a bump is a fright", b.state())
-    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    ok &= check(b.state()["mode"] == "scripted", "with none, a bump is a mishap", b.state())
+    b.key("left", True); time.sleep(0.5); b.key("left", False)
+    ok &= check(abs(b.state()["x"] - x1) < 4, "the keys do nothing during it", (x1, b.state()["x"]))
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    s = b.state()
+    ok &= check(abs(s["x"] - x1) > 100, "then she is back at her checkpoint", (x1, s["x"]))
     # A fall is never forgiven: two decks off deck 12's aft end, with three on her.
     b.eval(f"{S}.save.tangerines = 3")
     b.teleport(x_of(245.5), D12)

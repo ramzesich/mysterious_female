@@ -106,7 +106,7 @@ export class Crossers {
             // (Only in the air: on a deck she is under its flight.)
             const hit = s.mode === 'play' && s.route === 'inside' && !s.grounded && Math.abs(p.x - b.x) < 14 && y > p.y - PLAYER.height + 2 && y < p.y - 4;
             if (hit) sfx.at(b.x, y).gull();
-            if (hit) s.scareAir('crossgull');
+            if (hit) s.scareAir('crossgull', { snatch: b.sprite });
         }
     }
 }

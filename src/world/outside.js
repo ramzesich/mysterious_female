@@ -197,7 +197,7 @@ export class PerchGull {
                         this.world.carryBox.give();
                         this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
-                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull');
+                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite });
                 }
                 this.state = 'back';
                 this.at = time + 2600;
@@ -430,10 +430,8 @@ export class Rounds {
         const entry = { id: `${d.id}_fruit`, get x() { return cart.x; }, y: d.y, route: 'inside', items: [], reach: 24, interact: () => {
             entry.done = true;
             this.fruit = null;
+            s.gainTangerine(img.x, img.y);
             img.destroy();
-            s.save.tangerines += 1;
-            sfx.tangerine();
-            s.refreshHud();
         } };
         this.world.things.push(entry);
         return true;

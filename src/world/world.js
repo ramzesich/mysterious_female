@@ -1552,13 +1552,16 @@ export class World {
             this.lunged(t.fright, person.x);
             return;
         }
+        // (Their speed along the deck and their facing: which way the hit takes her, §1.6.)
+        const walking = person.walk && s.time.now >= (person.pausedUntil ?? 0);
+        const how = { vx: walking ? person.dir * person.walk.v * 48 : 0, dir: person.dir ?? 0 };
         if (this.carry) {
             this.touchCool = s.time.now + 1200;
             sfx.at(person.x, person.y).oh();
-            this.carryBox.spill(person.x);
+            this.carryBox.spill(person.x, false, t.fright || null, how);
         } else if (t.kind === 'scare') {
             if (!s.holding) sfx.at(person.x, person.y).hey();
-            s.scareContact(person.x, t.fright);
+            s.scareContact(person.x, t.fright, how);
         }
         // The pocket took it (docs/plan-three-uses.md §1.3): whoever walked into her stops and
         // stands aside, as at her cry, so as not to walk into her again.
@@ -1597,6 +1600,24 @@ export class World {
         const mark = MISHAPS[kind]?.mark;
         if (mark === 'wet') this.drops(p.x, head, 0x8fd3ff, 1);
         else if (mark) this.drops(p.x, head, mark === 'soot' ? 0x625565 : 0xffffff, -1);
+    }
+
+    // A gull takes the tangerine from her as it swoops (docs/plan-three-uses.md §1.6, 20 to 22): it
+    // goes from (x, y) to its beak and away with it.
+    snatch(sprite, x, y) {
+        const s = this.scene, t0 = s.time.now;
+        const img = s.add.image(x, y, 'tangerine').setOrigin(0.5, 0.6).setDepth(sprite.depth + 0.01);
+        this.add([img]);
+        const follow = () => {
+            const k = Math.min(1, (s.time.now - t0) / 160);
+            const bx = sprite.x + (sprite.flipX ? -6 : 6), by = sprite.y - 3;
+            img.setPosition(x + (bx - x) * k, y + (by - y) * k).setAlpha(sprite.alpha);
+            if (s.time.now - t0 > 1800 || !sprite.visible || !sprite.active) {
+                s.events.off('update', follow);
+                img.destroy();
+            }
+        };
+        s.events.on('update', follow);
     }
 
     // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:

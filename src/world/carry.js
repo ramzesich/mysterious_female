@@ -115,12 +115,13 @@ export class Carry {
     }
 
     // A bump: the tray goes flying, with a clatter. Never a scare. With a tangerine on her the pocket
-    // takes the hit and she keeps the tray (docs/plan-three-uses.md §1.3), unless it is `own`: her
-    // own feet (a load swayed over, into a pool with it).
-    spill(fromX, own = false) {
+    // takes the hit and she keeps the tray (docs/plan-three-uses.md §1.3), her reaction by what hit
+    // her and from where (`what`, `opts`: as `scareContact`'s), unless it is `own`: her own feet (a
+    // load swayed over, into a pool with it).
+    spill(fromX, own = false, what = null, opts = {}) {
         if (!this.kind) return;
         const s = this.scene, p = s.player;
-        if (!own && (s.isSafe() || s.pocket(fromX))) return;
+        if (!own && (s.isSafe() || s.pocket(fromX, s.reactionTo(fromX, what, opts), opts))) return;
         const away = p.x >= fromX ? 1 : -1;
         const flying = this.items;
         rumble('spill');

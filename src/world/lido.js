@@ -333,7 +333,7 @@ export const lido = {
                 const hit = s.mode === 'play' && s.route === 'inside' && ahead > 4 && ahead < KID.jet && her.y > k.y - 20 && Math.abs(her.y - k.y) < 40;
                 if (!hit || P.has('kid_fed')) return;
                 sfx.splashSmall();
-                if (w.carry) w.carryBox.spill(k.x);
+                if (w.carry) w.carryBox.spill(k.x, false, 'jet');
                 else s.scareContact(k.x, 'jet');
             });
             return;

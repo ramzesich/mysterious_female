@@ -234,6 +234,11 @@ controller) the third (step 3). **Built (step 1, 2026-11-15):**
   may take it first (`world.offered()`; the takers come with step 3).
 - `?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
   it off unless a scenario names it. Numbers: `POCKET` and `LOOSE` in `src/config.js`.
+- **Revised (2026-11-16, `docs/plan-three-uses.md` §1.6, §1.7):** her reaction is the hit's
+  own, by its side and who was moving, and the tangerine goes the way she is thrown (§5.6). A
+  gull takes it from her; at a "Do Not Disturb" door or the occupied balcony she hands it over.
+  **A tangerine she gets flies to the HUD's count** (0.4 s, on an arc, one after another): the
+  save has it at once, the number changes as it lands, and the icon bumps (`TALLY`).
 
 **Built (step 3, 2026-11-15): the throw.**
 
@@ -699,7 +704,7 @@ which keeps the challenge, but it plays as a scare:
 
 | What happens | What she does |
 |---|---|
-| Touches an enemy or a hidden trap | A fright **that fits what got her** (squeals at the vacuum robot, splashed by the water pistol, ...), then she **runs off the screen**. |
+| Touches an enemy or a hidden trap | **A mishap of that obstacle's own** (2026-11-16, `docs/plan-three-uses.md` §1.6): which one is read from the side of her it is on and from who was moving, she or it (into the porter's cart, she goes over it; it pushes into her as she stands facing it, she sits down; it reaches her back, she sits into the luggage). Then the fade and her checkpoint. During it the keys do nothing; a hit in the air plays it when she lands. Only the "Do Not Disturb" doors and the occupied balcony keep the old fright and run off the screen (she is truly embarrassed). Until each mishap's own gag is drawn, the built fall on its side stands in (on her bottom, or flat on her front, dazed). A slow thing she stands looking at (a paper sliding at her shoe, the suitcase rolling at her) does not knock her over. |
 | Falls **one deck** | Nothing. She lands and carries on. |
 | Falls **further than one deck** | The camera **stops following** once she passes one deck, and she drops out of the bottom of the screen, as Bumbot does. |
 | Falls **overboard** | No drowning. A splash, then she bobs up **smiling in a life ring, waving one hand**, for about a second. |
@@ -710,9 +715,15 @@ Then she steps out of the closest activated crew cabin door (§5.5).
 breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
 Disturb" door is no contact: that fright stands, lunge or not.
 
-**With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a fright by contact, or a hit
-under the parasol, is forgiven for one tangerine, which is knocked out of her pocket; she
-flinches and keeps her place. Falls and the sea are never forgiven.
+**With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a hit by contact, or a hit
+under the parasol, is forgiven for one tangerine, and she keeps her place. Since 2026-11-16 her
+short reaction is the hit's own, by the same two facts (`MISHAP_SCENES` in `src/config.js`):
+thrown back she reels a step and the tangerine rolls off behind her; pushed on she stumbles and it
+rolls on ahead; a door in her face, she rubs her nose; water in her face, a splutter, down her
+back, she arches; a flare, a yelp; from above, she ducks. A gull that comes down on her takes the
+tangerine and is gone with it; at a "Do Not Disturb" door or the occupied balcony she holds it
+out in both hands, head bowed, and a hand takes it (spent, not rolling). Never is she sat onto a
+thing or carried off with a tangerine on her. Falls and the sea are never forgiven.
 
 The word is **"scare"**, never "death", on screen and in the code alike.
 
@@ -2330,7 +2341,12 @@ Nothing blocks the start of the build. These get settled along the way:
       to the count, §1.7; art generated, never drawn in code or put together from other props;
       each built step gone back over under its "Revision", then the new step 4a). **Step 1's
       revision done** (every hit names its obstacle, `MISHAPS`; the new tangerine, chosen by the
-      user; the cabin's bowl in front of its tangerines); next step 2's. **Then step 5** (the rest of the
+      user; the cabin's bowl in front of its tangerines), `ec42bb4`. **Step 2's revision done**
+      (mishaps by side and mover with the built falls standing in, her seven reactions, the gulls
+      and the doors that take the tangerine, the flight to the count; §5.6), committed with the
+      no-save switch (`DEV_FRESH`) and `?at=deck4`. **Next: step 3's revision** (the new tangerine
+      in her toss's fist, already done in step 1's; the thrown one's flight back to the count),
+      then step 4's, then step 4a. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened.

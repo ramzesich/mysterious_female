@@ -124,6 +124,10 @@ export class BootScene extends Phaser.Scene {
         }
         if (meta.anims.slipback) this.anims.create({ key: 'her-slipback', frames: frames('slipback'), frameRate: 9 });
         if (meta.anims.stumble) this.anims.create({ key: 'her-stumble', frames: frames('stumble'), frameRate: 9 });
+        // Her reactions to a hit with a tangerine on her (docs/plan-three-uses.md §1.6), once each.
+        for (const [name, fps] of [['reel', 9], ['rubnose', 9], ['splutter', 9], ['arch', 9], ['yelp', 10], ['duck', 9], ['apology', 7]]) {
+            if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps });
+        }
         for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6], ['bow', 8]]) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
         }

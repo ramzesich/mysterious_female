@@ -1,4 +1,4 @@
-import { SAVE_KEY } from './config.js';
+import { SAVE_KEY, devFresh } from './config.js';
 
 // Progress lives in the browser (localStorage) and is written at every checkpoint (§5.5).
 
@@ -14,6 +14,8 @@ function emptySave() {
 }
 
 export function loadSave() {
+    // (While the game is made, every load is a new game: `DEV_FRESH` in src/config.js.)
+    if (devFresh()) return emptySave();
     if (new URLSearchParams(location.search).has('reset')) {
         localStorage.removeItem(SAVE_KEY);
     }
@@ -26,5 +28,6 @@ export function loadSave() {
 }
 
 export function writeSave(save) {
+    if (devFresh()) return;
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
 }

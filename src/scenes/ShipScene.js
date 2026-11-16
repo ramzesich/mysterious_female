@@ -1,5 +1,6 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAPS, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
+import { scenario } from '../world/mishaps.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
 import { loadSave, writeSave } from '../save.js';
@@ -72,8 +73,10 @@ const SIDEWALK_LOOKS = {
 };
 
 // Each hazard gets its own fright (§5.6): her word for it, in the game's language (src/lang.js).
-// What she cries at a hit: the word of the obstacle's line in `MISHAPS` (or a word itself).
-const fright = what => { const w = MISHAPS[what]?.word ?? what; return has(`fright.${w}`) ? t(`fright.${w}`) : '!'; };
+// What she cries at a hit (a scenario's `word`).
+const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
+// Her reaction's own sound, with a tangerine on her (the rest have the pocket's alone).
+const REACT_SOUND = { yelp: () => sfx.yelpHot(), splutter: () => sfx.splutter(), arch: () => sfx.gasp(), rubnose: () => sfx.sniff() };
 
 export class ShipScene extends Phaser.Scene {
     constructor() {
@@ -2481,7 +2484,7 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Verdana, sans-serif', fontSize: '24px', color: '#ffffff',
             stroke: '#1d2b53', strokeThickness: 5,
         };
-        const icon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
+        const icon = this.hudIcon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
         this.hudCount = this.add.text(62, 22, '', textStyle);
         // Her speech bubble and the messages over her live in the world, so they move exactly with
         // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
@@ -2530,7 +2533,41 @@ export class ShipScene extends Phaser.Scene {
     }
 
     refreshHud() {
-        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines}`);
+        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines - (this.flying ?? 0)}`);
+    }
+
+    // A tangerine is hers (picked up, handed back, the piñata's): one more at once, and its picture
+    // flies from where it was, (x, y) in the world, to the HUD's count, which changes as it lands
+    // (docs/plan-three-uses.md §1.7). Several follow each other.
+    gainTangerine(x, y) {
+        this.save.tangerines += 1;
+        sfx.tangerine();
+        const cam = this.cameras.main, view = cam.worldView, time = this.time.now;
+        const from = { x: (x - view.x) * cam.zoom, y: (y - view.y) * cam.zoom };
+        const to = { x: this.hudIcon.x + this.hudIcon.displayWidth / 2, y: this.hudIcon.y + this.hudIcon.displayHeight * 0.6 };
+        const delay = Math.max(0, (this.tallyNext ?? 0) - time);
+        this.tallyNext = time + delay + TALLY.gapMs;
+        this.flying = (this.flying ?? 0) + 1;
+        this.refreshHud();
+        const img = this.add.image(from.x, from.y, 'tangerine').setOrigin(0.5, 0.6).setScale(cam.zoom).setVisible(delay === 0);
+        this.uiLayer.add(img);
+        const k = { v: 0 };
+        this.tweens.add({
+            targets: k, v: 1, delay, duration: TALLY.ms, ease: 'Sine.easeIn',
+            onStart: () => img.setVisible(true),
+            onUpdate: () => img.setPosition(from.x + (to.x - from.x) * k.v, from.y + (to.y - from.y) * k.v - Math.sin(Math.PI * k.v) * TALLY.arc)
+                .setScale(cam.zoom + (this.hudIcon.scale - cam.zoom) * k.v),
+            onComplete: () => {
+                img.destroy();
+                this.flying -= 1;
+                this.refreshHud();
+                sfx.tally();
+                const icon = this.hudIcon;
+                this.tweens.killTweensOf(icon);
+                icon.setScale(3);
+                this.tweens.add({ targets: icon, scale: 3.6, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
+            },
+        });
     }
 
     // D with none on her: the count blinks once, and that is all.
@@ -2732,7 +2769,15 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
-        // A hit forgiven by the pocket: a flinch, pushed back a step, the her-hit clip playing.
+        // A mishap in the air: it plays when she lands (docs/plan-three-uses.md §1.6).
+        if (this.gagPending && this.grounded) {
+            const g = this.gagPending;
+            this.gagPending = null;
+            this.flinchUntil = 0;
+            this.mishap(g.sc, g.fromX);
+            return;
+        }
+        // A hit forgiven by the pocket: her reaction, a step back or on.
         if (time < this.flinchUntil) {
             body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
             return;
@@ -3855,9 +3900,8 @@ export class ShipScene extends Phaser.Scene {
         for (const t of this.tangerines) {
             if (!t.sprite.active || t.route !== this.route) continue;
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
-                this.save.tangerines += 1;
                 this.save.collected.push(t.id);
-                sfx.tangerine();
+                this.gainTangerine(t.sprite.x, t.sprite.y - 5);
                 t.glint.destroy();
                 this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
                 t.sprite.active = false;
@@ -3971,7 +4015,7 @@ export class ShipScene extends Phaser.Scene {
             } else if (this.world.carry) {
                 this.world.touched({ x: s.x, touch: { kind: 'spill' } });
             } else {
-                this.scareContact(s.x, 'vacuum');
+                this.scareContact(s.x, 'vacuum', { vx: v.dir * v.speed });
                 return;
             }
         }
@@ -4205,44 +4249,72 @@ export class ShipScene extends Phaser.Scene {
         return this.safeUntil > this.time.now;
     }
 
-    // A hit that would be a fright or a spilled tray, with a tangerine on her: one less, knocked out
-    // of her pocket and rolling away the way she is pushed; a flinch, a step back, a blink. True if
-    // it was forgiven. (Falls, the sea and her own feet never come here.)
-    // `what`: the obstacle (`MISHAPS`). A slip (she loses her balance backwards, arms going: her
-    // `slipback`) or a trip (she stumbles on forward: `stumble`, the tangerine flying on ahead of
-    // her); any other, the flinch.
-    pocket(fromX, what) {
-        const kind = { sit: 'slipped', belly: 'tripped' }[MISHAPS[what]?.down];
+    // A hit that would be a mishap or a spilled tray, with a tangerine on her: one less, and she
+    // keeps her place and her tray (docs/plan-three-uses.md §1.3). Her reaction is the scenario's
+    // (`MISHAP_SCENES`: reeling back a step, stumbling on, rubbing her nose, ducking...), always facing
+    // the way she faced, and the tangerine goes the way she is thrown (`toss`): rolling off ahead of
+    // her or behind her, dropped at her feet, taken by the gull (`snatch`: its sprite), or handed
+    // over at the door it came from. True if it was forgiven. (Falls, the sea and her own feet never
+    // come here.)
+    pocket(fromX, sc, { snatch = null } = {}) {
         if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         const p = this.player, time = this.time.now;
         const facing = p.flipX ? -1 : 1;
-        const away = kind === 'slipped' ? -facing : p.x >= fromX ? 1 : -1;
         this.safeUntil = time + POCKET.safeMs;
         sfx.pocket();
         rumble('spill');
-        this.loose.knock(p.x, p.y - 24, away);
+        const hand = sc.toss === 'hand' && this.mode === 'play' && !this.gliding;
+        if (sc.toss === 'gull' && snatch) this.world.snatch(snatch, p.x, p.y - PLAYER.height + 8);
+        else if (!hand) this.loose.knock(p.x, p.y - 24, sc.toss === 'on' ? facing : -facing, sc.toss === 'drop' ? 0.4 : 1);
         // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
         if (this.mode === 'play' && !this.gliding) {
             this.throwUntil = 0;
             this.throwing = null;
-            const clip = { slipped: 'her-slipback', tripped: 'her-stumble' }[kind];
-            if (clip && this.anims.exists(clip)) {
-                // (Facing the way she was going: a slip sends her back a step, a trip on.)
+            const clip = `her-${sc.react}`;
+            if (hand) {
+                this.handOver(fromX);
+            } else if (this.anims.exists(clip)) {
                 this.flinchUntil = time + POCKET.recoverMs;
-                p.setFlipX(kind === 'tripped' ? away < 0 : facing < 0);
-                p.anims.play(clip);
+                this.herClip(clip);
             } else {
                 this.flinchUntil = time + POCKET.flinchMs;
-                p.setFlipX(away > 0);            // facing what hit her
-                if (this.anims.exists('her-hit')) p.anims.play('her-hit');
+                if (this.anims.exists('her-hit')) this.herClip('her-hit');
             }
-            // (A trip stops her short, to stagger and catch herself: running on, it read as nothing.)
-            p.body.velocity.x = away * (kind === 'tripped' ? POCKET.stumblePush : POCKET.push);
-            p.body.velocity.y = kind ? 0 : -POCKET.hop;
+            // (Pushed on, she is stopped short, to stagger and catch herself: running on, it read as
+            // nothing; thrown back, a step back.)
+            p.body.velocity.x = hand ? 0 : sc.toss === 'on' ? facing * POCKET.stumblePush : sc.toss === 'back' ? -facing * POCKET.push : 0;
+            p.body.velocity.y = 0;
         }
+        REACT_SOUND[sc.react]?.();
         this.refreshHud();
         return true;
+    }
+
+    // One of her clips played at its own speed (her run's leaves its pace on her sprite).
+    herClip(key) {
+        this.player.anims.timeScale = 1;
+        this.player.anims.play(key);
+    }
+
+    // A tangerine held out in both hands as an apology, her head bowed (§1.6, 23 and 24); the hand
+    // at the door it came from takes it (spent, never loose).
+    handOver(fromX) {
+        const p = this.player, dir = p.flipX ? -1 : 1, time = this.time.now;
+        this.flinchUntil = time + HAND_OVER.ms;
+        if (this.anims.exists('her-apology')) this.herClip('her-apology');
+        // (Behind her, her hands over it.)
+        const fruit = this.add.image(p.x + dir * HAND_OVER.dx, p.y - HAND_OVER.dy, 'tangerine').setOrigin(0.5, 0.6)
+            .setDepth(p.depth - 0.01).setVisible(false);
+        this.worldLayer.add(fruit);
+        const show = () => fruit.setVisible((p.anims.currentFrame?.index ?? 1) - 1 >= HAND_OVER.frame);
+        p.on('animationupdate', show);
+        this.time.delayedCall(HAND_OVER.giveMs, () => {
+            p.off('animationupdate', show);
+            fruit.setVisible(true);
+            sfx.give();
+            this.tweens.add({ targets: fruit, x: fromX, y: p.y - HAND_OVER.dy - 4, alpha: 0, duration: 380, ease: 'Quad.easeIn', onComplete: () => fruit.destroy() });
+        });
     }
 
     updatePocket(time) {
@@ -4258,6 +4330,7 @@ export class ShipScene extends Phaser.Scene {
         this.mode = 'scripted';
         this.safeUntil = 0;
         this.flinchUntil = 0;
+        this.gagPending = null;
         this.throwUntil = 0;
         this.throwing = null;
         this.lungeUntil = 0;
@@ -4266,33 +4339,69 @@ export class ShipScene extends Phaser.Scene {
         this.cameras.main.stopFollow();
     }
 
-    // A fright that fits what got her, then she runs off the screen. (`force`: one that is no
-    // contact, her own cry at a "Do Not Disturb" door: a lunge does not help.)
-    scareContact(fromX, what, force = false) {
-        const m = MISHAPS[what] ?? {};
+    // The two facts read at every hit (docs/plan-three-uses.md §1.6): which side of her it is on
+    // (front: the way she faces, at this moment) and who was moving: she, toward it, faster than
+    // 20 px a second; it, toward her (`vx`, its speed along the deck), faster than 5. `dir`: the
+    // way it faces, for a person; `lying`: a thing at rest on the floor.
+    hitFacts(fromX, vx = 0, dir = 0, lying = false) {
+        const p = this.player, facing = p.flipX ? -1 : 1, toward = Math.sign(fromX - p.x) || facing;
+        return { front: toward === facing, she: p.body.velocity.x * toward > 20, it: vx * -toward > 5, faces: dir === -toward, lying };
+    }
+
+    // The scenario a hit with a tray in her hands takes for her reaction (the tray is spilled
+    // whatever it is): the obstacle's own, or, for a bump with no name, thrown back from the front
+    // and pushed on from behind.
+    reactionTo(fromX, what, { vx = 0, dir = 0, lying = false } = {}) {
+        const f = this.hitFacts(fromX, vx, dir, lying), sc = what && MISHAP_SCENES[scenario(what, f)];
+        if (sc && !sc.nothing && sc.toss !== 'hand') return sc;
+        return f.front ? { word: 'bumped', react: 'reel', toss: 'back' } : { word: 'bumped', react: 'stumble', toss: 'on' };
+    }
+
+    // She is hit by `what` (an obstacle of `MISHAPS`) from `fromX`: in a lunge she is through; with a
+    // tangerine on her, her reaction (the pocket); with none, her mishap and her checkpoint. Which
+    // scenario it is comes from the side and who was moving (src/world/mishaps.js); returns its
+    // number, or null when nothing happened. `force`: no contact (her own cry at a "Do Not Disturb"
+    // door): a lunge does not help. `snatch`: the gull that takes the tangerine.
+    scareContact(fromX, what, { vx = 0, dir = 0, lying = false, force = false, snatch = null } = {}) {
         const p = this.player;
-        if (this.holding) return;           // nothing scares her on the way home (§6.1.9)
+        if (this.holding || this.gagPending) return null;   // nothing scares her on the way home (§6.1.9)
         // In a lunge she is through: what touched her gives way in its own manner.
         if (this.lungeSafe() && !force) {
             this.world.lunged(what, fromX);
+            return null;
+        }
+        // Blinking after a hit forgiven, nothing touches her.
+        if (this.isSafe()) return null;
+        const id = scenario(what, this.hitFacts(fromX, vx, dir, lying)), sc = MISHAP_SCENES[id];
+        // (A slow thing she stands looking at does not knock her over: it is the thing's to stop.)
+        if (!sc || sc.nothing) return id;
+        this.lastMishap = { what, id, time: this.time.now };
+        if (!this.pocket(fromX, sc, { snatch })) this.mishap(sc, fromX);
+        return id;
+    }
+
+    // Her mishap with none on her (§1.6): the gag, and her checkpoint; the keys do nothing until
+    // the fade. A hit in the air plays it when she lands. Until a scenario's own gag is made, the
+    // built fall on its side stands in (`down`), or she runs off.
+    mishap(sc, fromX) {
+        const p = this.player;
+        if (this.mode === 'play' && !this.grounded) {
+            this.gagPending = { sc, fromX };
+            this.flinchUntil = this.time.now + 10000;
             return;
         }
-        // Blinking after a hit forgiven, nothing touches her; a tangerine on her forgives this one.
-        if (this.isSafe() || this.pocket(fromX, what)) return;
-        // A slip or a trip with none on her: down she goes, dizzy, and back to her checkpoint.
-        if (m.down) return this.scareDown(what);
+        if (sc.down) return this.scareDown(sc);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
         rumble('bump');
-        this.alert.setText(fright(what)).setVisible(true);
-        // A recoil from what got her (the vacuum: a jump, as it always was).
-        const jump = m.recoil === 'jump' || !this.anims.exists('her-hit');
-        if (m.recoil === 'shiver' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
-        else if (!jump) p.anims.play('her-hit');
+        this.alert.setText(fright(sc.word)).setVisible(true);
+        // Her reaction, as with a tangerine on her (shivering, arching), or her start; then off.
+        const clip = sc.react !== 'apology' && this.anims.exists(`her-${sc.react}`) ? `her-${sc.react}` : 'her-hit';
+        if (this.anims.exists(clip)) this.herClip(clip);
         else this.pose('rise');
-        p.setFlipX(jump ? away < 0 : away > 0);
+        p.setFlipX(away > 0);
         this.script = null;
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
@@ -4312,41 +4421,42 @@ export class ShipScene extends Phaser.Scene {
     // bottom (`slipfall`) or flat on her belly (`tripfall`), then dazed where she fell, butterflies
     // circling over her head (`dazed-sit`, `dazed-lie`: drawn with her, as the user asked), and
     // then back at her checkpoint.
-    scareDown(what) {
-        const p = this.player, slip = MISHAPS[what].down === 'sit';
+    scareDown(sc) {
+        const p = this.player, slip = sc.down === 'sit';
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         sfx.scare();
         rumble('bump');
-        this.alert.setText(fright(what)).setVisible(true);
+        this.alert.setText(fright(sc.word)).setVisible(true);
         this.script = null;
         const clip = slip ? 'her-slipfall' : 'her-tripfall';
         if (!this.anims.exists(clip)) {
             this.time.delayedCall(1600, () => this.respawn());
             return;
         }
-        p.anims.play(clip);
+        this.herClip(clip);
         p.once(`animationcomplete-${clip}`, () => {
             const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
-            if (this.anims.exists(dazed)) p.anims.play(dazed);
+            if (this.anims.exists(dazed)) this.herClip(dazed);
             this.time.delayedCall(2100, () => this.respawn());
         });
     }
 
     // Hit in the air under the parasol (a gull across her way down to the bow): it is knocked out
     // of her hands, and down she goes out of the bottom of the screen.
-    scareAir(what) {
+    scareAir(what, { snatch = null } = {}) {
         const p = this.player;
         if (this.mode !== 'play') return;
-        if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10)) return;
+        const sc = MISHAP_SCENES[scenario(what, {})];
+        if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10, sc, { snatch })) return;
         this.gliding = false;
         this.world.showParasol(false);
         this.takeoffY = p.y;
         sfx.scare();
         rumble('bump');
         this.scareFall();
-        this.alert.setText(fright(what)).setVisible(true);
-        if (this.anims.exists('her-hit')) p.anims.play('her-hit');
+        this.alert.setText(fright(sc.word)).setVisible(true);
+        if (this.anims.exists('her-hit')) this.herClip('her-hit');
     }
 
     // Longer than one deck: the camera lets go and she drops out of the bottom of the screen.

@@ -197,38 +197,96 @@ export const LUNGE = {
 // `push` px a second (slowed by `slow`), and blinks for `safeMs`, untouchable; she keeps her
 // place and her tray. The tangerine is knocked out of her pocket (LOOSE.knock). `?pocket=off`
 // switches it off.
-// How she takes a hit (docs/plan-three-uses.md §1.6), by the obstacle's own name: every
-// `scareContact`, `scareAir`, `Carry.spill` and `world.lunged` names one of these. `word`: what
-// she cries (`fright.<word>` in src/lang.js). Until each obstacle's own gags are made, what is
-// built stands in: `down` 'sit' (a slip: on her bottom, dazed) or 'belly' (a trip: flat on her
-// front, dazed); `recoil` 'shiver' or 'jump' before the run-off (otherwise her hit); `mark` what
-// a lunge through it leaves on her hair ('wet', 'soot', 'steam').
+// How she takes a hit (docs/plan-three-uses.md §1.6). Every obstacle that can hit her by its own
+// name: each `scareContact`, `scareAir`, `Carry.spill` and `world.lunged` names one (`mark`: what a
+// lunge through it leaves on her hair, 'wet', 'soot', 'steam'). Which of its scenarios a hit is,
+// by the side of her it is on and who was moving: src/world/mishaps.js.
 export const MISHAPS = {
-    chips: { word: 'slipped', down: 'sit' },        // the casino's spilled chips
-    lead: { word: 'tripped', down: 'belly' },       // the dog's lead (deck 4)
-    trays: { word: 'startled' },                    // trays on the floor by a "Do Not Disturb" door
-    papers: { word: 'slipped', down: 'sit' },       // the paper rounds' papers (deck 5)
-    vacuum: { word: 'vacuum', recoil: 'jump' },     // the robot vacuums (decks 4 and 9)
-    suitcase: { word: 'bumped' },                   // the runaway suitcase (deck 4)
-    deckchair: { word: 'bumped' },                  // the deck chair on the wet patch (deck 11)
-    cart: { word: 'bumped' },                       // the porter and his cart (deck 4)
-    jogger: { word: 'bumped' },                     // the jogger (the promenade)
-    breakfast: { word: 'bumped' },                  // the breakfast stewardess's tray (deck 5)
-    jet: { word: 'splashed' },                      // the kid's water pistol (deck 11)
-    light: { word: 'bonked' },                      // the stage's swinging light
-    door: { word: 'bonked' },                       // a door that flies open
-    ball: { word: 'bonked' },                       // the court's basketballs (deck 12)
-    boat: { word: 'bumped' },                       // the boat drill's boat (the walkway)
-    sprinkler: { word: 'drenched', recoil: 'shiver', mark: 'wet' },
-    steam: { word: 'fogged', mark: 'steam' },       // the sauna's steam
-    towels: { word: 'buried' },                     // the towel stack
-    flare: { word: 'singed', mark: 'soot' },        // Teppanyaki's flares
-    railgull: { word: 'swooped' },                  // the gulls on the balcony rails
-    funnelgull: { word: 'swooped' },                // the funnel's gulls, on the stairway
-    crossgull: { word: 'swooped' },                 // the gulls across her glide to the bow
-    dnd: { word: 'startled' },                      // a "Do Not Disturb" door
-    balcony: { word: 'startled' },                  // the occupied balcony
+    chips: {},              // the casino's spilled chips
+    lead: {},               // the dog's lead (deck 4)
+    trays: {},              // trays on the floor by a "Do Not Disturb" door
+    papers: {},             // the paper rounds' papers (deck 5)
+    vacuum: {},             // the robot vacuums (decks 4 and 9)
+    suitcase: {},           // the runaway suitcase (deck 4)
+    deckchair: {},          // the deck chair on the wet patch (deck 11)
+    cart: {},               // the porter and his cart (deck 4)
+    jogger: {},             // the jogger (the promenade)
+    breakfast: {},          // the breakfast stewardess's tray (deck 5)
+    jet: {},                // the kid's water pistol (deck 11)
+    light: {},              // the stage's swinging light
+    door: {},               // a door that flies open
+    ball: {},               // the court's basketballs (deck 12)
+    boat: {},               // the boat drill's boat (the walkway)
+    sprinkler: { mark: 'wet' },
+    steam: { mark: 'steam' },   // the sauna's steam
+    towels: {},             // the towel stack
+    flare: { mark: 'soot' },    // Teppanyaki's flares
+    railgull: {},           // the gulls on the balcony rails
+    funnelgull: {},         // the funnel's gulls, on the stairway
+    crossgull: {},          // the gulls across her glide to the bow
+    dnd: {},                // a "Do Not Disturb" door
+    balcony: {},            // the occupied balcony
 };
+
+// The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
+// (`fright.<word>` in src/lang.js). With a tangerine on her: `react`, her clip (`her-<react>`), and
+// `toss`, the way the tangerine goes: 'on' ahead of her (she is pushed on), 'back' behind her (she
+// is thrown back), 'drop' at her feet (no side), 'gull' a gull takes it, 'hand' she hands it over.
+// With none: her gag, then her checkpoint; until each gag is made, the built one on that side
+// stands in: `down` 'sit' (on her bottom, dazed) or 'belly' (on her front, dazed), or with no
+// `down` she runs off (`off`). `nothing`: a slow thing she is looking at does not knock her over.
+export const MISHAP_SCENES = {
+    '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
+    '2': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // into the dog's lead
+    '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // onto the trays
+    '4a': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },    // a paper slides her way
+    '4b': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },     // it slides against her
+    '4c': { nothing: true },                                                    // it stops at her shoe
+    '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly' },      // the vacuum, head-on
+    '5b': { word: 'ride', react: 'stumble', toss: 'on', down: 'sit' },          // it catches her from behind
+    '6a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // she runs into the suitcase
+    '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // it rolls into her back
+    '6c': { nothing: true },                                                    // she stops it
+    '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // the deck chair, head-on
+    '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // from behind
+    '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into the porter's cart
+    '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // it pushes into her
+    '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // it reaches her back
+    '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // into his back
+    '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // the jogger, head-on
+    '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // he runs into her
+    '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into her back
+    '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // she into his back
+    '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },        // into the breakfast tray
+    '10b': { word: 'splashed', react: 'arch', toss: 'on' },                     // it meets her back
+    '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit' },  // the jet in her face
+    '11b': { word: 'splashed', react: 'arch', toss: 'on' },                     // in her back
+    '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // the stage's light
+    '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
+    '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit' },     // a door in her face
+    '13b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },     // it catches her past it
+    '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // a basketball
+    '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
+    '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
+    '16': { word: 'drenched', react: 'shiver', toss: 'drop' },                  // a sprinkler
+    '17': { word: 'fogged', react: 'splutter', toss: 'drop', down: 'sit' },     // the sauna's steam
+    '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit' },         // the towel stack
+    '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
+    '20': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull on a balcony rail
+    '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit' },        // a funnel gull
+    '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
+    '23': { word: 'startled', react: 'apology', toss: 'hand' },                 // a "Do Not Disturb" door
+    '24': { word: 'startled', react: 'apology', toss: 'hand' },                 // the occupied balcony
+};
+
+// Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
+// hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken
+// by the hand at the door `giveMs` in; she stands for `ms`.
+export const HAND_OVER = { dx: 18, dy: 33, frame: 2, giveMs: 950, ms: 1400 };
+
+// A tangerine she gets flies to the HUD's count (§1.7): `ms` along an arc `arc` px high (the
+// screen's px), one after another `gapMs` apart; the count changes as each lands.
+export const TALLY = { ms: 400, arc: 70, gapMs: 80 };
 
 export const POCKET = {
     flinchMs: 340,
@@ -274,5 +332,16 @@ export const THROW = {
 // a little rounding, well clear of the limit, even from the top of a deck's end bulwark, 32px over
 // its floor (the user fell from deck 9's stern bulwark to deck 8's terrace, 2026-11-07).
 export const LONG_FALL_MARGIN = 56;
+
+// While the game is being made, nothing is saved (the user, 2026-11-16: "remove save games (for
+// now) ... Just don't save my progress"): every load is a new game, and every link works as it
+// did (the plain one with the welcome screen and the intro, `?play`, `?at=`, the rest). `?real`
+// keeps the save, as she will get it; every playtest opens with it. Set to false before the gift.
+export const DEV_FRESH = true;
+
+/** Whether this load keeps no save (`DEV_FRESH`, unless `?real`). */
+export function devFresh() {
+    return DEV_FRESH && !new URLSearchParams(location.search).has('real');
+}
 
 export const SAVE_KEY = 'bumbusik-save-v3';   // v2: the progression (§6.1); v3: the verbs, the books

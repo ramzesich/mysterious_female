@@ -210,7 +210,7 @@ export class SwingLight {
         this.cone.fillStyle(0xfbff86, 0.12).fillEllipse(fx, d.floor - 1, 40, 5);
         if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
-            if (this.world.carry) this.world.carryBox.spill(x);
+            if (this.world.carry) this.world.carryBox.spill(x, false, 'light');
             else if (s.lungeSafe()) this.world.lunged('light', x);
             else {
                 sfx.bonk();
@@ -261,7 +261,7 @@ export class Spill {
             const onFloor = p.body.blocked.down || p.body.touching.down;
             if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(p.y - d.y) < 3 && Math.abs(p.x - d.x) < d.half
                 && Math.abs(p.body.velocity.x) > 20) {
-                if (this.world.carry) this.world.carryBox.spill(d.x);
+                if (this.world.carry) this.world.carryBox.spill(d.x, false, 'chips');
                 else if (s.lungeSafe()) this.world.lunged('chips', d.x);
                 else {
                     sfx.slip();
@@ -392,9 +392,9 @@ export class Darter {
                 s.smash(v.x, v.y - 3);
                 s.tweens.add({ targets: v, angle: 720, alpha: 0.6, duration: 900, ease: 'Quad.easeOut', onComplete: () => this.home(s.time.now + 4000) });
             } else if (this.world.carry) {
-                this.world.carryBox.spill(v.x);
+                this.world.carryBox.spill(v.x, false, 'vacuum', { vx: this.dir * 300 });
             } else {
-                s.scareContact(v.x, 'vacuum');
+                s.scareContact(v.x, 'vacuum', { vx: this.dir * 300 });
             }
         }
     }
@@ -494,7 +494,7 @@ export class TowelStack {
             // Under it: only her hair shows for a moment.
             this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
             s.tweens.add({ targets: this.heap, y: d.y, scaleY: 1, duration: 900, delay: 500, ease: 'Bounce.easeOut' });
-            if (this.world.carry) this.world.carryBox.spill(d.x);
+            if (this.world.carry) this.world.carryBox.spill(d.x, false, 'towels');
             else s.scareContact(d.x, 'towels');
         }
     }
@@ -553,7 +553,7 @@ export class Sprinkler {
                 g.fillStyle(0xffffff, 0.8).fillRect(x, d.y - 2 - (Math.floor(time / 70 + i) % 2), 2, 1);
             }
             if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
-                if (this.world.carry) this.world.carryBox.spill(d.x);
+                if (this.world.carry) this.world.carryBox.spill(d.x, false, 'sprinkler');
                 else s.scareContact(d.x, 'sprinkler');
             }
         } else {
@@ -623,7 +623,7 @@ export class SwingDoor {
             if (here(s, d) && Math.abs(p.y - d.y) < 40 && dx > -18 && dx < 34) {
                 this.state = 'open';
                 this.at = time + 1500;
-                if (this.world.carry) this.world.carryBox.spill(d.x + 20);
+                if (this.world.carry) this.world.carryBox.spill(d.x + 20, false, 'door');
                 else s.scareContact(d.x + 14, 'door');
             } else if (time > this.at) {
                 this.state = 'open';
@@ -699,8 +699,8 @@ export class DndDoor {
             } else this.world.people.play(this.who, 'shriek');
         }
         const by = !look && (!heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60));
-        if (by && cried && this.world.carry) this.world.carryBox.spill(d.x);
-        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'dnd', cried);
+        if (by && cried && this.world.carry) this.world.carryBox.spill(d.x, false, 'dnd', { force: cried });
+        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'dnd', { force: cried });
         s.time.delayedCall(look ? 1900 : 1700, () => {
             this.shut.setVisible(true);
             this.card.setVisible(true);
@@ -760,9 +760,9 @@ export class Roller {
             s.tweens.add({ targets: this.sprite, x: away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, angle: away * 12, duration: 1400, ease: 'Quad.easeOut',
                 onComplete: () => this.sprite.setAngle(0) });
         } else if (this.world.carry) {
-            this.world.carryBox.spill(this.x);
+            this.world.carryBox.spill(this.x, false, 'suitcase', { vx: Math.sin(this.phase) * 50 });
         } else {
-            s.scareContact(this.x, 'suitcase');
+            s.scareContact(this.x, 'suitcase', { vx: Math.sin(this.phase) * 50 });
         }
     }
 }
@@ -1055,8 +1055,8 @@ export class Skimmer {
             if (q.done) {
                 if (!q.hit && !q.taking && this.under(q, her)) {
                     q.hit = true;
-                    if (this.world.carry) this.world.carryBox.spill(q.img.x);
-                    else s.scareContact(q.img.x, 'papers');
+                    if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: q.v <= 0 });
+                    else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: q.v <= 0 });
                 }
                 continue;
             }
@@ -1072,8 +1072,8 @@ export class Skimmer {
             if (!q.hit && this.under(q, her)) {
                 q.hit = true;
                 q.v = Math.max(q.v, Math.sqrt(2 * q.a * Math.max(1, Math.abs(q.door - q.img.x))));
-                if (this.world.carry) this.world.carryBox.spill(q.img.x);
-                else s.scareContact(q.img.x, 'papers');
+                if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: !(q.v > 0) });
+                else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: !(q.v > 0) });
             }
         }
     }
@@ -1268,7 +1268,7 @@ export class Breakfast {
             this.state = 'return';
         }
         this.until = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(this.x);
-        else s.scareContact(this.x, 'breakfast');
+        if (this.world.carry) this.world.carryBox.spill(this.x, false, 'breakfast', { dir: this.p?.dir ?? 0 });
+        else s.scareContact(this.x, 'breakfast', { dir: this.p?.dir ?? 0 });
     }
 }

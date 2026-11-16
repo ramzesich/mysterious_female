@@ -86,6 +86,12 @@ HER = {
         "tripfall": [(f"tripfall/{i}.png", "feet") for i in range(8)],
         "slipback": [(f"slipback/{i}.png", "feet") for i in range(6)],
         "stumble": [(f"stumble/{i}.png", "feet") for i in range(6)],
+        # Her reactions to a hit with a tangerine on her (docs/plan-three-uses.md §1.6; skeleton-v3
+        # poses, 2026-11-16): thrown back a step, rubbing her nose (a door), spluttering (water in her
+        # face), arching (water down her back), yelping and patting her sleeve (a flare), ducking (from
+        # above); and the apology, a tangerine held out in both hands (the game's own tangerine is put
+        # in them: `HAND_OVER` in src/config.js).
+        **{c: [(f"{c}/{i}.png", "feet") for i in range(6)] for c in ("reel", "rubnose", "splutter", "arch", "yelp", "duck", "apology")},
         # Dazed where she fell, butterflies circling over her head, drawn with her (the user's rule).
         "dazed-sit": [(f"dazed-sit/{i}.png", "feet") for i in range(6)],
         "dazed-lie": [(f"dazed-lie/{i}.png", "feet") for i in range(6)],

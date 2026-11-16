@@ -10,7 +10,7 @@ truth**: read the relevant section before any design or content work, and record
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip the welcome screen and the intro, `?intro=<part>` start the intro at a part,
-  `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?pocket=off` (a hit is a fright even with tangerines on her), `?at=pool` start at a
+  `?reset` clear save (**nothing is saved for now**, the user, 2026-11-16: every load a new game, `DEV_FRESH` in `src/config.js`; `?real` keeps the save, and every playtest opens with it), `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?pocket=off` (a hit is a fright even with tangerines on her), `?at=pool` start at a
   named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=uk` (Ukrainian for a session). D is the cry and the lunge, F the throw (`docs/plan-three-uses.md`).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
@@ -18,7 +18,7 @@ truth**: read the relevant section before any design or content work, and record
 
 | Path | What |
 |---|---|
-| `src/config.js` | All tuning: scale, speeds, jump, the cry and the lunge (`CRY`, `LUNGE`); `MISHAPS`, every obstacle that can hit her by its own name (`scareContact(fromX, name)`), with her word and what she does (docs/plan-three-uses.md §1.6) |
+| `src/config.js` | All tuning: scale, speeds, jump, the cry and the lunge (`CRY`, `LUNGE`); `MISHAPS`, every obstacle that can hit her by its own name (`scareContact(fromX, name, { vx, dir })`), and `MISHAP_SCENES`, each scenario of a hit (her word, her reaction with a tangerine, where it goes, what stands in for her gag); which scenario a hit is, by its side and who was moving: `src/world/mishaps.js` (docs/plan-three-uses.md §1.6); `TALLY`, a tangerine's flight to the count |
 | `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, D (`tryCry`: the cry, and the lunge once learned; `lungeSafe()` turns a fright by contact into `world.lunged()`), checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
 | `src/controls.js`, `src/rumble.js` | Keyboard and Xbox controller mapped to the same actions (§3.1; the whole mapping in its table there), the controller in use being whichever was touched last; the rumble's ten moments, only while she plays with the controller. The `gamepad` playtest drives a fake controller (`Browser.fake_pad()`) |
 | `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the welcome screen's LANGUAGE button switches it |
@@ -412,6 +412,13 @@ Lessons learned (2026-11-14, step 12, sound):
   plus the link when there's something to try). Don't carry on into test runs, commits or the next
   change before they answer (the user, 2026-11-06: iterations were too slow, and twice I went on
   without asking). Commit and update `GAME_DESIGN.md` once per approved round.
+- **After each approved step: commit, save and record everything, then say it is safe to compact**
+  (the user, 2026-11-16: "Commit, and save and record everything. Tell me when it's safe to compact
+  the context without losing anything. Make it a rule after each step"). That is: the step's log
+  entry in `docs/progress-decisions.md`, `GAME_DESIGN.md` §8's next-up, this file's table and
+  rules, the memory notes (progress, any new rule), the raw art and its ids kept in the repo, the
+  commit on the feature branch, the tree clean; then one line: "safe to compact", with what is
+  next.
 - **The whole `tools/playtest.py` suite is not required, not after a change and not before a
   merge** (the user, 2026-11-14). It had been the rule before every merge; it was about 35
   minutes long by step 11 and about 65 after step 12, and the user had it cancelled before a

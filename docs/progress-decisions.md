@@ -1985,3 +1985,63 @@ here" 7); each built step is gone back over under its "Revision".
   loaded when the data says `front`, drawn over the tangerines); in a pile a higher tangerine is
   behind a lower one (its depth by its height).
 - `lang`, `dash`, `pocket`, `deck4`, `deck3`, `intro`, `throw`, `boot`: pass.
+
+## The plan's revision, step 2 gone back over: mishaps by side and mover, her reactions, the flight to the count (2026-11-16)
+
+- **Which mishap a hit is** (§1.6): `src/world/mishaps.js` reads the two facts at every hit (the
+  side of her it is on, at that moment; who was moving: she toward it over 20 px/s, it toward her
+  over 5) and picks the obstacle's scenario by the plan's table (the porter: 8a into his cart, 8b
+  it pushes into her as she stands facing it, 8c it reaches her back, 8d into his back). The
+  scenarios are `MISHAP_SCENES` in `src/config.js`, one line each: her word, her reaction with a
+  tangerine, where the tangerine goes, and the built fall that stands in for the gag until it is
+  made (`down`: on her bottom or on her front; none: the run-off, now only for the doors and
+  the balcony and where no fall fits yet: a sprinkler, water down her back, a gull on a rail).
+  `scareContact(fromX, name, { vx, dir, lying, force, snatch })` returns the scenario; the callers
+  pass their speed (the vacuums, the suitcase, the papers, the deck chair, the people walking) and
+  a person their facing. `Carry.spill` takes the same name and gives the same reaction (a tray in
+  her hands is spilled whatever it is, and she never hands one over with it: thrown back or
+  pushed on instead). 4c and 6c (a paper at her shoe, the suitcase she watches) are no hit at
+  all; what the paper and the suitcase then do is step 4's revision.
+- **A hit in the air** plays its mishap when she lands (`gagPending`); during a mishap the keys
+  do nothing (as before: the scene is scripted).
+- **Her seven new clips** (skeleton-v3 poses, 3 generations each, 21): `reel` (the plan's
+  "thrown back, she reels a step"; PixelLab's `hit` move), `rubnose`, `splutter`, `arch`, `yelp`,
+  `duck`, `apology` (both hands held out, head bowed: only her body described; the game's own
+  tangerine is laid behind her hands from its third frame, `HAND_OVER`, so that a hand at the door
+  can take it). Each in place in the game, frame by frame, before showing.
+- **Found on the way:** her run's pace is left on her sprite's playback speed, so a fall played
+  just after running ran three times slower (the `dash` scenario waited out its 6 s). Her
+  reactions and falls are played at their own speed now (`herClip`).
+- **The gulls** (on the balcony rails, the funnel's, those across her glide) take the tangerine
+  from her and fly off with it (`world.snatch`). **A "Do Not Disturb" door, the occupied
+  balcony:** her apology, the hand takes it (spent).
+- **The flight to the count** (§1.7): `gainTangerine(x, y)` at the three places one is added
+  (one lying in its place, a loose one, the steward's cart); `TALLY` in the config.
+- **Sounds:** her reactions' own (`yelpHot`, `splutter`, `gasp`, `sniff`) and the tangerine's
+  landing at the count (`tally`); written, rendered and measured, not heard: the user's to judge
+  on the soundboard.
+- `pocket` grown (front and back, a door, a gull, a door's hand, a paper at her shoe, the count
+  changing on landing, the keys dead through a mishap, her checkpoint after); `vacuum` waits for
+  her return instead of a fixed time. Passed: `pocket`, `vacuum`, `dash`, `lang`, `boot`,
+  `sound`, `gamepad`, `deck4`, `region1`, `region6`, `region7`, `region8`; `check_sound.py`: all within bounds.
+
+## No save while the game is made; a start place on deck 4 (2026-11-16)
+
+- **The user: "remove save games (for now) ... If I want intro, I want a default link to work like
+  expected. If I want any other location, or infinite tangerines, or whatever else we had, it
+  should all still work. Just don't save my progress."** `DEV_FRESH` in `src/config.js`: the save
+  is neither read nor written, so every load is a new game; every link works as before. `?real`
+  keeps the save as she will get it; `tools/playtest.py` opens every scenario with it (the
+  `pocket` scenario reloads to find its tangerine where it lay). To be set to false before the
+  gift. (A first try also skipped the welcome screen and the intro on every load: not asked,
+  taken out.)
+- **`?at=deck4`**: deck 4's corridor at 49 m, between the runaway suitcase and the porter's
+  round (I had given the user a link with a place that did not exist, and the game started them
+  on deck 3). `docs/start-links.md`, `README.md`.
+- `boot`, `deck3`, `intro`, `pocket`: pass.
+- **The user asked whether her falling on her bottom when the porter's cart reaches her back is
+  meant** (8c's gag is sitting back into the luggage; the stand-in is the built fall in the gag's
+  direction). Offered: keep it until step 4 draws the gags, or stand in with the fall forward for
+  every hit from behind. **The user: keep it.**
+- **A new rule (the user): after each approved step, commit, save and record everything, and say
+  when it is safe to compact the context** (`CLAUDE.md`, "Working with the user").

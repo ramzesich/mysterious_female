@@ -200,7 +200,7 @@ export class Balls {
         if (!hit) return;
         this.hitAt = time + 1500;
         sfx.bounce();
-        if (this.world.carry) this.world.carryBox.spill(q.x);
+        if (this.world.carry) this.world.carryBox.spill(q.x, false, 'ball');
         else s.scareContact(q.x, 'ball');
     }
 }
@@ -284,7 +284,7 @@ export class Flare {
         if (env < 0.7 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         if (Math.abs(p.x - d.x) > d.half - 8 || Math.abs(p.y - d.y) > 90 || p.y < d.y - 100) return;
         this.hitAt = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(d.x);
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'flare');
         else s.scareContact(d.x, 'flare');
     }
 }
@@ -400,7 +400,7 @@ export class FunnelWind {
             if (time > this.at) {
                 this.mark.setVisible(false);
                 const hit = this.onStairs() && Math.abs(p.x - this.target.x) < 17 && Math.abs(p.y - this.target.y) < 30;
-                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'funnelgull');
+                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'funnelgull', { snatch: diver.sprite });
                 this.state = 'circle';
                 this.turn++;
             }

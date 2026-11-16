@@ -77,7 +77,7 @@ export class Steam {
         if (env < 0.6 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         if (p.x < d.x + 2 || p.x > d.x + reach - 6 || Math.abs(p.y - d.y) > 80) return;
         this.hitAt = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(d.x);
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'steam');
         else s.scareContact(d.x, 'steam');
     }
 }

@@ -35,6 +35,7 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all&tangerines=infinite> |
+| `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all&tangerines=infinite> |
 
 ## Deck 5
 

@@ -290,6 +290,13 @@ const her = {
     lungeEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),
     // A hit taken by the pocket: a soft knock, and the tangerine popping out of it.
     pocket: () => { thud(200, 0.07, 0.16); tone(520, 0.09, { type: 'sine', to: 880, vol: 0.07, t: 0.04 }); noise(0.03, { band: 1800, vol: 0.06, t: 0.04 }); },
+    // Her reactions to a hit taken by the pocket (docs/plan-three-uses.md §1.6), each with it: a
+    // yelp at a flare's heat, a splutter at water in her face, a gasp at water down her back, a
+    // sniff as she rubs her nose after a door.
+    yelpHot: () => { tone(900, 0.07, { type: 'square', to: 1700, vol: 0.07, lp: 3600 }); tone(1500, 0.1, { type: 'square', to: 1100, vol: 0.05, t: 0.08, lp: 3200 }); },
+    splutter: () => { [0, 0.09, 0.17].forEach((t, i) => noise(0.06, { band: [700 + i * 200, 2400], q: 1.2, vol: 0.12, t })); tone(420, 0.12, { type: 'sawtooth', to: 300, vol: 0.04, t: 0.05, lp: 1400 }); },
+    gasp: () => { noise(0.22, { band: [1200, 3800], q: 0.9, vol: 0.1, attack: 0.04 }); tone(700, 0.18, { type: 'sine', to: 1100, vol: 0.05 }); },
+    sniff: () => { noise(0.08, { band: [2200, 4200], q: 1.4, vol: 0.09 }); noise(0.1, { band: [2400, 4600], q: 1.4, vol: 0.08, t: 0.12 }); },
     // A fright: her yelp.
     scare: () => { tone(760, 0.11, { type: 'square', to: 1480, vol: 0.08, lp: 3400 }); tone(1480, 0.14, { type: 'square', to: 1000, vol: 0.07, t: 0.11, lp: 3400 }); },
     // Running off after one.
@@ -382,6 +389,8 @@ const ship = {
 const finds = {
     // A tangerine; something into her hands (a tray, a cup, a load); something handed over.
     tangerine: () => { tone(880, 0.08, { vol: 0.1 }); tone(1320, 0.13, { vol: 0.1, t: 0.06 }); },
+    // That tangerine landing at the HUD's count after its flight (§1.7): a small soft pluck.
+    tally: () => { tone(1760, 0.05, { type: 'sine', vol: 0.06 }); tone(2640, 0.07, { type: 'sine', vol: 0.04, t: 0.03 }); },
     pickup: () => { tone(880, 0.08, { vol: 0.1 }); tone(1320, 0.13, { vol: 0.1, t: 0.06 }); },
     take: () => { tone(620, 0.06, { vol: 0.09 }); tone(930, 0.1, { vol: 0.09, t: 0.05 }); },
     give: () => { tone(930, 0.06, { vol: 0.09 }); tone(700, 0.11, { vol: 0.09, t: 0.05 }); },
