@@ -39,6 +39,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
 | `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door, the shower room's door and the shower scene's pieces (stall, door slid open, see-through glass, the towel on its handle) |
+| `assets/source/her-mishaps/` | **Her mishap gags, each one picture of her with the thing** (docs/plan-three-uses.md §1.6): states of her character with the thing drawn in, animated v3 (ids in its README); built into `assets/sprites/her-mishaps.png` (`HER_MISHAPS` in `tools/build_sprites.py`, 112 px cells, each clip placed by its thing's middle); played by the ship scene's `rideGag` (`GAGS` in `src/config.js`) for a scenario with `gag`, when the thing that hit her passes `ride` (how it carries her: its way, its floor, `hide()`/`show()`). The world's vacuum and suitcase (`assets/source/things/robot-vacuum.png`, `suitcase-rolling.png`) are cut from the same pictures |
 | `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
@@ -405,7 +406,10 @@ Lessons learned (2026-11-14, step 12, sound):
   again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
 - **Every game link given to the user includes `&tangerines=infinite`** while we develop, e.g.
-  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish). **Whenever you
+  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish); **while
+  `docs/plan-three-uses.md` is being built, a link to try something that needs no tangerine on
+  her (a mishap's gag) leaves `&tangerines=infinite` out** (the user, 2026-11-16: "if I need to
+  test scenarios without tangerines, give me links without tangerines"). **Whenever you
   ask the user to try or check something, give the link**, starting as near the spot as `?at=`
   allows, and say where to walk from there.
 - **After each change, show the result and stop for the user's review** (screenshots in the chat,
@@ -444,6 +448,13 @@ Lessons learned (2026-11-14, step 12, sound):
   screenshots in the chat, and say plainly what changed.
 - **To approve a piece of art, show the user the image in the chat** (a preview or screenshot) and
   ask; don't send them to launch the game for it.
+- **Every visual change, update or new prop is approved before it is placed in the game or
+  tested** (the user, 2026-11-16: "make me approve visual changes/updates/new props before you
+  start placing them in the game and testing them"): a generated picture, a cut-out, a clip, a
+  mended edge, shown enlarged (beside what it comes from, or beside her), then stop for the word.
+  Only then the sheets, the code, the playtests. (I had cut the world's suitcase from her riding
+  picture, squared its rounded corners in the mending, and placed and tested it before the user
+  saw it.)
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
 

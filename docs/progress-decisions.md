@@ -2057,3 +2057,44 @@ here" 7); each built step is gone back over under its "Revision".
   `checkPickups`, the loose ones in `pickedUp`), and only the flight is seen. Shown frame by
   frame to the user.
 - `throw`, `gamepad`, `pocket`: pass. **Approved by the user.**
+
+## The plan's revision, step 4 under way: she rides the vacuum and the suitcase (2026-11-16)
+
+- **Her first two gags (§1.6, 5b and 6b), each one picture of her with the thing:** a state of her
+  character with the thing drawn in (10 generations each), then v3 clips from it: she plops down
+  onto it as it catches her heels, then rides (the vacuum: arms up, hair streaming, out of the
+  screen, "Weeeee!"; the suitcase: clutching her hands, to the end of its roll, where it tips and
+  she lands sitting on the floor). A sheet of their own, `assets/sprites/her-mishaps.png`
+  (`HER_MISHAPS`, 112 px cells, each clip placed by its thing's middle so the thing never jumps
+  between clips); `rideGag()` in the ship scene, `GAGS` in the config; the world's own thing is
+  hidden while the picture plays and is back in its place when she comes out of her door.
+- **The world's vacuum and suitcase are cut from the same pictures** (where she sits on them,
+  each row filled from its own colours or the column below), so the one that hits her is the one
+  she rides. Deck 4's vacuum was a 16 x 6 block drawn in code; the suitcase's handle is up now.
+- **The user's corrections, in order:** the first suitcase state was darker and narrower than the
+  game's: made again in the game's colours, handle up, tag (the user's choice, of two). My
+  cut-out squared the suitcase's rounded corners: restored. The vacuum "looks too big": made
+  smaller by taking out its plain middle columns and a row (32 x 13 to 22 x 11), its top line
+  run out to mirror its left end and greyed (the user's choice of three sizes and two greys);
+  the riding picture made again with it under her, she lowered 2 px, and both clips drawn again
+  from it (2 generations).
+- **"I prefer the ride in all cases"** (the user, after trying it from every side with a test flag,
+  `?ride=all`, since removed): 5a, 6a and 6c ride too, the picture facing the way the thing goes
+  (from the front she turns round onto it). With a tangerine the side still picks her reaction;
+  6c, before no hit at all, throws her back a step (the tangerine behind her). The suitcase from a
+  standstill at an end of its roll sets off for the other end with her, up to 80 px/s.
+- **A glitch the user saw:** the camera, restarted to follow the suitcase's ride, snapped the view
+  down a few px out of its slack box. The view now stays put and slides sideways by exactly her
+  ride (measured: 0 px up or down).
+- **Two new rules from the user:** every visual change or new prop is shown enlarged and approved
+  before it is placed or tested (I had placed and tested the cut-outs first: "If we follow the
+  preview/approve rule, we won't need to regenerate sequences like this time"); while this plan
+  is built, links for scenarios without tangerines leave `&tangerines=infinite` out.
+- `?at=deck4-aft`: deck 4's corridor at 112 m, by the vacuum's round.
+- Generations, from the account: 41 (three states 30, the first suitcase try among them; the
+  first five clips 8, the big vacuum's two now unused; the map object 1, not used; the small
+  vacuum's two clips 2). (I had told the user 31, then 33: miscounted.)
+- Passed: `deck4` (6a, 6b, 6c ride; tipped off at the roll's end; back at her checkpoint with it in
+  place), `vacuum` (head-on and from behind she rides it off; back; no smoke from a ridden one),
+  `pocket`, `boot`; `region1` before the vacuum was made smaller. The rest not run.
+

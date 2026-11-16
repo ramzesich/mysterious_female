@@ -235,6 +235,9 @@ export const MISHAPS = {
 // With none: her gag, then her checkpoint; until each gag is made, the built one on that side
 // stands in: `down` 'sit' (on her bottom, dazed) or 'belly' (on her front, dazed), or with no
 // `down` she runs off (`off`). `nothing`: a slow thing she is looking at does not knock her over.
+// `gag`: her own gag is made, one picture of her with the thing (`GAGS`, below), played when the
+// thing that hit her says how it carries her (`ride` in `scareContact`); `down` is kept for a hit
+// that cannot (a tray in her hands spilled, a hit in the air).
 export const MISHAP_SCENES = {
     '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
     '2': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // into the dog's lead
@@ -242,11 +245,11 @@ export const MISHAP_SCENES = {
     '4a': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },    // a paper slides her way
     '4b': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },     // it slides against her
     '4c': { nothing: true },                                                    // it stops at her shoe
-    '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly' },      // the vacuum, head-on
-    '5b': { word: 'ride', react: 'stumble', toss: 'on', down: 'sit' },          // it catches her from behind
-    '6a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // she runs into the suitcase
-    '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // it rolls into her back
-    '6c': { nothing: true },                                                    // she stops it
+    '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly', gag: 'vacuum' }, // the vacuum, head-on
+    '5b': { word: 'ride', react: 'stumble', toss: 'on', down: 'sit', gag: 'vacuum' },   // it catches her from behind
+    '6a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // she runs into the suitcase
+    '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // it rolls into her back
+    '6c': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'suitcase' },  // it rolls into her front
     '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // the deck chair, head-on
     '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // from behind
     '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into the porter's cart
@@ -277,6 +280,21 @@ export const MISHAP_SCENES = {
     '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', toss: 'hand' },                 // a "Do Not Disturb" door
     '24': { word: 'startled', react: 'apology', toss: 'hand' },                 // the occupied balcony
+};
+
+// Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,
+// 2026-11-16: "I prefer the ride in all cases"); `word` over her head for every one of them
+// (the vacuum's "Weeeee!"), else the scenario's. One picture of her with it (`assets/sprites/her-mishaps.png`, cells of
+// `GAG_CELL`, the thing's middle on the cell's middle), played where she was hit while the world's
+// own is hidden. `her`: px from the thing's middle to hers as she starts sitting down, so that she
+// starts where she stood. The vacuum (5b) carries her off out of the screen, gathering speed to
+// `speed` px/s by `accel`; the suitcase (6b) rolls on to the end of its roll (from an end, to the
+// other) at up to `top` px/s with her on it, slowing (`slow`: its speed per px left, at least
+// `least`), tips her off, and she sits there `holdMs`.
+export const GAG_CELL = 112;
+export const GAGS = {
+    vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
+    suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', top: 80, slow: 1.4, least: 16, holdMs: 1300 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out

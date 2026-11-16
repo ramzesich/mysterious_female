@@ -2346,8 +2346,15 @@ Nothing blocks the start of the build. These get settled along the way:
       and the doors that take the tangerine, the flight to the count; §5.6), committed with the
       no-save switch (`DEV_FRESH`) and `?at=deck4`. **Step 3's revision done** (the new tangerine
       in her toss's fist and rolling, from step 1's; a picked-up one's picture leaves the floor at
-      once, only its flight to the count is seen). **Next: step 4's revision** (region 1's gags,
-      about 70 generations, 5b and 6b first: her riding the vacuum and the suitcase), then step 4a. **Then step 5** (the rest of the
+      once, only its flight to the count is seen). **Step 4's revision under way:** her first two
+      gags made and approved: she rides deck 4's robot vacuum off out of the screen and the
+      runaway suitcase to the end of its roll, whichever side they reach her (the user: "I prefer
+      the ride in all cases": 5a, 6a, 6c ride too), one picture of her with the thing
+      (`assets/sprites/her-mishaps.png`); the vacuum smaller and the suitcase cut from those same
+      pictures. **Next in step 4's revision:** the rest of region 1's gags (4a, 4b, 8a to 8d, 10a,
+      10b, the dog's lick, the porter's cap: each still shown and approved before it is animated
+      or placed), 4c (a paper stopped at her shoe fades), the art rule looked back over; then step 4a
+      (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened.

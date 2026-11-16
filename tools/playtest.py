@@ -1070,10 +1070,25 @@ def scenario_vacuum(b):
     b.shot("vacuum-scare")
     s = b.state()
     ok = check(s["mode"] == "scripted", "touching the vacuum is a scare", s)
-    # (Her mishap: down on her front over it, dazed, then her checkpoint: docs/plan-three-uses.md §1.6.)
+    # (Head-on, 5a: she rides it off too, the other way, turned round onto it: the user, 2026-11-16.)
+    ok &= check(b.eval("(g => !!g && g.flipX)(window.__ship.worldLayer.list.find(o => o.texture?.key === 'her-mishaps'))"),
+                "head-on: she rides it off the way it was going")
     b.wait_for("window.__ship.mode === 'play'", timeout=6)
     s = b.state()
     ok &= check(s["mode"] == "play", "she comes back afterwards", s)
+    # 5b: it catches her from behind as she stands: she rides it off down the corridor, out of the
+    # screen (her with it in one picture, its own hidden, no smoke of a choked one), and is back.
+    S, G = "window.__ship", "window.__ship.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"
+    b.teleport(x_of(126), D4)
+    b.eval(f"(v => {{ v.sprite.x = {x_of(126) - 60}; v.dir = 1; v.minX = {x_of(110)}; v.maxX = {x_of(145)}; }})({S}.vacuums[0]);"
+           f" {S}.player.setFlipX(false)")
+    b.wait_for(f"{S}.mode === 'scripted'", timeout=6)
+    ok &= check(b.eval(f"{S}.lastMishap?.id") == "5b" and b.eval(f"!!{G} && !{S}.vacuums[0].sprite.visible && {S}.vacuums[0].alive"),
+                "5b: from behind she rides it off (her with it in one picture; its own hidden)",
+                b.eval(f"[{S}.lastMishap?.id, {G}?.anims.currentAnim?.key]"))
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    ok &= check(b.eval(f"!{G} && {S}.vacuums[0].sprite.visible && !{S}.vacuums[0].ridden && {S}.player.visible"),
+                "5b: out of the screen, back at her checkpoint, the vacuum in its place")
     return ok
 
 
@@ -1379,7 +1394,35 @@ def scenario_deck4(b):
     b.teleport(exact_x(36), D4)
     s = hold_until(b, "right", lambda st: st["mode"] != "play", timeout=6)
     ok = check(s["mode"] == "scripted", "the suitcase: walked into, a bump", s)
+    # (6a: she rides it off too, the user, 2026-11-16.)
+    ok &= check(b.eval(f"!!{S}.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"), "6a: walked into, she rides it off")
+    b.wait_for(f"{S}.mode === 'play'", timeout=12)
+
+    # 6b: rolled into her back as she stands facing its way, with none on her: she rides it to the
+    # end of its roll, it tips her off, and she is back at her checkpoint with it in its place.
+    G = f"{S}.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"
+    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {R}.phase = Math.PI / 2 - 0.35")
+    b.teleport(b.eval(f"{R}.mid - {R}.half * Math.cos(Math.PI / 2 - 0.35)") + 26, D4)
+    b.eval(f"{S}.player.setFlipX(false)")
+    b.wait_for(f"{S}.mode === 'scripted'", timeout=6)
+    ok &= check(b.eval(f"{S}.lastMishap?.id") == "6b" and b.eval(f"!!{G} && !{R}.sprite.visible && !{S}.player.visible"),
+                "6b: rolled into her back, she rides it (her with it in one picture; its own hidden)",
+                b.eval(f"[{S}.lastMishap?.id, {G}?.anims.currentAnim?.key]"))
+    b.wait_for(f"{G}?.anims.currentAnim?.key === 'gag-suitcase-tip'", timeout=8)
+    ok &= check(abs(b.eval(f"{G}.x") - b.eval(f"{R}.def.x1")) < 2, "6b: tipped off at the end of its roll",
+                (b.eval(f"{G}.x"), b.eval(f"{R}.def.x1")))
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    ok &= check(b.eval(f"!{G} && {R}.sprite.visible && {S}.player.visible && !{R}.parked"),
+                "6b: back at her checkpoint, the suitcase in its place")
+    # 6c: standing facing it as it rolls at her: she rides it off too, turned round onto it.
+    b.eval(f"{R}.phase = Math.PI / 2 - 0.35; {S}.player.setFlipX(true)")
+    b.teleport(b.eval(f"{R}.mid - {R}.half * Math.cos(Math.PI / 2 - 0.35)") + 50, D4)
+    b.eval(f"{S}.player.setFlipX(true)")
+    b.wait_for(f"{S}.mode === 'scripted'", timeout=6)
+    ok &= check(b.eval(f"{S}.lastMishap?.id") == "6c" and b.eval(f"!!{G} && !{G}.flipX"),
+                "6c: rolled into her front, she rides it off the way it was going",
+                b.eval(f"[{S}.lastMishap?.id, {G}?.flipX]"))
+    b.wait_for(f"{S}.mode === 'play'", timeout=12)
 
     # The dog's lead where it lies on the carpet: run into with no tangerine, she trips and falls flat
     # (a fright: the user, 2026-11-16); hopped, nothing.

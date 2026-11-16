@@ -198,6 +198,45 @@ HER_CAT = {
 }
 
 
+# Her mishap gags (docs/plan-three-uses.md §1.6), each one picture of her with the thing: states of
+# her character with the thing drawn in, animated v3 (assets/source/her-mishaps/README.md). A sheet
+# of their own so that hers stays within a texture's size; a bigger cell, the thing beside her.
+# Each clip is placed by its thing (`props`: the clip's name's start -> the thing's own picture in
+# assets/source/things/, cut from the same art): the thing's middle on the cell's middle in the
+# clip's first frame, the rest of the clip as drawn round it, so that from sitting down to the
+# ride the thing does not jump. Frame 0 of a v3 clip is its start frame (for a sit-down, our
+# composition of her standing and the thing: left out).
+HER_MISHAPS = {
+    "name": "her-mishaps",
+    "cell": 112,
+    "remap": HER["remap"],
+    "frames": {
+        "vacuum-sit": [(f"vacuum-sit/{i}.png", "feet") for i in range(1, 7)],
+        "vacuum-ride": [(f"vacuum-ride/{i}.png", "feet") for i in range(1, 9)],
+        "suitcase-sit": [(f"suitcase-sit/{i}.png", "feet") for i in range(1, 7)],
+        "suitcase-ride": [(f"suitcase-ride/{i}.png", "feet") for i in range(1, 9)],
+        "suitcase-tip": [(f"suitcase-tip/{i}.png", "feet") for i in range(0, 9)],
+    },
+    "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
+    "baseline": "ride-vacuum/east.png",
+}
+
+
+def prop_middle(img, colours):
+    """The x of the middle of a thing in a frame, found by its own colours (within a few steps of
+    them: the frames are redrawn), in the lower half of what is drawn."""
+    img = img.convert("RGBA")
+    bb = img.getbbox()
+    xs = []
+    for y in range((bb[1] + bb[3]) // 2, bb[3]):
+        for x in range(bb[0], bb[2]):
+            p = img.getpixel((x, y))
+            if p[3] and any(abs(p[0] - c[0]) + abs(p[1] - c[1]) + abs(p[2] - c[2]) < 24 for c in colours):
+                xs.append(x)
+    xs.sort()
+    return xs[len(xs) // 2] if xs else img.width // 2
+
+
 def seq(char, folder, anchor="keep"):
     """Every frame in assets/source/<char>/<folder>/, in order."""
     n = len(list((ROOT / "assets" / "source" / char / folder).glob("*.png")))
@@ -257,6 +296,14 @@ def build(spec):
         indices = []
         images = [(palettize(Image.open(src_dir / path), remap), anchor) for path, anchor in sources]
         anim_feet = max(lowest_row(img) for img, _ in images)
+        # Placed by its thing (HER_MISHAPS): the clip moved sideways by its first frame's thing.
+        shift = 0
+        for start, thing in spec.get("props", {}).items():
+            if anim.startswith(start):
+                pic = Image.open(ROOT / "assets" / "source" / "things" / f"{thing}.png").convert("RGBA")
+                colours = {c[1][:3] for c in pic.getcolors(4096) if c[1][3] and sum(c[1][:3]) > 60}
+                first = Image.open(src_dir / sources[0][0])
+                shift = first.width // 2 - prop_middle(first, colours)
         for img, anchor in images:
             if anchor == "keep":
                 feet = standing_feet(img.size)
@@ -265,7 +312,7 @@ def build(spec):
             else:
                 feet = lowest_row(img)
             frame = Image.new("RGBA", (cell, cell), (0, 0, 0, 0))
-            paste(frame, img, (cell - img.width) // 2, cell - 1 - feet)
+            paste(frame, img, (cell - img.width) // 2 + shift, cell - 1 - feet)
             indices.append(len(cells))
             cells.append(frame)
         meta["anims"][anim] = indices
@@ -289,4 +336,5 @@ if __name__ == "__main__":
     build(HER)
     build(HER_TOWEL)
     build(HER_CAT)
+    build(HER_MISHAPS)
     build(BUMBOT)

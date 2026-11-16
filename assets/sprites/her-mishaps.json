@@ -1,0 +1,60 @@
+{
+ "cell": 112,
+ "frames": {
+  "vacuum-sit": 0,
+  "vacuum-ride": 6,
+  "suitcase-sit": 14,
+  "suitcase-ride": 20,
+  "suitcase-tip": 28
+ },
+ "anims": {
+  "vacuum-sit": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "vacuum-ride": [
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13
+  ],
+  "suitcase-sit": [
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ],
+  "suitcase-ride": [
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27
+  ],
+  "suitcase-tip": [
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36
+  ]
+ },
+ "cols": 48
+}

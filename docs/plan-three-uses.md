@@ -191,11 +191,11 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 4a | A sliding paper | It slides her way | She sits down; the paper flutters open over her head like a tent |
 | 4b | | It slides against her | Down on her belly, chin on her hands; the paper settles on her back like a blanket |
 | 4c | | She stands still | **Nothing: it stops against her shoe.** Stopped short of its door it is not taken in by the hand: it fades away a moment later, harmless while it lies there (the user: "a stopped [paper] would not be collected, if it stops not by the door. It just disappears shortly after") |
-| 5a | Robot vacuums (decks 4 and 9) | It comes at her front, or she runs into it | Forward over it, on her belly across it; it bumps her side twice and trundles home. "Eeek!" |
+| 5a | Robot vacuums (decks 4 and 9) | It comes at her front, or she runs into it | ~~Forward over it, on her belly across it; it bumps her side twice and trundles home. "Eeek!"~~ **As 5b: she rides it off** (the user, 2026-11-16: "I prefer the ride in all cases"), turned round onto it, the way it was going |
 | 5b | | It catches her from behind | **She sits down on it and it carries her off down the corridor**, like a cat on one. **"Weeeee!"** (see the words, below) |
-| 6a | The runaway suitcase | She runs into it | Over it; it pops open; she sits up in someone's sun hat |
+| 6a | The runaway suitcase | She runs into it | ~~Over it; it pops open; she sits up in someone's sun hat~~ **As 6b: she rides it** (the user, 2026-11-16); standing at an end of its roll, it sets off for the other end with her |
 | 6b | | It rolls into her back as she stands | She sits on it and rides to the end of its roll, where it creaks and tips her off |
-| 6c | | She stands facing it | **Nothing: she stops it with her hands and it rolls back** |
+| 6c | | She stands facing it | ~~Nothing: she stops it with her hands and it rolls back~~ **As 6b: she rides it** (the user, 2026-11-16), turned round onto it; with a tangerine on her, thrown back (her reel) |
 | 7a | The deck chair on the wet patch | Head-on (she slid in from the forward end) | Face first onto it; it folds flat and she sledges on it across the tiles |
 | 7b | | From behind (she slid in from the aft end) | Scooped up seated; it folds shut on her, her feet out |
 | 8a | The porter's cart | She runs into the cart | Folded over its bar, draped on the bags, legs kicking |
@@ -252,8 +252,10 @@ gusts, the laundry lines, the gulls that take food, the waiter).
 - **The four gags that carry her off** (3, 5b, 6b, 20) are each one picture of her with the
   thing: the world's own tray, vacuum, suitcase or gull is hidden while the clip moves, and is
   back in its place when she steps out of her door.
-- **6c and 4c make the suitcase and the papers gentler on purpose:** a slow thing she is
-  looking at does not knock her over. She still has to hop them to get past.
+- **4c makes the papers gentler on purpose:** a slow thing she is looking at does not knock her
+  over. She still has to hop them to get past. (6c did the same for the suitcase until the user
+  tried the ride from every side, 2026-11-16: "I prefer the ride in all cases": the vacuum and the
+  suitcase carry her off whichever side they reach, the gag's picture facing the way it goes.)
 - **The words over her head** stay as they are for each kind of hit, in both languages. One
   changes, the user's: "Update the wording with fright/excitement, like 'Weeeee!' or
   something": the vacuum's ride (5b) is **"Weeeee!"** («Віііі!»); over it on her belly (5a) she
@@ -618,7 +620,10 @@ Shown: her throw's frames for approval before anything else; then each target as
   away, no hand takes it), deck 4's vacuum (5a, 5b), the suitcase (6a, 6b, 6c), the porter and
   his cart (8a to 8d, and his tip of the cap), the breakfast stewardess (10a, 10b).
 - **Art, each shown enlarged before it is placed:** twelve gags of hers (4a, 4b, 5a, 5b, 6a,
-  6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations. The
+  6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations.
+  **Done (2026-11-16): 5b and 6b, and with them 5a, 6a and 6c, which ride too** (the user's
+  word after trying it); the vacuum, made smaller, and the suitcase are cut from the same pictures.
+  Left: 4a, 4b, 8a to 8d, 10a, 10b, the dog's lick, the porter's cap. The
   first to be made and shown are 5b and 6b (her on the vacuum, her on the suitcase): they tell
   whether a picture of her riding a thing holds up.
 - Her gags go on a sheet of their own (`assets/sprites/her-mishaps.png`, its own cell, her
@@ -629,7 +634,7 @@ Shown: her throw's frames for approval before anything else; then each target as
   breakfast trolley and its tray, the papers, anything else found), show the list to the user
   with a close-up of each, and make again with PixelLab what they point at.
 - `deck4` grown: each scenario above set up by where she stands, which way she faces and
-  whether she moves, the right gag asked for, her checkpoint after; 6c and 4c cost nothing; with
+  whether she moves, the right gag asked for, her checkpoint after; 4c costs nothing; with
   a tangerine the reaction and the tangerine's way. Run with it: `region1`, `pocket`, `boot`.
 
 ### Step 4a. The mishaps on the rest of the ship (art: about 125, in three batches)

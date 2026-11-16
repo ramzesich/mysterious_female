@@ -14,8 +14,10 @@ const PICK = {
     // slid against her from behind, her foot is taken back (on her front); one sliding at her as she
     // stands looking at it stops against her shoe (the user's: "nothing").
     papers: f => f.lying ? '4a' : !f.front ? '4b' : f.she ? '4a' : '4c',
+    // (With none on her she rides it off either way, the user, 2026-11-16; with one, the side.)
     vacuum: f => f.front || f.she ? '5a' : '5b',
-    // The suitcase: run into, over it; rolled into her back, she rides it; seen coming, she stops it.
+    // The suitcase: run into; rolled into her back; rolled into her front. With none on her she
+    // rides it off in all three (the user, 2026-11-16); the side picks her reaction with one on her.
     suitcase: f => f.she ? '6a' : f.front ? '6c' : '6b',
     deckchair: f => f.front ? '7a' : '7b',
     // The porter: into his cart (he faces her) or into his back; standing, the cart pushes into her

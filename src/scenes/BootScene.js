@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -41,6 +41,9 @@ export class BootScene extends Phaser.Scene {
         // With Bumbot in her arms (the way home, §6.1.9).
         this.load.spritesheet('her-cat', 'assets/sprites/her-cat.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-cat-meta', 'assets/sprites/her-cat.json');
+        // Her mishap gags, each one picture of her with the thing (docs/plan-three-uses.md §1.6).
+        this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
+        this.load.json('her-mishaps-meta', 'assets/sprites/her-mishaps.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
@@ -191,6 +194,13 @@ export class BootScene extends Phaser.Scene {
             order.map(i => ({ key: 'her-cat', frame: held.anims[name][i] }));
         this.anims.create({ key: 'her-cat-run', frames: heldFrames('run'), frameRate: 11, repeat: -1 });
         this.anims.create({ key: 'her-cat-stroke', frames: heldFrames('stroke', [0, 1, 2, 3, 4, 4, 4, 3, 4, 4, 3, 2, 1, 0]), frameRate: 6 });
+        // Her gags with a thing (§1.6): sitting down onto it, the ride, the end of it (`gag-<clip>`).
+        const gag = this.cache.json.get('her-mishaps-meta');
+        for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
+                                           ['suitcase-sit', 10, 0], ['suitcase-ride', 8, -1], ['suitcase-tip', 10, 0]]) {
+            if (!gag.anims[name]) continue;
+            this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map(f => ({ key: 'her-mishaps', frame: f })), frameRate: fps, repeat });
+        }
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

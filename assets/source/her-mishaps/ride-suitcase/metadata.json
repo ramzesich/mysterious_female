@@ -1,0 +1,70 @@
+{
+  "group_id": "0ec85433-7778-4eb0-9101-bac19b5ceaf1",
+  "states": [
+    {
+      "character": {
+        "id": "fe79eecf-34e3-4ce8-b3f9-8419d001ba01",
+        "name": "Riding the suitcase 2",
+        "prompt": "young woman, cruise ship crew member: long very dark brown hair below the shoulders with ends flipping outward, fair skin, white short-sleeved blouse with gold epaulettes, red neck scarf, navy pencil skirt, dark flat shoes; beside her, an upright wheeled hard-shell suitcase in muted slate blue-violet with darker purple-grey edges, its telescopic pull handle extended, a small orange luggage tag on its side, two small wheels at its bottom, about half her standing height and as wide as her lap",
+        "size": {
+          "width": 80,
+          "height": 80
+        },
+        "template_id": "mannequin",
+        "directions": 4,
+        "view": "side",
+        "created_at": "2026-11-16T16:56:51.208169+00:00"
+      },
+      "folder": "Riding_the_suitcase_2",
+      "frames": {
+        "rotations": {
+          "south": "Riding_the_suitcase_2/rotations/south.png",
+          "west": "Riding_the_suitcase_2/rotations/west.png",
+          "east": "Riding_the_suitcase_2/rotations/east.png",
+          "north": "Riding_the_suitcase_2/rotations/north.png"
+        },
+        "animations": {
+          "tip-off": {
+            "east": [
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_000.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_001.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_002.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_003.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_004.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_005.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_006.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_007.png",
+              "Riding_the_suitcase_2/animations/tip-off/east/frame_008.png"
+            ]
+          },
+          "sit-on-suitcase": {
+            "east": [
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_000.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_001.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_002.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_003.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_004.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_005.png",
+              "Riding_the_suitcase_2/animations/sit-on-suitcase/east/frame_006.png"
+            ]
+          },
+          "ride": {
+            "east": [
+              "Riding_the_suitcase_2/animations/ride/east/frame_000.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_001.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_002.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_003.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_004.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_005.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_006.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_007.png",
+              "Riding_the_suitcase_2/animations/ride/east/frame_008.png"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-16T17:02:15.584545"
+}

@@ -730,7 +730,8 @@ export class Roller {
         this.world = world;
         this.scene = s;
         this.def = def;             // { x0, x1, y, v (m/s, its fastest) }
-        this.sprite = s.add.image(def.x0, def.y, 'shipart', 'suitcase').setOrigin(0.5, 1).setDepth(D.props + 0.03);
+        // (Its handle pulled up: the one she rides in her gag, 6b, cut from that picture.)
+        this.sprite = s.add.image(def.x0, def.y, 'things', 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         world.add([this.sprite]);
         this.mid = (def.x0 + def.x1) / 2;
         this.half = (def.x1 - def.x0) / 2;
@@ -750,7 +751,7 @@ export class Roller {
         if (Math.sign(Math.sin(this.phase)) !== Math.sign(was)) sfx.at(this.x, d.y).creak();
         this.sprite.setX(this.x).setAngle(Math.sin(this.phase) * 4);
         // Her against it (its height is a hop's).
-        if (!here(s, d) || Math.abs(p.x - this.x) > PLAYER.bodyWidth / 2 + 8 || p.y <= d.y - 26 || p.y - PLAYER.bodyHeight >= d.y) return;
+        if (!here(s, d) || Math.abs(p.x - this.x) > PLAYER.bodyWidth / 2 + 8 || p.y <= d.y - Roller.HOP || p.y - PLAYER.bodyHeight >= d.y) return;
         if (s.isLunging()) {
             // Sent rolling to the corridor's end, the way she was going; it stays there.
             this.parked = true;
@@ -762,10 +763,19 @@ export class Roller {
         } else if (this.world.carry) {
             this.world.carryBox.spill(this.x, false, 'suitcase', { vx: Math.sin(this.phase) * 50 });
         } else {
-            s.scareContact(this.x, 'suitcase', { vx: Math.sin(this.phase) * 50 });
+            // (Rolled into her back, she rides it to the end of its roll, 6b: it waits meanwhile.)
+            // (Standing at an end of its roll, it sets off for the other end with her.)
+            const vx = Math.sin(this.phase) * this.half * 2 * Math.PI / this.period;
+            const dir = Math.abs(vx) > 5 ? Math.sign(vx) : this.x < this.mid ? 1 : -1;
+            const ride = { x: this.x, y: d.y, dir, v: vx, endX: dir > 0 ? d.x1 : d.x0,
+                           hide: () => { this.parked = true; this.sprite.setVisible(false); },
+                           show: () => { this.parked = false; this.sprite.setVisible(true).setAngle(0); } };
+            s.scareContact(this.x, 'suitcase', { vx, ride });
         }
     }
 }
+// Her feet over this, she clears it: its body (the handle is a thin rail she passes).
+Roller.HOP = 30;
 
 // A small dog on a long lead (population: `haz_dog_4`), its owner in her cabin's doorway holding
 // the other end. The dog trots about within the lead's reach and sits now and then; where the lead
