@@ -13,6 +13,7 @@ from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BOW, FINALE
+from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
@@ -244,6 +245,33 @@ def build_world():
         ents.append(dict(kind="dnd", id=did, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", who=who))
     for oid, (deck, m, what) in OPENDOORS.items():
         ents.append(dict(kind="opendoor", id=oid, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", what=what))
+
+    # Region 1's decks filled (docs/plan-three-uses.md §4.2; src/world/movers.js).
+    for rid, (deck, a, b, v) in ROLLERS.items():
+        ents.append(dict(kind="roller", id=rid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
+                         v=v, route="inside"))
+    for did, (deck, m, who, reach, gives) in DOGS.items():
+        ents.append(dict(kind="dog", id=did, x=slot_x(deck, m), y=B.floor_y(deck), who=who, reach=round(reach * 48),
+                         gives=gives, route="inside"))
+    for sid, (deck, a, b, v, who) in SKIMMERS.items():
+        x0, x1 = B.exact_x(a), B.exact_x(b)
+        ents.append(dict(kind="skimmer", id=sid, x=(x0 + x1) // 2, x0=x0, x1=x1, y=B.floor_y(deck), v=v, who=who,
+                         doors=[x for x in sorted(cabin_slots(deck)) if x0 + 40 < x < x1 + 60], route="inside"))
+    for i, (m, piece) in enumerate(CLIMB["steps"]):
+        x, y = B.exact_x(m), B.floor_y(CLIMB["deck"])
+        if piece == "shelf":
+            ents.append(dict(kind="shelf", id=f"climb_{i}", x=x, y=y, up=CLIMB["shelf"], route="inside"))
+        else:
+            ents.append(dict(kind="solid", id=f"climb_{i}", x=x, y=y, route="inside", frame=piece))
+    ents.append(dict(kind="opendoor", id="amb_knitter_door", x=slot_x(KNITTER["deck"], KNITTER["door"]),
+                     y=B.floor_y(KNITTER["deck"]), route="inside", what="knit"))
+    ents.append(dict(kind="knitter", id="amb_knitter", x=B.exact_x(KNITTER["chair"]), y=B.floor_y(KNITTER["deck"]),
+                     route="inside", who=KNITTER["who"], basket=B.exact_x(KNITTER["basket"])))
+    for bid, (deck, doors, who) in BREAKFASTS.items():
+        xs = [slot_x(deck, m) for m in doors]
+        ents.append(dict(kind="breakfast", id=bid, x=xs[0], y=B.floor_y(deck), doors=xs, who=who, route="inside"))
+    ents.append(dict(kind="deskflags", id="deskflags", x=B.exact_x(DESK_FLAGS["m"]), y=B.floor_y(DESK_FLAGS["deck"]),
+                     on=DESK_FLAGS["on"], flags=DESK_FLAGS["flags"], route="inside"))
     for lid, (where, a, b, frame, *until) in LOWS.items():
         x0, y, route = spot(where, a)
         ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,
@@ -469,7 +497,7 @@ def build_world():
         home=dict(x0=room_x0["cabin"], y=room_floor["cabin"], stepX=room_x0["cabin"] + fh["step"], sitX=room_x0["cabin"] + fh["sit"],
                   catX=room_x0["cabin"] + fh["cat"], husbandX=room_x0["cabin"] + fh["husband"]),
         totals=dict(tangerines=sum(e.get("count", 1) for e in ents if e["kind"] == "tangerine"),
-                    slots=sum(1 for e in ents if e["kind"] == "slot")))
+                    slots=sum(1 for e in ents if e["kind"] == "slot"), keeps=KEEPS))
 
     return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
                 topdeck=topdeck, bow=bow, finale=finale,

@@ -13,13 +13,18 @@ import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
-import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor } from './movers.js';
+import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
 const OK = { ok: true };
+// The HUD's mark for each kind of thing to find (docs/plan-three-uses.md §4.1): Bumbot's, hers, her husband's.
+const KEEP_ICONS = { cat: '🐾', her: '🌸', him: '🎸' };
+// The knitting lady in her armchair: the chair was drawn round her own seated pose (its picture's
+// left edge 16 px behind her middle, its foot on her floor), so she sits in it exactly.
+const KNIT_SIT = { dx: 16, up: 0 };
 
 // How a bare room looks until it is drawn (tools/draw_rooms.py): wall, skirting, floor.
 const LOOKS = {
@@ -63,8 +68,9 @@ export class World {
     // Doors on the cabin corridors that take a cabin door's place (rooms, checkpoints).
     doorSpots() {
         const rooms = this.data.rooms.flatMap(r => r.doors.filter(d => d.outRoute === 'inside').map(d => ({ x: d.outX, y: d.outY })));
-        // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb".)
-        const own = ['checkpoint', 'swingdoor', 'dnd', 'opendoor'];
+        // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb";
+        // the dog's owner's, open behind her.)
+        const own = ['checkpoint', 'swingdoor', 'dnd', 'opendoor', 'dog'];
         const cps = this.data.ents.filter(e => own.includes(e.kind) && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
         return [...rooms, ...cps];
     }
@@ -270,6 +276,65 @@ export class World {
             g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
             g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
         });
+        // Region 1's (docs/plan-three-uses.md §4.2): the climb's shelf on two brackets; the knitting
+        // lady's basket; her open cabin, an armchair just inside the door; the little desk flags.
+        make('wall-shelf', 26, 9, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 26, 4);
+            g.fillStyle(0xa05b53, 1).fillRect(1, 1, 24, 2);
+            g.fillStyle(0xbf6f4a, 1).fillRect(1, 1, 24, 1);
+            g.fillStyle(0x2e222f, 1).fillRect(3, 4, 2, 5).fillRect(21, 4, 2, 5).fillRect(5, 4, 2, 2).fillRect(19, 4, 2, 2);
+        });
+        make('paper-fold', 10, 3, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 10, 3);
+            g.fillStyle(0xf3ecdd, 1).fillRect(1, 0, 8, 2);
+            g.fillStyle(0x9babb2, 1).fillRect(2, 1, 2, 1).fillRect(5, 1, 3, 1);
+        });
+        make('knit-basket', 14, 8, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 1, 14, 7).fillRect(2, 0, 10, 1);
+            g.fillStyle(0xc28d75, 1).fillRect(1, 2, 12, 5);
+            g.fillStyle(0x8a5a40, 1);
+            for (let x = 2; x < 13; x += 3) g.fillRect(x, 2, 1, 5);
+            g.fillRect(1, 4, 12, 1);
+            g.fillStyle(0x625565, 1).fillRect(9, -1, 1, 1);
+        });
+        make('peek-knit', 34, 74, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
+            g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
+            // A picture on the wall within, in a gilt frame: a red flower in a vase (the user,
+            // 2026-11-16: a green and blue landscape read as a flag upside down). Below it, the end
+            // of her bed with its runner. Inside a room, washed 30% toward the wall (CLAUDE.md;
+            // the user, 2026-11-16: they had been in full colours).
+            const wash = c => {
+                const w = 0xece3cf, k = 0.3, ch = sh => Math.round(((c >> sh) & 255) * (1 - k) + ((w >> sh) & 255) * k);
+                return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+            };
+            const fill = (c, x, y, w, h) => g.fillStyle(wash(c), 1).fillRect(x, y, w, h);
+            fill(0xa05b53, 14, 10, 14, 16);
+            fill(0xf9c22b, 15, 11, 12, 14);
+            fill(0xf3ecdd, 16, 12, 10, 12);
+            fill(0x239063, 21, 16, 1, 5); fill(0x239063, 19, 18, 2, 1); fill(0x239063, 22, 17, 2, 1);
+            fill(0xe83b3b, 20, 13, 3, 3);
+            fill(0xf9c22b, 21, 14, 1, 1);
+            fill(0x4d9be6, 19, 21, 5, 3);
+            fill(0x2e222f, 8, 52, 24, 20);
+            fill(0xffffff, 9, 53, 23, 13);
+            fill(0xc7dcd0, 9, 60, 23, 1);
+            fill(0x905ea9, 9, 56, 23, 3);
+            fill(0x6e2727, 9, 66, 23, 6);
+            g.fillStyle(0x9babb2, 1).fillRect(2, 72, 30, 2);
+            // The door's leaf, swung in against the wall.
+            g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
+            g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
+        });
+        const flagMake = (key, paint) => make(key, 5, 13, g => {
+            g.fillStyle(0x9babb2, 1).fillRect(0, 0, 1, 12);
+            g.fillStyle(0x2e222f, 1).fillRect(0, 12, 3, 1);
+            paint(g);
+        });
+        flagMake('deskflag-se', g => { g.fillStyle(0x4d9be6, 1).fillRect(1, 0, 4, 3); g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
+        flagMake('deskflag-fi', g => { g.fillStyle(0xffffff, 1).fillRect(1, 0, 4, 3); g.fillStyle(0x4d65b4, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
+        flagMake('deskflag-ee', g => { g.fillStyle(0x4d9be6, 1).fillRect(1, 0, 4, 1); g.fillStyle(0x2e222f, 1).fillRect(1, 1, 4, 1); g.fillStyle(0xffffff, 1).fillRect(1, 2, 4, 1); });
+        flagMake('deskflag-dk', g => { g.fillStyle(0xe83b3b, 1).fillRect(1, 0, 4, 3); g.fillStyle(0xffffff, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
         make('hatch-lid', 28, 5, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 28, 5);
             g.fillStyle(0x9babb2, 1).fillRect(1, 1, 26, 3);
@@ -749,8 +814,10 @@ export class World {
                 const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
                 items.push(img);
                 this.add(items);
-                // (`level`: where it lies, for her standing up there with it: a book on a bed.)
-                const thing = { ...e, level: y, items, pick: img, interact: () => this.take(thing) };
+                // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing
+                // to find up high, on the climb's shelf, is hers only from up there, or once a lob
+                // has knocked it down: `high`.)
+                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -795,7 +862,7 @@ export class World {
             }
             case 'solid': {
                 // Something standing in the way that she hops (a room-service cart).
-                const img = s.add.image(e.x, e.y, 'shipart', e.frame).setOrigin(0.5, 1).setDepth(depth - 0.01).setFlipX(!!e.flip);
+                const img = this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(depth - 0.01).setFlipX(!!e.flip);
                 const zone = s.add.zone(e.x, e.y, img.width - 6, img.height - 3).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 this.add([img]);
@@ -804,6 +871,49 @@ export class World {
                 this.things.push(thing);
                 break;
             }
+            case 'shelf': {
+                // A shelf on the wall under the ceiling, on two brackets: the climb's top
+                // (docs/plan-three-uses.md §4.2). She stands on it.
+                const img = s.add.image(e.x, e.y - e.up, 'wall-shelf').setOrigin(0.5, 0).setDepth(D.decor + 0.2);
+                const zone = s.add.zone(e.x, e.y - e.up + 4, img.width, 4).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                this.add([img]);
+                const thing = { ...e, items: [img], zone };
+                this.solids.push(thing);
+                this.things.push(thing);
+                break;
+            }
+            case 'deskflags': {
+                // Little desk flags of the cruise's ports on Shore excursions' desk, hers among them.
+                const items = e.flags.map((f, i) => s.add.image(e.x - 14 + i * 7, e.y - e.on, `deskflag-${f}`).setOrigin(0.5, 1).setDepth(depth + 0.01));
+                this.add(items);
+                this.things.push({ ...e, items });
+                break;
+            }
+            case 'knitter': {
+                // The lady knitting on her own armchair in the corridor, by her cabin's door, her basket
+                // beside her with the wool in it (docs/plan-three-uses.md §4.2; the wool: ITEMS
+                // `keep_wool`; the user, 2026-11-16: she had sat in her open doorway).
+                const chair = this.image(e.x, e.y, 'thing:knit-chair').setOrigin(0, 1).setDepth(D.decor + 0.11);
+                const basket = s.add.image(e.basket, e.y, 'knit-basket').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
+                this.add([chair, basket]);
+                this.people.add({ id: `${e.id}_who`, who: e.who, x: e.x + KNIT_SIT.dx, y: e.y - KNIT_SIT.up, route: 'inside', face: 1,
+                                  idle: 'knit', layer: 'back' });
+                this.things.push({ ...e, items: [chair, basket] });
+                break;
+            }
+            case 'breakfast':
+                this.movers.push(new Breakfast(this, e));
+                break;
+            case 'roller':
+                this.movers.push(new Roller(this, e));
+                break;
+            case 'dog':
+                this.movers.push(new Fetcher(this, e));
+                break;
+            case 'skimmer':
+                this.movers.push(new Skimmer(this, e));
+                break;
             case 'breakable': {
                 // Stacked luggage, crates: the dash goes through them; otherwise they are in the way
                 // (low ones can be hopped).
@@ -918,6 +1028,9 @@ export class World {
                 const items = [];
                 if (e.what === 'sea') {
                     items.push(s.add.image(e.x, e.y, 'peek-sea').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
+                } else if (e.what === 'knit') {
+                    // The knitting lady's cabin, its door open behind her chair (case 'knitter').
+                    items.push(s.add.image(e.x, e.y, 'peek-knit').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
                 } else {
                     items.push(s.add.image(e.x, e.y, 'shipart', 'door-cabin-ajar').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
                     const tied = s.add.image(e.x + 9, e.y - 34, 'balloons').setOrigin(0.5, 1).setDepth(D.decor + 0.15);
@@ -1040,6 +1153,7 @@ export class World {
 
     itemTaken(e) {
         const [type, name] = e.what.split(':');
+        if (type === 'keep') return this.save.keeps.includes(e.what);
         if (type === 'verb') return this.save.verbs.includes(name);
         if (type === 'book') return !!this.save.books[name];
         return this.save.items.includes(name) || this.save.seen.includes(e.id);
@@ -1074,6 +1188,9 @@ export class World {
         } else if (type === 'book') {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
+        } else if (type === 'keep') {
+            this.save.keeps.push(thing.what);
+            this.sparkle(thing.x, thing.pick.y - 4, 0xf9c22b);
         } else {
             this.save.items.push(name);
         }
@@ -1084,6 +1201,16 @@ export class World {
         writeSave(this.save);
         this.refresh();
         return true;
+    }
+
+    // A thing to find handed to her (the dog's owner's tennis ball): `what` is "keep:<whose>:<name>".
+    giveKeep(what, x, y) {
+        if (this.save.keeps.includes(what)) return;
+        this.save.keeps.push(what);
+        sfx.take();
+        this.sparkle(x, y, 0xf9c22b);
+        writeSave(this.save);
+        this.refresh();
     }
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.
@@ -1474,6 +1601,24 @@ export class World {
         return !!this.people.offered?.(t) || !!this.story.offered?.(t);
     }
 
+    // Something at a cabin's door taken in by whoever is inside (the paper round's papers, the
+    // breakfasts): the door opens a crack at its handle's side (these doors have their handles on
+    // the left), a hand reaches out at `handY` and draws the things in, and the door shuts.
+    handTakes(door, y, things, handY, done) {
+        const s = this.scene, D = s.DEPTH, x = door - 11;
+        const crack = s.add.rectangle(x, y - 2, 4, 68, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.15).setScale(0, 1);
+        const hand = s.add.rectangle(x, handY, 4, 2, 0xf3cfb6).setOrigin(0.5, 1).setDepth(D.props + 0.03).setVisible(false);
+        this.add([crack, hand]);
+        sfx.at(door, y).door();
+        const near = things[0];
+        s.tweens.chain({ tweens: [
+            { targets: crack, scaleX: 1, duration: 200 },
+            { targets: hand, x: near.x - Math.sign(near.x - x) * 3, duration: 260, onStart: () => hand.setVisible(true) },
+            { targets: [hand, ...things], x, duration: 300, ease: 'Sine.easeIn', onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); } },
+            { targets: crack, scaleX: 0, duration: 200, onComplete: () => { crack.destroy(); sfx.at(door, y).doorShut(); done?.(); } },
+        ] });
+    }
+
     // A gull comes down to a tangerine, pecks at it and flies off with it in its beak
     // (docs/plan-three-uses.md §2). The bird's sprite is the caller's: left hidden at the end, its
     // origin as it was, for the caller to bring back; `done()` then.
@@ -1613,6 +1758,7 @@ export class World {
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
             if (Math.abs(p.x - t.x) > (t.reach ?? 18) || (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
+            if (t.high && Math.abs(p.y - t.level) > 8) continue;
             if (t.interact() !== false) return true;
         }
         return false;
@@ -1742,6 +1888,14 @@ export class World {
         }
         this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
         this.hudBooks?.setAlpha(Object.keys(this.save.books).length ? 1 : 0.35);
+        // The things to find, of each kind found of all (docs/plan-three-uses.md §4.1): a kind's count
+        // shows from its first find, after the books', one after another.
+        let hx = 24 + (this.hudBooks?.width ?? 0) + 16;
+        for (const [whose, text] of Object.entries(this.hudKeeps ?? {})) {
+            const n = this.save.keeps.filter(k => k.startsWith(`keep:${whose}:`)).length;
+            text.setVisible(n > 0).setText(`${KEEP_ICONS[whose]} ${n}/${this.data.finale?.totals?.keeps?.[whose] ?? 0}`).setX(hx);
+            if (n > 0) hx += text.width + 16;
+        }
     }
 
     addColliders(p) {
@@ -1757,7 +1911,8 @@ export class World {
                 && (!t.top || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));
         }
         for (const t of this.lows) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
-        for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        // (`through`: one that a lunge goes past, the breakfast trolley.)
+        for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route && !(t.through && s.isLunging()));
         for (const r of this.robots ?? []) r.addCollider(p);
         // The lunge goes through a breakable, and it is gone for good.
         for (const t of this.breakables) {
@@ -1789,6 +1944,19 @@ export class World {
     lobbedInto(t) {
         if (!t.thrown || !t.lob) return false;
         const x = t.img.x, y = t.img.y;
+        // A thing to find up on a shelf: knocked off it, down to the floor, hers from there; the
+        // tangerine bounces off it and goes on.
+        for (const k of this.things) {
+            if (!k.high || k.done || k.route !== t.route || !k.pick?.active) continue;
+            const b = k.pick.getBounds();
+            if (x < b.left - 4 || x > b.right + 4 || y < b.top - 4 || y > b.bottom + 4) continue;
+            k.high = false;
+            k.level = k.y;
+            t.img.body.velocity.x *= -0.4;
+            sfx.at(k.x, k.y).plop();
+            this.scene.tweens.add({ targets: k.pick, y: k.y, angle: 180, duration: 420, ease: 'Bounce.easeOut' });
+            return false;
+        }
         for (const b of this.breakables) {
             if (!b.hang || b.done || b.route !== t.route) continue;
             const z = b.zone.body;
@@ -1834,7 +2002,10 @@ export class World {
         const back = s.add.rectangle(24, 146, 104, 10, 0x1d2b53).setOrigin(0).setVisible(false);
         const bar = s.add.rectangle(26, 148, 100, 6, 0x8fd3ff).setOrigin(0).setVisible(false);
         this.hudCarry = { back, bar };
-        layer.add([this.hudBooks, back, bar]);
+        this.hudKeeps = Object.fromEntries(Object.keys(KEEP_ICONS).map(whose => [whose, s.add.text(24, 114, '', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
+        }).setVisible(false)]));
+        layer.add([this.hudBooks, back, bar, ...Object.values(this.hudKeeps)]);
         this.refresh();
     }
 }

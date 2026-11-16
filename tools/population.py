@@ -173,7 +173,15 @@ ITEMS = {
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
+    # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
+    # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
+    "keep_feather": (4, 146.97, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
+    "keep_wool": (5, 24.2, "keep:cat:wool", None, 7, "thing:wool"),                    # in the knitter's basket
+    "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
 }
+
+# How many things to find there are of each kind, for the HUD (§4.1).
+KEEPS = {"cat": 8, "her": 4, "him": 4}
 
 # --- Bumbot's beats (GAME_DESIGN.md §6.1.8) --------------------------------------------------------
 # id: (deck or room, m or x, what he is doing, which way he bolts, where he is gone (m or x), needs).
@@ -257,7 +265,6 @@ PEOPLE = {
     "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
     "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
-    "amb_breakfast": dict(at=(5, 44.4), who="stewardess", face=1, idle="idle", layer="back"),
     "riv_rope": dict(at=(5, 81.05), who="rival", face=-1, idle="idle", until="region:2"),
     "amb_reception": dict(at=(5, 99.55), who="receptionist", face=-1, idle="idle", layer="behind"),
     "blk_photographer": dict(at=(5, 87.9), who="photographer", face=1, idle="idle", until="region:3"),
@@ -731,6 +738,32 @@ BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a
 DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
 # The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
+# --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------
+# A suitcase on its wheels rolling to and fro with the ship's slow roll: id: (deck, m from, m to, m/s).
+ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.1)}
+# A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
+# the lead's reach in m, what the owner gives after three fetches).
+DOGS = {"haz_dog_4": (4, 99.6, "railwoman", 4.0, "keep:cat:ball")}
+# The paper round: a steward skimming folded papers along the carpet to each door: id: (deck, m
+# from, m to, m/s, who).
+SKIMMERS = {"haz_papers_5": (5, 26.0, 42.0, 0.7, "paperboy"),        # (clear of the knitting lady at 23.3)
+            # (A second round where the forward cabins meet the stair hall: the user, 2026-11-16.)
+            "haz_papers_5b": (5, 57.5, 72.0, 0.7, "paperwoman")}      # (the stair hall's wall is at 73.9)
+# The breakfast round (the user, 2026-11-16: the stewardess with a tray given a purpose): door to
+# door with a tray from her room-service trolley: id: (deck, the doors' m, who).
+# (Doors where none is drawn, beside a lift's or a crew door, are passed over in the game.)
+BREAKFASTS = {"haz_breakfast_5": (5, [44.9, 48.9, 52.9], "roomservice")}      # (48.9: a lift's door, passed over)
+# The climb on deck 4 (the feather on its shelf: ITEMS `keep_feather`): a service cart, a laundry
+# cart, a shelf on the wall under the ceiling. Each: (m, atlas piece or "shelf", px up its top).
+CLIMB = dict(deck=4, steps=[(144.4, "service-cart"), (146.3, "@linen-cart"), (146.97, "shelf")], shelf=66)
+# The knitting lady on deck 5 (§4.2): on her own armchair in the corridor, a little forward of her
+# cabin's door (the user, 2026-11-16), her basket beside her with the wool.
+# (`chair`: its back's edge, against the deck's forward end wall, which runs to 23.33 m; the basket
+# between her feet and her door.)
+KNITTER = dict(deck=5, door=24.9, chair=23.35, who="knitter", basket=24.2)
+# The little desk flags of the Baltic's ports at Shore excursions' desk, hers among them (§4.1).
+DESK_FLAGS = dict(deck=5, m=140.25, on=34, flags=["se", "fi", "ee", "dk"])
+
 ROUNDS = {"haz_steward_rounds": (8, 162.0, 182.0, 0.9, [167.6, 175.6], 3.0, "steward_rounds")}
 
 # --- Region 8's own things (docs/population.md: deck 12 from Champs aft, the roof, the funnel;

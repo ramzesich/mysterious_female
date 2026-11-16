@@ -31,7 +31,22 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # Region 8, deck 12's sun deck: two more, on loungers of their own.
          "sunbather-3": 27, "sunbather-4": 22,
          # Region 9: the wedding cake, carried at her hands: its top about level with her head.
-         "wedding-cake": 25}
+         "wedding-cake": 25,
+         # The things to find, region 1 (docs/plan-three-uses.md §4.1): Bumbot's tennis ball, wool and
+         # feather on a stick, her little flag of Ukraine on its stand.
+         "tennis-ball": 5, "wool": 6, "feather-toy": 6, "flag-ua": 13,
+         # The breakfast round's tray, carried in both hands (the tray a hand's width).
+         "breakfast-tray": 12}
+
+# Generated, paid for, and not used: the folded newspaper came drawn tilted, a smudge at the 3 px
+# of a paper on the carpet; the paper round's papers are drawn in code (the user, 2026-11-16).
+SKIP = {"newspaper",
+        # (Butterflies made to circle over her head in code: the user would have them drawn with her,
+        # and they are, in her dazed clips.)
+        "butterfly-open", "butterfly-closed",
+        # (A first armchair for the knitting lady, drawn turned three-quarters while she is in flat
+        # profile: the user had it drawn again round her own seated pose, `knit-chair`.)
+        "knit-chair-turned"}
 
 # Colours changed after the palette: PixelLab drew the parasol's stripes maroon and pink; in the
 # game they are the life rings' red and white. name -> {from: to}.
@@ -93,7 +108,7 @@ def piece(path):
 
 
 def build():
-    pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png"))]
+    pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP]
     width = sum(im.width + 2 for _, im in pieces)
     height = max(im.height for _, im in pieces)
     sheet = Image.new("RGBA", (width, height), (0, 0, 0, 0))

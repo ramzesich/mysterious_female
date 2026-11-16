@@ -203,6 +203,8 @@ export const POCKET = {
     push: 120,
     hop: 90,
     slow: 300,
+    recoverMs: 700,     // her slipback and her stumble, before she has her balance back
+    stumblePush: 45,    // px/s on, tripped: stopped short to stagger (her run would carry it off)
 };
 
 // A tangerine loose in the world (src/world/tangerine.js): how it bounces (`bounce`, a share of

@@ -1314,6 +1314,180 @@ def scenario_throw(b):
     return ok
 
 
+def scenario_deck4(b):
+    """Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4): deck 4's suitcase (a bump),
+    the dog's lead (held back, never a fright; hopped), its three fetches and the tennis ball, the
+    climb by jumps and the feather (not from the floor; knocked down by a lob; taken up there);
+    deck 5's wool in the knitter's basket, her flag at the desk, a sliding paper (a slip); the
+    HUD's counts, each from its first find."""
+    S, W = "window.__ship", "window.__ship.world"
+    b.open("?reset&play&cards=all")
+
+    def keeps():
+        return b.eval(f"{S}.save.keeps.slice()")
+
+    # The suitcase: walked into, a bump.
+    R = f"{W}.movers.find(m => m.def?.id === 'haz_suitcase_4')"
+    b.eval(f"{R}.phase = 0")
+    b.teleport(exact_x(36), D4)
+    s = hold_until(b, "right", lambda st: st["mode"] != "play", timeout=6)
+    ok = check(s["mode"] == "scripted", "the suitcase: walked into, a bump", s)
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+
+    # The dog's lead where it lies on the carpet: run into with no tangerine, she trips and falls flat
+    # (a fright: the user, 2026-11-16); hopped, nothing.
+    F = f"{W}.movers.find(m => m.def?.id === 'haz_dog_4')"
+    # (The dog forward of its owner's door: aft of it, two metres on, is a bulkhead's wall, which its
+    # lead stops short of.)
+    ok &= check(b.eval(f"{F}.range().hi < {F}.def.x + {F}.def.reach"), "the lead stops short of the bulkhead's wall",
+                b.eval(f"[{F}.def.x, {F}.range()]"))
+    b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
+    time.sleep(0.3)
+    sag = b.eval(f"{F}.sag().x")
+    b.teleport(sag - 60, D4)
+    s = hold_until(b, "right", lambda st: st["x"] > sag + 30 or st["mode"] != "play", timeout=3)
+    ok &= check(s["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key").startswith("her-tripfall"),
+                "run into the lead with none on her: she trips and falls flat", (sag, s, b.eval(f"{S}.player.anims.currentAnim?.key")))
+    b.wait_for(f"{S}.player.anims.currentAnim?.key === 'her-dazed-lie'", timeout=3)
+    ok &= check(True, "dazed where she fell, butterflies over her head")
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
+    b.teleport(sag + 60, D4)
+    time.sleep(0.3)
+    b.key("left", True)
+    time.sleep(0.12)
+    b.tap("space", 0.25)
+    time.sleep(0.7)
+    b.key("left", False)
+    s = b.state()
+    ok &= check(s["x"] < sag and s["mode"] == "play", "hopped, no trip", (sag, s))
+    b.shot("deck4-dog")
+
+    # Three fetches: each brought back to her, hers again; then the tennis ball.
+    for i in range(3):
+        b.eval(f"(f => {{ f.go('sit', 0); f.dog.x = f.def.x + 40; }})({F})")
+        b.teleport(b.eval(f"{F}.def.x") - 140, D4)
+        time.sleep(0.4)
+        b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
+        b.tap("f")
+        b.wait_for(f"{F}.fetches > {i}", timeout=8)
+        time.sleep(0.4)
+        ok &= check(b.state()["tangerines"] == 3, f"fetch {i + 1}: brought back to her and hers again", b.state())
+    time.sleep(1.2)
+    ok &= check("keep:cat:ball" in keeps(), "three fetches, and the owner hands her the tennis ball", keeps())
+
+    # The feather on the climb's shelf: not from the floor; a lob knocks it down, hers from there.
+    K = f"{W}.things.find(t => t.id === 'keep_feather')"
+    kx = b.eval(f"{K}.x")
+    b.teleport(kx, D4)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check("keep:cat:feather" not in keeps(), "the feather is not to be had from the floor")
+    # (A lob from about four metres back comes down onto the shelf, over the carts.)
+    b.teleport(kx - 184, D4)
+    time.sleep(0.3)
+    b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
+    b.key("up", True)
+    b.tap("f")
+    b.key("up", False)
+    b.wait_for(f"!{K}.high", timeout=3)
+    time.sleep(0.6)
+    ok &= check(b.eval(f"!{K}.high && Math.abs({K}.pick.y - {K}.y) < 2"), "a lob knocks it down to the floor", b.eval(f"{K}.pick.y - {K}.y"))
+    b.eval(f"{S}.loose.all.slice().forEach(t => {S}.loose.remove(t))")
+    b.teleport(kx, D4)
+    time.sleep(0.3)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check("keep:cat:feather" in keeps(), "and it is hers from there", keeps())
+
+    # The climb itself: three steps up by jumps (a new game, the feather back on its shelf).
+    b.open("?reset&play&cards=all")
+    steps = b.eval(f"['climb_0', 'climb_1', 'climb_2'].map(id => {W}.solids.find(t => t.id === id).x)")
+    b.teleport(steps[0] - 40, D4)
+    time.sleep(0.3)
+    heights = []
+    for sx in steps:
+        b.key("space", True)
+        hold_until(b, "right", lambda st: st["x"] >= sx - 2, timeout=1.5)
+        time.sleep(0.25)
+        b.key("space", False)
+        time.sleep(0.5)
+        heights.append(round(D4 - b.state()["y"]))
+    ok &= check(heights == [25, 41, 66], "up the climb by jumps: the cart, the laundry cart, the shelf", heights)
+    b.tap("e")
+    time.sleep(0.3)
+    ok &= check("keep:cat:feather" in keeps(), "the feather taken up there", keeps())
+    b.shot("deck4-climb")
+
+    # Deck 5: the wool, her flag; the HUD's counts.
+    ok &= check(not b.eval(f"{W}.hudKeeps.her.visible"), "her count is not shown before her first find")
+    for tid, what in (("keep_wool", "keep:cat:wool"), ("keep_flag", "keep:her:flag")):
+        b.teleport(b.eval(f"{W}.things.find(t => t.id === '{tid}').x"), D5)
+        time.sleep(0.3)
+        b.tap("e")
+        time.sleep(0.3)
+        ok &= check(what in keeps(), f"{tid}: taken with E", keeps())
+    hud = b.eval(f"Object.fromEntries(Object.entries({W}.hudKeeps).map(([k, t]) => [k, t.visible ? t.text.split(' ')[1] : null]))")
+    ok &= check(hud == {"cat": "2/8", "her": "1/4", "him": None}, "the HUD counts each kind from its first find", hud)
+    b.shot("deck4-hud")
+
+    # The paper round: a paper sliding under her feet is a slip.
+    P = f"{W}.movers.find(m => m.def?.id === 'haz_papers_5')"
+    b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; }})({P})")
+    b.teleport(b.eval(f"{P}.def.doors[1]") - 40, D5)
+    b.wait_for(f"{P}.papers.length > 0 || {S}.mode !== 'play'", timeout=12)
+    b.wait_for(f"{S}.mode !== 'play'", timeout=4)
+    ok &= check(b.state()["mode"] == "scripted", "a sliding paper under her feet: she slips", b.state())
+    # (It shoots on to its door, nothing left lying in the corridor, and a hand takes it in.)
+    b.wait_for(f"{P}.papers.filter(q => q.hit).every(q => q.done)", timeout=4)
+    at = b.eval(f"{P}.papers.filter(q => q.hit).map(q => Math.round(q.img.x - q.door))")
+    ok &= check(bool(at) and all(abs(a) < 2 for a in at), "and it slides on to its door", at)
+    b.wait_for(f"!{P}.papers.some(q => q.hit)", timeout=5)
+    ok &= check(True, "where a hand takes it in")
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+
+    # One lying at its door, not yet taken in: she slips on it too.
+    b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; }})({P})")
+    door = b.eval(f"{P}.def.doors[1]")
+    b.teleport(door + 150, D5)
+    b.wait_for(f"{P}.papers.some(q => q.door === {door} && q.done)", timeout=15)
+    b.teleport(door - 30, D5)
+    s = hold_until(b, "right", lambda st: st["mode"] != "play", timeout=2)
+    ok &= check(s["mode"] == "scripted", "a paper lying at its door, not yet taken in: she slips on it", s)
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+
+    # The breakfast round: a plate taken in at a door, the trolley wheeled on; walked into, a fright.
+    B = f"{W}.movers.find(m => m.def?.id === 'haz_breakfast_5')"
+    # (Watching from past her second door, clear of the first paper round's end at 42 m.)
+    b.teleport(b.eval(f"{B}.doors()[1]") + 120, D5)
+    b.wait_for(f"{B}.state === 'serving'", timeout=30)
+    served = b.eval(f"{B}.i")
+    b.wait_for(f"{B}.state === 'push' && {B}.i !== {served}", timeout=30)
+    ok &= check(True, "the breakfast round: a tray taken in, the trolley wheeled on to the next door")
+    b.eval(f"{B}.until = {S}.time.now + 60000")
+    # (From the side away from her trolley: ahead of her while she wheels it, behind her otherwise.)
+    side = b.eval(f"{B}.state === 'push' ? -{B}.dir : {B}.dir")
+    b.teleport(b.eval(f"{B}.x") + side * 60, D5)
+    time.sleep(0.3)
+    s = hold_until(b, "left" if side > 0 else "right", lambda st: st["mode"] != "play", timeout=3)
+    ok &= check(s["mode"] == "scripted", "walked into, the breakfast stewardess drops her tray: a fright", s)
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    b.eval(f"{B}.until = 0")
+
+    # A tangerine thrown to the steward: caught, and eaten from his hand, bite by bite.
+    b.eval(f"(k => {{ k.x = k.def.x1 - 20; k.dir = -1; k.until = 0; }})({P})")
+    b.teleport(b.eval(f"{P}.x") - 45, D5)
+    time.sleep(0.4)
+    b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
+    b.tap("f")
+    b.wait_for(f"{P}.eating", timeout=5)
+    ok &= check(not b.eval(f"{S}.loose.all.length") and b.eval(f"{P}.p.sprite.anims.currentAnim?.key").endswith("bite"),
+                "a tangerine thrown to the steward: he eats it", b.eval(f"{P}.p.sprite.anims.currentAnim?.key"))
+    b.wait_for(f"!{P}.eating", timeout=8)
+    return ok
+
+
 def scenario_overboard(b):
     b.open("?reset&play")
     b.teleport((col(255) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing

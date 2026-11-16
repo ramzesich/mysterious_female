@@ -1785,3 +1785,168 @@ user: "continue the plan"). No art.
   `region7`, `region8`: all pass (`throw` again after the gull's fix); `tools/check_sound.py`: all
   within bounds. The rest of the suite was
   not run.
+
+## The plan for the three uses, step 4: region 1's decks, and the first things to find (2026-11-16)
+
+- **Art, approved item by item (49 generations):** the dog (PixelLab pro flash, the dog template,
+  side view, styled on her sprite; 6) with a walk, a run and a sit (skeleton-v3, 3 each); the
+  knitting lady (pro, styled on the cabin maid; 10) and her seated knit (skeleton-v3 poses; 3);
+  the paper round's steward (pro, styled on the drill's officer; 10), his walk (skeleton-v3
+  "walking"; 3) and his skim (poses; 3); four map objects (tennis ball, wool, feather on a stick,
+  a desk flag of Ukraine; 1 each) and a folded newspaper (1). Shown to the user before the clips.
+- **The newspaper map object is not used** (`SKIP` in `tools/build_things.py`): it came drawn
+  tilted, a smudge at the 3 px of a paper on the carpet; the papers are drawn in code
+  (`paper-fold`), on the user's word.
+- **The steward's skim lost its stack** in its first three frames (the finger licked): his flick is
+  the clip's last five (`cut` in `tools/cast.py`), and the lick is gone.
+- **The dog is shrunk to 22 px** (`scale` 0.65): a small dog beside her.
+- **The things to find** are `ITEMS` whose `what` is `keep:<whose>:<name>` (cat, her, him), kept in
+  `save.keeps`; taken with E, or handed over (`world.giveKeep()`, the dog's owner's ball). One up
+  high (more than 40 px over the floor: the climb's feather) is hers only from up there, or once a
+  lob has knocked it to the floor (`world.lobbedInto()`; the lob that does it comes down onto the
+  shelf from about four metres back, over the carts). The HUD: a count per kind after the books'
+  (🐾 Bumbot's, 🌸 hers, 🎸 his: my picks), each hidden until its first find; the totals are
+  `KEEPS` in `tools/population.py`.
+- **Deck 4:**
+  - The suitcase (`Roller`, the atlas's own `suitcase`) rolls between 38.5 and 45.5 m, a roll there
+    and back in 20 s, a creak at each end; walked into, a bump; a lunge sends it rolling to the
+    corridor's end, where it stays.
+  - The dog (`Fetcher`) is at the cabin door at 99.6 m, not 86: 90 m has a service cart and 95.6
+    a lift's door. Its owner is `railwoman`, the one figure made and placed nowhere (the plan's
+    "existing figure"), standing in her open door (`door-cabin-ajar`; its slot listed with the
+    corridor's door spots so no closed door is drawn under it). The lead is drawn from her hand
+    to its collar, sagging to the carpet. **Where it lies, run into, she trips on it: a stagger
+    (her slip pose), slowed to a third for half a second, and she is past; a hop clears it; never
+    a fright.** At first it held her back like a wall until she jumped (the plan's "a line to hop",
+    with its "no fright"): the user ran into it and asked why she could not pass; of three ways
+    offered they chose the trip (2026-11-16). Only crossing at the line itself counts (a teleport,
+    a fright's walk back, cross it freely). **The lead stops short of any wall across the deck:** the
+    user saw the dog wander past the bulkhead at 101.9 m into the stair hall, its lead through the
+    wall; its reach is now 95.6 to 101.6 m. Its owner turns to face her dog, the lead in her front
+    hand.
+    It fetches a tangerine on the carpet within its 4 m and brings it to her feet; she has it
+    again at once. Three fetches: a heart over its owner, and the tennis ball. Her cry: a howl,
+    round its owner's legs, the lead flat 5 s. A lunge: it jumps aside. It never meets the vacuum
+    (118 to 143 m), so it does not bark at it.
+  - The climb, between the cabin doors at 143.6 and 147.6 m: the room-service cart (25 px), the
+    laundry cart drawn for the linen room (41 px; nothing in the atlas reads as a linen cage), a
+    shelf on two brackets drawn in code at 66 px (the ceiling is at 128 and she is 59 tall: no
+    higher). The feather lies on the shelf. **The vacuum now stops at 143 m** (it ran to 150),
+    so it never runs through the carts: the plan's "the vacuum passing underneath" is dropped.
+- **Deck 5:**
+  - The knitting lady sits in an armchair just inside her open cabin door at 24.9 m (`peek-knit`,
+    drawn in code like `peek-sea`), knitting; her basket by the door with the wool.
+  - The paper round (`Skimmer`) between 31.5 and 42 m (not 34 to 46: a stewardess with a tray
+    stands at 44.4): from three metres short of each door he flicks a paper along the carpet
+    that slows to a stop at it; stepped on while it slides, she slips. At the end he walks back,
+    and the papers are taken in. Her cry: he stands aside; a tangerine thrown to him: caught and
+    eaten standing aside (spent).
+  - Her flag: there is no desk at 146 m. The one desk of Shore excursions and reservations is the
+    counter at 140 m; four little port flags drawn in code (Sweden, Finland, Estonia, Denmark) and
+    hers at its far end.
+- **Sounds:** `bark`, `howl`, `paperSlide` new (the user's to judge on the soundboard).
+- **`tools/check_corridors.py`** (the plan's §4.7, from the audit's scratch script): before this
+  step deck 4 had 80.4 m without a reward and deck 5 80.5 m; after it, deck 4 68.4 m (31 to 100)
+  and 29.6 m at most without a beat, deck 5 58.1 m without a reward and 55.2 m without a beat.
+- **A new playtest scenario `deck4`** (decks 4 and 5): the suitcase, the lead tripped on and hopped, its reach short of the bulkhead, three
+  fetches and the ball, the feather (not from the floor; a lob; up the climb by jumps, 25, 41 and
+  66 px), the wool, the flag, the HUD's counts, a paper slipped on.
+- `tools/check_overlaps.py`: nothing (after the dog's door).
+- **Playtests run, sound off:** `deck4` (new), `region1`, `boot`, `deck3`, `trunk`, `ladder`,
+  `throw`: all pass. `tools/check_sound.py`: all within bounds. The rest of the suite was not run.
+- **Eating, as the user asked it (2026-11-16): "to their mouths, bite, remove leftover food from
+  their mouths, chew; the food has to stay in their hands".** The tangerine had been squashed
+  flatter in the air at each bite, and the user saw it melt. Now a `bite` clip for the porter and
+  the paper round's steward (skeleton-v3 poses, 3 generations each, approved): the hand to the
+  mouth, a bite, the hand down, three chews; played three times (`people.eat()`), the fruit in
+  the fist in every frame (`FISTS` in `src/world/people.js`, found frame by frame and composed
+  offline at the game's offsets before trusting them), drawn behind the figure so the fingers
+  close over it (over the porter's trolley, which is drawn over him while he stands aside),
+  bitten at each bite (`tangerine-bit1`, `-bit2`, drawn in code) and gone at the third. The
+  steward eats with his far hand: the near arm holds his stack.
+- **The kid's clip was made and is not used** (3 generations): his water pistol is drawn into
+  both his hands in every pose he has, and the clip carried it to his mouth. He catches the
+  tangerine, turns his back and eats it out of sight (munches heard), back turned 15 s.
+- **The papers are taken in** (the user tried E and crouching on one lying at a door: it looked
+  like a thing to pick up): a moment after one stops at its door, the door opens a crack at its
+  handle's side, a hand draws it in, the door shuts. **One she slips on shoots on to its door**
+  (the user saw it stay where it hit her), harmless after the first slip, and is taken in.
+- **Playtests run, sound off:** `deck4` (with the paper taken in and the steward eating),
+  `throw`, `region1`, `region6`: all pass.
+- **The user's fixes to the paper round (2026-11-16):** the steward's tangerine is drawn over his
+  hand, covering his palm (it sat behind it: `FRUIT_OVER`); a paper lying at its door, not yet
+  taken in, is as slippery as a sliding one (once), and lies there 2 s before the hand takes it;
+  he skims each from five metres short of its door (three before), sliding a second and a half;
+  his round starts at 23.5 m so that the first door (28.9 m) has its five metres, and the doors
+  he serves start five metres into his round (the knitting lady's open door is not one).
+  `deck4` passes (with a paper lying at its door slipped on).
+- **More of the user's fixes (2026-11-16):** the steward skims papers on his way back too, west
+  to the doors behind him (from 5 m short of each, as forward), so the round is never quiet. The
+  knitting lady sat in front of her doorway rather than in it (the user: "she looks misplaced");
+  she sits two pixels further in, her armchair's back against the door's leaf, and the door's
+  frame on the corridor side is drawn over her (`peek-knit-front`), her toes behind it.
+- **The user's third round on deck 5 (2026-11-16; generations approved freely, "I have 5000"):**
+  - The knitting lady's cabin: its picture (a green and blue landscape) read as the flag of
+    Ukraine upside down; it is a red flower in a vase in a gilt frame, and below it the end of
+    her bed. She sits on her own armchair in the corridor, forward of her open door, its back
+    against the deck's end wall (which runs to 23.33 m), her basket at her feet. A first
+    armchair (a map object, 1 generation) came drawn turned three-quarters while she is in
+    flat profile; the user: "Regenerate the lady with the chair together". The armchair was
+    drawn by inpainting round her own seated frame (her pixels kept, 1 generation), the specks
+    cleaned off and her cut out of it, so she sits in it exactly (`knit-chair`; the turned one
+    kept unused in `SKIP`).
+  - The stewardess with the tray (`amb_breakfast`, an ambient figure) is the breakfast round
+    (`Breakfast`, `BREAKFASTS`): door to door at 44.9, 48.9 and 52.9 m with a covered plate from
+    her room-service trolley, a knock, a hand takes it in (`world.handTakes()`, shared with the
+    papers), she wheels the trolley on (a low thing to hop), and back at the last door. Walked
+    into, she drops her tray with a crash: a fright. Her cry: she stands aside. A tangerine
+    thrown to her: onto the trolley, in with the next plate (spent). A lunge: she is spun round.
+    Her walk clip (3 generations) carries her tray and her bag, as her standing pose does.
+  - A second paper round where the forward cabins meet the stair hall (57.5 to 74 m), by a new
+    stewardess (`paperwoman`: pro, styled on the cabin maid, 10; walk, skim, bite, 3 each). Her
+    skim is her flick whole (no finger licked); her stack is under her far arm, mostly hidden
+    behind her, so in her walk it shows in two frames of six. Her tangerine is in her palm.
+  - The first round starts at 26 m (it stood in front of the knitting lady at 23.5); it serves
+    the first door on its way back only.
+  - `deck4` (now with the breakfast round), `region1`, `boot`: pass; `check_overlaps.py`: none.
+- **The user's fourth round (2026-11-16): "broken on many levels".** The tray stewardess's figure
+  (`stewardess`, made long before) holds a tray in one hand and a bag in the other in every pose,
+  and I had drawn a covered dish over her painted tray. She is replaced by a new figure with
+  empty hands (`roomservice`: pro, styled on the cabin maid, 10; a walk and a `carry` walk, both
+  hands forward, 3 each) and a breakfast tray of its own (a map object, 1: a covered plate, a
+  glass of juice, a flower in a vase), carried on her hands (`TRAY_HANDS`, composed offline) to
+  the door, where the hand takes the tray itself in; she walks back empty-handed for the next.
+  Walked into with a tray, it falls with a crash.
+  **The door's crack opened in bare wall** at some doors: the rounds took their doors from the
+  corridor's grid of door places, but the corridor draws no cabin door beside a lift's, a crew
+  door or a stair hall. The corridor now keeps the doors it draws (`cabinDoorsDrawn`), and the
+  rounds serve only those (`realDoors`): the breakfast round 44.9 and 52.9 m (48.9 is a lift's),
+  the second paper round 60.9 to 68.9 m (72.9 is the stair hall's).
+  **The user's standing word, saved (`CLAUDE.md`, "Art"): "Don't hesitate to generate new/updated
+  props in order to implement things properly visually. Use the generations."**
+  The knitting lady's cabin: its picture and bed washed 30% toward the wall, as inside every room.
+  `deck4`, `boot`: pass; `check_overlaps.py`: none.
+- **The user's fifth round (2026-11-16):**
+  - A lunge goes past the breakfast trolley as past her (`through` on a solid: the trolley).
+  - **Her falls, new clips (skeleton-v3 poses, 3 generations each):** a slip with a tangerine on
+    her is caught backwards, arms going (`slipback`), the tangerine flying back; without one she
+    goes down on her bottom (`slipfall`), sits dazed with butterflies circling over her head
+    (`dazed-sit`) and is back at her checkpoint. **The dog's lead is a trip now** (`tripped`, a new
+    fright word in both languages): with a tangerine she stumbles on forward (`stumble`), the
+    tangerine flying ahead of her; without, she falls flat on her belly (`tripfall`), lies dazed
+    (`dazed-lie`) and is back at her checkpoint. The stagger of before (slowed, nothing lost) is
+    gone. The wet patch by the pool is a slip too, and has the same falls.
+  - **The butterflies are drawn with her** in the dazed clips (the user: "Don't generate
+    butterflies separately. As a rule ... generate people with objects together"; saved in
+    `CLAUDE.md`): two butterfly sprites made first to circle over her in code (2 generations) are
+    kept unused (`SKIP`). The dazed clips' first frame is their starting pose, without the
+    butterflies, and is left out of the loop. The trip's clip failed once on PixelLab's side (a
+    service error) and was made again.
+  - `deck4` (the lead's trip and fall, the breakfast round from a spot clear of the papers),
+    `pocket`, `lang`, `region6`: pass.
+- **The user's sixth round (2026-11-16):** the second paper stewardess turned on the stair hall's
+  doorway (its wall at 73.9 m): her round ends at 72 m. A trip with a tangerine on her played its
+  stumble while she ran on at her speed, and read as nothing ("she doesn't trip"): she is stopped
+  short now (45 px/s on), and her stumble and her slip caught backwards play at 9 frames a second
+  for 0.7 s. The fall after a slip with tangerines on her was my second link's `&pocket=off`,
+  which switches their help off while the HUD still shows ∞.

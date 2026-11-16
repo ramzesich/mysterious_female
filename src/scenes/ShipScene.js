@@ -2177,6 +2177,8 @@ export class ShipScene extends Phaser.Scene {
             if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
+            // (Kept: the doors there are, for those who go door to door: the paper rounds, breakfast.)
+            (this.cabinDoorsDrawn ??= []).push({ x: x + 17, y: o.y });
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
@@ -4203,11 +4205,14 @@ export class ShipScene extends Phaser.Scene {
     // A hit that would be a fright or a spilled tray, with a tangerine on her: one less, knocked out
     // of her pocket and rolling away the way she is pushed; a flinch, a step back, a blink. True if
     // it was forgiven. (Falls, the sea and her own feet never come here.)
-    pocket(fromX) {
+    // `kind`: a slip (she loses her balance backwards, arms going: her `slipback`) or a trip (she
+    // stumbles on forward: `stumble`, the tangerine flying on ahead of her); any other, the flinch.
+    pocket(fromX, kind) {
         if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         const p = this.player, time = this.time.now;
-        const away = p.x >= fromX ? 1 : -1;
+        const facing = p.flipX ? -1 : 1;
+        const away = kind === 'slipped' ? -facing : p.x >= fromX ? 1 : -1;
         this.safeUntil = time + POCKET.safeMs;
         sfx.pocket();
         rumble('spill');
@@ -4216,11 +4221,20 @@ export class ShipScene extends Phaser.Scene {
         if (this.mode === 'play' && !this.gliding) {
             this.throwUntil = 0;
             this.throwing = null;
-            this.flinchUntil = time + POCKET.flinchMs;
-            p.setFlipX(away > 0);                // facing what hit her
-            if (this.anims.exists('her-hit')) p.anims.play('her-hit');
-            p.body.velocity.x = away * POCKET.push;
-            p.body.velocity.y = -POCKET.hop;
+            const clip = { slipped: 'her-slipback', tripped: 'her-stumble' }[kind];
+            if (clip && this.anims.exists(clip)) {
+                // (Facing the way she was going: a slip sends her back a step, a trip on.)
+                this.flinchUntil = time + POCKET.recoverMs;
+                p.setFlipX(kind === 'tripped' ? away < 0 : facing < 0);
+                p.anims.play(clip);
+            } else {
+                this.flinchUntil = time + POCKET.flinchMs;
+                p.setFlipX(away > 0);            // facing what hit her
+                if (this.anims.exists('her-hit')) p.anims.play('her-hit');
+            }
+            // (A trip stops her short, to stagger and catch herself: running on, it read as nothing.)
+            p.body.velocity.x = away * (kind === 'tripped' ? POCKET.stumblePush : POCKET.push);
+            p.body.velocity.y = kind ? 0 : -POCKET.hop;
         }
         this.refreshHud();
         return true;
@@ -4258,7 +4272,9 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         // Blinking after a hit forgiven, nothing touches her; a tangerine on her forgives this one.
-        if (this.isSafe() || this.pocket(fromX)) return;
+        if (this.isSafe() || this.pocket(fromX, kind)) return;
+        // A slip or a trip with none on her: down she goes, dizzy, and back to her checkpoint.
+        if (kind === 'slipped' || kind === 'tripped') return this.scareDown(kind);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
@@ -4282,6 +4298,31 @@ export class ShipScene extends Phaser.Scene {
                     if (p.x < view.x - 20 || p.x > view.right + 20) this.respawn();
                 };
             },
+        });
+    }
+
+    // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her
+    // bottom (`slipfall`) or flat on her belly (`tripfall`), then dazed where she fell, butterflies
+    // circling over her head (`dazed-sit`, `dazed-lie`: drawn with her, as the user asked), and
+    // then back at her checkpoint.
+    scareDown(kind) {
+        const p = this.player, slip = kind === 'slipped';
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(kind)).setVisible(true);
+        this.script = null;
+        const clip = slip ? 'her-slipfall' : 'her-tripfall';
+        if (!this.anims.exists(clip)) {
+            this.time.delayedCall(1600, () => this.respawn());
+            return;
+        }
+        p.anims.play(clip);
+        p.once(`animationcomplete-${clip}`, () => {
+            const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
+            if (this.anims.exists(dazed)) p.anims.play(dazed);
+            this.time.delayedCall(2100, () => this.respawn());
         });
     }
 

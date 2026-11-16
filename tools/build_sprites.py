@@ -80,6 +80,15 @@ HER = {
         "carry-stand": [("carry-walk/2.png", "feet")],
         # A start: she recoils from what bumped her (skeleton-v3's hit move), before she runs off.
         "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
+        # Her falls (the user, 2026-11-16; skeleton-v3 poses): a slip onto her bottom and a trip flat on
+        # her belly, each ending dazed; the slip caught backwards, the trip stumbled on from.
+        "slipfall": [(f"slipfall/{i}.png", "feet") for i in range(8)],
+        "tripfall": [(f"tripfall/{i}.png", "feet") for i in range(8)],
+        "slipback": [(f"slipback/{i}.png", "feet") for i in range(6)],
+        "stumble": [(f"stumble/{i}.png", "feet") for i in range(6)],
+        # Dazed where she fell, butterflies circling over her head, drawn with her (the user's rule).
+        "dazed-sit": [(f"dazed-sit/{i}.png", "feet") for i in range(6)],
+        "dazed-lie": [(f"dazed-lie/{i}.png", "feet") for i in range(6)],
         # Her quirks (§6.1.11). The Four Seasons' ice swan: she shivers, hugging herself.
         "shiver": [(f"shiver/{i}.png", "feet") for i in range(8)],
         # Bliss's dance floor: standing still on it, she dances (skeleton-v3's dance move).

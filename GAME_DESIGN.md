@@ -1484,6 +1484,26 @@ each hint at one of the hidden ones, drawn, no words.
 | The captain's cabin door | A name plate: the user's in-joke | |
 | The tip of the bow | Standing still before he comes: the arms-wide pose | Built |
 
+**The things to find (Decided, the user, 2026-11-15; `docs/plan-three-uses.md` §4.1): twenty, of
+four kinds** (Bumbot's eight, four more books, four of hers, four of her husband's). **Built
+(step 4, 2026-11-16), the first four:** Bumbot's tennis ball (deck 4: three fetches for the dog on
+a lead, and its owner hands it over), his ball of wool (deck 5, the knitting lady's basket), his
+feather on a stick (deck 4, the shelf at the top of a climb: from up there, or knocked down by a
+lob), and her little flag of Ukraine (deck 5, among the port flags on the Shore excursions desk).
+The HUD counts each kind found of all (🐾 Bumbot's, 🌸 hers, 🎸 his) from its first find. Deck 4
+also has a suitcase rolling to and fro to hop and the dog's lead to hop. Deck 5 has the knitting
+lady in her armchair by her open door, two paper rounds (a steward and a stewardess skimming folded
+papers along the carpet to the doors, both ways; one sliding or lying at a door is slippery until
+a hand takes it in) and a breakfast round (a stewardess carrying trays from her trolley to the
+doors; walked into, a crash; her trolley a low thing to hop, which a lunge goes past). **Her falls
+(the user, 2026-11-16):** a slip (papers, wet floor) with a tangerine on her is caught backwards and
+costs the tangerine; without one she sits down hard, dazed, butterflies over her head, and is back
+at her checkpoint. A trip on the lead with a tangerine: she is stopped short and stumbles on, the
+tangerine flying ahead; without: flat on her belly, dazed, back at her checkpoint. Someone thrown
+a tangerine eats it from the hand, bite by bite (`people.eat()`). Data: `KEEPS`, `ROLLERS`,
+`DOGS`, `SKIMMERS`, `BREAKFASTS`, `CLIMB`, `KNITTER`, `DESK_FLAGS` and the `keep_*` lines of
+`ITEMS` in `tools/population.py`.
+
 #### 6.1.12 Art to make
 
 No limit on art (the user, 2026-11-10), but generations are stated before they are spent, and the
@@ -2301,9 +2321,13 @@ Nothing blocks the start of the build. These get settled along the way:
       `three-uses` (2026-11-15). Steps 1 and 2 done (D: the cry and the lunge, §3.2; the crew
       cabin's bowl, §6.3; the pocket, and the tangerine a real thing that rolls, §3.2, §5.6).
       Step 3 done (the throw, F: the roll and the lob, and what each thing does with it, §3.2),
-      committed `6a494b2`**; their record is in `docs/progress-decisions.md`, "The
-      plan for the three uses, step 1", "..., step 2" and "..., step 3". **Next: step 4**
-      (region 1's decks and the first things to find; about 45 generations, asked item by item).
+      committed `6a494b2`. Step 4 committed (region 1's decks and the first four things to find,
+      §6.1.11, after six rounds of the user's fixes on decks 4 and 5: the falls, the paper and
+      breakfast rounds, the knitting lady)**; their record is in `docs/progress-decisions.md`,
+      "The plan for the three uses, step 1" to "..., step 4". **Next: step 5** (the rest of the
+      twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
+      Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
+      three runs; the round itself always moved on when watched; its wait was lengthened.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

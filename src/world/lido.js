@@ -404,21 +404,20 @@ export const lido = {
         if (!this.people.anim(k, 'squirt')) k.sprite.setFrame(k.meta.stand);
     },
 
-    // A tangerine thrown to him: he catches it and eats it, and stands with his back turned 15 s
+    // A tangerine thrown to him: he catches it, turns his back and eats it out of sight (his hands
+    // hold his water pistol in every pose he has), and keeps his back turned 15 s
     // (docs/plan-three-uses.md §2). Spent.
     kidOffered(t) {
-        const k = this.who('npc_kid'), s = this.scene, w = this.world;
+        const k = this.who('npc_kid'), s = this.scene;
         if (!t.thrown || !k?.on || k.state === 'acting' || k.mode === 'flee' || !s.loose.near(t, k.x, k.y, 14, 50)) return false;
-        // (Facing where it came from.)
+        // (Caught at his front, facing where it came from; then his back to her.)
         k.dir = t.img.body.velocity.x > 0 ? -1 : 1;
-        k.state = 'acting';
         k.mode = 'patrol';
         this.people.place(k);
-        const img = s.loose.claim(t).setPosition(k.x + k.dir * 8, k.y - 27).setDepth(k.sprite.depth + 0.01);
+        const img = s.loose.claim(t).setPosition(k.x + k.dir * 8, k.y - 24).setDepth(k.sprite.depth + 0.01);
         sfx.at(k.x, k.y).take();
-        const eating = this.people.play(k, 'eat', { times: 2 });
-        for (let i = 1; i <= 2; i++) s.time.delayedCall(i * 800, () => { if (img.active) { img.setScale(1, 1 - i * 0.4); sfx.at(k.x, k.y).munch(); } });
-        eating.then(() => {
+        k.state = 'acting';
+        s.time.delayedCall(450, () => {
             img.destroy();
             k.state = 'idle';
             k.pose = null;
@@ -426,6 +425,7 @@ export const lido = {
             k.waitUntil = s.time.now + KID.fruit;
             k.sprite.anims.stop();
             k.sprite.setFrame(k.meta.back ?? k.meta.stand);
+            for (let i = 0; i < 3; i++) s.time.delayedCall(700 + i * 1300, () => sfx.at(k.x, k.y).munch());
         });
         return true;
     },

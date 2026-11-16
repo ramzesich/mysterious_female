@@ -8,6 +8,19 @@ import { PLAYER, CRY, PEOPLE_IDLE } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;                           // px per metre
+// Where the eating hand's fist is in each frame of someone's `bite` clip (found frame by frame on
+// the 96 px frames, composed offline with the fruit at the game's offsets, 2026-11-16): px ahead of
+// their middle, px over their feet. The tangerine sits in it all the way, drawn behind the figure
+// so that the fingers close over it: to the mouth, a bite (frames 2 and 3), the hand down, chewing.
+const FISTS = {
+    porter: [[17, 35], [14, 41], [6, 46], [9, 46], [17, 36], [17, 36], [17, 35], [17, 35]],
+    paperboy: [[14, 36], [13, 41], [10, 48], [11, 46], [12, 38], [12, 38], [13, 38], [13, 38]],
+    paperwoman: [[13, 37], [10, 43], [8, 49], [10, 47], [12, 38], [12, 38], [13, 37], [13, 37]],
+};
+// Whose hand the fruit is drawn over, covering the palm (the user, 2026-11-16: the steward's sat
+// behind his palm); the others' fingers close over it.
+const FRUIT_OVER = new Set(['paperboy', 'paperwoman']);
+const BITES = ['tangerine', 'tangerine-bit1', 'tangerine-bit2'];
 const BUBBLE = { w: 22, h: 20, rise: 8 };
 
 // A clip's frames a second: an idle clip on the idles' own clock (`PEOPLE_IDLE`), any other its sheet's.
@@ -279,9 +292,56 @@ export class People {
                 s.tweens.add({ targets: img, y: img.y + 6, alpha: 0, duration: 300, delay: 250, onComplete: () => img.destroy() });
                 return;
             }
-            for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 2200, () => { if (img.active) { img.setScale(1, 1 - i * 0.28); sfx.at(p.x, p.y).munch(); } });
-            s.time.delayedCall(9000, () => img.destroy());
+            const was = p.state;
+            p.state = 'acting';
+            this.eat(p, img, () => {
+                p.state = was === 'acting' ? 'idle' : was;
+                if (p.walk.clip !== 'run') p.sprite.anims.pause();
+            });
         } });
+    }
+
+    // Someone eats a tangerine held in their hand (the user, 2026-11-16: "to their mouths, bite,
+    // remove leftover food from their mouths, chew; the food has to stay in their hands"): their
+    // `bite` clip three times, the fruit at their fist in every frame (FISTS), bitten at each bite
+    // and gone at the third. `done` when they have finished.
+    eat(p, img, done) {
+        const s = this.scene, fists = FISTS[p.who], frames = p.meta.anims.bite;
+        if (!fists || !frames) {
+            img.destroy();
+            done?.();
+            return;
+        }
+        const key = `people-${p.who}-bite`;
+        if (!s.anims.exists(key)) s.anims.create({ key, frames: frames.map(f => ({ key: 'people', frame: f })), frameRate: p.meta.fps.bite ?? 6 });
+        let bites = 0;
+        const hold = () => {
+            const i = (p.sprite.anims.currentFrame?.index ?? 1) - 1, [fx, fy] = fists[i] ?? fists[0];
+            // (Behind the figure, the fingers over it; but over a cart of theirs that is drawn over
+            // them, the porter's trolley as he stands aside, or it would be hidden behind it.)
+            const over = Math.max(-Infinity, ...p.attached.map(a => a.img.depth));
+            img.setPosition(p.x + p.dir * fx, p.y - (p.dy ?? 0) - fy).setFlipX(p.dir < 0)
+                .setDepth(over > p.sprite.depth ? over + 0.001 : p.sprite.depth + (FRUIT_OVER.has(p.who) ? 0.001 : -0.001));
+            // (The bite: at the mouth; the hand comes away with a piece gone.)
+            if (i === 2 && img.getData('bitten') !== bites) {
+                img.setData('bitten', bites);
+                sfx.at(p.x, p.y).munch();
+            }
+            if (i === 4 && img.getData('bitten') === bites) {
+                bites += 1;
+                if (bites < BITES.length) img.setTexture(BITES[bites]);
+                else img.setVisible(false);
+            }
+        };
+        const update = () => hold();
+        p.sprite.on('animationupdate', update);
+        p.sprite.anims.play({ key, repeat: BITES.length - 1 });
+        hold();
+        p.sprite.once('animationcomplete', () => {
+            p.sprite.off('animationupdate', update);
+            img.destroy();
+            done?.();
+        });
     }
 
     // In a lunge she went through someone (`touch`): the porter's cart knocked rolling, he after

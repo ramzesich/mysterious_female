@@ -39,6 +39,27 @@ const PALETTE = {
 };
 
 const SPRITES = {
+    // A tangerine bitten into (someone eating one: src/world/people.js `eat`), then half of it.
+    'tangerine-bit1': [
+        '........',
+        '........',
+        '..oo....',
+        '.oooYY..',
+        '.ooooYO.',
+        '.ooooOO.',
+        '..oOOO..',
+        '........',
+    ],
+    'tangerine-bit2': [
+        '........',
+        '........',
+        '........',
+        '.YYYYYY.',
+        '.oooooO.',
+        '.ooooOO.',
+        '..oOOO..',
+        '........',
+    ],
     tangerine: [
         '....ll..',
         '...lll..',

@@ -31,11 +31,27 @@ the character; "stand" is its standing pose. Options: "flip": the sprite was dra
 CAST = {
     # Region 1.
     "officer": ("4d3e6422-a934-40e0-a47d-e841378610ae", {}, {}),
+    # Region 1's decks filled (docs/plan-three-uses.md §4.2, step 4, 2026-11-16): the dog on a lead
+    # on deck 4 (PixelLab pro flash, the dog template; shrunk to a small dog beside her), the lady
+    # knitting in her open cabin on deck 5 (seated in her clip), the paper round's steward on deck 5.
+    "dog": ("0e7afef8-f85d-44da-913d-16d81826d998", {"walk": 10, "run": 14, "sit": 8}, {"scale": 0.65}),
+    "knitter": ("eb35357d-18aa-421d-b6d9-80dedffa4446", {"knit": 4}, {}),
+    # (His skim's first three frames, a finger licked, lost the stack from under his arm: the flick
+    # is its last five.)
+    # The breakfast round on deck 5 (the user, 2026-11-16): her hands empty, the tray a picture of its
+    # own carried in them (`carry`, both hands forward), her walk back empty-handed.
+    "roomservice": ("73e8022b-ee91-4675-a256-57090a635979", {"walk": 8, "carry": 8}, {}),
+    # (The second paper round, deck 5 where the forward cabins meet the stair hall: the user, 2026-11-16.)
+    "paperwoman": ("af3c4fce-746e-4c24-9058-e257d237e716", {"walk": 8, "flick": 10, "bite": 6},
+                   {"cut": {"flick": ("skim", [0, 1, 2, 3, 4, 5])}}),
+    "paperboy": ("9682e0a2-dfb9-4142-ba02-344f936a875d", {"walk": 8, "flick": 10, "bite": 6},
+                 {"cut": {"flick": ("skim", [3, 4, 5, 5, 6, 7])}}),
     # (On the bridge, region 9: "swing" is the net brought down, cut from "swat"; a first try,
     # "lunge", ran with the net over his shoulder.)
     "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5, "swing": 10},
               {"cut": {"swing": ("swat", [2, 3, 4, 5, 7, 8])}}),
-    "porter": ("00c30095-76c1-4898-a423-34f740532970", {}, {}),
+    # (His `bite`: a tangerine to his mouth, a bite, the hand down, chewing: src/world/people.js `eat`.)
+    "porter": ("00c30095-76c1-4898-a423-34f740532970", {"bite": 6}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
     "robe": ("9d68ff5f-80b7-4187-86a9-7cd9eff01bed", {}, {}),

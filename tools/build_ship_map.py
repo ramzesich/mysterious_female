@@ -1920,9 +1920,10 @@ def build_objects():
     add(area("name-board", "nameboard", exact_x(NAME_BOARD[0]), ROOF_ROW * TILE - 52,
              exact_x(NAME_BOARD[1]) - exact_x(NAME_BOARD[0]), 30, [prop("text", "NORWEGIAN SUN")]))
 
-    # A robot vacuum patrolling the deck 4 cabin corridor.
+    # A robot vacuum patrolling the deck 4 cabin corridor (to 143 m: past it stands the climb,
+    # docs/plan-three-uses.md §4.2).
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
-        prop("minX", x_of(118), "float"), prop("maxX", x_of(150), "float"), prop("speed", 58, "float")]))
+        prop("minX", x_of(118), "float"), prop("maxX", x_of(143), "float"), prop("speed", 58, "float")]))
 
     return objs
 

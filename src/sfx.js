@@ -468,6 +468,11 @@ const things = {
     robotBeep: () => [0, 0.13].forEach(t => tone(1400, 0.07, { type: 'square', vol: 0.042, lp: 4000, t })),
     // Housekeeping's vacuum: its motor winding up (the tell), and its dart.
     vacRev: () => tone(170, 0.32, { type: 'sawtooth', to: 560, vol: 0.112, lp: 1500 }),
+    // The small dog on deck 4's lead: a yap (two short barks), and its howl back at her cry.
+    bark: () => [0, 0.14].forEach(t => { tone(820, 0.08, { type: 'sawtooth', path: [[0, 760], [0.3, 980], [1, 640]], vol: 0.07, lp: 2600, t, attack: 0.01 }); noise(0.05, { band: 1400, vol: 0.08, t }); }),
+    howl: () => tone(620, 1.0, { type: 'sawtooth', path: [[0, 520], [0.35, 880], [0.8, 820], [1, 560]], vol: 0.06, lp: 2200, lq: 3, attack: 0.1, release: 0.3, vib: [6, 14] }),
+    // A folded paper skimmed along the carpet (the paper round).
+    paperSlide: () => noise(0.4, { band: [2600, 1600], q: 1.2, vol: 0.12, attack: 0.02, release: 0.2 }),
     // A vacuum that has swallowed a tangerine: the motor chokes, sputters and winds down.
     vacChoke: () => { tone(420, 0.8, { type: 'sawtooth', path: [[0, 420], [0.25, 560], [1, 80]], vol: 0.08, lp: 1400, trem: [16, 0.6] }); [0.12, 0.34, 0.58].forEach(t => noise(0.08, { lo: [900, 300], vol: 0.22, t })); },
     vacDart: () => { tone(560, 0.5, { type: 'sawtooth', path: [[0, 560], [0.2, 720], [1, 420]], vol: 0.07, lp: 1700 }); noise(0.5, { band: 1100, vol: 0.12, attack: 0.05 }); },

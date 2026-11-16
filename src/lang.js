@@ -34,7 +34,7 @@ const TEXTS = {
         'lock.card': name => `🔒 ${name} card`,
         'card.deck': 'Deck', 'card.ent': 'Entertainment', 'card.hk': 'Housekeeping', 'card.off': "Officer's",
         // Her frights, one for each hazard (§5.6).
-        'fright.vacuum': 'Eeek!', 'fright.bumped': 'Oops!', 'fright.bonked': 'Ouch!', 'fright.slipped': 'Whoa!',
+        'fright.vacuum': 'Eeek!', 'fright.bumped': 'Oops!', 'fright.bonked': 'Ouch!', 'fright.slipped': 'Whoa!', 'fright.tripped': 'Whoops!',
         'fright.drenched': 'Brrr!', 'fright.buried': 'Mmmph!', 'fright.startled': 'Oh, sorry!', 'fright.splashed': 'Aaah!',
         'fright.swooped': 'Shoo!', 'fright.fogged': 'Pfff!', 'fright.singed': 'Hot!',
         // What she and the others say in a word.
@@ -53,7 +53,7 @@ const TEXTS = {
         'win.go': 'Натисни E: корабель і далі твій, гуляй скільки хочеш',
         'lock.card': name => `🔒 ${name} картка`,
         'card.deck': 'Палубна', 'card.ent': 'Розважальна', 'card.hk': 'Господарська', 'card.off': 'Офіцерська',
-        'fright.vacuum': 'Іііі!', 'fright.bumped': 'Ой!', 'fright.bonked': 'Ай!', 'fright.slipped': 'Ой-йой!',
+        'fright.vacuum': 'Іііі!', 'fright.bumped': 'Ой!', 'fright.bonked': 'Ай!', 'fright.slipped': 'Ой-йой!', 'fright.tripped': 'Ой-ой!',
         'fright.drenched': 'Бррр!', 'fright.buried': 'Мммф!', 'fright.startled': 'Ой, вибачте!', 'fright.splashed': 'Ааа!',
         'fright.swooped': 'Киш!', 'fright.fogged': 'Пхх!', 'fright.singed': 'Гаряче!',
         'say.oops': 'Ой!', 'say.ohno': 'Ой-ой-ой!', 'say.whoa': 'Ой-йой!', 'say.hey': 'Гей!', 'say.meow': 'Мяу!',
