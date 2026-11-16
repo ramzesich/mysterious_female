@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAPS, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
@@ -72,7 +72,8 @@ const SIDEWALK_LOOKS = {
 };
 
 // Each hazard gets its own fright (§5.6): her word for it, in the game's language (src/lang.js).
-const fright = kind => has(`fright.${kind}`) ? t(`fright.${kind}`) : '!';
+// What she cries at a hit: the word of the obstacle's line in `MISHAPS` (or a word itself).
+const fright = what => { const w = MISHAPS[what]?.word ?? what; return has(`fright.${w}`) ? t(`fright.${w}`) : '!'; };
 
 export class ShipScene extends Phaser.Scene {
     constructor() {
@@ -1261,9 +1262,10 @@ export class ShipScene extends Phaser.Scene {
     // is drawn over that route's room and shows only there.
     addTangerine(id, x, y, route = 'inside') {
         if (this.save.collected.includes(id)) return;
-        const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
+        // (In a pile, a higher one is behind a lower one: the crew cabin's bowl.)
+        const depth = (route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13) + y * 1e-7;
         const sprite = this.add.image(x, y, 'tangerine').setOrigin(0.5, 1).setDepth(depth);
-        const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
+        const glint = this.add.image(sprite.x - 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
         this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
         this.worldLayer.add([sprite, glint]);
         const t = { id, sprite, glint, route };
@@ -2479,7 +2481,7 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Verdana, sans-serif', fontSize: '24px', color: '#ffffff',
             stroke: '#1d2b53', strokeThickness: 5,
         };
-        const icon = this.add.image(24, 20, 'tangerine').setOrigin(0).setScale(4);
+        const icon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
         this.hudCount = this.add.text(62, 22, '', textStyle);
         // Her speech bubble and the messages over her live in the world, so they move exactly with
         // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
@@ -3336,6 +3338,7 @@ export class ShipScene extends Phaser.Scene {
         for (const r of this.rooms) {
             r.room.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
             r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
+            r.front?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
         }
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
@@ -4205,9 +4208,11 @@ export class ShipScene extends Phaser.Scene {
     // A hit that would be a fright or a spilled tray, with a tangerine on her: one less, knocked out
     // of her pocket and rolling away the way she is pushed; a flinch, a step back, a blink. True if
     // it was forgiven. (Falls, the sea and her own feet never come here.)
-    // `kind`: a slip (she loses her balance backwards, arms going: her `slipback`) or a trip (she
-    // stumbles on forward: `stumble`, the tangerine flying on ahead of her); any other, the flinch.
-    pocket(fromX, kind) {
+    // `what`: the obstacle (`MISHAPS`). A slip (she loses her balance backwards, arms going: her
+    // `slipback`) or a trip (she stumbles on forward: `stumble`, the tangerine flying on ahead of
+    // her); any other, the flinch.
+    pocket(fromX, what) {
+        const kind = { sit: 'slipped', belly: 'tripped' }[MISHAPS[what]?.down];
         if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         const p = this.player, time = this.time.now;
@@ -4263,29 +4268,31 @@ export class ShipScene extends Phaser.Scene {
 
     // A fright that fits what got her, then she runs off the screen. (`force`: one that is no
     // contact, her own cry at a "Do Not Disturb" door: a lunge does not help.)
-    scareContact(fromX, kind, force = false) {
+    scareContact(fromX, what, force = false) {
+        const m = MISHAPS[what] ?? {};
         const p = this.player;
         if (this.holding) return;           // nothing scares her on the way home (§6.1.9)
         // In a lunge she is through: what touched her gives way in its own manner.
         if (this.lungeSafe() && !force) {
-            this.world.lunged(kind, fromX);
+            this.world.lunged(what, fromX);
             return;
         }
         // Blinking after a hit forgiven, nothing touches her; a tangerine on her forgives this one.
-        if (this.isSafe() || this.pocket(fromX, kind)) return;
+        if (this.isSafe() || this.pocket(fromX, what)) return;
         // A slip or a trip with none on her: down she goes, dizzy, and back to her checkpoint.
-        if (kind === 'slipped' || kind === 'tripped') return this.scareDown(kind);
+        if (m.down) return this.scareDown(what);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
         rumble('bump');
-        this.alert.setText(fright(kind)).setVisible(true);
+        this.alert.setText(fright(what)).setVisible(true);
         // A recoil from what got her (the vacuum: a jump, as it always was).
-        if (kind === 'drenched' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
-        else if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
+        const jump = m.recoil === 'jump' || !this.anims.exists('her-hit');
+        if (m.recoil === 'shiver' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
+        else if (!jump) p.anims.play('her-hit');
         else this.pose('rise');
-        p.setFlipX(kind !== 'vacuum' && this.anims.exists('her-hit') ? away > 0 : away < 0);
+        p.setFlipX(jump ? away < 0 : away > 0);
         this.script = null;
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
@@ -4305,13 +4312,13 @@ export class ShipScene extends Phaser.Scene {
     // bottom (`slipfall`) or flat on her belly (`tripfall`), then dazed where she fell, butterflies
     // circling over her head (`dazed-sit`, `dazed-lie`: drawn with her, as the user asked), and
     // then back at her checkpoint.
-    scareDown(kind) {
-        const p = this.player, slip = kind === 'slipped';
+    scareDown(what) {
+        const p = this.player, slip = MISHAPS[what].down === 'sit';
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         sfx.scare();
         rumble('bump');
-        this.alert.setText(fright(kind)).setVisible(true);
+        this.alert.setText(fright(what)).setVisible(true);
         this.script = null;
         const clip = slip ? 'her-slipfall' : 'her-tripfall';
         if (!this.anims.exists(clip)) {
@@ -4328,7 +4335,7 @@ export class ShipScene extends Phaser.Scene {
 
     // Hit in the air under the parasol (a gull across her way down to the bow): it is knocked out
     // of her hands, and down she goes out of the bottom of the screen.
-    scareAir(kind) {
+    scareAir(what) {
         const p = this.player;
         if (this.mode !== 'play') return;
         if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10)) return;
@@ -4338,7 +4345,7 @@ export class ShipScene extends Phaser.Scene {
         sfx.scare();
         rumble('bump');
         this.scareFall();
-        this.alert.setText(fright(kind)).setVisible(true);
+        this.alert.setText(fright(what)).setVisible(true);
         if (this.anims.exists('her-hit')) p.anims.play('her-hit');
     }
 

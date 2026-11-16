@@ -14,6 +14,8 @@ export class BootScene extends Phaser.Scene {
         // Its rooms that are drawn (tools/draw_rooms.py); the others the game draws bare.
         this.load.once('filecomplete-json-world', (_key, _type, world) => {
             for (const r of world.rooms) if (r.art) this.load.image(`room-${r.id}`, `assets/ship/rooms/${r.id}.png`);
+            // (What of a room's picture is in front of the things lying in it: a bowl's side.)
+            for (const r of world.rooms) if (r.front) this.load.image(`room-${r.id}-front`, `assets/ship/rooms/${r.id}-front.png`);
         });
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');

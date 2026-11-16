@@ -334,7 +334,7 @@ export const lido = {
                 if (!hit || P.has('kid_fed')) return;
                 sfx.splashSmall();
                 if (w.carry) w.carryBox.spill(k.x);
-                else s.scareContact(k.x, 'splashed');
+                else s.scareContact(k.x, 'jet');
             });
             return;
         }

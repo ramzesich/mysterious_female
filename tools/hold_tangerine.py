@@ -1,7 +1,7 @@
 """Puts a tangerine in her fist in her toss's frames (docs/plan-three-uses.md §1.2): from
 assets/source/her/toss/ (PixelLab's raw frames, kept as they came) to toss-held/, which
 tools/build_sprites.py builds into her sheet. In the frames before she lets go (0 to 3) the
-fruit (the game's own, src/textures.js, without its leaf) is laid over her fist and her skin's
+fruit (the game's own, src/textures.js, its leaves too) is laid over her fist and her skin's
 pixels around it are put back on top, so her fingers close over it; from frame 4 it is in the
 air, a thing of the game's own (`THROW.hand`, `THROW.handY` in src/config.js).
 
@@ -17,14 +17,23 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "her" / "toss"
 OUT = ROOT / "assets" / "source" / "her" / "toss-held"
 
+# The game's tangerine (`FRUIT.tangerine` in src/textures.js, docs/plan-three-uses.md §1.7), its
+# leaves too; `FIST` is its fruit's middle, the picture's (5, 6).
 FRUIT = [
-    "..oooo..",
-    ".oooooo.",
-    ".oooooO.",
-    ".ooooOO.",
-    "..oOOO..",
+    "....K.KK..",
+    "...KlKllK.",
+    "..KollLK..",
+    ".KoooooOK.",
+    "KoohhooOOK",
+    "KohoooooOK",
+    "KOoOoooOOK",
+    ".KOOOOOOK.",
+    "..KOOOOK..",
+    "...KKKK...",
 ]
-COLOURS = {"o": (0xF2, 0x8C, 0x28, 255), "O": (0xD9, 0x71, 0x1A, 255)}
+COLOURS = {"K": (0x2E, 0x22, 0x2F, 255), "o": (0xFB, 0x6B, 0x1D, 255), "O": (0xEA, 0x4F, 0x36, 255),
+           "h": (0xFD, 0xCB, 0xB0, 255), "l": (0x23, 0x90, 0x63, 255), "L": (0x16, 0x5A, 0x4C, 255)}
+MIDDLE = (5, 6)
 # Frame: the fruit's middle (x, y). Frame 0 her hand hangs by her skirt, 1 and 2 swung back,
 # 3 swinging past her hip.
 FIST = {0: (43, 56), 1: (36, 53), 2: (37, 54), 3: (58, 53)}
@@ -44,7 +53,7 @@ def main():
         if i in FIST:
             orig = im.copy()
             cx, cy = FIST[i]
-            x0, y0 = cx - len(FRUIT[0]) // 2, cy - len(FRUIT) // 2
+            x0, y0 = cx - MIDDLE[0], cy - MIDDLE[1]
             for dy, row in enumerate(FRUIT):
                 for dx, ch in enumerate(row):
                     if ch in COLOURS:

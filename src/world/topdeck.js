@@ -132,7 +132,7 @@ export class Balls {
     // In a lunge she meets the ball: headed back onto the court, over the cage.
     lunged(kind, fromX) {
         const s = this.scene, d = this.def;
-        if (kind !== 'bonked' || !this.ball.visible || Math.abs(this.ball.x - fromX) > 12) return false;
+        if (kind !== 'ball' || !this.ball.visible || Math.abs(this.ball.x - fromX) > 12) return false;
         this.headed = Math.floor((s.time.now / 1000 + d.offset) / d.period);
         const b = s.add.image(this.ball.x, this.ball.y, 'shipart', 'basketball').setDepth(this.ball.depth);
         this.world.add([b]);
@@ -201,7 +201,7 @@ export class Balls {
         this.hitAt = time + 1500;
         sfx.bounce();
         if (this.world.carry) this.world.carryBox.spill(q.x);
-        else s.scareContact(q.x, 'bonked');
+        else s.scareContact(q.x, 'ball');
     }
 }
 
@@ -285,7 +285,7 @@ export class Flare {
         if (Math.abs(p.x - d.x) > d.half - 8 || Math.abs(p.y - d.y) > 90 || p.y < d.y - 100) return;
         this.hitAt = time + 1500;
         if (this.world.carry) this.world.carryBox.spill(d.x);
-        else s.scareContact(d.x, 'singed');
+        else s.scareContact(d.x, 'flare');
     }
 }
 
@@ -400,7 +400,7 @@ export class FunnelWind {
             if (time > this.at) {
                 this.mark.setVisible(false);
                 const hit = this.onStairs() && Math.abs(p.x - this.target.x) < 17 && Math.abs(p.y - this.target.y) < 30;
-                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'swooped');
+                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'funnelgull');
                 this.state = 'circle';
                 this.turn++;
             }

@@ -258,7 +258,7 @@ PEOPLE = {
     # Region 1, deck 4.
     "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
     "haz_porter": dict(at=(4, 58), who="porter", face=1, walk=(53.5, 64, 1.0, "cart"), end_ms=1500,
-                       touch=("scare", 46, 44, "bumped", 12),
+                       touch=("scare", 46, 44, "cart", 12),
                        carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
     "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
                         bubble=("tray", "!card:deck", None, 4)),
@@ -298,7 +298,7 @@ PEOPLE = {
     # The promenade: the jogger's loop on the JOGGING lane (she hops him or stands aside, ↑), the
     # rival peering under a boat (a glimpse: the story takes him away).
     "haz_jogger": dict(at=("prom", 150), who="jogger", face=1, walk=(116.5, 211.5, 2.2, "run"), end_ms=400,
-                       touch=("scare", 14, 40, "bumped")),
+                       touch=("scare", 14, 40, "jogger")),
     "riv_prom": dict(at=("prom", 190), who="rival", face=1, idle="idle", after="region:2", until="flag:riv_prom"),
     # Deck 7's lobbies and atrium walk: the carpet fitter on the 7-8 flight's foot, a couple at the plaques.
     "blk_fitter": dict(at=(7, 87.9), who="fitter", face=1, idle="work", until="region:4"),

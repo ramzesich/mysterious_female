@@ -78,7 +78,7 @@ export class Steam {
         if (p.x < d.x + 2 || p.x > d.x + reach - 6 || Math.abs(p.y - d.y) > 80) return;
         this.hitAt = time + 1500;
         if (this.world.carry) this.world.carryBox.spill(d.x);
-        else s.scareContact(d.x, 'fogged');
+        else s.scareContact(d.x, 'steam');
     }
 }
 

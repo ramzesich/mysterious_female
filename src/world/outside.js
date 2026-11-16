@@ -197,7 +197,7 @@ export class PerchGull {
                         this.world.carryBox.give();
                         this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
-                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'swooped');
+                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull');
                 }
                 this.state = 'back';
                 this.at = time + 2600;
@@ -299,7 +299,7 @@ export class Occupied {
         this.bang.setVisible(true);
         s.time.delayedCall(1300, () => this.bang.setVisible(false));
         sfx.at(this.d.x, this.d.y).hey();
-        s.scareContact(this.d.x, 'startled');
+        s.scareContact(this.d.x, 'balcony');
     }
 }
 
@@ -384,7 +384,7 @@ export class DrillBoat {
         const half = this.w / 2 - 14 + PLAYER.bodyWidth / 2;
         if (Math.abs(p.x - this.cx) >= half || head >= keel) return;
         if (a.coming) {
-            s.scareContact(this.cx, 'bumped');
+            s.scareContact(this.cx, 'boat');
             return;
         }
         // Down, or still too low on its way up: she is held at its end.

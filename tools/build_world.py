@@ -109,6 +109,7 @@ def build_world():
                               kind=d.get("door", "crew"), plate=d.get("plate", ""), lock=lock(d.get("lock"))))
         rooms.append(dict(id=r["id"], deck=deck, x0=x0, floor=floor, width=r["width"], look=r["look"],
                           art=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}.png").exists(),
+                          front=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}-front.png").exists(),
                           needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors,
                           **({"mirror": r["mirror"]} if "mirror" in r else {})))
 

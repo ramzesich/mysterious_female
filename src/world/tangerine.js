@@ -76,12 +76,14 @@ export class LooseTangerines {
         const s = this.scene;
         const id = e.id ?? `loose_${Date.now().toString(36)}_${made++}`;
         const outside = e.route !== 'inside';
-        // (Its position is its middle, so that it turns about itself as it rolls.)
-        const img = this.group.create(e.x, e.y, 'tangerine')
+        // (Its position is the fruit's middle, under its leaves, so that it turns about itself as
+        // it rolls: src/textures.js.)
+        const img = this.group.create(e.x, e.y, 'tangerine').setOrigin(0.5, 0.6)
             .setDepth(outside ? s.DEPTH.exterior + 0.13 : s.DEPTH.props + 0.05);
         s.worldLayer.add(img);
-        // (The fruit fills the picture's rows 2 to 6 and columns 1 to 6: the body is the fruit.)
-        img.body.setSize(6, 6).setOffset(1, 1);
+        // (The fruit fills the picture's rows 2 to 9 and its ten columns; the body is the fruit,
+        // a pixel in from its sides.)
+        img.body.setSize(8, 8).setOffset(1, 2);
         img.body.setBounce(LOOSE.bounce, LOOSE.bounce);
         img.body.setMaxVelocity(1000, PLAYER.maxFall);
         const t = { id, img, route: e.route, resting: false, floating: !!e.float, spin: 0, still: 0, vyWas: 0, pickableAt: 0 };

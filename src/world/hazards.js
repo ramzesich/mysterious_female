@@ -83,7 +83,7 @@ export class WetPatch {
                 this.slip = 0;
                 s.slipDir = 0;
                 if (this.world.carry) this.world.carryBox.spill(c.x);
-                else s.scareContact(c.x, 'bumped');
+                else s.scareContact(c.x, 'deckchair');
             }
         } else if (this.state === 'far') {
             if (time > this.at && !this.slip) this.state = 'home';

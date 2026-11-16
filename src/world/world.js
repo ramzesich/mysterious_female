@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -352,7 +352,11 @@ export class World {
             const img = s.add.image(def.x0, def.floor - ROOM.height, key).setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
             const dim = s.roomDim(img);
             this.add([dim, img]);
-            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, inDeck: true,
+            // (Its pixels in front of the things that lie in it, over its tangerines: tools/draw_rooms.py.)
+            const front = def.front ? s.add.image(def.x0, def.floor - ROOM.height, `room-${def.id}-front`).setOrigin(0)
+                .setDepth(D.exterior + 0.135).setVisible(false) : null;
+            if (front) this.add([front]);
+            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front, inDeck: true,
                            doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
             for (const d of def.doors) {
                 d.lockSpec = parseLock(d.lock);
@@ -1171,7 +1175,8 @@ export class World {
                 this.add([table]);
                 if (out) this.things.push({ id: `${e.id}-table`, x: e.x, y: e.y, route: OUTSIDE, items: [table] });
             }
-            y -= e.route === OUTSIDE ? 24 : 12;
+            // (On its top: a side table's is its picture's top row.)
+            y -= e.route === OUTSIDE ? 24 : s.textures.get('sidetable').getSourceImage().height;
         } else {
             y -= e.on;
         }
@@ -1544,7 +1549,7 @@ export class World {
         if (s.time.now < (this.touchCool ?? 0) || s.mode !== 'play') return;
         // (In a lunge she is through them: src/world/people.js has what each does about it.)
         if (!this.carry && s.lungeSafe()) {
-            this.lunged(t.fright || 'bumped', person.x);
+            this.lunged(t.fright, person.x);
             return;
         }
         if (this.carry) {
@@ -1589,8 +1594,9 @@ export class World {
         for (const m of this.movers) if (m.lunged?.(kind, fromX)) return;
         if (this.people.lunged(kind, fromX)) return;
         const head = p.y - PLAYER.height + 6;
-        if (kind === 'drenched') this.drops(p.x, head, 0x8fd3ff, 1);
-        else if (kind === 'singed' || kind === 'fogged') this.drops(p.x, head, kind === 'singed' ? 0x625565 : 0xffffff, -1);
+        const mark = MISHAPS[kind]?.mark;
+        if (mark === 'wet') this.drops(p.x, head, 0x8fd3ff, 1);
+        else if (mark) this.drops(p.x, head, mark === 'soot' ? 0x625565 : 0xffffff, -1);
     }
 
     // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:

@@ -1950,3 +1950,38 @@ user: "continue the plan"). No art.
   short now (45 px/s on), and her stumble and her slip caught backwards play at 9 frames a second
   for 0.7 s. The fall after a slip with tangerines on her was my second link's `&pocket=off`,
   which switches their help off while the HUD still shows ∞.
+
+## The plan's revision, step 1 gone back over: obstacles by name, the new tangerine (2026-11-16)
+
+The plan was revised with the user the same day (`docs/plan-three-uses.md`, §1.6, §1.7, "Start
+here" 7); each built step is gone back over under its "Revision".
+
+- **Every hit names its obstacle** (`MISHAPS` in `src/config.js`, 24 lines: the chips, the lead,
+  the trays, the papers, the vacuums, the suitcase, the deck chair, the porter's cart, the jogger,
+  the breakfast tray, the kid's jet, the stage's light, a door, a basketball, the drill's boat, a
+  sprinkler, the steam, the towels, a flare, the three kinds of gull, a "Do Not Disturb" door, the
+  occupied balcony). `scareContact`, `scareAir`, `Carry.spill` callers and `world.lunged` take that
+  name; the people's `touch` in the data names theirs (`cart`, `jogger`). Each line has the word she
+  cries, as before, and what stands in until its own gags are made (`down`: the built falls;
+  `recoil`; `mark`: what a lunge through it leaves on her). Nothing in play changes yet.
+- `src/lang.js`: "Weeeee!" / «Віііі!» (`fright.ride`), the vacuum's ride (§1.6, 5b).
+- **The new tangerine (§1.7):** six candidates from PixelLab (pixen, 16 and 20 px, 6 generations;
+  one came with a face). The user chose the second and asked for it a little smaller: shown at
+  12, 11 and 10 px, made by taking whole rows and columns out of its peel (not resampled, which
+  blurs the outline); its colours put on Resurrect 64 by hand (the automatic snap flattened its
+  shading and turned its leaves yellow). **The user chose 10 px.** It is `FRUIT.tangerine` in
+  `src/textures.js` with its own small palette, and its two bitten states are cut from it (the
+  half's top the fruit inside, not an outline, which read as a dark bowl). Everything follows: the
+  pickups (their glint on its highlight), the loose one (origin at the fruit's middle under its
+  leaves, so it turns about itself; its body 8 px, it was 6), the HUD's icon (x3, it was x4 of
+  8 px), her toss's fist (`tools/hold_tangerine.py`, leaves and all), `TANGERINE` in
+  `tools/draw_rooms.py`. Its raw picture: `assets/source/tangerine/`.
+- **Found on the way:** a tangerine on a side table lay 12 px up, the table is 22: it hung under
+  the top (it did with the old one too, the bigger fruit showed it). It lies on the top now.
+- **The crew cabin's bowl (the user):** "Two bottom tangerines should be layered out behind the
+  bowl (move them on z-axis relative to the bowl ...). The top tangerine move on the z-axis behind
+  the bottom two." A room's picture can now have pixels drawn in front of what lies in the room
+  (`Room.in_front()` in `tools/draw_rooms.py` marks what a drawing changed; `<room>-front.png`,
+  loaded when the data says `front`, drawn over the tangerines); in a pile a higher tangerine is
+  behind a lower one (its depth by its height).
+- `lang`, `dash`, `pocket`, `deck4`, `deck3`, `intro`, `throw`, `boot`: pass.

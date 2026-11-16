@@ -211,10 +211,10 @@ export class SwingLight {
         if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
             if (this.world.carry) this.world.carryBox.spill(x);
-            else if (s.lungeSafe()) this.world.lunged('bonked', x);
+            else if (s.lungeSafe()) this.world.lunged('light', x);
             else {
                 sfx.bonk();
-                s.scareContact(x, 'bonked');
+                s.scareContact(x, 'light');
             }
         }
     }
@@ -262,10 +262,10 @@ export class Spill {
             if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(p.y - d.y) < 3 && Math.abs(p.x - d.x) < d.half
                 && Math.abs(p.body.velocity.x) > 20) {
                 if (this.world.carry) this.world.carryBox.spill(d.x);
-                else if (s.lungeSafe()) this.world.lunged('slipped', d.x);
+                else if (s.lungeSafe()) this.world.lunged('chips', d.x);
                 else {
                     sfx.slip();
-                    s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'slipped');
+                    s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'chips');
                 }
             }
             if (left <= 0) {
@@ -495,7 +495,7 @@ export class TowelStack {
             this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
             s.tweens.add({ targets: this.heap, y: d.y, scaleY: 1, duration: 900, delay: 500, ease: 'Bounce.easeOut' });
             if (this.world.carry) this.world.carryBox.spill(d.x);
-            else s.scareContact(d.x, 'buried');
+            else s.scareContact(d.x, 'towels');
         }
     }
 }
@@ -554,7 +554,7 @@ export class Sprinkler {
             }
             if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
                 if (this.world.carry) this.world.carryBox.spill(d.x);
-                else s.scareContact(d.x, 'drenched');
+                else s.scareContact(d.x, 'sprinkler');
             }
         } else {
             this.wet = Math.max(0, this.wet - dt / 2.2);
@@ -624,7 +624,7 @@ export class SwingDoor {
                 this.state = 'open';
                 this.at = time + 1500;
                 if (this.world.carry) this.world.carryBox.spill(d.x + 20);
-                else s.scareContact(d.x + 14, 'bonked');
+                else s.scareContact(d.x + 14, 'door');
             } else if (time > this.at) {
                 this.state = 'open';
                 this.at = time + 1500;
@@ -700,7 +700,7 @@ export class DndDoor {
         }
         const by = !look && (!heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60));
         if (by && cried && this.world.carry) this.world.carryBox.spill(d.x);
-        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled', cried);
+        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'dnd', cried);
         s.time.delayedCall(look ? 1900 : 1700, () => {
             this.shut.setVisible(true);
             this.card.setVisible(true);
@@ -762,7 +762,7 @@ export class Roller {
         } else if (this.world.carry) {
             this.world.carryBox.spill(this.x);
         } else {
-            s.scareContact(this.x, 'bumped');
+            s.scareContact(this.x, 'suitcase');
         }
     }
 }
@@ -950,7 +950,7 @@ export class Fetcher {
         if (crossed && time >= this.flatUntil && here(s, d) && !s.isLunging() && p.y >= d.y - 6) {
             sfx.at(this.dog.x, d.y).bark();
             // (From behind her: she goes on the way she was going, forward.)
-            s.scareContact(p.x - side * 10, 'tripped');
+            s.scareContact(p.x - side * 10, 'lead');
         }
         this.side = side;
     }
@@ -1056,7 +1056,7 @@ export class Skimmer {
                 if (!q.hit && !q.taking && this.under(q, her)) {
                     q.hit = true;
                     if (this.world.carry) this.world.carryBox.spill(q.img.x);
-                    else s.scareContact(q.img.x, 'slipped');
+                    else s.scareContact(q.img.x, 'papers');
                 }
                 continue;
             }
@@ -1073,7 +1073,7 @@ export class Skimmer {
                 q.hit = true;
                 q.v = Math.max(q.v, Math.sqrt(2 * q.a * Math.max(1, Math.abs(q.door - q.img.x))));
                 if (this.world.carry) this.world.carryBox.spill(q.img.x);
-                else s.scareContact(q.img.x, 'slipped');
+                else s.scareContact(q.img.x, 'papers');
             }
         }
     }
@@ -1269,6 +1269,6 @@ export class Breakfast {
         }
         this.until = time + 1500;
         if (this.world.carry) this.world.carryBox.spill(this.x);
-        else s.scareContact(this.x, 'bumped');
+        else s.scareContact(this.x, 'breakfast');
     }
 }

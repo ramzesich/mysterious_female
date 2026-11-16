@@ -197,6 +197,39 @@ export const LUNGE = {
 // `push` px a second (slowed by `slow`), and blinks for `safeMs`, untouchable; she keeps her
 // place and her tray. The tangerine is knocked out of her pocket (LOOSE.knock). `?pocket=off`
 // switches it off.
+// How she takes a hit (docs/plan-three-uses.md §1.6), by the obstacle's own name: every
+// `scareContact`, `scareAir`, `Carry.spill` and `world.lunged` names one of these. `word`: what
+// she cries (`fright.<word>` in src/lang.js). Until each obstacle's own gags are made, what is
+// built stands in: `down` 'sit' (a slip: on her bottom, dazed) or 'belly' (a trip: flat on her
+// front, dazed); `recoil` 'shiver' or 'jump' before the run-off (otherwise her hit); `mark` what
+// a lunge through it leaves on her hair ('wet', 'soot', 'steam').
+export const MISHAPS = {
+    chips: { word: 'slipped', down: 'sit' },        // the casino's spilled chips
+    lead: { word: 'tripped', down: 'belly' },       // the dog's lead (deck 4)
+    trays: { word: 'startled' },                    // trays on the floor by a "Do Not Disturb" door
+    papers: { word: 'slipped', down: 'sit' },       // the paper rounds' papers (deck 5)
+    vacuum: { word: 'vacuum', recoil: 'jump' },     // the robot vacuums (decks 4 and 9)
+    suitcase: { word: 'bumped' },                   // the runaway suitcase (deck 4)
+    deckchair: { word: 'bumped' },                  // the deck chair on the wet patch (deck 11)
+    cart: { word: 'bumped' },                       // the porter and his cart (deck 4)
+    jogger: { word: 'bumped' },                     // the jogger (the promenade)
+    breakfast: { word: 'bumped' },                  // the breakfast stewardess's tray (deck 5)
+    jet: { word: 'splashed' },                      // the kid's water pistol (deck 11)
+    light: { word: 'bonked' },                      // the stage's swinging light
+    door: { word: 'bonked' },                       // a door that flies open
+    ball: { word: 'bonked' },                       // the court's basketballs (deck 12)
+    boat: { word: 'bumped' },                       // the boat drill's boat (the walkway)
+    sprinkler: { word: 'drenched', recoil: 'shiver', mark: 'wet' },
+    steam: { word: 'fogged', mark: 'steam' },       // the sauna's steam
+    towels: { word: 'buried' },                     // the towel stack
+    flare: { word: 'singed', mark: 'soot' },        // Teppanyaki's flares
+    railgull: { word: 'swooped' },                  // the gulls on the balcony rails
+    funnelgull: { word: 'swooped' },                // the funnel's gulls, on the stairway
+    crossgull: { word: 'swooped' },                 // the gulls across her glide to the bow
+    dnd: { word: 'startled' },                      // a "Do Not Disturb" door
+    balcony: { word: 'startled' },                  // the occupied balcony
+};
+
 export const POCKET = {
     flinchMs: 340,
     safeMs: 1500,

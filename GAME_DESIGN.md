@@ -2328,8 +2328,9 @@ Nothing blocks the start of the build. These get settled along the way:
       (`docs/plan-three-uses.md`: how she takes a hit, each obstacle its own mishap by the side
       it comes from and by who was moving, §1.6; a new picture of the tangerine and its flight
       to the count, §1.7; art generated, never drawn in code or put together from other props;
-      each built step gone back over under its "Revision", then the new step 4a). Only the plan
-      is written: nothing of the revision is built. **Then step 5** (the rest of the
+      each built step gone back over under its "Revision", then the new step 4a). **Step 1's
+      revision done** (every hit names its obstacle, `MISHAPS`; the new tangerine, chosen by the
+      user; the cabin's bowl in front of its tangerines); next step 2's. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened.
