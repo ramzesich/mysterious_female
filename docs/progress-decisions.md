@@ -2045,3 +2045,15 @@ here" 7); each built step is gone back over under its "Revision".
   every hit from behind. **The user: keep it.**
 - **A new rule (the user): after each approved step, commit, save and record everything, and say
   when it is safe to compact the context** (`CLAUDE.md`, "Working with the user").
+
+## The plan's revision, step 3 gone back over: the thrown tangerine (2026-11-16)
+
+- The new tangerine in her toss's fist (`tools/hold_tangerine.py`) and the loose one turning a
+  quarter at a time as it rolls were already done with step 1's revision; a thrown one picked up
+  again already flew to the count (`gainTangerine` in `LooseTangerines.pickedUp`).
+- **Changed:** on every pick-up the tangerine's own picture also rose and faded where it lay
+  while its copy flew to the count, so two showed for a moment. §1.7 says its picture flies
+  "from where it was": the one on the floor now goes at once (the placed ones in
+  `checkPickups`, the loose ones in `pickedUp`), and only the flight is seen. Shown frame by
+  frame to the user.
+- `throw`, `gamepad`, `pocket`: pass. **Approved by the user.**

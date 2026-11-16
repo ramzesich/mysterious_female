@@ -187,8 +187,8 @@ export class LooseTangerines {
         s.tweens.killTweensOf(img);
         this.all = this.all.filter(o => o !== t);
         s.save.loose = s.save.loose.filter(o => o.id !== t.id);
-        img.disableBody(false, false);
-        s.tweens.add({ targets: img, y: img.y - 12, alpha: 0, duration: 250, onComplete: () => img.destroy() });
+        // (Its picture is the one that flies to the count: §1.7.)
+        img.destroy();
         s.refreshHud();
         return true;
     }

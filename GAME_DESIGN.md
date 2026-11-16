@@ -2344,9 +2344,10 @@ Nothing blocks the start of the build. These get settled along the way:
       user; the cabin's bowl in front of its tangerines), `ec42bb4`. **Step 2's revision done**
       (mishaps by side and mover with the built falls standing in, her seven reactions, the gulls
       and the doors that take the tangerine, the flight to the count; §5.6), committed with the
-      no-save switch (`DEV_FRESH`) and `?at=deck4`. **Next: step 3's revision** (the new tangerine
-      in her toss's fist, already done in step 1's; the thrown one's flight back to the count),
-      then step 4's, then step 4a. **Then step 5** (the rest of the
+      no-save switch (`DEV_FRESH`) and `?at=deck4`. **Step 3's revision done** (the new tangerine
+      in her toss's fist and rolling, from step 1's; a picked-up one's picture leaves the floor at
+      once, only its flight to the count is seen). **Next: step 4's revision** (region 1's gags,
+      about 70 generations, 5b and 6b first: her riding the vacuum and the suitcase), then step 4a. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened.

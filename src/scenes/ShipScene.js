@@ -3902,8 +3902,9 @@ export class ShipScene extends Phaser.Scene {
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
                 this.save.collected.push(t.id);
                 this.gainTangerine(t.sprite.x, t.sprite.y - 5);
+                // (Its picture is the one that flies to the count: §1.7.)
                 t.glint.destroy();
-                this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
+                t.sprite.destroy();
                 t.sprite.active = false;
                 this.refreshHud();
             }
