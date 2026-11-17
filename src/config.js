@@ -126,6 +126,10 @@ export const SOUND = {
     far: 980,
     deckWeight: 2.2,
     stride: 30,        // px of floor to one footstep
+    // Her run's frames with a foot coming down (her-run, 8 frames): its footsteps sound on them, in
+    // step with her feet at any speed (the user, 2026-11-17: a step each 30 px ran a third faster
+    // than her feet, one every 40 px).
+    runSteps: [3, 7],
 };
 
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.
@@ -242,9 +246,12 @@ export const MISHAPS = {
 // `gag`: her own gag is made, one picture of her with the thing (`GAGS`, below), played when the
 // thing that hit her says how it carries her (`ride` in `scareContact`); `down` is kept for a hit
 // that cannot (a tray in her hands spilled, a hit in the air).
+// `pocket: false`: an exception to the tangerines (the user, 2026-11-17: "She has to fall here anyway,
+// tangerines or no. This will be an exception"): with tangerines on her she gets what she gets with
+// none (the gag, her checkpoint) and keeps them all. `pocket()` asks it, whatever the hit.
 export const MISHAP_SCENES = {
     '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
-    '2': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // into the dog's lead
+    '2': { word: 'tripped', down: 'belly', pocket: false },     // into the dog's lead: down whatever she carries
     '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // onto the trays
     '4a': { word: 'slipped', react: 'stumble', toss: 'on', down: 'belly', gag: 'paperFront' },   // a paper at her front: her leg up behind, on her belly
     '4b': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit', gag: 'paperBehind' }, // at her heel: her leg up in front, on her bottom

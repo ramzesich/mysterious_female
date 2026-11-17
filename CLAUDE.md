@@ -66,7 +66,7 @@ truth**: read the relevant section before any design or content work, and record
 | `src/world/bow.js` | Region 9: the bow's own things (the sauna's steam, the kids' club's ball pit, the step class's boards, the bridge's alarm) and its part of the story, mixed into the Story (the wedding planner and the cake, the party into the chapel and the ceremony, the piano, the slide, the captain's door, near-catch 6 with the net on the alarm panel and the hatch's ladder, the Library's odd book and the nook). A fragile load's sway is in `carry.js` (`SWAY`) |
 | `src/world/finale.js` | Region 10 and the end: the wind over the bow and the two crossing gulls; and its part of the story, mixed into the Story (the sunset's scene, Bumbot at the tip who backs off and comes to her standing still, the catch, where a miss puts her back, those who clap her home, cabin 8206's scene, the win screen, the day after). Her look and rules with Bumbot in her arms are the ship scene's `holding` (`HOLDING` in `src/config.js`; her sheet `assets/sprites/her-cat.png` from `assets/source/her-cat/`, PixelLab state `6905f308-15b1-4a44-ad97-a38a7ad17dff`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
-| `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
+| `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`; the dog and its owner are kept by hand, `BY_HAND`), and the sheet `assets/sprites/people.png`, every clip's frames set on the floor (`OFF_THE_FLOOR` the ones that leave it); `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
@@ -430,6 +430,25 @@ Lessons learned (2026-11-17, the art rule looked back over):
   pick a sign that survives it (a speaker crossed out).
 - **A deck's dim reaches 16 px under its floor:** anything that tests her body against a deck
   counts her head past the floor, not into the ceiling below it.
+
+Lessons learned (2026-11-17, the dog and its owner made together):
+
+- **Two things joined by a line that changes length** (a lead, a rope to a moving thing) are not
+  one generated picture: make them together once for their look and size, then draw the line
+  from ends measured in every frame of both clips, in the picture's own colours, px by px
+  (whole px, rows rounded, joined side by side), its depth between them as the picture has it.
+- **Map objects don't draw people** (silhouettes, no faces): a person, even with a thing, is a pro
+  character in the cast's style.
+- **A quadruped's template clips redraw it as another animal**: PixMiniMax from its own approved
+  picture holds it (a sit toward the approved sitting picture as its end frame); skeleton-v3
+  keeps the look but may stretch the body. Compare every clip with the approved still on one
+  floor line before anything else.
+- **A person's clips are set on the floor frame by frame** (`OFF_THE_FLOOR` in
+  `tools/build_people.py` lists the clips that leave it): PixelLab's frames drift 1 to 4 px.
+- **A sound tied to a clip** (footsteps) plays on the clip's own frames, not by a distance that
+  only matches it at one speed.
+- **An exception to a rule of hits** is a property of its scenario read where the rule is
+  applied (`pocket: false`, asked by `pocket()`), never a check at one caller.
 
 ## Working with the user
 

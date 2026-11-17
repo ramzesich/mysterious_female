@@ -746,7 +746,7 @@ DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
 ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6)}
 # A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
 # the lead's reach in m, what the owner gives after three fetches).
-DOGS = {"haz_dog_4": (4, 99.6, "railwoman", 4.0, "keep:cat:ball")}
+DOGS = {"haz_dog_4": (4, 99.6, "dogowner", 4.0, "keep:cat:ball")}
 # The paper round: a steward skimming folded papers along the carpet to each door: id: (deck, m
 # from, m to, m/s, who).
 SKIMMERS = {"haz_papers_5": (5, 26.0, 42.0, 0.7, "paperboy"),        # (clear of the knitting lady at 23.3)

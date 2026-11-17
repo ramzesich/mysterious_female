@@ -78,6 +78,10 @@ const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
 // Her reaction's own sound, with a tangerine on her (the rest have the pocket's alone).
 const REACT_SOUND = { yelp: () => sfx.yelpHot(), splutter: () => sfx.splutter(), arch: () => sfx.gasp(), rubnose: () => sfx.sniff() };
 
+// Lying flat on her belly after a trip (scareDown): her picture this many px lower, from this frame
+// of her fall on (the frames where she is down), so that she lies on the carpet, not over it.
+const LIE_DROP = { px: 2, frame: 3 };
+
 export class ShipScene extends Phaser.Scene {
     constructor() {
         super('ship');
@@ -4340,6 +4344,8 @@ export class ShipScene extends Phaser.Scene {
     // handed over at the door it came from ('hand'); her push still goes the way of `toss`. True if it was forgiven. (Falls, the sea and her own feet never
     // come here.)
     pocket(fromX, sc, { snatch = null } = {}) {
+        // (A scenario the tangerines do not save her from: she gets the gag, and keeps them.)
+        if (sc.pocket === false) return false;
         if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         const p = this.player, time = this.time.now;
@@ -4708,6 +4714,18 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         this.herClip(clip);
+        // Flat on her belly she is drawn 2 px lower, from the fall's first frame on the floor until she
+        // is back at her checkpoint (the user, 2026-11-17: she lay a px or two over the carpet; her
+        // cell ends at her lowest px, her hand under her chin, so it is done here, not in the art).
+        if (!slip) {
+            const down = () => {
+                if (p.anims.currentAnim?.key !== clip || (p.anims.currentFrame?.index ?? 1) - 1 >= LIE_DROP.frame) {
+                    this.herDrop(LIE_DROP.px);
+                    p.off('animationupdate', down);
+                }
+            };
+            p.on('animationupdate', down);
+        }
         // (`downMs`: dazed a shorter while than the stand-in's.)
         p.once(`animationcomplete-${clip}`, () => {
             const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
@@ -4782,6 +4800,13 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
+    // Her picture drawn `px` lower than her body (0: as always), its body kept where it is.
+    herDrop(px) {
+        const p = this.player;
+        p.setDisplayOrigin(p.width / 2, p.height - px);
+        p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight - px);
+    }
+
     respawn(cleanup) {
         if (this.respawning) return;
         this.respawning = true;
@@ -4797,6 +4822,7 @@ export class ShipScene extends Phaser.Scene {
                 this.gagEnd = null;
                 this.world.carryBox.drop();          // a tray is not hers to keep through a scare
                 this.tweens.killTweensOf(this.player);
+                this.herDrop(0);
                 this.spawnAt(target, { emerge: true });
                 this.tweens.add({ targets: this.fade, alpha: 0, duration: 260 });
                 this.respawning = false;

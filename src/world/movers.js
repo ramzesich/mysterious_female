@@ -787,6 +787,32 @@ export class Roller {
 Roller.HOP = 30;
 Roller.HALF = 12;               // px from its middle to its front
 
+// The dog's lead (the dog and its owner made together, the user, 2026-11-17: "the lady and the dog
+// are loosely connected, the leash looks weird and glitches on its connecting ends"): where it
+// leaves her fist and where it is clipped to the collar, px from the sprite's foot (in front, up),
+// measured in every frame of their clips on the people's sheet (her fist is still in all of her
+// idle's); the picture's own colours; how high its lowest point hangs over the carpet; where the
+// fruit is in the dog's mouth.
+const LEAD = {
+    fist: [7.5, 32],
+    collar: { stand: [2.5, 12],
+              walk: [[0.5, 13], [0.5, 12], [0.5, 12], [0.5, 13], [0.5, 13], [0.5, 12], [0.5, 12], [1.5, 13]],
+              run: [[4.5, 12], [4.5, 12], [4.5, 9], [4.5, 9], [4.5, 10], [3.5, 11]],
+              sit: [[2.5, 12], [3.5, 11], [3.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11]] },
+    core: 0x6e2727, edge: 0x2e222f,
+    low: 3,
+    mouth: [10, 11],
+};
+// A point of a person's picture in the world: `at` px in front of its middle (the way it faces) and
+// up from its feet, on the px the sprite is drawn at.
+// (By where the person is, not its sprite, which is only placed while she is near.)
+const leadEnd = (p, at) => ({ x: Math.round(p.x) + (p.dir < 0 ? -at[0] : at[0]), y: p.sprite.y - at[1] });
+// A straight run of points from a to b, one a px.
+const lineOf = (a, b) => {
+    const n = Math.max(1, Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+    return Array.from({ length: n + 1 }, (_, i) => ({ x: a.x + (b.x - a.x) * i / n, y: a.y + (b.y - a.y) * i / n }));
+};
+
 // A small dog on a long lead (population: `haz_dog_4`), its owner in her cabin's doorway holding
 // the other end. The dog trots about within the lead's reach and sits now and then; where the lead
 // sags to the carpet it is a line to hop: run into, she trips on it (the user, 2026-11-16): with a
@@ -807,7 +833,10 @@ export class Fetcher {
         this.owner = world.people.add({ id: `${def.id}_owner`, who: def.who, x: def.x, y: def.y, route: 'inside', face: 1,
                                         idle: 'idle', layer: 'back', owned: true });
         this.dog = world.people.add({ id: `${def.id}_dog`, who: 'dog', x: def.x + 60, y: def.y, route: 'inside', face: 1, owned: true });
-        this.lead = s.add.graphics().setDepth(D.props + 0.04);
+        // (Over the dog: from behind it the lead runs along its back to the collar, as in their picture;
+        // and under her, so that her fist closes over its end.)
+        this.lead = s.add.graphics().setDepth(D.props + 0.06);
+        this.owner.sprite.setDepth(D.props + 0.07);
         world.add([this.lead]);
         this.state = 'sit';
         this.at = 0;
@@ -815,20 +844,48 @@ export class Fetcher {
         this.flatUntil = 0;
     }
 
-    // Her hand at her front, the way she faces (always toward her dog).
+    // Where the lead leaves her fist, and where it is clipped to the dog's collar: measured in every
+    // frame of their clips (LEAD), in world px; the sprites are drawn at whole px (roundPixels).
     hand() {
-        return { x: this.def.x + (this.owner?.dir ?? 1) * 7, y: this.def.y - 29 };
+        return leadEnd(this.owner, LEAD.fist);
     }
 
     collar() {
-        const g = this.dog;
-        return { x: g.x + g.dir * 7, y: this.def.y - 13 };
+        const g = this.dog, f = Number(g.sprite.frame.name);
+        let at = LEAD.collar.stand;
+        for (const [clip, frames] of Object.entries(g.meta.anims)) {
+            const i = frames.indexOf(f);
+            if (i >= 0 && LEAD.collar[clip]) at = LEAD.collar[clip][i] ?? at;
+        }
+        return leadEnd(g, at);
     }
 
-    // The lowest point of the lead, where it touches the carpet.
+    // Where she meets the lead (`trip`), as it always was: a little over halfway from her hand to the
+    // dog; the lead's lowest point, LEAD.low px over the carpet (the user, 2026-11-17: hung at her
+    // waist, it could not trip her; "make the leash hang lower").
     sag() {
         const h = this.hand(), c = this.collar();
-        return { x: h.x + (c.x - h.x) * 0.62, y: this.def.y - 3 };
+        return { x: h.x + (c.x - h.x) * 0.62, y: this.def.y - LEAD.low };
+    }
+
+    // The lead's line, point by point from her fist to the collar: down from her fist to its lowest
+    // point and up again to the collar, each side a curve level at the bottom; or after her cry along
+    // the carpet.
+    curve(time) {
+        const h = this.hand(), c = this.collar(), floor = this.def.y - 1;
+        if (time < this.flatUntil) {
+            const foot = { x: h.x + Math.sign(c.x - h.x) * 3, y: floor };
+            return [...lineOf(h, foot), ...lineOf(foot, { x: c.x, y: floor }), ...lineOf({ x: c.x, y: floor }, c)];
+        }
+        const m = this.sag();
+        const hang = (end) => {
+            const n = Math.ceil(Math.abs(m.x - end.x) + Math.abs(m.y - end.y)) + 1;
+            return Array.from({ length: n + 1 }, (_, i) => {
+                const t = i / n;
+                return { x: end.x + (m.x - end.x) * t, y: m.y + (end.y - m.y) * (1 - t) ** 2 };
+            });
+        };
+        return [...hang(h), ...hang(c).reverse()];
     }
 
     go(state, ms = 0) {
@@ -882,7 +939,7 @@ export class Fetcher {
                 // In its mouth, and back to her.
                 this.go('back');
             } else if (this.state === 'back') {
-                this.fruit?.setPosition(g.x + g.dir * 11, d.y - 9);
+                this.fruit?.setPosition(g.x + g.dir * LEAD.mouth[0], d.y - LEAD.mouth[1]);
                 if (there || Math.abs(p.x - g.x) < 22) this.drop();
             } else if (this.state === 'walk' && there) {
                 this.go('sit', Phaser.Math.Between(1800, 3800));
@@ -928,26 +985,29 @@ export class Fetcher {
         }
     }
 
+    // The lead in the picture's own pixels: a line of its red-brown with its dark outline round it,
+    // down from her fist to just over the carpet and up to the collar, or after her
+    // cry round her feet and along the carpet.
     drawLead(time) {
-        const h = this.hand(), c = this.collar(), y = this.def.y;
-        const g = this.lead.clear();
-        g.lineStyle(1, 0xe83b3b, 1);
-        if (time < this.flatUntil) {
-            g.strokePoints([h, { x: h.x + 2, y: y - 1 }, { x: c.x, y: y - 1 }, c]);
-            return;
+        const floor = this.def.y - 1, pts = this.curve(time);
+        // Whole px, joined side by side (no diagonal gaps), then a dark px under each: 2 px thick (the
+        // picture's 3, its outline on both sides, was too thick, the user).
+        const core = new Map();
+        let last = null;
+        for (const q of pts) {
+            const x = Math.floor(q.x), y = Math.round(q.y);
+            if (last && last.x !== x && last.y !== y) core.set(`${x},${last.y}`, [x, last.y]);
+            core.set(`${x},${y}`, [x, y]);
+            last = { x, y };
         }
-        const m = this.sag(), pts = [];
-        for (let i = 0; i <= 12; i++) {
-            const k = i / 12;
-            if (k <= 0.62) {
-                const a = k / 0.62;
-                pts.push({ x: h.x + (m.x - h.x) * a, y: h.y + (m.y - h.y) * Math.sin(a * Math.PI / 2) });
-            } else {
-                const a = (k - 0.62) / 0.38;
-                pts.push({ x: m.x + (c.x - m.x) * a, y: m.y + (c.y - m.y) * (1 - Math.cos(a * Math.PI / 2)) });
-            }
+        // (Lying round her feet after her cry the dog is at her feet too: the lead under it then.)
+        const g = this.lead.clear().setDepth(this.scene.DEPTH.props + (time < this.flatUntil ? 0.04 : 0.06));
+        g.fillStyle(LEAD.edge, 1);
+        for (const [x, y] of core.values()) {
+            if (y + 1 <= floor && !core.has(`${x},${y + 1}`)) g.fillRect(x, y + 1, 1, 1);
         }
-        g.strokePoints(pts);
+        g.fillStyle(LEAD.core, 1);
+        for (const [x, y] of core.values()) g.fillRect(x, y, 1, 1);
     }
 
     // The lead where it lies on the carpet: crossed on her feet, she trips on it (a stagger, slowed

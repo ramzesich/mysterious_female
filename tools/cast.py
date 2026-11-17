@@ -34,7 +34,15 @@ CAST = {
     # Region 1's decks filled (docs/plan-three-uses.md §4.2, step 4, 2026-11-16): the dog on a lead
     # on deck 4 (PixelLab pro flash, the dog template; shrunk to a small dog beside her), the lady
     # knitting in her open cabin on deck 5 (seated in her clip), the paper round's steward on deck 5.
-    "dog": ("0e7afef8-f85d-44da-913d-16d81826d998", {"walk": 10, "run": 14, "sit": 8}, {"scale": 0.65}),
+    # (The dog and its owner made again together, 2026-11-17, the user: "the lady and the dog are
+    # loosely connected": one picture of the two, PixelLab pro in the cabin maid's style,
+    # dddf2b55-1eaa-44ca-a309-48a637f7ecf6, cut apart by hand. The dog's side view redrawn standing
+    # and made a character by Pro rotate; its walk and its sit are PixMiniMax clips of that picture
+    # (the sit toward the approved sitting dog), its run the dog template in skeleton-v3: so
+    # **don't fetch the dog or the owner with fetch_people.py**, their frames are kept by hand. The
+    # first dog, 0e7afef8, and every try: assets/source/people/dogowner-raw/README.md.)
+    "dog": ("be63988d-bf91-4122-a1da-eecd4fa4b65b", {"walk": 10, "run": 14, "sit": 8}, {}),
+    "dogowner": ("dddf2b55-1eaa-44ca-a309-48a637f7ecf6", {}, {}),
     "knitter": ("eb35357d-18aa-421d-b6d9-80dedffa4446", {"knit": 4}, {}),
     # (His skim's first three frames, a finger licked, lost the stack from under his arm: the flick
     # is its last five.)

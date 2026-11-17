@@ -189,7 +189,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | # | Obstacle | Scenario | The gag |
 |---|---|---|---|
 | 1 | Casino chips (3) | She runs onto them | On her bottom, butterflies (built). Standing on them: nothing (built) |
-| 2 | The dog's lead | She runs into it | On her belly, butterflies (built); **the dog comes and licks her face** |
+| 2 | The dog's lead | She runs into it | On her belly, butterflies (built); **the dog comes and licks her face**. **With tangerines on her too: down, back to her checkpoint, none lost** (`pocket: false`, the user, 2026-11-17: "She has to fall here anyway, tangerines or no") |
 | 3 | Trays on the floor (10) | She runs onto them | **A tray shoots on ahead with her on it**, arms wheeling, out of the screen; a crash; the door opens on the guest looking after her |
 | 4a | A sliding paper | ~~It slides her way~~ **At her front: sliding at her, standing or running, or lying where she steps** | ~~She sits down; the paper flutters open over her head like a tent~~ **Her leg flies up behind her with the paper on its sole, she lands on her belly, the paper comes round and down onto her back** (the user, 2026-11-16; built 2026-11-17) |
 | 4b | | ~~It slides against her~~ **At her heel, from behind** | ~~Down on her belly, chin on her hands; the paper settles on her back like a blanket~~ **Her heel is taken forward and up with the paper, she sits down hard, the paper comes round over her and lands on her head as a tent** |
@@ -709,6 +709,20 @@ Shown: her throw's frames for approval before anything else; then each target as
   user). With it, at the user's word: the climb a laundry cart and a shelf, the gap between
   them a jump from the cart's edge; the lady in the bathrobe an obstacle (10f's bounce,
   `robe`); and the tangerine knocked out of her pocket always rolls behind her (§1.3).
+  **The dog and its owner made again together (2026-11-17)**, the user's idea for the dog: the
+  mechanic kept, the pictures new ("the lady and the dog are loosely connected, the leash looks
+  weird and glitches on its connecting ends"). One picture of the two (a new owner, `dogowner`,
+  in her doorway holding the lead's loop, the dog at her feet), cut apart by hand; the dog made
+  a character from it standing, its walk and sit animated from its own picture, its run the dog
+  template in skeleton-v3; her idle her fist still on the lead
+  (`assets/source/people/dogowner-raw/README.md`). The lead drawn by the game in the picture's
+  own colours, 2 px (the picture's 3 "too thick"), from her fist to the collar as measured in
+  every frame, under her fist and over the dog's back, hanging down to 3 px over the carpet at
+  the spot she trips on (a little over halfway from her hand to the dog, as always: at her
+  waist it "cannot trip her"). With it: lying flat after a trip she is drawn 2 px lower; her
+  running footsteps on the frames her feet land on; everyone's clips set on the floor frame by
+  frame. Left of the dog: the together clips (the lead wound round her legs after the cry, the
+  tennis ball given, the lick).
 
 ### Step 4a. The mishaps on the rest of the ship (art: about 125, in three batches)
 

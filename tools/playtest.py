@@ -1446,6 +1446,19 @@ def scenario_deck4(b):
     b.wait_for(f"{S}.player.anims.currentAnim?.key === 'her-dazed-lie'", timeout=3)
     ok &= check(True, "dazed where she fell, butterflies over her head")
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    # With tangerines on her too (`pocket: false`, the user, 2026-11-17): down and back to her
+    # checkpoint, and she keeps them all.
+    b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
+    b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud()")
+    b.teleport(sag - 60, D4)
+    time.sleep(0.6)
+    s = hold_until(b, "right", lambda st: st["x"] > sag + 30 or st["mode"] != "play", timeout=3)
+    ok &= check(s["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key").startswith("her-tripfall")
+                and s["tangerines"] == 3,
+                "with tangerines on her too: she falls flat, and none flies out", (s, b.eval(f"{S}.player.anims.currentAnim?.key")))
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    ok &= check(b.state()["tangerines"] == 3, "back at her checkpoint with all three", b.state())
+    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud()")
     b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
     b.teleport(sag + 60, D4)
     time.sleep(0.3)

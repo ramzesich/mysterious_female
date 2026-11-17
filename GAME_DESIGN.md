@@ -2373,8 +2373,14 @@ Nothing blocks the start of the build. These get settled along the way:
       feather a cat teaser on the shelf); with it the climb two steps and a harder gap, the lady
       in the bathrobe an obstacle, deck 5's dim no longer blinking over the shelf, and **Decided
       (the user): the tangerine knocked out of her pocket always rolls behind her** ("a dilemma:
-      run back to pick it up, or continue"). **Next in step 4's revision:** the dog's lick, which
-      waits for an idea of the user's, talked over first; then step 4a
+      run back to pick it up, or continue"). **Done (2026-11-17): the dog and its owner made again
+      together** (the user's idea: one picture of the two, a new owner, the lead from her fist to
+      the collar measured frame by frame, 2 px, hanging low where she trips); **Decided (the user):
+      on the dog's lead she falls whatever she carries and keeps her tangerines** (`pocket: false`,
+      a scenario's exception to the tangerines; more to come); everyone's clips on the floor frame
+      by frame; her lying 2 px lower; her running steps on her footfalls. **Next in step 4's
+      revision:** the dog's together clips (the lead wound round her legs after the cry, the tennis
+      ball given, the lick after a trip); then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

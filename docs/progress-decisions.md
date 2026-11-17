@@ -2302,3 +2302,50 @@ here" 7); each built step is gone back over under its "Revision".
 - The lunge seemed broken: without `&cards=all` she has not learned it (Bumbot's first beat).
 - Generations: 33. Passed: `boot`, `pocket`, `deck4`, `region1`; `check_overlaps` lists nothing;
   the rest not run.
+
+## The dog and its owner made again together (2026-11-17)
+
+- **The user's idea for the dog** (talked over first, as agreed): keep the mechanic, remake the
+  pictures: "the lady and the dog are loosely connected, the leash looks weird and glitches on its
+  connecting ends ... regenerate them together as a single animation sequence. But we will still
+  have to keep the same hitbox areas". One picture cannot follow a dog that strolls 4 m, fetches
+  and comes back to her, so: the two made together as one picture for their look and size, then
+  separate sprites joined by a lead the game draws from measured ends; together clips for the
+  moments they are close (next). The user agreed, with a new owner, the dog still strolling, and
+  the lick "without leash glitches".
+- **Everyone's feet on the floor** (the user: "not even placed properly on the floor"): PixelLab's
+  frames drift 1 to 4 px; the dog sat 1 px up, its owner bobbed, the kid idled 2 to 3 px up, 71
+  clips in all. `tools/build_people.py` sets each frame of a clip whose feet stay down on the
+  floor by its own lowest px; the clips that leave the floor are listed (`OFF_THE_FLOOR`). No
+  generation. Committed by itself (4454684).
+- **The picture:** three map objects first (people come out as silhouettes there); then a pro
+  character in the cabin maid's style (10), a woman holding the lead's loop, the dog at her feet,
+  approved. Cut apart by hand (the dog's neck one px blackened, the user). The dog redrawn
+  standing by `edit_image_pro_flash` (a Pro Flash dog from text with it as style came out another
+  dog), made a character by Pro rotate; the dog template's walk and run redrew it as another dog
+  and its v3 sit never sat; skeleton-v3 kept it but stretched its walk a third; PixMiniMax from its
+  own picture held it (the walk, and the sit toward the approved sitting dog as its end frame); the
+  run is skeleton-v3's (a smooth gallop). Her idle: PixMiniMax, her fist still in every frame. 47
+  generations; ids and tries in `assets/source/people/dogowner-raw/README.md`. Their frames are kept
+  by hand (`BY_HAND` in `tools/fetch_people.py`).
+- **The lead** (`LEAD` in `src/world/movers.js`): from her fist (7 px in front, 32 up, the same in
+  all her idle) to the dog's collar (measured in each frame of its clips), drawn px by px in the
+  picture's colours; under her (her fist closes over it), over the dog (from behind, it runs along
+  its back to the collar, as in the picture). The user: "too thick" (3 px, the picture's) -> 2 px,
+  a dark px under its colour; and it hung at her waist where she met it ("She cannot trip over the
+  leash, if it's at her waist line"; I first moved the trip point, "Not what I meant. I meant we
+  need to make the leash hang lower"): it hangs down to 3 px over the carpet at the spot she trips
+  on, a little over halfway from her hand to the dog as always. A one-px notch at its bottom came
+  from cutting fractions down: rows rounded.
+- **Lying after a trip, 2 px lower** (the user): her cell ends at her lowest px (her hand under her
+  chin), so the game draws her picture lower (`herDrop`, `LIE_DROP`), her body where it was, from
+  the fall's frame on the floor until her checkpoint.
+- **Her running footsteps** (the user: "her sound is faster than her steps"): a step each 30 px;
+  her run lands a foot every 40. They sound on her run's footfall frames now (`SOUND.runSteps`):
+  7 in 2 s of running, each on a landing frame. I can't hear it: the user's to judge.
+- **Decided (the user): on the dog's lead she falls whatever she carries, and keeps her
+  tangerines** ("This will be an exception. And we'll have some other exception to this rule
+  later ... handled gracefully in the code"): `pocket: false` on a scenario (`MISHAP_SCENES`),
+  asked by `pocket()` itself, so every way a hit reaches her follows it.
+- Passed: `deck4` (with the new checks: she falls with tangerines, back with all three), `sound`;
+  `boot`; the rest not run.
