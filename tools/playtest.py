@@ -1445,7 +1445,15 @@ def scenario_deck4(b):
                 "run into the lead with none on her: she trips and falls flat", (sag, s, b.eval(f"{S}.player.anims.currentAnim?.key")))
     b.wait_for(f"{S}.player.anims.currentAnim?.key === 'her-dazed-lie'", timeout=3)
     ok &= check(True, "dazed where she fell, butterflies over her head")
+    # The dog comes and licks her face: her and it in one picture, its own sprite and her hidden,
+    # the lead to its collar there; her checkpoint after it (the dog's together clips, 2026-11-17).
+    b.wait_for(f"{F}.state === 'licking'", timeout=5)
+    ok &= check(b.eval(f"!!{F}.lickGag && {F}.lickGag.anims.currentAnim?.key === 'gag-dog-lick' && {F}.dog.sprite.alpha === 0"
+                       f" && !{S}.player.visible && {S}.mode === 'scripted'"),
+                "the dog licks her face (one picture of the two; she waits for it)")
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    ok &= check(b.eval(f"!{F}.lickGag && {F}.dog.sprite.alpha === 1 && {S}.player.visible"),
+                "back at her checkpoint, the dog its own again")
     # With tangerines on her too (`pocket: false`, the user, 2026-11-17): down and back to her
     # checkpoint, and she keeps them all.
     b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
@@ -1471,6 +1479,20 @@ def scenario_deck4(b):
     ok &= check(s["x"] < sag and s["mode"] == "play", "hopped, no trip", (sag, s))
     b.shot("deck4-dog")
 
+    # Her cry: it runs to its owner and round her legs (their picture: the dog and the lead in it),
+    # stands tied, unwinds, and trots off; no trip on the lead all the while.
+    b.eval(f"(f => {{ f.dog.x = f.def.x - 90; f.go('sit', 60000); }})({F})")
+    b.teleport(b.eval(f"{F}.def.x") - 150, D4)
+    time.sleep(0.4)
+    b.eval(f"{S}.save.tangerines = 3; {S}.tryCry({S}.time.now)")
+    b.wait_for(f"{F}.state === 'tied'", timeout=6)
+    ok &= check(b.eval(f"{F}.together && {F}.dog.sprite.alpha === 0 && {F}.owner.sprite.anims.currentAnim?.key === 'people-dogowner-tied'"
+                       f" && {F}.flatUntil === Infinity"),
+                "her cry: the dog winds the lead round its owner's legs (their picture), nothing to trip on")
+    b.wait_for(f"{F}.state === 'walk'", timeout=10)
+    ok &= check(b.eval(f"!{F}.together && {F}.dog.sprite.alpha === 1 && {F}.flatUntil === 0"),
+                "unwound, the dog trots off, the lead its own again")
+
     # Three fetches: each brought back to her, hers again; then the tennis ball.
     for i in range(3):
         b.eval(f"(f => {{ f.go('sit', 0); f.dog.x = f.def.x + 40; }})({F})")
@@ -1481,8 +1503,9 @@ def scenario_deck4(b):
         b.wait_for(f"{F}.fetches > {i}", timeout=8)
         time.sleep(0.4)
         ok &= check(b.state()["tangerines"] == 3, f"fetch {i + 1}: brought back to her and hers again", b.state())
-    time.sleep(1.2)
-    ok &= check("keep:cat:ball" in keeps(), "three fetches, and the owner hands her the tennis ball", keeps())
+    # (Her toss: out of her pocket, held out, a lob to her chest: about two seconds.)
+    b.wait_for(f"{S}.save.keeps.includes('keep:cat:ball')", timeout=5)
+    ok &= check("keep:cat:ball" in keeps(), "three fetches, and the owner tosses her the tennis ball", keeps())
 
     # The feather on the climb's shelf: not from the floor; a lob knocks it down, hers from there.
     K = f"{W}.things.find(t => t.id === 'keep_feather')"

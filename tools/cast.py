@@ -42,7 +42,9 @@ CAST = {
     # **don't fetch the dog or the owner with fetch_people.py**, their frames are kept by hand. The
     # first dog, 0e7afef8, and every try: assets/source/people/dogowner-raw/README.md.)
     "dog": ("be63988d-bf91-4122-a1da-eecd4fa4b65b", {"walk": 10, "run": 14, "sit": 8}, {}),
-    "dogowner": ("dddf2b55-1eaa-44ca-a309-48a637f7ecf6", {}, {}),
+    # (Her together clips with the dog, 2026-11-17: the lead wound round her legs, tied, unwound;
+    # the tennis ball tossed.)
+    "dogowner": ("dddf2b55-1eaa-44ca-a309-48a637f7ecf6", {"wind": 10, "tied": 6, "unwind": 10, "toss": 8}, {}),
     "knitter": ("eb35357d-18aa-421d-b6d9-80dedffa4446", {"knit": 4}, {}),
     # (His skim's first three frames, a finger licked, lost the stack from under his arm: the flick
     # is its last five.)

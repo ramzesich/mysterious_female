@@ -803,6 +803,26 @@ const LEAD = {
     low: 3,
     mouth: [10, 11],
 };
+// Their moments together (approved 2026-11-17), each one picture of the two (assets/source/people/
+// dogowner-raw/README.md), the dog sprite and the drawn lead hidden while it plays:
+// - her cry: the dog runs to its place at her feet in their picture (`dx` px in front of her, where
+//   its sitting picture lies on theirs), winds the lead round her legs (`wind`), they stand tied
+//   (`tied`) until `ms` after the cry, at least `tiedMin`, and it unwinds it (`unwind`);
+const WIND = { dx: 17, ms: 5000, tiedMin: 1500 };
+// - three fetches: she tosses her the tennis ball (`toss`). It is in her hand in the clip until
+//   frame `release`, where her hand opens; from then the game's ball flies, from where the clip
+//   held it (`from`: px in front of her middle, up from her feet), in a lob (gravity `g`, its top
+//   over the release a fifth of the way across, within `top`) to her chest;
+const TOSS = { release: 6, from: [13, 38], g: 400, top: [0.22, 16, 40], chest: 30 };
+// - a trip on its lead: the dog runs to her face (`dog` px in front of her middle, facing her) and
+//   licks it, one picture of her lying dazed and the dog (`gag-dog-lick`, her mishaps' sheet: its
+//   cell's middle `gag` px in front of hers). Its collar in each frame of that picture, (column,
+//   row) of its 128 x 96 frames, where her middle is column 48 + 0.5 and the floor under the dog
+//   row 72 (her hand under her chin, 74, is her cell's bottom row).
+const LICK = { dog: 45, gag: 16,
+               collar: [[90, 62], [90, 61], [89, 62], [88, 63], [87, 64], [88, 63], [89, 62], [90, 61]] };
+// (What it does by itself, its lead its own: the states in which a cry, a tangerine or a lunge reach it.)
+const FREE = new Set(['sit', 'sat', 'walk', 'aside']);
 // A point of a person's picture in the world: `at` px in front of its middle (the way it faces) and
 // up from its feet, on the px the sprite is drawn at.
 // (By where the person is, not its sprite, which is only placed while she is near.)
@@ -820,8 +840,10 @@ const lineOf = (a, b) => {
 // her belly, dizzy, and goes back to her checkpoint (`tripped`). At first it held her back like a
 // wall, then it was a stagger with nothing lost. A
 // tangerine rolled within its reach it fetches and brings back to her feet: not spent; three
-// fetches and its owner hands her the tennis ball. Her cry: it howls back and runs round its
-// owner's legs, the lead lying flat 5 s. In a lunge it jumps aside.
+// fetches and its owner tosses her the tennis ball. Her cry: it howls back and runs round its
+// owner's legs, the lead wound round them a while (5 s from the cry): nothing to trip on. Tripped
+// on its lead, she lies there and it comes and licks her face. Those three are pictures of the two
+// of them together (WIND, TOSS, LICK). In a lunge it jumps aside.
 export class Fetcher {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -851,6 +873,12 @@ export class Fetcher {
     }
 
     collar() {
+        // (Licking her face, the dog is in her picture: its collar there, by the frame shown.)
+        if (this.lickGag) {
+            const gag = this.lickGag, i = (gag.anims.currentFrame?.index ?? 1) - 1;
+            const [col, row] = LICK.collar[i] ?? LICK.collar[0];
+            return { x: gag.x + this.licked.face * (col - 63.5), y: gag.y - 75 + row };
+        }
         const g = this.dog, f = Number(g.sprite.frame.name);
         let at = LEAD.collar.stand;
         for (const [clip, frames] of Object.entries(g.meta.anims)) {
@@ -900,20 +928,65 @@ export class Fetcher {
         return (this.span ??= this.scene.spanOn(d.x, d.x - d.reach, d.x + d.reach, d.y, 10));
     }
 
-    // Her cry: a howl back at her, and round its owner's legs: the lead lies flat a while.
+    // Her cry: a howl back at her, and it runs to its owner and round her legs: the lead lies along
+    // the carpet as it runs, then wound round her legs a while (WIND), and no one trips on it.
     heard() {
-        const d = this.def, s = this.scene;
-        if (!this.dog || !this.world.hears(this.dog.x, d.y) || this.state === 'fetch' || this.state === 'back') return;
-        sfx.at(this.dog.x, d.y).howl();
-        this.flatUntil = s.time.now + 5000;
-        this.target = d.x + 14;
-        this.go('wind', 5000);
+        const d = this.def, s = this.scene, g = this.dog, o = this.owner;
+        if (!g || !this.world.hears(g.x, d.y) || !FREE.has(this.state) || this.tossDir) return;
+        sfx.at(g.x, d.y).howl();
+        this.flatUntil = Infinity;              // until it has unwound
+        this.windSide = Math.sign(g.x - o.x) || o.dir;
+        this.windEnd = s.time.now + WIND.ms;
+        this.target = o.x + this.windSide * WIND.dx;
+        this.go('wind');
+    }
+
+    // At her feet: the two of them in one picture (the dog sprite and the drawn lead hidden), round
+    // her legs, tied, unwound; then the dog sitting at her feet as in that picture, the lead its own.
+    wound() {
+        const s = this.scene, o = this.owner, g = this.dog, P = this.world.people;
+        this.go('winding');
+        this.together = true;
+        g.sprite.setAlpha(0);
+        o.dir = this.windSide;
+        P.place(o);
+        this.ownerClip('wind', () => {
+            this.go('tied');
+            this.ownerClip('tied');
+            s.time.delayedCall(Math.max(WIND.tiedMin, this.windEnd - s.time.now), () => {
+                this.go('unwinding');
+                // (Its last frame is their picture, the dog sat at her feet: held, until it gets up.)
+                this.ownerClip('unwind', () => this.go('sat', 1200));
+            });
+        });
+    }
+
+    // Getting up from her feet after their picture: the dog sprite where it sat in it, the lead its
+    // own again (the lead changes as the dog moves off, never while all three stand still).
+    apart() {
+        const o = this.owner, g = this.dog, P = this.world.people;
+        this.together = false;
+        this.flatUntil = 0;
+        g.x = o.x + this.windSide * WIND.dx;
+        g.dir = this.windSide;
+        g.sprite.setAlpha(1);
+        P.place(g);
+        P.idle(o);
+    }
+
+    // One of the owner's clips with the dog: looped, or played through and then `then`, at once in
+    // the same frame (never her idle between: she would stand there without the dog for a frame).
+    ownerClip(name, then) {
+        const o = this.owner;
+        o.state = 'acting';
+        this.world.people.anim(o, name, { loop: !then });
+        if (then) o.sprite.once(`animationcomplete-people-${o.who}-${name}`, then);
     }
 
     // A tangerine on the carpet within its reach: it fetches it.
     offered(t) {
         const d = this.def, s = this.scene, g = this.dog;
-        if (!g || this.state === 'fetch' || this.state === 'back' || this.state === 'wind' || t.route !== 'inside') return false;
+        if (!g || !FREE.has(this.state) || t.route !== 'inside') return false;
         const r = this.range();
         if (Math.abs(t.img.y + 3 - d.y) > 6 || t.img.x < r.lo || t.img.x > r.hi) return false;
         this.fruit = s.loose.claim(t).setAngle(0);
@@ -926,7 +999,7 @@ export class Fetcher {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, g = this.dog, P = this.world.people;
         if (!g || !nearby(s, d)) return;
-        const speed = { walk: 40, fetch: 150, back: 130, wind: 120 }[this.state] ?? 0;
+        const speed = { walk: 40, fetch: 150, back: 130, wind: 120, lick: 150 }[this.state] ?? 0;
         if (speed) {
             if (this.state === 'back') this.target = p.x - (p.x > g.x ? 14 : -14);
             const r = this.range(), to = Phaser.Math.Clamp(this.target, r.lo, r.hi);
@@ -943,21 +1016,40 @@ export class Fetcher {
                 if (there || Math.abs(p.x - g.x) < 22) this.drop();
             } else if (this.state === 'walk' && there) {
                 this.go('sit', Phaser.Math.Between(1800, 3800));
-            } else if (this.state === 'wind' && time > this.at) {
-                this.go('sit', 1200);
+            } else if (this.state === 'wind' && there) {
+                this.wound();
+            } else if (this.state === 'lick' && there) {
+                this.go('lickwait');
             }
-        } else if (this.state === 'sit') {
-            if (!P.anim(g, 'sit', { loop: false })) g.sprite.setFrame(g.meta.stand);
+        } else if (this.state === 'lickwait') {
+            this.lickWait(time);
+        } else if (this.state === 'sit' || this.state === 'sat') {
+            // (`sat`: sitting already, as their picture left it.)
+            if (this.state === 'sit' && !P.anim(g, 'sit', { loop: false })) g.sprite.setFrame(g.meta.stand);
             if (time > this.at) {
+                const apart = this.together;
+                if (apart) this.apart();
                 const r = this.range();
                 this.target = Phaser.Math.Between(r.lo + 10, r.hi - 10);
+                // (Out of the loops round her legs it trots off away from her, never back through
+                // them; walking from the first frame it is its own.)
+                if (apart) {
+                    const side = this.windSide, from = this.owner.x + side * 40;
+                    const end = side > 0 ? r.hi - 10 : r.lo + 10;
+                    this.target = (side > 0 ? end > from : end < from) ? Phaser.Math.Between(Math.min(from, end), Math.max(from, end)) : end;
+                }
                 this.go('walk');
+                if (apart) {
+                    g.dir = Math.sign(this.target - g.x) || g.dir;
+                    P.anim(g, 'walk');
+                }
             }
         } else if (this.state === 'aside' && time > this.at) {
             this.go('sit', 1500);
         }
         P.place(g);
-        const o = this.owner, face = g.x < o.x ? -1 : 1;
+        // (She faces the dog; tossing the ball, her; round her legs, as their picture is.)
+        const o = this.owner, face = this.tossDir || (this.together ? this.windSide : g.x < o.x ? -1 : 1);
         if (o.dir !== face) {
             o.dir = face;
             P.place(o);
@@ -977,11 +1069,102 @@ export class Fetcher {
         }
         this.fetches += 1;
         this.go('sit', 2500);
-        if (this.fetches >= 3 && !this.world.save.keeps.includes(d.gives)) {
+        if (this.fetches >= 3 && !this.world.save.keeps.includes(d.gives) && !this.tossDir) {
             const o = this.owner;
             this.world.pop(o.x, d.y - PLAYER.height - 6, 'heart', 1500);
             sfx.at(o.x, d.y).giggle();
-            s.time.delayedCall(700, () => this.world.giveKeep(d.gives, s.player.x, s.player.y - PLAYER.height));
+            this.toss();
+        }
+    }
+
+    // The tennis ball out of her pocket and tossed to her (TOSS): turned to her, her lead in her other
+    // fist as always; the ball in her hand is the clip's until her hand opens, then the game's.
+    toss() {
+        const s = this.scene, o = this.owner, P = this.world.people, key = `people-${o.who}-toss`;
+        this.tossDir = Math.sign(s.player.x - o.x) || o.dir;
+        o.dir = this.tossDir;
+        P.place(o);
+        const open = (anim, frame) => {
+            if (anim.key !== key || frame.index - 1 < TOSS.release) return;
+            o.sprite.off('animationupdate', open);
+            this.fly();
+        };
+        o.sprite.on('animationupdate', open);
+        this.ownerClip('toss', () => {
+            o.sprite.off('animationupdate', open);
+            this.tossDir = 0;
+            P.idle(o);
+        });
+    }
+
+    // The ball from her hand to her chest, a lob over the corridor (behind the owner's fingers as it
+    // leaves them, then in front of her); where it reaches her, it is hers.
+    fly() {
+        const s = this.scene, o = this.owner, p = s.player, d = this.def;
+        const x0 = Math.round(o.x) + o.dir * TOSS.from[0], y0 = o.sprite.y - TOSS.from[1];
+        const ball = s.add.image(x0, y0, 'things', 'tennis-ball').setDepth(s.DEPTH.props + 0.065);
+        this.world.add([ball]);
+        const [k, lo, hi] = TOSS.top, g = TOSS.g, dx = p.x - x0, ty = p.y - TOSS.chest;
+        const top = Phaser.Math.Clamp(Math.abs(dx) * k, lo, hi), vy = -Math.sqrt(2 * g * top);
+        const T = -vy / g + Math.sqrt(Math.max(0, 2 * (ty - (y0 - top)) / g)), vx = dx / T;
+        // (On the scene's clock, frame by frame: a tween keeps a clock of its own.)
+        const start = s.time.now;
+        const fly = () => {
+            const t = Math.min(T, (s.time.now - start) / 1000);
+            ball.setPosition(Math.round(x0 + vx * t), Math.round(y0 + vy * t + g * t * t / 2));
+            // (Out of the owner's fingers, it comes on in front of her: it reaches her, and its
+            // sparkle is over her, the user, 2026-11-17.)
+            if (Math.abs(ball.x - x0) > 6) ball.setDepth(p.depth + 0.01);
+            if (t < T) return;
+            s.events.off('update', fly);
+            ball.destroy();
+            this.world.giveKeep(d.gives, ball.x, ball.y);
+        };
+        s.events.on('update', fly);
+    }
+
+    // She tripped on its lead and lies there: it runs to her face and licks it (LICK), her
+    // checkpoint waiting for it (`down.holds`). Not if her face is out of its lead's reach, nor
+    // while it is busy (a tangerine in its mouth, round its owner's legs).
+    lick() {
+        const s = this.scene, p = s.player, g = this.dog;
+        if (!g || !s.down || !FREE.has(this.state)) return;
+        const face = p.flipX ? -1 : 1, spot = Math.round(p.x) + face * LICK.dog, r = this.range();
+        if (spot < r.lo || spot > r.hi) return;
+        let done;
+        s.down.holds.push(new Promise(resolve => { done = resolve; }));
+        this.licked = { face, done, giveUp: s.time.now + 4000 };
+        this.target = spot;
+        this.go('lick');
+    }
+
+    // At her face, standing, turned to her: their picture takes over when hers is at its frame
+    // (her dazed loop's second, the picture's first: the butterflies where they were).
+    lickWait(time) {
+        const s = this.scene, p = s.player, g = this.dog, L = this.licked;
+        g.dir = -L.face;
+        g.sprite.anims.stop();
+        g.sprite.setFrame(g.meta.stand);
+        if (p.anims.currentAnim?.key === 'her-dazed-lie' && p.anims.currentFrame?.index === 2) {
+            const gag = s.add.sprite(Math.round(p.x) + L.face * LICK.gag, p.y + s.herDropPx(), 'her-mishaps')
+                .setOrigin(0.5, 1).setFlipX(p.flipX).setDepth(p.depth);
+            s.worldLayer.add(gag);
+            p.setVisible(false);
+            g.sprite.setAlpha(0);
+            this.lickGag = gag;
+            this.go('licking');
+            s.gagEnd = () => {
+                gag.destroy();
+                this.lickGag = null;
+                p.setVisible(true);
+                g.sprite.setAlpha(1);
+                this.go('sit', 1500);
+            };
+            gag.play('gag-dog-lick');
+            gag.once('animationcomplete-gag-dog-lick', () => L.done());
+        } else if (time > L.giveUp || !s.down) {
+            L.done();
+            this.go('sit', 1500);
         }
     }
 
@@ -989,6 +1172,11 @@ export class Fetcher {
     // down from her fist to just over the carpet and up to the collar, or after her
     // cry round her feet and along the carpet.
     drawLead(time) {
+        // (Round her legs it is in their picture.)
+        if (this.together) {
+            this.lead.clear();
+            return;
+        }
         const floor = this.def.y - 1, pts = this.curve(time);
         // Whole px, joined side by side (no diagonal gaps), then a dark px under each: 2 px thick (the
         // picture's 3, its outline on both sides, was too thick, the user).
@@ -1000,8 +1188,12 @@ export class Fetcher {
             core.set(`${x},${y}`, [x, y]);
             last = { x, y };
         }
-        // (Lying round her feet after her cry the dog is at her feet too: the lead under it then.)
-        const g = this.lead.clear().setDepth(this.scene.DEPTH.props + (time < this.flatUntil ? 0.04 : 0.06));
+        // (Lying round her feet after her cry the dog is at her feet too: the lead under it then.
+        // Licking her face, the dog is in her picture: over it, as always, when its owner is on that
+        // side of her; from the other side it comes from under her, as it lay when she tripped.)
+        const s = this.scene, gag = this.lickGag;
+        const over = gag && Math.sign(this.owner.x - s.player.x) === this.licked.face;
+        const g = this.lead.clear().setDepth(over ? gag.depth + 0.01 : s.DEPTH.props + (time < this.flatUntil ? 0.04 : 0.06));
         g.fillStyle(LEAD.edge, 1);
         for (const [x, y] of core.values()) {
             if (y + 1 <= floor && !core.has(`${x},${y + 1}`)) g.fillRect(x, y + 1, 1, 1);
@@ -1014,7 +1206,7 @@ export class Fetcher {
     // a moment); hopped, or in a lunge, it is nothing.
     trip(p, time) {
         const s = this.scene, d = this.def, m = this.sag();
-        if (s.isLunging() && here(s, d) && Math.abs(p.x - this.dog.x) < 20 && this.state !== 'aside') this.jumpAside(p);
+        if (s.isLunging() && here(s, d) && Math.abs(p.x - this.dog.x) < 20 && FREE.has(this.state) && this.state !== 'aside') this.jumpAside(p);
         const side = Math.sign(p.x - m.x) || 1;
         // (Only crossing the line itself, from right beside it: a teleport or a fright's walk back
         // across it is no trip.)
@@ -1023,6 +1215,8 @@ export class Fetcher {
             sfx.at(this.dog.x, d.y).bark();
             // (From behind her: she goes on the way she was going, forward.)
             s.scareContact(p.x - side * 10, 'lead');
+            // (Down on her belly: it comes and licks her face.)
+            this.lick();
         }
         this.side = side;
     }

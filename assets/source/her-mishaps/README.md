@@ -63,3 +63,12 @@ state's own clips with the big vacuum (`ride`, `sit-on-vacuum`) are on PixelLab,
 Tried and not used: a first suitcase state (`56fd2d7c-b0b4-47f1-84ca-334628f115f1`: darker, no
 handle, unlike the game's); a map object to complete the vacuum (`18c5fa65-...`: flatter and
 lighter than the one she rides).
+
+## The dog's lick (2026-11-17)
+
+`dog-lick/raw/`: PixMiniMax (`28bdde8e-003a-446c-bb65-f8af818d781f`, 1 generation) from
+`raw/start.png` (her `dazed-lie/1.png` with the dog's standing picture turned to her at her face, its
+feet on her floor) to the same: the dog licks her face. `butterflies.py` puts her butterflies back to
+her yellow (the generator drew some purple and teal) and writes `dog-lick/0.png` to `7.png`. In the
+sheet as `dog-lick`, on her row 74 as her dazed clip is; played by the dog (`LICK` in
+src/world/movers.js).

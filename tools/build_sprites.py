@@ -259,6 +259,11 @@ HER_MISHAPS = {
         # world's own is drawn over her while it plays); its first (standing) frame left out, on
         # row 118 of its 140 px frames. Its middle, column 96, is 20 px past the trolley's (`at`).
         "trolley-trip": [(f"trolley-trip/{i}.png", 118) for i in range(1, 9)],
+        # The dog's lick after a trip on its lead (2026-11-17): her lying dazed with the dog at her
+        # face, one picture (PixMiniMax from her dazed-lie frame 1 and the dog's standing picture
+        # turned to her: `dog-lick/raw/start.png`); her body as in that frame, so on its row 74
+        # (her hand under her chin) as her own clip has it, and drawn 2 px lower as she is (LIE_DROP).
+        "dog-lick": [(f"dog-lick/{i}.png", 74) for i in range(8)],
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
     # Moved sideways as another clip is, which it carries on from.
@@ -269,7 +274,10 @@ HER_MISHAPS = {
     # kept for her falling back).
     "middle": {"paper-behind": 36, "paper-front": 28, "cart-drape": 70, "cart-kick": 70, "cart-sit": 52,
                "cart-push": 68, "cart-bounce": 68,
-               "tray-sit": 108, "trolley-trip": 96},
+               "tray-sit": 108, "trolley-trip": 96,
+               # (Her middle is column 48, as in her dazed clip; the dog reaches to 105: the cell's
+               # middle 16 px in front of hers, `GAGS` none: the dog's own `LICK` in movers.js.)
+               "dog-lick": 64},
     # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
     "paper": ("paper-",),
     "baseline": "ride-vacuum/east.png",

@@ -450,6 +450,24 @@ Lessons learned (2026-11-17, the dog and its owner made together):
 - **An exception to a rule of hits** is a property of its scenario read where the rule is
   applied (`pocket: false`, asked by `pocket()`), never a check at one caller.
 
+Lessons learned (2026-11-17, the dog's together clips):
+
+- **A together clip hands over by its own pictures, not by matching drawn lines to them:** the dog
+  runs to the spot where its sprite lies on their picture, and the clip starts; at the end the
+  clip's last frame is held until something moves (the dog gets up), and the game's lead takes over
+  then. A drawn line made to match a picture's at rest never quite did.
+- **A clip played backwards moves things the way they do not face** (the dog would run tail first):
+  the way back is a clip of its own, from the end picture to the start one.
+- **A thing handed on from a clip to the game** (the ball from her hand): the clip has it until the
+  frame the hand opens, and the game's starts moving from where it was held at that very frame; it
+  never stands still in the air a frame. Its depth follows what it passes: behind the fingers that
+  hold it, in front of whoever it reaches.
+- **Phaser's tweens keep a wall clock of their own:** a thing moved by one is not slowed by the
+  game's clock (a recording stepped frame by frame showed the ball three times too fast); move it
+  on the scene's `update` with `time.now`.
+- **Someone who comes to her while she is down holds her checkpoint** (`down.holds` in
+  `scareDown`), never a longer fixed wait.
+
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The

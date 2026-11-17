@@ -26,7 +26,10 @@ DEFAULT_FPS = 8
 # the floor"). By clip name, or (figure, clip).
 OFF_THE_FLOOR = {"run", "jump", "shriek", "bounce", "step", "steps", "lunge", "kiss", "flap", "flap2",
                  "dance", "clap", "cheer", "bolt", "fleeing",
-                 ("rival", "swat"), ("rival", "swing")}
+                 ("rival", "swat"), ("rival", "swing"),
+                 # (The dog's owner with the dog running round her legs: her feet stay where she
+                 # stands; the dog's paw a px lower in one frame is not the floor.)
+                 ("dogowner", "wind"), ("dogowner", "unwind")}
 
 
 def lowest_row(img):

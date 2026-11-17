@@ -15,7 +15,8 @@
   "cart-push": 81,
   "cart-bounce": 89,
   "tray-sit": 95,
-  "trolley-trip": 102
+  "trolley-trip": 102,
+  "dog-lick": 110
  },
  "anims": {
   "vacuum-sit": [
@@ -157,6 +158,16 @@
    107,
    108,
    109
+  ],
+  "dog-lick": [
+   110,
+   111,
+   112,
+   113,
+   114,
+   115,
+   116,
+   117
   ]
  },
  "cols": 48

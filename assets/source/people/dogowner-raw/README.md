@@ -21,6 +21,21 @@ tangerine, trips her); the pictures are new. 47 generations.
 | `clips/dog-run/` | The dog running: `../dog/run/` | the dog template `running-6-frames` in skeleton-v3 on `be63988d`, group `d2e58583-cbbe-4c1d-af27-810f0860003f` (3) |
 | `clips/dog-sit/` | Sitting down, from standing to the approved sitting dog as the end frame: `../dog/sit/` | PixMiniMax, `7a5fbe32-2dd8-4a73-8622-ba82c00b5847` (1) |
 
+## Their together clips (2026-11-17, 22 generations with the ball's candidates)
+
+| File | What | PixelLab |
+|---|---|---|
+| `pair-wound.png` | The two, the lead wound round her legs, the dog sat against her shins, her hand up | `edit_image_pro_flash` of `east.png`, job `014289ee-b61c-4868-a557-334dd89bdb0c` (5) |
+| `clips/pair-wind/` | From `east.png` (0) to it: the dog runs round her legs, the lead winds; 1 to 12 are `../dogowner/wind/` | PixMiniMax, `bbc5165d-4828-4a29-ba5d-d685aaf6e4bb` (2) |
+| `clips/pair-tied/` | Tied, a loop on `pair-wound.png`; 1 to 4 are `../dogowner/tied/` | PixMiniMax, `07673e2b-8bb3-4ec2-8da8-d3fd0c20242b` (1) |
+| `clips/pair-unwind/` | From `pair-wound.png` back to `east.png`, the other way round; 1 to 12 are `../dogowner/unwind/` (its last frame is `east.png`'s px) | PixMiniMax, `cfff0829-a485-4621-b8f9-cd8f1eb4004c` (2) |
+| `clips/owner-toss/` | The tennis ball out of her pocket, tossed underhand, her lead fist still; `ball_in_hand.py` puts the game's ball in her hand and writes `../dogowner/toss/` | PixMiniMax, `fdc6614e-1522-4305-aa7b-9fc5307c6198` (1) |
+
+The lick, her and the dog, is with her gags: `assets/source/her-mishaps/dog-lick/`. The tennis
+ball's 64 small candidates with a dark outline (`create_image_pro`, `fd3e097b-fed4-46d7-afdc-78bcfdd3bb8b`,
+10) were not used: the user chose the generated ball shrunk keeping its seam (`SEAM` in
+`tools/build_things.py`).
+
 ## Tries not used
 
 | File | PixelLab | Why not |

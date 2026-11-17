@@ -2349,3 +2349,40 @@ here" 7); each built step is gone back over under its "Revision".
   asked by `pocket()` itself, so every way a hit reaches her follows it.
 - Passed: `deck4` (with the new checks: she falls with tangerines, back with all three), `sound`;
   `boot`; the rest not run.
+
+## The dog's together clips (2026-11-17)
+
+- **The three moments the dog and someone are close, each one picture of the two** (the user's idea
+  for the dog, the hybrid agreed: separate sprites joined by a drawn lead, together clips where they
+  meet; "Go ahead with all three"). Made by PixMiniMax from the approved pictures (12 generations):
+  - **The lead round her legs (her cry):** an end picture of the two, the lead wound round her legs,
+    the dog sat against her shins (`edit_image_pro_flash` of their picture, 5); the winding toward it
+    and the unwinding from it back to their picture (2 each), and a loop of the two tied (1). The
+    winding played backwards would have the dog run tail first: the unwinding is its own clip. Her
+    "surprise" marks are the generator's, kept ("All good").
+  - **The toss:** her free hand to her pocket, the ball out, tossed underhand, her lead fist the
+    same px in every frame (1).
+  - **The lick:** her dazed-lie frame with the dog's standing picture turned to her at her face, to
+    the same (1); its butterflies drawn purple and teal, put back to her yellow by rule.
+- **The tennis ball** (the user: "has to look like a tennis ball"): the game's had been the
+  generated ball shrunk to 5 px by majority, its seam lost. 64 small candidates were made (10) with
+  a dark outline before the user's word ("don't use black outline"): not used. The user chose from
+  six shrinks of the same picture keeping its seam (7 or 8 px; none, a grey or an olive outline):
+  8 px with the olive (`SEAM` in `tools/build_things.py`, its own colours, not the palette's, which
+  dulled it).
+- **The toss made seamless** (the user, three times): the ball in her hand behind her fingers (at her
+  hip, held out; "partially covered by lady's hand", its place moved); the flight a lob, its top a
+  fifth of the way across (it had risen a little and flown flat, "Innatural"); the ball leaving her
+  hand as it opens, from where she held it (it had hung a frame over her open hand, "like the ball
+  takes off by itself"); in front of her as it reaches her, under the sparkle ("the final animation
+  with sparks is on top of her").
+- **In the game:** the dog runs to its place in their picture (17 px in front of her, where its
+  sitting picture lies on theirs) and the clip takes over; at the end their picture is held while it
+  sits and the game's dog and lead take over as it gets up, trotting away from her: the game's lead
+  at that spot never matched the picture's (tried: hung no lower than the collar when close; undone).
+  The lick waits for her dazed loop's frame the picture starts on; the lead's collar end is measured
+  in its 8 frames; over the dog when its owner is on her face's side (it had looked tied to its
+  rump), from under her when not. Her checkpoint waits for anyone with her (`down.holds`).
+- Passed: `deck4` (its new checks for all three) three runs in four, `boot`; the fourth failed later
+  on, the lob onto the climb's shelf not knocking the feather down; not seen again in three runs.
+  The rest not run.

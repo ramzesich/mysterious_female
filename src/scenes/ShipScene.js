@@ -4726,12 +4726,24 @@ export class ShipScene extends Phaser.Scene {
             };
             p.on('animationupdate', down);
         }
+        // Someone who comes to her while she lies there (the dog's lick, `Fetcher.lick()`) puts a
+        // promise in `down.holds`: her checkpoint waits for each of them.
+        const down = this.down = { holds: [] };
         // (`downMs`: dazed a shorter while than the stand-in's.)
         p.once(`animationcomplete-${clip}`, () => {
             const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
             if (this.anims.exists(dazed)) this.herClip(dazed);
-            this.time.delayedCall(sc.downMs ?? 2100, () => this.respawn());
+            this.time.delayedCall(sc.downMs ?? 2100, () => Promise.all(down.holds).then(() => {
+                if (this.down === down) this.respawn();
+            }));
         });
+    }
+
+    // How many px lower than her body her picture is drawn now (`herDrop`): a picture that takes
+    // her place (a gag) is set down by it too.
+    herDropPx() {
+        const p = this.player;
+        return Math.round(p.height - p.displayOriginY);
     }
 
     // Hit in the air under the parasol (a gull across her way down to the bow): it is knocked out
@@ -4811,6 +4823,7 @@ export class ShipScene extends Phaser.Scene {
         if (this.respawning) return;
         this.respawning = true;
         this.script = null;
+        this.down = null;
         const from = this.scareFrom || { x: this.player.x, y: this.player.y };
         // (Over the bow she comes back where the glide starts: src/world/finale.js.)
         const target = this.world.story.respawnFor?.(from) || this.closestCheckpoint(from.x, from.y);

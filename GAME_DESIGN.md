@@ -2378,13 +2378,18 @@ Nothing blocks the start of the build. These get settled along the way:
       the collar measured frame by frame, 2 px, hanging low where she trips); **Decided (the user):
       on the dog's lead she falls whatever she carries and keeps her tangerines** (`pocket: false`,
       a scenario's exception to the tangerines; more to come); everyone's clips on the floor frame
-      by frame; her lying 2 px lower; her running steps on her footfalls. **Next in step 4's
-      revision:** the dog's together clips (the lead wound round her legs after the cry, the tennis
-      ball given, the lick after a trip); then step 4a
+      by frame; her lying 2 px lower; her running steps on her footfalls. **Done (2026-11-17): the
+      dog's together clips**, each one picture of the two: after her cry it winds the lead round its
+      owner's legs, they stand tied, it unwinds it; three fetches and the owner tosses her the tennis
+      ball (the ball 8 px with its seam, an olive outline, in front of her as it reaches her); tripped
+      on its lead, it licks her face, her checkpoint waiting for it. **Next in step 4's revision:**
+      step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
-      three runs; the round itself always moved on when watched; its wait was lengthened.
+      three runs; the round itself always moved on when watched; its wait was lengthened. Another
+      (the lob onto the climb's shelf knocking the feather down) failed once in four runs after the
+      dog's together clips, and not in three runs of it alone; cause not found.
       Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look

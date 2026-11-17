@@ -359,7 +359,7 @@ and with none, by its side and by who was moving, is §1.6 (2026-11-16).
 | The steward on his rounds (8) | Pulls his cart in at once, as at a knock | · (solid) | Stops and puts it on his cart, hers to take back with E. Not spent | · |
 | The buffet queue (11) | They turn aside against the tables, as for a tray | · (solid) | · | · |
 | The kid with the water pistol (11) | **Draws his fire**: he turns and squirts at once | Runs and hides (built) | Catches it, eats it, back turned 15 s. Spent | Forgiven |
-| The dog on the lead (4, new) | Howls back and winds the lead round its owner's legs: the line lies flat 5 s | Jumps aside | **Fetches it and brings it back.** Not spent | Forgiven: a stumble, and the dog fetches the tangerine back (§1.6, 2) |
+| The dog on the lead (4, new) | Howls back, runs to its owner and winds the lead round her legs (their picture): nothing to trip on until 5 s after the cry, and it unwinds | Jumps aside | **Fetches it and brings it back.** Not spent | Forgiven: a stumble, and the dog fetches the tangerine back (§1.6, 2) |
 | The paper round's steward (5, new) | Drops the bundle and stands aside | Through the papers | Catches it, stands aside to eat it. Spent | Forgiven |
 | Anyone else (the ambient cast) | Turns to look; a `♥` over the few who like cats, a finger to the lips in quiet places | · | Looks at it | · |
 | The librarian | The shush (built), and the "QUIET PLEASE" sign rattles | The same | · | · |
@@ -721,8 +721,16 @@ Shown: her throw's frames for approval before anything else; then each target as
   the spot she trips on (a little over halfway from her hand to the dog, as always: at her
   waist it "cannot trip her"). With it: lying flat after a trip she is drawn 2 px lower; her
   running footsteps on the frames her feet land on; everyone's clips set on the floor frame by
-  frame. Left of the dog: the together clips (the lead wound round her legs after the cry, the
-  tennis ball given, the lick).
+  frame. **Then their together clips (2026-11-17)**, the moments the two are close, each one
+  picture of them (the dog sprite and the drawn lead hidden while it plays; `WIND`, `TOSS`, `LICK`
+  in `src/world/movers.js`): her cry, and the dog runs to its place at her feet in their picture,
+  winds the lead round her legs, they stand tied until 5 s after the cry, it unwinds it, their
+  picture held while it sits, and it trots off away from her (nothing to trip on all the while);
+  three fetches, and she takes the tennis ball out of her pocket and tosses it, her lead fist still,
+  the ball the clip's while she holds it and the game's from the frame her hand opens, a lob to her
+  chest, in front of her as it reaches her (the user); a trip on its lead, and it runs to her face
+  and licks it, one picture of her lying dazed and the dog, the lead to its collar there, over the
+  dog when its owner is on that side and from under her when not; her checkpoint waits for it.
 
 ### Step 4a. The mishaps on the rest of the ship (art: about 125, in three batches)
 

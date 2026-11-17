@@ -200,7 +200,8 @@ export class BootScene extends Phaser.Scene {
                                            ['suitcase-sit', 11, 0], ['suitcase-ride', 8.8, -1], ['suitcase-tip', 11, 0], ['suitcase-dazed', 11, -1],
                                            ['paper-behind', 10, 0], ['paper-front', 10, 0],
                                            ['cart-drape', 10, 0], ['cart-kick', 4, -1], ['cart-sit', 10, 0], ['cart-push', 10, 0], ['cart-bounce', 10, 0],
-                                           ['tray-sit', 10, 0], ['trolley-trip', 10, 0]]) {
+                                           ['tray-sit', 10, 0], ['trolley-trip', 10, 0],
+                                           ['dog-lick', 8, 1]]) {
             if (!gag.anims[name]) continue;
             // (The papers' first three frames quicker: the paper's push carried into the fall.)
             const fast = name.startsWith('paper-') ? 3 : 0;
