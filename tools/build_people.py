@@ -19,6 +19,14 @@ SRC = ROOT / "assets" / "source" / "people"
 CELL = 80
 COLS = 24
 DEFAULT_FPS = 8
+# Clips in which the figure leaves the floor (a jump, a hop, a leap, a run): kept where the
+# generator drew each frame. Every other clip has its feet on the floor, and each of its frames is
+# set on the floor by its own lowest row: PixelLab's frames drift 1 to 4 px up and down, and a
+# dog sat, a lady stood, a kid idled in the air (the user, 2026-11-17: "not even placed properly on
+# the floor"). By clip name, or (figure, clip).
+OFF_THE_FLOOR = {"run", "jump", "shriek", "bounce", "step", "steps", "lunge", "kiss", "flap", "flap2",
+                 "dance", "clap", "cheer", "bolt", "fleeing",
+                 ("rival", "swat"), ("rival", "swing")}
 
 
 def lowest_row(img):
@@ -86,7 +94,8 @@ def build():
             base = feet if frames[0].size == stand.size else max(lowest_row(f) for f in frames)
             entry["anims"][clip_dir.name] = list(range(len(cells), len(cells) + n))
             entry["fps"][clip_dir.name] = clips.get(clip_dir.name, DEFAULT_FPS)
-            cells += [cell_of(f, base, flip) for f in frames]
+            down = clip_dir.name not in OFF_THE_FLOOR and (name, clip_dir.name) not in OFF_THE_FLOOR
+            cells += [cell_of(f, lowest_row(f) if down else base, flip) for f in frames]
         # ("cut": {name: (clip, [frames])}: a loop made of some of a clip's frames, e.g. the frames
         # where a book is already in his hands.)
         for new, (clip, picks) in opts.get("cut", {}).items():
