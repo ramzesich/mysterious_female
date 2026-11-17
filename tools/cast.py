@@ -51,7 +51,9 @@ CAST = {
     "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5, "swing": 10},
               {"cut": {"swing": ("swat", [2, 3, 4, 5, 7, 8])}}),
     # (His `bite`: a tangerine to his mouth, a bite, the hand down, chewing: src/world/people.js `eat`.)
-    "porter": ("00c30095-76c1-4898-a423-34f740532970", {"bite": 6}, {}),
+    # (`tip`: his hand from the cart's handle to his cap's brim, a nod, and back: 8c, she sat on his
+    # bags; v3 from his pushing frame, 2026-11-17.)
+    "porter": ("00c30095-76c1-4898-a423-34f740532970", {"bite": 6, "tip": 8}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
     "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
     "robe": ("9d68ff5f-80b7-4187-86a9-7cd9eff01bed", {}, {}),

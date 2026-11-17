@@ -232,13 +232,29 @@ HER_MISHAPS = {
         # Standing and in the air on row 87; lying on her elbows, row 85 (the last frame's paper
         # hanging past them cut at the floor).
         "paper-front": [(f"paper-front-belly/frame_{i:03d}.png", 87 if i < 7 else ("cut", 85)) for i in range(2, 11)],
+        # The porter's cart (8a to 8d, approved 2026-11-17): v3 of her base character from her own
+        # standing sprite beside the game's own cart (`cart-start/`), on its floor (row 115 of the
+        # 136 px frames, 117 of the 140 px ones). 8a: she runs into its front and folds over the bags,
+        # her first three (standing) frames left out so the run carries into the leap; then her legs
+        # kicking, looped. 8c: it reaches her back and she sits into the bags, the top one on her lap
+        # (the game's cart pasted back under her in frames 1 to 5, the generator's flying bag taken
+        # out: `cart-start/fix8c.py`). 8b and 8d are her alone (the world's cart and porter stay):
+        # pushed back and sat down; bounced off his back and sat down; sitting, by each frame's lowest row.
+        "cart-drape": [(f"cart-drape/{i}.png", 115) for i in range(3, 9)],
+        "cart-kick": [(f"cart-drape/{i}.png", 115) for i in range(5, 9)],
+        "cart-sit": [(f"cart-sit/{i}.png", 115) for i in range(1, 9)],
+        "cart-push": [(f"cart-push/{i}.png", 117 if i < 8 else "feet") for i in range(1, 9)],
+        "cart-bounce": [(f"cart-bounce/{i}.png", 117 if i < 6 else "feet") for i in range(3, 9)],
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
     # Moved sideways as another clip is, which it carries on from.
     "shift_as": {"suitcase-dazed": "suitcase-tip"},
     # A gag with no thing to place it by: her middle in its frames (her own sprite's, in the start
     # picture) on the cell's middle.
-    "middle": {"paper-behind": 36, "paper-front": 28},
+    # The cart's: its middle (8a, 8c), or 18 px behind hers (8b, 8d: her middle is column 86, room
+    # kept for her falling back).
+    "middle": {"paper-behind": 36, "paper-front": 28, "cart-drape": 70, "cart-kick": 70, "cart-sit": 52,
+               "cart-push": 68, "cart-bounce": 68},
     # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
     "paper": ("paper-",),
     "baseline": "ride-vacuum/east.png",

@@ -8,7 +8,12 @@
   "suitcase-tip": 28,
   "suitcase-dazed": 37,
   "paper-behind": 45,
-  "paper-front": 54
+  "paper-front": 54,
+  "cart-drape": 63,
+  "cart-kick": 69,
+  "cart-sit": 73,
+  "cart-push": 81,
+  "cart-bounce": 89
  },
  "anims": {
   "vacuum-sit": [
@@ -89,6 +94,48 @@
    60,
    61,
    62
+  ],
+  "cart-drape": [
+   63,
+   64,
+   65,
+   66,
+   67,
+   68
+  ],
+  "cart-kick": [
+   69,
+   70,
+   71,
+   72
+  ],
+  "cart-sit": [
+   73,
+   74,
+   75,
+   76,
+   77,
+   78,
+   79,
+   80
+  ],
+  "cart-push": [
+   81,
+   82,
+   83,
+   84,
+   85,
+   86,
+   87,
+   88
+  ],
+  "cart-bounce": [
+   89,
+   90,
+   91,
+   92,
+   93,
+   94
   ]
  },
  "cols": 48

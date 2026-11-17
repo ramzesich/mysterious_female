@@ -661,7 +661,14 @@ Shown: her throw's frames for approval before anything else; then each target as
   6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations.
   **Done (2026-11-16): 5b and 6b, and with them 5a, 6a and 6c, which ride too** (the user's
   word after trying it); the vacuum, made smaller, and the suitcase are cut from the same pictures.
-  Left: 8a to 8d, 10a, 10b, the dog's lick, the porter's cap (4a, 4b done, below). **The papers (2026-11-16,
+  Left: 10a, 10b, the dog's lick (4a, 4b done, below; the dog's lick waits for an idea of the
+  user's, to be talked over at the end of this step, 2026-11-17). **The porter's cart done
+  (2026-11-17):** 8a to 8d and his tip of the cap, clips of her from her own sprite beside the
+  game's own cart (`assets/source/her-mishaps/README.md`), played by the ship scene's `cartGag`
+  (`GAGS` cartDrape, cartPush, cartSit, cartBounce): the cart's clips set down where she stands
+  and the world's cart hidden; her alone for 8b (the porter pushes on, his cart's front at hers)
+  and 8d (he walks on a step or two, then turns round); 8c's ride two metres and his cap;
+  doors and walls stop him (§1.8). **The papers (2026-11-16,
   under way):** a first 4a (sat, a tent) and 4b (on her belly, a blanket, the paper from behind)
   were approved as clips and put in the game (`fallGag` in the ship scene, a stopped paper fading
   for 4c, the start place `deck5`); the user tried them and asked for them again by the paper's

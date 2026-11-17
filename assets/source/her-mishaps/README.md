@@ -24,6 +24,15 @@ character "Bumbusik (final)" (`ebd5dadc-1318-4717-b0c0-6f429a7a58f0`) with the t
 | `paper-front-belly/` | **4a in the game (approved 2026-11-17; the same):** the paper under her front foot skids it back, that leg flies up behind her, she topples onto her belly, the paper carried up and dropped on her back (the user's brief: from the front, on her belly) | `paper-front-belly-3`, v3 from `start2-4b.png` toward `end-4b.png` |
 | `paper-front-kick/` | Not used: the first try at the one above, the leg kicked up in front | `paper-front-belly-1` |
 | `paper-start/` | The pictures the paper clips were made from: her own standing sprite in an 80 px frame (`start-*`; `start2-*` with the sliding newspaper under her foot), and the targets (`end-*`: the first stills shrunk to her size) | made here |
+| `cart-drape/` | **8a (approved 2026-11-17):** she runs into the porter's cart and folds over its bags, arms down the far side, legs kicking; frames 3 to 8 in the game (`cart-drape`), 5 to 8 looped slowly (`cart-kick`, 4 a second: faster read as twitching, the user) | animation `cart-8a-draped` of her base character, v3 from `cart-start/start-8a.png` (her own standing sprite before the game's own cart, its two atlas pieces) |
+| `cart-push/` | **8b:** the cart pushes into her front; she leans into it, back-pedals and sits down hard (her alone: the world's cart follows her) | `cart-8b-backpedal-2`, v3 from `cart-start/start-solo.png` toward `end-8b.png` (8d's first try's sitting frame, its cushion taken out) |
+| `cart-sit/` | **8c:** the cart reaches her back; she hops back onto the stack and sits, the top bag on her lap. The generator tossed the top bag into the air twice: here it is taken out, and in frames 1 to 5 the game's own cart is put back under her, her pixels kept by their colours (`cart-start/fix8c.py`); the raw frames are `cart-tries/cart-8c-sit-raw/` | `cart-8c-sit-2`, v3 from `start-8c.png` toward `end-8c.png` (the first try's last frame) |
+| `cart-bounce/` | **8d:** she runs into his back, bounces off and sits (her alone) | `cart-8d-bounce-2`, v3 from `start-solo.png` toward `end-8d.png` |
+| `cart-start/` | The start pictures and end targets of the four, and the scripts that made them and the composed strips shown to the user (`starts.py`, `fix8c.py`, `compose.py`) | made here |
+| `cart-tries/` | Not used: the first tries (8b ended lying flat; 8d drew a cushion, "something soft" in the description; 8c threw the bag up) | the same character |
+
+The porter's tip of the cap (8c's end) is his own clip, `assets/source/people/porter/tip/` (his character
+`00c30095-76c1-4898-a423-34f740532970`, animation `tip-cap`, v3 from his pushing frame; frames 1 to 8).
 
 The first two stills of the paper gags (states `7902a37e-18bc-40f0-a669-a788ff8dadfd` "Paper tent" and
 `71676d85-d4ae-466c-8b6e-d3cdbf5545ca` "Paper blanket") came out a quarter bigger than her (the user saw

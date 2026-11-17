@@ -4465,6 +4465,7 @@ export class ShipScene extends Phaser.Scene {
             this.flinchUntil = this.time.now + 10000;
             return;
         }
+        if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
         if (sc.gag && this.anims.exists(GAGS[sc.gag].fall)) return this.fallGag(sc, ride);
         if (sc.down) return this.scareDown(sc);
@@ -4585,6 +4586,92 @@ export class ShipScene extends Phaser.Scene {
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
         s.play(g.fall);
         s.once(`animationcomplete-${g.fall}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+    }
+
+    // Her gag with the porter and his cart (§1.6, 8a to 8d; `GAGS` cartDrape, cartPush, cartSit,
+    // cartBounce): one picture of her (with the cart in it for 8a and 8c, set down by the world's
+    // cart's middle, which is hidden), while the porter stands, follows her with his cart, wheels
+    // her on or turns round. Doors and walls stop him (`stopShort`). Then her checkpoint; he walks on.
+    cartGag(sc, q) {
+        const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        const dx = q.attached[0]?.dx ?? 24, walk = q.walk.clip ?? 'walk', v = q.walk.v * 48;
+        // (He stands at his handle: his push's first frame, held.)
+        const hold = () => { q.sprite.anims.stop(); q.sprite.setFrame(q.meta.anims[walk]?.[0] ?? q.meta.stand); };
+        const move = (x) => { q.x = x; pe.place(q); };
+        q.state = 'acting';
+        q.busy = true;
+        hold();
+        // (Each picture has her facing east: 8a's cart coming at her, 8c's up behind her. Set down
+        // where she stands; the porter is brought the last few px up to it.)
+        const x = g.cart ? p.x + face * g.cartAt : p.x - face * g.her;
+        if (g.cart) move(x - q.dir * dx);
+        const s = this.add.sprite(x, q.y, 'her-mishaps').setOrigin(0.5, 1).setFlipX(face < 0).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        if (g.cart) for (const a of q.attached) a.img.setVisible(false);
+        this.gagEnd = () => {
+            s.destroy();
+            p.setVisible(true);
+            for (const a of q.attached) a.img.setVisible(true);
+            q.busy = false;
+            pe.place(q);
+            pe.idle(q);
+            q.pausedUntil = this.time.now + 600;
+        };
+        const end = () => this.time.delayedCall(g.holdMs, () => this.respawn());
+        s.play(g.clip);
+        if (g.fronts) {
+            // 8b: he pushes on, blind behind his bags, the cart's front at hers, till she is down.
+            pe.anim(q, walk);
+            this.script = () => {
+                const k = Math.min((s.anims.currentFrame?.index ?? 1) - 1, g.fronts.length - 1);
+                const want = p.x + face * g.fronts[k], at = q.x + q.dir * (dx + 14);
+                // (Only ever on toward her, never further than she is pushed.)
+                if ((want - at) * q.dir > 0) move(this.stopShort(q.x, q.x + (want - at), q.y, dx + 14));
+            };
+            s.once(`animationcomplete-${g.clip}`, () => { this.script = null; hold(); end(); });
+        } else if (g.walkOnMs) {
+            // 8d: he walks on a few steps before he notices, then turns round to her (his cart
+            // stays where it is, in front of him).
+            pe.anim(q, walk);
+            const stop = this.stopShort(q.x, q.x + q.dir * (v * g.walkOnMs / 1000), q.y, dx + 14);
+            this.script = (dt) => {
+                const step = Math.min(v * dt, Math.abs(stop - q.x));
+                move(q.x + q.dir * step);
+                if (Math.abs(stop - q.x) < 0.5) {
+                    this.script = null;
+                    q.sprite.anims.stop();
+                    q.sprite.setFrame(q.meta.stand).setFlipX(q.dir > 0);
+                }
+            };
+            s.once(`animationcomplete-${g.clip}`, end);
+        } else if (g.rideM) {
+            // 8c: sat in his bags; he wheels her on, sees her and tips his cap.
+            s.once(`animationcomplete-${g.clip}`, () => {
+                const to = this.stopShort(s.x, s.x + q.dir * g.rideM * 48, q.y, 16);
+                pe.anim(q, walk);
+                this.script = (dt) => {
+                    const step = Math.min(v * dt, Math.abs(to - s.x));
+                    s.x += q.dir * step;
+                    move(q.x + q.dir * step);
+                    p.x = s.x;
+                    if (Math.abs(to - s.x) < 0.5) {
+                        this.script = null;
+                        pe.anim(q, g.tip, { loop: false });
+                        q.sprite.once('animationcomplete', () => { hold(); end(); });
+                    }
+                };
+            });
+        } else {
+            // 8a: over the bags, her legs kicking; he stands there.
+            s.once(`animationcomplete-${g.clip}`, () => { if (g.loop) s.play(g.loop); end(); });
+        }
     }
 
     // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her

@@ -2199,3 +2199,26 @@ here" 7); each built step is gone back over under its "Revision".
   approved as they are.
 - Passed: `deck4`, `vacuum`, `boot`, `dash`, `pocket`, `region1`, `region7`. The rest not run.
   No generations.
+
+## The porter's cart: 8a to 8d and his tip of the cap (2026-11-17)
+
+- **Made as the papers were:** each a v3 clip of her base character from her own standing sprite,
+  for 8a and 8c beside the game's own cart (its two atlas pieces) so that the clip's cart is the
+  world's; 8b and 8d her alone, the world's porter and cart staying. Shown first as a strip and a
+  GIF composed from the real frames with the porter, then in the game.
+- **What needed mending:** 8c's generator threw the top bag into the air on both tries: the flying
+  bag taken out and the game's cart put back under her in its first frames (her pixels told from
+  the redrawn stack by their colours). 8b's first try ended lying flat and 8d's drew a cushion
+  ("something soft" in the description: an object named is drawn); both made again toward end
+  poses.
+- **In the game (`cartGag` in the ship scene):** 8a and 8c are set down where she stands, the
+  porter brought the last few px up to the clip's cart and his own cart hidden; 8b keeps the cart's
+  front at hers as she is pushed back (`fronts`, measured from the clip); 8c's ride is two metres
+  at his walk, then his `tip` clip; 8d: he walks on, then turns round to her (his cart stays). Each
+  ends at her checkpoint. Doors and walls stop him (`stopShort`, §1.8).
+- **The user's one change:** 8a's kicking on the bags "too fast, making her look like twitching";
+  its loop at 4 frames a second, the scene as long as before.
+- Generations: 23 (four clips 12, three tries again 9, his cap 2). Passed: `deck4`, `boot`,
+  `region1`; the rest not run.
+- The dog's lick: the user has another idea for the dog's sequences; to be talked over once the
+  rest of this step is done.

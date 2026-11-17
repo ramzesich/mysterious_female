@@ -251,10 +251,10 @@ export const MISHAP_SCENES = {
     '6c': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'suitcase' },  // it rolls into her front
     '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // the deck chair, head-on
     '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // from behind
-    '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into the porter's cart
-    '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // it pushes into her
-    '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // it reaches her back
-    '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // into his back
+    '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
+    '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartPush' },      // it pushes into her
+    '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'cartSit' },      // it reaches her back
+    '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartBounce' },    // into his back
     '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // the jogger, head-on
     '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // he runs into her
     '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into her back
@@ -303,6 +303,19 @@ export const GAGS = {
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
     paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000 },
     suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', dazed: 'gag-suitcase-dazed', top: 80, slow: 1.4, least: 16, pace: 1.1, rideS: 3.3, holdMs: 1180 },
+    // The porter's cart (8a to 8d; the ship scene's `cartGag`). `cart`: the clip has the cart in it
+    // and is set down where she stands, the cart's middle `cartAt` px ahead of hers (behind, less
+    // than 0), the porter brought up to it and his own cart hidden; else it is her alone, set down
+    // `her` px behind her middle, and the world's porter and cart stay. 8a: she runs into its front
+    // and folds over the bags, her legs kicking (`loop`, slowly: at 8 a second it read as twitching, the user). 8b: it pushes her back (the cart's front
+    // kept at hers, `fronts`: px ahead of her middle in each frame of the clip) till she sits. 8c:
+    // she sits into the bags; he wheels her `rideM` metres, sees her, tips his cap (`tip`, his
+    // clip). 8d: she bounces off his back and sits; he walks on `walkOnMs`, then turns round to
+    // her. Then `holdMs`, her checkpoint.
+    cartDrape: { cart: true, cartAt: 26, clip: 'gag-cart-drape', loop: 'gag-cart-kick', holdMs: 1600 },
+    cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600 },
+    cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900 },
+    cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
