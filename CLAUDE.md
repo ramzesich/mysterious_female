@@ -39,7 +39,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
 | `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door, the shower room's door and the shower scene's pieces (stall, door slid open, see-through glass, the towel on its handle) |
-| `assets/source/her-mishaps/` | **Her mishap gags, each one picture of her with the thing** (docs/plan-three-uses.md §1.6): states of her character with the thing drawn in, animated v3 (ids in its README); built into `assets/sprites/her-mishaps.png` (`HER_MISHAPS` in `tools/build_sprites.py`, 112 px cells, each clip placed by its thing's middle); played by the ship scene's `rideGag` (`GAGS` in `src/config.js`) for a scenario with `gag`, when the thing that hit her passes `ride` (how it carries her: its way, its floor, `hide()`/`show()`), or by `fallGag` where she stands (the papers: the clip starts with her standing on the world's paper and is set down by where it is, `ride.x`), or by `cartGag` with the porter (8a to 8d: he stands, pushes on, wheels her and tips his cap, or turns round). The world's vacuum and suitcase (`assets/source/things/robot-vacuum.png`, `suitcase-rolling.png`) are cut from the same pictures |
+| `assets/source/her-mishaps/` | **Her mishap gags, each one picture of her with the thing** (docs/plan-three-uses.md §1.6): states of her character with the thing drawn in, animated v3 (ids in its README); built into `assets/sprites/her-mishaps.png` (`HER_MISHAPS` in `tools/build_sprites.py`, 112 px cells, each clip placed by its thing's middle); played by the ship scene's `rideGag` (`GAGS` in `src/config.js`) for a scenario with `gag`, when the thing that hit her passes `ride` (how it carries her: its way, its floor, `hide()`/`show()`), or by `fallGag` where she stands (the papers: the clip starts with her standing on the world's paper and is set down by where it is, `ride.x`; the breakfast stewardess's tray and trolley, 10a to 10f: on the corridor's floor, `ride.y`, the trolley drawn over her trip, `turn` for a hit at her back), or by `cartGag` with the porter (8a to 8d: he stands, pushes on, wheels her and tips his cap, or turns round). The world's vacuum and suitcase (`assets/source/things/robot-vacuum.png`, `suitcase-rolling.png`) are cut from the same pictures |
 | `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
@@ -396,6 +396,24 @@ Lessons learned (2026-11-14, step 12, sound):
   fits each of 250 moments in eleven files) goes well to helpers in parallel from one written
   brief that names what they may not do (no browser, no tools, no other files); read their
   doubts, they found a fault in the engine.
+
+Lessons learned (2026-11-17, the breakfast stewardess):
+
+- **A clip drawn with a world thing that stays in the world** (the trolley she trips over, the
+  trolley the stewardess pushes): make it with the game's own picture of the thing in the start
+  frame, then take the thing out of every frame (inside its box, a pixel nearer its colours than
+  the figure's; then loose specks) and draw the world's own over or under the figure. It never
+  changes, whatever the generator did to its copy.
+- **Hands that must stay on something while the legs walk:** v3 swings them with the step (5 px,
+  then 4 px again); pixminimax (1 generation) held them on one pixel. Measure the hand and the
+  planted foot in every frame by colour: a foot that creeps forward and back reads as "dancing";
+  two even steps whose planted foot slides back steadily, played at speed / slide frames a second,
+  keep pace with the floor.
+- **A gag is set on the floor of the place, not at her feet:** stood on a cart's top, she sat in
+  the air once it moved on.
+- **A GIF saved by PIL merges repeated frames:** count frames from the game's clock, not the GIF.
+- **Sliding a thing into a door crosses whoever holds it** when the door's hand is on their side:
+  it shrinks a little where it is held and is gone (`handTakes(..., { shrink })`).
 
 ## Working with the user
 

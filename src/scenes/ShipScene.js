@@ -4417,9 +4417,9 @@ export class ShipScene extends Phaser.Scene {
     // (front: the way she faces, at this moment) and who was moving: she, toward it, faster than
     // 20 px a second; it, toward her (`vx`, its speed along the deck), faster than 5. `dir`: the
     // way it faces, for a person; `lying`: a thing at rest on the floor.
-    hitFacts(fromX, vx = 0, dir = 0, lying = false) {
+    hitFacts(fromX, vx = 0, dir = 0, lying = false, crowded = false) {
         const p = this.player, facing = p.flipX ? -1 : 1, toward = Math.sign(fromX - p.x) || facing;
-        return { front: toward === facing, she: p.body.velocity.x * toward > 20, it: vx * -toward > 5, faces: dir === -toward, lying };
+        return { front: toward === facing, she: p.body.velocity.x * toward > 20, it: vx * -toward > 5, faces: dir === -toward, lying, crowded };
     }
 
     // The scenario a hit with a tray in her hands takes for her reaction (the tray is spilled
@@ -4437,7 +4437,7 @@ export class ShipScene extends Phaser.Scene {
     // number, or null when nothing happened. `force`: no contact (her own cry at a "Do Not Disturb"
     // door): a lunge does not help. `snatch`: the gull that takes the tangerine. `ride`: how the
     // thing carries her off, for a gag with it (`rideGag`).
-    scareContact(fromX, what, { vx = 0, dir = 0, lying = false, force = false, snatch = null, ride = null } = {}) {
+    scareContact(fromX, what, { vx = 0, dir = 0, lying = false, crowded = false, force = false, snatch = null, ride = null } = {}) {
         const p = this.player;
         if (this.holding || this.gagPending) return null;   // nothing scares her on the way home (§6.1.9)
         // In a lunge she is through: what touched her gives way in its own manner.
@@ -4447,7 +4447,7 @@ export class ShipScene extends Phaser.Scene {
         }
         // Blinking after a hit forgiven, nothing touches her.
         if (this.isSafe()) return null;
-        const id = scenario(what, this.hitFacts(fromX, vx, dir, lying)), sc = MISHAP_SCENES[id];
+        const id = scenario(what, this.hitFacts(fromX, vx, dir, lying, crowded)), sc = MISHAP_SCENES[id];
         // (A slow thing she stands looking at does not knock her over: it is the thing's to stop.)
         if (!sc || sc.nothing) return id;
         this.lastMishap = { what, id, time: this.time.now };
@@ -4467,7 +4467,7 @@ export class ShipScene extends Phaser.Scene {
         }
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
-        if (sc.gag && this.anims.exists(GAGS[sc.gag].fall)) return this.fallGag(sc, ride);
+        if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
         if (sc.down) return this.scareDown(sc);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
@@ -4567,7 +4567,9 @@ export class ShipScene extends Phaser.Scene {
 
     // Her gag where she stands, one picture of her with the thing (§1.6: the papers, 4a and 4b),
     // facing her way; set down so that its thing is where the world's own is (`ride.x`, the gag's
-    // `paper`), which is taken away (`ride.hide()`). She stays down a while, then her checkpoint.
+    // `paper`), which is taken away (`ride.hide()`), on its floor (`ride.y`: hit up on something,
+    // the trolley's top, she comes down to the floor, never sits on the air when it moves on). She
+    // stays down a while, then her checkpoint.
     fallGag(sc, ride) {
         const p = this.player, g = GAGS[sc.gag];
         this.beginScare();
@@ -4577,10 +4579,12 @@ export class ShipScene extends Phaser.Scene {
         this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
         this.script = null;
         ride?.hide?.();
-        const face = p.flipX ? -1 : 1;
-        const x = ride?.x !== undefined && g.paper !== undefined ? ride.x - face * g.paper : p.x;
-        const s = this.add.sprite(x, p.y, 'her-mishaps').setOrigin(0.5, 1)
-            .setFlipX(p.flipX).setDepth(p.depth);
+        // (Set down by the thing in the clip's own facing: turned, the other way.)
+        const face = (p.flipX ? -1 : 1) * (g.turn ? -1 : 1), at = g.at ?? g.paper;
+        const x = ride?.x !== undefined && at !== undefined ? ride.x - face * at : p.x - face * (g.her ?? 0);
+        // (`turn`: hit from behind, she turns round to face it, the clip drawn to her other side.)
+        const s = this.add.sprite(x, ride?.y ?? p.y, 'her-mishaps').setOrigin(0.5, 1)
+            .setFlipX(g.turn ? !p.flipX : p.flipX).setDepth(p.depth);
         this.worldLayer.add(s);
         p.setVisible(false);
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
@@ -4692,10 +4696,11 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         this.herClip(clip);
+        // (`downMs`: dazed a shorter while than the stand-in's.)
         p.once(`animationcomplete-${clip}`, () => {
             const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
             if (this.anims.exists(dazed)) this.herClip(dazed);
-            this.time.delayedCall(2100, () => this.respawn());
+            this.time.delayedCall(sc.downMs ?? 2100, () => this.respawn());
         });
     }
 

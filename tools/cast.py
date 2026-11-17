@@ -39,8 +39,11 @@ CAST = {
     # (His skim's first three frames, a finger licked, lost the stack from under his arm: the flick
     # is its last five.)
     # The breakfast round on deck 5 (the user, 2026-11-16): her hands empty, the tray a picture of its
-    # own carried in them (`carry`, both hands forward), her walk back empty-handed.
-    "roomservice": ("73e8022b-ee91-4675-a256-57090a635979", {"walk": 8, "carry": 8}, {}),
+    # own carried in them (`carry`, both hands forward), her walk back empty-handed; wheeling her
+    # trolley, her hands on its handle (`push`, 2026-11-17: v3 with the game's own trolley in the
+    # picture, then taken out, `assets/source/people/roomservice-push-start/`; at 6 a second her
+    # feet keep pace with her 0.8 m/s).
+    "roomservice": ("73e8022b-ee91-4675-a256-57090a635979", {"walk": 8, "carry": 8, "push": 6}, {}),
     # (The second paper round, deck 5 where the forward cabins meet the stair hall: the user, 2026-11-16.)
     "paperwoman": ("af3c4fce-746e-4c24-9058-e257d237e716", {"walk": 8, "flick": 10, "bite": 6},
                    {"cut": {"flick": ("skim", [0, 1, 2, 3, 4, 5])}}),

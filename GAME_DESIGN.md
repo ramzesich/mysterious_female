@@ -2358,9 +2358,17 @@ Nothing blocks the start of the build. These get settled along the way:
       newspaper generated (the user's pick), sliding at a steady speed right to her foot, where her
       clip takes over from the same picture. **The suitcase and the vacuum refined (2026-11-17):** the
       vacuum 2 px lower; after the tip she sits dazed, butterflies over her head; the ride 3.3 s
-      wherever she is hit, her clips 10% quicker, the suitcase by itself at 1.6 m/s. **Decided (the user, 2026-11-17): doors and walls across a deck stop whatever moves, not only her** (plan §1.8): a thing stops short of a door's face; a person walking a loop opens a door with no lock and goes through (deck 4's porter, at 60 m), a locked one turns them back; built into the ship scene (`stopShort`, `spanOn`, `holdDoor`) for every later step. **Done (2026-11-17): the porter's cart, 8a to 8d and his tip of the cap** (approved in the game; 8a's kicking slowed to 4 a second, "too fast, making her look like twitching"). **Next in step 4's revision:** the rest of region 1's
-      gags (10a, 10b: each still shown and approved before it is animated or placed; then the
-      dog's lick, which waits for an idea of the user's, talked over at the end of the step), the art rule looked back over; then step 4a
+      wherever she is hit, her clips 10% quicker, the suitcase by itself at 1.6 m/s. **Decided (the user, 2026-11-17): doors and walls across a deck stop whatever moves, not only her** (plan §1.8): a thing stops short of a door's face; a person walking a loop opens a door with no lock and goes through (deck 4's porter, at 60 m), a locked one turns them back; built into the ship scene (`stopShort`, `spanOn`, `holdDoor`) for every later step. **Done (2026-11-17): the porter's cart, 8a to 8d and his tip of the cap** (approved in the game; 8a's kicking slowed to 4 a second, "too fast, making her look like twitching"). **Done (2026-11-17): the breakfast stewardess** (approved in the game): 10a,
+      she runs into the tray and sits, toast on her head, the flower behind her ear; 10b the same
+      turned to the tray at her back; and, the user's rethink ("most of the round the woman pushes
+      her trolley, so that must impact the player"), her trolley's own four: 10c tripped over it
+      parked, 10d bumped back off it while it is wheeled (a trip would land her on the
+      stewardess), 10e tripped forward away from it at her back, dazed 1.2 s, 10f bounced off the
+      stewardess, who turns round; gags always on the corridor's floor; the stewardess wheels it
+      by its handle (a pushing walk generated with the trolley) and her tray at a door shrinks a
+      little and is gone, her hands out until then; her trip's lying pose mended (a leg stood up).
+      **Next in step 4's revision:** the dog's lick, which waits for an idea of the user's,
+      talked over now that the rest of the step is done; the art rule looked back over; then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

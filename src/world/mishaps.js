@@ -5,7 +5,7 @@
 
 // `f`: { front: the hit is on the side she faces; she: she was moving toward it; it: it was moving
 // toward her; faces: it faces her (a person: the porter, the jogger); lying: a thing at rest on the
-// floor (a paper) }. Returns the scenario's number, as in the plan's tables.
+// floor (a paper); crowded: someone stands just past it (the trolley's stewardess) }. Returns the scenario's number, as in the plan's tables.
 const PICK = {
     chips: () => '1',
     lead: () => '2',
@@ -25,6 +25,10 @@ const PICK = {
     cart: f => f.she ? (f.faces ? '8a' : '8d') : f.front ? '8b' : '8c',
     jogger: f => f.she && f.front ? (f.faces ? '9a' : '9d') : f.front ? '9b' : '9c',
     breakfast: f => f.front ? '10a' : '10b',
+    // Her trolley: at her front, over it if no one stands just past it, else back off it; at her
+    // back. The stewardess herself, her hands empty: bounced off.
+    trolley: f => f.front ? (f.crowded ? '10d' : '10c') : '10e',
+    stewardess: () => '10f',
     jet: f => f.front ? '11a' : '11b',
     light: f => f.front ? '12a' : '12b',
     // A door: opening in her face (she faces it), or catching her just past it.

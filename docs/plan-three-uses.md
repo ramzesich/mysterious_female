@@ -209,7 +209,11 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 9c | | He runs into her back | Shoved into three flailing steps and a belly-flop |
 | 9d | | She runs into his back | She bounces off and sits (8d's clip); he never notices |
 | 10a | The breakfast stewardess with a tray | She runs into the tray | She sits back with the breakfast on her: toast on her head, the flower behind her ear |
-| 10b | | The tray meets her back as she stands | Juice down her collar: she arches and dances on the spot, pulling her shirt off her back, and squelches off |
+| 10b | | The tray meets her back as she stands | ~~Juice down her collar: she arches and dances on the spot, pulling her shirt off her back, and squelches off~~ **As 10a, turned round to face the tray** (the user, 2026-11-17: the squirm looked weird, and the case is rare) |
+| 10c | Her trolley (the user, 2026-11-17: most of her round she wheels it) | Into it with no one just past it (parked at a door) | She trips over it head first and lands on her belly past it |
+| 10d | | Into it, or it wheeled into her front, the stewardess just behind it | Bumped back off it, she sits (8b's clip): over it she would land on the stewardess |
+| 10e | | It reaches her back | She trips forward, away from it, dazed a moment (her own trip) |
+| 10f | | She runs into the stewardess's back, her hands empty | She bounces off and sits (8d's clip); the stewardess turns round |
 | 11a | The kid's water jet | In her face | Sat back, spluttering, wringing her hair; he points and laughs |
 | 11b | | In her back | As 10b: she arches, dances, squelches off |
 | 12a | The stage's swinging light | From the front | Her head back, two spins on the spot, stars circling, she sits |
@@ -661,8 +665,13 @@ Shown: her throw's frames for approval before anything else; then each target as
   6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations.
   **Done (2026-11-16): 5b and 6b, and with them 5a, 6a and 6c, which ride too** (the user's
   word after trying it); the vacuum, made smaller, and the suitcase are cut from the same pictures.
-  Left: 10a, 10b, the dog's lick (4a, 4b done, below; the dog's lick waits for an idea of the
-  user's, to be talked over at the end of this step, 2026-11-17). **The porter's cart done
+  Left: the dog's lick (4a, 4b done, below; it waits for an idea of the user's, to be talked
+  over at the end of this step, 2026-11-17). **The breakfast stewardess done (2026-11-17):** 10a
+  and 10b, and her trolley's 10c to 10f added at the user's word (the table above): `fallGag`
+  (`GAGS` trayFront, trayBack, trolleyTrip, trolleyPush, trolleyBounce; 10e her own trip, dazed
+  1.2 s), always on the corridor's floor; the trolley a hit, not a thing that waits for her; she
+  wheels it by its handle, and a tray she hands in shrinks a little and is gone
+  (`assets/source/her-mishaps/README.md`). **The porter's cart done
   (2026-11-17):** 8a to 8d and his tip of the cap, clips of her from her own sprite beside the
   game's own cart (`assets/source/her-mishaps/README.md`), played by the ship scene's `cartGag`
   (`GAGS` cartDrape, cartPush, cartSit, cartBounce): the cart's clips set down where she stands

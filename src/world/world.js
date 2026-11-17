@@ -1626,8 +1626,12 @@ export class World {
 
     // Something at a cabin's door taken in by whoever is inside (the paper round's papers, the
     // breakfasts): the door opens a crack at its handle's side (these doors have their handles on
-    // the left), a hand reaches out at `handY` and draws the things in, and the door shuts.
-    handTakes(door, y, things, handY, done) {
+    // the left), a hand reaches out at `handY` and draws the things in, and the door shuts. `took()`
+    // once the hand has drawn them in (whoever held them out lowers their hands then), `done()` once
+    // the door is shut. `shrink`: taken from where they are held, not slid to the door: they shrink
+    // a little, as if drawn in through it, and are gone (the breakfast tray: slid sideways it
+    // crossed the stewardess holding it, the user, 2026-11-17).
+    handTakes(door, y, things, handY, done, { took, shrink = false } = {}) {
         const s = this.scene, D = s.DEPTH, x = door - 11;
         const crack = s.add.rectangle(x, y - 2, 4, 68, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.15).setScale(0, 1);
         const hand = s.add.rectangle(x, handY, 4, 2, 0xf3cfb6).setOrigin(0.5, 1).setDepth(D.props + 0.03).setVisible(false);
@@ -1637,7 +1641,12 @@ export class World {
         s.tweens.chain({ tweens: [
             { targets: crack, scaleX: 1, duration: 200 },
             { targets: hand, x: near.x - Math.sign(near.x - x) * 3, duration: 260, onStart: () => hand.setVisible(true) },
-            { targets: [hand, ...things], x, duration: 300, ease: 'Sine.easeIn', onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); } },
+            ...(shrink ? [
+                { targets: things, scale: 0.75, duration: 220, ease: 'Sine.easeIn' },
+                { targets: [hand, ...things], alpha: 0, duration: 110, onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); took?.(); } },
+            ] : [
+                { targets: [hand, ...things], x, duration: 300, ease: 'Sine.easeIn', onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); took?.(); } },
+            ]),
             { targets: crack, scaleX: 0, duration: 200, onComplete: () => { crack.destroy(); sfx.at(door, y).doorShut(); done?.(); } },
         ] });
     }

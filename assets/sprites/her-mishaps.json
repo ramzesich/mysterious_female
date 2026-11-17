@@ -13,7 +13,9 @@
   "cart-kick": 69,
   "cart-sit": 73,
   "cart-push": 81,
-  "cart-bounce": 89
+  "cart-bounce": 89,
+  "tray-sit": 95,
+  "trolley-trip": 102
  },
  "anims": {
   "vacuum-sit": [
@@ -136,6 +138,25 @@
    92,
    93,
    94
+  ],
+  "tray-sit": [
+   95,
+   96,
+   97,
+   98,
+   99,
+   100,
+   101
+  ],
+  "trolley-trip": [
+   102,
+   103,
+   104,
+   105,
+   106,
+   107,
+   108,
+   109
   ]
  },
  "cols": 48

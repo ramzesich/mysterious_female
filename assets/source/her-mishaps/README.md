@@ -30,9 +30,22 @@ character "Bumbusik (final)" (`ebd5dadc-1318-4717-b0c0-6f429a7a58f0`) with the t
 | `cart-bounce/` | **8d:** she runs into his back, bounces off and sits (her alone) | `cart-8d-bounce-2`, v3 from `start-solo.png` toward `end-8d.png` |
 | `cart-start/` | The start pictures and end targets of the four, and the scripts that made them and the composed strips shown to the user (`starts.py`, `fix8c.py`, `compose.py`) | made here |
 | `cart-tries/` | Not used: the first tries (8b ended lying flat; 8d drew a cushion, "something soft" in the description; 8c threw the bag up) | the same character |
+| `tray-sit/` | **10a and 10b (approved 2026-11-17):** she runs into the breakfast stewardess's tray, reels back and sits, the toast landing on her head and the flower behind her ear; frames 2 to 8 in the game (`tray-sit`). 10b, the tray meeting her back, is the same clip with her turned round to face it (`turn` in `GAGS` trayBack: the user liked it so) | `bf-10a-sit`, v3 from `cart-start/start-solo.png` toward `tray-start/end-10a.png` |
+| `tray-start/` | 10a's end picture (her sitting, toast on her head, the flower behind her ear: edit_image_pro_flash of `cart-start/end-8d.png`, its second try) and a crouch taken from a 10b try, an end target for another | made here |
+| `tray-tries/` | Not used: the first end picture (the toast a bun), an end pose for 10b that came out bigger than her with the stain on her front, three v3 tries at 10b (one turned to show her back, one hardly moved, one ran), and the pixminimax squirm on the spot that was put in the game and dropped by the user ("looks weird"; `tray-squirm/`) | the same character |
+| `trolley-trip/` | **10c (approved 2026-11-17):** her trolley parked, no one just past it, she runs into it and trips over it head first, onto her belly past it; frames 1 to 8 in the game. The trolley it was drawn with is taken out of every frame (`trolley-start/fix10c.py`: inside its box by colour, then loose specks), since the world's own trolley stays and is drawn over her while it plays; its last frame is her mended lying pose (`her/lie-fix/`) | `trolley-10c-trip`, v3 from `trolley-start/start-10c.png` (her standing sprite before the game's own trolley, its front to her) toward `end-10c.png` (her trip's lying frame past it) |
+| `trolley-start/` | 10c's start and end pictures and the scripts (`starts.py`, `fix10c.py`) | made here |
+| `trolley-tries/` | The raw frames of 10c (`trolley-10c-trip-raw/`), and the unused second try (`trolley-10c-trip-b/`: she stepped up onto the trolley and dived off it) | the same character |
 
 The porter's tip of the cap (8c's end) is his own clip, `assets/source/people/porter/tip/` (his character
 `00c30095-76c1-4898-a423-34f740532970`, animation `tip-cap`, v3 from his pushing frame; frames 1 to 8).
+
+The rest of the stewardess's trolley (10d to 10f) are clips she already had: bumped back off it with
+the stewardess just past it (8b's `cart-push`), her own trip forward and dazed at her back (10e,
+`her/tripfall`, `dazed-lie`), bounced off the stewardess (8d's `cart-bounce`). Her trip's and dazed
+loop's lying pose had one leg bent straight up; mended from one edit (`assets/source/her/lie-fix/`,
+the user, 2026-11-17). The stewardess's own pushing walk, her hands on the handle:
+`assets/source/people/roomservice-push-start/`.
 
 The first two stills of the paper gags (states `7902a37e-18bc-40f0-a669-a788ff8dadfd` "Paper tent" and
 `71676d85-d4ae-466c-8b6e-d3cdbf5545ca` "Paper blanket") came out a quarter bigger than her (the user saw

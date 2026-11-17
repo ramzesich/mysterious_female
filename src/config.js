@@ -212,6 +212,8 @@ export const MISHAPS = {
     cart: {},               // the porter and his cart (deck 4)
     jogger: {},             // the jogger (the promenade)
     breakfast: {},          // the breakfast stewardess's tray (deck 5)
+    trolley: {},            // her room-service trolley, wheeled or parked at a door
+    stewardess: {},         // the breakfast stewardess herself, her hands empty
     jet: {},                // the kid's water pistol (deck 11)
     light: {},              // the stage's swinging light
     door: {},               // a door that flies open
@@ -259,8 +261,17 @@ export const MISHAP_SCENES = {
     '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // he runs into her
     '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into her back
     '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // she into his back
-    '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },        // into the breakfast tray
-    '10b': { word: 'splashed', react: 'arch', toss: 'on' },                     // it meets her back
+    '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trayFront' },        // into the breakfast tray
+    '10b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'trayBack' },                     // it meets her back
+    // Her trolley (the user, 2026-11-17: most of the round she wheels it, so it is what she meets).
+    // At her front with no one just past it (parked), she trips over it head first (10c); with the
+    // stewardess just past it (wheeled), she is bumped back and sits (10d, 8b's clip): over it she
+    // would land on her; at her back, she trips forward away from it (10e, her own trip, dazed 1.2 s);
+    // into the stewardess's back, she bounces off and sits (10f, 8d's clip).
+    '10c': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', gag: 'trolleyTrip' },    // over it
+    '10d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyPush' },        // bumped back off it
+    '10e': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', downMs: 1200 },          // at her back
+    '10f': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyBounce' },      // into the stewardess's back
     '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit' },  // the jet in her face
     '11b': { word: 'splashed', react: 'arch', toss: 'on' },                     // in her back
     '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // the stage's light
@@ -316,6 +327,21 @@ export const GAGS = {
     cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600 },
     cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900 },
     cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600 },
+    // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
+    // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
+    // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head
+    // and the flower behind her ear. 10b: it meets her back: the same clip, and she turns round to
+    // face it as she falls (`turn`: the clip flipped to her other side, on purpose; the user,
+    // 2026-11-17, liked it so: a squirm on the spot looked wrong and the case is rare).
+    trayFront: { fall: 'gag-tray-sit', tray: true, holdMs: 1800 },
+    trayBack: { fall: 'gag-tray-sit', tray: true, turn: true, holdMs: 1800 },
+    // Her trolley (10c, 10d, 10f; `fallGag`): the trip over it (10c) is set down by the trolley's
+    // middle (`at`: px from it to the clip's middle), the world's trolley drawn over her while it
+    // plays (`ride.hide()`); bumped back off it (10d) and bounced off the stewardess (10f), her
+    // alone, `her` px behind her middle, as 8b's and 8d's.
+    trolleyTrip: { fall: 'gag-trolley-trip', at: -20, holdMs: 900 },
+    trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000 },
+    trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out

@@ -245,6 +245,20 @@ HER_MISHAPS = {
         "cart-sit": [(f"cart-sit/{i}.png", 115) for i in range(1, 9)],
         "cart-push": [(f"cart-push/{i}.png", 117 if i < 8 else "feet") for i in range(1, 9)],
         "cart-bounce": [(f"cart-bounce/{i}.png", 117 if i < 6 else "feet") for i in range(3, 9)],
+        # The breakfast stewardess's tray (10a, 10b; 2026-11-17), her alone (the world's stewardess
+        # and tray stay): v3 of her base character from her own standing sprite (`cart-start/
+        # start-solo.png`). 10a: she runs into the tray, reels and sits, the toast landing on her head
+        # and the flower behind her ear (toward `tray-start/end-10a.png`, her sitting with them, an
+        # edit of 8d's end); from its third frame (a rose already flying), so that her run carries
+        # into the reel; on row 117 of its 140 px frames, sitting by the lowest row. 10b, the tray
+        # meeting her back, is the same clip, she turned round to face it (`turn`, the user, 2026-11-17).
+        "tray-sit": [(f"tray-sit/{i}.png", 117 if i < 7 else "feet") for i in range(2, 9)],
+        # Her trolley (10c to 10e, 2026-11-17): she trips over it head first and lands on her belly
+        # past it; v3 of her base character from her own standing sprite before the game's own
+        # trolley (`trolley-start/`), the trolley then taken out of the frames (`fix10c.py`: the
+        # world's own is drawn over her while it plays); its first (standing) frame left out, on
+        # row 118 of its 140 px frames. Its middle, column 96, is 20 px past the trolley's (`at`).
+        "trolley-trip": [(f"trolley-trip/{i}.png", 118) for i in range(1, 9)],
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
     # Moved sideways as another clip is, which it carries on from.
@@ -254,7 +268,8 @@ HER_MISHAPS = {
     # The cart's: its middle (8a, 8c), or 18 px behind hers (8b, 8d: her middle is column 86, room
     # kept for her falling back).
     "middle": {"paper-behind": 36, "paper-front": 28, "cart-drape": 70, "cart-kick": 70, "cart-sit": 52,
-               "cart-push": 68, "cart-bounce": 68},
+               "cart-push": 68, "cart-bounce": 68,
+               "tray-sit": 108, "trolley-trip": 96},
     # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
     "paper": ("paper-",),
     "baseline": "ride-vacuum/east.png",

@@ -303,6 +303,9 @@ const here = (s, d) => s.route === 'inside' && s.mode === 'play' && Math.abs(s.p
 // Where the breakfast stewardess's hands hold her tray in each frame of her `carry` walk: px ahead
 // of her middle, px over her feet (found frame by frame, as the eaters' fists).
 const TRAY_HANDS = [[16, 33]];
+// The breakfast stewardess behind her trolley: her middle this far from its middle, her hands on its
+// handle in her `push` clip (drawn with the trolley there, 2026-11-17).
+const HANDLE = 26;
 const realDoors = (s, d) => (d.real ??= d.doors.filter(x => (s.cabinDoorsDrawn ?? []).some(c => c.y === d.y && Math.abs(c.x - x) < 6)));
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 800 && Math.abs(s.player.y - d.y) < 300;
 
@@ -1150,8 +1153,9 @@ export class Breakfast {
         this.dir = 1;
         this.p = world.people.add({ id: def.id, who: def.who, x: def.doors[0] - 80, y: def.y, route: 'inside', face: 1, owned: true });
         this.cartX = def.doors[0] - 46;
-        this.x = this.cartX - 30;
-        this.cart = s.add.image(this.cartX, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.05);
+        this.x = this.cartX - HANDLE;
+        // (Under her, a hair below her depth: her hands are on its handle.)
+        this.cart = s.add.image(this.cartX, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.04);
         this.tray = world.image(0, 0, 'thing:breakfast-tray').setOrigin(0.5, 1).setVisible(false);
         world.add([this.cart, this.tray]);
         // (A low thing to hop: solid, as the other carts on the decks are.)
@@ -1211,7 +1215,7 @@ export class Breakfast {
                 // Wheeling the trolley on to the next door, she behind it.
                 const to = this.park(), step = Math.sign(to - this.cartX) * Math.min(Math.abs(to - this.cartX), speed * dt);
                 this.cartX += step;
-                this.x = this.cartX - this.dir * 30;
+                this.x = this.cartX - this.dir * HANDLE;
                 moving = step;
                 if (!step) {
                     // A tray from the trolley.
@@ -1223,7 +1227,7 @@ export class Breakfast {
                 moving = this.walkTo(door - this.dir * 14, speed, dt);
                 if (!moving) this.serve(door);
             } else if (this.state === 'return') {
-                moving = this.walkTo(this.cartX - this.dir * 30, speed, dt);
+                moving = this.walkTo(this.cartX - this.dir * HANDLE, speed, dt);
                 if (!moving) {
                     // On to the next door; past the last, back the other way.
                     if (this.i + this.dir < 0 || this.i + this.dir >= doors.length) this.dir = -this.dir;
@@ -1234,11 +1238,14 @@ export class Breakfast {
         }
         p.x = this.x;
         p.dir = moving ? Math.sign(moving) : this.dir;
-        const clip = this.holding ? 'carry' : 'walk';
+        // (Bumped from behind, she turns round to see.)
+        if (time < (this.turnUntil ?? 0)) p.dir = this.turnTo;
+        // (Wheeling her trolley, her hands on its handle, `push`: stopped, she holds its first frame.)
+        const clip = this.holding ? 'carry' : this.state === 'push' && p.meta.anims.push ? 'push' : 'walk';
         if (moving) P.anim(p, clip);
-        else if (this.holding && p.meta.anims.carry) {
+        else if (clip !== 'walk') {
             p.sprite.anims.stop();
-            p.sprite.setFrame(p.meta.anims.carry[0]);
+            p.sprite.setFrame(p.meta.anims[clip][0]);
         } else if (p.state !== 'acting') P.idle(p);
         P.place(p);
         this.cart.setX(this.cartX).setFlipX(this.dir < 0);
@@ -1246,6 +1253,30 @@ export class Breakfast {
         this.zone.body.updateFromGameObject();
         this.holdTray(p);
         this.bump(her, time);
+        this.trolleyHit(her, time, this.state === 'push' ? moving : 0, dt);
+    }
+
+    // Her trolley met (the user, 2026-11-17: most of the round she wheels it): she runs into it,
+    // wheeled or parked, or it is wheeled into her, on the floor by it (over it in a jump, or on it,
+    // nothing). The stewardess stops a while; the trip is drawn under the world's own trolley
+    // (`ride.hide()` raises it over her), set down by its middle.
+    trolleyHit(her, time, step, dt) {
+        const s = this.scene, d = this.def, D = s.DEPTH;
+        if (!here(s, d) || time < (this.bumpedAt ?? 0) + 2500) return;
+        if (her.y < d.y - 6 || her.y - PLAYER.bodyHeight >= d.y) return;
+        const dx = her.x - this.cartX, side = Math.sign(dx) || 1;
+        if (Math.abs(dx) > (this.cart.width - 6) / 2 + PLAYER.bodyWidth / 2 + 2) return;
+        const b = her.body, pressing = side < 0 ? b.touching.right || b.blocked.right : b.touching.left || b.blocked.left;
+        const herInto = pressing || b.velocity.x * -side > 20, cartInto = step && Math.sign(step) === side;
+        if (!herInto && !cartInto) return;
+        this.bumpedAt = time;
+        this.until = time + 1500;
+        // (Someone just past it, where a trip over it would land: the stewardess behind it as she
+        // wheels it, or at the door it is parked by.)
+        const crowded = (this.x - this.cartX) * -side > 0 && Math.abs(this.x - this.cartX) < 90;
+        const cart = this.cart;
+        s.scareContact(this.cartX, 'trolley', { vx: cartInto ? step / dt : 0, dir: this.dir, crowded, ride: {
+            x: this.cartX, y: d.y, hide: () => cart.setDepth(s.player.depth + 0.02), show: () => cart.setDepth(D.props + 0.04) } });
     }
 
     // The tray in her hands, at their height in each frame of her carry (TRAY_HANDS), in front of
@@ -1270,17 +1301,23 @@ export class Breakfast {
         sfx.at(door, d.y).knock();
         s.time.delayedCall(170, () => sfx.at(door, d.y).knock());
         s.time.delayedCall(550, () => {
-            // (The tray handed over: a copy goes in, her hands are empty.)
+            // (Knocked out of her hands while she knocked: nothing to hand over.)
+            if (this.state !== 'serving' || !this.holding) return;
+            // (The tray handed over: a copy, taken from her hands where they hold it (`shrink`: slid
+            // to the door it crossed her), her hands held out until it is gone, `giving`.)
             const given = this.world.image(this.tray.x, this.tray.y, 'thing:breakfast-tray').setOrigin(0.5, 1)
                 .setFlipX(this.tray.flipX).setDepth(this.tray.depth);
             this.world.add([given]);
             const fruit = this.fruit;
             this.fruit = null;
-            this.holding = false;
+            this.giving = true;
             this.world.handTakes(door, d.y, [given, fruit].filter(Boolean), this.tray.y - 1, () => {
                 this.state = 'return';
                 this.until = s.time.now + 300;
-            });
+            }, { shrink: true, took: () => {
+                this.holding = false;
+                this.giving = false;
+            } });
         });
     }
 
@@ -1289,7 +1326,11 @@ export class Breakfast {
     bump(her, time) {
         const s = this.scene, d = this.def;
         if (!here(s, d) || time < (this.bumpedAt ?? 0) + 2500) return;
-        if (Math.abs(her.x - this.x) > PLAYER.bodyWidth / 2 + 7 || her.y <= d.y - 40 || her.y - PLAYER.bodyHeight >= d.y) return;
+        // (A tray in her hands meets her first: on its side, from its front edge, TRAY_HANDS' reach
+        // and half the tray, 34 px ahead of her middle; else her body's edge, 13 px.)
+        const ahead = (her.x - this.x) * (this.p?.dir ?? 1) > 0, carrying = this.holding && !this.giving;
+        const reach = carrying && ahead ? PLAYER.bodyWidth / 2 + 34 : PLAYER.bodyWidth / 2 + 13;
+        if (Math.abs(her.x - this.x) > reach || her.y <= d.y - 40 || her.y - PLAYER.bodyHeight >= d.y) return;
         this.bumpedAt = time;
         if (s.isLunging()) {
             // Spun round, and on again.
@@ -1297,18 +1338,27 @@ export class Breakfast {
             sfx.at(this.x, d.y).oh();
             return;
         }
-        if (this.holding && this.state !== 'serving') {
+        // (With a tray in her hands, her gag with it: 10a, 10b, `GAGS` trayFront, trayBack.)
+        const tray = this.holding && !this.giving;
+        if (tray) {
             // (Down it goes, and she goes back for another.)
             sfx.at(this.x, d.y).crash();
             const dropped = this.world.image(this.tray.x, this.tray.y, 'thing:breakfast-tray').setOrigin(0.5, 1).setDepth(this.tray.depth);
             this.world.add([dropped]);
-            s.tweens.add({ targets: dropped, y: d.y, angle: this.p.dir * 70, duration: 260, ease: 'Quad.easeIn',
+            // (Flat onto the carpet: turned on the way down, level as it lands, never into the floor.)
+            s.tweens.add({ targets: dropped, angle: { from: 0, to: this.p.dir * 25 }, duration: 130, yoyo: true });
+            s.tweens.add({ targets: dropped, y: d.y, duration: 260, ease: 'Quad.easeIn',
                 onComplete: () => s.tweens.add({ targets: dropped, alpha: 0, delay: 1500, duration: 400, onComplete: () => dropped.destroy() }) });
             this.holding = false;
             this.state = 'return';
         }
         this.until = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(this.x, false, 'breakfast', { dir: this.p?.dir ?? 0 });
-        else s.scareContact(this.x, 'breakfast', { dir: this.p?.dir ?? 0 });
+        // (Her hands empty: she herself, 10f; with her back to her, she turns round.)
+        if (!tray && (her.x - this.x) * (this.p?.dir ?? 1) < 0) {
+            this.turnTo = Math.sign(her.x - this.x);
+            this.turnUntil = time + 1500;
+        }
+        if (this.world.carry) this.world.carryBox.spill(this.x, false, tray ? 'breakfast' : 'stewardess', { dir: this.p?.dir ?? 0 });
+        else s.scareContact(this.x, tray ? 'breakfast' : 'stewardess', { dir: this.p?.dir ?? 0, ride: { tray, y: d.y } });
     }
 }

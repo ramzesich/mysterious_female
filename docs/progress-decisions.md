@@ -2222,3 +2222,44 @@ here" 7); each built step is gone back over under its "Revision".
   `region1`; the rest not run.
 - The dog's lick: the user has another idea for the dog's sequences; to be talked over once the
   rest of this step is done.
+
+## The breakfast stewardess: 10a, 10b and her trolley, 10c to 10f (2026-11-17)
+
+- **10a (approved at once in the game):** she runs into the stewardess's tray, reels back and
+  sits; the toast lands on her head and the flower behind her ear. A v3 clip of her base character
+  from her own standing sprite toward an end picture (her sitting, made with an edit of 8d's end;
+  its first try drew the toast as a bun). Contact counts from the tray's front edge, not the
+  stewardess's body (the tray had passed through her), and also while she knocks at a door with
+  it (that had played the old fall, butterflies and all).
+- **10b, rethought by the user:** a squirm on the spot with a squelching walk-off "still looks
+  weird, and it is a rare use case": it is 10a's clip, she turned round to face the tray at her
+  back (`turn`; the user liked it that way and asked that it be on purpose, not a bug's result).
+- **Her trolley, the user's word:** "most of the round the woman pushes her trolley, so that must
+  impact the player"; it had pushed her along (and then, for a moment, waited for her). Left to
+  me, with "the transition has to be always smooth, without change in appearance, speed, etc. And
+  the gag shouldn't take long", and 5: a parked trolley counts as 10c. The trolley stands to her
+  knee, so she trips over it, not over its top:
+  - 10c, no one just past it: she trips over it head first onto her belly past it (one new clip
+    from her sprite beside the game's own trolley, its trolley taken out so that the world's is
+    drawn over her: it never changes);
+  - 10d, the stewardess just past it (it is wheeled): over it she landed on the stewardess (seen
+    in the first recording), so she is bumped back and sits (8b's clip);
+  - 10e, at her back: tripped forward, away from it (her own trip); first without a dazed spell
+    to keep it short, then dazed 1.2 s at the user's question ("why doesn't she get dazed?");
+  - 10f, into the stewardess's back: bounced off (8d's clip), the stewardess turns round.
+  `crowded` (someone just past it) is a new fact of a hit, for the trolley.
+- **Fixes from the user's tries:** a gag is set on the corridor's floor whatever she stood on (on
+  the trolley's top she had sat in the air once it moved on); her trip's and dazed loop's lying
+  pose had one leg bent straight up: mended from one edit, the same legs in both so that the trip
+  hands over to the dazed loop unchanged, and the trolley trip's last frame too.
+- **The stewardess herself:** she pushed the trolley with her hands at her sides. Her pushing walk
+  generated with the game's own trolley in the picture (an edit of her walk frame gripping its
+  handle, then a loop), the trolley taken out after: v3 swung her hands 5 px off the handle (the
+  user), pixminimax held them but its legs shuffled ("like dancing a little"), a third try held
+  both, two even steps at 6 a second, her feet keeping pace. Her tray at a door: she lowered her
+  hands before it was taken, then it slid sideways across her (the door's hand is on her side
+  heading east); behind her it vanished at once. The user's idea: it shrinks a little and is gone
+  (`handTakes(..., { shrink })`), her hands out until then.
+- Generations: 76 (10a and 10b's tries 31, the spilled tray 7, the trip 8, the lying legs 10, the
+  pushing walk 20). Not used: a spilled tray, picture kept (`her-mishaps/tray-tries/`), the
+  dropped tray now landing flat. Passed: `deck4`, `boot`, `region1`; the rest not run.
