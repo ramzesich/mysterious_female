@@ -1726,7 +1726,7 @@ Every D costs one (§3.2).
     English-speaking ship (La Cucina, DECK 5, LINEN, a rope's QUIET PLEASE: my reading of "art
     text", asked about and answered "Ok" by the user, 2026-11-14), her «Кісюнічка!!!» (§3.2, the
     exact text), and everything
-    said without words. The choice is kept in the browser; `?lang=uk` sets it for a session.
+    said without words. The choice is kept in the browser; `?lang=ua` sets it for a session.
     The welcome screen's LANGUAGE button switches it (item 11). `WIN_MESSAGE` in
     `src/config.js` takes both versions.
 
@@ -2383,8 +2383,11 @@ Nothing blocks the start of the build. These get settled along the way:
       owner's legs, they stand tied, it unwinds it; three fetches and the owner tosses her the tennis
       ball (the ball 8 px with its seam, an olive outline, in front of her as it reaches her); tripped
       on its lead, it licks her face, her checkpoint waiting for it. **Next in step 4's revision:**
-      step 4a
-      (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
+      step 4a: **deck 9's darting vacuum done (2026-11-17)**: deck 4's generated picture (the code-drawn
+      one gone), its blink on its own front light, and she rides it off the way it darted (5a, 5b);
+      **under way:** the steward's cart jammed on deck 9 made a tall housekeeping trolley that shows
+      why it blocks the corridor (the user found "an invisible wall": a low trolley stood for it), and
+      his tug drawn with it; then the first batch of her gags. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened. Another

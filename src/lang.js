@@ -6,13 +6,14 @@
 // DECK 5: they are part of the picture of an English-speaking ship), her «Кісюнічка!!!» (§3.2: the
 // exact text), and everything said without words (the pictogram bubbles, ♥, ♪, !).
 //
-// The choice is kept in the browser (`bumbusik-lang`); `?lang=uk` or `?lang=en` sets it for one
-// session without keeping it. The welcome screen's LANGUAGE button (src/intro.js) calls
+// The choice is kept in the browser (`bumbusik-lang`); `?lang=ua` or `?lang=en` sets it for one
+// session without keeping it. Ukrainian is `ua` (the user, 2026-11-17: "uk is short for United
+// Kingdom"); a choice kept as `uk` before is read as `ua`. The welcome screen's LANGUAGE button (src/intro.js) calls
 // `nextLanguage()`.
 
 const KEY = 'bumbusik-lang';
 
-export const LANGUAGES = ['en', 'uk'];
+export const LANGUAGES = ['en', 'ua'];
 
 const TEXTS = {
     en: {
@@ -42,7 +43,7 @@ const TEXTS = {
         'say.oops': 'Oops!', 'say.ohno': 'Oh no, no, no!', 'say.whoa': 'Whoa!', 'say.hey': 'Hey!', 'say.meow': 'Meow!',
         'say.knock': 'knock',
     },
-    uk: {
+    ua: {
         'language.name': 'Українська',
         'title': 'Бумбусік',
         'menu.play': 'ГРАТИ',
@@ -57,7 +58,7 @@ const TEXTS = {
         'fright.vacuum': 'Іііі!', 'fright.bumped': 'Ой!', 'fright.bonked': 'Ай!', 'fright.slipped': 'Ой-йой!', 'fright.tripped': 'Ой-ой!',
         'fright.drenched': 'Бррр!', 'fright.buried': 'Мммф!', 'fright.startled': 'Ой, вибачте!', 'fright.splashed': 'Ааа!',
         'fright.swooped': 'Киш!', 'fright.fogged': 'Пхх!', 'fright.singed': 'Гаряче!',
-        'fright.ride': 'Віііі!',
+        'fright.ride': 'Уіііііііі!',
         'say.oops': 'Ой!', 'say.ohno': 'Ой-ой-ой!', 'say.whoa': 'Ой-йой!', 'say.hey': 'Гей!', 'say.meow': 'Мяу!',
         'say.knock': 'тук',
     },
@@ -67,7 +68,7 @@ function chosen() {
     const asked = new URLSearchParams(location.search).get('lang');
     if (LANGUAGES.includes(asked)) return asked;
     try {
-        const kept = localStorage.getItem(KEY);
+        const kept = localStorage.getItem(KEY)?.replace(/^uk$/, 'ua');
         if (LANGUAGES.includes(kept)) return kept;
     } catch { /* no storage: the default */ }
     return LANGUAGES[0];

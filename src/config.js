@@ -173,7 +173,7 @@ export const HOLDING = {
 
 // The win screen's own message (§6.4, Later: the user's to write), in the game's two languages
 // (src/lang.js). Empty, nothing is shown.
-export const WIN_MESSAGE = { en: '', uk: '' };
+export const WIN_MESSAGE = { en: '', ua: '' };
 
 // D (B on the controller): every press costs one tangerine, whatever it does (docs/plan-three-uses.md
 // §1.1). The cry, "Кісюнічка!!!", startles the people and animals within `reach` px on her deck

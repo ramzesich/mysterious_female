@@ -2386,3 +2386,22 @@ here" 7); each built step is gone back over under its "Revision".
 - Passed: `deck4` (its new checks for all three) three runs in four, `boot`; the fourth failed later
   on, the lob onto the climb's shelf not knocking the feather down; not seen again in three runs.
   The rest not run.
+
+## Step 4a: deck 9's darting vacuum, and small things on the way (2026-11-17)
+
+- **Deck 9's vacuum (`Darter`) rides her off too** (approved): it was a little shape drawn in code;
+  it is deck 4's generated vacuum now, the picture she rides in her gag, dimmed in its doorway at
+  its own size (it had been shrunk to 0.8, uneven pixels), its blink on its own red light at its
+  front. Caught by it, from the front or from behind, she rides it off down the corridor the way it
+  darted (5a, 5b; `ride` to the ship scene's `rideGag`); it is back in its doorway once she is at
+  her checkpoint. With a tangerine on her it is only a stumble and it goes on. `region4`'s check
+  changed from the old fall to the ride.
+- **Ukrainian is `ua`, not `uk`** (the user: "uk is short for United Kingdom"): `?lang=ua`, the
+  language's code everywhere; a choice kept in the browser as `uk` is read as `ua`. Its ride word is
+  «Уіііііііі!» (the user).
+- **The breakfast stewardess's trolley is solid by its picture's shape** (`TROLLEY`): the table, 21
+  by 18, and the cloche's dome on it, 10 by 7. One box the cloche's height over the whole trolley
+  had been 7 px of air over the table's ends to bump into.
+- **A start place `deck9-aft`** (deck 9, 134 m): past the steward's jammed cart, short of the
+  vacuum, which the user could not reach from `housekeeping`.
+- Passed: `region4`, `deck4`, `lang`. The rest not run.

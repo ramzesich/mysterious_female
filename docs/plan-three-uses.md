@@ -268,7 +268,7 @@ gusts, the laundry lines, the gulls that take food, the waiter).
   suitcase carry her off whichever side they reach, the gag's picture facing the way it goes.)
 - **The words over her head** stay as they are for each kind of hit, in both languages. One
   changes, the user's: "Update the wording with fright/excitement, like 'Weeeee!' or
-  something": the vacuum's ride (5b) is **"Weeeee!"** («Віііі!»); over it on her belly (5a) she
+  something": the vacuum's ride (5b) is **"Weeeee!"** («Уіііііііі!», the user, 2026-11-17); over it on her belly (5a) she
   keeps "Eeek!". A gag that needs a word of its own gets one in `src/lang.js`, in both.
 
 **In the code** (names are suggestions):
@@ -591,7 +591,7 @@ a swinging door; the cabin's bowl full and empty.
 - The cabin's bowl: its three follow the new tangerine (§1.7), and so does every tangerine
   painted into a room (`game_tangerine()` in `tools/draw_rooms.py`); the rooms' pictures built
   again and the crew cabin looked at enlarged, full and emptied.
-- `src/lang.js`: the vacuum's ride, "Weeeee!" / «Віііі!» (§1.6).
+- `src/lang.js`: the vacuum's ride, "Weeeee!" / «Уіііііііі!» (§1.6).
 - Run again: `dash`, `deck3`, `intro`, `lang`.
 
 ### Step 2. The real tangerine, and the pocket (no art)
@@ -741,7 +741,7 @@ is seen when she is hit.
 |---|---|---|
 | The casino's chips | `Spill` in `movers.js` | 1: as built |
 | The trays on the floor | `Trays` in `hazards.js` | 3: the trip and the ride are the fright now; the door opens after, on the guest looking after her |
-| Deck 9's vacuum | `Darter` in `movers.js` | 5a, 5b (step 4's clips) |
+| Deck 9's vacuum | `Darter` in `movers.js` | 5a, 5b (step 4's clips). **Done (2026-11-17):** deck 4's picture, the ride the way it darted, back in its doorway after |
 | The wet patch's deck chair | `WetPatch` in `hazards.js` | 7a, 7b, by the end she slid in from |
 | The jogger | `haz_jogger`, `world.touched()` | 9a to 9d; his sorry on the spot |
 | The kid's jet | `lido.js` | 11a, 11b; his laugh |

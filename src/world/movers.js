@@ -306,21 +306,30 @@ const TRAY_HANDS = [[16, 33]];
 // The breakfast stewardess behind her trolley: her middle this far from its middle, her hands on its
 // handle in her `push` clip (drawn with the trolley there, 2026-11-17).
 const HANDLE = 26;
+// What of the trolley is solid, as its picture is (27 x 28): the table under its cloth, 21 wide and
+// 18 high, and the cloche's dome on it, 10 wide and 7 more, 1 px toward its front. One box the
+// cloche's height over the whole trolley was a wall of air over the table's ends (the user,
+// 2026-11-17: "an invisible wall").
+const TROLLEY = { w: 21, h: 18, dome: [10, 7, 1] };
 const realDoors = (s, d) => (d.real ??= d.doors.filter(x => (s.cabinDoorsDrawn ?? []).some(c => c.y === d.y && Math.abs(c.x - x) < 6)));
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 800 && Math.abs(s.player.y - d.y) < 300;
 
 // The robot vacuum in the doorway of the cabin being cleaned (population: `haz_vacuum_9`). Its red
 // eye blinks while she is coming; as she comes into reach it rattles, then darts out along the
 // corridor at her (a fright; a jump as it rattles clears it; the dash sends it spinning) and backs
-// in again, harmless. Then it stays in until she has gone away and come again.
+// in again, harmless. Then it stays in until she has gone away and come again. It is deck 4's
+// vacuum, the picture she rides in her gag (5a, 5b): caught by it, she rides it off down the
+// corridor the way it darted (`ride`, the ship scene's `rideGag`), and it is back in its doorway
+// when she is back at her checkpoint. Its eye is the light on its front.
 export class Darter {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y, reach, dart }
-        this.sprite = s.add.image(def.x, def.y, 'vacuum').setOrigin(0.5, 1).setDepth(D.props + 0.02);
-        this.eye = s.add.image(def.x, def.y - 8, 'dot').setTint(0xe83b3b).setDepth(D.props + 0.03);
+        // (2 px down into the carpet's top line, as deck 4's.)
+        this.sprite = s.add.image(def.x, def.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(D.props + 0.02);
+        this.eye = s.add.image(def.x, def.y, 'dot').setScale(0.5, 1).setTint(0xe83b3b).setDepth(D.props + 0.03);
         world.add([this.sprite, this.eye]);
         this.state = 'in';
         this.armed = true;
@@ -328,20 +337,22 @@ export class Darter {
         this.rest();
     }
 
-    // In the doorway: small and dim, half in the cabin's dark.
+    // In the doorway: dim, half in the cabin's dark; its eye on its front's light (1 x 2 px, at
+    // its picture's column 20 of 22, rows 6 and 7 of 11).
     rest() {
-        this.sprite.setPosition(this.def.x, this.def.y).setScale(0.8).setTint(0x9babb2).setAngle(0).setAlpha(1);
+        const v = this.sprite.setPosition(this.def.x, this.def.y + 2).setTint(0x9babb2).setAngle(0).setAlpha(1).setVisible(true);
+        this.eye.setPosition(v.x + (v.flipX ? -9.5 : 9.5), v.y - 4);
     }
 
     // A tangerine under it, thrown or lying: swallowed, and it chokes (docs/plan-three-uses.md §2).
     offered(t) {
         const s = this.scene, v = this.sprite;
-        if (this.state === 'dead' || this.state === 'spun' || !s.loose.near(t, v.x, this.def.y, 12, 12)) return false;
+        if (this.state === 'dead' || this.state === 'spun' || this.state === 'ridden' || !s.loose.near(t, v.x, this.def.y, 12, 12)) return false;
         s.loose.remove(t);
         s.tweens.killTweensOf(v);
         this.state = 'dead';
         this.eye.setVisible(false);
-        v.setScale(1).clearTint();
+        v.clearTint();
         this.world.choke(v);
         this.at = s.time.now + 700;
         return true;
@@ -375,7 +386,7 @@ export class Darter {
             v.x = d.x + (Math.floor(time / 40) % 2 ? 1 : -1);
             if (time > this.at) {
                 this.state = 'out';
-                v.setScale(1).clearTint().setFlipX(this.dir < 0);
+                v.clearTint().setFlipX(this.dir < 0);
                 sfx.at(d.x, d.y).vacDart();
                 // Out fast, a breath, and back in slowly: only on its way out is it a fright.
                 s.tweens.add({
@@ -401,7 +412,12 @@ export class Darter {
             } else if (this.world.carry) {
                 this.world.carryBox.spill(v.x, false, 'vacuum', { vx: this.dir * 300 });
             } else {
-                s.scareContact(v.x, 'vacuum', { vx: this.dir * 300 });
+                // (She rides it off, 5a or 5b: it is hidden meanwhile, and back in its doorway after.
+                // With a tangerine on her it is only a stumble, and it goes on its way.)
+                const ride = { x: v.x, y: v.y, dir: this.dir, v: 200,
+                               hide: () => { s.tweens.killTweensOf(v); this.state = 'ridden'; v.setVisible(false); },
+                               show: () => this.home(s.time.now + 1200) };
+                s.scareContact(v.x, 'vacuum', { vx: this.dir * 300, ride });
             }
         }
     }
@@ -1412,11 +1428,15 @@ export class Breakfast {
         this.cart = s.add.image(this.cartX, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.04);
         this.tray = world.image(0, 0, 'thing:breakfast-tray').setOrigin(0.5, 1).setVisible(false);
         world.add([this.cart, this.tray]);
-        // (A low thing to hop: solid, as the other carts on the decks are.)
-        this.zone = s.add.zone(this.cartX, def.y, this.cart.width - 6, this.cart.height - 3).setOrigin(0.5, 1);
+        // (A low thing to hop: solid, as the other carts on the decks are, by its shape: `TROLLEY`.)
+        const [dw, dh] = TROLLEY.dome;
+        this.zone = s.add.zone(this.cartX, def.y, TROLLEY.w, TROLLEY.h).setOrigin(0.5, 1);
+        this.dome = s.add.zone(this.cartX, def.y - TROLLEY.h, dw, dh).setOrigin(0.5, 1);
         s.physics.add.existing(this.zone, true);
+        s.physics.add.existing(this.dome, true);
         // (In a lunge she is past it, as past her: the user, 2026-11-16.)
-        world.solids.push({ id: `${def.id}_cart`, route: 'inside', zone: this.zone, items: [this.cart], through: true });
+        world.solids.push({ id: `${def.id}_cart`, route: 'inside', zone: this.zone, items: [this.cart], through: true },
+                          { id: `${def.id}_cloche`, route: 'inside', zone: this.dome, items: [], through: true });
         this.state = 'push';
         this.until = 0;
         this.holding = false;
@@ -1505,6 +1525,8 @@ export class Breakfast {
         this.cart.setX(this.cartX).setFlipX(this.dir < 0);
         this.zone.x = this.cartX;
         this.zone.body.updateFromGameObject();
+        this.dome.x = this.cartX + (this.dir < 0 ? -1 : 1) * TROLLEY.dome[2];
+        this.dome.body.updateFromGameObject();
         this.holdTray(p);
         this.bump(her, time);
         this.trolleyHit(her, time, this.state === 'push' ? moving : 0, dt);

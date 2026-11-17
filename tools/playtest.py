@@ -519,15 +519,15 @@ def scenario_lang(b):
     lost = "(i => [['T', i.titleText], ...i.buttons.map(q => ['S', q.text])].flatMap(([f, s]) => window.__pixeltext.missing(window.__ship, f, s)))(window.__ship.intro)"
     b.open("?reset")
     keys = b.eval(f"{L}.KEYS")
-    ok = check(sorted(keys["en"]) == sorted(keys["uk"]) and len(keys["en"]) > 20, "every text has both versions",
-               sorted(set(keys["en"]) ^ set(keys["uk"])))
+    ok = check(sorted(keys["en"]) == sorted(keys["ua"]) and len(keys["en"]) > 20, "every text has both versions",
+               sorted(set(keys["en"]) ^ set(keys["ua"])))
     ok &= check(b.eval(f"{L}.language()") == "en" and b.eval(texts) == ["BUMBUSIK", "PLAY", "LANGUAGE"] and b.eval(lost) == [], "English is the default: the welcome screen", (b.eval(texts), b.eval(lost)))
     b.shot("lang-title-en")
-    b.open("?reset&lang=uk")
-    ok &= check(b.eval(f"{L}.language()") == "uk" and b.eval(texts) == ["БУМБУСІК", "ГРАТИ", "МОВА"] and b.eval(lost) == [], "?lang=uk: the welcome screen in Ukrainian, every letter drawn", (b.eval(texts), b.eval(lost)))
+    b.open("?reset&lang=ua")
+    ok &= check(b.eval(f"{L}.language()") == "ua" and b.eval(texts) == ["БУМБУСІК", "ГРАТИ", "МОВА"] and b.eval(lost) == [], "?lang=ua: the welcome screen in Ukrainian, every letter drawn", (b.eval(texts), b.eval(lost)))
     b.shot("lang-title-uk")
     said = {}
-    for code in ("en", "uk"):
+    for code in ("en", "ua"):
         b.open(f"?reset&play&lang={code}")
         time.sleep(0.4)
         b.eval(f"{S}.lockedUntil = 0; {S}.showLocked('deck')")
@@ -536,8 +536,8 @@ def scenario_lang(b):
         said[code] = (lock, alert(b), b.eval(f"{L}.t('fright.startled')"), b.eval(f"{L}.t('win.tally', 1, 2, 3, 4, 5)"))
         time.sleep(0.7)
     ok &= check(said["en"][:3] == ("🔒 Deck card", "Oops!", "Oh, sorry!"), "a lock, her word, a fright: in English", said["en"])
-    ok &= check(said["uk"][:3] == ("🔒 Палубна картка", "Ой!", "Ой, вибачте!"), "and in Ukrainian", said["uk"])
-    ok &= check("1 of 2" in said["en"][3] and "1 з 2" in said["uk"][3], "the win screen's tally takes its numbers in both", (said["en"][3], said["uk"][3]))
+    ok &= check(said["ua"][:3] == ("🔒 Палубна картка", "Ой!", "Ой, вибачте!"), "and in Ukrainian", said["ua"])
+    ok &= check("1 of 2" in said["en"][3] and "1 з 2" in said["ua"][3], "the win screen's tally takes its numbers in both", (said["en"][3], said["ua"][3]))
     ok &= check(b.eval(f"{S}.bubble.text") == "Кісюнічка!!!", "her shout is hers in both")
     ok &= check(b.eval(f"typeof {S}.world.hint + typeof {S}.world.glyph") == "undefinedundefined", "no hint and no key's cap is left in the game")
     b.open("?reset")
@@ -2751,12 +2751,14 @@ def scenario_region4(b):
     time.sleep(0.3)
     ok &= check(js(b, f"{vac}.state") == "in" and js(b, f"{vac}.armed"), "the vacuum waits in the cabin's doorway")
     b.key("right", True)
-    hit = scared(b, "Eeek", 2.5)
+    hit = scared(b, "Weeeee", 2.5)
     b.key("right", False)
     b.shot("region4-vacuum")
-    ok &= check(hit, "running at the doorway: it darts out at her", alert(b))
-    time.sleep(2.8)
-    ok &= check(b.state()["mode"] == "play" and abs(b.state()["x"] - exact_x(119.6)) < 30, "and she is back at the crew door by the trunk", b.state())
+    ok &= check(hit and js(b, "window.__ship.lastMishap?.id") == "5a" and not js(b, f"{vac}.sprite.visible"),
+                "running at the doorway: it darts out at her, and she rides it off (5a)", (alert(b), js(b, "window.__ship.lastMishap?.id")))
+    wait_js(b, "window.__ship.mode === 'play'", 8)
+    ok &= check(abs(b.state()["x"] - exact_x(119.6)) < 30 and js(b, f"{vac}.state === 'in' && {vac}.sprite.visible"),
+                "and she is back at the crew door by the trunk, the vacuum in its doorway", b.state())
     # A jump as it rattles clears it.
     b.teleport(vx - 160, D9)
     wait_js(b, f"{vac}.state === 'in' && {vac}.armed", 6)
@@ -3179,7 +3181,7 @@ def scenario_region6(b):
     hold_until(b, "right", lambda s: s["x"] > trays["x0"] + 6, 5)
     ok &= check(scared(b, "sorry", 3), "the trays clatter under her feet, and their door flies open: startled", alert(b))
     b.shot("region6-trays")
-    ok &= check(wait_js(b, f"{S}.mode === 'play'", 8) and "trays_10m" in flags(b), "she comes back at a checkpoint", b.state())
+    ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8) and "trays_10m" in flags(b), "she comes back at a checkpoint", b.state())
     ok &= check(js(b, f"{S}.tangerines.some(t => t.id === 'tan_10_tray')"), "a tangerine has rolled out from among the trays")
     b.teleport(trays["x0"] - 42, D10)
     time.sleep(0.6)
@@ -3249,7 +3251,7 @@ def scenario_region6(b):
     b.teleport(L["kidA"] + 70, D11)
     ok &= check(scared(b, "Aaah", 4), "in front of the kid within four metres: splashed", alert(b))
     b.shot("region6-kid")
-    ok &= check(wait_js(b, f"{S}.mode === 'play'", 8) and abs(b.state()["x"] - js(b, f"{S}.checkpoints.find(c => c.id === 'cp_pool').x")) < 30,
+    ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8) and abs(b.state()["x"] - js(b, f"{S}.checkpoints.find(c => c.id === 'cp_pool').x")) < 30,
                 "and back at the hut", b.state())
     b.eval(f"{S}.save.tangerines += 2; {S}.refreshHud()")
     b.eval(f"{kid}.x = {L['kidA'] + 190}; {kid}.dir = -1; {kid}.mode = 'patrol'; {kid}.nextSquirt = {S}.time.now + 1500; {kid}.pauseUntil = 0")
@@ -3279,7 +3281,7 @@ def scenario_region6(b):
     ok &= check(b.state()["x"] - x1 > 18, "without them she slides on across them", (x1, b.state()))
     ok &= check(scared(b, "Oops", 2), "and the deck chair slides at her: bumped", alert(b))
     b.shot("region6-wet")
-    wait_js(b, f"{S}.mode === 'play'", 8)
+    wait_js(b, "window.__ship.mode === 'play'", 8)
     time.sleep(2.5)
     b.teleport(wet["x0"] - 60, D11)
     time.sleep(0.4)

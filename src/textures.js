@@ -57,14 +57,6 @@ const SPRITES = {
         'CccccccccccccccC',
         'CCCCCCCCCCCCCCCC',
     ],
-    vacuum: [
-        '.....dddddd.....',
-        '...ddmmmmmmdd...',
-        '..dmmmmuummmmd..',
-        '.dmmmmmmmmmmmmd.',
-        'dddddddddddddddd',
-        '.d............d.',
-    ],
     // A small side table, background furniture (muted, so it never reads as something to stand on).
     sidetable: [
         'TTTTTTTTTTTTTTTTTTTT',

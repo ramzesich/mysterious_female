@@ -7,7 +7,7 @@ D free: the cry and the lunge never use up a tangerine (`tangerines=infinite`).
 Useful additions to any link:
 
 - `&reset` clears the saved progress first.
-- `&lang=uk` shows the game in Ukrainian for that session (`&lang=en` for English).
+- `&lang=ua` shows the game in Ukrainian for that session (`&lang=en` for English).
 - `&sound=off` silences it.
 - `&did=<flags>` starts with parts of the story already done (the list is in `README.md`).
 
@@ -77,6 +77,7 @@ new one added there should be added here too.
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all&tangerines=infinite> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all&tangerines=infinite> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all&tangerines=infinite> |
+| `deck9-aft`: past the steward's jammed cart, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all&tangerines=infinite> |
 | `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all&tangerines=infinite> |
 | `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all&tangerines=infinite> |
 
