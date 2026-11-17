@@ -10,10 +10,10 @@ const PICK = {
     chips: () => '1',
     lead: () => '2',
     trays: () => '3',
-    // A paper: run onto, or sliding her way as she goes, her foot goes on ahead (back on her bottom);
-    // slid against her from behind, her foot is taken back (on her front); one sliding at her as she
-    // stands looking at it stops against her shoe (the user's: "nothing").
-    papers: f => f.lying ? '4a' : !f.front ? '4b' : f.she ? '4a' : '4c',
+    // A paper (the user, 2026-11-16): at her front, sliding at her or lying where she steps, her
+    // leg goes up behind her and she falls on her belly; at her heel, from behind, her leg goes up
+    // in front and she falls on her bottom. Standing still she slips too.
+    papers: f => f.front ? '4a' : '4b',
     // (With none on her she rides it off either way, the user, 2026-11-16; with one, the side.)
     vacuum: f => f.front || f.she ? '5a' : '5b',
     // The suitcase: run into; rolled into her back; rolled into her front. With none on her she

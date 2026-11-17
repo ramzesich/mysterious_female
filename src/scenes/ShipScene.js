@@ -4478,8 +4478,8 @@ export class ShipScene extends Phaser.Scene {
     }
 
     // Her gag where she stands, one picture of her with the thing (§1.6: the papers, 4a and 4b),
-    // facing her way; the world's own is taken away (`ride.hide()`, when it passes one). She stays
-    // down a while, then her checkpoint.
+    // facing her way; set down so that its thing is where the world's own is (`ride.x`, the gag's
+    // `paper`), which is taken away (`ride.hide()`). She stays down a while, then her checkpoint.
     fallGag(sc, ride) {
         const p = this.player, g = GAGS[sc.gag];
         this.beginScare();
@@ -4489,7 +4489,9 @@ export class ShipScene extends Phaser.Scene {
         this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
         this.script = null;
         ride?.hide?.();
-        const s = this.add.sprite(p.x, p.y, 'her-mishaps').setOrigin(0.5, 1)
+        const face = p.flipX ? -1 : 1;
+        const x = ride?.x !== undefined && g.paper !== undefined ? ride.x - face * g.paper : p.x;
+        const s = this.add.sprite(x, p.y, 'her-mishaps').setOrigin(0.5, 1)
             .setFlipX(p.flipX).setDepth(p.depth);
         this.worldLayer.add(s);
         p.setVisible(false);

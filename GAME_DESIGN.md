@@ -2351,15 +2351,12 @@ Nothing blocks the start of the build. These get settled along the way:
       runaway suitcase to the end of its roll, whichever side they reach her (the user: "I prefer
       the ride in all cases": 5a, 6a, 6c ride too), one picture of her with the thing
       (`assets/sprites/her-mishaps.png`); the vacuum smaller and the suitcase cut from those same
-      pictures. **The papers under way (2026-11-16, saved at the user's word to continue the next
-      day):** a first 4a and 4b went into the game and the user found them wrong ("It doesn't work
-      at all"); by their brief, the paper from behind sits her down with a tent, from the front
-      lays her on her belly with a blanket, her paper leg kicked up and the paper circling after
-      it; she slips on one standing too (4c gone); the sliding paper generated. **Waiting on the
-      user:** the sliding newspaper (A or B, 14 or 10 px, `assets/source/things/newspaper-sliding/`)
-      and the two candidate clips (`paper-behind-sit/`, `paper-front-belly/`; or 3 again for a
-      higher leg); then wire them (the game still has the first version: `fallGag`, 4c fading; the
-      `deck4` playtest's paper check will need the new rules). **Then** the rest of region 1's
+      pictures. **The papers done (2026-11-17):** by the user's brief, a paper at her front (sliding
+      at her, standing or running, or lying where she steps) sends her leg up behind her and her
+      onto her belly, the paper round onto her back (4a); one at her heel takes it forward and up,
+      she sits, the paper round onto her head (4b); she slips standing too (4c gone). The sliding
+      newspaper generated (the user's pick), sliding at a steady speed right to her foot, where her
+      clip takes over from the same picture. **Next in step 4's revision:** the rest of region 1's
       gags (8a to 8d, 10a, 10b, the dog's lick, the porter's cap: each still shown and approved
       before it is animated or placed), the art rule looked back over; then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the

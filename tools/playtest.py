@@ -1249,9 +1249,14 @@ def scenario_pocket(b):
     ok &= check(got == "23" and clip == "her-apology" and not flying and n == 1, "a door's hand takes it as she bows", (got, clip, flying, n))
     b.shot("pocket-apology")
     time.sleep(1.6)
-    # The papers she stands watching stop at her shoe: nothing at all.
+    # A paper at her front, standing (the user, 2026-11-16: she slips standing too): she stumbles on,
+    # the tangerine ahead of her (her gag falls forward); one at her heel: she slips back, behind her.
     got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'papers', {{ vx: -60 }}")
-    ok &= check(got == "4c" and n == 2 and not flying, "a paper sliding at her as she stands: nothing", (got, n))
+    ok &= check(got == "4a" and clip == "her-stumble" and flying and flying[0] > 30 and n == 1,
+                "a paper at her front as she stands: she stumbles, the tangerine ahead of her", (got, clip, flying, n))
+    got, (clip, flying, n, mode) = hit(f"{S}.player.x - 12, 'papers', {{ vx: 60 }}")
+    ok &= check(got == "4b" and clip == "her-slipback" and flying and flying[0] < -30,
+                "one at her heel: she slips back, the tangerine behind her", (got, clip, flying))
     # A tangerine she gets flies to the count, which changes as it lands.
     b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {S}.gainTangerine({S}.player.x + 40, {S}.player.y - 10)")
     shown = b.eval(f"[{S}.save.tangerines, {S}.hudCount.text]")
@@ -1522,29 +1527,45 @@ def scenario_deck4(b):
     ok &= check(hud == {"cat": "2/8", "her": "1/4", "him": None}, "the HUD counts each kind from its first find", hud)
     b.shot("deck4-hud")
 
-    # The paper round: a paper sliding under her feet is a slip.
+    # The paper round (the user, 2026-11-16 and 17): a paper sliding at a steady speed right to her
+    # foot; at her heel she sits with it over her head (4b), at her front she goes down on her belly
+    # with it on her back (4a), standing or not; the paper is the one in her gag, the world's gone.
     P = f"{W}.movers.find(m => m.def?.id === 'haz_papers_5')"
-    b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; }})({P})")
-    b.teleport(b.eval(f"{P}.def.doors[1]") - 40, D5)
-    b.wait_for(f"{P}.papers.length > 0 || {S}.mode !== 'play'", timeout=12)
-    b.wait_for(f"{S}.mode !== 'play'", timeout=4)
-    ok &= check(b.state()["mode"] == "scripted", "a sliding paper under her feet: she slips", b.state())
-    # (It shoots on to its door, nothing left lying in the corridor, and a hand takes it in.)
-    b.wait_for(f"{P}.papers.filter(q => q.hit).every(q => q.done)", timeout=4)
-    at = b.eval(f"{P}.papers.filter(q => q.hit).map(q => Math.round(q.img.x - q.door))")
-    ok &= check(bool(at) and all(abs(a) < 2 for a in at), "and it slides on to its door", at)
-    b.wait_for(f"!{P}.papers.some(q => q.hit)", timeout=5)
-    ok &= check(True, "where a hand takes it in")
+    GAG = f"{S}.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"
+    def paper_hit(face_right, label):
+        b.wait_for(f"{S}.mode === 'play'", timeout=10)
+        b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; p.papers.forEach(q => q.img.destroy()); p.papers = []; }})({P})")
+        b.teleport(b.eval(f"{P}.def.doors[1]") - 40, D5)
+        time.sleep(0.2)
+        b.eval(f"{S}.player.setFlipX({'false' if face_right else 'true'})")
+        b.wait_for(f"{P}.papers.some(q => q.img.x > {S}.player.x - 90)", timeout=12)
+        x1 = b.eval(f"{P}.papers[0].img.x"); time.sleep(0.1); x2 = b.eval(f"{P}.papers[0]?.img.x ?? 0")
+        hx = b.eval(f"{S}.player.x")
+        b.wait_for(f"{S}.mode !== 'play'", timeout=4)
+        got = b.eval(f"[{S}.lastMishap?.id, {GAG}?.anims.currentAnim?.key, Math.round({GAG}?.x - {hx}), {P}.papers.length]")
+        b.shot(f"deck4-{label}")
+        return got, x2 - x1
+    got, step = paper_hit(True, "paper-behind")
+    ok &= check(150 < step * 10 < 330, "a paper slides at a steady speed as it nears her (px/s)", round(step * 10))
+    ok &= check(got[0] == "4b" and got[1] == "gag-paper-behind" and abs(got[2]) <= 4 and got[3] == 0,
+                "at her heel as she stands: she sits, the paper over her head; the world's own gone", got)
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    ok &= check(not b.eval(f"!!{GAG}"), "back at her checkpoint, the gag's picture gone")
+    got, _ = paper_hit(False, "paper-front")
+    ok &= check(got[0] == "4a" and got[1] == "gag-paper-front" and abs(got[2]) <= 4 and got[3] == 0,
+                "at her front as she stands: she slips too, on her belly, the paper on her back", got)
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
 
-    # One lying at its door, not yet taken in: she slips on it too.
+    # One lying at its door, not yet taken in: walked onto, the same fall.
     b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; }})({P})")
     door = b.eval(f"{P}.def.doors[1]")
     b.teleport(door + 150, D5)
     b.wait_for(f"{P}.papers.some(q => q.door === {door} && q.done)", timeout=15)
     b.teleport(door - 30, D5)
     s = hold_until(b, "right", lambda st: st["mode"] != "play", timeout=2)
-    ok &= check(s["mode"] == "scripted", "a paper lying at its door, not yet taken in: she slips on it", s)
+    got = b.eval(f"[{S}.lastMishap?.id, {GAG}?.anims.currentAnim?.key]")
+    ok &= check(s["mode"] == "scripted" and got == ["4a", "gag-paper-front"],
+                "a paper lying at its door, not yet taken in: walked onto, on her belly", (s["mode"], got))
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
 
     # The breakfast round: a plate taken in at a door, the trolley wheeled on; walked into, a fright.

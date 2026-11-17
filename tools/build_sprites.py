@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from palettize import palettize, hex_rgb
+from palettize import palettize, paper_greys, hex_rgb
 
 ROOT = Path(__file__).resolve().parent.parent
 COLS = 48           # cells in a row of a sheet
@@ -216,18 +216,24 @@ HER_MISHAPS = {
         "suitcase-sit": [(f"suitcase-sit/{i}.png", "feet") for i in range(1, 7)],
         "suitcase-ride": [(f"suitcase-ride/{i}.png", "feet") for i in range(1, 9)],
         "suitcase-tip": [(f"suitcase-tip/{i}.png", "feet") for i in range(0, 9)],
-        # 4a: a paper slid her way, she sits down hard and it flutters over her head (a tent). Its
-        # frames stand on the floor of her start picture (row 81), in the air and down.
-        "paper-tent": [(f"paper-tent/frame_{i:03d}.png", 81) for i in range(1, 9)],
-        # 4b: slid against her from behind, she pitches onto her belly and it settles on her back
-        # (the user chose this one over `paper-blanket/`, where it came down in front of her). In
-        # the air on her start's floor (row 85); lying, on her elbows (row 83: the clip had her 2 px
-        # over the floor), the paper's edge under them cut at the floor.
-        "paper-blanket": [(f"paper-blanket-behind/frame_{i:03d}.png", 85 if i < 4 else 83) for i in range(1, 9)],
+        # The papers (the user's brief, 2026-11-16; picked 2026-11-17), each from her standing on the
+        # sliding newspaper (`paper-start/start2-*.png`), its first frame (her still standing) left out
+        # so that the push carries straight into the fall. 4b, from behind: her heel taken forward and
+        # up, she sits, the paper round over her onto her head. In the air on her start's floor (row
+        # 83, her feet; the paper's lower edge a px under it, as in the start picture); sitting, by
+        # each frame's lowest row.
+        "paper-behind": [(f"paper-behind-sit/frame_{i:03d}.png", 83 if i < 7 else "feet") for i in range(2, 11)],
+        # 4a, from the front: her leg up behind her, onto her belly, the paper round onto her back.
+        # Standing and in the air on row 87; lying on her elbows, row 85 (the last frame's paper
+        # hanging past them cut at the floor).
+        "paper-front": [(f"paper-front-belly/frame_{i:03d}.png", 87 if i < 7 else ("cut", 85)) for i in range(2, 11)],
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
-    # A gag with no thing to place it by: her middle in the clip's start picture on the cell's middle.
-    "start": {"paper-tent": "paper-tent/frame_000.png", "paper-blanket": "paper-blanket-behind/frame_000.png"},
+    # A gag with no thing to place it by: her middle in its frames (her own sprite's, in the start
+    # picture) on the cell's middle.
+    "middle": {"paper-behind": 36, "paper-front": 28},
+    # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
+    "paper": ("paper-",),
     "baseline": "ride-vacuum/east.png",
 }
 
@@ -304,7 +310,9 @@ def build(spec):
     cells, meta = [], {"cell": cell, "frames": {}, "anims": {}}
     for anim, sources in spec["frames"].items():
         indices = []
-        images = [(palettize(Image.open(src_dir / path), remap), anchor) for path, anchor in sources]
+        paper = anim.startswith(spec.get("paper", ())) if spec.get("paper") else False
+        images = [(palettize(paper_greys(Image.open(src_dir / path)) if paper else Image.open(src_dir / path), remap), anchor)
+                  for path, anchor in sources]
         anim_feet = max(lowest_row(img) for img, _ in images)
         # Placed by its thing (HER_MISHAPS): the clip moved sideways by its first frame's thing.
         shift = 0
@@ -314,18 +322,17 @@ def build(spec):
                 colours = {c[1][:3] for c in pic.getcolors(4096) if c[1][3] and sum(c[1][:3]) > 60}
                 first = Image.open(src_dir / sources[0][0])
                 shift = first.width // 2 - prop_middle(first, colours)
-        if anim in spec.get("start", {}):
-            first = Image.open(src_dir / spec["start"][anim]).convert("RGBA")
-            bb = first.getbbox()
-            shift = first.width // 2 - (bb[0] + bb[2]) // 2
+        if anim in spec.get("middle", {}):
+            shift = Image.open(src_dir / sources[0][0]).width // 2 - spec["middle"][anim]
         for img, anchor in images:
             if anchor == "keep":
                 feet = standing_feet(img.size)
                 if feet is None:
                     feet = anim_feet
             elif isinstance(anchor, int):
-                # The row of the frame on the floor; whatever is under it is cut.
-                feet = anchor
+                feet = anchor                       # the row of the frame on the floor
+            elif isinstance(anchor, tuple):
+                feet = anchor[1]                    # ("cut", row): on the floor, whatever is under it cut
                 img = img.copy()
                 img.paste((0, 0, 0, 0), (0, feet + 1, img.width, img.height))
             else:

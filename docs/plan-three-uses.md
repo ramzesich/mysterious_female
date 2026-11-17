@@ -188,10 +188,10 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 1 | Casino chips (3) | She runs onto them | On her bottom, butterflies (built). Standing on them: nothing (built) |
 | 2 | The dog's lead | She runs into it | On her belly, butterflies (built); **the dog comes and licks her face** |
 | 3 | Trays on the floor (10) | She runs onto them | **A tray shoots on ahead with her on it**, arms wheeling, out of the screen; a crash; the door opens on the guest looking after her |
-| 4a | A sliding paper | It slides her way | She sits down; the paper flutters open over her head like a tent |
-| 4b | | It slides against her | Down on her belly, chin on her hands; the paper settles on her back like a blanket |
-| 4c | | She stands still | **Nothing: it stops against her shoe.** Stopped short of its door it is not taken in by the hand: it fades away a moment later, harmless while it lies there (the user: "a stopped [paper] would not be collected, if it stops not by the door. It just disappears shortly after") |
-| | | **The user's revision (2026-11-16, after trying the first 4a and 4b in the game: "It doesn't work at all")** | **From behind: the paper slides on under her foot, that leg goes up with the paper following it round in a circle, she falls on her bottom and it covers her as a tent. From the front: she falls on her belly, that leg up behind her, the paper following it round and covering her from above. She slips on a paper even standing (no more 4c). The sliding paper is generated, near the size of the open one.** Candidates made, the user to decide (see step 4's progress) |
+| 4a | A sliding paper | ~~It slides her way~~ **At her front: sliding at her, standing or running, or lying where she steps** | ~~She sits down; the paper flutters open over her head like a tent~~ **Her leg flies up behind her with the paper on its sole, she lands on her belly, the paper comes round and down onto her back** (the user, 2026-11-16; built 2026-11-17) |
+| 4b | | ~~It slides against her~~ **At her heel, from behind** | ~~Down on her belly, chin on her hands; the paper settles on her back like a blanket~~ **Her heel is taken forward and up with the paper, she sits down hard, the paper comes round over her and lands on her head as a tent** |
+| ~~4c~~ | | ~~She stands still~~ | ~~Nothing: it stops against her shoe.~~ **Gone (the user, 2026-11-16): she slips on a paper standing too** |
+| | | **The user's revision (2026-11-16, after trying the first 4a and 4b in the game: "It doesn't work at all")** | **From behind: the paper slides on under her foot, that leg goes up with the paper following it round in a circle, she falls on her bottom and it covers her as a tent. From the front: she falls on her belly, that leg up behind her, the paper following it round and covering her from above. She slips on a paper even standing (no more 4c). The sliding paper is generated, near the size of the open one.** Built 2026-11-17 (the rows above), the paper sliding at a steady speed right to her foot |
 | 5a | Robot vacuums (decks 4 and 9) | It comes at her front, or she runs into it | ~~Forward over it, on her belly across it; it bumps her side twice and trundles home. "Eeek!"~~ **As 5b: she rides it off** (the user, 2026-11-16: "I prefer the ride in all cases"), turned round onto it, the way it was going |
 | 5b | | It catches her from behind | **She sits down on it and it carries her off down the corridor**, like a cat on one. **"Weeeee!"** (see the words, below) |
 | 6a | The runaway suitcase | She runs into it | ~~Over it; it pops open; she sits up in someone's sun hat~~ **As 6b: she rides it** (the user, 2026-11-16); standing at an end of its roll, it sets off for the other end with her |
@@ -253,8 +253,9 @@ gusts, the laundry lines, the gulls that take food, the waiter).
 - **The four gags that carry her off** (3, 5b, 6b, 20) are each one picture of her with the
   thing: the world's own tray, vacuum, suitcase or gull is hidden while the clip moves, and is
   back in its place when she steps out of her door.
-- **4c makes the papers gentler on purpose:** a slow thing she is looking at does not knock her
-  over. She still has to hop them to get past. (6c did the same for the suitcase until the user
+- ~~**4c makes the papers gentler on purpose:** a slow thing she is looking at does not knock her
+  over. She still has to hop them to get past.~~ (The user, 2026-11-16: she slips on a paper
+  standing too; the papers slide fast and steady, so a slip convinces.) (6c did the same for the suitcase until the user
   tried the ride from every side, 2026-11-16: "I prefer the ride in all cases": the vacuum and the
   suitcase carry her off whichever side they reach, the gag's picture facing the way it goes.)
 - **The words over her head** stay as they are for each kind of hit, in both languages. One
@@ -624,13 +625,13 @@ Shown: her throw's frames for approval before anything else; then each target as
   6b, 8a, 8b, 8c, 8d, 10a, 10b), the dog's lick, the porter's cap: about 70 generations.
   **Done (2026-11-16): 5b and 6b, and with them 5a, 6a and 6c, which ride too** (the user's
   word after trying it); the vacuum, made smaller, and the suitcase are cut from the same pictures.
-  Left: 4a, 4b, 8a to 8d, 10a, 10b, the dog's lick, the porter's cap. **The papers (2026-11-16,
+  Left: 8a to 8d, 10a, 10b, the dog's lick, the porter's cap (4a, 4b done, below). **The papers (2026-11-16,
   under way):** a first 4a (sat, a tent) and 4b (on her belly, a blanket, the paper from behind)
   were approved as clips and put in the game (`fallGag` in the ship scene, a stopped paper fading
   for 4c, the start place `deck5`); the user tried them and asked for them again by the paper's
-  side (the revision under the table above). Candidates for that are made and kept
-  (`assets/source/her-mishaps/paper-behind-sit/`, `paper-front-belly/`; the sliding newspaper,
-  `assets/source/things/newspaper-sliding/`, A or B, 14 or 10 px tall): the user decides which.
+  side (the revision under the table above). **Done 2026-11-17:** the sliding newspaper
+  generated (`things/paper-sliding.png`, the user's B at 10 px), the two clips made from her
+  standing on it, its slide steady to her foot (approved in the game).
   The
   first to be made and shown are 5b and 6b (her on the vacuum, her on the suitcase): they tell
   whether a picture of her riding a thing holds up.

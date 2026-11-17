@@ -982,6 +982,9 @@ export class Fetcher {
 // he stands aside a while. A tangerine thrown to him: he catches it and
 // stands aside to eat it (spent). In a lunge she is through the papers.
 export class Skimmer {
+    static SPEED = 5.5 * M;     // a paper's slide, px/s (about 260)
+    static BRAKE = Skimmer.SPEED * Skimmer.SPEED / M;   // stopping in the last half metre to its door
+    static REACH = 9;           // px between its middle and hers when her foot is on it
     constructor(world, def) {
         const s = world.scene;
         this.world = world;
@@ -1048,12 +1051,14 @@ export class Skimmer {
         this.flicking = true;
         this.world.people.play(p, 'flick').then(() => { this.flicking = false; });
         s.time.delayedCall(220, () => {
-            const img = s.add.image(this.x + this.dir * 10, d.y, 'paper-fold').setOrigin(0.5, 1).setDepth(s.DEPTH.props + 0.02);
+            // (The paper the user picked of two generated, `assets/source/things/paper-sliding.png`;
+            // its curled edge trailing, as in the first picture of her clips with it.)
+            const dir = Math.sign(door - (this.x + this.dir * 10)) || 1;
+            const img = s.add.image(this.x + this.dir * 10, d.y, 'things', 'paper-sliding').setOrigin(0.5, 1)
+                .setFlipX(dir < 0).setDepth(s.DEPTH.props + 0.02);
             this.world.add([img]);
             sfx.at(this.x, d.y).paperSlide();
-            // (Fast, and slowing to a stop at its door in about a second and a half.)
-            const run = Math.abs(door - img.x), t = 1.5;
-            this.papers.push({ img, v: 2 * run / t, a: 2 * run / (t * t), door, dir: Math.sign(door - img.x) || 1 });
+            this.papers.push({ img, v: Skimmer.SPEED, door, dir });
         });
     }
 
@@ -1065,60 +1070,53 @@ export class Skimmer {
             if (q.done) {
                 if (!q.hit && !q.taking && this.under(q, her)) {
                     q.hit = true;
-                    if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: q.v <= 0 });
-                    else s.scareContact(q.img.x, 'papers', { vx: q.dir * q.v, lying: q.v <= 0, ride: this.onHer(q) });
+                    if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: 0, lying: true });
+                    else s.scareContact(q.img.x, 'papers', { vx: 0, lying: true, ride: this.onHer(q) });
                 }
                 continue;
             }
-            if (q.v <= 0 || (q.door - q.img.x) * q.dir <= 0) {
+            const left = Math.abs(q.door - q.img.x);
+            if (left < 0.5) {
                 q.done = true;
+                q.v = 0;
                 q.img.x = q.door;
                 s.time.delayedCall(2000, () => this.takeIn(q));
                 continue;
             }
-            q.img.x += q.dir * Math.min(q.v * dt, Math.abs(q.door - q.img.x));
-            q.v -= q.a * dt;
-            // Stepped on while it slides: she slips (once), and it shoots on to its door.
+            // At a steady speed right to her foot (the user, 2026-11-17: slowing as it reached her,
+            // her fall did not convince), braking only in its last half metre to its door.
+            q.v = Math.min(Skimmer.SPEED, Math.sqrt(2 * Skimmer.BRAKE * left));
+            q.img.x += q.dir * Math.min(Math.max(q.v, 20) * dt, left);
+            // Under her foot as it slides: she slips (once); with a tangerine on her (no gag) it
+            // goes on to its door.
             if (!q.hit && this.under(q, her)) {
                 q.hit = true;
-                const v = q.v;
-                q.v = Math.max(q.v, Math.sqrt(2 * q.a * Math.max(1, Math.abs(q.door - q.img.x))));
-                if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: q.dir * q.v, lying: !(q.v > 0) });
-                else if (s.scareContact(q.img.x, 'papers', { vx: q.dir * v, lying: !(v > 0), ride: this.onHer(q) }) === '4c') this.stopped(q, her);
+                // (From where it came: its middle may be a step past hers by the frame it is seen.)
+                const from = q.img.x - q.dir * 20;
+                if (this.world.carry) this.world.carryBox.spill(from, false, 'papers', { vx: q.dir * q.v });
+                else s.scareContact(from, 'papers', { vx: q.dir * q.v, ride: this.onHer(q) });
             }
         }
     }
 
-    // Her foot on a paper (not in a lunge: she is through them).
+    // Her foot on a paper (not in a lunge: she is through them): its middle within a few px of
+    // hers, where her clip's first picture has it (a foot on its near half).
     under(q, her) {
         const s = this.scene, d = this.def;
-        return here(s, d) && !s.isLunging() && Math.abs(her.x - q.img.x) < PLAYER.bodyWidth / 2 + 5 && her.y > d.y - 4;
+        return here(s, d) && !s.isLunging() && Math.abs(her.x - q.img.x) < Skimmer.REACH && her.y > d.y - 4;
     }
 
-    // The paper that hit her is the one in her gag (4a, 4b: over her head, on her back): the
-    // world's own is taken away (the ship scene's `fallGag` calls `hide`).
+    // The paper that hit her is the one in her gag (4a, 4b): her clip is set down by where it is
+    // (`x`), and the world's own taken away (the ship scene's `fallGag` calls `hide`).
     onHer(q) {
         return {
+            x: q.img.x,
             hide: () => {
                 q.gone = true;
                 q.img.destroy();
                 this.papers = this.papers.filter(o => o !== q);
             },
         };
-    }
-
-    // One sliding at her as she stands looking at it stops against her shoe (4c), short of its
-    // door: no hand takes it in; it lies there harmless a moment and fades away (the user).
-    stopped(q, her) {
-        const s = this.scene;
-        q.v = 0;
-        q.done = true;
-        q.gone = true;
-        q.img.x = her.x - q.dir * (PLAYER.bodyWidth / 2 + 4);
-        s.tweens.add({
-            targets: q.img, alpha: 0, delay: 1000, duration: 700,
-            onComplete: () => { q.img.destroy(); this.papers = this.papers.filter(o => o !== q); },
-        });
     }
 
     // A paper at its door taken in (`world.handTakes`).

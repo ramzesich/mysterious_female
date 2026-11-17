@@ -2122,3 +2122,29 @@ here" 7); each built step is gone back over under its "Revision".
   expects the old rules (not run).
 - Generations: 36 (the two oversized stills 20; clips 6 + 2 + 6; the two papers 2).
 
+## Step 4's revision, the papers done (2026-11-17)
+
+- **What the user asked first** (on seeing the strips): the paper sliding on the floor and her
+  slip clip, which has the paper in it, "work seamlessly together visually". Shown as one strip
+  each, composed from the real pictures: the world's paper sliding in under her (her own standing
+  sprite), then the clip, whose first frame is that same picture. Both papers now get one colour
+  rule (`paper_greys` in `tools/palettize.py`: the neutral greys by lightness, before the palette,
+  so that white paper is white and not pale green; her shirt's tinted shades are left alone).
+- **"The newspaper is slowing down when it gets under her foot. So the resulting fall is
+  unconvincing":** a paper slides at a steady 260 px/s right to her foot, braking only in its last
+  half metre to its door; the clip's first frame (her still standing) left out and its next three
+  at 60 ms, so that the push carries into the fall. Approved as a strip, then in the game.
+- **In the game:** the user's B at 10 px (`assets/source/things/paper-sliding.png`, in the things
+  sheet; the code-drawn 10 x 3 one gone), its curled edge trailing as in the clips. At her front
+  (sliding at her, standing or running, or lying at a door where she steps): 4a, her leg up behind
+  her, on her belly, the paper on her back. At her heel: 4b, on her bottom, the paper over her head.
+  She slips standing too (4c gone). Her foot is on it when its middle is within 9 px of hers; the
+  clip is set down by where the paper is (`GAGS[..].paper`: its offset from her middle in the
+  first picture) and the world's paper is taken away, so the paper does not jump. With a
+  tangerine on her the side gives her short reaction the way she falls: the front a stumble on
+  (the tangerine ahead), the heel a slip back (behind).
+- No new generations (36 for the papers in all, 2026-11-16).
+- Passed: `deck4` (the slide's speed near her, 273 px/s; from behind and in front as she stands;
+  one lying at its door walked onto; back at her checkpoint), `pocket` (a paper at her front and
+  at her heel with a tangerine), `region1`, `boot`: 85 checks. The rest not run.
+

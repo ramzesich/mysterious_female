@@ -284,11 +284,6 @@ export class World {
             g.fillStyle(0xbf6f4a, 1).fillRect(1, 1, 24, 1);
             g.fillStyle(0x2e222f, 1).fillRect(3, 4, 2, 5).fillRect(21, 4, 2, 5).fillRect(5, 4, 2, 2).fillRect(19, 4, 2, 2);
         });
-        make('paper-fold', 10, 3, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 10, 3);
-            g.fillStyle(0xf3ecdd, 1).fillRect(1, 0, 8, 2);
-            g.fillStyle(0x9babb2, 1).fillRect(2, 1, 2, 1).fillRect(5, 1, 3, 1);
-        });
         make('knit-basket', 14, 8, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 1, 14, 7).fillRect(2, 0, 10, 1);
             g.fillStyle(0xc28d75, 1).fillRect(1, 2, 12, 5);

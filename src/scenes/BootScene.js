@@ -198,9 +198,11 @@ export class BootScene extends Phaser.Scene {
         const gag = this.cache.json.get('her-mishaps-meta');
         for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
                                            ['suitcase-sit', 10, 0], ['suitcase-ride', 8, -1], ['suitcase-tip', 10, 0],
-                                           ['paper-tent', 10, 0], ['paper-blanket', 10, 0]]) {
+                                           ['paper-behind', 10, 0], ['paper-front', 10, 0]]) {
             if (!gag.anims[name]) continue;
-            this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map(f => ({ key: 'her-mishaps', frame: f })), frameRate: fps, repeat });
+            // (The papers' first three frames quicker: the paper's push carried into the fall.)
+            const fast = name.startsWith('paper-') ? 3 : 0;
+            this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map((f, i) => ({ key: 'her-mishaps', frame: f, duration: i < fast ? 60 : undefined })), frameRate: fps, repeat });
         }
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
