@@ -175,7 +175,7 @@ ITEMS = {
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
     # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
     # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
-    "keep_feather": (4, 146.97, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
+    "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
     "keep_wool": (5, 24.2, "keep:cat:wool", None, 7, "thing:wool"),                    # in the knitter's basket
     "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
 }
@@ -262,7 +262,9 @@ PEOPLE = {
                        carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
     "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
                         bubble=("tray", "!card:deck", None, 4)),
-    "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
+    # (In her way, no longer behind her: running into her, she bounces off and sits, as off the
+    # breakfast stewardess, 10f; the user, 2026-11-17.)
+    "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", touch=("scare", 14, 40, "robe")),
     "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
     "riv_rope": dict(at=(5, 81.05), who="rival", face=-1, idle="idle", until="region:2"),
@@ -754,9 +756,14 @@ SKIMMERS = {"haz_papers_5": (5, 26.0, 42.0, 0.7, "paperboy"),        # (clear of
 # door with a tray from her room-service trolley: id: (deck, the doors' m, who).
 # (Doors where none is drawn, beside a lift's or a crew door, are passed over in the game.)
 BREAKFASTS = {"haz_breakfast_5": (5, [44.9, 48.9, 52.9], "roomservice")}      # (48.9: a lift's door, passed over)
-# The climb on deck 4 (the feather on its shelf: ITEMS `keep_feather`): a service cart, a laundry
-# cart, a shelf on the wall under the ceiling. Each: (m, atlas piece or "shelf", px up its top).
-CLIMB = dict(deck=4, steps=[(144.4, "service-cart"), (146.3, "@linen-cart"), (146.97, "shelf")], shelf=66)
+# The climb on deck 4 (the feather on its shelf: ITEMS `keep_feather`): a laundry cart, a shelf
+# on the wall under the ceiling. Each: (m, atlas piece or "shelf", px up its top).
+# (The laundry cart is its own generated picture: the linen room's, drawn in code, had stood in for
+# it. The art rule looked back over, the user, 2026-11-17.)
+# (The room-service cart before it taken out, and the two moved a metre forward: the user,
+# 2026-11-17; then 0.8 m further apart, for a harder jump across, each by half: the user. From
+# the floor to the laundry cart's towels is one jump.)
+CLIMB = dict(deck=4, steps=[(144.9, "thing:laundry-cart"), (146.37, "shelf")], shelf=66)
 # The knitting lady on deck 5 (§4.2): on her own armchair in the corridor, a little forward of her
 # cabin's door (the user, 2026-11-16), her basket beside her with the wool.
 # (`chair`: its back's edge, against the deck's forward end wall, which runs to 23.33 m; the basket

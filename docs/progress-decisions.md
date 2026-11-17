@@ -2263,3 +2263,42 @@ here" 7); each built step is gone back over under its "Revision".
 - Generations: 76 (10a and 10b's tries 31, the spilled tray 7, the trip 8, the lying legs 10, the
   pushing walk 20). Not used: a spilled tray, picture kept (`her-mishaps/tray-tries/`), the
   dropped tray now landing flat. Passed: `deck4`, `boot`, `region1`; the rest not run.
+
+## The art rule looked back over, steps 1 to 4 (2026-11-17)
+
+- **What was found** (the branch's code read for drawing; nothing in steps 1 to 3): deck 4's climb
+  shelf, the knitting lady's basket, four desk flags, a cabin door's hand (a 4 x 2 rectangle), the
+  cry's heart and "shh" drawn in code; the climb's laundry cart was the linen room's, from deck 9.
+  The view into the knitting lady's cabin stays drawn, like the rooms (the user). Kept by the rule:
+  the dog's lead and the door's crack (flat), the bitten tangerines (a generated picture edited),
+  the fruit in a fist and the breakfast tray (separate in play).
+- **Made** (map objects, side view, low detail; ids and every try in
+  `assets/source/things/tries/README.md`): the flags, the shelf, the basket, the hand, the heart.
+  The "shh": two lips-and-finger tries and three faces with a finger at the lips; none read at a
+  bubble's 16 px ("doesn't read like a shh at all", the user), so a speaker crossed out, its cross
+  redrawn even by hand ("It is uneven"). The cart: tries drifted to three-quarters; the user chose
+  the look of one half-turned try (cart-c) "in profile", made with `edit_image_pro_flash` from it;
+  shrunk from 51 px to 44 it came out deformed, so it keeps its pixels with 7 rows cut from its bin,
+  and a white towel row across its rim painted the rim's green. The feather: lying flat 6 px tall
+  it read as "a shelf glitch" and not as a cat toy; stood on end, "stuck in the shelf"; a teaser
+  lying on the shelf, its handle made purple to stand out from the shelf's wood.
+- **Little flags shrink by majority colour** (`BY_MAJORITY` in `tools/build_things.py`): averaged
+  with their outline they came out dull, the Ukrainian flag too since step 4.
+- **The climb** (the user): the room-service cart taken out; the laundry cart and the shelf a
+  metre forward, then 0.8 m further apart (each by half, clear of both doors): the shelf is reached
+  by a jump from the cart's edge. `deck4`'s climb check runs to the edge first.
+- **Deck 5's dim blinked** as her head touched deck 4's ceiling from the shelf: a deck's dim piece
+  reaches 16 px under its floor, and her head counted in it. It counts past the floor now
+  (`updateDeckDim`).
+- **A corridor's extinguisher** hung under a crew door's card reader (deck 4): one within 50 px of
+  a door put in a cabin door's place moves 50 px from it.
+- **The lady in the bathrobe** (deck 4, 130 m), who did nothing, is an obstacle: 10f's bounce
+  (`MISHAPS.robe`), beside her rather than behind.
+- **Decided (the user): the tangerine knocked out of her pocket always rolls behind her**, whatever
+  the side (the gull's and the door's hand's excepted): "It would place a dilemma: run back to pick
+  it up, or continue moving to the initial destination." The user tried it at once: a hit in the
+  back by the porter at a glass door, the tangerine bounced off the door into the porter, who ate
+  it: "This entire scene played seamlessly and made sense."
+- The lunge seemed broken: without `&cards=all` she has not learned it (Bumbot's first beat).
+- Generations: 33. Passed: `boot`, `pocket`, `deck4`, `region1`; `check_overlaps` lists nothing;
+  the rest not run.

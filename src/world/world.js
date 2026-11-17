@@ -276,22 +276,9 @@ export class World {
             g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
             g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
         });
-        // Region 1's (docs/plan-three-uses.md §4.2): the climb's shelf on two brackets; the knitting
-        // lady's basket; her open cabin, an armchair just inside the door; the little desk flags.
-        make('wall-shelf', 26, 9, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 26, 4);
-            g.fillStyle(0xa05b53, 1).fillRect(1, 1, 24, 2);
-            g.fillStyle(0xbf6f4a, 1).fillRect(1, 1, 24, 1);
-            g.fillStyle(0x2e222f, 1).fillRect(3, 4, 2, 5).fillRect(21, 4, 2, 5).fillRect(5, 4, 2, 2).fillRect(19, 4, 2, 2);
-        });
-        make('knit-basket', 14, 8, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 1, 14, 7).fillRect(2, 0, 10, 1);
-            g.fillStyle(0xc28d75, 1).fillRect(1, 2, 12, 5);
-            g.fillStyle(0x8a5a40, 1);
-            for (let x = 2; x < 13; x += 3) g.fillRect(x, 2, 1, 5);
-            g.fillRect(1, 4, 12, 1);
-            g.fillStyle(0x625565, 1).fillRect(9, -1, 1, 1);
-        });
+        // Region 1's (docs/plan-three-uses.md §4.2): her open cabin, an armchair just inside the door.
+        // (The climb's shelf, the knitting lady's basket and the little desk flags are generated now:
+        // `things`, the art rule looked back over, the user, 2026-11-17.)
         make('peek-knit', 34, 74, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
             g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
@@ -321,15 +308,6 @@ export class World {
             g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
             g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
         });
-        const flagMake = (key, paint) => make(key, 5, 13, g => {
-            g.fillStyle(0x9babb2, 1).fillRect(0, 0, 1, 12);
-            g.fillStyle(0x2e222f, 1).fillRect(0, 12, 3, 1);
-            paint(g);
-        });
-        flagMake('deskflag-se', g => { g.fillStyle(0x4d9be6, 1).fillRect(1, 0, 4, 3); g.fillStyle(0xf9c22b, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
-        flagMake('deskflag-fi', g => { g.fillStyle(0xffffff, 1).fillRect(1, 0, 4, 3); g.fillStyle(0x4d65b4, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
-        flagMake('deskflag-ee', g => { g.fillStyle(0x4d9be6, 1).fillRect(1, 0, 4, 1); g.fillStyle(0x2e222f, 1).fillRect(1, 1, 4, 1); g.fillStyle(0xffffff, 1).fillRect(1, 2, 4, 1); });
-        flagMake('deskflag-dk', g => { g.fillStyle(0xe83b3b, 1).fillRect(1, 0, 4, 3); g.fillStyle(0xffffff, 1).fillRect(1, 1, 4, 1).fillRect(2, 0, 1, 3); });
         make('hatch-lid', 28, 5, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 28, 5);
             g.fillStyle(0x9babb2, 1).fillRect(1, 1, 26, 3);
@@ -873,7 +851,7 @@ export class World {
             case 'shelf': {
                 // A shelf on the wall under the ceiling, on two brackets: the climb's top
                 // (docs/plan-three-uses.md §4.2). She stands on it.
-                const img = s.add.image(e.x, e.y - e.up, 'wall-shelf').setOrigin(0.5, 0).setDepth(D.decor + 0.2);
+                const img = this.image(e.x, e.y - e.up, 'thing:wall-shelf').setOrigin(0.5, 0).setDepth(D.decor + 0.2);
                 const zone = s.add.zone(e.x, e.y - e.up + 4, img.width, 4).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 this.add([img]);
@@ -884,7 +862,7 @@ export class World {
             }
             case 'deskflags': {
                 // Little desk flags of the cruise's ports on Shore excursions' desk, hers among them.
-                const items = e.flags.map((f, i) => s.add.image(e.x - 14 + i * 7, e.y - e.on, `deskflag-${f}`).setOrigin(0.5, 1).setDepth(depth + 0.01));
+                const items = e.flags.map((f, i) => this.image(e.x - 18 + i * 9, e.y - e.on, `thing:flag-${f}`).setOrigin(0.5, 1).setDepth(depth + 0.01));
                 this.add(items);
                 this.things.push({ ...e, items });
                 break;
@@ -894,7 +872,7 @@ export class World {
                 // beside her with the wool in it (docs/plan-three-uses.md §4.2; the wool: ITEMS
                 // `keep_wool`; the user, 2026-11-16: she had sat in her open doorway).
                 const chair = this.image(e.x, e.y, 'thing:knit-chair').setOrigin(0, 1).setDepth(D.decor + 0.11);
-                const basket = s.add.image(e.basket, e.y, 'knit-basket').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
+                const basket = this.image(e.basket, e.y, 'thing:knit-basket').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
                 this.add([chair, basket]);
                 this.people.add({ id: `${e.id}_who`, who: e.who, x: e.x + KNIT_SIT.dx, y: e.y - KNIT_SIT.up, route: 'inside', face: 1,
                                   idle: 'knit', layer: 'back' });
@@ -1359,19 +1337,6 @@ export class World {
                 g.fillStyle(0xf68181, 1).fillRect(2, 13, 12, 1).fillRect(4, 8, 8, 1).fillRect(6, 3, 4, 1);
                 g.fillStyle(0xe83b3b, 1).fillRect(7, 0, 2, 2);
             },
-            // The cry's answers: a heart (one who likes cats), a finger to the lips (a quiet place).
-            heart: () => {
-                g.fillStyle(ink, 1).fillCircle(5, 6, 4).fillCircle(11, 6, 4).fillTriangle(1, 7, 15, 7, 8, 15);
-                g.fillStyle(0xe83b3b, 1).fillCircle(5, 6, 3).fillCircle(11, 6, 3).fillTriangle(2, 7, 14, 7, 8, 13);
-                g.fillStyle(0xffffff, 1).fillRect(4, 4, 2, 1);
-            },
-            shh: () => {
-                g.fillStyle(ink, 1).fillRect(2, 9, 12, 3);
-                g.fillStyle(0xe83b3b, 1).fillRect(3, 10, 10, 1);
-                g.fillStyle(ink, 1).fillRect(6, 1, 5, 15);
-                g.fillStyle(0xf5d6b4, 1).fillRect(7, 2, 3, 13);
-                g.fillStyle(0xffffff, 1).fillRect(7, 2, 3, 2);
-            },
             horn: () => {
                 g.fillStyle(ink, 1).fillRect(5, 5, 9, 6).fillTriangle(6, 8, 0, 1, 0, 15);
                 g.fillStyle(0xf9c22b, 1).fillRect(6, 6, 7, 4).fillTriangle(6, 8, 1, 3, 1, 13);
@@ -1634,10 +1599,13 @@ export class World {
     handTakes(door, y, things, handY, done, { took, shrink = false } = {}) {
         const s = this.scene, D = s.DEPTH, x = door - 11;
         const crack = s.add.rectangle(x, y - 2, 4, 68, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.15).setScale(0, 1);
-        const hand = s.add.rectangle(x, handY, 4, 2, 0xf3cfb6).setOrigin(0.5, 1).setDepth(D.props + 0.03).setVisible(false);
+        // (The hand in its shirt cuff is generated, `things`' `door-hand`, reaching to the right; it had
+        // been a 4 x 2 rectangle: the art rule looked back over, the user, 2026-11-17.)
+        const near = things[0];
+        const hand = s.add.image(x, handY, 'things', 'door-hand').setOrigin(0.5, 1).setDepth(D.props + 0.03).setVisible(false)
+            .setFlipX(near.x < x);
         this.add([crack, hand]);
         sfx.at(door, y).door();
-        const near = things[0];
         s.tweens.chain({ tweens: [
             { targets: crack, scaleX: 1, duration: 200 },
             { targets: hand, x: near.x - Math.sign(near.x - x) * 3, duration: 260, onStart: () => hand.setVisible(true) },
@@ -1709,7 +1677,10 @@ export class World {
         g.fillStyle(0xffffff, 1).fillRoundedRect(-w / 2, -h, w, h, 3);
         g.fillStyle(0x2e222f, 1).fillTriangle(-4, 1, 4, 1, 0, 6);
         g.fillStyle(0xffffff, 1).fillTriangle(-3, 0, 3, 0, 0, 4);
-        const img = s.add.image(x, y - h / 2, this.icon(icon)).setDepth(D.fx + 0.51);
+        // (The cry's two answers are generated, a heart and a speaker crossed out for a quiet place; the
+        // finger to the lips never read at a bubble's size: the user, 2026-11-17.)
+        const pict = { heart: 'icon-heart', shh: 'icon-mute' }[icon];
+        const img = (pict ? s.add.image(x, y - h / 2, 'things', pict) : s.add.image(x, y - h / 2, this.icon(icon))).setDepth(D.fx + 0.51);
         this.add([g, img]);
         s.tweens.add({ targets: [g, img], y: '-=4', duration: 120, yoyo: true });
         s.time.delayedCall(ms, () => {

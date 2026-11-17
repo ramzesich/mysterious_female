@@ -2367,9 +2367,14 @@ Nothing blocks the start of the build. These get settled along the way:
       stewardess, who turns round; gags always on the corridor's floor; the stewardess wheels it
       by its handle (a pushing walk generated with the trolley) and her tray at a door shrinks a
       little and is gone, her hands out until then; her trip's lying pose mended (a leg stood up).
-      **Next in step 4's revision:** the art rule looked back over (steps 1 to 4: anything drawn
-      in code or put together from other scenes' props); then the dog's lick, which waits for an
-      idea of the user's, talked over once the rest of the step is done; then step 4a
+      **Done (2026-11-17): the art rule looked back over** (steps 1 to 4's pictures drawn in code
+      made PixelLab's: the desk flags, the climb's shelf and laundry cart, the knitting lady's
+      basket, a door's hand, the cry's heart and its "quiet" sign, a speaker crossed out; the
+      feather a cat teaser on the shelf); with it the climb two steps and a harder gap, the lady
+      in the bathrobe an obstacle, deck 5's dim no longer blinking over the shelf, and **Decided
+      (the user): the tangerine knocked out of her pocket always rolls behind her** ("a dilemma:
+      run back to pick it up, or continue"). **Next in step 4's revision:** the dog's lick, which
+      waits for an idea of the user's, talked over first; then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

@@ -115,9 +115,11 @@ safeTailMs: 300 }`. The speed stays under Bumbot's 300 px a second.
   a short reaction that fits the hit and the side it came from (§1.6; about half a second),
   blinks for a second and a half during which nothing can touch her, **and keeps her place and
   her tray.**
-- **The tangerine is knocked out of her pocket and rolls away fast, the way she is thrown**
-  (§1.6): on ahead of her after a hit from behind, back the way she came after a hit from the
-  front. It is the same real thing as a thrown one: she can run after it, and whatever wants it
+- **The tangerine is knocked out of her pocket and rolls away fast, ~~the way she is thrown~~
+  (§1.6): ~~on ahead of her after a hit from behind, back the way she came after a hit from the
+  front~~ always behind her, back the way she came, whichever way the hit throws her** (the user,
+  2026-11-17: "It would place a dilemma: run back to pick it up, or continue moving to the initial
+  destination"). It is the same real thing as a thrown one: she can run after it, and whatever wants it
   may get there first. Two hits take it for good: a gull that comes down on her flies off with
   it, and at a "Do Not Disturb" door she holds it out as an apology and a hand takes it.
 - With none on her, a hit is a mishap with a gag of its own, and then her checkpoint (§1.6).
@@ -248,7 +250,8 @@ gusts, the laundry lines, the gulls that take food, the waiter).
 - **With a tangerine on her, the same side picks her short reaction:** thrown back, she reels a
   step (a slip: her caught-backwards, built); pushed on, she stumbles a step (built). A door in
   her face: she rubs her nose. Water in her face: a splutter; on her back: she arches. Heat: a
-  yelp. From above: she ducks. **The tangerine flies the way she is thrown.**
+  yelp. From above: she ducks. ~~**The tangerine flies the way she is thrown.**~~ **The tangerine
+  rolls off behind her whatever the side (§1.3; the user, 2026-11-17).**
 - **With a tangerine on her she is never sat onto a thing or carried by it:** a ride is only
   for the gag with none.
 - **A hit while she is in the air** uses the same rule; the gag starts when she lands.
@@ -697,6 +700,15 @@ Shown: her throw's frames for approval before anything else; then each target as
 - `deck4` grown: each scenario above set up by where she stands, which way she faces and
   whether she moves, the right gag asked for, her checkpoint after; 4c costs nothing; with
   a tangerine the reaction and the tangerine's way. Run with it: `region1`, `pocket`, `boot`.
+  **The art rule looked back over (2026-11-17):** steps 1 to 4's pictures drawn in code made
+  PixelLab's (`assets/source/things/`, its `tries/README.md`): the four other desk flags, the
+  climb's shelf and its laundry cart (the linen room's had stood in), the knitting lady's
+  basket, the hand a cabin door puts out, the cry's heart; the cry's "shh" a speaker crossed
+  out (a finger to the lips never read at a bubble's size); the feather a cat teaser lying on
+  the shelf, its handle purple. The view into her cabin stays drawn, like the rooms (the
+  user). With it, at the user's word: the climb a laundry cart and a shelf, the gap between
+  them a jump from the cart's edge; the lady in the bathrobe an obstacle (10f's bounce,
+  `robe`); and the tangerine knocked out of her pocket always rolls behind her (§1.3).
 
 ### Step 4a. The mishaps on the rest of the ship (art: about 125, in three batches)
 

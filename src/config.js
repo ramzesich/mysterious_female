@@ -214,6 +214,7 @@ export const MISHAPS = {
     breakfast: {},          // the breakfast stewardess's tray (deck 5)
     trolley: {},            // her room-service trolley, wheeled or parked at a door
     stewardess: {},         // the breakfast stewardess herself, her hands empty
+    robe: {},               // the lady in her bathrobe, standing in the corridor (deck 4)
     jet: {},                // the kid's water pistol (deck 11)
     light: {},              // the stage's swinging light
     door: {},               // a door that flies open
@@ -232,8 +233,9 @@ export const MISHAPS = {
 
 // The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
 // (`fright.<word>` in src/lang.js). With a tangerine on her: `react`, her clip (`her-<react>`), and
-// `toss`, the way the tangerine goes: 'on' ahead of her (she is pushed on), 'back' behind her (she
-// is thrown back), 'drop' at her feet (no side), 'gull' a gull takes it, 'hand' she hands it over.
+// `toss`, the way she is thrown: 'on' pushed on, 'back' thrown back, 'drop' no side; 'gull' a gull
+// takes the tangerine, 'hand' she hands it over. (Otherwise the tangerine always rolls off behind
+// her, whatever `toss` says: the user, 2026-11-17.)
 // With none: her gag, then her checkpoint; until each gag is made, the built one on that side
 // stands in: `down` 'sit' (on her bottom, dazed) or 'belly' (on her front, dazed), or with no
 // `down` she runs off (`off`). `nothing`: a slow thing she is looking at does not knock her over.

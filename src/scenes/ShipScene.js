@@ -402,7 +402,10 @@ export class ShipScene extends Phaser.Scene {
         d.shown = this.dimOverride != null ? this.dimOverride : smooth ? approach(d.shown, on, dt * 6) : on;
         d.outer.setVisible(d.shown > 0).setAlpha(d.shown);
         for (const c of d.pieces) {
-            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1;
+            // (Her head counts in the deck above only past its floor, not in the ceiling under it:
+            // jumping on deck 4's climb shelf, her head touched the ceiling and deck 5's dim lifted
+            // and came back each jump, the user, 2026-11-17. A piece reaches 16 px under its floor.)
+            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16;
             const dim = hers ? 0 : Math.min(...c.keys.map(k => this.shellAlpha[k]));
             c.dim = smooth ? approach(c.dim, dim, dt * 8) : dim;
             c.gfx.setVisible(d.shown > 0 && c.dim > 0).setAlpha(d.shown * c.dim);
@@ -2243,7 +2246,13 @@ export class ShipScene extends Phaser.Scene {
                 parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
             // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
-            if (n % 6 === 3 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            // (Kept 50 px from a door put in a cabin door's place, clear of its card reader: one hung
+            // under the reader of deck 4's crew door, the user, 2026-11-17.)
+            if (n % 6 === 3 && gap + 20 < o.x + o.width) {
+                const by = this.doorSpots.find(t => t.y === o.y && Math.abs(gap - t.x) < 50);
+                const ex = by ? by.x + (gap >= by.x ? 50 : -50) : gap;
+                parts.push(this.add.image(ex, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            }
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
             if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
@@ -4326,9 +4335,9 @@ export class ShipScene extends Phaser.Scene {
     // A hit that would be a mishap or a spilled tray, with a tangerine on her: one less, and she
     // keeps her place and her tray (docs/plan-three-uses.md §1.3). Her reaction is the scenario's
     // (`MISHAP_SCENES`: reeling back a step, stumbling on, rubbing her nose, ducking...), always facing
-    // the way she faced, and the tangerine goes the way she is thrown (`toss`): rolling off ahead of
-    // her or behind her, dropped at her feet, taken by the gull (`snatch`: its sprite), or handed
-    // over at the door it came from. True if it was forgiven. (Falls, the sea and her own feet never
+    // the way she faced, and the tangerine rolls off behind her, whichever way she is thrown
+    // (the user, 2026-11-17), unless the gull takes it (`toss` 'gull', `snatch`: its sprite) or it is
+    // handed over at the door it came from ('hand'); her push still goes the way of `toss`. True if it was forgiven. (Falls, the sea and her own feet never
     // come here.)
     pocket(fromX, sc, { snatch = null } = {}) {
         if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
@@ -4340,7 +4349,10 @@ export class ShipScene extends Phaser.Scene {
         rumble('spill');
         const hand = sc.toss === 'hand' && this.mode === 'play' && !this.gliding;
         if (sc.toss === 'gull' && snatch) this.world.snatch(snatch, p.x, p.y - PLAYER.height + 8);
-        else if (!hand) this.loose.knock(p.x, p.y - 24, sc.toss === 'on' ? facing : -facing, sc.toss === 'drop' ? 0.4 : 1);
+        // (Always behind her, whichever way the hit throws her: she must choose between running
+        // back for it and going on where she was going; the user, 2026-11-17. A gull's and a
+        // hand's take it.)
+        else if (!hand) this.loose.knock(p.x, p.y - 24, -facing, 1);
         // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
         if (this.mode === 'play' && !this.gliding) {
             this.throwUntil = 0;

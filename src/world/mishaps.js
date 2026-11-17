@@ -29,6 +29,8 @@ const PICK = {
     // back. The stewardess herself, her hands empty: bounced off.
     trolley: f => f.front ? (f.crowded ? '10d' : '10c') : '10e',
     stewardess: () => '10f',
+    // (The lady in her bathrobe, standing: she bounces off her as off the stewardess, 10f.)
+    robe: () => '10f',
     jet: f => f.front ? '11a' : '11b',
     light: f => f.front ? '12a' : '12b',
     // A door: opening in her face (she faces it), or catching her just past it.

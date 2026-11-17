@@ -1222,8 +1222,8 @@ def scenario_pocket(b):
     ok &= check(b.eval(f"{S}.loose.all.length") == 0 and s["tangerines"] == n + 1, "walked over, it is hers again", s)
     ok &= check(b.eval(f"{S}.save.loose.length") == 0, "and gone from the save")
     # By side and mover (§1.6): the porter's cart pushing into her as she stands facing it, she is
-    # thrown back (reels a step), the tangerine behind her; reaching her back, she stumbles on, the
-    # tangerine ahead of her.
+    # thrown back (reels a step); reaching her back, she stumbles on. The tangerine rolls off behind
+    # her either way (the user, 2026-11-17).
     def hit(js, n=2):
         b.eval(f"{S}.save.tangerines = {n}; {S}.safeUntil = 0; {S}.flinchUntil = 0; {S}.loose.all.slice().forEach(t => {S}.loose.remove(t)); {S}.player.setFlipX(false)")
         time.sleep(0.15)
@@ -1236,8 +1236,8 @@ def scenario_pocket(b):
     ok &= check(got == "8b" and clip == "her-reel" and flying and flying[0] < -50 and n == 1 and mode == "play",
                 "the cart into her front as she stands: thrown back, the tangerine behind her", (got, clip, flying, n))
     got, (clip, flying, n, mode) = hit(f"{S}.player.x - 12, 'cart', {{ vx: 48, dir: 1 }}")
-    ok &= check(got == "8c" and clip == "her-stumble" and flying and flying[0] > 30,
-                "into her back: pushed on, the tangerine ahead of her", (got, clip, flying))
+    ok &= check(got == "8c" and clip == "her-stumble" and flying and flying[0] < -30,
+                "into her back: pushed on, the tangerine still behind her", (got, clip, flying))
     got, (clip, flying, n, mode) = hit(f"{S}.player.x + 14, 'door'")
     ok &= check(got == "13a" and clip == "her-rubnose", "a door in her face: she rubs her nose", (got, clip))
     # A gull takes it: not on the floor.
@@ -1249,11 +1249,11 @@ def scenario_pocket(b):
     ok &= check(got == "23" and clip == "her-apology" and not flying and n == 1, "a door's hand takes it as she bows", (got, clip, flying, n))
     b.shot("pocket-apology")
     time.sleep(1.6)
-    # A paper at her front, standing (the user, 2026-11-16: she slips standing too): she stumbles on,
-    # the tangerine ahead of her (her gag falls forward); one at her heel: she slips back, behind her.
+    # A paper at her front, standing (the user, 2026-11-16: she slips standing too): she stumbles on
+    # (her gag falls forward); one at her heel: she slips back. The tangerine behind her both times.
     got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'papers', {{ vx: -60 }}")
-    ok &= check(got == "4a" and clip == "her-stumble" and flying and flying[0] > 30 and n == 1,
-                "a paper at her front as she stands: she stumbles, the tangerine ahead of her", (got, clip, flying, n))
+    ok &= check(got == "4a" and clip == "her-stumble" and flying and flying[0] < -30 and n == 1,
+                "a paper at her front as she stands: she stumbles, the tangerine behind her", (got, clip, flying, n))
     got, (clip, flying, n, mode) = hit(f"{S}.player.x - 12, 'papers', {{ vx: 60 }}")
     ok &= check(got == "4b" and clip == "her-slipback" and flying and flying[0] < -30,
                 "one at her heel: she slips back, the tangerine behind her", (got, clip, flying))
@@ -1496,20 +1496,27 @@ def scenario_deck4(b):
     time.sleep(0.3)
     ok &= check("keep:cat:feather" in keeps(), "and it is hers from there", keeps())
 
-    # The climb itself: three steps up by jumps (a new game, the feather back on its shelf).
+    # The climb itself: two steps up by jumps (a new game, the feather back on its shelf).
     b.open("?reset&play&cards=all")
-    steps = b.eval(f"['climb_0', 'climb_1', 'climb_2'].map(id => {W}.solids.find(t => t.id === id).x)")
+    steps = b.eval(f"['climb_0', 'climb_1'].map(id => {W}.solids.find(t => t.id === id).x)")
     b.teleport(steps[0] - 40, D4)
     time.sleep(0.3)
     heights = []
-    for sx in steps:
+    for i, sx in enumerate(steps):
+        # (To the shelf from the cart's far edge: from its middle the jump falls short, the user's
+        # harder gap, 2026-11-17.)
+        if i:
+            b.key("right", True)
+            end = time.time() + 1.5
+            while b.state()["x"] < steps[0] + 16 and time.time() < end:
+                time.sleep(0.01)
         b.key("space", True)
         hold_until(b, "right", lambda st: st["x"] >= sx - 2, timeout=1.5)
         time.sleep(0.25)
         b.key("space", False)
         time.sleep(0.5)
         heights.append(round(D4 - b.state()["y"]))
-    ok &= check(heights == [25, 41, 66], "up the climb by jumps: the cart, the laundry cart, the shelf", heights)
+    ok &= check(heights == [41, 66], "up the climb by jumps: the laundry cart, the shelf", heights)
     b.tap("e")
     time.sleep(0.3)
     ok &= check("keep:cat:feather" in keeps(), "the feather taken up there", keeps())

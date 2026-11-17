@@ -71,7 +71,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) ; what of a room is in front of the things lying in it (a bowl before its tangerines) is marked with `Room.in_front()` and saved as `<id>-front.png`, drawn over them |
-| `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals); the ten books' pages drawn in code (`assets/ship/pages/`) |
+| `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
 
@@ -414,6 +414,22 @@ Lessons learned (2026-11-17, the breakfast stewardess):
 - **A GIF saved by PIL merges repeated frames:** count frames from the game's clock, not the GIF.
 - **Sliding a thing into a door crosses whoever holds it** when the door's hand is on their side:
   it shrinks a little where it is held and is gone (`handTakes(..., { shrink })`).
+
+Lessons learned (2026-11-17, the art rule looked back over):
+
+- **A thing must read in its place at the game's size, not only enlarged:** a feather toy 6 px
+  tall on a thin shelf read as "a shelf glitch"; stood on end with nothing holding it, "stuck in
+  the shelf". Compose it at its spot, at 1:1 and enlarged, before showing it.
+- **A tiny picture is shrunk by majority colour, not averaged** (`BY_MAJORITY` in
+  `tools/build_things.py`): a flag's cloth averaged with its outline went dull. **And a picture
+  near its game size is never resampled:** 51 px to 44 deformed a cart; cut rows out of a plain
+  part instead (`CUT_ROWS`, or by hand).
+- **A strict side view that text will not give:** `edit_image_pro_flash` from the try whose look is
+  liked, "redraw this same ... in strict side profile" (5 generations).
+- **A pictogram has about 16 px:** a finger to the lips is lost at that size whatever the drawing;
+  pick a sign that survives it (a speaker crossed out).
+- **A deck's dim reaches 16 px under its floor:** anything that tests her body against a deck
+  counts her head past the floor, not into the ceiling below it.
 
 ## Working with the user
 
