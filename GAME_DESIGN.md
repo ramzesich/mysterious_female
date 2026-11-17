@@ -2367,8 +2367,9 @@ Nothing blocks the start of the build. These get settled along the way:
       stewardess, who turns round; gags always on the corridor's floor; the stewardess wheels it
       by its handle (a pushing walk generated with the trolley) and her tray at a door shrinks a
       little and is gone, her hands out until then; her trip's lying pose mended (a leg stood up).
-      **Next in step 4's revision:** the dog's lick, which waits for an idea of the user's,
-      talked over now that the rest of the step is done; the art rule looked back over; then step 4a
+      **Next in step 4's revision:** the art rule looked back over (steps 1 to 4: anything drawn
+      in code or put together from other scenes' props); then the dog's lick, which waits for an
+      idea of the user's, talked over once the rest of the step is done; then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
