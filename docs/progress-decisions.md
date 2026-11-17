@@ -2148,3 +2148,25 @@ here" 7); each built step is gone back over under its "Revision".
   one lying at its door walked onto; back at her checkpoint), `pocket` (a paper at her front and
   at her heel with a tangerine), `region1`, `boot`: 85 checks. The rest not run.
 
+## The suitcase and the vacuum refined (2026-11-17)
+
+- **The vacuum 2 px lower** (the user, shown as frames from the game moved by hand first): the
+  world's sits down into the carpet's top line, and her ride with it (`ride.y`).
+- **Butterflies over her head after the suitcase tips her off:** a loop of 8 frames v3 of the
+  riding state from the tip's last frame. Two tries from that frame had them fly off; set over her
+  head in the start picture (from her own dazed clip, start = end), they circle. The first such loop
+  had her grin with her eyes closed between open-eyed frames; the user: "I liked the smile, leave
+  it. Just don't add frames with her eyes blinking": the loop in the game keeps her eyes open, her
+  own small smile. Same canvas and edges as the tip's last frame, placed as the tip is
+  (`shift_as` in `HER_MISHAPS`).
+- **"The suitcase sequence takes too long":** recorded as GIFs from the running game at two paces.
+  The user liked the "as it is now" one, which played 10% fast (a GIF keeps hundredths of a
+  second: 66 ms frames became 60) and showed a ride from halfway along. So: the clips 10% quicker,
+  the dazed hold 1.18 s, and **the ride takes 3.3 s wherever she is hit** (the same speed profile,
+  scaled for the roll left, never under 1.1 times). And the suitcase by itself rolls faster, 1.6
+  m/s at its fastest from 1.1 (there and back in 13.7 s, from 20). Recordings since are at 70 ms a
+  frame, which a GIF keeps exactly.
+- Generations: 12 (the butterfly loops: six tries of 2).
+- Passed: `deck4` (6a, 6b, 6c; tipped off at the roll's end; back), `vacuum` (5b), `boot`: 41
+  checks. The rest not run.
+

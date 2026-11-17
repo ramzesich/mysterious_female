@@ -6,8 +6,9 @@
   "suitcase-sit": 14,
   "suitcase-ride": 20,
   "suitcase-tip": 28,
-  "paper-behind": 37,
-  "paper-front": 46
+  "suitcase-dazed": 37,
+  "paper-behind": 45,
+  "paper-front": 54
  },
  "anims": {
   "vacuum-sit": [
@@ -57,7 +58,7 @@
    35,
    36
   ],
-  "paper-behind": [
+  "suitcase-dazed": [
    37,
    38,
    39,
@@ -65,10 +66,10 @@
    41,
    42,
    43,
-   44,
-   45
+   44
   ],
-  "paper-front": [
+  "paper-behind": [
+   45,
    46,
    47,
    48,
@@ -76,8 +77,18 @@
    50,
    51,
    52,
-   53,
-   54
+   53
+  ],
+  "paper-front": [
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62
   ]
  },
  "cols": 48

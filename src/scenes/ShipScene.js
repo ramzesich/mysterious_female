@@ -520,8 +520,10 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'vacuum': {
-                    // (The one she rides in her gag, 5b: cut from that picture, tools/build_things.py.)
-                    const sprite = this.add.image(o.x, o.y, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    // (The one she rides in her gag, 5b: cut from that picture, tools/build_things.py.
+                    // Set 2 px down into the carpet's top line, and her ride with it, `ride.y`: the
+                    // user, 2026-11-17.)
+                    const sprite = this.add.image(o.x, o.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props);
                     this.worldLayer.add(sprite);
                     this.vacuums.push({
                         sprite, alive: true, dir: 1,
@@ -4448,7 +4450,15 @@ export class ShipScene extends Phaser.Scene {
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride.show(); };
         s.play(g.sit);
         s.once(`animationcomplete-${g.sit}`, () => s.play(g.ride));
-        let v = Math.abs(ride.v), tipped = false;
+        let v = Math.abs(ride.v), tipped = false, k = 1;
+        if (g.rideS) {
+            // The suitcase's ride takes `rideS` from wherever she is hit: the time its profile
+            // (cruise at `top`, then speed = px left x `slow`, at least `least`) would take over
+            // this roll, and every speed scaled to match; never under `pace`.
+            const L = Math.max(0, (ride.endX - (p.x - dir * g.her)) * dir), knee = g.top / g.slow, floor = g.least / g.slow;
+            const T = Math.max(0, L - knee) / g.top + Math.log(Math.max(Math.min(L, knee), floor) / floor) / g.slow + floor / g.least;
+            k = Math.max(g.pace ?? 1, T / g.rideS);
+        }
         this.script = (dt) => {
             if (sc.gag === 'vacuum') {
                 // Off down the corridor, faster and faster, out of the screen.
@@ -4459,7 +4469,7 @@ export class ShipScene extends Phaser.Scene {
             } else if (!tipped) {
                 // On to the end of its roll, slowing; there it creaks and tips her off.
                 const left = (ride.endX - s.x) * dir;
-                v = Math.max(g.least, Math.min(g.top, left * g.slow));
+                v = k * Math.max(g.least, Math.min(g.top, left * g.slow));
                 const step = dir * Math.min(v * dt, Math.max(0, left));
                 s.x += step;
                 // (Its roll is seven metres: the view slides along with her, exactly as she goes,
@@ -4469,7 +4479,10 @@ export class ShipScene extends Phaser.Scene {
                     tipped = true;
                     sfx.at(s.x, ride.y).creak();
                     s.play(g.tip);
-                    s.once(`animationcomplete-${g.tip}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+                    s.once(`animationcomplete-${g.tip}`, () => {
+                        if (g.dazed && this.anims.exists(g.dazed)) s.play(g.dazed);
+                        this.time.delayedCall(g.holdMs, () => this.respawn());
+                    });
                 }
             }
             // (Her word over her head goes with her.)

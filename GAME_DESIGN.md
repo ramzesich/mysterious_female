@@ -2356,7 +2356,9 @@ Nothing blocks the start of the build. These get settled along the way:
       onto her belly, the paper round onto her back (4a); one at her heel takes it forward and up,
       she sits, the paper round onto her head (4b); she slips standing too (4c gone). The sliding
       newspaper generated (the user's pick), sliding at a steady speed right to her foot, where her
-      clip takes over from the same picture. **Next in step 4's revision:** the rest of region 1's
+      clip takes over from the same picture. **The suitcase and the vacuum refined (2026-11-17):** the
+      vacuum 2 px lower; after the tip she sits dazed, butterflies over her head; the ride 3.3 s
+      wherever she is hit, her clips 10% quicker, the suitcase by itself at 1.6 m/s. **Next in step 4's revision:** the rest of region 1's
       gags (8a to 8d, 10a, 10b, the dog's lick, the porter's cap: each still shown and approved
       before it is animated or placed), the art rule looked back over; then step 4a
       (deck 9's darting vacuum rides her off too). **Then step 5** (the rest of the

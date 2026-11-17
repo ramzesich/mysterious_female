@@ -197,7 +197,7 @@ export class BootScene extends Phaser.Scene {
         // Her gags with a thing (§1.6): sitting down onto it, the ride, the end of it; the papers' (`gag-<clip>`).
         const gag = this.cache.json.get('her-mishaps-meta');
         for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
-                                           ['suitcase-sit', 10, 0], ['suitcase-ride', 8, -1], ['suitcase-tip', 10, 0],
+                                           ['suitcase-sit', 11, 0], ['suitcase-ride', 8.8, -1], ['suitcase-tip', 11, 0], ['suitcase-dazed', 11, -1],
                                            ['paper-behind', 10, 0], ['paper-front', 10, 0]]) {
             if (!gag.anims[name]) continue;
             // (The papers' first three frames quicker: the paper's push carried into the fall.)

@@ -289,7 +289,10 @@ export const MISHAP_SCENES = {
 // starts where she stood. The vacuum (5b) carries her off out of the screen, gathering speed to
 // `speed` px/s by `accel`; the suitcase (6b) rolls on to the end of its roll (from an end, to the
 // other) at up to `top` px/s with her on it, slowing (`slow`: its speed per px left, at least
-// `least`), tips her off, and she sits there `holdMs`. A gag with `fall` plays where she stands,
+// `least`), tips her off, and she sits there `holdMs`, dazed, butterflies over her head (`dazed`).
+// The ride takes `rideS` wherever she was hit (that speed profile run faster for a longer roll),
+// and never less than `pace` times its speeds (the user, 2026-11-17: "the suitcase sequence takes
+// too long"; their pick, a ride of 3.3 s and the clips 10% quicker). A gag with `fall` plays where she stands,
 // facing her way, then she stays so `holdMs`, then her checkpoint: the papers (4a, 4b), whose clip
 // starts with her standing on the world's paper; `paper`: px from her middle to the paper's, along
 // her facing, in that first picture, so that the clip is set down where the world's paper is (and
@@ -299,7 +302,7 @@ export const GAGS = {
     vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
     paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000 },
-    suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', top: 80, slow: 1.4, least: 16, holdMs: 1300 },
+    suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', dazed: 'gag-suitcase-dazed', top: 80, slow: 1.4, least: 16, pace: 1.1, rideS: 3.3, holdMs: 1180 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out

@@ -553,6 +553,12 @@ Lessons learned (2026-11-14, the intro shown to the user):
   size**, and an end frame (the state's still shrunk to her size, roughly) steers its last pose;
   a thing she meets can be put in that start picture (the paper under her foot). The clip's frames
   are then the stills shown for approval (1 to 2 generations a try).
+- **A GIF counts time in hundredths of a second:** 66 ms frames are saved as 60 and play 10%
+  fast (the user judged a pace by one). Record at 70 or 100 ms a frame, from game time (the game
+  loop slept between grabs), and say where in its range a moving thing met her: a ride from
+  halfway is half as long as one from an end.
+- **Something kept over her head through a generated loop** (butterflies): set it in the start
+  picture, the end frame the same; described alone, v3 had them fly off.
 - **Palettizing white paper turns it pale green** (Resurrect 64 has no light neutral grey): put a
   paper's greys on the palette by lightness (`assets/source/things/newspaper-sliding/README.md`).
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and

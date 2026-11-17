@@ -216,6 +216,11 @@ HER_MISHAPS = {
         "suitcase-sit": [(f"suitcase-sit/{i}.png", "feet") for i in range(1, 7)],
         "suitcase-ride": [(f"suitcase-ride/{i}.png", "feet") for i in range(1, 9)],
         "suitcase-tip": [(f"suitcase-tip/{i}.png", "feet") for i in range(0, 9)],
+        # Then she sits there dazed, butterflies circling over her head (the user, 2026-11-17): v3 of
+        # the riding state from the tip's last frame with them set over her head (`start.png`, from
+        # her own dazed clip), to the same; her eyes open throughout (a try had her blink). Its
+        # canvas and edges are the tip's last frame's, so it is placed as the tip is (`shift_as`).
+        "suitcase-dazed": [(f"suitcase-dazed/{i}.png", "feet") for i in range(1, 9)],
         # The papers (the user's brief, 2026-11-16; picked 2026-11-17), each from her standing on the
         # sliding newspaper (`paper-start/start2-*.png`), its first frame (her still standing) left out
         # so that the push carries straight into the fall. 4b, from behind: her heel taken forward and
@@ -229,6 +234,8 @@ HER_MISHAPS = {
         "paper-front": [(f"paper-front-belly/frame_{i:03d}.png", 87 if i < 7 else ("cut", 85)) for i in range(2, 11)],
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
+    # Moved sideways as another clip is, which it carries on from.
+    "shift_as": {"suitcase-dazed": "suitcase-tip"},
     # A gag with no thing to place it by: her middle in its frames (her own sprite's, in the start
     # picture) on the cell's middle.
     "middle": {"paper-behind": 36, "paper-front": 28},
@@ -308,6 +315,7 @@ def build(spec):
         return baseline[size]
 
     cells, meta = [], {"cell": cell, "frames": {}, "anims": {}}
+    shifts = {}
     for anim, sources in spec["frames"].items():
         indices = []
         paper = anim.startswith(spec.get("paper", ())) if spec.get("paper") else False
@@ -322,8 +330,11 @@ def build(spec):
                 colours = {c[1][:3] for c in pic.getcolors(4096) if c[1][3] and sum(c[1][:3]) > 60}
                 first = Image.open(src_dir / sources[0][0])
                 shift = first.width // 2 - prop_middle(first, colours)
+        if anim in spec.get("shift_as", {}):
+            shift = shifts[spec["shift_as"][anim]]
         if anim in spec.get("middle", {}):
             shift = Image.open(src_dir / sources[0][0]).width // 2 - spec["middle"][anim]
+        shifts[anim] = shift
         for img, anchor in images:
             if anchor == "keep":
                 feet = standing_feet(img.size)

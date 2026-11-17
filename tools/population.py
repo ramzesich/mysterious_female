@@ -740,7 +740,8 @@ DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
 # --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------
 # A suitcase on its wheels rolling to and fro with the ship's slow roll: id: (deck, m from, m to, m/s).
-ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.1)}
+# (1.6 m/s at its fastest, from 1.1: the user, 2026-11-17, with her ride on it made quicker.)
+ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6)}
 # A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
 # the lead's reach in m, what the owner gives after three fetches).
 DOGS = {"haz_dog_4": (4, 99.6, "railwoman", 4.0, "keep:cat:ball")}
