@@ -2388,9 +2388,13 @@ Nothing blocks the start of the build. These get settled along the way:
       **done (2026-11-17): the steward's jammed trolley** (the user found "an invisible wall": a low
       cart had stood for a block to the ceiling): a tall housekeeping trolley, the user's choice, too
       tall to hop; he and it one picture while it is jammed (his tug, his steps back as she pushes);
-      free, it stands back against the wall and he tosses her his card out of his pocket. **Next:**
-      the towel stack made an obstacle (its look kept, the user: "I like it the way it is"; how, put
-      to the user), then the first batch of her gags. **Then step 5** (the rest of the
+      free, it stands back against the wall and he tosses her his card out of his pocket. **Done
+      (2026-11-17): the towel stack an obstacle** (the user's rule: it falls on her the moment she
+      passes it; she gets past by stopping at it and waiting while it falls): it wobbles hard as she
+      comes at it and falls the way she goes; its look kept ("I like it the way it is"). **Next (the
+      user, 2026-11-17): its falling and scattering generated** ("The animations have to be
+      generated, I think, especially the falling and scattering"; the stack's own picture kept), with
+      her burial under it (scenario 18); then the first batch of her gags. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened. Another

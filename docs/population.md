@@ -555,7 +555,7 @@ the corridor at 118, not here.
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |
-| 141 | `haz_towels_9` | The towel stack in the doorway | `trap(1)` at running speed: it topples onto her: "Buried"; walking past is safe (it wobbles as the tell) | Drawn |
+| 141 | `haz_towels_9` | The towel stack in the doorway | Coming at it (100 px, middle to middle) it wobbles hard and falls the way she goes, onto her as she passes it: "Buried"; she gets past by stopping at it and waiting while it falls, then crossing the heap (the user, 2026-11-17; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. Its look kept (the user); its fall and scatter to be generated | Drawn; the fall to generate |
 | 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched" | |
 | 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); `cp_balcabin` | `room` | Drawn by hand |
 | 158 | `haz_swing_9` | A cabin door that swings open | `reactive(3, 0.6)`; "Bonked" | |

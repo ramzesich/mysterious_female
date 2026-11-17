@@ -2433,3 +2433,26 @@ here" 7); each built step is gone back over under its "Revision".
 - **The towel stack** (`haz_towels_9`): the user asked what it is for ("swaying, in the background,
   doing nothing else"): it fell only on a jump landed beside it or the dash; she has no walk, so its
   sway warned of nothing. The user: keep its look, "Make it an obstacle"; a way is proposed to them.
+
+## Step 4a: the towel stack an obstacle (2026-11-17)
+
+- **The user's rule:** "What if it falls on top of her the moment she passes it? And the getting
+  past will be having to stop at the stack and wait while it falls." (My proposal had been a wobble,
+  a fall a beat after she came in reach, and three ways past: stopping, the dash, knocking it down
+  from afar.) Its look kept: "Don't redraw it, I like it the way it is."
+- **Built:** coming at it within 100 px (middle to middle) it wobbles hard 0.4 s, then falls the way
+  she is going (0.36 s): as long as her run to it, so that she cannot outrun it, and it lands on her
+  as she passes it ("Mmmph!", her checkpoint). Stopped as it wobbles, she is about 60 px short and
+  it falls in front of her; she walks on over the heap. A jump landed beside it and the dash bring it
+  down as before. Its fall is on the game's clock (`update`), not a tween (a recording stepped by
+  hand had shown her outrunning it). Stacked again once she has gone (beyond 560 px, within its 800).
+- `region4`'s checks changed (running past: buried; stacked again; stopped: it falls in front of
+  her; she walks on); the old "the stack still stands" after the vacuum's jump dropped (running on
+  toward it, it now falls, in front of her). Passed: `region4`. The rest not run.
+- **Next (the user):** "The animations have to be generated, I think, especially the falling and
+  scattering": the stack's fall and the towels scattering, and her burial under them (scenario 18),
+  generated from the stack's own picture.
+- The user asked whether this corridor is on her way to the next area: it is not. Region 4's way
+  on is the steward's card, then the linen room at 112 m (behind where she arrives) and its vent;
+  the corridor aft of the steward (130 to 194 m) is the plan's optional "gauntlet" (book 4, the
+  tangerines, the balcony cabin, the checkpoint at 190).

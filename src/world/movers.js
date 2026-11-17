@@ -429,9 +429,15 @@ export class Darter {
     }
 }
 
-// A tall stack of fresh towels by the open cabin's door (population: `haz_towels_9`): it sways. A
-// jump landed beside it, or the dash, brings it down on that side: "Buried" if she is still under
-// it. Walked past, it only wobbles. It is stacked again once she has gone.
+// A tall stack of fresh towels by the open cabin's door (population: `haz_towels_9`): it sways. As
+// she comes at it, it wobbles hard and falls the way she is going, onto her as she passes it
+// ("Buried"); she gets past by stopping short of it and waiting while it falls, then crossing the
+// heap (the user, 2026-11-17: "What if it falls on top of her the moment she passes it? And the
+// getting past will be having to stop at the stack and wait while it falls"). A jump landed beside
+// it, or the dash, brings it down on that side. It is stacked again once she has gone.
+// `TOWELS`: how near she comes before it wobbles (px, middle to middle) and for how long: with its
+// fall, as long as her run takes to the stack, so that she cannot outrun it.
+const TOWELS = { reach: 100, wobbleMs: 400 };
 export class TowelStack {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -489,21 +495,37 @@ export class TowelStack {
             // The tell: it sways, more the nearer she is.
             const close = on && Math.abs(dx) < 130;
             this.stack.setAngle(Math.sin(time / (close ? 150 : 520)) * (close ? 3.2 : 1));
-            if (on && Math.abs(dx) < 48 && (landed || s.isLunging())) {
-                this.state = 'falling';
-                this.dir = dx < 0 ? -1 : 1;
+            const vx = p.body.velocity.x, coming = Math.abs(vx) > 20 && Math.sign(vx) === -Math.sign(dx);
+            if (on && Math.abs(dx) < 48 && (landed || s.isLunging())) this.fall(dx < 0 ? -1 : 1);
+            else if (on && Math.abs(dx) < TOWELS.reach && coming && s.mode === 'play') {
+                // (Coming at it: a hard wobble, then it falls the way she is going.)
+                this.state = 'wobble';
+                this.dir = Math.sign(vx);
+                this.at = time + TOWELS.wobbleMs;
                 sfx.at(d.x, d.y).cloth();
-                s.tweens.add({
-                    targets: this.stack, angle: this.dir * 86, duration: 360, ease: 'Quad.easeIn',
-                    onComplete: () => this.down(),
-                });
             }
+        } else if (this.state === 'wobble') {
+            this.stack.setAngle(Math.sin(time / 35) * 6 + this.dir * 2);
+            if (time > this.at) this.fall(this.dir);
+        } else if (this.state === 'falling') {
+            const k = Math.min(1, (time - this.at) / 360);
+            this.stack.setAngle(this.dir * 86 * k * k);
+            if (k >= 1) this.down();
         } else if (this.state === 'down' && (Math.abs(dx) > 560 || s.route !== 'inside')) {
             // Stacked again behind her back.
             this.state = 'up';
             this.stack.setVisible(true).setAngle(0);
             this.heap.setVisible(false);
         }
+    }
+
+    // (On the game's clock, as everything that must land where she is: in `update`.)
+    fall(dir) {
+        const s = this.scene, d = this.def;
+        this.state = 'falling';
+        this.dir = dir;
+        this.at = s.time.now;
+        sfx.at(d.x, d.y).cloth();
     }
 
     down() {
