@@ -2170,3 +2170,32 @@ here" 7); each built step is gone back over under its "Revision".
 - Passed: `deck4` (6a, 6b, 6c; tipped off at the roll's end; back), `vacuum` (5b), `boot`: 41
   checks. The rest not run.
 
+## Doors and walls stop whatever moves (2026-11-17)
+
+- **The user's rule:** "I want the corridor doors (and walls, where relevant) to serve as natural
+  obstacles not only for the player, but for moving NPCs and moving objects too. If it makes sense
+  for a given moving NPC to open a door on their path and walk through, then they should do that.
+  If not, the door should stop them (before the door, not while they're already on top of the
+  door). Moving obstacles are just stopped before doors." Written into the plan as §1.8, a standing
+  rule in its "Start here" and in `CLAUDE.md`'s rules.
+- **Built once, in the ship scene:** `stopShort` (how far a thing goes before the first door or
+  wall, the solid layer at a body's height), `spanOn` (a to-and-fro range cut short either side),
+  `doorAhead`, `mayOpen` (no lock), `holdDoor` / `letGoDoor` (a door held by a person stays open;
+  `updateBulkhead` shuts it once no one holds it and she is away). Bulkheads keep their width (`w`).
+- **Who does what:** a person walking a loop (`people.js`, `door()`) opens a door with no lock,
+  half a second at its handle, goes through holding it till their back (their cart's) is past; a
+  locked door turns them back short of it (one held open would let her past a lock). Things stop
+  short of a door, shut or open: the delivery robot, the suitcase (its roll and a lunge's send),
+  the dog's lead (its own rule before, now the shared one: the same spot), the vacuum's dart, the
+  porter's cart sent rolling, her ride on the vacuum (it ends at a door with a bump, then her
+  checkpoint). The paper rounds, the breakfast round and deck 8's steward keep to their side of
+  any door (one corridor's work). Loose tangerines already bounced off shut doors.
+- **What it changed today:** every mover's range checked against every door and wall from the
+  data: only the porter's loop on deck 4 crossed one (the glass door at 60 m, which he went
+  through shut); he opens it now (shown as frames and a GIF from the game). Nothing crossed a wall.
+- **Bumbot looked at, on the user's ask:** at near-catch 2 the rope stand he knocks swings deck 6's
+  194 m door open and he runs through it off the screen; at near-catch 5 he is gone off the screen
+  along the pools, 24 m short of deck 11's door (the pool scene does not use its `exitX`). Both
+  approved as they are.
+- Passed: `deck4`, `vacuum`, `boot`, `dash`, `pocket`, `region1`, `region7`. The rest not run.
+  No generations.

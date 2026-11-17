@@ -404,7 +404,9 @@ export class Rounds {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x0, x1, y, v (m/s), stops: [x], wait (s), who }
+        // (His round is one corridor's: short of any door or wall across the deck, ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, 30);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s), stops: [x], wait (s), who }
         this.p = world.people.add({ id: def.id, who: def.who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
         this.cart = s.add.image(def.x0, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.06);
         this.swan = s.add.image(def.x0, def.y - 28, 'shipart', 'towel-swan').setOrigin(0.5, 1).setDepth(D.props + 0.061);

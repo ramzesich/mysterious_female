@@ -353,7 +353,9 @@ export class People {
         const away = her.x < p.x ? 1 : -1;
         if (p.attached.length && p.walk) {
             // The cart goes rolling two metres the way she was going; he runs after it.
-            const roll = Phaser.Math.Clamp(p.x + away * 2 * M, p.walk.a, p.walk.b) - p.x;
+            // (Short of a door: a cart left to itself does not open one.)
+            const lead = away === p.dir ? this.ends(p).front : this.ends(p).back;
+            const roll = s.stopShort(p.x, Phaser.Math.Clamp(p.x + away * 2 * M, p.walk.a, p.walk.b), p.y, lead) - p.x;
             p.busy = true;
             p.state = 'acting';
             sfx.at(p.x, p.y).oh();
@@ -401,6 +403,7 @@ export class People {
             p.sprite.anims.resume();
         }
         const before = p.x;
+        if (this.door(p, time)) return;
         p.x += p.dir * w.v * M * dt;
         if (p.x >= w.b) { p.x = w.b; p.dir = -1; p.pausedUntil = time + (w.endMs ?? 600); }
         else if (p.x <= w.a) { p.x = w.a; p.dir = 1; p.pausedUntil = time + (w.endMs ?? 600); }
@@ -419,6 +422,38 @@ export class People {
             }
         }
         this.place(p);
+    }
+
+    // From their middle to their front and their back, the way they face (their cart's ends).
+    ends(p) {
+        const t = p.touch;
+        return t ? { front: (t.dx ?? 0) + t.w / 2, back: t.w / 2 - (t.dx ?? 0) } : { front: 10, back: 10 };
+    }
+
+    // A door across the deck on their way (the user, 2026-11-17; ShipScene `stopShort`): one with no
+    // lock they open, a moment at its handle, and go through, holding it till their back is past;
+    // a locked one turns them back short of it, as at an end of their walk. True while they wait.
+    door(p, time) {
+        const s = this.scene, w = p.walk, { front, back } = this.ends(p);
+        if (p.through && (p.x - p.through.x) * p.throughDir - back > p.through.w / 2 + 8) {
+            s.letGoDoor(p.through, p);
+            p.through = null;
+        }
+        const b = s.doorAhead(p.x, p.dir, p.y, front, 10);
+        if (!b || b === p.through) return false;
+        if (s.mayOpen(b)) {
+            p.through = b;
+            p.throughDir = p.dir;
+            if (!s.holdDoor(b, p)) return false;
+            p.pausedUntil = time + 450;
+        } else {
+            p.x = s.stopShort(p.x, p.x + p.dir * 10, p.y, front);
+            p.dir = -p.dir;
+            p.pausedUntil = time + (w.endMs ?? 600);
+        }
+        this.idle(p);
+        this.place(p);
+        return true;
     }
 
     // Her body against theirs (and their cart's): `touch.w` wide round them (shifted ahead by

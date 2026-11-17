@@ -36,7 +36,8 @@ It follows `docs/brainstorm/dash-rework.md` (the "shout, throw, pocket" proposal
    asking first for pictures: `CLAUDE.md`, "Art"); every picture shown to the user, enlarged,
    before it is placed; no hint popups
    and nothing that points to where something is; no person, hazard, errand or reward used
-   twice; nothing floats; failures are "scares"; every text in `src/lang.js` in both languages;
+   twice; nothing floats; doors and walls stop whatever moves, or a person opens the door
+   (§1.8); failures are "scares"; every text in `src/lang.js` in both languages;
    record each change of plan with its reason in `docs/progress-decisions.md`.
 5. Everything placed is a line of data in `tools/population.py`. **The user will move things
    while play testing** ("I will fine tune it while play testing"): keep each placement one
@@ -297,6 +298,41 @@ gusts, the laundry lines, the gulls that take food, the waiter).
   is shown waits), and the icon gives a small bump. It flies on the HUD's own layer, fixed to
   the screen, from the screen's point where it lay. Several at once follow each other 80 ms
   apart. With `?tangerines=infinite` it flies all the same. A tangerine spent does nothing new.
+
+### 1.8 Doors and walls stop everything that moves (the user, 2026-11-17)
+
+"I want the corridor doors (and walls, where relevant) to serve as natural obstacles not only for
+the player, but for moving NPCs and moving objects too. If it makes sense for a given moving NPC
+to open a door on their path and walk through, then they should do that. If not, the door should
+stop them (before the door, not while they're already on top of the door). Moving obstacles are
+just stopped before doors."
+
+A door across a deck is a bulkhead's (the glass doors between the ship's parts, the deck doors,
+the spa's, the bridge's, the sauna's); a wall is the solid layer at a body's height. Built into
+the ship scene (`stopShort`, `spanOn`, `doorAhead`, `mayOpen`, `holdDoor`, `letGoDoor`) and used
+by everything that moves, so that a later step only has to call them:
+
+- **A thing that moves by itself stops short of the door's face, shut or open** (one she holds
+  open would shut on it), never on top of it: a span (`spanOn`) for a thing that goes to and fro
+  (the robot, the suitcase, the dog's lead), `stopShort` for a single move (the vacuum's dart, a
+  lunge sending the suitcase or the porter's cart rolling, her ride on the vacuum, which ends at
+  the door with a bump and her checkpoint). Loose tangerines already bounce off a shut door
+  (`src/world/tangerine.js`).
+- **A person walking a loop opens a door with no lock** (`people.js`, `door()`): half a second at
+  its handle, the door opens (its sound), they go through holding it, and it shuts once their
+  back (and their cart's) is past and she is away. The porter on deck 4 does it at 60 m.
+- **A locked door turns a person back short of it** as at an end of their walk (a card, one way,
+  a rope, the story's block): one held open would let her past a lock.
+- **A round that is one corridor's work** (the paper rounds, the breakfast round, the steward on
+  deck 8) is kept to its side of any door: their cabins are all on one side.
+- **A scripted scene that walks people through a door opens it** (`setBulkheadOpen`, `ajar` while
+  they pass: the wedding party into the chapel).
+- **Placing a mover** (§5's steps): give it a span on one side of a door, or a walking person
+  whose door has no lock; never a thing set to cross a door.
+- Bumbot's ways out already keep it (looked at 2026-11-17): at near-catch 2 the rope stand he
+  knocks swings deck 6's 194 m door open and he runs through it, off the screen; at near-catch 5
+  he runs off the screen along the pools and is gone there, some 24 m short of deck 11's door
+  (its data's `exitX`, 170 m, is not used by the pool's own scene).
 
 ---
 

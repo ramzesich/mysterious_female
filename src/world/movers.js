@@ -26,6 +26,10 @@ export class Robot {
         this.h = this.sprite.height - 1;
         this.zone = s.add.zone(def.x, def.y, this.w, this.h).setOrigin(0.5, 1);
         s.physics.add.existing(this.zone, true);
+        // (Its run short of any door or wall across the deck: ShipScene `stopShort`.)
+        const span = s.spanOn(def.x, def.x0, def.x1, def.y, this.w / 2);
+        this.x0 = span.lo;
+        this.x1 = span.hi;
         this.beep = s.add.text(def.x, def.y - this.h - 6, '♪', {
             fontFamily: 'Verdana, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#0b5e65', resolution: 4,
         }).setOrigin(0.5, 1).setDepth(D.fx).setVisible(false);
@@ -72,8 +76,8 @@ export class Robot {
         this.wasBlocked = blocked;
         if (blocked || time < this.pausedUntil) return;
         let to = this.x + this.dir * d.v * M * dt;
-        if (to >= d.x1) { to = d.x1; this.dir = -1; this.pausedUntil = time + 900; }
-        else if (to <= d.x0) { to = d.x0; this.dir = 1; this.pausedUntil = time + 900; }
+        if (to >= this.x1) { to = this.x1; this.dir = -1; this.pausedUntil = time + 900; }
+        else if (to <= this.x0) { to = this.x0; this.dir = 1; this.pausedUntil = time + 900; }
         const dx = to - this.x;
         this.x = to;
         this.sprite.x = this.zone.x = to;
@@ -372,7 +376,7 @@ export class Darter {
                 sfx.at(d.x, d.y).vacDart();
                 // Out fast, a breath, and back in slowly: only on its way out is it a fright.
                 s.tweens.add({
-                    targets: v, x: d.x + this.dir * d.dart, duration: 400, ease: 'Quad.easeOut', hold: 160,
+                    targets: v, x: s.stopShort(d.x, d.x + this.dir * d.dart, d.y, 9), duration: 400, ease: 'Quad.easeOut', hold: 160,
                     onComplete: () => {
                         if (this.state !== 'out') return;
                         this.state = 'back';
@@ -729,7 +733,9 @@ export class Roller {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x0, x1, y, v (m/s, its fastest) }
+        // (Its roll short of any door or wall across the deck: ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, Roller.HALF);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s, its fastest) }
         // (Its handle pulled up: the one she rides in her gag, 6b, cut from that picture.)
         this.sprite = s.add.image(def.x0, def.y, 'things', 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         world.add([this.sprite]);
@@ -758,7 +764,7 @@ export class Roller {
             const away = p.body.velocity.x < 0 ? -1 : 1;
             s.smash(this.x, d.y - 16, false);
             sfx.at(this.x, d.y).creak();
-            s.tweens.add({ targets: this.sprite, x: away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, angle: away * 12, duration: 1400, ease: 'Quad.easeOut',
+            s.tweens.add({ targets: this.sprite, x: s.stopShort(this.x, away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, d.y, Roller.HALF), angle: away * 12, duration: 1400, ease: 'Quad.easeOut',
                 onComplete: () => this.sprite.setAngle(0) });
         } else if (this.world.carry) {
             this.world.carryBox.spill(this.x, false, 'suitcase', { vx: Math.sin(this.phase) * 50 });
@@ -776,6 +782,7 @@ export class Roller {
 }
 // Her feet over this, she clears it: its body (the handle is a thin rail she passes).
 Roller.HOP = 30;
+Roller.HALF = 12;               // px from its middle to its front
 
 // A small dog on a long lead (population: `haz_dog_4`), its owner in her cabin's doorway holding
 // the other end. The dog trots about within the lead's reach and sits now and then; where the lead
@@ -826,19 +833,11 @@ export class Fetcher {
         this.at = this.scene.time.now + ms;
     }
 
-    // Where the lead lets it go: its reach either way from the doorway, short of any wall across
-    // the deck (a bulkhead's: the lead does not go through walls).
+    // Where the lead lets it go: its reach either way from the doorway, short of any door or wall
+    // across the deck (ShipScene `stopShort`: the lead does not go through walls).
     range() {
-        if (this.span) return this.span;
-        const s = this.scene, d = this.def;
-        let lo = d.x - d.reach, hi = d.x + d.reach;
-        for (const b of s.bulkheads ?? []) {
-            const z = b.zone?.body;
-            if (!z || z.bottom < d.y - 4 || z.top > d.y - 4) continue;
-            if (z.left > d.x) hi = Math.min(hi, z.left - 12);
-            else if (z.right < d.x) lo = Math.max(lo, z.right + 12);
-        }
-        return (this.span = { lo, hi });
+        const d = this.def;
+        return (this.span ??= this.scene.spanOn(d.x, d.x - d.reach, d.x + d.reach, d.y, 10));
     }
 
     // Her cry: a howl back at her, and round its owner's legs: the lead lies flat a while.
@@ -989,7 +988,9 @@ export class Skimmer {
         const s = world.scene;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x0, x1, y, v (m/s), who, doors: [x] }
+        // (His round is one corridor's: short of any door or wall across the deck, ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, 10);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s), who, doors: [x] }
         this.p = world.people.add({ id: def.id, who: def.who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
         this.x = def.x0;
         this.dir = 1;
@@ -1164,8 +1165,11 @@ export class Breakfast {
         this.d = { x: def.doors[0], y: def.y };
     }
 
+    // (Only those she can wheel the trolley to from the first without a door across the deck: a
+    // service cart does not go through one, ShipScene `stopShort`.)
     doors() {
-        return realDoors(this.scene, this.def);
+        const s = this.scene, d = this.def;
+        return (this.reach ??= realDoors(s, d).filter(x => s.stopShort(d.doors[0], x, d.y, 30) === x));
     }
 
     // Where the trolley stands for a door: a step short of it on the side she comes from.

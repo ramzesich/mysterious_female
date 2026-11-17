@@ -1194,7 +1194,7 @@ export class ShipScene extends Phaser.Scene {
         }
         this.worldLayer.add(parts);
         const deck = key.split(':')[0];
-        this.bulkheads.push({ id: o.name, x, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone });
+        this.bulkheads.push({ id: o.name, x, w, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone });
     }
 
     // E at a wall's shut door: it opens.
@@ -1219,6 +1219,70 @@ export class ShipScene extends Phaser.Scene {
         b.openDoor.setVisible(open);
     }
 
+    // The doors across a deck, and its walls, stop whatever moves along it, not only her (the user,
+    // 2026-11-17; docs/plan-three-uses.md §1.8). A thing stops short of a door's face, shut or open
+    // (one she holds open would shut on it), never on top of it; a person may open a door with no
+    // lock, go through, and it shuts behind them (`holdDoor`, people.js `walk`); a locked one (a
+    // card, one way, a rope, the story's) turns them back, since one held open would let her by.
+    // `half`: px from the thing's middle to its front, the way it goes.
+
+    // How far a thing at x on the floor y can go toward `to`: there, or short of the first door or
+    // wall on the way (never back from where it is).
+    stopShort(x, to, y, half = 0, gap = 2) {
+        const dir = Math.sign(to - x);
+        if (!dir) return to;
+        const cut = stop => { if ((to - stop) * dir > 0) to = (stop - x) * dir > 0 ? stop : x; };
+        for (const b of this.bulkheads) {
+            if (Math.abs(b.floor - y) <= 4 && (b.x - x) * dir > 0) cut(b.x - dir * (b.w / 2 + half + gap));
+        }
+        // A wall: the solid layer at a body's height over the floor.
+        const T = 16, first = Math.floor((x + dir * half) / T) + dir, last = Math.floor((to + dir * half) / T);
+        for (let c = first; (last - c) * dir >= 0; c += dir) {
+            if (!(this.solidLayer.getTileAtWorldXY(c * T + T / 2, y - 20)?.index > 0)) continue;
+            cut((dir > 0 ? c * T : (c + 1) * T) - dir * (half + gap));
+            break;
+        }
+        return to;
+    }
+
+    // A span lo..hi round x on the floor y, cut short by the doors and walls either side.
+    spanOn(x, lo, hi, y, half = 0, gap = 2) {
+        return { lo: this.stopShort(x, lo, y, half, gap), hi: this.stopShort(x, hi, y, half, gap) };
+    }
+
+    // The door across the floor y that a thing at x going `dir` reaches within `reach` px of its
+    // front, or null.
+    doorAhead(x, dir, y, half = 0, reach = 12) {
+        let best = null, near = Infinity;
+        for (const b of this.bulkheads) {
+            const gap = (b.x - x) * dir - b.w / 2 - half;
+            if (Math.abs(b.floor - y) <= 4 && (b.x - x) * dir > 0 && gap <= reach && gap < near) {
+                best = b;
+                near = gap;
+            }
+        }
+        return best;
+    }
+
+    // A person may open it: no lock.
+    mayOpen(b) {
+        return !b.lock;
+    }
+
+    // A person opens a door and holds it while going through (`who`: anything to know them by); it
+    // shuts once no one holds it and she is away (`updateBulkhead`).
+    holdDoor(b, who) {
+        (b.held ??= new Set()).add(who);
+        if (b.open) return false;
+        this.setBulkheadOpen(b, true);
+        sfx.at(b.x, b.floor).doorHeavy();
+        return true;
+    }
+
+    letGoDoor(b, who) {
+        b.held?.delete(who);
+    }
+
     // Each frame: a door shuts behind her once she is away from it; a wall shows while its deck is
     // cut open on either side of it.
     updateBulkhead() {
@@ -1226,7 +1290,8 @@ export class ShipScene extends Phaser.Scene {
         for (const b of this.bulkheads) {
             const onDeck = this.route === 'inside' && p.y <= b.floor + 4 && p.y > b.floor - this.deckPitch;
             // (One left ajar stays so: the Library's aft door, after Bumbot.)
-            if (b.open && !b.ajar && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
+            // (Nor one a person is going through: `holdDoor`.)
+            if (b.open && !b.ajar && !b.held?.size && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
             if (!b.key) continue;
             const open = 1 - Math.min(this.shellAlpha[b.deck] ?? 1, this.shellAlpha[b.key] ?? 1);
             b.wall.setAlpha(open);
@@ -4459,13 +4524,22 @@ export class ShipScene extends Phaser.Scene {
             const T = Math.max(0, L - knee) / g.top + Math.log(Math.max(Math.min(L, knee), floor) / floor) / g.slow + floor / g.least;
             k = Math.max(g.pace ?? 1, T / g.rideS);
         }
+        // (A door or a wall across the deck stops the ride short of it, `stopShort`: a beat there,
+        // and her checkpoint.)
+        const wall = this.stopShort(s.x, s.x + dir * 4800, ride.y, 16);
         this.script = (dt) => {
             if (sc.gag === 'vacuum') {
                 // Off down the corridor, faster and faster, out of the screen.
                 v = Math.min(g.speed, v + g.accel * dt);
                 s.x += dir * v * dt;
                 const view = this.cameras.main.worldView;
-                if (s.x < view.x - 60 || s.x > view.right + 60) this.respawn();
+                if ((s.x - wall) * dir >= 0) {
+                    s.x = wall;
+                    this.script = null;
+                    s.anims.pause();
+                    sfx.at(s.x, ride.y).thump();
+                    this.time.delayedCall(700, () => this.respawn());
+                } else if (s.x < view.x - 60 || s.x > view.right + 60) this.respawn();
             } else if (!tipped) {
                 // On to the end of its roll, slowing; there it creaks and tips her off.
                 const left = (ride.endX - s.x) * dir;
