@@ -742,6 +742,7 @@ is seen when she is hit.
 | The casino's chips | `Spill` in `movers.js` | 1: as built |
 | The trays on the floor | `Trays` in `hazards.js` | 3: the trip and the ride are the fright now; the door opens after, on the guest looking after her |
 | Deck 9's vacuum | `Darter` in `movers.js` | 5a, 5b (step 4's clips). **Done (2026-11-17):** deck 4's picture, the ride the way it darted, back in its doorway after |
+| (Not a mishap) the steward's jammed cart | `cart_steward`, `updateHousekeeping` in `story.js` | **Done (2026-11-17), the user's:** a tall trolley that shows the block, he and it one picture, his card tossed (`docs/progress-decisions.md`) |
 | The wet patch's deck chair | `WetPatch` in `hazards.js` | 7a, 7b, by the end she slid in from |
 | The jogger | `haz_jogger`, `world.touched()` | 9a to 9d; his sorry on the spot |
 | The kid's jet | `lido.js` | 11a, 11b; his laugh |

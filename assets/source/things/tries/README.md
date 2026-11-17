@@ -33,3 +33,10 @@ The ones used: `flag-se` 40e7f9a8-db21-49e5-951b-5b0567a4246a, `flag-fi`
 `knit-basket`
 a35c7de6-b5bf-46c2-82ce-36fbb1246894, `door-hand` 304312bc-1e2e-4f7c-b7dd-3c06a80ac3fe,
 `icon-heart` f86250a0-3886-4984-a727-b06e35a23ca6.
+
+The steward's tall trolley (2026-11-17; `create_map_object`, side view, low detail, 64 x 96, 1 each):
+`steward-cart-a.png` ade11b6e-cf13-4701-94b5-7de02eaccb71 (wire trolley with towels), `-b`
+df97f40e-8901-4593-855b-7ffce7f262da (blue cart, a tower of pillows), `-c`
+9f4cea5e-ce98-480f-aafc-59b7ca4e4480 (wooden shelves, white and blue linen); **`-d`
+e03df2fc-812c-46e1-b898-cbaa1c442dfc chosen** ("4": boxes, towels and a laundry sack; see
+`../../people/steward-raw/README.md`).

@@ -207,7 +207,9 @@ LINEN = dict(vent=220, sill=42, chute=24, cart_top=36, laundry_cart=200)
 # tall: it fills the doorway until then, the side she pushes from: -1 forward of it[, needs: the
 # flag before which it is not hers to push]).
 PUSHABLES = {
-    "cart_steward": (9, 122.6, 130, "service-cart", "cart_free", True, -1),
+    # (The steward's: a tall housekeeping trolley, too tall to hop, so that it is seen to block the
+    # corridor (the user, 2026-11-17: a low service cart had stood for it, "an invisible wall").)
+    "cart_steward": (9, 122.6, 130, "thing:steward-trolley", "cart_free", True, -1),
     # The linen room's laundry cart: by the wall (she walks past it), pushed under the vent she
     # climbs onto it ("top": only its rim holds her).
     "cart_linen": ("linen", 108, 216, "@linen-cart", "cart_linen", "top", -1, "bb4"),

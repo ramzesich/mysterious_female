@@ -1109,12 +1109,18 @@ export class World {
                 const zone = s.add.zone(x, e.y, img.width - 4, e.tall === true && !done() ? 128 : rim).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 img.x = x;
+                // (A tall one, free: too tall to hop, it stands back against the wall, out of her
+                // way: the steward's trolley, the user, 2026-11-17.)
+                const aside = () => { zone.body.enable = false; img.setDepth(D.decor + 0.11); };
+                if (e.tall === true && done()) aside();
                 const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, rim,
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
                         if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
-                            // Free of the doorway: it stands in the corridor, low enough to hop.
+                            // Free of the doorway: it stands in the corridor, low enough to hop; a
+                            // tall one stands back against the wall.
                             zone.setSize(img.width - 4, rim);
+                            if (e.tall === true) aside();
                             this.progress.setFlag(e.flag);
                             s.pushing = null;
                             s.mode = 'play';
@@ -1431,6 +1437,50 @@ export class World {
         await this.wait(350);
         sfx.at(person.x, person.y).give();
         await this.tween({ targets: img, x: p.x, y: p.y - 40, duration: 420, ease: 'Sine.easeInOut' });
+        await this.received(img, frame, then);
+    }
+
+    // Someone tosses her a thing, with a clip of theirs (`clip`): it is in their fingers in the frames
+    // `held` names ({ frame: [px ahead of their middle, px up from their feet] }, behind their hand),
+    // leaves them at frame `release` from `from`, and flies to her chest in a lob, on the game's clock
+    // (the scene's `update`, not a tween: the lesson of the tennis ball); then as `handOver`.
+    tossOver(person, frame, then, tint, { clip, held, release, from }) {
+        const s = this.scene, p = s.player, sp = person.sprite;
+        if (!person.meta.anims[clip]) return this.handOver(person, frame, then, tint);
+        const img = this.image(0, 0, frame).setOrigin(0.5, 0.5).setDepth(sp.depth - 0.001).setVisible(false);
+        if (tint) img.setTint(tint);
+        this.add([img]);
+        const at = ([dx, up]) => img.setPosition(Math.round(person.x) + person.dir * dx, sp.y - up);
+        return new Promise(resolve => {
+            const hold = (anim, f) => {
+                const i = f.index - 1;
+                if (held[i]) at(held[i]).setVisible(true);
+                else if (i < release) img.setVisible(false);
+                if (i < release) return;
+                sp.off('animationupdate', hold);
+                at(from).setVisible(true).setDepth(s.DEPTH.player + 0.05);
+                sfx.at(person.x, person.y).give();
+                // (A lob: its top a fifth of the way across, at least 12 px over where it left.)
+                const x0 = img.x, y0 = img.y, tx = p.x, ty = p.y - 40, g = 400;
+                const top = Math.max(12, Math.abs(tx - x0) * 0.2), vy = -Math.sqrt(2 * g * (y0 - Math.min(y0, ty) + top));
+                const T = (-vy + Math.sqrt(Math.max(0, vy * vy - 2 * g * (y0 - ty)))) / g, t0 = s.time.now;
+                const fly = () => {
+                    const t = Math.min(T, (s.time.now - t0) / 1000);
+                    img.setPosition(x0 + (tx - x0) * t / T, y0 + vy * t + g * t * t / 2);
+                    if (t < T) return;
+                    s.events.off('update', fly);
+                    this.received(img, frame, then).then(resolve);
+                };
+                s.events.on('update', fly);
+            };
+            sp.on('animationupdate', hold);
+            this.people.play(person, clip);
+        });
+    }
+
+    // A thing handed or tossed to her has reached her: a sparkle, and it is hers.
+    async received(img, frame, then) {
+        const s = this.scene;
         if (frame === 'key-card') sfx.card();
         else sfx.take();
         for (let i = 0; i < 10; i++) {

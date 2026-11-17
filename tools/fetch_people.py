@@ -42,7 +42,9 @@ def fetch(name, facing="east"):
 
 # Figures whose frames are kept by hand (cut from a picture, clips not all on the character): a
 # fetch would overwrite them with the character's own, so they are fetched only by name.
-BY_HAND = {"dog", "dogowner"}
+# (The steward's `tug` is a picture of him with his jammed trolley, made by hand from PixMiniMax:
+# assets/source/people/steward-raw/README.md.)
+BY_HAND = {"dog", "dogowner", "steward"}
 
 
 def main():

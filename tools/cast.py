@@ -129,7 +129,7 @@ CAST = {
     "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"scale": 0.8}),
     "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"scale": 0.8}),
     # Region 4 (Housekeeping): deck 9's corridor, the atrium walks, the laundry.
-    "steward": ("88741662-8a90-437a-bca4-c996663761ff", {"idle": 4, "tug": 8, "walk": 9, "thanks": 8}, {}),
+    "steward": ("88741662-8a90-437a-bca4-c996663761ff", {"idle": 4, "tug": 6, "tugwalk": 8, "walk": 9, "thanks": 8, "toss": 8}, {}),
     "bride": ("70b0bc20-aef9-46aa-bd9d-35f56c4c0008", {"idle": 4, "kiss": 7}, {}),
     "groom": ("146b63d6-6f03-4675-9b0a-5d79914315ba", {"idle": 4, "kiss": 7}, {}),
     "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),

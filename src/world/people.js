@@ -182,8 +182,10 @@ export class People {
                 if (show && !p.bubbleShown && time > (p.bubbleQuietUntil ?? 0)) sfx.at(p.x, p.y).bubble();
                 if (show) p.bubbleQuietUntil = time + 6000;
                 p.bubbleShown = show;
-                p.bubbleItems[0].setVisible(show).setPosition(p.x, by);
-                p.bubbleItems[1].setVisible(show).setPosition(p.x, by - BUBBLE.h / 2);
+                // (`bubbleDx`: over his own head in a picture of him with something, px from its middle.)
+                const bx = p.x + (p.bubbleDx ?? 0);
+                p.bubbleItems[0].setVisible(show).setPosition(bx, by);
+                p.bubbleItems[1].setVisible(show).setPosition(bx, by - BUBBLE.h / 2);
             }
             if (p.touch && playing && s.route === p.route && !p.aside && !p.busy && !s.aside && this.touching(p, her)) this.world.touched(p);
         }

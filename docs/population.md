@@ -550,8 +550,8 @@ the corridor at 118, not here.
 |---|---|---|---|---|
 | 112 | the linen room | Built (§8): `bb_4` asleep in the towel heap; the laundry cart (push); the vent (crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
 | 118 | `rdr_trunk_bliss` | The trunk's deck 9 door, red, where she arrives | | |
-| 122 | `haz_cart_steward` | The steward's cart jammed across the corridor in a cabin's doorway | The push glyph; E at its east end and walk east: it rolls to 130 and stands there (hop); it cannot be passed before | A cart |
-| 126 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`: `item_card_hk` | Idle, thanks |
+| 122 | `haz_cart_steward` | The steward's tall housekeeping trolley jammed across the corridor, too tall to hop, the steward tugging at its handle (one picture of the two) | The push glyph; E at its near end and walk east: it rolls to 130 with him stepping back, and stands back against the wall there (not solid); it cannot be passed before (2026-11-17) | The trolley, his tug, steps and toss |
+| 126 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`: he steps back, thanks her and tosses her `item_card_hk` | Idle, thanks, toss |
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |

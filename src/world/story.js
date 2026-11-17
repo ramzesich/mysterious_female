@@ -12,6 +12,15 @@ import { finale } from './finale.js';
 
 const M = 48;
 
+// The steward and his jammed trolley (region 4): his `tug` is a picture of the two, drawn with the
+// trolley's middle this far behind his frame's middle; let go of it, he stands this far from it.
+const STEWARD_TUG = 17, STEWARD_FREE = 35;
+// (His head in that picture, px aft of its middle: his bubble over it.)
+const STEWARD_HEAD = 22;
+// His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
+// and 4 (px ahead of his middle, px up from his feet), out of his hand as it swings open in frame 5.
+const STEWARD_TOSS = { clip: 'toss', held: { 3: [1, 40], 4: [3, 41] }, release: 5, from: [19, 37] };
+
 export class Story {
     constructor(world) {
         this.world = world;
@@ -568,16 +577,26 @@ export class Story {
 
     updateHousekeeping(dt, time) {
         const s = this.scene, w = this.world, P = this.P, her = s.player;
-        // The steward pulls at his cart from its far end, and goes along with it as she pushes.
+        // The steward pulls at his trolley's handle, and goes along with it as she pushes: one picture
+        // of the two (his `tug`, the world's trolley hidden meanwhile), set by the trolley's middle
+        // (`STEWARD_TUG`); free, he stands back from it (`STEWARD_FREE`).
         const st = this.who('npc_steward'), cart = this.stewardCart;
         if (st && cart && st.state !== 'acting') {
             const free = P.has('cart_free');
-            const x = cart.x + 35;
-            if (st.x !== x || st.free !== free) {
+            cart.items[0].setVisible(free);
+            st.bubbleDx = free ? 0 : STEWARD_HEAD;
+            const x = cart.x + (free ? STEWARD_FREE : STEWARD_TUG);
+            // (While she pushes it along he steps back with it, `tugwalk`; stopped, he tugs.)
+            // (Moved within the last 150 ms: a frame without a step is no stop.)
+            if (this.lastCartX !== undefined && cart.x !== this.lastCartX) this.cartMovedAt = time;
+            this.lastCartX = cart.x;
+            const moving = !free && time - (this.cartMovedAt ?? -1e9) < 150;
+            const idle = free ? 'idle' : moving ? 'tugwalk' : 'tug';
+            if (st.x !== x || st.free !== free || st.idle !== idle) {
                 st.x = x;
                 st.dir = -1;
                 st.free = free;
-                st.idle = free ? 'idle' : 'tug';
+                st.idle = idle;
                 this.people.idle(st);
                 this.people.place(st);
             }
@@ -626,14 +645,27 @@ export class Story {
         w.cut(async () => {
             const her = s.player;
             her.setFlipX(st.x < her.x);
+            // (Let go of the handle: he steps back off it, `STEWARD_FREE` from its middle.)
+            const to = this.stewardCart ? this.stewardCart.x + STEWARD_FREE : st.x;
+            if (Math.abs(to - st.x) > 1) {
+                st.state = 'acting';
+                st.dir = Math.sign(to - st.x);
+                this.people.anim(st, 'walk');
+                const step = { x: st.x };
+                await w.tween({ targets: step, x: to, duration: Math.abs(to - st.x) / 40 * 1000,
+                                onUpdate: () => { st.x = step.x; this.people.place(st); } });
+                st.free = true;
+            }
             st.idle = 'idle';
             st.dir = her.x < st.x ? -1 : 1;
+            this.people.idle(st);
             this.people.place(st);
             await w.wait(200);
             sfx.at(st.x, st.y).aah();
             await this.people.play(st, 'thanks');
             await w.wait(150);
-            await w.handOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'));
+            // (Out of his shirt pocket and tossed to her: `STEWARD_TOSS`.)
+            await w.tossOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'), STEWARD_TOSS);
             this.P.setFlag('steward');
             sfx.done();
             this.thanking = false;

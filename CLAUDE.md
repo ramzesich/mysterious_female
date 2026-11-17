@@ -468,6 +468,22 @@ Lessons learned (2026-11-17, the dog's together clips):
 - **Someone who comes to her while she is down holds her checkpoint** (`down.holds` in
   `scareDown`), never a longer fixed wait.
 
+Lessons learned (2026-11-17, the steward's jammed trolley):
+
+- **A block must look like one:** a low cart standing for a wall to the ceiling read as "an invisible
+  wall" and the scene as "weird and unclear". What stops her is drawn at the size it stops her (too
+  tall to hop, it is taller than her jump).
+- **Someone working at a world thing that moves** (a trolley pulled, then pushed) is one picture of
+  the two while they are together, the world's thing hidden; the world's own is cut from that clip's
+  frame, so the hand-over matches. And a clip for every way they move together: tugging in place,
+  and stepping as it rolls (legs still while sliding along read at once).
+- **A thing given is tossed, not flown:** `world.tossOver` with the giver's toss clip (in the
+  fingers until the hand opens, then a lob); a thing that just crosses the air to her was "just
+  flying at her".
+- **Before reporting a block, find what it is:** I first showed the user a different trolley (the
+  breakfast stewardess's, the same picture) than the one in their screenshot. Match the person in the
+  picture before answering.
+
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The

@@ -2405,3 +2405,31 @@ here" 7); each built step is gone back over under its "Revision".
 - **A start place `deck9-aft`** (deck 9, 134 m): past the steward's jammed cart, short of the
   vacuum, which the user could not reach from `housekeeping`.
 - Passed: `region4`, `deck4`, `lang`. The rest not run.
+
+## Step 4a: the steward's jammed trolley (2026-11-17)
+
+- **The jam made visible** (the user: "I cannot jump over this scene here, there's an invisible
+  wall"; the scene "weird and unclear", a man "twitching"): deck 9's steward stood 35 px from a low
+  service cart, grabbing at the air, and an invisible block reached the ceiling. Asked how it should
+  be, the user took my recommendation: a tall housekeeping trolley that shows why the corridor is
+  blocked. Four candidates (map objects); the user chose "4" (boxes, towels, a laundry sack: 79 px,
+  taller than her jump), mirrored so its handle faces him.
+- **He and it one picture while jammed** (approved): him gripping its handle, leaning back (an edit
+  of the two composed); his two heaves at it, the trolley giving 3 px (PixMiniMax); the world's
+  trolley hidden meanwhile, so his hands never leave its handle. His bubble over his own head in it
+  (`bubbleDx` in people.js). The world's trolley is cut from the clip's last frame, so the two match
+  when one replaces the other.
+- **Free, it stands back against the wall**, drawn behind her and not solid (a tall `push` thing,
+  `aside()` in world.js): it could not be hopped where it stops, as the low one was. He steps back
+  off its handle before he thanks her.
+- **The user's fixes after trying it:** "When pushing, his legs are not moving": a clip of him
+  stepping back as he pulls, in place (`tugwalk`), played while the trolley moves (moved within 150
+  ms). "The card is just flying at her. Maybe we need a proper toss sequence": his toss clip from his
+  standing picture (to his shirt pocket, an underhand toss), the card in his fingers at his pocket
+  for two frames, out of his hand as it opens, a lob to her chest on the game's clock
+  (`world.tossOver`, for anyone with a toss clip; the others still hand over as before).
+- 12 generations (4 trolleys, 5 the edit, 3 clips). Passed: `region4` (its steward checks changed:
+  one picture of the two, he stands back, she walks past the trolley), `boot`. The rest not run.
+- **The towel stack** (`haz_towels_9`): the user asked what it is for ("swaying, in the background,
+  doing nothing else"): it fell only on a jump landed beside it or the dash; she has no walk, so its
+  sway warned of nothing. The user: keep its look, "Make it an obstacle"; a way is proposed to them.

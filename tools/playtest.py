@@ -2703,7 +2703,8 @@ def scenario_region4(b):
     cart = f"{W}.pushables.find(t => t.id === 'cart_steward')"
     cx = js(b, f"{cart}.x")
     st = person(b, "npc_steward")
-    ok &= check(st["on"] and abs(st["x"] - (cx + 35)) < 2, "the steward at his cart's far end", st)
+    ok &= check(st["on"] and abs(st["x"] - (cx + 17)) < 2 and not js(b, f"{cart}.items[0].visible"),
+                "the steward at his tall trolley's handle: one picture of the two", st)
     ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("tug"), "pulling at it")
     b.hold("right", 1.5)
     ok &= check(b.state()["x"] < cx, "the cart fills the corridor", b.state())
@@ -2727,11 +2728,11 @@ def scenario_region4(b):
     ok &= check(wait_js(b, "window.__ship.save.cards.includes('hk') && window.__ship.mode === 'play'", 10),
                 "he thanks her and hands over the Housekeeping card", save_list(b, "cards"))
     st = person(b, "npc_steward")
-    ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("idle") and st["x"] > exact_x(130),
-                "and stands by his cart", st)
-    b.hold(["right", "space"], 0.7)
-    b.hold("right", 0.5)
-    ok &= check(b.state()["x"] > exact_x(130) and b.state()["mode"] == "play", "she hops the cart there", b.state())
+    ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("idle") and st["x"] > exact_x(130)
+                and abs(st["x"] - (js(b, f"{cart}.x") + 35)) < 2 and js(b, f"{cart}.items[0].visible"),
+                "and stands by his trolley, stepped back off its handle", st)
+    b.hold("right", 1.2)
+    ok &= check(b.state()["x"] > exact_x(130) and b.state()["mode"] == "play", "she walks past it, back against the wall", b.state())
     # The honeymooners.
     b.teleport(exact_x(133.6), D9)
     time.sleep(0.4)

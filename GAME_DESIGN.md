@@ -2385,9 +2385,12 @@ Nothing blocks the start of the build. These get settled along the way:
       on its lead, it licks her face, her checkpoint waiting for it. **Next in step 4's revision:**
       step 4a: **deck 9's darting vacuum done (2026-11-17)**: deck 4's generated picture (the code-drawn
       one gone), its blink on its own front light, and she rides it off the way it darted (5a, 5b);
-      **under way:** the steward's cart jammed on deck 9 made a tall housekeeping trolley that shows
-      why it blocks the corridor (the user found "an invisible wall": a low trolley stood for it), and
-      his tug drawn with it; then the first batch of her gags. **Then step 5** (the rest of the
+      **done (2026-11-17): the steward's jammed trolley** (the user found "an invisible wall": a low
+      cart had stood for a block to the ceiling): a tall housekeeping trolley, the user's choice, too
+      tall to hop; he and it one picture while it is jammed (his tug, his steps back as she pushes);
+      free, it stands back against the wall and he tosses her his card out of his pocket. **Next:**
+      the towel stack made an obstacle (its look kept, the user: "I like it the way it is"; how, put
+      to the user), then the first batch of her gags. **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened. Another
