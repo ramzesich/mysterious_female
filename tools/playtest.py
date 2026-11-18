@@ -2,6 +2,16 @@
 events over the DevTools protocol, and reports state, console errors and screenshots.
 
     python tools/playtest.py [scenario ...]      (no arguments runs them all)
+    python tools/playtest.py --real [scenario ...]   (in real time, as before: for comparing)
+
+The stepped clock (docs/plan-fast-tests.md): once a page has loaded, the test stops the game's own
+loop and owns its clock (`takeover`): a wait of two seconds is 120 frames of a sixtieth of a second
+stepped undrawn (`Browser.advance`), a few milliseconds; a frame is drawn only for a screenshot.
+Every wait in the scenarios is `wait(seconds)` and every deadline `now()`, which go to that clock,
+or to real time under `--real` and for the scenarios pinned to it (`REAL_TIME`: the sound runs on
+the audio context's own clock, and `boot` proves the game's own loop still runs). Tools that use
+`Browser` themselves (check_overlaps, shoot_people, render_ship, check_sound) run in real time
+unless they ask for `Browser(stepped=True)`.
 
 Screenshots go to the system temp folder (printed at the end). Needs Google Chrome and the
 `websocket-client` package. Nothing here ships with the game.
@@ -52,8 +62,51 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+# The page's side of the stepped clock: the game's loop stopped, `Date.now` and `performance.now`
+# reading the stepped time (each keeps its own offset, so the tween manager, which reads `Date.now`,
+# and the rumble follow it), and `__advance(frames, draw)` stepping it a sixtieth of a second a frame,
+# the cameras moved each frame as drawing would move them, the browser given its turn between frames.
+TAKEOVER = """(() => { const g = window.__game;
+    if (window.__advance) return window.__t;
+    g.loop.stop();
+    window.__t = g.loop.now || performance.now();
+    const d0 = Date.now() - window.__t;
+    Date.now = () => Math.round(window.__t + d0);
+    performance.now = () => window.__t;
+    // (Between two frames the browser has its turn, as it has between two of the real loop's: the
+    // game's scenes await their waits and tweens, and a promise's continuation runs only then. A
+    // message on a channel is a turn with no delay of its own, after every pending continuation.)
+    const mc = new MessageChannel();
+    let turned = null;
+    mc.port1.onmessage = () => turned();
+    const turn = () => new Promise(r => { turned = r; mc.port2.postMessage(0); });
+    window.__advance = async (frames, draw) => {
+        for (let i = 0; i < frames; i++) {
+            window.__t += 1000 / 60;
+            if (draw) g.step(window.__t, 1000 / 60);
+            else {
+                g.headlessStep(window.__t, 1000 / 60);
+                // (Undrawn, the cameras are still moved as drawing moves them: a camera follows her
+                // and updates its view in its preRender, and the game reads that view.)
+                for (const sc of g.scene.getScenes(true)) for (const c of sc.cameras.cameras) c.preRender();
+            }
+            await turn();
+        }
+        return window.__t;
+    };
+    return window.__t; })()"""
+FRAME = 1 / 60
+
+
 class Browser:
-    def __init__(self):
+    current = None      # the one browser of this process, for `wait()` and `now()`
+
+    def __init__(self, stepped=False):
+        # (Stepped: each page, once loaded, is taken over, `takeover()`.)
+        self.stepped = stepped
+        self.taken = False
+        self.clock = 0.0
+        Browser.current = self
         self.http_port = free_port()
         handler = functools.partial(Quiet, directory=str(ROOT))
         self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", self.http_port), handler)
@@ -113,31 +166,59 @@ class Browser:
         # between loads, which some scenarios use.)
         if "real" not in query:
             query += ("&" if "?" in query else "?") + "real"
+        # (A new page runs in real time until it is there: loading is the browser's own work.)
+        self.taken = False
         self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
         time.sleep(0.3)
         # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
         self.wait_for("window.__ship && window.__ship.player && window.__ship.soundscape", timeout=15)
-        time.sleep(0.5)
+        if self.stepped:
+            self.takeover()
+        self.wait(0.5)
         if old:
             self.eval("""(s => { const c = s.checkpoints.find(c => c.id === 'cp_gangway');
                 if (c && !c.active) { s.lightCheckpoint(c, false); s.save.activated.push(c.id); } })(window.__ship)""")
 
-    def eval(self, expr):
-        res = self.send("Runtime.evaluate", expression=expr, returnByValue=True)
+    def eval(self, expr, settle=False):
+        """`settle`: the expression is a promise, and its value is what it settles to."""
+        res = self.send("Runtime.evaluate", expression=expr, returnByValue=True, awaitPromise=settle)
         if "exceptionDetails" in res:
             raise RuntimeError(res["exceptionDetails"].get("exception", {}).get("description"))
         return res.get("result", {}).get("value")
 
     def wait_for(self, expr, timeout=10):
-        end = time.time() + timeout
-        while time.time() < end:
+        end = self.now() + timeout
+        while self.now() < end:
             try:
                 if self.eval(f"!!({expr})"):
                     return
             except RuntimeError:
                 pass
-            time.sleep(0.1)
+            self.wait(0.1)
         raise TimeoutError(f"timed out waiting for: {expr}  errors: {self.errors}")
+
+    # --- The clock: stepped once the page is taken over, real before and under `--real` ----------
+
+    def takeover(self):
+        """Stops the game's own loop and owns its clock (docs/plan-fast-tests.md §3.1)."""
+        self.eval(TAKEOVER)
+        self.taken = True
+
+    def advance(self, seconds, draw=False):
+        """Steps the game `seconds` of its time, a sixtieth of a second a frame (at least one),
+        undrawn unless `draw`."""
+        n = max(1, round(seconds * 60))
+        self.eval(f"window.__advance({n}, {str(draw).lower()})", settle=True)
+        self.clock += n * FRAME
+
+    def wait(self, seconds):
+        if self.taken:
+            self.advance(seconds)
+        else:
+            time.sleep(seconds)
+
+    def now(self):
+        return self.clock if self.taken else time.time()
 
     def key(self, name, down):
         code, code_name, key = KEYS[name]
@@ -148,7 +229,7 @@ class Browser:
         names = [names] if isinstance(names, str) else names
         for n in names:
             self.key(n, True)
-        time.sleep(seconds)
+        self.wait(seconds)
         for n in names:
             self.key(n, False)
 
@@ -185,9 +266,9 @@ class Browser:
 
     def pad_tap(self, name, seconds=0.1):
         self.pad(name, True)
-        time.sleep(seconds)
+        self.wait(seconds)
         self.pad(name, False)
-        time.sleep(0.05)
+        self.wait(0.05)
 
     def stick(self, x, y):
         self.eval(f"window.__pad.axes[0] = {x}; window.__pad.axes[1] = {y};")
@@ -202,10 +283,13 @@ class Browser:
 
     def teleport(self, x, y, route="inside"):
         self.eval(f"window.__ship.spawnAt({{x: {x}, y: {y}, route: '{route}'}})")
-        time.sleep(0.3)
+        self.wait(0.3)
 
     def shot(self, name):
         OUT.mkdir(exist_ok=True)
+        if self.taken:
+            # (Stepped, nothing is drawn until a picture is wanted: one frame, drawn.)
+            self.advance(FRAME, draw=True)
         data = self.send("Page.captureScreenshot", format="png")["data"]
         path = OUT / f"{name}.png"
         path.write_bytes(base64.b64decode(data))
@@ -218,7 +302,7 @@ class Browser:
         from PIL import Image
         cut = "null" if deck is None else str(deck)
         self.eval(f"(() => {{ const s = window.__ship, c = s.cameras.main; s.viewOverride = {cut}; c.stopFollow(); c.centerOn({x}, {y}); }})()")
-        time.sleep(0.8 if deck is not None else 0.4)
+        self.wait(0.8 if deck is not None else 0.4)
         img = Image.open(self.shot(name))
         # (The canvas is fitted into the window, smaller than it: a game px is its width / 480 on
         # the screenshot, about 1.7 px, and its middle is the canvas's, not the window's.)
@@ -240,6 +324,19 @@ class Browser:
             self.httpd.shutdown()
 
 
+def wait(seconds):
+    """A wait in a scenario: game time stepped, or real time (`--real`, `REAL_TIME`)."""
+    if Browser.current:
+        Browser.current.wait(seconds)
+    else:
+        time.sleep(seconds)
+
+
+def now():
+    """The clock a scenario's deadlines are read on (seconds): the stepped clock, or real time."""
+    return Browser.current.now() if Browser.current else time.time()
+
+
 # --- Scenarios -----------------------------------------------------------------------------------
 # Positions come from the map builder (tools/build_ship_map.py), in metres from the bow.
 
@@ -259,7 +356,7 @@ def check(cond, label, detail=""):
 def scenario_boot(b):
     # (Straight into the game: the welcome screen and the intro have their own scenario, `intro`.)
     b.open("?reset&play", start=None)
-    time.sleep(0.5)
+    wait(0.5)
     s = b.state()
     b.shot("spawn")
     # (A sheet wider or taller than a texture may be is drawn as a black box, and nothing else
@@ -276,12 +373,12 @@ def scenario_boot(b):
     ok &= check(kinds[0] > 300 and kinds[1] > 100 and kinds[2] >= kinds[0], "the ship's side is painted: its tiles are of many kinds", kinds)
     # From outside (O), what stands inside a deck in front of her is behind the closed side.
     b.tap("o")
-    time.sleep(0.8)
+    wait(0.8)
     fronts = b.eval("(s => [!!s.overview, (s.insideFronts || []).length, (s.insideFronts || []).filter(f => f.item.alpha > 0.01).length])(window.__ship)")
     b.shot("outside-view")
     ok &= check(fronts[0] and fronts[1] >= 2 and fronts[2] == 0, "in the outside view nothing inside shows through the closed side", fronts)
     b.tap("o")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(not b.eval("!!window.__ship.overview") and b.state()["mode"] == "play", "and O again is back in the game")
     return ok
 
@@ -293,7 +390,7 @@ def scenario_deck3(b):
     a, z = (exact_x(m) for m in CREW_DECK["span"])
     ladder = x_of(CREW_DECK["ladder"])
     b.open("?reset&play", start=None)
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D3 and abs(s["x"] - SPAWN_X) < 4, "the game starts on deck 3 at her cabin's door", s)
     ok &= check(s["activated"] == ["cp_crew"], "that door is the first checkpoint, lit from the start", s["activated"])
@@ -303,7 +400,7 @@ def scenario_deck3(b):
     b.shot("deck3-start")
     # Her cabin: in with E, out with E.
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(route(b) == "crewcabin", "E at the door marked Crew: her cabin", route(b))
     b.shot("deck3-cabin")
     # The bowl on her desk (the user, 2026-11-15): its three tangerines are real, hers to take.
@@ -313,13 +410,13 @@ def scenario_deck3(b):
     bx = sum(e["x"] for e in bowl) / max(1, len(bowl))
     way = "right" if bx > door else "left"
     hold_until(b, way, lambda s: abs(s["x"] - bx) < 3, 6)
-    time.sleep(0.3)
+    wait(0.3)
     s = b.state()
     ok &= check(s["tangerines"] == 3 and all(e["id"] in save_list(b, "collected") for e in bowl), "walked to them: all three taken, the count 3", s)
     b.shot("deck3-bowl-empty")
     hold_until(b, "left" if way == "right" else "right", lambda s: abs(s["x"] - door) < 4, 6)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(route(b) == "inside" and s["y"] == D3 and s["mode"] == "play", "and E at its door again: back in the corridor", s)
     # A bulkhead at each end; no stairs and no lift come down here.
@@ -336,12 +433,12 @@ def scenario_deck3(b):
     # The way up: the service ladder behind its door.
     b.teleport(ladder, D3)
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     b.hold("up", 0.3)
     ok &= check(b.state()["mode"] == "trunk", "E at the ladder's door, then up: she is on the ladder", b.state())
     hold_until(b, "up", lambda s: s["y"] <= D4, 6)
     b.hold("left", 0.5)
-    time.sleep(0.9)
+    wait(0.9)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D4, "up the ladder and out of its door on deck 4", s)
     ok &= check(b.eval(f"{S}.shellAlpha[3]") > 0.95 and b.eval(f"{S}.shellAlpha[4]") < 0.05, "deck 3 is closed again under her, deck 4 open")
@@ -371,23 +468,23 @@ def scenario_intro(b):
     ok &= check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.T") == 0, "the movement keys start nothing")
     b.tap("down")
     b.tap("enter")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.eval(menu) == ["БУМБУСІК", "ГРАТИ", "МОВА"], "LANGUAGE switches to Ukrainian", b.eval(menu))
     b.shot("intro-welcome-uk")
     b.tap("enter")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.eval(menu)[1:] == ["PLAY", "LANGUAGE"] and b.eval("window.__lang.language()") == "en", "and back to English", b.eval(menu))
     b.tap("up")
     b.tap("enter")
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(b.eval(f"{I}.stage") == "running" and b.eval(f"{I}.T") > 0.8, "PLAY starts the sequence")
     ok &= check(b.eval(f"{I}.title.alpha") == 0 and b.eval(f"{I}.shade.alpha") < 0.36, "the menu is gone, the shade lifting", b.eval(f"{I}.shade.alpha"))
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.eval(f"!{I}.blur && {I}.shade.alpha === 0"), "the sky is in focus and at its full brightness")
 
     def at(part, k=0.5):
         b.eval(f"{I}.seek('{part}', {k})")
-        time.sleep(0.5)
+        wait(0.5)
         return b.eval(f"(c => ({{ x: c.midPoint.x, y: c.midPoint.y, z: c.zoom }}))({S}.cameras.main)")
 
     sky, sea = at("sky"), at("sea")
@@ -397,7 +494,7 @@ def scenario_intro(b):
     b.shot("intro-sea")
     still = f"[...{S}.backdrop.layers.map(l => l.s.tilePositionX), {S}.backdrop.clouds.tilePositionX, ...{I}.clouds.map(c => c.img.x), {I}.sun.x]"
     before = b.eval(still)
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(b.eval(still) == before, "the islands, the clouds and the sun hold still together: nothing drifts past the sun")
     ship = at("ship")
     ok &= check(ship["x"] > sea["x"] + 8000 and abs(ship["y"] - sea["y"]) < 20, "then right, to the ship", (sea, ship))
@@ -438,7 +535,7 @@ def scenario_intro(b):
                 "the camera has not moved since it stopped: no close-up")
     b.eval(f"{I}.seek('turn', 0.5, false)")
     b.wait_for(f"!{I}", timeout=6)
-    time.sleep(0.9)
+    wait(0.9)
     s = b.state()
     ok &= check(b.eval(f"{S}.mode") == "play" and b.eval(f"{S}.cameras.main.zoom") == 2 and b.eval(f"{S}.uiCam.visible && {S}.uiCam.alpha === 1"),
                 "the HUD comes up and the controls are hers", b.eval(f"{S}.mode"))
@@ -451,47 +548,47 @@ def scenario_intro(b):
     b.shot("intro-play")
     b.hold("right", 0.4)
     ok &= check(b.state()["x"] > s["x"] + 20, "she walks", (s["x"], b.state()["x"]))
-    time.sleep(6.2)
+    wait(6.2)
     ok &= check(not alert(b), "the hint goes after a few seconds")
 
     # Her cabin: she stops in front of her mirror and, turned to it, fixes her hair once or twice.
     b.eval(f"{S}.spawnAt({{ x: {SPAWN_X}, y: {D3} }})")
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.2)
+    wait(1.2)
     x0 = b.eval(f"{S}.world.rooms.crewcabin.def.x0")
     ok &= check(b.eval(f"{S}.route") == "crewcabin", "E at her door: into her cabin")
     b.eval(f"window.__hair = 0; {S}.player.on('animationstart', a => {{ if (a.key === 'her-hair') window.__hair++; }})")
     b.hold("left", 1.2)
     stop = b.state()["x"] - x0
     ok &= check(35 <= stop <= 37, "she stops in front of her mirror", stop)
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(b.eval("window.__hair") == 1 and b.eval(f"{S}.player.flipX"), "turned to it, she fixes her hair", b.eval("window.__hair"))
     b.shot("mirror-hair")
-    time.sleep(7.0)
+    wait(7.0)
     first = b.eval("window.__hair")
     ok &= check(first in (1, 2), "once or twice, and no more", first)
     b.hold("right", 0.5)
-    time.sleep(0.2)
+    wait(0.2)
     b.hold("left", 1.0)
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(b.eval("window.__hair") == first + 1, "again when she comes back to it", b.eval("window.__hair"))
     b.tap("right")
-    time.sleep(3.0)
+    wait(3.0)
     ok &= check(b.eval("window.__hair") == first + 1 and not b.eval(f"{S}.player.flipX"), "turned away, she leaves it alone")
     ok &= check(b.errors == [], "no errors", b.errors)
 
     # A game under way: the same welcome, a shorter way in, to wherever she is.
     b.eval(f"""(s => {{ const c = s.checkpoints.find(c => c.id === 'cp_gangway'); s.progress.openAll = true; s.spawnAt(c); }})({S})""")
-    time.sleep(0.6)
+    wait(0.6)
     b.wait_for(f"{S}.save.lastCheckpoint === 'cp_gangway'", timeout=4)
     b.open("", start=None)
     ok &= check(b.eval(f"{I}.stage") == "welcome" and b.eval(f"{I}.full") is False, "a game under way: the welcome screen, and the short way in")
     b.tap("enter")
-    time.sleep(0.5)
+    wait(0.5)
     b.eval(f"{I}.seek('near', 0.5, false)")
     b.wait_for(f"!{I}", timeout=8)
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(b.eval(f"{S}.mode") == "play" and abs(s["y"] - D4) < 2 and b.eval(f"{S}.shellAlpha['4']") == 0,
                 "it ends where she was: the gangway lobby, deck 4 open", s)
@@ -499,9 +596,9 @@ def scenario_intro(b):
     # Esc ends it at once.
     b.open("", start=None)
     b.tap("enter")
-    time.sleep(0.6)
+    wait(0.6)
     b.tap("escape")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(b.eval(f"!{I} && {S}.mode") == "play" and b.eval(f"{S}.uiCam.visible"), "Esc ends the intro at once")
     # And ?play goes past the welcome and the intro.
     b.open("?reset&play", start=None)
@@ -529,12 +626,12 @@ def scenario_lang(b):
     said = {}
     for code in ("en", "ua"):
         b.open(f"?reset&play&lang={code}")
-        time.sleep(0.4)
+        wait(0.4)
         b.eval(f"{S}.lockedUntil = 0; {S}.showLocked('deck')")
         lock = alert(b)
         b.eval(f"{S}.alert.setVisible(false); {S}.lockedUntil = 0; {S}.world.say({L}.t('say.oops'), 600)")
         said[code] = (lock, alert(b), b.eval(f"{L}.t('fright.startled')"), b.eval(f"{L}.t('win.tally', 1, 2, 3, 4, 5)"))
-        time.sleep(0.7)
+        wait(0.7)
     ok &= check(said["en"][:3] == ("🔒 Deck card", "Oops!", "Oh, sorry!"), "a lock, her word, a fright: in English", said["en"])
     ok &= check(said["ua"][:3] == ("🔒 Палубна картка", "Ой!", "Ой, вибачте!"), "and in Ukrainian", said["ua"])
     ok &= check("1 of 2" in said["en"][3] and "1 з 2" in said["ua"][3], "the win screen's tally takes its numbers in both", (said["en"][3], said["ua"][3]))
@@ -547,16 +644,16 @@ def scenario_lang(b):
 
 def scenario_run_jump(b):
     b.open("?reset&play")
-    time.sleep(0.4)
+    wait(0.4)
     x0 = b.state()["x"]
     b.hold("right", 0.6)
     s = b.state()
     ok = check(s["x"] > x0 + 30, "runs right", f"{x0} -> {s['x']}")
     b.key("space", True)
-    time.sleep(0.25)
+    wait(0.25)
     peak = b.state()["y"]
     b.key("space", False)
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(peak < D4 - 30, "jumps", f"y at 0.25s {peak}")
     ok &= check(b.state()["y"] == D4, "lands back on deck 4", b.state())
     return ok
@@ -568,7 +665,7 @@ def scenario_stairs(b):
     b.hold("up", 1.4)
     b.shot("stairs-climbing")
     b.key("up", True)
-    time.sleep(3.0)
+    wait(3.0)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D5, "holding up climbs to deck 5", s)
     locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
@@ -582,9 +679,9 @@ def scenario_stairs(b):
     b.teleport(CORE_L, D4)
     # (Held until she is there: the climb takes about nine seconds, a little more on a slow machine.)
     b.key("up", True)
-    end = time.time() + 14
-    while time.time() < end and b.state()["y"] > floor_y(8):
-        time.sleep(0.05)
+    end = now() + 14
+    while now() < end and b.state()["y"] > floor_y(8):
+        wait(0.05)
     b.key("up", False)
     s = b.state()
     ok &= check(s["y"] <= floor_y(8), "with every card she climbs on past deck 6", s)
@@ -631,7 +728,7 @@ def scenario_trunk(b):
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D4, "a shut trunk door doesn't take ↑", s)
     b.tap("e")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(trunk_door(b, "fwd-cabins", 4), "E opens it")
     b.shot("trunk-open")
     b.hold("up", 0.4)
@@ -654,15 +751,15 @@ def scenario_trunk(b):
     b.teleport(x, D4)
     b.tap("e")
     b.hold("up", 1.7)
-    time.sleep(0.5)
+    wait(0.5)
     s = b.state()
     ok &= check(s["mode"] == "trunk" and s["y"] == D5, "settles at the middle door, deck 5", s)
     ok &= check(trunk_door(b, "midships", 5, "up") == "arrow-up-on"
                 and trunk_door(b, "midships", 5, "down") == "arrow-down-on", "whose arrows show both ways")
     b.key("left", True)
-    time.sleep(0.1)
+    wait(0.1)
     b.shot("trunk-stepping-out")
-    time.sleep(0.3)
+    wait(0.3)
     b.key("left", False)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D5 and s["x"] < x - 20, "steps out there", s)
@@ -671,9 +768,9 @@ def scenario_trunk(b):
     b.teleport(x, D4)
     b.tap("e")
     b.key("up", True)
-    time.sleep(1.85)
+    wait(1.85)
     passing = trunk_door(b, "midships", 5)
-    time.sleep(2.0)
+    wait(2.0)
     b.key("up", False)
     s = b.state()
     ok &= check(passing and not trunk_door(b, "midships", 5) and trunk_door(b, "midships", 6)
@@ -684,7 +781,7 @@ def scenario_trunk(b):
     x = trunk_x("theatre")
     b.teleport(x, D4)
     b.tap("e")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(not trunk_door(b, "theatre", 4) and trunk_door(b, "theatre", 4, "up") == "arrow-up",
                 "the one-way trunk won't open from below", trunk_door(b, "theatre", 4, "up"))
     b.teleport(x, D6)
@@ -696,13 +793,13 @@ def scenario_trunk(b):
     ok &= check(trunk_door(b, "theatre", 4, "up") == "arrow-up-on", "and from then on it opens from below too")
     b.teleport(x, D4)
     b.tap("e")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(trunk_door(b, "theatre", 4), "it does")
 
     # Card-locked.
     b.teleport(trunk_x("magnums"), D6)
     b.tap("e")
-    time.sleep(0.1)
+    wait(0.1)
     locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
     b.shot("trunk-locked")
     ok &= check(not trunk_door(b, "magnums", 6) and bool(locked) and "Entertainment" in locked,
@@ -722,24 +819,24 @@ def scenario_lift(b):
     b.open("?reset&play")
     b.teleport(LIFT_X, D4)
     b.tap("e")
-    time.sleep(0.5)
+    wait(0.5)
     ok = check(b.state()["mode"] == "lift" and b.eval("!!window.__ship.liftPanel"), "E opens the doors and shows the panel")
     for _ in range(4):
         b.tap("up")
-        time.sleep(0.1)  # separate presses, not one long one
+        wait(0.1)  # separate presses, not one long one
     ok &= check(lift_cursor(b) == 5, "in region 1, ↑ picks no higher than deck 5", lift_cursor(b))
     b.shot("lift-panel")
     b.tap("e")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(not b.eval("window.__ship.liftPanel"), "the panel goes once the deck is chosen")
-    time.sleep(0.8)
+    wait(0.8)
     b.shot("lift-riding")
-    time.sleep(1.8)
+    wait(1.8)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D5 and abs(s["x"] - LIFT_X) < 2, "E rides it up to deck 5", s)
     b.shot("lift-arrived")
     b.hold("right", 0.5)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(b.eval("window.__ship.lifts[0].floors.every(f => f.leaves.open === 0)"), "the doors shut once she steps away")
 
     # Called from deck 4 while it waits on deck 5, the car comes down to her: she stays put.
@@ -747,37 +844,37 @@ def scenario_lift(b):
     b.tap("e")
     ys = []
     for _ in range(12):
-        time.sleep(0.15)
+        wait(0.15)
         ys.append(b.state()["y"])
     ok &= check(set(ys) == {D4} and b.eval("window.__ship.liftRun.choosing"),
                 "called from another deck, the car comes to her and she stays put", sorted(set(ys)))
     b.tap("left")
-    time.sleep(0.6)
+    wait(0.6)
 
     b.teleport(LIFT_X, D5)
     b.tap("e")
     b.wait_for("window.__ship.liftRun && window.__ship.liftRun.choosing", timeout=4)  # it comes up first
     b.tap("left")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(b.state()["mode"] == "play" and not b.eval("window.__ship.liftPanel"), "←/→ backs out of the panel")
 
     # The glass elevator: on deck 5 to start with, it comes up to fetch her on deck 7.
     b.open("?reset&play&cards=all")
     b.teleport(GLASS_X, walk_y(7))
     b.tap("e")
-    time.sleep(0.6)
+    wait(0.6)
     b.shot("glass-coming")
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.eval("window.__ship.liftRun.choosing && window.__ship.lifts.find(l => l.glass).carY") == walk_y(7),
                 "the glass car comes up to her deck")
     for _ in range(2):
         b.tap("up")
-        time.sleep(0.1)
+        wait(0.1)
     ok &= check(lift_cursor(b) == 9, "with every card she can pick deck 9", lift_cursor(b))
     b.tap("e")
-    time.sleep(1.2)
+    wait(1.2)
     b.shot("glass-riding")
-    time.sleep(1.8)
+    wait(1.8)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == walk_y(9), "and rides it to deck 9", s)
     return ok
@@ -793,10 +890,10 @@ def scenario_atrium(b):
     # (E opens each: a wall with a door between every two parts of the ship, 2026-11-07).
     b.teleport(ATRIUM_X0 - 20, D7)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("right", 7.4)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("right", 0.8)
     s = b.state()
     ok = check(s["y"] == D7 and s["x"] > ATRIUM_X1, "she runs straight across the atrium on deck 7", s)
@@ -828,7 +925,7 @@ def scenario_pool(b):
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D12, "deck 12's side walk is floor over the pools", s)
     b.tap("down")
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(s["mode"] == "swim", "↓ drops her from it into the pool below", s)
     b.shot("pool-swimming")
@@ -839,9 +936,9 @@ def scenario_pool(b):
     b.hold("right", 8.0)
     b.key("right", True)
     b.tap("space")
-    time.sleep(0.4)
+    wait(0.4)
     b.key("right", False)
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 and col(z) * TILE < s["x"] < col(POOLS[1][0]) * TILE,
                 "jump climbs her out at the edge", s)
@@ -861,12 +958,12 @@ def scenario_promenade(b):
     ok = check(route() == "promenade", "?at=promenade starts her on the promenade", route())
     b.eval(f"window.__ship.spawnAt({{x: {door + 8}, y: {floor_y(6)}, route: 'promenade'}})")
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok &= check(route() == "inside" and s["mode"] == "play" and s["x"] == door, "E at a door takes her inside", (route(), s))
     b.shot("promenade-inside")
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(route() == "promenade", "and E again back out", route())
     b.eval(f"window.__ship.spawnAt({{x: {x_of(PROMENADE['span'][0]) + 120}, y: {floor_y(6)}, route: 'promenade'}})")
     b.hold(["left"], 1.5)
@@ -888,12 +985,12 @@ def scenario_cabin(b):
     b.eval("window.__ship.route = 'inside'")
     b.teleport(door + 6, floor_y(8))
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok &= check(route() == "cabin" and s["mode"] == "play" and s["x"] == door, "E at the open door takes her in", (route(), s))
     b.shot("cabin-desk")
     b.hold(["right"], 0.6)
-    time.sleep(0.3)
+    wait(0.3)
     b.hold(["right"], 2.0)
     s = b.state()
     ok &= check(route() == "cabin" and door < s["x"] < door + 200 and s["y"] == floor_y(8), "the cabin's far wall holds her", s)
@@ -903,32 +1000,32 @@ def scenario_cabin(b):
     ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(8), "and so does its near wall", s)
     # She can jump onto the bed (its top 32px over the floor) and stand there.
     b.eval(f"window.__ship.spawnAt({{x: {door + 50}, y: {floor_y(8)}, route: 'cabin'}})")
-    time.sleep(0.4)
+    wait(0.4)
     b.key("right", True)
     b.tap("space")
-    time.sleep(0.5)
+    wait(0.5)
     b.key("right", False)
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == floor_y(8) - 32, "she jumps onto the bed and stands on it", s)
     b.shot("cabin-bed")
     # Standing still on it a second, she bounces for joy; any key and she stops, still on the bed.
-    time.sleep(1.4)
+    wait(1.4)
     ys = []
     for _ in range(12):
         ys.append(b.state()["y"])
-        time.sleep(0.05)
+        wait(0.05)
     ok &= check(b.state()["mode"] == "scripted" and min(ys) < floor_y(8) - 32 - 3 and max(ys) == floor_y(8) - 32,
                 "a second still on the bed: she bounces for joy, off it and back", ys)
     b.shot("cabin-bed-joy")
     b.tap("left")
-    time.sleep(0.5)
+    wait(0.5)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == floor_y(8) - 32, "a key stops it, her feet on the bed", s)
     b.teleport(door, floor_y(8))
     b.eval("window.__ship.route = 'cabin'")
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(route() == "inside", "E at the door takes her back out", route())
     b.shot("cabin-door")
     return ok
@@ -943,7 +1040,7 @@ def scenario_linen(b):
     b.eval("window.__ship.route = 'inside'")
     b.teleport(door + 6, floor_y(9))
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok = check(route() == "linen" and s["x"] == door, "E at the crew door takes her in", (route(), s))
     b.shot("linen-inside")
@@ -953,7 +1050,7 @@ def scenario_linen(b):
     b.teleport(door, floor_y(9))
     b.eval("window.__ship.route = 'linen'")
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(route() == "inside", "E at the door takes her back out", route())
     return ok
 
@@ -966,18 +1063,18 @@ def scenario_bridge(b):
     bridge = "window.__ship.bulkheads.find(b => b.key === '10:bridge')"
     door = b.eval(f"{bridge}.x")
     b.teleport(door + 60, floor_y(10))
-    time.sleep(2.5)    # the cut-away fades over from deck 4
+    wait(2.5)    # the cut-away fades over from deck 4
     ok = check(shell("10") < 0.05 and shell("10:bridge") < 0.05, "from the corridor the bridge is in sight",
                (shell("10"), shell("10:bridge")))
     b.hold("left", 0.8)
     s = b.state()
     ok &= check(s["x"] > door, "the shut door stops her", s)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.eval(f"{bridge}.open"), "E opens it")
     # Well past the shutting distance (0.6 s left her right at it, and the door open: 2026-11-07).
     b.hold("left", 0.9)
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(s["x"] < door and shell("10:bridge") < 0.05 and shell("10") < 0.05,
                 "on the bridge the deck is cut open too", (s, shell("10"), shell("10:bridge")))
@@ -990,14 +1087,14 @@ def scenario_balcony(b):
     # drop one deck onto the stage, no scare (§5.3).
     b.open("?reset&play")
     b.teleport(x_of(STAGE - 1.4), floor_y(7))
-    time.sleep(0.4)
+    wait(0.4)
     b.key("right", True)
     b.key("space", True)         # (held: a tap can come out as a cut-short hop on a slow machine)
-    time.sleep(0.4)
+    wait(0.4)
     b.key("space", False)
-    time.sleep(1.0)
+    wait(1.0)
     b.key("right", False)
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     b.shot("balcony-hop")
     return check(s["mode"] == "play" and s["y"] == floor_y(6) and s["x"] > x_of(STAGE),
@@ -1038,25 +1135,25 @@ def scenario_falls(b):
     b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # (Bumbot at the pool's rim would stop her)
     # One deck: down through deck 12's walk onto deck 11's pool area, aft of the pools.
     b.teleport(x_of(143.5), D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("down")
-    time.sleep(1.2)
+    wait(1.2)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D11, "a one-deck drop into the pool area is fine", s)
     # (Between the pools she comes down on the hot tub's canopy: a roof she can stand on.)
     b.teleport(x_of(132.5), D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("down")
-    time.sleep(1.2)
+    wait(1.2)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 - 90, "over the hot tub she lands on its canopy", s)
     # Two decks: off deck 12's aft end, past deck 11, onto the deck 10 terrace below.
     b.teleport(x_of(245.5), D12)  # past deck 12's (233 m) and deck 11's (244 m) aft ends
-    time.sleep(0.6)
+    wait(0.6)
     b.shot("long-fall")
     s = b.state()
     ok &= check(s["mode"] == "scripted", "a two-deck fall is a scare", s)
-    time.sleep(2.0)
+    wait(2.0)
     s = b.state()
     ok &= check(s["mode"] == "play", "she comes back afterwards", s)
     return ok
@@ -1066,7 +1163,7 @@ def scenario_vacuum(b):
     b.open("?reset&play")
     b.teleport(x_of(120), D4)  # the deck 4 corridor the robot vacuum patrols
     b.eval(f"window.__ship.vacuums[0].sprite.x = {x_of(120) + 40}; window.__ship.vacuums[0].dir = -1")
-    time.sleep(0.8)
+    wait(0.8)
     b.shot("vacuum-scare")
     s = b.state()
     ok = check(s["mode"] == "scripted", "touching the vacuum is a scare", s)
@@ -1100,14 +1197,14 @@ def scenario_dash(b):
     S, P = "window.__ship", "window.__ship.world.people.byId.haz_porter"
     b.open("?reset&play")
     b.teleport(x_of(50), D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.eval(f"{S}.save.tangerines = 4; {S}.refreshHud()")
     # The porter held at his forward end, facing her; she two metres from him.
     b.eval(f"(p => {{ p.x = p.walk.a; p.dir = -1; p.pausedUntil = 0; window.__ship.world.people.place(p); }})({P})")
     b.teleport(person(b, "haz_porter")["x"] - 100, D4)
     b.eval(f"{P}.pausedUntil = 0")
     b.tap("d")
-    time.sleep(0.15)
+    wait(0.15)
     b.shot("dash-cry-porter")
     s = b.state()
     ok = check(s["tangerines"] == 3 and not s["lunging"], "before the lunge is learned D is the cry alone, for one", s)
@@ -1115,28 +1212,28 @@ def scenario_dash(b):
     aside = b.eval(f"({P}.aside === true) && {P}.pausedUntil > {S}.time.now + 2000")
     ok &= check(aside, "the porter stops and stands aside", b.eval(f"[{P}.aside, {P}.pausedUntil - {S}.time.now]"))
     until = b.eval(f"{P}.pausedUntil")
-    time.sleep(0.8)
+    wait(0.8)
     b.tap("d")
-    time.sleep(0.15)
+    wait(0.15)
     ok &= check(b.state()["tangerines"] == 2, "a second cry costs another", b.state())
     ok &= check(b.eval(f"{P}.pausedUntil") == until, "and the porter is deaf to it", b.eval(f"{P}.pausedUntil - {until}"))
     # With a tray in her hands: the cry alone, even once the lunge is learned.
     b.eval(f"{S}.save.verbs.push('dash'); {S}.world.carryBox.take('lunch')")
-    time.sleep(0.8)
+    wait(0.8)
     b.tap("d")
-    time.sleep(0.15)
+    wait(0.15)
     s = b.state()
     ok &= check(s["tangerines"] == 1 and not s["lunging"], "with a tray: the cry alone, for one", s)
     b.eval(f"{S}.world.carryBox.drop()")
     # The lunge: deck 4's stacked luggage (30 m) ahead of her, the vacuum standing beyond it, both
     # within the second of it.
     b.teleport(x_of(33), D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.eval(f"{S}.save.tangerines = 1; {S}.player.setFlipX(true)")
     b.eval(f"{S}.vacuums[0].sprite.x = {x_of(29)}; {S}.vacuums[0].speed = 0")
     t0 = b.eval(f"{S}.time.now")
     b.tap("d")
-    time.sleep(0.1)
+    wait(0.1)
     b.shot("dash-lunge")
     s = b.state()
     ok &= check(s["lunging"] and s["tangerines"] == 0, "learned: D cries out and lunges, for one", s)
@@ -1151,20 +1248,20 @@ def scenario_dash(b):
     b.teleport(x_of(200), D4)
     b.eval(f"{S}.save.tangerines = 1")
     b.tap("d")
-    time.sleep(0.1)
+    wait(0.1)
     b.eval(f"{S}.scareContact({S}.player.x + 10, 'cart')")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(b.state()["mode"] == "play", "in a lunge a bump is nothing", b.state())
-    time.sleep(1.5)
+    wait(1.5)
     b.eval(f"{S}.scareContact({S}.player.x + 10, 'cart')")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(b.state()["mode"] == "scripted", "after it, a bump is a fright again", b.state())
     b.wait_for(f"{S}.mode === 'play'", timeout=6)
     # With none on her: nothing.
     b.eval(f"{S}.save.tangerines = 0")
-    time.sleep(0.7)
+    wait(0.7)
     b.tap("d")
-    time.sleep(0.1)
+    wait(0.1)
     s = b.state()
     ok &= check(not s["lunging"] and s["tangerines"] == 0 and not b.eval(f"{S}.time.now < {S}.bubbleUntil"),
                 "with none: D does nothing", s)
@@ -1179,7 +1276,7 @@ def scenario_pocket(b):
     S, P = "window.__ship", "window.__ship.world.people.byId.haz_porter"
     b.open("?reset&play&pocket=on")
     b.teleport(x_of(50), D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.eval(f"{S}.save.tangerines = 2; {S}.refreshHud(); {S}.world.carryBox.take('lunch')")
     # The porter at his aft end, walking forward her way; she stands in his path.
     b.eval(f"(p => {{ p.x = p.walk.b; p.dir = -1; p.pausedUntil = 0; window.__ship.world.people.place(p); }})({P})")
@@ -1187,7 +1284,7 @@ def scenario_pocket(b):
     b.eval(f"{S}.world.carryBox.take('lunch'); {S}.player.setFlipX(false)")
     x0 = b.state()["x"]
     b.wait_for(f"{S}.isSafe() || {S}.mode !== 'play'", timeout=8)
-    time.sleep(0.05)
+    wait(0.05)
     b.shot("pocket-hit")
     s = b.state()
     ok = check(s["mode"] == "play" and s["safe"], "the porter's hit is forgiven: she blinks, still in play", s)
@@ -1226,9 +1323,9 @@ def scenario_pocket(b):
     # her either way (the user, 2026-11-17).
     def hit(js, n=2):
         b.eval(f"{S}.save.tangerines = {n}; {S}.safeUntil = 0; {S}.flinchUntil = 0; {S}.loose.all.slice().forEach(t => {S}.loose.remove(t)); {S}.player.setFlipX(false)")
-        time.sleep(0.15)
+        wait(0.15)
         got = b.eval(f"{S}.scareContact({js})")
-        time.sleep(0.08)
+        wait(0.08)
         return got, b.eval(f"[{S}.player.anims.currentAnim?.key, {S}.loose.all.map(t => Math.round(t.img.body.velocity.x)), {S}.save.tangerines, {S}.mode]")
     b.eval(f"{P}.pausedUntil = {S}.time.now + 600000")
     b.teleport(x_of(48), D4)
@@ -1248,7 +1345,7 @@ def scenario_pocket(b):
     got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'dnd'")
     ok &= check(got == "23" and clip == "her-apology" and not flying and n == 1, "a door's hand takes it as she bows", (got, clip, flying, n))
     b.shot("pocket-apology")
-    time.sleep(1.6)
+    wait(1.6)
     # A paper at her front, standing (the user, 2026-11-16: she slips standing too): she stumbles on
     # (her gag falls forward); one at her heel: she slips back. The tangerine behind her both times.
     got, (clip, flying, n, mode) = hit(f"{S}.player.x + 12, 'papers', {{ vx: -60 }}")
@@ -1260,16 +1357,16 @@ def scenario_pocket(b):
     # A tangerine she gets flies to the count, which changes as it lands.
     b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {S}.gainTangerine({S}.player.x + 40, {S}.player.y - 10)")
     shown = b.eval(f"[{S}.save.tangerines, {S}.hudCount.text]")
-    time.sleep(0.7)
+    wait(0.7)
     landed = b.eval(f"{S}.hudCount.text")
     ok &= check(shown == [1, "× 0"] and landed == "× 1", "picked up: hers at once, counted when it lands", (shown, landed))
     # With none: her mishap, the keys dead through it, then her checkpoint.
     b.eval(f"{S}.save.tangerines = 0; {S}.safeUntil = 0; {S}.flinchUntil = 0")
     x1 = b.state()["x"]
     b.eval(f"{S}.scareContact({S}.player.x + 10, 'cart')")
-    time.sleep(0.1)
+    wait(0.1)
     ok &= check(b.state()["mode"] == "scripted", "with none, a bump is a mishap", b.state())
-    b.key("left", True); time.sleep(0.5); b.key("left", False)
+    b.key("left", True); wait(0.5); b.key("left", False)
     ok &= check(abs(b.state()["x"] - x1) < 4, "the keys do nothing during it", (x1, b.state()["x"]))
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
     s = b.state()
@@ -1277,7 +1374,7 @@ def scenario_pocket(b):
     # A fall is never forgiven: two decks off deck 12's aft end, with three on her.
     b.eval(f"{S}.save.tangerines = 3")
     b.teleport(x_of(245.5), D12)
-    time.sleep(0.6)
+    wait(0.6)
     s = b.state()
     ok &= check(s["mode"] == "scripted" and s["tangerines"] == 3, "a long fall is a fright, tangerines or not", s)
     return ok
@@ -1293,7 +1390,7 @@ def scenario_throw(b):
 
     def throw(x, y, face=1, lob=False):
         b.teleport(x, y)
-        time.sleep(0.4)
+        wait(0.4)
         b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud(); {S}.player.setFlipX({'true' if face < 0 else 'false'})")
         if lob:
             b.key("up", True)
@@ -1323,7 +1420,7 @@ def scenario_throw(b):
         y = b.eval(f"(t => t ? t.img.y : null)({S}.loose.all[0])")
         if y is not None:
             top = min(top, y)
-        time.sleep(0.03)
+        wait(0.03)
     ok &= check(80 < D4 - top < 125, "↑ and F lob it, high", D4 - top)
     b.eval(f"{S}.loose.all.slice().forEach(t => {S}.loose.remove(t))")
 
@@ -1335,10 +1432,10 @@ def scenario_throw(b):
     ok &= check(not loose() and b.state()["tangerines"] == 2, "deck 4's vacuum swallows it", loose())
     vx = b.eval(f"{S}.vacuums[0].sprite.x")
     b.teleport(vx, D4)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["mode"] == "play", "choked, it frightens nobody", b.state())
     b.teleport(x_of(150), D5)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.eval(f"{S}.vacuums[0].alive"), "and it is going again once she has left the deck")
     b.eval(f"{S}.vacuums[0].speed = 40")
 
@@ -1349,7 +1446,7 @@ def scenario_throw(b):
     throw(gx1 + 150, D11, face=-1)
     b.wait_for(f"{g}.fed || {g}.fruit", timeout=6)
     ok &= check(b.eval(f"!!({g}.fruit || {g}.fed)"), "a gull at the pool comes down for it", b.eval(f"{g}.state"))
-    time.sleep(0.5)
+    wait(0.5)
     b.shot("throw-gull")
     b.wait_for(f"{g}.fed", timeout=5)
     ok &= check(not loose() and b.state()["tangerines"] == 2, "and goes off with it", loose())
@@ -1360,7 +1457,7 @@ def scenario_throw(b):
     px = b.eval(f"{pin}.x")
     throw(px - 34, D12, lob=True)
     b.wait_for(f"{pin}.done", timeout=5)
-    time.sleep(0.4)
+    wait(0.4)
     b.shot("throw-pinata")
     ok &= check(b.eval(f"{S}.save.broken.includes('sec_pinata')"), "a lob brings the piñata down")
     ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_12_pinata')).length") == 3,
@@ -1437,7 +1534,7 @@ def scenario_deck4(b):
     ok &= check(b.eval(f"{F}.range().hi < {F}.def.x + {F}.def.reach"), "the lead stops short of the bulkhead's wall",
                 b.eval(f"[{F}.def.x, {F}.range()]"))
     b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
-    time.sleep(0.3)
+    wait(0.3)
     sag = b.eval(f"{F}.sag().x")
     b.teleport(sag - 60, D4)
     s = hold_until(b, "right", lambda st: st["x"] > sag + 30 or st["mode"] != "play", timeout=3)
@@ -1459,7 +1556,7 @@ def scenario_deck4(b):
     b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
     b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud()")
     b.teleport(sag - 60, D4)
-    time.sleep(0.6)
+    wait(0.6)
     s = hold_until(b, "right", lambda st: st["x"] > sag + 30 or st["mode"] != "play", timeout=3)
     ok &= check(s["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key").startswith("her-tripfall")
                 and s["tangerines"] == 3,
@@ -1469,11 +1566,11 @@ def scenario_deck4(b):
     b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud()")
     b.eval(f"(f => {{ f.dog.x = f.def.x - 120; f.go('sit', 60000); }})({F})")
     b.teleport(sag + 60, D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.key("left", True)
-    time.sleep(0.12)
+    wait(0.12)
     b.tap("space", 0.25)
-    time.sleep(0.7)
+    wait(0.7)
     b.key("left", False)
     s = b.state()
     ok &= check(s["x"] < sag and s["mode"] == "play", "hopped, no trip", (sag, s))
@@ -1483,7 +1580,7 @@ def scenario_deck4(b):
     # stands tied, unwinds, and trots off; no trip on the lead all the while.
     b.eval(f"(f => {{ f.dog.x = f.def.x - 90; f.go('sit', 60000); }})({F})")
     b.teleport(b.eval(f"{F}.def.x") - 150, D4)
-    time.sleep(0.4)
+    wait(0.4)
     b.eval(f"{S}.save.tangerines = 3; {S}.tryCry({S}.time.now)")
     b.wait_for(f"{F}.state === 'tied'", timeout=6)
     ok &= check(b.eval(f"{F}.together && {F}.dog.sprite.alpha === 0 && {F}.owner.sprite.anims.currentAnim?.key === 'people-dogowner-tied'"
@@ -1497,11 +1594,11 @@ def scenario_deck4(b):
     for i in range(3):
         b.eval(f"(f => {{ f.go('sit', 0); f.dog.x = f.def.x + 40; }})({F})")
         b.teleport(b.eval(f"{F}.def.x") - 140, D4)
-        time.sleep(0.4)
+        wait(0.4)
         b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
         b.tap("f")
         b.wait_for(f"{F}.fetches > {i}", timeout=8)
-        time.sleep(0.4)
+        wait(0.4)
         ok &= check(b.state()["tangerines"] == 3, f"fetch {i + 1}: brought back to her and hers again", b.state())
     # (Her toss: out of her pocket, held out, a lob to her chest: about two seconds.)
     b.wait_for(f"{S}.save.keeps.includes('keep:cat:ball')", timeout=5)
@@ -1511,50 +1608,50 @@ def scenario_deck4(b):
     K = f"{W}.things.find(t => t.id === 'keep_feather')"
     kx = b.eval(f"{K}.x")
     b.teleport(kx, D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check("keep:cat:feather" not in keeps(), "the feather is not to be had from the floor")
     # (A lob from about four metres back comes down onto the shelf, over the carts.)
     b.teleport(kx - 184, D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
     b.key("up", True)
     b.tap("f")
     b.key("up", False)
     b.wait_for(f"!{K}.high", timeout=3)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(b.eval(f"!{K}.high && Math.abs({K}.pick.y - {K}.y) < 2"), "a lob knocks it down to the floor", b.eval(f"{K}.pick.y - {K}.y"))
     b.eval(f"{S}.loose.all.slice().forEach(t => {S}.loose.remove(t))")
     b.teleport(kx, D4)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check("keep:cat:feather" in keeps(), "and it is hers from there", keeps())
 
     # The climb itself: two steps up by jumps (a new game, the feather back on its shelf).
     b.open("?reset&play&cards=all")
     steps = b.eval(f"['climb_0', 'climb_1'].map(id => {W}.solids.find(t => t.id === id).x)")
     b.teleport(steps[0] - 40, D4)
-    time.sleep(0.3)
+    wait(0.3)
     heights = []
     for i, sx in enumerate(steps):
         # (To the shelf from the cart's far edge: from its middle the jump falls short, the user's
         # harder gap, 2026-11-17.)
         if i:
             b.key("right", True)
-            end = time.time() + 1.5
-            while b.state()["x"] < steps[0] + 16 and time.time() < end:
-                time.sleep(0.01)
+            end = now() + 1.5
+            while b.state()["x"] < steps[0] + 16 and now() < end:
+                wait(0.01)
         b.key("space", True)
         hold_until(b, "right", lambda st: st["x"] >= sx - 2, timeout=1.5)
-        time.sleep(0.25)
+        wait(0.25)
         b.key("space", False)
-        time.sleep(0.5)
+        wait(0.5)
         heights.append(round(D4 - b.state()["y"]))
     ok &= check(heights == [41, 66], "up the climb by jumps: the laundry cart, the shelf", heights)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check("keep:cat:feather" in keeps(), "the feather taken up there", keeps())
     b.shot("deck4-climb")
 
@@ -1562,9 +1659,9 @@ def scenario_deck4(b):
     ok &= check(not b.eval(f"{W}.hudKeeps.her.visible"), "her count is not shown before her first find")
     for tid, what in (("keep_wool", "keep:cat:wool"), ("keep_flag", "keep:her:flag")):
         b.teleport(b.eval(f"{W}.things.find(t => t.id === '{tid}').x"), D5)
-        time.sleep(0.3)
+        wait(0.3)
         b.tap("e")
-        time.sleep(0.3)
+        wait(0.3)
         ok &= check(what in keeps(), f"{tid}: taken with E", keeps())
     hud = b.eval(f"Object.fromEntries(Object.entries({W}.hudKeeps).map(([k, t]) => [k, t.visible ? t.text.split(' ')[1] : null]))")
     ok &= check(hud == {"cat": "2/8", "her": "1/4", "him": None}, "the HUD counts each kind from its first find", hud)
@@ -1579,10 +1676,10 @@ def scenario_deck4(b):
         b.wait_for(f"{S}.mode === 'play'", timeout=10)
         b.eval(f"(p => {{ p.x = p.def.x0; p.dir = 1; p.next = 0; p.until = 0; p.papers.forEach(q => q.img.destroy()); p.papers = []; }})({P})")
         b.teleport(b.eval(f"{P}.def.doors[1]") - 40, D5)
-        time.sleep(0.2)
+        wait(0.2)
         b.eval(f"{S}.player.setFlipX({'false' if face_right else 'true'})")
         b.wait_for(f"{P}.papers.some(q => q.img.x > {S}.player.x - 90)", timeout=12)
-        x1 = b.eval(f"{P}.papers[0].img.x"); time.sleep(0.1); x2 = b.eval(f"{P}.papers[0]?.img.x ?? 0")
+        x1 = b.eval(f"{P}.papers[0].img.x"); wait(0.1); x2 = b.eval(f"{P}.papers[0]?.img.x ?? 0")
         hx = b.eval(f"{S}.player.x")
         b.wait_for(f"{S}.mode !== 'play'", timeout=4)
         got = b.eval(f"[{S}.lastMishap?.id, {GAG}?.anims.currentAnim?.key, Math.round({GAG}?.x - {hx}), {P}.papers.length]")
@@ -1623,7 +1720,7 @@ def scenario_deck4(b):
     # (From the side away from her trolley: ahead of her while she wheels it, behind her otherwise.)
     side = b.eval(f"{B}.state === 'push' ? -{B}.dir : {B}.dir")
     b.teleport(b.eval(f"{B}.x") + side * 60, D5)
-    time.sleep(0.3)
+    wait(0.3)
     s = hold_until(b, "left" if side > 0 else "right", lambda st: st["mode"] != "play", timeout=3)
     ok &= check(s["mode"] == "scripted", "walked into, the breakfast stewardess drops her tray: a fright", s)
     b.wait_for(f"{S}.mode === 'play'", timeout=8)
@@ -1632,7 +1729,7 @@ def scenario_deck4(b):
     # A tangerine thrown to the steward: caught, and eaten from his hand, bite by bite.
     b.eval(f"(k => {{ k.x = k.def.x1 - 20; k.dir = -1; k.until = 0; }})({P})")
     b.teleport(b.eval(f"{P}.x") - 45, D5)
-    time.sleep(0.4)
+    wait(0.4)
     b.eval(f"{S}.save.tangerines = 3; {S}.player.setFlipX(false)")
     b.tap("f")
     b.wait_for(f"{P}.eating", timeout=5)
@@ -1646,18 +1743,18 @@ def scenario_overboard(b):
     b.open("?reset&play")
     b.teleport((col(255) - 1) * TILE - 30, D6)  # deck 6's open aft terrace, just inside the railing
     b.key("right", True)
-    time.sleep(0.4)  # up against the railing first: the terrace is only a metre deep
+    wait(0.4)  # up against the railing first: the terrace is only a metre deep
     b.key("space", True)
-    time.sleep(0.5)
+    wait(0.5)
     b.key("space", False)
-    time.sleep(0.6)
+    wait(0.6)
     b.key("right", False)
     b.wait_for("window.__ship.mode === 'scripted'", timeout=4)  # a long drop: the hull stands two decks above the sea
-    time.sleep(0.6)
+    wait(0.6)
     b.shot("overboard")
     s = b.state()
     ok = check(s["mode"] == "scripted", "jumping the stern railing goes overboard", s)
-    time.sleep(2.5)
+    wait(2.5)
     s = b.state()
     ok &= check(s["mode"] == "play", "she comes back afterwards", s)
     return ok
@@ -1706,7 +1803,7 @@ def use_door(b, deck, m, side):
     """E at a door in a wall across the deck, from the bow side (-1) or the stern side (1)."""
     b.teleport(exact_x(m) + side * 16, floor_y(deck))
     b.tap("e")
-    time.sleep(0.15)
+    wait(0.15)
     return door_open(b, f"part-door-{deck}-{m:g}")
 
 
@@ -1714,7 +1811,7 @@ def take_card(b, card):
     deck, m, _ = CARD_SPOTS[card]
     go(b, deck, m)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     return card in save_list(b, "cards")
 
 
@@ -1728,11 +1825,11 @@ def route(b):
 
 def wait_flag(b, flag, timeout=12):
     """A scene sets its flag when it is over."""
-    end = time.time() + timeout
-    while time.time() < end:
+    end = now() + timeout
+    while now() < end:
         if flag in flags(b) and b.state()["mode"] == "play":
             return True
-        time.sleep(0.2)
+        wait(0.2)
     return False
 
 
@@ -1745,10 +1842,10 @@ def hold_until(b, keys, cond, timeout=10):
     keys = [keys] if isinstance(keys, str) else keys
     for k in keys:
         b.key(k, True)
-    end = time.time() + timeout
+    end = now() + timeout
     s = b.state()
-    while time.time() < end and not cond(s):
-        time.sleep(0.05)
+    while now() < end and not cond(s):
+        wait(0.05)
         s = b.state()
     for k in keys:
         b.key(k, False)
@@ -1766,7 +1863,7 @@ def scenario_golden(b):
     ok &= check(s["y"] == D5 and "SEARCH" in alert(b), "the forward stairs 5-6 are roped off for the search", alert(b))
     go(b, 4, 125)
     b.tap("e")
-    time.sleep(0.15)
+    wait(0.15)
     ok &= check("Deck" in alert(b), "the midships crew trunk wants the Deck card", alert(b))
     # Near-catch 1 at the Seven Seas: the scream, and the dash is hers.
     b.tap("d")
@@ -1813,30 +1910,30 @@ def scenario_golden(b):
     ok &= check(s["x"] < exact_x(185.2), "the steward's cart blocks the corridor", s)
     b.hold(["right", "space"], 0.7)
     ok &= check(b.state()["x"] < exact_x(185.2), "and can't be hopped where it is jammed", b.state())
-    time.sleep(0.5)
+    wait(0.5)
     b.hold("right", 0.3)
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     back = b.state()["x"]
     b.teleport(linen, D9)
     b.tap("e")
-    time.sleep(0.15)
+    wait(0.15)
     ok &= check("Housekeeping" in alert(b) and route(b) == "inside", "the linen room's crew door wants the Housekeeping card", alert(b))
-    time.sleep(0.5)
+    wait(0.5)
     b.teleport(back - 6, D9)
     b.hold("right", 0.3)
     b.tap("e")
     b.hold("right", 5.4)
     ok &= check("cart_free" in flags(b), "pushed along to 189 m, it is free", b.state())
-    end = time.time() + 12
-    while time.time() < end and not ("hk" in save_list(b, "cards") and b.state()["mode"] == "play"):
-        time.sleep(0.2)
+    end = now() + 12
+    while now() < end and not ("hk" in save_list(b, "cards") and b.state()["mode"] == "play"):
+        wait(0.2)
     ok &= check("hk" in save_list(b, "cards"), "the steward's thanks: the Housekeeping card", save_list(b, "cards"))
     b.hold(["right", "space"], 0.7)
     b.hold("right", 0.4)
     ok &= check(b.state()["x"] > exact_x(189.5), "and she walks past it there", b.state())
     b.teleport(linen, D9)
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(route(b) == "linen", "with it, into the linen room")
     # Near-catch 4 in the towels; crawling is learned; the laundry cart under the vent, the duct,
     # the drop into deck 8.
@@ -1845,19 +1942,19 @@ def scenario_golden(b):
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned there")
     lc = "window.__ship.world.pushables.find(t => t.id === 'cart_linen')"
     b.teleport(b.eval(f"{lc}.x") - 32, D9, "linen")
-    time.sleep(0.2)
+    wait(0.2)
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E at the laundry cart's end: she takes hold", b.state())
     b.hold("right", 3.8)
     ok &= check("cart_linen" in flags(b), "the laundry cart pushed under the vent", b.state())
     b.hold(["right", "space"], 0.45)
-    time.sleep(0.5)
+    wait(0.5)
     b.hold("down", 0.5)
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "duct", "from the cart's top, down on hands and knees: the duct", b.state())
     b.hold("left", 13.6)
     b.tap("down")
-    time.sleep(1.6)
+    wait(1.6)
     s = b.state()
     ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"),
                 "out of its far grille, down into deck 8 forward: region 5", s)
@@ -1871,10 +1968,10 @@ def scenario_golden(b):
     # Region 6: the socks; near-catch 5 drains the pool; the hatch into deck 10.
     go(b, 11, 95.75)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check("socks" in save_list(b, "verbs"), "the grip socks, in the gym")
     go(b, 11, 126)
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(b.state()["mode"] == "swim", "the first pool: she swims", b.state())
     hold_until(b, "right", lambda s: s["mode"] == "scripted", 8)
     ok &= check(wait_flag(b, "bb5", 16), "near-catch 5, from the water at the pool's rim", flags(b))
@@ -1882,22 +1979,22 @@ def scenario_golden(b):
     s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] == D11 + 32, 8)
     ok &= check(s["mode"] == "play" and s["y"] == D11 + 32, "she is left standing in the empty tank", s)
     b.teleport(x_of(125), D11 + 32)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.6)
+    wait(1.6)
     s = b.state()
     ok &= check(s["y"] == D10, "the hatch in its floor drops her into deck 10's hallway", s)
     # Region 8: with the socks, up the sun cover's post at the Great Outdoors, along it to deck 12.
     b.teleport(exact_x(233) + 13, D11)
     b.key("space", True)
-    time.sleep(0.34)
+    wait(0.34)
     b.key("space", False)
-    time.sleep(0.02)
+    wait(0.02)
     b.key("left", True)
     b.key("space", True)
-    time.sleep(0.2)
+    wait(0.2)
     b.key("space", False)
-    time.sleep(1.0)
+    wait(1.0)
     b.key("left", False)
     s = b.state()
     ok &= check(s["y"] < D11 - 100, "a wall jump up the post lands her on the sun cover", s)
@@ -1914,24 +2011,24 @@ def scenario_golden(b):
     b.teleport(LADDER_X, D12)
     b.hold("up", 0.6)
     ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in alert(b), "the technical ladder is chained off: the engineer wants his coffee", alert(b))
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(coffee_for_the_engineer(b), "a hot coffee carried up past Teppanyaki's flares: he drinks it and goes up", flags(b)[-3:])
-    time.sleep(0.4)
+    wait(0.4)
     b.teleport(LADDER_X, D12)
     b.hold("up", 3.0)
     b.hold("right", 0.5)
     top = b.eval("window.__ship.world.data.funnel.y")
     gust = "window.__ship.world.story.funnelGusts.phase(window.__ship.time.now)"
     b.eval("window.__ship.world.story.funnelWind.def.swoop = 1000")     # (the gulls are region8's own test)
-    end = time.time() + 60
-    while time.time() < end and b.state()["y"] > top:
+    end = now() + 60
+    while now() < end and b.state()["y"] > top:
         b.key("up", b.eval(gust) == "calm")
-        time.sleep(0.05)
+        wait(0.05)
     b.key("up", False)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == top, "up the funnel's stairway to its top", s)
     b.teleport(b.eval("window.__ship.world.data.topdeck.funnel.hornX") - 4, top)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
     ok &= check(wait_flag(b, "horn", 20), "the horn, and what it sets off", flags(b))
     ok &= check(take_card(b, "off"), "the Officer's card, dropped on the sun deck")
@@ -1939,7 +2036,7 @@ def scenario_golden(b):
     b.teleport(lady + 100, D12)
     hold_until(b, "left", lambda s: s["x"] < lady + 40, 3)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check("parasol" in save_list(b, "verbs"), "and the parasol, at the empty sunbed")
     b.eval("window.__ship.lockedUntil = 0")
     # Region 9: the cake clears the forward lobby; down the bow with the gold card to the bridge.
@@ -1957,7 +2054,7 @@ def scenario_golden(b):
     b.hold("left", 0.8)
     b.teleport(exact_x(40) + 16, D10)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(door_open(b, "bridge-door"), "and the bridge's door")
     b.hold("left", 3.0)
     ok &= check(wait_flag(b, "bb6"), "near-catch 6 on the bridge", flags(b))
@@ -1968,7 +2065,7 @@ def scenario_golden(b):
     ok &= check(s["mode"] == "play" and s["y"] == D7 and s["x"] < x_of(21), "the parasol carries her down to the mooring deck", s)
     b.shot("golden-bow")
     ok &= check(catch_him(b), "at the tip of the bow, standing still: the catch", (b.state(), flags(b)))
-    time.sleep(1.8)
+    wait(1.8)
     b.eval("window.__ship.lockedUntil = 0")
     s = hold_until(b, "right", lambda s: s["x"] > exact_x(27), 16)
     ok &= check(s["x"] > exact_x(27), "the mooring deck's door is open: into deck 7 with Bumbot in her arms", s)
@@ -1989,7 +2086,7 @@ def take_lunch(b):
     """A tray of lunch from the Seven Seas' pass."""
     b.teleport(exact_x(248.8) - 12, D5)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     return carrying(b) == "lunch"
 
 
@@ -2016,10 +2113,10 @@ def scenario_region1(b):
     b.teleport(exact_x(240), D5)
     y0 = b.state()["y"]
     b.key("space", True)
-    time.sleep(0.22)
+    wait(0.22)
     lifted = y0 - b.state()["y"]
     b.key("space", False)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(0 < lifted < 40 and carrying(b) == "lunch", "with a tray a jump is a low hop", lifted)
     b.eval("window.__ship.save.tangerines = 2")
     b.tap("d")
@@ -2028,14 +2125,14 @@ def scenario_region1(b):
     b.eval("(p => { p.pausedUntil = 0; p.aside = false; })(window.__ship.world.people.byId.haz_waiter)")
     b.teleport(person(b, "haz_waiter")["x"] + 60, D5)
     b.hold("left", 0.8)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(carrying(b) is None and b.state()["mode"] == "play", "the waiter bumps the tray out of her hands: a spill, no scare", b.state())
     b.shot("region1-spill")
     # At a table he is out of the aisle: she slips past behind him.
     ok &= check(take_lunch(b), "the pass has another")
     b.teleport(person(b, "haz_waiter")["x"] + 300, D5)       # (people only move near her)
     b.eval("(p => { p.x = p.walk.stops[0] - 4; p.dir = 1; p.pausedUntil = 0; })(window.__ship.world.people.byId.haz_waiter)")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(person(b, "haz_waiter")["aside"], "the waiter turns to a table", person(b, "haz_waiter"))
     b.teleport(person(b, "haz_waiter")["x"] + 50, D5)
     b.hold("left", 0.9)
@@ -2056,20 +2153,20 @@ def scenario_region1(b):
     b.eval("(p => { p.x = p.walk.a; p.dir = -1; p.pausedUntil = window.__ship.time.now + 60000; })(window.__ship.world.people.byId.haz_porter)")
     b.teleport(exact_x(65.6) + 30, D4)
     b.tap("e")
-    end = time.time() + 12
-    while time.time() < end and "deck" not in save_list(b, "cards"):
-        time.sleep(0.2)
+    end = now() + 12
+    while now() < end and "deck" not in save_list(b, "cards"):
+        wait(0.2)
     ok &= check("deck" in save_list(b, "cards") and carrying(b) is None, "he eats, and hands her the Deck card", save_list(b, "cards"))
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(not b.eval("window.__ship.world.people.byId.npc_officer.bubbleItems[0].visible"), "his bubble is gone")
     b.shot("region1-card")
     # The porter's cart is a bump without a tray; hopped, it is nothing.
     b.eval("(p => { p.pausedUntil = 0; p.dir = 1; })(window.__ship.world.people.byId.haz_porter)")
     b.teleport(person(b, "haz_porter")["x"] + 90, D4)
     b.hold("left", 0.9)
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "the porter's cart: bumped", alert(b))
-    time.sleep(2.5)
+    wait(2.5)
     s = b.state()
     ok &= check(s["mode"] == "play" and abs(s["x"] - exact_x(72)) < 30, "and she steps out of the gangway's crew door", s)
     # The luggage stack: hopped, or broken by the dash.
@@ -2104,10 +2201,10 @@ def lunch_for_the_officer(b):
     b.eval("(p => { p.x = p.walk.a; p.dir = -1; p.pausedUntil = window.__ship.time.now + 60000; })(window.__ship.world.people.byId.haz_porter)")
     b.teleport(exact_x(65.6) + 30, D4)
     b.tap("e")
-    end = time.time() + 12
-    while time.time() < end and "deck" not in save_list(b, "cards"):
-        time.sleep(0.2)
-    time.sleep(0.8)
+    end = now() + 12
+    while now() < end and "deck" not in save_list(b, "cards"):
+        wait(0.2)
+    wait(0.8)
     return "deck" in save_list(b, "cards")
 
 
@@ -2117,7 +2214,7 @@ def enter_region2(b):
     b.open("?reset&play")
     b.eval("(P => { P.setFlag('bb1'); P.setFlag('lunch'); P.open('cards', 'deck'); P.open('regions', 2); })(window.__ship.progress)")
     b.eval("window.__ship.cats.filter(c => c.flag === 'bb1').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
-    time.sleep(0.2)
+    wait(0.2)
 
 
 def js(b, text):
@@ -2141,13 +2238,13 @@ def scenario_region2(b):
     robot = "window.__ship.world.robots[0]"
     b.teleport(exact_x(34), D6)
     js(b, f"(r => {{ r.x = {exact_x(32)}; r.dir = 1; r.pausedUntil = 0; }})({robot})")
-    time.sleep(0.5)
+    wait(0.5)
     x0 = js(b, f"{robot}.x")
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(abs(js(b, f"{robot}.x") - x0) < 1 and js(b, f"{robot}.beep.visible") is not None, "the robot stops while she stands in its way", x0)
     b.shot("region2-robot")
     b.teleport(exact_x(31), D6)
-    time.sleep(0.5)
+    wait(0.5)
     x1 = js(b, f"{robot}.x")
     ok &= check(x1 > x0 + 4, "and trundles on when she is behind it", (x0, x1))
     b.hold("right", 0.5)
@@ -2156,45 +2253,45 @@ def scenario_region2(b):
     js(b, f"(r => {{ r.x = {exact_x(29.5)}; r.dir = -1; r.pausedUntil = 0; }})({robot})")
     top = js(b, f"{robot}.def.y - {robot}.h")
     b.teleport(js(b, f"{robot}.x"), top)
-    time.sleep(0.3)
+    wait(0.3)
     xa = b.state()["x"]
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(s["y"] == top and xa - s["x"] > 20, "she rides on its top", (xa, s))
-    end = time.time() + 8
-    while time.time() < end and b.state()["x"] > exact_x(26.94) + 6:
-        time.sleep(0.05)
+    end = now() + 8
+    while now() < end and b.state()["x"] > exact_x(26.94) + 6:
+        wait(0.05)
     b.tap("space")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check("tan_6_high" in save_list(b, "collected"), "a hop from its top takes the tangerine on the fire-hose cabinet", b.state())
     # The cabin being made up: a peek.
     maid = room(b, "maid6")
     b.teleport(maid["doors"][0]["outX"], D6)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "maid6" and person(b, "amb_maid")["on"], "the cabin being made up: in through its open door", route(b))
     b.shot("region2-cabin")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "inside", "and out again", route(b))
     # Bliss: standing still on the dance floor, she dances.
     b.teleport(exact_x(117.2), D6)
-    time.sleep(3.6)
+    wait(3.6)
     ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-dance",
                 "three seconds still on Bliss's dance floor: she dances", b.state())
     b.shot("region2-dance")
-    time.sleep(3.4)
+    wait(3.4)
     ok &= check(b.state()["mode"] == "play", "and stops", b.state())
     # The Photo Studio's flash: caught in it she poses; no scare.
     b.teleport(exact_x(133.6), D6)
-    end = time.time() + 9
+    end = now() + 9
     posed = False
-    while time.time() < end and not posed:
+    while now() < end and not posed:
         posed = b.state()["mode"] == "scripted"
-        time.sleep(0.05)
+        wait(0.05)
     ok &= check(posed, "caught in the studio's flash she poses")
     b.shot("region2-flash")
-    time.sleep(1.4)
+    wait(1.4)
     s = b.state()
     ok &= check(s["mode"] == "play" and abs(s["x"] - exact_x(133.6)) < 4, "and that is all: no scare", s)
     # The promenade: the jogger bumps her; standing aside (↑) lets him by.
@@ -2202,40 +2299,40 @@ def scenario_region2(b):
     js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     b.teleport(exact_x(150), D6, "promenade")
     b.key("up", True)
-    time.sleep(0.2)
+    wait(0.2)
     js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
-    time.sleep(1.8)
+    wait(1.8)
     s = b.state()
     b.key("up", False)
     ok &= check(s["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "standing aside by the wall (↑), the jogger runs by", (s, person(b, "haz_jogger")))
     b.shot("region2-jogger")
     js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "in his lane, he bumps her", alert(b))
-    time.sleep(2.6)
+    wait(2.6)
     ok &= check(b.state()["mode"] == "play", "a scare: she is back at a checkpoint", b.state())
     # He can be hopped.
     js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     b.teleport(exact_x(150), D6, "promenade")
     js(b, f"(p => {{ p.x = {exact_x(152.2)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
-    time.sleep(0.58)         # (standing still, the hop wants timing; running at him it is easy)
+    wait(0.58)         # (standing still, the hop wants timing; running at him it is easy)
     b.hold("space", 0.8)
     ok &= check(b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "or hopped", (b.state(), person(b, "haz_jogger")))
     js(b, f"(p => {{ p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     # The gulls on the rail fly up as she comes near, and settle again.
     gull = "window.__ship.world.movers.filter(m => m.rise !== undefined)[1]"
     b.teleport(exact_x(170), D6, "promenade")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, f"{gull}.rise") == 0, "a gull sits on the rail")
     # (On the way: two black ears in a porthole.)
     b.hold("right", 1.6)
     ok &= check("glimpse_window" in flags(b), "two black ears show in a porthole as she passes", flags(b))
     b.teleport(exact_x(174), D6, "promenade")
-    time.sleep(0.7)
+    wait(0.7)
     ok &= check(js(b, f"{gull}.rise") > 0.5, "and flies up as she comes near", js(b, f"{gull}.rise"))
     b.shot("region2-gull")
     b.teleport(exact_x(185), D6, "promenade")
-    time.sleep(3.2)
+    wait(3.2)
     ok &= check(js(b, f"{gull}.rise") == 0, "then settles again", js(b, f"{gull}.rise"))
     # The rival under the boats: he hurries off as she comes.
     ok &= check(person(b, "riv_prom")["on"], "the security officer peers under a boat on the promenade", person(b, "riv_prom"))
@@ -2251,48 +2348,48 @@ def scenario_region2(b):
     b.teleport(boat["doors"][0]["outX"], boat["floor"], "promenade")
     b.shot("region2-walkway")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "lifeboat", "the one lifeboat with its hatch open: inside", route(b))
     b.teleport(boat["x0"] + 112, boat["floor"], "lifeboat")
     b.shot("region2-lifeboat")
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, "window.__ship.save.books['2']") == "held", "the second book, on its bench", js(b, "JSON.stringify(window.__ship.save.books)"))
     b.teleport(boat["x0"] + 184, boat["floor"], "lifeboat")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(b.state()["mode"] == "scripted", "the photo in its frame opens over the screen", b.state())
     b.shot("region2-photo")
     b.tap("e")
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(b.state()["mode"] == "play" and "slot_lifeboat" in save_list(b, "seen"), "and closes on a key", b.state())
     b.teleport(boat["doors"][0]["x"], boat["floor"], "lifeboat")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "promenade" and b.state()["y"] == boat["floor"], "out onto the walkway again", (route(b), b.state()))
     # The Library: her bubble while a book is out, the trolley, the shelf, the chair.
     lib = js(b, "window.__ship.world.data.library")
     b.teleport(lib["trolley"]["x"] - 40, D6)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, "window.__ship.world.people.byId.npc_librarian.bubbleItems[0].visible"), "the librarian shows a book while she carries one")
     b.shot("region2-librarian")
     b.teleport(lib["trolley"]["x"], D6)
     b.tap("e")
-    end = time.time() + 6
-    while time.time() < end and js(b, "window.__ship.save.books['2']") != "returned":
-        time.sleep(0.1)
-    time.sleep(0.8)
+    end = now() + 6
+    while now() < end and js(b, "window.__ship.save.books['2']") != "returned":
+        wait(0.1)
+    wait(0.8)
     ok &= check(js(b, "window.__ship.save.books['2']") == "returned" and b.state()["mode"] == "play", "E at the return trolley: she shelves it",
                 js(b, "JSON.stringify(window.__ship.save.books)"))
     ok &= check(not js(b, "window.__ship.world.people.byId.npc_librarian.bubbleItems[0].visible"), "and her bubble is gone")
     b.shot("region2-shelf")
     b.teleport(lib["chair"]["x"], D6)
     b.tap("e")
-    time.sleep(2.4)
+    wait(2.4)
     ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-read", "in the red chair she reads it", b.state())
     b.shot("region2-page")
     b.tap("e")
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(b.state()["mode"] == "play" and 2 in save_list(b, "read"), "its page shows, and closes on a key", save_list(b, "read"))
     # Running past her desk: a finger to her lips.
     b.teleport(exact_x(188.5), D6)
@@ -2305,11 +2402,11 @@ def scenario_region2(b):
     b.hold("right", 1.5)
     ok &= check(wait_flag(b, "bb2"), "near-catch 2: he bolts from the reading table", flags(b))
     b.teleport(exact_x(191), D6)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(door_open(b, "part-door-6-194") and js(b, "window.__ship.world.things.find(t => t.id === 'prop_rope_down').img.visible"),
                 "the rope stand lies where he knocked it; the door stands ajar")
     b.shot("region2-door")
-    time.sleep(2.0)
+    wait(2.0)
     ok &= check(door_open(b, "part-door-6-194"), "and stays so")
     b.hold("right", 1.6)
     ok &= check(3 in save_list(b, "regions"), "through it: region 3", b.state())
@@ -2330,7 +2427,7 @@ def enter_region3(b):
     b.eval("(P => { ['bb1', 'lunch', 'bb_lift', 'bb2', 'riv_prom', 'glimpse1', 'glimpse_window'].forEach(f => P.setFlag(f));"
            " P.open('cards', 'deck'); P.open('regions', 2); P.open('regions', 3); })(window.__ship.progress)")
     b.eval("window.__ship.cats.filter(c => c.flag === 'bb1' || c.flag === 'bb2').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
-    time.sleep(0.2)
+    wait(0.2)
 
 
 def enter_region4(b):
@@ -2341,7 +2438,7 @@ def enter_region4(b):
            " P.open('cards', 'deck'); P.open('cards', 'ent'); [2, 3, 4].forEach(r => P.open('regions', r)); })(window.__ship.progress)")
     b.eval("window.__ship.cats.filter(c => ['bb1', 'bb2', 'bb3'].includes(c.flag)).forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
     b.eval("window.__ship.world.refresh()")
-    time.sleep(0.2)
+    wait(0.2)
 
 
 def pills_for_the_stage_manager(b):
@@ -2357,25 +2454,25 @@ def pills_for_the_stage_manager(b):
     cabin = room(b, "smcabin")
     b.teleport(cabin["doors"][0]["outX"], D4)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     b.teleport(cabin["x0"] + 172, D4, "smcabin")
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     if "pills" not in save_list(b, "items"):
         return False
     b.teleport(cabin["doors"][0]["x"], D4, "smcabin")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     b.teleport(tx, D4)
     b.tap("e")
     hold_until(b, "up", lambda s: s["y"] == D6, 8)
     b.hold("left", 0.4)
     b.teleport(exact_x(244.5), D6)
     b.tap("e")
-    end = time.time() + 12
-    while time.time() < end and "ent" not in save_list(b, "cards"):
-        time.sleep(0.2)
-    time.sleep(0.8)
+    end = now() + 12
+    while now() < end and "ent" not in save_list(b, "cards"):
+        wait(0.2)
+    wait(0.8)
     return "ent" in save_list(b, "cards") and b.state()["mode"] == "play"
 
 
@@ -2395,13 +2492,13 @@ def scenario_region3(b):
     x = js(b, f"{spill}.def.x")
     b.teleport(x - 150, D7)
     js(b, f"(m => {{ m.state = 'idle'; m.at = 0; }})({spill})")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(js(b, f"{spill}.state") == "tell", "a slot machine's lights race: the tell", js(b, f"{spill}.state"))
-    time.sleep(1.4)
+    wait(1.4)
     ok &= check(js(b, f"{spill}.state") == "spilled", "then its chips are all over the floor")
     b.shot("region3-chips")
     b.teleport(x - 20, D7)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["mode"] == "play", "standing still on them is nothing", b.state())
     half = js(b, f"{spill}.def.half")
     b.teleport(x - half - 50, D7)
@@ -2412,28 +2509,28 @@ def scenario_region3(b):
     js(b, f"(m => {{ m.at = window.__ship.time.now + 4000; }})({spill})")
     b.hold("left", 0.5)
     ok &= check(b.state()["mode"] == "scripted" and "Whoa" in alert(b), "running on them: slipped", alert(b))
-    time.sleep(2.8)
+    wait(2.8)
     js(b, "window.__ship.world.movers.filter(m => m.pour).forEach(m => { m.state = 'idle'; m.chips.clear(); m.at = window.__ship.time.now + 600000; })")
     # The machine with a glint pays her.
     jx = js(b, "window.__ship.world.things.find(t => t.id === 'sec_jackpot').x")
     b.teleport(jx, D7)
     b.tap("e")
     ok &= check(wait_flag(b, "jackpot", 5), "E at the machine with a glint: jackpot", flags(b))
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(b.state()["tangerines"] >= 2, "it pays out two tangerines", b.state())
     b.shot("region3-jackpot")
     # The Art Gallery's cat: a double-take.
     b.teleport(exact_x(140.0), D7)
-    time.sleep(1.9)
+    wait(1.9)
     ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-idle-look",
                 "a painting of a black cat: she looks twice", b.state())
     b.shot("region3-painting")
-    time.sleep(1.9)
+    wait(1.9)
     # The lighting booth and the stage door want the Entertainment card.
     booth = room(b, "lighting")
     b.teleport(booth["doors"][0]["outX"], D7)
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(route(b) == "inside" and "Entertainment" in alert(b), "the lighting booth wants the Entertainment card", alert(b))
     # Off the balcony's end, down onto the stage: no scare.
     st = js(b, "window.__ship.world.data.stage")
@@ -2441,100 +2538,100 @@ def scenario_region3(b):
     b.hold("right", 0.8)
     ok &= check(b.state()["y"] == D7, "the balcony's front holds her", b.state())
     hold_until(b, ["right", "space"], lambda s: s["y"] == D6, 4)
-    time.sleep(0.3)
+    wait(0.3)
     s = b.state()
     ok &= check(s["y"] == D6 and s["mode"] == "play", "hopped, she drops onto the stage: no scare", s)
     b.teleport(exact_x(244.4), D6)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_off")["on"],
                 "the stage manager at the curtain, the dancers rehearsing")
     b.shot("region3-stage")
     b.teleport(st["trapX"], D6)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["y"] == D6 and route(b) == "inside", "the trap door holds before the beat", b.state())
     # Near-catch 3.
     b.teleport(exact_x(246.9), D6)
     b.hold("right", 0.5)
-    time.sleep(1.5)
+    wait(1.5)
     b.shot("region3-rival")
     ok &= check(wait_flag(b, "bb3", 16), "near-catch 3: the rival goes down the trap door, Bumbot up the fly rope", flags(b))
     ok &= check(js(b, "window.__ship.world.story.trapHole.visible") and not js(b, "window.__ship.world.story.trapSeam.visible"),
                 "the trap door stays open")
     ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_off")["on"], "the dancers wait by the front row")
     light = "window.__ship.world.movers.find(m => m.lamp)"
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(js(b, f"{light}.lamp.swinging"), "and the stage light swings")
-    time.sleep(4.0)
+    wait(4.0)
     ok &= check(b.state()["mode"] == "play", "where the scene left her it does not reach her", b.state())
     b.shot("region3-after")
     # He wants his pills; she has none yet.
     b.teleport(exact_x(244.5), D6)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "the stage manager shows a pill bottle")
     b.tap("e")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check("ent" not in save_list(b, "cards") and b.state()["mode"] == "play", "E without them: nothing yet")
     # The bow, between the open trap door and the swinging light.
     b.teleport(exact_x(247.3), D6)
-    time.sleep(3.5)
+    wait(3.5)
     ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-bow",
                 "three seconds still at centre stage: she bows to the house", b.state())
     b.shot("region3-bow")
-    time.sleep(2.2)
+    wait(2.2)
     # The light at the bottom of its swing.
     b.teleport(js(b, f"{light}.def.x"), D6)
-    end = time.time() + 4
+    end = now() + 4
     hit = False
-    while time.time() < end and not hit:
+    while now() < end and not hit:
         hit = b.state()["mode"] == "scripted"
-        time.sleep(0.05)
+        wait(0.05)
     ok &= check(hit and "Ouch" in alert(b), "under the swinging light: bonked", alert(b))
-    time.sleep(2.8)
+    wait(2.8)
     # The open trap door: one deck down onto the galley's flour sacks, beside the rival.
     b.teleport(st["trapX"], D6)
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(route(b) == "galley" and b.state()["mode"] == "play", "into the open trap door: the galley, no scare", (route(b), b.state()))
     ok &= check(person(b, "riv_galley")["on"], "where the security officer sits in the flour")
     b.shot("region3-galley")
     g = room(b, "galley")
     b.teleport(g["doors"][0]["x"], D5, "galley")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "inside" and b.state()["y"] == D5, "out of the galley on deck 5", b.state())
     # The pills, down the theatre's trunk and back; his card.
     ok &= check(pills_for_the_stage_manager(b), "his pills from his cabin on deck 4: he hands over the Entertainment card", save_list(b, "cards"))
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(not js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "his bubble is gone")
     b.shot("region3-card")
     # With the card: the dressing room's book, the lighting booth's photo.
     dr = room(b, "dressing")
     b.teleport(dr["doors"][0]["outX"], D6)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "dressing", "the stage door opens", route(b))
     b.teleport(dr["x0"] + 118, D6, "dressing")
     b.shot("region3-dressing")
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, "window.__ship.save.books['3']") == "held", "the third book, on the make-up table")
     b.teleport(dr["doors"][0]["x"], D6, "dressing")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     b.teleport(booth["doors"][0]["outX"], D7)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "lighting", "the lighting booth opens", route(b))
     b.teleport(booth["x0"] + 446, D7, "lighting")
     b.shot("region3-catwalk")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(b.state()["mode"] == "scripted", "the photo at the catwalk's end", b.state())
     b.tap("e")
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check("slot_lighting" in save_list(b, "seen"), "seen")
     b.teleport(booth["doors"][0]["x"], D7, "lighting")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     # The way on: the red trunk from Bliss up to deck 9.
     b.teleport(trunk_x("magnums"), D6)
     b.tap("e")
@@ -2582,7 +2679,7 @@ def scenario_sweep(b):
     for name, deck, m in (("spa-door", 11, 74), ("bridge-door", 10, 40)):
         b.teleport(exact_x(m) + 16, floor_y(deck))
         b.tap("e")
-        time.sleep(0.15)
+        wait(0.15)
         ok &= check(not door_open(b, name), f"{name}: gold, shut", alert(b))
     # The walls at the decks' ends: walking into a locked face, she stays out.
     for (deck, end), lock in END_WALL_LOCKS.items():
@@ -2603,7 +2700,7 @@ def scenario_sweep(b):
             continue          # the balcony guest's own door, opened from inside (region 7's step)
         b.teleport(d["x"], d["y"], d["route"])
         b.tap("e")
-        time.sleep(0.4)
+        wait(0.4)
         ok &= check(route(b) == d["route"], f"the door of {d['id']} shut ({d['lock']})", route(b))
     ok &= check(len(doors) >= 12, "every locked room door was tried", len(doors))
     # The lifeboat station's ladder wants the Deck card from below.
@@ -2628,9 +2725,9 @@ def scenario_sweep(b):
     # before the linen room's beat, no dash before the first sight of him.
     b.teleport(exact_x(233) + 13, D11)
     b.key("space", True)
-    time.sleep(0.34)
+    wait(0.34)
     b.key("space", False)
-    time.sleep(0.02)
+    wait(0.02)
     b.hold(["left", "space"], 0.2)
     b.hold("left", 1.0)
     s = b.state()
@@ -2638,23 +2735,23 @@ def scenario_sweep(b):
     # (Jump is pressed once she is in the air: pressed on the floor first, she would jump, and
     # could come down on the sun cover's top.)
     b.eval(f"window.__ship.spawnAt({{x: {x_of(238)}, y: {D11 - 110}, route: 'inside'}})")       # in the air over the Great Outdoors
-    time.sleep(0.15)
+    wait(0.15)
     b.key("space", True)
-    time.sleep(0.75)
+    wait(0.75)
     s = b.state()
     b.key("space", False)
     ok &= check(s["y"] == D11, "no glide without the parasol: she just falls", s)
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     b.teleport(linen, D9, "linen")
     b.hold(["down", "right"], 2.4)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(route(b) == "linen" and not b.eval("window.__ship.crawling"), "no crawling into the vent before the beat", route(b))
     # The stage's trap door is shut before the rehearsal's beat.
     trap = b.eval("window.__ship.world.data.trapdoor")
     b.teleport(trap["x"] - 30, trap["y"])
     b.eval("window.__ship.cats.forEach(c => { c.gone = true; })")      # (he would stop her on the way)
     b.hold("right", 0.5)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(route(b) == "inside", "the trap door holds before the beat", route(b))
     # The elevators light only region 1's landings at the start.
     lit = b.eval("window.__ship.lifts.map(l => l.floors.filter(f => window.__ship.progress.regionOpen(f.region)).map(f => f.deck))")
@@ -2668,21 +2765,21 @@ def mover(mid):
 
 def wait_js(b, text, timeout=8):
     """Waits until an expression is true in the game."""
-    end = time.time() + timeout
-    while time.time() < end:
+    end = now() + timeout
+    while now() < end:
         if b.eval(text):
             return True
-        time.sleep(0.04)
+        wait(0.04)
     return False
 
 
 def scared(b, word, within=3.0):
     """A fright with `word` in it comes within a while."""
-    end = time.time() + within
-    while time.time() < end:
+    end = now() + within
+    while now() < end:
         if b.state()["mode"] == "scripted" and word in alert(b):
             return True
-        time.sleep(0.04)
+        wait(0.04)
     return False
 
 
@@ -2714,7 +2811,7 @@ def scenario_region4(b):
     cx = js(b, f"{cart}.x")
     ok &= check(abs(cx - exact_x(185.2)) < 2, "his trolley at the corridor's aft end", cx)
     b.teleport(cx - 100, D9)
-    time.sleep(0.3)
+    wait(0.3)
     st = person(b, "npc_steward")
     ok &= check(st["on"] and abs(st["x"] - (cx + 17)) < 2 and not js(b, f"{cart}.items[0].visible"),
                 "the steward at his tall trolley's handle: one picture of the two", st)
@@ -2728,22 +2825,22 @@ def scenario_region4(b):
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     b.teleport(linen, D9)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check("Housekeeping" in alert(b) and route(b) == "inside", "the linen room wants the Housekeeping card", alert(b))
-    time.sleep(0.5)
+    wait(0.5)
     b.teleport(cx - 26, D9)
     b.hold("right", 0.3)
     b.tap("e")
     gap = []
     b.key("right", True)
-    time.sleep(1.0)
+    wait(1.0)
     for _ in range(3):
         gap.append(js(b, f"{cart}.x - window.__ship.player.x"))
-        time.sleep(0.3)
+        wait(0.3)
     ok &= check(all(abs(g - 29) < 0.01 for g in gap), "she pushes it at her gap, 29 px from its middle", gap)
     ok &= check(wait_js(b, "window.__ship.save.flags.includes('cart_free')", 6), "pushed along to 189 m, the cart is free", b.state())
     b.key("right", False)
-    time.sleep(0.6)
+    wait(0.6)
     b.shot("region4-thanks")
     ok &= check(wait_js(b, "window.__ship.save.cards.includes('hk')", 4),
                 "he thanks her and tosses her the Housekeeping card, short", save_list(b, "cards"))
@@ -2758,11 +2855,11 @@ def scenario_region4(b):
     ok &= check(use_door(b, 9, 194, -1), "the door at 194 m opens from the corridor")
     # The honeymooners.
     b.teleport(exact_x(133.6), D9)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, f"{W}.people.byId.npc_bride.bubbleItems[0].visible"), "the honeymooners hold out a camera")
     b.shot("region4-honeymooners")
     b.tap("e")
-    time.sleep(1.75)
+    wait(1.75)
     b.shot("region4-photo")
     ok &= check(js(b, "window.__ship.player.anims.currentAnim.key") == "her-camera", "E: she takes their picture", b.state())
     ok &= check(wait_flag(b, "photo", 16), "the flash, their kiss, and in they go", flags(b))
@@ -2772,7 +2869,7 @@ def scenario_region4(b):
     vac = mover("haz_vacuum_9")
     vx = js(b, f"{vac}.def.x")
     b.teleport(vx - 160, D9)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(js(b, f"{vac}.state") == "in" and js(b, f"{vac}.armed"), "the vacuum waits in the cabin's doorway")
     b.key("right", True)
     hit = scared(b, "Weeeee", 2.5)
@@ -2789,28 +2886,28 @@ def scenario_region4(b):
     b.key("right", True)
     wait_js(b, f"{vac}.state === 'wait'", 3)
     b.key("space", True)
-    time.sleep(0.75)
+    wait(0.75)
     b.key("space", False)
     b.key("right", False)
-    time.sleep(0.3)
+    wait(0.3)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["x"] > vx - 30, "a jump as it rattles clears it", s)
     stk = mover("haz_towels_9")
     sx = js(b, f"{stk}.def.x")
     # (Running on toward the towel stack after it, the stack falls in front of her: its own checks below.)
     # Back in, it does nothing while she stands at the door; the cabin being cleaned.
-    time.sleep(1.6)
+    wait(1.6)
     cl = room(b, "cleanup")
     b.teleport(cl["doors"][0]["outX"], D9)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["mode"] == "play", "back in its doorway it leaves her alone", b.state())
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "cleanup" and person(b, "amb_bedmaker")["on"], "the cabin being cleaned: the bedmaker at the stripped bed", route(b))
     b.shot("region4-cleanup")
     b.teleport(cl["doors"][0]["x"], D9, "cleanup")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     # The towel stack: coming at it, it wobbles and falls the way she goes, onto her as she passes
     # it; stopped short as it wobbles, it falls in front of her and she walks on over the heap.
     # (The vacuum is kept in its doorway for this: beside the stack she is within its reach.)
@@ -2819,7 +2916,7 @@ def scenario_region4(b):
     b.teleport(sx - 700, D9)
     restack(b, stk)
     b.teleport(sx - 160, D9)
-    time.sleep(0.3)
+    wait(0.3)
     b.key("right", True)
     hit = scared(b, "Mmmph", 2.5)
     b.key("right", False)
@@ -2828,13 +2925,13 @@ def scenario_region4(b):
     wait_js(b, "window.__ship.mode === 'play'", 8)
     # (Fallen for good, its heap crossed on the way back from the steward: 2026-11-18.)
     b.teleport(sx - 700, D9)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(js(b, f"{stk}.state") == "down" and "haz_towels_9" in save_list(b, "broken"),
                 "it stays fallen once she has gone (kept with what she broke)", js(b, f"{stk}.state"))
     # (Stood up again by hand for the other way past it.)
     restack(b, stk)
     b.teleport(sx - 160, D9)
-    time.sleep(0.3)
+    wait(0.3)
     b.key("right", True)
     wobbled = wait_js(b, f"{stk}.state === 'wobble'", 3)
     b.key("right", False)
@@ -2855,38 +2952,38 @@ def scenario_region4(b):
     hit = scared(b, "Brrr", 2.5)
     b.shot("region4-drenched")
     ok &= check(hit, "under it when it rains: drenched", alert(b))
-    time.sleep(2.8)
+    wait(2.8)
     # The balcony cabin: the green card's door, a checkpoint, the basket, the balcony and who is up there.
     bc = room(b, "balcabin9")
     n = tangerines()
     b.teleport(bc["doors"][0]["outX"], D9)
-    time.sleep(0.2)
+    wait(0.2)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "balcabin9" and "cp_balcabin" in save_list(b, "activated"), "the balcony cabin opens with the card: a checkpoint", route(b))
     b.teleport(bc["x0"] + 150, D9, "balcabin9")
-    time.sleep(0.4)
+    wait(0.4)
     b.shot("region4-balcabin")
     b.hold("space", 0.3)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(tangerines() == n + 1, "a tangerine in its fruit basket", tangerines())
     b.teleport(bc["doors"][1]["x"], D9, "balcabin9")
     b.tap("e")
-    time.sleep(1.5)
+    wait(1.5)
     b.shot("region4-balcony")
     ok &= check(route(b) == "promenade" and "glimpse_balcony" in flags(b), "out on its balcony: Bumbot on the rail a deck up", (route(b), flags(b)))
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(route(b) == "balcabin9", "and back in", route(b))
     b.teleport(bc["doors"][0]["x"], D9, "balcabin9")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     # The door that flies open (2026-11-18): coming at it from aft, past its hinge, it bursts open and
     # slams her flat on the wall (13a, its own clip); from forward it never hits her.
     sw = mover("haz_swing_9")
     wx = js(b, f"{sw}.def.x")
     b.teleport(wx + 200, D9)
-    time.sleep(0.2)
+    wait(0.2)
     b.key("left", True)
     hit = scared(b, "Ouch", 3.0)
     b.key("left", False)
@@ -2894,7 +2991,7 @@ def scenario_region4(b):
     ok &= check(hit and js(b, f"{sw}.state") == "squash", "coming at the door that flies open from aft: slammed flat on the wall", (alert(b), js(b, f"{sw}.state")))
     ok &= check(person(b, "haz_swing_9_who")["on"], "the kid with the water pistol looks out")
     wait_js(b, "window.__ship.mode === 'play'", 8)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(abs(b.state()["x"] - bc["doors"][0]["outX"]) < 30, "back at the balcony cabin's door", b.state())
     wait_js(b, f"{sw}.state === 'shut' && {sw}.armed", 6)
     b.teleport(wx + 200, D9)
@@ -2902,32 +2999,32 @@ def scenario_region4(b):
     wait_js(b, f"{sw}.state === 'wait'", 3)
     b.key("left", False)
     ok &= check(wait_js(b, f"{sw}.state === 'burst'", 3), "stopping short of it, it bursts open by itself")
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("left", 1.6)
     ok &= check(b.state()["mode"] == "play" and b.state()["x"] < wx - 40, "then on past it, untouched", b.state())
     b.teleport(wx - 200, D9)
-    time.sleep(1.5)
+    wait(1.5)
     wait_js(b, f"{sw}.state === 'shut' && {sw}.armed", 6)
     b.hold("right", 2.4)
     ok &= check(b.state()["mode"] == "play" and b.state()["x"] > wx + 40, "from forward: past it, never hit", b.state())
     # "Do Not Disturb".
     dx = js(b, f"{mover('haz_dnd_9')}.def.x")
     b.teleport(dx - 8, D9)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.state()["mode"] == "play", "the Do Not Disturb door: left alone, nothing")
     b.tap("e")
-    time.sleep(0.35)
+    wait(0.35)
     b.shot("region4-startled")
     ok &= check(b.state()["mode"] == "scripted" and "sorry" in alert(b), "E at it: startled", alert(b))
-    time.sleep(3.0)
+    wait(3.0)
     # The standing cart and its tangerine; the luggage to the ceiling.
     # (Until she is over it, not for a time: the cart's top is 21 px wide, and 0.4 s carried her a
     # hair past it whenever the machine was quick.)
     b.teleport(exact_x(172.6) - 44, D9)
     hold_until(b, ["right", "space"], lambda s: s["x"] >= exact_x(172.6) - 6, 2)
-    time.sleep(0.5)
+    wait(0.5)
     b.hold("left", 0.08)
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check("tan_9_cart" in save_list(b, "collected") and b.state()["mode"] == "play", "onto the standing cart for its tangerine", b.state())
     b.teleport(exact_x(178.4), D9)
     b.hold("right", 1.0)
@@ -2938,20 +3035,20 @@ def scenario_region4(b):
     ad = room(b, "adjoin")
     b.teleport(ad["doors"][0]["outX"], D9)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "adjoin", "into the first of the adjoining cabins", route(b))
     b.hold("right", 2.2)
     ok &= check(b.state()["x"] < ad["x0"] + 236, "the blanket fort across the way through stops her", b.state()["x"] - ad["x0"])
     b.shot("region4-fort")
     b.teleport(ad["doors"][0]["x"], D9, "adjoin")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     # The dash goes through the luggage.
     b.teleport(exact_x(178.6), D9)
-    time.sleep(0.2)
+    wait(0.2)
     b.key("right", True)
     b.tap("d")
-    time.sleep(1.0)
+    wait(1.0)
     b.key("right", False)
     ok &= check("haz_luggage_9" in save_list(b, "broken") and b.state()["x"] > exact_x(180), "the dash goes through the luggage", b.state())
     ok &= check("tan_9_luggage" in save_list(b, "collected"), "and she has the tangerine behind it", save_list(b, "collected"))
@@ -2961,66 +3058,66 @@ def scenario_region4(b):
     # The linen room: near-catch 4, into the vent.
     b.teleport(linen, D9)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "linen", "with the card, into the linen room", route(b))
     b.shot("region4-linen")
     lc = f"{W}.pushables.find(t => t.id === 'cart_linen')"
     b.hold("right", 0.9)
     ok &= check(b.state()["x"] > js(b, f"{lc}.x"), "she walks past the laundry cart", b.state())
-    time.sleep(0.9)
+    wait(0.9)
     b.shot("region4-vent")
     ok &= check(wait_flag(b, "bb4", 12), "near-catch 4: Bumbot leaps from the towels into the vent", flags(b))
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned")
-    time.sleep(0.5)
+    wait(0.5)
     # The cart under the vent, onto it, down on hands and knees: the duct.
     b.teleport(js(b, f"{lc}.x") - 36, D9, "linen")
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E by the cart's end: she takes hold", b.state())
     b.hold("right", 3.8)
     ok &= check("cart_linen" in flags(b), "pushed under the vent", flags(b))
-    time.sleep(0.3)
+    wait(0.3)
     b.shot("region4-cart")
     b.hold(["right", "space"], 0.45)
-    time.sleep(0.5)
+    wait(0.5)
     s = b.state()
     ok &= check(s["y"] == D9 - 36, "she jumps up onto it", s)
     b.shot("region4-on-cart")
     b.hold("down", 0.5)
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "duct", "down on hands and knees on it: into the vent", route(b))
     duct = js(b, f"{W}.data.duct")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(js(b, f"{W}.eyesX != null && !{W}.eyesGone && {W}.eyesX < window.__ship.player.x - 100"), "his eyes in the dark ahead of her")
     b.shot("region4-duct")
     ok &= check(js(b, "window.__ship.player.anims.currentAnim.key") == "her-crawl", "crawling has its own clip")
     n = tangerines()
     g = duct["grilles"][3]
     s = hold_until(b, "left", lambda s: s["x"] < g["x"] + 6, 16)
-    time.sleep(0.5)
+    wait(0.5)
     b.shot("region4-peek")
     ok &= check(js(b, f"{W}.peeks.find(k => k.what === 'snore').items[1].alpha") > 0.9, "over a grille: a look down at who snores below")
     ok &= check(tangerines() == n + 1, "a tangerine lost in the duct", tangerines())
     s = hold_until(b, "left", lambda s: s["x"] < duct["exitX"] + 6, 8)
     b.tap("down")
-    time.sleep(1.7)
+    wait(1.7)
     s = b.state()
     ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"), "kicked out, she drops into deck 8 forward: region 5", s)
     # Now that she crawls: the fort, and what is in it.
     n = tangerines()
     b.teleport(ad["x0"] + 200, D9, "adjoin")
-    time.sleep(0.3)
+    wait(0.3)
     s = hold_until(b, ["down", "right"], lambda s: s["x"] > ad["x0"] + 330, 5)
     ok &= check(s["x"] > ad["x0"] + 330 and tangerines() == n + 2, "crawling through the blanket fort: two tangerines hidden in it", (s["x"] - ad["x0"], tangerines() - n))
     b.teleport(ad["doors"][1]["x"], D9, "adjoin")
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "inside" and abs(b.state()["x"] - exact_x(183.6)) < 12, "and out of the second cabin's door, past the luggage", b.state())
     # The chute.
     b.teleport(js(b, f"{W}.data.linen.chuteX"), D9, "linen")
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
-    time.sleep(1.5)
+    wait(1.5)
     b.shot("region4-chute")
     ok &= check(wait_flag(b, "chute", 8) and route(b) == "laundry", "E at the chute's hatch: down to the laundry on deck 4", route(b))
     ok &= check(js(b, f"!!{W}.story.hat"), "a towel on her head")
@@ -3038,7 +3135,7 @@ def enter_region5(b):
            " ['deck', 'ent', 'hk'].forEach(c => P.open('cards', c)); [2, 3, 4, 5].forEach(r => P.open('regions', r)); })(window.__ship.progress)")
     b.eval("window.__ship.cats.filter(c => ['bb1', 'bb2', 'bb3', 'bb4'].includes(c.flag)).forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
     b.eval("window.__ship.world.refresh()")
-    time.sleep(0.2)
+    wait(0.2)
 
 
 def enter_region6(b):
@@ -3047,7 +3144,7 @@ def enter_region6(b):
     b.eval("(P => { P.open('regions', 6); })(window.__ship.progress)")
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(exact_x(79.5), D11)
-    time.sleep(0.3)
+    wait(0.3)
 
 
 def enter_region7(b):
@@ -3056,11 +3153,11 @@ def enter_region7(b):
     enter_region6(b)
     b.eval("(P => { P.learn('socks'); ['bb5', 'kid_fed', 'refilled', 'table', 'glimpse_balcony'].forEach(f => P.setFlag(f)); })(window.__ship.progress)")
     b.eval("window.__ship.cats.filter(c => c.flag === 'bb5').forEach(c => { c.gone = true; c.away = true; c.sprite.setVisible(false); })")
-    time.sleep(0.3)
+    wait(0.3)
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     bc = room(b, "balcabin9")
     b.teleport(bc["doors"][1]["outX"], D9, "promenade")
-    time.sleep(0.4)
+    wait(0.4)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
 
 
@@ -3069,10 +3166,10 @@ def enter_region8(b):
     the sun cover onto deck 12's aft terrace."""
     enter_region7(b)
     b.eval("(P => { ['guest', 'riv_walkway'].forEach(f => P.setFlag(f)); P.open('regions', 7); P.open('regions', 8); })(window.__ship.progress)")
-    time.sleep(1.2)
+    wait(1.2)
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(exact_x(216.6), floor_y(12))
-    time.sleep(0.4)
+    wait(0.4)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
 
 
@@ -3087,7 +3184,7 @@ def scenario_region5(b):
     thing = lambda tid: f"{W}.things.find(t => t.id === '{tid}')"
     duct = js(b, f"{W}.data.duct")
     b.teleport(duct["dropX"], D8)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(js(b, f"{thing('prop_grille_open')}.items[0].visible") and not js(b, f"{thing('prop_grille_shut')}.items[0].visible"),
                 "the grille she dropped out of hangs open in the ceiling")
     ok &= check(js(b, f"{thing('prop_paws_8')}.items[0].visible"), "paw prints in the dust, toward the lobby's door")
@@ -3095,7 +3192,7 @@ def scenario_region5(b):
     # The party.
     px = js(b, f"{thing('amb_party')}.x")
     b.teleport(px - 60, D8)
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(person(b, "amb_birthday")["on"], "the birthday girl dances at the door with the balloons")
     ok &= check(js(b, f"{W}.story.noteAt > 0"), "its music comes out into the corridor")
     b.shot("region5-party")
@@ -3105,10 +3202,10 @@ def scenario_region5(b):
     # through the door (2026-11-18).
     sx = js(b, f"{thing('amb_peek_sea')}.x")
     b.teleport(sx + 16, D8)
-    time.sleep(2.5)
+    wait(2.5)
     ok &= check(b.state()["mode"] == "play", "standing at the open cabin does nothing by itself", b.state())
     b.tap("e")
-    time.sleep(1.3)
+    wait(1.3)
     b.shot("region5-sea")
     ok &= check(b.state()["mode"] == "scripted" and b.eval("window.__ship.player.isCropped") and b.state()["y"] < D8 - 15,
                 "E: she is in, bouncing on its bed, seen only through the door", b.state())
@@ -3122,39 +3219,39 @@ def scenario_region5(b):
     ok &= check("cp_8206" in save_list(b, "activated"), "her cabin's door: a checkpoint", save_list(b, "activated"))
     b.teleport(cabin, D8)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(route(b) == "cabin", "into cabin 8206", route(b))
     x0 = cabin - 59
     b.teleport(x0 + 104, D8, "cabin")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(b.state()["tangerines"] == 2, "two tangerines in the welcome basket", b.state())
     b.teleport(x0 + 186, D8, "cabin")
-    time.sleep(0.3)
+    wait(0.3)
     b.shot("region5-bed")
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, "window.__ship.save.books['5']") == "held", "the fifth book, on her bed")
     b.teleport(x0 + 186, D8 - 32, "cabin")
-    time.sleep(2.2)
+    wait(2.2)
     ok &= check(b.state()["mode"] == "scripted" and js(b, "!!window.__ship.world.library.reading"),
                 "standing still on the bed with it, she sits down and reads it there", b.state())
     b.shot("region5-reading")
-    time.sleep(1.6)
+    wait(1.6)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(5 in save_list(b, "read") and b.state()["mode"] == "play", "its page read", (save_list(b, "read"), b.state()))
-    time.sleep(5.2)
+    wait(5.2)
     ok &= check(b.state()["mode"] == "scripted" and not js(b, "!!window.__ship.world.library.reading"), "after that the bed is for bouncing again", b.state())
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     b.teleport(cabin, D8, "cabin")
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(route(b) == "inside", "and out again", route(b))
     # The swan's cart.
     ok &= check(js(b, f"{thing('prop_swan_cart_swan')}.items[0].visible"), "a steward's cart with a towel swan on it")
     b.teleport(exact_x(31.5), D8)
-    time.sleep(0.4)
+    wait(0.4)
     b.shot("region5-swan")
     # The forward stairs on up: the officers' lobbies stay shut, deck 11 opens.
     (x0, y0), _ = flight_feet("stairs-forward-8-9")
@@ -3163,7 +3260,7 @@ def scenario_region5(b):
     ok &= check(s["y"] == D11 and 6 in save_list(b, "regions"), "up the forward stairs, past decks 9 and 10, to deck 11: region 6", s)
     (x9, y9), _ = flight_feet("stairs-forward-9-10")
     b.teleport(x9, y9)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(not use_door(b, 9, 74, 1) and "Officer" in alert(b), "deck 9's forward lobby: its doors want the Officer's card", alert(b))
     return ok
 
@@ -3193,29 +3290,29 @@ def scenario_region6(b):
     ok &= check(js(b, f"{S}.progress.blockLifted('towels')") and not js(b, f"{thing('prop_towels_table')}.items[0].visible"),
                 "the towel animals are gone from the midship flight below")
     b.shot("region6-painter")
-    time.sleep(0.6)
+    wait(0.6)
     b.teleport(exact_x(95.75) - 8, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.shot("region6-socks")
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check("socks" in save_list(b, "verbs"), "the grip socks, on the rack by the yoga mats")
-    time.sleep(3.2)
+    wait(3.2)
     # The chess set.
     b.teleport(L["chessX"] - 20, D11)
-    time.sleep(0.3)
+    wait(0.3)
     px = js(b, f"{W}.story.pawn.x")
     b.tap("e")
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(js(b, f"{W}.story.pawn.x") != px and "sec_chess" in save_list(b, "seen"), "the giant chess set: she moves a pawn")
     b.shot("region6-chess")
     # Near-catch 5: she comes to him swimming; the kid in the hot tub; the pool drains with her in it.
     ok &= check(person(b, "npc_kid_tub")["on"] and not person(b, "npc_kid")["on"], "the kid is in the hot tub, his cap over its rim")
     b.teleport(pool1["x1"] - 230, D11)
-    time.sleep(0.8)
+    wait(0.8)
     ok &= check(b.state()["mode"] == "swim", "the first pool fills the deck: she swims", b.state())
     hold_until(b, "right", lambda s: s["mode"] == "scripted", 6)
-    time.sleep(2.2)
+    wait(2.2)
     b.shot("region6-beat")
     ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14), "near-catch 5: the kid squirts him, he falls in, climbs out over the lever and is gone aft", flags(b))
     ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.texture.key") == "lever-down", "the drain's lever is down")
@@ -3227,9 +3324,9 @@ def scenario_region6(b):
     # The hatch in the tank's floor; deck 10's hallway: the trays outside a "Do Not Disturb" door.
     hx = js(b, f"{W}.data.hatchPool.x")
     b.teleport(hx, D11 + 32)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.6)
+    wait(1.6)
     s = b.state()
     ok &= check(s["y"] == D10 and abs(s["x"] - hx) < 4, "the hatch drops her into deck 10's hallway", s)
     trays = js(b, f"{W}.data.ents.find(e => e.kind === 'trays')")
@@ -3243,65 +3340,65 @@ def scenario_region6(b):
     ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8) and "trays_10m" in flags(b), "she comes back at a checkpoint", b.state())
     ok &= check(js(b, f"{S}.tangerines.some(t => t.id === 'tan_10_tray')"), "a tangerine has rolled out from among the trays")
     b.teleport(trays["x0"] - 42, D10)
-    time.sleep(0.6)
+    wait(0.6)
     b.key("right", True)
-    time.sleep(0.2)
+    wait(0.2)
     b.key("space", True)
-    time.sleep(0.35)
+    wait(0.35)
     b.key("space", False)
-    time.sleep(0.75)
+    wait(0.75)
     b.key("right", False)
-    time.sleep(0.6)
+    wait(0.6)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["x"] > trays["x1"] and js(b, f"{mover('haz_trays_10m')}.armed"), "a jump clears the trays", s)
     ok &= check(all(js(b, f"!!{mover(m)}") for m in ("haz_swing_10m", "haz_sprinkler_10m", "haz_dnd_10m2")), "further aft: a swinging door, a sprinkler, another door not to knock at")
     b.teleport(exact_x(110) + 16, D10)
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(door_open(b, "part-door-10-110"), "the hallway's lobby door opens from inside")
     # Back on deck 11. The hot tub's canopy: up by a wall jump off its post, a tangerine on its roof.
     post = exact_x(131.03)
     had = len(save_list(b, "collected"))
     b.teleport(post + 30, D11)
-    time.sleep(0.5)
+    wait(0.5)
     b.key("left", True)
     b.key("space", True)
-    time.sleep(0.16)
+    wait(0.16)
     b.key("space", False)
-    time.sleep(0.06)
+    wait(0.06)
     b.key("space", True)
     b.key("left", False)
     b.key("right", True)
-    time.sleep(0.3)
+    wait(0.3)
     b.key("space", False)
-    time.sleep(0.12)
+    wait(0.12)
     b.key("right", False)
-    time.sleep(0.8)
+    wait(0.8)
     s = b.state()
     ok &= check(s["y"] == D11 - 90, "a kick off the canopy's post takes her up onto its roof", s)
     b.shot("region6-canopy")
     hold_until(b, "right" if s["x"] < L["tubX"] else "left", lambda s: abs(s["x"] - L["tubX"]) < 6, 3)
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(len(save_list(b, "collected")) == had + 1, "and to the tangerine on it")
     # The hot tub.
     b.teleport(L["tubX"] - 10, D11)
-    time.sleep(0.5)
+    wait(0.5)
     b.tap("e")
-    time.sleep(2.4)
+    wait(2.4)
     b.shot("region6-hottub")
     ok &= check(b.state()["mode"] == "scripted", "E at the hot tub: she gets in", b.state())
     b.tap("space")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 4) and "sec_hottub" in save_list(b, "seen"), "and out again at a key")
     # The second pool; the attendant's hut on its aft rim.
     b.teleport(pool2["x1"] - 70, D11)
-    time.sleep(0.8)
+    wait(0.8)
     b.hold("right", 0.5)
     b.key("right", True)
     b.tap("space")
-    time.sleep(1.2)
+    wait(1.2)
     b.key("right", False)
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.state()["y"] == D11 and "cp_pool" in save_list(b, "activated"), "out of the second pool at the pool attendant's hut: a checkpoint", b.state())
     # The kid: his jet; the dash sends him off.
     kid = who("npc_kid")
@@ -3315,52 +3412,52 @@ def scenario_region6(b):
     b.eval(f"{S}.save.tangerines += 2; {S}.refreshHud()")
     b.eval(f"{kid}.x = {L['kidA'] + 190}; {kid}.dir = -1; {kid}.mode = 'patrol'; {kid}.nextSquirt = {S}.time.now + 1500; {kid}.pauseUntil = 0")
     b.teleport(L["kidA"] + 70, D11)
-    time.sleep(0.15)
+    wait(0.15)
     b.tap("d")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, f"{kid}.mode") in ("flee", "hide"), "her shout sends him running to the far end", js(b, f"{kid}.mode"))
-    time.sleep(3.0)
+    wait(3.0)
     ok &= check(b.state()["mode"] == "play" and js(b, f"{kid}.mode") == "hide", "where he keeps his back turned", js(b, f"{kid}.mode"))
-    time.sleep(7.5)
+    wait(7.5)
     # The wet patch and its deck chair.
     wet = js(b, f"{W}.data.ents.find(e => e.kind === 'wet')")
     b.eval(f"{kid}.gone = true; {W}.refresh()")
     b.teleport(wet["x0"] - 60, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("right", 0.6)
     x1 = b.state()["x"]
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(abs(b.state()["x"] - x1) < 12 and b.state()["mode"] == "play", "in the grip socks the wet tiles hold her", (x1, b.state()))
     b.teleport(wet["x0"] - 60, D11)
     b.eval(f"{S}.save.verbs = {S}.save.verbs.filter(v => v !== 'socks')")
-    time.sleep(0.4)
+    wait(0.4)
     b.hold("right", 0.55)
     x1 = b.state()["x"]
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.state()["x"] - x1 > 18, "without them she slides on across them", (x1, b.state()))
     ok &= check(scared(b, "Oops", 2), "and the deck chair slides at her: bumped", alert(b))
     b.shot("region6-wet")
     wait_js(b, "window.__ship.mode === 'play'", 8)
-    time.sleep(2.5)
+    wait(2.5)
     b.teleport(wet["x0"] - 60, D11)
-    time.sleep(0.4)
+    wait(0.4)
     b.key("right", True)
-    time.sleep(0.94)
+    wait(0.94)
     b.key("space", True)
-    time.sleep(0.3)
+    wait(0.3)
     b.key("space", False)
-    time.sleep(0.8)
+    wait(0.8)
     b.key("right", False)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["x"] > wet["x1"], "a jump as it comes clears the chair", s)
     b.eval(f"{S}.progress.learn('socks'); {kid}.gone = false; {W}.refresh()")
-    time.sleep(3.3)
+    wait(3.3)
     # The Garden Cafe: the queue.
     q = js(b, f"{W}.data.ents.find(e => e.kind === 'queue')")
     line = lambda: sorted(js(b, f"{W}.people.list.filter(p => p.id.startsWith('haz_queue') && p.blocking).map(p => Math.round(p.x))"))
     first = line()[0]
     b.teleport(first - 110, D11)
-    time.sleep(0.4)
+    wait(0.4)
     b.hold("right", 2.2)
     s = b.state()
     # (Held at someone's back: whoever is next ahead of her is within a step.)
@@ -3377,48 +3474,48 @@ def scenario_region6(b):
     cold = js(b, f"{W}.rooms.coldroom.def.x0")
     b.teleport(door, D11)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     ok &= check(route(b) == "coldroom", "the cold room, with the Housekeeping card", route(b))
     b.teleport(cold + 150, D11, "coldroom")
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(carrying(b) is None, "the canister stays on its shelf until the machine wants it")
     b.shot("region6-coldroom")
     b.teleport(door, D11, "coldroom")
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     # The aft lobby: the fans on the stairs.
     s = climb(b, "stairs-aft-11-12", 0.6)
     ok &= check(s["y"] == D11 and "BIG GAME" in alert(b) and person(b, "blk_fan_a")["on"], "the aft flight up: the Sports Bar's fans", alert(b))
     b.shot("region6-fans")
-    time.sleep(0.6)
+    wait(0.6)
     # The Great Outdoors: the machine. A short swirl, too long a one, and a proper one.
     ok &= check(person(b, "npc_husband")["on"] and not js(b, f"{who('npc_husband')}.bubbleItems[0].visible"), "her husband at the first table, by the machine")
 
     def swirl(sec):
         b.teleport(L["machineX"] - 14, D11)
-        time.sleep(0.4)
+        wait(0.4)
         b.key("e", True)
-        time.sleep(sec)
+        wait(sec)
         b.key("e", False)
-        time.sleep(0.35)
+        wait(0.35)
         return js(b, f"{W}.story.lastSwirl")
 
     ok &= check(swirl(0.9) == "stub" and carrying(b) == "stub", "E let go early: a stub", carrying(b))
     b.eval(f"{kid}.x = {L['kidA'] + 120}; {kid}.mode = 'patrol'")
     b.teleport(L["kidA"] + 90, D11)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(js(b, f"{kid}.pose") == "stand" and js(b, f"{kid}.bubbleItems[0].visible"), "with a cone in her hands the kid waits for it, his bubble a soft serve")
     b.tap("e")
-    time.sleep(3.2)
+    wait(3.2)
     ok &= check("kid_fed" not in flags(b) and carrying(b) is None and b.state()["mode"] == "play", "a stub: he drops it on the deck", flags(b))
     b.shot("region6-stub")
     b.eval(f"{kid}.nextSquirt = {S}.time.now + 60000")
     ok &= check(swirl(3.2) == "toppled" and carrying(b) is None, "held too long: it goes over")
     ok &= check(js(b, f"{W}.foodGulls.gull_go.state") == "pounce", "and the gull is on it")
     b.shot("region6-toppled")
-    time.sleep(3.5)
+    wait(3.5)
     ok &= check(swirl(1.75) == "cone" and carrying(b) == "cone", "let go in the green: a proper cone", carrying(b))
     b.shot("region6-cone")
     ok &= check(0.5 < js(b, f"{W}.carryBox.left()") < 1, "and it is melting")
@@ -3426,57 +3523,57 @@ def scenario_region6(b):
     ok &= check(wait_js(b, f"{W}.foodGulls.gull_go.state === 'mark'", 6), "its shadow on the deck")
     ok &= check(wait_js(b, f"!{W}.carry", 4) and js(b, f"{W}.foodGulls.gull_go.stolen") == 1 and b.state()["mode"] == "play", "then the gull has her cone: no fright")
     b.shot("region6-gull")
-    time.sleep(1.2)
+    wait(1.2)
     # Another; through the queue with it (they let crew with a tray by); to the kid.
     ok &= check(swirl(1.75) == "cone" and carrying(b) == "cone", "another cone")
     b.teleport(q["x1"] + 60, D11)
-    time.sleep(0.3)
+    wait(0.3)
     s = hold_until(b, "left", lambda s: s["x"] < q["x0"] - 20, 12)
     ok &= check(s["x"] < q["x0"] and carrying(b) == "cone", "the queue turns aside for crew with a tray", (s, carrying(b)))
     b.eval(f"{kid}.x = {L['kidA'] + 120}; {kid}.mode = 'patrol'")
     b.teleport(L["kidA"] + 90, D11)
-    time.sleep(0.5)
+    wait(0.5)
     b.tap("e")
-    time.sleep(1.2)
+    wait(1.2)
     b.shot("region6-kid-eats")
     ok &= check(wait_flag(b, "kid_fed", 8) and carrying(b) is None, "a proper cone for the kid: he eats it", flags(b))
     ok &= check(js(b, f"{W}.foodGulls.gull_pool.off()"), "from now on he keeps the gulls off the pool deck")
-    time.sleep(3.0)
+    wait(3.0)
     ok &= check(b.state()["mode"] == "play", "and never squirts her again", b.state())
     # The machine has run empty; his bubble: the canister; the cold room; no hopping with it.
     ok &= check(swirl(1.5) != "stub" and carrying(b) is None and b.state()["mode"] == "play", "the machine has run empty")
     b.teleport(L["husbandX"] - 40, D11)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(js(b, f"{who('npc_husband')}.bubbleItems[0].visible") and js(b, f"{who('npc_husband')}.bubbleItems[1].texture.key") == "pict-canister",
                 "her husband's bubble: the canister")
     b.shot("region6-husband")
     b.teleport(door, D11)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     b.teleport(cold + 150, D11, "coldroom")
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(carrying(b) == "canister", "the ice cream mix's canister, from the cold room's shelf", carrying(b))
     y0 = b.state()["y"]
     b.hold("space", 0.3)
     ok &= check(b.state()["y"] == y0, "too heavy to hop with")
     b.teleport(door, D11, "coldroom")
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     b.teleport(L["machineX"] - 14, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     b.shot("region6-pour")
     ok &= check(wait_flag(b, "refilled", 6) and carrying(b) is None, "poured into the machine: it has mix for good", flags(b))
     # A proper cone, and the table with him.
     ok &= check(swirl(1.75) == "cone" and carrying(b) == "cone", "a cone again")
     b.teleport(L["husbandX"] - 30, D11)
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(js(b, f"{who('npc_husband')}.bubbleItems[1].texture.key") == "pict-softserve", "his bubble now: a soft serve")
     b.tap("e")
-    time.sleep(3.0)
+    wait(3.0)
     b.shot("region6-table")
     ok &= check(wait_flag(b, "table", 12), "E with it: she sits down with him, and they eat looking at the wake", flags(b))
     ok &= check(js(b, f"{S}.save.books['6']") == "held", "he gives her the sixth book")
@@ -3484,7 +3581,7 @@ def scenario_region6(b):
     b.shot("region6-picture")
     # With no errand left, a cone is hers.
     swirl(1.75)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["mode"] == "scripted" and carrying(b) is None, "a cone for herself, eaten where she stands", b.state())
     b.shot("region6-herself")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 5) and "sec_cone" in save_list(b, "seen"), "and done")
@@ -3492,12 +3589,12 @@ def scenario_region6(b):
     crates = js(b, f"{thing('haz_crates_11')}.x")
     b.eval(f"{S}.save.tangerines += 1; {S}.refreshHud()")
     b.teleport(crates - 90, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("d")
     b.hold("right", 0.9)
     ok &= check("haz_crates_11" in save_list(b, "broken") and js(b, f"{S}.tangerines.some(t => t.id.startsWith('tan_11_crates'))"),
                 "the dash goes through the crates: two tangerines were behind them", save_list(b, "broken"))
-    time.sleep(0.5)
+    wait(0.5)
     return ok
 
 
@@ -3512,9 +3609,9 @@ def scenario_region7(b):
     D7, UNIT = floor_y(7), 125
 
     def tap2(gap=0.2):
-        b.key("space", True); time.sleep(0.08); b.key("space", False)
-        time.sleep(gap)
-        b.key("space", True); time.sleep(0.08); b.key("space", False)
+        b.key("space", True); wait(0.08); b.key("space", False)
+        wait(gap)
+        b.key("space", True); wait(0.08); b.key("space", False)
 
     def calm(least=2.6):
         """Waits for the lull after a gust."""
@@ -3527,7 +3624,7 @@ def scenario_region7(b):
     enter_region6(b)
     bc = room(b, "balcabin9")
     b.teleport(bc["doors"][1]["outX"], D9, "promenade")
-    time.sleep(0.4)
+    wait(0.4)
     ok = check(7 not in save_list(b, "regions"), "without the socks the balcony is not region 7 yet", save_list(b, "regions"))
     enter_region7(b)
     ok &= check(7 in save_list(b, "regions") and "cp_balc_9" in lit(), "in the socks, out on the balcony: region 7; its door a checkpoint",
@@ -3539,7 +3636,7 @@ def scenario_region7(b):
     b.key("right", True)
     hold_until(b, [], lambda s: s["x"] > unit + 92, 3)
     tap2()
-    time.sleep(1.0)
+    wait(1.0)
     b.key("right", False)
     s = b.state()
     ok &= check(s["y"] == D9 and unit + UNIT < s["x"] < unit + 2 * UNIT, "a kick off the partition vaults it onto the next balcony", s)
@@ -3549,29 +3646,29 @@ def scenario_region7(b):
     b.hold("left", 0.9)
     b.key("up", True)
     for _ in range(4):
-        b.key("space", True); time.sleep(0.08); b.key("space", False)
-        time.sleep(0.27)
-    time.sleep(0.9)
+        b.key("space", True); wait(0.08); b.key("space", False)
+        wait(0.27)
+    wait(0.9)
     b.key("up", False)
     s = b.state()
     ok &= check(s["y"] == D10, "kicks with up held climb the pole to the balcony above", s)
     # A gust: in the air she is carried aft.
     b.teleport(unit + UNIT + 60, D10, "promenade")
     wait_js(b, f"{GUST} === 'blow'", 9)
-    time.sleep(0.1)
+    wait(0.1)
     x0 = b.state()["x"]
-    b.key("space", True); time.sleep(0.45); b.key("space", False)
-    time.sleep(0.6)
+    b.key("space", True); wait(0.45); b.key("space", False)
+    wait(0.6)
     s = b.state()
     ok &= check(s["x"] - x0 > 20 and s["mode"] == "play", "a gust carries her aft in the air", (x0, s))
     b.shot("region7-gust")
     # Down a deck: down and jump.
     calm(1.5)
-    b.key("down", True); time.sleep(0.1)
-    b.key("space", True); time.sleep(0.08); b.key("space", False)
-    time.sleep(0.2)
+    b.key("down", True); wait(0.1)
+    b.key("space", True); wait(0.08); b.key("space", False)
+    wait(0.2)
     b.key("down", False)
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(b.state()["y"] == D9, "down and jump drops her to the balcony below", b.state())
     # The balcony where Bumbot swiped at the gull: a tangerine.
     n = len(save_list(b, "collected"))
@@ -3598,9 +3695,9 @@ def scenario_region7(b):
     b.teleport(g["x0"] + 50, g["floor"], "promenade")
     ok &= check(wait_js(b, marked, 5), "lingering by a gull on the rail: it goes up, its shadow on her")
     b.hold("left", 0.45)
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.state()["mode"] == "play", "a step aside and it comes down on nothing", (b.state(), alert(b)))
-    time.sleep(3.2)
+    wait(3.2)
     b.teleport(g["x0"] + 50, g["floor"], "promenade")
     wait_js(b, marked, 6)
     got = scared(b, "Shoo", 3.0)
@@ -3613,45 +3710,45 @@ def scenario_region7(b):
     b.hold("right", 0.9)
     b.hold(["right", "space"], 0.7)
     ok &= check(b.state()["x"] < lx - 15, "the washing on the line stops her, walking or jumping", (b.state()["x"], lx))
-    b.key("down", True); time.sleep(0.15)
-    b.key("right", True); time.sleep(0.5)
+    b.key("down", True); wait(0.15)
+    b.key("right", True); wait(0.5)
     b.shot("region7-line")
-    time.sleep(0.9)
+    wait(0.9)
     b.key("right", False); b.key("down", False)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.state()["x"] > lx + 30, "she crawls under it", (b.state()["x"], lx))
     # The guest locked out on his balcony: he waves, his bubble a door; his door is shut from outside.
     gr = room(b, "guest10")
     gx = gr["doors"][1]["outX"]
     b.teleport(gx - 110, D10, "promenade")
-    time.sleep(0.8)
+    wait(0.8)
     guest = person(b, "npc_balcony_guest")
     ok &= check(guest["on"] and js(b, f"{W}.people.byId.npc_balcony_guest.bubbleItems[0].visible"), "the guest on his balcony: his bubble shows a door", guest)
     b.shot("region7-guest-out")
     b.teleport(gx, D10, "promenade")
     b.tap("e")
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(route(b) == "promenade" and "guest" not in flags(b), "his balcony door doesn't open from outside", route(b))
     ok &= check("cp_balc_guest" in lit(), "(a checkpoint all the same)", lit())
     # The ajar balcony cabin on deck 10 aft: in, and out of its corridor door into the hallway.
     ar = room(b, "balcabin10a")
     b.teleport(ar["doors"][1]["outX"], D10, "promenade")
-    time.sleep(0.3)
+    wait(0.3)
     b.shot("region7-ajar")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "balcabin10a" and "cp_balc_10a" in lit(), "the ajar balcony door: into the cabin", (route(b), lit()))
     b.shot("region7-cabin")
     b.teleport(ar["doors"][0]["x"], D10, "balcabin10a")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     s = b.state()
     ok &= check(route(b) == "inside" and s["y"] == D10 and "cp_hall_10a" in lit(), "out of its corridor door into deck 10's aft hallway", (route(b), s, lit()))
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "balcabin10a", "which opens from the hallway now", route(b))
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     # The tray by the "Do Not Disturb" door: run onto, she rides it off (3, 2026-11-18); and back at
     # the cabin's door.
     tr = js(b, f"{mover('haz_trays_10a2')}.def")
@@ -3662,7 +3759,7 @@ def scenario_region7(b):
     ok &= check(got, "running onto the tray by the door, she rides it off", (b.state(), alert(b)))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
     ok &= check(abs(s["x"] - ar["doors"][0]["outX"]) < 3 and route(b) == "inside", "she comes to at the cabin's door in the hallway", s)
-    time.sleep(2.0)
+    wait(2.0)
     b.teleport(tr["x1"] + 30, D10)
     b.hold(["left", "space"], 0.5)
     b.hold("left", 0.25)
@@ -3678,13 +3775,13 @@ def scenario_region7(b):
     ok &= check(b.state()["mode"] == "play", "short of it, no harm", b.state())
     # The guest's cabin, with the green card; his balcony door opened from inside: he comes in, the book.
     b.teleport(gr["doors"][0]["outX"], D10)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "guest10", "his cabin opens with the Housekeeping card", (route(b), alert(b)))
     b.teleport(gr["doors"][1]["x"], D10, "guest10")
     b.tap("e")
-    time.sleep(1.4)
+    wait(1.4)
     b.shot("region7-guest-in")
     ok &= check(wait_flag(b, "guest", 10), "E at his balcony door: he is let in", flags(b))
     ok &= check(js(b, "window.__ship.save.books['7']") == "held", "his thanks: the seventh book", js(b, "JSON.stringify(window.__ship.save.books)"))
@@ -3693,20 +3790,20 @@ def scenario_region7(b):
     b.shot("region7-guest-home")
     b.teleport(gr["doors"][1]["x"], D10, "guest10")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "promenade" and b.state()["y"] == D10, "and his balcony door is a way out, and in, for good", (route(b), b.state()))
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "guest10", "(in)", route(b))
     # Deck 8 midships: its aired cabin, the steward on his rounds across the hallway.
     mr = room(b, "balcabin8m")
     b.teleport(mr["doors"][1]["outX"], D8, "promenade")
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     b.teleport(mr["doors"][0]["x"], D8, "balcabin8m")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "inside" and b.state()["y"] == D8, "through deck 8's aired cabin into its hallway", (route(b), b.state()))
     rd = mover("haz_steward_rounds")
     js(b, f"(r => {{ r.x = r.def.stops[0] + 30; r.dir = 1; r.until = 0; r.aside = false; }})({rd})")
@@ -3735,31 +3832,31 @@ def scenario_region7(b):
     # The first balcony of all: the framed picture.
     sl = js(b, f"(t => ({{ x: t.x, y: t.y }}))({W}.things.find(t => t.id === 'slot_balcony'))")
     b.teleport(sl["x"], D8, "promenade")
-    time.sleep(0.3)
+    wait(0.3)
     b.shot("region7-slot")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(b.state()["mode"] == "scripted", "the photo on deck 8's first balcony opens", b.state())
     b.tap("e")
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(b.state()["mode"] == "play" and "slot_balcony" in save_list(b, "seen"), "and closes on a key", b.state())
     # Down to the boat walkway, and up one of its columns again.
     col_x = exact_x(142.3)
     b.teleport(col_x - 40, D8, "promenade")
     calm(1.0)
-    b.key("down", True); time.sleep(0.1)
-    b.key("space", True); time.sleep(0.08); b.key("space", False)
-    time.sleep(0.2)
+    b.key("down", True); wait(0.1)
+    b.key("space", True); wait(0.08); b.key("space", False)
+    wait(0.2)
     b.key("down", False)
-    time.sleep(1.0)
+    wait(1.0)
     s = b.state()
     ok &= check(s["y"] == D7 and s["mode"] == "play", "from deck 8's balcony a drop to the boat walkway", s)
     b.hold("right", 0.2)
     b.key("up", True)
     for _ in range(4):
-        b.key("space", True); time.sleep(0.08); b.key("space", False)
-        time.sleep(0.27)
-    time.sleep(1.0)
+        b.key("space", True); wait(0.08); b.key("space", False)
+        wait(0.27)
+    wait(1.0)
     b.key("up", False)
     ok &= check(b.state()["y"] == D8, "and up a white column again, kick after kick", b.state())
     # The drill: under the boat as it comes down; and the security officer at the tender.
@@ -3780,7 +3877,7 @@ def scenario_region7(b):
     rv = person(b, "riv_walkway")
     ok &= check(rv["on"], "the security officer looks into a tender on the walkway", rv)
     b.teleport(rv["x"] - 200, D7, "promenade")
-    time.sleep(0.5)
+    wait(0.5)
     b.shot("region7-rival")
     b.hold("right", 0.6)
     ok &= check(wait_flag(b, "riv_walkway", 6), "seen, he hurries off aft", flags(b))
@@ -3799,9 +3896,9 @@ def coffee_for_the_engineer(b):
     technical ladder."""
     src = b.eval("window.__ship.world.things.find(t => t.id === 'src_coffee').x")
     b.teleport(src - 6, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     if carrying(b) != "coffee":
         return False
     (x0, y0), (x1, y1) = flight_feet("stairs-aft-11-12")
@@ -3817,7 +3914,7 @@ def coffee_for_the_engineer(b):
         return False
     e = person(b, "npc_engineer")
     b.teleport(e["x"] + 40, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
     return wait_flag(b, "engineer", 16)
 
@@ -3830,7 +3927,7 @@ def scenario_region8(b):
     engineer's book, the telescope, and the glide down the atrium."""
     enter_region7(b)
     b.eval("(P => { ['guest', 'riv_walkway'].forEach(f => P.setFlag(f)); P.open('regions', 7); })(window.__ship.progress)")
-    time.sleep(1.0)
+    wait(1.0)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     W, T = "window.__ship.world", "window.__ship.world.data.topdeck"
     NOW = "window.__ship.time.now"
@@ -3841,11 +3938,11 @@ def scenario_region8(b):
     ok = check("cp_garden" in lit(), "the Garden Cafe's service door is lit on the way", lit())
     s = climb(b, "stairs-aft-11-12", 0.8)
     ok &= check(s["y"] == D11 and "BIG GAME" in alert(b), "the aft flight up to deck 12 is roped off: the fans", alert(b))
-    time.sleep(1.0)
+    wait(1.0)
     src = b.eval(f"{W}.things.find(t => t.id === 'src_coffee').x")
     b.teleport(src - 6, D11)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(not carrying(b), "no coffee to take before the engineer has asked", carrying(b))
     # The climb from the machine: a kick up the sun cover's post, along the cover, over the rail.
     # (Early in a lull of the terrace's gusts: a jump in one falls short.)
@@ -3853,14 +3950,14 @@ def scenario_region8(b):
     wait_js(b, tg, 9)
     b.teleport(exact_x(233) + 13, D11)
     b.key("space", True)
-    time.sleep(0.34)
+    wait(0.34)
     b.key("space", False)
-    time.sleep(0.02)
+    wait(0.02)
     b.key("left", True)
     b.key("space", True)
-    time.sleep(0.2)
+    wait(0.2)
     b.key("space", False)
-    time.sleep(1.0)
+    wait(1.0)
     b.key("left", False)
     s = b.state()
     ok &= check(s["y"] < D11 - 100, "a kick off the sun cover's post lands her on the cover", s)
@@ -3880,7 +3977,7 @@ def scenario_region8(b):
     b.teleport(g["x"] - 40, D12)
     got = scared(b, "Shoo", 6.0)
     ok &= check(got, "lingering by the gull on the terrace's rail: swooped")
-    time.sleep(3.0)
+    wait(3.0)
     s = b.state()
     ok &= check(s["y"] == D11 and abs(s["x"] - exact_x(192)) < 40, "she comes back at the Garden Cafe's door, a deck down", s)
     # Up the aft stairs now, and aft to Los Lobos: the pinata hangs in the way.
@@ -3892,19 +3989,19 @@ def scenario_region8(b):
     s = b.state()
     ok &= check(abs(s["x"] - (px - 16)) < 6, "walking, the pinata stops her", s["x"] - px)
     b.key("down", True)
-    time.sleep(0.15)
+    wait(0.15)
     b.key("right", True)
-    time.sleep(1.5)
+    wait(1.5)
     b.key("right", False)
     b.key("down", False)
-    time.sleep(0.3)
+    wait(0.3)
     s = b.state()
     ok &= check(s["x"] > px + 40 and "sec_pinata" not in save_list(b, "broken"), "on hands and knees she goes under it", s["x"] - px)
     b.eval("window.__ship.save.tangerines = Math.max(window.__ship.save.tangerines, 1)")
     b.tap("d")
-    time.sleep(0.1)
+    wait(0.1)
     b.hold("left", 1.1)
-    time.sleep(0.4)
+    wait(0.4)
     took = [t for t in save_list(b, "collected") if "pinata" in t]
     ok &= check("sec_pinata" in save_list(b, "broken") and len(took) == 3, "the dash goes through it: three tangerines come down", took)
     b.shot("region8-pinata")
@@ -3913,7 +4010,7 @@ def scenario_region8(b):
     fl = f"{W}.story.flares[1].phase({NOW})[0]"
     b.teleport(f["x"] + f["half"] + 16, D12)
     wait_js(b, fl + " === 'on'", 9)
-    time.sleep(0.4)
+    wait(0.4)
     b.shot("region8-flare")
     wait_js(b, fl + " === 'calm'", 4)
     s = hold_until(b, "left", lambda s: s["x"] < f["x"] - f["half"] - 10, 4)
@@ -3921,28 +4018,28 @@ def scenario_region8(b):
     b.teleport(f["x"] + 14, D12)
     got = scared(b, "Hot", 8.0)
     ok &= check(got, "at the grill when it flares: singed")
-    time.sleep(3.0)
+    wait(3.0)
     b.eval(f"{W}.carryBox.take('coffee')")
     b.teleport(f["x"] + 14, D12)
-    end = time.time() + 8
-    while time.time() < end and carrying(b):
-        time.sleep(0.1)
-    time.sleep(0.4)
+    end = now() + 8
+    while now() < end and carrying(b):
+        wait(0.1)
+    wait(0.4)
     ok &= check(not carrying(b) and b.state()["mode"] == "play", "with a tray a flare only spills it", (carrying(b), b.state()))
     # The engineer at the technical ladder: its chain; his coffee, still hot.
     F = b.eval(f"{T}.funnel")
     b.teleport(F["ladderX"], D12)
     b.hold("up", 0.6)
     ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in alert(b), "the technical ladder is chained off", alert(b))
-    time.sleep(1.0)
+    wait(1.0)
     b.eval(f"{W}.carryBox.take('coffee'); {W}.carryBox.until = {NOW} + 1200")
-    time.sleep(1.8)
+    wait(1.8)
     ok &= check(not carrying(b), "a coffee gone cold is no use: it is put down", carrying(b))
     ok &= check(coffee_for_the_engineer(b), "a hot coffee from the Great Outdoors, up the aft stairs, past the flares: he drinks it and climbs the ladder",
                 (carrying(b), flags(b)[-3:]))
     ok &= check("cp_technical" in lit(), "the technical door is lit on the way", lit())
     b.shot("region8-engineer")
-    time.sleep(0.4)
+    wait(0.4)
     b.teleport(F["ladderX"], D12)
     b.hold("up", 3.0)
     s = b.state()
@@ -3950,24 +4047,24 @@ def scenario_region8(b):
     # The old lady, before the horn: a block; a jump clears her sunbed; her mojito.
     L = b.eval(f"{T}.lady")
     b.teleport(L["x"] + 130, D12)
-    time.sleep(0.5)
+    wait(0.5)
     b.hold("left", 1.2)
     s = b.state()
     ok &= check(abs(s["x"] - (L["x"] + L["half"] + 7)) < 3, "the old lady's sunbed is across the walk", s["x"] - L["x"])
     ok &= check(person(b, "riv_sundeck")["on"], "the security officer is at the loungers", person(b, "riv_sundeck"))
     b.shot("region8-lady")
-    time.sleep(2.4)
+    wait(2.4)
     b.eval("window.__ship.lockedUntil = 0")
     b.hold(["left", "space"], 1.0)
-    time.sleep(0.3)
+    wait(0.3)
     s = b.state()
     ok &= check(s["x"] < L["x"] - L["half"] and s["mode"] == "play", "a jump takes her over it", s["x"] - L["x"])
     b.eval(f"{W}.carryBox.drop()")
     go(b, 11, 155.38)
     b.teleport(b.eval(f"{W}.things.find(t => t.id === 'src_cocktail').x") - 4, D11)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(carrying(b) == "cocktail", "a mojito from Topsiders' bar", carrying(b))
     s = climb(b, "stairs-midship-11-12", 3.4)
     ok &= check(s["y"] == D12 and carrying(b) == "cocktail", "up the midship flight with it: the paint is dry", s)
@@ -3977,7 +4074,7 @@ def scenario_region8(b):
     ok &= check(s["x"] < L["x"] - L["half"], "with a tray a hop does not clear the sunbed", s["x"] - L["x"])
     b.tap("e")
     ok &= check(wait_flag(b, "lady", 12), "E with the mojito: she drinks it and dozes off", flags(b)[-3:])
-    time.sleep(0.6)
+    wait(0.6)
     b.hold("left", 0.7)
     took = [t for t in save_list(b, "collected") if "lady" in t]
     ok &= check(len(took) == 2, "two tangerines out of her bag", took)
@@ -3987,51 +4084,51 @@ def scenario_region8(b):
     b.teleport(bl["x"] + 80, D12)
     got = scared(b, "Ouch", 9.0)
     ok &= check(got, "in the way of a ball off the hoop: bonked")
-    time.sleep(3.0)
+    wait(3.0)
     c = b.eval(f"{T}.court")
     b.teleport(c["ballX"] - 6, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     b.shot("region8-court")
-    time.sleep(3.2)
+    wait(3.2)
     ok &= check("sec_court" in save_list(b, "seen") and b.state()["mode"] == "play", "E at the ball by the court: she shoots", save_list(b, "seen")[-3:])
     # The funnel's stairway: no climbing in a gust.
     fn = b.eval(f"{W}.data.funnel")
     G = f"{W}.story.funnelGusts.phase({NOW})"
     b.teleport(fn["foot"][0], fn["foot"][1])
-    time.sleep(0.4)
+    wait(0.4)
     wait_js(b, G + " === 'calm'", 8)
     b.key("up", True)
     wait_js(b, G + " === 'blow'", 8)
-    time.sleep(0.3)
+    wait(0.3)
     slipped = b.eval("window.__ship.stairSlip") or "Whoa" in alert(b)
     b.shot("region8-slip")
-    time.sleep(0.5)
+    wait(0.5)
     b.key("up", False)
     ok &= check(slipped, "climbing into a gust on the stairway: her feet go, and she slides back", (b.state(), alert(b)))
     # (The gulls: one comes down at where she stands; keeping still there, she is swooped.)
     b.eval(f"{W}.story.funnelWind.cycle = -1; {W}.story.funnelWind.def.swoop = 5")
-    end = time.time() + 30
+    end = now() + 30
     got = False
-    while time.time() < end and not got:
+    while now() < end and not got:
         ph = b.eval(G)
         st = b.eval(f"{W}.story.funnelWind.state")
         b.key("up", ph == "calm" and st == "circle" and b.state()["y"] > fn["shoulder"][1] - 120)
         got = "Shoo" in alert(b)
-        time.sleep(0.05)
+        wait(0.05)
     b.key("up", False)
     ok &= check(got, "standing where a gull has marked her on the stairway: swooped", b.state())
-    time.sleep(3.0)
+    wait(3.0)
     s = b.state()
     ok &= check(s["y"] == D12 and abs(s["x"] - exact_x(165)) < 30, "she comes back at the technical door", s)
     b.eval(f"{W}.story.funnelWind.def.swoop = 1000")
     b.teleport(fn["foot"][0], fn["foot"][1])
-    time.sleep(0.4)
-    end = time.time() + 45
-    while time.time() < end and b.state()["y"] > fn["y"]:
+    wait(0.4)
+    end = now() + 45
+    while now() < end and b.state()["y"] > fn["y"]:
         b.key("up", b.eval(G) == "calm")
-        time.sleep(0.05)
+        wait(0.05)
     b.key("up", False)
     s = b.state()
     ok &= check(s["y"] == fn["y"] and s["mode"] == "play", "climbing in the lulls she reaches the funnel's top", s)
@@ -4040,14 +4137,14 @@ def scenario_region8(b):
     ok &= check(person(b, "npc_engineer_cord")["on"], "he is up there, by the cord", person(b, "npc_engineer_cord"))
     # The horn, and what it sets off.
     b.teleport(F["hornX"] - 4, fn["y"])
-    time.sleep(0.4)
+    wait(0.4)
     b.shot("region8-horn-before")
     b.tap("e")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check(b.state()["mode"] == "scripted", "E at the cord: she pulls it", b.state())
-    time.sleep(3.6)
+    wait(3.6)
     b.shot("region8-sundeck")
-    time.sleep(5.2)
+    wait(5.2)
     b.shot("region8-bow")
     ok &= check(wait_flag(b, "horn", 16), "the horn has sounded; the view comes back to her", flags(b)[-3:])
     cam = b.eval("(c => [c.worldView.centerX, c.worldView.centerY])(window.__ship.cameras.main)")
@@ -4057,62 +4154,62 @@ def scenario_region8(b):
     gone = b.eval(f"{W}.things.filter(t => t.id.startsWith('gull_bow')).every(t => !{W}.shown(t))")
     ok &= check(gone, "the gulls have left the bow")
     b.tap("e")
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.state()["mode"] == "play" and "horn" in flags(b), "the cord again: a toot, no more", b.state())
     # His book; the telescope.
     e = person(b, "npc_engineer_read")
     ok &= check(e["on"], "the engineer is on his break, reading", e)
     b.teleport(e["x"] - 30, fn["y"])
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
-    time.sleep(2.6)
+    wait(2.6)
     ok &= check(b.eval("window.__ship.save.books['9']") == "held", "E: he lends her his book, the ninth", b.eval("window.__ship.save.books"))
     b.teleport(F["telescopeX"] - 4, fn["y"])
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(2.8)
+    wait(2.8)
     b.shot("region8-telescope")
     cam = b.eval("(c => [c.worldView.centerX, c.worldView.centerY])(window.__ship.cameras.main)")
     ok &= check(abs(cam[0] - F["look"]["x"]) < 40 and abs(cam[1] - F["look"]["y"]) < 60, "E at the telescope: deck 8's first balcony, and the frame on its wall", cam)
-    time.sleep(3.2)
+    wait(3.2)
     ok &= check(b.state()["mode"] == "play" and "sec_telescope" in save_list(b, "seen"), "and back", b.state())
     # On the sun deck: the card where he dropped it, the parasol and the book at the empty sunbed.
     ok &= check(take_card(b, "off"), "the Officer's card lies on the sun deck")
     b.teleport(L["x"] + 100, D12)
     s = hold_until(b, "left", lambda s: s["x"] < L["x"] + 40, 3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check("parasol" in save_list(b, "verbs"), "her parasol, left leaning on the sunbed", save_list(b, "verbs"))
     b.shot("region8-parasol")
     b.eval("window.__ship.lockedUntil = 0")
     s = hold_until(b, "left", lambda s: s["x"] < L["x"] - 14, 3)
     ok &= check(s["x"] < L["x"], "the sunbed is no block now", s["x"] - L["x"])
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.eval("window.__ship.save.books['8']") == "held", "and her book, the eighth, on it", b.eval("window.__ship.save.books"))
     # The glide: over an atrium walk's rail on deck 10, down to the atrium's floor on deck 5.
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     go(b, 10, 92)
-    time.sleep(0.6)
+    wait(0.6)
     b.key("space", True)
-    time.sleep(1.2)
+    wait(1.2)
     b.key("space", False)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.state()["y"] == D10, "a jump with the key held leaves her on the walk", b.state())
     b.key("down", True)
-    time.sleep(0.12)
+    wait(0.12)
     b.key("space", True)
-    time.sleep(0.1)
+    wait(0.1)
     b.key("down", False)
-    time.sleep(1.8)
+    wait(1.8)
     b.shot("region8-glide")
     s = b.state()
     ok &= check(s["y"] > D10 + 30 and b.eval("window.__ship.gliding"), "↓ and jump: over the rail, the parasol opens", s)
-    end = time.time() + 20
-    while time.time() < end and b.state()["y"] < D5:
-        time.sleep(0.1)
+    end = now() + 20
+    while now() < end and b.state()["y"] < D5:
+        wait(0.1)
     b.key("space", False)
-    time.sleep(0.4)
+    wait(0.4)
     s = b.state()
     ok &= check(s["y"] == D5 and s["mode"] == "play", "and she floats down past five decks to the atrium's floor", s)
     b.shot("region8-atrium-floor")
@@ -4125,18 +4222,18 @@ def cake_for_the_planner(b):
     the planner at Champs' door. (The steady walk past the court is `region9`'s.)"""
     pl = person(b, "npc_planner")
     b.teleport(pl["x"] + 80, D12)
-    time.sleep(0.5)
+    wait(0.5)
     if "cake_asked" not in flags(b):
         return False
     src = b.eval("window.__ship.world.things.find(t => t.id === 'src_cake').x")
     b.teleport(src + 8, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     if carrying(b) != "cake":
         return False
     b.teleport(pl["x"] + 34, D12)
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
     return wait_flag(b, "wedding", 30)
 
@@ -4146,10 +4243,10 @@ def enter_region9(b):
     the parasol), she stands in Champs, aft of the wedding planner."""
     enter_region8(b)
     b.eval("(P => { ['engineer', 'horn', 'lady'].forEach(f => P.setFlag(f)); P.open('cards', 'off'); P.learn('parasol'); })(window.__ship.progress)")
-    time.sleep(0.8)
+    wait(0.8)
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(exact_x(95), D12)
-    time.sleep(0.4)
+    wait(0.4)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
 
 
@@ -4168,66 +4265,66 @@ def scenario_region9(b):
     # The wedding: the door is roped off, the party beyond it; no cake to take before she is asked.
     src = b.eval(f"{W}.things.find(t => t.id === 'src_cake').x")
     b.teleport(src + 8, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(not carrying(b), "the cake is not hers to take before the planner has asked", carrying(b))
     pl = person(b, "npc_planner")
     # (From the lobby's side: at Champs' side the planner is in reach, and E is hers.)
     b.teleport(exact_x(82) + 60, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("left", 0.6)
     s = b.state()
     ok &= check(s["x"] > exact_x(82) and not door_open(b, "part-door-12-82"), "Champs' door to the forward lobby: shut, the wedding's rope across it", s["x"] - exact_x(82))
     ok &= check(person(b, "amb_wed_bride")["on"] and not person(b, "amb_cer_bride")["on"], "the party waits in the lobby", person(b, "amb_wed_bride"))
     b.teleport(pl["x"] + 110, D12)
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check("cake_asked" in flags(b) and b.eval(f"{W}.people.byId.npc_planner.bubbleItems[0].visible"), "near the planner: her bubble, a cake", flags(b)[-3:])
     b.teleport(pl["x"] + 34, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.5)
+    wait(0.5)
     ok &= check("wedding" not in flags(b) and b.state()["mode"] == "play", "E without it: nothing yet")
     b.shot("region9-planner")
     # The cake: every start and stop sets it swaying; too much and it goes over.
     b.teleport(src + 8, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(carrying(b) == "cake", "E at the cake on its table: in her hands", carrying(b))
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     sigh = False
     for _ in range(5):
         b.hold("right", 0.2)
-        time.sleep(0.16)
-    end = time.time() + 2.5
-    while time.time() < end and not sigh:
+        wait(0.16)
+    end = now() + 2.5
+    while now() < end and not sigh:
         sigh = b.eval(f"{W}.people.byId.npc_pastrychef.sprite.anims.currentAnim?.key") == "people-pastrychef-sigh"
-        time.sleep(0.05)
+        wait(0.05)
     ok &= check(not carrying(b), "starts and stops in a row: it goes over", (carrying(b), b.eval(f"{W}.carryBox.wobble")))
     ok &= check(sigh, "the pastry chef sighs", b.eval(f"{W}.people.byId.npc_pastrychef.sprite.anims.currentAnim?.key"))
-    time.sleep(1.8)
+    wait(1.8)
     # Carried steadily it arrives: one go to the court, a wait while it settles, on to the planner.
     b.teleport(src + 8, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.3)
+    wait(0.3)
     b.key("left", True)
-    time.sleep(0.3)
+    wait(0.3)
     w1 = b.eval(f"{W}.carryBox.wobble")
     b.shot("region9-cake")
     s = hold_until(b, "left", lambda s: s["x"] < exact_x(162), 6)
     w2 = b.eval(f"{W}.carryBox.wobble")
     ok &= check(carrying(b) == "cake" and 0.1 < w1 < 0.5, "setting off sets it swaying", w1)
     ok &= check(carrying(b) == "cake" and w2 < w1, "a steady walk to the court settles it", (w1, w2))
-    time.sleep(1.2)
+    wait(1.2)
     b.teleport(pl["x"] + 200, D12)
-    time.sleep(0.3)
+    wait(0.3)
     s = hold_until(b, "left", lambda s: s["x"] < pl["x"] + 36, 6)
     ok &= check(carrying(b) == "cake", "and on through Champs to the planner", (carrying(b), b.eval(f"{W}.carryBox.wobble")))
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(3.5)
+    wait(3.5)
     b.shot("region9-wedding")
     ok &= check(wait_flag(b, "wedding", 30), "E with the cake: the party files into the chapel", flags(b)[-3:])
     ok &= check(not person(b, "amb_wed_bride")["on"] and not person(b, "npc_planner")["on"], "the lobby is clear")
@@ -4240,49 +4337,49 @@ def scenario_region9(b):
     hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
     ok &= check("cp_chapel" in save_list(b, "activated"), "the chapel lobby's crew door: a checkpoint")
     b.teleport(B["wedding"]["chapelX"], D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(2.6)
+    wait(2.6)
     ok &= check(route(b) == "chapel" and person(b, "amb_cer_bride")["on"], "E at the chapel's door: the couple at the altar, the guests", route(b))
     b.shot("region9-ceremony")
     ok &= check(wait_flag(b, "ceremony", 12), "the ceremony: a kiss", flags(b)[-3:])
     ok &= check(b.eval(f"{W}.things.find(t => t.id === 'slot_chapel').items[0].visible"), "and a frame on the chapel's wall that was not there")
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(route(b) == "inside", "out again", route(b))
     # The Spinnaker: two tangerines on the bar, a few notes on the piano.
     b.teleport(exact_x(57), D12)
     hold_until(b, "left", lambda s: s["x"] < exact_x(54.8), 4)
     ok &= check(got("tan_12_spinnaker"), "the Spinnaker's bar: its tangerines", save_list(b, "collected")[-3:])
     b.teleport(B["piano"]["x"] + 5, D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(b.state()["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key") == "her-keys", "E at the grand piano: she plays", b.eval(f"{S}.player.anims.currentAnim?.key"))
     b.shot("region9-piano")
-    time.sleep(2.4)
+    wait(2.4)
     ok &= check("sec_piano" in seen() and b.state()["mode"] == "play", "a few notes, and back")
     # The kids' pool: up the slide's ladder, down its chute, into the water.
     b.teleport(B["slide"]["ladderX"], D12)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.9)
+    wait(0.9)
     b.shot("region9-slide")
     s = hold_until(b, [], lambda s: s["mode"] == "swim", 5)
     ok &= check(s["mode"] == "swim" and "sec_slide" in seen(), "E at the slide: down it and into the kids' pool", s)
     # The spa (deck 11): open now; the steam at the sauna's aft door.
     b.teleport(exact_x(74) + 16, D11)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(door_open(b, "spa-door"), "the spa's door opens from the lobby now")
     st = B["steam"]
     b.teleport(st["x"] + 30, D11)
     ok &= check(scared(b, "Pfff", 7.0), "in the way of the sauna's steam: fogged")
-    time.sleep(2.6)
+    wait(2.6)
     b.eval("window.__ship.lockedUntil = 0")
     rec = person(b, "amb_spa_reception")
     b.teleport(rec["x"] + 60, D11)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(b.eval(f"{W}.people.byId.amb_spa_reception.sprite.anims.currentAnim?.key") == "people-spa_reception-bow", "the spa's receptionist bows")
     hold_until(b, "left", lambda s: s["x"] < rec["x"] - 34, 3)
     ok &= check(got("tan_11_spa"), "the tangerine on her desk", save_list(b, "collected")[-3:])
@@ -4298,66 +4395,66 @@ def scenario_region9(b):
     ok &= check(person(b, "riv_bridge")["on"], "on the bridge the security officer is creeping up on him", person(b, "riv_bridge"))
     b.teleport(exact_x(40) + 16, D10)
     b.tap("e")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(door_open(b, "bridge-door"), "the bridge's door")
     b.hold("left", 1.2)
     b.shot("region9-bridge")
     b.hold("left", 2.0)
-    time.sleep(1.6)
+    wait(1.6)
     b.shot("region9-alarm")
     ok &= check(wait_flag(b, "bb6", 20), "near-catch 6: his net comes down on the alarm panel", flags(b)[-3:])
     ok &= check("alarm" in flags(b) and b.eval(f"{W}.gates.find(g => g.needs === 'alarm').tiles.every(t => t.alpha === 1)"), "the alarm; the hatch's ladder is down")
     ok &= check(person(b, "riv_bridge_sat")["on"] and not person(b, "riv_bridge")["on"], "the security officer sits on the floor, done for the day")
     b.teleport(exact_x(37.5) + 4, D10)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(b.eval(f"{S}.save.books['10']") == "held", "the captain's book on the chart table: the tenth", b.eval(f"{S}.save.books"))
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     # Deck 9: the officers' corridor, the captain's door.
     go(b, 9, 78)
     ok &= check(use_door(b, 9, 74, 1), "the Officer's card opens deck 9's officers' corridor")
     b.teleport(B["captain"]["x"] + 6, D9)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(0.7)
+    wait(0.7)
     ok &= check(b.state()["mode"] == "scripted" and b.eval(f"{S}.player.anims.currentAnim?.key") == "her-knock", "E at the captain's door: a polite knock", b.eval(f"{S}.player.anims.currentAnim?.key"))
     b.shot("region9-knock")
-    time.sleep(3.6)
+    wait(3.6)
     ok &= check("sec_captain" in seen() and b.state()["mode"] == "play", "nobody answers")
     # Deck 7: the kids' clubs behind the lobby's gold door: the ball pit, the fort.
     go(b, 7, 78)
     ok &= check(use_door(b, 7, 74, 1), "the Officer's card opens the kids' clubs")
     pit = B["pit"]
     b.teleport(pit["x1"] + 40, D7)
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("left", 0.5)
     s = b.state()
     ok &= check(s["x"] > pit["x1"] - 2, "the ball pit's padded wall stops her feet", s["x"] - pit["x1"])
     b.key("left", True)
     b.tap("space", 0.25)
-    time.sleep(0.7)
+    wait(0.7)
     x0 = b.state()["x"]
-    time.sleep(0.5)
+    wait(0.5)
     x1 = b.state()["x"]
     b.shot("region9-ballpit")
     ok &= check(b.eval(f"{S}.wading") and 25 < x0 - x1 < 60, "over it with a hop: she wades, at half her speed", (b.eval(f"{S}.wading"), x0 - x1))
     b.key("left", False)
     # (The hop may carry her over it: back to it through the balls.)
-    time.sleep(0.2)
+    wait(0.2)
     s = b.state()
     hold_until(b, "right" if s["x"] < pit["tanX"] else "left", lambda s: abs(s["x"] - pit["tanX"]) < 6, 5)
     ok &= check(got("tan_7_ballpit"), "one of the balls is a tangerine", save_list(b, "collected")[-3:])
     hold_until(b, "left", lambda s: s["x"] < pit["x0"] + 16, 5)
     b.key("left", True)
     b.tap("space", 0.25)
-    time.sleep(0.8)
+    wait(0.8)
     b.key("left", False)
     s = b.state()
     ok &= check(s["x"] < pit["x0"] and not b.eval(f"{S}.wading"), "and out over the far wall", s["x"] - pit["x0"])
     fort = b.eval(f"(t => ({{ x0: t.x0, x1: t.x1 }}))({W}.lows.find(t => t.id === 'haz_fort_7'))")
     b.teleport(fort["x1"] + 60, D7)
-    time.sleep(0.3)
+    wait(0.3)
     b.hold("left", 0.8)
     s = b.state()
     ok &= check(s["x"] > fort["x1"] - 4, "the pillow fort across Splash Academy stops her", s["x"] - fort["x1"])
@@ -4371,21 +4468,21 @@ def scenario_region9(b):
     # The Library's odd book: stuck while there are gaps on the shelf; with all ten back, the nook.
     N = B["nook"]
     b.teleport(N["x"] + 16, D6)
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
-    time.sleep(0.25)
+    wait(0.25)
     pulled = b.state()["mode"] == "scripted"
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(pulled and "nook" not in flags(b) and b.state()["mode"] == "play", "the odd book on the Library's bookcase: she pulls, it is stuck", (pulled, flags(b)[-2:]))
     b.eval("(s => { for (let n = 1; n <= 10; n++) s.save.books[n] = 'returned'; s.world.library.refresh(); s.progress.setFlag('books_all'); })(window.__ship)")
-    time.sleep(0.4)
+    wait(0.4)
     b.tap("e")
     b.shot("region9-oddbook")
     ok &= check(wait_flag(b, "nook", 8), "with all ten books back: it tips, and the bookcase swings open", flags(b)[-2:])
     b.teleport(N["x"], D6)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.0)
+    wait(1.0)
     b.shot("region9-nook")
     ok &= check(route(b) == "nook", "E in the doorway: the reading nook", route(b))
     ok &= check(b.eval(f"!!{W}.things.find(t => t.id === 'slot_nook')"), "a frame on its wall")
@@ -4398,10 +4495,10 @@ def enter_region10(b):
     stands on the bridge by the hatch's ladder."""
     enter_region9(b)
     b.eval("(P => { ['cake_asked', 'wedding', 'ceremony', 'bb6', 'alarm'].forEach(f => P.setFlag(f)); })(window.__ship.progress)")
-    time.sleep(1.2)
+    wait(1.2)
     b.eval("window.__ship.world.refresh(); window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
     b.teleport(b.eval("window.__ship.world.gates[0].x") + 40, D10)
-    time.sleep(0.4)
+    wait(0.4)
 
 
 def out_of_the_hatch(b):
@@ -4427,7 +4524,7 @@ def glide_to_the_bow(b):
     b.key("left", False)
     hold_until(b, [], lambda s: s["mode"] != "play" or (s["y"] >= D7 - 34 and b.eval("window.__ship.grounded")), 16)
     b.key("space", False)
-    time.sleep(0.4)
+    wait(0.4)
     return b.state()
 
 
@@ -4443,13 +4540,13 @@ def home_with_him(b):
     key; true once the day after has come."""
     H = b.eval("window.__ship.world.data.finale.home")
     b.teleport(exact_x(52), D8)
-    time.sleep(0.5)
+    wait(0.5)
     hold_until(b, "left", lambda s: s["x"] < H["x0"] + 59 + 3, 10)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
     if not wait_js(b, "!!window.__ship.world.story.winItems", 25):
         return False
-    time.sleep(2.8)
+    wait(2.8)
     b.shot("finale-win")
     b.tap("e")
     return wait_flag(b, "home", 8)
@@ -4475,7 +4572,7 @@ def scenario_finale(b):
     s = b.state()
     ok &= check(s["y"] == D11 and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa", s)
     ok &= check(wait_js(b, "window.__ship.mode === 'scripted'", 3), "the sunset's scene begins", b.state())
-    time.sleep(6.0)
+    wait(6.0)
     b.shot("finale-sunset")
     ok &= check(b.eval("window.__ship.dusk") > 0.9, "the sky has turned", b.eval("window.__ship.dusk"))
     ok &= check(abs(b.eval("window.__ship.cameras.main.midPoint.y") - D7) < 80, "the camera is down at the tip of the bow")
@@ -4492,9 +4589,9 @@ def scenario_finale(b):
     wait_js(b, f"{S}.finaleWind.phase({W}.scene.time.now) === 'blow'", 6)
     b.eval("window.__ship.player.body.velocity.y = -330")
     x0 = b.state()["x"]
-    time.sleep(0.45)
+    wait(0.45)
     ok &= check(b.state()["x"] > x0 + 12, "a gust carries her aft in the air", (x0, b.state()["x"]))
-    time.sleep(1.2)
+    wait(1.2)
     # A glide into a gull: "Swooped", and back on the balcony.
     b.eval(f"(c => {{ c.parked = true; c.birds[1].x = 0; window.__iv = setInterval(() => {{ c.birds[0].x = window.__ship.player.x; }}, 16); }})({S}.crossers)")
     fresh_lull()
@@ -4507,22 +4604,22 @@ def scenario_finale(b):
     ok &= check(s["mode"] == "scripted" and alert(b) == "Shoo!" and s["y"] > D11 + 100, "flown into a gull: the parasol is knocked from her hands", (s, alert(b)))
     b.shot("finale-gull")
     b.eval(f"(c => {{ clearInterval(window.__iv); c.birds[0].x = 0; }})({S}.crossers)")
-    time.sleep(2.8)
+    wait(2.8)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and she is back on the balcony", s)
     # Over the rail at the tip: the sea; back on the balcony too.
     b.teleport(Mo["x0"] + 60, D7)
-    time.sleep(0.4)
+    wait(0.4)
     b.key("left", True)
     for _ in range(8):
         b.tap("space", 0.25)
-        time.sleep(0.35)
+        wait(0.35)
         if b.state()["mode"] != "play":
             break
     b.key("left", False)
     s = hold_until(b, [], lambda s: s["mode"] != "play", 6)
     ok &= check(s["mode"] == "scripted" and s["x"] < exact_x(0.5), "past the tip: overboard", s)
-    time.sleep(4.5)
+    wait(4.5)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and back on the balcony", s)
     # (That jump at the tip sent Bumbot off already: back to his place, as if she had not been.)
@@ -4536,10 +4633,10 @@ def scenario_finale(b):
     # Coming at him, he backs off; cornered at the tip, he darts past her.
     cat = lambda: b.eval(f"Math.round({S}.tipCat.x)")
     hold_until(b, "left", lambda s: b.eval(f"{S}.tip.spooks") >= 1, 12)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(b.eval(f"{S}.tip.spooks") >= 1 and cat() < Mo["catX"] - 20, "she comes at him: he backs off along the deck", (cat(), b.state()))
     hold_until(b, "left", lambda s: cat() > s["x"], 8)
-    time.sleep(1.2)
+    wait(1.2)
     s = b.state()
     ok &= check(cat() > s["x"] + 100, "cornered at the tip, he darts past her", (cat(), s))
     ok &= check(not alert(b), "and nothing says how he is caught: hers to find out", alert(b))
@@ -4548,15 +4645,15 @@ def scenario_finale(b):
     # Standing still: he comes; three seconds of it and the catch.
     b.hold("right", 0.25)
     c0 = cat()
-    time.sleep(2.2)
+    wait(2.2)
     ok &= check(cat() < c0 - 15 and "catch" not in flags(b), "she stands still: he comes, a few steps at a time", (c0, cat()))
     ok &= check(wait_js(b, "window.__ship.mode === 'scripted'", 4), "three seconds of it: the catch's scene")
-    time.sleep(2.0)
+    wait(2.0)
     b.shot("finale-arms")
     ok &= check(wait_js(b, "window.__ship.holding", 12), "he jumps into her arms")
     b.shot("finale-catch")
     ok &= check(wait_flag(b, "catch", 12), "the catch", flags(b))
-    time.sleep(1.6)
+    wait(1.6)
     ok &= check(b.state()["mode"] == "play" and b.eval("window.__ship.player.texture.key") == "her-cat", "she stands with Bumbot in her arms", b.state())
     ok &= check(not b.eval(f"{S}.tipCat.visible") and not b.eval(f"{S}.crossers.birds[0].sprite.visible"), "nobody at the tip, no gulls in the air")
     ok &= check(not alert(b), "and nothing says where to", alert(b))
@@ -4571,44 +4668,44 @@ def scenario_finale(b):
     b.shot("finale-kids")
     v = b.eval("window.__ship.player.body.velocity.x")
     b.key("right", True)
-    time.sleep(0.5)
+    wait(0.5)
     v = b.eval("window.__ship.player.body.velocity.x")
     b.tap("d")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(90 < v < 125 and not b.state()["lunging"], "a calm walk with him, and no lunge", (v, b.state()))
     b.key("right", False)
     b.hold("down", 0.4)
     ok &= check(not b.eval("window.__ship.crawling"), "no crawling with him in her arms")
     b.eval("window.__ship.scareContact(window.__ship.player.x + 10, 'cart')")
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(b.state()["mode"] == "play", "nothing scares her on the way home", b.state())
     # The game closed and opened again on the way home: still evening, he is still in her arms.
     b.open("?play")
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(b.eval("window.__ship.holding") and b.eval("window.__ship.dusk") == 1 and b.eval("window.__ship.player.texture.key") == "her-cat",
                 "the game opened again on the way home: evening still, Bumbot still in her arms",
                 (b.eval("window.__ship.holding"), b.eval("window.__ship.dusk")))
     # Deck 8: those she helped clap her in; the cabin; the win screen; the day after.
     b.teleport(exact_x(52), D8)
-    time.sleep(0.6)
+    wait(0.6)
     ok &= check(all(person(b, p) and person(b, p)["on"] for p in ("amb_home_steward", "amb_home_manager", "amb_home_engineer", "amb_home_planner")),
                 "four of those she helped wait outside her cabin")
     hold_until(b, "left", lambda s: s["x"] < exact_x(47.2), 8)
     b.shot("finale-welcome")
     ok &= check(b.eval(f"!!{W}.people.byId['amb_home_manager'].welcoming"), "they clap her in as she comes by")
     hold_until(b, "left", lambda s: s["x"] < H["x0"] + 59 + 3, 8)
-    time.sleep(0.3)
+    wait(0.3)
     b.tap("e")
-    time.sleep(1.2)
+    wait(1.2)
     ok &= check(route(b) == "cabin" and b.state()["mode"] == "scripted", "into cabin 8206: the scene", (route(b), b.state()))
     ok &= check(person(b, "npc_husband_home") and person(b, "npc_husband_home")["on"], "her husband is waiting there")
     ok &= check(wait_js(b, f"!!{S}.winItems", 25), "Bumbot curls up on the bed; the win screen")
-    time.sleep(2.8)
+    wait(2.8)
     b.shot("finale-win")
     ok &= check(not b.eval("window.__ship.holding") and b.eval(f"{S}.bedCat.visible"), "he is on the bed, out of her arms")
     b.tap("e")
     ok &= check(wait_flag(b, "home", 8), "a key: the game goes on", flags(b))
-    time.sleep(2.2)
+    wait(2.2)
     b.shot("finale-next-day")
     s = b.state()
     ok &= check(s["mode"] == "play" and b.eval("window.__ship.dusk") == 0 and b.eval("window.__ship.player.texture.key") == "her",
@@ -4618,7 +4715,7 @@ def scenario_finale(b):
     ok &= check(b.eval(f"{W}.things.find(t => t.id === 'haz_fort_7').items[0].visible"), "and the kids' fort is up again")
     b.hold("left", 0.2)
     b.tap("e")
-    time.sleep(0.4)
+    wait(0.4)
     ok &= check(b.state()["mode"] == "play", "E by him: a purr")
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
@@ -4633,7 +4730,7 @@ def scenario_sound(b):
         return b.eval(f"{S}.counts[{json.dumps(name)}] || 0")
 
     b.open("?reset&play")
-    time.sleep(0.5)
+    wait(0.5)
     if b.eval(f"{S}.muted"):                    # (left muted by a run that broke off)
         b.eval(f"{S}.toggle()")
     # Every effect the code names is one that exists.
@@ -4653,45 +4750,45 @@ def scenario_sound(b):
     ok &= check(b.eval(f"{S}.enabled") and not b.eval(f"{S}.muted"), "sound is on")
     n = count("step")
     b.hold("right", 1.0)
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.eval(f"{S}.running"), "the audio runs once a key has been pressed")
     ok &= check(count("step") - n >= 3, "her footsteps as she runs", count("step") - n)
     ok &= check(b.eval(f"{SC}.floor()") == "carpet", "inside, on carpet", b.eval(f"{SC}.floor()"))
     j, l = count("jump"), count("land")
     b.tap("space", 0.2)
-    time.sleep(0.9)
+    wait(0.9)
     ok &= check(count("jump") == j + 1 and count("land") == l + 1, "a jump and its landing", (count("jump") - j, count("land") - l))
     lv = b.eval(f"{SC}.levels()")
     ok &= check(lv["engine"] > 0.8 and lv["sea"] < 0.2 and lv.get("air", 0) > 0.5,
                 "low in the ship: the engines and the ventilation, hardly any sea", lv)
     # M mutes, and M again brings it back.
     b.tap("m")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(b.eval(f"{S}.muted") and b.eval("window.__ship.soundSign.alpha") > 0.9, "M mutes it, and its sign shows")
     b.shot("sound-muted")
     b.tap("m")
-    time.sleep(0.2)
+    wait(0.2)
     ok &= check(not b.eval(f"{S}.muted") and count("soundOn") == 1, "M again brings it back")
     # An elevator's ride: its doors, its car, its bell.
     b.teleport(LIFT_X, D4)
     b.tap("e")
-    time.sleep(0.5)
+    wait(0.5)
     b.tap("up")
-    time.sleep(0.1)
+    wait(0.1)
     b.tap("e")
-    time.sleep(3.2)
+    wait(3.2)
     got = [count(k) for k in ("doorSlide", "liftMove", "liftDing")]
     ok &= check(b.state()["y"] == D5 and got[0] >= 2 and got[1] == 1 and got[2] == 1, "an elevator: its doors, its car, its bell", got)
     # From outside, the sea.
     b.tap("o")
-    time.sleep(0.5)
+    wait(0.5)
     lv = b.eval(f"{SC}.levels()")
     ok &= check(lv["sea"] == 1 and lv["wind"] > 0.3, "from outside: the sea and the wind", lv)
     b.tap("o")
-    time.sleep(0.4)
+    wait(0.4)
     # Up on deck 12, out in the open: planks under her, the wind, less of the engines.
     b.open("?reset&play&at=sundeck&cards=all")
-    time.sleep(0.6)
+    wait(0.6)
     lv = b.eval(f"{SC}.levels()")
     ok &= check(b.eval(f"{SC}.floor()") == "deck" and lv["wind"] > 0.6 and lv["sea"] > 0.3 and lv["engine"] < 0.2,
                 "on deck 12 in the open: planks, the wind, the sea below", (b.eval(f"{SC}.floor()"), lv))
@@ -4699,7 +4796,7 @@ def scenario_sound(b):
     b.teleport(LADDER_X, D12)
     n = count("rung")
     hold_until(b, "up", lambda s: s["mode"] == "play" and s["y"] <= ROOF_Y, 6)
-    time.sleep(0.3)
+    wait(0.3)
     ok &= check(count("rung") - n >= 3 and b.eval(f"{SC}.floor()") == "metal", "a ladder's rungs, then the roof's metal",
                 (count("rung") - n, b.eval(f"{SC}.floor()"), b.state()))
     # And the tools' way: an effect rendered without being played is not silence.
@@ -4719,24 +4816,24 @@ def scenario_gamepad(b):
         b.open("?reset&play&tangerines=infinite")
         s0 = b.state()
         b.stick(1, 0)
-        time.sleep(0.6)
+        wait(0.6)
         s = b.state()
         ok = check(s["x"] > s0["x"] + 40, "the left stick runs her", s)
         b.stick(0.9, 0.45)            # tilted a little down while running
-        time.sleep(0.2)
+        wait(0.2)
         c = b.controls()
         ok &= check(c["right"] and not c["down"], "running with the stick tilted down isn't 'down'", c)
         b.stick(0.3, 0.9)
-        time.sleep(0.2)
+        wait(0.2)
         ok &= check(b.controls()["down"], "pointed down, it is")
         b.stick(0, 0)
-        time.sleep(0.3)
+        wait(0.3)
         y0 = b.state()["y"]
         b.pad("A", True)
-        time.sleep(0.25)
+        wait(0.25)
         ok &= check(b.state()["y"] < y0 - 20, "A jumps", b.state())
         b.pad("A", False)
-        time.sleep(0.8)
+        wait(0.8)
         door = "part-door-4-74"
         b.teleport(b.eval(f"window.__ship.bulkheads.find(d => d.id === '{door}').x") - 16, D4)
         b.pad_tap("X")
@@ -4745,39 +4842,39 @@ def scenario_gamepad(b):
         b.pad_tap("B")
         ok &= check(b.eval("window.__ship.isLunging()"), "B cries out and lunges")
         # The rumble (§3.1): the lunge's burst on the controller in use.
-        time.sleep(0.1)
+        wait(0.1)
         ok &= check([120, 0.3] in [r[1:3] for r in b.eval("window.__rumbles")], "and the controller rumbles with it",
                     b.eval("window.__rumbles"))
         n = len(b.eval("window.__rumbles"))
         b.tap("left")                  # back on the keyboard: no rumble
         b.eval("window.__ship.scareFall()")
-        time.sleep(0.2)
+        wait(0.2)
         ok &= check(len(b.eval("window.__rumbles")) == n, "playing on the keyboard, nothing rumbles", b.eval("window.__rumbles")[n:])
-        time.sleep(3.0)
+        wait(3.0)
         b.pad_tap("Y")                 # the controller again
         b.eval("window.__ship.scareFall()")
-        time.sleep(0.2)
+        wait(0.2)
         ok &= check([260, 1] in [r[1:3] for r in b.eval("window.__rumbles")[n:]], "a scare's fall rumbles hard",
                     b.eval("window.__rumbles")[n:])
-        time.sleep(3.0)
-        time.sleep(0.4)
+        wait(3.0)
+        wait(0.4)
         b.pad_tap("RS")
-        time.sleep(0.4)
+        wait(0.4)
         ok &= check(bool(b.eval("!!window.__ship.overview")), "the right stick's click shows the whole ship")
         z0 = b.eval("window.__ship.cameras.main.zoom")
         b.pad_tap("RT")
-        time.sleep(0.3)
+        wait(0.3)
         ok &= check(b.eval("window.__ship.cameras.main.zoom") > z0, "RT zooms in")
         b.pad_tap("LT")
-        time.sleep(0.3)
+        wait(0.3)
         ok &= check(b.eval("window.__ship.cameras.main.zoom") < z0 * 1.2, "LT zooms out")
         b.pad_tap("B")
-        time.sleep(0.4)
+        wait(0.4)
         ok &= check(not b.eval("!!window.__ship.overview"), "B leaves it")
         b.pad_tap("RS")
-        time.sleep(0.4)
+        wait(0.4)
         b.pad_tap("RS")
-        time.sleep(0.4)
+        wait(0.4)
         ok &= check(not b.eval("!!window.__ship.overview"), "and so does the right stick's click again")
         b.pad_tap("RS", 0.1)
         # Mute stays on the keyboard only (the user, 2026-11-15): no button changes the sound.
@@ -4790,10 +4887,10 @@ def scenario_gamepad(b):
         stage = "(window.__ship.intro ? window.__ship.intro.stage : 'none')"
         ok &= check(b.eval(stage) == "welcome", "the welcome screen", b.eval(stage))
         b.pad_tap("A")
-        time.sleep(0.6)
+        wait(0.6)
         ok &= check(b.eval(stage) == "running", "A starts the game: the intro runs", b.eval(stage))
         b.pad_tap("MENU")
-        time.sleep(1.0)
+        wait(1.0)
         ok &= check(b.eval(stage) in ("done", "none"), "Menu skips the intro", b.eval(stage))
 
         # A controller the browser puts in another slot still plays.
@@ -4802,7 +4899,7 @@ def scenario_gamepad(b):
         b.open("?reset&play")
         s0 = b.state()
         b.stick(-1, 0)
-        time.sleep(0.6)
+        wait(0.6)
         b.stick(0, 0)
         s = b.state()
         ok &= check(s["x"] < s0["x"] - 40, "a pad in the second slot runs her too", s)
@@ -4814,19 +4911,29 @@ def scenario_gamepad(b):
 SCENARIOS = {name[len("scenario_"):]: fn for name, fn in globals().items() if name.startswith("scenario_")}
 
 
+# Run in real time whatever the flag (docs/plan-fast-tests.md §3.3): the sound keeps the audio
+# context's own clock, and `boot` is the proof that the game's own loop still runs.
+REAL_TIME = {"sound", "boot"}
+
+
 def main():
     sys.stdout.reconfigure(errors="replace")  # the Windows console can't print every emoji
-    names = sys.argv[1:] or list(SCENARIOS)
+    args = sys.argv[1:]
+    real = "--real" in args
+    names = [a for a in args if not a.startswith("--")] or list(SCENARIOS)
     b = Browser()
     all_ok = True
     try:
         for name in names:
-            print(name)
+            b.stepped = not real and name not in REAL_TIME
+            t0 = time.time()
+            print(name + ("" if b.stepped else "  (real time)"))
             try:
                 all_ok &= SCENARIOS[name](b)
             except Exception as e:
                 all_ok = False
                 print(f"  FAIL  {type(e).__name__}: {e}")
+            print(f"  ({time.time() - t0:.1f} s)")
     finally:
         if b.errors:
             all_ok = False
