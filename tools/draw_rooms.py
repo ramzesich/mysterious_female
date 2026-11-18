@@ -72,6 +72,7 @@ class Room:
         self.wall = wall
         self.washed = True          # washed as above
         self.full = []              # boxes (x0, y0, x1, y1) kept in full colour
+        self.front = set()          # pixels drawn in front of the things in the room (`in_front`)
         self.im = Image.new("RGBA", (width, H), wall)
         self.d = ImageDraw.Draw(self.im)
         r = self.r
@@ -158,7 +159,24 @@ class Room:
         if self.washed:
             self.wash(out)
         out.save(OUT / f"{name}.png")
+        # Its pixels in front of what lies in the room (a bowl's side before its tangerines): a
+        # picture of the room's size with only those, which the game draws over them.
+        front = OUT / f"{name}-front.png"
+        if self.front:
+            over = Image.new("RGBA", out.size)
+            for p in self.front:
+                over.putpixel(p, out.getpixel(p))
+            over.save(front)
+        elif front.exists():
+            front.unlink()
         return out
+
+    def in_front(self, draw):
+        """Draws with `draw()` and marks what it changed as in front of the things in the room."""
+        before = self.im.copy()
+        draw()
+        a, b = before.load(), self.im.load()
+        self.front |= {(x, y) for y in range(self.im.height) for x in range(self.w) if a[x, y] != b[x, y]}
 
     def wash(self, out):
         """Fades everything above the floor toward the wall, after the palette (which would pull the
@@ -304,7 +322,7 @@ def crewcabin(width):
     intro: she stands by it as the game opens); by the door her spare uniform and the life
     jackets' shelf; a desk under Ukraine's flag with the trident (the user: in the wall mirror's
     place, over the desk's middle, its colours a little muted so it sits back on the wall),
-    tangerines in a bowl on it; her bed, for one, an orange blanket on it, a suitcase under it
+    a bowl on it (its three tangerines are the game's own, to take); her bed, for one, an orange blanket on it, a suitcase under it
     (the porthole that was between them is gone: the user); over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
@@ -380,17 +398,19 @@ def crewcabin(width):
     r(108, FLOOR - 40, 109, FLOOR - 31, DARK)                  # the lamp
     r(105, FLOOR - 44, 113, FLOOR - 40, YELLOW)
     r(106, FLOOR - 39, 112, FLOOR - 39, ORANGE)
-    # The bowl of tangerines (the user: they must read as tangerines to someone not told): the
-    # game's own tangerine, the one she picks up and the HUD counts, pixel for pixel, each with
-    # its leaf; two in the bowl and one on top of them.
-    for x, y in ((117, FLOOR - 41), (124, FLOOR - 41), (121, FLOOR - 46)):
-        game_tangerine(R, x, y)
-    r(117, FLOOR - 35, 132, FLOOR - 35, BLUE_LIGHT)            # the bowl's rim
-    r(117, FLOOR - 34, 132, FLOOR - 33, BLUE)
-    r(119, FLOOR - 32, 130, FLOOR - 31, BLUE)
-    r(118, FLOOR - 32, 118, FLOOR - 32, BLUE)
-    r(131, FLOOR - 32, 131, FLOOR - 32, BLUE)
-    r(119, FLOOR - 31, 130, FLOOR - 31, "#4d65b4")
+    # The bowl. Its three tangerines (two in it, one on top of them) are real ones now, hers to
+    # take (the user, 2026-11-15: `tan_3_bowl_*` in tools/population.py, each where it was painted:
+    # its 8 px cell's top left at (117, FLOOR - 41), (124, FLOOR - 41), (121, FLOOR - 46)); the
+    # picture keeps the bowl, empty once they are taken.
+    # (In front of them: they lie in it, behind its side. The user, 2026-11-16.)
+    def bowl():
+        r(117, FLOOR - 35, 132, FLOOR - 35, BLUE_LIGHT)            # the bowl's rim
+        r(117, FLOOR - 34, 132, FLOOR - 33, BLUE)
+        r(119, FLOOR - 32, 130, FLOOR - 31, BLUE)
+        r(118, FLOOR - 32, 118, FLOOR - 32, BLUE)
+        r(131, FLOOR - 32, 131, FLOOR - 32, BLUE)
+        r(119, FLOOR - 31, 130, FLOOR - 31, "#4d65b4")
+    R.in_front(bowl)
     box(136, FLOOR - 36, 139, FLOOR - 31, RED, INK)            # the mug
     stand(R.im, "chair", 128)
     # Over the bed, a picture of Bumbot (the user): him lying by a bowl of fruit, from their own
@@ -423,13 +443,16 @@ def crewcabin(width):
 
 
 BUMBOT_EYES, BUMBOT_GROUND = "#cdd38a", "#f3ecdd"
-# The game's tangerine (`SPRITES.tangerine` in src/textures.js) and its three colours.
-TANGERINE = ["....ll..", "...lll..", "..oooo..", ".oooooo.", ".oooooO.", ".ooooOO.", "..oOOO.."]
-TANGERINE_COLOURS = {"o": "#f28c28", "O": "#d9711a", "l": "#4c9a2a"}
+# The game's tangerine (`FRUIT.tangerine` in src/textures.js, docs/plan-three-uses.md §1.7) and
+# its colours.
+TANGERINE = ["....K.KK..", "...KlKllK.", "..KollLK..", ".KoooooOK.", "KoohhooOOK", "KohoooooOK",
+             "KOoOoooOOK", ".KOOOOOOK.", "..KOOOOK..", "...KKKK..."]
+TANGERINE_COLOURS = {"K": "#2e222f", "o": "#fb6b1d", "O": "#ea4f36", "h": "#fdcbb0", "l": "#239063",
+                     "L": "#165a4c"}
 
 
 def game_tangerine(R, x, y):
-    """The game's own tangerine, its 8 px cell's top left at (x, y)."""
+    """The game's own tangerine, its 10 px cell's top left at (x, y)."""
     for j, row in enumerate(TANGERINE):
         for i, ch in enumerate(row):
             if ch != ".":

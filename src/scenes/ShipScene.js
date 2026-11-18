@@ -1,5 +1,6 @@
-import { VIEW, PLAYER, DASH, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
 import { Controls } from '../controls.js';
+import { scenario } from '../world/mishaps.js';
 import { sfx } from '../sfx.js';
 import { t, has } from '../lang.js';
 import { loadSave, writeSave } from '../save.js';
@@ -10,6 +11,7 @@ import { Sea } from '../sea.js';
 import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '../background.js';
 import { World, OUTSIDE } from '../world/world.js';
 import { Soundscape } from '../world/soundscape.js';
+import { LooseTangerines } from '../world/tangerine.js';
 import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
 
@@ -71,7 +73,14 @@ const SIDEWALK_LOOKS = {
 };
 
 // Each hazard gets its own fright (§5.6): her word for it, in the game's language (src/lang.js).
-const fright = kind => has(`fright.${kind}`) ? t(`fright.${kind}`) : '!';
+// What she cries at a hit (a scenario's `word`).
+const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
+// Her reaction's own sound, with a tangerine on her (the rest have the pocket's alone).
+const REACT_SOUND = { yelp: () => sfx.yelpHot(), splutter: () => sfx.splutter(), arch: () => sfx.gasp(), rubnose: () => sfx.sniff() };
+
+// Lying flat on her belly after a trip (scareDown): her picture this many px lower, from this frame
+// of her fall on (the frames where she is down), so that she lies on the carpet, not over it.
+const LIE_DROP = { px: 2, frame: 3 };
 
 export class ShipScene extends Phaser.Scene {
     constructor() {
@@ -104,12 +113,20 @@ export class ShipScene extends Phaser.Scene {
         }
         this.buildPlayer();
         this.world.addColliders(this.player);
+        // Tangerines loose in the world: knocked out of her pocket (src/world/tangerine.js).
+        this.loose = new LooseTangerines(this);
+        this.loose.addColliders();
         this.buildCameras();
         this.buildHud();
         this.world.buildHud(this.uiLayer);
 
         this.mode = 'play'; // play | ladder | stairs | trunk | lift | swim | scripted
-        this.dashUntil = 0;
+        this.lungeUntil = 0;
+        this.safeUntil = 0;
+        this.flinchUntil = 0;
+        this.throwUntil = 0;
+        this.throwing = null;
+        this.cryGapUntil = 0;
         this.bubbleUntil = 0;
         this.lastTrailAt = 0;
         this.jumpBufferedAt = -Infinity;
@@ -389,7 +406,10 @@ export class ShipScene extends Phaser.Scene {
         d.shown = this.dimOverride != null ? this.dimOverride : smooth ? approach(d.shown, on, dt * 6) : on;
         d.outer.setVisible(d.shown > 0).setAlpha(d.shown);
         for (const c of d.pieces) {
-            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1;
+            // (Her head counts in the deck above only past its floor, not in the ceiling under it:
+            // jumping on deck 4's climb shelf, her head touched the ceiling and deck 5's dim lifted
+            // and came back each jump, the user, 2026-11-17. A piece reaches 16 px under its floor.)
+            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16;
             const dim = hers ? 0 : Math.min(...c.keys.map(k => this.shellAlpha[k]));
             c.dim = smooth ? approach(c.dim, dim, dt * 8) : dim;
             c.gfx.setVisible(d.shown > 0 && c.dim > 0).setAlpha(d.shown * c.dim);
@@ -507,7 +527,10 @@ export class ShipScene extends Phaser.Scene {
                 }
 
                 case 'vacuum': {
-                    const sprite = this.add.image(o.x, o.y, 'vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    // (The one she rides in her gag, 5b: cut from that picture, tools/build_things.py.
+                    // Set 2 px down into the carpet's top line, and her ride with it, `ride.y`: the
+                    // user, 2026-11-17.)
+                    const sprite = this.add.image(o.x, o.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props);
                     this.worldLayer.add(sprite);
                     this.vacuums.push({
                         sprite, alive: true, dir: 1,
@@ -1135,9 +1158,17 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(tone, 1).fillRect(x - w / 2, ceiling, w, head - ceiling);
         if (!wall) g.fillStyle(0xc7dcd0, 1).fillRect(x - w / 2 + 2, ceiling, 2, head - ceiling);
         g.fillStyle(wall ? 0x46291f : 0x625565, 1).fillRect(x - w / 2, head, w, 2);
-        // Shut: the door edge on, its handle sticking out on each side: white steel, or glass.
-        const shut = this.add.graphics().setDepth(DEPTH.props);
-        if (glass) {
+        // Shut: the door edge on, its handle sticking out on each side: white steel, or glass. A
+        // one-way glass door: its push bar's end and its closer on its free side, nothing on the
+        // other (generated; the user, 2026-11-18: "the door profile should also differ").
+        const oneway = glass && steel && lock.startsWith('oneway');
+        const free = oneway ? Number(lock.split(':')[1]) : 0;
+        const shut = oneway
+            ? this.add.image(free < 0 ? x - 10 : x - 2, floor, 'door-glass-oneway-edge').setOrigin(0, 1).setFlipX(free > 0).setDepth(DEPTH.props)
+            : this.add.graphics().setDepth(DEPTH.props);
+        if (oneway) {
+            // (Its picture: assets/source/ship/pushbar/.)
+        } else if (glass) {
             shut.fillStyle(rim, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
             shut.fillStyle(0xbfe6f5, 1).fillRect(x - 1, head + 4, 2, floor - head - 8);
             shut.fillStyle(rim, 1).fillRect(x - 5, floor - 36, 10, 3);
@@ -1149,7 +1180,12 @@ export class ShipScene extends Phaser.Scene {
         // Open: swung back against the wall (on the room's side), seen face on.
         const edge = x + swing * w / 2;
         let open;
-        if (glass) {
+        // (A one-way door: its push bar across it, generated from this very leaf, the rest of it the
+        // same; the user, 2026-11-18. The design's "fire-exit doors with a push bar on one side only".)
+        if (oneway) {
+            const lx = swing < 0 ? edge - 28 : edge;
+            open = this.add.image(lx, floor, 'door-glass-pushbar').setOrigin(0, 1).setDepth(DEPTH.decor + 0.2).setVisible(false);
+        } else if (glass) {
             // A glass door in its frame, a handle.
             open = this.add.graphics().setDepth(DEPTH.decor + 0.2).setVisible(false);
             const lx = swing < 0 ? edge - 28 : edge;
@@ -1178,7 +1214,16 @@ export class ShipScene extends Phaser.Scene {
         }
         this.worldLayer.add(parts);
         const deck = key.split(':')[0];
-        this.bulkheads.push({ id: o.name, x, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone });
+        const b = { id: o.name, x, w, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone };
+        this.bulkheads.push(b);
+        // (A one-way door she has come through from its free side stays propped open for good: its
+        // plain side has nothing to open it by; the user, 2026-11-18.)
+        if (oneway && this.save.opened.includes(o.name)) this.propOpen(b);
+    }
+
+    propOpen(b) {
+        b.ajar = true;
+        this.setBulkheadOpen(b, true);
     }
 
     // E at a wall's shut door: it opens.
@@ -1193,6 +1238,7 @@ export class ShipScene extends Phaser.Scene {
             return true;
         }
         this.setBulkheadOpen(b, true);
+        if (res.through && b.lock.startsWith('oneway')) this.propOpen(b);
         sfx.doorHeavy();
         return true;
     }
@@ -1203,6 +1249,70 @@ export class ShipScene extends Phaser.Scene {
         b.openDoor.setVisible(open);
     }
 
+    // The doors across a deck, and its walls, stop whatever moves along it, not only her (the user,
+    // 2026-11-17; docs/plan-three-uses.md §1.8). A thing stops short of a door's face, shut or open
+    // (one she holds open would shut on it), never on top of it; a person may open a door with no
+    // lock, go through, and it shuts behind them (`holdDoor`, people.js `walk`); a locked one (a
+    // card, one way, a rope, the story's) turns them back, since one held open would let her by.
+    // `half`: px from the thing's middle to its front, the way it goes.
+
+    // How far a thing at x on the floor y can go toward `to`: there, or short of the first door or
+    // wall on the way (never back from where it is).
+    stopShort(x, to, y, half = 0, gap = 2) {
+        const dir = Math.sign(to - x);
+        if (!dir) return to;
+        const cut = stop => { if ((to - stop) * dir > 0) to = (stop - x) * dir > 0 ? stop : x; };
+        for (const b of this.bulkheads) {
+            if (Math.abs(b.floor - y) <= 4 && (b.x - x) * dir > 0) cut(b.x - dir * (b.w / 2 + half + gap));
+        }
+        // A wall: the solid layer at a body's height over the floor.
+        const T = 16, first = Math.floor((x + dir * half) / T) + dir, last = Math.floor((to + dir * half) / T);
+        for (let c = first; (last - c) * dir >= 0; c += dir) {
+            if (!(this.solidLayer.getTileAtWorldXY(c * T + T / 2, y - 20)?.index > 0)) continue;
+            cut((dir > 0 ? c * T : (c + 1) * T) - dir * (half + gap));
+            break;
+        }
+        return to;
+    }
+
+    // A span lo..hi round x on the floor y, cut short by the doors and walls either side.
+    spanOn(x, lo, hi, y, half = 0, gap = 2) {
+        return { lo: this.stopShort(x, lo, y, half, gap), hi: this.stopShort(x, hi, y, half, gap) };
+    }
+
+    // The door across the floor y that a thing at x going `dir` reaches within `reach` px of its
+    // front, or null.
+    doorAhead(x, dir, y, half = 0, reach = 12) {
+        let best = null, near = Infinity;
+        for (const b of this.bulkheads) {
+            const gap = (b.x - x) * dir - b.w / 2 - half;
+            if (Math.abs(b.floor - y) <= 4 && (b.x - x) * dir > 0 && gap <= reach && gap < near) {
+                best = b;
+                near = gap;
+            }
+        }
+        return best;
+    }
+
+    // A person may open it: no lock.
+    mayOpen(b) {
+        return !b.lock;
+    }
+
+    // A person opens a door and holds it while going through (`who`: anything to know them by); it
+    // shuts once no one holds it and she is away (`updateBulkhead`).
+    holdDoor(b, who) {
+        (b.held ??= new Set()).add(who);
+        if (b.open) return false;
+        this.setBulkheadOpen(b, true);
+        sfx.at(b.x, b.floor).doorHeavy();
+        return true;
+    }
+
+    letGoDoor(b, who) {
+        b.held?.delete(who);
+    }
+
     // Each frame: a door shuts behind her once she is away from it; a wall shows while its deck is
     // cut open on either side of it.
     updateBulkhead() {
@@ -1210,7 +1320,8 @@ export class ShipScene extends Phaser.Scene {
         for (const b of this.bulkheads) {
             const onDeck = this.route === 'inside' && p.y <= b.floor + 4 && p.y > b.floor - this.deckPitch;
             // (One left ajar stays so: the Library's aft door, after Bumbot.)
-            if (b.open && !b.ajar && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
+            // (Nor one a person is going through: `holdDoor`.)
+            if (b.open && !b.ajar && !b.held?.size && !(onDeck && Math.abs(p.x - b.x) < BULKHEAD.shutAway)) this.setBulkheadOpen(b, false);
             if (!b.key) continue;
             const open = 1 - Math.min(this.shellAlpha[b.deck] ?? 1, this.shellAlpha[b.key] ?? 1);
             b.wall.setAlpha(open);
@@ -1252,9 +1363,10 @@ export class ShipScene extends Phaser.Scene {
     // is drawn over that route's room and shows only there.
     addTangerine(id, x, y, route = 'inside') {
         if (this.save.collected.includes(id)) return;
-        const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
+        // (In a pile, a higher one is behind a lower one: the crew cabin's bowl.)
+        const depth = (route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13) + y * 1e-7;
         const sprite = this.add.image(x, y, 'tangerine').setOrigin(0.5, 1).setDepth(depth);
-        const glint = this.add.image(sprite.x + 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
+        const glint = this.add.image(sprite.x - 2, sprite.y - 6, 'dot').setDepth(depth).setAlpha(0);
         this.tweens.add({ targets: glint, alpha: 1, duration: 120, yoyo: true, repeat: -1, repeatDelay: 2400, delay: Phaser.Math.Between(0, 2000) });
         this.worldLayer.add([sprite, glint]);
         const t = { id, sprite, glint, route };
@@ -2153,25 +2265,53 @@ export class ShipScene extends Phaser.Scene {
 
         const pictures = ['picture-sea-bg', 'picture-ship-bg', 'picture-art-bg'];
         const parts = [];
+        // (A picture is not hung behind a tall thing of the plan's world that stands against the wall,
+        // the towel stack, or anywhere a tall trolley is pushed along: it goes to the nearest gap with
+        // nothing on its wall and nothing of the world in front of it; the user, 2026-11-18. `gaps`:
+        // each gap and whether its wall is taken.)
+        const ents = (this.cache.json.get('world')?.ents ?? []).filter(e => e.y === o.y && e.route === 'inside');
+        const rolls = (e, x, by) => e.kind === 'push' && e.tall === true && x > e.min - by && x < e.max + by;
+        const tall = (gap) => ents.some(e => (e.kind === 'stack' && Math.abs(e.x - gap) < 40) || rolls(e, gap, 40));
+        const gaps = [], moved = [];
         for (let x = o.x + 60, n = Math.round(o.x / 192); x + 30 < o.x + o.width; x += 192, n++) {
             const gap = x + 15 + 96;                 // halfway to the next door
             g.fillStyle(0xfffbe8, 1);
             g.fillEllipse(gap, ceiling + 3, 8, 3);
-            if (n % 3 === 1 && gap + 20 < o.x + o.width) {
-                parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
+            const inside = gap + 20 < o.x + o.width;
+            gaps.push({ gap, taken: !inside || n % 3 === 1 || n % 6 === 3 || n % 8 === 5
+                || ents.some(e => Math.abs(e.x - gap) < 60 || rolls(e, gap, 60)) || this.doorSpots.some(t => t.y === o.y && Math.abs(gap - t.x) < 60) });
+            if (n % 3 === 1 && inside) {
+                if (tall(gap)) moved.push({ gap, frame: pictures[n % pictures.length] });
+                else parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
             // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
-            if (n % 6 === 3 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            // (Kept 50 px from a door put in a cabin door's place, clear of its card reader: one hung
+            // under the reader of deck 4's crew door, the user, 2026-11-17.)
+            if (n % 6 === 3 && gap + 20 < o.x + o.width) {
+                const by = this.doorSpots.find(t => t.y === o.y && Math.abs(gap - t.x) < 50);
+                const ex = by ? by.x + (gap >= by.x ? 50 : -50) : gap;
+                parts.push(this.add.image(ex, o.y - 14, 'shipart', 'extinguisher-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
+            }
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
             if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
             if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) continue;
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
+            // (Kept: the doors there are, for those who go door to door: the paper rounds, breakfast.)
+            (this.cabinDoorsDrawn ??= []).push({ x: x + 17, y: o.y });
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
-            if (cart && x + 64 < o.x + o.width) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
+            // (None where a tall trolley of the plan's world is pushed: the steward's, 2026-11-18.)
+            if (cart && x + 64 < o.x + o.width && !ents.some(e => rolls(e, x + 48, 50))) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
+        }
+        for (const m of moved) {
+            const free = gaps.filter(q => !q.taken).sort((a, b) => Math.abs(a.gap - m.gap) - Math.abs(b.gap - m.gap))[0];
+            if (!free) continue;
+            free.taken = true;
+            parts.push(this.add.image(free.gap, o.y - 50, 'shipart', m.frame).setDepth(DEPTH.decor + 0.1));
+            (this.picturesMoved ??= []).push({ from: m.gap, to: free.gap, y: o.y });
         }
         // By a stair core, a brass plaque with the corridor's cabin numbers and an arrow along it.
         // (The arrow is drawn: at this size the font's arrow comes out blank.)
@@ -2430,7 +2570,7 @@ export class ShipScene extends Phaser.Scene {
             this.droppingThrough !== zone.walk && !(zone.walk.atrium && this.overRail && this.gliding)
             && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
-            if (!this.isDashing()) return true;
+            if (!this.isLunging()) return true;
             this.smash(crate.x, crate.y);
             this.save.broken.push(crate.name);
             crate.disableBody(true, true);
@@ -2468,13 +2608,11 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Verdana, sans-serif', fontSize: '24px', color: '#ffffff',
             stroke: '#1d2b53', strokeThickness: 5,
         };
-        const icon = this.add.image(24, 20, 'tangerine').setOrigin(0).setScale(4);
+        const icon = this.hudIcon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
         this.hudCount = this.add.text(62, 22, '', textStyle);
-        this.dashBarBack = this.add.rectangle(24, 62, 164, 12, 0x1d2b53).setOrigin(0);
-        this.dashBar = this.add.rectangle(26, 64, 160, 8, 0xf28c28).setOrigin(0);
         // Her speech bubble and the messages over her live in the world, so they move exactly with
         // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
-        this.bubble = this.add.text(0, 0, DASH.shout, {
+        this.bubble = this.add.text(0, 0, CRY.shout, {
             fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#c8343f',
             backgroundColor: '#ffffff', padding: { x: 5, y: 3 }, resolution: 4,
         }).setOrigin(0.5, 1).setDepth(DEPTH.fx + 1);
@@ -2488,7 +2626,7 @@ export class ShipScene extends Phaser.Scene {
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
         // The sound's sign, shown a moment when M switches it: a loudspeaker, crossed out when muted.
         this.soundSign = this.add.graphics().setAlpha(0);
-        this.uiLayer.add([icon, this.hudCount, this.dashBarBack, this.dashBar, this.fade, this.debugText, this.soundSign]);
+        this.uiLayer.add([icon, this.hudCount, this.fade, this.debugText, this.soundSign]);
         this.progress.buildHud(this.uiLayer);
         this.refreshHud();
     }
@@ -2519,11 +2657,49 @@ export class ShipScene extends Phaser.Scene {
     }
 
     refreshHud() {
-        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines}`);
-        const left = Math.max(0, this.dashUntil - this.time.now);
-        const dashing = left > 0;
-        this.dashBarBack.setVisible(dashing);
-        this.dashBar.setVisible(dashing).setSize(160 * (left / DASH.durationMs), 8);
+        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines - (this.flying ?? 0)}`);
+    }
+
+    // A tangerine is hers (picked up, handed back, the piñata's): one more at once, and its picture
+    // flies from where it was, (x, y) in the world, to the HUD's count, which changes as it lands
+    // (docs/plan-three-uses.md §1.7). Several follow each other.
+    gainTangerine(x, y) {
+        this.save.tangerines += 1;
+        sfx.tangerine();
+        const cam = this.cameras.main, view = cam.worldView, time = this.time.now;
+        const from = { x: (x - view.x) * cam.zoom, y: (y - view.y) * cam.zoom };
+        const to = { x: this.hudIcon.x + this.hudIcon.displayWidth / 2, y: this.hudIcon.y + this.hudIcon.displayHeight * 0.6 };
+        const delay = Math.max(0, (this.tallyNext ?? 0) - time);
+        this.tallyNext = time + delay + TALLY.gapMs;
+        this.flying = (this.flying ?? 0) + 1;
+        this.refreshHud();
+        const img = this.add.image(from.x, from.y, 'tangerine').setOrigin(0.5, 0.6).setScale(cam.zoom).setVisible(delay === 0);
+        this.uiLayer.add(img);
+        const k = { v: 0 };
+        this.tweens.add({
+            targets: k, v: 1, delay, duration: TALLY.ms, ease: 'Sine.easeIn',
+            onStart: () => img.setVisible(true),
+            onUpdate: () => img.setPosition(from.x + (to.x - from.x) * k.v, from.y + (to.y - from.y) * k.v - Math.sin(Math.PI * k.v) * TALLY.arc)
+                .setScale(cam.zoom + (this.hudIcon.scale - cam.zoom) * k.v),
+            onComplete: () => {
+                img.destroy();
+                this.flying -= 1;
+                this.refreshHud();
+                sfx.tally();
+                const icon = this.hudIcon;
+                this.tweens.killTweensOf(icon);
+                icon.setScale(3);
+                this.tweens.add({ targets: icon, scale: 3.6, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
+            },
+        });
+    }
+
+    // D with none on her: the count blinks once, and that is all.
+    blinkCount() {
+        const c = this.hudCount;
+        this.tweens.killTweensOf(c);
+        c.setAlpha(1);
+        this.tweens.add({ targets: c, alpha: 0.15, duration: 110, yoyo: true, repeat: 1, onComplete: () => c.setAlpha(1) });
     }
 
     // --- Spawning --------------------------------------------------------------------------
@@ -2641,6 +2817,7 @@ export class ShipScene extends Phaser.Scene {
 
         this.updateVacuums(dt);
         this.world.update(dt, time, input);
+        this.loose.update(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
         else if (this.mode === 'push') this.updatePush(input, dt, time);
         else if (this.mode === 'ladder') this.updateLadder(input, dt, time);
@@ -2664,7 +2841,8 @@ export class ShipScene extends Phaser.Scene {
         }
         // Bumbot on her route: in the corridors, or asleep in the linen room.
         if (this.mode === 'play' || this.mode === 'ladder' || this.mode === 'stairs') this.checkBumbot();
-        this.updateDash(time);
+        this.updateLunge(time);
+        this.updatePocket(time);
         this.updateOverlays();
     }
 
@@ -2715,6 +2893,26 @@ export class ShipScene extends Phaser.Scene {
             this.grounded = false;
         }
 
+        // A mishap in the air: it plays when she lands (docs/plan-three-uses.md §1.6).
+        if (this.gagPending && this.grounded) {
+            const g = this.gagPending;
+            this.gagPending = null;
+            this.flinchUntil = 0;
+            this.mishap(g.sc, g.fromX, g.ride);
+            return;
+        }
+        // A hit forgiven by the pocket: her reaction, a step back or on.
+        if (time < this.flinchUntil) {
+            body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
+            return;
+        }
+        // Throwing (F): she stands for it, and the tangerine leaves her hand on the swing.
+        if (time < this.throwUntil) {
+            body.velocity.x = approach(body.velocity.x, 0, PLAYER.groundDecel * dt);
+            if (this.throwing && time >= this.throwing.at) this.releaseThrow();
+            return;
+        }
+
         if (onFloor && input.activatePressed && this.world.interact()) return;
         if (onFloor && input.activatePressed && !this.holding && this.progress.tryPickup()) return;
         if (onFloor && input.activatePressed && !this.holding && this.tryShower()) return;
@@ -2736,22 +2934,25 @@ export class ShipScene extends Phaser.Scene {
         // Through a side walk with ↓; through a balcony's floor outside with ↓ and jump (↓ alone crawls).
         if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
 
-        if (input.dashPressed) this.tryDash(time);
+        if (input.dashPressed) this.tryCry(time);
+        if (input.throwPressed && this.tryThrow(input, time, onFloor)) return;
 
         // The verbs (§6.1.2, src/world/verbs.js): crawling under things, a kick off a wall in grip
         // socks, a glide under the parasol.
         const crawling = this.updateCrawl(input, onFloor);
         const aside = this.updateAside(input, onFloor);
-        const dashing = this.isDashing();
+        const lunging = this.isLunging();
         // (Waist deep in the kids' club's ball pit she wades: src/world/bow.js.)
-        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (dashing ? DASH.speedMultiplier : 1) * (this.wading ? 0.5 : 1)
+        const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (lunging ? LUNGE.speed : 1) * (this.wading ? 0.5 : 1)
             * (this.holding ? HOLDING.speed : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        // (The lunge carries her on the way she faces whether a way is held or not.)
+        if (lunging && !dir && !aside) dir = p.flipX ? -1 : 1;
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
         // On wet tiles without the grip socks (src/world/hazards.js) she slides on the way she came.
         const slipping = onFloor && !!this.slipDir;
         if (slipping) dir = this.slipDir;
-        const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (dashing ? 2 : 1);
+        const accel = (onFloor ? (dir ? PLAYER.groundAccel : PLAYER.groundDecel) : PLAYER.airAccel) * (lunging ? 2 : 1);
         body.velocity.x = approach(body.velocity.x, dir * speed, accel * dt);
         if (dir) p.setFlipX(dir < 0);
 
@@ -2804,7 +3005,7 @@ export class ShipScene extends Phaser.Scene {
         else if (!onFloor && time < this.kickUntil + 160 && this.herFrames.wallkick !== undefined) this.pose('wallkick');
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (slipping) this.pose(this.herFrames.slip !== undefined ? 'slip' : 'apex');
-        else if (Math.abs(body.velocity.x) > 10) this.pose('run', dashing ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
+        else if (Math.abs(body.velocity.x) > 10) this.pose('run', lunging ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
         else this.standStill(time, dir);
 
         // Standing still on the bed long enough: she bounces on it.
@@ -3147,7 +3348,7 @@ export class ShipScene extends Phaser.Scene {
 
     enterPool(pool) {
         const p = this.player;
-        if (this.world.carry) this.world.carryBox.spill(p.x - (p.flipX ? -1 : 1));
+        if (this.world.carry) this.world.carryBox.spill(p.x - (p.flipX ? -1 : 1), true);   // her own doing
         this.mode = 'swim';
         this.pool = pool;
         p.body.setVelocity(0, 0);
@@ -3306,6 +3507,7 @@ export class ShipScene extends Phaser.Scene {
         for (const r of this.rooms) {
             r.room.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
             r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
+            r.front?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
         }
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
@@ -3822,11 +4024,11 @@ export class ShipScene extends Phaser.Scene {
         for (const t of this.tangerines) {
             if (!t.sprite.active || t.route !== this.route) continue;
             if (Math.abs(p.x - t.sprite.x) < 12 && t.sprite.y > p.y - PLAYER.height && t.sprite.y - 8 < p.y) {
-                this.save.tangerines += 1;
                 this.save.collected.push(t.id);
-                sfx.tangerine();
+                this.gainTangerine(t.sprite.x, t.sprite.y - 5);
+                // (Its picture is the one that flies to the count: §1.7.)
                 t.glint.destroy();
-                this.tweens.add({ targets: t.sprite, y: t.sprite.y - 12, alpha: 0, duration: 250, onComplete: () => t.sprite.destroy() });
+                t.sprite.destroy();
                 t.sprite.active = false;
                 this.refreshHud();
             }
@@ -3881,9 +4083,35 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    updateVacuums(dt) {
+    // Something here of the scene's own takes a tangerine loose near it (docs/plan-three-uses.md §2):
+    // deck 4's vacuum swallows it and chokes.
+    offeredHere(t) {
         for (const v of this.vacuums) {
-            if (!v.alive) continue;
+            if (!v.alive || v.ridden || !this.loose.near(t, v.sprite.x, v.sprite.y, 10, 12)) continue;
+            this.loose.remove(t);
+            v.alive = false;
+            v.puffAt = this.time.now + 700;
+            this.world.choke(v.sprite);
+            return true;
+        }
+        return false;
+    }
+
+    updateVacuums(dt) {
+        const p = this.player;
+        for (const v of this.vacuums) {
+            if (v.ridden) continue;                 // (in her gag, 5b: it is in her picture)
+            // Choked on a tangerine: dead, smoking now and then, until she has left the deck.
+            if (!v.alive) {
+                if (this.route !== 'inside' || Math.abs(p.y - v.sprite.y) > this.deckPitch / 2) {
+                    v.alive = true;
+                    v.sprite.clearTint().setAngle(0).setAlpha(1);
+                } else if (this.time.now > v.puffAt) {
+                    v.puffAt = this.time.now + 900;
+                    this.world.drops(v.sprite.x, v.sprite.y - 10, 0x8a8a8a, -1);
+                }
+                continue;
+            }
             if (v.asideUntil) {
                 if (this.time.now < v.asideUntil) continue;
                 v.asideUntil = 0;
@@ -3899,12 +4127,12 @@ export class ShipScene extends Phaser.Scene {
     checkVacuums() {
         const p = this.player;
         for (const v of this.vacuums) {
-            if (!v.alive) continue;
+            if (!v.alive || v.ridden) continue;
             const s = v.sprite;
-            const hit = Math.abs(p.x - s.x) < (PLAYER.bodyWidth / 2 + 6) && p.y > s.y - 6 && p.y - PLAYER.bodyHeight < s.y;
+            const hit = Math.abs(p.x - s.x) < (PLAYER.bodyWidth / 2 + s.width / 2 - 2) && p.y > s.y - s.height + 2 && p.y - PLAYER.bodyHeight < s.y;
             if (!hit) continue;
             if (v.asideUntil) continue;
-            if (this.isDashing()) {
+            if (this.isLunging()) {
                 // Shoved aside, spinning, into a doorway for a while (population: `haz_vacuum_4`).
                 v.asideUntil = this.time.now + 6000;
                 this.smash(s.x, s.y - 3);
@@ -3913,7 +4141,11 @@ export class ShipScene extends Phaser.Scene {
             } else if (this.world.carry) {
                 this.world.touched({ x: s.x, touch: { kind: 'spill' } });
             } else {
-                this.scareContact(s.x, 'vacuum');
+                // (From behind she rides it off down the corridor, 5b: it is hidden meanwhile.)
+                const ride = { x: s.x, y: s.y, dir: v.dir, v: v.speed,
+                               hide: () => { v.ridden = true; s.setVisible(false); },
+                               show: () => { v.ridden = false; s.setVisible(true); } };
+                this.scareContact(s.x, 'vacuum', { vx: v.dir * v.speed, ride });
                 return;
             }
         }
@@ -4049,35 +4281,52 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // --- The dash --------------------------------------------------------------------------
+    // --- D: the cry, and the lunge with it (docs/plan-three-uses.md §1.1) -------------------------
 
-    isDashing() {
-        return this.dashUntil > this.time.now;
+    isLunging() {
+        return this.lungeUntil > this.time.now;
     }
 
-    // ?tangerines=infinite: the dash never uses one up, for testing.
+    // During the lunge and a breath after it nothing frightens her by contact.
+    lungeSafe() {
+        return this.lungeUntil + LUNGE.safeTailMs > this.time.now;
+    }
+
+    // ?tangerines=infinite: D never uses one up, for testing.
     infiniteTangerines() {
         return new URLSearchParams(location.search).get('tangerines') === 'infinite';
     }
 
-    tryDash(time) {
-        if (!this.progress.knows('dash') || this.crawling || this.world.carry || this.holding) return;
-        if (this.isDashing() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return;
+    // Every D costs one tangerine, whatever it does. The cry startles what is in her way; with the
+    // lunge learned (near-catch 1) and her hands free, the lunge goes with it. Not crawling, nor
+    // with Bumbot in her arms (ladders, stairs, the pool are modes of their own: no D there).
+    tryCry(time) {
+        if (this.crawling || this.holding || time < this.cryGapUntil || this.isLunging()) return;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
+            this.blinkCount();
+            return;
+        }
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
-        this.dashUntil = time + DASH.durationMs;
-        this.bubbleUntil = time + DASH.bubbleMs;
-        sfx.dash();
-        rumble('dash');
+        this.cryGapUntil = time + CRY.gapMs;
+        this.bubbleUntil = time + CRY.bubbleMs;
+        sfx.cry();
+        const lunge = this.progress.knows('dash') && !this.world.carry;
+        if (lunge) {
+            this.lungeUntil = time + LUNGE.ms;
+            sfx.lunge();
+            rumble('lunge');
+        }
+        const p = this.player;
+        this.world.shout(p.x, p.y, this.route);
         this.refreshHud();
     }
 
-    updateDash(time) {
-        const dashing = this.isDashing();
-        if (this.wasDashing && !dashing) sfx.dashEnd();
-        this.wasDashing = dashing;
-        if (dashing || this.dashBar.visible) this.refreshHud();
+    updateLunge(time) {
+        const lunging = this.isLunging();
+        if (this.wasLunging && !lunging) sfx.lungeEnd();
+        this.wasLunging = lunging;
 
-        if (dashing && this.mode === 'play' && time - this.lastTrailAt > 45 && Math.abs(this.player.body.velocity.x) > 10) {
+        if (lunging && this.mode === 'play' && time - this.lastTrailAt > 45 && Math.abs(this.player.body.velocity.x) > 10) {
             this.lastTrailAt = time;
             const p = this.player;
             const ghost = this.add.image(p.x, p.y, 'her', p.frame.name).setOrigin(0.5, 1)
@@ -4087,31 +4336,212 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // --- The throw (docs/plan-three-uses.md §1.2) ----------------------------------------------
+
+    // F: one tangerine thrown underarm the way she faces: a roll, or with ↑ a lob. On her feet,
+    // hands free: not with a tray, crawling, gliding, in a lunge or holding Bumbot (ladders,
+    // stairs, the pool are modes of their own). No cursor: she aims by where she stands.
+    tryThrow(input, time, onFloor) {
+        if (!onFloor || this.crawling || this.holding || this.gliding || this.world.carry || this.isLunging()) return false;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
+            this.blinkCount();
+            return false;
+        }
+        const p = this.player;
+        this.throwing = { at: time + THROW.releaseMs, lob: !!input.up, dir: p.flipX ? -1 : 1 };
+        this.throwUntil = time + THROW.ms;
+        // (Until her clip is made, her reach stands in.)
+        p.anims.play(this.anims.exists('her-toss') ? 'her-toss' : 'her-reach');
+        return true;
+    }
+
+    // It leaves her hand: one less, a real thing in the world (src/world/tangerine.js).
+    releaseThrow() {
+        const p = this.player, { lob, dir } = this.throwing;
+        this.throwing = null;
+        if (this.save.tangerines <= 0 && !this.infiniteTangerines()) return;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
+        const k = lob ? THROW.lob : THROW.roll;
+        this.loose.throw(p.x + dir * THROW.hand, p.y - THROW.handY, dir * k.vx, -k.vy, lob);
+        sfx.toss();
+        this.refreshHud();
+    }
+
+    // --- The pocket (docs/plan-three-uses.md §1.3) ---------------------------------------------
+
+    // `?pocket=off`: every hit is what it was, whatever she has on her (for testing frights).
+    pocketOn() {
+        return new URLSearchParams(location.search).get('pocket') !== 'off';
+    }
+
+    // Blinking after a hit forgiven: nothing can touch her.
+    isSafe() {
+        return this.safeUntil > this.time.now;
+    }
+
+    // A hit that would be a mishap or a spilled tray, with a tangerine on her: one less, and she
+    // keeps her place and her tray (docs/plan-three-uses.md §1.3). Her reaction is the scenario's
+    // (`MISHAP_SCENES`: reeling back a step, stumbling on, rubbing her nose, ducking...), always facing
+    // the way she faced, and the tangerine rolls off behind her, whichever way she is thrown
+    // (the user, 2026-11-17), unless the gull takes it (`toss` 'gull', `snatch`: its sprite) or it is
+    // handed over at the door it came from ('hand'); her push still goes the way of `toss`. True if it was forgiven. (Falls, the sea and her own feet never
+    // come here.)
+    pocket(fromX, sc, { snatch = null } = {}) {
+        // (A scenario the tangerines do not save her from: she gets the gag, and keeps them.)
+        if (sc.pocket === false) return false;
+        if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
+        if (!this.infiniteTangerines()) this.save.tangerines -= 1;
+        const p = this.player, time = this.time.now;
+        const facing = p.flipX ? -1 : 1;
+        this.safeUntil = time + POCKET.safeMs;
+        sfx.pocket();
+        rumble('spill');
+        const hand = sc.toss === 'hand' && this.mode === 'play' && !this.gliding;
+        if (sc.toss === 'gull' && snatch) this.world.snatch(snatch, p.x, p.y - PLAYER.height + 8);
+        // (Always behind her, whichever way the hit throws her: she must choose between running
+        // back for it and going on where she was going; the user, 2026-11-17. A gull's and a
+        // hand's take it.)
+        else if (!hand) this.loose.knock(p.x, p.y - 24, -facing, 1);
+        // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
+        if (this.mode === 'play' && !this.gliding) {
+            this.throwUntil = 0;
+            this.throwing = null;
+            const clip = `her-${sc.react}`;
+            if (hand) {
+                this.handOver(fromX);
+            } else if (this.anims.exists(clip)) {
+                this.flinchUntil = time + POCKET.recoverMs;
+                this.herClip(clip);
+            } else {
+                this.flinchUntil = time + POCKET.flinchMs;
+                if (this.anims.exists('her-hit')) this.herClip('her-hit');
+            }
+            // (Pushed on, she is stopped short, to stagger and catch herself: running on, it read as
+            // nothing; thrown back, a step back.)
+            p.body.velocity.x = hand ? 0 : sc.toss === 'on' ? facing * POCKET.stumblePush : sc.toss === 'back' ? -facing * POCKET.push : 0;
+            p.body.velocity.y = 0;
+        }
+        REACT_SOUND[sc.react]?.();
+        this.refreshHud();
+        return true;
+    }
+
+    // One of her clips played at its own speed (her run's leaves its pace on her sprite).
+    herClip(key) {
+        this.player.anims.timeScale = 1;
+        this.player.anims.play(key);
+    }
+
+    // A tangerine held out in both hands as an apology, her head bowed (§1.6, 23 and 24); the hand
+    // at the door it came from takes it (spent, never loose).
+    handOver(fromX) {
+        const p = this.player, dir = p.flipX ? -1 : 1, time = this.time.now;
+        this.flinchUntil = time + HAND_OVER.ms;
+        if (this.anims.exists('her-apology')) this.herClip('her-apology');
+        // (Behind her, her hands over it.)
+        const fruit = this.add.image(p.x + dir * HAND_OVER.dx, p.y - HAND_OVER.dy, 'tangerine').setOrigin(0.5, 0.6)
+            .setDepth(p.depth - 0.01).setVisible(false);
+        this.worldLayer.add(fruit);
+        const show = () => fruit.setVisible((p.anims.currentFrame?.index ?? 1) - 1 >= HAND_OVER.frame);
+        p.on('animationupdate', show);
+        this.time.delayedCall(HAND_OVER.giveMs, () => {
+            p.off('animationupdate', show);
+            fruit.setVisible(true);
+            sfx.give();
+            this.tweens.add({ targets: fruit, x: fromX, y: p.y - HAND_OVER.dy - 4, alpha: 0, duration: 380, ease: 'Quad.easeIn', onComplete: () => fruit.destroy() });
+        });
+    }
+
+    updatePocket(time) {
+        const safe = this.isSafe();
+        if (safe) this.player.setAlpha(Math.floor(time / 70) % 2 ? 0.5 : 1);
+        else if (this.wasSafe) this.player.setAlpha(1);
+        this.wasSafe = safe;
+    }
+
     // --- Scares (never death, §5.6) ------------------------------------------------------------
 
     beginScare() {
         this.mode = 'scripted';
-        this.dashUntil = 0;
+        this.safeUntil = 0;
+        this.flinchUntil = 0;
+        this.gagPending = null;
+        this.throwUntil = 0;
+        this.throwing = null;
+        this.lungeUntil = 0;
         this.bubbleUntil = 0;
         this.player.body.enable = false;
         this.cameras.main.stopFollow();
     }
 
-    // A fright that fits what got her, then she runs off the screen.
-    scareContact(fromX, kind) {
+    // The two facts read at every hit (docs/plan-three-uses.md §1.6): which side of her it is on
+    // (front: the way she faces, at this moment) and who was moving: she, toward it, faster than
+    // 20 px a second; it, toward her (`vx`, its speed along the deck), faster than 5. `dir`: the
+    // way it faces, for a person; `lying`: a thing at rest on the floor.
+    hitFacts(fromX, vx = 0, dir = 0, lying = false, crowded = false) {
+        const p = this.player, facing = p.flipX ? -1 : 1, toward = Math.sign(fromX - p.x) || facing;
+        return { front: toward === facing, she: p.body.velocity.x * toward > 20, it: vx * -toward > 5, faces: dir === -toward, lying, crowded };
+    }
+
+    // The scenario a hit with a tray in her hands takes for her reaction (the tray is spilled
+    // whatever it is): the obstacle's own, or, for a bump with no name, thrown back from the front
+    // and pushed on from behind.
+    reactionTo(fromX, what, { vx = 0, dir = 0, lying = false } = {}) {
+        const f = this.hitFacts(fromX, vx, dir, lying), sc = what && MISHAP_SCENES[scenario(what, f)];
+        if (sc && !sc.nothing && sc.toss !== 'hand') return sc;
+        return f.front ? { word: 'bumped', react: 'reel', toss: 'back' } : { word: 'bumped', react: 'stumble', toss: 'on' };
+    }
+
+    // She is hit by `what` (an obstacle of `MISHAPS`) from `fromX`: in a lunge she is through; with a
+    // tangerine on her, her reaction (the pocket); with none, her mishap and her checkpoint. Which
+    // scenario it is comes from the side and who was moving (src/world/mishaps.js); returns its
+    // number, or null when nothing happened. `force`: no contact (her own cry at a "Do Not Disturb"
+    // door): a lunge does not help. `snatch`: the gull that takes the tangerine. `ride`: how the
+    // thing carries her off, for a gag with it (`rideGag`).
+    scareContact(fromX, what, { vx = 0, dir = 0, lying = false, crowded = false, force = false, snatch = null, ride = null } = {}) {
         const p = this.player;
-        if (this.holding) return;           // nothing scares her on the way home (§6.1.9)
+        if (this.holding || this.gagPending) return null;   // nothing scares her on the way home (§6.1.9)
+        // In a lunge she is through: what touched her gives way in its own manner.
+        if (this.lungeSafe() && !force) {
+            this.world.lunged(what, fromX);
+            return null;
+        }
+        // Blinking after a hit forgiven, nothing touches her.
+        if (this.isSafe()) return null;
+        const id = scenario(what, this.hitFacts(fromX, vx, dir, lying, crowded)), sc = MISHAP_SCENES[id];
+        // (A slow thing she stands looking at does not knock her over: it is the thing's to stop.)
+        if (!sc || sc.nothing) return id;
+        this.lastMishap = { what, id, time: this.time.now };
+        if (!this.pocket(fromX, sc, { snatch })) this.mishap(sc, fromX, ride);
+        return id;
+    }
+
+    // Her mishap with none on her (§1.6): the gag, and her checkpoint; the keys do nothing until
+    // the fade. A hit in the air plays it when she lands. Until a scenario's own gag is made, the
+    // built fall on its side stands in (`down`), or she runs off.
+    mishap(sc, fromX, ride = null) {
+        const p = this.player;
+        if (this.mode === 'play' && !this.grounded) {
+            this.gagPending = { sc, fromX, ride };
+            this.flinchUntil = this.time.now + 10000;
+            return;
+        }
+        if (sc.gag && ride?.play) return this.thingGag(sc, ride);
+        if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
+        if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
+        if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
+        if (sc.down) return this.scareDown(sc);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         const away = p.x >= fromX ? 1 : -1;
         sfx.scare();
         rumble('bump');
-        this.alert.setText(fright(kind)).setVisible(true);
-        // A recoil from what got her (the vacuum: a jump, as it always was).
-        if (kind === 'drenched' && this.anims.exists('her-shiver')) p.anims.play('her-shiver');
-        else if (kind !== 'vacuum' && this.anims.exists('her-hit')) p.anims.play('her-hit');
+        this.alert.setText(fright(sc.word)).setVisible(true);
+        // Her reaction, as with a tangerine on her (shivering, arching), or her start; then off.
+        const clip = sc.react !== 'apology' && this.anims.exists(`her-${sc.react}`) ? `her-${sc.react}` : 'her-hit';
+        if (this.anims.exists(clip)) this.herClip(clip);
         else this.pose('rise');
-        p.setFlipX(kind !== 'vacuum' && this.anims.exists('her-hit') ? away > 0 : away < 0);
+        p.setFlipX(away > 0);
         this.script = null;
         this.tweens.add({
             targets: p, y: p.y - 14, duration: 170, yoyo: true, ease: 'Quad.easeOut',
@@ -4127,19 +4557,271 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
+    // Her gag with the thing that hit her (§1.6: the vacuum, 5a and 5b; the suitcase, 6a to 6c):
+    // whichever side it came from and whoever was moving, she rides it off (the user, 2026-11-16:
+    // "I prefer the ride in all cases"), one picture of her with it, drawn together (`her-mishaps`),
+    // facing the way it carries her (from the front she turns round onto it); the world's own is
+    // hidden until she comes out of her door. `ride`: { x, y: the thing's middle and its floor, dir: the way it
+    // carries her, v: its speed, px/s; endX: where its roll ends (the suitcase); hide(), show() }.
+    rideGag(sc, ride) {
+        const p = this.player, g = GAGS[sc.gag], dir = ride.dir;
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        ride.hide();
+        const s = this.add.sprite(p.x - dir * g.her, ride.y, 'her-mishaps').setOrigin(0.5, 1)
+            .setFlipX(dir < 0).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        this.gagEnd = () => { s.destroy(); p.setVisible(true); ride.show(); };
+        s.play(g.sit);
+        s.once(`animationcomplete-${g.sit}`, () => s.play(g.ride));
+        let v = Math.abs(ride.v), tipped = false, k = 1;
+        if (g.rideS) {
+            // The suitcase's ride takes `rideS` from wherever she is hit: the time its profile
+            // (cruise at `top`, then speed = px left x `slow`, at least `least`) would take over
+            // this roll, and every speed scaled to match; never under `pace`.
+            const L = Math.max(0, (ride.endX - (p.x - dir * g.her)) * dir), knee = g.top / g.slow, floor = g.least / g.slow;
+            const T = Math.max(0, L - knee) / g.top + Math.log(Math.max(Math.min(L, knee), floor) / floor) / g.slow + floor / g.least;
+            k = Math.max(g.pace ?? 1, T / g.rideS);
+        }
+        // (A door or a wall across the deck stops the ride short of it, `stopShort`: a beat there,
+        // and her checkpoint.)
+        const wall = this.stopShort(s.x, s.x + dir * 4800, ride.y, 16);
+        this.script = (dt) => {
+            if (sc.gag === 'vacuum') {
+                // Off down the corridor, faster and faster, out of the screen.
+                v = Math.min(g.speed, v + g.accel * dt);
+                s.x += dir * v * dt;
+                const view = this.cameras.main.worldView;
+                if ((s.x - wall) * dir >= 0) {
+                    s.x = wall;
+                    this.script = null;
+                    s.anims.pause();
+                    sfx.at(s.x, ride.y).thump();
+                    this.time.delayedCall(700, () => this.respawn());
+                } else if (s.x < view.x - 60 || s.x > view.right + 60) this.respawn();
+            } else if (!tipped) {
+                // On to the end of its roll, slowing; there it creaks and tips her off.
+                const left = (ride.endX - s.x) * dir;
+                v = k * Math.max(g.least, Math.min(g.top, left * g.slow));
+                const step = dir * Math.min(v * dt, Math.max(0, left));
+                s.x += step;
+                // (Its roll is seven metres: the view slides along with her, exactly as she goes,
+                // and never up or down. A camera follow started here snapped the view onto her.)
+                this.cameras.main.scrollX += step;
+                if (left <= 0.5) {
+                    tipped = true;
+                    sfx.at(s.x, ride.y).creak();
+                    s.play(g.tip);
+                    s.once(`animationcomplete-${g.tip}`, () => {
+                        if (g.dazed && this.anims.exists(g.dazed)) s.play(g.dazed);
+                        this.time.delayedCall(g.holdMs, () => this.respawn());
+                    });
+                }
+            }
+            // (Her word over her head goes with her.)
+            p.x = s.x + dir * (sc.gag === 'vacuum' ? 0 : 4);
+        };
+    }
+
+    // Her gag where she stands, one picture of her with the thing (§1.6: the papers, 4a and 4b),
+    // facing her way; set down so that its thing is where the world's own is (`ride.x`, the gag's
+    // `paper`), which is taken away (`ride.hide()`), on its floor (`ride.y`: hit up on something,
+    // the trolley's top, she comes down to the floor, never sits on the air when it moves on). She
+    // stays down a while, then her checkpoint.
+    fallGag(sc, ride) {
+        const p = this.player, g = GAGS[sc.gag];
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        ride?.hide?.();
+        // (Set down by the thing in the clip's own facing: turned, the other way.)
+        const face = (p.flipX ? -1 : 1) * (g.turn ? -1 : 1), at = g.at ?? g.paper;
+        const x = ride?.x !== undefined && at !== undefined ? ride.x - face * at : p.x - face * (g.her ?? 0);
+        // (`turn`: hit from behind, she turns round to face it, the clip drawn to her other side.)
+        const s = this.add.sprite(x, ride?.y ?? p.y, 'her-mishaps').setOrigin(0.5, 1)
+            .setFlipX(g.turn ? !p.flipX : p.flipX).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
+        s.play(g.fall);
+        s.once(`animationcomplete-${g.fall}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+    }
+
+    // A gag the thing plays itself, one picture of it with her (the towel stack, 18: `TowelStack.ride`
+    // in src/world/movers.js): she is hidden while `ride.play(done)` runs its clips; when it says it
+    // is done, `holdMs`, then her checkpoint, and `ride.show()` puts the thing back as it is left.
+    thingGag(sc, ride) {
+        const p = this.player, g = GAGS[sc.gag];
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        p.setVisible(false);
+        p.body.setVelocity(0, 0);
+        this.gagEnd = () => { p.setVisible(true); ride.show?.(); };
+        ride.play(() => this.time.delayedCall(g.holdMs, () => this.respawn()));
+    }
+
+    // Her gag with the porter and his cart (§1.6, 8a to 8d; `GAGS` cartDrape, cartPush, cartSit,
+    // cartBounce): one picture of her (with the cart in it for 8a and 8c, set down by the world's
+    // cart's middle, which is hidden), while the porter stands, follows her with his cart, wheels
+    // her on or turns round. Doors and walls stop him (`stopShort`). Then her checkpoint; he walks on.
+    cartGag(sc, q) {
+        const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        const dx = q.attached[0]?.dx ?? 24, walk = q.walk.clip ?? 'walk', v = q.walk.v * 48;
+        // (He stands at his handle: his push's first frame, held.)
+        const hold = () => { q.sprite.anims.stop(); q.sprite.setFrame(q.meta.anims[walk]?.[0] ?? q.meta.stand); };
+        const move = (x) => { q.x = x; pe.place(q); };
+        q.state = 'acting';
+        q.busy = true;
+        hold();
+        // (Each picture has her facing east: 8a's cart coming at her, 8c's up behind her. Set down
+        // where she stands; the porter is brought the last few px up to it.)
+        const x = g.cart ? p.x + face * g.cartAt : p.x - face * g.her;
+        if (g.cart) move(x - q.dir * dx);
+        const s = this.add.sprite(x, q.y, 'her-mishaps').setOrigin(0.5, 1).setFlipX(face < 0).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        if (g.cart) for (const a of q.attached) a.img.setVisible(false);
+        this.gagEnd = () => {
+            s.destroy();
+            p.setVisible(true);
+            for (const a of q.attached) a.img.setVisible(true);
+            q.busy = false;
+            pe.place(q);
+            pe.idle(q);
+            q.pausedUntil = this.time.now + 600;
+        };
+        const end = () => this.time.delayedCall(g.holdMs, () => this.respawn());
+        s.play(g.clip);
+        if (g.fronts) {
+            // 8b: he pushes on, blind behind his bags, the cart's front at hers, till she is down.
+            pe.anim(q, walk);
+            this.script = () => {
+                const k = Math.min((s.anims.currentFrame?.index ?? 1) - 1, g.fronts.length - 1);
+                const want = p.x + face * g.fronts[k], at = q.x + q.dir * (dx + 14);
+                // (Only ever on toward her, never further than she is pushed.)
+                if ((want - at) * q.dir > 0) move(this.stopShort(q.x, q.x + (want - at), q.y, dx + 14));
+            };
+            s.once(`animationcomplete-${g.clip}`, () => { this.script = null; hold(); end(); });
+        } else if (g.walkOnMs) {
+            // 8d: he walks on a few steps before he notices, then turns round to her (his cart
+            // stays where it is, in front of him).
+            pe.anim(q, walk);
+            const stop = this.stopShort(q.x, q.x + q.dir * (v * g.walkOnMs / 1000), q.y, dx + 14);
+            this.script = (dt) => {
+                const step = Math.min(v * dt, Math.abs(stop - q.x));
+                move(q.x + q.dir * step);
+                if (Math.abs(stop - q.x) < 0.5) {
+                    this.script = null;
+                    q.sprite.anims.stop();
+                    q.sprite.setFrame(q.meta.stand).setFlipX(q.dir > 0);
+                }
+            };
+            s.once(`animationcomplete-${g.clip}`, end);
+        } else if (g.rideM) {
+            // 8c: sat in his bags; he wheels her on, sees her and tips his cap.
+            s.once(`animationcomplete-${g.clip}`, () => {
+                const to = this.stopShort(s.x, s.x + q.dir * g.rideM * 48, q.y, 16);
+                pe.anim(q, walk);
+                this.script = (dt) => {
+                    const step = Math.min(v * dt, Math.abs(to - s.x));
+                    s.x += q.dir * step;
+                    move(q.x + q.dir * step);
+                    p.x = s.x;
+                    if (Math.abs(to - s.x) < 0.5) {
+                        this.script = null;
+                        pe.anim(q, g.tip, { loop: false });
+                        q.sprite.once('animationcomplete', () => { hold(); end(); });
+                    }
+                };
+            });
+        } else {
+            // 8a: over the bags, her legs kicking; he stands there.
+            s.once(`animationcomplete-${g.clip}`, () => { if (g.loop) s.play(g.loop); end(); });
+        }
+    }
+
+    // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her
+    // bottom (`slipfall`) or flat on her belly (`tripfall`), then dazed where she fell, butterflies
+    // circling over her head (`dazed-sit`, `dazed-lie`: drawn with her, as the user asked), and
+    // then back at her checkpoint.
+    scareDown(sc) {
+        const p = this.player, slip = sc.down === 'sit';
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(sc.word)).setVisible(true);
+        this.script = null;
+        const clip = slip ? 'her-slipfall' : 'her-tripfall';
+        if (!this.anims.exists(clip)) {
+            this.time.delayedCall(1600, () => this.respawn());
+            return;
+        }
+        this.herClip(clip);
+        // Flat on her belly she is drawn 2 px lower, from the fall's first frame on the floor until she
+        // is back at her checkpoint (the user, 2026-11-17: she lay a px or two over the carpet; her
+        // cell ends at her lowest px, her hand under her chin, so it is done here, not in the art).
+        if (!slip) {
+            const down = () => {
+                if (p.anims.currentAnim?.key !== clip || (p.anims.currentFrame?.index ?? 1) - 1 >= LIE_DROP.frame) {
+                    this.herDrop(LIE_DROP.px);
+                    p.off('animationupdate', down);
+                }
+            };
+            p.on('animationupdate', down);
+        }
+        // Someone who comes to her while she lies there (the dog's lick, `Fetcher.lick()`) puts a
+        // promise in `down.holds`: her checkpoint waits for each of them.
+        const down = this.down = { holds: [] };
+        // (`downMs`: dazed a shorter while than the stand-in's.)
+        p.once(`animationcomplete-${clip}`, () => {
+            const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
+            if (this.anims.exists(dazed)) this.herClip(dazed);
+            this.time.delayedCall(sc.downMs ?? 2100, () => Promise.all(down.holds).then(() => {
+                if (this.down === down) this.respawn();
+            }));
+        });
+    }
+
+    // How many px lower than her body her picture is drawn now (`herDrop`): a picture that takes
+    // her place (a gag) is set down by it too.
+    herDropPx() {
+        const p = this.player;
+        return Math.round(p.height - p.displayOriginY);
+    }
+
     // Hit in the air under the parasol (a gull across her way down to the bow): it is knocked out
     // of her hands, and down she goes out of the bottom of the screen.
-    scareAir(kind) {
+    scareAir(what, { snatch = null } = {}) {
         const p = this.player;
         if (this.mode !== 'play') return;
+        const sc = MISHAP_SCENES[scenario(what, {})];
+        if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10, sc, { snatch })) return;
         this.gliding = false;
         this.world.showParasol(false);
         this.takeoffY = p.y;
         sfx.scare();
         rumble('bump');
         this.scareFall();
-        this.alert.setText(fright(kind)).setVisible(true);
-        if (this.anims.exists('her-hit')) p.anims.play('her-hit');
+        this.alert.setText(fright(sc.word)).setVisible(true);
+        if (this.anims.exists('her-hit')) this.herClip('her-hit');
     }
 
     // Longer than one deck: the camera lets go and she drops out of the bottom of the screen.
@@ -4191,10 +4873,18 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
+    // Her picture drawn `px` lower than her body (0: as always), its body kept where it is.
+    herDrop(px) {
+        const p = this.player;
+        p.setDisplayOrigin(p.width / 2, p.height - px);
+        p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight - px);
+    }
+
     respawn(cleanup) {
         if (this.respawning) return;
         this.respawning = true;
         this.script = null;
+        this.down = null;
         const from = this.scareFrom || { x: this.player.x, y: this.player.y };
         // (Over the bow she comes back where the glide starts: src/world/finale.js.)
         const target = this.world.story.respawnFor?.(from) || this.closestCheckpoint(from.x, from.y);
@@ -4202,8 +4892,11 @@ export class ShipScene extends Phaser.Scene {
             targets: this.fade, alpha: 1, duration: 220,
             onComplete: () => {
                 cleanup?.();
+                this.gagEnd?.();                     // a gag's picture gone, the thing back in its place
+                this.gagEnd = null;
                 this.world.carryBox.drop();          // a tray is not hers to keep through a scare
                 this.tweens.killTweensOf(this.player);
+                this.herDrop(0);
                 this.spawnAt(target, { emerge: true });
                 this.tweens.add({ targets: this.fade, alpha: 0, duration: 260 });
                 this.respawning = false;

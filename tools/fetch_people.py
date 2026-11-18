@@ -40,9 +40,16 @@ def fetch(name, facing="east"):
     return clips
 
 
+# Figures whose frames are kept by hand (cut from a picture, clips not all on the character): a
+# fetch would overwrite them with the character's own, so they are fetched only by name.
+# (The steward's `tug` is a picture of him with his jammed trolley, made by hand from PixMiniMax:
+# assets/source/people/steward-raw/README.md.)
+BY_HAND = {"dog", "dogowner", "steward"}
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    names = args or [n for n in CAST if "--all" in sys.argv or not (OUT / n / "stand.png").exists()]
+    names = args or [n for n in CAST if n not in BY_HAND and ("--all" in sys.argv or not (OUT / n / "stand.png").exists())]
     for name in names:
         try:
             print(name, fetch(name))

@@ -4,6 +4,10 @@
 
 import { PLAYER, VERBS, HOLDING } from '../config.js';
 import { sfx } from '../sfx.js';
+// Her body's px clear of a cart's end while she pushes it: her middle 29 px from a cart 39 px wide, a
+// whole px so that it never flickers (it was 27.5: drawn 27 or 28; the user, 2026-11-18, "shift her a
+// pixel back").
+const PUSH_GAP = 2.5;
 
 export const verbs = {
     resetVerbs() {
@@ -27,7 +31,7 @@ export const verbs = {
         const p = this.player;
         // (Under something low she stays down; standing, it stops her like a wall.)
         const low = this.route === 'duct' || (this.crawling && this.world.lowAt(p.x, p.y));
-        const can = this.progress.knows('crawl') && !this.world.carry && !this.isDashing() && !this.holding;
+        const can = this.progress.knows('crawl') && !this.world.carry && !this.isLunging() && !this.holding;
         // (Once down she stays down while ↓ is held: changing her body's size unsettles the floor a frame.)
         const want = low || (input.down && can && (onFloor || this.crawling));
         if (want !== this.crawling) this.setCrawl(want);
@@ -147,7 +151,22 @@ export const verbs = {
         this.mode = 'push';
         this.pushSide = p.x < thing.x ? -1 : 1;        // which side of it she stands on
         p.setFlipX(this.pushSide > 0);
+        // (Her hands on its end, a px clear of its body: the user, 2026-11-18, "shift her a pixel back".)
+        this.pushGap = thing.width / 2 + PLAYER.bodyWidth / 2 + PUSH_GAP;
+        p.body.reset(thing.x + this.pushSide * this.pushGap, p.y);
+        if (!this.pushFollowOn) {
+            this.pushFollowOn = true;
+            this.events.on('postupdate', () => this.pushFollow());
+        }
         return true;
+    },
+
+    // The cart she pushes, at her gap ahead of her where the physics has just put her.
+    pushFollow() {
+        const t = this.pushing;
+        if (!t || this.mode !== 'push') return;
+        const at = Phaser.Math.Clamp(this.player.x - this.pushSide * this.pushGap, t.min, t.max);
+        if (at !== t.x) t.moveTo(at);
     },
 
     updatePush(input, dt, time) {
@@ -162,13 +181,11 @@ export const verbs = {
             this.mode = 'play';
             return;
         }
-        // The cart rolls ahead of her and she keeps pace with it (it holds her otherwise).
-        let vx = 0;
-        if (dir === -this.pushSide) {
-            const to = Phaser.Math.Clamp(t.x + dir * VERBS.pushSpeed * dt, t.min, t.max);
-            vx = (to - t.x) / dt;
-            if (to !== t.x) t.moveTo(to);
-        }
+        // She walks at the push's pace and the cart rolls on ahead of her, at her gap from it (the
+        // user, 2026-11-18: one px further back), to the end of its way; there it holds her.
+        // (The cart is set after the physics has moved her, before the frame is drawn: `pushFollow`.)
+        const ahead = -this.pushSide, end = ahead > 0 ? t.max : t.min;
+        const vx = dir === ahead && (end - t.x) * ahead > 0 ? dir * VERBS.pushSpeed : 0;
         body.velocity.x = vx;
         if (this.anims.exists('her-push')) {
             p.anims.play('her-push', true);

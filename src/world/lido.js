@@ -12,7 +12,7 @@ import { writeSave } from '../save.js';
 const M = 48;
 // The swirl: how long a full one takes (ms), and where it is a stub, perfect, or too much.
 const SWIRL = { ms: 2400, none: 0.14, perfect: 0.58, over: 0.84, max: 1.08 };
-const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000 };
+const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000, fruit: 15000 };
 
 export const lido = {
     setupLido() {
@@ -157,7 +157,7 @@ export const lido = {
         }
         await w.wait(250);
         s.bubbleUntil = s.time.now + 1500;
-        sfx.dash();
+        sfx.cry();
         await w.wait(700);
         // The kid comes up out of the hot tub behind him, and lets fly.
         this.tubBusy = true;
@@ -333,13 +333,13 @@ export const lido = {
                 const hit = s.mode === 'play' && s.route === 'inside' && ahead > 4 && ahead < KID.jet && her.y > k.y - 20 && Math.abs(her.y - k.y) < 40;
                 if (!hit || P.has('kid_fed')) return;
                 sfx.splashSmall();
-                if (w.carry) w.carryBox.spill(k.x);
-                else s.scareContact(k.x, 'splashed');
+                if (w.carry) w.carryBox.spill(k.x, false, 'jet');
+                else s.scareContact(k.x, 'jet');
             });
             return;
         }
         // Her shout sends him running.
-        if (!fed && playing && level && s.isDashing() && Math.abs(dx) < KID.sees) {
+        if (!fed && playing && level && s.isLunging() && Math.abs(dx) < KID.sees) {
             k.mode = 'flee';
             sfx.at(k.x, k.y).oh();
             return;
@@ -388,6 +388,46 @@ export const lido = {
             face(k.x <= L.kidA ? 1 : -1);
             k.pauseUntil = time + 500;
         }
+    },
+
+    // Her cry draws his fire: he turns and squirts at her at once (in a lunge he runs and hides
+    // instead: kidOnDeck). Once he is on her side, nothing.
+    kidHeard(cry) {
+        const k = this.who('npc_kid'), s = this.scene, her = s.player;
+        if (!k?.on || k.state === 'acting' || this.P.has('kid_fed') || s.isLunging()) return;
+        if (k.mode === 'flee' || k.mode === 'hide' || k.mode === 'tell' || !this.world.hears(k.x, k.y)) return;
+        k.dir = her.x < k.x ? -1 : 1;
+        this.people.place(k);
+        k.mode = 'tell';
+        k.waitUntil = s.time.now + 160;
+        k.pose = 'aim';
+        if (!this.people.anim(k, 'squirt')) k.sprite.setFrame(k.meta.stand);
+    },
+
+    // A tangerine thrown to him: he catches it, turns his back and eats it out of sight (his hands
+    // hold his water pistol in every pose he has), and keeps his back turned 15 s
+    // (docs/plan-three-uses.md §2). Spent.
+    kidOffered(t) {
+        const k = this.who('npc_kid'), s = this.scene;
+        if (!t.thrown || !k?.on || k.state === 'acting' || k.mode === 'flee' || !s.loose.near(t, k.x, k.y, 14, 50)) return false;
+        // (Caught at his front, facing where it came from; then his back to her.)
+        k.dir = t.img.body.velocity.x > 0 ? -1 : 1;
+        k.mode = 'patrol';
+        this.people.place(k);
+        const img = s.loose.claim(t).setPosition(k.x + k.dir * 8, k.y - 24).setDepth(k.sprite.depth + 0.01);
+        sfx.at(k.x, k.y).take();
+        k.state = 'acting';
+        s.time.delayedCall(450, () => {
+            img.destroy();
+            k.state = 'idle';
+            k.pose = null;
+            k.mode = 'hide';
+            k.waitUntil = s.time.now + KID.fruit;
+            k.sprite.anims.stop();
+            k.sprite.setFrame(k.meta.back ?? k.meta.stand);
+            for (let i = 0; i < 3; i++) s.time.delayedCall(700 + i * 1300, () => sfx.at(k.x, k.y).munch());
+        });
+        return true;
     },
 
     // E at him with what she has made: a stub he hands back to the deck, with a face; a proper

@@ -1618,3 +1618,1213 @@ board's own red notice with a white cat on it, which read as a lost-cat poster t
 repainted as a plain notice of text lines when the atlas is built (`paint` in
 `tools/build_ship_art.py`); both boards that use it changed, deck 4's at 190.6 m and deck 3's muted
 one at 88.5 m. Looked at in the game; no playtests run (art only).
+
+## The plan for the three uses, step 1: the cry and the lunge, the cabin's bowl (2026-11-15)
+
+Built on the branch `three-uses` from `docs/plan-three-uses.md` §5, step 1 (the user: "Start the
+implementation plan"). No art.
+
+- **D is the cry, and the lunge with it once learned** (`tryCry` in the ship scene; `CRY`, `LUNGE`
+  in `src/config.js`); the ten-second dash, its HUD bar and `DASH` are gone. Every press costs one
+  tangerine; with none, the count blinks. A second D within 0.6 s (`CRY.gapMs`) or during a lunge
+  does nothing, so a double tap does not spend two by accident (my addition, not in the plan).
+- **The lunge carries her the way she faces** whether a way is held or not (a lunge, not a faster
+  run); the arrows still steer it. Twice her speed and twice her acceleration, as the dash had.
+- **What the cry reaches** (`world.shout()`, `world.hears()`: 4.5 m, on her route, within 70 px of
+  her height) and what each does: as GAME_DESIGN.md §3.2 lists, from the plan's §2. Choices made
+  where the plan left room:
+  - A startled walker freezes mid-step (`anims.pause()`), a little smaller, as the steward at a
+    door: his standing frame left the waiter's tray in the air over his face (seen in the
+    close-up). The jogger jogs on the spot.
+  - Only those standing about with the plain `idle` clip turn to look: one at work (the runner on
+    the treadmill, the chefs, the pianist) or seated keeps facing what they do ("Looking closely",
+    question 3).
+  - The few with a mark (`hear` in `tools/population.py`): a heart over four who like cats (the
+    lady in the robe on deck 4, the guest at the model ship, the shopper, the granny on the
+    Stardust's balcony); a finger to the lips over two in quiet places (the Internet Cafe's surfer,
+    a lady in the theatre's stalls). "own": the kid, the kid in the hot tub, the librarian, whose
+    story code answers. People the movers own (the queue, the steward on his rounds, the faces
+    behind the swinging and "Do Not Disturb" doors, the rival on the stage) are left to them.
+  - The "Do Not Disturb" door answers within 3 m, 0.3 s after the cry, and its fright is not
+    forgiven by the lunge (`scareContact(..., force)`): it is no contact. With a tray, a spill.
+  - Bumbot at a near-catch: he turns to her for half a second with a small hop (his ears are not
+    drawn separately). The funnel's gulls only mark her on its stairway, where D does not work
+    (stairs are a mode of their own): their answer is built but will rarely be heard.
+- **What the lunge does** (`world.lunged(kind, fromX)`, once per thing): the porter's cart rolls
+  two metres within his loop and he runs after it; the jogger spins; a basketball is headed back
+  onto the court and that turn's ball is gone; trays on a hallway's floor scatter (set straight
+  once she is 8 m away) and their door opens 0.9 s later; a sprinkler leaves drops on her, a flare
+  or the sauna's steam a wisp. The swinging light and the chips no longer play their bonk and slip
+  sounds when she is through them; the towels do not bury her.
+- **The bowl**: the crew cabin's three painted tangerines are `tan_3_bowl_1` to `_3`, each with
+  its 8 px cell where it was painted (`tools/draw_rooms.py` keeps the bowl and drops them). Laid
+  over the old picture pixel for pixel: the same places; the real ones are a little brighter (the
+  painted ones were washed with the room) and their bottom row now covers 4 px of the bowl's rim.
+  56 tangerines in all.
+- **Sounds**: `dash` became `cry` (unchanged), `lunge` (a rush of air, new: the user's to judge on
+  the soundboard) and `lungeEnd`; the rumble's "the dash starting" is "the lunge starting".
+- **The `dash` playtest** found that deck 4's crates it broke no longer exist (the check passed
+  because she ran past where they had been); it now lunges through deck 4's luggage at 30 m.
+- **Playtests run, sound off:** `boot`, `dash`, `deck3` (the bowl added to it: three taken, the count
+  3), `vacuum`, `gamepad`, `sound`, `lang`, `intro`, `region1`, `region4`, `region6`, `region8`:
+  all pass but one check in `region6`, "the grip socks ... how they are used", which looks for a
+  hint ("kick") taken out on 2026-11-14 and fails on `main` as well (the socks are taken: later
+  checks see them). Not fixed here. The rest of the suite was not run.
+  **Since (the user, 2026-11-15: "Drop the check (fix the test)"):** the check asks only that the
+  socks are taken; `region6` passes.
+
+## The plan for the three uses, step 2: the pocket, and the tangerine a real thing (2026-11-15)
+
+Built on `three-uses` from `docs/plan-three-uses.md` §5, step 2, after step 1 was approved (the
+user: "continue the plan"). No art.
+
+- **The pocket** (`pocket(fromX)` in the ship scene; `POCKET` in `src/config.js`): at the top of
+  `scareContact` (after the lunge, which still comes first) and of `Carry.spill`; also under the
+  parasol (`scareAir`, the two gulls over the bow), where she keeps gliding and only blinks (the
+  plan's table forgives the bow's flocks; a hit there was a fall). Not for a load gone over by her
+  own feet (the cake's sway, a tray carried into a pool: `spill(fromX, own)`), falls or the sea.
+  The flinch is her `her-hit` clip for 340 ms while she is slowed from a push of 120 px a second
+  (about half a metre back); the blink is her alpha between 1 and 0.5 (the soundscape takes her
+  under 0.5 for gone and would drop her steps).
+- **A walker who bumped into her stands aside** as at her cry (`people.standAside()`, taken out
+  of `heard()`): my addition. Without it the porter walked on through her while she blinked and
+  hit her again the moment it ended, a second tangerine for one meeting.
+- **The loose tangerine** (`src/world/tangerine.js`, `LOOSE` in the config): an 8 px body in a
+  physics group with the same floors and walls as hers by its own route (the solid layer, rooms,
+  side walks from above, the outside's platforms and partitions, the duct, carts, crates,
+  pushables, breakables, the robot, closed bulkheads, the ropes and fire doors that hold her).
+  Phaser hands a group against a single body to the callback in the other order: each callback
+  finds the tangerine first. It leaves her hip at 220 px a second, 200 up, bounces at 0.35, a
+  floor slows it 200 px a second each second: about 4 m in all, then rest. It turns a quarter at
+  a time about its middle (by degrees an 8 px fruit only blurs). She cannot catch it for 0.6 s
+  (it leaves from inside her). At rest it is kept in `save.loose` (written with the save at a
+  checkpoint, as her count is); picked up by walking over it, as any tangerine.
+- **Sounds**: `pocket` new (a soft knock and a pop; the user's to judge on the soundboard). The
+  plan's `roll` and `plop` were names taken already (a cart's wheels, a small soft thing dropped):
+  its bounces use `plop`, its fall into a pool or the sea `splashSmall`, and it rolls silently. No
+  new rumble: the spill's light tick.
+- **The playtests run with the pocket off** unless a scenario names it (`Browser.open()` adds
+  `&pocket=off`): a scenario that picks up a tangerine on its way and then checks a fright still
+  sees the fright, as the plan wanted of them. A new scenario, `pocket`: the porter walks into her
+  with her tray and two tangerines; forgiven, one less, the tray kept, he stands aside, it flies
+  off the way she was pushed, rests on the floor some way off, is in the save, there after a
+  reload, hers again walked over; with none, a fright; a long fall is a fright with three.
+- **Playtests run, sound off:** `pocket`, `dash`, `vacuum`, `falls`, `overboard`, `region1`,
+  `sound`, `boot`: all pass. `tools/check_sound.py`: all within bounds. The rest of the suite was
+  not run.
+
+## The plan for the three uses, step 3: the throw (2026-11-15)
+
+- **Her clip** (`toss`, 3 generations, approved by the user's price word: the plan said about 5,
+  I quoted 3.1): `animate_character` in skeleton-v3 mode with eight poses written by hand (arm
+  back low, a step, the swing past the hip, the let-go at chest height, the follow-through), east
+  only, on her stored character, so no pose estimate was needed. Her existing `throw` (the
+  two-handed overhead shot at the court) would not do for a roll. The tangerine is put in her
+  fist in frames 0 to 3 by `tools/hold_tangerine.py` (the game's own fruit, her fingers' skin put
+  back over it), into `toss-held/`; the raw frames are kept as they came. One frame has her fist
+  a little smeared as it swings past her hip: it reads as a hand at the game's size, left.
+- **The throw** (`tryThrow`, `releaseThrow` in the ship scene; `THROW` in the config): on her
+  feet only, hands free (not with a tray, crawling, gliding, in a lunge, holding Bumbot; the
+  ladders, stairs and pool are modes of their own). She stands for 440 ms; it leaves her hand at
+  250 ms (the clip's fifth frame, at 16 a second), 18 px ahead of her middle, 32 over her feet,
+  and is spent only then: a fright or the pocket's flinch before it drops the throw and keeps the
+  tangerine. The roll: 240 px/s, 60 up: 6.1 m measured. The lob: 250 px/s, 355 up: its top 99 px
+  over the floor 2.5 m ahead (the plan's 2.3). With none, the count blinks, as for D.
+- **A hard landing keeps 45% of its speed along the floor** (`LOOSE.landKeep`, from 260 px/s
+  down): a lob rolled on 9 m after landing without it. It applies to a knocked-out tangerine too.
+- **Lying tangerines are offered too**, each frame (step 2 offered only moving ones): a vacuum
+  passing one, a gull coming down to one. `loose.near(t, x, y, dx, dy, route)` is every taker's
+  test; `loose.claim(t)` hands over one a taker carries off itself.
+- **The takers, as built** (the plan's §2, fourth column, for everything there is today):
+  - Porter: he stops for it anywhere along his touch box, his cart's front included (at first
+    only his feet counted, and his cart reached her first: a fright), picks it up, stands by the
+    wall 10 s and eats it. Waiter: stops 2 s and pockets it. Both spent. Jogger: a little hop
+    over it, which rolls on.
+  - Anyone else standing about (the ones who turn at her cry) turns to look at a moving one
+    for 1.8 s.
+  - The steward on his rounds: on his cart's top beside the swan, hers again with E (a thing
+    whose x is the cart's). Not spent; **but it is not in the save while it is on the cart**:
+    lost if the game is closed then. My simplification.
+  - The kid: catches one that reaches his hands (he faces where it came from), eats it in two
+    bites, his back turned 15 s (`KID.fruit`). One that lands short of him at the pool is the
+    gulls'.
+  - Deck 4's vacuum (the scene's `offeredHere`) and deck 9's darting one: swallowed, a choke
+    (`vacChoke`, a new sound, the user's to judge), tinted dead and tilted, a wisp of smoke now
+    and then, harmless, until she has left the deck.
+  - Gulls (`world.gullTakes`: down to it, four pecks, off with it in its beak): the pool's and the
+    Great Outdoors' (their own `pounce`; no dive at her cone for 10 s after), a balcony's (gone
+    until she is 4 m away), the promenade's shy ones (8 s), the funnel's (no swoop 10 s), the
+    bow's flocks (one goes, and flies back to its place).
+  - The trays outside a "Do Not Disturb" door: the clatter, the door opens, the guest looks this
+    way and that (a third way of `knock`, `look`: no shriek, no fright wherever she is), and the
+    trays stay quiet until she is 3 m off them again. The tangerine lies there, hers again.
+  - The piñata: a lob that meets it brings it down by the lunge's own code, taken out into
+    `world.breakThing()`. It hangs in a small room past a wall, so the lob that does it is the
+    one thrown from under it, rising through it.
+  - The court's hoop: a lob coming down through the rim, a swish, a cheer, a sparkle; it falls
+    on through.
+  - The Spinnaker's piano: one coming down over its keys (a box guessed from where she stands to
+    play, not from the art) plays a random note of its tune and a ♪.
+  - The delivery robot: one that comes down on its top stays there (a bounce would take it off
+    so small a top) and rides along, its place in the save kept up.
+  - Bumbot at a spot: a thrown one that reaches him is batted straight back to her (his `bat`
+    clip, then a wash: "sniffs his paw"); his spot and his near-catch are what they were. At the
+    tip of the bow: he backs off (`spook`), and it rolls on.
+- **Not tried in the game:** the funnel's gulls and Bumbot at the tip (both need the story far
+  along); written by their own code's patterns.
+- **The `gamepad` scenario taps Y** to take the controller up again before a fright: Y is the
+  throw now; harmless there (the fright drops it).
+- **A new playtest scenario `throw`**: the roll (one less, about six metres, in the save, hers
+  again walked over), the lob's height, deck 4's vacuum choking and harmless and going again off
+  the deck, a pool gull taking one, the piñata by a lob and its three tangerines, Bumbot batting
+  one back and his near-catch after.
+- **Looked at closely** (the targets at their moment, enlarged): the porter's fruit in his hand,
+  on the steward's cart by the swan, the choked vacuum, the kid eating it and his back turned.
+  The pool's gull came down exactly on the fruit and hid it; it lands short of it now, facing it.
+- **Playtests run, sound off:** `throw`, `pocket`, `vacuum`, `gamepad`, `region2`, `region6`,
+  `region7`, `region8`: all pass (`throw` again after the gull's fix); `tools/check_sound.py`: all
+  within bounds. The rest of the suite was
+  not run.
+
+## The plan for the three uses, step 4: region 1's decks, and the first things to find (2026-11-16)
+
+- **Art, approved item by item (49 generations):** the dog (PixelLab pro flash, the dog template,
+  side view, styled on her sprite; 6) with a walk, a run and a sit (skeleton-v3, 3 each); the
+  knitting lady (pro, styled on the cabin maid; 10) and her seated knit (skeleton-v3 poses; 3);
+  the paper round's steward (pro, styled on the drill's officer; 10), his walk (skeleton-v3
+  "walking"; 3) and his skim (poses; 3); four map objects (tennis ball, wool, feather on a stick,
+  a desk flag of Ukraine; 1 each) and a folded newspaper (1). Shown to the user before the clips.
+- **The newspaper map object is not used** (`SKIP` in `tools/build_things.py`): it came drawn
+  tilted, a smudge at the 3 px of a paper on the carpet; the papers are drawn in code
+  (`paper-fold`), on the user's word.
+- **The steward's skim lost its stack** in its first three frames (the finger licked): his flick is
+  the clip's last five (`cut` in `tools/cast.py`), and the lick is gone.
+- **The dog is shrunk to 22 px** (`scale` 0.65): a small dog beside her.
+- **The things to find** are `ITEMS` whose `what` is `keep:<whose>:<name>` (cat, her, him), kept in
+  `save.keeps`; taken with E, or handed over (`world.giveKeep()`, the dog's owner's ball). One up
+  high (more than 40 px over the floor: the climb's feather) is hers only from up there, or once a
+  lob has knocked it to the floor (`world.lobbedInto()`; the lob that does it comes down onto the
+  shelf from about four metres back, over the carts). The HUD: a count per kind after the books'
+  (🐾 Bumbot's, 🌸 hers, 🎸 his: my picks), each hidden until its first find; the totals are
+  `KEEPS` in `tools/population.py`.
+- **Deck 4:**
+  - The suitcase (`Roller`, the atlas's own `suitcase`) rolls between 38.5 and 45.5 m, a roll there
+    and back in 20 s, a creak at each end; walked into, a bump; a lunge sends it rolling to the
+    corridor's end, where it stays.
+  - The dog (`Fetcher`) is at the cabin door at 99.6 m, not 86: 90 m has a service cart and 95.6
+    a lift's door. Its owner is `railwoman`, the one figure made and placed nowhere (the plan's
+    "existing figure"), standing in her open door (`door-cabin-ajar`; its slot listed with the
+    corridor's door spots so no closed door is drawn under it). The lead is drawn from her hand
+    to its collar, sagging to the carpet. **Where it lies, run into, she trips on it: a stagger
+    (her slip pose), slowed to a third for half a second, and she is past; a hop clears it; never
+    a fright.** At first it held her back like a wall until she jumped (the plan's "a line to hop",
+    with its "no fright"): the user ran into it and asked why she could not pass; of three ways
+    offered they chose the trip (2026-11-16). Only crossing at the line itself counts (a teleport,
+    a fright's walk back, cross it freely). **The lead stops short of any wall across the deck:** the
+    user saw the dog wander past the bulkhead at 101.9 m into the stair hall, its lead through the
+    wall; its reach is now 95.6 to 101.6 m. Its owner turns to face her dog, the lead in her front
+    hand.
+    It fetches a tangerine on the carpet within its 4 m and brings it to her feet; she has it
+    again at once. Three fetches: a heart over its owner, and the tennis ball. Her cry: a howl,
+    round its owner's legs, the lead flat 5 s. A lunge: it jumps aside. It never meets the vacuum
+    (118 to 143 m), so it does not bark at it.
+  - The climb, between the cabin doors at 143.6 and 147.6 m: the room-service cart (25 px), the
+    laundry cart drawn for the linen room (41 px; nothing in the atlas reads as a linen cage), a
+    shelf on two brackets drawn in code at 66 px (the ceiling is at 128 and she is 59 tall: no
+    higher). The feather lies on the shelf. **The vacuum now stops at 143 m** (it ran to 150),
+    so it never runs through the carts: the plan's "the vacuum passing underneath" is dropped.
+- **Deck 5:**
+  - The knitting lady sits in an armchair just inside her open cabin door at 24.9 m (`peek-knit`,
+    drawn in code like `peek-sea`), knitting; her basket by the door with the wool.
+  - The paper round (`Skimmer`) between 31.5 and 42 m (not 34 to 46: a stewardess with a tray
+    stands at 44.4): from three metres short of each door he flicks a paper along the carpet
+    that slows to a stop at it; stepped on while it slides, she slips. At the end he walks back,
+    and the papers are taken in. Her cry: he stands aside; a tangerine thrown to him: caught and
+    eaten standing aside (spent).
+  - Her flag: there is no desk at 146 m. The one desk of Shore excursions and reservations is the
+    counter at 140 m; four little port flags drawn in code (Sweden, Finland, Estonia, Denmark) and
+    hers at its far end.
+- **Sounds:** `bark`, `howl`, `paperSlide` new (the user's to judge on the soundboard).
+- **`tools/check_corridors.py`** (the plan's §4.7, from the audit's scratch script): before this
+  step deck 4 had 80.4 m without a reward and deck 5 80.5 m; after it, deck 4 68.4 m (31 to 100)
+  and 29.6 m at most without a beat, deck 5 58.1 m without a reward and 55.2 m without a beat.
+- **A new playtest scenario `deck4`** (decks 4 and 5): the suitcase, the lead tripped on and hopped, its reach short of the bulkhead, three
+  fetches and the ball, the feather (not from the floor; a lob; up the climb by jumps, 25, 41 and
+  66 px), the wool, the flag, the HUD's counts, a paper slipped on.
+- `tools/check_overlaps.py`: nothing (after the dog's door).
+- **Playtests run, sound off:** `deck4` (new), `region1`, `boot`, `deck3`, `trunk`, `ladder`,
+  `throw`: all pass. `tools/check_sound.py`: all within bounds. The rest of the suite was not run.
+- **Eating, as the user asked it (2026-11-16): "to their mouths, bite, remove leftover food from
+  their mouths, chew; the food has to stay in their hands".** The tangerine had been squashed
+  flatter in the air at each bite, and the user saw it melt. Now a `bite` clip for the porter and
+  the paper round's steward (skeleton-v3 poses, 3 generations each, approved): the hand to the
+  mouth, a bite, the hand down, three chews; played three times (`people.eat()`), the fruit in
+  the fist in every frame (`FISTS` in `src/world/people.js`, found frame by frame and composed
+  offline at the game's offsets before trusting them), drawn behind the figure so the fingers
+  close over it (over the porter's trolley, which is drawn over him while he stands aside),
+  bitten at each bite (`tangerine-bit1`, `-bit2`, drawn in code) and gone at the third. The
+  steward eats with his far hand: the near arm holds his stack.
+- **The kid's clip was made and is not used** (3 generations): his water pistol is drawn into
+  both his hands in every pose he has, and the clip carried it to his mouth. He catches the
+  tangerine, turns his back and eats it out of sight (munches heard), back turned 15 s.
+- **The papers are taken in** (the user tried E and crouching on one lying at a door: it looked
+  like a thing to pick up): a moment after one stops at its door, the door opens a crack at its
+  handle's side, a hand draws it in, the door shuts. **One she slips on shoots on to its door**
+  (the user saw it stay where it hit her), harmless after the first slip, and is taken in.
+- **Playtests run, sound off:** `deck4` (with the paper taken in and the steward eating),
+  `throw`, `region1`, `region6`: all pass.
+- **The user's fixes to the paper round (2026-11-16):** the steward's tangerine is drawn over his
+  hand, covering his palm (it sat behind it: `FRUIT_OVER`); a paper lying at its door, not yet
+  taken in, is as slippery as a sliding one (once), and lies there 2 s before the hand takes it;
+  he skims each from five metres short of its door (three before), sliding a second and a half;
+  his round starts at 23.5 m so that the first door (28.9 m) has its five metres, and the doors
+  he serves start five metres into his round (the knitting lady's open door is not one).
+  `deck4` passes (with a paper lying at its door slipped on).
+- **More of the user's fixes (2026-11-16):** the steward skims papers on his way back too, west
+  to the doors behind him (from 5 m short of each, as forward), so the round is never quiet. The
+  knitting lady sat in front of her doorway rather than in it (the user: "she looks misplaced");
+  she sits two pixels further in, her armchair's back against the door's leaf, and the door's
+  frame on the corridor side is drawn over her (`peek-knit-front`), her toes behind it.
+- **The user's third round on deck 5 (2026-11-16; generations approved freely, "I have 5000"):**
+  - The knitting lady's cabin: its picture (a green and blue landscape) read as the flag of
+    Ukraine upside down; it is a red flower in a vase in a gilt frame, and below it the end of
+    her bed. She sits on her own armchair in the corridor, forward of her open door, its back
+    against the deck's end wall (which runs to 23.33 m), her basket at her feet. A first
+    armchair (a map object, 1 generation) came drawn turned three-quarters while she is in
+    flat profile; the user: "Regenerate the lady with the chair together". The armchair was
+    drawn by inpainting round her own seated frame (her pixels kept, 1 generation), the specks
+    cleaned off and her cut out of it, so she sits in it exactly (`knit-chair`; the turned one
+    kept unused in `SKIP`).
+  - The stewardess with the tray (`amb_breakfast`, an ambient figure) is the breakfast round
+    (`Breakfast`, `BREAKFASTS`): door to door at 44.9, 48.9 and 52.9 m with a covered plate from
+    her room-service trolley, a knock, a hand takes it in (`world.handTakes()`, shared with the
+    papers), she wheels the trolley on (a low thing to hop), and back at the last door. Walked
+    into, she drops her tray with a crash: a fright. Her cry: she stands aside. A tangerine
+    thrown to her: onto the trolley, in with the next plate (spent). A lunge: she is spun round.
+    Her walk clip (3 generations) carries her tray and her bag, as her standing pose does.
+  - A second paper round where the forward cabins meet the stair hall (57.5 to 74 m), by a new
+    stewardess (`paperwoman`: pro, styled on the cabin maid, 10; walk, skim, bite, 3 each). Her
+    skim is her flick whole (no finger licked); her stack is under her far arm, mostly hidden
+    behind her, so in her walk it shows in two frames of six. Her tangerine is in her palm.
+  - The first round starts at 26 m (it stood in front of the knitting lady at 23.5); it serves
+    the first door on its way back only.
+  - `deck4` (now with the breakfast round), `region1`, `boot`: pass; `check_overlaps.py`: none.
+- **The user's fourth round (2026-11-16): "broken on many levels".** The tray stewardess's figure
+  (`stewardess`, made long before) holds a tray in one hand and a bag in the other in every pose,
+  and I had drawn a covered dish over her painted tray. She is replaced by a new figure with
+  empty hands (`roomservice`: pro, styled on the cabin maid, 10; a walk and a `carry` walk, both
+  hands forward, 3 each) and a breakfast tray of its own (a map object, 1: a covered plate, a
+  glass of juice, a flower in a vase), carried on her hands (`TRAY_HANDS`, composed offline) to
+  the door, where the hand takes the tray itself in; she walks back empty-handed for the next.
+  Walked into with a tray, it falls with a crash.
+  **The door's crack opened in bare wall** at some doors: the rounds took their doors from the
+  corridor's grid of door places, but the corridor draws no cabin door beside a lift's, a crew
+  door or a stair hall. The corridor now keeps the doors it draws (`cabinDoorsDrawn`), and the
+  rounds serve only those (`realDoors`): the breakfast round 44.9 and 52.9 m (48.9 is a lift's),
+  the second paper round 60.9 to 68.9 m (72.9 is the stair hall's).
+  **The user's standing word, saved (`CLAUDE.md`, "Art"): "Don't hesitate to generate new/updated
+  props in order to implement things properly visually. Use the generations."**
+  The knitting lady's cabin: its picture and bed washed 30% toward the wall, as inside every room.
+  `deck4`, `boot`: pass; `check_overlaps.py`: none.
+- **The user's fifth round (2026-11-16):**
+  - A lunge goes past the breakfast trolley as past her (`through` on a solid: the trolley).
+  - **Her falls, new clips (skeleton-v3 poses, 3 generations each):** a slip with a tangerine on
+    her is caught backwards, arms going (`slipback`), the tangerine flying back; without one she
+    goes down on her bottom (`slipfall`), sits dazed with butterflies circling over her head
+    (`dazed-sit`) and is back at her checkpoint. **The dog's lead is a trip now** (`tripped`, a new
+    fright word in both languages): with a tangerine she stumbles on forward (`stumble`), the
+    tangerine flying ahead of her; without, she falls flat on her belly (`tripfall`), lies dazed
+    (`dazed-lie`) and is back at her checkpoint. The stagger of before (slowed, nothing lost) is
+    gone. The wet patch by the pool is a slip too, and has the same falls.
+  - **The butterflies are drawn with her** in the dazed clips (the user: "Don't generate
+    butterflies separately. As a rule ... generate people with objects together"; saved in
+    `CLAUDE.md`): two butterfly sprites made first to circle over her in code (2 generations) are
+    kept unused (`SKIP`). The dazed clips' first frame is their starting pose, without the
+    butterflies, and is left out of the loop. The trip's clip failed once on PixelLab's side (a
+    service error) and was made again.
+  - `deck4` (the lead's trip and fall, the breakfast round from a spot clear of the papers),
+    `pocket`, `lang`, `region6`: pass.
+- **The user's sixth round (2026-11-16):** the second paper stewardess turned on the stair hall's
+  doorway (its wall at 73.9 m): her round ends at 72 m. A trip with a tangerine on her played its
+  stumble while she ran on at her speed, and read as nothing ("she doesn't trip"): she is stopped
+  short now (45 px/s on), and her stumble and her slip caught backwards play at 9 frames a second
+  for 0.7 s. The fall after a slip with tangerines on her was my second link's `&pocket=off`,
+  which switches their help off while the HUD still shows ∞.
+
+## The plan's revision, step 1 gone back over: obstacles by name, the new tangerine (2026-11-16)
+
+The plan was revised with the user the same day (`docs/plan-three-uses.md`, §1.6, §1.7, "Start
+here" 7); each built step is gone back over under its "Revision".
+
+- **Every hit names its obstacle** (`MISHAPS` in `src/config.js`, 24 lines: the chips, the lead,
+  the trays, the papers, the vacuums, the suitcase, the deck chair, the porter's cart, the jogger,
+  the breakfast tray, the kid's jet, the stage's light, a door, a basketball, the drill's boat, a
+  sprinkler, the steam, the towels, a flare, the three kinds of gull, a "Do Not Disturb" door, the
+  occupied balcony). `scareContact`, `scareAir`, `Carry.spill` callers and `world.lunged` take that
+  name; the people's `touch` in the data names theirs (`cart`, `jogger`). Each line has the word she
+  cries, as before, and what stands in until its own gags are made (`down`: the built falls;
+  `recoil`; `mark`: what a lunge through it leaves on her). Nothing in play changes yet.
+- `src/lang.js`: "Weeeee!" / «Віііі!» (`fright.ride`), the vacuum's ride (§1.6, 5b).
+- **The new tangerine (§1.7):** six candidates from PixelLab (pixen, 16 and 20 px, 6 generations;
+  one came with a face). The user chose the second and asked for it a little smaller: shown at
+  12, 11 and 10 px, made by taking whole rows and columns out of its peel (not resampled, which
+  blurs the outline); its colours put on Resurrect 64 by hand (the automatic snap flattened its
+  shading and turned its leaves yellow). **The user chose 10 px.** It is `FRUIT.tangerine` in
+  `src/textures.js` with its own small palette, and its two bitten states are cut from it (the
+  half's top the fruit inside, not an outline, which read as a dark bowl). Everything follows: the
+  pickups (their glint on its highlight), the loose one (origin at the fruit's middle under its
+  leaves, so it turns about itself; its body 8 px, it was 6), the HUD's icon (x3, it was x4 of
+  8 px), her toss's fist (`tools/hold_tangerine.py`, leaves and all), `TANGERINE` in
+  `tools/draw_rooms.py`. Its raw picture: `assets/source/tangerine/`.
+- **Found on the way:** a tangerine on a side table lay 12 px up, the table is 22: it hung under
+  the top (it did with the old one too, the bigger fruit showed it). It lies on the top now.
+- **The crew cabin's bowl (the user):** "Two bottom tangerines should be layered out behind the
+  bowl (move them on z-axis relative to the bowl ...). The top tangerine move on the z-axis behind
+  the bottom two." A room's picture can now have pixels drawn in front of what lies in the room
+  (`Room.in_front()` in `tools/draw_rooms.py` marks what a drawing changed; `<room>-front.png`,
+  loaded when the data says `front`, drawn over the tangerines); in a pile a higher tangerine is
+  behind a lower one (its depth by its height).
+- `lang`, `dash`, `pocket`, `deck4`, `deck3`, `intro`, `throw`, `boot`: pass.
+
+## The plan's revision, step 2 gone back over: mishaps by side and mover, her reactions, the flight to the count (2026-11-16)
+
+- **Which mishap a hit is** (§1.6): `src/world/mishaps.js` reads the two facts at every hit (the
+  side of her it is on, at that moment; who was moving: she toward it over 20 px/s, it toward her
+  over 5) and picks the obstacle's scenario by the plan's table (the porter: 8a into his cart, 8b
+  it pushes into her as she stands facing it, 8c it reaches her back, 8d into his back). The
+  scenarios are `MISHAP_SCENES` in `src/config.js`, one line each: her word, her reaction with a
+  tangerine, where the tangerine goes, and the built fall that stands in for the gag until it is
+  made (`down`: on her bottom or on her front; none: the run-off, now only for the doors and
+  the balcony and where no fall fits yet: a sprinkler, water down her back, a gull on a rail).
+  `scareContact(fromX, name, { vx, dir, lying, force, snatch })` returns the scenario; the callers
+  pass their speed (the vacuums, the suitcase, the papers, the deck chair, the people walking) and
+  a person their facing. `Carry.spill` takes the same name and gives the same reaction (a tray in
+  her hands is spilled whatever it is, and she never hands one over with it: thrown back or
+  pushed on instead). 4c and 6c (a paper at her shoe, the suitcase she watches) are no hit at
+  all; what the paper and the suitcase then do is step 4's revision.
+- **A hit in the air** plays its mishap when she lands (`gagPending`); during a mishap the keys
+  do nothing (as before: the scene is scripted).
+- **Her seven new clips** (skeleton-v3 poses, 3 generations each, 21): `reel` (the plan's
+  "thrown back, she reels a step"; PixelLab's `hit` move), `rubnose`, `splutter`, `arch`, `yelp`,
+  `duck`, `apology` (both hands held out, head bowed: only her body described; the game's own
+  tangerine is laid behind her hands from its third frame, `HAND_OVER`, so that a hand at the door
+  can take it). Each in place in the game, frame by frame, before showing.
+- **Found on the way:** her run's pace is left on her sprite's playback speed, so a fall played
+  just after running ran three times slower (the `dash` scenario waited out its 6 s). Her
+  reactions and falls are played at their own speed now (`herClip`).
+- **The gulls** (on the balcony rails, the funnel's, those across her glide) take the tangerine
+  from her and fly off with it (`world.snatch`). **A "Do Not Disturb" door, the occupied
+  balcony:** her apology, the hand takes it (spent).
+- **The flight to the count** (§1.7): `gainTangerine(x, y)` at the three places one is added
+  (one lying in its place, a loose one, the steward's cart); `TALLY` in the config.
+- **Sounds:** her reactions' own (`yelpHot`, `splutter`, `gasp`, `sniff`) and the tangerine's
+  landing at the count (`tally`); written, rendered and measured, not heard: the user's to judge
+  on the soundboard.
+- `pocket` grown (front and back, a door, a gull, a door's hand, a paper at her shoe, the count
+  changing on landing, the keys dead through a mishap, her checkpoint after); `vacuum` waits for
+  her return instead of a fixed time. Passed: `pocket`, `vacuum`, `dash`, `lang`, `boot`,
+  `sound`, `gamepad`, `deck4`, `region1`, `region6`, `region7`, `region8`; `check_sound.py`: all within bounds.
+
+## No save while the game is made; a start place on deck 4 (2026-11-16)
+
+- **The user: "remove save games (for now) ... If I want intro, I want a default link to work like
+  expected. If I want any other location, or infinite tangerines, or whatever else we had, it
+  should all still work. Just don't save my progress."** `DEV_FRESH` in `src/config.js`: the save
+  is neither read nor written, so every load is a new game; every link works as before. `?real`
+  keeps the save as she will get it; `tools/playtest.py` opens every scenario with it (the
+  `pocket` scenario reloads to find its tangerine where it lay). To be set to false before the
+  gift. (A first try also skipped the welcome screen and the intro on every load: not asked,
+  taken out.)
+- **`?at=deck4`**: deck 4's corridor at 49 m, between the runaway suitcase and the porter's
+  round (I had given the user a link with a place that did not exist, and the game started them
+  on deck 3). `docs/start-links.md`, `README.md`.
+- `boot`, `deck3`, `intro`, `pocket`: pass.
+- **The user asked whether her falling on her bottom when the porter's cart reaches her back is
+  meant** (8c's gag is sitting back into the luggage; the stand-in is the built fall in the gag's
+  direction). Offered: keep it until step 4 draws the gags, or stand in with the fall forward for
+  every hit from behind. **The user: keep it.**
+- **A new rule (the user): after each approved step, commit, save and record everything, and say
+  when it is safe to compact the context** (`CLAUDE.md`, "Working with the user").
+
+## The plan's revision, step 3 gone back over: the thrown tangerine (2026-11-16)
+
+- The new tangerine in her toss's fist (`tools/hold_tangerine.py`) and the loose one turning a
+  quarter at a time as it rolls were already done with step 1's revision; a thrown one picked up
+  again already flew to the count (`gainTangerine` in `LooseTangerines.pickedUp`).
+- **Changed:** on every pick-up the tangerine's own picture also rose and faded where it lay
+  while its copy flew to the count, so two showed for a moment. §1.7 says its picture flies
+  "from where it was": the one on the floor now goes at once (the placed ones in
+  `checkPickups`, the loose ones in `pickedUp`), and only the flight is seen. Shown frame by
+  frame to the user.
+- `throw`, `gamepad`, `pocket`: pass. **Approved by the user.**
+
+## The plan's revision, step 4 under way: she rides the vacuum and the suitcase (2026-11-16)
+
+- **Her first two gags (§1.6, 5b and 6b), each one picture of her with the thing:** a state of her
+  character with the thing drawn in (10 generations each), then v3 clips from it: she plops down
+  onto it as it catches her heels, then rides (the vacuum: arms up, hair streaming, out of the
+  screen, "Weeeee!"; the suitcase: clutching her hands, to the end of its roll, where it tips and
+  she lands sitting on the floor). A sheet of their own, `assets/sprites/her-mishaps.png`
+  (`HER_MISHAPS`, 112 px cells, each clip placed by its thing's middle so the thing never jumps
+  between clips); `rideGag()` in the ship scene, `GAGS` in the config; the world's own thing is
+  hidden while the picture plays and is back in its place when she comes out of her door.
+- **The world's vacuum and suitcase are cut from the same pictures** (where she sits on them,
+  each row filled from its own colours or the column below), so the one that hits her is the one
+  she rides. Deck 4's vacuum was a 16 x 6 block drawn in code; the suitcase's handle is up now.
+- **The user's corrections, in order:** the first suitcase state was darker and narrower than the
+  game's: made again in the game's colours, handle up, tag (the user's choice, of two). My
+  cut-out squared the suitcase's rounded corners: restored. The vacuum "looks too big": made
+  smaller by taking out its plain middle columns and a row (32 x 13 to 22 x 11), its top line
+  run out to mirror its left end and greyed (the user's choice of three sizes and two greys);
+  the riding picture made again with it under her, she lowered 2 px, and both clips drawn again
+  from it (2 generations).
+- **"I prefer the ride in all cases"** (the user, after trying it from every side with a test flag,
+  `?ride=all`, since removed): 5a, 6a and 6c ride too, the picture facing the way the thing goes
+  (from the front she turns round onto it). With a tangerine the side still picks her reaction;
+  6c, before no hit at all, throws her back a step (the tangerine behind her). The suitcase from a
+  standstill at an end of its roll sets off for the other end with her, up to 80 px/s.
+- **A glitch the user saw:** the camera, restarted to follow the suitcase's ride, snapped the view
+  down a few px out of its slack box. The view now stays put and slides sideways by exactly her
+  ride (measured: 0 px up or down).
+- **Two new rules from the user:** every visual change or new prop is shown enlarged and approved
+  before it is placed or tested (I had placed and tested the cut-outs first: "If we follow the
+  preview/approve rule, we won't need to regenerate sequences like this time"); while this plan
+  is built, links for scenarios without tangerines leave `&tangerines=infinite` out.
+- `?at=deck4-aft`: deck 4's corridor at 112 m, by the vacuum's round.
+- Generations, from the account: 41 (three states 30, the first suitcase try among them; the
+  first five clips 8, the big vacuum's two now unused; the map object 1, not used; the small
+  vacuum's two clips 2). (I had told the user 31, then 33: miscounted.)
+- Passed: `deck4` (6a, 6b, 6c ride; tipped off at the roll's end; back at her checkpoint with it in
+  place), `vacuum` (head-on and from behind she rides it off; back; no smoke from a ridden one),
+  `pocket`, `boot`; `region1` before the vacuum was made smaller. The rest not run.
+
+## Step 4's revision, the papers: a first try in the game, then the user's own brief (2026-11-16)
+
+- **The first stills** (two states of her character with the open newspaper, 20 generations) were
+  a quarter bigger than her: the user saw it at once. Clips from her own standing sprite in an 80
+  px frame, aimed at those stills shrunk to her size (v3 with an end frame), keep her size: the
+  clip's last frame is the still. Kept in `assets/source/her-mishaps/` (README).
+- **4a and 4b, the first version:** 4a sat with the paper over her head (a tent), 4b on her belly
+  with it on her back (the user chose the paper from behind over in front, both kept). Built onto
+  the gag sheet (frames stood on a fixed floor row; 4b's lying frames 2 px up, set down, the
+  paper's edge under the floor cut), played where she stands (`fallGag` in the ship scene; the
+  paper that hit her taken away), and 4c made: a paper stopped at her shoe lies a second and
+  fades, no hand takes it. A start place `?at=deck5`, between deck 5's two paper rounds.
+- **The user tried it: "It doesn't work at all".** Their brief: the sliding paper too small,
+  generated, near the open one's size; she slips even standing; from behind, the same paper
+  slides on under her foot, that leg goes up with the paper following it round in a circle, she
+  sits and it covers her as a tent; from the front, on her belly, that leg up behind her, the
+  paper round after it and over her. Candidates: two sliding newspapers (map objects; their
+  greys put on the palette as white, since plain palettizing turned them pale green), and the two
+  clips from her standing on the paper. The first try from the front kicked the leg up in front
+  (kept, not used). **Saved at the user's word, to decide the next day** which paper and whether
+  the clips go in. The game still has the first version; the `deck4` playtest's paper check
+  expects the old rules (not run).
+- Generations: 36 (the two oversized stills 20; clips 6 + 2 + 6; the two papers 2).
+
+## Step 4's revision, the papers done (2026-11-17)
+
+- **What the user asked first** (on seeing the strips): the paper sliding on the floor and her
+  slip clip, which has the paper in it, "work seamlessly together visually". Shown as one strip
+  each, composed from the real pictures: the world's paper sliding in under her (her own standing
+  sprite), then the clip, whose first frame is that same picture. Both papers now get one colour
+  rule (`paper_greys` in `tools/palettize.py`: the neutral greys by lightness, before the palette,
+  so that white paper is white and not pale green; her shirt's tinted shades are left alone).
+- **"The newspaper is slowing down when it gets under her foot. So the resulting fall is
+  unconvincing":** a paper slides at a steady 260 px/s right to her foot, braking only in its last
+  half metre to its door; the clip's first frame (her still standing) left out and its next three
+  at 60 ms, so that the push carries into the fall. Approved as a strip, then in the game.
+- **In the game:** the user's B at 10 px (`assets/source/things/paper-sliding.png`, in the things
+  sheet; the code-drawn 10 x 3 one gone), its curled edge trailing as in the clips. At her front
+  (sliding at her, standing or running, or lying at a door where she steps): 4a, her leg up behind
+  her, on her belly, the paper on her back. At her heel: 4b, on her bottom, the paper over her head.
+  She slips standing too (4c gone). Her foot is on it when its middle is within 9 px of hers; the
+  clip is set down by where the paper is (`GAGS[..].paper`: its offset from her middle in the
+  first picture) and the world's paper is taken away, so the paper does not jump. With a
+  tangerine on her the side gives her short reaction the way she falls: the front a stumble on
+  (the tangerine ahead), the heel a slip back (behind).
+- No new generations (36 for the papers in all, 2026-11-16).
+- Passed: `deck4` (the slide's speed near her, 273 px/s; from behind and in front as she stands;
+  one lying at its door walked onto; back at her checkpoint), `pocket` (a paper at her front and
+  at her heel with a tangerine), `region1`, `boot`: 85 checks. The rest not run.
+
+## The suitcase and the vacuum refined (2026-11-17)
+
+- **The vacuum 2 px lower** (the user, shown as frames from the game moved by hand first): the
+  world's sits down into the carpet's top line, and her ride with it (`ride.y`).
+- **Butterflies over her head after the suitcase tips her off:** a loop of 8 frames v3 of the
+  riding state from the tip's last frame. Two tries from that frame had them fly off; set over her
+  head in the start picture (from her own dazed clip, start = end), they circle. The first such loop
+  had her grin with her eyes closed between open-eyed frames; the user: "I liked the smile, leave
+  it. Just don't add frames with her eyes blinking": the loop in the game keeps her eyes open, her
+  own small smile. Same canvas and edges as the tip's last frame, placed as the tip is
+  (`shift_as` in `HER_MISHAPS`).
+- **"The suitcase sequence takes too long":** recorded as GIFs from the running game at two paces.
+  The user liked the "as it is now" one, which played 10% fast (a GIF keeps hundredths of a
+  second: 66 ms frames became 60) and showed a ride from halfway along. So: the clips 10% quicker,
+  the dazed hold 1.18 s, and **the ride takes 3.3 s wherever she is hit** (the same speed profile,
+  scaled for the roll left, never under 1.1 times). And the suitcase by itself rolls faster, 1.6
+  m/s at its fastest from 1.1 (there and back in 13.7 s, from 20). Recordings since are at 70 ms a
+  frame, which a GIF keeps exactly.
+- Generations: 12 (the butterfly loops: six tries of 2).
+- Passed: `deck4` (6a, 6b, 6c; tipped off at the roll's end; back), `vacuum` (5b), `boot`: 41
+  checks. The rest not run.
+
+## Doors and walls stop whatever moves (2026-11-17)
+
+- **The user's rule:** "I want the corridor doors (and walls, where relevant) to serve as natural
+  obstacles not only for the player, but for moving NPCs and moving objects too. If it makes sense
+  for a given moving NPC to open a door on their path and walk through, then they should do that.
+  If not, the door should stop them (before the door, not while they're already on top of the
+  door). Moving obstacles are just stopped before doors." Written into the plan as §1.8, a standing
+  rule in its "Start here" and in `CLAUDE.md`'s rules.
+- **Built once, in the ship scene:** `stopShort` (how far a thing goes before the first door or
+  wall, the solid layer at a body's height), `spanOn` (a to-and-fro range cut short either side),
+  `doorAhead`, `mayOpen` (no lock), `holdDoor` / `letGoDoor` (a door held by a person stays open;
+  `updateBulkhead` shuts it once no one holds it and she is away). Bulkheads keep their width (`w`).
+- **Who does what:** a person walking a loop (`people.js`, `door()`) opens a door with no lock,
+  half a second at its handle, goes through holding it till their back (their cart's) is past; a
+  locked door turns them back short of it (one held open would let her past a lock). Things stop
+  short of a door, shut or open: the delivery robot, the suitcase (its roll and a lunge's send),
+  the dog's lead (its own rule before, now the shared one: the same spot), the vacuum's dart, the
+  porter's cart sent rolling, her ride on the vacuum (it ends at a door with a bump, then her
+  checkpoint). The paper rounds, the breakfast round and deck 8's steward keep to their side of
+  any door (one corridor's work). Loose tangerines already bounced off shut doors.
+- **What it changed today:** every mover's range checked against every door and wall from the
+  data: only the porter's loop on deck 4 crossed one (the glass door at 60 m, which he went
+  through shut); he opens it now (shown as frames and a GIF from the game). Nothing crossed a wall.
+- **Bumbot looked at, on the user's ask:** at near-catch 2 the rope stand he knocks swings deck 6's
+  194 m door open and he runs through it off the screen; at near-catch 5 he is gone off the screen
+  along the pools, 24 m short of deck 11's door (the pool scene does not use its `exitX`). Both
+  approved as they are.
+- Passed: `deck4`, `vacuum`, `boot`, `dash`, `pocket`, `region1`, `region7`. The rest not run.
+  No generations.
+
+## The porter's cart: 8a to 8d and his tip of the cap (2026-11-17)
+
+- **Made as the papers were:** each a v3 clip of her base character from her own standing sprite,
+  for 8a and 8c beside the game's own cart (its two atlas pieces) so that the clip's cart is the
+  world's; 8b and 8d her alone, the world's porter and cart staying. Shown first as a strip and a
+  GIF composed from the real frames with the porter, then in the game.
+- **What needed mending:** 8c's generator threw the top bag into the air on both tries: the flying
+  bag taken out and the game's cart put back under her in its first frames (her pixels told from
+  the redrawn stack by their colours). 8b's first try ended lying flat and 8d's drew a cushion
+  ("something soft" in the description: an object named is drawn); both made again toward end
+  poses.
+- **In the game (`cartGag` in the ship scene):** 8a and 8c are set down where she stands, the
+  porter brought the last few px up to the clip's cart and his own cart hidden; 8b keeps the cart's
+  front at hers as she is pushed back (`fronts`, measured from the clip); 8c's ride is two metres
+  at his walk, then his `tip` clip; 8d: he walks on, then turns round to her (his cart stays). Each
+  ends at her checkpoint. Doors and walls stop him (`stopShort`, §1.8).
+- **The user's one change:** 8a's kicking on the bags "too fast, making her look like twitching";
+  its loop at 4 frames a second, the scene as long as before.
+- Generations: 23 (four clips 12, three tries again 9, his cap 2). Passed: `deck4`, `boot`,
+  `region1`; the rest not run.
+- The dog's lick: the user has another idea for the dog's sequences; to be talked over once the
+  rest of this step is done.
+
+## The breakfast stewardess: 10a, 10b and her trolley, 10c to 10f (2026-11-17)
+
+- **10a (approved at once in the game):** she runs into the stewardess's tray, reels back and
+  sits; the toast lands on her head and the flower behind her ear. A v3 clip of her base character
+  from her own standing sprite toward an end picture (her sitting, made with an edit of 8d's end;
+  its first try drew the toast as a bun). Contact counts from the tray's front edge, not the
+  stewardess's body (the tray had passed through her), and also while she knocks at a door with
+  it (that had played the old fall, butterflies and all).
+- **10b, rethought by the user:** a squirm on the spot with a squelching walk-off "still looks
+  weird, and it is a rare use case": it is 10a's clip, she turned round to face the tray at her
+  back (`turn`; the user liked it that way and asked that it be on purpose, not a bug's result).
+- **Her trolley, the user's word:** "most of the round the woman pushes her trolley, so that must
+  impact the player"; it had pushed her along (and then, for a moment, waited for her). Left to
+  me, with "the transition has to be always smooth, without change in appearance, speed, etc. And
+  the gag shouldn't take long", and 5: a parked trolley counts as 10c. The trolley stands to her
+  knee, so she trips over it, not over its top:
+  - 10c, no one just past it: she trips over it head first onto her belly past it (one new clip
+    from her sprite beside the game's own trolley, its trolley taken out so that the world's is
+    drawn over her: it never changes);
+  - 10d, the stewardess just past it (it is wheeled): over it she landed on the stewardess (seen
+    in the first recording), so she is bumped back and sits (8b's clip);
+  - 10e, at her back: tripped forward, away from it (her own trip); first without a dazed spell
+    to keep it short, then dazed 1.2 s at the user's question ("why doesn't she get dazed?");
+  - 10f, into the stewardess's back: bounced off (8d's clip), the stewardess turns round.
+  `crowded` (someone just past it) is a new fact of a hit, for the trolley.
+- **Fixes from the user's tries:** a gag is set on the corridor's floor whatever she stood on (on
+  the trolley's top she had sat in the air once it moved on); her trip's and dazed loop's lying
+  pose had one leg bent straight up: mended from one edit, the same legs in both so that the trip
+  hands over to the dazed loop unchanged, and the trolley trip's last frame too.
+- **The stewardess herself:** she pushed the trolley with her hands at her sides. Her pushing walk
+  generated with the game's own trolley in the picture (an edit of her walk frame gripping its
+  handle, then a loop), the trolley taken out after: v3 swung her hands 5 px off the handle (the
+  user), pixminimax held them but its legs shuffled ("like dancing a little"), a third try held
+  both, two even steps at 6 a second, her feet keeping pace. Her tray at a door: she lowered her
+  hands before it was taken, then it slid sideways across her (the door's hand is on her side
+  heading east); behind her it vanished at once. The user's idea: it shrinks a little and is gone
+  (`handTakes(..., { shrink })`), her hands out until then.
+- Generations: 76 (10a and 10b's tries 31, the spilled tray 7, the trip 8, the lying legs 10, the
+  pushing walk 20). Not used: a spilled tray, picture kept (`her-mishaps/tray-tries/`), the
+  dropped tray now landing flat. Passed: `deck4`, `boot`, `region1`; the rest not run.
+
+## The art rule looked back over, steps 1 to 4 (2026-11-17)
+
+- **What was found** (the branch's code read for drawing; nothing in steps 1 to 3): deck 4's climb
+  shelf, the knitting lady's basket, four desk flags, a cabin door's hand (a 4 x 2 rectangle), the
+  cry's heart and "shh" drawn in code; the climb's laundry cart was the linen room's, from deck 9.
+  The view into the knitting lady's cabin stays drawn, like the rooms (the user). Kept by the rule:
+  the dog's lead and the door's crack (flat), the bitten tangerines (a generated picture edited),
+  the fruit in a fist and the breakfast tray (separate in play).
+- **Made** (map objects, side view, low detail; ids and every try in
+  `assets/source/things/tries/README.md`): the flags, the shelf, the basket, the hand, the heart.
+  The "shh": two lips-and-finger tries and three faces with a finger at the lips; none read at a
+  bubble's 16 px ("doesn't read like a shh at all", the user), so a speaker crossed out, its cross
+  redrawn even by hand ("It is uneven"). The cart: tries drifted to three-quarters; the user chose
+  the look of one half-turned try (cart-c) "in profile", made with `edit_image_pro_flash` from it;
+  shrunk from 51 px to 44 it came out deformed, so it keeps its pixels with 7 rows cut from its bin,
+  and a white towel row across its rim painted the rim's green. The feather: lying flat 6 px tall
+  it read as "a shelf glitch" and not as a cat toy; stood on end, "stuck in the shelf"; a teaser
+  lying on the shelf, its handle made purple to stand out from the shelf's wood.
+- **Little flags shrink by majority colour** (`BY_MAJORITY` in `tools/build_things.py`): averaged
+  with their outline they came out dull, the Ukrainian flag too since step 4.
+- **The climb** (the user): the room-service cart taken out; the laundry cart and the shelf a
+  metre forward, then 0.8 m further apart (each by half, clear of both doors): the shelf is reached
+  by a jump from the cart's edge. `deck4`'s climb check runs to the edge first.
+- **Deck 5's dim blinked** as her head touched deck 4's ceiling from the shelf: a deck's dim piece
+  reaches 16 px under its floor, and her head counted in it. It counts past the floor now
+  (`updateDeckDim`).
+- **A corridor's extinguisher** hung under a crew door's card reader (deck 4): one within 50 px of
+  a door put in a cabin door's place moves 50 px from it.
+- **The lady in the bathrobe** (deck 4, 130 m), who did nothing, is an obstacle: 10f's bounce
+  (`MISHAPS.robe`), beside her rather than behind.
+- **Decided (the user): the tangerine knocked out of her pocket always rolls behind her**, whatever
+  the side (the gull's and the door's hand's excepted): "It would place a dilemma: run back to pick
+  it up, or continue moving to the initial destination." The user tried it at once: a hit in the
+  back by the porter at a glass door, the tangerine bounced off the door into the porter, who ate
+  it: "This entire scene played seamlessly and made sense."
+- The lunge seemed broken: without `&cards=all` she has not learned it (Bumbot's first beat).
+- Generations: 33. Passed: `boot`, `pocket`, `deck4`, `region1`; `check_overlaps` lists nothing;
+  the rest not run.
+
+## The dog and its owner made again together (2026-11-17)
+
+- **The user's idea for the dog** (talked over first, as agreed): keep the mechanic, remake the
+  pictures: "the lady and the dog are loosely connected, the leash looks weird and glitches on its
+  connecting ends ... regenerate them together as a single animation sequence. But we will still
+  have to keep the same hitbox areas". One picture cannot follow a dog that strolls 4 m, fetches
+  and comes back to her, so: the two made together as one picture for their look and size, then
+  separate sprites joined by a lead the game draws from measured ends; together clips for the
+  moments they are close (next). The user agreed, with a new owner, the dog still strolling, and
+  the lick "without leash glitches".
+- **Everyone's feet on the floor** (the user: "not even placed properly on the floor"): PixelLab's
+  frames drift 1 to 4 px; the dog sat 1 px up, its owner bobbed, the kid idled 2 to 3 px up, 71
+  clips in all. `tools/build_people.py` sets each frame of a clip whose feet stay down on the
+  floor by its own lowest px; the clips that leave the floor are listed (`OFF_THE_FLOOR`). No
+  generation. Committed by itself (4454684).
+- **The picture:** three map objects first (people come out as silhouettes there); then a pro
+  character in the cabin maid's style (10), a woman holding the lead's loop, the dog at her feet,
+  approved. Cut apart by hand (the dog's neck one px blackened, the user). The dog redrawn
+  standing by `edit_image_pro_flash` (a Pro Flash dog from text with it as style came out another
+  dog), made a character by Pro rotate; the dog template's walk and run redrew it as another dog
+  and its v3 sit never sat; skeleton-v3 kept it but stretched its walk a third; PixMiniMax from its
+  own picture held it (the walk, and the sit toward the approved sitting dog as its end frame); the
+  run is skeleton-v3's (a smooth gallop). Her idle: PixMiniMax, her fist still in every frame. 47
+  generations; ids and tries in `assets/source/people/dogowner-raw/README.md`. Their frames are kept
+  by hand (`BY_HAND` in `tools/fetch_people.py`).
+- **The lead** (`LEAD` in `src/world/movers.js`): from her fist (7 px in front, 32 up, the same in
+  all her idle) to the dog's collar (measured in each frame of its clips), drawn px by px in the
+  picture's colours; under her (her fist closes over it), over the dog (from behind, it runs along
+  its back to the collar, as in the picture). The user: "too thick" (3 px, the picture's) -> 2 px,
+  a dark px under its colour; and it hung at her waist where she met it ("She cannot trip over the
+  leash, if it's at her waist line"; I first moved the trip point, "Not what I meant. I meant we
+  need to make the leash hang lower"): it hangs down to 3 px over the carpet at the spot she trips
+  on, a little over halfway from her hand to the dog as always. A one-px notch at its bottom came
+  from cutting fractions down: rows rounded.
+- **Lying after a trip, 2 px lower** (the user): her cell ends at her lowest px (her hand under her
+  chin), so the game draws her picture lower (`herDrop`, `LIE_DROP`), her body where it was, from
+  the fall's frame on the floor until her checkpoint.
+- **Her running footsteps** (the user: "her sound is faster than her steps"): a step each 30 px;
+  her run lands a foot every 40. They sound on her run's footfall frames now (`SOUND.runSteps`):
+  7 in 2 s of running, each on a landing frame. I can't hear it: the user's to judge.
+- **Decided (the user): on the dog's lead she falls whatever she carries, and keeps her
+  tangerines** ("This will be an exception. And we'll have some other exception to this rule
+  later ... handled gracefully in the code"): `pocket: false` on a scenario (`MISHAP_SCENES`),
+  asked by `pocket()` itself, so every way a hit reaches her follows it.
+- Passed: `deck4` (with the new checks: she falls with tangerines, back with all three), `sound`;
+  `boot`; the rest not run.
+
+## The dog's together clips (2026-11-17)
+
+- **The three moments the dog and someone are close, each one picture of the two** (the user's idea
+  for the dog, the hybrid agreed: separate sprites joined by a drawn lead, together clips where they
+  meet; "Go ahead with all three"). Made by PixMiniMax from the approved pictures (12 generations):
+  - **The lead round her legs (her cry):** an end picture of the two, the lead wound round her legs,
+    the dog sat against her shins (`edit_image_pro_flash` of their picture, 5); the winding toward it
+    and the unwinding from it back to their picture (2 each), and a loop of the two tied (1). The
+    winding played backwards would have the dog run tail first: the unwinding is its own clip. Her
+    "surprise" marks are the generator's, kept ("All good").
+  - **The toss:** her free hand to her pocket, the ball out, tossed underhand, her lead fist the
+    same px in every frame (1).
+  - **The lick:** her dazed-lie frame with the dog's standing picture turned to her at her face, to
+    the same (1); its butterflies drawn purple and teal, put back to her yellow by rule.
+- **The tennis ball** (the user: "has to look like a tennis ball"): the game's had been the
+  generated ball shrunk to 5 px by majority, its seam lost. 64 small candidates were made (10) with
+  a dark outline before the user's word ("don't use black outline"): not used. The user chose from
+  six shrinks of the same picture keeping its seam (7 or 8 px; none, a grey or an olive outline):
+  8 px with the olive (`SEAM` in `tools/build_things.py`, its own colours, not the palette's, which
+  dulled it).
+- **The toss made seamless** (the user, three times): the ball in her hand behind her fingers (at her
+  hip, held out; "partially covered by lady's hand", its place moved); the flight a lob, its top a
+  fifth of the way across (it had risen a little and flown flat, "Innatural"); the ball leaving her
+  hand as it opens, from where she held it (it had hung a frame over her open hand, "like the ball
+  takes off by itself"); in front of her as it reaches her, under the sparkle ("the final animation
+  with sparks is on top of her").
+- **In the game:** the dog runs to its place in their picture (17 px in front of her, where its
+  sitting picture lies on theirs) and the clip takes over; at the end their picture is held while it
+  sits and the game's dog and lead take over as it gets up, trotting away from her: the game's lead
+  at that spot never matched the picture's (tried: hung no lower than the collar when close; undone).
+  The lick waits for her dazed loop's frame the picture starts on; the lead's collar end is measured
+  in its 8 frames; over the dog when its owner is on her face's side (it had looked tied to its
+  rump), from under her when not. Her checkpoint waits for anyone with her (`down.holds`).
+- Passed: `deck4` (its new checks for all three) three runs in four, `boot`; the fourth failed later
+  on, the lob onto the climb's shelf not knocking the feather down; not seen again in three runs.
+  The rest not run.
+
+## Step 4a: deck 9's darting vacuum, and small things on the way (2026-11-17)
+
+- **Deck 9's vacuum (`Darter`) rides her off too** (approved): it was a little shape drawn in code;
+  it is deck 4's generated vacuum now, the picture she rides in her gag, dimmed in its doorway at
+  its own size (it had been shrunk to 0.8, uneven pixels), its blink on its own red light at its
+  front. Caught by it, from the front or from behind, she rides it off down the corridor the way it
+  darted (5a, 5b; `ride` to the ship scene's `rideGag`); it is back in its doorway once she is at
+  her checkpoint. With a tangerine on her it is only a stumble and it goes on. `region4`'s check
+  changed from the old fall to the ride.
+- **Ukrainian is `ua`, not `uk`** (the user: "uk is short for United Kingdom"): `?lang=ua`, the
+  language's code everywhere; a choice kept in the browser as `uk` is read as `ua`. Its ride word is
+  «Уіііііііі!» (the user).
+- **The breakfast stewardess's trolley is solid by its picture's shape** (`TROLLEY`): the table, 21
+  by 18, and the cloche's dome on it, 10 by 7. One box the cloche's height over the whole trolley
+  had been 7 px of air over the table's ends to bump into.
+- **A start place `deck9-aft`** (deck 9, 134 m): past the steward's jammed cart, short of the
+  vacuum, which the user could not reach from `housekeeping`.
+- Passed: `region4`, `deck4`, `lang`. The rest not run.
+
+## Step 4a: the steward's jammed trolley (2026-11-17)
+
+- **The jam made visible** (the user: "I cannot jump over this scene here, there's an invisible
+  wall"; the scene "weird and unclear", a man "twitching"): deck 9's steward stood 35 px from a low
+  service cart, grabbing at the air, and an invisible block reached the ceiling. Asked how it should
+  be, the user took my recommendation: a tall housekeeping trolley that shows why the corridor is
+  blocked. Four candidates (map objects); the user chose "4" (boxes, towels, a laundry sack: 79 px,
+  taller than her jump), mirrored so its handle faces him.
+- **He and it one picture while jammed** (approved): him gripping its handle, leaning back (an edit
+  of the two composed); his two heaves at it, the trolley giving 3 px (PixMiniMax); the world's
+  trolley hidden meanwhile, so his hands never leave its handle. His bubble over his own head in it
+  (`bubbleDx` in people.js). The world's trolley is cut from the clip's last frame, so the two match
+  when one replaces the other.
+- **Free, it stands back against the wall**, drawn behind her and not solid (a tall `push` thing,
+  `aside()` in world.js): it could not be hopped where it stops, as the low one was. He steps back
+  off its handle before he thanks her.
+- **The user's fixes after trying it:** "When pushing, his legs are not moving": a clip of him
+  stepping back as he pulls, in place (`tugwalk`), played while the trolley moves (moved within 150
+  ms). "The card is just flying at her. Maybe we need a proper toss sequence": his toss clip from his
+  standing picture (to his shirt pocket, an underhand toss), the card in his fingers at his pocket
+  for two frames, out of his hand as it opens, a lob to her chest on the game's clock
+  (`world.tossOver`, for anyone with a toss clip; the others still hand over as before).
+- 12 generations (4 trolleys, 5 the edit, 3 clips). Passed: `region4` (its steward checks changed:
+  one picture of the two, he stands back, she walks past the trolley), `boot`. The rest not run.
+- **The towel stack** (`haz_towels_9`): the user asked what it is for ("swaying, in the background,
+  doing nothing else"): it fell only on a jump landed beside it or the dash; she has no walk, so its
+  sway warned of nothing. The user: keep its look, "Make it an obstacle"; a way is proposed to them.
+
+## Step 4a: the towel stack an obstacle (2026-11-17)
+
+- **The user's rule:** "What if it falls on top of her the moment she passes it? And the getting
+  past will be having to stop at the stack and wait while it falls." (My proposal had been a wobble,
+  a fall a beat after she came in reach, and three ways past: stopping, the dash, knocking it down
+  from afar.) Its look kept: "Don't redraw it, I like it the way it is."
+- **Built:** coming at it within 100 px (middle to middle) it wobbles hard 0.4 s, then falls the way
+  she is going (0.36 s): as long as her run to it, so that she cannot outrun it, and it lands on her
+  as she passes it ("Mmmph!", her checkpoint). Stopped as it wobbles, she is about 60 px short and
+  it falls in front of her; she walks on over the heap. A jump landed beside it and the dash bring it
+  down as before. Its fall is on the game's clock (`update`), not a tween (a recording stepped by
+  hand had shown her outrunning it). Stacked again once she has gone (beyond 560 px, within its 800).
+- `region4`'s checks changed (running past: buried; stacked again; stopped: it falls in front of
+  her; she walks on); the old "the stack still stands" after the vacuum's jump dropped (running on
+  toward it, it now falls, in front of her). Passed: `region4`. The rest not run.
+- **Next (the user):** "The animations have to be generated, I think, especially the falling and
+  scattering": the stack's fall and the towels scattering, and her burial under them (scenario 18),
+  generated from the stack's own picture.
+- The user asked whether this corridor is on her way to the next area: it is not. Region 4's way
+  on is the steward's card, then the linen room at 112 m (behind where she arrives) and its vent;
+  the corridor aft of the steward (130 to 194 m) is the plan's optional "gauntlet" (book 4, the
+  tangerines, the balcony cabin, the checkpoint at 190).
+
+## Step 4a: the towel stack's fall generated (2026-11-18)
+
+- **The user:** "The animations have to be generated, I think, especially the falling and
+  scattering"; the stack's look kept. All of it is PixMiniMax from the stack's own picture
+  (`assets/source/things/towel-fall/`, its README has the ids), then shown and approved:
+  - **Its fall alone** (try c of two pinned ones): pinned to an end picture made of the stack's own
+    fourteen towels lying scattered (`ends.py`), since the first tries fell as one stiff column and
+    landed "like books", and five generated heaps read as snow drifts.
+  - **The fall on her:** try g of five (c, the first approved, stretched the stack taller as it
+    tipped; the user: "fix the stack getting higher glitch"; the two told "never taller" stretched
+    worse).
+  - **Her coming up:** the heap stirs and bulges, a towel swan pops out, then she under it in her
+    towel turban (`emerged.py`: her turban look and a generated swan; five swans came as birds with
+    orange beaks, the palest one used with its beak whitened, at 15 px).
+  - **The towels redrawn soft** (the user: "the towels themselves look like white bricks. Can we
+    keep the animations, but redraw the towels"): `edit_animation` over every frame, the motion
+    kept to a px; the standing stack in the corridor is the redrawn first frame, so it and the
+    clips hand over exactly.
+- **In the game:** the stack and its stool apart while it stands (it sways on the stool's top),
+  one sprite for the clips; the fall on her is a gag the stack plays itself (the ship scene's new
+  `thingGag`, `GAGS.towels`): she hidden, its clips, her checkpoint, the heap left behind her.
+- **Seamless, the user's word** ("It looks like she deliberately stops for a fraction of time to let
+  the towels fall on top of her. It has to be seamless"):
+  - the stack used to start falling while she was 40 px short of it, so the fall on her took
+    over mid-clip, 25 px off: now it wobbles until she is past it (at most 1.1 s; stopped short, it
+    falls in front of her when that runs out), the user's own "the moment she passes it";
+  - the clip had her standing: four new ones start from her own run frames (0, 2, 4, 6) 6 px past
+    it, she running on about 10 px a frame (at her run's 14 a second, her 140 px/s) until it
+    catches her; the game takes the one whose first frame is the pose she shows next (in the
+    recordings: 7 px past, her stride carried on). A first try from her run frame 36 px past it had
+    her running on the spot (pinned to the heap where she stood);
+  - the sway eases as she comes level with it, so it is near upright when a clip takes over.
+  - The clip of her standing stays for her caught under it any other way while it falls.
+- **The heap behind her** as she crosses it (the user, with its stool: "Also its table").
+- **Placement:** the heap fell over the open cabin's door; moved 1 m aft (the user: "Yes"), it fell
+  over the next door aft: the doors' frames either side are 159 px apart and the heap reaches 90 px
+  the way it falls, so no spot keeps both clear; midway, 141.6 m, a towel's tip touches a frame by
+  a few px. **The ship picture it hid** (the user) now hangs in the nearest gap with nothing on its
+  wall: a rule in `drawCabinDoors` (a stack of the world in front of a picture's gap moves the
+  picture), here one gap forward.
+- Generations: 101 this round (the first clips 13, the redraw 70, the running clips 8, the heaps
+  and swans 10).
+- Passed: `region4` (its towel checks unchanged and green), `tools/check_overlaps.py` (0). The rest
+  not run.
+- Not made: her "bats the towels off" with a tangerine on her (the plan's 18): she reels, loses one,
+  the stack falls past her.
+
+## The books' titles, and where they show (2026-11-18; the documents only, nothing built)
+
+- **The user gave the titles**, from two photos of her bookshelf, and a photo of her reading
+  armchair at home (`reference/photos/Books/`, git-ignored; read here, sent nowhere). They had
+  been promised for "when the game is fully tested": they came now, so the plan's stand-in covers
+  are dropped.
+- **Decided by the user:** the fourteen titles, each in its own language and script, with its
+  author; Її війна is her own, on the bed in cabin 8206; the two Harry Potters by their real
+  English titles (the Philosopher's Stone, the Chamber of Secrets, as on her copies); a title
+  shows as a generated cover in the centre of a slightly dimmed screen when she gets the book,
+  and on the shelf seen close (E at it), generated too; every cover its own; the armchair's photo
+  is the picture in the nook's frame, not the nook's look.
+- **Mine:** which title lies where ("The order is random"), by what each name fits (approved by
+  the user: "Good"); the four new books are shelf numbers 11 to 14 in the plan's order (its things
+  17 to 20); the lettering set by a build tool, since the game's pixel lettering has neither
+  lower case nor Hebrew; the cover's moment through the Library's existing panel.
+- **Found while reading the mechanic, not changed:** the design's "standing still with a book she
+  reads where she stands" has no code (only the chair and her bed); the shelf and the trolley
+  are drawn in code; nothing says whether books 11 to 14 get hint pages. The second is proposed
+  in the plan's step 5; the third is in GAME_DESIGN.md §6.1.15.
+- Written: GAME_DESIGN.md §6.1.2 (the table, the two places) and §6.1.15; docs/plan-three-uses.md
+  §4.1, step 5's revision, §7, the answers; docs/population.md §2.2. No generations, no playtest.
+
+## Deck 9's corridor becomes the way: the steward to its aft end (2026-11-18; the documents only, nothing built)
+
+- **The user's question:** whether the sprinkler's gag is planned (it is: mishap 16, step 4a, not
+  in its first batch), and whether the corridor of the darting vacuum, the towel stack and the
+  sprinkler has to be crossed to go on. **It does not:** the trunk comes up at 118 m, the steward
+  is at 122, the card opens the linen room at 112, and all three stand aft of him, on a stretch
+  of rewards.
+- **Decided by the user** ("I accept your recommendation here, and the suggested fixes"): the
+  steward and his trolley go to the corridor's aft end, so the card is earned past everything
+  and brought back. The route plan is untouched (the trunk, the card, the linen room, the duct).
+- **Mine, accepted with it:** the aft end, not just past the sprinkler at 152 m (six different
+  things on the way, the luggage stack as the deck's one puzzle with two answers, the balcony
+  cabin's green door a tease out and a reward back; the price is a walk back of about 74 m); the
+  trolley's roll cut from 7.4 m to 3.8 (185.2 to 189.0), the checkpoint left where it is; the way
+  back changed, not repeated (the stack stays fallen, the luggage broken); the wall picture
+  rehung and the small housekeeping cart taken out at his new place; the glass door at 194 m
+  one-way from the corridor, like decks 8 and 10, so that she cannot come up behind him by deck
+  7 and the aft stairs (it had no lock: found when the user asked).
+- **Options set aside:** the steward at 152 m (the shorter errand: only the three obstacles);
+  the card apart from him (in the cabin being cleaned, or on a second cart: his approved toss
+  would lose its use); the hazards moved forward of him (the towel stack's place was just
+  fitted); the linen room or the trunk moved (the ship's layout).
+- **Proposed, to judge in play:** a checkpoint past the sprinkler, if the way out with no
+  tangerine proves harsh.
+- **Tried, outside the repo:** the two positions in a copy of the committed game in the temp
+  folder (`git archive`, its own map built, a muted headless browser on ports of its own; the
+  other session's folder untouched): two strips shown to the user, jammed and freed. The
+  checkpoint's door is drawn at 191.6 m, not 190. No playtest scenario run.
+- Written: GAME_DESIGN.md (region 4), docs/population.md (the corridor's table, a note under
+  it), docs/plan-three-uses.md (step 4a's revision, the answers). For the building session.
+
+## The one-way doors get their push bar (2026-11-18; the documents only, nothing built)
+
+- **The user had missed that there are one-way doors** (asked on reading deck 9's 194 m door
+  made one): thirteen in the built map, all at the cabin hallways of decks 8 to 10 and deck 11's
+  forward end wall, plus four balcony cabins from their balcony side and the theatre's trunk.
+- **Found:** they are drawn exactly like the free glass doors; only E tells (a rattle, a
+  padlock). The design's own line, "Fire-exit doors with a push bar on one side only are the
+  one-way doors", was never built.
+- **Decided by the user** ("Add it to the plan, yes"): the push bar on the free side, a plain
+  face on the other, as a generated variant of the glass door shown first.
+- **Mine:** its scope (the glass doors across a deck; the end walls' doorways proposed apart;
+  cabin doors and the trunk left), made from the game's own open leaf so the two kinds stay a
+  pair, the free leaf remade with it if they do not match.
+- Written: docs/plan-three-uses.md (step 4a's second revision, the answers), GAME_DESIGN.md
+  (§6.1.2's table of locks), docs/population.md (the doors' row). No generations, no playtest.
+
+## Step 4a: the first batch of gags, built (2026-11-18)
+
+The plan's first four (13a, 7b, 3, 20), each the thing's own clip with her (`gags` sheet,
+`tools/build_gags.py`, sources and PixelLab ids in `assets/source/her-mishaps/batch-4a/README.md`),
+played by the thing itself (the ship scene's `thingGag`, `ride.play`). About 36 generations.
+
+- **The user's rule, made on seeing the first tries** ("Take a look at each of the generated gags
+  and look for: visual overlaps that make no sense; anything that breaks seamless transition,
+  visually or dynamically; that the anatomy makes sense in every situation; that everything is
+  aligned well spatially. Make this a rule"): every candidate checked frame by frame and measured
+  before it is shown (`CLAUDE.md`, "Art"). It found: start frames 1 px off her built sheet, a run
+  loop floating 3 px, a gull that changed between frames, her standing in a clip where the game
+  has her slipping, a hand over the open doorway, holes in the world's door picture that turned
+  dark in a clip.
+- **13a, the swinging door.** First shown with the leaf as the game drew it (a door picture
+  stretched in code): the user could not read it, and the door changed colour. Now its swing is
+  generated, the door alone and the same with her (slammed flat on the wall under the leaf, she
+  slides down), from the world's own muted shut door, the frame's left side and top its own
+  pixels. **From aft only** (the user: from forward "it looks broken"): from forward it never hits
+  her and waits to burst until she is clear of its swing (the user: "Visually, that makes sense";
+  left so). Coming at it from aft it waits for her (it burst while she was still too far).
+  **No tell** (the user: "Let the opening of the door surprise the player"): its rattle and shake
+  taken out. 13b is no more.
+- **Whoever looks out of a door** (six swinging doors, seven "Do Not Disturb" doors) is cut to the
+  doorway (the user: a boy's cap through the frame; a sun hat and a Hawaiian shirt's hat the same,
+  found at once) and stands on its threshold (it stood 2 px up). `People.doorway`: Phaser's crop
+  (the Mask filter hid them whole).
+- **The "Do Not Disturb" doors** swing open and shut in their full colours (the swinging door's
+  clip, its muting taken back out exactly), their frame kept (the user: the door "just disappears
+  together with the doorframe"). Kept in full colour: she can knock at them (the user's question;
+  their "All good").
+- **3, the tray.** The three flat bars "don't make any sense" (the user): one tray, the breakfast
+  stewardess's own; two more detailed tries came out muddy at that size and are not used. Run onto
+  at any step (four clips, one from each quarter of her stride, so the hop never holds or slows) or
+  jumped onto (the user: "I should also slide in the direction of the jump"), she rides it off the
+  way she was going; the world's own tray base moves under her (her clips are her alone), its
+  dishes fly off and lie on the floor; the door opens after on the guest looking after her. Found:
+  after a ride the tray stayed hidden where it was carried until she was 8 m away (now back at the
+  respawn); the trays it passed were ridden through (knocked aside first, then one tray only).
+- **7b, the deck chair.** The plan's fold "shut on her" did not come in four tries; the collapse
+  flat under her was offered and taken. She slid off the patch before the chair could catch her:
+  sliding in past it, it hardly rocks now. It stops short of the wet-floor sign.
+- **20, the gull.** It dives onto her head; standing, she flails and runs off with it; running, she
+  runs on. To the next partition, a wall, or out of the screen.
+- **Test places:** `door9`, `trays10`, `wet`, `gull9` (`docs/start-links.md`).
+- **Tests:** `boot`, `pocket`, `region4`, `region6`, `region7` pass; the rest not run.
+  `check_overlaps`: 0. Changed to the new rules: `region4` (the swinging door from aft slams her
+  flat; stopping short it bursts by itself; from forward it never hits her), `region6` and
+  `region7` (the tray ridden off, the door opening on the guest after; a tray far from its door
+  ridden as well). Found by them: after a ride the tray never re-armed when she came back at a
+  checkpoint far off (it stopped updating before its re-arm); fixed.
+
+## Step 4a: deck 9's corridor is the way, built; her push remade; the steward's thanks shortened (2026-11-18)
+
+The first of the other session's two decided revisions (docs/plan-three-uses.md, step 4a).
+
+- **The steward and his trolley at the corridor's aft end** (`tools/population.py`): the trolley jammed
+  at 185.2 m, rolling to 189.0 (3.8 m), he at 186.0; the story places him by it as before. Shown to
+  the user in place, jammed and freed, before the tests (as the plan asks).
+- **The door at 194 m** one-way from the corridor (`tools/ship_layout.py`, as decks 8 and 10).
+- **At his new place, by rule** (`drawCabinDoors`): a picture is not hung, nor a small cart drawn,
+  anywhere along a tall trolley's whole way (the towel stack's rule, widened); the one there hangs in
+  the nearest empty gap, 20 m forward.
+- **The way back changed:** the towel stack, once fallen, stays fallen (kept with what she broke,
+  `save.broken`, the way it fell in `save.heaps`); it used to stack itself again 12 m behind her. The
+  luggage already stayed broken.
+- **A `steward` start place**, just forward of the trolley.
+- **The user, on pushing it:** "shift her a pixel back" and "her legs do not move properly". Her push
+  was an old clip whose feet shuffled 2.5 px a frame while the cart rolled 6.7. Remade with
+  PixMiniMax (1 generation, `assets/source/her/push2/`, its README) from her push frame against the
+  world's trolley, the trolley taken out: two even steps, the planted foot sliding back about 3.6 px a
+  frame, so 11 frames a second at 40 px/s (it was 9 and 60; every push, the laundry cart's too).
+  Checked frame by frame first: three frames 1 px off the floor set down; her knee clear of the post.
+  She stands 29 px from the cart's middle, a whole px so that it never flickers (it was 27.5, drawn
+  27 or 28), and the cart is now set at her gap ahead of her after the physics moves her
+  (`pushFollow`, on the scene's `postupdate`): set before, it read 27.8 or 28.5 by the moment.
+- **The user: his thanks "take too long", and "if I run past him, he doesn't turn to face me".** Found:
+  freeing the trolley set her back to play the very moment his scene had stopped her (the flag is set
+  inside the push's last step), so she always could walk on, and he faced where she had been. Now his
+  thanks do not stop her at all: he steps back twice as fast, no pauses, his brow mop and bow at 1.8
+  times, about 1.3 s to the toss (it was 2.5); he turns to her as she passes, during his thanks and
+  after while she is within 4 m; the card comes down where she is by then (`tossOver`; only his uses
+  it).
+- **Tests:** `region4` passes (changed: the steward found at his new place, the door at 194 shut from
+  the lobby and opened from the corridor, her gap while pushing, his turning to her, the towel stack
+  staying fallen and stood up again by hand for its second check, the laundry cart's push given the
+  slower pace); `vacuum` passes; `golden` (changed the same way) and `boot` pass; `check_overlaps`: 0;
+  `check_corridors`, deck 9: 64.6 m without a beat (55 to 120, forward of the trunk), 116 m without a
+  reward (24 to 140), neither in the stretch that changed.
+
+## Step 4a: the one-way doors' push bar, built (2026-11-18)
+
+The second of the other session's decided revisions (docs/plan-three-uses.md, step 4a).
+
+- **How it was made:** the game's own pictures of the glass door (drawn in code) rendered exactly,
+  and only a band of each redrawn by `inpaint_image_pro_flash`, every other pixel coming back as it
+  was: so the one-way door and the free one stay one pair. 20 generations
+  (`assets/source/ship/pushbar/`, its README).
+- **Open:** two bars shown in place beside her, plain steel and steel with a red band; the user chose
+  the plain steel. The leaf's glass see-through as the free door's (85%).
+- **Shut:** the user, on seeing the first version (the bar's end as a 3 px nub drawn in code): "the door
+  profile should also differ from a two-way glass door". Two generated profiles, the bar's end alone
+  and with a door closer at the top; the user chose the closer. The free door keeps its handle on both
+  sides.
+- **Also the user's, in play:** "It opens in the wrong way": the doors swung away from a stair lobby
+  (the house rule), so nine of ten opened toward whoever pushed them. A one-way door now swings away
+  from its free side (`part_doors()` in the map builder); the lobby's deck plan hangs 20 px further
+  along where such a leaf swings in. "I can also open it from the other side now": by the design, once
+  she has come through from the free side it is open both ways for good (the shortcuts back); but it
+  shut behind her and opened from its plain side with E. Now it stays propped open from then on
+  (`propOpen`), and before that its plain side does not open.
+- Checked: all ten doors shut and open beside her, in place; the whole ship from outside
+  (`tools/render_ship.py`: no door shows through the side); `check_overlaps`: 0.
+- **Not looked at yet:** the four end walls with a one-way doorway (decks 8 to 10 aft, deck 11
+  forward), to be proposed to the user apart, as the plan says.
+- **Tests:** `boot`, `region4`, `region5`, `region7`, `golden` pass; the rest not run.
+- **With it, the user's (deck 8's open cabin, `amb_peek_sea`):** "Let's make its interior more washed
+  out colors, like we usually do": its inside washed 30% toward the wall, as the knitting lady's open
+  cabin already was (`peek-sea` in `src/world/world.js`).
+
+## Deck 8's open cabin: a bed bounce on E (2026-11-18)
+
+- **The user, at `amb_peek_sea`** (region 5's open cabin with the sea in its window): "What is this open
+  cabin for?"; its inside washed (above); "I stood still at the entrance, and nothing happened, she
+  didn't lean in. But since it now reads as interactable, let's add some gag at the E press." Found:
+  standing still there 2 s did set the quirk off, but it played her ordinary look-around, which reads as
+  nothing.
+- **Four gags offered; the user chose the bed bounce:** E (X), she steps in at the door, her back to us,
+  hops onto the bed and bounces facing us (her 8206 clip and its springs), cut to the doorway's opening
+  (Phaser's crop, as the people in doorways), her head going out of sight under the lintel at each
+  bounce ("as shown", over a seated bounce that would have needed a new clip); "when she's inside, she's
+  in the background, so she also has to have the washed-out contrast": a copy of her frame filled with
+  the wall's colour at 30% over her, the room's own wash. Out again, she straightens her badge (the
+  intro's clip). About 5 s; any key ends the bouncing. A glance each way along the corridor first was
+  "the delay after the E press": taken out. Its door frame stays in full colour (it is used now).
+- No new art: her own clips. `peekBed` in `src/world/world.js`, the quirk `sec_peek_sea` (`gag: "bed"`).
+- **Tests:** `region5` (changed: nothing on standing still, E in and bouncing cut to the door, back out,
+  a find) and `boot` pass.
+
+## Step 4a's second batch: the sprinkler's gag (16), built (2026-11-18)
+
+- **What she does** (`Sprinkler.ride` in `src/world/movers.js`, played by the ship scene's `thingGag`;
+  `gags` sheet, `sprinkler-*`): in its rain she flinches and her hair falls flat over her face, where she
+  stands, or stopping short from her run (a clip from each quarter of her stride, run frames 1, 3, 5, 7;
+  the hit waits up to a frame for one), sliding to a stop; a sneeze; then she turns round and squelches
+  back the way she came (the user, on seeing it: "make her always return to the direction she came
+  from"), slowly, and her checkpoint. Her word "Brrr!" as before.
+- **Made:** her soaked picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the second drifted to a blue-black mop), then PixMiniMax clips (10 generations, 1 each)
+  from her built sheet's frames to it: the first drench and run-stop drew a thick water column and the
+  first sneeze uncovered her face; redone describing her body only. Checked frame by frame: eight frames
+  1 px over the floor set down, loose specks out, the water drops kept. Left: her blouse greys for one
+  frame in two run-stops as it soaks; her hair streams back at the sneeze's peak. 20 generations.
+  `assets/source/her-mishaps/batch-4a/` (README).
+- **The user: "Hard to understand like this, let me see it in the game"**: strips of loose frames on a
+  plain backdrop did not show it; it was put in the game and shown from there (a `sprinkler9` place).
+- **Deck 8's sprinkler rained through the floor** (the user: "do we have another sprinkler on the deck
+  below?"): it stands at 148 m right under deck 9's, and its rain, drawn above her layer, showed through
+  the darkened deck, in step with the one above. A sprinkler's rain and sound now only while she is on
+  its deck (the user declined different rain patterns: "No need").
+- **The second exception to the tangerines** (the user, on finding no difference with tangerines on, then:
+  "let's do this as another exception: the wet gag regardless of the tangerines"): `pocket: false`, as the
+  dog's lead; she keeps them all and goes back to her checkpoint. (The difference they had not seen: the
+  test link carried `&pocket=off`.) A tray in her hands still spills.
+
+
+## A plan for fast playtests: the stepped clock (2026-11-18; a plan only, nothing built)
+
+- **The user:** the tests take too long even when only the relevant ones are run, without the
+  sound's; "come up with a smart solution to speed up the development cycle without compromising
+  on QA".
+- **Found:** the tests wait in real time (650 sleeps, every walk a key held for real seconds), in
+  one browser, one scenario after another; the region scenarios are single functions of 55 to 70
+  checks. The test browser already draws on the graphics card, so nothing is to be gained there.
+- **Measured in a copy of the game:** a frame not drawn costs about 0.2 ms against 10.6 ms drawn
+  (600 game seconds in 6.7 s); her run and her jump come out the same stepped as in real time;
+  timers follow a stepped clock, tweens only once `Date.now` returns it.
+- **The plan (docs/plan-fast-tests.md):** the test stops the engine's loop after a page loads and
+  steps the game itself, undrawn but for screenshots; every wait in `tools/playtest.py` goes
+  through one clock, so no scenario is rewritten; then scenarios side by side, only-the-failed,
+  times per scenario, smaller cases as scenarios are next touched. `sound` and `boot` stay in real
+  time; `--real` keeps today's way for comparing. Its first step ends with two scenarios run both
+  ways and shown to the user.
+- **Also found:** five test browsers left running by scripts that had ended (2.6 cores, 2 GB);
+  closed with the user's leave. The plan's runner closes such leftovers itself.
+
+## Step 4a's second batch: the sauna's steam (17), built (2026-11-18)
+
+- **What she does** (`Steam.ride` in `src/world/bow.js`, played by the ship scene's `thingGag`; `gags`
+  sheet, `steam-*`): the cloud out of the sauna's aft door catches her; a thick burst of steam wraps her
+  where she is (from her run she slides to a stop) and thins, rising: her hair is frizzed into a huge
+  puff, her cheeks flushed; she fans her face, sways with a hand to her forehead, and sits down dazed;
+  then her checkpoint. Her word "Pfff!" as before; with a tangerine on her she splutters as before (no
+  exception). Sounds: a hiss at the hit, a cough in the burst, a plop as she sits (not heard by me).
+- **No clip per quarter of her stride** (as 16 needed): the burst covers her whole, puff and all, the
+  frame she is caught, so the change to her puff picture is not seen; drawn in code, as the cloud is.
+- **Found in the game and mended before showing:** a gap in the first burst showed a bit of her new
+  hair; caught pressed against the sauna's door she stood in its doorway, its post through her, and
+  sitting she put her legs across it: under the burst she is set 34 px clear of the door (`clear`).
+- **Made:** her puff picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the second hid her eye under a red blotch), the fan and the swoon by PixMiniMax from it
+  (2 generations). Checked frame by frame: the body from the hair down unchanged, feet on the floor line
+  (four swoon frames 1 px under, set up), four loose specks out, both clips starting on the exact puff
+  picture and the fan ending on it. 12 generations. `assets/source/her-mishaps/batch-4a/` (README).
+- **A `steam11` place** to try it; `region9` now checks the gag (fan, then swoon) and waits for her
+  return, longer than the old fright's.
+
+## Fast playtests: the stepped clock, built (2026-11-18)
+
+- **The user:** "Implement the entire fast test plan, then go back to our current plan" (step 1 shown
+  first: `vacuum` 8.3 s to 1.6 s, `region4` 126.8 s to 5.7 s, every check the same both ways).
+- **What it gives** (`docs/plan-fast-tests.md` §7): the 38 scenarios in about 35 minutes in real time,
+  about 4 stepped one after another, **55 s six at a time** (`-j 6`); 878 checks compared, every one the
+  same result both ways. `check_overlaps` 20 s to 6 s, `shoot_people` 399 s to 21 s, `render_ship` 27 s
+  to 5 s.
+- **Found in the harness:** undrawn frames left the cameras still (a ride's "out of the screen" ended at
+  once); the game's awaited waits and tweens ran late within a batch (the chute); the loop's own delta
+  froze (the cake never swayed); six browsers at once had a file refused by the test server.
+- **Found in the tests:** six checks that had passed by real time's slack (the trunk's lock message,
+  the funnel stairway's top twice, the jogger three times, the trays' jump, the terrace gull's swoop):
+  each now waits for the thing, not for a time.
+- **The rule stays** (the user, asked whether the whole suite should now run before each merge: "The old
+  rule"): after a change, the scenarios it touches, stepped; the whole suite never unasked; what is
+  judged by eye stays the real game (`CLAUDE.md`, "Working with the user").
+- **Also:** `Math.random` and Phaser's RND seeded in tests (`--seed`); 1,471 old browser profile folders
+  removed, and every test browser now takes its own away; cases (`scenario_region4__towels`) ready for
+  new checks, no old scenario cut up.
+
+## Step 4a: Teppanyaki's flares (19), built (2026-11-18)
+
+- **The gag:** caught in the flame, a puff of black smoke (embers in it) wraps her at once, so the
+  switch from her run is never seen; under it she jumps back out of the flame's reach (`back`, doors
+  and walls stop her: the flame is still up, and where she is caught the diners sit). It thins and she
+  is in her soot picture: her face black but for the white eye, her hair on end, singed at the tips;
+  she blinks, a wisp of smoke curling off her hair, and coughs out a puff of smoke; then her checkpoint.
+  A yelp at the hit, a cough on the clip (sound: the user's to judge).
+- **The user, on seeing it:** "The flames are too big, make them less wide": the reach from 1.25 m to
+  0.8 m each way, about the grill's own width. "If I just run past them, they usually go up behind me"
+  (a flame every 6 s by the clock, the flourish 0.9 s before it: she mostly met the flourish): asked,
+  the user chose **"Answers her coming"**: running at a quiet grill starts the chef's flourish so that
+  the flame is up as she gets there (by her speed); stopped at the flourish she lets it flare and passes
+  in the lull after it (2.5 s); nearer than the flame could meet her, nothing starts (it would rise
+  behind her); with no one near, the clock; her cry still makes his next one late (`FLARE` in
+  `src/config.js`). Asked why the hit moves her: the three reasons above; kept.
+- **Made:** her soot picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the first darkened her all over, legs and arms too), the blink and the cough by
+  PixMiniMax from it, both pinned to it at the end (2 generations). Checked frame by frame: the body
+  unchanged from the shoulders down, feet on the floor line in every frame, loose specks out (two in the
+  picture, three in a cough frame; two singed tips standing apart kept), the blink a lid over the eye,
+  not a change of the face. **Her soot came out green in the game:** the palette has no neutral dark
+  grey, and its two nearest are greenish; for these clips they go on the charcoal greys of her hair's
+  family (`SOOT` in `tools/build_gags.py`). 12 generations. `assets/source/her-mishaps/batch-4a/`
+  (README).
+- `region8` checks the gag (blink, then cough, and her return) and the chef answering her coming.

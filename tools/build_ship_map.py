@@ -165,7 +165,9 @@ OWN_DOORS = {(10, BRIDGE_WALL_M), (11, SPA_WALL_M)}
 
 def part_doors():
     """Every boundary between two indoor parts of a deck, (deck, metres, swing): a wall with a door
-    in it (the user, 2026-11-07). The door swings open away from a stair lobby, else aft."""
+    in it (the user, 2026-11-07). The door swings open away from a stair lobby, else aft; a one-way
+    door (a push bar on its free side) away from its free side, as it is pushed (the user, 2026-11-18:
+    "It opens in the wrong way")."""
     doors = []
     for deck in PLAYABLE:
         parts = deck_parts(deck)
@@ -176,6 +178,9 @@ def part_doors():
             if not (indoor(deck, m - 0.5) and indoor(deck, m + 0.5)):
                 continue
             swing = -1 if k1 == "core" else 1
+            lock = DOOR_LOCKS.get((deck, m))
+            if lock and lock[0] == "oneway":
+                swing = -lock[1]
             doors.append((deck, m, swing))
     return doors
 
@@ -1004,15 +1009,24 @@ def build_objects():
 
     # Named places to start at, for testing: ?at=<name> (README).
     add(point("crew", "place", exact_x(CREW_DECK["cabin"]), floor_y(crew)))
-    for name, deck, m in [("gangway", 4, 67), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
+    for name, deck, m in [("gangway", 4, 67), ("deck4", 4, 49), ("deck4-aft", 4, 112), ("deck5", 5, 50), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
                           ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
-                          ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117),
+                          ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117), ("deck9-aft", 9, 134), ("steward", 9, 183.4),
                           ("spinnaker", 12, 52), ("champs", 12, 92), ("court", 12, 150), ("sushi", 12, 178),
                           ("bistro", 12, 205)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
     add(point("balcony", "place", 7815, floor_y(9), [prop("route", "promenade")]))
+    # Step 4a's first gags, to try each (2026-11-18): aft of deck 9's swinging door (13a: walk forward
+    # at it), forward of deck 10's trays (3: run aft onto them), aft of the pool's wet patch and its
+    # deck chair (7b: walk forward past the chair onto the patch), and on the balcony with deck 9's
+    # second rail gull (20: stand by it).
+    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156), ("sprinkler9", 9, 144)]:
+        add(point(name, "place", x_of(m), floor_y(deck)))
+    add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
+    # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)
+    add(point("steam11", "place", exact_x(54.6), floor_y(11)))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
@@ -1582,9 +1596,10 @@ def build_objects():
     for deck in (8, 9, 10):
         for core, (a, _) in CORES.items():
             # Hung 20 px further aft where the wall has a card reader on the lobby's side (decks 9
-            # and 10 forward: the reader sits 20 px from the wall, 40 px up; the audit, 2026-11-15).
+            # and 10 forward: the reader sits 20 px from the wall, 40 px up; the audit, 2026-11-15),
+            # or where a one-way door swings open into the lobby (its leaf 28 px; 2026-11-18).
             lock = DOOR_LOCKS.get((deck, a))
-            x = col(a) * TILE + (50 if lock and lock[0] == "card" else 30)
+            x = col(a) * TILE + (50 if lock and lock[0] in ("card", "oneway") else 30)
             add(area(f"directory-{deck}-{core}", "decor", x - 13, floor_y(deck), 26, 0, [prop("kind", "directory")]))
             put(deck, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
         # The atrium's walk: downlights and a warm cove along its ceiling (deck 10's is the dome:
@@ -1920,9 +1935,10 @@ def build_objects():
     add(area("name-board", "nameboard", exact_x(NAME_BOARD[0]), ROOF_ROW * TILE - 52,
              exact_x(NAME_BOARD[1]) - exact_x(NAME_BOARD[0]), 30, [prop("text", "NORWEGIAN SUN")]))
 
-    # A robot vacuum patrolling the deck 4 cabin corridor.
+    # A robot vacuum patrolling the deck 4 cabin corridor (to 143 m: past it stands the climb,
+    # docs/plan-three-uses.md §4.2).
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
-        prop("minX", x_of(118), "float"), prop("maxX", x_of(150), "float"), prop("speed", 58, "float")]))
+        prop("minX", x_of(118), "float"), prop("maxX", x_of(143), "float"), prop("speed", 58, "float")]))
 
     return objs
 

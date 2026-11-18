@@ -151,7 +151,8 @@ Reference photos never enter the repo.
 | Run | ← / → | Left stick / D-pad |
 | Jump (hold for full height, tap for a hop) | Space | A |
 | Climb ladders | ↑ / ↓ | Left stick / D-pad up/down |
-| Кісюнічка dash (§3.2) | D (Shift until 2026-11-06) | B |
+| "Кісюнічка!!!": the cry, and the lunge with it once learned (§3.2); one tangerine each press | D (Shift until 2026-11-06) | B |
+| Throw a tangerine (§3.2): a roll; with ↑ held, a lob | F, ↑ + F | Y, ↑ + Y |
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
 | The welcome menu: choose, press | ↑ / ↓, Enter or Space | Left stick / D-pad, A or Menu |
 | Skip the intro | Esc | Menu or B |
@@ -171,7 +172,7 @@ only after a key or a click: with the controller alone the game may stay silent 
 **Rumble (the user, 2026-11-15; `src/rumble.js`):** only while she plays with the controller, and
 only at these moments, so that a rumble always means something: a scare (a bump, bonk or splash: a
 short sharp jolt; a long fall: a heavy thud; overboard: a big splash that fades); landing on her
-feet a deck or so down (a tiny thud; not after a glide); the dash starting (a short burst); a tray
+feet a deck or so down (a tiny thud; not after a glide); the lunge starting (a short burst); a tray
 spilled (a light tick); Bumbot bolting at a near-catch (two quick light pulses); the ship's horn (a
 deep rumble for the length of the blast); the bridge's alarm (four pulses with its lights); the
 pool draining (a faint low rumble for its five seconds); a gust pushing her on the balconies, the
@@ -182,35 +183,89 @@ heartbeat).
 
 No pause and no map, at least for now.
 
-### 3.2 Special move — the "Кісюнічка!!!" dash
-
-**Open (the user, 2026-11-14: "I'm not sure if it makes sense"):** the dash, the tangerines and
-what effort is rewarded with are being rethought. The analysis, the proposal on the table (the
-cry as the power, a tangerine thrown, a tangerine that forgives a hit; a second collection as
-the reward) and the questions still to answer are in `docs/brainstorm/dash-rework.md`. Until it
-is decided, what follows stands and is what the game does.
-
-**Decided (the plan, 2026-11-10): the dash stays**, learned at her first sight of Bumbot and never
-required: breakables hide shortcuts and secrets, and it tames a few hazards (§6.1.2). About 30
-tangerines go back on the ship (§6.3).
+### 3.2 Special move — "Кісюнічка!!!": the cry, and the lunge
 
 "Кісюнічка!!!" is what she happily screams every time she sees a random cat on the street, so
 it is her battle cry here.
 
-**Decided:**
+**Decided (the user, 2026-11-15; `docs/plan-three-uses.md` §1 and §2, which has what each
+person, animal and hazard does): a tangerine has three uses**, and the ten-second dash is gone.
+D (B on the controller) is the first, the pocket the second (step 2), the throw (F, Y on the
+controller) the third (step 3). **Built (step 1, 2026-11-15):**
 
-- A dash with increased speed while she shouts **"Кісюнічка!!!"**, smashing through some obstacles and
-  enemies in her path. Lasts **10 seconds**.
-- **Fuel: tangerines.** Each dash costs one. There is **no cap** on how many she carries, but there are
-  not many on the ship, so each one counts (§6.3).
-- **Speed:** ~2× run speed. Bumbot's cheat dash was 4×, which is fine on an empty rooftop but
-  uncontrollable for 10 seconds inside a ship full of corridors and ladders.
-- **What it breaks:** enemies and anything marked *breakable* (crates, luggage, stacked deck chairs,
-  room-service carts). It never breaks walls, floors, locked doors or the ship's structure.
-- **What it doesn't change:** falls still count (§5.6); jumps still work as normal during the dash,
-  and she still **lands on** floors she runs over (Bumbot's early dash fell through every ledge).
-- **Presentation:** a speech bubble with the exact text **"Кісюнічка!!!"** and a synthesised sound
-  (no recording), a speed trail, and a HUD countdown so she can see the 10 seconds draining.
+- **Every D costs one tangerine, whatever it does.** With none on her nothing happens, and the
+  HUD's count blinks once. (`?tangerines=infinite` never uses one up, for testing.)
+- **The cry, from the start:** "Кісюнічка!!!" in her bubble, her sound, and the people and animals
+  within 4.5 m on her deck are startled for three seconds: a walker in her way (the porter, the
+  waiter, the jogger) stops and stands aside with a "!", the buffet queue turns aside, the steward
+  on his rounds pulls his cart in, the gulls go up (a dive still in its tell is called off), the
+  kid with the water pistol turns and squirts at her at once, the winchman holds the boat a beat,
+  Teppanyaki's chef flares late, the librarian shushes her and her rope's sign rattles, Bumbot
+  looks up at his spot (the beat is what it was), and at the tip of the bow he backs off. A "Do
+  Not Disturb" door within 3 m opens on someone not dressed for visitors: "Startled". Anyone else
+  standing about turns to look; a heart over the few who like cats, a finger to the lips in a
+  quiet place (`hear` in `tools/population.py`). Machines do not hear; no door or venue answers
+  it. Each person startled is deaf to the next cry for eight seconds.
+- **The lunge, with the cry, once learned at the Seven Seas** (near-catch 1, "she lunges with
+  the scream"; the save's verb `dash`): one second at twice her speed the way she faces, the
+  trail behind her. During it and a breath after, **nothing frightens her by contact**: what
+  touched her gives way in its own manner (the porter's cart rolls off and he runs after it, the
+  jogger spins like a top, a basketball is headed back onto the court, a sprinkler leaves a few
+  drops on her, a flare a wisp of smoke); the luggage, the crates and the piñata break, the
+  vacuums spin, the towels topple; trays on a hallway's floor scatter and their door flies open
+  after she has gone. A jump taken in it carries about twice as far. Falls and the sea are what
+  they are; solid things stay solid.
+- **With a tray in her hands, or before the lunge is learned: the cry alone**, still one
+  tangerine. Not while she crawls, climbs, swims, or holds Bumbot.
+- Numbers in `src/config.js` (`CRY`, `LUNGE`), to be tuned in play. The lunge stays under
+  Bumbot's 300 px a second.
+
+**Built (step 2, 2026-11-15): the pocket, and the tangerine a real thing.**
+
+- **A hit that would be a fright or a spilled tray, with a tangerine on her, is forgiven**: she
+  flinches (her `her-hit` clip, a third of a second), is pushed back a step, and blinks for a
+  second and a half during which nothing touches her; she keeps her place and her tray. A walker
+  who bumped into her stops and stands aside, as at her cry. Falls, the sea, and a load that
+  goes over by her own feet (the cake swayed over, a tray into a pool) are never forgiven.
+- **The tangerine is knocked out of her pocket** and flies off the way she was pushed: it
+  bounces, rolls about four metres, off steps and edges, against anything solid it bounces back,
+  and lies where it stops, kept in the save (`save.loose`), hers again by walking over it. Off
+  the hull it falls into the sea, gone; in a pool it floats, to be swum to. Whatever wants it
+  may take it first (`world.offered()`; the takers come with step 3).
+- `?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
+  it off unless a scenario names it. Numbers: `POCKET` and `LOOSE` in `src/config.js`.
+- **Revised (2026-11-16, `docs/plan-three-uses.md` §1.6, §1.7):** her reaction is the hit's
+  own, by its side and who was moving, and the tangerine goes the way she is thrown (§5.6). A
+  gull takes it from her; at a "Do Not Disturb" door or the occupied balcony she hands it over.
+  **A tangerine she gets flies to the HUD's count** (0.4 s, on an arc, one after another): the
+  save has it at once, the number changes as it lands, and the icon bumps (`TALLY`).
+
+**Built (step 3, 2026-11-15): the throw.**
+
+- **F throws one tangerine underarm the way she faces: a roll**, low, one bounce, about six
+  metres. **With ↑ held, a lob**, high and short: its top is about 2.3 m ahead, a hand under a
+  corridor's ceiling. On her feet only, hands free (not with a tray, crawling, gliding, in a lunge
+  or with Bumbot); with none on her the count blinks. She stands for half a second while she
+  throws (her `toss` clip, the tangerine in her fist until it leaves her hand).
+- **What it meets answers it** (`plan-three-uses.md` §2's fourth column, every one built today):
+  the porter stops for it and peels it by the wall (10 s clear), the waiter pockets it, the
+  jogger hops it; the steward on his rounds puts it on his cart, hers again with E; the kid
+  catches it and eats it, his back turned 15 s; anyone standing about turns to look. Deck 4's
+  and deck 9's vacuums swallow it and choke, dead until she has left the deck. Gulls go for it:
+  at the pool (her cone left alone 10 s), on a balcony's rail (that balcony safe until she is
+  past), on the promenade's rail (clear 8 s), round the funnel (no swoop 10 s), in the bow's
+  flocks. Rolled into the trays outside a "Do Not Disturb" door: the clatter, the door opens,
+  the guest looks about at nobody, and the trays are safe to cross meanwhile. A lob brings the
+  piñata down (three for one), scores through the court's hoop, plays a note on the
+  Spinnaker's keys. On the delivery robot's top it rides along. **Bumbot at a spot bats it
+  straight back to her**; at the tip of the bow he backs off. What nothing takes lies where it
+  stops, hers again by walking over it.
+- The things of later steps (the dog, the paper round, the runaway suitcase, the gull with the
+  bell, the shelf of the climb) answer it when they are built. Numbers: `THROW` in
+  `src/config.js`.
+
+**Superseded:** the dash of 2026-11-10 (ten seconds at twice her speed, a HUD countdown), and
+before it the open question of 2026-11-14 (`docs/brainstorm/dash-rework.md`).
 
 ---
 
@@ -649,12 +704,26 @@ which keeps the challenge, but it plays as a scare:
 
 | What happens | What she does |
 |---|---|
-| Touches an enemy or a hidden trap | A fright **that fits what got her** (squeals at the vacuum robot, splashed by the water pistol, ...), then she **runs off the screen**. |
+| Touches an enemy or a hidden trap | **A mishap of that obstacle's own** (2026-11-16, `docs/plan-three-uses.md` §1.6): which one is read from the side of her it is on and from who was moving, she or it (into the porter's cart, she goes over it; it pushes into her as she stands facing it, she sits down; it reaches her back, she sits into the luggage). Then the fade and her checkpoint. During it the keys do nothing; a hit in the air plays it when she lands. Only the "Do Not Disturb" doors and the occupied balcony keep the old fright and run off the screen (she is truly embarrassed). Until each mishap's own gag is drawn, the built fall on its side stands in (on her bottom, or flat on her front, dazed). A slow thing she stands looking at (a paper sliding at her shoe, the suitcase rolling at her) does not knock her over. |
 | Falls **one deck** | Nothing. She lands and carries on. |
 | Falls **further than one deck** | The camera **stops following** once she passes one deck, and she drops out of the bottom of the screen, as Bumbot does. |
 | Falls **overboard** | No drowning. A splash, then she bobs up **smiling in a life ring, waving one hand**, for about a second. |
 
 Then she steps out of the closest activated crew cabin door (§5.5).
+
+**In a lunge** (§3.2, since 2026-11-15) nothing frightens her by contact, for its second and a
+breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
+Disturb" door is no contact: that fright stands, lunge or not.
+
+**With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a hit by contact, or a hit
+under the parasol, is forgiven for one tangerine, and she keeps her place. Since 2026-11-16 her
+short reaction is the hit's own, by the same two facts (`MISHAP_SCENES` in `src/config.js`):
+thrown back she reels a step and the tangerine rolls off behind her; pushed on she stumbles and it
+rolls on ahead; a door in her face, she rubs her nose; water in her face, a splutter, down her
+back, she arches; a flare, a yelp; from above, she ducks. A gull that comes down on her takes the
+tangerine and is gone with it; at a "Do Not Disturb" door or the occupied balcony she holds it
+out in both hands, head bowed, and a hand takes it (spent, not rolling). Never is she sat onto a
+thing or carried off with a tangerine on her. Falls and the sea are never forgiven.
 
 The word is **"scare"**, never "death", on screen and in the code alike.
 
@@ -756,8 +825,8 @@ region 6). At the very end he is in the cabin when she brings the cat home.
 
 | Kind | How it reads | The rule |
 |---|---|---|
-| **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors |
-| **New ways to move** | A pickup (no glyph and no hint since 2026-11-14: how a verb is used is hers to find out) | Four verbs, one per quarter: the dash (region 1), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
+| **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors (**built 2026-11-18**, docs/plan-three-uses.md, step 4a's second revision: shut, seen edge on, the bar's end and a door closer on the free side, nothing on the other; open, the leaf with a plain steel push bar across it; it swings away from its free side, as it is pushed; once she has come through from its free side it stays propped open for good, so it never opens from its plain side) |
+| **New ways to move** | A pickup (no glyph and no hint since 2026-11-14: how a verb is used is hers to find out) | Four verbs, one per quarter: the lunge (region 1; the cry is hers from the start), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
 | **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
 | **People and the ship's routine** | A person, a crowd or a thing on a flight, with a rope and a sign | A cleaner mopping, a photographer, a carpet being relaid, a table of towel animals, a painter, a crowd of fans, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
 
@@ -781,6 +850,47 @@ on the top shelf. Anywhere else, standing still with a book she opens it and rea
 bookcase (the push verb) and climbed to the top shelf reaches the odd book; pulling it swings the
 bookcase open on a hidden nook: an armchair, a lamp, a porthole on the sea, a photo slot, and the
 reading idle there for as long as she likes.
+
+**The books' titles and where they show. Decided (the user, 2026-11-18); not built.** The books are
+fourteen (docs/plan-three-uses.md §4.1), and their titles are real books of hers, read off two
+photos of her bookshelf (`reference/photos/Books/`, git-ignored). **Each is written in its own
+language and script**, whatever the game's language, with its author. A title shows in two places,
+and nowhere else:
+
+- **When she gets a book** (picked up, or handed to her as thanks): the screen is dimmed slightly
+  and **the book's cover is shown in the centre of the screen, its title and author on it**, until a
+  key is pressed. **Every book has a generated cover of its own**, so that the fourteen look
+  different. A naming, not a hint (§7.1).
+- **The shelf seen close:** E at the shelf behind the librarian's desk shows it over the whole
+  screen, **a generated picture**: the books that are back as spines with their titles, the gaps of
+  those still out. Any time, with or without a book on her.
+
+The lettering on covers and spines is drawn in by the build, not by the generator and not by the
+game's pixel lettering (which has Latin and Ukrainian capitals only): these titles need lower case,
+Polish letters, Russian and Ukrainian Cyrillic, and Hebrew, right to left.
+
+| Book | Title | Author | Where it is found |
+|---|---|---|---|
+| 1 | Atomic Habits | James Clear | Deck 5, a table at the Atrium Café |
+| 2 | Harry Potter and the Chamber of Secrets | J.K. Rowling | The lifeboat |
+| 3 | Танґо смерті | Юрій Винничук | The dancers' dressing room |
+| 4 | Unexpected Lessons in Love | Lucy Dillon | The honeymoon couple's thanks |
+| 5 | Її війна | Євгенія Подобна | **Her own, on the bed in cabin 8206 (the user)** |
+| 6 | Harry Potter and the Philosopher's Stone | J.K. Rowling | Her husband's, at the table |
+| 7 | Понаїхали | Артем Чапай | The balcony guest's thanks |
+| 8 | Niebieskie nitki | Małgorzata Gutowska-Adamczyk | The old lady's sunbed, after the horn |
+| 9 | Двор | Аркадий Львов | The engineer's, at the funnel's top |
+| 10 | Боря, выйди с моря | Рафаил Гругман | The captain's, on the bridge's chart table |
+| 11 | נערה במעיל כחול | מוניקה הסה | The boat walkway's end, beyond the boat drill |
+| 12 | Poczwarka | Dorota Terakowska | Deck 8 midships, the thanks for the flowers |
+| 13 | Daughters of Warsaw | Maria Frances | Deck 10 midships, the thanks for the tea |
+| 14 | Pachinko | Min Jin Lee | Deck 9 forward, the end of the officers' corridor |
+
+The fourteen titles and book 5's are the user's ("The order is random"). **Which title lies where
+is Decided** (proposed by what each name fits: the tango with the dancers, the sea with the captain,
+the chamber of secrets in the hidden lifeboat; the user, 2026-11-18: "Good"). Each spelling is checked against
+her copy's cover when its cover is made. Book 11's author is written as on her Hebrew copy (the
+user gave the spelling).
 
 **Ice cream (his machine).** The soft serve machine at the Great Outdoors' entrance is worked by her:
 **hold E and the swirl grows; release in the green band** for a perfect cone, early for a stub, late
@@ -806,9 +916,10 @@ The long cabin corridors are where risk lives: a gauntlet of a few hazards betwe
 and **after region 5 the door she steps out of anywhere forward on deck 8 is cabin 8206's own** (it is
 a respawn door, not a hub: the "no home base" ruling stands). Listed per region below.
 
-**The dash and the tangerines (Decided, replacing the open point in §3.2 and §6.3).** The dash stays.
-It is **learned, not given**: at her first sight of Bumbot she screams "Кісюнічка!!!", and from then
-on D dashes, fuelled by tangerines as §3.2 says. It is **never required**: breakables (stacked
+**The lunge and the tangerines (Decided; the lunge since 2026-11-15, §3.2).** The cry is hers from
+the start; the lunge is **learned, not given**: at her first sight of Bumbot she screams
+"Кісюнічка!!!", and from then on D lunges with the cry, one tangerine each, as §3.2 says. It is
+**never required**: breakables (stacked
 luggage, a jammed trolley, stacked deck chairs, crates, a piñata) hide shortcuts and secrets, never
 the way on; it also shoves the vacuum aside, scares the kid off and passes the sprinkler. **About 40
 tangerines** on the ship, each where food plausibly is (fruit bowls, buffet counters, trays, pantry
@@ -958,9 +1069,10 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   staircase up to 9 and its elevator to 10; the midship and aft cores' flights 7-10 (their 7-8 blocks
   lift as region 4 opens).
 - **The way in:** the Entertainment card on the Bliss/Magnum's trunk, up to deck 9.
-- **The corridor's life:** the **steward's cart** jammed in a cabin's doorway: the push glyph; she pushes
-  it free along the corridor (the push verb: E at a cart's end, then walk); he is grateful and hands
-  her the **Housekeeping card**. **The honeymoon couple** at their door (their bubble: a camera): E
+- **The corridor's life:** the **steward's cart** jammed across the corridor at its aft end (185.2 m,
+  since 2026-11-18, below): the push glyph; she pushes it free along the corridor (the push verb: E at
+  a cart's end, then walk); he is grateful and tosses her the **Housekeeping card** (short, turned to
+  her if she goes on). **The honeymoon couple** at their door (their bubble: a camera): E
   and she takes their picture with it (they pose, the flash); their thanks is **the book** they found
   in their cabin. **The balcony cabin** (150 m): a cabin with a balcony, its door green, the card's
   first use; inside, a balcony door out: a view, and a dead end until the socks; from its balcony she
@@ -979,13 +1091,39 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   towels; its door opens onto deck 4's corridor). One-way, down. **The pantries** (green crew doors
   by the restaurants on decks 4 and 5): small rooms with tangerine crates, one of them a passage
   between La Cucina's and the Four Seasons' kitchens, a shortcut past the waiter.
-- **Blocks:** the lobbies' doors into the corridors of decks 8 and 10 (shut from the lobby side); the
+- **Blocks:** the lobbies' doors into the corridors of decks 8 and 10, and deck 9's aft one (2026-11-18) (shut from the lobby side); the
   midship core's 10-11 flight (a table of towel animals across the landing, "PLEASE DO NOT TOUCH");
   the forward lobbies of decks 9 and 10 (gold, the officers' area).
 - **Blocks lifted now:** the atrium staircase's carpet (7-8): the atrium's stairs run 5-9 for good.
 - **Hazards:** standing carts to hop; the swinging door; **the towel stack** (hidden: it falls on her
   as she runs past the mid-cleanup cabin); **the sprinkler** (hidden, in a doorway, its wet-floor sign
   in the muted background); the vacuum in the mid-cleanup cabin, its second and last place.
+- **The corridor is the way. Decided (the user, 2026-11-18); built the same day.** The steward had
+  stood at 122 m, four metres from the trunk's door, so the card was hers before the vacuum, the
+  towel stack and the sprinkler, and everything aft of him was optional. **The steward and his
+  jammed trolley move to the corridor's aft end** (the trolley jammed at 185.2 m, rolling to
+  189.0 m, 3.8 m instead of 7.4; he at its handle as now), between the adjoining cabins' aft door
+  (184 m) and the checkpoint's crew door (drawn at 191.6 m). The route plan does not change (the
+  trunk up to 118 m, the card, the linen room at 112 m, the duct): what changes is where the card
+  is earned. She goes down the whole corridor (the honeymoon couple, the vacuum, the towel stack,
+  the sprinkler, the balcony cabin's green door still locked, the swinging door, the "Do Not
+  Disturb" door, the cart to hop, the luggage stack), frees the trolley, is tossed the card, and
+  comes back to the linen room.
+  - **The luggage stack stays as it is**, full height, with its two answers (the lunge, or the way
+    through the adjoining cabins): the one puzzle on this deck's way.
+  - **The way back is the corridor changed, not the corridor again:** the towel stack stays
+    fallen and the luggage stays broken if she broke it; the door, the vacuum and the sprinkler
+    reach her from the other side (other scenarios of docs/plan-three-uses.md §1.6); the balcony
+    cabin at 150 m opens to the card now: its checkpoint, its tangerine, Bumbot's glimpse.
+  - **The glass door at 194 m is shut from the aft lobby's side** until she opens it from the
+    corridor, like the same doors on decks 8 and 10: she cannot come up behind him by deck 7 and
+    the aft stairs. Opened once, it stays open (propped open for good, 2026-11-18), and that loop is a
+    second way back.
+  - **At his new place:** the wall picture the freed trolley and he would stand over is hung in
+    the nearest empty gap; the small housekeeping cart by the cabin door at 188 m is taken out.
+  - **To judge in play (Proposed):** on the way out nothing is lit between her arrival
+    (`cp_9_arrive`, 119.6 m) and the steward. If that proves harsh, one crew-door checkpoint just
+    past the sprinkler.
 - **Checkpoints:** deck 9, a crew door at the corridor's aft end (190 m); the laundry's door (deck 4).
 - **The book:** the honeymooners' (above).
 - **Secrets:** the duct's grilles (peeks into cabins: a snoring passenger, a cabin full of balloons);
@@ -1266,25 +1404,31 @@ shared bodies recoloured).
 
 #### 6.1.7 The hazards and obstacles
 
+(What the cry and the lunge do to each, since 2026-11-15: §3.2, and `docs/plan-three-uses.md` §2 in
+full; "Tamed by" below names the main ones.)
+
+(What the cry and the lunge do to each, since 2026-11-15: §3.2, and `docs/plan-three-uses.md` §2 in
+full; "Tamed by" below names the main ones.)
+
 | Hazard | Where | How it gets her | The tell | The response | Tamed by | Fright |
 |---|---|---|---|---|---|---|
-| The robot vacuum | Deck 4's corridor; the mid-cleanup cabin on deck 9 | Contact | Its hum, its path | Jump over, wait in a doorway | The dash shoves it aside | "Іііі!" (built) |
-| The luggage cart | The gangway lobby | Contact | The porter pushing | Hop it | The dash topples the stack | Bumped |
-| The waiter | The Four Seasons' doorway | A bump spills her tray | His loop | Step round, hop | | None (a spill) |
+| The robot vacuum | Deck 4's corridor; the mid-cleanup cabin on deck 9 | Contact | Its hum, its path | Jump over, wait in a doorway | The lunge sends it spinning | "Іііі!" (built) |
+| The luggage cart | The gangway lobby | Contact | The porter pushing | Hop it | The cry: he stands aside; the lunge: his cart rolls off | Bumped |
+| The waiter | The Four Seasons' doorway | A bump spills her tray | His loop | Step round, hop | The cry: he freezes, she passes with her tray | None (a spill) |
 | The delivery robot | Deck 6's forward cabins | An obstacle that stops and waits | Its beep | Hop onto it and ride, or pass it at a door | | None |
-| The jogger | The promenade | Contact | The JOGGING lane's arrows, his footfalls | Hop him; keep to the WALKING lane | | Bumped |
+| The jogger | The promenade | Contact | The JOGGING lane's arrows, his footfalls | Hop him; keep to the WALKING lane | The cry: he jogs on the spot; the lunge: spun round | Bumped |
 | The photo flash | The Photo Studio, deck 6 | She stops to pose a second | The camera raised | Pass between flashes | | None (a pose) |
 | Swinging stage lights | The stage, after the rival trips | Contact | The swing | Time it | | Bonked |
 | The trap door | The stage | A drop of one deck into the galley | A square seam | None needed | | None (a shortcut) |
 | The chip spill | The casino | A slip on chips | A machine's lights race first | Keep off the floor by a paying machine | | Slipped |
 | Standing carts | Deck 9's corridor | An obstacle | | Hop | The push verb moves them | |
 | The swinging cabin door | Deck 9's corridor | Contact | The handle turns | Wait or run past early | | Bonked |
-| The towel stack | A mid-cleanup doorway | Falls on her | A wobble | Walk, don't run, past it | The dash blows through it | Buried |
+| The towel stack | A mid-cleanup doorway | Falls on her | A wobble | Walk, don't run, past it | The lunge blows through it | Buried |
 | The sprinkler | A corridor doorway | A drench | A wet-floor sign in the background | Run through between bursts | The open parasol | Drenched |
 | The "Do Not Disturb" cabin | Deck 9's corridor; a balcony | A startled guest | The sign | Leave it shut | | Covers her eyes, backs out |
 | The wet patch | The pool deck, by the showers | An uncontrolled slide | The wet-floor sign | Walk onto it, or jump it | Grip socks | Slipped |
 | The sliding deck chair | On the wet patch | Slides into her | It rocks first | Keep clear of the patch | Grip socks | Bumped |
-| The kid with the water pistol | The pool deck | A squirt in range | He raises it | Hop over him | The dash scares him; the cone turns him | Splashed |
+| The kid with the water pistol | The pool deck | A squirt in range | He raises it | Hop over him | The lunge scares him (the cry alone draws his fire); the cone turns him | Splashed |
 | The buffet queue | The Garden Café | A shuffling block | The line's gaps | Hop it at a gap | | None |
 | Gulls | Open decks, balconies, the funnel | A swoop; they snatch food | A shadow sweeps the deck | Move on; crawl under it where she can | A cone as bait; the open parasol; the kid on the pool deck; the horn clears the bow | Swooped |
 | Gusts | The balconies, deck 12, the funnel's stairway, the finale | A push aft in the air | Towels flap, a line of spray | Jump between gusts | | None (a fall if unlucky) |
@@ -1419,6 +1563,26 @@ each hint at one of the hidden ones, drawn, no words.
 | The captain's cabin door | A name plate: the user's in-joke | |
 | The tip of the bow | Standing still before he comes: the arms-wide pose | Built |
 
+**The things to find (Decided, the user, 2026-11-15; `docs/plan-three-uses.md` §4.1): twenty, of
+four kinds** (Bumbot's eight, four more books, four of hers, four of her husband's). **Built
+(step 4, 2026-11-16), the first four:** Bumbot's tennis ball (deck 4: three fetches for the dog on
+a lead, and its owner hands it over), his ball of wool (deck 5, the knitting lady's basket), his
+feather on a stick (deck 4, the shelf at the top of a climb: from up there, or knocked down by a
+lob), and her little flag of Ukraine (deck 5, among the port flags on the Shore excursions desk).
+The HUD counts each kind found of all (🐾 Bumbot's, 🌸 hers, 🎸 his) from its first find. Deck 4
+also has a suitcase rolling to and fro to hop and the dog's lead to hop. Deck 5 has the knitting
+lady in her armchair by her open door, two paper rounds (a steward and a stewardess skimming folded
+papers along the carpet to the doors, both ways; one sliding or lying at a door is slippery until
+a hand takes it in) and a breakfast round (a stewardess carrying trays from her trolley to the
+doors; walked into, a crash; her trolley a low thing to hop, which a lunge goes past). **Her falls
+(the user, 2026-11-16):** a slip (papers, wet floor) with a tangerine on her is caught backwards and
+costs the tangerine; without one she sits down hard, dazed, butterflies over her head, and is back
+at her checkpoint. A trip on the lead with a tangerine: she is stopped short and stumbles on, the
+tangerine flying ahead; without: flat on her belly, dazed, back at her checkpoint. Someone thrown
+a tangerine eats it from the hand, bite by bite (`people.eat()`). Data: `KEEPS`, `ROLLERS`,
+`DOGS`, `SKIMMERS`, `BREAKFASTS`, `CLIMB`, `KNITTER`, `DESK_FLAGS` and the `keep_*` lines of
+`ITEMS` in `tools/population.py`.
+
 #### 6.1.12 Art to make
 
 No limit on art (the user, 2026-11-10), but generations are stated before they are spent, and the
@@ -1512,10 +1676,14 @@ half-dressed with nothing finished to review.
 
 #### 6.1.15 Still open (the user's)
 
-1. The pictures for the six photo slots (the lifeboat, the lighting bridge, the stern strip, the
-   chapel, the reading nook, the table at the Great Outdoors), and whether the chapel's wedding is
-   anyone in particular.
-2. **The ten books' titles**: real books she loves, one per region, and the one on the bed in 8206.
+1. The pictures for five of the six photo slots (the lifeboat, the lighting bridge, the stern
+   strip, the chapel, the table at the Great Outdoors), and whether the chapel's wedding is anyone
+   in particular. **The reading nook's is given (the user, 2026-11-18):** her own reading armchair
+   at home (`reference/photos/Books/reading-nook.heic`), as the picture in the nook's frame, not as
+   the nook's look ("The nook is at home, and cabin 8206 is not home in that sense"). Made into
+   pixel art from a cutout on a flat ground, the candidates shown first. Not made yet.
+2. ~~The books' titles~~ **Given (the user, 2026-11-18): §6.1.2's table.** Still open there:
+   whether the four new books' pages get a hint drawing each, and which.
 3. **The user's own sprite**: from his photo through PixelLab, as hers was, or described in words.
 4. The name on the captain's cabin door; the names on crew doors.
 5. Whether the rival has a name.
@@ -1542,9 +1710,14 @@ Mechanisms from the blockout, there to be used or dropped as the design needs. T
 
 ### 6.3 Tangerines
 
-**Decided (the plan, 2026-11-10):** the dash stays (§3.2), so about 30 tangerines go back on the ship,
-each where food plausibly is, a few as rewards from people (listed per region in §6.1.3). No carrying
-cap, scarce, and the game can be finished without the dash.
+**Decided (the plan, 2026-11-10):** about 30 tangerines go back on the ship, each where food
+plausibly is, a few as rewards from people (listed per region in §6.1.3). No carrying cap, scarce,
+and the game can be finished without them.
+
+**Decided (the user, 2026-11-15): 56.** The 53 on the ship are not moved and none is added on the
+decks; the three painted in the bowl on her crew cabin's desk on deck 3 are real ones now
+(`tan_3_bowl_*`, each where it was painted), so all but the lunge is hers from the first minute.
+Every D costs one (§3.2).
 
 ### 6.4 Later
 
@@ -1625,7 +1798,7 @@ cap, scarce, and the game can be finished without the dash.
     English-speaking ship (La Cucina, DECK 5, LINEN, a rope's QUIET PLEASE: my reading of "art
     text", asked about and answered "Ok" by the user, 2026-11-14), her «Кісюнічка!!!» (§3.2, the
     exact text), and everything
-    said without words. The choice is kept in the browser; `?lang=uk` sets it for a session.
+    said without words. The choice is kept in the browser; `?lang=ua` sets it for a session.
     The welcome screen's LANGUAGE button switches it (item 11). `WIN_MESSAGE` in
     `src/config.js` takes both versions.
 
@@ -2227,9 +2400,105 @@ Nothing blocks the start of the build. These get settled along the way:
       his shown on cabin 8206's desk; each count on the HUD from its first find); region 1's
       decks filled (a runaway suitcase, a dog on a lead, a climb, a knitting lady, a paper
       round); five look-outs; three deliveries; each deck its own plaque band and pictures. No
-      new ladder, no rounds, nothing that strengthens her uses. **Next: its step 1** (D: the
-      cry and the lunge, and the cabin's bowl; no art). Nothing of it is built yet.
-      Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
+      new ladder, no rounds, nothing that strengthens her uses. **Building it on the branch
+      `three-uses` (2026-11-15). Steps 1 and 2 done (D: the cry and the lunge, §3.2; the crew
+      cabin's bowl, §6.3; the pocket, and the tangerine a real thing that rolls, §3.2, §5.6).
+      Step 3 done (the throw, F: the roll and the lob, and what each thing does with it, §3.2),
+      committed `6a494b2`. Step 4 committed (region 1's decks and the first four things to find,
+      §6.1.11, after six rounds of the user's fixes on decks 4 and 5: the falls, the paper and
+      breakfast rounds, the knitting lady)**; their record is in `docs/progress-decisions.md`,
+      "The plan for the three uses, step 1" to "..., step 4". **Next (the user, 2026-11-16): the plan's revision of that day, before step 5**
+      (`docs/plan-three-uses.md`: how she takes a hit, each obstacle its own mishap by the side
+      it comes from and by who was moving, §1.6; a new picture of the tangerine and its flight
+      to the count, §1.7; art generated, never drawn in code or put together from other props;
+      each built step gone back over under its "Revision", then the new step 4a). **Step 1's
+      revision done** (every hit names its obstacle, `MISHAPS`; the new tangerine, chosen by the
+      user; the cabin's bowl in front of its tangerines), `ec42bb4`. **Step 2's revision done**
+      (mishaps by side and mover with the built falls standing in, her seven reactions, the gulls
+      and the doors that take the tangerine, the flight to the count; §5.6), committed with the
+      no-save switch (`DEV_FRESH`) and `?at=deck4`. **Step 3's revision done** (the new tangerine
+      in her toss's fist and rolling, from step 1's; a picked-up one's picture leaves the floor at
+      once, only its flight to the count is seen). **Step 4's revision under way:** her first two
+      gags made and approved: she rides deck 4's robot vacuum off out of the screen and the
+      runaway suitcase to the end of its roll, whichever side they reach her (the user: "I prefer
+      the ride in all cases": 5a, 6a, 6c ride too), one picture of her with the thing
+      (`assets/sprites/her-mishaps.png`); the vacuum smaller and the suitcase cut from those same
+      pictures. **The papers done (2026-11-17):** by the user's brief, a paper at her front (sliding
+      at her, standing or running, or lying where she steps) sends her leg up behind her and her
+      onto her belly, the paper round onto her back (4a); one at her heel takes it forward and up,
+      she sits, the paper round onto her head (4b); she slips standing too (4c gone). The sliding
+      newspaper generated (the user's pick), sliding at a steady speed right to her foot, where her
+      clip takes over from the same picture. **The suitcase and the vacuum refined (2026-11-17):** the
+      vacuum 2 px lower; after the tip she sits dazed, butterflies over her head; the ride 3.3 s
+      wherever she is hit, her clips 10% quicker, the suitcase by itself at 1.6 m/s. **Decided (the user, 2026-11-17): doors and walls across a deck stop whatever moves, not only her** (plan §1.8): a thing stops short of a door's face; a person walking a loop opens a door with no lock and goes through (deck 4's porter, at 60 m), a locked one turns them back; built into the ship scene (`stopShort`, `spanOn`, `holdDoor`) for every later step. **Done (2026-11-17): the porter's cart, 8a to 8d and his tip of the cap** (approved in the game; 8a's kicking slowed to 4 a second, "too fast, making her look like twitching"). **Done (2026-11-17): the breakfast stewardess** (approved in the game): 10a,
+      she runs into the tray and sits, toast on her head, the flower behind her ear; 10b the same
+      turned to the tray at her back; and, the user's rethink ("most of the round the woman pushes
+      her trolley, so that must impact the player"), her trolley's own four: 10c tripped over it
+      parked, 10d bumped back off it while it is wheeled (a trip would land her on the
+      stewardess), 10e tripped forward away from it at her back, dazed 1.2 s, 10f bounced off the
+      stewardess, who turns round; gags always on the corridor's floor; the stewardess wheels it
+      by its handle (a pushing walk generated with the trolley) and her tray at a door shrinks a
+      little and is gone, her hands out until then; her trip's lying pose mended (a leg stood up).
+      **Done (2026-11-17): the art rule looked back over** (steps 1 to 4's pictures drawn in code
+      made PixelLab's: the desk flags, the climb's shelf and laundry cart, the knitting lady's
+      basket, a door's hand, the cry's heart and its "quiet" sign, a speaker crossed out; the
+      feather a cat teaser on the shelf); with it the climb two steps and a harder gap, the lady
+      in the bathrobe an obstacle, deck 5's dim no longer blinking over the shelf, and **Decided
+      (the user): the tangerine knocked out of her pocket always rolls behind her** ("a dilemma:
+      run back to pick it up, or continue"). **Done (2026-11-17): the dog and its owner made again
+      together** (the user's idea: one picture of the two, a new owner, the lead from her fist to
+      the collar measured frame by frame, 2 px, hanging low where she trips); **Decided (the user):
+      on the dog's lead she falls whatever she carries and keeps her tangerines** (`pocket: false`,
+      a scenario's exception to the tangerines; more to come); everyone's clips on the floor frame
+      by frame; her lying 2 px lower; her running steps on her footfalls. **Done (2026-11-17): the
+      dog's together clips**, each one picture of the two: after her cry it winds the lead round its
+      owner's legs, they stand tied, it unwinds it; three fetches and the owner tosses her the tennis
+      ball (the ball 8 px with its seam, an olive outline, in front of her as it reaches her); tripped
+      on its lead, it licks her face, her checkpoint waiting for it. **Next in step 4's revision:**
+      step 4a: **deck 9's darting vacuum done (2026-11-17)**: deck 4's generated picture (the code-drawn
+      one gone), its blink on its own front light, and she rides it off the way it darted (5a, 5b);
+      **done (2026-11-17): the steward's jammed trolley** (the user found "an invisible wall": a low
+      cart had stood for a block to the ceiling): a tall housekeeping trolley, the user's choice, too
+      tall to hop; he and it one picture while it is jammed (his tug, his steps back as she pushes);
+      free, it stands back against the wall and he tosses her his card out of his pocket. **Done
+      (2026-11-17): the towel stack an obstacle** (the user's rule: it falls on her the moment she
+      passes it; she gets past by stopping at it and waiting while it falls): it wobbles hard as she
+      comes at it and falls the way she goes; its look kept ("I like it the way it is"). **Done
+      (2026-11-18): its fall generated**: the stack falls and scatters; running past, it falls on her
+      as she runs on (four clips, one from each phase of her run, so that she never stops for it),
+      she is buried, and her head comes up in a towel turban with a towel swan on it (18); its towels
+      redrawn soft (the user: "white bricks"); the heap behind her as she crosses it; the stack midway
+      between two cabin doors (141.6 m), and the picture it had hidden hung in the nearest empty gap.
+      **Done (2026-11-18): the first batch of step 4a's gags** (13a, 7b, 3, 20; `gags` sheet,
+      `tools/build_gags.py`): the swinging door bursts open with no tell and, from aft, slams her flat on
+      the wall; one tray, the stewardess's, ridden off whichever way she ran or jumped onto it; the deck
+      chair collapses under her; the gull rides off on her head; the "Do Not Disturb" doors swing open
+      and shut with their frames, and anyone in a doorway is seen only through it.
+      **Done (2026-11-18): deck 9's corridor is the way** (the steward and his trolley at its aft end, the
+      door at 194 m one-way, the towel stack fallen for good; her push remade, his thanks shortened).
+      **Done (2026-11-18): the one-way doors' push bar** (shut: the bar's end and a closer on the free
+      side; open: the steel bar across the leaf; they swing away from the free side; propped open for good
+      once she has come through).
+      **Done (2026-11-18): the sprinkler's gag (16)**: soaked, her hair plastered over her face, a sneeze,
+      and she squelches back the way she came; whatever she carries (the second exception to the
+      tangerines, with the dog's lead); a sprinkler rains only while she is on its deck.
+      **Done (2026-11-18): the sauna's steam (17)**: a burst wraps her, and out of it her hair is a huge
+      puff; she fans herself and swoons, sitting down dazed.
+      **Done (2026-11-18): fast playtests** (`docs/plan-fast-tests.md`, built whole): the test steps the
+      game's clock; the whole suite in 55 s six at a time (about 65 minutes before), every check the same
+      as in real time.
+      **Done (2026-11-18): Teppanyaki's flares (19)**: a puff of black smoke, and out of it her face is
+      sooty, her hair on end and singed; she blinks, smoke curling off her hair, and coughs out a puff.
+      The flames are narrower (0.8 m each way), and the chef answers her coming: run at a quiet grill,
+      the flame is up as she gets there; stopped at his flourish, she passes in the lull after it.
+      **Next: the rest of step 4a's gags** (21 and 22 the gulls, 23 the "Do Not Disturb" doors,
+      proposed). Waiting with it: the books' covers and
+      the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
+      twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
+      Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
+      three runs; the round itself always moved on when watched; its wait was lengthened. Another
+      (the lob onto the climb's shelf knocking the feather down) failed once in four runs after the
+      dog's together clips, and not in three runs of it alone; cause not found.
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")

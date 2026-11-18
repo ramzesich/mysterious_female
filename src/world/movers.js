@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, CRY, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -26,6 +26,10 @@ export class Robot {
         this.h = this.sprite.height - 1;
         this.zone = s.add.zone(def.x, def.y, this.w, this.h).setOrigin(0.5, 1);
         s.physics.add.existing(this.zone, true);
+        // (Its run short of any door or wall across the deck: ShipScene `stopShort`.)
+        const span = s.spanOn(def.x, def.x0, def.x1, def.y, this.w / 2);
+        this.x0 = span.lo;
+        this.x1 = span.hi;
         this.beep = s.add.text(def.x, def.y - this.h - 6, '♪', {
             fontFamily: 'Verdana, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#0b5e65', resolution: 4,
         }).setOrigin(0.5, 1).setDepth(D.fx).setVisible(false);
@@ -34,6 +38,25 @@ export class Robot {
 
     addCollider(p) {
         this.scene.physics.add.collider(p, this.zone, null, () => this.scene.route === 'inside');
+    }
+
+    // A tangerine come to rest on its top rides along with it, hers to take back (walking over it
+    // on the robot); docs/plan-three-uses.md §2. Never taken: it stays a loose tangerine.
+    offered(t) {
+        const d = this.def, top = d.y - this.h;
+        if (t.route !== 'inside' || Math.abs(t.img.y + 3 - top) > (t.rider === this ? 1 : 8)) return false;
+        if (t.rider !== this) {
+            if (Math.abs(t.img.x - this.x) > this.w / 2 + 4 || t.img.body.velocity.y < 0) return false;
+            // (Come down on its top, it stays there: a bounce would have it off so small a top.)
+            t.rider = this;
+            t.rideDx = Phaser.Math.Clamp(t.img.x - this.x, -this.w / 2 + 6, this.w / 2 - 6);
+            t.img.y = top - 3;
+            this.scene.loose.rest(t);
+        }
+        t.img.x = this.x + t.rideDx;
+        const e = this.scene.save.loose.find(o => o.id === t.id);
+        if (e) e.x = Math.round(t.img.x);
+        return false;
     }
 
     update(dt, time) {
@@ -53,8 +76,8 @@ export class Robot {
         this.wasBlocked = blocked;
         if (blocked || time < this.pausedUntil) return;
         let to = this.x + this.dir * d.v * M * dt;
-        if (to >= d.x1) { to = d.x1; this.dir = -1; this.pausedUntil = time + 900; }
-        else if (to <= d.x0) { to = d.x0; this.dir = 1; this.pausedUntil = time + 900; }
+        if (to >= this.x1) { to = this.x1; this.dir = -1; this.pausedUntil = time + 900; }
+        else if (to <= this.x0) { to = this.x0; this.dir = 1; this.pausedUntil = time + 900; }
         const dx = to - this.x;
         this.x = to;
         this.sprite.x = this.zone.x = to;
@@ -84,12 +107,34 @@ export class Gull {
         this.awaySince = 0;
     }
 
+    // Her cry: up and away for a while.
+    heard() {
+        const d = this.def;
+        if (this.world.hears(d.x, d.y + 40, d.route ?? 'inside')) this.scaredUntil = this.scene.time.now + 4000;
+    }
+
+    // A tangerine on the deck below its rail: down to it, and off with it; the rail clear 8 s
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (this.taking || s.time.now < (this.goneUntil ?? 0) || t.route !== (d.route ?? 'inside')) return false;
+        if (Math.abs(t.img.x - d.x) > 3 * M || t.img.y < d.y - 10 || t.img.y > d.y + 80) return false;
+        this.taking = true;
+        this.world.gullTakes(this.sprite, t, () => {
+            this.taking = false;
+            this.goneUntil = s.time.now + 8000;
+            this.rise = 1;
+        });
+        return true;
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
-        const on = d.route === 'inside' || d.route === s.route;
+        if (this.taking) return;
+        const on = (d.route === 'inside' || d.route === s.route) && time >= (this.goneUntil ?? 0);
         this.sprite.setVisible(on);
         if (!on) return;
-        const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90;
+        const near = Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 90 || time < (this.scaredUntil ?? 0);
         if (near) this.awaySince = time;
         const up = near || time - this.awaySince < 1400;
         if (up && this.rise === 0) sfx.at(d.x, d.y).flap();
@@ -169,10 +214,11 @@ export class SwingLight {
         this.cone.fillStyle(0xfbff86, 0.12).fillEllipse(fx, d.floor - 1, 40, 5);
         if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
-            if (this.world.carry) this.world.carryBox.spill(x);
+            if (this.world.carry) this.world.carryBox.spill(x, false, 'light');
+            else if (s.lungeSafe()) this.world.lunged('light', x);
             else {
                 sfx.bonk();
-                s.scareContact(x, 'bonked');
+                s.scareContact(x, 'light');
             }
         }
     }
@@ -219,10 +265,11 @@ export class Spill {
             const onFloor = p.body.blocked.down || p.body.touching.down;
             if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(p.y - d.y) < 3 && Math.abs(p.x - d.x) < d.half
                 && Math.abs(p.body.velocity.x) > 20) {
-                if (this.world.carry) this.world.carryBox.spill(d.x);
+                if (this.world.carry) this.world.carryBox.spill(d.x, false, 'chips');
+                else if (s.lungeSafe()) this.world.lunged('chips', d.x);
                 else {
                     sfx.slip();
-                    s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'slipped');
+                    s.scareContact(p.x - Math.sign(p.body.velocity.x) * 10, 'chips');
                 }
             }
             if (left <= 0) {
@@ -251,20 +298,42 @@ export class Spill {
 
 // On this hazard's deck, in the corridor, at play.
 const here = (s, d) => s.route === 'inside' && s.mode === 'play' && Math.abs(s.player.y - d.y) < 100;
+// Of the cabin doors' places in a def's `doors`, the ones where a cabin door is drawn (the corridor
+// leaves one out beside a lift's, a crew door, a stair hall: no hand reaches out of a wall there).
+// Where the breakfast stewardess's hands hold her tray in each frame of her `carry` walk: px ahead
+// of her middle, px over her feet (found frame by frame, as the eaters' fists).
+const TRAY_HANDS = [[16, 33]];
+// The breakfast stewardess behind her trolley: her middle this far from its middle, her hands on its
+// handle in her `push` clip (drawn with the trolley there, 2026-11-17).
+const HANDLE = 26;
+// What of the trolley is solid, as its picture is (27 x 28): the table under its cloth, 21 wide and
+// 18 high, and the cloche's dome on it, 10 wide and 7 more, 1 px toward its front. One box the
+// cloche's height over the whole trolley was a wall of air over the table's ends (the user,
+// 2026-11-17: "an invisible wall").
+const TROLLEY = { w: 21, h: 18, dome: [10, 7, 1] };
+const realDoors = (s, d) => (d.real ??= d.doors.filter(x => (s.cabinDoorsDrawn ?? []).some(c => c.y === d.y && Math.abs(c.x - x) < 6)));
+// Her run's frame now (0 to 7), or -1 when she is not running (on her run's clip, moving): a gag
+// drawn from each quarter of her stride starts on an odd one.
+const running = (p) => p.anims.currentAnim?.key === 'her-run' && p.anims.isPlaying && Math.abs(p.body?.velocity.x ?? 0) > 20;
+const runFrame = (p) => (running(p) ? p.anims.currentFrame.index - 1 : -1);
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 800 && Math.abs(s.player.y - d.y) < 300;
 
 // The robot vacuum in the doorway of the cabin being cleaned (population: `haz_vacuum_9`). Its red
 // eye blinks while she is coming; as she comes into reach it rattles, then darts out along the
 // corridor at her (a fright; a jump as it rattles clears it; the dash sends it spinning) and backs
-// in again, harmless. Then it stays in until she has gone away and come again.
+// in again, harmless. Then it stays in until she has gone away and come again. It is deck 4's
+// vacuum, the picture she rides in her gag (5a, 5b): caught by it, she rides it off down the
+// corridor the way it darted (`ride`, the ship scene's `rideGag`), and it is back in its doorway
+// when she is back at her checkpoint. Its eye is the light on its front.
 export class Darter {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y, reach, dart }
-        this.sprite = s.add.image(def.x, def.y, 'vacuum').setOrigin(0.5, 1).setDepth(D.props + 0.02);
-        this.eye = s.add.image(def.x, def.y - 8, 'dot').setTint(0xe83b3b).setDepth(D.props + 0.03);
+        // (2 px down into the carpet's top line, as deck 4's.)
+        this.sprite = s.add.image(def.x, def.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(D.props + 0.02);
+        this.eye = s.add.image(def.x, def.y, 'dot').setScale(0.5, 1).setTint(0xe83b3b).setDepth(D.props + 0.03);
         world.add([this.sprite, this.eye]);
         this.state = 'in';
         this.armed = true;
@@ -272,13 +341,38 @@ export class Darter {
         this.rest();
     }
 
-    // In the doorway: small and dim, half in the cabin's dark.
+    // In the doorway: dim, half in the cabin's dark; its eye on its front's light (1 x 2 px, at
+    // its picture's column 20 of 22, rows 6 and 7 of 11).
     rest() {
-        this.sprite.setPosition(this.def.x, this.def.y).setScale(0.8).setTint(0x9babb2).setAngle(0).setAlpha(1);
+        const v = this.sprite.setPosition(this.def.x, this.def.y + 2).setTint(0x9babb2).setAngle(0).setAlpha(1).setVisible(true);
+        this.eye.setPosition(v.x + (v.flipX ? -9.5 : 9.5), v.y - 4);
+    }
+
+    // A tangerine under it, thrown or lying: swallowed, and it chokes (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, v = this.sprite;
+        if (this.state === 'dead' || this.state === 'spun' || this.state === 'ridden' || !s.loose.near(t, v.x, this.def.y, 12, 12)) return false;
+        s.loose.remove(t);
+        s.tweens.killTweensOf(v);
+        this.state = 'dead';
+        this.eye.setVisible(false);
+        v.clearTint();
+        this.world.choke(v);
+        this.at = s.time.now + 700;
+        return true;
     }
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, v = this.sprite;
+        // Choked: dead where it stands, smoking, until she has left the deck.
+        if (this.state === 'dead') {
+            if (s.route !== 'inside' || Math.abs(p.y - d.y) > s.deckPitch / 2) this.home(time);
+            else if (time > this.at) {
+                this.at = time + 900;
+                this.world.drops(v.x, v.y - 10, 0x8a8a8a, -1);
+            }
+            return;
+        }
         if (!nearby(s, d)) return;
         const dx = p.x - d.x, on = here(s, d) && Math.abs(p.y - d.y) < 40;
         const within = on && Math.abs(dx) < d.reach;
@@ -296,11 +390,11 @@ export class Darter {
             v.x = d.x + (Math.floor(time / 40) % 2 ? 1 : -1);
             if (time > this.at) {
                 this.state = 'out';
-                v.setScale(1).clearTint().setFlipX(this.dir < 0);
+                v.clearTint().setFlipX(this.dir < 0);
                 sfx.at(d.x, d.y).vacDart();
                 // Out fast, a breath, and back in slowly: only on its way out is it a fright.
                 s.tweens.add({
-                    targets: v, x: d.x + this.dir * d.dart, duration: 400, ease: 'Quad.easeOut', hold: 160,
+                    targets: v, x: s.stopShort(d.x, d.x + this.dir * d.dart, d.y, 9), duration: 400, ease: 'Quad.easeOut', hold: 160,
                     onComplete: () => {
                         if (this.state !== 'out') return;
                         this.state = 'back';
@@ -313,16 +407,21 @@ export class Darter {
             const hit = here(s, d) && Math.abs(v.x - d.x) > 14 && Math.abs(p.x - v.x) < PLAYER.bodyWidth / 2 + 6
                 && p.y > v.y - 6 && p.y - PLAYER.bodyHeight < v.y;
             if (!hit) return;
-            if (s.isDashing()) {
+            if (s.isLunging()) {
                 // Sent spinning; it creeps home after a while.
                 s.tweens.killTweensOf(v);
                 this.state = 'spun';
                 s.smash(v.x, v.y - 3);
                 s.tweens.add({ targets: v, angle: 720, alpha: 0.6, duration: 900, ease: 'Quad.easeOut', onComplete: () => this.home(s.time.now + 4000) });
             } else if (this.world.carry) {
-                this.world.carryBox.spill(v.x);
+                this.world.carryBox.spill(v.x, false, 'vacuum', { vx: this.dir * 300 });
             } else {
-                s.scareContact(v.x, 'vacuum');
+                // (She rides it off, 5a or 5b: it is hidden meanwhile, and back in its doorway after.
+                // With a tangerine on her it is only a stumble, and it goes on its way.)
+                const ride = { x: v.x, y: v.y, dir: this.dir, v: 200,
+                               hide: () => { s.tweens.killTweensOf(v); this.state = 'ridden'; v.setVisible(false); },
+                               show: () => this.home(s.time.now + 1200) };
+                s.scareContact(v.x, 'vacuum', { vx: this.dir * 300, ride });
             }
         }
     }
@@ -334,49 +433,59 @@ export class Darter {
     }
 }
 
-// A tall stack of fresh towels by the open cabin's door (population: `haz_towels_9`): it sways. A
-// jump landed beside it, or the dash, brings it down on that side: "Buried" if she is still under
-// it. Walked past, it only wobbles. It is stacked again once she has gone.
+// A tall stack of fresh towels by the open cabin's door (population: `haz_towels_9`): it sways. As
+// she comes at it, it wobbles hard and falls the way she is going, onto her as she passes it
+// ("Buried"); she gets past by stopping short of it and waiting while it falls, then crossing the
+// heap (the user, 2026-11-17: "What if it falls on top of her the moment she passes it? And the
+// getting past will be having to stop at the stack and wait while it falls"). A jump landed beside
+// it, or the dash, brings it down on that side. It is stacked again once she has gone.
+// Its pictures are its own clips (the user, 2026-11-18: "The animations have to be generated";
+// `towels` sheet, tools/build_towels.py): the stack and its stool apart while it stands (it sways on
+// the stool's top), its fall and scatter alone, and with her under it the fall on her, then her
+// head coming up in a towel turban with a towel swan on it (18), all played to her checkpoint as
+// her gag (`ride.play`, the ship scene's `thingGag`). Running past it, the moment she is `passed` px
+// past its middle it falls on her: one of four clips, each starting from one of her own run frames
+// there, she running on into the fall (the user, 2026-11-18: "It has to be seamless"; a clip from her
+// standing made her seem to stop for it), the one whose first frame is the pose she shows next.
+// Caught under it any other way while it falls alone (standing there, landed from a jump), the
+// clip of her standing under it (her 36 px past it) takes over at the frame it has reached
+// (`under`, px past its middle; `lastFrame`). Each picture has it falling east, flipped for west.
+// `TOWELS`: how near she comes before it wobbles (px, middle to middle) and for how long at most:
+// longer than her run (140 px/s) takes from there to past it; stopped short, she waits the wobble
+// out and it falls in front of her. Its sway eases as she comes level with it (`settle`, px), so that
+// it is near upright when a clip, which starts upright, takes over. The frame it lands on (`lands`).
+const TOWELS = { reach: 100, wobbleMs: 1100, passed: 6, under: [4, 74], lastFrame: 6, lands: 7, settle: 60, emergeAfterMs: 450 };
 export class TowelStack {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y }
-        TowelStack.textures(s);
-        this.stool = s.add.image(def.x, def.y, 'towel-stool').setOrigin(0.5, 1).setDepth(D.props - 0.03);
-        this.stack = s.add.image(def.x, def.y - 12, 'towel-stack').setOrigin(0.5, 1).setDepth(D.props - 0.02);
-        this.heap = s.add.image(def.x, def.y, 'towel-heap').setOrigin(0.5, 1).setDepth(D.player + 0.06).setVisible(false);
-        world.add([this.stool, this.stack, this.heap]);
+        const m = s.cache.json.get('towels-meta');
+        this.meta = m;
+        const c = m.cell;
+        this.stool = s.add.sprite(def.x, def.y, 'towels', m.stool).setOrigin(m.middle / c, m.floor / c).setDepth(D.props - 0.03);
+        this.stack = s.add.sprite(def.x, def.y - (m.floor - m.top), 'towels', m.stack).setOrigin(m.middle / c, m.top / c).setDepth(D.props - 0.02);
+        this.pic = s.add.sprite(def.x, def.y, 'towels', m.anims.fall[0]).setOrigin(m.middle / c, m.floor / c).setDepth(D.props - 0.02).setVisible(false);
+        world.add([this.stool, this.stack, this.pic]);
         this.state = 'up';
         this.wasOnFloor = true;
+        // (Once fallen it stays fallen, its heap crossed on the way back: the corridor is the way to the
+        // steward, 2026-11-18. Kept with what she has broken, the way it fell with it.)
+        if (world.save.broken.includes(def.id)) {
+            this.dir = world.save.heaps?.[def.id] ?? 1;
+            this.show(this.dir, D.props - 0.02);
+            this.pic.setFrame(m.anims.fall[m.anims.fall.length - 1]);
+            this.state = 'down';
+        }
     }
 
-    static textures(s) {
-        if (s.textures.exists('towel-stack')) return;
-        const g = s.make.graphics({ x: 0, y: 0 }, false);
-        // The stack: fourteen folded towels, white and pale blue, none quite square on the one below.
-        for (let i = 0; i < 14; i++) {
-            const y = 70 - (i + 1) * 5, off = [0, 1, -1, 1, 0, -1, 0, 2, -1, 0, 1, -1, 0, 1][i];
-            g.fillStyle(0x9babb2, 1).fillRect(2 + off, y, 22, 5);
-            g.fillStyle(i % 4 === 2 ? 0x8fd3ff : 0xffffff, 1).fillRect(3 + off, y, 20, 4);
-            g.fillStyle(i % 4 === 2 ? 0x4d9be6 : 0xc7dcd0, 1).fillRect(3 + off, y + 3, 20, 1);
-        }
-        g.generateTexture('towel-stack', 28, 70);
-        g.clear();
-        // The stool it stands on.
-        g.fillStyle(0x7a4528, 1).fillRect(1, 0, 24, 3).fillRect(3, 3, 2, 9).fillRect(21, 3, 2, 9);
-        g.fillStyle(0xcd683d, 1).fillRect(2, 0, 22, 2);
-        g.generateTexture('towel-stool', 26, 12);
-        g.clear();
-        // The same towels in a heap on the floor.
-        const lie = [[2, 9, 0], [20, 10, 1], [38, 9, 0], [10, 5, 1], [28, 5, 0], [46, 10, 1], [18, 1, 0], [36, 1, 2]];
-        for (const [x, y, c] of lie) {
-            g.fillStyle(0x9babb2, 1).fillRoundedRect(x, y, 20, 6, 2);
-            g.fillStyle([0xffffff, 0xf2f6f6, 0x8fd3ff][c], 1).fillRoundedRect(x + 1, y, 18, 5, 2);
-        }
-        g.generateTexture('towel-heap', 68, 16);
-        g.destroy();
+    // (Down for good: kept in the save.)
+    fallen() {
+        const save = this.world.save, id = this.def.id;
+        if (!id || save.broken.includes(id)) return;
+        save.broken.push(id);
+        (save.heaps ??= {})[id] = this.dir;
     }
 
     update(dt, time) {
@@ -394,37 +503,99 @@ export class TowelStack {
             // The tell: it sways, more the nearer she is.
             const close = on && Math.abs(dx) < 130;
             this.stack.setAngle(Math.sin(time / (close ? 150 : 520)) * (close ? 3.2 : 1));
-            if (on && Math.abs(dx) < 48 && (landed || s.isDashing())) {
-                this.state = 'falling';
-                this.dir = dx < 0 ? -1 : 1;
+            const vx = p.body.velocity.x, coming = Math.abs(vx) > 20 && Math.sign(vx) === -Math.sign(dx);
+            if (on && Math.abs(dx) < 48 && (landed || s.isLunging())) this.fall(dx < 0 ? -1 : 1);
+            else if (on && Math.abs(dx) < TOWELS.reach && coming && s.mode === 'play') {
+                // (Coming at it: a hard wobble, then it falls the way she is going.)
+                this.state = 'wobble';
+                this.dir = Math.sign(vx);
+                this.at = time + TOWELS.wobbleMs;
                 sfx.at(d.x, d.y).cloth();
-                s.tweens.add({
-                    targets: this.stack, angle: this.dir * 86, duration: 360, ease: 'Quad.easeIn',
-                    onComplete: () => this.down(),
-                });
             }
-        } else if (this.state === 'down' && (Math.abs(dx) > 560 || s.route !== 'inside')) {
-            // Stacked again behind her back.
-            this.state = 'up';
-            this.stack.setVisible(true).setAngle(0);
-            this.heap.setVisible(false);
+        } else if (this.state === 'wobble') {
+            const k = Math.min(1, Math.max(0.25, Math.abs(dx) / TOWELS.settle));
+            this.stack.setAngle((Math.sin(time / 35) * 6 + this.dir * 2) * k);
+            const past = dx * this.dir, run = p.anims.currentAnim?.key === 'her-run';
+            if (on && onFloor && s.mode === 'play' && past >= TOWELS.passed) {
+                // The moment she has passed it, it falls, on her as she runs on.
+                this.fall(this.dir);
+                if (run) {
+                    const f = p.anims.currentFrame.index - 1, n = f % 2 ? (f + 1) % 8 : f;
+                    this.catch(`towels-run${n}`, n === f ? 1 : 0, past);
+                }
+            } else if (time > this.at) this.fall(this.dir);
+        }
+        if (this.state === 'falling') {
+            const k = this.pic.anims.currentFrame?.index ?? 1;     // the clip's frame, 1 = its first after the stack standing
+            if (k >= TOWELS.lands && !this.landed) {
+                this.landed = true;
+                sfx.at(d.x + this.dir * 36, d.y).towelFall();
+            }
+            // Under it as it comes down: her gag, from the frame it has reached (once a fall).
+            const past = dx * this.dir;
+            if (!this.tried && k <= TOWELS.lastFrame && on && onFloor && s.mode === 'play'
+                && past >= TOWELS.under[0] && past <= TOWELS.under[1]) {
+                this.catch('towels-bury', Math.max(0, k - 1), past);
+            }
         }
     }
 
-    down() {
-        const s = this.scene, p = s.player, d = this.def;
-        this.state = 'down';
-        const cx = d.x + this.dir * 36;
+    // Its picture for a clip, falling `dir` (each is drawn falling east: flipped, the stool's middle
+    // kept on its spot).
+    show(dir, depth) {
+        const m = this.meta, c = m.cell;
         this.stack.setVisible(false);
-        this.heap.setVisible(true).setPosition(cx, d.y);
-        sfx.at(cx, d.y).towelFall();
-        if (here(s, d) && Math.abs(p.x - cx) < 38 && p.y > d.y - 40) {
-            // Under it: only her hair shows for a moment.
-            this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
-            s.tweens.add({ targets: this.heap, y: d.y, scaleY: 1, duration: 900, delay: 500, ease: 'Bounce.easeOut' });
-            if (this.world.carry) this.world.carryBox.spill(d.x);
-            else s.scareContact(d.x, 'buried');
-        }
+        this.stool.setVisible(false);
+        this.pic.setVisible(true).setFlipX(dir < 0).setOrigin((dir < 0 ? c - m.middle : m.middle) / c, m.floor / c).setDepth(depth);
+    }
+
+    // (On the game's clock, as everything that must land where she is: the clip on the scene's.)
+    fall(dir) {
+        const s = this.scene, d = this.def;
+        this.state = 'falling';
+        this.dir = dir;
+        this.tried = this.landed = false;
+        this.show(dir, s.DEPTH.props - 0.02);
+        this.fallen();
+        this.pic.play('towels-fall');
+        this.pic.once('animationcomplete-towels-fall', () => {
+            // The heap: behind her as she crosses it (the user, 2026-11-18).
+            if (this.state === 'falling') this.state = 'down';
+        });
+        sfx.at(d.x, d.y).cloth();
+    }
+
+    // Under it: her gag, once a fall (carrying something, she spills it instead).
+    catch(key, startFrame, past) {
+        const s = this.scene, d = this.def;
+        this.tried = true;
+        this.caught = { key, startFrame, past: Math.round(past) };
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'towels');
+        else s.scareContact(d.x, 'towels', { ride: this.ride(key, startFrame) });
+    }
+
+    // Her gag (18), handed to the ship scene: the fall on her (`key`, from `startFrame`; she hidden),
+    // the heap still a moment, her head up in the turban; her checkpoint after. Back from it, the heap
+    // stays (the fall on her's last frame, the same in each) until she has gone.
+    ride(key, startFrame) {
+        const s = this.scene, m = this.meta;
+        return {
+            play: (done) => {
+                this.state = 'burying';
+                this.show(this.dir, s.player.depth);
+                this.pic.play({ key, startFrame });
+                this.pic.once(`animationcomplete-${key}`, () => s.time.delayedCall(TOWELS.emergeAfterMs, () => {
+                    if (this.state !== 'burying') return;
+                    this.pic.play('towels-emerge');
+                    this.pic.once('animationcomplete-towels-emerge', () => done());
+                }));
+            },
+            show: () => {
+                this.pic.anims.stop();
+                this.pic.setFrame(m.anims.bury[8]).setDepth(s.DEPTH.props - 0.02);   // behind her, as the fall's
+                this.state = 'down';
+            },
+        };
     }
 }
 
@@ -445,6 +616,62 @@ export class Sprinkler {
         this.wet = 0;
     }
 
+    // 16, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): drenched, her hair falls
+    // flat over her face, where she stands, or stopping short from her run (a clip from each quarter
+    // of her stride, her run frame 1, 3, 5 or 7: the hit waits for one, `runFrame`), sliding to a stop
+    // (`slideMs`); a sneeze; and she turns round and squelches off (`walkV` px/s for `walkMs`, or to
+    // a wall) back the way she came (the user, 2026-11-18), then her checkpoint.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, g = GAGS.sprinkler;
+        return {
+            play: (done) => {
+                const m = s.cache.json.get('gags-meta'), n = runFrame(p);
+                let dir = p.flipX ? -1 : 1;
+                const run = n % 2 === 1, clip = run ? `gags-sprinkler-run${n}` : 'gags-sprinkler-stand';
+                // (Each clip ends on her soaked picture at the cell's middle; from her run, frame 0
+                // has her middle `run` px short of it.)
+                const pic = s.add.sprite(p.x + (run ? dir * (m.sprinkler.x - m.sprinkler.run) : 0), d.y, 'gags')
+                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+                this.world.add([pic]);
+                this.pic = pic;
+                pic.play(clip);
+                let t = 0, stage = 'stop', end = 0, stepAt = 0;
+                pic.once(`animationcomplete-${clip}`, () => s.time.delayedCall(g.holdWetMs, () => {
+                    stage = 'sneeze';
+                    pic.play('gags-sprinkler-sneeze');
+                    s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).sneeze());
+                    pic.once('animationcomplete-gags-sprinkler-sneeze', () => {
+                        stage = 'walk';
+                        t = 0;
+                        // (Turned round: back the way she came.)
+                        dir = -dir;
+                        pic.setFlipX(dir < 0);
+                        end = s.stopShort(pic.x, pic.x + dir * g.walkV * g.walkMs / 1000, d.y, 16);
+                        pic.play('gags-sprinkler-walk');
+                    });
+                }));
+                s.script = (dt) => {
+                    t += dt * 1000;
+                    if (stage === 'stop' && run && t < g.slideMs) pic.x += dir * PLAYER.runSpeed * (1 - t / g.slideMs) * dt;
+                    if (stage === 'walk') {
+                        pic.x += dir * Math.min(g.walkV * dt, Math.max(0, (end - pic.x) * dir));
+                        if (t > stepAt) { stepAt = t + 500; sfx.at(pic.x, d.y).splashSmall(); }
+                        if (t >= g.walkMs || Math.abs(end - pic.x) < 0.5) {
+                            stage = 'done';
+                            pic.anims.pause();
+                            done();
+                        }
+                    }
+                    p.x = pic.x;
+                };
+            },
+            show: () => {
+                this.pic?.destroy();
+                this.pic = null;
+            },
+        };
+    }
+
     // Where it is in its round: 'tell', 'on' or 'off'.
     phase(time) {
         const d = this.def, t = (time / 1000 + d.offset) % d.period;
@@ -454,7 +681,9 @@ export class Sprinkler {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, g = this.rain.clear();
         // (Out on the ship's side the hallways are behind its plating.)
-        if (!nearby(s, d) || s.route === 'promenade') return;
+        // (Its rain and its sound only while she is on its deck, as everything else on a deck she is
+        // not on stands still: deck 8's, under deck 9's, rained through the floor.)
+        if (!nearby(s, d) || s.route !== 'inside' || Math.abs(p.y - d.y) > 72) return;
         const phase = this.phase(time), top = d.top + 16;
         // (Its sound, once in each round: the ticks of the tell, then its rain for what is left of it.)
         const round = (time / 1000 + d.offset) / d.period, key = phase + Math.floor(round);
@@ -481,8 +710,8 @@ export class Sprinkler {
                 g.fillStyle(0xffffff, 0.8).fillRect(x, d.y - 2 - (Math.floor(time / 70 + i) % 2), 2, 1);
             }
             if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
-                if (this.world.carry) this.world.carryBox.spill(d.x);
-                else s.scareContact(d.x, 'drenched');
+                if (this.world.carry) this.world.carryBox.spill(d.x, false, 'sprinkler');
+                else if (runFrame(p) % 2 !== 0) s.scareContact(d.x, 'sprinkler', { ride: this.ride() });
             }
         } else {
             this.wet = Math.max(0, this.wet - dt / 2.2);
@@ -492,20 +721,30 @@ export class Sprinkler {
     }
 }
 
-// A cabin door that flies open as she comes by (population: `haz_swing`): the handle rattles (the
-// tell), then the door swings out across the corridor: "Bonked" if she is at it. Whoever opened it
-// looks out, and shuts it again. It takes a cabin door's place.
+// A cabin door that flies open as she comes by (population: `haz_swing`): with no tell (the user,
+// 2026-11-18: "Let the opening of the door surprise the player"; its handle rattled and it shook), it
+// bursts open toward us and swings round flat against the wall past its hinge, and slams shut again. Whoever opened it looks out meanwhile. It takes a cabin door's place.
+// Its swing is its own clip (`gags` sheet, tools/build_gags.py; the user, 2026-11-18: the leaf drawn
+// in code was a door picture stretched, and changed colour): the door alone, or (13a) the same swing
+// slamming her flat against the wall when she stands just past its hinge facing it (`zone`, px past
+// its middle), and she slides down the wall. Both start from the world's shut door, in its muted
+// colours; the doorway's dark and whoever is in it are the world's, behind the clip. From any other
+// side it never hits her (the user, 2026-11-18): it bursts once she is clear of its swing.
 export class SwingDoor {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y, reach, delay (s), who }
+        const m = s.cache.json.get('gags-meta');
+        this.meta = m;
         this.shut = s.add.image(def.x, def.y, 'shipart', 'door-cabin-bg').setOrigin(0.5, 1).setDepth(D.decor + 0.1);
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
-        this.leaf = s.add.image(def.x + 14, def.y, 'shipart', 'door-cabin').setOrigin(0, 1).setDepth(D.props + 0.2).setTint(0xd9c4b8).setVisible(false);
-        world.add([this.shut, this.dark, this.leaf]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y - 2, route: 'inside', face: -1, idle: 'idle', layer: 'back' });
+        this.pic = s.add.sprite(def.x, def.y, 'gags', m.anims['door-burst'][0]).setOrigin(m.door.x / m.cell, m.floor / m.cell)
+            .setDepth(D.props + 0.2).setVisible(false);
+        world.add([this.shut, this.dark, this.pic]);
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y, route: 'inside', face: -1, idle: 'idle', layer: 'back', owned: true });
+        world.people.doorway(this.who, def.x - 14, def.x + 14, def.y - 72, def.y);
         if (this.who) this.who.gone = true;
         this.state = 'shut';
         this.armed = true;
@@ -515,60 +754,127 @@ export class SwingDoor {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
         if (!nearby(s, d)) return;
-        const dx = p.x - d.x, within = here(s, d) && Math.abs(p.y - d.y) < 40 && Math.abs(dx) < d.reach;
+        const dx = p.x - d.x, at = here(s, d) && Math.abs(p.y - d.y) < 40, within = at && Math.abs(dx) < d.reach;
         if (this.state === 'shut') {
             if (!within && time > this.at) this.armed = true;
             if (within && this.armed) {
                 this.armed = false;
-                this.state = 'rattle';
+                this.state = 'wait';
                 this.at = time + d.delay * 1000;
-                this.rattleAt = time + 300;
-                sfx.at(d.x, d.y).rattle();
             }
-        } else if (this.state === 'rattle') {
-            this.shut.x = d.x + (Math.floor(time / 45) % 2 ? 1 : -1);
-            if (time > this.at) {
-                // Open: the leaf swings out toward us and across the corridor.
-                this.state = 'burst';
-                this.at = time + 380;
-                this.shut.setVisible(false).setX(d.x);
-                this.dark.setVisible(true);
-                this.leaf.setVisible(true).setScale(0.2, 1);
-                s.tweens.add({ targets: this.leaf, scaleX: 0.42, duration: 220, ease: 'Back.easeOut' });
+        } else if (this.state === 'wait') {
+            // (Someone inside about to come out: nothing shows it.)
+            // (Coming up to it from past its hinge, facing it: it waits for her there, a while. Anywhere
+            // else in its swing, the doorway or the wall it sweeps, it waits until she is clear: it only
+            // ever hits her from that side, 13a; the user, 2026-11-18.)
+            const z = this.meta.door.zone, coming = at && p.flipX && dx > z[1] && dx < d.reach + 20 && p.body.velocity.x < -20;
+            const gag = at && p.flipX && dx >= z[0] && dx <= z[1], inSwing = at && dx > -20 && dx < 50 && !gag;
+            if (time > this.at && !(coming && time < this.at + 1200) && !inSwing) {
+                this.lookOut(dx);
                 sfx.at(d.x, d.y).doorBang();
-                if (this.who) {
-                    this.who.gone = false;
-                    this.who.dir = dx < 0 ? -1 : 1;
-                    this.world.people.place(this.who);
-                    this.world.people.refresh();
+                // Just past its hinge, facing it: slammed flat (13a); with a tangerine on her, her
+                // reaction, and the door swings as it does alone.
+                const onFloor = p.body.blocked.down || p.body.touching.down;
+                this.started = false;
+                if (at && onFloor && s.mode === 'play' && p.flipX && dx >= z[0] && dx <= z[1]) {
+                    if (this.world.carry) this.world.carryBox.spill(d.x + 20, false, 'door');
+                    else s.scareContact(d.x + 14, 'door', { ride: this.ride() });
                 }
-            } else if (time > this.rattleAt) {
-                // (The handle again, while it shakes.)
-                this.rattleAt = time + 300;
-                sfx.at(d.x, d.y).rattle();
+                if (!this.started) this.burst(time);
             }
-        } else if (this.state === 'burst') {
-            if (here(s, d) && Math.abs(p.y - d.y) < 40 && dx > -18 && dx < 34) {
-                this.state = 'open';
-                this.at = time + 1500;
-                if (this.world.carry) this.world.carryBox.spill(d.x + 20);
-                else s.scareContact(d.x + 14, 'bonked');
-            } else if (time > this.at) {
-                this.state = 'open';
-                this.at = time + 1500;
-            }
-        } else if (this.state === 'open' && time > this.at) {
-            this.state = 'shut';
-            this.at = time + 1500;
-            this.shut.setVisible(true);
-            this.dark.setVisible(false);
-            this.leaf.setVisible(false);
-            if (this.who) {
-                this.who.gone = true;
-                this.world.people.refresh();
-            }
-            sfx.at(d.x, d.y).doorShut();
         }
+    }
+
+    // Whoever opened it, in the doorway, looking her way.
+    lookOut(dx) {
+        if (!this.who) return;
+        this.who.gone = false;
+        this.who.dir = dx < 0 ? -1 : 1;
+        this.world.people.place(this.who);
+        this.world.people.refresh();
+    }
+
+    // Back in: the shut door, nobody.
+    close() {
+        this.shut.setVisible(true);
+        this.dark.setVisible(false);
+        this.pic.setVisible(false);
+        if (this.who) {
+            this.who.gone = true;
+            this.world.people.refresh();
+        }
+    }
+
+    // The door alone: open, flat against the wall, slammed shut (its clip's last frame is the shut
+    // door itself, so the world's takes over unseen).
+    burst(time) {
+        const d = this.def;
+        this.state = 'burst';
+        this.at = time + 300;
+        this.shut.setVisible(false);
+        this.dark.setVisible(true);
+        this.pic.setVisible(true).setDepth(this.scene.DEPTH.props + 0.2).play('gags-door-burst');
+        this.pic.on('animationupdate', this.shutting, this);
+        this.pic.once('animationcomplete-gags-door-burst', () => {
+            this.pic.off('animationupdate', this.shutting, this);
+            if (this.state !== 'burst') return;
+            this.close();
+            sfx.at(d.x, d.y).doorShut();
+            this.state = 'shut';
+            this.at = this.scene.time.now + 1500;
+        });
+    }
+
+    // (Its last frame is the world's shut door, holes and all: the doorway's dark goes as it shuts,
+    // or the wall seen through them would be dark.)
+    shutting(anim, frame) {
+        if (frame.index === anim.frames.length) this.dark.setVisible(false);
+    }
+
+    // 13a, the ship scene's `thingGag`: her own picture until the leaf covers her (its second frame),
+    // then she is in the clip: slammed flat under it, left flat on the wall as it slams shut, she
+    // slides down and sits. Back from it, the door is shut.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player;
+        return {
+            play: (done) => {
+                this.started = true;
+                this.state = 'squash';
+                p.setVisible(true);
+                this.shut.setVisible(false);
+                this.dark.setVisible(true);
+                this.pic.setVisible(true).setDepth(p.depth + 0.01).play('gags-door-squash');
+                const cover = (anim, frame) => {
+                    if (frame.index < 2) return;
+                    p.setVisible(false);
+                    if (frame.index === 3) sfx.at(d.x, d.y).thump();
+                    if (frame.index >= 3) this.pic.off('animationupdate', cover);
+                };
+                this.pic.on('animationupdate', cover);
+                this.pic.on('animationupdate', this.shutting, this);
+                this.pic.once('animationcomplete-gags-door-squash', () => {
+                    if (this.state !== 'squash') return;
+                    this.pic.off('animationupdate', cover);
+                    this.pic.off('animationupdate', this.shutting, this);
+                    p.setVisible(false);
+                    sfx.at(d.x, d.y).doorShut();
+                    this.shut.setVisible(true);
+                    this.dark.setVisible(false);
+                    if (this.who) { this.who.gone = true; this.world.people.refresh(); }
+                    s.time.delayedCall(350, () => {
+                        if (this.state !== 'squash') return;
+                        this.pic.play('gags-door-slide');
+                        this.pic.once('animationcomplete-gags-door-slide', () => done());
+                    });
+                });
+            },
+            show: () => {
+                this.pic.anims.stop();
+                this.close();
+                this.state = 'shut';
+                this.at = s.time.now + 1500;
+            },
+        };
     }
 }
 
@@ -586,15 +892,31 @@ export class DndDoor {
         this.card.fillStyle(0xe83b3b, 1).fillRect(def.x + 8, def.y - 40, 5, 13);
         this.card.fillStyle(0xffffff, 1).fillRect(def.x + 9, def.y - 39, 3, 2).fillRect(def.x + 9, def.y - 34, 3, 1).fillRect(def.x + 9, def.y - 32, 3, 1);
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
-        world.add([this.shut, this.card, this.dark]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y - 2, route: 'inside', face: -1, layer: 'back' });
+        // (Its swing open and shut: the swinging doors' own clip in this door's full colours; the user,
+        // 2026-11-18: hidden while open, it went with its frame.)
+        const m = s.cache.json.get('gags-meta');
+        this.pic = s.add.sprite(def.x, def.y, 'gags', m.anims['door-burst-full'][0]).setOrigin(m.door.x / m.cell, m.floor / m.cell)
+            .setDepth(D.decor + 0.13).setVisible(false);
+        world.add([this.shut, this.card, this.dark, this.pic]);
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y, route: 'inside', face: -1, layer: 'back', owned: true });
+        world.people.doorway(this.who, def.x - 14, def.x + 14, def.y - 72, def.y);
         if (this.who) this.who.gone = true;
         this.busy = false;
         world.things.push({ ...def, items: [], reach: 16, interact: () => this.knock() });
     }
 
-    // (`heard`: a clatter outside brought them to the door: a fright only if she is by it.)
-    knock(heard) {
+    // Her cry within three metres of it brings them to the door, and that is a fright even in a
+    // lunge (it is no contact); with a tray, a spill.
+    heard() {
+        const d = this.def;
+        if (!this.world.hears(d.x, d.y, 'inside', 3 * M)) return;
+        this.scene.time.delayedCall(300, () => this.knock(true, true));
+    }
+
+    // (`heard`: a clatter outside, or her cry, brought them to the door: a fright only if she is by
+    // it; `cried`: her own cry did, and nothing forgives it; `look`: a tangerine in the trays did,
+    // and they look about and see nobody: no fright, wherever she is.)
+    knock(heard, cried = false, look = false) {
         const s = this.scene, p = s.player, d = this.def;
         if (this.busy || (this.world.carry && !heard)) return false;
         this.busy = true;
@@ -605,28 +927,939 @@ export class DndDoor {
         this.shut.setVisible(false);
         this.card.setVisible(false);
         this.dark.setVisible(true);
+        this.pic.setVisible(true).play('gags-dnd-open');
         if (this.who) {
             this.who.gone = false;
             this.who.dir = p.x < d.x ? -1 : 1;
             this.world.people.place(this.who);
             this.world.people.refresh();
-            this.world.people.play(this.who, 'shriek');
+            if (look) {
+                // (This way and that, at the empty corridor.)
+                this.world.people.idle(this.who);
+                for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 420, () => { this.who.dir = -this.who.dir; this.world.people.place(this.who); });
+            } else this.world.people.play(this.who, 'shriek');
         }
-        const by = !heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60);
-        if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'startled');
-        s.time.delayedCall(1700, () => {
-            this.shut.setVisible(true);
-            this.card.setVisible(true);
-            this.dark.setVisible(false);
+        const by = !look && (!heard || (Math.abs(p.x - d.x) < 3 * M && Math.abs(p.y - d.y) < 60));
+        if (by && cried && this.world.carry) this.world.carryBox.spill(d.x, false, 'dnd', { force: cried });
+        else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'dnd', { force: cried });
+        s.time.delayedCall(look ? 1900 : 1700, () => {
             if (this.who) {
                 this.who.gone = true;
                 this.world.people.refresh();
             }
-            sfx.at(d.x, d.y).doorShut();
-            this.busy = false;
+            // (Swung shut: its last frame is the shut door itself, the doorway's dark gone with it.)
+            this.pic.play('gags-dnd-shut');
+            this.pic.on('animationupdate', (anim, frame) => { if (frame.index === anim.frames.length) this.dark.setVisible(false); });
+            this.pic.once('animationcomplete-gags-dnd-shut', () => {
+                this.pic.off('animationupdate');
+                this.pic.setVisible(false);
+                this.shut.setVisible(true);
+                this.card.setVisible(true);
+                this.dark.setVisible(false);
+                sfx.at(d.x, d.y).doorShut();
+                this.busy = false;
+            });
         });
         return true;
     }
 
     update() {}
+}
+
+// --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) ------------------
+
+// A suitcase on its wheels in a cabin corridor (population: `haz_suitcase_4`): it rolls to and fro
+// between two door frames with the ship's slow roll, slowing at each end with a creak before it
+// comes back. Hop it: walked into, it is a bump. In a lunge it is sent rolling to the corridor's
+// end, and stays there. A thrown tangerine only bounces off it.
+export class Roller {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        // (Its roll short of any door or wall across the deck: ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, Roller.HALF);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s, its fastest) }
+        // (Its handle pulled up: the one she rides in her gag, 6b, cut from that picture.)
+        this.sprite = s.add.image(def.x0, def.y, 'things', 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
+        world.add([this.sprite]);
+        this.mid = (def.x0 + def.x1) / 2;
+        this.half = (def.x1 - def.x0) / 2;
+        this.period = 2 * Math.PI * this.half / (def.v * M);    // seconds for a roll there and back
+        this.x = def.x0;
+        this.phase = 0;
+        this.parked = false;
+    }
+
+    update(dt, time) {
+        const s = this.scene, p = s.player, d = this.def;
+        if (!nearby(s, d) || this.parked) return;
+        const was = Math.sin(this.phase);
+        this.phase += dt * 2 * Math.PI / this.period;
+        this.x = this.mid - this.half * Math.cos(this.phase);
+        // (At an end: the creak, as it stops and comes back.)
+        if (Math.sign(Math.sin(this.phase)) !== Math.sign(was)) sfx.at(this.x, d.y).creak();
+        this.sprite.setX(this.x).setAngle(Math.sin(this.phase) * 4);
+        // Her against it (its height is a hop's).
+        if (!here(s, d) || Math.abs(p.x - this.x) > PLAYER.bodyWidth / 2 + 8 || p.y <= d.y - Roller.HOP || p.y - PLAYER.bodyHeight >= d.y) return;
+        if (s.isLunging()) {
+            // Sent rolling to the corridor's end, the way she was going; it stays there.
+            this.parked = true;
+            const away = p.body.velocity.x < 0 ? -1 : 1;
+            s.smash(this.x, d.y - 16, false);
+            sfx.at(this.x, d.y).creak();
+            s.tweens.add({ targets: this.sprite, x: s.stopShort(this.x, away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, d.y, Roller.HALF), angle: away * 12, duration: 1400, ease: 'Quad.easeOut',
+                onComplete: () => this.sprite.setAngle(0) });
+        } else if (this.world.carry) {
+            this.world.carryBox.spill(this.x, false, 'suitcase', { vx: Math.sin(this.phase) * 50 });
+        } else {
+            // (Rolled into her back, she rides it to the end of its roll, 6b: it waits meanwhile.)
+            // (Standing at an end of its roll, it sets off for the other end with her.)
+            const vx = Math.sin(this.phase) * this.half * 2 * Math.PI / this.period;
+            const dir = Math.abs(vx) > 5 ? Math.sign(vx) : this.x < this.mid ? 1 : -1;
+            const ride = { x: this.x, y: d.y, dir, v: vx, endX: dir > 0 ? d.x1 : d.x0,
+                           hide: () => { this.parked = true; this.sprite.setVisible(false); },
+                           show: () => { this.parked = false; this.sprite.setVisible(true).setAngle(0); } };
+            s.scareContact(this.x, 'suitcase', { vx, ride });
+        }
+    }
+}
+// Her feet over this, she clears it: its body (the handle is a thin rail she passes).
+Roller.HOP = 30;
+Roller.HALF = 12;               // px from its middle to its front
+
+// The dog's lead (the dog and its owner made together, the user, 2026-11-17: "the lady and the dog
+// are loosely connected, the leash looks weird and glitches on its connecting ends"): where it
+// leaves her fist and where it is clipped to the collar, px from the sprite's foot (in front, up),
+// measured in every frame of their clips on the people's sheet (her fist is still in all of her
+// idle's); the picture's own colours; how high its lowest point hangs over the carpet; where the
+// fruit is in the dog's mouth.
+const LEAD = {
+    fist: [7.5, 32],
+    collar: { stand: [2.5, 12],
+              walk: [[0.5, 13], [0.5, 12], [0.5, 12], [0.5, 13], [0.5, 13], [0.5, 12], [0.5, 12], [1.5, 13]],
+              run: [[4.5, 12], [4.5, 12], [4.5, 9], [4.5, 9], [4.5, 10], [3.5, 11]],
+              sit: [[2.5, 12], [3.5, 11], [3.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11], [2.5, 11]] },
+    core: 0x6e2727, edge: 0x2e222f,
+    low: 3,
+    mouth: [10, 11],
+};
+// Their moments together (approved 2026-11-17), each one picture of the two (assets/source/people/
+// dogowner-raw/README.md), the dog sprite and the drawn lead hidden while it plays:
+// - her cry: the dog runs to its place at her feet in their picture (`dx` px in front of her, where
+//   its sitting picture lies on theirs), winds the lead round her legs (`wind`), they stand tied
+//   (`tied`) until `ms` after the cry, at least `tiedMin`, and it unwinds it (`unwind`);
+const WIND = { dx: 17, ms: 5000, tiedMin: 1500 };
+// - three fetches: she tosses her the tennis ball (`toss`). It is in her hand in the clip until
+//   frame `release`, where her hand opens; from then the game's ball flies, from where the clip
+//   held it (`from`: px in front of her middle, up from her feet), in a lob (gravity `g`, its top
+//   over the release a fifth of the way across, within `top`) to her chest;
+const TOSS = { release: 6, from: [13, 38], g: 400, top: [0.22, 16, 40], chest: 30 };
+// - a trip on its lead: the dog runs to her face (`dog` px in front of her middle, facing her) and
+//   licks it, one picture of her lying dazed and the dog (`gag-dog-lick`, her mishaps' sheet: its
+//   cell's middle `gag` px in front of hers). Its collar in each frame of that picture, (column,
+//   row) of its 128 x 96 frames, where her middle is column 48 + 0.5 and the floor under the dog
+//   row 72 (her hand under her chin, 74, is her cell's bottom row).
+const LICK = { dog: 45, gag: 16,
+               collar: [[90, 62], [90, 61], [89, 62], [88, 63], [87, 64], [88, 63], [89, 62], [90, 61]] };
+// (What it does by itself, its lead its own: the states in which a cry, a tangerine or a lunge reach it.)
+const FREE = new Set(['sit', 'sat', 'walk', 'aside']);
+// A point of a person's picture in the world: `at` px in front of its middle (the way it faces) and
+// up from its feet, on the px the sprite is drawn at.
+// (By where the person is, not its sprite, which is only placed while she is near.)
+const leadEnd = (p, at) => ({ x: Math.round(p.x) + (p.dir < 0 ? -at[0] : at[0]), y: p.sprite.y - at[1] });
+// A straight run of points from a to b, one a px.
+const lineOf = (a, b) => {
+    const n = Math.max(1, Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+    return Array.from({ length: n + 1 }, (_, i) => ({ x: a.x + (b.x - a.x) * i / n, y: a.y + (b.y - a.y) * i / n }));
+};
+
+// A small dog on a long lead (population: `haz_dog_4`), its owner in her cabin's doorway holding
+// the other end. The dog trots about within the lead's reach and sits now and then; where the lead
+// sags to the carpet it is a line to hop: run into, she trips on it (the user, 2026-11-16): with a
+// tangerine on her she stumbles forward and it flies on ahead of her; without, she falls flat on
+// her belly, dizzy, and goes back to her checkpoint (`tripped`). At first it held her back like a
+// wall, then it was a stagger with nothing lost. A
+// tangerine rolled within its reach it fetches and brings back to her feet: not spent; three
+// fetches and its owner tosses her the tennis ball. Her cry: it howls back and runs round its
+// owner's legs, the lead wound round them a while (5 s from the cry): nothing to trip on. Tripped
+// on its lead, she lies there and it comes and licks her face. Those three are pictures of the two
+// of them together (WIND, TOSS, LICK). In a lunge it jumps aside.
+export class Fetcher {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        this.def = def;             // { x: the doorway, y, who: the owner, reach: px, gives }
+        // (Her cabin's door standing open behind her.)
+        world.add([s.add.image(def.x, def.y, 'shipart', 'door-cabin-ajar').setOrigin(0.5, 1).setDepth(D.decor + 0.1)]);
+        this.owner = world.people.add({ id: `${def.id}_owner`, who: def.who, x: def.x, y: def.y, route: 'inside', face: 1,
+                                        idle: 'idle', layer: 'back', owned: true });
+        this.dog = world.people.add({ id: `${def.id}_dog`, who: 'dog', x: def.x + 60, y: def.y, route: 'inside', face: 1, owned: true });
+        // (Over the dog: from behind it the lead runs along its back to the collar, as in their picture;
+        // and under her, so that her fist closes over its end.)
+        this.lead = s.add.graphics().setDepth(D.props + 0.06);
+        this.owner.sprite.setDepth(D.props + 0.07);
+        world.add([this.lead]);
+        this.state = 'sit';
+        this.at = 0;
+        this.fetches = 0;
+        this.flatUntil = 0;
+    }
+
+    // Where the lead leaves her fist, and where it is clipped to the dog's collar: measured in every
+    // frame of their clips (LEAD), in world px; the sprites are drawn at whole px (roundPixels).
+    hand() {
+        return leadEnd(this.owner, LEAD.fist);
+    }
+
+    collar() {
+        // (Licking her face, the dog is in her picture: its collar there, by the frame shown.)
+        if (this.lickGag) {
+            const gag = this.lickGag, i = (gag.anims.currentFrame?.index ?? 1) - 1;
+            const [col, row] = LICK.collar[i] ?? LICK.collar[0];
+            return { x: gag.x + this.licked.face * (col - 63.5), y: gag.y - 75 + row };
+        }
+        const g = this.dog, f = Number(g.sprite.frame.name);
+        let at = LEAD.collar.stand;
+        for (const [clip, frames] of Object.entries(g.meta.anims)) {
+            const i = frames.indexOf(f);
+            if (i >= 0 && LEAD.collar[clip]) at = LEAD.collar[clip][i] ?? at;
+        }
+        return leadEnd(g, at);
+    }
+
+    // Where she meets the lead (`trip`), as it always was: a little over halfway from her hand to the
+    // dog; the lead's lowest point, LEAD.low px over the carpet (the user, 2026-11-17: hung at her
+    // waist, it could not trip her; "make the leash hang lower").
+    sag() {
+        const h = this.hand(), c = this.collar();
+        return { x: h.x + (c.x - h.x) * 0.62, y: this.def.y - LEAD.low };
+    }
+
+    // The lead's line, point by point from her fist to the collar: down from her fist to its lowest
+    // point and up again to the collar, each side a curve level at the bottom; or after her cry along
+    // the carpet.
+    curve(time) {
+        const h = this.hand(), c = this.collar(), floor = this.def.y - 1;
+        if (time < this.flatUntil) {
+            const foot = { x: h.x + Math.sign(c.x - h.x) * 3, y: floor };
+            return [...lineOf(h, foot), ...lineOf(foot, { x: c.x, y: floor }), ...lineOf({ x: c.x, y: floor }, c)];
+        }
+        const m = this.sag();
+        const hang = (end) => {
+            const n = Math.ceil(Math.abs(m.x - end.x) + Math.abs(m.y - end.y)) + 1;
+            return Array.from({ length: n + 1 }, (_, i) => {
+                const t = i / n;
+                return { x: end.x + (m.x - end.x) * t, y: m.y + (end.y - m.y) * (1 - t) ** 2 };
+            });
+        };
+        return [...hang(h), ...hang(c).reverse()];
+    }
+
+    go(state, ms = 0) {
+        this.state = state;
+        this.at = this.scene.time.now + ms;
+    }
+
+    // Where the lead lets it go: its reach either way from the doorway, short of any door or wall
+    // across the deck (ShipScene `stopShort`: the lead does not go through walls).
+    range() {
+        const d = this.def;
+        return (this.span ??= this.scene.spanOn(d.x, d.x - d.reach, d.x + d.reach, d.y, 10));
+    }
+
+    // Her cry: a howl back at her, and it runs to its owner and round her legs: the lead lies along
+    // the carpet as it runs, then wound round her legs a while (WIND), and no one trips on it.
+    heard() {
+        const d = this.def, s = this.scene, g = this.dog, o = this.owner;
+        if (!g || !this.world.hears(g.x, d.y) || !FREE.has(this.state) || this.tossDir) return;
+        sfx.at(g.x, d.y).howl();
+        this.flatUntil = Infinity;              // until it has unwound
+        this.windSide = Math.sign(g.x - o.x) || o.dir;
+        this.windEnd = s.time.now + WIND.ms;
+        this.target = o.x + this.windSide * WIND.dx;
+        this.go('wind');
+    }
+
+    // At her feet: the two of them in one picture (the dog sprite and the drawn lead hidden), round
+    // her legs, tied, unwound; then the dog sitting at her feet as in that picture, the lead its own.
+    wound() {
+        const s = this.scene, o = this.owner, g = this.dog, P = this.world.people;
+        this.go('winding');
+        this.together = true;
+        g.sprite.setAlpha(0);
+        o.dir = this.windSide;
+        P.place(o);
+        this.ownerClip('wind', () => {
+            this.go('tied');
+            this.ownerClip('tied');
+            s.time.delayedCall(Math.max(WIND.tiedMin, this.windEnd - s.time.now), () => {
+                this.go('unwinding');
+                // (Its last frame is their picture, the dog sat at her feet: held, until it gets up.)
+                this.ownerClip('unwind', () => this.go('sat', 1200));
+            });
+        });
+    }
+
+    // Getting up from her feet after their picture: the dog sprite where it sat in it, the lead its
+    // own again (the lead changes as the dog moves off, never while all three stand still).
+    apart() {
+        const o = this.owner, g = this.dog, P = this.world.people;
+        this.together = false;
+        this.flatUntil = 0;
+        g.x = o.x + this.windSide * WIND.dx;
+        g.dir = this.windSide;
+        g.sprite.setAlpha(1);
+        P.place(g);
+        P.idle(o);
+    }
+
+    // One of the owner's clips with the dog: looped, or played through and then `then`, at once in
+    // the same frame (never her idle between: she would stand there without the dog for a frame).
+    ownerClip(name, then) {
+        const o = this.owner;
+        o.state = 'acting';
+        this.world.people.anim(o, name, { loop: !then });
+        if (then) o.sprite.once(`animationcomplete-people-${o.who}-${name}`, then);
+    }
+
+    // A tangerine on the carpet within its reach: it fetches it.
+    offered(t) {
+        const d = this.def, s = this.scene, g = this.dog;
+        if (!g || !FREE.has(this.state) || t.route !== 'inside') return false;
+        const r = this.range();
+        if (Math.abs(t.img.y + 3 - d.y) > 6 || t.img.x < r.lo || t.img.x > r.hi) return false;
+        this.fruit = s.loose.claim(t).setAngle(0);
+        this.target = this.fruit.x;
+        sfx.at(g.x, d.y).bark();
+        this.go('fetch');
+        return true;
+    }
+
+    update(dt, time) {
+        const s = this.scene, p = s.player, d = this.def, g = this.dog, P = this.world.people;
+        if (!g || !nearby(s, d)) return;
+        const speed = { walk: 40, fetch: 150, back: 130, wind: 120, lick: 150 }[this.state] ?? 0;
+        if (speed) {
+            if (this.state === 'back') this.target = p.x - (p.x > g.x ? 14 : -14);
+            const r = this.range(), to = Phaser.Math.Clamp(this.target, r.lo, r.hi);
+            const step = Math.sign(to - g.x) * Math.min(Math.abs(to - g.x), speed * dt);
+            if (step) g.dir = step > 0 ? 1 : -1;
+            g.x += step;
+            P.anim(g, this.state === 'walk' ? 'walk' : 'run');
+            const there = Math.abs(to - g.x) < 1;
+            if (this.state === 'fetch' && there) {
+                // In its mouth, and back to her.
+                this.go('back');
+            } else if (this.state === 'back') {
+                this.fruit?.setPosition(g.x + g.dir * LEAD.mouth[0], d.y - LEAD.mouth[1]);
+                if (there || Math.abs(p.x - g.x) < 22) this.drop();
+            } else if (this.state === 'walk' && there) {
+                this.go('sit', Phaser.Math.Between(1800, 3800));
+            } else if (this.state === 'wind' && there) {
+                this.wound();
+            } else if (this.state === 'lick' && there) {
+                this.go('lickwait');
+            }
+        } else if (this.state === 'lickwait') {
+            this.lickWait(time);
+        } else if (this.state === 'sit' || this.state === 'sat') {
+            // (`sat`: sitting already, as their picture left it.)
+            if (this.state === 'sit' && !P.anim(g, 'sit', { loop: false })) g.sprite.setFrame(g.meta.stand);
+            if (time > this.at) {
+                const apart = this.together;
+                if (apart) this.apart();
+                const r = this.range();
+                this.target = Phaser.Math.Between(r.lo + 10, r.hi - 10);
+                // (Out of the loops round her legs it trots off away from her, never back through
+                // them; walking from the first frame it is its own.)
+                if (apart) {
+                    const side = this.windSide, from = this.owner.x + side * 40;
+                    const end = side > 0 ? r.hi - 10 : r.lo + 10;
+                    this.target = (side > 0 ? end > from : end < from) ? Phaser.Math.Between(Math.min(from, end), Math.max(from, end)) : end;
+                }
+                this.go('walk');
+                if (apart) {
+                    g.dir = Math.sign(this.target - g.x) || g.dir;
+                    P.anim(g, 'walk');
+                }
+            }
+        } else if (this.state === 'aside' && time > this.at) {
+            this.go('sit', 1500);
+        }
+        P.place(g);
+        // (She faces the dog; tossing the ball, her; round her legs, as their picture is.)
+        const o = this.owner, face = this.tossDir || (this.together ? this.windSide : g.x < o.x ? -1 : 1);
+        if (o.dir !== face) {
+            o.dir = face;
+            P.place(o);
+        }
+        this.drawLead(time);
+        this.trip(p, time);
+    }
+
+    // The tangerine at her feet, hers again; three of them and its owner hands her the tennis ball.
+    drop() {
+        const s = this.scene, d = this.def;
+        const img = this.fruit;
+        this.fruit = null;
+        if (img) {
+            s.loose.make({ x: img.x, y: d.y - 3, route: 'inside' }, true);
+            img.destroy();
+        }
+        this.fetches += 1;
+        this.go('sit', 2500);
+        if (this.fetches >= 3 && !this.world.save.keeps.includes(d.gives) && !this.tossDir) {
+            const o = this.owner;
+            this.world.pop(o.x, d.y - PLAYER.height - 6, 'heart', 1500);
+            sfx.at(o.x, d.y).giggle();
+            this.toss();
+        }
+    }
+
+    // The tennis ball out of her pocket and tossed to her (TOSS): turned to her, her lead in her other
+    // fist as always; the ball in her hand is the clip's until her hand opens, then the game's.
+    toss() {
+        const s = this.scene, o = this.owner, P = this.world.people, key = `people-${o.who}-toss`;
+        this.tossDir = Math.sign(s.player.x - o.x) || o.dir;
+        o.dir = this.tossDir;
+        P.place(o);
+        const open = (anim, frame) => {
+            if (anim.key !== key || frame.index - 1 < TOSS.release) return;
+            o.sprite.off('animationupdate', open);
+            this.fly();
+        };
+        o.sprite.on('animationupdate', open);
+        this.ownerClip('toss', () => {
+            o.sprite.off('animationupdate', open);
+            this.tossDir = 0;
+            P.idle(o);
+        });
+    }
+
+    // The ball from her hand to her chest, a lob over the corridor (behind the owner's fingers as it
+    // leaves them, then in front of her); where it reaches her, it is hers.
+    fly() {
+        const s = this.scene, o = this.owner, p = s.player, d = this.def;
+        const x0 = Math.round(o.x) + o.dir * TOSS.from[0], y0 = o.sprite.y - TOSS.from[1];
+        const ball = s.add.image(x0, y0, 'things', 'tennis-ball').setDepth(s.DEPTH.props + 0.065);
+        this.world.add([ball]);
+        const [k, lo, hi] = TOSS.top, g = TOSS.g, dx = p.x - x0, ty = p.y - TOSS.chest;
+        const top = Phaser.Math.Clamp(Math.abs(dx) * k, lo, hi), vy = -Math.sqrt(2 * g * top);
+        const T = -vy / g + Math.sqrt(Math.max(0, 2 * (ty - (y0 - top)) / g)), vx = dx / T;
+        // (On the scene's clock, frame by frame: a tween keeps a clock of its own.)
+        const start = s.time.now;
+        const fly = () => {
+            const t = Math.min(T, (s.time.now - start) / 1000);
+            ball.setPosition(Math.round(x0 + vx * t), Math.round(y0 + vy * t + g * t * t / 2));
+            // (Out of the owner's fingers, it comes on in front of her: it reaches her, and its
+            // sparkle is over her, the user, 2026-11-17.)
+            if (Math.abs(ball.x - x0) > 6) ball.setDepth(p.depth + 0.01);
+            if (t < T) return;
+            s.events.off('update', fly);
+            ball.destroy();
+            this.world.giveKeep(d.gives, ball.x, ball.y);
+        };
+        s.events.on('update', fly);
+    }
+
+    // She tripped on its lead and lies there: it runs to her face and licks it (LICK), her
+    // checkpoint waiting for it (`down.holds`). Not if her face is out of its lead's reach, nor
+    // while it is busy (a tangerine in its mouth, round its owner's legs).
+    lick() {
+        const s = this.scene, p = s.player, g = this.dog;
+        if (!g || !s.down || !FREE.has(this.state)) return;
+        const face = p.flipX ? -1 : 1, spot = Math.round(p.x) + face * LICK.dog, r = this.range();
+        if (spot < r.lo || spot > r.hi) return;
+        let done;
+        s.down.holds.push(new Promise(resolve => { done = resolve; }));
+        this.licked = { face, done, giveUp: s.time.now + 4000 };
+        this.target = spot;
+        this.go('lick');
+    }
+
+    // At her face, standing, turned to her: their picture takes over when hers is at its frame
+    // (her dazed loop's second, the picture's first: the butterflies where they were).
+    lickWait(time) {
+        const s = this.scene, p = s.player, g = this.dog, L = this.licked;
+        g.dir = -L.face;
+        g.sprite.anims.stop();
+        g.sprite.setFrame(g.meta.stand);
+        if (p.anims.currentAnim?.key === 'her-dazed-lie' && p.anims.currentFrame?.index === 2) {
+            const gag = s.add.sprite(Math.round(p.x) + L.face * LICK.gag, p.y + s.herDropPx(), 'her-mishaps')
+                .setOrigin(0.5, 1).setFlipX(p.flipX).setDepth(p.depth);
+            s.worldLayer.add(gag);
+            p.setVisible(false);
+            g.sprite.setAlpha(0);
+            this.lickGag = gag;
+            this.go('licking');
+            s.gagEnd = () => {
+                gag.destroy();
+                this.lickGag = null;
+                p.setVisible(true);
+                g.sprite.setAlpha(1);
+                this.go('sit', 1500);
+            };
+            gag.play('gag-dog-lick');
+            gag.once('animationcomplete-gag-dog-lick', () => L.done());
+        } else if (time > L.giveUp || !s.down) {
+            L.done();
+            this.go('sit', 1500);
+        }
+    }
+
+    // The lead in the picture's own pixels: a line of its red-brown with its dark outline round it,
+    // down from her fist to just over the carpet and up to the collar, or after her
+    // cry round her feet and along the carpet.
+    drawLead(time) {
+        // (Round her legs it is in their picture.)
+        if (this.together) {
+            this.lead.clear();
+            return;
+        }
+        const floor = this.def.y - 1, pts = this.curve(time);
+        // Whole px, joined side by side (no diagonal gaps), then a dark px under each: 2 px thick (the
+        // picture's 3, its outline on both sides, was too thick, the user).
+        const core = new Map();
+        let last = null;
+        for (const q of pts) {
+            const x = Math.floor(q.x), y = Math.round(q.y);
+            if (last && last.x !== x && last.y !== y) core.set(`${x},${last.y}`, [x, last.y]);
+            core.set(`${x},${y}`, [x, y]);
+            last = { x, y };
+        }
+        // (Lying round her feet after her cry the dog is at her feet too: the lead under it then.
+        // Licking her face, the dog is in her picture: over it, as always, when its owner is on that
+        // side of her; from the other side it comes from under her, as it lay when she tripped.)
+        const s = this.scene, gag = this.lickGag;
+        const over = gag && Math.sign(this.owner.x - s.player.x) === this.licked.face;
+        const g = this.lead.clear().setDepth(over ? gag.depth + 0.01 : s.DEPTH.props + (time < this.flatUntil ? 0.04 : 0.06));
+        g.fillStyle(LEAD.edge, 1);
+        for (const [x, y] of core.values()) {
+            if (y + 1 <= floor && !core.has(`${x},${y + 1}`)) g.fillRect(x, y + 1, 1, 1);
+        }
+        g.fillStyle(LEAD.core, 1);
+        for (const [x, y] of core.values()) g.fillRect(x, y, 1, 1);
+    }
+
+    // The lead where it lies on the carpet: crossed on her feet, she trips on it (a stagger, slowed
+    // a moment); hopped, or in a lunge, it is nothing.
+    trip(p, time) {
+        const s = this.scene, d = this.def, m = this.sag();
+        if (s.isLunging() && here(s, d) && Math.abs(p.x - this.dog.x) < 20 && FREE.has(this.state) && this.state !== 'aside') this.jumpAside(p);
+        const side = Math.sign(p.x - m.x) || 1;
+        // (Only crossing the line itself, from right beside it: a teleport or a fright's walk back
+        // across it is no trip.)
+        const crossed = this.side && side !== this.side && Math.abs(p.x - m.x) < 24;
+        if (crossed && time >= this.flatUntil && here(s, d) && !s.isLunging() && p.y >= d.y - 6) {
+            sfx.at(this.dog.x, d.y).bark();
+            // (From behind her: she goes on the way she was going, forward.)
+            s.scareContact(p.x - side * 10, 'lead');
+            // (Down on her belly: it comes and licks her face.)
+            this.lick();
+        }
+        this.side = side;
+    }
+
+    jumpAside(p) {
+        const s = this.scene, g = this.dog, d = this.def;
+        this.go('aside', 900);
+        sfx.at(g.x, d.y).bark();
+        const r = this.range(), to = Phaser.Math.Clamp(g.x + (g.x < p.x ? -1 : 1) * 40, r.lo, r.hi);
+        s.tweens.add({ targets: g, x: to, duration: 300, ease: 'Quad.easeOut' });
+    }
+}
+
+// The paper round (population: `haz_papers_5`): a steward with a stack of folded papers walks a
+// cabin corridor and skims one along the carpet to each door. A paper sliding is a thing to hop:
+// stepped on, she slips, and it shoots on from under her foot to its door. A moment after it
+// stops there, the door opens a crack and a hand takes it in (the user, 2026-11-16: lying there
+// it looked like a thing to pick up). At the end of the round he turns and walks back. Her cry:
+// he stands aside a while. A tangerine thrown to him: he catches it and
+// stands aside to eat it (spent). In a lunge she is through the papers.
+export class Skimmer {
+    static SPEED = 5.5 * M;     // a paper's slide, px/s (about 260)
+    static BRAKE = Skimmer.SPEED * Skimmer.SPEED / M;   // stopping in the last half metre to its door
+    static REACH = 9;           // px between its middle and hers when her foot is on it
+    constructor(world, def) {
+        const s = world.scene;
+        this.world = world;
+        this.scene = s;
+        // (His round is one corridor's: short of any door or wall across the deck, ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, 10);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s), who, doors: [x] }
+        this.p = world.people.add({ id: def.id, who: def.who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
+        this.x = def.x0;
+        this.dir = 1;
+        this.until = 0;
+        this.papers = [];
+        this.next = 0;              // the door whose paper is next
+    }
+
+    heard() {
+        const s = this.scene, d = this.def;
+        if (!this.p || !this.world.hears(this.x, d.y)) return;
+        this.until = Math.max(this.until, s.time.now + CRY.startleMs);
+        this.world.pop(this.x, d.y - PLAYER.height - 6, 'alert', 1200);
+        sfx.at(this.x, d.y).oh();
+    }
+
+    // A tangerine thrown to him: caught, and eaten standing aside.
+    offered(t) {
+        const s = this.scene, d = this.def, p = this.p;
+        if (!p || !t.thrown || this.flicking || !s.loose.near(t, this.x, d.y, 14, 50)) return false;
+        const img = s.loose.claim(t).setDepth(p.sprite.depth + 0.01);
+        this.until = s.time.now + 8000;
+        this.eating = true;
+        sfx.at(this.x, d.y).take();
+        this.world.people.eat(p, img, () => { this.eating = false; });
+        return true;
+    }
+
+    update(dt, time) {
+        const s = this.scene, her = s.player, d = this.def, P = this.world.people, p = this.p;
+        if (!p || !nearby(s, d)) return;
+        if (time >= this.until && !this.flicking) {
+            this.x += this.dir * d.v * M * dt;
+            if (this.x >= d.x1) { this.x = d.x1; this.dir = -1; this.until = time + 1200; this.next = 0; }
+            else if (this.x <= d.x0) { this.x = d.x0; this.dir = 1; this.until = time + 1200; this.next = 0; }
+            // A door's paper is sent from five metres short of it (the user: from further away), both
+            // ways: going back he skims them to the doors behind him (the user: a constant obstacle).
+            const doors = realDoors(s, d);
+            const ahead = this.dir > 0 ? doors.filter(x => x - 5 * M >= d.x0) : doors.filter(x => x + 5 * M <= d.x1).reverse();
+            const door = ahead[this.next];
+            if (door !== undefined && (this.x - (door - this.dir * 5 * M)) * this.dir >= 0) this.flick(door);
+        }
+        if (!this.flicking && !this.eating) {
+            if (time < this.until) {
+                p.sprite.anims.stop();
+                p.sprite.setFrame(p.meta.stand);
+            } else P.anim(p, 'walk');
+        }
+        p.x = this.x;
+        p.dir = this.dir;
+        P.place(p);
+        this.slide(dt, her);
+    }
+
+    // He bends and sends one along the carpet to the door.
+    flick(door) {
+        const s = this.scene, d = this.def, p = this.p;
+        this.next += 1;
+        this.flicking = true;
+        this.world.people.play(p, 'flick').then(() => { this.flicking = false; });
+        s.time.delayedCall(220, () => {
+            // (The paper the user picked of two generated, `assets/source/things/paper-sliding.png`;
+            // its curled edge trailing, as in the first picture of her clips with it.)
+            const dir = Math.sign(door - (this.x + this.dir * 10)) || 1;
+            const img = s.add.image(this.x + this.dir * 10, d.y, 'things', 'paper-sliding').setOrigin(0.5, 1)
+                .setFlipX(dir < 0).setDepth(s.DEPTH.props + 0.02);
+            this.world.add([img]);
+            sfx.at(this.x, d.y).paperSlide();
+            this.papers.push({ img, v: Skimmer.SPEED, door, dir });
+        });
+    }
+
+    // The papers on the carpet: sliding to their doors, where a hand takes each in.
+    slide(dt, her) {
+        const s = this.scene, d = this.def;
+        for (const q of this.papers) {
+            // Lying at its door until it is taken in, it is as slippery: stepped on, she slips (once).
+            if (q.done) {
+                if (!q.hit && !q.taking && this.under(q, her)) {
+                    q.hit = true;
+                    if (this.world.carry) this.world.carryBox.spill(q.img.x, false, 'papers', { vx: 0, lying: true });
+                    else s.scareContact(q.img.x, 'papers', { vx: 0, lying: true, ride: this.onHer(q) });
+                }
+                continue;
+            }
+            const left = Math.abs(q.door - q.img.x);
+            if (left < 0.5) {
+                q.done = true;
+                q.v = 0;
+                q.img.x = q.door;
+                s.time.delayedCall(2000, () => this.takeIn(q));
+                continue;
+            }
+            // At a steady speed right to her foot (the user, 2026-11-17: slowing as it reached her,
+            // her fall did not convince), braking only in its last half metre to its door.
+            q.v = Math.min(Skimmer.SPEED, Math.sqrt(2 * Skimmer.BRAKE * left));
+            q.img.x += q.dir * Math.min(Math.max(q.v, 20) * dt, left);
+            // Under her foot as it slides: she slips (once); with a tangerine on her (no gag) it
+            // goes on to its door.
+            if (!q.hit && this.under(q, her)) {
+                q.hit = true;
+                // (From where it came: its middle may be a step past hers by the frame it is seen.)
+                const from = q.img.x - q.dir * 20;
+                if (this.world.carry) this.world.carryBox.spill(from, false, 'papers', { vx: q.dir * q.v });
+                else s.scareContact(from, 'papers', { vx: q.dir * q.v, ride: this.onHer(q) });
+            }
+        }
+    }
+
+    // Her foot on a paper (not in a lunge: she is through them): its middle within a few px of
+    // hers, where her clip's first picture has it (a foot on its near half).
+    under(q, her) {
+        const s = this.scene, d = this.def;
+        return here(s, d) && !s.isLunging() && Math.abs(her.x - q.img.x) < Skimmer.REACH && her.y > d.y - 4;
+    }
+
+    // The paper that hit her is the one in her gag (4a, 4b): her clip is set down by where it is
+    // (`x`), and the world's own taken away (the ship scene's `fallGag` calls `hide`).
+    onHer(q) {
+        return {
+            x: q.img.x,
+            hide: () => {
+                q.gone = true;
+                q.img.destroy();
+                this.papers = this.papers.filter(o => o !== q);
+            },
+        };
+    }
+
+    // A paper at its door taken in (`world.handTakes`).
+    takeIn(q) {
+        const s = this.scene, d = this.def;
+        if (q.gone) return;
+        this.world.handTakes(q.door, d.y, [q.img], d.y - 2);
+        q.taking = true;
+        s.time.delayedCall(560, () => { this.papers = this.papers.filter(o => o !== q); });
+    }
+}
+
+
+// The breakfast round (population: `haz_breakfast_5`; the user, 2026-11-16: the stewardess with a
+// tray given a purpose, an obstacle): a room-service stewardess takes breakfast door to door. Her
+// trolley parked a step short of a door, she takes a breakfast tray from it and carries it to the
+// door in both hands (her `carry` walk; the tray is a picture of its own, `breakfast-tray`), knocks,
+// and a hand takes the tray in; she walks back empty-handed and wheels the trolley on to the next
+// door (and at the last, back again). Only doors that are drawn (`realDoors`). The trolley is a low
+// thing to hop; walked into with a tray, she drops it with a crash (a fright). Her cry: she stops and
+// stands aside a while. A tangerine thrown to her: she catches it and puts it on the next tray, in
+// with the breakfast (spent). In a lunge she is spun round.
+export class Breakfast {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        this.def = def;             // { doors: [x], y, who }
+        this.i = 0;                 // the door she is at, or going to
+        this.dir = 1;
+        this.p = world.people.add({ id: def.id, who: def.who, x: def.doors[0] - 80, y: def.y, route: 'inside', face: 1, owned: true });
+        this.cartX = def.doors[0] - 46;
+        this.x = this.cartX - HANDLE;
+        // (Under her, a hair below her depth: her hands are on its handle.)
+        this.cart = s.add.image(this.cartX, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.04);
+        this.tray = world.image(0, 0, 'thing:breakfast-tray').setOrigin(0.5, 1).setVisible(false);
+        world.add([this.cart, this.tray]);
+        // (A low thing to hop: solid, as the other carts on the decks are, by its shape: `TROLLEY`.)
+        const [dw, dh] = TROLLEY.dome;
+        this.zone = s.add.zone(this.cartX, def.y, TROLLEY.w, TROLLEY.h).setOrigin(0.5, 1);
+        this.dome = s.add.zone(this.cartX, def.y - TROLLEY.h, dw, dh).setOrigin(0.5, 1);
+        s.physics.add.existing(this.zone, true);
+        s.physics.add.existing(this.dome, true);
+        // (In a lunge she is past it, as past her: the user, 2026-11-16.)
+        world.solids.push({ id: `${def.id}_cart`, route: 'inside', zone: this.zone, items: [this.cart], through: true },
+                          { id: `${def.id}_cloche`, route: 'inside', zone: this.dome, items: [], through: true });
+        this.state = 'push';
+        this.until = 0;
+        this.holding = false;
+        this.d = { x: def.doors[0], y: def.y };
+    }
+
+    // (Only those she can wheel the trolley to from the first without a door across the deck: a
+    // service cart does not go through one, ShipScene `stopShort`.)
+    doors() {
+        const s = this.scene, d = this.def;
+        return (this.reach ??= realDoors(s, d).filter(x => s.stopShort(d.doors[0], x, d.y, 30) === x));
+    }
+
+    // Where the trolley stands for a door: a step short of it on the side she comes from.
+    park() {
+        return this.doors()[this.i] - this.dir * 46;
+    }
+
+    heard() {
+        const s = this.scene, d = this.def;
+        if (!this.p || !this.world.hears(this.x, d.y)) return;
+        this.until = Math.max(this.until, s.time.now + CRY.startleMs);
+        this.world.pop(this.x, d.y - PLAYER.height - 6, 'alert', 1200);
+        sfx.at(this.x, d.y).oh();
+    }
+
+    // A tangerine thrown to her: caught, and onto the next tray, in with the breakfast.
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (!this.p || !t.thrown || this.fruit || !s.loose.near(t, this.x, d.y, 14, 50)) return false;
+        this.fruit = s.loose.claim(t).setAngle(0);
+        sfx.at(this.x, d.y).take();
+        return true;
+    }
+
+    walkTo(to, speed, dt) {
+        const step = Math.sign(to - this.x) * Math.min(Math.abs(to - this.x), speed * dt);
+        this.x += step;
+        return step;
+    }
+
+    update(dt, time) {
+        const s = this.scene, her = s.player, d = this.def, P = this.world.people, p = this.p;
+        const doors = this.doors();
+        if (!p || !doors.length || !nearby(s, this.d)) return;
+        const door = doors[this.i], speed = 0.8 * M;
+        let moving = 0;
+        if (time >= this.until) {
+            if (this.state === 'push') {
+                // Wheeling the trolley on to the next door, she behind it.
+                const to = this.park(), step = Math.sign(to - this.cartX) * Math.min(Math.abs(to - this.cartX), speed * dt);
+                this.cartX += step;
+                this.x = this.cartX - this.dir * HANDLE;
+                moving = step;
+                if (!step) {
+                    // A tray from the trolley.
+                    this.state = 'carry';
+                    this.holding = true;
+                    sfx.at(this.cartX, d.y).take();
+                }
+            } else if (this.state === 'carry') {
+                moving = this.walkTo(door - this.dir * 14, speed, dt);
+                if (!moving) this.serve(door);
+            } else if (this.state === 'return') {
+                moving = this.walkTo(this.cartX - this.dir * HANDLE, speed, dt);
+                if (!moving) {
+                    // On to the next door; past the last, back the other way.
+                    if (this.i + this.dir < 0 || this.i + this.dir >= doors.length) this.dir = -this.dir;
+                    this.i = Phaser.Math.Clamp(this.i + this.dir, 0, doors.length - 1);
+                    this.state = 'push';
+                }
+            }
+        }
+        p.x = this.x;
+        p.dir = moving ? Math.sign(moving) : this.dir;
+        // (Bumped from behind, she turns round to see.)
+        if (time < (this.turnUntil ?? 0)) p.dir = this.turnTo;
+        // (Wheeling her trolley, her hands on its handle, `push`: stopped, she holds its first frame.)
+        const clip = this.holding ? 'carry' : this.state === 'push' && p.meta.anims.push ? 'push' : 'walk';
+        if (moving) P.anim(p, clip);
+        else if (clip !== 'walk') {
+            p.sprite.anims.stop();
+            p.sprite.setFrame(p.meta.anims[clip][0]);
+        } else if (p.state !== 'acting') P.idle(p);
+        P.place(p);
+        this.cart.setX(this.cartX).setFlipX(this.dir < 0);
+        this.zone.x = this.cartX;
+        this.zone.body.updateFromGameObject();
+        this.dome.x = this.cartX + (this.dir < 0 ? -1 : 1) * TROLLEY.dome[2];
+        this.dome.body.updateFromGameObject();
+        this.holdTray(p);
+        this.bump(her, time);
+        this.trolleyHit(her, time, this.state === 'push' ? moving : 0, dt);
+    }
+
+    // Her trolley met (the user, 2026-11-17: most of the round she wheels it): she runs into it,
+    // wheeled or parked, or it is wheeled into her, on the floor by it (over it in a jump, or on it,
+    // nothing). The stewardess stops a while; the trip is drawn under the world's own trolley
+    // (`ride.hide()` raises it over her), set down by its middle.
+    trolleyHit(her, time, step, dt) {
+        const s = this.scene, d = this.def, D = s.DEPTH;
+        if (!here(s, d) || time < (this.bumpedAt ?? 0) + 2500) return;
+        if (her.y < d.y - 6 || her.y - PLAYER.bodyHeight >= d.y) return;
+        const dx = her.x - this.cartX, side = Math.sign(dx) || 1;
+        if (Math.abs(dx) > (this.cart.width - 6) / 2 + PLAYER.bodyWidth / 2 + 2) return;
+        const b = her.body, pressing = side < 0 ? b.touching.right || b.blocked.right : b.touching.left || b.blocked.left;
+        const herInto = pressing || b.velocity.x * -side > 20, cartInto = step && Math.sign(step) === side;
+        if (!herInto && !cartInto) return;
+        this.bumpedAt = time;
+        this.until = time + 1500;
+        // (Someone just past it, where a trip over it would land: the stewardess behind it as she
+        // wheels it, or at the door it is parked by.)
+        const crowded = (this.x - this.cartX) * -side > 0 && Math.abs(this.x - this.cartX) < 90;
+        const cart = this.cart;
+        s.scareContact(this.cartX, 'trolley', { vx: cartInto ? step / dt : 0, dir: this.dir, crowded, ride: {
+            x: this.cartX, y: d.y, hide: () => cart.setDepth(s.player.depth + 0.02), show: () => cart.setDepth(D.props + 0.04) } });
+    }
+
+    // The tray in her hands, at their height in each frame of her carry (TRAY_HANDS), in front of
+    // her; a tangerine she caught on it.
+    holdTray(p) {
+        const show = this.holding && !this.giving;
+        this.tray.setVisible(show);
+        if (!show) {
+            if (this.fruit && !this.giving) this.fruit.setPosition(this.cartX + 4, this.def.y - this.cart.height - 3).setDepth(this.cart.depth + 0.01);
+            return;
+        }
+        const i = p.sprite.anims.isPlaying ? (p.sprite.anims.currentFrame?.index ?? 1) - 1 : 0;
+        const [hx, hy] = TRAY_HANDS[i] ?? TRAY_HANDS[0];
+        this.tray.setPosition(p.x + p.dir * hx, p.y - hy).setFlipX(p.dir < 0).setDepth(p.sprite.depth + 0.01);
+        this.fruit?.setPosition(this.tray.x + p.dir * 9, this.tray.y - 3).setDepth(this.tray.depth + 0.01);
+    }
+
+    // At the door: a knock, a hand takes the tray in (and the tangerine on it), and back.
+    serve(door) {
+        const s = this.scene, d = this.def;
+        this.state = 'serving';
+        sfx.at(door, d.y).knock();
+        s.time.delayedCall(170, () => sfx.at(door, d.y).knock());
+        s.time.delayedCall(550, () => {
+            // (Knocked out of her hands while she knocked: nothing to hand over.)
+            if (this.state !== 'serving' || !this.holding) return;
+            // (The tray handed over: a copy, taken from her hands where they hold it (`shrink`: slid
+            // to the door it crossed her), her hands held out until it is gone, `giving`.)
+            const given = this.world.image(this.tray.x, this.tray.y, 'thing:breakfast-tray').setOrigin(0.5, 1)
+                .setFlipX(this.tray.flipX).setDepth(this.tray.depth);
+            this.world.add([given]);
+            const fruit = this.fruit;
+            this.fruit = null;
+            this.giving = true;
+            this.world.handTakes(door, d.y, [given, fruit].filter(Boolean), this.tray.y - 1, () => {
+                this.state = 'return';
+                this.until = s.time.now + 300;
+            }, { shrink: true, took: () => {
+                this.holding = false;
+                this.giving = false;
+            } });
+        });
+    }
+
+    // Walked into: with a tray in her hands she drops it with a crash; a fright either way (with a
+    // tray of her own, a spill).
+    bump(her, time) {
+        const s = this.scene, d = this.def;
+        if (!here(s, d) || time < (this.bumpedAt ?? 0) + 2500) return;
+        // (A tray in her hands meets her first: on its side, from its front edge, TRAY_HANDS' reach
+        // and half the tray, 34 px ahead of her middle; else her body's edge, 13 px.)
+        const ahead = (her.x - this.x) * (this.p?.dir ?? 1) > 0, carrying = this.holding && !this.giving;
+        const reach = carrying && ahead ? PLAYER.bodyWidth / 2 + 34 : PLAYER.bodyWidth / 2 + 13;
+        if (Math.abs(her.x - this.x) > reach || her.y <= d.y - 40 || her.y - PLAYER.bodyHeight >= d.y) return;
+        this.bumpedAt = time;
+        if (s.isLunging()) {
+            // Spun round, and on again.
+            s.time.addEvent({ delay: 90, repeat: 7, callback: () => this.p.sprite.setFlipX(!this.p.sprite.flipX) });
+            sfx.at(this.x, d.y).oh();
+            return;
+        }
+        // (With a tray in her hands, her gag with it: 10a, 10b, `GAGS` trayFront, trayBack.)
+        const tray = this.holding && !this.giving;
+        if (tray) {
+            // (Down it goes, and she goes back for another.)
+            sfx.at(this.x, d.y).crash();
+            const dropped = this.world.image(this.tray.x, this.tray.y, 'thing:breakfast-tray').setOrigin(0.5, 1).setDepth(this.tray.depth);
+            this.world.add([dropped]);
+            // (Flat onto the carpet: turned on the way down, level as it lands, never into the floor.)
+            s.tweens.add({ targets: dropped, angle: { from: 0, to: this.p.dir * 25 }, duration: 130, yoyo: true });
+            s.tweens.add({ targets: dropped, y: d.y, duration: 260, ease: 'Quad.easeIn',
+                onComplete: () => s.tweens.add({ targets: dropped, alpha: 0, delay: 1500, duration: 400, onComplete: () => dropped.destroy() }) });
+            this.holding = false;
+            this.state = 'return';
+        }
+        this.until = time + 1500;
+        // (Her hands empty: she herself, 10f; with her back to her, she turns round.)
+        if (!tray && (her.x - this.x) * (this.p?.dir ?? 1) < 0) {
+            this.turnTo = Math.sign(her.x - this.x);
+            this.turnUntil = time + 1500;
+        }
+        if (this.world.carry) this.world.carryBox.spill(this.x, false, tray ? 'breakfast' : 'stewardess', { dir: this.p?.dir ?? 0 });
+        else s.scareContact(this.x, tray ? 'breakfast' : 'stewardess', { dir: this.p?.dir ?? 0, ride: { tray, y: d.y } });
+    }
 }

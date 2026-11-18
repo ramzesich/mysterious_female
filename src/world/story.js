@@ -12,6 +12,15 @@ import { finale } from './finale.js';
 
 const M = 48;
 
+// The steward and his jammed trolley (region 4): his `tug` is a picture of the two, drawn with the
+// trolley's middle this far behind his frame's middle; let go of it, he stands this far from it.
+const STEWARD_TUG = 17, STEWARD_FREE = 35;
+// (His head in that picture, px aft of its middle: his bubble over it.)
+const STEWARD_HEAD = 22;
+// His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
+// and 4 (px ahead of his middle, px up from his feet), out of his hand as it swings open in frame 5.
+const STEWARD_TOSS = { clip: 'toss', held: { 3: [1, 40], 4: [3, 41] }, release: 5, from: [19, 37] };
+
 export class Story {
     constructor(world) {
         this.world = world;
@@ -35,7 +44,7 @@ export class Story {
         const bb1 = cat('bb1');
         if (bb1) {
             // Near-catch 1 (population §6.1): the scream that becomes her battle cry; the fruit bowl goes over.
-            bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.dash(); };
+            bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.cry(); };
             bb1.onLeap = () => this.world.topple('prop_bowl_7s');
         }
         const bb2 = cat('bb2');
@@ -174,12 +183,79 @@ export class Story {
         s.setBulkheadOpen(door, true);
     }
 
-    // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk.
-    shush(time) {
+    // Her cry, where the story answers it (docs/plan-three-uses.md §2): the librarian's shush and
+    // her rope's sign rattling, Bumbot looking up at his spot, the kid with the water pistol (lido),
+    // Bumbot at the tip of the bow (finale).
+    heard(cry) {
+        const w = this.world, s = this.scene, her = s.player;
+        const l = this.who('npc_librarian');
+        if (l?.on && w.hears(l.x, l.y)) {
+            this.shushAt = 0;
+            this.shush(s.time.now, true);
+        }
+        const rope = this.P.blockDrawings?.find(b => b.id === 'flag:bb2');
+        const sign = rope?.items[1];
+        if (sign?.visible && w.hears(sign.x, rope.items[0].y)) {
+            s.tweens.add({ targets: sign, angle: { from: -8, to: 8 }, duration: 70, yoyo: true, repeat: 4, onComplete: () => sign.setAngle(0) });
+            sfx.at(sign.x, sign.y).rattle();
+        }
+        // Bumbot at one of his spots: ears up, a look at her for half a second; the beat is what it was.
+        for (const cat of s.cats) {
+            const c = cat.sprite;
+            if (cat.gone || cat.hidden || !c.visible || !w.hears(c.x, cat.floor, cat.route)) continue;
+            const was = c.flipX;
+            c.setFlipX(her.x < c.x);
+            s.tweens.add({ targets: c, y: c.y - 2, duration: 90, yoyo: true });
+            s.time.delayedCall(500, () => { if (!cat.gone) c.setFlipX(was); });
+        }
+        this.kidHeard(cry);
+        this.tipHeard(cry);
+    }
+
+    // A tangerine loose near something the story answers (docs/plan-three-uses.md §2): Bumbot at a
+    // spot bats a thrown one back; Bumbot at the tip of the bow backs off (finale); the kid catches
+    // and eats it (lido); one over the Spinnaker's keys plays a note (bow). True if it was taken.
+    offered(t) {
+        return this.catBats(t) || !!this.tipOffered?.(t) || !!this.kidOffered?.(t) || !!this.pianoOffered?.(t);
+    }
+
+    // Bumbot at one of his spots, a thrown tangerine coming at him: he bats it straight back to her,
+    // sniffs his paw and pulls a face. Not spent; the beat is what it was.
+    catBats(t) {
+        const s = this.scene, her = s.player;
+        if (!t.thrown) return false;
+        for (const cat of s.cats) {
+            const c = cat.sprite;
+            if (cat.gone || cat.hidden || cat.batting || !c.visible || !c.anims.isPlaying
+                || !s.loose.near(t, c.x, c.y, 14, 24, cat.route)) continue;
+            cat.batting = true;
+            const back = her.x < c.x ? -1 : 1, was = c.anims.currentAnim.key, flip = c.flipX;
+            c.setFlipX(back < 0).play('bumbot-bat');
+            t.thrown = false;
+            t.pickableAt = s.time.now + 300;
+            t.img.body.setVelocity(back * 210, -170);
+            sfx.at(c.x, c.y).plop();
+            s.time.delayedCall(450, () => {
+                if (cat.gone) return;
+                c.play('bumbot-wash');
+                sfx.at(c.x, c.y).mrrp();
+            });
+            s.time.delayedCall(1700, () => {
+                cat.batting = false;
+                if (!cat.gone) c.setFlipX(flip).play(was);
+            });
+            return true;
+        }
+        return false;
+    }
+
+    // The librarian (population: `npc_librarian`): a finger to her lips when she runs past her desk,
+    // or cries out near it (`cried`).
+    shush(time, cried = false) {
         const l = this.who('npc_librarian'), s = this.scene, her = s.player;
         if (!l?.on || l.state === 'acting' || s.mode !== 'play' || s.route !== 'inside' || time < (this.shushAt ?? 0)) return;
-        if (Math.abs(her.y - l.y) > 8 || Math.abs(her.x - l.x) > 3 * M) return;
-        if (Math.abs(her.body.velocity.x) < 120 && !s.isDashing()) return;
+        if (!cried && (Math.abs(her.y - l.y) > 8 || Math.abs(her.x - l.x) > 3 * M)) return;
+        if (!cried && Math.abs(her.body.velocity.x) < 120 && !s.isLunging()) return;
         this.shushAt = time + 6000;
         l.dir = her.x < l.x ? -1 : 1;
         this.people.place(l);
@@ -380,7 +456,7 @@ export class Story {
         const s = this.scene, w = this.world, st = w.data.stage;
         const sm = this.who('npc_stagemanager');
         if (sm?.on) this.people.play(sm, 'flap', { times: 2 });
-        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1 });
+        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1, owned: true });
         if (!r) return;
         r.on = true;
         const place = () => this.people.place(r);
@@ -501,16 +577,30 @@ export class Story {
 
     updateHousekeeping(dt, time) {
         const s = this.scene, w = this.world, P = this.P, her = s.player;
-        // The steward pulls at his cart from its far end, and goes along with it as she pushes.
+        // The steward pulls at his trolley's handle, and goes along with it as she pushes: one picture
+        // of the two (his `tug`, the world's trolley hidden meanwhile), set by the trolley's middle
+        // (`STEWARD_TUG`); free, he stands back from it (`STEWARD_FREE`).
         const st = this.who('npc_steward'), cart = this.stewardCart;
-        if (st && cart && st.state !== 'acting') {
+        // (Thanking her, and after while she is by him: turned to her wherever she goes, once he has
+        // stepped off the handle.)
+        if (st && !this.stewardStepping && (this.thanking || (P.has('cart_free') && st.state !== 'acting'
+            && Math.abs(her.y - st.y) < 4 && Math.abs(her.x - st.x) < 4 * 48))) this.faceHer(st);
+        if (st && cart && st.state !== 'acting' && !this.thanking) {
             const free = P.has('cart_free');
-            const x = cart.x + 35;
-            if (st.x !== x || st.free !== free) {
+            cart.items[0].setVisible(free);
+            st.bubbleDx = free ? 0 : STEWARD_HEAD;
+            const x = cart.x + (free ? STEWARD_FREE : STEWARD_TUG);
+            // (While she pushes it along he steps back with it, `tugwalk`; stopped, he tugs.)
+            // (Moved within the last 150 ms: a frame without a step is no stop.)
+            if (this.lastCartX !== undefined && cart.x !== this.lastCartX) this.cartMovedAt = time;
+            this.lastCartX = cart.x;
+            const moving = !free && time - (this.cartMovedAt ?? -1e9) < 150;
+            const idle = free ? 'idle' : moving ? 'tugwalk' : 'tug';
+            if (st.x !== x || st.free !== free || st.idle !== idle) {
                 st.x = x;
                 st.dir = -1;
                 st.free = free;
-                st.idle = free ? 'idle' : 'tug';
+                st.idle = idle;
                 this.people.idle(st);
                 this.people.place(st);
             }
@@ -551,26 +641,46 @@ export class Story {
     }
 
     // The steward (population: `npc_steward`, `scn_card_hk`): his cart is free; he mops his brow,
-    // thanks her, and hands his card over it: she is doing his rounds now.
+    // thanks her, and tosses his card to her: she is doing his rounds now. Short, and she is free to
+    // go on meanwhile; he keeps turned to her, and his card follows her (the user, 2026-11-18: it
+    // "takes too long", and he did not turn as she ran past him).
     stewardThanks() {
         const st = this.who('npc_steward'), w = this.world, s = this.scene;
         if (!st || this.thanking || this.P.save.cards.includes('hk')) return;
         this.thanking = true;
-        w.cut(async () => {
-            const her = s.player;
-            her.setFlipX(st.x < her.x);
+        this.stewardStepping = false;
+        (async () => {
+            // (Let go of the handle: he steps back off it, `STEWARD_FREE` from its middle.)
+            const to = this.stewardCart ? this.stewardCart.x + STEWARD_FREE : st.x;
+            if (Math.abs(to - st.x) > 1) {
+                this.stewardStepping = true;
+                st.state = 'acting';
+                st.dir = Math.sign(to - st.x);
+                this.people.anim(st, 'walk');
+                const step = { x: st.x };
+                await w.tween({ targets: step, x: to, duration: Math.abs(to - st.x) / 80 * 1000,
+                                onUpdate: () => { st.x = step.x; this.people.place(st); } });
+                st.free = true;
+                this.stewardStepping = false;
+            }
             st.idle = 'idle';
-            st.dir = her.x < st.x ? -1 : 1;
-            this.people.place(st);
-            await w.wait(200);
+            this.faceHer(st);
+            this.people.idle(st);
             sfx.at(st.x, st.y).aah();
-            await this.people.play(st, 'thanks');
-            await w.wait(150);
-            await w.handOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'));
+            await this.people.play(st, 'thanks', { speed: 1.8 });
+            // (Out of his shirt pocket and tossed to her: `STEWARD_TOSS`.)
+            await w.tossOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'), STEWARD_TOSS);
             this.P.setFlag('steward');
             sfx.done();
             this.thanking = false;
-        });
+            w.refresh();
+        })().catch(err => { console.error(err); this.thanking = false; });
+    }
+
+    // (Someone turned to her where she is now.)
+    faceHer(p) {
+        const dir = this.scene.player.x < p.x ? -1 : 1;
+        if (p.dir !== dir) { p.dir = dir; this.people.place(p); }
     }
 
     // The honeymooners (population: `npc_honeymooners`, `scn_photo`): E, and she takes their picture

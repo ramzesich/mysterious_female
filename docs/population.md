@@ -52,10 +52,10 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 |---|---|---|---|---|
 | `item_card_deck` | Deck card, blue | Deck 4, 66, the gangway officer | Given for his lunch | §6.1.5 |
 | `item_card_ent` | Entertainment card, red | Deck 6, 246, the stage manager | Given for his pills | §6.1.5 |
-| `item_card_hk` | Housekeeping card, green | Deck 9, 126, the steward | Given for his cart | §6.1.5 |
+| `item_card_hk` | Housekeeping card, green | Deck 9, 186, the steward | Given for his cart | §6.1.5 |
 | `item_card_off` | Officer's card, gold | Deck 12, 136, on the sun deck | Dropped by the rival at the horn; a glint; E | Every reader |
-| `item_dash` | The dash | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
-| `item_push` | Pushing carts | Deck 9, 122, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
+| `item_dash` | The lunge (with the cry, which is hers from the start; the save's verb is still `dash`) | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
+| `item_push` | Pushing carts | Deck 9, 185.2, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
 | `item_crawl` | Crawling | Deck 9, the linen room's vent | ↓ on the cart under the vent | The duct, laundry lines, the pillow fort |
 | `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E | Wall jumps |
 | `item_parasol` | The parasol | Deck 12, 130, the old lady's sunbed, after the horn | E | The glide |
@@ -66,8 +66,10 @@ still name one: the user, 2026-11-14, "part of the game is figuring things out".
 ### 2.2 The ten books
 
 Pocket items; the HUD counts them. Returned at `src_trolley` (deck 6, 167); read at `sec_chair`
-(deck 6, 172). The titles are the user's. Each book's page, read in the chair, hints at the hidden
-thing named (drawn, no words).
+(deck 6, 172). The titles are the user's, given 2026-11-18: GAME_DESIGN.md §6.1.2 has the table
+(fourteen books with the four of docs/plan-three-uses.md §4.1), and where a title shows (the cover
+over the screen when she gets a book; the shelf seen close, E at `sec_shelf`). Each book's page,
+read in the chair, hints at the hidden thing named (drawn, no words).
 
 | Id | Region | Where | How she gets it | Its page hints at |
 |---|---|---|---|---|
@@ -82,12 +84,15 @@ thing named (drawn, no words).
 | `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
 | `book_10` | 9 | Deck 10, 38, the bridge's chart table | Pickup | The odd book on the library's top shelf |
 
-### 2.3 The tangerines (41)
+### 2.3 The tangerines (41 here; 56 in the game)
 
-Placed where food is; by touch. Trim to taste; §6.1 says about 40.
+Placed where food is; by touch. Trim to taste; §6.1 says about 40. (The table is the plan as first
+written; `TANGERINES` in `tools/population.py` is what the game has: 53, and since 2026-11-15 the
+three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md §3.2.)
 
 | Deck | m | Id | On what | Count |
 |---|---|---|---|---|
+| 3 | 90 | `tan_3_bowl_1` to `_3` | The bowl on her crew cabin's desk, each where it was painted (the user, 2026-11-15) | 3 |
 | 4 | 30 | `tan_4_30` | Behind the breakable luggage stack | 1 |
 | 4 | 112 | `tan_4_laundry` | A shelf in the laundry (`room_laundry`) | 1 |
 | 4 | 165 | `tan_4_store` | Crates in the dry store (`room_store`) | 2 |
@@ -115,7 +120,7 @@ Placed where food is; by touch. Trim to taste; §6.1 says about 40.
 | 12 | 54 | `tan_12_spinnaker` | The Spinnaker's bar | 2 |
 | 12 | 128 | `tan_12_lady` | The old lady's thanks for her cocktail | 2 |
 | 12 | 166 | `tan_12_cagneys` | Cagney's bread basket | 1 |
-| 12 | 211 | `tan_12_pinata` | Los Lobos' piñata, broken by the dash | 2 |
+| 12 | 211 | `tan_12_pinata` | Los Lobos' piñata, broken by the lunge | 2 |
 | The funnel | 186 | `tan_funnel` | The engineer's lunch box | 1 |
 | | | | **Total** | **41** |
 
@@ -200,7 +205,7 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 | `rdr_bridge` | Deck 10, 40, the bridge's door | Gold | The bridge |
 | `door_library_aft` | Deck 6, 194 | Shut by `blk_quiet` (a rope, "QUIET PLEASE") | Bumbot knocks the rope into it (`bb_2`) |
 | `door_8_fwd_lobby` | Deck 8, 74 | `oneway(the corridor)` | The duct drops her inside |
-| `door_8_mid_lobbies`, `door_8_aft_lobbies`, `door_9_aft_lobbies`, `door_10_mid_lobbies`, `door_10_aft_lobbies` | Each hallway's doors at its lobby ends | `oneway(the corridor)` | A balcony door, or the pool's hatch |
+| `door_8_mid_lobbies`, `door_8_aft_lobbies`, `door_9_aft_lobbies`, `door_10_mid_lobbies`, `door_10_aft_lobbies` | Each hallway's doors at its lobby ends. **Each has a push bar on its free side and a plain face on the other (built 2026-11-18; docs/plan-three-uses.md, step 4a): it swings away from its free side, and once she has come through it stays propped open** | `oneway(the corridor)` | A balcony door, or the pool's hatch |
 | `door_theatre_trunk` | Deck 4, 240 | `oneway(deck 6)` | The theatre's trunk, as built |
 | `door_midships_trunk_6` | Deck 6, 125 | `oneway(deck 6)` | Opens from Bliss first |
 | `door_mooring` | Deck 7, 21.4 | Shut; opens from the mooring deck after the catch | The way home |
@@ -486,7 +491,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 18.7-21.4 | the terrace | The forward terrace past the wall (built) | | |
 | 30 | `amb_swan_cart` | A steward's cart with a towel swan on it | Decor | A towel animal |
 | 41.4 | cabin 8206 | Her cabin (built): `tan_8_8206` in the welcome basket, `book_5` on the bed, the shower (§8) | `cp_8206` | Built |
-| 56 | `amb_peek_sea` | An open cabin door, the sea in its window, nobody in | A peek | Built pieces |
+| 56 | `amb_peek_sea` + `sec_peek_sea` | An open cabin door, the sea in its window, nobody in; its inside washed 30% toward the wall (2026-11-18) | E (X): she steps in and bounces on its made-up bed, seen through the door (cut to its opening, her head under the lintel at each bounce, washed as the room is), then out, straightening her badge; one of her finds (the user, 2026-11-18: standing still there had played only her look-around) | Her own clips |
 | 66 | `door_duct_exit` | The duct's exit grille in the ceiling | She drops out of it (`scn_duct`) | Drawn |
 | 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; the duct's peek above it | Balloons |
 | 74 | `door_8_fwd_lobby` | The lobby door | `oneway(the corridor)` | |
@@ -500,10 +505,10 @@ cabin at 150 or from the lobbies once opened.
 |---|---|---|---|---|
 | 110, 194 | `door_8_mid_lobbies` | The lobby doors | `oneway(the corridor)` | |
 | 114-190 | `haz_steward_rounds` | A steward pushing a cart on his rounds | `loop(114, 190, 0.9)`; every 8 m he pulls the cart into a doorway for 3 s: the gap to pass; otherwise a full-width block that pushes her back | A character, a cart |
-| 124-128 | `haz_trays_8m` | Three room-service trays on the floor | `trap`: stepping on one clatters and opens `haz_dnd_8m` | Trays |
-| 126 | `haz_dnd_8m` | A "Do Not Disturb" door | Opens on the clatter, or on E: a startled guest in a towel: "Startled" if she is within 2 m | A character |
-| 136 | `haz_swing_8m` | A cabin door that swings open | `reactive(3, 0.6)`: the handle turns, the door swings out 1 m for 1.5 s; contact "Bonked" | Drawn |
-| 146 | `sign_wet_8m` + `haz_sprinkler_8m` | A wet-floor sign (muted) and the sprinkler in the doorway at 148 | `timed(5, 2, 147-149)`; contact "Drenched"; the open parasol passes | Drawn |
+| 124-128 | `haz_trays_8m` | A room-service tray on the floor (one, the breakfast stewardess's own: the user, 2026-11-18; it was three flat bars) | `trap`: run or jumped onto, she rides it off the way she was going (3); the door opens after on the guest looking after her | Trays |
+| 126 | `haz_dnd_8m` | A "Do Not Disturb" door | Opens on the clatter, or on E: a startled guest in a towel: "Startled" if she is within 2 m. It swings open and shut in its full colours, its frame kept (2026-11-18); its guest seen only through the doorway | A character |
+| 136 | `haz_swing_8m` | A cabin door that swings open | `reactive(3, 0.6)`, **no tell** (the user, 2026-11-18: the rattle taken out): it bursts open toward us flat against the wall and slams shut (generated, muted, `gags` sheet). Coming at it from aft past its hinge, it waits for her and slams her flat on the wall (13a); from forward it never hits her, and bursts once she is clear of its swing | Generated |
+| 146 | `sign_wet_8m` + `haz_sprinkler_8m` | A wet-floor sign (muted) and the sprinkler in the doorway at 148 | `timed(5, 2, 147-149)`; contact "Drenched"; the open parasol passes; with none on her or some (`pocket: false`), 16: soaked, a sneeze, back the way she came | Drawn |
 | 150 | `room_balcabin_8m` | The balcony cabin whose balcony door stands ajar (housekeeping airing it): the way in from outside; its corridor door opens from inside | `room` | The generic balcony cabin, drawn by hand |
 | 176 | `amb_ice` | An ice bucket and two glasses on a tray outside a door | Decor | |
 | 184 | `haz_cart_8_184` | A standing cart | Hop | |
@@ -547,21 +552,26 @@ the corridor at 118, not here.
 |---|---|---|---|---|
 | 112 | the linen room | Built (§8): `bb_4` asleep in the towel heap; the laundry cart (push); the vent (crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
 | 118 | `rdr_trunk_bliss` | The trunk's deck 9 door, red, where she arrives | | |
-| 122 | `haz_cart_steward` | The steward's cart jammed across the corridor in a cabin's doorway | The push glyph; E at its east end and walk east: it rolls to 130 and stands there (hop); it cannot be passed before | A cart |
-| 126 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`: `item_card_hk` | Idle, thanks |
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |
-| 141 | `haz_towels_9` | The towel stack in the doorway | `trap(1)` at running speed: it topples onto her: "Buried"; walking past is safe (it wobbles as the tell) | Drawn |
-| 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched" | |
+| 141.6 | `haz_towels_9` | The towel stack by the doorway (once fallen it stays fallen, kept with what she broke, so that the way back from the steward crosses its heap: 2026-11-18), midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
+| 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched"; with none on her or some (`pocket: false`), 16: soaked, a sneeze, back the way she came | |
 | 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); `cp_balcabin` | `room` | Drawn by hand |
 | 158 | `haz_swing_9` | A cabin door that swings open | `reactive(3, 0.6)`; "Bonked" | |
 | 166 | `haz_dnd_9` | A "Do Not Disturb" door | E: "Startled"; otherwise nothing | |
 | 172 | `haz_cart_9_172` + `tan_9_cart` | A standing cart with a tangerine | Hop | |
 | 176, 184 | `room_adjoin_a`, `room_adjoin_b` | Two adjoining cabins with a connecting door between them | `room`: in at 176, through the connecting door, out at 184: the way past the stack | The inside cabin, with a connecting door |
 | 180 | `haz_luggage_9` | A stack of delivered luggage, full height, `tan_9_luggage` behind | Breakable (the dash) or the adjoining loop; not hoppable | Suitcases |
-| 190 | `cp_9_mid` | A crew door | Checkpoint | |
-| 194 | the lobby door | Open (region 4 includes the aft lobby); deck 9 aft's corridor door shut from the lobby (`door_9_aft_lobbies`) | | |
+| 185.2 | `haz_cart_steward` | The steward's tall housekeeping trolley jammed across the corridor, too tall to hop, the steward tugging at its handle (one picture of the two). **At the corridor's aft end since 2026-11-18** (it stood at 122, four metres from the trunk: the card was hers before the vacuum, the towel stack and the sprinkler) | The push glyph; E at its forward end and walk east: it rolls to 189.0 (3.8 m) with him stepping back, and stands back against the wall there (not solid); it cannot be passed before. She pushes at 40 px/s, 29 px from its middle (2026-11-18: her push remade, its steps on the floor) | The trolley, his tug, steps and toss |
+| 186 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`, short (2026-11-18: about 1.3 s to the toss): he steps back, thanks her and tosses her `item_card_hk`; she is free to go on meanwhile, he turns to her as she passes, the card comes down where she is | Idle, thanks, toss |
+| 188 | (the corridor's own) | No small housekeeping cart along the trolley's way, and the wall picture there hangs in the nearest empty gap (by rule, `drawCabinDoors`) | | |
+| 190 | `cp_9_mid` | A crew door (drawn at 191.6) | Checkpoint | |
+| 194 | the lobby door | `oneway(the corridor)`, as on decks 8 and 10 (2026-11-18): shut from the aft lobby until she opens it from the corridor, so that she cannot come up behind the steward by deck 7 and the aft stairs; opened once, it stays open (`door_9_aft_lobbies`) | | |
+
+**The corridor is the way (the user, 2026-11-18; built the same day)** (GAME_DESIGN.md, region 4): the steward at
+its aft end, so that the card is earned past everything and brought back; the way back is the
+corridor changed (the towel stack fallen, the luggage broken if she broke it).
 
 **The aft hallway 202-249.5 (region 7), "the sprinkler test".** 206 `haz_swing_9a`; 214 and 222
 `haz_sprinkler_9a`, `haz_sprinkler_9b`, two sprinklers 8 m apart out of phase (`timed(5, 2)` each,
@@ -632,7 +642,7 @@ along the Spinnaker balcony's front above bars the jump down from deck 12 (§6.1
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 32 | `tan_11_spa` + `amb_spa_reception` | The reception's fruit bowl, the receptionist | | |
-| 42-48 | the sauna | Built; `haz_steam` at its aft door 48: `timed(5, 1.5, 48-49.5)`, a puff; contact "Fogged" | A puff sprite |
+| 42-48 | the sauna | Built; `haz_steam` at its aft door 48: `timed(5, 1.5, 48-49.5)`, a puff; contact "Fogged": her gag, 17 (2026-11-18), a burst wraps her, her hair a huge puff, she fans herself and swoons (`Steam.ride`) | A puff sprite; her clips `gags` `steam-*` |
 | 50 | `amb_masseuse` | At a massage table | | |
 | 58 | `amb_salon` | A stylist and a guest under the hood dryer | | |
 | 68 | `amb_aerobics` | Two in a step class | A loop | |
@@ -750,7 +760,10 @@ asked; `amb_cagneys` diners.
 **The Sushi Bar 174-182.** `amb_sushi_chef` behind the counter; two diners. (No sign secret: dropped.)
 
 **Teppanyaki 182-194.** 186-190 `haz_flare`: the chef (`amb_teppan_chef`) flares the grill
-`timed(6, 1, 186-190)`: "Singed"; the flourish is the tell. `amb_teppan` four at the counter.
+`timed(6, 1, 186-190)`: "Singed"; the flourish is the tell. **The chef answers her coming**
+(2026-11-18, the user: run past them, they went up behind her): she runs at a quiet grill and his
+flourish starts so that the flame is up as she gets there; stopped, she passes in the lull after it
+(2.5 s); with no one near, the clock. The flame reaches 0.8 m each way (it was 1.25 m: "too big"). `amb_teppan` four at the counter.
 
 **The aft lobby 194-202.** `blk_fans` from below.
 

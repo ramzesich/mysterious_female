@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -14,10 +14,15 @@ export class BootScene extends Phaser.Scene {
         // Its rooms that are drawn (tools/draw_rooms.py); the others the game draws bare.
         this.load.once('filecomplete-json-world', (_key, _type, world) => {
             for (const r of world.rooms) if (r.art) this.load.image(`room-${r.id}`, `assets/ship/rooms/${r.id}.png`);
+            // (What of a room's picture is in front of the things lying in it: a bowl's side.)
+            for (const r of world.rooms) if (r.front) this.load.image(`room-${r.id}-front`, `assets/ship/rooms/${r.id}-front.png`);
         });
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
+        // A one-way glass door's open leaf, its push bar across it (assets/source/ship/pushbar/).
+        this.load.image('door-glass-pushbar', 'assets/ship/door-glass-pushbar.png');
+        this.load.image('door-glass-oneway-edge', 'assets/ship/door-glass-oneway-edge.png');
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
@@ -39,6 +44,16 @@ export class BootScene extends Phaser.Scene {
         // With Bumbot in her arms (the way home, §6.1.9).
         this.load.spritesheet('her-cat', 'assets/sprites/her-cat.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-cat-meta', 'assets/sprites/her-cat.json');
+        // Her mishap gags, each one picture of her with the thing (docs/plan-three-uses.md §1.6).
+        this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
+        this.load.json('her-mishaps-meta', 'assets/sprites/her-mishaps.json');
+        // The towel stack's own clips (deck 9; tools/build_towels.py): its fall, it on her, her coming up.
+        this.load.spritesheet('towels', 'assets/sprites/towels.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.json('towels-meta', 'assets/sprites/towels.json');
+        // Step 4a's first gags (tools/build_gags.py): the door that bursts open (13a), the tray ridden (3),
+        // the deck chair that collapses (7b), the gull on her head (20).
+        this.load.spritesheet('gags', 'assets/sprites/gags.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.json('gags-meta', 'assets/sprites/gags.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
@@ -111,13 +126,29 @@ export class BootScene extends Phaser.Scene {
         }
         // A start at a bump; her quirks (§6.1.11), each a clip of its own.
         if (meta.anims.hit) this.anims.create({ key: 'her-hit', frames: frames('hit', [0, 1, 1, 2, 3]), frameRate: 10 });
+        // Her falls: down (their first four frames), then dazed where she lies, butterflies circling
+        // over her head (clips of their own, drawn with them).
+        for (const name of ['slipfall', 'tripfall']) {
+            if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name, [0, 1, 2, 3]), frameRate: 10 });
+        }
+        // (Their first frame is the pose they start from, without the butterflies: left out.)
+        for (const name of ['dazed-sit', 'dazed-lie']) {
+            if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name, [1, 2, 3, 4, 5]), frameRate: 6, repeat: -1 });
+        }
+        if (meta.anims.slipback) this.anims.create({ key: 'her-slipback', frames: frames('slipback'), frameRate: 9 });
+        if (meta.anims.stumble) this.anims.create({ key: 'her-stumble', frames: frames('stumble'), frameRate: 9 });
+        // Her reactions to a hit with a tangerine on her (docs/plan-three-uses.md §1.6), once each.
+        for (const [name, fps] of [['reel', 9], ['rubnose', 9], ['splutter', 9], ['arch', 9], ['yelp', 10], ['duck', 9], ['apology', 7]]) {
+            if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps });
+        }
         for (const [name, fps] of [['shiver', 12], ['dance', 9], ['pose', 6], ['bow', 8]]) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name), frameRate: fps, repeat: -1 });
         }
         // Her verbs' own clips (§6.1.2): on hands and knees, pushing a cart; the honeymooners' camera
         // raised to her eye and held.
         if (meta.anims.crawl) this.anims.create({ key: 'her-crawl', frames: frames('crawl'), frameRate: 11, repeat: -1 });
-        if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 9, repeat: -1 });
+        // (11 a second at VERBS.pushSpeed: her planted foot slides back about 3.6 px a frame, as the floor.)
+        if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 11, repeat: -1 });
         if (meta.anims.camera) this.anims.create({ key: 'her-camera', frames: frames('camera', [0, 1, 2, 3]), frameRate: 9 });
         // Region 6: clinging to a wall, slipping on wet tiles, licking a cone, the canister held up,
         // sitting down at the table and eating there.
@@ -138,6 +169,8 @@ export class BootScene extends Phaser.Scene {
         // open parasol's handle.
         if (meta.anims.pull) this.anims.create({ key: 'her-pull', frames: frames('pull', [0, 1, 2, 3, 4]), frameRate: 10 });
         if (meta.anims.throw) this.anims.create({ key: 'her-throw', frames: frames('throw'), frameRate: 12 });
+        // F: her underarm toss (docs/plan-three-uses.md §1.2); THROW.releaseMs is its fifth frame.
+        if (meta.anims.toss) this.anims.create({ key: 'her-toss', frames: frames('toss'), frameRate: THROW.fps });
         if (meta.anims.glide) this.anims.create({ key: 'her-glide', frames: frames('glide'), frameRate: 2, repeat: -1 });
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });
@@ -172,6 +205,56 @@ export class BootScene extends Phaser.Scene {
             order.map(i => ({ key: 'her-cat', frame: held.anims[name][i] }));
         this.anims.create({ key: 'her-cat-run', frames: heldFrames('run'), frameRate: 11, repeat: -1 });
         this.anims.create({ key: 'her-cat-stroke', frames: heldFrames('stroke', [0, 1, 2, 3, 4, 4, 4, 3, 4, 4, 3, 2, 1, 0]), frameRate: 6 });
+        // Her gags with a thing (§1.6): sitting down onto it, the ride, the end of it; the papers' (`gag-<clip>`).
+        const gag = this.cache.json.get('her-mishaps-meta');
+        for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
+                                           ['suitcase-sit', 11, 0], ['suitcase-ride', 8.8, -1], ['suitcase-tip', 11, 0], ['suitcase-dazed', 11, -1],
+                                           ['paper-behind', 10, 0], ['paper-front', 10, 0],
+                                           ['cart-drape', 10, 0], ['cart-kick', 4, -1], ['cart-sit', 10, 0], ['cart-push', 10, 0], ['cart-bounce', 10, 0],
+                                           ['tray-sit', 10, 0], ['trolley-trip', 10, 0],
+                                           ['dog-lick', 8, 1]]) {
+            if (!gag.anims[name]) continue;
+            // (The papers' first three frames quicker: the paper's push carried into the fall.)
+            const fast = name.startsWith('paper-') ? 3 : 0;
+            this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map((f, i) => ({ key: 'her-mishaps', frame: f, duration: i < fast ? 60 : undefined })), frameRate: fps, repeat });
+        }
+        // The towel stack's (`TowelStack` in src/world/movers.js): frame 0 of each is the start, left out.
+        const tw = this.cache.json.get('towels-meta');
+        for (const [name, fps] of [['fall', 12], ['bury', 11], ['emerge', 9]])
+            this.anims.create({ key: `towels-${name}`, frames: tw.anims[name].slice(1).map(f => ({ key: 'towels', frame: f })), frameRate: fps });
+        // The fall on her running (one from each phase of her run): all nine, frame 0 her own run frame; she
+        // runs on in the first at her run's own 14 a second (10 px a frame: her 140 px/s), then 11.
+        for (const n of [0, 2, 4, 6])
+            this.anims.create({ key: `towels-run${n}`, frames: tw.anims[`run${n}`].map((f, i) => ({ key: 'towels', frame: f, duration: i < 4 ? 71 : 91 })) });
+        // Step 4a's first gags (`gags` sheet): frame 0 of a clip is the world's own picture (the shut
+        // door; her own run, slip or standing frame with the thing), left out where the world shows it.
+        const gg = this.cache.json.get('gags-meta');
+        const gf = (name, from = 0, to = gg.anims[name].length, ms) => gg.anims[name].slice(from, to).map((f, i) => ({ key: 'gags', frame: f, duration: ms?.(i) }));
+        this.anims.create({ key: 'gags-door-burst', frames: gf('door-burst', 1), frameRate: 13 });
+        this.anims.create({ key: 'gags-door-squash', frames: gf('door-squash', 1), frameRate: 13 });
+        this.anims.create({ key: 'gags-door-slide', frames: gf('door-slide', 1), frameRate: 8 });
+        // (A "Do Not Disturb" door: open on the guest, held there, then shut.)
+        this.anims.create({ key: 'gags-dnd-open', frames: gf('door-burst-full', 1, 6), frameRate: 13 });
+        this.anims.create({ key: 'gags-dnd-shut', frames: gf('door-burst-full', 6), frameRate: 13 });
+        // (The hop onto the tray at her run's own 14 a second, then the ride; its last four wheel on.)
+        for (const k of ['tray-ride', 'tray-ride3', 'tray-ride1', 'tray-ride5']) {
+            this.anims.create({ key: `gags-${k}`, frames: gf(k, 0, 9, i => (i < 3 ? 71 : 95)) });
+            this.anims.create({ key: `gags-${k}-wheel`, frames: gf(k, 5, 9), frameRate: 9, repeat: -1 });
+        }
+        this.anims.create({ key: 'gags-chair', frames: gf('chair-collapse', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-gull-flail', frames: gf('gull-flail', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-gull-run', frames: gf('gull-run', 1), frameRate: 12, repeat: -1 });
+        // (16, a sprinkler: drenched where she stands, or stopping short from her run at its own 14 a
+        // second; then a sneeze, and she squelches off.)
+        this.anims.create({ key: 'gags-sprinkler-stand', frames: gf('sprinkler-stand', 1), frameRate: 10 });
+        for (const n of [1, 3, 5, 7]) this.anims.create({ key: `gags-sprinkler-run${n}`, frames: gf(`sprinkler-run${n}`, 1, 9, i => (i < 3 ? 71 : 95)) });
+        this.anims.create({ key: 'gags-sprinkler-sneeze', frames: gf('sprinkler-sneeze', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-sprinkler-walk', frames: gf('sprinkler-walk', 1), frameRate: 8, repeat: -1 });
+        // (17, the sauna's steam: her hair a huge puff, she fans herself, then swoons and sits.)
+        this.anims.create({ key: 'gags-steam-fan', frames: gf('steam-fan', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-steam-swoon', frames: gf('steam-swoon', 1), frameRate: 9 });
+        this.anims.create({ key: 'gags-flare-blink', frames: gf('flare-blink', 1), frameRate: 8 });
+        this.anims.create({ key: 'gags-flare-cough', frames: gf('flare-cough', 1), frameRate: 9 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

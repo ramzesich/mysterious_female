@@ -2,12 +2,12 @@
 
 Every place the game can be started at on this computer, for testing. Run `python tools/serve.py`
 first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`), and makes
-the dash free (`tangerines=infinite`).
+D free: the cry and the lunge never use up a tangerine (`tangerines=infinite`).
 
 Useful additions to any link:
 
 - `&reset` clears the saved progress first.
-- `&lang=uk` shows the game in Ukrainian for that session (`&lang=en` for English).
+- `&lang=ua` shows the game in Ukrainian for that session (`&lang=en` for English).
 - `&sound=off` silences it.
 - `&did=<flags>` starts with parts of the story already done (the list is in `README.md`).
 
@@ -35,11 +35,14 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all&tangerines=infinite> |
+| `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all&tangerines=infinite> |
+| `deck4-aft`: deck 4's corridor aft, just forward of the robot vacuum's round | <http://localhost:8000/?play&at=deck4-aft&cards=all&tangerines=infinite> |
 
 ## Deck 5
 
 | Place | Link |
 |---|---|
+| `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all&tangerines=infinite> |
 | `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all&tangerines=infinite> |
 
 ## Deck 6
@@ -74,6 +77,14 @@ new one added there should be added here too.
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all&tangerines=infinite> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all&tangerines=infinite> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all&tangerines=infinite> |
+| `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all&tangerines=infinite> |
+| `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward&tangerines=infinite> |
+| `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9&pocket=off> |
+| `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10&pocket=off> |
+| `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair: 7b) | <http://localhost:8000/?play&at=wet&pocket=off> |
+| `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9&pocket=off> |
+| `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9&tangerines=infinite> |
+| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11&pocket=off> |
 | `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all&tangerines=infinite> |
 | `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all&tangerines=infinite> |
 

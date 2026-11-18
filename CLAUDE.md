@@ -10,22 +10,22 @@ truth**: read the relevant section before any design or content work, and record
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip the welcome screen and the intro, `?intro=<part>` start the intro at a part,
-  `?reset` clear save, `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?at=pool` start at a
-  named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=uk` (Ukrainian for a session). Dash is D.
+  `?reset` clear save (**nothing is saved for now**, the user, 2026-11-16: every load a new game, `DEV_FRESH` in `src/config.js`; `?real` keeps the save, and every playtest opens with it), `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?pocket=off` (a hit is a fright even with tangerines on her), `?at=pool` start at a
+  named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=ua` (Ukrainian for a session). D is the cry and the lunge, F the throw (`docs/plan-three-uses.md`).
 - Hosted on GitHub Pages from `main` root: every asset path must be relative.
 
 ## Layout
 
 | Path | What |
 |---|---|
-| `src/config.js` | All tuning: scale, speeds, jump, dash |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, dash, checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
+| `src/config.js` | All tuning: scale, speeds, jump, the cry and the lunge (`CRY`, `LUNGE`); `MISHAPS`, every obstacle that can hit her by its own name (`scareContact(fromX, name, { vx, dir })`), and `MISHAP_SCENES`, each scenario of a hit (her word, her reaction with a tangerine, where it goes, what stands in for her gag); which scenario a hit is, by its side and who was moving: `src/world/mishaps.js` (docs/plan-three-uses.md §1.6); `TALLY`, a tangerine's flight to the count |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, D (`tryCry`: the cry, and the lunge once learned; `lungeSafe()` turns a fright by contact into `world.lunged()`), checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
 | `src/controls.js`, `src/rumble.js` | Keyboard and Xbox controller mapped to the same actions (§3.1; the whole mapping in its table there), the controller in use being whichever was touched last; the rumble's ten moments, only while she plays with the controller. The `gamepad` playtest drives a fake controller (`Browser.fake_pad()`) |
-| `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=uk`; the welcome screen's LANGUAGE button switches it |
+| `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=ua`; the welcome screen's LANGUAGE button switches it |
 | `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Built 2026-11-14 on the user's word |
 | `src/intro.js` | **The welcome screen, the start sequence and the intro** (it ends on deck 3's corridor: her door opens, she steps out, straightens her badge, the hint; a close-up at her mirror was built first and dropped by the user), all in the ship scene's own picture: one clock (`T`) and everything a function of it (the camera, what is open, what is shown), its parts and their lengths in `PARTS`; `intro.seek(part, k)` shows any moment, Esc ends it, `?play` skips it, `?intro=<part>` starts at a part. A new game gets all of it; a game under way a short way in. While it runs the game holds still (`scene.intro`, `scene.fromAfar`: the ship closed and the sky laid out in the world) |
 | `src/pixeltext.js`, `tools/build_menu.py` | **The welcome screen's menu art** (the user chose brass plates from three mock-ups, 2026-11-14): `assets/source/menu/` (two generated pixel letterings and a generated plate) to the atlas `assets/sprites/menu.png`; `pixelText(scene, key, font, text, style)` sets a word in it (`T` the name's lettering, `S` the plates'), filled in bands, outlined, shadowed. **The lettering is Latin; the Ukrainian capitals are built from its shapes in the build tool, so the menu is in capitals.** A new menu word needs its letters there (`missing()`; the `lang` playtest fails otherwise) |
-| `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and the dash free: add a line when the builder gets a new `place` |
+| `docs/start-links.md` | A localhost link for every place the game can be started at (`?at=`), everything open and D free: add a line when the builder gets a new `place` |
 | `src/sfx.js` | **Every sound, synthesised** (step 12): about 130 effects in seven groups, each with a line saying what it is for, made of two voices (`tone`, `noise`) and a few helpers (`bell`, `clank`, `thud`, `voice`, `applause`); `sfx.name()` at her ears, `sfx.at(x, y).name()` from a place in the world (fainter with distance, silent out of earshot); the ambience's five layers; mute (M). Volumes: `SOUND` in `src/config.js` and each effect's own line |
 | `src/world/soundscape.js` | What nothing in particular makes: the ambience's levels from where she stands (out on deck, inside, how high in the ship, by a pool), her footsteps by what is under her (`floor()`), rungs, a cart's wheels, strokes; the small steady sounds of a few places (`PLACES`) |
 | `tools/check_sound.py`, `tools/soundboard.html` | Every effect rendered by the browser without playing it and measured (loudness, length, a spectrogram each on sheets in `%TEMP%/bumbusik-playtest/sound`): must end "all within bounds". The soundboard plays each by a button and has the ambience on sliders: <http://localhost:8000/tools/soundboard.html>, where the user listens |
@@ -39,6 +39,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/sprites/` | Built sheets: run `python tools/build_sprites.py` after changing sources |
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
 | `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door, the shower room's door and the shower scene's pieces (stall, door slid open, see-through glass, the towel on its handle) |
+| `assets/source/her-mishaps/` | **Her mishap gags, each one picture of her with the thing** (docs/plan-three-uses.md §1.6): states of her character with the thing drawn in, animated v3 (ids in its README); built into `assets/sprites/her-mishaps.png` (`HER_MISHAPS` in `tools/build_sprites.py`, 112 px cells, each clip placed by its thing's middle); played by the ship scene's `rideGag` (`GAGS` in `src/config.js`) for a scenario with `gag`, when the thing that hit her passes `ride` (how it carries her: its way, its floor, `hide()`/`show()`), or by `fallGag` where she stands (the papers: the clip starts with her standing on the world's paper and is set down by where it is, `ride.x`; the breakfast stewardess's tray and trolley, 10a to 10f: on the corridor's floor, `ride.y`, the trolley drawn over her trip, `turn` for a hit at her back), or by `cartGag` with the porter (8a to 8d: he stands, pushes on, wheels her and tips his cap, or turns round). The world's vacuum and suitcase (`assets/source/things/robot-vacuum.png`, `suitcase-rolling.png`) are cut from the same pictures |
 | `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
@@ -54,22 +55,27 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
 | `tools/population.py` | **The plan's world as data**: rooms behind doors, checkpoints, tangerines, pickups, Bumbot's beats, pushables, grips; `tools/build_world.py` turns it into `maps/world.json` (written with the map by `python tools/build_ship_map.py`) |
 | `src/world/world.js`, `verbs.js` | The plan's world in the game: builds everything in `maps/world.json` (rooms, the outside route of promenade, boat walkway and balconies, the duct, the funnel's top, things in place), answers E, ladders and grips; her verbs (crawl, wall jump, glide, push), mixed into the ship scene |
-| `src/world/people.js`, `carry.js`, `story.js` | The ship's people (loops, bubbles, what touching them does); carrying a tray and its rules; the story's own moments, one part per region |
-| `src/world/library.js`, `movers.js` | The Library's books (the return trolley, the shelf with ten gaps, the reading chair and its pages, the full-screen panel for a page or a photo slot); things that move by themselves or answer her coming (the delivery robot she rides, the shy gulls, the stage's swinging light, the casino's chips; deck 9's vacuum that darts out, towel stack, sprinkler, door that flies open, "Do Not Disturb" door) |
+| `src/world/people.js`, `carry.js`, `story.js` | The ship's people (loops, a door on the way opened or turning them back: `door()`, bubbles, what touching them does, what her cry and her lunge do to them: `heard`, `lunged`; eating a tangerine from the hand, bite by bite, the fruit at the fist of each frame of their `bite` clip: `eat()`, `FISTS`; each mover has its own `heard()`/`lunged()`, `world.shout()` and `world.lunged()` pass the word on); carrying a tray and its rules; the story's own moments, one part per region |
+| `src/world/tangerine.js` | A tangerine loose in the world (`LooseTangerines`, the scene's `loose`): knocked out of her pocket (the ship scene's `pocket()`, at the top of `scareContact` and `Carry.spill`) or thrown (F: `tryThrow`, `THROW` in the config), it bounces and rolls on her floors by its own route, rests, is kept in `save.loose`, picked up by walking over it, floats in a pool, is lost to the sea; offered each frame, lying or not, to whatever wants it (`world.offered(t)`: the scene's `offeredHere`, a lob into the piñata, each mover's `offered`, `people.offered`, `story.offered`; `loose.near()` is their test, `loose.claim()` hands one over, `world.gullTakes()` is any gull's). Its picture is `FRUIT` in `src/textures.js` (PixelLab's, chosen by the user; raw in `assets/source/tangerine/`) |
+| `tools/hold_tangerine.py` | Puts the tangerine in her fist in her toss's frames (`assets/source/her/toss/` to `toss-held/`, which the sprite build uses) |
+| `src/world/library.js`, `movers.js` | The Library's books (the return trolley, the shelf with ten gaps, the reading chair and its pages, the full-screen panel for a page or a photo slot); things that move by themselves or answer her coming (the delivery robot she rides, the shy gulls, the stage's swinging light, the casino's chips; deck 9's vacuum that darts out, towel stack, sprinkler, door that flies open, "Do Not Disturb" door; region 1's suitcase that rolls with the ship, the dog on a lead that fetches and trips her, the paper rounds, the breakfast round: `Roller`, `Fetcher`, `Skimmer`, `Breakfast`; a door's hand that takes things in is `world.handTakes()`, a round's doors are only those the corridor draws, `realDoors`) |
+| `tools/check_corridors.py` | From the data alone: per deck, the longest walk with nothing to do and the longest without a reward (`docs/plan-three-uses.md` §4.7): run at the end of a step that places things on the decks, and give its numbers |
 | `src/world/lido.js`, `hazards.js` | Region 6's part of the story, mixed into the Story (the pool's scene and its draining, the kid with the water pistol, the soft serve machine's swirl, the table with her husband, the chess set, the hot tub); the pool deck's and the hallways' hazards (the wet patch and its deck chair, the gulls that dive at food, the buffet queue, the trays outside a "Do Not Disturb" door) |
 | `src/world/outside.js` | Region 7: the balconies' own things (gusts, the gulls perched on the rails, laundry lines across a folded partition, balconies with someone on them), the boat drill on the walkway, the steward on his rounds; and its part of the story, mixed into the Story (the ajar balcony doors, the guest locked out on his balcony, the security officer at a tender). The vault over a partition and the climb up its pole are in `verbs.js` |
-| `src/world/topdeck.js` | Region 8: deck 12's and the funnel's own things (the old lady's sunbed, the court's basketballs, Teppanyaki's flares, the funnel's wind and circling gulls, the flocks on the bow) and its part of the story, mixed into the Story (the mojito, the engineer's coffee, the horn and what it sets off, the telescope, the court's shot). The glide's rules are in `verbs.js` and the ship scene (`overTheRail`) |
+| `src/world/topdeck.js` | Region 8: deck 12's and the funnel's own things (the old lady's sunbed, the court's basketballs, Teppanyaki's flares (the chef answers her coming: `FLARE` in the config; her gag 19, `Flare.ride`), the funnel's wind and circling gulls, the flocks on the bow) and its part of the story, mixed into the Story (the mojito, the engineer's coffee, the horn and what it sets off, the telescope, the court's shot). The glide's rules are in `verbs.js` and the ship scene (`overTheRail`) |
 | `src/world/bow.js` | Region 9: the bow's own things (the sauna's steam, the kids' club's ball pit, the step class's boards, the bridge's alarm) and its part of the story, mixed into the Story (the wedding planner and the cake, the party into the chapel and the ceremony, the piano, the slide, the captain's door, near-catch 6 with the net on the alarm panel and the hatch's ladder, the Library's odd book and the nook). A fragile load's sway is in `carry.js` (`SWAY`) |
 | `src/world/finale.js` | Region 10 and the end: the wind over the bow and the two crossing gulls; and its part of the story, mixed into the Story (the sunset's scene, Bumbot at the tip who backs off and comes to her standing still, the catch, where a miss puts her back, those who clap her home, cabin 8206's scene, the win screen, the day after). Her look and rules with Bumbot in her arms are the ship scene's `holding` (`HOLDING` in `src/config.js`; her sheet `assets/sprites/her-cat.png` from `assets/source/her-cat/`, PixelLab state `6905f308-15b1-4a44-ad97-a38a7ad17dff`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
-| `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`), and the sheet `assets/sprites/people.png`; `tools/fetch_her.py <animation>` does the same for a new clip of hers |
+| `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`; the dog and its owner are kept by hand, `BY_HAND`), and the sheet `assets/sprites/people.png`, every clip's frames set on the floor (`OFF_THE_FLOOR` the ones that leave it); `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
-| `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) |
-| `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals); the ten books' pages drawn in code (`assets/ship/pages/`) |
+| `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) ; what of a room is in front of the things lying in it (a bowl before its tangerines) is marked with `Room.in_front()` and saved as `<id>-front.png`, drawn over them |
+| `tools/build_towels.py` | **The towel stack's own clips** (deck 9; `assets/source/things/towel-fall/`, its README has the ids) to `assets/sprites/towels.png` + `.json`: its fall alone, the fall on her (from her standing, and four from her run's phases), her coming up in a towel turban with a towel swan, and the standing stack and stool apart. Played by `TowelStack`; the fall on her is a gag the thing plays itself (the ship scene's `thingGag`, `ride.play`) |
+| `tools/build_gags.py` | **Step 4a's gags, each the thing's own clip with her** (`assets/source/her-mishaps/batch-4a/`, its README has the ids) to `assets/sprites/gags.png` + `.json`: the swinging door alone and slamming her flat (13a) and her slide down the wall, the same swing in full colours for the "Do Not Disturb" doors, her tray ride from four quarters of her stride (3; the world's tray base moved under her by the game, `trayAt`), the deck chair collapsing under her (7b), the gull on her head (20), soaked under a sprinkler, her sneeze and her squelch back (16), her hair a puff out of the sauna's steam, fanning herself and swooning (17), sooty out of Teppanyaki's flare, blinking and coughing out a puff (19; its greys on her hair's charcoal, `SOOT`). Each played by its mover (`ride.play`, the ship scene's `thingGag`). The door clips keep their own (muted) colours: only her pixels go on the palette |
+| `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
-| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
+| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder. **On the stepped clock** (`docs/plan-fast-tests.md`, built 2026-11-18): once a page is loaded the test stops the game's loop and steps it itself, a sixtieth of a second a frame, undrawn unless a screenshot is wanted (`takeover`, `Browser.advance`); every wait in a scenario is `wait()`, every deadline `now()`. `-j 6` a process and a browser for each scenario, six at a time (the whole suite in about a minute); `--failed` those that failed last time; `--times` each one's time; `--real` real time, for comparing; `--seed N` the random draws' seed. `boot` and `sound` always run in real time. A scenario's cases: `scenario_region4__towels` is `region4.towels`, and `region4` runs it with the rest. The other tools that use `Browser` (`check_overlaps`, `shoot_people`, `render_ship`) are stepped too, `--real` for the old way; `check_sound` is real |
 
 ## Rules that are easy to break
 
@@ -78,6 +84,11 @@ truth**: read the relevant section before any design or content work, and record
 - No death: failures are "scares" (run off, long fall out of frame, life ring overboard). Never use
   the word death, in code or on screen.
 - Nothing floats: every object rests on or hangs from something plausible.
+- **Doors and walls across a deck stop whatever moves, not only her** (the user, 2026-11-17;
+  docs/plan-three-uses.md §1.8): a moving thing stops short of a door's face (`stopShort`,
+  `spanOn` in the ship scene), never on it; a person walking a loop opens a door with no lock and
+  goes through (`door()` in `src/world/people.js`), a locked one turns them back. A new mover
+  uses these, never its own range across a door.
 - Sprites face east; west is `flipX`. Background props are muted so they never read as interactive.
 - **Every door she can use is drawn in its full colours**, never washed or muted, so it stands out a
   little as something to use (the user, 2026-11-15): in rooms, in corridors, side-on in the walls
@@ -136,7 +147,28 @@ meant five).
 ## Art: PixelLab (MCP)
 
 - Generations cost money (Tier 1 month: 2000 generations until 2026-11-30). **State the cost and
-  ask before spending generations.** Several jobs can run at once.
+  ask before spending generations.** Several jobs can run at once. **Except for pictures (the user,
+  2026-11-16): "Don't hesitate to generate new/updated props in order to implement things properly
+  visually. Use the generations."** A new or better prop, figure or clip that makes a thing look
+  right is made without asking first; say in the report what was made and what it cost, and show
+  it enlarged as always.
+- **Art is generated, not drawn in code, and not put together from other scenes' props** (the
+  user, 2026-11-16: "use generations instead of attempting to draw by itself, or reuse part of
+  props from other scenarios"). Code drawing stays for what is flat by nature (a band of colour, a
+  wash, a rope's line, a jet of water) and the rooms already drawn that way. Cutting rows out of a
+  generated picture to size it, and putting its colours on the palette by hand, are fine.
+- **A person with a thing is generated together** (the user, 2026-11-16: "in a specific use case
+  that requires some animation or scene, generate people with objects together, that way it looks
+  more natural"): her dazed with butterflies over her head is one clip of her with them, a lady in
+  her armchair one picture, not a figure with props laid over it in code. Props placed by code stay
+  for things truly separate in play (a tangerine that flies off and lands).
+- **Every generated picture or clip is checked frame by frame before it is shown as a candidate**
+  (the user, 2026-11-18: "Make this a rule. Do it when you're generating imagery, before suggesting
+  final versions for my review"), enlarged and measured by pixels, and fixed first: (1) overlaps that
+  make no sense; (2) anything that breaks a seamless hand-over, seen (a thing changing shape, colour
+  or place between the world's picture and the clip, or frame to frame) or in time (a hold, a delay,
+  a jump in speed); (3) anatomy in every frame; (4) spatial alignment (feet and things on the floor
+  line, things on what holds them, nothing drifting). Say in the report what was checked and fixed.
 - For her animations use `skeleton-v3` mode: it moves her stored sprite instead of redrawing it, so
   hair and proportions stay consistent. Template mode redraws and drifts.
 - Save raw output to `assets/source/`, convert with the palette tools, never commit reference photos.
@@ -374,6 +406,182 @@ Lessons learned (2026-11-14, step 12, sound):
   brief that names what they may not do (no browser, no tools, no other files); read their
   doubts, they found a fault in the engine.
 
+Lessons learned (2026-11-17, the breakfast stewardess):
+
+- **A clip drawn with a world thing that stays in the world** (the trolley she trips over, the
+  trolley the stewardess pushes): make it with the game's own picture of the thing in the start
+  frame, then take the thing out of every frame (inside its box, a pixel nearer its colours than
+  the figure's; then loose specks) and draw the world's own over or under the figure. It never
+  changes, whatever the generator did to its copy.
+- **Hands that must stay on something while the legs walk:** v3 swings them with the step (5 px,
+  then 4 px again); pixminimax (1 generation) held them on one pixel. Measure the hand and the
+  planted foot in every frame by colour: a foot that creeps forward and back reads as "dancing";
+  two even steps whose planted foot slides back steadily, played at speed / slide frames a second,
+  keep pace with the floor.
+- **A gag is set on the floor of the place, not at her feet:** stood on a cart's top, she sat in
+  the air once it moved on.
+- **A GIF saved by PIL merges repeated frames:** count frames from the game's clock, not the GIF.
+- **Sliding a thing into a door crosses whoever holds it** when the door's hand is on their side:
+  it shrinks a little where it is held and is gone (`handTakes(..., { shrink })`).
+
+Lessons learned (2026-11-17, the art rule looked back over):
+
+- **A thing must read in its place at the game's size, not only enlarged:** a feather toy 6 px
+  tall on a thin shelf read as "a shelf glitch"; stood on end with nothing holding it, "stuck in
+  the shelf". Compose it at its spot, at 1:1 and enlarged, before showing it.
+- **A tiny picture is shrunk by majority colour, not averaged** (`BY_MAJORITY` in
+  `tools/build_things.py`): a flag's cloth averaged with its outline went dull. **And a picture
+  near its game size is never resampled:** 51 px to 44 deformed a cart; cut rows out of a plain
+  part instead (`CUT_ROWS`, or by hand).
+- **A strict side view that text will not give:** `edit_image_pro_flash` from the try whose look is
+  liked, "redraw this same ... in strict side profile" (5 generations).
+- **A pictogram has about 16 px:** a finger to the lips is lost at that size whatever the drawing;
+  pick a sign that survives it (a speaker crossed out).
+- **A deck's dim reaches 16 px under its floor:** anything that tests her body against a deck
+  counts her head past the floor, not into the ceiling below it.
+
+Lessons learned (2026-11-17, the dog and its owner made together):
+
+- **Two things joined by a line that changes length** (a lead, a rope to a moving thing) are not
+  one generated picture: make them together once for their look and size, then draw the line
+  from ends measured in every frame of both clips, in the picture's own colours, px by px
+  (whole px, rows rounded, joined side by side), its depth between them as the picture has it.
+- **Map objects don't draw people** (silhouettes, no faces): a person, even with a thing, is a pro
+  character in the cast's style.
+- **A quadruped's template clips redraw it as another animal**: PixMiniMax from its own approved
+  picture holds it (a sit toward the approved sitting picture as its end frame); skeleton-v3
+  keeps the look but may stretch the body. Compare every clip with the approved still on one
+  floor line before anything else.
+- **A person's clips are set on the floor frame by frame** (`OFF_THE_FLOOR` in
+  `tools/build_people.py` lists the clips that leave it): PixelLab's frames drift 1 to 4 px.
+- **A sound tied to a clip** (footsteps) plays on the clip's own frames, not by a distance that
+  only matches it at one speed.
+- **An exception to a rule of hits** is a property of its scenario read where the rule is
+  applied (`pocket: false`, asked by `pocket()`), never a check at one caller.
+
+Lessons learned (2026-11-17, the dog's together clips):
+
+- **A together clip hands over by its own pictures, not by matching drawn lines to them:** the dog
+  runs to the spot where its sprite lies on their picture, and the clip starts; at the end the
+  clip's last frame is held until something moves (the dog gets up), and the game's lead takes over
+  then. A drawn line made to match a picture's at rest never quite did.
+- **A clip played backwards moves things the way they do not face** (the dog would run tail first):
+  the way back is a clip of its own, from the end picture to the start one.
+- **A thing handed on from a clip to the game** (the ball from her hand): the clip has it until the
+  frame the hand opens, and the game's starts moving from where it was held at that very frame; it
+  never stands still in the air a frame. Its depth follows what it passes: behind the fingers that
+  hold it, in front of whoever it reaches.
+- **Phaser's tweens keep a wall clock of their own:** a thing moved by one is not slowed by the
+  game's clock (a recording stepped frame by frame showed the ball three times too fast); move it
+  on the scene's `update` with `time.now`.
+- **Someone who comes to her while she is down holds her checkpoint** (`down.holds` in
+  `scareDown`), never a longer fixed wait.
+
+Lessons learned (2026-11-17, the steward's jammed trolley):
+
+- **A block must look like one:** a low cart standing for a wall to the ceiling read as "an invisible
+  wall" and the scene as "weird and unclear". What stops her is drawn at the size it stops her (too
+  tall to hop, it is taller than her jump).
+- **Someone working at a world thing that moves** (a trolley pulled, then pushed) is one picture of
+  the two while they are together, the world's thing hidden; the world's own is cut from that clip's
+  frame, so the hand-over matches. And a clip for every way they move together: tugging in place,
+  and stepping as it rolls (legs still while sliding along read at once).
+- **A thing given is tossed, not flown:** `world.tossOver` with the giver's toss clip (in the
+  fingers until the hand opens, then a lob); a thing that just crosses the air to her was "just
+  flying at her".
+- **Before reporting a block, find what it is:** I first showed the user a different trolley (the
+  breakfast stewardess's, the same picture) than the one in their screenshot. Match the person in the
+  picture before answering.
+
+Lessons learned (2026-11-18, the towel stack's fall):
+
+- **A clip of her caught while she runs starts from her own run frame, and she runs on in it:** one
+  from her standing made her "deliberately stop for a fraction of time to let the towels fall"
+  (the user). Pinned to an end where she already stands she runs on the spot: start her where the
+  thing first reaches her and end where she is caught, so the clip must carry her forward (about her
+  run's px a frame), and play its first frames at her run's rate. One clip per phase of her stride
+  (four of eight frames), the one whose first frame is the pose she shows next.
+- **A thing that falls on her falls when she is where its clip has her**, not on a timer that
+  happens to fit one speed; and a sway or wobble eases to the clip's first pose before it takes over.
+- **Generated motion of many small pieces: pin the end.** Unpinned, a stack fell as one stiff column
+  and landed "like books"; an end picture made of its own pieces lying scattered gave the scatter.
+  Generated heaps as map objects came as snow drifts, swans as birds (a beak whitened by hand at
+  15 px reads as a towel swan).
+- **`edit_animation` restyles a clip and keeps its motion to the px** (4 frames a call at 128 px,
+  10 generations each, the same seed and wording for every call): the redrawn first frame becomes
+  the thing's standing picture, so the world and its clips stay one.
+- **A heap or a prop that lands on the floor is behind her** as she crosses it (the user), with
+  whatever is in its picture (the stool).
+- **Before placing a thing that grows when it moves, measure what it reaches:** a heap 90 px each
+  way does not fit between cabin doors 159 px apart; and look at the wall behind a tall thing (a
+  picture hidden behind the stack). Things of the corridor's own rule move out of a world thing's way
+  by rule (`drawCabinDoors`), not by hand.
+
+Lessons learned (2026-11-18, step 4a's first gags):
+
+- **A clip starts from the frame the game shows at that moment, taken from her built sheet**
+  (`assets/sprites/her.png`, cell 84, feet on its bottom row), never her source frames: they sit
+  1 px apart. And from the clip she is actually in (sliding on the wet patch she plays her slip,
+  not her stand). Where she can be in several phases, one clip per phase (four quarters of her run).
+- **A thing in her clip that the world shows too is the world's own, moved by the game** (the
+  tray's base under her feet): then she can land on it anywhere, and it never changes. A thing
+  that only sits on her (the gull) is pasted back from the world's picture where it does not move.
+- **A world picture with holes looks different on another background:** the cabin door's inset
+  lines are holes the wall shows through; over a doorway's dark they turned dark. Fill holes with
+  what the world shows through them, and keep the frames that must equal the world's exactly.
+- **A muted twin turns back into the full picture exactly** (`c = (m - 0.35 w) / 0.65`, then each
+  muted colour's own pair): one generated clip serves both kinds of door.
+- **Someone in a doorway is inside the room**: cut to the opening (`People.doorway`, Phaser's
+  crop; the Mask filter in world space hid them whole) and on its threshold.
+- **A clip's pace is checked in time, not only in pictures:** a first frame played slower than her
+  run held her pose while she glided ("a pause"); never slow a hand-over frame, start nearer.
+- **Look at what a thing reaches in the world before trusting a scenario:** the deck chair could
+  never catch her on so short a patch, and the door burst while she was still too far; both were
+  found only by walking at them with real keys.
+
+Lessons learned (2026-11-18, deck 9's corridor, her push):
+
+- **A walking clip is paced by its planted foot:** measure how far it slides back a frame (its lowest
+  row, frame by frame); frames a second times that is the speed it must move at, or her shoes slide
+  on the floor (the push: 2.5 px a frame at 9 a second while the cart rolled 60 px/s). Generated with
+  the world's thing in the start picture, then the thing taken out, the steps come out even.
+- **Two things that move together are placed one from the other after the physics**, on the scene's
+  `postupdate` (the cart from her, `pushFollow`): set in `update`, the gap read differently by the
+  moment. **And a gap of a half px flickers** under `roundPixels` (each sprite is rounded alone): keep
+  such gaps whole.
+- **A scene started by a flag can be undone by the code that set it:** the push's last step set
+  `cart_free` (which started the steward's scene and stopped her), then set her mode back to play. Look
+  at what runs after a `setFlag` before trusting a scene to hold her; and a scene that need not hold her
+  is better not holding her (the steward turns to her and his card follows her).
+- **A variant of a picture the game already has** (the one-way door's push bar on the glass door drawn
+  in code): render the game's picture exactly and inpaint only a band of it (`inpaint_image_pro_flash`
+  returns every other pixel as it was): the two stay one pair by construction.
+- **A thing with a use reads by how it is used, not only by how it looks:** a push-bar door must swing
+  away from the side it is pushed from, and a door with nothing on one side must not open from it.
+  Before showing a new look, play it both ways.
+- **Someone inside a room seen through its door is part of the room:** cut to the opening and washed
+  as it is (a copy of the frame filled with the wall's colour at 30% over them; Phaser 4 has no
+  `setTintFill`: `setTint(c).setTintMode(Phaser.TintModes.FILL)`).
+- **Describe her body, never the cause, in a clip's motion** (16): "water pours down on her" drew a
+  thick blue column over her, unlike the game's fine rain; "she gasps and flinches, her hair goes limp
+  and slides down over her face" gave the soak alone, the world's own rain over it.
+- **A thing drawn above her layer shows through a deck she is not on** (a sprinkler's rain, deck 8's
+  right under deck 9's, fell "through the floor"): draw it only while she is on its deck, as
+  everything else on another deck stands still.
+- **Screenshots of something moving are taken without pausing the game:** a close-up pauses it about a
+  second each, so a timed series all caught its start. Shoot the page and crop by the camera's view.
+
+Lessons learned (2026-11-18, Teppanyaki's flares):
+
+- **A hazard on a clock of its own reads wrong to a player running past:** she met the tell, and the
+  flame went up behind her ("usually", the user). A timed danger she runs into answers her coming, by
+  her speed (the tell starts so that it is at its worst as she gets there), with a lull after it, and
+  never once she is too near for it to meet her. With no one near, the clock.
+- **Grey on the palette goes green:** Resurrect 64's nearest dark greys to a neutral grey are greenish
+  (`#313638`, `#374e4a`); a sooty face read as green in the game, though the strips looked grey. Put
+  greys on the palette's purple greys by hand (`SOOT` in `tools/build_gags.py`) and look at the built
+  sheet, not the source frames.
+
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
@@ -388,22 +596,45 @@ Lessons learned (2026-11-14, step 12, sound):
   again and again: the user prefers removing it to over-iterating. Free fixes are fine to just do.
 - Work on a feature branch; merge to `main` and push only when the user approves.
 - **Every game link given to the user includes `&tangerines=infinite`** while we develop, e.g.
-  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish). **Whenever you
+  <http://localhost:8000/?play&at=library&tangerines=infinite> (the user's wish); **while
+  `docs/plan-three-uses.md` is being built, a link to try something that needs no tangerine on
+  her (a mishap's gag) leaves `&tangerines=infinite` out** (the user, 2026-11-16: "if I need to
+  test scenarios without tangerines, give me links without tangerines"). **Whenever you
   ask the user to try or check something, give the link**, starting as near the spot as `?at=`
   allows, and say where to walk from there.
 - **After each change, show the result and stop for the user's review** (screenshots in the chat,
   plus the link when there's something to try). Don't carry on into test runs, commits or the next
   change before they answer (the user, 2026-11-06: iterations were too slow, and twice I went on
   without asking). Commit and update `GAME_DESIGN.md` once per approved round.
-- **The whole `tools/playtest.py` suite is not required, not after a change and not before a
-  merge** (the user, 2026-11-14). It had been the rule before every merge; it was about 35
-  minutes long by step 11 and about 65 after step 12, and the user had it cancelled before a
-  merge: "an impractical amount of time". It was already too long before the sound came (the
-  user), so switching the sound off in the tests is no answer: the suite itself has to become
-  shorter (it has grown by a scenario of some fifty checks with every region). Until a way is found to
-  make it practical again (the user: "we'll have to find a solution for that"), run the scenarios
-  a change can touch (`python tools/playtest.py boot sound region6 ...`), and say plainly which
-  were run and that the rest were not. Never start the whole of it unasked.
+- **After each approved step: commit, save and record everything, then say it is safe to compact**
+  (the user, 2026-11-16: "Commit, and save and record everything. Tell me when it's safe to compact
+  the context without losing anything. Make it a rule after each step"). That is: the step's log
+  entry in `docs/progress-decisions.md`, `GAME_DESIGN.md` §8's next-up, this file's table and
+  rules, the memory notes (progress, any new rule), the raw art and its ids kept in the repo, the
+  commit on the feature branch, the tree clean; then one line: "safe to compact", with what is
+  next.
+- **The tests are fast now: the stepped clock** (`docs/plan-fast-tests.md`, built 2026-11-18 on
+  the user's word: "come up with a smart solution to speed up the development cycle without
+  compromising on QA"). The whole suite had become about 65 minutes in real time (the user, 2026-11-14:
+  "an impractical amount of time"; it was then no longer run before a merge). Stepped, the 38
+  scenarios take about 4 minutes one after another and **55 s six at a time**, every check with the
+  same result as in real time (878 compared). **The rule stays as it was** (the user, 2026-11-18,
+  asked whether the whole suite should now run before each merge: "The old rule"):
+  - **after a change:** the scenarios it can touch, stepped (`python tools/playtest.py boot region9`),
+    a few seconds each; say which were run and that the rest were not;
+  - **never start the whole suite unasked**, not before a merge either; when the user asks for it,
+    `python tools/playtest.py -j 6`, and the real-time set `python tools/playtest.py --real boot
+    sound deck3` if asked for (the real loop, the sound's own clock, the game's own start);
+  - **whatever is judged by eye** (motion, pace, a gag) is the real game, as before: the user's play,
+    and recordings stepped by hand.
+  A failure is read, not run again until it passes: `--failed` reruns only those, `--seed N` replays
+  the random draws.
+- **A wait in a test waits for the thing, not for a time** (found building the stepped clock): a
+  fixed wait tuned in real time had real time's slack in it (each call into the page let a frame or
+  two pass), and stepped it ended a few frames short: a jogger not yet by, a jump still over the
+  trays, her still on the funnel stairway's last step. Wait until the state is reached
+  (`hold_until`, `wait_for`, a loop on `now()`), with a limit; time a key press from the thing it
+  answers (0.15 s into the jogger's pause), not from the start.
 - **Tests run with the sound off** (the user, 2026-11-14: "When you're testing, please test with
   sound off": every headless run had been playing through their speakers). The test browser is
   muted at the browser (`--mute-audio` in `tools/playtest.py`'s `Browser`, which every tool
@@ -420,6 +651,13 @@ Lessons learned (2026-11-14, step 12, sound):
   screenshots in the chat, and say plainly what changed.
 - **To approve a piece of art, show the user the image in the chat** (a preview or screenshot) and
   ask; don't send them to launch the game for it.
+- **Every visual change, update or new prop is approved before it is placed in the game or
+  tested** (the user, 2026-11-16: "make me approve visual changes/updates/new props before you
+  start placing them in the game and testing them"): a generated picture, a cut-out, a clip, a
+  mended edge, shown enlarged (beside what it comes from, or beside her), then stop for the word.
+  Only then the sheets, the code, the playtests. (I had cut the world's suitcase from her riding
+  picture, squared its rounded corners in the mending, and placed and tested it before the user
+  saw it.)
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
 
@@ -512,5 +750,42 @@ Lessons learned (2026-11-14, the intro shown to the user):
   atlas (`foot`), and the game stands it by its frame (`setDoorArt()`), never by cutting it. And
   check what the two states share besides the frame: which side the handle and the hinges are
   on (both open doors came mirrored against their closed ones), where a plate sits.
+- **A state of her character on a bigger canvas can come out bigger than her** (the paper gags'
+  stills, a quarter bigger on 80 px; the suitcase's came right): set it beside her standing
+  sprite before showing it. **A clip v3 from her own sprite padded into the bigger frame keeps her
+  size**, and an end frame (the state's still shrunk to her size, roughly) steers its last pose;
+  a thing she meets can be put in that start picture (the paper under her foot). The clip's frames
+  are then the stills shown for approval (1 to 2 generations a try).
+- **A GIF counts time in hundredths of a second:** 66 ms frames are saved as 60 and play 10%
+  fast (the user judged a pace by one). Record at 70 or 100 ms a frame, from game time (the game
+  loop slept between grabs), and say where in its range a moving thing met her: a ride from
+  halfway is half as long as one from an end.
+- **Something kept over her head through a generated loop** (butterflies): set it in the start
+  picture, the end frame the same; described alone, v3 had them fly off.
+- **Palettizing white paper turns it pale green** (Resurrect 64 has no light neutral grey): put a
+  paper's greys on the palette by lightness (`assets/source/things/newspaper-sliding/README.md`).
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.
+
+Lessons learned (2026-11-18, the stepped clock):
+
+- **Undrawn frames skip what Phaser does while drawing:** a camera follows her and updates its view
+  in its `preRender`, so stepped undrawn the "out of the screen" test of a ride read a view left at
+  the gangway and ended the ride at once. `__advance` calls each camera's `preRender` itself.
+- **The game's scenes `await` their waits and tweens** (`world.cut`, `world.wait`, `world.tween`):
+  a promise's continuation runs only when the browser gets its turn. Stepped in one go, a batch of
+  frames ran all its frames first, and each `await` came late by up to the batch (the chute's fall
+  0.2 s late, which only a screenshot showed). Between two frames `__advance` gives the browser its
+  turn (a message on a channel: no delay of its own, after every pending continuation).
+- **Whatever reads the loop itself must be kept as the loop keeps it:** the cake's sway read
+  `game.loop.delta`, frozen once the loop was stopped, and the cake never swayed. `__advance` sets
+  the loop's time, delta and frame each frame.
+- **A real-time check can pass by luck of timing:** the trunk's "Deck card" passed only because the
+  calls into the page let 0.9 s pass after the stairs' own lock message (`lockedUntil`). Stepped,
+  such a check fails every time: it is a find; mend the test (or the game), never pad the wait.
+- **What is still not the same from one run to the next:** the game's clock at the takeover (how
+  long the page took to load) sets every timed thing's phase. A check that must catch a thing in
+  its round waits for the round (`wait_js` on its phase), with room for a whole round.
+- **Six browsers at once need a server that keeps up:** Python's default backlog of five refused a
+  file and a sheet's data never came (`Server.request_queue_size`); a page that does not come up
+  is loaded once more, its errors printed as a note.

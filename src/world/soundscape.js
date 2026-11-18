@@ -123,8 +123,17 @@ export class Soundscape {
             if (this.walked >= stride) { this.walked = 0; sfx.step(this.floor()); }
             if (this.rolled >= 20) { this.rolled = 0; sfx.roll(); }
         } else if ((s.mode === 'play' && s.grounded && !s.wading && !s.slipDir) || (s.mode === 'scripted' && dy === 0 && dx > 0)) {
+            // Running: a step as a foot comes down in her clip (SOUND.runSteps); else by the floor walked.
+            if (!s.crawling && p.anims.isPlaying && p.anims.currentAnim?.key === 'her-run') {
+                const i = (p.anims.currentFrame?.index ?? 1) - 1;
+                if (i !== this.runFrame && SOUND.runSteps.includes(i)) sfx.step(this.floor());
+                this.runFrame = i;
+                this.walked = 0;
+                return;
+            }
+            this.runFrame = -1;
             this.walked += dx;
-            const each = s.crawling ? stride * 0.8 : s.isDashing() ? stride * 1.35 : stride;
+            const each = s.crawling ? stride * 0.8 : s.isLunging() ? stride * 1.35 : stride;
             if (this.walked >= each) { this.walked = 0; sfx.step(s.crawling && s.route !== 'duct' ? 'crawl' : this.floor()); }
         }
     }

@@ -106,7 +106,7 @@ export class Crossers {
             // (Only in the air: on a deck she is under its flight.)
             const hit = s.mode === 'play' && s.route === 'inside' && !s.grounded && Math.abs(p.x - b.x) < 14 && y > p.y - PLAYER.height + 2 && y < p.y - 4;
             if (hit) sfx.at(b.x, y).gull();
-            if (hit) s.scareAir('swooped');
+            if (hit) s.scareAir('crossgull', { snatch: b.sprite });
         }
     }
 }
@@ -274,6 +274,22 @@ export const finale = {
             this.heart(cat.x, cat.y - 28);
         }
         if (T.still >= TIP.stillMs) this.catchScene();
+    },
+
+    // Her cry at the tip of the bow: he backs off, as when she moves.
+    tipHeard(cry) {
+        const cat = this.tipCat, T = this.tip, her = this.scene.player;
+        if (!cat || !T || T.busy || this.catching || !cat.visible || !this.world.hears(cat.x, this.F.mooring.y)) return;
+        this.spook(cat.x < her.x ? -1 : 1);
+    },
+
+    // A thrown tangerine coming at him at the tip: he backs off, as when she moves. It rolls on.
+    tipOffered(t) {
+        const cat = this.tipCat, T = this.tip, her = this.scene.player;
+        if (!t.thrown || !cat || !T || T.busy || this.catching || !cat.visible) return false;
+        if (Math.abs(t.img.x - cat.x) > 2 * M || Math.abs(t.img.y + 3 - this.F.mooring.y) > 30) return false;
+        this.spook(cat.x < her.x ? -1 : 1);
+        return false;
     },
 
     // He goes: back along the deck away from her, or, with no deck left behind him, past her.

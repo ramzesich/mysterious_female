@@ -280,12 +280,23 @@ const her = {
     // The parasol snapping open over her, and folding.
     parasolOpen: () => { noise(0.16, { band: [450, 1500], q: 0.9, vol: 0.2, attack: 0.06 }); thud(210, 0.06, 0.14, 0.14); },
     parasolShut: () => noise(0.1, { band: [1300, 420], q: 0.9, vol: 0.3 }),
-    // "Кісюнічка!!!": a bright rising cry, then its four syllables.
-    dash: () => {
+    // "Кісюнічка!!!" (D): a bright rising cry, then its four syllables.
+    cry: () => {
         tone(620, 0.18, { type: 'sawtooth', to: 1250, vol: 0.09, lp: 3200 });
         [1000, 1250, 1000, 1400].forEach((f, i) => tone(f, 0.09, { type: 'square', vol: 0.06, t: 0.18 + i * 0.07, lp: 3600 }));
     },
-    dashEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),
+    // The lunge with it: a rush of air past her, and its end, a breath out.
+    lunge: () => { noise(0.32, { band: [700, 2600], q: 0.8, vol: 0.16, attack: 0.04 }); thud(160, 0.05, 0.1, 0.1); },
+    lungeEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),
+    // A hit taken by the pocket: a soft knock, and the tangerine popping out of it.
+    pocket: () => { thud(200, 0.07, 0.16); tone(520, 0.09, { type: 'sine', to: 880, vol: 0.07, t: 0.04 }); noise(0.03, { band: 1800, vol: 0.06, t: 0.04 }); },
+    // Her reactions to a hit taken by the pocket (docs/plan-three-uses.md §1.6), each with it: a
+    // yelp at a flare's heat, a splutter at water in her face, a gasp at water down her back, a
+    // sniff as she rubs her nose after a door.
+    yelpHot: () => { tone(900, 0.07, { type: 'square', to: 1700, vol: 0.07, lp: 3600 }); tone(1500, 0.1, { type: 'square', to: 1100, vol: 0.05, t: 0.08, lp: 3200 }); },
+    splutter: () => { [0, 0.09, 0.17].forEach((t, i) => noise(0.06, { band: [700 + i * 200, 2400], q: 1.2, vol: 0.12, t })); tone(420, 0.12, { type: 'sawtooth', to: 300, vol: 0.04, t: 0.05, lp: 1400 }); },
+    gasp: () => { noise(0.22, { band: [1200, 3800], q: 0.9, vol: 0.1, attack: 0.04 }); tone(700, 0.18, { type: 'sine', to: 1100, vol: 0.05 }); },
+    sniff: () => { noise(0.08, { band: [2200, 4200], q: 1.4, vol: 0.09 }); noise(0.1, { band: [2400, 4600], q: 1.4, vol: 0.08, t: 0.12 }); },
     // A fright: her yelp.
     scare: () => { tone(760, 0.11, { type: 'square', to: 1480, vol: 0.08, lp: 3400 }); tone(1480, 0.14, { type: 'square', to: 1000, vol: 0.07, t: 0.11, lp: 3400 }); },
     // Running off after one.
@@ -378,6 +389,8 @@ const ship = {
 const finds = {
     // A tangerine; something into her hands (a tray, a cup, a load); something handed over.
     tangerine: () => { tone(880, 0.08, { vol: 0.1 }); tone(1320, 0.13, { vol: 0.1, t: 0.06 }); },
+    // That tangerine landing at the HUD's count after its flight (§1.7): a small soft pluck.
+    tally: () => { tone(1760, 0.05, { type: 'sine', vol: 0.06 }); tone(2640, 0.07, { type: 'sine', vol: 0.04, t: 0.03 }); },
     pickup: () => { tone(880, 0.08, { vol: 0.1 }); tone(1320, 0.13, { vol: 0.1, t: 0.06 }); },
     take: () => { tone(620, 0.06, { vol: 0.09 }); tone(930, 0.1, { vol: 0.09, t: 0.05 }); },
     give: () => { tone(930, 0.06, { vol: 0.09 }); tone(700, 0.11, { vol: 0.09, t: 0.05 }); },
@@ -464,6 +477,13 @@ const things = {
     robotBeep: () => [0, 0.13].forEach(t => tone(1400, 0.07, { type: 'square', vol: 0.042, lp: 4000, t })),
     // Housekeeping's vacuum: its motor winding up (the tell), and its dart.
     vacRev: () => tone(170, 0.32, { type: 'sawtooth', to: 560, vol: 0.112, lp: 1500 }),
+    // The small dog on deck 4's lead: a yap (two short barks), and its howl back at her cry.
+    bark: () => [0, 0.14].forEach(t => { tone(820, 0.08, { type: 'sawtooth', path: [[0, 760], [0.3, 980], [1, 640]], vol: 0.07, lp: 2600, t, attack: 0.01 }); noise(0.05, { band: 1400, vol: 0.08, t }); }),
+    howl: () => tone(620, 1.0, { type: 'sawtooth', path: [[0, 520], [0.35, 880], [0.8, 820], [1, 560]], vol: 0.06, lp: 2200, lq: 3, attack: 0.1, release: 0.3, vib: [6, 14] }),
+    // A folded paper skimmed along the carpet (the paper round).
+    paperSlide: () => noise(0.4, { band: [2600, 1600], q: 1.2, vol: 0.12, attack: 0.02, release: 0.2 }),
+    // A vacuum that has swallowed a tangerine: the motor chokes, sputters and winds down.
+    vacChoke: () => { tone(420, 0.8, { type: 'sawtooth', path: [[0, 420], [0.25, 560], [1, 80]], vol: 0.08, lp: 1400, trem: [16, 0.6] }); [0.12, 0.34, 0.58].forEach(t => noise(0.08, { lo: [900, 300], vol: 0.22, t })); },
     vacDart: () => { tone(560, 0.5, { type: 'sawtooth', path: [[0, 560], [0.2, 720], [1, 420]], vol: 0.07, lp: 1700 }); noise(0.5, { band: 1100, vol: 0.12, attack: 0.05 }); },
     // Cloth: a stack of towels leaning, and coming down; a sheet in the wind.
     cloth: () => { noise(0.1, { lo: 900, vol: 0.2, attack: 0.03 }); noise(0.1, { lo: 900, vol: 0.16, attack: 0.03, t: 0.13 }); },

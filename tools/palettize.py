@@ -17,6 +17,26 @@ from PIL import Image
 PALETTE_FILE = Path(__file__).resolve().parent.parent / "assets" / "palette" / "resurrect-64.hex"
 
 
+def paper_greys(img, tol=14):
+    """White paper's greys put on the palette by lightness, before `palettize` (which would turn them
+    pale green: Resurrect 64 has no light neutral grey). Only the near-neutral greys (within `tol`):
+    her shirt's shades are tinted and keep to the palette's own. The sliding newspaper and her paper
+    gags (`assets/source/things/newspaper-sliding/README.md`)."""
+    img = img.convert("RGBA")
+    px = img.load()
+    for y in range(img.height):
+        for x in range(img.width):
+            r, g, b, a = px[x, y]
+            if a < 100 or max(r, g, b) - min(r, g, b) >= tol:
+                continue
+            light = (r + g + b) / 3
+            if light < 90:
+                continue
+            px[x, y] = ((255, 255, 255) if light >= 200 else (199, 220, 208) if light >= 170
+                        else (155, 171, 178) if light >= 130 else (127, 112, 138)) + (255,)
+    return img
+
+
 def load_palette():
     lines = PALETTE_FILE.read_text(encoding="utf-8").split("\n")
     return [tuple(int(h[i:i + 2], 16) for i in (0, 2, 4)) for h in (l.strip() for l in lines) if h and not h.startswith(";")]

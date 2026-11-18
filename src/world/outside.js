@@ -6,12 +6,14 @@
 // locked out on his balcony, the security officer at the tender. Places come from maps/world.json
 // (`balcony`, `drill`).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, CRY, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 import { FOOD } from './hazards.js';
 
 const M = 48;
+// Where a gull sits on her head: its feet this far over her floor (her head's top at 59).
+const HEAD = 57;
 const OUT = 'promenade';            // the outside route's name (src/world/world.js)
 const UNIT = 125;                   // a balcony, px
 const TOWELS = [0xf68181, 0x8fd3ff, 0xfbb954, 0xb9e04c, 0xffffff];
@@ -115,12 +117,106 @@ export class PerchGull {
         this.y = def.y;
     }
 
+    // Her cry: off the rail for six seconds, without a swoop.
+    heard() {
+        const d = this.def, s = this.scene;
+        if (!this.world.hears(d.x, d.floor, this.route) || this.state === 'dive') return;
+        if (this.state === 'perched' || this.state === 'mark') sfx.at(d.x, d.y).flap();
+        s.tweens.killTweensOf(this.shadow);
+        this.shadow.setVisible(false);
+        this.state = 'back';
+        this.awayUntil = s.time.now + 6000;
+    }
+
+    // A tangerine on its balcony: it goes for it, and off with it; that balcony is safe until she
+    // is past (docs/plan-three-uses.md §2).
+    offered(t) {
+        const d = this.def, s = this.scene;
+        if ((this.state !== 'perched' && this.state !== 'mark') || t.route !== this.route
+            || Math.abs(t.img.y + 3 - d.floor) > 14 || Math.abs(t.img.x - d.x) > 2.6 * M) return false;
+        s.tweens.killTweensOf(this.shadow);
+        this.shadow.setVisible(false);
+        this.state = 'taking';
+        this.world.gullTakes(this.sprite, t, () => { this.state = 'gone'; });
+        return true;
+    }
+
+    // 20, the ship scene's `thingGag`: it has landed on her head (the world's gull hands over to their
+    // clip, `gags` sheet, tools/build_gags.py): standing, she flails at it and breaks into a run;
+    // running, she runs on; off she runs flailing with it sitting there, at her run's speed, out of
+    // the screen, or to the next partition or wall. Back from it, it flies back to its rail.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, w = this.world;
+        const dir = p.flipX ? -1 : 1, running = p.anims.currentAnim?.key === 'her-run';
+        return {
+            play: (done) => {
+                this.state = 'onhead';
+                this.sprite.setVisible(false);
+                const m = s.cache.json.get('gags-meta');
+                const pic = s.add.sprite(p.x, d.floor, 'gags', m.anims['gull-flail'][0]).setOrigin((dir > 0 ? m.gull.x : m.cell - m.gull.x) / m.cell, m.floor / m.cell)
+                    .setFlipX(dir < 0).setDepth(p.depth);
+                w.add([pic]);
+                this.pic = pic;
+                if (running) pic.play('gags-gull-run');
+                else {
+                    pic.play('gags-gull-flail');
+                    pic.once('animationcomplete-gags-gull-flail', () => pic.play('gags-gull-run'));
+                }
+                // (The next partition ahead on her floor, or a wall: she runs no further.)
+                let end = s.stopShort(p.x, p.x + dir * 4800, d.floor, 8);
+                for (const g of w.grips) {
+                    if (g.route !== s.route || !g.over || Math.abs(g.y1 - d.floor) > 6) continue;
+                    const stop = g.x - dir * (g.w / 2 + 10);
+                    if ((stop - p.x) * dir > 0 && (stop - end) * dir < 0) end = stop;
+                }
+                let flapAt = 0, over = false;
+                s.script = (dt, time) => {
+                    if (over) return;
+                    const go = pic.anims.currentAnim?.key === 'gags-gull-run' || pic.anims.currentFrame.index - 1 >= 5;
+                    if (go) pic.x += dir * PLAYER.runSpeed * dt;
+                    if (time > flapAt) { flapAt = time + 380; sfx.at(pic.x, d.floor - 60).flap(); }
+                    p.x = pic.x;
+                    const view = s.cameras.main.worldView;
+                    if ((pic.x - end) * dir >= 0 || pic.x < view.x - 60 || pic.x > view.right + 60) {
+                        over = true;
+                        pic.x = (pic.x - end) * dir >= 0 ? end : pic.x;
+                        pic.anims.pause();
+                        done();
+                    }
+                };
+            },
+            show: () => {
+                const x = this.pic?.x ?? p.x;
+                this.pic?.destroy();
+                this.pic = null;
+                this.sprite.setVisible(true);
+                this.x = x;
+                this.y = d.floor - HEAD;
+                this.state = 'back';
+                this.at = s.time.now + 2600;
+            },
+        };
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
+        if (this.state === 'taking' || this.state === 'onhead') return;
+        if (this.state === 'gone') {
+            // (Back once she is well past it, or gone from here.)
+            if (s.route !== this.route || Math.abs(p.x - d.x) > 4 * M || Math.abs(p.y - d.floor) > 100) {
+                this.state = 'back';
+                this.x = d.x + 80;
+                this.y = d.y - 120;
+                this.sprite.setVisible(true);
+            }
+            return;
+        }
         if (!nearby(s, d)) return;
         const frames = s.textures.get('things');
         const flap = Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up';
         const near = s.route === this.route && s.mode === 'play' && Math.abs(p.y - d.floor) < 70 && Math.abs(p.x - d.x) < 2.6 * M;
+        const away = time < (this.awayUntil ?? 0);
+        if (this.state === 'perched' && away) this.state = 'back';
         if (this.state === 'perched') {
             this.linger = near ? this.linger + dt : Math.max(0, this.linger - dt * 2);
             this.sprite.setFrame('gull-perched').setPosition(d.x, d.y - (this.linger > 1.2 ? Math.floor(time / 110) % 2 : 0));
@@ -142,12 +238,16 @@ export class PerchGull {
                 this.state = 'dive';
                 this.at = time + 230;
                 this.from = { x: this.x, y: this.y };
+                // (At food in her hands, down to it; else at her head, to land on it: 20.)
+                this.diveY = FOOD.includes(this.world.carry?.kind) ? d.floor - 30 : d.floor - HEAD;
                 sfx.at(this.x, this.y).gullDive();
             }
         } else if (this.state === 'dive') {
             const k = 1 - Math.max(0, this.at - time) / 230;
+            // (Onto her head if she is still under it: it follows her the last few px.)
+            if (Math.abs(p.x - this.targetX) < 17 && s.mode === 'play') this.targetX += (p.x + (p.flipX ? -1 : 1) - this.targetX) * Math.min(1, dt * 12);
             this.x = this.from.x + (this.targetX - this.from.x) * k;
-            this.y = this.from.y + (d.floor - 30 - this.from.y) * k * k;
+            this.y = this.from.y + ((this.diveY ?? d.floor - 30) - this.from.y) * k * k;
             this.sprite.setFrame('gull-down').setPosition(this.x, this.y);
             if (time > this.at) {
                 this.shadow.setVisible(false);
@@ -160,16 +260,19 @@ export class PerchGull {
                         this.world.carryBox.give();
                         this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
-                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'swooped');
+                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite, ride: this.ride() });
                 }
-                this.state = 'back';
-                this.at = time + 2600;
+                if (this.state !== 'onhead') {
+                    this.state = 'back';
+                    this.at = time + 2600;
+                }
             }
         } else {
-            // Up, round, and back to its rail.
-            this.x += (d.x - this.x) * Math.min(1, dt * 2.2);
-            this.y += (d.y - this.y) * Math.min(1, dt * 2.2) - (Math.abs(this.x - d.x) > 20 ? 50 * dt : 0);
-            const home = Math.abs(this.x - d.x) < 2 && Math.abs(this.y - d.y) < 2;
+            // Up, round, and back to its rail (off it a while after her cry, wheeling over it).
+            const tx = away ? d.x + Math.cos(time / 500) * 50 : d.x, ty = away ? d.y - 80 + Math.sin(time / 350) * 8 : d.y;
+            this.x += (tx - this.x) * Math.min(1, dt * 2.2);
+            this.y += (ty - this.y) * Math.min(1, dt * 2.2) - (!away && Math.abs(this.x - d.x) > 20 ? 50 * dt : 0);
+            const home = !away && Math.abs(this.x - d.x) < 2 && Math.abs(this.y - d.y) < 2;
             this.sprite.setFrame(flap).setPosition(this.x, this.y).setFlipX(d.x < this.x);
             if (home) {
                 this.state = 'perched';
@@ -261,7 +364,7 @@ export class Occupied {
         this.bang.setVisible(true);
         s.time.delayedCall(1300, () => this.bang.setVisible(false));
         sfx.at(this.d.x, this.d.y).hey();
-        s.scareContact(this.d.x, 'startled');
+        s.scareContact(this.d.x, 'balcony');
     }
 }
 
@@ -299,9 +402,16 @@ export class DrillBoat {
         this.k = 0;
     }
 
+    // Her cry: the winchman looks round, and the boat holds one beat longer before it comes down.
+    heard() {
+        const time = this.scene.time.now;
+        if (!this.world.hears(this.cx, this.def.y, OUT) || this.at(time).k > 0) return;
+        this.held = (this.held ?? 0) + 1000;
+    }
+
     // How far down it is at `time`, 0 hoisted to 1 on the walkway; and whether the tell is on.
     at(time) {
-        const d = this.def, t = (time / 1000) % d.period, lower = 1.1, hoist = 1.6;
+        const d = this.def, t = ((time - (this.held ?? 0)) / 1000) % d.period, lower = 1.1, hoist = 1.6;
         if (t < d.tell) return { k: 0, tell: true, t };
         const u = t - d.tell;
         if (u < lower) return { k: u / lower, coming: true };
@@ -339,7 +449,7 @@ export class DrillBoat {
         const half = this.w / 2 - 14 + PLAYER.bodyWidth / 2;
         if (Math.abs(p.x - this.cx) >= half || head >= keel) return;
         if (a.coming) {
-            s.scareContact(this.cx, 'bumped');
+            s.scareContact(this.cx, 'boat');
             return;
         }
         // Down, or still too low on its way up: she is held at its end.
@@ -359,8 +469,10 @@ export class Rounds {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x0, x1, y, v (m/s), stops: [x], wait (s), who }
-        this.p = world.people.add({ id: def.id, who: def.who, x: def.x0, y: def.y, route: 'inside', face: 1 });
+        // (His round is one corridor's: short of any door or wall across the deck, ShipScene `stopShort`.)
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, 30);
+        this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s), stops: [x], wait (s), who }
+        this.p = world.people.add({ id: def.id, who: def.who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
         this.cart = s.add.image(def.x0, def.y, 'shipart', 'service-cart').setOrigin(0.5, 1).setDepth(D.props + 0.06);
         this.swan = s.add.image(def.x0, def.y - 28, 'shipart', 'towel-swan').setOrigin(0.5, 1).setDepth(D.props + 0.061);
         this.dark = s.add.rectangle(0, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.105).setVisible(false);
@@ -373,6 +485,36 @@ export class Rounds {
         this.d = { x: (def.x0 + def.x1) / 2, y: def.y };
     }
 
+    // A tangerine at his cart's wheels: he stops, puts it on his cart, and goes on; hers to take
+    // back with E. Not spent (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (!this.p || this.aside || this.fruit || !s.loose.near(t, this.x + this.dir * 26, d.y, 22, 14)) return false;
+        const img = this.fruit = s.loose.claim(t).setDepth(this.swan.depth + 0.001);
+        this.until = s.time.now + 900;
+        sfx.at(this.x, d.y).take();
+        const cart = this.cart;
+        const entry = { id: `${d.id}_fruit`, get x() { return cart.x; }, y: d.y, route: 'inside', items: [], reach: 24, interact: () => {
+            entry.done = true;
+            this.fruit = null;
+            s.gainTangerine(img.x, img.y);
+            img.destroy();
+        } };
+        this.world.things.push(entry);
+        return true;
+    }
+
+    // Her cry: he pulls his cart in against the wall at once, as at a knock, a while.
+    heard() {
+        const time = this.scene.time.now;
+        if (this.aside || !this.p || !this.world.hears(this.x, this.def.y)) return;
+        this.aside = true;
+        this.cried = true;
+        this.until = time + CRY.startleMs;
+        this.world.pop(this.p.x, this.def.y - PLAYER.height - 6, 'alert', 1200);
+        sfx.at(this.x, this.def.y).oh();
+    }
+
     update(dt, time) {
         const s = this.scene, her = s.player, d = this.def, P = this.world.people, p = this.p;
         if (!p || !nearby(s, this.d)) return;
@@ -381,7 +523,8 @@ export class Rounds {
             if (this.aside) {
                 this.aside = false;
                 this.dark.setVisible(false);
-                if (s.route === 'inside') sfx.at(this.dark.x, d.y).doorShut();
+                if (s.route === 'inside' && !this.cried) sfx.at(this.dark.x, d.y).doorShut();
+                this.cried = false;
             }
             const before = this.x;
             this.x += this.dir * d.v * M * dt;
@@ -424,6 +567,8 @@ export class Rounds {
         }
         this.swan.setPosition(this.cart.x, this.cart.y - 28 * this.cart.scaleY).setDepth(this.cart.depth + 0.001).setScale(this.cart.scaleX)
             .setFlipX(this.dir < 0);
+        // (Her tangerine on the cart's top, beside the swan.)
+        this.fruit?.setPosition(this.cart.x - this.dir * 8, this.cart.y - 31 * this.cart.scaleY).setDepth(this.swan.depth + 0.001);
         P.place(p);
         if (this.aside || s.route !== 'inside' || (s.mode !== 'play' && s.mode !== 'push') || Math.abs(her.y - d.y) > 100) return;
         // Across the hallway: his back to the cart's nose.

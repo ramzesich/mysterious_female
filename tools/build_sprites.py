@@ -13,7 +13,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from palettize import palettize, hex_rgb
+from palettize import palettize, paper_greys, hex_rgb
 
 ROOT = Path(__file__).resolve().parent.parent
 COLS = 48           # cells in a row of a sheet
@@ -80,6 +80,21 @@ HER = {
         "carry-stand": [("carry-walk/2.png", "feet")],
         # A start: she recoils from what bumped her (skeleton-v3's hit move), before she runs off.
         "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
+        # Her falls (the user, 2026-11-16; skeleton-v3 poses): a slip onto her bottom and a trip flat on
+        # her belly, each ending dazed; the slip caught backwards, the trip stumbled on from.
+        "slipfall": [(f"slipfall/{i}.png", "feet") for i in range(8)],
+        "tripfall": [(f"tripfall/{i}.png", "feet") for i in range(8)],
+        "slipback": [(f"slipback/{i}.png", "feet") for i in range(6)],
+        "stumble": [(f"stumble/{i}.png", "feet") for i in range(6)],
+        # Her reactions to a hit with a tangerine on her (docs/plan-three-uses.md §1.6; skeleton-v3
+        # poses, 2026-11-16): thrown back a step, rubbing her nose (a door), spluttering (water in her
+        # face), arching (water down her back), yelping and patting her sleeve (a flare), ducking (from
+        # above); and the apology, a tangerine held out in both hands (the game's own tangerine is put
+        # in them: `HAND_OVER` in src/config.js).
+        **{c: [(f"{c}/{i}.png", "feet") for i in range(6)] for c in ("reel", "rubnose", "splutter", "arch", "yelp", "duck", "apology")},
+        # Dazed where she fell, butterflies circling over her head, drawn with her (the user's rule).
+        "dazed-sit": [(f"dazed-sit/{i}.png", "feet") for i in range(6)],
+        "dazed-lie": [(f"dazed-lie/{i}.png", "feet") for i in range(6)],
         # Her quirks (§6.1.11). The Four Seasons' ice swan: she shivers, hugging herself.
         "shiver": [(f"shiver/{i}.png", "feet") for i in range(8)],
         # Bliss's dance floor: standing still on it, she dances (skeleton-v3's dance move).
@@ -95,7 +110,10 @@ HER = {
         # On hands and knees (the duct, under a laundry line); pushing a cart, her walk with both
         # hands out; a camera raised to her eye, held (the game draws the camera): skeleton-v3.
         "crawl": [(f"crawl/{i}.png", "feet") for i in range(8)],
-        "push": [(f"push/{i}.png", "feet") for i in range(8)],
+        # (The push remade 2026-11-18, the user: "her legs do not move properly": PixMiniMax from her
+        # push frame against the steward's trolley, the trolley taken out, two even steps whose planted
+        # foot slides back about 3.6 px a frame (`push2/`, its README); her first, `push/`, kept.)
+        "push": [(f"push2/{i}.png", 83) for i in range(8)],
         "camera": [(f"camera/{i}.png", "feet") for i in range(8)],
         # Region 6 (skeleton-v3, custom poses): clinging to a wall in the grip socks, sliding down
         # it; slipping on wet tiles; licking a cone held to her mouth (the game draws the cone);
@@ -124,6 +142,10 @@ HER = {
         "pull": [(f"pull/{i}.png", "feet") for i in range(8)],
         "throw": [(f"throw/{i}.png", "feet") for i in range(8)],
         "glide": [(f"pull/{i}.png", "feet") for i in (0, 1)],
+        # The throw (docs/plan-three-uses.md §1.2; skeleton-v3, custom poses, 2026-11-15): an
+        # underarm toss, the arm back low, a step, the swing forward past the hip, the follow-through;
+        # the tangerine put in her fist by tools/hold_tangerine.py.
+        "toss": [(f"toss-held/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.
@@ -177,6 +199,107 @@ HER_CAT = {
     },
     "baseline": "rotations/east.png",
 }
+
+
+# Her mishap gags (docs/plan-three-uses.md §1.6), each one picture of her with the thing: states of
+# her character with the thing drawn in, animated v3 (assets/source/her-mishaps/README.md). A sheet
+# of their own so that hers stays within a texture's size; a bigger cell, the thing beside her.
+# Each clip is placed by its thing (`props`: the clip's name's start -> the thing's own picture in
+# assets/source/things/, cut from the same art): the thing's middle on the cell's middle in the
+# clip's first frame, the rest of the clip as drawn round it, so that from sitting down to the
+# ride the thing does not jump. Frame 0 of a v3 clip is its start frame (for a sit-down, our
+# composition of her standing and the thing: left out).
+HER_MISHAPS = {
+    "name": "her-mishaps",
+    "cell": 112,
+    "remap": HER["remap"],
+    "frames": {
+        "vacuum-sit": [(f"vacuum-sit/{i}.png", "feet") for i in range(1, 7)],
+        "vacuum-ride": [(f"vacuum-ride/{i}.png", "feet") for i in range(1, 9)],
+        "suitcase-sit": [(f"suitcase-sit/{i}.png", "feet") for i in range(1, 7)],
+        "suitcase-ride": [(f"suitcase-ride/{i}.png", "feet") for i in range(1, 9)],
+        "suitcase-tip": [(f"suitcase-tip/{i}.png", "feet") for i in range(0, 9)],
+        # Then she sits there dazed, butterflies circling over her head (the user, 2026-11-17): v3 of
+        # the riding state from the tip's last frame with them set over her head (`start.png`, from
+        # her own dazed clip), to the same; her eyes open throughout (a try had her blink). Its
+        # canvas and edges are the tip's last frame's, so it is placed as the tip is (`shift_as`).
+        "suitcase-dazed": [(f"suitcase-dazed/{i}.png", "feet") for i in range(1, 9)],
+        # The papers (the user's brief, 2026-11-16; picked 2026-11-17), each from her standing on the
+        # sliding newspaper (`paper-start/start2-*.png`), its first frame (her still standing) left out
+        # so that the push carries straight into the fall. 4b, from behind: her heel taken forward and
+        # up, she sits, the paper round over her onto her head. In the air on her start's floor (row
+        # 83, her feet; the paper's lower edge a px under it, as in the start picture); sitting, by
+        # each frame's lowest row.
+        "paper-behind": [(f"paper-behind-sit/frame_{i:03d}.png", 83 if i < 7 else "feet") for i in range(2, 11)],
+        # 4a, from the front: her leg up behind her, onto her belly, the paper round onto her back.
+        # Standing and in the air on row 87; lying on her elbows, row 85 (the last frame's paper
+        # hanging past them cut at the floor).
+        "paper-front": [(f"paper-front-belly/frame_{i:03d}.png", 87 if i < 7 else ("cut", 85)) for i in range(2, 11)],
+        # The porter's cart (8a to 8d, approved 2026-11-17): v3 of her base character from her own
+        # standing sprite beside the game's own cart (`cart-start/`), on its floor (row 115 of the
+        # 136 px frames, 117 of the 140 px ones). 8a: she runs into its front and folds over the bags,
+        # her first three (standing) frames left out so the run carries into the leap; then her legs
+        # kicking, looped. 8c: it reaches her back and she sits into the bags, the top one on her lap
+        # (the game's cart pasted back under her in frames 1 to 5, the generator's flying bag taken
+        # out: `cart-start/fix8c.py`). 8b and 8d are her alone (the world's cart and porter stay):
+        # pushed back and sat down; bounced off his back and sat down; sitting, by each frame's lowest row.
+        "cart-drape": [(f"cart-drape/{i}.png", 115) for i in range(3, 9)],
+        "cart-kick": [(f"cart-drape/{i}.png", 115) for i in range(5, 9)],
+        "cart-sit": [(f"cart-sit/{i}.png", 115) for i in range(1, 9)],
+        "cart-push": [(f"cart-push/{i}.png", 117 if i < 8 else "feet") for i in range(1, 9)],
+        "cart-bounce": [(f"cart-bounce/{i}.png", 117 if i < 6 else "feet") for i in range(3, 9)],
+        # The breakfast stewardess's tray (10a, 10b; 2026-11-17), her alone (the world's stewardess
+        # and tray stay): v3 of her base character from her own standing sprite (`cart-start/
+        # start-solo.png`). 10a: she runs into the tray, reels and sits, the toast landing on her head
+        # and the flower behind her ear (toward `tray-start/end-10a.png`, her sitting with them, an
+        # edit of 8d's end); from its third frame (a rose already flying), so that her run carries
+        # into the reel; on row 117 of its 140 px frames, sitting by the lowest row. 10b, the tray
+        # meeting her back, is the same clip, she turned round to face it (`turn`, the user, 2026-11-17).
+        "tray-sit": [(f"tray-sit/{i}.png", 117 if i < 7 else "feet") for i in range(2, 9)],
+        # Her trolley (10c to 10e, 2026-11-17): she trips over it head first and lands on her belly
+        # past it; v3 of her base character from her own standing sprite before the game's own
+        # trolley (`trolley-start/`), the trolley then taken out of the frames (`fix10c.py`: the
+        # world's own is drawn over her while it plays); its first (standing) frame left out, on
+        # row 118 of its 140 px frames. Its middle, column 96, is 20 px past the trolley's (`at`).
+        "trolley-trip": [(f"trolley-trip/{i}.png", 118) for i in range(1, 9)],
+        # The dog's lick after a trip on its lead (2026-11-17): her lying dazed with the dog at her
+        # face, one picture (PixMiniMax from her dazed-lie frame 1 and the dog's standing picture
+        # turned to her: `dog-lick/raw/start.png`); her body as in that frame, so on its row 74
+        # (her hand under her chin) as her own clip has it, and drawn 2 px lower as she is (LIE_DROP).
+        "dog-lick": [(f"dog-lick/{i}.png", 74) for i in range(8)],
+    },
+    "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
+    # Moved sideways as another clip is, which it carries on from.
+    "shift_as": {"suitcase-dazed": "suitcase-tip"},
+    # A gag with no thing to place it by: her middle in its frames (her own sprite's, in the start
+    # picture) on the cell's middle.
+    # The cart's: its middle (8a, 8c), or 18 px behind hers (8b, 8d: her middle is column 86, room
+    # kept for her falling back).
+    "middle": {"paper-behind": 36, "paper-front": 28, "cart-drape": 70, "cart-kick": 70, "cart-sit": 52,
+               "cart-push": 68, "cart-bounce": 68,
+               "tray-sit": 108, "trolley-trip": 96,
+               # (Her middle is column 48, as in her dazed clip; the dog reaches to 105: the cell's
+               # middle 16 px in front of hers, `GAGS` none: the dog's own `LICK` in movers.js.)
+               "dog-lick": 64},
+    # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
+    "paper": ("paper-",),
+    "baseline": "ride-vacuum/east.png",
+}
+
+
+def prop_middle(img, colours):
+    """The x of the middle of a thing in a frame, found by its own colours (within a few steps of
+    them: the frames are redrawn), in the lower half of what is drawn."""
+    img = img.convert("RGBA")
+    bb = img.getbbox()
+    xs = []
+    for y in range((bb[1] + bb[3]) // 2, bb[3]):
+        for x in range(bb[0], bb[2]):
+            p = img.getpixel((x, y))
+            if p[3] and any(abs(p[0] - c[0]) + abs(p[1] - c[1]) + abs(p[2] - c[2]) < 24 for c in colours):
+                xs.append(x)
+    xs.sort()
+    return xs[len(xs) // 2] if xs else img.width // 2
 
 
 def seq(char, folder, anchor="keep"):
@@ -234,19 +357,41 @@ def build(spec):
         return baseline[size]
 
     cells, meta = [], {"cell": cell, "frames": {}, "anims": {}}
+    shifts = {}
     for anim, sources in spec["frames"].items():
         indices = []
-        images = [(palettize(Image.open(src_dir / path), remap), anchor) for path, anchor in sources]
+        paper = anim.startswith(spec.get("paper", ())) if spec.get("paper") else False
+        images = [(palettize(paper_greys(Image.open(src_dir / path)) if paper else Image.open(src_dir / path), remap), anchor)
+                  for path, anchor in sources]
         anim_feet = max(lowest_row(img) for img, _ in images)
+        # Placed by its thing (HER_MISHAPS): the clip moved sideways by its first frame's thing.
+        shift = 0
+        for start, thing in spec.get("props", {}).items():
+            if anim.startswith(start):
+                pic = Image.open(ROOT / "assets" / "source" / "things" / f"{thing}.png").convert("RGBA")
+                colours = {c[1][:3] for c in pic.getcolors(4096) if c[1][3] and sum(c[1][:3]) > 60}
+                first = Image.open(src_dir / sources[0][0])
+                shift = first.width // 2 - prop_middle(first, colours)
+        if anim in spec.get("shift_as", {}):
+            shift = shifts[spec["shift_as"][anim]]
+        if anim in spec.get("middle", {}):
+            shift = Image.open(src_dir / sources[0][0]).width // 2 - spec["middle"][anim]
+        shifts[anim] = shift
         for img, anchor in images:
             if anchor == "keep":
                 feet = standing_feet(img.size)
                 if feet is None:
                     feet = anim_feet
+            elif isinstance(anchor, int):
+                feet = anchor                       # the row of the frame on the floor
+            elif isinstance(anchor, tuple):
+                feet = anchor[1]                    # ("cut", row): on the floor, whatever is under it cut
+                img = img.copy()
+                img.paste((0, 0, 0, 0), (0, feet + 1, img.width, img.height))
             else:
                 feet = lowest_row(img)
             frame = Image.new("RGBA", (cell, cell), (0, 0, 0, 0))
-            paste(frame, img, (cell - img.width) // 2, cell - 1 - feet)
+            paste(frame, img, (cell - img.width) // 2 + shift, cell - 1 - feet)
             indices.append(len(cells))
             cells.append(frame)
         meta["anims"][anim] = indices
@@ -270,4 +415,5 @@ if __name__ == "__main__":
     build(HER)
     build(HER_TOWEL)
     build(HER_CAT)
+    build(HER_MISHAPS)
     build(BUMBOT)

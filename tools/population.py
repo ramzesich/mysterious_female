@@ -104,6 +104,11 @@ CHECKPOINTS = {
 # table of its own; a number: that many px up, on a piece already there. `needs`: a flag (the bowl
 # Bumbot knocks over) or "break:<id>" (behind a breakable).
 TANGERINES = {
+    # Her crew cabin's bowl on deck 3 (the user, 2026-11-15): the three painted tangerines made
+    # real, each exactly where it was painted (tools/draw_rooms.py `crewcabin`), the third on top.
+    "tan_3_bowl_1": ("crewcabin", 121, 1, 33, None),
+    "tan_3_bowl_2": ("crewcabin", 128, 1, 33, None),
+    "tan_3_bowl_3": ("crewcabin", 125, 1, 38, None),
     "tan_4_30": (4, 31.2, 1, "table", None),
     "tan_4_laundry": ("laundry", 250, 1, 46, None),
     "tan_4_store": ("store", 150, 2, 40, None),
@@ -168,7 +173,15 @@ ITEMS = {
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
+    # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
+    # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
+    "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
+    "keep_wool": (5, 24.2, "keep:cat:wool", None, 7, "thing:wool"),                    # in the knitter's basket
+    "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
 }
+
+# How many things to find there are of each kind, for the HUD (§4.1).
+KEEPS = {"cat": 8, "her": 4, "him": 4}
 
 # --- Bumbot's beats (GAME_DESIGN.md §6.1.8) --------------------------------------------------------
 # id: (deck or room, m or x, what he is doing, which way he bolts, where he is gone (m or x), needs).
@@ -194,7 +207,11 @@ LINEN = dict(vent=220, sill=42, chute=24, cart_top=36, laundry_cart=200)
 # tall: it fills the doorway until then, the side she pushes from: -1 forward of it[, needs: the
 # flag before which it is not hers to push]).
 PUSHABLES = {
-    "cart_steward": (9, 122.6, 130, "service-cart", "cart_free", True, -1),
+    # (The steward's: a tall housekeeping trolley, too tall to hop, so that it is seen to block the
+    # corridor (the user, 2026-11-17: a low service cart had stood for it, "an invisible wall").)
+    # (At the corridor's aft end, so that the card is earned past the vacuum, the towel stack and the
+    # sprinkler and brought back; the user, 2026-11-18: it had stood at 122.6 m, all three aft of it.)
+    "cart_steward": (9, 185.2, 189.0, "thing:steward-trolley", "cart_free", True, -1),
     # The linen room's laundry cart: by the wall (she walks past it), pushed under the vent she
     # climbs onto it ("top": only its rim holds her).
     "cart_linen": ("linen", 108, 216, "@linen-cart", "cart_linen", "top", -1, "bb4"),
@@ -238,19 +255,22 @@ GRIPS = [
 #   takes them away / brings them; layer: "behind" furniture (a desk), "back" (scenery people,
 #   behind her), default beside her; cover=[(atlas piece, m, px up)] built furniture drawn again in
 #   front of them (a bar's counter, when its back bar must stay behind them); pose: "front" turned
-#   to us (at a rail), "back" turned away (reading a wall).
+#   to us (at a rail), "back" turned away (reading a wall); hear: what her cry (D) shows over them,
+#   "♥" (one who likes cats) or "shh" (a quiet place), or "own" (their part of the story answers it;
+#   docs/plan-three-uses.md §2); walkers stop and stand aside, the rest standing about turn to look.
 PEOPLE = {
     # Region 1, deck 4.
     "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
     "haz_porter": dict(at=(4, 58), who="porter", face=1, walk=(53.5, 64, 1.0, "cart"), end_ms=1500,
-                       touch=("scare", 46, 44, "bumped", 12),
+                       touch=("scare", 46, 44, "cart", 12),
                        carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
     "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
                         bubble=("tray", "!card:deck", None, 4)),
-    "amb_robe": dict(at=(4, 130), who="robe", face=-1, idle="idle", layer="back"),
+    # (In her way, no longer behind her: running into her, she bounces off and sits, as off the
+    # breakfast stewardess, 10f; the user, 2026-11-17.)
+    "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", touch=("scare", 14, 40, "robe")),
     "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
-    "amb_breakfast": dict(at=(5, 44.4), who="stewardess", face=1, idle="idle", layer="back"),
     "riv_rope": dict(at=(5, 81.05), who="rival", face=-1, idle="idle", until="region:2"),
     "amb_reception": dict(at=(5, 99.55), who="receptionist", face=-1, idle="idle", layer="behind"),
     "blk_photographer": dict(at=(5, 87.9), who="photographer", face=1, idle="idle", until="region:3"),
@@ -270,21 +290,21 @@ PEOPLE = {
     "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
     # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
     "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make"),
-    "amb_surfer": dict(at=(6, 67.45), who="surfer", face=1, layer="back"),
+    "amb_surfer": dict(hear="shh", at=(6, 67.45), who="surfer", face=1, layer="back"),
     "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
     "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
     "amb_dj": dict(at=(6, 121.3), who="dj", face=-1, idle="bob", layer="behind"),
     "amb_photog_2": dict(at=(6, 135.45), who="studio", face=-1, idle="idle", layer="back"),
     "amb_barman_wj": dict(at=(6, 142.6), who="barmaid", face=-1, idle="idle", layer="back",
                           cover=[("bar-counter-bg", 142.6, 0), ("tan-bar-stool-bg", 142.6, 0)]),
-    "amb_model_ship": dict(at=(6, 148.3), who="modelguest", face=1, idle="idle", layer="back"),
+    "amb_model_ship": dict(hear="♥", at=(6, 148.3), who="modelguest", face=1, idle="idle", layer="back"),
     # The Library: she stands behind her desk; her bubble while any book is in her pocket.
-    "npc_librarian": dict(at=(6, 192.3), who="librarian", face=-1, idle="idle", layer="behind",
+    "npc_librarian": dict(hear="own", at=(6, 192.3), who="librarian", face=-1, idle="idle", layer="behind",
                           bubble=("book", "books:held", None, 4)),
     # The promenade: the jogger's loop on the JOGGING lane (she hops him or stands aside, ↑), the
     # rival peering under a boat (a glimpse: the story takes him away).
     "haz_jogger": dict(at=("prom", 150), who="jogger", face=1, walk=(116.5, 211.5, 2.2, "run"), end_ms=400,
-                       touch=("scare", 14, 40, "bumped")),
+                       touch=("scare", 14, 40, "jogger")),
     "riv_prom": dict(at=("prom", 190), who="rival", face=1, idle="idle", after="region:2", until="flag:riv_prom"),
     # Deck 7's lobbies and atrium walk: the carpet fitter on the 7-8 flight's foot, a couple at the plaques.
     "blk_fitter": dict(at=(7, 87.9), who="fitter", face=1, idle="work", until="region:4"),
@@ -308,7 +328,7 @@ PEOPLE = {
     # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the
     # honeymooners at their door, the bedmaker in the cabin being cleaned; strollers on the atrium's
     # walks; the security officer in the laundry, waiting for his uniform.
-    "npc_steward": dict(at=(9, 123.4), who="steward", face=-1, idle="tug",
+    "npc_steward": dict(at=(9, 186.0), who="steward", face=-1, idle="tug",
                         bubble=("cart", "!flag:cart_free", None, 4)),
     "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
                       bubble=("camera", None, "flag:photo", 3)),
@@ -329,8 +349,8 @@ PEOPLE = {
     "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
                           cover=[("treadmill-bg", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
-    "npc_kid_tub": dict(at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
-    "npc_kid": dict(at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
+    "npc_kid_tub": dict(hear="own", at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
+    "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
                     bubble=("softserve", "!flag:kid_fed", None, 5)),
     "riv_loungers": dict(at=(11, 143.95), who="rival", face=1, idle="peek", layer="back", after="region:6", until="region:8"),
     "amb_barman_top": dict(at=(11, 155.65), who="barman_top", face=-1, idle="shake", layer="behind"),
@@ -344,7 +364,7 @@ PEOPLE = {
     "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
     "amb_go_her": dict(at=(11, 240.52), who="go_her", face=1, layer="back"),
     "amb_go_him": dict(at=(11, 241.48), who="go_him", face=-1, layer="back"),
-    "amb_audience_2": dict(at=(6, 213.25), who="aud_lady", face=1, layer="back"),
+    "amb_audience_2": dict(hear="shh", at=(6, 213.25), who="aud_lady", face=1, layer="back"),
     "amb_audience_3": dict(at=(6, 226.54), who="aud_popcorn", face=1, layer="back"),
     # Region 3, deck 7: Magnum's, the casino, Tradewinds, the Arcade, the Stardust balcony.
     "amb_barman_mag": dict(at=(7, 113.6), who="barman", face=1, idle="idle", layer="back",
@@ -353,10 +373,10 @@ PEOPLE = {
     "amb_croupier": dict(at=(7, 158.0), who="croupier", pose="front", layer="behind"),
     "amb_player_lady": dict(at=(7, 157.29), who="casinolady", face=1, layer="back"),
     "amb_player_cowboy": dict(at=(7, 162.4), who="cowboy", pose="back", layer="back"),
-    "amb_shopper": dict(at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
+    "amb_shopper": dict(hear="♥", at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
     "amb_teen": dict(at=(7, 188.29), who="teen", pose="back", layer="back"),
     "amb_balcony_1": dict(at=(7, 220.35), who="aud_girl", face=1, layer="back"),
-    "amb_balcony_2": dict(at=(7, 232.71), who="aud_granny", face=1, layer="back"),
+    "amb_balcony_2": dict(hear="♥", at=(7, 232.71), who="aud_granny", face=1, layer="back"),
     # Region 7 (Outside). The guest locked out on his own balcony, deck 10 aft (in his cabin once
     # she has let him in: the story walks him in); the security officer looking into a tender on the
     # boat walkway (a glimpse: the story takes him away); the boat drill's two.
@@ -570,8 +590,9 @@ QUIRKS = {
     "sec_spotlight": (6, 247.3, "still:3", "bow", 2000, dict(reach=14, needs="bb3", face=-1)),
     # The cat's portrait: a double-take.
     "sec_cat_look": (7, 140.0, "still:1.5", "idle-look", 1700, dict(reach=16)),
-    # An open cabin, the sea in its window: she looks in.
-    "sec_peek_sea": (8, 55.27, "still:2", "idle-look", 1700, dict(reach=14)),
+    # An open cabin, the sea in its window: E, she steps in and bounces on its bed
+    # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
+    "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
@@ -640,7 +661,7 @@ JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
 # A stack of towels that topples (`haz_towels_9`): id: (deck, m). A jump landed beside it, or the
 # dash, brings it down on her.
-STACKS = {"haz_towels_9": (9, 141.3)}
+STACKS = {"haz_towels_9": (9, 141.6)}   # midway between the cabin doors either side (the user, 2026-11-18: its heap had fallen over the open one): the heap reaches 90 px out the way it falls, the doors' frames are 159 px apart, so its last towel's tip touches a frame by 10 px
 # Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
 SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5),
               # Region 7: deck 8 midships' one; deck 9 aft's two, out of phase: a rhythm to run.
@@ -724,6 +745,38 @@ BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a
 DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
 # The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
+# --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------
+# A suitcase on its wheels rolling to and fro with the ship's slow roll: id: (deck, m from, m to, m/s).
+# (1.6 m/s at its fastest, from 1.1: the user, 2026-11-17, with her ride on it made quicker.)
+ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6)}
+# A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
+# the lead's reach in m, what the owner gives after three fetches).
+DOGS = {"haz_dog_4": (4, 99.6, "dogowner", 4.0, "keep:cat:ball")}
+# The paper round: a steward skimming folded papers along the carpet to each door: id: (deck, m
+# from, m to, m/s, who).
+SKIMMERS = {"haz_papers_5": (5, 26.0, 42.0, 0.7, "paperboy"),        # (clear of the knitting lady at 23.3)
+            # (A second round where the forward cabins meet the stair hall: the user, 2026-11-16.)
+            "haz_papers_5b": (5, 57.5, 72.0, 0.7, "paperwoman")}      # (the stair hall's wall is at 73.9)
+# The breakfast round (the user, 2026-11-16: the stewardess with a tray given a purpose): door to
+# door with a tray from her room-service trolley: id: (deck, the doors' m, who).
+# (Doors where none is drawn, beside a lift's or a crew door, are passed over in the game.)
+BREAKFASTS = {"haz_breakfast_5": (5, [44.9, 48.9, 52.9], "roomservice")}      # (48.9: a lift's door, passed over)
+# The climb on deck 4 (the feather on its shelf: ITEMS `keep_feather`): a laundry cart, a shelf
+# on the wall under the ceiling. Each: (m, atlas piece or "shelf", px up its top).
+# (The laundry cart is its own generated picture: the linen room's, drawn in code, had stood in for
+# it. The art rule looked back over, the user, 2026-11-17.)
+# (The room-service cart before it taken out, and the two moved a metre forward: the user,
+# 2026-11-17; then 0.8 m further apart, for a harder jump across, each by half: the user. From
+# the floor to the laundry cart's towels is one jump.)
+CLIMB = dict(deck=4, steps=[(144.9, "thing:laundry-cart"), (146.37, "shelf")], shelf=66)
+# The knitting lady on deck 5 (§4.2): on her own armchair in the corridor, a little forward of her
+# cabin's door (the user, 2026-11-16), her basket beside her with the wool.
+# (`chair`: its back's edge, against the deck's forward end wall, which runs to 23.33 m; the basket
+# between her feet and her door.)
+KNITTER = dict(deck=5, door=24.9, chair=23.35, who="knitter", basket=24.2)
+# The little desk flags of the Baltic's ports at Shore excursions' desk, hers among them (§4.1).
+DESK_FLAGS = dict(deck=5, m=140.25, on=34, flags=["se", "fi", "ee", "dk"])
+
 ROUNDS = {"haz_steward_rounds": (8, 162.0, 182.0, 0.9, [167.6, 175.6], 3.0, "steward_rounds")}
 
 # --- Region 8's own things (docs/population.md: deck 12 from Champs aft, the roof, the funnel;
@@ -739,8 +792,10 @@ BALLS = {"haz_balls_a": (12, 146.9, 1, 2.2, 4.0, 0.0), "haz_balls_b": (12, 154.4
 COURT = dict(deck=12, ball=150.65, hoop=154.4)
 # Teppanyaki's flares (`haz_flare`): id: (deck, the grill (m), half the flame's reach (m), every s,
 # for s, offset s, the chef whose flourish is the tell). "Singed"; a tray is spilled.
-FLARES = {"haz_flare_a": (12, 185.4, 1.25, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
-          "haz_flare_b": (12, 190.4, 1.25, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
+# (The flame's reach 0.8 m, about the grill's own width: the user, 2026-11-18, "too big, make them less
+# wide"; it was 1.25 m.)
+FLARES = {"haz_flare_a": (12, 185.4, 0.8, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
+          "haz_flare_b": (12, 190.4, 0.8, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
 # The aft terrace (`gust_terrace`, `gull_terrace`): gusts over it and the sun cover's upper end, the
 # jump over its rail (every s, for s, the tell, px/s aft in the air), the span they blow over (m:
 # no further aft than the towels can be seen from), towels on its deck chairs (the tell), a gull on

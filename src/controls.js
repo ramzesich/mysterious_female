@@ -15,7 +15,7 @@ export class Controls {
         this.scene = scene;
         this.keys = scene.input.keyboard.addKeys({
             left: 'LEFT', right: 'RIGHT', up: 'UP', down: 'DOWN',
-            jump: 'SPACE', dash: 'D', activate: 'E', start: 'ENTER',
+            jump: 'SPACE', dash: 'D', throw: 'F', activate: 'E', start: 'ENTER',
             outside: 'O', escape: 'ESC', zoomIn: 'PLUS', zoomOut: 'MINUS', mute: 'M',
             zoomInPad: 'NUMPAD_ADD', zoomOutPad: 'NUMPAD_SUBTRACT',
         });
@@ -61,6 +61,7 @@ export class Controls {
             down: k.down.isDown || (pad && (pad.down || (upright && stick.y > STICK_DEADZONE))),
             jump: k.jump.isDown || button('A'),
             dash: k.dash.isDown || button('B'),   // D for now (the user, 2026-11-06; it was Shift)
+            throw: k.throw.isDown || button('Y'),   // the throw (docs/plan-three-uses.md §1.2)
             activate: k.activate.isDown || button('X'),
             start: k.start.isDown || k.jump.isDown || button('A') || button('MENU'),
             // The outside view of the whole ship (O, or the right stick's click; Esc or B leaves it

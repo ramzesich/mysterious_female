@@ -7,7 +7,7 @@
 // the alarm panel, the hatch's ladder drops, Bumbot is up it), and the Library's odd book, which
 // opens the reading nook once all ten books are back. Places come from maps/world.json (`bow`).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble } from '../rumble.js';
 import { t } from '../lang.js';
@@ -40,8 +40,73 @@ export class Steam {
         return ['calm', 0];
     }
 
+    // 17, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): a burst of the steam wraps
+    // her where she is (from her run she slides to a stop, `slideMs`), and under it she is in her
+    // puff picture; it thins (`clearMs`): her hair frizzed into a huge puff, she fans herself and
+    // swoons, sitting down dazed; then her checkpoint.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, g = GAGS.steam;
+        return {
+            play: (done) => {
+                const m = s.cache.json.get('gags-meta');
+                const dir = p.flipX ? -1 : 1, v = Math.abs(p.body?.velocity.x ?? 0) > 20 ? PLAYER.runSpeed : 0;
+                const pic = s.add.sprite(p.x, d.y, 'gags', m.anims['steam-fan'][0])
+                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+                this.world.add([pic]);
+                this.pic = pic;
+                // (Doors and walls stop her slide; and under the burst she is set clear of the
+                // sauna's door, `clear` px aft of it, where the steam comes out.)
+                const x0 = pic.x, end = Math.max(d.x + g.clear, s.stopShort(pic.x, pic.x + dir * v * g.slideMs / 2000, d.y, 16));
+                this.burst = { x: pic.x, t: 0 };
+                // (Drawn at once: she is in her puff picture from this very frame.)
+                this.drawBurst(this.g);
+                sfx.at(pic.x, d.y).steam(0.6);
+                let t = 0, coughed = false;
+                s.time.delayedCall(g.coverMs + g.clearMs * 0.6 + g.holdPuffMs, () => {
+                    pic.play('gags-steam-fan');
+                    pic.once('animationcomplete-gags-steam-fan', () => {
+                        pic.play('gags-steam-swoon');
+                        s.time.delayedCall(g.plopAtMs, () => sfx.at(pic.x, d.y).plop());
+                        pic.once('animationcomplete-gags-steam-swoon', () => done());
+                    });
+                });
+                s.script = (dt) => {
+                    t += dt * 1000;
+                    const u = Math.min(1, t / g.slideMs);
+                    pic.x = x0 + (end - x0) * (1 - (1 - u) * (1 - u));
+                    if (!coughed && t > g.coverMs * 0.6) { coughed = true; sfx.at(pic.x, d.y).cough(); }
+                    this.burst.x = pic.x;
+                    this.burst.t = t;
+                    p.x = pic.x;
+                };
+            },
+            show: () => {
+                this.pic?.destroy();
+                this.pic = null;
+                this.burst = null;
+            },
+        };
+    }
+
+    // The burst round her (17): thick to `coverMs`, then thinning and rising over `clearMs`.
+    drawBurst(g) {
+        const b = this.burst, G = GAGS.steam;
+        if (!b) return;
+        const k = Math.max(0, (b.t - G.coverMs) / G.clearMs);
+        if (k >= 1) return;
+        const a = 1 - k * k, y = this.def.y;
+        // (Three columns of five over her, her hair's puff and all, so that nothing of her shows.)
+        for (let i = 0; i < 15; i++) {
+            const ox = (i % 3 - 1) * 15 + ((i * 7) % 5) - 2, oy = 8 + Math.floor(i / 3) * 17 + ((i * 11) % 5);
+            const r = 13 + ((i * 13) % 5) + k * 8;
+            g.fillStyle(i % 4 ? 0xffffff : 0xc7dcd0, a)
+                .fillCircle(b.x + ox * (1 + k * 0.6), y - oy - k * 26 + Math.sin(b.t / 200 + i) * 2, r);
+        }
+    }
+
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player, g = this.g.clear();
+        this.drawBurst(g);
         if (!near(s, d.x, d.y, 700, 200)) return;
         const [phase, k] = this.phase(time);
         if (phase === 'calm') {
@@ -77,8 +142,8 @@ export class Steam {
         if (env < 0.6 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         if (p.x < d.x + 2 || p.x > d.x + reach - 6 || Math.abs(p.y - d.y) > 80) return;
         this.hitAt = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(d.x);
-        else s.scareContact(d.x, 'fogged');
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'steam');
+        else s.scareContact(d.x, 'steam', { ride: this.ride() });
     }
 }
 
@@ -417,6 +482,22 @@ export const bow = {
             if (slot) w.sparkle(slot.x, slot.y - (slot.dy ?? 60));
             if (slot) sfx.at(slot.x, slot.y).sparkle();
         });
+    },
+
+    // A tangerine coming down on the Spinnaker's keys: a note where it lands (docs/plan-three-uses.md
+    // §2). It rolls on. (Her hands are on the keys a little ahead of where she stands to play.)
+    pianoOffered(t) {
+        const B = this.B?.piano, s = this.scene;
+        if (!B || t.route !== 'inside' || t.img.body.velocity.y <= 0 || s.time.now < (t.noteAt ?? 0)) return false;
+        const x = t.img.x, y = t.img.y;
+        if (x < B.x + 6 || x > B.x + 40 || y < B.y - 34 || y > B.y - 18) return false;
+        t.noteAt = s.time.now + 400;
+        sfx.at(x, y).piano(Phaser.Math.Between(0, 15));
+        const n = s.add.text(x, y - 12, '♪', { fontFamily: 'Verdana, sans-serif', fontSize: '10px', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
+            .setOrigin(0.5).setDepth(s.DEPTH.fx);
+        this.world.add([n]);
+        s.tweens.add({ targets: n, y: n.y - 22, alpha: 0, duration: 900, onComplete: () => n.destroy() });
+        return false;
     },
 
     // E at the Spinnaker's grand piano (population: `sec_piano`): a few notes.

@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -13,13 +13,18 @@ import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
-import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor } from './movers.js';
+import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
 const OK = { ok: true };
+// The HUD's mark for each kind of thing to find (docs/plan-three-uses.md §4.1): Bumbot's, hers, her husband's.
+const KEEP_ICONS = { cat: '🐾', her: '🌸', him: '🎸' };
+// The knitting lady in her armchair: the chair was drawn round her own seated pose (its picture's
+// left edge 16 px behind her middle, its foot on her floor), so she sits in it exactly.
+const KNIT_SIT = { dx: 16, up: 0 };
 
 // How a bare room looks until it is drawn (tools/draw_rooms.py): wall, skirting, floor.
 const LOOKS = {
@@ -63,8 +68,9 @@ export class World {
     // Doors on the cabin corridors that take a cabin door's place (rooms, checkpoints).
     doorSpots() {
         const rooms = this.data.rooms.flatMap(r => r.doors.filter(d => d.outRoute === 'inside').map(d => ({ x: d.outX, y: d.outY })));
-        // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb".)
-        const own = ['checkpoint', 'swingdoor', 'dnd', 'opendoor'];
+        // (And the doors that do something by themselves: the one that flies open, "Do Not Disturb";
+        // the dog's owner's, open behind her.)
+        const own = ['checkpoint', 'swingdoor', 'dnd', 'opendoor', 'dog'];
         const cps = this.data.ents.filter(e => own.includes(e.kind) && e.route === 'inside').map(e => ({ x: e.x, y: e.y }));
         return [...rooms, ...cps];
     }
@@ -255,16 +261,55 @@ export class World {
         make('peek-sea', 34, 74, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
             g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
-            g.fillStyle(0x7f708a, 1).fillRect(7, 9, 24, 2);
-            g.fillStyle(0xcd683d, 1).fillRect(10, 12, 20, 28);
-            g.fillStyle(0x8fd3ff, 1).fillRect(12, 14, 16, 24);
-            g.fillStyle(0x4d9be6, 1).fillRect(12, 27, 16, 11);
-            g.fillStyle(0xffffff, 1).fillRect(12, 26, 16, 1).fillRect(15, 17, 6, 2).fillRect(14, 31, 4, 1).fillRect(21, 34, 5, 1);
-            g.fillStyle(0x7f708a, 1).fillRect(8, 11, 3, 31).fillRect(29, 11, 3, 31);
-            g.fillStyle(0x9e4539, 1).fillRect(8, 66, 24, 6);
-            g.fillStyle(0xffffff, 1).fillRect(8, 52, 24, 14);
-            g.fillStyle(0xc7dcd0, 1).fillRect(8, 59, 24, 1);
-            g.fillStyle(0x0b5e65, 1).fillRect(15, 52, 8, 14);
+            // (Inside a room, washed 30% toward the wall, as the knitting lady's: the user, 2026-11-18,
+            // "Let's make its interior more washed out colors, like we usually do".)
+            const wash = c => {
+                const w = 0xece3cf, k = 0.3, ch = sh => Math.round(((c >> sh) & 255) * (1 - k) + ((w >> sh) & 255) * k);
+                return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+            };
+            const fill = c => g.fillStyle(wash(c), 1);
+            fill(0x7f708a).fillRect(7, 9, 24, 2);
+            fill(0xcd683d).fillRect(10, 12, 20, 28);
+            fill(0x8fd3ff).fillRect(12, 14, 16, 24);
+            fill(0x4d9be6).fillRect(12, 27, 16, 11);
+            fill(0xffffff).fillRect(12, 26, 16, 1).fillRect(15, 17, 6, 2).fillRect(14, 31, 4, 1).fillRect(21, 34, 5, 1);
+            fill(0x7f708a).fillRect(8, 11, 3, 31).fillRect(29, 11, 3, 31);
+            fill(0x9e4539).fillRect(8, 66, 24, 6);
+            fill(0xffffff).fillRect(8, 52, 24, 14);
+            fill(0xc7dcd0).fillRect(8, 59, 24, 1);
+            fill(0x0b5e65).fillRect(15, 52, 8, 14);
+            g.fillStyle(0x9babb2, 1).fillRect(2, 72, 30, 2);
+            // The door's leaf, swung in against the wall.
+            g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
+            g.fillStyle(0xcd683d, 1).fillRect(3, 3, 3, 68);
+        });
+        // Region 1's (docs/plan-three-uses.md §4.2): her open cabin, an armchair just inside the door.
+        // (The climb's shelf, the knitting lady's basket and the little desk flags are generated now:
+        // `things`, the art rule looked back over, the user, 2026-11-17.)
+        make('peek-knit', 34, 74, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
+            g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
+            // A picture on the wall within, in a gilt frame: a red flower in a vase (the user,
+            // 2026-11-16: a green and blue landscape read as a flag upside down). Below it, the end
+            // of her bed with its runner. Inside a room, washed 30% toward the wall (CLAUDE.md;
+            // the user, 2026-11-16: they had been in full colours).
+            const wash = c => {
+                const w = 0xece3cf, k = 0.3, ch = sh => Math.round(((c >> sh) & 255) * (1 - k) + ((w >> sh) & 255) * k);
+                return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+            };
+            const fill = (c, x, y, w, h) => g.fillStyle(wash(c), 1).fillRect(x, y, w, h);
+            fill(0xa05b53, 14, 10, 14, 16);
+            fill(0xf9c22b, 15, 11, 12, 14);
+            fill(0xf3ecdd, 16, 12, 10, 12);
+            fill(0x239063, 21, 16, 1, 5); fill(0x239063, 19, 18, 2, 1); fill(0x239063, 22, 17, 2, 1);
+            fill(0xe83b3b, 20, 13, 3, 3);
+            fill(0xf9c22b, 21, 14, 1, 1);
+            fill(0x4d9be6, 19, 21, 5, 3);
+            fill(0x2e222f, 8, 52, 24, 20);
+            fill(0xffffff, 9, 53, 23, 13);
+            fill(0xc7dcd0, 9, 60, 23, 1);
+            fill(0x905ea9, 9, 56, 23, 3);
+            fill(0x6e2727, 9, 66, 23, 6);
             g.fillStyle(0x9babb2, 1).fillRect(2, 72, 30, 2);
             // The door's leaf, swung in against the wall.
             g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
@@ -287,7 +332,11 @@ export class World {
             const img = s.add.image(def.x0, def.floor - ROOM.height, key).setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
             const dim = s.roomDim(img);
             this.add([dim, img]);
-            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, inDeck: true,
+            // (Its pixels in front of the things that lie in it, over its tangerines: tools/draw_rooms.py.)
+            const front = def.front ? s.add.image(def.x0, def.floor - ROOM.height, `room-${def.id}-front`).setOrigin(0)
+                .setDepth(D.exterior + 0.135).setVisible(false) : null;
+            if (front) this.add([front]);
+            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front, inDeck: true,
                            doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
             for (const d of def.doors) {
                 d.lockSpec = parseLock(d.lock);
@@ -749,8 +798,10 @@ export class World {
                 const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
                 items.push(img);
                 this.add(items);
-                // (`level`: where it lies, for her standing up there with it: a book on a bed.)
-                const thing = { ...e, level: y, items, pick: img, interact: () => this.take(thing) };
+                // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing
+                // to find up high, on the climb's shelf, is hers only from up there, or once a lob
+                // has knocked it down: `high`.)
+                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -795,7 +846,7 @@ export class World {
             }
             case 'solid': {
                 // Something standing in the way that she hops (a room-service cart).
-                const img = s.add.image(e.x, e.y, 'shipart', e.frame).setOrigin(0.5, 1).setDepth(depth - 0.01).setFlipX(!!e.flip);
+                const img = this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(depth - 0.01).setFlipX(!!e.flip);
                 const zone = s.add.zone(e.x, e.y, img.width - 6, img.height - 3).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 this.add([img]);
@@ -804,6 +855,49 @@ export class World {
                 this.things.push(thing);
                 break;
             }
+            case 'shelf': {
+                // A shelf on the wall under the ceiling, on two brackets: the climb's top
+                // (docs/plan-three-uses.md §4.2). She stands on it.
+                const img = this.image(e.x, e.y - e.up, 'thing:wall-shelf').setOrigin(0.5, 0).setDepth(D.decor + 0.2);
+                const zone = s.add.zone(e.x, e.y - e.up + 4, img.width, 4).setOrigin(0.5, 1);
+                s.physics.add.existing(zone, true);
+                this.add([img]);
+                const thing = { ...e, items: [img], zone };
+                this.solids.push(thing);
+                this.things.push(thing);
+                break;
+            }
+            case 'deskflags': {
+                // Little desk flags of the cruise's ports on Shore excursions' desk, hers among them.
+                const items = e.flags.map((f, i) => this.image(e.x - 18 + i * 9, e.y - e.on, `thing:flag-${f}`).setOrigin(0.5, 1).setDepth(depth + 0.01));
+                this.add(items);
+                this.things.push({ ...e, items });
+                break;
+            }
+            case 'knitter': {
+                // The lady knitting on her own armchair in the corridor, by her cabin's door, her basket
+                // beside her with the wool in it (docs/plan-three-uses.md §4.2; the wool: ITEMS
+                // `keep_wool`; the user, 2026-11-16: she had sat in her open doorway).
+                const chair = this.image(e.x, e.y, 'thing:knit-chair').setOrigin(0, 1).setDepth(D.decor + 0.11);
+                const basket = this.image(e.basket, e.y, 'thing:knit-basket').setOrigin(0.5, 1).setDepth(D.decor + 0.2);
+                this.add([chair, basket]);
+                this.people.add({ id: `${e.id}_who`, who: e.who, x: e.x + KNIT_SIT.dx, y: e.y - KNIT_SIT.up, route: 'inside', face: 1,
+                                  idle: 'knit', layer: 'back' });
+                this.things.push({ ...e, items: [chair, basket] });
+                break;
+            }
+            case 'breakfast':
+                this.movers.push(new Breakfast(this, e));
+                break;
+            case 'roller':
+                this.movers.push(new Roller(this, e));
+                break;
+            case 'dog':
+                this.movers.push(new Fetcher(this, e));
+                break;
+            case 'skimmer':
+                this.movers.push(new Skimmer(this, e));
+                break;
             case 'breakable': {
                 // Stacked luggage, crates: the dash goes through them; otherwise they are in the way
                 // (low ones can be hopped).
@@ -918,6 +1012,9 @@ export class World {
                 const items = [];
                 if (e.what === 'sea') {
                     items.push(s.add.image(e.x, e.y, 'peek-sea').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
+                } else if (e.what === 'knit') {
+                    // The knitting lady's cabin, its door open behind her chair (case 'knitter').
+                    items.push(s.add.image(e.x, e.y, 'peek-knit').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
                 } else {
                     items.push(s.add.image(e.x, e.y, 'shipart', 'door-cabin-ajar').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
                     const tied = s.add.image(e.x + 9, e.y - 34, 'balloons').setOrigin(0.5, 1).setDepth(D.decor + 0.15);
@@ -1019,12 +1116,18 @@ export class World {
                 const zone = s.add.zone(x, e.y, img.width - 4, e.tall === true && !done() ? 128 : rim).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 img.x = x;
+                // (A tall one, free: too tall to hop, it stands back against the wall, out of her
+                // way: the steward's trolley, the user, 2026-11-17.)
+                const aside = () => { zone.body.enable = false; img.setDepth(D.decor + 0.11); };
+                if (e.tall === true && done()) aside();
                 const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, rim,
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
                         if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
-                            // Free of the doorway: it stands in the corridor, low enough to hop.
+                            // Free of the doorway: it stands in the corridor, low enough to hop; a
+                            // tall one stands back against the wall.
                             zone.setSize(img.width - 4, rim);
+                            if (e.tall === true) aside();
                             this.progress.setFlag(e.flag);
                             s.pushing = null;
                             s.mode = 'play';
@@ -1040,6 +1143,7 @@ export class World {
 
     itemTaken(e) {
         const [type, name] = e.what.split(':');
+        if (type === 'keep') return this.save.keeps.includes(e.what);
         if (type === 'verb') return this.save.verbs.includes(name);
         if (type === 'book') return !!this.save.books[name];
         return this.save.items.includes(name) || this.save.seen.includes(e.id);
@@ -1057,7 +1161,8 @@ export class World {
                 this.add([table]);
                 if (out) this.things.push({ id: `${e.id}-table`, x: e.x, y: e.y, route: OUTSIDE, items: [table] });
             }
-            y -= e.route === OUTSIDE ? 24 : 12;
+            // (On its top: a side table's is its picture's top row.)
+            y -= e.route === OUTSIDE ? 24 : s.textures.get('sidetable').getSourceImage().height;
         } else {
             y -= e.on;
         }
@@ -1074,6 +1179,9 @@ export class World {
         } else if (type === 'book') {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
+        } else if (type === 'keep') {
+            this.save.keeps.push(thing.what);
+            this.sparkle(thing.x, thing.pick.y - 4, 0xf9c22b);
         } else {
             this.save.items.push(name);
         }
@@ -1084,6 +1192,16 @@ export class World {
         writeSave(this.save);
         this.refresh();
         return true;
+    }
+
+    // A thing to find handed to her (the dog's owner's tennis ball): `what` is "keep:<whose>:<name>".
+    giveKeep(what, x, y) {
+        if (this.save.keeps.includes(what)) return;
+        this.save.keeps.push(what);
+        sfx.take();
+        this.sparkle(x, y, 0xf9c22b);
+        writeSave(this.save);
+        this.refresh();
     }
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.
@@ -1326,6 +1444,52 @@ export class World {
         await this.wait(350);
         sfx.at(person.x, person.y).give();
         await this.tween({ targets: img, x: p.x, y: p.y - 40, duration: 420, ease: 'Sine.easeInOut' });
+        await this.received(img, frame, then);
+    }
+
+    // Someone tosses her a thing, with a clip of theirs (`clip`): it is in their fingers in the frames
+    // `held` names ({ frame: [px ahead of their middle, px up from their feet] }, behind their hand),
+    // leaves them at frame `release` from `from`, and flies to her chest in a lob, on the game's clock
+    // (the scene's `update`, not a tween: the lesson of the tennis ball); then as `handOver`.
+    tossOver(person, frame, then, tint, { clip, held, release, from }) {
+        const s = this.scene, p = s.player, sp = person.sprite;
+        if (!person.meta.anims[clip]) return this.handOver(person, frame, then, tint);
+        const img = this.image(0, 0, frame).setOrigin(0.5, 0.5).setDepth(sp.depth - 0.001).setVisible(false);
+        if (tint) img.setTint(tint);
+        this.add([img]);
+        const at = ([dx, up]) => img.setPosition(Math.round(person.x) + person.dir * dx, sp.y - up);
+        return new Promise(resolve => {
+            const hold = (anim, f) => {
+                const i = f.index - 1;
+                if (held[i]) at(held[i]).setVisible(true);
+                else if (i < release) img.setVisible(false);
+                if (i < release) return;
+                sp.off('animationupdate', hold);
+                at(from).setVisible(true).setDepth(s.DEPTH.player + 0.05);
+                sfx.at(person.x, person.y).give();
+                // (A lob: its top a fifth of the way across, at least 12 px over where it left; it
+                // comes down on her where she is by then, if she has gone on meanwhile.)
+                const x0 = img.x, y0 = img.y, tx0 = p.x, ty = p.y - 40, g = 400;
+                const top = Math.max(12, Math.abs(tx0 - x0) * 0.2), vy = -Math.sqrt(2 * g * (y0 - Math.min(y0, ty) + top));
+                const T = (-vy + Math.sqrt(Math.max(0, vy * vy - 2 * g * (y0 - ty)))) / g, t0 = s.time.now;
+                const fly = () => {
+                    const t = Math.min(T, (s.time.now - t0) / 1000);
+                    const tx = tx0 + (p.x - tx0) * t / T;
+                    img.setPosition(x0 + (tx - x0) * t / T, y0 + vy * t + g * t * t / 2);
+                    if (t < T) return;
+                    s.events.off('update', fly);
+                    this.received(img, frame, then).then(resolve);
+                };
+                s.events.on('update', fly);
+            };
+            sp.on('animationupdate', hold);
+            this.people.play(person, clip);
+        });
+    }
+
+    // A thing handed or tossed to her has reached her: a sparkle, and it is hers.
+    async received(img, frame, then) {
+        const s = this.scene;
         if (frame === 'key-card') sfx.card();
         else sfx.take();
         for (let i = 0; i < 10; i++) {
@@ -1351,6 +1515,7 @@ export class World {
     // One of her quirks: she turns to the thing and does her bit; any key after a moment ends it.
     quirk(thing) {
         const s = this.scene, p = s.player;
+        if (thing.gag === 'bed') return this.peekBed(thing);
         if (this.carry || !s.anims.exists(`her-${thing.clip}`)) return false;
         this.cut(async () => {
             p.setFlipX(thing.face ? thing.face < 0 : thing.x < p.x);
@@ -1368,6 +1533,105 @@ export class World {
             if (thing.clip === 'dance') for (let i = 0; i * 500 < thing.ms; i++) s.time.delayedCall(i * 500, () => sfx.thump());
             await this.wait(thing.ms);
             s.pose('stand');
+            if (!this.save.seen.includes(thing.id)) {
+                sfx.secret();
+                this.save.seen.push(thing.id);
+                writeSave(this.save);
+            }
+        });
+        return true;
+    }
+
+    // Deck 8's open cabin (`sec_peek_sea`; the user, 2026-11-18: "since it now reads as interactable,
+    // let's add some gag at the E press"): she steps in and bounces on its made-up
+    // bed, seen through the door: cut to its opening (her head under the lintel at each bounce), washed
+    // 30% toward the wall as the room is ("she's in the background"); out again, she straightens her
+    // badge. Any key ends the bouncing.
+    peekBed(thing) {
+        const s = this.scene, p = s.player, door = this.things.find(t => t.id === thing.door);
+        if (!door || this.carry || s.holding || s.towel) return false;
+        const meta = s.cache.json.get('her-meta');
+        // (The opening, past the leaf swung in: the picture's columns 7 to 31, rows 2 to 72.)
+        const x0 = door.x - 10, x1 = door.x + 14, top = door.y - 72, BED = 22;
+        const ghost = s.add.sprite(p.x, p.y, 'her').setOrigin(0.5, 1).setTint(0xece3cf).setTintMode(Phaser.TintModes.FILL).setAlpha(0.3).setVisible(false);
+        this.add([ghost]);
+        let inside = false;
+        const cut = () => {
+            if (!inside) { p.setCrop(); ghost.setVisible(false); return; }
+            const fw = p.frame.width, fh = p.frame.height, left = Math.round(p.x) - fw / 2;
+            let cx = x0 - left;
+            const cw = x1 - x0 + 1, cy = top - (Math.round(p.y) - fh), ch = door.y - top;
+            if (p.flipX) cx = fw - (cx + cw);
+            p.setCrop(cx, cy, cw, ch);
+            ghost.setTexture(p.texture.key, p.frame.name).setPosition(p.x, p.y).setFlipX(p.flipX)
+                .setDepth(p.depth + 0.001).setCrop(cx, cy, cw, ch).setVisible(true);
+        };
+        s.events.on('postupdate', cut);
+        const side = p.x < door.x ? -1 : 1, floor = p.y;
+        const move = (to, ms, key = 'x') => this.tween({ targets: p, [key]: to, duration: ms });
+        this.cut(async () => {
+            try {
+                p.body.enable = false;
+                // In at the door, her back to us, at once (the user, 2026-11-18: a glance each way first
+                // was "the delay after the E press").
+                s.pose('run');
+                p.setFlipX(door.x + 2 < p.x);
+                await move(door.x + 2, Math.abs(door.x + 2 - p.x) * 7 + 40);
+                s.pose('back');
+                inside = true;
+                await this.wait(260);
+                // Up onto the bed.
+                s.pose('rise');
+                await move(floor - BED - 6, 140, 'y');
+                await move(floor - BED, 90, 'y');
+                // Bouncing, facing us, as on her own cabin's bed.
+                const frames = meta.anims['bed-joy'];
+                p.anims.stop();
+                p.setFlipX(false);
+                await new Promise(done => {
+                    let t = 0, g0 = 0;
+                    const step = (time, delta) => {
+                        const i = s.controls.state;
+                        t += delta;
+                        const phase = (t % BED_JOY.cycleMs) / BED_JOY.cycleMs;
+                        p.setTexture('her', frames[Math.floor(phase * frames.length)]);
+                        const g = ((phase * 2) % 1 + 0.35) % 1;
+                        if (g >= BED_JOY.air && !(g0 >= BED_JOY.air)) sfx.at(door.x, door.y).boing();
+                        g0 = g;
+                        p.y = floor - BED - (g < BED_JOY.air ? Math.round(BED_JOY.hop * Math.sin(Math.PI * g / BED_JOY.air)) : 0);
+                        const key = t > 300 && (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed);
+                        if (key || t > BED_JOY.cycleMs * 4) {
+                            s.events.off('update', step);
+                            done();
+                        }
+                    };
+                    s.events.on('update', step);
+                });
+                // Down, and out the way she came.
+                s.pose('fall');
+                await move(floor, 130, 'y');
+                s.pose('front');
+                await this.wait(160);
+                inside = false;
+                s.pose('run');
+                p.setFlipX(side < 0);
+                await move(door.x + side * 30, 200);
+                // Straightening her badge.
+                p.anims.stop();
+                for (const f of meta.anims.badge) {
+                    p.setTexture('her', f);
+                    await this.wait(110);
+                }
+            } finally {
+                s.events.off('postupdate', cut);
+                inside = false;
+                p.setCrop();
+                ghost.destroy();
+                p.y = floor;
+                p.body.enable = true;
+                p.body.reset(p.x, floor);
+                s.pose('stand');
+            }
             if (!this.save.seen.includes(thing.id)) {
                 sfx.secret();
                 this.save.seen.push(thing.id);
@@ -1402,14 +1666,186 @@ export class World {
     touched(person) {
         const s = this.scene, t = person.touch;
         if (s.time.now < (this.touchCool ?? 0) || s.mode !== 'play') return;
+        // (In a lunge she is through them: src/world/people.js has what each does about it.)
+        if (!this.carry && s.lungeSafe()) {
+            this.lunged(t.fright, person.x);
+            return;
+        }
+        // (Their speed along the deck and their facing: which way the hit takes her, §1.6.)
+        const walking = person.walk && s.time.now >= (person.pausedUntil ?? 0);
+        const how = { vx: walking ? person.dir * person.walk.v * 48 : 0, dir: person.dir ?? 0 };
         if (this.carry) {
             this.touchCool = s.time.now + 1200;
             sfx.at(person.x, person.y).oh();
-            this.carryBox.spill(person.x);
+            this.carryBox.spill(person.x, false, t.fright || null, how);
         } else if (t.kind === 'scare') {
             if (!s.holding) sfx.at(person.x, person.y).hey();
-            s.scareContact(person.x, t.fright);
+            // (The porter's cart: who is in it, for her gag with him, 8a to 8d.)
+            s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' ? { person } : null });
         }
+        // The pocket took it (docs/plan-three-uses.md §1.3): whoever walked into her stops and
+        // stands aside, as at her cry, so as not to walk into her again.
+        if (s.mode === 'play' && s.isSafe() && person.walk) this.people.standAside(person);
+    }
+
+    // --- D: the cry and the lunge (docs/plan-three-uses.md §1.1, §2) ----------------------------
+
+    // "Кісюнічка!!!": everyone and everything within the cry's reach on her deck and route hears
+    // it (`heard()`), each in its own manner; machines do not.
+    shout(x, y, route) {
+        this.cry = { x, y, route, time: this.scene.time.now };
+        this.people.heard(this.cry);
+        for (const m of this.movers) m.heard?.(this.cry);
+        this.story.heard(this.cry);
+    }
+
+    // Whether a thing at (x, y) on `route` is within the last cry's reach: on her deck, near her.
+    hears(x, y, route = 'inside', reach = CRY.reach) {
+        const c = this.cry;
+        return !!c && c.route === route && Math.abs(x - c.x) < reach && Math.abs(y - c.y) < 70;
+    }
+
+    // In a lunge something would have frightened her by contact: she is through. What touched her
+    // gives way in its own manner (each mover's and person's `lunged()`); a few leave a mark on her.
+    // Once for each thing, however many frames she is in it.
+    lunged(kind, fromX) {
+        const s = this.scene, p = s.player, time = s.time.now;
+        const key = `${kind}@${Math.round(fromX / 24)}`;
+        this.lungedAt ??= {};
+        if (time < (this.lungedAt[key] ?? 0)) return;
+        this.lungedAt[key] = time + 1500;
+        for (const m of this.movers) if (m.lunged?.(kind, fromX)) return;
+        if (this.people.lunged(kind, fromX)) return;
+        const head = p.y - PLAYER.height + 6;
+        const mark = MISHAPS[kind]?.mark;
+        if (mark === 'wet') this.drops(p.x, head, 0x8fd3ff, 1);
+        else if (mark) this.drops(p.x, head, mark === 'soot' ? 0x625565 : 0xffffff, -1);
+    }
+
+    // A gull takes the tangerine from her as it swoops (docs/plan-three-uses.md §1.6, 20 to 22): it
+    // goes from (x, y) to its beak and away with it.
+    snatch(sprite, x, y) {
+        const s = this.scene, t0 = s.time.now;
+        const img = s.add.image(x, y, 'tangerine').setOrigin(0.5, 0.6).setDepth(sprite.depth + 0.01);
+        this.add([img]);
+        const follow = () => {
+            const k = Math.min(1, (s.time.now - t0) / 160);
+            const bx = sprite.x + (sprite.flipX ? -6 : 6), by = sprite.y - 3;
+            img.setPosition(x + (bx - x) * k, y + (by - y) * k).setAlpha(sprite.alpha);
+            if (s.time.now - t0 > 1800 || !sprite.visible || !sprite.active) {
+                s.events.off('update', follow);
+                img.destroy();
+            }
+        };
+        s.events.on('update', follow);
+    }
+
+    // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:
+    // whoever takes it has it (`offered(t)` true; it calls `this.scene.loose.remove(t)` or keeps it).
+    offered(t) {
+        if (this.scene.offeredHere?.(t) || this.lobbedInto(t)) return true;
+        for (const m of this.movers) if (m.offered?.(t)) return true;
+        return !!this.people.offered?.(t) || !!this.story.offered?.(t);
+    }
+
+    // Something at a cabin's door taken in by whoever is inside (the paper round's papers, the
+    // breakfasts): the door opens a crack at its handle's side (these doors have their handles on
+    // the left), a hand reaches out at `handY` and draws the things in, and the door shuts. `took()`
+    // once the hand has drawn them in (whoever held them out lowers their hands then), `done()` once
+    // the door is shut. `shrink`: taken from where they are held, not slid to the door: they shrink
+    // a little, as if drawn in through it, and are gone (the breakfast tray: slid sideways it
+    // crossed the stewardess holding it, the user, 2026-11-17).
+    handTakes(door, y, things, handY, done, { took, shrink = false } = {}) {
+        const s = this.scene, D = s.DEPTH, x = door - 11;
+        const crack = s.add.rectangle(x, y - 2, 4, 68, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.15).setScale(0, 1);
+        // (The hand in its shirt cuff is generated, `things`' `door-hand`, reaching to the right; it had
+        // been a 4 x 2 rectangle: the art rule looked back over, the user, 2026-11-17.)
+        const near = things[0];
+        const hand = s.add.image(x, handY, 'things', 'door-hand').setOrigin(0.5, 1).setDepth(D.props + 0.03).setVisible(false)
+            .setFlipX(near.x < x);
+        this.add([crack, hand]);
+        sfx.at(door, y).door();
+        s.tweens.chain({ tweens: [
+            { targets: crack, scaleX: 1, duration: 200 },
+            { targets: hand, x: near.x - Math.sign(near.x - x) * 3, duration: 260, onStart: () => hand.setVisible(true) },
+            ...(shrink ? [
+                { targets: things, scale: 0.75, duration: 220, ease: 'Sine.easeIn' },
+                { targets: [hand, ...things], alpha: 0, duration: 110, onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); took?.(); } },
+            ] : [
+                { targets: [hand, ...things], x, duration: 300, ease: 'Sine.easeIn', onComplete: () => { hand.destroy(); things.forEach(t => t.destroy()); took?.(); } },
+            ]),
+            { targets: crack, scaleX: 0, duration: 200, onComplete: () => { crack.destroy(); sfx.at(door, y).doorShut(); done?.(); } },
+        ] });
+    }
+
+    // A gull comes down to a tangerine, pecks at it and flies off with it in its beak
+    // (docs/plan-three-uses.md §2). The bird's sprite is the caller's: left hidden at the end, its
+    // origin as it was, for the caller to bring back; `done()` then.
+    gullTakes(sprite, t, done) {
+        const s = this.scene, img = s.loose.claim(t);
+        const ox = sprite.originX, oy = sprite.originY;
+        const x = img.x, foot = img.y + 3, off = x < sprite.x ? -1 : 1;
+        const down = s.textures.get('things').has('gull-down');
+        img.setDepth(sprite.depth + 0.01);
+        sprite.setOrigin(0.5, 1).setVisible(true).setAlpha(1).setFlipX(off < 0);
+        const flap = s.time.addEvent({ delay: 120, loop: true, callback: () => sprite.setFrame(sprite.frame.name === 'gull-up' && down ? 'gull-down' : 'gull-up') });
+        sfx.at(x, foot).gull();
+        // (It lands just short of it, the fruit before its beak; a few pecks; away with it.)
+        s.tweens.add({ targets: sprite, x: x - off * 6, y: foot, duration: 520, ease: 'Sine.easeIn', onComplete: () => {
+            flap.paused = true;
+            sprite.setFrame('gull-perched');
+            s.tweens.add({ targets: sprite, y: foot - 1, duration: 140, yoyo: true, repeat: 3, onComplete: () => {
+                flap.paused = false;
+                sfx.at(x, foot).flap();
+                s.tweens.add({ targets: sprite, x: x + off * 90, y: foot - 140, alpha: 0, duration: 1000, ease: 'Quad.easeIn',
+                    onUpdate: () => img.setPosition(sprite.x + (sprite.flipX ? -6 : 6), sprite.y - 5).setAlpha(sprite.alpha),
+                    onComplete: () => {
+                        flap.remove();
+                        img.destroy();
+                        sprite.setVisible(false).setAlpha(1).setOrigin(ox, oy);
+                        done?.();
+                    } });
+            } });
+        } });
+    }
+
+    // A machine that has swallowed a tangerine (a vacuum): dead where it stands, a wisp of smoke off
+    // it now and then (each caller on its own clock), until she has left the deck.
+    choke(sprite) {
+        sprite.setTint(0x6b6e72).setAngle(-8);
+        sfx.at(sprite.x, sprite.y).vacChoke();
+        this.drops(sprite.x, sprite.y - 10, 0x8a8a8a, -1);
+    }
+
+    // A few drops off her (`dir` 1: falling, water), or a wisp off her hair (-1: rising, smoke).
+    drops(x, y, colour, dir) {
+        const s = this.scene;
+        for (let i = 0; i < 6; i++) {
+            const d = s.add.image(x + Phaser.Math.Between(-7, 7), y + Phaser.Math.Between(-3, 3), 'dot').setTint(colour).setDepth(s.DEPTH.fx);
+            this.add([d]);
+            s.tweens.add({ targets: d, y: d.y + dir * Phaser.Math.Between(12, 22), x: d.x + Phaser.Math.Between(-4, 4), alpha: 0,
+                duration: Phaser.Math.Between(380, 620), delay: i * 50, onComplete: () => d.destroy() });
+        }
+    }
+
+    // A pictogram over a spot for a moment (a "!" startled, a heart, a finger to the lips).
+    pop(x, y, icon, ms = 1500) {
+        const s = this.scene, D = s.DEPTH, w = 22, h = 20;
+        const g = s.add.graphics().setDepth(D.fx + 0.5).setPosition(x, y);
+        g.fillStyle(0x2e222f, 1).fillRoundedRect(-w / 2 - 1, -h - 1, w + 2, h + 2, 4);
+        g.fillStyle(0xffffff, 1).fillRoundedRect(-w / 2, -h, w, h, 3);
+        g.fillStyle(0x2e222f, 1).fillTriangle(-4, 1, 4, 1, 0, 6);
+        g.fillStyle(0xffffff, 1).fillTriangle(-3, 0, 3, 0, 0, 4);
+        // (The cry's two answers are generated, a heart and a speaker crossed out for a quiet place; the
+        // finger to the lips never read at a bubble's size: the user, 2026-11-17.)
+        const pict = { heart: 'icon-heart', shh: 'icon-mute' }[icon];
+        const img = (pict ? s.add.image(x, y - h / 2, 'things', pict) : s.add.image(x, y - h / 2, this.icon(icon))).setDepth(D.fx + 0.51);
+        this.add([g, img]);
+        s.tweens.add({ targets: [g, img], y: '-=4', duration: 120, yoyo: true });
+        s.time.delayedCall(ms, () => {
+            s.tweens.add({ targets: [g, img], alpha: 0, duration: 200, onComplete: () => { g.destroy(); img.destroy(); } });
+        });
+        return [g, img];
     }
 
     // --- Each frame -----------------------------------------------------------------------------
@@ -1484,6 +1920,7 @@ export class World {
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
             if (Math.abs(p.x - t.x) > (t.reach ?? 18) || (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
+            if (t.high && Math.abs(p.y - t.level) > 8) continue;
             if (t.interact() !== false) return true;
         }
         return false;
@@ -1613,6 +2050,14 @@ export class World {
         }
         this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
         this.hudBooks?.setAlpha(Object.keys(this.save.books).length ? 1 : 0.35);
+        // The things to find, of each kind found of all (docs/plan-three-uses.md §4.1): a kind's count
+        // shows from its first find, after the books', one after another.
+        let hx = 24 + (this.hudBooks?.width ?? 0) + 16;
+        for (const [whose, text] of Object.entries(this.hudKeeps ?? {})) {
+            const n = this.save.keeps.filter(k => k.startsWith(`keep:${whose}:`)).length;
+            text.setVisible(n > 0).setText(`${KEEP_ICONS[whose]} ${n}/${this.data.finale?.totals?.keeps?.[whose] ?? 0}`).setX(hx);
+            if (n > 0) hx += text.width + 16;
+        }
     }
 
     addColliders(p) {
@@ -1628,25 +2073,61 @@ export class World {
                 && (!t.top || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));
         }
         for (const t of this.lows) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
-        for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
+        // (`through`: one that a lunge goes past, the breakfast trolley.)
+        for (const t of this.solids) s.physics.add.collider(p, t.zone, null, () => t.route === s.route && !(t.through && s.isLunging()));
         for (const r of this.robots ?? []) r.addCollider(p);
-        // The dash goes through a breakable, and it is gone for good.
+        // The lunge goes through a breakable, and it is gone for good.
         for (const t of this.breakables) {
             s.physics.add.collider(p, t.zone, null, () => {
                 if (t.route !== s.route || t.done) return false;
-                if (!s.isDashing()) return true;
-                t.done = true;
-                s.smash(t.x, t.y - (t.hang ?? 0) - 12);
-                if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
-                if (t.lowZone) this.low = this.low.filter(z => z !== t.lowZone);
-                this.save.broken.push(t.id);
-                t.items.forEach(i => i.destroy());
-                t.items = [];
-                t.zone.destroy();
-                this.refresh();
+                if (!s.isLunging()) return true;
+                this.breakThing(t);
                 return false;
             });
         }
+    }
+
+    // A breakable smashed (by her lunge; the piñata by a lob too): gone for good.
+    breakThing(t) {
+        const s = this.scene;
+        t.done = true;
+        s.smash(t.x, t.y - (t.hang ?? 0) - 12);
+        if (t.hang) this.confetti(t.x, t.y - t.hang - 10, t.y);
+        if (t.lowZone) this.low = this.low.filter(z => z !== t.lowZone);
+        this.save.broken.push(t.id);
+        t.items.forEach(i => i.destroy());
+        t.items = [];
+        t.zone.destroy();
+        this.refresh();
+    }
+
+    // A lobbed tangerine that meets a thing hung up (the piñata) brings it down: three for one
+    // (docs/plan-three-uses.md §2). Anything else breakable it only bounces off.
+    lobbedInto(t) {
+        if (!t.thrown || !t.lob) return false;
+        const x = t.img.x, y = t.img.y;
+        // A thing to find up on a shelf: knocked off it, down to the floor, hers from there; the
+        // tangerine bounces off it and goes on.
+        for (const k of this.things) {
+            if (!k.high || k.done || k.route !== t.route || !k.pick?.active) continue;
+            const b = k.pick.getBounds();
+            if (x < b.left - 4 || x > b.right + 4 || y < b.top - 4 || y > b.bottom + 4) continue;
+            k.high = false;
+            k.level = k.y;
+            t.img.body.velocity.x *= -0.4;
+            sfx.at(k.x, k.y).plop();
+            this.scene.tweens.add({ targets: k.pick, y: k.y, angle: 180, duration: 420, ease: 'Bounce.easeOut' });
+            return false;
+        }
+        for (const b of this.breakables) {
+            if (!b.hang || b.done || b.route !== t.route) continue;
+            const z = b.zone.body;
+            if (x < z.left - 4 || x > z.right + 4 || y < z.top - 4 || y > z.bottom + 4) continue;
+            this.scene.loose.remove(t);
+            this.breakThing(b);
+            return true;
+        }
+        return false;
     }
 
     // A burst of paper and sweets, coming down to the floor (the pinata).
@@ -1683,7 +2164,10 @@ export class World {
         const back = s.add.rectangle(24, 146, 104, 10, 0x1d2b53).setOrigin(0).setVisible(false);
         const bar = s.add.rectangle(26, 148, 100, 6, 0x8fd3ff).setOrigin(0).setVisible(false);
         this.hudCarry = { back, bar };
-        layer.add([this.hudBooks, back, bar]);
+        this.hudKeeps = Object.fromEntries(Object.keys(KEEP_ICONS).map(whose => [whose, s.add.text(24, 114, '', {
+            fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
+        }).setVisible(false)]));
+        layer.add([this.hudBooks, back, bar, ...Object.values(this.hudKeeps)]);
         this.refresh();
     }
 }

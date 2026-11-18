@@ -39,16 +39,6 @@ const PALETTE = {
 };
 
 const SPRITES = {
-    tangerine: [
-        '....ll..',
-        '...lll..',
-        '..oooo..',
-        '.oooooo.',
-        '.oooooO.',
-        '.ooooOO.',
-        '..oOOO..',
-        '........',
-    ],
     crate: [
         'CCCCCCCCCCCCCCCC',
         'CccccccccccccccC',
@@ -66,14 +56,6 @@ const SPRITES = {
         'CcCccccccccccCcC',
         'CccccccccccccccC',
         'CCCCCCCCCCCCCCCC',
-    ],
-    vacuum: [
-        '.....dddddd.....',
-        '...ddmmmmmmdd...',
-        '..dmmmmuummmmd..',
-        '.dmmmmmmmmmmmmd.',
-        'dddddddddddddddd',
-        '.d............d.',
     ],
     // A small side table, background furniture (muted, so it never reads as something to stand on).
     sidetable: [
@@ -180,24 +162,79 @@ const LAMP = {
     on: ['.dddddd.', 'dGyyyyGd', 'dyyyyyyd', '.dddddd.'],
 };
 
-function paint(ctx, rows, ox = 0, oy = 0) {
+// The tangerine (docs/plan-three-uses.md §1.7): PixelLab's (pixen, job bd5fec36), chosen by the
+// user from five on 2026-11-16 and made 10 px by taking two rows and two columns out of its peel,
+// its colours put on Resurrect 64 by hand. Its own colours, so that the letters mean what they do
+// here. The fruit fills rows 2 to 9 under its leaves: its middle is at (5, 6).
+const FRUIT_PALETTE = {
+    K: '#2e222f', // outline
+    o: '#fb6b1d', // peel
+    O: '#ea4f36', // peel in shade
+    h: '#fdcbb0', // highlight
+    l: '#239063', // leaf
+    L: '#165a4c', // leaf in shade
+    y: '#fbb954', // the fruit inside, where it is bitten
+};
+const FRUIT = {
+    tangerine: [
+        '....K.KK..',
+        '...KlKllK.',
+        '..KollLK..',
+        '.KoooooOK.',
+        'KoohhooOOK',
+        'KohoooooOK',
+        'KOoOoooOOK',
+        '.KOOOOOOK.',
+        '..KOOOOK..',
+        '...KKKK...',
+    ],
+    // Bitten into (someone eating one: src/world/people.js `eat`), then half of it: its leaves
+    // gone with the peel, the bite showing the fruit inside.
+    'tangerine-bit1': [
+        '..........',
+        '..........',
+        '..KKK.....',
+        '.KoooK....',
+        'KoohhyK...',
+        'KohooyyKK.',
+        'KOoOoooyOK',
+        '.KOOOOOOK.',
+        '..KOOOOK..',
+        '...KKKK...',
+    ],
+    'tangerine-bit2': [
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        '..........',
+        'KyyyyyyyyK',
+        'KOoOoooOOK',
+        '.KOOOOOOK.',
+        '..KOOOOK..',
+        '...KKKK...',
+    ],
+};
+
+function paint(ctx, rows, ox = 0, oy = 0, palette = PALETTE) {
     rows.forEach((row, y) => {
         [...row].forEach((ch, x) => {
-            if (ch === '.' || !PALETTE[ch]) return;
-            ctx.fillStyle = PALETTE[ch];
+            if (ch === '.' || !palette[ch]) return;
+            ctx.fillStyle = palette[ch];
             ctx.fillRect(ox + x, oy + y, 1, 1);
         });
     });
 }
 
-function makeSingle(scene, key, rows) {
+function makeSingle(scene, key, rows, palette) {
     const tex = scene.textures.createCanvas(key, rows[0].length, rows.length);
-    paint(tex.getContext(), rows);
+    paint(tex.getContext(), rows, 0, 0, palette);
     tex.refresh();
 }
 
 export function makeTextures(scene) {
     for (const [key, rows] of Object.entries(SPRITES)) makeSingle(scene, key, rows);
+    for (const [key, rows] of Object.entries(FRUIT)) makeSingle(scene, key, rows, FRUIT_PALETTE);
     makeSingle(scene, 'door', doorRows(false));
     makeSingle(scene, 'door-on', doorRows(true));
     makeSingle(scene, 'lamp', LAMP.off);

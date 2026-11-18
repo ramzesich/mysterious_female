@@ -286,7 +286,7 @@ first"); how it was done: `docs/progress-decisions.md`.
   `assets/source/livery/livery-by-hand.png`.
 - **The prep before the intro** (the user, 2026-11-14, on `docs/intro.md`). **Done the same
   day:** every hint popup taken out; the game's texts in English and Ukrainian (`src/lang.js`,
-  `?lang=uk`); deck 3's crew corridor, the start, with her crew cabin and the service ladder up
+  `?lang=ua`); deck 3's crew corridor, the start, with her crew cabin and the service ladder up
   to deck 4 (`docs/progress-decisions.md`). `docs/start-links.md` lists a link for every place
   the game can be started at.
 - **The intro** (`docs/intro.md`: the welcome screen with PLAY and LANGUAGE, the start sequence,

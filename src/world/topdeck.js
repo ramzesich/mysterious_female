@@ -7,7 +7,7 @@
 // her book, the gulls leave the bow, Bumbot runs for it), the engineer's book, the court's quirk.
 // Places come from maps/world.json (`topdeck`).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, GAGS, FLARE } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
@@ -116,6 +116,32 @@ export class Balls {
         this.hitAt = 0;
     }
 
+    // A lobbed tangerine coming down through the rim: it scores, a cheer, and it comes down again
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, r = this.rim, b = t.img.body;
+        if (!t.thrown || !t.lob || t.scored || b.velocity.y <= 0 || Math.abs(t.img.x - r.x) > 8 || Math.abs(t.img.y - r.y) > 8) return false;
+        t.scored = true;
+        b.velocity.x *= 0.2;
+        sfx.at(r.x, r.y).swish();
+        sfx.at(r.x, r.y).cheer(1.4);
+        this.world.sparkle(r.x, r.y + 6, 0xfbff86);
+        return false;
+    }
+
+    // In a lunge she meets the ball: headed back onto the court, over the cage.
+    lunged(kind, fromX) {
+        const s = this.scene, d = this.def;
+        if (kind !== 'ball' || !this.ball.visible || Math.abs(this.ball.x - fromX) > 12) return false;
+        this.headed = Math.floor((s.time.now / 1000 + d.offset) / d.period);
+        const b = s.add.image(this.ball.x, this.ball.y, 'shipart', 'basketball').setDepth(this.ball.depth);
+        this.world.add([b]);
+        sfx.at(b.x, b.y).bounce();
+        s.tweens.add({ targets: b, x: this.rim.x, duration: 700, ease: 'Sine.easeOut' });
+        s.tweens.add({ targets: b, y: this.rim.y - 30, duration: 350, ease: 'Quad.easeOut', yoyo: true, onComplete: () => b.destroy() });
+        return true;
+    }
+
     // Where the ball is `t` s into its turn: { x, y: px over the floor, a: alpha } or null.
     at(t) {
         const d = this.def, x0 = this.rim.x + d.dir * 8, R = d.reach * d.dir, drop = d.y - this.rim.y - 5;
@@ -148,6 +174,12 @@ export class Balls {
         }
         const t = ((time / 1000 + d.offset) % d.period);
         const q = this.at(t);
+        // (Headed back onto the court in a lunge: this turn's ball is gone.)
+        if (Math.floor((time / 1000 + d.offset) / d.period) === this.headed) {
+            this.ball.setVisible(false);
+            this.shadow.setVisible(false);
+            return;
+        }
         this.ball.setVisible(!!q);
         this.shadow.setVisible(!!q && !q.tell);
         if (!q) return;
@@ -168,14 +200,18 @@ export class Balls {
         if (!hit) return;
         this.hitAt = time + 1500;
         sfx.bounce();
-        if (this.world.carry) this.world.carryBox.spill(q.x);
-        else s.scareContact(q.x, 'bonked');
+        if (this.world.carry) this.world.carryBox.spill(q.x, false, 'ball');
+        else s.scareContact(q.x, 'ball');
     }
 }
 
 // A teppanyaki grill's flare (population: `haz_flare`): the chef's flourish, sparks on the plate,
 // and a ball of flame over the counter and the way past it for a second: "Singed" (a tray is
-// spilled). The two grills take turns.
+// spilled; with nothing in her hands, her gag: `ride()`). With no one near, the two grills take
+// turns by their clock. **The chef answers her coming** (the user, 2026-11-18: run past a clock's
+// flare, it went up behind her): she runs at a quiet grill and his flourish starts so that the flame
+// is up as she gets there (`FLARE`); stopped at the flourish, she lets it flare and passes in the
+// lull after it (`coolMs`).
 export class Flare {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -184,22 +220,126 @@ export class Flare {
         this.def = def;             // { x, y, half, period, on, offset, chef }
         this.g = s.add.graphics().setDepth(D.player + 0.04);
         this.glow = s.add.rectangle(def.x, def.y - 64, def.half * 2 + 90, 128, 0xf9c22b, 0).setDepth(D.decor + 0.3);
-        world.add([this.g, this.glow]);
+        // (The smoke that wraps her, 19: over her and over the flame.)
+        this.sg = s.add.graphics().setDepth(D.player + 0.05);
+        world.add([this.g, this.glow, this.sg]);
         this.hitAt = 0;
+        // (When the next flourish starts, ms of the scene's clock: the clock's own first, as the
+        // grills took turns before, `offset` s apart; and when the lull after the last one ends.)
+        const lead = (((def.period - def.on - FLARE.tellS - def.offset) % def.period) + def.period) % def.period;
+        this.next = s.time.now + lead * 1000;
+        this.coolUntil = 0;
+    }
+
+    // Her cry startles the chef: his next flare comes late (not one already alight).
+    heard() {
+        const s = this.scene, d = this.def;
+        const now = s.time.now;
+        if (!this.world.hears(d.x, d.y) || this.phase(now)[0] === 'on') return;
+        this.next = Math.max(this.next, now) + FLARE.lateMs;
+        this.coolUntil = Math.max(this.coolUntil, now + FLARE.lateMs);
+        const chef = this.world.people.byId[d.chef];
+        if (chef?.on) this.world.pop(chef.x, chef.y - PLAYER.height - 6, 'alert', 1000);
+    }
+
+    // 19, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): a puff of black smoke
+    // wraps her where the flame caught her, and under it she jumps back out of its reach (`back` px
+    // past it, `slideMs`; doors and walls stop her) and is in her soot picture; it thins (`clearMs`):
+    // her face black, her hair on end and singed; she blinks, a wisp of smoke curling off her hair,
+    // and coughs out a puff of smoke; then her checkpoint.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, g = GAGS.flare;
+        return {
+            play: (done) => {
+                const m = s.cache.json.get('gags-meta');
+                const dir = p.flipX ? -1 : 1, side = Math.sign(p.x - d.x) || -dir;
+                const pic = s.add.sprite(p.x, d.y, 'gags', m.anims['flare-blink'][0])
+                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+                this.world.add([pic]);
+                this.pic = pic;
+                const x0 = pic.x, end = s.stopShort(x0, d.x + side * (d.half + g.back), d.y, 16);
+                this.smoke = { x: x0, t: 0 };
+                // (Drawn at once: she is in her soot picture from this very frame.)
+                this.drawSmoke(this.sg.clear());
+                sfx.yelp();
+                let t = 0;
+                s.time.delayedCall(g.coverMs + g.clearMs * 0.6 + g.holdSootMs, () => {
+                    pic.play('gags-flare-blink');
+                    pic.once('animationcomplete-gags-flare-blink', () => {
+                        pic.play('gags-flare-cough');
+                        s.time.delayedCall(g.coughAtMs, () => sfx.at(pic.x, d.y).cough());
+                        pic.once('animationcomplete-gags-flare-cough', () => done());
+                    });
+                });
+                s.script = (dt) => {
+                    t += dt * 1000;
+                    const u = Math.min(1, t / g.slideMs);
+                    pic.x = x0 + (end - x0) * (1 - (1 - u) * (1 - u));
+                    this.smoke.x = x0 + (pic.x - x0) * 0.7;
+                    this.smoke.t = t;
+                    p.x = pic.x;
+                };
+            },
+            show: () => {
+                this.pic?.destroy();
+                this.pic = null;
+                this.smoke = null;
+            },
+        };
+    }
+
+    // The smoke round her (19): thick to `coverMs`, a few embers in it, then thinning and rising over
+    // `clearMs`.
+    drawSmoke(g) {
+        const b = this.smoke, G = GAGS.flare;
+        if (!b) return;
+        const k = Math.max(0, (b.t - G.coverMs) / G.clearMs);
+        if (k >= 1) return;
+        const a = 1 - k * k, y = this.def.y;
+        // (Three columns of five over her, her hair on end and all, so that nothing of her shows.)
+        for (let i = 0; i < 15; i++) {
+            const ox = (i % 3 - 1) * 15 + ((i * 7) % 5) - 2, oy = 8 + Math.floor(i / 3) * 17 + ((i * 11) % 5);
+            const r = 13 + ((i * 13) % 5) + k * 8;
+            g.fillStyle(i % 4 ? 0x3e3546 : 0x625565, a)
+                .fillCircle(b.x + ox * (1 + k * 0.6), y - oy - k * 26 + Math.sin(b.t / 200 + i) * 2, r);
+        }
+        if (b.t > G.coverMs) return;
+        for (let i = 0; i < 6; i++) {
+            const e = (b.t / G.coverMs + i * 0.17) % 1;
+            g.fillStyle(i % 2 ? 0xf9c22b : 0xf79617, 1 - e)
+                .fillRect(b.x + Math.sin(i * 2.3) * (14 + e * 12), y - 30 - i * 9 - e * 18, 2, 2);
+        }
     }
 
     // 'calm', 'tell' (how far into it, 0-1) or 'on' (0-1).
     phase(time) {
-        const d = this.def, t = (time / 1000 + d.offset) % d.period;
-        if (t >= d.period - d.on) return ['on', (t - (d.period - d.on)) / d.on];
-        if (t >= d.period - d.on - 0.9) return ['tell', (t - (d.period - d.on - 0.9)) / 0.9];
+        const d = this.def, t = (time - this.next) / 1000;
+        if (t >= 0 && t < FLARE.tellS) return ['tell', t / FLARE.tellS];
+        if (t >= FLARE.tellS && t < FLARE.tellS + d.on) return ['on', (t - FLARE.tellS) / d.on];
         return ['calm', 0];
     }
 
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player, g = this.g.clear();
+        this.drawSmoke(this.sg.clear());
+        // (A flare over: the lull, and the clock's next one.)
+        if (time >= this.next + (FLARE.tellS + d.on) * 1000) {
+            const end = this.next + (FLARE.tellS + d.on) * 1000;
+            this.coolUntil = Math.max(this.coolUntil, end + FLARE.coolMs);
+            this.next = end + (d.period - d.on - FLARE.tellS) * 1000;
+        }
         if (!near(s, d.x, d.y, 700, 200)) return;
-        const [phase, k] = this.phase(time);
+        let [phase, k] = this.phase(time);
+        // She runs at the quiet grill: the flourish starts now if the flame, once up, would meet her
+        // as she gets to it (her speed, the flourish and the flame's rise: `riseS`). Not once she is
+        // nearer than `nearK` of that: the flame would go up behind her.
+        if (phase === 'calm' && time >= this.coolUntil && s.mode === 'play' && s.route === 'inside' && Math.abs(p.y - d.y) < 60) {
+            const v = p.body?.velocity.x ?? 0, gap = Math.abs(p.x - d.x) - (d.half - 8);
+            if (Math.abs(v) > 20 && Math.sign(v) === Math.sign(d.x - p.x) && gap <= Math.abs(v) * (FLARE.tellS + FLARE.riseS) && gap >= Math.abs(v) * (FLARE.tellS + FLARE.riseS) * FLARE.nearK) {
+                this.next = time;
+                [phase, k] = this.phase(time);
+            }
+        }
         const top = d.y - 31;
         if (phase === 'calm') {
             this.told = false;
@@ -243,8 +383,8 @@ export class Flare {
         if (env < 0.7 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         if (Math.abs(p.x - d.x) > d.half - 8 || Math.abs(p.y - d.y) > 90 || p.y < d.y - 100) return;
         this.hitAt = time + 1500;
-        if (this.world.carry) this.world.carryBox.spill(d.x);
-        else s.scareContact(d.x, 'singed');
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'flare');
+        else s.scareContact(d.x, 'flare', { ride: this.ride() });
     }
 }
 
@@ -273,9 +413,34 @@ export class FunnelWind {
         this.turn = 0;
     }
 
+    // Her cry: a gull marking her breaks off.
+    heard() {
+        if (this.state !== 'mark') return;
+        const t = this.target;
+        if (!this.world.hears(t.x, t.y, this.scene.route)) return;
+        this.scene.tweens.killTweensOf(this.mark);
+        this.mark.setVisible(false);
+        this.state = 'circle';
+        this.turn++;
+    }
+
     onStairs() {
         const s = this.scene;
         return s.mode === 'stairs' && s.flight?.outside;
+    }
+
+    // A tangerine on the deck round the funnel: one goes after it, and none swoops for 10 s
+    // (docs/plan-three-uses.md §2).
+    offered(t) {
+        const c = this.centre, s = this.scene;
+        if (this.state !== 'circle' || this.taker || Math.abs(t.img.x - c.x) > 300 || t.img.y < c.y - 100 || t.img.y > c.y + 400) return false;
+        const b = this.taker = this.gulls[(this.turn + 1) % this.gulls.length];
+        this.quietUntil = s.time.now + 10000;
+        this.world.gullTakes(b.sprite, t, () => {
+            this.taker = null;
+            b.sprite.setVisible(true);
+        });
+        return true;
     }
 
     update(dt, time) {
@@ -296,7 +461,7 @@ export class FunnelWind {
         // The gulls: round the lattice, the diver out of its circle.
         const diver = this.gulls[this.turn % this.gulls.length];
         for (const b of this.gulls) {
-            if (b === diver && this.state !== 'circle') continue;
+            if ((b === diver && this.state !== 'circle') || b === this.taker) continue;
             const a = time / 1700 + b.i * Math.PI;
             const tx = this.centre.x + Math.cos(a) * 170, ty = this.centre.y + Math.sin(a) * 70 + Math.sin(a * 2.3) * 12;
             b.x += (tx - b.x) * Math.min(1, dt * 3);
@@ -307,7 +472,7 @@ export class FunnelWind {
         if (this.state === 'circle') {
             // In a lull, with time to get clear before the next gust.
             const due = cycle !== this.cycle && cycle % Math.max(1, Math.round(d.swoop / g.every)) === 0 && inCycle > 0.3 && inCycle < 1.0;
-            if (due && on && !s.stairSlip) {
+            if (due && on && !s.stairSlip && time > (this.quietUntil ?? 0)) {
                 this.cycle = cycle;
                 this.state = 'mark';
                 this.at = time + 1000;
@@ -334,7 +499,7 @@ export class FunnelWind {
             if (time > this.at) {
                 this.mark.setVisible(false);
                 const hit = this.onStairs() && Math.abs(p.x - this.target.x) < 17 && Math.abs(p.y - this.target.y) < 30;
-                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'swooped');
+                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'funnelgull', { snatch: diver.sprite });
                 this.state = 'circle';
                 this.turn++;
             }
@@ -370,6 +535,38 @@ export class Flock {
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
             b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
         }
+    }
+
+    // A tangerine by the flock: the nearest goes after it, and flies back (docs/plan-three-uses.md §2).
+    offered(t) {
+        const s = this.scene, d = this.def;
+        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60 || Math.abs(t.img.y + 3 - d.y) > 12) return false;
+        const free = this.birds.filter(b => !b.up);
+        if (!free.length) return false;
+        const b = free.reduce((a, c) => Math.abs(c.x - t.img.x) < Math.abs(a.x - t.img.x) ? c : a);
+        b.up = true;
+        this.world.gullTakes(b.sprite, t, () => {
+            const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
+            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, d.y - 110);
+            s.tweens.add({ targets: b.sprite, x: b.x, y: d.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
+                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched'); b.up = false; } });
+        });
+        return true;
+    }
+
+    // Her cry: the flock lifts a little, all at once, and settles again.
+    heard() {
+        const s = this.scene, d = this.def;
+        if (this.gone || !this.birds.some(b => this.world.hears(b.x, d.y))) return;
+        sfx.at((d.x0 + d.x1) / 2, d.y).flap();
+        this.birds.forEach((b, i) => {
+            if (b.up) return;
+            b.up = true;
+            const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
+            b.sprite.setFrame('gull-up');
+            s.tweens.add({ targets: b.sprite, y: d.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
+                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched').setY(d.y); b.up = false; } });
+        });
     }
 
     // Up and away over the bow, all at once. Resolves when the sky is clear.
