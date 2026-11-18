@@ -36,6 +36,15 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 `starts/flare/s19-soot.png`): her face black, her hair on end, singed at the tips; a
                 wisp of smoke curls up off her hair, her white eye blinks
   flare-cough   19: from and back to the soot picture, she bends and coughs out a puff of smoke
+  stairs-sit    21: a funnel gull's swoop on the stairway: from her standing she sits down hard on the
+                step, legs out down the flight (`stairs-bump/sit/`, cut by `stairs-bump/cut.py`)
+  stairs-bump   21: one bump on her bottom in place (from and back to the sit's last picture); the
+                game plays 3, 5, 7 a step, a step down at 5. Both stand on a step's corner at
+                (48, 64): the left edge of column 48, row 64
+  stairs-foot   21: the last two steps and off onto the roof's floor, slumped; it stands on the foot
+                of the flight at (50, 100). All three face east and descend east (the game flips them)
+  stairs-dazed  21's end: slumped at the foot, dizzy, her head wobbling, two butterflies circling over
+                it (a loop; stood as the foot's)
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -53,7 +62,9 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
-         ("flare-blink", 9), ("flare-cough", 9)]
+         ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8)]
+# (Gag 21's frames are cut from the generator's in a folder of their own.)
+PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed"}
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
 # (19's soot: its greys fall on the palette's two cool, greenish greys, and her face read as green; they
 # go on the charcoal greys of her hair's own family instead. No other colour of hers falls there.)
@@ -61,7 +72,7 @@ SOOT = {(49, 54, 56): (62, 53, 70), (55, 78, 74): (98, 85, 101)}
 
 
 def frame(clip, i):
-    im = Image.open(SRC / clip / f"{i}.png").convert("RGBA")
+    im = Image.open(SRC / PATH.get(clip, clip) / f"{i}.png").convert("RGBA")
     if clip == "door-slide":
         # (Her flattened picture's canvas is 96 px: set beside the door as the squash's last frame.)
         c = Image.new("RGBA", (CELL, CELL))
@@ -107,7 +118,8 @@ def main():
             "gull": {"x": 54},
             "sprinkler": {"x": 64, "run": 54},
             "steam": {"x": 64},
-            "flare": {"x": 64}}
+            "flare": {"x": 64},
+            "stairs": {"corner": [48, 64], "foot": [50, 100]}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

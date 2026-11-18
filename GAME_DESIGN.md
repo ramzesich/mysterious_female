@@ -1272,7 +1272,8 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   it and forward along the roof toward the bow.
 - **Hazards:** gusts and gulls on the funnel's stairway (2026-11-18: in a gust she crouches and holds on
   to the rail until it drops; a gull dives straight at her from its flight, every few seconds between
-  gusts; a slip onto the roof is one storey, fine; from
+  gusts; with no tangerine on her it is gag 21, built 2026-11-18: "Ow-ow-ow!", she sits down hard and bumps
+  down on her bottom step by step to the foot, dizzy there with butterflies over her head; a slip onto the roof is one storey, fine; from
   the top, the long fall); **basketballs** bouncing out of the sports court's cage (146-164 m), one
   every few seconds (a "bonked" scare); **Teppanyaki's flare** (the chef's grill flames up every few
   seconds as she passes the counter: a "singed" scare, she pats her hair); the old lady (a block);

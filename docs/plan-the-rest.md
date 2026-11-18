@@ -77,7 +77,8 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   apology and the hand-over).
 - **Under way (2026-11-18):** proposed and answered (21 facing down the flight, feet first, at a constant
   pace; 22 a new clip of her looking up at the inside-out parasol; 23 and 24 as written, to the next wall or
-  partition; one at a time). Gag 21's clip made and approved, not yet built. On the way, the funnel's
+  partition; one at a time). **Gag 21 built (2026-11-18)**: `stairsGag` in the ship scene, "Ow-ow-ow!", a dizzy end with
+  butterflies (the user's additions); `?at=stairway`. On the way, the funnel's
   stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
   the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
 
@@ -357,7 +358,7 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 ## 11. Checked by hand (2026-11-18)
 
 - `MISHAP_SCENES` in `src/config.js`: the scenarios with no `gag` are 1, 2, 7a, 9a to 9d, 10e,
-  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24. `src/world/mishaps.js` still returns `13b`.
+  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24 (21 built since: `gag: 'stairs'`). `src/world/mishaps.js` still returns `13b`.
 - `tools/playtest.py` has no `mishaps`, `keeps` or `deliveries`.
 - `KEY_CARDS.required` is `true`; `src/progression.js` knows no `locked`.
 - `DEV_FRESH` is `true`; `WIN_MESSAGE` is empty.

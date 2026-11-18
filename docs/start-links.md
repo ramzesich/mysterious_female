@@ -127,3 +127,4 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `funnel`: the funnel's top | <http://localhost:8000/?play&at=funnel&cards=all&tangerines=infinite> |
+| `stairway`: the foot of the funnel's stairway | <http://localhost:8000/?play&at=stairway&cards=all&tangerines=infinite> |

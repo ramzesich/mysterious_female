@@ -2908,3 +2908,23 @@ funnel's stairway for 21 brought up its faults, mended first on the user's word:
 - **Tests:** `boot`, `region6`, `region7`, `region8` (the hold in a gust, the dive), `finale`, `golden` (its walk to
   the stairway's foot now waits for the foot), `pocket`, `stairs`, `throw`, `atrium` pass; `check_overlaps` 0. The
   rest not run.
+
+## Gag 21 built: she bumps down the funnel's stairway (2026-11-18)
+
+`docs/plan-the-rest.md` §3 1.1, the first of its four gags. A funnel gull hits her on the stairway with no tangerine on
+her: from the step's corner nearest her she sits down hard facing down the flight and at once bumps down on her
+bottom, a step every three frames at one pace (the user: "let her just bump down at a constant speed, starting
+immediately"), across the turn and down to the foot; she slides off onto the roof slumped, then her checkpoint at the
+technical door. The ship scene's `stairsGag` (`GAGS.stairs`), frames from the `gags` sheet stood each on its step's
+corner, at her depth (the rail in front of her); her hidden sprite goes along for the camera and the word.
+
+- **Phaser 4 mirrors a frame in place**, its origin still counted from the left of what is drawn (not about the
+  origin): both clips first stood 26 to 30 px east of their corners. Found by matching the game's frames to the clip's
+  pixels; now every frame stands where the approved preview had it.
+- **The user's additions on seeing it:** a dizzy end, butterflies over her head (a new loop, PixMiniMax, 1 generation,
+  shown in the chat composed at the foot and approved; it plays twice, about 1.8 s); and the word "Ow-ow-ow!"
+  («Ай-ай-ай!») for the ride (`fright.bumpy`; the gull's snatch with a tangerine keeps "Shoo!").
+- `?at=stairway` (the stairway's foot), in README and `docs/start-links.md`. A thump on the steel at each step.
+- Not changed: from the stairway's top the ride is about 12 s (from five steps over the turn, about 5); she turns to
+  face down the flight in one frame if she was climbing.
+- **Tests:** `region8` (the hit, the ride to the foot, the technical door), `boot`, `lang` pass; the rest not run.

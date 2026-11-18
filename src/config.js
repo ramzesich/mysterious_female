@@ -295,7 +295,7 @@ export const MISHAP_SCENES = {
     '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
     '19': { word: 'singed', react: 'yelp', toss: 'drop', gag: 'flare' },        // a flare: out of a puff of smoke her face black, her hair on end and smoking; she blinks and coughs out a puff (`Flare.ride`)
     '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
-    '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit' },        // a funnel gull
+    '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit', gag: 'stairs' },  // a funnel gull: on her bottom down the stairway (the ship scene's `stairsGag`)
     '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', toss: 'hand' },                 // a "Do Not Disturb" door
     '24': { word: 'startled', react: 'apology', toss: 'hand' },                 // the occupied balcony
@@ -375,6 +375,12 @@ export const GAGS = {
     // flame (`back` px past its reach, over `slideMs`), and thins over `clearMs`: her face sooty, her
     // hair on end; she stands `holdSootMs`, blinks, and coughs out a puff (its sound `coughAtMs` in).
     flare: { holdMs: 1000, slideMs: 260, back: 44, coverMs: 360, clearMs: 600, holdSootMs: 300, coughAtMs: 330 },
+    // A funnel gull's swoop on the stairway (21): from the step's corner nearest her she sits down hard,
+    // facing down the flight, and at once bumps down on her bottom, a step each three frames at a
+    // constant pace (the user, 2026-11-18: "let her just bump down at a constant speed, starting
+    // immediately"), to the foot, and off onto the roof, slumped; `frameMs` each frame. Then dizzy, butterflies
+    // over her head (the user, 2026-11-18): her dazed loop `dazedLoops` times at `dazedMs` a frame, `holdMs` after.
+    stairs: { stairs: true, word: 'bumpy', frameMs: 60, dazedMs: 110, dazedLoops: 2, holdMs: 0 },
 };
 
 // Teppanyaki's flares (`Flare` in src/world/topdeck.js): the chef's flourish before the flame, s;

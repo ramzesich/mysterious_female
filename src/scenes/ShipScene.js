@@ -1465,6 +1465,11 @@ export class ShipScene extends Phaser.Scene {
         return { x: u * u * a.x + 2 * u * t * c.x + t * t * b.x, y: u * u * a.y + 2 * u * t * c.y + t * t * b.y };
     }
 
+    // How many steps a flight is drawn with: one each 8 px of its rise. Step i's corner is at `i / steps`.
+    stairSteps(f) {
+        return Math.max(2, Math.round((f.bottom.y - f.top.y) / 8));
+    }
+
     flightLength(f) {
         let length = 0;
         for (let i = 1; i <= 24; i++) length += Phaser.Math.Distance.BetweenPoints(this.stairPoint(f, (i - 1) / 24), this.stairPoint(f, i / 24));
@@ -1477,7 +1482,7 @@ export class ShipScene extends Phaser.Scene {
     // cores, gold ring scrollwork and a curled rail end on the atrium's curving staircase.
     drawStairs(g, front, f) {
         const look = STAIR_LOOKS[f.look] || (f.curve ? STAIR_LOOKS.atrium : STAIR_LOOKS.core);
-        const steps = Math.max(2, Math.round((f.bottom.y - f.top.y) / 8));
+        const steps = this.stairSteps(f);
         // On whole pixels, so nothing shimmers as the camera glides.
         const at = t => {
             const q = this.stairPoint(f, t);
@@ -4551,6 +4556,7 @@ export class ShipScene extends Phaser.Scene {
             this.flinchUntil = this.time.now + 10000;
             return;
         }
+        if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
@@ -4694,6 +4700,89 @@ export class ShipScene extends Phaser.Scene {
         p.body.setVelocity(0, 0);
         this.gagEnd = () => { p.setVisible(true); ride.show?.(); };
         ride.play(() => this.time.delayedCall(g.holdMs, () => this.respawn()));
+    }
+
+    // Gag 21 (§1.6), a funnel gull's swoop on the stairway with none on her: from the step's corner
+    // nearest her she sits down hard, facing down the flight, and at once bumps down on her bottom, a
+    // step each three frames at a constant pace (bump 3, 5, 7, the step down at 5), down to the lower
+    // flight's second step; there the foot's clip takes her off onto the roof, slumped; she sits there
+    // dizzy, butterflies over her head; then her checkpoint. The `gags` sheet's stairs-sit, -bump, -foot, drawn at her depth (the rail in front of
+    // her), each frame stood on its corner (`stairs` in its data); her own sprite, hidden, goes along
+    // for the camera and the word over her head.
+    stairsGag(sc) {
+        const p = this.player, g = GAGS[sc.gag], gm = this.cache.json.get('gags-meta'), A = gm.anims;
+        const corner = (f, t) => {
+            const q = this.stairPoint(f, t);
+            return { x: Math.round(q.x), y: Math.round(q.y) };
+        };
+        const below = f => this.flights.find(h => h !== f && h.outside && Math.abs(h.top.x - f.bottom.x) < 3 && Math.abs(h.top.y - f.bottom.y) < 3);
+        // The corners from hers down: a flight's own down to its first (its bottom is the next one's
+        // top), the last flight's down to its second.
+        const corners = [];
+        let f = this.flight, i = Math.round(this.stairT * this.stairSteps(f));
+        for (;;) {
+            const n = this.stairSteps(f), next = below(f);
+            for (; i >= (next ? 1 : 2); i--) corners.push(corner(f, i / n));
+            if (!next) break;
+            f = next;
+            i = this.stairSteps(f);
+        }
+        if (!corners.length) corners.push(corner(f, 2 / this.stairSteps(f)));   // (on its last two steps)
+        const foot = corner(f, 0), flip = f.top.x > f.bottom.x;
+        const seq = A['stairs-sit'].map(fr => ({ fr, at: corners[0] }));
+        for (let k = 0; k < corners.length - 1;) {
+            for (const b of [3, 5, 7]) {
+                if (b === 5) k = Math.min(k + 1, corners.length - 1);
+                seq.push({ fr: A['stairs-bump'][b], at: corners[k], thump: b === 5 });
+            }
+        }
+        A['stairs-foot'].forEach((fr, j) => seq.push({ fr, at: foot, foot: true, thump: j === 4 }));
+        // (Then dizzy where she slumped, butterflies over her head, at its own pace.)
+        for (let l = 0; l < g.dazedLoops; l++) for (const fr of A['stairs-dazed']) seq.push({ fr, at: foot, foot: true, ms: g.dazedMs });
+        let t = 0;
+        for (const q of seq) { q.t = t; t += q.ms ?? g.frameMs; }
+
+        this.beginScare();
+        this.scareFrom = { x: foot.x, y: foot.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        p.setVisible(false);
+        const spr = this.add.sprite(corners[0].x, corners[0].y, 'gags').setDepth(p.depth).setFlipX(flip);
+        const cam = this.cameras.main;
+        cam.startFollow(p, true, 0.15, 0.15);
+        cam.setFollowOffset(0, HALF);
+        // (Phaser mirrors a frame in place, its origin still counted from the left of what is drawn: the
+        // corner's column is counted from the right.)
+        const origin = ([cx, cy]) => [(flip ? gm.cell - 1 - cx : cx) / gm.cell, cy / gm.cell];
+        const [oc, of] = [origin(gm.stairs.corner), origin(gm.stairs.foot)];
+        const t0 = this.time.now;
+        let shown = -1, done = false;
+        const step = () => {
+            const e = this.time.now - t0;
+            let j = shown < 0 ? 0 : shown;
+            while (j + 1 < seq.length && seq[j + 1].t <= e) j++;
+            if (j !== shown) {
+                for (let q = shown + 1; q <= j; q++) if (seq[q].thump) sfx.land(seq[q].foot ? 'deck' : 'metal');
+                shown = j;
+                const s = seq[j];
+                spr.setFrame(s.fr).setOrigin(...(s.foot ? of : oc)).setPosition(s.at.x, s.at.y);
+                p.x = s.at.x;
+                p.y = s.at.y;
+            }
+            if (!done && e >= t + g.holdMs) {
+                done = true;
+                this.respawn();
+            }
+        };
+        this.events.on('update', step);
+        step();
+        this.gagEnd = () => {
+            this.events.off('update', step);
+            spr.destroy();
+            p.setVisible(true);
+        };
     }
 
     // Her gag with the porter and his cart (§1.6, 8a to 8d; `GAGS` cartDrape, cartPush, cartSit,

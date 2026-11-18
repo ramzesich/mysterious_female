@@ -1042,6 +1042,8 @@ def build_objects():
     add(point("home", "place", exact_x(52.0), floor_y(8)))
     from build_world import funnel_top as _top
     add(point("funnel", "place", _top()["x0"] + 20, _top()["y"]))
+    # (By the foot of the funnel's stairway, on the roof: its gulls and gusts, gag 21.)
+    add(point("stairway", "place", _top()["foot"][0] - 24, _top()["foot"][1]))
     # Deck 7's stern strip is outdoors with no way in: the deck is not cut away while she is on it.
     # Nor are the aft terraces behind the end walls (decks 8-10): she is hidden behind the ship's side.
     x0, x1 = STERN_STRIP_7

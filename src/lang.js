@@ -39,6 +39,7 @@ const TEXTS = {
         'fright.drenched': 'Brrr!', 'fright.buried': 'Mmmph!', 'fright.startled': 'Oh, sorry!', 'fright.splashed': 'Aaah!',
         'fright.swooped': 'Shoo!', 'fright.fogged': 'Pfff!', 'fright.singed': 'Hot!',
         'fright.ride': 'Weeeee!',      // carried off on the vacuum (docs/plan-three-uses.md §1.6, 5b)
+        'fright.bumpy': 'Ow-ow-ow!',   // bumped down the funnel's stairway on her bottom (21)
         // What she and the others say in a word.
         'say.oops': 'Oops!', 'say.ohno': 'Oh no, no, no!', 'say.whoa': 'Whoa!', 'say.hey': 'Hey!', 'say.meow': 'Meow!',
         'say.knock': 'knock',
@@ -59,6 +60,7 @@ const TEXTS = {
         'fright.drenched': 'Бррр!', 'fright.buried': 'Мммф!', 'fright.startled': 'Ой, вибачте!', 'fright.splashed': 'Ааа!',
         'fright.swooped': 'Киш!', 'fright.fogged': 'Пхх!', 'fright.singed': 'Гаряче!',
         'fright.ride': 'Уіііііііі!',
+        'fright.bumpy': 'Ай-ай-ай!',
         'say.oops': 'Ой!', 'say.ohno': 'Ой-ой-ой!', 'say.whoa': 'Ой-йой!', 'say.hey': 'Гей!', 'say.meow': 'Мяу!',
         'say.knock': 'тук',
     },

@@ -236,7 +236,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 18 | The towel stack | She bats the towels off | Buried; her head comes up in a towel turban, a towel swan sitting on top |
 | 19 | Teppanyaki's flares | She yelps and pats out a smoking sleeve | A sooty face, her hair on end and smoking, two white eyes blink, a puff of smoke coughed. **Built (2026-11-18):** out of a puff of black smoke (she jumps back out of the flame under it), her face black, her hair on end and singed; she blinks, a wisp of smoke off her hair, and coughs out a puff. The flames narrower, and the chef answers her coming (the user: "if I just run past them, they usually go up behind me") |
 | 20 | The gulls on the balcony rails | She ducks; **the gull takes the tangerine and is gone** | The gull lands on her head and stays; she runs off flailing with it sitting there |
-| 21 | The funnel's gulls, on the stairway | She ducks; the gull takes it | She bumps down the flight on her bottom, step by step, to its foot |
+| 21 | The funnel's gulls, on the stairway | She ducks; the gull takes it | She bumps down the flight on her bottom, step by step, to its foot (built 2026-11-18: `stairsGag`, "Ow-ow-ow!", dizzy at the foot with butterflies) |
 | 22 | The gulls across her glide | She ducks; the gull takes it | The parasol turns inside out, and she falls (the fall as built) |
 | 23 | "Do Not Disturb" doors (7) | **She holds a tangerine out in both hands, her head bowed; a hand takes it and the door shuts** (spent, not rolling) | "Oh, sorry!": both hands over her eyes, blushing, she tiptoes off fast, out of the screen |
 | 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23 |
