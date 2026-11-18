@@ -88,8 +88,7 @@ python tools/playtest.py --real boot sound deck3   # in real time, for comparing
 ```
 
 It drives the real game with key presses in headless Chrome (muted) and saves screenshots to
-`bumbusik-playtest` in the system temp folder (`python tools/tempdir.py` prints which; the
-variable `BUMBUSIK_TEMP` names another). Once a page is loaded the test stops the game's loop and
+`bumbusik-playtest` in the system temp folder. Once a page is loaded the test stops the game's loop and
 steps it itself, a sixtieth of a second a frame, drawing only for screenshots: a scenario takes
 seconds, and gives the same result every run. `boot` and `sound` always run in real time.
 `tools/check_sound.py` measures every sound without playing it; how a sound sounds is judged by

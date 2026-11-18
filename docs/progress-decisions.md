@@ -2829,59 +2829,35 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
   (README).
 - `region8` checks the gag (blink, then cough, and her return) and the chef answering her coming.
 
-## The rest of the game as one plan, in two halves; two workspaces side by side (2026-11-18; a plan and a setup, nothing of the game built)
+## The rest of the game as one plan (2026-11-18; a plan, nothing of the game built)
 
-- **The user:** "I want to spawn an additional session to pick up other parts of the plan. I want
-  them to work in parallel and not interfere with each other, in terms of code conflicts, browser
-  conflicts, etc."; then, everything being merged to `main` and pushed: "Split the rest of the
-  plan in two equal parts so that two sessions will work in parallel without interference. Fork
-  from this point, give them separate workspaces, separate memories (based on what we currently
-  have), and everything else what's relevant. They read from the same docs and reference (with
-  pictures) folders, but each one only updates their own memory, or local notes. If you are not
-  sure about something, find a way to check and make sure"; and on the plan itself: "Read all of
-  the docs of the project, and make a general implementation plan, combined from everything
-  what's left to do. Split it in half (roughly) in a smart way, so that the sessions will be
-  able to freely implement each one their own half."
+- **The user:** "Read all of the docs of the project, and make a general implementation plan,
+  combined from everything what's left to do."
 - **The plan: `docs/plan-the-rest.md`.** Four readers went through every document whole and
-  checked each open item against the code. It lists what can be built now, in two halves; what
-  waits for the user (sixteen things: a photo, a text, a decision); what is done once after both
-  halves are merged (the documents brought up to date, saving on, the release); and what is
-  closed.
-- **The cut (mine):** by files, not by plan step. **Half A, "when she is hit, and how the ship
-  looks":** step 4a to its end (thirteen gags, two clips of others, the `mishaps` playtest), the
-  look-outs of step 6, step 7. **Half B, "what there is to find, and the errands":** step 5
-  whole with the titles, the deliveries of step 6. Step 6 is cut in two because a look-out
-  (camera work, two pieces of the ship's art) and a delivery (a carry rule that pays with a
-  book) share nothing; a first split that gave B all of steps 5, 6 and 7 was uneven (two large
-  pieces and four medium against one large). Each big generated file has one owner.
-- **Found while reading, for the documents (not changed now; the plan's §6):** the key cards are
-  on, though `CLAUDE.md` and `README.md` say off and name a `?cards=locked` that does not exist;
-  Bumbot's beats are placed, though `CLAUDE.md`'s table says not; `GAME_DESIGN.md` §8's "Next
-  up" is of 2026-11-03 with about fifteen stale boxes; the Library's rolling ladder was never
-  built; none of the sound has been heard by the user.
-- **The workspaces, each a clone of its own** (not a git worktree: checked in Claude Code's
-  documentation, worktrees of one repository share one memory folder and one local settings
-  file): `C:\Users\ramze\Development\bumbusik-a` on branch `rest-a`, `bumbusik-b` on `rest-b`,
-  both from `main` at `0c99e7d` with this plan on top. Each has its own memory folder (a copy of
-  the project's as it stood), its own temp folder for screenshots and test browsers, its own
-  port for the user's links (8001, 8002), its own notes file in the repo
-  (`docs/session-a-notes.md`, `docs/session-b-notes.md`) and its brief in `CLAUDE.local.md` (not
-  in git). The PixelLab connection was added to each folder (it is kept per folder).
-- **The shared documents are read-only for both:** what a step should record in them goes to the
-  session's notes file and is folded in later by one hand. The reference photos stay in the main
-  folder and are read from there by full path (no link into the workspaces: removing a folder
-  that holds a link can take the photos with it).
-- **Checked, not assumed:** a fresh short session in each workspace named its own session, branch
-  and memory folder; the temp folder could not be set from a settings file (Claude Code keeps
-  its own `TEMP`: tried), so each workspace has a launcher, `start-session.cmd`, which sets it,
-  and the brief's first rule has the session check it and stop if it is wrong (the first check
-  did stop, on the settings-file try); `boot` passed in both workspaces at the same time, each
-  with its screenshots in its own folder.
-- **Meeting point:** `main` on GitHub, on the user's word each time: a session merges
-  `origin/main` into its branch, rebuilds any generated file that collides, runs what the merge
-  can touch, and pushes its branch to `main`.
+  checked each open item against the code. It lists what can be built now, in the order to build
+  it (the mishaps' gags to their end; the rest of the twenty things to find and the books; the
+  look-outs and the deliveries; each deck's own look; small faults); what waits for the user
+  (sixteen things: a photo, a text, a decision); what is done once at the end (the other
+  documents brought up to date, saving on, the release); and what is closed.
+- **Found while reading:** the key cards are on, though `CLAUDE.md` and `README.md` said off and
+  named a `?cards=locked` that does not exist; Bumbot's beats are placed, though `CLAUDE.md`'s
+  table said not; `GAME_DESIGN.md` §8's "Next up" is of 2026-11-03 with about fifteen stale
+  boxes; the Library's rolling ladder was never built; no record of the user having heard any of
+  the sound.
+- **Tried and taken down the same day:** the user first asked for the rest to be split between
+  two sessions building at once ("Split the rest of the plan in two equal parts so that two
+  sessions will work in parallel without interference"). I set that up as two clones of the
+  repository, each with its own branch, memory, temp folder, notes file and half of the plan,
+  and a small change to the tools for the temp folder. The user, on seeing it: "this is too
+  convoluted and hard to track for me. I will continue working in my current project in Paseo
+  with two worktrees: Design (this session) and Implementation (the other one)." Everything of
+  the split was removed (the clones, their folders and memories, their projects in Paseo, the
+  tools' change, the plan's two halves); the plan stayed, as one. **Lesson (mine):** when asked
+  for a way to work side by side, show the whole arrangement and what it asks of the user
+  before building it; separate memories and folders multiplied what the user had to keep track
+  of.
 
-## CLAUDE.md and README.md brought up to date; a temp folder a workspace can name (2026-11-18)
+## CLAUDE.md and README.md brought up to date (2026-11-18)
 
 - **The user:** "Bring both CLAUDE and README md documents up to date with the actual state."
   Every path, flag, control and start place the two name was checked against the code first.
@@ -2889,20 +2865,13 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
   does not exist; `?did=` was missing); Pages serves the `placeholder` branch, not `main`;
   Bumbot's beats are placed (the table said not); the PixelLab account as it is (Tier 2, 5,000 a
   cycle); rows for what the table did not name (`src/progression.js`, `src/save.js`,
-  `src/main.js`, `src/scenes/BootScene.js`, `src/textures.js`, `tools/draw_casino.py`,
-  `tools/tempdir.py`, the plans and the audit, a parallel workspace's own files); a session
-  starts from `docs/plan-the-rest.md`, no longer from `GAME_DESIGN.md` §8, whose "Next up" is of
-  2026-11-03.
+  `src/main.js`, `src/scenes/BootScene.js`, `src/textures.js`, `tools/draw_casino.py`, the plans
+  and the audit); a session starts from `docs/plan-the-rest.md`, no longer from
+  `GAME_DESIGN.md` §8, whose "Next up" is of 2026-11-03.
 - **`README.md`:** what the game is and that the whole route plays; Pages; the locks; what
   `?tangerines=infinite` covers now (the throw and the pocket too); the controls it lacked (the
   welcome screen, ending the intro, M); the layout table as the repo is; testing on the stepped
   clock. Its list of 49 start places already matched `docs/start-links.md`.
-- **Left as they are** (the plan's §6): `GAME_DESIGN.md` §8's stale boxes, `docs/build-plan.md`'s
-  intro entry, `docs/population.md`'s rows, the audit's marks, three links under the wrong deck.
-- **`tools/tempdir.py` (mine, small):** the five tools that chose the temp folder each by
-  themselves (`playtest.py`, `check_people.py`, `draw_regions.py`, `livery_photo.py`,
-  `render_ship.py`) take it from one module, which reads the variable `BUMBUSIK_TEMP` when it is
-  set. **Why:** the user works in Paseo, not in terminals, so the launcher that gave each
-  parallel workspace its own temp folder would never run; and Claude Code keeps `TEMP`, `TMP` and
-  `TMPDIR` to itself (a settings file's `env` passes any other variable: tried all four). With
-  nothing set, everything is where it was. `boot` passed both ways.
+- **Left as they are** (the plan's §10): `GAME_DESIGN.md` §8's stale boxes,
+  `docs/build-plan.md`'s intro entry, `docs/population.md`'s rows, the audit's marks, three
+  links under the wrong deck.
