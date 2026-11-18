@@ -75,6 +75,11 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   a proposal first. 22 needs her with the parasol (a state of her character).
 - With a tangerine on her these four are built already (the duck and the gull that takes it; the
   apology and the hand-over).
+- **Under way (2026-11-18):** proposed and answered (21 facing down the flight, feet first, at a constant
+  pace; 22 a new clip of her looking up at the inside-out parasol; 23 and 24 as written, to the next wall or
+  partition; one at a time). Gag 21's clip made and approved, not yet built. On the way, the funnel's
+  stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
+  the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
 
 ### 1.2 The third batch: nine gags and two clips of others (large; about 55 generations)
 

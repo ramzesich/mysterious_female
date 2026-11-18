@@ -46,6 +46,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/ship/` | The ship's art atlas (doors, furniture, fittings, each with a muted `-bg` twin), built from `assets/source/ship/` by `python tools/build_ship_art.py` |
 | `tools/draw_cabin.py` | Cabin 8206 (the user's own, deck 8), drawn by hand from her photo: its inside and its open door, the shower room's door and the shower scene's pieces (stall, door slid open, see-through glass, the towel on its handle) |
 | `assets/source/her-mishaps/` | **Her mishap gags, each one picture of her with the thing** (docs/plan-three-uses.md §1.6): states of her character with the thing drawn in, animated v3 (ids in its README); built into `assets/sprites/her-mishaps.png` (`HER_MISHAPS` in `tools/build_sprites.py`, 112 px cells, each clip placed by its thing's middle); played by the ship scene's `rideGag` (`GAGS` in `src/config.js`) for a scenario with `gag`, when the thing that hit her passes `ride` (how it carries her: its way, its floor, `hide()`/`show()`), or by `fallGag` where she stands (the papers: the clip starts with her standing on the world's paper and is set down by where it is, `ride.x`; the breakfast stewardess's tray and trolley, 10a to 10f: on the corridor's floor, `ride.y`, the trolley drawn over her trip, `turn` for a hit at her back), or by `cartGag` with the porter (8a to 8d: he stands, pushes on, wheels her and tips his cap, or turns round). The world's vacuum and suitcase (`assets/source/things/robot-vacuum.png`, `suitcase-rolling.png`) are cut from the same pictures |
+| `assets/source/her/stair-cling/` | Her hold on the funnel stairway's rail in a gust, facing up the flight and down it (`cling-up`, `cling-down` in her sheet, played by `updateStairs`); made on the steps with the rail where the game draws it, the generator's own rail taken out frame by frame (its README). `stair-slip/` beside it is retired |
 | `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
@@ -670,7 +671,11 @@ Lessons learned (2026-11-18, Teppanyaki's flares):
   mended edge, shown enlarged (beside what it comes from, or beside her), then stop for the word.
   Only then the sheets, the code, the playtests. (I had cut the world's suitcase from her riding
   picture, squared its rounded corners in the mending, and placed and tested it before the user
-  saw it.)
+  saw it.) **Shown in the chat itself, and a clip in its context** (the user, 2026-11-18: "when
+  generating art candidates, show them to me in this session before inserting in the game. If
+  that's an animation, show me clips of it, inside the context, when relevant"): the candidates
+  read into the chat, a clip as its frames composed over a real screenshot of the spot where it
+  plays, at the game's offsets, enlarged (a GIF saved beside it); the game shown after, for play.
 - Test in headless Chrome (the user uses Chrome, not Edge). Keep image viewing and tool output lean:
   the user watches session usage.
 
@@ -802,3 +807,21 @@ Lessons learned (2026-11-18, the stepped clock):
 - **Six browsers at once need a server that keeps up:** Python's default backlog of five refused a
   file and a sheet's data never came (`Server.request_queue_size`); a page that does not come up
   is loaded once more, its errors printed as a note.
+
+Lessons learned (2026-11-18, the funnel's stairway):
+
+- **A whole-picture edit (`edit_image_pro_flash`) of her in a scene drops the scene** (the stairs and the rail
+  wiped, her hands off the rail); a PixMiniMax clip from the same start picture keeps the world's pixels exactly
+  and gives the move into the pose too. For a new pose of hers in a place, animate into it.
+- **A generator moves the world's lines it was given** (the handrail drawn 1 px off, dashed, grey): find such a
+  line in each frame by its slope and colour, take it out, and fill her across it from her own pixels both sides;
+  the game draws its own in front. Cutting her out by "differs from the start" also takes in steps it redrew.
+- **A pose placed on a slope needs a picture made on that slope:** her floor slip on 44° stairs put a foot 11 px
+  into the steps ("she falls through"). Measure each foot against the tread under it on every flight.
+- **Something carried by a flapping sprite follows its frame's own point** (a gull's beak, measured per frame,
+  `GULL_BEAKS`), placed on `postupdate`: frames of different sizes moved a fixed offset 5 px every other frame.
+- **A hazard that waits over her and marks her spot is rarely met in play** (the user): a gull now dives straight
+  from its flight. A reaction coded for `play` only does nothing on stairs: check the modes a hit can come in.
+- **Say "candidate" only for alternatives to choose from:** for one thing to approve, say what it is (the user
+  could not tell what "the candidates" were in a sheet of one clip's frames).
+

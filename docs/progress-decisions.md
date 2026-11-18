@@ -2875,3 +2875,36 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - **Left as they are** (the plan's §10): `GAME_DESIGN.md` §8's stale boxes,
   `docs/build-plan.md`'s intro entry, `docs/population.md`'s rows, the audit's marks, three
   links under the wrong deck.
+
+## Part 1.1 begun: gags 21 to 24 proposed; the funnel's stairway gone over (2026-11-18)
+
+The building session's first round from `docs/plan-the-rest.md` §3. Gags 21 to 24 were proposed to the user
+(their answers: 21 sits facing down the flight and bumps down feet first; 22 a new clip of her looking up at the
+inside-out parasol, kicking; 23 and 24 as written, to the next wall or partition; built one at a time). Trying the
+funnel's stairway for 21 brought up its faults, mended first on the user's word:
+
+- **The stairway 12 px out from the lattice** (the user: on its edge "the background is visible on top of the
+  stairs ... it looks like a glitch"): `funnel_top()` in `tools/build_world.py`, mocked first in the running
+  game at 0, 6 and 12 px. The funnel's white base carried out under the lower flight and its navy frame under the
+  upper one (`src/world/topdeck.js`), the foot's windsock kept by the foot.
+- **Walked into, she steps onto it** (the user: walking left off its top she "falls through"; boarding was ↓ or ↑
+  only): for outside flights only (`tryStairs`); inside, ↑/↓ as before.
+- **The gust: she holds on** (the user, on the slide back down the flight on her feet: "Looks weird"; offered three
+  ways, the user took "she clings on"): while it blows on the stairway she crouches and grips the rail, ↑/↓ do
+  nothing, she stands back up when it drops; nothing is lost. Her clips `cling-up`/`cling-down` (PixMiniMax from
+  her standing frame on the steps with the rail where the game draws it; 12 generations with two whole-picture
+  edits that wiped the scene; `assets/source/her/stair-cling/README.md`). A first fix, a slip picture with her feet
+  on the steps (15 generations, `assets/source/her/stair-slip/`), was approved and then retired with the slide.
+- **The gulls dive straight at her** (the user: it "hovers for a bit above me before taking a dive ... That's why
+  it rarely happens"): no mark, no hover; every 2.5 to 5.5 s at random between gusts, the next gull breaks off from
+  wherever it is in its circle and dives at her, 320 px/s on average, speeding up; it hits wherever it touches her,
+  and a miss swoops on past. With a tangerine she now ducks on the stairs too (reactions played only in `play`),
+  and the gull flies off over the sea with it (it had snapped back to its circle: "it just disappeared").
+- **A gull carries a tangerine in its beak** (the user: it sat on its back): the beak's tip measured in each gull
+  frame (`GULL_BEAKS`, `inBeak` in `src/world/world.js`), the fruit behind the bird and placed on `postupdate`
+  (placed before the bird moved, it took the other wing frame's beak every other frame); every gull that takes one.
+- **Gag 21's clip** made and approved (4 generations; constant pace, no slow first bump, the user), not yet built:
+  `C:\...\bb\g21` scratch; to be saved with the build.
+- **Tests:** `boot`, `region6`, `region7`, `region8` (the hold in a gust, the dive), `finale`, `golden` (its walk to
+  the stairway's foot now waits for the foot), `pocket`, `stairs`, `throw`, `atrium` pass; `check_overlaps` 0. The
+  rest not run.

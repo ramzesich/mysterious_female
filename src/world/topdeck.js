@@ -16,6 +16,9 @@ import { Gusts, PerchGull } from './outside.js';
 
 const M = 48;
 const HALF = PLAYER.height / 2;
+// A funnel gull's dive, px a second on average (speeding up as it comes): a fraction slower than the
+// 470 its old dive from just over her head made (the user, 2026-11-18).
+const FUNNEL_DIVE = 320;
 const near = (s, x, y, dx = 900, dy = 320) => Math.abs(s.player.x - x) < dx && Math.abs(s.player.y - y) < dy;
 const onFloor = body => body.blocked.down || body.touching.down;
 
@@ -406,20 +409,17 @@ export class FunnelWind {
             world.add([sprite]);
             return { sprite, i, x: this.centre.x, y: this.centre.y };
         });
-        this.mark = s.add.ellipse(0, 0, 22, 5, 0x2e222f, 0.5).setDepth(D.player - 0.01).setVisible(false);
-        world.add([this.mark]);
         this.state = 'circle';
-        this.cycle = -1;
         this.turn = 0;
     }
 
-    // Her cry: a gull marking her breaks off.
+    // Her cry: a gull diving at her breaks off and climbs away.
     heard() {
-        if (this.state !== 'mark') return;
-        const t = this.target;
-        if (!this.world.hears(t.x, t.y, this.scene.route)) return;
-        this.scene.tweens.killTweensOf(this.mark);
-        this.mark.setVisible(false);
+        if (this.state !== 'dive') return;
+        const v = this.dive, diver = this.gulls[this.turn % this.gulls.length];
+        if (!this.world.hears(v.tx, v.ty, this.scene.route)) return;
+        this.flier = diver;
+        diver.away = { until: this.scene.time.now + 900, dir: v.tx < v.fx ? 1 : -1 };
         this.state = 'circle';
         this.turn++;
     }
@@ -447,61 +447,72 @@ export class FunnelWind {
         const s = this.scene, p = s.player, d = this.def, g = this.def.gust;
         if (!near(s, this.centre.x, this.centre.y, 1100, 700)) return;
         const flap = Math.floor(time / 130) % 2 ? 'gull-down' : 'gull-up';
-        // The slip: she was climbing when it blew.
+        // While it blows she holds on to the rail and does not move (the user, 2026-11-18, for the slide
+        // back down the flight it was: "Looks weird"); the ship scene's `updateStairs` plays it.
         const on = this.onStairs();
-        if (on && !s.stairSlip && this.gusts.phase(time) === 'blow' && this.lastFlight === s.flight && Math.abs(s.stairT - this.lastT) > 1e-5 && s.stairT > 0.02) {
-            s.stairSlip = true;
-            this.world.say(t('say.whoa'), 800);
-            sfx.slip();
-        }
+        const blowing = on && this.gusts.phase(time) === 'blow';
+        if (blowing && !s.stairWind) this.world.say(t('say.whoa'), 800);
+        s.stairWind = blowing;
         // A gust on the funnel's stairway: a faint tremor while it blows.
-        if (on && this.gusts.phase(time) === 'blow') rumbleNow('gust', 400);
-        this.lastFlight = on ? s.flight : null;
-        this.lastT = s.stairT;
+        if (blowing) rumbleNow('gust', 400);
         // The gulls: round the lattice, the diver out of its circle.
         const diver = this.gulls[this.turn % this.gulls.length];
         for (const b of this.gulls) {
-            if ((b === diver && this.state !== 'circle') || b === this.taker) continue;
+            if ((b === diver && this.state !== 'circle') || b === this.taker || b === this.flier) continue;
             const a = time / 1700 + b.i * Math.PI;
             const tx = this.centre.x + Math.cos(a) * 170, ty = this.centre.y + Math.sin(a) * 70 + Math.sin(a * 2.3) * 12;
-            b.x += (tx - b.x) * Math.min(1, dt * 3);
-            b.y += (ty - b.y) * Math.min(1, dt * 3);
+            // (Back from a dive or from flying off: an easy climb back into the circle, not a snap.)
+            const k = Math.min(1, dt * (b.back ? 0.9 : 3));
+            b.x += (tx - b.x) * k;
+            b.y += (ty - b.y) * k;
+            if (b.back && Math.hypot(tx - b.x, ty - b.y) < 24) b.back = false;
             b.sprite.setFrame(flap).setPosition(b.x, b.y).setFlipX(Math.sin(a) > 0);
         }
-        const inCycle = (time / 1000) % g.every, cycle = Math.floor(time / 1000 / g.every);
+        // A dive (the user, 2026-11-18: "Make the gull just dive in my direction ... from a few random
+        // positions when in flight. Without a pause, or without taking a prepared position"; the hover
+        // and the mark it had made it rare in play): every so often, between gusts, while she is on
+        // the stairway, the next gull breaks off from wherever it is in its circle and dives straight
+        // at where she is, speeding up. She can still step out of its way: it swoops on past and climbs
+        // away. `swoop` (s) sets how often: a gap of a quarter to a half and more of it, at random.
+        const calm = this.gusts.phase(time) === 'calm';
+        this.nextAt ??= time + Phaser.Math.Between(250, 550) * d.swoop;
         if (this.state === 'circle') {
-            // In a lull, with time to get clear before the next gust.
-            const due = cycle !== this.cycle && cycle % Math.max(1, Math.round(d.swoop / g.every)) === 0 && inCycle > 0.3 && inCycle < 1.0;
-            if (due && on && !s.stairSlip && time > (this.quietUntil ?? 0)) {
-                this.cycle = cycle;
-                this.state = 'mark';
-                this.at = time + 1000;
-                this.target = { x: p.x, y: p.y };
-                this.mark.setPosition(p.x, p.y - 1).setVisible(true).setScale(0.4);
-                s.tweens.add({ targets: this.mark, scale: 1.2, duration: 1000 });
-                sfx.at(diver.x, diver.y).gull();
-            }
-        } else if (this.state === 'mark') {
-            diver.x += (this.target.x - diver.x) * Math.min(1, dt * 5);
-            diver.y += (this.target.y - 108 - diver.y) * Math.min(1, dt * 5);
-            diver.sprite.setFrame(flap).setPosition(diver.x, diver.y).setFlipX(this.target.x < diver.x);
-            if (time > this.at) {
+            if (on && calm && !s.stairCling && !this.flier && time > this.nextAt && time > (this.quietUntil ?? 0)) {
+                const tx = p.x, ty = p.y - PLAYER.height * 0.6;
+                const dist = Math.hypot(tx - diver.x, ty - diver.y);
                 this.state = 'dive';
-                this.at = time + 230;
-                this.from = { x: diver.x, y: diver.y };
+                this.dive = { fx: diver.x, fy: diver.y, tx, ty, t0: time, ms: Math.max(350, dist / FUNNEL_DIVE * 1000) };
                 sfx.at(diver.x, diver.y).gullDive();
             }
         } else if (this.state === 'dive') {
-            const k = 1 - Math.max(0, this.at - time) / 230;
-            diver.x = this.from.x + (this.target.x - this.from.x) * k;
-            diver.y = this.from.y + (this.target.y - 30 - this.from.y) * k * k;
-            diver.sprite.setFrame('gull-down').setPosition(diver.x, diver.y);
-            if (time > this.at) {
-                this.mark.setVisible(false);
-                const hit = this.onStairs() && Math.abs(p.x - this.target.x) < 17 && Math.abs(p.y - this.target.y) < 30;
-                if (hit) s.scareContact(this.target.x + (p.flipX ? -8 : 8), 'funnelgull', { snatch: diver.sprite });
+            const v = this.dive, k = Math.min(1, (time - v.t0) / v.ms), e = k * (0.4 + 0.6 * k);
+            diver.x = v.fx + (v.tx - v.fx) * e;
+            diver.y = v.fy + (v.ty - v.fy) * e;
+            const dir = v.tx < v.fx ? -1 : 1;
+            diver.sprite.setFrame('gull-down').setPosition(diver.x, diver.y).setFlipX(dir < 0);
+            // (Its body through hers, all the way down: not only where it was aimed.)
+            const hit = this.onStairs() && Math.abs(p.x - diver.x) < 12 && diver.y > p.y - PLAYER.height && diver.y < p.y - 6;
+            if (hit) s.scareContact(diver.x, 'funnelgull', { snatch: diver.sprite });
+            if (hit || k >= 1) {
+                // Having hit her it flies on, out over the sea (with the tangerine, if it took one), and
+                // only then comes back round (the user, 2026-11-18: it "just disappeared immediately");
+                // having missed, it swoops on past the way it was going and climbs away.
+                this.flier = diver;
+                diver.away = { until: time + (hit ? 1700 : 900), dir: hit ? -1 : dir };
                 this.state = 'circle';
                 this.turn++;
+                this.nextAt = time + Phaser.Math.Between(250, 550) * d.swoop;
+            }
+        }
+        const fl = this.flier;
+        if (fl) {
+            fl.x += fl.away.dir * 150 * dt;
+            fl.y -= 55 * dt;
+            fl.sprite.setFrame(flap).setPosition(fl.x, fl.y).setFlipX(fl.away.dir < 0);
+            if (time > fl.away.until) {
+                fl.away = null;
+                fl.back = true;
+                this.flier = null;
             }
         }
     }
@@ -627,9 +638,23 @@ export const topdeck = {
             w.add([pole, img]);
             this.funnelGusts.flappers.push({ img, k: 3.6, i });
         };
+        // The funnel's white base carried on under the stairway's lower flight, out to its foot (the user,
+        // 2026-11-18: moved out 12 px from the lattice, the flight's foot stood past the base, the sky
+        // showing under its steps): as far up as the white goes, 64 px; the casing takes over above.
+        const [fx, fy] = f.foot, [sx, sy] = f.shoulder, up = 64;
+        const lx = fx + (sx - fx) * up / (fy - sy);
+        const hull = s.add.graphics().setDepth(D.exterior + 0.045);
+        hull.fillStyle(0xe8eaec, 1).fillPoints([{ x: fx, y: fy }, { x: lx, y: fy - up }, { x: lx + 40, y: fy - up }, { x: fx + 40, y: fy }], true);
+        w.add([hull]);
+        // And the lattice's navy frame carried out to the upper flight, whose steps stand 12 px out from it
+        // (the user, 2026-11-18: the sky showed between them at the bend).
+        const frame = s.add.graphics().setDepth(D.exterior + 0.045);
+        const [tx, ty] = f.head;
+        frame.fillStyle(0x323353, 1).fillPoints([{ x: sx, y: sy }, { x: tx, y: ty }, { x: tx + 14, y: ty }, { x: sx + 14, y: sy }], true);
+        w.add([frame]);
         sock(f.shoulder[0] - 44, f.shoulder[1], 1);
         sock(f.x1 - 10, f.y - 30, 2);
-        sock(F.ladderX + 34, F.roofY, 3);
+        sock(f.foot[0] + 8, F.roofY, 3);           // (by the stairway's foot, wherever it stands)
         w.movers.push(this.funnelWind = new FunnelWind(w, F, this.funnelGusts));
 
         // On the top: the horn on its post, its cord; the engineer's toolbox and lunch box; the

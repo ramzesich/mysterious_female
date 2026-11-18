@@ -519,5 +519,9 @@ def funnel_top():
     fa = B.x_of(FUNNEL[0]) - 8
     fb = fa + B.x_of(FUNNEL[1]) - B.x_of(FUNNEL[0]) + 16
     base = B.ROOF_ROW * B.TILE
-    return dict(foot=[fa - 14, base], shoulder=[fa + 150, base - 108], head=[fa + 560, base - 500],
+    # (The stairway 12 px out from the lattice's front, the whole of it (the user, 2026-11-18: on its
+    # edge the sky showed over the steps, "it looks like a glitch"): the frame's navy edge is a stringer
+    # under the treads. Its top still lands on the grating, which reaches 18 px past the corner.)
+    out = 12
+    return dict(foot=[fa - 14 - out, base], shoulder=[fa + 150 - out, base - 108], head=[fa + 560 - out, base - 500],
                 x0=fa + 560, x1=fb - 150, y=base - 500)

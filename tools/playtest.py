@@ -2071,10 +2071,12 @@ def scenario_golden(b):
     wait(0.4)
     b.teleport(LADDER_X, D12)
     b.hold("up", 3.0)
-    b.hold("right", 0.5)
+    # (Off the ladder's top to the stairway's foot: until she is there, not for a time.)
+    foot = b.eval("window.__ship.world.data.funnel.foot[0]")
+    hold_until(b, "right" if b.state()["x"] < foot else "left", lambda s: abs(s["x"] - foot) < 6, 3)
     top = b.eval("window.__ship.world.data.funnel.y")
     gust = "window.__ship.world.story.funnelGusts.phase(window.__ship.time.now)"
-    b.eval("window.__ship.world.story.funnelWind.def.swoop = 1000")     # (the gulls are region8's own test)
+    b.eval("(w => { w.def.swoop = 1000; w.nextAt = Infinity; })(window.__ship.world.story.funnelWind)")     # (the gulls are region8's own test)
     end = now() + 60
     # (Until she has stepped off its top, not only reached its height: on the clock stepped the look
     # comes the very frame she is level with it, still on the last step.)
@@ -4199,13 +4201,21 @@ def scenario_region8(b):
     b.key("up", True)
     wait_js(b, G + " === 'blow'", 8)
     wait(0.3)
-    slipped = b.eval("window.__ship.stairSlip") or "Whoa" in alert(b)
-    b.shot("region8-slip")
-    wait(0.5)
+    at = b.state()
+    clip = b.eval("window.__ship.player.anims.currentAnim?.key")
+    wait(0.6)
+    held = b.state()
+    b.shot("region8-cling")
+    ok &= check(clip and clip.startswith("her-cling-up") and held["y"] == at["y"] and held["x"] == at["x"],
+                "climbing into a gust on the stairway: she holds on to the rail and does not move", (clip, at, held))
+    wait_js(b, G + " === 'calm'", 8)
+    wait_js(b, "!window.__ship.stairCling", 3)
+    hold_until(b, [], lambda s: s["y"] < held["y"], 1.5)
+    ok &= check(b.state()["y"] < held["y"], "and once it drops, she climbs on", (held, b.state()))
     b.key("up", False)
-    ok &= check(slipped, "climbing into a gust on the stairway: her feet go, and she slides back", (b.state(), alert(b)))
-    # (The gulls: one comes down at where she stands; keeping still there, she is swooped.)
-    b.eval(f"{W}.story.funnelWind.cycle = -1; {W}.story.funnelWind.def.swoop = 5")
+    # (The gulls: one dives straight at her from its flight; standing still on the stairway, she is
+    # swooped.)
+    b.eval(f"(w => {{ w.def.swoop = 5; w.nextAt = 0; }})({W}.story.funnelWind)")
     end = now() + 30
     got = False
     while now() < end and not got:
@@ -4215,11 +4225,11 @@ def scenario_region8(b):
         got = "Shoo" in alert(b)
         wait(0.05)
     b.key("up", False)
-    ok &= check(got, "standing where a gull has marked her on the stairway: swooped", b.state())
+    ok &= check(got, "standing on the stairway, a gull dives at her: swooped", b.state())
     wait(3.0)
     s = b.state()
     ok &= check(s["y"] == D12 and abs(s["x"] - exact_x(165)) < 30, "she comes back at the technical door", s)
-    b.eval(f"{W}.story.funnelWind.def.swoop = 1000")
+    b.eval(f"(w => {{ w.def.swoop = 1000; w.nextAt = Infinity; }})({W}.story.funnelWind)")
     b.teleport(fn["foot"][0], fn["foot"][1])
     wait(0.4)
     end = now() + 45

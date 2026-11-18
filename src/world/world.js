@@ -38,6 +38,10 @@ const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the 
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
 const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
 
+// A gull's beak in each of its frames (the things atlas, px from the frame's top left): its tip's column
+// and its row, for a tangerine carried in it (`inBeak`).
+const GULL_BEAKS = { 'gull-up': [29, 16.5], 'gull-down': [27, 5.5], 'gull-perched': [19, 2] };
+
 export class World {
     constructor(scene) {
         this.scene = scene;
@@ -1726,18 +1730,23 @@ export class World {
     // goes from (x, y) to its beak and away with it.
     snatch(sprite, x, y) {
         const s = this.scene, t0 = s.time.now;
-        const img = s.add.image(x, y, 'tangerine').setOrigin(0.5, 0.6).setDepth(sprite.depth + 0.01);
+        // (In its beak: behind the bird, so that the beak closes over the fruit's top, frame by frame;
+        // the user, 2026-11-18: it sat on the gull's back.)
+        const img = s.add.image(x, y, 'tangerine').setOrigin(0.5, 0.6).setDepth(sprite.depth - 0.001);
         this.add([img]);
         const follow = () => {
             const k = Math.min(1, (s.time.now - t0) / 160);
-            const bx = sprite.x + (sprite.flipX ? -6 : 6), by = sprite.y - 3;
-            img.setPosition(x + (bx - x) * k, y + (by - y) * k).setAlpha(sprite.alpha);
+            const b = this.inBeak(sprite);
+            img.setOrigin(0.5, 0.6 + (0.15 - 0.6) * k);
+            img.setPosition(x + (b.x - x) * k, y + (b.y - y) * k).setAlpha(sprite.alpha);
             if (s.time.now - t0 > 1800 || !sprite.visible || !sprite.active) {
-                s.events.off('update', follow);
+                s.events.off('postupdate', follow);
                 img.destroy();
             }
         };
-        s.events.on('update', follow);
+        // (After the bird has moved and flapped this frame: placed before it, the fruit took the other
+        // wing frame's beak every other frame, 5 px off.)
+        s.events.on('postupdate', follow);
     }
 
     // A tangerine loose near something (src/world/tangerine.js), each frame until one wants it:
@@ -1778,6 +1787,17 @@ export class World {
         ] });
     }
 
+    // Where a tangerine hangs from a gull's beak, its stem in it: the beak's tip and row in each of the
+    // gull's frames (the things atlas, measured from its pixels: the orange beak), through the sprite's
+    // origin and flip. The fruit is drawn with origin (0.5, 0.15), just short of the tip.
+    inBeak(sprite) {
+        const b = GULL_BEAKS[sprite.frame.name] ?? [sprite.width - 1, sprite.height / 2];
+        const left = sprite.x - sprite.originX * sprite.width, top = sprite.y - sprite.originY * sprite.height;
+        const dir = sprite.flipX ? -1 : 1;
+        const tip = sprite.flipX ? left + sprite.width - 1 - b[0] : left + b[0] + 1;
+        return { x: tip - dir * 2, y: top + b[1] + 0.5 };
+    }
+
     // A gull comes down to a tangerine, pecks at it and flies off with it in its beak
     // (docs/plan-three-uses.md §2). The bird's sprite is the caller's: left hidden at the end, its
     // origin as it was, for the caller to bring back; `done()` then.
@@ -1786,7 +1806,7 @@ export class World {
         const ox = sprite.originX, oy = sprite.originY;
         const x = img.x, foot = img.y + 3, off = x < sprite.x ? -1 : 1;
         const down = s.textures.get('things').has('gull-down');
-        img.setDepth(sprite.depth + 0.01);
+        img.setDepth(sprite.depth - 0.001);
         sprite.setOrigin(0.5, 1).setVisible(true).setAlpha(1).setFlipX(off < 0);
         const flap = s.time.addEvent({ delay: 120, loop: true, callback: () => sprite.setFrame(sprite.frame.name === 'gull-up' && down ? 'gull-down' : 'gull-up') });
         sfx.at(x, foot).gull();
@@ -1797,9 +1817,15 @@ export class World {
             s.tweens.add({ targets: sprite, y: foot - 1, duration: 140, yoyo: true, repeat: 3, onComplete: () => {
                 flap.paused = false;
                 sfx.at(x, foot).flap();
+                // (In its beak, placed after the bird has moved and flapped each frame.)
+                const hold = () => {
+                    const b = this.inBeak(sprite);
+                    img.setOrigin(0.5, 0.15).setPosition(b.x, b.y).setAlpha(sprite.alpha);
+                };
+                s.events.on('postupdate', hold);
                 s.tweens.add({ targets: sprite, x: x + off * 90, y: foot - 140, alpha: 0, duration: 1000, ease: 'Quad.easeIn',
-                    onUpdate: () => img.setPosition(sprite.x + (sprite.flipX ? -6 : 6), sprite.y - 5).setAlpha(sprite.alpha),
                     onComplete: () => {
+                        s.events.off('postupdate', hold);
                         flap.remove();
                         img.destroy();
                         sprite.setVisible(false).setAlpha(1).setOrigin(ox, oy);

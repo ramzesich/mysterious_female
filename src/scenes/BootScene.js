@@ -136,6 +136,15 @@ export class BootScene extends Phaser.Scene {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name, [1, 2, 3, 4, 5]), frameRate: 6, repeat: -1 });
         }
         if (meta.anims.slipback) this.anims.create({ key: 'her-slipback', frames: frames('slipback'), frameRate: 9 });
+        // Holding on to the funnel stairway's rail in a gust (assets/source/her/stair-cling/): she crouches
+        // into it, holds on with her hair fluttering, and stands back up by the crouch backwards.
+        for (const way of ['up', 'down']) {
+            const name = `cling-${way}`;
+            if (!meta.anims[name]) continue;
+            this.anims.create({ key: `her-${name}-in`, frames: frames(name, [1, 2, 3, 4, 5, 6, 7, 8]), frameRate: 16 });
+            this.anims.create({ key: `her-${name}-hold`, frames: frames(name, [5, 6, 7, 8, 7, 6]), frameRate: 8, repeat: -1 });
+            this.anims.create({ key: `her-${name}-out`, frames: frames(name, [6, 4, 3, 2, 1, 0]), frameRate: 14 });
+        }
         if (meta.anims.stumble) this.anims.create({ key: 'her-stumble', frames: frames('stumble'), frameRate: 9 });
         // Her reactions to a hit with a tangerine on her (docs/plan-three-uses.md §1.6), once each.
         for (const [name, fps] of [['reel', 9], ['rubnose', 9], ['splutter', 9], ['arch', 9], ['yelp', 10], ['duck', 9], ['apology', 7]]) {

@@ -2926,7 +2926,7 @@ export class ShipScene extends Phaser.Scene {
         if (hands && inside && onFloor && input.activatePressed) this.activateTrunkDoor();
         if (hands && inside && onFloor && (input.up || input.down) && this.tryTrunk(input)) return;
         // Held, not just pressed, so holding ↓ carries her on down the next flight at a landing.
-        if (inside && onFloor && (input.up || input.down) && this.tryStairs(input)) return;
+        if (inside && onFloor && (input.up || input.down || input.left || input.right) && this.tryStairs(input)) return;
         if (hands && inside && (input.up || input.down) && this.tryLadder(input)) return;
         if (hands && (input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
         // With the parasol: over an atrium walk's railing with ↓ and jump, to float down the atrium.
@@ -3868,12 +3868,18 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const reach = PLAYER.stairsBoardReach;
         for (const f of this.flights) {
-            if (input.up && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) {
+            // The funnel's stairway is what is in front of her, out on the funnel: walked into, she is
+            // on it (the user, 2026-11-18: walking left off its top she dropped past it). Inside, a flight
+            // is behind the floor she walks along, and only ↑ or ↓ takes her onto it.
+            const down = Math.sign(f.bottom.x - f.top.x);
+            const walkUp = f.outside && !input.down && (down < 0 ? input.right : input.left);
+            const walkDown = f.outside && !input.up && (down < 0 ? input.left : input.right);
+            if ((input.up || walkUp) && Math.abs(p.x - f.bottom.x) < reach && Math.abs(p.y - f.bottom.y) < 4) {
                 const res = this.progress.flightPasses(f, true);
                 if (!res.ok && f.lockSpec?.kind === 'block') this.world.story.onBlocked(f.lockSpec.id);
                 return res.ok ? this.enterStairs(f, 0) : this.showLock(res);
             }
-            if (input.down && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) {
+            if ((input.down || walkDown) && Math.abs(p.x - f.top.x) < reach && Math.abs(p.y - f.top.y) < 4) {
                 const res = this.progress.flightPasses(f, false);
                 return res.ok ? this.enterStairs(f, 1) : this.showLock(res);
             }
@@ -3927,14 +3933,33 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         const f = this.flight;
         const upward = Math.sign(f.top.x - f.bottom.x); // which horizontal direction climbs
-        // Caught climbing by a gust on the funnel's stairway (src/world/topdeck.js): her feet go,
-        // and she slides back down the flight on the rail.
-        if (this.stairSlip) {
-            this.stairT = Math.max(0, this.stairT - (PLAYER.stairsSpeed * 3.2 * dt) / f.length);
+        // A gust on the funnel's stairway (src/world/topdeck.js): she crouches and holds on to the rail
+        // while it blows, facing the way she faced, and stands back up when it drops; meanwhile she does
+        // not move (the user, 2026-11-18).
+        // A hit's reaction on the stairs (a funnel gull's swoop, with a tangerine on her): she stays where
+        // she is while it plays.
+        if (time < this.flinchUntil) {
             this.placeOnStairs();
-            p.setFlipX(upward < 0);
-            this.pose(this.herFrames.slip !== undefined ? 'slip' : 'fall');
-            if (this.stairT <= 0) this.stairSlip = false;
+            return;
+        }
+        if (this.stairWind || this.stairCling) {
+            const c = this.stairCling ??= { way: (p.flipX ? -1 : 1) === upward ? 'up' : 'down', phase: null };
+            const key = `her-cling-${c.way}`;
+            if (!this.anims.exists(`${key}-in`)) {
+                this.stairCling = null;
+                this.pose('stand');
+                return;
+            }
+            const play = (phase, then) => {
+                c.phase = phase;
+                p.anims.play(`${key}-${phase}`);
+                if (then) p.once(`animationcomplete-${key}-${phase}`, () => { if (this.stairCling === c && c.phase === phase) then(); });
+            };
+            if (!c.phase) play('in', () => play('hold'));
+            if (!this.stairWind && c.phase !== 'out') play('out', () => {
+                this.stairCling = null;
+                this.pose('stand');
+            });
             return;
         }
         let v = 0;
@@ -4403,7 +4428,7 @@ export class ShipScene extends Phaser.Scene {
         // hand's take it.)
         else if (!hand) this.loose.knock(p.x, p.y - 24, -facing, 1);
         // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
-        if (this.mode === 'play' && !this.gliding) {
+        if ((this.mode === 'play' || this.mode === 'stairs') && !this.gliding) {
             this.throwUntil = 0;
             this.throwing = null;
             const clip = `her-${sc.react}`;

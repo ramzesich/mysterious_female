@@ -123,6 +123,10 @@ HER = {
         # tools/unchair.py; frame 2 kept a piece of its seat and is left out).
         "wallslide": [(f"wallslide/{i}.png", "feet") for i in range(4)],
         "slip": [(f"slip/{i}.png", "feet") for i in range(4)],
+        # Holding on to the funnel stairway's rail in a gust, facing up the flight and facing down it
+        # (assets/source/her/stair-cling/README.md); her stair point at row 79 of a 96 px canvas.
+        "cling-up": [(f"stair-cling/up/{i}.png", 79) for i in range(9)],
+        "cling-down": [(f"stair-cling/down/{i}.png", 79) for i in range(9)],
         "lick": [(f"lick/{i}.png", "feet") for i in range(4)],
         "pour": [("pour/0.png", "feet")],
         # Region 9. At the Spinnaker's piano: both hands tapping in front of her, skeleton-v3 custom
