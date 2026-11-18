@@ -32,6 +32,10 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
   steam-fan     17: her hair frizzed by the sauna's steam into a huge puff (frame 0 and 8: her puff
                 picture, `starts/steam/s17-puff.png`), she fans her face
   steam-swoon   17: from the puff picture she sways, a hand to her forehead, and sits down dazed
+  flare-blink   19: singed by Teppanyaki's flare (frame 0 and 8: her soot picture,
+                `starts/flare/s19-soot.png`): her face black, her hair on end, singed at the tips; a
+                wisp of smoke curls up off her hair, her white eye blinks
+  flare-cough   19: from and back to the soot picture, she bends and coughs out a puff of smoke
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -48,8 +52,12 @@ CELL, COLS = 128, 13
 CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride", 9), ("tray-ride3", 9), ("tray-ride1", 9), ("tray-ride5", 9),
          ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
-         ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9)]
+         ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
+         ("flare-blink", 9), ("flare-cough", 9)]
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
+# (19's soot: its greys fall on the palette's two cool, greenish greys, and her face read as green; they
+# go on the charcoal greys of her hair's own family instead. No other colour of hers falls there.)
+SOOT = {(49, 54, 56): (62, 53, 70), (55, 78, 74): (98, 85, 101)}
 
 
 def frame(clip, i):
@@ -76,7 +84,7 @@ def frame(clip, i):
                 if a[x, y][3] and a[x, y][:3] not in keep:
                     a[x, y] = b[x, y]
         return im
-    return palettize(im)
+    return palettize(im, SOOT if clip.startswith("flare-") else None)
 
 
 def main():
@@ -98,7 +106,8 @@ def main():
             "chair": {"x": 64, "chair": 46},
             "gull": {"x": 54},
             "sprinkler": {"x": 64, "run": 54},
-            "steam": {"x": 64}}
+            "steam": {"x": 64},
+            "flare": {"x": 64}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

@@ -4089,10 +4089,33 @@ def scenario_region8(b):
     wait_js(b, fl + " === 'calm'", 4)
     s = hold_until(b, "left", lambda s: s["x"] < f["x"] - f["half"] - 10, 4)
     ok &= check(s["mode"] == "play" and s["x"] < f["x"] - f["half"], "in the lull she walks past the grill", s)
+    # (The chef answers her coming: run at a quiet grill, his flourish starts while she is still clear
+    # of it, so that the flame is up as she gets there; she stops, and it flares in front of her.)
+    FL = f"{W}.story.flares[1]"
+    b.teleport(f["x"] + f["half"] + 150, D12)
+    wait_js(b, f"{fl} === 'calm' && {NOW} >= {FL}.coolUntil && {FL}.next - {NOW} > 600", 9)
+    b.key("left", True)
+    end = now() + 1.5
+    while now() < end and b.eval(fl) == "calm":
+        wait(1 / 30)
+    b.key("left", False)
+    x = b.state()["x"]
+    wait_js(b, fl + " === 'on'", 2)
+    ok &= check(x > f["x"] + f["half"] + 40 and b.state()["mode"] == "play",
+                "running at a quiet grill: the chef's flourish starts while she is clear of it; stopped, it flares in front of her",
+                (x - f["x"], b.state()["mode"]))
     b.teleport(f["x"] + 14, D12)
     got = scared(b, "Hot", 8.0)
     ok &= check(got, "at the grill when it flares: singed")
-    wait(3.0)
+    # (19, her gag: out of the smoke her face black, her hair on end; she blinks and coughs.)
+    GAG = f"{W}.story.flares[1].pic"
+    seen_gag = set()
+    end = now() + 9
+    while now() < end and b.state()["mode"] != "play":
+        seen_gag.add(b.eval(f"{GAG}?.anims.currentAnim?.key ?? null"))
+        wait(0.1)
+    ok &= check({"gags-flare-blink", "gags-flare-cough"} <= seen_gag and b.state()["mode"] == "play",
+                "sooty, her hair on end, she blinks and coughs out a puff; then she is back", sorted(k for k in seen_gag if k))
     b.eval(f"{W}.carryBox.take('coffee')")
     b.teleport(f["x"] + 14, D12)
     end = now() + 8

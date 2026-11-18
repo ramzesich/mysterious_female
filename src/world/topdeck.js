@@ -7,7 +7,7 @@
 // her book, the gulls leave the bow, Bumbot runs for it), the engineer's book, the court's quirk.
 // Places come from maps/world.json (`topdeck`).
 
-import { PLAYER } from '../config.js';
+import { PLAYER, GAGS, FLARE } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
@@ -207,7 +207,11 @@ export class Balls {
 
 // A teppanyaki grill's flare (population: `haz_flare`): the chef's flourish, sparks on the plate,
 // and a ball of flame over the counter and the way past it for a second: "Singed" (a tray is
-// spilled). The two grills take turns.
+// spilled; with nothing in her hands, her gag: `ride()`). With no one near, the two grills take
+// turns by their clock. **The chef answers her coming** (the user, 2026-11-18: run past a clock's
+// flare, it went up behind her): she runs at a quiet grill and his flourish starts so that the flame
+// is up as she gets there (`FLARE`); stopped at the flourish, she lets it flare and passes in the
+// lull after it (`coolMs`).
 export class Flare {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -216,31 +220,126 @@ export class Flare {
         this.def = def;             // { x, y, half, period, on, offset, chef }
         this.g = s.add.graphics().setDepth(D.player + 0.04);
         this.glow = s.add.rectangle(def.x, def.y - 64, def.half * 2 + 90, 128, 0xf9c22b, 0).setDepth(D.decor + 0.3);
-        world.add([this.g, this.glow]);
+        // (The smoke that wraps her, 19: over her and over the flame.)
+        this.sg = s.add.graphics().setDepth(D.player + 0.05);
+        world.add([this.g, this.glow, this.sg]);
         this.hitAt = 0;
+        // (When the next flourish starts, ms of the scene's clock: the clock's own first, as the
+        // grills took turns before, `offset` s apart; and when the lull after the last one ends.)
+        const lead = (((def.period - def.on - FLARE.tellS - def.offset) % def.period) + def.period) % def.period;
+        this.next = s.time.now + lead * 1000;
+        this.coolUntil = 0;
     }
 
     // Her cry startles the chef: his next flare comes late (not one already alight).
     heard() {
         const s = this.scene, d = this.def;
-        if (!this.world.hears(d.x, d.y) || this.phase(s.time.now)[0] === 'on') return;
-        this.late = (this.late ?? 0) + 1500;
+        const now = s.time.now;
+        if (!this.world.hears(d.x, d.y) || this.phase(now)[0] === 'on') return;
+        this.next = Math.max(this.next, now) + FLARE.lateMs;
+        this.coolUntil = Math.max(this.coolUntil, now + FLARE.lateMs);
         const chef = this.world.people.byId[d.chef];
         if (chef?.on) this.world.pop(chef.x, chef.y - PLAYER.height - 6, 'alert', 1000);
     }
 
+    // 19, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): a puff of black smoke
+    // wraps her where the flame caught her, and under it she jumps back out of its reach (`back` px
+    // past it, `slideMs`; doors and walls stop her) and is in her soot picture; it thins (`clearMs`):
+    // her face black, her hair on end and singed; she blinks, a wisp of smoke curling off her hair,
+    // and coughs out a puff of smoke; then her checkpoint.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, g = GAGS.flare;
+        return {
+            play: (done) => {
+                const m = s.cache.json.get('gags-meta');
+                const dir = p.flipX ? -1 : 1, side = Math.sign(p.x - d.x) || -dir;
+                const pic = s.add.sprite(p.x, d.y, 'gags', m.anims['flare-blink'][0])
+                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+                this.world.add([pic]);
+                this.pic = pic;
+                const x0 = pic.x, end = s.stopShort(x0, d.x + side * (d.half + g.back), d.y, 16);
+                this.smoke = { x: x0, t: 0 };
+                // (Drawn at once: she is in her soot picture from this very frame.)
+                this.drawSmoke(this.sg.clear());
+                sfx.yelp();
+                let t = 0;
+                s.time.delayedCall(g.coverMs + g.clearMs * 0.6 + g.holdSootMs, () => {
+                    pic.play('gags-flare-blink');
+                    pic.once('animationcomplete-gags-flare-blink', () => {
+                        pic.play('gags-flare-cough');
+                        s.time.delayedCall(g.coughAtMs, () => sfx.at(pic.x, d.y).cough());
+                        pic.once('animationcomplete-gags-flare-cough', () => done());
+                    });
+                });
+                s.script = (dt) => {
+                    t += dt * 1000;
+                    const u = Math.min(1, t / g.slideMs);
+                    pic.x = x0 + (end - x0) * (1 - (1 - u) * (1 - u));
+                    this.smoke.x = x0 + (pic.x - x0) * 0.7;
+                    this.smoke.t = t;
+                    p.x = pic.x;
+                };
+            },
+            show: () => {
+                this.pic?.destroy();
+                this.pic = null;
+                this.smoke = null;
+            },
+        };
+    }
+
+    // The smoke round her (19): thick to `coverMs`, a few embers in it, then thinning and rising over
+    // `clearMs`.
+    drawSmoke(g) {
+        const b = this.smoke, G = GAGS.flare;
+        if (!b) return;
+        const k = Math.max(0, (b.t - G.coverMs) / G.clearMs);
+        if (k >= 1) return;
+        const a = 1 - k * k, y = this.def.y;
+        // (Three columns of five over her, her hair on end and all, so that nothing of her shows.)
+        for (let i = 0; i < 15; i++) {
+            const ox = (i % 3 - 1) * 15 + ((i * 7) % 5) - 2, oy = 8 + Math.floor(i / 3) * 17 + ((i * 11) % 5);
+            const r = 13 + ((i * 13) % 5) + k * 8;
+            g.fillStyle(i % 4 ? 0x3e3546 : 0x625565, a)
+                .fillCircle(b.x + ox * (1 + k * 0.6), y - oy - k * 26 + Math.sin(b.t / 200 + i) * 2, r);
+        }
+        if (b.t > G.coverMs) return;
+        for (let i = 0; i < 6; i++) {
+            const e = (b.t / G.coverMs + i * 0.17) % 1;
+            g.fillStyle(i % 2 ? 0xf9c22b : 0xf79617, 1 - e)
+                .fillRect(b.x + Math.sin(i * 2.3) * (14 + e * 12), y - 30 - i * 9 - e * 18, 2, 2);
+        }
+    }
+
     // 'calm', 'tell' (how far into it, 0-1) or 'on' (0-1).
     phase(time) {
-        const d = this.def, t = ((time - (this.late ?? 0)) / 1000 + d.offset) % d.period;
-        if (t >= d.period - d.on) return ['on', (t - (d.period - d.on)) / d.on];
-        if (t >= d.period - d.on - 0.9) return ['tell', (t - (d.period - d.on - 0.9)) / 0.9];
+        const d = this.def, t = (time - this.next) / 1000;
+        if (t >= 0 && t < FLARE.tellS) return ['tell', t / FLARE.tellS];
+        if (t >= FLARE.tellS && t < FLARE.tellS + d.on) return ['on', (t - FLARE.tellS) / d.on];
         return ['calm', 0];
     }
 
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player, g = this.g.clear();
+        this.drawSmoke(this.sg.clear());
+        // (A flare over: the lull, and the clock's next one.)
+        if (time >= this.next + (FLARE.tellS + d.on) * 1000) {
+            const end = this.next + (FLARE.tellS + d.on) * 1000;
+            this.coolUntil = Math.max(this.coolUntil, end + FLARE.coolMs);
+            this.next = end + (d.period - d.on - FLARE.tellS) * 1000;
+        }
         if (!near(s, d.x, d.y, 700, 200)) return;
-        const [phase, k] = this.phase(time);
+        let [phase, k] = this.phase(time);
+        // She runs at the quiet grill: the flourish starts now if the flame, once up, would meet her
+        // as she gets to it (her speed, the flourish and the flame's rise: `riseS`). Not once she is
+        // nearer than `nearK` of that: the flame would go up behind her.
+        if (phase === 'calm' && time >= this.coolUntil && s.mode === 'play' && s.route === 'inside' && Math.abs(p.y - d.y) < 60) {
+            const v = p.body?.velocity.x ?? 0, gap = Math.abs(p.x - d.x) - (d.half - 8);
+            if (Math.abs(v) > 20 && Math.sign(v) === Math.sign(d.x - p.x) && gap <= Math.abs(v) * (FLARE.tellS + FLARE.riseS) && gap >= Math.abs(v) * (FLARE.tellS + FLARE.riseS) * FLARE.nearK) {
+                this.next = time;
+                [phase, k] = this.phase(time);
+            }
+        }
         const top = d.y - 31;
         if (phase === 'calm') {
             this.told = false;
@@ -285,7 +384,7 @@ export class Flare {
         if (Math.abs(p.x - d.x) > d.half - 8 || Math.abs(p.y - d.y) > 90 || p.y < d.y - 100) return;
         this.hitAt = time + 1500;
         if (this.world.carry) this.world.carryBox.spill(d.x, false, 'flare');
-        else s.scareContact(d.x, 'flare');
+        else s.scareContact(d.x, 'flare', { ride: this.ride() });
     }
 }
 

@@ -21,6 +21,9 @@ its input. About 36 generations in all.
 | `sprinkler-walk/` | 16: soaked, a slow walk loop on the spot (the game moves her, 26 px/s) | `0a304ca6-c8b0-42f2-8714-1639c90d737c` |
 | `steam-fan/` | 17 (2026-11-18): her puff picture (frame 0 and 8: `starts/steam/s17-puff.png`, `edit_image_pro_flash` `c129764a-032b-4db4-a560-d3fa2211533e`, 5 generations, of her standing frame on 96 px: `stand96.png`, three loose specks by her collar out), she fans her flushed face | `4a0142e9-a4ea-4105-b11f-04c5f10bce21` |
 | `steam-swoon/` | 17: from the puff picture she sways, a hand to her forehead, and sits down dazed (frames 5 to 8 set up 1 px) | `5486e191-9384-47f1-b5a6-90b7b5bc5667` |
+| `flare-blink/` | 19 (2026-11-18): her soot picture (frame 0 and 8: `starts/flare/s19-soot.png`, `edit_image_pro_flash` `81119fbd-5135-5783-850f-9b37653b53d4`, 5 generations, of her standing frame `starts/steam/stand96.png`, two loose specks out), a wisp of smoke curls off her hair, her eye blinks | `ac1f2f77-6f0a-4c8c-ae3a-a40066ebe225` |
+| `flare-cough/` | 19: from and back to the soot picture, she bends and coughs out a puff of smoke (three loose specks out of frame 3) | `9dc8e594-8e43-4a00-8c0e-78faa11e7e92` |
+| `starts/flare/` | 19's start picture, the two tries (`soot-*.png`), the fixes (`fix.py`) | made here |
 | `starts/steam/` | 17's start picture, the puff tries (`puff-*.png`, `puff-cmp.png`), the fixes (`fix.py`) | made here |
 | `starts/sprinkler/` | 16's start pictures (`starts.py`), the fixes (`fix.py`: frames 1 px up set down, loose specks out unless water), the strips first shown (`present.py`, `show16-*.png`) | made here |
 | `starts/` | The start and end pictures, the scripts that made them and mended the frames (`starts.py`, `starts2.py` from her built sheet, `door_starts.py`, `fix.py`, `dfix2.py`, `fullcolour.py`, `retray.py`, `analyze.py`: bounds, loose specks, colours per frame), and the review sheets shown to the user (`final-*.png`) | made here |
@@ -42,3 +45,6 @@ Not used for 16 (in `raw/sprinkler/`, by name): `drench-*` and `run7-*` drew a t
 
 Not used for 17: the second puff picture (`edit_image_pro_flash` `ab9de1fb-f67b-4a9d-a925-c941afa0b163`: a red blotch
 hid her eye). 12 generations for 17 in all.
+
+Not used for 19: the first soot picture (`edit_image_pro_flash` `e78273d9-01a6-5dba-9761-9b840f8b34c2`: her legs
+and arms darkened too, and she was lost against the red wall). 12 generations for 19 in all.

@@ -253,6 +253,8 @@ export class BootScene extends Phaser.Scene {
         // (17, the sauna's steam: her hair a huge puff, she fans herself, then swoons and sits.)
         this.anims.create({ key: 'gags-steam-fan', frames: gf('steam-fan', 1), frameRate: 10 });
         this.anims.create({ key: 'gags-steam-swoon', frames: gf('steam-swoon', 1), frameRate: 9 });
+        this.anims.create({ key: 'gags-flare-blink', frames: gf('flare-blink', 1), frameRate: 8 });
+        this.anims.create({ key: 'gags-flare-cough', frames: gf('flare-cough', 1), frameRate: 9 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

@@ -293,7 +293,7 @@ export const MISHAP_SCENES = {
     '16': { word: 'drenched', react: 'shiver', toss: 'drop', gag: 'sprinkler', pocket: false },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
     '17': { word: 'fogged', react: 'splutter', toss: 'drop', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
     '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
-    '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
+    '19': { word: 'singed', react: 'yelp', toss: 'drop', gag: 'flare' },        // a flare: out of a puff of smoke her face black, her hair on end and smoking; she blinks and coughs out a puff (`Flare.ride`)
     '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
     '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit' },        // a funnel gull
     '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
@@ -371,7 +371,17 @@ export const GAGS = {
     // `slideMs`; set `clear` px clear of the sauna's door) and thins over `clearMs`, her hair a huge puff; she stands `holdPuffMs`, fans herself,
     // swoons and sits (her plop `plopAtMs` into it).
     steam: { holdMs: 900, slideMs: 330, clear: 34, coverMs: 380, clearMs: 650, holdPuffMs: 250, plopAtMs: 500 },
+    // The flare (19): a puff of black smoke wraps her for `coverMs` while she jumps back out of the
+    // flame (`back` px past its reach, over `slideMs`), and thins over `clearMs`: her face sooty, her
+    // hair on end; she stands `holdSootMs`, blinks, and coughs out a puff (its sound `coughAtMs` in).
+    flare: { holdMs: 1000, slideMs: 260, back: 44, coverMs: 360, clearMs: 600, holdSootMs: 300, coughAtMs: 330 },
 };
+
+// Teppanyaki's flares (`Flare` in src/world/topdeck.js): the chef's flourish before the flame, s;
+// the flame's rise to its full heat, s; the lull after a flare, when her running at it does not start
+// another, ms; how much later her cry makes his next one, ms; how near she may be, of the way she runs
+// in the flourish and the rise, for her coming to start one (nearer, the flame would rise behind her).
+export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, nearK: 0.65 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
 // hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken

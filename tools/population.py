@@ -792,8 +792,10 @@ BALLS = {"haz_balls_a": (12, 146.9, 1, 2.2, 4.0, 0.0), "haz_balls_b": (12, 154.4
 COURT = dict(deck=12, ball=150.65, hoop=154.4)
 # Teppanyaki's flares (`haz_flare`): id: (deck, the grill (m), half the flame's reach (m), every s,
 # for s, offset s, the chef whose flourish is the tell). "Singed"; a tray is spilled.
-FLARES = {"haz_flare_a": (12, 185.4, 1.25, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
-          "haz_flare_b": (12, 190.4, 1.25, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
+# (The flame's reach 0.8 m, about the grill's own width: the user, 2026-11-18, "too big, make them less
+# wide"; it was 1.25 m.)
+FLARES = {"haz_flare_a": (12, 185.4, 0.8, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
+          "haz_flare_b": (12, 190.4, 0.8, 6.0, 1.0, 3.0, "amb_teppan_chef_b")}
 # The aft terrace (`gust_terrace`, `gull_terrace`): gusts over it and the sun cover's upper end, the
 # jump over its rail (every s, for s, the tell, px/s aft in the air), the span they blow over (m:
 # no further aft than the towels can be seen from), towels on its deck chairs (the tell), a gull on

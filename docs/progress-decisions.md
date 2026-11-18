@@ -2801,3 +2801,30 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - **Also:** `Math.random` and Phaser's RND seeded in tests (`--seed`); 1,471 old browser profile folders
   removed, and every test browser now takes its own away; cases (`scenario_region4__towels`) ready for
   new checks, no old scenario cut up.
+
+## Step 4a: Teppanyaki's flares (19), built (2026-11-18)
+
+- **The gag:** caught in the flame, a puff of black smoke (embers in it) wraps her at once, so the
+  switch from her run is never seen; under it she jumps back out of the flame's reach (`back`, doors
+  and walls stop her: the flame is still up, and where she is caught the diners sit). It thins and she
+  is in her soot picture: her face black but for the white eye, her hair on end, singed at the tips;
+  she blinks, a wisp of smoke curling off her hair, and coughs out a puff of smoke; then her checkpoint.
+  A yelp at the hit, a cough on the clip (sound: the user's to judge).
+- **The user, on seeing it:** "The flames are too big, make them less wide": the reach from 1.25 m to
+  0.8 m each way, about the grill's own width. "If I just run past them, they usually go up behind me"
+  (a flame every 6 s by the clock, the flourish 0.9 s before it: she mostly met the flourish): asked,
+  the user chose **"Answers her coming"**: running at a quiet grill starts the chef's flourish so that
+  the flame is up as she gets there (by her speed); stopped at the flourish she lets it flare and passes
+  in the lull after it (2.5 s); nearer than the flame could meet her, nothing starts (it would rise
+  behind her); with no one near, the clock; her cry still makes his next one late (`FLARE` in
+  `src/config.js`). Asked why the hit moves her: the three reasons above; kept.
+- **Made:** her soot picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the first darkened her all over, legs and arms too), the blink and the cough by
+  PixMiniMax from it, both pinned to it at the end (2 generations). Checked frame by frame: the body
+  unchanged from the shoulders down, feet on the floor line in every frame, loose specks out (two in the
+  picture, three in a cough frame; two singed tips standing apart kept), the blink a lid over the eye,
+  not a change of the face. **Her soot came out green in the game:** the palette has no neutral dark
+  grey, and its two nearest are greenish; for these clips they go on the charcoal greys of her hair's
+  family (`SOOT` in `tools/build_gags.py`). 12 generations. `assets/source/her-mishaps/batch-4a/`
+  (README).
+- `region8` checks the gag (blink, then cough, and her return) and the chef answering her coming.

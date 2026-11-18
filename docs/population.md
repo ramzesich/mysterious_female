@@ -760,7 +760,10 @@ asked; `amb_cagneys` diners.
 **The Sushi Bar 174-182.** `amb_sushi_chef` behind the counter; two diners. (No sign secret: dropped.)
 
 **Teppanyaki 182-194.** 186-190 `haz_flare`: the chef (`amb_teppan_chef`) flares the grill
-`timed(6, 1, 186-190)`: "Singed"; the flourish is the tell. `amb_teppan` four at the counter.
+`timed(6, 1, 186-190)`: "Singed"; the flourish is the tell. **The chef answers her coming**
+(2026-11-18, the user: run past them, they went up behind her): she runs at a quiet grill and his
+flourish starts so that the flame is up as she gets there; stopped, she passes in the lull after it
+(2.5 s); with no one near, the clock. The flame reaches 0.8 m each way (it was 1.25 m: "too big"). `amb_teppan` four at the counter.
 
 **The aft lobby 194-202.** `blk_fans` from below.
 

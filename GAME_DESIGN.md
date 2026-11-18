@@ -2487,8 +2487,12 @@ Nothing blocks the start of the build. These get settled along the way:
       **Done (2026-11-18): fast playtests** (`docs/plan-fast-tests.md`, built whole): the test steps the
       game's clock; the whole suite in 55 s six at a time (about 65 minutes before), every check the same
       as in real time.
-      **Next: the rest of step 4a's gags** (the second batch: 19 the flares, 21 and 22 the gulls, 23 the
-      "Do Not Disturb" doors, proposed). Waiting with it: the books' covers and
+      **Done (2026-11-18): Teppanyaki's flares (19)**: a puff of black smoke, and out of it her face is
+      sooty, her hair on end and singed; she blinks, smoke curling off her hair, and coughs out a puff.
+      The flames are narrower (0.8 m each way), and the chef answers her coming: run at a quiet grill,
+      the flame is up as she gets there; stopped at his flourish, she passes in the lull after it.
+      **Next: the rest of step 4a's gags** (21 and 22 the gulls, 23 the "Do Not Disturb" doors,
+      proposed). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
