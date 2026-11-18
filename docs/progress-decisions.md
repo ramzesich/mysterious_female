@@ -2828,3 +2828,55 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
   family (`SOOT` in `tools/build_gags.py`). 12 generations. `assets/source/her-mishaps/batch-4a/`
   (README).
 - `region8` checks the gag (blink, then cough, and her return) and the chef answering her coming.
+
+## The rest of the game as one plan, in two halves; two workspaces side by side (2026-11-18; a plan and a setup, nothing of the game built)
+
+- **The user:** "I want to spawn an additional session to pick up other parts of the plan. I want
+  them to work in parallel and not interfere with each other, in terms of code conflicts, browser
+  conflicts, etc."; then, everything being merged to `main` and pushed: "Split the rest of the
+  plan in two equal parts so that two sessions will work in parallel without interference. Fork
+  from this point, give them separate workspaces, separate memories (based on what we currently
+  have), and everything else what's relevant. They read from the same docs and reference (with
+  pictures) folders, but each one only updates their own memory, or local notes. If you are not
+  sure about something, find a way to check and make sure"; and on the plan itself: "Read all of
+  the docs of the project, and make a general implementation plan, combined from everything
+  what's left to do. Split it in half (roughly) in a smart way, so that the sessions will be
+  able to freely implement each one their own half."
+- **The plan: `docs/plan-the-rest.md`.** Four readers went through every document whole and
+  checked each open item against the code. It lists what can be built now, in two halves; what
+  waits for the user (sixteen things: a photo, a text, a decision); what is done once after both
+  halves are merged (the documents brought up to date, saving on, the release); and what is
+  closed.
+- **The cut (mine):** by files, not by plan step. **Half A, "when she is hit, and how the ship
+  looks":** step 4a to its end (thirteen gags, two clips of others, the `mishaps` playtest), the
+  look-outs of step 6, step 7. **Half B, "what there is to find, and the errands":** step 5
+  whole with the titles, the deliveries of step 6. Step 6 is cut in two because a look-out
+  (camera work, two pieces of the ship's art) and a delivery (a carry rule that pays with a
+  book) share nothing; a first split that gave B all of steps 5, 6 and 7 was uneven (two large
+  pieces and four medium against one large). Each big generated file has one owner.
+- **Found while reading, for the documents (not changed now; the plan's §6):** the key cards are
+  on, though `CLAUDE.md` and `README.md` say off and name a `?cards=locked` that does not exist;
+  Bumbot's beats are placed, though `CLAUDE.md`'s table says not; `GAME_DESIGN.md` §8's "Next
+  up" is of 2026-11-03 with about fifteen stale boxes; the Library's rolling ladder was never
+  built; none of the sound has been heard by the user.
+- **The workspaces, each a clone of its own** (not a git worktree: checked in Claude Code's
+  documentation, worktrees of one repository share one memory folder and one local settings
+  file): `C:\Users\ramze\Development\bumbusik-a` on branch `rest-a`, `bumbusik-b` on `rest-b`,
+  both from `main` at `0c99e7d` with this plan on top. Each has its own memory folder (a copy of
+  the project's as it stood), its own temp folder for screenshots and test browsers, its own
+  port for the user's links (8001, 8002), its own notes file in the repo
+  (`docs/session-a-notes.md`, `docs/session-b-notes.md`) and its brief in `CLAUDE.local.md` (not
+  in git). The PixelLab connection was added to each folder (it is kept per folder).
+- **The shared documents are read-only for both:** what a step should record in them goes to the
+  session's notes file and is folded in later by one hand. The reference photos stay in the main
+  folder and are read from there by full path (no link into the workspaces: removing a folder
+  that holds a link can take the photos with it).
+- **Checked, not assumed:** a fresh short session in each workspace named its own session, branch
+  and memory folder; the temp folder could not be set from a settings file (Claude Code keeps
+  its own `TEMP`: tried), so each workspace has a launcher, `start-session.cmd`, which sets it,
+  and the brief's first rule has the session check it and stop if it is wrong (the first check
+  did stop, on the settings-file try); `boot` passed in both workspaces at the same time, each
+  with its screenshots in its own folder.
+- **Meeting point:** `main` on GitHub, on the user's word each time: a session merges
+  `origin/main` into its branch, rebuilds any generated file that collides, runs what the merge
+  can touch, and pushes its branch to `main`.
