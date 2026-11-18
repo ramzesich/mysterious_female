@@ -809,6 +809,35 @@ optional stretch, since the steward gave the card at 122 m.
 - **Docs when built:** the rows of docs/population.md's table themselves, GAME_DESIGN.md's
   region 4 (its "corridor's life" and "Blocks"), `docs/progress-decisions.md`.
 
+**Second revision (2026-11-18): the one-way doors get their push bar (decided by the user,
+nothing of it built).** The design has had the line since the cards were settled ("Fire-exit
+doors with a push bar on one side only are the one-way doors", GAME_DESIGN.md §6.1.2's table of locks);
+as built, a one-way glass door is drawn exactly like a free one, and she learns which it is only
+by E (a rattle, a padlock over her). A naming of the door, not a hint.
+
+- **Which doors:** every glass door across a deck whose lock is `oneway` in `maps/ship.json`:
+  deck 8 at 74, 82, 110, 194 and 202 m; deck 9 at 202 m, and at 194 m once the revision above
+  makes it one; deck 10 at 110, 194 and 202 m. The four end walls with a one-way doorway (decks
+  8, 9 and 10 aft, deck 11 forward) are looked at and proposed to the user separately: they are
+  not this door. The balcony cabins' corridor doors are cabin doors and stay as they are. The
+  theatre's trunk has its unlit arrows already.
+- **What is seen:** shut, the door is edge on (`buildBulkhead` in the ship scene: a 4 px slab,
+  its handle sticking out on both sides): **a one-way door has the bar's end on its free side
+  only, and nothing on the other.** Open, swung against the wall and seen face on: the leaf with
+  the bar across it. The same after it has been opened for good: it is the same door.
+- **Art, generated (Start here, 7), shown first:** the open leaf with its push bar, made from
+  the game's own picture of the open glass leaf (28 px wide, a door's height) so that the two
+  kinds stay one family and share one frame; if the generated leaf makes the code-drawn free
+  door look poor beside it, the free leaf is made with it as a pair. The user sees, enlarged and
+  at the game's size, in place beside her: a one-way door shut from each side, open, and a free
+  door next to it. Two or three candidates for the bar (steel, or steel with a red or green
+  band); it must read at 1:1. About 5 to 10 generations.
+- **In the code:** the leaf and the handle by the lock's free side in `buildBulkhead` (the lock
+  is already passed to it); nothing in `src/progression.js` changes.
+- **Playtests:** `region4`, `region7` (the hallways' doors), `boot`;
+  `tools/check_overlaps.py` (must list nothing); `tools/render_ship.py` looked at whole (a door
+  drawn over the ship's side must not show from outside).
+
 ### Step 5. The rest of the twenty (art: about 12 small pictures, shown first)
 
 - The other placements of §4.1 (those not paid by a delivery).
@@ -1020,3 +1049,4 @@ promenade's enclosed ends: "Leave as they are for now."
 | (The user's own) | "Rework the tangerine sprite to make it a bit more detailed and look like a tangerine" |
 | (The user's own) | "Collected tangerines should fly into her tangerine meter above" |
 | (2026-11-18) Deck 9's vacuum, towel stack and sprinkler are on an optional stretch: make that part of the corridor required? Where does the steward go: just past the sprinkler (152 m) or the corridor's aft end? | "What would you recommend here for the most fun and varied gameplay?"; on the recommendation (the aft end; the luggage stack kept; the roll cut to about 4 m; the way back changed, not repeated; the picture rehung, the small cart out; the glass door at 194 one-way from the corridor): "Ok, I accept your recommendation here, and the suggested fixes" |
+| (2026-11-18) The one-way doors look like any glass door; the design's push bar on the free side was never drawn. Build it, as a generated variant shown first? | "Add it to the plan, yes" |

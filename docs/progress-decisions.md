@@ -2557,3 +2557,19 @@ here" 7); each built step is gone back over under its "Revision".
   checkpoint's door is drawn at 191.6 m, not 190. No playtest scenario run.
 - Written: GAME_DESIGN.md (region 4), docs/population.md (the corridor's table, a note under
   it), docs/plan-three-uses.md (step 4a's revision, the answers). For the building session.
+
+## The one-way doors get their push bar (2026-11-18; the documents only, nothing built)
+
+- **The user had missed that there are one-way doors** (asked on reading deck 9's 194 m door
+  made one): thirteen in the built map, all at the cabin hallways of decks 8 to 10 and deck 11's
+  forward end wall, plus four balcony cabins from their balcony side and the theatre's trunk.
+- **Found:** they are drawn exactly like the free glass doors; only E tells (a rattle, a
+  padlock). The design's own line, "Fire-exit doors with a push bar on one side only are the
+  one-way doors", was never built.
+- **Decided by the user** ("Add it to the plan, yes"): the push bar on the free side, a plain
+  face on the other, as a generated variant of the glass door shown first.
+- **Mine:** its scope (the glass doors across a deck; the end walls' doorways proposed apart;
+  cabin doors and the trunk left), made from the game's own open leaf so the two kinds stay a
+  pair, the free leaf remade with it if they do not match.
+- Written: docs/plan-three-uses.md (step 4a's second revision, the answers), GAME_DESIGN.md
+  (§6.1.2's table of locks), docs/population.md (the doors' row). No generations, no playtest.
