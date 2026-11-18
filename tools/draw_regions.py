@@ -16,10 +16,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 from build_ship_map import floor_y, x_of
 from ship_layout import EXTENT, LENGTH
-from tempdir import TEMP
 
 ROOT = Path(__file__).resolve().parent.parent
-FULL = TEMP / "bumbusik-playtest" / "exterior" / "ship-full.png"
+FULL = Path(os.environ["TEMP"]) / "bumbusik-playtest" / "exterior" / "ship-full.png"
 FONT = "C:/Windows/Fonts/arial.ttf"
 FONT_B = "C:/Windows/Fonts/arialbd.ttf"
 

@@ -18,10 +18,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from tempdir import TEMP
-
 ROOT = Path(__file__).resolve().parent.parent
-OUT = TEMP / "bumbusik-playtest"
+OUT = Path(os.environ.get("TEMP", "/tmp")) / "bumbusik-playtest"
 SKY = (150, 190, 220)
 LINE = (120, 160, 190)
 
