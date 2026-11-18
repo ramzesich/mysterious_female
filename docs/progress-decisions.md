@@ -2795,9 +2795,9 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - **Found in the tests:** six checks that had passed by real time's slack (the trunk's lock message,
   the funnel stairway's top twice, the jogger three times, the trays' jump, the terrace gull's swoop):
   each now waits for the thing, not for a time.
-- **The rule changed** (`CLAUDE.md`, "Working with the user"): after a change, the scenarios it touches,
-  stepped; before a merge is proposed, the whole suite stepped and the real-time set (`boot`, `sound`,
-  `deck3`); what is judged by eye stays the real game.
+- **The rule stays** (the user, asked whether the whole suite should now run before each merge: "The old
+  rule"): after a change, the scenarios it touches, stepped; the whole suite never unasked; what is
+  judged by eye stays the real game (`CLAUDE.md`, "Working with the user").
 - **Also:** `Math.random` and Phaser's RND seeded in tests (`--seed`); 1,471 old browser profile folders
   removed, and every test browser now takes its own away; cases (`scenario_region4__towels`) ready for
   new checks, no old scenario cut up.

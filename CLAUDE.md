@@ -607,12 +607,13 @@ Lessons learned (2026-11-18, deck 9's corridor, her push):
   compromising on QA"). The whole suite had become about 65 minutes in real time (the user, 2026-11-14:
   "an impractical amount of time"; it was then no longer run before a merge). Stepped, the 38
   scenarios take about 4 minutes one after another and **55 s six at a time**, every check with the
-  same result as in real time (878 compared). So:
+  same result as in real time (878 compared). **The rule stays as it was** (the user, 2026-11-18,
+  asked whether the whole suite should now run before each merge: "The old rule"):
   - **after a change:** the scenarios it can touch, stepped (`python tools/playtest.py boot region9`),
-    a few seconds each; say which were run;
-  - **before a merge is proposed:** the whole suite stepped, `python tools/playtest.py -j 6`, and the
-    real-time set, `python tools/playtest.py --real boot sound deck3` (the real loop, the sound's
-    own clock, the game's own start);
+    a few seconds each; say which were run and that the rest were not;
+  - **never start the whole suite unasked**, not before a merge either; when the user asks for it,
+    `python tools/playtest.py -j 6`, and the real-time set `python tools/playtest.py --real boot
+    sound deck3` if asked for (the real loop, the sound's own clock, the game's own start);
   - **whatever is judged by eye** (motion, pace, a gag) is the real game, as before: the user's play,
     and recordings stepped by hand.
   A failure is read, not run again until it passes: `--failed` reruns only those, `--seed N` replays
