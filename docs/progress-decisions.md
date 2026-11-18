@@ -2456,3 +2456,26 @@ here" 7); each built step is gone back over under its "Revision".
   on is the steward's card, then the linen room at 112 m (behind where she arrives) and its vent;
   the corridor aft of the steward (130 to 194 m) is the plan's optional "gauntlet" (book 4, the
   tangerines, the balcony cabin, the checkpoint at 190).
+
+## The books' titles, and where they show (2026-11-18; the documents only, nothing built)
+
+- **The user gave the titles**, from two photos of her bookshelf, and a photo of her reading
+  armchair at home (`reference/photos/Books/`, git-ignored; read here, sent nowhere). They had
+  been promised for "when the game is fully tested": they came now, so the plan's stand-in covers
+  are dropped.
+- **Decided by the user:** the fourteen titles, each in its own language and script, with its
+  author; Її війна is her own, on the bed in cabin 8206; the two Harry Potters by their real
+  English titles (the Philosopher's Stone, the Chamber of Secrets, as on her copies); a title
+  shows as a generated cover in the centre of a slightly dimmed screen when she gets the book,
+  and on the shelf seen close (E at it), generated too; every cover its own; the armchair's photo
+  is the picture in the nook's frame, not the nook's look.
+- **Mine:** which title lies where ("The order is random"), by what each name fits (approved by
+  the user: "Good"); the four new books are shelf numbers 11 to 14 in the plan's order (its things
+  17 to 20); the lettering set by a build tool, since the game's pixel lettering has neither
+  lower case nor Hebrew; the cover's moment through the Library's existing panel.
+- **Found while reading the mechanic, not changed:** the design's "standing still with a book she
+  reads where she stands" has no code (only the chair and her bed); the shelf and the trolley
+  are drawn in code; nothing says whether books 11 to 14 get hint pages. The second is proposed
+  in the plan's step 5; the third is in GAME_DESIGN.md §6.1.15.
+- Written: GAME_DESIGN.md §6.1.2 (the table, the two places) and §6.1.15; docs/plan-three-uses.md
+  §4.1, step 5's revision, §7, the answers; docs/population.md §2.2. No generations, no playtest.

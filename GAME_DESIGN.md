@@ -851,6 +851,46 @@ bookcase (the push verb) and climbed to the top shelf reaches the odd book; pull
 bookcase open on a hidden nook: an armchair, a lamp, a porthole on the sea, a photo slot, and the
 reading idle there for as long as she likes.
 
+**The books' titles and where they show. Decided (the user, 2026-11-18); not built.** The books are
+fourteen (docs/plan-three-uses.md §4.1), and their titles are real books of hers, read off two
+photos of her bookshelf (`reference/photos/Books/`, git-ignored). **Each is written in its own
+language and script**, whatever the game's language, with its author. A title shows in two places,
+and nowhere else:
+
+- **When she gets a book** (picked up, or handed to her as thanks): the screen is dimmed slightly
+  and **the book's cover is shown in the centre of the screen, its title and author on it**, until a
+  key is pressed. **Every book has a generated cover of its own**, so that the fourteen look
+  different. A naming, not a hint (§7.1).
+- **The shelf seen close:** E at the shelf behind the librarian's desk shows it over the whole
+  screen, **a generated picture**: the books that are back as spines with their titles, the gaps of
+  those still out. Any time, with or without a book on her.
+
+The lettering on covers and spines is drawn in by the build, not by the generator and not by the
+game's pixel lettering (which has Latin and Ukrainian capitals only): these titles need lower case,
+Polish letters, Russian and Ukrainian Cyrillic, and Hebrew, right to left.
+
+| Book | Title | Author | Where it is found |
+|---|---|---|---|
+| 1 | Atomic Habits | James Clear | Deck 5, a table at the Atrium Café |
+| 2 | Harry Potter and the Chamber of Secrets | J.K. Rowling | The lifeboat |
+| 3 | Танґо смерті | Юрій Винничук | The dancers' dressing room |
+| 4 | Unexpected Lessons in Love | Lucy Dillon | The honeymoon couple's thanks |
+| 5 | Її війна | Євгенія Подобна | **Her own, on the bed in cabin 8206 (the user)** |
+| 6 | Harry Potter and the Philosopher's Stone | J.K. Rowling | Her husband's, at the table |
+| 7 | Понаїхали | Артем Чапай | The balcony guest's thanks |
+| 8 | Niebieskie nitki | Małgorzata Gutowska-Adamczyk | The old lady's sunbed, after the horn |
+| 9 | Двор | Аркадий Львов | The engineer's, at the funnel's top |
+| 10 | Боря, выйди с моря | Рафаил Гругман | The captain's, on the bridge's chart table |
+| 11 | נערה במעיל כחול | Monica Hesse | The boat walkway's end, beyond the boat drill |
+| 12 | Poczwarka | Dorota Terakowska | Deck 8 midships, the thanks for the flowers |
+| 13 | Daughters of Warsaw | Maria Frances | Deck 10 midships, the thanks for the tea |
+| 14 | Pachinko | Min Jin Lee | Deck 9 forward, the end of the officers' corridor |
+
+The fourteen titles and book 5's are the user's ("The order is random"). **Which title lies where
+is Decided** (proposed by what each name fits: the tango with the dancers, the sea with the captain,
+the chamber of secrets in the hidden lifeboat; the user, 2026-11-18: "Good"). Each spelling is checked against
+her copy's cover when its cover is made: the author of נערה במעיל כחול is written in Hebrew on hers.
+
 **Ice cream (his machine).** The soft serve machine at the Great Outdoors' entrance is worked by her:
 **hold E and the swirl grows; release in the green band** for a perfect cone, early for a stub, late
 and it topples onto the deck (the gulls pounce). A cone is a melting tray (about 45 seconds). It runs
@@ -1608,10 +1648,14 @@ half-dressed with nothing finished to review.
 
 #### 6.1.15 Still open (the user's)
 
-1. The pictures for the six photo slots (the lifeboat, the lighting bridge, the stern strip, the
-   chapel, the reading nook, the table at the Great Outdoors), and whether the chapel's wedding is
-   anyone in particular.
-2. **The ten books' titles**: real books she loves, one per region, and the one on the bed in 8206.
+1. The pictures for five of the six photo slots (the lifeboat, the lighting bridge, the stern
+   strip, the chapel, the table at the Great Outdoors), and whether the chapel's wedding is anyone
+   in particular. **The reading nook's is given (the user, 2026-11-18):** her own reading armchair
+   at home (`reference/photos/Books/reading-nook.heic`), as the picture in the nook's frame, not as
+   the nook's look ("The nook is at home, and cabin 8206 is not home in that sense"). Made into
+   pixel art from a cutout on a flat ground, the candidates shown first. Not made yet.
+2. ~~The books' titles~~ **Given (the user, 2026-11-18): §6.1.2's table.** Still open there:
+   whether the four new books' pages get a hint drawing each, and which.
 3. **The user's own sprite**: from his photo through PixelLab, as hers was, or described in words.
 4. The name on the captain's cabin door; the names on crew doors.
 5. Whether the rival has a name.

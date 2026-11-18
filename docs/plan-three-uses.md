@@ -434,9 +434,13 @@ with what she has, and with twenty things to find.
   not merely locked. His spoon lies a few steps from his table, so his count appears at once
   as 1 of 4.
 - **Nothing makes her three uses stronger**, ever.
-- **The four new titles come from the user later**, with the photos and the other missing
-  things, once the game is tested: until then stand-in covers and plain pages (a picture, no
-  hint).
+- **The fourteen titles are given (the user, 2026-11-18)**, earlier than "once the game is
+  tested": GAME_DESIGN.md §6.1.2 has them, each in its own language and script, with its author.
+  **A title shows in two places:** the book's cover over a slightly dimmed screen, in its centre,
+  when she gets the book; and the shelf seen close (E at it), over the whole screen. **Every
+  cover is generated and different from the others; the shelf's close view is generated too.**
+  The lettering is drawn in by the build (Latin with Polish letters, Cyrillic, Hebrew). The four
+  new books' pages stay plain (a picture, no hint) until the user says otherwise.
 - **Before the desk is built, the user sees a picture of it with all eight on it** (if it is
   too crowded, some of hers go by the bed).
 
@@ -460,10 +464,10 @@ with what she has, and with twenty things to find.
 | 14 | His | His meditation and sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults | Region 7 |
 | 15 | His | His handheld (an Asus ROG Xbox Ally X: black, rounded grips, four coloured buttons; no logo) | Deck 12, Champs, on a sofa | E | Region 8 |
 | 16 | His | A pick for his electric guitar | Deck 12, the Spinnaker, on the bandstand by the piano | E | Region 9 |
-| 17 | Book | | The boat walkway, its end beyond the boat drill | E | Region 7 |
-| 18 | Book | | Deck 8 midships | The thanks for the flowers | Region 7 |
-| 19 | Book | | Deck 10 midships | The thanks for the tea | Region 7 |
-| 20 | Book | | Deck 9 forward, the end of the officers' corridor | E | Region 9 |
+| 17 | Book | נערה במעיל כחול (book 11) | The boat walkway, its end beyond the boat drill | E | Region 7 |
+| 18 | Book | Poczwarka (book 12) | Deck 8 midships | The thanks for the flowers | Region 7 |
+| 19 | Book | Daughters of Warsaw (book 13) | Deck 10 midships | The thanks for the tea | Region 7 |
+| 20 | Book | Pachinko (book 14) | Deck 9 forward, the end of the officers' corridor | E | Region 9 |
 
 Each place is set against what is built there before it is fixed (the lesson of 2026-11-14),
 and each small picture is shown to the user first. The five breakables and the jackpot keep
@@ -796,6 +800,30 @@ Shown: each gag as a strip of its frames in place, and the link to its spot with
 
 - The small pictures are generated, none drawn in code (Start here, 7); the four new books'
   stand-in covers too.
+
+**Revision (2026-11-18), the titles (GAME_DESIGN.md §6.1.2; nothing of it built):**
+
+- **Fourteen covers, generated, each its own** (no stand-ins any more): shown to the user
+  enlarged, numbered, with title and author drawn in, before any is placed. The small book lying
+  in the world and its spine on the shelf take their colours from its cover.
+- **The cover's moment:** in `world.take` and `world.giveBook`, after the pick-up's sparkle or the
+  hand-over's clip: the Library's `panel()` with a lighter dim (the user: "dimmed slightly"), the
+  cover in the centre, any key closes it. Each of the fourteen, once.
+- **The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
+  screen, the returned books' spines with their titles laid in by the game from the save, gaps
+  for the rest. The spines are cut to one height and width so that any fourteen stand together.
+- **The lettering:** a build tool sets each title and author on its cover and spine from a font
+  with every script needed, at whole pixels; Hebrew from right to left. Texts of the ship's own
+  kind, the same in both languages: they do not go through `src/lang.js`.
+- **The reading nook's photo** (the user's, of her armchair at home): pixel art from a cutout on
+  a flat ground (`image_to_pixelart`), candidates shown first; in the nook's frame (`slot_nook`).
+- **Proposed with it, for the user's word:** the small shelf and the return trolley in the
+  Library, drawn in code since step 2, generated as well (the art rule of 2026-11-16).
+- Art: about 30 generations more than this step's estimate (the covers, the shelf, the photo),
+  the exact cost said before each batch.
+- Playtests: `region2` (the cover on the first pick-up, closed by a key; the shelf's close view
+  with one book back and thirteen gaps), `keeps`, and each region's scenario that takes a book
+  (the cover closed before it goes on).
 - At the Sushi Bar the tangerine is handed over with the apology's clip (step 2's revision): it
   is the same act.
 - Nothing of the twenty flies to its count: only tangerines fly (§1.7).
@@ -874,8 +902,9 @@ whoever builds cannot hear them: every new one is the user's to judge on the sou
 
 ## 7. What is still the user's to give, later
 
-- The fourteen books' titles, the photos for the photo slots, and "other missing things", once
-  the game is tested and verified.
+- ~~The fourteen books' titles~~ (given 2026-11-18, §4.1) and the reading nook's photo (given
+  the same day). The other five photo slots' photos and "other missing things", once the game is
+  tested and verified.
 - The fine tuning of every placement, in play.
 
 ---
@@ -914,6 +943,14 @@ promenade's enclosed ends: "Leave as they are for now."
 | How do the things for Bumbot affect progress? (The user's own) | "I would reduce the number of collectibles for Bumbot and introduce instead a few more books, and some other items for her and her husband" |
 | 8 for Bumbot, 4 more books, 4 for her, 4 for him? | "Ok" |
 | The four titles | "I will provide all the titles later, when the game is fully tested and verified. Together with photos and other missing things" |
+| (2026-11-18, from two photos of her bookshelf) Which fourteen, and in what order? | Fourteen picked by number, the two Harry Potters "two first harry potter books in the series"; "The order is random" |
+| Her own book on the bed in cabin 8206? | Її війна |
+| The nook's photo: the picture in its frame, or the model for the nook? | "The picture. The nook is at home, and cabin 8206 is not home in that sense." |
+| Titles in their own language, or in the game's? | "In their own language and script." |
+| Where do titles show: A the cover when she gets a book, B the cover before the page in the chair, C the shelf seen close, D the nook's bookcase? | "A and C. On A, the screen is dimmed slightly, a generated book cover is shown in the center of the screen with the title and author. Covers have to be generated for every book, to look differently. For C, it also has to be generated." |
+| Harry Potter: which edition? | "English. But put the real titles there, not the first/second book." (Harry Potter and the Philosopher's Stone; Harry Potter and the Chamber of Secrets) |
+| The author on the cover? | "Yes" |
+| Which title lies where (GAME_DESIGN.md §6.1.2's table)? | "Good" |
 | Their things | "Bumbusik: A bookmark (cat-shaped on top of the bookmark), a small Ukraine flag (meant to stand on a writing desk), a diary notepad, a small plant in a pot. Husband: his handheld gaming device (Asus ROG Xbox Ally X), his ice-cream spoon, his mediation/sleep mask, a pick for his electric guitar" |
 | What each kind pays | "Drop the stronger uses idea, I don't like it. Otherwise, as you suggested. Also, the HUD shows number of items found vs total per category" |
 | (The user's own) | "In her initial crew cabin there's a bowl with three tangerines. Make the tangerines collectible (which increases the total number by 3)" |
