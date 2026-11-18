@@ -435,49 +435,37 @@ export class Darter {
 // heap (the user, 2026-11-17: "What if it falls on top of her the moment she passes it? And the
 // getting past will be having to stop at the stack and wait while it falls"). A jump landed beside
 // it, or the dash, brings it down on that side. It is stacked again once she has gone.
-// `TOWELS`: how near she comes before it wobbles (px, middle to middle) and for how long: with its
-// fall, as long as her run takes to the stack, so that she cannot outrun it.
-const TOWELS = { reach: 100, wobbleMs: 400 };
+// Its pictures are its own clips (the user, 2026-11-18: "The animations have to be generated";
+// `towels` sheet, tools/build_towels.py): the stack and its stool apart while it stands (it sways on
+// the stool's top), its fall and scatter alone, and with her under it the fall on her, then her
+// head coming up in a towel turban with a towel swan on it (18), all played to her checkpoint as
+// her gag (`ride.play`, the ship scene's `thingGag`). Running past it, the moment she is `passed` px
+// past its middle it falls on her: one of four clips, each starting from one of her own run frames
+// there, she running on into the fall (the user, 2026-11-18: "It has to be seamless"; a clip from her
+// standing made her seem to stop for it), the one whose first frame is the pose she shows next.
+// Caught under it any other way while it falls alone (standing there, landed from a jump), the
+// clip of her standing under it (her 36 px past it) takes over at the frame it has reached
+// (`under`, px past its middle; `lastFrame`). Each picture has it falling east, flipped for west.
+// `TOWELS`: how near she comes before it wobbles (px, middle to middle) and for how long at most:
+// longer than her run (140 px/s) takes from there to past it; stopped short, she waits the wobble
+// out and it falls in front of her. Its sway eases as she comes level with it (`settle`, px), so that
+// it is near upright when a clip, which starts upright, takes over. The frame it lands on (`lands`).
+const TOWELS = { reach: 100, wobbleMs: 1100, passed: 6, under: [4, 74], lastFrame: 6, lands: 7, settle: 60, emergeAfterMs: 450 };
 export class TowelStack {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y }
-        TowelStack.textures(s);
-        this.stool = s.add.image(def.x, def.y, 'towel-stool').setOrigin(0.5, 1).setDepth(D.props - 0.03);
-        this.stack = s.add.image(def.x, def.y - 12, 'towel-stack').setOrigin(0.5, 1).setDepth(D.props - 0.02);
-        this.heap = s.add.image(def.x, def.y, 'towel-heap').setOrigin(0.5, 1).setDepth(D.player + 0.06).setVisible(false);
-        world.add([this.stool, this.stack, this.heap]);
+        const m = s.cache.json.get('towels-meta');
+        this.meta = m;
+        const c = m.cell;
+        this.stool = s.add.sprite(def.x, def.y, 'towels', m.stool).setOrigin(m.middle / c, m.floor / c).setDepth(D.props - 0.03);
+        this.stack = s.add.sprite(def.x, def.y - (m.floor - m.top), 'towels', m.stack).setOrigin(m.middle / c, m.top / c).setDepth(D.props - 0.02);
+        this.pic = s.add.sprite(def.x, def.y, 'towels', m.anims.fall[0]).setOrigin(m.middle / c, m.floor / c).setDepth(D.props - 0.02).setVisible(false);
+        world.add([this.stool, this.stack, this.pic]);
         this.state = 'up';
         this.wasOnFloor = true;
-    }
-
-    static textures(s) {
-        if (s.textures.exists('towel-stack')) return;
-        const g = s.make.graphics({ x: 0, y: 0 }, false);
-        // The stack: fourteen folded towels, white and pale blue, none quite square on the one below.
-        for (let i = 0; i < 14; i++) {
-            const y = 70 - (i + 1) * 5, off = [0, 1, -1, 1, 0, -1, 0, 2, -1, 0, 1, -1, 0, 1][i];
-            g.fillStyle(0x9babb2, 1).fillRect(2 + off, y, 22, 5);
-            g.fillStyle(i % 4 === 2 ? 0x8fd3ff : 0xffffff, 1).fillRect(3 + off, y, 20, 4);
-            g.fillStyle(i % 4 === 2 ? 0x4d9be6 : 0xc7dcd0, 1).fillRect(3 + off, y + 3, 20, 1);
-        }
-        g.generateTexture('towel-stack', 28, 70);
-        g.clear();
-        // The stool it stands on.
-        g.fillStyle(0x7a4528, 1).fillRect(1, 0, 24, 3).fillRect(3, 3, 2, 9).fillRect(21, 3, 2, 9);
-        g.fillStyle(0xcd683d, 1).fillRect(2, 0, 22, 2);
-        g.generateTexture('towel-stool', 26, 12);
-        g.clear();
-        // The same towels in a heap on the floor.
-        const lie = [[2, 9, 0], [20, 10, 1], [38, 9, 0], [10, 5, 1], [28, 5, 0], [46, 10, 1], [18, 1, 0], [36, 1, 2]];
-        for (const [x, y, c] of lie) {
-            g.fillStyle(0x9babb2, 1).fillRoundedRect(x, y, 20, 6, 2);
-            g.fillStyle([0xffffff, 0xf2f6f6, 0x8fd3ff][c], 1).fillRoundedRect(x + 1, y, 18, 5, 2);
-        }
-        g.generateTexture('towel-heap', 68, 16);
-        g.destroy();
     }
 
     update(dt, time) {
@@ -505,43 +493,94 @@ export class TowelStack {
                 sfx.at(d.x, d.y).cloth();
             }
         } else if (this.state === 'wobble') {
-            this.stack.setAngle(Math.sin(time / 35) * 6 + this.dir * 2);
-            if (time > this.at) this.fall(this.dir);
-        } else if (this.state === 'falling') {
-            const k = Math.min(1, (time - this.at) / 360);
-            this.stack.setAngle(this.dir * 86 * k * k);
-            if (k >= 1) this.down();
+            const k = Math.min(1, Math.max(0.25, Math.abs(dx) / TOWELS.settle));
+            this.stack.setAngle((Math.sin(time / 35) * 6 + this.dir * 2) * k);
+            const past = dx * this.dir, run = p.anims.currentAnim?.key === 'her-run';
+            if (on && onFloor && s.mode === 'play' && past >= TOWELS.passed) {
+                // The moment she has passed it, it falls, on her as she runs on.
+                this.fall(this.dir);
+                if (run) {
+                    const f = p.anims.currentFrame.index - 1, n = f % 2 ? (f + 1) % 8 : f;
+                    this.catch(`towels-run${n}`, n === f ? 1 : 0, past);
+                }
+            } else if (time > this.at) this.fall(this.dir);
+        }
+        if (this.state === 'falling') {
+            const k = this.pic.anims.currentFrame?.index ?? 1;     // the clip's frame, 1 = its first after the stack standing
+            if (k >= TOWELS.lands && !this.landed) {
+                this.landed = true;
+                sfx.at(d.x + this.dir * 36, d.y).towelFall();
+            }
+            // Under it as it comes down: her gag, from the frame it has reached (once a fall).
+            const past = dx * this.dir;
+            if (!this.tried && k <= TOWELS.lastFrame && on && onFloor && s.mode === 'play'
+                && past >= TOWELS.under[0] && past <= TOWELS.under[1]) {
+                this.catch('towels-bury', Math.max(0, k - 1), past);
+            }
         } else if (this.state === 'down' && (Math.abs(dx) > 560 || s.route !== 'inside')) {
             // Stacked again behind her back.
             this.state = 'up';
             this.stack.setVisible(true).setAngle(0);
-            this.heap.setVisible(false);
+            this.stool.setVisible(true);
+            this.pic.setVisible(false);
         }
     }
 
-    // (On the game's clock, as everything that must land where she is: in `update`.)
+    // Its picture for a clip, falling `dir` (each is drawn falling east: flipped, the stool's middle
+    // kept on its spot).
+    show(dir, depth) {
+        const m = this.meta, c = m.cell;
+        this.stack.setVisible(false);
+        this.stool.setVisible(false);
+        this.pic.setVisible(true).setFlipX(dir < 0).setOrigin((dir < 0 ? c - m.middle : m.middle) / c, m.floor / c).setDepth(depth);
+    }
+
+    // (On the game's clock, as everything that must land where she is: the clip on the scene's.)
     fall(dir) {
         const s = this.scene, d = this.def;
         this.state = 'falling';
         this.dir = dir;
-        this.at = s.time.now;
+        this.tried = this.landed = false;
+        this.show(dir, s.DEPTH.props - 0.02);
+        this.pic.play('towels-fall');
+        this.pic.once('animationcomplete-towels-fall', () => {
+            // The heap: behind her as she crosses it (the user, 2026-11-18).
+            if (this.state === 'falling') this.state = 'down';
+        });
         sfx.at(d.x, d.y).cloth();
     }
 
-    down() {
-        const s = this.scene, p = s.player, d = this.def;
-        this.state = 'down';
-        const cx = d.x + this.dir * 36;
-        this.stack.setVisible(false);
-        this.heap.setVisible(true).setPosition(cx, d.y);
-        sfx.at(cx, d.y).towelFall();
-        if (here(s, d) && Math.abs(p.x - cx) < 38 && p.y > d.y - 40 && !s.lungeSafe()) {
-            // Under it: only her hair shows for a moment.
-            this.heap.setPosition(p.x, d.y - 26).setScale(1, 2.6);
-            s.tweens.add({ targets: this.heap, y: d.y, scaleY: 1, duration: 900, delay: 500, ease: 'Bounce.easeOut' });
-            if (this.world.carry) this.world.carryBox.spill(d.x, false, 'towels');
-            else s.scareContact(d.x, 'towels');
-        }
+    // Under it: her gag, once a fall (carrying something, she spills it instead).
+    catch(key, startFrame, past) {
+        const s = this.scene, d = this.def;
+        this.tried = true;
+        this.caught = { key, startFrame, past: Math.round(past) };
+        if (this.world.carry) this.world.carryBox.spill(d.x, false, 'towels');
+        else s.scareContact(d.x, 'towels', { ride: this.ride(key, startFrame) });
+    }
+
+    // Her gag (18), handed to the ship scene: the fall on her (`key`, from `startFrame`; she hidden),
+    // the heap still a moment, her head up in the turban; her checkpoint after. Back from it, the heap
+    // stays (the fall on her's last frame, the same in each) until she has gone.
+    ride(key, startFrame) {
+        const s = this.scene, m = this.meta;
+        return {
+            play: (done) => {
+                this.state = 'burying';
+                this.show(this.dir, s.player.depth);
+                this.pic.play({ key, startFrame });
+                this.pic.once(`animationcomplete-${key}`, () => s.time.delayedCall(TOWELS.emergeAfterMs, () => {
+                    if (this.state !== 'burying') return;
+                    this.pic.play('towels-emerge');
+                    this.pic.once('animationcomplete-towels-emerge', () => done());
+                }));
+            },
+            show: () => {
+                this.pic.anims.stop();
+                this.pic.setFrame(m.anims.bury[8]).setDepth(s.DEPTH.props - 0.02);   // behind her, as the fall's
+                this.state = 'down';
+            },
+        };
     }
 }
 

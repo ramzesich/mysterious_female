@@ -71,6 +71,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) ; what of a room is in front of the things lying in it (a bowl before its tangerines) is marked with `Room.in_front()` and saved as `<id>-front.png`, drawn over them |
+| `tools/build_towels.py` | **The towel stack's own clips** (deck 9; `assets/source/things/towel-fall/`, its README has the ids) to `assets/sprites/towels.png` + `.json`: its fall alone, the fall on her (from her standing, and four from her run's phases), her coming up in a towel turban with a towel swan, and the standing stack and stool apart. Played by `TowelStack`; the fall on her is a gag the thing plays itself (the ship scene's `thingGag`, `ride.play`) |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
@@ -483,6 +484,30 @@ Lessons learned (2026-11-17, the steward's jammed trolley):
 - **Before reporting a block, find what it is:** I first showed the user a different trolley (the
   breakfast stewardess's, the same picture) than the one in their screenshot. Match the person in the
   picture before answering.
+
+Lessons learned (2026-11-18, the towel stack's fall):
+
+- **A clip of her caught while she runs starts from her own run frame, and she runs on in it:** one
+  from her standing made her "deliberately stop for a fraction of time to let the towels fall"
+  (the user). Pinned to an end where she already stands she runs on the spot: start her where the
+  thing first reaches her and end where she is caught, so the clip must carry her forward (about her
+  run's px a frame), and play its first frames at her run's rate. One clip per phase of her stride
+  (four of eight frames), the one whose first frame is the pose she shows next.
+- **A thing that falls on her falls when she is where its clip has her**, not on a timer that
+  happens to fit one speed; and a sway or wobble eases to the clip's first pose before it takes over.
+- **Generated motion of many small pieces: pin the end.** Unpinned, a stack fell as one stiff column
+  and landed "like books"; an end picture made of its own pieces lying scattered gave the scatter.
+  Generated heaps as map objects came as snow drifts, swans as birds (a beak whitened by hand at
+  15 px reads as a towel swan).
+- **`edit_animation` restyles a clip and keeps its motion to the px** (4 frames a call at 128 px,
+  10 generations each, the same seed and wording for every call): the redrawn first frame becomes
+  the thing's standing picture, so the world and its clips stay one.
+- **A heap or a prop that lands on the floor is behind her** as she crosses it (the user), with
+  whatever is in its picture (the stool).
+- **Before placing a thing that grows when it moves, measure what it reaches:** a heap 90 px each
+  way does not fit between cabin doors 159 px apart; and look at the wall behind a tall thing (a
+  picture hidden behind the stack). Things of the corridor's own rule move out of a world thing's way
+  by rule (`drawCabinDoors`), not by hand.
 
 ## Working with the user
 

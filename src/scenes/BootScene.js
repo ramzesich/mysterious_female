@@ -44,6 +44,9 @@ export class BootScene extends Phaser.Scene {
         // Her mishap gags, each one picture of her with the thing (docs/plan-three-uses.md §1.6).
         this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
         this.load.json('her-mishaps-meta', 'assets/sprites/her-mishaps.json');
+        // The towel stack's own clips (deck 9; tools/build_towels.py): its fall, it on her, her coming up.
+        this.load.spritesheet('towels', 'assets/sprites/towels.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.json('towels-meta', 'assets/sprites/towels.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
@@ -207,6 +210,14 @@ export class BootScene extends Phaser.Scene {
             const fast = name.startsWith('paper-') ? 3 : 0;
             this.anims.create({ key: `gag-${name}`, frames: gag.anims[name].map((f, i) => ({ key: 'her-mishaps', frame: f, duration: i < fast ? 60 : undefined })), frameRate: fps, repeat });
         }
+        // The towel stack's (`TowelStack` in src/world/movers.js): frame 0 of each is the start, left out.
+        const tw = this.cache.json.get('towels-meta');
+        for (const [name, fps] of [['fall', 12], ['bury', 11], ['emerge', 9]])
+            this.anims.create({ key: `towels-${name}`, frames: tw.anims[name].slice(1).map(f => ({ key: 'towels', frame: f })), frameRate: fps });
+        // The fall on her running (one from each phase of her run): all nine, frame 0 her own run frame; she
+        // runs on in the first at her run's own 14 a second (10 px a frame: her 140 px/s), then 11.
+        for (const n of [0, 2, 4, 6])
+            this.anims.create({ key: `towels-run${n}`, frames: tw.anims[`run${n}`].map((f, i) => ({ key: 'towels', frame: f, duration: i < 4 ? 71 : 91 })) });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

@@ -2436,10 +2436,14 @@ Nothing blocks the start of the build. These get settled along the way:
       free, it stands back against the wall and he tosses her his card out of his pocket. **Done
       (2026-11-17): the towel stack an obstacle** (the user's rule: it falls on her the moment she
       passes it; she gets past by stopping at it and waiting while it falls): it wobbles hard as she
-      comes at it and falls the way she goes; its look kept ("I like it the way it is"). **Next (the
-      user, 2026-11-17): its falling and scattering generated** ("The animations have to be
-      generated, I think, especially the falling and scattering"; the stack's own picture kept), with
-      her burial under it (scenario 18); then the first batch of her gags. **Then step 5** (the rest of the
+      comes at it and falls the way she goes; its look kept ("I like it the way it is"). **Done
+      (2026-11-18): its fall generated**: the stack falls and scatters; running past, it falls on her
+      as she runs on (four clips, one from each phase of her run, so that she never stops for it),
+      she is buried, and her head comes up in a towel turban with a towel swan on it (18); its towels
+      redrawn soft (the user: "white bricks"); the heap behind her as she crosses it; the stack midway
+      between two cabin doors (141.6 m), and the picture it had hidden hung in the nearest empty gap.
+      **Next: the first batch of step 4a's gags** (13a, 7b, 3, 20). Waiting with it: the books' covers and
+      the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened. Another

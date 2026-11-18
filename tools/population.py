@@ -658,7 +658,7 @@ JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
 # A stack of towels that topples (`haz_towels_9`): id: (deck, m). A jump landed beside it, or the
 # dash, brings it down on her.
-STACKS = {"haz_towels_9": (9, 141.3)}
+STACKS = {"haz_towels_9": (9, 141.6)}   # midway between the cabin doors either side (the user, 2026-11-18: its heap had fallen over the open one): the heap reaches 90 px out the way it falls, the doors' frames are 159 px apart, so its last towel's tip touches a frame by 10 px
 # Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
 SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5),
               # Region 7: deck 8 midships' one; deck 9 aft's two, out of phase: a rhythm to run.

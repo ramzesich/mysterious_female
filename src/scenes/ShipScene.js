@@ -2242,12 +2242,22 @@ export class ShipScene extends Phaser.Scene {
 
         const pictures = ['picture-sea-bg', 'picture-ship-bg', 'picture-art-bg'];
         const parts = [];
+        // (A picture is not hung behind a tall thing of the plan's world that stands against the wall,
+        // the towel stack: it goes to the nearest gap with nothing on its wall and nothing of the world
+        // in front of it; the user, 2026-11-18. `gaps`: each gap and whether its wall is taken.)
+        const ents = (this.cache.json.get('world')?.ents ?? []).filter(e => e.y === o.y && e.route === 'inside');
+        const tall = (gap) => ents.some(e => e.kind === 'stack' && Math.abs(e.x - gap) < 40);
+        const gaps = [], moved = [];
         for (let x = o.x + 60, n = Math.round(o.x / 192); x + 30 < o.x + o.width; x += 192, n++) {
             const gap = x + 15 + 96;                 // halfway to the next door
             g.fillStyle(0xfffbe8, 1);
             g.fillEllipse(gap, ceiling + 3, 8, 3);
-            if (n % 3 === 1 && gap + 20 < o.x + o.width) {
-                parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
+            const inside = gap + 20 < o.x + o.width;
+            gaps.push({ gap, taken: !inside || n % 3 === 1 || n % 6 === 3 || n % 8 === 5
+                || ents.some(e => Math.abs(e.x - gap) < 60) || this.doorSpots.some(t => t.y === o.y && Math.abs(gap - t.x) < 60) });
+            if (n % 3 === 1 && inside) {
+                if (tall(gap)) moved.push({ gap, frame: pictures[n % pictures.length] });
+                else parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
             // Now and then an extinguisher on the wall, or an exit sign up high, between doors.
             // (Kept 50 px from a door put in a cabin door's place, clear of its card reader: one hung
@@ -2269,6 +2279,13 @@ export class ShipScene extends Phaser.Scene {
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
             if (cart && x + 64 < o.x + o.width) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
+        }
+        for (const m of moved) {
+            const free = gaps.filter(q => !q.taken).sort((a, b) => Math.abs(a.gap - m.gap) - Math.abs(b.gap - m.gap))[0];
+            if (!free) continue;
+            free.taken = true;
+            parts.push(this.add.image(free.gap, o.y - 50, 'shipart', m.frame).setDepth(DEPTH.decor + 0.1));
+            (this.picturesMoved ??= []).push({ from: m.gap, to: free.gap, y: o.y });
         }
         // By a stair core, a brass plaque with the corridor's cabin numbers and an arrow along it.
         // (The arrow is drawn: at this size the font's arrow comes out blank.)
@@ -4483,6 +4500,7 @@ export class ShipScene extends Phaser.Scene {
             this.flinchUntil = this.time.now + 10000;
             return;
         }
+        if (sc.gag && ride?.play) return this.thingGag(sc, ride);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
         if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
@@ -4608,6 +4626,23 @@ export class ShipScene extends Phaser.Scene {
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
         s.play(g.fall);
         s.once(`animationcomplete-${g.fall}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+    }
+
+    // A gag the thing plays itself, one picture of it with her (the towel stack, 18: `TowelStack.ride`
+    // in src/world/movers.js): she is hidden while `ride.play(done)` runs its clips; when it says it
+    // is done, `holdMs`, then her checkpoint, and `ride.show()` puts the thing back as it is left.
+    thingGag(sc, ride) {
+        const p = this.player, g = GAGS[sc.gag];
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        p.setVisible(false);
+        p.body.setVelocity(0, 0);
+        this.gagEnd = () => { p.setVisible(true); ride.show?.(); };
+        ride.play(() => this.time.delayedCall(g.holdMs, () => this.respawn()));
     }
 
     // Her gag with the porter and his cart (§1.6, 8a to 8d; `GAGS` cartDrape, cartPush, cartSit,

@@ -292,7 +292,7 @@ export const MISHAP_SCENES = {
     '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
     '16': { word: 'drenched', react: 'shiver', toss: 'drop' },                  // a sprinkler
     '17': { word: 'fogged', react: 'splutter', toss: 'drop', down: 'sit' },     // the sauna's steam
-    '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit' },         // the towel stack
+    '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
     '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
     '20': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull on a balcony rail
     '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit' },        // a funnel gull
@@ -351,6 +351,10 @@ export const GAGS = {
     trolleyTrip: { fall: 'gag-trolley-trip', at: -20, holdMs: 900 },
     trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000 },
     trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200 },
+    // The towel stack (18): its own clips with her in them, played by the stack (`TowelStack.ride` in
+    // src/world/movers.js, the ship scene's `thingGag`): buried, then her head up in a towel turban, a
+    // towel swan on it; `holdMs` after, her checkpoint.
+    towels: { holdMs: 1400 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out

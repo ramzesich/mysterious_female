@@ -2457,6 +2457,53 @@ here" 7); each built step is gone back over under its "Revision".
   the corridor aft of the steward (130 to 194 m) is the plan's optional "gauntlet" (book 4, the
   tangerines, the balcony cabin, the checkpoint at 190).
 
+## Step 4a: the towel stack's fall generated (2026-11-18)
+
+- **The user:** "The animations have to be generated, I think, especially the falling and
+  scattering"; the stack's look kept. All of it is PixMiniMax from the stack's own picture
+  (`assets/source/things/towel-fall/`, its README has the ids), then shown and approved:
+  - **Its fall alone** (try c of two pinned ones): pinned to an end picture made of the stack's own
+    fourteen towels lying scattered (`ends.py`), since the first tries fell as one stiff column and
+    landed "like books", and five generated heaps read as snow drifts.
+  - **The fall on her:** try g of five (c, the first approved, stretched the stack taller as it
+    tipped; the user: "fix the stack getting higher glitch"; the two told "never taller" stretched
+    worse).
+  - **Her coming up:** the heap stirs and bulges, a towel swan pops out, then she under it in her
+    towel turban (`emerged.py`: her turban look and a generated swan; five swans came as birds with
+    orange beaks, the palest one used with its beak whitened, at 15 px).
+  - **The towels redrawn soft** (the user: "the towels themselves look like white bricks. Can we
+    keep the animations, but redraw the towels"): `edit_animation` over every frame, the motion
+    kept to a px; the standing stack in the corridor is the redrawn first frame, so it and the
+    clips hand over exactly.
+- **In the game:** the stack and its stool apart while it stands (it sways on the stool's top),
+  one sprite for the clips; the fall on her is a gag the stack plays itself (the ship scene's new
+  `thingGag`, `GAGS.towels`): she hidden, its clips, her checkpoint, the heap left behind her.
+- **Seamless, the user's word** ("It looks like she deliberately stops for a fraction of time to let
+  the towels fall on top of her. It has to be seamless"):
+  - the stack used to start falling while she was 40 px short of it, so the fall on her took
+    over mid-clip, 25 px off: now it wobbles until she is past it (at most 1.1 s; stopped short, it
+    falls in front of her when that runs out), the user's own "the moment she passes it";
+  - the clip had her standing: four new ones start from her own run frames (0, 2, 4, 6) 6 px past
+    it, she running on about 10 px a frame (at her run's 14 a second, her 140 px/s) until it
+    catches her; the game takes the one whose first frame is the pose she shows next (in the
+    recordings: 7 px past, her stride carried on). A first try from her run frame 36 px past it had
+    her running on the spot (pinned to the heap where she stood);
+  - the sway eases as she comes level with it, so it is near upright when a clip takes over.
+  - The clip of her standing stays for her caught under it any other way while it falls.
+- **The heap behind her** as she crosses it (the user, with its stool: "Also its table").
+- **Placement:** the heap fell over the open cabin's door; moved 1 m aft (the user: "Yes"), it fell
+  over the next door aft: the doors' frames either side are 159 px apart and the heap reaches 90 px
+  the way it falls, so no spot keeps both clear; midway, 141.6 m, a towel's tip touches a frame by
+  a few px. **The ship picture it hid** (the user) now hangs in the nearest gap with nothing on its
+  wall: a rule in `drawCabinDoors` (a stack of the world in front of a picture's gap moves the
+  picture), here one gap forward.
+- Generations: 101 this round (the first clips 13, the redraw 70, the running clips 8, the heaps
+  and swans 10).
+- Passed: `region4` (its towel checks unchanged and green), `tools/check_overlaps.py` (0). The rest
+  not run.
+- Not made: her "bats the towels off" with a tangerine on her (the plan's 18): she reels, loses one,
+  the stack falls past her.
+
 ## The books' titles, and where they show (2026-11-18; the documents only, nothing built)
 
 - **The user gave the titles**, from two photos of her bookshelf, and a photo of her reading
