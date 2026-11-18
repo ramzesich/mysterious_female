@@ -2693,3 +2693,22 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - **With it, the user's (deck 8's open cabin, `amb_peek_sea`):** "Let's make its interior more washed
   out colors, like we usually do": its inside washed 30% toward the wall, as the knitting lady's open
   cabin already was (`peek-sea` in `src/world/world.js`).
+
+## Deck 8's open cabin: a bed bounce on E (2026-11-18)
+
+- **The user, at `amb_peek_sea`** (region 5's open cabin with the sea in its window): "What is this open
+  cabin for?"; its inside washed (above); "I stood still at the entrance, and nothing happened, she
+  didn't lean in. But since it now reads as interactable, let's add some gag at the E press." Found:
+  standing still there 2 s did set the quirk off, but it played her ordinary look-around, which reads as
+  nothing.
+- **Four gags offered; the user chose the bed bounce:** E (X), she steps in at the door, her back to us,
+  hops onto the bed and bounces facing us (her 8206 clip and its springs), cut to the doorway's opening
+  (Phaser's crop, as the people in doorways), her head going out of sight under the lintel at each
+  bounce ("as shown", over a seated bounce that would have needed a new clip); "when she's inside, she's
+  in the background, so she also has to have the washed-out contrast": a copy of her frame filled with
+  the wall's colour at 30% over her, the room's own wash. Out again, she straightens her badge (the
+  intro's clip). About 5 s; any key ends the bouncing. A glance each way along the corridor first was
+  "the delay after the E press": taken out. Its door frame stays in full colour (it is used now).
+- No new art: her own clips. `peekBed` in `src/world/world.js`, the quirk `sec_peek_sea` (`gag: "bed"`).
+- **Tests:** `region5` (changed: nothing on standing still, E in and bouncing cut to the door, back out,
+  a find) and `boot` pass.

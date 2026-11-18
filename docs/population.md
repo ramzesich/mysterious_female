@@ -491,7 +491,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 18.7-21.4 | the terrace | The forward terrace past the wall (built) | | |
 | 30 | `amb_swan_cart` | A steward's cart with a towel swan on it | Decor | A towel animal |
 | 41.4 | cabin 8206 | Her cabin (built): `tan_8_8206` in the welcome basket, `book_5` on the bed, the shower (§8) | `cp_8206` | Built |
-| 56 | `amb_peek_sea` | An open cabin door, the sea in its window, nobody in | A peek | Built pieces |
+| 56 | `amb_peek_sea` + `sec_peek_sea` | An open cabin door, the sea in its window, nobody in; its inside washed 30% toward the wall (2026-11-18) | E (X): she steps in and bounces on its made-up bed, seen through the door (cut to its opening, her head under the lintel at each bounce, washed as the room is), then out, straightening her badge; one of her finds (the user, 2026-11-18: standing still there had played only her look-around) | Her own clips |
 | 66 | `door_duct_exit` | The duct's exit grille in the ceiling | She drops out of it (`scn_duct`) | Drawn |
 | 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; the duct's peek above it | Balloons |
 | 74 | `door_8_fwd_lobby` | The lobby door | `oneway(the corridor)` | |

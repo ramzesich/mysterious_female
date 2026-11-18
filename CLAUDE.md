@@ -559,6 +559,11 @@ Lessons learned (2026-11-18, deck 9's corridor, her push):
 - **A thing with a use reads by how it is used, not only by how it looks:** a push-bar door must swing
   away from the side it is pushed from, and a door with nothing on one side must not open from it.
   Before showing a new look, play it both ways.
+- **Someone inside a room seen through its door is part of the room:** cut to the opening and washed
+  as it is (a copy of the frame filled with the wall's colour at 30% over them; Phaser 4 has no
+  `setTintFill`: `setTint(c).setTintMode(Phaser.TintModes.FILL)`).
+- **Screenshots of something moving are taken without pausing the game:** a close-up pauses it about a
+  second each, so a timed series all caught its start. Shoot the page and crop by the camera's view.
 
 ## Working with the user
 

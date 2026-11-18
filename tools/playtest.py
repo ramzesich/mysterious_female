@@ -3101,14 +3101,20 @@ def scenario_region5(b):
     b.shot("region5-party")
     # The lobby's door opens from the corridor.
     ok &= check(use_door(b, 8, 74, -1), "the lobby's door opens from the corridor")
-    # The cabin with the sea in its window: she looks in.
+    # The cabin with the sea in its window: E, in, and a bounce on its bed, seen
+    # through the door (2026-11-18).
     sx = js(b, f"{thing('amb_peek_sea')}.x")
-    b.teleport(sx, D8)
+    b.teleport(sx + 16, D8)
     time.sleep(2.5)
+    ok &= check(b.state()["mode"] == "play", "standing at the open cabin does nothing by itself", b.state())
+    b.tap("e")
+    time.sleep(1.3)
     b.shot("region5-sea")
-    ok &= check(b.state()["mode"] == "scripted" and js(b, "window.__ship.player.anims.currentAnim.key") == "her-idle-look",
-                "an open cabin, the sea in its window: she looks in", b.state())
-    time.sleep(1.9)
+    ok &= check(b.state()["mode"] == "scripted" and b.eval("window.__ship.player.isCropped") and b.state()["y"] < D8 - 15,
+                "E: she is in, bouncing on its bed, seen only through the door", b.state())
+    ok &= check(wait_js(b, "window.__ship.mode === 'play'", 6) and b.state()["y"] == D8 and not b.eval("window.__ship.player.isCropped"),
+                "and back out in the corridor", b.state())
+    ok &= check("sec_peek_sea" in save_list(b, "seen"), "a find of hers", save_list(b, "seen"))
     # Her own cabin: a checkpoint at its door; the basket; the fifth book on the bed, read there.
     cabin = b.eval("window.__ship.rooms.find(r => r.route === 'cabin').door")
     b.teleport(cabin - 30, D8)

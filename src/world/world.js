@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -1515,6 +1515,7 @@ export class World {
     // One of her quirks: she turns to the thing and does her bit; any key after a moment ends it.
     quirk(thing) {
         const s = this.scene, p = s.player;
+        if (thing.gag === 'bed') return this.peekBed(thing);
         if (this.carry || !s.anims.exists(`her-${thing.clip}`)) return false;
         this.cut(async () => {
             p.setFlipX(thing.face ? thing.face < 0 : thing.x < p.x);
@@ -1532,6 +1533,105 @@ export class World {
             if (thing.clip === 'dance') for (let i = 0; i * 500 < thing.ms; i++) s.time.delayedCall(i * 500, () => sfx.thump());
             await this.wait(thing.ms);
             s.pose('stand');
+            if (!this.save.seen.includes(thing.id)) {
+                sfx.secret();
+                this.save.seen.push(thing.id);
+                writeSave(this.save);
+            }
+        });
+        return true;
+    }
+
+    // Deck 8's open cabin (`sec_peek_sea`; the user, 2026-11-18: "since it now reads as interactable,
+    // let's add some gag at the E press"): she steps in and bounces on its made-up
+    // bed, seen through the door: cut to its opening (her head under the lintel at each bounce), washed
+    // 30% toward the wall as the room is ("she's in the background"); out again, she straightens her
+    // badge. Any key ends the bouncing.
+    peekBed(thing) {
+        const s = this.scene, p = s.player, door = this.things.find(t => t.id === thing.door);
+        if (!door || this.carry || s.holding || s.towel) return false;
+        const meta = s.cache.json.get('her-meta');
+        // (The opening, past the leaf swung in: the picture's columns 7 to 31, rows 2 to 72.)
+        const x0 = door.x - 10, x1 = door.x + 14, top = door.y - 72, BED = 22;
+        const ghost = s.add.sprite(p.x, p.y, 'her').setOrigin(0.5, 1).setTint(0xece3cf).setTintMode(Phaser.TintModes.FILL).setAlpha(0.3).setVisible(false);
+        this.add([ghost]);
+        let inside = false;
+        const cut = () => {
+            if (!inside) { p.setCrop(); ghost.setVisible(false); return; }
+            const fw = p.frame.width, fh = p.frame.height, left = Math.round(p.x) - fw / 2;
+            let cx = x0 - left;
+            const cw = x1 - x0 + 1, cy = top - (Math.round(p.y) - fh), ch = door.y - top;
+            if (p.flipX) cx = fw - (cx + cw);
+            p.setCrop(cx, cy, cw, ch);
+            ghost.setTexture(p.texture.key, p.frame.name).setPosition(p.x, p.y).setFlipX(p.flipX)
+                .setDepth(p.depth + 0.001).setCrop(cx, cy, cw, ch).setVisible(true);
+        };
+        s.events.on('postupdate', cut);
+        const side = p.x < door.x ? -1 : 1, floor = p.y;
+        const move = (to, ms, key = 'x') => this.tween({ targets: p, [key]: to, duration: ms });
+        this.cut(async () => {
+            try {
+                p.body.enable = false;
+                // In at the door, her back to us, at once (the user, 2026-11-18: a glance each way first
+                // was "the delay after the E press").
+                s.pose('run');
+                p.setFlipX(door.x + 2 < p.x);
+                await move(door.x + 2, Math.abs(door.x + 2 - p.x) * 7 + 40);
+                s.pose('back');
+                inside = true;
+                await this.wait(260);
+                // Up onto the bed.
+                s.pose('rise');
+                await move(floor - BED - 6, 140, 'y');
+                await move(floor - BED, 90, 'y');
+                // Bouncing, facing us, as on her own cabin's bed.
+                const frames = meta.anims['bed-joy'];
+                p.anims.stop();
+                p.setFlipX(false);
+                await new Promise(done => {
+                    let t = 0, g0 = 0;
+                    const step = (time, delta) => {
+                        const i = s.controls.state;
+                        t += delta;
+                        const phase = (t % BED_JOY.cycleMs) / BED_JOY.cycleMs;
+                        p.setTexture('her', frames[Math.floor(phase * frames.length)]);
+                        const g = ((phase * 2) % 1 + 0.35) % 1;
+                        if (g >= BED_JOY.air && !(g0 >= BED_JOY.air)) sfx.at(door.x, door.y).boing();
+                        g0 = g;
+                        p.y = floor - BED - (g < BED_JOY.air ? Math.round(BED_JOY.hop * Math.sin(Math.PI * g / BED_JOY.air)) : 0);
+                        const key = t > 300 && (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed);
+                        if (key || t > BED_JOY.cycleMs * 4) {
+                            s.events.off('update', step);
+                            done();
+                        }
+                    };
+                    s.events.on('update', step);
+                });
+                // Down, and out the way she came.
+                s.pose('fall');
+                await move(floor, 130, 'y');
+                s.pose('front');
+                await this.wait(160);
+                inside = false;
+                s.pose('run');
+                p.setFlipX(side < 0);
+                await move(door.x + side * 30, 200);
+                // Straightening her badge.
+                p.anims.stop();
+                for (const f of meta.anims.badge) {
+                    p.setTexture('her', f);
+                    await this.wait(110);
+                }
+            } finally {
+                s.events.off('postupdate', cut);
+                inside = false;
+                p.setCrop();
+                ghost.destroy();
+                p.y = floor;
+                p.body.enable = true;
+                p.body.reset(p.x, floor);
+                s.pose('stand');
+            }
             if (!this.save.seen.includes(thing.id)) {
                 sfx.secret();
                 this.save.seen.push(thing.id);

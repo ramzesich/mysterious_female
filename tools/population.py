@@ -590,8 +590,9 @@ QUIRKS = {
     "sec_spotlight": (6, 247.3, "still:3", "bow", 2000, dict(reach=14, needs="bb3", face=-1)),
     # The cat's portrait: a double-take.
     "sec_cat_look": (7, 140.0, "still:1.5", "idle-look", 1700, dict(reach=16)),
-    # An open cabin, the sea in its window: she looks in.
-    "sec_peek_sea": (8, 55.27, "still:2", "idle-look", 1700, dict(reach=14)),
+    # An open cabin, the sea in its window: E, she steps in and bounces on its bed
+    # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
+    "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
 SOURCES = {
