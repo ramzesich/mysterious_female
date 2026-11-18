@@ -295,7 +295,9 @@ DOOR_LOCKS = {
     (11, 74): ("block", "spa", 1),                   # the spa, closed until region 9
     (10, 40): ("card", "off", -1),                   # the bridge
     (8, 110): ("oneway", 1), (8, 194): ("oneway", -1), (8, 202): ("oneway", 1),
-    (9, 202): ("oneway", 1),
+    # (Deck 9's at 194 from the corridor only, as decks 8 and 10 have it: she cannot come up behind the
+    # steward's trolley by deck 7 and the aft stairs; the user, 2026-11-18.)
+    (9, 194): ("oneway", -1), (9, 202): ("oneway", 1),
     (10, 110): ("oneway", 1), (10, 194): ("oneway", -1), (10, 202): ("oneway", 1),
     (12, 82): ("block", "wedding", 1),               # Champs into the forward lobby (the rope on Champs' side)
 }

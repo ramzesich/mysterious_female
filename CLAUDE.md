@@ -539,6 +539,21 @@ Lessons learned (2026-11-18, step 4a's first gags):
   never catch her on so short a patch, and the door burst while she was still too far; both were
   found only by walking at them with real keys.
 
+Lessons learned (2026-11-18, deck 9's corridor, her push):
+
+- **A walking clip is paced by its planted foot:** measure how far it slides back a frame (its lowest
+  row, frame by frame); frames a second times that is the speed it must move at, or her shoes slide
+  on the floor (the push: 2.5 px a frame at 9 a second while the cart rolled 60 px/s). Generated with
+  the world's thing in the start picture, then the thing taken out, the steps come out even.
+- **Two things that move together are placed one from the other after the physics**, on the scene's
+  `postupdate` (the cart from her, `pushFollow`): set in `update`, the gap read differently by the
+  moment. **And a gap of a half px flickers** under `roundPixels` (each sprite is rounded alone): keep
+  such gaps whole.
+- **A scene started by a flag can be undone by the code that set it:** the push's last step set
+  `cart_free` (which started the steward's scene and stopped her), then set her mode back to play. Look
+  at what runs after a `setFlag` before trusting a scene to hold her; and a scene that need not hold her
+  is better not holding her (the steward turns to her and his card follows her).
+
 ## Working with the user
 
 - **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The

@@ -466,6 +466,22 @@ export class TowelStack {
         world.add([this.stool, this.stack, this.pic]);
         this.state = 'up';
         this.wasOnFloor = true;
+        // (Once fallen it stays fallen, its heap crossed on the way back: the corridor is the way to the
+        // steward, 2026-11-18. Kept with what she has broken, the way it fell with it.)
+        if (world.save.broken.includes(def.id)) {
+            this.dir = world.save.heaps?.[def.id] ?? 1;
+            this.show(this.dir, D.props - 0.02);
+            this.pic.setFrame(m.anims.fall[m.anims.fall.length - 1]);
+            this.state = 'down';
+        }
+    }
+
+    // (Down for good: kept in the save.)
+    fallen() {
+        const save = this.world.save, id = this.def.id;
+        if (!id || save.broken.includes(id)) return;
+        save.broken.push(id);
+        (save.heaps ??= {})[id] = this.dir;
     }
 
     update(dt, time) {
@@ -517,12 +533,6 @@ export class TowelStack {
                 && past >= TOWELS.under[0] && past <= TOWELS.under[1]) {
                 this.catch('towels-bury', Math.max(0, k - 1), past);
             }
-        } else if (this.state === 'down' && (Math.abs(dx) > 560 || s.route !== 'inside')) {
-            // Stacked again behind her back.
-            this.state = 'up';
-            this.stack.setVisible(true).setAngle(0);
-            this.stool.setVisible(true);
-            this.pic.setVisible(false);
         }
     }
 
@@ -542,6 +552,7 @@ export class TowelStack {
         this.dir = dir;
         this.tried = this.landed = false;
         this.show(dir, s.DEPTH.props - 0.02);
+        this.fallen();
         this.pic.play('towels-fall');
         this.pic.once('animationcomplete-towels-fall', () => {
             // The heap: behind her as she crosses it (the user, 2026-11-18).

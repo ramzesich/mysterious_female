@@ -110,7 +110,10 @@ HER = {
         # On hands and knees (the duct, under a laundry line); pushing a cart, her walk with both
         # hands out; a camera raised to her eye, held (the game draws the camera): skeleton-v3.
         "crawl": [(f"crawl/{i}.png", "feet") for i in range(8)],
-        "push": [(f"push/{i}.png", "feet") for i in range(8)],
+        # (The push remade 2026-11-18, the user: "her legs do not move properly": PixMiniMax from her
+        # push frame against the steward's trolley, the trolley taken out, two even steps whose planted
+        # foot slides back about 3.6 px a frame (`push2/`, its README); her first, `push/`, kept.)
+        "push": [(f"push2/{i}.png", 83) for i in range(8)],
         "camera": [(f"camera/{i}.png", "feet") for i in range(8)],
         # Region 6 (skeleton-v3, custom poses): clinging to a wall in the grip socks, sliding down
         # it; slipping on wet tiles; licking a cone held to her mouth (the game draws the cone);

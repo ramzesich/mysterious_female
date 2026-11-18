@@ -784,9 +784,12 @@ Shown: each gag as a strip of its frames in place, and the link to its spot with
 `&tangerines=infinite&pocket=off`.
 
 **Revision (2026-11-18): deck 9's midships corridor is the way (GAME_DESIGN.md, region 4;
-docs/population.md's table; decided by the user, nothing of it built).** The one placement this
-step moves, on the user's word: the vacuum, the towel stack and the sprinkler stood on an
-optional stretch, since the steward gave the card at 122 m.
+docs/population.md's table; decided by the user). Built the same day** (`docs/progress-decisions.md`):
+as written below, the wall picture moved by rule (a tall trolley's whole way), the towel stack
+fallen for good (in the save's `broken`), a `steward` start place; and on the user's word in play,
+her push remade (her steps on the floor, a px further back) and his thanks shortened, she free to
+go on meanwhile. The one placement this step moves, on the user's word: the vacuum, the towel stack
+and the sprinkler stood on an optional stretch, since the steward gave the card at 122 m.
 
 - **Data (`tools/population.py`):** `PUSHABLES["cart_steward"]` to `(9, 185.2, 189.0, ...)`;
   `npc_steward` to `at=(9, 186.0)`. The story's part (`updateHousekeeping`, `stewardThanks` in

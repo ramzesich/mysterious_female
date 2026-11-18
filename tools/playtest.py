@@ -1805,12 +1805,14 @@ def scenario_golden(b):
     ok &= check(s["mode"] == "trunk" and s["y"] == D9, "the red trunk from Bliss climbs to deck 9", s)
     b.hold("right", 0.6)
     ok &= check(4 in save_list(b, "regions"), "region 4: deck 9's corridor", b.state())
-    # Region 4: the steward's cart fills the corridor until she pushes it free.
-    b.hold("right", 1.6)
+    # Region 4: the steward's cart fills the corridor at its aft end until she pushes it free
+    # (2026-11-18: past the vacuum, the towel stack and the sprinkler; the corridor itself is region4's).
+    b.teleport(exact_x(183.4), D9)
+    b.hold("right", 1.0)
     s = b.state()
-    ok &= check(s["x"] < exact_x(122.6), "the steward's cart blocks the corridor", s)
+    ok &= check(s["x"] < exact_x(185.2), "the steward's cart blocks the corridor", s)
     b.hold(["right", "space"], 0.7)
-    ok &= check(b.state()["x"] < exact_x(122.6), "and can't be hopped where it is jammed", b.state())
+    ok &= check(b.state()["x"] < exact_x(185.2), "and can't be hopped where it is jammed", b.state())
     time.sleep(0.5)
     b.hold("right", 0.3)
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
@@ -1823,15 +1825,15 @@ def scenario_golden(b):
     b.teleport(back - 6, D9)
     b.hold("right", 0.3)
     b.tap("e")
-    b.hold("right", 6.6)
-    ok &= check("cart_free" in flags(b), "pushed along to 130 m, it is free", b.state())
+    b.hold("right", 5.4)
+    ok &= check("cart_free" in flags(b), "pushed along to 189 m, it is free", b.state())
     end = time.time() + 12
     while time.time() < end and not ("hk" in save_list(b, "cards") and b.state()["mode"] == "play"):
         time.sleep(0.2)
     ok &= check("hk" in save_list(b, "cards"), "the steward's thanks: the Housekeeping card", save_list(b, "cards"))
     b.hold(["right", "space"], 0.7)
     b.hold("right", 0.4)
-    ok &= check(b.state()["x"] > exact_x(130), "and she hops the cart there", b.state())
+    ok &= check(b.state()["x"] > exact_x(189.5), "and she walks past it there", b.state())
     b.teleport(linen, D9)
     b.tap("e")
     time.sleep(0.8)
@@ -1846,7 +1848,7 @@ def scenario_golden(b):
     time.sleep(0.2)
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E at the laundry cart's end: she takes hold", b.state())
-    b.hold("right", 2.8)
+    b.hold("right", 3.8)
     ok &= check("cart_linen" in flags(b), "the laundry cart pushed under the vent", b.state())
     b.hold(["right", "space"], 0.45)
     time.sleep(0.5)
@@ -2684,6 +2686,12 @@ def scared(b, word, within=3.0):
     return False
 
 
+def restack(b, stk):
+    """The towel stack stood up again by hand (once fallen it stays fallen, 2026-11-18)."""
+    js(b, f"(t => {{ const sv = window.__ship.save; sv.broken = sv.broken.filter(i => i !== t.def.id); t.state = 'up';"
+          f" t.pic.anims.stop(); t.stack.setVisible(true).setAngle(0); t.stool.setVisible(true); t.pic.setVisible(false); }})({stk})")
+
+
 def scenario_region4(b):
     """Region 4 (docs/build-plan.md, step 4): Housekeeping, deck 9's corridor: the steward's cart and
     his card, the honeymooners' picture and the fourth book, the vacuum that darts out, the towel
@@ -2699,9 +2707,14 @@ def scenario_region4(b):
     b.teleport(trunk_x("magnums"), D9)
     b.hold("right", 0.7)
     ok &= check("cp_9_arrive" in save_list(b, "activated"), "the crew door by the trunk: a checkpoint as she arrives", save_list(b, "activated"))
-    # The steward and his jammed cart.
+    # The steward and his jammed cart, at the corridor's aft end (2026-11-18): the door at 194 m aft
+    # of him is shut from the lobby, so that she cannot come up behind him.
+    ok &= check(not use_door(b, 9, 194, 1), "the door aft of the steward is shut from the lobby")
     cart = f"{W}.pushables.find(t => t.id === 'cart_steward')"
     cx = js(b, f"{cart}.x")
+    ok &= check(abs(cx - exact_x(185.2)) < 2, "his trolley at the corridor's aft end", cx)
+    b.teleport(cx - 100, D9)
+    time.sleep(0.3)
     st = person(b, "npc_steward")
     ok &= check(st["on"] and abs(st["x"] - (cx + 17)) < 2 and not js(b, f"{cart}.items[0].visible"),
                 "the steward at his tall trolley's handle: one picture of the two", st)
@@ -2721,18 +2734,28 @@ def scenario_region4(b):
     b.teleport(cx - 26, D9)
     b.hold("right", 0.3)
     b.tap("e")
-    b.hold("right", 6.8)
-    ok &= check("cart_free" in flags(b), "pushed along to 130 m, the cart is free", b.state())
+    gap = []
+    b.key("right", True)
     time.sleep(1.0)
+    for _ in range(3):
+        gap.append(js(b, f"{cart}.x - window.__ship.player.x"))
+        time.sleep(0.3)
+    ok &= check(all(abs(g - 29) < 0.01 for g in gap), "she pushes it at her gap, 29 px from its middle", gap)
+    ok &= check(wait_js(b, "window.__ship.save.flags.includes('cart_free')", 6), "pushed along to 189 m, the cart is free", b.state())
+    b.key("right", False)
+    time.sleep(0.6)
     b.shot("region4-thanks")
-    ok &= check(wait_js(b, "window.__ship.save.cards.includes('hk') && window.__ship.mode === 'play'", 10),
-                "he thanks her and hands over the Housekeeping card", save_list(b, "cards"))
+    ok &= check(wait_js(b, "window.__ship.save.cards.includes('hk')", 4),
+                "he thanks her and tosses her the Housekeeping card, short", save_list(b, "cards"))
+    ok &= check(wait_js(b, "window.__ship.world.people.byId.npc_steward.sprite.anims.currentAnim.key.endsWith('idle')", 3),
+                "his thanks over")
     st = person(b, "npc_steward")
-    ok &= check(js(b, f"{W}.people.byId.npc_steward.sprite.anims.currentAnim.key").endswith("idle") and st["x"] > exact_x(130)
-                and abs(st["x"] - (js(b, f"{cart}.x") + 35)) < 2 and js(b, f"{cart}.items[0].visible"),
+    ok &= check(st["x"] > exact_x(189) and abs(st["x"] - (js(b, f"{cart}.x") + 35)) < 2 and js(b, f"{cart}.items[0].visible"),
                 "and stands by his trolley, stepped back off its handle", st)
     b.hold("right", 1.2)
-    ok &= check(b.state()["x"] > exact_x(130) and b.state()["mode"] == "play", "she walks past it, back against the wall", b.state())
+    ok &= check(b.state()["x"] > exact_x(189.5) and b.state()["mode"] == "play", "she walks past it, back against the wall", b.state())
+    ok &= check(js(b, f"{W}.people.byId.npc_steward.dir") == 1, "he has turned to her as she passed him")
+    ok &= check(use_door(b, 9, 194, -1), "the door at 194 m opens from the corridor")
     # The honeymooners.
     b.teleport(exact_x(133.6), D9)
     time.sleep(0.4)
@@ -2794,7 +2817,7 @@ def scenario_region4(b):
     wait_js(b, f"{vac}.state === 'in'", 6)
     js(b, f"{vac}.update = () => {{}}")
     b.teleport(sx - 700, D9)
-    wait_js(b, f"{stk}.state === 'up'", 4)
+    restack(b, stk)
     b.teleport(sx - 160, D9)
     time.sleep(0.3)
     b.key("right", True)
@@ -2803,9 +2826,13 @@ def scenario_region4(b):
     b.shot("region4-buried")
     ok &= check(hit, "running past the towel stack: it falls on her, buried", alert(b))
     wait_js(b, "window.__ship.mode === 'play'", 8)
-    # (Stacked again once she has gone: within its 800 px, more than 560 away.)
+    # (Fallen for good, its heap crossed on the way back from the steward: 2026-11-18.)
     b.teleport(sx - 700, D9)
-    ok &= check(wait_js(b, f"{stk}.state === 'up'", 4), "stacked again once she has gone", js(b, f"{stk}.state"))
+    time.sleep(0.6)
+    ok &= check(js(b, f"{stk}.state") == "down" and "haz_towels_9" in save_list(b, "broken"),
+                "it stays fallen once she has gone (kept with what she broke)", js(b, f"{stk}.state"))
+    # (Stood up again by hand for the other way past it.)
+    restack(b, stk)
     b.teleport(sx - 160, D9)
     time.sleep(0.3)
     b.key("right", True)
@@ -2949,7 +2976,7 @@ def scenario_region4(b):
     b.teleport(js(b, f"{lc}.x") - 36, D9, "linen")
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E by the cart's end: she takes hold", b.state())
-    b.hold("right", 2.6)
+    b.hold("right", 3.8)
     ok &= check("cart_linen" in flags(b), "pushed under the vent", flags(b))
     time.sleep(0.3)
     b.shot("region4-cart")

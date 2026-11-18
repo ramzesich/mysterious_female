@@ -52,10 +52,10 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 |---|---|---|---|---|
 | `item_card_deck` | Deck card, blue | Deck 4, 66, the gangway officer | Given for his lunch | §6.1.5 |
 | `item_card_ent` | Entertainment card, red | Deck 6, 246, the stage manager | Given for his pills | §6.1.5 |
-| `item_card_hk` | Housekeeping card, green | Deck 9, 126, the steward | Given for his cart | §6.1.5 |
+| `item_card_hk` | Housekeeping card, green | Deck 9, 186, the steward | Given for his cart | §6.1.5 |
 | `item_card_off` | Officer's card, gold | Deck 12, 136, on the sun deck | Dropped by the rival at the horn; a glint; E | Every reader |
 | `item_dash` | The lunge (with the cry, which is hers from the start; the save's verb is still `dash`) | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
-| `item_push` | Pushing carts | Deck 9, 122, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
+| `item_push` | Pushing carts | Deck 9, 185.2, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
 | `item_crawl` | Crawling | Deck 9, the linen room's vent | ↓ on the cart under the vent | The duct, laundry lines, the pillow fort |
 | `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E | Wall jumps |
 | `item_parasol` | The parasol | Deck 12, 130, the old lady's sunbed, after the horn | E | The glide |
@@ -552,12 +552,10 @@ the corridor at 118, not here.
 |---|---|---|---|---|
 | 112 | the linen room | Built (§8): `bb_4` asleep in the towel heap; the laundry cart (push); the vent (crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
 | 118 | `rdr_trunk_bliss` | The trunk's deck 9 door, red, where she arrives | | |
-| 122 | `haz_cart_steward` | The steward's tall housekeeping trolley jammed across the corridor, too tall to hop, the steward tugging at its handle (one picture of the two) | The push glyph; E at its near end and walk east: it rolls to 130 with him stepping back, and stands back against the wall there (not solid); it cannot be passed before (2026-11-17) | The trolley, his tug, steps and toss |
-| 126 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`: he steps back, thanks her and tosses her `item_card_hk` | Idle, thanks, toss |
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |
-| 141.6 | `haz_towels_9` | The towel stack by the doorway, midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
+| 141.6 | `haz_towels_9` | The towel stack by the doorway (once fallen it stays fallen, kept with what she broke, so that the way back from the steward crosses its heap: 2026-11-18), midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
 | 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched" | |
 | 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); `cp_balcabin` | `room` | Drawn by hand |
 | 158 | `haz_swing_9` | A cabin door that swings open | `reactive(3, 0.6)`; "Bonked" | |
@@ -565,24 +563,15 @@ the corridor at 118, not here.
 | 172 | `haz_cart_9_172` + `tan_9_cart` | A standing cart with a tangerine | Hop | |
 | 176, 184 | `room_adjoin_a`, `room_adjoin_b` | Two adjoining cabins with a connecting door between them | `room`: in at 176, through the connecting door, out at 184: the way past the stack | The inside cabin, with a connecting door |
 | 180 | `haz_luggage_9` | A stack of delivered luggage, full height, `tan_9_luggage` behind | Breakable (the dash) or the adjoining loop; not hoppable | Suitcases |
-| 190 | `cp_9_mid` | A crew door | Checkpoint | |
-| 194 | the lobby door | Open (region 4 includes the aft lobby); deck 9 aft's corridor door shut from the lobby (`door_9_aft_lobbies`) | | |
+| 185.2 | `haz_cart_steward` | The steward's tall housekeeping trolley jammed across the corridor, too tall to hop, the steward tugging at its handle (one picture of the two). **At the corridor's aft end since 2026-11-18** (it stood at 122, four metres from the trunk: the card was hers before the vacuum, the towel stack and the sprinkler) | The push glyph; E at its forward end and walk east: it rolls to 189.0 (3.8 m) with him stepping back, and stands back against the wall there (not solid); it cannot be passed before. She pushes at 40 px/s, 29 px from its middle (2026-11-18: her push remade, its steps on the floor) | The trolley, his tug, steps and toss |
+| 186 | `npc_steward` | The steward | `static`; bubble (a cart) within 4 m until the cart is free; then `scn_card_hk`, short (2026-11-18: about 1.3 s to the toss): he steps back, thanks her and tosses her `item_card_hk`; she is free to go on meanwhile, he turns to her as she passes, the card comes down where she is | Idle, thanks, toss |
+| 188 | (the corridor's own) | No small housekeeping cart along the trolley's way, and the wall picture there hangs in the nearest empty gap (by rule, `drawCabinDoors`) | | |
+| 190 | `cp_9_mid` | A crew door (drawn at 191.6) | Checkpoint | |
+| 194 | the lobby door | `oneway(the corridor)`, as on decks 8 and 10 (2026-11-18): shut from the aft lobby until she opens it from the corridor, so that she cannot come up behind the steward by deck 7 and the aft stairs; opened once, it stays open (`door_9_aft_lobbies`) | | |
 
-**Decided (the user, 2026-11-18), not built: the corridor is the way** (GAME_DESIGN.md, region 4).
-The table above is what is built. The rows that change:
-
-| m | Id | What changes |
-|---|---|---|
-| 185.2 | `haz_cart_steward` | Here, not at 122: jammed across the corridor, E at its forward end and walk east, it rolls to 189.0 (3.8 m) and stands back against the wall, short of the checkpoint's door (drawn at 191.6) |
-| 186 | `npc_steward` | With it, as now: the tug, the steps back, the card tossed (`scn_card_hk`) |
-| 141.6 | `haz_towels_9` | Once fallen it stays fallen, so the way back crosses its heap |
-| 180 | `haz_luggage_9` | Unchanged, and now on the way: the lunge, or the adjoining cabins; once broken it stays broken |
-| 188 | (the corridor's own) | The small housekeeping cart by this cabin door goes; the wall picture at about 189.7 hangs in the nearest empty gap |
-| 194 | the lobby door | `oneway(the corridor)`, as decks 8 and 10: shut from the aft lobby until she opens it from the corridor |
-
-Tried in a copy of the game (2026-11-18, the two positions only): the trolley and the steward
-stand clear of every door, jammed and freed; she steps out of the adjoining cabins' aft door
-(184) about 1.2 m from the jammed trolley, with room to push.
+**The corridor is the way (the user, 2026-11-18; built the same day)** (GAME_DESIGN.md, region 4): the steward at
+its aft end, so that the card is earned past everything and brought back; the way back is the
+corridor changed (the towel stack fallen, the luggage broken if she broke it).
 
 **The aft hallway 202-249.5 (region 7), "the sprinkler test".** 206 `haz_swing_9a`; 214 and 222
 `haz_sprinkler_9a`, `haz_sprinkler_9b`, two sprinklers 8 m apart out of phase (`timed(5, 2)` each,

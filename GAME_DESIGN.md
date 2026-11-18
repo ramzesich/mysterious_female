@@ -1069,9 +1069,10 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   staircase up to 9 and its elevator to 10; the midship and aft cores' flights 7-10 (their 7-8 blocks
   lift as region 4 opens).
 - **The way in:** the Entertainment card on the Bliss/Magnum's trunk, up to deck 9.
-- **The corridor's life:** the **steward's cart** jammed in a cabin's doorway: the push glyph; she pushes
-  it free along the corridor (the push verb: E at a cart's end, then walk); he is grateful and hands
-  her the **Housekeeping card**. **The honeymoon couple** at their door (their bubble: a camera): E
+- **The corridor's life:** the **steward's cart** jammed across the corridor at its aft end (185.2 m,
+  since 2026-11-18, below): the push glyph; she pushes it free along the corridor (the push verb: E at
+  a cart's end, then walk); he is grateful and tosses her the **Housekeeping card** (short, turned to
+  her if she goes on). **The honeymoon couple** at their door (their bubble: a camera): E
   and she takes their picture with it (they pose, the flash); their thanks is **the book** they found
   in their cabin. **The balcony cabin** (150 m): a cabin with a balcony, its door green, the card's
   first use; inside, a balcony door out: a view, and a dead end until the socks; from its balcony she
@@ -1090,16 +1091,16 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   towels; its door opens onto deck 4's corridor). One-way, down. **The pantries** (green crew doors
   by the restaurants on decks 4 and 5): small rooms with tangerine crates, one of them a passage
   between La Cucina's and the Four Seasons' kitchens, a shortcut past the waiter.
-- **Blocks:** the lobbies' doors into the corridors of decks 8 and 10 (shut from the lobby side); the
+- **Blocks:** the lobbies' doors into the corridors of decks 8 and 10, and deck 9's aft one (2026-11-18) (shut from the lobby side); the
   midship core's 10-11 flight (a table of towel animals across the landing, "PLEASE DO NOT TOUCH");
   the forward lobbies of decks 9 and 10 (gold, the officers' area).
 - **Blocks lifted now:** the atrium staircase's carpet (7-8): the atrium's stairs run 5-9 for good.
 - **Hazards:** standing carts to hop; the swinging door; **the towel stack** (hidden: it falls on her
   as she runs past the mid-cleanup cabin); **the sprinkler** (hidden, in a doorway, its wet-floor sign
   in the muted background); the vacuum in the mid-cleanup cabin, its second and last place.
-- **The corridor is the way. Decided (the user, 2026-11-18); not built.** As built, the steward
-  stands at 122 m, four metres from the trunk's door, so the card is hers before the vacuum, the
-  towel stack and the sprinkler, and everything aft of him is optional. **The steward and his
+- **The corridor is the way. Decided (the user, 2026-11-18); built the same day.** The steward had
+  stood at 122 m, four metres from the trunk's door, so the card was hers before the vacuum, the
+  towel stack and the sprinkler, and everything aft of him was optional. **The steward and his
   jammed trolley move to the corridor's aft end** (the trolley jammed at 185.2 m, rolling to
   189.0 m, 3.8 m instead of 7.4; he at its handle as now), between the adjoining cabins' aft door
   (184 m) and the checkpoint's crew door (drawn at 191.6 m). The route plan does not change (the
@@ -2472,9 +2473,10 @@ Nothing blocks the start of the build. These get settled along the way:
       the wall; one tray, the stewardess's, ridden off whichever way she ran or jumped onto it; the deck
       chair collapses under her; the gull rides off on her head; the "Do Not Disturb" doors swing open
       and shut with their frames, and anyone in a doorway is seen only through it.
-      **Next: what the other session decided for deck 9 and the one-way doors** (docs/plan-three-uses.md,
-      step 4a's two revisions of 2026-11-18: the steward and his trolley to the corridor's aft end; the
-      push bar on the one-way doors, generated and shown first), **then the rest of step 4a's gags** (the
+      **Done (2026-11-18): deck 9's corridor is the way** (the steward and his trolley at its aft end, the
+      door at 194 m one-way, the towel stack fallen for good; her push remade, his thanks shortened).
+      **Next: the push bar on the one-way doors** (docs/plan-three-uses.md, step 4a's second revision of
+      2026-11-18, generated and shown first), **then the rest of step 4a's gags** (the
       sprinkler's 16 among them). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").

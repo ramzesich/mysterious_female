@@ -209,7 +209,9 @@ LINEN = dict(vent=220, sill=42, chute=24, cart_top=36, laundry_cart=200)
 PUSHABLES = {
     # (The steward's: a tall housekeeping trolley, too tall to hop, so that it is seen to block the
     # corridor (the user, 2026-11-17: a low service cart had stood for it, "an invisible wall").)
-    "cart_steward": (9, 122.6, 130, "thing:steward-trolley", "cart_free", True, -1),
+    # (At the corridor's aft end, so that the card is earned past the vacuum, the towel stack and the
+    # sprinkler and brought back; the user, 2026-11-18: it had stood at 122.6 m, all three aft of it.)
+    "cart_steward": (9, 185.2, 189.0, "thing:steward-trolley", "cart_free", True, -1),
     # The linen room's laundry cart: by the wall (she walks past it), pushed under the vent she
     # climbs onto it ("top": only its rim holds her).
     "cart_linen": ("linen", 108, 216, "@linen-cart", "cart_linen", "top", -1, "bb4"),
@@ -326,7 +328,7 @@ PEOPLE = {
     # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the
     # honeymooners at their door, the bedmaker in the cabin being cleaned; strollers on the atrium's
     # walks; the security officer in the laundry, waiting for his uniform.
-    "npc_steward": dict(at=(9, 123.4), who="steward", face=-1, idle="tug",
+    "npc_steward": dict(at=(9, 186.0), who="steward", face=-1, idle="tug",
                         bubble=("cart", "!flag:cart_free", None, 4)),
     "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
                       bubble=("camera", None, "flag:photo", 3)),

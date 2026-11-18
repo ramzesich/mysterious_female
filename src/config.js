@@ -160,7 +160,7 @@ export const VERBS = {
     slideFall: 50,
     gripReach: 5,
     glideFall: 55,
-    pushSpeed: 60,
+    pushSpeed: 40,        // px/s: her push clip's steps at 11 frames a second (it was 60, her feet slid)
     hop: 0.62,
 };
 

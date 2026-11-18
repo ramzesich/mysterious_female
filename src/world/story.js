@@ -581,7 +581,11 @@ export class Story {
         // of the two (his `tug`, the world's trolley hidden meanwhile), set by the trolley's middle
         // (`STEWARD_TUG`); free, he stands back from it (`STEWARD_FREE`).
         const st = this.who('npc_steward'), cart = this.stewardCart;
-        if (st && cart && st.state !== 'acting') {
+        // (Thanking her, and after while she is by him: turned to her wherever she goes, once he has
+        // stepped off the handle.)
+        if (st && !this.stewardStepping && (this.thanking || (P.has('cart_free') && st.state !== 'acting'
+            && Math.abs(her.y - st.y) < 4 && Math.abs(her.x - st.x) < 4 * 48))) this.faceHer(st);
+        if (st && cart && st.state !== 'acting' && !this.thanking) {
             const free = P.has('cart_free');
             cart.items[0].setVisible(free);
             st.bubbleDx = free ? 0 : STEWARD_HEAD;
@@ -637,39 +641,46 @@ export class Story {
     }
 
     // The steward (population: `npc_steward`, `scn_card_hk`): his cart is free; he mops his brow,
-    // thanks her, and hands his card over it: she is doing his rounds now.
+    // thanks her, and tosses his card to her: she is doing his rounds now. Short, and she is free to
+    // go on meanwhile; he keeps turned to her, and his card follows her (the user, 2026-11-18: it
+    // "takes too long", and he did not turn as she ran past him).
     stewardThanks() {
         const st = this.who('npc_steward'), w = this.world, s = this.scene;
         if (!st || this.thanking || this.P.save.cards.includes('hk')) return;
         this.thanking = true;
-        w.cut(async () => {
-            const her = s.player;
-            her.setFlipX(st.x < her.x);
+        this.stewardStepping = false;
+        (async () => {
             // (Let go of the handle: he steps back off it, `STEWARD_FREE` from its middle.)
             const to = this.stewardCart ? this.stewardCart.x + STEWARD_FREE : st.x;
             if (Math.abs(to - st.x) > 1) {
+                this.stewardStepping = true;
                 st.state = 'acting';
                 st.dir = Math.sign(to - st.x);
                 this.people.anim(st, 'walk');
                 const step = { x: st.x };
-                await w.tween({ targets: step, x: to, duration: Math.abs(to - st.x) / 40 * 1000,
+                await w.tween({ targets: step, x: to, duration: Math.abs(to - st.x) / 80 * 1000,
                                 onUpdate: () => { st.x = step.x; this.people.place(st); } });
                 st.free = true;
+                this.stewardStepping = false;
             }
             st.idle = 'idle';
-            st.dir = her.x < st.x ? -1 : 1;
+            this.faceHer(st);
             this.people.idle(st);
-            this.people.place(st);
-            await w.wait(200);
             sfx.at(st.x, st.y).aah();
-            await this.people.play(st, 'thanks');
-            await w.wait(150);
+            await this.people.play(st, 'thanks', { speed: 1.8 });
             // (Out of his shirt pocket and tossed to her: `STEWARD_TOSS`.)
             await w.tossOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'), STEWARD_TOSS);
             this.P.setFlag('steward');
             sfx.done();
             this.thanking = false;
-        });
+            w.refresh();
+        })().catch(err => { console.error(err); this.thanking = false; });
+    }
+
+    // (Someone turned to her where she is now.)
+    faceHer(p) {
+        const dir = this.scene.player.x < p.x ? -1 : 1;
+        if (p.dir !== dir) { p.dir = dir; this.people.place(p); }
     }
 
     // The honeymooners (population: `npc_honeymooners`, `scn_photo`): E, and she takes their picture

@@ -144,7 +144,8 @@ export class BootScene extends Phaser.Scene {
         // Her verbs' own clips (§6.1.2): on hands and knees, pushing a cart; the honeymooners' camera
         // raised to her eye and held.
         if (meta.anims.crawl) this.anims.create({ key: 'her-crawl', frames: frames('crawl'), frameRate: 11, repeat: -1 });
-        if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 9, repeat: -1 });
+        // (11 a second at VERBS.pushSpeed: her planted foot slides back about 3.6 px a frame, as the floor.)
+        if (meta.anims.push) this.anims.create({ key: 'her-push', frames: frames('push'), frameRate: 11, repeat: -1 });
         if (meta.anims.camera) this.anims.create({ key: 'her-camera', frames: frames('camera', [0, 1, 2, 3]), frameRate: 9 });
         // Region 6: clinging to a wall, slipping on wet tiles, licking a cone, the canister held up,
         // sitting down at the table and eating there.

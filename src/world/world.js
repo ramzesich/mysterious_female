@@ -1460,12 +1460,14 @@ export class World {
                 sp.off('animationupdate', hold);
                 at(from).setVisible(true).setDepth(s.DEPTH.player + 0.05);
                 sfx.at(person.x, person.y).give();
-                // (A lob: its top a fifth of the way across, at least 12 px over where it left.)
-                const x0 = img.x, y0 = img.y, tx = p.x, ty = p.y - 40, g = 400;
-                const top = Math.max(12, Math.abs(tx - x0) * 0.2), vy = -Math.sqrt(2 * g * (y0 - Math.min(y0, ty) + top));
+                // (A lob: its top a fifth of the way across, at least 12 px over where it left; it
+                // comes down on her where she is by then, if she has gone on meanwhile.)
+                const x0 = img.x, y0 = img.y, tx0 = p.x, ty = p.y - 40, g = 400;
+                const top = Math.max(12, Math.abs(tx0 - x0) * 0.2), vy = -Math.sqrt(2 * g * (y0 - Math.min(y0, ty) + top));
                 const T = (-vy + Math.sqrt(Math.max(0, vy * vy - 2 * g * (y0 - ty)))) / g, t0 = s.time.now;
                 const fly = () => {
                     const t = Math.min(T, (s.time.now - t0) / 1000);
+                    const tx = tx0 + (p.x - tx0) * t / T;
                     img.setPosition(x0 + (tx - x0) * t / T, y0 + vy * t + g * t * t / 2);
                     if (t < T) return;
                     s.events.off('update', fly);

@@ -2625,3 +2625,41 @@ played by the thing itself (the ship scene's `thingGag`, `ride.play`). About 36 
   `region7` (the tray ridden off, the door opening on the guest after; a tray far from its door
   ridden as well). Found by them: after a ride the tray never re-armed when she came back at a
   checkpoint far off (it stopped updating before its re-arm); fixed.
+
+## Step 4a: deck 9's corridor is the way, built; her push remade; the steward's thanks shortened (2026-11-18)
+
+The first of the other session's two decided revisions (docs/plan-three-uses.md, step 4a).
+
+- **The steward and his trolley at the corridor's aft end** (`tools/population.py`): the trolley jammed
+  at 185.2 m, rolling to 189.0 (3.8 m), he at 186.0; the story places him by it as before. Shown to
+  the user in place, jammed and freed, before the tests (as the plan asks).
+- **The door at 194 m** one-way from the corridor (`tools/ship_layout.py`, as decks 8 and 10).
+- **At his new place, by rule** (`drawCabinDoors`): a picture is not hung, nor a small cart drawn,
+  anywhere along a tall trolley's whole way (the towel stack's rule, widened); the one there hangs in
+  the nearest empty gap, 20 m forward.
+- **The way back changed:** the towel stack, once fallen, stays fallen (kept with what she broke,
+  `save.broken`, the way it fell in `save.heaps`); it used to stack itself again 12 m behind her. The
+  luggage already stayed broken.
+- **A `steward` start place**, just forward of the trolley.
+- **The user, on pushing it:** "shift her a pixel back" and "her legs do not move properly". Her push
+  was an old clip whose feet shuffled 2.5 px a frame while the cart rolled 6.7. Remade with
+  PixMiniMax (1 generation, `assets/source/her/push2/`, its README) from her push frame against the
+  world's trolley, the trolley taken out: two even steps, the planted foot sliding back about 3.6 px a
+  frame, so 11 frames a second at 40 px/s (it was 9 and 60; every push, the laundry cart's too).
+  Checked frame by frame first: three frames 1 px off the floor set down; her knee clear of the post.
+  She stands 29 px from the cart's middle, a whole px so that it never flickers (it was 27.5, drawn
+  27 or 28), and the cart is now set at her gap ahead of her after the physics moves her
+  (`pushFollow`, on the scene's `postupdate`): set before, it read 27.8 or 28.5 by the moment.
+- **The user: his thanks "take too long", and "if I run past him, he doesn't turn to face me".** Found:
+  freeing the trolley set her back to play the very moment his scene had stopped her (the flag is set
+  inside the push's last step), so she always could walk on, and he faced where she had been. Now his
+  thanks do not stop her at all: he steps back twice as fast, no pauses, his brow mop and bow at 1.8
+  times, about 1.3 s to the toss (it was 2.5); he turns to her as she passes, during his thanks and
+  after while she is within 4 m; the card comes down where she is by then (`tossOver`; only his uses
+  it).
+- **Tests:** `region4` passes (changed: the steward found at his new place, the door at 194 shut from
+  the lobby and opened from the corridor, her gap while pushing, his turning to her, the towel stack
+  staying fallen and stood up again by hand for its second check, the laundry cart's push given the
+  slower pace); `vacuum` passes; `golden` (changed the same way) and `boot` pass; `check_overlaps`: 0;
+  `check_corridors`, deck 9: 64.6 m without a beat (55 to 120, forward of the trunk), 116 m without a
+  reward (24 to 140), neither in the stretch that changed.

@@ -2243,10 +2243,12 @@ export class ShipScene extends Phaser.Scene {
         const pictures = ['picture-sea-bg', 'picture-ship-bg', 'picture-art-bg'];
         const parts = [];
         // (A picture is not hung behind a tall thing of the plan's world that stands against the wall,
-        // the towel stack: it goes to the nearest gap with nothing on its wall and nothing of the world
-        // in front of it; the user, 2026-11-18. `gaps`: each gap and whether its wall is taken.)
+        // the towel stack, or anywhere a tall trolley is pushed along: it goes to the nearest gap with
+        // nothing on its wall and nothing of the world in front of it; the user, 2026-11-18. `gaps`:
+        // each gap and whether its wall is taken.)
         const ents = (this.cache.json.get('world')?.ents ?? []).filter(e => e.y === o.y && e.route === 'inside');
-        const tall = (gap) => ents.some(e => e.kind === 'stack' && Math.abs(e.x - gap) < 40);
+        const rolls = (e, x, by) => e.kind === 'push' && e.tall === true && x > e.min - by && x < e.max + by;
+        const tall = (gap) => ents.some(e => (e.kind === 'stack' && Math.abs(e.x - gap) < 40) || rolls(e, gap, 40));
         const gaps = [], moved = [];
         for (let x = o.x + 60, n = Math.round(o.x / 192); x + 30 < o.x + o.width; x += 192, n++) {
             const gap = x + 15 + 96;                 // halfway to the next door
@@ -2254,7 +2256,7 @@ export class ShipScene extends Phaser.Scene {
             g.fillEllipse(gap, ceiling + 3, 8, 3);
             const inside = gap + 20 < o.x + o.width;
             gaps.push({ gap, taken: !inside || n % 3 === 1 || n % 6 === 3 || n % 8 === 5
-                || ents.some(e => Math.abs(e.x - gap) < 60) || this.doorSpots.some(t => t.y === o.y && Math.abs(gap - t.x) < 60) });
+                || ents.some(e => Math.abs(e.x - gap) < 60 || rolls(e, gap, 60)) || this.doorSpots.some(t => t.y === o.y && Math.abs(gap - t.x) < 60) });
             if (n % 3 === 1 && inside) {
                 if (tall(gap)) moved.push({ gap, frame: pictures[n % pictures.length] });
                 else parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
@@ -2278,7 +2280,8 @@ export class ShipScene extends Phaser.Scene {
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
-            if (cart && x + 64 < o.x + o.width) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
+            // (None where a tall trolley of the plan's world is pushed: the steward's, 2026-11-18.)
+            if (cart && x + 64 < o.x + o.width && !ents.some(e => rolls(e, x + 48, 50))) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
         }
         for (const m of moved) {
             const free = gaps.filter(q => !q.taken).sort((a, b) => Math.abs(a.gap - m.gap) - Math.abs(b.gap - m.gap))[0];

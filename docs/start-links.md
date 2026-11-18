@@ -77,7 +77,8 @@ new one added there should be added here too.
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all&tangerines=infinite> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all&tangerines=infinite> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all&tangerines=infinite> |
-| `deck9-aft`: past the steward's jammed cart, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all&tangerines=infinite> |
+| `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all&tangerines=infinite> |
+| `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward&tangerines=infinite> |
 | `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9&pocket=off> |
 | `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10&pocket=off> |
 | `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair: 7b) | <http://localhost:8000/?play&at=wet&pocket=off> |
