@@ -19,6 +19,9 @@ its input. About 36 generations in all.
 | `sprinkler-run1/`, `-run3/`, `-run5/`, `-run7/` | 16: from her run frames 1, 3, 5, 7 (her middle at x 54) she stops short in two steps, to the soaked picture at x 64 | 1: `2664b9b8-b23d-4bcd-8a59-308e01e1bcbe`; 3: `3cdcece7-a9b7-435c-b56f-6ae82474992c`; 5: `843e3b98-33bd-4bef-bec3-3132b6bebd2d`; 7: `245e069b-b571-4c86-82ab-cfc587541e85` |
 | `sprinkler-sneeze/` | 16: soaked, a sneeze, back to the soaked picture | `1c644093-c296-4505-a266-bdc922e341f6` |
 | `sprinkler-walk/` | 16: soaked, a slow walk loop on the spot (the game moves her, 26 px/s) | `0a304ca6-c8b0-42f2-8714-1639c90d737c` |
+| `steam-fan/` | 17 (2026-11-18): her puff picture (frame 0 and 8: `starts/steam/s17-puff.png`, `edit_image_pro_flash` `c129764a-032b-4db4-a560-d3fa2211533e`, 5 generations, of her standing frame on 96 px: `stand96.png`, three loose specks by her collar out), she fans her flushed face | `4a0142e9-a4ea-4105-b11f-04c5f10bce21` |
+| `steam-swoon/` | 17: from the puff picture she sways, a hand to her forehead, and sits down dazed (frames 5 to 8 set up 1 px) | `5486e191-9384-47f1-b5a6-90b7b5bc5667` |
+| `starts/steam/` | 17's start picture, the puff tries (`puff-*.png`, `puff-cmp.png`), the fixes (`fix.py`) | made here |
 | `starts/sprinkler/` | 16's start pictures (`starts.py`), the fixes (`fix.py`: frames 1 px up set down, loose specks out unless water), the strips first shown (`present.py`, `show16-*.png`) | made here |
 | `starts/` | The start and end pictures, the scripts that made them and mended the frames (`starts.py`, `starts2.py` from her built sheet, `door_starts.py`, `fix.py`, `dfix2.py`, `fullcolour.py`, `retray.py`, `analyze.py`: bounds, loose specks, colours per frame), and the review sheets shown to the user (`final-*.png`) | made here |
 | `raw/` | Every job's frames as downloaded, used or not | |
@@ -36,3 +39,6 @@ Not used for 16 (in `raw/sprinkler/`, by name): `drench-*` and `run7-*` drew a t
 (`cc834c57-76e0-45d7-b4fd-ad03ce81787a`, `e5d7e53f-b7f8-4f96-82b8-323163ba5939`), `sneeze-*` uncovered her face
 (`3900bd96-da26-45bb-b075-e8028af76257`); the second soaked picture, a blue-black mop
 (`edit_image_pro_flash` `889de6ce-800e-4496-a05b-558d888a0af9`). 20 generations for 16 in all.
+
+Not used for 17: the second puff picture (`edit_image_pro_flash` `ab9de1fb-f67b-4a9d-a925-c941afa0b163`: a red blotch
+hid her eye). 12 generations for 17 in all.

@@ -642,7 +642,7 @@ along the Spinnaker balcony's front above bars the jump down from deck 12 (§6.1
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 32 | `tan_11_spa` + `amb_spa_reception` | The reception's fruit bowl, the receptionist | | |
-| 42-48 | the sauna | Built; `haz_steam` at its aft door 48: `timed(5, 1.5, 48-49.5)`, a puff; contact "Fogged" | A puff sprite |
+| 42-48 | the sauna | Built; `haz_steam` at its aft door 48: `timed(5, 1.5, 48-49.5)`, a puff; contact "Fogged": her gag, 17 (2026-11-18), a burst wraps her, her hair a huge puff, she fans herself and swoons (`Steam.ride`) | A puff sprite; her clips `gags` `steam-*` |
 | 50 | `amb_masseuse` | At a massage table | | |
 | 58 | `amb_salon` | A stylist and a guest under the hood dryer | | |
 | 68 | `amb_aerobics` | Two in a step class | A loop | |

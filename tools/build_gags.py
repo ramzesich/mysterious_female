@@ -29,6 +29,9 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 x 54 in frame 0): she stops short in two steps, ending on the soaked picture at x 64
   sprinkler-sneeze  16: soaked, a sneeze (from and back to the soaked picture)
   sprinkler-walk  16: soaked, squelching off, a walk loop on the spot (the game moves her)
+  steam-fan     17: her hair frizzed by the sauna's steam into a huge puff (frame 0 and 8: her puff
+                picture, `starts/steam/s17-puff.png`), she fans her face
+  steam-swoon   17: from the puff picture she sways, a hand to her forehead, and sits down dazed
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -45,7 +48,7 @@ CELL, COLS = 128, 13
 CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride", 9), ("tray-ride3", 9), ("tray-ride1", 9), ("tray-ride5", 9),
          ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
-         ("sprinkler-sneeze", 9), ("sprinkler-walk", 9)]
+         ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9)]
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
 
 
@@ -94,7 +97,8 @@ def main():
                                         "5": {"key": "tray-ride5", "toe": 13, "trayAt": [67, 67, 67, 67, 66, 64, 62, 59, 57]}}},
             "chair": {"x": 64, "chair": 46},
             "gull": {"x": 54},
-            "sprinkler": {"x": 64, "run": 54}}
+            "sprinkler": {"x": 64, "run": 54},
+            "steam": {"x": 64}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

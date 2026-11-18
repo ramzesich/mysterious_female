@@ -232,7 +232,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | # | Obstacle | With a tangerine | The gag |
 |---|---|---|---|
 | 16 | Sprinklers (5) | ~~She shivers (built); it slips from her wet fingers~~ **As with none (the user, 2026-11-18: "the wet gag regardless of the tangerines"; `pocket: false`): she keeps them all** | Her hair plastered over her face, a sneeze, she squelches off to change. **Built (2026-11-18):** she stops short in the spray (from her standing or her run's quarter), sneezes, turns round and squelches back the way she came (the user), then her checkpoint |
-| 17 | The sauna's steam | She coughs and fans it away | Out of the cloud with her hair frizzed into a huge puff; she fans herself and swoons |
+| 17 | The sauna's steam | She coughs and fans it away | Out of the cloud with her hair frizzed into a huge puff; she fans herself and swoons (**built 2026-11-18**: out of a burst of it, she sits down dazed) |
 | 18 | The towel stack | She bats the towels off | Buried; her head comes up in a towel turban, a towel swan sitting on top |
 | 19 | Teppanyaki's flares | She yelps and pats out a smoking sleeve | A sooty face, her hair on end and smoking, two white eyes blink, a puff of smoke coughed |
 | 20 | The gulls on the balcony rails | She ducks; **the gull takes the tangerine and is gone** | The gull lands on her head and stays; she runs off flailing with it sitting there |
@@ -756,7 +756,7 @@ is seen when she is hit.
 | The swinging doors | `SwingDoor` in `movers.js` | 13a, 13b, by her facing. **13a built (2026-11-18):** the door's swing generated with her (the user: the leaf drawn in code was a picture stretched, and changed colour), slammed flat on the wall under the leaf, she slides down; the door alone the same swing. Only from aft, past its hinge (the user: from forward it never hits her); **no tell** (the user: "Let the opening of the door surprise the player"). 13b not made: no swing door hits her from the other side now |
 | The basketballs | `Balls` in `topdeck.js` | 14a, 14b |
 | The boat drill | `DrillBoat` in `outside.js` | 15 |
-| Sprinklers, the steam, the towels, the flares | `Sprinkler`, `Steam`, `TowelStack`, `Flare` | 16 to 19. **16 built (2026-11-18):** the first of the second batch (`gags` sheet, `sprinkler-*`); a sprinkler's rain drawn only while she is on its deck (deck 8's, right under deck 9's, rained through the floor) |
+| Sprinklers, the steam, the towels, the flares | `Sprinkler`, `Steam`, `TowelStack`, `Flare` | 16 to 19. **16 built (2026-11-18):** the first of the second batch (`gags` sheet, `sprinkler-*`); a sprinkler's rain drawn only while she is on its deck (deck 8's, right under deck 9's, rained through the floor). **17 built (2026-11-18)** (`steam-*`): a burst of the steam wraps her the frame she is caught and hides the change to her puff picture, so no clip from her run is needed; she is set clear of the sauna's door under it |
 | The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22. **20 built (2026-11-18):** the gull dives onto her head; standing, she flails and runs off with it, running she runs on, out of the screen or to the next partition |
 | "Do Not Disturb" doors, the occupied balcony | `DndDoor` in `movers.js`, `Occupied` in `outside.js` | 23, 24. **(2026-11-18)** the door swings open and shut (the swinging door's clip in its full colours; it had vanished with its frame); anyone in a doorway is cut to its opening and stands on its threshold (`People.doorway`) |
 

@@ -291,7 +291,7 @@ export const MISHAP_SCENES = {
     '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
     '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
     '16': { word: 'drenched', react: 'shiver', toss: 'drop', gag: 'sprinkler', pocket: false },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
-    '17': { word: 'fogged', react: 'splutter', toss: 'drop', down: 'sit' },     // the sauna's steam
+    '17': { word: 'fogged', react: 'splutter', toss: 'drop', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
     '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
     '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
     '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
@@ -367,6 +367,10 @@ export const GAGS = {
     // The sprinkler (16): from her run she slides to a stop over `slideMs`; soaked, she stands
     // `holdWetMs`, sneezes (its sound `sneezeAtMs` in), and squelches off at `walkV` px/s for `walkMs`.
     sprinkler: { holdMs: 150, slideMs: 330, holdWetMs: 250, sneezeAtMs: 450, walkV: 26, walkMs: 1300 },
+    // The steam (17): a burst wraps her for `coverMs` (from her run she slides to a stop over
+    // `slideMs`; set `clear` px clear of the sauna's door) and thins over `clearMs`, her hair a huge puff; she stands `holdPuffMs`, fans herself,
+    // swoons and sits (her plop `plopAtMs` into it).
+    steam: { holdMs: 900, slideMs: 330, clear: 34, coverMs: 380, clearMs: 650, holdPuffMs: 250, plopAtMs: 500 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
