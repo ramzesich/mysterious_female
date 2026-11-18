@@ -148,7 +148,8 @@ def audit(objs):
 
 
 def main():
-    b = P.Browser()
+    # (On the stepped clock, docs/plan-fast-tests.md; `--real` waits in real time, as before.)
+    b = P.Browser(stepped="--real" not in sys.argv)
     seen, rows = set(), []
     try:
         for state in ("start", "late", "end", "evening"):
@@ -164,7 +165,7 @@ def main():
             else:
                 # The evening of the catch (the same save): the way home, with what is put out for it.
                 b.eval("(P => { ['sunset', 'catch'].forEach(f => P.setFlag(f)); })(window.__ship.progress); window.__ship.world.refresh()")
-            time.sleep(1.0)
+            b.wait(1.0)
             for row in audit(json.loads(b.eval(DUMP))):
                 if row[:5] not in seen:
                     seen.add(row[:5])
@@ -183,7 +184,7 @@ def main():
                 if state == "start" and late:
                     continue
                 b.teleport(cx + 200, floor_y(deck))
-                time.sleep(0.5)
+                b.wait(0.5)
                 tile = Image.open(b.close_up("overlap", cx, cy - 10, 200, 110, 2, deck))
                 ImageDraw.Draw(tile).text((3, 3), f"{i}: {rule} d{deck} {m} {na} x {nb}"[:66], fill=(255, 255, 0))
                 tiles.append(tile)

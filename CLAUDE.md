@@ -72,10 +72,10 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) ; what of a room is in front of the things lying in it (a bowl before its tangerines) is marked with `Room.in_front()` and saved as `<id>-front.png`, drawn over them |
 | `tools/build_towels.py` | **The towel stack's own clips** (deck 9; `assets/source/things/towel-fall/`, its README has the ids) to `assets/sprites/towels.png` + `.json`: its fall alone, the fall on her (from her standing, and four from her run's phases), her coming up in a towel turban with a towel swan, and the standing stack and stool apart. Played by `TowelStack`; the fall on her is a gag the thing plays itself (the ship scene's `thingGag`, `ride.play`) |
-| `tools/build_gags.py` | **Step 4a's gags, each the thing's own clip with her** (`assets/source/her-mishaps/batch-4a/`, its README has the ids) to `assets/sprites/gags.png` + `.json`: the swinging door alone and slamming her flat (13a) and her slide down the wall, the same swing in full colours for the "Do Not Disturb" doors, her tray ride from four quarters of her stride (3; the world's tray base moved under her by the game, `trayAt`), the deck chair collapsing under her (7b), the gull on her head (20), soaked under a sprinkler, her sneeze and her squelch back (16). Each played by its mover (`ride.play`, the ship scene's `thingGag`). The door clips keep their own (muted) colours: only her pixels go on the palette |
+| `tools/build_gags.py` | **Step 4a's gags, each the thing's own clip with her** (`assets/source/her-mishaps/batch-4a/`, its README has the ids) to `assets/sprites/gags.png` + `.json`: the swinging door alone and slamming her flat (13a) and her slide down the wall, the same swing in full colours for the "Do Not Disturb" doors, her tray ride from four quarters of her stride (3; the world's tray base moved under her by the game, `trayAt`), the deck chair collapsing under her (7b), the gull on her head (20), soaked under a sprinkler, her sneeze and her squelch back (16), her hair a puff out of the sauna's steam, fanning herself and swooning (17). Each played by its mover (`ride.play`, the ship scene's `thingGag`). The door clips keep their own (muted) colours: only her pixels go on the palette |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
-| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
+| `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder. **On the stepped clock** (`docs/plan-fast-tests.md`, built 2026-11-18): once a page is loaded the test stops the game's loop and steps it itself, a sixtieth of a second a frame, undrawn unless a screenshot is wanted (`takeover`, `Browser.advance`); every wait in a scenario is `wait()`, every deadline `now()`. `-j 6` a process and a browser for each scenario, six at a time (the whole suite in about a minute); `--failed` those that failed last time; `--times` each one's time; `--real` real time, for comparing; `--seed N` the random draws' seed. `boot` and `sound` always run in real time. A scenario's cases: `scenario_region4__towels` is `region4.towels`, and `region4` runs it with the rest. The other tools that use `Browser` (`check_overlaps`, `shoot_people`, `render_ship`) are stepped too, `--real` for the old way; `check_sound` is real |
 
 ## Rules that are easy to break
 
@@ -602,15 +602,27 @@ Lessons learned (2026-11-18, deck 9's corridor, her push):
   rules, the memory notes (progress, any new rule), the raw art and its ids kept in the repo, the
   commit on the feature branch, the tree clean; then one line: "safe to compact", with what is
   next.
-- **The whole `tools/playtest.py` suite is not required, not after a change and not before a
-  merge** (the user, 2026-11-14). It had been the rule before every merge; it was about 35
-  minutes long by step 11 and about 65 after step 12, and the user had it cancelled before a
-  merge: "an impractical amount of time". It was already too long before the sound came (the
-  user), so switching the sound off in the tests is no answer: the suite itself has to become
-  shorter (it has grown by a scenario of some fifty checks with every region). Until a way is found to
-  make it practical again (the user: "we'll have to find a solution for that"), run the scenarios
-  a change can touch (`python tools/playtest.py boot sound region6 ...`), and say plainly which
-  were run and that the rest were not. Never start the whole of it unasked.
+- **The tests are fast now: the stepped clock** (`docs/plan-fast-tests.md`, built 2026-11-18 on
+  the user's word: "come up with a smart solution to speed up the development cycle without
+  compromising on QA"). The whole suite had become about 65 minutes in real time (the user, 2026-11-14:
+  "an impractical amount of time"; it was then no longer run before a merge). Stepped, the 38
+  scenarios take about 4 minutes one after another and **55 s six at a time**, every check with the
+  same result as in real time (878 compared). So:
+  - **after a change:** the scenarios it can touch, stepped (`python tools/playtest.py boot region9`),
+    a few seconds each; say which were run;
+  - **before a merge is proposed:** the whole suite stepped, `python tools/playtest.py -j 6`, and the
+    real-time set, `python tools/playtest.py --real boot sound deck3` (the real loop, the sound's
+    own clock, the game's own start);
+  - **whatever is judged by eye** (motion, pace, a gag) is the real game, as before: the user's play,
+    and recordings stepped by hand.
+  A failure is read, not run again until it passes: `--failed` reruns only those, `--seed N` replays
+  the random draws.
+- **A wait in a test waits for the thing, not for a time** (found building the stepped clock): a
+  fixed wait tuned in real time had real time's slack in it (each call into the page let a frame or
+  two pass), and stepped it ended a few frames short: a jogger not yet by, a jump still over the
+  trays, her still on the funnel stairway's last step. Wait until the state is reached
+  (`hold_until`, `wait_for`, a loop on `now()`), with a limit; time a key press from the thing it
+  answers (0.15 s into the jogger's pause), not from the start.
 - **Tests run with the sound off** (the user, 2026-11-14: "When you're testing, please test with
   sound off": every headless run had been playing through their speakers). The test browser is
   muted at the browser (`--mute-audio` in `tools/playtest.py`'s `Browser`, which every tool
@@ -742,3 +754,26 @@ Lessons learned (2026-11-14, the intro shown to the user):
   paper's greys on the palette by lightness (`assets/source/things/newspaper-sliding/README.md`).
 - **A one-off action tied to a place** (her hair at the mirror) is armed by arriving and
   disarmed only by leaving or turning away: a count drawn on arrival, never a timer that loops.
+
+Lessons learned (2026-11-18, the stepped clock):
+
+- **Undrawn frames skip what Phaser does while drawing:** a camera follows her and updates its view
+  in its `preRender`, so stepped undrawn the "out of the screen" test of a ride read a view left at
+  the gangway and ended the ride at once. `__advance` calls each camera's `preRender` itself.
+- **The game's scenes `await` their waits and tweens** (`world.cut`, `world.wait`, `world.tween`):
+  a promise's continuation runs only when the browser gets its turn. Stepped in one go, a batch of
+  frames ran all its frames first, and each `await` came late by up to the batch (the chute's fall
+  0.2 s late, which only a screenshot showed). Between two frames `__advance` gives the browser its
+  turn (a message on a channel: no delay of its own, after every pending continuation).
+- **Whatever reads the loop itself must be kept as the loop keeps it:** the cake's sway read
+  `game.loop.delta`, frozen once the loop was stopped, and the cake never swayed. `__advance` sets
+  the loop's time, delta and frame each frame.
+- **A real-time check can pass by luck of timing:** the trunk's "Deck card" passed only because the
+  calls into the page let 0.9 s pass after the stairs' own lock message (`lockedUntil`). Stepped,
+  such a check fails every time: it is a find; mend the test (or the game), never pad the wait.
+- **What is still not the same from one run to the next:** the game's clock at the takeover (how
+  long the page took to load) sets every timed thing's phase. A check that must catch a thing in
+  its round waits for the round (`wait_js` on its phase), with room for a whole round.
+- **Six browsers at once need a server that keeps up:** Python's default backlog of five refused a
+  file and a sheet's data never came (`Server.request_queue_size`); a page that does not come up
+  is loaded once more, its errors printed as a note.

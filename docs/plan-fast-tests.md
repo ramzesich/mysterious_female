@@ -2,8 +2,11 @@
 
 Written 2026-11-18 on the user's word ("The tests are taking too much time now ... come up with a
 smart solution to speed up the development cycle without compromising on QA"; then "Yes" to a plan
-for the implementation session). Nothing of it is built. It changes `tools/playtest.py` and the
-tools that use its `Browser`; it changes nothing in the game.
+for the implementation session). It changes `tools/playtest.py` and the tools that use its
+`Browser`; it changes nothing in the game.
+
+**Built 2026-11-18** (the user: "Implement the entire fast test plan"), all four steps and §3.5's and
+§3.6's pieces; what it gave and what it found are in §7.
 
 ## Start here (for whichever session builds it)
 
@@ -175,3 +178,47 @@ failing run can be played again exactly. About sixty places in the game draw a r
 The waits vanish and the questions to the page get fifty times quicker; the page loads (about
 1.5 s each, 48 of them) and the screenshots (about 45 ms each) stay. A region's scenario of two
 to four minutes should come down to well under half a minute, and six run side by side.
+
+## 7. What was built (2026-11-18)
+
+| Scenario set | Real time | Stepped |
+|---|---|---|
+| `vacuum` | 8.3 s | 1.6 s |
+| `region4` | 126.8 s | 5.7 s |
+| The 38 scenarios one after another (each its own process) | about 2,080 s (35 min) | about 230 s |
+| The 38 scenarios, `-j 6` | | **55 s** |
+| `check_overlaps.py` | 20 s | 6 s |
+| `shoot_people.py` | 399 s | 21 s |
+| `render_ship.py` | 27 s | 5 s |
+
+Every check of every scenario was run both ways: of the 878 found in both, all 878 have the same
+result (the real-time baseline ran with the tests as mended below). The screenshots show the same
+moments; where a camera is still easing after a move, a few px apart (the headless real loop draws
+about 95 frames a second, the stepped one 60).
+
+**Found in the harness** (each would have made stepped runs differ from real ones):
+
+- Undrawn frames left the cameras where they were (Phaser moves them in `preRender`): the vacuum's
+  ride ended at once. `__advance` calls `preRender` on every camera.
+- A batch of frames ran before any awaited continuation of the game's scenes: the chute's fall came
+  0.2 s late. The browser gets its turn between frames (a `MessageChannel` message).
+- `game.loop.delta` froze with the loop: the cake never swayed. `__advance` keeps the loop's time,
+  delta and frame.
+- Six browsers at once: a file refused by the test server (backlog 5), a boot stopped. Backlog 128,
+  and a page that does not come up is loaded once more.
+
+**Found in the tests** (checks that had passed by real time's slack; each mended to wait for the
+thing itself): the trunk's lock message within the stairs' 0.9 s (`golden`); the funnel stairway's
+last step (`golden`, `region8`); the jogger's pass, her return, and the hop timed from his pause
+(`region2`); the jump over the trays (`region7`); the terrace gull's swoop when it had to fly back
+first (`region8`, 6 s to 8 s). And one for the game's own change: 17's steam gag is longer than
+the old fright, so `region9` waits for her return and checks the gag (fan, then swoon).
+
+**Seeded:** `Math.random` in every test page and Phaser's RND at the takeover, from `--seed` (1).
+**Still varies between runs:** the game's clock at the takeover (the page's load time), which sets
+every timed thing's phase; checks that catch a thing in its round wait for the round.
+
+**The runner:** `-j N`, `--failed`, `--times` (`%TEMP%/bumbusik-playtest/last.json`), leftover
+browsers closed and their profile folders removed at each run (1,471 old folders were there), each
+`Browser` closed on exit. Cases (§3.5): `scenario_<name>__<case>` is `<name>.<case>`; none of the old
+scenarios has been cut up.

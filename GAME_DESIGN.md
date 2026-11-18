@@ -2482,15 +2482,19 @@ Nothing blocks the start of the build. These get settled along the way:
       **Done (2026-11-18): the sprinkler's gag (16)**: soaked, her hair plastered over her face, a sneeze,
       and she squelches back the way she came; whatever she carries (the second exception to the
       tangerines, with the dog's lead); a sprinkler rains only while she is on its deck.
-      **Next: the rest of step 4a's gags** (the second batch: 17 the steam, 19 the flares, 21 and 22 the
-      gulls, 23 the "Do Not Disturb" doors, proposed). Waiting with it: the books' covers and
+      **Done (2026-11-18): the sauna's steam (17)**: a burst wraps her, and out of it her hair is a huge
+      puff; she fans herself and swoons, sitting down dazed.
+      **Done (2026-11-18): fast playtests** (`docs/plan-fast-tests.md`, built whole): the test steps the
+      game's clock; the whole suite in 55 s six at a time (about 65 minutes before), every check the same
+      as in real time.
+      **Next: the rest of step 4a's gags** (the second batch: 19 the flares, 21 and 22 the gulls, 23 the
+      "Do Not Disturb" doors, proposed). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
       three runs; the round itself always moved on when watched; its wait was lengthened. Another
       (the lob onto the climb's shelf knocking the feather down) failed once in four runs after the
       dog's together clips, and not in three runs of it alone; cause not found.
-      Still open with it: a way to make the whole playtest suite practical again (`CLAUDE.md`).
       Mark each step done here as it lands. From step 9 on every new person is checked against
       her proportions before its clips are made, and every step ends with the close look
       (`CLAUDE.md`, "Looking closely")

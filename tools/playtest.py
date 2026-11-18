@@ -3,6 +3,10 @@ events over the DevTools protocol, and reports state, console errors and screens
 
     python tools/playtest.py [scenario ...]      (no arguments runs them all)
     python tools/playtest.py --real [scenario ...]   (in real time, as before: for comparing)
+    python tools/playtest.py -j 6 [scenario ...]     (a process and a browser for each, six at a time)
+    python tools/playtest.py --failed                (those that failed in the last run)
+    python tools/playtest.py --times                 (every scenario's last time, slowest first)
+    python tools/playtest.py --seed 7 region8        (the random draws from another seed; 1 by default)
 
 The stepped clock (docs/plan-fast-tests.md): once a page has loaded, the test stops the game's own
 loop and owns its clock (`takeover`): a wait of two seconds is 120 frames of a sixtieth of a second
@@ -17,12 +21,15 @@ Screenshots go to the system temp folder (printed at the end). Needs Google Chro
 `websocket-client` package. Nothing here ships with the game.
 """
 
+import atexit
 import base64
+import concurrent.futures
 import functools
 import http.server
 import json
 import os
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -62,6 +69,13 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+class Server(http.server.ThreadingHTTPServer):
+    # (Python's backlog is 5: with six browsers loading at once one of the game's files was refused,
+    # a sheet's data never came, and the boot stopped. Chrome asks for many at a time.)
+    request_queue_size = 128
+    daemon_threads = True
+
+
 # The page's side of the stepped clock: the game's loop stopped, `Date.now` and `performance.now`
 # reading the stepped time (each keeps its own offset, so the tween manager, which reads `Date.now`,
 # and the rumble follow it), and `__advance(frames, draw)` stepping it a sixtieth of a second a frame,
@@ -83,6 +97,11 @@ TAKEOVER = """(() => { const g = window.__game;
     window.__advance = async (frames, draw) => {
         for (let i = 0; i < frames; i++) {
             window.__t += 1000 / 60;
+            // (The loop's own figures as the real loop keeps them: the cake's sway reads its delta.)
+            const L = g.loop;
+            L.time = L.now = window.__t;
+            L.delta = L.rawDelta = 1000 / 60;
+            L.frame++;
             if (draw) g.step(window.__t, 1000 / 60);
             else {
                 g.headlessStep(window.__t, 1000 / 60);
@@ -96,6 +115,7 @@ TAKEOVER = """(() => { const g = window.__game;
     };
     return window.__t; })()"""
 FRAME = 1 / 60
+SEED = [1]      # the random draws' seed (`--seed N`)
 
 
 class Browser:
@@ -109,12 +129,16 @@ class Browser:
         Browser.current = self
         self.http_port = free_port()
         handler = functools.partial(Quiet, directory=str(ROOT))
-        self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", self.http_port), handler)
+        self.httpd = Server(("127.0.0.1", self.http_port), handler)
         self.httpd.handle_error = lambda *a, **k: None      # Chrome dropping a connection is no news
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
         self.debug_port = free_port()
         self.profile = tempfile.mkdtemp(prefix="bumbusik-chrome-")
+        # (A script stopped by a timeout or an error does not take its browser with it otherwise:
+        # five were found still running, 2026-11-18.)
+        self.closed = False
+        atexit.register(self.close)
         self.proc = subprocess.Popen([
             CHROME, "--headless=new", f"--remote-debugging-port={self.debug_port}",
             f"--user-data-dir={self.profile}", "--window-size=960,540", "--no-first-run",
@@ -135,6 +159,12 @@ class Browser:
         self.errors = []
         self.send("Runtime.enable")
         self.send("Page.enable")
+        # (The game's random draws from one seed, so that a failing run can be played again exactly:
+        # `--seed`, docs/plan-fast-tests.md §3.6. Installed before the page's own scripts.)
+        self.send("Page.addScriptToEvaluateOnNewDocument", source=f"""(() => {{ let a = {SEED[0]} >>> 0;
+            Math.random = () => {{ a = (a + 0x6D2B79F5) >>> 0; let t = a;
+                t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();""")
 
     def send(self, method, **params):
         self.msg_id += 1
@@ -168,10 +198,21 @@ class Browser:
             query += ("&" if "?" in query else "?") + "real"
         # (A new page runs in real time until it is there: loading is the browser's own work.)
         self.taken = False
-        self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
-        time.sleep(0.3)
-        # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
-        self.wait_for("window.__ship && window.__ship.player && window.__ship.soundscape", timeout=15)
+        before = len(self.errors)
+        for attempt in (1, 2):
+            self.send("Page.navigate", url=f"http://127.0.0.1:{self.http_port}/index.html{query}")
+            time.sleep(0.3)
+            # (The welcome screen and the intro are the ship scene's own: it is there whatever the link.)
+            try:
+                self.wait_for("window.__ship && window.__ship.player && window.__ship.soundscape", timeout=15)
+                break
+            except TimeoutError:
+                # (Once more: a file refused under load is not the game's fault; the game's own fails
+                # again, and its errors stay in `errors`.)
+                if attempt == 2:
+                    raise
+                print("  (the page did not come up; loaded again. Its errors:", "; ".join(e.splitlines()[0] for e in self.errors[before:]) + ")")
+                del self.errors[before:]
         if self.stepped:
             self.takeover()
         self.wait(0.5)
@@ -200,8 +241,10 @@ class Browser:
     # --- The clock: stepped once the page is taken over, real before and under `--real` ----------
 
     def takeover(self):
-        """Stops the game's own loop and owns its clock (docs/plan-fast-tests.md §3.1)."""
+        """Stops the game's own loop and owns its clock (docs/plan-fast-tests.md §3.1), and sows
+        Phaser's own random draws from the seed."""
         self.eval(TAKEOVER)
+        self.eval(f"Phaser.Math.RND.sow(['{SEED[0]}'])")
         self.taken = True
 
     def advance(self, seconds, draw=False):
@@ -317,11 +360,21 @@ class Browser:
         return out
 
     def close(self):
+        if self.closed:
+            return
+        self.closed = True
         try:
             self.ws.close()
+        except Exception:
+            pass
         finally:
             self.proc.terminate()
+            try:
+                self.proc.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                self.proc.kill()
             self.httpd.shutdown()
+            shutil.rmtree(self.profile, ignore_errors=True)
 
 
 def wait(seconds):
@@ -1862,6 +1915,8 @@ def scenario_golden(b):
     s = climb(b, "stairs-forward-5-6", 0.6)
     ok &= check(s["y"] == D5 and "SEARCH" in alert(b), "the forward stairs 5-6 are roped off for the search", alert(b))
     go(b, 4, 125)
+    # (A lock's message is not shown again within 0.9 s, `lockedUntil`: the stairs' was just shown.)
+    b.wait_for("window.__ship.time.now >= (window.__ship.lockedUntil || 0)", 2)
     b.tap("e")
     wait(0.15)
     ok &= check("Deck" in alert(b), "the midships crew trunk wants the Deck card", alert(b))
@@ -2021,7 +2076,9 @@ def scenario_golden(b):
     gust = "window.__ship.world.story.funnelGusts.phase(window.__ship.time.now)"
     b.eval("window.__ship.world.story.funnelWind.def.swoop = 1000")     # (the gulls are region8's own test)
     end = now() + 60
-    while now() < end and b.state()["y"] > top:
+    # (Until she has stepped off its top, not only reached its height: on the clock stepped the look
+    # comes the very frame she is level with it, still on the last step.)
+    while now() < end and not ((s := b.state())["y"] <= top and s["mode"] == "play"):
         b.key("up", b.eval(gust) == "calm")
         wait(0.05)
     b.key("up", False)
@@ -2301,7 +2358,10 @@ def scenario_region2(b):
     b.key("up", True)
     wait(0.2)
     js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
-    wait(1.8)
+    # (Until he is by, not for a time: the 1.8 s this was had real time's slack in it.)
+    end = now() + 4
+    while now() < end and b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] >= exact_x(150):
+        wait(0.1)
     s = b.state()
     b.key("up", False)
     ok &= check(s["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "standing aside by the wall (↑), the jogger runs by", (s, person(b, "haz_jogger")))
@@ -2310,13 +2370,22 @@ def scenario_region2(b):
     wait(1.6)
     ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "in his lane, he bumps her", alert(b))
     wait(2.6)
+    b.wait_for("window.__ship.mode === 'play'", 3)
     ok &= check(b.state()["mode"] == "play", "a scare: she is back at a checkpoint", b.state())
     # He can be hopped.
     js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     b.teleport(exact_x(150), D6, "promenade")
     js(b, f"(p => {{ p.x = {exact_x(152.2)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
-    wait(0.58)         # (standing still, the hop wants timing; running at him it is easy)
+    # (Standing still, the hop wants timing; running at him it is easy. He stops by her for 0.45 s,
+    # then runs on: she jumps 0.15 to 0.25 s into that pause (seen within a tenth; it clears him from
+    # 0.1 to 0.3 s), so that she is high as he passes. A fixed 0.58 s from his start passed only with
+    # real time's slack.)
+    b.wait_for(f"{jog}.pausedUntil > window.__ship.time.now", 3)
+    wait(0.15)
     b.hold("space", 0.8)
+    end = now() + 2     # (until he is by)
+    while now() < end and b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] >= exact_x(150):
+        wait(0.1)
     ok &= check(b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "or hopped", (b.state(), person(b, "haz_jogger")))
     js(b, f"(p => {{ p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     # The gulls on the rail fly up as she comes near, and settle again.
@@ -3762,8 +3831,8 @@ def scenario_region7(b):
     wait(2.0)
     b.teleport(tr["x1"] + 30, D10)
     b.hold(["left", "space"], 0.5)
-    b.hold("left", 0.25)
-    s = b.state()
+    # (On until past them, not for a time: 0.25 s ended over them once real time's slack was gone.)
+    s = hold_until(b, "left", lambda s: s["mode"] != "play" or s["x"] < tr["x0"], 1.0)
     ok &= check(s["mode"] == "play" and s["x"] < tr["x0"], "a jump clears them", s)
     ok &= check(use_door(b, 10, 202, 1), "the lobby's door opens from the hallway")
     # The door that flies open.
@@ -3975,8 +4044,13 @@ def scenario_region8(b):
     # The terrace's gull: lingering by it, a swoop.
     g = b.eval(f"{T}.terrace.gull")
     b.teleport(g["x"] - 40, D12)
-    got = scared(b, "Shoo", 6.0)
-    ok &= check(got, "lingering by the gull on the terrace's rail: swooped")
+    # (Within 8 s: 2 s lingering, 1 s marking her, the dive, and before them its flight back to its
+    # rail if it is off it. 6 s ran out 13 ms before the swoop when it was flying back.)
+    got = scared(b, "Shoo", 8.0)
+    ok &= check(got, "lingering by the gull on the terrace's rail: swooped", "" if got else b.eval(
+        f"(g => [g.state, Math.round(g.linger * 10) / 10, Math.round(g.at - window.__ship.time.now), Math.round((g.awayUntil ?? 0) - window.__ship.time.now),"
+        f" window.__ship.mode, window.__ship.route, g.route, Math.round(window.__ship.player.x - g.def.x), Math.round(window.__ship.player.y - g.def.floor)])"
+        f"(window.__ship.world.movers.find(m => m.def === window.__ship.world.data.topdeck?.terrace?.gull || (m.def && m.def.x === {g['x']} && m.constructor.name === 'PerchGull')))"))
     wait(3.0)
     s = b.state()
     ok &= check(s["y"] == D11 and abs(s["x"] - exact_x(192)) < 40, "she comes back at the Garden Cafe's door, a deck down", s)
@@ -4126,7 +4200,8 @@ def scenario_region8(b):
     b.teleport(fn["foot"][0], fn["foot"][1])
     wait(0.4)
     end = now() + 45
-    while now() < end and b.state()["y"] > fn["y"]:
+    # (Until she has stepped off its top, as in `golden`.)
+    while now() < end and not ((s := b.state())["y"] <= fn["y"] and s["mode"] == "play"):
         b.key("up", b.eval(G) == "calm")
         wait(0.05)
     b.key("up", False)
@@ -4375,7 +4450,16 @@ def scenario_region9(b):
     st = B["steam"]
     b.teleport(st["x"] + 30, D11)
     ok &= check(scared(b, "Pfff", 7.0), "in the way of the sauna's steam: fogged")
-    wait(2.6)
+    # (Her gag, 17: out of the burst with her hair a huge puff, she fans herself, swoons and sits;
+    # then her checkpoint.)
+    GAG = "window.__ship.world.movers.find(m => m.constructor.name === 'Steam').pic"
+    seen_gag = set()
+    end = now() + 8
+    while now() < end and b.state()["mode"] != "play":
+        seen_gag.add(b.eval(f"{GAG}?.anims.currentAnim?.key ?? null"))
+        wait(0.1)
+    ok &= check({"gags-steam-fan", "gags-steam-swoon"} <= seen_gag and b.state()["mode"] == "play",
+                "her hair a puff, she fans herself and swoons; then she is back", sorted(k for k in seen_gag if k))
     b.eval("window.__ship.lockedUntil = 0")
     rec = person(b, "amb_spa_reception")
     b.teleport(rec["x"] + 60, D11)
@@ -4908,39 +4992,158 @@ def scenario_gamepad(b):
     return ok
 
 
-SCENARIOS = {name[len("scenario_"):]: fn for name, fn in globals().items() if name.startswith("scenario_")}
+# A scenario's cases (docs/plan-fast-tests.md §3.5): `scenario_region4__towels` is `region4.towels`, a
+# function that starts from a prepared state (`enter_regionN`, `?at=`) and checks one thing. A new
+# check goes in as a case of its own; `region4` runs the old scenario and every case of it.
+SCENARIOS = {name[len("scenario_"):].replace("__", "."): fn for name, fn in globals().items() if name.startswith("scenario_")}
+
+
+def expand(names):
+    """Each name as asked, or a scenario's name standing for itself and all its cases."""
+    out = []
+    for n in names:
+        group = [k for k in SCENARIOS if k == n or k.startswith(n + ".")] or [n]
+        out += [k for k in group if k not in out]
+    return out
 
 
 # Run in real time whatever the flag (docs/plan-fast-tests.md §3.3): the sound keeps the audio
 # context's own clock, and `boot` is the proof that the game's own loop still runs.
 REAL_TIME = {"sound", "boot"}
+LAST = OUT / "last.json"       # the last run: what failed, and every scenario's time
+
+
+def load_last():
+    try:
+        return json.loads(LAST.read_text(encoding="utf-8"))
+    except Exception:
+        return {"failed": [], "times": {}}
+
+
+def save_last(results, real):
+    last = load_last()
+    last["failed"] = [n for n, (ok, _) in results.items() if not ok]
+    for n, (_, secs) in results.items():
+        last["times"][n + (" (real)" if real or n in REAL_TIME else "")] = round(secs, 1)
+    OUT.mkdir(exist_ok=True)
+    LAST.write_text(json.dumps(last, indent=1), encoding="utf-8")
+
+
+def clean_leftovers():
+    """Closes every test browser whose starting process is gone, and removes the profile folder of
+    every test browser that is not running (docs/plan-fast-tests.md §3.4)."""
+    import psutil
+    norm = lambda d: os.path.normcase(os.path.abspath(d))
+    used, closed = set(), 0
+    for proc in psutil.process_iter(["name", "cmdline", "ppid"]):
+        try:
+            if not (proc.info["name"] or "").lower().startswith("chrome"):
+                continue
+            cmd = proc.info["cmdline"] or []
+            prof = next((a.split("=", 1)[1] for a in cmd if a.startswith("--user-data-dir=") and "bumbusik-chrome-" in a), None)
+            if not prof:
+                continue
+            if any(a.startswith("--type=") for a in cmd) or psutil.pid_exists(proc.info["ppid"]):
+                used.add(norm(prof))     # (a browser's helper, or a browser whose test still runs)
+                continue
+            for c in proc.children(recursive=True):
+                c.kill()
+            proc.kill()
+            closed += 1
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+    gone = 0
+    for d in Path(tempfile.gettempdir()).glob("bumbusik-chrome-*"):
+        if d.is_dir() and norm(d) not in used:
+            shutil.rmtree(d, ignore_errors=True)
+            gone += 1
+    if closed or gone:
+        print(f"(leftover test browsers closed: {closed}; profile folders removed: {gone})")
+
+
+def run_here(names, real):
+    """The scenarios one after another, in this process, one browser."""
+    b = Browser()
+    results = {}
+    try:
+        for name in names:
+            b.stepped = not real and name not in REAL_TIME
+            t0, errors = time.time(), len(b.errors)
+            print(name + ("" if b.stepped else "  (real time)"), flush=True)
+            try:
+                ok = SCENARIOS[name](b)
+            except Exception as e:
+                ok = False
+                print(f"  FAIL  {type(e).__name__}: {e}")
+            if len(b.errors) > errors:
+                ok = False
+                print("  console errors:")
+                for e in dict.fromkeys(b.errors[errors:]):
+                    print("    ", e)
+            results[name] = (bool(ok), time.time() - t0)
+            print(f"  ({results[name][1]:.1f} s)", flush=True)
+    finally:
+        b.close()
+    return results
+
+
+def run_parallel(names, jobs, real):
+    """A process and a browser for each scenario, `jobs` at a time; the output of each printed
+    whole, in the order asked."""
+    def one(name):
+        t0 = time.time()
+        r = subprocess.run([sys.executable, __file__, "--child", "--seed", str(SEED[0])] + (["--real"] if real else []) + [name],
+                           capture_output=True, text=True, errors="replace", cwd=str(ROOT))
+        lines = [l for l in (r.stdout + r.stderr).splitlines() if not l.startswith(("screenshots:", "PASS", "FAILED"))]
+        return name, "\n".join(lines), r.returncode == 0, time.time() - t0
+
+    results, done, shown = {}, {}, 0
+    with concurrent.futures.ThreadPoolExecutor(jobs) as pool:
+        for fut in concurrent.futures.as_completed([pool.submit(one, n) for n in names]):
+            name, text, ok, secs = fut.result()
+            done[name] = (text, ok, secs)
+            while shown < len(names) and names[shown] in done:
+                text, ok, secs = done[names[shown]]
+                print(text, flush=True)
+                results[names[shown]] = (ok, secs)
+                shown += 1
+    return results
 
 
 def main():
     sys.stdout.reconfigure(errors="replace")  # the Windows console can't print every emoji
     args = sys.argv[1:]
-    real = "--real" in args
-    names = [a for a in args if not a.startswith("--")] or list(SCENARIOS)
-    b = Browser()
-    all_ok = True
-    try:
-        for name in names:
-            b.stepped = not real and name not in REAL_TIME
-            t0 = time.time()
-            print(name + ("" if b.stepped else "  (real time)"))
-            try:
-                all_ok &= SCENARIOS[name](b)
-            except Exception as e:
-                all_ok = False
-                print(f"  FAIL  {type(e).__name__}: {e}")
-            print(f"  ({time.time() - t0:.1f} s)")
-    finally:
-        if b.errors:
-            all_ok = False
-            print("console errors:")
-            for e in dict.fromkeys(b.errors):
-                print("  ", e)
-        b.close()
+    real, child = "--real" in args, "--child" in args
+    if "--seed" in args:
+        SEED[0] = int(args[args.index("--seed") + 1])
+    jobs = int(args[args.index("-j") + 1]) if "-j" in args else 1
+    names = [a for i, a in enumerate(args) if not a.startswith("-") and not (i and args[i - 1] in ("-j", "--seed"))]
+    if "--times" in args:
+        times = load_last()["times"]
+        for n, secs in sorted(times.items(), key=lambda kv: -kv[1]):
+            print(f"{secs:8.1f} s  {n}")
+        print(f"{sum(times.values()):8.1f} s  in all, one after another")
+        return
+    if "--failed" in args:
+        names = load_last()["failed"]
+        if not names:
+            print("nothing failed in the last run")
+            return
+    names = expand(names) if names else list(SCENARIOS)
+    unknown = [n for n in names if n not in SCENARIOS]
+    if unknown:
+        print("no such scenario:", ", ".join(unknown))
+        sys.exit(2)
+    if not child:
+        clean_leftovers()
+    t0 = time.time()
+    results = run_parallel(names, jobs, real) if jobs > 1 and len(names) > 1 else run_here(names, real)
+    all_ok = all(ok for ok, _ in results.values())
+    if not child:
+        save_last(results, real)
+        failed = [n for n, (ok, _) in results.items() if not ok]
+        if len(names) > 1:
+            print(f"{len(names)} scenarios in {time.time() - t0:.1f} s" + (f"; failed: {', '.join(failed)}" if failed else ""))
     print("screenshots:", OUT)
     print("PASS" if all_ok else "FAILED")
     sys.exit(0 if all_ok else 1)

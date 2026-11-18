@@ -22,14 +22,17 @@ W, H = 220, 110        # game px around each person
 
 def main():
     # (Those named: two across, enlarged three times; everyone: three across, twice.)
-    cols, zoom, per = (2, 3, 8) if len(sys.argv) > 1 else (3, 2, 18)
-    b = P.Browser()
+    # (On the stepped clock, docs/plan-fast-tests.md; `--real` waits in real time, as before.)
+    real = "--real" in sys.argv
+    named = [a for a in sys.argv[1:] if not a.startswith("--")]
+    cols, zoom, per = (2, 3, 8) if named else (3, 2, 18)
+    b = P.Browser(stepped=not real)
     tiles = []
     try:
         P.enter_region8(b)
         b.eval("(() => { const s = window.__ship, pe = s.world.people;"
                " pe.shown = p => p.route === 'inside' || p.route === s.route; pe.refresh(); })()")
-        ids = sys.argv[1:] or b.eval("window.__ship.world.people.list.map(p => p.id)")
+        ids = named or b.eval("window.__ship.world.people.list.map(p => p.id)")
         for pid in ids:
             p = b.eval(f"(() => {{ const p = window.__ship.world.people.byId['{pid}'];"
                        " return p ? { x: p.sprite.x, y: p.y, route: p.route } : null; })()")
@@ -38,7 +41,7 @@ def main():
                 continue
             b.teleport(p["x"] + 60, p["y"], p["route"])
             b.eval("window.__ship.world.people.refresh()")
-            time.sleep(1.2)
+            b.wait(1.2)
             deck = round(5 + (floor_y(5) - p["y"]) / 144) if p["route"] == "inside" else None
             tile = Image.open(b.close_up("people-in-place", p["x"] + 20, p["y"] - 40, W, H, zoom, deck))
             ImageDraw.Draw(tile).text((4, 4), pid, fill=(255, 255, 0))

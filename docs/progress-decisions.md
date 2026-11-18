@@ -2759,3 +2759,45 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
   ways and shown to the user.
 - **Also found:** five test browsers left running by scripts that had ended (2.6 cores, 2 GB);
   closed with the user's leave. The plan's runner closes such leftovers itself.
+
+## Step 4a's second batch: the sauna's steam (17), built (2026-11-18)
+
+- **What she does** (`Steam.ride` in `src/world/bow.js`, played by the ship scene's `thingGag`; `gags`
+  sheet, `steam-*`): the cloud out of the sauna's aft door catches her; a thick burst of steam wraps her
+  where she is (from her run she slides to a stop) and thins, rising: her hair is frizzed into a huge
+  puff, her cheeks flushed; she fans her face, sways with a hand to her forehead, and sits down dazed;
+  then her checkpoint. Her word "Pfff!" as before; with a tangerine on her she splutters as before (no
+  exception). Sounds: a hiss at the hit, a cough in the burst, a plop as she sits (not heard by me).
+- **No clip per quarter of her stride** (as 16 needed): the burst covers her whole, puff and all, the
+  frame she is caught, so the change to her puff picture is not seen; drawn in code, as the cloud is.
+- **Found in the game and mended before showing:** a gap in the first burst showed a bit of her new
+  hair; caught pressed against the sauna's door she stood in its doorway, its post through her, and
+  sitting she put her legs across it: under the burst she is set 34 px clear of the door (`clear`).
+- **Made:** her puff picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the second hid her eye under a red blotch), the fan and the swoon by PixMiniMax from it
+  (2 generations). Checked frame by frame: the body from the hair down unchanged, feet on the floor line
+  (four swoon frames 1 px under, set up), four loose specks out, both clips starting on the exact puff
+  picture and the fan ending on it. 12 generations. `assets/source/her-mishaps/batch-4a/` (README).
+- **A `steam11` place** to try it; `region9` now checks the gag (fan, then swoon) and waits for her
+  return, longer than the old fright's.
+
+## Fast playtests: the stepped clock, built (2026-11-18)
+
+- **The user:** "Implement the entire fast test plan, then go back to our current plan" (step 1 shown
+  first: `vacuum` 8.3 s to 1.6 s, `region4` 126.8 s to 5.7 s, every check the same both ways).
+- **What it gives** (`docs/plan-fast-tests.md` §7): the 38 scenarios in about 35 minutes in real time,
+  about 4 stepped one after another, **55 s six at a time** (`-j 6`); 878 checks compared, every one the
+  same result both ways. `check_overlaps` 20 s to 6 s, `shoot_people` 399 s to 21 s, `render_ship` 27 s
+  to 5 s.
+- **Found in the harness:** undrawn frames left the cameras still (a ride's "out of the screen" ended at
+  once); the game's awaited waits and tweens ran late within a batch (the chute); the loop's own delta
+  froze (the cake never swayed); six browsers at once had a file refused by the test server.
+- **Found in the tests:** six checks that had passed by real time's slack (the trunk's lock message,
+  the funnel stairway's top twice, the jogger three times, the trays' jump, the terrace gull's swoop):
+  each now waits for the thing, not for a time.
+- **The rule changed** (`CLAUDE.md`, "Working with the user"): after a change, the scenarios it touches,
+  stepped; before a merge is proposed, the whole suite stepped and the real-time set (`boot`, `sound`,
+  `deck3`); what is judged by eye stays the real game.
+- **Also:** `Math.random` and Phaser's RND seeded in tests (`--seed`); 1,471 old browser profile folders
+  removed, and every test browser now takes its own away; cases (`scenario_region4__towels`) ready for
+  new checks, no old scenario cut up.
