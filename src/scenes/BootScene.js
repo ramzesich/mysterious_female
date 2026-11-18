@@ -20,6 +20,9 @@ export class BootScene extends Phaser.Scene {
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
+        // A one-way glass door's open leaf, its push bar across it (assets/source/ship/pushbar/).
+        this.load.image('door-glass-pushbar', 'assets/ship/door-glass-pushbar.png');
+        this.load.image('door-glass-oneway-edge', 'assets/ship/door-glass-oneway-edge.png');
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');

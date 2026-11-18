@@ -65,7 +65,8 @@ Read from the code for this plan, so that the steps name real places:
 - People who walk already have "turned aside, she can slip past" (`aside` in
   `src/world/people.js`, the waiter at his tables).
 - A fire door she has come through from its free side is open both ways for good (`passes()` in
-  `src/progression.js`, `save.opened`).
+  `src/progression.js`, `save.opened`), and propped open from then on (`propOpen` in the ship scene;
+  2026-11-18: its plain side has nothing to open it by).
 - Her husband sits at the first table of the Great Outdoors (deck 11, about 220 m) from region
   6; the table scene is `tableScene` in `src/world/lido.js` and sets the flag `table`.
 - PixelLab: 4,939 generations left on 2026-11-16 (the user upgraded the subscription; the
@@ -814,8 +815,12 @@ and the sprinkler stood on an optional stretch, since the steward gave the card 
 - **Docs when built:** the rows of docs/population.md's table themselves, GAME_DESIGN.md's
   region 4 (its "corridor's life" and "Blocks"), `docs/progress-decisions.md`.
 
-**Second revision (2026-11-18): the one-way doors get their push bar (decided by the user,
-nothing of it built).** The design has had the line since the cards were settled ("Fire-exit
+**Second revision (2026-11-18): the one-way doors get their push bar (decided by the user).
+Built the same day** (`docs/progress-decisions.md`): the plain steel bar of two candidates, the
+profile with a closer of two (the user: "the door profile should also differ from a two-way glass
+door"), each door swinging away from its free side (the user: "It opens in the wrong way"), propped
+open for good once she has come through (the user: "I can also open it from the other side now").
+The end walls' one-way doorways were not looked at yet. The design has had the line since the cards were settled ("Fire-exit
 doors with a push bar on one side only are the one-way doors", GAME_DESIGN.md §6.1.2's table of locks);
 as built, a one-way glass door is drawn exactly like a free one, and she learns which it is only
 by E (a rattle, a padlock over her). A naming of the door, not a hint.

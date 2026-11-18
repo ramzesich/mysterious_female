@@ -165,7 +165,9 @@ OWN_DOORS = {(10, BRIDGE_WALL_M), (11, SPA_WALL_M)}
 
 def part_doors():
     """Every boundary between two indoor parts of a deck, (deck, metres, swing): a wall with a door
-    in it (the user, 2026-11-07). The door swings open away from a stair lobby, else aft."""
+    in it (the user, 2026-11-07). The door swings open away from a stair lobby, else aft; a one-way
+    door (a push bar on its free side) away from its free side, as it is pushed (the user, 2026-11-18:
+    "It opens in the wrong way")."""
     doors = []
     for deck in PLAYABLE:
         parts = deck_parts(deck)
@@ -176,6 +178,9 @@ def part_doors():
             if not (indoor(deck, m - 0.5) and indoor(deck, m + 0.5)):
                 continue
             swing = -1 if k1 == "core" else 1
+            lock = DOOR_LOCKS.get((deck, m))
+            if lock and lock[0] == "oneway":
+                swing = -lock[1]
             doors.append((deck, m, swing))
     return doors
 
@@ -1589,9 +1594,10 @@ def build_objects():
     for deck in (8, 9, 10):
         for core, (a, _) in CORES.items():
             # Hung 20 px further aft where the wall has a card reader on the lobby's side (decks 9
-            # and 10 forward: the reader sits 20 px from the wall, 40 px up; the audit, 2026-11-15).
+            # and 10 forward: the reader sits 20 px from the wall, 40 px up; the audit, 2026-11-15),
+            # or where a one-way door swings open into the lobby (its leaf 28 px; 2026-11-18).
             lock = DOOR_LOCKS.get((deck, a))
-            x = col(a) * TILE + (50 if lock and lock[0] == "card" else 30)
+            x = col(a) * TILE + (50 if lock and lock[0] in ("card", "oneway") else 30)
             add(area(f"directory-{deck}-{core}", "decor", x - 13, floor_y(deck), 26, 0, [prop("kind", "directory")]))
             put(deck, 0, "exit-sign-bg", 112, x=col(a) * TILE + 5 * TILE)
         # The atrium's walk: downlights and a warm cove along its ceiling (deck 10's is the dome:

@@ -2663,3 +2663,33 @@ The first of the other session's two decided revisions (docs/plan-three-uses.md,
   slower pace); `vacuum` passes; `golden` (changed the same way) and `boot` pass; `check_overlaps`: 0;
   `check_corridors`, deck 9: 64.6 m without a beat (55 to 120, forward of the trunk), 116 m without a
   reward (24 to 140), neither in the stretch that changed.
+
+## Step 4a: the one-way doors' push bar, built (2026-11-18)
+
+The second of the other session's decided revisions (docs/plan-three-uses.md, step 4a).
+
+- **How it was made:** the game's own pictures of the glass door (drawn in code) rendered exactly,
+  and only a band of each redrawn by `inpaint_image_pro_flash`, every other pixel coming back as it
+  was: so the one-way door and the free one stay one pair. 20 generations
+  (`assets/source/ship/pushbar/`, its README).
+- **Open:** two bars shown in place beside her, plain steel and steel with a red band; the user chose
+  the plain steel. The leaf's glass see-through as the free door's (85%).
+- **Shut:** the user, on seeing the first version (the bar's end as a 3 px nub drawn in code): "the door
+  profile should also differ from a two-way glass door". Two generated profiles, the bar's end alone
+  and with a door closer at the top; the user chose the closer. The free door keeps its handle on both
+  sides.
+- **Also the user's, in play:** "It opens in the wrong way": the doors swung away from a stair lobby
+  (the house rule), so nine of ten opened toward whoever pushed them. A one-way door now swings away
+  from its free side (`part_doors()` in the map builder); the lobby's deck plan hangs 20 px further
+  along where such a leaf swings in. "I can also open it from the other side now": by the design, once
+  she has come through from the free side it is open both ways for good (the shortcuts back); but it
+  shut behind her and opened from its plain side with E. Now it stays propped open from then on
+  (`propOpen`), and before that its plain side does not open.
+- Checked: all ten doors shut and open beside her, in place; the whole ship from outside
+  (`tools/render_ship.py`: no door shows through the side); `check_overlaps`: 0.
+- **Not looked at yet:** the four end walls with a one-way doorway (decks 8 to 10 aft, deck 11
+  forward), to be proposed to the user apart, as the plan says.
+- **Tests:** `boot`, `region4`, `region5`, `region7`, `golden` pass; the rest not run.
+- **With it, the user's (deck 8's open cabin, `amb_peek_sea`):** "Let's make its interior more washed
+  out colors, like we usually do": its inside washed 30% toward the wall, as the knitting lady's open
+  cabin already was (`peek-sea` in `src/world/world.js`).

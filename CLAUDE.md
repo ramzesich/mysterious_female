@@ -553,6 +553,12 @@ Lessons learned (2026-11-18, deck 9's corridor, her push):
   `cart_free` (which started the steward's scene and stopped her), then set her mode back to play. Look
   at what runs after a `setFlag` before trusting a scene to hold her; and a scene that need not hold her
   is better not holding her (the steward turns to her and his card follows her).
+- **A variant of a picture the game already has** (the one-way door's push bar on the glass door drawn
+  in code): render the game's picture exactly and inpaint only a band of it (`inpaint_image_pro_flash`
+  returns every other pixel as it was): the two stay one pair by construction.
+- **A thing with a use reads by how it is used, not only by how it looks:** a push-bar door must swing
+  away from the side it is pushed from, and a door with nothing on one side must not open from it.
+  Before showing a new look, play it both ways.
 
 ## Working with the user
 

@@ -1158,9 +1158,17 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(tone, 1).fillRect(x - w / 2, ceiling, w, head - ceiling);
         if (!wall) g.fillStyle(0xc7dcd0, 1).fillRect(x - w / 2 + 2, ceiling, 2, head - ceiling);
         g.fillStyle(wall ? 0x46291f : 0x625565, 1).fillRect(x - w / 2, head, w, 2);
-        // Shut: the door edge on, its handle sticking out on each side: white steel, or glass.
-        const shut = this.add.graphics().setDepth(DEPTH.props);
-        if (glass) {
+        // Shut: the door edge on, its handle sticking out on each side: white steel, or glass. A
+        // one-way glass door: its push bar's end and its closer on its free side, nothing on the
+        // other (generated; the user, 2026-11-18: "the door profile should also differ").
+        const oneway = glass && steel && lock.startsWith('oneway');
+        const free = oneway ? Number(lock.split(':')[1]) : 0;
+        const shut = oneway
+            ? this.add.image(free < 0 ? x - 10 : x - 2, floor, 'door-glass-oneway-edge').setOrigin(0, 1).setFlipX(free > 0).setDepth(DEPTH.props)
+            : this.add.graphics().setDepth(DEPTH.props);
+        if (oneway) {
+            // (Its picture: assets/source/ship/pushbar/.)
+        } else if (glass) {
             shut.fillStyle(rim, 1).fillRect(x - 2, head + 2, 4, floor - head - 2);
             shut.fillStyle(0xbfe6f5, 1).fillRect(x - 1, head + 4, 2, floor - head - 8);
             shut.fillStyle(rim, 1).fillRect(x - 5, floor - 36, 10, 3);
@@ -1172,7 +1180,12 @@ export class ShipScene extends Phaser.Scene {
         // Open: swung back against the wall (on the room's side), seen face on.
         const edge = x + swing * w / 2;
         let open;
-        if (glass) {
+        // (A one-way door: its push bar across it, generated from this very leaf, the rest of it the
+        // same; the user, 2026-11-18. The design's "fire-exit doors with a push bar on one side only".)
+        if (oneway) {
+            const lx = swing < 0 ? edge - 28 : edge;
+            open = this.add.image(lx, floor, 'door-glass-pushbar').setOrigin(0, 1).setDepth(DEPTH.decor + 0.2).setVisible(false);
+        } else if (glass) {
             // A glass door in its frame, a handle.
             open = this.add.graphics().setDepth(DEPTH.decor + 0.2).setVisible(false);
             const lx = swing < 0 ? edge - 28 : edge;
@@ -1201,7 +1214,16 @@ export class ShipScene extends Phaser.Scene {
         }
         this.worldLayer.add(parts);
         const deck = key.split(':')[0];
-        this.bulkheads.push({ id: o.name, x, w, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone });
+        const b = { id: o.name, x, w, x0, floor, key, deck, lock, open: false, shut, wall: g, openDoor: open, zone };
+        this.bulkheads.push(b);
+        // (A one-way door she has come through from its free side stays propped open for good: its
+        // plain side has nothing to open it by; the user, 2026-11-18.)
+        if (oneway && this.save.opened.includes(o.name)) this.propOpen(b);
+    }
+
+    propOpen(b) {
+        b.ajar = true;
+        this.setBulkheadOpen(b, true);
     }
 
     // E at a wall's shut door: it opens.
@@ -1216,6 +1238,7 @@ export class ShipScene extends Phaser.Scene {
             return true;
         }
         this.setBulkheadOpen(b, true);
+        if (res.through && b.lock.startsWith('oneway')) this.propOpen(b);
         sfx.doorHeavy();
         return true;
     }

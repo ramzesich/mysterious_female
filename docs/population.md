@@ -205,7 +205,7 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 | `rdr_bridge` | Deck 10, 40, the bridge's door | Gold | The bridge |
 | `door_library_aft` | Deck 6, 194 | Shut by `blk_quiet` (a rope, "QUIET PLEASE") | Bumbot knocks the rope into it (`bb_2`) |
 | `door_8_fwd_lobby` | Deck 8, 74 | `oneway(the corridor)` | The duct drops her inside |
-| `door_8_mid_lobbies`, `door_8_aft_lobbies`, `door_9_aft_lobbies`, `door_10_mid_lobbies`, `door_10_aft_lobbies` | Each hallway's doors at its lobby ends. **Each gets a push bar on its free side and a plain face on the other (decided 2026-11-18, not built; docs/plan-three-uses.md, step 4a)** | `oneway(the corridor)` | A balcony door, or the pool's hatch |
+| `door_8_mid_lobbies`, `door_8_aft_lobbies`, `door_9_aft_lobbies`, `door_10_mid_lobbies`, `door_10_aft_lobbies` | Each hallway's doors at its lobby ends. **Each has a push bar on its free side and a plain face on the other (built 2026-11-18; docs/plan-three-uses.md, step 4a): it swings away from its free side, and once she has come through it stays propped open** | `oneway(the corridor)` | A balcony door, or the pool's hatch |
 | `door_theatre_trunk` | Deck 4, 240 | `oneway(deck 6)` | The theatre's trunk, as built |
 | `door_midships_trunk_6` | Deck 6, 125 | `oneway(deck 6)` | Opens from Bliss first |
 | `door_mooring` | Deck 7, 21.4 | Shut; opens from the mooring deck after the catch | The way home |

@@ -825,7 +825,7 @@ region 6). At the very end he is in the cabin when she brings the cat home.
 
 | Kind | How it reads | The rule |
 |---|---|---|
-| **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors (**the push bar was never drawn: as built they look like any glass door. Decided to build, the user, 2026-11-18; not built:** docs/plan-three-uses.md, step 4a's second revision) |
+| **Department cards** | A coloured reader on a crew way: a crew door, a crew trunk, a crew room | Deck (blue), Entertainment (red), Housekeeping (green), Officer's (gold). Each opens things on several decks (§6.1.5). The Officer's card opens every reader. **Public stairs and public doors are never card-locked** (the user, 2026-11-11: a fire door can't appear on a public staircase, and an escape route never locks): they are roped off by people or the ship's routine (below). A card door may open freely from one side (the officers' corridors from inside). **Fire-exit doors** with a push bar on one side only are the one-way doors (**built 2026-11-18**, docs/plan-three-uses.md, step 4a's second revision: shut, seen edge on, the bar's end and a door closer on the free side, nothing on the other; open, the leaf with a plain steel push bar across it; it swings away from its free side, as it is pushed; once she has come through from its free side it stays propped open for good, so it never opens from its plain side) |
 | **New ways to move** | A pickup (no glyph and no hint since 2026-11-14: how a verb is used is hers to find out) | Four verbs, one per quarter: the lunge (region 1; the cry is hers from the start), pushing carts and crawling (4), grip socks (6), the parasol (8). Each makes old places new, and each tames a hazard (§6.1.7) |
 | **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
 | **People and the ship's routine** | A person, a crowd or a thing on a flight, with a rope and a sign | A cleaner mopping, a photographer, a carpet being relaid, a table of towel animals, a painter, a crowd of fans, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
@@ -1117,7 +1117,8 @@ Positions are in metres from the bow and approximate; the build sets them exactl
     cabin at 150 m opens to the card now: its checkpoint, its tangerine, Bumbot's glimpse.
   - **The glass door at 194 m is shut from the aft lobby's side** until she opens it from the
     corridor, like the same doors on decks 8 and 10: she cannot come up behind him by deck 7 and
-    the aft stairs. Opened once, it stays open, and that loop is a second way back.
+    the aft stairs. Opened once, it stays open (propped open for good, 2026-11-18), and that loop is a
+    second way back.
   - **At his new place:** the wall picture the freed trolley and he would stand over is hung in
     the nearest empty gap; the small housekeeping cart by the cabin door at 188 m is taken out.
   - **To judge in play (Proposed):** on the way out nothing is lit between her arrival
@@ -2475,8 +2476,10 @@ Nothing blocks the start of the build. These get settled along the way:
       and shut with their frames, and anyone in a doorway is seen only through it.
       **Done (2026-11-18): deck 9's corridor is the way** (the steward and his trolley at its aft end, the
       door at 194 m one-way, the towel stack fallen for good; her push remade, his thanks shortened).
-      **Next: the push bar on the one-way doors** (docs/plan-three-uses.md, step 4a's second revision of
-      2026-11-18, generated and shown first), **then the rest of step 4a's gags** (the
+      **Done (2026-11-18): the one-way doors' push bar** (shut: the bar's end and a closer on the free
+      side; open: the steel bar across the leaf; they swing away from the free side; propped open for good
+      once she has come through).
+      **Next: the rest of step 4a's gags** (the
       sprinkler's 16 among them). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").

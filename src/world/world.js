@@ -261,16 +261,23 @@ export class World {
         make('peek-sea', 34, 74, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
             g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
-            g.fillStyle(0x7f708a, 1).fillRect(7, 9, 24, 2);
-            g.fillStyle(0xcd683d, 1).fillRect(10, 12, 20, 28);
-            g.fillStyle(0x8fd3ff, 1).fillRect(12, 14, 16, 24);
-            g.fillStyle(0x4d9be6, 1).fillRect(12, 27, 16, 11);
-            g.fillStyle(0xffffff, 1).fillRect(12, 26, 16, 1).fillRect(15, 17, 6, 2).fillRect(14, 31, 4, 1).fillRect(21, 34, 5, 1);
-            g.fillStyle(0x7f708a, 1).fillRect(8, 11, 3, 31).fillRect(29, 11, 3, 31);
-            g.fillStyle(0x9e4539, 1).fillRect(8, 66, 24, 6);
-            g.fillStyle(0xffffff, 1).fillRect(8, 52, 24, 14);
-            g.fillStyle(0xc7dcd0, 1).fillRect(8, 59, 24, 1);
-            g.fillStyle(0x0b5e65, 1).fillRect(15, 52, 8, 14);
+            // (Inside a room, washed 30% toward the wall, as the knitting lady's: the user, 2026-11-18,
+            // "Let's make its interior more washed out colors, like we usually do".)
+            const wash = c => {
+                const w = 0xece3cf, k = 0.3, ch = sh => Math.round(((c >> sh) & 255) * (1 - k) + ((w >> sh) & 255) * k);
+                return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+            };
+            const fill = c => g.fillStyle(wash(c), 1);
+            fill(0x7f708a).fillRect(7, 9, 24, 2);
+            fill(0xcd683d).fillRect(10, 12, 20, 28);
+            fill(0x8fd3ff).fillRect(12, 14, 16, 24);
+            fill(0x4d9be6).fillRect(12, 27, 16, 11);
+            fill(0xffffff).fillRect(12, 26, 16, 1).fillRect(15, 17, 6, 2).fillRect(14, 31, 4, 1).fillRect(21, 34, 5, 1);
+            fill(0x7f708a).fillRect(8, 11, 3, 31).fillRect(29, 11, 3, 31);
+            fill(0x9e4539).fillRect(8, 66, 24, 6);
+            fill(0xffffff).fillRect(8, 52, 24, 14);
+            fill(0xc7dcd0).fillRect(8, 59, 24, 1);
+            fill(0x0b5e65).fillRect(15, 52, 8, 14);
             g.fillStyle(0x9babb2, 1).fillRect(2, 72, 30, 2);
             // The door's leaf, swung in against the wall.
             g.fillStyle(0x9e4539, 1).fillRect(2, 2, 5, 70);
