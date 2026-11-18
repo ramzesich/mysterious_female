@@ -359,13 +359,13 @@ under tray rules; a hand takes it at the door, with a `♥`.
    `docs/session-b-notes.md`): the log, `GAME_DESIGN.md`, `docs/population.md`, the plans,
    `docs/start-links.md`, `CLAUDE.md`'s table and lessons.
 2. **Documents out of step with the game, found while reading** (text only):
-   - `CLAUDE.md` and `README.md` say "key cards are off for now; `?cards=locked` turns them on":
-     the locks have been on since step 0 (`KEY_CARDS.required: true`) and no `locked` flag
-     exists. `GAME_DESIGN.md` §8 has a box saying the same.
-   - `CLAUDE.md`'s table says Bumbot's beats are "not placed yet": all six are, with the
-     glimpses. `GAME_DESIGN.md` §4 opens with "None of it is in the game yet".
-   - `CLAUDE.md`, "Art": "Tier 1 month: 2000 generations until 2026-11-30"; the account is Tier
-     2, 5,000 a cycle, 4,388 left on 2026-11-18, refilled 2026-12-16.
+   - **`CLAUDE.md` and `README.md` were brought up to date on 2026-11-18** (the user: "Bring both
+     CLAUDE and README md documents up to date with the actual state"): the locks are on and
+     there is no `?cards=locked`; Bumbot's beats are placed; Pages serves `placeholder`; the
+     PixelLab account as it is; the files and documents the tables did not name; the README's
+     layout, controls and testing sections. What is left of this list is in the other documents.
+   - `GAME_DESIGN.md` §8 has a box saying the locks are off; its §4 opens with "None of it is in
+     the game yet" (Bumbot's six beats and his glimpses are all placed).
    - `GAME_DESIGN.md` §8: "Next up" is dated 2026-11-03, and about fifteen boxes are open that
      are built or dropped (the checkpoints, the outside, the finale's art, the sun emblem, the
      glyphs, the gulls); §6.1.3 and §6.1.11 still describe the stern strip's slot (moved to
@@ -376,8 +376,7 @@ under tray rules; a hand takes it at the door, with a `♥`.
      (`slot_stern`, `sec_ladder`, `haz_pit`, the breakfast, the notice, the trolley at 130 m);
      glyphs named after the no-hints rule; the tangerine table "as first written".
    - `docs/audit-2026-11-15.md` was never marked with what was fixed (V1, V2, V3, V6, V7).
-   - `README.md`: the early layout table, "Placeholder tileset", the testing section before the
-     stepped clock. `docs/start-links.md`: three places under the wrong deck.
+   - `docs/start-links.md`: three places under the wrong deck.
 3. **Saving on:** `DEV_FRESH` to false ("Set to false before the gift"), and a pass over what
    the save must now hold (`save.loose`, `save.keeps`, `save.broken`, the heaps, a tangerine
    left on the steward's cart; the verb still named `dash` in the save).

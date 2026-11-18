@@ -2880,3 +2880,29 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - **Meeting point:** `main` on GitHub, on the user's word each time: a session merges
   `origin/main` into its branch, rebuilds any generated file that collides, runs what the merge
   can touch, and pushes its branch to `main`.
+
+## CLAUDE.md and README.md brought up to date; a temp folder a workspace can name (2026-11-18)
+
+- **The user:** "Bring both CLAUDE and README md documents up to date with the actual state."
+  Every path, flag, control and start place the two name was checked against the code first.
+- **`CLAUDE.md`:** the locks are on (it said key cards were off and named a `?cards=locked` that
+  does not exist; `?did=` was missing); Pages serves the `placeholder` branch, not `main`;
+  Bumbot's beats are placed (the table said not); the PixelLab account as it is (Tier 2, 5,000 a
+  cycle); rows for what the table did not name (`src/progression.js`, `src/save.js`,
+  `src/main.js`, `src/scenes/BootScene.js`, `src/textures.js`, `tools/draw_casino.py`,
+  `tools/tempdir.py`, the plans and the audit, a parallel workspace's own files); a session
+  starts from `docs/plan-the-rest.md`, no longer from `GAME_DESIGN.md` §8, whose "Next up" is of
+  2026-11-03.
+- **`README.md`:** what the game is and that the whole route plays; Pages; the locks; what
+  `?tangerines=infinite` covers now (the throw and the pocket too); the controls it lacked (the
+  welcome screen, ending the intro, M); the layout table as the repo is; testing on the stepped
+  clock. Its list of 49 start places already matched `docs/start-links.md`.
+- **Left as they are** (the plan's §6): `GAME_DESIGN.md` §8's stale boxes, `docs/build-plan.md`'s
+  intro entry, `docs/population.md`'s rows, the audit's marks, three links under the wrong deck.
+- **`tools/tempdir.py` (mine, small):** the five tools that chose the temp folder each by
+  themselves (`playtest.py`, `check_people.py`, `draw_regions.py`, `livery_photo.py`,
+  `render_ship.py`) take it from one module, which reads the variable `BUMBUSIK_TEMP` when it is
+  set. **Why:** the user works in Paseo, not in terminals, so the launcher that gave each
+  parallel workspace its own temp folder would never run; and Claude Code keeps `TEMP`, `TMP` and
+  `TMPDIR` to itself (a settings file's `env` passes any other variable: tried all four). With
+  nothing set, everything is where it was. `boot` passed both ways.

@@ -3,23 +3,29 @@
 A browser platformer, a gift for the developer's wife: she plays Bumbusik, a cruise ship crew member
 chasing the stowaway cat Bumbot around a Norwegian Sun-like ship. **`GAME_DESIGN.md` is the source of
 truth**: read the relevant section before any design or content work, and record new decisions there
-(tagged Decided / Proposed / Open / Later).
+(tagged Decided / Proposed / Open / Later). **What is left to build is in `docs/plan-the-rest.md`**
+(2026-11-18: everything the documents still call open, checked against the code, in two halves).
 
 ## Stack and running
 
 - Phaser 4.2.1, vendored (`vendor/phaser.min.js`); plain JS ES modules; no npm, no build.
 - Run: `python tools/serve.py` (caching off, so reloads are never stale), open
   <http://localhost:8000>. URL flags: `?play` skip the welcome screen and the intro, `?intro=<part>` start the intro at a part,
-  `?reset` clear save (**nothing is saved for now**, the user, 2026-11-16: every load a new game, `DEV_FRESH` in `src/config.js`; `?real` keeps the save, and every playtest opens with it), `?debug` bodies + state, `?cards=all` every key card (key cards are off for now; `?cards=locked` turns them on), `?tangerines=infinite`, `?pocket=off` (a hit is a fright even with tangerines on her), `?at=pool` start at a
+  `?reset` clear save (**nothing is saved for now**, the user, 2026-11-16: every load a new game, `DEV_FRESH` in `src/config.js`; `?real` keeps the save, and every playtest opens with it), `?debug` bodies + state, `?cards=all` every lock open and every verb known (**the locks are on**, since step 0: `KEY_CARDS.required` in `src/config.js`; there is no flag to turn them off but this one), `?did=<flags>` start with story flags set (`README.md` has examples), `?tangerines=infinite`, `?pocket=off` (a hit is a fright even with tangerines on her), `?at=pool` start at a
   named place (list in `README.md`, a link for each in `docs/start-links.md`; for testing), `?sound=off` (sound is on; M mutes it in the game), `?lang=ua` (Ukrainian for a session). D is the cry and the lunge, F the throw (`docs/plan-three-uses.md`).
-- Hosted on GitHub Pages from `main` root: every asset path must be relative.
+- To be hosted on GitHub Pages from `main` root: every asset path must be relative. **Since
+  2026-11-17 Pages serves the orphan branch `placeholder`** (her silhouette, no words): a push to
+  `main` does not publish the game, and `placeholder` is never merged. Switching Pages back to
+  `main` is a step of the release (`docs/plan-the-rest.md` §6).
 
 ## Layout
 
 | Path | What |
 |---|---|
 | `src/config.js` | All tuning: scale, speeds, jump, the cry and the lunge (`CRY`, `LUNGE`); `MISHAPS`, every obstacle that can hit her by its own name (`scareContact(fromX, name, { vx, dir })`), and `MISHAP_SCENES`, each scenario of a hit (her word, her reaction with a tangerine, where it goes, what stands in for her gag); which scenario a hit is, by its side and who was moving: `src/world/mishaps.js` (docs/plan-three-uses.md §1.6); `TALLY`, a tangerine's flight to the count |
-| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, D (`tryCry`: the cry, and the lunge once learned; `lungeSafe()` turns a fright by contact into `world.lunged()`), checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catch (his beats: §6.1.8, not placed yet) |
+| `src/scenes/ShipScene.js` | The game: map, objects, player modes (play, ladder, stairs, trunk, lift, scripted), scares, D (`tryCry`: the cry, and the lunge once learned; `lungeSafe()` turns a fright by contact into `world.lunged()`), checkpoints, card-locked stairs, escape trunks, elevators, walls with doors between the ship's parts (`bulkhead`), Bumbot's near-catches (`nearCatch`; his six beats of §6.1.8 are placed: `BEATS` in `tools/population.py`, his glimpses in `src/world/`) |
+| `src/progression.js`, `src/save.js` | The locks and what opens them (the regions she has opened, her cards, the flags; flights of stairs, doors in the walls across the decks, end walls, the lifts' landings: `passes()`), from the map's data; the save (in the browser, written at every checkpoint: what she has activated, collected, broken, opened, her cards, verbs, books, the loose tangerines, the things found, `keeps`). **Nothing is kept between loads for now** (`DEV_FRESH` in `src/config.js`, "set to false before the gift") |
+| `src/main.js`, `src/scenes/BootScene.js`, `src/textures.js` | The Phaser config and the page's start; the loading of every sheet, atlas and map; the few sprites still drawn from text pixel maps at boot (the early placeholders, and `FRUIT`, the tangerine's picture) |
 | `src/controls.js`, `src/rumble.js` | Keyboard and Xbox controller mapped to the same actions (§3.1; the whole mapping in its table there), the controller in use being whichever was touched last; the rumble's ten moments, only while she plays with the controller. The `gamepad` playtest drives a fake controller (`Browser.fake_pad()`) |
 | `src/lang.js` | **Every text the game says, in English and Ukrainian** (the user, 2026-11-14): `t(key)`; the title, the win screen, a lock's popup, her exclamations. A new text goes here in both languages, never as a string where it is shown (the `lang` playtest fails when one language lacks a key). The ship's own signs and plates stay as they are in both, and her «Кісюнічка!!!». `?lang=ua`; the welcome screen's LANGUAGE button switches it |
 | `docs/intro.md` | **The user's own document, never edit it**: the welcome screen, the start sequence and the intro's scene. Built 2026-11-14 on the user's word |
@@ -45,11 +51,16 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor, the vent high on its far wall, the chute's hatch by the door), drawn by hand: its inside, its open crew door, and the laundry cart she pushes under the vent (`assets/ship/linen-cart.png`) |
+| `tools/draw_casino.py` | The casino's roulette and blackjack tables and the Stardust balcony's parapet, drawn by hand in strict side view (PixelLab kept drawing them at three-quarters): `assets/source/ship/casino-drawn/` |
 | `tools/draw_lifeboat.py` | The ship's boats, drawn by hand in code (PixelLab's tries didn't read): the lifeboat, the tender, the rescue boat (`assets/ship/lifeboat.png`, `tender.png`, `rescue-boat.png`) |
 | `tools/build_livery.py` | The ship's sun livery from its PixelLab tiles (`assets/source/livery/p2-*.png`) to one picture at full size (`assets/source/livery/livery.png`); then `build_ship_map.py` cuts it by deck into `assets/ship/livery.png` + `.json`. Its placement (`SHIFT`, `DROP`, `DISC`) is the user's. Its outlines are smoothed along their length with the tips kept (`sleek()`, `SLEEK`; the user, 2026-11-14); leftover spots are filled by rule (`fill_spots`) or by a point inside them (`SPOTS`). **The user's own touches: `assets/source/livery/livery-by-hand.png`**, a copy of `livery.png` edited by hand (flat colours, no antialiasing), which `build_ship_map.py` uses in its place while it is there; never write it, and say so when `build_livery.py` is run while it exists (its changes then show only once they are copied over by hand). `tools/livery_photo.py` makes the tiles' generation inputs from the user's side photo |
 | `tools/render_ship.py` | The whole ship from outside at full size, every deck closed (`ship-full.png` in `%TEMP%/bumbusik-playtest/exterior`, or the folder given), through the game's own outside view; in the game, O shows it too |
 | `tools/shell_paint.py` | **The ship's side painted by rules** (step 11): the plating's seams, butts and shades, the shade under overhangs, weathering, the hull's marks and openings, as a picture the map builder cuts into tiles (after the placeholder ones in `assets/tiles/placeholder.png`, rows of 64); the parts the game draws itself get their pixels as marks (`shellSlopes`' `marks`, `stemMarks`, `plateSeams` in the map). Its colours and spacings are at its top |
-| `docs/build-plan.md` | **The build plan**: step 0 the skeleton, then one step per region in play order, each with its scope, systems, art, playtest and exit; §8 names the current step |
+| `docs/build-plan.md` | **The build plan**: step 0 the skeleton, then one step per region in play order, each with its scope, systems, art, playtest and exit. **All of it is built** (steps 0 to 12, 2026-11-14); its "After the regions" is carried on in `docs/plan-the-rest.md` |
+| `docs/plan-the-rest.md` | **What is left, as one plan** (2026-11-18): half A (the rest of the mishaps' gags, the `mishaps` playtest, the look-outs, each deck's own look), half B (the rest of the twenty things to find, the fourteen books with their covers, cabin 8206's desk, the deliveries); what waits for the user; what is done once at the end (the documents, saving on, the release); what is closed |
+| `docs/plan-three-uses.md` | **The three uses of a tangerine and the decks' life** (the cry and the lunge, the throw, the pocket; the mishaps' table §1.6; the twenty things to find, the look-outs, the deliveries, each deck's look): steps 1 to 4 and most of 4a are built, the rest is in `docs/plan-the-rest.md` |
+| `docs/audit-2026-11-15.md`, `docs/plan-visual-fixes.md`, `docs/plan-fast-tests.md` | The user's audit (visual faults, empty decks) and the two plans that came of it and of the slow tests: the visual fixes and the stepped clock, both built whole |
+| `CLAUDE.local.md`, `docs/session-<a,b>-notes.md` | **Only in a parallel workspace** (since 2026-11-18 two sessions build `docs/plan-the-rest.md` side by side, each in a clone of its own: `bumbusik-a` on branch `rest-a`, `bumbusik-b` on `rest-b`): the workspace's own brief, not in git, **which holds where it and this file differ** (its half of the plan, its port, its temp and memory folders; the shared documents, this one too, are read-only there), and the notes file where that session records what this file would have it record in the shared documents |
 | `docs/population.md` | **The population spec**: every person, hazard, item, secret, room and scene in place (deck, metres, behaviour), the corridors designed beat by beat; the build populates the ship from it (§6.1.13, phase 1) |
 | `tools/draw_regions.py` | The progression plan (§6.1) drawn on the real ship (`docs/ship-regions.png`, `docs/ship-unlock-order.png`), from its own lists of regions, routes and steps; needs `tools/render_ship.py`'s picture |
 | `tools/palettize.py` | Converts any image to the Resurrect 64 palette (`assets/palette/`) |
@@ -75,6 +86,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/build_gags.py` | **Step 4a's gags, each the thing's own clip with her** (`assets/source/her-mishaps/batch-4a/`, its README has the ids) to `assets/sprites/gags.png` + `.json`: the swinging door alone and slamming her flat (13a) and her slide down the wall, the same swing in full colours for the "Do Not Disturb" doors, her tray ride from four quarters of her stride (3; the world's tray base moved under her by the game, `trayAt`), the deck chair collapsing under her (7b), the gull on her head (20), soaked under a sprinkler, her sneeze and her squelch back (16), her hair a puff out of the sauna's steam, fanning herself and swooning (17), sooty out of Teppanyaki's flare, blinking and coughing out a puff (19; its greys on her hair's charcoal, `SOOT`). Each played by its mover (`ride.play`, the ship scene's `thingGag`). The door clips keep their own (muted) colours: only her pixels go on the palette |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
+| `tools/tempdir.py` | Where every tool puts what it makes (screenshots, sheets, the test browsers' profiles): the system's temp folder, or the one named in `BUMBUSIK_TEMP` (a parallel workspace names its own in `.claude/settings.local.json`; Claude Code keeps `TEMP`, `TMP` and `TMPDIR` to itself). `python tools/tempdir.py` prints it; "`%TEMP%/bumbusik-playtest`" in this file means that folder's |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder. **On the stepped clock** (`docs/plan-fast-tests.md`, built 2026-11-18): once a page is loaded the test stops the game's loop and steps it itself, a sixtieth of a second a frame, undrawn unless a screenshot is wanted (`takeover`, `Browser.advance`); every wait in a scenario is `wait()`, every deadline `now()`. `-j 6` a process and a browser for each scenario, six at a time (the whole suite in about a minute); `--failed` those that failed last time; `--times` each one's time; `--real` real time, for comparing; `--seed N` the random draws' seed. `boot` and `sound` always run in real time. A scenario's cases: `scenario_region4__towels` is `region4.towels`, and `region4` runs it with the rest. The other tools that use `Browser` (`check_overlaps`, `shoot_people`, `render_ship`) are stepped too, `--real` for the old way; `check_sound` is real |
 
 ## Rules that are easy to break
@@ -146,7 +158,8 @@ meant five).
 
 ## Art: PixelLab (MCP)
 
-- Generations cost money (Tier 1 month: 2000 generations until 2026-11-30). **State the cost and
+- Generations cost money (Tier 2, 5,000 a cycle; 4,388 left on 2026-11-18, refilled 2026-12-16;
+  `get_balance` says what is left). **State the cost and
   ask before spending generations.** Several jobs can run at once. **Except for pictures (the user,
   2026-11-16): "Don't hesitate to generate new/updated props in order to implement things properly
   visually. Use the generations."** A new or better prop, figure or clip that makes a thing look
@@ -584,7 +597,10 @@ Lessons learned (2026-11-18, Teppanyaki's flares):
 
 ## Working with the user
 
-- **Start each session from `GAME_DESIGN.md` §8 "Next up"**: it records where work stopped. The
+- **Start each session from `docs/plan-the-rest.md`** (what is left, and whose half it is), and in
+  a parallel workspace from `CLAUDE.local.md` and that session's notes file. `GAME_DESIGN.md` §8
+  records how the work went; its last entry's end says where it stopped, its "Next up" heading
+  is of 2026-11-03 and many of its boxes are long built. The
   user works on one computer but often starts new sessions, and power outages have cut sessions
   off (2026-11-07), so progress lives in the repo (design doc, this file, commits, pushed to
   `main` once approved), never only in local memory or uncommitted files.
