@@ -781,6 +781,34 @@ is seen when she is hit.
 Shown: each gag as a strip of its frames in place, and the link to its spot with
 `&tangerines=infinite&pocket=off`.
 
+**Revision (2026-11-18): deck 9's midships corridor is the way (GAME_DESIGN.md, region 4;
+docs/population.md's table; decided by the user, nothing of it built).** The one placement this
+step moves, on the user's word: the vacuum, the towel stack and the sprinkler stood on an
+optional stretch, since the steward gave the card at 122 m.
+
+- **Data (`tools/population.py`):** `PUSHABLES["cart_steward"]` to `(9, 185.2, 189.0, ...)`;
+  `npc_steward` to `at=(9, 186.0)`. The story's part (`updateHousekeeping`, `stewardThanks` in
+  `story.js`) places him by the cart and needs no change: tried in a copy, both states stand
+  right.
+- **The map (`tools/build_ship_map.py`):** `part-door-9-194`'s lock from none to `oneway:-1`, as
+  decks 8 and 10 have it. Check what else leans on that door being free (the `region4` scenario,
+  anyone's loop through it).
+- **The corridor's own things at his new place:** the wall picture near 189.7 m moves out of the
+  freed trolley's way by rule (as the towel stack's did, `drawCabinDoors`' kind of rule, not by
+  hand); the small housekeeping cart by the cabin door at 188 m is left out there.
+- **What stays as she left it:** the towel stack fallen (its heap, crossed on the way back), the
+  luggage stack broken. See what the save and the movers keep today; add what is missing.
+- **Nothing new is drawn:** the trolley, his tug, his steps and his toss as approved
+  (2026-11-17). Shown to the user in place all the same, jammed and freed, before the playtests.
+- **Proposed, to judge in play:** a crew-door checkpoint just past the sprinkler, only if the
+  stretch from `cp_9_arrive` to the steward with no tangerine proves harsh.
+- **Playtests:** `region4` (its order changes: the corridor first, then the trolley, the card,
+  the way back, the linen room; the door at 194 shut from the lobby, open after), `vacuum`,
+  `mishaps` when it exists; `tools/check_overlaps.py` (must list nothing), `tools/check_corridors.py`
+  (its numbers for deck 9 given).
+- **Docs when built:** the rows of docs/population.md's table themselves, GAME_DESIGN.md's
+  region 4 (its "corridor's life" and "Blocks"), `docs/progress-decisions.md`.
+
 ### Step 5. The rest of the twenty (art: about 12 small pictures, shown first)
 
 - The other placements of §4.1 (those not paid by a delivery).
@@ -991,3 +1019,4 @@ promenade's enclosed ends: "Leave as they are for now."
 | (The user's own) | "Also, add a general rule: use generations instead of attempting to draw by itself, or reuse part of props from other scenarios" |
 | (The user's own) | "Rework the tangerine sprite to make it a bit more detailed and look like a tangerine" |
 | (The user's own) | "Collected tangerines should fly into her tangerine meter above" |
+| (2026-11-18) Deck 9's vacuum, towel stack and sprinkler are on an optional stretch: make that part of the corridor required? Where does the steward go: just past the sprinkler (152 m) or the corridor's aft end? | "What would you recommend here for the most fun and varied gameplay?"; on the recommendation (the aft end; the luggage stack kept; the roll cut to about 4 m; the way back changed, not repeated; the picture rehung, the small cart out; the glass door at 194 one-way from the corridor): "Ok, I accept your recommendation here, and the suggested fixes" |

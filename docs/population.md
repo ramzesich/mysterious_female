@@ -568,6 +568,22 @@ the corridor at 118, not here.
 | 190 | `cp_9_mid` | A crew door | Checkpoint | |
 | 194 | the lobby door | Open (region 4 includes the aft lobby); deck 9 aft's corridor door shut from the lobby (`door_9_aft_lobbies`) | | |
 
+**Decided (the user, 2026-11-18), not built: the corridor is the way** (GAME_DESIGN.md, region 4).
+The table above is what is built. The rows that change:
+
+| m | Id | What changes |
+|---|---|---|
+| 185.2 | `haz_cart_steward` | Here, not at 122: jammed across the corridor, E at its forward end and walk east, it rolls to 189.0 (3.8 m) and stands back against the wall, short of the checkpoint's door (drawn at 191.6) |
+| 186 | `npc_steward` | With it, as now: the tug, the steps back, the card tossed (`scn_card_hk`) |
+| 141.6 | `haz_towels_9` | Once fallen it stays fallen, so the way back crosses its heap |
+| 180 | `haz_luggage_9` | Unchanged, and now on the way: the lunge, or the adjoining cabins; once broken it stays broken |
+| 188 | (the corridor's own) | The small housekeeping cart by this cabin door goes; the wall picture at about 189.7 hangs in the nearest empty gap |
+| 194 | the lobby door | `oneway(the corridor)`, as decks 8 and 10: shut from the aft lobby until she opens it from the corridor |
+
+Tried in a copy of the game (2026-11-18, the two positions only): the trolley and the steward
+stand clear of every door, jammed and freed; she steps out of the adjoining cabins' aft door
+(184) about 1.2 m from the jammed trolley, with room to push.
+
 **The aft hallway 202-249.5 (region 7), "the sprinkler test".** 206 `haz_swing_9a`; 214 and 222
 `haz_sprinkler_9a`, `haz_sprinkler_9b`, two sprinklers 8 m apart out of phase (`timed(5, 2)` each,
 offset 2.5 s): a rhythm to run; 225 `room_balcabin_9a` (the ajar door, the way in); 230

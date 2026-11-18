@@ -2526,3 +2526,34 @@ here" 7); each built step is gone back over under its "Revision".
   in the plan's step 5; the third is in GAME_DESIGN.md §6.1.15.
 - Written: GAME_DESIGN.md §6.1.2 (the table, the two places) and §6.1.15; docs/plan-three-uses.md
   §4.1, step 5's revision, §7, the answers; docs/population.md §2.2. No generations, no playtest.
+
+## Deck 9's corridor becomes the way: the steward to its aft end (2026-11-18; the documents only, nothing built)
+
+- **The user's question:** whether the sprinkler's gag is planned (it is: mishap 16, step 4a, not
+  in its first batch), and whether the corridor of the darting vacuum, the towel stack and the
+  sprinkler has to be crossed to go on. **It does not:** the trunk comes up at 118 m, the steward
+  is at 122, the card opens the linen room at 112, and all three stand aft of him, on a stretch
+  of rewards.
+- **Decided by the user** ("I accept your recommendation here, and the suggested fixes"): the
+  steward and his trolley go to the corridor's aft end, so the card is earned past everything
+  and brought back. The route plan is untouched (the trunk, the card, the linen room, the duct).
+- **Mine, accepted with it:** the aft end, not just past the sprinkler at 152 m (six different
+  things on the way, the luggage stack as the deck's one puzzle with two answers, the balcony
+  cabin's green door a tease out and a reward back; the price is a walk back of about 74 m); the
+  trolley's roll cut from 7.4 m to 3.8 (185.2 to 189.0), the checkpoint left where it is; the way
+  back changed, not repeated (the stack stays fallen, the luggage broken); the wall picture
+  rehung and the small housekeeping cart taken out at his new place; the glass door at 194 m
+  one-way from the corridor, like decks 8 and 10, so that she cannot come up behind him by deck
+  7 and the aft stairs (it had no lock: found when the user asked).
+- **Options set aside:** the steward at 152 m (the shorter errand: only the three obstacles);
+  the card apart from him (in the cabin being cleaned, or on a second cart: his approved toss
+  would lose its use); the hazards moved forward of him (the towel stack's place was just
+  fitted); the linen room or the trunk moved (the ship's layout).
+- **Proposed, to judge in play:** a checkpoint past the sprinkler, if the way out with no
+  tangerine proves harsh.
+- **Tried, outside the repo:** the two positions in a copy of the committed game in the temp
+  folder (`git archive`, its own map built, a muted headless browser on ports of its own; the
+  other session's folder untouched): two strips shown to the user, jammed and freed. The
+  checkpoint's door is drawn at 191.6 m, not 190. No playtest scenario run.
+- Written: GAME_DESIGN.md (region 4), docs/population.md (the corridor's table, a note under
+  it), docs/plan-three-uses.md (step 4a's revision, the answers). For the building session.

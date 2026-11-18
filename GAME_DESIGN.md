@@ -1097,6 +1097,31 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 - **Hazards:** standing carts to hop; the swinging door; **the towel stack** (hidden: it falls on her
   as she runs past the mid-cleanup cabin); **the sprinkler** (hidden, in a doorway, its wet-floor sign
   in the muted background); the vacuum in the mid-cleanup cabin, its second and last place.
+- **The corridor is the way. Decided (the user, 2026-11-18); not built.** As built, the steward
+  stands at 122 m, four metres from the trunk's door, so the card is hers before the vacuum, the
+  towel stack and the sprinkler, and everything aft of him is optional. **The steward and his
+  jammed trolley move to the corridor's aft end** (the trolley jammed at 185.2 m, rolling to
+  189.0 m, 3.8 m instead of 7.4; he at its handle as now), between the adjoining cabins' aft door
+  (184 m) and the checkpoint's crew door (drawn at 191.6 m). The route plan does not change (the
+  trunk up to 118 m, the card, the linen room at 112 m, the duct): what changes is where the card
+  is earned. She goes down the whole corridor (the honeymoon couple, the vacuum, the towel stack,
+  the sprinkler, the balcony cabin's green door still locked, the swinging door, the "Do Not
+  Disturb" door, the cart to hop, the luggage stack), frees the trolley, is tossed the card, and
+  comes back to the linen room.
+  - **The luggage stack stays as it is**, full height, with its two answers (the lunge, or the way
+    through the adjoining cabins): the one puzzle on this deck's way.
+  - **The way back is the corridor changed, not the corridor again:** the towel stack stays
+    fallen and the luggage stays broken if she broke it; the door, the vacuum and the sprinkler
+    reach her from the other side (other scenarios of docs/plan-three-uses.md §1.6); the balcony
+    cabin at 150 m opens to the card now: its checkpoint, its tangerine, Bumbot's glimpse.
+  - **The glass door at 194 m is shut from the aft lobby's side** until she opens it from the
+    corridor, like the same doors on decks 8 and 10: she cannot come up behind him by deck 7 and
+    the aft stairs. Opened once, it stays open, and that loop is a second way back.
+  - **At his new place:** the wall picture the freed trolley and he would stand over is hung in
+    the nearest empty gap; the small housekeeping cart by the cabin door at 188 m is taken out.
+  - **To judge in play (Proposed):** on the way out nothing is lit between her arrival
+    (`cp_9_arrive`, 119.6 m) and the steward. If that proves harsh, one crew-door checkpoint just
+    past the sprinkler.
 - **Checkpoints:** deck 9, a crew door at the corridor's aft end (190 m); the laundry's door (deck 4).
 - **The book:** the honeymooners' (above).
 - **Secrets:** the duct's grilles (peeks into cabins: a snoring passenger, a cabin full of balloons);
