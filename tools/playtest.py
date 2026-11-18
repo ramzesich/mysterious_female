@@ -44,10 +44,11 @@ import websocket
 from build_ship_map import (ATRIUM, CORES, FUNNEL, POOL_OPENING, POOLS, PROMENADE, ROOF_ROW, STAGE, TILE, TRUNKS, col, exact_x,
                             floor_y, region_at, walk_y, x_of)
 from ship_layout import CARD_SPOTS, CREW_DECK, DOOR_LOCKS, END_WALL_LOCKS, FLIGHT_LOCKS
+from tempdir import TEMP
 
 ROOT = Path(__file__).resolve().parent.parent
 CHROME = os.environ.get("CHROME", r"C:\Program Files\Google\Chrome\Application\chrome.exe")
-OUT = Path(tempfile.gettempdir()) / "bumbusik-playtest"
+OUT = TEMP / "bumbusik-playtest"
 
 KEYS = {
     "left": (37, "ArrowLeft", "ArrowLeft"), "right": (39, "ArrowRight", "ArrowRight"),
@@ -134,7 +135,7 @@ class Browser:
         threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
 
         self.debug_port = free_port()
-        self.profile = tempfile.mkdtemp(prefix="bumbusik-chrome-")
+        self.profile = tempfile.mkdtemp(prefix="bumbusik-chrome-", dir=str(TEMP))
         # (A script stopped by a timeout or an error does not take its browser with it otherwise:
         # five were found still running, 2026-11-18.)
         self.closed = False
@@ -5076,7 +5077,7 @@ def clean_leftovers():
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
     gone = 0
-    for d in Path(tempfile.gettempdir()).glob("bumbusik-chrome-*"):
+    for d in TEMP.glob("bumbusik-chrome-*"):
         if d.is_dir() and norm(d) not in used:
             shutil.rmtree(d, ignore_errors=True)
             gone += 1

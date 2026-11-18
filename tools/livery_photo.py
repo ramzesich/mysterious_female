@@ -23,9 +23,10 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_ship_map as b  # noqa: E402
 from build_livery import ORIGIN, SCALE, SRC, TILES  # noqa: E402
+from tempdir import TEMP  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = Path(os.environ.get("TEMP", "/tmp")) / "bumbusik-playtest" / "livery"
+OUT = TEMP / "bumbusik-playtest" / "livery"
 TOP, BOTTOM = 640, 1830           # map rows straightened (the photo's layout, before the user's moves)
 
 

@@ -22,10 +22,11 @@ from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from playtest import Browser  # noqa: E402
+from tempdir import TEMP  # noqa: E402
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    out = Path(args[0]) if args else Path(os.environ["TEMP"]) / "bumbusik-playtest" / "exterior"
+    out = Path(args[0]) if args else TEMP / "bumbusik-playtest" / "exterior"
     out.mkdir(parents=True, exist_ok=True)
     b = Browser(stepped="--real" not in sys.argv)
     try:
