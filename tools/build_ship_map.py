@@ -1022,7 +1022,7 @@ def build_objects():
     # at it), forward of deck 10's trays (3: run aft onto them), aft of the pool's wet patch and its
     # deck chair (7b: walk forward past the chair onto the patch), and on the balcony with deck 9's
     # second rail gull (20: stand by it).
-    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156)]:
+    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156), ("sprinkler9", 9, 144)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))

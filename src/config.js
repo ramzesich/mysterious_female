@@ -290,7 +290,7 @@ export const MISHAP_SCENES = {
     '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // a basketball
     '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
     '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
-    '16': { word: 'drenched', react: 'shiver', toss: 'drop' },                  // a sprinkler
+    '16': { word: 'drenched', react: 'shiver', toss: 'drop', gag: 'sprinkler', pocket: false },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
     '17': { word: 'fogged', react: 'splutter', toss: 'drop', down: 'sit' },     // the sauna's steam
     '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
     '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
@@ -364,6 +364,9 @@ export const GAGS = {
     tray: { holdMs: 600, speed: 260, accel: 300 },
     chair: { holdMs: 1300, slideMs: 450 },
     gull: { holdMs: 400 },
+    // The sprinkler (16): from her run she slides to a stop over `slideMs`; soaked, she stands
+    // `holdWetMs`, sneezes (its sound `sneezeAtMs` in), and squelches off at `walkV` px/s for `walkMs`.
+    sprinkler: { holdMs: 150, slideMs: 330, holdWetMs: 250, sneezeAtMs: 450, walkV: 26, walkMs: 1300 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out

@@ -22,6 +22,13 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
   door-burst-full  the same swing as door-burst in the full-colour door's own colours (the muting taken
                 back out, exactly: `starts/fullcolour.py`): a "Do Not Disturb" door opening on the
                 guest and shutting (the user, 2026-11-18: it vanished with its frame)
+  sprinkler-stand  16: from her standing frame, drenched: she flinches, her hair falls flat over her
+                face (frame 8: her soaked picture, `starts/sprinkler/wet-9b13cff9-...png`); her middle
+                at x 64
+  sprinkler-run1, -run3, -run5, -run7  16: the same from her run frames 1, 3, 5 and 7 (her middle at
+                x 54 in frame 0): she stops short in two steps, ending on the soaked picture at x 64
+  sprinkler-sneeze  16: soaked, a sneeze (from and back to the soaked picture)
+  sprinkler-walk  16: soaked, squelching off, a walk loop on the spot (the game moves her)
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -36,7 +43,9 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "her-mishaps" / "batch-4a"
 CELL, COLS = 128, 13
 CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride", 9), ("tray-ride3", 9), ("tray-ride1", 9), ("tray-ride5", 9),
-         ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13)]
+         ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
+         ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
+         ("sprinkler-sneeze", 9), ("sprinkler-walk", 9)]
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
 
 
@@ -84,7 +93,8 @@ def main():
                                         "1": {"key": "tray-ride1", "toe": 12, "trayAt": [66, 64, 63, 61, 59, 58, 56, 54, 53]},
                                         "5": {"key": "tray-ride5", "toe": 13, "trayAt": [67, 67, 67, 67, 66, 64, 62, 59, 57]}}},
             "chair": {"x": 64, "chair": 46},
-            "gull": {"x": 54}}
+            "gull": {"x": 54},
+            "sprinkler": {"x": 64, "run": 54}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

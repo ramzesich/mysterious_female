@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER, CRY } from '../config.js';
+import { PLAYER, CRY, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -312,6 +312,10 @@ const HANDLE = 26;
 // 2026-11-17: "an invisible wall").
 const TROLLEY = { w: 21, h: 18, dome: [10, 7, 1] };
 const realDoors = (s, d) => (d.real ??= d.doors.filter(x => (s.cabinDoorsDrawn ?? []).some(c => c.y === d.y && Math.abs(c.x - x) < 6)));
+// Her run's frame now (0 to 7), or -1 when she is not running (on her run's clip, moving): a gag
+// drawn from each quarter of her stride starts on an odd one.
+const running = (p) => p.anims.currentAnim?.key === 'her-run' && p.anims.isPlaying && Math.abs(p.body?.velocity.x ?? 0) > 20;
+const runFrame = (p) => (running(p) ? p.anims.currentFrame.index - 1 : -1);
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 800 && Math.abs(s.player.y - d.y) < 300;
 
 // The robot vacuum in the doorway of the cabin being cleaned (population: `haz_vacuum_9`). Its red
@@ -612,6 +616,62 @@ export class Sprinkler {
         this.wet = 0;
     }
 
+    // 16, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): drenched, her hair falls
+    // flat over her face, where she stands, or stopping short from her run (a clip from each quarter
+    // of her stride, her run frame 1, 3, 5 or 7: the hit waits for one, `runFrame`), sliding to a stop
+    // (`slideMs`); a sneeze; and she turns round and squelches off (`walkV` px/s for `walkMs`, or to
+    // a wall) back the way she came (the user, 2026-11-18), then her checkpoint.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, g = GAGS.sprinkler;
+        return {
+            play: (done) => {
+                const m = s.cache.json.get('gags-meta'), n = runFrame(p);
+                let dir = p.flipX ? -1 : 1;
+                const run = n % 2 === 1, clip = run ? `gags-sprinkler-run${n}` : 'gags-sprinkler-stand';
+                // (Each clip ends on her soaked picture at the cell's middle; from her run, frame 0
+                // has her middle `run` px short of it.)
+                const pic = s.add.sprite(p.x + (run ? dir * (m.sprinkler.x - m.sprinkler.run) : 0), d.y, 'gags')
+                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+                this.world.add([pic]);
+                this.pic = pic;
+                pic.play(clip);
+                let t = 0, stage = 'stop', end = 0, stepAt = 0;
+                pic.once(`animationcomplete-${clip}`, () => s.time.delayedCall(g.holdWetMs, () => {
+                    stage = 'sneeze';
+                    pic.play('gags-sprinkler-sneeze');
+                    s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).sneeze());
+                    pic.once('animationcomplete-gags-sprinkler-sneeze', () => {
+                        stage = 'walk';
+                        t = 0;
+                        // (Turned round: back the way she came.)
+                        dir = -dir;
+                        pic.setFlipX(dir < 0);
+                        end = s.stopShort(pic.x, pic.x + dir * g.walkV * g.walkMs / 1000, d.y, 16);
+                        pic.play('gags-sprinkler-walk');
+                    });
+                }));
+                s.script = (dt) => {
+                    t += dt * 1000;
+                    if (stage === 'stop' && run && t < g.slideMs) pic.x += dir * PLAYER.runSpeed * (1 - t / g.slideMs) * dt;
+                    if (stage === 'walk') {
+                        pic.x += dir * Math.min(g.walkV * dt, Math.max(0, (end - pic.x) * dir));
+                        if (t > stepAt) { stepAt = t + 500; sfx.at(pic.x, d.y).splashSmall(); }
+                        if (t >= g.walkMs || Math.abs(end - pic.x) < 0.5) {
+                            stage = 'done';
+                            pic.anims.pause();
+                            done();
+                        }
+                    }
+                    p.x = pic.x;
+                };
+            },
+            show: () => {
+                this.pic?.destroy();
+                this.pic = null;
+            },
+        };
+    }
+
     // Where it is in its round: 'tell', 'on' or 'off'.
     phase(time) {
         const d = this.def, t = (time / 1000 + d.offset) % d.period;
@@ -621,7 +681,9 @@ export class Sprinkler {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, g = this.rain.clear();
         // (Out on the ship's side the hallways are behind its plating.)
-        if (!nearby(s, d) || s.route === 'promenade') return;
+        // (Its rain and its sound only while she is on its deck, as everything else on a deck she is
+        // not on stands still: deck 8's, under deck 9's, rained through the floor.)
+        if (!nearby(s, d) || s.route !== 'inside' || Math.abs(p.y - d.y) > 72) return;
         const phase = this.phase(time), top = d.top + 16;
         // (Its sound, once in each round: the ticks of the tell, then its rain for what is left of it.)
         const round = (time / 1000 + d.offset) / d.period, key = phase + Math.floor(round);
@@ -649,7 +711,7 @@ export class Sprinkler {
             }
             if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
                 if (this.world.carry) this.world.carryBox.spill(d.x, false, 'sprinkler');
-                else s.scareContact(d.x, 'sprinkler');
+                else if (runFrame(p) % 2 !== 0) s.scareContact(d.x, 'sprinkler', { ride: this.ride() });
             }
         } else {
             this.wet = Math.max(0, this.wet - dt / 2.2);

@@ -2712,3 +2712,30 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
 - No new art: her own clips. `peekBed` in `src/world/world.js`, the quirk `sec_peek_sea` (`gag: "bed"`).
 - **Tests:** `region5` (changed: nothing on standing still, E in and bouncing cut to the door, back out,
   a find) and `boot` pass.
+
+## Step 4a's second batch: the sprinkler's gag (16), built (2026-11-18)
+
+- **What she does** (`Sprinkler.ride` in `src/world/movers.js`, played by the ship scene's `thingGag`;
+  `gags` sheet, `sprinkler-*`): in its rain she flinches and her hair falls flat over her face, where she
+  stands, or stopping short from her run (a clip from each quarter of her stride, run frames 1, 3, 5, 7;
+  the hit waits up to a frame for one), sliding to a stop; a sneeze; then she turns round and squelches
+  back the way she came (the user, on seeing it: "make her always return to the direction she came
+  from"), slowly, and her checkpoint. Her word "Brrr!" as before.
+- **Made:** her soaked picture by `edit_image_pro_flash` from her standing frame (two tries, 10
+  generations; the second drifted to a blue-black mop), then PixMiniMax clips (10 generations, 1 each)
+  from her built sheet's frames to it: the first drench and run-stop drew a thick water column and the
+  first sneeze uncovered her face; redone describing her body only. Checked frame by frame: eight frames
+  1 px over the floor set down, loose specks out, the water drops kept. Left: her blouse greys for one
+  frame in two run-stops as it soaks; her hair streams back at the sneeze's peak. 20 generations.
+  `assets/source/her-mishaps/batch-4a/` (README).
+- **The user: "Hard to understand like this, let me see it in the game"**: strips of loose frames on a
+  plain backdrop did not show it; it was put in the game and shown from there (a `sprinkler9` place).
+- **Deck 8's sprinkler rained through the floor** (the user: "do we have another sprinkler on the deck
+  below?"): it stands at 148 m right under deck 9's, and its rain, drawn above her layer, showed through
+  the darkened deck, in step with the one above. A sprinkler's rain and sound now only while she is on
+  its deck (the user declined different rain patterns: "No need").
+- **The second exception to the tangerines** (the user, on finding no difference with tangerines on, then:
+  "let's do this as another exception: the wet gag regardless of the tangerines"): `pocket: false`, as the
+  dog's lead; she keeps them all and goes back to her checkpoint. (The difference they had not seen: the
+  test link carried `&pocket=off`.) A tray in her hands still spills.
+

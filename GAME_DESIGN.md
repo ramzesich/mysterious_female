@@ -2479,8 +2479,11 @@ Nothing blocks the start of the build. These get settled along the way:
       **Done (2026-11-18): the one-way doors' push bar** (shut: the bar's end and a closer on the free
       side; open: the steel bar across the leaf; they swing away from the free side; propped open for good
       once she has come through).
-      **Next: the rest of step 4a's gags** (the
-      sprinkler's 16 among them). Waiting with it: the books' covers and
+      **Done (2026-11-18): the sprinkler's gag (16)**: soaked, her hair plastered over her face, a sneeze,
+      and she squelches back the way she came; whatever she carries (the second exception to the
+      tangerines, with the dog's lead); a sprinkler rains only while she is on its deck.
+      **Next: the rest of step 4a's gags** (the second batch: 17 the steam, 19 the flares, 21 and 22 the
+      gulls, 23 the "Do Not Disturb" doors, proposed). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

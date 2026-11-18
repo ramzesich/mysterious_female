@@ -15,6 +15,11 @@ its input. About 36 generations in all.
 | `chair-collapse/` | 7b: from her slip frame 0 with the world's deck chair at her heels: it takes her behind the knees, she sits, it collapses flat under her, her feet up. The plan's "folds shut on her" did not come in four tries; the user took the collapse | `3a71c18b-9cd2-470a-bc94-fa512c50e4a3` (start `starts/c7b2-slip0.png`) |
 | `gull-flail/` | 20: the world's gull landed on her head, she flails at it and breaks into a run; the world's own gull pasted back where it only sits (frames 1, 2, 5, 8), specks removed, every frame on the floor line (`starts/fix.py`) | `179d3b76-b158-4896-9213-30b70952a586` (from `starts/g20-stand.png` to `g20-run.png`) |
 | `gull-run/` | 20: running off flailing, the gull on her head (a loop); the same fixes | `1995dc00-cdd6-44c8-89e1-45f9b3d02810` (`g20-run.png` to itself) |
+| `sprinkler-stand/` | 16 (2026-11-18): from her standing frame, soaked: she flinches, her hair falls flat over her face; frame 8 her soaked picture (`starts/sprinkler/wet-9b13cff9-....png`, `edit_image_pro_flash` `9b13cff9-439d-4cde-84b6-8403b239d72b`, 5 generations, of her standing frame on 96 px: `stand96.png`) | `bca6de50-f866-4500-8e1a-a020dcf0b1a8` |
+| `sprinkler-run1/`, `-run3/`, `-run5/`, `-run7/` | 16: from her run frames 1, 3, 5, 7 (her middle at x 54) she stops short in two steps, to the soaked picture at x 64 | 1: `2664b9b8-b23d-4bcd-8a59-308e01e1bcbe`; 3: `3cdcece7-a9b7-435c-b56f-6ae82474992c`; 5: `843e3b98-33bd-4bef-bec3-3132b6bebd2d`; 7: `245e069b-b571-4c86-82ab-cfc587541e85` |
+| `sprinkler-sneeze/` | 16: soaked, a sneeze, back to the soaked picture | `1c644093-c296-4505-a266-bdc922e341f6` |
+| `sprinkler-walk/` | 16: soaked, a slow walk loop on the spot (the game moves her, 26 px/s) | `0a304ca6-c8b0-42f2-8714-1639c90d737c` |
+| `starts/sprinkler/` | 16's start pictures (`starts.py`), the fixes (`fix.py`: frames 1 px up set down, loose specks out unless water), the strips first shown (`present.py`, `show16-*.png`) | made here |
 | `starts/` | The start and end pictures, the scripts that made them and mended the frames (`starts.py`, `starts2.py` from her built sheet, `door_starts.py`, `fix.py`, `dfix2.py`, `fullcolour.py`, `retray.py`, `analyze.py`: bounds, loose specks, colours per frame), and the review sheets shown to the user (`final-*.png`) | made here |
 | `raw/` | Every job's frames as downloaded, used or not | |
 
@@ -26,3 +31,8 @@ pose (`70a8095c-46e3-4275-80b2-aba40c85e684`) and three tries at the fold (`ad67
 (`58996240-9113-48bc-863c-cba06ef7fa27`: its doorway turned brown); two more detailed trays from the stewardess's
 (`edit_image_pro_flash` `88d1fd22-206e-4bd1-be0b-a817c7f50460`, `6f595933-63d7-4960-9d6e-508bc804397e`, 5 each: muddy
 at that size, the user kept hers).
+
+Not used for 16 (in `raw/sprinkler/`, by name): `drench-*` and `run7-*` drew a thick water column over her
+(`cc834c57-76e0-45d7-b4fd-ad03ce81787a`, `e5d7e53f-b7f8-4f96-82b8-323163ba5939`), `sneeze-*` uncovered her face
+(`3900bd96-da26-45bb-b075-e8028af76257`); the second soaked picture, a blue-black mop
+(`edit_image_pro_flash` `889de6ce-800e-4496-a05b-558d888a0af9`). 20 generations for 16 in all.

@@ -83,6 +83,7 @@ new one added there should be added here too.
 | `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10&pocket=off> |
 | `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair: 7b) | <http://localhost:8000/?play&at=wet&pocket=off> |
 | `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9&pocket=off> |
+| `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9&tangerines=infinite> |
 | `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all&tangerines=infinite> |
 | `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all&tangerines=infinite> |
 
