@@ -2739,3 +2739,23 @@ The second of the other session's decided revisions (docs/plan-three-uses.md, st
   dog's lead; she keeps them all and goes back to her checkpoint. (The difference they had not seen: the
   test link carried `&pocket=off`.) A tray in her hands still spills.
 
+
+## A plan for fast playtests: the stepped clock (2026-11-18; a plan only, nothing built)
+
+- **The user:** the tests take too long even when only the relevant ones are run, without the
+  sound's; "come up with a smart solution to speed up the development cycle without compromising
+  on QA".
+- **Found:** the tests wait in real time (650 sleeps, every walk a key held for real seconds), in
+  one browser, one scenario after another; the region scenarios are single functions of 55 to 70
+  checks. The test browser already draws on the graphics card, so nothing is to be gained there.
+- **Measured in a copy of the game:** a frame not drawn costs about 0.2 ms against 10.6 ms drawn
+  (600 game seconds in 6.7 s); her run and her jump come out the same stepped as in real time;
+  timers follow a stepped clock, tweens only once `Date.now` returns it.
+- **The plan (docs/plan-fast-tests.md):** the test stops the engine's loop after a page loads and
+  steps the game itself, undrawn but for screenshots; every wait in `tools/playtest.py` goes
+  through one clock, so no scenario is rewritten; then scenarios side by side, only-the-failed,
+  times per scenario, smaller cases as scenarios are next touched. `sound` and `boot` stay in real
+  time; `--real` keeps today's way for comparing. Its first step ends with two scenarios run both
+  ways and shown to the user.
+- **Also found:** five test browsers left running by scripts that had ended (2.6 cores, 2 GB);
+  closed with the user's leave. The plan's runner closes such leftovers itself.
