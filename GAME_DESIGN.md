@@ -881,7 +881,7 @@ Polish letters, Russian and Ukrainian Cyrillic, and Hebrew, right to left.
 | 8 | Niebieskie nitki | Małgorzata Gutowska-Adamczyk | The old lady's sunbed, after the horn |
 | 9 | Двор | Аркадий Львов | The engineer's, at the funnel's top |
 | 10 | Боря, выйди с моря | Рафаил Гругман | The captain's, on the bridge's chart table |
-| 11 | נערה במעיל כחול | Monica Hesse | The boat walkway's end, beyond the boat drill |
+| 11 | נערה במעיל כחול | מוניקה הסה | The boat walkway's end, beyond the boat drill |
 | 12 | Poczwarka | Dorota Terakowska | Deck 8 midships, the thanks for the flowers |
 | 13 | Daughters of Warsaw | Maria Frances | Deck 10 midships, the thanks for the tea |
 | 14 | Pachinko | Min Jin Lee | Deck 9 forward, the end of the officers' corridor |
@@ -889,7 +889,8 @@ Polish letters, Russian and Ukrainian Cyrillic, and Hebrew, right to left.
 The fourteen titles and book 5's are the user's ("The order is random"). **Which title lies where
 is Decided** (proposed by what each name fits: the tango with the dancers, the sea with the captain,
 the chamber of secrets in the hidden lifeboat; the user, 2026-11-18: "Good"). Each spelling is checked against
-her copy's cover when its cover is made: the author of נערה במעיל כחול is written in Hebrew on hers.
+her copy's cover when its cover is made. Book 11's author is written as on her Hebrew copy (the
+user gave the spelling).
 
 **Ice cream (his machine).** The soft serve machine at the Great Outdoors' entrance is worked by her:
 **hold E and the swirl grows; release in the green band** for a perfect cone, early for a stub, late
