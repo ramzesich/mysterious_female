@@ -2573,3 +2573,55 @@ here" 7); each built step is gone back over under its "Revision".
   pair, the free leaf remade with it if they do not match.
 - Written: docs/plan-three-uses.md (step 4a's second revision, the answers), GAME_DESIGN.md
   (§6.1.2's table of locks), docs/population.md (the doors' row). No generations, no playtest.
+
+## Step 4a: the first batch of gags, built (2026-11-18)
+
+The plan's first four (13a, 7b, 3, 20), each the thing's own clip with her (`gags` sheet,
+`tools/build_gags.py`, sources and PixelLab ids in `assets/source/her-mishaps/batch-4a/README.md`),
+played by the thing itself (the ship scene's `thingGag`, `ride.play`). About 36 generations.
+
+- **The user's rule, made on seeing the first tries** ("Take a look at each of the generated gags
+  and look for: visual overlaps that make no sense; anything that breaks seamless transition,
+  visually or dynamically; that the anatomy makes sense in every situation; that everything is
+  aligned well spatially. Make this a rule"): every candidate checked frame by frame and measured
+  before it is shown (`CLAUDE.md`, "Art"). It found: start frames 1 px off her built sheet, a run
+  loop floating 3 px, a gull that changed between frames, her standing in a clip where the game
+  has her slipping, a hand over the open doorway, holes in the world's door picture that turned
+  dark in a clip.
+- **13a, the swinging door.** First shown with the leaf as the game drew it (a door picture
+  stretched in code): the user could not read it, and the door changed colour. Now its swing is
+  generated, the door alone and the same with her (slammed flat on the wall under the leaf, she
+  slides down), from the world's own muted shut door, the frame's left side and top its own
+  pixels. **From aft only** (the user: from forward "it looks broken"): from forward it never hits
+  her and waits to burst until she is clear of its swing (the user: "Visually, that makes sense";
+  left so). Coming at it from aft it waits for her (it burst while she was still too far).
+  **No tell** (the user: "Let the opening of the door surprise the player"): its rattle and shake
+  taken out. 13b is no more.
+- **Whoever looks out of a door** (six swinging doors, seven "Do Not Disturb" doors) is cut to the
+  doorway (the user: a boy's cap through the frame; a sun hat and a Hawaiian shirt's hat the same,
+  found at once) and stands on its threshold (it stood 2 px up). `People.doorway`: Phaser's crop
+  (the Mask filter hid them whole).
+- **The "Do Not Disturb" doors** swing open and shut in their full colours (the swinging door's
+  clip, its muting taken back out exactly), their frame kept (the user: the door "just disappears
+  together with the doorframe"). Kept in full colour: she can knock at them (the user's question;
+  their "All good").
+- **3, the tray.** The three flat bars "don't make any sense" (the user): one tray, the breakfast
+  stewardess's own; two more detailed tries came out muddy at that size and are not used. Run onto
+  at any step (four clips, one from each quarter of her stride, so the hop never holds or slows) or
+  jumped onto (the user: "I should also slide in the direction of the jump"), she rides it off the
+  way she was going; the world's own tray base moves under her (her clips are her alone), its
+  dishes fly off and lie on the floor; the door opens after on the guest looking after her. Found:
+  after a ride the tray stayed hidden where it was carried until she was 8 m away (now back at the
+  respawn); the trays it passed were ridden through (knocked aside first, then one tray only).
+- **7b, the deck chair.** The plan's fold "shut on her" did not come in four tries; the collapse
+  flat under her was offered and taken. She slid off the patch before the chair could catch her:
+  sliding in past it, it hardly rocks now. It stops short of the wet-floor sign.
+- **20, the gull.** It dives onto her head; standing, she flails and runs off with it; running, she
+  runs on. To the next partition, a wall, or out of the screen.
+- **Test places:** `door9`, `trays10`, `wet`, `gull9` (`docs/start-links.md`).
+- **Tests:** `boot`, `pocket`, `region4`, `region6`, `region7` pass; the rest not run.
+  `check_overlaps`: 0. Changed to the new rules: `region4` (the swinging door from aft slams her
+  flat; stopping short it bursts by itself; from forward it never hits her), `region6` and
+  `region7` (the tray ridden off, the door opening on the guest after; a tray far from its door
+  ridden as well). Found by them: after a ride the tray never re-armed when she came back at a
+  checkpoint far off (it stopped updating before its re-arm); fixed.

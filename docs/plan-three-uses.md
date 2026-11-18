@@ -744,26 +744,28 @@ is seen when she is hit.
 | Obstacle | Where its code is | Scenarios |
 |---|---|---|
 | The casino's chips | `Spill` in `movers.js` | 1: as built |
-| The trays on the floor | `Trays` in `hazards.js` | 3: the trip and the ride are the fright now; the door opens after, on the guest looking after her |
+| The trays on the floor | `Trays` in `hazards.js` | 3: the trip and the ride are the fright now; the door opens after, on the guest looking after her. **Built (2026-11-18):** one tray, the breakfast stewardess's own (the user: the three flat bars "don't make any sense"); run onto at any step of her stride (four clips, one each quarter) or jumped onto, she rides it off the way she was going, its dishes flying off behind her; the "Do Not Disturb" door swings open on the guest after |
 | Deck 9's vacuum | `Darter` in `movers.js` | 5a, 5b (step 4's clips). **Done (2026-11-17):** deck 4's picture, the ride the way it darted, back in its doorway after |
 | The towel stack | `TowelStack` in `movers.js` | 18. **Its rule (the user, 2026-11-17):** it falls on her the moment she passes it; she stops at it and waits while it falls. **Built, its pictures generated (2026-11-18):** its own clips (`towels` sheet, `tools/build_towels.py`): its fall and scatter alone; running past, the fall on her from her own run's phase, she running on into it; buried, then her head up in a towel turban with a towel swan on it. With a tangerine on her: the reel and a tangerine lost, the stack falling past her (her "bats the towels off" not made) |
 | (Not a mishap) the steward's jammed cart | `cart_steward`, `updateHousekeeping` in `story.js` | **Done (2026-11-17), the user's:** a tall trolley that shows the block, he and it one picture, his card tossed (`docs/progress-decisions.md`) |
-| The wet patch's deck chair | `WetPatch` in `hazards.js` | 7a, 7b, by the end she slid in from |
+| The wet patch's deck chair | `WetPatch` in `hazards.js` | 7a, 7b, by the end she slid in from. **7b built (2026-11-18):** from her slip frame the chair takes her behind the knees, carries her on, and collapses flat under her (the fold "shut on her" did not come in four tries; the user took the collapse); sliding in past it, it hardly rocks, so that it can catch her on so short a patch |
 | The jogger | `haz_jogger`, `world.touched()` | 9a to 9d; his sorry on the spot |
 | The kid's jet | `lido.js` | 11a, 11b; his laugh |
 | The stage's light | `SwingLight` in `movers.js` | 12a, 12b, by the way it swings |
-| The swinging doors | `SwingDoor` in `movers.js` | 13a, 13b, by her facing |
+| The swinging doors | `SwingDoor` in `movers.js` | 13a, 13b, by her facing. **13a built (2026-11-18):** the door's swing generated with her (the user: the leaf drawn in code was a picture stretched, and changed colour), slammed flat on the wall under the leaf, she slides down; the door alone the same swing. Only from aft, past its hinge (the user: from forward it never hits her); **no tell** (the user: "Let the opening of the door surprise the player"). 13b not made: no swing door hits her from the other side now |
 | The basketballs | `Balls` in `topdeck.js` | 14a, 14b |
 | The boat drill | `DrillBoat` in `outside.js` | 15 |
 | Sprinklers, the steam, the towels, the flares | `Sprinkler`, `Steam`, `TowelStack`, `Flare` | 16 to 19 |
-| The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22 |
-| "Do Not Disturb" doors, the occupied balcony | `DndDoor` in `movers.js`, `Occupied` in `outside.js` | 23, 24 |
+| The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22. **20 built (2026-11-18):** the gull dives onto her head; standing, she flails and runs off with it, running she runs on, out of the screen or to the next partition |
+| "Do Not Disturb" doors, the occupied balcony | `DndDoor` in `movers.js`, `Occupied` in `outside.js` | 23, 24. **(2026-11-18)** the door swings open and shut (the swinging door's clip in its full colours; it had vanished with its frame); anyone in a doorway is cut to its opening and stands on its threshold (`People.doorway`) |
 
 - **Art:** twenty-two gags of hers (3, 7a, 7b, 9a, 9b, 9c, 11a, 12a, 12b, 13a, 13b, 14a, 14b,
   15 to 23), the kid's laugh, the jogger's sorry. **Three batches of about eight, each shown to
   the user enlarged and numbered before anything of it is placed.** The first: 13a (flat behind
   the door), 7b (folded in the chair), 3 (on the tray), 20 (the gull on her head): the hardest
-  to get right. One that will not read after two tries is shown to the user with what could
+  to get right. **The first batch done (2026-11-18)**, approved in the game (`gags` sheet,
+  `tools/build_gags.py`; `docs/progress-decisions.md`). Each candidate is checked frame by frame
+  before it is shown (the user's rule of the same day, `CLAUDE.md`, "Art"). One that will not read after two tries is shown to the user with what could
   take its place, not re-rolled on and on.
 - **Each gag looked at as "Looking closely" asks:** her proportions held in every frame, the
   thing the size it is in the world, what holds it up, the same spot before and after (the

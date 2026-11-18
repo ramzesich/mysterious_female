@@ -6,12 +6,14 @@
 // locked out on his balcony, the security officer at the tender. Places come from maps/world.json
 // (`balcony`, `drill`).
 
-import { PLAYER, CRY } from '../config.js';
+import { PLAYER, CRY, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 import { FOOD } from './hazards.js';
 
 const M = 48;
+// Where a gull sits on her head: its feet this far over her floor (her head's top at 59).
+const HEAD = 57;
 const OUT = 'promenade';            // the outside route's name (src/world/world.js)
 const UNIT = 125;                   // a balcony, px
 const TOWELS = [0xf68181, 0x8fd3ff, 0xfbb954, 0xb9e04c, 0xffffff];
@@ -139,9 +141,66 @@ export class PerchGull {
         return true;
     }
 
+    // 20, the ship scene's `thingGag`: it has landed on her head (the world's gull hands over to their
+    // clip, `gags` sheet, tools/build_gags.py): standing, she flails at it and breaks into a run;
+    // running, she runs on; off she runs flailing with it sitting there, at her run's speed, out of
+    // the screen, or to the next partition or wall. Back from it, it flies back to its rail.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player, w = this.world;
+        const dir = p.flipX ? -1 : 1, running = p.anims.currentAnim?.key === 'her-run';
+        return {
+            play: (done) => {
+                this.state = 'onhead';
+                this.sprite.setVisible(false);
+                const m = s.cache.json.get('gags-meta');
+                const pic = s.add.sprite(p.x, d.floor, 'gags', m.anims['gull-flail'][0]).setOrigin((dir > 0 ? m.gull.x : m.cell - m.gull.x) / m.cell, m.floor / m.cell)
+                    .setFlipX(dir < 0).setDepth(p.depth);
+                w.add([pic]);
+                this.pic = pic;
+                if (running) pic.play('gags-gull-run');
+                else {
+                    pic.play('gags-gull-flail');
+                    pic.once('animationcomplete-gags-gull-flail', () => pic.play('gags-gull-run'));
+                }
+                // (The next partition ahead on her floor, or a wall: she runs no further.)
+                let end = s.stopShort(p.x, p.x + dir * 4800, d.floor, 8);
+                for (const g of w.grips) {
+                    if (g.route !== s.route || !g.over || Math.abs(g.y1 - d.floor) > 6) continue;
+                    const stop = g.x - dir * (g.w / 2 + 10);
+                    if ((stop - p.x) * dir > 0 && (stop - end) * dir < 0) end = stop;
+                }
+                let flapAt = 0, over = false;
+                s.script = (dt, time) => {
+                    if (over) return;
+                    const go = pic.anims.currentAnim?.key === 'gags-gull-run' || pic.anims.currentFrame.index - 1 >= 5;
+                    if (go) pic.x += dir * PLAYER.runSpeed * dt;
+                    if (time > flapAt) { flapAt = time + 380; sfx.at(pic.x, d.floor - 60).flap(); }
+                    p.x = pic.x;
+                    const view = s.cameras.main.worldView;
+                    if ((pic.x - end) * dir >= 0 || pic.x < view.x - 60 || pic.x > view.right + 60) {
+                        over = true;
+                        pic.x = (pic.x - end) * dir >= 0 ? end : pic.x;
+                        pic.anims.pause();
+                        done();
+                    }
+                };
+            },
+            show: () => {
+                const x = this.pic?.x ?? p.x;
+                this.pic?.destroy();
+                this.pic = null;
+                this.sprite.setVisible(true);
+                this.x = x;
+                this.y = d.floor - HEAD;
+                this.state = 'back';
+                this.at = s.time.now + 2600;
+            },
+        };
+    }
+
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
-        if (this.state === 'taking') return;
+        if (this.state === 'taking' || this.state === 'onhead') return;
         if (this.state === 'gone') {
             // (Back once she is well past it, or gone from here.)
             if (s.route !== this.route || Math.abs(p.x - d.x) > 4 * M || Math.abs(p.y - d.floor) > 100) {
@@ -179,12 +238,16 @@ export class PerchGull {
                 this.state = 'dive';
                 this.at = time + 230;
                 this.from = { x: this.x, y: this.y };
+                // (At food in her hands, down to it; else at her head, to land on it: 20.)
+                this.diveY = FOOD.includes(this.world.carry?.kind) ? d.floor - 30 : d.floor - HEAD;
                 sfx.at(this.x, this.y).gullDive();
             }
         } else if (this.state === 'dive') {
             const k = 1 - Math.max(0, this.at - time) / 230;
+            // (Onto her head if she is still under it: it follows her the last few px.)
+            if (Math.abs(p.x - this.targetX) < 17 && s.mode === 'play') this.targetX += (p.x + (p.flipX ? -1 : 1) - this.targetX) * Math.min(1, dt * 12);
             this.x = this.from.x + (this.targetX - this.from.x) * k;
-            this.y = this.from.y + (d.floor - 30 - this.from.y) * k * k;
+            this.y = this.from.y + ((this.diveY ?? d.floor - 30) - this.from.y) * k * k;
             this.sprite.setFrame('gull-down').setPosition(this.x, this.y);
             if (time > this.at) {
                 this.shadow.setVisible(false);
@@ -197,10 +260,12 @@ export class PerchGull {
                         this.world.carryBox.give();
                         this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
-                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite });
+                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite, ride: this.ride() });
                 }
-                this.state = 'back';
-                this.at = time + 2600;
+                if (this.state !== 'onhead') {
+                    this.state = 'back';
+                    this.at = time + 2600;
+                }
             }
         } else {
             // Up, round, and back to its rail (off it a while after her cry, wheeling over it).

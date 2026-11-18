@@ -2467,7 +2467,15 @@ Nothing blocks the start of the build. These get settled along the way:
       she is buried, and her head comes up in a towel turban with a towel swan on it (18); its towels
       redrawn soft (the user: "white bricks"); the heap behind her as she crosses it; the stack midway
       between two cabin doors (141.6 m), and the picture it had hidden hung in the nearest empty gap.
-      **Next: the first batch of step 4a's gags** (13a, 7b, 3, 20). Waiting with it: the books' covers and
+      **Done (2026-11-18): the first batch of step 4a's gags** (13a, 7b, 3, 20; `gags` sheet,
+      `tools/build_gags.py`): the swinging door bursts open with no tell and, from aft, slams her flat on
+      the wall; one tray, the stewardess's, ridden off whichever way she ran or jumped onto it; the deck
+      chair collapses under her; the gull rides off on her head; the "Do Not Disturb" doors swing open
+      and shut with their frames, and anyone in a doorway is seen only through it.
+      **Next: what the other session decided for deck 9 and the one-way doors** (docs/plan-three-uses.md,
+      step 4a's two revisions of 2026-11-18: the steward and his trolley to the corridor's aft end; the
+      push bar on the one-way doors, generated and shown first), **then the rest of step 4a's gags** (the
+      sprinkler's 16 among them). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

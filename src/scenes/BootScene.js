@@ -47,6 +47,10 @@ export class BootScene extends Phaser.Scene {
         // The towel stack's own clips (deck 9; tools/build_towels.py): its fall, it on her, her coming up.
         this.load.spritesheet('towels', 'assets/sprites/towels.png', { frameWidth: 128, frameHeight: 128 });
         this.load.json('towels-meta', 'assets/sprites/towels.json');
+        // Step 4a's first gags (tools/build_gags.py): the door that bursts open (13a), the tray ridden (3),
+        // the deck chair that collapses (7b), the gull on her head (20).
+        this.load.spritesheet('gags', 'assets/sprites/gags.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.json('gags-meta', 'assets/sprites/gags.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
         this.load.json('bumbot-meta', 'assets/sprites/bumbot.json');
@@ -218,6 +222,24 @@ export class BootScene extends Phaser.Scene {
         // runs on in the first at her run's own 14 a second (10 px a frame: her 140 px/s), then 11.
         for (const n of [0, 2, 4, 6])
             this.anims.create({ key: `towels-run${n}`, frames: tw.anims[`run${n}`].map((f, i) => ({ key: 'towels', frame: f, duration: i < 4 ? 71 : 91 })) });
+        // Step 4a's first gags (`gags` sheet): frame 0 of a clip is the world's own picture (the shut
+        // door; her own run, slip or standing frame with the thing), left out where the world shows it.
+        const gg = this.cache.json.get('gags-meta');
+        const gf = (name, from = 0, to = gg.anims[name].length, ms) => gg.anims[name].slice(from, to).map((f, i) => ({ key: 'gags', frame: f, duration: ms?.(i) }));
+        this.anims.create({ key: 'gags-door-burst', frames: gf('door-burst', 1), frameRate: 13 });
+        this.anims.create({ key: 'gags-door-squash', frames: gf('door-squash', 1), frameRate: 13 });
+        this.anims.create({ key: 'gags-door-slide', frames: gf('door-slide', 1), frameRate: 8 });
+        // (A "Do Not Disturb" door: open on the guest, held there, then shut.)
+        this.anims.create({ key: 'gags-dnd-open', frames: gf('door-burst-full', 1, 6), frameRate: 13 });
+        this.anims.create({ key: 'gags-dnd-shut', frames: gf('door-burst-full', 6), frameRate: 13 });
+        // (The hop onto the tray at her run's own 14 a second, then the ride; its last four wheel on.)
+        for (const k of ['tray-ride', 'tray-ride3', 'tray-ride1', 'tray-ride5']) {
+            this.anims.create({ key: `gags-${k}`, frames: gf(k, 0, 9, i => (i < 3 ? 71 : 95)) });
+            this.anims.create({ key: `gags-${k}-wheel`, frames: gf(k, 5, 9), frameRate: 9, repeat: -1 });
+        }
+        this.anims.create({ key: 'gags-chair', frames: gf('chair-collapse', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-gull-flail', frames: gf('gull-flail', 1), frameRate: 10 });
+        this.anims.create({ key: 'gags-gull-run', frames: gf('gull-run', 1), frameRate: 12, repeat: -1 });
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

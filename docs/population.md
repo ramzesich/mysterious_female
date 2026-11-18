@@ -505,9 +505,9 @@ cabin at 150 or from the lobbies once opened.
 |---|---|---|---|---|
 | 110, 194 | `door_8_mid_lobbies` | The lobby doors | `oneway(the corridor)` | |
 | 114-190 | `haz_steward_rounds` | A steward pushing a cart on his rounds | `loop(114, 190, 0.9)`; every 8 m he pulls the cart into a doorway for 3 s: the gap to pass; otherwise a full-width block that pushes her back | A character, a cart |
-| 124-128 | `haz_trays_8m` | Three room-service trays on the floor | `trap`: stepping on one clatters and opens `haz_dnd_8m` | Trays |
-| 126 | `haz_dnd_8m` | A "Do Not Disturb" door | Opens on the clatter, or on E: a startled guest in a towel: "Startled" if she is within 2 m | A character |
-| 136 | `haz_swing_8m` | A cabin door that swings open | `reactive(3, 0.6)`: the handle turns, the door swings out 1 m for 1.5 s; contact "Bonked" | Drawn |
+| 124-128 | `haz_trays_8m` | A room-service tray on the floor (one, the breakfast stewardess's own: the user, 2026-11-18; it was three flat bars) | `trap`: run or jumped onto, she rides it off the way she was going (3); the door opens after on the guest looking after her | Trays |
+| 126 | `haz_dnd_8m` | A "Do Not Disturb" door | Opens on the clatter, or on E: a startled guest in a towel: "Startled" if she is within 2 m. It swings open and shut in its full colours, its frame kept (2026-11-18); its guest seen only through the doorway | A character |
+| 136 | `haz_swing_8m` | A cabin door that swings open | `reactive(3, 0.6)`, **no tell** (the user, 2026-11-18: the rattle taken out): it bursts open toward us flat against the wall and slams shut (generated, muted, `gags` sheet). Coming at it from aft past its hinge, it waits for her and slams her flat on the wall (13a); from forward it never hits her, and bursts once she is clear of its swing | Generated |
 | 146 | `sign_wet_8m` + `haz_sprinkler_8m` | A wet-floor sign (muted) and the sprinkler in the doorway at 148 | `timed(5, 2, 147-149)`; contact "Drenched"; the open parasol passes | Drawn |
 | 150 | `room_balcabin_8m` | The balcony cabin whose balcony door stands ajar (housekeeping airing it): the way in from outside; its corridor door opens from inside | `room` | The generic balcony cabin, drawn by hand |
 | 176 | `amb_ice` | An ice bucket and two glasses on a tray outside a door | Decor | |

@@ -72,6 +72,7 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
 | `tools/draw_rooms.py` | The plan's rooms drawn by hand in code (`assets/ship/rooms/<id>.png`); a room with no drawing is bare in the game. Also the blanket fort drawn in front of her (`adjoin-fort.png`) and the looks down through the duct's grilles (`assets/ship/peeks/`) ; what of a room is in front of the things lying in it (a bowl before its tangerines) is marked with `Room.in_front()` and saved as `<id>-front.png`, drawn over them |
 | `tools/build_towels.py` | **The towel stack's own clips** (deck 9; `assets/source/things/towel-fall/`, its README has the ids) to `assets/sprites/towels.png` + `.json`: its fall alone, the fall on her (from her standing, and four from her run's phases), her coming up in a towel turban with a towel swan, and the standing stack and stool apart. Played by `TowelStack`; the fall on her is a gag the thing plays itself (the ship scene's `thingGag`, `ride.play`) |
+| `tools/build_gags.py` | **Step 4a's gags, each the thing's own clip with her** (`assets/source/her-mishaps/batch-4a/`, its README has the ids) to `assets/sprites/gags.png` + `.json`: the swinging door alone and slamming her flat (13a) and her slide down the wall, the same swing in full colours for the "Do Not Disturb" doors, her tray ride from four quarters of her stride (3; the world's tray base moved under her by the game, `trayAt`), the deck chair collapsing under her (7b), the gull on her head (20). Each played by its mover (`ride.play`, the ship scene's `thingGag`). The door clips keep their own (muted) colours: only her pixels go on the palette |
 | `tools/build_things.py`, `draw_pages.py` | The plan's own things from PixelLab map objects (`assets/source/things/` to `assets/sprites/things.png`: the robot, the gulls, the towel animals, region 1's flags, shelf, laundry cart, basket, a door's hand, the cry's two signs; the tries and their ids in `tries/README.md`); the ten books' pages drawn in code (`assets/ship/pages/`) |
 | `docs/progress-decisions.md` | **The autonomous build's log** (the user's order, 2026-11-13): every change or addition to the plan made while building, with its reason, step by step |
 | `tools/playtest.py` | Headless Chrome playtests with real key presses; `python tools/playtest.py [scenario]`. Positions come from the map builder |
@@ -161,6 +162,13 @@ meant five).
   more natural"): her dazed with butterflies over her head is one clip of her with them, a lady in
   her armchair one picture, not a figure with props laid over it in code. Props placed by code stay
   for things truly separate in play (a tangerine that flies off and lands).
+- **Every generated picture or clip is checked frame by frame before it is shown as a candidate**
+  (the user, 2026-11-18: "Make this a rule. Do it when you're generating imagery, before suggesting
+  final versions for my review"), enlarged and measured by pixels, and fixed first: (1) overlaps that
+  make no sense; (2) anything that breaks a seamless hand-over, seen (a thing changing shape, colour
+  or place between the world's picture and the clip, or frame to frame) or in time (a hold, a delay,
+  a jump in speed); (3) anatomy in every frame; (4) spatial alignment (feet and things on the floor
+  line, things on what holds them, nothing drifting). Say in the report what was checked and fixed.
 - For her animations use `skeleton-v3` mode: it moves her stored sprite instead of redrawing it, so
   hair and proportions stay consistent. Template mode redraws and drifts.
 - Save raw output to `assets/source/`, convert with the palette tools, never commit reference photos.
@@ -508,6 +516,28 @@ Lessons learned (2026-11-18, the towel stack's fall):
   way does not fit between cabin doors 159 px apart; and look at the wall behind a tall thing (a
   picture hidden behind the stack). Things of the corridor's own rule move out of a world thing's way
   by rule (`drawCabinDoors`), not by hand.
+
+Lessons learned (2026-11-18, step 4a's first gags):
+
+- **A clip starts from the frame the game shows at that moment, taken from her built sheet**
+  (`assets/sprites/her.png`, cell 84, feet on its bottom row), never her source frames: they sit
+  1 px apart. And from the clip she is actually in (sliding on the wet patch she plays her slip,
+  not her stand). Where she can be in several phases, one clip per phase (four quarters of her run).
+- **A thing in her clip that the world shows too is the world's own, moved by the game** (the
+  tray's base under her feet): then she can land on it anywhere, and it never changes. A thing
+  that only sits on her (the gull) is pasted back from the world's picture where it does not move.
+- **A world picture with holes looks different on another background:** the cabin door's inset
+  lines are holes the wall shows through; over a doorway's dark they turned dark. Fill holes with
+  what the world shows through them, and keep the frames that must equal the world's exactly.
+- **A muted twin turns back into the full picture exactly** (`c = (m - 0.35 w) / 0.65`, then each
+  muted colour's own pair): one generated clip serves both kinds of door.
+- **Someone in a doorway is inside the room**: cut to the opening (`People.doorway`, Phaser's
+  crop; the Mask filter in world space hid them whole) and on its threshold.
+- **A clip's pace is checked in time, not only in pictures:** a first frame played slower than her
+  run held her pose while she glided ("a pause"); never slow a hand-over frame, start nearer.
+- **Look at what a thing reaches in the world before trusting a scenario:** the deck chair could
+  never catch her on so short a patch, and the door burst while she was still too far; both were
+  found only by walking at them with real keys.
 
 ## Working with the user
 

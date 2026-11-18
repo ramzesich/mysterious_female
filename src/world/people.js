@@ -137,9 +137,29 @@ export class People {
         });
     }
 
+    // Someone looking out of a doorway is inside the room: seen only through its opening (`x0`..`x1`,
+    // `top`..`bottom`, world px), never over the frame or the wall beside it (the user, 2026-11-18:
+    // a boy's cap stuck through the door frame).
+    doorway(p, x0, x1, top, bottom) {
+        if (!p) return;
+        p.door = { x0, x1, top, bottom };
+        this.cropToDoor(p);
+    }
+
+    // (Their picture cut to the opening, in the picture's own unflipped px: turned, mirrored.)
+    cropToDoor(p) {
+        const d = p.door, sp = p.sprite, fw = sp.frame.width, fh = sp.frame.height;
+        const left = sp.x - fw * sp.originX, top = sp.y - fh * sp.originY;
+        const a = Math.max(0, Math.min(fw, d.x0 - left)), b = Math.max(0, Math.min(fw, d.x1 - left));
+        const u0 = sp.flipX ? fw - b : a;
+        const v0 = Math.max(0, d.top - top), v1 = Math.min(fh, d.bottom - top);
+        sp.setCrop(u0, v0, b - a, v1 - v0);
+    }
+
     place(p) {
         p.sprite.x = p.x;
         p.sprite.setFlipX(p.dir < 0);
+        if (p.door) this.cropToDoor(p);
         for (const a of p.attached) {
             a.img.x = p.x + p.dir * a.dx;
             a.img.y = p.y - (a.dy ?? 0);

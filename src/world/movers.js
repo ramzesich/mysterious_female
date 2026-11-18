@@ -648,20 +648,30 @@ export class Sprinkler {
     }
 }
 
-// A cabin door that flies open as she comes by (population: `haz_swing`): the handle rattles (the
-// tell), then the door swings out across the corridor: "Bonked" if she is at it. Whoever opened it
-// looks out, and shuts it again. It takes a cabin door's place.
+// A cabin door that flies open as she comes by (population: `haz_swing`): with no tell (the user,
+// 2026-11-18: "Let the opening of the door surprise the player"; its handle rattled and it shook), it
+// bursts open toward us and swings round flat against the wall past its hinge, and slams shut again. Whoever opened it looks out meanwhile. It takes a cabin door's place.
+// Its swing is its own clip (`gags` sheet, tools/build_gags.py; the user, 2026-11-18: the leaf drawn
+// in code was a door picture stretched, and changed colour): the door alone, or (13a) the same swing
+// slamming her flat against the wall when she stands just past its hinge facing it (`zone`, px past
+// its middle), and she slides down the wall. Both start from the world's shut door, in its muted
+// colours; the doorway's dark and whoever is in it are the world's, behind the clip. From any other
+// side it never hits her (the user, 2026-11-18): it bursts once she is clear of its swing.
 export class SwingDoor {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y, reach, delay (s), who }
+        const m = s.cache.json.get('gags-meta');
+        this.meta = m;
         this.shut = s.add.image(def.x, def.y, 'shipart', 'door-cabin-bg').setOrigin(0.5, 1).setDepth(D.decor + 0.1);
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
-        this.leaf = s.add.image(def.x + 14, def.y, 'shipart', 'door-cabin').setOrigin(0, 1).setDepth(D.props + 0.2).setTint(0xd9c4b8).setVisible(false);
-        world.add([this.shut, this.dark, this.leaf]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y - 2, route: 'inside', face: -1, idle: 'idle', layer: 'back', owned: true });
+        this.pic = s.add.sprite(def.x, def.y, 'gags', m.anims['door-burst'][0]).setOrigin(m.door.x / m.cell, m.floor / m.cell)
+            .setDepth(D.props + 0.2).setVisible(false);
+        world.add([this.shut, this.dark, this.pic]);
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x - 2, y: def.y, route: 'inside', face: -1, idle: 'idle', layer: 'back', owned: true });
+        world.people.doorway(this.who, def.x - 14, def.x + 14, def.y - 72, def.y);
         if (this.who) this.who.gone = true;
         this.state = 'shut';
         this.armed = true;
@@ -671,60 +681,127 @@ export class SwingDoor {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
         if (!nearby(s, d)) return;
-        const dx = p.x - d.x, within = here(s, d) && Math.abs(p.y - d.y) < 40 && Math.abs(dx) < d.reach;
+        const dx = p.x - d.x, at = here(s, d) && Math.abs(p.y - d.y) < 40, within = at && Math.abs(dx) < d.reach;
         if (this.state === 'shut') {
             if (!within && time > this.at) this.armed = true;
             if (within && this.armed) {
                 this.armed = false;
-                this.state = 'rattle';
+                this.state = 'wait';
                 this.at = time + d.delay * 1000;
-                this.rattleAt = time + 300;
-                sfx.at(d.x, d.y).rattle();
             }
-        } else if (this.state === 'rattle') {
-            this.shut.x = d.x + (Math.floor(time / 45) % 2 ? 1 : -1);
-            if (time > this.at) {
-                // Open: the leaf swings out toward us and across the corridor.
-                this.state = 'burst';
-                this.at = time + 380;
-                this.shut.setVisible(false).setX(d.x);
-                this.dark.setVisible(true);
-                this.leaf.setVisible(true).setScale(0.2, 1);
-                s.tweens.add({ targets: this.leaf, scaleX: 0.42, duration: 220, ease: 'Back.easeOut' });
+        } else if (this.state === 'wait') {
+            // (Someone inside about to come out: nothing shows it.)
+            // (Coming up to it from past its hinge, facing it: it waits for her there, a while. Anywhere
+            // else in its swing, the doorway or the wall it sweeps, it waits until she is clear: it only
+            // ever hits her from that side, 13a; the user, 2026-11-18.)
+            const z = this.meta.door.zone, coming = at && p.flipX && dx > z[1] && dx < d.reach + 20 && p.body.velocity.x < -20;
+            const gag = at && p.flipX && dx >= z[0] && dx <= z[1], inSwing = at && dx > -20 && dx < 50 && !gag;
+            if (time > this.at && !(coming && time < this.at + 1200) && !inSwing) {
+                this.lookOut(dx);
                 sfx.at(d.x, d.y).doorBang();
-                if (this.who) {
-                    this.who.gone = false;
-                    this.who.dir = dx < 0 ? -1 : 1;
-                    this.world.people.place(this.who);
-                    this.world.people.refresh();
+                // Just past its hinge, facing it: slammed flat (13a); with a tangerine on her, her
+                // reaction, and the door swings as it does alone.
+                const onFloor = p.body.blocked.down || p.body.touching.down;
+                this.started = false;
+                if (at && onFloor && s.mode === 'play' && p.flipX && dx >= z[0] && dx <= z[1]) {
+                    if (this.world.carry) this.world.carryBox.spill(d.x + 20, false, 'door');
+                    else s.scareContact(d.x + 14, 'door', { ride: this.ride() });
                 }
-            } else if (time > this.rattleAt) {
-                // (The handle again, while it shakes.)
-                this.rattleAt = time + 300;
-                sfx.at(d.x, d.y).rattle();
+                if (!this.started) this.burst(time);
             }
-        } else if (this.state === 'burst') {
-            if (here(s, d) && Math.abs(p.y - d.y) < 40 && dx > -18 && dx < 34) {
-                this.state = 'open';
-                this.at = time + 1500;
-                if (this.world.carry) this.world.carryBox.spill(d.x + 20, false, 'door');
-                else s.scareContact(d.x + 14, 'door');
-            } else if (time > this.at) {
-                this.state = 'open';
-                this.at = time + 1500;
-            }
-        } else if (this.state === 'open' && time > this.at) {
-            this.state = 'shut';
-            this.at = time + 1500;
-            this.shut.setVisible(true);
-            this.dark.setVisible(false);
-            this.leaf.setVisible(false);
-            if (this.who) {
-                this.who.gone = true;
-                this.world.people.refresh();
-            }
-            sfx.at(d.x, d.y).doorShut();
         }
+    }
+
+    // Whoever opened it, in the doorway, looking her way.
+    lookOut(dx) {
+        if (!this.who) return;
+        this.who.gone = false;
+        this.who.dir = dx < 0 ? -1 : 1;
+        this.world.people.place(this.who);
+        this.world.people.refresh();
+    }
+
+    // Back in: the shut door, nobody.
+    close() {
+        this.shut.setVisible(true);
+        this.dark.setVisible(false);
+        this.pic.setVisible(false);
+        if (this.who) {
+            this.who.gone = true;
+            this.world.people.refresh();
+        }
+    }
+
+    // The door alone: open, flat against the wall, slammed shut (its clip's last frame is the shut
+    // door itself, so the world's takes over unseen).
+    burst(time) {
+        const d = this.def;
+        this.state = 'burst';
+        this.at = time + 300;
+        this.shut.setVisible(false);
+        this.dark.setVisible(true);
+        this.pic.setVisible(true).setDepth(this.scene.DEPTH.props + 0.2).play('gags-door-burst');
+        this.pic.on('animationupdate', this.shutting, this);
+        this.pic.once('animationcomplete-gags-door-burst', () => {
+            this.pic.off('animationupdate', this.shutting, this);
+            if (this.state !== 'burst') return;
+            this.close();
+            sfx.at(d.x, d.y).doorShut();
+            this.state = 'shut';
+            this.at = this.scene.time.now + 1500;
+        });
+    }
+
+    // (Its last frame is the world's shut door, holes and all: the doorway's dark goes as it shuts,
+    // or the wall seen through them would be dark.)
+    shutting(anim, frame) {
+        if (frame.index === anim.frames.length) this.dark.setVisible(false);
+    }
+
+    // 13a, the ship scene's `thingGag`: her own picture until the leaf covers her (its second frame),
+    // then she is in the clip: slammed flat under it, left flat on the wall as it slams shut, she
+    // slides down and sits. Back from it, the door is shut.
+    ride() {
+        const s = this.scene, d = this.def, p = s.player;
+        return {
+            play: (done) => {
+                this.started = true;
+                this.state = 'squash';
+                p.setVisible(true);
+                this.shut.setVisible(false);
+                this.dark.setVisible(true);
+                this.pic.setVisible(true).setDepth(p.depth + 0.01).play('gags-door-squash');
+                const cover = (anim, frame) => {
+                    if (frame.index < 2) return;
+                    p.setVisible(false);
+                    if (frame.index === 3) sfx.at(d.x, d.y).thump();
+                    if (frame.index >= 3) this.pic.off('animationupdate', cover);
+                };
+                this.pic.on('animationupdate', cover);
+                this.pic.on('animationupdate', this.shutting, this);
+                this.pic.once('animationcomplete-gags-door-squash', () => {
+                    if (this.state !== 'squash') return;
+                    this.pic.off('animationupdate', cover);
+                    this.pic.off('animationupdate', this.shutting, this);
+                    p.setVisible(false);
+                    sfx.at(d.x, d.y).doorShut();
+                    this.shut.setVisible(true);
+                    this.dark.setVisible(false);
+                    if (this.who) { this.who.gone = true; this.world.people.refresh(); }
+                    s.time.delayedCall(350, () => {
+                        if (this.state !== 'squash') return;
+                        this.pic.play('gags-door-slide');
+                        this.pic.once('animationcomplete-gags-door-slide', () => done());
+                    });
+                });
+            },
+            show: () => {
+                this.pic.anims.stop();
+                this.close();
+                this.state = 'shut';
+                this.at = s.time.now + 1500;
+            },
+        };
     }
 }
 
@@ -742,8 +819,14 @@ export class DndDoor {
         this.card.fillStyle(0xe83b3b, 1).fillRect(def.x + 8, def.y - 40, 5, 13);
         this.card.fillStyle(0xffffff, 1).fillRect(def.x + 9, def.y - 39, 3, 2).fillRect(def.x + 9, def.y - 34, 3, 1).fillRect(def.x + 9, def.y - 32, 3, 1);
         this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
-        world.add([this.shut, this.card, this.dark]);
-        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y - 2, route: 'inside', face: -1, layer: 'back', owned: true });
+        // (Its swing open and shut: the swinging doors' own clip in this door's full colours; the user,
+        // 2026-11-18: hidden while open, it went with its frame.)
+        const m = s.cache.json.get('gags-meta');
+        this.pic = s.add.sprite(def.x, def.y, 'gags', m.anims['door-burst-full'][0]).setOrigin(m.door.x / m.cell, m.floor / m.cell)
+            .setDepth(D.decor + 0.13).setVisible(false);
+        world.add([this.shut, this.card, this.dark, this.pic]);
+        this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y, route: 'inside', face: -1, layer: 'back', owned: true });
+        world.people.doorway(this.who, def.x - 14, def.x + 14, def.y - 72, def.y);
         if (this.who) this.who.gone = true;
         this.busy = false;
         world.things.push({ ...def, items: [], reach: 16, interact: () => this.knock() });
@@ -771,6 +854,7 @@ export class DndDoor {
         this.shut.setVisible(false);
         this.card.setVisible(false);
         this.dark.setVisible(true);
+        this.pic.setVisible(true).play('gags-dnd-open');
         if (this.who) {
             this.who.gone = false;
             this.who.dir = p.x < d.x ? -1 : 1;
@@ -786,15 +870,22 @@ export class DndDoor {
         if (by && cried && this.world.carry) this.world.carryBox.spill(d.x, false, 'dnd', { force: cried });
         else if (by && !this.world.carry) s.scareContact(d.x + (p.x < d.x ? 12 : -12), 'dnd', { force: cried });
         s.time.delayedCall(look ? 1900 : 1700, () => {
-            this.shut.setVisible(true);
-            this.card.setVisible(true);
-            this.dark.setVisible(false);
             if (this.who) {
                 this.who.gone = true;
                 this.world.people.refresh();
             }
-            sfx.at(d.x, d.y).doorShut();
-            this.busy = false;
+            // (Swung shut: its last frame is the shut door itself, the doorway's dark gone with it.)
+            this.pic.play('gags-dnd-shut');
+            this.pic.on('animationupdate', (anim, frame) => { if (frame.index === anim.frames.length) this.dark.setVisible(false); });
+            this.pic.once('animationcomplete-gags-dnd-shut', () => {
+                this.pic.off('animationupdate');
+                this.pic.setVisible(false);
+                this.shut.setVisible(true);
+                this.card.setVisible(true);
+                this.dark.setVisible(false);
+                sfx.at(d.x, d.y).doorShut();
+                this.busy = false;
+            });
         });
         return true;
     }

@@ -1013,6 +1013,13 @@ def build_objects():
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
     add(point("balcony", "place", 7815, floor_y(9), [prop("route", "promenade")]))
+    # Step 4a's first gags, to try each (2026-11-18): aft of deck 9's swinging door (13a: walk forward
+    # at it), forward of deck 10's trays (3: run aft onto them), aft of the pool's wet patch and its
+    # deck chair (7b: walk forward past the chair onto the patch), and on the balcony with deck 9's
+    # second rail gull (20: stand by it).
+    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156)]:
+        add(point(name, "place", x_of(m), floor_y(deck)))
+    add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.

@@ -252,7 +252,7 @@ export const MISHAPS = {
 export const MISHAP_SCENES = {
     '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
     '2': { word: 'tripped', down: 'belly', pocket: false },     // into the dog's lead: down whatever she carries
-    '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly' },      // onto the trays
+    '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', gag: 'tray' },  // onto the trays: she rides one off (`Trays.ride`)
     '4a': { word: 'slipped', react: 'stumble', toss: 'on', down: 'belly', gag: 'paperFront' },   // a paper at her front: her leg up behind, on her belly
     '4b': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit', gag: 'paperBehind' }, // at her heel: her leg up in front, on her bottom
     '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly', gag: 'vacuum' }, // the vacuum, head-on
@@ -261,7 +261,7 @@ export const MISHAP_SCENES = {
     '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // it rolls into her back
     '6c': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'suitcase' },  // it rolls into her front
     '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // the deck chair, head-on
-    '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit' },        // from behind
+    '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`)
     '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
     '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartPush' },      // it pushes into her
     '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'cartSit' },      // it reaches her back
@@ -285,7 +285,7 @@ export const MISHAP_SCENES = {
     '11b': { word: 'splashed', react: 'arch', toss: 'on' },                     // in her back
     '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // the stage's light
     '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
-    '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit' },     // a door in her face
+    '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
     '13b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },     // it catches her past it
     '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // a basketball
     '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
@@ -294,7 +294,7 @@ export const MISHAP_SCENES = {
     '17': { word: 'fogged', react: 'splutter', toss: 'drop', down: 'sit' },     // the sauna's steam
     '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
     '19': { word: 'singed', react: 'yelp', toss: 'drop', down: 'sit' },         // a flare
-    '20': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull on a balcony rail
+    '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
     '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit' },        // a funnel gull
     '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', toss: 'hand' },                 // a "Do Not Disturb" door
@@ -355,6 +355,15 @@ export const GAGS = {
     // src/world/movers.js, the ship scene's `thingGag`): buried, then her head up in a towel turban, a
     // towel swan on it; `holdMs` after, her checkpoint.
     towels: { holdMs: 1400 },
+    // Step 4a's first gags, each the thing's own clip with her (`gags` sheet, tools/build_gags.py),
+    // played by the thing (`thingGag`). The door (13a): slammed flat on the wall, she slides down. The
+    // tray (3): she rides it off at up to `speed` px/s (from her run's, `accel` px/s²). The deck chair
+    // (7b): it takes her on `slideMs` along the wet patch, then collapses. The gull (20): it sits on her
+    // head and she runs off flailing at her run's speed, out of the screen.
+    door: { holdMs: 1200 },
+    tray: { holdMs: 600, speed: 260, accel: 300 },
+    chair: { holdMs: 1300, slideMs: 450 },
+    gull: { holdMs: 400 },
 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
