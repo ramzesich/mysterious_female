@@ -49,6 +49,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 4 (§6) | Each deck its own look | Step 7 | Medium | About 20 |
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
 | 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
+| 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19) | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -332,6 +333,47 @@ code. PixelLab character "Bumbot (final)", `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855
 7. Each near-catch and glimpse looked at enlarged in its place (he sits on our side of railings);
    the scenarios that have him (`finale`, the regions' near-catches, `deck3`), `boot`,
    `tools/check_overlaps.py`. The old sources are kept beside the new for comparison.
+
+## 7b. Part 7: the intro's scene tuned (medium; about 30 generations, a guess)
+
+Added 2026-11-19 on the user's word: "fine-tune the intro scene. I want more
+realistically-looking sun and reflections, more varied and volumetric clouds." Built after
+part 6 and before §10; numbered 7b so that no other section's number changes.
+
+Design: `docs/intro.md` (the user's own document: read it, never edit it); `src/intro.js`'s
+head comment; `CLAUDE.md`'s lessons of 2026-11-14 (the intro; the intro shown to the user) and
+2026-11-07 (art far bigger than a generation).
+
+**What there is today**, all drawn in code: the sun (`intro-sun` in `src/intro.js`: a disc, a
+glow, two sets of rays that take turns); its glitter on the water (`intro-glitter-0` and `-1`:
+short bright dashes in two frames, swapped 3.2 times a second); eight clouds round it (`CLOUDS`,
+each from `cloudTexture()` in `src/background.js`: heaps of round puffs with a shaded lower rim,
+the same recipe as the game's cloud strip, see-through).
+
+1. **Ask first, by numbered questions,** with the three wide views as they are (`?intro=focus`,
+   `sky`, `sea`) shown in the chat: what "more real" means for the sun (a soft disc with a
+   bloom and no rays? a low warm sun? haze round it?); what reflects (a path of light on the
+   water under the sun only, or also the clouds and the sky's colour in the sea, the ship's
+   side in the water); how far from pixel art it may go; and **how far it reaches**: the intro's
+   own sky only, or also the game's far background (the same clouds drift past in play) and the
+   sunset's sun and path (`bg-sunpath`). This item is the intro's until the user says more.
+2. **The look chosen from mock-ups of the whole screen,** two or three, composed offline over a
+   real screenshot of the wide view with the menu on it, in both languages (the lesson of the
+   menu's plates): the sun, its light on the water, the clouds together, not loose pieces.
+3. **Then the art, generated** (the rule: art is generated, not drawn in code): clouds of
+   several kinds and sizes with lit tops and shaded bellies, each its own picture, none
+   repeated in a view; the sun and its bloom; the water's light. A cloud wider than a
+   generation is made in tiles. The colours on the palette by rule, checked at the game's zoom
+   and at 1:1.
+4. **The motion, in code:** the path of light broken by the waves' own rows (`src/sea.js`), a
+   shimmer that does not read as two frames swapping; nothing far off drifts in these views
+   (the user's ruling, 2026-11-14: the camera stands still). It is judged in motion: the
+   plainest version that runs is shown to the user before the rest is polished.
+5. The welcome screen dims and blurs the sky: every new piece looked at there too, and through
+   each part of the camera's way to the ship (`intro.seek`), where the sun, the clouds and the
+   glitter fade as it goes in.
+6. `intro`, `boot`, `lang`, `deck3`; if the user widens it to the game's background, `finale`
+   and the whole ship rendered as well.
 
 ## 8. Optional, each only on the user's word
 

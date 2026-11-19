@@ -2941,3 +2941,15 @@ from §8. Its size (large, about 90 generations) is the design session's guess, 
 
 The estimate given on 2026-11-18 (about 14 working days; around 10 December by the last two weeks' attendance) grows
 by about three working days with it: around 15 December, at the slow end about the 20th. The gift is for New Year.
+
+## The plan gets a part 7: the intro's scene tuned (2026-11-19; a plan, nothing built)
+
+The user, to the design session: "And after that one, add another action item: fine-tune the intro scene. I want more
+realistically-looking sun and reflections, more varied and volumetric clouds." Written into `docs/plan-the-rest.md` as
+§7b, part 7, after Bumbot's (§7a) and before what is done once at the end. It starts with questions to the user (what
+"more real" means, what reflects, and whether it reaches past the intro to the game's far background and the sunset),
+then the look chosen from mock-ups of the whole screen, then the art generated (today the sun, the glitter and the
+clouds are all drawn in code) and the motion. Its size (medium, about 30 generations) is the design session's guess.
+
+The estimate grows by about two working days with it: around 18 December by the last two weeks' attendance, at the
+slow end about the 23rd.
