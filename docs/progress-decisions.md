@@ -3439,3 +3439,15 @@ while the building session worked.
   funnel's top (the user asked to see that fix before and after), made before both checkpoints were dropped;
   not used, not in the repo.
 - Written: `docs/plan-the-rest.md` §2 and §7e (part 10, after part 9), §3 1.4; `GAME_DESIGN.md` §5.5.
+
+## 1.4: the two leftovers of step 4a, closed (the user, 2026-11-19)
+
+- **The four end walls with a one-way doorway** (decks 8, 9 and 10 aft, deck 11's front): shot in the running
+  game from both sides. Only one face of each is ever on screen, the other always behind the ship's plating (the
+  stern terraces, the balcony forward of the spa, out of sight by design). On decks 8 to 10 the face seen is the
+  free one: the corridor ends and she passes through as through any end wall; on deck 11 it is the spa's locked
+  face (the padlock and the rattle). I offered a door's profile, a sign, or nothing; the user: "This looks exactly
+  the way we already decided and built." Left as built, nothing changed.
+- **The checkpoint past deck 9's sprinkler:** closed by the design session's checkpoint audit (§7e, `8cd94f0`):
+  the balcony cabin's lamp stood there in effect, and goes with part 10.
+- **Part 1 (§3) is done.** Next: part 2, §4 2.1, the other fourteen of the twenty things to find.

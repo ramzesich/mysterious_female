@@ -2589,7 +2589,7 @@ Nothing blocks the start of the build. These get settled along the way:
       answers her coming (`DRILL`); its falls made fast to the boat's posts; the winch 0.3 m forward. 1.2 is done.
       **Done (2026-11-19): 1.3**: the `mishaps` playtest (sixty hits through each thing's own code, none
       on her and two), ten gag sounds on their clips' frames, five start places, the table of hits
-      (`docs/population.md` §2.9). **Next: 1.4** (two leftovers of step 4a, each the user's word first); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      (`docs/population.md` §2.9). **Done 1.4 (2026-11-19):** the four one-way end walls looked at and left as built (only their free or their locked face is ever seen, the other behind the plating; the user: "exactly the way we already decided and built"); the checkpoint past deck 9's sprinkler closed by the design session (§7e). **Part 1 is done. Next: part 2, §4 2.1** (the other fourteen of the twenty things to find, each picture shown first); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

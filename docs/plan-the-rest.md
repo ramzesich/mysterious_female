@@ -247,9 +247,14 @@ gag landed). `docs/progress-decisions.md`, "1.3".
 
 ### 1.4 Two leftovers of step 4a (small each; each the user's word first)
 
-- **The four end walls with a one-way doorway** (decks 8, 9 and 10 aft, deck 11 forward): not
+- ~~**The four end walls with a one-way doorway** (decks 8, 9 and 10 aft, deck 11 forward): not
   looked at yet. Look, and propose to the user whether and how they show their free side
-  (`end_walls()` in `tools/build_ship_map.py`, `buildBulkhead`, `assets/source/ship/pushbar/`).
+  (`end_walls()` in `tools/build_ship_map.py`, `buildBulkhead`, `assets/source/ship/pushbar/`).~~
+  **Looked at and left as built (the user, 2026-11-19):** only one face of each is ever on screen,
+  the other always behind the ship's plating (the stern terraces, the balcony forward of the spa);
+  on decks 8 to 10 that face is the free one, she passes through as through any end wall; on
+  deck 11 it is the spa's, and she gets the padlock there. "This looks exactly the way we already
+  decided and built." **Part 1 is done.**
 - ~~**A crew-door checkpoint just past deck 9's sprinkler:** proposed, "only if the stretch from
   `cp_9_arrive` to the steward with no tangerine proves harsh". The user judges it in play; if
   yes, one line of data.~~ **Closed (the user, 2026-11-19, §7e):** none. One stood there in
