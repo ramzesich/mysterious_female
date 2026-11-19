@@ -354,8 +354,9 @@ export const GAGS = {
     lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700 },
     // The court's basketballs (14a, 14b; plan-the-rest §3 1.2): stiff as a plank onto her back or her face, from
     // her stand or her run's quarter, then lying so with the butterflies (`lie`, set on by `ball.dx`).
-    ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700 },
-    ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700 },
+    // (`drop`: hit in the air, she stops there and drops straight down; the gag where she lands.)
+    ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true },
+    ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700, drop: true },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head

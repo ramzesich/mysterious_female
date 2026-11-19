@@ -3272,3 +3272,11 @@ over her head, then her checkpoint (`jogGag`, now with `meta` and `lie`). The ba
   tangerines back after; its funnel stairway check holds the gulls off (by the clock's new phase one dived at her
   there). `region8`, `boot`, `throw` pass; the rest not run.
 - **Generations:** 35 for 14a and 14b (the first ten falls unused), 38 for the players.
+
+## A ball in the air knocks her down where it hits (2026-11-19)
+
+The user: "when the ball hits her in mid-jump, the gag plays only at her landing. She should fall on the ground from
+where the ball hit her." A hit in the air is held until she lands (`gagPending`), and she went on along her jump's arc.
+Now a gag with `drop` (the court's balls, 14a and 14b) stops her there: her way across is gone, she goes stiff at once
+(her standing frame, the topple's first) with her word, drops straight down, and topples where she lands. Every other
+hit in the air is as before. `region8` and `boot` pass.

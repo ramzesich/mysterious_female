@@ -2931,6 +2931,7 @@ export class ShipScene extends Phaser.Scene {
         }
         // A hit forgiven by the pocket: her reaction, a step back or on.
         if (time < this.flinchUntil) {
+            if (this.gagPending && GAGS[this.gagPending.sc.gag]?.drop) body.velocity.x = 0;
             body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
             return;
         }
@@ -4596,6 +4597,14 @@ export class ShipScene extends Phaser.Scene {
         if (this.mode === 'play' && !this.grounded) {
             this.gagPending = { sc, fromX, ride };
             this.flinchUntil = this.time.now + 10000;
+            // (A gag that knocks the jump out of her (`drop`, the court's balls): she stops where she was hit and drops
+            // straight down, the gag where she lands (the user, 2026-11-19: it played where her jump would have ended).)
+            // Stiff at once (her standing frame, the gag's first), her word at the hit.
+            if (sc.gag && GAGS[sc.gag].drop) {
+                p.body.setVelocity(0, Math.max(0, p.body.velocity.y));
+                this.pose('stand');
+                this.alert.setText(fright(GAGS[sc.gag].word ?? sc.word)).setVisible(true);
+            }
             return;
         }
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);

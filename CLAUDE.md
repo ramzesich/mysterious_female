@@ -928,6 +928,8 @@ Lessons learned (2026-11-19, the basketballs and the court's players):
   out before. A washed figure's thing changes colour at the hand-over: fade between the thing's two pictures (0.2 s).
 - **Through a ring, only the ring is in front:** behind the hoop's picture the ball vanished behind the board above
   the net; it goes behind only between the rim and the net's foot, and keeps its falling speed through it.
+- **A hit in the air waits for her landing** (`gagPending`) and she keeps her jump's arc: a gag that should knock the
+  jump out of her says so (`drop` in `GAGS`: stopped, stiff, straight down; the court's balls).
 - **A mover's field must not take a mover's method's name:** `this.heard = {}` broke every cry (`heard()`).
 - **A test that empties her pocket gives it back**, and a stretch whose time a change moves can meet another timed
   hazard by phase (a funnel gull on the stairway check): hold what the check is not about.
