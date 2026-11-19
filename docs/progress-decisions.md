@@ -3164,3 +3164,8 @@ with her sat before him and then taken out; 9a he runs on; one clip per quarter 
   `region2` moved him by hand while the game counted him in a door: it lets go first.
 - **Tests:** `region2` (new: the bump plays 9b and his sorry), `region4`, `region6`, `region7`, `region8`, `region9`,
   `boot` pass. 31 generations (9b 19, 9a 8, 9c 4).
+
+## 11a and 11b: the wet gag covers them (2026-11-19)
+
+Asked whether the kid's jet still wants its own two gags of the plan (11a: sat back spluttering, he points and laughs;
+11b: 10b's arch), now that the wet gag plays for both with none on her: the user, "Covers". Not made.
