@@ -714,6 +714,21 @@ That works out to (numbers to be tuned in testing):
 - A scare keeps everything collected (cards, keys, opened doors). Only her position resets. Unlimited.
 - The game **auto-saves at each checkpoint** (in the browser), so she can close it and continue later.
 
+**Decided (the user, 2026-11-19; not built yet: `docs/plan-the-rest.md` §7e):** nineteen places, from
+twenty-six (23 checkpoints as the game counts them, from 32: a balcony cabin has one on each side). "I feel
+like that is too many checkpoints in the game"; on the nineteen: "Yes, let's try those 19", to be judged in
+play. **A checkpoint stays only if a scare sends her back to it, and taking it away would cost her hazards to
+do again, not only an empty walk:** none inside a run of hazards, none on a calm stretch. Fourteen on the main
+way (her crew cabin; the gangway lobby and the laundry on deck 4; the Library and the theatre's foyer on deck
+6; the Arcade on deck 7; cabin 8206; deck 9's crew trunk, its own door, and the corridor's aft end; the
+bridge; the gym, the pool's hut and the Garden Café on deck 11; the technical door on deck 12) and the five
+balcony cabins of the outside region. Gone: deck 6 forward, deck 4 aft, the officer's door, the guest's
+cabin, the chapel lobby, the funnel's top, the boat walkway's station, and the balcony cabin's lamp on deck
+9's corridor side. None is added in deck 10's midships hallway ("No, don't add"). **She never comes back
+behind a door that is shut to her.** **A checkpoint's door is its place's own** (a padded theatre door in the
+foyer and the Arcade, a dark wood service door in the Library and at Cagney's, the white crew door in
+corridors and lobbies, the pool's hut); the green lamp over it is what says checkpoint everywhere.
+
 ### 5.6 Scares (instead of death)
 
 **Decided:** there is **no death and no death animation**, anywhere. One hit is still one failure,

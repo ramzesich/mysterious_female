@@ -3403,3 +3403,39 @@ scenarios in too; 2 7b and 13b left in the table, marked unreachable; 3 the ten 
 - The table of every hit, its gag, sounds and checks: `docs/population.md` §2.9.
 - Run: `mishaps` (three times whole), `pocket`, `deck4`, `region1` to `region4`, `region6` to `region9`,
   `finale`, `vacuum`, `sound`, `boot`: all pass.
+
+## The checkpoints: an audit of all 32, and a new part 10 (2026-11-19; a plan, nothing built)
+
+The user: "I've seen a few places myself where doors are stuck at weird places or misplaced"; asked the design
+session for an audit (placements that make no sense, new props for variety, the best total, "Don't make the game
+too easy", "Remove redundant/unnecessary checkpoints") and a plan update for review, nothing to be changed
+while the building session worked.
+
+- **How it was looked at:** every one of `window.__ship.checkpoints` in the running game, her teleported
+  beside it, `Browser.close_up` (a fresh page each), then the doubtful ones closer, unlit and lit; the
+  hazards' places from `maps/world.json` and `maps/ship.json`; the game's own `closestCheckpoint` asked where
+  each scare sends her, with the checkpoints of each stage of the game lit. From a script outside the repo.
+- **Found, in the pictures:** 32 as the game counts them at 26 places; 17 the same white crew door, nine of
+  those standing wrong (on the Stardust Lounge marquee's post; in the walkway's glass wall over its railing;
+  on an exhaust pipe on the funnel's top; in the Garden Café's window; over the officer who stands there;
+  wedged between a wall and Cagney's wine cabinet; white on the Library's panelling beside the promenade
+  door; between the Arcade's machines; a twin of deck 9's trunk door 1.4 m from it).
+- **Found, in the returns:** hit by deck 9's aft swinging door she comes back behind a one-way door she has
+  not opened; deck 10's midships hallway has five things that scare and none of its own; the balcony cabin's
+  lamp on deck 9 lights as she walks past its locked door (so §3 1.4's "a checkpoint past the sprinkler" stood
+  there in effect); `cp_6_fwd` takes deck 5's scares a deck up; nothing returns to `cp_4_aft`, `cp_chapel`,
+  `cp_officer`; lit, `cp_funnel` puts her back at the top after a gull has bumped her down to the foot.
+- **The first proposal, 28 (23 places), turned down:** "I feel like that is too many checkpoints in the game."
+- **Decided (the user): "Yes, let's try those 19"**, the leaner set: a checkpoint stays only if a scare sends
+  her back to it and its removal would cost hazards done again, not an empty walk. Nine go (`cp_6_fwd`,
+  `cp_4_aft`, `cp_officer`, `cp_hall_guest`, `cp_balc_guest`, `cp_chapel`, `cp_funnel`, `cp_station`,
+  `cp_balcabin`); none is added in deck 10's midships hallway ("No, don't add"). 23 as the game counts them,
+  fourteen on the main way and five balcony cabins. The reason for each and what it costs her:
+  `docs/plan-the-rest.md` §7e.
+- **With it:** six doors that stay are mended; deck 9's trunk door carries its own lamp; two door props (a
+  padded theatre door, a dark wood service door), each with its lit twin; one rule, she never comes back
+  behind a door shut to her. §3 1.4's second leftover is closed.
+- **Spent by the design session:** 4 generations, four tries of a steel locker for the walkway and the
+  funnel's top (the user asked to see that fix before and after), made before both checkpoints were dropped;
+  not used, not in the repo.
+- Written: `docs/plan-the-rest.md` §2 and §7e (part 10, after part 9), §3 1.4; `GAME_DESIGN.md` §5.5.

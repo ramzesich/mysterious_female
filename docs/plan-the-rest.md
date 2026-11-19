@@ -52,6 +52,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19) | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess) |
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
+| 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -249,9 +250,11 @@ gag landed). `docs/progress-decisions.md`, "1.3".
 - **The four end walls with a one-way doorway** (decks 8, 9 and 10 aft, deck 11 forward): not
   looked at yet. Look, and propose to the user whether and how they show their free side
   (`end_walls()` in `tools/build_ship_map.py`, `buildBulkhead`, `assets/source/ship/pushbar/`).
-- **A crew-door checkpoint just past deck 9's sprinkler:** proposed, "only if the stretch from
+- ~~**A crew-door checkpoint just past deck 9's sprinkler:** proposed, "only if the stretch from
   `cp_9_arrive` to the steward with no tangerine proves harsh". The user judges it in play; if
-  yes, one line of data.
+  yes, one line of data.~~ **Closed (the user, 2026-11-19, §7e):** none. One stood there in
+  effect all along (the balcony cabin's lamp at 151.6 m lit as she walked past its locked door);
+  it goes with part 10, and the corridor keeps its two ends.
 
 ## 4. Part 2: the rest of the twenty, and the books
 
@@ -572,6 +575,120 @@ and `boot`. `docs/population.md` §2.3's rows, `GAME_DESIGN.md` §6.3.
 
 The audit's pictures were made by a script outside the repo (her teleported beside each `tangerine` of
 `maps/world.json`, `Browser.close_up` on it); they are not kept. Make them again the same way before and after.
+
+## 7e. Part 10: the checkpoints, nineteen places (medium; about 20 generations, a guess; added 2026-11-19)
+
+The user, 2026-11-19: "I've seen a few places myself where doors are stuck at weird places or misplaced"; asked for an
+audit of every checkpoint: placements that make no sense, new props for more variety of doors, the best total for the
+progression, the routes and the map, "Don't make the game too easy", "Remove redundant/unnecessary checkpoints". The
+design session looked at all 32 in the running game, each enlarged with her beside it, unlit and lit, and worked out
+from the hazards' places and the game's own rule (`closestCheckpoint`) where every scare sends her back. On a first
+proposal of 28: "I feel like that is too many checkpoints in the game". On the leaner one: "Yes, let's try those 19";
+on a new one for deck 10's midships hallway: "No, don't add".
+
+**The test for each: a checkpoint stays only if a scare sends her back to it, and taking it away would cost her hazards
+to do again, not only an empty walk.** None stands inside a run of hazards; none on a calm stretch.
+
+**Today 32 as the game counts them, at 26 places** (a balcony cabin has two, one at its corridor door and one at its
+balcony door, the hallway and the balconies being two routes). **From now 23, at 19 places:**
+
+| Where | Id | What it is | Changes |
+|---|---|---|---|
+| Deck 3, 90 m | `cp_crew` | Her crew cabin's door, lit from the start | None |
+| Deck 4, 72 m | `cp_gangway` | The gangway lobby's crew door | None |
+| Deck 4, 111.6 m | `cp_laundry` | The lamp over the laundry's door (the foot of the vacuum's corridor) | None |
+| Deck 6, 160.9 m | `cp_library` | The Library, beside its promenade door: the promenade's scares come back here, two steps from the way out | Its place and its door, below |
+| Deck 6, 204.4 m | `cp_foyer` | The theatre's foyer | Its place and its door |
+| Deck 7, 189.2 m | `cp_7_aft` | The Arcade | Its neighbours and its door |
+| Deck 8, 43.3 m | `cp_8206` | The lamp over cabin 8206's door | None |
+| Deck 9, 118.2 m | `cp_9_arrive` | **The crew trunk's own door, the one she comes out of** | The twin door 1.4 m aft goes |
+| Deck 9, 191.6 m | `cp_9_mid` | The crew door at the corridor's aft end | None |
+| Deck 10, 41.6 m | `cp_bridge` | The crew door by the bridge | None |
+| Deck 11, 82.7 m | `cp_gym` | The crew door between the lobby and the gym's windows | None |
+| Deck 11, 140.6 m | `cp_pool` | The pool attendant's hut | None |
+| Deck 11, 192 m | `cp_garden` | The Garden Café's service door | Out of the window, below |
+| Deck 12, 165 m | `cp_technical` | The technical door at Cagney's forward end | Its neighbours and its door |
+| Deck 9, 150 m | `cp_balc_9` | The balcony cabin, **its balcony side only** | The corridor side goes |
+| Decks 8, 9, 10 | `cp_hall_8m`/`cp_balc_8m`, `cp_hall_8a`/`cp_balc_8a`, `cp_hall_9a`/`cp_balc_9a`, `cp_hall_10a`/`cp_balc_10a` | The four hallways' cabins with an ajar balcony door, both sides: each is its hallway's only way in | None |
+
+Fourteen on the main way, five balcony cabins in the optional outside region.
+
+**The nine that go, and what each costs her:**
+
+| Id | Why | What changes in play |
+|---|---|---|
+| `cp_6_fwd` (deck 6, 40.9 m) | Nothing scares on deck 6 forward; it took deck 5's scares and put her a deck up, 38 m from the stairs | Deck 5 forward's scares (the papers, the breakfast round) come back at the gangway lobby, a flight below |
+| `cp_4_aft` (deck 4, 211.6 m) | No scare returns to it | Nothing |
+| `cp_officer` (deck 10, 61.6 m) | 20 m from `cp_bridge` in a calm corridor; its door was drawn over the officer who stands there (`amb_officer_10`, 60 m) | Nothing; he stands at a cabin door again |
+| `cp_hall_guest`, `cp_balc_guest` (deck 10, 235.6 m) | 20 m from the other cabin of deck 10's aft hallway | A gull at 231 m on the balconies costs 16 m, not 5. The guest, his cabin, his balcony door as a way in and his book stay |
+| `cp_chapel` (deck 12, 70.7 m) | No scare returns to it | Nothing |
+| `cp_funnel` (the funnel's top) | A gull's hit bumped her down to the stairway's foot and she then came back at the top; a door on an exhaust pipe | Any hit on the stairway, and a fall from the top, come back at the technical door: the climb again |
+| `cp_station` (the boat walkway, 128 m) | A crew door in the walkway's glass wall, drawn over the railing | The drill's boat costs about 100 m, not 58: back at the Library (or the Arcade), out to the promenade, up the ladder. Deck 8's balconies reached from the walkway, with no balcony cabin lit yet, come back inside the ship |
+| `cp_balcabin` (deck 9's corridor, 151.6 m) | It lit as she walked past the cabin's locked door, in the middle of the corridor's hazards | On the way out every hit in deck 9's corridor comes back at the trunk (up to 48 m, the vacuum and the sprinkler again); on the way back, at one of the two ends |
+
+**Not added (the user):** deck 10's midships hallway, under the pool's hatch, keeps none. She comes back at the pool
+attendant's hut above the hatch for three of its four scares, and at deck 9's aft end for the "Do Not Disturb" door at
+171.6 m.
+
+**One rule in `closestCheckpoint` (the ship scene): she never comes back behind a door that is shut to her.** Among the
+lit checkpoints on her deck and route, leave out any with a wall across the deck between it and where she was, whose
+door would not open to her coming from the checkpoint's side (a one-way door not opened yet, a card or a flag she lacks:
+`passes()` in `src/progression.js`); with none left on her deck, the nearest deck as now. Found in the running game: hit
+by deck 9's aft swinging door (`haz_swing_9a`, 207.6 m) on her first way forward from the cabin, she comes back at
+`cp_9_mid` (16.0 m against 16.0), outside the hallway, behind `part-door-9-202` (shut from the lobby's side), and the
+only way in again is the balconies. Deck 10's midships scares, once `cp_hall_10a` or `cp_bridge` is lit, are the same
+case. A check for it in `region7`.
+
+**The six doors that stay and stand wrong** (nine did; `cp_officer`, `cp_station` and `cp_funnel` go):
+
+| Id | What is wrong | The fix |
+|---|---|---|
+| `cp_foyer` | The door stands on the Stardust Lounge marquee's gold post (`stardust-entrance`, its post ends about 204.3 m) | About 1 m aft (about 205.3), clear of the post and of the first seat (206.6); prop B |
+| `cp_7_aft` | Squeezed between an arcade cabinet (188.3, where `amb_teen` plays) and the claw machine (190.0), a third of a metre each side | One cabinet out or the row spread: a clear metre each side; prop B |
+| `cp_library` | White on the dark panelling, a quarter of a metre from the wall's pillar and 0.85 m from the promenade door (`door-deck`, 162.2) | Centred in the gap (about 161.1); prop C. It stays beside the promenade door on purpose |
+| `cp_technical` | Wedged between the wall across the deck (164.2) and the wine cabinet (`wine-cabinet-bg`, 165.9), its lit leaf over the cabinet | The cabinet moves aft of the kitchen or goes; half a metre clear each side; prop C |
+| `cp_garden` | In the café's window (the run ends about 193.3 m), a wicker table and chairs at its edge (190.3 to 191.3) | The window run ends a pane short, as at `cp_gym`; the table a metre forward; the white crew door stays |
+| `cp_9_arrive` | A second white door 1.4 m from the trunk's, the two alike | The trunk's own door carries the lamp (`addCheckpoint(..., { door: null })`), above its arrows' plate as her crew cabin's sign is above its lamp, whichever order reads; it lights as she steps out of the trunk |
+
+`cp_gangway`, `cp_9_mid`, `cp_gym`, `cp_bridge` and the pool's hut were looked at and are right; so are the lamps over
+doors drawn already.
+
+**Two props, each with its lit twin, each shown to the user on a screenshot of its two places, shut and lit, before
+anything is placed** (`CLAUDE.md`, "Art"). The green lamp over the door is what says checkpoint everywhere; the door is
+its place's own:
+
+- **B: a padded theatre door** (dark leather, brass studs, a small round window), for the foyer and the Arcade's night
+  blue walls.
+- **C: a dark wood service door** (a brass kick plate), for the Library's and Cagney's panelling.
+
+Each on `door-crew`'s frame (29 x 74) so that its placing holds, in full colours as every door of hers; the ajar twin
+built from the shut one's frame, the warm light in the gap as `door-crew-ajar` has it (`CLAUDE.md`, "Two states of one
+thing share one frame"). `addCheckpoint` takes the door's name already; `lightCheckpoint` sets `door-crew-ajar` for all:
+the door's own twin. `tools/check_overlaps.py` knows a door by its picture's name: the new names go in. The white crew
+door stays in the corridors and lobbies. (The design session made four tries of a steel locker for the walkway and the
+funnel, 4 generations, before those two were dropped: PixelLab map objects `3bfbdd69`, `24fa40fb`, `bfe5b772`,
+`16aeb45b`, not used.)
+
+**In the data and the code:** `CHECKPOINTS` in `tools/population.py` loses `cp_6_fwd`, `cp_4_aft`, `cp_station`,
+`cp_officer`, `cp_chapel` and `cp_9_arrive`'s own door; `ROOMS` loses `checkpoint=` on `balcabin9` and `guest10`;
+`BALCONY_CPS` loses `cp_balc_guest`; `cp_funnel` goes from `src/world/world.js`. The three that took a cabin door's
+place (`slot`) give it back by the corridor's rule: look at each. A save that names a checkpoint that is gone starts her
+at the start (`initialSpawn`): fine while nothing is saved (`DEV_FRESH`), one line to keep in mind for the release.
+
+**Then:** each of the nineteen looked at enlarged, unlit and lit, with the people of the spot in place;
+`tools/check_overlaps.py` lists nothing. The playtests that name what goes or moves: `region4` (`cp_balcabin` as the
+card opens the cabin; `cp_9_arrive` by its id still), `region7` (`cp_balc_guest`; the new check), `region8`
+(`cp_funnel`, and whatever expects her back at the top), `region9` (`cp_chapel`, `cp_officer`); run those,
+`region1` to `region3`, `region6`, `mishaps`, `finale`, `boot`. The documents: `docs/population.md` §2.5 and each
+deck's rows, `GAME_DESIGN.md` §5.5 and §6.1.3's "Checkpoints" lines.
+
+**"Let's try" is the user's word: the number is judged in play.** If it is still too many, the next to go, each with
+its cost: `cp_gym` (the sauna's steam then costs an 88 m empty walk from the pool's hut), `cp_laundry` (the first vacuum
+sends her back to the gangway, past the dog again), `cp_7_aft` (the casino's chips wake her a deck down, in the
+Library). Under about eleven on the main way, scares wake her on the wrong deck as a rule.
+
+The audit's pictures and its model of the returns were made by scripts outside the repo (her teleported beside each of
+`window.__ship.checkpoints`, `Browser.close_up`; `closestCheckpoint` asked with a given set lit); they are not kept.
 
 ## 8. Optional, each only on the user's word
 
