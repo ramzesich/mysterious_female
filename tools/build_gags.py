@@ -64,7 +64,8 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
   jog-spin1..7   9a: head on into the jogger, both running: from her run frame 1, 3, 5 or 7 (one each quarter of her
                 stride) she is spun round like a top, through her front and back, and sits (her dazed sit's first
                 frame); the generator's streaks were across her in frame 2 (and 3 from frame 1): left out. Her middle
-                at x 72, at the end 64 (`jog.spin`)
+                at x 72, at the end 64 (`jog.spin`). `jog-spin-stand`: the same from her standing frame (not
+                running; the stage light's 12a too)
   jog-shoved    9c: he runs into her back: she pitches forward, stumbles bent over, dives and lands flat on her
                 belly (her dazed lie's first frame, the last frame 2 px lower as the game draws her lying); her middle
                 at x 36, at the end 86 (`jog.shove`)
@@ -89,7 +90,7 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
          ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
          ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9), ("jog-bowled", 13),
-         ("jog-spin1", 11), ("jog-spin3", 12), ("jog-spin5", 12), ("jog-spin7", 12), ("jog-shoved", 17)]
+         ("jog-spin1", 11), ("jog-spin3", 12), ("jog-spin5", 12), ("jog-spin7", 12), ("jog-shoved", 17), ("jog-spin-stand", 13)]
 # (Gags 7a's and 21's to 23's frames are cut from the generator's in a folder of their own.)
 PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
         "parasol-flip": "parasol-flip/flip", "dnd-cover": "dnd-sorry/cover", "dnd-tiptoe": "dnd-sorry/tiptoe",

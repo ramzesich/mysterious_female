@@ -2661,7 +2661,11 @@ def scenario_region3(b):
         hit = b.state()["mode"] == "scripted"
         wait(0.05)
     ok &= check(hit and "Ouch" in alert(b), "under the swinging light: bonked", alert(b))
-    wait(2.8)
+    ok &= check(js(b, "window.__ship.worldLayer.list.some(o => /^gags-jog-(spin|shoved)/.test(o.anims?.currentAnim?.key || ''))"),
+                "12a or 12b: the jogger's spin or belly-flop (the user, 2026-11-19: reuse)")
+    # (Until she is back at her checkpoint, not for a time: the gag is longer than the fall it replaced.)
+    b.wait_for("window.__ship.mode === 'play'", 8)
+    wait(0.3)
     # The open trap door: one deck down onto the galley's flour sacks, beside the rival.
     b.teleport(st["trapX"], D6)
     wait(1.6)

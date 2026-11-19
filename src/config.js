@@ -286,8 +286,8 @@ export const MISHAP_SCENES = {
     '10f': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyBounce' },      // into the stewardess's back
     '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit', gag: 'sprinkler' },  // the jet in her face; with none on her the wet gag, 16's (the user, 2026-11-19: `soakRide`)
     '11b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'sprinkler' },   // in her back; the same
-    '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // the stage's light
-    '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
+    '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit', gag: 'lightSpin' },  // the stage's light: 9a's spin, she sits dizzy (the user, 2026-11-19: reuse)
+    '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly', gag: 'lightShoved' },  // at her back: 9c's stumble and belly-flop
     '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
     '13b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },     // it catches her past it
     '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // a basketball
@@ -349,6 +349,9 @@ export const GAGS = {
     jogSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
     jogShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', his: 'sorry', loop: 'scratch', holdMs: 1700 },
     jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, holdMs: 1600 },
+    // The stage's light (12a, 12b; the user, 2026-11-19: reuse the jogger's): 9a's spin, 9c's belly-flop.
+    lightSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
+    lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700 },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head

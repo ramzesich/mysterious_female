@@ -4601,7 +4601,7 @@ export class ShipScene extends Phaser.Scene {
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
         if (sc.gag && GAGS[sc.gag].sorry && this.anims.exists('gags-dnd-tiptoe')) return this.sorryGag(sc, fromX);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
-        if (sc.gag && GAGS[sc.gag].jog && ride?.person) return this.jogGag(sc, ride.person);
+        if (sc.gag && GAGS[sc.gag].jog && (ride?.person || !GAGS[sc.gag].his && !GAGS[sc.gag].bounce)) return this.jogGag(sc, ride?.person ?? null);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
         if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
@@ -4963,7 +4963,8 @@ export class ShipScene extends Phaser.Scene {
     // 9c into her back, she stumbles and belly-flops. In 9b and 9c he stops where he met her, his far arm up
     // to scratch the back of his head, sorry (his `sorry` clip, then `scratch` until her checkpoint); in 9a
     // he runs on. Where she ends dizzy (`dazed`), her own dazed clip takes over from the clip's last frame
-    // (its first frame). 9d: 8d's bounce off his back (`cartGag`'s picture), and he never notices.
+    // (its first frame). 9d: 8d's bounce off his back (`cartGag`'s picture), and he never notices. The stage's
+    // light plays 9a's and 9c's (12a, 12b): no one with it (`q` null), on the floor she stands on.
     jogGag(sc, q) {
         const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
         const m = this.cache.json.get('gags-meta');
@@ -4986,12 +4987,16 @@ export class ShipScene extends Phaser.Scene {
             s.once(`animationcomplete-${g.clip}`, end);
             return;
         }
-        const clip = g.clips ? `${g.clips}${n >= 0 ? (n % 2 ? n : (n + 1) % 8) : 1}` : g.clip;
+        // (Not running, or landed from a jump: the spin from her standing frame.)
+        const clip = g.clips ? `${g.clips}${n >= 0 ? (n % 2 ? n : (n + 1) % 8) : '-stand'}` : g.clip;
         const [x0, x1] = g.at ? m.jog[g.at] : [m.jog.x, m.jog.x];
         // (A frame anchored at column c, flipped, takes origin (cell - 1 - c) / cell.)
         const ox = (face < 0 ? m.cell - 1 - x0 : x0) / m.cell;
-        const s = this.add.sprite(p.x, q.y, 'gags').setOrigin(ox, m.floor / m.cell).setFlipX(face < 0).setDepth(p.depth);
+        const s = this.add.sprite(p.x, q ? q.y : p.y, 'gags').setOrigin(ox, m.floor / m.cell).setFlipX(face < 0).setDepth(p.depth);
         this.worldLayer.add(s);
+        // (Where the clip carries her on, a door or a wall across the deck ahead stops her short of it: the clip
+        // starts as far back as it would have taken her through.)
+        if (x1 !== x0) s.x -= face * (x1 - x0) - (this.stopShort(p.x, p.x + face * (x1 - x0), s.y, 12) - p.x);
         p.setVisible(false);
         if (g.his) {
             q.state = 'acting';
