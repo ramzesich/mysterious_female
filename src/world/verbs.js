@@ -15,6 +15,7 @@ export const verbs = {
         this.kickDir = 0;
         this.kickedAt = -Infinity;
         this.gliding = false;
+        this.glideArmed = false;
         this.stairWind = false;
         this.stairCling = null;
         this.overRail = false;
@@ -112,11 +113,15 @@ export const verbs = {
     },
 
     // --- The glide: the parasol (region 8) --------------------------------------------------------
-    // It opens only while she holds jump in the air, falling: she sinks slowly and steers. A fall is
-    // measured from where she closes it, so letting go high up is still a long fall.
+    // It opens while she holds jump in the air, falling: she sinks slowly and steers. Only a press made in
+    // the air counts (the user, 2026-11-19: "it should open only on the second jump press (when we're in the
+    // air). It stays open as long we hold that jump press"): a jump from the floor held on does not open
+    // it. Letting go shuts it. A fall is measured from where she shuts it, so letting go high up is still a
+    // long fall.
     updateGlide(input) {
         const p = this.player, body = p.body;
-        const on = this.progress.knows('parasol') && !this.world.carry && !this.holding && input.jump && body.velocity.y > 0 && !this.crawling;
+        this.glideArmed = input.jump && (this.glideArmed || this.glidePress);
+        const on = this.progress.knows('parasol') && !this.world.carry && !this.holding && this.glideArmed && body.velocity.y > 0 && !this.crawling;
         if (on) {
             body.velocity.y = Math.min(body.velocity.y, VERBS.glideFall);
             this.takeoffY = p.y;

@@ -1264,7 +1264,9 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   he lends her **his book**.
 - **The card and the parasol:** the **Officer's card** glints on the sun deck where he dropped it;
   the **parasol** stands at the empty sunbed (a glyph: hold jump in the air). The parasol **opens only
-  while she holds jump in the air**: she drifts down slowly and steers; gusts push her; falling without
+  while she holds jump in the air**, a press made in the air (2026-11-19, the user: "it should open only on
+  the second jump press (when we're in the air)": a jump from the floor held on does not open it); letting
+  go shuts it: she drifts down slowly and steers; gusts push her; falling without
   it is still the long-fall scare. It shields her from gulls and sprinklers while open. New glides:
   down the atrium from deck 10's walk to 5; from the balconies to the promenade; off deck 12's end
   onto the Great Outdoors; the finale.

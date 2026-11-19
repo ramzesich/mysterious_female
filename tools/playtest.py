@@ -4316,10 +4316,16 @@ def scenario_region8(b):
     b.key("space", True)
     wait(0.1)
     b.key("down", False)
-    wait(1.8)
+    wait_js(b, "window.__ship.player.body.velocity.y > 0", 2)
+    wait(0.1)
+    ok &= check(not b.eval("window.__ship.gliding"), "over the rail with jump held on: the parasol stays shut", b.state())
+    b.key("space", False)
+    wait(0.1)
+    b.key("space", True)
+    wait(1.0)
     b.shot("region8-glide")
     s = b.state()
-    ok &= check(s["y"] > D10 + 30 and b.eval("window.__ship.gliding"), "↓ and jump: over the rail, the parasol opens", s)
+    ok &= check(s["y"] > D10 + 30 and b.eval("window.__ship.gliding"), "jump pressed again in the air and held: the parasol opens", s)
     end = now() + 20
     while now() < end and b.state()["y"] < D5:
         wait(0.1)
@@ -4636,6 +4642,15 @@ def out_of_the_hatch(b):
     return wait_flag(b, "sunset", 30)
 
 
+def open_parasol(b):
+    """A jump, and jump pressed again in the air as she starts to come down and held: the parasol
+    opens and stays open while it is held (the user, 2026-11-19: a jump from the floor held on does
+    not open it). The caller lets go of space."""
+    b.tap("space", 0.1)
+    wait_js(b, "window.__ship.player.body.velocity.y > 0", 2)
+    b.key("space", True)
+
+
 def glide_to_the_bow(b):
     """From the balcony forward of the spa: over its front rail and down under the parasol to the
     mooring deck, the two gulls kept out of her way (`finale` flies into one)."""
@@ -4643,7 +4658,7 @@ def glide_to_the_bow(b):
     b.eval("(c => { c.parked = true; c.birds.forEach(g => { g.x = 0; }); })(window.__ship.world.story.crossers)")
     hold_until(b, "left", lambda s: s["x"] < F["balcony"]["x0"] + 10, 5)
     b.key("left", True)
-    b.key("space", True)         # over the rail, and the parasol opens as she falls
+    open_parasol(b)              # over the rail, and jump again in the air: the parasol
     hold_until(b, [], lambda s: s["x"] < exact_x(12) or s["mode"] != "play", 16)
     b.key("left", False)
     hold_until(b, [], lambda s: s["mode"] != "play" or (s["y"] >= D7 - 34 and b.eval("window.__ship.grounded")), 16)
@@ -4721,7 +4736,7 @@ def scenario_finale(b):
     fresh_lull()
     hold_until(b, "left", lambda s: s["x"] < B["x0"] + 10, 5)
     b.key("left", True)
-    b.key("space", True)
+    open_parasol(b)
     s = hold_until(b, [], lambda s: s["mode"] != "play", 9)
     b.key("left", False)
     b.key("space", False)

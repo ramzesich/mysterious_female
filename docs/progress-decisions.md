@@ -2988,3 +2988,17 @@ ways round. Her word is raised over the parasol's top for it (`alertOver`). With
 - **Tests:** `finale` (the gag's word and picture, back on the balcony), `lang`, `boot`, `falls`, `overboard`,
   `region7`, `region9`, `bridge`, `balcony`, `run_jump`, `promenade`, `atrium` pass; `check_overlaps` 0. The rest
   not run. 2 generations.
+
+## The parasol opens on a second press of jump (2026-11-19)
+
+The user: "Let's change the parasol control: it will open on a second jump press only, not on hold." I first made it
+a toggle (a press in the air opened it, it stayed open, another press shut it); the user: "not what I meant ... it
+should open only on the second jump press (when we're in the air). It stays open as long we hold that jump press.
+Meaning, the only difference with the initial mechanic is that it doesn't open if we jump from the ground and hold."
+So: a press of jump in the air (not the jump from the floor, nor a coyote jump, nor a wall kick: `glidePress` in the
+ship scene's jump code) arms it while it is held (`glideArmed`); armed and falling, it opens as before; letting go
+shuts it; landing disarms it. `updateGlide` in `src/world/verbs.js`.
+
+- **Tests:** the glides in `region8`, `finale` and `golden` press jump a second time in the air and hold it
+  (`open_parasol` in `tools/playtest.py`); `region8` checks that over the atrium's rail with the hop's jump still held
+  the parasol stays shut. `region8`, `finale`, `golden`, `falls`, `run_jump`, `balcony` pass; the rest not run.

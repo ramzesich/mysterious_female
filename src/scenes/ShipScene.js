@@ -2897,6 +2897,7 @@ export class ShipScene extends Phaser.Scene {
                 this.world.showParasol(false);
                 sfx.parasolShut();
             }
+            this.glideArmed = false;                 // (a press in the air, held on: only for that fall)
             this.grounded = true;
             this.lastGroundedAt = time;
             this.takeoffY = p.y;
@@ -2970,14 +2971,19 @@ export class ShipScene extends Phaser.Scene {
         if (input.jumpPressed) this.jumpBufferedAt = time;
         // (The ice cream mix's canister is too heavy to hop with: §6.1.2.)
         const canJump = !crawling && !this.world.carry?.heavy && (onFloor || time - this.lastGroundedAt < PLAYER.coyoteMs);
+        let jumped = false;
         if (canJump && time - this.jumpBufferedAt < PLAYER.jumpBufferMs) {
             body.velocity.y = -PLAYER.jumpVelocity * this.jumpScale();
             this.jumpBufferedAt = -Infinity;
             this.lastGroundedAt = -Infinity;
+            jumped = true;
             if (this.jumpScale() < 1) sfx.hop(); else sfx.jump();
         } else if (!onFloor && this.tryWallJump(input, time)) {
             this.jumpBufferedAt = -Infinity;
+            jumped = true;
         }
+        // (A press in the air that was not a jump or a wall kick: the parasol's, `updateGlide`.)
+        this.glidePress = !onFloor && !jumped && input.jumpPressed;
         if (input.jumpReleased && body.velocity.y < -PLAYER.jumpCutVelocity && !(time - this.kickedAt < 700)) {
             body.velocity.y = -PLAYER.jumpCutVelocity;
         }
