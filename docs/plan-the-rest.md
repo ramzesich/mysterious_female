@@ -223,6 +223,13 @@ built for them. They stay as built: a tangerine thrown to them is what saves a c
 
 ### 1.3 The `mishaps` playtest, the sounds, the start places (medium; no art)
 
+**Built 2026-11-19** (the user's answers: region 1's untested ones in too; 7b and 13b kept, marked
+unreachable; the ten sounds; the five places): `mishaps` in nine cases, sixty hits through each thing's own
+code, none on her and two; ten gag sounds on their clips' frames; `chips7`, `jet11`, `light6`, `towels9`,
+`drill7`; `pocket`'s three stand-in checks and three leftover pocket-emptying lines gone; the table of hits
+in `docs/population.md` §2.9. The old run-off checks listed below were already gone (each rewritten as its
+gag landed). `docs/progress-decisions.md`, "1.3".
+
 - `mishaps`: a new scenario, a case for each scenario of §1.6 outside region 1 (the gag it asks
   for, her checkpoint after, the thing back in its place; ~~with a tangerine the reaction and
   where the tangerine goes~~ **with tangerines on her the same gag and the count unchanged, and

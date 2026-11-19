@@ -54,6 +54,7 @@ new one added there should be added here too.
 | `library`: inside the Library | <http://localhost:8000/?play&at=library&cards=all> |
 | `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |
 | `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all> |
+| `light6`: deck 6, by the stage door, forward of the stage's swinging light (walk aft under it as it swings: 12a from in front of it, 12b at her back; it swings once near-catch 3 is done, `did=bb3`) | <http://localhost:8000/?play&at=light6&did=bb3> |
 
 ## Deck 7
 
@@ -63,6 +64,8 @@ new one added there should be added here too.
 | `kids`: Splash Academy | <http://localhost:8000/?play&at=kids&cards=all> |
 | `atrium`: the atrium's walk | <http://localhost:8000/?play&at=atrium&cards=all> |
 | `walkway`: outside, the boat walkway over the promenade, at the station locker | <http://localhost:8000/?play&at=walkway&cards=all> |
+| `chips7`: deck 7, at the casino's door, forward of the slot machines (run aft onto a spill of chips: 1) | <http://localhost:8000/?play&at=chips7> |
+| `drill7`: outside, on the boat walkway 5.5 m forward of the drill's boat (once it is hoisted again, run aft at it: 15) | <http://localhost:8000/?play&at=drill7&cards=all> |
 
 ## Deck 8
 
@@ -82,14 +85,10 @@ new one added there should be added here too.
 | `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
 | `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward> |
 | `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9> |
-| `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10> |
-| `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet> |
-| `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a> |
-| `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5> |
 | `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9> |
 | `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9> |
 | `dnd9`: deck 9's corridor, 2 m forward of its "Do Not Disturb" door (walk aft to it and press E: 23, no tangerine on her) | <http://localhost:8000/?play&at=dnd9> |
-| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11> |
+| `towels9`: deck 9's corridor, 3 m aft of the towel stack (run forward past it: 18) | <http://localhost:8000/?play&at=towels9> |
 | `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all> |
 | `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all> |
 
@@ -98,6 +97,7 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `bridge`: the bridge | <http://localhost:8000/?play&at=bridge&cards=all> |
+| `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10> |
 
 ## Deck 11
 
@@ -109,6 +109,11 @@ new one added there should be added here too.
 | `pool`: the pool deck | <http://localhost:8000/?play&at=pool&cards=all> |
 | `buffet`: the Garden Café | <http://localhost:8000/?play&at=buffet&cards=all> |
 | `diner`: the Great Outdoors | <http://localhost:8000/?play&at=diner&cards=all> |
+| `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet> |
+| `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a> |
+| `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5> |
+| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11> |
+| `jet11`: deck 11, at the pool attendant's hut on the aft pool's rim (walk aft at the kid: his jet in her face, 11a; past him, in her back, 11b; he is there once near-catch 5 is done, `did=bb5`) | <http://localhost:8000/?play&at=jet11&did=bb5> |
 
 ## Deck 12
 

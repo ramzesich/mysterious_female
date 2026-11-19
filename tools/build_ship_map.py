@@ -1039,6 +1039,13 @@ def build_objects():
     # (The soft serve machine, deck 11's Great Outdoors: a cone to carry forward to the pool's gulls.)
     add(point("icecream", "place", exact_x(215.4), floor_y(11)))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
+    # (§3 1.3, 2026-11-19: a start by each hazard whose gags had none: the casino's slots, 1, run aft
+    # onto a spill; the kid's jet, 11a/11b, `&did=bb5`, at the pool attendant's hut (his checkpoint), walk aft at him; the stage's swinging light,
+    # 12a/12b, `&did=bb3`, walk aft under it; the towel stack, 18, aft of it (forward of it the darting vacuum comes first), run forward past it; the drill's boat,
+    # 15, run aft at it once it is hoisted.)
+    for name, deck, m in [("chips7", 7, 148.5), ("jet11", 11, 140.8), ("light6", 6, 241.5), ("towels9", 9, 144.5)]:
+        add(point(name, "place", exact_x(m), floor_y(deck)))
+    add(point("drill7", "place", exact_x(180.5), floor_y(7), [prop("route", "promenade")]))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):

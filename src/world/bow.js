@@ -74,7 +74,7 @@ export class Steam {
                     t += dt * 1000;
                     const u = Math.min(1, t / g.slideMs);
                     pic.x = x0 + (end - x0) * (1 - (1 - u) * (1 - u));
-                    if (!coughed && t > g.coverMs * 0.6) { coughed = true; sfx.at(pic.x, d.y).cough(); }
+                    if (!coughed && t > g.coverMs * 0.6) { coughed = true; sfx.at(pic.x, d.y).herCough(); }
                     this.burst.x = pic.x;
                     this.burst.t = t;
                     p.x = pic.x;

@@ -231,6 +231,42 @@ one-way door opened, each book (found, returned, read), each tangerine taken, ea
 seen, each errand's state, each Bumbot beat done, the machine refilled, the kid's ally state, the old
 lady's doze, the wedding, the horn, the alarm, the catch, the way home; the towel's place (§8).
 
+### 2.9 The hits: each hazard's scenarios, gag, sounds and checks (as built, 2026-11-19)
+
+Every hazard that can hit her, with its scenarios of `docs/plan-three-uses.md` §1.6 (`MISHAP_SCENES` in
+`src/config.js`; which one by the side and who was moving, `src/world/mishaps.js`), the gag each plays
+(**whatever she carries**: only a gull, 20 to 22, takes a tangerine instead, 1.2a), the sounds on top of
+the fright's (`sfx.scare`; a gag's own are played on its clips' frames, `GAGS[...].sounds`), and the
+playtests that make the hit and check it (`mishaps` makes each through its own code, with none on her and
+with two). A start place by each: `docs/start-links.md`.
+
+| Hazard | Where | Scenarios | Gag | Sounds | Checked in |
+|---|---|---|---|---|---|
+| `haz_chips` (the slots' spills) | 7 | 1 | none: the built fall (sit) | `slip` | `region3` |
+| The dog's lead (`haz_dog_4`) | 4 | 2 | the built fall, then the dog's lick | `bark` | `deck4` |
+| Room-service trays (`haz_trays_*`) | 8, 10 | 3 | her ride on a tray | `crash` | `region6`, `region7`, `mishaps.things` |
+| The papers (`haz_papers_5`, `5b`) | 5 | 4a, 4b | her leg up behind (belly) / in front (bottom) | `paperSlide` | `deck4`, `pocket` |
+| The robot vacuums (`haz_vacuum_4`, `_9`) | 4, 9 | 5a, 5b | she rides it off | `vacRev`, `vacDart`, `thump` | `vacuum`, `region4` |
+| The suitcase (`haz_suitcase_4`) | 4 | 6a, 6b, 6c | she rides it, tipped off | `creak` | `deck4` |
+| The deck chair (`haz_deckchair`, `haz_wet`) | 11 | 7a; **7b unreachable** (it stands still) | face first onto it, she sleds on it | `scrape`, `creak`, `thump` | `region6` |
+| The porter's cart (`haz_porter`) | 4 | 8a, 8b, 8c, 8d | over the cart, pushed, sat on it, bounced off his back | `cartBump`, `thump` | `region1`, `mishaps.porter` |
+| The jogger (`haz_jogger`) | 6 | 9a, 9b, 9c, 9d | spun like a top, bowled back, shoved onto her belly, bounced off his back | `spin`, `thump`, `bellyFlop` | `region2`, `mishaps.jogger` |
+| The breakfast round (`haz_breakfast_5`; the lady in her robe) | 5 (4) | 10a to 10f | on her bottom by the tray; over the trolley, back off it, bounced off the stewardess; 10e the built fall | `crash`, `trolleyRattle`, `bellyFlop`, `thump` | `deck4`, `mishaps.breakfast` |
+| The kid's jet (`npc_kid`, after `bb5`) | 11 | 11a, 11b | the wet gag (16's) | `jet`, `splashSmall`, `herSneeze` | `region6`, `mishaps.jet` |
+| The stage's light (`haz_lights`, after `bb3`) | 6 | 12a, 12b | 9a's spin, 9c's belly-flop | `bonk`, `spin`, `bellyFlop` | `region3`, `mishaps.light` |
+| The swinging doors (`haz_swing_*`) | 8 to 10 | 13a; **13b unreachable** (it hits her only facing it) | flat on the wall, sliding down it | `doorBang`, `thump`, `doorShut` | `region4` |
+| The court's basketballs | 12 | 14a, 14b | stiff onto her back / her face, lying dazed | `bounce`, `headBonk`, `bellyFlop` | `region8`, `mishaps.ball` |
+| The boat drill (`haz_drill`) | 7 | 15 | 14a's fall, the boat down over her | `boatThump`, `bellyFlop` | `region7`, `mishaps.things` |
+| The sprinklers | 8 to 10 | 16 | soaked, a sneeze, she squelches back | `herSneeze`, `splashSmall` | `region4`, `mishaps.things` |
+| The sauna's steam | 11 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9` |
+| The towel stack (`haz_towels_9`) | 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things` |
+| Teppanyaki's flares | 12 | 19 | sooty, blinking, a cough | `flare`, `yelpHot`, `herCough` | `region8` |
+| The gulls on the rails | balconies, 12 | 20 | on her head; with a tangerine, it takes one | `gullDive`, `flap` | `region7`, `region8`, `pocket`, `mishaps.gulls` |
+| The funnel's gulls | the roof | 21 | on her bottom down the stairway; with one, it takes it | `gullDive`, `land` | `region8`, `mishaps.gulls` |
+| The crossing gulls | the finale | 22 | the parasol inside out, she drops; with one, it takes it | `gull`, `parasolShut` | `finale`, `mishaps.gulls` |
+| "Do Not Disturb" doors (`haz_dnd_*`) | 8 to 10 | 23 | hands over her eyes, she tiptoes off | `knock`, `door`, `oh`, `tiptoe` | `region4`, `pocket` |
+| The occupied balconies (`haz_sunbather`, `haz_breakfast`) | 8, 10 | 24 | as 23, to the partition | `hey`, `tiptoe` | `region7`, `mishaps.balcony` |
+
 ## 3. The decks, bow to stern
 
 Columns: metres, id, what, behaviour, needs (art or a room). Ambient people (`amb_`) never block

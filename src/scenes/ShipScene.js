@@ -32,6 +32,7 @@ const DEPTH = {
 const approach = (value, target, step) =>
     value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
+const GAG_SHEETS = new Set(['gags', 'her-mishaps', 'towels']);   // the sheets whose clips have a gag's sounds
 const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
@@ -95,6 +96,19 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer = this.add.layer();
         this.uiLayer = this.add.layer();
         this.DEPTH = DEPTH;
+        // The gags' own sounds, on their clips' frames (`GAGS[...].sounds`, §3 1.3): any sprite of
+        // the gag sheets, while the gag of her last hit plays. (Before the world, which makes some.)
+        this.sys.events.on('addedtoscene', go => {
+            // (A sprite put into a layer is added again: one listener each.)
+            if (!go.anims || !GAG_SHEETS.has(go.texture?.key) || go.gagEars) return;
+            go.gagEars = true;
+            const at = (anim, frame) => {
+                if (this.mode === 'play') return;
+                const s = GAGS[MISHAP_SCENES[this.lastMishap?.id]?.gag]?.sounds?.[anim.key]?.[frame.index];
+                if (s) [].concat(s).forEach(n => sfx.at(go.x, go.y)[n]());
+            };
+            go.on('animationstart', at).on('animationupdate', at);
+        });
         // The plan's world (§6.1, docs/population.md; src/world/): rooms, people, things, the outside.
         this.world = new World(this);
 
@@ -5077,8 +5091,10 @@ export class ShipScene extends Phaser.Scene {
     scareAir(what, { snatch = null } = {}) {
         const p = this.player;
         if (this.mode !== 'play') return;
-        const sc = MISHAP_SCENES[scenario(what, {})];
-        if (this.isSafe() || this.pocket(p.x - (p.flipX ? -1 : 1) * 10, sc, { snatch })) return;
+        const id = scenario(what, {}), sc = MISHAP_SCENES[id];
+        if (this.isSafe()) return;
+        this.lastMishap = { what, id, time: this.time.now };    // (as every hit: its gag's sounds and the playtests read it)
+        if (this.pocket(p.x - (p.flipX ? -1 : 1) * 10, sc, { snatch })) return;
         this.gliding = false;
         this.world.showParasol(false);
         this.takeoffY = p.y;

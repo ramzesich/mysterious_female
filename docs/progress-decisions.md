@@ -3365,3 +3365,41 @@ The last of the third batch's gags, made under 1.2a's rule (its gag whatever she
   a lunge that ends under the lowered boat. The user asked how she could be under it at all; told, left as is.
 - `region7`'s drill check rewritten (just hoisted, she passes under it; running at it after the lull, the lamp, and
   it catches her well under it, the boat down over her); `region7`, `boot` and `tools/check_overlaps.py` pass.
+
+## 1.3: the `mishaps` playtest, the gags' sounds, the start places (2026-11-19, §3 step 1.3)
+
+No art. Proposed first with what a survey found (the user's answers by number: 1 region 1's untested
+scenarios in too; 2 7b and 13b left in the table, marked unreachable; 3 the ten sounds; 4 the start places).
+
+- **Found:** no check still expected the old run-off (the plan's list was done, each check rewritten as its
+  gag landed). Untested: 8c, 8d, 9a, 9c, 9d, 10a to 10f, 11b, 14b; 12a/12b not told apart; 3 (in region 7),
+  8a, 15, 16, 18, 20 and 24 checked by her word alone; three `pocket` checks passing on a stand-in (8b and 13a
+  called with no ride played the built fall, 20 with none the old run-off); the gulls' take checked for 20
+  only. 7b (the chair stands) and 13b (a door hits her only facing it) cannot happen.
+- **`mishaps`**, nine cases (`porter`, `jogger`, `breakfast`, `jet`, `light`, `ball`, `things`, `balcony`,
+  `gulls`): sixty hits, each through the thing's own code, with none on her and with two: the scenario, its
+  gag's clip (every clip played is recorded by wrapping Phaser's `AnimationState.play`), her checkpoint
+  after (`respawn` counted), the count as it was, nothing lying. With two on her each gull takes one and she
+  keeps her place (21 on the stairway, 22 in a glide). `pocket`'s three stand-in checks taken out (the cases
+  cover them); the leftover lines that emptied her pocket before the jet, the ball and the suitcase gone.
+- **The sounds:** ten new effects, each played on its gag's clip frames (`GAGS[...].sounds`; a clip shared by
+  several gags sounds as the gag of her last hit: the cart's push is the porter's bump, the trolley's
+  rattle): `spin`, `bellyFlop`, `tiptoe`, `herCough`, `herSneeze`, `cartBump`, `trolleyRattle`, `headBonk`,
+  `boatThump`, `towelFlump`; `thump` where she sits down hard (8b, 8d, 9b, 9d, 10d, 10f). 19's yelp is her own
+  `yelpHot` (it was the people's man's), 17's and 19's cough hers (it was the soft serve machine's), the wet
+  gag's sneeze hers. `tiptoe` measured too faint and was raised; `tools/check_sound.py`: all within bounds (the
+  first run since 16, 17 and 19). The user judges them on the soundboard.
+- **A fix found by the tests:** a hit in the air (`scareAir`, the crossing gulls) did not record `lastMishap`;
+  it does, as every hit.
+- **Start places:** `chips7`, `jet11` (`&did=bb5`; first in the pool, now at the pool attendant's hut),
+  `light6` (`&did=bb3`), `towels9` (aft of the stack: forward of it the darting vacuum comes first),
+  `drill7`. `jogger6` was not made: the `promenade` place is on his loop already. Five places filed under
+  deck 9 in `docs/start-links.md` moved to decks 10 and 11.
+- **Found while testing, in the tests:** a round's "just bumped" wait counted from 0 blocked the test's own
+  bump in a game's first 2.5 s (`bumpedAt` far in the past now); a stage-light hit from a teleport landing
+  mid-swing gave either side (she stands before the lamp turns back her way); the open trap door is just
+  aft of the light's lowest point; the test browser keeps its save between games (`&reset` for the towel
+  stack, which stays fallen); her step out of a checkpoint's door turns her, so each hit waits it out.
+- The table of every hit, its gag, sounds and checks: `docs/population.md` §2.9.
+- Run: `mishaps` (three times whole), `pocket`, `deck4`, `region1` to `region4`, `region6` to `region9`,
+  `finale`, `vacuum`, `sound`, `boot`: all pass.

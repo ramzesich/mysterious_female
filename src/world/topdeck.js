@@ -363,13 +363,13 @@ export class Flare {
                 this.smoke = { x: x0, t: 0 };
                 // (Drawn at once: she is in her soot picture from this very frame.)
                 this.drawSmoke(this.sg.clear());
-                sfx.yelp();
+                sfx.yelpHot();
                 let t = 0;
                 s.time.delayedCall(g.coverMs + g.clearMs * 0.6 + g.holdSootMs, () => {
                     pic.play('gags-flare-blink');
                     pic.once('animationcomplete-gags-flare-blink', () => {
                         pic.play('gags-flare-cough');
-                        s.time.delayedCall(g.coughAtMs, () => sfx.at(pic.x, d.y).cough());
+                        s.time.delayedCall(g.coughAtMs, () => sfx.at(pic.x, d.y).herCough());
                         pic.once('animationcomplete-gags-flare-cough', () => done());
                     });
                 });

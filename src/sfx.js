@@ -297,6 +297,17 @@ const her = {
     splutter: () => { [0, 0.09, 0.17].forEach((t, i) => noise(0.06, { band: [700 + i * 200, 2400], q: 1.2, vol: 0.12, t })); tone(420, 0.12, { type: 'sawtooth', to: 300, vol: 0.04, t: 0.05, lp: 1400 }); },
     gasp: () => { noise(0.22, { band: [1200, 3800], q: 0.9, vol: 0.1, attack: 0.04 }); tone(700, 0.18, { type: 'sine', to: 1100, vol: 0.05 }); },
     sniff: () => { noise(0.08, { band: [2200, 4200], q: 1.4, vol: 0.09 }); noise(0.1, { band: [2400, 4600], q: 1.4, vol: 0.08, t: 0.12 }); },
+    // Her gags' own (§3 1.3, 2026-11-19; played on their clips' frames, `GAGS[...].sounds`):
+    // spun round like a top (9a, 12a): a whirl that rises and falls over her turns.
+    spin: () => { noise(0.62, { band: [[0, 600], [0.5, 1500], [1, 500]], q: 2, vol: 0.2, attack: 0.05, trem: [7, 0.6] }); tone(480, 0.62, { type: 'sine', path: [[0, 480], [0.5, 1100], [1, 420]], vol: 0.04, vib: [7, 60] }); },
+    // Flat on her belly or her back on the floor (9c, 12b, 10c; the balls' and the boat's stiff fall): a slap and the floor.
+    bellyFlop: () => { noise(0.05, { band: 1400, q: 0.8, vol: 0.26 }); thud(120, 0.16, 0.26, 0.01); noise(0.12, { lo: 500, vol: 0.12, t: 0.02 }); },
+    // Tiptoeing off (23, 24): one tiny step, a soft tick.
+    tiptoe: () => { noise(0.035, { band: 2600, q: 2, vol: 0.2 }); tone(r(1250, 1450), 0.04, { type: 'sine', vol: 0.06 }); },
+    // Her cough, out of the steam or the soot (17, 19): two short light ones.
+    herCough: () => [0, 0.18].forEach((t, i) => { noise(0.08, { band: [1500, 900], q: 1, vol: 0.2 - i * 0.05, t, attack: 0.008 }); voice([[0, 560], [1, 440]], 0.07, 0.035, t); }),
+    // Her sneeze, soaked (16, 11a, 11b): a little breath in, then the "choo".
+    herSneeze: () => { voice([[0, 520], [1, 680]], 0.14, 0.04, 0, { lp: [[0, 900], [1, 1800]] }); noise(0.16, { hp: [2400, 3800], vol: 0.1, t: 0.18, attack: 0.008 }); voice([[0, 780], [1, 460]], 0.12, 0.05, 0.18); },
     // A fright: her yelp.
     scare: () => { tone(760, 0.11, { type: 'square', to: 1480, vol: 0.08, lp: 3400 }); tone(1480, 0.14, { type: 'square', to: 1000, vol: 0.07, t: 0.11, lp: 3400 }); },
     // Running off after one.
@@ -542,6 +553,17 @@ const things = {
     // Small steady things of a place: the bridge's radar, a party's beat through its door.
     ping: () => { tone(1480, 0.5, { type: 'sine', vol: 0.09 }); tone(1480, 0.4, { type: 'sine', vol: 0.028, t: 0.24 }); },
     thump: () => thud(78, 0.15, 0.3),
+    // The gags' things (§3 1.3, 2026-11-19; on their clips' frames, `GAGS[...].sounds`):
+    // the porter's luggage cart bumped (8a to 8d): its rail's knock, the bags rocking on it.
+    cartBump: () => { clank(330, 0.16, 0.1); thud(150, 0.12, 0.18, 0.01); [0.07, 0.15].forEach(t => noise(0.05, { lo: 700, vol: 0.12, t })); },
+    // The breakfast trolley jolted (10c, 10d, 10f): cups and plates jingling on it, its wheels.
+    trolleyRattle: () => { for (let i = 0; i < 5; i++) bell(r(2300, 3400), 0.1, 0.03, r(0, 0.2), [1, 2.3]); noise(0.22, { lo: 600, vol: 0.12, trem: [24, 0.6] }); },
+    // A basketball on her head (14a, 14b): a hollow rubber bonk.
+    headBonk: () => { tone(330, 0.16, { type: 'sine', path: [[0, 380], [0.15, 300], [1, 250]], vol: 0.16 }); noise(0.025, { band: 700, q: 1.5, vol: 0.14 }); tone(660, 0.08, { type: 'triangle', vol: 0.03 }); },
+    // The drill's boat on her head (15): a hollow wooden thump.
+    boatThump: () => { thud(105, 0.24, 0.3); noise(0.06, { band: 450, q: 1.2, vol: 0.2 }); tone(210, 0.12, { type: 'triangle', to: 180, vol: 0.05, lp: 900 }); },
+    // The towel stack's heap landing on her (18): soft, muffled, heavy.
+    towelFlump: () => { noise(0.28, { lo: [700, 200], vol: 0.4, attack: 0.02 }); thud(80, 0.18, 0.12, 0.03); },
 };
 
 const ending = {

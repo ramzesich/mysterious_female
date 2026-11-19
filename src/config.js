@@ -258,7 +258,7 @@ export const MISHAP_SCENES = {
     '6b': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'suitcase' }, // it rolls into her back
     '6c': { word: 'bumped', react: 'reel', down: 'sit', gag: 'suitcase' },  // it rolls into her front
     '7a': { word: 'bumped', react: 'stumble', down: 'belly', gag: 'sledge' },  // the deck chair, head-on: face first onto it, she sleds on it (`WetPatch.ride`)
-    '7b': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`)
+    '7b': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`). **Unreachable** since the chair stands still (2026-11-19); kept (the user, §3 1.3)
     '8a': { word: 'bumped', react: 'stumble', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
     '8b': { word: 'bumped', react: 'reel', down: 'sit', gag: 'cartPush' },      // it pushes into her
     '8c': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'cartSit' },      // it reaches her back
@@ -283,7 +283,7 @@ export const MISHAP_SCENES = {
     '12a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'lightSpin' },  // the stage's light: 9a's spin, she sits dizzy (the user, 2026-11-19: reuse)
     '12b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'lightShoved' },  // at her back: 9c's stumble and belly-flop
     '13a': { word: 'bonked', react: 'rubnose', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
-    '13b': { word: 'bonked', react: 'stumble', down: 'belly' },     // it catches her past it
+    '13b': { word: 'bonked', react: 'stumble', down: 'belly' },     // it catches her past it. **Unreachable**: the door hits her only facing it (`SwingDoor`); kept (the user, 2026-11-19, §3 1.3)
     '14a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
     '14b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
     '15': { word: 'bumped', react: 'duck', down: 'sit', gag: 'boat' },  // the drill's boat on her head: stiff onto her back, 14a's
@@ -315,6 +315,12 @@ export const MISHAP_SCENES = {
 // her facing, in that first picture, so that the clip is set down where the world's paper is (and
 // the world's own taken away), and `fast`: its first frames' ms each, the push carried into the fall.
 export const GAG_CELL = 112;
+// A gag's own sounds on its clips' frames (§3 1.3, 2026-11-19): `sounds: { clip key: { frame (from 1): effect } }`,
+// played from the sprite that shows it (the ship scene's `addedtoscene` hook). `onClips` gives several clips the same.
+const onClips = (keys, at) => Object.fromEntries(keys.map(k => [k, at]));
+const SPIN = onClips(['gags-jog-spin-stand', 'gags-jog-spin1', 'gags-jog-spin3', 'gags-jog-spin5', 'gags-jog-spin7'], { 1: 'spin' });
+const STIFF = (first, prefix) => ({ [`${prefix}-stand`]: { 1: first, 7: 'bellyFlop' }, [`${prefix}1`]: { 1: first, 8: 'bellyFlop' }, [`${prefix}3`]: { 1: first, 8: 'bellyFlop' },
+    [`${prefix}5`]: { 1: first, 8: 'bellyFlop' }, [`${prefix}7`]: { 1: first, 8: 'bellyFlop' } });
 export const GAGS = {
     vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
@@ -329,31 +335,31 @@ export const GAGS = {
     // she sits into the bags; he wheels her `rideM` metres, sees her, tips his cap (`tip`, his
     // clip). 8d: she bounces off his back and sits; he walks on `walkOnMs`, then turns round to
     // her. Then `holdMs`, her checkpoint.
-    cartDrape: { cart: true, cartAt: 26, clip: 'gag-cart-drape', loop: 'gag-cart-kick', holdMs: 1600 },
-    cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600 },
-    cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900 },
-    cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600 },
+    cartDrape: { cart: true, cartAt: 26, clip: 'gag-cart-drape', loop: 'gag-cart-kick', holdMs: 1600, sounds: { 'gag-cart-drape': { 1: 'cartBump' } } },
+    cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600, sounds: { 'gag-cart-push': { 1: 'cartBump', 7: 'thump' } } },
+    cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900, sounds: { 'gag-cart-sit': { 1: 'cartBump' } } },
+    cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600, sounds: { 'gag-cart-bounce': { 1: 'cartBump', 5: 'thump' } } },
     // The jogger (9b; the ship scene's `jogGag`): her clip where she stands (`gags` sheet), he stops where
     // he met her and plays `sorry` (his far arm up to the back of his head), then `scratch` until her
     // checkpoint, `holdMs` after her clip ends.
-    jogBowled: { clip: 'gags-jog-bowled', jog: true, his: 'sorry', loop: 'scratch', holdMs: 1700 },
+    jogBowled: { clip: 'gags-jog-bowled', jog: true, his: 'sorry', loop: 'scratch', holdMs: 1700, sounds: { 'gags-jog-bowled': { 4: 'thump' } } },
     // 9a: one clip from each odd frame of her run (`clips`), he runs on; she ends sat dizzy (her own dazed
     // sit, butterflies). 9c: he stops behind her and scratches his head; she ends dazed on her belly.
     // 9d: 8d's bounce off his back (her-mishaps sheet, `her` px behind her middle); he never notices.
-    jogSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
-    jogShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', his: 'sorry', loop: 'scratch', holdMs: 1700 },
-    jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, holdMs: 1600 },
+    jogSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700, sounds: SPIN },
+    jogShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', his: 'sorry', loop: 'scratch', holdMs: 1700, sounds: { 'gags-jog-shoved': { 15: 'bellyFlop' } } },
+    jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, holdMs: 1600, sounds: { 'gag-cart-bounce': { 5: 'thump' } } },
     // The stage's light (12a, 12b; the user, 2026-11-19: reuse the jogger's): 9a's spin, 9c's belly-flop.
-    lightSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
-    lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700 },
+    lightSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700, sounds: SPIN },
+    lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700, sounds: { 'gags-jog-shoved': { 15: 'bellyFlop' } } },
     // The court's basketballs (14a, 14b; plan-the-rest §3 1.2): stiff as a plank onto her back or her face, from
     // her stand or her run's quarter, then lying so with the butterflies (`lie`, set on by `ball.dx`).
     // (`drop`: hit in the air, she stops there and drops straight down; the gag where she lands.)
-    ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true },
-    ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700, drop: true },
+    ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true, sounds: STIFF('headBonk', 'gags-ball-back') },
+    ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700, drop: true, sounds: STIFF('headBonk', 'gags-ball-front') },
     // The drill's boat (15; the user, 2026-11-19: "lying flat on her back, like the basketball case"): 14a's clips, the
     // boat stopped where its keel met her head (`DrillBoat`) while she lies under it.
-    boat: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true },
+    boat: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true, sounds: STIFF('boatThump', 'gags-ball-back') },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head
@@ -366,13 +372,13 @@ export const GAGS = {
     // middle (`at`: px from it to the clip's middle), the world's trolley drawn over her while it
     // plays (`ride.hide()`); bumped back off it (10d) and bounced off the stewardess (10f), her
     // alone, `her` px behind her middle, as 8b's and 8d's.
-    trolleyTrip: { fall: 'gag-trolley-trip', at: -20, holdMs: 900 },
-    trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000 },
-    trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200 },
+    trolleyTrip: { fall: 'gag-trolley-trip', at: -20, holdMs: 900, sounds: { 'gag-trolley-trip': { 1: 'trolleyRattle', 7: 'bellyFlop' } } },
+    trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000, sounds: { 'gag-cart-push': { 1: 'trolleyRattle', 7: 'thump' } } },
+    trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200, sounds: { 'gag-cart-bounce': { 1: 'trolleyRattle', 5: 'thump' } } },
     // The towel stack (18): its own clips with her in them, played by the stack (`TowelStack.ride` in
     // src/world/movers.js, the ship scene's `thingGag`): buried, then her head up in a towel turban, a
     // towel swan on it; `holdMs` after, her checkpoint.
-    towels: { holdMs: 1400 },
+    towels: { holdMs: 1400, sounds: { 'towels-bury': { 6: 'towelFlump' }, ...onClips(['towels-run0', 'towels-run2', 'towels-run4', 'towels-run6'], { 7: 'towelFlump' }) } },
     // Step 4a's first gags, each the thing's own clip with her (`gags` sheet, tools/build_gags.py),
     // played by the thing (`thingGag`). The door (13a): slammed flat on the wall, she slides down. The
     // tray (3): she rides it off at up to `speed` px/s (from her run's, `accel` px/s²). The deck chair
@@ -412,7 +418,7 @@ export const GAGS = {
     // startled hop, both hands over her eyes, her cheek blushing; then she turns away from the door and tiptoes off
     // at `speed` px/s (her planted foot's own pace, 2.6 px a frame, at the clip's 26 ms a frame) to the next wall or door across the
     // deck or a balcony's partition (`partitionShort`), a beat there (`holdMs`), or out of the screen; then her checkpoint.
-    sorry: { sorry: true, speed: 100, holdMs: 600 },
+    sorry: { sorry: true, speed: 100, holdMs: 600, sounds: { 'gags-dnd-tiptoe': { 3: 'tiptoe', 7: 'tiptoe' } } },
 };
 
 // Teppanyaki's flares (`Flare` in src/world/topdeck.js): the chef's flourish before the flame, s;

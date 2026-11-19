@@ -702,7 +702,7 @@ export function soakRide(s, y, away = 0) {
             pic.once(`animationcomplete-${clip}`, () => s.time.delayedCall(g.holdWetMs, () => {
                 stage = 'sneeze';
                 pic.play('gags-sprinkler-sneeze');
-                s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).sneeze());
+                s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).herSneeze());
                 pic.once('animationcomplete-gags-sprinkler-sneeze', () => {
                     stage = 'walk';
                     t = 0;

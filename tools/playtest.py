@@ -1321,10 +1321,10 @@ def scenario_dash(b):
 
 def scenario_pocket(b):
     """A hit is its gag whatever she carries (docs/plan-the-rest.md §3 1.2a; the user, 2026-11-19):
-    with tangerines on her, the cart, a door, a paper and a "Do Not Disturb" door are each her mishap
+    with tangerines on her, a paper and a "Do Not Disturb" door are each her mishap
     and her checkpoint, the count as it was and nothing left lying; the porter walking into her tray
     spills it, the count as it was. Only a gull takes one: she ducks, blinks, keeps her place and her
-    tray. With none on her, the gull's swoop is her mishap. A fall is a fright, tangerines or not. A
+    tray. (The rest: `mishaps`.) A fall is a fright, tangerines or not. A
     tangerine she gets flies to the count."""
     S, P = "window.__ship", "window.__ship.world.people.byId.haz_porter"
     b.open("?reset&play")
@@ -1359,8 +1359,9 @@ def scenario_pocket(b):
         b.wait_for(f"{S}.mode === 'play'", timeout=12)
         s = b.state()
         return r & check(abs(s["x"] - x) > 100 and s["tangerines"] == 2, "then her checkpoint, still two", (x, s))
-    ok &= mishap(f"{S}.player.x + 12, 'cart', {{ vx: -48, dir: -1 }}", "8b", "the cart into her front")
-    ok &= mishap(f"{S}.player.x + 14, 'door'", "13a", "a door in her face")
+    # (The cart's and a door's hits, and a gull's with none on her, are the `mishaps` cases now, made
+    # through their own movers: called from here with no ride, they played the built fall or the old
+    # run-off, not their gags (§3 1.3, 2026-11-19).)
     ok &= mishap(f"{S}.player.x + 12, 'papers', {{ vx: -60 }}", "4a", "a paper at her front")
     got, x, s = hit(f"{S}.player.x + 12, 'dnd'")
     ok &= check(got == "23" and s["mode"] == "scripted" and s["tangerines"] == 2 and b.eval(f"{S}.player.anims.currentAnim?.key") != "her-apology",
@@ -1377,10 +1378,6 @@ def scenario_pocket(b):
     b.wait_for(f"!{S}.isSafe()", timeout=4)
     ok &= check(abs(b.state()["x"] - x) < 4, "and her place", (x, b.state()["x"]))
     b.eval(f"{S}.world.carryBox.drop()")
-    # With none on her, the gull's swoop is her mishap.
-    got, x, s = hit(f"{S}.player.x + 8, 'railgull', {{ snatch: window.__gull }}", n=0)
-    ok &= check(got == "20" and s["mode"] == "scripted", "with none, a gull's swoop is her mishap", (got, s))
-    b.wait_for(f"{S}.mode === 'play'", timeout=12)
     # A tangerine she gets flies to the count, which changes as it lands.
     b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {S}.gainTangerine({S}.player.x + 40, {S}.player.y - 10)")
     shown = b.eval(f"[{S}.save.tangerines, {S}.hudCount.text]")
@@ -1516,10 +1513,10 @@ def scenario_deck4(b):
     ok &= check(b.eval(f"!!{S}.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"), "6a: walked into, she rides it off")
     b.wait_for(f"{S}.mode === 'play'", timeout=12)
 
-    # 6b: rolled into her back as she stands facing its way, with none on her: she rides it to the
+    # 6b: rolled into her back as she stands facing its way, whatever she carries (1.2a): she rides it to the
     # end of its roll, it tips her off, and she is back at her checkpoint with it in its place.
     G = f"{S}.worldLayer.list.find(o => o.texture?.key === 'her-mishaps')"
-    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {R}.phase = Math.PI / 2 - 0.35")
+    b.eval(f"{R}.phase = Math.PI / 2 - 0.35")
     b.teleport(b.eval(f"{R}.mid - {R}.half * Math.cos(Math.PI / 2 - 0.35)") + 26, D4)
     b.eval(f"{S}.player.setFlipX(false)")
     b.wait_for(f"{S}.mode === 'scripted'", timeout=6)
@@ -3454,12 +3451,11 @@ def scenario_region6(b):
     kid = who("npc_kid")
     ok &= check(person(b, "riv_loungers")["on"], "the security officer on his knees at a lounger")
     b.eval(f"{kid}.x = {L['kidA'] + 190}; {kid}.dir = -1; {kid}.mode = 'patrol'; {kid}.nextSquirt = 0; {kid}.pauseUntil = 0")
-    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud()")
     b.teleport(L["kidA"] + 70, D11)
     ok &= check(scared(b, "Aaah", 4), "in front of the kid within four metres: splashed", alert(b))
     wait(0.3)
     ok &= check(js(b, f"{S}.worldLayer.list.some(o => (o.anims?.currentAnim?.key || '').startsWith('gags-sprinkler'))"),
-                "with none on her, the wet gag (16's)", js(b, f"{S}.worldLayer.list.filter(o => (o.anims?.currentAnim?.key || '').startsWith('gags')).map(o => o.anims.currentAnim.key).join(',')"))
+                "the wet gag (16's), whatever she carries (1.2a)", js(b, f"{S}.worldLayer.list.filter(o => (o.anims?.currentAnim?.key || '').startsWith('gags')).map(o => o.anims.currentAnim.key).join(',')"))
     b.shot("region6-kid")
     ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8) and abs(b.state()["x"] - js(b, f"{S}.checkpoints.find(c => c.id === 'cp_pool').x")) < 30,
                 "and back at the hut", b.state())
@@ -4199,9 +4195,7 @@ def scenario_region8(b):
     b.shot("region8-lady-doze")
     # The court: a ball off the rim; her own shot.
     bl = b.eval(f"{T}.balls[0]")
-    # (With none on her, 14a: facing the hoop the ball comes off, stiff as a skittle onto her back, and lying so.)
-    had = b.eval("window.__ship.save.tangerines")
-    b.eval("window.__ship.save.tangerines = 0; window.__ship.refreshHud()")
+    # (14a, whatever she carries: facing the hoop the ball comes off, stiff as a skittle onto her back, and lying so.)
     b.teleport(bl["x"] + 80, D12)
     b.eval("window.__ship.player.setFlipX(true)")
     got = scared(b, "Ouch", 9.0)
@@ -4210,9 +4204,8 @@ def scenario_region8(b):
     first = b.eval(GK)
     wait_js(b, GK + " === 'gags-ball-back-lie'", 2.0)
     ok &= check(first and first.startswith("gags-ball-back") and b.eval(GK) == "gags-ball-back-lie",
-                "a ball in her face, none on her: she topples onto her back, and lies there dazed (14a)", (first, b.eval(GK)))
+                "a ball in her face: she topples onto her back, and lies there dazed (14a)", (first, b.eval(GK)))
     wait_js(b, "window.__ship.mode === 'play'", 5.0)
-    b.eval(f"window.__ship.save.tangerines = {had}; window.__ship.refreshHud()")
     wait(0.5)
     c = b.eval(f"{T}.court")
     b.teleport(c["ballX"] - 6, D12)
@@ -5086,6 +5079,290 @@ def scenario_gamepad(b):
         ok &= check(s["x"] < s0["x"] - 40, "a pad in the second slot runs her too", s)
     finally:
         b.fake_pad(False)
+    return ok
+
+
+# --- The mishaps (docs/plan-the-rest.md §3 1.3, 2026-11-19) -----------------------------------------
+# A case for each scenario of docs/plan-three-uses.md §1.6 that had no check of its own, or one by her
+# word alone: made through the thing's own code (the person's touch, the round's hit, the hazard met in
+# play), each with none on her and then with two: the scenario, its gag's clip, her checkpoint after,
+# the count as it was and nothing left lying (1.2a). 7b and 13b cannot happen (the chair stands, a door
+# hits her only facing it): kept in the table, not here. Region 1's papers, suitcase, dog and vacuum,
+# 7a, 13a, 14a, 17, 19, 21 and 23 are checked in their regions' scenarios.
+
+MS = "window.__ship"
+# (Every gag clip played, in order, and every trip back to a checkpoint: what the cases read.)
+WATCH = ("(() => { const S = window.__ship; window.__clips = []; window.__respawns = 0; window.__hits = [];"
+         " if (window.__watching) return; window.__watching = true;"
+         " const A = Phaser.Animations.AnimationState.prototype, play = A.play;"
+         " A.play = function (key, ...rest) { const k = typeof key === 'string' ? key : key?.key;"
+         " if (/^(gags?|towels)-/.test(k || '')) window.__clips.push(k); return play.call(this, key, ...rest); };"
+         " const r = S.respawn; S.respawn = function (...a) { window.__respawns++; return r.apply(this, a); };"
+         " const h = S.scareContact; S.scareContact = function (x, w, o) { const id = h.call(this, x, w, o);"
+         " window.__hits.push([w, id, this.mode, Math.round(this.time.now)]); return id; }; })()")
+# (A gag of hers, as against the world's own clips: a door's swing, the towels' fall.)
+HER_GAG = r"^(gag-|gags-(jog|ball|tray|sprinkler|dnd|gull|chair|steam|flare|stairs|parasol|door-(squash|slide))|towels-(run|bury))"
+
+
+def mishap_hit(b, label, n, act, want, clip, within=4.0, fresh=None):
+    """`act()` makes the hit; then: the scenario `want`, a clip matching `clip` (None: no gag of hers,
+    the built fall), and her checkpoint after with `n` on her as before and nothing lying. `fresh()`
+    first: a new game."""
+    if fresh:
+        fresh()
+    b.eval(f"{MS}.save.tangerines = {n}; {MS}.refreshHud(); {MS}.lastMishap = null; {MS}.safeUntil = 0; {MS}.flinchUntil = 0")
+    b.eval(WATCH)
+    act()
+    hit = wait_js(b, f"!!{MS}.lastMishap && {MS}.mode !== 'play'", within)
+    back = wait_js(b, f"{MS}.mode === 'play' && window.__respawns > 0", 15)
+    # (Its clips read once she is back: a gag may play its own after its first, as the tiptoe after the hands.)
+    got = b.eval(f"[{MS}.lastMishap?.id ?? null, window.__clips.slice(), window.__hits.slice()]")
+    gag = any(re.match(clip, c) for c in got[1]) if clip else not any(re.match(HER_GAG, c) for c in got[1])
+    ok = check(hit and got[0] == want and gag, f"{label}, {n} on her: {want}, {clip or 'the built fall'}", got)
+    s = b.state()
+    ok &= check(back and s["tangerines"] == n and b.eval(f"{MS}.loose.all.length") == 0,
+                f"{label}: then her checkpoint, {n} on her as before, nothing lying", s)
+    wait(1.0)       # (her step out of the checkpoint's door turns her: done before the next hit is set up)
+    return ok
+
+
+def both(b, label, act, want, clip, within=4.0, fresh=None):
+    """The hit with none on her, then with two (1.2a: the same gag, the count as it was)."""
+    ok = mishap_hit(b, label, 0, act, want, clip, within, fresh)
+    return ok & mishap_hit(b, label, 2, act, want, clip, within, fresh)
+
+
+def touch(b, pid, floor, route, face, v, his_dir, walking):
+    """She and someone of the people 30 px ahead of her on his round: her facing (1 east) and speed, his
+    way and whether he walks; then their touch, as the game makes it (`world.touched`)."""
+    # (Their own touch held off until this one: he stands, and the cool-down covers the teleport.)
+    b.eval(f"(S => {{ const p = S.world.people.byId.{pid}; p.pausedUntil = S.time.now + 600000; S.world.touchCool = S.time.now + 600000; }})({MS})")
+    x = person(b, pid)["x"] - 30
+    b.teleport(x, floor, route)
+    wait(0.3)
+    b.eval(f"(S => {{ const p = S.world.people.byId.{pid}; p.x = S.player.x + 30; p.dir = {his_dir};"
+           f" p.pausedUntil = {'0' if walking else 'S.time.now + 600000'}; S.world.people.place(p);"
+           f" S.player.setFlipX({'true' if face < 0 else 'false'}); S.player.body.setVelocityX({v}); S.world.touchCool = 0;"
+           f" S.world.touched(p); }})({MS})")
+
+
+def scenario_mishaps__porter(b):
+    """The porter and his cart (deck 4): 8a she runs into the cart, 8b it pushes into her front, 8c it
+    reaches her back, 8d she runs into his back."""
+    b.open("?play&at=deck4")
+    ok = True
+    for want, face, v, his, walking, clip in [("8a", 1, 120, -1, False, "^gag-cart-drape"), ("8b", 1, 0, -1, True, "^gag-cart-push"),
+                                               ("8c", -1, 0, -1, True, "^gag-cart-sit"), ("8d", 1, 120, 1, False, "^gag-cart-bounce")]:
+        ok &= both(b, f"the porter ({want})", lambda: touch(b, "haz_porter", D4, "inside", face, v, his, walking), want, clip)
+    return ok
+
+
+def scenario_mishaps__jogger(b):
+    """The jogger on the promenade (deck 6): 9a she runs into him head-on, 9b he runs into her front, 9c
+    into her back, 9d she runs into his back."""
+    b.open("?play&at=promenade")
+    ok = True
+    for want, face, v, his, walking, clip in [("9a", 1, 120, -1, False, "^gags-jog-spin"), ("9b", 1, 0, -1, True, "^gags-jog-bowled"),
+                                               ("9c", -1, 0, -1, True, "^gags-jog-shoved"), ("9d", 1, 120, 1, False, "^gag-cart-bounce")]:
+        ok &= both(b, f"the jogger ({want})", lambda: touch(b, "haz_jogger", D6, "promenade", face, v, his, walking), want, clip)
+    return ok
+
+
+def scenario_mishaps__breakfast(b):
+    """The breakfast round (deck 5): 10a she walks into the stewardess's tray, 10b it meets her back; her
+    trolley: 10c over it, 10d back off it (the stewardess just past it), 10e wheeled into her back (the
+    built fall); 10f the stewardess, her hands empty."""
+    b.open("?play&at=deck5")
+    BK = f"{MS}.world.movers.find(m => m.constructor.name === 'Breakfast')"
+    y = b.eval(f"{BK}.def.y")
+    ok = True
+
+    def bump(face, tray):
+        b.eval(f"{BK}.bumpedAt = {MS}.time.now")     # (its own hits held off over the teleport)
+        b.teleport(b.eval(f"{BK}.x") - 20, y)
+        wait(0.3)
+        b.eval(f"(k => {{ const S = {MS}; k.x = S.player.x + 20; k.holding = {str(tray).lower()}; k.giving = false; k.bumpedAt = -1e9;"
+               f" S.player.setFlipX({'true' if face < 0 else 'false'}); k.bump(S.player, S.time.now); }})({BK})")
+
+    def trolley(face, v, step, crowded):
+        x = b.eval(f"(k => k.cartX - ((k.cart.width - 6) / 2 + {MS}.player.body.width / 2) + 1)({BK})")
+        b.eval(f"{BK}.bumpedAt = {MS}.time.now")
+        b.teleport(x, y)
+        wait(0.3)
+        b.eval(f"(k => {{ const S = {MS}; S.player.x = k.cartX - ((k.cart.width - 6) / 2 + S.player.body.width / 2) + 1;"
+               f" k.x = k.cartX + {40 if crowded else -200}; k.bumpedAt = -1e9; S.player.setFlipX({'true' if face < 0 else 'false'});"
+               f" S.player.body.setVelocityX({v}); k.trolleyHit(S.player, S.time.now, {step}, 1 / 60); }})({BK})")
+
+    ok &= both(b, "the stewardess's tray in front (10a)", lambda: bump(1, True), "10a", "^gag-tray-sit")
+    ok &= both(b, "the stewardess's tray at her back (10b)", lambda: bump(-1, True), "10b", "^gag-tray-sit")
+    ok &= both(b, "the stewardess, her hands empty (10f)", lambda: bump(1, False), "10f", "^gag-cart-bounce")
+    ok &= both(b, "into the trolley, no one past it (10c)", lambda: trolley(1, 120, 0, False), "10c", "^gag-trolley-trip")
+    ok &= both(b, "into the trolley, the stewardess past it (10d)", lambda: trolley(1, 120, 0, True), "10d", "^gag-cart-push")
+    ok &= both(b, "the trolley wheeled into her back (10e)", lambda: trolley(-1, 0, -2, False), "10e", None)
+    return ok
+
+
+def scenario_mishaps__jet(b):
+    """The kid's jet (deck 11, after near-catch 5): 11a in her face, 11b in her back; the wet gag (16's)."""
+    b.open("?play&at=jet11&did=bb5")
+    L = b.eval(f"{MS}.world.data.lido")
+    K = f"{MS}.world.people.byId.npc_kid"
+    ok = True
+
+    def squirt(face):
+        b.teleport(L["kidA"] + 70, D11)
+        wait(0.2)
+        b.eval(f"(k => {{ k.x = {L['kidA'] + 190}; k.dir = -1; k.mode = 'patrol'; k.nextSquirt = 0; k.pauseUntil = 0;"
+               f" {MS}.player.setFlipX({'true' if face < 0 else 'false'}); }})({K})")
+
+    ok &= both(b, "the kid's jet in her face (11a)", lambda: squirt(1), "11a", "^gags-sprinkler", within=5)
+    ok &= both(b, "the kid's jet in her back (11b)", lambda: squirt(-1), "11b", "^gags-sprinkler", within=5)
+    return ok
+
+
+def scenario_mishaps__light(b):
+    """The stage's swinging light (deck 6, after near-catch 3): 12a facing it as it comes (9a's spin), 12b
+    with her back to it (9c's belly-flop)."""
+    b.open("?play&at=light6&did=bb3")
+    LT = f"{MS}.world.movers.find(m => m.constructor.name === 'SwingLight')"
+    ok = True
+
+    def under(front):
+        # (Once the lamp has turned at the aft end of its swing, she stands just forward of the bottom
+        # of its arc, facing aft or not: it meets her from aft. Aft of the bottom is the open trap door.)
+        cx = b.eval(f"{LT}.def.x")
+        end = now() + 8
+        while now() < end:
+            a = b.eval(f"{LT}.lamp?.x ?? 0")
+            wait(1 / 60)
+            c = b.eval(f"{LT}.lamp?.x ?? 0")
+            if b.eval(f"!!{LT}.lamp?.swinging") and c < a and c > cx + 45:
+                break
+        b.teleport(cx - 10, D6)
+        b.eval(f"{MS}.player.setFlipX({'false' if front else 'true'})")
+
+    ok &= both(b, "the stage's light, facing it (12a)", lambda: under(True), "12a", "^gags-jog-spin", within=3)
+    ok &= both(b, "the stage's light at her back (12b)", lambda: under(False), "12b", "^gags-jog-shoved", within=3)
+    return ok
+
+
+def scenario_mishaps__ball(b):
+    """The court's balls (deck 12): 14a in her face, 14b on the back of her head."""
+    b.open("?play&at=court")
+    bl = b.eval(f"{MS}.world.data.topdeck.balls[0]")
+    ok = True
+
+    def stand(face):
+        b.teleport(bl["x"] + 80, D12)
+        b.eval(f"{MS}.player.setFlipX({'true' if face < 0 else 'false'})")
+
+    ok &= both(b, "a ball off the hoop, facing it (14a)", lambda: stand(-1), "14a", "^gags-ball-back", within=9)
+    ok &= both(b, "a ball off the hoop, her back to it (14b)", lambda: stand(1), "14b", "^gags-ball-front", within=9)
+    return ok
+
+
+def scenario_mishaps__things(b):
+    """Met in play from their start places, checked till now by her word alone: the room-service tray (3),
+    the drill's boat (15), a sprinkler (16), the towel stack (18)."""
+    ok = True
+
+    def run(place, key, extra="", first=None):
+        # (A new game for each (`fresh`): the towel stack stays fallen once it has fallen.)
+        def act():
+            if first:
+                first()
+            hold_until(b, key, lambda s: s["mode"] != "play", 6)
+            b.key(key, False)
+        return dict(act=act, fresh=lambda: b.open(f"?play&reset&at={place}{extra}"))
+
+    DR = f"{MS}.world.story.drill"
+    lull = lambda: wait_js(b, f"(a => a.idle && a.t > 8.3)({DR}.at({MS}.time.now))", 14)
+    # (Deck 9's sprinkler: she sets off once it rains.)
+    SP = f"{MS}.world.movers.filter(m => m.constructor.name === 'Sprinkler').sort((a, c) => Math.abs(a.def.x - {MS}.player.x) - Math.abs(c.def.x - {MS}.player.x))[0]"
+    rain = lambda: wait_js(b, f"(m => m.phase({MS}.time.now) === 'on')({SP})", 14)
+    ok &= both(b, "the room-service tray (3)", want="3", **run("trays10", "right"), clip="^gags-tray-ride", within=6)
+    ok &= both(b, "the drill's boat (15)", want="15", **run("drill7", "right", "&cards=all", lull), clip="^gags-ball-back", within=8)
+    ok &= both(b, "deck 9's sprinkler (16)", want="16", **run("sprinkler9", "right", first=rain), clip="^gags-sprinkler", within=8)
+    ok &= both(b, "the towel stack (18)", want="18", **run("towels9", "left"), clip="^towels-(run|bury)", within=6)
+    return ok
+
+
+def scenario_mishaps__balcony(b):
+    """Vaulting onto the sunbather's balcony (deck 8): 24, her tiptoe, none on her or two."""
+    b.open("?play&at=occupied8&cards=all")
+    spot = b.state()
+
+    def vault():
+        b.teleport(spot["x"], spot["y"], "promenade")
+        wait(0.4)
+        b.key("left", True)
+        hold_until(b, [], lambda s: s["x"] < spot["x"] - 20, 3)
+        b.key("space", True); wait(0.08); b.key("space", False)
+        wait(0.2)
+        b.key("space", True); wait(0.08); b.key("space", False)
+        hold_until(b, [], lambda s: s["mode"] != "play", 3)
+        b.key("left", False)
+
+    return both(b, "the sunbather's balcony (24)", vault, "24", "^gags-dnd-tiptoe", within=4)
+
+
+def scenario_mishaps__gulls(b):
+    """The three gulls (20 to 22): with none on her, a gull on a balcony rail is her gag (20); with two,
+    each takes one and she keeps her place: on the rail's balcony, on the funnel's stairway, in a glide."""
+    ok = True
+    b.open("?play&at=gull9")
+    spot = b.state()
+    def linger():
+        b.teleport(spot["x"], spot["y"], "promenade")
+
+    ok &= mishap_hit(b, "a gull on the rail (20)", 0, linger, "20", "^gags-gull", within=14)
+
+    def took(label, want, act, within):
+        b.eval(f"{MS}.save.tangerines = 2; {MS}.refreshHud(); {MS}.lastMishap = null; {MS}.safeUntil = 0")
+        b.eval(WATCH)
+        act()
+        hit = wait_js(b, f"{MS}.lastMishap?.id === '{want}'", within)
+        wait(0.3)
+        s = b.state()
+        return check(hit and s["tangerines"] == 1 and b.eval("window.__respawns") == 0 and b.eval(f"{MS}.loose.all.length") == 0
+                     and not any(re.match(HER_GAG, c) for c in b.eval("window.__clips")),
+                     f"{label}, two on her: it takes one, no gag, her place kept", (b.eval(f"{MS}.lastMishap?.id"), s, b.eval("window.__clips")))
+
+    ok &= took("a gull on the rail (20)", "20", linger, 14)
+    wait_js(b, f"!{MS}.isSafe()", 4)
+    # The funnel's stairway: a few steps up in a lull (its own gulls held off), a gull dives at her.
+    b.open("?play&at=stairway&cards=all")
+    b.eval(f"{MS}.world.story.funnelWind.nextAt = 1e12")
+    fn = b.eval(f"{MS}.world.data.funnel")
+    b.teleport(fn["foot"][0], fn["foot"][1])
+    wait(0.4)
+    wait_js(b, f"{MS}.world.story.funnelGusts.phase({MS}.time.now) === 'calm'", 8)
+    b.key("up", True)
+    hold_until(b, [], lambda s: s["mode"] == "stairs", 3)
+    wait(0.3)
+    b.key("up", False)
+    ok &= check(b.state()["mode"] == "stairs", "on the funnel's stairway", b.state())
+
+    def dive():
+        b.eval(f"window.__gull = {MS}.add.image({MS}.player.x + 30, {MS}.player.y - 60, 'tangerine');"
+               f" {MS}.scareContact({MS}.player.x + 8, 'funnelgull', {{ snatch: window.__gull }})")
+
+    ok &= took("a funnel gull on the stairway (21)", "21", dive, 2)
+    ok &= check(b.state()["mode"] == "stairs", "and she is still on the stairway", b.state())
+    # A glide off the balcony forward of the spa, and a crossing gull meets her (the game's own call for
+    # it, `scareAir`: the gulls' flight is the finale's, checked there).
+    b.open("?play&at=sunset&cards=all")
+
+    def glide():
+        b.key("left", True)
+        open_parasol(b)
+        wait_js(b, f"{MS}.gliding", 3)
+        b.eval(f"window.__gull = {MS}.add.image({MS}.player.x - 20, {MS}.player.y - 40, 'tangerine');"
+               f" {MS}.scareAir('crossgull', {{ snatch: window.__gull }})")
+
+    ok &= took("a gull across her glide (22)", "22", glide, 6)
+    b.key("left", False)
+    b.key("space", False)
     return ok
 
 

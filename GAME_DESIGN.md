@@ -728,6 +728,12 @@ which keeps the challenge, but it plays as a scare:
 
 Then she steps out of the closest activated crew cabin door (§5.5).
 
+**Built (2026-11-19, `docs/plan-the-rest.md` §3 1.3):** every hazard, its scenarios, its gag, its sounds
+and the playtests that check it are one table, `docs/population.md` §2.9. A gag has sounds of its own on
+its clips' frames (`GAGS[...].sounds`); the `mishaps` playtest makes each hit through the thing's own
+code, with none on her and with two. 7b and 13b cannot happen as built (the chair stands, a door hits her
+only facing it) and stay in the table.
+
 **In a lunge** (§3.2, since 2026-11-15) nothing frightens her by contact, for its second and a
 breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
 Disturb" door is no contact: that fright stands, lunge or not.
@@ -791,6 +797,8 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   used twice (the user, 2026-11-10).
 - **Secrets** exist: §6.1.11. (Bumbot's SUSHI sign had leaked in from the Bumbot game; dropped, the
   user, 2026-11-10.)
+- **As built (2026-11-19):** each hazard with what its hit does, its sounds and its checks:
+  `docs/population.md` §2.9.
 
 ---
 
@@ -2564,7 +2572,9 @@ Nothing blocks the start of the build. These get settled along the way:
       gull that comes down on her takes one (and she keeps her tray); trays always spill; `?pocket=off` gone.
       **Done (2026-11-19): 15**, the drill's boat: 14a's fall onto her back, the boat down over her; the drill
       answers her coming (`DRILL`); its falls made fast to the boat's posts; the winch 0.3 m forward. 1.2 is done.
-      **Next: 1.3** (the `mishaps` playtest, the sounds, the start places), then 1.4; part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      **Done (2026-11-19): 1.3**: the `mishaps` playtest (sixty hits through each thing's own code, none
+      on her and two), ten gag sounds on their clips' frames, five start places, the table of hits
+      (`docs/population.md` §2.9). **Next: 1.4** (two leftovers of step 4a, each the user's word first); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
