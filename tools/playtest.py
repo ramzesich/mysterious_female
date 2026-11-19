@@ -3087,7 +3087,14 @@ def scenario_region4(b):
     wait(0.35)
     b.shot("region4-startled")
     ok &= check(b.state()["mode"] == "scripted" and "sorry" in alert(b), "E at it: startled", alert(b))
-    wait(3.0)
+    # (23, 2026-11-19: her hands over her eyes, then off on tiptoe forward, away from the door, to the swinging door
+    # there, and her checkpoint.)
+    tip = "window.__ship.worldLayer.list.find(o => o.anims?.currentAnim?.key === 'gags-dnd-tiptoe')"
+    ok &= check(wait_js(b, f"!!{tip}", 2), "she covers her eyes, then tiptoes off")
+    x0 = js(b, f"{tip}.x")
+    wait(0.5)
+    ok &= check(js(b, f"{tip}?.x ?? 0") < x0 - 35 and js(b, f"{tip}.flipX"), "away from the door, at her quick tiptoe", (x0, js(b, f"{tip}?.x")))
+    ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8), "and back at her checkpoint", b.state())
     # The standing cart and its tangerine; the luggage to the ceiling.
     # (Until she is over it, not for a time: the cart's top is 21 px wide, and 0.4 s carried her a
     # hair past it whenever the machine was quick.)

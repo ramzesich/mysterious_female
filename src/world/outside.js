@@ -327,7 +327,7 @@ export class Laundry {
     update() {}
 }
 
-// A balcony with someone on it, a "Do Not Disturb" card on each of its partitions (population:
+// A balcony with someone on it, a "Do Not Disturb" sign on each of its partitions (population:
 // `haz_sunbather`): she lands on it: "Startled". The way past it is by another deck.
 export class Occupied {
     constructor(world, def) {
@@ -338,7 +338,8 @@ export class Occupied {
         const img = world.image((def.x0 + def.x1) / 2 + 3, def.y, def.frame).setOrigin(0.5, 1).setDepth(D.exterior + 0.12);
         const items = [img];
         for (const x of [def.x0 + 3, def.x1 + 3]) {
-            items.push(s.add.image(x, def.y - 76, 'dnd-tag').setOrigin(0.5, 0).setDepth(D.player + 0.32));
+            // (The doors' own sign, `assets/source/ship/dnd-hanger/`.)
+            items.push(s.add.image(x, def.y - 76, 'dnd-hanger').setOrigin(0.5, 0).setDepth(D.player + 0.32));
         }
         this.bang = s.add.text(img.x, def.y - 62, '!', {
             fontFamily: 'Verdana, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#e83b3b', stroke: '#ffffff', strokeThickness: 3, resolution: 4,
@@ -652,12 +653,6 @@ export const outside = {
         cloth('cloth-tee', 15, 20, 0xffffff, 0xc7dcd0, g => g.fillStyle(0x1ebc73, 1).fillRect(4, 8, 7, 5));
         cloth('cloth-shorts', 13, 15, 0x1ebc73, 0x239063, g => g.fillStyle(0x239063, 1).fillRect(6, 8, 1, 7));
         cloth('cloth-sock', 6, 14, 0xffffff, 0xc7dcd0, g => g.fillStyle(0xe83b3b, 1).fillRect(0, 4, 6, 2));
-        // A "Do Not Disturb" card hung on a partition.
-        make('dnd-tag', 9, 17, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 9, 15).fillRect(3, 0, 3, 3);
-            g.fillStyle(0xe83b3b, 1).fillRect(1, 3, 7, 13);
-            g.fillStyle(0xffffff, 1).fillRect(4, 1, 1, 2).fillRect(2, 6, 5, 2).fillRect(2, 10, 5, 1).fillRect(2, 12, 5, 1);
-        });
         // An ajar balcony door: the glass slid aside on the lit cabin.
         make('balcony-ajar', 34, 98, g => {
             g.fillStyle(0xf4f4f4, 1).fillRect(0, 0, 34, 98);

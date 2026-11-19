@@ -201,9 +201,11 @@ def interior():
     r(x0 + 9, top + 14, x0 + 19, top + 14, "#1ebc73")
     d.line([(x0 + 10, top + 18), (x0 + 18, top + 24)], fill="#1ebc73")
     r(x0 + 10, top + 20, x0 + 13, top + 22, GREY)
+    # The "Do Not Disturb" sign on the lever where it is mounted, the corridor doors' own
+    # (`assets/source/ship/dnd-hanger/`, the user, 2026-11-19), the lever over it through its hole.
+    sign = Image.open(ROOT / "assets" / "source" / "ship" / "dnd-hanger" / "hanger.png").convert("RGBA")
+    im.alpha_composite(sign, (x0 + 23 - 5, top + 40 - 3))
     r(x0 + 21, top + 40, x0 + 25, top + 41, GREY)                # the lever
-    r(x0 + 21, top + 42, x0 + 24, top + 50, "#ae2334")           # the card
-    r(x0 + 22, top + 44, x0 + 23, top + 44, WHITE)
 
     # The desk unit: a tall wood column of glass shelves, the desk, the TV on its arm, a pouf.
     r(80, 20, 92, FLOOR - 5, WOOD_DARK)

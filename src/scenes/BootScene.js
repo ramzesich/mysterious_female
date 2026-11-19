@@ -23,6 +23,10 @@ export class BootScene extends Phaser.Scene {
         // A one-way glass door's open leaf, its push bar across it (assets/source/ship/pushbar/).
         this.load.image('door-glass-pushbar', 'assets/ship/door-glass-pushbar.png');
         this.load.image('door-glass-oneway-edge', 'assets/ship/door-glass-oneway-edge.png');
+        // (A "Do Not Disturb" door shut with its sign on the lever's mount, and the sign alone, on the balconies'
+        // partitions: `assets/source/ship/dnd-hanger/`.)
+        this.load.image('door-cabin-dnd', 'assets/ship/door-cabin-dnd.png');
+        this.load.image('dnd-hanger', 'assets/ship/dnd-hanger.png');
         this.load.image('lifeboat', 'assets/ship/lifeboat.png');
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
@@ -264,6 +268,13 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'gags-steam-swoon', frames: gf('steam-swoon', 1), frameRate: 9 });
         this.anims.create({ key: 'gags-flare-blink', frames: gf('flare-blink', 1), frameRate: 8 });
         this.anims.create({ key: 'gags-flare-cough', frames: gf('flare-cough', 1), frameRate: 9 });
+        // (23, a "Do Not Disturb" door opened on its guest: a startled hop, her hands over her eyes, blushing; then off
+        // on tiptoe, two tiny steps a round, quick: the user, 2026-11-19, "make her move faster", and again: 26 ms a frame. Frame 0 of the cover
+        // is her standing, shown already; of the tiptoe, the cover's last.)
+        if (gg.anims['dnd-cover']) {
+            this.anims.create({ key: 'gags-dnd-cover', frames: gf('dnd-cover', 1), frameRate: 1000 / 90 });
+            this.anims.create({ key: 'gags-dnd-tiptoe', frames: gf('dnd-tiptoe', 1), frameRate: 1000 / 26, repeat: -1 });
+        }
         // Bumbot: his spot activities loop until she comes close; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>

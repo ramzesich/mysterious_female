@@ -878,7 +878,7 @@ export class SwingDoor {
     }
 }
 
-// A cabin door with a "Do Not Disturb" card on its handle (population: `haz_dnd`). E at it: whoever
+// A cabin door with a "Do Not Disturb" sign on its handle (population: `haz_dnd`). E at it: whoever
 // is in is not dressed for visitors: "Startled". Left alone, nothing.
 export class DndDoor {
     constructor(world, def) {
@@ -886,18 +886,16 @@ export class DndDoor {
         this.world = world;
         this.scene = s;
         this.def = def;             // { x, y, who }
-        this.shut = s.add.image(def.x, def.y, 'shipart', 'door-cabin').setOrigin(0.5, 1).setDepth(D.decor + 0.1);
-        this.card = s.add.graphics().setDepth(D.decor + 0.12);
-        this.card.fillStyle(0x2e222f, 1).fillRect(def.x + 7, def.y - 41, 7, 15);
-        this.card.fillStyle(0xe83b3b, 1).fillRect(def.x + 8, def.y - 40, 5, 13);
-        this.card.fillStyle(0xffffff, 1).fillRect(def.x + 9, def.y - 39, 3, 2).fillRect(def.x + 9, def.y - 34, 3, 1).fillRect(def.x + 9, def.y - 32, 3, 1);
-        this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
-        // (Its swing open and shut: the swinging doors' own clip in this door's full colours; the user,
-        // 2026-11-18: hidden while open, it went with its frame.)
+        // (Shut: the cabin door with its sign hung where the lever is mounted, exactly the first frame of its own
+        // swing; the user, 2026-11-19: `assets/source/ship/dnd-hanger/`. Its swing open and shut: the swinging doors'
+        // own clip in this door's full colours, the sign going round with the lever's mount and behind the leaf
+        // once it is past edge-on; the user, 2026-11-18: hidden while open, it went with its frame.)
         const m = s.cache.json.get('gags-meta');
+        this.shut = s.add.image(def.x, def.y, 'door-cabin-dnd').setOrigin(0.5, 1).setDepth(D.decor + 0.1);
+        this.dark = s.add.rectangle(def.x, def.y - 2, 28, 70, 0x2e222f).setOrigin(0.5, 1).setDepth(D.decor + 0.1).setVisible(false);
         this.pic = s.add.sprite(def.x, def.y, 'gags', m.anims['door-burst-full'][0]).setOrigin(m.door.x / m.cell, m.floor / m.cell)
             .setDepth(D.decor + 0.13).setVisible(false);
-        world.add([this.shut, this.card, this.dark, this.pic]);
+        world.add([this.shut, this.dark, this.pic]);
         this.who = world.people.add({ id: `${def.id}_who`, who: def.who, x: def.x, y: def.y, route: 'inside', face: -1, layer: 'back', owned: true });
         world.people.doorway(this.who, def.x - 14, def.x + 14, def.y - 72, def.y);
         if (this.who) this.who.gone = true;
@@ -925,7 +923,6 @@ export class DndDoor {
         sfx.at(d.x, d.y).door();
         if (this.who) sfx.at(d.x, d.y).oh();
         this.shut.setVisible(false);
-        this.card.setVisible(false);
         this.dark.setVisible(true);
         this.pic.setVisible(true).play('gags-dnd-open');
         if (this.who) {
@@ -954,7 +951,6 @@ export class DndDoor {
                 this.pic.off('animationupdate');
                 this.pic.setVisible(false);
                 this.shut.setVisible(true);
-                this.card.setVisible(true);
                 this.dark.setVisible(false);
                 sfx.at(d.x, d.y).doorShut();
                 this.busy = false;

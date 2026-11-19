@@ -1021,8 +1021,8 @@ def build_objects():
     # Step 4a's first gags, to try each (2026-11-18): aft of deck 9's swinging door (13a: walk forward
     # at it), forward of deck 10's trays (3: run aft onto them), aft of the pool's wet patch and its
     # deck chair (7b: walk forward past the chair onto the patch), and on the balcony with deck 9's
-    # second rail gull (20: stand by it).
-    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156), ("sprinkler9", 9, 144)]:
+    # second rail gull (20: stand by it); 2 m forward of deck 9's "Do Not Disturb" door (23: E at it).
+    for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156), ("sprinkler9", 9, 144), ("dnd9", 9, 166)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
     # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)

@@ -3002,3 +3002,34 @@ shuts it; landing disarms it. `updateGlide` in `src/world/verbs.js`.
 - **Tests:** the glides in `region8`, `finale` and `golden` press jump a second time in the air and hold it
   (`open_parasol` in `tools/playtest.py`); `region8` checks that over the atrium's rail with the hop's jump still held
   the parasol stays shut. `region8`, `finale`, `golden`, `falls`, `run_jump`, `balcony` pass; the rest not run.
+
+## Gag 23 built: "Oh, sorry!" at a "Do Not Disturb" door; the doors' sign redrawn (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.1, the third of its four gags. A "Do Not Disturb" door opened on its guest with no tangerine
+on her (E at it, or her cry by it): "Oh, sorry!", a startled hop, both hands over her eyes, her cheek blushing; she turns
+away from the door and tiptoes off, quick, to the next wall or door across the deck (`stopShort`: a beat there) or out of
+the screen; then her checkpoint. The ship scene's `sorryGag` (`GAGS.sorry`), the `gags` sheet's `dnd-cover` and
+`dnd-tiptoe` (`assets/source/her-mishaps/batch-4a/dnd-sorry/`, its README has the ids). With a tangerine on her, the
+apology and the hand-over as before. `?at=dnd9`, 2 m forward of deck 9's door.
+
+- **The cover:** PixMiniMax from her standing frame (2 tries); its own blush turned her whole hands hot pink, so the
+  blush is set by hand on her cheek in the palette's pinks.
+- **The tiptoe:** PixMiniMax's walk loops (4 tries) took strides 28 px wide with a bob: "a bit like a skip-dancing" (the
+  user). Her character's skeleton "sneak" (3) came as a crouched sneak with lighter hair. What worked:
+  animate_with_skeleton_v3 from her own end pose along skeletons laid out by rule (`raw/tiptoe_kp.py`: her pose from the
+  hips up held, two tiny steps on her toes, the pelvis level). Paced by her planted foot (2.6 px a frame); the user asked
+  twice for faster: 26 ms a frame, 100 px/s.
+- **The sign** (the user, mid-way: "redraw the door with the dnd sign: The sign should hang from the door handle, have a
+  half round top and in the middle of the sign it should have visible red circle, crossed"): drawn by hand on the palette
+  (11 x 22 px, below what a generation draws exactly), `assets/source/ship/dnd-hanger/`. The old red card hung beside the
+  door from nothing. First hung from the lever's tip; the user: "it should hang from where the door handle is mounted";
+  moved onto the rose, the bar resting at the hole's top, the lever drawn over it. **Swung with the door** (the user:
+  "Swing"): in each of the swing's 13 frames, on the lever's mount of the outer face; first it "magically transfers to its
+  inner side" (the open leaf shows its inner face): now, once the leaf is past edge-on, it is behind the leaf, its plain
+  back peeking 4 px past the leaf's free edge (measured below the handle in each frame, the generated leaf's width
+  wobbling), a strip against the leaf edge-on. Gone over frame by frame on the user's word (frames 1, 3, 5 to 7, 9, 10
+  mended). Everywhere it shows: the seven doors (shut: `door-cabin-dnd`, exactly the swing's frame 0, a picture of its own
+  so that `tools/check_overlaps.py` still sees a door), the occupied balconies' partitions (`dnd-hanger` for the old
+  `dnd-tag`), cabin 8206's door inside (`tools/draw_cabin.py`).
+- **Tests:** `region4` checks the gag (the tiptoe away from the door at her pace, back at her checkpoint); `boot`,
+  `region4`, `pocket`, `region6`, `region7`, `cabin` pass; `check_overlaps` 0. The rest not run. About 12 generations.

@@ -4583,6 +4583,7 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
+        if (sc.gag && GAGS[sc.gag].sorry && this.anims.exists('gags-dnd-tiptoe')) return this.sorryGag(sc, fromX);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
@@ -4611,6 +4612,46 @@ export class ShipScene extends Phaser.Scene {
                     if (p.x < view.x - 20 || p.x > view.right + 20) this.respawn();
                 };
             },
+        });
+    }
+
+    // Her gag at a "Do Not Disturb" door (23), the door opened on its guest: "Oh, sorry!", a startled hop, both hands
+    // over her eyes, blushing; then she turns away from the door and tiptoes off, quick, to the next wall or door
+    // across the deck (`stopShort`: a beat there, then her checkpoint) or out of the screen. One picture of her
+    // (the `gags` sheet's dnd-cover and dnd-tiptoe), first facing her way, then away from the door.
+    sorryGag(sc, fromX) {
+        const p = this.player, g = GAGS[sc.gag], gm = this.cache.json.get('gags-meta');
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        const y = p.y, away = p.x >= fromX ? 1 : -1;
+        const s = this.add.sprite(p.x, y, 'gags', gm.anims['dnd-cover'][0]).setOrigin(gm.dnd.x / gm.cell, gm.floor / gm.cell)
+            .setFlipX(p.flipX).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        this.gagEnd = () => { s.destroy(); p.setVisible(true); };
+        s.play('gags-dnd-cover');
+        s.once('animationcomplete-gags-dnd-cover', () => {
+            if (this.gagEnd === null) return;
+            s.setFlipX(away < 0).play('gags-dnd-tiptoe');
+            const wall = this.stopShort(s.x, s.x + away * 4800, y, 12);
+            this.script = (dt) => {
+                s.x += away * g.speed * dt;
+                const view = this.cameras.main.worldView;
+                if ((s.x - wall) * away >= 0) {
+                    // (At a wall: she stops there, still covering her eyes.)
+                    s.x = wall;
+                    this.script = null;
+                    s.anims.stop();
+                    s.setFrame(gm.anims['dnd-tiptoe'][0]);
+                    this.time.delayedCall(g.holdMs, () => this.respawn());
+                } else if (s.x < view.x - 30 || s.x > view.right + 30) this.respawn();
+                // (Her word over her head goes with her.)
+                p.x = s.x;
+            };
         });
     }
 

@@ -83,7 +83,10 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   butterflies (the user's additions); `?at=stairway`. **Gag 22 built (2026-11-18)**: `parasolGag`, "Whoa-whoa-whoa!",
   the crossing gull's dart at her first (the user's addition), the bow's plating kept closed and its railings behind it
   (`docs/progress-decisions.md`). Then the parasol's control (the user, 2026-11-19): it opens only on a press
-  of jump made in the air and held, not on the jump from the floor held on. Next: 23. On the way, the funnel's
+  of jump made in the air and held, not on the jump from the floor held on. **Gag 23 built (2026-11-19)**: `sorryGag`,
+  "Oh, sorry!", her hands over her eyes, blushing, a quick tiptoe off to the next wall or door; and on the user's word
+  the doors' sign redrawn (a hanger with a half-round top and a crossed red circle, on the lever's mount, swung with
+  the door; the same on cabin 8206's door and the occupied balconies' partitions); `?at=dnd9`. Next: 24. On the way, the funnel's
   stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
   the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
 

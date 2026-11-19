@@ -21,7 +21,9 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
   gull-run      20: running off flailing, the gull on her head (a loop; frame 0 = flail's 8)
   door-burst-full  the same swing as door-burst in the full-colour door's own colours (the muting taken
                 back out, exactly: `starts/fullcolour.py`): a "Do Not Disturb" door opening on the
-                guest and shutting (the user, 2026-11-18: it vanished with its frame)
+                guest and shutting (the user, 2026-11-18: it vanished with its frame); built from
+                `door-burst-dnd/`, the same frames with the door's "Do Not Disturb" hanger on its lever
+                (2026-11-19: `assets/source/ship/dnd-hanger/swing.py`; frame 0 and 12 the shut door with it)
   sprinkler-stand  16: from her standing frame, drenched: she flinches, her hair falls flat over her
                 face (frame 8: her soaked picture, `starts/sprinkler/wet-9b13cff9-...png`); her middle
                 at x 64
@@ -49,6 +51,10 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 draws it, 1 to 3 the parasol blown inside out, 4 to 8 she looks up at it and kicks her
                 legs (a loop as she drops); her feet at (56, 112), the left edge of column 56, as her
                 own sprite's middle (`parasol-flip/flip/`, cut by `parasol-flip/cut.py`)
+  dnd-cover     23: a "Do Not Disturb" door opened on its guest: from her standing frame a startled hop,
+                both hands over her eyes, her cheek blushing (`dnd-sorry/cover/`)
+  dnd-tiptoe    23: off on tiptoe, her hands over her eyes, two tiny steps (a loop; frame 0 = cover's 8;
+                `dnd-sorry/tiptoe/`, cut by `dnd-sorry/cut.py`). Both: her middle at x 64 (`dnd.x`)
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -67,10 +73,11 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
          ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
-         ("parasol-flip", 9)]
-# (Gags 21's and 22's frames are cut from the generator's in a folder of their own.)
+         ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9)]
+# (Gags 21's to 23's frames are cut from the generator's in a folder of their own.)
 PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
-        "parasol-flip": "parasol-flip/flip"}
+        "parasol-flip": "parasol-flip/flip", "dnd-cover": "dnd-sorry/cover", "dnd-tiptoe": "dnd-sorry/tiptoe",
+        "door-burst-full": "door-burst-dnd"}
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
 # (19's soot: its greys fall on the palette's two cool, greenish greys, and her face read as green; they
 # go on the charcoal greys of her hair's own family instead. No other colour of hers falls there.)
@@ -126,7 +133,8 @@ def main():
             "steam": {"x": 64},
             "flare": {"x": 64},
             "stairs": {"corner": [48, 64], "foot": [50, 100]},
-            "parasol": {"feet": [56, 112]}}
+            "parasol": {"feet": [56, 112]},
+            "dnd": {"x": 64}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

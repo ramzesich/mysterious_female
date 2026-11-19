@@ -84,6 +84,7 @@ new one added there should be added here too.
 | `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair: 7b) | <http://localhost:8000/?play&at=wet&pocket=off> |
 | `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9&pocket=off> |
 | `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9&tangerines=infinite> |
+| `dnd9`: deck 9's corridor, 2 m forward of its "Do Not Disturb" door (walk aft to it and press E: 23, no tangerine on her) | <http://localhost:8000/?play&at=dnd9> |
 | `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11&pocket=off> |
 | `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all&tangerines=infinite> |
 | `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all&tangerines=infinite> |
