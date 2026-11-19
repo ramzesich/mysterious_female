@@ -130,6 +130,9 @@ export const SOUND = {
     // step with her feet at any speed (the user, 2026-11-17: a step each 30 px ran a third faster
     // than her feet, one every 40 px).
     runSteps: [3, 7],
+    // Her walk with a tray or a cone in her hands (`her-carry-run`): a step as each foot lands, its widest stances
+    // (the user, 2026-11-19: by the floor walked they ran much quicker than her feet).
+    carrySteps: [0, 4],
 };
 
 // Deck 6's promenade doors (§5.3): the quick fade to black and back as she steps through.

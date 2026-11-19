@@ -77,7 +77,7 @@ truth**: read the relevant section before any design or content work, and record
 | `src/world/bow.js` | Region 9: the bow's own things (the sauna's steam, the kids' club's ball pit, the step class's boards, the bridge's alarm) and its part of the story, mixed into the Story (the wedding planner and the cake, the party into the chapel and the ceremony, the piano, the slide, the captain's door, near-catch 6 with the net on the alarm panel and the hatch's ladder, the Library's odd book and the nook). A fragile load's sway is in `carry.js` (`SWAY`) |
 | `src/world/finale.js` | Region 10 and the end: the wind over the bow and the two crossing gulls; and its part of the story, mixed into the Story (the sunset's scene, Bumbot at the tip who backs off and comes to her standing still, the catch, where a miss puts her back, those who clap her home, cabin 8206's scene, the win screen, the day after). Her look and rules with Bumbot in her arms are the ship scene's `holding` (`HOLDING` in `src/config.js`; her sheet `assets/sprites/her-cat.png` from `assets/source/her-cat/`, PixelLab state `6905f308-15b1-4a44-ad97-a38a7ad17dff`) |
 | `tools/unchair.py` | Takes out a chair PixelLab drew under her in a seated clip (`assets/source/her/<clip>/` to `<clip>-clean/`), so she can sit on the game's own chairs |
-| `tools/cast.py`, `fetch_people.py`, `build_people.py` | The people's PixelLab characters, the download of their frames (`assets/source/people/`; the dog and its owner are kept by hand, `BY_HAND`), and the sheet `assets/sprites/people.png`, every clip's frames set on the floor (`OFF_THE_FLOOR` the ones that leave it); `tools/fetch_her.py <animation>` does the same for a new clip of hers |
+| `tools/cast.py`, `fetch_people.py`, `build_people.py` | (Every folder in a person's `assets/source/people/<name>/` is built as a clip: a clip's own sources go beside it, as `kid-eat-cone/`.) The people's PixelLab characters, the download of their frames (`assets/source/people/`; the dog and its owner are kept by hand, `BY_HAND`), and the sheet `assets/sprites/people.png`, every clip's frames set on the floor (`OFF_THE_FLOOR` the ones that leave it); `tools/fetch_her.py <animation>` does the same for a new clip of hers |
 | `tools/check_people.py` | The people checked against her: everyone standing next to her, heads against a pixel ruler (`--heads`), every clip of a figure (`--clips`); pictures in `%TEMP%/bumbusik-playtest/`. Run it on every new figure before making its clips |
 | `tools/shoot_people.py` | Every person (or those named) in place in the game, close up beside her, tiled into sheets: facing, overlaps, what they stand on (see "Looking closely") |
 | `tools/check_overlaps.py` | Overlaps that make no sense, by rule, from the running game: doors, plates, signs and wall pictures against furniture and each other, in four states of the story; `--shots` tiles a close-up of each. Must list nothing at a step's end |
@@ -863,3 +863,18 @@ Lessons learned (2026-11-19, 7a and the wet patch):
 - **A thing of a deck drawn over her layer is drawn only while she is on that deck** (`onDeck` in
   `src/world/topdeck.js`): the court's ball, near by its distance alone, bounced in front of deck 12's closed side
   from deck 11. A distance test for "near" is not a test for "on its deck".
+
+Lessons learned (2026-11-19, the kid's cone, the pool's gulls, the queue):
+
+- **Look at what a person's clip actually shows before using it with a thing:** the kid's `eat` had him biting his own
+  water pistol, and the game laid its cone in the air in front of him; seen in play, at once. A person eating a thing is
+  one clip of the two (an edit of his stand with the thing in his fist, then animated), the thing handed over into his
+  fist as the first frame holds it.
+- **A scene holds her only as long as she must:** handing over a cone held her for his whole meal, standing over him.
+  She steps to arm's length, hands it, and is free; what the other does with it plays on by itself (`kidHas`).
+- **Someone who makes way does not leave their layer:** the queue turned aside by going 5 depths back, behind the café's
+  tables and chairs; and one who has stopped stops the line (they slid on, turned away).
+- **Before calling a look wrong, find what is drawn:** the "missing" opening over the pool existed; the gulls flew in
+  front of deck 12's band. A mock-up in the running game (a script that moves the things in the page) showed the fix.
+- **A test script can start the game's own hazards:** a teleport by the wet patch set off 7a, a stop in the gulls'
+  stretch lost the cone; trace who calls `respawn` (a wrapper with the call stack) before blaming the change.

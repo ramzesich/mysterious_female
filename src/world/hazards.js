@@ -181,7 +181,14 @@ export class FoodGulls {
         this.world = world;
         this.scene = s;
         this.def = def;             // { x0, x1, y, count, perch: { x, y }, off: a flag that keeps them away }
-        this.top = def.y - 112;
+        // Those that circle (the pool's, `gull_pool`) wheel in the open sky over deck 12, above its railing, over the
+        // opening above the pool: under deck 12's band they had flown as if under a ceiling (the user, 2026-11-19).
+        // They are behind the ship's side up there (from deck 11 out of view) and come down past deck 12's band, in
+        // front of her once under it (`band`); and they give no shadow (the user: "Remove the shadow spot"). A perched
+        // one (the Great Outdoors') waits on its rail, its shadow marking its dive.
+        this.high = !def.perch;
+        this.top = this.high ? def.y - 206 : def.y - 112;
+        this.band = def.y - 128;
         this.birds = [];
         for (let i = 0; i < def.count; i++) {
             const sprite = s.add.image(def.x, this.top, 'things', def.perch ? 'gull-perched' : 'gull-up').setOrigin(0.5, 1).setDepth(D.player + 0.34);
@@ -253,6 +260,7 @@ export class FoodGulls {
         const frames = s.textures.get('things');
         const flap = Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up';
         for (const b of this.birds) {
+            if (this.high) b.sprite.setDepth(b.y - 12 > this.band ? s.DEPTH.player + 0.34 : s.DEPTH.exterior - 0.05);
             if (b === this.diver && this.state !== 'idle') continue;
             const h = this.home(b, time);
             b.x += (h.x - b.x) * Math.min(1, dt * 4);
@@ -270,8 +278,10 @@ export class FoodGulls {
                 this.state = 'mark';
                 this.at = time + 950;
                 this.targetX = Phaser.Math.Clamp(p.x + p.body.velocity.x * 0.95, d.x0 + 6, d.x1 - 6);
-                this.shadow.setPosition(this.targetX, d.y - 1).setVisible(true).setScale(0.4);
-                s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 950 });
+                if (!this.high) {
+                    this.shadow.setPosition(this.targetX, d.y - 1).setVisible(true).setScale(0.4);
+                    s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 950 });
+                }
                 sfx.at(b.x, d.y).gull();
             }
         } else if (this.state === 'mark') {
@@ -281,12 +291,13 @@ export class FoodGulls {
             b.sprite.setFrame(flap).setPosition(b.x, b.y);
             if (time > this.at) {
                 this.state = 'dive';
-                this.at = time + 230;
+                this.diveMs = this.high ? 420 : 230;
+                this.at = time + this.diveMs;
                 this.from = { x: b.x, y: b.y };
                 sfx.at(this.targetX, d.y).gullDive();
             }
         } else if (this.state === 'dive') {
-            const k = 1 - Math.max(0, this.at - time) / 230;
+            const k = 1 - Math.max(0, this.at - time) / this.diveMs;
             b.x = this.from.x + (this.targetX - this.from.x) * k;
             b.y = this.from.y + (d.y - 30 - this.from.y) * k * k;
             b.sprite.setFrame('gull-down').setPosition(b.x, b.y);
@@ -355,10 +366,7 @@ export class Queue {
         const offsets = [0, 46, 92, 300, 346, 392];
         this.people = def.who.map((who, i) => {
             const p = world.people.add({ id: `${def.id}_${i + 1}`, who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
-            if (p) {
-                p.along = (this.len * 0.2 + offsets[i % offsets.length] + Math.floor(i / offsets.length) * 520) % this.len;
-                p.depth0 = p.sprite.depth;
-            }
+            if (p) p.along = (this.len * 0.2 + offsets[i % offsets.length] + Math.floor(i / offsets.length) * 520) % this.len;
             return p;
         }).filter(Boolean);
         this.span = 392;
@@ -373,20 +381,22 @@ export class Queue {
     update(dt, time) {
         const s = this.scene, her = s.player, d = this.def, P = this.world.people;
         if (!nearby(s, d)) return;
-        // A shuffle: a few steps, a wait.
-        const moving = (time % 2000) < 1150;
+        // A shuffle: a few steps, a wait. While anyone has turned aside for her, the whole line stands still (the user,
+        // 2026-11-19: turned away, they slid on forward).
         const tray = !!this.world.carry;
+        const yieldsAt = p => (tray && here(s, d) && Math.abs(her.y - d.y) < 60 && Math.abs(her.x - p.x) < 62) || time < (this.criedUntil ?? 0);
+        const moving = (time % 2000) < 1150 && !this.people.some(yieldsAt);
         for (const p of this.people) {
             if (moving) p.along = (p.along + d.v * M * 1.74 * dt) % this.len;
             p.x = d.x0 + p.along;
             // Out from behind the buffet, in behind the ice cream counter: faint and out of the way at the ends.
             const edge = Math.min(p.along, this.len - p.along);
             const hidden = edge < 26;
-            // For crew with a tray: turned aside, against the tables.
-            const yields = (tray && here(s, d) && Math.abs(her.y - d.y) < 60 && Math.abs(her.x - p.x) < 62) || time < (this.criedUntil ?? 0);
+            // For crew with a tray: turned aside, their backs to her, and she squeezes by in front of them. (They went
+            // 5 depths back once, behind the café's tables and chairs: the user, 2026-11-19.)
+            const yields = yieldsAt(p);
             if (yields !== p.aside) {
                 p.aside = yields;
-                p.sprite.setDepth(p.depth0 - (yields ? 5 : 0));
                 if (yields) {
                     p.sprite.anims.stop();
                     p.sprite.setFrame(p.meta.back ?? p.meta.stand);

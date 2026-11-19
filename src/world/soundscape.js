@@ -123,10 +123,13 @@ export class Soundscape {
             if (this.walked >= stride) { this.walked = 0; sfx.step(this.floor()); }
             if (this.rolled >= 20) { this.rolled = 0; sfx.roll(); }
         } else if ((s.mode === 'play' && s.grounded && !s.wading && !s.slipDir) || (s.mode === 'scripted' && dy === 0 && dx > 0)) {
-            // Running: a step as a foot comes down in her clip (SOUND.runSteps); else by the floor walked.
-            if (!s.crawling && p.anims.isPlaying && p.anims.currentAnim?.key === 'her-run') {
+            // Running, or walking with something in her hands: a step as a foot comes down in her clip (SOUND.runSteps,
+            // SOUND.carrySteps); else by the floor walked.
+            const clip = p.anims.isPlaying ? p.anims.currentAnim?.key : null;
+            const feet = clip === 'her-run' ? SOUND.runSteps : clip === 'her-carry-run' ? SOUND.carrySteps : null;
+            if (!s.crawling && feet) {
                 const i = (p.anims.currentFrame?.index ?? 1) - 1;
-                if (i !== this.runFrame && SOUND.runSteps.includes(i)) sfx.step(this.floor());
+                if (i !== this.runFrame && feet.includes(i)) sfx.step(this.floor());
                 this.runFrame = i;
                 this.walked = 0;
                 return;

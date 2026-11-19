@@ -1175,7 +1175,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   dash scares him off); his bubble: a soft serve. Only a perfect cone will do (a stub and he squirts
   her anyway); it melts in about 45 seconds, and the way back crosses the pool deck's open gap, where
   gulls dive at food (the first use of a cone as bait, or of the covered stretch under deck 12's
-  walk). He eats, and from then on **he squirts the gulls** on the pool deck for her. **The machine
+  walk). He eats (since 2026-11-19 his own clip with the cone, from a step away, she free at once), and from then on **he squirts the gulls** on the pool deck for her (they wheel in the sky over deck 12 since 2026-11-19, and dive past its band with no shadow). **The machine
   runs empty** after that cone; **her husband's bubble shows the canister**: the mix is in the Garden
   Café's cold room (a green crew door at 185 m); the canister is a heavy tray (no jumps at all),
   carried back past the buffet queue; E at the machine refills it, and **it never runs out again**:
@@ -2522,7 +2522,9 @@ Nothing blocks the start of the build. These get settled along the way:
       **Done (2026-11-19): gag 7a** (into the deck chair head on: face first onto it, she sleds on it), the wet
       patch redrawn (the shower runs, a puddle on the floor's face; the user chose it of four) and its chair standing
       still; deck 12's court ball and Teppanyaki's flame no longer show from deck 11.
-      **Next: the opening in deck 12 over the pool** (`docs/plan-the-rest.md` §3 1.1b, the user's word), then 1.2 from 9a. Waiting with it: the books' covers and
+      **Done (2026-11-19): the pool's gulls over deck 12** (the opening was built; they flew under its band), the kid's
+      cone (his own eating clip, the hand-over from a step away), her carry footsteps, the buffet queue that stands for her.
+      **Next: `docs/plan-the-rest.md` §3 1.2 from 9a** (the jogger); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

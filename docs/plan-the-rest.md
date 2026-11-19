@@ -50,6 +50,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
 | 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19) | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess) |
+| 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -88,12 +89,12 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   the doors' sign redrawn (a hanger with a half-round top and a crossed red circle, on the lever's mount, swung with
   the door; the same on cabin 8206's door and the occupied balconies' partitions); `?at=dnd9`. **Gag 24 built (2026-11-19)**:
   the same gag on an occupied balcony, she tiptoes away from its guests to the partition ahead (`partitionShort` in the
-  ship scene, which the gull's 20 uses too); `?at=occupied8`. **1.1 is done.** Then 1.2's 7a (2026-11-19); **next: 1.1b, the
-  opening over the pool** (the user's word), then 1.2 from 9a. On the way, the funnel's
+  ship scene, which the gull's 20 uses too); `?at=occupied8`. **1.1 is done.** Then 1.2's 7a, then 1.1b (2026-11-19, built:
+  the gulls' flight; the kid's cone, his eating clip, the queue on the way); **next: 1.2 from 9a.** On the way, the funnel's
   stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
   the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
 
-### 1.1b The opening in deck 12 over the pool (medium; no art; next, added 2026-11-19)
+### 1.1b The pool's gulls and the opening in deck 12 over the pool (small; no art; added 2026-11-19; built)
 
 The user, 2026-11-19, of the two gulls circling over deck 11's pool: "Why are the gulls flying here?" They have a
 purpose (`gull_pool`, `FoodGulls` in `src/world/hazards.js`: one dives at food she carries there, a cone held up is
@@ -101,6 +102,14 @@ bait, a thrown tangerine is taken; once fed the kid squirts them away for her), 
 "circling over the gap where deck 12 is open above the pool"; but that gap was never drawn, so they fly under deck 12's
 closed side. Removing them was asked and taken back (it would take the kid's reward with it). **To build, as the next
 step:** the opening in deck 12 over the pool, as the design and the real ship have it.
+
+**Found when it was started (2026-11-19): the opening is built** (`POOL_OPENING`, 115 to 145 m in
+`tools/build_ship_map.py`: deck 12's floor open over the pools, crossed by a walk; she can drop through it into a pool).
+From deck 11 the near side of deck 12 shows as a white band (its walk over the gap and its slab), and the gulls circled
+just under it. **Built instead:** the pool's gulls wheel in the open sky over deck 12, above its railing, behind the
+ship's side (from deck 11 out of view); a dive at her food comes down past the band, in front of her once under it,
+and longer (0.42 s); and, the user's word, **no shadow** for them (the perched gull on the Great Outdoors' rail keeps
+its own). The items below were the first plan, not needed:
 
 - Where: over `gull_pool`'s stretch and the pool under it (deck 11, about 140.9 to 145.6 m in the code's metres; check
   the pools' own extent in `tools/ship_layout.py` and `docs/population.md`).
@@ -403,6 +412,25 @@ the same recipe as the game's cloud strip, see-through).
    glitter fade as it goes in.
 6. `intro`, `boot`, `lang`, `deck3`; if the user widens it to the game's background, `finale`
    and the whole ship rendered as well.
+
+## 7c. Part 8: what she can use, does it stand out? (small to medium; added 2026-11-19)
+
+The user, 2026-11-19, of the soft serve machine on deck 11: "Since the ice cream machine is interactable, it should have
+a bit more contrast to it"; and, shown nine such things muted and in full colours: "In order to answer the contrast
+question, I need to understand how that compared to other interactable things that already stand out in the game. Add
+this to the end of the plan."
+
+- **Found:** the map builder places most pieces as their muted background twins (`-bg`; `at11`, `at12` and others in
+  `tools/build_ship_map.py`), and nine things she uses are among them: the soft serve machine, the coffee station (the
+  engineer's coffee), the pool bar (the mojito), the lunch service station by the galley, the captain's door; and four
+  secrets, the ice swan, the jackpot slot pair, the hot tub, the kids' slide. Each has a full-colour twin in the atlas.
+  (Found by matching every world thing with an `interact` against the `-bg` pictures under it, in the running game.)
+- **First, for the user:** one sheet of every thing she can use in the game as it is drawn now, side by side with what
+  already stands out (the doors in full colours, the people, the pickups, the drawn rooms' things, the movers), each
+  enlarged at its spot; so that the user can set the rule.
+- **Then the user's rule** for what she uses and for the secrets (in full colour the jackpot pair stands out from the
+  muted slots round it, which gives the secret away), and the rule applied everywhere it falls, by rule in the builder
+  (a list of the pieces she uses, not by hand); `tools/check_overlaps.py` and a close look at each.
 
 ## 8. Optional, each only on the user's word
 

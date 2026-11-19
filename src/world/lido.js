@@ -344,8 +344,20 @@ export const lido = {
             sfx.at(k.x, k.y).oh();
             return;
         }
-        // A cone for him: he waits for it, turned to her.
+        // A cone for him: he waits for it, turned to her; not on the spot of the security officer on his knees at a
+        // lounger, but a step clear of him first (the user, 2026-11-19: the two of them in one place, the eating hidden).
         if (!fed && cone && playing && level && Math.abs(dx) < 6 * M) {
+            // (He kneels facing `front`, his net and head 30 px before his middle, his legs 42 behind; the kid 10 px clear.)
+            const riv = this.who('riv_loungers'), front = riv?.sprite.flipX ? -1 : 1;
+            const rel = riv?.on ? (k.x - riv.x) * front : Infinity;
+            if (rel > -46 && rel < 40) {
+                let away = rel >= -6 ? front : -front;
+                const to = riv.x + away * (away === front ? 40 : 46);
+                if (to < L.kidA || to > L.kidB) away = -away;
+                face(away);
+                step(KID.walk);
+                return;
+            }
             face(dx < 0 ? -1 : 1);
             stand();
             return;
@@ -431,7 +443,10 @@ export const lido = {
     },
 
     // E at him with what she has made: a stub he hands back to the deck, with a face; a proper
-    // swirl he eats, and from then on he is on her side.
+    // swirl he eats, and from then on he is on her side. She hands it over from a step away (if she
+    // is closer, she steps back first, so that she does not stand over him), and is free as soon as
+    // it is in his hand: he eats, or turns the stub down, by himself (the user, 2026-11-19: she
+    // hid him while he ate, and could not move).
     feedKid() {
         const k = this.near('npc_kid', 44), w = this.world, s = this.scene;
         if (!k || this.P.has('kid_fed') || k.mode === 'flee') return false;
@@ -444,7 +459,16 @@ export const lido = {
         const state = k.state;
         k.state = 'acting';
         w.cut(async () => {
-            const her = s.player;
+            const her = s.player, GAP = 24;
+            const side = Math.sign(her.x - k.x) || -(k.dir || 1);
+            const spot = k.x + side * GAP;
+            if (Math.abs(her.x - k.x) < GAP - 2) {
+                // (A step back to arm's length: away from him, then round to face him.)
+                her.setFlipX(side < 0);
+                s.pose('run', 0.6);
+                await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) / 60 * 1000 });
+                s.pose('stand');
+            }
             her.setFlipX(k.x < her.x);
             k.dir = her.x < k.x ? -1 : 1;
             this.people.place(k);
@@ -455,48 +479,61 @@ export const lido = {
             const img = s.add.image(her.x + (her.flipX ? -12 : 12), her.y - 31, kind === 'cone' ? 'load-cone' : 'load-stub').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
             w.add([img]);
             sfx.give();
-            await w.tween({ targets: img, x: k.x + k.dir * 9, y: k.y - 22, duration: 340, ease: 'Sine.easeInOut' });
-            if (kind === 'stub') {
-                // He looks at it, and at her.
-                await w.wait(500);
-                for (let i = 0; i < 2; i++) {
-                    k.dir = -k.dir;
-                    this.people.place(k);
-                    await w.wait(170);
-                    k.dir = -k.dir;
-                    this.people.place(k);
-                    await w.wait(170);
-                }
-                await w.tween({ targets: img, y: k.y - 1, x: img.x + k.dir * 8, angle: 100, duration: 300, ease: 'Quad.easeIn' });
-                sfx.at(img.x, k.y).plop();
-                s.tweens.add({ targets: img, alpha: 0, delay: 900, duration: 500, onComplete: () => img.destroy() });
-                w.foodGulls?.gull_pool?.pounce(img.x);
-                k.state = state === 'acting' ? 'idle' : state;
-                k.pose = null;
-                k.nextSquirt = s.time.now + 3000;
-                return;
-            }
-            img.setPosition(k.x + k.dir * 8, k.y - 27).setDepth(k.sprite.depth + 0.01);
-            const eating = this.people.play(k, 'eat', { times: 3 });
-            for (let i = 1; i <= 3; i++) s.time.delayedCall(i * 800, () => { if (img.active) { img.setScale(1, 1 - i * 0.28); sfx.at(k.x, k.y).munch(); } });
-            await eating;
-            img.destroy();
-            k.state = 'acting';
-            for (let i = 0; i < 3; i++) {
-                const heart = s.add.text(k.x + (i - 1) * 8, k.y - 50, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
-                    .setOrigin(0.5).setDepth(s.DEPTH.fx);
-                w.add([heart]);
-                s.tweens.add({ targets: heart, y: heart.y - 18 - i * 4, alpha: 0, duration: 1000, delay: i * 130, onComplete: () => heart.destroy() });
-            }
-            sfx.at(k.x, k.y).heart();
-            await w.wait(700);
-            k.state = 'idle';
-            k.pose = null;
-            // The machine has given its last: that is the next thing.
-            sfx.done();
-            this.P.setFlag('kid_fed');
+            // (A proper cone into his fist as his eating clip's first frame holds it: 3 px before his middle, its tip
+            // 19 px up; a stub to his hand.)
+            const to = kind === 'cone' ? { x: k.x + k.dir * 3, y: k.y - 19 } : { x: k.x + k.dir * 9, y: k.y - 22 };
+            await w.tween({ targets: img, ...to, duration: 340, ease: 'Sine.easeInOut' });
+            img.setDepth(k.sprite.depth + 0.01);
+            // (In his hand: she is free; what he does with it goes on by itself.)
+            this.kidHas(k, img, kind, state);
         });
         return true;
+    },
+
+    // The kid with what she gave him: a stub turned down, or a proper swirl eaten.
+    async kidHas(k, img, kind, state) {
+        const w = this.world, s = this.scene;
+        if (kind === 'stub') {
+            // He looks at it, and at her.
+            await w.wait(500);
+            for (let i = 0; i < 2; i++) {
+                k.dir = -k.dir;
+                this.people.place(k);
+                await w.wait(170);
+                k.dir = -k.dir;
+                this.people.place(k);
+                await w.wait(170);
+            }
+            await w.tween({ targets: img, y: k.y - 1, x: img.x + k.dir * 8, angle: 100, duration: 300, ease: 'Quad.easeIn' });
+            sfx.at(img.x, k.y).plop();
+            s.tweens.add({ targets: img, alpha: 0, delay: 900, duration: 500, onComplete: () => img.destroy() });
+            w.foodGulls?.gull_pool?.pounce(img.x);
+            k.state = state === 'acting' ? 'idle' : state;
+            k.pose = null;
+            k.nextSquirt = s.time.now + 3000;
+            return;
+        }
+        // (His eating clip has the cone in his fist, his pistol tucked in his waistband: three licks, the swirl
+        // smaller each time, then a bite of the cone. `assets/source/people/kid-eat-cone/`.)
+        img.destroy();
+        // (Fed from the moment he has it: his bubble asking for one goes, and the machine has given its last.)
+        this.P.setFlag('kid_fed');
+        const eating = this.people.play(k, 'eat', { times: 1 });
+        for (const f of [3, 6, 12]) s.time.delayedCall(f / 7 * 1000, () => sfx.at(k.x, k.y).munch());
+        await eating;
+        k.state = 'acting';
+        for (let i = 0; i < 3; i++) {
+            const heart = s.add.text(k.x + (i - 1) * 8, k.y - 50, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
+                .setOrigin(0.5).setDepth(s.DEPTH.fx);
+            w.add([heart]);
+            s.tweens.add({ targets: heart, y: heart.y - 18 - i * 4, alpha: 0, duration: 1000, delay: i * 130, onComplete: () => heart.destroy() });
+        }
+        sfx.at(k.x, k.y).heart();
+        await w.wait(700);
+        k.state = 'idle';
+        k.pose = null;
+        // The machine has given its last: that is the next thing.
+        sfx.done();
     },
 
     // --- The soft serve machine (§6.1.2) ----------------------------------------------------------

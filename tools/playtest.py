@@ -3631,6 +3631,9 @@ def scenario_region6(b):
     b.tap("e")
     wait(1.2)
     b.shot("region6-kid-eats")
+    k = js(b, f"[{kid}.state, Math.round({kid}.x)]")
+    ok &= check(b.state()["mode"] == "play" and k[0] == "acting" and abs(b.state()["x"] - k[1]) >= 20,
+                "the cone in his hand, she is free, a step from him, while he eats", (b.state(), k))
     ok &= check(wait_flag(b, "kid_fed", 8) and carrying(b) is None, "a proper cone for the kid: he eats it", flags(b))
     ok &= check(js(b, f"{W}.foodGulls.gull_pool.off()"), "from now on he keeps the gulls off the pool deck")
     wait(3.0)

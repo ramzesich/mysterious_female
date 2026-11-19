@@ -3080,3 +3080,35 @@ patch (four ways: a run from 2.5 m and from 1 m, a jump in, one step on), the ch
   opening in deck 12 over the pool is the next step** (the user), `docs/plan-the-rest.md` §3 1.1b.
 - **Tests:** `region6` (7a's sled, a new check from aft), `throw`, `region8`, `boot` pass; `check_overlaps` 0. The rest
   not run.
+
+## The pool's gulls, the kid's cone, the buffet queue (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.1b, and what the user found trying it.
+
+- **The pool's gulls** (`gull_pool`): the opening in deck 12 over the pool was built all along (`POOL_OPENING`); from
+  deck 11 the near side of deck 12 shows as a white band, and the gulls circled just under it, "as under a ceiling".
+  Now they wheel in the open sky over deck 12, above its railing, behind the ship's side (from deck 11 out of view),
+  and a dive at her food comes down past the band, in front of her once under it (0.42 s, longer than the perched
+  gull's). The user: "Remove the shadow spot": none for them (the Great Outdoors' perched gull keeps its own). Shown as
+  mock-ups in the running game first.
+- **Where the cone goes** (the user could not find the machine, then whom to bring it to): the machine is built (deck
+  11's Great Outdoors, hold E, let go in the green); the cone is for the kid, who is on the aft pool deck only after
+  near-catch 5 (`did=bb5`). A start place by the machine, `?at=icecream`.
+- **Her footsteps with something in her hands** ran by distance, much quicker than her carry walk's feet: now on its
+  own frames, 0 and 4 (`SOUND.carrySteps`), as her run's are.
+- **The hand-over** (the user: "I stand obscuring him, while he eats. And I cannot move"): from a step away (she steps
+  back to arm's length first), and she is free as soon as the cone is in his hand (`kidHas`, the rest on its own); he is
+  fed from that moment (his bubble asking for one went on while he ate). He waits for her cone a step clear of the
+  security officer on his knees at the loungers (their two figures were one).
+- **His eating clip** (the user: "the kid is holding his water gun while eating. The ice cream is just hanging in the air
+  in front of him"): his old `eat` had him biting his orange water pistol. A new one, him and the cone together:
+  `edit_image_pro_flash` of his stand with the cone in his fist and the pistol tucked away (2 tries, 10 generations),
+  then PixMiniMax: three licks, the swirl smaller each time, a bite of the cone (1). `assets/source/people/kid-eat-cone/`.
+- **The buffet queue** (the user: when she carries something, those who turn away "are shifted behind the background
+  props", then "they continue sliding forward"): turned aside they kept their depth (they had gone 5 depths back,
+  behind the café's tables and chairs), and while anyone has turned aside the whole line stands still.
+- **What she uses, muted:** the soft serve machine was drawn in its muted background twin (`at11` places every piece
+  as `-bg`), like eight more things she uses. The user, to answer it, wants them compared first with what already
+  stands out: `docs/plan-the-rest.md` §7c, part 8, at the plan's end.
+- **Tests:** `region6` (new: she is free a step from him while he eats), `throw`, `boot` pass. The rest not run. 11
+  generations.

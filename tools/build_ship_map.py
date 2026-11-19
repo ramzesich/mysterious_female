@@ -1031,6 +1031,8 @@ def build_objects():
     add(point("steam11", "place", exact_x(54.6), floor_y(11)))
     # (7a: deck 11, forward of the wet patch: walk aft onto it, the chair comes at her head on.)
     add(point("wet7a", "place", exact_x(148.5), floor_y(11)))
+    # (The soft serve machine, deck 11's Great Outdoors: a cone to carry forward to the pool's gulls.)
+    add(point("icecream", "place", exact_x(215.4), floor_y(11)))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.

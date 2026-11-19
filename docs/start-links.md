@@ -84,6 +84,7 @@ new one added there should be added here too.
 | `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10&pocket=off> |
 | `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet&pocket=off> |
 | `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a&pocket=off> |
+| `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5&tangerines=infinite> |
 | `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9&pocket=off> |
 | `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9&tangerines=infinite> |
 | `dnd9`: deck 9's corridor, 2 m forward of its "Do Not Disturb" door (walk aft to it and press E: 23, no tangerine on her) | <http://localhost:8000/?play&at=dnd9> |
