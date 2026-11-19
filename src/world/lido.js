@@ -8,6 +8,7 @@ import { PLAYER, SWIM } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
+import { soakRide, runFrame } from './movers.js';
 
 const M = 48;
 // The swirl: how long a full one takes (ms), and where it is a stub, perfect, or too much.
@@ -267,13 +268,20 @@ export const lido = {
                 ev.remove();
                 return;
             }
-            const reach = Math.min(1, k * 3);
-            for (let i = 0; i <= 14; i++) {
-                const f = (i / 14) * reach;
+            // A stream 2 px thick, a point every 2 px of it: light blue over mid blue, white glints, so
+            // that it reads against the pale sky and sea in the windows (the user chose it from six,
+            // 2026-11-19; it was light blue and white dots).
+            const reach = Math.min(1, k * 3), n = Math.max(4, Math.ceil(Math.abs(x1 - x0) * reach / 2));
+            for (let i = 0; i <= n; i++) {
+                const f = (i / n) * reach;
                 const x = x0 + (x1 - x0) * f, y = y0 + (y1 - y0) * f + Math.sin(f * Math.PI) * -5;
-                g.fillStyle(i % 3 ? 0x8fd3ff : 0xffffff, 0.95).fillRect(x - 1, y - 1, 3, 2);
+                g.fillStyle(0x8fd3ff, 1).fillRect(x - 1, y, 2, 1);
+                g.fillStyle(0x4d9be6, 1).fillRect(x - 1, y + 1, 2, 1);
+                if (i % 6 < 2) g.fillStyle(0xffffff, 1).fillRect(x - 1, y, 2, 1);
             }
-            if (k > 0.33) for (let i = 0; i < 4; i++) g.fillStyle(0xffffff, 0.9).fillRect(x1 + Math.cos(i * 1.7 + k * 20) * 6, y1 + Math.sin(i * 2.1 + k * 17) * 5, 2, 2);
+            if (k > 0.33) for (let i = 0; i < 5; i++) {
+                g.fillStyle(i % 2 ? 0xffffff : 0x4d9be6, 1).fillRect(x1 + Math.cos(i * 1.7 + k * 20) * 6, y1 + Math.sin(i * 2.1 + k * 17) * 5, 2, 2);
+            }
         } });
     },
 
@@ -333,8 +341,16 @@ export const lido = {
                 const hit = s.mode === 'play' && s.route === 'inside' && ahead > 4 && ahead < KID.jet && her.y > k.y - 20 && Math.abs(her.y - k.y) < 40;
                 if (!hit || P.has('kid_fed')) return;
                 sfx.splashSmall();
-                if (w.carry) w.carryBox.spill(k.x, false, 'jet');
-                else s.scareContact(k.x, 'jet');
+                if (w.carry) return w.carryBox.spill(k.x, false, 'jet');
+                // With none on her, the wet gag (16's, the user, 2026-11-19), and she squelches off
+                // away from him. (From her run its clips start on an odd frame of her stride: the
+                // hit waits for one, a frame at most.)
+                const soak = (tries) => {
+                    if (s.mode !== 'play') return;
+                    if (runFrame(her) % 2 === 0 && tries > 0) return s.time.delayedCall(16, () => soak(tries - 1));
+                    s.scareContact(k.x, 'jet', { ride: soakRide(s, L.y, her.x >= k.x ? 1 : -1) });
+                };
+                soak(10);
             });
             return;
         }

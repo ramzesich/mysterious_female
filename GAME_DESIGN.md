@@ -2524,7 +2524,8 @@ Nothing blocks the start of the build. These get settled along the way:
       still; deck 12's court ball and Teppanyaki's flame no longer show from deck 11.
       **Done (2026-11-19): the pool's gulls over deck 12** (the opening was built; they flew under its band), the kid's
       cone (his own eating clip, the hand-over from a step away), her carry footsteps, the buffet queue that stands for her.
-      **Next: `docs/plan-the-rest.md` §3 1.2 from 9a** (the jogger); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      **Done (2026-11-19): the kid's jet plays the wet gag (16's) with none on her; 16's run clips play; the water drawn
+      stronger.** **Next: `docs/plan-the-rest.md` §3 1.2 from 9b** (the jogger, approved: 9b, 9c, 9a, 9d); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

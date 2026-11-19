@@ -284,8 +284,8 @@ export const MISHAP_SCENES = {
     '10d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyPush' },        // bumped back off it
     '10e': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', downMs: 1200 },          // at her back
     '10f': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyBounce' },      // into the stewardess's back
-    '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit' },  // the jet in her face
-    '11b': { word: 'splashed', react: 'arch', toss: 'on' },                     // in her back
+    '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit', gag: 'sprinkler' },  // the jet in her face; with none on her the wet gag, 16's (the user, 2026-11-19: `soakRide`)
+    '11b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'sprinkler' },   // in her back; the same
     '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // the stage's light
     '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
     '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
@@ -373,7 +373,7 @@ export const GAGS = {
     gull: { holdMs: 400 },
     // The sprinkler (16): from her run she slides to a stop over `slideMs`; soaked, she stands
     // `holdWetMs`, sneezes (its sound `sneezeAtMs` in), and squelches off at `walkV` px/s for `walkMs`.
-    sprinkler: { holdMs: 150, slideMs: 330, holdWetMs: 250, sneezeAtMs: 450, walkV: 26, walkMs: 1300 },
+    sprinkler: { holdMs: 150, slideMs: 330, holdWetMs: 250, sneezeAtMs: 450, walkV: 26, walkMs: 2300 },  // (walkMs 1300 until 2026-11-19, the user: "it cuts off a bit too soon")
     // The steam (17): a burst wraps her for `coverMs` (from her run she slides to a stop over
     // `slideMs`; set `clear` px clear of the sauna's door) and thins over `clearMs`, her hair a huge puff; she stands `holdPuffMs`, fans herself,
     // swoons and sits (her plop `plopAtMs` into it).

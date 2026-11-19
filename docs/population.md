@@ -672,7 +672,7 @@ lobby doors on 9 and 10 are the gold ones).
 | 131 | `bb_5` | Bumbot fishing at the first pool's aft rim | `scene` §9.7 | |
 | 131-213 | `sec_pawprints` | Wet paw prints along the deck aft to the ice cream machine, fading over 60 s after `bb_5` | Decor | Drawn |
 | 132 | `sec_hottub` | The hot tub | `quirk(E)`: she sits in it, steam | A clip |
-| 136-160 | `npc_kid` | The kid with the water pistol | `patrol(136, 160, 1.0, squirt)`: squirts when she is within 4 m in front, every 2.5 s, the jet 3 m: "Splashed"; a jump clears him; the dash: he runs to 160 and hides 10 s; with a cone in her hand he waits, bubble (a soft serve); a stub: he takes it, frowns, resumes in 3 s; perfect: he eats, ally for good: `patrol(135, 160)` squirting gulls | Walk, squirt, run, eat |
+| 136-160 | `npc_kid` | The kid with the water pistol | `patrol(136, 160, 1.0, squirt)`: squirts when she is within 4 m in front, every 2.5 s, the jet 3 m: "Splashed" (with no tangerine on her the wet gag, 16's, since 2026-11-19); a jump clears him; the dash: he runs to 160 and hides 10 s; with a cone in her hand he waits, bubble (a soft serve); a stub: he takes it, frowns, resumes in 3 s; perfect: he eats, ally for good: `patrol(135, 160)` squirting gulls | Walk, squirt, run, eat |
 | 142 | `riv_loungers` | The rival on his knees looking under a lounger; the kid squirts him now and then | `glimpse(region 6)`, a loop | |
 | 145 | `src_cocktail` + `tan_11_topsiders` | Topsiders' bar: the mojito for the old lady (`source(cocktail)` once her errand is open), the barman (`amb_barman_top`), a tangerine | | |
 | 149 | `sign_wet_11` | The wet-floor sign, muted, by the showers | | Built style |

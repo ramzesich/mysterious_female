@@ -3482,8 +3482,12 @@ def scenario_region6(b):
     kid = who("npc_kid")
     ok &= check(person(b, "riv_loungers")["on"], "the security officer on his knees at a lounger")
     b.eval(f"{kid}.x = {L['kidA'] + 190}; {kid}.dir = -1; {kid}.mode = 'patrol'; {kid}.nextSquirt = 0; {kid}.pauseUntil = 0")
+    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud()")
     b.teleport(L["kidA"] + 70, D11)
     ok &= check(scared(b, "Aaah", 4), "in front of the kid within four metres: splashed", alert(b))
+    wait(0.3)
+    ok &= check(js(b, f"{S}.worldLayer.list.some(o => (o.anims?.currentAnim?.key || '').startsWith('gags-sprinkler'))"),
+                "with none on her, the wet gag (16's)", js(b, f"{S}.worldLayer.list.filter(o => (o.anims?.currentAnim?.key || '').startsWith('gags')).map(o => o.anims.currentAnim.key).join(',')"))
     b.shot("region6-kid")
     ok &= check(wait_js(b, "window.__ship.mode === 'play'", 8) and abs(b.state()["x"] - js(b, f"{S}.checkpoints.find(c => c.id === 'cp_pool').x")) < 30,
                 "and back at the hut", b.state())

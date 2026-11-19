@@ -315,7 +315,7 @@ const realDoors = (s, d) => (d.real ??= d.doors.filter(x => (s.cabinDoorsDrawn ?
 // Her run's frame now (0 to 7), or -1 when she is not running (on her run's clip, moving): a gag
 // drawn from each quarter of her stride starts on an odd one.
 const running = (p) => p.anims.currentAnim?.key === 'her-run' && p.anims.isPlaying && Math.abs(p.body?.velocity.x ?? 0) > 20;
-const runFrame = (p) => (running(p) ? p.anims.currentFrame.index - 1 : -1);
+export const runFrame = (p) => (running(p) ? p.anims.currentFrame.index - 1 : -1);
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 800 && Math.abs(s.player.y - d.y) < 300;
 
 // The robot vacuum in the doorway of the cabin being cleaned (population: `haz_vacuum_9`). Its red
@@ -622,54 +622,7 @@ export class Sprinkler {
     // (`slideMs`); a sneeze; and she turns round and squelches off (`walkV` px/s for `walkMs`, or to
     // a wall) back the way she came (the user, 2026-11-18), then her checkpoint.
     ride() {
-        const s = this.scene, d = this.def, p = s.player, g = GAGS.sprinkler;
-        return {
-            play: (done) => {
-                const m = s.cache.json.get('gags-meta'), n = runFrame(p);
-                let dir = p.flipX ? -1 : 1;
-                const run = n % 2 === 1, clip = run ? `gags-sprinkler-run${n}` : 'gags-sprinkler-stand';
-                // (Each clip ends on her soaked picture at the cell's middle; from her run, frame 0
-                // has her middle `run` px short of it.)
-                const pic = s.add.sprite(p.x + (run ? dir * (m.sprinkler.x - m.sprinkler.run) : 0), d.y, 'gags')
-                    .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
-                this.world.add([pic]);
-                this.pic = pic;
-                pic.play(clip);
-                let t = 0, stage = 'stop', end = 0, stepAt = 0;
-                pic.once(`animationcomplete-${clip}`, () => s.time.delayedCall(g.holdWetMs, () => {
-                    stage = 'sneeze';
-                    pic.play('gags-sprinkler-sneeze');
-                    s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).sneeze());
-                    pic.once('animationcomplete-gags-sprinkler-sneeze', () => {
-                        stage = 'walk';
-                        t = 0;
-                        // (Turned round: back the way she came.)
-                        dir = -dir;
-                        pic.setFlipX(dir < 0);
-                        end = s.stopShort(pic.x, pic.x + dir * g.walkV * g.walkMs / 1000, d.y, 16);
-                        pic.play('gags-sprinkler-walk');
-                    });
-                }));
-                s.script = (dt) => {
-                    t += dt * 1000;
-                    if (stage === 'stop' && run && t < g.slideMs) pic.x += dir * PLAYER.runSpeed * (1 - t / g.slideMs) * dt;
-                    if (stage === 'walk') {
-                        pic.x += dir * Math.min(g.walkV * dt, Math.max(0, (end - pic.x) * dir));
-                        if (t > stepAt) { stepAt = t + 500; sfx.at(pic.x, d.y).splashSmall(); }
-                        if (t >= g.walkMs || Math.abs(end - pic.x) < 0.5) {
-                            stage = 'done';
-                            pic.anims.pause();
-                            done();
-                        }
-                    }
-                    p.x = pic.x;
-                };
-            },
-            show: () => {
-                this.pic?.destroy();
-                this.pic = null;
-            },
-        };
+        return soakRide(this.scene, this.def.y);
     }
 
     // Where it is in its round: 'tell', 'on' or 'off'.
@@ -695,19 +648,24 @@ export class Sprinkler {
         if (phase === 'tell') {
             // Three slow drops.
             const y = top + ((time * 0.3) % (d.y - top));
-            g.fillStyle(0x8fd3ff, 1).fillRect(d.x - 1, y, 2, 4);
+            g.fillStyle(0x8fd3ff, 1).fillRect(d.x - 1, y, 2, 2);
+            g.fillStyle(0x4d9be6, 1).fillRect(d.x - 1, y + 2, 2, 2);
             g.fillStyle(0xffffff, 1).fillRect(d.x - 1, y, 1, 1);
         } else if (phase === 'on') {
             this.wet = 1;
+            // (Each streak 1 px: a white head, light blue, a mid blue tail, so that it reads against the
+            // pale walls and windows: the user chose it from five, 2026-11-19; it was light blue and white.)
             for (let i = 0; i < 22; i++) {
                 const k = (i * 0.618034) % 1, spread = (k * 2 - 1) * d.half;
                 const f = ((time * 0.42 + i * 53) % 112) / 112;
-                const x = d.x + spread * (0.25 + 0.75 * f), y = top + f * (d.y - top);
-                g.fillStyle(i % 3 ? 0x8fd3ff : 0xffffff, 0.95).fillRect(x, y, 1, 5);
+                const x = Math.round(d.x + spread * (0.25 + 0.75 * f)), y = Math.round(top + f * (d.y - top));
+                g.fillStyle(0x8fd3ff, 1).fillRect(x, y, 1, 3);
+                g.fillStyle(0x4d9be6, 1).fillRect(x, y + 3, 1, 3);
+                g.fillStyle(0xffffff, 1).fillRect(x, y, 1, 1);
             }
             for (let i = 0; i < 6; i++) {
                 const x = d.x - d.half + ((time * 0.11 + i * 41) % (d.half * 2));
-                g.fillStyle(0xffffff, 0.8).fillRect(x, d.y - 2 - (Math.floor(time / 70 + i) % 2), 2, 1);
+                g.fillStyle(0x8fd3ff, 1).fillRect(x, d.y - 2 - (Math.floor(time / 70 + i) % 2), 2, 1);
             }
             if (here(s, d) && Math.abs(p.x - d.x) < d.half - 5 && !s.gliding) {
                 if (this.world.carry) this.world.carryBox.spill(d.x, false, 'sprinkler');
@@ -717,8 +675,64 @@ export class Sprinkler {
             this.wet = Math.max(0, this.wet - dt / 2.2);
         }
         // The puddle it leaves, drying.
-        if (this.wet > 0) g.fillStyle(0x8fd3ff, 0.35 * this.wet).fillEllipse(d.x, d.y - 1, d.half * 2 - 6, 4);
+        if (this.wet > 0) g.fillStyle(0x4d9be6, 0.35 * this.wet).fillEllipse(d.x, d.y - 1, d.half * 2 - 6, 4);
     }
+}
+
+// The wet gag (16; the kid's jet too, 11a and 11b with none on her, the user, 2026-11-19): `y` the floor
+// she stands on; `away`, if given, the way she squelches off (else she turns round, back the way she came).
+// Her stride is read at the hit, when the ride is made: the gag stops her (`thingGag`) before it plays, and
+// read then she was never running (every soak from a run played the standing one until 2026-11-19).
+export function soakRide(s, y, away = 0) {
+    const p = s.player, g = GAGS.sprinkler, d = { y };
+    const self = {}, hit = runFrame(p);
+    return {
+        play: (done) => {
+            const m = s.cache.json.get('gags-meta'), n = runFrame(p) >= 0 ? runFrame(p) : hit;
+            let dir = p.flipX ? -1 : 1;
+            const run = n % 2 === 1, clip = run ? `gags-sprinkler-run${n}` : 'gags-sprinkler-stand';
+            // (Each clip ends on her soaked picture at the cell's middle; from her run, frame 0
+            // has her middle `run` px short of it.)
+            const pic = s.add.sprite(p.x + (run ? dir * (m.sprinkler.x - m.sprinkler.run) : 0), d.y, 'gags')
+                .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
+            s.world.add([pic]);
+            self.pic = pic;
+            pic.play(clip);
+            let t = 0, stage = 'stop', end = 0, stepAt = 0;
+            pic.once(`animationcomplete-${clip}`, () => s.time.delayedCall(g.holdWetMs, () => {
+                stage = 'sneeze';
+                pic.play('gags-sprinkler-sneeze');
+                s.time.delayedCall(g.sneezeAtMs, () => sfx.at(pic.x, d.y - 50).sneeze());
+                pic.once('animationcomplete-gags-sprinkler-sneeze', () => {
+                    stage = 'walk';
+                    t = 0;
+                    // (Turned round: back the way she came; or away from what soaked her.)
+                    dir = away || -dir;
+                    pic.setFlipX(dir < 0);
+                    end = s.stopShort(pic.x, pic.x + dir * g.walkV * g.walkMs / 1000, d.y, 16);
+                    pic.play('gags-sprinkler-walk');
+                });
+            }));
+            s.script = (dt) => {
+                t += dt * 1000;
+                if (stage === 'stop' && run && t < g.slideMs) pic.x += dir * PLAYER.runSpeed * (1 - t / g.slideMs) * dt;
+                if (stage === 'walk') {
+                    pic.x += dir * Math.min(g.walkV * dt, Math.max(0, (end - pic.x) * dir));
+                    if (t > stepAt) { stepAt = t + 500; sfx.at(pic.x, d.y).splashSmall(); }
+                    if (t >= g.walkMs || Math.abs(end - pic.x) < 0.5) {
+                        stage = 'done';
+                        pic.anims.pause();
+                        done();
+                    }
+                }
+                p.x = pic.x;
+            };
+        },
+        show: () => {
+            self.pic?.destroy();
+            self.pic = null;
+        },
+    };
 }
 
 // A cabin door that flies open as she comes by (population: `haz_swing`): with no tell (the user,

@@ -3112,3 +3112,27 @@ patch (four ways: a run from 2.5 m and from 1 m, a jump in, one step on), the ch
   stands out: `docs/plan-the-rest.md` §7c, part 8, at the plan's end.
 - **Tests:** `region6` (new: she is free a step from him while he eats), `throw`, `boot` pass. The rest not run. 11
   generations.
+
+## The kid's jet plays the wet gag; the sprinkler's run clips; the water drawn stronger (2026-11-19)
+
+Asked by the user before the jogger's gags (`docs/plan-the-rest.md` §3 1.2, 9a to 9d, proposed and approved as
+recommended: 9b first, his "sorry" a clip of his own; the meetings composed from the sheets,
+`assets/source/her-mishaps/batch-4a/starts/jog9/`).
+
+- **The kid's jet with no tangerine on her** (the user: "a standard dazed gag is played. Let's replace it with the wet
+  gag"): 11a and 11b play 16's soak (`gag: 'sprinkler'`): soaked, a sneeze, and she squelches off away from him, then her
+  checkpoint. The soak is one ride for both, `soakRide(scene, floor, away)` in `src/world/movers.js`; from her run the jet's
+  hit waits for an odd frame of her stride (a frame at most), as the sprinkler's does. With a tangerine on her nothing
+  changed (her splutter, her arch). So 11a's and 11b's own gags of the plan (spluttering with his laugh; 10b's arch) are
+  stood in for by it: to be asked when the plan reaches them.
+- **Found on the way: 16's four clips from her run never played.** `thingGag` stops her before the ride plays, and the
+  ride read her stride then: every soak from a run was the standing one, she stopped dead. The ride reads her stride when
+  it is made, at the hit. Seen in a recording; the sprinkler's own recording now shows the run clip (`run7`).
+- **Her walk off, drenched,** 2.3 s instead of 1.3 (the user: "it cuts off a bit too soon"): `GAGS.sprinkler.walkMs`.
+- **The water** (the user: "make the water a bit more visible", then of my try, 4 px with a dark blue underside: "too
+  strong and too thick. Draw the suggested images for me to choose from"): six jets and five rains drawn in the running
+  game, frozen at one moment (a script that draws them in the page); chosen: the jet a stream 2 px thick, light blue over
+  mid blue with white glints (it was light blue and white dots); the rain 1 px streaks, a white head, light blue, a mid
+  blue tail (it was light blue and white). The sprinkler's drip and splashes in the same blues.
+- **Tests:** `region6` (new: with none on her, the jet plays the wet gag), `region4`, `boot` pass. The rest not run.
+  No generations.
