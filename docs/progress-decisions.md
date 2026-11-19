@@ -3169,3 +3169,12 @@ with her sat before him and then taken out; 9a he runs on; one clip per quarter 
 
 Asked whether the kid's jet still wants its own two gags of the plan (11a: sat back spluttering, he points and laughs;
 11b: 10b's arch), now that the wet gag plays for both with none on her: the user, "Covers". Not made.
+
+## The stage: the light and the stage manager change places (2026-11-19)
+
+The user: "Switch locations of the DJ and the swinging lamp" (the stage manager, in his headset). He stands at 250.4 m,
+in front of the stage's aft red curtain, facing the stage (all in black, he must stand against the red: 2026-11-14).
+Hung at his old 244.42 m the light swung out over the wings' speakers, its cable across the curtain: at 245.9 m, over
+the drum kit, its whole swing on the stage. `region3` finds him where he is. `check_overlaps`: 0. Then the user asked
+what the black rectangle on the stage is: the open trap door (near-catch 3's), drawn in code as a black box and a
+stick; to be redrawn (option 1: a generated open trap door, its lid up on hinges, a ladder's top in the hole).

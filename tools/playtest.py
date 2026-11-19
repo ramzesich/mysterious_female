@@ -2542,7 +2542,8 @@ def pills_for_the_stage_manager(b):
     b.tap("e")
     hold_until(b, "up", lambda s: s["y"] == D6, 8)
     b.hold("left", 0.4)
-    b.teleport(exact_x(244.5), D6)
+    # (He stands at the stage's aft curtain since 2026-11-19, the swinging light where he was.)
+    b.teleport(exact_x(249.6), D6)
     b.tap("e")
     end = now() + 12
     while now() < end and "ent" not in save_list(b, "cards"):
@@ -2639,8 +2640,8 @@ def scenario_region3(b):
     wait(4.0)
     ok &= check(b.state()["mode"] == "play", "where the scene left her it does not reach her", b.state())
     b.shot("region3-after")
-    # He wants his pills; she has none yet.
-    b.teleport(exact_x(244.5), D6)
+    # He wants his pills; she has none yet. (At the stage's aft curtain since 2026-11-19.)
+    b.teleport(exact_x(249.6), D6)
     wait(0.4)
     ok &= check(js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "the stage manager shows a pill bottle")
     b.tap("e")

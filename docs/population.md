@@ -399,8 +399,8 @@ leaving the frame (a wink, no trigger).
 | 200 | `cp_foyer` | The foyer's crew door | Checkpoint | |
 | 206-240 | decor | Rows of seats (built); `amb_audience` three seated | | |
 | 242 | `haz_pit` | The orchestra pit in front of the stage | A one-deck drop for the rival only (she can hop it) | Drawn |
-| 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
-| 246 | `npc_stagemanager` | The stage manager | `static`; sneezes every 5 s; bubble (a pill bottle) after `bb_3`; E with the pills: `item_card_ent` (`scn_card_ent`) | Sneeze, flap, talk |
+| 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` (as built: one, at 245.9 over the drum kit since 2026-11-19, the user's swap with the stage manager) | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
+| 246 | `npc_stagemanager` | The stage manager (as built: at 250.4, in front of the stage's aft curtain, facing it, since 2026-11-19) | `static`; sneezes every 5 s; bubble (a pill bottle) after `bb_3`; E with the pills: `item_card_ent` (`scn_card_ent`) | Sneeze, flap, talk |
 | 248 | `haz_trapdoor` | The trap door, a square seam | `trap`: standing on it drops her into `room_galley` (one deck, no scare) | Drawn |
 | 249 | `sec_spotlight` | Centre stage | `quirk(still 3)`: she bows | A clip |
 | 249 | `bb_3` | Bumbot washing in the spotlight | `scene` §9.4 | His `washing` |

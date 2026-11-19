@@ -313,9 +313,10 @@ PEOPLE = {
     # Region 3, the theatre (deck 6). The stage manager at the curtain; two dancers rehearsing on
     # the stage until Bumbot's beat, standing by the front row after; the rival where the trap
     # door dropped him, on the galley's flour sacks; three in the stalls.
-    # (He is all in black: in front of the red curtain's leg at the stage's forward edge, where he
-    # shows; at 245 m he stood in the drum kit, black on the dark stage.)
-    "npc_stagemanager": dict(at=(6, 244.42), who="stagemanager", face=1, idle="idle",
+    # (He is all in black: in front of the red curtain's leg, where he shows; at 245 m he stood in the
+    # drum kit, black on the dark stage. The user, 2026-11-19: he and the swinging light change places,
+    # he to the stage's aft curtain, facing it.)
+    "npc_stagemanager": dict(at=(6, 250.4), who="stagemanager", face=-1, idle="idle",
                              bubble=("pills", "flag:bb3", "card:ent", 4)),
     "amb_dancer_her": dict(at=(6, 245.9), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
     "amb_dancer_him": dict(at=(6, 247.15), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
@@ -586,7 +587,7 @@ QUIRKS = {
     "sec_swan": (5, 177.6, "E", "shiver", 1700, {}),
     # (While she dances the disco ball over the floor throws its lights: `glitter` = m, px up.)
     "sec_dance": (6, 117.2, "still:3", "dance", 3200, dict(reach=36, glitter=(119.4, 113))),
-    # Centre stage, between the open trap door and the swinging light: she bows to the house.
+    # Centre stage, past the open trap door: she bows to the house.
     "sec_spotlight": (6, 247.3, "still:3", "bow", 2000, dict(reach=14, needs="bb3", face=-1)),
     # The cat's portrait: a double-take.
     "sec_cat_look": (7, 140.0, "still:1.5", "idle-look", 1700, dict(reach=16)),
@@ -649,7 +650,10 @@ GLIMPSE_WINDOW = (168.3, 72)
 # --- Region 3's own things (docs/population.md, decks 6 and 7) --------------------------------------
 # Stage lights that swing once their flag is set (`haz_lights`): id: (deck, m, flag, cable px while
 # hauled up, cable px let down, swing in degrees, period s). From the ceiling.
-LIGHTS = {"haz_light": (6, 249.1, "bb3", 30, 74, 55, 3.2)}
+# (At 249.1 m by the piano until 2026-11-19; the user: it and the stage manager change places. At his
+# 244.42 m it swung out over the wings' speakers, its cable across the curtain: 1.5 m in, over the drums,
+# its whole swing on the stage.)
+LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2)}
 # Slot machines that pay out over the floor (`haz_chips`): id: (deck, m, half the spill's width m).
 CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_chips_3": (7, 166.79, 0.9)}
 # The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).
