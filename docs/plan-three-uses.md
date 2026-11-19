@@ -112,6 +112,27 @@ safeTailMs: 300 }`. The speed stays under Bumbot's 300 px a second.
 
 ### 1.3 The pocket (automatic, on every hit), one tangerine
 
+> **Revised 2026-11-19 (the user, after playing): the pocket is the gulls' only.** "Losing a
+> tangerine on hit almost never fits visually and in terms of gameplay. I want to play the
+> respawn gags in most of the cases, tangerines or no." Every hit in the game and in the plans
+> was gone through with one test, **losing a tangerine fits only where someone takes it**, and
+> the user took the recommendation whole:
+>
+> - **A gull that comes down on her (§1.6: 20, 21, 22) takes a tangerine and is gone with it;
+>   she ducks and keeps her place.** This is all that is left of the pocket.
+> - **Every other hit is its gag and her checkpoint, with tangerines on her or with none, and
+>   none is lost.** No tangerine is knocked out to roll away; her short reactions to a hit are
+>   no longer played.
+> - **At a "Do Not Disturb" door and on the occupied balcony (23, 24): gag 23 always.** No
+>   tangerine is held out.
+> - **A bump with a tray, a cone or a delivery in her hands is always a spill**; no tangerine
+>   saves it.
+> - A tangerine is otherwise only ever spent by her own choice: the cry and the lunge, a throw.
+>   The lunge is now the one way to pay a tangerine to get through a hit.
+>
+> What follows in this section, and every "with a tangerine on her" in §1.6 and §2's last
+> column, holds for the three gulls only. To build: `docs/plan-the-rest.md` §3, 1.2a.
+
 - A hit that would send her back or spill her tray, with a tangerine on her: she takes it with
   a short reaction that fits the hit and the side it came from (§1.6; about half a second),
   blinks for a second and a half during which nothing can touch her, **and keeps her place and
@@ -154,8 +175,15 @@ when she is facing a moving object, versus when she is hit with it from behind (
 forward vs fall backwards on her bottom). What happens when she stumbles on an object while
 moving, versus when an object hits her while she's standing".
 
-**The outcome does not change:** with a tangerine on her, one is lost and she keeps her place
-(§1.3); with none, she goes back to her checkpoint. **What changes is what is seen.** "A fright,
+> **Revised 2026-11-19 (§1.3's note): the gag plays whatever she carries.** In the tables below,
+> "the gag" is what happens at every hit, with tangerines on her or with none, and she keeps
+> them all. The exceptions are the three gulls (20, 21, 22): with a tangerine on her the gull
+> takes it, she ducks and goes on; with none, its gag. 23 and 24 are gag 23 always. The short
+> reactions (the reel, the stumble, the rubbed nose, the splutter, the arch, the yelp, the
+> shiver) and the tangerine that rolls off behind her are no longer part of a hit.
+
+~~**The outcome does not change:** with a tangerine on her, one is lost and she keeps her place
+(§1.3); with none, she goes back to her checkpoint.~~ **What changes is what is seen.** "A fright,
 then she runs off the screen" stays only where she is truly embarrassed (the "Do Not Disturb"
 doors, the occupied balcony). Everywhere else:
 
@@ -229,6 +257,9 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 
 **Those with no side, one gag each:**
 
+(2026-11-19: the "With a tangerine" column holds for 20, 21 and 22 only; for 17, 18, 19, 23 and
+24 it is the gag, as for 16.)
+
 | # | Obstacle | With a tangerine | The gag |
 |---|---|---|---|
 | 16 | Sprinklers (5) | ~~She shivers (built); it slips from her wet fingers~~ **As with none (the user, 2026-11-18: "the wet gag regardless of the tangerines"; `pocket: false`): she keeps them all** | Her hair plastered over her face, a sneeze, she squelches off to change. **Built (2026-11-18):** she stops short in the spray (from her standing or her run's quarter), sneezes, turns round and squelches back the way she came (the user), then her checkpoint |
@@ -242,12 +273,14 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23. **Built 2026-11-19:** away from its guests to the partition ahead |
 
 **Unchanged:** a fall of more than a deck, the sea and its life ring, a tray spilled (it flies,
-she fetches another; the pocket saves it), and everything that never sent her back (the
+she fetches another; ~~the pocket saves it~~ nothing saves it, 2026-11-19), and everything that never sent her back (the
 delivery robot, the steward on his rounds, the buffet queue, the old lady, the ball pit, the
 gusts, the laundry lines, the gulls that take food, the waiter).
 
 **The rules that go with the tables:**
 
+- **(2026-11-19: the next two rules and the tray's "with a tangerine" are gone with the pocket,
+  §1.3's note. From above, a gull: she ducks, and it takes the tangerine; that one stays.)**
 - **With a tangerine on her, the same side picks her short reaction:** thrown back, she reels a
   step (a slip: her caught-backwards, built); pushed on, she stumbles a step (built). A door in
   her face: she rubs her nose. Water in her face: a splutter; on her back: she arches. Heat: a
@@ -349,6 +382,11 @@ by everything that moves, so that a later step only has to call them:
 `·` = nothing. Built today: the breakables, both vacuums' spin, the towels, the kid's flight, the
 librarian's shush. The rest is new.
 
+**(2026-11-19, §1.3's note: the last column is void but for the gulls' two rows, "the gull takes
+it". No other hit is forgiven, no tray is saved by a tangerine, the vacuum eats only what she
+throws. The gulls that dive at food take the food whatever is in her pocket, as built: "her cone
+saved" was never built for them, and a tangerine thrown to them is what saves a cone.)**
+
 **The last column** says whether the pocket forgives the hit. How she takes it, with one on her
 and with none, by its side and by who was moving, is §1.6 (2026-11-16).
 
@@ -402,15 +440,17 @@ and with none, by its side and by who was moving, is §1.6 (2026-11-16).
 - **The tangerine is a real thing.** One object (`Loose`) is what a throw and a knocked-out
   tangerine both are. From that alone: the vacuum that hits her and then chokes on her
   tangerine; the gull that steals what she dropped; a miss that costs a walk.
-- **The lunge is a second she owns**, and it overlaps with the pocket on purpose: a tangerine
-  spent with skill keeps her running; one lost to a hit costs a flinch and a chase.
+- **The lunge is a second she owns**, ~~and it overlaps with the pocket on purpose: a tangerine
+  spent with skill keeps her running; one lost to a hit costs a flinch and a chase~~ **and since
+  2026-11-19 it is the one way a tangerine gets her through a hit** (§1.3's note): spent with
+  skill it keeps her running; unspent, the hit is its gag and her checkpoint.
 
 | Spent on | What it buys | Comes back? |
 |---|---|---|
 | D | Those in her way startled three seconds; with the lunge, a second of speed and safety, a smash, a leap | No |
 | A throw that is taken | A hazard out of play, a thing knocked down, a trade | No (the piñata pays three) |
 | A throw that is not | Nothing | Yes, by walking to it |
-| A hit | Her place and her tray | If she catches it before something else does |
+| ~~A hit~~ A gull's swoop (2026-11-19: the only hit that takes one) | Her place | No: the gull is gone with it |
 
 ---
 
@@ -526,7 +566,7 @@ camera move is judged in motion; the others after.
 Each hallway is entered the first time from the balconies and left by a fire door, which then
 stays open both ways. After that a delivery waits at its pantry end: a tray with a cabin's
 number on its tag (a label), carried to that cabin under tray rules (a low hop, no lunge, a hit
-is a spill unless the pocket saves it, the cry alone for the steward, silence past the "Do Not
+is a spill ~~unless the pocket saves it~~ (always, 2026-11-19), the cry alone for the steward, silence past the "Do Not
 Disturb" doors). A hand takes it at the door, with a `♥`.
 
 | Hallway | The load | Its own rule | Pays |
@@ -906,8 +946,8 @@ by E (a rattle, a padlock over her). A naming of the door, not a hint.
 
 **Revision (2026-11-16):**
 
-- With a delivery in her hands a hit is a spill, as with any tray; with a tangerine on her the
-  reaction follows §1.6.
+- With a delivery in her hands a hit is a spill, as with any tray~~; with a tangerine on her the
+  reaction follows §1.6~~, tangerines on her or not (2026-11-19).
 - The loads (the vase of flowers, the teapot, the pillows) and the look-outs' porthole and
   window are generated (Start here, 7). Where a load hides her or changes how she stands (the
   vase before her face, the pillows in both arms), her with it is one generated clip.
@@ -946,8 +986,11 @@ whoever builds cannot hear them: every new one is the user's to judge on the sou
   only by tangerines that roll being hers to pick up again; and the game is finishable with
   none (audit C10). If play shows her at zero for long, the levers are how easily a dropped one
   is caught again and what the pocket costs. To be watched from step 2 on.
-- **The pocket may make frights rare.** How fast and how far the dropped one rolls decides how
-  often it is lost: the first thing to tune.
+- ~~**The pocket may make frights rare.** How fast and how far the dropped one rolls decides how
+  often it is lost: the first thing to tune.~~ **It did, and it did not fit what is seen** (the
+  user, 2026-11-19): the pocket is the gulls' only now (§1.3's note). The new risk is the other
+  way: every hit costs the way back, so the checkpoints' spacing and the tray errands are what
+  to watch in play.
 - **A cry bought and wasted.** A tangerine spent where nothing hears it is a dear lesson with
   no word of warning. If the user finds that harsh in play, a cry that startles nobody could
   cost nothing.
@@ -995,7 +1038,7 @@ promenade's enclosed ends: "Leave as they are for now."
 |---|---|
 | The cry alone free, or every D costs one? | "Every D cost one" |
 | The cry from the start, the lunge from the Seven Seas? | "As assumed" |
-| The pocket on every hit? | "As assumed" |
+| The pocket on every hit? | "As assumed". **Taken back, 2026-11-19:** "losing a tangerine on hit almost never fits visually and in terms of gameplay"; only a gull takes one (§1.3's note) |
 | The second collection | "Take you best judgement here in order to make the game fun and varied" |
 | The laundry open in region 1? | "No" |
 | The BOSUN's, PURSER's and DJ's doors answering the cry? | "The cry is to startle obstacles. Take your best judgment where crying in joy 'Кісюнічка' should affect things." |
@@ -1052,7 +1095,7 @@ promenade's enclosed ends: "Leave as they are for now."
 | Four gags have her sit onto the thing: a family, or too alike? | "Accepted" |
 | Any rows to change or drop? | "All accepted" |
 | The vacuum's ride in place of her squeal and run-off, the "Eeek!" kept? | "Update the wording with fright/excitement, like 'Weeeee!' or something" |
-| "Do Not Disturb" doors with a tangerine on her: (a) held out as an apology, (b) knocked out? | "a" |
+| "Do Not Disturb" doors with a tangerine on her: (a) held out as an apology, (b) knocked out? | "a". **Neither since 2026-11-19:** gag 23 always |
 | Any key cuts a gag short? | "No, during the gag the movement keys have no effect" |
 | Who builds it? | "You update the plan with this update in detail, and my other session implements it. You update each step with their relevant additions. Even the built steps. The other session should revise what it already built and complete it" |
 | (The user's own) | "Also, add a general rule: use generations instead of attempting to draw by itself, or reuse part of props from other scenarios" |

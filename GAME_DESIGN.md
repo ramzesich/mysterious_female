@@ -220,6 +220,18 @@ controller) the third (step 3). **Built (step 1, 2026-11-15):**
 - Numbers in `src/config.js` (`CRY`, `LUNGE`), to be tuned in play. The lunge stays under
   Bumbot's 300 px a second.
 
+**Decided (the user, 2026-11-19; not built yet: `docs/plan-the-rest.md` §3, 1.2a): the pocket is
+the gulls' only.** After playing: "losing a tangerine on hit almost never fits visually and in
+terms of gameplay. I want to play the respawn gags in most of the cases, tangerines or no."
+Losing one fits only where someone takes it. So: a gull that comes down on her (the balcony
+rails', the funnel's on the stairway, one across her glide) takes a tangerine and she keeps her
+place; **every other hit is its gag and her checkpoint whatever she carries, and none is lost**;
+a "Do Not Disturb" door and the occupied balcony are the "Oh, sorry!" gag always; a bump with a
+tray, a cone or a delivery in her hands is always a spill. A tangerine is otherwise spent only
+by her own choice (the cry, the lunge, a throw), and the lunge is the one way a tangerine gets
+her through a hit. What is written below of the pocket, and in §5.6 of a hit "with a tangerine
+on her", is what is built until that step, and holds after it for the three gulls only.
+
 **Built (step 2, 2026-11-15): the pocket, and the tangerine a real thing.**
 
 - **A hit that would be a fright or a spilled tray, with a tangerine on her, is forgiven**: she
@@ -714,6 +726,9 @@ Then she steps out of the closest activated crew cabin door (§5.5).
 **In a lunge** (§3.2, since 2026-11-15) nothing frightens her by contact, for its second and a
 breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
 Disturb" door is no contact: that fright stands, lunge or not.
+
+**(Decided 2026-11-19, §3.2: the next paragraph will hold for the three gulls only; every other
+hit is its gag and her checkpoint whatever she carries. Not built yet.)**
 
 **With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a hit by contact, or a hit
 under the parasol, is forgiven for one tangerine, and she keeps her place. Since 2026-11-16 her

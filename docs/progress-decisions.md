@@ -3205,3 +3205,39 @@ randomly", "slightly washed"; and "behind the right (closest to the screen) chai
 - **Found:** a sitter's head at the balcony's "LIGHTING" plate (the seats beside the booth door stay empty); the new
   pieces' empty canvas counted as overlaps (trimmed to what is drawn, their middle kept).
 - `check_overlaps` 0; `region3`, `boot` pass. 80 generations.
+
+## A hit is its gag, tangerines or not; only a gull takes one (2026-11-19; a plan, nothing built)
+
+The user, after playing: "losing a tangerine on hit almost never fits visually and in terms of gameplay. I want to play
+the respawn gags in most of the cases, tangerines or no. But analyze all of the encounters that are in the game and in
+the plan, and see if there are cases that are really fitting to lose a tangerine on hit."
+
+The design session went through every hit (`MISHAPS`' 27 obstacles, `MISHAP_SCENES`' 45 scenarios, the tray spills,
+part 3's deliveries) with one test: **losing a tangerine fits only where someone takes it**, not where a knock makes a
+fruit pop out of her pocket while she stays on her feet. Recommended, and the user's answer "Yes, all as recommended":
+
+1. **The gulls' three (20, 21, 22) keep it:** the gull takes a tangerine, she ducks and keeps her place.
+2. **The "Do Not Disturb" doors and the occupied balcony (23, 24): gag 23 always.** The tangerine held out fits the
+   fiction, but it hides the better picture.
+3. **A tray, a cone or a delivery in her hands is always spilled by a bump.**
+4. **Every other hit: its gag and her checkpoint always, none lost.**
+
+**Why:** with tangerines on her, the gags (the most worked-on art of this part) were never seen, and what was seen in
+their place (a flinch, a fruit rolling off) had no cause in the picture. A tangerine is now only spent by her own choice,
+or taken by a gull that wants it.
+
+**What goes with it:** the tangerine knocked out to roll off behind her and its "run back or go on" choice (the user's
+own, 2026-11-17); her short reactions to a hit (left in the sheets); the vacuum eating what she dropped; a tray saved by
+a tangerine; the proposed "bats the towels off". The game is harder with a full pocket: every hit costs the way back;
+the lunge is the one way to pay through a hit.
+
+**Found while writing it:** the gulls that dive at food take the food whatever is in her pocket (`FoodGulls`, the rail
+gulls with food in her hands): the three-uses plan's "her cone saved" was never built for them. Left as built; I had
+listed it to the user as a case that exists, which was wrong.
+
+**In the documents:** `docs/plan-three-uses.md` §1.3 and §1.6 (dated notes; what they supersede struck or marked), §2's
+last column, §3, §4.4, step 6, the risks, the user's answers; `GAME_DESIGN.md` §3.2 and §5.6 (decided, not built);
+`docs/plan-the-rest.md`: **a new step 1.2a in §3, after 14a/14b and before 15** (the user: "Steps that are already
+implemented: add a step for their update after 14a/14b"), what it changes in the code, the tests and the documents; 1.3's
+`mishaps` playtest, 3.2's deliveries, U16, and §12's closed list. No art; about half a day to build, about what the
+`mishaps` playtest saves by losing its "with a tangerine" half, so the date does not move.

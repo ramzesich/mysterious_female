@@ -43,7 +43,7 @@ findings that decide something were checked again by hand (the list in §11).
 
 | Part | What | From | Size | Art, by the plans' own estimates |
 |---|---|---|---|---|
-| 1 (§3) | The mishaps' gags to their end, their playtest, two leftovers | `docs/plan-three-uses.md` step 4a | Large | About 80 generations |
+| 1 (§3) | The mishaps' gags to their end, their playtest, two leftovers; **and (1.2a, added 2026-11-19) a hit is its gag whatever she carries, only a gull takes a tangerine** | `docs/plan-three-uses.md` step 4a, §1.3 and §1.6 | Large | About 80 generations |
 | 2 (§4) | The rest of the twenty things to find; fourteen books with their covers; cabin 8206's desk | Step 5 and its revisions | Large | About 45, and the nook's photo |
 | 3 (§5) | The look-outs; the deliveries | Step 6 | Large | About 15 |
 | 4 (§6) | Each deck its own look | Step 7 | Medium | About 20 |
@@ -145,15 +145,81 @@ its own). The items below were the first plan, not needed:
   trip). 13b is not made (no swing door hits her from that side); `src/world/mishaps.js` still
   names it for a door hit from behind: check whether that can still be reached, and take the
   line out of `MISHAP_SCENES` only if it cannot.
-- **Proposed, the user's word first:** her "bats the towels off" (18 with a tangerine on her;
-  the reel stands in). 16's two small flaws were noted and left (her blouse greys one frame in
+- ~~**Proposed, the user's word first:** her "bats the towels off" (18 with a tangerine on her;
+  the reel stands in).~~ **Dropped (2026-11-19, 1.2a):** with a tangerine on her the towels bury
+  her all the same. 16's two small flaws were noted and left (her blouse greys one frame in
   two run-stops; her hair streams back at the sneeze's peak).
+- **The order from here (2026-11-19):** 14a and 14b, then **1.2a** (below), then 15, made under
+  1.2a's rule from the start (the boat's gag whatever she carries).
+
+### 1.2a A hit is its gag, tangerines or not; only a gull takes one (medium; no art; added 2026-11-19)
+
+The user, 2026-11-19, after playing: "losing a tangerine on hit almost never fits visually and in
+terms of gameplay. I want to play the respawn gags in most of the cases, tangerines or no." The
+design session went through every hit in the game and in the plans (the 27 obstacles of
+`MISHAPS`, the 45 scenarios of `MISHAP_SCENES`, the tray spills, part 3's deliveries) with one
+test: **losing a tangerine fits only where someone takes it.** The user's answers: "Yes, all as
+recommended"; and for what is built, "add a step for their update after 14a/14b". The design:
+`docs/plan-three-uses.md` §1.3 and §1.6, revised the same day.
+
+**The rule:**
+
+| Hit | With tangerines on her |
+|---|---|
+| A gull that comes down on her: the balcony rails' (20), the funnel's on the stairway (21), one across her glide (22) | **As built: she ducks, the gull flies off with one, she keeps her place** (under the parasol she glides on). With none, the gull's gag |
+| A "Do Not Disturb" door (23), the occupied balcony (24) | **Gag 23 always** ("Oh, sorry!", the tiptoe); no tangerine held out, none lost |
+| Every other hit (1 to 19) | **Its gag and her checkpoint, always; none lost.** What 2 (the dog's lead) and 16 (the sprinklers) already do |
+| A bump with a tray, a cone or a delivery in her hands | **Always a spill**, as before the pocket; no tangerine saves it, none is lost |
+
+Not changed: a lunge still takes her through a hit; falls, the sea and a load that goes over by
+her own feet; everything a tangerine is spent on by her own choice (the cry, the lunge, a
+throw and whoever takes it). **Found while writing this:** the gulls that dive at food (the
+pool's, the Great Outdoors', the rail gulls with food in her hands) take the food whatever is in
+her pocket, in the code as built; `docs/plan-three-uses.md` §2's "her cone saved" was never
+built for them. They stay as built: a tangerine thrown to them is what saves a cone.
+
+**To build, after 14a and 14b:**
+
+1. **`MISHAP_SCENES` (`src/config.js`):** the pocket is the exception now, not the rule: it
+   holds for 20, 21 and 22 only (say `pocket: true` on those three and nothing on the rest;
+   `pocket: false` on 2 and 16 goes). The scenarios built with a stand-in and no gag of their
+   own (1, 10e, 13b if it can still be reached, 15 until it is made) give their stand-in.
+2. **`pocket()` (the ship scene):** only the gull's take is left (`toss: 'gull'`, `snatch`),
+   with its duck and the blink. Gone from it: the tangerine knocked out to roll off behind her
+   (`loose.knock`), the push, the hand-over at a door. **Keep `handOver()` and her `apology`
+   clip:** part 2's sardines (the Sushi Bar's chef takes a tangerine from her hands) uses them.
+3. **`Carry.spill` (`src/world/carry.js`):** no pocket; `reactionTo()` in the ship scene goes
+   with it. A gull's hit while she carries something that is not food: the spill, as any bump.
+4. **`world.touched()`:** "the pocket took it: whoever walked into her stands aside" goes with
+   the pocket (her gag holds them now, as built per gag).
+5. **Left in the sheets, no longer played by a hit:** her short reactions (`reel`, `slipback`,
+   `stumble`, `rubnose`, `splutter`, `arch`, `yelp`, `shiver`) and their sounds
+   (`REACT_SOUND`). Search each before touching it (her own trip, the wet patch's slip and
+   others play some of them); nothing is deleted from the art.
+6. **Each gag looked at with tangerines on her**, since none has been played that way: the
+   count on the HUD unchanged, nothing left lying, her checkpoint after. In the air a hit's gag
+   still starts when she lands.
+7. **`tools/playtest.py`:** `pocket` rewritten (a hit with tangerines on her: the gag, her
+   checkpoint, the count as it was; a gull takes one and she keeps her place; a tray is spilled
+   with tangerines on her; a fall as before); every `Browser.open()` adds `&pocket=off` today,
+   so the regions' checks already see the gags: look for the few that ask for `pocket=on`. Run
+   `pocket`, `vacuum`, `region1` to `region9`, `finale`, `boot` (each a few seconds, stepped).
+8. **The documents:** `GAME_DESIGN.md` §3.2 and §5.6 (the design session has put the decision
+   there; the "built" lines are this step's); `README.md`'s two flags; `docs/population.md`'s
+   hazards; `CLAUDE.md`: `src/config.js`'s and `tangerine.js`'s rows, and the rule on links
+   (a gag no longer needs a link without `&tangerines=infinite`; **the gulls' three do**,
+   20 to 22: propose the new wording to the user, it is their rule).
+9. **For the user in play, after it:** every hit now costs the way back. If a stretch proves
+   harsh with it (1.4's checkpoint past deck 9's sprinkler is such a question; the tray errands,
+   where a bump is now always a spill), it is answered with a checkpoint or a hazard's timing,
+   one at a time, on the user's word.
 
 ### 1.3 The `mishaps` playtest, the sounds, the start places (medium; no art)
 
 - `mishaps`: a new scenario, a case for each scenario of §1.6 outside region 1 (the gag it asks
-  for, her checkpoint after, the thing back in its place; with a tangerine the reaction and
-  where the tangerine goes; the side told right). The gags built so far are checked inside
+  for, her checkpoint after, the thing back in its place; ~~with a tangerine the reaction and
+  where the tangerine goes~~ **with tangerines on her the same gag and the count unchanged, and
+  for 20 to 22 the gull's take (1.2a, 2026-11-19)**; the side told right). The gags built so far are checked inside
   `region4`, `region6`, `region7`, `region8`, `region9`: those stay, new ones go here.
 - The checks that still expect the old run-off, as each gag lands: `region2` (the jogger),
   `region3` (the stage's light), `region6` (the jet, 7a), `region7` (the boat, the doors, the
@@ -289,8 +355,8 @@ cabin's number on its tag, carried under tray rules; a hand takes it at the door
 | 3 | Deck 9 aft | A stack of pillows | Light: a full jump allowed, but the top one slides off if she stops short | A thank-you only |
 
 - `LOADS` in `src/world/carry.js`; a source at each pantry end `when` its door is opened; the
-  door that takes it. With a delivery in her hands a hit is a spill, as with any tray; with a
-  tangerine on her the reaction follows §1.6.
+  door that takes it. With a delivery in her hands a hit is a spill, as with any tray,
+  **tangerines on her or not** (1.2a, 2026-11-19: no tangerine saves a tray).
 - The loads are generated; where a load hides her or changes how she stands (the vase before
   her face, the pillows in both arms), her with it is one generated clip.
 - The plan's own warning: three deliveries are one kind of errand with three loads and three
@@ -470,7 +536,7 @@ this to the end of the plan."
 | U13 | A pause, a map ("at least for now" neither); a controller button for the outside view (O) | Only if wanted |
 | U14 | The real Xbox controller through the whole route (the mapping and rumble are built, the test drives a fake one); with the controller alone the game may stay silent until a key or click | The user's own run |
 | U15 | The user's own touches to the livery (`assets/source/livery/livery-by-hand.png`) | The user's own |
-| U16 | Fine placement of everything, and the numbers, in play: the cry and the lunge, the pocket's roll, how often she runs dry, each gag's length, the glide, the checkpoints' spacing | Her playtest and the user's |
+| U16 | Fine placement of everything, and the numbers, in play: the cry and the lunge, ~~the pocket's roll~~ (gone with 1.2a: now how often a hit sends her back, and how far), how often she runs dry, each gag's length, the glide, the checkpoints' spacing | Her playtest and the user's |
 
 ## 10. Once, at the end (on the user's word)
 
@@ -523,6 +589,10 @@ it first); whether the two `deck4` checks still fail on the stepped clock.
   of small pickups: decided against.
 - The audit's I1, I5, I8, I11; V9 and V11 (choices, not faults); V1, V2, V3, V6, V7 (fixed).
 - 13b, 4c, 10b's squirm, 7b's fold "shut on her" (the collapse was taken).
+- **A tangerine lost to a hit, everywhere but the gulls' three (20 to 22)** (the user,
+  2026-11-19; §3 1.2a): the tangerine knocked out of her pocket to roll off behind her, her
+  short reactions to a hit, the tangerine held out at a "Do Not Disturb" door, a tray saved by
+  a tangerine, her "bats the towels off".
 - The controller's mute (keyboard only). A whole suite before each merge ("The old rule").
 - A gust carries her twice what its data says: known since region 7, every gust is tuned to it.
 - After the sunset, the stairs to deck 8's forward terrace are a way round the glide: left in,
