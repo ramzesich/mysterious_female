@@ -1281,6 +1281,21 @@ export class ShipScene extends Phaser.Scene {
         return to;
     }
 
+    // ... and short of a balcony's partition on her route (a grip with `over`, which only she vaults):
+    // what runs off her along the balconies stops at the next one (the gull on her head, 20; her
+    // tiptoe away from an occupied balcony, 24). One she already stands by stops it where it is.
+    partitionShort(x, to, y, half = 0, gap = 2) {
+        const dir = Math.sign(to - x);
+        if (!dir) return to;
+        for (const g of this.world.grips) {
+            if (g.route !== this.route || !g.over || Math.abs(g.y1 - y) > 6 || (g.x - x) * dir <= 0) continue;
+            const stop = g.x - dir * (g.w / 2 + half + gap);
+            const at = (stop - x) * dir > 0 ? stop : x;
+            if ((to - at) * dir > 0) to = at;
+        }
+        return to;
+    }
+
     // A span lo..hi round x on the floor y, cut short by the doors and walls either side.
     spanOn(x, lo, hi, y, half = 0, gap = 2) {
         return { lo: this.stopShort(x, lo, y, half, gap), hi: this.stopShort(x, hi, y, half, gap) };
@@ -4617,7 +4632,8 @@ export class ShipScene extends Phaser.Scene {
 
     // Her gag at a "Do Not Disturb" door (23), the door opened on its guest: "Oh, sorry!", a startled hop, both hands
     // over her eyes, blushing; then she turns away from the door and tiptoes off, quick, to the next wall or door
-    // across the deck (`stopShort`: a beat there, then her checkpoint) or out of the screen. One picture of her
+    // across the deck (`stopShort`: a beat there, then her checkpoint) or out of the screen; on an occupied balcony (24) the
+    // same, away from its guests to the partition ahead (`partitionShort`). One picture of her
     // (the `gags` sheet's dnd-cover and dnd-tiptoe), first facing her way, then away from the door.
     sorryGag(sc, fromX) {
         const p = this.player, g = GAGS[sc.gag], gm = this.cache.json.get('gags-meta');
@@ -4637,7 +4653,7 @@ export class ShipScene extends Phaser.Scene {
         s.once('animationcomplete-gags-dnd-cover', () => {
             if (this.gagEnd === null) return;
             s.setFlipX(away < 0).play('gags-dnd-tiptoe');
-            const wall = this.stopShort(s.x, s.x + away * 4800, y, 12);
+            const wall = this.partitionShort(s.x, this.stopShort(s.x, s.x + away * 4800, y, 12), y, 12);
             this.script = (dt) => {
                 s.x += away * g.speed * dt;
                 const view = this.cameras.main.worldView;

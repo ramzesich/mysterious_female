@@ -3033,3 +3033,20 @@ apology and the hand-over as before. `?at=dnd9`, 2 m forward of deck 9's door.
   `dnd-tag`), cabin 8206's door inside (`tools/draw_cabin.py`).
 - **Tests:** `region4` checks the gag (the tiptoe away from the door at her pace, back at her checkpoint); `boot`,
   `region4`, `pocket`, `region6`, `region7`, `cabin` pass; `check_overlaps` 0. The rest not run. About 12 generations.
+
+## Gag 24 built: "Oh, sorry!" on an occupied balcony (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.1, the last of its four gags (the user: "as written", to the next partition). Vaulting onto a
+balcony with someone on it (the sunbather on deck 8, the breakfast couple on deck 10) with no tangerine on her: gag 23's
+own clips, "Oh, sorry!", her hands over her eyes, blushing, then she tiptoes away from the balcony's middle to the
+partition ahead, a beat there, her checkpoint. No new art, no generations. With a tangerine on her, the hand-over as before.
+
+- **Partitions stop what runs off her:** `partitionShort` in the ship scene (a grip with `over` on her route and floor),
+  after `stopShort`; the gull's 20 had its own copy of it, now this one, which also stops her where she is when she
+  already stands by the partition (before, the gull could then run her through it).
+- **Where she lands:** a vault held toward the balcony drops her just past its middle, so the tiptoe ahead is short
+  (about 20 px, 0.2 s); shown to the user with that said, approved as it is. The couple's red "!" is half under her word.
+- **The vault, asked by the user** ("Not sure how I get there at all", "Do we have a double jump there?"): no double
+  jump; the second press is the grip socks' kick off the partition (`tryWallJump`), which works 0.1 to 0.5 s after the
+  first while beside it. `?at=occupied8`: deck 8's balcony aft of the sunbather's, `cards=all` for the socks.
+- **Tests:** `region7` (the occupied balcony's check now sees the gag) and `region4` pass; the rest not run.

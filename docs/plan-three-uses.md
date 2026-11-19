@@ -239,7 +239,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 21 | The funnel's gulls, on the stairway | She ducks; the gull takes it | She bumps down the flight on her bottom, step by step, to its foot (built 2026-11-18: `stairsGag`, "Ow-ow-ow!", dizzy at the foot with butterflies) |
 | 22 | The gulls across her glide | She ducks; the gull takes it | The parasol turns inside out, and she falls (the fall as built). **Built 2026-11-18:** she looks up at it kicking her legs as she drops, a softer fall; the gull darts at her first |
 | 23 | "Do Not Disturb" doors (7) | **She holds a tangerine out in both hands, her head bowed; a hand takes it and the door shuts** (spent, not rolling) | "Oh, sorry!": both hands over her eyes, blushing, she tiptoes off fast, out of the screen. **Built 2026-11-19:** to the next wall or door across the deck, or out of the screen; the doors' sign redrawn and swung with the door |
-| 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23 |
+| 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23. **Built 2026-11-19:** away from its guests to the partition ahead |
 
 **Unchanged:** a fall of more than a deck, the sea and its life ring, a tray spilled (it flies,
 she fetches another; the pocket saves it), and everything that never sent her back (the

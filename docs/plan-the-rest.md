@@ -86,7 +86,9 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   of jump made in the air and held, not on the jump from the floor held on. **Gag 23 built (2026-11-19)**: `sorryGag`,
   "Oh, sorry!", her hands over her eyes, blushing, a quick tiptoe off to the next wall or door; and on the user's word
   the doors' sign redrawn (a hanger with a half-round top and a crossed red circle, on the lever's mount, swung with
-  the door; the same on cabin 8206's door and the occupied balconies' partitions); `?at=dnd9`. Next: 24. On the way, the funnel's
+  the door; the same on cabin 8206's door and the occupied balconies' partitions); `?at=dnd9`. **Gag 24 built (2026-11-19)**:
+  the same gag on an occupied balcony, she tiptoes away from its guests to the partition ahead (`partitionShort` in the
+  ship scene, which the gull's 20 uses too); `?at=occupied8`. **1.1 is done; next: 1.2.** On the way, the funnel's
   stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
   the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
 
@@ -450,7 +452,7 @@ the same recipe as the game's cloud strip, see-through).
 ## 11. Checked by hand (2026-11-18)
 
 - `MISHAP_SCENES` in `src/config.js`: the scenarios with no `gag` are 1, 2, 7a, 9a to 9d, 10e,
-  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24 (21 built since: `gag: 'stairs'`). `src/world/mishaps.js` still returns `13b`.
+  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24 (21 to 24 built since: `stairs`, `parasol`, `sorry`). `src/world/mishaps.js` still returns `13b`.
 - `tools/playtest.py` has no `mishaps`, `keeps` or `deliveries`.
 - `KEY_CARDS.required` is `true`; `src/progression.js` knows no `locked`.
 - `DEV_FRESH` is `true`; `WIN_MESSAGE` is empty.

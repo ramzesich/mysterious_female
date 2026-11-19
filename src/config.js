@@ -298,7 +298,7 @@ export const MISHAP_SCENES = {
     '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit', gag: 'stairs' },  // a funnel gull: on her bottom down the stairway (the ship scene's `stairsGag`)
     '22': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'parasol' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', toss: 'hand', gag: 'sorry' },   // a "Do Not Disturb" door: her hands over her eyes, she tiptoes off (the ship scene's `sorryGag`)
-    '24': { word: 'startled', react: 'apology', toss: 'hand' },                 // the occupied balcony
+    '24': { word: 'startled', react: 'apology', toss: 'hand', gag: 'sorry' },   // the occupied balcony: as 23, she tiptoes off to the partition
 };
 
 // Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,
@@ -386,10 +386,10 @@ export const GAGS = {
     // and kicks her legs, `kickMs` a frame, dropping out of the screen, a softer fall than a closed
     // parasol's (`fall` px/s², at most `maxFall` px/s: it still catches a little air).
     parasol: { air: true, word: 'whoa', flipMs: 80, kickMs: 100, fall: 500, maxFall: 240 },
-    // 23: a "Do Not Disturb" door opened on its guest with no tangerine on her (the ship scene's `sorryGag`): a
+    // 23 and 24: a "Do Not Disturb" door opened on its guest, or a balcony with someone on it, with no tangerine on her (the ship scene's `sorryGag`): a
     // startled hop, both hands over her eyes, her cheek blushing; then she turns away from the door and tiptoes off
     // at `speed` px/s (her planted foot's own pace, 2.6 px a frame, at the clip's 26 ms a frame) to the next wall or door across the
-    // deck, a beat there (`holdMs`), or out of the screen; then her checkpoint.
+    // deck or a balcony's partition (`partitionShort`), a beat there (`holdMs`), or out of the screen; then her checkpoint.
     sorry: { sorry: true, speed: 100, holdMs: 600 },
 };
 

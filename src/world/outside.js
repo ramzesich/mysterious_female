@@ -163,12 +163,7 @@ export class PerchGull {
                     pic.once('animationcomplete-gags-gull-flail', () => pic.play('gags-gull-run'));
                 }
                 // (The next partition ahead on her floor, or a wall: she runs no further.)
-                let end = s.stopShort(p.x, p.x + dir * 4800, d.floor, 8);
-                for (const g of w.grips) {
-                    if (g.route !== s.route || !g.over || Math.abs(g.y1 - d.floor) > 6) continue;
-                    const stop = g.x - dir * (g.w / 2 + 10);
-                    if ((stop - p.x) * dir > 0 && (stop - end) * dir < 0) end = stop;
-                }
+                const end = s.partitionShort(p.x, s.stopShort(p.x, p.x + dir * 4800, d.floor, 8), d.floor, 8);
                 let flapAt = 0, over = false;
                 s.script = (dt, time) => {
                     if (over) return;

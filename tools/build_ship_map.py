@@ -1025,6 +1025,8 @@ def build_objects():
     for name, deck, m in [("door9", 9, 163), ("trays10", 10, 126), ("wet", 11, 156), ("sprinkler9", 9, 144), ("dnd9", 9, 166)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
+    # (24: deck 8's balcony aft of the sunbather's: vault the partition forward onto it.)
+    add(point("occupied8", "place", 9310, floor_y(8), [prop("route", "promenade")]))
     # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)
     add(point("steam11", "place", exact_x(54.6), floor_y(11)))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))

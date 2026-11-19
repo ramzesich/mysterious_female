@@ -69,6 +69,7 @@ new one added there should be added here too.
 |---|---|
 | `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all&tangerines=infinite> |
 | `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all&tangerines=infinite> |
+| `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
 
 ## Deck 9
 

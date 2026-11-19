@@ -704,7 +704,7 @@ which keeps the challenge, but it plays as a scare:
 
 | What happens | What she does |
 |---|---|
-| Touches an enemy or a hidden trap | **A mishap of that obstacle's own** (2026-11-16, `docs/plan-three-uses.md` §1.6): which one is read from the side of her it is on and from who was moving, she or it (into the porter's cart, she goes over it; it pushes into her as she stands facing it, she sits down; it reaches her back, she sits into the luggage). Then the fade and her checkpoint. During it the keys do nothing; a hit in the air plays it when she lands. At a "Do Not Disturb" door she covers her eyes, blushing, and tiptoes off (gag 23, 2026-11-19); the occupied balcony keeps the old fright and runs off the screen until its own (24). Until each mishap's own gag is drawn, the built fall on its side stands in (on her bottom, or flat on her front, dazed). A slow thing she stands looking at (a paper sliding at her shoe, the suitcase rolling at her) does not knock her over. |
+| Touches an enemy or a hidden trap | **A mishap of that obstacle's own** (2026-11-16, `docs/plan-three-uses.md` §1.6): which one is read from the side of her it is on and from who was moving, she or it (into the porter's cart, she goes over it; it pushes into her as she stands facing it, she sits down; it reaches her back, she sits into the luggage). Then the fade and her checkpoint. During it the keys do nothing; a hit in the air plays it when she lands. At a "Do Not Disturb" door she covers her eyes, blushing, and tiptoes off (gag 23, 2026-11-19); on an occupied balcony the same, to its partition (gag 24, 2026-11-19). Until each mishap's own gag is drawn, the built fall on its side stands in (on her bottom, or flat on her front, dazed). A slow thing she stands looking at (a paper sliding at her shoe, the suitcase rolling at her) does not knock her over. |
 | Falls **one deck** | Nothing. She lands and carries on. |
 | Falls **further than one deck** | The camera **stops following** once she passes one deck, and she drops out of the bottom of the screen, as Bumbot does. |
 | Falls **overboard** | No drowning. A splash, then she bobs up **smiling in a life ring, waving one hand**, for about a second. |
@@ -1084,7 +1084,8 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   and once the leaf is past edge-on it is behind it, its edge peeking past. Cabin 8206's door has the same inside, the
   occupied balconies' partitions the same. Opened with no tangerine on her, **gag 23** (built 2026-11-19): "Oh, sorry!",
   a startled hop, both hands over her eyes, blushing; she turns away from the door and tiptoes off, quick, to the next
-  wall or door across the deck, or out of the screen; then her checkpoint. `?at=dnd9`.
+  wall or door across the deck, or out of the screen; then her checkpoint. `?at=dnd9`. Vaulting onto an occupied balcony
+  with none on her, **gag 24** (built 2026-11-19): the same, away from its guests to the partition ahead. `?at=occupied8`.
 - **The linen room:** **Bumbot asleep in the towel heap** (the heap is drawn). **Near-catch 4:** he
   squeezes into the low vent whose grille hangs open. The laundry cart in the room: she pushes it under
   the vent, climbs onto it and crawls in (the crawl glyph: ↓ then ←/→). **The duct** is a room of its
@@ -2515,7 +2516,8 @@ Nothing blocks the start of the build. These get settled along the way:
       **Done (2026-11-19): the parasol's control** (it opens on a press of jump made in the air, held),
       **gag 23** (at a "Do Not Disturb" door her hands over her eyes, blushing, she tiptoes off) and the
       doors' new sign, hung on the lever's mount and swung with the door.
-      **Next: gag 24, the occupied balcony** (as 23), then the third batch: `docs/plan-the-rest.md` §3. Waiting with it: the books' covers and
+      **Done (2026-11-19): gag 24** (on an occupied balcony as 23, she tiptoes off to the partition).
+      **Next: the third batch, `docs/plan-the-rest.md` §3 1.2** (first: can 7a still happen?). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in
