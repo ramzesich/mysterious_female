@@ -133,8 +133,8 @@ its own). The items below were the first plan, not needed:
 | 9d | She runs into his back | "She bounces off and sits (8d's clip); he never notices" | The same | **Built 2026-11-19** (no art) |
 | 11a | The kid's jet in her face | "Sat back, spluttering, wringing her hair; he points and laughs" (**done 2026-11-19: the wet gag, 16's, plays for 11a and 11b; asked, the user: "Covers"; neither his laugh nor 11b's own is made**) | `src/world/lido.js` | **The kid's laugh** is a clip of his (his pistol is drawn into both hands in every pose) |
 | 11b | The jet in her back | "As 10b: she arches, dances, squelches off" | The same | **A question for the user:** 10b's squirm was dropped ("looked weird, and the case is rare"), so 11b points at a clip that is gone. Propose: her arch as built and the run-off, no new clip |
-| 12a | The stage's light, from the front | "Her head back, two spins on the spot, stars circling, she sits" | `SwingLight`, `movers.js` | |
-| 12b | The same, from behind | "Three stumbling steps, down on her hands and knees, stars" | The same | |
+| 12a | The stage's light, from the front | "Her head back, two spins on the spot, stars circling, she sits" | `SwingLight`, `movers.js` | **Built 2026-11-19** (the user: reuse 9a's spin, a new one from her standing frame; butterflies, not stars) |
+| 12b | The same, from behind | "Three stumbling steps, down on her hands and knees, stars" | The same | **Built 2026-11-19** (9c's stumble and belly-flop, dazed). The light and the stage manager swapped places, the trap door drawn (the user) |
 | 14a | A basketball in her face | "She tips over backward, stiff as a skittle" | `Balls`, `topdeck.js` | |
 | 14b | A basketball on the back of her head | "She topples forward, stiff as a plank" | The same | |
 | 15 | The drill's boat, from above | "Pressed down to half her height, a waddle, she springs back up and sits" | `DrillBoat`, `outside.js` | |
