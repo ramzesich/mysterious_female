@@ -1,11 +1,12 @@
 # Start links
 
 Every place the game can be started at on this computer, for testing. Run `python tools/serve.py`
-first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`), and makes
-D free: the cry and the lunge never use up a tangerine (`tangerines=infinite`).
+first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`).
 
 Useful additions to any link:
 
+- `&tangerines=infinite`: a tangerine is never used up (the cry, the lunge, the throw; a gull still
+  swoops at her, and takes one rather than playing its gag).
 - `&reset` clears the saved progress first.
 - `&lang=ua` shows the game in Ukrainian for that session (`&lang=en` for English).
 - `&sound=off` silences it.
@@ -18,117 +19,117 @@ new one added there should be added here too.
 
 | Place | Link |
 |---|---|
-| Where the game starts: deck 3, her crew cabin's door (with a fresh save) | <http://localhost:8000/?play&reset&cards=all&tangerines=infinite> |
-| The welcome screen, then the whole intro (a new game: the save is cleared) | <http://localhost:8000/?reset&tangerines=infinite> |
+| Where the game starts: deck 3, her crew cabin's door (with a fresh save) | <http://localhost:8000/?play&reset&cards=all> |
+| The welcome screen, then the whole intro (a new game: the save is cleared) | <http://localhost:8000/?reset> |
 | The welcome screen with the save kept (a game under way gets the short way in) | <http://localhost:8000/?tangerines=infinite> |
-| The intro from the whole ship in view | <http://localhost:8000/?reset&intro=ship&tangerines=infinite> |
-| The intro from the corridor, just before her door opens | <http://localhost:8000/?reset&intro=corridor&tangerines=infinite> |
+| The intro from the whole ship in view | <http://localhost:8000/?reset&intro=ship> |
+| The intro from the corridor, just before her door opens | <http://localhost:8000/?reset&intro=corridor> |
 
 ## Deck 3
 
 | Place | Link |
 |---|---|
-| `crew`: the crew corridor, at her cabin's door | <http://localhost:8000/?play&at=crew&cards=all&tangerines=infinite> |
+| `crew`: the crew corridor, at her cabin's door | <http://localhost:8000/?play&at=crew&cards=all> |
 
 ## Deck 4
 
 | Place | Link |
 |---|---|
-| `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all&tangerines=infinite> |
-| `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all&tangerines=infinite> |
-| `deck4-aft`: deck 4's corridor aft, just forward of the robot vacuum's round | <http://localhost:8000/?play&at=deck4-aft&cards=all&tangerines=infinite> |
+| `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all> |
+| `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all> |
+| `deck4-aft`: deck 4's corridor aft, just forward of the robot vacuum's round | <http://localhost:8000/?play&at=deck4-aft&cards=all> |
 
 ## Deck 5
 
 | Place | Link |
 |---|---|
-| `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all&tangerines=infinite> |
-| `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all&tangerines=infinite> |
+| `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all> |
+| `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all> |
 
 ## Deck 6
 
 | Place | Link |
 |---|---|
-| `bar`: Bliss Ultra Lounge | <http://localhost:8000/?play&at=bar&cards=all&tangerines=infinite> |
-| `library`: inside the Library | <http://localhost:8000/?play&at=library&cards=all&tangerines=infinite> |
-| `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all&tangerines=infinite> |
-| `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all&tangerines=infinite> |
+| `bar`: Bliss Ultra Lounge | <http://localhost:8000/?play&at=bar&cards=all> |
+| `library`: inside the Library | <http://localhost:8000/?play&at=library&cards=all> |
+| `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |
+| `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all> |
 
 ## Deck 7
 
 | Place | Link |
 |---|---|
-| `bow`: the mooring deck | <http://localhost:8000/?play&at=bow&cards=all&tangerines=infinite> |
-| `kids`: Splash Academy | <http://localhost:8000/?play&at=kids&cards=all&tangerines=infinite> |
-| `atrium`: the atrium's walk | <http://localhost:8000/?play&at=atrium&cards=all&tangerines=infinite> |
-| `walkway`: outside, the boat walkway over the promenade, at the station locker | <http://localhost:8000/?play&at=walkway&cards=all&tangerines=infinite> |
+| `bow`: the mooring deck | <http://localhost:8000/?play&at=bow&cards=all> |
+| `kids`: Splash Academy | <http://localhost:8000/?play&at=kids&cards=all> |
+| `atrium`: the atrium's walk | <http://localhost:8000/?play&at=atrium&cards=all> |
+| `walkway`: outside, the boat walkway over the promenade, at the station locker | <http://localhost:8000/?play&at=walkway&cards=all> |
 
 ## Deck 8
 
 | Place | Link |
 |---|---|
-| `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all&tangerines=infinite> |
-| `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all&tangerines=infinite> |
+| `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all> |
+| `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all> |
 | `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
 
 ## Deck 9
 
 | Place | Link |
 |---|---|
-| `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all&tangerines=infinite> |
-| `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all&tangerines=infinite> |
-| `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all&tangerines=infinite> |
-| `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all&tangerines=infinite> |
-| `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward&tangerines=infinite> |
-| `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9&pocket=off> |
-| `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10&pocket=off> |
-| `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet&pocket=off> |
-| `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a&pocket=off> |
-| `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5&tangerines=infinite> |
-| `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9&pocket=off> |
-| `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9&tangerines=infinite> |
+| `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all> |
+| `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all> |
+| `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all> |
+| `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
+| `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward> |
+| `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9> |
+| `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10> |
+| `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet> |
+| `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a> |
+| `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5> |
+| `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9> |
+| `sprinkler9`: deck 9's corridor, 4 m forward of its sprinkler (run aft into its rain: 16; tangerines make no difference) | <http://localhost:8000/?play&at=sprinkler9> |
 | `dnd9`: deck 9's corridor, 2 m forward of its "Do Not Disturb" door (walk aft to it and press E: 23, no tangerine on her) | <http://localhost:8000/?play&at=dnd9> |
-| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11&pocket=off> |
-| `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all&tangerines=infinite> |
-| `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all&tangerines=infinite> |
+| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11> |
+| `balcony`: outside, on the balcony of the balcony cabin | <http://localhost:8000/?play&at=balcony&cards=all> |
+| `stern`: the aft terrace | <http://localhost:8000/?play&at=stern&cards=all> |
 
 ## Deck 10
 
 | Place | Link |
 |---|---|
-| `bridge`: the bridge | <http://localhost:8000/?play&at=bridge&cards=all&tangerines=infinite> |
+| `bridge`: the bridge | <http://localhost:8000/?play&at=bridge&cards=all> |
 
 ## Deck 11
 
 | Place | Link |
 |---|---|
-| `sunset`: the balcony forward of the spa, where the last glide starts | <http://localhost:8000/?play&at=sunset&cards=all&tangerines=infinite> |
-| `spa`: the spa's reception | <http://localhost:8000/?play&at=spa&cards=all&tangerines=infinite> |
-| `gym`: the fitness centre | <http://localhost:8000/?play&at=gym&cards=all&tangerines=infinite> |
-| `pool`: the pool deck | <http://localhost:8000/?play&at=pool&cards=all&tangerines=infinite> |
-| `buffet`: the Garden Café | <http://localhost:8000/?play&at=buffet&cards=all&tangerines=infinite> |
-| `diner`: the Great Outdoors | <http://localhost:8000/?play&at=diner&cards=all&tangerines=infinite> |
+| `sunset`: the balcony forward of the spa, where the last glide starts | <http://localhost:8000/?play&at=sunset&cards=all> |
+| `spa`: the spa's reception | <http://localhost:8000/?play&at=spa&cards=all> |
+| `gym`: the fitness centre | <http://localhost:8000/?play&at=gym&cards=all> |
+| `pool`: the pool deck | <http://localhost:8000/?play&at=pool&cards=all> |
+| `buffet`: the Garden Café | <http://localhost:8000/?play&at=buffet&cards=all> |
+| `diner`: the Great Outdoors | <http://localhost:8000/?play&at=diner&cards=all> |
 
 ## Deck 12
 
 | Place | Link |
 |---|---|
-| `spinnaker`: the Spinnaker Lounge | <http://localhost:8000/?play&at=spinnaker&cards=all&tangerines=infinite> |
-| `chapel`: inside the Chapel | <http://localhost:8000/?play&at=chapel&cards=all&tangerines=infinite> |
-| `champs`: Champs Bar | <http://localhost:8000/?play&at=champs&cards=all&tangerines=infinite> |
-| `deck12`: the sun deck, over the pools | <http://localhost:8000/?play&at=deck12&cards=all&tangerines=infinite> |
-| `sundeck`: the sun deck, by the old lady's sunbed | <http://localhost:8000/?play&at=sundeck&cards=all&tangerines=infinite> |
-| `court`: the sports court | <http://localhost:8000/?play&at=court&cards=all&tangerines=infinite> |
-| `technical`: the technical ladder's foot, at Cagney's | <http://localhost:8000/?play&at=technical&cards=all&tangerines=infinite> |
-| `cagneys`: Cagney's, by the wedding cake | <http://localhost:8000/?play&at=cagneys&cards=all&tangerines=infinite> |
-| `sushi`: the Sushi Bar | <http://localhost:8000/?play&at=sushi&cards=all&tangerines=infinite> |
-| `teppanyaki`: Teppanyaki | <http://localhost:8000/?play&at=teppanyaki&cards=all&tangerines=infinite> |
-| `bistro`: Le Bistro | <http://localhost:8000/?play&at=bistro&cards=all&tangerines=infinite> |
-| `terrace`: the aft terrace | <http://localhost:8000/?play&at=terrace&cards=all&tangerines=infinite> |
+| `spinnaker`: the Spinnaker Lounge | <http://localhost:8000/?play&at=spinnaker&cards=all> |
+| `chapel`: inside the Chapel | <http://localhost:8000/?play&at=chapel&cards=all> |
+| `champs`: Champs Bar | <http://localhost:8000/?play&at=champs&cards=all> |
+| `deck12`: the sun deck, over the pools | <http://localhost:8000/?play&at=deck12&cards=all> |
+| `sundeck`: the sun deck, by the old lady's sunbed | <http://localhost:8000/?play&at=sundeck&cards=all> |
+| `court`: the sports court | <http://localhost:8000/?play&at=court&cards=all> |
+| `technical`: the technical ladder's foot, at Cagney's | <http://localhost:8000/?play&at=technical&cards=all> |
+| `cagneys`: Cagney's, by the wedding cake | <http://localhost:8000/?play&at=cagneys&cards=all> |
+| `sushi`: the Sushi Bar | <http://localhost:8000/?play&at=sushi&cards=all> |
+| `teppanyaki`: Teppanyaki | <http://localhost:8000/?play&at=teppanyaki&cards=all> |
+| `bistro`: Le Bistro | <http://localhost:8000/?play&at=bistro&cards=all> |
+| `terrace`: the aft terrace | <http://localhost:8000/?play&at=terrace&cards=all> |
 
 ## Above deck 12
 
 | Place | Link |
 |---|---|
-| `funnel`: the funnel's top | <http://localhost:8000/?play&at=funnel&cards=all&tangerines=infinite> |
-| `stairway`: the foot of the funnel's stairway | <http://localhost:8000/?play&at=stairway&cards=all&tangerines=infinite> |
+| `funnel`: the funnel's top | <http://localhost:8000/?play&at=funnel&cards=all> |
+| `stairway`: the foot of the funnel's stairway | <http://localhost:8000/?play&at=stairway&cards=all> |

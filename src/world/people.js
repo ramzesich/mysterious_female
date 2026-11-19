@@ -245,7 +245,7 @@ export class People {
         }
     }
 
-    // A walker startled (by her cry, or by walking into her when the pocket took the hit): he stops
+    // A walker startled by her cry: he stops
     // and stands aside for a while, a "!" over him.
     standAside(p) {
         const time = this.scene.time.now;

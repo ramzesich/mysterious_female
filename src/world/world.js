@@ -1687,9 +1687,6 @@ export class World {
             // (The porter's cart: who is in it, for her gag with him, 8a to 8d; the jogger, for 9b.)
             s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' || t.fright === 'jogger' ? { person } : null });
         }
-        // The pocket took it (docs/plan-three-uses.md §1.3): whoever walked into her stops and
-        // stands aside, as at her cry, so as not to walk into her again.
-        if (s.mode === 'play' && s.isSafe() && person.walk) this.people.standAside(person);
     }
 
     // --- D: the cry and the lunge (docs/plan-three-uses.md §1.1, §2) ----------------------------
@@ -1739,7 +1736,7 @@ export class World {
             const b = this.inBeak(sprite);
             img.setOrigin(0.5, 0.6 + (0.15 - 0.6) * k);
             img.setPosition(x + (b.x - x) * k, y + (b.y - y) * k).setAlpha(sprite.alpha);
-            if (s.time.now - t0 > 1800 || !sprite.visible || !sprite.active) {
+            if (s.time.now - t0 > (sprite.snatchMs ?? 1800) || !sprite.visible || !sprite.active) {
                 s.events.off('postupdate', follow);
                 img.destroy();
             }

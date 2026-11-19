@@ -220,7 +220,7 @@ controller) the third (step 3). **Built (step 1, 2026-11-15):**
 - Numbers in `src/config.js` (`CRY`, `LUNGE`), to be tuned in play. The lunge stays under
   Bumbot's 300 px a second.
 
-**Decided (the user, 2026-11-19; not built yet: `docs/plan-the-rest.md` §3, 1.2a): the pocket is
+**Decided (the user, 2026-11-19), built the same day (`docs/plan-the-rest.md` §3, 1.2a): the pocket is
 the gulls' only.** After playing: "losing a tangerine on hit almost never fits visually and in
 terms of gameplay. I want to play the respawn gags in most of the cases, tangerines or no."
 Losing one fits only where someone takes it. So: a gull that comes down on her (the balcony
@@ -230,7 +230,12 @@ a "Do Not Disturb" door and the occupied balcony are the "Oh, sorry!" gag always
 tray, a cone or a delivery in her hands is always a spill. A tangerine is otherwise spent only
 by her own choice (the cry, the lunge, a throw), and the lunge is the one way a tangerine gets
 her through a hit. What is written below of the pocket, and in §5.6 of a hit "with a tangerine
-on her", is what is built until that step, and holds after it for the three gulls only.
+on her", was built before that step, and holds now for the three gulls only. **Built
+(2026-11-19):** `pocket: true` on 20, 21 and 22 in `MISHAP_SCENES`, the rest give their gag; nothing
+is knocked out of her pocket (`loose.knock` gone); a tray is spilled whatever she carries; a rail
+gull that comes down on her with a tray (not food) in her hands takes a tangerine and she keeps the
+tray (the user: "Let the gull steal a tangerine"); the flag `?pocket=off` is gone (the user: "it
+always confused me").
 
 **Built (step 2, 2026-11-15): the pocket, and the tangerine a real thing.**
 
@@ -244,8 +249,8 @@ on her", is what is built until that step, and holds after it for the three gull
   and lies where it stops, kept in the save (`save.loose`), hers again by walking over it. Off
   the hull it falls into the sea, gone; in a pool it floats, to be swum to. Whatever wants it
   may take it first (`world.offered()`; the takers come with step 3).
-- `?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
-  it off unless a scenario names it. Numbers: `POCKET` and `LOOSE` in `src/config.js`.
+- ~~`?pocket=off` switches it off (to see a fright with tangerines on her); the playtests run with
+  it off unless a scenario names it.~~ (Gone, 2026-11-19.) Numbers: `POCKET` and `LOOSE` in `src/config.js`.
 - **Revised (2026-11-16, `docs/plan-three-uses.md` §1.6, §1.7):** her reaction is the hit's
   own, by its side and who was moving, and the tangerine goes the way she is thrown (§5.6). A
   gull takes it from her; at a "Do Not Disturb" door or the occupied balcony she hands it over.
@@ -727,8 +732,8 @@ Then she steps out of the closest activated crew cabin door (§5.5).
 breath after: she is through. Falls and the sea are what they are. Her own cry at a "Do Not
 Disturb" door is no contact: that fright stands, lunge or not.
 
-**(Decided 2026-11-19, §3.2: the next paragraph will hold for the three gulls only; every other
-hit is its gag and her checkpoint whatever she carries. Not built yet.)**
+**(Decided and built 2026-11-19, §3.2: the next paragraph holds for the three gulls only; every
+other hit is its gag and her checkpoint whatever she carries.)**
 
 **With a tangerine on her** (the pocket, §3.2, since 2026-11-15) a hit by contact, or a hit
 under the parasol, is forgiven for one tangerine, and she keeps her place. Since 2026-11-16 her
@@ -1250,7 +1255,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   into another boat.
 - **Hazards:** **gusts** (every few seconds a gust sweeps aft along the ship's side: the towels on the
   rails flap first, then a line of spray; in the air she is pushed aft about a metre: jump between
-  gusts); **gulls** perched on the rails, a swoop when she lingers (the shadow tells); **laundry
+  gusts); **gulls** perched on the rails, a swoop when she lingers (it rising over her tells; the shadow on the floor removed 2026-11-19); **laundry
   lines** strung across some balconies (crawl under); **room-service trays** left on the hallways'
   floors (step on one and it clatters, and the nearest "Do Not Disturb" door opens on a startled
   guest: hop them, or walk); the drop.
@@ -2545,8 +2550,9 @@ Nothing blocks the start of the build. These get settled along the way:
       12a/12b** (the jogger's spin and belly-flop), the stage light and the stage manager swapped, the open trap door drawn.
       **Done (2026-11-19): 14a/14b** (stiff as a skittle onto her back, as a plank onto her face) and **the court's two
       players**, who shoot the balls through their rings and pick them up at their feet.
-      **Next: `docs/plan-the-rest.md` §3 step 1.2a** (a hit is its gag whatever she carries; the design session's, 2026-11-19),
-      then 15; part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      **Done (2026-11-19): step 1.2a**: a hit is its gag and her checkpoint whatever she carries, none lost; only a
+      gull that comes down on her takes one (and she keeps her tray); trays always spill; `?pocket=off` gone.
+      **Next: 15** (the drill's boat, under 1.2a's rule from the start); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

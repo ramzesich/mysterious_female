@@ -1,5 +1,5 @@
-// A tangerine loose in the world (docs/plan-three-uses.md §1.2, §1.3, §3): knocked out of her
-// pocket by a hit, or thrown (F: `throw`). One real thing, whichever it was: it bounces and
+// A tangerine loose in the world (docs/plan-three-uses.md §1.2, §3): thrown (F: `throw`), or laid
+// in the world. (No hit knocks one out of her pocket since 2026-11-19.) One real thing: it bounces and
 // rolls, off steps and edges, stops against anything solid, and lies where it stopped until she
 // walks over it, today or next week (`save.loose`). Off the hull it goes into the sea, gone; in a
 // pool it floats. While it is loose it is offered each frame to whatever is near
@@ -50,15 +50,6 @@ export class LooseTangerines {
         for (const r of w.robots ?? []) add(r.zone, o => route(o) === 'inside');
         // (A rope or a fire door that holds her holds it.)
         for (const b of s.progress.barriers) add(b.zone, o => route(o) === 'inside' && s.progress.barrierHolds(b));
-    }
-
-    // Knocked out of her pocket at (x, y), flying off the way `away` says (§1.3).
-    knock(x, y, away, f = 1) {
-        const k = LOOSE.knock;
-        const t = this.make({ x, y, route: this.scene.route }, false);
-        t.img.body.setVelocity(away * k.vx * f, -k.vy);
-        t.pickableAt = this.scene.time.now + LOOSE.pickDelayMs;
-        return t;
     }
 
     // Thrown from her hand at (x, y) (§1.2): a roll, or a lob. `thrown` while it flies and rolls,

@@ -199,11 +199,6 @@ export const LUNGE = {
     safeTailMs: 300,
 };
 
-// The pocket (docs/plan-three-uses.md §1.3): a hit that would be a fright or a spilled tray, with a
-// tangerine on her, is forgiven. She flinches for `flinchMs` (the her-hit clip), pushed back at
-// `push` px a second (slowed by `slow`), and blinks for `safeMs`, untouchable; she keeps her
-// place and her tray. The tangerine is knocked out of her pocket (LOOSE.knock). `?pocket=off`
-// switches it off.
 // How she takes a hit (docs/plan-three-uses.md §1.6). Every obstacle that can hit her by its own
 // name: each `scareContact`, `scareAir`, `Carry.spill` and `world.lunged` names one (`mark`: what a
 // lunge through it leaves on her hair, 'wet', 'soot', 'steam'). Which of its scenarios a hit is,
@@ -239,69 +234,68 @@ export const MISHAPS = {
 };
 
 // The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
-// (`fright.<word>` in src/lang.js). With a tangerine on her: `react`, her clip (`her-<react>`), and
-// `toss`, the way she is thrown: 'on' pushed on, 'back' thrown back, 'drop' no side; 'gull' a gull
-// takes the tangerine, 'hand' she hands it over. (Otherwise the tangerine always rolls off behind
-// her, whatever `toss` says: the user, 2026-11-17.)
-// With none: her gag, then her checkpoint; until each gag is made, the built one on that side
+// (`fright.<word>` in src/lang.js). **A hit is its gag and her checkpoint, whatever she carries**
+// (the user, 2026-11-19: "I want to play the respawn gags in most of the cases, tangerines or no";
+// docs/plan-the-rest.md §3 1.2a): none is lost. `pocket: true`, only a gull that comes down on her
+// (20, 21, 22): with a tangerine on her it flies off with one, she ducks (`react`, her clip
+// `her-<react>`) and keeps her place, blinking (`POCKET`); with none, its gag. (`react` is also her
+// start before running off, where no gag stands in.)
+// Her gag, then her checkpoint; until each gag is made, the built one on that side
 // stands in: `down` 'sit' (on her bottom, dazed) or 'belly' (on her front, dazed), or with no
 // `down` she runs off (`off`). `nothing`: a slow thing she is looking at does not knock her over.
 // `gag`: her own gag is made, one picture of her with the thing (`GAGS`, below), played when the
 // thing that hit her says how it carries her (`ride` in `scareContact`); `down` is kept for a hit
 // that cannot (a tray in her hands spilled, a hit in the air).
-// `pocket: false`: an exception to the tangerines (the user, 2026-11-17: "She has to fall here anyway,
-// tangerines or no. This will be an exception"): with tangerines on her she gets what she gets with
-// none (the gag, her checkpoint) and keeps them all. `pocket()` asks it, whatever the hit.
 export const MISHAP_SCENES = {
-    '1': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit' },     // she runs onto the chips
-    '2': { word: 'tripped', down: 'belly', pocket: false },     // into the dog's lead: down whatever she carries
-    '3': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', gag: 'tray' },  // onto the trays: she rides one off (`Trays.ride`)
-    '4a': { word: 'slipped', react: 'stumble', toss: 'on', down: 'belly', gag: 'paperFront' },   // a paper at her front: her leg up behind, on her belly
-    '4b': { word: 'slipped', react: 'slipback', toss: 'back', down: 'sit', gag: 'paperBehind' }, // at her heel: her leg up in front, on her bottom
-    '5a': { word: 'vacuum', react: 'stumble', toss: 'on', down: 'belly', gag: 'vacuum' }, // the vacuum, head-on
-    '5b': { word: 'ride', react: 'stumble', toss: 'on', down: 'sit', gag: 'vacuum' },   // it catches her from behind
-    '6a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // she runs into the suitcase
-    '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // it rolls into her back
-    '6c': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'suitcase' },  // it rolls into her front
-    '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'sledge' },  // the deck chair, head-on: face first onto it, she sleds on it (`WetPatch.ride`)
-    '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`)
-    '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
-    '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartPush' },      // it pushes into her
-    '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'cartSit' },      // it reaches her back
-    '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartBounce' },    // into his back
-    '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogSpin' },     // the jogger, head-on: spun round like a top, she sits dizzy; he runs on
-    '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogBowled' },  // he runs into her: bowled back onto her bottom, he scratches the back of his head, sorry (`jogGag`)
-    '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'jogShoved' },  // into her back: shoved, she stumbles and belly-flops; he scratches his head
-    '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogBounce' },   // she into his back: 8d's bounce, he never notices
-    '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trayFront' },        // into the breakfast tray
-    '10b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'trayBack' },                     // it meets her back
+    '1': { word: 'slipped', react: 'slipback', down: 'sit' },     // she runs onto the chips
+    '2': { word: 'tripped', down: 'belly' },     // into the dog's lead: down whatever she carries
+    '3': { word: 'tripped', react: 'stumble', down: 'belly', gag: 'tray' },  // onto the trays: she rides one off (`Trays.ride`)
+    '4a': { word: 'slipped', react: 'stumble', down: 'belly', gag: 'paperFront' },   // a paper at her front: her leg up behind, on her belly
+    '4b': { word: 'slipped', react: 'slipback', down: 'sit', gag: 'paperBehind' }, // at her heel: her leg up in front, on her bottom
+    '5a': { word: 'vacuum', react: 'stumble', down: 'belly', gag: 'vacuum' }, // the vacuum, head-on
+    '5b': { word: 'ride', react: 'stumble', down: 'sit', gag: 'vacuum' },   // it catches her from behind
+    '6a': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'suitcase' }, // she runs into the suitcase
+    '6b': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'suitcase' }, // it rolls into her back
+    '6c': { word: 'bumped', react: 'reel', down: 'sit', gag: 'suitcase' },  // it rolls into her front
+    '7a': { word: 'bumped', react: 'stumble', down: 'belly', gag: 'sledge' },  // the deck chair, head-on: face first onto it, she sleds on it (`WetPatch.ride`)
+    '7b': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`)
+    '8a': { word: 'bumped', react: 'stumble', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
+    '8b': { word: 'bumped', react: 'reel', down: 'sit', gag: 'cartPush' },      // it pushes into her
+    '8c': { word: 'bumped', react: 'stumble', down: 'sit', gag: 'cartSit' },      // it reaches her back
+    '8d': { word: 'bumped', react: 'reel', down: 'sit', gag: 'cartBounce' },    // into his back
+    '9a': { word: 'bumped', react: 'reel', down: 'sit', gag: 'jogSpin' },     // the jogger, head-on: spun round like a top, she sits dizzy; he runs on
+    '9b': { word: 'bumped', react: 'reel', down: 'sit', gag: 'jogBowled' },  // he runs into her: bowled back onto her bottom, he scratches the back of his head, sorry (`jogGag`)
+    '9c': { word: 'bumped', react: 'stumble', down: 'belly', gag: 'jogShoved' },  // into her back: shoved, she stumbles and belly-flops; he scratches his head
+    '9d': { word: 'bumped', react: 'reel', down: 'sit', gag: 'jogBounce' },   // she into his back: 8d's bounce, he never notices
+    '10a': { word: 'bumped', react: 'reel', down: 'sit', gag: 'trayFront' },        // into the breakfast tray
+    '10b': { word: 'splashed', react: 'arch', gag: 'trayBack' },                     // it meets her back
     // Her trolley (the user, 2026-11-17: most of the round she wheels it, so it is what she meets).
     // At her front with no one just past it (parked), she trips over it head first (10c); with the
     // stewardess just past it (wheeled), she is bumped back and sits (10d, 8b's clip): over it she
     // would land on her; at her back, she trips forward away from it (10e, her own trip, dazed 1.2 s);
     // into the stewardess's back, she bounces off and sits (10f, 8d's clip).
-    '10c': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', gag: 'trolleyTrip' },    // over it
-    '10d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyPush' },        // bumped back off it
-    '10e': { word: 'tripped', react: 'stumble', toss: 'on', down: 'belly', downMs: 1200 },          // at her back
-    '10f': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trolleyBounce' },      // into the stewardess's back
-    '11a': { word: 'splashed', react: 'splutter', toss: 'back', down: 'sit', gag: 'sprinkler' },  // the jet in her face; with none on her the wet gag, 16's (the user, 2026-11-19: `soakRide`)
-    '11b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'sprinkler' },   // in her back; the same
-    '12a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit', gag: 'lightSpin' },  // the stage's light: 9a's spin, she sits dizzy (the user, 2026-11-19: reuse)
-    '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly', gag: 'lightShoved' },  // at her back: 9c's stumble and belly-flop
-    '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
-    '13b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },     // it catches her past it
-    '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
-    '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
-    '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
-    '16': { word: 'drenched', react: 'shiver', toss: 'drop', gag: 'sprinkler', pocket: false },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
-    '17': { word: 'fogged', react: 'splutter', toss: 'drop', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
-    '18': { word: 'buried', react: 'reel', toss: 'drop', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
-    '19': { word: 'singed', react: 'yelp', toss: 'drop', gag: 'flare' },        // a flare: out of a puff of smoke her face black, her hair on end and smoking; she blinks and coughs out a puff (`Flare.ride`)
-    '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
-    '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit', gag: 'stairs' },  // a funnel gull: on her bottom down the stairway (the ship scene's `stairsGag`)
-    '22': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'parasol' },                     // a gull across her glide
-    '23': { word: 'startled', react: 'apology', toss: 'hand', gag: 'sorry' },   // a "Do Not Disturb" door: her hands over her eyes, she tiptoes off (the ship scene's `sorryGag`)
-    '24': { word: 'startled', react: 'apology', toss: 'hand', gag: 'sorry' },   // the occupied balcony: as 23, she tiptoes off to the partition
+    '10c': { word: 'tripped', react: 'stumble', down: 'belly', gag: 'trolleyTrip' },    // over it
+    '10d': { word: 'bumped', react: 'reel', down: 'sit', gag: 'trolleyPush' },        // bumped back off it
+    '10e': { word: 'tripped', react: 'stumble', down: 'belly', downMs: 1200 },          // at her back
+    '10f': { word: 'bumped', react: 'reel', down: 'sit', gag: 'trolleyBounce' },      // into the stewardess's back
+    '11a': { word: 'splashed', react: 'splutter', down: 'sit', gag: 'sprinkler' },  // the jet in her face: the wet gag, 16's (the user, 2026-11-19: `soakRide`)
+    '11b': { word: 'splashed', react: 'arch', gag: 'sprinkler' },   // in her back; the same
+    '12a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'lightSpin' },  // the stage's light: 9a's spin, she sits dizzy (the user, 2026-11-19: reuse)
+    '12b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'lightShoved' },  // at her back: 9c's stumble and belly-flop
+    '13a': { word: 'bonked', react: 'rubnose', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
+    '13b': { word: 'bonked', react: 'stumble', down: 'belly' },     // it catches her past it
+    '14a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
+    '14b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
+    '15': { word: 'bumped', react: 'duck', down: 'sit' },         // the drill's boat
+    '16': { word: 'drenched', react: 'shiver', gag: 'sprinkler' },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
+    '17': { word: 'fogged', react: 'splutter', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
+    '18': { word: 'buried', react: 'reel', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
+    '19': { word: 'singed', react: 'yelp', gag: 'flare' },        // a flare: out of a puff of smoke her face black, her hair on end and smoking; she blinks and coughs out a puff (`Flare.ride`)
+    '20': { word: 'swooped', react: 'duck', pocket: true, gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
+    '21': { word: 'swooped', react: 'duck', pocket: true, down: 'sit', gag: 'stairs' },  // a funnel gull: on her bottom down the stairway (the ship scene's `stairsGag`)
+    '22': { word: 'swooped', react: 'duck', pocket: true, gag: 'parasol' },                     // a gull across her glide
+    '23': { word: 'startled', react: 'apology', gag: 'sorry' },   // a "Do Not Disturb" door: her hands over her eyes, she tiptoes off (the ship scene's `sorryGag`)
+    '24': { word: 'startled', react: 'apology', gag: 'sorry' },   // the occupied balcony: as 23, she tiptoes off to the partition
 };
 
 // Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,
@@ -433,26 +427,24 @@ export const HAND_OVER = { dx: 18, dy: 33, frame: 2, giveMs: 950, ms: 1400 };
 // screen's px), one after another `gapMs` apart; the count changes as each lands.
 export const TALLY = { ms: 400, arc: 70, gapMs: 80 };
 
+// A gull's take (the ship scene's `pocket()`): she flinches `flinchMs` (her duck: `recoverMs`), her
+// way slowed by `slow` px a second each second, and blinks for `safeMs`, untouchable.
 export const POCKET = {
     flinchMs: 340,
     safeMs: 1500,
-    push: 120,
-    hop: 90,
     slow: 300,
-    recoverMs: 700,     // her slipback and her stumble, before she has her balance back
-    stumblePush: 45,    // px/s on, tripped: stopped short to stagger (her run would carry it off)
+    recoverMs: 700,
 };
 
 // A tangerine loose in the world (src/world/tangerine.js): how it bounces (`bounce`, a share of
 // its speed kept), how fast a floor slows its roll (px a second, each second), below what speed
-// it lies still, how near her feet she picks it up, the speed it leaves her pocket at, how long
+// it lies still, how near her feet she picks it up, how long
 // before she can catch it again, and from what speed down onto a floor it makes a sound.
 export const LOOSE = {
     bounce: 0.35,
     rollDecel: 200,
     rest: 10,
     reach: 12,
-    knock: { vx: 220, vy: 200 },
     pickDelayMs: 600,
     thudAt: 60,
     landKeep: 0.45,     // of its speed along the floor kept when it comes down hard (a lob stops near where it lands)

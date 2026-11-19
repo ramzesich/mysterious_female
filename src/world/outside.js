@@ -97,8 +97,10 @@ export class Gusts {
 }
 
 // A gull perched on a balcony's rail (population: `gull_8`...): she lingers near it for two
-// seconds and it goes up; its shadow shows where she stands, and a second later it comes down on
-// that spot: "Swooped" (or, if she carries food, the food is gone). Keeping on the move is the way.
+// seconds and it goes up, hangs over her a second, and comes down on that spot: "Swooped" (or, if
+// she carries food, the food is gone). Keeping on the move is the way. (No shadow on the floor since
+// 2026-11-19, the user.) With a tangerine on her it takes one and flies off with it, out of sight,
+// and is back once she is past (`flee`).
 export class PerchGull {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -107,8 +109,9 @@ export class PerchGull {
         this.def = def;             // { x, y: the rail's top, floor[, route: where it is, if not on a balcony] }
         this.route = def.route ?? OUT;
         this.sprite = s.add.image(def.x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setDepth(D.player + 0.34);
-        this.shadow = s.add.ellipse(def.x, def.floor - 1, 22, 5, 0x2e222f, 0.45).setDepth(this.route === OUT ? D.exterior + 0.14 : D.props + 0.01).setVisible(false);
-        world.add([this.sprite, this.shadow]);
+        // (A tangerine it takes stays in its beak until it is out of sight: `world.snatch`.)
+        this.sprite.snatchMs = 8000;
+        world.add([this.sprite]);
         if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(world.data.balcony, def.floor), gfx: this.sprite });
         this.state = 'perched';
         this.linger = 0;
@@ -122,8 +125,6 @@ export class PerchGull {
         const d = this.def, s = this.scene;
         if (!this.world.hears(d.x, d.floor, this.route) || this.state === 'dive') return;
         if (this.state === 'perched' || this.state === 'mark') sfx.at(d.x, d.y).flap();
-        s.tweens.killTweensOf(this.shadow);
-        this.shadow.setVisible(false);
         this.state = 'back';
         this.awayUntil = s.time.now + 6000;
     }
@@ -134,8 +135,6 @@ export class PerchGull {
         const d = this.def, s = this.scene;
         if ((this.state !== 'perched' && this.state !== 'mark') || t.route !== this.route
             || Math.abs(t.img.y + 3 - d.floor) > 14 || Math.abs(t.img.x - d.x) > 2.6 * M) return false;
-        s.tweens.killTweensOf(this.shadow);
-        this.shadow.setVisible(false);
         this.state = 'taking';
         this.world.gullTakes(this.sprite, t, () => { this.state = 'gone'; });
         return true;
@@ -220,8 +219,6 @@ export class PerchGull {
                 this.state = 'mark';
                 this.at = time + 1000;
                 this.targetX = p.x;
-                this.shadow.setPosition(this.targetX, d.floor - 1).setVisible(true).setScale(0.4);
-                s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 1000 });
                 sfx.at(d.x, d.y).gull();
             }
         } else if (this.state === 'mark') {
@@ -245,7 +242,6 @@ export class PerchGull {
             this.y = this.from.y + ((this.diveY ?? d.floor - 30) - this.from.y) * k * k;
             this.sprite.setFrame('gull-down').setPosition(this.x, this.y);
             if (time > this.at) {
-                this.shadow.setVisible(false);
                 // (Under the open parasol she is out of its reach.)
                 const hit = s.route === this.route && s.mode === 'play' && !s.gliding && Math.abs(p.x - this.targetX) < 17
                     && p.y > d.floor - 30 && p.y < d.floor + 8;
@@ -255,12 +251,32 @@ export class PerchGull {
                         this.world.carryBox.give();
                         this.world.say(t('say.hey'), 900);
                         sfx.at(this.x, this.y).flap();
-                    } else s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite, ride: this.ride() });
+                    } else {
+                        const n = s.save.tangerines;
+                        s.scareContact(this.targetX + (p.flipX ? -8 : 8), 'railgull', { snatch: this.sprite, ride: this.ride() });
+                        // (It took a tangerine: off with it, on past her and up, out of sight.)
+                        if (s.mode === 'play' && s.isSafe() && (s.save.tangerines < n || s.infiniteTangerines())) {
+                            this.state = 'flee';
+                            this.fleeDir = this.x >= p.x ? 1 : -1;
+                            sfx.at(this.x, this.y).flap();
+                        }
+                    }
                 }
-                if (this.state !== 'onhead') {
+                if (this.state !== 'onhead' && this.state !== 'flee') {
                     this.state = 'back';
                     this.at = time + 2600;
                 }
+            }
+        } else if (this.state === 'flee') {
+            // Off with the tangerine in its beak, wings beating fast; out of sight it is gone until she is past.
+            this.x += this.fleeDir * 170 * dt;
+            this.y -= 110 * dt;
+            this.sprite.setFrame(Math.floor(time / 65) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up')
+                .setPosition(this.x, this.y).setFlipX(this.fleeDir < 0);
+            const view = s.cameras.main.worldView;
+            if (this.x < view.x - 40 || this.x > view.right + 40 || this.y < view.y - 40) {
+                this.sprite.setVisible(false);
+                this.state = 'gone';
             }
         } else {
             // Up, round, and back to its rail (off it a while after her cry, wheeling over it).

@@ -3280,3 +3280,36 @@ where the ball hit her." A hit in the air is held until she lands (`gagPending`)
 Now a gag with `drop` (the court's balls, 14a and 14b) stops her there: her way across is gone, she goes stiff at once
 (her standing frame, the topple's first) with her word, drops straight down, and topples where she lands. Every other
 hit in the air is as before. `region8` and `boot` pass.
+
+## A hit is its gag whatever she carries; only a gull takes a tangerine (2026-11-19, §3 step 1.2a)
+
+Built as the design session wrote it (`docs/plan-the-rest.md` §3 1.2a), with the user's three answers:
+
+- **Every hit but a gull's is its gag and her checkpoint, whatever she carries; none is lost.** `MISHAP_SCENES` says
+  `pocket: true` on 20, 21 and 22 only; `toss` is gone from every scenario, and `pocket: false` from 2 and 16. A
+  "Do Not Disturb" door and the occupied balcony are her tiptoe always. `react` stays: a gull's duck, and her start
+  before running off where no gag stands in.
+- **`pocket()` is the gull's take alone:** it takes one (`snatch`), she ducks, blinks, keeps her place and whatever she
+  carries. Gone: the tangerine knocked out to roll behind her (`loose.knock`, `LOOSE.knock`), the push on or back
+  (`POCKET.push`, `stumblePush`, `hop`), the hand-over at a door, her reactions' sounds (`REACT_SOUND`; the sounds stay
+  in `src/sfx.js`), `reactionTo()`, the walker standing aside after a forgiven bump. `handOver()` and her apology clip
+  are kept for part 2's sardines.
+- **A tray is spilled whatever she carries** (`Carry.spill` no longer asks the pocket; only the blink after a gull's take
+  keeps it).
+- **A rail gull with a tray (not food) in her hands** takes a tangerine and she keeps the tray (the user: "Let the gull
+  steal a tangerine"); with food in her hands it takes the food, as built; with none on her, its gag.
+- **`?pocket=off` is gone** (the user: "Remove the flag, it always confused me"): the playtests no longer add it; the
+  gull checks of `region7`, `region8` (the terrace's gull, the funnel's) and `finale` empty her pocket first and give it
+  back.
+- **The rule on links is dropped** (the user: "Drop the rule, and render the links as appropriate in the context"):
+  `docs/start-links.md` without `&tangerines=infinite` (and without `&pocket=off`); `CLAUDE.md`'s rule rewritten.
+- **Tests:** `pocket` rewritten (with two on her: the porter spills her tray, the cart, a door, a paper each her mishap
+  and her checkpoint with the count unchanged and nothing lying, a "Do Not Disturb" door her tiptoe; a gull takes one,
+  she ducks and keeps place and tray; with none, the gull's swoop is her mishap; a fall a fright). Run and passed:
+  `pocket`, `vacuum`, `region1` to `region9`, `finale`, `boot`, and `dash`, `throw`, `deck4`, `overboard` (the ones
+  that give her tangerines). The rest not run.
+- **The perched gull's take, on the user's word after trying it:** its shadow spot on the floor is gone (the balconies'
+  and the terrace's gulls: one class), the tell is the gull going up and hanging over her; and having taken a tangerine
+  it flies off with it in its beak, on past her and up, out of sight (`flee`), back on its rail once she is past (as
+  after taking a loose one). It had gone straight back to its rail and the fruit vanished from its beak after 1.8 s.
+  (The funnel's and the crossing gulls already fly on with theirs.) `region7`, `region8`, `pocket` pass.

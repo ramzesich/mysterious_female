@@ -154,6 +154,12 @@ its own). The items below were the first plan, not needed:
 
 ### 1.2a A hit is its gag, tangerines or not; only a gull takes one (medium; no art; added 2026-11-19)
 
+**Built 2026-11-19.** As below, with the user's three answers: a rail gull that comes down on her while she
+carries something that is not food takes a tangerine and she keeps it ("Let the gull steal a tangerine"); the
+flag `?pocket=off` is gone ("it always confused me"); the rule on links is dropped (links as the context needs;
+`docs/start-links.md` without `&tangerines=infinite`). The `pocket` playtest is rewritten; the gull checks of
+`region7`, `region8` and `finale` empty her pocket first and give it back.
+
 The user, 2026-11-19, after playing: "losing a tangerine on hit almost never fits visually and in
 terms of gameplay. I want to play the respawn gags in most of the cases, tangerines or no." The
 design session went through every hit in the game and in the plans (the 27 obstacles of

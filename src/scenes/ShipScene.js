@@ -76,8 +76,6 @@ const SIDEWALK_LOOKS = {
 // Each hazard gets its own fright (§5.6): her word for it, in the game's language (src/lang.js).
 // What she cries at a hit (a scenario's `word`).
 const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
-// Her reaction's own sound, with a tangerine on her (the rest have the pocket's alone).
-const REACT_SOUND = { yelp: () => sfx.yelpHot(), splutter: () => sfx.splutter(), arch: () => sfx.gasp(), rubnose: () => sfx.sniff() };
 
 // Lying flat on her belly after a trip (scareDown): her picture this many px lower, from this frame
 // of her fall on (the frames where she is down), so that she lies on the carpet, not over it.
@@ -2929,7 +2927,7 @@ export class ShipScene extends Phaser.Scene {
             this.mishap(g.sc, g.fromX, g.ride);
             return;
         }
-        // A hit forgiven by the pocket: her reaction, a step back or on.
+        // A gull's take: her duck (or a hit in the air, waiting for her landing).
         if (time < this.flinchUntil) {
             if (this.gagPending && GAGS[this.gagPending.sc.gag]?.drop) body.velocity.x = 0;
             body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
@@ -4439,61 +4437,40 @@ export class ShipScene extends Phaser.Scene {
         this.refreshHud();
     }
 
-    // --- The pocket (docs/plan-three-uses.md §1.3) ---------------------------------------------
+    // --- A gull's take (docs/plan-the-rest.md §3 1.2a) ------------------------------------------
 
-    // `?pocket=off`: every hit is what it was, whatever she has on her (for testing frights).
-    pocketOn() {
-        return new URLSearchParams(location.search).get('pocket') !== 'off';
-    }
-
-    // Blinking after a hit forgiven: nothing can touch her.
+    // Blinking after a gull's take: nothing can touch her.
     isSafe() {
         return this.safeUntil > this.time.now;
     }
 
-    // A hit that would be a mishap or a spilled tray, with a tangerine on her: one less, and she
-    // keeps her place and her tray (docs/plan-three-uses.md §1.3). Her reaction is the scenario's
-    // (`MISHAP_SCENES`: reeling back a step, stumbling on, rubbing her nose, ducking...), always facing
-    // the way she faced, and the tangerine rolls off behind her, whichever way she is thrown
-    // (the user, 2026-11-17), unless the gull takes it (`toss` 'gull', `snatch`: its sprite) or it is
-    // handed over at the door it came from ('hand'); her push still goes the way of `toss`. True if it was forgiven. (Falls, the sea and her own feet never
-    // come here.)
+    // A gull that comes down on her (`pocket` in `MISHAP_SCENES`: 20, 21, 22), with a tangerine on her:
+    // it flies off with one (`snatch`: its sprite), she ducks, blinks, and keeps her place and whatever
+    // she carries (under the parasol she glides on). True if it took one. Every other hit is its gag
+    // and her checkpoint, whatever she carries (the user, 2026-11-19).
     pocket(fromX, sc, { snatch = null } = {}) {
-        // (A scenario the tangerines do not save her from: she gets the gag, and keeps them.)
-        if (sc.pocket === false) return false;
-        if (!this.pocketOn() || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
+        if (!sc.pocket || (this.save.tangerines <= 0 && !this.infiniteTangerines())) return false;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         const p = this.player, time = this.time.now;
-        const facing = p.flipX ? -1 : 1;
         this.safeUntil = time + POCKET.safeMs;
         sfx.pocket();
         rumble('spill');
-        const hand = sc.toss === 'hand' && this.mode === 'play' && !this.gliding;
-        if (sc.toss === 'gull' && snatch) this.world.snatch(snatch, p.x, p.y - PLAYER.height + 8);
-        // (Always behind her, whichever way the hit throws her: she must choose between running
-        // back for it and going on where she was going; the user, 2026-11-17. A gull's and a
-        // hand's take it.)
-        else if (!hand) this.loose.knock(p.x, p.y - 24, -facing, 1);
+        if (snatch) this.world.snatch(snatch, p.x, p.y - PLAYER.height + 8);
         // (Under the parasol she keeps on gliding: only the blink. A throw under way is dropped.)
         if ((this.mode === 'play' || this.mode === 'stairs') && !this.gliding) {
             this.throwUntil = 0;
             this.throwing = null;
             const clip = `her-${sc.react}`;
-            if (hand) {
-                this.handOver(fromX);
-            } else if (this.anims.exists(clip)) {
+            if (this.anims.exists(clip)) {
                 this.flinchUntil = time + POCKET.recoverMs;
                 this.herClip(clip);
             } else {
                 this.flinchUntil = time + POCKET.flinchMs;
                 if (this.anims.exists('her-hit')) this.herClip('her-hit');
             }
-            // (Pushed on, she is stopped short, to stagger and catch herself: running on, it read as
-            // nothing; thrown back, a step back.)
-            p.body.velocity.x = hand ? 0 : sc.toss === 'on' ? facing * POCKET.stumblePush : sc.toss === 'back' ? -facing * POCKET.push : 0;
+            p.body.velocity.x = 0;
             p.body.velocity.y = 0;
         }
-        REACT_SOUND[sc.react]?.();
         this.refreshHud();
         return true;
     }
@@ -4504,8 +4481,9 @@ export class ShipScene extends Phaser.Scene {
         this.player.anims.play(key);
     }
 
-    // A tangerine held out in both hands as an apology, her head bowed (§1.6, 23 and 24); the hand
-    // at the door it came from takes it (spent, never loose).
+    // A tangerine held out in both hands as an apology, her head bowed; the hand at `fromX` takes it
+    // (spent, never loose). No hit plays it since 1.2a (23 and 24 are her tiptoe always); kept for
+    // part 2's sardines, the Sushi Bar's chef taking one from her hands (docs/plan-the-rest.md).
     handOver(fromX) {
         const p = this.player, dir = p.flipX ? -1 : 1, time = this.time.now;
         this.flinchUntil = time + HAND_OVER.ms;
@@ -4556,17 +4534,8 @@ export class ShipScene extends Phaser.Scene {
         return { front: toward === facing, she: p.body.velocity.x * toward > 20, it: vx * -toward > 5, faces: dir === -toward, lying, crowded };
     }
 
-    // The scenario a hit with a tray in her hands takes for her reaction (the tray is spilled
-    // whatever it is): the obstacle's own, or, for a bump with no name, thrown back from the front
-    // and pushed on from behind.
-    reactionTo(fromX, what, { vx = 0, dir = 0, lying = false } = {}) {
-        const f = this.hitFacts(fromX, vx, dir, lying), sc = what && MISHAP_SCENES[scenario(what, f)];
-        if (sc && !sc.nothing && sc.toss !== 'hand') return sc;
-        return f.front ? { word: 'bumped', react: 'reel', toss: 'back' } : { word: 'bumped', react: 'stumble', toss: 'on' };
-    }
-
-    // She is hit by `what` (an obstacle of `MISHAPS`) from `fromX`: in a lunge she is through; with a
-    // tangerine on her, her reaction (the pocket); with none, her mishap and her checkpoint. Which
+    // She is hit by `what` (an obstacle of `MISHAPS`) from `fromX`: in a lunge she is through; a gull
+    // with a tangerine on her takes one (`pocket()`); otherwise her mishap and her checkpoint. Which
     // scenario it is comes from the side and who was moving (src/world/mishaps.js); returns its
     // number, or null when nothing happened. `force`: no contact (her own cry at a "Do Not Disturb"
     // door): a lunge does not help. `snatch`: the gull that takes the tangerine. `ride`: how the
@@ -4579,7 +4548,7 @@ export class ShipScene extends Phaser.Scene {
             this.world.lunged(what, fromX);
             return null;
         }
-        // Blinking after a hit forgiven, nothing touches her.
+        // Blinking after a gull's take, nothing touches her.
         if (this.isSafe()) return null;
         const id = scenario(what, this.hitFacts(fromX, vx, dir, lying, crowded)), sc = MISHAP_SCENES[id];
         // (A slow thing she stands looking at does not knock her over: it is the thing's to stop.)
@@ -4589,7 +4558,7 @@ export class ShipScene extends Phaser.Scene {
         return id;
     }
 
-    // Her mishap with none on her (§1.6): the gag, and her checkpoint; the keys do nothing until
+    // Her mishap (§1.6): the gag, and her checkpoint; the keys do nothing until
     // the fade. A hit in the air plays it when she lands. Until a scenario's own gag is made, the
     // built fall on its side stands in (`down`), or she runs off.
     mishap(sc, fromX, ride = null) {
