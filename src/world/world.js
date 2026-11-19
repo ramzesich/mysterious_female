@@ -1684,8 +1684,8 @@ export class World {
             this.carryBox.spill(person.x, false, t.fright || null, how);
         } else if (t.kind === 'scare') {
             if (!s.holding) sfx.at(person.x, person.y).hey();
-            // (The porter's cart: who is in it, for her gag with him, 8a to 8d.)
-            s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' ? { person } : null });
+            // (The porter's cart: who is in it, for her gag with him, 8a to 8d; the jogger, for 9b.)
+            s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' || t.fright === 'jogger' ? { person } : null });
         }
         // The pocket took it (docs/plan-three-uses.md §1.3): whoever walked into her stops and
         // stands aside, as at her cry, so as not to walk into her again.

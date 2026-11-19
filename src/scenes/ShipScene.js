@@ -4600,6 +4600,7 @@ export class ShipScene extends Phaser.Scene {
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
         if (sc.gag && GAGS[sc.gag].sorry && this.anims.exists('gags-dnd-tiptoe')) return this.sorryGag(sc, fromX);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
+        if (sc.gag && GAGS[sc.gag].jog && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.jogGag(sc, ride.person);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
         if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
@@ -4952,6 +4953,44 @@ export class ShipScene extends Phaser.Scene {
             // 8a: over the bags, her legs kicking; he stands there.
             s.once(`animationcomplete-${g.clip}`, () => { if (g.loop) s.play(g.loop); end(); });
         }
+    }
+
+    // Her gag with the jogger (§1.6, 9b; `GAGS` jogBowled): he runs into her as she stands facing him;
+    // knocked off her feet, she lands on her bottom (her clip, `gags` sheet, where she stands, her middle at
+    // `jog.x` of its cell), and he stops where he met her, his far arm up to scratch the back of his head,
+    // sorry (his `sorry` clip, then `scratch` until her checkpoint). Then he runs on.
+    jogGag(sc, q) {
+        const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
+        const m = this.cache.json.get('gags-meta');
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        p.body.setVelocity(0, 0);
+        // (A frame anchored at column c, flipped, takes origin (cell - 1 - c) / cell.)
+        const ox = (face < 0 ? m.cell - 1 - m.jog.x : m.jog.x) / m.cell;
+        const s = this.add.sprite(p.x, q.y, 'gags').setOrigin(ox, m.floor / m.cell).setFlipX(face < 0).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        q.state = 'acting';
+        q.busy = true;
+        // (Turned to her, where he met her.)
+        q.dir = p.x < q.x ? -1 : 1;
+        pe.place(q);
+        pe.anim(q, g.his, { loop: false });
+        q.sprite.once('animationcomplete', () => { if (q.busy) pe.anim(q, g.loop); });
+        this.gagEnd = () => {
+            s.destroy();
+            p.setVisible(true);
+            q.busy = false;
+            pe.place(q);
+            pe.idle(q);
+            q.pausedUntil = this.time.now + 600;
+        };
+        s.play(g.clip);
+        s.once(`animationcomplete-${g.clip}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
     }
 
     // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her

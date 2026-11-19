@@ -88,7 +88,10 @@ CAST = {
     "diner_linen": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
     # Region 2.
     "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6}, {}),
-    "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12}, {}),
+    "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12, "sorry": 10, "scratch": 5},
+               # (9b, 9c: "sorry", his far arm up to scratch the back of his head, then "scratch" back and forth;
+               # made in assets/source/her-mishaps/batch-4a/starts/jog9/sorry/, 2026-11-19.)
+               {"cut": {"scratch": ("sorry", [4, 5, 6, 5])}}),
     "fitter": ("e0de11f2-246a-40cc-b9e6-3f374eb03d66", {"work": 6}, {}),
     "dj": ("68e66eb2-4d14-48c8-9acc-37bb6d1001aa", {"bob": 9}, {}),
     "barmaid": ("a0121f2c-c4ee-4b9f-a230-c20e513d118f", {}, {}),

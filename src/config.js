@@ -270,7 +270,7 @@ export const MISHAP_SCENES = {
     '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'cartSit' },      // it reaches her back
     '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartBounce' },    // into his back
     '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // the jogger, head-on
-    '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // he runs into her
+    '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogBowled' },  // he runs into her: bowled back onto her bottom, he scratches the back of his head, sorry (`jogGag`)
     '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into her back
     '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // she into his back
     '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trayFront' },        // into the breakfast tray
@@ -339,6 +339,10 @@ export const GAGS = {
     cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600 },
     cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900 },
     cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600 },
+    // The jogger (9b; the ship scene's `jogGag`): her clip where she stands (`gags` sheet), he stops where
+    // he met her and plays `sorry` (his far arm up to the back of his head), then `scratch` until her
+    // checkpoint, `holdMs` after her clip ends.
+    jogBowled: { clip: 'gags-jog-bowled', jog: true, his: 'sorry', loop: 'scratch', holdMs: 1700 },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head

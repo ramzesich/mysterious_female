@@ -57,6 +57,10 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 own sprite's middle (`parasol-flip/flip/`, cut by `parasol-flip/cut.py`)
   dnd-cover     23: a "Do Not Disturb" door opened on its guest: from her standing frame a startled hop,
                 both hands over her eyes, her cheek blushing (`dnd-sorry/cover/`)
+  jog-bowled    9b: the jogger runs into her standing, facing him: knocked off her feet, back about 20 px and down on
+                her bottom, a little bounce (frame 0: her standing frame; its last, her dazed sit's first; PixMiniMax,
+                `starts/jog9/`, the generator's speed lines and specks taken out: `starts/jog9/clean.py`); her middle
+                at x 84 (`jog.x`)
   dnd-tiptoe    23: off on tiptoe, her hands over her eyes, two tiny steps (a loop; frame 0 = cover's 8;
                 `dnd-sorry/tiptoe/`, cut by `dnd-sorry/cut.py`). Both: her middle at x 64 (`dnd.x`)
 
@@ -77,7 +81,7 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
          ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
-         ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9)]
+         ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9), ("jog-bowled", 13)]
 # (Gags 7a's and 21's to 23's frames are cut from the generator's in a folder of their own.)
 PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
         "parasol-flip": "parasol-flip/flip", "dnd-cover": "dnd-sorry/cover", "dnd-tiptoe": "dnd-sorry/tiptoe",
@@ -139,7 +143,8 @@ def main():
             "flare": {"x": 64},
             "stairs": {"corner": [48, 64], "foot": [50, 100]},
             "parasol": {"feet": [56, 112]},
-            "dnd": {"x": 64}}
+            "dnd": {"x": 64},
+            "jog": {"x": 84}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

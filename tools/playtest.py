@@ -2371,11 +2371,15 @@ def scenario_region2(b):
     js(b, f"(p => {{ p.x = {exact_x(153)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
     wait(1.6)
     ok &= check(b.state()["mode"] == "scripted" and "Oops" in alert(b), "in his lane, he bumps her", alert(b))
+    ok &= check(js(b, "window.__ship.worldLayer.list.some(o => o.anims?.currentAnim?.key === 'gags-jog-bowled')")
+                and (js(b, f"{jog}.sprite.anims.currentAnim?.key") or "").startswith("people-jogger-s"),
+                "9b: bowled back onto her bottom; he stops and scratches the back of his head", js(b, f"{jog}.sprite.anims.currentAnim?.key"))
     wait(2.6)
     b.wait_for("window.__ship.mode === 'play'", 3)
     ok &= check(b.state()["mode"] == "play", "a scare: she is back at a checkpoint", b.state())
-    # He can be hopped.
-    js(b, f"(p => {{ p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
+    # He can be hopped. (Moved by hand he lets go of a door he was going through first: 9b's gag, 2026-11-19,
+    # stops him in the doorway he met her in, and he would be behind a door still his.)
+    js(b, f"(p => {{ if (p.through) {{ window.__ship.letGoDoor(p.through, p); p.through = null; }} p.x = {exact_x(180)}; p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     b.teleport(exact_x(150), D6, "promenade")
     js(b, f"(p => {{ p.x = {exact_x(152.2)}; p.dir = -1; p.pausedUntil = 0; }})({jog})")
     # (Standing still, the hop wants timing; running at him it is easy. He stops by her for 0.45 s,
