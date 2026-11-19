@@ -385,7 +385,7 @@ PEOPLE = {
                               bubble=("door", None, "flag:guest", 5)),
     "npc_guest_in": dict(at=("guest10", 196), who="balcony_guest", face=-1, idle="idle", after="flag:guest"),
     "riv_walkway": dict(at=("walkway", 207.6), who="rival", face=1, idle="peek", after="region:7", until="flag:riv_walkway"),
-    "amb_drill_winch": dict(at=("walkway", 184.9), who="drill_winch", face=1, idle="crank", layer="back"),
+    "amb_drill_winch": dict(at=("walkway", 184.6), who="drill_winch", face=1, idle="crank", layer="back"),
     "amb_drill_officer": dict(at=("walkway", 192.6), who="drill_officer", face=-1, idle="idle", layer="back"),
     # Region 8 (deck 12 from Champs aft, the funnel). Champs' three at the TVs; the old lady on her
     # sunbed across the sun deck's walk (src/world/topdeck.js: she glares, dozes over her mojito,
@@ -531,9 +531,10 @@ PROPS = {
     # The drill's rope across the walkway's inboard side and its sign.
     # (No `back` outside: that depth is behind the ship's side, and the rope was never seen.)
     "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, {}),
+    # (At 184.6 m, from 184.9, with its crewman: the user, 2026-11-19, so that she lies clear of it after 15.)
     # The winch its crewman cranks (he cranked the air: found in the sweep of 2026-11-14). Its
     # handle is where his hands go round, 12 px in front of his middle; he is drawn over it.
-    "prop_drill_winch": ("walkway", 184.9 + 24 / 48, "thing:winch", 0, {}),
+    "prop_drill_winch": ("walkway", 184.6 + 24 / 48, "thing:winch", 0, {}),
     # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
     "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
     # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under

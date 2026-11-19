@@ -6,7 +6,7 @@
 // locked out on his balcony, the security officer at the tender. Places come from maps/world.json
 // (`balcony`, `drill`).
 
-import { PLAYER, CRY, GAGS } from '../config.js';
+import { PLAYER, CRY, GAGS, DRILL } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 import { FOOD } from './hazards.js';
@@ -15,6 +15,9 @@ const M = 48;
 // Where a gull sits on her head: its feet this far over her floor (her head's top at 59).
 const HEAD = 57;
 const OUT = 'promenade';            // the outside route's name (src/world/world.js)
+// The rescue boat's two posts in its picture (`assets/ship/rescue-boat.png`): their middles' columns and
+// their tops' row, where the falls are made fast.
+const POSTS = { x: [50, 201], top: 12 };
 const UNIT = 125;                   // a balcony, px
 const TOWELS = [0xf68181, 0x8fd3ff, 0xfbb954, 0xb9e04c, 0xffffff];
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 900 && Math.abs(s.player.y - d.y) < 320;
@@ -382,8 +385,11 @@ export class Occupied {
 
 // The boat drill on the walkway (population: `haz_drill`): a rescue boat on its falls in the gap
 // between the boats. Hoisted right up she walks under it; every few seconds, after a jolt and the
-// winch's lamp (the tell), the crew lower it onto the walkway and hoist it again. Under it as it
-// comes down: "Bumped". Down, it is in her way.
+// winch's lamp (the tell), the crew lower it onto the walkway and hoist it again; running at it, she
+// sets it off (`DRILL`). Under it as it comes down: "Bumped", stiff onto her back (15: 14a's gag),
+// and it comes down over her as she lies, as low as on the bare walkway (`DRILL.pinPx`), and stays down
+// until she is back at her checkpoint. Down, it is in her way. Its falls run from the davit's arms to
+// the tops of the boat's two posts (`POSTS`).
 export class DrillBoat {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -399,7 +405,7 @@ export class DrillBoat {
         this.d = { x: this.cx, y: def.y };
         // The davit's two arms under the overhang, a lamp on the forward one.
         const arms = s.add.graphics().setDepth(D.exterior + 0.08);
-        this.hooks = [def.x + Math.round(this.w * 0.2), def.x + Math.round(this.w * 0.8)];
+        this.hooks = POSTS.x.map(x => def.x + x);
         for (const hx of this.hooks) {
             arms.fillStyle(0xf7f8f8, 1).fillRect(hx - 14, def.top + 16, 28, 6);
             arms.fillStyle(0xd3e1da, 1).fillRect(hx - 14, def.top + 21, 28, 1);
@@ -412,44 +418,73 @@ export class DrillBoat {
         world.add(items);
         items.forEach(i => s.shellSlopes.push({ deck: [6, 7], gfx: i }));
         this.k = 0;
+        this.t0 = 0;                // when this round's tell started (the scene's ms)
     }
 
     // Her cry: the winchman looks round, and the boat holds one beat longer before it comes down.
     heard() {
         const time = this.scene.time.now;
-        if (!this.world.hears(this.cx, this.def.y, OUT) || this.at(time).k > 0) return;
-        this.held = (this.held ?? 0) + 1000;
+        if (!this.world.hears(this.cx, this.def.y, OUT)) return;
+        if (this.at(time).tell) this.t0 += 1000;
     }
 
-    // How far down it is at `time`, 0 hoisted to 1 on the walkway; and whether the tell is on.
+    // Seconds from the tell's end until the keel, coming down, is at her head as she stands.
+    hitS() {
+        const want = (this.def.y - PLAYER.bodyHeight) - (this.up + this.h - 4), span = this.low - this.up;
+        for (let k = 0; k <= 1; k += 0.01) if (span * k * k * (3 - 2 * k) >= want) return k * DRILL.lowerS;
+        return DRILL.lowerS;
+    }
+
+    // How far down it is at `time`, 0 hoisted to 1 on the walkway; whether the tell is on; `idle` once
+    // it is hoisted again, `t` s into the round.
     at(time) {
-        const d = this.def, t = ((time - (this.held ?? 0)) / 1000) % d.period, lower = 1.1, hoist = 1.6;
+        const d = this.def, t = (time - this.t0) / 1000, lower = DRILL.lowerS, hoist = DRILL.hoistS;
         if (t < d.tell) return { k: 0, tell: true, t };
         const u = t - d.tell;
         if (u < lower) return { k: u / lower, coming: true };
         if (u < lower + d.down) return { k: 1 };
         if (u < lower + d.down + hoist) return { k: 1 - (u - lower - d.down) / hoist };
-        return { k: 0 };
+        return { k: 0, idle: true, t };
     }
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
+        // (The clock's rounds, `period` s apart, when nothing sets it off sooner.)
+        if (time - this.t0 >= d.period * 1000) this.t0 += Math.floor((time - this.t0) / (d.period * 1000)) * d.period * 1000;
+        // (Down on her: it stays down until she is back at her checkpoint.)
+        if (this.pinned) {
+            if (s.mode === 'play') this.pinned = false;
+            else if (this.at(time).k === 1 && time - this.t0 > (d.tell + DRILL.lowerS + d.down - 0.1) * 1000) this.t0 += dt * 1000;
+        }
         if (!nearby(s, this.d)) return;
-        const a = this.at(time);
+        let a = this.at(time);
+        // She runs at it, hoisted and quiet: the tell starts now if the keel, once coming, would be at her
+        // head as she is `inPx` under its end; not once she is nearer than `nearK` of that (it would come
+        // down behind her), nor in the lull after it was hoisted.
+        if (a.idle && a.t >= d.tell + DRILL.lowerS + d.down + DRILL.hoistS + DRILL.lullMs / 1000
+            && s.mode === 'play' && s.route === OUT && Math.abs(p.y - d.y) < 30) {
+            const v = p.body?.velocity.x ?? 0, gap = Math.abs(p.x - this.cx) - (this.w / 2 - DRILL.inPx);
+            const reach = Math.abs(v) * (d.tell + this.hitS());
+            if (Math.abs(v) > 20 && Math.sign(v) === Math.sign(this.cx - p.x) && gap <= reach && gap >= reach * DRILL.nearK) {
+                this.t0 = time;
+                a = this.at(time);
+            }
+        }
         const ease = a.k * a.k * (3 - 2 * a.k);
-        const y = Math.round(this.up + (this.low - this.up) * ease) + (a.tell ? (Math.floor(time / 70) % 2) : 0);
+        let y = Math.round(this.up + (this.low - this.up) * ease) + (a.tell ? (Math.floor(time / 70) % 2) : 0);
+        if (this.pinned) y = Math.min(y, this.low - DRILL.pinPx);
         this.boat.y = y;
         this.lamp.setFillStyle(a.tell || a.coming ? (Math.floor(time / 140) % 2 ? 0xe83b3b : 0xfbb954) : 0x625565);
         this.shade.setScale(0.5 + 0.5 * ease, 1).setAlpha(0.15 + 0.3 * ease);
         const g = this.falls.clear();
-        for (const hx of this.hooks) g.fillStyle(0x7a7480, 1).fillRect(hx, d.top + 22, 1, Math.max(0, y + 6 - d.top - 22));
+        for (const hx of this.hooks) g.fillStyle(0x7a7480, 1).fillRect(hx, d.top + 22, 1, Math.max(0, y + POSTS.top - d.top - 22));
         if (a.tell && !this.rang) {
             this.rang = true;
             if (s.route === OUT) sfx.at(this.cx, d.y).whistle();
         } else if (!a.tell) this.rang = false;
         // (The winch: its pawl while the boat is under way, its falls taking the weight to hoist it.)
         const hoisting = !a.coming && a.k > 0 && a.k < 1;
-        if (s.route === OUT && a.k > 0 && a.k < 1 && time > (this.winchAt ?? 0)) {
+        if (s.route === OUT && a.k > 0 && a.k < 1 && y < this.low - (this.pinned ? DRILL.pinPx : 0) && time > (this.winchAt ?? 0)) {
             this.winchAt = time + 220;
             sfx.at(this.cx, y).ratchet();
         }
@@ -462,6 +497,7 @@ export class DrillBoat {
         if (Math.abs(p.x - this.cx) >= half || head >= keel) return;
         if (a.coming) {
             s.scareContact(this.cx, 'boat');
+            if (s.mode !== 'play') this.pinned = true;
             return;
         }
         // Down, or still too low on its way up: she is held at its end.

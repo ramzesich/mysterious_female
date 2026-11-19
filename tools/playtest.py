@@ -3936,19 +3936,29 @@ def scenario_region7(b):
     wait(1.0)
     b.key("up", False)
     ok &= check(b.state()["y"] == D8, "and up a white column again, kick after kick", b.state())
-    # The drill: under the boat as it comes down; and the security officer at the tender.
+    # The drill: just hoisted, she runs under it (the lull); running at it after, she sets it off and it
+    # comes down on her well under it (15: stiff on her back, the boat down over her); and the security
+    # officer at the tender.
     d = js(b, f"{W}.data.drill")
     DR = f"{W}.story.drill"
-    cx = d["x"] + 126
     b.teleport(d["x"] - 50, D7, "promenade")
-    wait_js(b, f"{DR}.at(window.__ship.time.now).k === 0 && (window.__ship.time.now / 1000) % 10 > 6.4 && (window.__ship.time.now / 1000) % 10 < 7.2", 12)
+    wait_js(b, f"(a => a.idle && a.t < 7.2)({DR}.at(window.__ship.time.now))", 12)
     b.hold("right", 2.6)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["x"] > d["x"] + 252, "hoisted, the drill's boat lets her under it", (s, d))
-    b.teleport(cx, D7, "promenade")
-    got = scared(b, "Oops", 12.0)
+    ok &= check(s["mode"] == "play" and s["x"] > d["x"] + 252, "just hoisted, the drill's boat lets her under it", (s, d))
+    # (From 330 px off its middle, as soon as the lull is over: from further the clock's round comes first,
+    # and the boat comes down ahead of her and stops her at its end.)
+    b.teleport(d["x"] + 126 - 330, D7, "promenade")
+    wait_js(b, f"(a => a.idle && a.t > 8.3 && a.t < 8.6)({DR}.at(window.__ship.time.now))", 12)
+    b.key("right", True)
+    told = wait_js(b, f"{DR}.at(window.__ship.time.now).tell", 3)
+    got = scared(b, "Oops", 3.0)
+    b.key("right", False)
+    s = b.state()
+    ok &= check(told and got and d["x"] + 40 < s["x"] < d["x"] + 212, "running at it, she sets it off: the lamp, and it comes down on her under it", (told, got, s, d))
+    ok &= check(wait_js(b, f"{DR}.boat.y === {DR}.low && {DR}.pinned && window.__ship.mode === 'scripted'", 3),
+                "flat on her back, the boat down over her", js(b, f"[{DR}.boat.y, {DR}.low, {DR}.pinned]"))
     b.shot("region7-drill")
-    ok &= check(got, "under it as the crew lower it: bumped", (b.state(), alert(b)))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
     ok &= check(route(b) == "promenade", "(she comes to outside)", (route(b), s))
     rv = person(b, "riv_walkway")

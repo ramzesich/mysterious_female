@@ -286,7 +286,7 @@ export const MISHAP_SCENES = {
     '13b': { word: 'bonked', react: 'stumble', down: 'belly' },     // it catches her past it
     '14a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
     '14b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
-    '15': { word: 'bumped', react: 'duck', down: 'sit' },         // the drill's boat
+    '15': { word: 'bumped', react: 'duck', down: 'sit', gag: 'boat' },  // the drill's boat on her head: stiff onto her back, 14a's
     '16': { word: 'drenched', react: 'shiver', gag: 'sprinkler' },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
     '17': { word: 'fogged', react: 'splutter', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
     '18': { word: 'buried', react: 'reel', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
@@ -351,6 +351,9 @@ export const GAGS = {
     // (`drop`: hit in the air, she stops there and drops straight down; the gag where she lands.)
     ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true },
     ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700, drop: true },
+    // The drill's boat (15; the user, 2026-11-19: "lying flat on her back, like the basketball case"): 14a's clips, the
+    // boat stopped where its keel met her head (`DrillBoat`) while she lies under it.
+    boat: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head
@@ -417,6 +420,14 @@ export const GAGS = {
 // another, ms; how much later her cry makes his next one, ms; how near she may be, of the way she runs
 // in the flourish and the rise, for her coming to start one (nearer, the flame would rise behind her).
 export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, nearK: 0.65 };
+
+// The drill's boat (`DrillBoat`, src/world/outside.js; the user, 2026-11-19: "the drill starts too late, I can
+// just run past it freely"): lowered over `lowerS`, hoisted over `hoistS`. Like the flares it answers her
+// coming: running at it, the tell starts so that the keel is at her head as she is `inPx` under its end; not
+// once she is nearer than `nearK` of that, and not for `lullMs` after it is hoisted (her way through). On her,
+// it comes down over her lying (stiff on her back, 15) as far as on the bare walkway (`pinPx` higher: none, the
+// user: "the first gif had the boat at a lower level") and stays down until she is back at her checkpoint.
+export const DRILL = { lowerS: 1.1, hoistS: 1.6, lullMs: 1500, nearK: 0.6, inPx: 64, pinPx: 0 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
 // hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken

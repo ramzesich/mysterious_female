@@ -3340,3 +3340,28 @@ tangerines), then closer second looks, each on a fresh page.
   word: the number stays, one pair moves about 6 m, the rest is what they lie on.
 - **Cost, the design session's guess:** 20 to 25 generations, about a day with the approvals, out of the slack before
   the date (about 18 December, the slow end the 23rd).
+
+## 15: the drill's boat (2026-11-19, §3 step 1.2)
+
+The last of the third batch's gags, made under 1.2a's rule (its gag whatever she carries). No art.
+
+- **The gag:** the plan's "pressed down to half her height, a waddle, she springs back up and sits" was proposed as a
+  cartoon squash or a deep crouch; the user: "No squash and no crouch. Make her lying flat on her back (like the
+  basketball case)". So 15 plays 14a's clips (`GAGS.boat`: `gags-ball-back` from her stand or her run's quarter,
+  then lying with the butterflies). First the boat stopped where its keel met her head; the user: "when hit, the boat
+  stops too high. Your first gif ... had the boat at a lower level, that's why I asked for the lying down gag". It
+  comes down over her as she lies, as low as on the bare walkway, and stays down until her checkpoint (`pinned`;
+  `DRILL.pinPx` 0). The butterflies are mostly behind its hull; left so.
+- **The drill answers her coming** (the user: "The drill starts too late, I can just run past it freely"): as the
+  flares do, running at the hoisted boat she sets off its tell so that the keel is at her head as she is `inPx` (64)
+  under its end (her speed, the tell, `hitS()` the lowering's time to her head); not nearer than `nearK` of that,
+  nor for `lullMs` (1.5 s) after it is hoisted, her way through. With no one near, its 10 s clock as before. Its
+  round is now a start time (`t0`), not the clock's remainder; her cry holds the tell a second.
+- **The falls** (the user: "Fix the boat cables not being attached properly"): they stopped 6 px over the boat's two
+  posts; now drawn to the posts' tops (`POSTS` in `src/world/outside.js`, measured in `rescue-boat.png`).
+- **The winch and its crewman 0.3 m forward** (184.6 m; the user: "Yes, move them"): caught at the boat's end as
+  first built, she fell back with her hair on the winch's base. Caught 64 px in now, she lies clear of it anyway.
+- **Found, left:** the lowered boat holding her at its end moves her twice (body and picture); only reachable after
+  a lunge that ends under the lowered boat. The user asked how she could be under it at all; told, left as is.
+- `region7`'s drill check rewritten (just hoisted, she passes under it; running at it after the lull, the lamp, and
+  it catches her well under it, the boat down over her); `region7`, `boot` and `tools/check_overlaps.py` pass.

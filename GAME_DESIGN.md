@@ -2562,7 +2562,9 @@ Nothing blocks the start of the build. These get settled along the way:
       players**, who shoot the balls through their rings and pick them up at their feet.
       **Done (2026-11-19): step 1.2a**: a hit is its gag and her checkpoint whatever she carries, none lost; only a
       gull that comes down on her takes one (and she keeps her tray); trays always spill; `?pocket=off` gone.
-      **Next: 15** (the drill's boat, under 1.2a's rule from the start); part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      **Done (2026-11-19): 15**, the drill's boat: 14a's fall onto her back, the boat down over her; the drill
+      answers her coming (`DRILL`); its falls made fast to the boat's posts; the winch 0.3 m forward. 1.2 is done.
+      **Next: 1.3** (the `mishaps` playtest, the sounds, the start places), then 1.4; part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

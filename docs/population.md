@@ -478,7 +478,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 128 | `cp_station` | The station locker | Checkpoint | A locker |
 | 104-230 every 9 | boats | The lifeboats, tenders, rescue boat (built) | | |
 | 140 | `room_lifeboat` | The one lifeboat with its hatch open: inside, benches, an oar, `book_2`, `slot_lifeboat`, a porthole | `room`; E at the hatch | Drawn by hand |
-| 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped" | Two characters, the boat's swing |
+| 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped". **As built:** lowered onto the walkway and hoisted, its falls from the davit's arms to the boat's posts; running at it she sets it off (the lamp first, `DRILL` in `src/config.js`, 2026-11-19); under it as it comes down, 15: stiff onto her back (14a's), the boat down over her until her checkpoint. The winch and its crewman at 184.6 m (from 184.9, 2026-11-19: she lies clear of it) | Two characters, the boat's swing |
 | 210 | `riv_walkway` | The rival looking into a boat | `glimpse(region 7, once)` | |
 | 110-231 | the wall | The recess's wall: wall jumps up to deck 8's balconies (the socks) | | |
 

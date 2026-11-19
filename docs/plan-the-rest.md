@@ -138,7 +138,7 @@ its own). The items below were the first plan, not needed:
 | 12b | The same, from behind | "Three stumbling steps, down on her hands and knees, stars" | The same | **Built 2026-11-19** (9c's stumble and belly-flop, dazed). The light and the stage manager swapped places, the trap door drawn (the user) |
 | 14a | A basketball in her face | "She tips over backward, stiff as a skittle" | `Balls`, `topdeck.js` | **Built 2026-11-19** (from her stand or a quarter of her run, onto her back, lying so with the butterflies; her lying redrawn, the user: her stand turned flat "appears to be at an angle"). With it, on the user's word: **the court's two players** (a man and a woman, lightly washed) shoot the balls through their rings, the ball comes back to their feet and they pick it up (`tools/build_court.py`); it hits her from the throw to its second landing |
 | 14b | A basketball on the back of her head | "She topples forward, stiff as a plank" | The same | **Built 2026-11-19** (face down, redrawn lying flat: the user chose it) |
-| 15 | The drill's boat, from above | "Pressed down to half her height, a waddle, she springs back up and sits" | `DrillBoat`, `outside.js` | |
+| 15 | The drill's boat, from above | ~~"Pressed down to half her height, a waddle, she springs back up and sits"~~ **14a's: stiff onto her back, the boat down over her** (the user, 2026-11-19: "no squash and no crouch") | `DrillBoat`, `outside.js` | **Built 2026-11-19**, no art; the drill answers her coming, the falls made fast to the posts, the winch 0.3 m forward |
 
 - Shown to the user in batches, enlarged and numbered, each checked frame by frame first; one
   that will not read after two tries is shown with what could take its place.
@@ -151,7 +151,7 @@ its own). The items below were the first plan, not needed:
   her all the same. 16's two small flaws were noted and left (her blouse greys one frame in
   two run-stops; her hair streams back at the sneeze's peak).
 - **The order from here (2026-11-19):** 14a and 14b, then **1.2a** (below), then 15, made under
-  1.2a's rule from the start (the boat's gag whatever she carries).
+  1.2a's rule from the start (the boat's gag whatever she carries). **All built (2026-11-19); 1.2 is done.**
 
 ### 1.2a A hit is its gag, tangerines or not; only a gull takes one (medium; no art; added 2026-11-19)
 
