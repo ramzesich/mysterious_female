@@ -51,6 +51,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19) | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess) |
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
+| 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -504,6 +505,67 @@ this to the end of the plan."
   muted slots round it, which gives the secret away), and the rule applied everywhere it falls, by rule in the builder
   (a list of the pieces she uses, not by hand); `tools/check_overlaps.py` and a close look at each.
 
+## 7d. Part 9: the tangerines' seats (medium; about 20 to 25 generations, a guess; added 2026-11-19)
+
+The user, 2026-11-19: "I've seen a few places myself where tangerines are weirdly placed or misplaced"; asked for an
+audit of every placement, of whether new props would give them sense and one look, and of the total. The design
+session looked at all 56 in the running game, each enlarged with her beside it (43 spots). The user's answer to the
+findings and the four questions: "Yes, do all as recommended. Add this as a new action point at the end of the plan."
+
+**The rule from now on: a tangerine lies on food service or in a fruit bowl** (a tray, a trolley's plate, a bar, a
+bowl, a crate in a store, a balcony table), or where the story put it (the hose cabinet, the canopy, the duct, the
+fort, the ball pit, what an event pours out). **Never on bare furniture, never balanced on a thing, never in the air,
+never behind someone.**
+
+**The number stays 56** (41 lying, 15 from events; the win screen counts "found of 56"). Counted against what a run
+spends since 1.2a: the five breakables, the bell and the sardines 7 (they pay back 9); the gulls' takes 3 to 6; a cry
+or a throw to get a load through 4 to 8; lunges through hazards 0 to 20; typically 25 to 30. Someone who finds three
+quarters has about 42, so D still costs and she rarely runs dry. Under about 48 she would run dry in the middle of the
+game; over 60 the count means nothing. No tangerine is added or dropped; one pair moves about 6 m (4, below).
+
+**The twelve** (`TANGERINES` in `tools/population.py`):
+
+| # | Id | What is wrong | The fix |
+|---|---|---|---|
+| 1 | `tan_11_spa` | Floats about 15 px over the reception desk's end (`on` 40; the desk's top is lower) | The fruit bowl (prop B) on the desk, the tangerine in it |
+| 2 | `tan_11_topsiders` | In the air beside the bar canopy's post, off the counter | Onto the counter, in prop B |
+| 3 | `tan_4_laundry` | On its shelf, wholly behind the laundress's head (`amb_folder` at 258, the tangerine at 250) | One of the two moved clear; look at it with her in place |
+| 4 | `tan_11_fruit` (two) | On a bare side table inside the buffet queue's line (`haz_queue`, 162.5 to 181.5 m; the pair at 176.8): the queue covers it, and standing there she is pushed onto it | A fruit stand (prop B on a counter piece) just aft of the queue's end, about 183 m, set against what is built there |
+| 5 | `tan_5_dessert` | Balanced on the tips of the dessert cart's two glass domes | A plate on the cart with room for it (prop C) |
+| 6 | `tan_9_cart` | Balanced on the dome's knob of the room-service trolley | A side plate by the dome (prop C) |
+| 7 | `tan_12_cagneys` | The same, on Cagney's steel trolley | The same (prop C) |
+| 8 | `tan_10_mid` | `prop_tray_10` (`@tray`) is drawn through the bare table's legs | One piece: the tray on its stand (prop A) |
+| 9 | `tan_4_30` | The bare table stands against a fire extinguisher | Prop A, clear of it |
+| 10 | `tan_8_aft` | The same | Prop A, clear of it |
+| 11 | `tan_8_fwd` | A bare table alone in a cabin corridor, one tangerine on it | Prop A |
+| 12 | `tan_9_luggage` | The same, behind the luggage stack | Prop A |
+
+Small shifts, no art: `tan_6_windjammer` and `tan_12_spinnaker` lie on the barkeeper's hands and chest (along the
+counter, clear of them); `tan_8_8206`'s two lie loose on the desk, one over a dark object (the plan's "welcome basket":
+prop B there). Everything else was looked at and is right as it is.
+
+**The cause of 4 and 8 to 12:** the `sidetable` picture (`src/textures.js`) is an early placeholder drawn in code, a top
+and two thin legs. `placeTangerine` in `src/world/world.js` stands it under every `"table"` tangerine inside, the `item`
+case under a pickup with no `on`, and the ship scene under the map's own `tangerine` objects: find what else stands
+on it before it goes.
+
+**The three props, each shown to the user enlarged beside her before anything is placed** (`CLAUDE.md`, "Art"):
+
+- **A: a room-service tray on a folding stand**, two variants so that five corridors do not show the same one; in the
+  `sidetable`'s place. Not a tray on the floor: those trip her (`trays`), and the two must not look alike.
+- **B: a small fruit bowl** for a desk or a counter, the tangerine on top as in her crew cabin's bowl; and the piece it
+  stands on at the Garden Café.
+- **C: a side plate on each of the three trolleys** (the dessert cart, the cloth-covered one on deck 9, Cagney's steel
+  one), each an inpaint of the game's own piece so that the rest of it stays to the pixel.
+
+**Then:** the data (`on`, the metres, the holders), each of the twelve and the three shifts looked at enlarged with
+the people of the spot in place and at the game's size; `tools/check_overlaps.py` lists nothing;
+`tools/check_corridors.py`'s numbers given (the Garden Café's pair moves); the scenarios that pick these up by id,
+and `boot`. `docs/population.md` §2.3's rows, `GAME_DESIGN.md` §6.3.
+
+The audit's pictures were made by a script outside the repo (her teleported beside each `tangerine` of
+`maps/world.json`, `Browser.close_up` on it); they are not kept. Make them again the same way before and after.
+
 ## 8. Optional, each only on the user's word
 
 - **The Library's rolling ladder** (`sec_ladder`, `docs/population.md`): pushed along the
@@ -592,7 +654,8 @@ it first); whether the two `deck4` checks still fail on the stepped clock.
   the user's word; her portrait and her photos went with it.
 - Every hint popup but "E to interact". The "LOST: CAT" note.
 - More tangerines on decks 4 to 6: "leave their number and their location unchanged". A trail
-  of small pickups: decided against.
+  of small pickups: decided against. (2026-11-19: the number was looked at again and stays 56;
+  what twelve of them lie on is mended in §7d, on the user's word.)
 - The audit's I1, I5, I8, I11; V9 and V11 (choices, not faults); V1, V2, V3, V6, V7 (fixed).
 - 13b, 4c, 10b's squirm, 7b's fold "shut on her" (the collapse was taken).
 - **A tangerine lost to a hit, everywhere but the gulls' three (20 to 22)** (the user,

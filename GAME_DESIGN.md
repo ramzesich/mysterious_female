@@ -1761,6 +1761,16 @@ decks; the three painted in the bowl on her crew cabin's desk on deck 3 are real
 (`tan_3_bowl_*`, each where it was painted), so all but the lunge is hers from the first minute.
 Every D costs one (§3.2).
 
+**Decided (the user, 2026-11-19; not built yet: `docs/plan-the-rest.md` §7d): the number stays 56, and a
+tangerine lies on food service or in a fruit bowl** (a tray, a trolley's plate, a bar, a bowl, a crate in a
+store, a balcony table), or where the story put it; never on bare furniture, balanced on a thing, in the air or
+behind someone. An audit of all 56 in the running game found twelve spots that break this (one floating over the
+spa's desk, one in the air by Topsiders' bar, one behind the laundress, the Garden Café's pair under the buffet
+queue, three balanced on trolleys' domes, five on the placeholder side table in the corridors). They are mended
+with three generated props (a room-service tray on a folding stand, a small fruit bowl, a side plate on the
+trolleys); only the Garden Café's pair moves, about 6 m. The number, against what a run spends since a hit no
+longer takes one: typically 25 to 30 of the about 42 a first player finds.
+
 ### 6.4 Later
 
 - **Hidden extras** (photos/memories of the two of you). **Later**

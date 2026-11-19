@@ -3313,3 +3313,30 @@ Built as the design session wrote it (`docs/plan-the-rest.md` §3 1.2a), with th
   it flies off with it in its beak, on past her and up, out of sight (`flee`), back on its rail once she is past (as
   after taking a loose one). It had gone straight back to its rail and the fruit vanished from its beak after 1.8 s.
   (The funnel's and the crossing gulls already fly on with theirs.) `region7`, `region8`, `pocket` pass.
+
+## The tangerines' seats: an audit of all 56, and a new part 9 (2026-11-19; a plan, nothing built)
+
+The user: "I've seen a few places myself where tangerines are weirdly placed or misplaced"; asked the design session
+to audit the game and the plan for placements that make no sense, for props that would give them sense and one look,
+and for the best total. Nothing was to be changed while the building session worked: the audit ran a script of its own
+outside the repo (her teleported beside each `tangerine` of `maps/world.json`, a close-up of each; 43 spots, 56
+tangerines), then closer second looks, each on a fresh page.
+
+- **Found, twelve spots (13 tangerines) that make no sense:** `tan_11_spa` floats over the desk's end;
+  `tan_11_topsiders` is in the air by the bar's post; `tan_4_laundry` is behind the laundress's head; `tan_11_fruit`'s
+  pair is on a bare table inside the buffet queue's line; `tan_5_dessert`, `tan_9_cart` and `tan_12_cagneys` are
+  balanced on trolleys' domes; `tan_10_mid` has a tray prop through its table's legs; `tan_4_30` and `tan_8_aft`
+  stand against fire extinguishers; `tan_8_fwd` and `tan_9_luggage` are on a bare table alone in a corridor. The
+  cause of six: `sidetable`, an early placeholder drawn in code. The plan's own words for those spots had been "a
+  room-service tray by a door" and "the fruit counter".
+- **The number: 56 stays.** Against what a run spends now that a hit takes none (1.2a): typically 25 to 30 of the
+  about 42 a first player finds. Under about 48 she would run dry mid-game; over 60 the count means nothing. The
+  audit's old I2 (more on decks 4 to 6) was for the pocket, which is gone.
+- **The user's answer** to the findings and four questions (all twelve with new props; a tray on a stand for the
+  corridors, not five dropped; 56; the Garden Café's pair moved just past the queue): "Yes, do all as recommended.
+  Add this as a new action point at the end of the plan."
+- **Written:** `docs/plan-the-rest.md` §7d (part 9, after part 8), its row in §2 and a note in §12;
+  `GAME_DESIGN.md` §6.3. This reopens "leave their number and their location unchanged" (2026-11-15) on the user's
+  word: the number stays, one pair moves about 6 m, the rest is what they lie on.
+- **Cost, the design session's guess:** 20 to 25 generations, about a day with the approvals, out of the slack before
+  the date (about 18 December, the slow end the 23rd).
