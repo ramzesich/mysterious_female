@@ -3513,7 +3513,14 @@ def scenario_region6(b):
     x1 = b.state()["x"]
     wait(0.2)
     ok &= check(b.state()["x"] - x1 > 18, "without them she slides on across them", (x1, b.state()))
-    ok &= check(scared(b, "Oops", 2), "and the deck chair slides at her: bumped", alert(b))
+    ok &= check(scared(b, "Oops", 2), "and she slides into the deck chair standing at its end: bumped", alert(b))
+    # (7a, head on with none on her: face first onto it, and she sleds on it the way she dived.)
+    sled = "(() => { const g = window.__ship.worldLayer.list.find(o => o.anims && o.anims.currentAnim && o.anims.currentAnim.key === 'gags-sledge'); return g ? Math.round(g.x) : null; })()"
+    x0s = js(b, sled)
+    wait(1.4)
+    x1s = js(b, sled)
+    ok &= check(x0s is not None and x1s is not None and 15 < x1s - x0s and x1s <= wet["x1"] + 14,
+                "head on: face first onto the chair, she sleds on it aft, short of the palm", (x0s, x1s, wet["x1"]))
     b.shot("region6-wet")
     wait_js(b, "window.__ship.mode === 'play'", 8)
     wait(2.5)
@@ -3527,7 +3534,17 @@ def scenario_region6(b):
     wait(0.8)
     b.key("right", False)
     s = b.state()
-    ok &= check(s["mode"] == "play" and s["x"] > wet["x1"], "a jump as it comes clears the chair", s)
+    ok &= check(s["mode"] == "play" and s["x"] > wet["x1"], "a jump clears the chair", s)
+    # From aft, past the chair onto the tiles: she slides forward, away from it, and nothing trips her.
+    wait(1.0)
+    b.teleport(wet["chairX"] + 40, D11)
+    wait(0.4)
+    b.key("left", True)
+    hold_until(b, [], lambda s: s["x"] < wet["x1"] - 10, 2)
+    b.key("left", False)
+    wait(1.2)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["x"] < wet["x0"] + 10, "from aft she slides forward across it, the chair behind her", s)
     b.eval(f"{S}.progress.learn('socks'); {kid}.gone = false; {W}.refresh()")
     wait(3.3)
     # The Garden Cafe: the queue.

@@ -676,8 +676,8 @@ lobby doors on 9 and 10 are the gold ones).
 | 142 | `riv_loungers` | The rival on his knees looking under a lounger; the kid squirts him now and then | `glimpse(region 6)`, a loop | |
 | 145 | `src_cocktail` + `tan_11_topsiders` | Topsiders' bar: the mojito for the old lady (`source(cocktail)` once her errand is open), the barman (`amb_barman_top`), a tangerine | | |
 | 149 | `sign_wet_11` | The wet-floor sign, muted, by the showers | | Built style |
-| 150-153 | `haz_wet` | The wet patch | On it she slides at her speed until the patch ends: into the pool at 140 if she came from aft (a splash, fine) or into the deck chair; the socks: no slide; a jump clears it | Drawn |
-| 155 | `haz_deckchair` | The sliding deck chair at the patch's aft edge | When she lands on the patch it rocks (the tell) and slides at her: "Bumped"; the socks: it stays | A chair |
+| 150-153 | `haz_wet` | The wet patch, under a pool shower that runs (2026-11-19: its tray brims over, a puddle on the floor's face, splashes off her feet) | On it she slides at her speed until the patch ends: into the pool at 140 if she came from aft (a splash, fine) or into the deck chair; the socks: no slide; a jump clears it | Drawn |
+| 155 | `haz_deckchair` | The deck chair at the patch's aft edge, its front legs in the puddle | It stands still (2026-11-19; it slid at her before, with no cause the user could see): sliding into it from forward she goes over it face first and sleds on it (7a): "Bumped"; from aft she slides away from it | A chair |
 | 110-146 | the walk above | Deck 12's side walk covers the pool deck except the gap over 123-128 | | Built |
 
 **The Garden Café 160-194.**

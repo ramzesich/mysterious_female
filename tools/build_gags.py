@@ -16,6 +16,10 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 quarter of her stride, so that the tray is always within a short hop
   chair-collapse 7b: from her slip frame 0 the deck chair takes her behind the knees, she sits,
                 it collapses flat under her; her middle at x 64, the chair's at 46
+  chair-sledge  7a: sliding into the deck chair as it slides at her (frame 0: her slip frame 0, the world's chair
+                flipped 18 px ahead of her middle): it trips her, she dives face first onto it, it folds flat,
+                she lies on it on her belly like on a sled, arms ahead, legs up (`chair-sledge/`, cut by
+                `chair-sledge/cut.py`); her middle at x 52 (`sledge.x`), the chair's at 70
   gull-flail    20: the world's gull landed on her head; she flails, breaks into a run; her middle
                 at x 54
   gull-run      20: running off flailing, the gull on her head (a loop; frame 0 = flail's 8)
@@ -69,12 +73,12 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "her-mishaps" / "batch-4a"
 CELL, COLS = 128, 13
 CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride", 9), ("tray-ride3", 9), ("tray-ride1", 9), ("tray-ride5", 9),
-         ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
+         ("chair-collapse", 9), ("chair-sledge", 13), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
          ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
          ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9)]
-# (Gags 21's to 23's frames are cut from the generator's in a folder of their own.)
+# (Gags 7a's and 21's to 23's frames are cut from the generator's in a folder of their own.)
 PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
         "parasol-flip": "parasol-flip/flip", "dnd-cover": "dnd-sorry/cover", "dnd-tiptoe": "dnd-sorry/tiptoe",
         "door-burst-full": "door-burst-dnd"}
@@ -128,6 +132,7 @@ def main():
                                         "1": {"key": "tray-ride1", "toe": 12, "trayAt": [66, 64, 63, 61, 59, 58, 56, 54, 53]},
                                         "5": {"key": "tray-ride5", "toe": 13, "trayAt": [67, 67, 67, 67, 66, 64, 62, 59, 57]}}},
             "chair": {"x": 64, "chair": 46},
+            "sledge": {"x": 52, "chair": 70},
             "gull": {"x": 54},
             "sprinkler": {"x": 64, "run": 54},
             "steam": {"x": 64},

@@ -3050,3 +3050,33 @@ partition ahead, a beat there, her checkpoint. No new art, no generations. With 
   jump; the second press is the grip socks' kick off the partition (`tryWallJump`), which works 0.1 to 0.5 s after the
   first while beside it. `?at=occupied8`: deck 8's balcony aft of the sunbather's, `cards=all` for the socks.
 - **Tests:** `region7` (the occupied balcony's check now sees the gag) and `region4` pass; the rest not run.
+
+## Gag 7a built; the wet patch redrawn, its chair standing; deck 12's ball and flame (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.2, its first row. **Can 7a still happen?** Yes: walked at with real keys from forward of the
+patch (four ways: a run from 2.5 m and from 1 m, a jump in, one step on), the chair met her head on every time.
+
+- **The gag:** PixMiniMax from her slip frame 0 with the world's chair 18 px ahead (2 tries, 4 generations; the other fell
+  on her back): it trips her, she dives face first onto it, it folds flat, she lies on it like on a sled. Checked frame by
+  frame: frame 1's chair put back on its place (1 px off), two loose specks out, every frame on the floor line. Its
+  direction (head first aft, the way she dived) was my choice, approved. The trip and the dive were first at 10 frames a
+  second (half a second to the landing); the user: "reduce the delay": 40 to 60 ms, 0.24 s. `chair-sledge` in the gags
+  sheet, the chair's `ride()`, `GAGS.sledge`; `?at=wet7a`.
+- **The patch and the chair** (the user, on seeing it: "It is unclear, why either she or the chair is sliding, and they
+  also slide toward each other"): the chair stands still now (the user's choice), moved from 153.35 to 153.0 m so that she
+  meets it still on the wet tiles, exactly where the clip has it; 7b, the chair reaching her back, cannot happen any more
+  (its clip kept). The patch was a 2 px blue strip seen edge-on against the sea in the windows: it did not read. Four
+  versions drawn in the running game (wet boards, overflow, a puddle on the floor's face, the puddle with the tray
+  brimming over); the user chose the last: the shower runs, its tray brims over, a puddle lies on the floor's face, and
+  splashes fly off her feet as she slides.
+- **Deck 12 from deck 11** (the user's screenshot: "What is that orange round thing bouncing above in the air?"): the
+  court's ball was drawn whenever she was within 200 px of its deck, so from deck 11 it bounced in front of deck 12's
+  closed side. Drawn now only while she is on its deck (`onDeck` in `src/world/topdeck.js`); Teppanyaki's flame had the
+  same fault, mended the same way.
+- **The pool's gulls** (the user: "Why are the gulls flying here?"): they serve (the dive at food, the bait, the kid's
+  reward), but fly under deck 12's closed side: the design's opening over the pool was never drawn. I offered to remove
+  them without saying what goes with them (the kid's reward, the bait, the throw, the pounce on the dropped stub); the user
+  caught it, and the removal was taken back. A rule since (memory: list what a removal takes, in the question). **The
+  opening in deck 12 over the pool is the next step** (the user), `docs/plan-the-rest.md` §3 1.1b.
+- **Tests:** `region6` (7a's sled, a new check from aft), `throw`, `region8`, `boot` pass; `check_overlaps` 0. The rest
+  not run.

@@ -88,15 +88,36 @@ Design: `docs/plan-three-uses.md` §1.6 (the mishaps' table) and step 4a;
   the doors' sign redrawn (a hanger with a half-round top and a crossed red circle, on the lever's mount, swung with
   the door; the same on cabin 8206's door and the occupied balconies' partitions); `?at=dnd9`. **Gag 24 built (2026-11-19)**:
   the same gag on an occupied balcony, she tiptoes away from its guests to the partition ahead (`partitionShort` in the
-  ship scene, which the gull's 20 uses too); `?at=occupied8`. **1.1 is done; next: 1.2.** On the way, the funnel's
+  ship scene, which the gull's 20 uses too); `?at=occupied8`. **1.1 is done.** Then 1.2's 7a (2026-11-19); **next: 1.1b, the
+  opening over the pool** (the user's word), then 1.2 from 9a. On the way, the funnel's
   stairway gone over (`docs/progress-decisions.md`): moved 12 px out, boarded by walking into it, a hold on
   the rail in a gust, gulls that dive straight from their flight, a tangerine carried in the beak.
+
+### 1.1b The opening in deck 12 over the pool (medium; no art; next, added 2026-11-19)
+
+The user, 2026-11-19, of the two gulls circling over deck 11's pool: "Why are the gulls flying here?" They have a
+purpose (`gull_pool`, `FoodGulls` in `src/world/hazards.js`: one dives at food she carries there, a cone held up is
+bait, a thrown tangerine is taken; once fed the kid squirts them away for her), and `docs/population.md` puts them
+"circling over the gap where deck 12 is open above the pool"; but that gap was never drawn, so they fly under deck 12's
+closed side. Removing them was asked and taken back (it would take the kid's reward with it). **To build, as the next
+step:** the opening in deck 12 over the pool, as the design and the real ship have it.
+
+- Where: over `gull_pool`'s stretch and the pool under it (deck 11, about 140.9 to 145.6 m in the code's metres; check
+  the pools' own extent in `tools/ship_layout.py` and `docs/population.md`).
+- What: deck 12's floor gone over it, the sky and the far background seen through, railings at deck 12's edges round
+  it, deck 11's ceiling band gone there; the ship's side (shell tiles, livery, the cut-away) following it; the gulls
+  circling in it, under the sky.
+- First: list what stands on deck 12 there (the court's two hoops are at 146.9 and 154.4 m, the sun deck, the kids'
+  pool) and what reaches over it; propose the opening's size and look to the user (a mock-up over a real screenshot)
+  before building it.
+- Tests: `region6` (the gulls, the kid), `region8` (deck 12 above), `throw`; `tools/check_overlaps.py`; the whole ship's
+  render (`tools/render_ship.py`) for the side.
 
 ### 1.2 The third batch: nine gags and two clips of others (large; about 55 generations)
 
 | # | What hits her | The gag with no tangerine on her | Its code | Before any art |
 |---|---|---|---|---|
-| 7a | The deck chair, head on | "Face first onto it; it folds flat and she sledges on it across the tiles" | `WetPatch`, `hazards.js` | **Walk at it with real keys: can it still happen?** Since 7b the chair hardly rocks as she slides in past it. If it cannot, say so to the user and drop it |
+| 7a | The deck chair, head on | "Face first onto it; it folds flat and she sledges on it across the tiles" | `WetPatch`, `hazards.js` | **Built 2026-11-19** (it could still happen: from forward, every time; then the chair made to stand still, the patch redrawn). Was: **Walk at it with real keys: can it still happen?** Since 7b the chair hardly rocks as she slides in past it. If it cannot, say so to the user and drop it |
 | 9a | The jogger, head on, both running | "Twirled like a top, spirals over her head, she sits" | `haz_jogger`, `world.touched()` | |
 | 9b | He runs into her, she standing | "Bowled back onto her bottom; he jogs on the spot, sorry" | The same | **His sorry on the spot** is a clip of his (where the two meet they are generated together) |
 | 9c | He runs into her back | "Shoved into three flailing steps and a belly-flop" | The same | |
@@ -452,7 +473,7 @@ the same recipe as the game's cloud strip, see-through).
 ## 11. Checked by hand (2026-11-18)
 
 - `MISHAP_SCENES` in `src/config.js`: the scenarios with no `gag` are 1, 2, 7a, 9a to 9d, 10e,
-  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24 (21 to 24 built since: `stairs`, `parasol`, `sorry`). `src/world/mishaps.js` still returns `13b`.
+  11a, 11b, 12a, 12b, 13b, 14a, 14b, 15, 21 to 24 (21 to 24 and 7a built since: `stairs`, `parasol`, `sorry`, `sledge`). `src/world/mishaps.js` still returns `13b`.
 - `tools/playtest.py` has no `mishaps`, `keeps` or `deliveries`.
 - `KEY_CARDS.required` is `true`; `src/progression.js` knows no `locked`.
 - `DEV_FRESH` is `true`; `WIN_MESSAGE` is empty.

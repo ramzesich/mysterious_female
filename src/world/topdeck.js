@@ -20,6 +20,9 @@ const HALF = PLAYER.height / 2;
 // 470 its old dive from just over her head made (the user, 2026-11-18).
 const FUNNEL_DIVE = 320;
 const near = (s, x, y, dx = 900, dy = 320) => Math.abs(s.player.x - x) < dx && Math.abs(s.player.y - y) < dy;
+// She is on the deck whose floor is y (in the air over it too). A thing drawn over her layer that belongs to a deck is
+// drawn only then: from the deck under it, it showed through that deck's closed side (the court's ball, 2026-11-19).
+const onDeck = (s, y) => s.player.y <= y + 4 && s.player.y > y - 140;
 const onFloor = body => body.blocked.down || body.touching.down;
 
 // The old lady on her sunbed across the walk (population: `npc_oldlady`): a block too wide and too
@@ -170,7 +173,7 @@ export class Balls {
 
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player;
-        if (!near(s, d.x, d.y, 700, 200)) {
+        if (!near(s, d.x, d.y, 700, 200) || !onDeck(s, d.y)) {
             this.ball.setVisible(false);
             this.shadow.setVisible(false);
             return;
@@ -331,7 +334,7 @@ export class Flare {
             this.coolUntil = Math.max(this.coolUntil, end + FLARE.coolMs);
             this.next = end + (d.period - d.on - FLARE.tellS) * 1000;
         }
-        if (!near(s, d.x, d.y, 700, 200)) return;
+        if (!near(s, d.x, d.y, 700, 200) || !onDeck(s, d.y)) return;
         let [phase, k] = this.phase(time);
         // She runs at the quiet grill: the flourish starts now if the flame, once up, would meet her
         // as she gets to it (her speed, the flourish and the flame's rise: `riseS`). Not once she is

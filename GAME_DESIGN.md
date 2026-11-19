@@ -1182,9 +1182,11 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   he keeps it. **A perfect cone for him:** she sits down with him and they eat looking at the wake (a
   quirk with a photo slot: the two of them there), and **he gives her the book** he borrowed from the
   library. The rival, searching under the loungers: a glimpse, and the kid squirts him too.
-- **Hazards:** **the wet patch** by the showers (its wet-floor sign in the muted background; she slides
-  with her momentum into the pool, fine, or into **the sliding deck chair**, which slides at her on
-  the wet patch: a scare); the kid; **the buffet queue** in the Garden Café (a shuffling line of
+- **Hazards:** **the wet patch** by the showers (its wet-floor sign in the muted background; since
+  2026-11-19 the shower over it runs, its tray brims over, and a puddle lies on the floor's face; she
+  slides with her momentum into the pool, fine, or into **the deck chair** standing at its aft end: a
+  scare, gag 7a, face first onto it, it folds flat and she sleds on it. It slid at her once; the user:
+  "unclear why either she or the chair is sliding", so it stands); the kid; **the buffet queue** in the Garden Café (a shuffling line of
   passengers with trays along the counter, a moving block to hop or to wait out at its gaps); gulls
   over the Great Outdoors and the pool's open gap (they dive at food, the shadow tells); the Sports
   Bar's crowd spilling onto the aft stairs (a block).
@@ -1447,7 +1449,7 @@ full; "Tamed by" below names the main ones.)
 | The sprinkler | A corridor doorway | A drench | A wet-floor sign in the background | Run through between bursts | The open parasol | Drenched |
 | The "Do Not Disturb" cabin | Deck 9's corridor; a balcony | A startled guest | The sign | Leave it shut | | Covers her eyes, backs out |
 | The wet patch | The pool deck, by the showers | An uncontrolled slide | The wet-floor sign | Walk onto it, or jump it | Grip socks | Slipped |
-| The sliding deck chair | On the wet patch | Slides into her | It rocks first | Keep clear of the patch | Grip socks | Bumped |
+| The deck chair | At the wet patch's aft end | She slides into it (it stands still since 2026-11-19) | Seen standing in the puddle | Jump it, or come from aft | Grip socks | Bumped |
 | The kid with the water pistol | The pool deck | A squirt in range | He raises it | Hop over him | The lunge scares him (the cry alone draws his fire); the cone turns him | Splashed |
 | The buffet queue | The Garden Café | A shuffling block | The line's gaps | Hop it at a gap | | None |
 | Gulls | Open decks, balconies, the funnel | A swoop; they snatch food | A shadow sweeps the deck | Move on; crawl under it where she can | A cone as bait; the open parasol; the kid on the pool deck; the horn clears the bow | Swooped |
@@ -2517,7 +2519,10 @@ Nothing blocks the start of the build. These get settled along the way:
       **gag 23** (at a "Do Not Disturb" door her hands over her eyes, blushing, she tiptoes off) and the
       doors' new sign, hung on the lever's mount and swung with the door.
       **Done (2026-11-19): gag 24** (on an occupied balcony as 23, she tiptoes off to the partition).
-      **Next: the third batch, `docs/plan-the-rest.md` §3 1.2** (first: can 7a still happen?). Waiting with it: the books' covers and
+      **Done (2026-11-19): gag 7a** (into the deck chair head on: face first onto it, she sleds on it), the wet
+      patch redrawn (the shower runs, a puddle on the floor's face; the user chose it of four) and its chair standing
+      still; deck 12's court ball and Teppanyaki's flame no longer show from deck 11.
+      **Next: the opening in deck 12 over the pool** (`docs/plan-the-rest.md` §3 1.1b, the user's word), then 1.2 from 9a. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

@@ -260,7 +260,7 @@ export const MISHAP_SCENES = {
     '6a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // she runs into the suitcase
     '6b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'suitcase' }, // it rolls into her back
     '6c': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'suitcase' },  // it rolls into her front
-    '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // the deck chair, head-on
+    '7a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'sledge' },  // the deck chair, head-on: face first onto it, she sleds on it (`WetPatch.ride`)
     '7b': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'chair' },  // from behind: it takes her and collapses (`WetPatch.ride`)
     '8a': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'cartDrape' },  // into the porter's cart
     '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartPush' },      // it pushes into her
@@ -363,6 +363,10 @@ export const GAGS = {
     door: { holdMs: 1200 },
     tray: { holdMs: 600, speed: 260, accel: 300 },
     chair: { holdMs: 1300, slideMs: 450 },
+    // 7a: the chair head on (`WetPatch.ride`): she dives face first onto it and it folds flat; from the clip's frame
+    // `sledFrom` she sleds on it the way she dived, from her slide's speed to a stop over `slideMs`, at most `reach` px
+    // past the patch's end (clear of the palm's pot); a beat (`holdMs`), her checkpoint.
+    sledge: { holdMs: 1300, slideMs: 500, sledFrom: 6, reach: 14 },
     gull: { holdMs: 400 },
     // The sprinkler (16): from her run she slides to a stop over `slideMs`; soaked, she stands
     // `holdWetMs`, sneezes (its sound `sneezeAtMs` in), and squelches off at `walkV` px/s for `walkMs`.

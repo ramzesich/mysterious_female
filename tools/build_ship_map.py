@@ -1029,6 +1029,8 @@ def build_objects():
     add(point("occupied8", "place", 9310, floor_y(8), [prop("route", "promenade")]))
     # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)
     add(point("steam11", "place", exact_x(54.6), floor_y(11)))
+    # (7a: deck 11, forward of the wet patch: walk aft onto it, the chair comes at her head on.)
+    add(point("wet7a", "place", exact_x(148.5), floor_y(11)))
     add(point("walkway", "place", x_of(131), floor_y(7), [prop("route", "promenade")]))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.

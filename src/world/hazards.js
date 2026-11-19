@@ -1,5 +1,5 @@
 // The open decks' and the hallways' hazards that came with the pool deck (docs/population.md, deck
-// 11 and deck 10's hallway under it): the wet patch and the deck chair that slides at her across it,
+// 11 and deck 10's hallway under it): the wet patch under a pool shower and the deck chair at its end,
 // the gulls that dive at food carried in the open, the buffet queue, the room-service trays left on
 // a hallway's floor. Like src/world/movers.js, each takes its place from maps/world.json.
 
@@ -14,34 +14,75 @@ const nearby = (s, d) => Math.abs(s.player.x - d.x) < 900 && Math.abs(s.player.y
 // What a gull will dive at.
 export const FOOD = ['cone', 'stub', 'lunch', 'cake'];
 
-// A wet patch by the pool showers (population: `haz_wet`, `haz_deckchair`). Without the grip socks
-// she slides across it the way she came, with no stopping and no turning, and the deck chair at
-// its aft end rocks (the tell) and slides at her: "Bumped"; a jump clears it. In the socks the tiles
-// hold, and the chair stays where it is.
+// A wet patch by the pool showers (population: `haz_wet`, `haz_deckchair`): the shower over it runs, its tray brims
+// over, and a puddle lies across the floor under it (drawn on the floor's face, as if seen a little from above: seen
+// edge-on, against the sea in the windows, water did not read; the user chose this look of four, 2026-11-19). Without
+// the grip socks she slides across it the way she came, with no stopping and no turning, splashing. The deck chair
+// stands still at its aft end, its front legs in the puddle: sliding at it she goes over it face first (7a, `ride`);
+// a jump clears it. (It slid at her once, with no cause the user could see: it stands since 2026-11-19.) In the socks
+// the tiles hold.
 export class WetPatch {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
         this.def = def;             // { x0, x1, y, chairX }
-        const g = s.add.graphics().setDepth(D.decor + 0.3);
-        const w = def.x1 - def.x0;
-        g.fillStyle(0x8fd3ff, 0.3).fillRect(def.x0 + 3, def.y - 3, w - 6, 3);
-        g.fillStyle(0x8fd3ff, 0.3).fillRect(def.x0, def.y - 2, w, 2);
-        g.fillStyle(0xffffff, 0.75);
-        for (let x = def.x0 + 7; x < def.x1 - 8; x += 17) g.fillRect(x + (x % 3), def.y - 2, 6, 1);
-        this.shine = s.add.rectangle(def.x0, def.y - 3, 5, 1, 0xffffff, 0.9).setOrigin(0, 0).setDepth(D.decor + 0.31);
+        // (The shower's head over the patch's middle, 48 px up; its tray 24 px forward of that to 16 aft.)
+        this.head = { x: Math.round((def.x0 + def.x1) / 2) + 1, y: def.y - 48 };
+        this.tray = [this.head.x - 24, this.head.x + 16];
+        this.water = s.add.graphics().setDepth(D.props + 0.05);
+        this.drawPuddle();
+        this.fx = s.add.graphics().setDepth(D.props + 0.06);
+        this.spray = s.add.graphics().setDepth(D.player + 0.01);
         this.chair = s.add.image(def.chairX, def.y, 'shipart', 'deck-chair').setOrigin(0.5, 1).setDepth(D.props + 0.02).setFlipX(true);
-        world.add([g, this.shine, this.chair]);
+        world.add([this.water, this.fx, this.spray, this.chair]);
         this.state = 'rest';
-        this.at = 0;
         this.slip = 0;
+        this.drops = [];
+        this.dropAt = 0;
+    }
+
+    // The puddle: a flat lens of water on the floor's face, its rim darker; the tray brimming over.
+    drawPuddle() {
+        const g = this.water, d = this.def, y = d.y, L = d.x0 + 2, R = d.x1 - 2;
+        for (let x = L; x < R; x++) {
+            const u = (x - L) / (R - L) * 2 - 1;
+            const h = Math.max(0, Math.round(2.6 * Math.sqrt(1 - u * u) + 0.3 * Math.sin(x * 0.7)));
+            if (!h) continue;
+            g.fillStyle(0x4d9be6, 1).fillRect(x, y + 2 - h, 1, 2 * h);
+            g.fillStyle(0x8fd3ff, 1).fillRect(x, y + 3 - h, 1, Math.max(1, 2 * h - 2));
+            g.fillStyle(0x4d65b4, 1).fillRect(x, y + 1 + h, 1, 1);
+        }
+        const [t0, t1] = this.tray;
+        g.fillStyle(0x4d9be6, 1).fillRect(t0, y - 2, t1 - t0 + 4, 2);
+        g.fillStyle(0x8fd3ff, 1).fillRect(t0 + 1, y - 2, t1 - t0 + 2, 1);
+        g.fillStyle(0xffffff, 1).fillRect(t0 + 4, y - 2, 5, 1).fillRect(t0 + 26, y - 2, 7, 1);
+    }
+
+    // What moves: the shower's streaks falling into the tray, the puddle's glints, the splashes off her feet.
+    drawWater(time) {
+        const g = this.fx.clear(), d = this.def, y = d.y, h = this.head, fall = 36;
+        for (let i = 0; i < 9; i++) {
+            const dx = (i % 5) * 2 - 4 + (i > 4 ? 1 : 0);
+            const k = (time / 1000 * 1.6 + i * 0.37) % 1;
+            g.fillStyle(i % 2 ? 0xffffff : 0x8fd3ff, 1).fillRect(h.x + dx + Math.round(dx * k * 0.6), h.y + 2 + Math.round(k * fall), 1, 3);
+        }
+        // (A splash where the streaks meet the tray.)
+        if (Math.floor(time / 90) % 2) g.fillStyle(0xffffff, 1).fillRect(h.x - 9, y - 5, 1, 1).fillRect(h.x + 8, y - 6, 1, 1);
+        else g.fillStyle(0xffffff, 1).fillRect(h.x - 6, y - 7, 1, 1).fillRect(h.x + 5, y - 5, 1, 1);
+        const L = d.x0 + 2, W = d.x1 - d.x0 - 4;
+        for (const [o, w] of [[0.1, 6], [0.38, 9], [0.64, 5], [0.86, 3]]) {
+            const x = L + Math.round(((o + time / 9000) % 1) * (W - 10)) + 5;
+            g.fillStyle(0xffffff, 1).fillRect(x, y + 1, w, 1);
+        }
+        const s = this.spray.clear();
+        for (const q of this.drops) s.fillStyle(q.c, 1).fillRect(Math.round(q.x), Math.round(q.y), 1, 1);
     }
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def, c = this.chair;
         if (!nearby(s, d)) return;
-        this.shine.x = d.x0 + 4 + ((time * 0.03) % (d.x1 - d.x0 - 12));
+        this.drawWater(time);
         const onFloor = p.body.blocked.down || p.body.touching.down;
         const on = here(s, d) && Math.abs(p.y - d.y) < 2 && onFloor && p.x > d.x0 && p.x < d.x1;
         const socks = this.world.progress.knows('socks');
@@ -55,72 +96,66 @@ export class WetPatch {
             this.slip = 0;
         }
         s.slipDir = this.slip && here(s, d) ? this.slip : 0;
-        // The chair: it rocks, then slides the patch's length at her, waits, and slides home again.
-        if (this.state === 'rest') {
-            if (this.slip) {
-                this.state = 'rock';
-                // (Slid in past it, away from it: it is right behind her, and hardly rocks: 7b.)
-                this.at = time + (this.slip * Math.sign(d.chairX - (d.x0 + d.x1) / 2) < 0 ? 120 : 450);
-                sfx.at(c.x, d.y).scrape();
+        // Splashes off her feet as she slides: thrown up and back, falling to the floor.
+        if (s.slipDir && on && time > this.dropAt) {
+            this.dropAt = time + 45;
+            for (let i = 0; i < 2; i++) {
+                this.drops.push({ x: p.x - s.slipDir * (2 + Math.random() * 4), y: d.y - 1, vx: -s.slipDir * (20 + Math.random() * 50),
+                                  vy: -(50 + Math.random() * 70), c: Math.random() < 0.5 ? 0xffffff : 0x8fd3ff });
             }
-        } else if (this.state === 'rock') {
-            c.setAngle(Math.sin(time / 38) * 7);
-            if (time > this.at) {
-                c.setAngle(0);
-                this.state = 'slide';
-                sfx.at(c.x, d.y).scrape();
-            }
-        } else if (this.state === 'slide') {
-            c.x -= 235 * dt;
-            if (c.x <= d.x0 + 8) {
-                c.x = d.x0 + 8;
-                this.state = 'far';
-                this.at = time + 1600;
-            }
-            const hit = here(s, d) && Math.abs(p.x - c.x) < PLAYER.bodyWidth / 2 + 11 && p.y > d.y - 20;
-            if (hit) {
-                this.state = 'far';
-                this.at = time + 1600;
-                this.slip = 0;
-                s.slipDir = 0;
-                if (this.world.carry) this.world.carryBox.spill(c.x, false, 'deckchair', { vx: -235 });
-                else s.scareContact(c.x, 'deckchair', { vx: -235, ride: this.ride() });
-            }
-        } else if (this.state === 'far') {
-            if (time > this.at && !this.slip) this.state = 'home';
-        } else if (this.state === 'home') {
-            c.x = Math.min(d.chairX, c.x + 60 * dt);
-            if (c.x >= d.chairX) this.state = 'rest';
+        }
+        this.drops = this.drops.filter(q => {
+            q.vy += 500 * dt;
+            q.x += q.vx * dt;
+            q.y += q.vy * dt;
+            return q.y < d.y;
+        });
+        // The chair: sliding into it she goes over it (it stands 18 px past her middle as they meet, as in her clip).
+        if (this.state === 'rest' && this.slip && here(s, d) && Math.sign(c.x - p.x) === this.slip && Math.abs(c.x - p.x) <= 18 && p.y > d.y - 20) {
+            this.slip = 0;
+            s.slipDir = 0;
+            sfx.at(c.x, d.y).scrape();
+            this.state = 'hit';
+            if (this.world.carry) this.world.carryBox.spill(c.x, false, 'deckchair', { vx: 0 });
+            else s.scareContact(c.x, 'deckchair', { ride: this.ride() });
+        } else if (this.state === 'hit' && s.mode === 'play' && Math.abs(c.x - p.x) > 30) {
+            // (Once she is clear of it, it can trip her again.)
+            this.state = 'rest';
         }
     }
 
-    // 7b, the ship scene's `thingGag` (the chair reaching her back as she slides away from it): its own
-    // clip with her (`gags` sheet, tools/build_gags.py), from her slip frame 0 with the world's chair
-    // at her heels: it takes her behind the knees, carries her on along the tiles (`slideMs`, slowing
-    // from her slide, never past the patch's end), she sits, and it collapses flat under her. The
-    // world's chair is hidden meanwhile, and back at its place after.
+    // 7a, the ship scene's `thingGag`: its own clip with her (`gags` sheet, `chair-sledge`, tools/build_gags.py), from
+    // her slip frame 0 with the world's chair 18 px ahead of her: it trips her, she dives face first onto it, it folds
+    // flat, and from the clip's `sledFrom` she sleds on it the way she dived, slowing from her slide to a stop
+    // (`GAGS.sledge`). The world's chair is hidden meanwhile, and back in its place after. (7b's clip, the chair
+    // reaching her back and collapsing under her, `chair-collapse`, waits in the sheet: a chair that stands cannot.)
     ride() {
-        const s = this.scene, d = this.def, p = s.player, c = this.chair, g = GAGS.chair;
+        const s = this.scene, d = this.def, p = s.player, c = this.chair, g = GAGS.sledge;
         const dir = p.flipX ? -1 : 1, v0 = Math.abs(p.body.velocity.x);
         return {
             play: (done) => {
-                this.state = 'gag';
-                const m = s.cache.json.get('gags-meta');
+                const m = s.cache.json.get('gags-meta'), at = m.sledge.x;
                 c.setVisible(false);
-                const pic = s.add.sprite(p.x, d.y, 'gags', m.anims['chair-collapse'][0]).setOrigin((dir > 0 ? m.chair.x : m.cell - m.chair.x) / m.cell, m.floor / m.cell)
+                // (Flipped, a frame anchored at column `at` stands by column cell - 1 - at.)
+                const pic = s.add.sprite(p.x, d.y, 'gags', m.anims['chair-sledge'][0]).setOrigin((dir > 0 ? at : m.cell - 1 - at) / m.cell, m.floor / m.cell)
                     .setFlipX(dir < 0).setDepth(p.depth);
                 this.world.add([pic]);
                 this.pic = pic;
-                pic.play('gags-chair');
+                pic.play('gags-sledge');
                 sfx.at(p.x, d.y).creak();
-                pic.once('animationcomplete-gags-chair', () => { sfx.at(pic.x, d.y).thump(); done(); });
-                let t = 0;
-                // (Her lying picture reaches 30 px either way: clear of the wet-floor sign at the patch's end.)
-                const lo = d.x0 + 34, hi = d.x1 - 34;
+                pic.once('animationcomplete-gags-sledge', () => done());
+                let t = 0, thumped = false;
+                const end = dir > 0 ? d.x1 + g.reach : d.x0 - g.reach;
                 s.script = (dt) => {
+                    if (pic.anims.currentFrame.index < g.sledFrom) return;
+                    if (!thumped) {
+                        thumped = true;
+                        sfx.at(pic.x, d.y).thump();
+                    }
                     t += dt * 1000;
                     const k = Math.max(0, 1 - t / g.slideMs);
-                    pic.x = Math.max(lo, Math.min(hi, pic.x + dir * v0 * k * dt));
+                    pic.x += dir * v0 * k * dt;
+                    if ((pic.x - end) * dir > 0) pic.x = end;
                     p.x = pic.x;
                     if (!k) s.script = null;
                 };
@@ -128,7 +163,7 @@ export class WetPatch {
             show: () => {
                 this.pic?.destroy();
                 this.pic = null;
-                c.setVisible(true).setAngle(0).setX(d.chairX);
+                c.setVisible(true);
                 this.state = 'rest';
                 this.slip = 0;
             },

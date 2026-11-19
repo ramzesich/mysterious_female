@@ -700,9 +700,11 @@ PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90)}
 # deck after (from m, to m), the lounger the security officer peers under, the chess set.
 LIDO = dict(deck=11, lever=131.68, ladder=130.5, tub=132.5, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
             machine=214.6, husband=219.52, table=220.0, paws=(141.2, 213.6))
-# A wet patch she slides on without the socks, a deck chair that slides at her across it
-# (`haz_wet`, `haz_deckchair`): id: (deck, from m, to m, where the chair stands (m)).
-WETS = {"haz_wet": (11, 150.9, 152.9, 153.35)}
+# A wet patch she slides on without the socks, the pool shower over it running, and a deck chair that
+# stands at its aft end, its front legs in the puddle (`haz_wet`, `haz_deckchair`): id: (deck, from m,
+# to m, where the chair stands (m)). (The chair stands still since 2026-11-19, the user: one sliding
+# at her had no cause; forward from 153.35 m so that she meets it while still on the wet tiles.)
+WETS = {"haz_wet": (11, 150.9, 152.9, 153.0)}
 # Gulls that dive at food carried in the open (`gull_pool`, `gull_go`): id: (deck, from m, to m,
 # how many, where they wait: "circle" overhead or a perch (m, px up), the flag that keeps them off).
 FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
