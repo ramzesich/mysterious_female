@@ -418,11 +418,9 @@ export class Story {
         this.trapSeam = s.add.graphics().setDepth(D.decor + 0.3);
         this.trapSeam.lineStyle(1, 0x3b2a20, 1).strokeRect(st.trapX - 12.5, st.floor - 7.5, 25, 7);
         this.trapSeam.fillStyle(0xd9a43b, 1).fillRect(st.trapX - 2, st.floor - 5, 4, 2);
-        this.trapHole = s.add.graphics().setDepth(D.decor + 0.3);
-        this.trapHole.fillStyle(0x0d0b14, 1).fillRect(st.trapX - 13, st.floor - 8, 26, 8);
-        this.trapHole.fillStyle(0x2e222f, 1).fillRect(st.trapX - 13, st.floor - 8, 26, 1);
-        this.trapHole.fillStyle(0x3b2a20, 1).fillRect(st.trapX - 17, st.floor - 30, 4, 30);
-        this.trapHole.fillStyle(0x74503a, 1).fillRect(st.trapX - 16, st.floor - 29, 2, 28);
+        // (Open: its own picture, the lid up on its hinge, a ladder's top in the opening, its middle the drop's:
+        // `assets/source/ship/trapdoor/`, 2026-11-19; it was a black box and a stick, "that black rectangle".)
+        this.trapHole = s.add.image(st.trapX - 15, st.floor + 1, 'trapdoor-open').setOrigin(0, 1).setDepth(D.decor + 0.3);
         // The fly rope, a loop at its end: he rides it up, and it stays hauled up after.
         this.rope = s.add.graphics().setDepth(D.props + 0.02);
         this.world.add([this.trapSeam, this.trapHole, this.rope]);

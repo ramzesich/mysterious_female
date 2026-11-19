@@ -22,6 +22,7 @@ export class BootScene extends Phaser.Scene {
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
         // A one-way glass door's open leaf, its push bar across it (assets/source/ship/pushbar/).
         this.load.image('door-glass-pushbar', 'assets/ship/door-glass-pushbar.png');
+        this.load.image('trapdoor-open', 'assets/ship/trapdoor-open.png');
         this.load.image('door-glass-oneway-edge', 'assets/ship/door-glass-oneway-edge.png');
         // (A "Do Not Disturb" door shut with its sign on the lever's mount, and the sign alone, on the balconies'
         // partitions: `assets/source/ship/dnd-hanger/`.)

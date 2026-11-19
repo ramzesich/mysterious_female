@@ -1470,7 +1470,7 @@ def build_objects():
         m = 206.6 + k * 0.95
         put(6, m, "theatre-seat-bg")
     put(6, 245.2, "drum-kit-bg")
-    put(6, 246.7, "mic-stand-bg")
+    put(6, 246.95, "mic-stand-bg")    # (246.7 until 2026-11-19: it stood in the open trap door's new picture)
     put(6, 247.6, "guitar-bg")
     put(6, 249.0, "grand-piano-bg", flip=True)
     put(6, 243.2, "speaker-stack-bg")

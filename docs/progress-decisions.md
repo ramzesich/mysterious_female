@@ -3178,3 +3178,13 @@ Hung at his old 244.42 m the light swung out over the wings' speakers, its cable
 the drum kit, its whole swing on the stage. `region3` finds him where he is. `check_overlaps`: 0. Then the user asked
 what the black rectangle on the stage is: the open trap door (near-catch 3's), drawn in code as a black box and a
 stick; to be redrawn (option 1: a generated open trap door, its lid up on hinges, a ladder's top in the hole).
+
+## The stage's open trap door, drawn (2026-11-19)
+
+Option 1 of three (generated; with hazard tape; as it was): an inpaint of the game's own stage at 1:1 (Phaser's
+snapshot: the canvas reads back black), so it takes the stage's colours and light; its lid up on its hinge, a ladder's
+top in the opening, its middle the drop's. The try used took the mic stand out: only its own pixels are kept and the
+game's mic stand moved 0.25 m aft. The user: "fix the stairs' right side to match its left" (the ladder's right rail
+stopped at the floor): copied from its left. `assets/source/ship/trapdoor/`. A faint copy of the trap area in a shot
+before near-catch 3 was that scene caught mid-fall, not a fault. `region3`, `boot` pass; `check_overlaps` 0. 10
+generations.
