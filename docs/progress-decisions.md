@@ -3136,3 +3136,31 @@ recommended: 9b first, his "sorry" a clip of his own; the meetings composed from
   blue tail (it was light blue and white). The sprinkler's drip and splashes in the same blues.
 - **Tests:** `region6` (new: with none on her, the jet plays the wet gag), `region4`, `boot` pass. The rest not run.
   No generations.
+
+## The jogger's four gags, 9a to 9d (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.2. Proposed as a table with the four meetings composed from the sheets
+(`assets/source/her-mishaps/batch-4a/starts/jog9/meet.png`); approved as recommended (his sorry a clip of his own, made
+with her sat before him and then taken out; 9a he runs on; one clip per quarter of her stride), then 9a moved before 9c
+(the user met 9a first in play and took its stand-in for 9b: "Is that what we planned?").
+
+- **9b** (commit f246cf0): standing, facing him: bowled back onto her bottom. **His sorry**, by the user's word, three
+  times: jogging on the spot with his palms out ("That looks weird"), a hand raised by his head ("It looks like he's
+  saying Hi in both cases"), then: "His hand has to go behind his head (be obscured by his head)". PixMiniMax could not
+  give it (a blob that read as hair, twice; once he turned to face us); an edit of his standing frame into the pose
+  (`edit_image_pro_flash`) and a clip toward it did. Mended by hand: his far hand still peeked out at his hip ("three
+  hands"), two px on his shorts ("Make his shorts look the same as on the previous frames"). The composites drew them
+  over the promenade's railing; the game draws it in front of them (the user: "They both should be placed behind the
+  railings"): a shot of the game with a marker at their layer gives what is in front.
+- **9a**: both running, head on: spun round like a top through her front and back, she sits dizzy (her own dazed sit, the
+  butterflies, takes over from the clip's last frame); he runs on, through her, drawn behind her. Four clips, one per odd
+  frame of her stride (an even one taken as the next).
+- **9c**: into her back, she standing: she pitches forward, stumbles, dives, flat on her belly, dazed; he stops behind
+  her and scratches his head.
+- **9d**: she into his back: 8d's bounce; he never notices.
+- **Found on the way:** a gag whose settings had a key `sorry` was played as gag 23's (its own test); renamed `his`. A clip
+  of 17 frames on a sheet 13 wide showed another gag's picture for its last four (the sheet is 17 wide, the build refuses
+  one longer). He met her in a promenade door he held open, its leaf drawn in front of her: he lets it go when he stops.
+  `region2` moved him by hand while the game counted him in a door: it lets go first.
+- **Tests:** `region2` (new: the bump plays 9b and his sorry), `region4`, `region6`, `region7`, `region8`, `region9`,
+  `boot` pass. 31 generations (9b 19, 9a 8, 9c 4).

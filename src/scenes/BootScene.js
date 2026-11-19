@@ -258,6 +258,8 @@ export class BootScene extends Phaser.Scene {
         // (7a: the trip and the dive quick, 240 ms from the hit to her landing on the chair (the user: "reduce the delay"); the rest at 10 a second.)
         this.anims.create({ key: 'gags-sledge', frames: gf('chair-sledge', 1, undefined, i => [40, 40, 50, 50, 60][i] ?? 100), frameRate: 10 });
         this.anims.create({ key: 'gags-jog-bowled', frames: gf('jog-bowled', 1), frameRate: 14 });
+        for (const n of [1, 3, 5, 7]) this.anims.create({ key: `gags-jog-spin${n}`, frames: gf(`jog-spin${n}`, 1), frameRate: 14 });
+        this.anims.create({ key: 'gags-jog-shoved', frames: gf('jog-shoved', 1), frameRate: 14 });
         this.anims.create({ key: 'gags-gull-flail', frames: gf('gull-flail', 1), frameRate: 10 });
         this.anims.create({ key: 'gags-gull-run', frames: gf('gull-run', 1), frameRate: 12, repeat: -1 });
         // (16, a sprinkler: drenched where she stands, or stopping short from her run at its own 14 a

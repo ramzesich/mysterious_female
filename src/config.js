@@ -269,10 +269,10 @@ export const MISHAP_SCENES = {
     '8b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartPush' },      // it pushes into her
     '8c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'sit', gag: 'cartSit' },      // it reaches her back
     '8d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'cartBounce' },    // into his back
-    '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // the jogger, head-on
+    '9a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogSpin' },     // the jogger, head-on: spun round like a top, she sits dizzy; he runs on
     '9b': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogBowled' },  // he runs into her: bowled back onto her bottom, he scratches the back of his head, sorry (`jogGag`)
-    '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly' },      // into her back
-    '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit' },         // she into his back
+    '9c': { word: 'bumped', react: 'stumble', toss: 'on', down: 'belly', gag: 'jogShoved' },  // into her back: shoved, she stumbles and belly-flops; he scratches his head
+    '9d': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'jogBounce' },   // she into his back: 8d's bounce, he never notices
     '10a': { word: 'bumped', react: 'reel', toss: 'back', down: 'sit', gag: 'trayFront' },        // into the breakfast tray
     '10b': { word: 'splashed', react: 'arch', toss: 'on', gag: 'trayBack' },                     // it meets her back
     // Her trolley (the user, 2026-11-17: most of the round she wheels it, so it is what she meets).
@@ -343,6 +343,12 @@ export const GAGS = {
     // he met her and plays `sorry` (his far arm up to the back of his head), then `scratch` until her
     // checkpoint, `holdMs` after her clip ends.
     jogBowled: { clip: 'gags-jog-bowled', jog: true, his: 'sorry', loop: 'scratch', holdMs: 1700 },
+    // 9a: one clip from each odd frame of her run (`clips`), he runs on; she ends sat dizzy (her own dazed
+    // sit, butterflies). 9c: he stops behind her and scratches his head; she ends dazed on her belly.
+    // 9d: 8d's bounce off his back (her-mishaps sheet, `her` px behind her middle); he never notices.
+    jogSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
+    jogShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', his: 'sorry', loop: 'scratch', holdMs: 1700 },
+    jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, holdMs: 1600 },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head

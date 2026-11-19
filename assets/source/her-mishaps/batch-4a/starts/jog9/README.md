@@ -19,3 +19,30 @@ All PixMiniMax (`animate_image_pixminimax`) unless said; index 0 of each job is 
 
 Composed over the promenade for the user (`compose9b.py`; the railing in front of them from a shot of the game with a
 marker at their layer). 19 generations for 9b.
+
+## 9a: head on, both running (in `../../jog-spin1/` to `jog-spin7/`)
+
+From her run frame 1, 3, 5 or 7 at x 72 (`a/start-run*.png`, `../jog9ac.py`) to her dazed sit's first frame at x 64
+(`a/end.png`): spun round like a top, through her front and back, and down to sit. Cleaned by `clean.py`'s biggest
+piece (`a/clean-r*`); frame 2 of each (the generator's streaks across her) and frame 3 from run frame 1 (red streaks over
+her face) left out. 12 frames, 2 generations each, seed 23:
+
+| From | PixelLab |
+|---|---|
+| run frame 1 (`a/raw/r1`) | `42bbd533-47c8-429f-8995-724ad3b42fc1` |
+| run frame 3 (`a/raw/r3`) | `2a3600da-5331-4914-8544-ecce533ce3f3` |
+| run frame 5 (`a/raw/r5`) | `c01db272-f87a-480c-baea-49b52950d716` |
+| run frame 7 (`a/raw/r7`) | `53169be7-0f06-4cf4-8df2-703ad664475f` |
+
+## 9c: he runs into her back (in `../../jog-shoved/`)
+
+From her standing frame at x 36 (`c/start.png`) to her dazed lie's first frame 50 px on (`c/end.png`): she pitches
+forward at once, stumbles bent over, dives and lands flat on her belly (16 frames, 2 generations); its last frame 2 px
+lower, as the game draws her lying.
+
+| Try | PixelLab |
+|---|---|
+| **Used** (seed 11, "at once ... with no pause", `c/raw/s11`, `c/clean-s11`) | `3c14b991-2456-4c44-b90a-1267b9751447` |
+| Not used (seed 23: stood still three frames, then ran) | `71bc3151-f42c-4c62-bf99-8eb379a74ccb` |
+
+9d has no art: 8d's bounce (`assets/source/her-mishaps/cart-bounce/`). 31 generations for the jogger in all.

@@ -12,6 +12,7 @@ import { Backdrop, FarGulls, HORIZON_ABOVE, HORIZON_SETTLE, DUSK_LIGHT } from '.
 import { World, OUTSIDE } from '../world/world.js';
 import { Soundscape } from '../world/soundscape.js';
 import { LooseTangerines } from '../world/tangerine.js';
+import { runFrame } from '../world/movers.js';
 import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
 
@@ -4600,7 +4601,7 @@ export class ShipScene extends Phaser.Scene {
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
         if (sc.gag && GAGS[sc.gag].sorry && this.anims.exists('gags-dnd-tiptoe')) return this.sorryGag(sc, fromX);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
-        if (sc.gag && GAGS[sc.gag].jog && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.jogGag(sc, ride.person);
+        if (sc.gag && GAGS[sc.gag].jog && ride?.person) return this.jogGag(sc, ride.person);
         if (sc.gag && ride?.person && this.anims.exists(GAGS[sc.gag].clip)) return this.cartGag(sc, ride.person);
         if (sc.gag && ride && this.anims.exists(GAGS[sc.gag].ride)) return this.rideGag(sc, ride);
         if (sc.gag && this.anims.exists(GAGS[sc.gag].fall) && (!GAGS[sc.gag].tray || ride?.tray) && (GAGS[sc.gag].at === undefined || ride)) return this.fallGag(sc, ride);
@@ -4955,13 +4956,18 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
-    // Her gag with the jogger (§1.6, 9b; `GAGS` jogBowled): he runs into her as she stands facing him;
-    // knocked off her feet, she lands on her bottom (her clip, `gags` sheet, where she stands, her middle at
-    // `jog.x` of its cell), and he stops where he met her, his far arm up to scratch the back of his head,
-    // sorry (his `sorry` clip, then `scratch` until her checkpoint). Then he runs on.
+    // Her gags with the jogger (§1.6, 9a to 9d; `GAGS` jogSpin, jogBowled, jogShoved, jogBounce): her clip
+    // where she stands (`gags` sheet, her middle at `jog.x` of its cell, or `jog[at]`'s first, its second
+    // where she ends): 9b he runs into her standing facing him, bowled back onto her bottom; 9a head on, both
+    // running, spun round like a top (a clip from each odd frame of her run, an even one taken as the next);
+    // 9c into her back, she stumbles and belly-flops. In 9b and 9c he stops where he met her, his far arm up
+    // to scratch the back of his head, sorry (his `sorry` clip, then `scratch` until her checkpoint); in 9a
+    // he runs on. Where she ends dizzy (`dazed`), her own dazed clip takes over from the clip's last frame
+    // (its first frame). 9d: 8d's bounce off his back (`cartGag`'s picture), and he never notices.
     jogGag(sc, q) {
         const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
         const m = this.cache.json.get('gags-meta');
+        const n = runFrame(p);
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         sfx.scare();
@@ -4969,28 +4975,60 @@ export class ShipScene extends Phaser.Scene {
         this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
         this.script = null;
         p.body.setVelocity(0, 0);
+        const end = () => this.time.delayedCall(g.holdMs, () => this.respawn());
+        if (g.bounce) {
+            // 9d: as 8d's picture is placed; he runs on.
+            const s = this.add.sprite(p.x - face * g.her, q.y, 'her-mishaps').setOrigin(0.5, 1).setFlipX(face < 0).setDepth(p.depth);
+            this.worldLayer.add(s);
+            p.setVisible(false);
+            this.gagEnd = () => { s.destroy(); p.setVisible(true); };
+            s.play(g.clip);
+            s.once(`animationcomplete-${g.clip}`, end);
+            return;
+        }
+        const clip = g.clips ? `${g.clips}${n >= 0 ? (n % 2 ? n : (n + 1) % 8) : 1}` : g.clip;
+        const [x0, x1] = g.at ? m.jog[g.at] : [m.jog.x, m.jog.x];
         // (A frame anchored at column c, flipped, takes origin (cell - 1 - c) / cell.)
-        const ox = (face < 0 ? m.cell - 1 - m.jog.x : m.jog.x) / m.cell;
+        const ox = (face < 0 ? m.cell - 1 - x0 : x0) / m.cell;
         const s = this.add.sprite(p.x, q.y, 'gags').setOrigin(ox, m.floor / m.cell).setFlipX(face < 0).setDepth(p.depth);
         this.worldLayer.add(s);
         p.setVisible(false);
-        q.state = 'acting';
-        q.busy = true;
-        // (Turned to her, where he met her.)
-        q.dir = p.x < q.x ? -1 : 1;
-        pe.place(q);
-        pe.anim(q, g.his, { loop: false });
-        q.sprite.once('animationcomplete', () => { if (q.busy) pe.anim(q, g.loop); });
+        if (g.his) {
+            q.state = 'acting';
+            q.busy = true;
+            // (A door he was going through shuts behind him: held open, its leaf drawn in front of them
+            // hid her fall.)
+            if (q.through) {
+                this.letGoDoor(q.through, q);
+                q.through = null;
+            }
+            // (Turned to her, where he met her.)
+            q.dir = p.x < q.x ? -1 : 1;
+            pe.place(q);
+            pe.anim(q, g.his, { loop: false });
+            q.sprite.once('animationcomplete', () => { if (q.busy) pe.anim(q, g.loop); });
+        }
         this.gagEnd = () => {
             s.destroy();
             p.setVisible(true);
+            if (!g.his) return;
             q.busy = false;
             pe.place(q);
             pe.idle(q);
             q.pausedUntil = this.time.now + 600;
         };
-        s.play(g.clip);
-        s.once(`animationcomplete-${g.clip}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+        s.play(clip);
+        s.once(`animationcomplete-${clip}`, () => {
+            if (g.dazed && this.anims.exists(`her-dazed-${g.dazed}`)) {
+                // Her own dazed clip from where the clip ends (its last frame is that clip's first).
+                s.setVisible(false);
+                p.x = s.x + face * (x1 - x0);
+                p.setVisible(true);
+                if (g.dazed === 'lie') this.herDrop(LIE_DROP.px);
+                this.herClip(`her-dazed-${g.dazed}`);
+            }
+            end();
+        });
     }
 
     // A slip or a trip with no tangerine on her (the user, 2026-11-16): she goes down, on her
