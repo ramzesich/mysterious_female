@@ -2928,3 +2928,16 @@ corner, at her depth (the rail in front of her); her hidden sprite goes along fo
 - Not changed: from the stairway's top the ride is about 12 s (from five steps over the turn, about 5); she turns to
   face down the flight in one frame if she was climbing.
 - **Tests:** `region8` (the hit, the ride to the foot, the technical door), `boot`, `lang` pass; the rest not run.
+
+## The plan gets a part 6: Bumbot made again (2026-11-19; a plan, nothing built)
+
+The user, to the design session: "Add to the end of our combined plan a new action item: regenerate all Bumbot's
+sprites. Now it doesn't look like him, and also his animations must be enriched and fine-tuned." Written into
+`docs/plan-the-rest.md` as §7a, part 6, after the small faults and before what is done once at the end; numbered 7a so
+that no other section's number changes. It starts with questions to the user (what in him is off, which moves are
+missed), then his look from the user's photos, every clip again, new clips, the tuning, and everything else that shows
+him (her sheet with him in her arms). The two optional clips of his (the fly rope, the vent's squeeze) moved into it
+from §8. Its size (large, about 90 generations) is the design session's guess, not a count.
+
+The estimate given on 2026-11-18 (about 14 working days; around 10 December by the last two weeks' attendance) grows
+by about three working days with it: around 15 December, at the slow end about the 20th. The gift is for New Year.

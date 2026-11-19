@@ -48,6 +48,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 3 (§5) | The look-outs; the deliveries | Step 6 | Large | About 15 |
 | 4 (§6) | Each deck its own look | Step 7 | Medium | About 20 |
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
+| 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -288,6 +289,50 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
   be stopped (the soft serve's motor is short pieces end to end); eating and drinking are mostly
   silent; the intro has a checkpoint's chime and a door and no more.
 
+## 7a. Part 6: Bumbot made again (large; about 90 generations, a guess)
+
+Added 2026-11-19 on the user's word: "regenerate all Bumbot's sprites. Now it doesn't look like
+him, and also his animations must be enriched and fine-tuned." It is numbered 7a so that no
+other section's number changes; it is built after part 5 and before §10.
+
+Design: `GAME_DESIGN.md` §4 (who he is, his size, his clips as first decided); `CLAUDE.md`'s
+lessons of 2026-10-31 (his character, shrinking a bigger design), 2026-11-17 (a quadruped's
+clips) and 2026-11-14 (a photo to pixel art, step 10's her with him in her arms).
+
+**What there is today** (`BUMBOT` in `tools/build_sprites.py`, `assets/source/bumbot/`): one
+standing picture, our own two-thirds shrink of a 48 px PixelLab design, about 28 px tall; clips
+`run`, `wash`, `jump`, `sit`, `eat`, `bat`, `shake`, and `asleep` as one still that breathes in
+code. PixelLab character "Bumbot (final)", `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855`.
+
+1. **Ask first, by numbered questions:** what in him is not the real Bumbot (the head's shape,
+   the ears, the eyes, the body's build, the tail, the coat's shine, his size next to her), and
+   which moves the user misses or finds wrong. Nothing is generated before the answers.
+2. **His look.** From the user's photos of him (`reference/photos/Bumbot/`, four; never
+   committed; only a cutout on a flat pale ground is sent). Several candidates, each shown in
+   the chat enlarged, at the game's size beside her, and beside the photo. He stays about 28 px
+   standing unless the user says otherwise (everything he does is placed to that size). A black
+   cat comes back charcoal or navy with orange eyes: recolour by rule. The user approves the
+   still before any clip is made.
+3. **Every clip again from the approved still,** each compared with the still on one floor line
+   and shown in the chat on a real screenshot of a spot where it plays: `stand`, `run`, `wash`,
+   `jump`, `sit`, `eat`, `bat`, `shake`, `asleep`. Template clips redraw a quadruped as another
+   animal: PixMiniMax from his own picture holds him.
+4. **Richer.** The list is the user's to settle in step 1; proposed: an idle that lives (a tail
+   flick, an ear turn, a blink), a look back over his shoulder before he bolts, a stretch, a
+   loaf, a turn round instead of a flip, lying down into `asleep` and getting up out of it, a
+   landing after `jump`, and his own clips for the fly rope and the vent's squeeze (they were in
+   §8; the scenes play with his other clips today).
+5. **Tuned.** `run` paced by his planted paws against his 300 px a second; every clip set on the
+   floor frame by frame; each hand-over between clips and with the scenes that move him (the six
+   near-catches, his glimpses, the finale at the tip) looked at in time, not only in pictures.
+6. **Everything else that shows him follows:** her sheet with him in her arms
+   (`assets/sprites/her-cat.png`, PixelLab state `6905f308-15b1-4a44-ad97-a38a7ad17dff`; every
+   pose the game asks of it), the catch, cabin 8206's scene and the day after, any gag or page
+   that draws him. The picture over her crew cabin's bed is from a photo and stays.
+7. Each near-catch and glimpse looked at enlarged in its place (he sits on our side of railings);
+   the scenarios that have him (`finale`, the regions' near-catches, `deck3`), `boot`,
+   `tools/check_overlaps.py`. The old sources are kept beside the new for comparison.
+
 ## 8. Optional, each only on the user's word
 
 - **The Library's rolling ladder** (`sec_ladder`, `docs/population.md`): pushed along the
@@ -299,8 +344,7 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 - The string trio on the atrium floor; the Seven Seas' other two tables of diners
   (`docs/population.md` asks three, one is built); deck 5's open cabin with a guest at the
   window (`amb_robe_5`; the knitting lady's open cabin fills that stretch now).
-- Bumbot's own clips for the fly rope and the vent's squeeze (the scenes play with his other
-  clips).
+- (Bumbot's own clips for the fly rope and the vent's squeeze: moved to §7a, 2026-11-19.)
 - The Photo Studio's flash as a hazard "when paired with a cart" (a gag only, today).
 - The ship's side: the funnel's white base, the open decks' bulwarks and the sun cover are
   still plain (`tools/shell_paint.py`).
