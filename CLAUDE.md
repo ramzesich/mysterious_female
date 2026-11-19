@@ -49,7 +49,7 @@ truth**: read the relevant section before any design or content work, and record
 | `assets/source/her/stair-cling/` | Her hold on the funnel stairway's rail in a gust, facing up the flight and down it (`cling-up`, `cling-down` in her sheet, played by `updateStairs`); made on the steps with the rail where the game draws it, the generator's own rail taken out frame by frame (its README). `stair-slip/` beside it is retired |
 | `assets/source/her-towel/` | Her towel-turban look (after the cabin's shower): PixelLab's "Towel turban" state of her character, `e2632c97-abd6-4f52-886f-ccf10b34b28d`; only the clips she uses in the cabin; built into `assets/sprites/her-towel.png` |
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
-| `tools/build_ship_art.py` options | Per piece: `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
+| `tools/build_ship_art.py` options | Per piece (and `-lt`, a light wash for the theatre's pieces, `LIGHT`; `keep` (from, to): a piece's own canvas columns kept, for pieces that must stand at one spot, the theatre's seat and its ten sitters): `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
 | `tools/draw_linen.py` | The linen room (deck 9, a heap of towels on its floor, the vent high on its far wall, the chute's hatch by the door), drawn by hand: its inside, its open crew door, and the laundry cart she pushes under the vent (`assets/ship/linen-cart.png`) |
 | `tools/draw_casino.py` | The casino's roulette and blackjack tables and the Stardust balcony's parapet, drawn by hand in strict side view (PixelLab kept drawing them at three-quarters): `assets/source/ship/casino-drawn/` |
@@ -915,3 +915,13 @@ Lessons learned (2026-11-19, the stage):
   fixed time after a hit breaks when a gag gets longer: wait for her checkpoint.
 - **Before calling a ghost in a shot a fault, check whether a scene was playing:** reaching the stage starts near-catch 3,
   and a shot mid-fall looked like a faint copy of the trap door.
+
+Lessons learned (2026-11-19, the theatre's audience):
+
+- **"The same chair" means the same pixels:** five people drawn each in a chair of their own read as "similar, but
+  different". Take each out of their chair (`edit_image_pro_flash`, "remove the chair, the same pose"), then set them in
+  one seat split in two: what is behind them (the backrest, the far arm) and what is in front (the near arm, the seat's
+  front). New people for a crowd: edits of those, "a different person in exactly the same pose", 5 generations each.
+- **A wash is the user's to set per place:** the background's 35% read as "washed out too much" in the dark theatre.
+- **A piece that keeps its canvas counts its empty part in `check_overlaps`:** keep only the columns it needs and cut its
+  top to what is drawn (it stands on its bottom row).

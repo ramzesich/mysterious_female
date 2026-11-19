@@ -44,7 +44,9 @@ def fetch(name, facing="east"):
 # fetch would overwrite them with the character's own, so they are fetched only by name.
 # (The steward's `tug` is a picture of him with his jammed trolley, made by hand from PixMiniMax:
 # assets/source/people/steward-raw/README.md.)
-BY_HAND = {"dog", "dogowner", "steward"}
+BY_HAND = {"dog", "dogowner", "steward",
+           # (The theatre's audience, 2026-11-19: in the one theatre seat, `assets/source/people/audience-seated/`.)
+           "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny"}
 
 
 def main():

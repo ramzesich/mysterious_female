@@ -126,11 +126,14 @@ CAST = {
     # Seated, each on a seat of their own (they take a built seat's place), shrunk to the others' size.
     "pianist": ("f3cc44c3-8f12-4e1f-95af-3e95eb44c59f", {"play": 8}, {"scale": 0.8}),
     "casinolady": ("1e62b76d-ee89-41aa-adba-a443c7b5d23f", {}, {"scale": 0.8}),
-    "aud_gent": ("7a1005bb-985f-4463-87e0-a07a75b1da48", {}, {"scale": 0.8}),
-    "aud_lady": ("5b1a8280-b981-4f70-9520-fece33d9532b", {}, {"scale": 0.8}),
-    "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {}, {"scale": 0.8}),
-    "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"scale": 0.8}),
-    "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"scale": 0.8}),
+    # (The theatre's audience, 2026-11-19, the user: all in the one seat, the empty seats', and lightly washed as the
+    # theatre's pieces: their pictures are at the game's size now, `assets/source/people/audience-seated/`; their
+    # PixelLab ones in their own chairs kept as `stand-own-chair.png`.)
+    "aud_gent": ("7a1005bb-985f-4463-87e0-a07a75b1da48", {}, {"wash": 0.12}),
+    "aud_lady": ("5b1a8280-b981-4f70-9520-fece33d9532b", {}, {"wash": 0.12}),
+    "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {}, {"wash": 0.12}),
+    "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"wash": 0.12}),
+    "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"wash": 0.12}),
     # Region 4 (Housekeeping): deck 9's corridor, the atrium walks, the laundry.
     "steward": ("88741662-8a90-437a-bca4-c996663761ff", {"idle": 4, "tug": 6, "tugwalk": 8, "walk": 9, "thanks": 8, "toss": 8}, {}),
     "bride": ("70b0bc20-aef9-46aa-bd9d-35f56c4c0008", {"idle": 4, "kiss": 7}, {}),

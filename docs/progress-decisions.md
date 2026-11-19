@@ -3188,3 +3188,20 @@ game's mic stand moved 0.25 m aft. The user: "fix the stairs' right side to matc
 stopped at the floor): copied from its left. `assets/source/ship/trapdoor/`. A faint copy of the trap area in a shot
 before near-catch 3 was that scene caught mid-fall, not a fault. `region3`, `boot` pass; `check_overlaps` 0. 10
 generations.
+
+## The theatre: lightly washed, one seat for all, a full house (2026-11-19)
+
+The user: the theatre's and the stage's props "are washed out too much. Please use their original pictures, and let's
+wash out them only slightly"; the half-turned seats out for "empty chairs like the one that the guys sits on"; then all
+the audience "on the same exact chair as the popcorn guy, and as the empty chairs", "much more chairs with people,
+randomly", "slightly washed"; and "behind the right (closest to the screen) chair arm, but obscure the left (far) part".
+
+- **A light wash** (`-lt`, 12% toward the wall instead of the background's 35%): the stage's drum kit, mic stand, guitar,
+  piano, speakers, the seats, the audience (`MUTE_LIGHT`, `LIGHT` in `tools/build_ship_art.py`; `wash` in `tools/cast.py`).
+  The rule that background props are muted stands; the theatre is muted less, on the user's word.
+- **The one seat:** an edit of the popcorn man's picture without him. The five named without their own chairs, ten
+  others from them, each set in it, the near arm in front of them (`assets/source/people/audience-seated/`). The five stay
+  people (the lady's "shh"); the ten are pieces filling about half the empty seats, the same each build.
+- **Found:** a sitter's head at the balcony's "LIGHTING" plate (the seats beside the booth door stay empty); the new
+  pieces' empty canvas counted as overlaps (trimmed to what is drawn, their middle kept).
+- `check_overlaps` 0; `region3`, `boot` pass. 80 generations.

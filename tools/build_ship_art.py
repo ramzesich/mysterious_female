@@ -16,7 +16,10 @@ Sources (PixelLab 1-direction objects, sidescroller view, Resurrect 64 palette, 
     props-4/   object 88f0ed0d-37b0-407f-ab67-523f0d24288a, 64 props, 32px canvas: bar, library,
                photo studio, shops, nightclub, theatre (2026-11-03, for deck 6)
     tall-1/    object 084f5932-777f-4804-93b7-6773efa99d7c, 16 tall pieces, 64px canvas (deck 6)
-    theatre-seat/  map object a388646f-b80d-403a-87ab-4446106a66dc, 48px (try-2 kept, unused)
+    theatre-seat/  map object a388646f-b80d-403a-87ab-4446106a66dc, 48px (try-2 kept, unused; half-turned,
+               out of the theatre since 2026-11-19)
+    theatre-seat-side/  the empty seat the stalls' people sit in, side-on: `edit_image_pro_flash` of
+               aud_popcorn's game picture, him taken out (7b4bf611-153f-4bef-ac24-635016b452a3, seed 4, 5)
     props-5/   object f8f4f1fa-4267-48b8-b9e6-725209ad5a70, 64 props, 32px canvas: plaques,
                paintings, bar, casino, shop, kids' club (2026-11-03, for deck 7)
     tall-2/    object 310360e6-4a51-4387-ab44-88d5cbecbeed, 16 tall pieces, 64px canvas (deck 7)
@@ -60,6 +63,10 @@ OUT = ROOT / "assets" / "ship"
 CABIN_WOOD = (0xCD, 0x68, 0x3D)       # the plain cabin door's terracotta
 WALL = (0xE9, 0xDF, 0xCC)             # the corridor wall that muted pieces fade toward
 MUTE = 0.35
+# A lighter wash, "<name>-lt", for the theatre's stage and seats (the user, 2026-11-19: "They are washed out too
+# much ... let's wash out them only slightly"): only the pieces in LIGHT get one.
+MUTE_LIGHT = 0.12
+LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack"} | {f"audience-{k}" for k in range(10)}
 
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's
@@ -157,6 +164,11 @@ for i, name in enumerate(TALL_1):
     if name:
         PIECES[name] = ("tall-1", i, None, {})
 PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
+# (The empty seat and the ten people in it keep their 80 px canvas, `whole`: the seat at the same spot in each,
+# where the audience's people sit in theirs; `audience/`: edits of the five into ten others, 2026-11-19.)
+PIECES["theatre-seat-side"] = ("theatre-seat-side", 0, None, {"whole": (18, 62)})
+for _k in range(10):
+    PIECES[f"audience-{_k}"] = ("audience", _k, None, {"whole": (18, 62)})
 # Deck 7's sheets (NCL's plan and the user's photos). Left out: the sheet's casino tables (no felt,
 # no wheel), a famous portrait, a garbled "welcome" sign.
 PROPS_5 = [
@@ -297,7 +309,7 @@ PIECES["notice-board"][3]["paint"] = [(4, 7, 9, 13, "#ffffff"), (4, 8, 8, 8, "#7
                                       (4, 10, 8, 10, "#7f708a"), (4, 12, 7, 12, "#7f708a")]
 
 
-def load(sheet, frame, from_x=0, join=None, caption=0):
+def load(sheet, frame, from_x=0, join=None, caption=0, keep=None):
     img = Image.open(SRC / sheet / f"frame_{frame}.png").convert("RGBA")
     if caption:
         # The sheet wrote each piece's name across the frame's top rows: blanked.
@@ -310,6 +322,14 @@ def load(sheet, frame, from_x=0, join=None, caption=0):
         whole.paste(img, (0, 0))
         whole.paste(rest, (img.width, 0))
         img = whole
+    if keep:
+        # (Its own canvas kept, down to the floor row, but only columns `whole` (from, to), the same for each:
+        # pieces that must stand at the same spot as each other, their middle the canvas's.)
+        box = img.getbbox()
+        x0, x1 = keep
+        assert box[0] >= x0 and box[2] <= x1, (sheet, frame, box)
+        # (Their tops cut to what is drawn: they stand on their bottom row, so that changes nothing.)
+        return img.crop((x0, box[1], x1, box[3]))
     return img.crop(img.getbbox())
 
 
@@ -413,7 +433,7 @@ def _drop(img, i, axis):
     return out
 
 
-def muted(img):
+def muted(img, k=MUTE):
     px = img.load()
     out = img.copy()
     dst = out.load()
@@ -421,7 +441,7 @@ def muted(img):
         for x in range(img.width):
             r, g, b, a = px[x, y]
             if a:
-                dst[x, y] = (*(round(c + (w - c) * MUTE) for c, w in zip((r, g, b), WALL)), a)
+                dst[x, y] = (*(round(c + (w - c) * k) for c, w in zip((r, g, b), WALL)), a)
     return out
 
 
@@ -487,7 +507,7 @@ def build():
     pieces = {}
     for name, spec in PIECES.items():
         sheet, frame, size, opts = spec
-        img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"), opts.get("caption", 0))
+        img = load(sheet, frame, opts.get("from_x", 0), opts.get("join"), opts.get("caption", 0), opts.get("whole", False))
         if opts.get("legs"):
             img = leg_base(img, opts["legs"])
         if opts.get("flat"):
@@ -506,6 +526,8 @@ def build():
             FEET[f"{name}-bg"] = FEET[name]
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
+        if name in LIGHT:
+            pieces[f"{name}-lt"] = muted(img, MUTE_LIGHT)
     # (Once every piece is made: the ones that take another's frame.)
     for name, (_, _, _, opts) in PIECES.items():
         if opts.get("reframe"):

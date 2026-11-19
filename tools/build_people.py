@@ -55,6 +55,20 @@ def shrunk(img, scale):
     return out
 
 
+WALL = (0xE9, 0xDF, 0xCC)     # as tools/build_ship_art.py's
+
+
+def washed(img, k):
+    out = img.copy()
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (*(round(c + (w - c) * k) for c, w in zip((r, g, b), WALL)), a)
+    return out
+
+
 def cell_of(img, feet, flip):
     """The frame in a cell: centred as its canvas is, the row `feet` on the cell's bottom row."""
     if flip:
@@ -78,6 +92,11 @@ def build():
         flip = opts.get("flip", False)
         scale = opts.get("scale")
         load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale)) if scale else (lambda path: palettize(Image.open(path)))
+        if opts.get("wash"):
+            # (Washed toward the corridor wall as the ship's background pieces are, `wash` of the way: the
+            # theatre's audience, as lightly as the theatre's own pieces, `-lt`.)
+            plain, k = load, opts["wash"]
+            load = lambda path, plain=plain, k=k: washed(plain(path), k)
         stand = load(src / "stand.png")
         feet = lowest_row(stand)
         entry = {"stand": len(cells), "anims": {}, "fps": {}}

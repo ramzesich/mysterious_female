@@ -11,9 +11,14 @@ Run from the repo root:  python tools/build_ship_map.py
 
 import json
 import math
+import random
 import struct
 import zlib
 from pathlib import Path
+from population import PEOPLE
+
+# Where the theatre's audience sit, per deck (m): their pictures have their own seats, so none is set there.
+AUDIENCE = {d: [p["at"][1] for p in PEOPLE.values() if str(p.get("who", "")).startswith("aud_") and p["at"][0] == d] for d in (6, 7)}
 
 from ship_layout import (ATRIUM, BOW, CORES, DECKS, EXTENT, FRONT_WALL, FUNNEL, HULL_PLAIN_TO, LENGTH, MAST, RADAR_MAST, PLAYABLE,
                          OUR_CABIN, LINEN_ROOM, CHAPEL, CREW_DECK, BRIDGE_WALL_M, SPA_WALL_M, PROMENADE, STAGE, TRUNKS, VENUES,
@@ -1466,14 +1471,28 @@ def build_objects():
     # the stage with its red curtains, spotlights and the band's instruments.
     decor("stardust-entrance", "marquee", exact_x(203.4), exact_x(203.4), deck=6, text="STARDUST LOUNGE")
     decor("stardust-stage", "stage", col(STAGE) * TILE, stage_end_col() * TILE, deck=6)
+
+    # (The user, 2026-11-19: "Fill much more chairs with people, randomly": about half the empty seats have one of
+    # the ten others in them, the same each build.)
+    fill = random.Random(2026)
+
+    def seat(deck, k, m=None):
+        # (Not beside the balcony's lighting booth door, 206.1 m: its plate is at a sitter's head.)
+        if deck == 7 and m is not None and abs(m - 206.1) < 1.2:
+            return "theatre-seat-side-lt"
+        return f"audience-{fill.randrange(10)}-lt" if fill.random() < 0.55 else "theatre-seat-side-lt"
+    # (The user, 2026-11-19: the seats are the empty side-on seat the audience sit in, not the half-turned
+    # one, none where one of them sits (their picture has its own); the stage's and the seats' pieces only
+    # lightly washed, `-lt`.)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
-        put(6, m, "theatre-seat-bg")
-    put(6, 245.2, "drum-kit-bg")
-    put(6, 246.95, "mic-stand-bg")    # (246.7 until 2026-11-19: it stood in the open trap door's new picture)
-    put(6, 247.6, "guitar-bg")
-    put(6, 249.0, "grand-piano-bg", flip=True)
-    put(6, 243.2, "speaker-stack-bg")
+        if all(abs(m - s) > 0.3 for s in AUDIENCE[6]):
+            put(6, m, seat(6, k))
+    put(6, 245.2, "drum-kit-lt")
+    put(6, 246.95, "mic-stand-lt")    # (246.7 until 2026-11-19: it stood in the open trap door's new picture)
+    put(6, 247.6, "guitar-lt")
+    put(6, 249.0, "grand-piano-lt", flip=True)
+    put(6, 243.2, "speaker-stack-lt")
 
     # Deck 7, after NCL's plan and the user's photos (§5.3). Clear of the Hotel trunk's door (118).
     def plaque(name, m, text):
@@ -1596,8 +1615,8 @@ def build_objects():
     # The Stardust Lounge's balcony: rows of red seats down to the railing over the stage.
     decor("balcony-doorway", "doorway", exact_x(202), exact_x(202), deck=7, text="Stardust Lounge Balcony")
     for k in range(int((STAGE - 1.6 - 204.2) / 0.95) + 1):
-        if k != 2:      # (no seat at 206.1 m: the lighting booth's door is in the wall there)
-            put(7, 204.2 + k * 0.95, "theatre-seat-bg")
+        if k != 2 and all(abs(204.2 + k * 0.95 - s) > 0.3 for s in AUDIENCE[7]):      # (no seat at 206.1 m: the lighting booth's door is in the wall there)
+            put(7, 204.2 + k * 0.95, seat(7, k, 204.2 + k * 0.95))
     # Its front over the stage, seen end-on: a velvet-padded parapet with a brass rail, as tall as
     # the solid railing she hops (the tile itself is invisible).
     put(7, 0, "balcony-front", x=(col(STAGE) - 1) * TILE + TILE // 2)
