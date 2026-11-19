@@ -1046,6 +1046,12 @@ def build_objects():
     for name, deck, m in [("chips7", 7, 148.5), ("jet11", 11, 140.8), ("light6", 6, 241.5), ("towels9", 9, 144.5)]:
         add(point(name, "place", exact_x(m), floor_y(deck)))
     add(point("drill7", "place", exact_x(180.5), floor_y(7), [prop("route", "promenade")]))
+    # (§4 2.1, 2026-11-19: a start by each thing to find that had none near it, for the user to judge
+    # where they lie: the dry store's door (deck 4), the maid's cabin's door (deck 6), the knitting lady's
+    # (deck 5, aft of her basket), Shore excursions' desk (deck 5), the Stardust balcony's far end (deck 7).)
+    for name, deck, m in [("store4", 4, 161.5), ("maid6", 6, 46.5), ("knit5", 5, 28.0), ("shore5", 5, 136.0),
+                          ("balcony7", 7, 236.0)]:
+        add(point(name, "place", exact_x(m), floor_y(deck)))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):

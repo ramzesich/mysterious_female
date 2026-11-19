@@ -121,8 +121,9 @@ SEED = [1]      # the random draws' seed (`--seed N`)
 class Browser:
     current = None      # the one browser of this process, for `wait()` and `now()`
 
-    def __init__(self, stepped=False):
-        # (Stepped: each page, once loaded, is taken over, `takeover()`.)
+    def __init__(self, stepped=False, closeups=False):
+        # (Stepped: each page, once loaded, is taken over, `takeover()`. `closeups`: a thing she gets is
+        # shown close and waits for a key, `world.closeup`; off unless that is what is checked.)
         self.stepped = stepped
         self.taken = False
         self.clock = 0.0
@@ -165,6 +166,8 @@ class Browser:
             Math.random = () => {{ a = (a + 0x6D2B79F5) >>> 0; let t = a;
                 t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
                 return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }}; }})();""")
+        if not closeups:
+            self.send("Page.addScriptToEvaluateOnNewDocument", source="window.__skipCloseups = true;")
 
     def send(self, method, **params):
         self.msg_id += 1

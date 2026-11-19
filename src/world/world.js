@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -805,7 +805,7 @@ export class World {
                 // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing
                 // to find up high, on the climb's shelf, is hers only from up there, or once a lob
                 // has knocked it down: `high`.)
-                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40, interact: () => this.take(thing) };
+                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40 && !e.low, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -1186,6 +1186,7 @@ export class World {
         } else if (type === 'keep') {
             this.save.keeps.push(thing.what);
             this.sparkle(thing.x, thing.pick.y - 4, 0xf9c22b);
+            this.closeup(thing.what.split(':')[2]);
         } else {
             this.save.items.push(name);
         }
@@ -1206,6 +1207,56 @@ export class World {
         this.sparkle(x, y, 0xf9c22b);
         writeSave(this.save);
         this.refresh();
+        this.closeup(what.split(':')[2]);
+    }
+
+    // A thing she has just got, seen close (the user, 2026-11-19: "A and C"): its picture
+    // (tools/build_closeups.py, the world's pixel size) in the middle of the screen over a dim, a warm
+    // light behind it; she holds still and nothing touches her (`scene.viewing`) until any key. Every
+    // thing to find and every key card; the books' covers will come the same way (§4 2.3). The
+    // playtests skip it (`window.__skipCloseups`) but where it is what they check.
+    closeup(frame) {
+        const s = this.scene;
+        if (window.__skipCloseups || !s.textures.get('closeups').has(frame)) return;
+        if (!s.textures.exists('closeup-glow')) {
+            const size = 360, c = s.textures.createCanvas('closeup-glow', size, size), ctx = c.getContext();
+            const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+            g.addColorStop(0, 'rgba(255, 240, 214, 0.62)');
+            g.addColorStop(0.45, 'rgba(255, 240, 214, 0.32)');
+            g.addColorStop(1, 'rgba(255, 240, 214, 0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, size, size);
+            c.refresh();
+        }
+        this.cut(() => new Promise(resolve => {
+            s.viewing = true;
+            const cx = VIEW.width / 2, cy = VIEW.height / 2;
+            const dim = s.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422, 0.62).setOrigin(0);
+            const glow = s.add.image(cx, cy, 'closeup-glow');
+            const pic = s.add.image(cx, cy, 'closeups', frame).setScale(2);
+            const all = [dim, glow, pic];
+            s.uiLayer.add(all);
+            s.tweens.add({ targets: all, alpha: { from: 0, to: 1 }, duration: 200 });
+            const close = () => {
+                s.tweens.add({ targets: all, alpha: 0, duration: 160, onComplete: () => {
+                    all.forEach(o => o.destroy());
+                    s.viewing = false;
+                    resolve();
+                } });
+            };
+            // Any key, after a moment (so the E that took it does not close it at once).
+            s.time.delayedCall(450, () => {
+                const poll = () => {
+                    const i = s.controls.state;
+                    if (i.activatePressed || i.jumpPressed || i.leftPressed || i.rightPressed || i.escapePressed || i.startPressed
+                        || i.dashPressed || i.throwPressed || i.upPressed || i.downPressed) {
+                        s.events.off('postupdate', poll);
+                        close();
+                    }
+                };
+                s.events.on('postupdate', poll);
+            });
+        }));
     }
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.

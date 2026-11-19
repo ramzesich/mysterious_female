@@ -4557,6 +4557,7 @@ export class ShipScene extends Phaser.Scene {
     scareContact(fromX, what, { vx = 0, dir = 0, lying = false, crowded = false, force = false, snatch = null, ride = null } = {}) {
         const p = this.player;
         if (this.holding || this.gagPending) return null;   // nothing scares her on the way home (§6.1.9)
+        if (this.viewing) return null;                      // nor while a thing she got is shown close (`world.closeup`)
         // In a lunge she is through: what touched her gives way in its own manner.
         if (this.lungeSafe() && !force) {
             this.world.lunged(what, fromX);

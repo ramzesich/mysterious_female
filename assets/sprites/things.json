@@ -40,9 +40,29 @@
     "h": 32
    }
   },
-  "breakfast-tray": {
+  "bookmark-book": {
    "frame": {
     "x": 143,
+    "y": 0,
+    "w": 14,
+    "h": 15
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 14,
+    "h": 15
+   },
+   "sourceSize": {
+    "w": 14,
+    "h": 15
+   }
+  },
+  "breakfast-tray": {
+   "frame": {
+    "x": 159,
     "y": 0,
     "w": 24,
     "h": 12
@@ -60,9 +80,29 @@
     "h": 12
    }
   },
+  "diary": {
+   "frame": {
+    "x": 185,
+    "y": 0,
+    "w": 8,
+    "h": 13
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 8,
+    "h": 13
+   },
+   "sourceSize": {
+    "w": 8,
+    "h": 13
+   }
+  },
   "door-hand": {
    "frame": {
-    "x": 169,
+    "x": 195,
     "y": 0,
     "w": 7,
     "h": 4
@@ -82,27 +122,27 @@
   },
   "feather-toy": {
    "frame": {
-    "x": 178,
+    "x": 204,
     "y": 0,
-    "w": 21,
-    "h": 12
+    "w": 27,
+    "h": 8
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 21,
-    "h": 12
+    "w": 27,
+    "h": 8
    },
    "sourceSize": {
-    "w": 21,
-    "h": 12
+    "w": 27,
+    "h": 8
    }
   },
   "flag-dk": {
    "frame": {
-    "x": 201,
+    "x": 233,
     "y": 0,
     "w": 9,
     "h": 13
@@ -122,7 +162,7 @@
   },
   "flag-ee": {
    "frame": {
-    "x": 212,
+    "x": 244,
     "y": 0,
     "w": 10,
     "h": 13
@@ -142,7 +182,7 @@
   },
   "flag-fi": {
    "frame": {
-    "x": 224,
+    "x": 256,
     "y": 0,
     "w": 8,
     "h": 13
@@ -162,7 +202,7 @@
   },
   "flag-se": {
    "frame": {
-    "x": 234,
+    "x": 266,
     "y": 0,
     "w": 9,
     "h": 13
@@ -182,27 +222,27 @@
   },
   "flag-ua": {
    "frame": {
-    "x": 245,
+    "x": 277,
     "y": 0,
-    "w": 6,
-    "h": 13
+    "w": 11,
+    "h": 16
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 6,
-    "h": 13
+    "w": 11,
+    "h": 16
    },
    "sourceSize": {
-    "w": 6,
-    "h": 13
+    "w": 11,
+    "h": 16
    }
   },
   "gull-down": {
    "frame": {
-    "x": 253,
+    "x": 290,
     "y": 0,
     "w": 30,
     "h": 10
@@ -222,7 +262,7 @@
   },
   "gull-perched": {
    "frame": {
-    "x": 285,
+    "x": 322,
     "y": 0,
     "w": 20,
     "h": 20
@@ -242,7 +282,7 @@
   },
   "gull-up": {
    "frame": {
-    "x": 307,
+    "x": 344,
     "y": 0,
     "w": 30,
     "h": 22
@@ -262,7 +302,7 @@
   },
   "icon-heart": {
    "frame": {
-    "x": 339,
+    "x": 376,
     "y": 0,
     "w": 15,
     "h": 14
@@ -282,7 +322,7 @@
   },
   "icon-mute": {
    "frame": {
-    "x": 356,
+    "x": 393,
     "y": 0,
     "w": 17,
     "h": 11
@@ -302,7 +342,7 @@
   },
   "knit-basket": {
    "frame": {
-    "x": 375,
+    "x": 412,
     "y": 0,
     "w": 12,
     "h": 9
@@ -322,7 +362,7 @@
   },
   "knit-chair": {
    "frame": {
-    "x": 389,
+    "x": 426,
     "y": 0,
     "w": 19,
     "h": 39
@@ -342,7 +382,7 @@
   },
   "laundry-cart": {
    "frame": {
-    "x": 410,
+    "x": 447,
     "y": 0,
     "w": 45,
     "h": 44
@@ -362,7 +402,7 @@
   },
   "lounge-her": {
    "frame": {
-    "x": 457,
+    "x": 494,
     "y": 0,
     "w": 30,
     "h": 43
@@ -382,7 +422,7 @@
   },
   "lounge-him": {
    "frame": {
-    "x": 489,
+    "x": 526,
     "y": 0,
     "w": 32,
     "h": 41
@@ -402,7 +442,7 @@
   },
   "massage-client": {
    "frame": {
-    "x": 523,
+    "x": 560,
     "y": 0,
     "w": 50,
     "h": 28
@@ -420,9 +460,29 @@
     "h": 28
    }
   },
+  "massage-gun": {
+   "frame": {
+    "x": 612,
+    "y": 0,
+    "w": 15,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 15,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 15,
+    "h": 16
+   }
+  },
   "paper-sliding": {
    "frame": {
-    "x": 575,
+    "x": 629,
     "y": 0,
     "w": 28,
     "h": 10
@@ -442,7 +502,7 @@
   },
   "parasol-closed": {
    "frame": {
-    "x": 605,
+    "x": 659,
     "y": 0,
     "w": 24,
     "h": 43
@@ -462,7 +522,7 @@
   },
   "parasol-open": {
    "frame": {
-    "x": 631,
+    "x": 685,
     "y": 0,
     "w": 58,
     "h": 46
@@ -482,7 +542,7 @@
   },
   "pillow-fort": {
    "frame": {
-    "x": 691,
+    "x": 745,
     "y": 0,
     "w": 169,
     "h": 32
@@ -502,7 +562,7 @@
   },
   "pillow-pile": {
    "frame": {
-    "x": 862,
+    "x": 916,
     "y": 0,
     "w": 53,
     "h": 30
@@ -520,29 +580,49 @@
     "h": 30
    }
   },
-  "robot-vacuum": {
+  "plant-pot": {
    "frame": {
-    "x": 917,
+    "x": 971,
     "y": 0,
-    "w": 22,
-    "h": 11
+    "w": 7,
+    "h": 17
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 22,
-    "h": 11
+    "w": 7,
+    "h": 17
    },
    "sourceSize": {
-    "w": 22,
-    "h": 11
+    "w": 7,
+    "h": 17
+   }
+  },
+  "rc-car": {
+   "frame": {
+    "x": 980,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 10
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 10
    }
   },
   "robot": {
    "frame": {
-    "x": 941,
+    "x": 998,
     "y": 0,
     "w": 22,
     "h": 52
@@ -558,11 +638,31 @@
    "sourceSize": {
     "w": 22,
     "h": 52
+   }
+  },
+  "robot-vacuum": {
+   "frame": {
+    "x": 1022,
+    "y": 0,
+    "w": 22,
+    "h": 11
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 11
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 11
    }
   },
   "salon-client": {
    "frame": {
-    "x": 965,
+    "x": 1046,
     "y": 0,
     "w": 31,
     "h": 44
@@ -580,9 +680,29 @@
     "h": 44
    }
   },
+  "snack-tube": {
+   "frame": {
+    "x": 1079,
+    "y": 0,
+    "w": 19,
+    "h": 6
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 19,
+    "h": 6
+   },
+   "sourceSize": {
+    "w": 19,
+    "h": 6
+   }
+  },
   "steward-trolley": {
    "frame": {
-    "x": 998,
+    "x": 1100,
     "y": 0,
     "w": 43,
     "h": 79
@@ -602,7 +722,7 @@
   },
   "suitcase-rolling": {
    "frame": {
-    "x": 1043,
+    "x": 1145,
     "y": 0,
     "w": 19,
     "h": 48
@@ -622,7 +742,7 @@
   },
   "sunbather-1": {
    "frame": {
-    "x": 1064,
+    "x": 1166,
     "y": 0,
     "w": 63,
     "h": 33
@@ -642,7 +762,7 @@
   },
   "sunbather-2": {
    "frame": {
-    "x": 1129,
+    "x": 1231,
     "y": 0,
     "w": 62,
     "h": 20
@@ -662,7 +782,7 @@
   },
   "sunbather-3": {
    "frame": {
-    "x": 1193,
+    "x": 1295,
     "y": 0,
     "w": 58,
     "h": 27
@@ -682,7 +802,7 @@
   },
   "sunbather-4": {
    "frame": {
-    "x": 1253,
+    "x": 1355,
     "y": 0,
     "w": 50,
     "h": 22
@@ -702,27 +822,27 @@
   },
   "tennis-ball": {
    "frame": {
-    "x": 1305,
+    "x": 1407,
     "y": 0,
-    "w": 10,
-    "h": 10
+    "w": 12,
+    "h": 12
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 10,
-    "h": 10
+    "w": 12,
+    "h": 12
    },
    "sourceSize": {
-    "w": 10,
-    "h": 10
+    "w": 12,
+    "h": 12
    }
   },
   "toddler-blocks": {
    "frame": {
-    "x": 1317,
+    "x": 1421,
     "y": 0,
     "w": 24,
     "h": 28
@@ -742,7 +862,7 @@
   },
   "toddler-cook": {
    "frame": {
-    "x": 1343,
+    "x": 1447,
     "y": 0,
     "w": 25,
     "h": 36
@@ -762,7 +882,7 @@
   },
   "toddler-crawl": {
    "frame": {
-    "x": 1370,
+    "x": 1474,
     "y": 0,
     "w": 25,
     "h": 26
@@ -782,7 +902,7 @@
   },
   "towel-elephant": {
    "frame": {
-    "x": 1397,
+    "x": 1501,
     "y": 0,
     "w": 29,
     "h": 19
@@ -802,7 +922,7 @@
   },
   "towel-monkey": {
    "frame": {
-    "x": 1428,
+    "x": 1532,
     "y": 0,
     "w": 24,
     "h": 27
@@ -822,7 +942,7 @@
   },
   "towel-rabbit": {
    "frame": {
-    "x": 1454,
+    "x": 1558,
     "y": 0,
     "w": 16,
     "h": 27
@@ -842,7 +962,7 @@
   },
   "wall-shelf": {
    "frame": {
-    "x": 1472,
+    "x": 1576,
     "y": 0,
     "w": 31,
     "h": 5
@@ -862,7 +982,7 @@
   },
   "wedding-cake": {
    "frame": {
-    "x": 1505,
+    "x": 1609,
     "y": 0,
     "w": 20,
     "h": 25
@@ -882,7 +1002,7 @@
   },
   "winch": {
    "frame": {
-    "x": 1527,
+    "x": 1631,
     "y": 0,
     "w": 24,
     "h": 36
@@ -902,22 +1022,22 @@
   },
   "wool": {
    "frame": {
-    "x": 1553,
+    "x": 1657,
     "y": 0,
-    "w": 6,
-    "h": 6
+    "w": 10,
+    "h": 10
    },
    "rotated": false,
    "trimmed": false,
    "spriteSourceSize": {
     "x": 0,
     "y": 0,
-    "w": 6,
-    "h": 6
+    "w": 10,
+    "h": 10
    },
    "sourceSize": {
-    "w": 6,
-    "h": 6
+    "w": 10,
+    "h": 10
    }
   }
  },

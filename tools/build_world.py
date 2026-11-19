@@ -162,8 +162,11 @@ def build_world():
     for iid, (where, at, what, needs, *on) in ITEMS.items():
         x, y, route = spot(where, at)
         # `on`: px up, on a piece already there (a table); else on a side table of its own.
+        # (`low`: a thing to find more than 40 px up that is still taken with E from the floor, a plant
+        # on a windowsill; any higher one is hers only from up there, or once a lob knocks it down.)
+        opts = on[2] if len(on) > 2 else {}
         ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
-                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else ""))
+                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", low=opts.get("low", False)))
 
     for pid, d in PEOPLE.items():
         x, y, route = spot(*d["at"])

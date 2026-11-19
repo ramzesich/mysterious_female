@@ -275,13 +275,13 @@ of data and a generated picture shown first, each set against what is built at i
 | # | Whose | Thing | Where | How |
 |---|---|---|---|---|
 | 4 | Bumbot's | Collar bell | The promenade, a gull on a lamp | A lob: it drops the bell for the fruit. **A new mover** (her cry: it flaps and keeps the bell) |
-| 5 | Bumbot's | Liquid snack in a tube | Deck 4, the dry store, on a shelf | E (green card) |
-| 6 | Bumbot's | Massage gun | Deck 11, the gym, the bench by the weights | E |
+| 5 | Bumbot's | Liquid snack in a tube | Deck 4, the dry store, on a shelf | E (green card). **Placed 2026-11-19** (the bottom shelf, by its tangerines) |
+| 6 | Bumbot's | Massage gun | Deck 11, the gym, the bench by the weights | E. **Placed 2026-11-19** (on the bench under the barbell) |
 | 7 | Bumbot's | Tin of sardines | The Sushi Bar | The chef's bubble shows a tangerine; he takes one for it (the apology's hand-over) |
-| 8 | Bumbot's | Remote-controlled car | Deck 7, Entourage, past the ball pit | E |
-| 10 | Hers | Bookmark with a cat on top | Deck 6, the maid's cabin, in the book by the bed | E |
-| 11 | Hers | Diary notepad | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end) |
-| 12 | Hers | Small plant in a pot | Deck 9, the cabin being cleaned, its windowsill | E |
+| 8 | Bumbot's | Remote-controlled car (beige, two big rubbery cyan wheels: the user) | Deck 7, Entourage, past the ball pit | E. **Placed 2026-11-19** (on the floor between the foosball and the pool tables) |
+| 10 | Hers | Bookmark with a cat on top | ~~Deck 6, the maid's cabin, in the book by the bed~~ **Deck 9, the cabin being cleaned, in its book on the stripped bed** (swapped with 12, the user: that cabin has no window) | E. **Placed 2026-11-19** |
+| 11 | Hers | Diary notepad (brown leather, a strap with a brass buckle: the user) | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end). **Placed 2026-11-19** (the last seat, by the railing) |
+| 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the floor (`low`). **Placed 2026-11-19** |
 | 13 | His | Ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E, after the table scene (look-out 5 will be at the same rail) |
 | 14 | His | Sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults |
 | 15 | His | Handheld (black, four coloured buttons, no logo) | Deck 12, Champs, on a sofa | E |
@@ -289,6 +289,18 @@ of data and a generated picture shown first, each set against what is built at i
 | 17 | Book 11 | נערה במעיל כחול | The boat walkway's end, beyond the boat drill | E |
 | 20 | Book 14 | Pachinko | Deck 9 forward, the officers' corridor's end | E (look-out 4 will be at the same end) |
 
+- **Built so far (2026-11-19): 5, 6, 8, 10, 11 and 12 placed; and the user's "A and C" for every thing
+  to find and every key card:** (A) in the world a little bigger than life, each the shrink of (C) its
+  **close-up**, a detailed generated picture (about 100 px) shown in the middle of the screen at 2x over a
+  dim with a warm light behind it when she gets it, any key closes it (`world.closeup()`;
+  `assets/source/closeups/`, `tools/build_closeups.py`). The four already placed got theirs too (the tennis
+  ball, the feather and the flag a new world sprite from it; the wool a small picture of its own, its strand
+  over the basket's rim); the dog's owner's toss holds the new ball over her far hand. 26 generations.
+  **Waiting for the user: the locations of all ten, judged in play** (the links: `docs/start-links.md`, five
+  new places `store4`, `maid6`, `knit5`, `shore5`, `balcony7`); noted for that: the flag now stands 16 px
+  among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull) and 7 (the sardines),
+  his four (13 to 16) after the table scene, then 2.2 before the two books. The close-ups also as the HUD's
+  icons (2.4): to propose with it.
 - His four are not there before the table scene ("not lying there before it, not merely
   locked"). Nothing of the twenty flies to its count. Books 12 and 13 (rows 18 and 19) are paid
   by part 3's deliveries.

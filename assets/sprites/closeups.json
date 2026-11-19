@@ -1,0 +1,287 @@
+{
+ "frames": {
+  "ball": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 80
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 82,
+    "h": 80
+   },
+   "sourceSize": {
+    "w": 82,
+    "h": 80
+   }
+  },
+  "bookmark": {
+   "frame": {
+    "x": 84,
+    "y": 0,
+    "w": 94,
+    "h": 99
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 94,
+    "h": 99
+   },
+   "sourceSize": {
+    "w": 94,
+    "h": 99
+   }
+  },
+  "car": {
+   "frame": {
+    "x": 180,
+    "y": 0,
+    "w": 94,
+    "h": 59
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 94,
+    "h": 59
+   },
+   "sourceSize": {
+    "w": 94,
+    "h": 59
+   }
+  },
+  "diary": {
+   "frame": {
+    "x": 276,
+    "y": 0,
+    "w": 70,
+    "h": 120
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 70,
+    "h": 120
+   },
+   "sourceSize": {
+    "w": 70,
+    "h": 120
+   }
+  },
+  "feather": {
+   "frame": {
+    "x": 348,
+    "y": 0,
+    "w": 120,
+    "h": 39
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 120,
+    "h": 39
+   },
+   "sourceSize": {
+    "w": 120,
+    "h": 39
+   }
+  },
+  "flag": {
+   "frame": {
+    "x": 470,
+    "y": 0,
+    "w": 73,
+    "h": 110
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 73,
+    "h": 110
+   },
+   "sourceSize": {
+    "w": 73,
+    "h": 110
+   }
+  },
+  "card-deck": {
+   "frame": {
+    "x": 545,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 111
+   }
+  },
+  "card-ent": {
+   "frame": {
+    "x": 579,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 111
+   }
+  },
+  "card-hk": {
+   "frame": {
+    "x": 613,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 111
+   }
+  },
+  "card-off": {
+   "frame": {
+    "x": 647,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 111
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 111
+   }
+  },
+  "massage": {
+   "frame": {
+    "x": 681,
+    "y": 0,
+    "w": 93,
+    "h": 102
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 93,
+    "h": 102
+   },
+   "sourceSize": {
+    "w": 93,
+    "h": 102
+   }
+  },
+  "plant": {
+   "frame": {
+    "x": 776,
+    "y": 0,
+    "w": 46,
+    "h": 108
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 46,
+    "h": 108
+   },
+   "sourceSize": {
+    "w": 46,
+    "h": 108
+   }
+  },
+  "snack": {
+   "frame": {
+    "x": 824,
+    "y": 0,
+    "w": 109,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 109,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 109,
+    "h": 34
+   }
+  },
+  "wool": {
+   "frame": {
+    "x": 935,
+    "y": 0,
+    "w": 71,
+    "h": 76
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 71,
+    "h": 76
+   },
+   "sourceSize": {
+    "w": 71,
+    "h": 76
+   }
+  }
+ },
+ "meta": {
+  "image": "closeups.png"
+ }
+}

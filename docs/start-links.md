@@ -38,12 +38,15 @@ new one added there should be added here too.
 | `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all> |
 | `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all> |
 | `deck4-aft`: deck 4's corridor aft, just forward of the robot vacuum's round | <http://localhost:8000/?play&at=deck4-aft&cards=all> |
+| `store4`: deck 4, by the dry store's door (E in, the green card; Bumbot's snack tube on the bottom shelf, 5) | <http://localhost:8000/?play&at=store4&cards=all> |
 
 ## Deck 5
 
 | Place | Link |
 |---|---|
 | `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all> |
+| `knit5`: deck 5's forward corridor, aft of the knitting lady and her basket (the wool, 2) | <http://localhost:8000/?play&at=knit5> |
+| `shore5`: deck 5, forward of Shore excursions' desk (her flag among the little flags at its far end, 9) | <http://localhost:8000/?play&at=shore5> |
 | `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all> |
 
 ## Deck 6
@@ -55,6 +58,7 @@ new one added there should be added here too.
 | `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |
 | `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all> |
 | `light6`: deck 6, by the stage door, forward of the stage's swinging light (walk aft under it as it swings: 12a from in front of it, 12b at her back; it swings once near-catch 3 is done, `did=bb3`) | <http://localhost:8000/?play&at=light6&did=bb3> |
+| `maid6`: deck 6, by the maid's cabin's open door (E in; her plant on the windowsill, 12) | <http://localhost:8000/?play&at=maid6> |
 
 ## Deck 7
 
@@ -66,6 +70,7 @@ new one added there should be added here too.
 | `walkway`: outside, the boat walkway over the promenade, at the station locker | <http://localhost:8000/?play&at=walkway&cards=all> |
 | `chips7`: deck 7, at the casino's door, forward of the slot machines (run aft onto a spill of chips: 1) | <http://localhost:8000/?play&at=chips7> |
 | `drill7`: outside, on the boat walkway 5.5 m forward of the drill's boat (once it is hoisted again, run aft at it: 15) | <http://localhost:8000/?play&at=drill7&cards=all> |
+| `balcony7`: deck 7, the Stardust balcony near its far end (her diary on the last seat by the railing, 11) | <http://localhost:8000/?play&at=balcony7> |
 
 ## Deck 8
 

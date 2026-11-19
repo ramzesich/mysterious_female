@@ -3451,3 +3451,44 @@ while the building session worked.
 - **The checkpoint past deck 9's sprinkler:** closed by the design session's checkpoint audit (§7e, `8cd94f0`):
   the balcony cabin's lamp stood there in effect, and goes with part 10.
 - **Part 1 (§3) is done.** Next: part 2, §4 2.1, the other fourteen of the twenty things to find.
+
+## §4 2.1 begun: six things placed, and a close-up for every thing to find and every card (the user, 2026-11-19)
+
+- **Proposed and approved:** 2.1 in three batches, the ten picked up with E first, then 4 (the bell gull) and 7
+  (the sardines), the books 11 and 14 only after 2.2 (the game counts books to ten). Each spot shot in the game
+  first: the dry store's shelves, the gym's bench, Entourage past the ball pit, the maid's cabin (deck 6), the
+  Stardust balcony's last seat (the same mother with a doll sits in two seats side by side there: the user, "Leave
+  that for now"), the cabin being cleaned (deck 9).
+- **The cabin being cleaned is an inside cabin, no window:** the plant (12) and the bookmark (10) swapped (the
+  user): the plant on the maid's cabin's sill (deck 6, region 2), taken with E from the floor (`low` in the item's
+  data: a thing to find over 40 px up is otherwise hers only from up there or by a lob); the bookmark's book on
+  the deck 9 cabin's stripped bed (region 4). `docs/plan-three-uses.md` §4.1's rows changed with them.
+- **The user: "Can we use more fine-detailed visuals for the items in the game (keycards, collectables, books)?"**
+  I explained the limit (the world's pixel is 2 screen px; her 59 px sets the scale) and offered A, bigger than
+  life in the world; B, finer pixels in the world (advised against: pixels of two sizes); C, a close-up when she
+  gets one. **Chosen: A and C.** Of two looks for the moment (a soft warm light behind it, or a pale card), **the
+  warm light**.
+- **The art (26 generations):** six first pictures at 48 px (7 with a retry; the bookmark first came as a cat
+  sitting on the book), replaced by detailed ones at about 100 px once C was chosen; the car again ("beige with two
+  big rubbery cyan wheels": two tries, the side-on one taken, its wheels moved to the palette's brightest cyan by
+  hand); the diary again ("leather cover": two, the user took the brown one with a buckle over the tan one I
+  recommended for the red seat); the four placed things and the key card (one card, its stripe in each card's
+  colour). The world's sprites are the close-ups shrunk (majority colour; the plant's stem and the bookmark's
+  4 px cat head mended by hand). The user approved every close-up and the new world sprites but the wool's ("I
+  don't like both of the in-game versions"): shrunk, it was always a plain red blob; a small picture made for its
+  size, 10 px with its strand over the basket's rim, chosen of four in the basket.
+- **The tennis ball in the owner's toss:** its clip held the old ball in her hands (frames 4 and 5, let go at 6):
+  the new ball pasted in at the old one's middle, **over her far hand** in both frames, under her near hand (the
+  user, twice: frame 5 first, then frame 4).
+- **Built:** `assets/source/closeups/` (README with ids), `tools/build_closeups.py` to `assets/sprites/closeups.*`;
+  `FROM_CLOSEUP` in `tools/build_things.py` (the ball 10 px, the feather 9, the flag 16, the snack tube 6, the gun
+  16, the car 10, the diary 13; the old pictures in `things/tries/`); `world.closeup(frame)` from `take`,
+  `giveKeep` and `progression.open('cards')`, a cut, `scene.viewing` keeping every hit off her; the six items in
+  `ITEMS`; five start places (`store4`, `maid6`, `knit5`, `shore5`, `balcony7`). Playtests skip the moment
+  (`Browser(closeups=False)`).
+- **Checked:** in the running game, each of the nine taken with E (the feather from the shelf by `take`): kept,
+  the close-up up, she held, a key closes it, play again; the five places start clean; every built sprite equal
+  to the one approved. `boot`, `deck4`, `region1`, `region2`, `region3`, `region4`, `region6`, `golden` pass; the
+  rest not run.
+- **Waiting for the user (asked for the next session): the locations of all ten, judged in play.**
+

@@ -36,7 +36,13 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # feather on a stick, her little flag of Ukraine on its stand.
          # (The tennis ball 8 px and its outline, bigger than life so that it reads: the user chose it
          # from six, 2026-11-17, `SEAM`.)
-         "tennis-ball": 8, "wool": 6, "flag-ua": 13,
+         # (Since 2026-11-19 each made from its close-up, `FROM_CLOSEUP`, a little bigger than life: the
+         # user, "A and C". The wool: a small picture of its own, its strand over the basket's rim.)
+         "tennis-ball": 10, "wool": 10, "flag-ua": 16,
+         # §4 2.1's things to find, each its close-up shrunk (the user approved each in place): Bumbot's
+         # snack tube, massage gun and remote-controlled car; her diary. (Her bookmark in its book and
+         # her plant are kept finished, mended by hand: the bookmark's cat head, the plant's stem.)
+         "snack-tube": 6, "massage-gun": 16, "rc-car": 10, "diary": 13,
          # The breakfast round's tray, carried in both hands (the tray a hand's width).
          "breakfast-tray": 12,
          # Steps 1 to 4's pictures drawn in code, generated instead (the art rule looked back over,
@@ -46,10 +52,16 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # out; the heart her cry shows. (`icon-mute`, the quiet place's sign, is kept at its size.)
          "flag-se": 13, "flag-fi": 13, "flag-ee": 13, "flag-dk": 13,
          "wall-shelf": 5, "knit-basket": 9, "door-hand": 4, "icon-heart": 14,
-         # (The laundry cart is kept at its size: its rows cut, not shrunk, and its rim mended; the
-         # feather toy is a teaser lying on the shelf now, its handle made purple to stand out from the
-         # shelf's wood: `assets/source/things/tries/README.md`.)
-         "feather-toy": 12}
+         # (The laundry cart is kept at its size: its rows cut, not shrunk, and its rim mended. The
+         # feather toy is its close-up shrunk since 2026-11-19; the purple-handled one before it is
+         # `tries/feather-toy-purple.png`.)
+         "feather-toy": 9}
+
+# The things to find drawn in the world from their close-ups (assets/source/closeups/, the user's "A and
+# C", 2026-11-19): the world's sprite is the close-up shrunk, so the two are one picture.
+CLOSEUPS = SRC.parent / "closeups"
+FROM_CLOSEUP = {"tennis-ball": "ball", "feather-toy": "feather", "flag-ua": "flag", "snack-tube": "snack",
+                "massage-gun": "massage", "rc-car": "car", "diary": "diary"}
 
 # Generated, paid for, and not used: the folded newspaper came drawn tilted, a smudge at the 3 px
 # of a paper on the carpet; the paper round's papers are drawn in code (the user, 2026-11-16).
@@ -70,6 +82,8 @@ RECOLOUR = {
                        "fdcbb0": "ffffff", "9babb2": "ffffff"},
     # Sweden's blue and yellow came out a dull violet and an olive on the palette.
     "flag-se": {"484a77": "4d65b4", "8fd3ff": "4d65b4", "d5e04b": "f9c22b", "a2a947": "f9c22b"},
+    # The car's two rubbery wheels came a dull teal on the palette: its brightest cyans (the user: "cyan").
+    "rc-car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
 }
 # Rows taken out of a piece (its own rows, top to bottom, after trimming) rather than shrinking it,
 # which would blur its stripes: the old lady's parasol came as long as she is tall, open and furled.
@@ -82,7 +96,8 @@ CROP = {}
 # Shrunk by the colour that covers most of each new pixel, not by averaging: a little flag's cloth
 # averaged with its dark outline came out dull (the Ukrainian flag had too, in the game since
 # step 4): the four other desk flags and hers (the art rule looked back over, 2026-11-17).
-BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-toy"}
+BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-toy", "wool", "snack-tube",
+               "massage-gun", "rc-car", "diary"}
 # Shrunk keeping a thin white line that reads it, then outlined: the tennis ball's seam (by majority
 # it was lost, a plain yellow dot; the user: "has to look like a tennis ball", and chose an olive
 # outline, 2026-11-17). name -> the outline's colour.
@@ -148,9 +163,11 @@ def majority_shrink(img, w, h):
     return out
 
 
-def piece(path):
+def piece(path, name=None):
+    name = name or path.stem
     img = Image.open(path).convert("RGBA")
     img = img.crop(img.getbbox())
+    path = Path(name + ".png")       # (the options below go by the thing's name, wherever its picture is)
     if path.stem in CROP:
         img = img.crop(CROP[path.stem])
         img = img.crop(img.getbbox())
@@ -191,11 +208,17 @@ def piece(path):
                 r, g, b, a = px[x, y]
                 if a and (r, g, b) in swaps:
                     px[x, y] = swaps[(r, g, b)] + (a,)
+    # (A shrunk close-up can leave an empty row or column at its edge: trimmed, or it would stand a px
+    # off what holds it.)
+    if name in FROM_CLOSEUP:
+        img = img.crop(img.getbbox())
     return img
 
 
 def build():
     pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP]
+    pieces += [(name, piece(CLOSEUPS / f"{src}.png", name)) for name, src in FROM_CLOSEUP.items()]
+    pieces.sort(key=lambda t: t[0])
     width = sum(im.width + 2 for _, im in pieces)
     height = max(im.height for _, im in pieces)
     sheet = Image.new("RGBA", (width, height), (0, 0, 0, 0))

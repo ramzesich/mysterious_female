@@ -498,9 +498,9 @@ with what she has, and with twenty things to find.
 | 7 | Bumbot | A tin of sardines | The Sushi Bar | The chef's bubble shows a tangerine; he takes one for it | |
 | 8 | Bumbot | A small remote-controlled car (his toy) | Deck 7, Entourage, past the ball pit | E | Region 9 |
 | 9 | Hers | A small flag of Ukraine on a stand | Deck 5, Shore excursions, among the little flags at the desk's far end (about 146 m) | E | Region 1 |
-| 10 | Hers | A bookmark with a cat on its top | Deck 6, the maid's cabin, in the book by the bed | E | Region 2 |
+| 10 | Hers | A bookmark with a cat on its top | Deck 9, the cabin being cleaned, in its book on the bed (swapped with 12, the user, 2026-11-19) | E | Region 4 |
 | 11 | Hers | A diary notepad | Deck 7, the Stardust balcony's far end, on a seat | E | Region 3 |
-| 12 | Hers | A small plant in a pot | Deck 9, the cabin being cleaned, on its windowsill | E | Region 4 |
+| 12 | Hers | A small plant in a pot | Deck 6, the maid's cabin, on its windowsill (swapped with 10: the deck 9 cabin has no window) | E from the floor | Region 2 |
 | 13 | His | His ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E | After the table scene |
 | 14 | His | His meditation and sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults | Region 7 |
 | 15 | His | His handheld (an Asus ROG Xbox Ally X: black, rounded grips, four coloured buttons; no logo) | Deck 12, Champs, on a sofa | E | Region 8 |

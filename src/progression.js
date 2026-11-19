@@ -274,6 +274,8 @@ export class Progression {
         this.save[list].push(value);
         writeSave(this.save);
         this.refresh();
+        // A card she gets, from a table or from someone's hand: seen close (`world.closeup`).
+        if (list === 'cards') this.scene.world?.closeup(`card-${value}`);
     }
 
     setFlag(name) {

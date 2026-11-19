@@ -178,6 +178,20 @@ ITEMS = {
     "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
     "keep_wool": (5, 24.2, "keep:cat:wool", None, 7, "thing:wool"),                    # in the knitter's basket
     "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
+    # §4 2.1 (2026-11-19), each with its close-up (assets/source/closeups/), placed for the user to judge in
+    # play: Bumbot's snack tube on the dry store's bottom shelf, beside its tangerines (the green card);
+    # his massage gun on the gym's bench, under the barbell; his car on Entourage's floor past the ball
+    # pit, between the foosball and the pool tables.
+    "keep_snack": ("store", 173, "keep:cat:snack", None, 40, "thing:snack-tube"),
+    "keep_massage": (11, 99.08, "keep:cat:massage", None, 18, "thing:massage-gun"),
+    "keep_car": (7, 56.25, "keep:cat:car", None, 0, "thing:rc-car"),
+    # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
+    # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
+    # an inside one with no window (the user); the sill is reached with E from the floor (`low`). Her diary
+    # on the Stardust balcony's last seat, by the railing over the stage.
+    "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 22, "thing:bookmark-book"),
+    "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"low": True}),
+    "keep_diary": (7, 242.06, "keep:her:diary", None, 23, "thing:diary"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).

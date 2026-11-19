@@ -71,6 +71,8 @@ export class BootScene extends Phaser.Scene {
         // The plan's own things (the delivery robot, the gulls: tools/build_things.py), and the ten
         // books' pages (tools/draw_pages.py).
         this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
+        // Each thing to find and each key card seen close, shown when she gets it (tools/build_closeups.py).
+        this.load.atlas('closeups', 'assets/sprites/closeups.png', 'assets/sprites/closeups.json');
         for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
