@@ -66,7 +66,7 @@ MUTE = 0.35
 # A lighter wash, "<name>-lt", for the theatre's stage and seats (the user, 2026-11-19: "They are washed out too
 # much ... let's wash out them only slightly"): only the pieces in LIGHT get one.
 MUTE_LIGHT = 0.12
-LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack"} | {f"audience-{k}" for k in range(10)}
+LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
 
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's

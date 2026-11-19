@@ -3241,3 +3241,34 @@ last column, §3, §4.4, step 6, the risks, the user's answers; `GAME_DESIGN.md`
 implemented: add a step for their update after 14a/14b"), what it changes in the code, the tests and the documents; 1.3's
 `mishaps` playtest, 3.2's deliveries, U16, and §12's closed list. No art; about half a day to build, about what the
 `mishaps` playtest saves by losing its "with a tangerine" half, so the date does not move.
+
+## 14a and 14b, and the court's two players (2026-11-19)
+
+`docs/plan-the-rest.md` §3 1.2. **14a**, a basketball in her face: stiff as a skittle she tips over backward onto her
+back; **14b**, on the back of her head: stiff as a plank she topples forward onto her face. One clip from her stand and
+one from each quarter of her run (PixMiniMax pinned to her lying flat), then lying so with her dazed lie's butterflies
+over her head, then her checkpoint (`jogGag`, now with `meta` and `lie`). The ball bounces off her and rolls back.
+
+- **Her lying picture redrawn.** Her standing frame turned a quarter touched the floor only with her hair (14a) or her
+  chest (14b): "she should be on the ground, not float above it". Set straight along a line under her, it "appears to
+  be at an angle" (her standing frame's head tips forward, so on her back her head stayed up). An edit of it, lying
+  flat on her back, and the clips made again to it; 14b the same, the user choosing the face-down redraw over the old.
+- **Her red scarf under her face on the floor** read as blood in 14b's landing frames: recoloured there.
+- **The ball no longer rolls back to the cage's foot** (the user): it stops; then, on the user's word, **the court's two
+  players**: a man in red and a woman in blue (pro characters in the cast's style, 12% washed like the theatre's people),
+  each 1.6 m (was 2.2) in front of their own hoop, where the ball comes to rest. A round of 5 s (was 4), the two half a
+  round apart, never in step: the jump shot (its wind-up is the tell; the rim's rattle is gone), the game's ball from
+  the hand up, in front of the board and down through the net (behind the hoop's picture only in the ring), bouncing
+  twice to their feet; they pick it up, dribble once, shoot again. The waiting plays at 4 frames a second (the user:
+  slower). Everything is a function of the round's clock (`frame(t)`, `at(t)`), so it steps and seeks exactly.
+- **Seamless hand-overs.** The clip's ball is in the hand until frame 8, the game's starts at frame 7's spot; lying, the
+  ball is the game's until the hands take it (frame 3 of the pick-up), the clip's lying ball cut out before. The washed
+  ball in their hands and the game's full one turn into each other over 0.2 s (`basketball-lt`, the theatre's light
+  wash added for it).
+- **It hits her from the throw to its second landing** (the user): the flight, the drop, the first hop; not the second
+  hop, the roll or a ball lying still. Off her (a hit) or headed in a lunge, it comes down and rolls to its player's feet,
+  and the pick-up waits for it.
+- **Tests:** `region8` checks 14a (none on her, facing the hoop: her back clip, then the lying loop) and gives her
+  tangerines back after; its funnel stairway check holds the gulls off (by the clock's new phase one dived at her
+  there). `region8`, `boot`, `throw` pass; the rest not run.
+- **Generations:** 35 for 14a and 14b (the first ten falls unused), 38 for the players.

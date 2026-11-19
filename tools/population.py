@@ -793,7 +793,9 @@ LADY = dict(deck=12, m=128.5, half=30, tall=36, rival=134.75, card=134.0)
 # Basketballs out of the sports court (`haz_balls`): id: (deck, the hoop (m), the way the ball
 # bounces: 1 aft, how far (m), every s, offset s). It comes off the rim (the tell), bounces twice
 # along the walk and rolls back: "Bonked".
-BALLS = {"haz_balls_a": (12, 146.9, 1, 2.2, 4.0, 0.0), "haz_balls_b": (12, 154.4, -1, 2.2, 4.0, 2.0)}
+# (Since 2026-11-19 each hoop has its player, who shoots at it and picks the ball up where it lies, at their feet: a
+# round of 5 s, the two half a round apart, never in step (the user); 1.6 m, so the two stand apart.)
+BALLS = {"haz_balls_a": (12, 146.9, 1, 1.6, 5.0, 0.0), "haz_balls_b": (12, 154.4, -1, 1.6, 5.0, 2.5)}
 # The court's quirk (`sec_court`): a ball lying at the court's side (m); E: she shoots at the hoop (m).
 COURT = dict(deck=12, ball=150.65, hoop=154.4)
 # Teppanyaki's flares (`haz_flare`): id: (deck, the grill (m), half the flame's reach (m), every s,

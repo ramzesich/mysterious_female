@@ -4964,7 +4964,8 @@ export class ShipScene extends Phaser.Scene {
     // to scratch the back of his head, sorry (his `sorry` clip, then `scratch` until her checkpoint); in 9a
     // he runs on. Where she ends dizzy (`dazed`), her own dazed clip takes over from the clip's last frame
     // (its first frame). 9d: 8d's bounce off his back (`cartGag`'s picture), and he never notices. The stage's
-    // light plays 9a's and 9c's (12a, 12b): no one with it (`q` null), on the floor she stands on.
+    // light plays 9a's and 9c's (12a, 12b): no one with it (`q` null), on the floor she stands on. The court's
+    // basketballs (14a, 14b) the same way, with their own clips (`meta: 'ball'`) and a lying loop after them (`lie`).
     jogGag(sc, q) {
         const p = this.player, g = GAGS[sc.gag], pe = this.world.people, face = p.flipX ? -1 : 1;
         const m = this.cache.json.get('gags-meta');
@@ -4988,8 +4989,10 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         // (Not running, or landed from a jump: the spin from her standing frame.)
-        const clip = g.clips ? `${g.clips}${n >= 0 ? (n % 2 ? n : (n + 1) % 8) : '-stand'}` : g.clip;
-        const [x0, x1] = g.at ? m.jog[g.at] : [m.jog.x, m.jog.x];
+        const tag = n >= 0 ? (n % 2 ? n : (n + 1) % 8) : '-stand';
+        const clip = g.clips ? `${g.clips}${tag}` : g.clip;
+        const mm = m[g.meta ?? 'jog'];
+        const [x0, x1] = g.at ? mm[g.at] : [mm.x, mm.x];
         // (A frame anchored at column c, flipped, takes origin (cell - 1 - c) / cell.)
         const ox = (face < 0 ? m.cell - 1 - x0 : x0) / m.cell;
         const s = this.add.sprite(p.x, q ? q.y : p.y, 'gags').setOrigin(ox, m.floor / m.cell).setFlipX(face < 0).setDepth(p.depth);
@@ -5024,6 +5027,11 @@ export class ShipScene extends Phaser.Scene {
         };
         s.play(clip);
         s.once(`animationcomplete-${clip}`, () => {
+            // (14a, 14b: lying where the clip ends, the butterflies circling; a run's clip ends further on.)
+            if (g.lie) {
+                s.x += face * mm.dx[g.at][tag];
+                s.play(g.lie);
+            }
             if (g.dazed && this.anims.exists(`her-dazed-${g.dazed}`)) {
                 // Her own dazed clip from where the clip ends (its last frame is that clip's first).
                 s.setVisible(false);

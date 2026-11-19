@@ -2543,7 +2543,10 @@ Nothing blocks the start of the build. These get settled along the way:
       stronger.** **Done (2026-11-19): the jogger's four gags, 9a to 9d** (spun like a top; bowled back; shoved onto her belly; the
       bounce off his back; he scratches the back of his head, sorry). 11a/11b: the wet gag covers them (the user). **Done (2026-11-19):
       12a/12b** (the jogger's spin and belly-flop), the stage light and the stage manager swapped, the open trap door drawn.
-      **Next: `docs/plan-the-rest.md` §3 1.2's 14a/14b** (the basketballs), then 15; part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+      **Done (2026-11-19): 14a/14b** (stiff as a skittle onto her back, as a plank onto her face) and **the court's two
+      players**, who shoot the balls through their rings and pick them up at their feet.
+      **Next: `docs/plan-the-rest.md` §3 step 1.2a** (a hit is its gag whatever she carries; the design session's, 2026-11-19),
+      then 15; part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

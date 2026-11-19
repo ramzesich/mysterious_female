@@ -742,7 +742,10 @@ the 11-12 flight (the painter, "WET PAINT").
 | 140 | `amb_sunbathers` | Two on loungers | | |
 
 **Sports 146-164.** 148-160 the court's cage; `haz_balls` at 150 and 158: `timed(4, 2, 2 m out)`
-alternating, a basketball bounces out, twice, and rolls back: "Bonked"; 161-164 shuffleboard,
+alternating, a basketball bounces out, twice, and rolls back: "Bonked" (**since 2026-11-19**, the user: each hoop
+has its player, a man in red at 146.9 m's and a woman in blue at 154.4 m's, standing 1.6 m out where the ball comes
+to rest, lightly washed: a jump shot through the ring every 5 s, half a round apart, the ball bouncing back to
+their feet, picked up, a dribble; "Bonked" from the throw to its second landing; 14a and 14b); 161-164 shuffleboard,
 `amb_shuffle` two players; `sec_court` (`quirk(E)` at the court's gate with a ball lying there: she
 scores).
 

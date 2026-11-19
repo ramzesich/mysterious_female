@@ -4220,10 +4220,21 @@ def scenario_region8(b):
     b.shot("region8-lady-doze")
     # The court: a ball off the rim; her own shot.
     bl = b.eval(f"{T}.balls[0]")
+    # (With none on her, 14a: facing the hoop the ball comes off, stiff as a skittle onto her back, and lying so.)
+    had = b.eval("window.__ship.save.tangerines")
+    b.eval("window.__ship.save.tangerines = 0; window.__ship.refreshHud()")
     b.teleport(bl["x"] + 80, D12)
+    b.eval("window.__ship.player.setFlipX(true)")
     got = scared(b, "Ouch", 9.0)
     ok &= check(got, "in the way of a ball off the hoop: bonked")
-    wait(3.0)
+    GK = "(window.__ship.worldLayer.list.find(o => o.anims?.currentAnim?.key.startsWith('gags-ball')))?.anims.currentAnim.key"
+    first = b.eval(GK)
+    wait_js(b, GK + " === 'gags-ball-back-lie'", 2.0)
+    ok &= check(first and first.startswith("gags-ball-back") and b.eval(GK) == "gags-ball-back-lie",
+                "a ball in her face, none on her: she topples onto her back, and lies there dazed (14a)", (first, b.eval(GK)))
+    wait_js(b, "window.__ship.mode === 'play'", 5.0)
+    b.eval(f"window.__ship.save.tangerines = {had}; window.__ship.refreshHud()")
+    wait(0.5)
     c = b.eval(f"{T}.court")
     b.teleport(c["ballX"] - 6, D12)
     wait(0.3)
@@ -4232,7 +4243,9 @@ def scenario_region8(b):
     b.shot("region8-court")
     wait(3.2)
     ok &= check("sec_court" in save_list(b, "seen") and b.state()["mode"] == "play", "E at the ball by the court: she shoots", save_list(b, "seen")[-3:])
-    # The funnel's stairway: no climbing in a gust.
+    # The funnel's stairway: no climbing in a gust. (Its gulls held off meanwhile: by the clock's phase one could
+    # dive at her on the stairway; their own check is below.)
+    b.eval(f"{W}.story.funnelWind.nextAt = 1e12")
     fn = b.eval(f"{W}.data.funnel")
     G = f"{W}.story.funnelGusts.phase({NOW})"
     b.teleport(fn["foot"][0], fn["foot"][1])

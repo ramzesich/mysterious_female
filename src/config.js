@@ -290,8 +290,8 @@ export const MISHAP_SCENES = {
     '12b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly', gag: 'lightShoved' },  // at her back: 9c's stumble and belly-flop
     '13a': { word: 'bonked', react: 'rubnose', toss: 'back', down: 'sit', gag: 'door' },  // a door in her face: flat on the wall (`SwingDoor.ride`)
     '13b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },     // it catches her past it
-    '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit' },        // a basketball
-    '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly' },
+    '14a': { word: 'bonked', react: 'reel', toss: 'back', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
+    '14b': { word: 'bonked', react: 'stumble', toss: 'on', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
     '15': { word: 'bumped', react: 'duck', toss: 'drop', down: 'sit' },         // the drill's boat
     '16': { word: 'drenched', react: 'shiver', toss: 'drop', gag: 'sprinkler', pocket: false },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
     '17': { word: 'fogged', react: 'splutter', toss: 'drop', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
@@ -352,6 +352,10 @@ export const GAGS = {
     // The stage's light (12a, 12b; the user, 2026-11-19: reuse the jogger's): 9a's spin, 9c's belly-flop.
     lightSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700 },
     lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700 },
+    // The court's basketballs (14a, 14b; plan-the-rest §3 1.2): stiff as a plank onto her back or her face, from
+    // her stand or her run's quarter, then lying so with the butterflies (`lie`, set on by `ball.dx`).
+    ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700 },
+    ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700 },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head

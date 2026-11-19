@@ -69,6 +69,12 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
   jog-shoved    9c: he runs into her back: she pitches forward, stumbles bent over, dives and lands flat on her
                 belly (her dazed lie's first frame, the last frame 2 px lower as the game draws her lying); her middle
                 at x 36, at the end 86 (`jog.shove`)
+  ball-back*, ball-front*   14a, 14b: a basketball in her face or on the back of her head: stiff as a plank she tips
+                over backward onto her back (14a) or forward onto her face (14b), from her standing frame (`-stand`) or
+                her run frame 1, 3, 5 or 7, PixMiniMax pinned to a redrawn picture of her lying flat
+                (`starts/ball14/`, its README); `-lie`: lying so, her dazed lie's butterflies over her head (a loop).
+                Her middle at x 92 (14a) or 36 (14b) (`ball.back`, `ball.front`); a run's clip ends further on, and
+                the lying loop is set `ball.dx[way][clip]` on
   dnd-tiptoe    23: off on tiptoe, her hands over her eyes, two tiny steps (a loop; frame 0 = cover's 8;
                 `dnd-sorry/tiptoe/`, cut by `dnd-sorry/cut.py`). Both: her middle at x 64 (`dnd.x`)
 
@@ -91,6 +97,8 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
          ("parasol-flip", 9), ("dnd-cover", 9), ("dnd-tiptoe", 9), ("jog-bowled", 13),
          ("jog-spin1", 11), ("jog-spin3", 12), ("jog-spin5", 12), ("jog-spin7", 12), ("jog-shoved", 17), ("jog-spin-stand", 13)]
+CLIPS += [(f"ball-{w}{n}", 9) for w in ("back", "front") for n in ("-stand", "1", "3", "5", "7")]
+CLIPS += [("ball-back-lie", 5), ("ball-front-lie", 5)]
 # (Gags 7a's and 21's to 23's frames are cut from the generator's in a folder of their own.)
 PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
         "parasol-flip": "parasol-flip/flip", "dnd-cover": "dnd-sorry/cover", "dnd-tiptoe": "dnd-sorry/tiptoe",
@@ -154,7 +162,8 @@ def main():
             "stairs": {"corner": [48, 64], "foot": [50, 100]},
             "parasol": {"feet": [56, 112]},
             "dnd": {"x": 64},
-            "jog": {"x": 84, "spin": [72, 64], "shove": [36, 86]}}
+            "jog": {"x": 84, "spin": [72, 64], "shove": [36, 86]},
+            "ball": {"back": [92, 92], "front": [36, 36], "dx": {"back": {"-stand": 0, "1": 1, "3": 5, "5": 13, "7": 7}, "front": {"-stand": 0, "1": 8, "3": 12, "5": 20, "7": 14}}}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

@@ -106,9 +106,15 @@ export class OldLady {
     }
 }
 
-// Basketballs out of the sports court (population: `haz_balls`): every few seconds one comes off a
-// hoop's rim (the rattle is the tell), bounces twice along the walk and rolls back: "Bonked". The
-// two hoops take turns.
+// Basketballs on the sports court (population: `haz_balls`), each hoop's own player shooting at it (the user,
+// 2026-11-19: "place two different basketball players on either side ... and make them throw the balls through their
+// respective rings"; `tools/build_court.py`). A round of `period` s, the two hoops half a round apart: the jump shot
+// (its wind-up is the tell), the ball from the hand up through the ring, down, bouncing twice along the walk toward
+// its player and lying at their feet ("Bonked" from the throw until it lands the second time); they pick it up (the ball the game's until
+// their hands take it), dribble, and shoot again. Everything is a function of the round's clock. The ball in their
+// hands is washed as they are: the game's ball turns to and from its washed picture at the hand-overs.
+const SHOT_FPS = 12, IDLE_FPS = 4, PICK_FPS = 10, DRIB_FPS = 10;
+const FLIGHT = 0.6, DROP = 0.26, PICK = 3.2;
 export class Balls {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -116,10 +122,31 @@ export class Balls {
         this.scene = s;
         this.def = def;             // { x: the hoop, y, dir, reach, period, offset }
         this.rim = { x: def.x + def.dir * 24, y: def.y - 93 };
+        this.x0 = this.rim.x + def.dir * 8;
+        this.restX = this.x0 + def.dir * def.reach;
+        // The player: facing the hoop, the ball lying at their toes at the rest spot.
+        const m = s.cache.json.get('court-meta');
+        this.m = m;
+        this.who = def.dir > 0 ? 'man' : 'woman';
+        this.face = -def.dir;
+        const rc = m.ball[this.who].rest[0];
+        this.player = s.add.sprite(this.restX, def.y, 'court', m.anims[this.who].shoot[0])
+            .setOrigin((this.face < 0 ? m.cell - 1 - rc : rc) / m.cell, (m.feet + 1) / m.cell)
+            .setFlipX(this.face < 0).setDepth(D.props + 0.03);
+        const [cx, cy] = m.ball[this.who].release;
+        this.release = { x: this.restX + this.face * (cx - rc), y: def.y - 1 - (m.feet - cy) };
+        this.tR = (m.release - 1) / SHOT_FPS;
         this.ball = s.add.image(this.rim.x, this.rim.y, 'shipart', 'basketball').setDepth(D.player + 0.03).setVisible(false);
+        this.ballLt = s.add.image(this.rim.x, this.rim.y, 'shipart', 'basketball-lt').setDepth(D.player + 0.031).setVisible(false);
         this.shadow = s.add.ellipse(this.rim.x, def.y - 1, 10, 3, 0x2e222f, 0.4).setDepth(D.props + 0.01).setVisible(false);
-        world.add([this.ball, this.shadow]);
+        world.add([this.player, this.ball, this.ballLt, this.shadow]);
+        // (Through the ring: behind the hoop's own picture, its rim's front and net drawn over it.)
+        const hoop = [...s.children.list, ...(s.worldLayer?.list ?? [])]
+            .find(o => o.frame?.name?.startsWith?.('basketball-hoop') && Math.abs(o.x - def.x) < 48 && Math.abs(o.y - def.y) < 160);
+        this.behind = hoop ? hoop.depth - 0.001 : D.props;
         this.hitAt = 0;
+        this.turn = null;
+        this.sounded = {};      // (not `heard`: every mover's `heard()` answers her cry)
     }
 
     // A lobbed tangerine coming down through the rim: it scores, a cheer, and it comes down again
@@ -135,79 +162,148 @@ export class Balls {
         return false;
     }
 
-    // In a lunge she meets the ball: headed back onto the court, over the cage.
+    // In a lunge she meets the ball: headed up and over, it comes down at its player's feet.
     lunged(kind, fromX) {
         const s = this.scene, d = this.def;
-        if (kind !== 'ball' || !this.ball.visible || Math.abs(this.ball.x - fromX) > 12) return false;
-        this.headed = Math.floor((s.time.now / 1000 + d.offset) / d.period);
-        const b = s.add.image(this.ball.x, this.ball.y, 'shipart', 'basketball').setDepth(this.ball.depth);
-        this.world.add([b]);
-        sfx.at(b.x, b.y).bounce();
-        s.tweens.add({ targets: b, x: this.rim.x, duration: 700, ease: 'Sine.easeOut' });
-        s.tweens.add({ targets: b, y: this.rim.y - 30, duration: 350, ease: 'Quad.easeOut', yoyo: true, onComplete: () => b.destroy() });
+        if (kind !== 'ball' || !this.ball.visible || !this.turn || this.turn.off || Math.abs(this.ball.x - fromX) > 12) return false;
+        sfx.at(this.ball.x, this.ball.y).bounce();
+        this.away('headed', s.time.now, this.ball.x, d.y - 5 - this.ball.y, 0, false);
         return true;
     }
 
-    // Where the ball is `t` s into its turn: { x, y: px over the floor, a: alpha } or null.
+    // The ball sent off its way (off her in a hit, or headed in a lunge), back at its player's feet by the pick-up.
+    away(kind, time, x, h, dir, front) {
+        const T = this.turn, P = this.def.period;
+        const at = this.clock(time);
+        const o = { kind, at, x, h, dir, front };
+        if (kind === 'rebound') {
+            o.land = x + dir * 60;
+            o.rest = Math.min(at + 0.6 + Math.abs(this.restX - o.land) / 120, P - 1.1);
+        } else o.rest = Math.min(at + 0.7, P - 1.1);
+        T.off = o;
+        T.pickAt = Math.max(PICK, o.rest + 0.15);
+    }
+
+    clock(time) {
+        return (time / 1000 + this.def.offset) % this.def.period;
+    }
+
+    // Where the ball is `t` s into the round: { x, h: px over the floor, lt: how washed (0 to 1), behind, hits,
+    // rest } or null while it is in the player's hands.
     at(t) {
-        const d = this.def, x0 = this.rim.x + d.dir * 8, R = d.reach * d.dir, drop = d.y - this.rim.y - 5;
-        if (t < 0.5) return { x: this.rim.x + Math.sin(t * 40) * 2, y: drop + 4, a: 1, tell: true };
-        t -= 0.5;
-        if (t < 0.42) return { x: this.rim.x + d.dir * 8 * (t / 0.42), y: drop * (1 - (t / 0.42) ** 2), a: 1 };
-        t -= 0.42;
-        const hop = (t0, len, h, xa, xb) => {
-            const k = (t - t0) / len;
-            return { x: x0 + R * (xa + (xb - xa) * k), y: 4 * h * k * (1 - k), a: 1 };
-        };
-        if (t < 0.56) return hop(0, 0.56, 44, 0, 0.5);
-        if (t < 0.98) return hop(0.56, 0.42, 22, 0.5, 0.82);
-        if (t < 1.4) return { x: x0 + R * (0.82 + 0.18 * ((t - 0.98) / 0.42)), y: 0, a: 1 };
-        if (t < 1.7) return { x: x0 + R, y: 0, a: 1 };
-        // Back to the cage's foot, and in under its net.
-        if (t < 2.7) {
-            const k = (t - 1.7) / 1.0;
-            return { x: x0 + R * (1 - k), y: 0, a: k > 0.8 ? (1 - k) * 5 : 1, back: true };
+        const d = this.def, T = this.turn, grab = T.pickAt + (this.m.grab - 1) / PICK_FPS;
+        if (t >= grab) return null;
+        const washed = Math.max(0, Math.min(1, (t - (grab - 0.2)) / 0.2));
+        const o = T.off;
+        if (o && t >= o.at) {
+            const k = t - o.at;
+            if (o.kind === 'rebound') {
+                if (k < 0.6) {
+                    const u = k / 0.6;
+                    return { x: o.x + (o.land - o.x) * u, h: o.h * (1 - u) + 4 * (o.front ? 30 : 40) * u * (1 - u), lt: 0 };
+                }
+                const u = Math.min(1, (t - o.at - 0.6) / Math.max(0.01, o.rest - o.at - 0.6));
+                return { x: o.land + (this.restX - o.land) * u, h: 0, lt: washed, rest: u >= 1 };
+            }
+            const u = Math.min(1, k / Math.max(0.01, o.rest - o.at));
+            return { x: o.x + (this.restX - o.x) * u, h: o.h * (1 - u) + 4 * 34 * u * (1 - u), lt: washed, rest: u >= 1 };
         }
-        return null;
+        if (t < this.tR) return null;
+        let k = t - this.tR;
+        const drop = d.y - this.rim.y - 5, from = { x: this.release.x, h: d.y - 5 - this.release.y };
+        if (k < FLIGHT) {
+            // Up from the hand and down into the ring.
+            const u = k / FLIGHT, peak = drop + 30;
+            const h = u < 0.6 ? from.h + (peak - from.h) * (1 - (1 - u / 0.6) ** 2) : peak + (drop - peak) * ((u - 0.6) / 0.4) ** 2;
+            return { x: from.x + (this.rim.x - from.x) * u, h, lt: Math.max(0, 1 - k / 0.2), hits: true };
+        }
+        k -= FLIGHT;
+        // (Down through the net at the speed it came down into the ring (its flight's last 0.4 a parabola of 30 px),
+        // falling faster, onto the walk.)
+        const v = 2 * 30 / (0.4 * FLIGHT), g = 2 * (drop - v * DROP) / DROP ** 2;
+        if (k < DROP) {
+            const h = Math.max(0, drop - v * k - g * k * k / 2);
+            return { x: this.rim.x + d.dir * 8 * (k / DROP), h, lt: 0, hits: true };
+        }
+        k -= DROP;
+        const R = this.restX - this.x0;
+        // (It hits her from the throw until it comes down on the walk the second time (the user, 2026-11-19): its first
+        // hop, not the second or its roll.)
+        const hop = (t0, len, hh, xa, xb, hits) => {
+            const v = (k - t0) / len;
+            return { x: this.x0 + R * (xa + (xb - xa) * v), h: 4 * hh * v * (1 - v), lt: 0, hits };
+        };
+        if (k < 0.56) return hop(0, 0.56, 44, 0, 0.5, true);
+        if (k < 0.98) return hop(0.56, 0.42, 22, 0.5, 0.82, false);
+        if (k < 1.4) return { x: this.x0 + R * (0.82 + 0.18 * ((k - 0.98) / 0.42)), h: 0, lt: washed };
+        return { x: this.restX, h: 0, lt: washed, rest: true };
+    }
+
+    // The player's frame `t` s into the round.
+    frame(t) {
+        const A = this.m.anims[this.who], P = this.def.period, pk = this.turn.pickAt;
+        if (t < 12 / SHOT_FPS) return A.shoot[1 + Math.floor(t * SHOT_FPS)];
+        if (t < pk) return A.idle[Math.floor((t - 12 / SHOT_FPS) * IDLE_FPS) % 4];
+        if (t < pk + 0.8) return A.pick[1 + Math.floor((t - pk) * PICK_FPS)];
+        if (t < pk + 1.6 && pk + 1.6 <= P) return A.dribble[1 + Math.floor((t - pk - 0.8) * DRIB_FPS)];
+        return A.shoot[0];
+    }
+
+    // A sound once a round, at its moment.
+    once(key, t, at, play) {
+        const n = this.turn.n;
+        if (t >= at && this.sounded[key] !== n) {
+            this.sounded[key] = n;
+            play();
+        }
     }
 
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player;
         if (!near(s, d.x, d.y, 700, 200) || !onDeck(s, d.y)) {
             this.ball.setVisible(false);
+            this.ballLt.setVisible(false);
             this.shadow.setVisible(false);
             return;
         }
-        const t = ((time / 1000 + d.offset) % d.period);
+        const t = this.clock(time), n = Math.floor((time / 1000 + d.offset) / d.period);
+        if (this.turn?.n !== n) this.turn = { n, pickAt: PICK, off: null };
+        this.player.setFrame(this.frame(t));
         const q = this.at(t);
-        // (Headed back onto the court in a lunge: this turn's ball is gone.)
-        if (Math.floor((time / 1000 + d.offset) / d.period) === this.headed) {
-            this.ball.setVisible(false);
-            this.shadow.setVisible(false);
-            return;
-        }
         this.ball.setVisible(!!q);
-        this.shadow.setVisible(!!q && !q.tell);
-        if (!q) return;
-        if (q.tell && !this.told) {
-            this.told = true;
-            sfx.at(this.rim.x, this.rim.y).ratchet();
+        this.ballLt.setVisible(!!q && q.lt > 0);
+        this.shadow.setVisible(!!q);
+        // (The swish through the net, each time it comes down on the walk, the dribble's bounce.)
+        if (!this.turn.off) {
+            this.once('toss', t, this.tR, () => sfx.at(this.release.x, this.release.y).toss());
+            this.once('swish', t, this.tR + FLIGHT, () => sfx.at(this.rim.x, this.rim.y).swish());
+            for (const [i, b] of [this.tR + FLIGHT + DROP, this.tR + FLIGHT + DROP + 0.56, this.tR + FLIGHT + DROP + 0.98].entries()) {
+                this.once(`bounce${i}`, t, b, () => sfx.at(q ? q.x : this.restX, d.y).bounce());
+            }
         }
-        if (!q.tell) this.told = false;
-        // (Each time it comes down on the walk.)
-        const bounces = t < 0.92 ? 0 : t < 1.48 ? 1 : t < 1.9 ? 2 : 3;
-        if (bounces > this.bounces) sfx.at(q.x, d.y).bounce();
-        this.bounces = bounces;
-        const y = d.y - 5 - q.y;
-        this.ball.setPosition(q.x, y).setAlpha(q.a).setAngle((q.x * 6) % 360);
-        this.shadow.setPosition(q.x, d.y - 1).setAlpha(q.a * Math.max(0.15, 0.45 - q.y / 200));
-        if (q.tell || q.back || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
+        const pk = this.turn.pickAt;
+        if (pk + 1.6 <= d.period) this.once('dribble', t, pk + 0.8 + 0.3, () => sfx.at(this.restX, d.y).bounce());
+        if (!q) return;
+        const y = d.y - 5 - q.h;
+        // (In the ring and its net, behind the hoop's picture: its rim's front and the net over it. Above the rim it is
+        // in front of the board, which stands over the net.)
+        const inNet = Math.abs(q.x - this.rim.x) < 12 && y > this.rim.y + 1 && y < d.y - 62;
+        const depth = inNet ? this.behind : s.DEPTH.player + 0.03;
+        this.ball.setPosition(q.x, y).setAngle((q.x * 6) % 360).setDepth(depth);
+        this.ballLt.setPosition(q.x, y).setAngle((q.x * 6) % 360).setDepth(depth + 0.001).setAlpha(q.lt);
+        this.shadow.setPosition(q.x, d.y - 1).setAlpha(Math.max(0.15, 0.45 - q.h / 200));
+        if (!q.hits || this.turn.off || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
         const hit = Math.abs(p.x - q.x) < PLAYER.bodyWidth / 2 + 5 && y > p.y - PLAYER.height - 3 && y < p.y + 2 && Math.abs(p.y - d.y) < 80;
         if (!hit) return;
         this.hitAt = time + 1500;
         sfx.bounce();
-        if (this.world.carry) this.world.carryBox.spill(q.x, false, 'ball');
-        else s.scareContact(q.x, 'ball');
+        if (this.world.carry) return this.world.carryBox.spill(q.x, false, 'ball');
+        // (In her face, the side she faces, as the scenario reads it (14a): it bounces back off her, away in front of
+        // her; on the back of her head (14b) it pops up higher and on over her as she goes down: the same way. Then it
+        // rolls to its player's feet.)
+        const face = p.flipX ? -1 : 1;
+        this.away('rebound', time, q.x, q.h, face, (q.x - p.x) * face > 0);
+        s.scareContact(q.x, 'ball');
     }
 }
 

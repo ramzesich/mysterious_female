@@ -135,8 +135,8 @@ its own). The items below were the first plan, not needed:
 | 11b | The jet in her back | "As 10b: she arches, dances, squelches off" | The same | **A question for the user:** 10b's squirm was dropped ("looked weird, and the case is rare"), so 11b points at a clip that is gone. Propose: her arch as built and the run-off, no new clip |
 | 12a | The stage's light, from the front | "Her head back, two spins on the spot, stars circling, she sits" | `SwingLight`, `movers.js` | **Built 2026-11-19** (the user: reuse 9a's spin, a new one from her standing frame; butterflies, not stars) |
 | 12b | The same, from behind | "Three stumbling steps, down on her hands and knees, stars" | The same | **Built 2026-11-19** (9c's stumble and belly-flop, dazed). The light and the stage manager swapped places, the trap door drawn (the user) |
-| 14a | A basketball in her face | "She tips over backward, stiff as a skittle" | `Balls`, `topdeck.js` | |
-| 14b | A basketball on the back of her head | "She topples forward, stiff as a plank" | The same | |
+| 14a | A basketball in her face | "She tips over backward, stiff as a skittle" | `Balls`, `topdeck.js` | **Built 2026-11-19** (from her stand or a quarter of her run, onto her back, lying so with the butterflies; her lying redrawn, the user: her stand turned flat "appears to be at an angle"). With it, on the user's word: **the court's two players** (a man and a woman, lightly washed) shoot the balls through their rings, the ball comes back to their feet and they pick it up (`tools/build_court.py`); it hits her from the throw to its second landing |
+| 14b | A basketball on the back of her head | "She topples forward, stiff as a plank" | The same | **Built 2026-11-19** (face down, redrawn lying flat: the user chose it) |
 | 15 | The drill's boat, from above | "Pressed down to half her height, a waddle, she springs back up and sits" | `DrillBoat`, `outside.js` | |
 
 - Shown to the user in batches, enlarged and numbered, each checked frame by frame first; one

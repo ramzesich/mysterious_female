@@ -58,6 +58,9 @@ export class BootScene extends Phaser.Scene {
         // Step 4a's first gags (tools/build_gags.py): the door that bursts open (13a), the tray ridden (3),
         // the deck chair that collapses (7b), the gull on her head (20).
         this.load.spritesheet('gags', 'assets/sprites/gags.png', { frameWidth: 128, frameHeight: 128 });
+        // (The court's two players, `tools/build_court.py`: their frames set by the balls' round, `Balls` in topdeck.js.)
+        this.load.spritesheet('court', 'assets/sprites/court.png', { frameWidth: 96, frameHeight: 96 });
+        this.load.json('court-meta', 'assets/sprites/court.json');
         this.load.json('gags-meta', 'assets/sprites/gags.json');
         for (const name of ['inside', 'open', 'glass', 'towel']) this.load.image(`cabin-shower-${name}`, `assets/ship/cabin-shower-${name}.png`);
         this.load.spritesheet('bumbot', 'assets/sprites/bumbot.png', { frameWidth: BUMBOT.cell, frameHeight: BUMBOT.cell });
@@ -261,6 +264,12 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'gags-jog-bowled', frames: gf('jog-bowled', 1), frameRate: 14 });
         for (const n of [1, 3, 5, 7, '-stand']) this.anims.create({ key: `gags-jog-spin${n}`, frames: gf(`jog-spin${n}`, 1), frameRate: 14 });
         this.anims.create({ key: 'gags-jog-shoved', frames: gf('jog-shoved', 1), frameRate: 14 });
+        // (14a, 14b: stiff as a plank onto her back or her face, from her stand or a quarter of her run; then lying
+        // there, the butterflies circling, at her dazed clips' pace.)
+        for (const w of ['back', 'front']) {
+            for (const n of [1, 3, 5, 7, '-stand']) this.anims.create({ key: `gags-ball-${w}${n}`, frames: gf(`ball-${w}${n}`, 1), frameRate: 14 });
+            this.anims.create({ key: `gags-ball-${w}-lie`, frames: gf(`ball-${w}-lie`), frameRate: 6, repeat: -1 });
+        }
         this.anims.create({ key: 'gags-gull-flail', frames: gf('gull-flail', 1), frameRate: 10 });
         this.anims.create({ key: 'gags-gull-run', frames: gf('gull-run', 1), frameRate: 12, repeat: -1 });
         // (16, a sprinkler: drenched where she stands, or stopping short from her run at its own 14 a
