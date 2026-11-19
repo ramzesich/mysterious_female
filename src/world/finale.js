@@ -20,6 +20,13 @@ const BED_TOP = 32;                 // cabin 8206's mattress over its floor (the
 // Bumbot at the tip: he bolts from her coming within `spook`; he minds her standing still within
 // `near`; he comes at `come` px/s, never nearer than `gap`; `stillMs` of standing still and he is hers.
 const TIP = { spook: 2.3 * M, near: 7.5 * M, come: 34, gap: 44, stillMs: 3000, back: 110, dart: 6 * M };
+// A crossing gull's dart at her (the user, 2026-11-18: flown into, it was "indistinguishable from the gull
+// just flying around ... it should dart toward us a little bit (not too fast)"): with her ahead of it within
+// `ahead` px and `rise` px up or down, it cries and darts straight at where she is then (no homing: she can
+// still steer out of its way or let the parasol go; it aims where her drift takes her), at `speed` px/s, for at most `ms`; then on, back to its
+// height at `climb` px/s, and no dart again for `rest` ms.
+const DART = { ahead: 130, rise: 80, speed: 170, ms: 1100, climb: 45, rest: 2500 };
+const BELLY = 5;
 
 // The wind over the bow (population: `gust_finale`): as along the ship's side, it blows aft every
 // few seconds and carries her with it in the air; windsocks on the balcony's rail and at the stem
@@ -80,13 +87,17 @@ export class Crossers {
         this.scene = s;
         this.story = story;
         this.birds = defs.map((d, i) => {
-            const sprite = s.add.image(d.x0, d.y, 'things', 'gull-up').setDepth(D.player + 0.34).setVisible(false);
+            // (Hung by its underside, so that its two flap pictures, 22 px and 10 px tall, keep its head and
+            // body where they are and only the wings beat: by their middles the body jumped 5 px a flap, and
+            // at the top of the view, standing on the bow under the low one, it came and went, the user,
+            // 2026-11-18. `BELLY`: its underside under the point it flies at.)
+            const sprite = s.add.image(d.x0, d.y, 'things', 'gull-up').setOrigin(0.5, 1).setDepth(D.player + 0.34).setVisible(false);
             world.add([sprite]);
             return { ...d, sprite, i, x: d.x0, dir: 1 };
         });
     }
 
-    // Where a gull is at `time` (ms), and which way it is going.
+    // Where a gull is at `time` (ms), and which way it is going: where it starts.
     at(b, time) {
         const span = b.x1 - b.x0, t = ((time / 1000) * b.v + b.i * span * 0.6) % (2 * span);
         return t < span ? { x: b.x0 + t, dir: 1 } : { x: b.x1 - (t - span), dir: -1 };
@@ -95,16 +106,48 @@ export class Crossers {
     update(dt, time) {
         const s = this.scene, p = s.player, P = this.world.progress;
         const on = P.has('alarm') && !P.has('catch');
+        const air = s.mode === 'play' && s.route === 'inside' && !s.grounded;
+        const chest = p.y - HALF;
         for (const b of this.birds) {
             b.sprite.setVisible(on);
             if (!on) continue;
+            if (b.fly === undefined) Object.assign(b, this.at(b, time), { fly: b.y, rest: 0 });
             const was = b.dir;
-            if (!this.parked) Object.assign(b, this.at(b, time));
-            if (b.dir !== was) sfx.at(b.x, b.y).gull();
-            const y = b.y + Math.round(Math.sin(time / 420 + b.i * 2) * 3);
-            b.sprite.setPosition(b.x, y).setFrame(Math.floor(time / 130) % 2 ? 'gull-down' : 'gull-up').setFlipX(b.dir < 0);
+            if (this.parked) {
+                b.dart = null;
+                b.fly = b.y;
+            } else if (b.dart) {
+                // Straight at where she was, until it has gone past it or for `ms`.
+                const d = b.dart;
+                b.x += d.vx * dt;
+                b.fly += d.vy * dt;
+                if (time - d.t0 > DART.ms || (b.x - d.tx) * Math.sign(d.vx) > 24) {
+                    b.dart = null;
+                    b.rest = time + DART.rest;
+                }
+            } else {
+                // Level, to and fro across its span; after a dart, back to its own height.
+                b.x += b.dir * b.v * dt;
+                if (b.x > b.x1) { b.x = b.x1; b.dir = -1; }
+                if (b.x < b.x0) { b.x = b.x0; b.dir = 1; }
+                b.fly += Phaser.Math.Clamp(b.y - b.fly, -DART.climb * dt, DART.climb * dt);
+                const dx = p.x - b.x, dy = chest - b.fly;
+                if (air && time > b.rest && Math.sign(dx) === b.dir && Math.abs(dx) > 20 && Math.abs(dx) < DART.ahead && Math.abs(dy) < DART.rise) {
+                    // (At where she will be when it gets there, as she drifts on now: she sinks under the parasol.)
+                    const v = p.body.velocity, lead = Math.hypot(dx, dy) / DART.speed;
+                    const ax = dx + v.x * lead, ay = dy + v.y * lead, k = DART.speed / Math.hypot(ax, ay);
+                    b.dart = { t0: time, tx: p.x + v.x * lead, vx: ax * k, vy: ay * k };
+                    sfx.at(b.x, b.fly).gullDive();
+                }
+            }
+            if (b.dart) b.dir = Math.sign(b.dart.vx);
+            if (b.dir !== was && !b.dart) sfx.at(b.x, b.fly).gull();
+            const y = b.fly + (b.dart ? 0 : Math.round(Math.sin(time / 420 + b.i * 2) * 3));
+            // (Darting, its wings beat twice as fast.)
+            const beat = b.dart ? 65 : 130;
+            b.sprite.setPosition(Math.round(b.x), Math.round(y) + BELLY).setFrame(Math.floor(time / beat) % 2 ? 'gull-down' : 'gull-up').setFlipX(b.dir < 0);
             // (Only in the air: on a deck she is under its flight.)
-            const hit = s.mode === 'play' && s.route === 'inside' && !s.grounded && Math.abs(p.x - b.x) < 14 && y > p.y - PLAYER.height + 2 && y < p.y - 4;
+            const hit = air && Math.abs(p.x - b.x) < 14 && y > p.y - PLAYER.height + 2 && y < p.y - 4;
             if (hit) sfx.at(b.x, y).gull();
             if (hit) s.scareAir('crossgull', { snatch: b.sprite });
         }

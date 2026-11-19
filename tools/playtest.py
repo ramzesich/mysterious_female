@@ -4725,10 +4725,14 @@ def scenario_finale(b):
     s = hold_until(b, [], lambda s: s["mode"] != "play", 9)
     b.key("left", False)
     b.key("space", False)
-    ok &= check(s["mode"] == "scripted" and alert(b) == "Shoo!" and s["y"] > D11 + 100, "flown into a gull: the parasol is knocked from her hands", (s, alert(b)))
+    gag = "window.__ship.children.list.some(o => o.texture?.key === 'gags' && o.visible)"
+    ok &= check(s["mode"] == "scripted" and alert(b) == "Whoa-whoa-whoa!" and s["y"] > D11 + 100 and b.eval(gag),
+                "flown into a gull: the parasol blown inside out, she drops kicking (gag 22)", (s, alert(b)))
+    wait(0.5)
     b.shot("finale-gull")
     b.eval(f"(c => {{ clearInterval(window.__iv); c.birds[0].x = 0; }})({S}.crossers)")
-    wait(2.8)
+    wait_js(b, "window.__ship.mode === 'play'", 6)
+    wait(0.4)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D11 and abs(s["x"] - B["backX"]) < 4, "and she is back on the balcony", s)
     # Over the rail at the tip: the sea; back on the balcony too.

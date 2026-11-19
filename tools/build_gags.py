@@ -45,6 +45,10 @@ Every frame: the floor under row 120 (the world's `y` is the canvas row 121).
                 of the flight at (50, 100). All three face east and descend east (the game flips them)
   stairs-dazed  21's end: slumped at the foot, dizzy, her head wobbling, two butterflies circling over
                 it (a loop; stood as the foot's)
+  parasol-flip  22: a gull across her glide: frame 0 her glide picture with the open parasol as the game
+                draws it, 1 to 3 the parasol blown inside out, 4 to 8 she looks up at it and kicks her
+                legs (a loop as she drops); her feet at (56, 112), the left edge of column 56, as her
+                own sprite's middle (`parasol-flip/flip/`, cut by `parasol-flip/cut.py`)
 
 The door's clips keep their colours (the world's muted shut door is not on the palette, and the
 leaf is drawn in its colours): only her pixels are put on the palette there.
@@ -62,9 +66,11 @@ CLIPS = [("door-burst", 13), ("door-squash", 13), ("door-slide", 9), ("tray-ride
          ("chair-collapse", 9), ("gull-flail", 9), ("gull-run", 9), ("door-burst-full", 13),
          ("sprinkler-stand", 9), ("sprinkler-run1", 9), ("sprinkler-run3", 9), ("sprinkler-run5", 9), ("sprinkler-run7", 9),
          ("sprinkler-sneeze", 9), ("sprinkler-walk", 9), ("steam-fan", 9), ("steam-swoon", 9),
-         ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8)]
-# (Gag 21's frames are cut from the generator's in a folder of their own.)
-PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed"}
+         ("flare-blink", 9), ("flare-cough", 9), ("stairs-sit", 6), ("stairs-bump", 9), ("stairs-foot", 7), ("stairs-dazed", 8),
+         ("parasol-flip", 9)]
+# (Gags 21's and 22's frames are cut from the generator's in a folder of their own.)
+PATH = {"stairs-sit": "stairs-bump/sit", "stairs-bump": "stairs-bump/bump", "stairs-foot": "stairs-bump/foot", "stairs-dazed": "stairs-bump/dazed",
+        "parasol-flip": "parasol-flip/flip"}
 DOOR = {"door-burst", "door-squash", "door-burst-full"}
 # (19's soot: its greys fall on the palette's two cool, greenish greys, and her face read as green; they
 # go on the charcoal greys of her hair's own family instead. No other colour of hers falls there.)
@@ -119,7 +125,8 @@ def main():
             "sprinkler": {"x": 64, "run": 54},
             "steam": {"x": 64},
             "flare": {"x": 64},
-            "stairs": {"corner": [48, 64], "foot": [50, 100]}}
+            "stairs": {"corner": [48, 64], "foot": [50, 100]},
+            "parasol": {"feet": [56, 112]}}
     (ROOT / "assets" / "sprites" / "gags.json").write_text(json.dumps(meta))
     print(out, sheet.size)
 

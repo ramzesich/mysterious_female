@@ -296,7 +296,7 @@ export const MISHAP_SCENES = {
     '19': { word: 'singed', react: 'yelp', toss: 'drop', gag: 'flare' },        // a flare: out of a puff of smoke her face black, her hair on end and smoking; she blinks and coughs out a puff (`Flare.ride`)
     '20': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'gull' },       // a gull on a balcony rail: on her head (`PerchGull.ride`)
     '21': { word: 'swooped', react: 'duck', toss: 'gull', down: 'sit', gag: 'stairs' },  // a funnel gull: on her bottom down the stairway (the ship scene's `stairsGag`)
-    '22': { word: 'swooped', react: 'duck', toss: 'gull' },                     // a gull across her glide
+    '22': { word: 'swooped', react: 'duck', toss: 'gull', gag: 'parasol' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', toss: 'hand' },                 // a "Do Not Disturb" door
     '24': { word: 'startled', react: 'apology', toss: 'hand' },                 // the occupied balcony
 };
@@ -381,6 +381,11 @@ export const GAGS = {
     // immediately"), to the foot, and off onto the roof, slumped; `frameMs` each frame. Then dizzy, butterflies
     // over her head (the user, 2026-11-18): her dazed loop `dazedLoops` times at `dazedMs` a frame, `holdMs` after.
     stairs: { stairs: true, word: 'bumpy', frameMs: 60, dazedMs: 110, dazedLoops: 2, holdMs: 0 },
+    // 22: a gull across her glide with no tangerine on her (the ship scene's `parasolGag`): the parasol
+    // blown inside out, `flipMs` a frame while she still sinks at the glide's pace; then she looks up at it
+    // and kicks her legs, `kickMs` a frame, dropping out of the screen, a softer fall than a closed
+    // parasol's (`fall` px/s², at most `maxFall` px/s: it still catches a little air).
+    parasol: { air: true, word: 'whoa', flipMs: 80, kickMs: 100, fall: 500, maxFall: 240 },
 };
 
 // Teppanyaki's flares (`Flare` in src/world/topdeck.js): the chef's flourish before the flame, s;

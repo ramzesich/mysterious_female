@@ -237,7 +237,7 @@ suitcase 53 at its fastest) reach her back only while she stands; fast ones (the
 | 19 | Teppanyaki's flares | She yelps and pats out a smoking sleeve | A sooty face, her hair on end and smoking, two white eyes blink, a puff of smoke coughed. **Built (2026-11-18):** out of a puff of black smoke (she jumps back out of the flame under it), her face black, her hair on end and singed; she blinks, a wisp of smoke off her hair, and coughs out a puff. The flames narrower, and the chef answers her coming (the user: "if I just run past them, they usually go up behind me") |
 | 20 | The gulls on the balcony rails | She ducks; **the gull takes the tangerine and is gone** | The gull lands on her head and stays; she runs off flailing with it sitting there |
 | 21 | The funnel's gulls, on the stairway | She ducks; the gull takes it | She bumps down the flight on her bottom, step by step, to its foot (built 2026-11-18: `stairsGag`, "Ow-ow-ow!", dizzy at the foot with butterflies) |
-| 22 | The gulls across her glide | She ducks; the gull takes it | The parasol turns inside out, and she falls (the fall as built) |
+| 22 | The gulls across her glide | She ducks; the gull takes it | The parasol turns inside out, and she falls (the fall as built). **Built 2026-11-18:** she looks up at it kicking her legs as she drops, a softer fall; the gull darts at her first |
 | 23 | "Do Not Disturb" doors (7) | **She holds a tangerine out in both hands, her head bowed; a hand takes it and the door shuts** (spent, not rolling) | "Oh, sorry!": both hands over her eyes, blushing, she tiptoes off fast, out of the screen |
 | 24 | The occupied balcony | As 23: whoever is on it takes the tangerine | As 23 |
 
@@ -757,7 +757,7 @@ is seen when she is hit.
 | The basketballs | `Balls` in `topdeck.js` | 14a, 14b |
 | The boat drill | `DrillBoat` in `outside.js` | 15 |
 | Sprinklers, the steam, the towels, the flares | `Sprinkler`, `Steam`, `TowelStack`, `Flare` | 16 to 19. **16 built (2026-11-18):** the first of the second batch (`gags` sheet, `sprinkler-*`); a sprinkler's rain drawn only while she is on its deck (deck 8's, right under deck 9's, rained through the floor). **17 built (2026-11-18)** (`steam-*`): a burst of the steam wraps her the frame she is caught and hides the change to her puff picture, so no clip from her run is needed; she is set clear of the sauna's door under it |
-| The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22. **20 built (2026-11-18):** the gull dives onto her head; standing, she flails and runs off with it, running she runs on, out of the screen or to the next partition |
+| The gulls | `PerchGull` in `outside.js`, `FunnelWind` in `topdeck.js`, `Crossers` in `finale.js` | 20, 21, 22. **20 built (2026-11-18):** the gull dives onto her head; standing, she flails and runs off with it, running she runs on, out of the screen or to the next partition. **21 and 22 built (2026-11-18)** |
 | "Do Not Disturb" doors, the occupied balcony | `DndDoor` in `movers.js`, `Occupied` in `outside.js` | 23, 24. **(2026-11-18)** the door swings open and shut (the swinging door's clip in its full colours; it had vanished with its frame); anyone in a doorway is cut to its opening and stands on its threshold (`People.doorway`) |
 
 - **Art:** twenty-two gags of hers (3, 7a, 7b, 9a, 9b, 9c, 11a, 12a, 12b, 13a, 13b, 14a, 14b,

@@ -1052,6 +1052,12 @@ def build_objects():
     # 12 over it, and its floor's edge, there whether she is out on it or not.
     fa, fb = front_bulwark_11()
     add(area("front-11", "outdoors", fa, floor_y(11), fb - fa, 0, [prop("deck", 11, "int"), prop("end", "fwd")]))
+    # The mooring deck at the bow, the same (the user, 2026-11-18: landing on it from the glide, its floor's
+    # edge and the plating under it changed as the deck was cut open; "closed always"): from the stem to deck
+    # 7's front wall, the side closed under its railing, the plate sloping over its forward end in front of her.
+    wa7 = next(wa for deck, wa, wb in end_walls() if deck == 7)
+    add(area("bow-7", "outdoors", col(BOW["stem"][7]) * TILE, floor_y(7), wa7 * TILE - col(BOW["stem"][7]) * TILE, 0,
+             [prop("deck", 7, "int"), prop("end", "fwd")]))
     for deck, wa, wb in end_walls():
         if deck != 7 and metres(wb) > (EXTENT[deck][0] + EXTENT[deck][1]) / 2:
             x1 = col(EXTENT[deck][1]) * TILE

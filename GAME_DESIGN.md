@@ -1324,6 +1324,14 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 **Region 10: Sunset.** The balcony forward of the spa (deck 11, 24-29.5 m) through the bridge's hatch;
 the air; the mooring deck (deck 7, 0.5-21.4 m); the tip of the bow. The ending (§6.1.9). The mooring
 deck's door into deck 7 opens from the mooring side after the catch, for the way home.
+- **The two gulls across the glide** (2026-11-18): each flies level to and fro; with her ahead of it and near
+  its height it cries and darts straight at where her drift takes her (170 px/s, no homing: she can steer
+  away or let the parasol go), then climbs back to its line. Flown into with no tangerine on her, **gag 22**
+  (built 2026-11-18): the parasol turns inside out, she looks up at it kicking her legs and drops out of the
+  screen, softer than a closed parasol's fall, "Whoa-whoa-whoa!"; back on the balcony.
+- **The mooring deck stays closed** (2026-11-18, the user: "closed always"): like deck 11's open front, the
+  ship's side under its railing and the plate sloping over its forward end are drawn whether she is on it or
+  not (she is hidden behind the plate by deck 7's door); landing on it from the glide changes nothing.
 
 #### 6.1.4 The stair cores, every flight
 
@@ -2494,8 +2502,10 @@ Nothing blocks the start of the build. These get settled along the way:
       sooty, her hair on end and singed; she blinks, smoke curling off her hair, and coughs out a puff.
       The flames are narrower (0.8 m each way), and the chef answers her coming: run at a quiet grill,
       the flame is up as she gets there; stopped at his flourish, she passes in the lull after it.
-      **Next: the rest of step 4a's gags** (21 and 22 the gulls, 23 the "Do Not Disturb" doors,
-      proposed). Waiting with it: the books' covers and
+      **Done (2026-11-18): gags 21 and 22** (the funnel's stairway on her bottom; the parasol inside
+      out over the bow, the crossing gull's dart), the bow's plating and railings mended.
+      **Next: the rest of step 4a's gags** (23 the "Do Not Disturb" doors, 24 the occupied balcony,
+      then the third batch: `docs/plan-the-rest.md` §3). Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

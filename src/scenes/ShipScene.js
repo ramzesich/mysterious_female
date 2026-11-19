@@ -272,7 +272,7 @@ export class ShipScene extends Phaser.Scene {
             const g = this.add.graphics().setDepth(DEPTH.exterior);
             g.fillStyle(0xe8eaec, 1).fillPoints([{ x: s.x1, y: s.yTop }, { x: s.x0, y: s.yFloor }, { x: s.x1, y: s.yFloor }], true);
             for (const [x, y, w, h, c] of s.marks || []) g.fillStyle(colour(c), 1).fillRect(x, y, w, h);
-            return { deck: s.deck, end: s.end, gfx: g };
+            return { deck: s.deck, end: s.end, gfx: g, x0: Math.min(s.x0, s.x1), x1: Math.max(s.x0, s.x1), yTop: s.yTop, yFloor: s.yFloor };
         });
         // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
         // each on its deck's wall, fading with it, or always there ("fixed").
@@ -569,6 +569,12 @@ export class ShipScene extends Phaser.Scene {
                         .setOrigin(0.5, 1).setDepth(prop(o, 'front', false) ? DEPTH.player + 0.04 : DEPTH.decor + 0.1)
                         .setFlipX(prop(o, 'flip', false));
                     this.worldLayer.add(piece);
+                    // A piece in front of her under a deck's sloped front plate (the mooring deck's railing, which
+                    // runs on to deck 7's wall): behind the plate while it is shown, in front of her once it is
+                    // cut away (the user, 2026-11-18: the plating should "hide the balcony railings behind them").
+                    const slope = prop(o, 'front', false) && this.shellSlopes.find(q => q.x0 !== undefined
+                        && o.x + piece.width / 2 > q.x0 && o.x - piece.width / 2 < q.x1 && o.y > q.yTop && o.y - piece.height < q.yFloor);
+                    if (slope) (this.underSlopes ||= []).push({ slope, img: piece });
                     break;
                 }
 
@@ -3472,6 +3478,9 @@ export class ShipScene extends Phaser.Scene {
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
         else if (this.mode === 'play' && !(p.body.blocked.down || p.body.touching.down)) target = this.viewDeck;  // in the air
+        // (And falling from a scare in the air, as she was: the decks she drops past stay closed; cut open
+        // one by one, the parts of the side at the bow came and went, the user, 2026-11-18.)
+        else if (this.airScare) target = this.viewDeck;
         else target = Math.round(this.deckAt(p.y));
         if (target === null || target === undefined) {
             this.viewDeck = null;
@@ -3526,8 +3535,18 @@ export class ShipScene extends Phaser.Scene {
         for (const { deck, gfx, always } of this.shellSlopes) {
             gfx.setAlpha(always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
         }
-        const onDeck = this.deckOfY(p.y);
+        // (The deck she stands on, or last stood on while she is in the air or falling from a scare: gliding
+        // down past the bow, the decks' leaning railings at their forward ends showed on the closed side one
+        // after another as she passed their heights, the user, 2026-11-18.)
+        const air = this.airScare || (this.mode === 'play' && !(p.body.blocked.down || p.body.touching.down));
+        if (!air || this.floorDeck === undefined) this.floorDeck = this.deckOfY(p.y);
+        const onDeck = this.floorDeck;
         for (const { deck, img } of this.leaningRailings || []) img.setAlpha(onDeck === deck ? 1 : 1 - shown(deck));
+        // (A plate always drawn in front of her, an open deck's that stays closed, covers them as it is.)
+        for (const { slope, img } of this.underSlopes || []) {
+            const depth = slope.always || shown(slope.deck) === 0 ? DEPTH.player + 0.04 : DEPTH.exterior - 0.01;
+            if (img.depth !== depth) img.setDepth(depth);
+        }
         this.updateDeckDim(dt);
     }
 
@@ -4493,6 +4512,7 @@ export class ShipScene extends Phaser.Scene {
 
     beginScare() {
         this.mode = 'scripted';
+        this.airScare = false;
         this.safeUntil = 0;
         this.flinchUntil = 0;
         this.gagPending = null;
@@ -4931,6 +4951,7 @@ export class ShipScene extends Phaser.Scene {
         this.gliding = false;
         this.world.showParasol(false);
         this.takeoffY = p.y;
+        if (sc.gag && GAGS[sc.gag]?.air && this.cache.json.get('gags-meta')?.anims['parasol-flip']) return this.parasolGag(sc);
         sfx.scare();
         rumble('bump');
         this.scareFall();
@@ -4938,11 +4959,50 @@ export class ShipScene extends Phaser.Scene {
         if (this.anims.exists('her-hit')) this.herClip('her-hit');
     }
 
+    // 22: a gull across her glide with no tangerine on her. One picture of her with the parasol (its
+    // frame 0 is her glide's with the world's parasol, to the px): it is blown inside out while she still
+    // sinks at the glide's pace, then she looks up at it and kicks her legs as she drops, a softer fall
+    // than a closed parasol's; the camera lets go and she leaves the bottom of the screen.
+    parasolGag(sc) {
+        const p = this.player, g = GAGS[sc.gag], gm = this.cache.json.get('gags-meta'), A = gm.anims['parasol-flip'];
+        this.beginScare();
+        this.airScare = true;
+        this.scareFrom = { x: p.x, y: this.takeoffY };
+        sfx.scare();
+        sfx.parasolShut();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        p.setVisible(false);
+        const flip = p.flipX, [fx, fy] = gm.parasol.feet;
+        // (Phaser mirrors a frame in place: flipped, her feet's edge is counted from the right.)
+        // (In front of everything, as her fall is: she drops past the decks.)
+        const spr = this.add.sprite(p.x, p.y, 'gags', A[1]).setDepth(DEPTH.fx).setFlipX(flip)
+            .setOrigin((flip ? gm.cell - fx : fx) / gm.cell, fy / gm.cell);
+        this.alertOver = fy - 16 - PLAYER.height + 2;          // (her word over the parasol's top, not on it)
+        const flipFor = 3 * g.flipMs;
+        let vy = Math.min(p.body.velocity.y, VERBS.glideFall), e = 0, top = fy - 16;   // (the parasol's top over her feet)
+        this.script = (dt) => {
+            e += dt * 1000;
+            if (e >= flipFor) vy = Math.min(vy + g.fall * dt, g.maxFall);
+            p.y += vy * dt;
+            const k = e < flipFor ? 1 + Math.floor(e / g.flipMs) : 4 + Math.floor((e - flipFor) / g.kickMs) % 5;
+            spr.setFrame(A[k]).setPosition(Math.round(p.x), Math.round(p.y));
+            // (Out of the screen once the parasol's top is: it stands `top` px over her feet.)
+            if (p.y - top > this.cameras.main.worldView.bottom) this.respawn();
+        };
+        this.gagEnd = () => {
+            spr.destroy();
+            p.setVisible(true);
+            this.alertOver = 0;
+        };
+    }
+
     // Longer than one deck: the camera lets go and she drops out of the bottom of the screen.
     scareFall() {
         const p = this.player;
         let vy = p.body.velocity.y;
         this.beginScare();
+        this.airScare = true;
         this.scareFrom = { x: p.x, y: this.takeoffY };
         p.setDepth(DEPTH.fx);
         this.pose('fall');
@@ -5011,6 +5071,7 @@ export class ShipScene extends Phaser.Scene {
                 this.world.carryBox.drop();          // a tray is not hers to keep through a scare
                 this.tweens.killTweensOf(this.player);
                 this.herDrop(0);
+                this.airScare = false;
                 this.spawnAt(target, { emerge: true });
                 this.tweens.add({ targets: this.fade, alpha: 0, duration: 260 });
                 this.respawning = false;
@@ -5025,7 +5086,8 @@ export class ShipScene extends Phaser.Scene {
         const x = Math.round(p.x);
         const y = Math.round(p.y - (this.crawling ? 30 : PLAYER.height) - 3);
         this.bubble.setVisible(this.time.now < this.bubbleUntil).setPosition(x, y);
-        this.alert.setPosition(x, y);
+        // (`alertOver`: px more, over a thing held over her head, the inside-out parasol.)
+        this.alert.setPosition(x, y - (this.alertOver ?? 0));
         if (this.debugText.visible) {
             this.debugText.setText(`${this.mode}  x ${p.x.toFixed(0)}  y ${p.y.toFixed(0)}  takeoff ${this.takeoffY?.toFixed(0)}`);
         }

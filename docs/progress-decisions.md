@@ -2953,3 +2953,38 @@ clouds are all drawn in code) and the motion. Its size (medium, about 30 generat
 
 The estimate grows by about two working days with it: around 18 December by the last two weeks' attendance, at the
 slow end about the 23rd.
+
+## Gag 22 built: the parasol inside out over the bow (2026-11-18)
+
+`docs/plan-the-rest.md` §3 1.1, the second of its four gags. A crossing gull flown into with no tangerine on her: the
+parasol is blown inside out while she still sinks at the glide's pace, then she looks up at it, her hair flying up,
+and kicks her legs as she drops out of the screen, more slowly than a closed parasol's fall (it still catches a little
+air); "Whoa-whoa-whoa!" («Ой-ой-ой!», `fright.whoa`, my suggestion, kept by the user); back on the balcony. The clip:
+PixMiniMax from her glide picture with the world's parasol (2 tries, 1 generation each; the second used), mended by
+`assets/source/her-mishaps/batch-4a/parasol-flip/cut.py` (loose wind scraps, a shaft lit pale). The ship scene's
+`parasolGag` (`GAGS.parasol`), from `scareAir`; its frame 0 matched against her glide in the game, 0 px apart both
+ways round. Her word is raised over the parasol's top for it (`alertOver`). With a tangerine on her, as before.
+
+- **The user's addition on playing it:** the hit was "indistinguishable from the gull just flying around ... it
+  should dart toward us a little bit (not too fast)". With her ahead of it within 130 px and 80 px of its height, a
+  crossing gull cries (the dive's cry) and darts straight at where her drift will take her, 170 px/s (its flight is
+  96 to 110), wings beating twice as fast; no homing, so she can steer away or let the parasol go; then on and back
+  up to its line, no dart for 2.5 s (`DART` in `src/world/finale.js`; the gulls now move by their own state, not a
+  clock). The first try aimed at where she was and passed over her head: she sinks under the parasol.
+- **The bow's plating** (the user: parts of the hull at the front balconies "disappear when the gull attack happens";
+  "they should also hide the balcony railings behind them"): a scripted fall had the cut-away follow her height, so
+  the decks she dropped past opened one by one (the bridge's piece among them); now a fall from a scare in the air
+  keeps the view she had (`airScare`). The decks' leaning railings at their forward ends showed whenever she was at
+  their height in the air: they now count the deck she last stood on (`floorDeck`). The mooring deck's railing ran on
+  under deck 7's sloped front plate in front of it: it goes behind the plate while the plate shows (`underSlopes`).
+- **Landing on the bow** (the user: "something changes on the bow's floor"): deck 7 was cut open as she landed (its
+  floor's edge and slab for the plating, the sloped plate gone). Asked: "Closed always". The mooring deck is an
+  `outdoors` area now, as deck 11's front (`bow-7` in `tools/build_ship_map.py`): the side closed, the plate in front
+  of her always (she is hidden behind it by deck 7's door); the railing's last pieces behind the plate.
+- **The low crossing gull at the top of the view** (the user, standing on the bow: "appears and disappears rapidly"):
+  its two flap pictures (22 and 10 px tall) hung by their middles, so its body jumped 5 px a flap at the screen's
+  edge. Hung by its underside now (the beak within 1 px in both). The funnel's circling gulls hang the same old way;
+  offered, not changed.
+- **Tests:** `finale` (the gag's word and picture, back on the balcony), `lang`, `boot`, `falls`, `overboard`,
+  `region7`, `region9`, `bridge`, `balcony`, `run_jump`, `promenade`, `atrium` pass; `check_overlaps` 0. The rest
+  not run. 2 generations.
