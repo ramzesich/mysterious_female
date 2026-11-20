@@ -128,3 +128,15 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   the parts' table say this session built it and the building session skips it; `CLAUDE.md`'s table
   has `tools/build_sky.py`, and its `src/intro.js` and `src/background.js` rows say what the sky is
   now. On this branch only until it is merged.
+
+## Merged to main (2026-11-20)
+
+- **Asked:** "let's update our branch from the latest main, and merge everything back there, so that
+  other sessions see it" (the Implementation session's round merged and pushed first, `c4a8098`).
+- **Done:** `main` merged into `refinement` (`e33b18c`): one conflict, `maps/ship.json`, generated:
+  rebuilt with `tools/build_ship_map.py` from the merged tools, not merged by hand; it differs from
+  `main`'s only by deck 3's notice board (4728 to 4703), `maps/world.json` the same as `main`'s. Then
+  `main` fast-forwarded to `refinement`.
+- **Checked:** `intro`, `boot`, `lang`, `deck3`, `finale` pass; `tools/check_overlaps.py`: 0 overlaps
+  (the deck 7 diary's is mended on `main`); her walk out of her door shot again after `main`'s
+  "her picture a pixel lower": as before. The rest not run.
