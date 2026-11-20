@@ -3557,3 +3557,22 @@ while the building session worked.
   not the bed: now only from the bed (`from` on the item: px up she must stand). `boot`, `region2`, `region6`,
   `golden` pass; overlaps 0. **The ten things' locations are all approved.**
 
+## Every pickup lying in the world glints (the user, 2026-11-20)
+
+- **The user:** "Every collectible thing that we pick up from somewhere (not given to us, or not made by an ice
+  cream machine, for example): let's add a tiny spark animation to it." Then: tangerines "have no spark".
+- **As it came to be, round by round:** a 7 px star at a random spot on the thing's upper half every 2.2 to
+  3.2 s ("too aggressive, and blinking all over the place. I meant a much softer, and slower spark on the top
+  right corner of every item"); then 5 px at the top right corner, fading in and out over 1.6 s at 80% every
+  4.5 to 6 s ("Reduce the delay ... Make the spark also rotate (not fast)"); then every 2.5 to 3.5 s, turned by
+  rotating the picture ("it leaves LCD traces"); then four drawn turns, two with bent rays ("every frame shall
+  have the rays straight"); **approved: "+" and "×" in eighth-turns, eight steps of 0.2 s, growing over two and
+  shrinking over two, fading with them** (`world.glint`, `updateGlints`, the `spark` texture drawn in code at
+  the world's start: twelve px at most, an effect, as the sparkle on taking).
+- **On:** every pickup taken with E (the things to find, the books lying out, the socks, the parasol, the pills)
+  and the key cards lying on a table or on the deck (the deck card's pulsing dot gives way). Not tangerines, not
+  what is handed to her or made for her.
+- **The user, on pictures of the game:** "When asking for in game scenes, I meant not closed-up, but how I
+  actually see it in game": recordings of the game's own view from now on.
+- `boot`, `region1`, `region2`, `region8`, `golden` pass.
+

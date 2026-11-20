@@ -56,10 +56,9 @@ export class Progression {
                     // Dropped on the deck (the Officer's card, at the horn): lying there, a glint on it.
                     const img = s.add.image(o.x, o.y, 'shipart', 'key-card').setOrigin(0.5, 1).setScale(0.5).setDepth(3.1);
                     const band = s.add.rectangle(o.x - 3, o.y - 5, 7, 2, CARD_COLOURS[card]).setOrigin(0).setDepth(3.11);
-                    const glint = s.add.image(o.x + 4, o.y - 8, 'dot').setTint(0xfbff86).setDepth(3.12);
-                    s.tweens.add({ targets: glint, alpha: { from: 0.1, to: 1 }, scale: { from: 0.6, to: 1.8 }, duration: 480, yoyo: true, repeat: -1, repeatDelay: 700 });
-                    s.worldLayer.add([img, band, glint]);
-                    this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img, band, glint] });
+                    s.worldLayer.add([img, band]);
+                    // (Its twinkle, as every pickup's: `world.glint`, once the world is built.)
+                    this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img, band] });
                     break;
                 }
                 // On a small side table: nothing floats (§6.3).
