@@ -199,6 +199,9 @@ ITEMS = {
     # on the Stardust balcony's last seat, by the railing over the stage.
     "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 24, "thing:bookmark-book"),
     "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"from": 20}),
+    # Bumbot's collar bell, in the beak of the gull on the promenade's wall light (`BELL_GULL`): on the deck
+    # under its beak once a lob has made it drop it (the game sets it there, 9 px aft of the gull).
+    "keep_bell": ("prom", 140.6, "keep:cat:bell", "flag:bell_dropped", 0, "thing:collar-bell"),
     "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
 }
 
@@ -656,6 +659,12 @@ SIGNS = {
 LIBRARY = dict(deck=6, shelf=(190.1, 60), trolley=191.04, chair=166.75)
 # The delivery robot (`haz_robot`): id: (deck, from m, to m, m/s). She rides on its top.
 ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
+# The gull with Bumbot's collar bell (§4 2.1, thing 4; the user, 2026-11-20): on the round wall light at
+# 140.6 m (`prop_lamp_prom_3`), between door 138 and the column; where it stands (m), its feet px up (the
+# light's hood), the thing it holds (ITEMS) and the flag of its drop. It keeps its place when she comes; her
+# cry sends it up flapping, the bell kept; a lob that reaches it is caught, the bell drops to the deck and
+# the gull is off with the fruit for good.
+BELL_GULL = dict(at=("prom", 140.6), up=90, item="keep_bell", flag="bell_dropped")
 # Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
@@ -897,6 +906,12 @@ PEOPLE.update({
     "amb_home_engineer": dict(at=(8, 46.1), who="engineer", face=1, idle="idle", after="flag:catch", until="flag:home"),
     "amb_home_planner": dict(at=(8, 44.42), who="planner", face=1, idle="idle", after="flag:catch", until="flag:home"),
 })
+# The promenade's wall lights (the user, 2026-11-20: "a few along the promenade, with our gull sitting on
+# top of one of them"): round and oval in turn, their middles 80 px up, clear of the doors, the portholes,
+# the window wall, the columns and the plating's butts (149.6, not 149: on a butt, the user).
+PROPS.update({f"prop_lamp_prom_{i + 1}": ("prom", m, "thing:lamp-round" if k == "r" else "thing:lamp-oval", 69 if k == "r" else 72, {})
+              for i, (m, k) in enumerate([(118, "o"), (134.5, "o"), (140.6, "r"), (149.6, "o"), (165, "r"), (173.5, "o"),
+                                          (181.5, "r"), (190, "o"), (198.5, "r"), (206.5, "o")])})
 PROPS.update({
     # The kids' club's fort, taken down for the night.
     "prop_pillow_pile": (7, 33.4, "thing:pillow-pile", 0, dict(back=True, after="flag:catch", until="flag:home")),

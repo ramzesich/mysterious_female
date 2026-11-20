@@ -37,6 +37,12 @@ MIDDLE = (5, 6)
 # Frame: the fruit's middle (x, y). Frame 0 her hand hangs by her skirt, 1 and 2 swung back,
 # 3 swinging past her hip.
 FIST = {0: (43, 56), 1: (36, 53), 2: (37, 54), 3: (58, 53)}
+# Her throw in the air (the user, 2026-11-20): `air-throw/raw/` (skeleton-v3 from her jump's top, her near arm
+# swung back, down, forward at her chest and back) to `air-throw/held/`; in her fist in frames 0 to 2, off her hand
+# at frame 3 (`THROW.airHand`, `THROW.airHandY`).
+CLIPS = [(SRC, OUT, FIST),
+         (ROOT / "assets" / "source" / "her" / "air-throw" / "raw", ROOT / "assets" / "source" / "her" / "air-throw" / "held",
+          {0: (32, 60), 1: (36, 64), 2: (46, 62)})]
 KEEP = 4            # px round the fist where her skin is put back over the fruit
 
 
@@ -46,6 +52,11 @@ def skin(c):
 
 
 def main():
+    for src, out, fist in CLIPS:
+        hold(src, out, fist)
+
+
+def hold(SRC, OUT, FIST):
     OUT.mkdir(parents=True, exist_ok=True)
     for f in sorted(SRC.glob("*.png"), key=lambda p: int(p.stem)):
         i = int(f.stem)
@@ -64,7 +75,7 @@ def main():
                     if skin(orig.getpixel((x, y))):
                         im.putpixel((x, y), orig.getpixel((x, y)))
         im.save(OUT / f.name)
-    print("toss-held:", len(list(OUT.glob("*.png"))), "frames")
+    print(OUT.relative_to(ROOT), len(list(OUT.glob("*.png"))), "frames")
 
 
 if __name__ == "__main__":

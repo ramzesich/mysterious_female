@@ -3598,3 +3598,43 @@ while the building session worked.
   `falls`, `dash`, `golden`, `region4`, `region7`, `finale` pass. `tools/check_overlaps.py` listed 3: the pickups'
   glint stars (since the glint's commit, where it was not run), now skipped by it (`spark`); then 0.
 
+
+## §4 2.1, thing 4: the bell gull, the promenade's lights, her throw in the air (the user, 2026-11-20)
+
+- **What the bell is for** (the user asked): one of Bumbot's eight things to find, no power; his count, and
+  with him in cabin 8206 the day after. The gull makes it a small riddle of the throw.
+- **The promenade's lights:** the first two tries were lanterns no cruise ship has (the user: "Before setting them
+  in the game, you should have shown them to me. Neither of such lamps are on cruise ships"). Four real fittings
+  generated; the user chose the round caged bulkhead light and the oval one, a little bigger than life, "a few
+  along the promenade, with our gull sitting on top of one of them": ten, round and oval in turn, their middles
+  80 px up, clear of doors, portholes, the window wall, the columns and the plating's butts. **The two portholes
+  at 156.0 and 158.2 m moved to 156.4 and 158.6** (the first stood on a butt; the user: "so that they won't be
+  placed on top of the hull plating stitching"), and a light from 149 to 149.6 m.
+- **The gull** (`BellGull`): on the round light at 140.6 m, between door 138 and the column, the first thing out
+  of that door. It keeps its place as she passes; her cry sends it up, the bell kept; a throw that reaches it is
+  caught, the bell falls to the deck under its beak (growing from its size in the beak to its own 14 px) with a
+  jingle (`jingle`, new; the user judges sounds), the gull is off with the fruit for good (`bell_dropped`). The
+  bell lies glinting, E takes it, its close-up (the collar, its yellow ring taken out by hand at the user's word).
+  It flinches only when she jumps straight into it (the user). **Its collar at game size is drawn by hand** in the
+  close-up's colours: the generated one, shrunk to the 20 px gull, read as nothing ("unclear what it carries in
+  its beak"). The collar glints a size smaller, at the bell's bottom right (the user placed it, three tries).
+- **Hits:** the lob from the deck reaches it only from 1.25 to 3.5 m (measured); the user, as a player: "a thrown
+  tangerine never flies high enough to hit the gull ... What I would expect is to be able to throw it while
+  jumping". **Her throw in the air:** F in a jump tosses forward and a little up from her hand (vy 200: a level
+  throw dropped under the gull beyond 1.5 m; this one meets it from 0.5 to 2.5 m whenever in the jump, but at the
+  end of her fall), ↑ and F the lob; once a jump, her arc kept, some of her speed along carried. Her clip
+  (`her-airtoss`): skeleton-v3 from her jump's top, only her near arm moving, the tangerine in her fist until
+  the fourth frame (two PixMiniMax tries swung both arms; the first skeleton try raised her hand to her face).
+  Everything that answers a thrown tangerine answers it.
+- **Showing through the hull, found and mended:** the Photo Studio's flash (from the promenade outside, the user
+  saw it, and from deck 7 above it), the theatre's stage light (from the Stardust balcony; the user saw it too),
+  the sauna's steam (from the Spinnaker): each now only while she is inside on its deck. A sweep of every effect
+  drawn over the hull on a clock or by her distance found no others (the bridge's alarm, the old lady's snores,
+  the kid's jets, the terrace's gusts, the crossing and funnel gulls are over open deck or check her deck).
+- **A tangerine on the promenade's deck** showed its lowest row through the hull, as her feet had: the side's
+  own two rows under the floor's line are drawn again over what lies there, while she is out on it.
+- **Tests:** `throw` checks the bell gull (kept as she walks under it, the cry, a throw in a jump caught with her
+  clip and once a jump, a lob from the deck caught, the bell taken); `region2`'s shy gull is found by its id (the
+  bell gull came first in the list). `boot`, `throw`, `region2`, `region3`, `region9`, `mishaps`, `gamepad` pass;
+  `mishaps.things` failed once in a batch, unread, and passed five runs after (four seeds). `check_overlaps`: 0.
+  Generations: 6 lights, 10 gull edits, 2 close-ups, 8 for her throw in the air.

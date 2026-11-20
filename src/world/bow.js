@@ -107,7 +107,9 @@ export class Steam {
     update(dt, time) {
         const s = this.scene, d = this.def, p = s.player, g = this.g.clear();
         this.drawBurst(g);
-        if (!near(s, d.x, d.y, 700, 200)) return;
+        // (Only while she is inside on its deck: drawn over her layer, it rose through the closed side of deck 11
+        // under the Spinnaker, 2026-11-20.)
+        if (!near(s, d.x, d.y, 700, 200) || s.route !== 'inside' || Math.abs(p.y - d.y) > 72) return;
         const [phase, k] = this.phase(time);
         if (phase === 'calm') {
             this.told = false;

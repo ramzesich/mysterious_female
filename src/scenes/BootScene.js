@@ -207,6 +207,7 @@ export class BootScene extends Phaser.Scene {
         if (meta.anims.throw) this.anims.create({ key: 'her-throw', frames: frames('throw'), frameRate: 12 });
         // F: her underarm toss (docs/plan-three-uses.md §1.2); THROW.releaseMs is its fifth frame.
         if (meta.anims.toss) this.anims.create({ key: 'her-toss', frames: frames('toss'), frameRate: THROW.fps });
+        if (meta.anims.airtoss) this.anims.create({ key: 'her-airtoss', frames: frames('airtoss'), frameRate: THROW.airFps });
         if (meta.anims.glide) this.anims.create({ key: 'her-glide', frames: frames('glide'), frameRate: 2, repeat: -1 });
         // Reading in the library's chair: she sits down, and stays sat with the book.
         if (meta.anims.read) this.anims.create({ key: 'her-read', frames: frames('read'), frameRate: 8 });

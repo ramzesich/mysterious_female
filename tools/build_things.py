@@ -45,6 +45,15 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          "snack-tube": 6, "massage-gun": 16, "rc-car": 10, "diary": 13,
          # Her other pickups (2026-11-20, part of 2.1): the grip socks, the stage manager's pills.
          "grip-socks": 10, "pills-bottle": 12,
+         # Bumbot's collar bell (4), lying on the promenade's deck once the gull has dropped it: its
+         # close-up shrunk, 14 px wide (the user, 2026-11-20). (The gull holding it, `gull-bell-*`, is
+         # the game's own gull frames with the collar drawn in by hand at this size: shrunk, the
+         # generated collar read as nothing; `gull-bell/README.md`.)
+         "collar-bell": 11,
+         # The promenade's wall lights (deck 6, ten along it; the bell's gull on one): a round caged
+         # bulkhead light and an oval one, a little bigger than life (the user chose 3 and 4, size B,
+         # 2026-11-20; `lamps/README.md`).
+         "lamp-round": 23, "lamp-oval": 17,
          # The breakfast round's tray, carried in both hands (the tray a hand's width).
          "breakfast-tray": 12,
          # Steps 1 to 4's pictures drawn in code, generated instead (the art rule looked back over,
@@ -64,7 +73,7 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
 CLOSEUPS = SRC.parent / "closeups"
 FROM_CLOSEUP = {"tennis-ball": "ball", "feather-toy": "feather", "flag-ua": "flag", "snack-tube": "snack",
                 "massage-gun": "massage", "rc-car": "car", "diary": "diary", "grip-socks": "socks",
-                "pills-bottle": "pills"}
+                "pills-bottle": "pills", "collar-bell": "bell"}
 # A slight outline round a picture, in one of its own darker colours (the user, 2026-11-20: the socks
 # and the pills, "give them a slight outline"): name -> its colour.
 OUTLINE = {"grip-socks": "cf657f", "pills-bottle": "cd683d"}
@@ -109,7 +118,7 @@ CROP = {}
 # averaged with its dark outline came out dull (the Ukrainian flag had too, in the game since
 # step 4): the four other desk flags and hers (the art rule looked back over, 2026-11-17).
 BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-toy", "wool", "snack-tube",
-               "massage-gun", "rc-car", "diary", "grip-socks", "pills-bottle"}
+               "massage-gun", "rc-car", "diary", "grip-socks", "pills-bottle", "collar-bell", "lamp-round", "lamp-oval"}
 # Shrunk keeping a thin white line that reads it, then outlined: the tennis ball's seam (by majority
 # it was lost, a plain yellow dot; the user: "has to look like a tennis ball", and chose an olive
 # outline, 2026-11-17). name -> the outline's colour.

@@ -150,6 +150,10 @@ HER = {
         # underarm toss, the arm back low, a step, the swing forward past the hip, the follow-through;
         # the tangerine put in her fist by tools/hold_tangerine.py.
         "toss": [(f"toss-held/{i}.png", "feet") for i in range(8)],
+        # Her throw in the air (the user, 2026-11-20): skeleton-v3 from her jump's top (`apex`), only her near arm
+        # swung, back, down, forward at her chest and back; the tangerine in her fist in frames 0 to 2
+        # (tools/hold_tangerine.py; the tries kept in `air-throw/tries/`, its README).
+        "airtoss": [(f"air-throw/held/{i}.png", "feet") for i in range(8)],
         # Her walk (the user, 2026-11-20: out of her door at the intro's end, "walk, not run"):
         # skeleton-v3's walking-8-frames with a shorter stride and less arm swing (0.85, 0.6), the
         # calmer of two tries (walk-a: the template's own, its head dipping once a cycle). Its

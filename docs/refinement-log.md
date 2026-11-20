@@ -183,3 +183,18 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   change; the Implementation session's). The rest not run.
 - **Open:** the court's ball (15): she lies under a standing player and her tail passes him (asked;
   left as it is). `CLAUDE.md`'s table has no row for the new tools until the user's word.
+
+## Merged to main again (2026-11-20)
+
+- **Asked:** "update from the main branch, but carefully ... Reload the documents from there. Then,
+  update the documents, commit, merge your changes back to main, push everything."
+- **Done:** the heads kept by clip, not by frame number (`1bd38be`): `main`'s new clip of hers
+  (`airtoss`) went in before `walk` and moved its frames; the people's still poses added. `main`
+  (the bell gull, her throw in the air) merged in without conflicts; her `airtoss` clip and the
+  steward's still poses estimated (11 frames, about 1 generation), `heads.json` rebuilt.
+- **Documents, on the user's word:** `CLAUDE.md`: a row for `src/popup.js`, `tools/build_popups.py`,
+  `tools/build_heads.py`; a rule (words over a head are popups; run `build_heads.py` after rebuilding
+  a sheet of hers or the people's); the lessons. `docs/plan-the-rest.md` "Start here": the popups built
+  outside the plan, what a new popup goes through, what was not touched.
+- **A slip, mended:** `git checkout origin/main -- .` (meant only to read the documents) overwrote the
+  merge in progress; `git merge --abort` and the merge again, every popup edit checked present after.
