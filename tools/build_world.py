@@ -8,6 +8,7 @@ funnel's top.
 import json
 
 import build_ship_map as B
+from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
@@ -512,7 +513,7 @@ def build_world():
         totals=dict(tangerines=sum(e.get("count", 1) for e in ents if e["kind"] == "tangerine"),
                     slots=sum(1 for e in ents if e["kind"] == "slot"), keeps=KEEPS))
 
-    return dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
+    return rewash(dict(rooms=rooms, ents=ents, flagGives=FLAG_GIVES, funnel=funnel_top(), duct=duct, linen=linen, lido=lido,
                 topdeck=topdeck, bow=bow, finale=finale,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
@@ -522,7 +523,39 @@ def build_world():
                 trapdoor=dict(x=B.exact_x(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],
                               landX=room_x0[TRAPDOOR_LANDS[0]] + TRAPDOOR_LANDS[1]),
                 catch=dict(x=B.x_of(CATCH_M), y=B.floor_y(7)),
-                waterY=(B.WATER_ROW + 1) * B.TILE)
+                waterY=(B.WATER_ROW + 1) * B.TILE))
+
+
+def rewash(world):
+    """Every background piece the world names (`-bg`) turned into its place's twin: the user's wash levels
+    (tools/wash_levels.py), by the deck its y stands on and its metre, the balconies' furniture and anything on
+    the outside route of decks 8 to 10 at the balconies' level. A `cover` (a piece drawn again in front of
+    someone) has no y of its own: it takes its owner's, so it matches the piece it covers."""
+    floors = sorted((B.floor_y(d), d) for d in B.FLOOR_ROW)
+
+    def deck_of(y):
+        return next((d for fy, d in floors if fy >= y - 4), None)
+
+    def walk(o, y=None, route=None, balcony=False):
+        if isinstance(o, list):
+            for v in o:
+                walk(v, y, route, balcony)
+            return
+        if not isinstance(o, dict):
+            return
+        y = o.get("y", y) if isinstance(o.get("y", y), (int, float)) else y
+        route = o.get("route", route)
+        f = o.get("frame")
+        if isinstance(f, str) and f.endswith("-bg") and y is not None and isinstance(o.get("x"), (int, float)):
+            deck = deck_of(y)
+            out = balcony or (route == OUTSIDE and deck in (8, 9, 10))
+            o["frame"] = wash_frame(f, deck, B.metres(int(o["x"]) // B.TILE), balcony=out)
+        for k, v in o.items():
+            if k != "frame":
+                walk(v, y, route, balcony or k == "furniture")
+
+    walk(world)
+    return world
 
 
 def funnel_top():

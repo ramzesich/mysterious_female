@@ -198,3 +198,30 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   outside the plan, what a new popup goes through, what was not touched.
 - **A slip, mended:** `git checkout origin/main -- .` (meant only to read the documents) overwrote the
   merge in progress; `git merge --abort` and the merge again, every popup edit checked present after.
+
+## The background props' wash, deck by deck (2026-11-20)
+
+- **Asked:** "a visual audit of the background props. At some places they are too much washed out ...
+  even out the level of washing out. Take the gym props and the theater chairs as example."
+- **First try, reverted:** every `-bg` prop, the rooms and the lifeboats at 12% at once ("Too many changes
+  that I don't agree with. Let's revert to the original and maybe go deck by deck, in steps"). Nothing of it
+  was kept.
+- **Deck by deck:** each place shot in the game at 35% (the old level), 20% and 12% (the gym's), the user
+  choosing: decks 3 to 7, 10 to 12 at 20%; the Library, Magnum's (dark wood) and the Sports Bar (dark green)
+  at 12%; decks 8 and 9 as they were but their balconies (20%, deck 10's too); **the guest cabin corridors
+  (beige walls) as they were on every deck** ("Those guest cabin corridors remain as they were before this
+  entire update"). Doors she cannot use, railings, the rooms, the lifeboats untouched.
+- **Built:** `tools/wash_levels.py` (the table; `frame()` picks `-bg`, `-w20` or `-lt` by deck and metre);
+  `tools/build_ship_art.py` makes `-w20` (20%) and `-lt` (12%) for every piece but doors and railings (every
+  old frame unchanged; the atlas 512 x 3945); `put()` in `tools/build_ship_map.py` and a last pass in
+  `tools/build_world.py` (the balconies' furniture, the pieces drawn again in front of people) take the
+  place's twin. The guest cabin corridors' props are laid by the ship scene itself, still `-bg`.
+- **The Library's chairs:** one red reading chair is hers, in full colours, beside two washed ones; the user:
+  all five reading chairs in full colours and each one to sit in and read. Written into
+  `docs/plan-the-rest.md` §2.3b for the Implementation session (the user's word), not built here.
+- **A slip, mended:** the first deck 8 balconies shown were deck 9's (`?at=balcony` is deck 9's); deck 8's
+  shown and confirmed after.
+- **Checked:** the built game shot at nine spots against the old shots; `boot`, `deck3`, `region2`,
+  `region3`, `region6`, `region7`, `region8` pass, no errors; `check_overlaps`: 0 overlaps. The rest not run.
+- **Open, on the user's word:** a line in `CLAUDE.md` (a new background prop is placed with `-bg`, its place's
+  twin picked by `tools/wash_levels.py`); the merge to `main`.
