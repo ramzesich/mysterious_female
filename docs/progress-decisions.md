@@ -3595,5 +3595,6 @@ while the building session worked.
   against the row above it (a leak made on purpose is caught); deck 9's stern leaked until the slopes' copy.
 - **On the promenade's deck** her lowest row is left off (a crop while she stands there): the user's call.
 - `boot`, `run_jump`, `stairs`, `ladder`, `trunk`, `lift`, `pool`, `promenade`, `cabin`, `linen`, `balcony`,
-  `falls`, `dash`, `golden`, `region4`, `region7`, `finale` pass; overlaps 0.
+  `falls`, `dash`, `golden`, `region4`, `region7`, `finale` pass. `tools/check_overlaps.py` listed 3: the pickups'
+  glint stars (since the glint's commit, where it was not run), now skipped by it (`spark`); then 0.
 

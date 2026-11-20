@@ -48,7 +48,8 @@ SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel"
 
 # Textures that are not things standing on a deck: her, the people (they walk past doors), the cat,
 # pickups and their glints, lamps, the weather.
-SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "dot", "glow", "lamp", "puff", "livery", "things-gull"}
+SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "dot", "glow", "lamp", "puff", "livery", "things-gull",
+             "spark"}         # (a pickup's glint, 2026-11-20)
 
 DUMP = """(() => { const s = window.__ship, out = [];
   const walk = list => { for (const o of list) {
