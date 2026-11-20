@@ -278,7 +278,7 @@ of data and a generated picture shown first, each set against what is built at i
 | 5 | Bumbot's | Liquid snack in a tube | Deck 4, the dry store, on a shelf | E (green card). **Placed 2026-11-19** (the bottom shelf, by its tangerines) |
 | 6 | Bumbot's | Massage gun | Deck 11, the gym, ~~the bench by the weights~~ **the rowing machine's seat** (the user, 2026-11-20) | E. **Placed 2026-11-19, moved 2026-11-20** |
 | 7 | Bumbot's | Tin of sardines | The Sushi Bar | The chef's bubble shows a tangerine; he takes one for it (the apology's hand-over) |
-| 8 | Bumbot's | Remote-controlled car (beige, two big rubbery cyan wheels: the user) | Deck 7, Entourage, past the ball pit | E. **Placed 2026-11-19** (on the floor between the foosball and the pool tables) |
+| 8 | Bumbot's | Remote-controlled car (beige, two big rubbery cyan wheels: the user) | Deck 7, Entourage, past the ball pit | E. **Placed 2026-11-19, moved 2026-11-20** (on the air hockey table, left of its post: the user) |
 | 10 | Hers | Bookmark with a cat on top | ~~Deck 6, the maid's cabin, in the book by the bed~~ **Deck 9, the cabin being cleaned, in its book on the stripped bed** (swapped with 12, the user: that cabin has no window) | E. **Placed 2026-11-19** |
 | 11 | Hers | Diary notepad (brown leather, a strap with a brass buckle: the user) | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end). **Placed 2026-11-19** (the last seat, by the railing) |
 | 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the floor (`low`). **Placed 2026-11-19** |

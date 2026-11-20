@@ -183,11 +183,11 @@ ITEMS = {
     # §4 2.1 (2026-11-19), each with its close-up (assets/source/closeups/), placed for the user to judge in
     # play: Bumbot's snack tube on the dry store's bottom shelf, beside its tangerines (the green card);
     # his massage gun on the gym's rowing machine, on its seat (the user, 2026-11-20:
-    # not the bench under the barbell); his car on Entourage's floor past the ball pit, between the
-    # foosball and the pool tables.
+    # not the bench under the barbell); his car on Entourage's air hockey table, left of its post (the
+    # user, 2026-11-20: not on the floor).
     "keep_snack": ("store", 173, "keep:cat:snack", None, 40, "thing:snack-tube"),
     "keep_massage": (11, 97.08, "keep:cat:massage", None, 15, "thing:massage-gun"),
-    "keep_car": (7, 56.25, "keep:cat:car", None, 0, "thing:rc-car"),
+    "keep_car": (7, 57.85, "keep:cat:car", None, 26, "thing:rc-car"),
     # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
     # an inside one with no window (the user); the sill is reached with E from the floor (`low`). Her diary

@@ -1550,17 +1550,18 @@ def build_objects():
     put(7, 43.6, "cactus-bg")
     # Entourage, the teen club: deep teal, a dark carpet with neon specks, games.
     decor("entourage-doorway", "doorway", exact_x(45), exact_x(45), deck=7, text="Entourage")
-    put(7, 48.4, "tv-console-bg")
+    # (Its pieces washed only slightly, as the gym's and the theatre's: the user, 2026-11-20.)
+    put(7, 48.4, "tv-console-lt")
     # (49.3-53.7 m: the ball pit, src/world/bow.js.)
-    put(7, 54.6, "foosball-bg")
-    put(7, 58.2, "air-hockey-bg")
-    put(7, 61.4, "dartboard-2-bg", 54)
-    put(7, 63.2, "arcade-cabinet-bg")
-    put(7, 65.0, "vending-machine-bg")
-    put(7, 67.8, "wall-tv-bg", 62)
-    put(7, 67.2, "beanbag-orange-bg")
-    put(7, 68.4, "beanbag-blue-bg")
-    put(7, 71.6, "monstera-bg")
+    put(7, 54.6, "foosball-lt")
+    put(7, 58.2, "air-hockey-lt")
+    put(7, 61.4, "dartboard-2-lt", 54)
+    put(7, 63.2, "arcade-cabinet-lt")
+    put(7, 65.0, "vending-machine-lt")
+    put(7, 67.8, "wall-tv-lt", 62)
+    put(7, 67.2, "beanbag-orange-lt")
+    put(7, 68.4, "beanbag-blue-lt")
+    put(7, 71.6, "monstera-lt")
     # The atrium on deck 7 (the user's photos): burl-wood panels behind the side walk, covered in
     # the ports' plaques, a ship's wheel and paintings among them.
     plaques = ["plaque-shield", "plaque-medallion", "certificate", "plaque-lighthouse", "plaque-crown",

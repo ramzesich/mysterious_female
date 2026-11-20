@@ -3520,4 +3520,9 @@ while the building session worked.
 - **Checked:** each in place and its close-up in the running game; every built picture equal to the approved
   one. `boot`, `region1`, `region2`, `region6`, `region8`, `golden` pass (`region6` and `golden` took the socks
   from the rack: their spot changed); the rest not run.
+- **The locations (the user, 2026-11-20):** 1, 2, 3, 5 approved as placed; 6 moved (above); the car (8) "where I
+  circled": on Entourage's air hockey table, left of its post, 26 px up; the flag (9) approved. Entourage's
+  props "too washed out": its ten pieces take the light wash too (the TV console, the foosball and air hockey
+  tables, the dartboard, the arcade cabinet, the vending machine, the wall TV, two beanbags, the monstera; the
+  same pieces elsewhere keep `-bg`). `boot`, `region3`, `region9`, `golden` pass.
 

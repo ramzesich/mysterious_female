@@ -72,6 +72,9 @@ LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", 
 LIGHT |= {"treadmill", "exercise-bike", "cross-trainer", "rowing-machine", "weight-bench", "dumbbell-rack"}
 # And the spa's aerobics studio beside it (the user, 2026-11-20).
 LIGHT |= {"yoga-rack", "gym-bottle", "yoga-mat", "medicine-ball", "dumbbells", "kettlebell", "water-dispenser"}
+# And Entourage, the teen club on deck 7 (the user, 2026-11-20: "too washed out").
+LIGHT |= {"tv-console", "foosball", "air-hockey", "dartboard-2", "arcade-cabinet", "vending-machine", "wall-tv",
+          "beanbag-orange", "beanbag-blue", "monstera"}
 
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's
