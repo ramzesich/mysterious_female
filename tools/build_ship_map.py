@@ -1721,21 +1721,20 @@ def build_objects():
     at11(57.0, "salon-chair")       # (59.8 m: the chair with a client in it, tools/population.py)
     at11(62.3, "hood-dryer")
     at11(63.8, "manicure-table")
-    at11(66.6, "yoga-rack")
+    # (The aerobics studio washed only slightly, as the gym and the theatre: the user, 2026-11-20.)
+    put(11, 66.6, "yoga-rack-lt")
     # (67-70 m: the step class.)
-    at11(70.3, "gym-bottle")
-    at11(70.8, "yoga-mat")
-    at11(71.3, "medicine-ball")
-    at11(71.9, "dumbbells")
-    at11(72.4, "kettlebell")
-    at11(73.0, "water-dispenser")
+    for m, frame in ((70.3, "gym-bottle"), (70.8, "yoga-mat"), (71.3, "medicine-ball"), (71.9, "dumbbells"),
+                     (72.4, "kettlebell"), (73.0, "water-dispenser")):
+        put(11, m, frame + "-lt")
     # The fitness centre over the atrium's dome: machines in a row before big windows.
     add(area("fitness-windows", "decor", exact_x(83.2), floor_y(11) - 104, exact_x(100.8) - exact_x(83.2), 56,
              [prop("kind", "bridgewindows")]))
     for m, frame in ((84.4, "treadmill"), (86.6, "treadmill"), (88.8, "treadmill"), (90.8, "exercise-bike"),
                      (92.6, "exercise-bike"), (94.6, "cross-trainer"), (96.8, "rowing-machine"),
                      (99.0, "weight-bench"), (101.0, "dumbbell-rack")):
-        at11(m, frame)
+        # (Washed only slightly, as the theatre's: the user, 2026-11-20.)
+        put(11, m, frame + "-lt")
     # The pool deck (the user's photos): the giant chess set, sun loungers and parasols, the hot tub
     # between the two pools, ladders into them, the towel cart and a shower, Topsiders' bar.
     decor("chess-11", "chess", exact_x(110.4), exact_x(114.4), deck=11)

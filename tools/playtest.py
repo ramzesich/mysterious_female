@@ -1984,7 +1984,7 @@ def scenario_golden(b):
     s = b.state()
     ok &= check(s["y"] == D11 and 6 in save_list(b, "regions"), "up the forward stairs to deck 11: region 6", s)
     # Region 6: the socks; near-catch 5 drains the pool; the hatch into deck 10.
-    go(b, 11, 95.75)
+    go(b, 11, 89.19)
     b.tap("e")
     wait(0.2)
     ok &= check("socks" in save_list(b, "verbs"), "the grip socks, in the gym")
@@ -3341,12 +3341,12 @@ def scenario_region6(b):
                 "the towel animals are gone from the midship flight below")
     b.shot("region6-painter")
     wait(0.6)
-    b.teleport(exact_x(95.75) - 8, D11)
+    b.teleport(exact_x(89.19) - 8, D11)
     wait(0.3)
     b.shot("region6-socks")
     b.tap("e")
     wait(0.3)
-    ok &= check("socks" in save_list(b, "verbs"), "the grip socks, on the rack by the yoga mats")
+    ok &= check("socks" in save_list(b, "verbs"), "the grip socks, on the free treadmill's belt")
     wait(3.2)
     # The chess set.
     b.teleport(L["chessX"] - 20, D11)

@@ -3492,3 +3492,32 @@ while the building session worked.
   rest not run.
 - **Waiting for the user (asked for the next session): the locations of all ten, judged in play.**
 
+## §4 2.1 continued: the gym, and the other pickups' pictures and close-ups (the user, 2026-11-20)
+
+- **Merged:** `main` fast-forwarded to `three-uses` (0b49441) and pushed, on the user's word.
+- **The massage gun (6):** "Move it to the bench that I circled": the rowing machine; first on its rail, then
+  (the user: "Put it on the seat") on its seat, 15 px up.
+- **The gym's background props "too washed out ... like in the theater":** the fitness centre's machines
+  (treadmill, exercise bike, cross-trainer, rowing machine, weight bench, dumbbell rack) and, asked and
+  answered "Yes", the spa's aerobics studio (the yoga-mat rack, mat, medicine ball, dumbbells, kettlebell,
+  bottle, water cooler) take the theatre's light wash (`LIGHT` in `tools/build_ship_art.py`, `-lt`, 12%). Found
+  with it: the treadmill runner's `cover` still named `treadmill-bg`, now `-lt`. The crew corridor's water
+  cooler keeps `-bg`.
+- **"What is this?"** (the pink sock on the yoga-mat rack): the grip socks, an early placeholder drawn in code,
+  as the pills were. "Are their refinement and their close-ups not in the plan?" They were not; added to 2.1
+  ("As part of 2.1"), and built: the pills are her only quest item kept in the pocket (the user: the same for
+  every pocket quest item, not the carried ones; every hand-over and pickup of the story was looked at).
+  Pictures (6 generations): the socks and the pills generated; the parasol's close-up first came open, then
+  redrawn from the world's sprite (rough), then generated again furled, two tries, the user taking the one
+  folded like a closed umbrella, "remove the red pixel from the parasol's handle". In the world: the socks
+  in a stronger pink with a lighter pink outline, then moved to the free treadmill's belt by its rear end and
+  two px lower, in front of it (the user); the close-up recoloured to match ("more similar to that in the
+  game"). The pills at 12 px with an orange outline; "something that resembles a text on its white label"
+  (a dark title and lines of print, by hand, on both); "its bottom line has to be fixed" (the foot stepped in
+  on one side): three candidates, B, an even foot with rounded corners, "but make the top line to match the
+  color of the cap in the close up" (the cap's white ridges). `icon-socks` and `icon-pills`, drawn in code,
+  removed.
+- **Checked:** each in place and its close-up in the running game; every built picture equal to the approved
+  one. `boot`, `region1`, `region2`, `region6`, `region8`, `golden` pass (`region6` and `golden` took the socks
+  from the rack: their spot changed); the rest not run.
+

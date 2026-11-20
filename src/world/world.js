@@ -142,16 +142,8 @@ export class World {
             g.fillStyle(c, 1).fillRect(1, 1, 8, 11);
             g.fillStyle(0xf3ecdd, 1).fillRect(8, 2, 1, 9).fillRect(3, 3, 4, 1);
         }));
-        make('icon-socks', 12, 12, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(2, 0, 6, 9).fillRect(2, 7, 10, 5);
-            g.fillStyle(0xf68181, 1).fillRect(3, 1, 4, 8).fillRect(3, 8, 8, 3);
-            g.fillStyle(0xffffff, 1).fillRect(3, 1, 4, 2).fillRect(5, 9, 1, 1).fillRect(8, 9, 1, 1);
-        });
-        make('icon-pills', 8, 12, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 8, 10).fillRect(1, 0, 6, 3);
-            g.fillStyle(0xf9c22b, 1).fillRect(1, 3, 6, 8);
-            g.fillStyle(0xffffff, 1).fillRect(2, 1, 4, 1).fillRect(2, 5, 4, 3);
-        });
+        // (The grip socks and the stage manager's pills were drawn here until 2026-11-20: now their
+        // close-ups' pictures, `grip-socks` and `pills-bottle` among the things.)
         // (The old lady's parasol, furled and open, is PixelLab's: `parasol-closed`, `parasol-open`
         // among the things.)
         make('switch-box', 14, 22, g => {
@@ -1180,6 +1172,7 @@ export class World {
         const [type, name] = thing.what.split(':');
         if (type === 'verb') {
             this.progress.learn(name);
+            this.closeup(name);
         } else if (type === 'book') {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
@@ -1189,6 +1182,7 @@ export class World {
             this.closeup(thing.what.split(':')[2]);
         } else {
             this.save.items.push(name);
+            this.closeup(name);
         }
         thing.done = true;
         thing.pick.destroy();

@@ -67,6 +67,11 @@ MUTE = 0.35
 # much ... let's wash out them only slightly"): only the pieces in LIGHT get one.
 MUTE_LIGHT = 0.12
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
+# The fitness centre's machines too (the user, 2026-11-20: "too washed out ... only slightly washed out, like
+# in the theater").
+LIGHT |= {"treadmill", "exercise-bike", "cross-trainer", "rowing-machine", "weight-bench", "dumbbell-rack"}
+# And the spa's aerobics studio beside it (the user, 2026-11-20).
+LIGHT |= {"yoga-rack", "gym-bottle", "yoga-mat", "medicine-ball", "dumbbells", "kettlebell", "water-dispenser"}
 
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's

@@ -276,7 +276,7 @@ of data and a generated picture shown first, each set against what is built at i
 |---|---|---|---|---|
 | 4 | Bumbot's | Collar bell | The promenade, a gull on a lamp | A lob: it drops the bell for the fruit. **A new mover** (her cry: it flaps and keeps the bell) |
 | 5 | Bumbot's | Liquid snack in a tube | Deck 4, the dry store, on a shelf | E (green card). **Placed 2026-11-19** (the bottom shelf, by its tangerines) |
-| 6 | Bumbot's | Massage gun | Deck 11, the gym, the bench by the weights | E. **Placed 2026-11-19** (on the bench under the barbell) |
+| 6 | Bumbot's | Massage gun | Deck 11, the gym, ~~the bench by the weights~~ **the rowing machine's seat** (the user, 2026-11-20) | E. **Placed 2026-11-19, moved 2026-11-20** |
 | 7 | Bumbot's | Tin of sardines | The Sushi Bar | The chef's bubble shows a tangerine; he takes one for it (the apology's hand-over) |
 | 8 | Bumbot's | Remote-controlled car (beige, two big rubbery cyan wheels: the user) | Deck 7, Entourage, past the ball pit | E. **Placed 2026-11-19** (on the floor between the foosball and the pool tables) |
 | 10 | Hers | Bookmark with a cat on top | ~~Deck 6, the maid's cabin, in the book by the bed~~ **Deck 9, the cabin being cleaned, in its book on the stripped bed** (swapped with 12, the user: that cabin has no window) | E. **Placed 2026-11-19** |
@@ -306,6 +306,36 @@ of data and a generated picture shown first, each set against what is built at i
   by part 3's deliveries.
 - `tools/check_overlaps.py` must list nothing; `tools/check_corridors.py`'s numbers given at
   the end (the audit's C9: a reward every 25 to 30 m is measured only now).
+
+**Also part of 2.1: the other pickups' pictures and close-ups** (small; about 3 to 6 generations; added 2026-11-20, the user: "As part of 2.1").
+
+The user, 2026-11-20, of the pink sock on the gym's yoga-mat rack: "What is this?", then "Are their
+refinement and their close-ups not in the plan?" They were not: "A and C" (2.1) covered the things to
+find and the key cards, and the books' covers come in 2.3; the pickups that give her a way to move or a
+pocket item were left out. "Yes, add those to the plan."
+
+- **The grip socks** (`item_socks`, deck 11, 95.75 m, on the yoga-mat rack's top) and **her pills**
+  (`item_pills`, the stage manager's cabin, deck 4): both still the early placeholders drawn in code at
+  the game's start (`icon-socks`, `icon-pills` in `src/world/world.js`), never generated or approved; the
+  sock floats over the rack's top rail. Each gets a detailed generated picture (assets/source/closeups/,
+  `tools/build_closeups.py`), its world sprite made from it a little bigger than life (`FROM_CLOSEUP` in
+  `tools/build_things.py`), standing on what holds it (the rack's top rail; the cabin's shelf or table).
+- **The parasol** (`item_parasol`, deck 12, at the old lady's sunbed after the horn): its world picture
+  is generated and approved (`parasol-closed`); only its close-up, made to match it.
+- **The close-up on getting each**, as for the things to find (`world.closeup()`): from `take()` for a
+  `verb:` and an `item:` pickup too (frames named for what she gets: `socks`, `pills`, `parasol`).
+- Each picture shown to the user enlarged and in place before it goes in; then `region1` (the pills),
+  `region6` (the socks), `region8` (the parasol), `boot`.
+- **Built 2026-11-20:** the pills are her only quest item kept in her pocket (the user: "the same treatment
+  to all the quest items that we put in our pocket, except those that we carry"; every hand-over and pickup
+  of the story looked at: the rest she carries, or are cards and books). The socks: a pink pair, the world's
+  in a stronger pink with a lighter pink outline, **moved to the free treadmill's belt by its rear end, 8 px
+  up, sunk into it a little** (the user); the close-up in the same pink. The pills: a yellow bottle, 12 px with
+  an orange outline, the cap's white ridges on top, an even foot with rounded corners, a dark title and two
+  lines of print on its label (the close-up's label likewise, drawn by hand); the stage manager's hand-over
+  carries it too. The parasol: a close-up only, generated furled (the second of two tries), set to the world
+  parasol's red and white, the red band on its handle painted as the pole. The code-drawn `icon-socks` and
+  `icon-pills` are gone. 6 generations.
 
 ### 2.2 Fourteen books where ten is written (medium; no art by itself)
 

@@ -163,10 +163,12 @@ TANGERINES = {
 # piece it is drawn as]]). `what`: "verb:<name>" a new way to move, "book:<n>", "item:<name>" a pocket
 # item. All taken with E (population §2.1, §2.2).
 ITEMS = {
-    "item_socks": (11, 95.75, "verb:socks", None, 40),
+    # (On the free treadmill's belt, by its rear end, 8 px up, sunk into it a little in front of it (the user, 2026-11-20: it was on the yoga-mat
+    # rack's top); its pictures since that day its close-up's: assets/source/closeups/.)
+    "item_socks": (11, 89.19, "verb:socks", None, 8, "thing:grip-socks"),
     # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
-    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
+    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
@@ -180,10 +182,11 @@ ITEMS = {
     "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
     # §4 2.1 (2026-11-19), each with its close-up (assets/source/closeups/), placed for the user to judge in
     # play: Bumbot's snack tube on the dry store's bottom shelf, beside its tangerines (the green card);
-    # his massage gun on the gym's bench, under the barbell; his car on Entourage's floor past the ball
-    # pit, between the foosball and the pool tables.
+    # his massage gun on the gym's rowing machine, on its seat (the user, 2026-11-20:
+    # not the bench under the barbell); his car on Entourage's floor past the ball pit, between the
+    # foosball and the pool tables.
     "keep_snack": ("store", 173, "keep:cat:snack", None, 40, "thing:snack-tube"),
-    "keep_massage": (11, 99.08, "keep:cat:massage", None, 18, "thing:massage-gun"),
+    "keep_massage": (11, 97.08, "keep:cat:massage", None, 15, "thing:massage-gun"),
     "keep_car": (7, 56.25, "keep:cat:car", None, 0, "thing:rc-car"),
     # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
@@ -362,7 +365,7 @@ PEOPLE = {
     # (The treadmills' consoles are at their forward ends: she faces it, on the belt behind it, and
     # the machine is drawn again in front of her, its near handrail across her.)
     "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
-                          cover=[("treadmill-bg", 86.6, 0)]),
+                          cover=[("treadmill-lt", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
     "npc_kid_tub": dict(hear="own", at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
     "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
