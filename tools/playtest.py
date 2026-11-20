@@ -607,10 +607,19 @@ def scenario_intro(b):
     ok &= check(b.eval(f"{S}.route") == "inside" and abs(s["x"] - (SPAWN_X - 72)) < 2 and s["y"] == D3
                 and b.eval(f"{S}.player.visible && {S}.player.alpha === 1 && {S}.player.flipX"),
                 "she stands in the corridor a few steps left of her door, turned to go on to the left", s)
-    ok &= check(not alert(b), "no word over her yet", alert(b))
+    ok &= check(alert(b) == "← and → to move, Space to jump", "a word over her says how to move and jump", alert(b))
     ok &= check(b.eval(f"{S}.cameras.cameras.length") == 3 and b.eval(f"{S}.save.intro") is True, "nothing of the intro is left; it is saved as seen",
                 b.eval(f"{S}.cameras.cameras.length"))
     b.shot("intro-play")
+    b.eval(f"{S}.controls.device = 'pad'")
+    wait(0.1)
+    ok &= check(alert(b) == "Left stick to move, A to jump", "with the controller in use, in its buttons", alert(b))
+    b.shot("intro-play-pad")
+    b.eval(f"{S}.controls.device = 'keys'")
+    wait(0.1)
+    ok &= check(alert(b) == "← and → to move, Space to jump", "and back in the keys'", alert(b))
+    wait(5.4)
+    ok &= check(not alert(b), "it goes after a few seconds", alert(b))
     hold_until(b, "right", lambda q: q["x"] >= SPAWN_X, timeout=3)
     ok &= check(not alert(b), "nothing at her door yet", alert(b))
     hold_until(b, "right", lambda q: q["x"] >= SPAWN_X + 20, timeout=3)

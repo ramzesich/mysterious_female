@@ -24,7 +24,11 @@ const TEXTS = {
         'title': 'Bumbusik',
         'menu.play': 'PLAY',
         'menu.language': 'LANGUAGE',
-        // The one hint (the user asked for it, 2026-11-14): over her as the intro hands her over.
+        // The two hints (the user asked for each): how to move and jump, over her once as the intro
+        // hands her over (2026-11-20; with the controller in use, its own buttons); what E is for,
+        // the first time she walks past her door (2026-11-14).
+        'hint.move': '← and → to move, Space to jump',
+        'hint.move.pad': 'Left stick to move, A to jump',
         'hint.interact': 'E to interact',
         // The win screen (§6.4).
         'win.line': 'Bumbot is home.',
@@ -50,6 +54,8 @@ const TEXTS = {
         'title': 'Бумбусік',
         'menu.play': 'ГРАТИ',
         'menu.language': 'МОВА',
+        'hint.move': '← і → — рухатися, пробіл — стрибати',
+        'hint.move.pad': 'Лівий стік — рухатися, A — стрибати',
         'hint.interact': 'E — взаємодіяти',
         'win.line': 'Бумбот удома.',
         'win.tally': (found, tangerines, books, photos, slots) =>

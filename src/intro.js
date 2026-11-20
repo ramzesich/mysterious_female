@@ -53,7 +53,7 @@ const MENU = { title: 178, first: 336, step: 90,
                sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
-const HINT_MS = 6000;             // how long "E to interact" stays over her
+const HINT_MS = 6000;             // how long a hint stays over her
 const HINT_PAST = 16;             // ...shown once she is this many px past her door's middle, going right
 // Out of her door, walking straight to the left, a few steps (the user, 2026-11-20: "walk, not
 // run"; no stop facing us in the doorway): how far (72 px: she stops where the notice board hung,
@@ -510,15 +510,35 @@ export class Intro {
             s.cameras.remove(this.menuCam);
             s.intro = null;
         } });
-        // The one hint in the game (the user, 2026-11-14: "Add a hint popup, saying 'E to
-        // interact'"), over her in a new game the first time she walks past her cabin's door in
-        // the corridor (the user, 2026-11-20; she is handed over a few steps to the left of it).
+        // The game's two hints, each once in a new game. How to move and jump (the user, 2026-11-20:
+        // "When we get the controls after she faces left, place a one time popup"), over her as she
+        // is handed over, in the words of what she plays with (the controller's buttons while it is
+        // the one in use, and switched over if she takes up the other while it shows). What E is
+        // for (the user, 2026-11-14: "Add a hint popup, saying 'E to interact'"), the first time
+        // she walks past her cabin's door in the corridor (the user, 2026-11-20; she is handed over
+        // a few steps to the left of it); it takes the bubble over if the first is still up.
         if (this.full) {
             const past = this.door().x + HINT_PAST;
+            const moveText = () => t(s.controls.device === 'pad' ? 'hint.move.pad' : 'hint.move');
+            let move = null, moveUntil = 0, doorDone = false;
+            s.time.delayedCall(through ? 700 : 250, () => {
+                move = moveText();
+                moveUntil = s.time.now + HINT_MS;
+                s.world.say(move, HINT_MS);
+            });
             const watch = () => {
-                if (s.mode !== 'play' || s.route !== 'inside' || p.x < past) return;
-                s.events.off('update', watch);
-                s.world.say(t('hint.interact'), HINT_MS);
+                const showing = move && s.alert.visible && s.alert.text === move;
+                if (showing && moveText() !== move) {
+                    const now = moveText();
+                    s.alert.setText(now);
+                    s.time.delayedCall(Math.max(0, moveUntil - s.time.now), () => { if (s.alert.text === now) s.alert.setVisible(false); });
+                    move = now;
+                }
+                if (!doorDone && s.mode === 'play' && s.route === 'inside' && p.x >= past) {
+                    doorDone = true;
+                    s.world.say(t('hint.interact'), HINT_MS);
+                }
+                if (doorDone && move && s.time.now >= moveUntil) s.events.off('update', watch);
             };
             s.events.on('update', watch);
         }
