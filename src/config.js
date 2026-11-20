@@ -482,6 +482,18 @@ export const THROW = {
     ms: 440,
     releaseMs: 250,
     fps: 16,
+    // In the air (the user, 2026-11-20: "a player expects" to throw while jumping): F straight forward from her
+    // hand's height, ↑ and F the lob from there; once a jump, her arc kept, her clip (`her-airtoss`) over her jump's
+    // pose for `airMs`, the fruit off her hand at `airReleaseMs`; `carry` of her own speed along goes with it.
+    // (Forward and a little up: a level throw dropped below a gull on a light within 1.5 m; this one meets it
+    // from 0.5 to 2.5 m whenever in the jump it leaves her hand, but at the end of her fall.)
+    air: { vx: 260, vy: 200 },
+    airHand: 7,
+    airHandY: 23,
+    airMs: 400,
+    airFps: 20,
+    airReleaseMs: 150,
+    carry: 0.5,
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus

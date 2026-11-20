@@ -894,6 +894,10 @@ export class ShipScene extends Phaser.Scene {
             x0: o.x, x1: o.x + o.width, floor,
             doors: list('doors').map(Number),
         };
+        // The side's own two rows under its floor's line drawn again over what lies on it (a tangerine's lowest
+        // row reached into them, through the hull, the user, 2026-11-20: as her feet did, which are cut short
+        // there); only while she is out on it (inside, the deck below may be open there).
+        pr.edge = this.plateCopy(pr.x0, floor, pr.x1 - pr.x0, 2, DEPTH.exterior + 0.135).setVisible(false);
         const enclosed = list('enclosed').map(pair => pair.split(':').map(Number));
         // Each boat: its x, its picture, its two hooks' x in it and their eyes' depth below its top.
         const boats = list('boats').map(s => {
@@ -2938,6 +2942,8 @@ export class ShipScene extends Phaser.Scene {
             }
             this.glideArmed = false;                 // (a press in the air, held on: only for that fall)
             this.grounded = true;
+            this.airThrown = false;                  // (one throw a jump: hers again once she has landed)
+            this.airThrowUntil = 0;
             this.lastGroundedAt = time;
             this.takeoffY = p.y;
         } else {
@@ -2958,6 +2964,8 @@ export class ShipScene extends Phaser.Scene {
             body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
             return;
         }
+        // (A throw in the air: off her hand on the swing, while she flies on.)
+        if (this.throwing?.air && time >= this.throwing.at) this.releaseThrow();
         // Throwing (F): she stands for it, and the tangerine leaves her hand on the swing.
         if (time < this.throwUntil) {
             body.velocity.x = approach(body.velocity.x, 0, PLAYER.groundDecel * dt);
@@ -2987,7 +2995,7 @@ export class ShipScene extends Phaser.Scene {
         if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
 
         if (input.dashPressed) this.tryCry(time);
-        if (input.throwPressed && this.tryThrow(input, time, onFloor)) return;
+        if (input.throwPressed && this.tryThrow(input, time, onFloor) && onFloor) return;
 
         // The verbs (§6.1.2, src/world/verbs.js): crawling under things, a kick off a wall in grip
         // socks, a glide under the parasol.
@@ -3060,6 +3068,10 @@ export class ShipScene extends Phaser.Scene {
         else if (gliding) this.pose(this.anims.exists('her-glide') ? 'glide' : 'apex');
         else if (sliding) this.pose(this.herFrames.wallslide !== undefined ? 'wallslide' : 'fall');
         else if (!onFloor && time < this.kickUntil + 160 && this.herFrames.wallkick !== undefined) this.pose('wallkick');
+        else if (!onFloor && time < this.airThrowUntil) {
+            // (Her throw in the air plays over her jump; until its clip is approved, her jump's top stands in.)
+            if (!this.anims.exists('her-airtoss')) this.pose('apex');
+        }
         else if (!onFloor) this.pose(body.velocity.y < -60 ? 'rise' : body.velocity.y < 60 ? 'apex' : 'fall');
         else if (slipping) this.pose(this.herFrames.slip !== undefined ? 'slip' : 'apex');
         else if (Math.abs(body.velocity.x) > 10) this.pose('run', lunging ? 1.8 : Math.abs(body.velocity.x) / PLAYER.runSpeed);
@@ -3597,6 +3609,7 @@ export class ShipScene extends Phaser.Scene {
         // bottom line of her feet on the promenade"): her picture cut that many rows short while she stands there.
         const pr = this.promenade;
         const onProm = !!pr && this.route === 'promenade' && Math.abs(p.y - pr.floor) < 2 && p.x >= pr.x0 && p.x <= pr.x1;
+        if (pr) pr.edge.setVisible(this.route === 'promenade');
         if (onProm) p.setCrop(0, 0, PLAYER.cell, PLAYER.cell - PLAYER.sink);
         else if (this.promCrop) p.setCrop();
         this.promCrop = onProm;
@@ -4444,12 +4457,21 @@ export class ShipScene extends Phaser.Scene {
     // hands free: not with a tray, crawling, gliding, in a lunge or holding Bumbot (ladders,
     // stairs, the pool are modes of their own). No cursor: she aims by where she stands.
     tryThrow(input, time, onFloor) {
-        if (!onFloor || this.crawling || this.holding || this.gliding || this.world.carry || this.isLunging()) return false;
+        if (this.crawling || this.holding || this.gliding || this.world.carry || this.isLunging()) return false;
+        // (In the air: once a jump, and not kicking off a wall.)
+        if (!onFloor && (this.airThrown || this.throwing || time < this.kickUntil + 160)) return false;
         if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
             this.blinkCount();
             return false;
         }
         const p = this.player;
+        if (!onFloor) {
+            this.airThrown = true;
+            this.throwing = { at: time + THROW.airReleaseMs, lob: !!input.up, dir: p.flipX ? -1 : 1, air: true };
+            this.airThrowUntil = time + THROW.airMs;
+            if (this.anims.exists('her-airtoss')) p.anims.play('her-airtoss');
+            return true;
+        }
         this.throwing = { at: time + THROW.releaseMs, lob: !!input.up, dir: p.flipX ? -1 : 1 };
         this.throwUntil = time + THROW.ms;
         // (Until her clip is made, her reach stands in.)
@@ -4459,12 +4481,15 @@ export class ShipScene extends Phaser.Scene {
 
     // It leaves her hand: one less, a real thing in the world (src/world/tangerine.js).
     releaseThrow() {
-        const p = this.player, { lob, dir } = this.throwing;
+        const p = this.player, { lob, dir, air } = this.throwing;
         this.throwing = null;
         if (this.save.tangerines <= 0 && !this.infiniteTangerines()) return;
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
-        const k = lob ? THROW.lob : THROW.roll;
-        this.loose.throw(p.x + dir * THROW.hand, p.y - THROW.handY, dir * k.vx, -k.vy, lob);
+        const k = lob ? THROW.lob : air ? THROW.air : THROW.roll;
+        // (In the air: from her hand where the swing has it, with some of her own speed along.)
+        const hand = air ? THROW.airHand : THROW.hand, handY = air ? THROW.airHandY : THROW.handY;
+        const along = air ? p.body.velocity.x * THROW.carry : 0;
+        this.loose.throw(p.x + dir * hand, p.y - handY, dir * k.vx + along, -k.vy, lob);
         sfx.toss();
         this.refreshHud();
     }

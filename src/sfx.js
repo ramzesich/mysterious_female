@@ -422,6 +422,8 @@ const finds = {
     // Her bubble or theirs popping up; a little heart.
     bubble: () => { tone(900, 0.035, { vol: 0.068 }); tone(1250, 0.05, { vol: 0.068, t: 0.03 }); },
     heart: () => { tone(784, 0.14, { type: 'sine', vol: 0.07 }); tone(988, 0.24, { type: 'sine', vol: 0.07, t: 0.1 }); },
+    // Bumbot's collar bell: a little jingle bell shaken, as the gull lets it go and as it lands on the deck.
+    jingle: () => { for (let i = 0; i < 4; i++) bell(r(3900, 4700), 0.2, 0.03, i * 0.055 + r(0, 0.02), [1, 1.58, 2.37]); },
     // One struck bell: an elevator's, a counter's.
     ding: () => { bell(988, 0.4, 0.07); bell(784, 0.6, 0.07, 0.14); },
     // Air moved by something quick, generic.

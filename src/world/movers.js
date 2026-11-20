@@ -152,6 +152,151 @@ export class Gull {
     }
 }
 
+// The gull with Bumbot's collar bell (§4 2.1, thing 4; the user, 2026-11-20; population: `BELL_GULL`): on a
+// wall light on the promenade, the bell's collar in its beak. Unlike the shy gulls it keeps its place when
+// she comes (it flaps up only from her jump at it, or her cry, the bell kept, and settles again). A throw that
+// reaches it (a lob from the deck, any throw in a jump) is caught: the bell drops to the deck under its beak (the thing to find `keep_bell`, hers by E,
+// its glint and close-up as any other) and the gull is off with the fruit, for good (`flag`). Its pictures
+// with the bell are its own frames with the collar drawn in (`gull-bell-*`), so it is the same bird after.
+const BELL_FRAMES = { 'gull-perched': 'gull-bell-perched', 'gull-up': 'gull-bell-up', 'gull-down': 'gull-bell-down' };
+const BELL_DROP = 9;            // px aft of its middle: where the bell hangs, and lands
+// Just under the bell, at its right, in each frame (its glint's place: at the bell's bottom, then 2 px right, the user, 2026-11-20).
+const COLLAR_AT = { 'gull-bell-perched': [21, 10], 'gull-bell-up': [30, 25], 'gull-bell-down': [29, 14] };
+const BELL_AT = { 'gull-bell-perched': [19.5, 9], 'gull-bell-up': [28.5, 24], 'gull-bell-down': [27.5, 13] };   // the bell's middle in each frame
+export class BellGull {
+    constructor(world, def) {
+        const s = world.scene;
+        this.world = world;
+        this.scene = s;
+        this.def = def;             // { x, y (its feet), floor, route, item, flag }
+        this.rise = 0;
+        this.sprite = s.add.image(def.x, def.y, 'things', 'gull-bell-perched').setDepth(world.depthFor(def.route) - 0.015);
+        world.add([this.sprite]);
+        this.items = [this.sprite];
+        this.gone = world.progress.has(def.flag);
+        this.pose('gull-perched');
+        this.sprite.setVisible(!this.gone);
+        // The collar in its beak twinkles as any thing to find does, a size smaller (the user, 2026-11-20).
+        world.glint(this.sprite, { small: true, when: () => !this.gone, at: () => {
+            const sp = this.sprite, c = COLLAR_AT[sp.frame.name] ?? COLLAR_AT['gull-bell-perched'];
+            return { x: sp.x - sp.originX * sp.width + c[0], y: sp.y - sp.originY * sp.height + c[1] };
+        } });
+        // (The bell lies where it lands, under its beak: there from the start, hidden while the gull has it.)
+        this.thing = world.things.find(t => t.id === def.item);
+        if (this.thing) {
+            this.thing.x = def.x + BELL_DROP;
+            this.thing.pick.setX(def.x + BELL_DROP).setVisible(this.gone);
+        }
+    }
+
+    // A frame of the gull, with the bell while it has it, set so that the bird stands where its own
+    // frame would (its origin its foot's middle; the bell's frames are wider and taller, to the right and down).
+    pose(plain) {
+        const s = this.scene, sp = this.sprite, f = s.textures.getFrame('things', plain);
+        sp.setFrame(this.gone ? plain : BELL_FRAMES[plain]);
+        sp.setOrigin(f.width * 0.5 / sp.frame.width, f.height / sp.frame.height);
+    }
+
+    // Her cry: up and away a while, the bell kept.
+    heard() {
+        const d = this.def;
+        if (!this.gone && this.world.hears(d.x, d.floor - 40, d.route)) this.scaredUntil = this.scene.time.now + 4000;
+    }
+
+    // A lob that reaches it in the air: caught, the bell let go.
+    offered(t) {
+        const d = this.def, sp = this.sprite;
+        if (this.gone || !t.thrown || t.route !== d.route || t.img.y > d.floor - 30) return false;
+        // (Its body: the plain bird's box, the bell's frame being wider.)
+        const cx = sp.x, cy = sp.y - 10;
+        if (Math.abs(t.img.x - cx) > 14 || Math.abs(t.img.y - cy) > 14) return false;
+        this.catchFruit(t);
+        return true;
+    }
+
+    catchFruit(t) {
+        const s = this.scene, w = this.world, d = this.def, sp = this.sprite;
+        const fruit = s.loose.claim(t).setDepth(sp.depth + 0.001);
+        // (Where the bell hangs this moment: under the beak, in the frame shown.)
+        const at = BELL_AT[sp.frame.name] ?? BELL_AT['gull-bell-perched'];
+        const bellX = sp.x - sp.originX * sp.width + at[0], bellY = sp.y - sp.originY * sp.height + at[1];
+        this.gone = true;
+        w.progress.setFlag(d.flag);
+        sfx.at(d.x, d.y).gull();
+        sfx.at(d.x, d.y).jingle();
+        this.pose(this.rise > 0 ? 'gull-up' : 'gull-perched');
+        // The bell falls to the deck, growing from its size in the beak to its own (a little bigger than life).
+        const pick = this.thing?.pick;
+        if (pick) {
+            pick.setVisible(true).setPosition(bellX, bellY + 3).setScale(0.5);
+            this.fall = { pick, t0: s.time.now, x0: bellX, y0: bellY + 3, x1: d.x + BELL_DROP, y1: this.thing.level, landed: false };
+        }
+        // The gull: the fruit in its beak, up and off with it.
+        this.away = { t0: s.time.now, x0: sp.x, y0: sp.y, fruit };
+    }
+
+    update(dt, time) {
+        const s = this.scene, p = s.player, d = this.def, sp = this.sprite;
+        if (this.fall) this.updateFall(time);
+        if (this.away) return this.updateAway(time);
+        if (this.gone) return;
+        const on = d.route === s.route;
+        sp.setVisible(on);
+        if (!on) return;
+        // (Only her jumping straight into it, or her cry, sends it up: it keeps its light as she walks by, and
+        // as she jumps to throw at it, the user, 2026-11-20.)
+        const jumpAt = s.route === d.route && Math.abs(p.x - d.x) < 12 && p.y - PLAYER.height < d.y && p.y > d.y - 22;
+        if (jumpAt) this.awaySince = time;
+        const up = jumpAt || time < (this.scaredUntil ?? 0) || time - (this.awaySince ?? -1e9) < 1400;
+        if (up && this.rise === 0) sfx.at(d.x, d.y).flap();
+        this.rise = Phaser.Math.Clamp(this.rise + (up ? 2.2 : -1.3) * dt, 0, 1);
+        if (this.rise === 0) {
+            this.pose('gull-perched');
+            sp.setPosition(d.x, d.y);
+            return;
+        }
+        const flap = Math.floor(time / 130) % 2;
+        this.pose(flap ? 'gull-down' : 'gull-up');
+        const ease = this.rise * this.rise * (3 - 2 * this.rise);
+        sp.setPosition(d.x + 10 * ease, d.y - 46 * ease + Math.sin(time / 240) * 2 * ease + (flap ? 2 : 0));
+    }
+
+    // The bell's fall: down to the deck in 0.45 s, a small hop where it lands, the jingle.
+    updateFall(time) {
+        const f = this.fall, k = Math.min(1, (time - f.t0) / 450);
+        f.pick.setPosition(f.x0 + (f.x1 - f.x0) * k, f.y0 + (f.y1 - f.y0) * k * k).setScale(0.5 + 0.5 * k);
+        if (k < 1) return;
+        if (!f.landed) {
+            f.landed = true;
+            sfx.at(f.x1, f.y1).jingle();
+        }
+        const h = (time - f.t0 - 450) / 220;
+        if (h >= 1) {
+            f.pick.setPosition(f.x1, f.y1).setScale(1);
+            this.fall = null;
+            return;
+        }
+        f.pick.setY(f.y1 - Math.round(3 * Math.sin(Math.PI * h)));
+    }
+
+    // Off with the fruit: flapping, up and aft out of sight, the fruit in its beak (placed after the bird).
+    updateAway(time) {
+        const a = this.away, sp = this.sprite, e = (time - a.t0) / 1100;
+        if (e >= 1) {
+            a.fruit.destroy();
+            sp.setVisible(false);
+            this.away = null;
+            return;
+        }
+        const flap = Math.floor(time / 120) % 2;
+        this.pose(flap ? 'gull-down' : 'gull-up');
+        const k = e * e;
+        sp.setPosition(a.x0 + 100 * k + 6 * e, a.y0 - 30 * e - 120 * k).setAlpha(1 - Math.max(0, e - 0.6) / 0.4);
+        const b = this.world.inBeak(sp);
+        a.fruit.setOrigin(0.5, 0.15).setPosition(b.x, b.y).setAlpha(sp.alpha);
+    }
+}
+
 // A stage light on its cable (population: `haz_lights`). Until its flag it is hauled up short and
 // lights its spot; after (the rival's crash shook the rig) it hangs low and swings like a
 // pendulum: at the bottom of its arc it is at her head's height, "Bonked"; at the ends it is over it.
@@ -171,7 +316,9 @@ export class SwingLight {
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
-        const near = Math.abs(p.x - d.x) < 800 && Math.abs(p.y - d.floor) < 300;
+        // (Only while she is inside on its deck: drawn over her layer, its cable and lamp hung over the closed
+        // side of deck 6 seen from the Stardust balcony above, 2026-11-20.)
+        const near = Math.abs(p.x - d.x) < 800 && s.route === 'inside' && Math.abs(p.y - d.floor) < 72;
         this.g.setVisible(near);
         this.cone.setVisible(near);
         if (!near) return;

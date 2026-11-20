@@ -104,6 +104,8 @@ safeTailMs: 300 }`. The speed stays under Bumbot's 300 px a second.
   and stops against anything solid.
 - **↑ with F: a lob.** High and short (it tops out just under the ceiling, about 2.3 m ahead):
   for what is up on shelves, ledges, lamps and strings.
+- **In a jump (the user, 2026-11-20: "a player expects" it):** F tosses it forward and a little up from her
+  hand, ↑ and F lobs it from there; once a jump, and she flies on (`THROW.air*`, her clip `her-airtoss`).
 - **It is a real thing on the floor.** Whatever wants it takes it (§2). If nothing does, it lies
   where it stopped and is picked up by walking over it, today or next week (it is saved). Over
   the side it is gone, with a small splash. In a pool it floats.

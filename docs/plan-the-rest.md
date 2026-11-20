@@ -274,7 +274,7 @@ of data and a generated picture shown first, each set against what is built at i
 
 | # | Whose | Thing | Where | How |
 |---|---|---|---|---|
-| 4 | Bumbot's | Collar bell | The promenade, a gull on a lamp | A lob: it drops the bell for the fruit. **A new mover** (her cry: it flaps and keeps the bell) |
+| 4 | Bumbot's | Collar bell | The promenade, a gull on a lamp | A lob: it drops the bell for the fruit. **A new mover** (her cry: it flaps and keeps the bell). **Placed 2026-11-20:** `BellGull` on the round wall light at 140.6 m (ten lights along the promenade, the user's), any throw that reaches it (a lob from the deck, or **her throw in the air**, new, the user's word), the bell's collar drawn in its beak, its close-up the collar |
 | 5 | Bumbot's | Liquid snack in a tube | Deck 4, the dry store, on a shelf | E (green card). **Placed 2026-11-19** (the bottom shelf, by its tangerines) |
 | 6 | Bumbot's | Massage gun | Deck 11, the gym, ~~the bench by the weights~~ **the rowing machine's seat** (the user, 2026-11-20) | E. **Placed 2026-11-19, moved 2026-11-20** |
 | 7 | Bumbot's | Tin of sardines | The Sushi Bar | The chef's bubble shows a tangerine; he takes one for it (the apology's hand-over) |
@@ -298,7 +298,7 @@ of data and a generated picture shown first, each set against what is built at i
   over the basket's rim); the dog's owner's toss holds the new ball over her far hand. 26 generations.
   **Waiting for the user: the locations of all ten, judged in play** (the links: `docs/start-links.md`, five
   new places `store4`, `maid6`, `knit5`, `shore5`, `balcony7`); noted for that: the flag now stands 16 px
-  among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull) and 7 (the sardines),
+  among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull, **placed 2026-11-20**) and 7 (the sardines),
   his four (13 to 16) after the table scene, then 2.2 before the two books. **2026-11-20: all ten approved where
   they lie** (the user's review, in play). The close-ups also as the HUD's
   icons (2.4): to propose with it.

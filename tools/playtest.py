@@ -1518,6 +1518,62 @@ def scenario_throw(b):
     b.wait_for(f"{S}.loose.all.length === 0 || {S}.loose.all[0].resting", timeout=5)
     hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=6)
     ok &= check(b.eval(f"{cat}.gone"), "walking up to him, the near-catch goes as it always did")
+
+    # The gull with Bumbot's collar bell on the promenade's wall light (§4 2.1, thing 4): it keeps its place
+    # as she walks under it; her cry sends it up with the bell; a throw in a jump, or a lob from about 2 m, is
+    # caught, the bell drops to the deck under its beak, and E takes it (the thing to find).
+    G = f"{S}.world.movers.find(m => m.def?.id === 'gull_bell')"
+    bell = f"{S}.world.things.find(t => t.id === 'keep_bell')"
+    gx = b.eval(f"{G}.def.x")
+    b.wait_for(f"{S}.mode === 'play'", timeout=12)        # (the near-catch above played out)
+    b.teleport(gx - 120, D6, "promenade")
+    wait(0.4)
+    ok &= check(not b.eval(f"{bell}.pick.visible"), "the bell gull: the bell in its beak, none on the deck")
+    hold_until(b, "right", lambda st: st["x"] > gx + 20, timeout=4)
+    ok &= check(b.eval(f"{G}.rise") == 0, "it keeps its light as she walks under it", b.eval(f"{G}.rise"))
+    b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud()")
+    b.tap("d")
+    wait(0.4)
+    ok &= check(b.eval(f"{G}.rise") > 0 and not b.eval(f"{G}.gone"), "her cry sends it up, the bell kept", b.eval(f"{G}.rise"))
+    b.wait_for(f"{G}.rise === 0", timeout=8)
+    # A throw in a jump (the user, 2026-11-20): 1.5 m short, F as she rises; a second F in the same jump
+    # throws nothing; she flies on; the gull catches it.
+    b.teleport(gx - 72, D6, "promenade")
+    wait(0.4)
+    b.eval(f"{S}.player.setFlipX(false); {S}.save.tangerines = 3; {S}.refreshHud()")
+    b.key("space", True)
+    wait(0.2)
+    b.key("space", False)
+    b.tap("f", 0.05)
+    air = b.eval(f"[{S}.player.anims.currentAnim?.key, !{S}.player.body.blocked.down, {S}.throwing?.air]")
+    b.tap("f", 0.05)
+    ok &= check(air == ["her-airtoss", True, True], "F in a jump: her throw in the air, and she flies on", air)
+    b.wait_for(f"{G}.gone", timeout=3)
+    ok &= check(b.state()["tangerines"] == 2, "one throw a jump: a second F threw nothing", b.state())
+    b.wait_for(f"!{G}.fall && !{G}.away", timeout=4)
+    b.shot("throw-bell")
+    ok &= check(b.eval(f"{S}.save.flags.includes('bell_dropped')") and b.eval(f"{bell}.pick.visible")
+                and abs(b.eval(f"{bell}.pick.y") - D6) < 1, "the gull catches it: the bell drops to the deck",
+                b.eval(f"[{bell}.pick.x, {bell}.pick.y, {bell}.pick.visible]"))
+    # (Again, by a lob from the deck about 2 m off: the gull put back as it was.)
+    b.eval(f"(g => {{ g.gone = false; g.away = null; g.fall = null; g.rise = 0; {S}.save.flags = {S}.save.flags.filter(f => f !== 'bell_dropped');"
+           f" g.sprite.setVisible(true).setAlpha(1); g.pose('gull-perched'); g.sprite.setPosition(g.def.x, g.def.y); g.thing.pick.setVisible(false); }})({G})")
+    b.wait_for(f"{S}.mode === 'play' && {S}.player.body.blocked.down", timeout=3)
+    b.teleport(gx - 117, D6, "promenade")
+    wait(0.4)
+    b.eval(f"{S}.player.setFlipX(false)")
+    b.key("up", True)
+    b.tap("f")
+    b.key("up", False)
+    b.wait_for(f"{G}.gone", timeout=3)
+    b.wait_for(f"!{G}.fall && !{G}.away", timeout=4)
+    ok &= check(b.eval(f"{S}.save.flags.includes('bell_dropped')") and abs(b.eval(f"{bell}.pick.y") - D6) < 1,
+                "or a lob from the deck: caught, the bell drops", b.eval(f"[{bell}.pick.x, {bell}.pick.y, {bell}.pick.visible]"))
+    b.teleport(b.eval(f"{bell}.x") - 6, D6, "promenade")
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:cat:bell" in b.eval(f"{S}.save.keeps"), "and E takes it", b.eval(f"{S}.save.keeps"))
     return ok
 
 
@@ -2385,7 +2441,7 @@ def scenario_region2(b):
     ok &= check(b.state()["mode"] == "play" and person(b, "haz_jogger")["x"] < exact_x(150), "or hopped", (b.state(), person(b, "haz_jogger")))
     js(b, f"(p => {{ p.pausedUntil = window.__ship.time.now + 600000; }})({jog})")
     # The gulls on the rail fly up as she comes near, and settle again.
-    gull = "window.__ship.world.movers.filter(m => m.rise !== undefined)[1]"
+    gull = "window.__ship.world.movers.find(m => m.def?.id === 'gull_prom_2')"
     b.teleport(exact_x(170), D6, "promenade")
     wait(0.4)
     ok &= check(js(b, f"{gull}.rise") == 0, "a gull sits on the rail")

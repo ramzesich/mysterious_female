@@ -334,6 +334,12 @@ export class Story {
         if (!f) return;
         const her = s.player;
         if (Math.abs(her.x - (f.x0 + f.x1) / 2) > 700 || Math.abs(her.y - f.y) > 200) return;
+        // (Only while she is inside on its deck: its white, drawn over everything, showed through the ship's
+        // side to her on the promenade outside the studio, the user, 2026-11-20, and to her on deck 7 above it.)
+        if (s.route !== 'inside' || Math.abs(her.y - f.y) > 72) {
+            this.flashGlow?.setFillStyle(0xfff1c9, 0);
+            return;
+        }
         this.flashAt ??= time + 2500;
         if (!this.flashGlow) {
             this.flashGlow = s.add.rectangle((f.x0 + f.x1) / 2, f.y - 60, f.x1 - f.x0, 120, 0xfff1c9, 0).setDepth(s.DEPTH.decor + 0.3);

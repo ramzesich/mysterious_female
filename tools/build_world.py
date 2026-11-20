@@ -12,7 +12,7 @@ from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, S
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
-from population import BOW, FINALE
+from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
@@ -222,6 +222,9 @@ def build_world():
     for rid, (deck, a, b, v) in ROBOTS.items():
         ents.append(dict(kind="robot", id=rid, x=B.exact_x(a), y=B.floor_y(deck), route="inside", x0=B.exact_x(a),
                          x1=B.exact_x(b), v=v))
+    x, y, route = spot(*BELL_GULL["at"])
+    ents.append(dict(kind="bellgull", id="gull_bell", x=x, y=y - BELL_GULL["up"], floor=y, route=route,
+                     item=BELL_GULL["item"], flag=BELL_GULL["flag"]))
     for gid, (where, at, up) in GULLS.items():
         x, y, route = spot(where, at)
         ents.append(dict(kind="gull", id=gid, x=x, y=y - up, route=route))

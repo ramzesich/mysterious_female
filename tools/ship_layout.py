@@ -75,7 +75,7 @@ PROMENADE = {"deck": 6, "span": (100, 231), "enclosed": [(100, 116), (212, 231)]
                        (166.6, "lifeboat"), (199.3, "tender"), (209.9, "tender"), (220.4, "lifeboat")],
              "columns": [112.2, 122.8, 131.4, 142.3, 155.1, 178.9, 183.9, 196.0, 209.5, 220.1],
              # Its back wall (the photo): round portholes on deck 6, a glazed bay two decks tall.
-             "portholes": [105.5, 156.0, 158.2, 168.3, 193.6, 200.9, 203.3],
+             "portholes": [105.5, 156.4, 158.6, 168.3, 193.6, 200.9, 203.3],    # (156.4, 158.6: clear of a plate butt, the user, 2026-11-20)
              "glazed": [(123.4, 131.0)]}
 
 # Cabin 8206, the user's own cabin on the cruise (2026-11-06): an oceanview with a picture window on

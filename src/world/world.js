@@ -13,7 +13,7 @@ import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
 import { Library } from './library.js';
-import { Robot, Gull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
+import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 
@@ -1023,6 +1023,9 @@ export class World {
             case 'gull':
                 this.movers.push(new Gull(this, e));
                 break;
+            case 'bellgull':
+                this.movers.push(new BellGull(this, e));
+                break;
             case 'light':
                 this.movers.push(new SwingLight(this, e));
                 break;
@@ -1485,11 +1488,13 @@ export class World {
     // 3.5 s on the scene's clock, each thing in its own
     // time. Not the things handed to her or made for her, nor the tangerines. It goes with the picture:
     // hidden with it, gone once it is taken.
-    glint(img) {
+    // (`at()`: where it shows, if not the picture's top right corner; `when()`: only while it is true;
+    // `small`: a size smaller, its arms one px: the bell's collar in the gull's beak, the user, 2026-11-20.)
+    glint(img, { at = null, when = null, small = false } = {}) {
         const s = this.scene;
         const spark = s.add.image(0, 0, 'spark', 0).setDepth(img.depth + 0.005).setVisible(false);
         this.add([spark]);
-        (this.glints ??= []).push({ img, spark, period: Phaser.Math.Between(2500, 3500), offset: Phaser.Math.Between(0, 3500) });
+        (this.glints ??= []).push({ img, spark, at, when, small, period: Phaser.Math.Between(2500, 3500), offset: Phaser.Math.Between(0, 3500) });
     }
 
     updateGlints(time) {
@@ -1497,15 +1502,15 @@ export class World {
         this.glints = (this.glints ?? []).filter(g => {
             if (!g.img.active) { g.spark.destroy(); return false; }
             const into = (time + g.offset) % g.period;
-            const on = g.img.visible && g.img.alpha > 0.5 && into < LONG;
+            const on = g.img.visible && g.img.alpha > 0.5 && into < LONG && (!g.when || g.when());
             g.spark.setVisible(on);
             if (!on) return true;
             // Eight steps: it grows over two, turns an eighth each step, shrinks over the last two; it fades
             // in and out as it does.
-            const SIZES = [0, 1, 2, 2, 2, 2, 1, 0], step = Math.min(7, Math.floor(8 * into / LONG));
+            const SIZES = g.small ? [0, 1, 1, 1, 1, 1, 1, 0] : [0, 1, 2, 2, 2, 2, 1, 0], step = Math.min(7, Math.floor(8 * into / LONG));
             const k = Math.sin(Math.PI * into / LONG);                     // 0, up to 1 halfway, back to 0
-            const b = g.img.getBounds();
-            g.spark.setPosition(Math.round(b.right - 1), Math.round(b.y + 1))
+            const b = g.img.getBounds(), pt = g.at ? g.at() : { x: b.right - 1, y: b.y + 1 };
+            g.spark.setPosition(Math.round(pt.x), Math.round(pt.y))
                 .setFrame((step % 2) * 3 + SIZES[step]).setAlpha(PEAK * Math.max(0.35, k));
             return true;
         });
