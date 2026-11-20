@@ -223,5 +223,6 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   shown and confirmed after.
 - **Checked:** the built game shot at nine spots against the old shots; `boot`, `deck3`, `region2`,
   `region3`, `region6`, `region7`, `region8` pass, no errors; `check_overlaps`: 0 overlaps. The rest not run.
-- **Open, on the user's word:** a line in `CLAUDE.md` (a new background prop is placed with `-bg`, its place's
-  twin picked by `tools/wash_levels.py`); the merge to `main`.
+- **On the user's word ("1. Ok 2. Ok"):** a rule in `CLAUDE.md` (a new background prop is placed with `-bg`,
+  its place's twin picked by `tools/wash_levels.py`); merged to `main` (a fast-forward: `main` had not moved)
+  and pushed.
