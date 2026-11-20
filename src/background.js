@@ -45,7 +45,7 @@ export const HORIZON_SETTLE = 1.0;
 // it starts]: small and faint low over the horizon, far off; bigger and nearer higher up.
 const OUTSIDE_SIZE = { islands: 10, clouds: 8 };
 const OUTSIDE_SKY = 2400;
-const OUTSIDE_CLOUDS = [[330, 4, 0.36, 1100], [1150, 6, 0.44, 420], [2500, 8, 0.5, 0]];
+const OUTSIDE_CLOUDS = [[330, 4, 0.7, 1100], [1150, 6, 0.8, 420], [2500, 8, 0.85, 0]];
 
 // Each layer: [texture height, how far into the haze (0-1), drift aft px/s, share of her running,
 // how far under the horizon its islands sit (px), seed].
@@ -176,67 +176,10 @@ function islandStrip(scene, key, h, haze, seed) {
     tex.refresh();
 }
 
-// Fair-weather clouds: heaps of round puffs, the biggest in the middle and highest, the smaller
-// ones lower at the sides, so each cloud's underside is lumpy, not a flat line (the user,
-// 2026-11-08); each puff's lower rim shaded. Drawn see-through (`CLOUD_ALPHA`), so they sit back in
-// the sky's haze rather than in front of it.
-const CLOUD_ALPHA = 0.5;
-function cloudStrip(scene) {
-    const w = 2048, h = 60;
-    const tex = scene.textures.createCanvas('bg-clouds', w, h);
-    const ctx = tex.getContext();
-    const rand = rng(21);
-    const blob = (cx, cy, rx, ry) => {
-        for (let yy = -Math.ceil(ry); yy <= Math.ceil(ry); yy++) {
-            const half = Math.floor(rx * Math.sqrt(Math.max(0, 1 - (yy / ry) ** 2)));
-            if (half > 0) ctx.fillRect(Math.round(cx - half), Math.round(cy + yy), half * 2, 1);
-        }
-    };
-    let x = 40;
-    while (x < w - 140) {
-        const cw = 34 + Math.round(rand() * 80), base = 26 + Math.round(rand() * (h - 40));
-        const n = 4 + Math.floor(rand() * 4);
-        const puffs = [];
-        for (let p = 0; p < n; p++) {
-            const t = (p + 0.5) / n, mid = 1 - Math.abs(t - 0.5) * 2;      // 1 in the middle
-            const r = (cw / n) * (0.6 + 0.5 * mid + rand() * 0.35);
-            puffs.push([x + cw * t + (rand() - 0.5) * 4, base - r * (0.2 + 0.5 * mid) + (rand() - 0.5) * 3, r]);
-        }
-        ctx.fillStyle = '#c7dcd0';                      // the shaded rims
-        for (const [cx, cy, r] of puffs) blob(cx, cy, r, r * 0.8);
-        ctx.fillStyle = '#ffffff';                      // the sunlit body, a little higher
-        for (const [cx, cy, r] of puffs) blob(cx, cy - Math.max(1, r * 0.22), r * 0.95, r * 0.75);
-        x += cw + 60 + Math.round(rand() * 300);
-    }
-    tex.refresh();
-}
-
-// One cloud by itself, `w` px wide, drawn as the strip's are (the few round the sun in the intro:
-// src/intro.js).
-export function cloudTexture(scene, key, w, seed) {
-    const h = Math.round(w * 0.5) + 8;
-    const tex = scene.textures.createCanvas(key, w + 12, h);
-    const ctx = tex.getContext();
-    const rand = rng(seed);
-    const blob = (cx, cy, rx, ry) => {
-        for (let yy = -Math.ceil(ry); yy <= Math.ceil(ry); yy++) {
-            const half = Math.floor(rx * Math.sqrt(Math.max(0, 1 - (yy / ry) ** 2)));
-            if (half > 0) ctx.fillRect(Math.round(cx - half), Math.round(cy + yy), half * 2, 1);
-        }
-    };
-    const n = 5 + Math.floor(rand() * 3), base = h - 8;
-    const puffs = [];
-    for (let p = 0; p < n; p++) {
-        const t = (p + 0.5) / n, mid = 1 - Math.abs(t - 0.5) * 2;
-        const r = (w / n) * (0.62 + 0.55 * mid + rand() * 0.3);
-        puffs.push([6 + w * t + (rand() - 0.5) * 4, base - r * (0.25 + 0.5 * mid) + (rand() - 0.5) * 3, r]);
-    }
-    ctx.fillStyle = '#c7dcd0';
-    for (const [cx, cy, r] of puffs) blob(cx, cy, r, r * 0.8);
-    ctx.fillStyle = '#ffffff';
-    for (const [cx, cy, r] of puffs) blob(cx, cy - Math.max(1, r * 0.22), r * 0.95, r * 0.75);
-    tex.refresh();
-}
+// The far clouds: a strip of small soft clouds, generated, hazed toward the horizon's colour
+// (tools/build_sky.py, `sky-strip`; the user chose them for the intro's sky, 2026-11-20, over the
+// heaps of round puffs drawn here before). Nearly solid: the haze is in their colours.
+const CLOUD_ALPHA = 0.85;
 
 // The far sea's ripples: faint short dashes, finer and fewer toward the horizon, so it reads as
 // the same water as the near sea's rows of waves (sea.js) where they meet.
@@ -383,7 +326,6 @@ function duskTextures(scene) {
 function makeTextures(scene) {
     if (scene.textures.exists('bg-far')) return;
     for (const [name, [h, haze, , , , seed]] of Object.entries(LAYERS)) islandStrip(scene, `bg-${name}`, h, haze, seed);
-    cloudStrip(scene);
     rippleStrip(scene);
     gullSheet(scene);
     gradient(scene, 'bg-sky', SKY_FADE, [[0, SKY_TOP], [1, HAZE]]);
@@ -400,9 +342,9 @@ export class Backdrop {
         const fixed = o => o.setOrigin(0).setScrollFactor(0);
         this.skyTop = fixed(scene.add.rectangle(0, 0, 4, 4, Number('0x' + SKY_TOP.slice(1)))).setDepth(depth);
         this.sky = fixed(scene.add.image(0, 0, 'bg-sky')).setDepth(depth);
-        this.clouds = fixed(scene.add.tileSprite(0, 0, 4, 60, 'bg-clouds')).setDepth(depth + 0.01).setAlpha(CLOUD_ALPHA);
+        this.clouds = fixed(scene.add.tileSprite(0, 0, 4, 60, 'sky-strip')).setDepth(depth + 0.01).setAlpha(CLOUD_ALPHA);
         // (The outside view's lower rows; its highest is `clouds` itself.)
-        this.cloudRows = OUTSIDE_CLOUDS.slice(0, -1).map(() => fixed(scene.add.tileSprite(0, 0, 4, 60, 'bg-clouds')).setDepth(depth + 0.01).setVisible(false));
+        this.cloudRows = OUTSIDE_CLOUDS.slice(0, -1).map(() => fixed(scene.add.tileSprite(0, 0, 4, 60, 'sky-strip')).setDepth(depth + 0.01).setVisible(false));
         this.sea = fixed(scene.add.image(0, 0, 'bg-sea')).setDepth(depth + 0.02);
         this.seaDeep = fixed(scene.add.rectangle(0, 0, 4, 4, Number('0x' + SEA_NEAR.slice(1)))).setDepth(depth + 0.02);
         this.ripples = fixed(scene.add.tileSprite(0, 0, 4, RIPPLES_H, 'bg-ripples')).setDepth(depth + 0.025);
@@ -433,8 +375,8 @@ export class Backdrop {
     setDusk(k) {
         this.dusk = k;
         for (const o of this.duskOnly) o.setAlpha(k).setVisible(k > 0);
-        this.clouds.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(CLOUD_ALPHA + 0.25 * k);
-        this.cloudRows.forEach((c, i) => c.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(OUTSIDE_CLOUDS[i][2] + 0.25 * k));
+        this.clouds.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(Math.min(1, CLOUD_ALPHA + 0.25 * k));
+        this.cloudRows.forEach((c, i) => c.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(Math.min(1, OUTSIDE_CLOUDS[i][2] + 0.25 * k)));
         this.ripples.setTint(tintTo(DUSK_TINTS.ripples, k));
         for (const l of this.layers) l.s.setTint(tintTo(DUSK_TINTS.islands, k));
         for (const g of this.gullSprites) g.setTint(tintTo(DUSK_TINTS.gulls, k));

@@ -547,7 +547,7 @@ def scenario_intro(b):
     water = b.eval(f"(c => ({S}.waterY - c.worldView.y) / c.worldView.height)({S}.cameras.main)")
     ok &= check(0.55 < water < 0.9, "the horizon and the sea are in the picture", water)
     b.shot("intro-sea")
-    still = f"[...{S}.backdrop.layers.map(l => l.s.tilePositionX), {S}.backdrop.clouds.tilePositionX, ...{I}.clouds.map(c => c.img.x), {I}.sun.x]"
+    still = f"[...{S}.backdrop.layers.map(l => l.s.tilePositionX), {S}.backdrop.clouds.tilePositionX, ...{I}.clouds.map(c => c.x), {I}.sun.x]"
     before = b.eval(still)
     wait(1.2)
     ok &= check(b.eval(still) == before, "the islands, the clouds and the sun hold still together: nothing drifts past the sun")

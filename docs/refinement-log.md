@@ -64,3 +64,39 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   was past the door by then ("with a slight delay"); now as she reaches it, her middle at its
   near edge (`HINT_AT`, -14 px).
 - **Checked:** `intro` (the hint before she is at the door's middle) and `deck3` pass.
+
+## The intro's sky: the sun, its light, the clouds (2026-11-20; plan-the-rest §7b, part 7, begun)
+
+- **Asked:** the plan's part 7 ("more realistically-looking sun and reflections, more varied and
+  volumetric clouds"). The user's answers: the sun a soft disc with a bloom and no rays, "but also
+  with some god rays through the clouds"; on the water only a path of light under the sun; clouds
+  all fair-weather heaps, lit tops and shaded bellies; pixel-art shapes, the bloom and the haze
+  smooth; and it reaches the game's far background and the sunset too. Warned: §7b is the
+  Implementation session's plan item, so the plan needs a note before it builds it (only with the
+  user's word); it touches `src/intro.js`, `src/background.js`.
+- **Chosen:** mock-up B (of A, B, and C on the palette), each built into the running intro (both
+  languages, the welcome's blur); then "too heavy, remove the black underlines, the clouds have to
+  be softer": B3, the clouds generated soft (no dark base). Their own colours, not the palette's.
+  Then: the light reflected under the sun with a cloud between them "looks off": nothing under the
+  sun now, a smaller cloud over its right side ("not on the bottom"), the light turned down a
+  little (bloom 85 %, rays 0.7); the big cloud in the pan to the ship made smaller (a cloud of a
+  size between, generated), and seven clouds of four sizes over the ship ("not big").
+- **Built:** `tools/build_sky.py` (the clouds' layout in screen px from the sun, each cloud's edge
+  toward the sun lit; the god rays worked out from the clouds: each casts a shadow lane away from
+  the sun, the beams only where they break its light; the bloom; the far clouds' strip; light
+  pictures fading to nothing at their borders, or the pan right showed their edge), to
+  `assets/sprites/sky.png`/`.json` (atlas `skyart`: the key `sky` was taken), `sky-layout.json`,
+  `sky-rays.png`, `sky-glow.png`, `sky-strip.png`; loaded in `BootScene`. `src/intro.js`: the old
+  drawn sun, rays, clouds and two-frame glitter gone; the path of light (`pathGlints`, `drawPath`)
+  glints on the far sea's rows, each flickering on its own clock and swaying with the ripples; the
+  old blinking white squares on the water ("sparks") taken out. `src/background.js`: the far clouds
+  are the generated strip (in play, from outside, the intro's far rows), nearly solid (their haze is
+  in their colours), the drawn puffs (`cloudStrip`, `cloudTexture`) gone.
+- **Art:** 12 PixelLab jobs (`create_image_pro`), 120 generations; every try and its job in
+  `assets/source/sky/tries/` (its README).
+- **Checked:** `intro` (its "nothing drifts" check reads the new clouds), `boot`, `lang`, `deck3`
+  pass; the rest not run. The views shot exactly through the renderer: the welcome, `sky`, `down`,
+  `sea`, the pan `right`, `ship`; play on deck 12 and the outside view (O). From outside the far
+  clouds stand in a fairly even row, as the old ones did.
+- **Still to do for §7b:** the sunset's sun and its path on the sea (a mock-up first); then the
+  plan's note and `CLAUDE.md`'s table, on the user's word.

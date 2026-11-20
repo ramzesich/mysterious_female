@@ -35,7 +35,6 @@ import { VIEW, PLAYER, IDLE } from './config.js';
 import { sfx } from './sfx.js';
 import { t, nextLanguage } from './lang.js';
 import { writeSave } from './save.js';
-import { cloudTexture } from './background.js';
 import { pixelText } from './pixeltext.js';
 
 const HALF = PLAYER.height / 2;
@@ -71,9 +70,6 @@ PARTS.full.find(q => q[0] === 'walk')[1] = WALK.secs + WALK.stop;
 const SUN_UP = 365;               // the sun over the horizon, in screen px of the wide view
 const HORIZON = 140;               // the horizon under the middle of the screen in the wide views
 const PAN = 960;                  // how far left of the ship the sea's view is, in screen px
-// The few clouds round the sun: [px right of it, px under it, texels wide, screen px a texel, seed].
-const CLOUDS = [[-250, 56, 96, 3, 5], [228, -74, 84, 3, 12], [150, 110, 60, 2, 23], [-190, -112, 52, 2, 31], [372, 62, 70, 2, 44],
-                [-420, -30, 64, 2, 57]];
 // The gulls over the sea: [px right of the sea view's middle, px over the horizon, px/s, screen px a texel].
 const GULLS = [[-330, 96, 26, 2], [-60, 150, -18, 2], [210, 60, 22, 2], [380, 128, -30, 3], [-200, 40, 34, 3], [60, 206, 14, 2]];
 
@@ -86,78 +82,38 @@ function rng(seed) {
     return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
-// The intro's own pictures: the day's sun (its disc, its glow, two sets of rays that take turns),
-// and the sun's glitter on the water in two frames.
-function makeTextures(scene) {
-    if (scene.textures.exists('intro-sun')) return;
-    const R = 15, d = R * 2 + 1;
-    let tex = scene.textures.createCanvas('intro-sun', d, d), ctx = tex.getContext();
-    for (let y = 0; y < d; y++) {
-        const half = Math.floor(Math.sqrt(Math.max(0, (R + 0.4) ** 2 - (y - R) ** 2)));
-        if (!half) continue;
-        ctx.fillStyle = '#ffe9a0';
-        ctx.fillRect(R - half, y, half * 2 + 1, 1);
-        if (half > 2) {
-            ctx.fillStyle = '#fffbe2';
-            ctx.fillRect(R - half + 2, y, half * 2 - 3, 1);
-        }
-    }
-    tex.refresh();
-    const G = 180;
-    tex = scene.textures.createCanvas('intro-sunglow', G, G);
-    ctx = tex.getContext();
-    const g = ctx.createRadialGradient(G / 2, G / 2, R - 3, G / 2, G / 2, G / 2);
-    g.addColorStop(0, 'rgba(255,250,214,0.85)');
-    g.addColorStop(0.22, 'rgba(255,246,200,0.38)');
-    g.addColorStop(0.55, 'rgba(255,244,196,0.12)');
-    g.addColorStop(1, 'rgba(255,244,196,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, G, G);
-    tex.refresh();
-    for (const f of [0, 1]) {
-        const S = 140;
-        tex = scene.textures.createCanvas(`intro-rays-${f}`, S, S);
-        ctx = tex.getContext();
-        const n = 12;
+// The sun's path on the water (plan-the-rest §7b, the user: "more realistically-looking sun and
+// reflections"; a path of light under the sun only): glints on the far sea's rows, thick under the
+// sun and thinning out to the sides, longer and further apart as they come nearer; each glint
+// flickers on a clock of its own (no two frames taking turns), and they sway with the ripples.
+// [texel x, row, length, colour, how bright, phase, rate]. Texels two screen px each.
+const PATH = { w: 300, h: 120 };
+function pathGlints() {
+    const rand = rng(301), glints = [];
+    const normal = () => (rand() + rand() + rand() + rand() - 2) / 0.58;      // about N(0, 1)
+    let y = 0, row = 0;
+    while (y < PATH.h) {
+        const k = y / PATH.h, spread = 8 + (PATH.w / 2 - 14) * k ** 0.85;
+        const n = Math.round(10 + 8 * (1 - k));
         for (let i = 0; i < n; i++) {
-            const a = (i + f * 0.5) / n * Math.PI * 2, long = i % 2 === 0;
-            const r0 = R + 5, r1 = R + (long ? 44 : 26) - f * 6, w = 0.05;
-            const grad = ctx.createLinearGradient(S / 2 + Math.cos(a) * r0, S / 2 + Math.sin(a) * r0, S / 2 + Math.cos(a) * r1, S / 2 + Math.sin(a) * r1);
-            grad.addColorStop(0, 'rgba(255,248,205,0.75)');
-            grad.addColorStop(1, 'rgba(255,248,205,0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.moveTo(S / 2 + Math.cos(a - w) * r0, S / 2 + Math.sin(a - w) * r0);
-            ctx.lineTo(S / 2 + Math.cos(a) * r1, S / 2 + Math.sin(a) * r1);
-            ctx.lineTo(S / 2 + Math.cos(a + w) * r0, S / 2 + Math.sin(a + w) * r0);
-            ctx.closePath();
-            ctx.fill();
+            const off = normal() * spread * 0.42;
+            if (Math.abs(off) > spread) continue;
+            const near = 1 - Math.abs(off) / spread;
+            const len = 1 + Math.floor(rand() * (2 + Math.floor(6 * k * near + 1)));
+            const colour = near > 0.6 ? '#fffffa' : near > 0.3 ? '#fff4d0' : '#c8ecff';
+            const bright = near > 0.45 ? 1 : 0.47 + 0.78 * near;
+            glints.push([Math.round(PATH.w / 2 + off - len / 2), Math.floor(y), len, colour, bright, rand() * 6.3, 1.4 + rand() * 2.8]);
         }
-        tex.refresh();
+        y += 1 + k * 3.2 + (row++ % 2) * 0.6;
     }
-    // The glitter: short bright dashes on the water, thick under the sun and thinning to the
-    // sides, longer as they come nearer.
-    const W = 300, H = 120;
-    for (const f of [0, 1]) {
-        tex = scene.textures.createCanvas(`intro-glitter-${f}`, W, H);
-        ctx = tex.getContext();
-        const rand = rng(301 + f * 13);
-        for (let y = 1; y < H; y += 1 + Math.floor(rand() * 2)) {
-            const k = y / H, spread = 16 + (W / 2 - 20) * k ** 0.8;
-            const n = 3 + Math.round(4 * (1 - k));
-            for (let i = 0; i < n; i++) {
-                const off = (rand() + rand() + rand() - 1.5) / 1.5 * spread;
-                const len = 2 + Math.floor(rand() * (2 + 7 * k));
-                const near = Math.abs(off) < spread * 0.3;
-                ctx.fillStyle = near ? (rand() < 0.6 ? '#ffffff' : '#fff6cf') : (rand() < 0.5 ? '#fff6cf' : '#c7f0ff');
-                ctx.globalAlpha = near ? 1 : 0.75;
-                ctx.fillRect(Math.round(W / 2 + off - len / 2), y, len, 1);
-            }
-        }
-        ctx.globalAlpha = 1;
-        tex.refresh();
-    }
-    CLOUDS.forEach(([, , w, , seed], i) => cloudTexture(scene, `intro-cloud-${i}`, w, seed));
+    return glints;
+}
+
+// The intro's own pictures: the sun, its bloom, its god rays and the clouds round it are built art
+// (tools/build_sky.py: `skyart`, `sky-glow`, `sky-rays`, `sky-layout`); the path of light is drawn here,
+// each frame.
+function makeTextures(scene) {
+    if (!scene.textures.exists('intro-glitter')) scene.textures.createCanvas('intro-glitter', PATH.w, PATH.h);
 }
 
 export class Intro {
@@ -206,30 +162,44 @@ export class Intro {
     buildDressing() {
         const s = this.s, u = this.u, D = s.DEPTH, items = this.dressing = [];
         const add = o => { items.push(o); s.worldLayer.add(o); return o; };
-        this.glow = add(s.add.image(this.sunX, this.sunY, 'intro-sunglow').setScale(2 * u).setDepth(D.sky + 0.006));
-        this.rays = [0, 1].map(f => add(s.add.image(this.sunX, this.sunY, `intro-rays-${f}`).setScale(2 * u).setDepth(D.sky + 0.007)));
-        this.sun = add(s.add.image(this.sunX, this.sunY, 'intro-sun').setScale(2 * u).setDepth(D.sky + 0.008));
-        this.clouds = CLOUDS.map(([dx, dy, , size], i) => {
-            const img = add(s.add.image(0, this.sunY + dy * u, `intro-cloud-${i}`).setScale(size * u).setDepth(D.sky + 0.012).setAlpha(0.92));
-            return { img, x: this.sunX + dx * u };
-        });
+        // The sun (B3 of three mock-ups, the user, 2026-11-20): a soft disc and its bloom, no rays of
+        // its own, just over a cloud's top; the god rays are the clouds' shadows in its light, worked
+        // out from where they stand; a little of the bloom over the cloud it is behind.
+        const L = s.cache.json.get('sky-layout'), at = (x, y) => [this.sunX + x * u, this.sunY + y * u];
+        this.glow = add(s.add.image(this.sunX, this.sunY, 'sky-glow').setScale(u).setDepth(D.sky + 0.006));
+        this.sun = add(s.add.image(this.sunX, this.sunY, 'skyart', 'sun').setScale(2 * u).setDepth(D.sky + 0.008));
+        this.rays = add(s.add.image(...at(L.rays.x, L.rays.y), 'sky-rays').setOrigin(0).setScale(u).setDepth(D.sky + 0.009));
+        this.clouds = L.clouds.map(c => add(s.add.image(...at(c.x, c.y), 'skyart', c.frame).setScale(2 * u).setDepth(D.sky + 0.012)));
+        this.flare = add(s.add.image(this.sunX, this.sunY, 'sky-glow').setScale(0.6 * u).setDepth(D.sky + 0.013));
         // On the water, over the sea's own rows and under the hull's foam: the far sea's ripples
         // at the game's pixel size, and the sun's glitter.
         const left = this.sunX - VIEW.width * u, right = this.shipX + VIEW.width * u;
         this.ripples = add(s.add.tileSprite(left, s.waterY, (right - left) / (2 * u), 160, 'bg-ripples').setOrigin(0)
             .setScale(2 * u).setDepth(D.exterior + 0.26).setAlpha(0.6));
-        this.glitter = add(s.add.image(this.sunX, s.waterY, 'intro-glitter-0').setOrigin(0.5, 0).setScale(2 * u).setDepth(D.exterior + 0.27));
-        this.sparks = Array.from({ length: 14 }, (_, i) => {
-            const r = rng(700 + i * 17), k = r();
-            const spark = add(s.add.image(this.sunX + (r() - 0.5) * (60 + 380 * k) * u, s.waterY + (10 + 170 * k) * u, 'dot')
-                .setScale((k > 0.5 ? 4 : 2) * u).setDepth(D.exterior + 0.28));
-            return { spark, phase: r() * 6, rate: 2 + r() * 3 };
-        });
+        this.glitter = add(s.add.image(this.sunX, s.waterY, 'intro-glitter').setOrigin(0.5, 0).setScale(2 * u).setDepth(D.exterior + 0.27));
+        this.glints = pathGlints();
         this.gulls = GULLS.map(([dx, up, speed, size], i) => {
             const img = add(s.add.sprite(0, s.waterY - up * u, 'bg-gull', 0).setOrigin(0.5, 1).setScale(size * u).setDepth(D.fx)
                 .setTint(size === 3 ? 0x8f8aa0 : 0xc8c6d4).setFlipX(speed < 0));
             return { img, x0: dx, y: s.waterY - up * u, speed, phase: i * 1.7, rate: 5 + (i % 3) };
         });
+    }
+
+    // The path of light as it is at `now`, moved `dx` texels with the ripples: each glint lit by
+    // its own clock, most of the time a little, now and then at its brightest.
+    drawPath(now, dx) {
+        const tex = this.s.textures.get('intro-glitter'), ctx = tex.getContext();
+        ctx.clearRect(0, 0, PATH.w, PATH.h);
+        for (const [x, y, len, colour, bright, phase, rate] of this.glints) {
+            const k = Math.max(0, Math.sin(now * rate + phase));
+            const a = bright * k * k;
+            if (a < 0.08) continue;
+            ctx.globalAlpha = Math.min(1, a);
+            ctx.fillStyle = colour;
+            ctx.fillRect(x + dx, y, len, 1);
+        }
+        ctx.globalAlpha = 1;
+        tex.refresh();
     }
 
     // --- The welcome screen -----------------------------------------------------------------------
@@ -392,14 +362,17 @@ export class Intro {
         for (const o of this.dressing) o.setVisible(far > 0);
         if (far > 0) {
             this.sun.setAlpha(far);
-            this.glow.setAlpha(far * (0.9 + 0.1 * Math.sin(now * 1.7)));
-            this.rays.forEach((r, f) => r.setAlpha(far * (0.5 + 0.5 * Math.sin(now * 1.3 + f * Math.PI))));
+            const breath = 0.9 + 0.1 * Math.sin(now * 1.7);
+            this.glow.setAlpha(far * breath);
+            this.flare.setAlpha(far * 0.35 * breath);
+            this.rays.setAlpha(far * (0.85 + 0.15 * Math.sin(now * 0.6)));
             // (Nothing here drifts: the sun stands still, and whatever slid past it looked wrong.
             // The water only sways a little in place; the gulls and the glitter are the life in it.)
-            for (const c of this.clouds) c.img.setX(c.x).setAlpha(0.92 * far);
-            this.ripples.setAlpha(0.6 * far).tilePositionX = Math.round(Math.sin(now * 0.9) * 2);
-            this.glitter.setAlpha(far).setTexture(`intro-glitter-${Math.floor(now * 3.2) % 2}`);
-            for (const k of this.sparks) k.spark.setAlpha(far * Math.max(0, Math.sin(now * k.rate + k.phase)) ** 3);
+            for (const c of this.clouds) c.setAlpha(far);
+            const sway = Math.round(Math.sin(now * 0.9) * 2);
+            this.ripples.setAlpha(0.6 * far).tilePositionX = sway;
+            this.glitter.setAlpha(far);
+            this.drawPath(now, -sway);
             const span = 1500;
             for (const g of this.gulls) {
                 const x = ((g.x0 + g.speed * now + span / 2) % span + span) % span - span / 2;

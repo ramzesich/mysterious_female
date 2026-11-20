@@ -76,6 +76,13 @@ export class BootScene extends Phaser.Scene {
         for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
+        // The sky's art (tools/build_sky.py): the intro's clouds and sun, where they stand, the god
+        // rays and the bloom; the far clouds' strip of the game's background.
+        this.load.atlas('skyart', 'assets/sprites/sky.png', 'assets/sprites/sky.json');
+        this.load.json('sky-layout', 'assets/sprites/sky-layout.json');
+        this.load.image('sky-rays', 'assets/sprites/sky-rays.png');
+        this.load.image('sky-glow', 'assets/sprites/sky-glow.png');
+        this.load.image('sky-strip', 'assets/sprites/sky-strip.png');
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each
