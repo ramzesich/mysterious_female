@@ -150,6 +150,11 @@ HER = {
         # underarm toss, the arm back low, a step, the swing forward past the hip, the follow-through;
         # the tangerine put in her fist by tools/hold_tangerine.py.
         "toss": [(f"toss-held/{i}.png", "feet") for i in range(8)],
+        # Her walk (the user, 2026-11-20: out of her door at the intro's end, "walk, not run"):
+        # skeleton-v3's walking-8-frames with a shorter stride and less arm swing (0.85, 0.6), the
+        # calmer of two tries (walk-a: the template's own, its head dipping once a cycle). Its
+        # planted foot rolls back about 4.4 px a frame; a foot comes down on frames 3 and 7.
+        "walk": [(f"walk-b-calm/{i}.png", "feet") for i in range(8)],
     },
     # The standing baseline: this frame's lowest pixel row is where the feet are in "keep" frames
     # of the same canvas size. Frames on another canvas use their own animation's lowest row.

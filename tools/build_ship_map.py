@@ -1315,7 +1315,7 @@ def build_objects():
               [prop("text", "Medical Center"), prop("style", "plaque")]))
     put(crew, 86.45, "first-aid-bg", 46)
     put(crew, 87.35, "gallery-bench-bg")
-    put(crew, 88.5, "notice-board-bg", 44)
+    put(crew, 87.98, "notice-board-bg", 44)   # (left of where she stops at the intro's end: src/intro.js, WALK)
     put(crew, 91.3, "wall-clock-bg", 50)
     put(crew, 92.3, "water-dispenser-bg")
     put(crew, 93.2, "exit-sign-bg", 90)      # (between two tube lights, not on one)

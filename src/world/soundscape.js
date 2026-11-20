@@ -99,6 +99,8 @@ export class Soundscape {
     // for each stretch she has covered, whatever moves her (her own run, a scene's walk).
     steps() {
         const s = this.scene, p = s.player;
+        // (The intro walks her out of her door and sounds her steps on her clip's own frames.)
+        if (s.intro) { this.last = null; this.walked = 0; return; }
         const was = this.last ?? { x: p.x, y: p.y, mode: s.mode };
         const dx = Math.abs(p.x - was.x), dy = Math.abs(p.y - was.y);
         this.last = { x: p.x, y: p.y, mode: s.mode };

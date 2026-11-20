@@ -10,9 +10,10 @@
 //   The intro: the camera tilts down to the sea and the Baltic shore (gulls, the sun's glitter on
 //   the water), pans right until the whole ship has come in from the right, then zooms in on
 //   deck 3: its side opens on the crew corridor, and the camera stops there at the game's own
-//   scale, on the door marked CREW. The door opens, she steps out and stands by it, straightens
-//   her name badge (her `badge` clip), and turns to go: the HUD comes up, she is the player's,
-//   and a word over her says what E is for (the one hint in the game: the user asked for it).
+//   scale, on the door marked CREW. The door opens and she walks out of it, a few steps to the
+//   left (her `walk` clip), and stops, straightens her name badge (her `badge` clip), and turns to
+//   go on to the left: the HUD comes up, she is the player's; and the first time she walks past her
+//   door, a word over her says what E is for (the one hint in the game: the user asked for it).
 //   (A first ending went on in through the door to a close-up of her at her mirror; the user saw
 //   it and had it dropped: "The transition scene doesn't work at all".)
 //
@@ -42,7 +43,7 @@ const HALF = PLAYER.height / 2;
 export const PARTS = {
     // (The sea is held only a moment before the camera goes right: the user, on seeing it wait.)
     full: [['focus', 2.4], ['sky', 0.8], ['down', 4.6], ['sea', 0.5], ['right', 6.6], ['ship', 1.3], ['dive', 5.6],
-           ['corridor', 1.0], ['step', 1.6], ['badge', 2.4], ['turn', 0.6]],
+           ['corridor', 1.0], ['step', 0.4], ['walk', 0], ['badge', 2.4], ['turn', 0.6]],
     back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 0.4], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
@@ -53,6 +54,19 @@ const MENU = { title: 178, first: 336, step: 90,
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
 const HINT_MS = 6000;             // how long "E to interact" stays over her
+const HINT_PAST = 16;             // ...shown once she is this many px past her door's middle, going right
+// Out of her door, walking straight to the left, a few steps (the user, 2026-11-20: "walk, not
+// run"; no stop facing us in the doorway): how far (72 px: she stops where the notice board hung,
+// the board moved left of her: tools/build_ship_map.py; clear of it in every frame); her pace (her walk clip's frames a
+// second, and the px a second its planted foot slides back at that rate: about 4.4 px a frame);
+// the clip's frames where a foot comes down (a footstep); when the door shuts behind her (until
+// then its open leaf, swung toward us, is drawn over her, and she steps out past its edge: `leaf`,
+// the first of the open door's columns that are the leaf, the ones before it the jamb and the
+// light in the gap, which she is in front of); and how long she stands still facing left before
+// she turns to us. The part `walk` is her walk and that stop.
+const WALK = { px: 72, speed: 44, fps: 10, steps: [3, 7], shut: 0.65, leaf: 6, stop: 0.25 };
+WALK.secs = WALK.px / WALK.speed;
+PARTS.full.find(q => q[0] === 'walk')[1] = WALK.secs + WALK.stop;
 const SUN_UP = 365;               // the sun over the horizon, in screen px of the wide view
 const HORIZON = 140;               // the horizon under the middle of the screen in the wide views
 const PAN = 960;                  // how far left of the ship the sea's view is, in screen px
@@ -333,6 +347,8 @@ export class Intro {
         let cx = this.sunX + step(smoother(this.p('right')) * PAN);
         let cy = this.sunY + step(smoother(this.p('down')) * (SUN_UP - HORIZON));
         const to = this.full ? this.door() : { x: p.x, y: p.y - HALF };
+        // (Her few steps out: the camera goes with her, easing, and is on her as she stops.)
+        if (this.full) to.x -= WALK.px * smooth(clamp01(this.p('walk') * (WALK.secs + WALK.stop) / WALK.secs));
         const dive = this.p(this.full ? 'dive' : 'near');
         if (dive > 0) {
             // In on a point: the zoom doubles and doubles again, the point coming to the middle.
@@ -358,7 +374,7 @@ export class Intro {
             s.viewOverride = s.fromAfar || this.p('corridor') >= 1 ? null : 2 + smooth(open);
             // (The dark round her deck comes with the corridor's opening, not after it: the user.)
             s.dimOverride = s.fromAfar ? 0 : smooth(open);
-            this.arrive(this.p('step'), this.p('badge'), this.p('turn'));
+            this.arrive(this.p('step'), this.p('walk'), this.p('badge'), this.p('turn'));
         }
 
         // The welcome's shade and blur, lifting; the menu melting away; at a short intro's end
@@ -399,19 +415,38 @@ export class Intro {
         return { x: d.outX, y: d.outY - HALF };
     }
 
-    // Her coming out: the door opens, she is in it, facing us (`step` 0 to 1); she straightens her
-    // badge (`badge`); she turns to go (`turn`). Each by the clock, so any moment can be shown.
-    arrive(step, badge, turn) {
+    // Her coming out: the door opens (`step` 0 to 1); she walks out of it to the left, the door
+    // shutting behind her, and stops (`walk`); she turns to us and straightens her badge (`badge`);
+    // she turns to go (`turn`). Each by the clock, so any moment can be shown.
+    arrive(step, walk, badge, turn) {
         const s = this.s, p = s.player, room = s.world.rooms.crewcabin;
-        const open = step > 0.06 && step < 0.82;
+        const secs = walk * (WALK.secs + WALK.stop);            // into the walk, in seconds
+        const open = step > 0.15 && secs < WALK.shut;
         s.setDoorArt(room.outside[0], open ? 'door-crew-ajar' : 'door-crew');
         if (open && !this.doorHeard && this.stage === 'running' && !this.held) sfx.at(p.x, p.y).door();
         this.doorHeard = open || this.doorHeard && step > 0;
-        const shown = clamp01((step - 0.16) / 0.34);
-        p.setVisible(shown > 0).setAlpha(shown).setFlipX(false);
-        const clip = s.herFrames && s.cache.json.get('her-meta').anims.badge;
+        const anims = s.herFrames && s.cache.json.get('her-meta').anims;
+        const going = walk > 0 && badge === 0;                  // walking, or stopped and still facing left
+        p.x = this.door().x - WALK.px * clamp01(secs / WALK.secs);
+        p.setVisible(walk > 0).setAlpha(1).setFlipX(going || turn >= 0.5);     // (she turns to go left: the user, 2026-11-20)
+        // (In the doorway the door's open leaf is over her: a copy of the open door, cut to the leaf.)
+        const door = room.outside[0];
+        if (!this.leaf) {
+            this.leaf = s.add.image(0, 0, 'shipart', 'door-crew-ajar');
+            s.worldLayer.add(this.leaf);
+        }
+        const f = this.leaf.frame;
+        this.leaf.setPosition(door.x, door.y).setOrigin(door.originX, door.originY).setDepth(p.depth + 0.01)
+            .setCrop(WALK.leaf, 0, f.width - WALK.leaf, f.height).setVisible(open && walk > 0);
         let frame = turn >= 0.5 ? s.herFrames.stand : s.herFrames.front;
-        if (clip && badge > 0 && badge < 1) frame = clip[Math.min(clip.length - 1, Math.floor(badge * clip.length))];
+        if (going) {
+            const clip = anims.walk ?? anims.run;
+            const i = secs < WALK.secs ? Math.floor(secs * WALK.fps) % clip.length : -1;
+            frame = i >= 0 ? clip[i] : s.herFrames.stand;
+            if (i !== this.stepFrame && WALK.steps.includes(i) && this.stage === 'running' && !this.held) sfx.step(s.soundscape.floor());
+            this.stepFrame = i;
+        }
+        if (anims && badge > 0 && badge < 1) frame = anims.badge[Math.min(anims.badge.length - 1, Math.floor(badge * anims.badge.length))];
         if (p.anims.isPlaying) p.anims.stop();
         p.setTexture('her', frame);
     }
@@ -443,7 +478,8 @@ export class Intro {
         this.stage = 'done';
         this.T = this.length;
         this.setBlur(0);
-        if (this.full) this.arrive(1, 1, 1);
+        if (this.full) this.arrive(1, 1, 1, 1);
+        this.leaf?.destroy();
         p.setVisible(true).setAlpha(1);
         s.pose('stand');
         for (const o of [...this.dressing, ...this.menu]) o.destroy();
@@ -475,8 +511,17 @@ export class Intro {
             s.intro = null;
         } });
         // The one hint in the game (the user, 2026-11-14: "Add a hint popup, saying 'E to
-        // interact'"), over her as she is handed over at a new game's start.
-        if (this.full) s.time.delayedCall(through ? 700 : 250, () => s.world.say(t('hint.interact'), HINT_MS));
+        // interact'"), over her in a new game the first time she walks past her cabin's door in
+        // the corridor (the user, 2026-11-20; she is handed over a few steps to the left of it).
+        if (this.full) {
+            const past = this.door().x + HINT_PAST;
+            const watch = () => {
+                if (s.mode !== 'play' || s.route !== 'inside' || p.x < past) return;
+                s.events.off('update', watch);
+                s.world.say(t('hint.interact'), HINT_MS);
+            };
+            s.events.on('update', watch);
+        }
         if (!s.save.intro) {
             s.save.intro = true;
             writeSave(s.save);
