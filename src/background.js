@@ -32,8 +32,8 @@ const DUSK_SKY = ['#584c78', '#7b5586', '#a65d88', '#d36c7c', '#ee8a76', '#f8a77
 const DUSK_SEA_FAR = '#c08aa0';
 const DUSK_SEA_NEAR = '#7a6699';
 const DUSK_TINTS = { clouds: '#ff9c9c', ripples: '#ffb08a', islands: '#7a5f86', gulls: '#6a4f6e' };
-const DUSK_BAND = 14;                       // px a band
-const SUN = { at: 0.2, r: 17, up: 5 };      // how far across the view, its radius, its middle over the horizon
+const DUSK_BAND = 14;                       // px a colour of DUSK_SKY (blended)
+const SUN = { at: 0.2, up: 5 };             // how far across the view, its middle over the horizon
 export const HORIZON_ABOVE = 58;
 export const HORIZON_SETTLE = 1.0;
 // The outside view (O) is laid out in the world, not on the screen (the user, 2026-11-14: a picture
@@ -268,59 +268,57 @@ function gradient(scene, key, h, stops) {
     tex.refresh();
 }
 
-// The sunset's own pictures: the sky in flat bands (the lowest and brightest at the horizon), the
-// sea under it, the sun's disc and its glow, and its path on the water: short bright dashes, most
-// of them under the sun, spreading as they come nearer, in two frames that take turns (a glitter).
-const PATH = { w: 150, h: SEA_FADE + RIPPLES_H };
+// A path of light on the water under a sun (the intro's and the sunset's; plan-the-rest §7b, the user:
+// "more realistically-looking sun and reflections"): glints on the far sea's rows, thick under the sun
+// and thinning out to the sides, longer and further apart as they come nearer, each flickering on a
+// clock of its own (no two frames taking turns). A glint: [x, row, length, kind (0 under the sun, 1,
+// 2 out to the sides), how bright, phase, rate]; `drawGlints` paints them as they are at `now` in the
+// kinds' colours, moved `dx`.
+export function pathGlints(w, h, seed) {
+    const rand = rng(seed), glints = [];
+    const normal = () => (rand() + rand() + rand() + rand() - 2) / 0.58;      // about N(0, 1)
+    let y = 0, row = 0;
+    while (y < h) {
+        const k = y / h, spread = 8 + (w / 2 - 14) * k ** 0.85;
+        const n = Math.round(10 + 8 * (1 - k));
+        for (let i = 0; i < n; i++) {
+            const off = normal() * spread * 0.42;
+            if (Math.abs(off) > spread) continue;
+            const near = 1 - Math.abs(off) / spread;
+            const len = 1 + Math.floor(rand() * (2 + Math.floor(6 * k * near + 1)));
+            const kind = near > 0.6 ? 0 : near > 0.3 ? 1 : 2;
+            const bright = near > 0.45 ? 1 : 0.47 + 0.78 * near;
+            glints.push([Math.round(w / 2 + off - len / 2), Math.floor(y), len, kind, bright, rand() * 6.3, 1.4 + rand() * 2.8]);
+        }
+        y += 1 + k * 3.2 + (row++ % 2) * 0.6;
+    }
+    return glints;
+}
+export function drawGlints(tex, glints, colours, now, dx = 0) {
+    const ctx = tex.getContext();
+    ctx.clearRect(0, 0, tex.width, tex.height);
+    for (const [x, y, len, kind, bright, phase, rate] of glints) {
+        const k = Math.max(0, Math.sin(now * rate + phase));
+        const a = bright * k * k;
+        if (a < 0.08) continue;
+        ctx.globalAlpha = Math.min(1, a);
+        ctx.fillStyle = colours[kind];
+        ctx.fillRect(x + dx, y, len, 1);
+    }
+    ctx.globalAlpha = 1;
+    tex.refresh();
+}
+
+// The sunset's own pictures: the sky blended from its colours (the lowest and brightest at the
+// horizon; in flat bands until the user chose it smooth, 2026-11-20), the sea under it, and the
+// canvas its path of light is drawn on each frame. Its sun, glow, rays and clouds are built art
+// (tools/build_sky.py: `skyart`'s `dusk-*`, `sky-dusk-*`, `sky-layout`'s `dusk`).
+const PATH = { w: 170, h: SEA_FADE + RIPPLES_H };
+const PATH_COLOURS = ['#fff0c8', '#fdc88c', '#f08c8c'].map(dusk);
 function duskTextures(scene) {
-    const sky = scene.textures.createCanvas('bg-sky-dusk', 4, DUSK_BAND * DUSK_SKY.length);
-    let ctx = sky.getContext();
-    DUSK_SKY.forEach((c, i) => {
-        ctx.fillStyle = dusk(c);
-        ctx.fillRect(0, i * DUSK_BAND, 4, DUSK_BAND);
-    });
-    sky.refresh();
+    gradient(scene, 'bg-sky-dusk', DUSK_BAND * DUSK_SKY.length, DUSK_SKY.map((c, i) => [i / (DUSK_SKY.length - 1), dusk(c)]));
     gradient(scene, 'bg-sea-dusk', SEA_FADE, [[0, dusk(DUSK_SEA_FAR)], [1, dusk(DUSK_SEA_NEAR)]]);
-    const d = SUN.r * 2 + 1;
-    const sun = scene.textures.createCanvas('bg-sun', d, d);
-    ctx = sun.getContext();
-    for (let y = 0; y < d; y++) {
-        const half = Math.floor(Math.sqrt(Math.max(0, SUN.r ** 2 - (y - SUN.r) ** 2)));
-        if (!half) continue;
-        ctx.fillStyle = dusk('#fde9a8');
-        ctx.fillRect(SUN.r - half, y, half * 2 + 1, 1);
-        if (half > 2) {
-            ctx.fillStyle = dusk('#fff6cf');
-            ctx.fillRect(SUN.r - half + 2, y, half * 2 - 3, 1);
-        }
-    }
-    sun.refresh();
-    const G = 150;
-    const glow = scene.textures.createCanvas('bg-sunglow', G, G);
-    ctx = glow.getContext();
-    const g = ctx.createRadialGradient(G / 2, G / 2, SUN.r - 2, G / 2, G / 2, G / 2);
-    g.addColorStop(0, 'rgba(255,236,170,0.75)');
-    g.addColorStop(0.35, 'rgba(255,214,150,0.3)');
-    g.addColorStop(1, 'rgba(255,200,140,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, G, G);
-    glow.refresh();
-    for (const f of [0, 1]) {
-        const tex = scene.textures.createCanvas(`bg-sunpath-${f}`, PATH.w, PATH.h);
-        ctx = tex.getContext();
-        const rand = rng(91 + f * 7);
-        for (let y = 1; y < PATH.h; y += 1 + Math.floor(rand() * 2)) {
-            const t = y / PATH.h, spread = 10 + (PATH.w / 2 - 12) * t ** 0.7;
-            const n = 2 + Math.round(3 * (1 - t));
-            for (let i = 0; i < n; i++) {
-                const off = (rand() + rand() - 1) * spread;
-                const len = 2 + Math.floor(rand() * (3 + 7 * t));
-                ctx.fillStyle = dusk(Math.abs(off) < spread * 0.35 ? (rand() < 0.5 ? '#fff6cf' : '#fde09a') : '#fca790');
-                ctx.fillRect(Math.round(PATH.w / 2 + off - len / 2), y, len, 1);
-            }
-        }
-        tex.refresh();
-    }
+    scene.textures.createCanvas('bg-sunpath', PATH.w, PATH.h);
 }
 
 function makeTextures(scene) {
@@ -357,16 +355,25 @@ export class Backdrop {
         // The sunset's twins, each just over the day's (see the top of this file).
         this.duskTop = fixed(scene.add.rectangle(0, 0, 4, 4, Phaser.Display.Color.ValueToColor(dusk(DUSK_SKY[0])).color)).setDepth(depth + 0.001);
         this.duskSky = fixed(scene.add.image(0, 0, 'bg-sky-dusk')).setDepth(depth + 0.001);
-        this.sunGlow = scene.add.image(0, 0, 'bg-sunglow').setScrollFactor(0).setDepth(depth + 0.004);
-        this.sun = scene.add.image(0, 0, 'bg-sun').setScrollFactor(0).setDepth(depth + 0.005);
+        this.sunGlow = scene.add.image(0, 0, 'sky-dusk-glow').setScrollFactor(0).setDepth(depth + 0.004);
+        this.sun = scene.add.image(0, 0, 'skyart', 'dusk-sun').setScrollFactor(0).setDepth(depth + 0.005);
+        // Its god rays and its clouds round it, worked out together (tools/build_sky.py), and its far
+        // clouds, taking over from the day's as it comes on.
+        const L = this.duskLayout = scene.cache.json.get('sky-layout').dusk;
+        this.duskRays = scene.add.image(0, 0, 'sky-dusk-rays').setOrigin(0).setScrollFactor(0).setDepth(depth + 0.006);
+        this.duskClouds = L.clouds.map(c => scene.add.image(0, 0, 'skyart', c.frame).setScrollFactor(0).setDepth(depth + 0.012));
+        this.duskStrip = fixed(scene.add.tileSprite(0, 0, 4, 60, 'sky-dusk-strip')).setDepth(depth + 0.011);
+        this.duskRows = this.cloudRows.map(() => fixed(scene.add.tileSprite(0, 0, 4, 60, 'sky-dusk-strip')).setDepth(depth + 0.011).setVisible(false));
         this.duskSea = fixed(scene.add.image(0, 0, 'bg-sea-dusk')).setDepth(depth + 0.021);
         this.duskDeep = fixed(scene.add.rectangle(0, 0, 4, 4, Phaser.Display.Color.ValueToColor(dusk(DUSK_SEA_NEAR)).color)).setDepth(depth + 0.021);
-        this.sunPath = scene.add.image(0, 0, 'bg-sunpath-0').setOrigin(0.5, 0).setScrollFactor(0).setDepth(depth + 0.026);
-        this.duskOnly = [this.duskTop, this.duskSky, this.sunGlow, this.sun, this.duskSea, this.duskDeep, this.sunPath];
+        this.sunPath = scene.add.image(0, 0, 'bg-sunpath').setOrigin(0.5, 0).setScrollFactor(0).setDepth(depth + 0.026);
+        this.glints = pathGlints(PATH.w, PATH.h, 91);
+        this.duskOnly = [this.duskTop, this.duskSky, this.sunGlow, this.sun, this.duskRays, ...this.duskClouds, this.duskStrip,
+            this.duskSea, this.duskDeep, this.sunPath];
         this.time = 0;
         // (In drawing order: the windows' copies are drawn as a container, which keeps the list's.)
-        this.objects = [this.skyTop, this.duskTop, this.sky, this.duskSky, this.sunGlow, this.sun, ...this.cloudRows, this.clouds,
-            this.sea, this.duskSea, this.seaDeep, this.duskDeep, this.ripples, this.sunPath, ...this.layers.map(l => l.s),
+        this.objects = [this.skyTop, this.duskTop, this.sky, this.duskSky, this.sunGlow, this.sun, this.duskRays, ...this.cloudRows,
+            this.clouds, ...this.duskRows, this.duskStrip, ...this.duskClouds, this.sea, this.duskSea, this.seaDeep, this.duskDeep, this.ripples, this.sunPath, ...this.layers.map(l => l.s),
             ...this.gullSprites];
         this.setDusk(0);
     }
@@ -375,8 +382,11 @@ export class Backdrop {
     setDusk(k) {
         this.dusk = k;
         for (const o of this.duskOnly) o.setAlpha(k).setVisible(k > 0);
-        this.clouds.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(Math.min(1, CLOUD_ALPHA + 0.25 * k));
-        this.cloudRows.forEach((c, i) => c.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(Math.min(1, OUTSIDE_CLOUDS[i][2] + 0.25 * k)));
+        // (The day's far clouds give way to the sunset's, which are lit by it.)
+        this.clouds.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(CLOUD_ALPHA * (1 - k));
+        this.cloudRows.forEach((c, i) => c.setTint(tintTo(DUSK_TINTS.clouds, k)).setAlpha(OUTSIDE_CLOUDS[i][2] * (1 - k)));
+        this.duskStrip.setAlpha(CLOUD_ALPHA * k);
+        this.duskRows.forEach((c, i) => c.setAlpha(OUTSIDE_CLOUDS[i][2] * k));
         this.ripples.setTint(tintTo(DUSK_TINTS.ripples, k));
         for (const l of this.layers) l.s.setTint(tintTo(DUSK_TINTS.islands, k));
         for (const g of this.gullSprites) g.setTint(tintTo(DUSK_TINTS.gulls, k));
@@ -411,10 +421,18 @@ export class Backdrop {
             this.duskDeep.setPosition(left, hy + SEA_FADE).setSize(width, Math.max(0, bottom - hy - SEA_FADE));
             // The sun ahead of the bow, half sunk; its path of light on the water under it.
             const k = outside ? OUTSIDE_SIZE.islands : 1;
-            const sx = Math.round(left + width * SUN.at);
-            this.sun.setScale(k).setPosition(sx, hy - SUN.up * k);
-            this.sunGlow.setScale(k).setPosition(sx, hy - SUN.up * k);
-            this.sunPath.setScale(k).setPosition(sx, hy).setTexture(`bg-sunpath-${Math.floor(this.time * 3.2) % 2}`);
+            const sx = Math.round(left + width * SUN.at), sy = hy - SUN.up * k, L = this.duskLayout;
+            this.sun.setScale(k).setPosition(sx, sy);
+            this.sunGlow.setScale(k / 2).setPosition(sx, sy);
+            this.duskRays.setScale(k / 2).setPosition(sx + L.rays.x * k, sy + L.rays.y * k);
+            this.duskClouds.forEach((c, i) => c.setScale(k).setPosition(sx + L.clouds[i].x * k, sy + L.clouds[i].y * k));
+            this.sunPath.setScale(k).setPosition(sx, hy);
+            // (Drawn once a frame, though the windows' views have backdrops of their own.)
+            const tex = this.scene.textures.get('bg-sunpath');
+            if (tex.drawnAt !== this.scene.time.now) {
+                tex.drawnAt = this.scene.time.now;
+                drawGlints(tex, this.glints, PATH_COLOURS, this.time);
+            }
         }
         const run = cam.scrollX;
         // From outside (`OUTSIDE_SIZE`, `OUTSIDE_CLOUDS`) the islands and the clouds are far bigger
@@ -429,12 +447,19 @@ export class Backdrop {
         const cloudFoot = outside ? hy - OUTSIDE_CLOUDS.at(-1)[0] : hy - 40;
         this.clouds.setScale(sc).setPosition(left, cloudFoot - 60 * sc).setSize(width / sc, 60);
         this.clouds.tilePositionX = Math.round((outside ? shown : run * 0.01) / sc - this.time * 1.2);
+        this.duskStrip.setScale(sc).setPosition(this.clouds.x, this.clouds.y).setSize(width / sc, 60);
+        this.duskStrip.tilePositionX = this.clouds.tilePositionX;
         this.cloudRows.forEach((c, i) => {
             const [up, size, , start] = OUTSIDE_CLOUDS[i];
             c.setVisible(outside);
             if (!outside) return;
             c.setScale(size).setPosition(left, hy - up - 60 * size).setSize(width / size, 60);
             c.tilePositionX = Math.round(shown / size + start - this.time * 1.2 * (size / sc));
+        });
+        this.duskRows.forEach((d, i) => {
+            const c = this.cloudRows[i];
+            d.setVisible(outside && this.dusk > 0);
+            if (outside) d.setScale(c.scaleX).setPosition(c.x, c.y).setSize(c.width, 60).tilePositionX = c.tilePositionX;
         });
         for (const l of this.layers) {
             l.s.setScale(si).setPosition(left, hy - (l.h - 1 - l.base) * si).setSize(width / si, l.h);

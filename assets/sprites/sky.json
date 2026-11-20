@@ -339,12 +339,192 @@
     "w": 31,
     "h": 31
    }
+  },
+  "dusk-cloud-0": {
+   "frame": {
+    "x": 1712,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 52
+   }
+  },
+  "dusk-cloud-1": {
+   "frame": {
+    "x": 1809,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 52
+   }
+  },
+  "dusk-cloud-2": {
+   "frame": {
+    "x": 1906,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 36
+   }
+  },
+  "dusk-cloud-3": {
+   "frame": {
+    "x": 1971,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 52
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 52
+   }
+  },
+  "dusk-cloud-4": {
+   "frame": {
+    "x": 2068,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 36
+   }
+  },
+  "dusk-cloud-5": {
+   "frame": {
+    "x": 2133,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 36
+   }
+  },
+  "dusk-cloud-6": {
+   "frame": {
+    "x": 2198,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 36
+   }
+  },
+  "dusk-cloud-7": {
+   "frame": {
+    "x": 2263,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 36
+   }
+  },
+  "dusk-sun": {
+   "frame": {
+    "x": 2328,
+    "y": 0,
+    "w": 35,
+    "h": 35
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 35,
+    "h": 35
+   },
+   "sourceSize": {
+    "w": 35,
+    "h": 35
+   }
   }
  },
  "meta": {
   "image": "sky.png",
   "size": {
-   "w": 1712,
+   "w": 2364,
    "h": 96
   },
   "scale": "1"

@@ -20,3 +20,17 @@ All `create_image_pro`, transparent, 10 generations a job; each folder holds a j
 
 `big-soft/3` was placed first and replaced; mid-soft 3, 5, 7 and small-soft 5, 9 are placed too (7 over the
 sun's right side, the rest over the ship).
+
+## The sunset's (2026-11-20)
+
+`create_image_pro` with `big-soft/2` as the style image for its outline, detail and shading only (not
+its colours): clouds lit by a low sun from below and from the left, gold and coral under, lavender on
+top. Built with `smooth_edges` in `tools/build_sky.py` (the user: "too prominent or too torn-away
+edges"): the generator's darker outer ring and loose bits taken out.
+
+| Folder | Job | Canvas | What was asked | Kept? |
+|---|---|---|---|---|
+| `dusk-mid` | `efa7fd20-d1e6-400a-8962-391ced38ca0d` | 96x52 | a soft cumulus at sunset | **Yes** (0, 1, 6) |
+| `dusk-small` | `9d384e38-5efa-4c95-9e43-67d12ca53970` | 64x36 | the same, small and far | **Yes** (0, 3, 4, 12, 20 by the sun; twelve in the far strip) |
+| `dusk-wide` | `5684ed30-949b-45de-8869-a8e34bc0d653` | 128x56 | the same, wide and low | No: in the first mock-up; "a bit smaller, they are too prominent" |
+| `dusk-smallmid` | `506f4b64-1744-4f60-b74d-df4fc4bceaa0` | 80x44 | the same, between small and medium | No: dark outlines, odd shapes (a crescent, scattered bits) |

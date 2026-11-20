@@ -100,3 +100,29 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   clouds stand in a fairly even row, as the old ones did.
 - **Still to do for §7b:** the sunset's sun and its path on the sea (a mock-up first); then the
   plan's note and `CLAUDE.md`'s table, on the user's word.
+
+## The sunset's sky (2026-11-20; plan-the-rest §7b done)
+
+- **Asked:** the rest of part 7, the sunset's sun and its path (the user's "how far it reaches": the
+  game's background and the sunset too). Mock-ups in the game at the bow and the glide's start: S1
+  the sky in bands as it was, S2 smooth; the user: S2, the rays "as shown"; the clouds "a bit
+  smaller, they are too prominent now"; then "in some places they have either too prominent or too
+  torn-away edges. Let's smooth them" (the sunset's, at the bow and at the glide's start).
+- **Built:** `tools/build_sky.py` `DUSK_*`: eight clouds lit by the low sun round it (generated, in
+  game px from the sun, fixed with it to the screen as it is), its sun (softer, warmer), its glow
+  wide and low along the horizon, god rays up through the clouds' gaps worked out from them (none
+  under the horizon), the far strip of small sunset clouds; every colour divided by the evening
+  light as `dusk()` does; `smooth_edges`: loose bits under 8% of a cloud dropped, the outline
+  rounded, the darker outer ring the generator drew given the inside's colour and made a little
+  see-through. `src/background.js`: the sunset's sky blended (`bg-sky-dusk`), its sun, glow, rays and
+  clouds placed from the sun wherever the sunset shows (in play, from outside, the windows' views:
+  `objects`), the day's far clouds giving way to the sunset's as it comes on (`duskStrip`,
+  `duskRows`), its path of light flickering glint by glint; `pathGlints` and `drawGlints` shared with
+  the intro's path (moved there from `src/intro.js`).
+- **Art:** 4 more jobs, 40 generations (160 for §7b); the tries and their jobs in
+  `assets/source/sky/tries/README.md`.
+- **Checked:** `finale`, `intro`, `boot`, `lang`, `deck3` pass; the rest not run. Shot exactly: the
+  bow, the glide's start, the sun deck, the outside view (the sun behind the bow there, as before),
+  cabin 8206's window; the path recorded.
+- **Not done, on the user's word only:** a note in `docs/plan-the-rest.md` §7b that this session
+  built it (so the Implementation session does not), and `tools/build_sky.py` in `CLAUDE.md`'s table.

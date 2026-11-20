@@ -36,6 +36,7 @@ import { sfx } from './sfx.js';
 import { t, nextLanguage } from './lang.js';
 import { writeSave } from './save.js';
 import { pixelText } from './pixeltext.js';
+import { pathGlints, drawGlints } from './background.js';
 
 const HALF = PLAYER.height / 2;
 // The parts, in order, and the seconds each takes: a new game's, and a game's under way.
@@ -82,32 +83,11 @@ function rng(seed) {
     return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
 }
 
-// The sun's path on the water (plan-the-rest §7b, the user: "more realistically-looking sun and
-// reflections"; a path of light under the sun only): glints on the far sea's rows, thick under the
-// sun and thinning out to the sides, longer and further apart as they come nearer; each glint
-// flickers on a clock of its own (no two frames taking turns), and they sway with the ripples.
-// [texel x, row, length, colour, how bright, phase, rate]. Texels two screen px each.
+// The sun's path on the water (a path of light under the sun only, the user): glints on the far sea's
+// rows, each flickering on a clock of its own, swaying with the ripples (`pathGlints`, `drawGlints` in
+// src/background.js, the sunset's too). Texels two screen px each.
 const PATH = { w: 300, h: 120 };
-function pathGlints() {
-    const rand = rng(301), glints = [];
-    const normal = () => (rand() + rand() + rand() + rand() - 2) / 0.58;      // about N(0, 1)
-    let y = 0, row = 0;
-    while (y < PATH.h) {
-        const k = y / PATH.h, spread = 8 + (PATH.w / 2 - 14) * k ** 0.85;
-        const n = Math.round(10 + 8 * (1 - k));
-        for (let i = 0; i < n; i++) {
-            const off = normal() * spread * 0.42;
-            if (Math.abs(off) > spread) continue;
-            const near = 1 - Math.abs(off) / spread;
-            const len = 1 + Math.floor(rand() * (2 + Math.floor(6 * k * near + 1)));
-            const colour = near > 0.6 ? '#fffffa' : near > 0.3 ? '#fff4d0' : '#c8ecff';
-            const bright = near > 0.45 ? 1 : 0.47 + 0.78 * near;
-            glints.push([Math.round(PATH.w / 2 + off - len / 2), Math.floor(y), len, colour, bright, rand() * 6.3, 1.4 + rand() * 2.8]);
-        }
-        y += 1 + k * 3.2 + (row++ % 2) * 0.6;
-    }
-    return glints;
-}
+const PATH_COLOURS = ['#fffffa', '#fff4d0', '#c8ecff'];
 
 // The intro's own pictures: the sun, its bloom, its god rays and the clouds round it are built art
 // (tools/build_sky.py: `skyart`, `sky-glow`, `sky-rays`, `sky-layout`); the path of light is drawn here,
@@ -177,7 +157,7 @@ export class Intro {
         this.ripples = add(s.add.tileSprite(left, s.waterY, (right - left) / (2 * u), 160, 'bg-ripples').setOrigin(0)
             .setScale(2 * u).setDepth(D.exterior + 0.26).setAlpha(0.6));
         this.glitter = add(s.add.image(this.sunX, s.waterY, 'intro-glitter').setOrigin(0.5, 0).setScale(2 * u).setDepth(D.exterior + 0.27));
-        this.glints = pathGlints();
+        this.glints = pathGlints(PATH.w, PATH.h, 301);
         this.gulls = GULLS.map(([dx, up, speed, size], i) => {
             const img = add(s.add.sprite(0, s.waterY - up * u, 'bg-gull', 0).setOrigin(0.5, 1).setScale(size * u).setDepth(D.fx)
                 .setTint(size === 3 ? 0x8f8aa0 : 0xc8c6d4).setFlipX(speed < 0));
@@ -185,21 +165,9 @@ export class Intro {
         });
     }
 
-    // The path of light as it is at `now`, moved `dx` texels with the ripples: each glint lit by
-    // its own clock, most of the time a little, now and then at its brightest.
+    // The path of light as it is at `now`, moved `dx` texels with the ripples.
     drawPath(now, dx) {
-        const tex = this.s.textures.get('intro-glitter'), ctx = tex.getContext();
-        ctx.clearRect(0, 0, PATH.w, PATH.h);
-        for (const [x, y, len, colour, bright, phase, rate] of this.glints) {
-            const k = Math.max(0, Math.sin(now * rate + phase));
-            const a = bright * k * k;
-            if (a < 0.08) continue;
-            ctx.globalAlpha = Math.min(1, a);
-            ctx.fillStyle = colour;
-            ctx.fillRect(x + dx, y, len, 1);
-        }
-        ctx.globalAlpha = 1;
-        tex.refresh();
+        drawGlints(this.s.textures.get('intro-glitter'), this.glints, PATH_COLOURS, now, dx);
     }
 
     // --- The welcome screen -----------------------------------------------------------------------

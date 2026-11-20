@@ -83,6 +83,9 @@ export class BootScene extends Phaser.Scene {
         this.load.image('sky-rays', 'assets/sprites/sky-rays.png');
         this.load.image('sky-glow', 'assets/sprites/sky-glow.png');
         this.load.image('sky-strip', 'assets/sprites/sky-strip.png');
+        this.load.image('sky-dusk-rays', 'assets/sprites/sky-dusk-rays.png');
+        this.load.image('sky-dusk-glow', 'assets/sprites/sky-dusk-glow.png');
+        this.load.image('sky-dusk-strip', 'assets/sprites/sky-dusk-strip.png');
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each

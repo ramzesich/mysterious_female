@@ -11,7 +11,10 @@ top, the clouds soft with no dark base, god rays through them). Builds:
   the sun and beams show only where clouds break the light); smooth, one texel a screen px;
 - `assets/sprites/sky-glow.png`: the sun's bloom, smooth, one texel a screen px;
 - `assets/sprites/sky-strip.png`: the far clouds' strip (the game's far background, in play and from
-  outside, and the intro's far rows), small clouds hazed toward the horizon's colour.
+  outside, and the intro's far rows), small clouds hazed toward the horizon's colour;
+- the sunset's (`DUSK_*`): its clouds and its sun in the atlas (`dusk-cloud-<i>`, `dusk-sun`), where
+  they stand in the layout (`dusk`), its rays (`sky-dusk-rays.png`), its glow along the horizon
+  (`sky-dusk-glow.png`), its far strip (`sky-dusk-strip.png`).
 
     python tools/build_sky.py
 
@@ -27,6 +30,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from scipy import ndimage
 
 ROOT = Path(__file__).resolve().parent.parent
 TRIES = ROOT / "assets" / "source" / "sky" / "tries"
@@ -52,6 +56,22 @@ LINING = 0.9                    # how bright a cloud's edge toward the sun goes 
 RAYS = {"box": (-960, -330, 960, 540), "strength": 0.7, "reach": 420}   # (wide: the camera pans right past it)
 STRIP = {"names": [f"small-soft/{i}.png" for i in (0, 1, 2, 4, 5, 8, 9, 11, 12, 14, 18, 20, 23, 24)],
          "w": 2048, "h": 60, "haze": 0.3, "seed": 21}
+
+# The sunset (§6.1.9; the user chose S2 of two mock-ups, 2026-11-20: the sky smooth, rays "as shown",
+# the clouds "a bit smaller, they are too prominent"): clouds lit by the low sun, generated, round the
+# sun fixed to the screen 20% across and half sunk (src/background.js, `SUN`). In game px from the
+# sun's middle, a cloud's texel one game px; the light pictures in half game px (shown at 0.5). Every
+# colour divided by the evening light the whole picture is multiplied by (`DUSK_LIGHT` there), so it
+# looks itself under it.
+DUSK_LIGHT = np.array([1, 0.84, 0.74])
+DUSK_CLOUDS = [
+    ("dusk-mid/6.png", -50, -58, True), ("dusk-mid/1.png", 80, -50, False), ("dusk-small/0.png", 10, -92, False),
+    ("dusk-mid/0.png", 232, -74, False), ("dusk-small/12.png", 160, -26, False), ("dusk-small/3.png", 345, -44, False),
+    ("dusk-small/20.png", 300, -98, False), ("dusk-small/4.png", -150, -34, True),
+]
+DUSK_RAYS = {"box": (-260, -260, 840, 30), "strength": 1.15, "reach": 380, "colour": (255, 200, 140)}
+DUSK_STRIP = {"names": [f"dusk-small/{i}.png" for i in (1, 2, 5, 7, 10, 13, 15, 17, 19, 21, 22, 24)],
+              "w": 2048, "h": 60, "haze": 0.0, "seed": 21, "smooth": True}
 
 
 def load(name):
@@ -150,13 +170,14 @@ def god_rays(clouds, box, strength, reach):
     return a
 
 
-def strip():
-    s = STRIP
+def strip(s=STRIP):
     a = np.zeros((s["h"], s["w"], 4))
     rng = np.random.default_rng(s["seed"])
     x = 30
     while x < s["w"] - 120:
         c = load(s["names"][rng.integers(len(s["names"]))])
+        if s.get("smooth"):
+            c = smooth_edges(c)
         if rng.random() < 0.5:
             c = c[:, ::-1]
         c = c.copy()
@@ -168,6 +189,76 @@ def strip():
         m = c[..., 3] > 0
         a[top:top + ch, x:x + cw][m] = c[m]
         x += cw + 70 + int(rng.integers(0, 260))
+    return a
+
+
+def smooth_edges(a, min_part=10, rounds=1, edge_alpha=0.75, lift=0.85):
+    """A cloud's edge made soft (the user, 2026-11-20, of the sunset's: "in some places they have either
+    too prominent or too torn-away edges. Let's smooth them"): the loose specks and bits away from its
+    body dropped; its outline rounded (a pixel is in if most of the nine round it are: no one-pixel
+    spurs or notches); its outer ring, which the generator drew darker like an outline, given the
+    colour of what is inside it and made a little see-through."""
+    a = a.copy()
+    orig = a[..., 3] > 0
+    nine = np.ones((3, 3))
+    lab, k = ndimage.label(orig, structure=nine)
+    m = orig
+    if k > 1:
+        sizes = ndimage.sum(orig, lab, range(1, k + 1))
+        m = np.isin(lab, 1 + np.nonzero(sizes >= max(min_part, 0.08 * sizes.max()))[0])   # (8% of its body)
+    for _ in range(rounds):
+        m = ndimage.convolve(m.astype(int), nine.astype(int), mode="constant") >= 5
+    rgb = a[..., :3]
+
+    def mean_of(where):
+        w = ndimage.convolve(where.astype(float), nine, mode="constant")
+        tot = np.stack([ndimage.convolve(rgb[..., c] * where, nine, mode="constant") for c in range(3)], -1)
+        return tot / np.maximum(w, 1)[..., None], w > 0
+
+    near, ok = mean_of(orig)
+    new = m & ~orig & ok                                            # (a notch filled: its neighbours' colour)
+    rgb[new] = near[new]
+    m &= orig | ok
+    inner = ndimage.binary_erosion(m, structure=nine)
+    edge = m & ~inner
+    inside, ok = mean_of(inner)
+    lit = edge & ok
+    rgb[lit] = rgb[lit] * (1 - lift) + inside[lit] * lift
+    a[..., :3] = rgb
+    a[..., 3] = np.where(m, 255.0, 0.0)
+    a[..., 3][edge] = 255 * edge_alpha
+    return a
+
+
+def undusk(a):
+    """A sunset colour as it must be drawn to look itself under the evening light."""
+    out = a.copy()
+    out[..., :3] = (a[..., :3] / DUSK_LIGHT).clip(0, 255)
+    return out
+
+
+def dusk_sun(r=15):
+    """The setting sun: warmer, its rim orange."""
+    d = 2 * r + 5
+    c = d // 2
+    a = np.zeros((d, d, 4))
+    dist = np.hypot(*(np.mgrid[:d, :d] - c))
+    a[dist <= r + 1.6] = [255, 160, 90, 120]
+    a[dist <= r + 0.5] = [255, 190, 110, 255]
+    a[dist <= r - 0.8] = [255, 226, 160, 255]
+    a[dist <= r - 4] = [255, 246, 214, 255]
+    return a
+
+
+def dusk_glow(w=1000, h=420):
+    """Wide and low along the horizon (half game px)."""
+    yy, xx = np.mgrid[:h, :w]
+    r = np.hypot((xx - w / 2) / 2.2, yy - h / 2)
+    v = 0.95 * np.exp(-(r / 44) ** 1.3) + 0.5 * np.exp(-(r / 120) ** 1.3) + 0.22 * np.exp(-r / 220)
+    v *= border(h, w, 120)
+    a = np.zeros((h, w, 4))
+    a[..., :3] = (255, 180, 110)
+    a[..., 3] = v.clip(0, 1) * 255
     return a
 
 
@@ -198,15 +289,33 @@ def main():
         placed.append((px, x, y))
         layout["clouds"].append({"frame": f"cloud-{i}", "x": x, "y": y})
     frames["sun"] = sun_disc()
+    dusk_placed, layout["dusk"] = [], {"clouds": []}
+    for i, (name, x, y, mirror) in enumerate(DUSK_CLOUDS):
+        px = load(name)
+        if mirror:
+            px = px[:, ::-1].copy()
+        px = smooth_edges(px)
+        frames[f"dusk-cloud-{i}"] = undusk(px)
+        dusk_placed.append((px, x * 2, y * 2))                    # (the rays are worked out in half game px)
+        layout["dusk"]["clouds"].append({"frame": f"dusk-cloud-{i}", "x": x, "y": y})
+    frames["dusk-sun"] = undusk(dusk_sun())
     sheet, atlas = pack(frames)
     save(sheet, OUT / "sky.png")
     (OUT / "sky.json").write_text(json.dumps(atlas, indent=1))
     layout["rays"] = {"x": RAYS["box"][0], "y": RAYS["box"][1]}
-    (OUT / "sky-layout.json").write_text(json.dumps(layout, indent=1))
     save(god_rays(placed, RAYS["box"], RAYS["strength"], RAYS["reach"]), OUT / "sky-rays.png")
     save(bloom(), OUT / "sky-glow.png")
     save(strip(), OUT / "sky-strip.png")
-    for f in ("sky.png", "sky-rays.png", "sky-glow.png", "sky-strip.png"):
+    R = DUSK_RAYS
+    rays = god_rays(dusk_placed, R["box"], R["strength"], R["reach"])
+    rays[..., :3] = R["colour"]
+    rays[..., 3] *= (np.arange(R["box"][1], R["box"][3]) < 10)[:, None]     # (none under the horizon)
+    save(undusk(rays), OUT / "sky-dusk-rays.png")
+    layout["dusk"]["rays"] = {"x": R["box"][0] / 2, "y": R["box"][1] / 2}
+    (OUT / "sky-layout.json").write_text(json.dumps(layout, indent=1))
+    save(undusk(dusk_glow()), OUT / "sky-dusk-glow.png")
+    save(undusk(strip(DUSK_STRIP)), OUT / "sky-dusk-strip.png")
+    for f in ("sky.png", "sky-rays.png", "sky-glow.png", "sky-strip.png", "sky-dusk-rays.png", "sky-dusk-glow.png", "sky-dusk-strip.png"):
         print(f, (OUT / f).stat().st_size // 1024, "KB")
 
 
