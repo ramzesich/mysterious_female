@@ -207,7 +207,11 @@ CAST = {
     "teppan_chef_a": ("64b21a54-a081-444c-8ab3-c911eb069453", {"flourish": 10},
                       {"cut": {"flourish": ("flourish2", [1, 2, 3, 4, 5, 6, 7, 8])}}),
     "teppan_chef_b": ("2598efbb-c8a0-4125-a731-7c43ec6f8a26", {"flourish": 10}, {}),
-    "sushi_chef": ("1114fd50-c3d7-43f8-9641-0aa91b6f4e49", {"slice": 10}, {}),
+    # (His trade for the tin of sardines, 7: take, give, catch, each a PixMiniMax clip toward an edit of his
+    # own frame, and each played back down again; sources in `sushi-chef-trade/`.)
+    "sushi_chef": ("1114fd50-c3d7-43f8-9641-0aa91b6f4e49", {"slice": 10, "take": 14, "take-back": 14, "give": 12,
+                                                            "give-back": 14, "catch": 22, "catch-back": 14},
+                   {"own": {"give": ["131d2f", "cbd6e6", "879bb1", "6f869a", "4a6079", "273649", "f1f6fb", "b5cce8"]}}),
     "lobos_waiter": ("0d3e8eeb-65c4-42e6-8367-ee902890f063", {"shake": 9}, {}),
     "shuffle_a": ("6f8f13f9-7b6d-41de-950f-a548cd4f1449", {"push": 6}, {}),
     "shuffle_b": ("a52e43f1-5bb8-437c-856e-c650ccfc8a5b", {"idle": 4}, {}),

@@ -796,7 +796,7 @@ asked; `amb_cagneys` diners.
 |---|---|---|---|---|
 | 165 | `npc_engineer` | The engineer at the technical door | `static`; bubble (a steaming cup) within 4 m; E with the hot coffee: he drinks, waves her up, climbs the ladder (`scn_engineer`); afterwards he is at the top | Idle, drink, climb, wave, read |
 
-**The Sushi Bar 174-182.** `amb_sushi_chef` behind the counter; two diners. (No sign secret: dropped.)
+**The Sushi Bar 174-182.** `amb_sushi_chef` behind the counter; two diners. (No sign secret: dropped.) His cloud shows a tangerine once she is near: Bumbot's tin of sardines (7) is his for one, by E or a throw that reaches him (then on his case, `keep_sardines`; 2026-11-20). The nigiri stand behind him, by the sake set.
 
 **Teppanyaki 182-194.** 186-190 `haz_flare`: the chef (`amb_teppan_chef`) flares the grill
 `timed(6, 1, 186-190)`: "Singed"; the flourish is the tell. **The chef answers her coming**

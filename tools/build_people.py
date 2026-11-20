@@ -69,6 +69,18 @@ def washed(img, k):
     return out
 
 
+def kept(done, raw, colours):
+    """`done` (on the palette) with the pixels of `raw` whose colour is one of `colours` put back."""
+    out, px, rp = done.copy(), None, raw.load()
+    px = out.load()
+    for y in range(raw.height):
+        for x in range(raw.width):
+            r, g, b, a = rp[x, y]
+            if a and (r, g, b) in colours:
+                px[x, y] = (r, g, b, a)
+    return out
+
+
 def cell_of(img, feet, flip):
     """The frame in a cell: centred as its canvas is, the row `feet` on the cell's bottom row."""
     if flip:
@@ -109,6 +121,11 @@ def build():
         for clip_dir in sorted(p for p in src.iterdir() if p.is_dir()):
             n = len(list(clip_dir.glob("*.png")))
             frames = [load(clip_dir / f"{i}.png") for i in range(n)]
+            # ("own": {clip: [colours]}: a thing in the clip kept in its own colours, not the palette's, as the
+            # world's own picture of it is: the sushi chef's tin of sardines.)
+            own = {tuple(bytes.fromhex(c)) for c in opts.get("own", {}).get(clip_dir.name, [])}
+            if own:
+                frames = [kept(f, Image.open(clip_dir / f"{i}.png").convert("RGBA"), own) for i, f in enumerate(frames)]
             if not frames:
                 continue
             # On the standing pose's canvas the feet stay where they stand; on another canvas the

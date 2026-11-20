@@ -116,7 +116,8 @@ export class People {
     }
 
     // A clip played once (a shake of the head, eating), then back to idling. Resolves when it is over.
-    play(p, clip, { times = 1, hold = 0, speed = 1 } = {}) {
+    // (`stay`: held in its last frame, still acting, for the next clip: the sushi chef's trade.)
+    play(p, clip, { times = 1, hold = 0, speed = 1, stay = false } = {}) {
         return new Promise(resolve => {
             const frames = p.meta.anims[clip];
             if (!frames) {
@@ -132,6 +133,7 @@ export class People {
             p.sprite.anims.timeScale = speed;
             p.sprite.once('animationcomplete', () => {
                 p.sprite.anims.timeScale = 1;
+                if (stay) return resolve();
                 this.scene.time.delayedCall(hold, () => {
                     if (p.state === 'acting') this.idle(p);
                     resolve();

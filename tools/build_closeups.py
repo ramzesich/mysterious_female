@@ -25,7 +25,8 @@ OUT = ROOT / "assets" / "sprites"
 
 # Kept in their own colours: the tennis ball's fluorescent felt went olive on the palette (as in the
 # world, where the user chose it so).
-OWN_COLOURS = {"ball"}
+# (The sardines keep their own blue silver too, the user's "as it is", 2026-11-20: on the palette they went purple.)
+OWN_COLOURS = {"ball", "sardines"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the
 # palette's brightest cyans (the user: "two big rubbery cyan wheels").
 RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},

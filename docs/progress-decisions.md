@@ -3675,3 +3675,35 @@ shot of deck 4's corridor (A to K), each the user's word:
   `hud.state()` (deck 4/5 checks the order found); `boot`, `pocket`, `deck4`, `region1`, `region2` pass.
   Generations: 65 (`assets/source/hud/README.md`). Not done: a sound for a count appearing (none asked); the
   lock popups' card keeps its slot notch.
+
+## §4 2.1, thing 7: the tin of sardines at the Sushi Bar (the user, 2026-11-20)
+
+Asked one question at a time (the user: "Give me questions interactively, one by one, with the context"):
+
+- **His wish:** a thought cloud with the game's own tangerine (`icon-tangerine` in the popups' atlas, from
+  `FRUIT`; no generation), shown **only once she is near** (3 m), until he has one (`flag:sushi`).
+- **The trade by hand:** E at the counter with a tangerine: she walks round to his front (the case's bare end;
+  36 px before him, clear of the seated diner), bows and holds it out (her apology's clip, as the plan had it),
+  he reaches over the glass case and takes it on his palm, puts it away behind the case, comes up with the tin and
+  hands it across; the close-up, Bumbot's count pops in; one tangerine fewer. **With none:** his cloud hops. Her
+  hands full: nothing.
+- **By a throw** (the user: "also tossing him a tangerine works. Only if it hits him (or almost hit him)"): a
+  thrown tangerine within 22 px of his middle, above his case and up to 10 px over his head, is caught (his fist
+  up), put away, and **the tin set on his case's top** for E (the user's choice of three; `keep_sardines`,
+  `flag:sushi_tin`). Measured: a lob reaches him from up to about 1.3 m, a throw in a jump from about 2.7 m on;
+  between, it passes 25 px or more over his head. A throw from the floor passes under the case's top.
+- **The tin:** four close-up tries (two closed, two open); the user chose **4 as it is** (open, silver, the fish
+  packed in): kept in its own blue silver (`OWN_COLOURS`; on the palette it went purple). Its world picture is
+  **drawn by hand at 13 x 9 in its colours**: shrunk, it was a grey blob (the collar bell's lesson). That one
+  picture is in his hand in the clip (`own` colours in `tools/build_people.py`), crossing to her, on the counter.
+- **His clips** (approved): `take`, `give`, `catch`, each a PixMiniMax clip from his slice frame toward an edit
+  of it (`edit_image_pro_flash`), and each played back down (`take-back`, `give-back` without the tin,
+  `catch-back`); the give's frame with the tin in front of his face dropped; the generator's tin replaced by the
+  drawn one. The tangerine in his hand is the game's, at his palm or fist measured per frame (`SUSHI` in
+  `src/world/topdeck.js`), put away once his hand is below his shoulder.
+- **The nigiri moved behind him** by the sake set (the user, over raising his arm): his take had laid his hand on
+  the plate.
+- Built: `sushi()`, `sushiOffered()` in `src/world/topdeck.js`; `people.play(..., { stay })` holds a clip's last
+  frame for the next. Test `throw.sardines` (the cloud near, E with none and with one, a lob caught, the tin taken);
+  `boot`, `throw`, `region8`, `deck4` pass; `check_overlaps` 0. Generations: 22 (`assets/source/closeups/README.md`,
+  `assets/source/people/sushi-chef-trade/README.md`).

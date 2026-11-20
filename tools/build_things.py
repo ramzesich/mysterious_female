@@ -123,6 +123,9 @@ BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-t
 # it was lost, a plain yellow dot; the user: "has to look like a tennis ball", and chose an olive
 # outline, 2026-11-17). name -> the outline's colour.
 SEAM = {"tennis-ball": "a2a947"}
+# Kept in their own colours, not put on the palette: the tin of sardines (7), drawn by hand at its size in its
+# close-up's blue silver (shrunk, the close-up was a grey blob; on the palette its greys went purple).
+OWN_COLOURS = {"sardine-tin"}
 
 
 def seam_shrink(img, n, outline):
@@ -212,7 +215,7 @@ def piece(path, name=None):
                 px[x, y] = (r, g, b, 255 if a >= 128 else 0)
     # (The tennis ball keeps its own felt's colours, as the user chose it: on the palette its
     # fluorescent yellow went dull.)
-    if path.stem not in SEAM:
+    if path.stem not in SEAM and path.stem not in OWN_COLOURS:
         img = palettize(img)
     if path.stem in LEAN:
         every = LEAN[path.stem]

@@ -7,7 +7,7 @@
 // her book, the gulls leave the bow, Bumbot runs for it), the engineer's book, the court's quirk.
 // Places come from maps/world.json (`topdeck`).
 
-import { PLAYER, GAGS, FLARE } from '../config.js';
+import { PLAYER, GAGS, FLARE, HAND_OVER } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
@@ -28,6 +28,21 @@ const onFloor = body => body.blocked.down || body.touching.down;
 // The old lady on her sunbed across the walk (population: `npc_oldlady`): a block too wide and too
 // high for a tray's hop; a jump clears it (landing on it she slides on over: nobody stands on the
 // old lady). She glares at whoever comes near, and dozes once she has had her mojito.
+// The sushi chef's trade (§4 2.1, thing 7, the user's, 2026-11-20): a tangerine for Bumbot's tin of sardines.
+// Measured in his built frames (px ahead of his middle, px up from his feet, facing east): his palm's top in
+// `take` (the tangerine sits on it), his fist in `catch` (the tangerine behind it), the tin's left and its
+// bottom in `give`'s last frame (the world's tin, `thing:sardine-tin`, takes over there exactly). She stands
+// `spot` px before him, on his front, to hand it over (the nigiri stand behind him since).
+const SUSHI = {
+    id: 'amb_sushi_chef', item: 'keep_sardines', keep: 'keep:cat:sardines', spot: 36, reach: 46,
+    palm: [[11, 48], [22, 32], [14, 32], [24, 42], [24, 42], [24, 42], [24, 42], [24, 42], [24, 42]],
+    fist: [[11, 47], [10, 37], [10, 50], [19, 61], [15, 61], [14, 61], [14, 61], [14, 61], [14, 61]],
+    tin: { left: 15, w: 13, bottom: 41 },
+    // A throw that reaches him: within `hitX` px of his middle, between `top` and `low` px over his feet
+    // (above the glass case: the case itself is not him).
+    hitX: 22, top: 70, low: 38,
+};
+
 export class OldLady {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -959,6 +974,145 @@ export const topdeck = {
             gate?.extra?.forEach(i => i.setAlpha(1));
         });
         return true;
+    },
+
+    // E at the sushi chef (population: `amb_sushi_chef`; his cloud shows a tangerine): with a tangerine, she
+    // offers it with a small bow (her apology's clip), he takes it over the glass case, puts it away, and hands
+    // her Bumbot's tin of sardines (7) across. With none, his cloud hops. Her hands full: nothing.
+    sushi() {
+        const c = this.near(SUSHI.id, SUSHI.reach), w = this.world, s = this.scene;
+        if (!c || this.P.has('sushi') || c.state === 'acting') return false;
+        if (w.carry) return false;
+        if (s.save.tangerines <= 0 && !s.infiniteTangerines()) {
+            w.nudge(c);
+            return true;
+        }
+        c.state = 'acting';
+        w.cut(async () => {
+            const her = s.player, spot = c.x - SUSHI.spot;
+            // (To his front, the case's bare end: from his back she walks round.)
+            if (Math.abs(her.x - spot) > 2) {
+                her.setFlipX(spot < her.x);
+                s.pose('run', 0.6);
+                await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) / 70 * 1000 });
+            }
+            s.pose('stand');
+            her.setFlipX(false);
+            c.dir = -1;
+            this.people.place(c);
+            await w.wait(150);
+            // Her bow, the tangerine held out in both hands (behind her, her hands over it).
+            if (s.anims.exists('her-apology')) s.herClip('her-apology');
+            const fruit = s.add.image(her.x + HAND_OVER.dx, her.y - HAND_OVER.dy, 'tangerine').setOrigin(0.5, 0.6)
+                .setDepth(her.depth - 0.01).setVisible(false);
+            w.add([fruit]);
+            const show = () => fruit.setVisible((her.anims.currentFrame?.index ?? 1) - 1 >= HAND_OVER.frame);
+            her.on('animationupdate', show);
+            if (!s.infiniteTangerines()) s.save.tangerines -= 1;
+            s.refreshHud();
+            // His hand out over the case as hers come up.
+            await w.wait(300);
+            await this.people.play(c, 'take', { stay: true });
+            await w.wait(Math.max(0, HAND_OVER.giveMs - 300 - 650));
+            her.off('animationupdate', show);
+            fruit.setVisible(true);
+            sfx.give();
+            const palm = this.sushiAt(c, SUSHI.palm.at(-1));
+            await w.tween({ targets: fruit, x: palm.x, y: palm.y - 6, duration: 320, ease: 'Sine.easeInOut' });
+            fruit.setOrigin(0.5, 1).setPosition(palm.x, palm.y).setDepth(c.sprite.depth - 0.001);
+            this.P.setFlag('sushi');
+            s.pose('stand');
+            await w.wait(250);
+            // Down behind the case with it, and up again with the tin.
+            await this.sushiCarry(c, 'take-back', fruit, [...SUSHI.palm].reverse(), [0.5, 1], 0, 42);
+            fruit.destroy();
+            await w.wait(350);
+            await this.people.play(c, 'give', { stay: true });
+            await w.wait(200);
+            const tin = this.sushiTin(c);
+            const backDown = this.people.play(c, 'give-back');
+            sfx.at(c.x, c.y).give();
+            tin.setDepth(s.DEPTH.player + 0.05);
+            await w.tween({ targets: tin, x: her.x - tin.width / 2 + 4, y: her.y - 34, duration: 420, ease: 'Sine.easeInOut' });
+            tin.destroy();
+            w.giveKeep(SUSHI.keep, her.x, her.y - 40);
+            await backDown;
+        });
+        return true;
+    },
+
+    // A thrown tangerine that reaches the sushi chef over his case (or nearly: the user, 2026-11-20, "only if it hits
+    // him, or almost hits him"): he catches it, puts it away, and sets the tin of sardines on the case's top for her
+    // to take (`keep_sardines`, shown by `flag:sushi_tin`).
+    sushiOffered(t) {
+        const c = this.who(SUSHI.id), s = this.scene, w = this.world;
+        if (!t.thrown || !c?.on || c.state === 'acting' || this.P.has('sushi') || t.route !== c.route) return false;
+        const x = t.img.x, y = t.img.y;
+        if (Math.abs(x - c.x) > SUSHI.hitX || y < c.y - SUSHI.top || y > c.y - SUSHI.low) return false;
+        const fruit = s.loose.claim(t);
+        c.state = 'acting';
+        this.P.setFlag('sushi');
+        // (Caught facing where it came from.)
+        c.dir = x < c.x ? -1 : 1;
+        if (Math.abs(x - c.x) < 4) c.dir = s.player.x < c.x ? -1 : 1;
+        this.people.place(c);
+        sfx.at(c.x, c.y).take();
+        (async () => {
+            await this.sushiCarry(c, 'catch', fruit, SUSHI.fist, [0.5, 0.5], 3);
+            await w.wait(400);
+            await this.sushiCarry(c, 'catch-back', fruit, [...SUSHI.fist].reverse(), [0.5, 0.5], 0, 55);
+            fruit.destroy();
+            // To the case's front (his own way), and the tin set down on it.
+            c.dir = -1;
+            this.people.place(c);
+            await w.wait(300);
+            await this.people.play(c, 'give', { stay: true });
+            await w.wait(200);
+            const tin = this.sushiTin(c);
+            const pick = w.things.find(k => k.id === SUSHI.item)?.pick;
+            const backDown = this.people.play(c, 'give-back');
+            if (pick) await w.tween({ targets: tin, x: pick.x - pick.displayWidth * pick.originX, y: pick.y + pick.displayHeight * (1 - pick.originY), duration: 140, ease: 'Quad.easeIn' });
+            sfx.at(c.x, c.y).clink();
+            tin.destroy();
+            this.P.setFlag('sushi_tin');
+            w.refresh();
+            await backDown;
+        })();
+        return true;
+    },
+
+    // A world point of the sushi chef's frame: [px ahead of his middle, px up from his feet] (east-facing).
+    sushiAt(c, [dx, up]) {
+        const sp = c.sprite;
+        // (A flipped frame is mirrored in place: its column c lands at 79 - c of the cell.)
+        return { x: Math.round(sp.x) + (sp.flipX ? -dx - 1 : dx), y: Math.round(sp.y) - up };
+    },
+
+    // One of his clips with the tangerine in his hand: it follows `points` (one per frame); `from` the first
+    // frame it is held in (before, it flies there, a tween as long as those frames).
+    // `low`: once his hand is lower than so many px over his feet the tangerine is put away (gone from his
+    // hand, not shown at his chin on its way down).
+    sushiCarry(c, clip, fruit, points, origin, from = 0, low = 0) {
+        const s = this.scene, fps = c.meta.fps?.[clip] ?? 10;
+        fruit.setOrigin(...origin).setDepth(c.sprite.depth - 0.001);
+        const at = i => this.sushiAt(c, points[Math.min(points.length - 1, i)]);
+        if (from > 0) s.tweens.add({ targets: fruit, ...at(from), duration: from / fps * 1000, ease: 'Sine.easeOut' });
+        const follow = (anim, f) => {
+            const i = f.index - 1;
+            if (i >= from) fruit.setPosition(at(i).x, at(i).y);
+            if (low && points[Math.min(points.length - 1, i)][1] < low) fruit.setVisible(false);
+        };
+        c.sprite.on('animationupdate', follow);
+        return this.people.play(c, clip, { stay: true }).then(() => c.sprite.off('animationupdate', follow));
+    },
+
+    // The world's tin of sardines where his `give` clip's last frame holds it (his frame shown without it next).
+    sushiTin(c) {
+        const s = this.scene, sp = c.sprite, T = SUSHI.tin;
+        const left = sp.flipX ? Math.round(sp.x) - T.left - T.w : Math.round(sp.x) + T.left;
+        const tin = s.add.image(left, Math.round(sp.y) - T.bottom, 'things', 'sardine-tin').setOrigin(0, 1).setDepth(sp.depth + 0.002);
+        this.world.add([tin]);
+        return tin;
     },
 
     // E at the engineer on his break, after the horn: he lends her what he is reading, the ninth book.

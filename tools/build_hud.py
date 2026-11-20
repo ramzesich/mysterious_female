@@ -21,13 +21,12 @@ background). The game draws them at 2 screen px a pixel (`src/hud.js`).
     python tools/build_hud.py
 """
 import json
-import re
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
-from build_popups import card, crop, TRIES, pack
+from build_popups import card, crop, TRIES, pack, tangerine
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source"
@@ -40,19 +39,6 @@ GHOST_EDGE, GHOST_FILL = 150, 40
 
 def rgba(path):
     return np.array(Image.open(path).convert("RGBA"))
-
-
-def tangerine():
-    js = (ROOT / "src" / "textures.js").read_text(encoding="utf-8")
-    pal = dict(re.findall(r"^\s+(\w): '(#[0-9a-f]{6})'", js.split("const FRUIT_PALETTE")[1].split("};")[0], re.M))
-    rows = re.findall(r"'([.\w]+)'", js.split("const FRUIT = {")[1].split("],")[0])
-    a = np.zeros((len(rows), len(rows[0]), 4), np.uint8)
-    for y, r in enumerate(rows):
-        for x, c in enumerate(r):
-            if c in pal:
-                h = pal[c]
-                a[y, x] = (int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16), 255)
-    return a
 
 
 def rim(a):

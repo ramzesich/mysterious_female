@@ -64,7 +64,7 @@ export class Story {
     // E. True if something here took it.
     interact() {
         return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband()
-            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake();
+            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake() || this.sushi();
     }
 
     update(dt, time, input) {
@@ -216,7 +216,8 @@ export class Story {
     // spot bats a thrown one back; Bumbot at the tip of the bow backs off (finale); the kid catches
     // and eats it (lido); one over the Spinnaker's keys plays a note (bow). True if it was taken.
     offered(t) {
-        return this.catBats(t) || !!this.tipOffered?.(t) || !!this.kidOffered?.(t) || !!this.pianoOffered?.(t);
+        return this.catBats(t) || !!this.tipOffered?.(t) || !!this.kidOffered?.(t) || !!this.pianoOffered?.(t)
+            || !!this.sushiOffered?.(t);
     }
 
     // Bumbot at one of his spots, a thrown tangerine coming at him: he bats it straight back to her,

@@ -203,6 +203,10 @@ ITEMS = {
     # under its beak once a lob has made it drop it (the game sets it there, 9 px aft of the gull).
     "keep_bell": ("prom", 140.6, "keep:cat:bell", "flag:bell_dropped", 0, "thing:collar-bell"),
     "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
+    # Bumbot's tin of sardines (7), the sushi chef's for a tangerine: handed to her across the counter (E with one;
+    # `sushi()` in src/world/topdeck.js), or, for a tangerine thrown at him, set on his glass case's top at his
+    # front, where his hand held it, for her to take (the user, 2026-11-20).
+    "keep_sardines": (12, 177.552, "keep:cat:sardines", "flag:sushi_tin", 40, "thing:sardine-tin"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
@@ -435,7 +439,9 @@ PEOPLE = {
                               bubble=("book", "!flag:book9", None, 4)),
     "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_her", face=1, layer="back"),
     "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_him", face=-1, layer="back"),
-    "amb_sushi_chef": dict(at=(12, 178.0), who="sushi_chef", face=-1, idle="slice", layer="behind"),
+    # (His cloud shows a tangerine once she is near, until he has one: the tin of sardines is his for it, 7.)
+    "amb_sushi_chef": dict(at=(12, 178.0), who="sushi_chef", face=-1, idle="slice", layer="behind",
+                           bubble=("tangerine", None, "flag:sushi", 3)),
     "amb_sushi_a": dict(at=(12, 176.71), who="sushi_a", face=1, layer="back"),
     "amb_sushi_b": dict(at=(12, 179.29), who="sushi_b", face=-1, layer="back"),
     "amb_teppan_chef_a": dict(at=(12, 185.4), who="teppan_chef_a", face=1, idle="idle", layer="behind"),

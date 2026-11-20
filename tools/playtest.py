@@ -1577,6 +1577,60 @@ def scenario_throw(b):
     return ok
 
 
+def scenario_throw__sardines(b):
+    """The sushi chef's tin of sardines (§4 2.1, thing 7; deck 12): his cloud shows a tangerine once she is near;
+    E with none, it hops, nothing else; E with one, she hands it over with a bow, he takes it over his case and hands
+    her Bumbot's tin (one tangerine fewer, his cloud gone); again, a lob that reaches him is caught, and he sets the
+    tin on his case for E to take."""
+    S = "window.__ship"
+    C = f"{S}.world.people.byId.amb_sushi_chef"
+    tin = f"{S}.world.things.find(t => t.id === 'keep_sardines')"
+    b.open("?reset&play&at=sushi")
+    cx = b.eval(f"{C}.x")
+    b.teleport(cx - 200, D12)
+    wait(0.3)
+    ok = check(not b.eval(f"{C}.bubbleItems[0].visible"), "the sushi chef's cloud: not from afar")
+    b.teleport(cx + 30, D12)
+    wait(0.4)
+    ok &= check(b.eval(f"{C}.bubbleItems[0].visible"), "near him, his cloud shows a tangerine",
+                b.eval(f"{C}.bubbleItems[1].texture.key"))
+    b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud()")
+    b.tap("e")
+    wait(0.5)
+    got = b.eval(f"[{S}.mode, {S}.save.keeps.slice(), {C}.state]")
+    ok &= check(got[0] == "play" and "keep:cat:sardines" not in got[1], "E with no tangerine: nothing but his cloud's hop", got)
+    b.eval(f"{S}.save.tangerines = 2; {S}.refreshHud()")
+    b.tap("e")
+    b.wait_for(f"{S}.save.keeps.includes('keep:cat:sardines')", timeout=10)
+    ok &= check(b.eval(f"{S}.save.keeps.includes('keep:cat:sardines')") and b.state()["tangerines"] == 1,
+                "E with one: handed over, the tin is hers, one tangerine fewer", [b.eval(f"{S}.save.keeps"), b.state()["tangerines"]])
+    b.shot("sardines-given")
+    b.wait_for(f"{S}.mode === 'play' && {C}.state === 'idle'", timeout=6)
+    ok &= check(not b.eval(f"{C}.bubbleItems[0].visible") and not b.eval(f"{tin}.pick.visible"),
+                "his cloud gone, no tin on the counter")
+    # Again, by a lob from the floor about a metre off his front: caught, the tin set on his case.
+    b.eval(f"{S}.save.keeps = []; {S}.save.flags = {S}.save.flags.filter(f => !f.startsWith('sushi')); {S}.world.refresh()")
+    b.teleport(cx - 45, D12)
+    wait(0.4)
+    b.eval(f"{S}.player.setFlipX(false); {S}.save.tangerines = 3; {S}.refreshHud()")
+    b.key("up", True)
+    b.tap("f")
+    b.key("up", False)
+    b.wait_for(f"{S}.save.flags.includes('sushi')", timeout=3)
+    ok &= check(b.eval(f"{S}.save.flags.includes('sushi')"), "a lob that reaches him: caught")
+    b.wait_for(f"{S}.save.flags.includes('sushi_tin')", timeout=8)
+    b.shot("sardines-counter")
+    top = b.eval(f"{tin}.pick.y")
+    ok &= check(b.eval(f"{tin}.pick.visible") and abs(top - (D12 - 40)) < 1, "the tin set on his case's top", [top, D12 - 40])
+    b.wait_for(f"{C}.state === 'idle'", timeout=4)
+    b.teleport(b.eval(f"{tin}.x"), D12)
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:cat:sardines" in b.eval(f"{S}.save.keeps"), "and E takes it", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
 def scenario_deck4(b):
     """Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4): deck 4's suitcase (a bump),
     the dog's lead (held back, never a fright; hopped), its three fetches and the tennis ball, the

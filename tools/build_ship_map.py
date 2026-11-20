@@ -1918,7 +1918,9 @@ def build_objects():
     decor("sushi-doorway", "doorway", exact_x(174), exact_x(174), deck=12, text="Sushi Bar")
     at12(175.2, "shoji-screen")
     at12(178.0, "sushi-counter")
-    at12(177.6, "nigiri", height("sushi-counter-bg"))
+    # (Behind the chef, by the sake set: his hands reach over the case's bare front when he trades her the
+    # sardines, 7; the user, 2026-11-20.)
+    at12(178.3, "nigiri", height("sushi-counter-bg"))
     at12(178.5, "sake-set", height("sushi-counter-bg"))
     at12(176.7, "bar-stool")
     at12(179.3, "bar-stool", flip=True)

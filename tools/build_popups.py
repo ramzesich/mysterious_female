@@ -18,6 +18,7 @@ the lettering, into the atlas `assets/sprites/popups.png` + `.json` (key `popups
     python tools/build_popups.py
 """
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -172,6 +173,21 @@ def pack(pieces):
     return sheet, places
 
 
+def tangerine():
+    """The game's own tangerine (`FRUIT` in src/textures.js, read from there): a wish's icon (the sushi
+    chef's, 7) and the HUD's (tools/build_hud.py)."""
+    js = (ROOT / "src" / "textures.js").read_text(encoding="utf-8")
+    pal = dict(re.findall(r"^\s+(\w): '(#[0-9a-f]{6})'", js.split("const FRUIT_PALETTE")[1].split("};")[0], re.M))
+    rows = re.findall(r"'([.\w]+)'", js.split("const FRUIT = {")[1].split("],")[0])
+    a = np.zeros((len(rows), len(rows[0]), 4), np.uint8)
+    for y, r in enumerate(rows):
+        for x, c in enumerate(r):
+            if c in pal:
+                h = pal[c]
+                a[y, x] = (int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16), 255)
+    return a
+
+
 def main():
     pieces = [("speech", speech())]
     cloud, circles = thought()
@@ -186,6 +202,8 @@ def main():
         pieces.append((f"icon-{name}", crop(np.array(Image.open(TRIES / "icons" / f"{i}.png").convert("RGBA")))))
     for c in CARDS:
         pieces.append((f"icon-card-{c}", card(c)))
+    # (Not generated: the game's own tangerine, a wish's icon, 2026-11-20.)
+    pieces.append(("icon-tangerine", tangerine()))
     regular, asc, desc = glyphs(False)
     bold, _, _ = glyphs(True)
     for ch, (g, adv) in regular.items():
@@ -206,7 +224,7 @@ def main():
                  "adv": {str(ord(c)): a for c, (g, a) in regular.items()},
                  "advBold": {str(ord(c)): a for c, (g, a) in bold.items()}},
         "bands": bands,
-        "icons": sorted(list(ICONS) + [f"card-{c}" for c in CARDS]),
+        "icons": sorted(list(ICONS) + [f"card-{c}" for c in CARDS] + ["tangerine"]),
         # The colours the game draws a speech tail in, the bubble's own.
         "tail": {"ink": "#2e222f", "fill": "#ffffff", "shade": "#9babb2"},
     }
