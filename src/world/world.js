@@ -1511,11 +1511,12 @@ export class World {
         });
     }
 
-    // A word over her for a moment (her own exclamations).
-    say(text, ms = 900) {
+    // A word over her for a moment (her own exclamations; `opts` for src/popup.js: `kind`, a hint's
+    // 'plate'; `from`, 'bumbot' for his "Meow!" in her arms).
+    say(text, ms = 900, opts = {}) {
         const s = this.scene;
         s.lockedUntil = s.time.now + ms;
-        s.alert.setText(text).setVisible(true);
+        s.alert.setText(text, opts).setVisible(true);
         sfx.bubble();
         s.time.delayedCall(ms, () => { if (s.alert.text === text) s.alert.setVisible(false); });
     }

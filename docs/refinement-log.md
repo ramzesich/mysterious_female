@@ -140,3 +140,46 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
 - **Checked:** `intro`, `boot`, `lang`, `deck3`, `finale` pass; `tools/check_overlaps.py`: 0 overlaps
   (the deck 7 diary's is mended on `main`); her walk out of her door shot again after `main`'s
   "her picture a pixel lower": as before. The rest not run.
+
+## Every popup's look (2026-11-20)
+
+- **Asked:** "we're refining the looks of every popup in the game"; the user's answers: 1 to 5 of the
+  list (the word over her, her cry, the people's pictogram bubbles, the little signs, the sound sign;
+  not the full-screen panels, which are the Implementation session's plan, §2.3 and §2.4), a pixel
+  font with an open licence, a look for each kind, generated icons; "a nice framing, and differentiate
+  between [speech] bubbles and thought clouds". On the mock-up: "The tip should always come from the
+  relevant person's head (not connected to it, but come from the direction of the middle of the
+  head)", no tail on her cry, more padding; "The placement of the tails must work in all of the cases
+  in the game". A knock needs no bubble (left as it was). Approved.
+- **Built:** `src/popup.js` (new): four kinds, speech (her words, Bumbot's "Meow!"), thought (a lock
+  with its padlock and card, her hands too full for a ladder, the melted or cold thing she carried,
+  the people's wishes), shout (her cry, no tail, over her head), plate (the hints). Each frame sized to
+  its words by a band whose edges match (a cloud's bump, a burst's spike), repeated or taken out once;
+  the tail drawn from the bubble toward the middle of the head, stopping 3 px over it or over what is
+  on it (the inside-out parasol, 22); a thought's two circles on the same line; clear of the view's
+  edges and of each other (hers first); still through a stride's bob, following a jump at once;
+  Bumbot's "Meow!" set out to his side so its tail misses her face. It keeps the API of the text it
+  replaced (`setText`, `setVisible`, `text`, `visible`), so the game's calls stand; the people's
+  `bubbleItems` are stand-ins taking the old calls (shown, its picture changed, a hop). In the shared
+  files only the lines that make the popups changed: `ShipScene.js` (`buildHud`, `showLocked` passes
+  the card, the "Meow!" its speaker), `world.js` (`say` passes its options), `people.js` (the bubble's
+  block), `intro.js` (the hints are plates), `BootScene.js` (three loads).
+- **Art (`tools/build_popups.py`, new):** generated frames (the user's picks of 16 each: speech 9,
+  thought 10, shout 2 as 15 had a tail, plate 1), 20 icons and key caps (one sheet of 64), the
+  cards cut from their close-ups; the lettering Galmuri9 (SIL OFL 1.1, a subset) at its own pixel size,
+  a bold for the cry; `assets/source/popups/README.md` has the jobs. 60 generations.
+- **Heads (`tools/build_heads.py`, new):** where the head is in every frame of every picture a popup
+  can speak from (`assets/sprites/heads.json`): her sheets, her gags and the towels', and the people
+  with a wish by PixelLab's skeleton estimate (about 900 frames, about 100 generations; kept in
+  `assets/source/popups/heads/estimates.json`); her upright frames by rule (within 2 px of the
+  estimate); the other people by rule; Bumbot in her arms by rule and two by hand. Checked on contact
+  sheets: frames of the door alone dropped, four of her clinging in the gust set by hand.
+- **Checked:** shot in the game: her standing, running, in the air, crawling in the duct, on stairs,
+  on the funnel ladder, swimming, a lock, a ladder with her hands full, "Meow!" with Bumbot, in her
+  towel turban, the cart, papers, trays and ball gags, the parasol (22), a gull in the air, the
+  steward, the kid, the old lady, the engineer, the planner, the hints in both languages. `boot`,
+  `lang`, `deck3`, `stairs`, `trunk`, `mishaps`, `region6` to `region9`, `finale` pass but
+  `mishaps.things`: the sprinkler (16) misses her when run with others, as on `main` (not this
+  change; the Implementation session's). The rest not run.
+- **Open:** the court's ball (15): she lies under a standing player and her tail passes him (asked;
+  left as it is). `CLAUDE.md`'s table has no row for the new tools until the user's word.

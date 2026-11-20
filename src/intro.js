@@ -466,19 +466,19 @@ export class Intro {
             s.time.delayedCall(through ? 700 : 250, () => {
                 move = moveText();
                 moveUntil = s.time.now + HINT_MS;
-                s.world.say(move, HINT_MS);
+                s.world.say(move, HINT_MS, { kind: 'plate' });
             });
             const watch = () => {
                 const showing = move && s.alert.visible && s.alert.text === move;
                 if (showing && moveText() !== move) {
                     const now = moveText();
-                    s.alert.setText(now);
+                    s.alert.setText(now, { kind: 'plate' });
                     s.time.delayedCall(Math.max(0, moveUntil - s.time.now), () => { if (s.alert.text === now) s.alert.setVisible(false); });
                     move = now;
                 }
                 if (!doorDone && s.mode === 'play' && s.route === 'inside' && p.x >= past) {
                     doorDone = true;
-                    s.world.say(t('hint.interact'), HINT_MS);
+                    s.world.say(t('hint.interact'), HINT_MS, { kind: 'plate' });
                 }
                 if (doorDone && move && s.time.now >= moveUntil) s.events.off('update', watch);
             };

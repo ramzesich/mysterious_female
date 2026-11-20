@@ -68,18 +68,10 @@ export class People {
             const img = s.add.image(c.x, def.y - (c.dy ?? 0), 'shipart', c.frame).setOrigin(0.5, 1).setDepth(depth + 0.005);
             this.world.add([img]);
         }
-        if (def.bubble) {
-            const g = s.add.graphics().setDepth(D.fx + 0.5);
-            g.fillStyle(0x2e222f, 1).fillRoundedRect(-BUBBLE.w / 2 - 1, -BUBBLE.h - 1, BUBBLE.w + 2, BUBBLE.h + 2, 4);
-            g.fillStyle(0xffffff, 1).fillRoundedRect(-BUBBLE.w / 2, -BUBBLE.h, BUBBLE.w, BUBBLE.h, 3);
-            g.fillStyle(0x2e222f, 1).fillTriangle(-4, 1, 4, 1, 0, 6);
-            g.fillStyle(0xffffff, 1).fillTriangle(-3, 0, 3, 0, 0, 4);
-            const icon = s.add.image(0, 0, this.world.icon(def.bubble.icon)).setDepth(D.fx + 0.51);
-            this.world.add([g, icon]);
-            p.bubbleItems = [g, icon];
-            g.setVisible(false);
-            icon.setVisible(false);
-        }
+        // Their wish: a thought cloud with its picture, over their head (src/popup.js). `bubbleItems`
+        // keeps the calls made on the old bubble and its icon: shown or not, its picture changed
+        // (`setTexture` of a `world.icon()` key), a hop (`world.nudge`'s tween of `y`).
+        if (def.bubble) p.bubbleItems = s.popups.wish(p, def.bubble.icon);
         this.idle(p);
         this.place(p);
         this.list.push(p);

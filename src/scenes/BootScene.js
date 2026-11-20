@@ -88,6 +88,11 @@ export class BootScene extends Phaser.Scene {
         this.load.image('sky-dusk-rays', 'assets/sprites/sky-dusk-rays.png');
         this.load.image('sky-dusk-glow', 'assets/sprites/sky-dusk-glow.png');
         this.load.image('sky-dusk-strip', 'assets/sprites/sky-dusk-strip.png');
+        // The popups' art (tools/build_popups.py: frames, icons, lettering) and where every picture's
+        // head is (tools/build_heads.py), for src/popup.js.
+        this.load.atlas('popups', 'assets/sprites/popups.png', 'assets/sprites/popups.json');
+        this.load.json('popup-layout', 'assets/sprites/popup-layout.json');
+        this.load.json('heads', 'assets/sprites/heads.json');
     }
 
     // A copy of some of her frames (by index in her sheet) with everything from row `chin` of each

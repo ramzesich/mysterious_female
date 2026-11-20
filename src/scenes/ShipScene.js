@@ -15,6 +15,7 @@ import { LooseTangerines } from '../world/tangerine.js';
 import { runFrame } from '../world/movers.js';
 import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
+import { Popups } from '../popup.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -109,6 +110,8 @@ export class ShipScene extends Phaser.Scene {
             };
             go.on('animationstart', at).on('animationupdate', at);
         });
+        // Every popup over a head (src/popup.js; the people's wishes are made with the world).
+        this.popups = new Popups(this);
         // The plan's world (§6.1, docs/population.md; src/world/): rooms, people, things, the outside.
         this.world = new World(this);
 
@@ -2660,17 +2663,21 @@ export class ShipScene extends Phaser.Scene {
         };
         const icon = this.hudIcon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
         this.hudCount = this.add.text(62, 22, '', textStyle);
-        // Her speech bubble and the messages over her live in the world, so they move exactly with
-        // her: drawn by the screen's own camera they jittered a pixel as the world camera glided.
-        this.bubble = this.add.text(0, 0, CRY.shout, {
-            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#c8343f',
-            backgroundColor: '#ffffff', padding: { x: 5, y: 3 }, resolution: 4,
-        }).setOrigin(0.5, 1).setDepth(DEPTH.fx + 1);
-        this.alert = this.add.text(0, 0, '', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#1d2b53',
-            backgroundColor: '#ffffff', padding: { x: 4, y: 2 }, resolution: 4,
-        }).setOrigin(0.5, 1).setVisible(false).setDepth(DEPTH.fx + 1);
-        this.worldLayer.add([this.bubble, this.alert]);
+        // Her cry and the words over her (src/popup.js): in the world, so they move exactly with her
+        // (drawn by the screen's own camera they jittered a pixel as the world camera glided), from her
+        // head in whichever picture shows her; Bumbot's "Meow!" from his (`alert.from`).
+        const herHead = (alert = false) => {
+            if (alert && this.alert?.from === 'bumbot' && this.holding) {
+                const h = this.popups.headOf(this.player, 'her-cat-bumbot');
+                if (h) return h;
+            }
+            const h = this.popups.herHead();
+            // (`alertOver`: over a thing held over her head, the inside-out parasol, its top that many px
+            // over her standing height: the tail stops over it.)
+            return h && this.alertOver ? { ...h, top: Math.min(h.top, this.player.y - PLAYER.height - this.alertOver) } : h;
+        };
+        this.bubble = this.popups.make('shout', herHead, 0).setText(CRY.shout);
+        this.alert = this.popups.make('auto', () => herHead(true), 0);
         this.fade = this.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422).setOrigin(0).setAlpha(0);
         this.debugText = this.add.text(VIEW.width - 12, 12, '', { fontFamily: 'monospace', fontSize: '14px', color: '#ffffff' })
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
@@ -3042,7 +3049,7 @@ export class ShipScene extends Phaser.Scene {
             p.body.reset(back, pool.y);
             if (time > (this.mewAt ?? 0)) {
                 this.mewAt = time + 2500;
-                this.world.say(t('say.meow'), 900);
+                this.world.say(t('say.meow'), 900, { from: 'bumbot' });
                 sfx.meow();
             }
         } else if (pool) return this.enterPool(pool);
@@ -3981,7 +3988,7 @@ export class ShipScene extends Phaser.Scene {
         this.lockedUntil = this.time.now + 900;
         const shown = text ?? t('lock.card', this.progress.cardName(card));
         if (card) sfx.deny(); else sfx.rattle();
-        this.alert.setText(shown).setVisible(true);
+        this.alert.setText(shown, { card }).setVisible(true);
         // Held at the lock, it shows again before this runs: hide it only once the last one is over,
         // whatever she is doing by then (on the stairs, in a lift), unless a fright has taken it over.
         this.time.delayedCall(900, () => {
