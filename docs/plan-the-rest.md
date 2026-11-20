@@ -49,7 +49,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 4 (§6) | Each deck its own look | Step 7 | Medium | About 20 |
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
 | 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
-| 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19) | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess) |
+| 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19). **Built 2026-11-20 by the Refinement session** (branch `refinement`, `4eb23d8`, `504be54`), the sunset's sky with it: not to be built again | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess); 160 spent |
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
@@ -473,6 +473,14 @@ code. PixelLab character "Bumbot (final)", `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855
    `tools/check_overlaps.py`. The old sources are kept beside the new for comparison.
 
 ## 7b. Part 7: the intro's scene tuned (medium; about 30 generations, a guess)
+
+**Built 2026-11-20 by the Refinement session, on branch `refinement` (`4eb23d8` the intro's sky,
+`504be54` the sunset's); the building session skips this part** (the user's word, 2026-11-20). What
+the user chose, and how, is in `docs/refinement-log.md`: mock-up B3 of the intro's sky (generated soft
+clouds, a soft sun with god rays worked out from the clouds, nothing under the sun, the path of light
+flickering glint by glint), and its reach to the game's far clouds and the sunset (S2: the sky blended,
+clouds lit by the low sun, their edges smoothed). The art: `tools/build_sky.py`. The steps below are as
+they were planned.
 
 Added 2026-11-19 on the user's word: "fine-tune the intro scene. I want more
 realistically-looking sun and reflections, more varied and volumetric clouds." Built after

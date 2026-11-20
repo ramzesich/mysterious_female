@@ -124,5 +124,7 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
 - **Checked:** `finale`, `intro`, `boot`, `lang`, `deck3` pass; the rest not run. Shot exactly: the
   bow, the glide's start, the sun deck, the outside view (the sun behind the bow there, as before),
   cabin 8206's window; the path recorded.
-- **Not done, on the user's word only:** a note in `docs/plan-the-rest.md` §7b that this session
-  built it (so the Implementation session does not), and `tools/build_sky.py` in `CLAUDE.md`'s table.
+- **Documents, on the user's word ("Yes", 2026-11-20):** `docs/plan-the-rest.md` §7b and its row in
+  the parts' table say this session built it and the building session skips it; `CLAUDE.md`'s table
+  has `tools/build_sky.py`, and its `src/intro.js` and `src/background.js` rows say what the sky is
+  now. On this branch only until it is merged.
