@@ -141,7 +141,7 @@ CAST = {
     "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
     # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
     "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4, "walk": 8, "squirt": 11, "eat": 7}, {"scale": 0.72}),
-    "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 8}, {}),
+    "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 4}, {}),     # (8 read frantic: the user, 2026-11-20)
     "domeman": ("7a956cd3-6357-4fa6-a319-020144870524", {"idle": 4}, {}),
     "bagslady": ("1528b5cf-4225-4d4b-85f8-e6f67ed664df", {"walk": 8}, {}),
     "planman": ("3bccf530-3e86-4a11-b6de-c7a049b9572c", {}, {}),

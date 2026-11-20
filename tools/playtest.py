@@ -2946,7 +2946,9 @@ def scenario_region4(b):
     ok &= check(b.state()["mode"] == "play", "back in its doorway it leaves her alone", b.state())
     b.tap("e")
     wait(0.9)
-    ok &= check(route(b) == "cleanup" and person(b, "amb_bedmaker")["on"], "the cabin being cleaned: the bedmaker at the stripped bed", route(b))
+    # (Its stewardess works on deck 10 since 2026-11-20, `makeup10`; her bookmark lies on this bed.)
+    ok &= check(route(b) == "cleanup" and js(b, f"{W}.things.some(t => t.id === 'keep_bookmark' && t.route === 'cleanup')"),
+                "the cabin being cleaned: the bookmark on its stripped bed", route(b))
     b.shot("region4-cleanup")
     b.teleport(cl["doors"][0]["x"], D9, "cleanup")
     b.tap("e")

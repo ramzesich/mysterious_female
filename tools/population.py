@@ -43,6 +43,10 @@ ROOMS = [
          lock=("card", "ent", 0)),
     dict(id="lifeboat", deck=7, m=147.5, route="outside", width=240, look="lifeboat", door="hatch"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
+    # A guest cabin being made up on deck 10's midships hallway, its door held open, the bedmaker in it
+    # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
+    # sprinkler (156 m) and the "Do Not Disturb" door (171.6 m).
+    dict(id="makeup10", deck=10, m=164, slot=True, width=240, look="cabin", door="open"),
     dict(id="balcabin9", deck=9, m=150, slot=True, width=288, look="balcabin", door="cabin",
          lock=("card", "hk", 0), checkpoint="cp_balcabin",
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
@@ -192,7 +196,7 @@ ITEMS = {
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
     # an inside one with no window (the user); the sill is reached with E from the floor (`low`). Her diary
     # on the Stardust balcony's last seat, by the railing over the stage.
-    "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 22, "thing:bookmark-book"),
+    "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 24, "thing:bookmark-book"),
     "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"low": True}),
     "keep_diary": (7, 242.06, "keep:her:diary", None, 23, "thing:diary"),
 }
@@ -351,7 +355,7 @@ PEOPLE = {
     "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
                       bubble=("camera", None, "flag:photo", 3)),
     "npc_groom": dict(at=(9, 135.75), who="groom", face=-1, idle="idle", until="flag:photo"),
-    "amb_bedmaker": dict(at=("cleanup", 166), who="bedmaker", face=1, idle="make"),
+    "amb_bedmaker": dict(at=("makeup10", 166), who="bedmaker", face=1, idle="make"),
     "amb_planman": dict(at=(9, 104.7), who="planman", face=-1, layer="back"),
     "amb_bagslady": dict(at=(8, 86), who="bagslady", face=1, walk=(84.2, 90.4, 0.7), end_ms=1800, layer="back"),
     "amb_domeman": dict(at=(10, 86.6), who="domeman", face=1, idle="idle", layer="back"),

@@ -959,11 +959,28 @@ def wardrobe(R, x0, x1, open_=False):
         r(mid + 3, FLOOR - 50, mid + 4, FLOOR - 42, GREY)
 
 
+def makeup10(width):
+    """A guest cabin being made up, deck 10's midships hallway (population: `amb_bedmaker`, moved here from
+    the cabin being cleaned on deck 9 so that its bed is free for her bookmark: the user, 2026-11-20): the
+    bed made, the stewardess shaking out a fresh sheet at its foot (166), her trolley clear of her (136),
+    the wardrobe shut, a picture over the trolley."""
+    R = cabin_room(width, (60, 130, 200))
+    r, d = R.r, R.d
+    cabin_door(R, DOOR_X)
+    wardrobe(R, 80, 108)
+    picture(R, 122, 36, 30, 22, (BLUE_LIGHT, BLUE, WHITE))
+    stand(R.im, "towel-trolley", 136)
+    bed(R, 186, 236)
+    wall_lamp(R, 222, FLOOR - 70)
+    return R.save("makeup10")
+
+
 def cleanup(width):
     """The cabin mid-cleanup, deck 9 (population: `room_cleanup`), an inside cabin with its door held
     open: the bed stripped to its mattress, the sheets in a heap, the pillows piled on the chair, the
     wardrobe open, the housekeeping trolley in the middle of the room, a spray bottle and a bucket.
-    The bedmaker shakes out a sheet at the bed's foot (176); the robot vacuum's dock by the door."""
+    The robot vacuum's dock by the door. (The bedmaker who shook out a sheet at the bed's foot works on
+    deck 10 now, `makeup10`: her bookmark lies on this bed.)"""
     R = cabin_room(width, (60, 130, 200))
     r, box, d = R.r, R.box, R.d
     cabin_door(R, DOOR_X)
@@ -1397,7 +1414,7 @@ def peeks():
 
 DRAW = {"crewcabin": crewcabin, "laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
-        "cleanup": cleanup, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
+        "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
         "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,
         "guest10": guest10, "nook": nook}
 

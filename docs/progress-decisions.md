@@ -3525,4 +3525,14 @@ while the building session worked.
   props "too washed out": its ten pieces take the light wash too (the TV console, the foosball and air hockey
   tables, the dartboard, the arcade cabinet, the vending machine, the wall TV, two beanbags, the monstera; the
   same pieces elsewhere keep `-bg`). `boot`, `region3`, `region9`, `golden` pass.
+- **The bookmark (10) and "this lady":** the bedmaker shaking out a sheet in the cabin being cleaned "is
+  problematic, we'll have to slow her down, and also find some other place for her, maybe another room". Of
+  three places offered (the linen room, a new open cabin on deck 10's midships hallway, the cabin left
+  empty), the user chose **a new cabin on deck 10**: `makeup10` at 164 m, between the sprinkler and the "Do Not
+  Disturb" door, drawn in code as its kin (`tools/draw_rooms.py`: the bed made, her trolley clear of her,
+  the wardrobe, a picture; a first layout had her in front of her trolley); her `make` at 4 frames a second
+  (was 8, "frantic"). The cabin being cleaned is empty, its bed the bookmark's: on the mattress's top, then two
+  px lower into it (the user). `region4`'s check of her there now checks the bookmark. `tools/check_overlaps.py`
+  skips the pickups lying on furniture (the car on its table, the diary on its seat). `boot`, `region4`,
+  `region7`, `vacuum`, `golden` pass; overlaps 0.
 
