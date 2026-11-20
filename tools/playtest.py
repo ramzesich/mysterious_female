@@ -1410,10 +1410,10 @@ def scenario_pocket(b):
     b.eval(f"{S}.world.carryBox.drop()")
     # A tangerine she gets flies to the count, which changes as it lands.
     b.eval(f"{S}.save.tangerines = 0; {S}.refreshHud(); {S}.gainTangerine({S}.player.x + 40, {S}.player.y - 10)")
-    shown = b.eval(f"[{S}.save.tangerines, {S}.hudCount.text]")
+    shown = b.eval(f"[{S}.save.tangerines, {S}.hud.items.tangerine.value]")
     wait(0.7)
-    landed = b.eval(f"{S}.hudCount.text")
-    ok &= check(shown == [1, "× 0"] and landed == "× 1", "picked up: hers at once, counted when it lands", (shown, landed))
+    landed = b.eval(f"{S}.hud.state().tangerine")
+    ok &= check(shown == [1, "x 0"] and landed == "x 1", "picked up: hers at once, counted when it lands", (shown, landed))
     # A fall: two decks off deck 12's aft end, with three on her.
     b.eval(f"{S}.save.tangerines = 3")
     b.teleport(x_of(245.5), D12)
@@ -1755,15 +1755,17 @@ def scenario_deck4(b):
     b.shot("deck4-climb")
 
     # Deck 5: the wool, her flag; the HUD's counts.
-    ok &= check(not b.eval(f"{W}.hudKeeps.her.visible"), "her count is not shown before her first find")
+    ok &= check(b.eval("window.__ship.hud.state().her") == "", "her count is not shown before her first find")
     for tid, what in (("keep_wool", "keep:cat:wool"), ("keep_flag", "keep:her:flag")):
         b.teleport(b.eval(f"{W}.things.find(t => t.id === '{tid}').x"), D5)
         wait(0.3)
         b.tap("e")
         wait(0.3)
         ok &= check(what in keeps(), f"{tid}: taken with E", keeps())
-    hud = b.eval(f"Object.fromEntries(Object.entries({W}.hudKeeps).map(([k, t]) => [k, t.visible ? t.text.split(' ')[1] : null]))")
-    ok &= check(hud == {"cat": "2/8", "her": "1/4", "him": None}, "the HUD counts each kind from its first find", hud)
+    hud = b.eval("window.__ship.hud.state()")
+    hud = {k: hud[k] or None for k in ("cat", "her", "him")} | {"order": hud["order"]}
+    ok &= check(hud == {"cat": "2/8", "her": "1/4", "him": None, "order": ["cat", "her"]},
+                "the HUD counts each kind from its first find, in the order found", hud)
     b.shot("deck4-hud")
 
     # The paper round (the user, 2026-11-16 and 17): a paper sliding at a steady speed right to her

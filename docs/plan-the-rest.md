@@ -307,7 +307,7 @@ of data and a generated picture shown first, each set against what is built at i
   among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull, **placed 2026-11-20**) and 7 (the sardines),
   his four (13 to 16) after the table scene, then 2.2 before the two books. **2026-11-20: all ten approved where
   they lie** (the user's review, in play). The close-ups also as the HUD's
-  icons (2.4): to propose with it.
+  icons (2.4): superseded, the HUD's kinds are faces (built 2026-11-20).
 - His four are not there before the table scene ("not lying there before it, not merely
   locked"). Nothing of the twenty flies to its count. Books 12 and 13 (rows 18 and 19) are paid
   by part 3's deliveries.
@@ -379,8 +379,14 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
   picture of the desk with all eight, shown to the user**; if it is crowded, some of hers go by
   the bed (`tools/draw_cabin.py` for where the desk's top is).
 - **The day after:** Bumbot's eight laid out with him (`src/world/finale.js`).
-- **The HUD:** each kind's count appears with its first find. Its three icons are font emoji
-  (🐾 🌸 🎸), never approved and not generated: propose small generated icons with the rest.
+- **The HUD:** **BUILT 2026-11-20** (the user's design; `docs/progress-decisions.md`, "The HUD redone"):
+  each count appears with its first find, the kinds as faces (Bumbot's, hers, her husband's) and the book, in
+  the order found; the cards under them, faint until held; the first tangerine and each card fly to their
+  places (`src/hud.js`, `tools/build_hud.py`). The books' total there is 10 until 2.2 (`BOOKS` in `src/hud.js`).
+- **Her husband in the game (new, 2026-11-20):** his character from his photo is made and approved
+  (`assets/source/hud/husband/`, PixelLab `a1ebd48e-3b9f-40fd-b2d8-e737d4981bba`: his pyjamas with the bear, at
+  the table and in the cabin); still to do: his clips (seated at the table: `idle`, `wave`, `laugh`, `eat`;
+  waiting in cabin 8206), shown to the user first, then he replaces the stand-in (`husband` in `tools/cast.py`).
 
 ### 2.5 The `keeps` playtest (medium; no art)
 

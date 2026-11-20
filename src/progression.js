@@ -11,7 +11,6 @@ import { t } from './lang.js';
 
 // The readers' and the HUD's colours (Resurrect 64).
 export const CARD_COLOURS = { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b };
-const CARD_ORDER = ['deck', 'ent', 'hk', 'off'];
 
 // "card:off:-1", "oneway:1", "flag:bb2", "block:wedding", "region:3", "" (none).
 export function parseLock(text) {
@@ -270,11 +269,13 @@ export class Progression {
     }
 
     open(list, value) {
+        // (A card shows on the HUD as it flies out from behind its close-up: src/hud.js.)
+        if (list === 'cards') this.scene.hud?.expect(`card:${value}`);
         this.save[list].push(value);
         writeSave(this.save);
         this.refresh();
         // A card she gets, from a table or from someone's hand: seen close (`world.closeup`).
-        if (list === 'cards') this.scene.world?.closeup(`card-${value}`);
+        if (list === 'cards') this.scene.world?.closeup(`card-${value}`, dim => this.scene.hud?.release(`card:${value}`, dim));
     }
 
     setFlag(name) {
@@ -302,19 +303,7 @@ export class Progression {
             const there = !this.save.cards.includes(c.card) && (!c.needs || this.save.flags.includes(c.needs));
             c.items.forEach(i => i.setVisible(there));
         }
-        this.hudSlots?.forEach(({ card, rect }) => rect.setFillStyle(CARD_COLOURS[card], this.save.cards.includes(card) ? 1 : 0.15));
         this.scene.world?.refresh();
-    }
-
-    // Four card slots under the tangerine count (§2.8 of the population spec), lit when held.
-    buildHud(layer) {
-        const s = this.scene;
-        this.hudSlots = CARD_ORDER.map((card, i) => {
-            const rect = s.add.rectangle(24 + i * 30, 92, 24, 16, CARD_COLOURS[card], 0.15).setOrigin(0).setStrokeStyle(2, 0x1d2b53);
-            layer.add(rect);
-            return { card, rect };
-        });
-        this.refresh();
     }
 
     cardName(card) {

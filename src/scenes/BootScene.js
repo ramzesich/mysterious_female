@@ -92,6 +92,8 @@ export class BootScene extends Phaser.Scene {
         // head is (tools/build_heads.py), for src/popup.js.
         this.load.atlas('popups', 'assets/sprites/popups.png', 'assets/sprites/popups.json');
         this.load.json('popup-layout', 'assets/sprites/popup-layout.json');
+        // The HUD's pictures (tools/build_hud.py), for src/hud.js.
+        this.load.atlas('hud', 'assets/sprites/hud.png', 'assets/sprites/hud.json');
         this.load.json('heads', 'assets/sprites/heads.json');
     }
 

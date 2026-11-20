@@ -3638,3 +3638,40 @@ while the building session worked.
   bell gull came first in the list). `boot`, `throw`, `region2`, `region3`, `region9`, `mishaps`, `gamepad` pass;
   `mishaps.things` failed once in a batch, unread, and passed five runs after (four seeds). `check_overlaps`: 0.
   Generations: 6 lights, 10 gull edits, 2 close-ups, 8 for her throw in the air.
+
+## The HUD redone (2026-11-20, the user's design, before item 7)
+
+The user: "Before we do it, let's refine the HUD": nothing at the start; the first tangerine flies to its place
+and the count shows with it; a key card shows in its place from its close-up; each kind of thing to find, and
+the books, shows its count as its close-up closes, a little bigger, settling. Settled by mock-ups over a real
+shot of deck 4's corridor (A to K), each the user's word:
+
+- **One row**, at the game's pixel size (2 screen px a pixel, "A as a baseline"): the tangerines in a slot of
+  their own on the left, kept free before the first ("only the offset from the tangerines is fixed"), then the
+  kinds **from left to right in the order first found**; each keeps the width of its largest count, so nothing
+  moves once placed. Under it the **four key cards in fixed places, faint outlines until held** ("slightly
+  stronger"); the row of cards shows from the first card.
+- **The kinds are faces** ("The flower and the guitar are especially unclear. Have to be faces of Bumbusik and
+  her husband"): Bumbot's generated from his photo (#3 of 64; two pixels cleared at the user's circle); hers her
+  own front view; her husband's from **his new character** (below), with the bear on his chest, one forehead row
+  out. The books the popups' book, the cards the popups' card with the slot at its top filled ("fix the
+  triangular cuts"). **Every picture rimmed** with a light pixel, the tangerine too ("The light rim helps"); all
+  on one bottom line, the numbers on one line a little lower, the row 4 px higher than first drawn.
+- **Smaller was tried and dropped:** shrunk by majority the faces "became distorted"; cut by rows and columns
+  they kept their pixels, but the user took the originals.
+- **The numbers** are the popups' lettering (Galmuri9), white with a navy outline, "x 12", "3/8"; the lettering
+  has no "×" (an x) nor "∞": for `?tangerines=infinite` an ∞ drawn in its style, as tall as the x and centred on
+  it (the user: "Enlarge the infinity sign, and center it against the X"; "x --" before).
+- **The moments:** the first tangerine's flight lands in its slot and the count shows (a bump after); a card
+  flies out from under its close-up's card as that closes, arcs to its place and settles, the outlines fading in
+  with the first; a kind's count shows as its close-up closes (`world.closeup(frame, then)`), a book's at once.
+- **Her husband's character** (asked by the user with the photos: "my HUD icon and sprites in the game"): a pro
+  character in the cast's style from his first photo, **in his pyjamas, at the table and in the cabin** ("That's
+  an inside joke"); the bear on his top by an edit, its face the edit's own, its pyjamas set to his trousers'
+  check by hand. Approved; **not yet in the game** (the stand-in diner is still at his table, with no clips).
+- Built: `tools/build_hud.py` (the `hud` atlas from the approved sources), `src/hud.js` (the scene's `hud`;
+  `refreshHud`/`blinkCount` hand over to it; the save keeps `hud`: the tangerines shown, the kinds' order, the
+  cards shown). Gone: the Verdana count, the emoji counts, the card rectangles. Tests: `pocket` and `deck4` read
+  `hud.state()` (deck 4/5 checks the order found); `boot`, `pocket`, `deck4`, `region1`, `region2` pass.
+  Generations: 65 (`assets/source/hud/README.md`). Not done: a sound for a count appearing (none asked); the
+  lock popups' card keeps its slot notch.

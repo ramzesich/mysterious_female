@@ -16,6 +16,7 @@ import { runFrame } from '../world/movers.js';
 import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
 import { Popups } from '../popup.js';
+import { Hud } from '../hud.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -2661,12 +2662,6 @@ export class ShipScene extends Phaser.Scene {
     }
 
     buildHud() {
-        const textStyle = {
-            fontFamily: 'Verdana, sans-serif', fontSize: '24px', color: '#ffffff',
-            stroke: '#1d2b53', strokeThickness: 5,
-        };
-        const icon = this.hudIcon = this.add.image(24, 18, 'tangerine').setOrigin(0).setScale(3);
-        this.hudCount = this.add.text(62, 22, '', textStyle);
         // Her cry and the words over her (src/popup.js): in the world, so they move exactly with her
         // (drawn by the screen's own camera they jittered a pixel as the world camera glided), from her
         // head in whichever picture shows her; Bumbot's "Meow!" from his (`alert.from`).
@@ -2687,9 +2682,9 @@ export class ShipScene extends Phaser.Scene {
             .setOrigin(1, 0).setVisible(new URLSearchParams(location.search).has('debug'));
         // The sound's sign, shown a moment when M switches it: a loudspeaker, crossed out when muted.
         this.soundSign = this.add.graphics().setAlpha(0);
-        this.uiLayer.add([icon, this.hudCount, this.fade, this.debugText, this.soundSign]);
-        this.progress.buildHud(this.uiLayer);
-        this.refreshHud();
+        // The counts and the cards (src/hud.js): nothing until the first of each is hers.
+        this.hud = new Hud(this);
+        this.uiLayer.add([this.fade, this.debugText, this.soundSign]);
     }
 
     showSoundSign(muted) {
@@ -2718,18 +2713,19 @@ export class ShipScene extends Phaser.Scene {
     }
 
     refreshHud() {
-        this.hudCount.setText(this.infiniteTangerines() ? '× ∞' : `× ${this.save.tangerines - (this.flying ?? 0)}`);
+        this.hud?.refresh();
     }
 
     // A tangerine is hers (picked up, handed back, the piñata's): one more at once, and its picture
     // flies from where it was, (x, y) in the world, to the HUD's count, which changes as it lands
-    // (docs/plan-three-uses.md §1.7). Several follow each other.
+    // (docs/plan-three-uses.md §1.7); the first one shows the count (src/hud.js). Several follow
+    // each other.
     gainTangerine(x, y) {
         this.save.tangerines += 1;
         sfx.tangerine();
         const cam = this.cameras.main, view = cam.worldView, time = this.time.now;
         const from = { x: (x - view.x) * cam.zoom, y: (y - view.y) * cam.zoom };
-        const to = { x: this.hudIcon.x + this.hudIcon.displayWidth / 2, y: this.hudIcon.y + this.hudIcon.displayHeight * 0.6 };
+        const to = this.hud.tangerineTarget();
         const delay = Math.max(0, (this.tallyNext ?? 0) - time);
         this.tallyNext = time + delay + TALLY.gapMs;
         this.flying = (this.flying ?? 0) + 1;
@@ -2741,26 +2737,19 @@ export class ShipScene extends Phaser.Scene {
             targets: k, v: 1, delay, duration: TALLY.ms, ease: 'Sine.easeIn',
             onStart: () => img.setVisible(true),
             onUpdate: () => img.setPosition(from.x + (to.x - from.x) * k.v, from.y + (to.y - from.y) * k.v - Math.sin(Math.PI * k.v) * TALLY.arc)
-                .setScale(cam.zoom + (this.hudIcon.scale - cam.zoom) * k.v),
+                .setScale(cam.zoom + (to.scale - cam.zoom) * k.v),
             onComplete: () => {
                 img.destroy();
                 this.flying -= 1;
-                this.refreshHud();
                 sfx.tally();
-                const icon = this.hudIcon;
-                this.tweens.killTweensOf(icon);
-                icon.setScale(3);
-                this.tweens.add({ targets: icon, scale: 3.6, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
+                this.hud.landed();
             },
         });
     }
 
     // D with none on her: the count blinks once, and that is all.
     blinkCount() {
-        const c = this.hudCount;
-        this.tweens.killTweensOf(c);
-        c.setAlpha(1);
-        this.tweens.add({ targets: c, alpha: 0.15, duration: 110, yoyo: true, repeat: 1, onComplete: () => c.setAlpha(1) });
+        this.hud.blink();
     }
 
     // --- Spawning --------------------------------------------------------------------------

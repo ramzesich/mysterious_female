@@ -20,8 +20,6 @@ import { Rounds } from './outside.js';
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
 const OK = { ok: true };
-// The HUD's mark for each kind of thing to find (docs/plan-three-uses.md §4.1): Bumbot's, hers, her husband's.
-const KEEP_ICONS = { cat: '🐾', her: '🌸', him: '🎸' };
 // The knitting lady in her armchair: the chair was drawn round her own seated pose (its picture's
 // left edge 16 px behind her middle, its foot on her floor), so she sits in it exactly.
 const KNIT_SIT = { dx: 16, up: 0 };
@@ -1222,9 +1220,12 @@ export class World {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
         } else if (type === 'keep') {
+            // (Its kind's count shows, or goes up, as its close-up closes: src/hud.js.)
+            const kind = thing.what.split(':')[1];
+            s.hud?.expect(kind);
             this.save.keeps.push(thing.what);
             this.sparkle(thing.x, thing.pick.y - 4, 0xf9c22b);
-            this.closeup(thing.what.split(':')[2]);
+            this.closeup(thing.what.split(':')[2], () => s.hud?.release(kind));
         } else {
             this.save.items.push(name);
             this.closeup(name);
@@ -1241,22 +1242,29 @@ export class World {
     // A thing to find handed to her (the dog's owner's tennis ball): `what` is "keep:<whose>:<name>".
     giveKeep(what, x, y) {
         if (this.save.keeps.includes(what)) return;
+        const kind = what.split(':')[1];
+        this.scene.hud?.expect(kind);
         this.save.keeps.push(what);
         sfx.take();
         this.sparkle(x, y, 0xf9c22b);
         writeSave(this.save);
         this.refresh();
-        this.closeup(what.split(':')[2]);
+        this.closeup(what.split(':')[2], () => this.scene.hud?.release(kind));
     }
 
     // A thing she has just got, seen close (the user, 2026-11-19: "A and C"): its picture
     // (tools/build_closeups.py, the world's pixel size) in the middle of the screen over a dim, a warm
     // light behind it; she holds still and nothing touches her (`scene.viewing`) until any key. Every
     // thing to find and every key card; the books' covers will come the same way (§4 2.3). The
-    // playtests skip it (`window.__skipCloseups`) but where it is what they check.
-    closeup(frame) {
+    // playtests skip it (`window.__skipCloseups`) but where it is what they check. `then(dim)`: called
+    // as it starts to close (or at once, with none shown), with what lies lowest in it: the HUD's card
+    // flies out from behind it.
+    closeup(frame, then = null) {
         const s = this.scene;
-        if (window.__skipCloseups || !s.textures.get('closeups').has(frame)) return;
+        if (window.__skipCloseups || !s.textures.get('closeups').has(frame)) {
+            then?.();
+            return;
+        }
         if (!s.textures.exists('closeup-glow')) {
             const size = 360, c = s.textures.createCanvas('closeup-glow', size, size), ctx = c.getContext();
             const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
@@ -1277,6 +1285,7 @@ export class World {
             s.uiLayer.add(all);
             s.tweens.add({ targets: all, alpha: { from: 0, to: 1 }, duration: 200 });
             const close = () => {
+                then?.(dim);
                 s.tweens.add({ targets: all, alpha: 0, duration: 160, onComplete: () => {
                     all.forEach(o => o.destroy());
                     s.viewing = false;
@@ -2202,16 +2211,8 @@ export class World {
             g.lid?.setVisible(!open);
             g.extra?.forEach(i => i.setVisible(!open));
         }
-        this.hudBooks?.setText(`📖 ${Object.keys(this.save.books).length}/10`);
-        this.hudBooks?.setAlpha(Object.keys(this.save.books).length ? 1 : 0.35);
-        // The things to find, of each kind found of all (docs/plan-three-uses.md §4.1): a kind's count
-        // shows from its first find, after the books', one after another.
-        let hx = 24 + (this.hudBooks?.width ?? 0) + 16;
-        for (const [whose, text] of Object.entries(this.hudKeeps ?? {})) {
-            const n = this.save.keeps.filter(k => k.startsWith(`keep:${whose}:`)).length;
-            text.setVisible(n > 0).setText(`${KEEP_ICONS[whose]} ${n}/${this.data.finale?.totals?.keeps?.[whose] ?? 0}`).setX(hx);
-            if (n > 0) hx += text.width + 16;
-        }
+        // The books' and the things to find's counts (src/hud.js).
+        s.hud?.refresh();
     }
 
     addColliders(p) {
@@ -2309,19 +2310,13 @@ export class World {
         if (left !== null) this.hudCarry.bar.setSize(100 * left, 6).setFillStyle(hot ? (left > 0.35 ? 0xf79617 : 0x4d9be6) : left > 0.35 ? 0x8fd3ff : 0xe83b3b);
     }
 
-    // The books' count, under the card slots (population §2.8).
+    // What she carries and how much of it is left, a bar under the cards (the counts: src/hud.js).
     buildHud(layer) {
         const s = this.scene;
-        this.hudBooks = s.add.text(24, 114, '', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
-        });
         const back = s.add.rectangle(24, 146, 104, 10, 0x1d2b53).setOrigin(0).setVisible(false);
         const bar = s.add.rectangle(26, 148, 100, 6, 0x8fd3ff).setOrigin(0).setVisible(false);
         this.hudCarry = { back, bar };
-        this.hudKeeps = Object.fromEntries(Object.keys(KEEP_ICONS).map(whose => [whose, s.add.text(24, 114, '', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '18px', color: '#ffffff', stroke: '#1d2b53', strokeThickness: 4,
-        }).setVisible(false)]));
-        layer.add([this.hudBooks, back, bar, ...Object.values(this.hudKeeps)]);
+        layer.add([back, bar]);
         this.refresh();
     }
 }
