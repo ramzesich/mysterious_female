@@ -3535,4 +3535,9 @@ while the building session worked.
   px lower into it (the user). `region4`'s check of her there now checks the bookmark. `tools/check_overlaps.py`
   skips the pickups lying on furniture (the car on its table, the diary on its seat). `boot`, `region4`,
   `region7`, `vacuum`, `golden` pass; overlaps 0.
+- **The diary (11):** "still looks weird": moved 9 px aft onto the cushion, clear of the backrest, then 4 px down
+  into it, and "the circled part of the diary obscured by the chair's arm": first drawn behind the whole seat
+  (the user: "both armchair's arms, and I meant only the one closer to the screen"), then right: a pickup can
+  name the furniture it is in (`cover` in the item's data: piece, metres, px), whose lowest rows (the seat's
+  near arm, 21 px) the game draws again in front of it. `boot`, `region3`, `golden` pass; overlaps 0.
 

@@ -163,10 +163,14 @@ def build_world():
         x, y, route = spot(where, at)
         # `on`: px up, on a piece already there (a table); else on a side table of its own.
         # (`low`: a thing to find more than 40 px up that is still taken with E from the floor, a plant
-        # on a windowsill; any higher one is hers only from up there, or once a lob knocks it down.)
+        # on a windowsill; any higher one is hers only from up there, or once a lob knocks it down.
+        # `cover`: (piece, m, px) the piece of furniture it is in, at m, whose lowest px rows (its near
+        # part) are drawn again in front of it: the diary in its seat, its foot under the near arm.)
         opts = on[2] if len(on) > 2 else {}
+        cover = opts.get("cover")
         ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
-                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", low=opts.get("low", False)))
+                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", low=opts.get("low", False),
+                         cover=dict(frame=cover[0], x=B.exact_x(cover[1]), rows=cover[2]) if cover else None))
 
     for pid, d in PEOPLE.items():
         x, y, route = spot(*d["at"])

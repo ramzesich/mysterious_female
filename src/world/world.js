@@ -792,6 +792,13 @@ export class World {
                     y -= table.height;
                 }
                 const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
+                // The near part of the furniture it is in, drawn again in front of it (`cover`: the seat's
+                // near arm over the diary's foot). It stays when the thing is taken: the same pixels.
+                if (e.cover) {
+                    const c = s.add.image(e.cover.x, e.y, 'shipart', e.cover.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
+                    c.setCrop(0, c.height - e.cover.rows, c.width, e.cover.rows);
+                    this.add([c]);
+                }
                 items.push(img);
                 this.add(items);
                 // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing

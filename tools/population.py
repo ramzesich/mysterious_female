@@ -198,7 +198,7 @@ ITEMS = {
     # on the Stardust balcony's last seat, by the railing over the stage.
     "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 24, "thing:bookmark-book"),
     "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"low": True}),
-    "keep_diary": (7, 242.06, "keep:her:diary", None, 23, "thing:diary"),
+    "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
