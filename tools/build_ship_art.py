@@ -55,6 +55,7 @@ from pathlib import Path
 from PIL import Image
 
 from palettize import palettize
+from wash_levels import KEEP as WASH_KEEP
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "ship"
@@ -66,6 +67,10 @@ MUTE = 0.35
 # A lighter wash, "<name>-lt", for the theatre's stage and seats (the user, 2026-11-19: "They are washed out too
 # much ... let's wash out them only slightly"): only the pieces in LIGHT get one.
 MUTE_LIGHT = 0.12
+# And "<name>-w20", 20%, for every piece: the user's levels place by place, 2026-11-20 (`tools/wash_levels.py`,
+# which picks among "-bg", "-w20" and "-lt" for each prop the map and the world place). Since then every piece
+# has its "-lt" too; LIGHT is the list of those placed at 12% before it.
+MUTE_W20 = 0.20
 # Colours changed after the palette, name -> {from: to}: the towel swan's orange beak, impossible in a
 # folded towel, whitened (the user, 2026-11-20; as the towel stack's swan's was).
 RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
@@ -456,6 +461,15 @@ def muted(img, k=MUTE):
     return out
 
 
+def twins(pieces, name):
+    """The lighter twins of a piece: "-lt" (12%) and "-w20" (20%), which `tools/wash_levels.py` gives each place
+    in the map and the world (the user's levels, 2026-11-20), but for doors and railings, which keep "-bg"."""
+    if name in LIGHT or not name.startswith(WASH_KEEP):
+        pieces[f"{name}-lt"] = muted(pieces[name], MUTE_LIGHT)
+    if not name.startswith(WASH_KEEP):
+        pieces[f"{name}-w20"] = muted(pieces[name], MUTE_W20)
+
+
 def level_frame(img, frame, cut, more):
     """An open door's frame made the closed door's equal (the user, 2026-11-14: "A closed door
     frame is leveled correctly with the floor. An open door's frame is not on the same level. Make
@@ -543,14 +557,14 @@ def build():
             FEET[f"{name}-bg"] = FEET[name]
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
-        if name in LIGHT:
-            pieces[f"{name}-lt"] = muted(img, MUTE_LIGHT)
+        twins(pieces, name)
     # (Once every piece is made: the ones that take another's frame.)
     for name, (_, _, _, opts) in PIECES.items():
         if opts.get("reframe"):
             r = opts["reframe"]
             pieces[name] = reframe(pieces[name], pieces[r["of"]], r["opening"], r["inner"], r["wider"])
             pieces[f"{name}-bg"] = muted(pieces[name])
+            twins(pieces, name)
 
     # Shelf packing, tallest first, one pixel apart.
     order = sorted(pieces, key=lambda n: -pieces[n].height)

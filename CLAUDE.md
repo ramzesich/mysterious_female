@@ -110,6 +110,12 @@ truth**: read the relevant section before any design or content work, and record
   goes through (`door()` in `src/world/people.js`), a locked one turns them back. A new mover
   uses these, never its own range across a door.
 - Sprites face east; west is `flipX`. Background props are muted so they never read as interactive.
+  **How much is the place's** (the user, 2026-11-20, chosen deck by deck): a background prop is placed with
+  its `-bg` name and `tools/wash_levels.py` gives it its place's twin, `-bg` (35%), `-w20` (20%) or `-lt`
+  (12%), in the map builder's `put()` and the world builder's last pass. Most decks are at 20%, the Library,
+  Magnum's and the Sports Bar at 12%; **the guest cabin corridors stay at 35%** on every deck (their props are
+  laid by the ship scene itself), as do decks 8 and 9 inside, doors she cannot use and railings. A new venue
+  or a change of level goes into that table, never a new suffix by hand.
 - **Every door she can use is drawn in its full colours**, never washed or muted, so it stands out a
   little as something to use (the user, 2026-11-15): in rooms, in corridors, side-on in the walls
   across the decks. Inside every room she enters, the rest above the floor is washed 30% toward the

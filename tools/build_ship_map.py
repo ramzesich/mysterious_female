@@ -16,6 +16,7 @@ import struct
 import zlib
 from pathlib import Path
 from population import PEOPLE
+from wash_levels import frame as wash_frame
 
 # Where the theatre's audience sit, per deck (m): their pictures have their own seats, so none is set there.
 AUDIENCE = {d: [p["at"][1] for p in PEOPLE.values() if str(p.get("who", "")).startswith("aud_") and p["at"][0] == d] for d in (6, 7)}
@@ -1243,7 +1244,8 @@ def build_objects():
     def put(deck, m, frame, dy=0, flip=False, x=None, front=False):
         # At the exact spot, not snapped to a tile's middle: pieces set round each other stay even.
         # `front`: drawn in front of her (a railing on the deck's near side).
-        props = [prop("frame", frame), prop("dy", dy, "int")]
+        # (A background piece's twin for its place: the user's wash levels, tools/wash_levels.py.)
+        props = [prop("frame", wash_frame(frame, deck, metres((x if x is not None else exact_x(m)) // TILE))), prop("dy", dy, "int")]
         if flip:
             props.append(prop("flip", True, "bool"))
         if front:

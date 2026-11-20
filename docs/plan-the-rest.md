@@ -373,6 +373,26 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
    until then); whether the Library's small shelf and return trolley, drawn in code, are
    generated too (proposed).
 
+### 2.3b The Library's reading chairs, every one to sit in (small; no art; added 2026-11-20, the user)
+
+Asked in the Refinement session's audit of the background props' wash (the user: "Make all three chairs
+interactable ... she can sit in either of them"). Today one red reading chair is hers (`sec_chair`,
+`src/world/library.js`: the game's own `reading-chair` and `floor-lamp`, in full colours) and the four
+beside the two reading tables are the map's background (`around(6, m, "reading-table-bg",
+"reading-chair-bg")` in `tools/build_ship_map.py`), washed, so one chair of three read differently.
+
+1. **All five in full colours:** the four by the tables become `reading-chair` (not `-bg`); the floor lamp
+   stays as it is. The reading tables stay background (the Refinement session's wash, below).
+2. **Each one a seat:** E at any of them is `read()` from that chair: she sits in it (facing the way it
+   faces: the two round a table face each other, so `flipX` from the chair, not always false), the next
+   book she has not read, its page. The chairs' places come from the map's data, as `data.chair` does now.
+3. **Checked:** her seated clip (`her-read`) in each chair, enlarged, both ways she faces (the art rule's
+   overlaps and floor line); `region2`'s reading check still passes; nothing else in the Library answers E
+   from where a chair now does (the trolley, the shelf).
+
+The background props' wash is the Refinement session's (the user's levels per deck, 2026-11-20; the Library
+at 12%): not part of this item.
+
 ### 2.4 Cabin 8206's desk, the day after, the counts (medium; little art)
 
 - **The desk:** his four and her four, each a prop shown from its own find on. **First the
