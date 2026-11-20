@@ -281,7 +281,7 @@ of data and a generated picture shown first, each set against what is built at i
 | 8 | Bumbot's | Remote-controlled car (beige, two big rubbery cyan wheels: the user) | Deck 7, Entourage, past the ball pit | E. **Placed 2026-11-19, moved 2026-11-20** (on the air hockey table, left of its post: the user) |
 | 10 | Hers | Bookmark with a cat on top | ~~Deck 6, the maid's cabin, in the book by the bed~~ **Deck 9, the cabin being cleaned, in its book on the stripped bed** (swapped with 12, the user: that cabin has no window) | E. **Placed 2026-11-19; approved 2026-11-20**, the bed freed (its stewardess moved to a new cabin on deck 10, `makeup10`, her shake at half pace) |
 | 11 | Hers | Diary notepad (brown leather, a strap with a brass buckle: the user) | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end). **Placed 2026-11-19, approved 2026-11-20** (the last seat, by the railing: 9 px aft, 4 px down, the seat's near arm over its foot) |
-| 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the floor (`low`). **Placed 2026-11-19** |
+| 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the maid's bed, not the floor (`from`). **Placed 2026-11-19, approved 2026-11-20** |
 | 13 | His | Ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E, after the table scene (look-out 5 will be at the same rail) |
 | 14 | His | Sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults |
 | 15 | His | Handheld (black, four coloured buttons, no logo) | Deck 12, Champs, on a sofa | E |
@@ -299,7 +299,8 @@ of data and a generated picture shown first, each set against what is built at i
   **Waiting for the user: the locations of all ten, judged in play** (the links: `docs/start-links.md`, five
   new places `store4`, `maid6`, `knit5`, `shore5`, `balcony7`); noted for that: the flag now stands 16 px
   among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull) and 7 (the sardines),
-  his four (13 to 16) after the table scene, then 2.2 before the two books. The close-ups also as the HUD's
+  his four (13 to 16) after the table scene, then 2.2 before the two books. **2026-11-20: all ten approved where
+  they lie** (the user's review, in play). The close-ups also as the HUD's
   icons (2.4): to propose with it.
 - His four are not there before the table scene ("not lying there before it, not merely
   locked"). Nothing of the twenty flies to its count. Books 12 and 13 (rows 18 and 19) are paid

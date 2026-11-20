@@ -2606,7 +2606,8 @@ export class ShipScene extends Phaser.Scene {
         this.droppingThrough = null;
         // (Out over the atrium under the open parasol, she floats down in front of its walks.)
         this.physics.add.collider(p, this.walkGroup, null, (_, zone) =>
-            this.droppingThrough !== zone.walk && !(zone.walk.atrium && this.overRail && this.gliding)
+            (!zone.walk.route || zone.walk.route === this.route)
+            && this.droppingThrough !== zone.walk && !(zone.walk.atrium && this.overRail && this.gliding)
             && p.body.velocity.y >= 0 && p.body.bottom <= zone.body.top + 10);
         this.physics.add.collider(p, this.crates, null, (_, crate) => {
             if (!this.isLunging()) return true;

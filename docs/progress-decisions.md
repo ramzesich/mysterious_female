@@ -3540,4 +3540,20 @@ while the building session worked.
   (the user: "both armchair's arms, and I meant only the one closer to the screen"), then right: a pickup can
   name the furniture it is in (`cover` in the item's data: piece, metres, px), whose lowest rows (the seat's
   near arm, 21 px) the game draws again in front of it. `boot`, `region3`, `golden` pass; overlaps 0.
+- **The plant (12) and the maid's cabin (deck 6), the user's four:** (1) "Make Bumbusik able to jump on top of the
+  bed, like in cabin 8206": a ledge on the bed (`PLATFORMS` may now name a room: there only while she is in it;
+  `walk.route`), then 2 px lower so her feet touch the mattress (the user). (2) On the bed the swan is in front
+  of her, on the floor she is in front of it: the swan's own pixels cut from the finished room picture
+  (`on_bed` in `tools/draw_rooms.py`, `maid6-onbed.png`), drawn over her while she stands on the bed. I first
+  read it backwards. (3) The towel swan's orange beak, "impossible if it made of towels": whitened in the shared
+  piece (`RECOLOUR` in `tools/build_ship_art.py`), as the towel stack's swan's was; the swans of deck 10's
+  towel table and deck 8's cart with it. (4) "Stretch her back, while holding her waist behind her back ... after
+  the current making the bed sequence ... in a loop": a PixMiniMax clip from `make`'s last frame to its first
+  (2 generations), approved; her loop twice `make`, once `stretch` (`cycle` on a person, `people.cycleIdle`).
+  Then "her hands have to be a little bit lower, now they don't reach the bed": her forearms bent down by hand
+  in every `make` frame (5 px at the fingertips) and in the stretch's first and last four, fading
+  (`assets/source/people/maid-raw/` keeps them as generated). "Make the two pillow outlines obscure the bed":
+  asked, "Solid pillows": the upper one had the wall's colour inside. And the plant was taken from the floor,
+  not the bed: now only from the bed (`from` on the item: px up she must stand). `boot`, `region2`, `region6`,
+  `golden` pass; overlaps 0. **The ten things' locations are all approved.**
 

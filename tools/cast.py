@@ -104,7 +104,8 @@ CAST = {
     "surfer": ("33bd2921-f3b1-4b59-b2ce-1f8892bd9eee", {}, {"scale": 0.8}),
     "atriumwoman": ("7a2ebdab-d174-463f-8636-6f915cfe60e8", {}, {}),
     "railman": ("0c8faf8c-a4f6-4920-8785-658c177af315", {}, {}),
-    "maid": ("4677d8f1-5586-41e1-b13e-53d9bdd49ffc", {"make": 6}, {}),
+    # (`stretch` after her bed-making, in a loop: the user, 2026-11-20; as generated: `maid-raw/`.)
+    "maid": ("4677d8f1-5586-41e1-b13e-53d9bdd49ffc", {"make": 6, "stretch": 8}, {}),
     "modelguest": ("d15bae3f-7372-455a-82fc-f4ce9bab224e", {}, {}),
     # A couple reading the ports' plaques on deck 7, their backs to us.
     "plaquewoman": ("da2e0888-a560-4557-9f72-ad92e4f5e772", {}, {}),

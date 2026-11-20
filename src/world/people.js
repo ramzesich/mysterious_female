@@ -108,10 +108,19 @@ export class People {
             p.sprite.setFrame(p.meta.anims[p.still].at(-1));
             return;
         }
+        // (`cycle`: clips in turn, each so many times, round and round: the maid's bed-making and her stretch.)
+        if (p.cycle?.length) return this.cycleIdle(p, 0);
         if (!p.idle || !this.anim(p, p.idle)) {
             p.sprite.anims.stop();
             p.sprite.setFrame(p.meta[p.pose] ?? p.meta.stand);
         }
+    }
+
+    cycleIdle(p, k) {
+        const [clip, times] = p.cycle[k % p.cycle.length];
+        if (!this.anim(p, clip, { loop: false })) return;
+        p.sprite.anims.play({ key: `people-${p.who}-${clip}`, repeat: times - 1 });
+        p.sprite.once('animationcomplete', () => { if (p.state === 'idle') this.cycleIdle(p, k + 1); });
     }
 
     // A clip played once (a shake of the head, eating), then back to idling. Resolves when it is over.

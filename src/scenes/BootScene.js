@@ -16,6 +16,8 @@ export class BootScene extends Phaser.Scene {
             for (const r of world.rooms) if (r.art) this.load.image(`room-${r.id}`, `assets/ship/rooms/${r.id}.png`);
             // (What of a room's picture is in front of the things lying in it: a bowl's side.)
             for (const r of world.rooms) if (r.front) this.load.image(`room-${r.id}-front`, `assets/ship/rooms/${r.id}-front.png`);
+            // (What of a room is in front of her while she stands on its bed: the maid's cabin's swan.)
+            for (const e of world.ents) if (e.kind === 'platform' && e.front) this.load.image(`room-${e.front}`, `assets/ship/rooms/${e.front}.png`);
         });
         this.load.image('tiles', 'assets/tiles/placeholder.png');
         this.load.atlas('shipart', 'assets/ship/ship.png', 'assets/ship/ship.json');

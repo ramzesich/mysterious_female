@@ -194,10 +194,11 @@ ITEMS = {
     "keep_car": (7, 57.85, "keep:cat:car", None, 26, "thing:rc-car"),
     # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
-    # an inside one with no window (the user); the sill is reached with E from the floor (`low`). Her diary
+    # an inside one with no window (the user); the sill is reached with E from the bed, not the floor (`from`:
+    # the user, 2026-11-20, "that's why we added the jump on top of the bed"). Her diary
     # on the Stardust balcony's last seat, by the railing over the stage.
     "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 24, "thing:bookmark-book"),
-    "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"low": True}),
+    "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"from": 20}),
     "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
 }
 
@@ -310,7 +311,8 @@ PEOPLE = {
     "amb_7s_her": dict(at=(5, 213.0 - 0.17), who="diner_red", face=1, layer="back"),
     "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
     # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
-    "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make"),
+    # (Twice her bed-making, then she stretches her back, in a loop: `cycle`, the user, 2026-11-20.)
+    "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make", cycle=[("make", 2), ("stretch", 1)]),
     "amb_surfer": dict(hear="shh", at=(6, 67.45), who="surfer", face=1, layer="back"),
     "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
     "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
@@ -719,8 +721,11 @@ OPENDOORS = {"amb_party": (8, 72, "party"), "amb_peek_sea": (8, 56, "sea")}
 GLIMPSE_BALCONY = (9, 151.6)
 
 # --- Region 6's own things (docs/population.md, deck 11 "Lido" and deck 10's hallway under it) -------
-# Roofs she can stand on, landing from above: id: (deck, from m, to m, px up).
-PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90)}
+# Roofs she can stand on, landing from above: id: (deck, from m, to m, px up); in a room: (room, from px,
+# to px, px up[, a picture drawn over her while she stands on it]), there only while she is in it.
+PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90),
+             # The maid's cabin's bed, its mattress (the user, 2026-11-20: "like in cabin 8206").
+             "plat_bed_maid6": ("maid6", 161, 228, 20, "maid6-onbed")}
 # The pool's beat (`bb5`, src/world/lido.js): the drain lever's housing on the first pool's aft rim,
 # the ladder Bumbot comes out by, the hot tub the kid squirts from, the kid's beat on the aft pool
 # deck after (from m, to m), the lounger the security officer peers under, the chess set.

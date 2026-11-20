@@ -58,6 +58,19 @@ def stand(im, frame, x, dy=0, flip=False):
     return piece.size
 
 
+def on_bed(room, frame, x, dy, name):
+    """The pixels of a piece stood in a room (`stand`), cut from the finished room picture: a picture of the
+    room's size with only those, which the game draws over her while she stands on the room's bed."""
+    piece = atlas(frame)
+    x0, y0 = x - piece.width // 2, FLOOR - dy - piece.height
+    over = Image.new("RGBA", room.size)
+    for y in range(piece.height):
+        for x1 in range(piece.width):
+            if piece.getpixel((x1, y))[3]:
+                over.putpixel((x0 + x1, y0 + y), room.getpixel((x0 + x1, y0 + y)))
+    over.save(OUT / f"{name}.png")
+
+
 # Every room she can enter is washed out a little toward its wall above the floor, as cabin 8206 is
 # (tools/draw_cabin.py's WASH; the user, 2026-11-15): its furniture is background, never to read as
 # something to use. What she does use keeps its full colours, every door above all, which stands out
@@ -623,7 +636,7 @@ def maid6(width):
     box(160, FLOOR - 24, 196, FLOOR - 19, BLUE_LIGHT)
     r(161, FLOOR - 20, 195, FLOOR - 20, BLUE)
     d.rounded_rectangle([211, FLOOR - 28, 228, FLOOR - 21], radius=3, fill=WHITE, outline=GREY)
-    d.rounded_rectangle([214, FLOOR - 33, 228, FLOOR - 27], radius=3, fill=PALE, outline=GREY)
+    d.rounded_rectangle([214, FLOOR - 33, 228, FLOOR - 27], radius=3, fill=WHITE, outline=GREY)      # (solid: it showed the wall through it, the user)
     stand(R.im, "towel-swan", 190, dy=21)
     # A bedside lamp on the wall over the pillows; fresh towels folded on a stool by the bed's foot.
     r(224, FLOOR - 62, 232, FLOOR - 55, YELLOW)
@@ -633,7 +646,11 @@ def maid6(width):
         r(x, FLOOR - 13, x + 1, FLOOR - 1, WOOD_DARK)
     for k in range(3):
         d.rounded_rectangle([128, FLOOR - 21 - k * 4, 140, FLOOR - 17 - k * 4], radius=1, fill=(WHITE, BLUE_LIGHT, WHITE)[k], outline=GREY)
-    return R.save("maid6")
+    out = R.save("maid6")
+    # The swan again, alone, drawn over her while she stands on the bed (the user, 2026-11-20: on the bed
+    # the swan is in front of her; on the floor she is in front of it).
+    on_bed(out, "towel-swan", 190, 21, "maid6-onbed")
+    return out
 
 
 def lifeboat(width):

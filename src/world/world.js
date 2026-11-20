@@ -804,7 +804,7 @@ export class World {
                 // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing
                 // to find up high, on the climb's shelf, is hers only from up there, or once a lob
                 // has knocked it down: `high`.)
-                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40 && !e.low, interact: () => this.take(thing) };
+                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40 && e.from == null, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -952,13 +952,21 @@ export class World {
                 break;
             }
             case 'platform': {
-                // A roof she can stand on, landing from above (the hot tub's canopy).
-                const walk = { x0: e.x0, x1: e.x1, y: e.y, dropThrough: false };
+                // A roof she can stand on, landing from above (the hot tub's canopy); a bed in a room, there
+                // only while she is in it (the maid's cabin's: `route`).
+                const walk = { x0: e.x0, x1: e.x1, y: e.y, dropThrough: false, route: e.route === 'inside' ? null : e.route };
                 walk.zone = s.add.zone(e.x0, e.y, e.x1 - e.x0, 6).setOrigin(0);
                 walk.zone.walk = walk;
                 s.physics.add.existing(walk.zone, true);
                 s.walkGroup.add(walk.zone);
                 s.walks.push(walk);
+                // What of the room is in front of her while she stands on it (`front`: the swan on the
+                // maid's bed); on the floor she is in front of it, as of the rest of the room.
+                if (e.front) {
+                    walk.front = s.add.image(e.roomX, e.roomY - ROOM.height, `room-${e.front}`).setOrigin(0).setDepth(D.player + 0.01).setVisible(false);
+                    this.add([walk.front]);
+                    (this.bedFronts ??= []).push(walk);
+                }
                 break;
             }
             case 'wet':
@@ -1290,6 +1298,9 @@ export class World {
 
     updateSpecials(time) {
         const s = this.scene, p = s.player, P = this.progress;
+        for (const w of this.bedFronts ?? []) {
+            w.front.setVisible(s.route === w.route && Math.abs(p.y - w.y) < 2 && p.x >= w.x0 - 8 && p.x <= w.x1 + 8);
+        }
         if (s.mode !== 'play') return;
         const onFloor = p.body.blocked.down || p.body.touching.down;
         // The stage's trap door (population: `haz_trapdoor`): after the rehearsal's beat, standing on
@@ -1994,7 +2005,9 @@ export class World {
         }
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
-            if (Math.abs(p.x - t.x) > (t.reach ?? 18) || (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
+            if (Math.abs(p.x - t.x) > (t.reach ?? 18)) continue;
+            // (`from`: taken only standing that high, the plant from the maid's bed; else from the floor or up there.)
+            if (t.from != null ? Math.abs(p.y - (t.y - t.from)) > 4 : (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
             if (t.high && Math.abs(p.y - t.level) > 8) continue;
             if (t.interact() !== false) return true;
         }
