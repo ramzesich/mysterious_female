@@ -220,9 +220,49 @@
     "h": 102
    }
   },
-  "plant": {
+  "parasol": {
    "frame": {
     "x": 776,
+    "y": 0,
+    "w": 22,
+    "h": 109
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 109
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 109
+   }
+  },
+  "pills": {
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 26,
+    "h": 60
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 26,
+    "h": 60
+   },
+   "sourceSize": {
+    "w": 26,
+    "h": 60
+   }
+  },
+  "plant": {
+   "frame": {
+    "x": 828,
     "y": 0,
     "w": 46,
     "h": 108
@@ -242,7 +282,7 @@
   },
   "snack": {
    "frame": {
-    "x": 824,
+    "x": 876,
     "y": 0,
     "w": 109,
     "h": 34
@@ -260,9 +300,29 @@
     "h": 34
    }
   },
+  "socks": {
+   "frame": {
+    "x": 987,
+    "y": 0,
+    "w": 96,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 96,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 96,
+    "h": 72
+   }
+  },
   "wool": {
    "frame": {
-    "x": 935,
+    "x": 1085,
     "y": 0,
     "w": 71,
     "h": 76

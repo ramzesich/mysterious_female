@@ -197,6 +197,7 @@ export class BallPit {
                 g.fillStyle(0xfbff86, 1).fillRect(ex + 1, 7, 6, 2);
             }
         }).setDepth(D.player + 0.04);
+        s.withFoot(front);          // (to her floor's own row: her feet hidden whole)
         // The one that is not a ball: orange, a leaf on it, a glint now and then.
         this.odd = s.add.graphics().setDepth(D.player + 0.045);
         this.odd.fillStyle(0x2e222f, 1).fillCircle(def.tanX, y - 29, 4);

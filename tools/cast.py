@@ -104,7 +104,8 @@ CAST = {
     "surfer": ("33bd2921-f3b1-4b59-b2ce-1f8892bd9eee", {}, {"scale": 0.8}),
     "atriumwoman": ("7a2ebdab-d174-463f-8636-6f915cfe60e8", {}, {}),
     "railman": ("0c8faf8c-a4f6-4920-8785-658c177af315", {}, {}),
-    "maid": ("4677d8f1-5586-41e1-b13e-53d9bdd49ffc", {"make": 6}, {}),
+    # (`stretch` after her bed-making, in a loop: the user, 2026-11-20; as generated: `maid-raw/`.)
+    "maid": ("4677d8f1-5586-41e1-b13e-53d9bdd49ffc", {"make": 6, "stretch": 8}, {}),
     "modelguest": ("d15bae3f-7372-455a-82fc-f4ce9bab224e", {}, {}),
     # A couple reading the ports' plaques on deck 7, their backs to us.
     "plaquewoman": ("da2e0888-a560-4557-9f72-ad92e4f5e772", {}, {}),
@@ -141,7 +142,7 @@ CAST = {
     "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
     # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
     "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4, "walk": 8, "squirt": 11, "eat": 7}, {"scale": 0.72}),
-    "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 8}, {}),
+    "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 4}, {}),     # (8 read frantic: the user, 2026-11-20)
     "domeman": ("7a956cd3-6357-4fa6-a319-020144870524", {"idle": 4}, {}),
     "bagslady": ("1528b5cf-4225-4d4b-85f8-e6f67ed664df", {"walk": 8}, {}),
     "planman": ("3bccf530-3e86-4a11-b6de-c7a049b9572c", {}, {}),

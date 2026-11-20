@@ -28,7 +28,20 @@ OUT = ROOT / "assets" / "sprites"
 OWN_COLOURS = {"ball"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the
 # palette's brightest cyans (the user: "two big rubbery cyan wheels").
-RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"}}
+RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
+            # The parasol came maroon: the world parasol's red and white (`parasol-closed`).
+            "parasol": {"ae2334": "e83b3b", "6e2727": "ae2334", "966c6c": "c7dcd0", "fdcbb0": "ffffff",
+                        "f68181": "ffffff"},
+            # The socks in the world's stronger pink, their shading a shade deeper (the user, 2026-11-20:
+            # "more similar to that in the game").
+            "socks": {"eaaded": "ed8099", "ed8099": "cf657f", "cf657f": "a24b6f"}}
+# Pixels set by hand after the palette (x, y in the trimmed picture -> colour): the parasol's handle had a
+# band of the cloth's red across it (the user, 2026-11-20: "remove the red pixel from the parasol's
+# handle"), now the pole's own two colours.
+MEND = {"parasol": {(9, 98): "cd683d", (10, 98): "4c3e24", (9, 99): "cd683d", (10, 99): "4c3e24"},
+        # The pills' white label: a dark title, lines of print, a dark mark (the user, 2026-11-20:
+        # "something that resembles a text on its white label"; text in art is ours to draw).
+        "pills": {(3, 30): "3e3546", (4, 30): "3e3546", (5, 30): "3e3546", (6, 30): "3e3546", (7, 30): "3e3546", (8, 30): "3e3546", (9, 30): "3e3546", (10, 30): "3e3546", (11, 30): "3e3546", (12, 30): "3e3546", (13, 30): "3e3546", (14, 30): "3e3546", (15, 30): "3e3546", (3, 31): "3e3546", (4, 31): "3e3546", (5, 31): "3e3546", (6, 31): "3e3546", (7, 31): "3e3546", (8, 31): "3e3546", (9, 31): "3e3546", (10, 31): "3e3546", (11, 31): "3e3546", (12, 31): "3e3546", (13, 31): "3e3546", (14, 31): "3e3546", (15, 31): "3e3546", (3, 35): "9babb2", (4, 35): "9babb2", (5, 35): "9babb2", (6, 35): "9babb2", (7, 35): "9babb2", (8, 35): "9babb2", (9, 35): "9babb2", (10, 35): "9babb2", (11, 35): "9babb2", (12, 35): "9babb2", (13, 35): "9babb2", (14, 35): "9babb2", (15, 35): "9babb2", (16, 35): "9babb2", (17, 35): "9babb2", (18, 35): "9babb2", (19, 35): "9babb2", (3, 38): "9babb2", (4, 38): "9babb2", (5, 38): "9babb2", (6, 38): "9babb2", (7, 38): "9babb2", (8, 38): "9babb2", (9, 38): "9babb2", (10, 38): "9babb2", (11, 38): "9babb2", (12, 38): "9babb2", (13, 38): "9babb2", (14, 38): "9babb2", (15, 38): "9babb2", (16, 38): "9babb2", (17, 38): "9babb2", (3, 41): "9babb2", (4, 41): "9babb2", (5, 41): "9babb2", (6, 41): "9babb2", (7, 41): "9babb2", (8, 41): "9babb2", (9, 41): "9babb2", (10, 41): "9babb2", (11, 41): "9babb2", (12, 41): "9babb2", (13, 41): "9babb2", (14, 41): "9babb2", (15, 41): "9babb2", (16, 41): "9babb2", (17, 41): "9babb2", (18, 41): "9babb2", (19, 41): "9babb2", (3, 44): "9babb2", (4, 44): "9babb2", (5, 44): "9babb2", (6, 44): "9babb2", (7, 44): "9babb2", (8, 44): "9babb2", (9, 44): "9babb2", (10, 44): "9babb2", (11, 44): "9babb2", (12, 44): "9babb2", (3, 48): "3e3546", (4, 48): "3e3546", (5, 48): "3e3546", (6, 48): "3e3546", (3, 49): "3e3546", (4, 49): "3e3546", (5, 49): "3e3546", (6, 49): "3e3546", (9, 49): "9babb2", (10, 49): "9babb2", (11, 49): "9babb2", (12, 49): "9babb2", (13, 49): "9babb2", (14, 49): "9babb2", (15, 49): "9babb2", (16, 49): "9babb2", (17, 49): "9babb2", (18, 49): "9babb2", (19, 49): "9babb2"}}
 # The four cards: one picture, its stripe (the generated blue, on the palette) in each card's colour,
 # the colours of `CARD_COLOURS` in src/progression.js.
 CARD_STRIPE = "4d65b4"
@@ -51,7 +64,10 @@ def picture(path):
     img = img.crop(img.getbbox())
     if path.stem not in OWN_COLOURS:
         img = palettize(img)
-    return recolour(img, RECOLOUR.get(path.stem, {}))
+    img = recolour(img, RECOLOUR.get(path.stem, {}))
+    for (x, y), c in MEND.get(path.stem, {}).items():
+        img.putpixel((x, y), tuple(bytes.fromhex(c)) + (255,))
+    return img
 
 
 def build():

@@ -43,6 +43,10 @@ ROOMS = [
          lock=("card", "ent", 0)),
     dict(id="lifeboat", deck=7, m=147.5, route="outside", width=240, look="lifeboat", door="hatch"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
+    # A guest cabin being made up on deck 10's midships hallway, its door held open, the bedmaker in it
+    # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
+    # sprinkler (156 m) and the "Do Not Disturb" door (171.6 m).
+    dict(id="makeup10", deck=10, m=164, slot=True, width=240, look="cabin", door="open"),
     dict(id="balcabin9", deck=9, m=150, slot=True, width=288, look="balcabin", door="cabin",
          lock=("card", "hk", 0), checkpoint="cp_balcabin",
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
@@ -163,10 +167,12 @@ TANGERINES = {
 # piece it is drawn as]]). `what`: "verb:<name>" a new way to move, "book:<n>", "item:<name>" a pocket
 # item. All taken with E (population §2.1, §2.2).
 ITEMS = {
-    "item_socks": (11, 95.75, "verb:socks", None, 40),
+    # (On the free treadmill's belt, by its rear end, 8 px up, sunk into it a little in front of it (the user, 2026-11-20: it was on the yoga-mat
+    # rack's top); its pictures since that day its close-up's: assets/source/closeups/.)
+    "item_socks": (11, 89.19, "verb:socks", None, 8, "thing:grip-socks"),
     # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
-    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50),
+    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     "book_1": (5, 85.5, "book:1", None, 23),
     "book_2": ("lifeboat", 112, "book:2", None, 17),
     "book_3": ("dressing", 118, "book:3", None, 31),
@@ -180,18 +186,20 @@ ITEMS = {
     "keep_flag": (5, 140.7, "keep:her:flag", None, 34, "thing:flag-ua"),               # the desk's far end
     # §4 2.1 (2026-11-19), each with its close-up (assets/source/closeups/), placed for the user to judge in
     # play: Bumbot's snack tube on the dry store's bottom shelf, beside its tangerines (the green card);
-    # his massage gun on the gym's bench, under the barbell; his car on Entourage's floor past the ball
-    # pit, between the foosball and the pool tables.
+    # his massage gun on the gym's rowing machine, on its seat (the user, 2026-11-20:
+    # not the bench under the barbell); his car on Entourage's air hockey table, left of its post (the
+    # user, 2026-11-20: not on the floor).
     "keep_snack": ("store", 173, "keep:cat:snack", None, 40, "thing:snack-tube"),
-    "keep_massage": (11, 99.08, "keep:cat:massage", None, 18, "thing:massage-gun"),
-    "keep_car": (7, 56.25, "keep:cat:car", None, 0, "thing:rc-car"),
+    "keep_massage": (11, 97.08, "keep:cat:massage", None, 15, "thing:massage-gun"),
+    "keep_car": (7, 57.85, "keep:cat:car", None, 26, "thing:rc-car"),
     # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
-    # an inside one with no window (the user); the sill is reached with E from the floor (`low`). Her diary
+    # an inside one with no window (the user); the sill is reached with E from the bed, not the floor (`from`:
+    # the user, 2026-11-20, "that's why we added the jump on top of the bed"). Her diary
     # on the Stardust balcony's last seat, by the railing over the stage.
-    "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 22, "thing:bookmark-book"),
-    "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"low": True}),
-    "keep_diary": (7, 242.06, "keep:her:diary", None, 23, "thing:diary"),
+    "keep_bookmark": ("cleanup", 197, "keep:her:bookmark", None, 24, "thing:bookmark-book"),
+    "keep_plant": ("maid6", 203, "keep:her:plant", None, 56, "thing:plant-pot", {"from": 20}),
+    "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
@@ -303,7 +311,8 @@ PEOPLE = {
     "amb_7s_her": dict(at=(5, 213.0 - 0.17), who="diner_red", face=1, layer="back"),
     "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
     # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
-    "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make"),
+    # (Twice her bed-making, then she stretches her back, in a loop: `cycle`, the user, 2026-11-20.)
+    "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make", cycle=[("make", 2), ("stretch", 1)]),
     "amb_surfer": dict(hear="shh", at=(6, 67.45), who="surfer", face=1, layer="back"),
     "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
     "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
@@ -348,7 +357,7 @@ PEOPLE = {
     "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
                       bubble=("camera", None, "flag:photo", 3)),
     "npc_groom": dict(at=(9, 135.75), who="groom", face=-1, idle="idle", until="flag:photo"),
-    "amb_bedmaker": dict(at=("cleanup", 166), who="bedmaker", face=1, idle="make"),
+    "amb_bedmaker": dict(at=("makeup10", 166), who="bedmaker", face=1, idle="make"),
     "amb_planman": dict(at=(9, 104.7), who="planman", face=-1, layer="back"),
     "amb_bagslady": dict(at=(8, 86), who="bagslady", face=1, walk=(84.2, 90.4, 0.7), end_ms=1800, layer="back"),
     "amb_domeman": dict(at=(10, 86.6), who="domeman", face=1, idle="idle", layer="back"),
@@ -362,7 +371,7 @@ PEOPLE = {
     # (The treadmills' consoles are at their forward ends: she faces it, on the belt behind it, and
     # the machine is drawn again in front of her, its near handrail across her.)
     "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
-                          cover=[("treadmill-bg", 86.6, 0)]),
+                          cover=[("treadmill-lt", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
     "npc_kid_tub": dict(hear="own", at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
     "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
@@ -712,8 +721,11 @@ OPENDOORS = {"amb_party": (8, 72, "party"), "amb_peek_sea": (8, 56, "sea")}
 GLIMPSE_BALCONY = (9, 151.6)
 
 # --- Region 6's own things (docs/population.md, deck 11 "Lido" and deck 10's hallway under it) -------
-# Roofs she can stand on, landing from above: id: (deck, from m, to m, px up).
-PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90)}
+# Roofs she can stand on, landing from above: id: (deck, from m, to m, px up); in a room: (room, from px,
+# to px, px up[, a picture drawn over her while she stands on it]), there only while she is in it.
+PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90),
+             # The maid's cabin's bed, its mattress (the user, 2026-11-20: "like in cabin 8206").
+             "plat_bed_maid6": ("maid6", 161, 228, 20, "maid6-onbed")}
 # The pool's beat (`bb5`, src/world/lido.js): the drain lever's housing on the first pool's aft rim,
 # the ladder Bumbot comes out by, the hot tub the kid squirts from, the kid's beat on the aft pool
 # deck after (from m, to m), the lounger the security officer peers under, the chess set.

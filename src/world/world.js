@@ -95,6 +95,8 @@ export class World {
         this.library.build(this.data.library);
         this.buildSpecials();
         this.story.setup();
+        // The key cards lying on a table or on the deck twinkle as the pickups do.
+        for (const c of this.progress.cards) this.glint(c.items[0]);
         this.built = true;
         if (this.progress.has('drain')) this.drainPool(true);
         this.refresh();
@@ -121,6 +123,29 @@ export class World {
             g.destroy();
         };
         this.carryBox.textures();
+        // A pickup's glint (the user, 2026-11-20: "a tiny spark animation", "much softer, and slower", "also
+        // rotate"): a four-point star, "+" and "x" (the only turns whose rays are straight in pixels: "every
+        // frame shall have the rays straight", the user) at three sizes (a dot, its arms one px, two px),
+        // frame `turn * 3 + size`. Turned by its frames in eighth-turns, never by rotating the picture, which
+        // left ragged pixels ("LCD traces").
+        if (!s.textures.exists('spark')) {
+            const c = s.textures.createCanvas('spark', 6 * 7, 7), ctx = c.getContext();
+            const W = '#ffffff', Y = '#fbff86';
+            // One arm's pixels at each turn, near to far (the other three arms are it turned by 90).
+            const ARMS = [[[1, 0], [2, 0]], [[1, 1], [2, 2]]];
+            for (let turn = 0; turn < 2; turn++) {
+                for (let size = 0; size < 3; size++) {
+                    const f = turn * 3 + size, px = (x, y, col) => { ctx.fillStyle = col; ctx.fillRect(f * 7 + 3 + x, 3 + y, 1, 1); };
+                    px(0, 0, W);
+                    ARMS[turn].slice(0, size).forEach(([x, y], d) => {
+                        const col = d === size - 1 ? Y : W;
+                        px(x, y, col); px(-y, x, col); px(-x, -y, col); px(y, -x, col);
+                    });
+                    c.add(f, 0, f * 7, 0, 7, 7);
+                }
+            }
+            c.refresh();
+        }
         // Region 6: the pool attendant's hut (a checkpoint's door stands in it); the painter's bucket.
         make('pool-hut', 50, 96, g => {
             g.fillStyle(0x2e222f, 1).fillRect(3, 8, 44, 88);
@@ -142,16 +167,8 @@ export class World {
             g.fillStyle(c, 1).fillRect(1, 1, 8, 11);
             g.fillStyle(0xf3ecdd, 1).fillRect(8, 2, 1, 9).fillRect(3, 3, 4, 1);
         }));
-        make('icon-socks', 12, 12, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(2, 0, 6, 9).fillRect(2, 7, 10, 5);
-            g.fillStyle(0xf68181, 1).fillRect(3, 1, 4, 8).fillRect(3, 8, 8, 3);
-            g.fillStyle(0xffffff, 1).fillRect(3, 1, 4, 2).fillRect(5, 9, 1, 1).fillRect(8, 9, 1, 1);
-        });
-        make('icon-pills', 8, 12, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 8, 10).fillRect(1, 0, 6, 3);
-            g.fillStyle(0xf9c22b, 1).fillRect(1, 3, 6, 8);
-            g.fillStyle(0xffffff, 1).fillRect(2, 1, 4, 1).fillRect(2, 5, 4, 3);
-        });
+        // (The grip socks and the stage manager's pills were drawn here until 2026-11-20: now their
+        // close-ups' pictures, `grip-socks` and `pills-bottle` among the things.)
         // (The old lady's parasol, furled and open, is PixelLab's: `parasol-closed`, `parasol-open`
         // among the things.)
         make('switch-box', 14, 22, g => {
@@ -467,7 +484,7 @@ export class World {
             g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - 48, gl.x1 - gl.x0, 40);
             g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - 36, gl.x1 - gl.x0, 1);
             g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 50, gl.x1 - gl.x0, 3);
-            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8);
+            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8 + PLAYER.sink);
         }
         for (const [deck, g] of Object.entries(fronts)) {
             this.add([g]);
@@ -589,7 +606,7 @@ export class World {
         for (const g of [back, front]) {
             const top = g === back ? f.y - 34 : f.y - 30;
             g.fillStyle(0xe8eaec, 1).fillRect(f.x0 + 14, top, f.x1 - f.x0 - 14, 2).fillRect(f.x0 + 14, top + 14, f.x1 - f.x0 - 14, 1);
-            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top);
+            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top + (g === front ? PLAYER.sink : 0));
         }
         this.add([back, front]);
         const walk = { x0, x1: f.x1, y: f.y, dropThrough: false };
@@ -800,12 +817,20 @@ export class World {
                     y -= table.height;
                 }
                 const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
+                this.glint(img);
+                // The near part of the furniture it is in, drawn again in front of it (`cover`: the seat's
+                // near arm over the diary's foot). It stays when the thing is taken: the same pixels.
+                if (e.cover) {
+                    const c = s.add.image(e.cover.x, e.y, 'shipart', e.cover.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
+                    c.setCrop(0, c.height - e.cover.rows, c.width, e.cover.rows);
+                    this.add([c]);
+                }
                 items.push(img);
                 this.add(items);
                 // (`level`: where it lies, for her standing up there with it: a book on a bed. A thing
                 // to find up high, on the climb's shelf, is hers only from up there, or once a lob
                 // has knocked it down: `high`.)
-                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40 && !e.low, interact: () => this.take(thing) };
+                const thing = { ...e, level: y, items, pick: img, high: type === 'keep' && e.on > 40 && e.from == null, interact: () => this.take(thing) };
                 this.things.push(thing);
                 break;
             }
@@ -844,6 +869,7 @@ export class World {
                 // on something, in front of her or behind.
                 const d = e.front ? D.player + 0.04 : e.back ? D.decor + 0.11 : depth - 0.02;
                 const img = this.image(e.x, e.y - (e.dy ?? 0), e.frame).setOrigin(0.5, 1).setDepth(d).setFlipX(!!e.flip).setAngle(e.angle ?? 0);
+                if (e.front && !e.dy) s.withFoot(img);
                 this.add([img]);
                 this.things.push({ ...e, items: [img], img });
                 break;
@@ -953,13 +979,21 @@ export class World {
                 break;
             }
             case 'platform': {
-                // A roof she can stand on, landing from above (the hot tub's canopy).
-                const walk = { x0: e.x0, x1: e.x1, y: e.y, dropThrough: false };
+                // A roof she can stand on, landing from above (the hot tub's canopy); a bed in a room, there
+                // only while she is in it (the maid's cabin's: `route`).
+                const walk = { x0: e.x0, x1: e.x1, y: e.y, dropThrough: false, route: e.route === 'inside' ? null : e.route };
                 walk.zone = s.add.zone(e.x0, e.y, e.x1 - e.x0, 6).setOrigin(0);
                 walk.zone.walk = walk;
                 s.physics.add.existing(walk.zone, true);
                 s.walkGroup.add(walk.zone);
                 s.walks.push(walk);
+                // What of the room is in front of her while she stands on it (`front`: the swan on the
+                // maid's bed); on the floor she is in front of it, as of the rest of the room.
+                if (e.front) {
+                    walk.front = s.add.image(e.roomX, e.roomY - ROOM.height, `room-${e.front}`).setOrigin(0).setDepth(D.player + 0.01).setVisible(false);
+                    this.add([walk.front]);
+                    (this.bedFronts ??= []).push(walk);
+                }
                 break;
             }
             case 'wet':
@@ -1039,7 +1073,7 @@ export class World {
                 const zone = s.add.zone(e.x, e.y - 30, e.x1 - e.x0, 98).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 this.low.push({ route: e.route, x0: e.x0 - 18, x1: e.x1 + 18, y: e.y });
-                const items = e.frame ? [this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04)] : [];
+                const items = e.frame ? [s.withFoot(this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04))] : [];
                 this.add(items);
                 const thing = { ...e, items, zone };
                 this.lows.push(thing);
@@ -1180,6 +1214,7 @@ export class World {
         const [type, name] = thing.what.split(':');
         if (type === 'verb') {
             this.progress.learn(name);
+            this.closeup(name);
         } else if (type === 'book') {
             this.save.books[name] = 'held';
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
@@ -1189,6 +1224,7 @@ export class World {
             this.closeup(thing.what.split(':')[2]);
         } else {
             this.save.items.push(name);
+            this.closeup(name);
         }
         thing.done = true;
         thing.pick.destroy();
@@ -1289,6 +1325,10 @@ export class World {
 
     updateSpecials(time) {
         const s = this.scene, p = s.player, P = this.progress;
+        this.updateGlints(time);
+        for (const w of this.bedFronts ?? []) {
+            w.front.setVisible(s.route === w.route && Math.abs(p.y - w.y) < 2 && p.x >= w.x0 - 8 && p.x <= w.x1 + 8);
+        }
         if (s.mode !== 'play') return;
         const onFloor = p.body.blocked.down || p.body.touching.down;
         // The stage's trap door (population: `haz_trapdoor`): after the rehearsal's beat, standing on
@@ -1437,6 +1477,38 @@ export class World {
             this.add([spark]);
             s.tweens.add({ targets: spark, x: x + Math.cos(a) * 18, y: y + Math.sin(a) * 18, alpha: 0, duration: 450, onComplete: () => spark.destroy() });
         }
+    }
+
+    // A pickup lying somewhere glints now and then (the user, 2026-11-20: "a much softer, and slower spark
+    // on the top right corner of every item"): a small star at its top right corner, fading in as it grows
+    // and out as it shrinks over 1.6 s, turning a quarter round slowly as it shows (the user), once every 2.5 to
+    // 3.5 s on the scene's clock, each thing in its own
+    // time. Not the things handed to her or made for her, nor the tangerines. It goes with the picture:
+    // hidden with it, gone once it is taken.
+    glint(img) {
+        const s = this.scene;
+        const spark = s.add.image(0, 0, 'spark', 0).setDepth(img.depth + 0.005).setVisible(false);
+        this.add([spark]);
+        (this.glints ??= []).push({ img, spark, period: Phaser.Math.Between(2500, 3500), offset: Phaser.Math.Between(0, 3500) });
+    }
+
+    updateGlints(time) {
+        const LONG = 1600, PEAK = 0.8;
+        this.glints = (this.glints ?? []).filter(g => {
+            if (!g.img.active) { g.spark.destroy(); return false; }
+            const into = (time + g.offset) % g.period;
+            const on = g.img.visible && g.img.alpha > 0.5 && into < LONG;
+            g.spark.setVisible(on);
+            if (!on) return true;
+            // Eight steps: it grows over two, turns an eighth each step, shrinks over the last two; it fades
+            // in and out as it does.
+            const SIZES = [0, 1, 2, 2, 2, 2, 1, 0], step = Math.min(7, Math.floor(8 * into / LONG));
+            const k = Math.sin(Math.PI * into / LONG);                     // 0, up to 1 halfway, back to 0
+            const b = g.img.getBounds();
+            g.spark.setPosition(Math.round(b.right - 1), Math.round(b.y + 1))
+                .setFrame((step % 2) * 3 + SIZES[step]).setAlpha(PEAK * Math.max(0.35, k));
+            return true;
+        });
     }
 
     // A word over her for a moment (her own exclamations).
@@ -1993,7 +2065,9 @@ export class World {
         }
         for (const t of this.things) {
             if (!t.interact || t.done || !this.shown(t)) continue;
-            if (Math.abs(p.x - t.x) > (t.reach ?? 18) || (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
+            if (Math.abs(p.x - t.x) > (t.reach ?? 18)) continue;
+            // (`from`: taken only standing that high, the plant from the maid's bed; else from the floor or up there.)
+            if (t.from != null ? Math.abs(p.y - (t.y - t.from)) > 4 : (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
             if (t.high && Math.abs(p.y - t.level) > 8) continue;
             if (t.interact() !== false) return true;
         }

@@ -41,11 +41,15 @@ ALLOWED = [
     ("parasol-bg", "sundae-bg"),            # a sundae on a table under its parasol
 ]
 # Things that move, lie flat on the floor or rest on furniture: no fault where they pass or lie.
-SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-")
+SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-",
+              # (The things to find and the other pickups, lying on a table, a seat, a shelf: 2026-11-20.)
+              "rc-car", "diary", "massage-gun", "snack-tube", "bookmark-book", "plant-pot", "grip-socks",
+              "pills-bottle", "wool", "flag-ua", "feather-toy", "tennis-ball")
 
 # Textures that are not things standing on a deck: her, the people (they walk past doors), the cat,
 # pickups and their glints, lamps, the weather.
-SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "dot", "glow", "lamp", "puff", "livery", "things-gull"}
+SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "dot", "glow", "lamp", "puff", "livery", "things-gull",
+             "spark"}         # (a pickup's glint, 2026-11-20)
 
 DUMP = """(() => { const s = window.__ship, out = [];
   const walk = list => { for (const o of list) {

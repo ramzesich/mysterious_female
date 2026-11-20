@@ -45,7 +45,7 @@ export const verbs = {
         const h = on ? VERBS.crawlHeight : PLAYER.bodyHeight;
         const w = on ? 30 : PLAYER.bodyWidth;
         body.setSize(w, h);
-        body.setOffset((PLAYER.cell - w) / 2, PLAYER.cell - h);
+        body.setOffset((PLAYER.cell - w) / 2, PLAYER.cell - h - PLAYER.sink);
         this.crawling = on;
     },
 

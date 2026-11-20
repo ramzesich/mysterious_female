@@ -162,16 +162,20 @@ def build_world():
     for iid, (where, at, what, needs, *on) in ITEMS.items():
         x, y, route = spot(where, at)
         # `on`: px up, on a piece already there (a table); else on a side table of its own.
-        # (`low`: a thing to find more than 40 px up that is still taken with E from the floor, a plant
-        # on a windowsill; any higher one is hers only from up there, or once a lob knocks it down.)
+        # (`from`: px up she must stand to take it, and only there: the plant on the maid's windowsill, from
+        # her bed; any other thing more than 40 px up is hers only from up there, or once a lob knocks it down.
+        # `cover`: (piece, m, px) the piece of furniture it is in, at m, whose lowest px rows (its near
+        # part) are drawn again in front of it: the diary in its seat, its foot under the near arm.)
         opts = on[2] if len(on) > 2 else {}
+        cover = opts.get("cover")
         ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
-                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", low=opts.get("low", False)))
+                         on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", **({"from": opts["from"]} if "from" in opts else {}),
+                         cover=dict(frame=cover[0], x=B.exact_x(cover[1]), rows=cover[2]) if cover else None))
 
     for pid, d in PEOPLE.items():
         x, y, route = spot(*d["at"])
         e = dict(kind="person", id=pid, x=x, y=y, route=route, who=d["who"], face=d.get("face", 1),
-                 idle=d.get("idle", ""), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
+                 idle=d.get("idle", ""), cycle=d.get("cycle", []), layer=d.get("layer", ""), until=d.get("until", ""), after=d.get("after", ""),
                  pose=d.get("pose", ""), still=d.get("still", ""), dy=d.get("dy", 0), hear=d.get("hear", ""))
         if "walk" in d:
             a, b, v, *clip = d["walk"]
@@ -282,8 +286,10 @@ def build_world():
                          frame=frame or "", until=until[0] if until else ""))
 
     # Region 6's (src/world/movers.js, src/world/lido.js).
-    for pid, (deck, a, b, up) in PLATFORMS.items():
-        ents.append(dict(kind="platform", id=pid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, route="inside"))
+    for pid, (deck, a, b, up, *front) in PLATFORMS.items():
+        (x0, y, route), (x1, _, _) = spot(deck, a), spot(deck, b)
+        ents.append(dict(kind="platform", id=pid, x0=x0, x1=x1, y=y - up, route=route, front=front[0] if front else "",
+                         roomX=room_x0.get(deck, 0) if front else 0, roomY=room_floor.get(deck, 0) if front else 0))
     for wid, (deck, a, b, chair) in WETS.items():
         ents.append(dict(kind="wet", id=wid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
                          chairX=B.exact_x(chair), route="inside"))

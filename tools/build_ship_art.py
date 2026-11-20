@@ -66,7 +66,18 @@ MUTE = 0.35
 # A lighter wash, "<name>-lt", for the theatre's stage and seats (the user, 2026-11-19: "They are washed out too
 # much ... let's wash out them only slightly"): only the pieces in LIGHT get one.
 MUTE_LIGHT = 0.12
+# Colours changed after the palette, name -> {from: to}: the towel swan's orange beak, impossible in a
+# folded towel, whitened (the user, 2026-11-20; as the towel stack's swan's was).
+RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
+# The fitness centre's machines too (the user, 2026-11-20: "too washed out ... only slightly washed out, like
+# in the theater").
+LIGHT |= {"treadmill", "exercise-bike", "cross-trainer", "rowing-machine", "weight-bench", "dumbbell-rack"}
+# And the spa's aerobics studio beside it (the user, 2026-11-20).
+LIGHT |= {"yoga-rack", "gym-bottle", "yoga-mat", "medicine-ball", "dumbbells", "kettlebell", "water-dispenser"}
+# And Entourage, the teen club on deck 7 (the user, 2026-11-20: "too washed out").
+LIGHT |= {"tv-console", "foosball", "air-hockey", "dartboard-2", "arcade-cabinet", "vending-machine", "wall-tv",
+          "beanbag-orange", "beanbag-blue", "monstera"}
 
 # name: (sheet, frame, fit, options). fit is (width, height) for doors, or None to keep the drawn
 # size. Options: "fill", the door's body was drawn transparent and is filled with the cabin door's
@@ -521,6 +532,12 @@ def build():
         img = palettize(img)
         for x0, y0, x1, y1, colour in opts.get("paint", ()):
             img.paste(colour, (x0, y0, x1 + 1, y1 + 1))
+        if name in RECOLOUR:
+            px, swaps = img.load(), {tuple(bytes.fromhex(k)): tuple(bytes.fromhex(v)) for k, v in RECOLOUR[name].items()}
+            for y in range(img.height):
+                for x in range(img.width):
+                    if px[x, y][3] and px[x, y][:3] in swaps:
+                        px[x, y] = swaps[px[x, y][:3]] + (px[x, y][3],)
         if opts.get("level"):
             img, FEET[name] = level_frame(img, **opts["level"])
             FEET[f"{name}-bg"] = FEET[name]

@@ -24,9 +24,12 @@ then mended by hand: the bookmark's 4 px cat head, the plant's stem; kept finish
 | `wool.png` | Bumbot's ball of wool (2) | 50f9bb72-28b6-4829-a7d8-76bf78135867 |
 | `feather.png` | Bumbot's feather teaser (3) | 8ddc8382-b5a9-4398-82a9-68c4cc868738 |
 | `flag.png` | Her little flag of Ukraine (9) | 323be526-63d5-40c7-890c-389a09fb326d |
+| `socks.png` | Her grip socks (a way to move, the wall jump): recoloured to the world's stronger pink | 7dfab48e-ba85-489a-8184-6aa65c49c76c |
+| `pills.png` | The stage manager's pills (her one pocket quest item); its label's print drawn by hand (`MEND`) | e13fda28-1f0d-458f-a1d5-806a9fc48650 |
+| `parasol.png` | The old lady's parasol, furled (the glide): set to the world parasol's red and white, its handle's red band painted as the pole (`MEND`) | 0d8aa46f-6029-466f-ac5e-e287d5d6f82b |
 | `key-card.png` | The key card on its lanyard: one picture, its stripe recoloured to each card's colour (`CARDS`) | 8ce90882-fedc-4c3a-8d0a-0301aeb82b09 |
 
-Tried and not used (not kept): the first, small pictures of 5, 6, 8, 10, 11, 12 (48 px, low detail;
+Tried and not used (not kept): an open parasol (70b96778), the world parasol redrawn with `image_to_pixelart` (f6b66145), a parasol wrapped in a spiral (fc5737e0); the first, small pictures of 5, 6, 8, 10, 11, 12 (48 px, low detail;
 a first bookmark came as a cat sitting on the book, 953b1b7f); a red rally car (a927ee5c, "beige with two
 big rubbery cyan wheels", the user); a four-wheeled beige truck (ca2b75f3); a lilac diary (2694e671) and
 a tan leather one (1fd61702); a wool ball with knitting needles (1e618d29); the small wool used is

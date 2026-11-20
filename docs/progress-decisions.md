@@ -3492,3 +3492,109 @@ while the building session worked.
   rest not run.
 - **Waiting for the user (asked for the next session): the locations of all ten, judged in play.**
 
+## §4 2.1 continued: the gym, and the other pickups' pictures and close-ups (the user, 2026-11-20)
+
+- **Merged:** `main` fast-forwarded to `three-uses` (0b49441) and pushed, on the user's word.
+- **The massage gun (6):** "Move it to the bench that I circled": the rowing machine; first on its rail, then
+  (the user: "Put it on the seat") on its seat, 15 px up.
+- **The gym's background props "too washed out ... like in the theater":** the fitness centre's machines
+  (treadmill, exercise bike, cross-trainer, rowing machine, weight bench, dumbbell rack) and, asked and
+  answered "Yes", the spa's aerobics studio (the yoga-mat rack, mat, medicine ball, dumbbells, kettlebell,
+  bottle, water cooler) take the theatre's light wash (`LIGHT` in `tools/build_ship_art.py`, `-lt`, 12%). Found
+  with it: the treadmill runner's `cover` still named `treadmill-bg`, now `-lt`. The crew corridor's water
+  cooler keeps `-bg`.
+- **"What is this?"** (the pink sock on the yoga-mat rack): the grip socks, an early placeholder drawn in code,
+  as the pills were. "Are their refinement and their close-ups not in the plan?" They were not; added to 2.1
+  ("As part of 2.1"), and built: the pills are her only quest item kept in the pocket (the user: the same for
+  every pocket quest item, not the carried ones; every hand-over and pickup of the story was looked at).
+  Pictures (6 generations): the socks and the pills generated; the parasol's close-up first came open, then
+  redrawn from the world's sprite (rough), then generated again furled, two tries, the user taking the one
+  folded like a closed umbrella, "remove the red pixel from the parasol's handle". In the world: the socks
+  in a stronger pink with a lighter pink outline, then moved to the free treadmill's belt by its rear end and
+  two px lower, in front of it (the user); the close-up recoloured to match ("more similar to that in the
+  game"). The pills at 12 px with an orange outline; "something that resembles a text on its white label"
+  (a dark title and lines of print, by hand, on both); "its bottom line has to be fixed" (the foot stepped in
+  on one side): three candidates, B, an even foot with rounded corners, "but make the top line to match the
+  color of the cap in the close up" (the cap's white ridges). `icon-socks` and `icon-pills`, drawn in code,
+  removed.
+- **Checked:** each in place and its close-up in the running game; every built picture equal to the approved
+  one. `boot`, `region1`, `region2`, `region6`, `region8`, `golden` pass (`region6` and `golden` took the socks
+  from the rack: their spot changed); the rest not run.
+- **The locations (the user, 2026-11-20):** 1, 2, 3, 5 approved as placed; 6 moved (above); the car (8) "where I
+  circled": on Entourage's air hockey table, left of its post, 26 px up; the flag (9) approved. Entourage's
+  props "too washed out": its ten pieces take the light wash too (the TV console, the foosball and air hockey
+  tables, the dartboard, the arcade cabinet, the vending machine, the wall TV, two beanbags, the monstera; the
+  same pieces elsewhere keep `-bg`). `boot`, `region3`, `region9`, `golden` pass.
+- **The bookmark (10) and "this lady":** the bedmaker shaking out a sheet in the cabin being cleaned "is
+  problematic, we'll have to slow her down, and also find some other place for her, maybe another room". Of
+  three places offered (the linen room, a new open cabin on deck 10's midships hallway, the cabin left
+  empty), the user chose **a new cabin on deck 10**: `makeup10` at 164 m, between the sprinkler and the "Do Not
+  Disturb" door, drawn in code as its kin (`tools/draw_rooms.py`: the bed made, her trolley clear of her,
+  the wardrobe, a picture; a first layout had her in front of her trolley); her `make` at 4 frames a second
+  (was 8, "frantic"). The cabin being cleaned is empty, its bed the bookmark's: on the mattress's top, then two
+  px lower into it (the user). `region4`'s check of her there now checks the bookmark. `tools/check_overlaps.py`
+  skips the pickups lying on furniture (the car on its table, the diary on its seat). `boot`, `region4`,
+  `region7`, `vacuum`, `golden` pass; overlaps 0.
+- **The diary (11):** "still looks weird": moved 9 px aft onto the cushion, clear of the backrest, then 4 px down
+  into it, and "the circled part of the diary obscured by the chair's arm": first drawn behind the whole seat
+  (the user: "both armchair's arms, and I meant only the one closer to the screen"), then right: a pickup can
+  name the furniture it is in (`cover` in the item's data: piece, metres, px), whose lowest rows (the seat's
+  near arm, 21 px) the game draws again in front of it. `boot`, `region3`, `golden` pass; overlaps 0.
+- **The plant (12) and the maid's cabin (deck 6), the user's four:** (1) "Make Bumbusik able to jump on top of the
+  bed, like in cabin 8206": a ledge on the bed (`PLATFORMS` may now name a room: there only while she is in it;
+  `walk.route`), then 2 px lower so her feet touch the mattress (the user). (2) On the bed the swan is in front
+  of her, on the floor she is in front of it: the swan's own pixels cut from the finished room picture
+  (`on_bed` in `tools/draw_rooms.py`, `maid6-onbed.png`), drawn over her while she stands on the bed. I first
+  read it backwards. (3) The towel swan's orange beak, "impossible if it made of towels": whitened in the shared
+  piece (`RECOLOUR` in `tools/build_ship_art.py`), as the towel stack's swan's was; the swans of deck 10's
+  towel table and deck 8's cart with it. (4) "Stretch her back, while holding her waist behind her back ... after
+  the current making the bed sequence ... in a loop": a PixMiniMax clip from `make`'s last frame to its first
+  (2 generations), approved; her loop twice `make`, once `stretch` (`cycle` on a person, `people.cycleIdle`).
+  Then "her hands have to be a little bit lower, now they don't reach the bed": her forearms bent down by hand
+  in every `make` frame (5 px at the fingertips) and in the stretch's first and last four, fading
+  (`assets/source/people/maid-raw/` keeps them as generated). "Make the two pillow outlines obscure the bed":
+  asked, "Solid pillows": the upper one had the wall's colour inside. And the plant was taken from the floor,
+  not the bed: now only from the bed (`from` on the item: px up she must stand). `boot`, `region2`, `region6`,
+  `golden` pass; overlaps 0. **The ten things' locations are all approved.**
+
+## Every pickup lying in the world glints (the user, 2026-11-20)
+
+- **The user:** "Every collectible thing that we pick up from somewhere (not given to us, or not made by an ice
+  cream machine, for example): let's add a tiny spark animation to it." Then: tangerines "have no spark".
+- **As it came to be, round by round:** a 7 px star at a random spot on the thing's upper half every 2.2 to
+  3.2 s ("too aggressive, and blinking all over the place. I meant a much softer, and slower spark on the top
+  right corner of every item"); then 5 px at the top right corner, fading in and out over 1.6 s at 80% every
+  4.5 to 6 s ("Reduce the delay ... Make the spark also rotate (not fast)"); then every 2.5 to 3.5 s, turned by
+  rotating the picture ("it leaves LCD traces"); then four drawn turns, two with bent rays ("every frame shall
+  have the rays straight"); **approved: "+" and "×" in eighth-turns, eight steps of 0.2 s, growing over two and
+  shrinking over two, fading with them** (`world.glint`, `updateGlints`, the `spark` texture drawn in code at
+  the world's start: twelve px at most, an effect, as the sparkle on taking).
+- **On:** every pickup taken with E (the things to find, the books lying out, the socks, the parasol, the pills)
+  and the key cards lying on a table or on the deck (the deck card's pulsing dot gives way). Not tangerines, not
+  what is handed to her or made for her.
+- **The user, on pictures of the game:** "When asking for in game scenes, I meant not closed-up, but how I
+  actually see it in game": recordings of the game's own view from now on.
+- `boot`, `region1`, `region2`, `region8`, `golden` pass.
+
+## Her feet a pixel into the floor (the user, 2026-11-20)
+
+- **The user:** "shift Bumbusik down one pixel everywhere in the game ... update her default ground level", then
+  "leave the gags out of it", then "in some places where her feet should be obscured, the bottom line shows ...
+  fix that properly everywhere", then "Hide the bottom line of her feet on the promenade".
+- **Built:** `PLAYER.sink` (1): her picture drawn that much lower than her body's foot, by her display origin and
+  her body's offset together (`herDrop`, the crawl's offset), so where she stands, and every check of it, is
+  unchanged; in every look of hers (uniform, towel, with Bumbot), on stairs, ladders, crawling. Her gag clips
+  are left as they were.
+- **What hides her feet reaches a pixel lower too:** the decks' end railings, the props and pickups' fronts,
+  the forts, the ball pit's front (`withFoot`: the picture's bottom row drawn once more, its placement kept);
+  the balconies' fronts, the bulwarks, the promenade's sills, posts and columns, the side walks' railing, the
+  funnel top's front rail (graphics a px taller); the end walls' strips and the open decks' strip (plating a
+  px into the floor's row); under each sloped plate the side's own floor row copied in front of her (no pixel
+  changes from outside, checked). Found and checked in the running game: everything over her that ends on a
+  floor line listed, then at each kind of spot the screen with and without her compared on her lowest row
+  against the row above it (a leak made on purpose is caught); deck 9's stern leaked until the slopes' copy.
+- **On the promenade's deck** her lowest row is left off (a crop while she stands there): the user's call.
+- `boot`, `run_jump`, `stairs`, `ladder`, `trunk`, `lift`, `pool`, `promenade`, `cabin`, `linen`, `balcony`,
+  `falls`, `dash`, `golden`, `region4`, `region7`, `finale` pass. `tools/check_overlaps.py` listed 3: the pickups'
+  glint stars (since the glint's commit, where it was not run), now skipped by it (`spark`); then 0.
+

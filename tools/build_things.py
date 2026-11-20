@@ -43,6 +43,8 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # snack tube, massage gun and remote-controlled car; her diary. (Her bookmark in its book and
          # her plant are kept finished, mended by hand: the bookmark's cat head, the plant's stem.)
          "snack-tube": 6, "massage-gun": 16, "rc-car": 10, "diary": 13,
+         # Her other pickups (2026-11-20, part of 2.1): the grip socks, the stage manager's pills.
+         "grip-socks": 10, "pills-bottle": 12,
          # The breakfast round's tray, carried in both hands (the tray a hand's width).
          "breakfast-tray": 12,
          # Steps 1 to 4's pictures drawn in code, generated instead (the art rule looked back over,
@@ -61,7 +63,15 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
 # C", 2026-11-19): the world's sprite is the close-up shrunk, so the two are one picture.
 CLOSEUPS = SRC.parent / "closeups"
 FROM_CLOSEUP = {"tennis-ball": "ball", "feather-toy": "feather", "flag-ua": "flag", "snack-tube": "snack",
-                "massage-gun": "massage", "rc-car": "car", "diary": "diary"}
+                "massage-gun": "massage", "rc-car": "car", "diary": "diary", "grip-socks": "socks",
+                "pills-bottle": "pills"}
+# A slight outline round a picture, in one of its own darker colours (the user, 2026-11-20: the socks
+# and the pills, "give them a slight outline"): name -> its colour.
+OUTLINE = {"grip-socks": "cf657f", "pills-bottle": "cd683d"}
+# Pixels set by hand at the end (x, y in the finished sprite -> colour): the pills' label, a dark title
+# and two lines of print, as on its close-up; its top row the cap's white ridges, as on the close-up, and
+# its foot made even, a band of yellow and rounded corners (the user, 2026-11-20).
+MEND = {"pills-bottle": {(1, 7): "3e3546", (2, 7): "3e3546", (3, 7): "3e3546", (4, 7): "3e3546", (1, 9): "9babb2", (2, 9): "9babb2", (3, 9): "9babb2", (4, 9): "9babb2", (1, 11): "9babb2", (2, 11): "9babb2", (3, 11): "9babb2", (1, 0): "c7dcd0", (2, 0): "ffffff", (3, 0): "c7dcd0", (4, 0): "ffffff", (5, 0): "c7dcd0", (0, 12): "cd683d", (1, 12): "f9c22b", (1, 13): "cd683d"}}
 
 # Generated, paid for, and not used: the folded newspaper came drawn tilted, a smudge at the 3 px
 # of a paper on the carpet; the paper round's papers are drawn in code (the user, 2026-11-16).
@@ -84,6 +94,8 @@ RECOLOUR = {
     "flag-se": {"484a77": "4d65b4", "8fd3ff": "4d65b4", "d5e04b": "f9c22b", "a2a947": "f9c22b"},
     # The car's two rubbery wheels came a dull teal on the palette: its brightest cyans (the user: "cyan").
     "rc-car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
+    # The socks shrunk were all one pale pink, a blob on the gym's white wall: the stronger pink (the user).
+    "grip-socks": {"eaaded": "ed8099", "ed8099": "cf657f"},
 }
 # Rows taken out of a piece (its own rows, top to bottom, after trimming) rather than shrinking it,
 # which would blur its stripes: the old lady's parasol came as long as she is tall, open and furled.
@@ -97,7 +109,7 @@ CROP = {}
 # averaged with its dark outline came out dull (the Ukrainian flag had too, in the game since
 # step 4): the four other desk flags and hers (the art rule looked back over, 2026-11-17).
 BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-toy", "wool", "snack-tube",
-               "massage-gun", "rc-car", "diary"}
+               "massage-gun", "rc-car", "diary", "grip-socks", "pills-bottle"}
 # Shrunk keeping a thin white line that reads it, then outlined: the tennis ball's seam (by majority
 # it was lost, a plain yellow dot; the user: "has to look like a tennis ball", and chose an olive
 # outline, 2026-11-17). name -> the outline's colour.
@@ -212,7 +224,25 @@ def piece(path, name=None):
     # off what holds it.)
     if name in FROM_CLOSEUP:
         img = img.crop(img.getbbox())
+    if name in OUTLINE:
+        img = outlined(img, OUTLINE[name])
+    for (x, y), c in MEND.get(name, {}).items():
+        img.putpixel((x, y), tuple(bytes.fromhex(c)) + (255,))
     return img
+
+
+def outlined(img, colour):
+    """A one px ring round what is drawn, not on its corners."""
+    w, h = img.size
+    ring = Image.new("RGBA", (w + 2, h + 2), (0, 0, 0, 0))
+    ring.alpha_composite(img, (1, 1))
+    out, c = ring.copy(), tuple(bytes.fromhex(colour)) + (255,)
+    for y in range(h + 2):
+        for x in range(w + 2):
+            if not ring.getpixel((x, y))[3] and any(0 <= x + dx < w + 2 and 0 <= y + dy < h + 2 and ring.getpixel((x + dx, y + dy))[3]
+                                                    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                out.putpixel((x, y), c)
+    return out
 
 
 def build():

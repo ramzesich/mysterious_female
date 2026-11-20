@@ -533,7 +533,7 @@ export class Story {
             this.people.place(m);
             await w.wait(250);
             // The bottle crosses from her hands to his.
-            const bottle = s.add.image(her.x, her.y - 34, 'icon-pills').setDepth(s.DEPTH.player + 0.05);
+            const bottle = s.add.image(her.x, her.y - 34, 'things', 'pills-bottle').setDepth(s.DEPTH.player + 0.05);
             w.add([bottle]);
             sfx.give();
             await w.tween({ targets: bottle, x: m.x + m.dir * 10, y: m.y - 36, duration: 380, ease: 'Sine.easeInOut' });
