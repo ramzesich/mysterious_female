@@ -270,8 +270,10 @@ export class ShipScene extends Phaser.Scene {
                 const air = t.y !== this.deckFloors[deck];
                 const end = dx => shell(dx, 0) && !allCut.has(`${t.x + dx},${t.y}`);
                 const cover = cx => {
-                    this.plateTiles(endCover, cx, y, coverW, h);
-                    (this.endCovers ||= []).push({ x: cx, y, w: coverW, h });
+                    // (The lowest strip, over the floor, reaches `PLAYER.sink` into it: her feet hidden whole.)
+                    const hh = t.y + 1 === this.deckFloors[deck] ? h + PLAYER.sink : h;
+                    this.plateTiles(endCover, cx, y, coverW, hh);
+                    (this.endCovers ||= []).push({ x: cx, y, w: coverW, h: hh });
                 };
                 if (air && end(-1)) cover(x - coverW);
                 if (air && end(1)) cover(x + w);
@@ -287,6 +289,13 @@ export class ShipScene extends Phaser.Scene {
             for (const [x, y, w, h, c] of s.marks || []) g.fillStyle(colour(c), 1).fillRect(x, y, w, h);
             return { deck: s.deck, end: s.end, gfx: g, x0: Math.min(s.x0, s.x1), x1: Math.max(s.x0, s.x1), yTop: s.yTop, yFloor: s.yFloor };
         });
+        // Under each slope, the floor's own row of the side copied over it, `PLAYER.sink` tall: where the
+        // slope hides her (the stern terraces), her lowest row, drawn into the floor's row, is hidden too;
+        // the picture is the same pixels, so nothing else changes. It fades and stands as its slope does.
+        for (const q of this.shellSlopes.slice()) {
+            const foot = this.plateCopy(q.x0, q.yFloor, q.x1 - q.x0, PLAYER.sink, DEPTH.exterior);
+            this.shellSlopes.push({ deck: q.deck, end: q.end, gfx: foot, foot: true });
+        }
         // The shell's details (§5.3): windows, balconies, portholes, the funnel, the mast, the domes;
         // each on its deck's wall, fading with it, or always there ("fixed").
         for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
@@ -323,7 +332,7 @@ export class ShipScene extends Phaser.Scene {
             // A leaning railing reaches in over the deck, in front of her: she stands behind it, and
             // stops a little short of its foot (the user, 2026-11-06). An upright one, at deck 7's
             // ends, is in front of her too (the user, 2026-11-07).
-            railings.push(img.setDepth(DEPTH.player + 0.04));
+            railings.push(this.withFoot(img).setDepth(DEPTH.player + 0.04));
             // From outside, a leaning railing is behind its deck's wall: it shows only while she
             // is on its deck (in front of her, as above) or that deck is cut away (the user,
             // 2026-11-07).
@@ -581,6 +590,7 @@ export class ShipScene extends Phaser.Scene {
                     const piece = this.add.image(o.x, o.y - prop(o, 'dy', 0), 'shipart', prop(o, 'frame', ''))
                         .setOrigin(0.5, 1).setDepth(prop(o, 'front', false) ? DEPTH.player + 0.04 : DEPTH.decor + 0.1)
                         .setFlipX(prop(o, 'flip', false));
+                    if (prop(o, 'front', false) && prop(o, 'dy', 0) === 0) this.withFoot(piece);
                     this.worldLayer.add(piece);
                     // A piece in front of her under a deck's sloped front plate (the mooring deck's railing, which
                     // runs on to deck 7's wall): behind the plate while it is shown, in front of her once it is
@@ -690,7 +700,7 @@ export class ShipScene extends Phaser.Scene {
                     // A strip of plating over the wall's edge beside it, there only while she is on
                     // it, so nothing of her shows past the wall.
                     const end = prop(o, 'end', 'aft');
-                    const cover = this.plateCopy(end === 'aft' ? o.x - 16 : o.x + o.width, o.y - this.deckPitch + 16, 16, this.deckPitch - 16,
+                    const cover = this.plateCopy(end === 'aft' ? o.x - 16 : o.x + o.width, o.y - this.deckPitch + 16, 16, this.deckPitch - 16 + PLAYER.sink,
                         DEPTH.player + 0.05).setVisible(false);
                     (this.outdoors ||= []).push({ x0: o.x, x1: o.x + o.width, floor: o.y, cover });
                     // The sloped stern plating over it is drawn in front of her, and stays there at
@@ -710,7 +720,7 @@ export class ShipScene extends Phaser.Scene {
                     const g = this.add.graphics().setDepth(DEPTH.player + 0.04);
                     const top = prop(o, 'glass', 48);
                     g.fillStyle(0xbfe6f5, 0.45).fillRect(o.x, o.y - top, o.width, top - 24);
-                    g.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - 24, o.width, 24);
+                    g.fillStyle(0xe8eaec, 1).fillRect(o.x, o.y - 24, o.width, 24 + PLAYER.sink);
                     g.fillStyle(0xcd683d, 1).fillRect(o.x, o.y - top - 2, o.width, 2);
                     if (top > 48) g.fillStyle(0xffffff, 0.35).fillRect(o.x, o.y - top + 10, o.width, 1);
                     for (let x = o.x; x < o.x + o.width; x += 48) g.fillStyle(0xe8eaec, 1).fillRect(x, o.y - top - 2, 2, top - 22);
@@ -766,7 +776,7 @@ export class ShipScene extends Phaser.Scene {
                     // The ship's wall where a deck's indoors end at an open stretch of deck (§5.3):
                     // drawn over her as she passes straight through it, as if through a door hidden
                     // in it (the user: deck 7's front, 2026-11-03; deck 8's ends, 2026-11-06).
-                    this.plateCopy(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16, DEPTH.player + 0.06);
+                    this.plateCopy(o.x, o.y - this.deckPitch + 16, o.width, this.deckPitch - 16 + PLAYER.sink, DEPTH.player + 0.06);
                     // Some are locked (§6.1, `END_WALL_LOCKS`): the progression puts a barrier in them.
                     endWalls.push({ id: o.name, x0: o.x, x1: o.x + o.width, floor: o.y, lock: prop(o, 'lock', '') });
                     break;
@@ -915,7 +925,7 @@ export class ShipScene extends Phaser.Scene {
         // The enclosed ends: a white wall in front of her with large glassless openings.
         const OPEN_W = 80, PIER = 24, SILL = 30, LINTEL = 100;
         for (const [a, b] of enclosed) {
-            front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL);
+            front.fillStyle(0xe8eaec, 1).fillRect(a, floor - 128, b - a, 128 - LINTEL).fillRect(a, floor - SILL, b - a, SILL + PLAYER.sink);
             this.plateSeams(front, a, floor - 128, b - a, 128 - LINTEL);
             const n = Math.floor((b - a - PIER) / (OPEN_W + PIER));
             const pier = (b - a - n * OPEN_W) / (n + 1);
@@ -937,7 +947,7 @@ export class ShipScene extends Phaser.Scene {
         const ra = enclosed[0][1], rb = enclosed[enclosed.length - 1][0];
         front.fillStyle(0xffffff, 1);
         for (const y of [floor - 9, floor - 19]) front.fillRect(ra, y, rb - ra, 2);
-        for (let x = ra; x <= rb; x += 48) front.fillRect(x - 1, floor - 30, 3, 30);
+        for (let x = ra; x <= rb; x += 48) front.fillRect(x - 1, floor - 30, 3, 30 + PLAYER.sink);
         front.fillStyle(0xab947a, 1).fillRect(ra, floor - 31, rb - ra, 3);
         front.fillStyle(0x7f708a, 1).fillRect(ra, floor - 28, rb - ra, 1);
         // Life rings hung from the handrail between two posts, about every 12 m along the open
@@ -997,7 +1007,7 @@ export class ShipScene extends Phaser.Scene {
         const behindWall = add([6, 7], DEPTH.player + 0.29);
         for (const x of columns) {
             const g = enclosed.some(([a, b]) => x > a && x < b) ? behindWall : columnsGfx;
-            g.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang);
+            g.fillStyle(0xf7f8f8, 1).fillRect(x - 5, hang, 10, floor - hang + PLAYER.sink);
             g.fillStyle(0xd3e1da, 1).fillRect(x + 2, hang, 3, floor - hang);
             g.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
@@ -2467,9 +2477,9 @@ export class ShipScene extends Phaser.Scene {
         if (look.light) back.fillStyle(look.light, 1).fillRect(x0, y + 12, x1 - x0, 2);
         // The railing in front of it: glass panels between posts, a handrail along the top.
         const railTop = y - SIDEWALK.railHeight;
-        front.fillStyle(0x8fd3ff, 0.22).fillRect(x0, railTop, x1 - x0, SIDEWALK.railHeight);
+        front.fillStyle(0x8fd3ff, 0.22).fillRect(x0, railTop, x1 - x0, SIDEWALK.railHeight + PLAYER.sink);
         front.fillStyle(look.rail, 1).fillRect(x0, railTop, x1 - x0, 2);
-        for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight);
+        for (let px = x0; px <= x1; px += 40) front.fillStyle(look.post, 1).fillRect(px, railTop, 1, SIDEWALK.railHeight + PLAYER.sink);
 
         // The walkway itself: floor from above.
         const walk = { x0, x1, y, dropThrough, atrium: style === 'atrium' };
@@ -2577,7 +2587,7 @@ export class ShipScene extends Phaser.Scene {
         this.idleAt = 0;
         const p = this.physics.add.sprite(0, 0, 'her', this.herFrames.stand).setOrigin(0.5, 1).setDepth(DEPTH.player);
         p.body.setSize(PLAYER.bodyWidth, PLAYER.bodyHeight);
-        p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight);
+        this.herDrop(0, p);
         p.body.setMaxVelocity(10000, PLAYER.maxFall);
         this.worldLayer.add(p);
         this.player = p;
@@ -3583,6 +3593,13 @@ export class ShipScene extends Phaser.Scene {
             const depth = slope.always || shown(slope.deck) === 0 ? DEPTH.player + 0.04 : DEPTH.exterior - 0.01;
             if (img.depth !== depth) img.setDepth(depth);
         }
+        // On the promenade's deck (deck 6, outside) her lowest row is left off (the user, 2026-11-20: "Hide the
+        // bottom line of her feet on the promenade"): her picture cut that many rows short while she stands there.
+        const pr = this.promenade;
+        const onProm = !!pr && this.route === 'promenade' && Math.abs(p.y - pr.floor) < 2 && p.x >= pr.x0 && p.x <= pr.x1;
+        if (onProm) p.setCrop(0, 0, PLAYER.cell, PLAYER.cell - PLAYER.sink);
+        else if (this.promCrop) p.setCrop();
+        this.promCrop = onProm;
         this.updateDeckDim(dt);
     }
 
@@ -5196,11 +5213,30 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
-    // Her picture drawn `px` lower than her body (0: as always), its body kept where it is.
-    herDrop(px) {
-        const p = this.player;
-        p.setDisplayOrigin(p.width / 2, p.height - px);
-        p.body.setOffset((PLAYER.cell - PLAYER.bodyWidth) / 2, PLAYER.cell - PLAYER.bodyHeight - px);
+    // Something drawn in front of her that stands on her floor line (a railing, a fort, a bulwark's foot)
+    // reaches `PLAYER.sink` px lower, its bottom row drawn again: her picture is drawn that much lower than
+    // her foot, and where her feet are hidden behind it her lowest row must be too (the user, 2026-11-20).
+    // Its placement is kept: the picture grows downward only. For an image with its origin at its foot.
+    withFoot(img) {
+        const n = PLAYER.sink, f = img.frame;
+        if (!n) return img;
+        const key = `${img.texture.key}~${f.name}~foot`;
+        if (!this.textures.exists(key)) {
+            const c = this.textures.createCanvas(key, f.cutWidth, f.cutHeight + n), ctx = c.getContext(), src = f.source.image;
+            ctx.drawImage(src, f.cutX, f.cutY, f.cutWidth, f.cutHeight, 0, 0, f.cutWidth, f.cutHeight);
+            for (let k = 1; k <= n; k++) ctx.drawImage(src, f.cutX, f.cutY + f.cutHeight - 1, f.cutWidth, 1, 0, f.cutHeight - 1 + k, f.cutWidth, 1);
+            c.refresh();
+        }
+        const ox = img.originX;
+        return img.setTexture(key).setOrigin(ox, f.cutHeight / (f.cutHeight + n));
+    }
+
+    // Her picture drawn `px` lower than her body (0: as always, which is `PLAYER.sink` lower than its foot),
+    // its body kept where it is.
+    herDrop(px, p = this.player) {
+        const down = px + PLAYER.sink;
+        p.setDisplayOrigin(p.width / 2, p.height - down);
+        p.body.setOffset((PLAYER.cell - p.body.width) / 2, PLAYER.cell - p.body.height - down);
     }
 
     respawn(cleanup) {

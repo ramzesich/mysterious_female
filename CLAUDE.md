@@ -92,6 +92,9 @@ truth**: read the relevant section before any design or content work, and record
 
 ## Rules that are easy to break
 
+- **Her picture is drawn `PLAYER.sink` (1) px lower than her body's foot** (the user, 2026-11-20): anything new drawn
+  in front of her that stands on her floor line must reach that much lower too (`withFoot` for an image, a px
+  taller for graphics), or her lowest row shows under it; on the promenade's deck the row is left off.
 - Scale: one deck = 144px; she is 59px tall in an 84px cell, feet on the cell's bottom row. Every
   human-sized thing (doors, furniture, railings) is sized to her, never to the ship.
 - No death: failures are "scares" (run off, long fall out of frame, life ring overboard). Never use

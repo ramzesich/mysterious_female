@@ -484,7 +484,7 @@ export class World {
             g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - 48, gl.x1 - gl.x0, 40);
             g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - 36, gl.x1 - gl.x0, 1);
             g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 50, gl.x1 - gl.x0, 3);
-            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8);
+            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8 + PLAYER.sink);
         }
         for (const [deck, g] of Object.entries(fronts)) {
             this.add([g]);
@@ -606,7 +606,7 @@ export class World {
         for (const g of [back, front]) {
             const top = g === back ? f.y - 34 : f.y - 30;
             g.fillStyle(0xe8eaec, 1).fillRect(f.x0 + 14, top, f.x1 - f.x0 - 14, 2).fillRect(f.x0 + 14, top + 14, f.x1 - f.x0 - 14, 1);
-            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top);
+            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top + (g === front ? PLAYER.sink : 0));
         }
         this.add([back, front]);
         const walk = { x0, x1: f.x1, y: f.y, dropThrough: false };
@@ -869,6 +869,7 @@ export class World {
                 // on something, in front of her or behind.
                 const d = e.front ? D.player + 0.04 : e.back ? D.decor + 0.11 : depth - 0.02;
                 const img = this.image(e.x, e.y - (e.dy ?? 0), e.frame).setOrigin(0.5, 1).setDepth(d).setFlipX(!!e.flip).setAngle(e.angle ?? 0);
+                if (e.front && !e.dy) s.withFoot(img);
                 this.add([img]);
                 this.things.push({ ...e, items: [img], img });
                 break;
@@ -1072,7 +1073,7 @@ export class World {
                 const zone = s.add.zone(e.x, e.y - 30, e.x1 - e.x0, 98).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 this.low.push({ route: e.route, x0: e.x0 - 18, x1: e.x1 + 18, y: e.y });
-                const items = e.frame ? [this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04)] : [];
+                const items = e.frame ? [s.withFoot(this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04))] : [];
                 this.add(items);
                 const thing = { ...e, items, zone };
                 this.lows.push(thing);

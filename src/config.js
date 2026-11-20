@@ -8,6 +8,8 @@ export const VIEW = { width: 960, height: 540, zoom: 2 };
 export const PLAYER = {
     height: 59,           // the figure, feet to top of hair
     cell: 84,             // her sprite sheet's frame size; the feet sit on its bottom row
+    sink: 1,              // her picture drawn this many px lower than her body's foot, everywhere: her feet
+                          // a px into the floor line (the user, 2026-11-20); where she stands is unchanged
     bodyWidth: 14,
     bodyHeight: 56,
     runSpeed: 140,        // px/s

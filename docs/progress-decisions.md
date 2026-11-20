@@ -3576,3 +3576,24 @@ while the building session worked.
   actually see it in game": recordings of the game's own view from now on.
 - `boot`, `region1`, `region2`, `region8`, `golden` pass.
 
+## Her feet a pixel into the floor (the user, 2026-11-20)
+
+- **The user:** "shift Bumbusik down one pixel everywhere in the game ... update her default ground level", then
+  "leave the gags out of it", then "in some places where her feet should be obscured, the bottom line shows ...
+  fix that properly everywhere", then "Hide the bottom line of her feet on the promenade".
+- **Built:** `PLAYER.sink` (1): her picture drawn that much lower than her body's foot, by her display origin and
+  her body's offset together (`herDrop`, the crawl's offset), so where she stands, and every check of it, is
+  unchanged; in every look of hers (uniform, towel, with Bumbot), on stairs, ladders, crawling. Her gag clips
+  are left as they were.
+- **What hides her feet reaches a pixel lower too:** the decks' end railings, the props and pickups' fronts,
+  the forts, the ball pit's front (`withFoot`: the picture's bottom row drawn once more, its placement kept);
+  the balconies' fronts, the bulwarks, the promenade's sills, posts and columns, the side walks' railing, the
+  funnel top's front rail (graphics a px taller); the end walls' strips and the open decks' strip (plating a
+  px into the floor's row); under each sloped plate the side's own floor row copied in front of her (no pixel
+  changes from outside, checked). Found and checked in the running game: everything over her that ends on a
+  floor line listed, then at each kind of spot the screen with and without her compared on her lowest row
+  against the row above it (a leak made on purpose is caught); deck 9's stern leaked until the slopes' copy.
+- **On the promenade's deck** her lowest row is left off (a crop while she stands there): the user's call.
+- `boot`, `run_jump`, `stairs`, `ladder`, `trunk`, `lift`, `pool`, `promenade`, `cabin`, `linen`, `balcony`,
+  `falls`, `dash`, `golden`, `region4`, `region7`, `finale` pass; overlaps 0.
+
