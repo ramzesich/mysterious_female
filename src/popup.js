@@ -31,7 +31,7 @@ export class Popups {
     constructor(scene) {
         this.s = scene;
         this.L = scene.cache.json.get('popup-layout');
-        this.heads = scene.cache.json.get('heads') ?? {};
+        this.heads = frameHeads(scene, scene.cache.json.get('heads') ?? {});
         this.list = [];
         this.pixels = {};
         scene.events.on('postupdate', this.update, this);
@@ -358,6 +358,32 @@ class Popup {
             d.setPosition(Math.round(sx + (ex - sx) * f - d.width / 2), Math.round(sy + (ey - sy) * f - d.height / 2)).setVisible(true);
         });
     }
+}
+
+// `heads` (tools/build_heads.py, kept by clip: { sheet: { clip: [[x, y, top] | null, ...] } }) laid on
+// each sheet's frame numbers from its own data (`<sheet>-meta`; Bumbot's in her arms from her-cat's): a
+// clip added to a sheet moves nothing, and a clip remade with another count of frames is left out (no
+// head: the popup stands over where she is) until the tool is run again.
+function frameHeads(scene, byClip) {
+    const out = {};
+    for (const [sheet, clips] of Object.entries(byClip)) {
+        const meta = scene.cache.json.get(`${sheet === 'her-cat-bumbot' ? 'her-cat' : sheet}-meta`);
+        if (!meta) continue;
+        const anims = sheet === 'people'
+            ? Object.fromEntries(Object.entries(meta.people ?? {}).flatMap(([who, m]) => [
+                ...Object.entries(m.anims ?? {}).map(([c, v]) => [`${who}.${c}`, v]),
+                // (Their still poses, single frames outside the clips.)
+                ...['stand', 'front', 'back'].filter(k => Number.isInteger(m[k])).map(k => [`${who}.@${k}`, [m[k]]]),
+            ]))
+            : meta.anims ?? {};
+        const table = out[sheet] = {};
+        for (const [clip, row] of Object.entries(clips)) {
+            const frames = anims[clip];
+            if (!Array.isArray(frames) || frames.length !== row.length) continue;
+            frames.forEach((f, k) => { if (row[k]) table[f] = row[k]; });
+        }
+    }
+    return out;
 }
 
 // A frame sized along `axis` (1 across, 0 down) to at least `target` px by its band [c, c + p)
