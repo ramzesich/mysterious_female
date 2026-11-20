@@ -583,10 +583,10 @@ def scenario_intro(b):
     her = f"(p => ({{ x: p.x, left: p.flipX, walk: {S}.cache.json.get('her-meta').anims.walk.includes(p.frame.name), stand: p.frame.name === {S}.herFrames.stand, cam: {S}.cameras.main.midPoint.x }}))({S}.player)"
     at("walk", 0.4)
     w = b.eval(her)
-    ok &= check(w["left"] and w["walk"] and SPAWN_X - 72 < w["x"] < SPAWN_X - 10, "she walks a few steps to the left", w)
+    ok &= check(w["left"] and w["walk"] and SPAWN_X - 56 < w["x"] < SPAWN_X - 10, "she walks a few steps to the left", w)
     at("walk", 1)
     w = b.eval(her)
-    ok &= check(w["left"] and w["stand"] and abs(w["x"] - (SPAWN_X - 72)) < 1 and abs(w["cam"] - w["x"]) < 1,
+    ok &= check(w["left"] and w["stand"] and abs(w["x"] - (SPAWN_X - 56)) < 1 and abs(w["cam"] - w["x"]) < 1,
                 "and stops, the camera on her", w)
     clip, frames = b.eval(f"{S}.cache.json.get('her-meta').anims.badge"), set()
     for k in (0.1, 0.3, 0.5, 0.7, 0.9):
@@ -604,7 +604,7 @@ def scenario_intro(b):
     s = b.state()
     ok &= check(b.eval(f"{S}.mode") == "play" and b.eval(f"{S}.cameras.main.zoom") == 2 and b.eval(f"{S}.uiCam.visible && {S}.uiCam.alpha === 1"),
                 "the HUD comes up and the controls are hers", b.eval(f"{S}.mode"))
-    ok &= check(b.eval(f"{S}.route") == "inside" and abs(s["x"] - (SPAWN_X - 72)) < 2 and s["y"] == D3
+    ok &= check(b.eval(f"{S}.route") == "inside" and abs(s["x"] - (SPAWN_X - 56)) < 2 and s["y"] == D3
                 and b.eval(f"{S}.player.visible && {S}.player.alpha === 1 && {S}.player.flipX"),
                 "she stands in the corridor a few steps left of her door, turned to go on to the left", s)
     ok &= check(alert(b) == "← and → to move, Space to jump", "a word over her says how to move and jump", alert(b))
@@ -620,11 +620,10 @@ def scenario_intro(b):
     ok &= check(alert(b) == "← and → to move, Space to jump", "and back in the keys'", alert(b))
     wait(5.4)
     ok &= check(not alert(b), "it goes after a few seconds", alert(b))
-    hold_until(b, "right", lambda q: q["x"] >= SPAWN_X, timeout=3)
-    ok &= check(not alert(b), "nothing at her door yet", alert(b))
-    hold_until(b, "right", lambda q: q["x"] >= SPAWN_X + 20, timeout=3)
-    wait(0.1)
-    ok &= check(alert(b) == "E to interact", "past her door, a word over her says what E is for", alert(b))
+    hold_until(b, "right", lambda q: q["x"] >= SPAWN_X - 30, timeout=3)
+    ok &= check(not alert(b), "nothing short of her door", alert(b))
+    hold_until(b, "right", lambda q: q["x"] >= SPAWN_X - 12, timeout=3)
+    ok &= check(alert(b) == "E to interact" and b.state()["x"] < SPAWN_X, "at her door, a word over her says what E is for", (alert(b), b.state()["x"]))
     b.shot("intro-hint")
     wait(6.2)
     ok &= check(not alert(b), "the hint goes after a few seconds")

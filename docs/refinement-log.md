@@ -53,3 +53,14 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   new verb is used") and §6.1.3's "New ways to move" row ("how a verb is used is hers to find
   out") now say the opposite of the rule. "E to interact" is in the keys' words with a controller
   too.
+
+## Tuned in play (2026-11-20)
+
+- **The popups shorter:** 6 s, then 4 s ("a bit earlier"), then 3 s ("even a bit earlier"):
+  `HINT_MS` in `src/intro.js`, both hints.
+- **She stops earlier:** 56 px out of her door instead of 72 (about three steps, 1.3 s); the
+  notice board stays where it was moved, she stands between it and her door.
+- **"E to interact" in time:** it waited for her 16 px past her door's middle, and running she
+  was past the door by then ("with a slight delay"); now as she reaches it, her middle at its
+  near edge (`HINT_AT`, -14 px).
+- **Checked:** `intro` (the hint before she is at the door's middle) and `deck3` pass.

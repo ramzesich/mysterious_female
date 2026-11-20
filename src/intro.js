@@ -53,18 +53,19 @@ const MENU = { title: 178, first: 336, step: 90,
                sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
-const HINT_MS = 6000;             // how long a hint stays over her
-const HINT_PAST = 16;             // ...shown once she is this many px past her door's middle, going right
+const HINT_MS = 3000;             // how long a hint stays over her (6 s first, then 4; "even a bit earlier": the user, 2026-11-20)
+const HINT_AT = -14;              // "E to interact" as she reaches her door going right: her middle at its near edge
+                                  // (16 px past its middle first: she was past the door by then, the user)
 // Out of her door, walking straight to the left, a few steps (the user, 2026-11-20: "walk, not
-// run"; no stop facing us in the doorway): how far (72 px: she stops where the notice board hung,
-// the board moved left of her: tools/build_ship_map.py; clear of it in every frame); her pace (her walk clip's frames a
+// run"; no stop facing us in the doorway): how far (56 px, "a bit earlier" than the 72 where the
+// notice board hung: the board moved left of that, tools/build_ship_map.py); her pace (her walk clip's frames a
 // second, and the px a second its planted foot slides back at that rate: about 4.4 px a frame);
 // the clip's frames where a foot comes down (a footstep); when the door shuts behind her (until
 // then its open leaf, swung toward us, is drawn over her, and she steps out past its edge: `leaf`,
 // the first of the open door's columns that are the leaf, the ones before it the jamb and the
 // light in the gap, which she is in front of); and how long she stands still facing left before
 // she turns to us. The part `walk` is her walk and that stop.
-const WALK = { px: 72, speed: 44, fps: 10, steps: [3, 7], shut: 0.65, leaf: 6, stop: 0.25 };
+const WALK = { px: 56, speed: 44, fps: 10, steps: [3, 7], shut: 0.65, leaf: 6, stop: 0.25 };
 WALK.secs = WALK.px / WALK.speed;
 PARTS.full.find(q => q[0] === 'walk')[1] = WALK.secs + WALK.stop;
 const SUN_UP = 365;               // the sun over the horizon, in screen px of the wide view
@@ -518,7 +519,7 @@ export class Intro {
         // she walks past her cabin's door in the corridor (the user, 2026-11-20; she is handed over
         // a few steps to the left of it); it takes the bubble over if the first is still up.
         if (this.full) {
-            const past = this.door().x + HINT_PAST;
+            const past = this.door().x + HINT_AT;
             const moveText = () => t(s.controls.device === 'pad' ? 'hint.move.pad' : 'hint.move');
             let move = null, moveUntil = 0, doorDone = false;
             s.time.delayedCall(through ? 700 : 250, () => {
