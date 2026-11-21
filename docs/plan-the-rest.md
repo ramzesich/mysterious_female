@@ -958,8 +958,9 @@ up in one hand like a microphone. **His uniform is the real ship's waiters', not
 session first wrote the cast's `waiter` (a white jacket, black trousers) as the model; the user, 2026-11-21: "No, that
 uniform doesn't match. Don't reference him." So the cast's `waiter` is not his model, in look or as a style reference.
 What the real uniform is, is not settled: a web search and the user's photo of the café (no crew in it) did not show
-it, and one careers site's line (a white long-sleeved shirt, black trousers, a yellow tie) is unconfirmed. **The user
-is asked for its colours and pieces before his character is generated;** the tries are shown as always. `python tools/check_people.py --heads washie` before any clip. His clips: `sing` (his loop: he sways from
+it, and one careers site's line (a white long-sleeved shirt, black trousers, a yellow tie) is unconfirmed. **It is
+decided with the user at the build** (the user, 2026-11-21: "We'll decide on the uniform look when building"): the
+building session asks before his character is generated and shows the tries as always. `python tools/check_people.py --heads washie` before any clip. His clips: `sing` (his loop: he sways from
 foot to foot and sings into the bottle), `squirt` (the arm out, two squeezes), `wiggle` (the duet's "happy, happy"),
 `wash` (he catches a tangerine, squirts it, polishes it on his sleeve and tosses it: the fruit in his fist until the
 frame the hand opens, then the game's). Hers: one clip, facing him: her hands held out, rubbed, then the same wiggle
