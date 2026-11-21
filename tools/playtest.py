@@ -4624,6 +4624,39 @@ def scenario_region8__tshirt(b):
     return ok
 
 
+def scenario_region8__handheld(b):
+    """His handheld (§4 2.1, thing 15; deck 12, Champs): not on the sofa before the table scene; after it, on the left
+    seat cushion of the sofa in the aft high table's place (the user's), and E takes it, a thing of his. Champs as the
+    user set it, 2026-11-21: the bigger bar with its right end where the old one's was, the sofa under the aft windows,
+    the two seated fans at the bar's two ends."""
+    S = "window.__ship"
+    item = f"{S}.world.things.find(t => t.id === 'keep_handheld')"
+    pieces = ("JSON.stringify((() => { const out = {}; const walk = l => { for (const o of l) { if (o.list) walk(o.list);"
+              " const f = o.frame?.name; if (typeof f === 'string' && /^(champs-bar-long|sofa-champs)-/.test(f) && o.visible) {"
+              " const r = o.getBounds(); out[f] = [Math.round(r.x), Math.round(r.right), Math.round(r.bottom)]; } } };"
+              f" walk({S}.children.list); return out; }})())")
+    b.open("?reset&play&at=deck12")
+    wait(0.4)
+    ok = check(not b.eval(f"!!({item}?.pick?.visible)"), "before the table scene: no handheld on the sofa")
+    got = json.loads(b.eval(pieces))
+    ok &= check(got.get("champs-bar-long-w20", [0, 0])[1] == 4956 and got.get("sofa-champs-w20", [0])[0] == 5156,
+                "the bigger bar's right end where the old one's was; the sofa under the aft windows", got)
+    fans = json.loads(b.eval(f"JSON.stringify(['amb_champs_c', 'amb_champs_d'].map(id => {{ const p = {S}.world.people.byId[id]; return p ? [Math.round(p.sprite.x), p.sprite.flipX] : null; }}))"))
+    ok &= check(fans == [[4972, True], [4832, False]] and not b.eval(f"!!{S}.world.people.byId.amb_champs_a"),
+                "the seated fans at the bar's two ends, facing it; the fan in stripes gone", fans)
+    b.open("?reset&play&at=deck12&did=table")
+    wait(0.4)
+    pick = b.eval(f"[{item}.pick.visible, {item}.pick.x, {item}.pick.y]")
+    ok &= check(pick == [True, exact_x(97.9167), D12 - 18], "after it: on the sofa's left seat cushion", pick)
+    b.close_up("handheld-sofa", exact_x(98.3), D12 - 24, 120, 60, 5)
+    b.teleport(exact_x(97.9167), D12)
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:him:handheld" in b.eval(f"{S}.save.keeps"), "E takes it, his", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
 def scenario_region9(b):
     """Region 9 (docs/build-plan.md, step 9): the wedding at Champs' door, the cake from Cagney's
     (it sways and goes over; carried steadily it arrives), the party into the chapel and the

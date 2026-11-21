@@ -768,7 +768,11 @@ inside; 72 `cp_chapel`; `blk_wedding`: the planner at 76, four guests at 70-80 a
 | 76 | `npc_planner` | The wedding planner with a clipboard | `static`; bubble (a cake) within 4 m; E with the cake box: `scn_wedding` | Idle, clipboard |
 | 70-80 | `amb_wedding_guests` | Four guests chatting across the lobby | A block until `scn_wedding` | Shared bodies |
 
-**Champs Bar 82-102.** `amb_champs` three at the TVs; the midship lobby 102-110 with `blk_paint` on
+**Champs Bar 82-102.** `amb_champs` at the TVs: the fan with the foam finger (94.79), and two seated at the bar's two
+ends facing it (`amb_champs_c` 93.58 with his wings and his cheer, `amb_champs_d` 90.67 with a pint, a still; the fan in
+stripes gone); the bar bigger (`champs-bar-long`, its right end at 4955 px as the old one's); a sofa under the aft
+windows (98.3, `sofa-champs`, in the aft high table's place); **`keep_handheld` at 97.92**, his handheld (15) on its
+left seat cushion, `pickup` after the table scene (`flag:table`); E; its close-up (the user, 2026-11-21); the midship lobby 102-110 with `blk_paint` on
 the 11-12 flight (the painter, "WET PAINT").
 
 **The sun deck 110-146 (the side walk over the pools).**

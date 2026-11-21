@@ -3839,3 +3839,32 @@ valuable."
   onto deck 9 from the next balcony, the cut at the partition, the mask on the slats, E takes it); `region7`,
   `region4`, `mishaps`, `boot` pass; `check_overlaps` 0 (it skips the side's copied tiles: plating, not things).
   Generations: 4.
+
+
+## §4 2.1, thing 15: his handheld on a new sofa in Champs; Champs remade round it (the user, 2026-11-21)
+
+- **Champs had no sofa** (the plan's "on a sofa"): a new one, generated (try 3 of four, front view, dark brown leather),
+  in its own colours lightened 1.9 times (the user's tone 4; on the palette the brown went mauve), **in the aft high
+  table's place** under the aft windows; the table, its stools and the wings gone. The seated cheering fan moved to the
+  bar's aft end facing it, on his own stool (that end's bar stool gone); both fans 15 px forward and 2 px down (the user).
+- **The bar bigger** (the user, its right end where it was): the first four tries were "neither ... A bar from a cruise
+  ship"; the real Champs Bar's photos (cruisedeckplans.com) showed honey teak under a pale top; try 7 of the second four
+  (vertical honey slats, a white top, its own tap and two glasses), 109 x 49 at its own size, its right end at 4955 px.
+  Its beer pint and its forward stool gone.
+- **The fan in stripes** standing by that stool gone; **a second seated fan** at the bar's forward end facing it: an edit
+  of the first fan's frame, "a different person in exactly the same pose" (try 2 of three, a blonde woman in a blue
+  jersey with a pint; 5 generations each), a still.
+- **The handheld** (his ROG Xbox Ally X, from the user's photos, every logo painted out before sending): from text,
+  "neither"; from the photo, try 1 chosen, then "too rough ... compared to other close ups": **the close-up is a pro
+  redraw** (`image_to_pixelart_pro_flash`). The world picture: the converter at 16 px gave blobs, the photo shrunk a
+  brick ("Handhelds are really broken ... How do we do it correctly?"): a clean front view first (a pro redraw of the
+  front photo), then a 24 x 11 built feature by feature (outline, the screen in its bezel, the sticks' RGB rings, the
+  d-pad, the face buttons, a lit top edge); **the user then edited it in Paint** (`assets/source/things/handheld-by-hand.png`,
+  white its ground; never written by a tool, read by `BY_HAND` in `tools/build_things.py`). On the sofa's left seat
+  cushion, only after the table scene.
+- Built: `sofa-champs` and `champs-bar-long` (`tools/build_ship_art.py`, `OWN`, `BRIGHTEN`), placed in
+  `tools/build_ship_map.py`; `champs_d` (`tools/cast.py`, `BY_HAND` in `tools/fetch_people.py`; its tries in
+  `champs_d-raw/`: a folder beside `stand.png` is read as a clip); `keep_handheld`; the fans in `tools/population.py`.
+  Test `region8.handheld` (absent before the table scene, the bar's right end and the sofa in place, the fans at the bar's
+  ends, the handheld on the seat, E takes it); `region8`, `region9`, `boot` pass; `check_overlaps` 0. Generations: about
+  58 (the sofa 4, the bars 8, the handheld 31, the fans 15).

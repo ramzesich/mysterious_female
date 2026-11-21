@@ -46,7 +46,9 @@ def fetch(name, facing="east"):
 # assets/source/people/steward-raw/README.md.)
 BY_HAND = {"dog", "dogowner", "steward",
            # (The theatre's audience, 2026-11-19: in the one theatre seat, `assets/source/people/audience-seated/`.)
-           "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny"}
+           "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny",
+           # (Champs' second seated fan, an edit of the first's frame, 2026-11-21.)
+           "champs_d"}
 
 
 def main():

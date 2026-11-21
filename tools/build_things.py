@@ -129,6 +129,15 @@ SEAM = {"tennis-ball": "a2a947"}
 # choice), its purples set to the close-up's navies by lightness, 20 x 12 (the user, 2026-11-21: "Better"); not the
 # close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
 OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask"}
+# Pictures the user drew by hand in Paint, on a white ground (white is empty): name -> its file's stem. **Never written
+# by a tool** (CLAUDE.md): his handheld (15), the user's own pixel edit of my 24 x 11, 2026-11-21.
+BY_HAND = {"handheld": "handheld-by-hand"}
+
+
+def by_hand(path):
+    img = Image.open(path).convert("RGBA")
+    img.putdata([(0, 0, 0, 0) if p[:3] == (255, 255, 255) else p for p in img.get_flattened_data()])
+    return img.crop(img.getbbox())
 
 
 def seam_shrink(img, n, outline):
@@ -261,7 +270,8 @@ def outlined(img, colour):
 
 
 def build():
-    pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP]
+    pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP and p.stem not in BY_HAND.values()]
+    pieces += [(name, by_hand(SRC / f"{stem}.png")) for name, stem in BY_HAND.items()]
     pieces += [(name, piece(CLOSEUPS / f"{src}.png", name)) for name, src in FROM_CLOSEUP.items()]
     pieces.sort(key=lambda t: t[0])
     width = sum(im.width + 2 for _, im in pieces)

@@ -218,6 +218,9 @@ CAST = {
     "champs_a": ("0f1e2f4d-b920-48a0-af67-78c769d69054", {}, {}),
     "champs_b": ("3d41e4f4-0058-47d8-bf6a-03c3e82226b4", {}, {}),
     "champs_c": ("65193a43-d567-4270-85ef-74b2632f7861", {"cheer": 8}, {"scale": 0.8}),
+    # (A second seated fan, an edit of champs_c's first frame, "a different person in exactly the same pose" on his
+    # stool (edit_image_pro_flash 0d2de307-d910-5109-955a-c851f27158f2, try 2 of three; `champs_d/tries/`); a still.)
+    "champs_d": ("0d2de307-d910-5109-955a-c851f27158f2", {}, {"scale": 0.8}),
     "cagneys_her": ("c3fb03be-54f7-4b0e-aade-1d7134d3b66f", {}, {"scale": 0.8}),
     "cagneys_him": ("cbf3d679-01a3-4ab8-9be2-b4c56be18426", {}, {"scale": 0.8}),
     "sushi_a": ("ab3f381b-f5ba-4c2b-8568-a20a81ed36f3", {}, {"scale": 0.8}),

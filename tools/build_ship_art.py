@@ -76,6 +76,10 @@ MUTE_W20 = 0.20
 # A piece's washed twins (-bg, -w20, -lt) darkened, every colour times this (their own hues kept; the palette's darker
 # greys came out purple): the sun deck's lounger, "a bit darker" (the user, 2026-11-21).
 SHADE = {"sunlounger-long": 0.7}
+# Pieces kept off the palette (on it Champs' brown leather went a grey mauve, and lighter a pink), and pieces made
+# lighter before their twins, every colour times this (the sofa: "make it lighter", the user, 2026-11-21).
+OWN = {"sofa-champs"}
+BRIGHTEN = {"sofa-champs": 1.9}
 RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
 # The fitness centre's machines too (the user, 2026-11-20: "too washed out ... only slightly washed out, like
@@ -185,6 +189,12 @@ for i, name in enumerate(TALL_1):
 PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
 # Deck 12's sun deck lounger (the user, 2026-11-21): a generated piece at its own size (`sunlounger-long/README.md`).
 PIECES["sunlounger-long"] = ("sunlounger-long", 0, None, {})
+# Champs Bar's sofa (deck 12, in the aft high table's place; his handheld, 15, on it): try 3 of four at its own size,
+# in its own brown made lighter (`OWN`, `BRIGHTEN`: the user's 4 of four, 2026-11-21; `sofa-champs/README.md`).
+PIECES["sofa-champs"] = ("sofa-champs", 0, None, {})
+# Champs Bar's counter, bigger (the user: "the bar prop itself must be larger", its right end where it was), after the
+# real Champs Bar's honey teak front: try 3 of the second four, at its own size (`champs-bar-long/README.md`).
+PIECES["champs-bar-long"] = ("champs-bar-long", 0, None, {})
 # (The empty seat and the ten people in it keep their 80 px canvas, `whole`: the seat at the same spot in each,
 # where the audience's people sit in theirs; `audience/`: edits of the five into ten others, 2026-11-19.)
 PIECES["theatre-seat-side"] = ("theatre-seat-side", 0, None, {"whole": (18, 62)})
@@ -548,7 +558,12 @@ def build():
             img = fit(img, *size, lever=opts.get("lever"))
         if opts.get("height"):
             img = shrink(img, opts["height"])
-        img = palettize(img)
+        if name not in OWN:
+            img = palettize(img)
+        if name in BRIGHTEN:
+            k = BRIGHTEN[name]
+            img.putdata([(min(255, round(r * k)), min(255, round(g * k)), min(255, round(b * k)), a)
+                         for r, g, b, a in img.get_flattened_data()])
         for x0, y0, x1, y1, colour in opts.get("paint", ()):
             img.paste(colour, (x0, y0, x1 + 1, y1 + 1))
         if name in RECOLOUR:

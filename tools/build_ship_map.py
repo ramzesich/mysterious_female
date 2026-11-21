@@ -1882,12 +1882,13 @@ def build_objects():
     for a, b in ((86.2, 90.4), (95.6, 101.0)):
         add(area(f"champs-windows-{a}", "decor", exact_x(a), floor_y(12) - 104, exact_x(b) - exact_x(a), 56,
                  [prop("kind", "bridgewindows")]))
-    for m, top in ((88.3, "beer-pint-bg"), (98.3, "chicken-wings-bg")):
-        around(12, m, "bar-table-bg", "champs-stool-bg", on_top=top)
-    at12(92.6, "champs-bar")
-    at12(92.6, "beer-pint", height("champs-bar-bg"))
-    at12(91.3, "champs-stool")
-    at12(93.9, "champs-stool", flip=True)
+    around(12, 88.3, "bar-table-bg", "champs-stool-bg", on_top="beer-pint-bg")
+    # (The aft high table gave way to a sofa, his handheld on it (§4 2.1, 15; the user, 2026-11-21), a px into the
+    # floor; its fan moved to the bar's aft end on his own stool, so the bar's stool there is gone.)
+    at12(98.3, "sofa-champs", -1)
+    # (The bar bigger, its right end where the old one's was, 4955 px; its own tap and glasses on it. Its forward stool
+    # and the fan standing there gave way to a seated fan of the people's: the user, 2026-11-21.)
+    put(12, 0, "champs-bar-long-bg", x=4901)
     at12(91.9, "sports-tv", 70)
     at12(93.9, "sports-tv", 70)
     decor("downlights-12-champs", "downlights", x_of(82), x_of(102), deck=12)

@@ -217,6 +217,9 @@ ITEMS = {
     # on deck 10's first balcony (`BALCONY_SET`; the plan's §7f P3, the row's forward end), pressed a little into
     # them: only after the table scene. Its world picture is its close-up shrunk by hand, outlined, with its tabs.
     "keep_sleepmask": ("b10", 64.417, "keep:him:sleepmask", "flag:table", 12, "thing:sleepmask"),
+    # His handheld (15), on the left seat cushion of Champs' new sofa (deck 12, in the aft high table's place): only
+    # after the table scene. Its close-up a pro redraw of his model's photo; its world picture the user's own pixels.
+    "keep_handheld": (12, 97.9167, "keep:him:handheld", "flag:table", 18, "thing:handheld"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
@@ -433,9 +436,13 @@ PEOPLE = {
     # the engineer at the technical ladder's foot, and on the funnel's top once he has had his
     # coffee (by the cord until the horn, reading after); the restaurants' people; the fans in the
     # Sports Bar once they are off the stairs.
-    "amb_champs_a": dict(at=(12, 90.3), who="champs_a", pose="back", layer="back"),
-    "amb_champs_b": dict(at=(12, 95.1), who="champs_b", pose="back", layer="back"),
-    "amb_champs_c": dict(at=(12, 97.88), who="champs_c", face=1, idle="cheer", layer="back"),
+    # (The fan in stripes standing at the bar's forward stool gave way to a seated fan at the bar's forward end, facing it:
+    # the user, 2026-11-21, when the bar grew.)
+    "amb_champs_d": dict(at=(12, 90.6667), who="champs_d", face=1, layer="back", dy=-2),
+    # (The two fans 15 px forward and 2 px down, the seated one at the bar's aft end facing it, off the high table that
+    # gave way to the sofa: the user, 2026-11-21.)
+    "amb_champs_b": dict(at=(12, 94.7917), who="champs_b", pose="back", layer="back", dy=-2),
+    "amb_champs_c": dict(at=(12, 93.5833), who="champs_c", face=-1, idle="cheer", layer="back", dy=-2),
     "npc_oldlady": dict(at=(12, 128.5), who="oldlady", face=1, idle="read", until="flag:horn", dy=11,
                         bubble=("cocktail", "!flag:lady", None, 3.4)),
     "riv_sundeck": dict(at=(12, 134.75), who="rival", face=1, idle="peek", until="flag:horn"),
