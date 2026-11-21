@@ -288,7 +288,7 @@ export const MISHAP_SCENES = {
     '13b': { word: 'bonked', react: 'stumble', down: 'belly' },     // it catches her past it. **Unreachable**: the door hits her only facing it (`SwingDoor`); kept (the user, 2026-11-19, §3 1.3)
     '14a': { word: 'bonked', react: 'reel', down: 'sit', gag: 'ballBack' },     // a basketball in her face: stiff as a skittle onto her back
     '14b': { word: 'bonked', react: 'stumble', down: 'belly', gag: 'ballFront' },  // on the back of her head: stiff as a plank onto her face
-    '15': { word: 'bumped', react: 'duck', down: 'sit', gag: 'boat' },  // the drill's boat on her head: stiff onto her back, 14a's
+    '15': { word: 'bonked', react: 'duck', down: 'sit', gag: 'boat' },  // the drill's boat on her head ("Ouch!", the user, 2026-11-21): on all fours, she crawls out
     '16': { word: 'drenched', react: 'shiver', gag: 'sprinkler' },  // a sprinkler: soaked, a sneeze, she squelches back (`Sprinkler.ride`); whatever she carries (the user, 2026-11-18: "the wet gag regardless of the tangerines")
     '17': { word: 'fogged', react: 'splutter', gag: 'steam' },    // the sauna's steam: out of the cloud with her hair a huge puff, she fans herself and swoons (`Steam.ride`)
     '18': { word: 'buried', react: 'reel', down: 'sit', gag: 'towels' },  // the towel stack: its own clip with her (`thingGag`)
@@ -359,9 +359,14 @@ export const GAGS = {
     // (`drop`: hit in the air, she stops there and drops straight down; the gag where she lands.)
     ballBack: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true, sounds: STIFF('headBonk', 'gags-ball-back') },
     ballFront: { clips: 'gags-ball-front', jog: true, meta: 'ball', at: 'front', lie: 'gags-ball-front-lie', holdMs: 1700, drop: true, sounds: STIFF('headBonk', 'gags-ball-front') },
-    // The drill's boat (15; the user, 2026-11-19: "lying flat on her back, like the basketball case"): 14a's clips, the
-    // boat stopped where its keel met her head (`DrillBoat`) while she lies under it.
-    boat: { clips: 'gags-ball-back', jog: true, meta: 'ball', at: 'back', lie: 'gags-ball-back-lie', holdMs: 1700, drop: true, sounds: STIFF('boatThump', 'gags-ball-back') },
+    // The drill's boat (15; the user, 2026-11-21, in place of 14a's fall of 2026-11-19): bumped on the head, she sinks onto
+    // all fours, dizzy, the butterflies over her head, and crawls out from under it the way she was facing (`crawl`, px
+    // a second, at her crawl clip's pace), the boat resting just over her back (`DRILL.pinPx`); then `holdMs`, her
+    // checkpoint (the ship scene's `crawlGag`, `assets/sprites/drill.png`).
+    // (`crawlMs`: she crawls no longer than this, as short as the other gags: the user, 2026-11-21, "the time she takes to
+    // crouch away is too long. Other gags are ended earlier".)
+    // ("Don't stop her crouch until the screen fades away completely": she crawls on through the fade.)
+    boat: { crawl: 45, crawlMs: 1200, drop: true, sounds: { 'drill-drop': { 1: 'boatThump' } } },
     // The breakfast stewardess's tray (10a, 10b; `fallGag`, her alone where she stands, the world's
     // stewardess and dropped tray staying), only when the stewardess had a tray in her hands (`tray`;
     // else the built fall stands in). 10a: she runs into it, reels and sits, the toast on her head
@@ -435,7 +440,7 @@ export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, near
 // once she is nearer than `nearK` of that, and not for `lullMs` after it is hoisted (her way through). On her,
 // it comes down over her lying (stiff on her back, 15) as far as on the bare walkway (`pinPx` higher: none, the
 // user: "the first gif had the boat at a lower level") and stays down until she is back at her checkpoint.
-export const DRILL = { lowerS: 1.1, hoistS: 1.6, lullMs: 1500, nearK: 0.6, inPx: 64, pinPx: 0 };
+export const DRILL = { lowerS: 1.1, hoistS: 1.6, lullMs: 1500, nearK: 0.6, inPx: 64, pinPx: 26 };
 
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
 // hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken

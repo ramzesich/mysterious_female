@@ -82,6 +82,9 @@ export class BootScene extends Phaser.Scene {
         }
         this.load.atlas('reading', 'assets/sprites/reading.png', 'assets/sprites/reading.json');
         this.load.json('reading-meta', 'assets/sprites/reading.json');
+        // The boat drill's own clips (tools/build_drill.py): the crewman turning his winch; her gag under the boat.
+        this.load.spritesheet('drill', 'assets/sprites/drill.png', { frameWidth: 96, frameHeight: 96 });
+        this.load.json('drill-meta', 'assets/sprites/drill.json');
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
         // The sky's art (tools/build_sky.py): the intro's clouds and sun, where they stand, the god
@@ -287,6 +290,11 @@ export class BootScene extends Phaser.Scene {
             this.anims.create({ key: `gags-${k}-wheel`, frames: gf(k, 5, 9), frameRate: 9, repeat: -1 });
         }
         this.anims.create({ key: 'gags-chair', frames: gf('chair-collapse', 1), frameRate: 10 });
+        // (15: her drop under the drill's boat, from her run (its frame 0, left out), then her crawl on all fours.)
+        const dm = this.cache.json.get('drill-meta');
+        // (Quick, the user, 2026-11-21: "now there is a delay": from its third frame, at 20 a second.)
+        this.anims.create({ key: 'drill-drop', frames: dm.drop.slice(2).map(f => ({ key: 'drill', frame: f })), frameRate: 20 });
+        this.anims.create({ key: 'drill-crawl', frames: dm.crawl.map(f => ({ key: 'drill', frame: f })), frameRate: 10, repeat: -1 });
         // (7a: the trip and the dive quick, 240 ms from the hit to her landing on the chair (the user: "reduce the delay"); the rest at 10 a second.)
         this.anims.create({ key: 'gags-sledge', frames: gf('chair-sledge', 1, undefined, i => [40, 40, 50, 50, 60][i] ?? 100), frameRate: 10 });
         this.anims.create({ key: 'gags-jog-bowled', frames: gf('jog-bowled', 1), frameRate: 14 });

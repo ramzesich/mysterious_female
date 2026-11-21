@@ -4109,7 +4109,7 @@ def scenario_region7(b):
     b.key("up", False)
     ok &= check(b.state()["y"] == D8, "and up a white column again, kick after kick", b.state())
     # The drill: just hoisted, she runs under it (the lull); running at it after, she sets it off and it
-    # comes down on her well under it (15: stiff on her back, the boat down over her); and the security
+    # comes down on her well under it (15: on all fours, the boat down to her back, she crawls out); and the security
     # officer at the tender.
     d = js(b, f"{W}.data.drill")
     DR = f"{W}.story.drill"
@@ -4124,13 +4124,17 @@ def scenario_region7(b):
     wait_js(b, f"(a => a.idle && a.t > 8.3 && a.t < 8.6)({DR}.at(window.__ship.time.now))", 12)
     b.key("right", True)
     told = wait_js(b, f"{DR}.at(window.__ship.time.now).tell", 3)
-    got = scared(b, "Oops", 3.0)
+    got = scared(b, "Ouch", 3.0)
     b.key("right", False)
     s = b.state()
     ok &= check(told and got and d["x"] + 40 < s["x"] < d["x"] + 212, "running at it, she sets it off: the lamp, and it comes down on her under it", (told, got, s, d))
-    ok &= check(wait_js(b, f"{DR}.boat.y === {DR}.low && {DR}.pinned && window.__ship.mode === 'scripted'", 3),
-                "flat on her back, the boat down over her", js(b, f"[{DR}.boat.y, {DR}.low, {DR}.pinned]"))
+    # (15 since 2026-11-21, the user: she sinks onto all fours, the boat down to her back, and crawls out from under it.)
+    DG = "window.__ship.worldLayer.list.find(o => o.texture && o.texture.key === 'drill' && o.anims && o.anims.currentAnim && o.visible)"
+    ok &= check(wait_js(b, f"{DR}.boat.y === {DR}.low - 26 && {DR}.pinned && window.__ship.mode === 'scripted'", 3),
+                "on all fours, the boat down to her back", js(b, f"[{DR}.boat.y, {DR}.low, {DR}.pinned]"))
     b.shot("region7-drill")
+    ok &= check(wait_js(b, f"(g => g && g.anims.currentAnim.key === 'drill-crawl' && g.x > {s['x']} + 30)({DG})", 4),
+                "and she crawls away on all fours the way she was facing", js(b, f"(g => g && [g.anims.currentAnim.key, g.x])({DG})"))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
     ok &= check(route(b) == "promenade", "(she comes to outside)", (route(b), s))
     rv = person(b, "riv_walkway")
@@ -5418,12 +5422,12 @@ WATCH = ("(() => { const S = window.__ship; window.__clips = []; window.__respaw
          " if (window.__watching) return; window.__watching = true;"
          " const A = Phaser.Animations.AnimationState.prototype, play = A.play;"
          " A.play = function (key, ...rest) { const k = typeof key === 'string' ? key : key?.key;"
-         " if (/^(gags?|towels)-/.test(k || '')) window.__clips.push(k); return play.call(this, key, ...rest); };"
+         " if (/^(gags?|towels|drill)-/.test(k || '')) window.__clips.push(k); return play.call(this, key, ...rest); };"
          " const r = S.respawn; S.respawn = function (...a) { window.__respawns++; return r.apply(this, a); };"
          " const h = S.scareContact; S.scareContact = function (x, w, o) { const id = h.call(this, x, w, o);"
          " window.__hits.push([w, id, this.mode, Math.round(this.time.now)]); return id; }; })()")
 # (A gag of hers, as against the world's own clips: a door's swing, the towels' fall.)
-HER_GAG = r"^(gag-|gags-(jog|ball|tray|sprinkler|dnd|gull|chair|steam|flare|stairs|parasol|door-(squash|slide))|towels-(run|bury))"
+HER_GAG = r"^(gag-|gags-(jog|ball|tray|sprinkler|dnd|gull|chair|steam|flare|stairs|parasol|door-(squash|slide))|towels-(run|bury)|drill-(drop|crawl))"
 
 
 def mishap_hit(b, label, n, act, want, clip, within=4.0, fresh=None):
@@ -5603,7 +5607,7 @@ def scenario_mishaps__things(b):
     SP = f"{MS}.world.movers.filter(m => m.constructor.name === 'Sprinkler').sort((a, c) => Math.abs(a.def.x - {MS}.player.x) - Math.abs(c.def.x - {MS}.player.x))[0]"
     rain = lambda: wait_js(b, f"(m => m.phase({MS}.time.now) === 'on')({SP})", 14)
     ok &= both(b, "the room-service tray (3)", want="3", **run("trays10", "right"), clip="^gags-tray-ride", within=6)
-    ok &= both(b, "the drill's boat (15)", want="15", **run("drill7", "right", "&cards=all", lull), clip="^gags-ball-back", within=8)
+    ok &= both(b, "the drill's boat (15)", want="15", **run("drill7", "right", "&cards=all", lull), clip="^drill-drop", within=8)
     ok &= both(b, "deck 9's sprinkler (16)", want="16", **run("sprinkler9", "right", first=rain), clip="^gags-sprinkler", within=8)
     ok &= both(b, "the towel stack (18)", want="18", **run("towels9", "left"), clip="^towels-(run|bury)", within=6)
     return ok

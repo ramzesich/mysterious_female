@@ -420,7 +420,7 @@ def build_world():
                    lines=[dict(id=lid, x=ux + 3, y=B.floor_y(deck)) for (deck, ux), lid in lines.items()],
                    top=B.floor_y(10) - 144, bottom=B.floor_y(8), x0=min(u for _, u in units), x1=max(u for _, u in units) + UNIT)
     drill = dict(x=B.exact_x(DRILL["m"]), y=B.floor_y(7), top=B.floor_y(8), period=DRILL["period"], down=DRILL["down"],
-                 tell=DRILL["tell"])
+                 tell=DRILL["tell"], winch=B.exact_x(DRILL["winch"]))
 
     for route, m, deck, y0, y1, side in GRIPS:
         fy = B.floor_y(deck)

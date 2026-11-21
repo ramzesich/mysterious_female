@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "assets" / "source" / "ship" / "lifeboats"
 GAME = ROOT / "assets" / "ship"
 
-PLATING, MUTE = (0xE8, 0xEA, 0xEC), 0.35     # what the boats fade toward, and how far (as the -bg props)
+PLATING, MUTE = (0xE8, 0xEA, 0xEC), 0.25     # what the boats fade toward, and how far (35% as the -bg props until 2026-11-21; 25% since they hang in front of her, "slightly less washed out": the user)
 OUTLINE = "#2e222f"
 HULL, HULL_SHADE, HULL_DARK = "#ffffff", "#c7dcd0", "#9babb2"
 RUB = "#3e3546"

@@ -1,4 +1,5 @@
 import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { wire } from '../wire.js';
 import { Controls } from '../controls.js';
 import { scenario } from '../world/mishaps.js';
 import { sfx } from '../sfx.js';
@@ -35,7 +36,7 @@ const DEPTH = {
 const approach = (value, target, step) =>
     value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 
-const GAG_SHEETS = new Set(['gags', 'her-mishaps', 'towels']);   // the sheets whose clips have a gag's sounds
+const GAG_SHEETS = new Set(['gags', 'her-mishaps', 'towels', 'drill']);   // the sheets whose clips have a gag's sounds
 const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
 const DOOR = { width: 28, height: 74 };
@@ -1032,7 +1033,8 @@ export class ShipScene extends Phaser.Scene {
                 const hook = x + h;
                 high.fillStyle(0xf7f8f8, 1).fillRect(hook - 14, hang, 28, 6);
                 high.fillStyle(0xd3e1da, 1).fillRect(hook - 14, hang + 5, 28, 1);
-                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, drop + eyes[i] - 6 + 1);
+                // (Steel wire rope, as on the drill's winch: src/wire.js.)
+                wire(high, hook, hang + 6, hang + drop + eyes[i] + 1);
             });
             // (In front of her on the walkway, as they hang outside its railing: the user, 2026-11-21, "She has to
             // move behind the boats, obscured by them". The drill's boat is so already: src/world/outside.js.)
@@ -4685,6 +4687,7 @@ export class ShipScene extends Phaser.Scene {
             }
             return;
         }
+        if (sc.gag && GAGS[sc.gag].crawl && this.anims.exists('drill-crawl')) return this.crawlGag(sc, fromX);
         if (sc.gag && GAGS[sc.gag].stairs && this.mode === 'stairs' && this.flight?.outside) return this.stairsGag(sc);
         if (sc.gag && GAGS[sc.gag].sorry && this.anims.exists('gags-dnd-tiptoe')) return this.sorryGag(sc, fromX);
         if (sc.gag && ride?.play) return this.thingGag(sc, ride);
@@ -5128,6 +5131,52 @@ export class ShipScene extends Phaser.Scene {
                 this.herClip(`her-dazed-${g.dazed}`);
             }
             end();
+        });
+    }
+
+    // 15, the drill's boat (the user, 2026-11-21): bumped on the head as she runs under it, she sinks onto all fours,
+    // dizzy, the butterflies over her head (`drill-drop`), and crawls out from under it the way she was facing
+    // (`drill-crawl`, `GAGS.boat.crawl` px a second) until she is clear of its end; the boat comes down as far as her
+    // back (`DrillBoat`, `DRILL.pinPx`). Then `holdMs` and her checkpoint. Its pictures: tools/build_drill.py.
+    crawlGag(sc, fromX) {
+        const p = this.player, g = GAGS[sc.gag], face = p.flipX ? -1 : 1, m = this.cache.json.get('drill-meta');
+        const boat = this.world.story.drill;
+        this.beginScare();
+        this.scareFrom = { x: p.x, y: p.y };
+        sfx.scare();
+        rumble('bump');
+        this.alert.setText(fright(g.word ?? sc.word)).setVisible(true);
+        this.script = null;
+        p.body.setVelocity(0, 0);
+        // (A frame anchored at column c, flipped, takes origin (cell - 1 - c) / cell.)
+        const ox = (face < 0 ? m.cell - 1 - m.herX : m.herX) / m.cell;
+        const s = this.add.sprite(p.x, p.y + this.herDropPx(), 'drill', m.drop[2]).setOrigin(ox, (m.herFloor + 1) / m.cell)
+            .setFlipX(face < 0).setDepth(p.depth);
+        this.worldLayer.add(s);
+        p.setVisible(false);
+        let crawl = null;
+        const stop = () => this.events.off('update', crawl);
+        this.gagEnd = () => { stop(); s.destroy(); p.setVisible(true); };
+        s.play('drill-drop');
+        s.once('animationcomplete-drill-drop', () => {
+            s.play('drill-crawl');
+            // Toward the boat's end on her side of its middle, short of a door or a wall, never off the screen and for
+            // `crawlMs` at most (the user, 2026-11-21): then her checkpoint, as soon as the other gags end.
+            const end = boat ? boat.cx + face * (boat.w / 2 + 22) : s.x + face * 60;
+            // (The camera is on her body, where she was hit: the screen's edge is half its width from there.)
+            const edge = p.x + face * (VIEW.width / 2 - 40);
+            // (After `crawlMs` the screen fades to her checkpoint while she crawls on: she is still crawling when it is
+            // dark, the user, 2026-11-21: "Don't stop her crouch until the screen fades away completely". Her sprite goes
+            // with the fade's end, `gagEnd`.)
+            const to = this.stopShort(s.x, face > 0 ? Math.min(end, edge) : Math.max(end, edge), s.y, 12);
+            let ms = 0;
+            crawl = (_, dt) => {
+                ms += dt;
+                if (ms >= g.crawlMs && !this.respawning) this.respawn();
+                const left = to - s.x;
+                if (Math.abs(left) >= 0.5 && Math.sign(left) === face) s.x += face * Math.min(Math.abs(left), g.crawl * dt / 1000);
+            };
+            this.events.on('update', crawl);
         });
     }
 

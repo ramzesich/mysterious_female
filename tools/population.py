@@ -435,7 +435,7 @@ PEOPLE = {
                               bubble=("door", None, "flag:guest", 5)),
     "npc_guest_in": dict(at=("guest10", 196), who="balcony_guest", face=-1, idle="idle", after="flag:guest"),
     "riv_walkway": dict(at=("walkway", 207.6), who="rival", face=1, idle="peek", after="region:7", until="flag:riv_walkway"),
-    "amb_drill_winch": dict(at=("walkway", 184.6), who="drill_winch", face=1, idle="crank", layer="back"),
+    # (The winch's crewman is the drill's own since 2026-11-21: one picture of him and his winch, `DRILL["winch"]`.)
     "amb_drill_officer": dict(at=("walkway", 192.6), who="drill_officer", face=-1, idle="idle", layer="back"),
     # Region 8 (deck 12 from Champs aft, the funnel). Champs' three at the TVs; the old lady on her
     # sunbed across the sun deck's walk (src/world/topdeck.js: she glares, dozes over her mojito,
@@ -587,10 +587,6 @@ PROPS = {
     # The drill's rope across the walkway's inboard side and its sign.
     # (No `back` outside: that depth is behind the ship's side, and the rope was never seen.)
     "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, {}),
-    # (At 184.6 m, from 184.9, with its crewman: the user, 2026-11-19, so that she lies clear of it after 15.)
-    # The winch its crewman cranks (he cranked the air: found in the sweep of 2026-11-14). Its
-    # handle is where his hands go round, 12 px in front of his middle; he is drawn over it.
-    "prop_drill_winch": ("walkway", 184.6 + 24 / 48, "thing:winch", 0, {}),
     # The life-jacket box at the walkway's aft end, past the drill, against the railing (book 11 on its lid): 1 px up, the
     # user's placing (2026-11-21); behind her and behind the walkway's railing.
     "prop_lifejacket_box": ("walkway", 230 + 10 / 48, "thing:lifejacket-box", 1, {}),
@@ -827,7 +823,10 @@ BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a
 # The boat drill on the walkway (`haz_drill`): a rescue boat on its falls in the gap between the
 # boats, its forward end (m); it hangs high (she walks under it), and every `period` s the crew
 # lower it onto the walkway for `down` s: under it as it comes: "Bumped".
-DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0)
+DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0,
+             # The winch and its crewman, one generated picture of the two (the user, 2026-11-21: "a single generated
+             # animation of a worker turning the valve"; tools/build_drill.py): his middle's metre, where he stood.
+             winch=184.6)
 # The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
 # --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------

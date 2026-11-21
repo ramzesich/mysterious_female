@@ -52,3 +52,12 @@ its five purples set to the close-up's navies by lightness, 20 x 12 by majority)
 | `tshirt/2.png` | Laid flat, lighter | 8f11cbf5-f9e8-4c75-b362-8cc4abe3ed6c |
 | `tshirt/3.png` | **Used**: folded, lying, seen a little from above, 48 x 32 (came purple) | c55b5d17-bb51-4a94-b026-1e487cd5d59f |
 | `tshirt/4.png` | Folded, standing, grey | e4e6a2ef-5c94-4997-a65a-463d3f59ff74 |
+
+## The boat walkway's life-jacket box and the drill's warning light (2026-11-21)
+
+| File | What | PixelLab object |
+|---|---|---|
+| `lifejacket-box/try1.png` | A white deck box: came tiny and broken | 7e81974d-e910-4778-a584-ba1d3503d099 |
+| `lifejacket-box/try2.png` | **Used** (`../lifejacket-box.png`, the user's): a white deck box, two latches, a handle; book 11 on its lid | 5f1feb8b-79fd-4eab-abb6-73c467bea192 |
+| `warning-light/try1.png` | A red beacon dome on a stand: stands up, does not hang | 0c8c773e-e9c3-4777-ba4b-8e0c773453ac |
+| `warning-light/try2.png` | **Used** (`../warning-light.png`): a red lens in a cage hanging from a ceiling mount; its "off" twin built by `DIM` | 24f9e26e-ec4d-4b53-aafa-5a84fdfc7d27 |

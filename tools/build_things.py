@@ -130,7 +130,11 @@ SEAM = {"tennis-ball": "a2a947"}
 # close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
 # The life-jacket box at the boat walkway's aft end (book 11 on its lid; the user chose try 2 of two, 2026-11-21): white,
 # which the palette turns pale green; kept so, and washed as the walkway's background is (`WASH`).
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box"}
+# The boat drill's warning light (the user, 2026-11-21: "a proper red warning light"; try 2 of two, a red lens in a cage
+# hanging from a ceiling mount, `tries/warning-light/`): its reds kept, and a twin with the lens off (`DIM`).
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light"}
+# A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
+DIM = {"warning-light-off": ("warning-light", 0.75)}
 # Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->
 # (how far, the wall's colour). The walkway's recess wall is ShipScene's 0xc9ced3; decks 6 and 7 are at 20%.
 WASH = {"lifejacket-box": (0.20, (0xc9, 0xce, 0xd3))}
@@ -282,6 +286,12 @@ def build():
     pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP and p.stem not in BY_HAND.values()]
     pieces += [(name, by_hand(SRC / f"{stem}.png")) for name, stem in BY_HAND.items()]
     pieces += [(name, piece(CLOSEUPS / f"{src}.png", name)) for name, src in FROM_CLOSEUP.items()]
+    lit = dict(pieces)
+    for name, (src, k) in DIM.items():
+        off = lit[src].copy()
+        off.putdata([(round(p[0] * (1 - k) + 0x5a * k), round(p[1] * (1 - k) + 0x1c * k), round(p[2] * (1 - k) + 0x22 * k), p[3])
+                     if p[3] and p[0] > p[1] + 40 and p[0] > p[2] + 40 else p for p in off.get_flattened_data()])
+        pieces.append((name, off))
     pieces.sort(key=lambda t: t[0])
     width = sum(im.width + 2 for _, im in pieces)
     height = max(im.height for _, im in pieces)
