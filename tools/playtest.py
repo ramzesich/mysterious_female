@@ -4906,6 +4906,38 @@ def scenario_region9(b):
     return ok
 
 
+def scenario_region9__pick(b):
+    """His guitar pick (§4 2.1, thing 16; deck 12, the Spinnaker Lounge): not on the amp before the table scene; after it,
+    on the amp of the new bandstand corner between the cream armchair and the sofa, resting on its wide edge (the user's),
+    and E takes it, a thing of his. The lounge as the user set it, 2026-11-21: the corner 2 px down, the piano 8 px
+    forward, the two seated guests 2 px down, hers 5 px forward."""
+    S = "window.__ship"
+    item = f"{S}.world.things.find(t => t.id === 'keep_pick')"
+    pieces = ("JSON.stringify((() => { const out = {}; const walk = l => { for (const o of l) { if (o.list) walk(o.list);"
+              " const f = o.frame?.name; if (typeof f === 'string' && /^(bandstand-w20|grand-piano-w20|lounge-her|lounge-him)$/.test(f)"
+              " && o.visible && Math.abs(o.y - %d) < 30) { const r = o.getBounds(); out[f] = [Math.round(r.x), Math.round(r.bottom)]; } } };"
+              f" walk({S}.children.list); return out; }})())") % D12
+    b.open("?reset&play&at=deck12")
+    wait(0.4)
+    ok = check(not b.eval(f"!!({item}?.pick?.visible)"), "before the table scene: no pick on the amp")
+    got = json.loads(b.eval(pieces))
+    want = {"bandstand-w20": [2777, D12 + 2], "grand-piano-w20": [exact_x(53.8) - 8 - 30, D12], "lounge-her": [2689, D12 + 2],
+            "lounge-him": [2965, D12 + 2]}
+    ok &= check(all(got.get(k) == v for k, v in want.items()), "the corner, the piano and the two guests where the user put them",
+                got)
+    b.open("?reset&play&at=deck12&did=table")
+    wait(0.4)
+    pick = b.eval(f"[{item}.pick.visible, {item}.pick.x, {item}.pick.y]")
+    ok &= check(pick == [True, exact_x(47.9375), D12 - 16], "after it: on the amp's top, point up", pick)
+    b.close_up("pick-amp", 2790, D12 - 24, 120, 60, 5)
+    b.teleport(exact_x(47.9375), D12)
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:him:pick" in b.eval(f"{S}.save.keeps"), "E takes it, his", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
 def enter_region10(b):
     """A save at region 10's door: region 9 done (the wedding, the bridge's beat, the alarm), she
     stands on the bridge by the hatch's ladder."""

@@ -28,7 +28,7 @@ OUT = ROOT / "assets" / "sprites"
 # (The sardines keep their own blue silver too, the user's "as it is", 2026-11-20: on the palette they went purple.)
 # (His navy t-shirt (13) and its logo too, the photo's own inks (the user, 2026-11-21): on the palette the navy went
 # purple and the lilac a grey green.)
-OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld"}
+OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld", "pick"}
 # Not close-ups: the t-shirt's logo alone, built and the user's own edit of it (`tools/draw_tshirt_logo.py`).
 NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the

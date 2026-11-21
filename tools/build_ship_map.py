@@ -1851,7 +1851,10 @@ def build_objects():
     at12(50.8, "marble-table")
     at12(50.8, "olives", height("marble-table-bg"))
     # (46.44 and 52.1 m: armchairs with guests in them, tools/population.py.)
-    at12(53.8, "grand-piano")
+    # (The piano 8 px forward, the bandstand corner between the cream armchair and the sofa, 2 px down: the user,
+    # 2026-11-21, with his guitar pick on the amp.)
+    put(12, 0, "grand-piano-bg", x=exact_x(53.8) - 8)
+    put(12, 0, "bandstand-bg", -2, x=2793)
     at12(55.7, "back-bar")
     at12(55.7, "bar-counter")
     for m in (55.2, 56.2):

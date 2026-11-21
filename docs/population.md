@@ -752,7 +752,7 @@ are on the stairs).
 **The Spinnaker balcony 31-44 (region 9).** The windscreen (built); `gull_bow_b` six gulls on the
 windscreen until the horn; a bench.
 
-**The Spinnaker Lounge 44-57.5.** 48 `sec_piano` (`quirk(E)`: a few notes); 54 `tan_12_spinnaker`
+**The Spinnaker Lounge 44-57.5.** A bandstand corner between the cream armchair and the sofa (a guitar on its stand by a small amp, 47.6 to 48.3); **`keep_pick` at 47.94**, his guitar pick (16) on the amp, `pickup` after the table scene (`flag:table`); E; its close-up (the user, 2026-11-21; the piano 8 px forward, the two guests in their armchairs 2 px down). 48 `sec_piano` (`quirk(E)`: a few notes); 54 `tan_12_spinnaker`
 at the bar, `amb_barman_sp`; `amb_lounge` two in armchairs.
 
 **The kids' pool 57.5-67.** 60 `sec_slide` (`quirk`: walk onto the slide's top: she rides it into

@@ -128,7 +128,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # His folded t-shirt (13), on deck 12's lounger: PixelLab's small folded shirt (`tries/tshirt/3.png`, the user's
 # choice), its purples set to the close-up's navies by lightness, 20 x 12 (the user, 2026-11-21: "Better"); not the
 # close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask"}
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick"}
 # Pictures the user drew by hand in Paint, on a white ground (white is empty): name -> its file's stem. **Never written
 # by a tool** (CLAUDE.md): his handheld (15), the user's own pixel edit of my 24 x 11, 2026-11-21.
 BY_HAND = {"handheld": "handheld-by-hand"}

@@ -2646,7 +2646,7 @@ its towel moved to the next balcony; the balconies mended with it: no drop where
 picture cut at partitions and a row's ends. **Thing 15 placed (2026-11-21):** his handheld (his ROG Xbox Ally X, from the
 user's photos) on a new sofa in Champs in the aft high table's place; Champs remade round it: the bar bigger after the real
 Champs Bar's teak, two seated fans at its ends facing it (one new), the fan in stripes gone; the world picture the user's own
-pixels. **Next: his guitar pick (16), then 2.2;** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+pixels. **Thing 16 placed (2026-11-21):** his guitar pick (his own red one, from the user's photo) on the amp of a new bandstand corner in the Spinnaker Lounge (a guitar on its stand by a small amp), point up. **His four are done. Next: 2.2, fourteen books where ten is written;** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

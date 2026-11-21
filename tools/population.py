@@ -220,6 +220,9 @@ ITEMS = {
     # His handheld (15), on the left seat cushion of Champs' new sofa (deck 12, in the aft high table's place): only
     # after the table scene. Its close-up a pro redraw of his model's photo; its world picture the user's own pixels.
     "keep_handheld": (12, 97.9167, "keep:him:handheld", "flag:table", 18, "thing:handheld"),
+    # His guitar pick (16; his own, red, from the user's photo), on the amp of the Spinnaker's new bandstand corner,
+    # resting on its wide edge, point up (the user's): only after the table scene.
+    "keep_pick": (12, 47.9375, "keep:him:pick", "flag:table", 16, "thing:guitar-pick"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
@@ -596,8 +599,9 @@ PROPS = {
     # guest on the second massage table and a client in the second salon chair; three toddlers at
     # Splash Academy's play kitchen.
     "prop_cake_table": (12, 167.75, "side-table", 0, {}),
-    "amb_lounge_her": (12, 46.9 - 22 / 48, "thing:lounge-her", 0, dict(back=True)),
-    "amb_lounge_him": (12, 52.1, "thing:lounge-him", 0, dict(back=True)),
+    # (Both 2 px down, hers 5 px forward too: the user, 2026-11-21, with the bandstand corner.)
+    "amb_lounge_her": (12, 46.3333, "thing:lounge-her", -2, dict(back=True)),
+    "amb_lounge_him": (12, 52.1, "thing:lounge-him", -2, dict(back=True)),
     "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
     "prop_massage_client": (11, 45.45, "thing:massage-client", 0, {}),
     "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),

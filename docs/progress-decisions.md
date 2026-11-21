@@ -3894,3 +3894,22 @@ valuable."
   and black trousers) as the model for his uniform. The user: "No, that uniform doesn't match. Don't reference him."
   The reference is out of §7g. The real uniform is not known to the design session (a search and the user's photo of
   the café did not show it): the user is asked before his character is generated.
+
+
+## §4 2.1, thing 16: his guitar pick on a new bandstand corner in the Spinnaker Lounge (the user, 2026-11-21)
+
+- **The look:** "a plain classic pick", tortoiseshell; four tries from text, then "Use mine as a reference": his own,
+  red, a Jazz shape with a raised dot grid. The photo cut out, its words ("D-GriP", the maker's name) and mark painted
+  out and the dot grid mended where they had been, before anything was sent; three tries; the user chose the plain
+  converter's ("B"), its edges cleaned (loose specks off, black and grey rim pixels removed or set to the red beside them).
+- **Where:** the plan's "bandstand by the piano"; the lounge had none: a small one (the user's choice of three), a guitar
+  on its stand by a small amp, generated together (try 4 of four, at its own size), first tried by the piano's tail, then
+  **between the cream armchair and the sofa** (the user), 2 px down; the piano 8 px forward and the two seated guests 2 px
+  down, the lady 5 px forward (the user, a few px at a time).
+- **In the world:** 8 x 9, the close-up's outline shrunk by majority and coloured by hand; **point up**, resting on its
+  wide edge on the amp (point down it stood on its tip, which a pick cannot). Only after the table scene.
+- Built: `bandstand` (`tools/build_ship_art.py`), placed with the piano's move in `tools/build_ship_map.py`;
+  `keep_pick` and the guests' moves in `tools/population.py`; `pick` close-up and `guitar-pick` thing in their own
+  colours. Test `region9.pick` (absent before the table scene, the corner, the piano and the guests where the user put
+  them, the pick on the amp, E takes it); `region9`, `region8`, `boot` pass; `check_overlaps` 0. Generations: 19 (the
+  corner 4, the pick's close-up 12). **His four (13 to 16) are placed.**

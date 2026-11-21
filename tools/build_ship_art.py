@@ -195,6 +195,9 @@ PIECES["sofa-champs"] = ("sofa-champs", 0, None, {})
 # Champs Bar's counter, bigger (the user: "the bar prop itself must be larger", its right end where it was), after the
 # real Champs Bar's honey teak front: try 3 of the second four, at its own size (`champs-bar-long/README.md`).
 PIECES["champs-bar-long"] = ("champs-bar-long", 0, None, {})
+# The Spinnaker Lounge's bandstand corner (deck 12): a guitar on its stand by a small amp, generated together (try 4 of
+# four, at its own size; `bandstand/README.md`); his guitar pick (16) on the amp (the user, 2026-11-21).
+PIECES["bandstand"] = ("bandstand", 0, None, {})
 # (The empty seat and the ten people in it keep their 80 px canvas, `whole`: the seat at the same spot in each,
 # where the audience's people sit in theirs; `audience/`: edits of the five into ten others, 2026-11-19.)
 PIECES["theatre-seat-side"] = ("theatre-seat-side", 0, None, {"whole": (18, 62)})
