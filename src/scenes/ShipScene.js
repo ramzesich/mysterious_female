@@ -63,7 +63,9 @@ const WALK_LIFT = 2;
 // back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
 // in: [which, its hands' lowest row, px lower] (the last 10 px lower, the user: "Frame 13 is the same as 12. Shift her down").
 // (`backDown`: her back frame a little lower, stepping toward the opening: the user, "shift her down a little on frame 9".)
-const ROOF = { far: 94, lip: 83, frameMs: 120, frontMs: 300, turnMs: 140, backMs: 200, backDown: 3, inOpening: 22,
+// (`reach`: how far from the hatch's middle E takes her in, and it glows: about the hatch's width, the user, 2026-11-21:
+// "Widen the area behind the boat where we can enter the hatch".)
+const ROOF = { reach: 26, far: 94, lip: 83, frameMs: 120, frontMs: 300, turnMs: 140, backMs: 200, backDown: 3, inOpening: 22,
                sink: [[2, 56, 0], [1, 44, 0], [0, 44, 10]] };   // her picture's px higher on the boat walkway (the user, 2026-11-21: "shift her two pixels up")
 // The bridge's back wall (deck 10): its thickness; how far she goes from its door before it shuts.
 const BULKHEAD = { width: 12, shutAway: 70 };
@@ -1458,7 +1460,8 @@ export class ShipScene extends Phaser.Scene {
                     if (this.route === r.route && Math.abs(y - r.floor) <= 4 && Math.abs(x - d.x) < 16) {
                         return { x: d.outX, y: d.outY, to: d.outRoute, room: r, d, leaving: true };
                     }
-                    if (this.route === d.outRoute && Math.abs(y - d.outY) <= 4 && Math.abs(x - d.outX) < 16) {
+                    // (A boat's roof hatch takes her in from anywhere under its width: `ROOF.reach`.)
+                    if (this.route === d.outRoute && Math.abs(y - d.outY) <= 4 && Math.abs(x - d.outX) < (d.kind === 'roof' ? ROOF.reach : 16)) {
                         return { x: d.x, y: r.floor, to: r.route, room: r, d };
                     }
                 }
@@ -1534,6 +1537,9 @@ export class ShipScene extends Phaser.Scene {
     roofOut(room, d) {
         const p = this.player;
         this.mode = 'scripted';
+        // (Hidden before the fade: `travel` stands her up, and her standing frame showed a moment over the boat's inside,
+        // in the air: the user, 2026-11-21, "a flashing frame showing her standing in the air in profile".)
+        p.setVisible(false);
         p.setCrop();
         sfx.door();
         this.travel(d.outX, d.outY, d.outRoute, () => {
@@ -1555,7 +1561,7 @@ export class ShipScene extends Phaser.Scene {
     updateRoofGlow(dt) {
         const p = this.player;
         for (const g of this.world.roofGlows ?? []) {
-            const here = this.route === g.d.outRoute && this.mode === 'play' && Math.abs(p.x - g.d.outX) < 16 && Math.abs(p.y - g.d.outY) <= 4;
+            const here = this.route === g.d.outRoute && this.mode === 'play' && Math.abs(p.x - g.d.outX) < ROOF.reach && Math.abs(p.y - g.d.outY) <= 4;
             g.shown = approach(g.shown, here ? 1 : 0, dt * 3);
             g.glow.setVisible(g.shown > 0).setAlpha(g.shown);
         }

@@ -42,6 +42,7 @@ SIZES = {"lifeboat": (408, 128), "tender": (400, 128), "rescue-boat": (252, 74),
 # "place the round ones at the same exact locations where they are inside"), every 36 px but where the ladder (112) takes
 # the rhythm's place.
 PORTHOLES = (40, 76, 148, 184, 220, 256, 292, 328, 364)
+CLOSED_AT = (90, 27)        # the closed roof hatch's top left in the boat's picture (the open one's rim: tools/build_hatch.py)
 # Where each boat's two cables take it, from its left edge (as fractions of its length), and how far
 # down its picture the hooks' eyes are: the game hangs it by these.
 # (The tender's forward hook is forward of its wheelhouse, on the cabin's roof: on the wheelhouse its ring rose past the
@@ -197,11 +198,19 @@ def washed(im):
 
 if __name__ == "__main__":
     SOURCE.mkdir(parents=True, exist_ok=True)
-    boats = {"lifeboat": lifeboat(), "tender": tender(), "rescue-boat": rescue_boat(),
+    # (Every red lifeboat in the one design since 2026-11-21, the user: "Make other red life boats same design, but hatch
+    # closed": round windows, the boarding hatch's outline under the roof hatch; their roof hatch closed, its cover laid on
+    # the game's picture after the wash, as it was cut from the washed boat (`assets/source/ship/lifeboat-hatch-closed.png`:
+    # the open hatch's own pixels, its opening covered in the canopy's reds, no dark lines, no handle).)
+    boats = {"lifeboat": lifeboat(PORTHOLES), "tender": tender(), "rescue-boat": rescue_boat(),
              "lifeboat-round": lifeboat(PORTHOLES)}
+    closed = Image.open(ROOT / "assets" / "source" / "ship" / "lifeboat-hatch-closed.png").convert("RGBA")
     for name, im in boats.items():
         im.save(SOURCE / f"{name}.png")
-        washed(im).save(GAME / f"{name}.png")
+        game = washed(im)
+        if name == "lifeboat":
+            game.alpha_composite(closed, CLOSED_AT)
+        game.save(GAME / f"{name}.png")
         print(f"{name}: {im.size}")
     if "--preview" in sys.argv:
         out = sys.argv[sys.argv.index("--preview") + 1]

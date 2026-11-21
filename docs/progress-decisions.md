@@ -3990,3 +3990,10 @@ valuable."
   `ladder` fails at "walks off the ladder top without falling through" on `d6a62ee` too (the funnel's top puts her on its
   stairway); not looked at. Generations: about 75 (the box 2, the drill 22, the hatch and climb 35, the light 2, oars
   and boathook 5, the rest tries).
+- **After the user's playtest** (same day): E behind the boat and the glow from anywhere under the hatch's width
+  (`ROOF.reach` 26 px, from 16); **every red lifeboat in the same design, its hatch closed** (the cover made from the open
+  hatch's own pixels, its opening in the canopy's reds; "remove the black lines", "remove the black handle"); her ladder
+  climb's frames cleaned (a rung-like strip the generator drew under her shoes showed beside her feet on every ladder:
+  `assets/source/her/climb-alternating/`, raw frames kept); leaving the boat she is hidden before the fade (her standing
+  frame flashed over its inside). Tests: `region2`, `region7`, `region8`, `mishaps`, `boot` pass; `check_overlaps` 0;
+  `ladder` fails as before (not this work).
