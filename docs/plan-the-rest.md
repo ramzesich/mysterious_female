@@ -59,7 +59,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
-| 11 (§7f) | The empty stretches: ten obstacles on the walks where nothing can catch her, seven of them things already built, placed anew; the rule "nothing is used twice" dropped (added 2026-11-21) | The user's word; the design session's audit | Large | About 75 (the design session's guess) |
+| 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -290,7 +290,7 @@ of data and a generated picture shown first, each set against what is built at i
 | 11 | Hers | Diary notepad (brown leather, a strap with a brass buckle: the user) | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end). **Placed 2026-11-19, approved 2026-11-20** (the last seat, by the railing: 9 px aft, 4 px down, the seat's near arm over its foot) |
 | 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the maid's bed, not the floor (`from`). **Placed 2026-11-19, approved 2026-11-20** |
 | 13 | His | Ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E, after the table scene (look-out 5 will be at the same rail) |
-| 14 | His | Sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults |
+| 14 | His | Sleep mask | Deck 10, ~~the far balcony~~ **the first balcony of the row, its forward end (62.9 m)** (§7f, P3), on a sunbed | E, after the vaults |
 | 15 | His | Handheld (black, four coloured buttons, no logo) | Deck 12, Champs, on a sofa | E |
 | 16 | His | Guitar pick | Deck 12, the Spinnaker, the bandstand by the piano | E |
 | 17 | Book 11 | נערה במעיל כחול | The boat walkway's end, beyond the boat drill | E |
@@ -431,15 +431,15 @@ still and comes back when she moves. Nothing is counted.
 | 1 | Deck 7, the Stardust balcony's far end, the rail | The whole theatre from above |
 | 2 | Deck 4, the stern end, a porthole (250 m) | The wake from just above the waterline |
 | 3 | Deck 5, the forward end, a porthole (20 m) | The bow wave |
-| 4 | Deck 9, the officers' corridor's forward end, the front windows | Forward over the bow |
+| 4 | ~~Deck 9, the officers' corridor's forward end, the front windows~~ **Deck 12, the Spinnaker's balcony** (§7f, P2: she drawn in front of its glass) | Forward over the bow, from the top of the ship |
 | 5 | Deck 11, the Great Outdoors, the stern rail | Down and aft over the wake; at sunset the sun's path |
 
 - **The Stardust's first, shown to the user running** (motion is judged by eye), then the other
   four. A porthole piece and a window piece, generated.
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data, the camera in the ship scene (the
   intro's camera work is the model); a case each in the regions' scenarios.
-- Spots 1, 4 and 5 are where the diary, book 14 and his spoon lie (2.1): look at each with both
-  in place.
+- Spots 1 and 5 are where the diary and his spoon lie (2.1): look at each with both in place.
+  (Spot 4 was book 14's end too until it moved to the Spinnaker's balcony, §7f.)
 
 ### 3.2 The deliveries (large; about 10 generations)
 
@@ -450,7 +450,7 @@ cabin's number on its tag, carried under tray rules; a hand takes it at the door
 |---|---|---|---|---|
 | 1 | Deck 8 midships | Flowers in a tall vase | It stands in front of her face: she sees the hallway through the stems | Book 12 (Poczwarka) |
 | 2 | Deck 10 midships | A pot of tea | It cools (the HUD's meter, as the coffee) | Book 13 (Daughters of Warsaw) |
-| 3 | Deck 9 aft | A stack of pillows | Light: a full jump allowed, but the top one slides off if she stops short | A thank-you only |
+| 3 | Deck 9 aft, **to the last cabin, about 246 m** (§7f, P4) | A stack of pillows | Light: a full jump allowed, but the top one slides off if she stops short | A thank-you only |
 
 - `LOADS` in `src/world/carry.js`; a source at each pantry end `when` its door is opened; the
   door that takes it. With a delivery in her hands a hit is a spill, as with any tray,
@@ -637,7 +637,7 @@ game; over 60 the count means nothing. No tangerine is added or dropped; one pai
 | 8 | `tan_10_mid` | `prop_tray_10` (`@tray`) is drawn through the bare table's legs | One piece: the tray on its stand (prop A) |
 | 9 | `tan_4_30` | The bare table stands against a fire extinguisher | Prop A, clear of it |
 | 10 | `tan_8_aft` | The same | Prop A, clear of it |
-| 11 | `tan_8_fwd` | A bare table alone in a cabin corridor, one tangerine on it | Prop A |
+| 11 | `tan_8_fwd` | A bare table alone in a cabin corridor, one tangerine on it | ~~Prop A~~ **It moves to a table on deck 8's forward terrace** (§7f, P5). (Also moved by §7f: `tan_9_aft` to about 246 m on prop A, P4; `tan_7_splash` with its snack table behind the pillow fort, P6) |
 | 12 | `tan_9_luggage` | The same, behind the luggage stack | Prop A |
 
 Small shifts, no art: `tan_6_windjammer` and `tan_12_spinnaker` lie on the barkeeper's hands and chest (along the
@@ -780,7 +780,7 @@ Library). Under about eleven on the main way, scares wake her on the wrong deck 
 The audit's pictures and its model of the returns were made by scripts outside the repo (her teleported beside each of
 `window.__ship.checkpoints`, `Browser.close_up`; `closestCheckpoint` asked with a given set lit); they are not kept.
 
-## 7f. Part 11: the empty stretches, ten obstacles (large; about 75 generations, a guess; added 2026-11-21)
+## 7f. Part 11: the empty stretches: sixteen obstacles, and a purpose for every end (large; about 80 generations, a guess; added 2026-11-21)
 
 The user, 2026-11-21: "Let's focus on the long corridors that are still underpopulated with obstacles. I want a
 proposal of how we would fill the empty stretches with playable obstacles by reusing the current ones (in a smart way,
@@ -819,7 +819,7 @@ first** (the lesson of 2026-11-14), looked at enlarged beside her, and shown to 
 | 1 | Deck 4, about 169.6 m, midway between two cabin doors | **The towel stack** (`STACKS`, gag 18) | Deck 9 | Alone here, as the lesson (stop short, it falls in front of her); deck 9 keeps it with the darting vacuum. It stays fallen, as there. Look at the wall behind it (a picture was hidden on deck 9) and at the extinguisher at 173.5 m |
 | 2 | Deck 4, 225.5 to 239 m | **A second vacuum** (the map's `vacuum`, gag 5) | Deck 4 midships | It patrols the pocket with the stage manager's door (232.5 m): "the vacuum on deck 4 is the test" for the pills (`GAME_DESIGN.md` §6.1.3, region 3), which the first one, at 118 to 143 m, never was. It turns short of the trunk's door (240.6 m), so that stepping out of the trunk is never a hit. The cart at 220 m and the prop cart at 224 m bound its forward end: see that it stops short of them |
 | 3 | Deck 5, Shore excursions, 126.5 to 136.5 m | **A second runaway suitcase** (`ROLLERS`, gags 6a to 6c) | Deck 4 forward | Between the trunk's door (124.9 m) and the reservations desk (137.5 m, her flag at 140.7 m), clear of both. The first time it is met with the lunch in her hands. **Measure first whether a tray's low hop clears it:** if not, the lunch by deck 5 has no way past and the lane is cut so that it leaves her a gap, or the user is told |
-| 4 | Deck 5, the Seven Seas, three lots between 214 and 240 m | **Plates and trays Bumbot knocked down** (`TRAYS`, gag 3: she rides one off) | Decks 8 and 10 | There only from near-catch 1 (`flag:bb1`: his way forward out of the restaurant) until the lunch is delivered. No door behind them (`Trays.door()` may be nothing already). Each lot under two metres, between the tables, clear of the three tangerines that roll from the bowl. With the lunch in her hands a hop clears them; landed on, a spill and the pass again. Needs: `after`/`until` on a `TRAYS` entry |
+| 4 | Deck 5, the Seven Seas, three lots between 214 and 240 m | **Plates and trays Bumbot knocked down** (`TRAYS`, gag 3: she rides one off) | Decks 8 and 10 | ~~There only from near-catch 1 (`flag:bb1`: his way forward out of the restaurant)~~ **There from the start** (the second round, below: her first walk in had nothing; his mess on his way in to the lunch) until the lunch is delivered. **The user was asked whether a trail of his mess reads as a hint to the cat** and let it stand ("Write it"); if in play it does read so, back to `flag:bb1`. No door behind them (`Trays.door()` may be nothing already). Each lot under two metres, between the tables, clear of the three tangerines that roll from the bowl. With the lunch in her hands a hop clears them; landed on, a spill and the pass again. Needs: `until` on a `TRAYS` entry |
 | 5 | Deck 6, Bliss, about 113.2 to 114.8 m | **The DJ's fog machine: a puff every few seconds** (`Steam`, gag 17) | The sauna | Region 2's first timed obstacle, the DJ at his booth (`amb_dj`) its cause. Clear by a metre and a half of the promenade door (111 m), the dance floor's spot (117.2 m, where she stands still three seconds) and the trunk's door (118 m). Needs: a second steam in the data (`bow.steam` is one today); **a small fog machine on the floor, generated (1 or 2), as what it comes out of**, the sauna's hiss and wisps as its tell; drawn only while she is on deck 6 (the lesson of 2026-11-20 on effects seen through the hull) |
 | 6 | The boat walkway, about 160 and 181 m | **Two gulls on its rail, and the balconies' gusts reaching down to it** (`PERCH`, gag 20; `GUSTS`) | The balconies | The second sits five metres from the boat drill (186 m): waiting out the boat is what a gull punishes. Needs: a perch at the walkway's rail (the data takes balcony decks today); the gusts' band down to the walkway's floor; **a tell that can be seen there** (the balconies' is their towels: the boats' covers or the drill's rope flapping, a line drawn in code) |
 | 7 | Deck 12, the sun deck, 112 to 144 m | **Gusts** (`Gusts`, as `TERRACE`) | The aft terrace | The jump over the old lady's sunbed (128.5 m) must be timed; after the horn a gust rocks the cake unless she stands still. Two towels on the sunbeds and the palm (114 m) as the tell. Needs: `SWAY` in `src/world/carry.js` given a `gust` (moving in one adds to the wobble; standing still adds nothing), to be tuned in play; only while she is on deck 12 |
@@ -845,13 +845,65 @@ the suitcase (moving), the waiter (walker), the plates (hop).
 - 9: the gym's door a deck up by the forward stairs; once lit, the bridge's.
 - 10: the Arcade's door (189 m), which she has passed on her way from the balcony.
 
-**Left alone:** by the user's earlier word Magnum's, the aft ends of decks 9 and 10, the Spinnaker's balcony, behind
-the flares, and deck 8 forward (home); by the design session's judgment the Library, the theatre's aisle before the
-stage's scene, deck 9's officers' corridor and deck 6's forward cabins, where the robot's ride is the play. No more
-sprinklers, swinging doors or standing carts: there are five, six and nine.
+### The second round: every long run its obstacles, every end its purpose (the user, 2026-11-21)
 
-**The order:** 1 to 7, then 8, then 9, then 10. If the date presses, what is unbuilt is said to the user, the last
-first.
+Asked next to check the ends of all the long corridors ("whether reaching every end benefits the player. Whether it is
+part of a route that must be taken, or whether the end holds something else valuable"), the design session found
+eleven ends that held nothing and proposed leaving most. The user: **"First of all, your plan has to account for
+already planned things that are not built yet. Plan with them in mind, like they are in the game. Second of all, I do
+not agree leaving empty ends. Every long corridor run has to have obstacles (you already planned it) and a purpose."**
+On the adjusted plan: "Write it".
+
+**Counted as in the game:** the ten above, the five look-outs (§5 3.1), his four things and books 11 to 14 (§4 2.1),
+the three deliveries (§5 3.2), the tangerines' seats (§7d), the nineteen checkpoints (§7e). A run is a walk of thirty
+metres or more between stairs or to an end.
+
+**Six runs still had no obstacle:**
+
+| # | Where | What | From | What the build needs |
+|---|---|---|---|---|
+| 11 | Deck 6, the Photo Gallery, 150 to 159 m | **A crowd shuffling along the photo wall**, looking for their pictures: bodies to hop at the gaps (`QUEUES`) | The buffet queue | Three or four of the queue's own people (the same passengers, a day earlier; no art). No trays in their hands if their clips allow it: look. They hold her back and never hit; a hop at a gap |
+| 12 | Deck 6, the theatre's aisle, about 224 to 229 m | **Popcorn spilled now and then by the man with the tub** (`amb_audience_3`, 226.5 m): a slip (`Spill`, scenario 1) | The casino's chips | `Spill` with the chips' colours changed and its tell from him, not a machine's lights (a rustle and his tub tipping: a clip of his, about 3 generations, shown first). Standing still or hopped, nothing, as the chips |
+| 13 | Deck 7, the Stardust balcony, about 225 m | **A second lamp of the stage's rig, swinging over the aisle** after near-catch 3 (`LIGHTS`, gags 12a and 12b) | The stage's light | A line of data with `flag:bb3`; out of step with the stage's. Clear of the seats' people and of the diary's seat (242.2 m); what it hangs from looked at |
+| 14 | Deck 8 forward, 70 to 73 m, by the party cabin's door (72 m) | **New, small: the birthday party's balloons drifted across the corridor.** She wades through them, slowed, they bob aside and one may pop; no fright | None | A few balloons, generated (about 3); a small class (they are pushed by her, bob back, slow her while she is among them, as the ball pit does). **Gone by the evening of the catch** (`until flag:catch`): the walk home with Bumbot is not slowed. Deck 8 forward was agreed calm ("no hazards, no people"): it has no fright still |
+| 15 | Deck 9 forward, 30 to 70 m | **A second delivery robot, bringing the officers' coffee**: it stops and beeps in her way, she rides on its top (`ROBOTS`) | Deck 6 forward | A line of data. It turns short of the gold door (74 m) and of the corridor's end, where book 14 and the captain's door are; clear of the officer's walk (`amb_officer_9`) |
+| 16 | Deck 12, the kids' pool, about 60 m | **A stack of pool towels** (`STACKS`, gag 18) | Decks 4 and 9 | A line of data; on the open deck, clear of the slide (62.3 m) and the pool's rims; it stays fallen. Drawn only while she is on deck 12 |
+
+**Six ends still had no purpose:**
+
+| # | The end | Its purpose now | What the build needs |
+|---|---|---|---|
+| P1 | The promenade aft of its last door (186 m): 45 m with the jogger's turn and a gull | **A ladder at about 210 m up to the boat walkway beyond the drill, its gate unlatched only from above:** once she has passed the drill, it is the way round it (the user's own test for a ladder, 2026-11-15: "a smart shortcut ... opened once that path is complete at least once"; `docs/plan-three-uses.md` §4.6 had found no place for one). **The last 19 m (212 to 231 m), where she is hidden behind the ship's side (the audit's V5), are chained off** | The gate's ladder again (`ladders`, a lock that opens from the top); a chain or rope across at 212 m, the jogger's turn and the lane's sign (213.6 m) kept clear. The forward enclosed end stays (11 m past its door) |
+| P2 | Deck 12, the Spinnaker's balcony (31 to 44 m) | **Look-out 4 moves here from deck 9's corridor end:** forward over the bow from the top of the ship. Deck 9's end keeps book 14 and the captain's door | §5 3.1's row 4. **She must be seen there** (the audit's V4: she is a pale figure cut off at the thighs behind the windscreen's glass): she and the balcony's things drawn in front of the glass |
+| P3 | Deck 10's balcony row, its forward end (62.9 m) | **His sleep mask** (§4 2.1, 14: "the far balcony") on the first balcony's sunbed. Deck 9's forward balconies are then the climb between deck 8's photo slot (74.9 m) and it | The place of a thing not yet placed |
+| P4 | Deck 9 aft, the last 19 m | **Its tangerine (`tan_9_aft`) moves from 230 m to the last cabin door, about 246 m**, on §7d's tray on a stand; **the pillow delivery (§5 3.2, 3) ends at that cabin** | Two lines of data; the cart at 230 m stays as an obstacle |
+| P5 | Deck 8 forward, past her cabin (21 to 41 m, and the forward terrace) | **Its tangerine (`tan_8_fwd`, §7d's 11) moves from 49.3 m to a table on the forward terrace** | A table for it out there (a balcony table is a seat §7d allows); looked at with the terrace's stairs and U11 in mind |
+| P6 | Deck 7, behind the pillow fort (21.4 to 31 m): a crawl to a shut door | **Splash Academy's snack table and its tangerine (`tan_7_splash`) move there from 41.2 m**, to about 27 m, by the counsellor | The table and the tangerine moved, clear of the counsellor (30.1 m) and of the mooring deck's door; the way home after the catch not blocked |
+
+**Three tangerines move; the number stays 56** (§12 had "leave their number and their location unchanged": the user
+saw the three moves and wrote "Write it").
+
+**Ends that needed no change:** the walkway's forward end (its end wall, 100.2 m, is the climb straight up to deck 8's
+balcony with the tangerine) and its aft end (book 11, and the climb to deck 8 aft's ajar door); deck 10 aft (the
+guest's door is 11 m from the end); deck 4 aft, the Great Outdoors' stern, the Stardust balcony and deck 5 forward
+(a look-out each, three with a thing to find); deck 8 aft (its tangerine 5 m from the end); Magnum's and the two
+restaurants behind the flares (inside runs that have obstacles and lead on; the piñata is there).
+
+**What this overrides:** the list "left empty by choice" (`docs/plan-three-uses.md` §4.6: the aft ends of decks 9 and
+10, Magnum's, the Spinnaker's balcony, behind the flares) is gone, and §8's line on it with it; deck 8 forward is no
+longer bare; U10 (V4 and V5, "Leave as they are for now") is answered for the Spinnaker's balcony (she is drawn in
+front of the glass) and for the promenade's aft end (closed off); the first round's "left alone" below.
+
+~~**Left alone:** by the user's earlier word Magnum's, the aft ends of decks 9 and 10, the Spinnaker's balcony, behind
+the flares, and deck 8 forward (home); by the design session's judgment the Library, the theatre's aisle before the
+stage's scene, deck 9's officers' corridor and deck 6's forward cabins, where the robot's ride is the play.~~ (The
+first round's; the second round fills them, but for the Library, which lies inside deck 6's run with the fog and the
+crowd, and deck 6's forward cabins, where the robot is the obstacle.) No more sprinklers, swinging doors or standing
+carts: there are five, six and nine.
+
+**The order:** 1 to 7, then 8, then 9; then 11 to 13, 15, 16 and P3 to P6 (lines of data); then P2, P1, 14; 10 last.
+If the date presses, what is unbuilt is said to the user; the design session would drop the balloons (14) and the
+ladder (P1) first.
 
 **Tests:** a case in `mishaps` for each new thing that can hit her (the stack, the second vacuum, the second
 suitcase, the plates, the fog, a walkway gull, the gym ball, the night watch's door and tray, the painting), each with
@@ -860,15 +912,20 @@ possible), `region2` (Bliss), `region3` (the pills, the gallery), `region6` (the
 `region8` and `region9` (the sun deck: the old lady's jump, the cake), `pocket`, `boot`; a start place for each new
 spot (`docs/start-links.md`). `tools/check_overlaps.py` lists nothing; `tools/check_corridors.py`'s numbers given
 (today, the longest walk with nothing to do: deck 4 29.6 m, 5 55.2, 6 68.3, 7 82.1, 8 40.1, 9 64.6, 10 56.4, 11
-47.4, 12 44.0).
+47.4, 12 44.0). **For the second round:** `mishaps` cases for the popcorn, the balcony's lamp and the pool's towel
+stack; `region2` (the gallery's crowd; the ladder's gate from below and from above), `region3` (the aisle, the
+balcony), `region5` (the balloons; the terrace's tangerine), `region7` (the mask; deck 9 aft's tangerine and the
+pillows' cabin), `region9` (the robot, the towels, the look-out on the Spinnaker's balcony, the snack table behind the
+fort), `finale` (the walk home: no balloons, the fort's place), the scenarios that pick the three tangerines up by id.
 
 **The documents:** `GAME_DESIGN.md` §5.8, §6.1.2 (the rule is marked dropped there, 2026-11-21), §6.1.3's "Hazards"
 lines and §6.1.7's table as each is built; `docs/population.md` §2.9, each deck's rows and §4's rules;
 `CLAUDE.md`'s table for a new class or option.
 
-**The date:** the design session's guess is about three working days for all ten (1 to 7 about one, 8 a few hours, 9
-half a day, 10 one). Parts 9 and 10 had taken two of the roughly five spare days before the 23rd of December; this
-takes the rest. The user was told before choosing.
+**The date:** the design session's guess is about three working days for the first ten (1 to 7 about one, 8 a few
+hours, 9 half a day, 10 one) and about two for the second round: five in all. Parts 9 and 10 had taken two of the
+roughly five spare days before the 23rd of December; this takes the rest and about two more: the likely end near the
+25th, the slow end at New Year's Eve. The user was told before each choice.
 
 The audit's map and panoramas were made by scripts outside the repo (the obstacles' places from `maps/world.json` and
 the map; each stretch shot tile by tile through `playtest.Browser`, a deck cut open by `viewOverride`); not kept.
@@ -889,7 +946,7 @@ the map; each stretch shot tile by tile through `playtest.Browser`, a deck cut o
 - The ship's side: the funnel's white base, the open decks' bulwarks and the sun cover are
   still plain (`tools/shell_paint.py`).
 - The places the audit found empty and no plan names: deck 4's last 14 m, the Internet Café, Le
-  Bistro, four of the five balcony cabins. Those left empty by choice stay so (the aft ends of
+  Bistro, four of the five balcony cabins. ~~Those left empty by choice stay so~~ (none is left empty: §7f's second round, 2026-11-21) (the aft ends of
   decks 9 and 10, Magnum's, the Spinnaker's balcony, behind the flares).
 
 ## 9. Waiting for the user
@@ -906,6 +963,7 @@ the map; each stretch shot tile by tile through `playtest.Browser`, a deck cut o
 | U8 | The bridge and the spa hidden until she enters them (`LOCKED_PARTS`, off since 2026-11-08 "until we settle how the ship is split") | A switch and a look |
 | U9 | Deck 7's stern strip: "maybe a secret place later"; today she can only leave it by jumping off | As decided |
 | U10 | V4 and V5 of the audit: she is hard to see on the Spinnaker's balcony and at the promenade's enclosed ends ("Leave as they are for now") | Cut the side open there, or draw her in front of the glass |
+| | **U10, 2026-11-21:** answered in part by §7f's second round: the Spinnaker's balcony gets look-out 4, she drawn in front of the glass; the promenade's aft enclosed end is chained off. The forward enclosed end stays as it is | |
 | U11 | The mooring deck can be reached from deck 8's forward terrace before the sunset, its door shut, and the hint that covered it went with every popup. Acceptable so? | As decided |
 | U12 | Functional signs stay English in the Ukrainian version: the answer was "Ok", taken as yes | A confirmation |
 | U13 | A pause, a map ("at least for now" neither); a controller button for the outside view (O) | Only if wanted |

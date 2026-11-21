@@ -3741,3 +3741,33 @@ current ones (in a smart way, so that they aren't repeated one after the other),
   aft lift's door (200.3 m) on decks 4 and 5 with her at the gangway, which may be the pictures' doing (`?cards=all`,
   a deck cut open by `viewOverride`) and was not looked into.
 - No generations. The scripts and pictures are outside the repo and not kept.
+
+## The ends of the long runs: a second round for part 11 (2026-11-21; a plan, nothing built)
+
+The design session, on the user's word: "check the ends of the all the long corridors and see whether reaching every
+end benefits the player. Whether it is part of a route that must be taken, or whether the end holds something else
+valuable."
+
+- **Found** (from `maps/world.json`, the plan and the panoramas): of about forty ends, eleven held nothing; four of
+  those got something from parts 2 and 3. The design session proposed leaving most, three of them by the user's own
+  earlier choice.
+- **The user:** "First of all, your plan has to account for already planned things that are not built yet. Plan with
+  them in mind, like they are in the game. Second of all, I do not agree leaving empty ends. Every long corridor run
+  has to have obstacles (you already planned it) and a purpose." On the adjusted plan, shown with a map: "Write it".
+- **Changes to the plan, and why:** `docs/plan-the-rest.md` §7f has a second round: six more obstacles (11 to 16: the
+  Photo Gallery's crowd, the aisle's popcorn, the balcony's lamp, deck 8 forward's balloons, a robot in deck 9's
+  officers' corridor, pool towels on deck 12) and six ends given a purpose (P1 to P6: a ladder with a gate from above
+  at the promenade's aft end, its hidden tip chained off; look-out 4 moved to the Spinnaker's balcony; his mask at
+  deck 10's first balcony; deck 9 aft's tangerine and the pillows' cabin at its last door; deck 8 forward's tangerine
+  out on the terrace; the snack table behind the fort). Number 4's plates lie there from the start. Why: the user's
+  rule, with what is planned counted as built.
+- **What it overrides, each said to the user first:** "left empty by choice" (`docs/plan-three-uses.md` §4.6); deck 8
+  forward agreed bare; three tangerines' places (the number stays 56); "Leave as they are for now" on the two places
+  where she is hard to see (one is closed off, in the other she is drawn in front of the glass); "No new ladder".
+- **Lines amended elsewhere in the plan:** §4 2.1's row 14, §5 3.1's row 4 and 3.2's row 3, §7d's row 11, §8's line
+  on the empty places, U10.
+- **The date:** about two more working days by the design session's guess, five for the part: the likely end near
+  25 December, the slow end at New Year's Eve. If it slips: the balloons and the ladder first.
+- Found on the way: the walkway's end walls and its columns are all climbs up to deck 8's balconies (the grips), so
+  both its ends lead on; "behind Teppanyaki's flares" was never empty (the piñata).
+- No generations. The scripts and the two maps are outside the repo and not kept.

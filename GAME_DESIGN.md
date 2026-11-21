@@ -825,6 +825,20 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   flares, deck 8 forward, the Library, the theatre's aisle, deck 9's officers' corridor, deck 6's forward
   cabins. **No checkpoint is added or kept for them** ("As decided": deck 4's aft one goes, §5.5; a hit
   by the two on deck 4 aft is the walk from the gangway again).
+- **Decided the same day, a second round (not built: §7f): every long run has obstacles, and every end a
+  purpose.** The user: "I do not agree leaving empty ends. Every long corridor run has to have obstacles
+  ... and a purpose", planned things counted as built. So the "left calm" list above is gone but for the
+  Library and deck 6's forward cabins. **Six more obstacles:** a crowd shuffling along the Photo Gallery's
+  wall (the buffet queue's people); popcorn spilled in the theatre's aisle (the chips' slip); a second
+  swinging lamp over the Stardust balcony after near-catch 3; the birthday party's balloons across deck 8's
+  forward corridor (new: a wade, no fright, gone by the evening of the catch); a second delivery robot in
+  deck 9's officers' corridor; a stack of pool towels by the kids' pool. The plates in the Seven Seas lie
+  there from the start. **Six ends given a purpose:** the promenade's aft end, a ladder up to the walkway
+  beyond the drill, unlatched only from above, the hidden last 19 m chained off; the Spinnaker's balcony,
+  the forward look-out moved there from deck 9, she drawn in front of its glass; deck 10's first balcony,
+  his sleep mask; deck 9 aft's last door, its tangerine moved there and the pillow delivery's cabin; deck
+  8's forward terrace, its corridor's tangerine moved onto a table there; behind deck 7's pillow fort,
+  the snack table and its tangerine. Three tangerines move; 56 stays.
 - **Secrets** exist: §6.1.11. (Bumbot's SUSHI sign had leaked in from the Bumbot game; dropped, the
   user, 2026-11-10.)
 - **As built (2026-11-19):** each hazard with what its hit does, its sounds and its checks:
