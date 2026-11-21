@@ -97,7 +97,7 @@ def build_world():
         room_x0[r["id"]], room_floor[r["id"]] = x0, floor
         doors = [dict(id=r["id"], x=door, outX=door, outY=floor, outRoute=route_of(r.get("route", "inside")),
                       kind=r.get("door", "crew"), plate=r.get("plate", ""), plateSide=r.get("plate_side", 1),
-                      plateUp=bool(r.get("plate_up")),
+                      plateUp=bool(r.get("plate_up")), **({"plateStyle": r["plate_style"]} if "plate_style" in r else {}),
                       lock=lock(r.get("lock")))]
         for i, d in enumerate(r.get("doors", [])):
             if d["to"] == "outside":

@@ -56,7 +56,8 @@ DUMP = """(() => { const s = window.__ship, out = [];
     if (o.type === 'Container' || o.type === 'Layer') { walk(o.list); continue; }
     if (!o.visible || o.alpha === 0 || !o.getBounds || !['Image', 'Sprite', 'Text'].includes(o.type)) continue;
     const b = o.getBounds();
-    out.push({ t: o.type, k: o.texture ? o.texture.key : '', f: String(o.frame ? o.frame.name : ''), text: o.text || '',
+    // (A sign of src/signs.js is a picture that says what it reads: counted as text.)
+    out.push({ t: o.signText != null ? 'Text' : o.type, k: o.texture ? o.texture.key : '', f: String(o.frame ? o.frame.name : ''), text: o.signText ?? o.text ?? '',
                d: o.depth, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) });
   } };
   walk(s.worldLayer.list); return JSON.stringify(out); })()"""

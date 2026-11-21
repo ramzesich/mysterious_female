@@ -237,3 +237,27 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   the camera has stopped). **The user chose C.**
 - **Built:** one line in `src/intro.js`; the `intro` playtest's halfway check moved to the dive's 0.86. The built
   game recorded and compared frame by frame with C: the same. `intro`, `deck3`, `boot` pass; the rest not run.
+
+## The signs, drawn at their size (2026-11-21)
+
+- **Asked:** "a similar work as we done to the tooltips, but now it concerns signs ... Show me every plain white
+  sign": 13 white (crew door plates, two notes) and 34 cream (30 rope barrier cards, 4 posters), every one a
+  Verdana text box.
+- **First round, rejected:** 16 generated blank signs (create_1_direction_object, 10 generations), my picks mocked
+  up at the game's size with Galmuri7: "all bad, oversized and do not fit their places". The lesson: fit the
+  lettering to the sign's place, not the sign to a font. The tries were deleted (the user's word).
+- **Second round:** each sign kept to its place and about its old size; a 5 px pixel font drawn by hand, plates drawn
+  at size (a 1 px rim, a face, a lit edge or a band); three looks a kind, the old sign beside them in the same shot.
+  The user's numbers: brushed steel door plates, navy where the wall is dark (STAGE DOOR, LIGHTING, the PANTRY on
+  dark wood); navy and gold rope cards; the yellow notice (SEARCH IN PROGRESS); blue plaques (JOGGING TRACK), words
+  painted on the wall (WALKERS), a white notice with a red band (BOAT DRILL), a cream card (JUST MARRIED). Set in
+  capitals. BOAT DRILL and JUST MARRIED 2 px higher; JUST MARRIED moved beside its door to clear the bride's wish
+  cloud, then put back over it ("where it was on your first preview"): the cloud is drawn over it.
+- **Built:** `src/signs.js` (new: the font, the looks, `sign()`, each sign one canvas texture `sign:<look>:<text>`,
+  no asset files); one call each in `world.js` (door plates, wall signs; the brass name plates stay text),
+  `ShipScene.js` (LINEN), `progression.js` (rope cards); `plate_style` and the signs' looks in `tools/population.py`,
+  passed on by `tools/build_world.py`; `tools/check_overlaps.py` counts a sign picture as text (`signText`).
+- **Checked:** the game shot at every kind (47 signs, no page errors); `check_overlaps` 0; `boot`, `deck3`,
+  `region2`, `region4`, `region9` pass; the rest not run.
+- **Open:** a row for `src/signs.js` in `CLAUDE.md`'s table and a rule (a new sign is `sign()` with a look), only on
+  the user's word.

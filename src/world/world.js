@@ -16,6 +16,7 @@ import { Library } from './library.js';
 import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
+import { sign, SIGN_LOOKS } from '../signs.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -371,10 +372,9 @@ export class World {
                     // (Aft of its door, or forward of it where the deck ends just aft: `plateSide`.)
                     // (`plateUp`: a sign over the door, above a checkpoint's lamp: her crew cabin's.)
                     const side = d.plateSide ?? 1;
-                    const plate = s.add.text(d.plateUp ? d.outX : d.outX + 20 * side, d.outY - (d.plateUp ? 93 : 50), d.plate, {
-                        fontFamily: 'Verdana, sans-serif', fontSize: d.plateUp ? '7px' : '5px', fontStyle: 'bold', color: '#3e3546',
-                        backgroundColor: '#ffffff', padding: { left: d.plateUp ? 4 : 2, right: d.plateUp ? 4 : 2, top: 1, bottom: 1 }, resolution: 4,
-                    }).setOrigin(d.plateUp ? 0.5 : side > 0 ? 0 : 1, 0.5).setDepth(D.props);
+                    // (Brushed steel; navy on a dark wall, `plateStyle`: src/signs.js.)
+                    const plate = sign(s, d.plateUp ? d.outX : d.outX + 20 * side, d.outY - (d.plateUp ? 93 : 50), d.plate, d.plateStyle ?? 'steel')
+                        .setOrigin(d.plateUp ? 0.5 : side > 0 ? 0 : 1, 0.5).setDepth(D.props);
                     this.add([plate]);
                     room.outside.push(plate);
                 }
@@ -1129,16 +1129,14 @@ export class World {
                 break;
             }
             case 'sign': {
-                // A plate by a door, a poster, a notice.
-                const style = {
-                    plate: { color: '#45293f', backgroundColor: '#d9a43b' },
-                    poster: { color: '#ae2334', backgroundColor: '#f3ecdd' },
-                    note: { color: '#3e3546', backgroundColor: '#ffffff' },
-                }[e.style ?? 'plate'];
-                const text = s.add.text(e.x, e.y - (e.dy ?? 52), e.text, {
-                    fontFamily: 'Verdana, sans-serif', fontSize: `${e.size ?? 5}px`, fontStyle: 'bold', align: 'center', ...style,
+                // A plate by a door (brass, its name), a notice, a plaque, words painted on the wall: the
+                // looks of src/signs.js; the brass name plates are still text.
+                const text = SIGN_LOOKS[e.style] ? sign(s, e.x, e.y - (e.dy ?? 52), e.text, e.style) : s.add.text(e.x, e.y - (e.dy ?? 52), e.text, {
+                    fontFamily: 'Verdana, sans-serif', fontSize: `${e.size ?? 5}px`, fontStyle: 'bold', align: 'center',
+                    color: '#45293f', backgroundColor: '#d9a43b',
                     padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4, wordWrap: e.wrap ? { width: e.wrap } : undefined,
-                }).setOrigin(0.5).setDepth(e.route === OUTSIDE ? D.exterior + 0.09 : D.decor + 0.25);
+                });
+                text.setOrigin(0.5).setDepth(e.route === OUTSIDE ? D.exterior + 0.09 : D.decor + 0.25);
                 this.add([text]);
                 this.things.push({ ...e, items: [text] });
                 break;
