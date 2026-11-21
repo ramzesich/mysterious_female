@@ -42,9 +42,10 @@ ROOMS = [
          lock=("card", "ent", 0)),
     dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING", plate_style="navy",
          lock=("card", "ent", 0)),
-    # (As long as the boat it is in, its hatch 68 px from the boat's forward end at 143 m, clear of the bow's curve:
-    # the user, 2026-11-21. `door_x` is drawn_rooms.py's LIFEBOAT_DOOR.)
-    dict(id="lifeboat", deck=7, m=143 + 68 / 48, route="outside", width=408, door_x=68, look="lifeboat", door="hatch"),
+    # (As long as the boat it is in, the user, 2026-11-21; in through its roof hatch, whose middle is 112 px from the boat's
+    # forward end at 143 m, she climbing up behind the boat into it (`roof`: tools/build_hatch.py), a ladder there inside;
+    # `door_x` is draw_rooms.py's LIFEBOAT_DOOR.)
+    dict(id="lifeboat", deck=7, m=143 + 112 / 48, route="outside", width=408, door_x=112, look="lifeboat", door="roof"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
     # A guest cabin being made up on deck 10's midships hallway, its door held open, the bedmaker in it
     # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
@@ -177,7 +178,7 @@ ITEMS = {
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     "book_1": (5, 85.5, "book:1", None, 23),
-    "book_2": ("lifeboat", 112, "book:2", None, 17),
+    "book_2": ("lifeboat", 146, "book:2", None, 17),     # (from 112 since 2026-11-21: clear of the ladder at 112)
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),

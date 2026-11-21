@@ -132,7 +132,10 @@ SEAM = {"tennis-ball": "a2a947"}
 # which the palette turns pale green; kept so, and washed as the walkway's background is (`WASH`).
 # The boat drill's warning light (the user, 2026-11-21: "a proper red warning light"; try 2 of two, a red lens in a cage
 # hanging from a ceiling mount, `tries/warning-light/`): its reds kept, and a twin with the lens off (`DIM`).
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light"}
+# The lifeboat's roof hatch, its back and its lip (the user, 2026-11-21; `tools/build_hatch.py`): cut from the boat's own
+# washed picture, kept so.
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light",
+               "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
 # Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->

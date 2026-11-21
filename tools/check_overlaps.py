@@ -44,13 +44,17 @@ ALLOWED = [
 SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-",
               # (The things to find and the other pickups, lying on a table, a seat, a shelf: 2026-11-20.)
               "rc-car", "diary", "massage-gun", "snack-tube", "bookmark-book", "plant-pot", "grip-socks",
-              "pills-bottle", "wool", "flag-ua", "feather-toy", "tennis-ball")
+              "pills-bottle", "wool", "flag-ua", "feather-toy", "tennis-ball",
+              "lifeboat-hatch")       # (on its boat's roof, as the boat: 2026-11-21)
 
 # Textures that are not things standing on a deck: her, the people (they walk past doors), the cat,
 # pickups and their glints, lamps, the weather.
 SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "dot", "glow", "lamp", "puff", "livery", "things-gull",
              "spark",         # (a pickup's glint, 2026-11-20)
-             "tiles"}         # (the ship's side drawn again over her on the balconies, 2026-11-21: plating, not a thing)
+             "tiles",         # (the ship's side drawn again over her on the balconies, 2026-11-21: plating, not a thing)
+             # (The walkway's boats, outside the ship's side, drawn in front of her since 2026-11-21 and so out of the
+             # outside route's depths: they fade with their decks, never seen with the furniture inside.)
+             "lifeboat", "tender", "rescue-boat"}
 
 DUMP = """(() => { const s = window.__ship, out = [];
   const walk = list => { for (const o of list) {

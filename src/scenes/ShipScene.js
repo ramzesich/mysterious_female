@@ -57,7 +57,14 @@ const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
 const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
 const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
-const WALK_LIFT = 2;   // her picture's px higher on the boat walkway (the user, 2026-11-21: "shift her two pixels up")
+const WALK_LIFT = 2;
+// Her climb into the lifeboat's roof hatch (`roofSteps`): the hatch's far rim and near lip, px over the walkway's floor
+// (tools/build_hatch.py's pieces: the boat's rows 26 and 37, its floor at 120); each frame's ms (her front frame and her
+// back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
+// in: [which, its hands' lowest row, px lower] (the last 10 px lower, the user: "Frame 13 is the same as 12. Shift her down").
+// (`backDown`: her back frame a little lower, stepping toward the opening: the user, "shift her down a little on frame 9".)
+const ROOF = { far: 94, lip: 83, frameMs: 120, frontMs: 300, turnMs: 140, backMs: 200, backDown: 3, inOpening: 22,
+               sink: [[2, 56, 0], [1, 44, 0], [0, 44, 10]] };   // her picture's px higher on the boat walkway (the user, 2026-11-21: "shift her two pixels up")
 // The bridge's back wall (deck 10): its thickness; how far she goes from its door before it shuts.
 const BULKHEAD = { width: 12, shutAway: 70 };
 
@@ -1485,11 +1492,120 @@ export class ShipScene extends Phaser.Scene {
             if (!lock.quiet) this.showLock(lock);
             return true;
         }
+        // (A boat's roof hatch: she climbs up into it, or out of it and down behind the boat.)
+        if (door.d?.kind === 'roof') return this.textures.exists('mantle-front') && this.roofClimb(door);
         // (A crew door that her card opens: the reader's beep first.)
         if (door.room?.lockSpec?.kind === 'card' && door.to !== 'inside') sfx.beep();
         sfx.door();
         this.travel(door.x, door.y ?? p.y, door.to);
         return true;
+    }
+
+    // The lifeboat's roof hatch (the user, 2026-11-21; its frames approved together as one GIF): going in (E behind the
+    // boat at the hatch) she pulls herself up over the hatch's far rim facing us, her hands held on it (`mantle-front`, her
+    // own character), stands on the roof, turns side-on and her back to us, steps into the opening and sinks in with her
+    // hands on its rim (her own frames), cut by its near lip; the fade, and she is on the top of the ladder inside, for
+    // the player to climb down. Out: up that ladder past its top (`roofOut`), no E, and the same frames the other way.
+    // Her body waits on the walkway, the camera with it: what shows is a picture of her (`roofPic`), between the
+    // hatch's back and its lip, cut where the frame says.
+    roofClimb(door) {
+        if (door.leaving) return false;
+        const p = this.player, d = door.d;
+        this.roofHold();
+        const pic = this.roofPic();
+        this.roofRun(pic, this.roofSteps(d), () => {
+            pic.destroy();
+            sfx.door();
+            this.travel(d.x, door.y, door.to, () => {
+                // On the top of the ladder inside, for the player to climb down.
+                const L = this.world.roofLadderOf(door.room);
+                p.setVisible(true);
+                this.enterLadder(L.x, L.y1, L.y0, L.out, L.ceil);
+                p.y = L.start;
+                this.updateLadder({}, 0);
+                this.world.onLadder = L;
+            });
+        });
+        return true;
+    }
+
+    // Out of the lifeboat (up its ladder past the top): the fade, then the climb's frames the other way, out of the
+    // hatch, turning to face us on the roof, and down the boat's far side; then she is on the walkway behind the boat.
+    roofOut(room, d) {
+        const p = this.player;
+        this.mode = 'scripted';
+        p.setCrop();
+        sfx.door();
+        this.travel(d.outX, d.outY, d.outRoute, () => {
+            this.roofHold();
+            const pic = this.roofPic();
+            this.roofRun(pic, this.roofSteps(d).reverse(), () => {
+                pic.destroy();
+                p.body.enable = true;
+                p.body.reset(d.outX, d.outY);
+                p.setVisible(true);
+                this.pose('stand');
+                this.mode = 'play';
+            });
+        });
+    }
+
+    // Her body held where it is, hidden, while a picture of her climbs.
+    roofHold() {
+        const p = this.player;
+        this.mode = 'scripted';
+        this.script = null;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.setVisible(false);
+    }
+
+    roofPic() {
+        const s = this.add.image(0, 0, 'her', this.herFrames.front).setOrigin(0).setDepth(DEPTH.player + 0.065).setVisible(false);
+        this.worldLayer.add(s);
+        return s;
+    }
+
+    // The climb in, frame by frame: [ms, texture, frame, its top left's x and y, the row it is cut at] in the world,
+    // from the hatch's middle over the walkway's floor (`d.outX`, `d.outY`): the hatch's far rim `ROOF.far` px up, its
+    // near lip `ROOF.lip` (tools/build_hatch.py). Her own sheet's cells are 84 px, her middle at 42, her feet on row 83.
+    roofSteps(d) {
+        const mf = this.cache.json.get('mantle-front-meta'), F = this.herFrames, x = d.outX;
+        const far = d.outY - ROOF.far, lip = d.outY - ROOF.lip, cell = PLAYER.cell, mid = cell / 2;
+        const steps = [];
+        // Up over the far rim, her hands on it (each frame's hands' lowest row a px over it), cut at it.
+        mf.hands.forEach((h, i) => steps.push([ROOF.frameMs, 'mantle-front', i, x - mf.x, far - 1 - h, far]));
+        // On the roof behind the opening, her feet on the far rim: facing us, side-on, her back to us.
+        for (const [f, ms, down] of [[F.front, ROOF.frontMs, 0], [F.stand, ROOF.turnMs, 0], [F.back, ROOF.backMs, ROOF.backDown]]) {
+            steps.push([ms, 'her', f, x - mid, far - cell + 1 + down, null]);
+        }
+        // Into the opening, the near lip at her thighs; then down it, her hands on its rim (her `climb-out` frames).
+        steps.push([ROOF.frameMs, 'her', F.back, x - mid, lip + ROOF.inOpening - cell, lip]);
+        const out = this.climbOutFrames;
+        for (const [f, hands, down] of ROOF.sink) steps.push([ROOF.frameMs, 'her', out[f], x - mid, lip - 1 - hands + down, lip]);
+        return steps;
+    }
+
+    // Shows `steps` (from `roofSteps`) on `pic` one after another, on the scene's clock (as the tests step it), then `done`.
+    roofRun(pic, steps, done) {
+        let ms = 0, i = -1;
+        const show = ([, key, frame, x, y, cut]) => {
+            pic.setTexture(key, frame).setPosition(x, y).setVisible(true);
+            if (cut == null) pic.setCrop();
+            else pic.setCrop(0, 0, pic.width, Math.max(0, cut - y));
+        };
+        const run = (_, dt) => {
+            ms += dt;
+            let at = 0, k = 0;
+            while (k < steps.length && ms >= at + steps[k][0]) at += steps[k++][0];
+            if (k >= steps.length) {
+                this.events.off('update', run);
+                done();
+                return;
+            }
+            if (k !== i) show(steps[i = k]);
+        };
+        this.events.on('update', run);
     }
 
     // A quick fade, and she is somewhere else: through a door to another route, down a chute, out of
@@ -3368,10 +3484,15 @@ export class ShipScene extends Phaser.Scene {
         const L = this.ladder;
         const v = (input.down ? 1 : 0) - (input.up ? 1 : 0);
         p.y = Phaser.Math.Clamp(p.y + v * PLAYER.climbSpeed * dt, L.topY, L.bottomY);
+        if (L.ceil != null) {
+            const hide = Math.max(0, Math.min(p.height, Math.round(L.ceil - (p.y - p.displayOriginY))));
+            p.setCrop(0, hide, p.width, p.height - hide);
+        }
 
         // Her hands reach to about head height. Once that is above the last rung there is nothing
         // to grab, so her hands come down: climbing out of the hatch, or starting down into it.
-        const handsAboveLadder = p.y - PLAYER.height * 0.85 < L.topY;
+        // (Not on a ladder that goes on out of the picture, the lifeboat's: she climbs it all the way.)
+        const handsAboveLadder = !L.out && p.y - PLAYER.height * 0.85 < L.topY;
         if (handsAboveLadder) {
             // Her hands stay on the hatch rim as she rises: head, shoulder, then waist height.
             const risen = (L.topY - (p.y - PLAYER.height * 0.85)) / (PLAYER.height * 0.85);
@@ -3388,6 +3509,10 @@ export class ShipScene extends Phaser.Scene {
 
         const atTop = p.y <= L.topY;
         const atBottom = p.y >= L.bottomY;
+        if (L.out && atTop && input.up) {
+            L.out();
+            return;
+        }
         if (input.jumpPressed) {
             this.leaveLadderOrStairs();
             p.body.velocity.y = -PLAYER.jumpVelocity * 0.6;
@@ -3398,9 +3523,11 @@ export class ShipScene extends Phaser.Scene {
     }
 
     // Onto a ladder that is not on the map's ladder layer (the lifeboat station's, outside).
-    enterLadder(x, topY, bottomY) {
+    enterLadder(x, topY, bottomY, out = null, ceil = null) {
         const p = this.player;
-        this.ladder = { x, topY, bottomY };
+        // (`out`: past its top she goes somewhere else, the lifeboat's ladder up into its hatch; `ceil`: her picture is
+        // cut there, the ceiling she climbs through, the user, 2026-11-21: "she has to be cut off on top".)
+        this.ladder = { x, topY, bottomY, out, ceil };
         this.mode = 'ladder';
         p.body.enable = false;
         p.x = x;
@@ -3413,6 +3540,8 @@ export class ShipScene extends Phaser.Scene {
     leaveLadderOrStairs() {
         const p = this.player;
         this.mode = 'play';
+        this.downLatch = true;          // (a ↓ held from the climb does not crawl her: verbs.js `updateCrawl`)
+        p.setCrop();
         p.setDepth(DEPTH.player);
         this.pose('stand');
         p.body.enable = true;

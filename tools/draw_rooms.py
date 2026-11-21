@@ -653,14 +653,14 @@ def maid6(width):
     return out
 
 
-LIFEBOAT_DOOR = 68   # (population.py's `door_x` for it: clear of the boat's bow curve)
+LIFEBOAT_DOOR = 112   # (population.py's `door_x` for it: under the roof hatch's middle, tools/build_hatch.py)
 
 
 def lifeboat(width):
     """Inside the one lifeboat whose hatch is open, on the boat walkway (population: `room_lifeboat`), as long as
     the boat it is seen in (408 px, the user, 2026-11-21: the inside is the whole boat, the hatch near its forward
     end): the orange hull's ribs, a bench with harnesses along its side, two oars in their brackets, portholes on
-    the sea, life jackets, a ration box; the second book lies on the bench (112, 17 px up), the photo slot hangs
+    the sea, life jackets, a ration box; the second book lies on the bench (146, 17 px up, clear of the ladder), the photo slot hangs
     between the portholes (184)."""
     R = Room(width, "#f79617", "#cd683d", ceiling="#fbb954", skirting="#cd683d", floor=GREY, fleck=SLATE, pitch=30)
     r, box, d = R.r, R.box, R.d
@@ -673,18 +673,31 @@ def lifeboat(width):
     r(20, 14, width - 21, 14, WHITE)
     for x in range(24, width - 20, 30):
         r(x, 12, x, 16, GREY)
-    for lamp in (120, 288):
+    for lamp in (156, 288):
         box(lamp - 6, 9, lamp + 6, 15, DARK)
         r(lamp - 4, 11, lamp + 4, 13, TUBE)
-    R.door(x=LIFEBOAT_DOOR, frame="door-watertight")
+    # The way out, since 2026-11-21 (the user: "Inside the boat, there's a ladder in that place and the hatch above"):
+    # a steel ladder from the floor up to the open roof hatch in the canopy, the sky's light through it. In full
+    # colours, as every way she can use.
+    x = LIFEBOAT_DOOR
+    box(x - 12, 0, x + 12, 9, DARK)
+    r(x - 10, 0, x + 10, 7, BLUE_LIGHT)
+    r(x - 10, 0, x + 10, 2, WHITE)
+    for rail in (x - 7, x + 6):
+        r(rail, 9, rail + 1, FLOOR - 1, GREY)
+        r(rail, 9, rail, FLOOR - 1, WHITE)
+    for y in range(16, FLOOR - 4, 9):
+        r(x - 6, y, x + 5, y + 1, GREY)
+        r(x - 6, y, x + 5, y, WHITE)
+    R.full.append((x - 13, 0, x + 13, FLOOR - 1))
     # Portholes on the sea.
-    for x in (96, 150, 218, 290, 358):
+    for x in (150, 232, 290, 358):
         d.ellipse([x - 9, 34, x + 9, 52], fill=DARK, outline=INK)
         d.ellipse([x - 7, 36, x + 7, 50], fill=BLUE_LIGHT)
         d.chord([x - 7, 36, x + 7, 50], 10, 170, fill=BLUE)
         r(x - 5, 41, x - 2, 41, WHITE)
     # The oars in their brackets over the bench: the shaft, a red-tipped blade.
-    for o in (0, 176):
+    for o in (38, 176):
         r(88 + o, 66, 176 + o, 68, WOOD)
         r(88 + o, 68, 176 + o, 68, WOOD_DARK)
         box(176 + o, 62, 204 + o, 72, WOOD_LIGHT)
@@ -692,11 +705,11 @@ def lifeboat(width):
         for x in (104, 160):
             r(x + o, 63, x + o + 2, 72, DARK)
     # The bench along the side, 17 px up, harness straps hung over it.
-    box(94, FLOOR - 17, width - 4, FLOOR - 13, PALE)
-    box(96, FLOOR - 13, width - 6, FLOOR - 1, STEEL_SHADE)
-    for x in range(100, width - 8, 28):
+    box(124, FLOOR - 17, width - 4, FLOOR - 13, PALE)
+    box(126, FLOOR - 13, width - 6, FLOOR - 1, STEEL_SHADE)
+    for x in range(132, width - 8, 28):
         r(x, FLOOR - 12, x, FLOOR - 2, GREY)
-    for x in range(100, width - 20, 56):
+    for x in range(132, width - 20, 56):
         r(x, FLOOR - 44, x + 1, FLOOR - 18, SLATE)
         r(x + 7, FLOOR - 44, x + 8, FLOOR - 18, SLATE)
         r(x, FLOOR - 32, x + 8, FLOOR - 30, SLATE)
@@ -707,7 +720,7 @@ def lifeboat(width):
     box(width - 34, FLOOR - 29, width - 16, FLOOR - 17, WHITE)
     r(width - 27, FLOOR - 26, width - 23, FLOOR - 20, RED)
     r(width - 29, FLOOR - 24, width - 21, FLOOR - 22, RED)
-    for x in (140, 252):
+    for x in (204, 252):
         box(x, FLOOR - 27, x + 10, FLOOR - 17, BLUE)
         r(x + 3, FLOOR - 30, x + 7, FLOOR - 27, WHITE)
     return R.save("lifeboat")

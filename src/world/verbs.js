@@ -35,7 +35,10 @@ export const verbs = {
         const low = this.route === 'duct' || (this.crawling && this.world.lowAt(p.x, p.y));
         const can = this.progress.knows('crawl') && !this.world.carry && !this.isLunging() && !this.holding;
         // (Once down she stays down while ↓ is held: changing her body's size unsettles the floor a frame.)
-        const want = low || (input.down && can && (onFloor || this.crawling));
+        // (↓ still held from climbing down a ladder or stairs does not put her down: it must be let go first, the
+        // user, 2026-11-21: "when the climb down finishes, she automatically crouches".)
+        if (!input.down) this.downLatch = false;
+        const want = low || (input.down && !this.downLatch && can && (onFloor || this.crawling));
         if (want !== this.crawling) this.setCrawl(want);
         return this.crawling;
     },

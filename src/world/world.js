@@ -35,6 +35,13 @@ const LOOKS = {
 };
 const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the user, 2026-11-14; it was the gangway's)
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
+// The lifeboat's roof hatch (tools/build_hatch.py): its two pieces' top lefts from the walkway's floor under the hatch's
+// middle (the boat's column 112, where E takes her in; the back at its column 91 and row 26, the lip at 90 and 37, the
+// floor at its row 120).
+const HATCH_PIECE = { back: { x: 91 - 112, y: 26 - 120 }, front: { x: 90 - 112, y: 37 - 120 } };
+// Its ladder inside (tools/draw_rooms.py's): where she is put on it coming in (her head in the hatch), and how far she climbs
+// it going out, until she is through the hatch and out of the picture.
+const ROOF_LADDER = { start: 62, out: 128 };
 
 // A gull's beak in each of its frames (the things atlas, px from the frame's top left): its tip's column
 // and its row, for a tangerine carried in it (`inBeak`).
@@ -371,6 +378,24 @@ export class World {
                 d.lockSpec = parseLock(d.lock);
                 const out = d.outRoute === OUTSIDE;
                 const art = DOOR_ART[d.kind];
+                // A way in through a boat's roof hatch (the lifeboat, the user, 2026-11-21): the hatch laid on its boat,
+                // in front of her as the boat is (tools/build_hatch.py: her climb up into it, the scene's `roofClimb`).
+                if (d.kind === 'roof') {
+                    // Its ladder inside, up to the hatch: on its top as she comes in; up past its top, out.
+                    // (`y1` its top as far as she climbs, out of the picture through the hatch; `start` where she is put on it
+                    // coming in, her head in the hatch; `ceil` the room's top, where her picture is cut.)
+                    (this.roofLadders ??= []).push({ room, x: d.x, y0: def.floor, y1: def.floor - ROOF_LADDER.out,
+                        start: def.floor - ROOF_LADDER.start, ceil: def.floor - ROOM.height, routeBottom: def.id, routeTop: null,
+                        out: () => s.roofOut(room, d) });
+                    // (Its back, the far rim and the dark opening, behind her picture; its near lip over it.)
+                    for (const [part, depth] of [['back', D.player + 0.062], ['front', D.player + 0.068]]) {
+                        const at = HATCH_PIECE[part];
+                        const hatch = s.add.image(d.outX + at.x, d.outY + at.y, 'things', `lifeboat-hatch-${part}`).setOrigin(0).setDepth(depth);
+                        this.add([hatch]);
+                        room.outside.push(hatch);
+                        s.shellSlopes.push({ deck: [6, 7], gfx: hatch });
+                    }
+                }
                 if (art) {
                     // (Outside, the lifeboat's hatch is on the boat, which is in front of her: ShipScene's BOAT_DEPTH.)
                     const door = s.add.image(d.outX, d.outY, 'shipart', art).setOrigin(0.5, 1).setDepth(out ? D.player + 0.065 : D.props);
@@ -603,7 +628,7 @@ export class World {
     tryLadder(input, onFloor) {
         const s = this.scene, p = s.player;
         if (this.carry || !onFloor) return false;
-        for (const L of this.ladders) {
+        for (const L of this.ladders.concat(this.roofLadders ?? [])) {
             if (Math.abs(p.x - L.x) > 10) continue;
             const atFoot = input.up && s.route === L.routeBottom && Math.abs(p.y - L.y0) < 4;
             const atTop = input.down && s.route === L.routeTop && Math.abs(p.y - L.y1) < 4;
@@ -614,9 +639,14 @@ export class World {
                 return true;
             }
             this.onLadder = L;
-            return s.enterLadder(L.x, L.y1, L.y0);
+            return s.enterLadder(L.x, L.y1, L.y0, L.out, L.ceil);
         }
         return false;
+    }
+
+    // The ladder inside a room entered through a roof hatch (the lifeboat).
+    roofLadderOf(room) {
+        return (this.roofLadders ?? []).find(L => L.room === room);
     }
 
     // A ladder on the map she can't take now: a tray in her hands, or its hatch still shut.

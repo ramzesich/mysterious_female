@@ -85,6 +85,9 @@ export class BootScene extends Phaser.Scene {
         // The boat drill's own clips (tools/build_drill.py): the crewman turning his winch; her gag under the boat.
         this.load.spritesheet('drill', 'assets/sprites/drill.png', { frameWidth: 96, frameHeight: 96 });
         this.load.json('drill-meta', 'assets/sprites/drill.json');
+        // Her pull-up over the lifeboat's roof hatch, facing us (tools/build_hatch.py).
+        this.load.spritesheet('mantle-front', 'assets/sprites/mantle-front.png', { frameWidth: 96, frameHeight: 96 });
+        this.load.json('mantle-front-meta', 'assets/sprites/mantle-front.json');
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
         // The sky's art (tools/build_sky.py): the intro's clouds and sun, where they stand, the god
