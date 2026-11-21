@@ -226,3 +226,14 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
 - **On the user's word ("1. Ok 2. Ok"):** a rule in `CLAUDE.md` (a new background prop is placed with `-bg`,
   its place's twin picked by `tools/wash_levels.py`); merged to `main` (a fast-forward: `main` had not moved)
   and pushed.
+
+## The intro: deck 3's side opens later (2026-11-21)
+
+- **First:** `refinement` brought up to `main` (`f7134c6`, a fast-forward: the HUD, the sardines), the user's word.
+- **Asked:** the side opening on deck 3's corridor "happens a bit early now. Let's open the corridor a bit later",
+  GIFs of the sequence from where the whole ship starts closing in.
+- **Shown:** four timings recorded on the stepped clock (the opening's range set in the page only): A as it was
+  (zoom 0.7 to 1.7, 3.6 to 4.3 s of the 5.6 s dive), B (1.2 to 1.9), C (1.6 to 1.99, about 4.5 to 5.1 s), D (after
+  the camera has stopped). **The user chose C.**
+- **Built:** one line in `src/intro.js`; the `intro` playtest's halfway check moved to the dive's 0.86. The built
+  game recorded and compared frame by frame with C: the same. `intro`, `deck3`, `boot` pass; the rest not run.

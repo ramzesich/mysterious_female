@@ -558,7 +558,7 @@ def scenario_intro(b):
                 "the whole ship is in view, every deck closed, nothing dimmed")
     t_sea, t_right = b.eval(f"{I}.parts.find(q => q.name === 'sea').len"), b.eval(f"{I}.parts.find(q => q.name === 'right').from")
     ok &= check(t_sea <= 0.6, "the camera goes right soon after the sea has come into view", (t_sea, t_right))
-    at("dive", 0.72)         # (its side is opening while the zoom goes from 0.7 to 1.7)
+    at("dive", 0.86)         # (its side is opening while the zoom goes from 1.6 to 1.99)
     mid = b.eval(f"[{S}.shellAlpha['3'], {S}.deckDim.shown]")
     ok &= check(0 < mid[0] < 1 and abs((1 - mid[0]) - mid[1]) < 0.25, "the dark round deck 3 comes on as its side opens", mid)
     b.shot("intro-ship")
