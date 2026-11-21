@@ -4607,7 +4607,8 @@ def scenario_region8__tshirt(b):
     b.open("?reset&play&at=deck12")
     wait(0.4)
     ok = check(not b.eval(f"!!({shirt}?.pick?.visible)"), "before the table scene: no shirt on the lounger")
-    got = json.loads(b.eval(loungers))
+    # (Deck 12's only: deck 10's first balcony has one too since thing 14.)
+    got = [g for g in json.loads(b.eval(loungers)) if abs(g[1] - D12) < 8]
     ok &= check(got == [[exact_x(111.0) - 40, D12 + 2], [exact_x(112.8) - 36, D12 + 2]],
                 "the two new loungers where the user put them", got)
     b.open("?reset&play&at=deck12&did=table")
