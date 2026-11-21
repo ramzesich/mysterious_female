@@ -42,7 +42,9 @@ ROOMS = [
          lock=("card", "ent", 0)),
     dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING", plate_style="navy",
          lock=("card", "ent", 0)),
-    dict(id="lifeboat", deck=7, m=147.5, route="outside", width=240, look="lifeboat", door="hatch"),
+    # (As long as the boat it is in, its hatch 68 px from the boat's forward end at 143 m, clear of the bow's curve:
+    # the user, 2026-11-21. `door_x` is drawn_rooms.py's LIFEBOAT_DOOR.)
+    dict(id="lifeboat", deck=7, m=143 + 68 / 48, route="outside", width=408, door_x=68, look="lifeboat", door="hatch"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
     # A guest cabin being made up on deck 10's midships hallway, its door held open, the bedmaker in it
     # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
@@ -180,6 +182,8 @@ ITEMS = {
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
+    # (§4 2.1, 17: on the life-jacket box's lid at the boat walkway's aft end, its foot 2 px into the lid: the user.)
+    "book_11": ("walkway", 230 + 2 / 48, "book:11", None, 30),
     # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
     # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
     "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
@@ -587,6 +591,9 @@ PROPS = {
     # The winch its crewman cranks (he cranked the air: found in the sweep of 2026-11-14). Its
     # handle is where his hands go round, 12 px in front of his middle; he is drawn over it.
     "prop_drill_winch": ("walkway", 184.6 + 24 / 48, "thing:winch", 0, {}),
+    # The life-jacket box at the walkway's aft end, past the drill, against the railing (book 11 on its lid): 1 px up, the
+    # user's placing (2026-11-21); behind her and behind the walkway's railing.
+    "prop_lifejacket_box": ("walkway", 230 + 10 / 48, "thing:lifejacket-box", 1, {}),
     # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
     "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
     # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under

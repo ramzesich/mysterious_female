@@ -54,6 +54,9 @@ const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], ve
 // The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
 const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
+const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
+const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
+const WALK_LIFT = 2;   // her picture's px higher on the boat walkway (the user, 2026-11-21: "shift her two pixels up")
 // The bridge's back wall (deck 10): its thickness; how far she goes from its door before it shuts.
 const BULKHEAD = { width: 12, shutAway: 70 };
 
@@ -904,10 +907,10 @@ export class ShipScene extends Phaser.Scene {
         // there); only while she is out on it (inside, the deck below may be open there).
         pr.edge = this.plateCopy(pr.x0, floor, pr.x1 - pr.x0, 2, DEPTH.exterior + 0.135).setVisible(false);
         const enclosed = list('enclosed').map(pair => pair.split(':').map(Number));
-        // Each boat: its x, its picture, its two hooks' x in it and their eyes' depth below its top.
+        // Each boat: its x, its picture, its two hooks' x in it and each one's eye's top below its top.
         const boats = list('boats').map(s => {
-            const [x, key, h1, h2, eye] = s.split(':');
-            return { x: Number(x), key, hooks: [Number(h1), Number(h2)], eye: Number(eye) };
+            const [x, key, h1, h2, e1, e2] = s.split(':');
+            return { x: Number(x), key, hooks: [Number(h1), Number(h2)], eyes: [Number(e1), Number(e2)] };
         });
         const columns = list('columns').map(Number);
         const add = (deck, depth) => {
@@ -919,6 +922,9 @@ export class ShipScene extends Phaser.Scene {
         const behind = add(6, DEPTH.exterior + 0.08);
         const front = add(6, DEPTH.player + 0.3);
         const high = add([6, 7], DEPTH.exterior + 0.06);
+        // The walkway's railing: over her and what stands on the walkway, under the boats hanging outside it
+        // (the user, 2026-11-21: "behind the boats, but cover the player and the box with the book").
+        const walkRail = this.walkRail = add([6, 7], WALK_RAIL_DEPTH);
         const columnsGfx = add([6, 7], DEPTH.player + 0.32);
 
         // The deck underfoot, beige, and under the enclosed ends the wall in their shade.
@@ -1007,10 +1013,10 @@ export class ShipScene extends Phaser.Scene {
         // white walkway at deck 7's floor (the user's side photo, 2026-11-07). Each boat hangs high,
         // under the overhang, from a short davit arm over each of its hooks, on its cables. All
         // washed out a little, background like the boats (the user, 2026-11-06).
-        high.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 6, pr.x1 - pr.x0, 6);
-        high.fillStyle(0xc7dcd0, 1).fillRect(pr.x0, top7, pr.x1 - pr.x0, 1);
-        high.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 30, pr.x1 - pr.x0, 2);
-        for (let x = pr.x0 + 24; x < pr.x1; x += 48) high.fillRect(x, top7 - 30, 2, 24);
+        walkRail.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 6, pr.x1 - pr.x0, 6);
+        walkRail.fillStyle(0xc7dcd0, 1).fillRect(pr.x0, top7, pr.x1 - pr.x0, 1);
+        walkRail.fillStyle(0xf4f4f4, 1).fillRect(pr.x0, top7 - 30, pr.x1 - pr.x0, 2);
+        for (let x = pr.x0 + 24; x < pr.x1; x += 48) walkRail.fillRect(x, top7 - 30, 2, 24);
         // A column within an enclosed end stands behind its wall, seen through its openings and over
         // it (the user, 2026-11-07).
         const behindWall = add([6, 7], DEPTH.player + 0.29);
@@ -1021,14 +1027,17 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0xe8eaec, 1).fillRect(x - 7, floor - 4, 14, 4);
         }
         const drop = 8;                              // the boats' tops under the overhang, their keels clear of the enclosed ends' walls
-        for (const { x, key, hooks, eye } of boats) {
-            for (const h of hooks) {
+        for (const { x, key, hooks, eyes } of boats) {
+            hooks.forEach((h, i) => {
                 const hook = x + h;
                 high.fillStyle(0xf7f8f8, 1).fillRect(hook - 14, hang, 28, 6);
                 high.fillStyle(0xd3e1da, 1).fillRect(hook - 14, hang + 5, 28, 1);
-                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, drop + eye - 6 + 1);
-            }
-            const boat = this.add.image(x, hang + drop, key).setOrigin(0).setDepth(DEPTH.exterior + 0.07);
+                high.fillStyle(0x7a7480, 1).fillRect(hook, hang + 6, 1, drop + eyes[i] - 6 + 1);
+            });
+            // (In front of her on the walkway, as they hang outside its railing: the user, 2026-11-21, "She has to
+            // move behind the boats, obscured by them". The drill's boat is so already: src/world/outside.js.)
+            const boat = this.add.image(x, hang + drop, key).setOrigin(0).setDepth(BOAT_DEPTH);
+            (this.boatPics ??= []).push(boat);
             this.worldLayer.add(boat);
             this.shellSlopes.push({ deck: [6, 7], gfx: boat });
         }
@@ -3577,6 +3586,15 @@ export class ShipScene extends Phaser.Scene {
             r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
             r.front?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
         }
+        // Inside a boat (the lifeboat, a room entered from outside), the boat's own picture and its hatch, drawn in
+        // front of her outside, are not drawn over its inside (the user, 2026-11-21: "the inside of the boat is now
+        // not shown").
+        const boatRoom = this.overview || this.fromAfar ? null : this.rooms.find(r => r.route === this.route && r.inDeck === false);
+        for (const b of this.boatPics || []) {
+            b.setVisible(!boatRoom || b.x + b.width <= boatRoom.room.x || b.x >= boatRoom.room.x + boatRoom.room.width);
+        }
+        for (const r of this.rooms) if (r.inDeck === false) r.outside?.forEach(o => o.setVisible(r !== boatRoom && !r.hidden));
+        this.walkRail?.setDepth(boatRoom ? DEPTH.exterior + 0.06 : WALK_RAIL_DEPTH);
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
         for (const cat of this.cats) {
@@ -3609,11 +3627,22 @@ export class ShipScene extends Phaser.Scene {
         if (onProm) p.setCrop(0, 0, PLAYER.cell, PLAYER.cell - PLAYER.sink);
         else if (this.promCrop) p.setCrop();
         this.promCrop = onProm;
+        // On the boat walkway (deck 7's height, outside, up to deck 8's balconies) her picture is drawn `WALK_LIFT` px
+        // higher, her body where it is; changed only while she plays (a gag sets her picture its own way).
+        const top7 = pr && pr.floor - this.deckPitch;
+        const onWalk = !!pr && this.route === 'promenade' && p.y <= top7 + 2 && p.y > top7 - this.deckPitch + 2 && p.x >= pr.x0 && p.x <= pr.x1;
+        if (this.mode === 'play') {
+            const px = this.herDropPx() - PLAYER.sink;
+            if (onWalk && px !== -WALK_LIFT) this.herDrop(-WALK_LIFT);
+            else if (!onWalk && px === -WALK_LIFT) this.herDrop(0);
+        }
         // On a balcony her picture is cut at its partitions and at a row's end (`balconyRoom`): what reached past
         // one showed on the next balcony or over the ship's side (the user, 2026-11-21). (Phaser 4 crops a picture
         // turned by `flipX` with its content shifted by width - 2 x - w: so while she is on a balcony a stand-in of
         // her is drawn, turned by its scale, which crops true, and her own picture is cropped to nothing.)
-        const balc = !onProm && this.route === OUTSIDE && p.visible ? this.world.balconyRoom(p.x, p.y) : null;
+        // (And on the boat walkway at its two ends, where it meets the ship's side: the user, 2026-11-21, "the same way
+        // we fixed this issue on the balconies".)
+        const balc = !onProm && this.route === OUTSIDE && p.visible ? this.world.balconyRoom(p.x, p.y) ?? (onWalk ? [pr.x0, pr.x1] : null) : null;
         const pic = this.balconyPic;
         if (balc) {
             const left = p.x - p.displayOriginX, rw = p.width;

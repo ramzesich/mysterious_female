@@ -359,14 +359,21 @@ export class World {
             const front = def.front ? s.add.image(def.x0, def.floor - ROOM.height, `room-${def.id}-front`).setOrigin(0)
                 .setDepth(D.exterior + 0.135).setVisible(false) : null;
             if (front) this.add([front]);
-            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front, inDeck: true,
+            // (A room entered from outside, the lifeboat, is seen through the ship's closed side: the deck behind it
+            // is not cut open, the user, 2026-11-21: "The cut away must show the outside of the hull".)
+            const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front,
+                           inDeck: !def.doors.some(d => d.outRoute === OUTSIDE),
                            doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
+            // (Its dim then goes over what the outside draws in front of her too, the balconies' fronts: they showed
+            // undimmed over it. It frames the room, so neither the room nor she is under it.)
+            if (!room.inDeck) dim.setDepth(D.player + 0.35);
             for (const d of def.doors) {
                 d.lockSpec = parseLock(d.lock);
                 const out = d.outRoute === OUTSIDE;
                 const art = DOOR_ART[d.kind];
                 if (art) {
-                    const door = s.add.image(d.outX, d.outY, 'shipart', art).setOrigin(0.5, 1).setDepth(out ? D.exterior + 0.1 : D.props);
+                    // (Outside, the lifeboat's hatch is on the boat, which is in front of her: ShipScene's BOAT_DEPTH.)
+                    const door = s.add.image(d.outX, d.outY, 'shipart', art).setOrigin(0.5, 1).setDepth(out ? D.player + 0.065 : D.props);
                     this.add([door]);
                     room.outside.push(door);
                     if (out) s.shellSlopes.push({ deck: [6, 7], gfx: door });

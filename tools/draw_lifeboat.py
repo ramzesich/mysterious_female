@@ -39,7 +39,9 @@ STEEL, ROOF, ROOF_LIT = "#9babb2", "#7f708a", "#9babb2"
 SIZES = {"lifeboat": (408, 128), "tender": (400, 128), "rescue-boat": (252, 74)}
 # Where each boat's two cables take it, from its left edge (as fractions of its length), and how far
 # down its picture the hooks' eyes are: the game hangs it by these.
-HOOKS = {"lifeboat": ((0.173, 0.893), 0.13), "tender": ((0.173, 0.893), 0.13), "rescue-boat": ((0.2, 0.8), 0.3)}
+# (The tender's forward hook is forward of its wheelhouse, on the cabin's roof: on the wheelhouse its ring rose past the
+# picture's top and was cut, the user, 2026-11-21. The game measures each eye's top in the picture: build_ship_map.py.)
+HOOKS = {"lifeboat": ((0.173, 0.893), 0.13), "tender": ((0.1, 0.893), 0.13), "rescue-boat": ((0.2, 0.8), 0.3)}
 
 
 class Pen:
@@ -96,8 +98,8 @@ HULL_SHAPE = [(10, 56), (290, 56), (296, 62), (296, 72), (290, 82), (276, 90), (
               (48, 94), (26, 90), (12, 80), (5, 68), (5, 60)]
 
 
-def hooks(pen, top_fore=20, top_aft=24):
-    for x in (52, 268):
+def hooks(pen, top_fore=20, top_aft=24, xs=(52, 268)):
+    for x in xs:
         top = top_fore if x < 200 else top_aft
         pen.rect(x - 1.5, top, x + 1.5, top + 8, fill=STEEL)
         pen.d.ellipse([pen.p(x - 4, top - 6), pen.p(x + 4, top + 2)], outline=STEEL, width=2)
@@ -146,7 +148,7 @@ def tender():
     pen.line(110, 16, 270, 16, STEEL, 1)
     for x in range(110, 272, 20):
         pen.line(x, 16, x, 22, STEEL, 1)
-    hooks(pen, 4, 12)
+    hooks(pen, 12, 12, xs=(30, 268))
     return pen.outline()
 
 

@@ -2008,15 +2008,21 @@ def build_objects():
 def promenade():
     """Deck 6's promenade (§5.3), as one object for the game to draw and use: its span, the doors,
     the enclosed ends, the boats hanging high in it on their davits and the white columns, as in the
-    user's side photo (2026-11-07). Each boat: x, its picture, its two hooks' x and their eyes' depth
-    in the picture (tools/draw_lifeboat.py)."""
+    user's side photo (2026-11-07). Each boat: x, its picture, its two hooks' x and each hook's eye's top in
+    the picture (tools/draw_lifeboat.py), measured there: the first row drawn in the hook's column. (One depth
+    for both, the lifeboats' aft cables stopped 5 px short of their rings and the tenders' ran through theirs:
+    the user, 2026-11-21, "the places where the boat cables are not attached properly".)"""
+    from PIL import Image
     from draw_lifeboat import HOOKS, SIZES
     deck, (a, b) = PROMENADE["deck"], PROMENADE["span"]
     boats = []
     for m, kind in PROMENADE["boats"]:
-        (h1, h2), eye = HOOKS[kind]
+        (h1, h2), _ = HOOKS[kind]
         w, h = SIZES[kind]
-        boats.append(f"{exact_x(m)}:{kind}:{round(h1 * w)}:{round(h2 * w)}:{round(eye * h)}")
+        pic = Image.open(ROOT / "assets" / "ship" / f"{kind}.png").convert("RGBA")
+        xs = [round(h1 * w), round(h2 * w)]
+        eyes = [next(y for y in range(h) if pic.getpixel((x, y))[3]) for x in xs]
+        boats.append(f"{exact_x(m)}:{kind}:{xs[0]}:{xs[1]}:{eyes[0]}:{eyes[1]}")
     columns = [exact_x(m) for m in PROMENADE["columns"]]
     doors = [x_of(m) for m in PROMENADE["doors"]]
     for d in doors:

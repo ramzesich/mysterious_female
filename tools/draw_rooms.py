@@ -653,11 +653,15 @@ def maid6(width):
     return out
 
 
+LIFEBOAT_DOOR = 68   # (population.py's `door_x` for it: clear of the boat's bow curve)
+
+
 def lifeboat(width):
-    """Inside the one lifeboat whose hatch is open, on the boat walkway (population: `room_lifeboat`):
-    the orange hull's ribs, a bench with harnesses along its side, an oar in its brackets, portholes
-    on the sea, life jackets, a ration box; the second book lies on the bench (112, 17 px up), the
-    photo slot hangs between the portholes (184)."""
+    """Inside the one lifeboat whose hatch is open, on the boat walkway (population: `room_lifeboat`), as long as
+    the boat it is seen in (408 px, the user, 2026-11-21: the inside is the whole boat, the hatch near its forward
+    end): the orange hull's ribs, a bench with harnesses along its side, two oars in their brackets, portholes on
+    the sea, life jackets, a ration box; the second book lies on the bench (112, 17 px up), the photo slot hangs
+    between the portholes (184)."""
     R = Room(width, "#f79617", "#cd683d", ceiling="#fbb954", skirting="#cd683d", floor=GREY, fleck=SLATE, pitch=30)
     r, box, d = R.r, R.box, R.d
     # The hull closes in at both ends: dark rounded corners under the canopy.
@@ -665,43 +669,47 @@ def lifeboat(width):
         d.pieslice([x0, 8, x1, 88], a0, a1, fill="#fbb954")
     r(0, 9, 3, FLOOR - 5, "#cd683d")
     r(width - 4, 9, width - 1, FLOOR - 5, "#cd683d")
-    # A grab line along the canopy, a lamp in its cage.
+    # A grab line along the canopy, a lamp in its cage over each half.
     r(20, 14, width - 21, 14, WHITE)
     for x in range(24, width - 20, 30):
         r(x, 12, x, 16, GREY)
-    box(114, 9, 126, 15, DARK)
-    r(116, 11, 124, 13, TUBE)
-    R.door(frame="door-watertight")
+    for lamp in (120, 288):
+        box(lamp - 6, 9, lamp + 6, 15, DARK)
+        r(lamp - 4, 11, lamp + 4, 13, TUBE)
+    R.door(x=LIFEBOAT_DOOR, frame="door-watertight")
     # Portholes on the sea.
-    for x in (96, 150, 218):
+    for x in (96, 150, 218, 290, 358):
         d.ellipse([x - 9, 34, x + 9, 52], fill=DARK, outline=INK)
         d.ellipse([x - 7, 36, x + 7, 50], fill=BLUE_LIGHT)
         d.chord([x - 7, 36, x + 7, 50], 10, 170, fill=BLUE)
         r(x - 5, 41, x - 2, 41, WHITE)
-    # The oar in its brackets over the bench: the shaft, a red-tipped blade.
-    r(88, 66, 176, 68, WOOD)
-    r(88, 68, 176, 68, WOOD_DARK)
-    box(176, 62, 204, 72, WOOD_LIGHT)
-    r(198, 63, 203, 71, RED)
-    for x in (104, 160):
-        r(x, 63, x + 2, 72, DARK)
+    # The oars in their brackets over the bench: the shaft, a red-tipped blade.
+    for o in (0, 176):
+        r(88 + o, 66, 176 + o, 68, WOOD)
+        r(88 + o, 68, 176 + o, 68, WOOD_DARK)
+        box(176 + o, 62, 204 + o, 72, WOOD_LIGHT)
+        r(198 + o, 63, 203 + o, 71, RED)
+        for x in (104, 160):
+            r(x + o, 63, x + o + 2, 72, DARK)
     # The bench along the side, 17 px up, harness straps hung over it.
-    box(84, FLOOR - 17, 236, FLOOR - 13, PALE)
-    box(86, FLOOR - 13, 234, FLOOR - 1, STEEL_SHADE)
-    for x in range(100, 232, 28):
+    box(94, FLOOR - 17, width - 4, FLOOR - 13, PALE)
+    box(96, FLOOR - 13, width - 6, FLOOR - 1, STEEL_SHADE)
+    for x in range(100, width - 8, 28):
         r(x, FLOOR - 12, x, FLOOR - 2, GREY)
-    for x in (100, 156, 212):
+    for x in range(100, width - 20, 56):
         r(x, FLOOR - 44, x + 1, FLOOR - 18, SLATE)
         r(x + 7, FLOOR - 44, x + 8, FLOOR - 18, SLATE)
         r(x, FLOOR - 32, x + 8, FLOOR - 30, SLATE)
         r(x + 3, FLOOR - 33, x + 5, FLOOR - 29, YELLOW)
-    # A life jacket on its hook, the ration box and a water can on the bench's end.
-    stand(R.im, "life-jacket", 72 + 104, dy=17)
-    box(214, FLOOR - 29, 232, FLOOR - 17, WHITE)
-    r(221, FLOOR - 26, 225, FLOOR - 20, RED)
-    r(219, FLOOR - 24, 227, FLOOR - 22, RED)
-    box(140, FLOOR - 27, 150, FLOOR - 17, BLUE)
-    r(143, FLOOR - 30, 147, FLOOR - 27, WHITE)
+    # Life jackets on their hooks, the ration box and the water cans on the bench.
+    for x in (176, 304):
+        stand(R.im, "life-jacket", x, dy=17)
+    box(width - 34, FLOOR - 29, width - 16, FLOOR - 17, WHITE)
+    r(width - 27, FLOOR - 26, width - 23, FLOOR - 20, RED)
+    r(width - 29, FLOOR - 24, width - 21, FLOOR - 22, RED)
+    for x in (140, 252):
+        box(x, FLOOR - 27, x + 10, FLOOR - 17, BLUE)
+        r(x + 3, FLOOR - 30, x + 7, FLOOR - 27, WHITE)
     return R.save("lifeboat")
 
 

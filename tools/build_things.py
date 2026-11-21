@@ -128,7 +128,12 @@ SEAM = {"tennis-ball": "a2a947"}
 # His folded t-shirt (13), on deck 12's lounger: PixelLab's small folded shirt (`tries/tshirt/3.png`, the user's
 # choice), its purples set to the close-up's navies by lightness, 20 x 12 (the user, 2026-11-21: "Better"); not the
 # close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick"}
+# The life-jacket box at the boat walkway's aft end (book 11 on its lid; the user chose try 2 of two, 2026-11-21): white,
+# which the palette turns pale green; kept so, and washed as the walkway's background is (`WASH`).
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box"}
+# Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->
+# (how far, the wall's colour). The walkway's recess wall is ShipScene's 0xc9ced3; decks 6 and 7 are at 20%.
+WASH = {"lifejacket-box": (0.20, (0xc9, 0xce, 0xd3))}
 # Pictures the user drew by hand in Paint, on a white ground (white is empty): name -> its file's stem. **Never written
 # by a tool** (CLAUDE.md): his handheld (15), the user's own pixel edit of my 24 x 11, 2026-11-21.
 BY_HAND = {"handheld": "handheld-by-hand"}
@@ -252,6 +257,10 @@ def piece(path, name=None):
         img = outlined(img, OUTLINE[name])
     for (x, y), c in MEND.get(name, {}).items():
         img.putpixel((x, y), tuple(bytes.fromhex(c)) + (255,))
+    if name in WASH:
+        k, wall = WASH[name]
+        img.putdata([(*(round(c + (w - c) * k) for c, w in zip(p[:3], wall)), p[3]) if p[3] else p
+                     for p in img.get_flattened_data()])
     return img
 
 
