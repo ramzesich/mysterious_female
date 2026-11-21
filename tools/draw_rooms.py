@@ -17,6 +17,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 from palettize import palettize
+from draw_lifeboat import PORTHOLES
 from population import ROOMS
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -653,6 +654,7 @@ def maid6(width):
     return out
 
 
+SHAFT_ROW = 3       # the boathook's pole's first row in its picture (the oars' shafts are on rows 62 and 63)
 LIFEBOAT_DOOR = 112   # (population.py's `door_x` for it: under the roof hatch's middle, tools/build_hatch.py)
 
 
@@ -660,8 +662,8 @@ def lifeboat(width):
     """Inside the one lifeboat whose hatch is open, on the boat walkway (population: `room_lifeboat`), as long as
     the boat it is seen in (408 px, the user, 2026-11-21: the inside is the whole boat, the hatch near its forward
     end): the orange hull's ribs, a bench with harnesses along its side, two oars in their brackets, portholes on
-    the sea, life jackets, a ration box; the second book lies on the bench (146, 17 px up, clear of the ladder), the photo slot hangs
-    between the portholes (184)."""
+    the sea, life jackets, a ration box; the second book lies on the bench left of the ladder (46, 17 px up), the photo slot hangs
+    where the forward oar's blade was, just under its shaft (228, its middle 50 px up)."""
     R = Room(width, "#f79617", "#cd683d", ceiling="#fbb954", skirting="#cd683d", floor=GREY, fleck=SLATE, pitch=30)
     r, box, d = R.r, R.box, R.d
     # The hull closes in at both ends: dark rounded corners under the canopy.
@@ -690,20 +692,23 @@ def lifeboat(width):
         r(x - 6, y, x + 5, y + 1, GREY)
         r(x - 6, y, x + 5, y, WHITE)
     R.full.append((x - 13, 0, x + 13, FLOOR - 1))
-    # Portholes on the sea.
-    for x in (150, 232, 290, 358):
+    # Portholes on the sea, every 36 px, the ladder in the rhythm (the user, 2026-11-21: "Make more round
+    # windows inside, space them evenly"; the boat's outside has round windows at the same columns: draw_lifeboat.py).
+    for x in PORTHOLES:
         d.ellipse([x - 9, 34, x + 9, 52], fill=DARK, outline=INK)
         d.ellipse([x - 7, 36, x + 7, 50], fill=BLUE_LIGHT)
         d.chord([x - 7, 36, x + 7, 50], 10, 170, fill=BLUE)
         r(x - 5, 41, x - 2, 41, WHITE)
     # The oars in their brackets over the bench: the shaft, a red-tipped blade.
+    # (Level with the boathook left of the ladder, their shafts on its rows 62 and 63: the user, 2026-11-21, "Move the oar
+    # bars to be all on the same level as the bar to the left of the ladder". Generated, "proper oars there, matching the
+    # current lengths": try 2 of two, a light shaft and an orange-red blade, `assets/source/ship/lifeboat-oar.png`, its
+    # tries and ids in `assets/source/things/tries/README.md`; held in their brackets, drawn over them.)
+    oar = Image.open(ROOT / "assets" / "source" / "ship" / "lifeboat-oar.png").convert("RGBA")
     for o in (38, 176):
-        r(88 + o, 66, 176 + o, 68, WOOD)
-        r(88 + o, 68, 176 + o, 68, WOOD_DARK)
-        box(176 + o, 62, 204 + o, 72, WOOD_LIGHT)
-        r(198 + o, 63, 203 + o, 71, RED)
+        R.im.alpha_composite(oar, (88 + o, 57))
         for x in (104, 160):
-            r(x + o, 63, x + o + 2, 72, DARK)
+            r(x + o, 59, x + o + 2, 67, DARK)
     # The bench along the side, 17 px up, harness straps hung over it.
     box(124, FLOOR - 17, width - 4, FLOOR - 13, PALE)
     box(126, FLOOR - 13, width - 6, FLOOR - 1, STEEL_SHADE)
@@ -714,6 +719,28 @@ def lifeboat(width):
         r(x + 7, FLOOR - 44, x + 8, FLOOR - 18, SLATE)
         r(x, FLOOR - 32, x + 8, FLOOR - 30, SLATE)
         r(x + 3, FLOOR - 33, x + 5, FLOOR - 29, YELLOW)
+    # Its forward end, left of the ladder (the user, 2026-11-21: "Fill the inside of the boat to the left of the ladder"):
+    # a bench of its own, a harness over it, a boathook in its brackets, a water can and the flare box; the second book
+    # lies on it where a life jacket hung (the user: "Remove the vest from the left part of the inside. Place the book there").
+    box(12, FLOOR - 17, 98, FLOOR - 13, PALE)
+    box(14, FLOOR - 13, 96, FLOOR - 1, STEEL_SHADE)
+    for x in range(22, 96, 28):
+        r(x, FLOOR - 12, x, FLOOR - 2, GREY)
+    r(72, FLOOR - 44, 73, FLOOR - 18, SLATE)
+    r(79, FLOOR - 44, 80, FLOOR - 18, SLATE)
+    r(72, FLOOR - 32, 80, FLOOR - 30, SLATE)
+    r(75, FLOOR - 33, 77, FLOOR - 29, YELLOW)
+    # (Its boathook, generated, "slightly thinner, to match the oar handles": the user's choice of three, its pole cut to
+    # the oars' two rows and to the space here, its pole smoothed to one colour a row (the user), `assets/source/ship/
+    # lifeboat-boathook.png`; level with the oars, in its brackets.)
+    hook = Image.open(ROOT / "assets" / "source" / "ship" / "lifeboat-boathook.png").convert("RGBA")
+    R.im.alpha_composite(hook, (12, 62 - SHAFT_ROW))
+    for x in (30, 82):
+        r(x, 59, x + 2, 67, DARK)
+    box(58, FLOOR - 27, 68, FLOOR - 17, BLUE)
+    r(61, FLOOR - 30, 65, FLOOR - 27, WHITE)
+    box(18, FLOOR - 28, 34, FLOOR - 17, "#fb6b1d")        # (2 px further forward: the user, 2026-11-21)
+    r(18, FLOOR - 24, 34, FLOOR - 22, "#ae2334")
     # Life jackets on their hooks, the ration box and the water cans on the bench.
     for x in (176, 304):
         stand(R.im, "life-jacket", x, dy=17)

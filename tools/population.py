@@ -178,7 +178,7 @@ ITEMS = {
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     "book_1": (5, 85.5, "book:1", None, 23),
-    "book_2": ("lifeboat", 146, "book:2", None, 17),     # (from 112 since 2026-11-21: clear of the ladder at 112)
+    "book_2": ("lifeboat", 46, "book:2", None, 17),      # (on the bench left of the ladder, where a vest hung, midway between the flare box and the water can: the user, 2026-11-21)
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
@@ -702,7 +702,7 @@ BELL_GULL = dict(at=("prom", 140.6), up=90, item="keep_bell", flag="bell_dropped
 # Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
-SLOTS = {"slot_lifeboat": ("lifeboat", 184, 85), "slot_lighting": ("lighting", 446, 62),
+SLOTS = {"slot_lifeboat": ("lifeboat", 228, 50),     # (where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21) "slot_lighting": ("lighting", 446, 62),
          # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
          "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 176, 70),
          "slot_table": (11, 220.0, 36, "flag:table"),

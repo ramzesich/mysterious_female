@@ -36,12 +36,18 @@ STEEL, ROOF, ROOF_LIT = "#9babb2", "#7f708a", "#9babb2"
 
 # Each boat's size in game px (length, height): its length after the user's photo.
 # (A little smaller than life, 85%, so they hang clear of the promenade's walls: the user, 2026-11-07.)
-SIZES = {"lifeboat": (408, 128), "tender": (400, 128), "rescue-boat": (252, 74)}
+SIZES = {"lifeboat": (408, 128), "tender": (400, 128), "rescue-boat": (252, 74), "lifeboat-round": (408, 128)}
+# The one lifeboat she goes into (the walkway's at 143 m, its roof hatch: tools/build_hatch.py): round windows in place of
+# the small square ones, at the columns of its portholes inside (tools/draw_rooms.py's lifeboat; the user, 2026-11-21:
+# "place the round ones at the same exact locations where they are inside"), every 36 px but where the ladder (112) takes
+# the rhythm's place.
+PORTHOLES = (40, 76, 148, 184, 220, 256, 292, 328, 364)
 # Where each boat's two cables take it, from its left edge (as fractions of its length), and how far
 # down its picture the hooks' eyes are: the game hangs it by these.
 # (The tender's forward hook is forward of its wheelhouse, on the cabin's roof: on the wheelhouse its ring rose past the
 # picture's top and was cut, the user, 2026-11-21. The game measures each eye's top in the picture: build_ship_map.py.)
-HOOKS = {"lifeboat": ((0.173, 0.893), 0.13), "tender": ((0.1, 0.893), 0.13), "rescue-boat": ((0.2, 0.8), 0.3)}
+HOOKS = {"lifeboat": ((0.173, 0.893), 0.13), "tender": ((0.1, 0.893), 0.13), "rescue-boat": ((0.2, 0.8), 0.3),
+         "lifeboat-round": ((0.173, 0.893), 0.13)}
 
 
 class Pen:
@@ -105,7 +111,7 @@ def hooks(pen, top_fore=20, top_aft=24, xs=(52, 268)):
         pen.d.ellipse([pen.p(x - 4, top - 6), pen.p(x + 4, top + 2)], outline=STEEL, width=2)
 
 
-def lifeboat():
+def lifeboat(round_windows=None):
     pen = Pen(*SIZES["lifeboat"])
     pen.poly(HULL_SHAPE, HULL)
     pen.shade_below(85, 92, 94)
@@ -120,10 +126,20 @@ def lifeboat():
     pen.rect(206, 8, 250, 32, fill=CANOPY, radius=8)
     pen.rect(210, 14, 246, 20, fill=GLASS)
     pen.line(212, 10, 244, 10, CANOPY_LIT)
-    # Small windows along the canopy's side, and the boarding hatch amidships.
-    for x in list(range(36, 116, 12)) + list(range(152, 200, 12)) + [262]:
-        pen.rect(x, 40, x + 6, 45, fill=GLASS)
-    pen.rect(122, 34, 144, 50, outline=CANOPY_SHADE, radius=3)
+    # Small windows along the canopy's side (or round ones, at game px columns), and the boarding hatch amidships.
+    if round_windows:
+        for x in round_windows:
+            pen.d.ellipse([x - 5, 48, x + 5, 58], fill=GLASS, outline=CANOPY_SHADE)
+            pen.d.line([(x - 3, 51), (x - 1, 51)], fill=GLASS_LIT)
+            pen.d.point([(x - 3, 52)], fill=GLASS_LIT)
+        # (Its boarding hatch's outline under the roof hatch, over the ladder inside, at game px column 112: the user,
+        # 2026-11-21, "Move the rectangle to be where the ladder is inside"; a round window where it was.)
+        c = 112 * 300 / SIZES["lifeboat"][0]
+        pen.rect(c - 11, 34, c + 11, 50, outline=CANOPY_SHADE, radius=3)
+    else:
+        for x in list(range(36, 116, 12)) + list(range(152, 200, 12)) + [262]:
+            pen.rect(x, 40, x + 6, 45, fill=GLASS)
+        pen.rect(122, 34, 144, 50, outline=CANOPY_SHADE, radius=3)
     hooks(pen)
     return pen.outline()
 
@@ -181,7 +197,8 @@ def washed(im):
 
 if __name__ == "__main__":
     SOURCE.mkdir(parents=True, exist_ok=True)
-    boats = {"lifeboat": lifeboat(), "tender": tender(), "rescue-boat": rescue_boat()}
+    boats = {"lifeboat": lifeboat(), "tender": tender(), "rescue-boat": rescue_boat(),
+             "lifeboat-round": lifeboat(PORTHOLES)}
     for name, im in boats.items():
         im.save(SOURCE / f"{name}.png")
         washed(im).save(GAME / f"{name}.png")

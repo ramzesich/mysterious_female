@@ -71,7 +71,8 @@ PROMENADE = {"deck": 6, "span": (100, 231), "enclosed": [(100, 116), (212, 231)]
              # Its boats and white columns as in the user's side photo (2026-11-07): where each boat's
              # bow is (m) and what it is (clear of the recess's ends); the columns between them. Its
              # opening, 100-231 m, too.
-             "boats": [(100.8, "lifeboat"), (113.0, "rescue-boat"), (143.0, "lifeboat"), (155.6, "lifeboat"),
+             # (The one at 143 m is the lifeboat she goes into: its round windows, `lifeboat-round`, tools/draw_lifeboat.py.)
+             "boats": [(100.8, "lifeboat"), (113.0, "rescue-boat"), (143.0, "lifeboat-round"), (155.6, "lifeboat"),
                        (166.6, "lifeboat"), (199.3, "tender"), (209.9, "tender"), (220.4, "lifeboat")],
              "columns": [112.2, 122.8, 131.4, 142.3, 155.1, 178.9, 183.9, 196.0, 209.5, 220.1],
              # Its back wall (the photo): round portholes on deck 6, a glazed bay two decks tall.

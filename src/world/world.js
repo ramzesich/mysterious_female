@@ -39,6 +39,8 @@ const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-aja
 // middle (the boat's column 112, where E takes her in; the back at its column 91 and row 26, the lip at 90 and 37, the
 // floor at its row 120).
 const HATCH_PIECE = { back: { x: 91 - 112, y: 26 - 120 }, front: { x: 90 - 112, y: 37 - 120 } };
+// The middle of its dark opening (the boat's rows 28 to 36), from the same point: where its glow comes from.
+const HATCH_GLOW = { x: 2, y: 32 - 120 };
 // Its ladder inside (tools/draw_rooms.py's): where she is put on it coming in (her head in the hatch), and how far she climbs
 // it going out, until she is through the hatch and out of the picture.
 const ROOF_LADDER = { start: 62, out: 128 };
@@ -388,6 +390,16 @@ export class World {
                         start: def.floor - ROOF_LADDER.start, ceil: def.floor - ROOM.height, routeBottom: def.id, routeTop: null,
                         out: () => s.roofOut(room, d) });
                     // (Its back, the far rim and the dark opening, behind her picture; its near lip over it.)
+                    // (A faint warm glow out of the opening while she stands where E takes her in: the user, 2026-11-21. The
+                    // inside's lamp light, in soft layers over the opening's dark, under its lip; faded in and out by the
+                    // ship scene, `updateRoofGlow`.)
+                    const glow = s.add.graphics().setDepth(D.player + 0.063).setAlpha(0);
+                    const gx = d.outX + HATCH_GLOW.x, gy = d.outY + HATCH_GLOW.y;
+                    glow.fillStyle(0xfbb954, 0.35).fillRect(gx - 17, gy - 3, 35, 8);
+                    for (const [w, h, a] of [[30, 10, 0.16], [44, 20, 0.08], [58, 32, 0.05]]) glow.fillStyle(0xfbb954, a).fillEllipse(gx, gy - h / 4, w, h);
+                    this.add([glow]);
+                    room.outside.push(glow);
+                    (this.roofGlows ??= []).push({ glow, d, shown: 0 });
                     for (const [part, depth] of [['back', D.player + 0.062], ['front', D.player + 0.068]]) {
                         const at = HATCH_PIECE[part];
                         const hatch = s.add.image(d.outX + at.x, d.outY + at.y, 'things', `lifeboat-hatch-${part}`).setOrigin(0).setDepth(depth);

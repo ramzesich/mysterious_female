@@ -1550,6 +1550,17 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
+    // The lifeboat's hatch glows faintly while she stands where E takes her in (behind the boat, under it), fading in and
+    // out (the user, 2026-11-21: "add a faint glow from inside the hatch").
+    updateRoofGlow(dt) {
+        const p = this.player;
+        for (const g of this.world.roofGlows ?? []) {
+            const here = this.route === g.d.outRoute && this.mode === 'play' && Math.abs(p.x - g.d.outX) < 16 && Math.abs(p.y - g.d.outY) <= 4;
+            g.shown = approach(g.shown, here ? 1 : 0, dt * 3);
+            g.glow.setVisible(g.shown > 0).setAlpha(g.shown);
+        }
+    }
+
     // Her body held where it is, hidden, while a picture of her climbs.
     roofHold() {
         const p = this.player;
@@ -3726,6 +3737,7 @@ export class ShipScene extends Phaser.Scene {
         }
         for (const r of this.rooms) if (r.inDeck === false) r.outside?.forEach(o => o.setVisible(r !== boatRoom && !r.hidden));
         this.walkRail?.setDepth(boatRoom ? DEPTH.exterior + 0.06 : WALK_RAIL_DEPTH);
+        this.updateRoofGlow(dt);
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
         for (const cat of this.cats) {

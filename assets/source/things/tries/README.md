@@ -61,3 +61,18 @@ its five purples set to the close-up's navies by lightness, 20 x 12 by majority)
 | `lifejacket-box/try2.png` | **Used** (`../lifejacket-box.png`, the user's): a white deck box, two latches, a handle; book 11 on its lid | 5f1feb8b-79fd-4eab-abb6-73c467bea192 |
 | `warning-light/try1.png` | A red beacon dome on a stand: stands up, does not hang | 0c8c773e-e9c3-4777-ba4b-8e0c773453ac |
 | `warning-light/try2.png` | **Used** (`../warning-light.png`): a red lens in a cage hanging from a ceiling mount; its "off" twin built by `DIM` | 24f9e26e-ec4d-4b53-aafa-5a84fdfc7d27 |
+
+## The lifeboat's oars (2026-11-21)
+
+| File | What | PixelLab object |
+|---|---|---|
+| `oar/try1.png` | A dark varnished oar, a broad blade, a red tip | b1e62f2d-fc75-4293-8851-b89400c853b6 |
+| `oar/try2.png` | **Used** (`../ship/lifeboat-oar.png`, cut to what is drawn; the user's): a light shaft, a narrower orange-red blade | e8317e60-187b-46c9-8f95-e7b6152977b3 |
+
+## The lifeboat's boathook, left of the ladder (2026-11-21)
+
+| File | What | PixelLab object |
+|---|---|---|
+| `left-rack/boathook-wood.png` | **Used** (`../ship/lifeboat-boathook.png`: cut to 82 px from its pole's middle, its pole thinned to the oars' two rows, the user's "slightly thinner, to match the oar handles") | 342946d5-cdfd-4b2e-8bdf-d0630c4ba211 |
+| `left-rack/boathook-alu.png` | An aluminium boathook: read as a pipe | 7a657304-26e2-4d00-981d-0da3827a72b3 |
+| `left-rack/reaching-pole.png` | A striped rescue reaching pole | b0d37384-70fb-4769-aa91-712180b05730 |

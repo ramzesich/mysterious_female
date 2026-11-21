@@ -54,7 +54,7 @@ SKIP_KEYS = {"people", "her", "her-towel", "her-cat", "bumbot", "tangerine", "do
              "tiles",         # (the ship's side drawn again over her on the balconies, 2026-11-21: plating, not a thing)
              # (The walkway's boats, outside the ship's side, drawn in front of her since 2026-11-21 and so out of the
              # outside route's depths: they fade with their decks, never seen with the furniture inside.)
-             "lifeboat", "tender", "rescue-boat"}
+             "lifeboat", "lifeboat-round", "tender", "rescue-boat"}
 
 DUMP = """(() => { const s = window.__ship, out = [];
   const walk = list => { for (const o of list) {
