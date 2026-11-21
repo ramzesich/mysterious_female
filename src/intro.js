@@ -48,8 +48,9 @@ export const PARTS = {
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
 // The menu: where the name and the two plates stand on the screen, and the lettering's colours
-// from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen).
-const MENU = { title: 178, first: 336, step: 90,
+// from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen). The whole menu
+// stands 60 px higher than it was (the user's 3 of four, 2026-11-21).
+const MENU = { title: 118, first: 276, step: 90,
                sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is
@@ -309,7 +310,9 @@ export class Intro {
         s.fromAfar = z < 0.6;
         s.horizonOnScreen = undefined;
         if (this.full) {
-            const open = clamp01(Math.log(z / 0.7) / Math.log(1.7 / 0.7));
+            // (It opens as the zoom goes from 1.6 to 1.99, the camera all but settled on the corridor:
+            // from 0.7 to 1.7 it was "a bit early", the user's C of four, 2026-11-21.)
+            const open = clamp01(Math.log(z / 1.6) / Math.log(1.99 / 1.6));
             s.viewOverride = s.fromAfar || this.p('corridor') >= 1 ? null : 2 + smooth(open);
             // (The dark round her deck comes with the corridor's opening, not after it: the user.)
             s.dimOverride = s.fromAfar ? 0 : smooth(open);

@@ -1865,10 +1865,14 @@ longer takes one: typically 25 to 30 of the about 42 a first player finds.
       English, the default, and Ukrainian: every word on the screen changes with it, so it does
       not spell the language out). ↑/↓ and Enter, Space or E, or the mouse. **Its look** (the
       user: "The text looks too plain now", then chose from three mock-ups): the name in
-      generated pixel lettering in the sun livery's yellows and oranges with a navy outline;
+      pixel lettering in the sun livery's yellows and oranges with a navy outline;
       the buttons ship's name plates, riveted brass round navy enamel, their letters cream and
-      gold on the one chosen, a tangerine beside it. All in capitals: the lettering is Latin,
-      and the Ukrainian capitals are built from its shapes (`tools/build_menu.py`).
+      gold on the one chosen, a tangerine beside it. All in capitals. **Decided (2026-11-21,
+      the user's choice of five fonts set over the menu):** the lettering is the pixel font
+      Press Start 2P, with its own Ukrainian capitals (it was a generated Latin lettering, the
+      Ukrainian built from its shapes), the name at twice the font's pixels, the plates' words
+      at its own (`tools/build_menu.py`); and the whole menu stands 60 px higher than at
+      first, a little above the middle of the screen (the user's 3 of four).
     - **The start sequence:** the menu melts away, the sky comes into focus and to the game's
       brightness.
     - **The intro** (about 28 s): the camera moves down to the sea and the Baltic shore (gulls,

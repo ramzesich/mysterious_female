@@ -28,7 +28,8 @@ ROOMS = [
     dict(id="store", deck=4, m=165, slot=True, width=240, look="store", door="crew", plate="DRY STORE",
          lock=("card", "hk", 0)),
     dict(id="smcabin", deck=4, m=232, slot=True, width=240, look="crewcabin", door="cabin", plate="STAGE MGR"),
-    dict(id="pantry", deck=5, m=166, width=288, look="pantry", door="crew", plate="PANTRY", lock=("card", "hk", 0),
+    # (`plate_style`: a door plate's look, src/signs.js; navy on a dark wall, the user, 2026-11-21.)
+    dict(id="pantry", deck=5, m=166, width=288, look="pantry", door="crew", plate="PANTRY", plate_style="navy", lock=("card", "hk", 0),
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
     # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
@@ -37,9 +38,9 @@ ROOMS = [
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
     dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
     # (At 242.5 m its door and its plate lay on the speaker stack by the stage: the user, 2026-11-14.)
-    dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR",
+    dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR", plate_style="navy",
          lock=("card", "ent", 0)),
-    dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING",
+    dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING", plate_style="navy",
          lock=("card", "ent", 0)),
     dict(id="lifeboat", deck=7, m=147.5, route="outside", width=240, look="lifeboat", door="hatch"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
@@ -650,19 +651,20 @@ SOURCES = {
     # has shown what she wants, until the wedding has it.
     "src_cake": (12, 167.75, "cake", "region:8", [("thing:wedding-cake", 25)], "flag:cake_asked", "flag:wedding"),
 }
-# Signs: id: (deck, m, text, style: plate / poster / note, dy px up, options: size, wrap).
+# Signs: id: (deck, m, text, style, dy px up, options). The style is a look of src/signs.js (notice, bulletin,
+# plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {
-    "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "poster", 56, dict(size=5)),
+    "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "notice", 56, {}),
     "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
     "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
     "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),
     # The promenade's two lanes, painted on its wall: the track by the rail, the walk by the wall.
-    "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
-    "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall  ↑", "note", 58, dict(size=4)),
-    "sign_lane_3": ("prom", 213.6, "JOGGING TRACK\nby the rail", "poster", 58, dict(size=4)),
-    # Region 4: the honeymooners' door.
-    "sign_married": (9, 135.6, "JUST MARRIED", "note", 81, dict(size=4)),
-    "sign_drill": ("walkway", 183.2, "BOAT DRILL", "poster", 40, dict(size=4)),
+    "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "plaque", 58, {}),
+    "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall ↑", "painted", 58, {}),
+    "sign_lane_3": ("prom", 213.6, "JOGGING TRACK\nby the rail", "plaque", 58, {}),
+    # Region 4: the honeymooners' door, the card over it.
+    "sign_married": (9, 135.6, "JUST\nMARRIED", "card", 83, {}),
+    "sign_drill": ("walkway", 183.2, "BOAT DRILL", "bulletin", 42, {}),
     # Region 9: the captain's cabin, the first door of deck 9's officers' corridor. (The name on
     # its plate is the user's to give: GAME_DESIGN.md §6.4.)
     "sign_captain": (9, 28.604 + 0.68, "CAPTAIN", "plate", 52, {}),

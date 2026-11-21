@@ -8,6 +8,7 @@ import { KEY_CARDS } from './config.js';
 import { writeSave } from './save.js';
 import { sfx } from './sfx.js';
 import { t } from './lang.js';
+import { sign } from './signs.js';
 
 // The readers' and the HUD's colours (Resurrect 64).
 export const CARD_COLOURS = { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b };
@@ -136,14 +137,10 @@ export class Progression {
         const s = this.scene;
         const rope = s.add.image(x, floor, 'shipart', 'rope-barrier').setOrigin(0.5, 1).setDepth(8);
         const text = this.blocks[id]?.sign ?? (id === 'flag:bb2' ? 'QUIET PLEASE' : '');
-        // Hung on the rope, within its posts: long signs wrap onto two lines.
-        const sign = s.add.text(x, floor - 15, text, {
-            fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#45293f',
-            backgroundColor: '#f3ecdd', padding: { x: 1, y: 1 }, resolution: 4, align: 'center',
-            wordWrap: { width: 34 },
-        }).setOrigin(0.5).setDepth(8.01);
-        s.worldLayer.add([rope, sign]);
-        this.blockDrawings.push({ id, items: [rope, sign] });
+        // Its card hung on the rope (src/signs.js): long words on two lines.
+        const card = sign(s, x, floor - 15, text, 'rope').setOrigin(0.5).setDepth(8.01);
+        s.worldLayer.add([rope, card]);
+        this.blockDrawings.push({ id, items: [rope, card] });
     }
 
     // The barriers' colliders, once she exists.

@@ -226,3 +226,73 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
 - **On the user's word ("1. Ok 2. Ok"):** a rule in `CLAUDE.md` (a new background prop is placed with `-bg`,
   its place's twin picked by `tools/wash_levels.py`); merged to `main` (a fast-forward: `main` had not moved)
   and pushed.
+
+## The intro: deck 3's side opens later (2026-11-21)
+
+- **First:** `refinement` brought up to `main` (`f7134c6`, a fast-forward: the HUD, the sardines), the user's word.
+- **Asked:** the side opening on deck 3's corridor "happens a bit early now. Let's open the corridor a bit later",
+  GIFs of the sequence from where the whole ship starts closing in.
+- **Shown:** four timings recorded on the stepped clock (the opening's range set in the page only): A as it was
+  (zoom 0.7 to 1.7, 3.6 to 4.3 s of the 5.6 s dive), B (1.2 to 1.9), C (1.6 to 1.99, about 4.5 to 5.1 s), D (after
+  the camera has stopped). **The user chose C.**
+- **Built:** one line in `src/intro.js`; the `intro` playtest's halfway check moved to the dive's 0.86. The built
+  game recorded and compared frame by frame with C: the same. `intro`, `deck3`, `boot` pass; the rest not run.
+
+## The signs, drawn at their size (2026-11-21)
+
+- **Asked:** "a similar work as we done to the tooltips, but now it concerns signs ... Show me every plain white
+  sign": 13 white (crew door plates, two notes) and 34 cream (30 rope barrier cards, 4 posters), every one a
+  Verdana text box.
+- **First round, rejected:** 16 generated blank signs (create_1_direction_object, 10 generations), my picks mocked
+  up at the game's size with Galmuri7: "all bad, oversized and do not fit their places". The lesson: fit the
+  lettering to the sign's place, not the sign to a font. The tries were deleted (the user's word).
+- **Second round:** each sign kept to its place and about its old size; a 5 px pixel font drawn by hand, plates drawn
+  at size (a 1 px rim, a face, a lit edge or a band); three looks a kind, the old sign beside them in the same shot.
+  The user's numbers: brushed steel door plates, navy where the wall is dark (STAGE DOOR, LIGHTING, the PANTRY on
+  dark wood); navy and gold rope cards; the yellow notice (SEARCH IN PROGRESS); blue plaques (JOGGING TRACK), words
+  painted on the wall (WALKERS), a white notice with a red band (BOAT DRILL), a cream card (JUST MARRIED). Set in
+  capitals. BOAT DRILL and JUST MARRIED 2 px higher; JUST MARRIED moved beside its door to clear the bride's wish
+  cloud, then put back over it ("where it was on your first preview"): the cloud is drawn over it.
+- **Built:** `src/signs.js` (new: the font, the looks, `sign()`, each sign one canvas texture `sign:<look>:<text>`,
+  no asset files); one call each in `world.js` (door plates, wall signs; the brass name plates stay text),
+  `ShipScene.js` (LINEN), `progression.js` (rope cards); `plate_style` and the signs' looks in `tools/population.py`,
+  passed on by `tools/build_world.py`; `tools/check_overlaps.py` counts a sign picture as text (`signText`).
+- **Checked:** the game shot at every kind (47 signs, no page errors); `check_overlaps` 0; `boot`, `deck3`,
+  `region2`, `region4`, `region9` pass; the rest not run.
+- **On the user's word ("Add them"):** a row for `src/signs.js` in `CLAUDE.md`'s table and the rule (a sign is `sign()` with a look,
+  never a text box), `f27383c`.
+
+## The menu's font (2026-11-21, approved)
+
+- **Asked:** the welcome screen's lettering changed, in both languages; candidates first.
+- **Shown:** five open pixel fonts with their own Cyrillic, each set in the menu's look over a real shot of the
+  screen, English beside Ukrainian (Press Start 2P twice, Galmuri11, Fusion Pixel 12, Handjet); left out: Rubik
+  Pixels (breaks up), Pixelify Sans and Pixel Code (not on a pixel grid), the thin ones. **Chosen: 1**, Press Start
+  2P, the name at twice the font's pixels, the plates' words at its own.
+- **Built:** `assets/source/menu/PressStart2P-Regular.ttf` (SIL OFL, `OFL.txt` beside it); `tools/build_menu.py` sets
+  every Latin and Ukrainian capital (Ґ Є Ї Й too), digits and signs from it at 16 (`T`) and 8 (`S`), each frame trimmed
+  with its place in the font's cell kept as the trim; `src/pixeltext.js` steps by the cell and lays the bands over the
+  capitals' rows (H's frame). The two generated letterings (`font-title.png`, `font-sign.png`) stay in the folder,
+  unused. No generations.
+- **Checked:** the game's menu against the approved mock-up enlarged (the same); `boot`, `intro`, `lang` pass; the rest
+  not run.
+
+## The menu 60 px higher (2026-11-21, approved)
+
+- **Asked:** the whole menu a little higher; candidates first.
+- **Shown:** the game's own screen with the menu 24, 42 (centred), 60 and 80 px higher. **Chosen: 3**, 60 px.
+- **Built:** `MENU` in `src/intro.js`, the name at 118 and the first plate at 276 (from 178 and 336); the second
+  plate, the tangerine and the name's drift as it melts follow from them.
+- **Checked:** shot in both languages, the same as the candidate; `boot`, `intro`, `lang` pass; the rest not run.
+- **Documents, on the user's word ("Update all relevant documents"):** `CLAUDE.md`'s row for `src/pixeltext.js` (the
+  font, its own Ukrainian capitals, the trimmed frames, where `MENU` is) and `GAME_DESIGN.md`'s welcome screen (the
+  font and the place, Decided). `docs/progress-decisions.md` keeps its account of the old lettering as history.
+
+## `docs/intro.md` brought up to date (2026-11-21, the user's word)
+
+The user asked for their own document to be updated to the game as it is ("Update docs/intro.md to match the
+current state of the game"). Their structure and wording kept; what changed: the menu's lettering, plates, place
+and keys; the sky's soft sun, clouds and sunbeams, the path of light, nothing drifting; deck 3's side opening late
+in the zoom; the cabin close-up at the mirror (dropped on 2026-11-14) replaced by her walk out of the door, the
+badge and the turn; the HUD empty at first; the two hint popups; a game under way and Esc. The rule that
+`docs/intro.md` is the user's own stays: edited only on their word.

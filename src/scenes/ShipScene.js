@@ -17,6 +17,7 @@ import { verbs } from '../world/verbs.js';
 import { Intro } from '../intro.js';
 import { Popups } from '../popup.js';
 import { Hud } from '../hud.js';
+import { sign } from '../signs.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -1138,10 +1139,7 @@ export class ShipScene extends Phaser.Scene {
     buildLinenRoom(o, prop) {
         const x0 = o.x - LINEN.doorX;
         const door = this.add.image(o.x, o.y, 'linen-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
-        const plate = this.add.text(o.x + 20, o.y - 50, 'LINEN', {
-            fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#3e3546',
-            backgroundColor: '#ffffff', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
-        }).setOrigin(0, 0.5).setDepth(DEPTH.props);
+        const plate = sign(this, o.x + 20, o.y - 50, 'LINEN', 'steel').setOrigin(0, 0.5).setDepth(DEPTH.props);
         const room = this.add.image(x0, o.y - LINEN.height, 'linen-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(room);
         this.worldLayer.add([door, plate, dim, room]);
