@@ -474,8 +474,8 @@ with what she has, and with twenty things to find.
   until its first thing is found**, the books' too. The books' number counts every book she has
   picked up, carried or shelved.
 - **His four exist only after the table scene** (`after flag:table`): not lying there before it,
-  not merely locked. His spoon lies a few steps from his table, so his count appears at once
-  as 1 of 4.
+  not merely locked. ~~His spoon lies a few steps from his table, so his count appears at once
+  as 1 of 4.~~ (2026-11-21: thing 13 is his t-shirt on deck 12's sun deck, `docs/plan-the-rest.md` 2.1.)
 - **Nothing makes her three uses stronger**, ever.
 - **The fourteen titles are given (the user, 2026-11-18)**, earlier than "once the game is
   tested": GAME_DESIGN.md §6.1.2 has them, each in its own language and script, with its author.
@@ -503,7 +503,7 @@ with what she has, and with twenty things to find.
 | 10 | Hers | A bookmark with a cat on its top | Deck 9, the cabin being cleaned, in its book on the bed (swapped with 12, the user, 2026-11-19) | E | Region 4 |
 | 11 | Hers | A diary notepad | Deck 7, the Stardust balcony's far end, on a seat | E | Region 3 |
 | 12 | Hers | A small plant in a pot | Deck 6, the maid's cabin, on its windowsill (swapped with 10: the deck 9 cabin has no window) | E from the floor | Region 2 |
-| 13 | His | His ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E | After the table scene |
+| 13 | His | ~~His ice cream spoon~~ His navy t-shirt (2026-11-21) | ~~Deck 11, the Great Outdoors, the last table at the stern rail~~ Deck 12, the sun deck, on a lounger | E | After the table scene |
 | 14 | His | His meditation and sleep mask | Deck 10, the far balcony, on a sunbed | E, after the vaults | Region 7 |
 | 15 | His | His handheld (an Asus ROG Xbox Ally X: black, rounded grips, four coloured buttons; no logo) | Deck 12, Champs, on a sofa | E | Region 8 |
 | 16 | His | A pick for his electric guitar | Deck 12, the Spinnaker, on the bandstand by the piano | E | Region 9 |

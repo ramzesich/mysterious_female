@@ -26,7 +26,11 @@ OUT = ROOT / "assets" / "sprites"
 # Kept in their own colours: the tennis ball's fluorescent felt went olive on the palette (as in the
 # world, where the user chose it so).
 # (The sardines keep their own blue silver too, the user's "as it is", 2026-11-20: on the palette they went purple.)
-OWN_COLOURS = {"ball", "sardines"}
+# (His navy t-shirt (13) and its logo too, the photo's own inks (the user, 2026-11-21): on the palette the navy went
+# purple and the lilac a grey green.)
+OWN_COLOURS = {"ball", "sardines", "tshirt"}
+# Not close-ups: the t-shirt's logo alone, built and the user's own edit of it (`tools/draw_tshirt_logo.py`).
+NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the
 # palette's brightest cyans (the user: "two big rubbery cyan wheels").
 RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
@@ -74,6 +78,8 @@ def picture(path):
 def build():
     pieces = []
     for p in sorted(SRC.glob("*.png")):
+        if p.stem in NOT_CLOSEUPS:
+            continue
         img = picture(p)
         if p.stem == "key-card":
             pieces += [(f"card-{card}", recolour(img.copy(), {CARD_STRIPE: c})) for card, c in CARDS.items()]

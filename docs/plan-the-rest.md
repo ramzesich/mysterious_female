@@ -289,7 +289,7 @@ of data and a generated picture shown first, each set against what is built at i
 | 10 | Hers | Bookmark with a cat on top | ~~Deck 6, the maid's cabin, in the book by the bed~~ **Deck 9, the cabin being cleaned, in its book on the stripped bed** (swapped with 12, the user: that cabin has no window) | E. **Placed 2026-11-19; approved 2026-11-20**, the bed freed (its stewardess moved to a new cabin on deck 10, `makeup10`, her shake at half pace) |
 | 11 | Hers | Diary notepad (brown leather, a strap with a brass buckle: the user) | Deck 7, the Stardust balcony's far end, on a seat | E (look-out 1 will be at the same end). **Placed 2026-11-19, approved 2026-11-20** (the last seat, by the railing: 9 px aft, 4 px down, the seat's near arm over its foot) |
 | 12 | Hers | Small plant in a pot | ~~Deck 9, the cabin being cleaned, its windowsill~~ **Deck 6, the maid's cabin, its windowsill** (swapped with 10) | E from the maid's bed, not the floor (`from`). **Placed 2026-11-19, approved 2026-11-20** |
-| 13 | His | Ice cream spoon | Deck 11, the Great Outdoors, the last table at the stern rail | E, after the table scene (look-out 5 will be at the same rail) |
+| 13 | His | ~~Ice cream spoon~~ **His navy t-shirt** (the user, 2026-11-21) | ~~Deck 11, the Great Outdoors, the last table at the stern rail~~ **Deck 12, the sun deck over the pools, folded on the first lounger (111.25 m)** | E, after the table scene. **Placed 2026-11-21:** its close-up the top half of the shirt with the logo from his photo ("bluevine cares", the user's own pixel edit); folded in the world, no logo; the sun deck's two loungers replaced by a new longer one, no armrests (the user's) |
 | 14 | His | Sleep mask | Deck 10, ~~the far balcony~~ **the first balcony of the row, its forward end (62.9 m)** (§7f, P3), on a sunbed | E, after the vaults |
 | 15 | His | Handheld (black, four coloured buttons, no logo) | Deck 12, Champs, on a sofa | E |
 | 16 | His | Guitar pick | Deck 12, the Spinnaker, the bandstand by the piano | E |
@@ -306,7 +306,7 @@ of data and a generated picture shown first, each set against what is built at i
   **Waiting for the user: the locations of all ten, judged in play** (the links: `docs/start-links.md`, five
   new places `store4`, `maid6`, `knit5`, `shore5`, `balcony7`); noted for that: the flag now stands 16 px
   among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull, **placed 2026-11-20**) and 7 (the sardines),
-  his four (13 to 16) after the table scene, then 2.2 before the two books. **2026-11-20: all ten approved where
+  his four (13 to 16) after the table scene (**13, his t-shirt, placed 2026-11-21**), then 2.2 before the two books. **2026-11-20: all ten approved where
   they lie** (the user's review, in play). The close-ups also as the HUD's
   icons (2.4): superseded, the HUD's kinds are faces (built 2026-11-20).
 - His four are not there before the table scene ("not lying there before it, not merely
@@ -438,7 +438,8 @@ still and comes back when she moves. Nothing is counted.
   four. A porthole piece and a window piece, generated.
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data, the camera in the ship scene (the
   intro's camera work is the model); a case each in the regions' scenarios.
-- Spots 1 and 5 are where the diary and his spoon lie (2.1): look at each with both in place.
+- Spot 1 is where the diary lies (2.1): look at it with both in place. (Spot 5 had his spoon until the t-shirt took
+  thing 13 to deck 12, 2026-11-21.)
   (Spot 4 was book 14's end too until it moved to the Spinnaker's balcony, §7f.)
 
 ### 3.2 The deliveries (large; about 10 generations)

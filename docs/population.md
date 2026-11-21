@@ -772,6 +772,7 @@ the 11-12 flight (the painter, "WET PAINT").
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
+| 111.25 | `keep_tshirt` | His navy t-shirt (13), folded on the first of two loungers (`sunlounger-long`, 111.0 and 112.8, the user's: longer, no armrests) | `pickup` after the table scene (`flag:table`); E; its close-up | |
 | 119-140 | the walk | ↓ drops her through into the pool below (built) | | |
 | 126-131 | `npc_oldlady` | The old lady on her sunbed across the walk, bags and towels, a book in her hands | `static`; glares within 4 m; a full block (jump the sunbed from the rail side, or ↓ into the pool); bubble (a cocktail glass) within 3 m; E with the mojito: she dozes (`tan_12_lady` from her bag), still a block; at the horn (`scn_horn`) she bolts forward and is gone: `item_parasol` at 130, `book_8` at 129 | Sit, read, glare, doze, bolt |
 | 138 | `riv_sundeck` | The rival searching under the loungers | `glimpse(region 8)` until the horn; at the horn he jumps, drops `item_card_off` at 136, runs forward | |

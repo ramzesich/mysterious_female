@@ -73,6 +73,9 @@ MUTE_LIGHT = 0.12
 MUTE_W20 = 0.20
 # Colours changed after the palette, name -> {from: to}: the towel swan's orange beak, impossible in a
 # folded towel, whitened (the user, 2026-11-20; as the towel stack's swan's was).
+# A piece's washed twins (-bg, -w20, -lt) darkened, every colour times this (their own hues kept; the palette's darker
+# greys came out purple): the sun deck's lounger, "a bit darker" (the user, 2026-11-21).
+SHADE = {"sunlounger-long": 0.7}
 RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
 # The fitness centre's machines too (the user, 2026-11-20: "too washed out ... only slightly washed out, like
@@ -180,6 +183,8 @@ for i, name in enumerate(TALL_1):
     if name:
         PIECES[name] = ("tall-1", i, None, {})
 PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
+# Deck 12's sun deck lounger (the user, 2026-11-21): a generated piece at its own size (`sunlounger-long/README.md`).
+PIECES["sunlounger-long"] = ("sunlounger-long", 0, None, {})
 # (The empty seat and the ten people in it keep their 80 px canvas, `whole`: the seat at the same spot in each,
 # where the audience's people sit in theirs; `audience/`: edits of the five into ten others, 2026-11-19.)
 PIECES["theatre-seat-side"] = ("theatre-seat-side", 0, None, {"whole": (18, 62)})
@@ -558,6 +563,12 @@ def build():
         pieces[name] = img
         pieces[f"{name}-bg"] = muted(img)
         twins(pieces, name)
+        if name in SHADE:
+            for twin in (f"{name}-bg", f"{name}-w20", f"{name}-lt"):
+                if twin in pieces:
+                    t = pieces[twin]
+                    t.putdata([(round(r * SHADE[name]), round(g * SHADE[name]), round(b * SHADE[name]), a)
+                               for r, g, b, a in t.getdata()])
     # (Once every piece is made: the ones that take another's frame.)
     for name, (_, _, _, opts) in PIECES.items():
         if opts.get("reframe"):

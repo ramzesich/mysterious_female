@@ -3771,3 +3771,36 @@ valuable."
 - Found on the way: the walkway's end walls and its columns are all climbs up to deck 8's balconies (the grips), so
   both its ends lead on; "behind Teppanyaki's flares" was never empty (the piñata).
 - No generations. The scripts and the two maps are outside the repo and not kept.
+
+## §4 2.1, thing 13: his navy t-shirt on deck 12's sun deck (the user, 2026-11-21)
+
+- **The thing changed:** "Replace #13 with his navy t-shirt. I have added a new photo to the Husband folder. The
+  t-shirt has to have this logo on the left side of the chest" (the logo: "bluevine cares", an arch with a heart
+  flower). The photo stays in `reference/Husband/` (git-ignored); only the print, its fabric made one flat navy,
+  was sent to PixelLab.
+- **Where:** not the plan's last table at the stern rail; the linen room was asked about and dropped (region 4: she
+  reaches it before she meets him); a sunbed "by the pool" reached only after their meeting: **deck 12's sun deck
+  over the pools** (deck 12 opens only by the wall jump at 232 m, past his table), the first of its two loungers.
+  Shown only after the table scene (`flag:table`), as all four of his.
+- **The close-up:** a big generated shirt (try 7, as the user's choice of look, try 2, at twice the size), **only its
+  top half** (the user, so the logo can be in proportion and legible). The logo: my hand-drawn one was set aside for
+  one generated from the photo (`image_to_pixelart`, four tries; the user chose **a**); its colours set to the
+  photo's inks, carried over by the fabric's navy; "bluevine" (which no try could write) and "cares" stamped in pixel
+  letters; the user chose the bigger "cares". My fix of its leaves was "worse"; **the user edited the logo
+  themselves** (`assets/source/closeups/tshirt-logo-by-hand.png`, never written by a tool; `tshirt-logo.png` is
+  the file they saved over, left as it is). Its own colours, not the palette's (on it the navy went purple).
+- **In the world:** the close-up shrunk read as a dark bag ("None of them read as a folded t-shirt"); a small
+  generated folded shirt (try 3 of four, `create_map_object` 48 x 32) made navy by lightness, 20 x 12, no logo
+  ("it cannot be shown when the t-shirt is folded, anyway"), pressed 3 px into the seat (the user's placing).
+- **The loungers:** "Each of the two sunbeds ... replaced with a newly generated one (same one for both). Slightly
+  longer and without arm rests. With longer head support": try 3 of four, mirrored, **at its own size** (82 x 32;
+  shrunk to 36 or 41 px it was faint, and outlined its slats read as teeth); washed as deck 12's props, then
+  darkened to 70% (`SHADE` in `tools/build_ship_art.py`); the second 4 px aft, both 2 px down (the user, pixel by
+  pixel). Deck 11's loungers are unchanged.
+- Built: `keep_tshirt` (`tools/population.py`), `sunlounger-long` (`tools/build_ship_art.py`, placed in
+  `tools/build_ship_map.py`), `tshirt` close-up and `tshirt-folded` thing in their own colours. Test
+  `region8.tshirt` (absent before the table scene, the loungers where the user put them, the shirt on the seat, E
+  takes it); `boot`, `region8` pass; `check_overlaps` 0. Generations: about 40 (the shirt 7, its fold 6, the logo 4,
+  the small folded shirts 4, the loungers 4, and tries along the way; the ids in the READMEs).
+- **Set right on the way:** the dropped mirror close-up of the intro was taken out of CLAUDE.md's lessons and my
+  memory (the user: "it should not be there anymore").

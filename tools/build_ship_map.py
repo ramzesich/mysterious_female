@@ -1890,8 +1890,10 @@ def build_objects():
     at12(93.9, "sports-tv", 70)
     decor("downlights-12-champs", "downlights", x_of(82), x_of(102), deck=12)
     # The sun deck, round the walk over the pools: loungers and a palm.
-    at12(111.0, "sunlounger")
-    at12(112.8, "sunlounger")
+    # (The user's lounger, 2026-11-21: longer, no armrests, a long backrest; both 2 px down, the second 4 px
+    # aft, as the user placed them. His folded t-shirt, thing 13, lies on the first.)
+    put(12, 0, "sunlounger-long-bg", -2, x=exact_x(111.0) + 1)
+    put(12, 0, "sunlounger-long-bg", -2, x=exact_x(112.8) + 5)
     at12(114.3, "planter-palm")
     # Sports: the basketball and volleyball court in its net cage, shuffleboard courts painted on
     # the deck, the golf driving net.

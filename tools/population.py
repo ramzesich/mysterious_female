@@ -207,6 +207,11 @@ ITEMS = {
     # `sushi()` in src/world/topdeck.js), or, for a tangerine thrown at him, set on his glass case's top at his
     # front, where his hand held it, for her to take (the user, 2026-11-20).
     "keep_sardines": (12, 177.552, "keep:cat:sardines", "flag:sushi_tin", 40, "thing:sardine-tin"),
+    # His navy t-shirt (13; in the plan's ice cream spoon's place, the user, 2026-11-21), folded on the first of the
+    # sun deck's two loungers over the pools (deck 12, `sunlounger-long`), pressed a little into its slats: only after
+    # the table scene, as all four of his ("not lying there before it"); deck 12 opens only by the wall jump past his
+    # table. Its close-up is the top half of the shirt with the logo from his photo (`tools/draw_tshirt_logo.py`).
+    "keep_tshirt": (12, 111.25, "keep:him:tshirt", "flag:table", 10, "thing:tshirt-folded"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).

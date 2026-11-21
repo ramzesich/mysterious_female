@@ -360,9 +360,29 @@
     "h": 72
    }
   },
-  "wool": {
+  "tshirt": {
    "frame": {
     "x": 1234,
+    "y": 0,
+    "w": 191,
+    "h": 84
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 191,
+    "h": 84
+   },
+   "sourceSize": {
+    "w": 191,
+    "h": 84
+   }
+  },
+  "wool": {
+   "frame": {
+    "x": 1427,
     "y": 0,
     "w": 71,
     "h": 76

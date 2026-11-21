@@ -4543,6 +4543,34 @@ def enter_region9(b):
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
 
 
+def scenario_region8__tshirt(b):
+    """His navy t-shirt (§4 2.1, thing 13; deck 12): not on the sun deck's lounger before the table scene; after it,
+    folded on the first of the two new loungers (the user's placing: both 2 px down, the second 4 px aft), and E takes
+    it, a thing of his."""
+    S = "window.__ship"
+    shirt = f"{S}.world.things.find(t => t.id === 'keep_tshirt')"
+    loungers = ("JSON.stringify((() => { const out = []; const walk = l => { for (const o of l) { if (o.list) walk(o.list);"
+                " if (o.frame?.name === 'sunlounger-long-w20') { const r = o.getBounds(); out.push([Math.round(r.x), Math.round(r.bottom)]); } } };"
+                f" walk({S}.children.list); return out.sort((a, b) => a[0] - b[0]); }})())")
+    b.open("?reset&play&at=deck12")
+    wait(0.4)
+    ok = check(not b.eval(f"!!({shirt}?.pick?.visible)"), "before the table scene: no shirt on the lounger")
+    got = json.loads(b.eval(loungers))
+    ok &= check(got == [[exact_x(111.0) - 40, D12 + 2], [exact_x(112.8) - 36, D12 + 2]],
+                "the two new loungers where the user put them", got)
+    b.open("?reset&play&at=deck12&did=table")
+    wait(0.4)
+    pick = b.eval(f"[{shirt}.pick.visible, {shirt}.pick.x, {shirt}.pick.y]")
+    ok &= check(pick == [True, exact_x(111.25), D12 - 10], "after it: folded on the first lounger's seat", pick)
+    b.close_up("tshirt-lounger", exact_x(111.9), D12 - 20, 160, 60, 4)
+    b.teleport(exact_x(111.25), D12)
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:him:tshirt" in b.eval(f"{S}.save.keeps"), "E takes it, his", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
 def scenario_region9(b):
     """Region 9 (docs/build-plan.md, step 9): the wedding at Champs' door, the cake from Cagney's
     (it sways and goes over; carried steadily it arrives), the party into the chapel and the

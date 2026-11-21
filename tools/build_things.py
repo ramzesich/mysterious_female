@@ -125,7 +125,10 @@ BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-t
 SEAM = {"tennis-ball": "a2a947"}
 # Kept in their own colours, not put on the palette: the tin of sardines (7), drawn by hand at its size in its
 # close-up's blue silver (shrunk, the close-up was a grey blob; on the palette its greys went purple).
-OWN_COLOURS = {"sardine-tin"}
+# His folded t-shirt (13), on deck 12's lounger: PixelLab's small folded shirt (`tries/tshirt/3.png`, the user's
+# choice), its purples set to the close-up's navies by lightness, 20 x 12 (the user, 2026-11-21: "Better"); not the
+# close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
+OWN_COLOURS = {"sardine-tin", "tshirt-folded"}
 
 
 def seam_shrink(img, n, outline):

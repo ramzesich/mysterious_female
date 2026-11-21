@@ -40,3 +40,15 @@ df97f40e-8901-4593-855b-7ffce7f262da (blue cart, a tower of pillows), `-c`
 9f4cea5e-ce98-480f-aafc-59b7ca4e4480 (wooden shelves, white and blue linen); **`-d`
 e03df2fc-812c-46e1-b898-cbaa1c442dfc chosen** ("4": boxes, towels and a laundry sack; see
 `../../people/steward-raw/README.md`).
+
+## His folded t-shirt (13), 2026-11-21: `tshirt/`
+
+Small folded shirts at their own size (the close-up shrunk read as a dark bag). **3 used** (`../tshirt-folded.png`:
+its five purples set to the close-up's navies by lightness, 20 x 12 by majority).
+
+| File | What | PixelLab id |
+|---|---|---|
+| `tshirt/1.png` | Laid flat, 32 x 32 | 17bfd147-58b4-4b65-b15c-aed71ebfbe61 |
+| `tshirt/2.png` | Laid flat, lighter | 8f11cbf5-f9e8-4c75-b362-8cc4abe3ed6c |
+| `tshirt/3.png` | **Used**: folded, lying, seen a little from above, 48 x 32 (came purple) | c55b5d17-bb51-4a94-b026-1e487cd5d59f |
+| `tshirt/4.png` | Folded, standing, grey | e4e6a2ef-5c94-4997-a65a-463d3f59ff74 |
