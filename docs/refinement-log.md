@@ -287,3 +287,12 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
 - **Documents, on the user's word ("Update all relevant documents"):** `CLAUDE.md`'s row for `src/pixeltext.js` (the
   font, its own Ukrainian capitals, the trimmed frames, where `MENU` is) and `GAME_DESIGN.md`'s welcome screen (the
   font and the place, Decided). `docs/progress-decisions.md` keeps its account of the old lettering as history.
+
+## `docs/intro.md` brought up to date (2026-11-21, the user's word)
+
+The user asked for their own document to be updated to the game as it is ("Update docs/intro.md to match the
+current state of the game"). Their structure and wording kept; what changed: the menu's lettering, plates, place
+and keys; the sky's soft sun, clouds and sunbeams, the path of light, nothing drifting; deck 3's side opening late
+in the zoom; the cabin close-up at the mirror (dropped on 2026-11-14) replaced by her walk out of the door, the
+badge and the turn; the HUD empty at first; the two hint popups; a game under way and Esc. The rule that
+`docs/intro.md` is the user's own stays: edited only on their word.
