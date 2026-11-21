@@ -48,8 +48,9 @@ export const PARTS = {
 };
 const DIM = 0.36;                 // the welcome screen's shade over the sky
 // The menu: where the name and the two plates stand on the screen, and the lettering's colours
-// from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen).
-const MENU = { title: 178, first: 336, step: 90,
+// from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen). The whole menu
+// stands 60 px higher than it was (the user's 3 of four, 2026-11-21).
+const MENU = { title: 118, first: 276, step: 90,
                sunny: ['#fbff86', '#f9c22b', '#f9c22b', '#f79617', '#fb6b1d'], gold: ['#fbff86', '#f9c22b', '#f79617'],
                cream: ['#ffffff', '#ffffff', '#fdcbb0'] };
 const BLUR = 2.0;                 // ...and how far out of focus it is

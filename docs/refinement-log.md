@@ -275,4 +275,15 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   capitals' rows (H's frame). The two generated letterings (`font-title.png`, `font-sign.png`) stay in the folder,
   unused. No generations.
 - **Checked:** the game's menu against the approved mock-up enlarged (the same); `boot`, `intro`, `lang` pass; the rest
-  not run. `CLAUDE.md`'s row still says the lettering is Latin with Ukrainian built from it: asked, not changed.
+  not run.
+
+## The menu 60 px higher (2026-11-21, approved)
+
+- **Asked:** the whole menu a little higher; candidates first.
+- **Shown:** the game's own screen with the menu 24, 42 (centred), 60 and 80 px higher. **Chosen: 3**, 60 px.
+- **Built:** `MENU` in `src/intro.js`, the name at 118 and the first plate at 276 (from 178 and 336); the second
+  plate, the tangerine and the name's drift as it melts follow from them.
+- **Checked:** shot in both languages, the same as the candidate; `boot`, `intro`, `lang` pass; the rest not run.
+- **Documents, on the user's word ("Update all relevant documents"):** `CLAUDE.md`'s row for `src/pixeltext.js` (the
+  font, its own Ukrainian capitals, the trimmed frames, where `MENU` is) and `GAME_DESIGN.md`'s welcome screen (the
+  font and the place, Decided). `docs/progress-decisions.md` keeps its account of the old lettering as history.
