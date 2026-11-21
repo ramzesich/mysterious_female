@@ -953,9 +953,13 @@ and the painting there moves. She first reaches him from the pool side, after th
 queue (a hop), 22 m before her husband's table, her hands free.
 
 **His look.** The user's words above, and nothing from a photo. A pro character in the cast's style (the drill's
-officer as the style reference, size 64, side view), in the game's own waiter uniform (the cast's `waiter`: a white
-jacket, black trousers): short black hair, a wide happy smile, a small spray bottle held up in one hand like a
-microphone. `python tools/check_people.py --heads washie` before any clip. His clips: `sing` (his loop: he sways from
+officer as the style reference, size 64, side view): short black hair, a wide happy smile, a small spray bottle held
+up in one hand like a microphone. **His uniform is the real ship's waiters', not the game's waiter's.** The design
+session first wrote the cast's `waiter` (a white jacket, black trousers) as the model; the user, 2026-11-21: "No, that
+uniform doesn't match. Don't reference him." So the cast's `waiter` is not his model, in look or as a style reference.
+What the real uniform is, is not settled: a web search and the user's photo of the café (no crew in it) did not show
+it, and one careers site's line (a white long-sleeved shirt, black trousers, a yellow tie) is unconfirmed. **The user
+is asked for its colours and pieces before his character is generated;** the tries are shown as always. `python tools/check_people.py --heads washie` before any clip. His clips: `sing` (his loop: he sways from
 foot to foot and sings into the bottle), `squirt` (the arm out, two squeezes), `wiggle` (the duet's "happy, happy"),
 `wash` (he catches a tangerine, squirts it, polishes it on his sleeve and tosses it: the fruit in his fist until the
 frame the hand opens, then the game's). Hers: one clip, facing him: her hands held out, rubbed, then the same wiggle
@@ -1008,7 +1012,7 @@ beside her first); the heads' estimates about 2. The prints are a few px each: m
 foamy, and shown enlarged on the café's and the lobby's real floors (the lobby's is patterned blue). Everything shown
 to the user in the chat before it is placed, the clips composed over a real shot of the spot.
 
-**Open for the build:** where exactly he and the stand fit (above); whether the foamy prints read on the lobby's
+**Open for the build:** his uniform (the user's description, above); where exactly he and the stand fit (above); whether the foamy prints read on the lobby's
 floor; the duet's two popups; that the first meeting's stop does not start while she is in the air or sliding.
 
 **Tests:** a case `region6.washie`: the first coming with free hands plays the scene, sets `washie`, and she can move

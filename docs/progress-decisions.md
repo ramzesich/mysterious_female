@@ -3890,3 +3890,7 @@ valuable."
   choice. The design session's ranking: the balloons (14) and the ladder (P1) of part 11 are dropped before him.
 - **Mine, not the user's:** the bottle held like a microphone, the words kept in English in both languages, the
   squirt's sound, the build order. Each is marked so in §7g.
+- **Corrected the same day (the user):** the plan had named the game's own waiter (the cast's `waiter`, a white jacket
+  and black trousers) as the model for his uniform. The user: "No, that uniform doesn't match. Don't reference him."
+  The reference is out of §7g. The real uniform is not known to the design session (a search and the user's photo of
+  the café did not show it): the user is asked before his character is generated.
