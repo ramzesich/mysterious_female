@@ -3454,7 +3454,7 @@ export class ShipScene extends Phaser.Scene {
     // she is over one). Nowhere else: in the atrium ↓ only ever takes the stairs.
     dropThroughWalk() {
         const p = this.player;
-        const walk = this.route === OUTSIDE ? this.world.dropFloorAt(p.x, p.y)
+        const walk = this.route === OUTSIDE ? this.world.dropFloorAt(p.x, p.y, this.progress.knows('parasol'))
             : this.walks.find(w => w.dropThrough && p.x >= w.x0 && p.x <= w.x1 && Math.abs(p.y - w.y) < 2);
         if (!walk) return false;
         this.droppingThrough = walk;
@@ -3609,6 +3609,32 @@ export class ShipScene extends Phaser.Scene {
         if (onProm) p.setCrop(0, 0, PLAYER.cell, PLAYER.cell - PLAYER.sink);
         else if (this.promCrop) p.setCrop();
         this.promCrop = onProm;
+        // On a balcony her picture is cut at its partitions and at a row's end (`balconyRoom`): what reached past
+        // one showed on the next balcony or over the ship's side (the user, 2026-11-21). (Phaser 4 crops a picture
+        // turned by `flipX` with its content shifted by width - 2 x - w: so while she is on a balcony a stand-in of
+        // her is drawn, turned by its scale, which crops true, and her own picture is cropped to nothing.)
+        const balc = !onProm && this.route === OUTSIDE && p.visible ? this.world.balconyRoom(p.x, p.y) : null;
+        const pic = this.balconyPic;
+        if (balc) {
+            const left = p.x - p.displayOriginX, rw = p.width;
+            const a = Math.max(0, balc[0] - left), b = Math.min(rw, balc[1] - left);
+            const q = this.balconyPic ??= this.add.image(0, 0, p.texture.key);
+            if (!this.worldLayer.list.includes(q)) this.worldLayer.add(q);
+            // (Scaled by -1 a picture turns about its origin; `flipX` keeps it in place: x moved to match.)
+            q.setTexture(p.texture.key, p.frame.name).setDisplayOrigin(p.displayOriginX, p.displayOriginY)
+                .setPosition(p.flipX ? p.x - 2 * p.displayOriginX + rw : p.x, p.y).setScale(p.flipX ? -1 : 1, 1)
+                .setAlpha(p.alpha).setDepth(p.depth).setVisible(b > a);
+            for (const k of ['tint', 'tint2', 'tintMode', 'tintTopLeft', 'tintTopRight', 'tintBottomLeft', 'tintBottomRight']) {
+                if (k in p && q[k] !== p[k]) q[k] = p[k];
+            }
+            q.setCrop(p.flipX ? rw - b : a, 0, Math.max(0, b - a), p.height);
+            Phaser.Utils.Array.MoveAbove(this.worldLayer.list, q, p);
+            p.setCrop(0, 0, 0, 0);
+        } else if (this.balconyCrop) {
+            pic?.setVisible(false);
+            if (!onProm) p.setCrop();
+        }
+        this.balconyCrop = !!balc;
         this.updateDeckDim(dt);
     }
 

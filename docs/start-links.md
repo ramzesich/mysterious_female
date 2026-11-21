@@ -79,6 +79,7 @@ new one added there should be added here too.
 | `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all> |
 | `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all> |
 | `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
+| `mask10`: outside, deck 10's first balcony, aft of its long lounger (his sleep mask on it after the table scene, 14) | <http://localhost:8000/?play&at=mask10&did=table> |
 
 ## Deck 9
 

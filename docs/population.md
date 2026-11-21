@@ -666,7 +666,10 @@ view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
 245; `bb_glimpse_balcony` at 160 (Bumbot swiping at a gull on the rail: `batting`, the gull flaps
 off; `glimpse(region 4, once)`, seen from deck 9's balcony cabin); the ajar door at 215;
 `npc_balcony_guest` at 235 on his balcony (`static`, waves, a bubble with a door within 4 m, until
-let in).
+let in). **The first balcony of the row (62.9 m, its forward end; §7f P3):** `keep_sleepmask` at 64.42, his sleep
+mask (14) on the slats of deck 12's long lounger (`sunlounger-long`), set there by hand (`BALCONY_SET`), its towel
+moved to the next balcony, blue; `pickup` after the table scene (`flag:table`); E; its close-up (2026-11-21). No
+balcony under it on decks 9 and 8: ↓ and jump does nothing there.
 
 ### Deck 11 (regions 6, 9, 10)
 

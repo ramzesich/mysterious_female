@@ -1033,6 +1033,8 @@ def build_objects():
     add(point("gull9", "place", 8660, floor_y(9), [prop("route", "promenade")]))
     # (24: deck 8's balcony aft of the sunbather's: vault the partition forward onto it.)
     add(point("occupied8", "place", 9310, floor_y(8), [prop("route", "promenade")]))
+    # (His sleep mask, 14: deck 10's first balcony, aft of its long lounger; the mask is there after the table scene.)
+    add(point("mask10", "place", 3610, floor_y(10), [prop("route", "promenade")]))
     # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)
     add(point("steam11", "place", exact_x(54.6), floor_y(11)))
     # (7a: deck 11, forward of the wet patch: walk aft onto it, the chair comes at her head on.)

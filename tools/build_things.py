@@ -128,7 +128,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # His folded t-shirt (13), on deck 12's lounger: PixelLab's small folded shirt (`tries/tshirt/3.png`, the user's
 # choice), its purples set to the close-up's navies by lightness, 20 x 12 (the user, 2026-11-21: "Better"); not the
 # close-up shrunk (that read as a dark bag), and no logo (folded, it would not show: the user).
-OWN_COLOURS = {"sardine-tin", "tshirt-folded"}
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask"}
 
 
 def seam_shrink(img, n, outline):

@@ -488,6 +488,30 @@ export class World {
             this.add([g]);
             s.shellSlopes.push({ deck: Number(deck), gfx: g });
         }
+        // The ship's side drawn again over her where her picture reaches past her body (the user, 2026-11-21: it
+        // showed through a partition and through the hull past a row's end): each partition's panel (its colours as
+        // the map builder draws it; its foot, under the glass's sill, the side's own painted tiles). At the fronts'
+        // depth, faded with their deck as they are.
+        const panels = {};
+        this.balconyWalls = {};     // a balcony floor's y: [x0, x1, kind] of each partition's panel and each row's end
+        for (const c of out.covers ?? []) {
+            (this.balconyWalls[c.y] ??= []).push([c.x0, c.x1, c.kind]);
+            const depth = D.player + 0.3, parts = [];
+            if (c.kind === 'panel') {
+                const g = panels[c.deck] ??= s.add.graphics().setDepth(depth);
+                const h = c.y - 8 - c.y0;
+                g.fillStyle(0xf4f4f4, 1).fillRect(c.x0, c.y0, c.x1 - c.x0, h);
+                g.fillStyle(0xc7dcd0, 1).fillRect(c.x1 - 1, c.y0, 1, h).fillRect(c.x0, c.y0, c.x1 - c.x0, 1);
+                parts.push(s.plateCopy(c.x0, c.y - 8, c.x1 - c.x0, 8 + PLAYER.sink, depth));
+            }
+            // (A row's end is not drawn again: windows and lamps on the side there are not its tiles, and a copy hid
+            // them. Her picture is cut at it instead, at any height, the wall running floor to ceiling: `balconyRoom`.)
+            parts.forEach(gfx => s.shellSlopes.push({ deck: c.deck, gfx }));
+        }
+        for (const [deck, g] of Object.entries(panels)) {
+            this.add([g]);
+            s.shellSlopes.push({ deck: Number(deck), gfx: g });
+        }
         // Ladders between routes: the lifeboat station's, from the promenade's gate up its column.
         this.ladders = this.data.ladders.map(L => {
             const g = s.add.graphics().setDepth(D.exterior + 0.09);
@@ -534,9 +558,35 @@ export class World {
         return { deck: 0x4d9be6, ent: 0xe83b3b, hk: 0x1ebc73, off: 0xf9c22b }[card] ?? 0xffffff;
     }
 
-    // A balcony's floor at her feet that she can drop through.
-    dropFloorAt(x, y) {
-        return this.platZones.find(z => z.plat.drop && x >= z.plat.x0 && x <= z.plat.x1 && Math.abs(y - z.plat.y) < 2)?.plat ?? null;
+    // The open width of the balcony she is on: her picture is cut to it, since what reaches past a partition would
+    // show on the next balcony, and past a row's end over the ship's side (the user, 2026-11-21). A partition counts
+    // while all of her is under its panel's top (her head 60 px over her feet; over it she may lean across); a row's
+    // end, its wall running to the ceiling, at any height under it. Null off the balconies.
+    balconyRoom(x, y) {
+        for (const [fy, list] of Object.entries(this.balconyWalls ?? {})) {
+            const f = Number(fy);
+            if (y > f + 2 || y < f - 116) continue;
+            const low = y >= f - (this.data.outside.partition - 60);
+            let left = -Infinity, right = Infinity;
+            for (const [a, b, kind] of list) {
+                if (kind === 'panel' && !low) continue;
+                if (b <= x + 1) left = Math.max(left, b);
+                if (a >= x - 1) right = Math.min(right, a);
+            }
+            if (left > -Infinity || right < Infinity) return [Math.max(left, x - 200), Math.min(right, x + 200)];
+        }
+        return null;
+    }
+
+    // A balcony's floor at her feet that she can drop through: only where a floor of the route lies one deck under
+    // her to land on (a balcony, the walkway), or with the parasol, any floor of it under her to float down to (the
+    // user, 2026-11-21: "she shouldn't jump down" where no balcony is underneath; it had been the long fall).
+    dropFloorAt(x, y, floating = false) {
+        const at = this.platZones.find(z => z.plat.drop && x >= z.plat.x0 && x <= z.plat.x1 && Math.abs(y - z.plat.y) < 2)?.plat;
+        if (!at) return null;
+        const under = this.platZones.some(z => x >= z.plat.x0 && x <= z.plat.x1
+            && (floating ? z.plat.y > y + 2 : Math.abs(z.plat.y - (y + 144)) < 2));   // (a deck: 144 px)
+        return under ? at : null;
     }
 
     // ↑/↓ at a ladder between routes.

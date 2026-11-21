@@ -11,7 +11,7 @@ import build_ship_map as B
 from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
-from population import BALCONY_CPS, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
+from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
@@ -25,6 +25,7 @@ ROOM_DOOR_X = 59            # a room's door, in from its left edge (the drawings
 PARTITION_H = 88            # a balcony partition: taller than her jump (68)
 POLE_H = 140                # the pole on a partition's top, up to the balcony above
 UNIT = 125                  # a balcony, px
+END_COVER = 40              # the side drawn over her past a row of balconies' end, px (her picture reaches past her body)
 
 
 def cabin_slots(deck):
@@ -336,6 +337,10 @@ def build_world():
     platforms = [dict(x0=pa, x1=pb, y=B.floor_y(6), solid=True, id="promenade"),
                  dict(x0=pa, x1=pb, y=B.floor_y(7), solid=False, drop=False, id="walkway")]
     walls, grips, glass = [], [], []
+    # What stands between balconies, for her picture (the user, 2026-11-21: it showed through a partition and through
+    # the hull at a row's end): each partition's panel, drawn again over her by the game; and the side past each row's
+    # end (as far as her picture can reach past her body), where the game cuts her picture.
+    covers = []
     units = balcony_units()
     # A laundry line: the partition nearest to it is folded open (no panel, no pole).
     lines = {}
@@ -350,14 +355,17 @@ def build_world():
             glass.append(dict(x0=ux, x1=ux + 6, y=y, deck=deck))
             continue
         walls.append(dict(x=ux + 3, y0=y - PARTITION_H, y1=y, w=6))
+        covers.append(dict(kind="panel", x0=ux, x1=ux + 6, y0=y - PARTITION_H, y=y, deck=deck))
         # (The panel is solid; the pole on its top runs up to the balcony above, a grip all the way:
         # a kick off the panel vaults it, kicks with up held climb the pole to the next deck.)
         grips.append(dict(route=OUTSIDE, x=ux + 3, y0=y - POLE_H, y1=y, side=0, w=6, over=True, panel=PARTITION_H))
         # A row's last balcony ends in the ship's wall.
         if (deck, ux + UNIT) not in units:
             walls.append(dict(x=ux + UNIT + 3, y0=y - 128, y1=y, w=6))
+            covers.append(dict(kind="end", x0=ux + UNIT, x1=ux + UNIT + END_COVER, y0=y - 116, y=y, deck=deck))
         if (deck, ux - UNIT) not in units:
             walls.append(dict(x=ux - 3, y0=y - 128, y1=y, w=6))
+            covers.append(dict(kind="end", x0=ux - END_COVER, x1=ux, y0=y - 116, y=y, deck=deck))
     # The recess's end walls: from the walkway up to deck 8's floor, each a grip on its open side;
     # and the white columns between the boats, deck 7's height: kicks with up held climb any of them
     # onto deck 8's balconies.
@@ -390,14 +398,22 @@ def build_world():
             [("sunlounger-bg", 60, False)], [("deck-chair-bg", 40, False), ("small-plant-bg", 104, False)],
             [("bistro-table-bg", 84, False), ("bistro-chair-bg", 56, False)], [("plant-bg", 100, False)],
             [("sunlounger-2-bg", 74, True), ("side-table-bg", 34, False)], [("deck-chair-2-bg", 82, True)]]
+    own_sets = {(deck, unit_at(deck, m)): v for (deck, m), v in BALCONY_SET.items()}
     for deck, ux in units:
         y = B.floor_y(deck)
         h = (ux * 7919 + deck * 104729) % 1000
         if (y, ux) in busy:
             continue
-        if h % 10 < 3:
+        own = own_sets.get((deck, ux), {})
+        if "towel" in own:
+            if own["towel"]:
+                towels.append(dict(x=ux + own["towel"][0], y=y - 50, tint=own["towel"][1]))
+        elif h % 10 < 3:
             towels.append(dict(x=ux + 28 + h % 67, y=y - 50, tint=h % 5))
-        if (h // 10) % 10 < 6:
+        if "furniture" in own:
+            for frame, dx, flip in own["furniture"]:
+                furniture.append(dict(x=ux + dx, y=y, frame=frame, flip=flip))
+        elif (h // 10) % 10 < 6:
             for frame, dx, flip in sets[(h // 100 + deck) % len(sets)]:
                 furniture.append(dict(x=ux + dx, y=y, frame=frame, flip=flip))
     balcony = dict(gust=GUSTS, towels=towels, furniture=furniture, perch=perch, occupied=occupied,
@@ -517,7 +533,7 @@ def build_world():
                 topdeck=topdeck, bow=bow, finale=finale,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
-                outside=dict(platforms=platforms, walls=walls, glass=glass, partition=PARTITION_H),
+                outside=dict(platforms=platforms, walls=walls, glass=glass, covers=covers, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.x_of(125), y=B.floor_y(11), toY=B.floor_y(10)),
                 trapdoor=dict(x=B.exact_x(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],

@@ -4146,6 +4146,58 @@ def coffee_for_the_engineer(b):
     return wait_flag(b, "engineer", 16)
 
 
+def scenario_region7__mask(b):
+    """His sleep mask (§4 2.1, thing 14; deck 10's first balcony, the plan's §7f P3): not there before the table scene;
+    after it, on the slats of deck 12's long lounger set on that balcony (the user's placing), and E takes it. The
+    balconies' fixes of the same day (the user, 2026-11-21): ↓ and jump drops her only where a floor lies one deck
+    under her (none under this balcony: she stays; the next one's drops her onto deck 9's), and her picture is cut at
+    a partition and at the row's end (a stand-in of her, `balconyPic`, cropped to the balcony)."""
+    S = "window.__ship"
+    mask = f"{S}.world.things.find(t => t.id === 'keep_sleepmask')"
+    lounger = ("JSON.stringify((() => { const out = []; const walk = l => { for (const o of l) { if (o.list) walk(o.list);"
+               " if (o.frame?.name === 'sunlounger-long-w20' && o.y === %d) { const r = o.getBounds(); out.push([Math.round(r.x), Math.round(r.bottom)]); } } };"
+               f" walk({S}.children.list); return out; }})())") % D10
+    b.open("?reset&play&at=mask10")
+    wait(0.4)
+    ok = check(not b.eval(f"!!({mask}?.pick?.visible)"), "before the table scene: no mask on the lounger")
+    got = json.loads(b.eval(lounger))
+    ok &= check([3519, D10] in got, "the long lounger on deck 10's first balcony", got)
+    # ↓ and jump: on the first balcony nothing is under her (decks 9 and 8 have none there): she stays on it.
+    b.teleport(3610, D10, route="promenade")
+    wait(0.3)
+    b.key("down", True); b.tap("space"); b.key("down", False)
+    wait(1.5)
+    s = b.state()
+    ok &= check(s["y"] == D10 and s["mode"] == "play", "no drop where no balcony is under her", s)
+    b.teleport(3700, D10, route="promenade")
+    wait(0.3)
+    b.key("down", True); b.tap("space"); b.key("down", False)
+    wait(1.5)
+    s = b.state()
+    ok &= check(s["y"] == D9, "the next balcony's floor drops her onto deck 9's", s)
+    # Her picture cut at the partition: walking aft into it, the stand-in reaches no further than the panel.
+    b.teleport(3600, D10, route="promenade")
+    wait(0.2)
+    b.hold("right", 0.5)
+    # (Where the stand-in shows: its crop in the frame's columns, counted from the other side when it is turned.)
+    cut = json.loads(b.eval(f"JSON.stringify((() => {{ const q = {S}.balconyPic, p = {S}.player, c = q._crop, rw = p.width;"
+                            " const left = p.x - p.displayOriginX, b = p.flipX ? rw - c.x : c.x + c.width;"
+                            f" return {{ shown: q.visible, right: Math.round(left + b), own: p._crop.width }}; }})())"))
+    ok &= check(cut["shown"] and cut["right"] <= 3625 and cut["own"] == 0, "at a partition her picture stops at its panel", cut)
+    b.close_up("mask-partition", 3620, D10 - 24, 100, 60, 6)
+    b.open("?reset&play&at=mask10&did=table")
+    wait(0.4)
+    pick = b.eval(f"[{mask}.pick.visible, {mask}.pick.x, {mask}.pick.y]")
+    ok &= check(pick == [True, exact_x(64.417), D10 - 12], "after it: on the lounger's slats", pick)
+    b.close_up("mask-lounger", 3560, D10 - 24, 120, 60, 6)
+    b.teleport(exact_x(64.417), D10, route="promenade")
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    ok &= check("keep:him:sleepmask" in b.eval(f"{S}.save.keeps"), "E takes it, his", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
 def scenario_region8(b):
     """Region 8 (docs/build-plan.md, step 8): the climb from the Great Outdoors onto deck 12's aft
     terrace, Los Lobos' pinata, Teppanyaki's flares, the old lady on her sunbed and her mojito, the

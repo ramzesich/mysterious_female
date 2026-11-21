@@ -212,6 +212,10 @@ ITEMS = {
     # the table scene, as all four of his ("not lying there before it"); deck 12 opens only by the wall jump past his
     # table. Its close-up is the top half of the shirt with the logo from his photo (`tools/draw_tshirt_logo.py`).
     "keep_tshirt": (12, 111.25, "keep:him:tshirt", "flag:table", 10, "thing:tshirt-folded"),
+    # His sleep mask (14), pink-beige with one strap (the user, 2026-11-21), on the slats of deck 12's long lounger
+    # on deck 10's first balcony (`BALCONY_SET`; the plan's §7f P3, the row's forward end), pressed a little into
+    # them: only after the table scene. Its world picture is its close-up shrunk by hand, outlined, with its tabs.
+    "keep_sleepmask": ("b10", 64.417, "keep:him:sleepmask", "flag:table", 12, "thing:sleepmask"),
 }
 
 # How many things to find there are of each kind, for the HUD (§4.1).
@@ -788,6 +792,12 @@ LINES = {"haz_line_8a": (8, 135), "haz_line_8b": (8, 215), "haz_line_9": (9, 195
          "haz_line_10b": (10, 224.4)}
 # Balconies with someone on them behind a "Do Not Disturb" sign (`haz_sunbather`): id: (deck, m,
 # the picture). Landing on one: "Startled". The way past is by another deck.
+# Balconies furnished by hand, not by the builder's rule (deck, m on the balcony): what stands there (atlas piece,
+# px from its forward partition, flipped) and the towel on its rail (px from the partition, colour) or none; what
+# is not named is the rule's. Deck 10's first balcony holds his sleep mask (14) on deck 12's long lounger, its towel
+# moved to the next balcony aft, blue and 35 px in as on deck 9's below (the user, 2026-11-21).
+BALCONY_SET = {(10, 62.9): dict(furniture=[("sunlounger-long-bg", 60, False)], towel=None),
+               (10, 66.9): dict(towel=(35, 1))}
 OCCUPIED = {"haz_sunbather": (8, 181.4, "thing:balc-sunbather"), "haz_breakfast": (10, 178.8, "thing:balc-breakfast")}
 # Checkpoints on balconies, each at an ajar balcony door (a lamp over it): id: the room.
 BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a": "balcabin8a",

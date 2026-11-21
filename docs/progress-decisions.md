@@ -3804,3 +3804,38 @@ valuable."
   the small folded shirts 4, the loungers 4, and tries along the way; the ids in the READMEs).
 - **Set right on the way:** the dropped mirror close-up of the intro was taken out of CLAUDE.md's lessons and my
   memory (the user: "it should not be there anymore").
+
+## §4 2.1, thing 14: his sleep mask on deck 10's first balcony; the balconies mended (the user, 2026-11-21)
+
+- **Where:** the Design session's §7f P3 had moved it to deck 10's balcony row, its forward end (62.9 m). That balcony
+  was bare (the furnishing rule gave it only a towel): the user chose a sunlounger, then **deck 12's long lounger**
+  (`sunlounger-long-w20`, the balconies' wash), behind the balcony's bottom wall as every balcony's furniture; its
+  towel moved to the next balcony aft, **blue, 35 px in as on deck 9's below** (the user). Both set by hand:
+  `BALCONY_SET` in `tools/population.py`, read by `tools/build_world.py` (the rule furnishes the rest as before).
+  Shown only after the table scene (`flag:table`), as all four of his.
+- **The look:** "A regular sleep mask with one strap. Pink/beige color." Four map objects (1 generation each); the
+  user took **try 1, the edges smoothed**: its body's outline smoothed by rule (the mask blurred and cut at half, one
+  outline colour), the dotted seam by the edge filled from the shading 2 px in (version A; B filled 3 px), the strap's
+  two tabs square and **the same size** (7 x 15), on the user's word (a try one pixel shorter was set aside:
+  "take the before variant"). `assets/source/closeups/sleepmask.png`; the script in `tries/mask/smooth.py`.
+- **In the world:** the close-up's body shrunk by majority to 12 x 6, outlined in its rose, a pixel of strap each side:
+  16 x 8 (C of three sizes, the user's), on the lounger's slats, 4 px forward and 3 px down from where I first set it
+  (the user, a pixel at a time). Both pictures in their own colours: on the palette the pink went peach.
+- **The balconies, seen with it** (the user's two screenshots): parts of her picture showed through a partition (on
+  the next balcony) and over the ship's side at the row's end. Now each partition's panel is drawn over her (its
+  colours as the builder draws it, its foot the side's own tiles; pixel-identical to the side with her away), and her
+  picture is cut to her balcony: at a partition while she is under its top (over it she can be seen leaning across),
+  at a row's end at any height. **Phaser 4 shifts a picture turned by `flipX` when it is cropped** (by width - 2x - w),
+  so while she is on a balcony a stand-in of her, turned by its scale (which crops true), is drawn and her own
+  picture cropped to nothing (`balconyPic` in the ship scene). A copy of the side past the rows' ends was tried and
+  dropped: it hid a window on deck 9, not a tile of the side.
+- **↓ and jump** on a balcony with no balcony under it had been the long-fall scare (the user: "That shouldn't
+  happen if there is no balcony underneath. She shouldn't jump down"): she drops only where a floor of the route
+  lies one deck under her (a balcony, the walkway under deck 8's); with the parasol, where any floor of it is under
+  her (`dropFloorAt`). GAME_DESIGN §6.1.3 says so now.
+- Built: `keep_sleepmask`, `BALCONY_SET`, the `covers` of the outside's data (`tools/build_world.py`), the panels and
+  the cut (`src/world/world.js`, `src/scenes/ShipScene.js`), the start place `mask10` (`docs/start-links.md`). Test
+  `region7.mask` (no mask before the table scene, the lounger in place, no drop where nothing is under her, the drop
+  onto deck 9 from the next balcony, the cut at the partition, the mask on the slats, E takes it); `region7`,
+  `region4`, `mishaps`, `boot` pass; `check_overlaps` 0 (it skips the side's copied tiles: plating, not things).
+  Generations: 4.
