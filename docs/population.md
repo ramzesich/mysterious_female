@@ -76,7 +76,7 @@ last column is what the drawn pages hinted at until then.
 | Id | Region | Where | How she gets it | Its page hints at |
 |---|---|---|---|---|
 | `book_1` | 1 | Deck 5, 96, a table at the Atrium Café, by a half-drunk coffee | Pickup, before she knows what it is for | The galley's crate behind the Seven Seas' crew door |
-| `book_2` | 2 | The lifeboat at 140 on the boat walkway, on its bench | Pickup inside `room_lifeboat` | The trap door in the stage |
+| `book_2` | 2 | The lifeboat at 143 on the boat walkway, on the bench left of its ladder (since 2026-11-21) | Pickup inside `room_lifeboat` | The trap door in the stage |
 | `book_3` | 3 | Deck 6, 254, the dressing room's make-up table | Pickup inside `room_dressing` (the stage door, red) | The jackpot machine's glint |
 | `book_4` | 4 | Deck 9, 134, the honeymoon couple | Their thanks for their picture | The pantry passage between the kitchens |
 | `book_5` | 5 | Deck 8, cabin 8206, on the bed | Pickup (a book like the rest since 2026-11-21: the bed is one of the places she reads, E on it) | Deck 7's stern strip |
@@ -85,6 +85,7 @@ last column is what the drawn pages hinted at until then.
 | `book_8` | 8 | Deck 12, 129, the old lady's sunbed, after the horn | Pickup | The lighting bridge over the stage |
 | `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
 | `book_10` | 9 | Deck 10, 38, the bridge's chart table | Pickup | The odd book on the library's top shelf |
+| `book_11` | 11 | Deck 7, the boat walkway's aft end, past the drill, on the lid of a life-jacket box (`prop_lifejacket_box`, 2026-11-21) | Pickup | (no hint: every page its book's opening since 2026-11-21) |
 
 ### 2.3 The tangerines (41 here; 56 in the game)
 
@@ -132,7 +133,7 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 
 | Id | Where | Needs |
 |---|---|---|
-| `slot_lifeboat` | Inside the lifeboat at 140 | `room_lifeboat` |
+| `slot_lifeboat` | Inside the lifeboat at 143, under its forward oar (2026-11-21) | `room_lifeboat` |
 | `slot_lighting` | The lighting bridge's end, over the stage | `room_lighting` (red) |
 | `slot_stern` | Deck 7's stern strip, 253, on the stern structure | A drop from deck 8's stern terrace; the socks to climb back |
 | `slot_chapel` | The chapel, on its wall | After the cake |
@@ -258,7 +259,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The stage's light (`haz_lights`, after `bb3`) | 6 | 12a, 12b | 9a's spin, 9c's belly-flop | `bonk`, `spin`, `bellyFlop` | `region3`, `mishaps.light` |
 | The swinging doors (`haz_swing_*`) | 8 to 10 | 13a; **13b unreachable** (it hits her only facing it) | flat on the wall, sliding down it | `doorBang`, `thump`, `doorShut` | `region4` |
 | The court's basketballs | 12 | 14a, 14b | stiff onto her back / her face, lying dazed | `bounce`, `headBonk`, `bellyFlop` | `region8`, `mishaps.ball` |
-| The boat drill (`haz_drill`) | 7 | 15 | 14a's fall, the boat down over her | `boatThump`, `bellyFlop` | `region7`, `mishaps.things` |
+| The boat drill (`haz_drill`) | 7 | 15 | Ouch!: onto all fours, dizzy, the boat down to her back, she crawls away through the fade (since 2026-11-21) | `boatThump` | `region7`, `mishaps.things` |
 | The sprinklers | 8 to 10 | 16 | soaked, a sneeze, she squelches back | `herSneeze`, `splashSmall` | `region4`, `mishaps.things` |
 | The sauna's steam | 11 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9` |
 | The towel stack (`haz_towels_9`) | 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things` |
@@ -515,8 +516,8 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 125 | ladder top | From `rdr_gate` | | |
 | 128 | `cp_station` | The station locker | Checkpoint | A locker |
 | 104-230 every 9 | boats | The lifeboats, tenders, rescue boat (built) | | |
-| 140 | `room_lifeboat` | The one lifeboat with its hatch open: inside, benches, an oar, `book_2`, `slot_lifeboat`, a porthole | `room`; E at the hatch | Drawn by hand |
-| 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped". **As built:** lowered onto the walkway and hoisted, its falls from the davit's arms to the boat's posts; running at it she sets it off (the lamp first, `DRILL` in `src/config.js`, 2026-11-19); under it as it comes down, 15: stiff onto her back (14a's), the boat down over her until her checkpoint. The winch and its crewman at 184.6 m (from 184.9, 2026-11-19: she lies clear of it) | Two characters, the boat's swing |
+| 143 | `room_lifeboat` | The one lifeboat she enters (2026-11-21, the user's): through a hatch on its roof, climbing up behind the boat (E at it, a faint glow); inside the whole boat, a ladder down from the hatch, benches, oars and a boathook, nine portholes (round windows outside at the same columns), `book_2`, `slot_lifeboat` | `room`, `door: roof`; out up the ladder | Drawn by hand, its oars and boathook and the hatch generated |
+| 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign (2026-11-21: the winch and its crewman one generated clip turning with the boat, a wire rope up from its drum, a generated warning light; down, the boat a floor she can stand in; 15 remade: on all fours, she crawls away) | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped". **As built:** lowered onto the walkway and hoisted, its falls from the davit's arms to the boat's posts; running at it she sets it off (the lamp first, `DRILL` in `src/config.js`, 2026-11-19); under it as it comes down, 15: stiff onto her back (14a's), the boat down over her until her checkpoint. The winch and its crewman at 184.6 m (from 184.9, 2026-11-19: she lies clear of it) | Two characters, the boat's swing |
 | 210 | `riv_walkway` | The rival looking into a boat | `glimpse(region 7, once)` | |
 | 110-231 | the wall | The recess's wall: wall jumps up to deck 8's balconies (the socks) | | |
 

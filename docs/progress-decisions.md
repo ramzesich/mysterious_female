@@ -3952,3 +3952,41 @@ valuable."
   her bed bounce and sits her to read; the hint `hint.read` (both languages, the pad's buttons). Tests: `region2` (the
   chair, a table chair, the page, the row back, getting up), `region5` (the bed), `region4`, `region6`, `region7`,
   `region8`, `region9` (the nook at fourteen), `lang`, `boot` pass; `check_overlaps` 0. Generations: 2.
+
+## §4 2.1, book 11, and the boat walkway mended on the way (the user, 2026-11-21)
+
+- **Book 11** (row 17, "the boat walkway's end, beyond the boat drill"): the end had nothing to lie on. The user asked
+  for it in a boat; the one boat she enters (at 143 m) is forward of the drill and holds book 2, so "the initial plan":
+  a **life-jacket box** at the walkway's aft end (generated, try 2 of two), the book on its lid, the box 2 px up and the
+  book 2 px into the lid (the user's placing), the box washed 20% toward the recess wall.
+- **The walkway, fixed as the user went** (commits `842e657`, `d6a62ee`, `3e4816b`, `70623ef`):
+  - the lifeboat's inside showed deck 7's casino: a room entered from outside keeps the ship's side closed, dimmed round
+    it (`inDeck` false; its dim over the outside's fronts);
+  - her picture 2 px higher on the walkway (`WALK_LIFT`), cut at its two ends as on the balconies;
+  - the boats drawn **in front of her** (she walks behind them), the walkway's railing between her and them; the boats
+    25% washed (from 35%); every cable a **wire rope** (`src/wire.js`) ending on its ring (each eye measured in the
+    boat's picture; the tender's forward hook moved off its wheelhouse, its ring had been cut);
+  - **the drill**: its boat, down, is a floor she can jump into and run along, and stays down while she is in it; while it
+    moves its ends are a wall to a jump; **gag 15 remade** ("Ouch!"): she sinks onto all fours, dizzy, butterflies, and
+    crawls away through the fade (generated from her crawl, 2 clips); the winch and its crewman one generated clip that
+    turns with the boat (forward lowering, back hoisting), a wire rope up from its drum, a **generated red warning
+    light** that blinks with a faint halo;
+  - **the lifeboat's way in, after many tries** (the user's rulings: "the cut away must show the outside of the hull";
+    "Remove the door. Make a hatch on top of the boat"; "Crawls from behind the boat"; "her hands cannot be climbing
+    the air"; "she still doesn't go into the hatch, but outside the boat"): a **wide hatch on its roof**, seen a little
+    from above, its lid taken off; going in, she pulls herself up over its far rim facing us (her own character, a
+    skeleton-v3 clip of written poses, her hands held on the rim), stands, turns with her own frames, steps into the
+    opening and sinks with her hands on its rim (her `climb-out` frames), cut by its near lip; the 14 frames approved
+    together as a GIF. Inside she starts **on top of a ladder** the player climbs down; up past its top she comes out,
+    the same frames the other way (no E). A faint warm glow out of the hatch while she stands where E works. ↓ held
+    from a climb no longer crawls her. Dropped on the way (each shown, each broke): a side boarding door, a generated
+    whole climb (another drawing than her sprite), her ladder clips over the roof (hands on nothing).
+  - **the lifeboat itself**: its inside the whole boat (408 px); nine portholes evenly (36 px), the ladder in the rhythm;
+    round windows outside at the same columns (a picture of its own, `lifeboat-round`); its forward end furnished
+    (book 2 there now, between the flare box and the water can); generated oars and a wooden boathook, level, smoothed;
+    the photo frame under the forward oar.
+- Tests: `region2` (in, down, book 2, the photo, up and out), `region7` (the drill: on all fours, the crawl), `mishaps`,
+  `boot` pass; `check_overlaps` 0 (the boats are outside the outside route's depths now: skipped by name). Not mine:
+  `ladder` fails at "walks off the ladder top without falling through" on `d6a62ee` too (the funnel's top puts her on its
+  stairway); not looked at. Generations: about 75 (the box 2, the drill 22, the hatch and climb 35, the light 2, oars
+  and boathook 5, the rest tries).
