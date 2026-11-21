@@ -59,6 +59,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
+| 11 (§7f) | The empty stretches: ten obstacles on the walks where nothing can catch her, seven of them things already built, placed anew; the rule "nothing is used twice" dropped (added 2026-11-21) | The user's word; the design session's audit | Large | About 75 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -458,6 +459,7 @@ cabin's number on its tag, carried under tray rules; a hand takes it at the door
   her face, the pillows in both arms), her with it is one generated clip.
 - The plan's own warning: three deliveries are one kind of errand with three loads and three
   rules, "the closest the plan comes to the line" of nothing twice. Each must feel its own.
+  (The rule itself was dropped by the user on 2026-11-21, §7f; that each load feels its own still holds.)
 - New scenario `deliveries`; `region3`, `region5`, `region7`, `region4`, `region9`;
   `tools/check_corridors.py`'s numbers again.
 
@@ -777,6 +779,99 @@ Library). Under about eleven on the main way, scares wake her on the wrong deck 
 
 The audit's pictures and its model of the returns were made by scripts outside the repo (her teleported beside each of
 `window.__ship.checkpoints`, `Browser.close_up`; `closestCheckpoint` asked with a given set lit); they are not kept.
+
+## 7f. Part 11: the empty stretches, ten obstacles (large; about 75 generations, a guess; added 2026-11-21)
+
+The user, 2026-11-21: "Let's focus on the long corridors that are still underpopulated with obstacles. I want a
+proposal of how we would fill the empty stretches with playable obstacles by reusing the current ones (in a smart way,
+so that they aren't repeated one after the other), and maybe adding a few new ones." On the proposal of ten: "All of
+them". On deck 4's aft checkpoint, which §7e removes and which two of the ten would give a use: "As decided" (it goes).
+On the old rule "No person, hazard, errand or reward is used twice" (2026-11-10): **"Drop the rule, it is no longer
+relevant, we are doing refinements manually now."**
+
+**What was measured** (from `maps/world.json`, the map and the running game; only what can catch her or must be got
+past was counted, not people to look at, checkpoints or things to find):
+
+- **Regions 1 to 3 are the thin part of the main way.** Deck 4 from the climb (145 m) to the stern: 109 m with three
+  standing carts. Deck 5 from the forward stairs to the stern: 182 m with the waiter alone, who matters only with a
+  tray. Deck 6 inside from the forward cabins to the stage: 184 m with nothing that can catch her.
+- **The best gags sit off the main way:** the suitcase, both paper rounds and the breakfast trolley in the forward
+  cabins of decks 4 and 5, which the lunch errand never crosses; her tray ride and the "Do Not Disturb" gag in the
+  optional hallways; the steam in the optional spa.
+- **From region 4 on the game is dense enough**, but for the gym (49 m with the pool's start), the sun deck once the
+  old lady has gone, the officers' corridors and the boat walkway (131 m with the drill alone).
+
+**How the ten were chosen** (the design session's own three rules for bringing a thing back; they stand in place of
+the dropped rule for this part, and later refinements are the user's, by hand):
+
+1. Never the same thing as the last one she met, counted along her way, across the stairs too.
+2. Neighbours never ask for the same move. The moves: hop a thing that stands, hop a thing that moves, time a pulse,
+   stop for a tell, get past someone walking.
+3. A thing comes back changed in one way: a new partner, a new state of hers (a tray, the cake), or a place that
+   gives it a reason.
+
+Every hazard is a class built from a line of data (`tools/population.py`, `src/world/*.js`), so a thing placed anew is
+a line, a look and a test, unless said otherwise below. Metres are "about": **each is set against what is built there
+first** (the lesson of 2026-11-14), looked at enlarged beside her, and shown to the user before it is tested.
+
+| # | Where | What | From | What is changed, and what the build needs |
+|---|---|---|---|---|
+| 1 | Deck 4, about 169.6 m, midway between two cabin doors | **The towel stack** (`STACKS`, gag 18) | Deck 9 | Alone here, as the lesson (stop short, it falls in front of her); deck 9 keeps it with the darting vacuum. It stays fallen, as there. Look at the wall behind it (a picture was hidden on deck 9) and at the extinguisher at 173.5 m |
+| 2 | Deck 4, 225.5 to 239 m | **A second vacuum** (the map's `vacuum`, gag 5) | Deck 4 midships | It patrols the pocket with the stage manager's door (232.5 m): "the vacuum on deck 4 is the test" for the pills (`GAME_DESIGN.md` §6.1.3, region 3), which the first one, at 118 to 143 m, never was. It turns short of the trunk's door (240.6 m), so that stepping out of the trunk is never a hit. The cart at 220 m and the prop cart at 224 m bound its forward end: see that it stops short of them |
+| 3 | Deck 5, Shore excursions, 126.5 to 136.5 m | **A second runaway suitcase** (`ROLLERS`, gags 6a to 6c) | Deck 4 forward | Between the trunk's door (124.9 m) and the reservations desk (137.5 m, her flag at 140.7 m), clear of both. The first time it is met with the lunch in her hands. **Measure first whether a tray's low hop clears it:** if not, the lunch by deck 5 has no way past and the lane is cut so that it leaves her a gap, or the user is told |
+| 4 | Deck 5, the Seven Seas, three lots between 214 and 240 m | **Plates and trays Bumbot knocked down** (`TRAYS`, gag 3: she rides one off) | Decks 8 and 10 | There only from near-catch 1 (`flag:bb1`: his way forward out of the restaurant) until the lunch is delivered. No door behind them (`Trays.door()` may be nothing already). Each lot under two metres, between the tables, clear of the three tangerines that roll from the bowl. With the lunch in her hands a hop clears them; landed on, a spill and the pass again. Needs: `after`/`until` on a `TRAYS` entry |
+| 5 | Deck 6, Bliss, about 113.2 to 114.8 m | **The DJ's fog machine: a puff every few seconds** (`Steam`, gag 17) | The sauna | Region 2's first timed obstacle, the DJ at his booth (`amb_dj`) its cause. Clear by a metre and a half of the promenade door (111 m), the dance floor's spot (117.2 m, where she stands still three seconds) and the trunk's door (118 m). Needs: a second steam in the data (`bow.steam` is one today); **a small fog machine on the floor, generated (1 or 2), as what it comes out of**, the sauna's hiss and wisps as its tell; drawn only while she is on deck 6 (the lesson of 2026-11-20 on effects seen through the hull) |
+| 6 | The boat walkway, about 160 and 181 m | **Two gulls on its rail, and the balconies' gusts reaching down to it** (`PERCH`, gag 20; `GUSTS`) | The balconies | The second sits five metres from the boat drill (186 m): waiting out the boat is what a gull punishes. Needs: a perch at the walkway's rail (the data takes balcony decks today); the gusts' band down to the walkway's floor; **a tell that can be seen there** (the balconies' is their towels: the boats' covers or the drill's rope flapping, a line drawn in code) |
+| 7 | Deck 12, the sun deck, 112 to 144 m | **Gusts** (`Gusts`, as `TERRACE`) | The aft terrace | The jump over the old lady's sunbed (128.5 m) must be timed; after the horn a gust rocks the cake unless she stands still. Two towels on the sunbeds and the palm (114 m) as the tell. Needs: `SWAY` in `src/world/carry.js` given a `gust` (moving in one adds to the wobble; standing still adds nothing), to be tuned in play; only while she is on deck 12 |
+| 8 | Deck 11, the gym, 91 to 96 m | **A gym ball rolling with the ship** (`ROLLERS` with a picture of its own) | The suitcase's code | New picture: a gym ball about 30 px, generated (about 5 with tries), turned as it rolls. Between the socks' rack (89.2 m) and the bench (97.1 m). Its hit is a scenario of its own (`MISHAPS.gymball`): "Bumped", the built sit-down, no ride, until a gag is wanted |
+| 9 | Deck 10, the officers' corridor, about 52 to 56 m, a cabin door's slot | **The night watch asleep: a "Do Not Disturb" door with his tray outside** (`DND`, `TRAYS`, gags 23 and 3) | Decks 8 to 10 | Both gags on the way to the bridge. Needs one person, an officer in pyjamas, a sleep mask pushed up (a pro character in the cast's style, the drill's officer; about 15 with what the other `dnd_*` people have). Clear of the officer's walk (`amb_officer_10`, about 60 m) and of the cabin door `cp_officer` gives back (§7e) |
+| 10 | Deck 7, the Art Gallery, 132 to 148 m | **New: two handlers carrying a large framed painting to and fro** | None | Region 3's one walker. They carry it along her lane and set it against the wall at each end for a few seconds, wiping their brows: then the way is free. Her cry sets it down at once. Run into while they walk: **she goes through the canvas**, head and arms out of the picture, the frame round her; she staggers and sits; they look at each other. Then her checkpoint; they fetch another. About 50 generations, a guess (the two with the painting made together, their walk, setting down and picking up, their look; her gag). **Built last, a plain version first:** a rough of the shot over a real screenshot and the walk with stand-in art are shown to the user before any art is made (the intro's lesson) |
+
+**The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
+first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:
+the suitcase (moving), the waiter (walker), the plates (hop).
+
+**Where a hit sends her back, with §7e's nineteen** (the user: "As decided"; no checkpoint is added or kept for these):
+
+- 1 and 2: the gangway's door (72 m), about 100 and 155 m back, past the dog and the first vacuum; from region 4 the
+  laundry's door (112 m). In region 3 a hit by the second vacuum is the long walk aft again with the pills. This is
+  the cost the user took.
+- 3: the gangway's door, a deck down and up the forward stairs, about 65 m; once it is lit, the Library's.
+- 4: with the lunch in her hands, a spill and the pass, at most 35 m; without, the gangway.
+- 5: the Library's door (45 m) once she has been there; before, the gangway, two decks down.
+- 6: as the drill's hit today; with a tangerine on her the gull takes one and she keeps her place.
+- 7: no hit; a cake gone over is fetched again at Cagney's.
+- 8: the gym's door, ten metres.
+- 9: the gym's door a deck up by the forward stairs; once lit, the bridge's.
+- 10: the Arcade's door (189 m), which she has passed on her way from the balcony.
+
+**Left alone:** by the user's earlier word Magnum's, the aft ends of decks 9 and 10, the Spinnaker's balcony, behind
+the flares, and deck 8 forward (home); by the design session's judgment the Library, the theatre's aisle before the
+stage's scene, deck 9's officers' corridor and deck 6's forward cabins, where the robot's ride is the play. No more
+sprinklers, swinging doors or standing carts: there are five, six and nine.
+
+**The order:** 1 to 7, then 8, then 9, then 10. If the date presses, what is unbuilt is said to the user, the last
+first.
+
+**Tests:** a case in `mishaps` for each new thing that can hit her (the stack, the second vacuum, the second
+suitcase, the plates, the fog, a walkway gull, the gym ball, the night watch's door and tray, the painting), each with
+none on her and with two; `deck4`, `vacuum`, `region1` (the lunch carried by deck 4 and by deck 5 must still be
+possible), `region2` (Bliss), `region3` (the pills, the gallery), `region6` (the gym), `region7` (the walkway),
+`region8` and `region9` (the sun deck: the old lady's jump, the cake), `pocket`, `boot`; a start place for each new
+spot (`docs/start-links.md`). `tools/check_overlaps.py` lists nothing; `tools/check_corridors.py`'s numbers given
+(today, the longest walk with nothing to do: deck 4 29.6 m, 5 55.2, 6 68.3, 7 82.1, 8 40.1, 9 64.6, 10 56.4, 11
+47.4, 12 44.0).
+
+**The documents:** `GAME_DESIGN.md` §5.8, §6.1.2 (the rule is marked dropped there, 2026-11-21), §6.1.3's "Hazards"
+lines and §6.1.7's table as each is built; `docs/population.md` §2.9, each deck's rows and §4's rules;
+`CLAUDE.md`'s table for a new class or option.
+
+**The date:** the design session's guess is about three working days for all ten (1 to 7 about one, 8 a few hours, 9
+half a day, 10 one). Parts 9 and 10 had taken two of the roughly five spare days before the 23rd of December; this
+takes the rest. The user was told before choosing.
+
+The audit's map and panoramas were made by scripts outside the repo (the obstacles' places from `maps/world.json` and
+the map; each stretch shot tile by tile through `playtest.Browser`, a deck cut open by `viewOverride`); not kept.
 
 ## 8. Optional, each only on the user's word
 

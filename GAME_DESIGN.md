@@ -809,7 +809,22 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   swinging cabin door, room-service trays on the floor, laundry lines, a boat drill, the buffet queue,
   gusts, basketballs, Teppanyaki's flare, the sauna's steam, a pillow fort and a ball pit, a sunbather
   behind a "Do Not Disturb" sign. Passengers who are hazards become errand-givers, and nothing is
-  used twice (the user, 2026-11-10).
+  used twice (the user, 2026-11-10; **the rule dropped by the user, 2026-11-21**, below).
+- **Decided (the user, 2026-11-21; not built yet: `docs/plan-the-rest.md` §7f, part 11): ten obstacles on
+  the walks where nothing could catch her**, "All of them" of the design session's proposal. Seven are
+  things already built, placed anew, each changed in one way and never next to itself on her way: the
+  towel stack on deck 4 (about 170 m); a second vacuum in deck 4's aft pocket by the stage manager's door,
+  the pills' test; a second runaway suitcase at Shore excursions (deck 5); the plates and trays Bumbot
+  knocks down on his way out of the Seven Seas, from near-catch 1 until the lunch is delivered; the DJ's
+  fog machine in Bliss (the sauna's steam); two gulls on the boat walkway's rail, one by the drill, and
+  the balconies' gusts reaching down to it; gusts over deck 12's sun deck, which also rock the cake. Two
+  need one small picture or person: a gym ball rolling with the ship in the gym (the suitcase's code); the
+  night watch asleep behind a "Do Not Disturb" door, his tray outside, in deck 10's officers' corridor.
+  One is new: two handlers carrying a large painting to and fro in the Art Gallery, through whose canvas
+  she goes. Left calm: Magnum's, the aft ends of decks 9 and 10, the Spinnaker's balcony, behind the
+  flares, deck 8 forward, the Library, the theatre's aisle, deck 9's officers' corridor, deck 6's forward
+  cabins. **No checkpoint is added or kept for them** ("As decided": deck 4's aft one goes, §5.5; a hit
+  by the two on deck 4 aft is the walk from the gangway again).
 - **Secrets** exist: §6.1.11. (Bumbot's SUSHI sign had leaked in from the Bumbot game; dropped, the
   user, 2026-11-10.)
 - **As built (2026-11-19):** each hazard with what its hit does, its sounds and its checks:
@@ -944,8 +959,11 @@ as the shadow comes, the gull takes the cone and leaves her be.
 
 **People.** Fellow crew are friendly and never scare her. Passengers and machinery are the
 obstacles, and **a passenger who is a hazard can become an errand-giver**: service is a crew member's
-superpower. **No person, hazard, errand or reward is used twice** (the user, 2026-11-10): each place
-has its own, and where the plan had a repeat it was swapped (§6.1.14). Every request is **a speech
+superpower. ~~**No person, hazard, errand or reward is used twice** (the user, 2026-11-10): each place
+has its own, and where the plan had a repeat it was swapped (§6.1.14).~~ **Dropped (the user, 2026-11-21):**
+"Drop the rule, it is no longer relevant, we are doing refinements manually now." Asked for: the empty
+stretches filled "by reusing the current ones (in a smart way, so that they aren't repeated one after the
+other)", §5.8 and `docs/plan-the-rest.md` §7f. Every request is **a speech
 bubble with a pictogram** (a tray, a cup, a pill bottle, a cake, a canister), never words, so the goal
 is never stated and nothing needs translating. People stand or walk where they plausibly would;
 blocks on flights have a rope and a sign.

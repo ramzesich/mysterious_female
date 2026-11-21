@@ -3707,3 +3707,37 @@ Asked one question at a time (the user: "Give me questions interactively, one by
   frame for the next. Test `throw.sardines` (the cloud near, E with none and with one, a lob caught, the tin taken);
   `boot`, `throw`, `region8`, `deck4` pass; `check_overlaps` 0. Generations: 22 (`assets/source/closeups/README.md`,
   `assets/source/people/sushi-chef-trade/README.md`).
+
+## The empty stretches: an audit, and a new part 11 (2026-11-21; a plan, nothing built)
+
+The design session, on the user's word: "Let's focus on the long corridors that are still underpopulated with
+obstacles. I want a proposal of how we would fill the empty stretches with playable obstacles by reusing the
+current ones (in a smart way, so that they aren't repeated one after the other), and maybe adding a few new ones."
+
+- **Measured**, counting only what can catch her or must be got past (from `maps/world.json` and the map, then
+  eight stretches looked at as panoramas of the running game): deck 4 from the climb to the stern is 109 m with
+  three standing carts; deck 5 from the forward stairs to the stern 182 m with the waiter alone; deck 6 inside
+  184 m with nothing. Regions 1 to 3 are the thin part of the main way, and the best gags (the suitcase, the
+  papers, the breakfast trolley, the tray ride, the "Do Not Disturb" door, the steam) sit in side stretches and
+  optional parts. `tools/check_corridors.py` did not show it: it counts a checkpoint, a person with a bubble and
+  a room's door as "something to do".
+- **Proposed:** ten placements, seven of them things already built and placed anew under three rules (never the
+  same thing as the last she met; neighbours never the same move; a thing comes back changed in one way), two
+  with one small picture or person, one new. A map of the decks with the empty stretches and the ten was shown.
+- **The user's answers:** on which go in, "All of them"; on deck 4's aft checkpoint, which part 10 removes and
+  which two of the ten would give a use (a hit there is about 100 and 155 m back from the gangway), "As decided":
+  it goes, and no checkpoint is added or kept for the ten; on the rule "No person, hazard, errand or reward is
+  used twice" (the user, 2026-11-10), **"Drop the rule, it is no longer relevant, we are doing refinements
+  manually now."**
+- **Changes to the plan, and why:** `docs/plan-the-rest.md` has a new last part, **11 (§7f)**, with the ten, what
+  each needs, where a hit sends her back under the nineteen checkpoints, what is left calm, the tests and the
+  order (the new one, the painting carried through the Art Gallery, last and from a plain version shown first).
+  `GAME_DESIGN.md` §6.1.2 marks the rule dropped, §5.8 has the decision, not built. Why: the user's request, and
+  the measurement above.
+- **The date:** about three working days, the design session's guess; with parts 9 and 10 that is all of the
+  roughly five spare days before the 23rd of December. Said to the user before the choice.
+- Three things found on the way, not acted on: a tray's low hop over the suitcase is not measured (§7f, 3); the
+  walkway has nothing that could flap as a gust's tell (§7f, 6); in the panoramas a thought cloud stood over the
+  aft lift's door (200.3 m) on decks 4 and 5 with her at the gangway, which may be the pictures' doing (`?cards=all`,
+  a deck cut open by `viewOverride`) and was not looked into.
+- No generations. The scripts and pictures are outside the repo and not kept.
