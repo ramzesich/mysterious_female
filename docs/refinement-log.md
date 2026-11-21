@@ -259,5 +259,5 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   passed on by `tools/build_world.py`; `tools/check_overlaps.py` counts a sign picture as text (`signText`).
 - **Checked:** the game shot at every kind (47 signs, no page errors); `check_overlaps` 0; `boot`, `deck3`,
   `region2`, `region4`, `region9` pass; the rest not run.
-- **Open:** a row for `src/signs.js` in `CLAUDE.md`'s table and a rule (a new sign is `sign()` with a look), only on
-  the user's word.
+- **On the user's word ("Add them"):** a row for `src/signs.js` in `CLAUDE.md`'s table and the rule (a sign is `sign()` with a look,
+  never a text box), `f27383c`.
