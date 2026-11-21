@@ -261,3 +261,18 @@ planned. Each entry: what the user asked, what was made, what was checked. The s
   `region2`, `region4`, `region9` pass; the rest not run.
 - **On the user's word ("Add them"):** a row for `src/signs.js` in `CLAUDE.md`'s table and the rule (a sign is `sign()` with a look,
   never a text box), `f27383c`.
+
+## The menu's font (2026-11-21, approved)
+
+- **Asked:** the welcome screen's lettering changed, in both languages; candidates first.
+- **Shown:** five open pixel fonts with their own Cyrillic, each set in the menu's look over a real shot of the
+  screen, English beside Ukrainian (Press Start 2P twice, Galmuri11, Fusion Pixel 12, Handjet); left out: Rubik
+  Pixels (breaks up), Pixelify Sans and Pixel Code (not on a pixel grid), the thin ones. **Chosen: 1**, Press Start
+  2P, the name at twice the font's pixels, the plates' words at its own.
+- **Built:** `assets/source/menu/PressStart2P-Regular.ttf` (SIL OFL, `OFL.txt` beside it); `tools/build_menu.py` sets
+  every Latin and Ukrainian capital (Ґ Є Ї Й too), digits and signs from it at 16 (`T`) and 8 (`S`), each frame trimmed
+  with its place in the font's cell kept as the trim; `src/pixeltext.js` steps by the cell and lays the bands over the
+  capitals' rows (H's frame). The two generated letterings (`font-title.png`, `font-sign.png`) stay in the folder,
+  unused. No generations.
+- **Checked:** the game's menu against the approved mock-up enlarged (the same); `boot`, `intro`, `lang` pass; the rest
+  not run. `CLAUDE.md`'s row still says the lettering is Latin with Ukrainian built from it: asked, not changed.

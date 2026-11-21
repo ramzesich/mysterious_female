@@ -5,80 +5,63 @@ menu out).
 
     python tools/build_menu.py
 
-The sources, in `assets/source/menu/`, are PixelLab's:
-- `font-title.png` (cells of 32) and `font-sign.png` (cells of 16; both made smaller here: `SCALE`): two generated pixel letterings
-  (`create_font`, 15 generations each), each an atlas of 80 glyphs, eight to a row, in the order
-  `ORDER`. Only the shapes are used: the game gives them their colours, outline and shadow.
+The sources, in `assets/source/menu/`:
+- `PressStart2P-Regular.ttf`, the menu's lettering (the user chose it from five fonts set over the
+  menu, 2026-11-21; SIL Open Font License, `OFL.txt` beside it): a pixel font on an 8 px grid with
+  its own Ukrainian capitals. It is set here at the sizes where its pixels are the game's: the name
+  (`T`) at 16, two art px to one of the font's; the plates' words (`S`) at 8. Only the shapes are
+  used: the game gives them their colours, outline and shadow. Every letter is its own frame,
+  trimmed to what it draws, its place in the font's cell kept as the frame's trim (src/pixeltext.js
+  steps by the cell, as the font does).
 - `plates.png`: a generated ship's name plate (`create_ui_asset`, 10 generations), a riveted brass
   frame round navy enamel; the upper of its two, made a little lower by taking rows out over and
   under its middle.
 
-**The lettering is Latin only, and the game is in Ukrainian too:** the Ukrainian capitals the menu
-needs are built here from the Latin ones, so both languages are in one hand. Thirteen are the same
-shape (А В Е І К М Н О Р С Т У Х from A B E I K M H O P C T Y X); Г is L turned upside down, И is N
-mirrored, Ь is P upside down, Б is that with E's top bar, Ї is I with two dots, З is 3, Я is R
-mirrored. The menu is set in capitals for that reason. A word with a letter not here is left
-without it, and the `lang` playtest says so.
+The menu is set in capitals. `font-title.png` and `font-sign.png`, the two generated letterings it
+had before (Latin only, the Ukrainian capitals built from their shapes), are kept there but no
+longer used.
 """
 
 import json
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 from palettize import palettize
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "menu"
 OUT = ROOT / "assets" / "sprites"
-ORDER = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?:;'\"-+()0123456789/%*=_$"
-SAME = dict(zip("АВЕІКМНОРСТУХ", "ABEIKMHOPCTYX"))
+FONT = SRC / "PressStart2P-Regular.ttf"
+# The letters in the atlas: the Latin and Ukrainian capitals, the digits and a few signs.
+LETTERS = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ" "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ" "0123456789" ".,!?:;'\"-+()/%*=_$’")
+# Each lettering: its size (a multiple of the font's 8 px grid) and its frames' names.
+SIZES = {"T": 16, "S": 8}
 # The plate: where it is in its sheet, and the rows taken out of it (it came 62 px high).
 PLATE = {"box": (0, 0, 256, 128), "cut": [(14, 20), (38, 44)]}
-# Everything is made three quarters of the size it was drawn at (the user, on seeing the menu in
-# the game: "Make the initial menu smaller, but still big. Now it is oversized"): the name's
-# letters 24 px, the plates' 12, the plate 166 x 38; each two screen pixels to one in the game.
+# The plate is made three quarters of the size it was drawn at (the user, on seeing the menu in the
+# game: "Make the initial menu smaller, but still big. Now it is oversized"): 166 x 38, two screen
+# pixels to one in the game.
 SCALE = 0.75
 
 
-def glyphs(path, cell):
-    """Every glyph of a lettering as a mask a cell high, by its character: the atlas's own and
-    the Ukrainian capitals made from them."""
-    atlas = Image.open(path).convert("RGBA")
-    g = {}
-    for i, ch in enumerate(ORDER):
-        box = ((i % 8) * cell, (i // 8) * cell, (i % 8 + 1) * cell, (i // 8 + 1) * cell)
-        g[ch] = atlas.crop(box).getchannel("A").point(lambda v: 255 if v > 127 else 0)
-    top, bottom = g["H"].getbbox()[1], g["H"].getbbox()[3]          # the capitals' rows
-    stroke = max(2, round(cell / 7))
-
-    def upside_down(m):
-        out = Image.new("L", (cell, cell), 0)
-        out.paste(m.crop((0, top, cell, bottom)).transpose(Image.FLIP_TOP_BOTTOM), (0, top))
-        return out
-
-    for cyr, lat in SAME.items():
-        g[cyr] = g[lat]
-    g["Г"] = upside_down(g["L"])
-    g["И"] = g["N"].transpose(Image.FLIP_LEFT_RIGHT)
-    g["Я"] = g["R"].transpose(Image.FLIP_LEFT_RIGHT)
-    g["З"] = g["3"]
-    g["Ь"] = upside_down(g["P"])
-    be = g["Ь"].copy()                                             # Б: Ь under E's top bar
-    be.paste(255, (0, top), g["E"].crop((0, top, cell, top + stroke + 1)))
-    g["Б"] = be
-    yi = g["I"].copy()                                             # Ї: I, shorter, two dots over it
-    d = ImageDraw.Draw(yi)
-    box = g["I"].getbbox()
-    dot = max(2, cell // 8)
-    d.rectangle([0, 0, cell, top + dot + max(1, dot // 2)], fill=0)
-    mid = (box[0] + box[2]) / 2
-    for side in (-1, 1):
-        x0 = round(mid + side * (dot * 0.5 + 1) - dot / 2)
-        d.rectangle([x0, top, x0 + dot - 1, top + dot - 1], fill=255)
-    g["Ї"] = yi
-    small = round(cell * SCALE)
-    return {ch: m.resize((small, small), Image.LANCZOS).point(lambda v: 255 if v > 118 else 0) for ch, m in g.items() if m.getbbox()}
+def glyphs(size):
+    """Every letter at `size`, by its character: its mask trimmed to what it draws, where that is in
+    the font's cell (the advance wide, from the top of the capitals to the foot of Д's tail), and the
+    cell's size."""
+    font = ImageFont.truetype(str(FONT), size)
+    cell = (round(font.getlength("H")), size)
+    out = {}
+    for ch in LETTERS:
+        im = Image.new("L", (cell[0] * 2, cell[1] * 2), 0)
+        d = ImageDraw.Draw(im)
+        d.fontmode = "1"                                           # (no antialiasing: the font's own pixels)
+        d.text((0, 0), ch, font=font, fill=255)
+        box = im.getbbox()
+        assert round(font.getlength(ch)) == cell[0], ch            # (one cell for every letter)
+        assert box[2] <= cell[0] + 1 and box[3] <= cell[1], (ch, box)
+        out[ch] = (im.crop(box), box[0], box[1], cell)
+    return out
 
 
 def plate():
@@ -97,12 +80,14 @@ def plate():
 
 def main():
     pieces = [("plate", plate())]
-    for font, name, cell in (("T", "font-title.png", 32), ("S", "font-sign.png", 16)):
-        for ch, mask in glyphs(SRC / name, cell).items():
-            box = mask.getbbox()
-            white = Image.new("RGBA", (box[2] - box[0], mask.height), (255, 255, 255, 0))
-            white.putalpha(mask.crop((box[0], 0, box[2], mask.height)))
-            pieces.append((f"{font}-{ord(ch):04x}", white))
+    trims = {}
+    for font, size in SIZES.items():
+        for ch, (mask, x, y, cell) in glyphs(size).items():
+            white = Image.new("RGBA", mask.size, (255, 255, 255, 0))
+            white.putalpha(mask)
+            name = f"{font}-{ord(ch):04x}"
+            pieces.append((name, white))
+            trims[name] = (x, y, cell)
     # Packed in rows, a pixel between pieces.
     W, x, y, row = 512, 0, 0, 0
     frames = {}
@@ -114,6 +99,10 @@ def main():
         frames[name] = {"frame": {"x": x, "y": y, "w": im.width, "h": im.height}, "rotated": False, "trimmed": False,
                         "spriteSourceSize": {"x": 0, "y": 0, "w": im.width, "h": im.height},
                         "sourceSize": {"w": im.width, "h": im.height}}
+        if name in trims:                                       # (a letter: its place in the font's cell)
+            tx, ty, (cw, ch) = trims[name]
+            frames[name].update(trimmed=True, spriteSourceSize={"x": tx, "y": ty, "w": im.width, "h": im.height},
+                                sourceSize={"w": cw, "h": ch})
         x += im.width + 1
         row = max(row, im.height)
     sheet = Image.new("RGBA", (W, y + row), (0, 0, 0, 0))
@@ -123,7 +112,7 @@ def main():
     sheet.save(OUT / "menu.png")
     (OUT / "menu.json").write_text(json.dumps({"frames": frames, "meta": {"image": "menu.png", "size": {"w": sheet.width, "h": sheet.height},
                                                                          "scale": "1"}}), encoding="utf-8")
-    print(f"menu.png {sheet.size}: the plate and {len(pieces) - 1} glyphs")
+    print(f"menu.png {sheet.size}: the plate and {len(pieces) - 1} letters")
 
 
 if __name__ == "__main__":
