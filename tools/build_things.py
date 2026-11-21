@@ -132,15 +132,19 @@ SEAM = {"tennis-ball": "a2a947"}
 # which the palette turns pale green; kept so, and washed as the walkway's background is (`WASH`).
 # The boat drill's warning light (the user, 2026-11-21: "a proper red warning light"; try 2 of two, a red lens in a cage
 # hanging from a ceiling mount, `tries/warning-light/`): its reds kept, and a twin with the lens off (`DIM`).
+# The console table at the end of deck 9's officers' corridor (book 14 on it; the user chose try 4 of four, a half-moon
+# one, 2026-11-21, `tries/console-table/`): its honey teak kept (palettized, browns go mauve), washed as deck 9 inside.
 # The lifeboat's roof hatch, its back and its lip (the user, 2026-11-21; `tools/build_hatch.py`): cut from the boat's own
 # washed picture, kept so.
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light",
+OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
 # Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->
 # (how far, the wall's colour). The walkway's recess wall is ShipScene's 0xc9ced3; decks 6 and 7 are at 20%.
-WASH = {"lifejacket-box": (0.20, (0xc9, 0xce, 0xd3))}
+WASH = {"lifejacket-box": (0.20, (0xc9, 0xce, 0xd3)),
+        # (Deck 9 inside is at 35%, toward the corridor's wall, tools/build_ship_art.py's WALL.)
+        "console-table": (0.35, (0xE9, 0xDF, 0xCC))}
 # Pictures the user drew by hand in Paint, on a white ground (white is empty): name -> its file's stem. **Never written
 # by a tool** (CLAUDE.md): his handheld (15), the user's own pixel edit of my 24 x 11, 2026-11-21.
 BY_HAND = {"handheld": "handheld-by-hand"}

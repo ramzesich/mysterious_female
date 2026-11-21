@@ -3997,3 +3997,20 @@ valuable."
   `assets/source/her/climb-alternating/`, raw frames kept); leaving the boat she is hidden before the fade (her standing
   frame flashed over its inside). Tests: `region2`, `region7`, `region8`, `mishaps`, `boot` pass; `check_overlaps` 0;
   `ladder` fails as before (not this work).
+
+## §4 2.1, book 14: on a console table at the end of deck 9's officers' corridor (the user, 2026-11-21)
+
+- **Book 14** (row 20, "Deck 9 forward, the officers' corridor's end"): the end had nothing to lie on, only about 45 px
+  of wall between the end wall and the captain's door (the bow terrace past the wall holds only its railing). The user
+  chose a console table (of a console table, a chair, the terrace, the floor). Four generated tries (4 generations): the
+  first two came as low desks ("None of them are consoles though"), so two more, tall and slim; all four were placed in
+  the running game for the user, who chose **4, a half-moon console in honey teak**, and set it **1 px down**
+  (`prop_console_9`, `dy` -1; the book on its top row, `on` 27).
+- Kept in its own colours (palettized, browns go mauve) and **washed 35% toward the corridor's wall**, as deck 9's
+  furniture inside (`WASH` in `tools/build_things.py`).
+- **All fourteen books are now in the world.** `region9` checks E takes it; `check_overlaps` lists nothing; deck 9's
+  longest walk without a reward now starts at the book (28 to 140 m).
+- Asked on the way: what the captain's door does. As built (`knock()` in `src/world/bow.js`): a polite knock, three
+  "knock"s and "…", nobody answers, `sec_captain` kept; the plate's name is still the user's to give. Its floating
+  "knock" words are text boxes, not popups (the one such place left), and the door is drawn muted though she uses it
+  (§7c): told to the user, left as built.

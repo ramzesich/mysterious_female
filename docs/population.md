@@ -86,6 +86,7 @@ last column is what the drawn pages hinted at until then.
 | `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
 | `book_10` | 9 | Deck 10, 38, the bridge's chart table | Pickup | The odd book on the library's top shelf |
 | `book_11` | 11 | Deck 7, the boat walkway's aft end, past the drill, on the lid of a life-jacket box (`prop_lifejacket_box`, 2026-11-21) | Pickup | (no hint: every page its book's opening since 2026-11-21) |
+| `book_14` | 14 | Deck 9, the officers' corridor's forward end (27.6 m), between its end wall and the captain's door, on a half-moon console table (`prop_console_9`, 2026-11-21) | Pickup | (no hint) |
 
 ### 2.3 The tangerines (41 here; 56 in the game)
 

@@ -76,3 +76,16 @@ its five purples set to the close-up's navies by lightness, 20 x 12 by majority)
 | `left-rack/boathook-wood.png` | **Used** (`../ship/lifeboat-boathook.png`: cut to 82 px from its pole's middle, its pole thinned to the oars' two rows, the user's "slightly thinner, to match the oar handles") | 342946d5-cdfd-4b2e-8bdf-d0630c4ba211 |
 | `left-rack/boathook-alu.png` | An aluminium boathook: read as a pipe | 7a657304-26e2-4d00-981d-0da3827a72b3 |
 | `left-rack/reaching-pole.png` | A striped rescue reaching pole | b0d37384-70fb-4769-aa91-712180b05730 |
+
+## Deck 9's console table, book 14 on it (2026-11-21)
+
+The end of the officers' corridor, between its end wall and the captain's door (about 45 px of bare wall). Tries 1 and 2
+came as low desks ("None of them are consoles though", the user); 3 and 4 asked for a tall slim one. All four were
+placed in the game for the user, who chose 4 (its legs uneven at the floor at 8x, unseen at the game's size).
+
+| File | What | PixelLab object |
+|---|---|---|
+| `console-table/try1.png` | A honey teak table with a drawer: a desk | a9b30900-8f0a-4585-9d61-ec0d9b9c0dc8 |
+| `console-table/try2.png` | A dark mahogany table with a low shelf: a desk, ragged legs | 03ded0bb-488f-4ee5-bf43-0384d1f9342d |
+| `console-table/try3.png` | A tall slim console, four thin legs with brass feet | f281640d-1621-4902-89b3-0fd7671e4cb2 |
+| `console-table/try4.png` | **Used** (`../console-table.png`, trimmed, 32 x 28; the user's): a half-moon console in honey teak on curved legs | 284ced4a-0507-42e5-b810-4e3da6a2a945 |

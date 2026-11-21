@@ -185,6 +185,9 @@ ITEMS = {
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
     # (§4 2.1, 17: on the life-jacket box's lid at the boat walkway's aft end, its foot 2 px into the lid: the user.)
     "book_11": ("walkway", 230 + 2 / 48, "book:11", None, 30),
+    # (§4 2.1, 20: on the console table at the end of deck 9's officers' corridor, left of the captain's door: the user's
+    # choice of four, 2026-11-21; on its top row, the table 1 px down.)
+    "book_14": (9, 27 + 30 / 48, "book:14", None, 27),
     # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
     # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
     "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
@@ -591,6 +594,9 @@ PROPS = {
     # The life-jacket box at the walkway's aft end, past the drill, against the railing (book 11 on its lid): 1 px up, the
     # user's placing (2026-11-21); behind her and behind the walkway's railing.
     "prop_lifejacket_box": ("walkway", 230 + 10 / 48, "thing:lifejacket-box", 1, {}),
+    # The console table at the end of deck 9's officers' corridor, between its end wall and the captain's door (book 14 on
+    # it): generated, the user's choice of four (2026-11-21, a half-moon one), 1 px down (the user's placing).
+    "prop_console_9": (9, 27 + 30 / 48, "thing:console-table", -1, {}),
     # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
     "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
     # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under

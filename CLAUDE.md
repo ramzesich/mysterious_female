@@ -1045,6 +1045,9 @@ Lessons learned (2026-11-21, the boat walkway and the lifeboat's hatch):
   `check_overlaps`' outside depths and were compared with deck 7's furniture; skip them by name, with the reason.
 - **A room entered from outside keeps the ship's side closed round it** (`inDeck` false): cut open, it showed the deck
   behind the hull (the lifeboat showed the casino).
+- **A piece of furniture is asked for by its shape, not its name:** "console table" came as two low desks ("None of them
+  are consoles though"); "tall slim ... taller than a normal table, thin legs" gave consoles. Tries that differ are shown
+  placed in the game side by side (all four, the user's ask), where the choice is made.
 
 Lessons learned (2026-11-21, the books and reading):
 

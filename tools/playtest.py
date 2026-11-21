@@ -4879,6 +4879,13 @@ def scenario_region9(b):
     b.shot("region9-knock")
     wait(3.6)
     ok &= check("sec_captain" in seen() and b.state()["mode"] == "play", "nobody answers")
+    # The fourteenth book, on the console table at the corridor's end (§4 2.1, 20; the user, 2026-11-21).
+    bk = b.eval(f"(t => t && [t.x, t.y])({S}.world.things.find(t => t.id === 'book_14'))")
+    b.teleport(bk[0], bk[1])
+    wait(0.3)
+    b.tap("e")
+    wait_js(b, f"{S}.save.books['14'] === 'held'", 4)
+    ok &= check(b.eval(f"{S}.save.books['14']") == "held", "the fourteenth book, on the console table at the corridor's end", b.eval(f"{S}.save.books"))
     # Deck 7: the kids' clubs behind the lobby's gold door: the ball pit, the fort.
     go(b, 7, 78)
     ok &= check(use_door(b, 7, 74, 1), "the Officer's card opens the kids' clubs")
