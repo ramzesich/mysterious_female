@@ -482,8 +482,9 @@ with what she has, and with twenty things to find.
   **A title shows in two places:** the book's cover over a slightly dimmed screen, in its centre,
   when she gets the book; and the shelf seen close (E at it), over the whole screen. **Every
   cover is generated and different from the others; the shelf's close view is generated too.**
-  The lettering is drawn in by the build (Latin with Polish letters, Cyrillic, Hebrew). The four
-  new books' pages stay plain (a picture, no hint) until the user says otherwise.
+  The lettering is drawn in by the build (Latin with Polish letters, Cyrillic, Hebrew). ~~The four
+  new books' pages stay plain (a picture, no hint) until the user says otherwise.~~ (2026-11-21: every book's page is
+  its real opening, text only, the hint pages gone: `docs/plan-the-rest.md` 2.2.)
 - **Before the desk is built, the user sees a picture of it with all eight on it** (if it is
   too crowded, some of hers go by the bed).
 

@@ -25,13 +25,15 @@ const INK = { speech: '#2e222f', thought: '#2e222f', shout: '#ae2334', plate: '#
 // What a popup's text says in pictures (the old emoji), and what is no picture at all.
 const EMOJI = { '🔒': 'padlock', '🪜': 'ladder', '✋': 'hand', '💧': 'drop', '❄': 'snow' };
 const DROPPED = new Set(['🚧']);
-const HER_SHEETS = ['her', 'her-towel', 'her-cat', 'her-mishaps', 'gags', 'towels'];
+const HER_SHEETS = ['her', 'her-towel', 'her-cat', 'her-mishaps', 'gags', 'towels', 'reading'];
 
 export class Popups {
     constructor(scene) {
         this.s = scene;
         this.L = scene.cache.json.get('popup-layout');
         this.heads = frameHeads(scene, scene.cache.json.get('heads') ?? {});
+        // Her reading clips keep their heads by frame name (tools/build_reading.py).
+        this.heads.reading = scene.cache.json.get('reading-meta')?.heads ?? {};
         this.list = [];
         this.pixels = {};
         scene.events.on('postupdate', this.update, this);

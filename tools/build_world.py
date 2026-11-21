@@ -438,8 +438,17 @@ def build_world():
                       sign="TECHNICAL\nCREW ONLY"))
 
     lib_y = B.floor_y(LIBRARY["deck"])
-    library = dict(shelf=dict(x0=B.exact_x(LIBRARY["shelf"][0]), y=lib_y - LIBRARY["shelf"][1]),
+    case = json.loads((B.ROOT / "assets" / "ship" / "ship.json").read_text(encoding="utf-8"))
+    case_w = case["frames"]["bookcase-bg"]["frame"]["w"]
+    library = dict(shelf=dict(x0=B.exact_x(LIBRARY["shelf"][0]) - case_w // 2,
+                              x1=B.exact_x(LIBRARY["shelf"][1]) - case_w // 2 + case_w, y=lib_y - LIBRARY["shelf"][2]),
                    trolley=dict(x=B.exact_x(LIBRARY["trolley"]), y=lib_y), chair=dict(x=B.exact_x(LIBRARY["chair"]), y=lib_y))
+    # Every armchair she reads in: the red one, and the two at each reading table (where the map builder's `around()`
+    # puts them, the right one turned).
+    frames = case["frames"]
+    off = (frames["reading-table-bg"]["frame"]["w"] + frames["reading-chair"]["frame"]["w"]) // 2 - 5
+    library["chairs"] = [dict(x=library["chair"]["x"], y=lib_y, flip=False)] + [
+        dict(x=B.exact_x(m) + k * off, y=lib_y, flip=k > 0) for m in LIBRARY["tables"] for k in (-1, 1)]
     flash = dict(x0=B.exact_x(FLASH[1]), x1=B.exact_x(FLASH[2]), y=B.floor_y(FLASH[0]), period=FLASH[3])
     window = dict(x=B.exact_x(GLIMPSE_WINDOW[0]), y=B.floor_y(6) - GLIMPSE_WINDOW[1], floor=B.floor_y(6))
 

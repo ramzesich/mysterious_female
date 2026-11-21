@@ -30,6 +30,9 @@ const TEXTS = {
         'hint.move': '← and → to move, Space to jump',
         'hint.move.pad': 'Left stick to move, A to jump',
         'hint.interact': 'E to interact',
+        // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
+        'hint.read': '← and → to choose, E to read, Esc to get up',
+        'hint.read.pad': 'Left stick to choose, X to read, B to get up',
         // The win screen (§6.4).
         'win.line': 'Bumbot is home.',
         'win.tally': (found, tangerines, books, photos, slots) =>
@@ -57,6 +60,8 @@ const TEXTS = {
         'hint.move': '← і → — рухатися, пробіл — стрибати',
         'hint.move.pad': 'Лівий стік — рухатися, A — стрибати',
         'hint.interact': 'E — взаємодіяти',
+        'hint.read': '← і → — вибрати, E — читати, Esc — встати',
+        'hint.read.pad': 'Лівий стік — вибрати, X — читати, B — встати',
         'win.line': 'Бумбот удома.',
         'win.tally': (found, tangerines, books, photos, slots) =>
             `Мандаринки: ${found} з ${tangerines}      Книжки на полиці: ${books} з 10      Знайдені світлини: ${photos} з ${slots}`,

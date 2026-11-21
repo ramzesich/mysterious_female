@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -70,12 +70,18 @@ export class BootScene extends Phaser.Scene {
         // The ship's people (tools/cast.py, tools/build_people.py): one sheet, a grid of equal cells.
         this.load.json('people-meta', 'assets/sprites/people.json');
         this.load.spritesheet('people', 'assets/sprites/people.png', { frameWidth: 80, frameHeight: 80 });
-        // The plan's own things (the delivery robot, the gulls: tools/build_things.py), and the ten
-        // books' pages (tools/draw_pages.py).
+        // The plan's own things (the delivery robot, the gulls: tools/build_things.py).
         this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
         // Each thing to find and each key card seen close, shown when she gets it (tools/build_closeups.py).
         this.load.atlas('closeups', 'assets/sprites/closeups.png', 'assets/sprites/closeups.json');
-        for (let n = 1; n <= 10; n++) this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
+        // Each book's first page and its title in the pages' lettering, for the row she chooses from
+        // (tools/draw_pages.py); her reading clips, in the armchairs and on her bed (tools/build_reading.py).
+        for (let n = 1; n <= BOOKS; n++) {
+            this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
+            this.load.image(`book-title-${n}`, `assets/ship/pages/title-${n}.png`);
+        }
+        this.load.atlas('reading', 'assets/sprites/reading.png', 'assets/sprites/reading.json');
+        this.load.json('reading-meta', 'assets/sprites/reading.json');
         // The welcome screen's menu (tools/build_menu.py): its lettering and its plate.
         this.load.atlas('menu', 'assets/sprites/menu.png', 'assets/sprites/menu.json');
         // The sky's art (tools/build_sky.py): the intro's clouds and sun, where they stand, the god

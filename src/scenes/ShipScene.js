@@ -3075,8 +3075,8 @@ export class ShipScene extends Phaser.Scene {
         const still = onFloor && !dir && Math.abs(body.velocity.x) < 10 && !input.up && !input.down && !input.jump;
         if (!still) this.stillSince = time;
         else if (!this.holding && this.onBed() && time - (this.stillSince ?? time) > BED_JOY.idleMs) {
-            // (With the book found on it, unread, she sits down on its edge and reads: population `book_5`.)
-            if (!this.world.library.readOnBed()) this.startBedJoy();
+            // (Reading on it is E now, with any book she carries: `Library.read()`, the user, 2026-11-21.)
+            if (!this.world.library.reading) this.startBedJoy();
         }
     }
 
@@ -3253,6 +3253,8 @@ export class ShipScene extends Phaser.Scene {
             const i = this.controls.state;
             if (i.left || i.right || i.up || i.down || i.jumpPressed || i.dashPressed || i.activatePressed) {
                 this.endBedJoy(y);
+                // (E stops her bouncing and does what E does on the bed: she sits down to read, `Library.read()`.)
+                if (i.activatePressed) this.world.interact();
                 return;
             }
             t += dt * 1000;

@@ -5,7 +5,7 @@
 // party filing into the chapel and the ceremony there, the Spinnaker's piano, the kids' pool's
 // slide, the captain's door, near-catch 6 on the bridge (the security officer's net comes down on
 // the alarm panel, the hatch's ladder drops, Bumbot is up it), and the Library's odd book, which
-// opens the reading nook once all ten books are back. Places come from maps/world.json (`bow`).
+// opens the reading nook once all fourteen books are back. Places come from maps/world.json (`bow`).
 
 import { PLAYER, GAGS } from '../config.js';
 import { sfx } from '../sfx.js';
@@ -268,15 +268,17 @@ export const bow = {
         w.things.push({ id: 'sec_slide', x: B.slide.ladderX, y: B.slide.y, route: 'inside', items: [], reach: 12, interact: () => this.slide() });
         w.things.push({ id: 'sec_captain', x: B.captain.x, y: B.captain.y, route: 'inside', items: [], reach: 14, interact: () => this.knock() });
 
-        // The odd book on the Library's bookcase: a spine that sticks out a little; with all ten
-        // back it glints. Behind the bookcase, once it has swung: a doorway, lamp light in it.
+        // The odd book on the Library's bookcase: standing in the top shelf of its third glass door among
+        // the lit books, a dark teal spine with two gold bands a px taller than they are (the user,
+        // 2026-11-21: it had hung on the glass's front). `N.up` is its foot, on that shelf (the bookcase's
+        // row 14; its columns 38 to 40). With all fourteen back it glints. Behind the bookcase, once it
+        // has swung: a doorway, lamp light in it.
         const N = B.nook;
         this.oddBook = s.add.graphics().setDepth(D.decor + 0.2);
-        this.oddBook.fillStyle(0x2e222f, 1).fillRect(-3, -12, 6, 13);
-        this.oddBook.fillStyle(0x0b5e65, 1).fillRect(-2, -11, 4, 11);
-        this.oddBook.fillStyle(0xf9c22b, 1).fillRect(-2, -8, 4, 1).fillRect(-2, -3, 4, 1);
-        this.oddBook.setPosition(N.x + 9, N.y - N.up);
-        this.oddGlint = s.add.image(N.x + 9, N.y - N.up - 8, 'dot').setTint(0xfbff86).setDepth(D.decor + 0.21);
+        this.oddBook.fillStyle(0x0b5e65, 1).fillRect(-1, -6, 3, 7);
+        this.oddBook.fillStyle(0xf9c22b, 1).fillRect(-1, -4, 3, 1).fillRect(-1, -1, 3, 1);
+        this.oddBook.setPosition(N.x + 8, N.y - N.up);
+        this.oddGlint = s.add.image(N.x + 9, N.y - N.up - 7, 'dot').setTint(0xfbff86).setDepth(D.decor + 0.21);
         s.tweens.add({ targets: this.oddGlint, alpha: { from: 0.1, to: 1 }, scale: { from: 0.6, to: 1.8 }, duration: 500, yoyo: true, repeat: -1, repeatDelay: 700 });
         this.nookWay = s.add.graphics().setDepth(D.decor + 0.19);
         this.nookWay.fillStyle(0x2e222f, 1).fillRect(N.x - 31, N.y - 58, 62, 58);
@@ -600,7 +602,7 @@ export const bow = {
         return true;
     },
 
-    // E at the odd book (population: `scn_nook`): stuck, until all ten books are back on the shelf.
+    // E at the odd book (population: `scn_nook`): stuck, until all fourteen books are back on the shelf.
     // Then it tips, something clicks, and the bookcase swings open on the reading nook.
     oddBookPull() {
         const s = this.scene, w = this.world, N = this.B.nook;
@@ -608,7 +610,7 @@ export const bow = {
         this.pulling = true;
         w.cut(async () => {
             const her = s.player;
-            her.setFlipX(N.x + 9 < her.x);
+            her.setFlipX(N.x + 8 < her.x);
             if (s.anims.exists('her-pull')) her.anims.play('her-pull');
             await w.wait(300);
             await w.tween({ targets: this.oddBook, angle: -24, duration: 160 });

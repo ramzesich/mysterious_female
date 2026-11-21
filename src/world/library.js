@@ -1,15 +1,26 @@
-// The library's books (GAME_DESIGN.md §6.1.2, "her own thread"): ten of them are out on the ship.
+// The library's books (GAME_DESIGN.md §6.1.2, "her own thread"): fourteen of them are out on the ship (`BOOKS`).
 // A book is a pocket item; the return trolley takes the ones she carries and the librarian shelves
-// each into its gap on the shelf behind her desk, so the shelf shows how far the collection is. In
-// the red reading chair she reads the next book she has not read: its page shows a drawing that
-// hints at one hidden thing on the ship. Also here: the photo slots' and the pages' full-screen panel.
+// each into its gap on the shelf behind her desk, so the shelf shows how far the collection is. In any
+// of the Library's armchairs or on her bed she chooses one of the books she carries and reads it: its
+// first page shows (`read()`). Also here: the photo slots' and the pages' full-screen panel.
 
-import { VIEW } from '../config.js';
+import { VIEW, BOOKS, PLAYER } from '../config.js';
+import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
 
-export const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
-const SLOT = 9;         // px per book on the shelf
+// Each book's colour, its small picture's and its spine's (until §4 2.3 takes them from its cover).
+export const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b,
+    0x4d65b4, 0xa24b6f, 0x0eaf9b, 0x92a984];
+const SLOT = 8;         // px per book on the shelf
+const SPINE = 7;        // a spine's width there, its outline in
+// The books back on the shelf are washed toward the wall as the Library's background is, so they do not read
+// as things to pick up (the user, 2026-11-21); `tools/build_ship_art.py`'s `WALL` and its washes.
+const SHELF_WASH = 0.12;
+const washed = c => [16, 8, 0].reduce((v, sh) => {
+    const a = (c >> sh) & 255, w = (0xe9dfcc >> sh) & 255;
+    return v | (Math.round(a + (w - a) * SHELF_WASH) << sh);
+}, 0);
 
 export class Library {
     constructor(world) {
@@ -31,14 +42,15 @@ export class Library {
         if (!data) return;
         const s = this.scene, D = s.DEPTH, w = this.world;
         this.data = data;
-        // The shelf with ten gaps, on the wall behind her desk: a board on brackets, a brass plate.
-        const { x0, y } = data.shelf;
-        const width = 10 * SLOT + 8;
+        // The shelf with a gap for each book, on the wall behind her desk: a board on the bookcases' tops.
+        // (Its board runs over the two bookcases under it, from the first's left side to the second's
+        // right, with no brackets under it: the user, 2026-11-21. The gaps are centred on it.)
+        const { x0, x1, y } = data.shelf;
         const g = s.add.graphics().setDepth(D.decor + 0.2);
-        g.fillStyle(0x7a4528, 1).fillRect(x0 - 2, y, width + 4, 3);
-        g.fillStyle(0x46291f, 1).fillRect(x0 - 2, y + 3, width + 4, 1).fillRect(x0 + 4, y + 3, 2, 6).fillRect(x0 + width - 6, y + 3, 2, 6);
-        g.fillStyle(0x46291f, 0.35).fillRect(x0, y - 15, width, 15);
-        for (let i = 0; i < 10; i++) g.fillStyle(0x2e222f, 0.5).fillRect(x0 + 4 + i * SLOT, y - 13, SLOT - 2, 13);
+        g.fillStyle(0x7a4528, 1).fillRect(x0, y, x1 - x0, 3);
+        g.fillStyle(0x46291f, 1).fillRect(x0, y + 3, x1 - x0, 1);
+        g.fillStyle(0x46291f, 0.35).fillRect(x0 + 2, y - 15, x1 - x0 - 4, 15);
+        for (let n = 1; n <= BOOKS; n++) g.fillStyle(0x2e222f, 0.5).fillRect(this.slotX(n), y - 13, SPINE, 13);
         this.shelfBooks = s.add.graphics().setDepth(D.decor + 0.21);
         w.add([g, this.shelfBooks]);
         // The return trolley by her desk, and the red reading chair by the window.
@@ -49,8 +61,22 @@ export class Library {
         w.add([trolley, chair, lamp]);
         w.things.push({ id: 'src_trolley', x: data.trolley.x, y: data.trolley.y, route: 'inside', items: [trolley], reach: 22,
             interact: () => this.giveBack() });
-        w.things.push({ id: 'sec_chair', x: data.chair.x, y: data.chair.y, route: 'inside', items: [chair, lamp], reach: 16,
-            interact: () => this.read() });
+        // (Her clip in an armchair is 68 px square, the chair's foot on its bottom row, its middle at column 34.)
+        (data.chairs ?? [data.chair]).forEach((c, i) => {
+            const seat = { kind: 'chair', x: c.x, left: c.x - 34, top: c.y - 68 };
+            w.things.push({ id: i ? `sec_chair_${i}` : 'sec_chair', x: c.x, y: c.y, route: 'inside', items: i ? [] : [chair, lamp], reach: 14,
+                interact: () => this.read(seat) });
+        });
+        // Her bed in cabin 8206 (the ship scene's `cabin`, built after the world): E standing on it. Her clip there is
+        // the cabin picture's columns 108 to 239 and rows 28 to 127; she sits at column 196.
+        s.events.once('update', () => {
+            const cab = s.cabin;
+            if (!cab) return;
+            const x0 = cab.door - 59, top = cab.floor - 32;
+            const seat = { kind: 'bed', x: x0 + 196, left: x0 + 108, top: cab.floor - 100 };
+            w.things.push({ id: 'sec_bed', x: x0 + 187, y: top, route: 'cabin', items: [], reach: 50,
+                interact: () => s.onBed() && this.read(seat) });
+        });
         this.refresh();
     }
 
@@ -83,16 +109,22 @@ export class Library {
         g.destroy();
     }
 
+    // Where book n's gap starts on the shelf (px): the fourteen centred on the board.
+    slotX(n) {
+        const { x0, x1 } = this.data.shelf;
+        return x0 + Math.floor((x1 - x0 - (BOOKS * SLOT - (SLOT - SPINE))) / 2) + (n - 1) * SLOT;
+    }
+
     // The shelf: each book that is back stands in its own gap.
     refresh() {
         if (!this.shelfBooks) return;
-        const { x0, y } = this.data.shelf;
+        const { y } = this.data.shelf;
         const g = this.shelfBooks.clear();
         for (const n of this.returned()) {
-            const x = x0 + 4 + (n - 1) * SLOT, h = 11 + (n * 7) % 3;
-            g.fillStyle(0x2e222f, 1).fillRect(x, y - h - 1, SLOT - 2, h + 1);
-            g.fillStyle(BOOK_COLOURS[n - 1], 1).fillRect(x + 1, y - h, SLOT - 4, h);
-            g.fillStyle(0xf3ecdd, 1).fillRect(x + 2, y - h + 2, SLOT - 6, 1);
+            const x = this.slotX(n), h = 11 + (n * 7) % 3;
+            g.fillStyle(washed(0x2e222f), 1).fillRect(x, y - h - 1, SPINE, h + 1);
+            g.fillStyle(washed(BOOK_COLOURS[n - 1]), 1).fillRect(x + 1, y - h, SPINE - 2, h);
+            g.fillStyle(washed(0xf3ecdd), 1).fillRect(x + 2, y - h + 2, SPINE - 4, 1);
         }
     }
 
@@ -109,82 +141,191 @@ export class Library {
                 else await w.wait(300);
                 this.save.books[n] = 'returned';
                 this.refresh();
-                const { x0, y } = this.data.shelf;
-                w.sparkle(x0 + 7 + (n - 1) * SLOT, y - 7);
-                sfx.at(x0 + 7 + (n - 1) * SLOT, y).book();
+                const { y } = this.data.shelf, x = this.slotX(n) + 3;
+                w.sparkle(x, y - 7);
+                sfx.at(x, y).book();
                 await w.wait(250);
             }
             writeSave(this.save);
-            if (this.returned().length === 10) sfx.done();
-            if (this.returned().length === 10) w.progress.setFlag('books_all');
+            if (this.returned().length === BOOKS) sfx.done();
+            if (this.returned().length === BOOKS) w.progress.setFlag('books_all');
         });
         return true;
     }
 
-    // E at the reading chair: she sits and reads the next book she has not read; its page shows.
-    read() {
+    // Every place she reads (the user, 2026-11-21): the Library's seven armchairs (the red one by the lamp and the
+    // two at each reading table, `data.chairs`) and her bed in cabin 8206. E there: she sits (her reading clips,
+    // `tools/build_reading.py`), the books she carries show in a row (`choose()`), ← and → pick one, E reads it
+    // (she opens it, its first page shows), and back to the row; Esc, B or Space stand her up. Any book she carries,
+    // as often as she likes; none carried, she sits a moment and gets up.
+    read(seat) {
         const w = this.world, s = this.scene, p = s.player;
-        if (w.carry) return false;
-        const next = Object.keys(this.save.books).map(Number).sort((a, b) => a - b).find(n => !this.save.read.includes(n));
-        w.cut(async () => {
-            const chair = this.data.chair;
-            p.setFlipX(false);
-            p.x = chair.x - 2;
-            p.body.reset(p.x, p.y);
-            const seated = s.anims.exists('her-read');
-            if (seated) {
-                p.anims.play('her-read');
-                await w.wait(700);
-            }
-            const book = s.add.image(p.x + 10, p.y - (seated ? 24 : 32), 'book-open').setDepth(s.DEPTH.player + 0.02);
-            w.add([book]);
-            sfx.page();
-            await w.wait(next ? 900 : 1800);
-            if (next) {
-                await this.panel(`page-${next}`);
-                this.save.read.push(next);
-                writeSave(this.save);
-            }
-            book.destroy();
-            s.pose('stand');
-        });
-        return true;
-    }
-
-    // On her own bed with the fifth book, not read yet: she sits down on its edge and reads it there,
-    // as in the Library's chair.
-    readOnBed() {
-        const w = this.world, s = this.scene, p = s.player;
-        if (this.save.books['5'] !== 'held' || this.save.read.includes(5) || w.carry || this.reading) return false;
+        if (w.carry || this.reading) return false;
+        const bed = seat.kind === 'bed';
+        // (Each clip's frames: sitting down, the pose she holds while she chooses, opening the book and reading.)
+        const SIT = bed ? [0, 1, 2, 3] : [0, 1, 2, 3, 4];
+        const OPEN = bed ? [4, 5, 6, 7, 8, 9] : [7, 8, 9, 10, 11, 12, 13];
+        const name = bed ? 'bed' : 'chair';
         this.reading = true;
-        this.textures();
-        const y = p.y;
         w.cut(async () => {
-            p.setFlipX(false);
+            const y = p.y;
+            p.x = seat.x;
+            p.setFlipX(bed);
             p.body.enable = false;
-            const seated = s.anims.exists('her-read');
-            if (seated) {
-                p.anims.play('her-read');
-                // (Her seat comes down onto the mattress; her legs hang over its side.)
-                await w.tween({ targets: p, y: y + 13, duration: 500, ease: 'Quad.easeOut' });
-                await w.wait(200);
+            p.setVisible(false);
+            const pic = s.add.image(seat.left, seat.top, 'reading', `${name}-0`).setOrigin(0).setDepth(s.DEPTH.player);
+            w.add([pic]);
+            this.readingPic = pic;
+            const play = async (frames, fps = 9) => {
+                for (const i of frames) {
+                    pic.setFrame(`${name}-${i}`);
+                    await w.wait(1000 / fps);
+                }
+            };
+            // (Her popups stand over her seated head: the reading sheet keeps its heads, src/popup.js.)
+            const standTop = y - PLAYER.height;
+            await play(SIT);
+            const head = s.popups.headOf(pic);
+            s.alertOver = head ? -Math.max(0, Math.round(head.top - standTop)) : 0;
+            const books = this.heldInOrder();
+            if (!books.length) {
+                await w.wait(1100);
+            } else {
+                let at = books.length - 1;
+                for (;;) {
+                    const n = await this.choose(books, at);
+                    if (n == null) break;
+                    at = books.indexOf(n);
+                    sfx.page();
+                    await play(OPEN);
+                    await this.panel(`page-${n}`);
+                    if (!this.save.read.includes(n)) this.save.read.push(n);
+                    writeSave(this.save);
+                    await play([...OPEN].reverse().concat(SIT.slice(-1)), 14);
+                }
             }
-            const book = s.add.image(p.x + 10, p.y - (seated ? 24 : 32), 'book-open').setDepth(s.DEPTH.player + 0.02);
-            w.add([book]);
-            sfx.page();
-            await w.wait(900);
-            await this.panel('page-5');
-            this.save.read.push(5);
-            writeSave(this.save);
-            book.destroy();
-            s.pose('stand');
+            s.alertOver = 0;
+            await play([...SIT].reverse(), 11);
+            pic.destroy();
+            this.readingPic = null;
+            p.setVisible(true);
             p.y = y;
             p.body.enable = true;
             p.body.reset(p.x, y);
-            s.stillSince = s.time.now + 4000;       // no bounce right after
+            if (!bed) s.pose('front');
+            s.stillSince = s.time.now + 4000;       // (on the bed: no bounce right after)
             this.reading = false;
         });
         return true;
+    }
+
+    // The books she carries, in the order she got them (`save.bookOrder`; any set held otherwise, by number, after).
+    heldInOrder() {
+        const held = this.held();
+        const order = (this.save.bookOrder ?? []).filter(n => held.includes(n));
+        return order.concat(held.filter(n => !order.includes(n)).sort((a, b) => a - b));
+    }
+
+    // A book is hers: held, and its place in the order she got them.
+    got(n) {
+        n = Number(n);
+        this.save.books[n] = 'held';
+        this.save.bookOrder ??= [];
+        if (!this.save.bookOrder.includes(n)) this.save.bookOrder.push(n);
+    }
+
+    // The row of the books she carries, over a soft dark backdrop at the top of the screen, the chosen one raised in
+    // a pale frame and its title under the row in the pages' lettering (the user's mock-ups, 2026-11-21). ← and →
+    // move along it, E reads (resolves the book's number), Esc, B or Space leave (resolves null). The first time,
+    // a hint over her says how (`hint.read`, once in a game: `save.seen`).
+    choose(books, at) {
+        const s = this.scene, S = 3;
+        return new Promise(resolve => {
+            const n = books.length, bw = 18 * S, room = VIEW.width - 120;
+            let gap = n > 1 ? Math.min(8 * S, Math.floor((room - n * bw) / (n - 1))) : 0;
+            gap -= gap % S;
+            const roww = n * bw + (n - 1) * gap;
+            const titleW = Math.max(...books.map(k => s.textures.get(`book-title-${k}`).getSourceImage().width)) * S;
+            const pad = 4 * S, top = 8, lift = 4 * S, titleH = 16 * S;
+            const bw2 = Math.max(roww, titleW) + 2 * pad, bh = pad + lift + 24 * S + 2 * S + titleH + pad;
+            const x0 = Math.round((VIEW.width - bw2) / 2);
+            const back = s.add.image(x0 - 8, top - 8, this.backdrop(bw2, bh)).setOrigin(0);
+            const items = [back];
+            const rowX = Math.round((VIEW.width - roww) / 2);
+            const covers = books.map((k, i) => {
+                const img = s.add.image(rowX + i * (bw + gap), 0, this.cover(k)).setOrigin(0).setScale(S);
+                items.push(img);
+                return img;
+            });
+            const rim = s.add.image(0, 0, 'book-rim').setOrigin(0).setScale(S);
+            const title = s.add.image(VIEW.width / 2, top + pad + lift + 24 * S + 2 * S, `book-title-${books[at]}`).setOrigin(0.5, 0).setScale(S);
+            items.push(rim, title);
+            s.uiLayer.add(items);
+            this.choosing = { books, get at() { return at; } };
+            const show = () => {
+                covers.forEach((c, i) => c.setY(top + pad + (i === at ? 0 : lift)));
+                rim.setPosition(covers[at].x - S, top + pad - S);
+                title.setTexture(`book-title-${books[at]}`);
+            };
+            show();
+            s.tweens.add({ targets: items, alpha: { from: 0, to: 1 }, duration: 160 });
+            if (!this.save.seen.includes('hint:read')) {
+                this.save.seen.push('hint:read');
+                writeSave(this.save);
+                this.world.say(t(s.controls.device === 'pad' ? 'hint.read.pad' : 'hint.read'), 3000, { kind: 'plate' });
+            }
+            const done = v => {
+                s.events.off('postupdate', poll);
+                this.choosing = null;
+                s.tweens.add({ targets: items, alpha: 0, duration: 140, onComplete: () => items.forEach(o => o.destroy()) });
+                resolve(v);
+            };
+            const poll = () => {
+                const i = s.controls.state;
+                if (i.leftPressed && at > 0) { at--; sfx.page(); show(); }
+                else if (i.rightPressed && at < n - 1) { at++; sfx.page(); show(); }
+                else if (i.activatePressed) done(books[at]);
+                else if (i.escapePressed || i.jumpPressed) done(null);
+            };
+            // (A key counts only in the frame it is pressed: the E that sat her down was half a second ago.)
+            s.events.on('postupdate', poll);
+        });
+    }
+
+    // A book's stand-in cover for the row (18 x 24, shown at 3x): its colour, a darker spine edge, a pale label;
+    // §4 2.3's generated covers will take its place. And the pale frame round the chosen one.
+    cover(n) {
+        const s = this.scene, key = `book-cover-${n}`;
+        if (s.textures.exists(key)) return key;
+        const c = BOOK_COLOURS[n - 1], dark = [16, 8, 0].reduce((v, sh) => v | (Math.round(((c >> sh) & 255) * 0.75) << sh), 0);
+        const g = s.make.graphics({ x: 0, y: 0 }, false);
+        g.fillStyle(0x2e222f, 1).fillRect(1, 1, 16, 22);
+        g.fillStyle(c, 1).fillRect(2, 2, 14, 20);
+        g.fillStyle(dark, 1).fillRect(2, 2, 2, 20);
+        g.fillStyle(0xf3ecdd, 1).fillRect(6, 6, 8, 3);
+        g.generateTexture(key, 18, 24);
+        if (!s.textures.exists('book-rim')) {
+            g.clear().fillStyle(0xfbff86, 1).fillRect(0, 0, 20, 1).fillRect(0, 25, 20, 1).fillRect(0, 0, 1, 26).fillRect(19, 0, 1, 26);
+            g.generateTexture('book-rim', 20, 26);
+        }
+        g.destroy();
+        return key;
+    }
+
+    // The row's backdrop: a rounded rectangle of the night's dark, see-through (two thirds), its rim feathered
+    // a few px (the user: "slightly more transparent, smooth the edges"); made at the size it is asked for.
+    backdrop(w, h) {
+        const s = this.scene, F = 8, key = `book-backdrop-${w}x${h}`;
+        if (s.textures.exists(key)) return key;
+        const tex = s.textures.createCanvas(key, w + 2 * F, h + 2 * F);
+        const ctx = tex.getContext();
+        ctx.filter = 'blur(3.5px)';
+        ctx.fillStyle = 'rgba(13, 11, 20, 0.667)';
+        ctx.beginPath();
+        ctx.roundRect(F, F, w, h, 15);
+        ctx.fill();
+        tex.refresh();
+        return key;
     }
 
     // A picture over the whole screen (a book's page, a photo), until she presses a key.

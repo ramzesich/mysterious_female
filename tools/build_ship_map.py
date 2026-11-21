@@ -15,7 +15,7 @@ import random
 import struct
 import zlib
 from pathlib import Path
-from population import PEOPLE
+from population import PEOPLE, LIBRARY
 from wash_levels import frame as wash_frame
 
 # Where the theatre's audience sit, per deck (m): their pictures have their own seats, so none is set there.
@@ -1477,8 +1477,10 @@ def build_objects():
     # striped carpet, red reading chairs round lamp tables, a chess table, a writing desk.
     for m in (164.2, 165.5, 170.6, 171.9, 177.2, 178.5, 183.4, 189.4, 190.7):
         put(6, m, "bookcase-bg")
-    for m in (168.0, 174.9, 181.0):
-        around(6, m, "reading-table-bg", "reading-chair-bg")
+    # Its three reading tables, an armchair each side: the chairs in full colours, each a seat she reads in (plan-the-rest
+    # §2.3b, the user, 2026-11-21: `LIBRARY["tables"]`, the world builder's `library.chairs`); the tables stay background.
+    for m in LIBRARY["tables"]:
+        around(6, m, "reading-table-bg", "reading-chair")
     around(6, 187.9, "chess-table-bg", "chair-bg")
     put(6, 191.9, "desk-bg")
     put(6, 191.9, "bankers-lamp-bg", height("desk-bg"))

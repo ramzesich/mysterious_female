@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -12,7 +12,7 @@ import { rumble, rumbleNow } from '../rumble.js';
 import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
-import { Library } from './library.js';
+import { Library, BOOK_COLOURS } from './library.js';
 import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
@@ -35,7 +35,6 @@ const LOOKS = {
 };
 const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the user, 2026-11-14; it was the gangway's)
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
-const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b];
 
 // A gull's beak in each of its frames (the things atlas, px from the frame's top left): its tip's column
 // and its row, for a tangerine carried in it (`inBeak`).
@@ -85,6 +84,10 @@ export class World {
         // playing to it (README; for testing).
         const did = new URLSearchParams(location.search).get('did');
         for (const f of (did ?? '').split(',')) if (f && !this.save.flags.includes(f)) this.save.flags.push(f);
+        // ?books=3,8,11 (or `all`): she starts carrying those books, in that order (README; for testing reading).
+        const books = new URLSearchParams(location.search).get('books');
+        const list = books === 'all' ? Array.from({ length: BOOKS }, (_, i) => i + 1) : (books ?? '').split(',').map(Number);
+        for (const n of list) if (n >= 1 && n <= BOOKS && !this.save.books[n]) this.library.got(n);
         this.makeTextures();
         this.buildRooms();
         this.buildOutside();
@@ -1265,7 +1268,7 @@ export class World {
             this.progress.learn(name);
             this.closeup(name);
         } else if (type === 'book') {
-            this.save.books[name] = 'held';
+            this.library.got(name);
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
         } else if (type === 'keep') {
             // (Its kind's count shows, or goes up, as its close-up closes: src/hud.js.)
@@ -1357,7 +1360,7 @@ export class World {
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.
     giveBook(n) {
-        this.save.books[n] = 'held';
+        this.library.got(n);
         writeSave(this.save);
         this.refresh();
     }
@@ -1421,7 +1424,7 @@ export class World {
             case 'card': return save.cards.includes(v);
             case 'verb': return save.verbs.includes(v);
             case 'carry': return this.carry?.kind === v;
-            case 'books': return v === 'held' ? this.library.held().length > 0 : this.library.returned().length === 10;
+            case 'books': return v === 'held' ? this.library.held().length > 0 : this.library.returned().length === BOOKS;
             case 'broken': return save.broken.includes(v);
             case 'block': return this.progress.blockLifted(v) && !this.progress.openAll;
         }

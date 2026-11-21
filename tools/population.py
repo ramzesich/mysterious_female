@@ -682,9 +682,11 @@ SIGNS = {
 }
 
 # --- Region 2's own things (docs/population.md, deck 6) ---------------------------------------------
-# The library (GAME_DESIGN.md §6.1.2): the shelf with ten gaps on the wall over the librarian's desk
-# (its forward end, m; px up to its board), the return trolley, the red reading chair.
-LIBRARY = dict(deck=6, shelf=(190.1, 60), trolley=191.04, chair=166.75)
+# The library (GAME_DESIGN.md §6.1.2): the shelf with a gap for each of the fourteen books, on the wall
+# over the two bookcases by the librarian's desk, from the first's left side to the second's right (the user,
+# 2026-11-21: the bookcases' places, m; px up to its board, 2 px higher than the ten's), the return trolley,
+# the red reading chair; the three reading tables (m), an armchair each side, every one a seat she reads in (§2.3b).
+LIBRARY = dict(deck=6, shelf=(189.4, 190.7, 62), trolley=191.04, chair=166.75, tables=(168.0, 174.9, 181.0))
 # The delivery robot (`haz_robot`): id: (deck, from m, to m, m/s). She rides on its top.
 ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
 # The gull with Bumbot's collar bell (§4 2.1, thing 4; the user, 2026-11-20): on the round wall light at

@@ -63,13 +63,15 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 (No glyph and no hint shows how any of them is used, here or in the tables and scenes below that
 still name one: the user, 2026-11-14, "part of the game is figuring things out". GAME_DESIGN.md §7.1.)
 
-### 2.2 The ten books
+### 2.2 The books (ten here; fourteen in all)
 
 Pocket items; the HUD counts them. Returned at `src_trolley` (deck 6, 167); read at `sec_chair`
 (deck 6, 172). The titles are the user's, given 2026-11-18: GAME_DESIGN.md §6.1.2 has the table
 (fourteen books with the four of docs/plan-three-uses.md §4.1), and where a title shows (the cover
-over the screen when she gets a book; the shelf seen close, E at `sec_shelf`). Each book's page,
-read in the chair, hints at the hidden thing named (drawn, no words).
+over the screen when she gets a book; the shelf seen close, E at `sec_shelf`). ~~Each book's page,
+read in the chair, hints at the hidden thing named (drawn, no words).~~ Since 2026-11-21 each book's page is its real
+opening (text only, `assets/source/pages/README.md`), read in any of the Library's seven armchairs or on her bed; the
+last column is what the drawn pages hinted at until then.
 
 | Id | Region | Where | How she gets it | Its page hints at |
 |---|---|---|---|---|
@@ -77,7 +79,7 @@ read in the chair, hints at the hidden thing named (drawn, no words).
 | `book_2` | 2 | The lifeboat at 140 on the boat walkway, on its bench | Pickup inside `room_lifeboat` | The trap door in the stage |
 | `book_3` | 3 | Deck 6, 254, the dressing room's make-up table | Pickup inside `room_dressing` (the stage door, red) | The jackpot machine's glint |
 | `book_4` | 4 | Deck 9, 134, the honeymoon couple | Their thanks for their picture | The pantry passage between the kitchens |
-| `book_5` | 5 | Deck 8, cabin 8206, on the bed | Pickup; standing still on the bed with it, she reads there instead of the bounce | Deck 7's stern strip |
+| `book_5` | 5 | Deck 8, cabin 8206, on the bed | Pickup (a book like the rest since 2026-11-21: the bed is one of the places she reads, E on it) | Deck 7's stern strip |
 | `book_6` | 6 | Deck 11, 216, her husband | His thanks for a perfect cone | Los Lobos' piñata |
 | `book_7` | 7 | Deck 10, 235, the balcony guest | His thanks for his door | The telescope on the funnel |
 | `book_8` | 8 | Deck 12, 129, the old lady's sunbed, after the horn | Pickup | The lighting bridge over the stage |
@@ -419,7 +421,7 @@ leaving the frame (a wink, no trigger).
 | 162-166 | `sec_shelf` | The shelf with ten gaps behind the desk | Fills as books come back | Drawn by hand |
 | 164 | `npc_librarian` | The librarian at her desk | `static`; bubble (a book and the gapped shelf) within 4 m while any book is out; shelves each book (`scn_shelve`); a finger to her lips when she runs past | Shelve, idle, shush |
 | 167 | `src_trolley` | The return trolley, "RETURN" | E with a book: returned | A trolley |
-| 172 | `sec_chair` | The red reading chair by the window | `quirk(E)` with a book: she reads (an idle), the page shows (§2.2) | A clip, ten pages |
+| 172 | `sec_chair` | The red reading chair by the window (and `sec_chair_1` to `_6`, the armchairs at the three reading tables; `sec_bed`, her bed) | E: she sits facing us, the books she carries in a row, she chooses one and its first page shows (§2.2, 2026-11-21) | Her two reading clips, fourteen pages |
 | 178 | `bb_2` | Bumbot asleep on the open book on the reading table | `scene` §9.3 | His `asleep` |
 | 184-190 | `sec_ladder` | The rolling ladder on the bookcase | Pushed along 170-192 (the push verb); climbable (ladder) | Drawn |
 | 186 | decor | The chess table, the globe | | Built |

@@ -3913,3 +3913,42 @@ valuable."
   colours. Test `region9.pick` (absent before the table scene, the corner, the piano and the guests where the user put
   them, the pick on the amp, E takes it); `region9`, `region8`, `boot` pass; `check_overlaps` 0. Generations: 19 (the
   corner 4, the pick's close-up 12). **His four (13 to 16) are placed.**
+
+
+## §4 2.2, fourteen books, their pages, and reading anywhere she can sit (the user, 2026-11-21)
+
+- **Fourteen where ten was written:** one total, `BOOKS = 14` (`src/config.js`), read by the shelf, the nook's
+  `books_all`, the HUD, the trolley's last return and the nook's test; one list of colours (`BOOK_COLOURS`, four new
+  stand-ins: indigo, plum, turquoise, sage, until 2.3's covers).
+- **The shelf** (mock-ups in the game): "Move the current shelf up two pixels. Make it cover both standing book cases"
+  (its board from the first bookcase's left side to the second's right, the gaps centred, 8 px a book); "Remove the
+  bookshelf's legs"; the books back on it "slightly more washed out, now they look like pickable objects": washed 12%
+  toward the wall (the user's choice of 12% and 20%).
+- **The odd book** ("What is that green thing hanging on the book case?"): it was drawn on the glass's front; "Stand
+  it in the bookcase's top shelf behind the glass": a dark teal spine with two gold bands among the lit books, a px
+  taller than they, in full colours (she uses it).
+- **The pages:** drawings for 11 to 14 were turned down ("I'd rather prefer the actual book pages"), then "Text only for
+  all the books, same as we have decided now": the ten hint drawings are gone. Each page is the book's real opening,
+  readable, in its own language and script; "Try to enlarge the font slightly, making less words per page, but cover
+  the entire page. Don't break sentences": shown at 3x on a 260 x 146 page, a running head, justified, whole sentences,
+  the spare lines spread. The lettering: Pixelzone (GGBotNet, CC0; of the three CC0 pixel fonts with Polish, Cyrillic
+  and Hebrew, the user liked its page, `mock-zone`). The texts: the web's tools quote a couple of sentences at most, so
+  the Ukrainian and Russian ones came from online libraries' pages and the publisher's scan (Її війна), the Polish from
+  the publisher's free sample (Niebieskie nitki) and a school excerpt (Poczwarka), the Hebrew, «Боря» and Daughters of
+  Warsaw from the user; «Тс-с…» set for the scan's «Тс— с…» (the user). **Placeholders:** 1, 2, 6, 14 (two sentences
+  each), 4 (a title page): the user gives them on 2026-11-22.
+- **Reading** ("How do I choose what book to read?": the lowest unread was shown, no choice): the user chose "a small
+  choice": the books she carries ("picked up and unreturned"), "no need to mark read books, they're just books". Book 5
+  a regular book, "Make the bed another readable place". Her seated pictures generated: "a proper sprite for her
+  seating facing us in that red chair" and "where she sits properly on the bed, reading" (one PixMiniMax clip each from
+  the game's own chair and bed, 2 generations; frames with red streaks and a speck left out). The backdrop: "rectangular
+  ... round corners ... standing out from behind the book and the title on all sides", "slightly more transparent,
+  smooth the edges"; "any number of books ... (1 to 14)". Hebrew titles were cut at the top in a mock-up (a lamed's
+  stroke): every title strip now as tall as its letters reach. "Show me other reading locations": the six armchairs at
+  the reading tables are the same armchair, so **2.3b is built here**: all seven seats, in full colours.
+- Built: `src/world/library.js` (`read(seat)`, `choose()`, `got()`, `heldInOrder()`), `tools/build_reading.py`
+  (`assets/sprites/reading.png`, heads for the popups), `tools/draw_pages.py` (pages and titles), the seats in
+  `tools/build_world.py` (`library.chairs`), the chairs' full colours in `tools/build_ship_map.py`; `?books=`; E stops
+  her bed bounce and sits her to read; the hint `hint.read` (both languages, the pad's buttons). Tests: `region2` (the
+  chair, a table chair, the page, the row back, getting up), `region5` (the bed), `region4`, `region6`, `region7`,
+  `region8`, `region9` (the nook at fourteen), `lang`, `boot` pass; `check_overlaps` 0. Generations: 2.

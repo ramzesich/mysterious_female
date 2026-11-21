@@ -920,15 +920,17 @@ scare: she fetches another from the same place, which always has more. Some tray
 meter on the HUD) so her fastest known route is the test. E hands the thing over. Her hands full show
 in her sprite.
 
-**Books (her own thread).** Ten of the library's books are out on the ship, each in a place and a
+**Books (her own thread).** Fourteen of the library's books (ten at first) are out on the ship, each in a place and a
 situation of its own (the list is in §6.1.3; the titles are the user's: real books she loves). A book
 is a pocket item; the HUD counts the ones she carries. **The library's return trolley** takes them
 (E), and **the librarian shelves each one into its gap** on the shelf behind her desk, so the shelf
-shows how far the collection is. **Reading:** with a book in hand, E at the library's red reading
-chair sits her down to read (a new idle: she turns the pages, her feet tucked up), and **the page
-shows a drawing that hints at one hidden thing on the ship** (§6.1.11), the last one at the odd book
-on the top shelf. Anywhere else, standing still with a book she opens it and reads where she stands
-(a quirk). **The reading nook:** when all ten are shelved, the rolling ladder pushed along the
+shows how far the collection is. **Reading (Decided, the user, 2026-11-21; built):** E at any of the
+Library's seven armchairs or on her bed in cabin 8206 sits her down (facing us in an armchair, up against the
+pillows on the bed); **the books she carries show in a row** over a soft dark backdrop, in the order she got them;
+← and → choose, E reads, Esc gets her up. **The page is the book's real first page**: its opening, readable, in its
+own language and script, whole sentences covering the page ("Text only for all the books"; until 2026-11-21 a
+drawing that hinted at a hidden thing, §6.1.11, and the ten drawings are gone). Any book she carries, as often as
+she likes; a hint says how, once. **The reading nook:** when all fourteen are shelved, the rolling ladder pushed along the
 bookcase (the push verb) and climbed to the top shelf reaches the odd book; pulling it swings the
 bookcase open on a hidden nook: an armchair, a lamp, a porthole on the sea, a photo slot, and the
 reading idle there for as long as she likes.
@@ -2646,7 +2648,7 @@ its towel moved to the next balcony; the balconies mended with it: no drop where
 picture cut at partitions and a row's ends. **Thing 15 placed (2026-11-21):** his handheld (his ROG Xbox Ally X, from the
 user's photos) on a new sofa in Champs in the aft high table's place; Champs remade round it: the bar bigger after the real
 Champs Bar's teak, two seated fans at its ends facing it (one new), the fan in stripes gone; the world picture the user's own
-pixels. **Thing 16 placed (2026-11-21):** his guitar pick (his own red one, from the user's photo) on the amp of a new bandstand corner in the Spinnaker Lounge (a guitar on its stand by a small amp), point up. **His four are done. Next: 2.2, fourteen books where ten is written;** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+pixels. **Thing 16 placed (2026-11-21):** his guitar pick (his own red one, from the user's photo) on the amp of a new bandstand corner in the Spinnaker Lounge (a guitar on its stand by a small amp), point up. **His four are done.** **2.2 built (2026-11-21):** fourteen books everywhere (one `BOOKS`), the shelf over the two bookcases (its books washed), the odd book standing in its bookcase; every page the book's real opening, text only (1, 2, 4, 6, 14 placeholders until the user gives them); reading in the Library's seven armchairs and on her bed, choosing from the books she carries (two generated clips; 2.3b with it). **Next: books 11 and 14 placed (2.1, rows 17 and 20), then 2.3, the covers;** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

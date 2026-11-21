@@ -440,6 +440,10 @@ export const DRILL = { lowerS: 1.1, hoistS: 1.6, lullMs: 1500, nearK: 0.6, inPx:
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
 // hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken
 // by the hand at the door `giveMs` in; she stands for `ms`.
+// The Library's books (GAME_DESIGN.md §6.1.2, docs/plan-three-uses.md §4.1): fourteen out on the ship; the
+// shelf's gaps, the nook's `books_all`, the HUD's count and the pages all go by this.
+export const BOOKS = 14;
+
 export const HAND_OVER = { dx: 18, dy: 33, frame: 2, giveMs: 950, ms: 1400 };
 
 // A tangerine she gets flies to the HUD's count (§1.7): `ms` along an arc `arc` px high (the

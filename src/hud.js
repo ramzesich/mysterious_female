@@ -14,7 +14,7 @@
 // at 2 screen px a pixel; the numbers in the popups' lettering (Galmuri9, src/popup.js), white with a
 // navy outline. Positions are in the HUD's pixels (half the screen's), as in the approved mock-up.
 
-import { TALLY } from './config.js';
+import { TALLY, BOOKS } from './config.js';
 
 const S = 2;                    // screen px a HUD pixel
 const LEFT = 12;                // the row's left edge
@@ -24,7 +24,6 @@ const APART = 10;               // from a number to the next picture
 const CARDS_Y = 42, CARD_STEP = 15;
 const CARD_ORDER = ['deck', 'ent', 'hk', 'off'];
 const KINDS = ['cat', 'her', 'him', 'book'];
-const BOOKS = 10;               // the books the game counts (14 once §4 2.2 is built)
 const NAVY = '#1d2b53';
 // Letters the lettering lacks, drawn for the HUD (`tools/build_hud.py`, in the `hud` atlas): the ∞.
 const OWN = { 0x221e: 12 };

@@ -307,7 +307,7 @@ of data and a generated picture shown first, each set against what is built at i
   **Waiting for the user: the locations of all ten, judged in play** (the links: `docs/start-links.md`, five
   new places `store4`, `maid6`, `knit5`, `shore5`, `balcony7`); noted for that: the flag now stands 16 px
   among four of 13, the brown diary on a red seat. Next after it: 4 (the bell gull, **placed 2026-11-20**) and 7 (the sardines),
-  his four (13 to 16) after the table scene (**13 to 16, his t-shirt, sleep mask, handheld and guitar pick, all placed 2026-11-21**), then 2.2 before the two books. **2026-11-20: all ten approved where
+  his four (13 to 16) after the table scene (**13 to 16, his t-shirt, sleep mask, handheld and guitar pick, all placed 2026-11-21**), then 2.2 before the two books (**2.2 built 2026-11-21**). **2026-11-20: all ten approved where
   they lie** (the user's review, in play). The close-ups also as the HUD's
   icons (2.4): superseded, the HUD's kinds are faces (built 2026-11-20).
 - His four are not there before the table scene ("not lying there before it, not merely
@@ -353,6 +353,25 @@ pocket item were left out. "Yes, add those to the plan."
 `/10`), `tools/draw_pages.py`, `tools/playtest.py` (`n <= 10`), the nook in `src/world/bow.js`.
 The books' count on the HUD: found of 14, **hidden** until the first (today dimmed).
 
+**Built 2026-11-21** (with the user, step by step; `docs/progress-decisions.md`, "2.2"):
+- **Fourteen everywhere:** one total, `BOOKS = 14` in `src/config.js` (the shelf's gaps, `books_all`, the HUD, the
+  trolley's last return, the nook's test); one list of colours (`BOOK_COLOURS`, four new stand-ins until 2.3).
+- **The shelf:** over the two bookcases by the librarian's desk, from the first's left side to the second's right,
+  2 px higher, no brackets; the books back on it washed 12% toward the wall ("now they look like pickable objects").
+- **The odd book** (the nook's): standing in the top shelf of its bookcase's third glass door, among the lit books, no
+  longer hanging on the glass.
+- **The pages are text, all fourteen** (the user: "Text only for all the books"; the ten drawn hint pages are gone):
+  each book's real opening in its own language and script, readable, whole sentences, covering the page (Pixelzone,
+  CC0; `tools/draw_pages.py`, `assets/source/pages/`, its README says where each text came from). **Books 1, 2, 4, 6
+  and 14 are placeholders** until the user gives their openings from her copies (2026-11-22: two sentences each, 4 a
+  title page).
+- **Reading, anywhere she can sit** (the user's design, mock-ups approved round by round): E at any of the Library's
+  seven armchairs (the red one and the six at the reading tables, now in full colours: **2.3b is built with it**) or on
+  her bed in cabin 8206; she sits (two generated clips: facing us in the armchair, side-on against the pillows on the
+  bed, `tools/build_reading.py`), the books she carries in a row over a soft rounded backdrop (1 to 14 fit), ← and →
+  (d-pad or stick) choose, E reads, Esc/B/Space get up; any book, as often as she likes; a hint once. Book 5 is a
+  regular book (no more reading it only on her bed). `?books=3,8,11` starts her carrying books.
+
 ### 2.3 The titles: covers, their moment, the shelf seen close, the nook's photo (large; about 30 generations)
 
 `docs/plan-three-uses.md`, step 5's revision of 2026-11-18. Nothing of it is built.
@@ -371,11 +390,15 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
    screen, the returned books' spines with their titles laid in from the save, gaps for the rest.
 5. **The reading nook's photo** (given): pixel art from a cutout on a flat ground, candidates
    shown first; in `slot_nook`'s frame.
-6. **The user's to answer before they are built:** whether books 11 to 14 get hint pages (plain
+6. ~~**The user's to answer before they are built:** whether books 11 to 14 get hint pages~~ (answered 2026-11-21:
+   every page is its book's opening, no hints, 2.2) ~~(plain
    until then); whether the Library's small shelf and return trolley, drawn in code, are
    generated too (proposed).
 
-### 2.3b The Library's reading chairs, every one to sit in (small; no art; added 2026-11-20, the user)
+### 2.3b The Library's reading chairs, every one to sit in (small; no art; added 2026-11-20, the user) **BUILT 2026-11-21 with 2.2**
+
+All seven armchairs are seats she reads in, in full colours; they turned out to be the same front-facing armchair, so
+she sits in each facing us (her new clip), not side-on as below.
 
 Asked in the Refinement session's audit of the background props' wash (the user: "Make all three chairs
 interactable ... she can sit in either of them"). Today one red reading chair is hers (`sec_chair`,
