@@ -60,6 +60,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
 | 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
+| 12 (§7g) | "Washie, washie, happy, happy!": the crewman with the sanitizer at the Garden Café's door by the aft lifts (deck 11), the user's and his wife's own joke: a first meeting that cannot be missed, their duet, foamy paw prints past him, a tangerine washed and tossed back, the song stuck in her head (added 2026-11-21) | The user's word | Medium | About 25 to 30 (the design session's guess) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -930,6 +931,102 @@ roughly five spare days before the 23rd of December; this takes the rest and abo
 
 The audit's map and panoramas were made by scripts outside the repo (the obstacles' places from `maps/world.json` and
 the map; each stretch shot tile by tile through `playtest.Browser`, a deck cut open by `viewOverride`); not kept.
+
+## 7g. Part 12: "Washie, washie, happy, happy!" (medium; about 25 to 30 generations, a guess; added 2026-11-21)
+
+The user, 2026-11-21: "In the dining area on deck 11, there was a crew member guy, who was standing at the entrance to
+the dining area from the elevators and offering to sanitize the hands of the visitors. He was singing comedically:
+'Washie, washie, happy, happy!' That's our inside meme. Suggest a fun way to add this meme into the game: placement,
+looks, maybe some mechanics around him." On the design session's five pieces: **"All five."** On his look: "His was an
+Asian crew member, maybe Philippine guy. Happy face, black hair. Standard waiter crew uniform." On the duet: "When they
+both do the song, they should both do 'Washie, washie, happy, happy!'" On a melody: "No tune, he was just singing those
+words."
+
+**The idea:** he is the one person on the ship nobody gets past with dry hands, the cat included, and his song stays
+in her head. He is not an obstacle: he never hits her, has no gag, and is not counted among part 11's.
+
+**Where.** Deck 11, inside, where the Garden Café (160 to 194 m) opens into the aft lift lobby: his real place. About
+193.2 m, on the free piece of white wall between the checkpoint's door (`cp_garden`, 192 m; §7e leaves the door
+there) and the lobby's pillar (194 m), a sanitizer stand beside him on the pillar's side. He turns to whoever comes. If
+he and the stand crowd the door (`tools/check_overlaps.py`), he goes to the lobby's side of the pillar, about 194.8 m,
+and the painting there moves. She first reaches him from the pool side, after the kid's jet (a dodge) and the buffet
+queue (a hop), 22 m before her husband's table, her hands free.
+
+**His look.** The user's words above, and nothing from a photo. A pro character in the cast's style (the drill's
+officer as the style reference, size 64, side view), in the game's own waiter uniform (the cast's `waiter`: a white
+jacket, black trousers): short black hair, a wide happy smile, a small spray bottle held up in one hand like a
+microphone. `python tools/check_people.py --heads washie` before any clip. His clips: `sing` (his loop: he sways from
+foot to foot and sings into the bottle), `squirt` (the arm out, two squeezes), `wiggle` (the duet's "happy, happy"),
+`wash` (he catches a tangerine, squirts it, polishes it on his sleeve and tosses it: the fruit in his fist until the
+frame the hand opens, then the game's). Hers: one clip, facing him: her hands held out, rubbed, then the same wiggle
+(skeleton-v3 from her character; `tools/build_heads.py` after her sheet is rebuilt). The squirt itself is drawn by the
+game, two fine puffs, as the kid's jet is.
+
+**The five pieces.**
+
+1. **The first meeting cannot be missed.** The first time she comes within about 1.5 m of him with free hands, he
+   steps out with the bottle and she stops, for about three seconds and no longer: her hands out, his squirt, she rubs
+   them, and both wiggle, **each with the whole line over the head: "Washie, washie, happy, happy!"** (the user). Her
+   hands sparkle a moment (the pickups' glint). Flag `washie`, kept in the save. Before she is that near, and ever
+   after, he sings alone as she comes within about 4 m: "Washie, washie!", then "Happy, happy!", on his clip's beats.
+2. **After that he never holds her.** He sings as she passes, once a pass. Stopping beside him with free hands (or E)
+   plays the duet again, and any move key ends it at once. **With her hands full** (a tray, the cone, the canister,
+   the coffee, Bumbot in her arms) he sings and waves her through and no scene starts: the cone's 45 s and the
+   coffee's 50 s are untouched.
+3. **The cat paid too.** From near-catch 5 (`bb5`) until she has eaten with her husband (`table`): a few wet paw
+   prints on the floor up to his spot from forward (about 3 m), and past him about 4 m of foamy ones, small heaps of
+   suds that glint now and then. No words. **These prints are built here:** the population spec's `sec_pawprints`
+   (wet prints from the pool at 131 m aft to the machine at 213 m) was never built and is in no part of this plan;
+   the design session told the user they "already run past this spot", wrongly, from the spec. Only the stretch by
+   him is built. The whole trail stays the user's to ask for: 82 m of prints leading aft could read as "go there".
+4. **A tangerine thrown to him comes back washed.** Everyone else eats it. He takes one that reaches him (thrown, or
+   lying within his reach: `people.offered`, `loose.claim`), plays `wash`, and tosses it back to her
+   (`world.tossOver`), glinting as it flies; her count is as before. If she has left the café's end by then, it is
+   set rolling on the floor toward where she went, a loose tangerine like any other. From how far a lob and a throw
+   in a jump reach him is measured by a sweep and said to the user.
+5. **The song stays in her head.** Once `washie` is set, about one of her idles in four anywhere on the ship comes
+   with a small speech popup over her: "♪ washie, washie…". Never while she carries something, holds Bumbot, or in a
+   scene (her idles do not play then anyway).
+
+**Left out on purpose** (said to the user with the proposal): his squirt is nothing to dodge (the kid's jet 40 m
+before is that already); the buffet's fruit is not locked behind clean hands (she passes the fruit before she meets
+him).
+
+**Texts** (`src/lang.js`, the same words in both languages, as her «Кісюнічка!!!»: it is their joke as it was sung;
+the design session's proposal, the user did not object): `washie.a` "Washie, washie!", `washie.b` "Happy, happy!",
+`washie.all` "Washie, washie, happy, happy!", `washie.hum` "♪ washie, washie…". If the popups' lettering has no ♪, it
+is drawn in its stroke, as × and ∞ were for the HUD. **The duet's two popups stand 30 to 40 px apart and each line is
+wider than that:** how they sit (the line broken in two, one higher than the other) is mocked up over a real shot of
+the spot and shown to the user first.
+
+**Sound.** No melody is made for the song (the user: "No tune"): the words are the popups. One new effect, the
+squirt's two puffs (the design session's addition; the user hears it on the soundboard before it stays).
+
+**Art, about 25 to 30 generations** (a guess): his character 10; `sing`, `squirt`, `wiggle` about 3 each; `wash`
+about 5; her clip 2 to 4; the stand 1 or 2 (the atlas has a `sanitizer` of 12 x 26 px that was never placed: looked at
+beside her first); the heads' estimates about 2. The prints are a few px each: made at their size by hand, wet and
+foamy, and shown enlarged on the café's and the lobby's real floors (the lobby's is patterned blue). Everything shown
+to the user in the chat before it is placed, the clips composed over a real shot of the spot.
+
+**Open for the build:** where exactly he and the stand fit (above); whether the foamy prints read on the lobby's
+floor; the duet's two popups; that the first meeting's stop does not start while she is in the air or sliding.
+
+**Tests:** a case `region6.washie`: the first coming with free hands plays the scene, sets `washie`, and she can move
+again within 3.5 s; the second coming does not hold her; with the cone in her hand no scene starts and her speed
+across 190 to 196 m is unchanged; a tangerine thrown to him comes back and the count is the same; the prints are there
+with `bb5` and gone with `table`; the hum shows only after `washie` (the idles' draw seeded). `region6` whole (the
+cone's run to the kid, the canister), `lang`, `boot`; `python tools/shoot_people.py washie`;
+`tools/check_overlaps.py` lists nothing. The start place `?at=buffet` is 23 m forward of him.
+
+**The documents, as it is built:** `docs/population.md` (deck 11's rows; `sec_pawprints` marked as built only by
+him), `GAME_DESIGN.md` §6.1's region 6, `CLAUDE.md`'s row for `src/world/lido.js`, `tools/cast.py`.
+
+**When, and the date.** About a day and a half by the design session's guess (him and pieces 1 and 2 a day; 3 to 5
+half a day). Part 11 had used the spare days, so this moves the likely end from near the 25th of December to about
+the 27th, and the slow end past New Year's Eve unless something gives. The user was told before choosing. **He is
+built before part 11's P2, P1, 14 and 10,** and if the date presses, the balloons (14) and the ladder (P1) are dropped
+before any of his five pieces (the design session's ranking, said to the user with the proposal: their own joke is
+worth more to the gift than either).
 
 ## 8. Optional, each only on the user's word
 

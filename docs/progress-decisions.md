@@ -3868,3 +3868,25 @@ valuable."
   Test `region8.handheld` (absent before the table scene, the bar's right end and the sofa in place, the fans at the bar's
   ends, the handheld on the seat, E takes it); `region8`, `region9`, `boot` pass; `check_overlaps` 0. Generations: about
   58 (the sofa 4, the bars 8, the handheld 31, the fans 15).
+
+## "Washie, washie, happy, happy!": a new part 12 (2026-11-21; a plan, nothing built)
+
+- **What the user asked:** a fun way to bring their and his wife's own joke into the game: the crewman who stood at
+  the entrance to deck 11's dining area from the lifts, sanitizing hands and singing "Washie, washie, happy, happy!".
+- **What was proposed and taken:** five pieces, "All five" (`docs/plan-the-rest.md` §7g, `GAME_DESIGN.md` §5.8): a
+  first meeting that cannot be missed, their duet; he never holds her after it, nor ever with her hands full; foamy
+  paw prints past him; a tangerine washed and tossed back; the song stuck in her head. The user's own additions: his
+  look ("Asian crew member, maybe Philippine guy. Happy face, black hair. Standard waiter crew uniform"), both sing
+  the whole line in the duet, and no melody.
+- **Why there:** the game's Garden Café opens into the aft lift lobby at 194 m, so his real place exists, and a piece
+  of wall is free between the checkpoint's door and the lobby's pillar (seen in a shot of the spot). She meets him
+  after the kid's jet and the queue, so he is a rest and not a third thing to get past; for that reason his squirt is
+  nothing to dodge. The fruit counter was not locked behind clean hands: she passes it before him.
+- **A mistake of the design session's, mended in the plan:** the proposal said Bumbot's wet paw prints "already run
+  past this spot". They are in `docs/population.md` (`sec_pawprints`) and were never built. Part 12 builds only the
+  prints by him; the 82 m trail is left to the user, since it could read as a hint where to go.
+- **What it costs:** about 25 to 30 generations and a day and a half (a guess). The likely end moves from near 25
+  December to about the 27th, the slow end past New Year's Eve unless something gives; said to the user before the
+  choice. The design session's ranking: the balloons (14) and the ladder (P1) of part 11 are dropped before him.
+- **Mine, not the user's:** the bottle held like a microphone, the words kept in English in both languages, the
+  squirt's sound, the build order. Each is marked so in §7g.

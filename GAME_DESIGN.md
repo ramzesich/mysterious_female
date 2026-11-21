@@ -839,6 +839,16 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   his sleep mask; deck 9 aft's last door, its tangerine moved there and the pillow delivery's cabin; deck
   8's forward terrace, its corridor's tangerine moved onto a table there; behind deck 7's pillow fort,
   the snack table and its tangerine. Three tangerines move; 56 stays.
+- **Decided (the user, 2026-11-21; not built: `docs/plan-the-rest.md` §7g): "Washie, washie, happy, happy!"** The
+  user's and his wife's own joke, from the real ship: a crewman at the Garden Café's door by the aft lifts (deck 11,
+  about 193 m) who sanitizes everyone's hands, singing. "His was an Asian crew member, maybe Philippine guy. Happy
+  face, black hair. Standard waiter crew uniform." Not an obstacle. Five pieces, "All five": the first meeting holds
+  her about three seconds (he squirts, she rubs her hands, and both sing the whole line, the user: "they should both
+  do 'Washie, washie, happy, happy!'"); after that he never holds her, and with her hands full he only sings and
+  waves her through; Bumbot's paw prints turn foamy past him (from near-catch 5 until the table scene; only this
+  stretch of prints is built); a tangerine thrown to him comes back washed, the count unchanged; and once she has met
+  him, now and then an idle of hers comes with "♪ washie, washie…" over her. The words are the same in both
+  languages. No melody ("No tune, he was just singing those words").
 - **Secrets** exist: §6.1.11. (Bumbot's SUSHI sign had leaked in from the Bumbot game; dropped, the
   user, 2026-11-10.)
 - **As built (2026-11-19):** each hazard with what its hit does, its sounds and its checks:
