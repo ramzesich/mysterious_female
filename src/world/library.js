@@ -9,9 +9,12 @@ import { t } from '../lang.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
 
-// Each book's colour, its small picture's and its spine's (until §4 2.3 takes them from its cover).
-export const BOOK_COLOURS = [0xae2334, 0x4d9be6, 0x1ebc73, 0xf9c22b, 0x905ea9, 0xf68181, 0x0b5e65, 0xcd683d, 0x323353, 0xe83b3b,
-    0x4d65b4, 0xa24b6f, 0x0eaf9b, 0x92a984];
+// Each book's colours, its small picture's and its spine's, from its cover (tools/build_covers.py, plan-the-rest §2.3):
+// the cover's ground (its commonest colour but the outlines') and its title's colour, for the label.
+export const BOOK_COLOURS = [0xf7f5ef, 0x009e3a, 0x004ca3, 0xe6edd2, 0x363b1e, 0x000815, 0xede9d0, 0x0a0c14, 0x878787,
+    0xf6e7b6, 0x7cefff, 0xc72c02, 0x020207, 0x4ebefb];
+export const BOOK_ACCENTS = [0xb09256, 0xe2f4e2, 0xfebe04, 0xb21c28, 0xf0f0e8, 0x60dead, 0xc41c24, 0x96c4de, 0xfafafa,
+    0x1e1814, 0x7a1e22, 0x96d6ee, 0xd6a85c, 0xc92a0f];
 const SLOT = 8;         // px per book on the shelf
 const SPINE = 7;        // a spine's width there, its outline in
 // The books back on the shelf are washed toward the wall as the Library's background is, so they do not read
@@ -124,7 +127,7 @@ export class Library {
             const x = this.slotX(n), h = 11 + (n * 7) % 3;
             g.fillStyle(washed(0x2e222f), 1).fillRect(x, y - h - 1, SPINE, h + 1);
             g.fillStyle(washed(BOOK_COLOURS[n - 1]), 1).fillRect(x + 1, y - h, SPINE - 2, h);
-            g.fillStyle(washed(0xf3ecdd), 1).fillRect(x + 2, y - h + 2, SPINE - 4, 1);
+            g.fillStyle(washed(BOOK_ACCENTS[n - 1]), 1).fillRect(x + 2, y - h + 2, SPINE - 4, 1);
         }
     }
 
@@ -302,7 +305,7 @@ export class Library {
         g.fillStyle(0x2e222f, 1).fillRect(1, 1, 16, 22);
         g.fillStyle(c, 1).fillRect(2, 2, 14, 20);
         g.fillStyle(dark, 1).fillRect(2, 2, 2, 20);
-        g.fillStyle(0xf3ecdd, 1).fillRect(6, 6, 8, 3);
+        g.fillStyle(BOOK_ACCENTS[n - 1], 1).fillRect(6, 6, 8, 3);
         g.generateTexture(key, 18, 24);
         if (!s.textures.exists('book-rim')) {
             g.clear().fillStyle(0xfbff86, 1).fillRect(0, 0, 20, 1).fillRect(0, 25, 20, 1).fillRect(0, 0, 1, 26).fillRect(19, 0, 1, 26);

@@ -4014,3 +4014,34 @@ valuable."
   "knock"s and "…", nobody answers, `sec_captain` kept; the plate's name is still the user's to give. Its floating
   "knock" words are text boxes, not popups (the one such place left), and the door is drawn muted though she uses it
   (§7c): told to the user, left as built.
+
+## §4 2.3, the books' covers (the user, 2026-11-22)
+
+- **Her own copies' covers.** Asked whether the covers should be original or like her copies, the user said: pull the
+  official covers from the Internet and generate simplified ones from them. Most were found (Open Library, Amazon's
+  images by ISBN, publishers' pages), but several editions were not hers or not online, so the user photographed all
+  fourteen of her copies instead (`reference/books/`, git-ignored, never committed). Each was straightened (GrabCut
+  and a warp), its words painted out (OpenCV inpaint over the letters, boxes measured per cover), and redrawn by
+  PixelLab `image_to_pixelart` at 120 x 180. Of the two modes tried on three covers, redrawn (clean pixel art) over
+  faithful (the photo's grain and glare): the user's "Ok". 16 generations in all (Atomic Habits, all lettering, has
+  none: its gold dust is drawn by the build). Ids: `assets/source/covers/README.md`.
+- **Mends by hand:** Понаїхали's bag came blue (back to grey), Двор sepia (back to black and white but the window's
+  blue), Niebieskie nitki's blue bands made taller for its lettering, a leftover of a painted-out subtitle on Її війна,
+  the plate's inner rule on Танґо смерті (room for the author's two lines). The covers' blurbs, stickers, publishers
+  and taglines are left off; on Philosopher's Stone its "PRIDE / AMBITION / CUNNING" too (the user).
+- **The lettering** (`tools/build_covers.py`): each title and author where her copy has them, in its colours, Pixelzone
+  at whole-pixel scales; a spine's title turned; Понаїхали's title climbing its tag letter by letter (slanted by whole
+  letters); a long title's letters 1 px apart; Hebrew right to left; Pachinko's Korean title left off (no Korean in the
+  font).
+- **Й was wrong everywhere** (the user: "It adds two dots"). The font's breve is two dots over a bar, and FreeType's
+  hinting at 16 px moved the dots a row up. `tools/pixelzone.py` now draws Pixelzone eight times larger and reads it
+  back pixel by pixel (the font exactly as designed; the Polish accents moved a pixel too), and the font's Й/й are
+  mended to И/и with a 2 px line one row above (the user's B of three). The pages and the row's titles were redrawn
+  with it (only the Cyrillic and Polish ones changed).
+- **The cover's moment** (`world.cover()`, from `take` and `giveBook`): the close-up's own code with a picture of its
+  own, the dim at 35% (the user: "dimmed slightly"), a faint shadow, and the close-ups' warm light (the user's B of
+  two, mocked up in the running game first). `region2` checks it shows on book 2 and a key closes it.
+- **The small books and the shelf's spines take their colours from the covers** (`BOOK_COLOURS`, `BOOK_ACCENTS` in
+  `src/world/library.js`): the cover's ground and its title's colour for the label. A vertical label on the spines
+  was tried and reverted (the user: "it's worse now").
+- Tests: `boot`, `region2`, `region9` pass.

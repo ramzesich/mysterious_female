@@ -80,6 +80,8 @@ export class BootScene extends Phaser.Scene {
         for (let n = 1; n <= BOOKS; n++) {
             this.load.image(`page-${n}`, `assets/ship/pages/page-${n}.png`);
             this.load.image(`book-title-${n}`, `assets/ship/pages/title-${n}.png`);
+            // (its cover, her own copy's, shown when she gets it: tools/build_covers.py)
+            this.load.image(`cover-${n}`, `assets/ship/covers/cover-${n}.png`);
         }
         this.load.atlas('reading', 'assets/sprites/reading.png', 'assets/sprites/reading.json');
         this.load.json('reading-meta', 'assets/sprites/reading.json');

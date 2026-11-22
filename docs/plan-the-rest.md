@@ -374,16 +374,19 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
 
 ### 2.3 The titles: covers, their moment, the shelf seen close, the nook's photo (large; about 30 generations)
 
-`docs/plan-three-uses.md`, step 5's revision of 2026-11-18. Nothing of it is built.
+`docs/plan-three-uses.md`, step 5's revision of 2026-11-18. **1 to 3 built 2026-11-22** (16 generations): the
+covers are her own copies' (the user's photos, `reference/books/`), `tools/build_covers.py`; 4 and 5 remain.
 
-1. **The lettering tool first** (new): each title and author set on its cover and spine from a
+1. **BUILT 2026-11-22: `tools/pixelzone.py`** (the pages' Pixelzone drawn exactly, Й/й mended). **The lettering tool first** (new): each title and author set on its cover and spine from a
    font with every script needed (lower case, Polish letters, Russian and Ukrainian Cyrillic,
    Hebrew from right to left), at whole pixels. The books' own texts do not go through
    `src/lang.js`. Each spelling checked against her copy (the photos: `reference/photos/Books`).
-2. **Fourteen covers, generated, each its own:** shown enlarged, numbered, title and author
+2. **BUILT 2026-11-22, the user's: her own copies' covers** (photographed, words painted out, `image_to_pixelart`,
+   title and author set back in). **Fourteen covers, generated, each its own:** shown enlarged, numbered, title and author
    drawn in, before any is placed. The small book in the world and its spine take their colours
    from its cover.
-3. **The cover's moment:** in `world.take` and `world.giveBook`, after the sparkle or the
+3. **BUILT 2026-11-22** (`world.cover()`, a 35% dim with the close-ups' warm light, the user's B; `region2` checks
+   it). **The cover's moment:** in `world.take` and `world.giveBook`, after the sparkle or the
    hand-over: the Library's `panel()` with a lighter dim, the cover in the centre, any key
    closes it. Each of the fourteen, once.
 4. **The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the

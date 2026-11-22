@@ -12,7 +12,7 @@ import { rumble, rumbleNow } from '../rumble.js';
 import { People } from './people.js';
 import { Carry } from './carry.js';
 import { Story } from './story.js';
-import { Library, BOOK_COLOURS } from './library.js';
+import { Library, BOOK_COLOURS, BOOK_ACCENTS } from './library.js';
 import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
@@ -176,7 +176,8 @@ export class World {
         BOOK_COLOURS.forEach((c, i) => make(`book-${i + 1}`, 10, 13, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 10, 13);
             g.fillStyle(c, 1).fillRect(1, 1, 8, 11);
-            g.fillStyle(0xf3ecdd, 1).fillRect(8, 2, 1, 9).fillRect(3, 3, 4, 1);
+            g.fillStyle(0xf3ecdd, 1).fillRect(8, 2, 1, 9);
+            g.fillStyle(BOOK_ACCENTS[i], 1).fillRect(3, 3, 4, 1);
         }));
         // (The grip socks and the stage manager's pills were drawn here until 2026-11-20: now their
         // close-ups' pictures, `grip-socks` and `pills-bottle` among the things.)
@@ -1319,6 +1320,7 @@ export class World {
         } else if (type === 'book') {
             this.library.got(name);
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
+            this.cover(name);
         } else if (type === 'keep') {
             // (Its kind's count shows, or goes up, as its close-up closes: src/hud.js.)
             const kind = thing.what.split(':')[1];
@@ -1355,13 +1357,15 @@ export class World {
     // A thing she has just got, seen close (the user, 2026-11-19: "A and C"): its picture
     // (tools/build_closeups.py, the world's pixel size) in the middle of the screen over a dim, a warm
     // light behind it; she holds still and nothing touches her (`scene.viewing`) until any key. Every
-    // thing to find and every key card; the books' covers will come the same way (§4 2.3). The
+    // thing to find and every key card; the books' covers the same way (`cover()`). The
     // playtests skip it (`window.__skipCloseups`) but where it is what they check. `then(dim)`: called
     // as it starts to close (or at once, with none shown), with what lies lowest in it: the HUD's card
     // flies out from behind it.
-    closeup(frame, then = null) {
+    // (`texture`, `dim`, `shadow`, `glow`: a picture of its own, the dim's alpha, a faint shadow, the light's scale.)
+    closeup(frame, then = null, { texture = 'closeups', dim: dimAlpha = 0.62, shadow = false, glow: glowScale = 1 } = {}) {
         const s = this.scene;
-        if (window.__skipCloseups || !s.textures.get('closeups').has(frame)) {
+        const pictured = texture === 'closeups' ? s.textures.get('closeups').has(frame) : s.textures.exists(texture);
+        if (window.__skipCloseups || !pictured) {
             then?.();
             return;
         }
@@ -1378,10 +1382,13 @@ export class World {
         this.cut(() => new Promise(resolve => {
             s.viewing = true;
             const cx = VIEW.width / 2, cy = VIEW.height / 2;
-            const dim = s.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422, 0.62).setOrigin(0);
-            const glow = s.add.image(cx, cy, 'closeup-glow');
-            const pic = s.add.image(cx, cy, 'closeups', frame).setScale(2);
-            const all = [dim, glow, pic];
+            const dim = s.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422, dimAlpha).setOrigin(0);
+            const glow = s.add.image(cx, cy, 'closeup-glow').setScale(glowScale);
+            const pic = s.add.image(cx, cy, texture, frame).setScale(2);
+            const all = [dim, glow];
+            // (a book's faint shadow, 4 px down and right)
+            if (shadow) all.push(s.add.rectangle(cx + 4, cy + 4, pic.width * 2, pic.height * 2, 0x000000, 0.35));
+            all.push(pic);
             s.uiLayer.add(all);
             s.tweens.add({ targets: all, alpha: { from: 0, to: 1 }, duration: 200 });
             const close = () => {
@@ -1412,6 +1419,15 @@ export class World {
         this.library.got(n);
         writeSave(this.save);
         this.refresh();
+        this.cover(n);
+    }
+
+    // A book she has just got, its cover seen close (plan-the-rest §2.3; the user, 2026-11-18: "the screen is dimmed
+    // slightly, a generated book cover is shown in the center of the screen with the title and author"): her own
+    // copy's cover (tools/build_covers.py) at 2x over a lighter dim than a found thing's, with the same warm light
+    // behind it (the user's B of two, 2026-11-22), until any key. A book is got once, so each cover shows once.
+    cover(n) {
+        this.closeup(undefined, null, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
     }
 
     // The scripted places that are not rooms: the pool's hatch, the stage's trap door, the linen

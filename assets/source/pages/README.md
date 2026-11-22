@@ -8,6 +8,9 @@ of step 2 are gone. Whole sentences from the start, as many as fit ("Don't break
 - `Pixelzone.ttf`: the lettering, by GGBotNet, **CC0** (https://github.com/ggbotnet/fonts-cc0). Chosen from the
   three CC0 pixel fonts there with Latin and the Polish letters, Ukrainian and Russian Cyrillic, and Hebrew
   (Liber Struct's 6 px "z" read as "e"; Public Pixel, an 8 x 8 monospace, held half as much). No vowel points.
+  **Mended here (2026-11-22, the user's choice of three):** Й and й are И and и with a 2 px line one empty row above
+  them, in place of the font's breve (two dots over a bar, which read as dots). Always drawn by `tools/pixelzone.py`
+  (eight times larger, read back pixel by pixel): FreeType's hinting at 16 px moves the font's small parts.
 - `<nn>.txt`: each book's opening, one paragraph a line, as printed (italics dropped, the font has none).
   `04.txt` is missing: its page is a title page until the text comes.
 

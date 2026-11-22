@@ -24,6 +24,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
+import pixelzone
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "pages"
 OUT = ROOT / "assets" / "ship" / "pages"
@@ -115,12 +117,12 @@ def page(n):
         # No text yet: a title page, its title and author in the middle.
         for k, (t, c) in enumerate(((title, INK), (author, SOFT))):
             t = " ".join(visual(t.split(), bool(HEBREW.search(t))))
-            d.text(((W - font.getlength(t)) // 2, H // 2 - LEADING + k * (LEADING + 4)), t, font=font, fill=c)
+            pixelzone.text(im, ((W - font.getlength(t)) // 2, H // 2 - LEADING + k * (LEADING + 4)), t, c)
         return im
     pars = [l.strip() for l in src.read_text(encoding="utf-8").splitlines() if l.strip()]
     rtl = bool(HEBREW.search(pars[0]))
     head = " ".join(visual(title.split(), rtl))
-    d.text(((W - font.getlength(head)) // 2, 6), head, font=font, fill=SOFT)
+    pixelzone.text(im, ((W - font.getlength(head)) // 2, 6), head, SOFT)
     d.line([(x0, 6 + LEADING + 1), (x1, 6 + LEADING + 1)], fill=EDGE)
     top = 6 + LEADING + 5
     rows = (H - 8 - top) // LEADING
@@ -131,12 +133,12 @@ def page(n):
         words = visual(words, rtl)
         if last or len(words) == 1:
             t = " ".join(words)
-            d.text((x1 - font.getlength(t) if rtl else x0, y), t, font=font, fill=INK)
+            pixelzone.text(im, (x1 - font.getlength(t) if rtl else x0, y), t, INK)
             continue
         gap = (x1 - x0 - sum(font.getlength(w) for w in words)) / (len(words) - 1)
         x = x0
         for w in words:
-            d.text((round(x), y), w, font=font, fill=INK)
+            pixelzone.text(im, (round(x), y), w, INK)
             x += font.getlength(w) + gap
     return im
 
@@ -150,9 +152,7 @@ def title(n):
     t = " ".join(visual(t.split(), bool(HEBREW.search(t))))
     # (Every title the same height on the same line, its letters' rows 1 to 14, so none moves as the choice does.)
     im = Image.new("RGBA", (int(font.getlength(t)) + 2, 16), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    d.fontmode = "1"
-    d.text((1, 0), t, font=font, fill=PAPER)
+    pixelzone.text(im, (1, 0), t, PAPER)
     return im
 
 
