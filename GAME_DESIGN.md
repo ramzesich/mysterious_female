@@ -930,10 +930,14 @@ pillows on the bed); **the books she carries show in a row** over a soft dark ba
 ← and → choose, E reads, Esc gets her up. **The page is the book's real first page**: its opening, readable, in its
 own language and script, whole sentences covering the page ("Text only for all the books"; until 2026-11-21 a
 drawing that hinted at a hidden thing, §6.1.11, and the ten drawings are gone). Any book she carries, as often as
-she likes; a hint says how, once. **The reading nook:** when all fourteen are shelved, the rolling ladder pushed along the
-bookcase (the push verb) and climbed to the top shelf reaches the odd book; pulling it swings the
-bookcase open on a hidden nook: an armchair, a lamp, a porthole on the sea, a photo slot, and the
-reading idle there for as long as she likes.
+she likes; a hint says how, once. **Since 2026-11-22 (the user): the row shows every book she has found**, a book she
+has given back greyed with a green check stamp and RETURNED beside its title, not to be read; the HUD's count never goes
+down. **At the return trolley** with more than one book on her the row opens and she chooses which goes back, one at a
+time, until none is left or she keeps the rest. **The reading nook:** when all fourteen are shelved, E at the odd book
+on the bookcase's top shelf: it tips and clicks, the bookcase shudders with puffs of dust at both its sides and slides
+to the right behind its neighbour (the screen still), leaving the nook's entrance, a wooden casing round a washed view
+of its lamp and armchair. Inside: the armchair, where **all fourteen books are hers to read again**, a lamp, a
+porthole, a picture of a black cat asleep on a book, and a photo slot, her own armchair at home (the user's photo).
 
 **The books' titles and where they show. Decided (the user, 2026-11-18); not built.** The books are
 fourteen (docs/plan-three-uses.md §4.1), and their titles are real books of hers, read off two
@@ -1654,7 +1658,7 @@ each hint at one of the hidden ones, drawn, no words.
 | Place | What happens | Needs |
 |---|---|---|
 | **The reading chair** | With a book in hand: she reads, feet tucked up; the book's page shows its hint | A clip; ten drawn pages |
-| **The reading nook** | All ten books shelved, the ladder pushed to the odd book: the bookcase swings open on an armchair, a lamp, a porthole, a photo slot | Drawn by hand |
+| **The reading nook** | All fourteen books shelved, E at the odd book: the bookcase slides aside on an armchair (all fourteen to read), a lamp, a porthole, a photo slot (her armchair at home) | Drawn by hand; its pictures generated |
 | **The table with her husband** | A perfect cone for him: they eat looking at the wake; a photo slot | A clip for each |
 | A lifeboat (from the boat walkway) | Inside: benches, an oar, a book, a photo slot | The boat's inside, drawn by hand |
 | The lighting bridge over the stage | The catwalk, the view down onto the stage, a photo slot | The red card; drawn by hand |
@@ -1664,7 +1668,7 @@ each hint at one of the hidden ones, drawn, no words.
 | Los Lobos' piñata | The dash breaks it: three tangerines | |
 | The galley pass, the pantries, the service station | Tangerine crates, some behind breakables | |
 | Cabin 8206's shower | Built (§8) | |
-| Reading anywhere | Standing still with a book: she opens it where she stands | A clip |
+| ~~Reading anywhere~~ | ~~Standing still with a book: she opens it where she stands~~ **Dropped 2026-11-22** (the user): she reads in the Library's armchairs, on her bed and in the nook's armchair | ~~A clip~~ |
 | The hot tub | She sits in it, steam rising, a relax idle | A clip |
 | The ice cream machine | A cone for herself, eaten where she stands | A clip |
 | Bliss's dance floor | Standing still, she dances | A clip |
@@ -2649,7 +2653,7 @@ its towel moved to the next balcony; the balconies mended with it: no drop where
 picture cut at partitions and a row's ends. **Thing 15 placed (2026-11-21):** his handheld (his ROG Xbox Ally X, from the
 user's photos) on a new sofa in Champs in the aft high table's place; Champs remade round it: the bar bigger after the real
 Champs Bar's teak, two seated fans at its ends facing it (one new), the fan in stripes gone; the world picture the user's own
-pixels. **Thing 16 placed (2026-11-21):** his guitar pick (his own red one, from the user's photo) on the amp of a new bandstand corner in the Spinnaker Lounge (a guitar on its stand by a small amp), point up. **His four are done.** **2.2 built (2026-11-21):** fourteen books everywhere (one `BOOKS`), the shelf over the two bookcases (its books washed), the odd book standing in its bookcase; every page the book's real opening, text only (1, 2, 4, 6, 14 placeholders until the user gives them); reading in the Library's seven armchairs and on her bed, choosing from the books she carries (two generated clips; 2.3b with it). **Book 11 placed (2026-11-21)** on a life-jacket box at the boat walkway's aft end; on the way the walkway mended (the boats in front of her, wire ropes, the drill's boat to stand in and gag 15 remade, the winch's crewman and a warning light, the lifeboat entered through a roof hatch she climbs into, a ladder inside: `docs/progress-decisions.md`). **Book 14 placed (2026-11-21)** on a generated half-moon console table at the end of deck 9's officers' corridor, left of the captain's door (the user's choice of four); **all fourteen books are in the world.** **2.3's covers built (2026-11-22):** every book's cover is her own copy's (the user photographed all fourteen), straightened, its words painted out, redrawn as pixel art by PixelLab (120 x 180) and its title and author set back in Pixelzone where her copy has them; shown at 2x over a slight dim with the close-ups' warm light when she gets the book (the user's B); each small book and spine in its cover's colours; Й/й in the lettering mended (И with a line a row above, the user's B of three), the pages redrawn with it. **The shelf seen close dropped (2026-11-22, the user).** **Next: 2.3's rest, the nook's photo;** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+pixels. **Thing 16 placed (2026-11-21):** his guitar pick (his own red one, from the user's photo) on the amp of a new bandstand corner in the Spinnaker Lounge (a guitar on its stand by a small amp), point up. **His four are done.** **2.2 built (2026-11-21):** fourteen books everywhere (one `BOOKS`), the shelf over the two bookcases (its books washed), the odd book standing in its bookcase; every page the book's real opening, text only (1, 2, 4, 6, 14 typed by the user from her copies, 2026-11-22); reading in the Library's seven armchairs and on her bed, choosing from the books she carries (two generated clips; 2.3b with it). **Book 11 placed (2026-11-21)** on a life-jacket box at the boat walkway's aft end; on the way the walkway mended (the boats in front of her, wire ropes, the drill's boat to stand in and gag 15 remade, the winch's crewman and a warning light, the lifeboat entered through a roof hatch she climbs into, a ladder inside: `docs/progress-decisions.md`). **Book 14 placed (2026-11-21)** on a generated half-moon console table at the end of deck 9's officers' corridor, left of the captain's door (the user's choice of four); **all fourteen books are in the world.** **2.3's covers built (2026-11-22):** every book's cover is her own copy's (the user photographed all fourteen), straightened, its words painted out, redrawn as pixel art by PixelLab (120 x 180) and its title and author set back in Pixelzone where her copy has them; shown at 2x over a slight dim with the close-ups' warm light when she gets the book (the user's B); each small book and spine in its cover's colours; Й/й in the lettering mended (И with a line a row above, the user's B of three), the pages redrawn with it. **The shelf seen close dropped (2026-11-22, the user).** **2.3 done (2026-11-22):** the nook's photo (her armchair, redrawn, recoloured, the throw's weave; small and faded in a gold frame over the table, framed when seen close); the row of books shows all she found, the given-back greyed with a green check; the trolley's row to choose which goes back; the nook's armchair reads all fourteen; the bookcase slides aside with dust; the return trolley, the shelf's board, the cat picture and the row's small covers generated; the five missing openings from her copies. **Next: §5, part 3 (the look-outs and the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

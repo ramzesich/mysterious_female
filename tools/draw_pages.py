@@ -56,11 +56,16 @@ HEBREW = re.compile(r"[֐-׿]")
 DASH_ON = re.compile(r"[—–-]\s*[^\sA-ZА-ЯЁҐЄІЇ]")    # "— принимая находку": the sentence goes on
 
 
-def sentences(par):
+# Books whose page may end a sentence at a colon too (the user, 2026-11-22: book 4's second paragraph has a sentence
+# one line longer than the page has left; "Long sentence, broken at the colon").
+COLON = {4}
+
+
+def sentences(par, colon=False):
     """A paragraph's whole sentences: each ends at . ? ! or … before a space, unless what follows goes on with a
-    dash and a small letter ("— Это мне? — принимая находку, …" is one sentence)."""
+    dash and a small letter ("— Это мне? — принимая находку, …" is one sentence). With `colon`, at a colon too."""
     out = []
-    for piece in [x for x in re.split(r"(?<=[.?!…])\s+", par) if x]:
+    for piece in [x for x in re.split(r"(?<=[.?!…:])\s+" if colon else r"(?<=[.?!…])\s+", par) if x]:
         if out and DASH_ON.match(piece):
             out[-1] += " " + piece
         else:
@@ -81,11 +86,11 @@ def wrap(words, font, width):
     return lines
 
 
-def layout(pars, font, width, rows):
+def layout(pars, font, width, rows, colon=False):
     """Whole sentences from the start, as many as fit in `rows` lines: [(words, last line of its paragraph)]."""
     best, taken = [], {}
     for pi, par in enumerate(pars):
-        ss = sentences(par)
+        ss = sentences(par, colon)
         for si in range(len(ss)):
             taken[pi] = " ".join(ss[: si + 1])
             out = []
@@ -126,7 +131,7 @@ def page(n):
     d.line([(x0, 6 + LEADING + 1), (x1, 6 + LEADING + 1)], fill=EDGE)
     top = 6 + LEADING + 5
     rows = (H - 8 - top) // LEADING
-    lines = layout(pars, font, x1 - x0, rows)
+    lines = layout(pars, font, x1 - x0, rows, n in COLON)
     spare = (rows - len(lines)) * LEADING if rows - len(lines) <= SPREAD_MAX else 0
     for i, (words, last) in enumerate(lines):
         y = top + i * LEADING + (round(spare * i / (len(lines) - 1)) if len(lines) > 1 else 0)

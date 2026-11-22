@@ -16,12 +16,12 @@ of step 2 are gone. Whole sentences from the start, as many as fit ("Don't break
 
 | # | Book | Where the text is from | State |
 |---|---|---|---|
-| 1 | Atomic Habits | The UK ebook's sample (OverDrive, ISBN 9781473537804): two sentences | **Placeholder**: the user gives her copy's opening |
-| 2 | Harry Potter and the Chamber of Secrets | The Pottermore en-gb ebook's sample (OverDrive, ISBN 9781781100226): two sentences | **Placeholder** |
+| 1 | Atomic Habits | **Her copy** (the user typed it, 2026-11-22): the introduction, "My Story", from its first line (its drop cap O restored) to the last whole sentence given | Done |
+| 2 | Harry Potter and the Chamber of Secrets | **Her copy** (the user typed it, 2026-11-22): chapter one, "The Worst Birthday", British "Mr" and single quotes as printed (its drop cap N restored, the quotes the typing lost put back) | Done |
 | 3 | Танґо смерті | readli.net (edition not named), the untitled passage before chapter 1 | Set |
-| 4 | Unexpected Lessons in Love | Not found online (Transworld 2019/2020) | **Title page** until the user gives it |
+| 4 | Unexpected Lessons in Love | **Her copy** (the user typed it, 2026-11-22): the prologue, "Brooklyn Bridge, October", to the last whole sentence given | Done |
 | 5 | Її війна | Vivat 2024, the publisher's own excerpt (a scan of p. 5), the first story (Валерія Зеленська) | Set |
-| 6 | Harry Potter and the Philosopher's Stone | The Pottermore en-gb ebook's sample (OverDrive, ISBN 9781781100219): two sentences | **Placeholder** |
+| 6 | Harry Potter and the Philosopher's Stone | **Her copy** (the user typed it, 2026-11-22): chapter one, "The Boy Who Lived", British "Mr" as printed (the typing's slips mended: "Mr and Mrs", "fear", "found"), to the last whole sentence given | Done |
 | 7 | Понаїхали | royallib.com (Нора-Друк 2015), «Частина перша», 1; its Latin i put back to Cyrillic і | Set |
 | 8 | Niebieskie nitki | The publisher's free ebook fragment (ebookpoint, Virtualo 2022/2023), chapter "sobota" | Set |
 | 9 | Двор | readli.net, «Книга первая», I | Set |
@@ -29,6 +29,6 @@ of step 2 are gone. Whole sentences from the start, as many as fit ("Don't break
 | 11 | נערה במעיל כחול | The user's text (פן, chapter 1, «יום שלישי»); a footnote mark after «ירוקים.» left out | Set |
 | 12 | Poczwarka | The novel's start as quoted on zpe.gov.pl (Kraków 2004, p. 8) | Set |
 | 13 | Daughters of Warsaw | The user's text (chapter 1, "Seattle, Present Day") | Set |
-| 14 | Pachinko | PBS NewsHour's annotated first page: two sentences | **Placeholder** |
+| 14 | Pachinko | **Her copy** (the user typed it, 2026-11-22): "Yeongdo, Busan, Korea", from its first line (its drop cap H restored, "century" and the em dash mended) | Done |
 
 Each is to be checked against her copy (the user).

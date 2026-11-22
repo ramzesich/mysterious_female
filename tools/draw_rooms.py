@@ -86,6 +86,7 @@ class Room:
         self.wall = wall
         self.washed = True          # washed as above
         self.full = []              # boxes (x0, y0, x1, y1) kept in full colour
+        self.full_px = set()        # single pixels kept in full colour (a piece's own, not the wall round it)
         self.front = set()          # pixels drawn in front of the things in the room (`in_front`)
         self.im = Image.new("RGBA", (width, H), wall)
         self.d = ImageDraw.Draw(self.im)
@@ -199,7 +200,7 @@ class Room:
         w = tuple(int(self.wall[i:i + 2], 16) for i in (1, 3, 5))
         for y in range(FLOOR):
             for x in range(out.width):
-                if any(x0 <= x <= x1 and y0 <= y <= y1 for x0, y0, x1, y1 in self.full):
+                if any(x0 <= x <= x1 and y0 <= y <= y1 for x0, y0, x1, y1 in self.full) or (x, y) in self.full_px:
                     continue
                 c = px[x, y]
                 px[x, y] = (*(round(v + (k - v) * WASH) for v, k in zip(c[:3], w)), c[3])
@@ -830,23 +831,26 @@ def nook(width):
     for x in range(88, 166, 8):
         r(x, FLOOR, x + 3, FLOOR + 2, "#ae2334")
     stand(R.im, "floor-lamp", 100)
+    chair = atlas("reading-chair")
     stand(R.im, "reading-chair", 124)
+    # (She reads in it: its own pixels in full colours, the wall round it washed as the rest.)
+    cx0, cy0 = 124 - chair.width // 2, FLOOR - chair.height
+    R.full_px |= {(cx0 + x, cy0 + y) for x in range(chair.width) for y in range(chair.height) if chair.getpixel((x, y))[3] > 0}
     w, h = stand(R.im, "side-table", 152)
     stand(R.im, "coffee-cup", 152, dy=h)
     # Books to the ceiling: a bookcase, a shelf over it, stacks on the floor.
     stand(R.im, "bookcase", 206)
-    stand(R.im, "book-stack", 172)
+    stand(R.im, "book-stack", 23)          # (left of the way out: the user, 2026-11-22; it stood against the bookcase)
     r(176, 40, 238, 42, WOOD_DARK)
     for i, x in enumerate(range(196, 236, 5)):
         c = (RED, BLUE, GREEN, YELLOW, MAUVE, TEAL, ORANGE, PINK)[i % 8]
         hh = 9 + (i * 5) % 5
         box(x, 40 - hh, x + 4, 40, c)
-    # A sconce, and a small picture of a black cat asleep on a book.
-    box(22, 40, 34, 56, WOOD_DARK)
-    r(24, 42, 32, 54, CREAM)
-    d.ellipse([25, 47, 31, 52], fill=INK)
-    d.polygon([(25, 48), (26, 45), (27, 48)], fill=INK)
-    r(24, 52, 32, 54, RED)
+    # A sconce, and a picture of a black cat asleep on a red book over the stack of books (generated, try 1 of three,
+    # its ear's red made black and its eyes Bumbot's yellow-green by hand: the user, 2026-11-22;
+    # `assets/source/things/tries/cat-picture/`).
+    cat = Image.open(ROOT / "assets" / "source" / "things" / "cat-picture.png").convert("RGBA")
+    R.im.alpha_composite(cat, (23 - cat.width // 2, 38))
     box(110, 18, 118, 24, YELLOW, ORANGE)
     r(112, 24, 116, 26, TUBE)
     return R.save("nook")

@@ -56,6 +56,7 @@ new one added there should be added here too.
 | `bar`: Bliss Ultra Lounge | <http://localhost:8000/?play&at=bar&cards=all> |
 | `library`: inside the Library | <http://localhost:8000/?play&at=library&cards=all> |
 | `library` carrying three books (reading: any armchair, E) | <http://localhost:8000/?play&at=library&books=3,8,11> |
+| `nook`: inside the reading nook, open (its armchair: all fourteen books; its frame: her armchair at home) | <http://localhost:8000/?play&at=nook&did=books_all,nook> |
 | `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |
 | `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all> |
 | `light6`: deck 6, by the stage door, forward of the stage's swinging light (walk aft under it as it swings: 12a from in front of it, 12b at her back; it swings once near-catch 3 is done, `did=bb3`) | <http://localhost:8000/?play&at=light6&did=bb3> |

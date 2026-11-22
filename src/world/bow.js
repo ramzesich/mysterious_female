@@ -271,8 +271,9 @@ export const bow = {
         // The odd book on the Library's bookcase: standing in the top shelf of its third glass door among
         // the lit books, a dark teal spine with two gold bands a px taller than they are (the user,
         // 2026-11-21: it had hung on the glass's front). `N.up` is its foot, on that shelf (the bookcase's
-        // row 14; its columns 38 to 40). With all fourteen back it glints. Behind the bookcase, once it
-        // has swung: a doorway, lamp light in it.
+        // row 14; its columns 38 to 40). With all fourteen back it glints. Behind the bookcase, once it has slid
+        // aside (the user, 2026-11-22): the entrance to the reading nook, a wooden casing round a view of the nook's
+        // lamp and armchair, washed as a background is (`nookEntrance()`).
         const N = B.nook;
         this.oddBook = s.add.graphics().setDepth(D.decor + 0.2);
         this.oddBook.fillStyle(0x0b5e65, 1).fillRect(-1, -6, 3, 7);
@@ -280,15 +281,8 @@ export const bow = {
         this.oddBook.setPosition(N.x + 8, N.y - N.up);
         this.oddGlint = s.add.image(N.x + 9, N.y - N.up - 7, 'dot').setTint(0xfbff86).setDepth(D.decor + 0.21);
         s.tweens.add({ targets: this.oddGlint, alpha: { from: 0.1, to: 1 }, scale: { from: 0.6, to: 1.8 }, duration: 500, yoyo: true, repeat: -1, repeatDelay: 700 });
-        this.nookWay = s.add.graphics().setDepth(D.decor + 0.19);
-        this.nookWay.fillStyle(0x2e222f, 1).fillRect(N.x - 31, N.y - 58, 62, 58);
-        this.nookWay.fillStyle(0x46291f, 1).fillRect(N.x - 29, N.y - 56, 58, 56);
-        this.nookWay.fillStyle(0xf9c22b, 0.35).fillRect(N.x - 22, N.y - 52, 44, 52);
-        this.nookWay.fillStyle(0xfbff86, 0.35).fillRect(N.x - 12, N.y - 48, 24, 48);
-        // (The bookcase itself, swung open on its hinges: seen edge-on at the doorway's side.)
-        this.nookWay.fillStyle(0x2e222f, 1).fillRect(N.x + 25, N.y - 58, 8, 58);
-        this.nookWay.fillStyle(0x7a4528, 1).fillRect(N.x + 26, N.y - 57, 6, 56);
-        for (let y = N.y - 50; y < N.y - 6; y += 11) this.nookWay.fillStyle(0xab947a, 1).fillRect(N.x + 26, y, 6, 1);
+        // (Under the bookcases: the bookcase that slides is between it and the other one, `nookCases()`.)
+        this.nookWay = s.add.image(N.x, N.y, this.nookEntrance()).setOrigin(0.5, 1).setDepth(D.decor + 0.09).setVisible(false);
         w.add([this.oddBook, this.oddGlint, this.nookWay]);
         w.things.push({ id: 'sec_oddbook', x: N.x + 9, y: N.y, route: 'inside', items: [], reach: 18, until: 'flag:nook', interact: () => this.oddBookPull() });
 
@@ -311,6 +305,46 @@ export const bow = {
         this.oddBook?.setVisible(!nook);
         this.oddGlint?.setVisible(!nook && P.has('books_all'));
         this.nookWay?.setVisible(nook);
+        const cases = this.nookCases();
+        if (cases && nook && !this.pulling) cases.slide.setX(cases.home + cases.slide.width);
+    },
+
+    // The Library's two bookcases by the odd book: the one it stands in (it slides) and the one to its right (it slides
+    // behind that one). Found once among the built props by their picture.
+    nookCases() {
+        if (this.cases) return this.cases;
+        const s = this.scene, N = this.B.nook;
+        const all = [s.children.list, ...s.children.list.filter(l => l.list).map(l => l.list)].flat()
+            .filter(o => o.frame?.name?.startsWith?.('bookcase') && Math.abs(o.y - N.y) < 2);
+        const slide = all.find(o => Math.abs(o.x - N.x) < 4);
+        const other = slide && all.find(o => o !== slide && Math.abs(o.x - (slide.x + slide.width)) < 4);
+        if (!slide || !other) return null;
+        slide.setDepth(other.depth - 0.002);
+        return (this.cases = { slide, other, home: slide.x });
+    },
+
+    // The way into the reading nook, as the bookcase leaves it (the user, 2026-11-22: "a proper entrance to the reading
+    // room, with the reading room's background's relevant parts washed out and visible"): the nook's own picture
+    // (`tools/draw_rooms.py`'s `nook`) at its lamp and armchair, washed 35% toward its wall as a background is, in a
+    // wooden casing of the Library's dark wood, the bookcase's size.
+    nookEntrance() {
+        const s = this.scene, key = 'nook-entrance';
+        if (s.textures.exists(key)) return key;
+        const W = 62, H = 58, FLOOR = 128, src = s.textures.get('room-nook').getSourceImage();
+        const tex = s.textures.createCanvas(key, W, H), ctx = tex.getContext();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(src, 94, FLOOR - H + 3, W - 6, H - 3, 3, 3, W - 6, H - 3);
+        const img = ctx.getImageData(0, 0, W, H), d = img.data, wall = [0x7a, 0x30, 0x45];
+        for (let i = 0; i < d.length; i += 4) for (let c = 0; c < 3; c++) d[i + c] = Math.round(d[i + c] + (wall[c] - d[i + c]) * 0.35);
+        ctx.putImageData(img, 0, 0);
+        // The casing: a dark outer line, the wood, a lit edge along its inside; the threshold a darker board.
+        const r = (c, x, y, w, h) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
+        r('#2e222f', 0, 0, W, 3); r('#2e222f', 0, 0, 3, H); r('#2e222f', W - 3, 0, 3, H);
+        r('#7a4528', 1, 1, W - 2, 2); r('#7a4528', 1, 1, 2, H - 1); r('#7a4528', W - 3, 1, 2, H - 1);
+        r('#ab947a', 2, 2, W - 4, 1); r('#ab947a', 2, 2, 1, H - 2);
+        r('#46291f', 3, H - 1, W - 6, 1);
+        tex.refresh();
+        return key;
     },
 
     updateBow(dt, time) {
@@ -603,7 +637,9 @@ export const bow = {
     },
 
     // E at the odd book (population: `scn_nook`): stuck, until all fourteen books are back on the shelf.
-    // Then it tips, something clicks, and the bookcase swings open on the reading nook.
+    // Then it tips, something clicks, the bookcase shudders with puffs of dust rising at both its sides, and slides
+    // to the right behind the other bookcase, the nook's entrance open where it stood (the user, 2026-11-22; the
+    // screen does not shake).
     oddBookPull() {
         const s = this.scene, w = this.world, N = this.B.nook;
         if (w.carry || this.P.has('nook') || this.pulling) return false;
@@ -624,12 +660,44 @@ export const bow = {
                 return;
             }
             sfx.at(N.x, N.y).lever();
-            await w.wait(350);
-            s.cameras.main.shake(260, 0.004);
-            sfx.at(N.x, N.y).rumble();
-            this.nookWay.setVisible(true).setAlpha(0);
             this.oddGlint.setVisible(false);
-            await w.tween({ targets: this.nookWay, alpha: 1, duration: 700 });
+            await w.wait(350);
+            const cases = this.nookCases();
+            sfx.at(N.x, N.y).rumble();
+            this.nookWay.setVisible(true).setAlpha(1);
+            if (cases) {
+                const { slide, home } = cases, book = this.oddBook, bookX = book.x;
+                // It shudders, a px either way, while dust puffs up at its two sides, low and high.
+                const puff = (x, y, flip) => {
+                    const p = s.add.sprite(x, y, 'dust-puff', 0).setOrigin(0.5, 1).setFlipX(flip).setDepth(slide.depth + 0.003);
+                    w.add([p]);
+                    let f = 0;
+                    const ev = s.time.addEvent({ delay: 90, repeat: 7, callback: () => {
+                        f++;
+                        if (f > 7) { p.destroy(); return; }
+                        p.setFrame(f).setY(p.y - 1).setX(p.x + (flip ? -0.5 : 0.5));
+                    } });
+                    return ev;
+                };
+                const sides = [[home - slide.width / 2 - 2, true], [home + slide.width / 2 + 2, false]];
+                [0, 140, 300, 470].forEach((t, i) => s.time.delayedCall(t, () => sides.forEach(([x, flip]) =>
+                    puff(x + (flip ? -1 : 1) * (i % 2), N.y - [0, 18, 6, 34][i], flip))));
+                for (let i = 0; i < 9; i++) {
+                    const dx = i % 2 ? -1 : 1;
+                    slide.setX(home + dx);
+                    book.setX(bookX + dx);
+                    await w.wait(70);
+                }
+                slide.setX(home);
+                book.setX(bookX);
+                await w.wait(250);
+                // Then it slides aside, behind its neighbour, the odd book with it (behind the neighbour too).
+                book.setDepth(slide.depth + 0.0005);
+                await w.tween({ targets: [slide, book], x: `+=${slide.width}`, duration: 1400, ease: 'Sine.easeInOut' });
+                book.setVisible(false);
+            } else {
+                await w.tween({ targets: this.nookWay, alpha: { from: 0, to: 1 }, duration: 700 });
+            }
             w.sparkle(N.x, N.y - 30);
             sfx.secret();
             s.pose('stand');

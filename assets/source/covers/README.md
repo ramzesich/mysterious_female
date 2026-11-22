@@ -27,3 +27,10 @@ Titles and authors are set back in by `tools/build_covers.py` (Pixelzone), never
 
 Book 1 (Atomic Habits) is lettering on white with gold dust and nothing else: no try, drawn by the build.
 Books 2 and 6 are her Slytherin house editions (Bloomsbury), photographed later the same day.
+
+## The row's small covers (`mini/`, 2026-11-22)
+
+The row she chooses from shows each book small: PixelLab `image_to_pixelart` at 16 x 22 (seed 7, 1 generation each) from
+each cover's picture without its lettering (the try with its mends; book 1 the white with its dust), framed by
+`tools/build_covers.py` into `assets/ship/covers/mini-<n>.png`. Three first tries from the lettered covers are kept in
+`mini/first/` (set aside: the user, "Use the covers without the text").

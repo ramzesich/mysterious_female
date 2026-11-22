@@ -363,8 +363,7 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
 - **The pages are text, all fourteen** (the user: "Text only for all the books"; the ten drawn hint pages are gone):
   each book's real opening in its own language and script, readable, whole sentences, covering the page (Pixelzone,
   CC0; `tools/draw_pages.py`, `assets/source/pages/`, its README says where each text came from). **Books 1, 2, 4, 6
-  and 14 are placeholders** until the user gives their openings from her copies (2026-11-22: two sentences each, 4 a
-  title page).
+  and 14 typed by the user from her copies (2026-11-22)**; book 4's page may end a sentence at its colon (`COLON`).
 - **Reading, anywhere she can sit** (the user's design, mock-ups approved round by round): E at any of the Library's
   seven armchairs (the red one and the six at the reading tables, now in full colours: **2.3b is built with it**) or on
   her bed in cabin 8206; she sits (two generated clips: facing us in the armchair, side-on against the pillows on the
@@ -375,7 +374,7 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
 ### 2.3 The titles: covers, their moment, ~~the shelf seen close~~, the nook's photo (large; about 30 generations)
 
 `docs/plan-three-uses.md`, step 5's revision of 2026-11-18. **1 to 3 built 2026-11-22** (16 generations): the
-covers are her own copies' (the user's photos, `reference/books/`), `tools/build_covers.py`; 4 dropped 2026-11-22 (the user: "no need for that"; nothing else rides on it); 5 remains.
+covers are her own copies' (the user's photos, `reference/books/`), `tools/build_covers.py`; 4 dropped 2026-11-22 (the user: "no need for that"; nothing else rides on it); **5 built 2026-11-22. 2.3 is done.**
 
 1. **BUILT 2026-11-22: `tools/pixelzone.py`** (the pages' Pixelzone drawn exactly, Й/й mended). **The lettering tool first** (new): each title and author set on its cover and spine from a
    font with every script needed (lower case, Polish letters, Russian and Ukrainian Cyrillic,
@@ -392,12 +391,20 @@ covers are her own copies' (the user's photos, `reference/books/`), `tools/build
 4. ~~**The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
    screen, the returned books' spines with their titles laid in from the save, gaps for the rest.~~ **dropped 2026-11-22 (the user: "no need for that"; nothing else rides on it).**
    The shelf itself stays as built: the returned books' spines in their covers' colours, the odd book and the nook.
-5. **The reading nook's photo** (given): pixel art from a cutout on a flat ground, candidates
-   shown first; in `slot_nook`'s frame.
+5. **BUILT 2026-11-22:** her armchair (the user's photo cut out, PixelLab's try 2 of three recoloured to her greys
+   with the throw's weave: `tools/recolour_nook_photo.py`), small and faded in a gold frame over the nook's table
+   (`tools/frame_nook_thumb.py`), framed when seen close. **The reading nook's photo** (given): pixel art from a cutout
+   on a flat ground, candidates shown first; in `slot_nook`'s frame.
+   **With it, the user's (2026-11-22):** the row of books shows every book found, the given-back greyed with a green
+   check stamp and RETURNED by the title (E does nothing on them); the trolley's row to choose which goes back; the
+   nook's armchair reads all fourteen; the bookcase slides aside behind its neighbour with puffs of dust, the screen
+   still, the entrance a casing round the nook's washed view; the stack of books left of the nook's door, its cat
+   picture generated; the return trolley and the shelf's board generated; the row's small covers PixelLab's redraws of
+   the covers' pictures without their lettering; the win screen counts 14; `?at=nook`.
 6. ~~**The user's to answer before they are built:** whether books 11 to 14 get hint pages~~ (answered 2026-11-21:
    every page is its book's opening, no hints, 2.2) ~~(plain
    until then); whether the Library's small shelf and return trolley, drawn in code, are
-   generated too (proposed).
+   generated too (proposed).~~ (answered 2026-11-22: generated, built.)
 
 ### 2.3b The Library's reading chairs, every one to sit in (small; no art; added 2026-11-20, the user) **BUILT 2026-11-21 with 2.2**
 
@@ -514,8 +521,8 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 - **Two `deck4` checks failed now and then before the stepped clock:** the breakfast round
   moving on (once in three runs), and the lob onto the climb's shelf not knocking the feather
   down (once in four, cause not found). See whether they still do (`--seed`), and find the cause.
-- **"Standing still with a book she reads where she stands"** (`GAME_DESIGN.md` §6.1.2) has no
-  code: she reads only in the chair and on her bed. Her reading clips exist.
+- ~~**"Standing still with a book she reads where she stands"** (`GAME_DESIGN.md` §6.1.2) has no
+  code: she reads only in the chair and on her bed. Her reading clips exist.~~ **Dropped 2026-11-22** (the user).
 - **V8** (her word's white box has no outline) and **V10** (the party cabin's music notes drawn
   at the wall's depth): left out "unless the user asks". Ask once; a few lines each.
 - **Sound, the engine's leftovers** (the user hears, the builder cannot): a held sound that can

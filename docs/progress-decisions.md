@@ -4052,3 +4052,36 @@ valuable."
   is: `sec_shelf` was only a line of the spec and the plan (no code); the shelf's spines filling as books come back
   (the trolley), the odd book and the nook with all fourteen back are the shelf itself and stay. A title now shows on
   its cover only.
+
+## §4 2.3, the rest: the books found and given back, the nook, the Library's art (the user, 2026-11-22)
+
+- **The row of books** (`choose()` in `src/world/library.js`): every book she has found, those given back greyed with a
+  stamp and not to be read; the HUD's count never goes down. The stamp, by rounds: a red frame with two lines, then a
+  green ring with a V, then (the user's picture) a green disc with a white check, two of its pixels taken off and moved
+  one right; RETURNED beside the chosen one's title in green (the word is wider than a book in a full row, so on the
+  cover only the mark: the user's choice of three). While the row is open the HUD fades (a full row reached under it).
+- **The trolley:** with more than one book on her, the row opens on those she carries; each E gives the chosen back, the
+  row opens again on the rest until none is left or Esc. `hint.return` once.
+- **The nook:** its armchair is a reading seat (`kind: 'nook'`, full colours, its own pixels only: a box had left a
+  pale patch of wall), all fourteen to read. **The bookcase's opening, reworked:** no screen shake; it shudders a px
+  each way with puffs of dust rising at its two sides (PixelLab's effects workbench, free: `assets/source/things/dust-puff/`),
+  then slides right behind its neighbour (it was a fade); the entrance a wooden casing round the nook's own picture at
+  its lamp and armchair, washed 35% (`nookEntrance()` in `src/world/bow.js`). Its stack of books left of its door; its
+  cat picture generated (try 1 of three, its ear's red black, its eyes Bumbot's yellow-green). `?at=nook`; `did=books_all`
+  now also fills the shelf. The win screen counts 14 (it said 10).
+- **The nook's photo:** her armchair at home (the user's photo cut out, nothing of the room sent), PixelLab's redraw
+  try 2 of three, its navy chair recoloured to her greys with the throw's woolly weave and its cushion found by its own
+  outline (a first try by its purples split it diagonally with a yellow tint: the user saw it): `tools/recolour_nook_photo.py`.
+  On the wall: a 20 x 26 redraw, faded as an old print, its oranges mostly out, in a gold frame centred over the table
+  (`tools/frame_nook_thumb.py`). Seen close, every photo slot's picture now in a gold frame (`framed()`).
+- **Generated for the Library:** the return trolley (a small bookcase on castors, try 2 of three) and the shelf's board
+  (try 2 of two, its plain middle lengthened to 125 px); the row's small covers, PixelLab's 16 x 22 redraws of each cover's
+  picture without its lettering (the user: "Use the covers without the text"; a first three with lettering were set
+  aside).
+- **The pages:** books 1, 2, 4, 6 and 14 typed by the user from her copies (drop caps and lost quotes mended, the
+  unfinished last sentences left off); book 4's page may break a sentence at its colon (one line short otherwise).
+- **Dropped:** reading while standing (GAME_DESIGN's table); the shelf seen close (earlier today).
+- Generations: about 30 today in all (covers 16, minis 17 with the three set aside, the cat 3, the trolley and shelf 5,
+  the photo 3 and its two small redraws 2). Tests: `boot`, `region2` (now also the trolley's row with two books and the
+  row of found books), `region9` (now also the bookcase slid aside and the nook's armchair with fourteen), `lang` pass;
+  `check_overlaps` 0.

@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "bookcase-dust-puff 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 1.png",
+   "frame": {
+    "x": 20,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 2.png",
+   "frame": {
+    "x": 40,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 3.png",
+   "frame": {
+    "x": 60,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 4.png",
+   "frame": {
+    "x": 0,
+    "y": 21,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 5.png",
+   "frame": {
+    "x": 20,
+    "y": 21,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 6.png",
+   "frame": {
+    "x": 40,
+    "y": 21,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 7.png",
+   "frame": {
+    "x": 60,
+    "y": 21,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 8.png",
+   "frame": {
+    "x": 0,
+    "y": 42,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  },
+  {
+   "filename": "bookcase-dust-puff 9.png",
+   "frame": {
+    "x": 20,
+    "y": 42,
+    "w": 20,
+    "h": 21
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 21
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 21
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": -0.6190476190476191
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "bookcase-dust-puff.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 80,
+   "h": 63
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 10,
+   "y": -13
+  },
+  "frameTags": [
+   {
+    "name": "bookcase-dust-puff",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

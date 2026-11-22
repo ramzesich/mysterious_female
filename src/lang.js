@@ -33,10 +33,15 @@ const TEXTS = {
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
         'hint.read': '← and → to choose, E to read, Esc to get up',
         'hint.read.pad': 'Left stick to choose, X to read, B to get up',
+        // Giving books back at the Library's trolley with more than one on her (the first time the row shows there).
+        'hint.return': '← and → to choose, E to give it back, Esc to keep the rest',
+        'hint.return.pad': 'Left stick to choose, X to give it back, B to keep the rest',
+        // Stamped beside a given-back book's title in the row (the menu's plate lettering: capitals).
+        'book.returned': 'RETURNED',
         // The win screen (§6.4).
         'win.line': 'Bumbot is home.',
-        'win.tally': (found, tangerines, books, photos, slots) =>
-            `Tangerines ${found} of ${tangerines}      Books back on the shelf ${books} of 10      Pictures found ${photos} of ${slots}`,
+        'win.tally': (found, tangerines, books, photos, slots, shelf) =>
+            `Tangerines ${found} of ${tangerines}      Books back on the shelf ${books} of ${shelf}      Pictures found ${photos} of ${slots}`,
         'win.go': 'Press E: the ship is still yours to wander',
         // A lock she has no card for (§6.1.5).
         'lock.card': name => `🔒 ${name} card`,
@@ -62,9 +67,12 @@ const TEXTS = {
         'hint.interact': 'E — взаємодіяти',
         'hint.read': '← і → — вибрати, E — читати, Esc — встати',
         'hint.read.pad': 'Лівий стік — вибрати, X — читати, B — встати',
+        'hint.return': '← і → — вибрати, E — повернути, Esc — залишити решту',
+        'hint.return.pad': 'Лівий стік — вибрати, X — повернути, B — залишити решту',
+        'book.returned': 'ПОВЕРНЕНО',
         'win.line': 'Бумбот удома.',
-        'win.tally': (found, tangerines, books, photos, slots) =>
-            `Мандаринки: ${found} з ${tangerines}      Книжки на полиці: ${books} з 10      Знайдені світлини: ${photos} з ${slots}`,
+        'win.tally': (found, tangerines, books, photos, slots, shelf) =>
+            `Мандаринки: ${found} з ${tangerines}      Книжки на полиці: ${books} з ${shelf}      Знайдені світлини: ${photos} з ${slots}`,
         'win.go': 'Натисни E: корабель і далі твій, гуляй скільки хочеш',
         'lock.card': name => `🔒 ${name} картка`,
         'card.deck': 'Палубна', 'card.ent': 'Розважальна', 'card.hk': 'Господарська', 'card.off': 'Офіцерська',

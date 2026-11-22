@@ -18,7 +18,10 @@ right to left.
 
     python tools/build_covers.py [--preview out.png]
 
-Writes assets/ship/covers/cover-<n>.png (120 x 180; shown at 2x in the middle of the screen when she gets the book).
+Writes assets/ship/covers/cover-<n>.png (120 x 180; shown at 2x in the middle of the screen when she gets the book),
+and mini-<n>.png (18 x 24, the row she chooses from: her cover's picture without its lettering, the same mends, redrawn
+by PixelLab at 16 x 22 (`assets/source/covers/mini/<nn>.png`, the user's word, 2026-11-22: "Use the covers without the
+text") in a 1 px dark outline).
 """
 
 import random
@@ -33,6 +36,7 @@ import pixelzone
 
 ROOT = Path(__file__).resolve().parent.parent
 TRIES = ROOT / "assets" / "source" / "covers" / "tries"
+MINI = ROOT / "assets" / "source" / "covers" / "mini"
 OUT = ROOT / "assets" / "ship" / "covers"
 W, H = 120, 180
 HEBREW = re.compile(r"[֐-׿]")
@@ -256,6 +260,11 @@ def main():
         img = cover(n)
         img.save(OUT / f"cover-{n}.png")
         built.append((n, img))
+        if (MINI / f"{n:02d}.png").exists():
+            mini = Image.new("RGBA", (18, 24), (0, 0, 0, 0))
+            mini.paste((0x2e, 0x22, 0x2f, 255), (1, 1, 17, 23))
+            mini.alpha_composite(Image.open(MINI / f"{n:02d}.png").convert("RGBA"), (1, 1))
+            mini.save(OUT / f"mini-{n}.png")
     print(f"wrote {len(built)} covers to assets/ship/covers/")
     if "--preview" in args and built:
         out = Path(args[args.index("--preview") + 1])

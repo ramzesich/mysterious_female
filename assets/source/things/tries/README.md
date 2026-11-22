@@ -89,3 +89,26 @@ placed in the game for the user, who chose 4 (its legs uneven at the floor at 8x
 | `console-table/try2.png` | A dark mahogany table with a low shelf: a desk, ragged legs | 03ded0bb-488f-4ee5-bf43-0384d1f9342d |
 | `console-table/try3.png` | A tall slim console, four thin legs with brass feet | f281640d-1621-4902-89b3-0fd7671e4cb2 |
 | `console-table/try4.png` | **Used** (`../console-table.png`, trimmed, 32 x 28; the user's): a half-moon console in honey teak on curved legs | 284ced4a-0507-42e5-b810-4e3da6a2a945 |
+
+## The reading nook's cat picture (2026-11-22)
+
+A picture of a black cat asleep on a book for the nook's wall, over its stack of books (it replaced a few drawn shapes
+that did not read). `create_map_object`, side view, 32 x 40, 1 generation each, in `cat-picture/`:
+
+| Try | What | Object id |
+|---|---|---|
+| 1 | **Used**: dark wood frame, the cat curled on a red book (its ear's red made black and its eyes Bumbot's yellow-green #a2a947 by hand: `assets/source/things/cat-picture.png`) | 2a95c608-6027-434b-bbed-a0ce0b0aabc4 |
+| 2 | gold frame, the cat sitting on two books | 0261b657-57ea-4ce3-9cec-bc766dd20e5c |
+| 3 | the cat stretched on an open book | 5bfe38eb-d4aa-4071-9ae5-ebf9eca79c2b |
+
+## The Library's return trolley and the shelf's board (2026-11-22)
+
+In `library/`, `create_map_object`, side view, 1 generation each (the user chose "Both of them: 2"):
+
+| Try | What | Object id |
+|---|---|---|
+| trolley1 | a low cart with a sign (its arrow read as a cross) | ce7c671a-7cef-4d1c-8231-337eaac84d15 |
+| trolley2 | **Used**: a small bookcase on castors (`assets/sprites/book-trolley.png`, 29 x 34) | 4c9bda8e-5f10-4483-a1ab-4138233c46ff |
+| trolley3 | a cart full of books, three-quarters (dropped) | 4a8d890d-58d3-460a-8afb-552c2a899101 |
+| shelf1 | a dark board seen from above | 6eaa6034-2cac-406b-8c05-466917f30601 |
+| shelf2 | **Used**: a thin warm plank, its middle lengthened to 125 px (`assets/sprites/book-shelf.png`) | 1f7439dd-79fc-436c-a588-2d1ba56d0364 |

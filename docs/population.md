@@ -138,7 +138,7 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 | `slot_lighting` | The lighting bridge's end, over the stage | `room_lighting` (red) |
 | `slot_stern` | Deck 7's stern strip, 253, on the stern structure | A drop from deck 8's stern terrace; the socks to climb back |
 | `slot_chapel` | The chapel, on its wall | After the cake |
-| `slot_nook` | The reading nook's wall | All ten books, the odd book |
+| `slot_nook` | The reading nook's wall, over its table | All fourteen books, the odd book (her armchair at home, the user's photo) |
 | `slot_table` | The table with her husband, 216 | A perfect cone for him (the frame stands on the table after) |
 
 ### 2.5 The checkpoints (17)
@@ -420,14 +420,14 @@ leaving the frame (a wink, no trigger).
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 162-166 | `sec_shelf` | The shelf with ten gaps behind the desk | Fills as books come back | Drawn by hand |
+| 162-166 | `sec_shelf` | The shelf with fourteen gaps over the bookcases behind the desk | Fills as books come back | Its board generated |
 | 164 | `npc_librarian` | The librarian at her desk | `static`; bubble (a book and the gapped shelf) within 4 m while any book is out; shelves each book (`scn_shelve`); a finger to her lips when she runs past | Shelve, idle, shush |
 | 167 | `src_trolley` | The return trolley, "RETURN" | E with a book: returned | A trolley |
 | 172 | `sec_chair` | The red reading chair by the window (and `sec_chair_1` to `_6`, the armchairs at the three reading tables; `sec_bed`, her bed) | E: she sits facing us, the books she carries in a row, she chooses one and its first page shows (§2.2, 2026-11-21) | Her two reading clips, fourteen pages |
 | 178 | `bb_2` | Bumbot asleep on the open book on the reading table | `scene` §9.3 | His `asleep` |
 | 184-190 | `sec_ladder` | The rolling ladder on the bookcase | Pushed along 170-192 (the push verb); climbable (ladder) | Drawn |
 | 186 | decor | The chess table, the globe | | Built |
-| 188 | `sec_oddbook` | The odd book on the top shelf | E with all ten shelved: the bookcase swings (`scn_nook`) | |
+| 188 | `sec_oddbook` | The odd book on the top shelf | E with all fourteen shelved: the bookcase slides aside (`scn_nook`) | |
 | 186-192 | `room_nook` | The reading nook behind the bookcase: an armchair, a lamp, a porthole on the sea, `slot_nook`; the reading idle | `room` after `scn_nook` | Drawn by hand |
 | 193 | `cp_library` | The crew door | Checkpoint | Built |
 | 194 | `door_library_aft` + `blk_quiet` | The aft door and its rope stand | Shut until `bb_2` | A rope stand |
@@ -950,7 +950,7 @@ Input locked unless said; each sets its save flag.
     `cp_bridge`; the gulls fly level, to and fro; Bumbot backs off and darts past her until she
     stands still; the fort is put away and four of those she helped clap her in on deck 8; after
     the win screen the game goes on, the day after.*
-12. **`scn_nook`:** E at the odd book with all ten shelved: the bookcase swings open; `room_nook`.
+12. **`scn_nook`:** E at the odd book with all fourteen shelved: it tips, the bookcase shudders with dust and slides aside behind its neighbour; `room_nook` (its armchair: all fourteen to read).
     **`scn_shelve`:** each return: the librarian takes the book to its gap.
 
 ## 7. The ambient cast

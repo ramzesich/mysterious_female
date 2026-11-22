@@ -711,7 +711,7 @@ def scenario_lang(b):
         b.eval(f"{S}.lockedUntil = 0; {S}.showLocked('deck')")
         lock = alert(b)
         b.eval(f"{S}.alert.setVisible(false); {S}.lockedUntil = 0; {S}.world.say({L}.t('say.oops'), 600)")
-        said[code] = (lock, alert(b), b.eval(f"{L}.t('fright.startled')"), b.eval(f"{L}.t('win.tally', 1, 2, 3, 4, 5)"))
+        said[code] = (lock, alert(b), b.eval(f"{L}.t('fright.startled')"), b.eval(f"{L}.t('win.tally', 1, 2, 3, 4, 5, 14)"))
         wait(0.7)
     ok &= check(said["en"][:3] == ("🔒 Deck card", "Oops!", "Oh, sorry!"), "a lock, her word, a fright: in English", said["en"])
     ok &= check(said["ua"][:3] == ("🔒 Палубна картка", "Ой!", "Ой, вибачте!"), "and in Ukrainian", said["ua"])
@@ -2573,15 +2573,35 @@ def scenario_region2(b):
                 js(b, "JSON.stringify(window.__ship.save.books)"))
     ok &= check(not js(b, "window.__ship.world.people.byId.npc_librarian.bubbleItems[0].visible"), "and her bubble is gone")
     b.shot("region2-shelf")
+    # With several books on her, the trolley's row: she chooses which goes back (the user, 2026-11-22).
+    L2 = "window.__ship.world.library"
+    js(b, f"{L2}.got(7); {L2}.got(9)")
+    b.tap("e")
+    wait_js(b, f"!!{L2}.choosing", 3)
+    row = js(b, f"{L2}.choosing && [{L2}.choosing.verb, {L2}.choosing.books]")
+    wait(0.3)
+    b.tap("e")
+    wait_js(b, "window.__ship.save.books['9'] === 'returned'", 5)
+    wait_js(b, f"!!{L2}.choosing", 3)
+    again = js(b, f"{L2}.choosing && {L2}.choosing.books")
+    b.tap("escape")
+    wait(0.8)
+    ok &= check(row == ["return", [7, 9]] and again == [7] and js(b, "window.__ship.save.books['7']") == "held" and b.state()["mode"] == "play",
+                "two books on her: the trolley's row, the chosen goes back, the row again on the other, Esc keeps it", (row, again))
+    js(b, "(s => { delete s.books[7]; delete s.books[9]; s.bookOrder = s.bookOrder.filter(n => n !== 7 && n !== 9); })(window.__ship.save)")
+    js(b, f"{L2}.refresh()")
     # (Reading, the user, 2026-11-21: she sits facing us in the armchair, the books she carries in a row; E reads.)
     L = "window.__ship.world.library"
     js(b, f"{L}.got(6)")
     b.teleport(lib["chair"]["x"], D6)
     b.tap("e")
     wait_js(b, f"!!{L}.choosing", 3)
-    ok &= check(js(b, f"JSON.stringify({L}.choosing && {L}.choosing.books)") == "[6]" and not js(b, "window.__ship.player.visible")
-                and js(b, f"{L}.readingPic.frame.name") == "chair-4",
-                "in the red chair she sits facing us, the book she carries in the row", js(b, f"JSON.stringify({L}.choosing && {L}.choosing.books)"))
+    # (Every book she has found is in the row, a given-back one greyed: the user, 2026-11-22; the chosen one the last she
+    # can read.)
+    ok &= check(js(b, f"JSON.stringify({L}.choosing && {L}.choosing.books)") == "[2,6]" and js(b, f"{L}.choosing.at") == 1
+                and not js(b, "window.__ship.player.visible") and js(b, f"{L}.readingPic.frame.name") == "chair-4",
+                "in the red chair she sits facing us, the books she found in the row (book 2, given back, greyed), on the one she carries",
+                js(b, f"JSON.stringify({L}.choosing && {L}.choosing.books)"))
     js(b, f"(() => {{ {L}.got(2); window.__ship.save.books['2'] = 'returned'; }})()")
     b.tap("e")
     wait_js(b, f"!{L}.choosing && window.__ship.uiLayer.list.some(o => o.texture && o.texture.key === 'page-6')", 3)
@@ -4950,7 +4970,9 @@ def scenario_region9(b):
     wait(0.4)
     b.tap("e")
     b.shot("region9-oddbook")
-    ok &= check(wait_flag(b, "nook", 8), "with all fourteen books back: it tips, and the bookcase swings open", flags(b)[-2:])
+    ok &= check(wait_flag(b, "nook", 8), "with all fourteen books back: it tips, and the bookcase slides aside", flags(b)[-2:])
+    case = b.eval(f"(c => c && c.slide.x - c.home)({S}.world.story.cases)")
+    ok &= check(case is not None and case > 50, "behind the other bookcase, the entrance open where it stood", case)
     b.teleport(N["x"], D6)
     wait(0.3)
     b.tap("e")
@@ -4958,6 +4980,16 @@ def scenario_region9(b):
     b.shot("region9-nook")
     ok &= check(route(b) == "nook", "E in the doorway: the reading nook", route(b))
     ok &= check(b.eval(f"!!{W}.things.find(t => t.id === 'slot_nook')"), "a frame on its wall")
+    # Its armchair: all fourteen to read again (the user, 2026-11-22).
+    chair = b.eval(f"(t => t && [t.x, t.y])({W}.things.find(t => t.id === 'sec_chair_nook'))")
+    b.teleport(chair[0], chair[1], "nook")
+    wait(0.3)
+    b.tap("e")
+    wait_js(b, f"!!{W}.library.choosing", 4)
+    row = b.eval(f"{W}.library.choosing && {W}.library.choosing.books.length")
+    ok &= check(row == 14, "in its armchair, all fourteen books in the row", row)
+    b.tap("escape")
+    wait(1.5)
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
 

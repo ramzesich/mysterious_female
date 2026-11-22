@@ -56,6 +56,17 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
         this.load.json('her-mishaps-meta', 'assets/sprites/her-mishaps.json');
         // The towel stack's own clips (deck 9; tools/build_towels.py): its fall, it on her, her coming up.
+        // The Library's return trolley and the board of the shelf the books go back to (generated: library.js).
+        this.load.image('book-trolley', 'assets/sprites/book-trolley.png');
+        this.load.image('book-shelf', 'assets/sprites/book-shelf.png');
+        // The photo slots' pictures (§6.1.11; E at a slot's frame opens its picture over the screen: world.js's `slot`):
+        // the reading nook's, her armchair at home (the user's photo, cut out, redrawn by PixelLab, recoloured to her greys).
+        for (const id of ['slot_nook']) {
+            this.load.image(`photo-${id}`, `assets/ship/photos/${id}.png`);
+            this.load.image(`thumb-${id}`, `assets/ship/photos/thumb-${id}.png`);     // (on the wall: small, framed)
+        }
+        // A small puff of dust (the Library's bookcase sliding open; assets/source/things/dust-puff/README.md).
+        this.load.spritesheet('dust-puff', 'assets/sprites/dust-puff.png', { frameWidth: 20, frameHeight: 21 });
         this.load.spritesheet('towels', 'assets/sprites/towels.png', { frameWidth: 128, frameHeight: 128 });
         this.load.json('towels-meta', 'assets/sprites/towels.json');
         // Step 4a's first gags (tools/build_gags.py): the door that bursts open (13a), the tray ridden (3),
@@ -82,6 +93,7 @@ export class BootScene extends Phaser.Scene {
             this.load.image(`book-title-${n}`, `assets/ship/pages/title-${n}.png`);
             // (its cover, her own copy's, shown when she gets it: tools/build_covers.py)
             this.load.image(`cover-${n}`, `assets/ship/covers/cover-${n}.png`);
+            this.load.image(`cover-mini-${n}`, `assets/ship/covers/mini-${n}.png`);
         }
         this.load.atlas('reading', 'assets/sprites/reading.png', 'assets/sprites/reading.json');
         this.load.json('reading-meta', 'assets/sprites/reading.json');

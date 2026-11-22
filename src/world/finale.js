@@ -7,7 +7,7 @@
 // are in src/background.js and src/sea.js; her look with him in her arms is the ship scene's
 // (`holding`).
 
-import { PLAYER, VIEW, WIN_MESSAGE } from '../config.js';
+import { PLAYER, VIEW, WIN_MESSAGE, BOOKS } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble } from '../rumble.js';
 import { t, pick } from '../lang.js';
@@ -544,7 +544,7 @@ export const finale = {
             const found = save.collected.filter(id => id.startsWith('tan_')).length;
             const books = Object.values(save.books).filter(b => b === 'returned').length;
             const photos = save.seen.filter(id => id.startsWith('slot_')).length;
-            const tally = s.add.text(cx, 148, t('win.tally', found, T.tangerines, books, photos, T.slots),
+            const tally = s.add.text(cx, 148, t('win.tally', found, T.tangerines, books, photos, T.slots, BOOKS),
                 { fontFamily: 'Verdana, sans-serif', fontSize: '15px', color: '#fdcbb0' }).setOrigin(0.5);
             const message = pick(WIN_MESSAGE);
             const note = s.add.text(cx, 176, message, { ...serif, fontSize: '22px', strokeThickness: 4, fontStyle: 'italic', align: 'center', wordWrap: { width: VIEW.width - 160 } }).setOrigin(0.5, 0);

@@ -97,6 +97,13 @@ export class World {
         const books = new URLSearchParams(location.search).get('books');
         const list = books === 'all' ? Array.from({ length: BOOKS }, (_, i) => i + 1) : (books ?? '').split(',').map(Number);
         for (const n of list) if (n >= 1 && n <= BOOKS && !this.save.books[n]) this.library.got(n);
+        // (`books_all` means every book is back: the shelf full, as in play, the HUD counting fourteen.)
+        if (this.save.flags.includes('books_all')) {
+            for (let n = 1; n <= BOOKS; n++) {
+                this.library.got(n);
+                this.save.books[n] = 'returned';
+            }
+        }
         this.makeTextures();
         this.buildRooms();
         this.buildOutside();
@@ -1209,7 +1216,9 @@ export class World {
             case 'slot': {
                 // A photo slot (§6.1.11): a framed picture in a secret place; E opens it full screen.
                 this.library.textures();
-                const img = s.add.image(e.x, e.y - (e.dy ?? 56), 'photo-frame').setDepth(depth + 0.01);
+                // (its own picture small in a frame, where it has one: `thumb-<id>`; the gold frame with a heart otherwise)
+                const img = s.add.image(e.x, e.y - (e.dy ?? 56), s.textures.exists(`thumb-${e.id}`) ? `thumb-${e.id}` : 'photo-frame')
+                    .setDepth(depth + 0.01);
                 this.add([img]);
                 this.things.push({ ...e, items: [img], reach: 16, interact: () => {
                     this.cut(async () => {

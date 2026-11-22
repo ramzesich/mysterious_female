@@ -710,7 +710,7 @@ GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "
 # Photo slots (population §2.4): id: (where, m or x, px up).
 SLOTS = {"slot_lifeboat": ("lifeboat", 228, 50),     # (where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21) "slot_lighting": ("lighting", 446, 62),
          # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
-         "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 176, 70),
+         "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 152, 70),
          "slot_table": (11, 220.0, 36, "flag:table"),
          # On the wall of deck 8's first balcony of all, at the forward end of the row (the plan's
          # `slot_stern`: the stern's terraces are out of sight behind its plating).
