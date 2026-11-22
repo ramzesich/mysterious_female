@@ -4875,14 +4875,14 @@ def scenario_region9(b):
     b.shot("region9-slide")
     s = hold_until(b, [], lambda s: s["mode"] == "swim", 5)
     ok &= check(s["mode"] == "swim" and "sec_slide" in seen(), "E at the slide: down it and into the kids' pool", s)
-    # The spa (deck 11): open now; the steam at the sauna's aft door.
+    # The spa (deck 11): open now; the steam up from the sauna's coals (the user, 2026-11-22: no longer out of its door).
     b.teleport(exact_x(74) + 16, D11)
     b.tap("e")
     wait(0.2)
     ok &= check(door_open(b, "spa-door"), "the spa's door opens from the lobby now")
     st = B["steam"]
-    b.teleport(st["x"] + 30, D11)
-    ok &= check(scared(b, "Pfff", 7.0), "in the way of the sauna's steam: fogged")
+    b.teleport(st["x"], D11)
+    ok &= check(scared(b, "Pfff", 7.0), "by the sauna's stove as its steam rises: fogged")
     # (Her gag, 17: out of the burst with her hair a huge puff, she fans herself, swoons and sits;
     # then her checkpoint.)
     GAG = "window.__ship.world.movers.find(m => m.constructor.name === 'Steam').pic"

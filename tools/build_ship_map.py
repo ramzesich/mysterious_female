@@ -1040,7 +1040,7 @@ def build_objects():
     # (His sleep mask, 14: deck 10's first balcony, aft of its long lounger; the mask is there after the table scene.)
     add(point("mask10", "place", 3610, floor_y(10), [prop("route", "promenade")]))
     # (17: deck 11's spa, between the sauna's aft door and the salon's wall, the steam's way.)
-    add(point("steam11", "place", exact_x(54.6), floor_y(11)))
+    add(point("steam11", "place", exact_x(50.2), floor_y(11)))   # (in the sauna, forward of its stove: the steam rises from its coals)
     # (7a: deck 11, forward of the wet patch: walk aft onto it, the chair comes at her head on.)
     add(point("wet7a", "place", exact_x(148.5), floor_y(11)))
     # (The soft serve machine, deck 11's Great Outdoors: a cone to carry forward to the pool's gulls.)

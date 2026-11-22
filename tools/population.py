@@ -919,14 +919,16 @@ FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 
 # The Spinnaker's piano (`sec_piano`: where she stands at its keys); the kids' pool's slide
 # (`sec_slide`); the captain's door (`sec_captain`: deck, m of a cabin door); the odd book on the
 # Library's bookcase (`scn_nook`: deck, m, px up).
-# The sauna's steam (`haz_steam`): out of its aft door every `every` s for `on` s, over `reach` m.
+# The sauna's steam (`haz_steam`; the user, 2026-11-22: no longer out of its aft door): up from the stove's coals (`stove`,
+# m) inside the sauna (its walls at `walls`), every `every` s for `on` s after a tell of `tell` s, a column `half` m either
+# side of the stove's middle, spreading under the ceiling; a timing obstacle to pass, as the sprinkler.
 # The step class's boards (m, in front of each stepper). The ball pit (`haz_ballpit`: from, to).
 # The bridge's beat (`bb_6`): where the security officer swings from, the alarm panel his net
 # lands on, where he sits after.
 BOW = dict(
     wedding=dict(deck=12, planner=83.25, chapel=68.6, look=76.6),
     piano=(12, 53.02), slide=dict(deck=12), captain=(9, 30), nook=dict(deck=6, m=189.4, up=44),
-    steam=dict(deck=11, door=52.9, reach=1.6, every=5.0, on=1.5, tell=0.7),
+    steam=dict(deck=11, stove=51.7, walls=(47.9, 52.9), half=0.3, every=4.6, on=1.6, tell=0.8),
     steps=[(11, 68.2), (11, 69.8)],
     pit=dict(deck=7, a=49.3, b=53.7, tangerine="tan_7_ballpit"),
     bridge=dict(deck=10, swat=30.55, panel=31.85, sit=30.7, a=28.4, b=40.0),

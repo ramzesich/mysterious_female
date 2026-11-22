@@ -510,8 +510,11 @@ def build_world():
                    poolX=slide_x0 - 30),
         captain=dict(x=slot_x(cap_deck, cap_m), y=B.floor_y(cap_deck)),
         nook=dict(x=B.exact_x(BOW["nook"]["m"]), y=B.floor_y(BOW["nook"]["deck"]), up=BOW["nook"]["up"]),
-        steam=dict(id="haz_steam", x=B.exact_x(st["door"]), y=B.floor_y(st["deck"]), x1=B.exact_x(st["door"] + st["reach"]),
-                   period=st["every"], on=st["on"], tell=st["tell"]),
+        # (Inside the sauna: its walls' inner faces, 6 px from their middles, and its ceiling's beam, 122 px over the floor;
+        # the stove's coals 26 px over it.)
+        steam=dict(id="haz_steam", x=B.exact_x(st["stove"]), y=B.floor_y(st["deck"]), half=round(st["half"] * B.PER_M * B.TILE),
+                   x0=B.exact_x(st["walls"][0]) + 6, x1=B.exact_x(st["walls"][1]) - 6, top=B.floor_y(st["deck"]) - 122,
+                   coals=26, period=st["every"], on=st["on"], tell=st["tell"]),
         steps=[dict(x=B.exact_x(m), y=B.floor_y(deck)) for deck, m in BOW["steps"]],
         pit=dict(id="haz_ballpit", x0=B.exact_x(pit["a"]), x1=B.exact_x(pit["b"]), y=B.floor_y(pit["deck"]),
                  tangerine=pit["tangerine"],

@@ -18,15 +18,17 @@ const HALF = PLAYER.height / 2;
 const near = (s, x, y, dx = 900, dy = 320) => Math.abs(s.player.x - x) < dx && Math.abs(s.player.y - y) < dy;
 const BALLS = [0xe83b3b, 0xf9c22b, 0x4d9be6, 0x1ebc73, 0x905ea9, 0xf68181];
 
-// The sauna's steam (population: `haz_steam`): every few seconds a cloud of it rolls out of the
-// sauna's aft door over the way past: "Fogged" (a tray is spilled). Wisps at the door's top and a
-// hiss are the tell.
+// The sauna's steam (population: `haz_steam`; the user, 2026-11-22: no longer rolling out of its aft door): up from the
+// stove's coals inside the sauna, on a clock, a timing obstacle to pass as the sprinkler is. The tell: the coals glow
+// and hiss, a few wisps curl up off them. Then a column of it rises from the coals to the ceiling and spreads under it,
+// thinning; every puff kept inside the sauna's walls and under its ceiling (`x0`, `x1`, `top`: nothing of it outside).
+// Caught in the column by the stove: "Fogged" (a tray is spilled), her gag 17 there in the sauna, then her checkpoint.
 export class Steam {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { x: the door, y, x1: how far it rolls, period, on, tell }
+        this.def = def;             // { x: the stove's middle, y: the floor, half, x0, x1, top, coals, period, on, tell }
         this.g = s.add.graphics().setDepth(D.player + 0.04);
         world.add([this.g]);
         this.hitAt = 0;
@@ -40,10 +42,17 @@ export class Steam {
         return ['calm', 0];
     }
 
+    // A puff of steam, cut to fit inside the sauna: never past its walls or over its ceiling.
+    puff(g, x, y, r, colour, alpha) {
+        const d = this.def;
+        r = Math.min(r, x - d.x0, d.x1 - x, y - d.top);
+        if (r >= 1 && alpha > 0) g.fillStyle(colour, alpha).fillCircle(x, y, r);
+    }
+
     // 17, the ship scene's `thingGag` (`gags` sheet, tools/build_gags.py): a burst of the steam wraps
-    // her where she is (from her run she slides to a stop, `slideMs`), and under it she is in her
-    // puff picture; it thins (`clearMs`): her hair frizzed into a huge puff, she fans herself and
-    // swoons, sitting down dazed; then her checkpoint.
+    // her where she is (from her run she slides to a stop, `slideMs`, short of the sauna's doors), and under it she is in
+    // her puff picture; it thins (`clearMs`): her hair frizzed into a huge puff, she fans herself and swoons, sitting down
+    // dazed; then her checkpoint.
     ride() {
         const s = this.scene, d = this.def, p = s.player, g = GAGS.steam;
         return {
@@ -54,9 +63,8 @@ export class Steam {
                     .setOrigin(0.5, m.floor / m.cell).setFlipX(dir < 0).setDepth(p.depth);
                 this.world.add([pic]);
                 this.pic = pic;
-                // (Doors and walls stop her slide; and under the burst she is set clear of the
-                // sauna's door, `clear` px aft of it, where the steam comes out.)
-                const x0 = pic.x, end = Math.max(d.x + g.clear, s.stopShort(pic.x, pic.x + dir * v * g.slideMs / 2000, d.y, 16));
+                // (Doors and walls stop her slide: she stays in the sauna.)
+                const x0 = pic.x, end = s.stopShort(pic.x, pic.x + dir * v * g.slideMs / 2000, d.y, 16);
                 this.burst = { x: pic.x, t: 0 };
                 // (Drawn at once: she is in her puff picture from this very frame.)
                 this.drawBurst(this.g);
@@ -88,7 +96,7 @@ export class Steam {
         };
     }
 
-    // The burst round her (17): thick to `coverMs`, then thinning and rising over `clearMs`.
+    // The burst round her (17): thick to `coverMs`, then thinning and rising over `clearMs`; inside the sauna's walls.
     drawBurst(g) {
         const b = this.burst, G = GAGS.steam;
         if (!b) return;
@@ -99,8 +107,7 @@ export class Steam {
         for (let i = 0; i < 15; i++) {
             const ox = (i % 3 - 1) * 15 + ((i * 7) % 5) - 2, oy = 8 + Math.floor(i / 3) * 17 + ((i * 11) % 5);
             const r = 13 + ((i * 13) % 5) + k * 8;
-            g.fillStyle(i % 4 ? 0xffffff : 0xc7dcd0, a)
-                .fillCircle(b.x + ox * (1 + k * 0.6), y - oy - k * 26 + Math.sin(b.t / 200 + i) * 2, r);
+            this.puff(g, b.x + ox * (1 + k * 0.6), y - oy - k * 26 + Math.sin(b.t / 200 + i) * 2, r, i % 4 ? 0xffffff : 0xc7dcd0, a);
         }
     }
 
@@ -116,33 +123,52 @@ export class Steam {
             this.blown = false;
             return;
         }
-        const top = d.y - 112;
+        const coals = d.y - d.coals;
         if (phase === 'tell') {
             if (!this.told) {
                 this.told = true;
                 sfx.at(d.x, d.y).steam(0.3);
             }
-            // Wisps curling out over the door's top.
+            // The coals glow, and wisps curl up off them.
+            for (let i = 0; i < 6; i++) {
+                const glow = 0.5 + 0.5 * Math.sin(time / 90 + i * 1.7);
+                g.fillStyle(i % 2 ? 0xfb6b1d : 0xf9c22b, 0.55 * glow).fillRect(d.x - 9 + i * 3, coals - 1 + (i % 2), 2, 1);
+            }
             for (let i = 0; i < 5; i++) {
-                const a = (time / 300 + i * 0.23) % 1;
-                g.fillStyle(0xffffff, 0.7 * (1 - a)).fillCircle(d.x + 4 + a * 16 + Math.sin(i * 2.1) * 3, top + 6 - a * 10 + i * 2, 2 + a * 3);
+                const a = (time / 420 + i * 0.21) % 1;
+                this.puff(g, d.x - 6 + i * 3 + Math.sin(time / 200 + i * 2.1) * 2, coals - 4 - a * 22, 1.5 + a * 2.5, 0xffffff, 0.7 * (1 - a) * k);
             }
             return;
         }
-        // The cloud: out of the door, rolling aft and up, thinning.
+        // The column: up from the coals to the ceiling, then out under it toward the walls, thinning as it goes.
         if (!this.blown) {
             this.blown = true;
-            sfx.at(d.x, d.y).steam(Math.max(0.3, d.on * (1 - k)));
+            sfx.at(d.x, d.y).steam(Math.max(0.3, d.on));
         }
         const env = k < 0.15 ? k / 0.15 : k > 0.7 ? Math.max(0, (1 - k) / 0.3) : 1;
-        const reach = (d.x1 - d.x) * Math.min(1, k * 2.4 + 0.25);
-        for (let i = 0; i < 16; i++) {
-            const f = ((i * 0.618 + time / 900) % 1);
-            const x = d.x + 4 + f * reach, y = d.y - 14 - ((i * 37) % 80) - Math.sin(time / 240 + i) * 5 - f * 10;
-            g.fillStyle(i % 3 ? 0xffffff : 0xc7dcd0, (0.75 - f * 0.35) * env).fillCircle(x, y, 9 + ((i * 13) % 8) + f * 6);
+        // (Dispersing to the sides as it rises, not only up (the user, 2026-11-22): each puff drifts out to its own side,
+        // the higher the further, a cone; `puff` keeps it inside the walls.)
+        const rise = coals - d.top, up = rise * Math.min(1, k * 3 + 0.2);
+        for (let i = 0; i < 26; i++) {
+            const f = (i * 0.618 + time / 700) % 1;             // how far up this puff is, 0 at the coals
+            if (f * rise > up) continue;
+            // (its own way out, -1 to 1, scattered: a sequence in step with `f` lined the puffs up in one leaning curve)
+            const side = ((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1 * 2 - 1;
+            const y = coals - f * rise * (0.85 + 0.15 * Math.abs(side));
+            const x = d.x + side * Math.sqrt(f) * 64 + Math.sin(time / 230 + i * 1.3) * (2 + f * 4);
+            this.puff(g, x, y, 5 + f * 8 + ((i * 13) % 4), i % 3 ? 0xffffff : 0xc7dcd0, (0.8 - f * 0.35) * env);
         }
+        // (Under the ceiling, once it is up there: spreading toward both walls.)
+        const spread = Math.max(0, k * 3 + 0.2 - 1) / 1.2;
+        for (let i = 0; i < 14 && spread > 0; i++) {
+            const f = ((i * 0.381 + time / 1100) % 1) * Math.min(1, spread);
+            const side = i % 2 ? 1 : -1, reach = side > 0 ? d.x1 - d.x : d.x - d.x0;
+            const x = d.x + side * f * reach, y = d.top + 10 + ((i * 7) % 12) + Math.sin(time / 260 + i) * 2;
+            this.puff(g, x, y, 8 + ((i * 11) % 5) + f * 4, i % 3 ? 0xffffff : 0xc7dcd0, (0.6 - f * 0.4) * env);
+        }
+        // Caught in the column by the stove.
         if (env < 0.6 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
-        if (p.x < d.x + 2 || p.x > d.x + reach - 6 || Math.abs(p.y - d.y) > 80) return;
+        if (Math.abs(p.x - d.x) > d.half + 6 || Math.abs(p.y - d.y) > 80) return;
         this.hitAt = time + 1500;
         if (this.world.carry) this.world.carryBox.spill(d.x, false, 'steam');
         else s.scareContact(d.x, 'steam', { ride: this.ride() });

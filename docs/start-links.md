@@ -120,7 +120,7 @@ new one added there should be added here too.
 | `wet`: deck 11, aft of the wet patch and its deck chair (walk forward past the chair onto the tiles: she slides away from it) | <http://localhost:8000/?play&at=wet> |
 | `wet7a`: deck 11, 2.5 m forward of the wet patch (walk aft onto it: she slides into the chair, 7a) | <http://localhost:8000/?play&at=wet7a> |
 | `icecream`: deck 11's Great Outdoors, by the soft serve machine (E and hold, let go in the green: a cone; carry it forward to the kid on the aft pool deck, about 65 m, before it melts in 45 s; he is there once Bumbot's near-catch 5 at the hot tub is done, `did=bb5`) | <http://localhost:8000/?play&at=icecream&did=bb5> |
-| `steam11`: deck 11's spa, aft of the sauna's door, just short of the steam's reach (walk forward into it as it rolls out, or stand in it: 17) | <http://localhost:8000/?play&at=steam11> |
+| `steam11`: deck 11's spa, inside the sauna forward of its stove (walk aft past the stove as its steam rises from the coals, or stand in it: 17) | <http://localhost:8000/?play&at=steam11> |
 | `jet11`: deck 11, at the pool attendant's hut on the aft pool's rim (walk aft at the kid: his jet in her face, 11a; past him, in her back, 11b; he is there once near-catch 5 is done, `did=bb5`) | <http://localhost:8000/?play&at=jet11&did=bb5> |
 
 ## Deck 12

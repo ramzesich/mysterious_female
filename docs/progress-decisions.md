@@ -4192,3 +4192,20 @@ valuable."
 - Tests: `region9` with a new case `region9.massage` (the guest's table: the sauna, the gun, her return; the empty
   table: he comes, she waits, no second gun), `boot`, `tools/check_overlaps.py` (0) pass. Not run: the rest of the suite.
 
+## The sauna's steam from its coals (the user, 2026-11-22)
+
+- **The user's:** the steam gag at the sauna's door removed; the steam rises from the coals inside the sauna instead, "no
+  overlaps and leaking of steam outside", a timing obstacle like the sprinkler; caught, her gag inside the sauna and her
+  checkpoint.
+- **Built** (`Steam` in `src/world/bow.js`; `BOW["steam"]` in `tools/population.py`: the stove at 51.7 m, the walls at
+  47.9 and 52.9, every 4.6 s, 1.6 s on, a 0.8 s tell): the tell, the coals glowing and a few wisps with the hiss; then
+  the steam up from the coals to the ceiling and out under it toward the walls, thinning. Every puff, the burst round her
+  too, is cut to fit inside the walls' inner faces and under the ceiling's beam (`puff`): nothing of it outside. Caught
+  within 20 px of the stove's middle: "Fogged", gag 17 where she is (her slide stops short of the sauna's doors), then her
+  checkpoint; a tray spills as before. The guest on the sauna's bench (49.6 m, the massage scene) is clear of it.
+- **The user, on the GIF previews:** "make the steam disperse more to the sides, not only up": each puff drifts out to its
+  own side as it rises, wider the higher (a scattered side for each: a sequence in step with its height lined them up
+  in one curve), about 64 px either side near the top. GIFs recorded from the game's own renderer on the stepped clock.
+- `?at=steam11` now starts inside the sauna, forward of the stove. Tests: `region9` (by the stove as the steam rises:
+  fogged; the fan and the swoon) passes. Not run: the rest of the suite.
+
