@@ -4244,3 +4244,5 @@ valuable."
   into the room, the bed drawn again over him (`assets/ship/cabin-8206-bed.png`, the room's own pixels where
   `tools/draw_cabin.py` draws the bed; a `carry` in front of him), under her and Bumbot. Tests: `finale` passes.
 
+- **Merged:** `main` fast-forwarded to `three-uses` (3fb257b: his table and his cabin seat) and pushed, on the user's
+  word (2026-11-22).
