@@ -2,6 +2,9 @@
 // visible world is 480x270 inside a 960x540 canvas (GAME_DESIGN.md §2.1, §5.4).
 
 export const VIEW = { width: 960, height: 540, zoom: 2 };
+// What cabin 8206's desk shows seen close, each from its find (`keep:her:<name>`, `keep:him:<name>`; §4 2.4): drawn
+// in this order, the back row first (tools/build_desk.py).
+export const DESK_THINGS = ['flag', 'plant', 'bookmark', 'diary', 'tshirt', 'sleepmask', 'handheld', 'pick'];
 
 // She is 59px tall (her PixelLab sprite), so decks are 144px and a deck's ceiling sits at ~2.2x her
 // height (§5.4). Everything human-sized on board is sized to her, not to the ship.

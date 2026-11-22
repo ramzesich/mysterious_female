@@ -167,9 +167,6 @@ TANGERINES = {
     "tan_7_splash": (7, 41.2, 1, 20, None),
     "tan_7_ballpit": (7, 52.4, 1, 0, None),
 }
-# Tangerines gone from a moment on, picked up or not (`until`, a condition as a thing's): cabin 8206's on the day
-# after (the user, 2026-11-22: "on the day after, the tangerines won't be there anymore").
-TANGERINES_UNTIL = {"tan_8_8206": "flag:home"}
 
 # --- Pickups ---------------------------------------------------------------------------------------
 # id: (deck or room, m or x, what she gets, needs flag[, px up on a piece already there[, the atlas

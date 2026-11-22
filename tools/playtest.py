@@ -1109,6 +1109,19 @@ def scenario_cabin(b):
     wait(0.8)
     ok &= check(route() == "inside", "E at the door takes her back out", route())
     b.shot("cabin-door")
+    # Its desk seen close (§4 2.4): E at it any time, the bare desk with nothing found, her things and his as found.
+    desk = "(() => { const s = window.__ship; const k = s.textures.exists('desk-seen') && s.textures.get('desk-seen').getSourceImage(); return [!!s.viewing, k ? k.width : 0]; })()"
+    for q, what in (("", "nothing found: the bare desk"), ("&keeps=flag,pick", "two found"), ("&did=catch,home&keeps=desk", "all eight, the day after")):
+        b.open("?reset&play&at=cabin" + q)
+        b.teleport(door + 51, floor_y(8))
+        b.eval("window.__ship.route = 'cabin'")
+        b.tap("e")
+        wait(0.6)
+        got = b.eval(desk)
+        ok &= check(got == [True, 400], f"E at the desk shows it close ({what})", got)
+        b.tap("e")
+        wait(0.6)
+        ok &= check(not b.eval("window.__ship.viewing"), "  and a key closes it", None)
     return ok
 
 

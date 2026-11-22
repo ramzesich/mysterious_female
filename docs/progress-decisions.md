@@ -4096,3 +4096,25 @@ valuable."
   while the screen is black, not counted. Tests: `boot`, `cabin`, `finale` pass.
 - The desk's eight (2.4): two layouts shown (A: his on the desk unit, hers on the window sill; B: hers on the shelf,
   his on the bed); the user is deciding with the day after's whole arrangement (the bed's reading spot stays free).
+
+## §4 2.4, the desk seen close (the user, 2026-11-22)
+
+- **Correction to the entry above:** the user then chose to keep cabin 8206's tangerines on the day after if not picked
+  up ("since we're not putting anything on the desk"); the removal (`TANGERINES_UNTIL`, `dropTangerines`) is gone.
+- **The eight do not fit the room** (the desk 36 px, half of it the phone; two layouts on the shelf, the sill and the bed
+  shown; the bed's reading spot must stay free): the user chose **the desk seen close**. E at the desk (`sec_desk`, the
+  cabin picture's column 110) shows, over the dim at 2x, a picture of the desk under the TV's lower edge, her four
+  things and his four each from its find (`save.keeps`), **the bare desk where one is not found, and with none** (the
+  user: "On None, show empty desk"); **any time she is in the cabin** (the user), Bumbot in her arms too (`look`: looking
+  needs no hand; the evening of the catch is a scene the moment she enters, so in play that is the day after).
+- **Its picture:** a rough of the approved close-ups shrunk smoothly on a desk drawn in code (the user chose the first of
+  two: each close-up at its own scale, not true sizes; the TV made a TV, centred, only its lower part), redrawn by
+  PixelLab `image_to_pixelart` 400 x 225 (try 1 of three, 3 generations), two stray marks on the mask taken out; his
+  shirt's two words kept as the redraw's smudge (drawn as strokes they read as a barcode). **The bare desk by rule**: its
+  wall, back edge, top, edge and front are flat colours, so each thing's box is filled along its row (free, exact, no
+  inpaint); each thing is what differs from it in its box (the mask and the handheld split by colour, the flag's stand
+  and the shirt's sleeve by the nearer box, a 2 px bit of the back edge given back to the desk); bare + all eight is
+  the redraw exactly. `tools/build_desk.py` to `assets/ship/desk/`; `world.deskSeen()`, `library.panel(key, { scale })`;
+  `DESK_THINGS` in the config; `?keeps=flag,pick` or `desk` for testing.
+- Tests: `boot`, `cabin` (now also E at the desk: none, two, all eight the day after, a key closing it), `finale`,
+  `region2` pass.

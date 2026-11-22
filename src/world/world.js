@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -97,6 +97,12 @@ export class World {
         const books = new URLSearchParams(location.search).get('books');
         const list = books === 'all' ? Array.from({ length: BOOKS }, (_, i) => i + 1) : (books ?? '').split(',').map(Number);
         for (const n of list) if (n >= 1 && n <= BOOKS && !this.save.books[n]) this.library.got(n);
+        // ?keeps=flag,pick (or `desk`: all eight of hers and his): those found from the start (README; for testing the desk).
+        const keeps = new URLSearchParams(location.search).get('keeps');
+        for (const k of keeps === 'desk' ? DESK_THINGS : (keeps ?? '').split(',')) {
+            const what = `keep:${['flag', 'plant', 'bookmark', 'diary'].includes(k) ? 'her' : 'him'}:${k}`;
+            if (DESK_THINGS.includes(k) && !this.save.keeps.includes(what)) this.save.keeps.push(what);
+        }
         // (`books_all` means every book is back: the shelf full, as in play, the HUD counting fourteen.)
         if (this.save.flags.includes('books_all')) {
             for (let n = 1; n <= BOOKS; n++) {
@@ -1301,7 +1307,6 @@ export class World {
     placeTangerine(e) {
         const s = this.scene, D = s.DEPTH;
         if (this.save.collected.includes(e.id)) return;
-        if (e.until && this.cond(e.until)) return;
         let y = e.y;
         if (e.on === 'table') {
             if (e.first) {
@@ -1316,19 +1321,7 @@ export class World {
         } else {
             y -= e.on;
         }
-        const t = s.addTangerine(e.id, e.x, y, e.route);
-        if (t && e.until) t.until = e.until;
-    }
-
-    // Tangerines whose time is over leave, picked up or not (`until`: cabin 8206's on the day after). Not counted.
-    dropTangerines() {
-        const s = this.scene;
-        s.tangerines = (s.tangerines || []).filter(t => {
-            if (!t.until || !this.cond(t.until)) return true;
-            t.glint.destroy();
-            t.sprite.destroy();
-            return false;
-        });
+        s.addTangerine(e.id, e.x, y, e.route);
     }
 
     // E at a pickup: a verb, a book, a pocket item. (Nothing says how a verb is used: no hint
@@ -1452,6 +1445,25 @@ export class World {
         this.closeup(undefined, null, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
     }
 
+    // Cabin 8206's desk seen close: the bare desk, and on it each of her things and his she has found, in its place
+    // (`assets/ship/desk/`, tools/build_desk.py), at 2x over the dim, until any key. Nothing found yet: the bare desk
+    // (the user, 2026-11-22).
+    deskSeen() {
+        const s = this.scene;
+        const found = DESK_THINGS.filter(k => this.save.keeps.some(w => w.endsWith(`:${k}`) && /^keep:(her|him):/.test(w)));
+        if (s.viewing) return false;
+        const bare = s.textures.get('desk-bare').getSourceImage(), L = s.cache.json.get('desk-layout');
+        if (s.textures.exists('desk-seen')) s.textures.remove('desk-seen');
+        const tex = s.textures.createCanvas('desk-seen', bare.width, bare.height), ctx = tex.getContext();
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(bare, 0, 0);
+        for (const k of found) ctx.drawImage(s.textures.get(`desk-${k}`).getSourceImage(), L[k][0], L[k][1]);
+        tex.refresh();
+        s.viewing = true;
+        this.library.panel('desk-seen', { scale: 2 }).then(() => { s.viewing = false; });
+        return true;
+    }
+
     // The scripted places that are not rooms: the pool's hatch, the stage's trap door, the linen
     // room's chute.
     buildSpecials() {
@@ -1466,6 +1478,11 @@ export class World {
             // (Her own cabin's door is a checkpoint: population §2.5, `cp_8206`.)
             const own = s.rooms.find(r => r.route === 'cabin');
             if (own) s.addCheckpoint('cp_8206', own.door, own.floor, { door: null });
+            // Its desk (the cabin picture's columns 92 to 128): E there shows it close, her things and his on it as she
+            // finds them (the user, 2026-11-22: the room has no space for the eight at the game's size).
+            // (Any time she is in the cabin, whatever the story's moment, Bumbot in her arms too: `look`; the user.)
+            if (own) this.things.push({ id: 'sec_desk', x: own.door - 59 + 110, y: own.floor, route: 'cabin', items: [], reach: 16, look: true,
+                interact: () => this.deskSeen() });
             // The laundry chute's hatch, low in the wall by the door (drawn in the room's picture):
             // E, and down she goes to the laundry on deck 4 (population: `scn_chute`).
             this.things.push({ id: 'chute', x: this.data.linen.chuteX, y: linen.floor, route: 'linen', items: [], reach: 16,
@@ -2203,10 +2220,10 @@ export class World {
     // E: a cart's end, a pickup, a switch, a hatch.
     interact() {
         const s = this.scene, p = s.player;
-        if (s.holding) return false;        // Bumbot in her arms: no hand for anything
-        if (this.story.interact()) return true;
+        // Bumbot in her arms: no hand for anything, but she can still look (`look`: cabin 8206's desk seen close).
+        if (!s.holding && this.story.interact()) return true;
         for (const t of this.pushables) {
-            if (this.carry) break;          // her hands are full
+            if (this.carry || s.holding) break;          // her hands are full
             if (t.route !== s.route || Math.abs(p.y - t.y) > 4 || (t.flag && this.progress.has(t.flag) && !t.free)) continue;
             if (!this.met(t.needs)) continue;
             const side = p.x < t.x ? -1 : 1;
@@ -2217,7 +2234,7 @@ export class World {
             if (Math.abs(Math.abs(p.x - t.x) - end) < 10) return s.startPush(t);
         }
         for (const t of this.things) {
-            if (!t.interact || t.done || !this.shown(t)) continue;
+            if (!t.interact || t.done || !this.shown(t) || (s.holding && !t.look)) continue;
             if (Math.abs(p.x - t.x) > (t.reach ?? 18)) continue;
             // (`from`: taken only standing that high, the plant from the maid's bed; else from the floor or up there.)
             if (t.from != null ? Math.abs(p.y - (t.y - t.from)) > 4 : (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;

@@ -17,7 +17,7 @@ from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
-                        SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TANGERINES_UNTIL, TRAPDOOR_LANDS, TRAPDOOR_M)
+                        SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
@@ -159,7 +159,7 @@ def build_world():
         for k in range(count):
             ents.append(dict(kind="tangerine", id=tid if count == 1 else f"{tid}#{k}", x=x + k * 9 - (count - 1) * 4, y=y,
                              route=route, on="table" if on in ("table", "out") else int(on), needs=needs or "",
-                             first=k == 0, **({"until": TANGERINES_UNTIL[tid]} if tid in TANGERINES_UNTIL else {})))
+                             first=k == 0))
 
     for iid, (where, at, what, needs, *on) in ITEMS.items():
         x, y, route = spot(where, at)

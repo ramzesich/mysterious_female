@@ -431,9 +431,14 @@ at 12%): not part of this item.
 
 ### 2.4 Cabin 8206's desk, the day after, the counts (medium; little art)
 
-- **The desk:** his four and her four, each a prop shown from its own find on. **First the
+- ~~**The desk:** his four and her four, each a prop shown from its own find on. **First the
   picture of the desk with all eight, shown to the user**; if it is crowded, some of hers go by
-  the bed (`tools/draw_cabin.py` for where the desk's top is).
+  the bed (`tools/draw_cabin.py` for where the desk's top is).~~ **BUILT 2026-11-22, otherwise (the user's):** the room
+  has no space for the eight at the game's size (two layouts in the room shown, "the things can't be arranged there
+  properly"), so **the desk seen close**: E at the desk, any time she is in the cabin (Bumbot in her arms too), shows a
+  generated picture of it (the TV's lower edge over it) over the whole screen, each of the eight from its find, bare
+  desk where one is not yet found, and with none (`tools/build_desk.py`, `assets/source/closeups/desk/`, `world.deskSeen()`,
+  `?keeps=`). The room's desk keeps its two tangerines, moved onto its top (they stay till picked up).
 - **The day after:** Bumbot's eight laid out with him (`src/world/finale.js`).
 - **The HUD:** **BUILT 2026-11-20** (the user's design; `docs/progress-decisions.md`, "The HUD redone"):
   each count appears with its first find, the kinds as faces (Bumbot's, hers, her husband's) and the book, in
@@ -678,8 +683,8 @@ game; over 60 the count means nothing. No tangerine is added or dropped; one pai
 
 Small shifts, no art: `tan_6_windjammer` and `tan_12_spinnaker` lie on the barkeeper's hands and chest (along the
 counter, clear of them); `tan_8_8206`'s two lie loose on the desk, one over a dark object (the plan's "welcome basket":
-prop B there). (**2026-11-22, the user:** moved onto the desk's top, right of the phone, and gone on the day after;
-the bowl may still come with prop B.) Everything else was looked at and is right as it is.
+prop B there). (**2026-11-22, the user:** moved onto the desk's top, right of the phone; they stay on the day after if
+not picked up; the bowl may still come with prop B.) Everything else was looked at and is right as it is.
 
 **The cause of 4 and 8 to 12:** the `sidetable` picture (`src/textures.js`) is an early placeholder drawn in code, a top
 and two thin legs. `placeTangerine` in `src/world/world.js` stands it under every `"table"` tangerine inside, the `item`

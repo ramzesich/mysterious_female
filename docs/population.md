@@ -108,7 +108,7 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | 6 | 142 | `tan_6_windjammer` | The Windjammer's bar | 1 |
 | 7 | 160 | `tan_7_jackpot` | The jackpot machine (`sec_jackpot`) | 2 |
 | 7 | 180 | `tan_7_tradewinds` | A gift basket in Tradewinds | 1 |
-| 8 | 41.4 | `tan_8_8206` | On cabin 8206's desk, right of the phone (the welcome basket: prop B, §7d); gone on the day after, picked up or not (`TANGERINES_UNTIL`) | 2 |
+| 8 | 41.4 | `tan_8_8206` | On cabin 8206's desk, right of the phone (the welcome basket: prop B, §7d); still there on the day after if not picked up (the user, 2026-11-22) | 2 |
 | 8 | 246 | `tan_8_aft` | A room-service tray by a door, deck 8 aft | 1 |
 | 8 (out) | 100 | `tan_8_balc_fwd` | A balcony table | 1 |
 | 8 (out) | 245 | `tan_8_balc_aft` | A balcony table | 1 |
@@ -530,7 +530,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 |---|---|---|---|---|
 | 18.7-21.4 | the terrace | The forward terrace past the wall (built) | | |
 | 30 | `amb_swan_cart` | A steward's cart with a towel swan on it | Decor | A towel animal |
-| 41.4 | cabin 8206 | Her cabin (built): `tan_8_8206` in the welcome basket, `book_5` on the bed, the shower (§8) | `cp_8206` | Built |
+| 41.4 | cabin 8206 | Her cabin (built): `tan_8_8206` on the desk, `book_5` on the bed, the shower (§8); `sec_desk`: E at the desk shows it close, her four things and his four as found (2026-11-22) | `cp_8206` | Built |
 | 56 | `amb_peek_sea` + `sec_peek_sea` | An open cabin door, the sea in its window, nobody in; its inside washed 30% toward the wall (2026-11-18) | E (X): she steps in and bounces on its made-up bed, seen through the door (cut to its opening, her head under the lintel at each bounce, washed as the room is), then out, straightening her badge; one of her finds (the user, 2026-11-18: standing still there had played only her look-around) | Her own clips |
 | 66 | `door_duct_exit` | The duct's exit grille in the ceiling | She drops out of it (`scn_duct`) | Drawn |
 | 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; the duct's peek above it | Balloons |

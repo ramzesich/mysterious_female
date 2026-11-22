@@ -475,8 +475,8 @@ export class Library {
         return key;
     }
 
-    // A picture over the whole screen (a book's page, a photo), until she presses a key.
-    panel(key) {
+    // A picture over the whole screen (a book's page, a photo, cabin 8206's desk at `scale` 2), until she presses a key.
+    panel(key, { scale = 0 } = {}) {
         const s = this.scene;
         return new Promise(resolve => {
             const dim = s.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d0b14, 0.82).setOrigin(0);
@@ -484,7 +484,7 @@ export class Library {
             // (A photo slot's picture in its gold frame, as the small one on the wall: the user, 2026-11-22.)
             const framed = exists && key.startsWith('photo-');
             const pic = s.add.image(VIEW.width / 2, VIEW.height / 2, framed ? this.framed(key) : exists ? key : 'photo-frame');
-            pic.setScale(Math.max(1, Math.floor(Math.min((VIEW.width - 160) / pic.width, (VIEW.height - (framed ? 80 : 100)) / pic.height))));
+            pic.setScale(scale || Math.max(1, Math.floor(Math.min((VIEW.width - 160) / pic.width, (VIEW.height - (framed ? 80 : 100)) / pic.height))));
             s.uiLayer.add([dim, pic]);
             s.tweens.add({ targets: [dim, pic], alpha: { from: 0, to: 1 }, duration: 220 });
             sfx.page();

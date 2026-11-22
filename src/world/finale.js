@@ -189,7 +189,6 @@ export const finale = {
     // home; the sunset from the balcony's scene until the day after.
     refreshFinale() {
         const s = this.scene, P = this.P;
-        this.world.dropTangerines();
         if (!this.F) return;
         if (!this.catching && !this.homing) s.holding = P.has('catch') && !P.has('home');
         const dusk = P.has('sunset') && !P.has('home') ? 1 : 0;
