@@ -4118,3 +4118,32 @@ valuable."
   `DESK_THINGS` in the config; `?keeps=flag,pick` or `desk` for testing.
 - Tests: `boot`, `cabin` (now also E at the desk: none, two, all eight the day after, a key closing it), `finale`,
   `region2` pass.
+
+## §4 2.4, Bumbot's bed seen close, the day after (the user, 2026-11-22)
+
+- **His eight do not fit the room either** (about 126 px of them side by side; the bed's top about 97 px, him and her
+  reading spot taking most of it): the user chose **"seen close, like the desk"**. On the day after, E by him (`bb_home`)
+  makes him purr and shows, over the dim at 2x, him lying on the bed with his eight round him (massage gun, car, collar
+  bell, feather toy, snack tube, tennis ball, wool, sardine tin), each from its find (`keep:cat:*` in `save.keeps`), the
+  bare bed where one is not found and with none (`world.seenClose('bed')`; the desk's code made one for both,
+  `seenClose('desk')`). No hearts on that E (the user: "we cannot see them anyway").
+- **E by him is from the floor only:** it had been anywhere within 26 px of him, the bed too, and her reading seat on
+  the bed is 18 px from him: on the day after she could not read on her bed (the user: "she still has to have access to
+  the bed's reading spot"). Now on the bed E is her reading.
+- **Her bounce for joy on the bed stays** (it starts by itself when she stands still a second, not on E; the user asked
+  it removed, then: "if not, then leave it". It was taken out and put back exactly).
+- **Its picture:** a rough of him cut out of the user's photo on a bed drawn in code in the cabin's colours, his eight
+  the close-ups shrunk smoothly, then PixelLab `image_to_pixelart` 400 x 225, faithful 150 (9 generations in all,
+  `assets/source/closeups/bed/README.md`). The user's steps: try 3 of three (photo 1, eyes shut); the other photo to
+  compare; "the eyes are not right, why not leave them open?"; photo 2 (stretched out); his tail over the runner; the
+  massage gun bigger, its handle on the runner's left edge; the car, the bell and the tin on the front row, 12 px apart.
+- **The bare bed by rule** (`bare_bed` in `tools/build_desk.py`, which now builds both pictures): along the row as the
+  desk's, but where an edge runs down through a box: under the gun the runner from its own pattern (its chevrons repeat
+  every 16 rows exactly: the same column 48 rows lower), above the bed's top the cushions and the pillow straight down,
+  their bottom edge from the nearest open column of the same thing. The boxes 2 px wider all round (the things' light
+  rims share the bed's colours; streaks were left otherwise), and specks the redraw put round a thing kept with it
+  (`bits`). Bare + all eight is the redraw exactly; the desk's files came out the same.
+- `?keeps=` takes his things' names, and `bed` for all eight (`BED_THINGS` in the config).
+- Tests: `cabin` (E by him from the floor: none, two, all eight, a key closing it; on the bed by him, E is her reading)
+  and `finale` (the day after: E by him first takes book 5 off the bed, then the bed seen close) pass. Not run: the
+  rest of the suite.

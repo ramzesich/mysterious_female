@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -97,11 +97,14 @@ export class World {
         const books = new URLSearchParams(location.search).get('books');
         const list = books === 'all' ? Array.from({ length: BOOKS }, (_, i) => i + 1) : (books ?? '').split(',').map(Number);
         for (const n of list) if (n >= 1 && n <= BOOKS && !this.save.books[n]) this.library.got(n);
-        // ?keeps=flag,pick (or `desk`: all eight of hers and his): those found from the start (README; for testing the desk).
-        const keeps = new URLSearchParams(location.search).get('keeps');
-        for (const k of keeps === 'desk' ? DESK_THINGS : (keeps ?? '').split(',')) {
-            const what = `keep:${['flag', 'plant', 'bookmark', 'diary'].includes(k) ? 'her' : 'him'}:${k}`;
-            if (DESK_THINGS.includes(k) && !this.save.keeps.includes(what)) this.save.keeps.push(what);
+        // ?keeps=flag,pick,ball (`desk`: all eight of hers and his, `bed`: Bumbot's eight): those found from the start
+        // (README; for testing the desk and the bed seen close).
+        const keeps = (new URLSearchParams(location.search).get('keeps') ?? '').split(',')
+            .flatMap(k => k === 'desk' ? DESK_THINGS : k === 'bed' ? BED_THINGS : [k]);
+        for (const k of keeps) {
+            const whose = BED_THINGS.includes(k) ? 'cat' : ['flag', 'plant', 'bookmark', 'diary'].includes(k) ? 'her' : 'him';
+            const what = `keep:${whose}:${k}`;
+            if ((DESK_THINGS.includes(k) || BED_THINGS.includes(k)) && !this.save.keeps.includes(what)) this.save.keeps.push(what);
         }
         // (`books_all` means every book is back: the shelf full, as in play, the HUD counting fourteen.)
         if (this.save.flags.includes('books_all')) {
@@ -1445,22 +1448,23 @@ export class World {
         this.closeup(undefined, null, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
     }
 
-    // Cabin 8206's desk seen close: the bare desk, and on it each of her things and his she has found, in its place
-    // (`assets/ship/desk/`, tools/build_desk.py), at 2x over the dim, until any key. Nothing found yet: the bare desk
-    // (the user, 2026-11-22).
-    deskSeen() {
+    // Cabin 8206 seen close (the user, 2026-11-22), at 2x over the dim, until any key: `desk`, the bare desk and on it
+    // each of her things and his she has found; `bed`, Bumbot asleep on the bed on the day after and his things round
+    // him. Each in its place (`assets/ship/<scene>/`, tools/build_desk.py); nothing found yet, the bare picture.
+    seenClose(scene) {
         const s = this.scene;
-        const found = DESK_THINGS.filter(k => this.save.keeps.some(w => w.endsWith(`:${k}`) && /^keep:(her|him):/.test(w)));
         if (s.viewing) return false;
-        const bare = s.textures.get('desk-bare').getSourceImage(), L = s.cache.json.get('desk-layout');
-        if (s.textures.exists('desk-seen')) s.textures.remove('desk-seen');
-        const tex = s.textures.createCanvas('desk-seen', bare.width, bare.height), ctx = tex.getContext();
+        const [list, whose] = scene === 'bed' ? [BED_THINGS, /^keep:cat:/] : [DESK_THINGS, /^keep:(her|him):/];
+        const found = list.filter(k => this.save.keeps.some(w => w.endsWith(`:${k}`) && whose.test(w)));
+        const bare = s.textures.get(`${scene}-bare`).getSourceImage(), L = s.cache.json.get(`${scene}-layout`);
+        if (s.textures.exists(`${scene}-seen`)) s.textures.remove(`${scene}-seen`);
+        const tex = s.textures.createCanvas(`${scene}-seen`, bare.width, bare.height), ctx = tex.getContext();
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(bare, 0, 0);
-        for (const k of found) ctx.drawImage(s.textures.get(`desk-${k}`).getSourceImage(), L[k][0], L[k][1]);
+        for (const k of found) ctx.drawImage(s.textures.get(`${scene}-${k}`).getSourceImage(), L[k][0], L[k][1]);
         tex.refresh();
         s.viewing = true;
-        this.library.panel('desk-seen', { scale: 2 }).then(() => { s.viewing = false; });
+        this.library.panel(`${scene}-seen`, { scale: 2 }).then(() => { s.viewing = false; });
         return true;
     }
 
@@ -1482,7 +1486,7 @@ export class World {
             // finds them (the user, 2026-11-22: the room has no space for the eight at the game's size).
             // (Any time she is in the cabin, whatever the story's moment, Bumbot in her arms too: `look`; the user.)
             if (own) this.things.push({ id: 'sec_desk', x: own.door - 59 + 110, y: own.floor, route: 'cabin', items: [], reach: 16, look: true,
-                interact: () => this.deskSeen() });
+                interact: () => this.seenClose('desk') });
             // The laundry chute's hatch, low in the wall by the door (drawn in the room's picture):
             // E, and down she goes to the laundry on deck 4 (population: `scn_chute`).
             this.things.push({ id: 'chute', x: this.data.linen.chuteX, y: linen.floor, route: 'linen', items: [], reach: 16,

@@ -1122,6 +1122,25 @@ def scenario_cabin(b):
         b.tap("e")
         wait(0.6)
         ok &= check(not b.eval("window.__ship.viewing"), "  and a key closes it", None)
+    # Bumbot's bed seen close on the day after (§4 2.4, the user's): E by him from the floor, his things as found, the
+    # bare bed with none; on the bed, by her seat 18 px from him, E is her reading. (Book 5, on the bed, taken first.)
+    bed = desk.replace("desk-seen", "bed-seen")
+    for q, what in (("", "none found: the bare bed"), ("&keeps=ball,car", "two found"), ("&keeps=bed", "all eight")):
+        b.open("?reset&play&at=cabin&did=catch,home&books=5" + q)
+        cat = b.eval("window.__ship.world.data.finale.home.catX")
+        b.teleport(cat - 6, floor_y(8), route="cabin")
+        b.tap("e")
+        wait(0.6)
+        got = b.eval(bed)
+        ok &= check(got == [True, 400], f"E by Bumbot from the floor shows the bed close ({what})", got)
+        b.tap("e")
+        wait(0.6)
+        ok &= check(not b.eval("window.__ship.viewing"), "  and a key closes it", None)
+    b.teleport(door - 59 + 196, floor_y(8) - 32, route="cabin")
+    b.tap("e")
+    wait(1.0)
+    ok &= check(b.eval("!!window.__ship.world.library.reading") and not b.eval("window.__ship.viewing"),
+                "on the bed by him, E is her reading", None)
     return ok
 
 
@@ -5278,10 +5297,22 @@ def scenario_finale(b):
     ok &= check(b.eval(f"{S}.bedCat.visible") and not person(b, "npc_husband_home")["on"] and person(b, "npc_husband")["on"],
                 "Bumbot sleeps on the bed; her husband is back at his table")
     ok &= check(b.eval(f"{W}.things.find(t => t.id === 'haz_fort_7').items[0].visible"), "and the kids' fort is up again")
-    b.hold("left", 0.2)
+    # E by him from the floor: a purr, and the bed seen close (§4 2.4, the user's); on the bed E is her reading.
+    # (Book 5 still lies on the bed in this run, by him: the first E takes it, as in play.)
+    cat = b.eval(f"{S}.bedCat.x")
+    b.teleport(cat - 6, floor_y(8), route="cabin")
     b.tap("e")
-    wait(0.4)
-    ok &= check(b.state()["mode"] == "play", "E by him: a purr")
+    wait(0.6)
+    ok &= check(b.eval(f"!!{W}.save.books[5]"), "E by him first takes book 5 off the bed", None)
+    b.tap("e")
+    wait(0.6)
+    seen = "(() => { const s = window.__ship; const k = s.textures.exists('bed-seen') && s.textures.get('bed-seen').getSourceImage(); return [!!s.viewing, k ? k.width : 0]; })()"
+    got = b.eval(seen)
+    ok &= check(b.state()["mode"] == "play" and got == [True, 400], "E by him from the floor: a purr, the bed seen close", got)
+    b.shot("finale-bed-seen")
+    b.tap("e")
+    wait(0.6)
+    ok &= check(not b.eval("window.__ship.viewing"), "  and a key closes it", None)
     ok &= check(not b.errors, "no errors", b.errors[:3])
     return ok
 

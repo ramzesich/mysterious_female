@@ -176,12 +176,15 @@ export const finale = {
         w.things.push({ id: 'bb_tip', x: Mo.catX, y: Mo.y, route: 'inside', items: [this.tipCat], after: 'flag:sunset', until: 'flag:catch' });
         this.tip = { still: 0, hearts: 0, spooks: 0, busy: false, coming: false };
 
-        // At home, from the day after: asleep on the cabin's bed; E, and he purrs.
+        // At home, from the day after: asleep on the cabin's bed; E by him, and he purrs, and the bed is seen close with
+        // his things round him, each from its find (the user, 2026-11-22: `world.seenClose('bed')`). From the floor only:
+        // on the bed E is her reading (her seat is 18 px from him; the user: "she still has to have access to the bed's
+        // reading spot").
         const H = F.home;
         this.bedCat = s.add.sprite(H.catX, H.y - BED_TOP, 'bumbot', s.cache.json.get('bumbot-meta').frames.asleep).setOrigin(0.5, 1).setDepth(w.depthFor('cabin') + 0.02);
         w.add([this.bedCat]);
-        w.things.push({ id: 'bb_home', x: H.catX, y: H.y, level: H.y - BED_TOP, route: 'cabin', items: [this.bedCat], after: 'flag:home', reach: 26,
-            interact: () => this.purr() });
+        w.things.push({ id: 'bb_home', x: H.catX, y: H.y, route: 'cabin', items: [this.bedCat], after: 'flag:home', reach: 26,
+            interact: () => { if (s.viewing) return false; this.purr(); return w.seenClose('bed'); } });
         this.refreshFinale();
     },
 
@@ -518,14 +521,14 @@ export const finale = {
         });
     },
 
-    // E by him, asleep on the bed, any day after: a purr.
+    // E by him, asleep on the bed, any day after: a purr (and the bed seen close, `setupFinale`).
     purr() {
         const cat = this.bedCat, now = this.scene.time.now;
         if (now > (this.purrAt ?? 0)) {
             this.purrAt = now + 1600;
             sfx.at(cat.x, cat.y).purr(1.6);
         }
-        this.heart(cat.x, cat.y - 14, 3);
+        // (No hearts: the bed seen close covers him at once, the user, 2026-11-22.)
         this.scene.tweens.add({ targets: cat, scaleY: 1.06, duration: 260, yoyo: true, repeat: 1 });
         return true;
     },

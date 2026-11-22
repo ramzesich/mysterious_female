@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -63,6 +63,9 @@ export class BootScene extends Phaser.Scene {
         this.load.image('desk-bare', 'assets/ship/desk/bare.png');
         this.load.json('desk-layout', 'assets/ship/desk/layout.json');
         for (const k of DESK_THINGS) this.load.image(`desk-${k}`, `assets/ship/desk/${k}.png`);
+        this.load.image('bed-bare', 'assets/ship/bed/bare.png');
+        this.load.json('bed-layout', 'assets/ship/bed/layout.json');
+        for (const k of BED_THINGS) this.load.image(`bed-${k}`, `assets/ship/bed/${k}.png`);
         // The photo slots' pictures (§6.1.11; E at a slot's frame opens its picture over the screen: world.js's `slot`):
         // the reading nook's, her armchair at home (the user's photo, cut out, redrawn by PixelLab, recoloured to her greys).
         for (const id of ['slot_nook']) {

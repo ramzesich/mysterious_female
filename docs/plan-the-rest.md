@@ -437,9 +437,14 @@ at 12%): not part of this item.
   has no space for the eight at the game's size (two layouts in the room shown, "the things can't be arranged there
   properly"), so **the desk seen close**: E at the desk, any time she is in the cabin (Bumbot in her arms too), shows a
   generated picture of it (the TV's lower edge over it) over the whole screen, each of the eight from its find, bare
-  desk where one is not yet found, and with none (`tools/build_desk.py`, `assets/source/closeups/desk/`, `world.deskSeen()`,
+  desk where one is not yet found, and with none (`tools/build_desk.py`, `assets/source/closeups/desk/`, `world.seenClose('desk')`,
   `?keeps=`). The room's desk keeps its two tangerines, moved onto its top (they stay till picked up).
-- **The day after:** Bumbot's eight laid out with him (`src/world/finale.js`).
+- ~~**The day after:** Bumbot's eight laid out with him (`src/world/finale.js`).~~ **BUILT 2026-11-22, otherwise (the
+  user's):** the room has no space for them either (the bed's reading spot kept free), so **his bed seen close**: on the
+  day after, E by him from the floor, he purrs and a generated picture shows him lying on the bed (from the user's photo,
+  eyes open) with his eight round him, each from its find, bare bed where one is not found (`tools/build_desk.py`,
+  `assets/source/closeups/bed/`, `world.seenClose('bed')`, `?keeps=bed`). On the bed E is her reading (it had been his purr
+  within 26 px of him, and her seat is 18 px from him). No hearts on E (the picture covers him).
 - **The HUD:** **BUILT 2026-11-20** (the user's design; `docs/progress-decisions.md`, "The HUD redone"):
   each count appears with its first find, the kinds as faces (Bumbot's, hers, her husband's) and the book, in
   the order found; the cards under them, faint until held; the first tangerine and each card fly to their
