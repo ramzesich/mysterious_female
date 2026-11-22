@@ -128,7 +128,9 @@ TANGERINES = {
     "tan_6_windjammer": (6, 142.2, 1, 32, None),
     "tan_7_jackpot": (7, 153.1, 2, 0, "jackpot"),
     "tan_7_tradewinds": (7, 182.21, 1, 20, None),
-    "tan_8_8206": ("cabin", 104, 2, 33, None),
+    # (Cabin 8206's two on its desk's top, 40 px up (tools/draw_cabin.py), right of the phone and the daily
+    # programme: at 104 and 33 px they hung 7 px low in front of its edge, one over the phone; the user, 2026-11-22.)
+    "tan_8_8206": ("cabin", 118, 2, 40, None),
     "tan_8_fwd": (8, 49.3, 1, "table", None),
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
@@ -165,6 +167,9 @@ TANGERINES = {
     "tan_7_splash": (7, 41.2, 1, 20, None),
     "tan_7_ballpit": (7, 52.4, 1, 0, None),
 }
+# Tangerines gone from a moment on, picked up or not (`until`, a condition as a thing's): cabin 8206's on the day
+# after (the user, 2026-11-22: "on the day after, the tangerines won't be there anymore").
+TANGERINES_UNTIL = {"tan_8_8206": "flag:home"}
 
 # --- Pickups ---------------------------------------------------------------------------------------
 # id: (deck or room, m or x, what she gets, needs flag[, px up on a piece already there[, the atlas

@@ -678,7 +678,8 @@ game; over 60 the count means nothing. No tangerine is added or dropped; one pai
 
 Small shifts, no art: `tan_6_windjammer` and `tan_12_spinnaker` lie on the barkeeper's hands and chest (along the
 counter, clear of them); `tan_8_8206`'s two lie loose on the desk, one over a dark object (the plan's "welcome basket":
-prop B there). Everything else was looked at and is right as it is.
+prop B there). (**2026-11-22, the user:** moved onto the desk's top, right of the phone, and gone on the day after;
+the bowl may still come with prop B.) Everything else was looked at and is right as it is.
 
 **The cause of 4 and 8 to 12:** the `sidetable` picture (`src/textures.js`) is an early placeholder drawn in code, a top
 and two thin legs. `placeTangerine` in `src/world/world.js` stands it under every `"table"` tangerine inside, the `item`

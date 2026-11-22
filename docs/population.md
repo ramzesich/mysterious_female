@@ -108,7 +108,7 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md ย
 | 6 | 142 | `tan_6_windjammer` | The Windjammer's bar | 1 |
 | 7 | 160 | `tan_7_jackpot` | The jackpot machine (`sec_jackpot`) | 2 |
 | 7 | 180 | `tan_7_tradewinds` | A gift basket in Tradewinds | 1 |
-| 8 | 41.4 | `tan_8_8206` | The welcome basket in cabin 8206 | 2 |
+| 8 | 41.4 | `tan_8_8206` | On cabin 8206's desk, right of the phone (the welcome basket: prop B, ยง7d); gone on the day after, picked up or not (`TANGERINES_UNTIL`) | 2 |
 | 8 | 246 | `tan_8_aft` | A room-service tray by a door, deck 8 aft | 1 |
 | 8 (out) | 100 | `tan_8_balc_fwd` | A balcony table | 1 |
 | 8 (out) | 245 | `tan_8_balc_aft` | A balcony table | 1 |

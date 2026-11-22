@@ -4085,3 +4085,14 @@ valuable."
   the photo 3 and its two small redraws 2). Tests: `boot`, `region2` (now also the trolley's row with two books and the
   row of found books), `region9` (now also the bookcase slid aside and the nook's armchair with fourteen), `lang` pass;
   `check_overlaps` 0.
+
+## §4 2.4 begun: cabin 8206's tangerines (the user, 2026-11-22)
+
+- Its two tangerines hung 7 px under the desk's top, in front of its edge, one over the phone: now on the top (40 px
+  up), right of the phone and the daily programme (`tan_8_8206` at 118).
+- **On the day after they are gone**, picked up or not (the user: "on the day after, the tangerines won't be there
+  anymore ... they should be removed in any case"): `TANGERINES_UNTIL` in `tools/population.py` gives a tangerine an
+  `until`; `placeTangerine` skips it once met, `world.dropTangerines()` (from the story's flag refresh) takes it away
+  while the screen is black, not counted. Tests: `boot`, `cabin`, `finale` pass.
+- The desk's eight (2.4): two layouts shown (A: his on the desk unit, hers on the window sill; B: hers on the shelf,
+  his on the bed); the user is deciding with the day after's whole arrangement (the bed's reading spot stays free).

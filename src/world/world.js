@@ -1301,6 +1301,7 @@ export class World {
     placeTangerine(e) {
         const s = this.scene, D = s.DEPTH;
         if (this.save.collected.includes(e.id)) return;
+        if (e.until && this.cond(e.until)) return;
         let y = e.y;
         if (e.on === 'table') {
             if (e.first) {
@@ -1315,7 +1316,19 @@ export class World {
         } else {
             y -= e.on;
         }
-        s.addTangerine(e.id, e.x, y, e.route);
+        const t = s.addTangerine(e.id, e.x, y, e.route);
+        if (t && e.until) t.until = e.until;
+    }
+
+    // Tangerines whose time is over leave, picked up or not (`until`: cabin 8206's on the day after). Not counted.
+    dropTangerines() {
+        const s = this.scene;
+        s.tangerines = (s.tangerines || []).filter(t => {
+            if (!t.until || !this.cond(t.until)) return true;
+            t.glint.destroy();
+            t.sprite.destroy();
+            return false;
+        });
     }
 
     // E at a pickup: a verb, a book, a pocket item. (Nothing says how a verb is used: no hint
