@@ -4045,3 +4045,10 @@ valuable."
   `src/world/library.js`): the cover's ground and its title's colour for the label. A vertical label on the spines
   was tried and reverted (the user: "it's worse now").
 - Tests: `boot`, `region2`, `region9` pass.
+
+## §4 2.3 4, the shelf seen close: dropped (the user, 2026-11-22)
+
+- "Drop the shelf seen close from the plan, no need for that. Unless there's some other mechanic tied to it." Nothing
+  is: `sec_shelf` was only a line of the spec and the plan (no code); the shelf's spines filling as books come back
+  (the trolley), the odd book and the nook with all fourteen back are the shelf itself and stay. A title now shows on
+  its cover only.

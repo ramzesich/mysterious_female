@@ -919,7 +919,7 @@ by E (a rattle, a padlock over her). A naming of the door, not a hint.
 - **The cover's moment:** in `world.take` and `world.giveBook`, after the pick-up's sparkle or the
   hand-over's clip: the Library's `panel()` with a lighter dim (the user: "dimmed slightly"), the
   cover in the centre, any key closes it. Each of the fourteen, once.
-- **The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
+- (**Dropped 2026-11-22**, the user, `docs/plan-the-rest.md` §2.3 4.) **The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
   screen, the returned books' spines with their titles laid in by the game from the save, gaps
   for the rest. The spines are cut to one height and width so that any fourteen stand together.
 - **The lettering:** a build tool sets each title and author on its cover and spine from a font

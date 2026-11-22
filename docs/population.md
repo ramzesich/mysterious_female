@@ -68,7 +68,7 @@ still name one: the user, 2026-11-14, "part of the game is figuring things out".
 Pocket items; the HUD counts them. Returned at `src_trolley` (deck 6, 167); read at `sec_chair`
 (deck 6, 172). The titles are the user's, given 2026-11-18: GAME_DESIGN.md §6.1.2 has the table
 (fourteen books with the four of docs/plan-three-uses.md §4.1), and where a title shows (the cover
-over the screen when she gets a book; the shelf seen close, E at `sec_shelf`). ~~Each book's page,
+over the screen when she gets a book; ~~the shelf seen close, E at `sec_shelf`~~, dropped 2026-11-22). ~~Each book's page,
 read in the chair, hints at the hidden thing named (drawn, no words).~~ Since 2026-11-21 each book's page is its real
 opening (text only, `assets/source/pages/README.md`), read in any of the Library's seven armchairs or on her bed; the
 last column is what the drawn pages hinted at until then.

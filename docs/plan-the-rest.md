@@ -372,10 +372,10 @@ The books' count on the HUD: found of 14, **hidden** until the first (today dimm
   (d-pad or stick) choose, E reads, Esc/B/Space get up; any book, as often as she likes; a hint once. Book 5 is a
   regular book (no more reading it only on her bed). `?books=3,8,11` starts her carrying books.
 
-### 2.3 The titles: covers, their moment, the shelf seen close, the nook's photo (large; about 30 generations)
+### 2.3 The titles: covers, their moment, ~~the shelf seen close~~, the nook's photo (large; about 30 generations)
 
 `docs/plan-three-uses.md`, step 5's revision of 2026-11-18. **1 to 3 built 2026-11-22** (16 generations): the
-covers are her own copies' (the user's photos, `reference/books/`), `tools/build_covers.py`; 4 and 5 remain.
+covers are her own copies' (the user's photos, `reference/books/`), `tools/build_covers.py`; 4 dropped 2026-11-22 (the user: "no need for that"; nothing else rides on it); 5 remains.
 
 1. **BUILT 2026-11-22: `tools/pixelzone.py`** (the pages' Pixelzone drawn exactly, Й/й mended). **The lettering tool first** (new): each title and author set on its cover and spine from a
    font with every script needed (lower case, Polish letters, Russian and Ukrainian Cyrillic,
@@ -389,8 +389,9 @@ covers are her own copies' (the user's photos, `reference/books/`), `tools/build
    it). **The cover's moment:** in `world.take` and `world.giveBook`, after the sparkle or the
    hand-over: the Library's `panel()` with a lighter dim, the cover in the centre, any key
    closes it. Each of the fourteen, once.
-4. **The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
-   screen, the returned books' spines with their titles laid in from the save, gaps for the rest.
+4. ~~**The shelf seen close:** `sec_shelf` answers E: a generated picture of the shelf over the
+   screen, the returned books' spines with their titles laid in from the save, gaps for the rest.~~ **dropped 2026-11-22 (the user: "no need for that"; nothing else rides on it).**
+   The shelf itself stays as built: the returned books' spines in their covers' colours, the odd book and the nook.
 5. **The reading nook's photo** (given): pixel art from a cutout on a flat ground, candidates
    shown first; in `slot_nook`'s frame.
 6. ~~**The user's to answer before they are built:** whether books 11 to 14 get hint pages~~ (answered 2026-11-21:
