@@ -4237,4 +4237,10 @@ valuable."
   is settled he sits on nothing in cabin 8206** (the stand-in brought its own chair).
 - **Cost:** about 37 generations (the chairs 8, the tables 8, the guests 15, his import 0.25, his idles 6). Tests:
   `boot`, `region6` (the table scene, his book, the photo) pass; `tools/check_overlaps.py` 0. Not run: the rest.
+- **In cabin 8206 (the user's):** at first a desk chair (four generated, the user's 3, `assets/source/ship/cabin-chair/`,
+  not used); then "place me on the sofa that's under the window, facing the screen"; a south view of his seated idle
+  (3 generations, `sit-idle-2/south/`, not used): "I already have my facing the screen sprite, use that one. My lower
+  body isn't visible anyway". His front view (`front`, from `assets/source/hud/husband/short/south-bear.png`) at 160 px
+  into the room, the bed drawn again over him (`assets/ship/cabin-8206-bed.png`, the room's own pixels where
+  `tools/draw_cabin.py` draws the bed; a `carry` in front of him), under her and Bumbot. Tests: `finale` passes.
 

@@ -286,6 +286,7 @@ def interior():
     r(154, FLOOR - 4, 176, FLOOR - 4, "#094a50")
 
     im.alpha_composite(bed)
+    interior.bed = bed            # (its shape, for the bed drawn again over her husband on the sofa: `bed_front()`)
 
     # The cabin shows where the corridor was, the deck around it dimmed by the game (the user,
     # 2026-11-06, as the linen room): the ceiling's shadow as along the corridor, and its two side
@@ -334,12 +335,22 @@ def open_door():
     return door
 
 
+def bed_front(room):
+    """The bed alone, the room's own pixels where it is drawn: over her husband sitting on the sofa behind it, facing us
+    (the user, 2026-11-22: "place me on the sofa that's under the window, facing the screen"; his lower body behind
+    it). The game draws it in front of him (`npc_husband_home`'s `carry` in `tools/population.py`)."""
+    out = room.copy()
+    out.putalpha(interior.bed.getchannel("A"))
+    return out
+
+
 if __name__ == "__main__":
     SOURCE.mkdir(parents=True, exist_ok=True)
     room, door = interior(), open_door()
     room.save(SOURCE / "interior.png")
     door.save(SOURCE / "door-open.png")
     room.save(GAME / "cabin-8206.png")
+    bed_front(room).save(GAME / "cabin-8206-bed.png")
     door.save(GAME / "cabin-door-open.png")
     for name, piece in shower_pieces().items():
         piece.save(SOURCE / f"shower-{name}.png")

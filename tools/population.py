@@ -956,11 +956,16 @@ FINALE = dict(
     socks=[(11, 25.1), (7, 1.05)],
     gulls=[dict(drop=190, a=9.0, b=23.2, v=2.3), dict(drop=395, a=2.5, b=19.5, v=2.0)],
     mooring=dict(deck=7, a=1.4, b=20.4, cat=4.0, wall=21.4),
-    home=dict(step=128, sit=206, cat=178, husband=118),
+    home=dict(step=128, sit=206, cat=178, husband=160),
 )
 PEOPLE.update({
-    # Her husband, waiting in the cabin on the evening of the catch (the stand-in, as at his table).
-    "npc_husband_home": dict(at=("cabin", FINALE["home"]["husband"]), who="husband", face=1, after="flag:catch", until="flag:home"),
+    # Her husband, waiting in the cabin on the evening of the catch: on the sofa under the window, behind the bed, facing
+    # us (the user, 2026-11-22: "place me on the sofa that's under the window, facing the screen"; "I already have my
+    # facing the screen sprite, use that one. My lower body isn't visible anyway"): his front view (`front`), the bed
+    # drawn again over him (`@cabin-8206-bed`, the room's own pixels: its 240 x 144 canvas's middle 40 px left of him,
+    # its bottom the slab's, 16 px under the floor).
+    "npc_husband_home": dict(at=("cabin", FINALE["home"]["husband"]), who="husband", face=1, pose="front",
+                             carry=[("@cabin-8206-bed", -40, -16, True)], after="flag:catch", until="flag:home"),
     # The way home: those she helped, outside her cabin, clapping her in (deck 8, between the doors).
     "amb_home_steward": dict(at=(8, 50.1), who="steward", face=1, idle="idle", after="flag:catch", until="flag:home"),
     "amb_home_manager": dict(at=(8, 48.2), who="stagemanager", face=1, idle="idle", after="flag:catch", until="flag:home"),

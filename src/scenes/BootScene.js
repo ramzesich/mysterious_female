@@ -35,6 +35,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
         this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
+        this.load.image('cabin-8206-bed', 'assets/ship/cabin-8206-bed.png');   // (the bed again, over her husband on the sofa)
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.image('linen-room', 'assets/ship/linen-room.png');
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');

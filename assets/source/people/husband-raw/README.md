@@ -15,6 +15,7 @@ olive, his skin pink, his eye red).
 |---|---|---|---|
 | `sit-idle/` | First try: seated, hands on his knees, his legs together; the generator drew a brown chair under him (`unchair.py` took it out, to `clean/`); its first frame's face "distorted"; the far leg could not be told apart. Not used ("not working") | skeleton-v3 poses, group `6272a497-0de1-4e70-a9ad-1e459c65370f` | 3 |
 | `sit-idle-2/` | **Used**, `idle`: seated upright, breathing from the chest, the near leg bent, the far leg forward; no chair drawn. `make.py`: frame 2's head and legs in every frame (one face, the legs still), the far leg cut to `far` | skeleton-v3 poses, group `0c867a63-9341-42f6-8d40-1914c6ffa6e8` | 3 |
+| `sit-idle-2/south/` | The same idle seen from the front, for the cabin's sofa; not used (the user: his own front view, `front.png`, his lower body behind the bed) | the same group, south | 3 |
 | `standin/` | The stand-in he replaces: the linen-shirted diner's character `89dfbeac-8d4c-4a89-a578-8dbc95ba16fc`, in his own chair | | |
 
 `make.py` writes `out/`; the approved are copied to `assets/source/people/husband/` (`stand.png` the idle's first frame).

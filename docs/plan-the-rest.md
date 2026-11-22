@@ -456,8 +456,9 @@ at 12%): not part of this item.
   **Begun 2026-11-22:** one row of his forehead out (as his icon), his character imported so; **seated at his table
   (`idle`), in the stand-in's place**, in the Great Outdoors' new patio chair (its near arm in front of him, his far leg
   behind the table); the Great Outdoors' and the Garden Café's tables and chairs remade side-on and beige (what stands on
-  them 3 px into the top). Still to do: `wave`, `laugh`, `eat`, `give`; what he sits on in cabin 8206 (the stand-in brought
-  its own chair: until then he sits on nothing there).
+  them 3 px into the top). **In cabin 8206** (the user's): on the sofa under the window, behind the bed, facing us, in his
+  own front view ("my lower body isn't visible anyway"), the bed drawn again over him. Still to do: `wave`, `laugh`, `eat`,
+  `give`.
 
 ### 2.5 The `keeps` playtest (medium; no art)
 
