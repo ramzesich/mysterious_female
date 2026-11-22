@@ -31,7 +31,9 @@ OFF_THE_FLOOR = {"run", "jump", "shriek", "bounce", "step", "steps", "lunge", "k
                  # stands; the dog's paw a px lower in one frame is not the floor.)
                  ("dogowner", "wind"), ("dogowner", "unwind"),
                  # (The massage guest getting up off the table: lying on its top, then on the floor.)
-                 ("massage_guest", "up")}
+                 ("massage_guest", "up"),
+                 # (Her husband's far leg, alone: on his canvas, where his feet are.)
+                 ("husband", "far")}
 
 
 def lowest_row(img):
@@ -106,6 +108,10 @@ def build():
         flip = opts.get("flip", False)
         scale = opts.get("scale")
         load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale)) if scale else (lambda path: palettize(Image.open(path)))
+        if opts.get("own_colours"):
+            # (All of a figure kept in its own colours: her husband, whose hair went olive, skin pink and eye red on
+            # the palette, 2026-11-22.)
+            load = lambda path: Image.open(path).convert("RGBA")
         if opts.get("wash"):
             # (Washed toward the corridor wall as the ship's background pieces are, `wash` of the way: the
             # theatre's audience, as lightly as the theatre's own pieces, `-lt`.)

@@ -212,6 +212,8 @@ def metres(c):
 
 # A thing on the round side table stands 2 px into its top, the top's rim in front of its foot (the user, 2026-11-22).
 ON_SIDE_TABLE = 2
+# And on the round patio tables of the Great Outdoors and the Garden Café (the user, 2026-11-22): 3 px into the top.
+ON_PATIO_TABLE = 3
 
 
 def exact_x(m):
@@ -1773,7 +1775,7 @@ def build_objects():
     at11(158.8, "planter-palm")
     # The Garden Café (the user's photos): the buffet counters, light wood tables with light blue
     # chairs, a painting between the windows, the Ice Cream Bar, window seats at round white tables
-    # in wicker chairs, a fish on one of the tables.
+    # in beige armchairs, a fish on one of the tables.
     decor("cafe-doorway", "doorway", exact_x(160), exact_x(160), deck=11, text="Garden Café")
     for a, b in ((160.8, 170.2), (172.8, 181.8), (184.2, 193.4)):
         add(area(f"cafe-windows-{a}", "decor", exact_x(a), floor_y(11) - 104, exact_x(b) - exact_x(a), 56,
@@ -1790,8 +1792,8 @@ def build_objects():
     at11(183.0, "ice-cream-counter")
     at11(183.0, "ice-cream-sign", 56)
     for m in (187.2, 190.8):
-        around(11, m, "round-white-table-bg", "wicker-chair-bg")
-        put(11, m, "orange-juice-bg", height("round-white-table-bg"))
+        around(11, m, "patio-table-bg", "patio-chair-bg")
+        put(11, m, "orange-juice-bg", height("patio-table-bg") - ON_PATIO_TABLE)
     decor("downlights-11-cafe", "downlights", x_of(160), x_of(194), deck=11)
     decor("downlights-11-gym", "downlights", x_of(82), x_of(102), deck=11)
     # The Sports Bar, inside by the aft lobby: the back bar and its counter, stools, a TV, darts.
@@ -1804,7 +1806,7 @@ def build_objects():
     at11(209.0, "dartboard", 54)
     # The Great Outdoors, open aft: the self-service station first, the coffee machines and the soft
     # serve ice cream machine (the finale's place in §4's first plan, to be decided later); then
-    # round white tables and wicker chairs, parasols where the sky is open, palms.
+    # round beige tables and armchairs, parasols where the sky is open, palms.
     # (Its plaque hangs from the ceiling on cords: with deck 12 ending at 220 m the sky is behind it.)
     decor("outdoors-doorway", "doorway", exact_x(210), exact_x(210), deck=11, text="The Great Outdoors", hang="1")
     at11(211.4, "chalkboard")
@@ -1812,8 +1814,8 @@ def build_objects():
     at11(214.6, "ice-cream-machine")
     at11(216.4, "juice-station")
     for m in (220.0, 224.0, 228.0, 237.0, 241.0):
-        around(11, m, "round-white-table-bg", "wicker-chair-bg")
-        put(11, m, ("iced-coffee-bg", "sundae-bg", "lemonade-bg")[int(m) % 3], height("round-white-table-bg"))
+        around(11, m, "patio-table-bg", "patio-chair-bg")
+        put(11, m, ("iced-coffee-bg", "sundae-bg", "lemonade-bg")[int(m) % 3], height("patio-table-bg") - ON_PATIO_TABLE)
     for m in (237.0, 241.0):
         at11(m, "parasol")
     # From where deck 12 ends, a large canvas sun cover over the first tables, on two posts between

@@ -4209,3 +4209,32 @@ valuable."
 - `?at=steam11` now starts inside the sauna, forward of the stove. Tests: `region9` (by the stove as the steam rises:
   fogged; the fan and the swoon) passes. Not run: the rest of the suite.
 
+## Her husband at his table, and the Great Outdoors' tables and chairs (§4 2.4, the user, 2026-11-22)
+
+- **His forehead:** "Remove one line from my forehead, like we did on the icon": a row out of each view where two
+  rows of the forehead are alike (`assets/source/hud/husband/short/shorten.py`); his character imported again from
+  those (`5b85cf25-df58-47e2-b592-affd32aff145`, 0.25 generations) so every clip keeps it.
+- **The chairs:** "Use wicker chairs, like in the game, but regenerate them to be made with their side to us. When I sit
+  in the chair, its arm that close to the screen shall obscure me. I shall obscure the farther arm." Four wicker tries
+  "too garbled"; "other chairs fitting that location": the user's 5 of eight, a teak armchair. **The table:** the old
+  round white table stretched taller (the user: "slightly taller") was "too distorted"; generated ones: four (teak,
+  square) "none of them", four more round, the user's 5, a white café table. "Make it beige. Also, make the chairs
+  beige": both put on a beige ramp by lightness (`patio-table/beige.py`), kept off the palette (on it the teak went
+  olive). At all seven tables (the Great Outdoors' five, the Garden Café's two window tables). What stands on them 3 px
+  into the top (the user: 2, then "one more pixel down"; `ON_PATIO_TABLE`, the table scene's photo too).
+- **The far guests** (the reader, the couple) have wicker chairs drawn into their own pictures: taken out of them and
+  set in the beige chair (their shins shortened to its lower seat): "This doesn't work, let's leave them as they are
+  for now" (`assets/source/people/go-seated/README.md`).
+- **Him seated:** his skeleton-v3 idle (poses: hips over the 15 px seat, hands on his knees). The first try had the
+  generator's own chair under him (taken out by its colours), its first frame's face "distorted", and the stills were
+  shown from the browser's screenshot resampled ("distorted": since then every still is the renderer's own picture at
+  exact game px). "My far leg should be behind the table": the legs together could not be told apart ("not working");
+  regenerated "the entire idle" with the legs apart, the far one forward under the table. One face (skeleton-v3 redraws
+  the head a little each frame: one frame's head in all), one pair of legs; the far leg cut into a frame of its own drawn
+  behind the furniture (`under`, new in `src/world/people.js`), the chair's near arm a piece drawn over him (`cover`,
+  `patio-chair-arm`). On the palette his hair went olive, his skin pink, his eye red: he keeps his own colours
+  (`own_colours`, new in `tools/build_people.py`). The stand-in is gone (`husband-raw/standin/`). **Until his cabin seat
+  is settled he sits on nothing in cabin 8206** (the stand-in brought its own chair).
+- **Cost:** about 37 generations (the chairs 8, the tables 8, the guests 15, his import 0.25, his idles 6). Tests:
+  `boot`, `region6` (the table scene, his book, the photo) pass; `tools/check_overlaps.py` 0. Not run: the rest.
+

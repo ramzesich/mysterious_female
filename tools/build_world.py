@@ -191,6 +191,8 @@ def build_world():
             e["carry"] = [dict(frame=f, dx=dx, dy=dy, front=front) for f, dx, dy, front in d["carry"]]
         if "cover" in d:
             e["cover"] = [dict(frame=f, x=spot(d["at"][0], m)[0], dy=dy) for f, m, dy in d["cover"]]
+        if "under" in d:
+            e["under"] = d["under"]
         if "bubble" in d:
             icon, when, unless, *rng = d["bubble"]
             e["bubble"] = dict(icon=icon, when=when or "", unless=unless or "", range=rng[0] if rng else 4)

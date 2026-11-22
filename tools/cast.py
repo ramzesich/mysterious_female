@@ -158,9 +158,11 @@ CAST = {
     "queue_d": ("709fc84f-77bc-4693-bb48-4a1de35ba6e5", {"walk": 6}, {}),
     "queue_e": ("7d1f88c4-005b-4752-aad5-c86958b996bb", {"walk": 6}, {}),
     "queue_f": ("096244bc-9c59-49bc-8d8d-e0d0483d5c60", {"walk": 6}, {}),
-    # Her husband, at the first table of the Great Outdoors. A STAND-IN until the user's photo comes:
-    # the linen-shirted diner's character. Replace this id with his own character's.
-    "husband": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
+    # Her husband, at the first table of the Great Outdoors: his own character from his photo, in his pyjamas with the
+    # bear (the user's), one row of his forehead out (`assets/source/hud/husband/short/`), seated in the patio chair
+    # (skeleton-v3 clips made by hand: `assets/source/people/husband-raw/`; `far` his far leg, drawn behind the table).
+    # (The stand-in, the linen-shirted diner, kept in `husband-raw/standin/`.)
+    "husband": ("5b85cf25-df58-47e2-b592-affd32aff145", {"idle": 4}, {"own_colours": True}),
     "fan_a": ("dc207d50-0515-4a17-b85e-03130517536d", {"cheer": 9}, {}),
     "fan_b": ("76e60a27-a813-4456-8d85-e7830eb21730", {"cheer": 9}, {}),
     "fan_c": ("beeb5d2c-2cc0-4145-98d0-b570504269aa", {"cheer": 7}, {}),

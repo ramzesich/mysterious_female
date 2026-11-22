@@ -417,7 +417,10 @@ PEOPLE = {
     "blk_fan_b": dict(at=(11, 200.55), who="fan_b", face=-1, idle="cheer", until="region:8"),
     "blk_fan_c": dict(at=(10, 196.45), who="fan_c", face=-1, idle="cheer", until="region:8"),
     # (On the evening of the catch he waits in cabin 8206: `npc_husband_home`, region 10.)
-    "npc_husband": dict(at=(11, 219.52), who="husband", face=1, idle="idle", until="flag:catch&!flag:home",
+    # (In the patio chair left of the table: his back on its backrest, its near arm drawn in front of him, his far leg
+    # behind the table, `under`; 219.73 and 219.646 put them on the chair's px.)
+    "npc_husband": dict(at=(11, 219.73), who="husband", face=1, idle="idle", until="flag:catch&!flag:home",
+                        under="far", cover=[("patio-chair-arm-w20", 219.646, 0)],
                         bubble=("canister", "flag:kid_fed", "flag:table", 5)),
     "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
     "amb_go_her": dict(at=(11, 240.52), who="go_her", face=1, layer="back"),
@@ -718,7 +721,7 @@ GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "
 SLOTS = {"slot_lifeboat": ("lifeboat", 228, 50),     # (where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21) "slot_lighting": ("lighting", 446, 62),
          # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
          "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 152, 70),
-         "slot_table": (11, 220.0, 36, "flag:table"),
+         "slot_table": (11, 220.0, 33, "flag:table"),  # (3 px into the patio table's top, as what stands on it)
          # On the wall of deck 8's first balcony of all, at the forward end of the row (the plan's
          # `slot_stern`: the stern's terraces are out of sight behind its plating).
          "slot_balcony": ("b8", 74.9, 62)}

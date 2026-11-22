@@ -63,6 +63,14 @@ export class People {
             p.attached.push({ ...a, img });
             p.items.push(img);
         }
+        // What of them is behind the furniture they sit at, a frame of theirs of its own drawn behind the map's pieces
+        // (her husband's far leg under his table, `under`: a clip of one frame on his own canvas).
+        if (def.under && meta.anims[def.under]) {
+            p.underPic = s.add.sprite(def.x, def.y - (def.dy ?? 0), 'people', meta.anims[def.under][0]).setOrigin(0.5, 1)
+                .setDepth(D.decor + 0.09).setFlipX((def.face ?? 1) < 0);
+            this.world.add([p.underPic]);
+            p.items.push(p.underPic);
+        }
         // Built furniture they stand behind, drawn again in front of them (a bar's counter).
         for (const c of def.cover ?? []) {
             const img = s.add.image(c.x, def.y - (c.dy ?? 0), 'shipart', c.frame).setOrigin(0.5, 1).setDepth(depth + 0.005);
@@ -164,6 +172,10 @@ export class People {
     place(p) {
         p.sprite.x = p.x;
         p.sprite.setFlipX(p.dir < 0);
+        if (p.underPic) {
+            p.underPic.x = p.x;
+            p.underPic.setFlipX(p.dir < 0);
+        }
         if (p.door) this.cropToDoor(p);
         for (const a of p.attached) {
             a.img.x = p.x + p.dir * a.dx;

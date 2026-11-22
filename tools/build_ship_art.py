@@ -78,7 +78,7 @@ MUTE_W20 = 0.20
 SHADE = {"sunlounger-long": 0.7}
 # Pieces kept off the palette (on it Champs' brown leather went a grey mauve, and lighter a pink), and pieces made
 # lighter before their twins, every colour times this (the sofa: "make it lighter", the user, 2026-11-21).
-OWN = {"sofa-champs"}
+OWN = {"sofa-champs", "patio-chair", "patio-table", "patio-chair-arm"}  # (the patio set: on the palette its teak went olive, 2026-11-22)
 BRIGHTEN = {"sofa-champs": 1.9}
 RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
@@ -293,6 +293,13 @@ for i, name in enumerate(PROPS_6):
 # side table is every round side table on board (deck 12's, the cake's, the balconies', the reading nook's).
 PIECES["massage-table"] = ("massage-table-2", 0, None, {})
 PIECES["side-table"] = ("side-table-2", 0, None, {})
+# The Great Outdoors' and the Garden Café's tables and chairs, remade side-on (the user, 2026-11-22: the wicker tries
+# "too garbled", the round white table stretched taller "too distorted"): a round café table and an armchair, the
+# user's 5 of eight each, made beige (`patio-table/beige.py`; READMEs). Her husband sits in one at his table, its near
+# arm drawn in front of him.
+PIECES["patio-chair"] = ("patio-chair", 0, None, {})
+PIECES["patio-table"] = ("patio-table", 0, None, {})
+PIECES["patio-chair-arm"] = ("patio-chair-arm", 0, None, {})   # (drawn in front of him: `patio-chair-arm/`)
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22
