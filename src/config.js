@@ -69,6 +69,27 @@ export const BED_JOY = {
     air: 0.7,
 };
 
+// The spa's massage (the user, 2026-11-22; src/world/spa.js): E within `reach` px of the second table's middle, on its
+// floor. The masseur walks `walk` px a second (his walk's planted foot), stands `end` px past the table's ends to
+// stretch, kneads `knead` times a round. Her climb on and off the table at `climbMs` a frame; the guest
+// gets up at her clip's speed and, standing, is `guestUp` px right of the table's middle (her clip's last frame). Gone
+// away this far from the table (or off its deck), the guest is lying on it again (`resetAway`). His toss of Bumbot's
+// massage gun (6) the first time: the gun in his hands in his clip's frames `held` ([px ahead of his middle, px up]),
+// let go at frame `release` from `from`.
+export const MASSAGE = {
+    m: 45.45, reach: 40, walk: 28, end: 10, knead: 3, climbMs: 120, guestUp: 19, resetAway: 380,
+    // (The guest's walk out, faster: "walking away too slowly", the user; her clip at 12 frames a second, tools/cast.py.)
+    guestWalk: 42,
+    // (Where she sits in the sauna meanwhile, facing us: the first bench's seat (49.6 m), px aft of the table's middle.)
+    bench: 196,
+    // (One round: behind the table facing us, a stretch at the feet, in front his back to us, a stretch at the head; the
+    // guest's round and round, hers once, the user's. His picture `lower` px lower but facing us behind the table.)
+    rounds: ['front', 'foot', 'back', 'head'],
+    lower: 1,
+    keep: 'keep:cat:massage',
+    toss: { clip: 'toss', held: { 1: [6, 30], 2: [15, 34], 3: [19, 40] }, release: 4, from: [18, 41] },
+};
+
 // Cabin 8206's shower (§5.3, the user, 2026-11-08): E at its door and she showers, singing (small
 // notes rise, no sound), and comes out with a towel round her head, worn until she leaves the cabin.
 // Times in ms: her stepping in or out, the shower; how often a note and a puff of steam rise.

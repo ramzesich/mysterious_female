@@ -48,7 +48,9 @@ BY_HAND = {"dog", "dogowner", "steward",
            # (The theatre's audience, 2026-11-19: in the one theatre seat, `assets/source/people/audience-seated/`.)
            "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny",
            # (Champs' second seated fan, an edit of the first's frame, 2026-11-21.)
-           "champs_d"}
+           "champs_d",
+           # (The massage scene's two, 2026-11-22: frames cleaned by hand, `masseur-raw/`, `massage_guest-raw/`.)
+           "masseur", "massage_guest"}
 
 
 def main():

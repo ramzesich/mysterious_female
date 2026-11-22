@@ -9,6 +9,7 @@ import { outside } from './outside.js';
 import { topdeck } from './topdeck.js';
 import { bow } from './bow.js';
 import { finale } from './finale.js';
+import { spa } from './spa.js';
 
 const M = 48;
 
@@ -59,12 +60,14 @@ export class Story {
         this.setupTopdeck();
         this.setupBow();
         this.setupFinale();
+        this.setupSpa();
     }
 
     // E. True if something here took it.
     interact() {
         return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband()
-            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake() || this.sushi();
+            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake() || this.sushi()
+            || this.massage();
     }
 
     update(dt, time, input) {
@@ -876,3 +879,4 @@ Object.assign(Story.prototype, outside);
 Object.assign(Story.prototype, topdeck);
 Object.assign(Story.prototype, bow);
 Object.assign(Story.prototype, finale);
+Object.assign(Story.prototype, spa);

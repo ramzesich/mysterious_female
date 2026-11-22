@@ -58,6 +58,11 @@ HER = {
         # foot to the other, her arms waving up and down; skeleton-v3 custom poses. (A first try,
         # skeleton-v3's cheer move with the game hopping her side to side, is kept in bed-cheer/.)
         "bed-joy": [(f"bed-bounce/{i}.png", "feet") for i in range(8)],
+        # Onto the spa's massage table and lying face down on it (the massage scene, the user, 2026-11-22): PixMiniMax
+        # from her standing frame in front of the game's table to her lying on it (the 14b gag's lying, 2 px into the
+        # pad), the table taken out (tools/untable.py); its floor is row 92 of the clip's canvas, the table's middle
+        # its canvas's. Played backwards she gets up.
+        "massage-lie": [(f"massage-lie/clean/{i}.png", 92) for i in range(17)],
         # Swimming in a pool (GAME_DESIGN.md §5.3): a side-on breaststroke, her head above the water,
         # skeleton-v3 custom poses. Each frame keeps its place on the canvas: lining them up by their
         # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A

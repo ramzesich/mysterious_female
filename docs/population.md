@@ -686,7 +686,8 @@ along the Spinnaker balcony's front above bars the jump down from deck 12 (§6.1
 |---|---|---|---|---|
 | 32 | `tan_11_spa` + `amb_spa_reception` | The reception's fruit bowl, the receptionist | | |
 | 42-48 | the sauna | Built; `haz_steam` at its aft door 48: `timed(5, 1.5, 48-49.5)`, a puff; contact "Fogged": her gag, 17 (2026-11-18), a burst wraps her, her hair a huge puff, she fans herself and swoons (`Steam.ride`) | A puff sprite; her clips `gags` `steam-*` |
-| 50 | `amb_masseuse` | At a massage table | | |
+| 42.2, 45.45 | the two massage tables (generated, 2026-11-22), the round side table between them with its candle | Built | |
+| 45.45 | `amb_masseur`, `amb_massage_guest` | **The massage (the user, 2026-11-22):** the masseur gives his guest, lying face down in a towel wrap on the second table, his round over and over (behind the table facing us, a stretch at her feet, in front his back to us, a stretch at her head). E at her table: he goes behind it at once (round its head), she gets up and sits on the sauna's bench (49.6 m) facing us; Bumbusik climbs on, gets the round, gets up and, the first time, his toss of Bumbot's massage gun (6); the guest comes back and lies down, and he goes on with her. E at the empty table: he comes over, the guest waits lying on hers | `src/world/spa.js`; his clips, hers, Bumbusik's `massage-lie` |
 | 58 | `amb_salon` | A stylist and a guest under the hood dryer | | |
 | 68 | `amb_aerobics` | Two in a step class | A loop | |
 | 74 | `blk_spa` | The spa's door, a "CLOSED" rope until region 9 | | Built door |

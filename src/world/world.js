@@ -1360,13 +1360,16 @@ export class World {
     }
 
     // A thing to find handed to her (the dog's owner's tennis ball): `what` is "keep:<whose>:<name>".
-    giveKeep(what, x, y) {
+    // (`quiet`: its arrival already had its sparkle and sound, `tossOver`'s.)
+    giveKeep(what, x, y, { quiet = false } = {}) {
         if (this.save.keeps.includes(what)) return;
         const kind = what.split(':')[1];
         this.scene.hud?.expect(kind);
         this.save.keeps.push(what);
-        sfx.take();
-        this.sparkle(x, y, 0xf9c22b);
+        if (!quiet) {
+            sfx.take();
+            this.sparkle(x, y, 0xf9c22b);
+        }
         writeSave(this.save);
         this.refresh();
         this.closeup(what.split(':')[2], () => this.scene.hud?.release(kind));

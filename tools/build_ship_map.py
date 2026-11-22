@@ -210,6 +210,10 @@ def metres(c):
     return (c - SEA + 0.5) / PER_M
 
 
+# A thing on the round side table stands 2 px into its top, the top's rim in front of its foot (the user, 2026-11-22).
+ON_SIDE_TABLE = 2
+
+
 def exact_x(m):
     """Pixel x at exactly `m` metres from the bow (not snapped to a column)."""
     return SEA * TILE + round(m * PER_M * TILE)
@@ -1710,10 +1714,12 @@ def build_objects():
     at11(37.4, "spa-towels", height("towel-shelf-bg"))
     at11(37.4, "painting-flowers", 56)
     at11(38.9, "cucumber-water")
+    # The two massage tables and the round side table between them with its candle on the middle of its top, remade
+    # (the user, 2026-11-22; tools/build_ship_art.py). The masseuse and her guest: tools/population.py.
     at11(42.2, "massage-table")
     at11(43.8, "side-table")
-    at11(43.8, "spa-candle", height("side-table-bg"))
-    # (45.4 m: the table with a guest on it, tools/population.py.)
+    at11(43.8, "spa-candle", height("side-table-bg") - ON_SIDE_TABLE)
+    at11(45.45, "massage-table")
     at11(47.2, "bathrobe", 34)
     at11(47.2, "spa-slippers")
     at11(53.6, "bathrobe", 34)          # and one by the sauna's far door (the user)
@@ -1879,7 +1885,7 @@ def build_objects():
     add(point("chapel-room", "chapel", exact_x(CHAPEL["m"]), floor_y(12)))
     add(point("chapel", "place", exact_x(CHAPEL["m"]), floor_y(12), [prop("route", "chapel")]))
     at12(69.75, "side-table")       # (clear of the lobby's crew door at 70.7 m)
-    at12(69.75, "rose-glass", height("side-table-bg"))
+    at12(69.75, "rose-glass", height("side-table-bg") - ON_SIDE_TABLE)
     at12(72.6, "door-cabin")
     add(point("sign-restrooms", "sign", exact_x(72.6), floor_y(12) - 84, [prop("text", "Restrooms"), prop("style", "plaque")]))
     # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
@@ -1942,7 +1948,7 @@ def build_objects():
     for m in (176.5, 179.5):
         hang12(m, "paper-lantern")
     at12(181.0, "side-table")
-    at12(181.0, "bonsai", height("side-table-bg"))
+    at12(181.0, "bonsai", height("side-table-bg") - ON_SIDE_TABLE)
     # Teppanyaki: the griddles, diners round them, a lantern, a fan on the wall.
     decor("teppan-doorway", "doorway", exact_x(182), exact_x(182), deck=12, text="Teppanyaki")
     # (More of it, the user: it looked empty.) The host's menu stand, a shoji screen between the
@@ -1957,8 +1963,9 @@ def build_objects():
     for m in (184.3, 191.6):
         at12(m, "paper-fan", 62)
     at12(191.9, "side-table")
-    at12(191.7, "bonsai", height("side-table-bg"))
-    at12(192.1, "iron-teapot", height("side-table-bg"))
+    # (The bonsai at the top's left end, the teapot at its right: the round side table is 18 px wide since 2026-11-22.)
+    at12(191.9 - 3.5 / 48, "bonsai", height("side-table-bg") - ON_SIDE_TABLE)
+    at12(191.9 + 5.5 / 48, "iron-teapot", height("side-table-bg") - ON_SIDE_TABLE)
     at12(193.0, "bamboo")
     # Le Bistro: its zinc bar, a candlelit table for two, a painting, a chandelier.
     decor("bistro-doorway", "doorway", exact_x(202), exact_x(202), deck=12, text="Le Bistro")

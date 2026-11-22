@@ -4147,3 +4147,48 @@ valuable."
 - Tests: `cabin` (E by him from the floor: none, two, all eight, a key closing it; on the bed by him, E is her reading)
   and `finale` (the day after: E by him first takes book 5 off the bed, then the bed seen close) pass. Not run: the
   rest of the suite.
+
+## Bumbot's massage gun from the spa's masseur (the user, 2026-11-22)
+
+- **The idea (the user's):** the massage gun (6) a quest item from a massage person in the spa. Of five ideas the user
+  chose "she gets a massage": E at the masseur, she lies on the table, and he hands her the gun after. It leaves the
+  gym's rowing machine (region 6) for the spa (region 9, where the spa opens). Then the user's scene, step by step
+  (`docs/massage-sequence-prompt.md` is the user's own note of it, not committed).
+- **The room remade:** the old masseuse "huge", the guest "tiny"; the masseuse, both tables, the guest and the round
+  table taken out. **The massage table** generated (four map objects, the user's 3, a sage pad, shown with her lying on
+  each; its back legs deleted after, `no_back_legs.py`), two of them at 42.2 and 45.45 m. **The round side table**
+  generated in a strict side view (the user's 2 of four, 18 x 21) and made **every** round side table on board (the
+  spa's, the Chapel's rose, Teppanyaki's two bonsai, the wedding cake's, the balconies', the nook's); **what stands on
+  one is 2 px into its top** (`ON_SIDE_TABLE`, the cake's `src_cake`, the nook in `tools/draw_rooms.py`); the second
+  bonsai and its teapot set on the narrower top; the cake was 4 px over it and is set for the new height. The nook's
+  table has the spa's candle in its coffee cup's place (the user's A of two).
+- **The masseur:** a man in a spa uniform (the user's), pro in the drill officer's style (61 px, a 15 px head). His
+  stretch: four tries failed (turned to us in a T, hands to his face, hands behind his head) before the library's
+  `arms_overhead` on his skeleton; the user: slower in the game, the hands up longer and his head looking up (held
+  0.6 s a frame, 5 a second). His massage, one skeleton clip seen from the front (behind the table) and the back (his
+  back to us): the back view's hands were drawn over his own back, painted out, the back one even white ("clean his
+  back"). His walk round the table (the far arm's doubled outline thinned) and his toss (both hands, the game draws the
+  gun in them).
+- **The guest:** a woman in a towel wrap and turban (the user's of three). Her lying face down: the first two edits
+  bared her back with the towel at her hips, made again with the towel wrapped as she stands; 3 px into the pad in all
+  (the user: "at least two pixels", then one more). Her get-up from the table and Bumbusik's climb on were made with the
+  game's table in the picture (Bumbusik's first try flipped from her back to her front in one frame: remade on hands
+  and knees, her hands on the table throughout), the table taken out after (`tools/untable.py`).
+- **The scene, the user's rounds of fixes:** the guest walks faster (42 px/s), in front of the sauna's open glass door;
+  the whole round for the guest too, over and over; E stops him at once and he goes behind the table round its head,
+  the guest getting up in the same moment; **the user's idea:** the guest goes into the sauna and sits on its bench
+  facing us while Bumbusik is massaged, then comes back and lies down again (her sitting made on her skeleton; the bench
+  the generator drew under her taken out by its own colours: a first try by kinds of grey took her own pixels, "missing a
+  few pixels"); Bumbusik's round is one: behind, a stretch at her feet, in front his back to us, a stretch at her head,
+  then she gets up and gets the gun. His layering: the user asked that she cover him in front of the table, which put her
+  over his back while she lay there ("incorrect layering"): in front he is over her while she lies on the table, under
+  her while she stands. He is 1 px lower but facing us behind the table. Her climb's pink speckles (greys the palette
+  took to the mauve her sheet turns pink, and her skin's shading scattered) cleaned. The pad's leftovers under the
+  guest cut. **The empty table too (the user's addition):** E at it brings him over at once, the guest waiting on hers;
+  he goes back to her after. His slide on the way there (the interrupted step stopped his new walk's clip) mended.
+- **Cost:** 76 generations (the tables 8, the masseur 31, the guest 33, her climb 4); every try and its id in the
+  READMEs (`assets/source/people/masseur-raw/`, `massage_guest-raw/`, `assets/source/her/massage-lie/`,
+  `assets/source/ship/massage-table-2/`, `side-table-2/`).
+- Tests: `region9` with a new case `region9.massage` (the guest's table: the sauna, the gun, her return; the empty
+  table: he comes, she waits, no second gun), `boot`, `tools/check_overlaps.py` (0) pass. Not run: the rest of the suite.
+

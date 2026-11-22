@@ -201,7 +201,8 @@ ITEMS = {
     # not the bench under the barbell); his car on Entourage's air hockey table, left of its post (the
     # user, 2026-11-20: not on the floor).
     "keep_snack": ("store", 173, "keep:cat:snack", None, 40, "thing:snack-tube"),
-    "keep_massage": (11, 97.08, "keep:cat:massage", None, 15, "thing:massage-gun"),
+    # (His massage gun was here, on the gym's rowing machine; since 2026-11-22 the spa's masseur gives it to her after her
+    # massage, the user's: `amb_masseur`, src/world/spa.js.)
     "keep_car": (7, 57.85, "keep:cat:car", None, 26, "thing:rc-car"),
     # Hers: the bookmark in its book on the stripped bed of the cabin being cleaned (deck 9), and her plant
     # on the maid's cabin's windowsill (deck 6): swapped from the plan's places, the cabin on deck 9 being
@@ -513,7 +514,11 @@ PEOPLE = {
     "amb_poolkid_a": dict(at=(12, 58.05), who="poolkid_a", face=1, idle="hop", layer="back"),
     "amb_poolkid_b": dict(at=(12, 64.7), who="poolkid_b", face=-1, idle="hop", layer="back"),
     "amb_spa_reception": dict(at=(11, 35.8), who="spa_reception", face=1, layer="behind"),
-    "amb_masseuse": dict(at=(11, 44.95), who="masseuse", face=1, idle="knead", layer="back"),
+    # The spa's massage (the user, 2026-11-22; src/world/spa.js): the masseur behind the second table kneading his guest's
+    # back, she lying on it face down in a towel wrap. E at the table: he goes to its far end and stretches, she gets up
+    # and goes out through the sauna, Bumbusik lies down for rounds of massage and gets his massage gun (6) the first time.
+    "amb_masseur": dict(at=(11, 45.45), who="masseur", face=1, idle="mf-knead", layer="behind"),
+    "amb_massage_guest": dict(at=(11, 45.45), who="massage_guest", face=1, layer="back"),
     "amb_stylist": dict(at=(11, 59.2), who="stylist", face=1, idle="work", layer="back"),
     "amb_stepper_a": dict(at=(11, 67.7), who="stepper_a", face=1, idle="steps", layer="back"),
     "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="steps", layer="back"),
@@ -615,7 +620,6 @@ PROPS = {
     "amb_lounge_her": (12, 46.3333, "thing:lounge-her", -2, dict(back=True)),
     "amb_lounge_him": (12, 52.1, "thing:lounge-him", -2, dict(back=True)),
     "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
-    "prop_massage_client": (11, 45.45, "thing:massage-client", 0, {}),
     "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),
     # (Gone to bed on the evening of the catch: she comes through with Bumbot in her arms.)
     "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True, until="flag:catch&!flag:home")),
@@ -672,7 +676,8 @@ SOURCES = {
     "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
     # Region 9: the wedding cake on its table by the pastry chef, hers to take once the planner
     # has shown what she wants, until the wedding has it.
-    "src_cake": (12, 167.75, "cake", "region:8", [("thing:wedding-cake", 25)], "flag:cake_asked", "flag:wedding"),
+    # (On the round side table: its 21 px less 2, as everything on it, the user, 2026-11-22.)
+    "src_cake": (12, 167.75, "cake", "region:8", [("thing:wedding-cake", 19)], "flag:cake_asked", "flag:wedding"),
 }
 # Signs: id: (deck, m, text, style, dy px up, options). The style is a look of src/signs.js (notice, bulletin,
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).

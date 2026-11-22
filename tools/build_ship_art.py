@@ -288,6 +288,11 @@ PROPS_6_HEIGHT = {
 }
 for i, name in enumerate(PROPS_6):
     PIECES[name] = ("props-6", i, None, {"height": PROPS_6_HEIGHT[name]})
+# The spa's massage tables and the round side table, remade (the user, 2026-11-22: "the masseuse is huge and the guest
+# is tiny"): generated at their own size, the user's 3 and 2 of four (`massage-table-2/`, `side-table-2/` READMEs). The
+# side table is every round side table on board (deck 12's, the cake's, the balconies', the reading nook's).
+PIECES["massage-table"] = ("massage-table-2", 0, None, {})
+PIECES["side-table"] = ("side-table-2", 0, None, {})
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22

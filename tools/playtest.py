@@ -5026,6 +5026,49 @@ def scenario_region9(b):
     return ok
 
 
+def scenario_region9__massage(b):
+    """The spa's massage (deck 11; the user, 2026-11-22; src/world/spa.js). The masseur works on his guest round and round.
+    E at her table: he goes behind it, she goes to the sauna's bench and sits there; Bumbusik lies down, gets her round and,
+    the first time, Bumbot's massage gun (6); the guest comes back and lies down, and his round goes on. E at the empty
+    table: he comes over, the guest stays lying on hers; no second gun."""
+    S = "window.__ship"
+    W = f"{S}.world"
+    M, G, ST = f"{W}.people.byId.amb_masseur", f"{W}.people.byId.amb_massage_guest", f"{W}.story.spaState"
+    gun = f"{S}.save.keeps.filter(k => k === 'keep:cat:massage').length"
+    b.open("?reset&play&at=spa")
+    wait(0.4)
+    tables = b.eval(f"{W}.story.spaTables().map(t => t.x)")
+    home = b.eval(f"{W}.story.spaTable().x")
+    ok = check(len(tables) == 2, "two massage tables", tables)
+    ok &= check(wait_js(b, f"{M}.sprite.anims.currentAnim?.key === 'people-masseur-mf-knead'", 20),
+                "he kneads his guest's back, behind her table", b.eval(f"{M}.sprite.anims.currentAnim?.key"))
+    ok &= check(b.eval(f"{gun}") == 0, "no massage gun in the gym any more: none yet")
+    # At the guest's table.
+    b.teleport(home - 30, floor_y(11) - 32)
+    wait(0.3)
+    b.tap("e")
+    ok &= check(wait_js(b, f"{M}.behind && Math.abs({M}.x - {home}) < 1 && {G}.sprite.anims.currentAnim?.key === 'people-massage_guest-sit'", 20),
+                "E: he stands behind her table, she sits on the sauna's bench", (b.eval(f"{M}.x"), b.eval(f"{G}.x")))
+    b.shot("region9-massage-sauna")
+    ok &= check(wait_js(b, f"{gun} === 1", 90), "her massage, and his massage gun tossed to her", b.eval(f"{S}.save.keeps"))
+    ok &= check(wait_js(b, f"!{ST}.busy", 40) and abs(b.eval(f"{G}.x") - home) < 1
+                and b.eval(f"{G}.sprite.frame.name === {G}.meta.anims.up[0]"),
+                "the guest back on her table, lying", (b.eval(f"{G}.x"), b.eval(f"{ST}.busy")))
+    # At the empty table.
+    other = [x for x in tables if abs(x - home) > 1][0]
+    b.teleport(other - 20, floor_y(11) - 32)
+    wait(0.3)
+    b.tap("e")
+    ok &= check(wait_js(b, f"{M}.behind && Math.abs({M}.x - {other}) < 1", 20), "E at the empty table: he comes behind it",
+                b.eval(f"{M}.x"))
+    ok &= check(abs(b.eval(f"{G}.x") - home) < 1, "the guest stays lying on hers", b.eval(f"{G}.x"))
+    b.shot("region9-massage-other")
+    ok &= check(wait_js(b, f"!{ST}.busy", 90) and abs(b.eval(f"{M}.x") - home) < 1, "done: he goes back to her table",
+                b.eval(f"{M}.x"))
+    ok &= check(b.eval(f"{gun}") == 1, "no second gun")
+    return ok
+
+
 def scenario_region9__pick(b):
     """His guitar pick (§4 2.1, thing 16; deck 12, the Spinnaker Lounge): not on the amp before the table scene; after it,
     on the amp of the new bandstand corner between the cream armchair and the sofa, resting on its wide edge (the user's),

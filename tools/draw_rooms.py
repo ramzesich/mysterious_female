@@ -837,7 +837,9 @@ def nook(width):
     cx0, cy0 = 124 - chair.width // 2, FLOOR - chair.height
     R.full_px |= {(cx0 + x, cy0 + y) for x in range(chair.width) for y in range(chair.height) if chair.getpixel((x, y))[3] > 0}
     w, h = stand(R.im, "side-table", 152)
-    stand(R.im, "coffee-cup", 152, dy=h)
+    # The spa's candle on it, in the coffee cup's place (the user, 2026-11-22); 2 px into the table's top, as on every
+    # round side table.
+    stand(R.im, "spa-candle", 152, dy=h - 2)
     # Books to the ceiling: a bookcase, a shelf over it, stacks on the floor.
     stand(R.im, "bookcase", 206)
     stand(R.im, "book-stack", 23)          # (left of the way out: the user, 2026-11-22; it stood against the bookcase)

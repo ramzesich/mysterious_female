@@ -29,7 +29,9 @@ OFF_THE_FLOOR = {"run", "jump", "shriek", "bounce", "step", "steps", "lunge", "k
                  ("rival", "swat"), ("rival", "swing"),
                  # (The dog's owner with the dog running round her legs: her feet stay where she
                  # stands; the dog's paw a px lower in one frame is not the floor.)
-                 ("dogowner", "wind"), ("dogowner", "unwind")}
+                 ("dogowner", "wind"), ("dogowner", "unwind"),
+                 # (The massage guest getting up off the table: lying on its top, then on the floor.)
+                 ("massage_guest", "up")}
 
 
 def lowest_row(img):

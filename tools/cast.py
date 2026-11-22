@@ -249,7 +249,24 @@ CAST = {
     "pastrychef": ("4bdd435f-84cb-4f3a-bd36-2106d0b693be", {"idle": 4, "sigh": 7}, {}),
     "barman_sp": ("8a4fd600-d655-4810-bced-3fcc89f29d61", {"shine": 7}, {"cut": {"shine": ("polish", [0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 4, 2])}}),
     "spa_reception": ("d45cc830-9766-4229-a74f-c950873b6e0f", {"bow": 8}, {}),
-    "masseuse": ("2fefa59f-b6af-4f92-8133-41d5c5256da8", {"knead": 7}, {}),
+    # The spa's massage (the user, 2026-11-22; the old masseuse, 2fefa59f, "huge", left out): the masseur, pro in the
+    # drill officer's style, and his clips made on his own skeleton (`masseur-raw/README.md`): his walk round the table,
+    # his stretch at its ends (5 a second, the hands up held 0.6 s each), his massage from behind the table facing us and
+    # in front of it his back to us (each cut into its bow, its kneading and its straightening), his toss of the gun.
+    "masseur": ("ca46c265-17de-497c-89e4-806181e735c9",
+                {"walk": 8, "stretch-slow": 5, "mf-bow": 5, "mf-knead": 5, "mf-rise": 5, "mb-bow": 5, "mb-knead": 5,
+                 "mb-rise": 5, "toss": 8},
+                {"cut": {"stretch-slow": ("stretch", [0, 1, 2, 3, 3, 3, 4, 4, 4, 5, 6, 7]),
+                         "mf-bow": ("massage-front", [0, 1]), "mf-knead": ("massage-front", [2, 3, 4, 5]),
+                         "mf-rise": ("massage-front", [6, 7]),
+                         "mb-bow": ("massage-back", [0, 1]), "mb-knead": ("massage-back", [2, 3, 4, 5]),
+                         "mb-rise": ("massage-back", [6, 7])}}),
+    # And his guest, in a towel wrap (pro in the cabin maid's style): lying face down on the table (`up`'s first frame),
+    # getting up off it (made with the table, the table taken out: tools/untable.py), walking off.
+    "massage_guest": ("26e8b77a-c87c-4c84-904c-9e7d9765fe42", {"walk": 12, "up": 7, "lie": 7, "sit": 6, "sit-up": 6},
+                      # (walk: 42 px/s, MASSAGE.guestWalk. Back onto the table: her getting up backwards; up from the
+                      # sauna's bench: her sitting down backwards.)
+                      {"cut": {"lie": ("up", list(range(16, -1, -1))), "sit-up": ("sit", list(range(7, -1, -1)))}}),
     "stylist": ("42d60ae5-b735-40b6-b118-5cb62efa8577", {"work": 6}, {"cut": {"work": ("snip", [0, 1, 2, 3, 2, 1])}}),
     "stepper_a": ("b360c69a-412b-45aa-a318-38495b31dde9", {"steps": 9}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
     "stepper_b": ("6be4ce88-e432-45d4-9efe-84d79ad27e4e", {"steps": 8}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
