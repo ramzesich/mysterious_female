@@ -4431,3 +4431,23 @@ valuable."
 - `region5` checks the towel clip on the bed and that she stands up in the towel; its stale "two tangerines in the welcome
   basket" (at 104 px since the desk took them, 118 px, 2026-11-22) mended. Tests: `region5`, `cabin`, `boot`, `keeps`
   pass. Not run: the rest. 1 generation.
+
+## Her blouse without sky blue; the water on her blue (the user, 2026-11-23)
+
+- **"I still feel like blue pixels were added to Bumbusik's sprites"**: her stand and run were checked through every
+  build of her sheet (36 commits): pixel for pixel the same since 2026-10-31. The blue was there from her first sheet:
+  PixelLab shades her white blouse with pale lavender-blues, and the palette's nearest to the palest is its sky blue
+  (`#8fd3ff`), a few px in every frame of hers (5 in her stand, 82 in her run). The user chose its replacement from three
+  (the blouse's own grey-blue shade `#9babb2`, white, a neutral grey): the grey-blue. `blouse_grey` in `tools/palettize.py`:
+  sky blue joined to the blouse's white or grey-blue, after the palette, in her sheets (`blouse` in `HER`, `HER_TOWEL`,
+  `HER_CAT`, `HER_MISHAPS`) and the gags (`tools/build_gags.py`). Her eye's glint and loose water stay.
+- **"When she's wet, a lot of water pixels were turned to grey"**: the first try greyed water on her too, and the user
+  found the wet gag's drips grey before it (since it was built, 2026-11-18: PixelLab's blue drips, `#6889ab`, fell on the
+  palette's lavender-grey). Frame by frame with the user was too slow for the deadline; measured instead: PixelLab's
+  water on her is cyan-blue (green well above red), her blouse's blues lavender-blue, and not one px of her 399 dry
+  generated frames is cyan-blue. `water_blue` (`is_water`): in her wet clips (the wet gag's seven, `shower`, `swim`,
+  `shiver`, `splutter`: `WET` in `tools/build_sprites.py`) a cyan-blue source px goes on the palette's nearest true blue.
+  The palette's own sky blue is not water (a gag's first frame is her built sheet's). Every wet clip's frames looked
+  over (before, after, the blue marked); what no tint tells (pale grey drips, blue-white water on the blouse) stays grey.
+- Only colours changed (diffed against the old sheets: dry clips only sky blue to grey-blue). Tests: `boot`, `cabin`
+  pass. Not run: the rest.

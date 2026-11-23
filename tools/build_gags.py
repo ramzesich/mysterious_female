@@ -85,7 +85,7 @@ python tools/build_gags.py"""
 import json
 from pathlib import Path
 from PIL import Image
-from palettize import palettize
+from palettize import palettize, blouse_grey, water_blue
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "her-mishaps" / "batch-4a"
@@ -132,8 +132,12 @@ def frame(clip, i):
             for x in range(CELL):
                 if a[x, y][3] and a[x, y][:3] not in keep:
                     a[x, y] = b[x, y]
-        return im
-    return palettize(im, SOOT if clip.startswith("flare-") else None)
+        return blouse_grey(im)
+    # (Her blouse's sky blue grey-blue, as in her sheets: `blouse_grey`.)
+    # (On the wet gag's clips the water on her keeps its blue, told from the blouse's by its tint: `water_blue`,
+    # the user, 2026-11-23.)
+    pal = blouse_grey(palettize(im, SOOT if clip.startswith("flare-") else None))
+    return water_blue(im, pal) if clip.startswith("sprinkler-") else pal
 
 
 def main():

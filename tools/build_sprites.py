@@ -13,13 +13,15 @@ from pathlib import Path
 
 from PIL import Image
 
-from palettize import palettize, paper_greys, hex_rgb
+from palettize import palettize, paper_greys, hex_rgb, blouse_grey, water_blue
 
 ROOT = Path(__file__).resolve().parent.parent
 COLS = 48           # cells in a row of a sheet
 
 # Bumbusik. Sources face east (the game mirrors her for west); the climb faces north.
 HER = {
+    # (Her blouse's sky blue grey-blue: `blouse_grey`, the user, 2026-11-23.)
+    "blouse": True,
     "name": "her",
     "cell": 84,
     # Palette swaps after the nearest-colour match: warmer brown hair highlights, and pink-peach
@@ -190,6 +192,8 @@ HER = {
 # PixelLab's is east-raw.png). The run and the jump are the same skeleton-v3 templates as hers; the
 # idles and the bed bounce are skeleton-v3 with her own clips' poses, read off their frames.
 HER_TOWEL = {
+    # (Her blouse's sky blue grey-blue: `blouse_grey`, the user, 2026-11-23.)
+    "blouse": True,
     "name": "her-towel",
     "cell": 84,
     "remap": HER["remap"],
@@ -220,6 +224,8 @@ HER_TOWEL = {
 # clip: its first frames; in the last three the cat is gone). In the air: two strides of the walk
 # (a skeleton-v3 jump, kept in jump/, drew him as a dark blob).
 HER_CAT = {
+    # (Her blouse's sky blue grey-blue: `blouse_grey`, the user, 2026-11-23.)
+    "blouse": True,
     "name": "her-cat",
     "cell": 84,
     "remap": HER["remap"],
@@ -246,6 +252,8 @@ HER_CAT = {
 # ride the thing does not jump. Frame 0 of a v3 clip is its start frame (for a sit-down, our
 # composition of her standing and the thing: left out).
 HER_MISHAPS = {
+    # (Her blouse's sky blue grey-blue: `blouse_grey`, the user, 2026-11-23.)
+    "blouse": True,
     "name": "her-mishaps",
     "cell": 112,
     "remap": HER["remap"],
@@ -397,6 +405,11 @@ def grey_top(im, rows):
                 im.putpixel((x, y), (v, v, v, a))
     return im
 
+# Her clips with water on her (the user, 2026-11-23: "when she's wet, a lot of water pixels were turned to grey"): the
+# water's own blue kept (`water_blue`), told from the blouse's pale blue by its tint.
+WET = {"swim", "shower", "shiver", "splutter"}
+
+
 def build(spec):
     src_dir = ROOT / "assets" / "source" / spec["name"]
     cell = spec["cell"]
@@ -418,6 +431,10 @@ def build(spec):
                   for path, anchor in sources]
         if spec.get("grey_top"):
             images = [(grey_top(img, spec["grey_top"]), anchor) for img, anchor in images]
+        if spec.get("blouse"):
+            images = [(blouse_grey(img), anchor) for img, anchor in images]
+            if anim in WET:
+                images = [(water_blue(Image.open(src_dir / path), img), anchor) for (img, anchor), (path, _) in zip(images, sources)]
         anim_feet = max(lowest_row(img) for img, _ in images)
         # Placed by its thing (HER_MISHAPS): the clip moved sideways by its first frame's thing.
         shift = 0

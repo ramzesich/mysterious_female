@@ -90,6 +90,69 @@ def palettize(img, remap=None):
     return out
 
 
+SKY, BLOUSE_SHADE = (0x8f, 0xd3, 0xff), (0x9b, 0xab, 0xb2)
+
+
+def blouse_grey(img):
+    """Her blouse's sky blue to its own grey-blue shade, after `palettize` (the user, 2026-11-23: "I still feel like blue
+    pixels were added to Bumbusik's sprites"): the generator shaded her white blouse with pale blue-greys, and the
+    palette's nearest to the palest is its sky blue, a few px of it in every frame of hers since her first sheet.
+    Only sky blue joined (at a side or a corner, through more of it) to the blouse's white or grey-blue: loose drops of
+    water stay blue (her sneeze's spray)."""
+    img = img.copy()
+    px = img.load()
+    w, h = img.size
+    sky = {(x, y) for y in range(h) for x in range(w) if px[x, y][3] and px[x, y][:3] == SKY}
+    seen = set()
+    for start in sky:
+        if start in seen:
+            continue
+        part, stack, touches = [], [start], False
+        seen.add(start)
+        while stack:
+            x, y = stack.pop()
+            part.append((x, y))
+            for nx in (x - 1, x, x + 1):
+                for ny in (y - 1, y, y + 1):
+                    if not (0 <= nx < w and 0 <= ny < h) or (nx, ny) in seen:
+                        continue
+                    q = px[nx, ny]
+                    if (nx, ny) in sky:
+                        seen.add((nx, ny))
+                        stack.append((nx, ny))
+                    elif q[3] and q[:3] in ((255, 255, 255), BLOUSE_SHADE):
+                        touches = True
+        if touches:
+            for x, y in part:
+                px[x, y] = BLOUSE_SHADE + (255,)
+    return img
+
+
+WATER_BLUES = [(0x48, 0x4a, 0x77), (0x4d, 0x65, 0xb4), (0x4d, 0x9b, 0xe6), (0x8f, 0xd3, 0xff)]
+
+
+def is_water(c):
+    """Water as PixelLab draws it on her: cyan-blue, its green well above its red (drips #6889ab, #92c1d5, splashes
+    #a1e4f1). Her blouse's pale blues are lavender-blue, green near red (#b6c9e6, #a1afce): not one px of her 399 dry
+    generated frames is cyan-blue (measured 2026-11-23)."""
+    r, g, b = c[:3]
+    # (The palette's own sky blue is not water: a clip's first frame is her built sheet's, its blouse's sky blue in it.)
+    return b - r >= 20 and b >= g and g - r >= 25 and (r, g, b) != SKY
+
+
+def water_blue(src, pal):
+    """Her wet clips (the user, 2026-11-23: the palette had turned the water on her grey): each px of `src` (the frame
+    before `palettize`) that is water goes on the palette's nearest true blue in `pal` instead of its lavender-grey."""
+    pal = pal.copy()
+    s, p = src.convert("RGBA").load(), pal.load()
+    for y in range(pal.height):
+        for x in range(pal.width):
+            c = s[x, y]
+            if c[3] >= 128 and is_water(c):
+                p[x, y] = min(WATER_BLUES, key=lambda w: sum((a - b) ** 2 for a, b in zip(w, c[:3]))) + (255,)
+    return pal
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("src")
