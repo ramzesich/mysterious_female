@@ -36,6 +36,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
         this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
         this.load.image('cabin-8206-bed', 'assets/ship/cabin-8206-bed.png');   // (the bed again, over her husband on the sofa)
+        // (Her husband's near hand drawn again over her as they embrace at his table: `husband-raw/embrace/hand.py`.)
+        for (const n of [1, 2]) this.load.image(`hug-hand-${n}`, `assets/sprites/hug-hand-${n}.png`);
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.image('linen-room', 'assets/ship/linen-room.png');
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
@@ -69,7 +71,7 @@ export class BootScene extends Phaser.Scene {
         for (const k of BED_THINGS) this.load.image(`bed-${k}`, `assets/ship/bed/${k}.png`);
         // The photo slots' pictures (§6.1.11; E at a slot's frame opens its picture over the screen: world.js's `slot`):
         // the reading nook's, her armchair at home (the user's photo, cut out, redrawn by PixelLab, recoloured to her greys).
-        for (const id of ['slot_nook']) {
+        for (const id of ['slot_nook', 'slot_cucina']) {
             this.load.image(`photo-${id}`, `assets/ship/photos/${id}.png`);
             this.load.image(`thumb-${id}`, `assets/ship/photos/thumb-${id}.png`);     // (on the wall: small, framed)
         }
@@ -234,10 +236,15 @@ export class BootScene extends Phaser.Scene {
         if (meta.anims.knock) this.anims.create({ key: 'her-knock', frames: frames('knock'), frameRate: 9 });
         // At her cabin's mirror: a hand over her hair (the intro plays her `badge` clip frame by frame).
         if (meta.anims.hair) this.anims.create({ key: 'her-hair', frames: frames('hair'), frameRate: 8 });
-        if (meta.anims['sit-eat']) {
-            this.anims.create({ key: 'her-sit-eat', frames: frames('sit-eat', [0, 1, 2, 3]), frameRate: 7 });
-            this.anims.create({ key: 'her-eat-sat', frames: frames('sit-eat', [3, 4, 5, 6, 5, 4]), frameRate: 5, repeat: -1 });
+        // At her husband's table: down into the patio chair with her cone, licking it, getting up after the book.
+        if (meta.anims['sit-cone']) {
+            this.anims.create({ key: 'her-sit-cone', frames: frames('sit-cone'), frameRate: 8 });
+            this.anims.create({ key: 'her-lick-cone', frames: frames('lick-cone'), frameRate: 5, repeat: -1 });
+            this.anims.create({ key: 'her-sat', frames: frames('sat') });
+            this.anims.create({ key: 'her-sit-up', frames: frames('sit-up'), frameRate: 10 });
         }
+        // Her arms up round his neck as they kiss (back to us), and down again (played backwards).
+        if (meta.anims.embrace) this.anims.create({ key: 'her-embrace', frames: frames('embrace'), frameRate: 8 });
         // Region 8: the horn's cord pulled, held at its lowest; a shot at the hoop; hanging from the
         // open parasol's handle.
         if (meta.anims.pull) this.anims.create({ key: 'her-pull', frames: frames('pull', [0, 1, 2, 3, 4]), frameRate: 10 });

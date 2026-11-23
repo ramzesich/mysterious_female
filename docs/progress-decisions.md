@@ -4246,3 +4246,53 @@ valuable."
 
 - **Merged:** `main` fast-forwarded to `three-uses` (3fb257b: his table and his cabin seat) and pushed, on the user's
   word (2026-11-22).
+
+## §4 2.4's rest: his gestures and the table scene (the user, 2026-11-23)
+
+- **His four gestures**, seated, skeleton-v3 poses on his character from the idle's pose, through `make.py` (his legs held,
+  his far leg behind the table): `wave` (his near hand raised forward toward her; the first try's hand crossed his face),
+  `laugh`, `give` (the held frames' stern brow given the first held frame's face), `eat` (an edit of his seated frame with
+  a soft serve, then PixMiniMax). The book is in his fist while his arm is out, from the clip's third frame
+  (`GIVE_HANDS` in `src/world/world.js`). Ids in `assets/source/people/husband-raw/README.md`.
+- **The crates** on deck 11 stood between the soft serve machine and his table: no cone could pass ("Do we need that
+  obstacle here at all?"). Moved aft of his table between the Garden Café's palms (232.8 m), off every carrying route,
+  their two tangerines with them.
+- **Bumbusik at the table** ("what does Bumbusik do, while seated?"; "not seating properly in the chair"): her old
+  `sit-eat` had empty hands, made on another chair. Remade on her skeleton (the `sit_seat` move, her near hand at her
+  chest, then small head dips), the generated chair taken out, set 7 px further back into the patio chair than first
+  composed (the user's 7 of 2 to 8), the chair's near arm over her lap; her face held (her standing sprite's head:
+  "Her face is distorted while she's eating"); her cone her husband's cone's own pixels ("too big, let it match his";
+  the carried cone stays as it is: the user's "only at the table"). Clips `sit-cone`, `lick-cone`, `sat`, `sit-up`;
+  `assets/source/her/sit-cone/README.md`.
+- **Only the book after eating** ("two things appearing at once"): the photo slot left his table for La Cucina's wall on
+  deck 5 (`slot_cucina`, 154.25 m, "between the entrance and the first window"; the user's choice of place), with the
+  user's own photo of the two of them at La Cucina's window table (sent whole, his *vyshyvanka* kept; tries at 108 x 144
+  "too pixellated", try 4 of 168 x 224 chosen; a 20 x 26 redraw framed small on the wall: `tools/frame_nook_thumb.py
+  cucina`); the preview shows it at 2x (its margin 76 px). A start place at La Cucina's entrance, `cucina`.
+- **The book he gives** is *Atomic Habits* (book 1, "switch the book to the Atomic Habits one"); book 6 lies on the
+  Atrium Café's table in book 1's old place.
+- **Cost:** about 45 generations (his gestures 23, hers about 15, the photo 7). Tests: `boot`, `region6`, `region9` pass;
+  `tools/check_overlaps.py` 0. Not run: the rest.
+
+## The Great Outdoors refined (the user, 2026-11-23)
+
+- **Her hop with a load** ("the ice cream is just hanging in the air"): her sheet's `carry-rise`, `carry-apex`,
+  `carry-fall`, her own jump's poses with her carrying arms ("that doesn't look like a jump at all" of a hop with straight
+  legs), the load by her fists in each (`HOP_HOLDS` in `src/world/carry.js`); height and timing unchanged.
+  `assets/source/her/carry-jump/README.md`.
+- **The machine:** she steps to its side (the side she came from, `SWIRL.aside` 18 px) and faces the cone filling.
+- **The gull** (`gull_go`): no shadow; its hover 600 ms (950 before; the pool's gulls too); its perch 210.9 m, away from
+  the machine; with her cone it flies off the screen, stays away 5 s and flies back, each leg placed by the time since it
+  began (`FLIGHT` in `src/world/hazards.js`): the birds are updated only while she is near, and one left mid-flight had
+  stayed in the air.
+- **Feeding him every time** while he is at his table (his book the first time only); a cone she eats herself
+  (`sec_cone`) only from the catch to the day after; `region6` checks a second meal, no second book.
+- **The kiss** (E with her hands empty once he has been fed; before, his wave and his bubble): he stands facing us (his
+  front view; his chair's near arm and far leg hidden: the people's `coverPics`), she steps up 6 px to his right with
+  her back to us, they embrace (his `embrace`, hers, his near hand drawn over her: `hug-hand-*`; her forearms behind her
+  hair: "She is hugging herself, not him"), seven hearts, the embrace backwards, he sits; she faces the way she was going.
+  `assets/source/her/embrace/README.md`, `assets/source/people/husband-raw/README.md`.
+- **Cost:** about 13 generations (her hop 8.4, the embrace 4.2). Tests: `boot`, `region6`, `region8`, `region9` pass. Not
+  run: the rest.
+- **Merged:** `main` fast-forwarded to `three-uses` (e4f719c: the table scene, the photo, the Great Outdoors refined) and
+  pushed, on the user's word (2026-11-23).

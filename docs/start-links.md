@@ -46,6 +46,7 @@ new one added there should be added here too.
 |---|---|
 | `deck5`: deck 5's corridor between its two paper rounds (the first forward of her, the second aft) | <http://localhost:8000/?play&at=deck5&cards=all> |
 | `knit5`: deck 5's forward corridor, aft of the knitting lady and her basket (the wool, 2) | <http://localhost:8000/?play&at=knit5> |
+| `cucina`: deck 5, at La Cucina's entrance (its portico); the photo of her with her husband on its wall after the table scene, `did=table` | <http://localhost:8000/?play&at=cucina&did=table> |
 | `shore5`: deck 5, forward of Shore excursions' desk (her flag among the little flags at its far end, 9) | <http://localhost:8000/?play&at=shore5> |
 | `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all> |
 

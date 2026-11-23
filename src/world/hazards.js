@@ -172,9 +172,17 @@ export class WetPatch {
 }
 
 // Gulls over a stretch of open deck (population: `gull_pool`, `gull_go`): they wheel overhead, or
-// one sits on the rail. While she carries food there one of them dives at it: its shadow shows on
-// the deck where she will be in a second, then it comes down on that spot. If she is there, it has
-// her cone (never a fright: she fetches another). The way past: not to be where the shadow is.
+// one sits on the rail. While she carries food there one of them dives at it: it hangs over the
+// spot where she will be when it comes down (`TELL_MS`), then dives on it. If she is there, it has
+// her cone (never a fright: she fetches another). The way past: not to be under it when it drops.
+// (No shadow on the deck: the user, 2026-11-23, "Remove the spot shadow under the gull"; and a
+// shorter hover, 950 ms then: "too easy to avoid ... but don't make it impossible to avoid".)
+const TELL_MS = 600;
+// With her cone (or a tangerine) it flies up and off the screen (`up`, ms), stays away (`away`), and flies back to its
+// perch or its round (`back`); a dive that misses, or her cry in its tell, sends it straight back. Each leg is placed
+// by the time since it began, never moved a step a frame: the birds are only updated while she is near, and a bird
+// left mid-flight when she jumped away stayed in the air there (the user, 2026-11-23).
+const FLIGHT = { up: 1400, away: 5000, back: 1800, off: { x: 300, y: -230 } };
 export class FoodGulls {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -184,8 +192,8 @@ export class FoodGulls {
         // Those that circle (the pool's, `gull_pool`) wheel in the open sky over deck 12, above its railing, over the
         // opening above the pool: under deck 12's band they had flown as if under a ceiling (the user, 2026-11-19).
         // They are behind the ship's side up there (from deck 11 out of view) and come down past deck 12's band, in
-        // front of her once under it (`band`); and they give no shadow (the user: "Remove the shadow spot"). A perched
-        // one (the Great Outdoors') waits on its rail, its shadow marking its dive.
+        // front of her once under it (`band`). A perched one (the Great Outdoors') waits on its rail. None gives a
+        // shadow (the user: "Remove the shadow spot", the pool's, 2026-11-19; the Great Outdoors', 2026-11-23).
         this.high = !def.perch;
         this.top = this.high ? def.y - 206 : def.y - 112;
         this.band = def.y - 128;
@@ -194,9 +202,8 @@ export class FoodGulls {
             const sprite = s.add.image(def.x, this.top, 'things', def.perch ? 'gull-perched' : 'gull-up').setOrigin(0.5, 1).setDepth(D.player + 0.34);
             this.birds.push({ sprite, phase: i * Math.PI, x: def.x, y: this.top });
         }
-        this.shadow = s.add.ellipse(def.x, def.y - 1, 22, 5, 0x2e222f, 0.45).setDepth(D.decor + 0.32).setVisible(false);
         this.loot = s.add.image(0, 0, 'load-cone').setOrigin(0.5, 1).setDepth(D.player + 0.35).setVisible(false);
-        world.add([...this.birds.map(b => b.sprite), this.shadow, this.loot]);
+        world.add([...this.birds.map(b => b.sprite), this.loot]);
         this.state = 'idle';
         this.at = 0;
         this.diver = this.birds[0];
@@ -222,11 +229,8 @@ export class FoodGulls {
         if (!this.world.hears(Phaser.Math.Clamp(c.x, d.x0, d.x1), d.y)) return;
         this.scaredUntil = s.time.now + CRY.startleMs;
         if (this.state === 'mark') {
-            s.tweens.killTweensOf(this.shadow);
-            this.shadow.setVisible(false);
             sfx.at(this.diver.x, this.diver.y).flap();
-            this.state = 'up';
-            this.at = s.time.now + 900;
+            this.flyBack(s.time.now, 2800);
         }
     }
 
@@ -243,6 +247,22 @@ export class FoodGulls {
         this.pounce(this.fruit.x + side * 7);
         this.at = s.time.now + 1600;
         return true;
+    }
+
+    // Off the screen with what it took, then back after `FLIGHT.away` (`rearm`: ms after it is back before it dives again).
+    flyOff(time, rearm) {
+        const b = this.diver;
+        this.state = 'up';
+        this.leg = { t0: time, from: { x: b.x, y: b.y }, to: { x: b.x + FLIGHT.off.x, y: b.y + FLIGHT.off.y }, rearm };
+    }
+
+    // Straight back to its perch (or its round).
+    flyBack(time, rearm) {
+        const b = this.diver;
+        this.state = 'back';
+        this.loot.setVisible(false);
+        b.sprite.setVisible(true);
+        this.leg = { t0: time, from: { x: b.x, y: b.y }, rearm };
     }
 
     // A cone dropped on the deck: one comes down for it, stays a moment, and goes.
@@ -274,14 +294,10 @@ export class FoodGulls {
         const b = this.diver;
         if (this.state === 'idle') {
             if (food && inZone && !this.off() && time > this.at) {
-                // Its shadow, where she will be if she keeps on as she goes.
+                // Where she will be if she keeps on as she goes: it goes to hang over that spot.
                 this.state = 'mark';
-                this.at = time + 950;
-                this.targetX = Phaser.Math.Clamp(p.x + p.body.velocity.x * 0.95, d.x0 + 6, d.x1 - 6);
-                if (!this.high) {
-                    this.shadow.setPosition(this.targetX, d.y - 1).setVisible(true).setScale(0.4);
-                    s.tweens.add({ targets: this.shadow, scale: 1.2, duration: 950 });
-                }
+                this.at = time + TELL_MS;
+                this.targetX = Phaser.Math.Clamp(p.x + p.body.velocity.x * TELL_MS / 1000, d.x0 + 6, d.x1 - 6);
                 sfx.at(b.x, d.y).gull();
             }
         } else if (this.state === 'mark') {
@@ -302,7 +318,6 @@ export class FoodGulls {
             b.y = this.from.y + (d.y - 30 - this.from.y) * k * k;
             b.sprite.setFrame('gull-down').setPosition(b.x, b.y);
             if (time > this.at) {
-                this.shadow.setVisible(false);
                 const got = this.world.carry && FOOD.includes(this.world.carry.kind) && here(s, d) && !s.gliding
                     && Math.abs(p.x - this.targetX) < 17 && p.y > d.y - 30;
                 if (got) {
@@ -312,21 +327,35 @@ export class FoodGulls {
                     this.world.say(t('say.hey'), 900);
                     this.stolen = (this.stolen ?? 0) + 1;
                 }
-                // (Up and away, with her cone or without.)
+                // (Up and off the screen with her cone; missed, back to its perch.)
                 sfx.at(this.targetX, d.y).flap();
-                this.state = 'up';
-                this.at = time + 900;
+                if (got) this.flyOff(time, 2800);
+                else this.flyBack(time, 2800);
             }
         } else if (this.state === 'up') {
-            b.y -= 150 * dt;
-            b.x += 60 * dt;
-            b.sprite.setFrame(flap).setPosition(b.x, b.y);
+            const L = this.leg, k = Math.min(1, (time - L.t0) / FLIGHT.up);
+            b.x = L.from.x + (L.to.x - L.from.x) * k;
+            b.y = L.from.y + (L.to.y - L.from.y) * k * (2 - k);
+            b.sprite.setFrame(flap).setFlipX(false).setPosition(b.x, b.y);
             this.loot.setPosition(b.x, b.y + 6);
-            if (time > this.at) {
+            if (k >= 1) {
                 this.loot.setVisible(false);
+                b.sprite.setVisible(false);
+                this.state = 'away';
+                this.at = L.t0 + FLIGHT.up + FLIGHT.away;     // (from when it went: not from when she came back)
+            }
+        } else if (this.state === 'away') {
+            if (time > this.at) {
+                this.flyBack(this.at, this.leg.rearm);   // (from where it went off the screen, when it set off back)
+            }
+        } else if (this.state === 'back') {
+            const L = this.leg, h = this.home(b, time), k = Math.min(1, (time - L.t0) / FLIGHT.back), e = k * k * (3 - 2 * k);
+            b.x = L.from.x + (h.x - L.from.x) * e;
+            b.y = L.from.y + (h.y - L.from.y) * e;
+            b.sprite.setFrame(k >= 1 && h.perched ? 'gull-perched' : flap).setFlipX(k < 1 && h.x < L.from.x).setPosition(b.x, b.y);
+            if (k >= 1) {
                 this.state = 'idle';
-                this.at = time + (this.fed ? 10000 : 2800);
-                this.fed = false;
+                this.at = time + L.rearm;
             }
         } else if (this.state === 'pounce') {
             // Down beside the mess on the deck; a few pecks; away.
@@ -338,11 +367,9 @@ export class FoodGulls {
                 // (Off with the tangerine in its beak.)
                 this.fruit.destroy();
                 this.fruit = null;
-                this.fed = true;
                 this.loot.setTexture('tangerine').setVisible(true);
                 sfx.at(this.targetX, d.y).flap();
-                this.state = 'up';
-                this.at = time + 900;
+                this.flyOff(time, 10000);
             } else if (time > this.at) {
                 this.state = 'idle';
                 this.at = time + 1500;

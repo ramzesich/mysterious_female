@@ -1,9 +1,13 @@
-"""The reading nook's photo small on its wall (`thumb-slot_nook`): PixelLab's 20 x 26 redraw of the recoloured picture
-(`assets/source/photos/nook/thumb2.png`), faded as an old print and its oranges and yellows (the lion, the cream ground)
-taken mostly out (the user, 2026-11-22: "a bit more washed-out coloring", "the orange/yellow much less prominent"), in a
-gold frame with a dark outline: `assets/ship/photos/thumb-slot_nook.png` (26 x 32).
+"""A photo slot's picture small on its wall (`thumb-slot_<name>`): PixelLab's 20 x 26 redraw of its picture, in a gold
+frame with a dark outline: `assets/ship/photos/thumb-slot_<name>.png` (26 x 32).
 
-    python tools/frame_nook_thumb.py
+- `nook`: the reading nook's (`assets/source/photos/nook/thumb2.png`), faded as an old print and its oranges and yellows
+  (the lion, the cream ground) taken mostly out (the user, 2026-11-22: "a bit more washed-out coloring", "the
+  orange/yellow much less prominent").
+- `cucina`: the two of them at La Cucina's window table (`assets/source/photos/cucina/thumb.png`, from try 4, the user's
+  choice, 2026-11-23), as it came.
+
+    python tools/frame_nook_thumb.py [nook|cucina ...]      (all of them by default)
 """
 import colorsys
 from pathlib import Path
@@ -11,14 +15,16 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "assets" / "source" / "photos" / "nook"
-WARM = 0.25          # how much of the oranges' and yellows' colour is left
-FADE = 0.35          # how far every colour goes toward the print's paper
 PAPER = (226, 222, 214)
+# name: (its small redraw, how much of the oranges' and yellows' colour is left, how far every colour goes toward the
+# print's paper)
+SLOTS = {"nook": ("thumb2.png", 0.25, 0.35), "cucina": ("thumb.png", 1.0, 0.0)}
 
 
-def main():
-    t = Image.open(SRC / "thumb2.png").convert("RGBA")
+def frame(name):
+    src, WARM, FADE = SLOTS[name]
+    SRC = ROOT / "assets" / "source" / "photos" / name
+    t = Image.open(SRC / src).convert("RGBA")
     px = t.load()
     for y in range(t.height):
         for x in range(t.width):
@@ -35,9 +41,11 @@ def main():
     f.paste((0xf0, 0xc8, 0x60, 255), (1, 1, W - 1, 2))
     f.alpha_composite(t, (3, 3))
     f.save(SRC / "framed.png")
-    f.save(ROOT / "assets" / "ship" / "photos" / "thumb-slot_nook.png")
-    print("wrote thumb-slot_nook.png", f.size)
+    f.save(ROOT / "assets" / "ship" / "photos" / f"thumb-slot_{name}.png")
+    print(f"wrote thumb-slot_{name}.png", f.size)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    for name in sys.argv[1:] or SLOTS:
+        frame(name)

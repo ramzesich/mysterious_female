@@ -75,12 +75,12 @@ last column is what the drawn pages hinted at until then.
 
 | Id | Region | Where | How she gets it | Its page hints at |
 |---|---|---|---|---|
-| `book_1` | 1 | Deck 5, 96, a table at the Atrium Café, by a half-drunk coffee | Pickup, before she knows what it is for | The galley's crate behind the Seven Seas' crew door |
+| `book_6` | 6 | Deck 5, 96, a table at the Atrium Café, by a half-drunk coffee (book 1's place until 2026-11-23: the user swapped them) | Pickup, before she knows what it is for | The galley's crate behind the Seven Seas' crew door |
 | `book_2` | 2 | The lifeboat at 143 on the boat walkway, on the bench left of its ladder (since 2026-11-21) | Pickup inside `room_lifeboat` | The trap door in the stage |
 | `book_3` | 3 | Deck 6, 254, the dressing room's make-up table | Pickup inside `room_dressing` (the stage door, red) | The jackpot machine's glint |
 | `book_4` | 4 | Deck 9, 134, the honeymoon couple | Their thanks for their picture | The pantry passage between the kitchens |
 | `book_5` | 5 | Deck 8, cabin 8206, on the bed | Pickup (a book like the rest since 2026-11-21: the bed is one of the places she reads, E on it) | Deck 7's stern strip |
-| `book_6` | 6 | Deck 11, 216, her husband | His thanks for a perfect cone | Los Lobos' piñata |
+| `book_1` | 1 | Deck 11, 216, her husband (*Atomic Habits*, since 2026-11-23, the user: "switch the book to the Atomic Habits one"; from his fist, his `give` clip) | His thanks for a perfect cone | Los Lobos' piñata |
 | `book_7` | 7 | Deck 10, 235, the balcony guest | His thanks for his door | The telescope on the funnel |
 | `book_8` | 8 | Deck 12, 129, the old lady's sunbed, after the horn | Pickup | The lighting bridge over the stage |
 | `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
@@ -120,7 +120,7 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | 11 | 32 | `tan_11_spa` | The spa reception's fruit bowl | 1 |
 | 11 | 145 | `tan_11_topsiders` | Topsiders' bar | 1 |
 | 11 | 176 | `tan_11_fruit` | The Garden Café's fruit counter | 2 |
-| 11 | 209 | `tan_11_crates` | Behind stacked crates at the service station, breakable | 2 |
+| 11 | 232.8 | `tan_11_crates` | Behind stacked crates between the Garden Café's two palms, aft of her husband's table, breakable (at 209, then 217.9 by the build, they stood on the cone's way to him: moved 2026-11-23, the user) | 2 |
 | 12 | 54 | `tan_12_spinnaker` | The Spinnaker's bar | 2 |
 | 12 | 128 | `tan_12_lady` | The old lady's thanks for her cocktail | 2 |
 | 12 | 166 | `tan_12_cagneys` | Cagney's bread basket | 1 |
@@ -139,7 +139,7 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 | `slot_stern` | Deck 7's stern strip, 253, on the stern structure | A drop from deck 8's stern terrace; the socks to climb back |
 | `slot_chapel` | The chapel, on its wall | After the cake |
 | `slot_nook` | The reading nook's wall, over its table | All fourteen books, the odd book (her armchair at home, the user's photo) |
-| `slot_table` | The table with her husband, 216 | A perfect cone for him (the frame stands on the table after) |
+| `slot_cucina` | La Cucina's wall, deck 5, 154.25 m, between its entrance and its first window | A perfect cone for him: the photo of the two of them at La Cucina's window table (the user's), up once the table scene is done (it stood on his table till 2026-11-23: "I would leave only the book") |
 
 ### 2.5 The checkpoints (17)
 
@@ -353,7 +353,7 @@ character, built in step 1 (the user, 2026-11-13).
 | 86 | `blk_photographer` | The photographer and his backdrop at the curving stairs' foot | `block(region 3)`; he poses passengers (`amb_posers`, a couple) | Three characters |
 | 88-100 | `amb_trio` | A string trio on the atrium floor (optional) | `static`, a play loop | Three characters |
 | 90 | `tan_5_cafe` | The café's fruit bowl | | |
-| 96 | `book_1` | The book on a café table | `pickup` | A book |
+| 96 | `book_6` | The book on a café table (book 1's place till 2026-11-23) | `pickup` | A book |
 | 92 | `sec_lift_glimpse` | The glass elevator at deck 5: the car's panel lights 5 only | | Built |
 
 **Shore excursions, reservations 110-150.** Decor; `amb_agent` at the desk.
@@ -742,14 +742,13 @@ are on the stairs).
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 209 | `haz_crates` | Stacked crates behind the service station, `tan_11_crates` behind | Breakable | Crates |
+| 232.8 | `haz_crates` | Stacked crates between the Garden Café's two palms, aft of her husband's table (off every carrying route: the cones go from the machine to him and to the kid, the coffee forward to the stairs; moved from 217.9 m, 2026-11-23, the user), `tan_11_crates` behind | Breakable | Crates |
 | 211 | `src_coffee` | The coffee machines | `source(coffee)`: a hot cup on a tray; a "keep it hot" meter, 50 s | A cup |
 | 213 | `src_icecream` | The soft serve machine | `machine`: hold E; perfect, stub or toppled; empty after the first cone until `item_canister` is poured in (E); a cone melts in 45 s; a cone is gull bait | The meter, three cones |
 | 213 | `sec_cone` | A cone for herself | `quirk(E)` with no errand open: she eats it where she stands | A clip |
-| 216 | `npc_husband` | Her husband at the first table, a cone in hand, looking at the wake | `static`; bubble (the canister) once the machine is empty; bubble (a cone) once it is refilled and the kid is fed; E with a perfect cone: `scn_table` (they eat together, `slot_table` appears on the table, `book_6`) | From the user's photo; sit, eat, wave, the moment. **2026-11-22:** his own character (`husband-raw/`), seated in the patio chair at 219.73 m, its near arm over him (`cover`), his far leg behind the table (`under`); `idle` built, the gestures to come |
-| 216 | `slot_table` | The framed picture on the table after `scn_table` | | |
+| 216 | `npc_husband` | Her husband at the first table, a cone in hand, looking at the wake | `static`; bubble (the canister) once the machine is empty; bubble (a cone) once it is refilled and the kid is fed; E with a perfect cone: `scn_table` (they eat together, `book_1` the first time; their photo is on La Cucina's wall after, `slot_cucina`), every time while he is at his table (2026-11-23); E with her hands empty: his wave before he is fed, **the kiss** after (he stands facing us, she steps up with her back to us, they embrace, hearts; he sits back down) | From the user's photo; sit, eat, wave, the moment. **2026-11-22:** his own character (`husband-raw/`), seated in the patio chair at 219.73 m, its near arm over him (`cover`), his far leg behind the table (`under`); `idle` built. **2026-11-23:** his `wave`, `laugh`, `give` (the book from his fist) and `eat` (a soft serve), all seated |
 | 210-222 | the climb | The service station's roof (2 m), the first table's parasol top (2.6 m), a wall jump off deck 12's end wall at 220 onto the sun cover's low end at 222, up the cover to the aft terrace | The socks | Built cover |
-| 225, 235 | `gull_go` | Perched gulls | Dive at food within 4 m; a cone as bait; a swoop otherwise when she lingers | |
+| 225, 235 | `gull_go` | Perched gulls | Dive at food within 4 m; a cone as bait; a swoop otherwise when she lingers | **As built (2026-11-23):** one, on the Great Outdoors' rail at 210.9 m (its forward end, away from the machine), over 210.6 to 219.2 m: it hangs 600 ms over where she will be, no shadow, then dives; with her cone it flies off the screen, is away 5 s and flies back to its rail (each leg placed by the clock: `FLIGHT` in `src/world/hazards.js`) |
 | 230-240 | `amb_tables_go` | Two tables of guests | | |
 
 ### Deck 12 (regions 8, 9)
@@ -922,9 +921,11 @@ Input locked unless said; each sets its save flag.
    floor. **`scn_machine`:** the first cone at `src_icecream` empties it (a sad sputter); her
    husband's bubble shows the canister; `room_coldroom` has it; E at the machine with the canister:
    she pours, it hums, it never empties again; his bubble shows a cone once the kid is fed.
-   **`scn_table`:** E at her husband with a perfect cone: they sit, eat, look at the wake for 4 s
-   (input free to leave any time after); the framed picture appears on the table (`slot_table`);
-   he hands her `book_6`.
+   **`scn_table`:** E at her husband with a perfect cone: she sits down across from him in the patio
+   chair with her cone, they eat looking at the wake for 4 s (her cone his cone's look; the clips:
+   `assets/source/her/sit-cone/`); he hands her `book_1` (*Atomic Habits*) from his fist; she gets up.
+   Their photo is on La Cucina's wall from then on (`slot_cucina`, deck 5; till 2026-11-23 a frame
+   that came on the table at the same moment as the book).
 8. **`scn_engineer`:** E at the technical door with the hot coffee: he drinks, waves her up, climbs
    the ladder out of sight; from then on he is at the top. **`scn_horn`:** E at the cord: the pull
    clip, the screen shakes, the smoke puffs; the camera pans to the sun deck: the rival jumps, the

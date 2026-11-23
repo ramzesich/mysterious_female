@@ -3834,7 +3834,7 @@ def scenario_region6(b):
     b.shot("region6-cone")
     ok &= check(0.5 < js(b, f"{W}.carryBox.left()") < 1, "and it is melting")
     # Standing about with it in the open: the gull has it.
-    ok &= check(wait_js(b, f"{W}.foodGulls.gull_go.state === 'mark'", 6), "its shadow on the deck")
+    ok &= check(wait_js(b, f"{W}.foodGulls.gull_go.state === 'mark'", 6), "it hangs over the spot she is at")
     ok &= check(wait_js(b, f"!{W}.carry", 4) and js(b, f"{W}.foodGulls.gull_go.stolen") == 1 and b.state()["mode"] == "play", "then the gull has her cone: no fright")
     b.shot("region6-gull")
     wait(1.2)
@@ -3893,15 +3893,28 @@ def scenario_region6(b):
     wait(3.0)
     b.shot("region6-table")
     ok &= check(wait_flag(b, "table", 12), "E with it: she sits down with him, and they eat looking at the wake", flags(b))
-    ok &= check(js(b, f"{S}.save.books['6']") == "held", "he gives her the sixth book")
-    ok &= check(js(b, f"{thing('slot_table')}.items[0].visible"), "their picture stands on the table")
+    ok &= check(js(b, f"{S}.save.books['1']") == "held", "he gives her the first book, Atomic Habits")
+    ok &= check(js(b, f"{thing('slot_cucina')}.items[0].visible"), "their photo is on La Cucina's wall now")
     b.shot("region6-picture")
-    # With no errand left, a cone is hers.
+    # Every perfect cone while he is at his table: they sit down together again; his book only the first time.
+    wait_js(b, f"{S}.mode === 'play'", 10)
+    ok &= check(swirl(1.75) == "cone" and carrying(b) == "cone", "another cone: hers to carry while he is at his table", carrying(b))
+    b.eval(f"(w => {{ w.__hands = 0; const o = w.handOver.bind(w); w.handOver = (...a) => (w.__hands++, o(...a)); }})({W})")
+    b.teleport(L["husbandX"] - 30, D11)
+    wait(0.4)
+    b.tap("e")
+    ok &= check(wait_js(b, f"{S}.mode === 'scripted'", 3) and wait_js(b, f"{S}.mode === 'play'", 16) and carrying(b) is None,
+                "E with it: they eat together again", b.state())
+    ok &= check(js(b, f"{W}.__hands") == 0 and js(b, f"{S}.save.books['1']") == "held", "no second book")
+    # With him away from his table (from the catch to the day after), a cone is hers: eaten where she stands. (The flag
+    # set in the save alone, so that the finale's scenes do not start.)
+    b.eval(f"{S}.save.flags.push('catch')")
     swirl(1.75)
     wait(0.5)
-    ok &= check(b.state()["mode"] == "scripted" and carrying(b) is None, "a cone for herself, eaten where she stands", b.state())
+    ok &= check(b.state()["mode"] == "scripted" and carrying(b) is None, "him away: a cone for herself, eaten where she stands", b.state())
     b.shot("region6-herself")
     ok &= check(wait_js(b, f"{S}.mode === 'play'", 5) and "sec_cone" in save_list(b, "seen"), "and done")
+    b.eval(f"{S}.save.flags = {S}.save.flags.filter(f => f !== 'catch')")
     # The crates behind the service station.
     crates = js(b, f"{thing('haz_crates_11')}.x")
     b.eval(f"{S}.save.tangerines += 1; {S}.refreshHud()")

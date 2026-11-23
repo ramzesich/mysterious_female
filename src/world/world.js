@@ -20,6 +20,9 @@ import { sign, SIGN_LOOKS } from '../signs.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
+// Things handed over from a `give` clip's fist (`handOver`): her husband's arm held out across his table from its third
+// frame, his fist 15 to 20 px ahead of his middle and 29 to 36 px up (assets/source/people/husband/give/2.png-4.png).
+const GIVE_HANDS = { husband: { from: 2, at: [13, 39], out: 650 } };
 const OK = { ok: true };
 // The knitting lady in her armchair: the chair was drawn round her own seated pose (its picture's
 // left edge 16 px behind her middle, its foot on her floor), so she sits in it exactly.
@@ -1739,13 +1742,27 @@ export class World {
     }
 
     // Someone hands her a thing: it crosses from their hands to hers, sparkles, and `then` it is hers.
+    // (`GIVE_HANDS[who]`: their `give` clip reaches out with it, in the fist from the clip's frame `from` on, its top
+    // left corner `at` [px ahead of their middle, px up from their feet], behind the fingers; it leaves the hand
+    // `out` ms in, while the arm is still out: her husband's book across his table.)
     async handOver(person, frame, then, tint) {
-        const s = this.scene, p = s.player;
+        const s = this.scene, p = s.player, sp = person.sprite;
+        const hand = person.meta.anims.give && GIVE_HANDS[person.who];
         const img = this.image(person.x + person.dir * 12, person.y - 34, frame).setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
         if (tint) img.setTint(tint);
         this.add([img]);
+        if (hand) {
+            img.setVisible(false).setOrigin(person.dir < 0 ? 1 : 0, 0).setDepth(sp.depth - 0.001);
+            const held = (anim, f) => {
+                if (f.index - 1 < hand.from) return;
+                sp.off('animationupdate', held);
+                img.setPosition(Math.round(sp.x) + person.dir * hand.at[0], Math.round(sp.y) - hand.at[1]).setVisible(true);
+            };
+            sp.on('animationupdate', held);
+        }
         if (person.meta.anims.give) this.people.play(person, 'give');
-        await this.wait(350);
+        await this.wait(hand ? hand.out : 350);
+        if (hand) img.setVisible(true).setOrigin(0.5, 1).setPosition(img.x + person.dir * 5, img.y + 13).setDepth(s.DEPTH.player + 0.05);
         sfx.at(person.x, person.y).give();
         await this.tween({ targets: img, x: p.x, y: p.y - 40, duration: 420, ease: 'Sine.easeInOut' });
         await this.received(img, frame, then);

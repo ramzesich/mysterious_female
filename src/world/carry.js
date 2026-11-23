@@ -23,6 +23,10 @@ export const LOADS = {
     canister: { draw: 'canister', heavy: true, bare: true },
 };
 
+// Her hop with a load (`carry-rise`, `carry-apex`, `carry-fall` in her sheet): where the load stands in each, [px ahead of
+// her middle, px up from her feet], by her fists (the user, 2026-11-23: it hung in the air before her as she jumped).
+const HOP_HOLDS = [['carry-rise', [7, 28]], ['carry-apex', [10, 19]], ['carry-fall', [11, 18]]];
+
 // A fragile load's sway: what each start or stop, turn on the move and landing adds (1: it goes
 // over), and how much settles in a second.
 export const SWAY = { startStop: 0.26, turn: 0.42, landing: 0.5, settle: 0.24 };
@@ -151,7 +155,11 @@ export class Carry {
         if (!this.kind) return;
         const s = this.scene, p = s.player;
         const front = p.flipX ? -1 : 1;
-        const x = Math.round(p.x + front * 14), y = Math.round(p.y - 31 + (s.grounded ? 0 : -1));
+        // (In her hop's three poses the load is where her fists are in that frame, px ahead of her middle and up:
+        // tucked, her hands come nearer her feet; `assets/source/her/carry-jump/`.)
+        const hold = HOP_HOLDS.find(([pose]) => s.herFrames?.[pose] === p.frame.name);
+        const [dx, up] = hold ? hold[1] : [14, 31];
+        const x = Math.round(p.x + front * dx), y = Math.round(p.y - up + (s.grounded ? 0 : -1));
         let top = y;
         for (const img of this.items) {
             img.setPosition(x, top).setVisible(p.visible && s.mode !== 'lift');
