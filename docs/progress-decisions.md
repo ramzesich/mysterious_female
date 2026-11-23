@@ -4322,3 +4322,34 @@ valuable."
 - **The pulse itself** (`src/highlight.js`, the Refinement session's) is unchanged: a dark pickup pulses faintly wherever
   it lies. Offered: pickups pulsing deeper (about 50%); not decided.
 - Tests: `keeps`, `highlight`, `region1`, `region2`, `region6` pass. Not run: the rest.
+
+## §5 3.1 begun: the Stardust's look-out, its drop, the theatre's twins, the booth's photo back (2026-11-23)
+
+- **Look-out 1, the Stardust balcony's rail** (`LOOKOUTS` in `tools/population.py`, `Lookout` in `src/world/movers.js`):
+  standing still on the spot (243.45 m, half a metre either way) eases the camera aft and down over 1.8 s to the stage
+  seen from above, curtain to curtain, her at the rail top left; it holds while she stands and comes back in 0.7 s when
+  she moves. **The wait is 0.5 s, not the plan's 2 s** (the user, on trying it). Nothing counted, no art.
+- **The camera is the look-out's while it is away from her:** the follow's deadzone (40 x 24) held back the first 20 and
+  12 px of a follow offset, and the view stopped short. Its middle is her middle as the follow keeps it, eased on to her,
+  mixed with the view's by one eased number `k` (the intro's way); at 0 the follow takes it back where it stands. If
+  anything else takes the camera meanwhile (the outside view, a scene, a checkpoint: `cam._follow` set again), the look
+  ends without a move of its own.
+- **Two decks open at once** (`world.lookOpen`, read by the ship scene's cut-away): opening deck 6 alone (`viewOverride`)
+  closed deck 7 and she floated over its white side. **A deck so opened is a crossfade from its dimmed hull to its
+  inside at every step, never the hull undimmed** (the user: "I don't want to be shown an undimmed hull"): the hull's
+  alpha `(1-t)(1-r) / ((1-t)(1-r) + t)` and its dim `1 - t` (`lookDim()` from the alpha), r the deck dim's 0.88; only
+  while a deck is cut open (not in the outside view); never on her own deck.
+- **The drop off that rail** (the user: "make the below deck open earlier, and don't show the hull in between"): the
+  look-out names it (`drop`: 244 to 256 m, onto deck 6). Clearing the rail from deck 7, the stage opens from its dim in a
+  quarter second and both decks stay open as she falls; landed, deck 7 closes to its dimmed hull once the cut-away has
+  deck 6. Jumping from the view, the view and the stage hold till she lands, then the camera comes back to her. A jump on
+  the stage itself opens nothing.
+- **The theatre's twins** (the user: "two identical women next to each other in the front rows"): a sitter the same as
+  the seat before is swapped for another by a draw of its own (`tools/build_ship_map.py`, `seat()`), the rest where they
+  were; in the whole theatre one seat changed (deck 7, 241.3 m: the lady with the doll to the man in the navy suit).
+- **The lighting booth's photo was missing** since 70623ef (2026-11-21): `slot_lighting` had gone into the lifeboat slot's
+  comment on one line; `region3` found it (failing the same on b81e18a, in a worktree). Split back; no other entry so hidden.
+- Checked in the game: the outside view while looking (the hull closed), walking off (deck 6 dimmed again, the follow
+  back), jumps on the stage (nothing opens), after the drop (nothing left open). Tests: `boot`, `balcony`, `region3`,
+  `golden`, `highlight`, `mishaps.light` pass; `tools/check_overlaps.py` 0. Not run: the rest.
+- Next: look-outs 2 to 5 (deck 4's and deck 5's portholes, the Spinnaker's balcony, the Great Outdoors' stern rail).

@@ -506,7 +506,8 @@ easel, which she looks at twice if she stands still (a 1 s double-take; no rewar
 |---|---|---|---|---|
 | 206 | `rdr_booth` + `room_lighting` | The lighting booth (red): the console, a window on the stage, a door onto the catwalk over the stage (244-254 at ceiling height), `slot_lighting` at its end, the hatch Bumbot vanished through (decor) | `room` | Drawn by hand |
 | 210-240 | `amb_balcony_seats` | Two seated | | |
-| 244-254 | the rail | The railing over the stage: hop it and drop onto the stage (built) | | |
+| 243.5 | `look_stardust` | Look-out 1 at the rail: still half a second, the camera eases to the stage from above (built 2026-11-23) | `LOOKOUTS` | |
+| 244-254 | the rail | The railing over the stage: hop it and drop onto the stage (built); both decks stay open as she falls (the look-out's `drop`) | | |
 
 **Deck 7's stern strip (behind deck 8's end, 252-254).** `slot_stern` at 253 on the stern structure.
 In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (the socks), or a scare.

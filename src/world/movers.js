@@ -2020,3 +2020,105 @@ export class Breakfast {
         else s.scareContact(this.x, tray ? 'breakfast' : 'stewardess', { dir: this.p?.dir ?? 0, ride: { tray, y: d.y } });
     }
 }
+
+// A look-out (population: `LOOKOUTS`; plan-the-rest §5 3.1, docs/plan-three-uses.md §4.3): standing
+// still half a second on its spot eases the camera from her to the view, and opens the decks the view
+// is of (`world.lookOpen`, read by the ship scene's cut-away); it holds while she is still and comes
+// back when she moves. Nothing is counted. The camera's way is one number, `k` (0 her, 1 the view),
+// and everything a smooth function of it, as the intro's.
+export const LOOK = { still: 0.5, out: 1.8, back: 0.7, open: 0.25, close: 0.5 };    // (still: 2 s in the plan; 0.5, the user, 2026-11-23)
+export class Lookout {
+    constructor(world, def) {
+        this.world = world;
+        this.scene = world.scene;
+        this.def = def;
+        this.still = 0;
+        this.k = 0;
+        this.drop = 0;
+        this.from = null;
+        this.shown = {};
+    }
+
+    reset() {
+        this.k = 0;
+        this.still = 0;
+        this.drop = 0;
+        this.from = null;
+        for (const deck of [...this.def.open, ...(this.def.drop?.decks ?? [])]) delete this.world.lookOpen?.[deck];
+    }
+
+    onFloor() {
+        const b = this.scene.player.body;
+        return b.blocked.down || b.touching.down;
+    }
+
+    // She is on the spot, on her feet, in play, not moving and not about to.
+    standing() {
+        const s = this.scene, p = s.player, d = this.def;
+        return s.route === 'inside' && s.mode === 'play' && !s.viewing && !s.intro
+            && Math.abs(p.x - d.x) <= d.reach && Math.abs(p.y - d.y) < 4 && this.onFloor() && Math.abs(p.body.velocity.x) < 1;
+    }
+
+    // In the air from the spot or over the drop, on her way down to the deck under it.
+    airborne() {
+        const s = this.scene, p = s.player, d = this.def, D = d.drop;
+        if (!D || s.route !== 'inside' || this.onFloor()) return false;
+        return p.x >= d.x - d.reach && p.x <= D.x1 && p.y < D.floor - 2 && p.y > d.y - 150;
+    }
+
+    // (The camera is the look-out's while it is away from her: the follow's deadzone would hold back
+    // the first px of any offset. Its middle is `from`, her middle as the follow keeps it (where the
+    // camera stood when she stopped, eased on to her), and the view, mixed by the eased `k`; at 0 the
+    // follow takes it back where it stands.)
+    update(dt) {
+        const s = this.scene, d = this.def, p = s.player, cam = s.cameras.main;
+        if (!nearby(s, d) && this.k === 0 && this.drop === 0) return;
+        // (Something else took the camera while she looked (the outside view, a scene, a checkpoint): the view is
+        // over, without a move of its own; she stands still again for it.)
+        if (this.k > 0 && cam._follow) this.reset();
+        const standing = this.standing(), air = this.airborne();
+        this.still = standing ? this.still + dt : 0;
+        // (Once the view is out, standing keeps it, and a jump from it holds it till she lands.)
+        const goal = this.still >= LOOK.still || (this.k > 0 && (standing || air)) ? 1 : 0;
+        // Over the drop: the deck under her opens at once from its dim, and stays so, with the one she left, till
+        // she has landed; then the one she left closes, dimmed.
+        // (From the deck the drop starts on, not a jump on the deck under it: then it holds till she lands.)
+        const over = air && d.drop && p.x > d.drop.x0 && (this.drop > 0 || p.y <= d.y + 8);
+        if (over) this.drop = Math.min(1, this.drop + dt / LOOK.open);
+        // (Landed, the deck she left closes once the cut-away has the one she is on open.)
+        else if (this.drop > 0 && !air && s.viewDeck !== null && Math.abs(s.viewDeck - d.drop.decks[1]) < 0.01) {
+            this.drop = Math.max(0, this.drop - dt / LOOK.close);
+        }
+        if (goal !== this.k) {
+            const her = { x: p.x, y: p.y - PLAYER.height / 2 };
+            if (this.k === 0) {
+                this.from = { x: cam.midPoint.x, y: cam.midPoint.y };
+                this.view = { x: her.x + d.dx, y: her.y + d.dy };
+                cam.stopFollow();
+            }
+            this.k = goal > this.k ? Math.min(1, this.k + dt / LOOK.out) : Math.max(0, this.k - dt / LOOK.back);
+            const f = 1 - Math.pow(0.85, dt * 60);
+            this.from.x += (her.x - this.from.x) * f;
+            this.from.y += (her.y - this.from.y) * f;
+            if (this.k === 0) {
+                cam.startFollow(p, true, 0.15, 0.15);
+                cam.setFollowOffset(0, PLAYER.height / 2);
+            } else {
+                const e = ease(this.k);
+                cam.centerOn(Math.round(this.from.x + (this.view.x - this.from.x) * e), Math.round(this.from.y + (this.view.y - this.from.y) * e));
+            }
+        }
+        // The decks opened: the view's by the camera's way, the drop's by its own.
+        const e = ease(this.k), dropE = ease(this.drop), open = this.world.lookOpen ??= {};
+        const want = {};
+        for (const deck of d.open) want[deck] = e;
+        for (const deck of d.drop?.decks ?? []) want[deck] = Math.max(want[deck] ?? 0, dropE);
+        for (const [deck, v] of Object.entries(want)) {
+            // (Her own deck is the cut-away's, open already: never dimmed under her.)
+            const hers = s.viewDeck !== null && Math.abs(s.viewDeck - deck) < 0.01;
+            if (v > 0 && !hers) open[deck] = v;
+            else delete open[deck];
+        }
+    }
+}
+const ease = k => k * k * (3 - 2 * k);

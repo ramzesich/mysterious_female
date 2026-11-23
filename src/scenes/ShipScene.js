@@ -57,6 +57,10 @@ const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], ve
 // The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
 const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
+// The dim over a hull showing at `a` while a deck is crossfaded to its inside (a look-out's): the hull's colour and the
+// dim's together are the dimmed hull's, mixed with the inside, at every step (`(1 - t)` dimmed hull + `t` inside: the
+// hull's alpha `(1-t)(1-r) / ((1-t)(1-r) + t)`, its dim `1 - t`, here from the alpha).
+const lookDim = a => 1 - (1 - ROOM_DIM) * (1 - a) / (1 - ROOM_DIM + a * ROOM_DIM);
 const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
 const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
 const WALK_LIFT = 2;
@@ -454,8 +458,12 @@ export class ShipScene extends Phaser.Scene {
             // jumping on deck 4's climb shelf, her head touched the ceiling and deck 5's dim lifted
             // and came back each jump, the user, 2026-11-17. A piece reaches 16 px under its floor.)
             const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16;
-            const dim = hers ? 0 : Math.min(...c.keys.map(k => this.shellAlpha[k]));
-            c.dim = smooth ? approach(c.dim, dim, dt * 8) : dim;
+            // (A deck a look-out opens is dimmed as its hull still shows, hers or not, so that the hull and its dim fade
+            // together: `world.lookOpen`, the cut-away.)
+            const look = this.world?.lookOpen, looked = look && c.keys.some(k => look[k]);
+            const dim = looked ? Math.min(...c.keys.map(k => look[k] ? lookDim(this.shellAlpha[k]) : this.shellAlpha[k]))
+                : hers ? 0 : Math.min(...c.keys.map(k => this.shellAlpha[k]));
+            c.dim = smooth && !looked ? approach(c.dim, dim, dt * 8) : dim;
             c.gfx.setVisible(d.shown > 0 && c.dim > 0).setAlpha(d.shown * c.dim);
         }
     }
@@ -3715,6 +3723,11 @@ export class ShipScene extends Phaser.Scene {
             let alpha = this.viewDeck === null ? 1 : Phaser.Math.Clamp(Math.abs(parseInt(deck, 10) - this.viewDeck), 0, 1);
             const ownRoom = this.shellRooms.find(r => r.key === deck);
             if (LOCKED_PARTS.on && (ownRoom ? ownRoom !== room : room && String(room.deck) === deck)) alpha = 1;
+            // (A look-out opens the deck its view is of, with the camera's way to it, and a drop under it the decks she
+            // falls through: `world.lookOpen`, 0 to 1. A crossfade from the hull dimmed to the deck's inside, never the
+            // hull undimmed (the user, 2026-11-23): the hull's alpha here, its dim in `updateDeckDim`.)
+            const look = this.viewDeck !== null && this.world?.lookOpen?.[deck];
+            if (look) alpha = Math.min(alpha, (1 - look) * (1 - ROOM_DIM) / ((1 - look) * (1 - ROOM_DIM) + look));
             // A room's shell and its deck's swap with a quick fade as she goes through its door.
             if (dt > 0 && (ownRoom || this.shellRooms.some(r => String(r.deck) === deck))) {
                 alpha = approach(this.shellAlpha[deck], alpha, dt * 6);

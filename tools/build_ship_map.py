@@ -1503,12 +1503,23 @@ def build_objects():
     # (The user, 2026-11-19: "Fill much more chairs with people, randomly": about half the empty seats have one of
     # the ten others in them, the same each build.)
     fill = random.Random(2026)
+    # (No one beside their own double, the user, 2026-11-23: "two identical women next to each other". A sitter
+    # the same as the seat before is swapped for another by a draw of its own, so the rest stay where they were.)
+    other, last = random.Random(1123), {}
 
     def seat(deck, k, m=None):
         # (Not beside the balcony's lighting booth door, 206.1 m: its plate is at a sitter's head.)
         if deck == 7 and m is not None and abs(m - 206.1) < 1.2:
+            last[deck] = None
             return "theatre-seat-side-lt"
-        return f"audience-{fill.randrange(10)}-lt" if fill.random() < 0.55 else "theatre-seat-side-lt"
+        if fill.random() >= 0.55:
+            last[deck] = None
+            return "theatre-seat-side-lt"
+        who = fill.randrange(10)
+        if who == last.get(deck):
+            who = (who + 1 + other.randrange(9)) % 10
+        last[deck] = who
+        return f"audience-{who}-lt"
     # (The user, 2026-11-19: the seats are the empty side-on seat the audience sit in, not the half-turned
     # one, none where one of them sits (their picture has its own); the stage's and the seats' pieces only
     # lightly washed, `-lt`.)

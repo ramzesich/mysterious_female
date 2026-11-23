@@ -502,6 +502,9 @@ still and comes back when she moves. Nothing is counted.
 
 - **The Stardust's first, shown to the user running** (motion is judged by eye), then the other
   four. A porthole piece and a window piece, generated.
+- **Built 2026-11-23: 1, the Stardust's** (approved in play): the wait is **0.5 s** (the user), the view eases out in
+  1.8 s and back in 0.7 s; both decks open, crossfaded from the hull dimmed, never undimmed; its drop off the rail keeps
+  both open as she falls (`LOOKOUTS`' `drop`). 2 to 5 to come.
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data, the camera in the ship scene (the
   intro's camera work is the model); a case each in the regions' scenarios.
 - Spot 1 is where the diary lies (2.1): look at it with both in place. (Spot 5 had his spoon until the t-shirt took
