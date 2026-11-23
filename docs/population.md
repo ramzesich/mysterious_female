@@ -332,6 +332,7 @@ stairs and no lift come down to it.
 | 224-236 | `sign_names` | Crew cabin name plates (the user's in-jokes, §6.1.15) | Decor | Plates |
 | 232 | `room_sm_cabin` | The stage manager's cabin: a bunk, show posters, a shelf; `item_pills` on the shelf once he has asked | `room`; E at the shelf takes the pills | Drawn by hand |
 | 240 | trunk `theatre` | The trunk's lower door | `oneway(deck 6)`, as built | |
+| 250 | `look_wake` | Look-out 2: a brass porthole by the aft end wall, the live sea in its glass (the corridor's picture there out) | E: she turns her back to us at it and the outside view (O) shows; a movement key brings her back (built 2026-11-23) | The atlas's porthole |
 
 ### Deck 5 (region 1)
 

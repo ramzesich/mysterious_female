@@ -750,14 +750,20 @@ GLIMPSE_WINDOW = (168.3, 72)
 LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2)}
 # The look-outs (plan-the-rest §5 3.1, docs/plan-three-uses.md §4.3): standing still two seconds on the spot eases the
 # camera from her to the view; it holds while she is still and comes back when she moves. Nothing is counted.
-# id: (deck, m, reach m either side, the view's middle from her middle in px (x, y), decks opened while she looks).
+# id: (deck, m, reach m either side, the view's middle from her middle in px (x, y), decks opened while she looks,
+# options). Options: `drop`, a drop under it (from m, to m, the deck she lands on): hopping over its rail, both decks
+# stay open as she falls, the one under her opened at once from its dim, and the one she left closes, dimmed, only once
+# she has landed (the user, 2026-11-23: "I don't want to be shown an undimmed hull during that jump"); jumping from the
+# view, the view holds till she lands.
 # 1, the Stardust balcony's far end at its rail (244 m), the stage seen from above: the camera eases aft and down to
 # frame the stage under her, deck 6 opened under deck 7 (`world.lookOpen`, the ship scene's cut-away).
-# A look-out over a drop (the Stardust's rail over the stage) also names the drop: (from m, to m, the deck she lands
-# on). Hopping over its rail, both decks stay open as she falls, the one under her opened at once from its dim, and
-# the one she left closes, dimmed, only once she has landed (the user, 2026-11-23: "I don't want to be shown an
-# undimmed hull during that jump"); jumping from the view, the view holds till she lands.
-LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], (244, 256, 6))}
+# (3, deck 5's forward end, a porthole on the bow wave: dropped, the user, 2026-11-23.)
+LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], {"drop": (244, 256, 6)})}
+# Look-out 2 is a porthole she looks out of by E (the user, 2026-11-23, turning down a wait that eased the camera out of
+# the ship to the wake): she turns her back to us at it, and the outside view (O) shows, the whole ship from outside;
+# any movement key (or O, Esc) brings her back. The corridor's brass porthole, the live sea in its glass, in the place
+# of the corridor's picture there. id: (deck, m, px up its middle).
+PORTHOLES = {"look_wake": (4, 249.96, 52)}
 # Slot machines that pay out over the floor (`haz_chips`): id: (deck, m, half the spill's width m).
 CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_chips_3": (7, 166.79, 0.9)}
 # The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).

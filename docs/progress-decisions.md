@@ -4353,3 +4353,24 @@ valuable."
   back), jumps on the stage (nothing opens), after the drop (nothing left open). Tests: `boot`, `balcony`, `region3`,
   `golden`, `highlight`, `mishaps.light` pass; `tools/check_overlaps.py` 0. Not run: the rest.
 - Next: look-outs 2 to 5 (deck 4's and deck 5's portholes, the Spinnaker's balcony, the Great Outdoors' stern rail).
+
+## §5 3.1: look-out 2 by E, look-out 3 dropped (the user, 2026-11-23)
+
+- **First built as the Stardust's:** deck 4's aft end and deck 5's forward end, each a porthole on the corridor's wall
+  (the atlas's brass `porthole-bg`, its dark glass cut out in the game and the windows' live sea behind it, a glint on
+  it, in the place of the corridor's picture there); half a second still eased the camera out of the ship to the wake
+  behind the stern, or to the bow wave, the deck dim fading and the far horizon gliding down onto the waterline with
+  it. Deck 5's first place (26.75 m) was in the paperboy's round (26-42 m), so it went over the knitting lady's head
+  on the end wall.
+- **The user: "I don't like either of those."** Deck 4's porthole stays and is used **by E**: she steps to it and
+  turns her back to us (her `back` frame), and half a second later the outside view (O) shows; **any movement key**
+  brings the camera back to her (the overview's `porthole` flag; O and Esc too; O pressed alone still ignores the
+  movement keys, as the user had it on 2026-11-07). **Deck 5's is dropped from the plan.** The code for the eased view
+  out of the ship (the dim's fade, the horizon on the waterline, a view at a fixed place) was taken out again.
+  `PORTHOLES` in `tools/population.py`; `world.porthole()`, `lookOutOf()`. A start place `wake4` (deck 4, 246.5 m).
+- **Playtests added:** `region3.lookout` (standing still: the view, decks 6 and 7 open; a step: back, deck 6 closed;
+  over the rail both open all the way down, none after the landing) and `deck4.porthole` (E: her back at the
+  porthole, the outside view; a movement key: back with her). Tests: `boot`, `highlight`, `region1`, `deck4`,
+  `balcony`, `region3` with both cases pass; `tools/check_overlaps.py` 0. Not run: the rest.
+- No generations spent. Next: look-out 5 (the Great Outdoors' stern rail), then 4 (the Spinnaker's balcony, with
+  part 11's P2: her drawn in front of its glass).

@@ -1152,6 +1152,9 @@ export class World {
             case 'lookout':
                 this.movers.push(new Lookout(this, e));
                 break;
+            case 'porthole':
+                this.things.push({ ...e, items: [this.porthole(e.x, e.y - e.up)], reach: 16, interact: () => this.lookOutOf(e) });
+                break;
             case 'spill':
                 this.movers.push(new Spill(this, e));
                 break;
@@ -2193,6 +2196,45 @@ export class World {
             s.tweens.add({ targets: [g, img], alpha: 0, duration: 200, onComplete: () => { g.destroy(); img.destroy(); } });
         });
         return [g, img];
+    }
+
+    // A look-out's porthole on a corridor's wall (population `LOOKOUTS`): the corridor's brass porthole (washed as its
+    // props, 35%) with its glass taken out of the picture, the live sea behind it (the windows' view), a glint on it.
+    porthole(x, y) {
+        const s = this.scene, D = s.DEPTH, frame = 'porthole-bg', key = 'porthole-open';
+        if (!s.textures.exists(key)) {
+            const src = s.textures.getFrame('shipart', frame), w = src.width, h = src.height;
+            const tex = s.textures.createCanvas(key, w, h), c = tex.getContext();
+            c.drawImage(src.source.image, src.cutX, src.cutY, w, h, 0, 0, w, h);
+            // (Its dark glass: a disc of 8.6 px round (13, 13.5) of the 26 x 27 picture.)
+            c.globalCompositeOperation = 'destination-out';
+            c.beginPath();
+            c.arc(13, 13.5, 8.6, 0, Math.PI * 2);
+            c.fill();
+            tex.refresh();
+        }
+        const pic = s.add.image(x, y, key).setDepth(D.decor + 0.1);
+        this.add([pic]);
+        s.windowView?.mask.fillCircle(x, y + 0.5, 9);
+        s.glassGfx?.fillStyle(0xffffff, 0.35).fillRect(x - 4, y - 4, 2, 1).fillRect(x - 5, y - 3, 1, 2);
+        return pic;
+    }
+
+    // E at a porthole (population `PORTHOLES`, look-out 2; the user, 2026-11-23): she turns her back to us, looking out
+    // of it, and the outside view (O) shows, the whole ship from outside; any movement key (or O, Esc) and the camera
+    // is back with her (the ship scene's `enterOverview`, `leaveOverview`).
+    lookOutOf(e) {
+        const s = this.scene;
+        if (this.carry || s.holding) return false;
+        this.cut(async () => {
+            s.player.setX(e.x);
+            s.pose('back');
+            await this.wait(450);
+            // (Within the moment: as it ends she is in play again, the game held by the outside view.)
+            if (s.overview) return;
+            s.enterOverview();
+            s.overview.porthole = true;
+        });
     }
 
     // --- Each frame -----------------------------------------------------------------------------

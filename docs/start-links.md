@@ -38,6 +38,7 @@ new one added there should be added here too.
 | `gangway`: the gangway lobby | <http://localhost:8000/?play&at=gangway&cards=all> |
 | `deck4`: deck 4's corridor between the runaway suitcase and the porter's round | <http://localhost:8000/?play&at=deck4&cards=all> |
 | `deck4-aft`: deck 4's corridor aft, just forward of the robot vacuum's round | <http://localhost:8000/?play&at=deck4-aft&cards=all> |
+| `wake4`: deck 4's corridor near its aft end (look-out 2: stand still by the porthole at the end wall) | <http://localhost:8000/?play&at=wake4> |
 | `store4`: deck 4, by the dry store's door (E in, the green card; Bumbot's snack tube on the bottom shelf, 5) | <http://localhost:8000/?play&at=store4&cards=all> |
 
 ## Deck 5

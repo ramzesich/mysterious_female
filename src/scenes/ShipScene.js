@@ -2491,7 +2491,9 @@ export class ShipScene extends Phaser.Scene {
             const inside = gap + 20 < o.x + o.width;
             gaps.push({ gap, taken: !inside || n % 3 === 1 || n % 6 === 3 || n % 8 === 5
                 || ents.some(e => Math.abs(e.x - gap) < 60 || rolls(e, gap, 60)) || this.doorSpots.some(t => t.y === o.y && Math.abs(gap - t.x) < 60) });
-            if (n % 3 === 1 && inside) {
+            // (A porthole she looks out of takes the place of the gap's picture: population `PORTHOLES`.)
+            const porthole = ents.some(e => e.kind === 'porthole' && Math.abs(e.x - gap) < 60);
+            if (n % 3 === 1 && inside && !porthole) {
                 if (tall(gap)) moved.push({ gap, frame: pictures[n % pictures.length] });
                 else parts.push(this.add.image(gap, o.y - 50, 'shipart', pictures[n % pictures.length]).setDepth(DEPTH.decor + 0.1));
             }
@@ -3011,7 +3013,9 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         // The outside view (O): the whole ship from outside, every deck closed, the game paused.
-        if (input.outsidePressed || (this.overview && input.escapePressed)) {
+        // (Opened from a porthole by E: any movement key brings her back too, the user, 2026-11-23.)
+        const moved = input.leftPressed || input.rightPressed || input.upPressed || input.downPressed || input.jumpPressed;
+        if (input.outsidePressed || (this.overview && (input.escapePressed || (this.overview.porthole && moved)))) {
             if (this.overview) this.leaveOverview(); else this.enterOverview();
         }
         if (this.overview) {

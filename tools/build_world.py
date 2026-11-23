@@ -16,7 +16,7 @@ from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
-                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
@@ -239,13 +239,15 @@ def build_world():
     for lid, (deck, m, flag, short, long, amp, period) in LIGHTS.items():
         ents.append(dict(kind="light", id=lid, x=B.exact_x(m), top=B.floor_y(deck) - 128, floor=B.floor_y(deck), route="inside",
                          flag=flag, short=short, long=long, amp=amp, period=period))
-    for lid, (deck, m, reach, (dx, dy), opened, *drop) in LOOKOUTS.items():
+    for lid, (deck, m, reach, (dx, dy), opened, opts) in LOOKOUTS.items():
         e = dict(kind="lookout", id=lid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", reach=round(reach * 48),
                  dx=dx, dy=dy, open=opened)
-        if drop:
-            a, b, under = drop[0]
+        if "drop" in opts:
+            a, b, under = opts["drop"]
             e["drop"] = dict(x0=B.exact_x(a), x1=B.exact_x(b), floor=B.floor_y(under), decks=[deck, under])
         ents.append(e)
+    for pid, (deck, m, up) in PORTHOLES.items():
+        ents.append(dict(kind="porthole", id=pid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", up=up))
     for cid, (deck, m, half) in CHIPS.items():
         ents.append(dict(kind="spill", id=cid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", half=round(half * 48), top=64))
     for jid, (deck, m, flag, up) in JACKPOTS.items():

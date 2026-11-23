@@ -6057,6 +6057,66 @@ def scenario_keeps(b):
     return ok
 
 
+def scenario_region3__lookout(b):
+    """Look-out 1 (plan-the-rest §5 3.1; the user, 2026-11-23): at the Stardust balcony's rail, half a second standing
+    still eases the camera aft and down to the stage, deck 6 opened under deck 7 (both cut open); a step and it comes
+    back to her, deck 6 closed again. Hopping the rail, both decks stay open as she falls, nothing after she lands."""
+    S = "window.__ship"
+    L = f"{S}.world.movers.find(m => m.def?.id === 'look_stardust')"
+    b.open("?reset&play&at=balcony7")
+    wait(0.4)
+    x = b.eval(f"{L}.def.x")
+    b.teleport(x - 2, D7)
+    ok = check(b.eval(f"{L}.k") == 0, "on the spot, at first: her own view")
+    wait(2.6)
+    v = b.eval(f"[{L}.k, {S}.shellAlpha[6], {S}.shellAlpha[7], {S}.cameras.main.midPoint.x - {S}.player.x, !!{S}.cameras.main._follow]")
+    ok &= check(v[0] == 1 and v[1] == 0 and v[2] == 0 and v[3] > 150 and not v[4],
+                "standing still: the camera out over the stage, decks 6 and 7 both open", v)
+    b.key("left", True); wait(0.3); b.key("left", False)
+    wait(1.2)
+    v = b.eval(f"[{L}.k, {S}.shellAlpha[6], JSON.stringify({S}.world.lookOpen), !!{S}.cameras.main._follow]")
+    ok &= check(v[0] == 0 and v[1] == 1 and v[2] == "{}" and v[3], "a step: back to her, deck 6 closed, the follow hers", v)
+    # Over the rail: both open all the way down.
+    b.teleport(x - 2, D7)
+    wait(0.2)
+    b.key("right", True); b.key("space", True)
+    seen = []
+    for _ in range(20):
+        wait(0.05)
+        seen.append(b.eval(f"[{S}.player.x > {L}.def.drop.x0 && {S}.player.y > {D7} + 20 && {S}.player.y < {D6} - 20, {S}.shellAlpha[6], {S}.shellAlpha[7]]"))
+        if len(seen) == 6:
+            b.key("space", False)
+    b.key("right", False); b.key("space", False)
+    falling = [q for q in seen if q[0]]
+    ok &= check(falling and all(q[1] == 0 and q[2] == 0 for q in falling), "falling to the stage: both decks open the whole way", falling)
+    wait(1.5)
+    v = b.eval(f"[{S}.player.y, JSON.stringify({S}.world.lookOpen), {S}.shellAlpha[6], {S}.shellAlpha[7]]")
+    ok &= check(v[0] == D6 and v[1] == "{}" and v[2] == 0 and v[3] == 1, "landed: the stage hers, deck 7 closed again", v)
+    return ok
+
+
+def scenario_deck4__porthole(b):
+    """Look-out 2 (the user, 2026-11-23): deck 4's aft porthole by E: she turns her back to us at it, and the outside
+    view (O) shows; a movement key brings the camera back to her."""
+    S = "window.__ship"
+    b.open("?reset&play&at=wake4")
+    wait(0.4)
+    x = b.eval(f"{S}.world.things.find(t => t.id === 'look_wake').x")
+    b.teleport(x - 10, D4)
+    wait(0.3)
+    b.tap("e")
+    wait(0.2)
+    v = b.eval(f"[{S}.player.frame.name, {S}.herFrames.back, {S}.player.x]")
+    ok = check(v[0] == v[1] and v[2] == x, "E: she steps to the porthole and turns her back to us", v)
+    wait(0.6)
+    ok &= check(b.eval(f"!!{S}.overview?.porthole"), "the outside view shows")
+    b.key("right", True); wait(0.2); b.key("right", False)
+    wait(0.3)
+    v = b.eval(f"[!!{S}.overview, {S}.mode, !!{S}.cameras.main._follow]")
+    ok &= check(not v[0] and v[1] == "play" and v[2], "a movement key: back with her", v)
+    return ok
+
+
 SCENARIOS = {name[len("scenario_"):].replace("__", "."): fn for name, fn in globals().items() if name.startswith("scenario_")}
 
 
