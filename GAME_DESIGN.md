@@ -1904,9 +1904,9 @@ longer takes one: typically 25 to 30 of the about 42 a first player finds.
     - A game already under way gets the same welcome and a shorter way in (sky, sea, ship, then
       in toward wherever she is and over to the game through a short fade). Esc ends the intro
       at once. `?play` goes past both; `?intro=<part>` starts at a part of it.
-    - **Her cabin's mirror** (the user): she stops in front of it (an unseen wall), and when she
-      stands there turned to it she runs a hand over her hair, once or twice, and not again
-      until she has walked away or turned from it and come back.
+    - **Her cabin's mirror** (the user): she stops in front of it (an unseen wall); E there turns
+      her to it and she runs a hand over her hair, once a press (the user, 2026-11-23: on E, no
+      longer by standing there).
 12. **Save:** auto-save at checkpoints to localStorage.
 13. **The sea:** scrolling water and sky behind the ship, visible outside and through windows.
 14. **Sound effects only**, synthesised. No music for now. **Built (step 12, 2026-11-14):**

@@ -305,4 +305,4 @@ no longer plays by itself when she stands at the mirror turned to it; E within 1
 Bumbot. `tryMirror` in the ship scene, in the E chain after the shower and before the route's doors; the old
 count in `standStill` (`mirrorLooks`) is gone. The `intro` playtest's mirror checks rewritten (standing does
 nothing, E once a press, E away from it nothing); `intro` and `deck3` passed. GAME_DESIGN.md's line on the mirror
-(§7.1 item 11) still describes the old way: left for the user's word.
+(§7.1 item 11) updated to match, on the user's word.
