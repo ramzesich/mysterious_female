@@ -709,7 +709,7 @@ session looked at all 56 in the running game, each enlarged with her beside it (
 findings and the four questions: "Yes, do all as recommended. Add this as a new action point at the end of the plan."
 
 **The rule from now on: a tangerine lies on food service or in a fruit bowl** (a tray, a trolley's plate, a bar, a
-bowl, a crate in a store, a balcony table), or where the story put it (the hose cabinet, the canopy, the duct, the
+bowl, a crate in a store, a balcony table), or where the story put it (the hose cabinet, the canopy, the shaft, the
 fort, the ball pit, what an event pours out). **Never on bare furniture, never balanced on a thing, never in the air,
 never behind someone.**
 

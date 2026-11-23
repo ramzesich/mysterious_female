@@ -59,8 +59,9 @@ record of this one piece of work: `docs/progress-decisions.md` has a pointer to 
    ↓ puts her on hands and knees on the rim, ← takes her in. No climb to animate, nothing taken out of the
    player's hands, and ↓ = crawl is learned here by using it. The cart is always there when she is: it is
    solid and in her way, so the only way to the wall is to push it to the wall.
-7. **No cut, no fade, going in.** The shaft is one picture with the room: the room stays in view behind her,
-   the mouth's near side fades away as her head reaches it (the cut-away the decks use), the view scrolls on.
+7. **No cut, no fade, going in.** The shaft is one picture with the room: the room stays in view behind her and
+   the view scrolls on. (At first the mouth's near side faded away as her head reached it, the cut-away the decks
+   use; since decision 23 it stays, and she goes in behind it.)
 8. **The shaft is at its true place and length.** From the room's forward wall (111.8 m) to the grille at
    66.2 m: 2,200 px, about 25 s at her crawl's 88 px/s (it was 1,300 px, 15 s). She drops out where it ends:
    no jump of 21 m.
@@ -68,7 +69,8 @@ record of this one piece of work: `docs/progress-decisions.md` has a pointer to 
    with its floor on deck 8's ceiling line. **She slides down the slope** on her front, arms out, as her head
    reaches its lip (she is only just in: the mouth is 22 px deep), and is on her hands and knees again at its foot.
    One way, as the plan always had the duct ("9 to 8, one-way"): a wall at the slope's foot.
-10. **The looks down are the ship itself.** The ship round the shaft is dark as round a room, but under each
+10. **The looks down are the ship itself.** (Where they are and what is round them changed after the user played
+    it: decision 21.) The ship round the shaft is dark as round a room, but under each
     grille a cone of light shows deck 8 as it really is below: the midship lift hall (the lift's door, the
     DECK 8 plaque), the atrium's gallery, the atrium's stair and glass lift, its side walk, the forward lift
     hall, the party's door with its balloons and the girl dancing. Nothing is shown that is not there, and
@@ -77,14 +79,16 @@ record of this one piece of work: `docs/progress-decisions.md` has a pointer to 
     down into from over the corridor.
 11. **Each grille is over something worth the look, and at the middle of a 2 m length of duct** (the joints
     are laid from the way out), so no joint crosses a grille.
-12. **The last grille gives way under her.** It is sprung: it clapped shut behind Bumbot, and under her it
+12. **The last grille gives way under her.** It is sprung (Bumbot, long gone by then, went through it), and under her it
     creaks, sags and drops open; she falls out feet first where the shaft ends, onto deck 8, the deck open
     from the first moment of the fall. No key to press at the end, no kick from all fours. It hangs open
     after, and a later trip through just drops through the opening.
-13. **Bumbot** leaps forward from his shelf at the cover, which comes off and ends leaning by the wall under
-    the mouth; he goes into the mouth (drawn under its near side, so into it, not across it). In the run his
-    eyes keep ahead of her as before, until the last grille. His own new clips are part 6 of the plan and are
-    not made here.
+13. **Bumbot** leaps forward from his shelf at the cover, which comes off and ends by the wall under the mouth; he
+    goes into the mouth (drawn under its near side, so into it, not across it). **After that there is nothing of
+    him in the shaft** (the user, 2026-11-23, on seeing two yellow dots that moved with her: "Take them out, and
+    take the sounds out. Bumbot is long gone when we're crawling in the shaft"): the old duct's pair of eyes ahead
+    of her, kept at first, and his scramble and "mrrp" at the last grille are gone. His own new clips are part 6 of
+    the plan and are not made here.
 14. **The view looks 42 px lower in the shaft**, so that deck 8's floor is in the picture under her.
 
 ## 4. How it is built
@@ -110,8 +114,44 @@ record of this one piece of work: `docs/progress-decisions.md` has a pointer to 
     the opening after): the shaft has one kind of cover at both ends. The two pictures drawn in code are retired.
 18. **The shaft is put away in the ship's outside view** (O) and in views from afar: found by pressing O inside it,
     where its dark stayed over the whole ship.
-19. **The slide's sound, the grille's creak and clang, the cover's rattle** are effects the game already had
-    (`slide`, `creak`, `clang`, `rattle`); none was added, so none needs the user's ear.
+19. **The slide's sound and the grille's creak and clang** are effects the game already had (`slide`, `creak`,
+    `clang`); none was added, so none needs the user's ear.
+
+20. **Standing, the mouth's end is her wall** (the user, on playing it: "When we're on the cart, we should stop at
+    the shaft entrance if we run left, now we fall through it, on the other side of the cart"). The room's own
+    stop was 6 px forward of the mouth's end, so her feet left the cart's rim and she dropped into the gap under
+    the mouth. On hands and knees she goes in as before.
+21. **Everything round the shaft is black, and every grille is over a landmark** (the user, on playing it: "The
+    peeks down make no sense, really, because they show nothing, only empty corridors. Maybe, when we're in the
+    shaft, make the cut away black, and place the peek-outs in appropriate place for us to orient ourselves:
+    showing signs, or recognizable parts of the deck below"). Nine grilles, from aft: the midship lift hall's DECK 8
+    plaque and lift; the midship stairs' exit sign and directory; the atrium's curving staircase, and its glass
+    lift beside it; the shut glass door into the forward lobby; the forward lift hall's plaque and lift; the
+    forward stairs' exit sign; the sign of the forward cabins' numbers (8202 to 8213, her own among them); the
+    party's door. Between them it is dark; a grille ahead shows faintly. Coming out of the linen room the dark
+    starts from the room's own dim and closes to black as the shaft's pictures come, so nothing flashes.
+22. **The grilles are drawn by rule now, wherever each stands** (a slot in a dark frame, lit slats), since they are
+    no longer at the middle of a length; the build refuses one on a joint. The two generated lengths with a
+    grille in them (`gen/grille-a.png`, `grille-b.png`, 10 generations) are not used. The light under a grille is
+    wide enough right under it (56 px) for a sign high on the wall to show whole.
+
+23. **On hands and knees at the mouth she is behind its near side** (the user, with a picture of her head drawn
+    across the mouth: "When we crouch here, the shaft should obscure us, to give us a feeling that we are getting
+    inside of it"). The mouth's near side is drawn over her while she is on hands and knees in the room and all
+    the while she is in the shaft; it is no longer faded away as she goes in. She disappears into it and shows
+    again past the room's wall, on the slope. Standing by it she is in front of it.
+24. **Only the grille she is over opens its view** (the user: "only the peek out that we're crawling past should
+    open, all the rest are only visible as glowing-through openings in the shaft's floor"). Every other grille is
+    its lit slats and nothing under them. Built as small shared pictures of the dark ("windows"), one for each
+    group of grilles whose cones touch, drawn again as a grille opens or shuts: with a black cone laid over each
+    shut grille, a neighbour's cone cut across the open one, and faint streaks of deck 8 showed along the cones'
+    soft edges.
+25. **One grille to a place, well apart** (the user: "No need for places with double openings ... By sitting
+    close, they look weird"). Six, from aft: the midship lift hall (108.7 m), the midship stairs (103.7 m), the
+    atrium (92.7 m: one grille now, over both its glass lift and its staircase), the forward lift hall (80.7 m),
+    the forward stairs (75.7 m), the party's door (71.6 m); the nearest two are 194 px apart. Gone: the
+    atrium's second grille, the one over the forward lobby's glass door, the one over the cabin numbers' sign.
+    This replaces the nine of decision 21.
 
 ## 5. Not done, and why
 
@@ -140,6 +180,9 @@ balance went from 2,991 to 2,899.
 
 ## 7. Checked
 
+(The first list is of the build as first shown, 2026-11-23; the second of the changes the user asked for on playing
+it, decisions 13 and 20 to 25.)
+
 - **Every generated picture enlarged, before it was used.** The steel: the shapes are where the flat drawing has
   them (the build lays them by its numbers); each piece's tone brought to one mean, measured where no grille's
   light reaches. The mouth: its duct is one picture in every state, only the cover changes. The slide: nine frames
@@ -159,3 +202,18 @@ balance went from 2,991 to 2,899.
   `linen` were brought to the mirrored room. The whole suite was not run.
 - **`python tools/check_overlaps.py`:** 0 overlaps.
 - **Not judged by me:** how it feels in motion and how it sounds. That is the user's play.
+
+**After the user's play (the eyes, the wall at the mouth, the black and the landmarks, the mouth over her, one grille
+open, one to a place):**
+
+- Looked at, at the game's pixel size: every look down with her over its grille (first nine, then the six that
+  stayed); the black between two grilles; her going in on hands and knees, sixteen frames (the mouth over her, she
+  showing again past the wall); her stopped at the mouth standing on the cart; three spots with neighbouring
+  grilles, to see that a shut one does not cut across an open one. Found and mended that way: faint streaks of
+  deck 8 along a shut cone's soft edges; a shut neighbour's cone across the open one.
+- `python tools/playtest.py -j 5 boot linen region4 golden sweep region5 highlight` pass. `region4` checks, beyond
+  the first list: standing on the cart she is stopped at the mouth, still on its rim; on hands and knees there the
+  mouth's near side is drawn over her; no grille is open but the one she is over; the grilles are 180 px apart or
+  more; nothing of Bumbot is in the shaft; the grille hangs open after her.
+- `python tools/check_overlaps.py`: 0 overlaps.
+- The same two things are not judged by me: how it feels in motion, and how it sounds.

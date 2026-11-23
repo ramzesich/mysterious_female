@@ -777,14 +777,29 @@ export class World {
             ctx.putImageData(img, 0, 0);
             tex.refresh();
         }
+        // A grille's view is opened by taking its cone out of the dark, by as much as it is lit. Neighbouring grilles'
+        // cones cross, and only one is open at a time: so the grilles whose cones touch share one small picture of the
+        // dark (a "window"), drawn again whenever one of them opens or shuts (the dark, less each cone by its light),
+        // and the great dark has a clear box where each window is. (Shut by a black cone of its own laid over its
+        // opening, a grille's cone cut across its open neighbour's.)
+        const cones = [...d.grilles, { x: d.exitX, what: 'exit' }].map(g => ({ ...g, lit: 0 })).sort((a, b) => a.x - b.x);
+        const windows = [];
+        for (const c of cones) {
+            const w = windows[windows.length - 1];
+            if (w && c.x - w.cones[w.cones.length - 1].x < cone.foot) w.cones.push(c);
+            else windows.push({ cones: [c] });
+        }
+        for (const [i, w] of windows.entries()) {
+            w.x = w.cones[0].x - cone.foot / 2;
+            w.w = w.cones[w.cones.length - 1].x + cone.foot / 2 - w.x;
+            w.key = `shaft-window-${i}`;
+            if (!s.textures.exists(w.key)) s.textures.createCanvas(w.key, w.w, ch);
+        }
         if (!s.textures.exists('shaft-dark')) {
             const tex = s.textures.createCanvas('shaft-dark', W, H), ctx = tex.getContext();
             ctx.fillStyle = `rgba(13, 11, 20, ${SHAFT.dim})`;
             ctx.fillRect(0, 0, W, H);
-            ctx.globalCompositeOperation = 'destination-out';
-            const c = s.textures.get(coneKey).getSourceImage();
-            for (const g of [...d.grilles, { x: d.exitX }]) ctx.drawImage(c, g.x - cone.foot / 2 - X0, top - Y0);
-            ctx.globalCompositeOperation = 'source-over';
+            for (const w of windows) ctx.clearRect(w.x - X0, top - Y0, w.w, ch);
             tex.refresh();
         }
         const dark = s.add.container(0, 0).setDepth(base - 0.008).setAlpha(0).setVisible(false);
@@ -792,11 +807,30 @@ export class World {
         dark.add([s.add.image(X0, Y0, 'shaft-dark').setOrigin(0),
             panel(X0 - far, Y0 - far, W + 2 * far, far), panel(X0 - far, Y0 + H, W + 2 * far, far),
             panel(X0 - far, Y0, far, H), panel(X0 + W, Y0, far, H)]);
-        this.cones = [...d.grilles, { x: d.exitX, what: 'exit' }].map(g => {
-            const shade = s.add.image(g.x - cone.foot / 2, top, coneKey).setOrigin(0).setAlpha(SHAFT.dim);
-            dark.add(shade);
-            return { ...g, shade, lit: 0 };
-        });
+        const eraser = s.textures.get(coneKey).getSourceImage();
+        for (const w of windows) {
+            dark.add(s.add.image(w.x, top, w.key).setOrigin(0));
+            w.draw = () => {
+                const tex = s.textures.get(w.key), ctx = tex.getContext();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1;
+                ctx.clearRect(0, 0, w.w, ch);
+                ctx.fillStyle = `rgba(13, 11, 20, ${SHAFT.dim})`;
+                ctx.fillRect(0, 0, w.w, ch);
+                ctx.globalCompositeOperation = 'destination-out';
+                for (const c of w.cones) {
+                    if (c.lit <= 0) continue;
+                    ctx.globalAlpha = c.lit;
+                    ctx.drawImage(eraser, c.x - cone.foot / 2 - w.x, 0);
+                }
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1;
+                tex.refresh();
+            };
+            w.draw();
+        }
+        this.cones = cones;
+        this.shaftWindows = windows;
         // The shaft itself, cut open: its inside behind her, the near halves of its joints in front of her.
         const strip = s.add.image(L.strip[0], L.strip[1], 'shaft-strip').setOrigin(0).setDepth(base + 0.002).setAlpha(0).setVisible(false);
         const front = s.add.image(L.strip[0], L.strip[1], 'shaft-front').setOrigin(0).setDepth(D.player + 0.05).setAlpha(0).setVisible(false);
@@ -809,7 +843,7 @@ export class World {
         this.things.push({ id: 'shaft_mouth', x: L.mouth[0], y: d.upper, route: 'linen', items: [mouth] });
         this.things.push({ id: 'vent_cover', x: L.cover[0], y: d.upper, route: 'linen', items: [cover], until: 'flag:bb4' });
         this.things.push({ id: 'vent_cover_down', x: L.coverDown[0], y: L.coverDown[1], route: 'linen', items: [down], after: 'flag:bb4' });
-        this.shaft = { dark, strip, front, mouth, cover, down, shown: 0, look: 0 };
+        this.shaft = { dark, strip, front, mouth, cover, down, shown: 0, look: 0, mouthDepth: mouth.depth };
         // Her slide down the slope: one clip of her made on the shaft's own picture (tools/build_shaft.py `--slide`,
         // assets/source/her/shaft-slide/), played where it was made: from her crawl at the slope's lip to her crawl at
         // its foot.
@@ -831,12 +865,6 @@ export class World {
         s.addRouteWall(d.x0 + 22, -1, d.lower, 'duct');
         s.addRouteWall(d.x1 - 4, 1, d.upper, 'duct');
         s.addRouteWall(d.slopeFoot + 2, 1, d.lower, 'duct');       // (the slope's foot: no way back up it)
-        // His eyes in the dark ahead of her (the first time through): two green points that keep their distance,
-        // and are gone at the last grille, which claps shut behind him.
-        this.ductEyes = s.add.graphics().setDepth(base + 0.003).setVisible(false);
-        this.ductEyes.fillStyle(0xb9e04c, 1).fillRect(-4, -1, 2, 2).fillRect(2, -1, 2, 2);
-        this.ductEyes.fillStyle(0xffffff, 1).fillRect(-4, -1, 1, 1).fillRect(2, -1, 1, 1);
-        this.add([this.ductEyes]);
     }
 
     // The linen room's laundry cart, once it stands at the shaft's mouth; and whether she is on it.
@@ -860,7 +888,7 @@ export class World {
             // (From the linen room, and back into it, the dark round the room is the dark round the shaft: no moment
             // without either. Only out of its far end does it lift slowly.)
             sh.viaRoom = inDuct || s.route === 'linen';
-            if (sh.viaRoom) sh.dark.setAlpha(inDuct ? 1 : 0);
+            if (sh.viaRoom) sh.dark.setAlpha(inDuct ? SHAFT.roomDim : 0);
         }
         // The shaft's pictures come and go with her (no cut: she crawls in, and drops out of its end), the deck below
         // opens under it, and the view looks a little down, at what the grilles show.
@@ -868,37 +896,41 @@ export class World {
         sh.shown = approach(sh.shown, inDuct ? 1 : 0, dt * 1000 / SHAFT.fadeMs);
         if (sh.shown !== was || inDuct) {
             const on = sh.shown > 0 && !sh.away;
-            if (!sh.viaRoom) sh.dark.setAlpha(sh.shown);
+            // (From the room: on from its own dim to black. Out of the far end: lifting with the shaft's pictures.)
+            sh.dark.setAlpha(sh.viaRoom ? (inDuct ? SHAFT.roomDim + (1 - SHAFT.roomDim) * sh.shown : 0) : sh.shown);
             sh.dark.setVisible(on && sh.dark.alpha > 0);
             sh.strip.setVisible(on).setAlpha(sh.shown);
             sh.front.setVisible(on).setAlpha(sh.shown);
-            sh.mouth.setAlpha(1 - sh.shown);
             const open = this.lookOpen ??= {};
             if (inDuct) open[d.dropDeck] = sh.shown;
             else delete open[d.dropDeck];
             const cam = s.cameras.main;
             if (cam._follow === p) cam.setFollowOffset(0, PLAYER.height / 2 - SHAFT.look * (inDuct ? sh.shown : 0));
         }
+        // The mouth's near side is nearer than her: on hands and knees at it, and in it, she is behind it, so that she
+        // goes into the shaft and is not drawn across it (the user, 2026-11-23: "the shaft should obscure us, to give us a
+        // feeling that we are getting inside of it"). It is not cut away: past the room's wall she shows again, on the
+        // slope. Standing by it she is in front of it, as of anything on the wall.
+        const inMouth = inDuct || (s.route === 'linen' && s.crawling);
+        if (inMouth !== sh.inMouth) {
+            sh.inMouth = inMouth;
+            sh.mouth.setDepth(inMouth ? s.DEPTH.player + 0.06 : sh.mouthDepth);
+        }
         for (const c of this.cones) {
-            // (Far from her a grille's light is faint; over it, what is below shows clear.)
-            const want = !inDuct ? 0 : Math.abs(p.x - c.x) < SHAFT.over ? 1 : SHAFT.faint;
-            c.lit = approach(c.lit, want, dt * 3);
-            c.shade.setAlpha(SHAFT.dim * (1 - c.lit));
+            // (Only the grille she is crawling over opens: what is below it shows in its cone. Every other one is its
+            // lit slats in the shaft's floor and nothing under them: the user, 2026-11-23.)
+            const want = inDuct && Math.abs(p.x - c.x) < SHAFT.over ? 1 : 0;
+            const lit = approach(c.lit, want, dt * 3);
+            if (lit !== c.lit) c.changed = true;
+            c.lit = lit;
         }
-        const eyes = this.ductEyes;
-        if (inDuct && !P.has('duct') && !this.eyesGone && p.x < d.slopeFoot) {
-            this.eyesX = Math.min(this.eyesX ?? p.x - 170, p.x - 150);
-            if (this.eyesX <= d.exitX + 6) {
-                this.eyesGone = true;
-                eyes.setVisible(false);
-                sfx.at(d.exitX, d.lower).rattle();
-                sfx.at(d.exitX, d.lower).mrrp();
-            } else {
-                eyes.setVisible(Math.floor(time / 2600) % 5 !== 4 || (time % 2600) > 160).setPosition(this.eyesX, d.lower - 9);
-            }
-        } else {
-            eyes.setVisible(false);
+        for (const w of this.shaftWindows) {
+            if (!w.cones.some(c => c.changed)) continue;
+            w.cones.forEach(c => { c.changed = false; });
+            w.draw();
         }
+        // (Nothing of Bumbot in the shaft: no eyes ahead of her, none of his sounds. The user, 2026-11-23: "Bumbot is long
+        // gone when we're crawling in the shaft.")
         // (The party's beat comes up through its grille: src/world/story.js `party`.)
         if (inDuct) this.story.party?.(time, true);
         if (s.mode !== 'play') return;
@@ -934,7 +966,6 @@ export class World {
         sh.dark.setVisible(on && sh.dark.alpha > 0);
         sh.strip.setVisible(on);
         sh.front.setVisible(on);
-        this.ductEyes.setVisible(false);
     }
 
     // Behind the linen room's wall the shaft slopes down into the slab between the decks: over its lip she slides

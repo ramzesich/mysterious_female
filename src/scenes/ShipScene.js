@@ -53,7 +53,7 @@ const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], b
                 towel: [28, 79], slide: 18 };     // her towel hung on its handle; how far the door slides open
 // The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels (its middle
 // and its top over the floor, from the room's left edge), and the vent (its opening's ends).
-const LINEN = { width: 240, doorX: 180, height: 128, stop: 20 };
+const LINEN = { width: 240, doorX: 180, height: 128, stop: 20, mouth: 26 };    // (`mouth`: the shaft's mouth's end, tools/population.py's SHAFT)
 // The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
 const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
@@ -1182,7 +1182,10 @@ export class ShipScene extends Phaser.Scene {
         const shut = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.01).setVisible(false);
         this.worldLayer.add(shut);
         this.progress.roomDoor(linen, prop(o, 'lock', ''), shut, o.x, o.y);
-        this.addRouteWall(x0 + LINEN.stop, -1, o.y, 'linen');
+        // (Forward, the end of the shaft's mouth is her wall, at every height: standing she is too tall to go into it or
+        // under it. With the room's own stop, 6 px further forward, she ran off the parked cart's end and dropped into
+        // the gap under the mouth: the user, 2026-11-23. On hands and knees on the cart she goes in: `updateDuct`.)
+        this.addRouteWall(x0 + LINEN.mouth + PLAYER.bodyWidth / 2, -1, o.y, 'linen');
         this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
     }
 

@@ -29,8 +29,8 @@ of the rack's upright); the build cuts it at the mouth's end, so it was not made
 | `gen/run-a.png` (seed 3) | edit_image_pro_flash | `cb0c5c75-f01b-4829-ad61-54f3278ff0ad` | 9 |
 | `gen/run-b.png` (seed 21, "a small cobweb") | edit_image_pro_flash | `0f522866-cbe2-49dc-8dd2-e8de078571b8` | 9 |
 | `gen/run-c.png` (seed 42, "a rust streak", "paw prints in the dust") | edit_image_pro_flash | `3c686fdb-1a76-4045-910d-ae1552d6d49c` | 9 |
-| `gen/grille-a.png` (seed 7) | edit_image_pro_flash | `60085bb9-5928-45ab-a331-c3cbeb511b4f` | 5 |
-| `gen/grille-b.png` (seed 19) | edit_image_pro_flash | `f03232b4-cc69-4743-8e4b-7e6e430cc62b` | 5 |
+| `gen/grille-a.png` (seed 7; **not used** since the grilles were moved over landmarks and are drawn by rule, 2026-11-23) | edit_image_pro_flash | `60085bb9-5928-45ab-a331-c3cbeb511b4f` | 5 |
+| `gen/grille-b.png` (seed 19; **not used**, as above) | edit_image_pro_flash | `f03232b4-cc69-4743-8e4b-7e6e430cc62b` | 5 |
 | `gen/end.png` (seed 5) | edit_image_pro_flash | `5ec36a2c-707e-49a1-9cca-1144e845586c` | 6 |
 | `gen/entry.png` (seed 9) | edit_image_pro_flash | `98ea1208-57f3-4e5c-b955-65a29ad1d1f2` | 6 |
 | `gen/mouth-shut.png` (seed 4) | edit_image_pro_flash | `52c66b6e-4cfd-437a-b342-3f23f3aa16d2` | 5 |

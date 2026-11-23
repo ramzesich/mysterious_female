@@ -84,10 +84,17 @@ ROOMS = [
 # px in the linen room's picture: the mouth's ends, the slope's top and foot (from the room's left edge, forward of it
 # negative); `height` the shaft's inside, `drop` how far the slope takes her down; `end` the dead end past the way out.
 SHAFT = dict(deck=9, drop_deck=8, m_out=66.1667, mouth=(4, 26), slope=(-6, -62), height=36, drop=48, end=64,
-             # (Each over a thing worth the look, and each at the middle of a 2 m length of duct between two joints,
-             # as the way out is: the joints are laid from it, tools/build_shaft.py.)
-             grilles=[(108.1667, "hall"), (100.1667, "gallery"), (92.1667, "atrium"), (86.1667, "walk"), (80.1667, "lobby"),
-                      (72.1667, "party")])
+             # (Each straight over a thing that says where on deck 8 she is: a sign, a staircase, a door; the user,
+             # 2026-11-23: over bare wall the looks "show nothing, only empty corridors". One to a place, well apart:
+             # two close together "look weird" (the user; the atrium had two, the forward lift hall two, the forward
+             # cabins three). None on a joint of the duct, which are laid every 2 m from the way out:
+             # tools/build_shaft.py checks it.)
+             grilles=[(108.7083, "hall"),        # the midship lift hall: its DECK 8 plaque, the lift's door
+                      (103.6667, "stairs"),      # the midship stairs: their exit sign, the deck's directory
+                      (92.7083, "atrium"),       # the atrium: its glass lift and its curving staircase, both
+                      (80.6667, "lobby"),        # the forward lift hall: its DECK 8 plaque, the lift's door
+                      (75.6667, "stairs_fwd"),   # the forward stairs: their exit sign, the deck's directory
+                      (71.625, "party")])        # the door with the party's balloons       # the door with the party's balloons
 
 # --- Checkpoints (population §2.5) -----------------------------------------------------------------
 # id: (deck, m, route, slot). Crew doors; `slot` takes a cabin door's place. The rooms' own doors
@@ -149,7 +156,7 @@ TANGERINES = {
     "tan_9_cart": (9, 172.6, 1, 28, None),
     "tan_9_luggage": (9, 181.5, 1, "table", None),
     "tan_9_fort": ("adjoin", 267, 2, 0, None),
-    "tan_9_duct": ("duct", 691, 1, 0, None),
+    "tan_9_duct": ("duct", 567, 1, 0, None),
     "tan_9_balc": (9, 240, 1, "out", None),
     "tan_10_mid": (10, 182, 1, "table", None),
     # (On the reception's desk: 32 m, the spec's place, is inside the deck's front wall.)

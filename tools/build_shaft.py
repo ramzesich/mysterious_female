@@ -49,7 +49,6 @@ FLANGE = 4
 GRILLE = 30               # a floor grille's slot
 PAD = 10                  # a piece's rows above and below the duct's inside
 RUN_PIECES = ("run-a", "run-b", "run-c")     # plain lengths: each picture holds two
-GRILLE_PIECES = ("grille-a", "grille-b")
 WARM, COOL = (0xff, 0xf1, 0xc9), (0xdf, 0xe8, 0xe2)
 
 
@@ -68,7 +67,9 @@ def geometry():
     g["w"] = g["mouthX"] + 4 - g["ox"]
     g["w"] += -(g["w"] - (g["entry"] - g["ox"])) % 4       # (the entry piece's width a multiple of 4: the generator's grid)
     g["h"] = g["lower"] + PAD - g["oy"]
-    assert all((gr["x"] - g["first"] - 50) % JOINT == 0 for gr in g["grilles"]), "a grille is not at the middle of a length"
+    for gr in g["grilles"]:
+        off = (gr["x"] - g["first"]) % JOINT
+        assert GRILLE // 2 + FLANGE + 1 <= off <= JOINT - GRILLE // 2 - 1, f"the grille '{gr['what']}' is on a joint ({off} px past it)"
     return g
 
 
@@ -163,8 +164,6 @@ def piece_boxes(g):
     run = lambda j: (j - 32 - g["ox"], top, j - 32 - g["ox"] + 256, top + g["height"] + 2 * PAD)
     plain = [j for j in g["joints"][2:-3] if not any(j <= gr["x"] < j + 2 * JOINT for gr in g["grilles"])]
     boxes = {"run": run(plain[len(plain) // 2])}
-    gj = g["grilles"][2]["x"] - 50
-    boxes["grille"] = (gj - g["ox"], top, gj - g["ox"] + JOINT, top + g["height"] + 2 * PAD)
     boxes["end"] = (g["x0"] - 6 - g["ox"], top, g["joints"][1] - g["ox"], top + g["height"] + 2 * PAD)
     w = g["w"] - (g["entry"] - g["ox"])
     boxes["entry"] = (g["entry"] - g["ox"], 0, g["entry"] - g["ox"] + w, g["h"])
@@ -223,7 +222,6 @@ def compose(g):
             flip = seg.copy()
             flip.paste(row(seg, FLANGE, JOINT).transpose(Image.FLIP_LEFT_RIGHT), (FLANGE, 0))
             lengths.append(flip)
-    grilles = [im for im in (load(n) for n in GRILLE_PIECES) if im is not None]
     # One steel all along: each redrawn piece came back in a tone of its own (bluer, greener, greyer), and laid side by
     # side the lengths read as patches. Each is moved most of the way to the mean of the plain lengths, measured on the
     # upper panel rows, where no grille's light reaches. (A little of its own tone is kept: sheets do differ.)
@@ -244,18 +242,13 @@ def compose(g):
     if lengths:
         target = [sum(t[i] for t in map(tone, lengths)) / len(lengths) for i in range(3)]
         lengths = [toward(s, target) for s in lengths]
-        grilles = [toward(s, target) for s in grilles]
     rnd = random.Random(11)
     last = None
-    at = {gr["x"] - 50: gr for gr in g["grilles"]}
     for n, j in enumerate(g["joints"][1:-1], 1):          # (the first length is the dead end's, the last the entry's)
-        if j in at and grilles:
-            seg = grilles[list(at).index(j) % len(grilles)]
-        elif j in at or not lengths:
-            continue
-        else:
-            seg = rnd.choice([s for s in lengths if s is not last] or lengths)
-            last = seg
+        if not lengths:
+            break
+        seg = rnd.choice([s for s in lengths if s is not last] or lengths)
+        last = seg
         out.paste(seg, (j - g["ox"], top))
     for name in ("end", "entry"):
         im = load(name)
@@ -272,7 +265,15 @@ def compose(g):
     px, ip = strip.load(), inner.load()
     H = g["height"]
     bot = g["lower"] - g["oy"]
-    # The way out: a clear opening through the floor's sheet. (The grilles keep their slats.)
+    # The grilles, by rule, wherever each stands along a length (since 2026-11-23 they are placed over what is worth
+    # seeing below, not at a length's middle, and the two generated lengths with a grille in them are not used): a
+    # slot through the floor's sheet in a dark frame, lit slats across it. The way out: a clear opening.
+    for gr in g["grilles"]:
+        a, b = gr["x"] - GRILLE // 2 - g["ox"], gr["x"] + GRILLE // 2 - 1 - g["ox"]
+        for x in range(a - 1, b + 2):
+            for y in range(bot - 2, bot + SHEET):
+                frame = x in (a - 1, b + 1) or y == bot - 2 or (x - a) % 4 == 3
+                px[x, y] = rgb(INK) + (255,) if frame else WARM + (255,)
     for x in range(g["exitX"] - GRILLE // 2, g["exitX"] + GRILLE // 2):
         for y in range(bot - 1, bot + SHEET + 1):
             px[x - g["ox"], y] = (0, 0, 0, 0)

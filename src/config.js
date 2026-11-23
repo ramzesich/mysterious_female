@@ -181,13 +181,15 @@ export const SWIM = {
 // steering held for kickMs; pressed to a wall she slides down it slowly. The parasol: how fast she
 // sinks under it. Pushing a cart. With a tray in her hands a jump is a low hop.
 // The shaft from the linen room to deck 8 forward (src/world/world.js `buildDuct`; docs/shaft-remake-log.md): the dark
-// round it (a room's), a grille's cone of light down to deck 8's floor (its width at the grille and at its foot, its
-// soft edge), how faint it is while she is not over it (within `over` px of its middle), the fade of the shaft's own
+// round it (black: the user, 2026-11-23, "make the cut away black"; coming out of the linen room it starts from a
+// room's dim, `roomDim`, and closes to black as the shaft's pictures come), a grille's cone of light down to deck 8's
+// floor (its width under the grille, wide enough for a sign high on the wall, and at its foot; its soft edge), shown
+// only while she is over that grille (within `over` px of its middle), how faint it is while she is not over it (within `over` px of its middle), the fade of the shaft's own
 // pictures as she goes in and drops out, how far the view looks down in it; how near the mouth she turns into it from
 // the cart, the slope's lip, where its slide sets her down past its foot and how long it takes; how near the last
 // grille's middle it gives way, and how far out of it her feet are as the drop begins.
 export const SHAFT = {
-    dim: 0.88, cone: { top: 26, foot: 150, soft: 14 }, faint: 0.5, over: 40, fadeMs: 260, look: 42,
+    dim: 1, roomDim: 0.88, cone: { top: 56, foot: 170, soft: 14 }, over: 40, fadeMs: 260, look: 42,
     reach: 22, lip: 22, land: 18, slideMs: 520, trap: 6, out: 22,
 };
 

@@ -3394,6 +3394,17 @@ def scenario_region4(b):
     s = b.state()
     ok &= check(s["y"] == D9 - js(b, f"{W}.data.linen.cartTop") == duct["upper"], "she jumps up onto its rim, level with the shaft's floor", s)
     b.shot("region4-on-cart")
+    # (Standing, the mouth's end is a wall: she does not run off the cart's end into the gap under it.)
+    b.hold("left", 0.8)
+    s = b.state()
+    ok &= check(route(b) == "linen" and s["y"] == duct["upper"] and s["x"] >= duct["mouthX"] + 6,
+                "running forward on the cart, standing: the mouth stops her, still on the rim", s)
+    b.key("down", True)
+    wait(0.25)
+    ok &= check(js(b, f"window.__ship.crawling && {W}.shaft.mouth.depth > window.__ship.player.depth && {W}.shaft.mouth.alpha === 1"),
+                "on hands and knees at the mouth: its near side is drawn over her")
+    b.shot("region4-at-mouth")
+    b.key("down", False)
     ok &= check(into_the_shaft(b, jump=False), "down on hands and knees on it and forward: into the shaft", route(b))
     ok &= check(js(b, "window.__ship.player.flipX") and js(b, "!window.__ship.cameras.main.fadeEffect.isRunning"),
                 "facing forward as she went in, and no fade")
@@ -3408,12 +3419,13 @@ def scenario_region4(b):
     ok &= check(js(b, "window.__ship.player.visible && window.__ship.player.anims.currentAnim.key") == "her-crawl", "crawling has its own clip")
     ok &= check(js(b, "window.__ship.shellAlpha[8]") == 0 and js(b, "window.__ship.viewDeck") == 9, "deck 8 open under the shaft")
     wait(0.4)
-    ok &= check(js(b, f"{W}.eyesX != null && !{W}.eyesGone && {W}.eyesX < window.__ship.player.x - 100"), "his eyes in the dark ahead of her")
     b.shot("region4-duct")
     # The grilles: each over what is really below it; a tangerine on the way.
     n = tangerines()
     lit = lambda what: js(b, f"{W}.cones.find(c => c.what === '{what}').lit")
-    ok &= check(lit("party") <= 0.5, "a grille's light faint from afar", lit("party"))
+    ok &= check(lit("party") == 0 and lit("atrium") == 0, "no grille open but the one she is over: the rest are lit slats in the floor", (lit("atrium"), lit("party")))
+    xs = [duct["exitX"]] + sorted(g["x"] for g in duct["grilles"])
+    ok &= check(min(b_ - a_ for a_, b_ in zip(xs, xs[1:])) >= 180, "the grilles one to a place, well apart", xs)
     for what, below in (("hall", "the midship lift hall"), ("atrium", "the atrium"), ("party", "the party's door")):
         g = next(g for g in duct["grilles"] if g["what"] == what)
         s = hold_until(b, "left", lambda s: s["x"] < g["x"] + 4, 16)
@@ -3429,7 +3441,8 @@ def scenario_region4(b):
     s = through_the_shaft(b)
     ok &= check(route(b) == "inside" and s["y"] == D8 and abs(s["x"] - duct["exitX"]) < 40 and 5 in save_list(b, "regions"),
                 "the last grille gives way: she drops into deck 8 forward where the shaft ends: region 5", s)
-    ok &= check("duct" in flags(b) and js(b, f"{W}.eyesGone"), "the grille sprung shut behind him, hanging open after her")
+    ok &= check("duct" in flags(b) and js(b, f"{W}.things.find(t => t.id === 'prop_grille_open').items[0].visible"), "the grille hanging open after her")
+    ok &= check(js(b, f"{W}.ductEyes === undefined"), "nothing of Bumbot in the shaft: he is long gone")
     b.shot("region4-dropped")
     # Now that she crawls: the fort, and what is in it.
     n = tangerines()

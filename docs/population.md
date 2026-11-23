@@ -921,9 +921,11 @@ Input locked unless said; each sets its save flag.
    and squeezes in (the user, 2026-11-23; he slept in a towel heap and she bent for him). The cart stands in her way
    between the door and him. **`scn_duct` (remade 2026-11-23, `docs/shaft-remake-log.md`):** the cart pushed to the
    mouth, ↓ on its rim and ←: she crawls in, the room still in view; behind the wall she slides down a slope into
-   the slab between decks 9 and 8 and crawls forward at the shaft's true length, about 25 seconds, with grilles over
-   the midship lift hall (108), the atrium (100, 92, 86), the forward lift hall (80) and the party's door (72), each
-   lighting deck 8 as it is below; the last grille (66) gives way under her and she drops into deck 8 where the shaft
+   the slab between decks 9 and 8 and crawls forward at the shaft's true length, about 25 seconds, in the black, with
+   six grilles, one to a place, each straight over a landmark of deck 8, shown in a cone of light only while she is
+   over that grille (the midship lift hall's DECK 8 plaque, 108.7; the midship stairs' exit sign, 103.7; the atrium's
+   glass lift and staircase, 92.7; the forward lift hall's plaque, 80.7; the forward stairs' exit sign, 75.7; the
+   party's door, 71.6); nothing of Bumbot in it; the last grille (66) gives way under her and she drops into deck 8 where the shaft
    ends. **`scn_chute`:** E at the hatch
    with the green card: a whoosh in the dark, and she lands in the laundry's cart of towels with a
    towel on her head (a gag frame), on deck 4.

@@ -73,7 +73,7 @@ everywhere.
   muted**, so it stands out a little as something to use, the way her crew cabin's door does: the
   doors back out of rooms, 8206's shower door, the balcony doors, the rooms' doors in the corridors,
   the side-on doors in the walls across the decks. What else in a room she uses keeps its colours
-  too (her mirror, the linen room's vent and chute hatch, the nook's way out). The drawing tools
+  too (her mirror, the linen room's chute hatch, the nook's way out). The drawing tools
   carry it (`Room.full` in `tools/draw_rooms.py`, `keep` in the others).
 - **Everything is placed where it makes sense.** Nothing floats in the air: a tangerine sits on a
   table, a counter, a tray or in a fruit bowl; a key hangs on a hook; a card lies on a desk. Same for
@@ -1180,10 +1180,10 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   with none on her, **gag 24** (built 2026-11-19): the same, away from its guests to the partition ahead. `?at=occupied8`.
 - **The linen room:** ~~Bumbot asleep in the towel heap~~ **Bumbot asleep on the second rack's bottle shelf** (the user,
   2026-11-23: the heap is gone). **Near-catch 4, a scene of its own:** the moment she, or the laundry cart she pushes, all
-  but touches him (2 px), he leaps at the vent's cover (generated, closed over the opening), it drops to the floor with a
-  clang, and he squeezes in; her walk-up and reach are not played. The laundry cart (the generated one, region 1's, since
-  2026-11-23; the drawn one is retired) stands in her way, solid: she cannot walk past it, she pushes it under the vent,
-  climbs onto its rim and crawls in (↓).
+  but touches him (2 px), he leaps at the cover on the mouth of the ventilation shaft (generated, closed over its end), it
+  drops to the floor with a clang, and he squeezes in; her walk-up and reach are not played. The laundry cart (the
+  generated one, region 1's, since 2026-11-23; the drawn one is retired) stands in her way, solid: she cannot walk past
+  it, she pushes it up to the mouth, climbs onto its rim and crawls in (↓, then ←).
   **The room mirrored, and the shaft remade (the user, 2026-11-23; the whole record: `docs/shaft-remake-log.md`).**
   ~~**The duct** is a room of its own shown in the corridor's place: a dark crawlspace with grilles that show the
   corridors' light and glimpses down into cabins, about twenty seconds, ending at a grille she kicks out.~~ She had
@@ -1197,14 +1197,23 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   - **The mouth** is the end of a duct standing out of the forward wall, seen from the side, its louvred cover on its
     end until Bumbot knocks it off (it ends by the wall under the mouth). Its floor is level with the laundry cart's
     rim: the cart, pushed to its stop, ends against it; ↓ on the rim puts her on hands and knees, ← takes her in. No
-    cut: the room stays in view behind her, the mouth's near side fades as her head reaches it.
+    cut: the room stays in view behind her. Standing, the mouth's end is a wall to her (she does not run off the
+    cart's end under it).
   - **The shaft is at its true place and length:** behind the wall a slope down into the slab between decks 9 and 8
     (her slide, one way), then forward for 2,200 px (about 25 s) to a grille at 66.2 m over deck 8's forward corridor.
-  - **The looks down are the ship itself:** the ship round the shaft is dark as round a room, but under each grille a
-    cone of light shows deck 8 as it is there: the midship lift hall (108 m), the atrium's gallery (100 m), the
-    atrium's stair and glass lift (92 m), its side walk (86 m), the forward lift hall (80 m), the party's door with its
-    balloons (72 m). The four framed pictures (a lobby light, a dome, a cabin of balloons, a snoring passenger) are
-    retired.
+  - **The looks down are the ship itself, each one a landmark** (the user, 2026-11-23: over bare wall they "show
+    nothing, only empty corridors"; "make the cut away black, and place the peek-outs in appropriate place for us to
+    orient ourselves: showing signs, or recognizable parts of the deck below"). Everything round the shaft is black; a
+    cone of light under each grille shows deck 8 as it is there, and each grille stands straight over a thing that says
+    where she is, one to a place and well apart (two close together "look weird", the user): the midship lift hall's
+    DECK 8 plaque and lift (108.7 m), the midship stairs' exit sign and directory (103.7 m), the atrium's glass lift
+    and curving staircase (92.7 m), the forward lift hall's plaque and lift (80.7 m), the forward stairs' exit sign
+    (75.7 m), the party's door with its balloons (71.6 m). **Only the grille she is over opens its view**; every other
+    one is its lit slats in the shaft's floor (the user). Between them it is dark.
+  - **On hands and knees at the mouth she is behind its near side** (the user: "the shaft should obscure us, to give
+    us a feeling that we are getting inside of it"): she goes into it, and shows again past the room's wall. The four framed pictures (a lobby light, a dome, a cabin of balloons, a snoring passenger) are retired.
+  - **Nothing of Bumbot in the shaft** (the user, 2026-11-23: "Bumbot is long gone when we're crawling in the shaft"):
+    no eyes ahead of her, none of his sounds.
   - **The last grille gives way under her** (sprung: it clapped shut behind Bumbot): a creak, and she drops out feet
     first where the shaft ends, into deck 8's forward corridor, past its lobby door, which then opens from inside for
     good (region 5). It hangs open after.
@@ -1226,7 +1235,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   jammed trolley move to the corridor's aft end** (the trolley jammed at 185.2 m, rolling to
   189.0 m, 3.8 m instead of 7.4; he at its handle as now), between the adjoining cabins' aft door
   (184 m) and the checkpoint's crew door (drawn at 191.6 m). The route plan does not change (the
-  trunk up to 118 m, the card, the linen room at 112 m, the duct): what changes is where the card
+  trunk up to 118 m, the card, the linen room (at 115.4 m since 2026-11-23), the shaft): what changes is where the card
   is earned. She goes down the whole corridor (the honeymoon couple, the vacuum, the towel stack,
   the sprinkler, the balcony cabin's green door still locked, the swinging door, the "Do Not
   Disturb" door, the cart to hop, the luggage stack), frees the trolley, is tossed the card, and
@@ -1255,7 +1264,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 
 - **Covers:** deck 8's forward corridor (21.4-74 m), its forward lobby, the forward terrace at the bow
   end, **cabin 8206** (41.4 m) with its door open and the steward's cart outside, its shower (§8).
-- **The way in:** the duct's grille. Then the lobby door from inside, the forward core's 7-8 door
+- **The way in:** the shaft's last grille, which gives way under her. Then the lobby door from inside, the forward core's 7-8 door
   (free from above) and the atrium walk on 8 all connect.
 - **Calm:** no hazards, no people. The cabin is the surprise, as agreed: nothing gives it away before.
 - **The book:** **her own, on the bed in cabin 8206**, the one she was reading on the cruise (the title
@@ -1502,7 +1511,7 @@ lighting the decks she can reach.
 |---|---|---|---|
 | Deck | Blue | The gangway officer, for his lunch (region 1) | The midships crew trunk (4-5-6) up into Bliss; the boat walkway's gate on the promenade |
 | Entertainment | Red | The stage manager, for his pills (region 3) | The Bliss/Magnum's trunk up to deck 9; the stage door to the dressing room; the lighting booth on the theatre's balcony |
-| Housekeeping | Green | The steward, for his cart (region 4) | **The linen room's crew door** (so the duct and region 5 need it); guest cabin doors, a steward's master key (the balcony cabin, the balcony guest's); the pantries on decks 4 and 5; the laundry chute and the laundry's door; the Garden Café's cold room |
+| Housekeeping | Green | The steward, for his cart (region 4) | **The linen room's crew door** (so the shaft and region 5 need it); guest cabin doors, a steward's master key (the balcony cabin, the balcony guest's); the pantries on decks 4 and 5; the laundry chute and the laundry's door; the Garden Café's cold room |
 | Officer's | Gold | Dropped by the rival at the horn (region 8) | Every reader: the officers' corridors on decks 9 and 10, the bridge's door, the kids' clubs' staff door |
 
 Public doors are roped, not carded (2026-11-11): Magnum's door from deck 7's midship lobby ("CLOSED",
@@ -1603,7 +1612,7 @@ background glimpses of §4 (a tail round a corner, a shape past a window) go on.
 | 1 | The Seven Seas' pass | Eating the lunch (`eating`) | Near-catch 1; the scream; the fruit bowl | Along the counter and out forward; a tail up the forward stairs |
 | 2 | The atrium; the Library | Sitting in the glass car; asleep on her open book (`asleep`) | A glimpse up the glass elevator; near-catch 2 | Through the Library's aft door, knocking the rope over |
 | 3 | The stage | Washing in the spotlight (`washing`) | Near-catch 3, the rival trips | Up a fly rope to the lighting bridge (new clip: hanging on a rope) |
-| 4 | The linen room | Asleep on the bottle shelf (`asleep`; in the towels until 2026-11-23) | Near-catch 4: off as she or the cart all but touches him | Into the vent, its cover knocked down (a squeeze) |
+| 4 | The linen room | Asleep on the bottle shelf (`asleep`; in the towels until 2026-11-23) | Near-catch 4: off as she or the cart all but touches him | Into the shaft's mouth, its cover knocked off (a squeeze); nothing of him in the shaft after |
 | 5 | Deck 8's forward lobby | | A glimpse | A tail up the stairs |
 | 6 | The pool's edge | Fishing (`batting` over the rim) | Near-catch 5; the kid squirts him | Into the pool, up the ladder (new clip: the wet shake), the drain lever |
 | 7 | A balcony rail | Swiping at a gull (`batting`) | A glimpse | Inside; his door is ajar |
@@ -2715,7 +2724,14 @@ the low hop; stopped short from a run the top one slides off ahead and E crouche
 spill scatters all three; a "Thank you!" from the door's crack, no book, no heart. A delivery holds her hands up until the
 hand has it. **The linen room changed (2026-11-23, the user's):** the generated laundry cart in place of the drawn one, an
 obstacle she pushes; Bumbot on the bottle shelf; a generated vent cover he knocks down; the opening smaller; the heap and
-the hanging grille gone; its door washed 20%. **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+the hanging grille gone; its door washed 20%. **The shaft remade (2026-11-23, the user's, by the design session; the
+whole record is `docs/shaft-remake-log.md`):** the linen room mirrored and its door one cabin door aft, so that she
+pushes the cart, goes in and crawls on all one way; the chute's hatch straight over the laundry's cart; the shaft's mouth
+a duct's end seen from the side, level with the cart's rim, its near side drawn over her as she goes in; a slide down
+behind the wall; the shaft at its true place and length in the slab between decks 9 and 8, black round it, six grilles
+each over a landmark of deck 8 (the lift halls' DECK 8 plaques, the stairs' exit signs, the atrium's lift and staircase,
+the party's door), each opening its view only while she is over it; the last grille giving way; nothing of Bumbot in it.
+92 generations (`tools/build_shaft.py`). **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

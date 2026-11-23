@@ -4574,3 +4574,8 @@ The sequence where she follows Bumbot into the linen room's vent, remade on the 
 door one slot aft, the chute's hatch over the laundry's cart, the shaft at its true place and length with the ship
 itself under its grilles, no cut going in or out. Every decision, what was generated and what was checked:
 **`docs/shaft-remake-log.md`**.
+
+**After the user's play of it, the same day** (decisions 13 and 20 to 25 of that log): nothing of Bumbot in the shaft
+(two eyes kept ahead of her "move in sync with the player"; "Bumbot is long gone"); standing on the cart she is stopped
+at the mouth; everything round the shaft black and each grille over a landmark of deck 8; on hands and knees at the
+mouth she is behind its near side; only the grille she is over opens; one grille to a place, six in all.
