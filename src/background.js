@@ -180,6 +180,11 @@ function islandStrip(scene, key, h, haze, seed) {
 // (tools/build_sky.py, `sky-strip`; the user chose them for the intro's sky, 2026-11-20, over the
 // heaps of round puffs drawn here before). Nearly solid: the haze is in their colours.
 const CLOUD_ALPHA = 0.85;
+// In play the strip's foot is this far over the horizon on the screen (40 at first; 52 since the user, 2026-11-23: "the
+// cloud cannot obscure the gulls" on the Spinnaker balcony's windscreen: its lowest clouds behind their white heads read
+// as over them). Its clouds are in its rows 9 to 47, so they stand 61 to 99 px over the horizon, 3 px under the screen's
+// top at their highest.
+const CLOUDS_UP = 52;
 
 // The far sea's ripples: faint short dashes, finer and fewer toward the horizon, so it reads as
 // the same water as the near sea's rows of waves (sea.js) where they meet.
@@ -446,7 +451,7 @@ export class Backdrop {
         const shown = run + left, sr = outside ? 1 : keep;
         this.ripples.setScale(sr).setPosition(left, hy).setSize(width / sr, RIPPLES_H);
         this.ripples.tilePositionX = Math.round((outside ? shown : run * 0.05) / sr - this.time * 8);
-        const cloudFoot = outside ? hy - OUTSIDE_CLOUDS.at(-1)[0] : hy - 40 * keep;
+        const cloudFoot = outside ? hy - OUTSIDE_CLOUDS.at(-1)[0] : hy - CLOUDS_UP * keep;
         this.clouds.setScale(sc).setPosition(left, cloudFoot - 60 * sc).setSize(width / sc, 60);
         this.clouds.tilePositionX = Math.round((outside ? shown : run * 0.01) / sc - this.time * 1.2);
         this.duskStrip.setScale(sc).setPosition(this.clouds.x, this.clouds.y).setSize(width / sc, 60);

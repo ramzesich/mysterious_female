@@ -506,7 +506,8 @@ def build_world():
                     telescopeX=B.exact_x(FUNNEL_TOP["telescope"]), y=ft["y"], roofY=ft["foot"][1], ladderX=ladder_x,
                     x0=ladder_x - 60, x1=ft["x1"] + 40,
                     look=dict(x=look["x"], y=look["y"] - look["dy"], id=look["id"])),
-        flocks=[dict(id=fid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, n=n)
+        # (`front`: a flock on the windscreen's rail, nearer to us than she is on the balcony, the user, 2026-11-23.)
+        flocks=[dict(id=fid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, n=n, front=up > 0)
                 for fid, (deck, a, b, n, up) in FLOCKS.items()])
 
     # Region 9's (src/world/bow.js).

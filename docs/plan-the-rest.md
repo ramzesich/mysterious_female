@@ -510,7 +510,12 @@ still and comes back when she moves. Nothing is counted.
   second still zooms out aft (the user's "Ease aft, not down", then "zoom out", then the frame moved aft "until only
   half of the ship shown here remains"): `frame` in `LOOKOUTS`, the far background held at its size on the screen
   (`keep` in `src/background.js`), its horizon down onto the waterline. At sunset the sun, fixed near the screen's
-  left, is behind the ship; its glow and lit clouds show aft. 4 to come.
+  left, is behind the ship; its glow and lit clouds show aft. **4 built 2026-11-23**, on the Spinnaker's balcony: its
+  first metre from the windscreen (she stands against it), half a second still zooms out forward over the bow, 5's
+  mirror (the user's choice of two: 63 m of sea ahead of the bow to 61 m aft); the windscreen left in front of her (the
+  user: "Leave as it is"). With it: the gulls on its rail drawn over her, and one her head comes up at in a jump takes
+  off a little, aside, and sits down again once she has landed; the far clouds 12 px higher on the screen (clear of the
+  gulls' white heads); the bow's dark band's bulge evened (`even_band` in `tools/build_livery.py`). **3.1 done.**
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data, the camera in the ship scene (the
   intro's camera work is the model); a case each in the regions' scenarios.
 - Spot 1 is where the diary lies (2.1): look at it with both in place. (Spot 5 had his spoon until the t-shirt took
@@ -964,7 +969,7 @@ metres or more between stairs or to an end.
 | # | The end | Its purpose now | What the build needs |
 |---|---|---|---|
 | P1 | The promenade aft of its last door (186 m): 45 m with the jogger's turn and a gull | **A ladder at about 210 m up to the boat walkway beyond the drill, its gate unlatched only from above:** once she has passed the drill, it is the way round it (the user's own test for a ladder, 2026-11-15: "a smart shortcut ... opened once that path is complete at least once"; `docs/plan-three-uses.md` §4.6 had found no place for one). **The last 19 m (212 to 231 m), where she is hidden behind the ship's side (the audit's V5), are chained off** | The gate's ladder again (`ladders`, a lock that opens from the top); a chain or rope across at 212 m, the jogger's turn and the lane's sign (213.6 m) kept clear. The forward enclosed end stays (11 m past its door) |
-| P2 | Deck 12, the Spinnaker's balcony (31 to 44 m) | **Look-out 4 moves here from deck 9's corridor end:** forward over the bow from the top of the ship. Deck 9's end keeps book 14 and the captain's door | §5 3.1's row 4. **She must be seen there** (the audit's V4: she is a pale figure cut off at the thighs behind the windscreen's glass): she and the balcony's things drawn in front of the glass |
+| P2 | Deck 12, the Spinnaker's balcony (31 to 44 m) | **Look-out 4 moves here from deck 9's corridor end:** forward over the bow from the top of the ship. Deck 9's end keeps book 14 and the captain's door | §5 3.1's row 4. **She must be seen there** (the audit's V4: she is a pale figure cut off at the thighs behind the windscreen's glass): she and the balcony's things drawn in front of the glass. **Built 2026-11-23 (look-out 4); the glass left in front of her: the user, shown her drawn in front of it, "Leave as it is"** |
 | P3 | Deck 10's balcony row, its forward end (62.9 m) | **His sleep mask** (§4 2.1, 14: "the far balcony") on the first balcony's sunbed. Deck 9's forward balconies are then the climb between deck 8's photo slot (74.9 m) and it | The place of a thing not yet placed. **Built 2026-11-21** (§4 2.1, 14) |
 | P4 | Deck 9 aft, the last 19 m | **Its tangerine (`tan_9_aft`) moves from 230 m to the last cabin door, about 246 m**, on §7d's tray on a stand; **the pillow delivery (§5 3.2, 3) ends at that cabin** | Two lines of data; the cart at 230 m stays as an obstacle |
 | P5 | Deck 8 forward, past her cabin (21 to 41 m, and the forward terrace) | **Its tangerine (`tan_8_fwd`, §7d's 11) moves from 49.3 m to a table on the forward terrace** | A table for it out there (a balcony table is a seat §7d allows); looked at with the terrace's stairs and U11 in mind |

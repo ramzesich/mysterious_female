@@ -644,7 +644,10 @@ export class Flock {
             // (About the two ends of the stretch: a pool's two rims, a windscreen's length.)
             const k = def.n > 1 ? i / (def.n - 1) : 0.5;
             const x = Math.round(def.x0 + (def.x1 - def.x0) * (k < 0.5 ? k * 0.36 : 1 - (1 - k) * 0.36) + ((i * 37) % 9) - 4);
-            const sprite = s.add.image(x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setFlipX(i % 2 === 0).setDepth(D.props + 0.06);
+            // (On the windscreen's rail, `front`, they are nearer to us than she is: over her as she jumps by, and over
+            // the windscreen drawn over her; the user, 2026-11-23.)
+            const sprite = s.add.image(x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setFlipX(i % 2 === 0)
+                .setDepth(def.front ? D.player + 0.05 : D.props + 0.06);
             world.add([sprite]);
             return { sprite, x, i };
         });
@@ -654,11 +657,47 @@ export class Flock {
     update(dt, time) {
         const s = this.scene, d = this.def;
         if (this.gone || !near(s, (d.x0 + d.x1) / 2, d.y, 800, 300)) return;
+        if (d.front) this.dodge(dt, time);
         // Now and then one shuffles, or stretches a wing.
         for (const b of this.birds) {
             if (b.up) continue;
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
             b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
+        }
+    }
+
+    // A jump at the gulls on the windscreen's rail (the user, 2026-11-23): the one her head comes up at takes off a little,
+    // up and aside out of her way, flapping, and sits down again once she has landed. On the scene's clock (`k`, 0 sat,
+    // 1 up), not a tween's.
+    dodge(dt, time) {
+        const s = this.scene, p = s.player, d = this.def;
+        const onFloor = p.body.blocked.down || p.body.touching.down;
+        const head = p.y - PLAYER.height;
+        for (const b of this.birds) {
+            if (b.up && !b.dodge) continue;
+            if (!b.dodge) {
+                if (s.mode === 'play' && s.route === 'inside' && !onFloor && Math.abs(p.x - b.x) < 24
+                    && head < d.y + 8 && p.y > d.y - 40) {
+                    b.up = true;
+                    b.dodge = { k: 0, side: Math.sign(b.x - p.x) || 1, landed: 0 };
+                    sfx.at(b.x, d.y).flap();
+                }
+                continue;
+            }
+            const D = b.dodge;
+            // (Up while she is in the air; down a moment (0.15 s) after she lands.)
+            D.landed = onFloor ? D.landed + dt : 0;
+            const up = D.landed < 0.15;
+            D.k = up ? Math.min(1, D.k + dt / 0.22) : Math.max(0, D.k - dt / 0.4);
+            const e = Math.sin(D.k * Math.PI / 2);
+            if (D.k === 0 && !up) {
+                b.sprite.setFrame('gull-perched').setPosition(b.x, d.y);
+                b.dodge = null;
+                b.up = false;
+                continue;
+            }
+            b.sprite.setFrame(Math.floor(time / 110) % 2 ? 'gull-up' : 'gull-down')
+                .setPosition(Math.round(b.x + D.side * 10 * e), Math.round(d.y - 34 * e));
         }
     }
 

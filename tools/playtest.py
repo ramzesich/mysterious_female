@@ -6136,6 +6136,32 @@ def scenario_region6__lookout(b):
     return ok
 
 
+def scenario_region9__lookout(b):
+    """Look-out 4 (the user, 2026-11-23): at the Spinnaker's balcony's forward end (from the windscreen to the first
+    palm), half a second standing still zooms the camera out forward over the bow (look-out 5's mirror), every deck
+    closed; walking off the spot and it is back with her."""
+    S = "window.__ship"
+    L = f"{S}.world.movers.find(m => m.def?.id === 'look_spinnaker')"
+    b.open("?reset&play&cards=all&at=spinnaker")
+    wait(0.4)
+    x, reach = b.eval(f"[{L}.def.x, {L}.def.reach]")
+    b.teleport(x + reach + 40, D12)
+    wait(0.3)
+    ok = check(b.eval(f"{S}.cameras.main.zoom") == 2, "on the balcony, at first: play's zoom")
+    # (Walked into the windscreen, as the user stood: the spot reaches it.)
+    hold_until(b, "left", lambda s: False, timeout=2.5)
+    wait(2.8)
+    v = b.eval(f"[{L}.k, {S}.cameras.main.zoom, {S}.cameras.main.worldView.x, {S}.cameras.main.worldView.right, {S}.viewDeck, {S}.cameras.main.useBounds]")
+    x0, x1 = b.eval(f"{L}.def.frame")
+    ok &= check(v[0] == 1 and v[1] < 0.2 and abs(v[2] - x0) < 2 and abs(v[3] - x1) < 2 and v[4] is None and not v[5],
+                "against the windscreen, still: zoomed out forward over the bow, every deck closed", v)
+    hold_until(b, "right", lambda s: s["x"] > x + reach + 8)
+    wait(1.2)
+    v = b.eval(f"[{L}.k, {S}.cameras.main.zoom, !!{S}.cameras.main._follow, {S}.cameras.main.useBounds, {S}.world.lookFar]")
+    ok &= check(v == [0, 2, True, True, 0], "off the spot: back with her, play's zoom and bounds", v)
+    return ok
+
+
 def scenario_deck4__porthole(b):
     """Look-out 2 (the user, 2026-11-23): deck 4's aft porthole by E: she turns her back to us at it, and the outside
     view (O) shows; a movement key brings the camera back to her."""

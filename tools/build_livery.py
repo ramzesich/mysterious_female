@@ -237,6 +237,33 @@ def fill_at(label, spots=SPOTS):
     return label
 
 
+# The bow's dark band tapers evenly toward the sun, but over a stretch its lower edge sagged into a bulge (the user,
+# 2026-11-23: "a bulge under the dark strip of the front part"): its thickness 78 px, 84, then 71 where its neighbours
+# go 87, 78, 62. Between these columns (map px) its lower edge follows its upper one, the thickness eased from one
+# end's to the other's.
+EVEN_BAND = (1000 + 384, 1280 + 384)
+
+
+def even_band(label, span=EVEN_BAND, colour=2, rows=(300, 800)):
+    def run(x):
+        col = np.nonzero(label[rows[0]:rows[1], x] == colour)[0]
+        return int(col[0]) + rows[0], int(col[-1]) + rows[0] + 1
+    x0, x1 = span[0] - ORIGIN[0], span[1] - ORIGIN[0]
+    thick = lambda x: (lambda t, b: b - t)(*run(x))
+    # (Eased from each end's thickness and the way it was changing there, so the edge runs on without a kink.)
+    h0, h1, n = thick(x0), thick(x1), x1 - x0
+    m0, m1 = (h0 - thick(x0 - 24)) / 24 * n, (thick(x1 + 24) - h1) / 24 * n
+    for x in range(x0 + 1, x1):
+        top, bottom = run(x)
+        k = (x - x0) / n
+        h = (2 * k ** 3 - 3 * k ** 2 + 1) * h0 + (k ** 3 - 2 * k ** 2 + k) * m0 + (-2 * k ** 3 + 3 * k ** 2) * h1 + (k ** 3 - k ** 2) * m1
+        new = top + round(h)
+        label[top:new, x] = colour
+        if bottom > new:
+            label[new:bottom, x][label[new:bottom, x] == colour] = 0
+    return label
+
+
 def moved(X):
     """Where in the photo's layout the livery's column X (map pixels) is taken from: the sun and all
     aft of it SHIFT pixels forward of where the photo has it (the user: it sat too far back), the
@@ -289,7 +316,7 @@ def build(path=None, edge=None, sleeked=True):
     label[(label == 1) & (weight > 0)] = 0
     label = fill_spots(label)
     if sleeked:
-        label = fill_at(fill_spots(sleek(label)))
+        label = even_band(fill_at(fill_spots(sleek(label))))
     cx, cy, r = DISC[0] - ORIGIN[0], DISC[1] - ORIGIN[1], DISC[2]
     ys, xs = np.ogrid[0:H, 0:W]
     d = np.hypot(xs - cx, ys - cy)

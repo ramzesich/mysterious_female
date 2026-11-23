@@ -2672,8 +2672,10 @@ had stood in two places at once). **Her towel turban mended (2026-11-23, the use
 read on the bed (a towel version of that clip); its outline whole on top as she steps out of the shower; no blue in it.
 **Her blouse without sky blue (2026-11-23, the user's):** the palette's sky blue that
 shaded her white blouse in every frame since her first sheet is the blouse's grey-blue; the water on her, in her wet clips,
-blue again (it had gone lavender-grey). **Next: §5, part 3 (look-out 4,
-the Spinnaker's balcony with part 11's P2; then the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+blue again (it had gone lavender-grey). **Look-out 4 (2026-11-23):** on the Spinnaker's balcony, against the windscreen, the view
+zooms out forward over the bow (5's mirror); the windscreen left in front of her; its rail's gulls over her, making way
+from a jump; the far clouds higher; the livery's bow band evened. The look-outs are done. **Next: §5, part 3 (the
+deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

@@ -758,7 +758,9 @@ are on the stairs).
 ### Deck 12 (regions 8, 9)
 
 **The Spinnaker balcony 31-44 (region 9).** The windscreen (built); `gull_bow_b` six gulls on the
-windscreen until the horn; a bench.
+windscreen until the horn, drawn over her, one taking off aside from a jump at it and sitting down again once she has
+landed (2026-11-23); a bench. `look_spinnaker` at 31.5 (the first metre from the windscreen): look-out 4, still half a
+second, the camera zooms out forward over the bow (-63.4 to 60.6 m, every deck closed; built 2026-11-23, `LOOKOUTS`).
 
 **The Spinnaker Lounge 44-57.5.** A bandstand corner between the cream armchair and the sofa (a guitar on its stand by a small amp, 47.6 to 48.3); **`keep_pick` at 47.94**, his guitar pick (16) on the amp, `pickup` after the table scene (`flag:table`); E; its close-up (the user, 2026-11-21; the piano 8 px forward, the two guests in their armchairs 2 px down). 48 `sec_piano` (`quirk(E)`: a few notes); 54 `tan_12_spinnaker`
 at the bar, `amb_barman_sp`; `amb_lounge` two in armchairs.

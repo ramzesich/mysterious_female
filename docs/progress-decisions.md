@@ -4451,3 +4451,21 @@ valuable."
   over (before, after, the blue marked); what no tint tells (pale grey drips, blue-white water on the blouse) stays grey.
 - Only colours changed (diffed against the old sheets: dry clips only sky blue to grey-blue). Tests: `boot`, `cabin`
   pass. Not run: the rest.
+
+## Look-out 4 on the Spinnaker's balcony (§5 3.1, part 11's P2; the user, 2026-11-23)
+
+- **Shown two mock-ups:** her drawn in front of the windscreen (P2) and two zoomed views. **The user: the glass "Leave
+  as it is"; the view A, 5's mirror** (-63.4 to 60.6 m: the sea ahead of the bow and the bow, every deck closed).
+- **Built:** `look_spinnaker` in `LOOKOUTS`. The user's fixes after trying it: **the spot** (at 33 m, a metre wide, it
+  "never triggers": she stood against the windscreen; to the first palm it went off "when we stand back a little":
+  now the first metre from the windscreen, 31.5 m, reach 0.5 m); **the gulls on the rail over her** ("they sit on a
+  railing that is closer to the screen": `front` flocks at `player + 0.05`) **and making way** ("they have to take off a
+  little bit, as if out of the way, and then sit down after I land": `Flock.dodge`, the one her head comes up at flaps
+  34 px up and 10 aside, 0.15 s after she lands it sits again over 0.4 s, on the scene's clock); **the cloud "cannot
+  obscure the gulls"** (it was behind them: their white heads have no outline; the user chose, of an outline or
+  clouds higher, the clouds higher: `CLOUDS_UP` 52 from 40 in `src/background.js`, the clouds 61 to 99 px over the
+  horizon on the screen); **"a bulge under the dark strip of the front part of the livery"** (the bow's dark band 74,
+  84, 71 px thick where it tapers from 87 to 59: its lower edge follows its upper one there, the thickness eased with
+  the slopes either side, `even_band` in `tools/build_livery.py`, the rebuild otherwise identical).
+- Tests: `region9.lookout` (new: walked into the windscreen, still, zoomed; off the spot, back), `region8`, `boot`
+  pass. Not run: the rest. No generations.

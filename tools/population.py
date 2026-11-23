@@ -771,7 +771,13 @@ LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2)}
 # aft "until only half of the ship shown here remains in view" (the user): from 142-266 m to 197.6-321.6 m, the stern's
 # half on the left, the sea and the sky aft of it on the right (along the user's arrow, up too, the sea left the frame).
 LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], {"drop": (244, 256, 6)}),
-            "look_outdoors": (11, 243.52, 0.5, (200, 0), [], {"frame": (197.6, 321.6)})}
+            "look_outdoors": (11, 243.52, 0.5, (200, 0), [], {"frame": (197.6, 321.6)}),
+            # Look-out 4 (plan-the-rest §7f's P2; the user, 2026-11-23): the Spinnaker's balcony's forward end, its first metre
+            # from the windscreen, where she stands against it (at 33 m it was never found; to the first palm it went off
+            # "when we stand back a little": "only at the front"), zoomed out
+            # forward over the bow as 5 is aft, its mirror (the user's choice of two): 63 m of sea ahead of the bow to 61 m
+            # aft, every deck closed. The windscreen stays in front of her ("Leave as it is").
+            "look_spinnaker": (12, 31.5, 0.5, (0, 0), [], {"frame": (-63.4, 60.6)})}
 # Look-out 2 is a porthole she looks out of by E (the user, 2026-11-23, turning down a wait that eased the camera out of
 # the ship to the wake): she turns her back to us at it, and the outside view (O) shows, the whole ship from outside;
 # any movement key (or O, Esc) brings her back. The corridor's brass porthole, the live sea in its glass, in the place
