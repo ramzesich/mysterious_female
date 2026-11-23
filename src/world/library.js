@@ -200,7 +200,8 @@ export class Library {
         // (Each clip's frames: sitting down, the pose she holds while she chooses, opening the book and reading.)
         const SIT = bed ? [0, 1, 2, 3] : [0, 1, 2, 3, 4];
         const OPEN = bed ? [4, 5, 6, 7, 8, 9] : [7, 8, 9, 10, 11, 12, 13];
-        const name = bed ? 'bed' : 'chair';
+        // (With the towel round her hair after the shower, the bed's clip with it: the user, 2026-11-23.)
+        const name = bed ? (s.towel ? 'bed-towel' : 'bed') : 'chair';
         this.reading = true;
         w.cut(async () => {
             const y = p.y;

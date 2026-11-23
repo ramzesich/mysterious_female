@@ -4409,3 +4409,25 @@ valuable."
   she was home (outside 8206 and at their own places): their own places now `until="flag:catch&!flag:home"`.
 - `finale`'s checks of the day after changed to this state, and two added (none at their own place while clapping her
   home; all back after). Tests: `finale`, `region6`, `region9`, `region2`, `keeps`, `boot` pass. Not run: the rest.
+
+## Her towel turban: kept while she reads on the bed, its top outline back, no blue (the user, 2026-11-23)
+
+- **The towel went from her hair when she sat to read on the bed** (the user's bug): the bed's reading clip was made
+  without it. A towel version, made as the first (one PixMiniMax clip, 1 generation, from cabin 8206's picture with her
+  towel look standing at the plain clip's very place), cut by a new tool, `tools/cut_reading.py` (its rules in
+  `assets/source/her/reading/README.md`), each fault the user or the frame-by-frame check found mended in the cut:
+  the window lit grey, the towel's inside cut away over the pale wall picture, tufts over it, "shifting pixels in front of
+  the towel" (the picture's greys within a px of its outline, kept because the closing counted its own grown ring),
+  "the top-right part of the turban outline partly missing" (a diagonal outline's steps joined only side to side),
+  "some white spot behind her" (the pillow redrawn against her back). `library.read()` plays `bed-towel` while the towel
+  is on. The towel is only on in the cabin, so the Library's chairs need none.
+- **"The turban is missing some of its outline on top"** as she steps out of the shower: PixelLab's front still of the
+  towel look has the turban touching its canvas's top, its outline cut off. `rotations/south-topped.png`, a row taller
+  with that row of outline in the outline's colour, stood by its lowest row; no other towel frame touches its top.
+- **"Remove the added blue pixels from all the with turban on frames"** (the user asked whether they were water): the
+  palette's sky blue shading the towel (372 px) and the reading clip's blue-greys turned to neutral grey of the same
+  lightness, in the figure's top 18 rows, dark blues (her eyes) kept: `grey_top` in `tools/build_sprites.py`
+  (`HER_TOWEL`) and in the reading clip's cut.
+- `region5` checks the towel clip on the bed and that she stands up in the towel; its stale "two tangerines in the welcome
+  basket" (at 104 px since the desk took them, 118 px, 2026-11-22) mended. Tests: `region5`, `cabin`, `boot`, `keeps`
+  pass. Not run: the rest. 1 generation.

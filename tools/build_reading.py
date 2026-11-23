@@ -21,7 +21,9 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "her" / "reading"
 OUT = ROOT / "assets" / "sprites"
-CLIPS = {"chair": (range(0, 17), (68, 68)), "bed": (range(0, 17), (132, 100))}
+# (`bed-towel`: the bed's with her towel turban on, after the shower, the frames the game plays; cut by
+# `tools/cut_reading.py`, the user, 2026-11-23: the towel went from her hair when she sat to read.)
+CLIPS = {"chair": (range(0, 17), (68, 68)), "bed": (range(0, 17), (132, 100)), "bed-towel": (range(0, 10), (132, 100))}
 ROW = 2048
 
 

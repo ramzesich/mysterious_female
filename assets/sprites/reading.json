@@ -679,6 +679,206 @@
    },
    "rotated": false,
    "trimmed": false
+  },
+  "bed-towel-0": {
+   "frame": {
+    "x": 1452,
+    "y": 100,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-1": {
+   "frame": {
+    "x": 1584,
+    "y": 100,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-2": {
+   "frame": {
+    "x": 1716,
+    "y": 100,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-3": {
+   "frame": {
+    "x": 1848,
+    "y": 100,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-4": {
+   "frame": {
+    "x": 0,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-5": {
+   "frame": {
+    "x": 132,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-6": {
+   "frame": {
+    "x": 264,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-7": {
+   "frame": {
+    "x": 396,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-8": {
+   "frame": {
+    "x": 528,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
+  },
+  "bed-towel-9": {
+   "frame": {
+    "x": 660,
+    "y": 200,
+    "w": 132,
+    "h": 100
+   },
+   "sourceSize": {
+    "w": 132,
+    "h": 100
+   },
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 132,
+    "h": 100
+   },
+   "rotated": false,
+   "trimmed": false
   }
  },
  "heads": {
@@ -851,13 +1051,63 @@
    98,
    43,
    35
+  ],
+  "bed-towel-0": [
+   86,
+   13,
+   5
+  ],
+  "bed-towel-1": [
+   85,
+   16,
+   8
+  ],
+  "bed-towel-2": [
+   90,
+   23,
+   15
+  ],
+  "bed-towel-3": [
+   103,
+   36,
+   28
+  ],
+  "bed-towel-4": [
+   104,
+   36,
+   28
+  ],
+  "bed-towel-5": [
+   102,
+   36,
+   28
+  ],
+  "bed-towel-6": [
+   100,
+   36,
+   28
+  ],
+  "bed-towel-7": [
+   100,
+   36,
+   28
+  ],
+  "bed-towel-8": [
+   101,
+   36,
+   28
+  ],
+  "bed-towel-9": [
+   102,
+   36,
+   28
   ]
  },
  "meta": {
   "image": "reading.png",
   "size": {
    "w": 2048,
-   "h": 200
+   "h": 300
   }
  }
 }

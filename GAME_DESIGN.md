@@ -2668,7 +2668,9 @@ sea past it, the far sky held at its size on the screen; back to her when she mo
 the ending have the same state as at the ending"):** what was "the day after" keeps the evening of the catch: the sunset,
 her husband on the sofa in cabin 8206 and his table empty, the kids' club in bed and its fort a pile, every cone hers;
 Bumbot asleep on the bed; those who clapped her home back at their own places (and away from them while they clap: they
-had stood in two places at once). **Next: §5, part 3 (look-out 4,
+had stood in two places at once). **Her towel turban mended (2026-11-23, the user's):** she keeps it when she sits to
+read on the bed (a towel version of that clip); its outline whole on top as she steps out of the shower; no blue in it.
+**Next: §5, part 3 (look-out 4,
 the Spinnaker's balcony with part 11's P2; then the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").

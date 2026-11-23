@@ -201,11 +201,16 @@ HER_TOWEL = {
         "rise": [("jump/3.png", "feet")],
         "apex": [("jump/4.png", "feet")],
         "fall": [("jump/5.png", "feet")],
-        "front": [("rotations/south.png", "keep")],
+        # (PixelLab's front still has the turban touching its canvas's top, its outline over the towel cut off: the
+        # user saw it as she stepped out of the shower, 2026-11-23. `south-topped.png` is it a row taller, that row
+        # of outline put back in the outline's own colour; stood by its lowest row, as `keep` stood the other.)
+        "front": [("rotations/south-topped.png", "feet")],
         "bed-joy": [(f"bed-bounce/{i}.png", "feet") for i in range(8)],
         "back": [("rotations/north.png", "keep")],
     },
     "baseline": "idle-tap/0.png",
+    # (The turban's light blues grey, in every frame: `grey_top`.)
+    "grey_top": 18,
 }
 
 
@@ -375,6 +380,23 @@ def paste(dst, src, x, y):
         dst.alpha_composite(src.crop((left, top, right, bottom)), (x + left, y + top))
 
 
+
+def grey_top(im, rows):
+    """The light blues of the figure's top `rows` (her towel turban) turned to neutral grey of the same lightness: the
+    palette's sky blue in its shading read as "water?" (the user, 2026-11-23: "remove the added blue pixels from all the
+    with turban on frames"). Dark blues (her eyes) stay."""
+    im = im.copy()
+    bb = im.getbbox()
+    if not bb:
+        return im
+    for y in range(bb[1], min(bb[3], bb[1] + rows)):
+        for x in range(bb[0], bb[2]):
+            r, g, b, a = im.getpixel((x, y))
+            if a and b - r > 25 and b >= g and (r + g + b) / 3 > 130:
+                v = round(0.3 * r + 0.59 * g + 0.11 * b)
+                im.putpixel((x, y), (v, v, v, a))
+    return im
+
 def build(spec):
     src_dir = ROOT / "assets" / "source" / spec["name"]
     cell = spec["cell"]
@@ -394,6 +416,8 @@ def build(spec):
         paper = anim.startswith(spec.get("paper", ())) if spec.get("paper") else False
         images = [(palettize(paper_greys(Image.open(src_dir / path)) if paper else Image.open(src_dir / path), remap), anchor)
                   for path, anchor in sources]
+        if spec.get("grey_top"):
+            images = [(grey_top(img, spec["grey_top"]), anchor) for img, anchor in images]
         anim_feet = max(lowest_row(img) for img, _ in images)
         # Placed by its thing (HER_MISHAPS): the clip moved sideways by its first frame's thing.
         shift = 0
