@@ -2674,8 +2674,10 @@ read on the bed (a towel version of that clip); its outline whole on top as she 
 shaded her white blouse in every frame since her first sheet is the blouse's grey-blue; the water on her, in her wet clips,
 blue again (it had gone lavender-grey). **Look-out 4 (2026-11-23):** on the Spinnaker's balcony, against the windscreen, the view
 zooms out forward over the bow (5's mirror); the windscreen left in front of her; its rail's gulls over her, making way
-from a jump; the far clouds higher; the livery's bow band evened. The look-outs are done. **Next: §5, part 3 (the
-deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+from a jump; the far clouds higher; the livery's bow band evened. The look-outs are done. **Delivery 1 (2026-11-23):** the
+vase of flowers from deck 8 midships' aft lobby door to cabin 8215, a flower frame round the screen while she carries it,
+book 12; the ice bucket's tray a trap; a floor tray spills a load and plays its ride. **Next: §5, part 3 (deliveries 2 and
+3: the tea, book 13; the pillows);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

@@ -4469,3 +4469,36 @@ valuable."
   the slopes either side, `even_band` in `tools/build_livery.py`, the rebuild otherwise identical).
 - Tests: `region9.lookout` (new: walked into the windscreen, still, zoomed; off the spot, back), `region8`, `boot`
   pass. Not run: the rest. No generations.
+
+## Delivery 1, the vase of flowers (§5 3.2; the user, 2026-11-23)
+
+- **Asked, one at a time:** the vase's rule (she sees the hallway through the stems): **stems over the view**; the route:
+  **approved as proposed** (a table by deck 8 midships' aft lobby door at 193 m, to cabin 8215 at the forward end, 115.6
+  m, past the steward's rounds, the sprinkler, the swinging door, the trays and the "Do Not Disturb" door), tray rules.
+- **The art, generated and chosen:** the vase (cut 8 rows of plain glass, 43 to 35 px); its tray narrower (18 px: "the
+  tray should be shorter"); the low table ("more in profile from the side"); the view: a bouquet over the hallway ahead
+  was turned into **"a flower frame, all around the screen's perimeter, obscuring parts of front and back of the
+  corridor"**: three candidates, the first chosen; it "looks cut out near the screen edges": its margins inpainted (the
+  background removal took them; then on magenta: "the bottom part doesn't look good"); **"measure the exact dimensions
+  and regenerate the entire thing from scratch"**: 512 x 288 cut to the screen's 480 x 270, full bleed, then "sides
+  fuller still" (the last frame as a style image). Ids in `assets/source/things/delivery/README.md`; about 200
+  generations, most of them the frame.
+- **Built:** `LOADS.vase` (`tray`, `view` in `src/world/carry.js`), the frame on the screen's layer under the HUD, faded in
+  and out, **never in a zoomed-out view** (the user: the look-outs' and the outside view; the scene's update hides it, as
+  the outside view holds the world still); `src_vase` with its tag hanging from the table's edge (a source's `sign:`
+  item); `DELIVERIES` and the world's `delivery` (E with the load: a knock, `handTakes`, a heart, the flag, the book);
+  conditions `a|b` and `opened:<door>` in `world.cond`; start place `hall8`.
+- **The user's play:** the vase "magically appears behind me" (shown once a lobby door was opened): there from the start.
+  (The "SCENERY MOVE" sign that went with the door is the theatre's block, lifted with region 4, which a fresh game at
+  `hall8` opens there.) **The ice bucket's tray "should be a gag": a trap** (`haz_trays_8ice`, its own things, `DISH_PIECES`
+  splitting the two glasses; its tangerine in the bucket flies off with them and lies loose, `fruitOff`). **"This tray
+  breaks the vase, but the sliding gag isn't triggered"**: asked, **"gag and spill, trays only"**: a floor tray spills a load
+  and plays its ride (her carry run counts as her run); every other hit with a load stays a spill only. **"Scattered items
+  should all be on the floor. Spilled items should not sink through the floor"**: a spill's things turned about their middles
+  and set down by their height once turned (the tray upside down, the load on its side); the lunge's scatter tumbles the
+  dishes over as the ride does. **"The gag is triggered before we visually touch the tray"**: the hop starts within 4 px of
+  her toe (it was 22), from the next quarter of her stride if she is between; 16 runs at the ice tray, all ridden.
+- Tests: `deliveries` (new), `region7`, `region6`, `region9`, `region4`, `boot` pass; `mishaps` but `mishaps.things`' deck
+  9 sprinkler (16): **broken since cefcf4c** (the Refinement session's "doors are secrets too"; passes at e621d5b; the door
+  burst's gag plays instead), not looked into. `tools/check_overlaps.py`: 0. Corridors: deck 8 40.1 m without a beat,
+  104.3 m without a reward (the delivery is not counted).

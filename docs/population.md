@@ -553,7 +553,9 @@ cabin at 150 or from the lobbies once opened.
 | 136 | `haz_swing_8m` | A cabin door that swings open | `reactive(3, 0.6)`, **no tell** (the user, 2026-11-18: the rattle taken out): it bursts open toward us flat against the wall and slams shut (generated, muted, `gags` sheet). Coming at it from aft past its hinge, it waits for her and slams her flat on the wall (13a); from forward it never hits her, and bursts once she is clear of its swing | Generated |
 | 146 | `sign_wet_8m` + `haz_sprinkler_8m` | A wet-floor sign (muted) and the sprinkler in the doorway at 148 | `timed(5, 2, 147-149)`; contact "Drenched"; the open parasol passes; whatever she carries (every hit since 2026-11-19), 16: soaked, a sneeze, back the way she came | Drawn |
 | 150 | `room_balcabin_8m` | The balcony cabin whose balcony door stands ajar (housekeeping airing it): the way in from outside; its corridor door opens from inside | `room` | The generic balcony cabin, drawn by hand |
-| 176 | `amb_ice` | An ice bucket and two glasses on a tray outside a door | Decor | |
+| 115.6 | `dlv_vase` | Cabin 8215, delivery 1's door: its number on a steel plate on the wall beside it; E with the vase, a hand takes it, book 12 | `DELIVERIES` (2026-11-23) | |
+| 178 | `haz_trays_8ice` | An ice bucket and two glasses on a tray outside a door (`tan_8_mid` in the bucket): a trap as the room-service trays since 2026-11-23 (the user), its things and its tangerine flying off; it was decor (`amb_ice`) | `trap` | |
+| 193 | `src_vase` | Delivery 1: the vase of flowers on its narrow tray on a low table by the aft lobby door, its tag 8215 | `SOURCES` (2026-11-23) | Generated |
 | 184 | `haz_cart_8_184` | A standing cart | Hop | |
 
 **The aft hallway 202-251.5 (region 7), "the breakfast rush".**

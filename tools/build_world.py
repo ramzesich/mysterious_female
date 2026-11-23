@@ -15,7 +15,7 @@ from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, 
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
-from population import (BEAT_LIFT, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
+from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
@@ -212,6 +212,11 @@ def build_world():
         # (`when`: it is there to see, but hers to take only then; `until`: gone after.)
         ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show,
                          when=rest[0] if rest else "", until=rest[1] if len(rest) > 1 else ""))
+    for did, (deck, m, load, flag, book, number, up) in DELIVERIES.items():
+        # (At the cabin door's own middle: the corridor's doors stand every 192 px.)
+        x, y, route = slot_x(deck, m), B.floor_y(deck), "inside"
+        ents.append(dict(kind="delivery", id=did, x=x, y=y, route=route, load=load, flag=flag, book=book, number=number,
+                         plateUp=up))
     for qid, (where, at, trigger, clip, ms, opts) in QUIRKS.items():
         x, y, route = spot(where, at)
         opts = dict(opts)
@@ -320,9 +325,9 @@ def build_world():
     for qid, (deck, a, b, v, who) in QUEUES.items():
         ents.append(dict(kind="queue", id=qid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,
                          who=who, route="inside"))
-    for tid, (deck, a, b, door, flag) in TRAYS.items():
+    for tid, (deck, a, b, door, flag, *dishes) in TRAYS.items():
         ents.append(dict(kind="trays", id=tid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
-                         door=door, flag=flag, route="inside"))
+                         door=door, flag=flag, route="inside", **({"dishes": dishes[0]} if dishes else {})))
     # Region 7's (src/world/outside.js).
     for rid, (deck, a, b, v, stops, wait, who) in ROUNDS.items():
         ents.append(dict(kind="rounds", id=rid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,

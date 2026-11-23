@@ -94,6 +94,8 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('people', 'assets/sprites/people.png', { frameWidth: 80, frameHeight: 80 });
         // The plan's own things (the delivery robot, the gulls: tools/build_things.py).
         this.load.atlas('things', 'assets/sprites/things.png', 'assets/sprites/things.json');
+        // The flower frame round the screen while she carries delivery 1's vase (tools/build_things.py).
+        this.load.image('flower-frame', 'assets/sprites/flower-frame.png');
         // Each thing to find and each key card seen close, shown when she gets it (tools/build_closeups.py).
         this.load.atlas('closeups', 'assets/sprites/closeups.png', 'assets/sprites/closeups.json');
         // Each book's first page and its title in the pages' lettering, for the row she chooses from

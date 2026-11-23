@@ -10,6 +10,7 @@
 import { sfx } from '../sfx.js';
 import { rumble } from '../rumble.js';
 import { t } from '../lang.js';
+import { VIEW } from '../config.js';
 
 // What a tray can hold: how it is drawn (a piece of the ship's atlas on the tray, or drawn here),
 // whether it runs out (`ms`: a melting cone, a cooling cup), whether it is too heavy to hop with.
@@ -21,6 +22,10 @@ export const LOADS = {
     cocktail: { frame: 'umbrella-cocktail' },
     cake: { thing: 'wedding-cake', fragile: true },
     canister: { draw: 'canister', heavy: true, bare: true },
+    // The deliveries (plan-the-rest §5 3.2), each a tray with its own rule. 1, the vase of flowers (deck 8 midships): a
+    // narrower tray (`tray`, px; the user, 2026-11-23), the bouquet before her face, and round the screen the flowers
+    // she sees the hallway through (`view`, the user's frame: `assets/source/things/delivery/`).
+    vase: { thing: 'delivery-vase', tray: 18, view: 'flower-frame' },
 };
 
 // Her hop with a load (`carry-rise`, `carry-apex`, `carry-fall` in her sheet): where the load stands in each, [px ahead of
@@ -52,6 +57,12 @@ export class Carry {
             g.fillStyle(0x2e222f, 1).fillRect(1, 0, 24, 4);
             g.fillStyle(0xc7dcd0, 1).fillRect(2, 1, 22, 2);
             g.fillStyle(0xffffff, 1).fillRect(3, 1, 8, 1);
+        });
+        // (A narrower one, the same drawing: the vase's.)
+        make('tray-18', 18, 4, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(1, 0, 16, 4);
+            g.fillStyle(0xc7dcd0, 1).fillRect(2, 1, 14, 2);
+            g.fillStyle(0xffffff, 1).fillRect(3, 1, 6, 1);
         });
         make('load-cloche', 18, 12, g => {
             g.fillStyle(0x2e222f, 1).fillEllipse(9, 12, 18, 22);
@@ -95,7 +106,7 @@ export class Carry {
         this.wobble = 0;
         this.st = null;
         this.items = [top];
-        if (!load.bare) this.items.unshift(s.add.image(0, 0, 'tray').setOrigin(0.5, 1).setDepth(D.player + 0.011));
+        if (!load.bare) this.items.unshift(s.add.image(0, 0, load.tray ? `tray-${load.tray}` : 'tray').setOrigin(0.5, 1).setDepth(D.player + 0.011));
         this.world.add(this.items);
         this.world.carry = { kind, ...load };
         sfx.take();
@@ -136,18 +147,46 @@ export class Carry {
         this.items = [];
         this.kind = null;
         this.world.carry = null;
+        // (Each turned about its middle and set down on the floor she stands on by how tall it stands once turned, never
+        // into it (the user, 2026-11-23: the vase sank through the floor): the tray upside down, what was on it on its
+        // side.)
+        const floor = s.grounded ? p.y : (s.takeoffY ?? p.y);
         flying.forEach((img, k) => {
-            s.tweens.add({ targets: img, x: img.x + away * (26 + k * 10), angle: away * (140 + k * 60), duration: 520 });
+            const tray = img.texture.key.startsWith('tray') && flying.length > 1;
+            const turn = tray ? 180 : 270, half = (turn % 180 ? img.width : img.height) / 2;
+            img.setOrigin(0.5, 0.5).setPosition(img.x, img.y - img.height / 2);
+            s.tweens.add({ targets: img, x: img.x + away * (26 + k * 10), angle: away * turn, duration: 520 });
             s.tweens.add({ targets: img, y: img.y - 18, duration: 180, ease: 'Quad.easeOut', yoyo: false,
-                onComplete: () => s.tweens.add({ targets: img, y: p.y - 2, duration: 300, ease: 'Quad.easeIn',
+                onComplete: () => s.tweens.add({ targets: img, y: floor - half, duration: 300, ease: 'Quad.easeIn',
                     onComplete: () => s.tweens.add({ targets: img, alpha: 0, delay: 700, duration: 300, onComplete: () => img.destroy() }) }) });
         });
         s.smash(p.x + away * 20, p.y - 8, false);      // (its own sound is above)
-        // A start, no more: she is knocked back a step.
-        p.body.velocity.x = away * 120;
-        p.body.velocity.y = -90;
-        this.world.say(t('say.oops'), 700);
+        // A start, no more: she is knocked back a step. (`still`: a hit that plays its own gag as well, the trays.)
+        if (!opts.still) {
+            p.body.velocity.x = away * 120;
+            p.body.velocity.y = -90;
+            this.world.say(t('say.oops'), 700);
+        }
         this.world.refresh();
+    }
+
+    // A load she sees the world through (`view`: the vase's flowers): a picture the screen's size round its edges, on the
+    // screen's own layer under the HUD (so a look-out's zoom leaves it as it is), faded in as she takes it and out as it
+    // leaves her hands; not while something is seen close, nor in a view zoomed out from her.
+    showView() {
+        const s = this.scene, key = this.kind && LOADS[this.kind].view;
+        // (Never in a view zoomed out from her, a look-out's or the outside view: the user, 2026-11-23.)
+        const zoomedOut = !!s.overview || s.cameras.main.zoom < VIEW.zoom - 0.01;
+        const on = !!key && !s.viewing && !s.intro && !zoomedOut;
+        if (on && (!this.view || this.view.texture.key !== key)) {
+            this.view?.destroy();
+            this.view = s.add.image(0, 0, key).setOrigin(0).setScale(VIEW.width / s.textures.get(key).getSourceImage().width).setAlpha(0);
+            s.uiLayer.addAt(this.view, 0);
+        }
+        if (!this.view) return;
+        const dt = Math.min(0.05, s.game.loop.delta / 1000);
+        this.view.alpha = zoomedOut ? 0 : on ? Math.min(1, this.view.alpha + dt / 0.35) : Math.max(0, this.view.alpha - dt / 0.35);
+        this.view.setVisible(this.view.alpha > 0);
     }
 
     // Each frame: the tray rides in front of her, at her hands; a load that runs out is lost.
@@ -163,7 +202,7 @@ export class Carry {
         let top = y;
         for (const img of this.items) {
             img.setPosition(x, top).setVisible(p.visible && s.mode !== 'lift');
-            top -= img.texture.key === 'tray' ? 3 : 0;
+            top -= img.texture.key.startsWith('tray') ? 3 : 0;
         }
         if (LOADS[this.kind].fragile && this.sway(x)) return;
         // A hot cup steams (less as it cools).

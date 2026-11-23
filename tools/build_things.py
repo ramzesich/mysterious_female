@@ -9,6 +9,7 @@ as tools/build_ship_art.py's `height` does: name -> its height in the game, px.
 """
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -136,7 +137,9 @@ SEAM = {"tennis-ball": "a2a947"}
 # one, 2026-11-21, `tries/console-table/`): its honey teak kept (palettized, browns go mauve), washed as deck 9 inside.
 # The lifeboat's roof hatch, its back and its lip (the user, 2026-11-21; `tools/build_hatch.py`): cut from the boat's own
 # washed picture, kept so.
-OWN_COLOURS = {"sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
+# (Delivery 1's vase of flowers and the low table it waits on, §5 3.2: in their own colours, as the user approved them;
+# `delivery/`, its README.)
+OWN_COLOURS = {"delivery-vase", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
@@ -313,6 +316,9 @@ def build():
     sheet.save(OUT / "things.png")
     (OUT / "things.json").write_text(json.dumps({"frames": frames, "meta": {"image": "things.png"}}, indent=1), encoding="utf-8")
     print("wrote assets/sprites/things.png:", ", ".join(f"{n} {im.width}x{im.height}" for n, im in pieces))
+    # The flower frame round the screen while she carries the vase (delivery 1, the user's choice; `delivery/`): the
+    # screen's own size, in its own colours, as it is.
+    shutil.copyfile(SRC / "delivery" / "frame.png", OUT / "flower-frame.png")
     if "--preview" in sys.argv:
         out = sys.argv[sys.argv.index("--preview") + 1]
         big = Image.new("RGBA", sheet.size, (150, 160, 175, 255))

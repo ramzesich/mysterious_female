@@ -3938,6 +3938,55 @@ def scenario_region6(b):
     return ok
 
 
+def scenario_deliveries(b):
+    """The deliveries (plan-the-rest §5 3.2). 1, the vase (deck 8 midships, the user, 2026-11-23): on its table by the aft
+    lobby door from the start; E, in her hands on its narrow tray, the flower frame round the screen; gone at once in the
+    outside view; a floor tray on the way spills it and plays its ride all the same; E at cabin 8215's door: a hand takes
+    it, book 12 hers, the table and its tag gone."""
+    S = "window.__ship"
+    W = f"{S}.world"
+    src = f"{W}.things.find(t => t.id === 'src_vase')"
+    b.open("?reset&play&at=hall8")
+    wait(0.4)
+    ok = check(b.eval(f"{W}.shown({src})"), "the vase on its table from the start")
+    x = b.eval(f"{src}.x")
+    b.teleport(x - 14, D8)
+    wait(0.3)
+    b.tap("e")
+    wait(0.6)
+    v = b.eval(f"[{W}.carry?.kind, {W}.carryBox.items[0]?.texture.key, {W}.carryBox.view?.alpha]")
+    ok &= check(v[0] == "vase" and v[1] == "tray-18" and v[2] == 1, "E: the vase on its narrow tray, the flower frame round the screen", v)
+    b.tap("o")
+    wait(0.3)
+    v = b.eval(f"[!!{S}.overview, {W}.carryBox.view?.visible]")
+    ok &= check(v == [True, False], "the outside view: no frame", v)
+    b.tap("o")
+    wait(0.8)
+    # The ice bucket's tray: run at it, the vase spills, and she rides the tray off all the same.
+    ice = b.eval(f"{W}.movers.find(m => m.def?.id === 'haz_trays_8ice').trays[0].x")
+    b.teleport(ice + 110, D8)
+    wait(0.3)
+    hold_until(b, "left", lambda s: s["mode"] != "play", timeout=4)
+    v = b.eval(f"[{S}.lastMishap?.what, !!{W}.movers.find(m => m.def?.id === 'haz_trays_8ice').pic, {W}.carry]")
+    ok &= check(v[0] == "trays" and v[1] and v[2] is None, "a floor tray with the vase: spilled, and the ride", v)
+    wait_for = now() + 8
+    while now() < wait_for and b.eval(f"{S}.mode") != "play":
+        wait(0.2)
+    # Again, to the door.
+    b.teleport(x - 14, D8)
+    wait(0.3)
+    b.tap("e")
+    wait(0.4)
+    door = b.eval(f"{W}.things.find(t => t.id === 'dlv_vase').x")
+    b.teleport(door + 6, D8)
+    wait(0.3)
+    b.tap("e")
+    wait(3.0)
+    v = b.eval(f"[{S}.save.flags.includes('dlv_vase'), {S}.save.books?.['12'], {W}.carry, {W}.shown({src})]")
+    ok &= check(v[0] and v[1] == "held" and v[2] is None and not v[3], "E at 8215: taken in, book 12 hers, the table gone", v)
+    return ok
+
+
 def scenario_region7(b):
     """Region 7 (docs/build-plan.md, step 7): Outside: the balconies of decks 8-10 in the grip socks
     (a vault over a partition, a climb up its pole, gusts, a perched gull, a laundry line, a balcony

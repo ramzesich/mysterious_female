@@ -466,9 +466,14 @@ export class Queue {
 // px: one of them always comes with the tray's near end within her hop, `HOP`, px past her toe), the world's
 // tray lying where it is until she lands on it, then hidden, the clip's base carrying her. Landed on
 // from a jump, or walked onto standing, the hit's own fall. A jump clears it.
-const HOP = [0, 22];
+// (The ride starts once her toe is this near the tray's near end, px: 22 at first, and the gag began before she touched
+// it, the user, 2026-11-23; a little past it still rides.)
+const HOP = [-8, 4];
 // The tray's picture in pieces (px in `breakfast-tray`, 24 x 12): its base, and what stands on it.
 const TRAY_PIECES = { base: [0, 10, 24, 2], cloche: [0, 0, 12, 10], glass: [12, 0, 4, 10], vase: [16, 0, 8, 10] };
+// A tray's own things drawn as one picture that must fly apart (each lands on its own side: the two wine glasses, as one
+// picture turned they stood one on the other in the air, the user, 2026-11-23): [x, y, w, h] in the picture.
+const DISH_PIECES = { 'wine-glasses': [[0, 0, 8, 15], [10, 0, 8, 15]] };
 export class Trays {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -480,7 +485,18 @@ export class Trays {
             if (!tex.has(`btray-${k}`)) tex.add(`btray-${k}`, f.sourceIndex, f.cutX + x, f.cutY + y, w, h);
         const tx = Math.round((def.x0 + def.x1) / 2), left = tx - 12, top = def.y - 12;
         const piece = (k, dz) => s.add.image(left + TRAY_PIECES[k][0], top + TRAY_PIECES[k][1], 'things', `btray-${k}`).setOrigin(0, 0).setDepth(D.props + dz);
-        const base = piece('base', 0.02), dishes = ['cloche', 'glass', 'vase'].map(k => piece(k, 0.03));
+        // (`def.dishes`: its own things on the trays' base instead of the breakfast's, [the ship's atlas piece, px from its
+        // middle]: deck 8's ice bucket and glasses.)
+        const own = (frame, dx) => {
+            const ship = s.textures.get('shipart'), whole = ship.get(frame);
+            const at = tx + dx - Math.round(whole.width / 2), top = def.y - 2 - whole.height;
+            return (DISH_PIECES[frame] ?? [[0, 0, whole.width, whole.height]]).map(([x, y, w, h], i) => {
+                const name = DISH_PIECES[frame] ? `${frame}#${i}` : frame;
+                if (!ship.has(name)) ship.add(name, whole.sourceIndex, whole.cutX + x, whole.cutY + y, w, h);
+                return s.add.image(at + x, top + y, 'shipart', name).setOrigin(0, 0).setDepth(D.props + 0.03);
+            });
+        };
+        const base = piece('base', 0.02), dishes = def.dishes ? def.dishes.flatMap(([f, dx]) => own(f, dx)) : ['cloche', 'glass', 'vase'].map(k => piece(k, 0.03));
         this.items = [base, ...dishes];
         this.trays = [{ x: tx, base, dishes }];
         for (const img of this.items) img.setData({ x: img.x, y: img.y });
@@ -501,6 +517,31 @@ export class Trays {
     }
 
     door() { return this.world.movers.find(m => m.def?.id === this.def.door); }
+
+    // The dishes off it, tumbling `away`, each to lie on its side on the floor: turned about its middle, a quarter turn
+    // and more, its middle half its width over the floor.
+    tumble(dishes, away) {
+        const s = this.scene, d = this.def;
+        dishes.forEach((img, i) => {
+            img.setOrigin(0.5, 0.5).setPosition(img.x + img.width / 2, img.y + img.height / 2);
+            s.tweens.add({ targets: img, x: img.x + away * (18 + i * 14), y: d.y - img.width / 2, angle: away * (90 + i * 180), duration: 380 + i * 60, ease: 'Quad.easeOut' });
+        });
+    }
+
+    // A tangerine lying on it (deck 8's, in the ice bucket) goes flying with its things, back the way she came, and lies
+    // loose on the floor, hers to pick up (it would hang in the air where the bucket was).
+    fruitOff(dir) {
+        const s = this.scene, d = this.def, tx = this.trays[0].x;
+        // (Raised on its things, not lying on the floor among them: deck 10's rolls out from among its trays by itself.)
+        const t = s.tangerines.find(q => q.sprite.active && q.route === 'inside' && Math.abs(q.sprite.x - tx) < 14 && d.y - q.sprite.y >= 4 && d.y - q.sprite.y < 20);
+        if (!t) return;
+        this.world.save.collected.push(t.id);
+        const { x, y } = t.sprite;
+        t.glint.destroy();
+        t.sprite.destroy();
+        t.sprite.active = false;
+        s.loose.throw(x, y - 4, -dir * 70, -110, true);
+    }
 
     // (The dishes jump on it.)
     rattle() {
@@ -544,9 +585,12 @@ export class Trays {
         }
         // Running at it: at a quarter of her stride (her run frame 1, 3, 5 or 7) with its near end within
         // her hop.
-        const dir = p.flipX ? -1 : 1, run = p.anims.currentAnim?.key === 'her-run' && !s.isLunging();
+        // (Her run with a load in her hands is her carry run, stride for stride: the load spills as she hops on, 2026-11-23.)
+        const dir = p.flipX ? -1 : 1, run = ['her-run', 'her-carry-run'].includes(p.anims.currentAnim?.key) && !s.isLunging();
         if (run) {
-            const clip = s.cache.json.get('gags-meta').tray.clips[p.anims.currentFrame.index - 1];
+            // (Its clip from the quarter of her stride she shows, or the next one: the pose she would show next.)
+            const clips = s.cache.json.get('gags-meta').tray.clips, i = p.anims.currentFrame.index - 1;
+            const clip = clips[i] ?? clips[(i + 1) % 8];
             if (clip) {
                 const gap = (t.x - dir * 12 - (p.x + dir * clip.toe)) * dir;
                 if (gap >= HOP[0] && gap <= HOP[1]) return this.hit(t, clip);
@@ -570,14 +614,21 @@ export class Trays {
             // has gone.
             this.scattered = true;
             const away = p.body.velocity.x < 0 ? -1 : 1;
-            this.items.forEach(img => s.tweens.add({ targets: img, x: img.x + away * Phaser.Math.Between(8, 26), angle: Phaser.Math.Between(-40, 40), duration: 260, ease: 'Quad.easeOut' }));
+            // (The base slid along the floor, the dishes over on their sides on it: the user, 2026-11-23, "scattered items
+            // should all be on the floor".)
+            this.trays.forEach(t => s.tweens.add({ targets: t.base, x: t.base.x + away * Phaser.Math.Between(8, 20), duration: 260, ease: 'Quad.easeOut' }));
+            this.tumble(this.trays.flatMap(t => t.dishes), away);
+            this.fruitOff(-away);
             s.time.delayedCall(900, () => this.door()?.knock(true));
             return;
         }
         this.started = false;
         const at = t?.x ?? this.trays[0].x;
-        if (this.world.carry) this.world.carryBox.spill(at, false, 'trays');
-        else s.scareContact(at, 'trays', { ride: t ? this.ride(t, clip, land) : null });
+        // (With a load in her hands it spills, and the tray plays its gag all the same: the one hit that is both, the
+        // user, 2026-11-23, "this tray breaks the vase, but the sliding gag isn't triggered"; every other hit with a load
+        // is a spill only.)
+        if (this.world.carry) this.world.carryBox.spill(at, false, 'trays', { still: true });
+        s.scareContact(at, 'trays', { ride: t ? this.ride(t, clip, land) : null });
         // (Not ridden off: it clatters where it lies, and the door opens on the guest, who looks
         // about.)
         if (this.started) return;
@@ -622,13 +673,9 @@ export class Trays {
                 pic.anims.timeScale = quick;
                 pic.once(`animationcomplete-gags-${clip.key}`, () => pic.play(`gags-${clip.key}-wheel`));
                 const fly = () => {
-                    // (The dishes off it, tumbling back the way she came, each to lie on its side on
-                    // the floor: turned about its middle, a quarter turn and more.)
-                    t.dishes.forEach((img, i) => {
-                        img.setOrigin(0.5, 0.5).setPosition(img.x + img.width / 2, img.y + img.height / 2);
-                        s.tweens.add({ targets: img, x: img.x - dir * (18 + i * 14), y: d.y - img.width / 2, angle: -dir * (90 + i * 180), duration: 380 + i * 60, ease: 'Quad.easeOut' });
-                    });
+                    this.tumble(t.dishes, -dir);
                     sfx.at(t.x, d.y).crash();
+                    this.fruitOff(dir);
                 };
                 if (land) fly();
                 s.script = (dt) => {

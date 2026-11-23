@@ -1085,6 +1085,12 @@ export class World {
                     this.carryBox.textures();
                     // (One of the game's own pictures, or a piece of the ship's atlas.)
                     for (const [key, dy] of e.show) {
+                        // (A tag, "sign:<look>:<text>", hangs from `dy` px up, in front: a delivery's cabin number.)
+                        if (key.startsWith('sign:')) {
+                            const [, look, text] = key.split(':');
+                            items.push(sign(s, e.x, e.y - dy, text, look).setOrigin(0.5, 0).setDepth(depth + 0.04));
+                            continue;
+                        }
                         const img = s.textures.exists(key) ? s.add.image(e.x, e.y - dy, key) : this.image(e.x, e.y - dy, key);
                         items.push(img.setOrigin(0.5, 1).setDepth(depth + 0.03));
                     }
@@ -1155,6 +1161,33 @@ export class World {
             case 'porthole':
                 this.things.push({ ...e, items: [this.porthole(e.x, e.y - e.up)], reach: 16, interact: () => this.lookOutOf(e) });
                 break;
+            case 'delivery': {
+                // A delivery's cabin (plan-the-rest §5 3.2): E there with its load in her hands, a knock, the door opens a
+                // crack and a hand takes it in, a heart; then what it pays (`book`). Its number on a plate on the door.
+                // (On the wall beside the door, past its frame on the side away from its handle, as a ship's cabin
+                // numbers are: on the door it covered the door's own small plate.)
+                const plate = sign(s, e.x + 17, e.y - e.plateUp, e.number, 'steel').setOrigin(0, 0.5).setDepth(D.decor + 0.25);
+                this.add([plate]);
+                const thing = { ...e, items: [plate], reach: 18, interact: () => {
+                    if (this.carry?.kind !== e.load || this.delivering) return false;
+                    this.delivering = true;
+                    const held = this.carryBox.items.map(i => this.image(i.x, i.y, i.texture.key === 'things' ? `thing:${i.frame.name}`
+                        : `@${i.texture.key}`).setOrigin(0.5, 1).setDepth(i.depth));
+                    this.add(held);
+                    this.carryBox.give();
+                    sfx.at(e.x, e.y).knock();
+                    s.time.delayedCall(450, () => this.handTakes(e.x, e.y, held, held[0].y - 1, () => {
+                        this.story.heart?.(e.x, e.y - 80);
+                        this.progress.setFlag(e.flag);
+                        this.delivering = false;
+                        if (e.book) s.time.delayedCall(700, () => this.giveBook(e.book));
+                        this.refresh();
+                    }, { shrink: true }));
+                    return true;
+                } };
+                this.things.push(thing);
+                break;
+            }
             case 'spill':
                 this.movers.push(new Spill(this, e));
                 break;
@@ -1537,7 +1570,8 @@ export class World {
     // ?cards=all fakes none of it.
     cond(text) {
         if (!text) return true;
-        // ("a&b": both; the evening of the catch is "flag:catch&!flag:home".)
+        // ("a|b": either; "a&b": both; the evening of the catch is "flag:catch&!flag:home".)
+        if (text.includes('|')) return text.split('|').some(t => this.cond(t));
         if (text.includes('&')) return text.split('&').every(t => this.cond(t));
         if (text.startsWith('!')) return !this.cond(text.slice(1));
         const [kind, v] = text.split(':');
@@ -1550,6 +1584,8 @@ export class World {
             case 'carry': return this.carry?.kind === v;
             case 'books': return v === 'held' ? this.library.held().length > 0 : this.library.returned().length === BOOKS;
             case 'broken': return save.broken.includes(v);
+            // (A one-way door she has been through, propped open since: "opened:part-door-8-194".)
+            case 'opened': return save.opened.includes(v);
             case 'block': return this.progress.blockLifted(v) && !this.progress.openAll;
         }
         return false;

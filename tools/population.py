@@ -153,7 +153,7 @@ TANGERINES = {
     "tan_10_tray": (10, 129.8, 1, 0, "flag:trays_10m"),
     # Region 7: in the ice bucket's tray on deck 8 (the steward's rounds go by it), on deck 9 aft's
     # cart, and on the balcony where Bumbot swiped at the gull.
-    "tan_8_mid": (8, 178.32, 1, 3, None),
+    "tan_8_mid": (8, 178.0 - 6 / 48, 1, 10, None),      # (in the ice bucket, over its rim: `haz_trays_8ice`)
     "tan_9_aft": (9, 230, 1, 28, None),
     "tan_10_balc": (10, 160.6, 1, "out", None),
     # (On the bar: 54 m is the grand piano.)
@@ -599,13 +599,10 @@ PROPS = {
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
     "sign_wet_10m": (10, 154.2, "wet-floor-sign", 0, {}),
     "prop_tray_10": (10, 182, "@tray", 12, {}),
-    # Region 7's hallways: the wet-floor signs under the sprinklers; an ice bucket and glasses on a
-    # tray outside a door (a tangerine in the tray).
+    # Region 7's hallways: the wet-floor signs under the sprinklers. (Deck 8's ice bucket and glasses on their tray are a
+    # trap since 2026-11-23: `haz_trays_8ice`.)
     "sign_wet_8m": (8, 146.2, "wet-floor-sign", 0, {}),
     "sign_wet_9a": (9, 216.5, "wet-floor-sign", 0, {}),
-    "amb_ice_tray": (8, 178.0, "@tray", 0, {}),
-    "amb_ice": (8, 177.82, "ice-bucket", 3, {}),
-    "amb_ice_glasses": (8, 178.02, "wine-glasses", 3, {}),
     # The drill's rope across the walkway's inboard side and its sign.
     # (No `back` outside: that depth is behind the ship's side, and the rope was never seen.)
     "prop_drill_rope": ("walkway", 183.2, "rope-barrier", 0, {}),
@@ -691,7 +688,19 @@ SOURCES = {
     # has shown what she wants, until the wedding has it.
     # (On the round side table: its 21 px less 2, as everything on it, the user, 2026-11-22.)
     "src_cake": (12, 167.75, "cake", "region:8", [("thing:wedding-cake", 19)], "flag:cake_asked", "flag:wedding"),
+    # The deliveries (plan-the-rest §5 3.2; `DELIVERIES`): each at its hallway's end by a lobby door, there from the start
+    # until it is delivered (shown only once she had been through a lobby door, it "magically appears behind me": the
+    # user, 2026-11-23). 1, the vase of flowers on its low table (the user's
+    # choice, 2026-11-23), its narrow tray on the table's top (24 px), its tag with the cabin's number hanging from the
+    # top's front edge.
+    "src_vase": (8, 193.0, "vase", None,
+                 [("thing:tray-stand", 0), ("tray-18", 24), ("thing:delivery-vase", 27), ("sign:card:8215", 23)], None,
+                 "flag:dlv_vase"),
 }
+# The deliveries' cabins (plan-the-rest §5 3.2): id: (deck, m of its door, what she brings, the flag once delivered, the
+# book it pays or None, its number, px up to the number's plate on the door). The number is the corridor's own count
+# (`cabins-8-360`: 8214 at its first door, 111.6 m).
+DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48)}
 # Signs: id: (deck, m, text, style, dy px up, options). The style is a look of src/signs.js (notice, bulletin,
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {
@@ -858,7 +867,11 @@ TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),
          "haz_trays_8a1": (8, 204.9, 206.3, "haz_dnd_8a1", ""), "haz_trays_8a2": (8, 209.4, 210.8, "haz_dnd_8a1", ""),
          "haz_trays_8a3": (8, 212.4, 213.8, "haz_dnd_8a1", ""), "haz_trays_8a4": (8, 216.9, 218.3, "haz_dnd_8a2", ""),
          "haz_trays_8a5": (8, 221.4, 222.8, "haz_dnd_8a2", ""), "haz_trays_8a6": (8, 224.4, 225.8, "haz_dnd_8a2", ""),
-         "haz_trays_10a1": (10, 205.4, 206.8, "haz_dnd_10a", ""), "haz_trays_10a2": (10, 208.4, 209.8, "haz_dnd_10a", "")}
+         "haz_trays_10a1": (10, 205.4, 206.8, "haz_dnd_10a", ""), "haz_trays_10a2": (10, 208.4, 209.8, "haz_dnd_10a", ""),
+         # Deck 8 midships' ice bucket and two glasses on a tray outside a door, a trap as the rest since 2026-11-23 (the
+         # user: "should this tray be a gag? We just walk past it"); no door its clatter opens. Its own dishes: (the ship's
+         # atlas piece, px from the tray's middle), on the trays' base.
+         "haz_trays_8ice": (8, 177.3, 178.7, "", "", [("ice-bucket", -6), ("wine-glasses", 4)])}
 
 # --- Region 7's own things (docs/population.md: the outside; src/world/outside.js) ------------------
 # Gusts along the ship's side, on the balconies: every s, for s, the tell before (s: the towels on

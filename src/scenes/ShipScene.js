@@ -3018,6 +3018,9 @@ export class ShipScene extends Phaser.Scene {
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
+        // (What she sees a load through, the vase's flowers, every frame: the outside view holds the world still, and the
+        // frame must be gone in it at once.)
+        this.world?.carryBox.showView();
         // (Under the intro the game itself holds still: only the ship's side opens and shuts.)
         if (this.intro) {
             this.updateCutaway(dt);

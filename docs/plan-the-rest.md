@@ -529,7 +529,7 @@ cabin's number on its tag, carried under tray rules; a hand takes it at the door
 
 | # | Hallway | Load | Its rule | Pays |
 |---|---|---|---|---|
-| 1 | Deck 8 midships | Flowers in a tall vase | It stands in front of her face: she sees the hallway through the stems | Book 12 (Poczwarka) |
+| 1 | Deck 8 midships | Flowers in a tall vase | It stands in front of her face: she sees the hallway through the stems. **Built 2026-11-23:** the vase on a narrow tray, on a low table by the aft lobby door (from the start: shown only once a lobby door was opened, it "magically appears"), its tag 8215; a flower frame round the whole screen while she carries it (the user's design, never in a zoomed-out view); to cabin 8215 (115.6 m), its number on the wall beside the door; E: a knock, a hand, a heart, book 12. The floor trays (and the ice bucket's tray, a trap since) spill it and play their ride | Book 12 (Poczwarka) |
 | 2 | Deck 10 midships | A pot of tea | It cools (the HUD's meter, as the coffee) | Book 13 (Daughters of Warsaw) |
 | 3 | Deck 9 aft, **to the last cabin, about 246 m** (§7f, P4) | A stack of pillows | Light: a full jump allowed, but the top one slides off if she stops short | A thank-you only |
 

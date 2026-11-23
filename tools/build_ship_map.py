@@ -1025,7 +1025,7 @@ def build_objects():
                           ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
                           ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 92), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117), ("deck9-aft", 9, 134), ("steward", 9, 183.4),
                           ("spinnaker", 12, 52), ("champs", 12, 92), ("court", 12, 150), ("sushi", 12, 178),
-                          ("bistro", 12, 205), ("wake4", 4, 246.5)]:
+                          ("bistro", 12, 205), ("wake4", 4, 246.5), ("hall8", 8, 188)]:
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
