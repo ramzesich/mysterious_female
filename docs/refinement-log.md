@@ -296,3 +296,13 @@ and keys; the sky's soft sun, clouds and sunbeams, the path of light, nothing dr
 in the zoom; the cabin close-up at the mirror (dropped on 2026-11-14) replaced by her walk out of the door, the
 badge and the turn; the HUD empty at first; the two hint popups; a game under way and Esc. The rule that
 `docs/intro.md` is the user's own stays: edited only on their word.
+
+## Her hair at the crew cabin's mirror on E (2026-11-23, approved)
+
+The user: "Make the mirror animation play by pressing E, instead of by standing by it." Her hair (`her-hair`)
+no longer plays by itself when she stands at the mirror turned to it; E within 14 px of the spot where she stops
+(`MIRROR_REACH`) turns her to it and plays it once, each press once more; not while she carries a thing or holds
+Bumbot. `tryMirror` in the ship scene, in the E chain after the shower and before the route's doors; the old
+count in `standStill` (`mirrorLooks`) is gone. The `intro` playtest's mirror checks rewritten (standing does
+nothing, E once a press, E away from it nothing); `intro` and `deck3` passed. GAME_DESIGN.md's line on the mirror
+(§7.1 item 11) still describes the old way: left for the user's word.

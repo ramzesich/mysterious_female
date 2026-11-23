@@ -24,6 +24,7 @@ import { sign } from '../signs.js';
 const LADDER_TOP = 3;
 const RAILING = 4;
 const RAILING_STOP = 10;   // px short of a leaning railing's foot that she stops
+const MIRROR_REACH = 14;   // px from her crew cabin's mirror that E fixes her hair at it
 
 const DEPTH = {
     sky: 0, sea: 1, back: 2, decor: 3, stairs: 4, playerBehind: 5, balustrade: 5.1,
@@ -3114,6 +3115,7 @@ export class ShipScene extends Phaser.Scene {
         if (onFloor && input.activatePressed && this.world.interact()) return;
         if (onFloor && input.activatePressed && !this.holding && this.progress.tryPickup()) return;
         if (onFloor && input.activatePressed && !this.holding && this.tryShower()) return;
+        if (onFloor && input.activatePressed && this.tryMirror()) return;
         if (onFloor && input.activatePressed && this.useRouteDoor()) return;
         if (onFloor && input.activatePressed && this.useBulkheadDoor()) return;
         // On the promenade, or in the cabin, the stairs, ladders, trunks and elevators are out of reach.
@@ -3228,6 +3230,21 @@ export class ShipScene extends Phaser.Scene {
     // The user's secret (2026-11-08): E at the shower room's door and it slides open; she steps in,
     // the door closes, and through its frosted glass she washes her hair, steam rising over it and
     // small notes as she sings; then she steps out with a towel round her head.
+
+    // E in front of her crew cabin's standing mirror (it is at the room's forward wall, where she
+    // stops): she turns to it and fixes her hair, once a press (the user, 2026-11-23: on E, no
+    // longer by standing there).
+    tryMirror() {
+        const p = this.player, mirror = this.world.rooms[this.route]?.mirror;
+        if (mirror === undefined || this.holding || this.world.carry || !this.anims.exists('her-hair')) return false;
+        if (Math.abs(p.x - mirror) > MIRROR_REACH) return false;
+        p.body.setVelocityX(0);
+        p.setFlipX(true);                  // (the mirror is forward of her: to her left)
+        this.idle = 'hair';
+        p.anims.play('her-hair');
+        this.stillSince = this.time.now;
+        return true;
+    }
 
     tryShower() {
         const c = this.cabin, p = this.player;
@@ -3427,24 +3444,11 @@ export class ShipScene extends Phaser.Scene {
     // Standing still is her plain side pose; after a while one of her idles plays once (§3).
     standStill(time, dir) {
         const p = this.player;
-        // Stopped at her cabin's mirror, turned to it, she fixes her hair: once or twice, then no
-        // more until she has walked away or turned from it and come back (the user, 2026-11-14:
-        // "Don't do it in a constant loop").
-        const mirror = this.world.rooms[this.route]?.mirror;
-        const atMirror = mirror !== undefined && !dir && p.flipX && Math.abs(p.x - mirror) < 4 && !this.holding && !this.world.carry;
-        if (!atMirror) this.mirrorLooks = null;
-        else this.mirrorLooks ??= { left: Phaser.Math.Between(1, 2), at: time + 450 };
+        // (Her hair at her cabin's mirror plays on E: `tryMirror`.)
         if (this.idle) {
             if (p.anims.isPlaying && !dir) return;
             this.idle = null;
             this.idleAt = time + Phaser.Math.Between(IDLE.gapMs[0], IDLE.gapMs[1]);
-            if (atMirror) this.mirrorLooks.at = time + 500;
-        }
-        if (atMirror && this.mirrorLooks.left > 0 && time >= this.mirrorLooks.at && this.anims.exists('her-hair')) {
-            this.mirrorLooks.left--;
-            this.idle = 'hair';
-            p.anims.play('her-hair');
-            return;
         }
         if (dir || time < this.idleAt || this.world.carry) {
             if (dir) this.idleAt = Math.max(this.idleAt, time + IDLE.firstMs);

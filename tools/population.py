@@ -19,8 +19,8 @@ ROOMS = [
     # Her own crew cabin on deck 3, where the game starts (the user, 2026-11-14): its door in the crew
     # corridor, the sign "Crew" over it (`plate_up`), lit as a checkpoint from the start.
     # `mirror`: her standing mirror is by the cabin's forward wall, and she stops this far from the
-    # cabin's edge, in front of it (the user: "an invisible barrier"); turned to it there, she
-    # fixes her hair once or twice (the ship scene's `standStill`).
+    # cabin's edge, in front of it (the user: "an invisible barrier"); E there turns her to it and
+    # she fixes her hair, once a press (the ship scene's `tryMirror`; the user, 2026-11-23).
     dict(id="crewcabin", deck=3, m=90, width=240, look="crewcabin", door="crew", plate="CREW", plate_up=True,
          checkpoint="cp_crew", mirror=36),
     dict(id="laundry", deck=4, m=112, slot=True, width=336, look="laundry", door="crew", plate="LAUNDRY",

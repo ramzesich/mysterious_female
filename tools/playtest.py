@@ -632,7 +632,7 @@ def scenario_intro(b):
     wait(0.1)
     ok &= check(not alert(b), "and only the first time", alert(b))
 
-    # Her cabin: she stops in front of her mirror and, turned to it, fixes her hair once or twice.
+    # Her cabin: she stops in front of her mirror; E there turns her to it and she fixes her hair, once a press.
     b.eval(f"{S}.spawnAt({{ x: {SPAWN_X}, y: {D3} }})")
     wait(0.3)
     b.tap("e")
@@ -643,20 +643,26 @@ def scenario_intro(b):
     b.hold("left", 1.2)
     stop = b.state()["x"] - x0
     ok &= check(35 <= stop <= 37, "she stops in front of her mirror", stop)
-    wait(1.0)
-    ok &= check(b.eval("window.__hair") == 1 and b.eval(f"{S}.player.flipX"), "turned to it, she fixes her hair", b.eval("window.__hair"))
-    b.shot("mirror-hair")
-    wait(7.0)
-    first = b.eval("window.__hair")
-    ok &= check(first in (1, 2), "once or twice, and no more", first)
-    b.hold("right", 0.5)
-    wait(0.2)
-    b.hold("left", 1.0)
-    wait(1.2)
-    ok &= check(b.eval("window.__hair") == first + 1, "again when she comes back to it", b.eval("window.__hair"))
-    b.tap("right")
     wait(3.0)
-    ok &= check(b.eval("window.__hair") == first + 1 and not b.eval(f"{S}.player.flipX"), "turned away, she leaves it alone")
+    ok &= check(b.eval("window.__hair") == 0, "standing there alone does nothing", b.eval("window.__hair"))
+    b.tap("right")
+    wait(0.3)
+    off = b.state()["x"] - x0 - 36
+    ok &= check(not b.eval(f"{S}.player.flipX") and off < 14, "turned from it, a step off", off)
+    b.tap("e")
+    wait(0.4)
+    ok &= check(b.eval("window.__hair") == 1 and b.eval(f"{S}.player.flipX"), "E: she turns to it and fixes her hair", b.eval("window.__hair"))
+    b.shot("mirror-hair")
+    wait(4.0)
+    ok &= check(b.eval("window.__hair") == 1, "once a press", b.eval("window.__hair"))
+    b.tap("e")
+    wait(0.4)
+    ok &= check(b.eval("window.__hair") == 2, "and again at the next", b.eval("window.__hair"))
+    wait(3.0)
+    b.hold("right", 1.0)
+    b.tap("e")
+    wait(0.6)
+    ok &= check(b.eval("window.__hair") == 2, "away from it, E does not", b.eval("window.__hair"))
     ok &= check(b.errors == [], "no errors", b.errors)
 
     # A game under way: the same welcome, a shorter way in, to wherever she is.
