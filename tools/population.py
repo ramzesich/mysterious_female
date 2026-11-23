@@ -377,7 +377,9 @@ PEOPLE = {
     # (He is all in black: in front of the red curtain's leg, where he shows; at 245 m he stood in the
     # drum kit, black on the dark stage. The user, 2026-11-19: he and the swinging light change places,
     # he to the stage's aft curtain, facing it.)
-    "npc_stagemanager": dict(at=(6, 250.4), who="stagemanager", face=-1, idle="idle",
+    # (Each of those who clap her home is away from their own place while they stand outside 8206, the evening of the
+    # catch till she is home; back after: never in two places, the user, 2026-11-23.)
+    "npc_stagemanager": dict(at=(6, 250.4), who="stagemanager", face=-1, idle="idle", until="flag:catch&!flag:home",
                              bubble=("pills", "flag:bb3", "card:ent", 4)),
     "amb_dancer_her": dict(at=(6, 245.9), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
     "amb_dancer_him": dict(at=(6, 247.15), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
@@ -390,7 +392,7 @@ PEOPLE = {
     # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the
     # honeymooners at their door, the bedmaker in the cabin being cleaned; strollers on the atrium's
     # walks; the security officer in the laundry, waiting for his uniform.
-    "npc_steward": dict(at=(9, 186.0), who="steward", face=-1, idle="tug",
+    "npc_steward": dict(at=(9, 186.0), who="steward", face=-1, idle="tug", until="flag:catch&!flag:home",
                         bubble=("cart", "!flag:cart_free", None, 4)),
     "npc_bride": dict(at=(9, 135.0), who="bride", face=-1, idle="idle", until="flag:photo",
                       bubble=("camera", None, "flag:photo", 3)),
@@ -420,10 +422,12 @@ PEOPLE = {
     "blk_fan_a": dict(at=(11, 199.75), who="fan_a", face=-1, idle="cheer", until="region:8"),
     "blk_fan_b": dict(at=(11, 200.55), who="fan_b", face=-1, idle="cheer", until="region:8"),
     "blk_fan_c": dict(at=(10, 196.45), who="fan_c", face=-1, idle="cheer", until="region:8"),
-    # (On the evening of the catch he waits in cabin 8206: `npc_husband_home`, region 10.)
+    # (On the evening of the catch he waits in cabin 8206, and stays there after the ending: `npc_husband_home`, region 10.
+    # The evening goes on after the ending, the user, 2026-11-23: "I want the exploration after the ending have the same
+    # state as at the ending".)
     # (In the patio chair left of the table: his back on its backrest, its near arm drawn in front of him, his far leg
     # behind the table, `under`; 219.73 and 219.646 put them on the chair's px.)
-    "npc_husband": dict(at=(11, 219.73), who="husband", face=1, idle="idle", until="flag:catch&!flag:home",
+    "npc_husband": dict(at=(11, 219.73), who="husband", face=1, idle="idle", until="flag:catch",
                         under="far", cover=[("patio-chair-arm-w20", 219.646, 0)],
                         bubble=("canister", "flag:kid_fed", "flag:table", 5)),
     "amb_go_reader": dict(at=(11, 236.52), who="go_reader", face=1, layer="back"),
@@ -473,7 +477,7 @@ PEOPLE = {
                          bubble=("coffee", None, "flag:engineer", 4)),
     "npc_engineer_cord": dict(at=("funnel", 187.25), who="engineer", face=-1, idle="idle", after="flag:engineer",
                               until="flag:horn", bubble=("horn", None, "flag:horn", 5)),
-    "npc_engineer_read": dict(at=("funnel", 188.0), who="engineer", face=-1, idle="reading", after="flag:horn",
+    "npc_engineer_read": dict(at=("funnel", 188.0), who="engineer", face=-1, idle="reading", after="flag:horn", until="flag:catch&!flag:home",
                               bubble=("book", "!flag:book9", None, 4)),
     "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_her", face=1, layer="back"),
     "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_him", face=-1, layer="back"),
@@ -508,7 +512,7 @@ PEOPLE = {
     "amb_wed_b": dict(at=(12, 78.3), who="wed_guest_b", face=1, until="flag:wedding"),
     "amb_wed_c": dict(at=(12, 77.2), who="wed_guest_c", face=-1, until="flag:wedding"),
     "amb_wed_d": dict(at=(12, 76.4), who="wed_guest_d", face=1, until="flag:wedding"),
-    "amb_cer_planner": dict(at=("chapel", 88), who="planner", face=1, idle="idle", after="flag:wedding"),
+    "amb_cer_planner": dict(at=("chapel", 88), who="planner", face=1, idle="idle", after="flag:wedding", until="flag:catch&!flag:home"),
     "amb_cer_a": dict(at=("chapel", 108), who="wed_guest_a", face=1, after="flag:wedding"),
     "amb_cer_b": dict(at=("chapel", 128), who="wed_guest_b", face=1, after="flag:wedding"),
     "amb_cer_c": dict(at=("chapel", 148), who="wed_guest_c", face=1, after="flag:wedding"),
@@ -628,10 +632,11 @@ PROPS = {
     "amb_lounge_him": (12, 52.1, "thing:lounge-him", -2, dict(back=True)),
     "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
     "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),
-    # (Gone to bed on the evening of the catch: she comes through with Bumbot in her arms.)
-    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True, until="flag:catch&!flag:home")),
-    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True, until="flag:catch&!flag:home")),
-    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True, until="flag:catch&!flag:home")),
+    # (Gone to bed on the evening of the catch: she comes through with Bumbot in her arms. The evening goes on after
+    # the ending, the user, 2026-11-23.)
+    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True, until="flag:catch")),
+    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True, until="flag:catch")),
+    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True, until="flag:catch")),
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -803,7 +808,7 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
         # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long). (Taken
         # down for the night on the evening of the catch: with Bumbot in her arms she cannot crawl.)
-        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort", "flag:catch&!flag:home")}
+        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort", "flag:catch")}
 # --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
 # Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
 # door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window
@@ -1002,7 +1007,7 @@ PEOPLE.update({
     # drawn again over him (`@cabin-8206-bed`, the room's own pixels: its 240 x 144 canvas's middle 40 px left of him,
     # its bottom the slab's, 16 px under the floor).
     "npc_husband_home": dict(at=("cabin", FINALE["home"]["husband"]), who="husband", face=1, pose="front",
-                             carry=[("@cabin-8206-bed", -40, -16, True)], after="flag:catch", until="flag:home"),
+                             carry=[("@cabin-8206-bed", -40, -16, True)], after="flag:catch"),
     # The way home: those she helped, outside her cabin, clapping her in (deck 8, between the doors).
     "amb_home_steward": dict(at=(8, 50.1), who="steward", face=1, idle="idle", after="flag:catch", until="flag:home"),
     "amb_home_manager": dict(at=(8, 48.2), who="stagemanager", face=1, idle="idle", after="flag:catch", until="flag:home"),
@@ -1017,5 +1022,5 @@ PROPS.update({f"prop_lamp_prom_{i + 1}": ("prom", m, "thing:lamp-round" if k == 
                                           (181.5, "r"), (190, "o"), (198.5, "r"), (206.5, "o")])})
 PROPS.update({
     # The kids' club's fort, taken down for the night.
-    "prop_pillow_pile": (7, 33.4, "thing:pillow-pile", 0, dict(back=True, after="flag:catch", until="flag:home")),
+    "prop_pillow_pile": (7, 33.4, "thing:pillow-pile", 0, dict(back=True, after="flag:catch")),
 })

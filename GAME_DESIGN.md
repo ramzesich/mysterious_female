@@ -2664,7 +2664,11 @@ the theatre; the lighting booth's photo, lost from the data on 2026-11-21, back.
 shows the whole ship; a movement key brings her back. Deck 5's porthole on the bow wave is dropped; the camera easing out
 of the ship to a view by the water was turned down for both. **Look-out 5 built (2026-11-23, the user's):** at the Great
 Outdoors' stern rail, half a second still zooms the camera out aft to the stern's half of the ship from outside and the
-sea past it, the far sky held at its size on the screen; back to her when she moves. **Next: §5, part 3 (look-out 4,
+sea past it, the far sky held at its size on the screen; back to her when she moves. **After the ending the evening goes on (2026-11-23, the user: "I want the exploration after
+the ending have the same state as at the ending"):** what was "the day after" keeps the evening of the catch: the sunset,
+her husband on the sofa in cabin 8206 and his table empty, the kids' club in bed and its fort a pile, every cone hers;
+Bumbot asleep on the bed; those who clapped her home back at their own places (and away from them while they clap: they
+had stood in two places at once). **Next: §5, part 3 (look-out 4,
 the Spinnaker's balcony with part 11's P2; then the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").

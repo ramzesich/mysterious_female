@@ -3906,7 +3906,7 @@ def scenario_region6(b):
     ok &= check(wait_js(b, f"{S}.mode === 'scripted'", 3) and wait_js(b, f"{S}.mode === 'play'", 16) and carrying(b) is None,
                 "E with it: they eat together again", b.state())
     ok &= check(js(b, f"{W}.__hands") == 0 and js(b, f"{S}.save.books['1']") == "held", "no second book")
-    # With him away from his table (from the catch to the day after), a cone is hers: eaten where she stands. (The flag
+    # With him away from his table (from the catch on, after the ending too), a cone is hers: eaten where she stands. (The flag
     # set in the save alone, so that the finale's scenes do not start.)
     b.eval(f"{S}.save.flags.push('catch')")
     swirl(1.75)
@@ -5336,6 +5336,10 @@ def scenario_finale(b):
     wait(0.6)
     ok &= check(all(person(b, p) and person(b, p)["on"] for p in ("amb_home_steward", "amb_home_manager", "amb_home_engineer", "amb_home_planner")),
                 "four of those she helped wait outside her cabin")
+    # (Placed by the story, wherever she is: the planner's place is in the chapel, shown only while she is in it.)
+    own = ("npc_steward", "npc_stagemanager", "npc_engineer_read", "amb_cer_planner")
+    placed = lambda pid: b.eval(f"(p => !!p && !p.gone && !(p.until && {W}.cond(p.until)) && !(p.after && !{W}.cond(p.after)))({W}.people.byId['{pid}'])")
+    ok &= check(not any(placed(p) for p in own), "and none of them is at their own place meanwhile", [(p, placed(p)) for p in own])
     hold_until(b, "left", lambda s: s["x"] < exact_x(47.2), 8)
     b.shot("finale-welcome")
     ok &= check(b.eval(f"!!{W}.people.byId['amb_home_manager'].welcoming"), "they clap her in as she comes by")
@@ -5354,11 +5358,15 @@ def scenario_finale(b):
     wait(2.2)
     b.shot("finale-next-day")
     s = b.state()
-    ok &= check(s["mode"] == "play" and b.eval("window.__ship.dusk") == 0 and b.eval("window.__ship.player.texture.key") == "her",
-                "the day after: midday, she is up, on her own", (s, b.eval("window.__ship.dusk")))
-    ok &= check(b.eval(f"{S}.bedCat.visible") and not person(b, "npc_husband_home")["on"] and person(b, "npc_husband")["on"],
-                "Bumbot sleeps on the bed; her husband is back at his table")
-    ok &= check(b.eval(f"{W}.things.find(t => t.id === 'haz_fort_7').items[0].visible"), "and the kids' fort is up again")
+    # (After the ending the evening goes on, the user, 2026-11-23: the ending's state.)
+    ok &= check(s["mode"] == "play" and b.eval("window.__ship.dusk") == 1 and b.eval("window.__ship.player.texture.key") == "her",
+                "after the ending: still sunset, she is up, on her own", (s, b.eval("window.__ship.dusk")))
+    ok &= check(b.eval(f"{S}.bedCat.visible") and person(b, "npc_husband_home")["on"] and not person(b, "npc_husband")["on"],
+                "Bumbot sleeps on the bed; her husband stays on the sofa, his table empty")
+    ok &= check(not b.eval(f"{W}.things.find(t => t.id === 'haz_fort_7').items[0].visible"), "the kids' fort still down for the night")
+    home = ("amb_home_steward", "amb_home_manager", "amb_home_engineer", "amb_home_planner")
+    ok &= check(all(placed(p) for p in own) and not any(placed(p) for p in home),
+                "those who clapped her home are back at their own places", [(p, placed(p)) for p in own + home])
     # E by him from the floor: a purr, and the bed seen close (§4 2.4, the user's); on the bed E is her reading.
     # (Book 5 still lies on the bed in this run, by him: the first E takes it, as in play.)
     cat = b.eval(f"{S}.bedCat.x")

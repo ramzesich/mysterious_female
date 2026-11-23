@@ -672,9 +672,10 @@ export const lido = {
         this.lastSwirl = kind;
         if (kind === 'toppled') return this.toppled(cx, cy);
         if (kind === 'cone') sfx.done();
-        // With every errand done and him away from his table (from the catch to the day after), it is hers: she eats it
-        // where she stands (population: `sec_cone`). While he is at his table every cone can be his (the user, 2026-11-23).
-        if (this.P.has('table') && this.P.has('catch') && !this.P.has('home')) return this.forHerself(kind);
+        // With every errand done and him away from his table (from the catch on, after the ending too), it is hers: she
+        // eats it where she stands (population: `sec_cone`). While he is at his table every cone can be his (the user,
+        // 2026-11-23).
+        if (this.P.has('table') && this.P.has('catch')) return this.forHerself(kind);
         this.world.carryBox.take(kind);
     },
 

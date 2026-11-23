@@ -189,12 +189,13 @@ export const finale = {
     },
 
     // What the flags mean for her and the sky: Bumbot in her arms from the catch until they are
-    // home; the sunset from the balcony's scene until the day after.
+    // home; the sunset from the balcony's scene on, after the ending too (the user, 2026-11-23: the exploration
+    // after the ending in the ending's state).
     refreshFinale() {
         const s = this.scene, P = this.P;
         if (!this.F) return;
         if (!this.catching && !this.homing) s.holding = P.has('catch') && !P.has('home');
-        const dusk = P.has('sunset') && !P.has('home') ? 1 : 0;
+        const dusk = P.has('sunset') ? 1 : 0;
         if (!this.turning && !this.homing && s.dusk !== dusk) s.setDusk(dusk);
     },
 
@@ -505,7 +506,7 @@ export const finale = {
             if (husband?.on) this.heart(husband.x, husband.y - 50, 2);
             await w.wait(2400);
             await this.winScreen();
-            // The next day: he sleeps on, she is up.
+            // After the win screen: he sleeps on, she is up; the evening goes on.
             await w.tween({ targets: s.fade, alpha: 1, duration: 600 });
             her.setFlipX(false);
             her.y = top;

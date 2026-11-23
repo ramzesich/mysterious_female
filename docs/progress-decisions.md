@@ -4394,3 +4394,18 @@ valuable."
   show aft of the stern. Said to the user; left so.
 - Playtest case `region6.lookout`. Tests: `boot`, `intro`, `finale`, `region6`, `region3`, `deck4` with their cases pass.
   Not run: the rest. No generations spent. Next: look-out 4 (the Spinnaker's balcony, with part 11's P2).
+
+## After the ending the evening goes on (the user, 2026-11-23)
+
+- **Asked:** after the ending, is it sunset, and is her husband in two places? It was midday ("the day after"), he back at
+  his table and off the cabin's sofa, never in both. **The user: "I want the exploration after the ending have the same
+  state as at the ending".**
+- **Built:** the evening of the catch (`flag:catch&!flag:home`) no longer ends at `home` for the sky (`refreshFinale`:
+  the sunset from the balcony's scene on), her husband (`npc_husband` until the catch, `npc_husband_home` from it), the
+  kids' club (the toddlers until the catch, the fort down, its pile from the catch) and the cone that is hers (`lido.js`).
+  Bumbot sleeps on the bed after it as before; her hands are free.
+- **Asked: those who clap her home** (the steward, the stage manager, the engineer, the wedding planner): back to their
+  own places after it (the user's choice of two). On the way: **they had stood in two places at once** from the catch till
+  she was home (outside 8206 and at their own places): their own places now `until="flag:catch&!flag:home"`.
+- `finale`'s checks of the day after changed to this state, and two added (none at their own place while clapping her
+  home; all back after). Tests: `finale`, `region6`, `region9`, `region2`, `keeps`, `boot` pass. Not run: the rest.
