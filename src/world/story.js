@@ -4,6 +4,7 @@
 // region, in the order of docs/build-plan.md.
 
 import { sfx } from '../sfx.js';
+import { rumble } from '../rumble.js';
 import { lido } from './lido.js';
 import { outside } from './outside.js';
 import { topdeck } from './topdeck.js';
@@ -16,6 +17,9 @@ const M = 48;
 // The steward and his jammed trolley (region 4): his `tug` is a picture of the two, drawn with the
 // trolley's middle this far behind his frame's middle; let go of it, he stands this far from it.
 const STEWARD_TUG = 17, STEWARD_FREE = 35;
+// Near-catch 4 (the linen room): his body's columns in his asleep frame (of 64), and how near she or the laundry cart comes
+// before he is off (the user, 2026-11-23: "she almost touches him, or the cart almost touches him, by a couple of pixels").
+const BB4_SPAN = [10, 49], BB4_GAP = 2;
 // (His head in that picture, px aft of its middle: his bubble over it.)
 const STEWARD_HEAD = 22;
 // His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
@@ -562,12 +566,25 @@ export class Story {
 
     // --- Region 4 -----------------------------------------------------------------------------
 
+
     // Housekeeping (population §6.5-6.6): near-catch 4's own way out (into the vent), the keys shown
     // at the laundry cart, the steward at his jammed cart, the uniform in the laundry's washer.
     setupHousekeeping() {
         const s = this.scene, w = this.world, L = w.data.linen;
+        // (Near-catch 4 is a scene of its own since 2026-11-23, the user's: asleep on the bottle shelf, he is off into the
+        // vent the moment she, or the laundry cart she pushes, all but touches him; her walk-up and reach are not played.)
         const bb4 = s.cats.find(c => c.flag === 'bb4');
-        if (bb4) bb4.flee = (sprite, done) => this.intoTheVent(sprite, done);
+        if (bb4) { bb4.custom = true; this.bb4 = bb4; }
+        // The vent's cover over its opening until he knocks it down; then on the floor under it.
+        const linen = w.rooms.linen;
+        if (linen && L.cover) {
+            const depth = w.depthFor('linen') + 0.015, [cx, cy] = L.cover;
+            this.ventCover = s.add.image(cx, linen.floor + cy, 'things', 'vent-cover').setOrigin(0).setDepth(depth);
+            const down = s.add.image(cx, linen.floor, 'things', 'vent-cover-down').setOrigin(0, 1).setDepth(depth);
+            w.add([this.ventCover, down]);
+            w.things.push({ id: 'vent_cover', x: cx + 12, y: linen.floor, route: 'linen', items: [this.ventCover], until: 'flag:bb4' });
+            w.things.push({ id: 'vent_cover_down', x: cx + 12, y: linen.floor, route: 'linen', items: [down], after: 'flag:bb4' });
+        }
         this.linenCart = w.pushables.find(t => t.id === 'cart_linen');
         this.stewardCart = w.pushables.find(t => t.id === 'cart_steward');
         // The security officer's uniform, going round in the laundry's third washer while he waits.
@@ -585,6 +602,7 @@ export class Story {
 
     updateHousekeeping(dt, time) {
         const s = this.scene, w = this.world, P = this.P, her = s.player;
+        this.bb4Wakes();
         // The steward pulls at his trolley's handle, and goes along with it as she pushes: one picture
         // of the two (his `tug`, the world's trolley hidden meanwhile), set by the trolley's middle
         // (`STEWARD_TUG`); free, he stands back from it (`STEWARD_FREE`).
@@ -632,13 +650,44 @@ export class Story {
         this.glimpseBalcony();
     }
 
-    // Bumbot's way out of the linen room: a leap from the towels up to the vent, and he squeezes in.
+    // Near-catch 4: she, or the cart she pushes, within `BB4_GAP` px of him asleep on the shelf (his body's own columns
+    // in his frame, `BB4_SPAN`), and he is off into the vent. The beat's flag (crawling learned) once he is in.
+    bb4Wakes() {
+        const s = this.scene, w = this.world, cat = this.bb4, p = s.player;
+        if (!cat || cat.gone || cat.hidden || s.route !== 'linen' || this.P.has('bb4')) return;
+        const sp = cat.sprite, left = sp.x - 32 + (sp.flipX ? 64 - BB4_SPAN[1] : BB4_SPAN[0]), right = left + BB4_SPAN[1] - BB4_SPAN[0];
+        const near = (a, b) => a <= right + BB4_GAP && b >= left - BB4_GAP;
+        const cart = this.linenCart, half = cart ? cart.items[0].width / 2 : 0;
+        if (!near(p.body.left, p.body.right) && !(cart && near(cart.x - half, cart.x + half))) return;
+        cat.gone = true;
+        s.tweens.killTweensOf(sp);
+        sp.setScale(1);
+        rumble('bolt');
+        sfx.mrrp();
+        this.intoTheVent(sp, () => {
+            cat.away = true;
+            sp.setVisible(false).stop();
+            this.P.setFlag('bb4');
+        });
+    }
+
+    // Bumbot's way out of the linen room: a leap from the shelf up at the vent's cover, which falls to the floor with a
+    // clang, and he squeezes in.
     intoTheVent(sprite, done) {
         const s = this.scene, w = this.world, L = w.data.linen, floor = w.rooms.linen.floor;
         sprite.setFlipX(L.ventX < sprite.x).play('bumbot-jump');
         s.tweens.add({
             targets: sprite, x: L.ventX - 10, y: floor - L.sill + 1, duration: 320, ease: 'Quad.easeOut',
             onComplete: () => {
+                // (The cover knocked off the wall: it drops, tipping toward us, and lies flat on the floor.)
+                const c = this.ventCover;
+                if (c?.visible) {
+                    s.tweens.add({ targets: c, y: floor - 6, scaleY: 0.3, duration: 340, ease: 'Quad.easeIn', onComplete: () => {
+                        sfx.at(c.x, floor).clang();
+                        c.setVisible(false).setScale(1);
+                        w.things.find(t => t.id === 'vent_cover_down')?.items[0].setVisible(true);
+                    } });
+                }
                 sfx.at(sprite.x, floor).scramble();
                 s.tweens.add({
                     targets: sprite, x: L.ventX + 6, scaleX: 0.3, scaleY: 0.8, alpha: 0, duration: 460, ease: 'Sine.easeIn',

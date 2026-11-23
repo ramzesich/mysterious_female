@@ -1178,9 +1178,12 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   a startled hop, both hands over her eyes, blushing; she turns away from the door and tiptoes off, quick, to the next
   wall or door across the deck, or out of the screen; then her checkpoint. `?at=dnd9`. Vaulting onto an occupied balcony
   with none on her, **gag 24** (built 2026-11-19): the same, away from its guests to the partition ahead. `?at=occupied8`.
-- **The linen room:** **Bumbot asleep in the towel heap** (the heap is drawn). **Near-catch 4:** he
-  squeezes into the low vent whose grille hangs open. The laundry cart in the room: she pushes it under
-  the vent, climbs onto it and crawls in (the crawl glyph: ↓ then ←/→). **The duct** is a room of its
+- **The linen room:** ~~Bumbot asleep in the towel heap~~ **Bumbot asleep on the second rack's bottle shelf** (the user,
+  2026-11-23: the heap is gone). **Near-catch 4, a scene of its own:** the moment she, or the laundry cart she pushes, all
+  but touches him (2 px), he leaps at the vent's cover (generated, closed over the opening), it drops to the floor with a
+  clang, and he squeezes in; her walk-up and reach are not played. The laundry cart (the generated one, region 1's, since
+  2026-11-23; the drawn one is retired) stands in her way, solid: she cannot walk past it, she pushes it under the vent,
+  climbs onto its rim and crawls in (↓). **The duct** is a room of its
   own shown in the corridor's place (as the linen room is): a dark crawlspace with grilles that show
   the corridors' light and glimpses down into cabins, running forward and down for about twenty
   seconds, ending at a grille she kicks out, dropping her into deck 8's forward corridor at 66 m, past
@@ -1574,7 +1577,7 @@ background glimpses of §4 (a tail round a corner, a shape past a window) go on.
 | 1 | The Seven Seas' pass | Eating the lunch (`eating`) | Near-catch 1; the scream; the fruit bowl | Along the counter and out forward; a tail up the forward stairs |
 | 2 | The atrium; the Library | Sitting in the glass car; asleep on her open book (`asleep`) | A glimpse up the glass elevator; near-catch 2 | Through the Library's aft door, knocking the rope over |
 | 3 | The stage | Washing in the spotlight (`washing`) | Near-catch 3, the rival trips | Up a fly rope to the lighting bridge (new clip: hanging on a rope) |
-| 4 | The linen room | Asleep in the towels (`asleep`) | Near-catch 4 | Into the vent (new clip: a squeeze) |
+| 4 | The linen room | Asleep on the bottle shelf (`asleep`; in the towels until 2026-11-23) | Near-catch 4: off as she or the cart all but touches him | Into the vent, its cover knocked down (a squeeze) |
 | 5 | Deck 8's forward lobby | | A glimpse | A tail up the stairs |
 | 6 | The pool's edge | Fishing (`batting` over the rim) | Near-catch 5; the kid squirts him | Into the pool, up the ladder (new clip: the wet shake), the drain lever |
 | 7 | A balcony rail | Swiping at a gull (`batting`) | A glimpse | Inside; his door is ajar |
@@ -2680,7 +2683,13 @@ book 12; the ice bucket's tray a trap; a floor tray spills a load and plays its 
 of tea from deck 10 midships' forward lobby door to cabin 10230, cooling on the HUD's meter (45 s), steam from its spout,
 book 13; the teapot generated and its pixels set by hand; a delivery's tray and load leave the table while she carries them;
 whatever she carries is drawn at her depth, in the lifts too, and turned to us or away it is at her middle in front of her or
-behind her, her hands raised to it (her `carry-front`, `carry-back`). **Next: §5, part 3 (delivery 3: the pillows);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+behind her, her hands raised to it (her `carry-front`, `carry-back`). **Delivery 3 (2026-11-23):** three pillows on the laundry
+cart (emptied of its sheets) by deck 9 aft's forward lobby door, to cabin 9245, the last; on her forearms in her tray pose,
+the low hop; stopped short from a run the top one slides off ahead and E crouches her to put it back (her `carry-crouch`); a
+spill scatters all three; a "Thank you!" from the door's crack, no book, no heart. A delivery holds her hands up until the
+hand has it. **The linen room changed (2026-11-23, the user's):** the generated laundry cart in place of the drawn one, an
+obstacle she pushes; Bumbot on the bottle shelf; a generated vent cover he knocks down; the opening smaller; the heap and
+the hanging grille gone; its door washed 20%. **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

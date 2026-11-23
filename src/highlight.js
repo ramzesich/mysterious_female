@@ -28,6 +28,9 @@ const PERIOD = 1600;        // ms, full colour to the wash and back
 const SETTLE = 270;         // ms, from the deepest pulse back to its own state once she has gone
 const WALL = 0xe9dfcc;      // the corridor wall the props are washed toward (tools/build_ship_art.py's WALL)
 const ROOM_WASH = 0.3;      // a room's wash toward its own wall (tools/draw_rooms.py, draw_cabin.py, draw_linen.py)
+// A room's door back out washed less than that, by its route (the linen room's: "a bit more full color, also
+// proportionally affecting its pulse range", the user, 2026-11-23; its pulse from there to full colour).
+const ROOM_DOOR_WASH = { linen: 0.2 };
 const SUFFIX = { '-bg': 0.35, '-w20': 0.20, '-lt': 0.12 };
 // (Her crew cabin's door pulsed down to 40% once, "only for this door here"; muted at rest since, it pulses up.)
 const TRUNK_ALONE = 0.2;    // a trunk's door with no background door and no prop round it (the user, 2026-11-23)
@@ -233,8 +236,9 @@ export class Highlight {
             if (!obj) return;
             const box = this.doorBox(obj, x, y), key = `${obj.texture.key}:${box.join(',')}`;
             if (this.restBox.has(key)) return;
-            const over = this.boxPicture(obj, { box }, 'full', ROOM_WASH, this.wallOf(obj.texture.key));
-            this.restBox.set(key, { over, k: ROOM_WASH, o: obj });
+            const k = ROOM_DOOR_WASH[route] ?? ROOM_WASH;
+            const over = this.boxPicture(obj, { box }, 'full', k, this.wallOf(obj.texture.key));
+            this.restBox.set(key, { over, k, o: obj });
         };
         for (const r of s.rooms) {
             const doors = r.doors ?? [{ x: r.door, outX: r.door, outY: r.floor, outRoute: 'inside' }];

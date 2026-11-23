@@ -39,6 +39,7 @@ ALLOWED = [
     ("text:PLEASE DO NOT TOUCH", "text:WET PAINT"), ("text:PLEASE DO NOT TOUCH", "paint-bucket"),
     ("door-crew", "life-ring"),             # the ring hangs on the promenade's rail, outside the foyer's wall
     ("parasol-", "sundae-"),                # a sundae on a table under its parasol
+    ("laundry-cart-empty", "delivery-pillow-"),  # delivery 3's pillows on the cart's rim, within its handle's box
 ]
 # Things that move, lie flat on the floor or rest on furniture: no fault where they pass or lie.
 SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-",

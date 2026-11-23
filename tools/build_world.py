@@ -212,11 +212,11 @@ def build_world():
         # (`when`: it is there to see, but hers to take only then; `until`: gone after.)
         ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show,
                          when=rest[0] if rest else "", until=rest[1] if len(rest) > 1 else ""))
-    for did, (deck, m, load, flag, book, number, up) in DELIVERIES.items():
+    for did, (deck, m, load, flag, book, number, up, *opts) in DELIVERIES.items():
         # (At the cabin door's own middle: the corridor's doors stand every 192 px.)
         x, y, route = slot_x(deck, m), B.floor_y(deck), "inside"
         ents.append(dict(kind="delivery", id=did, x=x, y=y, route=route, load=load, flag=flag, book=book, number=number,
-                         plateUp=up))
+                         plateUp=up, **(opts[0] if opts else {})))
     for qid, (where, at, trigger, clip, ms, opts) in QUIRKS.items():
         x, y, route = spot(where, at)
         opts = dict(opts)
@@ -474,7 +474,7 @@ def build_world():
     stage = dict(floor=stage_y, top=stage_y - 128, wingX=B.exact_x(STAGE["wing"]), cableX=B.exact_x(STAGE["cable"]),
                  trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]))
 
-    linen = dict(ventX=room_x0["linen"] + LINEN["vent"], sill=LINEN["sill"], chuteX=room_x0["linen"] + LINEN["chute"],
+    linen = dict(ventX=room_x0["linen"] + LINEN["vent"], sill=LINEN["sill"], cover=[room_x0["linen"] + LINEN["cover"][0], LINEN["cover"][1] - 128], chuteX=room_x0["linen"] + LINEN["chute"],
                  cartTop=LINEN["cart_top"], laundryCartX=room_x0["laundry"] + LINEN["laundry_cart"])
     gdeck, gm = GLIMPSE_BALCONY
     gx = nearest_balcony(gdeck, slot_x(gdeck, gm))

@@ -4533,3 +4533,37 @@ valuable."
 - Tests: `deliveries` (the tea added), `boot`, `region4` to `region9`, `lift` pass. `tools/check_overlaps.py`: 0. Corridors:
   deck 10 51.6 m without a beat (62 to 113), 92.3 m without a reward (38 to 130; the delivery is not counted). Start
   place `hall10`.
+
+## Delivery 3, the pillows; the linen room changed (plan-the-rest §5 3.2; 2026-11-23)
+
+- **Proposed (as text with numbered questions, the user's new rule for long proposals; short choices stay in the dialog):**
+  the table by deck 9 aft's forward lobby door to 9245, the last cabin; answered: **"1. Let's try reusing her tray pose
+  first, and then see 2. Let's try E, but that would require some sort of additional animation where she crouches with her
+  pillows on her hands and the pillow is somehow picked up 3. A thank you, without hearts 4. Right"**.
+- **The pillows:** three map objects; try 2, cut into its three pillows. "Meanwhile, all looks fine." **The crouch:** her
+  carry-stand animated into a squat (skeleton-v3, 2 generations), the load on her fists frame by frame. The slide: after
+  0.3 s of running, a stop (under 5 px/s on the floor) slides the top one 14 px on ahead; E within 36 px: she crouches, it
+  arcs back on top. The thank-you: a speech popup from the door's crack as the hand takes them (first from over her head:
+  its tail pointed at her, "as if she says it").
+- **The user's play:** "why does she jump too high? Isn't the carrying jumping handled for deliveries in the same way?": the
+  low hop (the plan's full jump dropped). **"When she hands it over, her hands lower too soon (the previous cases with tray
+  should be checked for that too)"**: a delivery holds her in her carrying pose until the hand has it (the vase, the tea and
+  the pillows; the story's other hand-overs run as scripted moments and kept her pose already; their trays vanish while the
+  load crosses, offered, not asked). **"When she spills the pillows, they fall down as a single block now"**: three pieces,
+  scattered flat. **"Place the pillows not on this table, but on an appropriate laundry trolley"**: three trolleys shown; the
+  user took the linen room's drawn cart, then: **"can we replace the drawn-in-code version with the first one on my
+  picture? For the pillow stack case, make the version without the pillows/sheets in it"**: region 1's generated laundry
+  cart, and an empty copy of it for the pillows.
+- **The linen room (the user's, on playing it):** "make the cart an obstacle there: we cannot move past it, we have to push
+  it" (`"rim"`: solid, pushed from the start); "her legs move too slowly" (near-catch 4's walk had left her clip at 0.6; the
+  push now plays at its own pace); "nothing worked" on the cart (my link's `?did=bb4` set the flag without the crawl it
+  gives: `?did=` now gives what a flag gives). Then, the near-catch's reach being broken ("I will fix it in a separate
+  session"): **the hanging grille removed, a proper vent cover over the opening that falls to the floor when Bumbot jumps at
+  it** (generated, try 1 of 3); the heap and Bumbot on it removed; the opening 2 px smaller all round, centred between the
+  rack's upright and the wall; **Bumbot asleep on the bottle shelf**; **he leaps the moment she, or the cart, is 2 px from
+  him** ("closer ... by a couple of pixels"). Its door "a bit more full color": washed 20% instead of 30% (`ROOM_DOOR_WASH`
+  in `src/highlight.js`, the Refinement session's file, asked first).
+- Tests: `deliveries` (the pillows added), `boot`, `lang`, `region4` to `region9`, `golden`, `linen`, `highlight`, `lift`
+  pass; `mishaps` but `mishaps.things`' deck 9 sprinkler (broken since cefcf4c, the Refinement session's). `region4`'s and
+  `golden`'s linen room steps rewritten for the new order. About 14 generations (pillows 3, trolleys 3, crouch 2.3, covers 3,
+  heads 0.2, the teapot's round already counted).

@@ -595,7 +595,7 @@ the corridor at 118, not here.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 112 | the linen room | Built (§8): `bb_4` asleep in the towel heap; the laundry cart (push); the vent (crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
+| 112 | the linen room | Built (§8): `bb_4` asleep on the second rack's bottle shelf (36 px up, 176 px in; the towel heap gone, 2026-11-23); the laundry cart (the generated one, solid in her way, pushed from the start); the vent (20 x 18, its generated cover until he knocks it down; crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
 | 118 | `rdr_trunk_bliss` | The trunk's deck 9 door, red, where she arrives | | |
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
@@ -618,7 +618,9 @@ the corridor at 118, not here.
 its aft end, so that the card is earned past everything and brought back; the way back is the
 corridor changed (the towel stack fallen, the luggage broken if she broke it).
 
-**The aft hallway 202-249.5 (region 7), "the sprinkler test".** 206 `haz_swing_9a`; 214 and 222
+**The aft hallway 202-249.5 (region 7), "the sprinkler test".** 205.2 `src_pillows`, delivery 3: three pillows on the laundry
+cart emptied of its sheets, its tag 9245 (2026-11-23); 243.6 `dlv_pillows`, cabin 9245, the last door: E with the whole
+stack, a hand takes it, "Thank you!" from the crack (`DELIVERIES`). 206 `haz_swing_9a`; 214 and 222
 `haz_sprinkler_9a`, `haz_sprinkler_9b`, two sprinklers 8 m apart out of phase (`timed(5, 2)` each,
 offset 2.5 s): a rhythm to run; 225 `room_balcabin_9a` (the ajar door, the way in); 230
 `haz_cart_9_230`; 240 the terrace wall's doorway; the aft terrace (built).
@@ -914,8 +916,9 @@ Input locked unless said; each sets its save flag.
    start to swing (`haz_lights` on for good); Bumbot leaps onto the fly rope at 250 and rides up out
    of view; the stage manager's bubble turns to the pill bottle. Then `scn_card_ent` when she brings
    them: he takes them, sneezes once more, hands the card.
-5. **`bb_4` near-catch 4 (the linen room):** he sleeps in the heap; she bends; he leaps to the vent
-   and squeezes in; the push glyph shows on the laundry cart. **`scn_duct`:** with the cart under the
+5. **`bb_4` near-catch 4 (the linen room):** he sleeps on the bottle shelf; the moment she or the laundry cart she pushes
+   all but touches him (2 px) he leaps at the vent's cover, which drops to the floor with a clang, and squeezes in (the
+   user, 2026-11-23; he slept in a towel heap and she bent for him). The cart stands in her way between the door and him. **`scn_duct`:** with the cart under the
    vent and ↓ on it she crawls in; the duct room: she crawls west about twenty seconds with grilles
    at 100 (the lobby's light), 90 (the dome's glow), 72 (the balloons), 68 (a snoring passenger); at
    the end grille, ↓ kicks it out and she drops into deck 8 at 66. **`scn_chute`:** E at the hatch

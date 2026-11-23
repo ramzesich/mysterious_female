@@ -2,11 +2,10 @@
 (Bumbot slept in its towels until his spots were taken out, 2026-11-07; §4). Inside, it shows in the corridor's place, the deck around it dimmed
 (not cut into the ship's side as cabin 8206 is). A crew room behind a crew door held open: pale
 painted steel, a fluorescent tube, grey vinyl. The laundry chute's hatch low in the wall by the door,
-the door back out, chrome wire racks stacked with folded towels, sheets and pillows, a heap of fresh
-towels on the floor (where Bumbot sleeps), and high on the far wall a vent with its grille hanging
-open, where he gets away (the autonomous build, 2026-11-13: it was low; now she pushes the laundry
-cart under it to reach it, docs/population.md `scn_duct`). The laundry cart is a picture of its
-own, a thing she pushes (assets/ship/linen-cart.png).
+the door back out, chrome wire racks stacked with folded towels, sheets and pillows (Bumbot asleep on the
+toiletries' shelf, the game's), and high on the far wall a vent behind its cover (the game's), where he gets away (the autonomous build, 2026-11-13: it was low; now she pushes the laundry
+cart under it to reach it, docs/population.md `scn_duct`). The laundry cart she pushes is the generated one in the
+things atlas (`laundry-cart`; the one drawn here until 2026-11-23 is retired, the user).
 
 Also the open door seen from the corridor: a white crew door's frame, its leaf swung in, the racks
 beyond it.
@@ -38,12 +37,12 @@ CANVAS, CANVAS_DARK = "#b2ba90", "#92a984"
 TUBE = "#fbff86"
 
 # Where things are, from the room's left edge (ShipScene's LINEN must agree): the door back out,
-# the heap of towels on the floor (its middle and its top over the floor), the vent (its ends, and
-# its opening's bottom and top over the floor), the chute's hatch (its middle).
+# the vent (its opening's ends, and its bottom and top over the floor), the chute's hatch (its middle).
+# (The vent 20 x 18 since 2026-11-23, the user: "a bit smaller", its frame a px clear of the rack's upright on its left
+# and of the wall on its right; the heap of towels Bumbot slept on is gone, he sleeps on the rack's bottle shelf.)
 DOOR_X = 59
-HEAP = (150, 6)
-VENT = (208, 232)
-VENT_UP = (42, 64)
+VENT = (212, 231)
+VENT_UP = (44, 61)
 CHUTE_X = 24
 WASH = 0.3               # how far the background fades toward the wall (cabin 8206's, the user, 2026-11-15)
 # What she uses keeps its full colours: the door back out, the chute's hatch, the vent and its
@@ -164,33 +163,21 @@ def interior():
         r(x, 86, x + 2, 91, BLUE if x % 10 else "#0eaf9b")
         r(x, 85, x + 2, 85, WHITE)
 
-    # High on the far wall, a vent: its dark duct, the grille hanging open under it on one screw.
+    # High on the far wall, a vent: its dark duct (its cover, closed until Bumbot knocks it down, is the game's:
+    # `vent-cover` in the things atlas).
     a, b = VENT
     lo, hi = FLOOR - VENT_UP[0], FLOOR - VENT_UP[1]
     r(a - 2, hi - 2, b + 2, lo + 2, SLATE)
     r(a, hi, b, lo, INK)
     r(a + 1, hi + 1, b - 1, hi + 2, DARK)
     r(a - 2, lo + 2, b + 2, lo + 2, CHROME_DARK)
-    # (The grille, swung down and to one side: a slatted square hanging by its corner.)
-    d.polygon([(a - 1, lo + 3), (a + 17, lo + 9), (a + 13, lo + 25), (a - 5, lo + 19)], fill=GREY, outline=SLATE)
-    for i in range(4):
-        d.line([(a - 2 + i, lo + 7 + i * 4), (a + 15 + i - 2, lo + 12 + i * 4)], fill=SLATE)
-    d.point((a - 1, lo + 3), fill=WHITE)
 
-    # All of that is background, washed out a little toward the wall, as in the cabin; the floor
-    # she stands on and the heap Bumbot sleeps on keep their colours.
+    # All of that is background, washed out a little toward the wall, as in the cabin; the floor she stands on, the
+    # doors and the vent keep their colours.
     wash(im, 0, FLOOR, keep=((DOOR_X - 15, FLOOR - 81, DOOR_X + 15, FLOOR - 1),
                              (CHUTE_X - 16, FLOOR - 45, CHUTE_X + 16, FLOOR - 11),
-                             (VENT[0] - 6, FLOOR - VENT_UP[1] - 3, VENT[1] + 3, FLOOR - VENT_UP[0] + 26)))
+                             (VENT[0] - 2, FLOOR - VENT_UP[1] - 2, VENT[1] + 2, FLOOR - VENT_UP[0] + 2)))
     d = ImageDraw.Draw(im)
-
-    # The heap of fresh towels on the floor, in front of the second rack: Bumbot sleeps on it.
-    cx, top = HEAP[0], FLOOR - HEAP[1]
-    d.rounded_rectangle([cx - 26, top, cx + 26, FLOOR + 1], radius=3, fill=WHITE)
-    d.rounded_rectangle([cx - 30, top + 2, cx - 16, FLOOR + 1], radius=2, fill="#f2f6f6")
-    d.rounded_rectangle([cx + 14, top + 1, cx + 30, FLOOR + 1], radius=2, fill=BLUE_LIGHT)
-    d.line([(cx - 22, top + 3), (cx + 10, top + 3)], fill=PALE)
-    d.line([(cx + 16, top + 4), (cx + 28, top + 4)], fill=BLUE)
 
     # The room opens where the corridor was (the user, 2026-11-06), the deck around it dimmed by the
     # game: the ceiling's shadow as along the corridor, and its two end bulkheads, plain steel.
@@ -204,31 +191,6 @@ def interior():
     for x0, x1 in ((0, 3), (W - 4, W - 1)):
         d.rectangle([x0, 0, x1, H - 1], fill=GREY)
         d.rectangle([x0 + 1, 0, x1 - 1, H - 1], fill=PALE)
-    return im
-
-
-def cart():
-    """The laundry cart (she pushes it under the vent and climbs on it): a canvas bin on a steel frame
-    on castors, crumpled sheets heaped in it. 38 x 44; its rim, where she stands, is 36 px up."""
-    w, h = 38, 44
-    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    r = lambda x0, y0, x1, y1, c: d.rectangle([x0, y0, x1, y1], fill=c)
-    B = h - 1
-    r(2, B - 35, 35, B - 7, INK)
-    r(3, B - 34, 34, B - 8, CANVAS)
-    r(3, B - 34, 34, B - 33, CANVAS_DARK)
-    for x in range(8, 34, 7):
-        r(x, B - 30, x, B - 10, CANVAS_DARK)
-    d.rounded_rectangle([4, B - 43, 21, B - 33], radius=4, fill=WHITE, outline=GREY)
-    d.rounded_rectangle([15, B - 41, 33, B - 32], radius=4, fill="#f2f6f6", outline=GREY)
-    d.line([(8, B - 39), (17, B - 37)], fill=PALE)
-    r(0, B - 37, 37, B - 35, CHROME_DARK)
-    r(0, B - 37, 37, B - 37, CHROME)
-    r(2, B - 7, 35, B - 6, CHROME_DARK)
-    for x in (6, 31):
-        r(x - 2, B - 4, x + 2, B, INK)
-        d.point((x, B - 2), fill=GREY)
     return im
 
 
@@ -273,13 +235,10 @@ if __name__ == "__main__":
     door.save(SOURCE / "door-open.png")
     room.save(GAME / "linen-room.png")
     door.save(GAME / "linen-door-open.png")
-    cart().save(SOURCE / "cart.png")
-    cart().save(GAME / "linen-cart.png")
     if "--preview" in sys.argv:
         out = Path(sys.argv[sys.argv.index("--preview") + 1])
         sheet = Image.new("RGBA", (W + 50, H), "#2e222f")
         sheet.paste(room, (0, 0))
         sheet.paste(door, (W + 8, H - door.height))
-        sheet.alpha_composite(cart(), (86, FLOOR - 44))
         sheet.resize((sheet.width * 3, sheet.height * 3), Image.NEAREST).save(out)
     print("wrote", (GAME / "linen-room.png").relative_to(ROOT), (GAME / "linen-door-open.png").relative_to(ROOT))

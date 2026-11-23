@@ -197,6 +197,9 @@ export const verbs = {
         const vx = dir === ahead && (end - t.x) * ahead > 0 ? dir * VERBS.pushSpeed : 0;
         body.velocity.x = vx;
         if (this.anims.exists('her-push')) {
+            // (At its own pace: a walk at 0.6 before it, near-catch 4's in the linen room, had left her steps slow and
+            // sliding, the user, 2026-11-23.)
+            p.anims.timeScale = 1;
             p.anims.play('her-push', true);
             if (!vx) p.anims.pause();
         } else if (vx) this.pose('run', 0.5);

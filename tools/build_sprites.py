@@ -94,6 +94,9 @@ HER = {
         # with her forearms raised to the tray at her middle (`carry-turn/`, its README), framed as `rotations/`.
         "carry-front": [("carry-turn/front.png", "keep")],
         "carry-back": [("carry-turn/back.png", "keep")],
+        # Down to pick a pillow up with the stack on her forearms (delivery 3; the user, 2026-11-23): her carry-stand
+        # squatting, back straight, forearms level (`carry-crouch/`, its README); played down and back up.
+        "carry-crouch": [(f"carry-crouch/raw/{i}.png", "feet") for i in range(3)],
         # A start: she recoils from what bumped her (skeleton-v3's hit move), before she runs off.
         "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
         # Her falls (the user, 2026-11-16; skeleton-v3 poses): a slip onto her bottom and a trip flat on

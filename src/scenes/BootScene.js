@@ -43,7 +43,6 @@ export class BootScene extends Phaser.Scene {
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
         // The linen room's laundry cart (she pushes it), the adjoining cabins' blanket fort (in front
         // of her), and what shows under the duct's grilles (tools/draw_rooms.py).
-        this.load.image('linen-cart', 'assets/ship/linen-cart.png');
         this.load.image('fort', 'assets/ship/rooms/adjoin-fort.png');
         for (const what of ['lobby', 'dome', 'balloons', 'snore']) this.load.image(`peek-${what}`, `assets/ship/peeks/${what}.png`);
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');

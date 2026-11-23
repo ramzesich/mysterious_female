@@ -250,17 +250,22 @@ BEATS = {
     "bb1": (5, 248.8, "eat", -1, 203, None),
     "bb2": (6, 181.0, "asleep", 1, 193.6, None),
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
-    "bb4": ("linen", 150, "asleep", 1, 226, None),
+    # (Asleep on the linen room's bottle shelf, the second rack's middle, since 2026-11-23: the user; he was on a heap of
+    # towels on its floor.)
+    "bb4": ("linen", 176, "asleep", 1, 226, None),
     "bb5": (11, 131.27, "bat", 1, 160, None),
     "bb6": (10, 31.15, "wash", -1, 29.2, None),
 }
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
-BEAT_LIFT = {"bb4": 6, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
+BEAT_LIFT = {"bb4": 36, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
 # The linen room (tools/draw_linen.py): the vent high on its far wall (its middle, and its sill px
-# up), the chute's hatch by the door, where the laundry's cart stands under the chute's mouth.
-LINEN = dict(vent=220, sill=42, chute=24, cart_top=36, laundry_cart=200)
+# up), the chute's hatch by the door, where the laundry's cart stands under the chute's mouth; the cart's rim px up
+# (the generated laundry cart's since 2026-11-23, the user: it replaced the one drawn in code, whose rim was 36).
+# (The vent 20 x 18 since 2026-11-23, its opening 212 to 231, 44 to 61 px up; its cover the game's: `vent-cover` at
+# `cover`, its top left corner in the room's picture.)
+LINEN = dict(vent=222, sill=44, cover=(210, 65), chute=24, cart_top=32, laundry_cart=200)
 
 # --- Things she pushes (the push verb, region 4) ----------------------------------------------------
 # id: (deck or room, m or x, how far it rolls (m or x), the atlas piece, flag set when it gets there,
@@ -272,9 +277,13 @@ PUSHABLES = {
     # (At the corridor's aft end, so that the card is earned past the vacuum, the towel stack and the
     # sprinkler and brought back; the user, 2026-11-18: it had stood at 122.6 m, all three aft of it.)
     "cart_steward": (9, 185.2, 189.0, "thing:steward-trolley", "cart_free", True, -1),
-    # The linen room's laundry cart: by the wall (she walks past it), pushed under the vent she
-    # climbs onto it ("top": only its rim holds her).
-    "cart_linen": ("linen", 108, 216, "@linen-cart", "cart_linen", "top", -1, "bb4"),
+    # The linen room's laundry cart: in her way between the door and the towels ("rim": solid, she stands on its rim; the
+    # user, 2026-11-23: "make the cart an obstacle there: we cannot move past it, we have to push it"; it stood by the wall
+    # and she walked past it, "top"), hers to push from the start: past the towels, where Bumbot wakes and is off into the
+    # vent (near-catch 4), and on under the vent, where she climbs onto it.
+    # (The generated laundry cart, region 1's, since 2026-11-23: the drawn one's wheels were square and its sheets showed
+    # through its rim, the user.)
+    "cart_linen": ("linen", 108, 216, "thing:laundry-cart", "cart_linen", "rim", -1),
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
@@ -702,13 +711,22 @@ SOURCES = {
     "src_tea": (10, 113.2, "tea", None,
                 [("thing:tray-stand", 0), ("tray-22", 24), ("thing:delivery-teapot", 26), ("sign:card:10230", 23)], None,
                 "flag:dlv_tea"),
+    # 3, the stack of pillows (deck 9 aft; the user, 2026-11-23): on the laundry cart emptied of its sheets ("an appropriate
+    # laundry trolley", the user) by the forward lobby door, between cabins 9235 and 9236 (the swinging door at 207.6 m
+    # swings clear of it), its three pillows on its rim (32 px up, each on the one under it), its tag 9245 on its side.
+    "src_pillows": (9, 205.2, "pillows", None,
+                    [("thing:laundry-cart-empty", 0), ("thing:delivery-pillow-bottom", 32), ("thing:delivery-pillow-mid", 37),
+                     ("thing:delivery-pillow-top", 43),
+                     ("sign:card:9245", 24)], None, "flag:dlv_pillows"),
 }
 # The deliveries' cabins (plan-the-rest §5 3.2): id: (deck, m of its door, what she brings, the flag once delivered, the
 # book it pays or None, its number, px up to the number's plate on the door). The number is the corridor's own count
 # (`cabins-8-360`: 8214 at its first door, 111.6 m).
 DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48),
               # (`cabins-10-360`: 10211 at its first door, 111.2 m.)
-              "dlv_tea": (10, 187.6, "tea", "dlv_tea", 13, "10230", 48)}
+              "dlv_tea": (10, 187.6, "tea", "dlv_tea", 13, "10230", 48),
+              # (`cabins-9-636`: 9235 at its first door, 203.2 m; 9245 the last. A thank-you only: `thanks`.)
+              "dlv_pillows": (9, 243.6, "pillows", "dlv_pillows", None, "9245", 48, {"thanks": True})}
 # Signs: id: (deck, m, text, style, dy px up, options). The style is a look of src/signs.js (notice, bulletin,
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {

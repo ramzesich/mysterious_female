@@ -30,3 +30,15 @@ door's plate are `src/signs.js` looks (`card`, `steel`). About 200 generations, 
 Its tray is the game's own, 22 px long and 3 tall (`tray-22` in `src/world/carry.js`: "a little bit shorter", then "a bit
 thinner"), on the vase's low table. 7 generations for the pot; her front and back with a load, 4.2 more
 (`assets/source/her/carry-turn/`).
+
+## 3, the stack of pillows (deck 9 aft; the user, 2026-11-23)
+
+| File | What | PixelLab |
+|---|---|---|
+| `tries/pillows-2.png` | **Used**: three plump pillows stacked, blue-grey shading (`create_map_object`, side, 32 x 32), cut into its three pillows along the lines between them: `../delivery-pillow-top.png` (rows 0 to 8), `-mid` (9 to 14), `-bottom` (15 to 19), each 28 px long, in their own colours | `a09c4319-15f6-4815-8953-4e7dbabb6cc7` |
+| `tries/pillows-1.png`, `pillow-3.png` | A faint flat stack; a single pillow drawn at an angle | `4c0e1b2b-26ef-40c7-bac9-2671993c4892`, `9edb07d9-a8ab-417e-a48d-a8f3cd2f981a` |
+| `tries/trolley-1.png` to `-3.png` | Three linen trolleys to put them on (not used: the user chose the laundry cart, emptied of its sheets) | `ca92333b-f6a3-4b17-8bb5-bd0247f4de7b`, `4048b227-6ebf-4be7-a52b-98af093e8e51`, `a40576d9-a8d9-4627-836b-89e2ad2bcda5` |
+| `../laundry-cart-empty.png` | Region 1's laundry cart (`../laundry-cart.png`) with its heaped sheets taken out above the rim, its handle kept: the pillows' cart | |
+
+Her crouch to put a slid-off pillow back: `assets/source/her/carry-crouch/`. 3 generations for the pillows, 3 for the
+trolleys, 2.1 for the crouch.

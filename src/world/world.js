@@ -17,6 +17,7 @@ import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 import { sign, SIGN_LOOKS } from '../signs.js';
+import { t } from '../lang.js';
 
 export const OUTSIDE = 'promenade';     // the outside route (deck 6's promenade came first)
 const ROOM = { height: 128, stop: 20 };
@@ -95,7 +96,17 @@ export class World {
         // ?did=horn,wedding: story flags set from the start, to look at a later state without
         // playing to it (README; for testing).
         const did = new URLSearchParams(location.search).get('did');
-        for (const f of (did ?? '').split(',')) if (f && !this.save.flags.includes(f)) this.save.flags.push(f);
+        // (With what each flag gives in play, `flagGives`: `did=bb4` is crawling learned too.)
+        const setDid = f => {
+            if (!f || this.save.flags.includes(f)) return;
+            this.save.flags.push(f);
+            for (const g of this.data.flagGives?.[f] ?? []) {
+                const [type, what] = g.split(':');
+                if (type === 'verb') { if (!this.save.verbs.includes(what)) this.save.verbs.push(what); }
+                else setDid(what);
+            }
+        };
+        for (const f of (did ?? '').split(',')) setDid(f);
         // ?books=3,8,11 (or `all`): she starts carrying those books, in that order (README; for testing reading).
         const books = new URLSearchParams(location.search).get('books');
         const list = books === 'all' ? Array.from({ length: BOOKS }, (_, i) => i + 1) : (books ?? '').split(',').map(Number);
@@ -1099,7 +1110,7 @@ export class World {
                 // (A delivery's tray and its load are gone from the table while they are in her hands, back as a fresh one
                 // if she spills it or it goes cold: the user, 2026-11-23. Its table and its tag stay.)
                 const lifted = e.until?.startsWith('flag:dlv_')
-                    ? items.filter(i => i.texture.key.startsWith('tray') || i.frame?.name === LOADS[e.gives]?.thing) : null;
+                    ? items.filter(i => i.texture.key.startsWith('tray') || [LOADS[e.gives]?.thing, ...(LOADS[e.gives]?.stack ?? [])].includes(i.frame?.name)) : null;
                 this.things.push({ ...e, items, lifted, reach: 22, interact: () => {
                     // (`when`: there to see, but hers to take only then.)
                     if (this.carry || (e.when && !this.cond(e.when))) return false;
@@ -1173,20 +1184,35 @@ export class World {
                 const plate = sign(s, e.x + 17, e.y - e.plateUp, e.number, 'steel').setOrigin(0, 0.5).setDepth(D.decor + 0.25);
                 this.add([plate]);
                 const thing = { ...e, items: [plate], reach: 18, interact: () => {
-                    if (this.carry?.kind !== e.load || this.delivering) return false;
+                    // (The pillows only whole: a slid-off one is picked up first.)
+                    if (this.carry?.kind !== e.load || this.delivering || this.carryBox.fallen) return false;
                     this.delivering = true;
+                    // (She stands still holding it out, her hands up, until the hand at the door has it: the user,
+                    // 2026-11-23, they had dropped as the load left her carrying.)
+                    const p = s.player;
+                    s.mode = 'scripted';
+                    s.script = null;
+                    p.body.setVelocity(0, 0);
+                    s.pose('stand');
+                    this.carryBox.update();
                     const held = this.carryBox.items.map(i => this.image(i.x, i.y, i.texture.key === 'things' ? `thing:${i.frame.name}`
                         : `@${i.texture.key}`).setOrigin(0.5, 1).setDepth(i.depth).setFlipX(i.flipX));
                     this.add(held);
                     this.carryBox.give();
                     sfx.at(e.x, e.y).knock();
                     s.time.delayedCall(450, () => this.handTakes(e.x, e.y, held, held[0].y - 1, () => {
-                        this.story.heart?.(e.x, e.y - 80);
+                        // (The pillows' thank-you is instead of the heart: the user, 2026-11-23.)
+                        if (!e.thanks) this.story.heart?.(e.x, e.y - 80);
                         this.progress.setFlag(e.flag);
                         this.delivering = false;
                         if (e.book) s.time.delayedCall(700, () => this.giveBook(e.book));
                         this.refresh();
-                    }, { shrink: true }));
+                    // (A thank-you from the crack in the door as the hand takes them in: the speaker is behind it.)
+                    }, { shrink: true, took: () => {
+                        // (Taken: her hands down, hers again; the pillows' thanks from the crack.)
+                        if (s.mode === 'scripted') { s.mode = 'play'; s.pose('stand'); }
+                        if (e.thanks) this.thanks(e.x - 11, e.y);
+                    } }));
                     return true;
                 } };
                 this.things.push(thing);
@@ -1314,8 +1340,9 @@ export class World {
                 const done = () => !e.flag || this.progress.has(e.flag);
                 const x = done() ? e.max : e.x;
                 // (`tall`: jammed in a doorway, it fills it until it is free; "top": it stands by the
-                // wall, she walks past it, and only its rim holds her when she jumps onto it.)
-                const top = e.tall === 'top';
+                // wall, she walks past it, and only its rim holds her when she jumps onto it; "rim": in her way, solid, she
+                // stands on its rim, the linen room's laundry cart.)
+                const top = e.tall === 'top' || e.tall === 'rim', block = e.tall === 'rim';
                 const rim = top ? (this.data.linen?.cartTop ?? 36) : img.height - 4;
                 const zone = s.add.zone(x, e.y, img.width - 4, e.tall === true && !done() ? 128 : rim).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
@@ -1324,7 +1351,7 @@ export class World {
                 // way: the steward's trolley, the user, 2026-11-17.)
                 const aside = () => { zone.body.enable = false; img.setDepth(D.decor + 0.11); };
                 if (e.tall === true && done()) aside();
-                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, rim,
+                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, block, rim,
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
                         if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
@@ -1773,6 +1800,14 @@ export class World {
             this.refresh();
         };
         Promise.resolve().then(fn).then(done, err => { console.error(err); done(); });
+    }
+
+    // Words from behind a door opened a crack (a delivery's thanks): a speech popup from the crack at a head's height, a while.
+    thanks(x, y) {
+        const s = this.scene;
+        const pop = s.popups.make('speech', () => ({ x, y: y - 52, top: y - 60 }), 1).setText(t('say.thanks')).setVisible(true);
+        sfx.bubble();
+        s.time.delayedCall(1800, () => pop.setVisible(false));
     }
 
     wait(ms) {
@@ -2494,7 +2529,7 @@ export class World {
         s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
         for (const t of this.pushables) {
             s.physics.add.collider(p, t.zone, null, () => t.route === s.route
-                && (!t.top || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));
+                && (!t.top || (t.block && s.pushing !== t) || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));
         }
         for (const t of this.lows) s.physics.add.collider(p, t.zone, null, () => t.route === s.route);
         // (`through`: one that a lunge goes past, the breakfast trolley.)

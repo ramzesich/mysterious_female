@@ -30,7 +30,22 @@ export const LOADS = {
     // spout; a tray 22 px long and 3 tall (the user, 2026-11-23: "a bit thinner"); the pot drawn by hand
     // (`assets/source/things/delivery/draw_teapot.py`), its spout the way she faces.
     tea: { thing: 'delivery-teapot', tray: 22, ms: 45000, hot: true, spout: [9, 7] },
+    // 3, the stack of pillows (deck 9 aft): on her forearms, no tray (the user, 2026-11-23: her tray pose first); the low
+    // hop as every load (the user: "why does she jump too high?", the plan's full jump dropped); three pillows, each a piece
+    // (`stack`, on the one under it), so that a spill scatters them (`soft`: they tumble flat; the user: "they fall down as
+    // a single block"); the top one slides off ahead of her when she stops short from a run (`slides`), and E at it puts it
+    // back (her crouch, `carry-crouch`).
+    pillows: { thing: 'delivery-pillow-bottom', stack: ['delivery-pillow-mid', 'delivery-pillow-top'], bare: true, soft: true, slides: true },
 };
+
+// Stopping short with the pillows: a run of at least `runS` s at more than `fast` px/s, then her speed under `still` px/s on
+// the floor; the top pillow slides `ahead` px on before it lands.
+export const SLIDE = { runS: 0.3, fast: 100, still: 5, ahead: 14 };
+
+// Her crouch with a load (`carry-crouch`'s three frames): where the load stands in each, as `HOP_HOLDS` (her fists measured:
+// 4, 8 and 13 px lower than standing), and each frame's time going down (back up the same, reversed).
+const CROUCH_HOLDS = [[14, 27], [14, 23], [14, 18]];
+const CROUCH_MS = 90;
 
 // Her hop with a load (`carry-rise`, `carry-apex`, `carry-fall` in her sheet): where the load stands in each, [px ahead of
 // her middle, px up from her feet], by her fists (the user, 2026-11-23: it hung in the air before her as she jumped).
@@ -115,7 +130,10 @@ export class Carry {
         top.setOrigin(0.5, 1).setDepth(D.player + 0.012);
         this.wobble = 0;
         this.st = null;
+        this.run = 0;
         this.items = [top];
+        // (A stack of pieces, each on the one under it.)
+        for (const piece of load.stack ?? []) this.items.push(s.add.image(0, 0, 'things', piece).setOrigin(0.5, 1));
         if (!load.bare) this.items.unshift(s.add.image(0, 0, load.tray ? `tray-${load.tray}` : 'tray').setOrigin(0.5, 1).setDepth(D.player + 0.011));
         this.world.add(this.items);
         this.world.carry = { kind, ...load };
@@ -125,6 +143,7 @@ export class Carry {
     }
 
     drop() {
+        this.clearFallen();
         this.items.forEach(i => i.destroy());
         this.items = [];
         this.kind = null;
@@ -147,11 +166,13 @@ export class Carry {
         if (!this.kind) return;
         const s = this.scene, p = s.player;
         if (!own && s.isSafe()) return;
+        this.clearFallen();
         const away = p.x >= fromX ? 1 : -1;
-        const flying = this.items;
+        const flying = this.items, kind = this.kind;
         rumble('spill');
-        // (The steel canister rings; anything else is crockery, or lands like it.)
+        // (The steel canister rings; pillows land soft; anything else is crockery, or lands like it.)
         if (this.kind === 'canister') sfx.clang();
+        else if (LOADS[kind].soft) sfx.flump();
         else if (['cake', 'cone', 'stub'].includes(this.kind)) sfx.splat();
         else sfx.crash();
         this.items = [];
@@ -161,12 +182,15 @@ export class Carry {
         // into it (the user, 2026-11-23: the vase sank through the floor): the tray upside down, what was on it on its
         // side.)
         const floor = s.grounded ? p.y : (s.takeoffY ?? p.y);
+        // (Soft things, the pillows, tumble apart and land flat, each its own way: the higher in the stack, the further.)
+        const soft = LOADS[kind]?.soft;
         flying.forEach((img, k) => {
             const tray = img.texture.key.startsWith('tray') && flying.length > 1;
-            const turn = tray ? 180 : 270, half = (turn % 180 ? img.width : img.height) / 2;
+            const turn = tray || soft ? 180 : 270, half = (turn % 180 ? img.width : img.height) / 2;
             img.setOrigin(0.5, 0.5).setPosition(img.x, img.y - img.height / 2);
-            s.tweens.add({ targets: img, x: img.x + away * (26 + k * 10), angle: away * turn, duration: 520 });
-            s.tweens.add({ targets: img, y: img.y - 18, duration: 180, ease: 'Quad.easeOut', yoyo: false,
+            const far = soft ? [10, 34, 58][k] ?? 30 : 26 + k * 10, rise = soft ? 12 + k * 9 : 18;
+            s.tweens.add({ targets: img, x: img.x + away * far, angle: away * (soft ? turn * (k % 2 ? 1 : 2) : turn), duration: soft ? 560 + k * 90 : 520 });
+            s.tweens.add({ targets: img, y: img.y - rise, duration: 180, ease: 'Quad.easeOut', yoyo: false,
                 onComplete: () => s.tweens.add({ targets: img, y: floor - half, duration: 300, ease: 'Quad.easeIn',
                     onComplete: () => s.tweens.add({ targets: img, alpha: 0, delay: 700, duration: 300, onComplete: () => img.destroy() }) }) });
         });
@@ -212,7 +236,7 @@ export class Carry {
         const fr = p.texture.key === 'her' ? Number(p.frame.name) : NaN;
         const F = s.herFrames ?? {};
         const facing = fr === F['carry-front'] || fr === F.front ? 1 : fr === F['carry-back'] || fr === F.back ? -1 : 0;
-        const [dx, up] = facing ? [0, 31] : hold ? hold[1] : [14, 31];
+        const [dx, up] = facing ? [0, 31] : this.crouchHold ?? (hold ? hold[1] : [14, 31]);
         const x = Math.round(p.x + front * dx), y = Math.round(p.y - up + (s.grounded ? 0 : -1));
         let top = y;
         // (Drawn as she is, one step nearer us, the tray under its load: her depth wherever she is, behind a flight's wall or a
@@ -225,9 +249,10 @@ export class Carry {
         for (const img of this.items) {
             // (Turned the way she faces: the teapot's spout ahead of her.)
             img.setPosition(x, top).setFlipX(p.flipX).setVisible(p.visible);
-            // (What is on a tray stands on its top row.)
-            top -= img.texture.key.startsWith('tray') ? img.height - 1 : 0;
+            // (What is on a tray stands on its top row; a stack's top on the rest.)
+            top -= img.texture.key.startsWith('tray') ? img.height - 1 : LOADS[this.kind].stack ? img.height : 0;
         }
+        this.slides();
         if (LOADS[this.kind].fragile && this.sway(x)) return;
         // A hot cup or pot steams (less as it cools): a pot from its spout's tip (`spout`, px ahead of its middle and up).
         const load = LOADS[this.kind];
@@ -245,6 +270,69 @@ export class Carry {
             this.world.say(kind === 'cone' || kind === 'stub' ? '💧' : '❄', 900);
             this.world.refresh();
         }
+    }
+
+    // The pillows' rule: stopped short from a run, the top pillow slides on ahead of her and lands on the floor.
+    slides() {
+        const s = this.scene, p = s.player, load = LOADS[this.kind];
+        if (!load.slides || this.fallen || s.mode !== 'play') { this.run = 0; return; }
+        const dt = Math.min(0.05, s.game.loop.delta / 1000), vx = Math.abs(p.body.velocity.x);
+        if (vx > SLIDE.fast) this.run += dt;
+        else if (vx < SLIDE.still && s.grounded) {
+            if (this.run >= SLIDE.runS) this.slideOff();
+            this.run = 0;
+        }
+    }
+
+    slideOff() {
+        const s = this.scene, p = s.player, w = this.world;
+        const img = this.items.pop(), dir = p.flipX ? -1 : 1, floor = p.y;
+        const x = Math.round(img.x + dir * SLIDE.ahead);
+        img.setDepth(s.DEPTH.player - 0.01);          // (on the floor, behind her as she crosses it)
+        s.tweens.add({ targets: img, x, duration: 420, ease: 'Quad.easeOut' });
+        s.tweens.add({ targets: img, y: img.y - 4, duration: 120, ease: 'Quad.easeOut',
+            onComplete: () => s.tweens.add({ targets: img, y: floor, duration: 260, ease: 'Quad.easeIn', onComplete: () => sfx.at(x, floor).flump() }) });
+        w.say(t('say.whoa'), 700);
+        // (E at it: she crouches and it goes back on top.)
+        this.fallen = { id: 'pillow_fallen', x, y: floor, route: s.route, items: [img], reach: 36, interact: () => this.pickUp() };
+        w.things.push(this.fallen);
+    }
+
+    clearFallen() {
+        if (!this.fallen) return;
+        const w = this.world, i = w.things.indexOf(this.fallen);
+        if (i >= 0) w.things.splice(i, 1);
+        this.fallen.items.forEach(img => img.destroy());
+        this.fallen = null;
+    }
+
+    // E at the fallen pillow: she crouches with the stack, the pillow goes back on top, she stands.
+    pickUp() {
+        const s = this.scene, p = s.player, w = this.world, f = this.fallen;
+        if (!f || !this.kind || w.picking) return false;
+        w.picking = true;
+        const frames = s.cache.json.get('her-meta').anims['carry-crouch'];
+        p.setFlipX(f.x < p.x);
+        w.cut(async () => {
+            const at = k => { p.anims.stop(); p.setTexture('her', frames[k]); this.crouchHold = CROUCH_HOLDS[k]; this.update(); };
+            for (const k of [0, 1, 2]) { at(k); await w.wait(CROUCH_MS); }
+            // (Down: the pillow comes up from the floor onto the stack, in a little arc.)
+            const img = f.items[0], rest = this.items.at(-1);
+            w.things.splice(w.things.indexOf(f), 1);
+            this.fallen = null;
+            img.setDepth(p.depth + 0.003).setFlipX(p.flipX);
+            const tx = rest.x, ty = rest.y - rest.height;
+            sfx.flump();
+            await w.tween({ targets: img, x: { value: tx, ease: 'Sine.easeInOut' }, y: { value: ty, ease: 'Back.easeOut' }, duration: 220 });
+            img.setPosition(tx, ty);
+            this.items.push(img);
+            this.update();
+            await w.wait(110);
+            for (const k of [2, 1, 0]) { at(k); await w.wait(CROUCH_MS); }
+            this.crouchHold = null;
+            w.picking = false;
+        });
+        return true;
     }
 
     // A fragile load's sway (the cake): what her feet do sets it going, time settles it. True if
