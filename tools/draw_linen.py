@@ -3,8 +3,9 @@
 (not cut into the ship's side as cabin 8206 is). A crew room behind a crew door held open: pale
 painted steel, a fluorescent tube, grey vinyl. The laundry chute's hatch low in the wall by the door,
 the door back out, chrome wire racks stacked with folded towels, sheets and pillows (Bumbot asleep on the
-toiletries' shelf, the game's), and high on the far wall a vent behind its cover (the game's), where he gets away (the autonomous build, 2026-11-13: it was low; now she pushes the laundry
-cart under it to reach it, docs/population.md `scn_duct`). The laundry cart she pushes is the generated one in the
+toiletries' shelf, the game's), and on the forward wall the mouth of a ventilation shaft behind its cover (the game's,
+tools/build_shaft.py), where he gets away: she pushes the laundry cart up to it and crawls in from the cart's rim
+(docs/population.md `scn_duct`; docs/shaft-remake-log.md). The laundry cart she pushes is the generated one in the
 things atlas (`laundry-cart`; the one drawn here until 2026-11-23 is retired, the user).
 
 Also the open door seen from the corridor: a white crew door's frame, its leaf swung in, the racks
@@ -36,17 +37,17 @@ BLUE, BLUE_LIGHT = "#4d9be6", "#8fd3ff"
 CANVAS, CANVAS_DARK = "#b2ba90", "#92a984"
 TUBE = "#fbff86"
 
-# Where things are, from the room's left edge (ShipScene's LINEN must agree): the door back out,
-# the vent (its opening's ends, and its bottom and top over the floor), the chute's hatch (its middle).
-# (The vent 20 x 18 since 2026-11-23, the user: "a bit smaller", its frame a px clear of the rack's upright on its left
-# and of the wall on its right; the heap of towels Bumbot slept on is gone, he sleeps on the rack's bottle shelf.)
-DOOR_X = 59
-VENT = (212, 231)
-VENT_UP = (44, 61)
-CHUTE_X = 24
+# Where things are, from the room's left edge (ShipScene's LINEN and tools/population.py's LINEN and SHAFT must agree):
+# the door back out, the chute's hatch (its middle), the shaft's mouth on the forward wall.
+# (Mirrored 2026-11-23, the user: the door at the room's aft end, on the right, the racks and Bumbot's bottle shelf
+# forward of it, the shaft's mouth on the forward wall, so that she pushes the cart, climbs in and crawls on all one
+# way, toward the bow, where the shaft leads. The chute's hatch between the racks and the door: straight over the
+# laundry's cart on deck 4, five decks down. The mouth itself is the game's (tools/build_shaft.py): a duct's end
+# standing out of the wall, its floor level with the laundry cart's rim; this picture leaves its wall bare.)
+DOOR_X = 180
+CHUTE_X = 129
 WASH = 0.3               # how far the background fades toward the wall (cabin 8206's, the user, 2026-11-15)
-# What she uses keeps its full colours: the door back out, the chute's hatch, the vent and its
-# hanging grille (x0, y0, x1, y1).
+# What she uses keeps its full colours: the door back out and the chute's hatch (x0, y0, x1, y1).
 
 
 def wash(im, y0, y1, keep=()):
@@ -94,14 +95,14 @@ def interior():
     r(0, 8, W - 1, 8, WALL_SHADE)
     r(0, 10, W - 1, 11, GREY)
     r(0, 10, W - 1, 10, PALE)
-    for x0 in (70, 160):
+    for x0 in (39, 129):
         r(x0, 5, x0 + 40, 7, GREY)
         r(x0 + 2, 7, x0 + 38, 8, TUBE)
     # The wall: steel panels with their seams and a few rivets; the skirting.
-    for x in range(0, W, 40):
+    for x in range(W - 1, 0, -40):
         r(x, 12, x, FLOOR - 5, WALL_SEAM)
         for y in range(18, FLOOR - 8, 24):
-            d.point((x + 3, y), fill=WALL_SHADE)
+            d.point((x - 3, y), fill=WALL_SHADE)
     r(0, FLOOR - 4, W - 1, FLOOR - 1, GREY)
     r(0, FLOOR - 4, W - 1, FLOOR - 4, SLATE)
     # The floor: grey-green vinyl, flecked, over the deck's slab.
@@ -111,7 +112,7 @@ def interior():
     r(0, FLOOR + 4, W - 1, H - 2, SLAB)
     r(0, H - 1, W - 1, H - 1, "#6f7882")
 
-    # The laundry chute's hatch, low in the wall by the door: a steel flap on a hinge, a handle, a
+    # The laundry chute's hatch, low in the wall between the racks and the door: a steel flap on a hinge, a handle, a
     # green plate with an arrow down (the Housekeeping card's colour).
     cx = CHUTE_X
     r(cx - 15, FLOOR - 44, cx + 15, FLOOR - 12, CHROME_DARK)
@@ -125,58 +126,50 @@ def interior():
     for x in (cx - 12, cx + 12):
         d.point((x, FLOOR - 43), fill=SLATE)
     # A clipboard on the wall over it: the steward's checklist.
-    r(17, 44, 31, 62, "#ab947a")
-    r(19, 47, 29, 61, WHITE)
-    r(22, 43, 26, 45, GREY)
+    r(cx - 7, 44, cx + 7, 62, "#ab947a")
+    r(cx - 5, 47, cx + 5, 61, WHITE)
+    r(cx - 2, 43, cx + 2, 45, GREY)
     for y in range(50, 60, 3):
-        r(20, y, 28, y, GREY)
+        r(cx - 4, y, cx + 4, y, GREY)
 
     # The door back out to the corridor (its inside face): a white steel crew door, its lever and
     # a sign; it stands on the skirting's line, as the cabin's does.
     x0, top = DOOR_X - 14, FLOOR - 80
     r(x0, top, x0 + 28, FLOOR - 5, GREY)
     r(x0 + 2, top + 2, x0 + 26, FLOOR - 5, WHITE)
-    r(x0 + 3, top + 3, x0 + 3, FLOOR - 6, PALE)
+    r(x0 + 25, top + 3, x0 + 25, FLOOR - 6, PALE)
     r(x0 + 7, top + 12, x0 + 21, top + 20, "#1ebc73")             # a green safety sign
     r(x0 + 9, top + 14, x0 + 19, top + 14, WHITE)
     r(x0 + 9, top + 17, x0 + 15, top + 17, WHITE)
-    r(x0 + 20, top + 40, x0 + 25, top + 41, SLATE)                # the lever
+    r(x0 + 3, top + 40, x0 + 8, top + 41, SLATE)                  # the lever
 
-    # The racks: folded white towels, hand towels, blue bath mats, sheets, pillows on top.
-    rack(d, 80, 140, (34, 58, 82, 106))
-    towels(d, 83, 140, 34, WHITE, PALE, h=6, n=2)
-    towels(d, 83, 140, 58, WHITE, PALE)
-    towels(d, 83, 140, 82, BLUE_LIGHT, BLUE, h=4, n=4)
-    towels(d, 83, 140, 106, WHITE, PALE, h=4, n=4)
-    for x in range(84, 136, 17):                                  # the pillows, on the top shelf
-        d.rounded_rectangle([x, 26, x + 15, 33], radius=3, fill="#f2f6f6")
-    rack(d, 146, 206, (40, 66, 92))
+    # The racks. Forward of the hatch, the wide one: sheets, towels, toilet rolls, and the bottle shelf Bumbot sleeps
+    # on (36 px up, his middle 63 px in: tools/population.py's `bb4`). Aft of the door, a narrow one: towels, bath
+    # mats, pillows on top.
+    rack(d, 33, 93, (40, 66, 92))
     for y in (40, 66):                                            # sheets, folded flat
         for k in range(5):
-            r(149, y - 3 - k * 3, 172, y - 1 - k * 3, WHITE if k % 2 else "#f2f6f6")
-            r(149, y - 1 - k * 3, 172, y - 1 - k * 3, PALE)
-    towels(d, 176, 206, 40, WHITE, PALE, h=5, n=4)
-    for x in range(177, 205, 6):                                  # toilet rolls
+            r(67, y - 3 - k * 3, 90, y - 1 - k * 3, WHITE if k % 2 else "#f2f6f6")
+            r(67, y - 1 - k * 3, 90, y - 1 - k * 3, PALE)
+    towels(d, 36, 66, 40, WHITE, PALE, h=5, n=4)
+    for x in range(36, 64, 6):                                    # toilet rolls
         r(x, 60, x + 4, 65, WHITE)
         r(x + 2, 62, x + 2, 63, GREY)
-    for x in range(150, 205, 5):                                  # little toiletry bottles
+    for x in range(36, 91, 5):                                    # little toiletry bottles
         r(x, 86, x + 2, 91, BLUE if x % 10 else "#0eaf9b")
         r(x, 85, x + 2, 85, WHITE)
-
-    # High on the far wall, a vent: its dark duct (its cover, closed until Bumbot knocks it down, is the game's:
-    # `vent-cover` in the things atlas).
-    a, b = VENT
-    lo, hi = FLOOR - VENT_UP[0], FLOOR - VENT_UP[1]
-    r(a - 2, hi - 2, b + 2, lo + 2, SLATE)
-    r(a, hi, b, lo, INK)
-    r(a + 1, hi + 1, b - 1, hi + 2, DARK)
-    r(a - 2, lo + 2, b + 2, lo + 2, CHROME_DARK)
+    rack(d, 199, 233, (34, 58, 82, 106))
+    towels(d, 202, 233, 34, WHITE, PALE, h=6, n=2)
+    towels(d, 202, 233, 58, WHITE, PALE)
+    towels(d, 202, 233, 82, BLUE_LIGHT, BLUE, h=4, n=4)
+    towels(d, 202, 233, 106, WHITE, PALE, h=4, n=4)
+    for x in (202, 218):                                          # the pillows, on the top shelf
+        d.rounded_rectangle([x, 26, x + 14, 33], radius=3, fill="#f2f6f6")
 
     # All of that is background, washed out a little toward the wall, as in the cabin; the floor she stands on, the
-    # doors and the vent keep their colours.
+    # door and the hatch keep their colours.
     wash(im, 0, FLOOR, keep=((DOOR_X - 15, FLOOR - 81, DOOR_X + 15, FLOOR - 1),
-                             (CHUTE_X - 16, FLOOR - 45, CHUTE_X + 16, FLOOR - 11),
-                             (VENT[0] - 2, FLOOR - VENT_UP[1] - 2, VENT[1] + 2, FLOOR - VENT_UP[0] + 2)))
+                             (CHUTE_X - 16, FLOOR - 45, CHUTE_X + 16, FLOOR - 11)))
     d = ImageDraw.Draw(im)
 
     # The room opens where the corridor was (the user, 2026-11-06), the deck around it dimmed by the
@@ -225,6 +218,10 @@ def open_door():
         r(x0 + 1, y, x0 + 2, y, WHITE)
     # The light falling out of the room onto the frame's inner edge.
     r(x1, y0, x1, h - 1, TUBE)
+    # (The room reaches forward of its door since it was mirrored, 2026-11-23: the leaf against the right, the rack to
+    # the left; the frame is the same either way.)
+    opening = door.crop((x0, y0, x1 + 1, h)).transpose(Image.FLIP_LEFT_RIGHT)
+    door.paste(opening, (x0, y0))
     return door
 
 

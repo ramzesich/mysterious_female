@@ -1163,9 +1163,10 @@ def scenario_linen(b):
     s = b.state()
     ok = check(route() == "linen" and s["x"] == door, "E at the crew door takes her in", (route(), s))
     b.shot("linen-inside")
-    b.hold(["left"], 2.0)
+    # (Mirrored 2026-11-23: its door at its aft end, the room forward of it; the near wall is aft of the door.)
+    b.hold(["right"], 2.0)
     s = b.state()
-    ok &= check(door - 60 < s["x"] < door and s["y"] == floor_y(9), "the room's near wall holds her", s)
+    ok &= check(door < s["x"] < door + 60 and s["y"] == floor_y(9), "the room's near wall holds her", s)
     b.teleport(door, floor_y(9))
     b.eval("window.__ship.route = 'linen'")
     b.tap("e")
@@ -2045,6 +2046,32 @@ def hold_until(b, keys, cond, timeout=10):
     return s
 
 
+def into_the_shaft(b, jump=True):
+    """By the laundry cart parked at the shaft's mouth (the linen room): up onto its rim (`jump`), down on hands and
+    knees and forward, into the shaft."""
+    if jump:
+        b.hold(["left", "space"], 0.4)
+        wait(0.5)
+    b.key("down", True)
+    wait(0.2)
+    b.key("left", True)
+    ok = wait_js(b, "window.__ship.route === 'duct'", 3)
+    b.key("left", False)
+    b.key("down", False)
+    return ok
+
+
+def through_the_shaft(b, limit=45):
+    """Forward along the shaft to its end and out through its last grille: her state once she stands on deck 8."""
+    b.key("left", True)
+    end = now() + limit
+    while now() < end and not (route(b) == "inside" and b.state()["mode"] == "play" and b.state()["y"] == D8):
+        wait(0.25)
+    b.key("left", False)
+    wait(0.3)
+    return b.state()
+
+
 def scenario_golden(b):
     """The whole route, the gangway to the catch, every lock opened the intended way (step 0 of
     docs/build-plan.md): teleports only within regions she has opened, the mechanics with real keys."""
@@ -2130,29 +2157,20 @@ def scenario_golden(b):
     b.tap("e")
     wait(0.8)
     ok &= check(route(b) == "linen", "with it, into the linen room")
-    # The laundry cart in her way: pushed up to the towels it wakes him (near-catch 4); crawling is learned; the cart on
-    # under the vent, the duct, the drop into deck 8.
-    lc = "window.__ship.world.pushables.find(t => t.id === 'cart_linen')"
-    b.hold("right", 0.9)
+    # The laundry cart in her way: pushed forward up to his shelf it wakes him (near-catch 4); crawling is learned; the
+    # cart on to the shaft's mouth, in from its rim, the shaft to its end, the drop into deck 8.
+    b.hold("left", 0.9)
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E at the laundry cart's end: she takes hold", b.state())
-    b.key("right", True)
-    ok &= check(wait_flag(b, "bb4"), "near-catch 4 on the bottle shelf: he is gone into the vent", flags(b))
-    b.key("right", False)
+    b.key("left", True)
+    ok &= check(wait_flag(b, "bb4"), "near-catch 4 on the bottle shelf: he is gone into the shaft", flags(b))
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned there")
-    b.hold("right", 3.8)
-    ok &= check("cart_linen" in flags(b), "the laundry cart pushed under the vent", b.state())
-    b.hold(["right", "space"], 0.45)
-    wait(0.5)
-    b.hold("down", 0.5)
-    wait(0.9)
-    ok &= check(route(b) == "duct", "from the cart's top, down on hands and knees: the duct", b.state())
-    b.hold("left", 13.6)
-    b.tap("down")
-    wait(1.6)
-    s = b.state()
+    ok &= check(wait_flag(b, "cart_linen", 8), "the laundry cart pushed to the shaft's mouth", b.state())
+    b.key("left", False)
+    ok &= check(into_the_shaft(b), "from the cart's rim, on hands and knees, into the shaft", b.state())
+    s = through_the_shaft(b)
     ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"),
-                "out of its far grille, down into deck 8 forward: region 5", s)
+                "out of its last grille, down into deck 8 forward: region 5", s)
     # Region 5: the lobby door opens from inside; the forward stairs go on up to deck 11.
     ok &= check(use_door(b, 8, 74, -1), "deck 8's lobby door opens from the corridor")
     (x0, y0), _ = flight_feet("stairs-forward-8-9")
@@ -3019,9 +3037,9 @@ def scenario_sweep(b):
     ok &= check(s["y"] == D11, "no glide without the parasol: she just falls", s)
     linen = b.eval("window.__ship.rooms.find(r => r.route === 'linen').door")
     b.teleport(linen, D9, "linen")
-    b.hold(["down", "right"], 2.4)
+    b.hold(["down", "left"], 2.4)
     wait(0.6)
-    ok &= check(route(b) == "linen" and not b.eval("window.__ship.crawling"), "no crawling into the vent before the beat", route(b))
+    ok &= check(route(b) == "linen" and not b.eval("window.__ship.crawling"), "no crawling into the shaft before the beat", route(b))
     # The stage's trap door is shut before the rehearsal's beat.
     trap = b.eval("window.__ship.world.data.trapdoor")
     b.teleport(trap["x"] - 30, trap["y"])
@@ -3348,47 +3366,71 @@ def scenario_region4(b):
     b.shot("region4-linen")
     lc = f"{W}.pushables.find(t => t.id === 'cart_linen')"
     # (The laundry cart is in her way, solid, hers to push from the start; Bumbot asleep on the bottle shelf is off into
-    # the vent, knocking its cover down, as the cart all but touches him: the user, 2026-11-23.)
-    b.hold("right", 0.9)
-    ok &= check(b.state()["x"] < js(b, f"{lc}.x"), "the laundry cart stops her", b.state())
+    # the shaft, knocking the cover off its mouth, as the cart all but touches him: the user, 2026-11-23. The room is
+    # mirrored since that day: its door aft, the cart pushed forward, the mouth on its forward wall.)
+    duct = js(b, f"{W}.data.duct")
+    ok &= check(js(b, f"{W}.data.linen.chuteX") == js(b, f"{W}.data.linen.laundryCartX"),
+                "the chute's hatch stands straight over the laundry's cart on deck 4", js(b, f"{W}.data.linen"))
+    b.hold("left", 0.9)
+    ok &= check(b.state()["x"] > js(b, f"{lc}.x"), "the laundry cart stops her", b.state())
     b.tap("e")
     ok &= check(b.state()["mode"] == "push", "E by the cart's end: she takes hold", b.state())
-    b.key("right", True)
-    ok &= check(wait_flag(b, "bb4", 12), "the cart all but touching him: near-catch 4, Bumbot leaps into the vent", flags(b))
-    ok &= check(js(b, f"{W}.things.find(t => t.id === 'vent_cover_down').items[0].visible"), "its cover down on the floor")
-    b.key("right", False)
+    ok &= check(js(b, f"{W}.things.find(t => t.id === 'vent_cover').items[0].visible"), "the cover on the shaft's mouth")
+    b.key("left", True)
+    ok &= check(wait_flag(b, "bb4", 12), "the cart all but touching him: near-catch 4, Bumbot leaps into the shaft's mouth", flags(b))
+    wait(0.5)
+    ok &= check(js(b, f"{W}.things.find(t => t.id === 'vent_cover_down').items[0].visible")
+                and not js(b, f"{W}.things.find(t => t.id === 'vent_cover').items[0].visible"), "its cover knocked off, by the wall under it")
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned")
     b.shot("region4-vent")
-    # The cart on under the vent, onto it, down on hands and knees: the duct.
-    b.hold("right", 3.8)
-    ok &= check("cart_linen" in flags(b), "pushed under the vent", flags(b))
+    # The cart on to the mouth, onto its rim, down on hands and knees, and in: no cut, the room still in view.
+    ok &= check(wait_flag(b, "cart_linen", 8), "pushed to the shaft's mouth", flags(b))
+    b.key("left", False)
+    ok &= check(js(b, f"{lc}.x - {lc}.width / 2 - 2") <= duct["mouthX"] + 1, "its end against the mouth's", js(b, f"{lc}.x"))
     wait(0.3)
     b.shot("region4-cart")
-    b.hold(["right", "space"], 0.45)
+    b.hold(["left", "space"], 0.4)
     wait(0.5)
     s = b.state()
-    ok &= check(s["y"] == D9 - js(b, f"{W}.data.linen.cartTop"), "she jumps up onto its rim", s)
+    ok &= check(s["y"] == D9 - js(b, f"{W}.data.linen.cartTop") == duct["upper"], "she jumps up onto its rim, level with the shaft's floor", s)
     b.shot("region4-on-cart")
-    b.hold("down", 0.5)
-    wait(0.9)
-    ok &= check(route(b) == "duct", "down on hands and knees on it: into the vent", route(b))
-    duct = js(b, f"{W}.data.duct")
-    wait(0.3)
+    ok &= check(into_the_shaft(b, jump=False), "down on hands and knees on it and forward: into the shaft", route(b))
+    ok &= check(js(b, "window.__ship.player.flipX") and js(b, "!window.__ship.cameras.main.fadeEffect.isRunning"),
+                "facing forward as she went in, and no fade")
+    ok &= check(js(b, "window.__ship.rooms.find(r => r.route === 'linen').room.visible"), "the linen room still in view behind her")
+    b.shot("region4-mouth")
+    # The slope behind the wall: her slide, to her hands and knees at its foot, in the slab between the decks.
+    b.key("left", True)
+    ok &= check(wait_js(b, f"window.__ship.mode === 'scripted' && {W}.shaft.slide.visible", 3), "over the slope's lip: her slide", b.state())
+    b.shot("region4-slide")
+    ok &= check(wait_js(b, "window.__ship.mode === 'play'", 3) and b.state()["y"] == duct["lower"] and b.state()["x"] < duct["slopeFoot"],
+                "down it, on her hands and knees at its foot", b.state())
+    ok &= check(js(b, "window.__ship.player.visible && window.__ship.player.anims.currentAnim.key") == "her-crawl", "crawling has its own clip")
+    ok &= check(js(b, "window.__ship.shellAlpha[8]") == 0 and js(b, "window.__ship.viewDeck") == 9, "deck 8 open under the shaft")
+    wait(0.4)
     ok &= check(js(b, f"{W}.eyesX != null && !{W}.eyesGone && {W}.eyesX < window.__ship.player.x - 100"), "his eyes in the dark ahead of her")
     b.shot("region4-duct")
-    ok &= check(js(b, "window.__ship.player.anims.currentAnim.key") == "her-crawl", "crawling has its own clip")
+    # The grilles: each over what is really below it; a tangerine on the way.
     n = tangerines()
-    g = duct["grilles"][3]
-    s = hold_until(b, "left", lambda s: s["x"] < g["x"] + 6, 16)
-    wait(0.5)
-    b.shot("region4-peek")
-    ok &= check(js(b, f"{W}.peeks.find(k => k.what === 'snore').items[1].alpha") > 0.9, "over a grille: a look down at who snores below")
-    ok &= check(tangerines() == n + 1, "a tangerine lost in the duct", tangerines())
-    s = hold_until(b, "left", lambda s: s["x"] < duct["exitX"] + 6, 8)
-    b.tap("down")
-    wait(1.7)
-    s = b.state()
-    ok &= check(route(b) == "inside" and s["y"] == D8 and 5 in save_list(b, "regions"), "kicked out, she drops into deck 8 forward: region 5", s)
+    lit = lambda what: js(b, f"{W}.cones.find(c => c.what === '{what}').lit")
+    ok &= check(lit("party") <= 0.5, "a grille's light faint from afar", lit("party"))
+    for what, below in (("hall", "the midship lift hall"), ("atrium", "the atrium"), ("party", "the party's door")):
+        g = next(g for g in duct["grilles"] if g["what"] == what)
+        s = hold_until(b, "left", lambda s: s["x"] < g["x"] + 4, 16)
+        wait(0.6)
+        ok &= check(lit(what) > 0.9, f"over the grille at {round((g['x'] - 480) / 48)} m: {below} shows", lit(what))
+        b.shot(f"region4-over-{what}")
+        b.key("left", True)
+    b.key("left", False)
+    ok &= check(tangerines() == n + 1, "a tangerine lost in the shaft", tangerines())
+    party = js(b, f"{W}.things.find(t => t.id === 'amb_party').x")
+    ok &= check(abs(next(g["x"] for g in duct["grilles"] if g["what"] == "party") - party) < 60, "that grille is over the door with the balloons", party)
+    # The last grille gives way under her: she drops out where the shaft ends, no cut.
+    s = through_the_shaft(b)
+    ok &= check(route(b) == "inside" and s["y"] == D8 and abs(s["x"] - duct["exitX"]) < 40 and 5 in save_list(b, "regions"),
+                "the last grille gives way: she drops into deck 8 forward where the shaft ends: region 5", s)
+    ok &= check("duct" in flags(b) and js(b, f"{W}.eyesGone"), "the grille sprung shut behind him, hanging open after her")
+    b.shot("region4-dropped")
     # Now that she crawls: the fort, and what is in it.
     n = tangerines()
     b.teleport(ad["x0"] + 200, D9, "adjoin")

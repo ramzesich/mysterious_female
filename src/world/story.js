@@ -575,16 +575,7 @@ export class Story {
         // vent the moment she, or the laundry cart she pushes, all but touches him; her walk-up and reach are not played.)
         const bb4 = s.cats.find(c => c.flag === 'bb4');
         if (bb4) { bb4.custom = true; this.bb4 = bb4; }
-        // The vent's cover over its opening until he knocks it down; then on the floor under it.
-        const linen = w.rooms.linen;
-        if (linen && L.cover) {
-            const depth = w.depthFor('linen') + 0.015, [cx, cy] = L.cover;
-            this.ventCover = s.add.image(cx, linen.floor + cy, 'things', 'vent-cover').setOrigin(0).setDepth(depth);
-            const down = s.add.image(cx, linen.floor, 'things', 'vent-cover-down').setOrigin(0, 1).setDepth(depth);
-            w.add([this.ventCover, down]);
-            w.things.push({ id: 'vent_cover', x: cx + 12, y: linen.floor, route: 'linen', items: [this.ventCover], until: 'flag:bb4' });
-            w.things.push({ id: 'vent_cover_down', x: cx + 12, y: linen.floor, route: 'linen', items: [down], after: 'flag:bb4' });
-        }
+        // (The cover on the shaft's mouth until he knocks it off, and where it lies after: the world's, `buildDuct`.)
         this.linenCart = w.pushables.find(t => t.id === 'cart_linen');
         this.stewardCart = w.pushables.find(t => t.id === 'cart_steward');
         // The security officer's uniform, going round in the laundry's third washer while he waits.
@@ -671,27 +662,30 @@ export class Story {
         });
     }
 
-    // Bumbot's way out of the linen room: a leap from the shelf up at the vent's cover, which falls to the floor with a
-    // clang, and he squeezes in.
+    // Bumbot's way out of the linen room: a leap from the shelf at the cover on the shaft's mouth, forward of him, which
+    // drops to the floor with a clang and comes to lean by the wall under the mouth; and he is in, and gone down the
+    // shaft the way it leads, toward the bow. (The mouth's near side is drawn over him: he goes into it, not across it.)
     intoTheVent(sprite, done) {
-        const s = this.scene, w = this.world, L = w.data.linen, floor = w.rooms.linen.floor;
-        sprite.setFlipX(L.ventX < sprite.x).play('bumbot-jump');
+        const s = this.scene, w = this.world, d = w.data.duct, floor = w.rooms.linen.floor, sh = w.shaft;
+        sprite.setFlipX(d.mouthX < sprite.x).play('bumbot-jump');
         s.tweens.add({
-            targets: sprite, x: L.ventX - 10, y: floor - L.sill + 1, duration: 320, ease: 'Quad.easeOut',
+            targets: sprite, x: d.mouthX + 12, y: d.upper + 1, duration: 320, ease: 'Quad.easeOut',
             onComplete: () => {
-                // (The cover knocked off the wall: it drops, tipping toward us, and lies flat on the floor.)
-                const c = this.ventCover;
-                if (c?.visible) {
-                    s.tweens.add({ targets: c, y: floor - 6, scaleY: 0.3, duration: 340, ease: 'Quad.easeIn', onComplete: () => {
+                const c = sh.cover, down = sh.down;
+                if (c.visible) {
+                    const at = { x: c.x, y: c.y };
+                    s.tweens.add({ targets: c, x: down.x + 4, y: floor - c.height, angle: -8, duration: 340, ease: 'Quad.easeIn', onComplete: () => {
                         sfx.at(c.x, floor).clang();
-                        c.setVisible(false).setScale(1);
-                        w.things.find(t => t.id === 'vent_cover_down')?.items[0].setVisible(true);
+                        c.setVisible(false).setPosition(at.x, at.y).setAngle(0);
+                        down.setVisible(true);
                     } });
                 }
                 sfx.at(sprite.x, floor).scramble();
+                const depth = sprite.depth;
+                sprite.setDepth(sh.mouth.depth - 0.001);
                 s.tweens.add({
-                    targets: sprite, x: L.ventX + 6, scaleX: 0.3, scaleY: 0.8, alpha: 0, duration: 460, ease: 'Sine.easeIn',
-                    onComplete: () => { sprite.setScale(1).setAlpha(1); done(); },
+                    targets: sprite, x: d.mouthX - 8, scaleX: 0.4, duration: 300, ease: 'Sine.easeIn',
+                    onComplete: () => { sprite.setDepth(depth).setScale(1); done(); },
                 });
             },
         });
@@ -891,12 +885,12 @@ export class Story {
 
     // --- Region 5 -----------------------------------------------------------------------------
 
-    // Out of the duct's far grille into deck 8's forward corridor (population: `door_duct_exit`):
-    // the grille swings open over her, dust comes down with her.
+    // Out of the shaft's last grille into deck 8's forward corridor (population: `door_duct_exit`):
+    // the grille swings open under her, dust comes down with her.
     outOfTheDuct() {
         const s = this.scene, w = this.world, d = w.data.duct;
         for (let i = 0; i < 9; i++) {
-            const dot = s.add.image(d.dropX + Phaser.Math.Between(-12, 12), d.dropY - 118, 'dot').setTint(0xb9a98a).setDepth(s.DEPTH.fx).setScale(1.5);
+            const dot = s.add.image(d.dropX + Phaser.Math.Between(-12, 12), d.lower + 6, 'dot').setTint(0xb9a98a).setDepth(s.DEPTH.fx).setScale(1.5);
             w.add([dot]);
             s.tweens.add({ targets: dot, y: d.dropY - Phaser.Math.Between(4, 60), x: dot.x + Phaser.Math.Between(-8, 8), alpha: 0, duration: Phaser.Math.Between(700, 1300), delay: i * 40, onComplete: () => dot.destroy() });
         }
@@ -904,11 +898,13 @@ export class Story {
 
     // The party behind the door with the balloons (population: `amb_party`): its music comes out
     // into the corridor as notes while she is near.
-    party(time) {
+    // (`above`: she is in the shaft over the corridor, src/world/world.js: its beat comes up through the grille.)
+    party(time, above = false) {
         const s = this.scene, w = this.world;
         this.partyDoor ??= w.things.find(t => t.id === 'amb_party') ?? null;
         const d = this.partyDoor, her = s.player;
-        if (!d || s.route !== 'inside' || Math.abs(her.y - d.y) > 8 || Math.abs(her.x - d.x) > 330) return;
+        if (!d || Math.abs(her.x - d.x) > 330) return;
+        if (above ? s.route !== 'duct' : (s.route !== 'inside' || Math.abs(her.y - d.y) > 8)) return;
         if (time < (this.noteAt ?? 0)) return;
         this.noteAt = time + 520;
         // Its beat through the door, and now and then a party horn.

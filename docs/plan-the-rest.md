@@ -1075,10 +1075,14 @@ game, two fine puffs, as the kid's jet is.
    coffee's 50 s are untouched.
 3. **The cat paid too.** From near-catch 5 (`bb5`) until she has eaten with her husband (`table`): a few wet paw
    prints on the floor up to his spot from forward (about 3 m), and past him about 4 m of foamy ones, small heaps of
-   suds that glint now and then. No words. **These prints are built here:** the population spec's `sec_pawprints`
+   suds that glint now and then. No words. **These prints are built here:** ~~the population spec's `sec_pawprints`
    (wet prints from the pool at 131 m aft to the machine at 213 m) was never built and is in no part of this plan;
-   the design session told the user they "already run past this spot", wrongly, from the spec. Only the stretch by
-   him is built. The whole trail stays the user's to ask for: 82 m of prints leading aft could read as "go there".
+   the design session told the user they "already run past this spot", wrongly, from the spec.~~ **Corrected
+   2026-11-23: a trail was built in step 6** (`src/world/lido.js`, `paws`, `LIDO["paws"]` in `tools/population.py`):
+   small blue prints from 141.2 to 213.6 m, shown at the beat and faded out over 90 s (checked by `region6`). So the
+   prints by him must be reconciled with it (one trail or the other by his spot, not both), and the pool's sequence is
+   being reworked by the user (§9, U17). ~~Only the stretch by him is built. The whole trail stays the user's to ask
+   for: 82 m of prints leading aft could read as "go there".~~
 4. **A tangerine thrown to him comes back washed.** Everyone else eats it. He takes one that reaches him (thrown, or
    lying within his reach: `people.offered`, `loose.claim`), plays `wash`, and tosses it back to her
    (`world.tossOver`), glinting as it flies; her count is as before. If she has left the café's end by then, it is
@@ -1186,6 +1190,32 @@ When we're done with this update, remind me to work on the balcony doors."
 | U14 | The real Xbox controller through the whole route (the mapping and rumble are built, the test drives a fake one); with the controller alone the game may stay silent until a key or click | The user's own run |
 | U15 | The user's own touches to the livery (`assets/source/livery/livery-by-hand.png`) | The user's own |
 | U16 | Fine placement of everything, and the numbers, in play: the cry and the lunge, ~~the pocket's roll~~ (gone with 1.2a: now how often a hit sends her back, and how far), how often she runs dry, each gag's length, the glide, the checkpoints' spacing | Her playtest and the user's |
+| U17 | **The pool's sequence, near-catch 5, fixed by the user** (2026-11-23: "it plays and looks very broken"; kept, not removed) | Notes below |
+| U18 | **The near-catches' walk-up, reach and crouch, fixed by the user** (2026-11-23, "especially her crouching sequence after Bumbot escapes") | Notes below |
+
+**U17, the pool's sequence (`bb5`; `poolWatch`, `poolBeat` in `src/world/lido.js`; the drain in `src/world/world.js`,
+`drainPool`).** What it must keep, and what was found round it on 2026-11-23:
+
+- **It is not on the way to the finale, but it opens an optional area.** The hatch in the drained tank's floor is the
+  only way into deck 10's midships hallway: its lobby doors open only from inside (each stays propped open once she has
+  walked out through it), and none of its balcony doors is ajar. Delivery 2 (the tea, book 13), that hallway's hazards
+  and its two tangerines hang on it. The lifts stop at deck 10's lobbies from region 4 on, at its shut doors; the drain
+  changes nothing in them. Keep the hatch working (`door_hatch_pool`; the drain finds its pool by the hatch's place).
+- **The kid hangs on it:** `npc_kid_tub` until `bb5`, `npc_kid` on patrol after; his cone errand, and through it the
+  machine's chain (the canister, her husband's cone), start only after the beat.
+- **The wet paw prints** (`paws` in `src/world/lido.js`, 141.2 to 213.6 m, 90 s) were built with it; part 12's own prints
+  by him (§7g item 3) must be reconciled with them.
+- **His exit:** he runs off the screen along the pools, 24 m short of deck 11's door; the scene ignores his `exitX`
+  (approved as it was in 2026-11-17's door review). Decide where he really goes.
+- **Part 6 (Bumbot made again, §7a)** remakes his `bat` and `shake`, which this scene plays: a fix made first is timed
+  again once his clips change.
+- Tests: `region6` (the near-catch from the water, the drain, the lever, the prints, the hatch), `golden`, and the
+  `?did=bb5` cases (`jet11`).
+
+**U18, the near-catches' shared scene (`nearCatch` in `src/scenes/ShipScene.js`).** Her walk up to him, her reach and
+her crouch after he escapes, played by every near-catch that is not `custom` (1, 2, 3 and 6; the linen room's 4 and the
+pool's 5 have scenes of their own since 2026-11-23 and earlier). Found broken while building near-catch 4's cart version
+(2026-11-23); that version was dropped for the shelf's own scene, and the shared one was left as it was for the user.
 
 ## 10. Once, at the end (on the user's word)
 

@@ -62,7 +62,7 @@ const IN_ROOM = {
     sec_desk: { key: 'cabin-8206', box: [92, 88, 37, 36], full: false,
         keep: [[92, 88, 128, 92], [94, 93, 126, 123]], cut: [[105, 104, 119, 123]] },
     sec_bed: { key: 'cabin-8206', box: [137, 57, 101, 71], full: false },     // her bed (ShipScene's CABIN.bed)
-    chute: { key: 'linen-room', box: [7, 82, 35, 37], full: true },           // tools/draw_linen.py: the chute's hatch (kept)
+    chute: { key: 'linen-room', box: [112, 82, 35, 37], full: true },           // tools/draw_linen.py: the chute's hatch (kept)
 };
 
 // A copy cut as its picture is (a door's leaf drawn in front of her as she steps out of it is the door's picture

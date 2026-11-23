@@ -56,7 +56,7 @@ while she carries a tray spills the tray instead (never a scare) unless the tabl
 | `item_card_off` | Officer's card, gold | Deck 12, 136, on the sun deck | Dropped by the rival at the horn; a glint; E | Every reader |
 | `item_dash` | The lunge (with the cry, which is hers from the start; the save's verb is still `dash`) | Deck 5, 247, the fruit bowl | The scream at near-catch 1 | §3.2 |
 | `item_push` | Pushing carts | Deck 9, 185.2, the steward's cart | E at the cart's end | Carts, the laundry cart, the library's ladder |
-| `item_crawl` | Crawling | Deck 9, the linen room's vent | ↓ on the cart under the vent | The duct, laundry lines, the pillow fort |
+| `item_crawl` | Crawling | Deck 9, the linen room's shaft | ↓ on the cart at the shaft's mouth, then ← | The shaft, laundry lines, the pillow fort |
 | `item_socks` | Grip socks | Deck 11, 96, the gym's rack | E | Wall jumps |
 | `item_parasol` | The parasol | Deck 12, 130, the old lady's sunbed, after the horn | E | The glide |
 
@@ -202,7 +202,7 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 | `rdr_pantry_5a`, `rdr_pantry_5b` | Deck 5, 167 and 169 | Green | `room_pantry` (both ends) |
 | `rdr_store` | Deck 4, 165 | Green | `room_store` |
 | `rdr_laundry` | Deck 4, 112 | Green | `room_laundry` |
-| `rdr_linen` | Deck 9, 112, the linen room's crew door | Green | The linen room (the vent, the duct) |
+| `rdr_linen` | Deck 9, 115.4 (one cabin door aft of 111.4 since 2026-11-23), the linen room's crew door | Green | The linen room (the shaft) |
 | `rdr_chute` | Deck 9, the linen room's hatch | Green | The chute |
 | `rdr_coldroom` | Deck 11, 185, the Garden Café's cold room | Green | `room_coldroom` |
 | `blk_spa` | Deck 11, 74, the spa's door | A rope, "CLOSED" | Region 9 opens |
@@ -535,8 +535,8 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 30 | `amb_swan_cart` | A steward's cart with a towel swan on it | Decor | A towel animal |
 | 41.4 | cabin 8206 | Her cabin (built): `tan_8_8206` on the desk, `book_5` on the bed, the shower (§8); `sec_desk`: E at the desk shows it close, her four things and his four as found; `bb_home` (the day after): E by Bumbot on the bed, from the floor, he purrs and the bed shows close with his eight as found (2026-11-22) | `cp_8206` | Built |
 | 56 | `amb_peek_sea` + `sec_peek_sea` | An open cabin door, the sea in its window, nobody in; its inside washed 30% toward the wall (2026-11-18) | E (X): she steps in and bounces on its made-up bed, seen through the door (cut to its opening, her head under the lintel at each bounce, washed as the room is), then out, straightening her badge; one of her finds (the user, 2026-11-18: standing still there had played only her look-around) | Her own clips |
-| 66 | `door_duct_exit` | The duct's exit grille in the ceiling | She drops out of it (`scn_duct`) | Drawn |
-| 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; the duct's peek above it | Balloons |
+| 66 | `door_duct_exit` | The shaft's last grille in the ceiling: the cover of its mouth again, shut; hanging open once it has given way | She drops out of it (`scn_duct`) | `tools/build_shaft.py` |
+| 72 | `amb_party` | A cabin's door with balloons spilling out, music | Decor; a grille of the shaft over it shows it from above, its beat coming up | Balloons |
 | 74 | `door_8_fwd_lobby` | The lobby door | `oneway(the corridor)` | |
 
 **The atrium walk 82-102, the midship lobby 102-110 (region 4).** Built; `blk_florist`, `blk_auction` at the flights' feet on deck 7.
@@ -595,7 +595,7 @@ the corridor at 118, not here.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 112 | the linen room | Built (§8): `bb_4` asleep on the second rack's bottle shelf (36 px up, 176 px in; the towel heap gone, 2026-11-23); the laundry cart (the generated one, solid in her way, pushed from the start); the vent (20 x 18, its generated cover until he knocks it down; crawl, `scn_duct`); the chute hatch (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
+| 115.4 | the linen room (mirrored 2026-11-23: its door at its aft end, the room forward of it) | Built (§8): `bb_4` asleep on the wide rack's bottle shelf (36 px up, 63 px in); the laundry cart (the generated one, solid in her way, pushed forward from in front of the chute's hatch to the shaft's mouth); the shaft's mouth on the forward wall (its cover until he knocks it off; crawl, `scn_duct`); the chute hatch, straight over the laundry's cart on deck 4 (`rdr_chute`, `scn_chute`) | `scene` §9.5 | The vent's inside |
 | 118 | `rdr_trunk_bliss` | The trunk's deck 9 door, red, where she arrives | | |
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
@@ -917,11 +917,14 @@ Input locked unless said; each sets its save flag.
    of view; the stage manager's bubble turns to the pill bottle. Then `scn_card_ent` when she brings
    them: he takes them, sneezes once more, hands the card.
 5. **`bb_4` near-catch 4 (the linen room):** he sleeps on the bottle shelf; the moment she or the laundry cart she pushes
-   all but touches him (2 px) he leaps at the vent's cover, which drops to the floor with a clang, and squeezes in (the
-   user, 2026-11-23; he slept in a towel heap and she bent for him). The cart stands in her way between the door and him. **`scn_duct`:** with the cart under the
-   vent and ↓ on it she crawls in; the duct room: she crawls west about twenty seconds with grilles
-   at 100 (the lobby's light), 90 (the dome's glow), 72 (the balloons), 68 (a snoring passenger); at
-   the end grille, ↓ kicks it out and she drops into deck 8 at 66. **`scn_chute`:** E at the hatch
+   all but touches him (2 px) he leaps forward at the cover on the shaft's mouth, which drops to the floor with a clang,
+   and squeezes in (the user, 2026-11-23; he slept in a towel heap and she bent for him). The cart stands in her way
+   between the door and him. **`scn_duct` (remade 2026-11-23, `docs/shaft-remake-log.md`):** the cart pushed to the
+   mouth, ↓ on its rim and ←: she crawls in, the room still in view; behind the wall she slides down a slope into
+   the slab between decks 9 and 8 and crawls forward at the shaft's true length, about 25 seconds, with grilles over
+   the midship lift hall (108), the atrium (100, 92, 86), the forward lift hall (80) and the party's door (72), each
+   lighting deck 8 as it is below; the last grille (66) gives way under her and she drops into deck 8 where the shaft
+   ends. **`scn_chute`:** E at the hatch
    with the green card: a whoosh in the dark, and she lands in the laundry's cart of towels with a
    towel on her head (a gag frame), on deck 4.
 6. **`scn_card_hk`:** the cart pushed to 130; the steward walks to her, thanks, the card.

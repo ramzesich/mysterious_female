@@ -87,7 +87,10 @@ OUR_CABIN = {"deck": 8, "number": 8206, "m": 41.4}
 # The housekeeping linen room on deck 9 (towels heaped on its floor, §5.3): a crew door off the cabin
 # corridor, in a cabin door's place, that she can go through (the user, 2026-11-06); the Housekeeping
 # card opens it (§6.1.5).
-LINEN_ROOM = {"deck": 9, "m": 112, "lock": ("card", "hk", 0)}
+# (Its door one cabin door aft since 2026-11-23, the slot at 115.4 m, the user: the room, mirrored the same day, reaches
+# forward of its door now, and from the slot at 111.4 m it stood in the lift hall's place; `door_x`: its door in from the
+# room's left edge, tools/draw_linen.py's.)
+LINEN_ROOM = {"deck": 9, "m": 116, "door_x": 180, "lock": ("card", "hk", 0)}
 
 # The Chapel on deck 12 (the user's photo, 2026-11-07): off the forward lobby, behind its door, shown
 # in the deck's place like the linen room; the door at `m`.

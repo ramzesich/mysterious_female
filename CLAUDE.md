@@ -56,7 +56,8 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/estimate_skeleton.py` | PixelLab's skeleton estimate for PNGs (0.1 generations each): poses to give a new state of her character the exact motion of an existing clip |
 | `tools/build_ship_art.py` options | Per piece (and `-lt`, a light wash for the theatre's pieces, `LIGHT`; `keep` (from, to): a piece's own canvas columns kept, for pieces that must stand at one spot, the theatre's seat and its ten sitters): `height` shrinks a PixelLab piece to her scale, `join`/`from_x` mend pieces drawn across two frames, `flat` squares a base, `legs` runs short legs down to the floor, `caption` blanks a name the sheet wrote into the frame |
 | `tools/draw_chapel.py` | The Chapel (deck 12), drawn by hand from her photo: its inside and its open door (run after `build_ship_art.py`: its chairs and flowers come from the atlas) |
-| `tools/draw_linen.py` | The linen room (deck 9: its racks, the vent high on its far wall, 20 x 18, the chute's hatch by the door), drawn by hand: its inside and its open crew door. What moves is the game's (the user, 2026-11-23): Bumbot asleep on the bottle shelf, the generated vent cover he knocks to the floor (`vent-cover`, `vent-cover-down`, `assets/source/things/vent/`; `bb4Wakes` and `intoTheVent` in `src/world/story.js`), and the generated laundry cart she pushes, solid in her way (`thing:laundry-cart`, `"rim"` in `PUSHABLES`; the drawn cart is retired); its door washed 20% (`ROOM_DOOR_WASH` in `src/highlight.js`) |
+| `tools/draw_linen.py` | The linen room (deck 9; **mirrored 2026-11-23**, the user: its door at its aft end, the wide rack forward of it, the chute's hatch straight over the laundry's cart on deck 4, a narrow rack aft of the door; the shaft's mouth on its forward wall is the game's, `tools/build_shaft.py`), drawn by hand: its inside and its open crew door. What moves is the game's (the user, 2026-11-23): Bumbot asleep on the bottle shelf, the generated vent cover he knocks to the floor (`vent-cover`, `vent-cover-down`, `assets/source/things/vent/`; `bb4Wakes` and `intoTheVent` in `src/world/story.js`), and the generated laundry cart she pushes, solid in her way (`thing:laundry-cart`, `"rim"` in `PUSHABLES`; the drawn cart is retired); its door washed 20% (`ROOM_DOOR_WASH` in `src/highlight.js`) |
+| `tools/build_shaft.py`, `assets/source/shaft/`, `docs/shaft-remake-log.md` | **The ventilation shaft from the linen room to deck 8 forward** (the user's remake, 2026-11-23): at its true place and length on the ship (`SHAFT` in `tools/population.py`, `shaft_geometry()` in `tools/build_world.py`, `data.duct`). Its steel: the whole shaft drawn flat by rule (a flanged joint every 2 m, cross-broken panels), its pieces redrawn by PixelLab (`edit_image_pro_flash` keeps every shape in place), laid back along the run and lit by rule, into `assets/ship/shaft/strip.png` and `front.png`; `--mouth` cuts the mouth as the room shows it, its cover on and off, and the exit's grille from generated pictures of the room's corner; her slide down the slope (`assets/source/her/shaft-slide/`: PixMiniMax on a green copy of the shaft's own picture, she cut out by colour) into `slide.png`. In the game (`buildDuct`, `updateDuct`, `shaftSlide`, `shaftDrop` in `src/world/world.js`, `SHAFT` in `src/config.js`): one picture with the linen room, no cut going in (she crawls from the laundry cart's rim into the mouth, the room's `also: 'duct'` keeps it in view); the ship round it dark as round a room but for a cone of light under each grille, where deck 8 shows as it is (`world.lookOpen`); the last grille gives way and she drops out where the shaft ends. Put away in the outside view by the ship scene's cut-away (`shaftAway`) |
 | `tools/draw_casino.py` | The casino's roulette and blackjack tables and the Stardust balcony's parapet, drawn by hand in strict side view (PixelLab kept drawing them at three-quarters): `assets/source/ship/casino-drawn/` |
 | `tools/draw_lifeboat.py` | The ship's boats, drawn by hand in code (PixelLab's tries didn't read): the lifeboat, the tender, the rescue boat (`assets/ship/lifeboat.png`, `tender.png`, `rescue-boat.png`) |
 | `tools/build_livery.py` | The ship's sun livery from its PixelLab tiles (`assets/source/livery/p2-*.png`) to one picture at full size (`assets/source/livery/livery.png`); then `build_ship_map.py` cuts it by deck into `assets/ship/livery.png` + `.json`. Its placement (`SHIFT`, `DROP`, `DISC`) is the user's. Its outlines are smoothed along their length with the tips kept (`sleek()`, `SLEEK`; the user, 2026-11-14); leftover spots are filled by rule (`fill_spots`) or by a point inside them (`SPOTS`); the bow's dark band's bulge evened by `even_band` (the user, 2026-11-23). **The user's own touches: `assets/source/livery/livery-by-hand.png`**, a copy of `livery.png` edited by hand (flat colours, no antialiasing), which `build_ship_map.py` uses in its place while it is there; never write it, and say so when `build_livery.py` is run while it exists (its changes then show only once they are copied over by hand). `tools/livery_photo.py` makes the tiles' generation inputs from the user's side photo |
@@ -631,6 +632,30 @@ Lessons learned (2026-11-18, Teppanyaki's flares):
   (`#313638`, `#374e4a`); a sooty face read as green in the game, though the strips looked grey. Put
   greys on the palette's purple greys by hand (`SOOT` in `tools/build_gags.py`) and look at the built
   sheet, not the source frames.
+
+Lessons learned (2026-11-23, the shaft remade):
+
+- **A passage is drawn at its true place and length, joined to the room it opens off:** a strip drawn shorter than its
+  way and entered by a fade turned her round and showed rooms that were not there (the user: "how can she peek down
+  into the room that are not there?"). Laid where it runs, what shows under it is the ship itself, live, and nothing
+  needs a cut: she crawls in, and drops out where it ends.
+- **Which way a room faces is part of the route:** a way that leads forward is entered facing forward. Mirror the room
+  rather than turn her inside the passage (the user: entering and turning "still interferes with the player's sense
+  of direction").
+- **Steel, walls, long repeated structure: draw it flat by rule with the real thing's features, then have it redrawn**
+  (`edit_image_pro_flash`: every shape stays where it is, the surface becomes worn metal). PixFlux img2img returned
+  the flat drawing; text alone gave another style and a perspective. Each redrawn piece comes back in a tone of its own:
+  bring them to one mean before laying them side by side.
+- **A state of a thing is one picture plus the part that changes:** three generated pictures of the mouth (cover on,
+  off, fallen) each drew the duct differently; the game uses the open one's duct in every state and cuts only the
+  cover from the other.
+- **A clip of her made on a dark set is made on that set turned green:** cut from the dark duct by difference she lost
+  her navy skirt and dark hair in two frames of nine; on a green copy of the same picture (its shapes kept, so the
+  motion still follows the slope) a colour rule took her out whole in every frame.
+- **What a world's update shows must also be hidden where that update does not run:** the shaft's dark stayed over the
+  ship in the outside view (O), since `world.update` is not called there; the ship scene's cut-away, which runs
+  everywhere, puts it away.
+- **Never stage a file in the shared folder before the commit:** the index is shared with the other sessions.
 
 ## Working with the user
 

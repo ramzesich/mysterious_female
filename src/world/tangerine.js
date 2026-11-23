@@ -44,7 +44,7 @@ export class LooseTangerines {
         add(w.platZones, (o, z) => route(o) === OUTSIDE
             && (z.plat.solid || (o.body.velocity.y >= 0 && o.body.bottom <= z.body.top + 6)));
         add(w.wallZones, o => route(o) === OUTSIDE);
-        if (w.ductFloor) add(w.ductFloor, o => route(o) === 'duct');
+        for (const z of w.ductFloors ?? []) add(z, o => route(o) === 'duct');
         for (const t of [...w.pushables, ...w.lows, ...w.solids]) add(t.zone, o => t.route === route(o));
         for (const t of w.breakables) add(t.zone, o => !t.done && t.route === route(o));
         for (const r of w.robots ?? []) add(r.zone, o => route(o) === 'inside');

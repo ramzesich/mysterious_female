@@ -44,7 +44,10 @@ export class BootScene extends Phaser.Scene {
         // The linen room's laundry cart (she pushes it), the adjoining cabins' blanket fort (in front
         // of her), and what shows under the duct's grilles (tools/draw_rooms.py).
         this.load.image('fort', 'assets/ship/rooms/adjoin-fort.png');
-        for (const what of ['lobby', 'dome', 'balloons', 'snore']) this.load.image(`peek-${what}`, `assets/ship/peeks/${what}.png`);
+        // The shaft from the linen room to deck 8 forward (tools/build_shaft.py), where each of its pictures stands.
+        for (const what of ['strip', 'front', 'mouth', 'cover', 'cover-down', 'hatch', 'hatch-open']) this.load.image(`shaft-${what}`, `assets/ship/shaft/${what}.png`);
+        this.load.json('shaft', 'assets/ship/shaft/shaft.json');
+        this.load.atlas('shaft-slide', 'assets/ship/shaft/slide.png', 'assets/ship/shaft/slide.json');
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });

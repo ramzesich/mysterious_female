@@ -1036,7 +1036,7 @@ opens full screen. Six places are fixed here (§6.1.11); the pictures come from 
 | 2 | Atrium + promenade | Deck 6 from the bow to the Library, the promenade, the atrium on 6-7, the boat walkway's gate | The Deck card, on the midships crew trunk up into Bliss | | Rides the glass elevator up where she can't; in the Library, near-catch 2: asleep on her book, he bolts through a roped-off door and leaves it open |
 | 3 | Showtime | The theatre, its balcony, deck 7 from Magnum's to the Arcade | The door he left open | | On stage in the spotlight: near-catch 3, up a fly rope |
 | 4 | Housekeeping | Deck 9 midships round the linen room, the atrium's walks and midship lobbies on 8-10 | The Entertainment card, on the crew trunk from Bliss up to deck 9 | Pushing carts, crawling | Asleep in the towels: near-catch 4, into the vent |
-| 5 | Deck 8 forward | Deck 8 forward of the atrium, cabin 8206 | The vent's duct, dropping her past the corridor's shut door | | A glimpse: his tail up the forward stairs |
+| 5 | Deck 8 forward | Deck 8 forward of the atrium, cabin 8206 | The ventilation shaft from the linen room, dropping her past the corridor's shut door | | A glimpse: his tail up the forward stairs |
 | 6 | Lido | Deck 11 from the forward lobby aft: gym, pool deck, Garden Café, Great Outdoors and his ice cream machine | The forward stairs on up from deck 8 | Grip socks (wall jumps) | Fishing at the pool: near-catch 5, he falls in and drains it; the hatch into deck 10 |
 | 7 | Outside | The balconies of decks 8-10, the boat walkway, the hallways inside | Grip socks, out through the balcony cabin on deck 9 or up from the boat walkway | | A glimpse: swiping at a gull on a rail a deck up; his balcony door is ajar |
 | 8 | Top deck + funnel | Deck 12 from Champs aft, the roof, the funnel's stairway and top | Grip socks: a wall jump from the Great Outdoors onto the sun cover and up to deck 12's aft terrace | The parasol (a glide) | A silhouette on the funnel; at the horn he bolts for the bow |
@@ -1183,11 +1183,31 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   but touches him (2 px), he leaps at the vent's cover (generated, closed over the opening), it drops to the floor with a
   clang, and he squeezes in; her walk-up and reach are not played. The laundry cart (the generated one, region 1's, since
   2026-11-23; the drawn one is retired) stands in her way, solid: she cannot walk past it, she pushes it under the vent,
-  climbs onto its rim and crawls in (↓). **The duct** is a room of its
-  own shown in the corridor's place (as the linen room is): a dark crawlspace with grilles that show
-  the corridors' light and glimpses down into cabins, running forward and down for about twenty
-  seconds, ending at a grille she kicks out, dropping her into deck 8's forward corridor at 66 m, past
-  its lobby door, which then opens from inside for good (region 5).
+  climbs onto its rim and crawls in (↓).
+  **The room mirrored, and the shaft remade (the user, 2026-11-23; the whole record: `docs/shaft-remake-log.md`).**
+  ~~**The duct** is a room of its own shown in the corridor's place: a dark crawlspace with grilles that show the
+  corridors' light and glimpses down into cabins, about twenty seconds, ending at a grille she kicks out.~~ She had
+  gone into the vent facing aft and was then shown facing forward in a strip laid over the atrium, with looks down
+  into cabins that are not there. Now:
+  - **The linen room is mirrored:** its door at its aft end, the wide rack and Bumbot's shelf forward of it, the
+    shaft's mouth on its forward wall; its corridor door one cabin door aft (the slot at 115.4 m), so that the room
+    stands clear of the lift hall. She comes in, pushes the cart forward, and goes on forward: one way throughout.
+  - **The chute's hatch stands straight over the laundry's cart on deck 4** (between the wide rack and the door; the
+    room's second rack is a narrow one aft of the door). The laundry cart starts parked in front of the hatch.
+  - **The mouth** is the end of a duct standing out of the forward wall, seen from the side, its louvred cover on its
+    end until Bumbot knocks it off (it ends by the wall under the mouth). Its floor is level with the laundry cart's
+    rim: the cart, pushed to its stop, ends against it; ↓ on the rim puts her on hands and knees, ← takes her in. No
+    cut: the room stays in view behind her, the mouth's near side fades as her head reaches it.
+  - **The shaft is at its true place and length:** behind the wall a slope down into the slab between decks 9 and 8
+    (her slide, one way), then forward for 2,200 px (about 25 s) to a grille at 66.2 m over deck 8's forward corridor.
+  - **The looks down are the ship itself:** the ship round the shaft is dark as round a room, but under each grille a
+    cone of light shows deck 8 as it is there: the midship lift hall (108 m), the atrium's gallery (100 m), the
+    atrium's stair and glass lift (92 m), its side walk (86 m), the forward lift hall (80 m), the party's door with its
+    balloons (72 m). The four framed pictures (a lobby light, a dome, a cabin of balloons, a snoring passenger) are
+    retired.
+  - **The last grille gives way under her** (sprung: it clapped shut behind Bumbot): a creak, and she drops out feet
+    first where the shaft ends, into deck 8's forward corridor, past its lobby door, which then opens from inside for
+    good (region 5). It hangs open after.
 - **Also here:** **the laundry chute** (a hatch in the linen room's wall, green): a slide down to the
   **laundry** on deck 4 (a new crew room at 112 m: machines, carts, steam; she lands in a cart of
   towels; its door opens onto deck 4's corridor). One-way, down. **The pantries** (green crew doors
@@ -1228,7 +1248,7 @@ Positions are in metres from the bow and approximate; the build sets them exactl
     past the sprinkler.
 - **Checkpoints:** deck 9, a crew door at the corridor's aft end (190 m); the laundry's door (deck 4).
 - **The book:** the honeymooners' (above).
-- **Secrets:** the duct's grilles (peeks into cabins: a snoring passenger, a cabin full of balloons);
+- **Secrets:** the shaft's grilles (looks down at deck 8 as it is under them: the lift halls, the atrium, the party's door);
   the pantries' crates. Tangerines: the pantries (2 and 2), the balcony cabin's basket (1).
 
 **Region 5: Deck 8 forward.**
@@ -1260,6 +1280,12 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   aft. The lever drops: **the pool drains** over five seconds, gurgling, and **a maintenance hatch
   shows in the tank's floor**: E and she drops into deck 10's corridor at 135 m (one-way); its lobby
   doors open from inside, so deck 10 midships is the first hallway, the early taste of region 7.
+  **The hatch is the only way into that hallway** (checked 2026-11-23): its lobby doors are shut from the lobbies'
+  side until she has walked out through each, and none of its balcony doors is ajar. So everything in it hangs on
+  this beat: delivery 2 (the tea, book 13), its hazards and its tangerines. Not on the way to the finale, but not a
+  mere shortcut either. The lifts stop at deck 10's lobbies from region 4 on, at the hallway's shut doors.
+  **The kid hangs on it too:** he stays in the hot tub until the beat and patrols the aft pool deck only after it, so
+  his cone errand and the machine's chain after it start there.
   **Near-catch 5** is at the pool's edge before he falls: she lunges, he leaps, she topples into the
   pool (a splash, a swim out, no scare).
 - **The Great Outdoors' entrance, his place:** **her husband** (the user; his sprite from his photo,
@@ -1465,7 +1491,7 @@ The other vertical ways: the forward-cabins trunk (4-5, 50 m, free); the midship
 125 m, blue: region 1's way on); the theatre's trunk (6 to 4, 240 m, one-way then
 both ways); the Bliss/Magnum's trunk (6-7-9, 118 m, red, the way into region 4); the boat walkway's
 ladder (blue gate on the promenade, free from above); the laundry chute (9 to 4, green, down only);
-the vent's duct (9 to 8, one-way); the pool's hatch (11 to 10, one-way); the sun cover (11 to 12 with
+the ventilation shaft from the linen room (9 to 8, one-way); the pool's hatch (11 to 10, one-way; the only way into deck 10's midships hallway, region 6); the sun cover (11 to 12 with
 the socks, down any time); the bridge's hatch (10 to 11, after the alarm); the funnel's ladder and
 stairway (12 to the top); the library's rolling ladder (to the top shelf). Elevators: free, each panel
 lighting the decks she can reach.
@@ -1682,7 +1708,7 @@ each hint at one of the hidden ones, drawn, no words.
 | The kids' pool's slide | She rides it into the pool | |
 | The sports court | E with a ball: she scores | A clip |
 | The giant chess set | She moves a piece | |
-| The duct's grilles | Peeks into cabins: a snoring passenger, a cabin full of balloons | Drawn by hand |
+| The shaft (the linen room's mouth to deck 8 forward) | Its steel generated from a flat drawing, its grilles' looks the ship itself (2026-11-23) | `tools/build_shaft.py` |
 | The captain's cabin door | A name plate: the user's in-joke | |
 | The tip of the bow | Standing still before he comes: the arms-wide pose | Built |
 

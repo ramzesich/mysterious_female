@@ -15,8 +15,8 @@ from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, 
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
-from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, DUCT, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
-                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SIGNS,
+from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
@@ -69,6 +69,23 @@ def balcony_units():
     return sorted(set(B.BALCONY_UNITS))
 
 
+def shaft_geometry():
+    """The shaft's places in the world (population `SHAFT`; tools/build_shaft.py draws it by the same numbers): from the
+    linen room's forward wall (`wallX`) its mouth reaches into the room to `mouthX`, its floor (`upper`) level with the
+    laundry cart's rim; the slope from `slopeTop` down to `slopeFoot`; the run in the slab between the decks (`lower`,
+    deck 8's ceiling line) forward to the dead end `x0`; the grilles in its floor, the last one (`exitX`) the way out,
+    straight down onto deck 8's floor (`dropY`). `x1`: the aft end of her floor, the parked cart's."""
+    x0r = slot_x(LINEN_ROOM["deck"], LINEN_ROOM["m"]) - LINEN_ROOM["door_x"]
+    upper = B.floor_y(SHAFT["deck"]) - LINEN["cart_top"]
+    exit_x = round(B.exact_x(SHAFT["m_out"]))
+    cart = x0r + PUSHABLES["cart_linen"][2]
+    return dict(x0=exit_x - SHAFT["end"], x1=cart + 22, roomX=x0r, wallX=x0r + SHAFT["mouth"][0], mouthX=x0r + SHAFT["mouth"][1],
+                upper=upper, lower=upper + SHAFT["drop"], floor=upper + SHAFT["drop"], height=SHAFT["height"],
+                slopeTop=x0r + SHAFT["slope"][0], slopeFoot=x0r + SHAFT["slope"][1],
+                exitX=exit_x, dropX=exit_x, dropY=B.floor_y(SHAFT["drop_deck"]), deck=SHAFT["deck"], dropDeck=SHAFT["drop_deck"],
+                grilles=[dict(x=round(B.exact_x(m)), what=what) for m, what in SHAFT["grilles"]])
+
+
 def nearest_balcony(deck, x):
     return min((ux for d, ux in balcony_units() if d == deck), key=lambda ux: abs(ux + 6 + (UNIT - 6) / 2 - x))
 
@@ -85,7 +102,7 @@ def build_world():
     # from their left edge all the same.
     room_x0["cabin"] = slot_x(OUR_CABIN["deck"], OUR_CABIN["m"]) - ROOM_DOOR_X
     room_floor["cabin"] = B.floor_y(OUR_CABIN["deck"])
-    room_x0["linen"] = slot_x(LINEN_ROOM["deck"], LINEN_ROOM["m"]) - ROOM_DOOR_X
+    room_x0["linen"] = slot_x(LINEN_ROOM["deck"], LINEN_ROOM["m"]) - LINEN_ROOM["door_x"]
     room_floor["linen"] = B.floor_y(LINEN_ROOM["deck"])
     room_x0["chapel"] = B.exact_x(CHAPEL["m"]) - ROOM_DOOR_X
     room_floor["chapel"] = B.floor_y(CHAPEL["deck"])
@@ -115,23 +132,16 @@ def build_world():
                           needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors,
                           **({"mirror": r["mirror"]} if "mirror" in r else {})))
 
-    # The duct, drawn shorter than the way it stands for (a crawl of about a quarter of a minute):
-    # from the linen room's end forward, its grilles evenly along it, the last one the way out.
-    dx1 = B.x_of(DUCT["m_in"]) + 40
-    dx0 = dx1 - DUCT["length"]
-    n = len(DUCT["grilles"]) + 1
-    duct = dict(x0=dx0, x1=dx1, floor=B.floor_y(DUCT["deck"]), exitX=dx0 + 70,
-                dropX=B.x_of(DUCT["m_out"]), dropY=B.floor_y(DUCT["drop_deck"]),
-                grilles=[dict(x=round(dx1 - 120 - (i + 1) * (DUCT["length"] - 250) / n), what=what)
-                         for i, what in enumerate(DUCT["grilles"])])
+    # The shaft, at its true place and length (the user, 2026-11-23: it was drawn shorter than its way, over the atrium).
+    duct = shaft_geometry()
 
     def spot(where, at):
         """(x, y, route) of a thing on a deck at `at` m, or in a room `at` px from its left edge (in
-        the duct: px along it from the linen room's end)."""
+        the shaft: px forward along its run from the slope's foot)."""
         if where == "funnel":
             return B.exact_x(at), funnel_top()["y"], "inside"
         if where == "duct":
-            return duct["x1"] - at, duct["floor"], "duct"
+            return duct["slopeFoot"] - at, duct["lower"], "duct"
         # Outside: the promenade's deck, the boat walkway over it.
         if where in ("prom", "walkway"):
             return B.exact_x(at), B.floor_y(6 if where == "prom" else 7), OUTSIDE
@@ -341,7 +351,9 @@ def build_world():
 
     for pid, (where, at, to, frame, flag, tall, sides, *needs) in PUSHABLES.items():
         x, y, route = spot(where, at)
-        ents.append(dict(kind="push", id=pid, x=x, y=y, route=route, min=x, max=spot(where, to)[0], frame=frame,
+        # (`goal`: the end it is pushed to, either way: the linen room's cart rolls forward, toward the bow.)
+        goal = spot(where, to)[0]
+        ents.append(dict(kind="push", id=pid, x=x, y=y, route=route, min=min(x, goal), max=max(x, goal), goal=goal, frame=frame,
                          flag=flag or "", tall=tall, sides=sides, needs=needs[0] if needs else ""))
 
     for sid, (where, at, flag, needs, label) in SWITCHES.items():
@@ -474,7 +486,7 @@ def build_world():
     stage = dict(floor=stage_y, top=stage_y - 128, wingX=B.exact_x(STAGE["wing"]), cableX=B.exact_x(STAGE["cable"]),
                  trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]))
 
-    linen = dict(ventX=room_x0["linen"] + LINEN["vent"], sill=LINEN["sill"], cover=[room_x0["linen"] + LINEN["cover"][0], LINEN["cover"][1] - 128], chuteX=room_x0["linen"] + LINEN["chute"],
+    linen = dict(x0=room_x0["linen"], chuteX=room_x0["linen"] + LINEN["chute"],
                  cartTop=LINEN["cart_top"], laundryCartX=room_x0["laundry"] + LINEN["laundry_cart"])
     gdeck, gm = GLIMPSE_BALCONY
     gx = nearest_balcony(gdeck, slot_x(gdeck, gm))

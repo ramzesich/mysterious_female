@@ -4567,3 +4567,10 @@ valuable."
   pass; `mishaps` but `mishaps.things`' deck 9 sprinkler (broken since cefcf4c, the Refinement session's). `region4`'s and
   `golden`'s linen room steps rewritten for the new order. About 14 generations (pillows 3, trolleys 3, crouch 2.3, covers 3,
   heads 0.2, the teapot's round already counted).
+
+## The shaft remade (the user's own request, outside the plan; 2026-11-23)
+
+The sequence where she follows Bumbot into the linen room's vent, remade on the user's word: the room mirrored and its
+door one slot aft, the chute's hatch over the laundry's cart, the shaft at its true place and length with the ship
+itself under its grilles, no cut going in or out. Every decision, what was generated and what was checked:
+**`docs/shaft-remake-log.md`**.

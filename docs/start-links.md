@@ -94,6 +94,7 @@ new one added there should be added here too.
 |---|---|
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all> |
+| `linen`, Bumbot gone and the cart at the shaft's mouth: jump on the cart, ↓, ← | <http://localhost:8000/?play&at=linen&cards=all&did=bb4,cart_linen> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all> |
 | `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
 | `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward> |

@@ -74,11 +74,20 @@ ROOMS = [
          lock=("card", "hk", 0)),
 ]
 
-# The duct (population §6.5): a crawl space at deck 9's floor level, from the linen room's vent
-# forward to a grille over deck 8's forward corridor, where she drops out. Grilles on the way show
-# what is below (m, what).
-DUCT = dict(deck=9, m_in=112, m_out=66, drop_deck=8, length=1300,
-            grilles=["lobby", "dome", "balloons", "snore"])
+# The shaft (population §6.5; remade 2026-11-23, the user: docs/shaft-remake-log.md): a ventilation shaft from the
+# linen room's forward wall to a grille over deck 8's forward corridor, at its true place and length on the ship.
+# Its mouth sticks out of the room's left wall, its floor level with the laundry cart's rim (`LINEN["cart_top"]`), so
+# that she crawls from the cart straight into it, facing forward as she pushed the cart. Right behind the wall it slopes
+# down into the slab between decks 9 and 8 and runs forward there, over the midship lift hall, along the atrium under
+# deck 9's side walk, over the forward lift hall, to the first cabins of deck 8 forward. Grilles in its floor show what
+# is really under them (m from the bow, a name for the tests); the last one gives way under her.
+# px in the linen room's picture: the mouth's ends, the slope's top and foot (from the room's left edge, forward of it
+# negative); `height` the shaft's inside, `drop` how far the slope takes her down; `end` the dead end past the way out.
+SHAFT = dict(deck=9, drop_deck=8, m_out=66.1667, mouth=(4, 26), slope=(-6, -62), height=36, drop=48, end=64,
+             # (Each over a thing worth the look, and each at the middle of a 2 m length of duct between two joints,
+             # as the way out is: the joints are laid from it, tools/build_shaft.py.)
+             grilles=[(108.1667, "hall"), (100.1667, "gallery"), (92.1667, "atrium"), (86.1667, "walk"), (80.1667, "lobby"),
+                      (72.1667, "party")])
 
 # --- Checkpoints (population §2.5) -----------------------------------------------------------------
 # id: (deck, m, route, slot). Crew doors; `slot` takes a cabin door's place. The rooms' own doors
@@ -140,7 +149,7 @@ TANGERINES = {
     "tan_9_cart": (9, 172.6, 1, 28, None),
     "tan_9_luggage": (9, 181.5, 1, "table", None),
     "tan_9_fort": ("adjoin", 267, 2, 0, None),
-    "tan_9_duct": ("duct", 540, 1, 0, None),
+    "tan_9_duct": ("duct", 691, 1, 0, None),
     "tan_9_balc": (9, 240, 1, "out", None),
     "tan_10_mid": (10, 182, 1, "table", None),
     # (On the reception's desk: 32 m, the spec's place, is inside the deck's front wall.)
@@ -250,9 +259,9 @@ BEATS = {
     "bb1": (5, 248.8, "eat", -1, 203, None),
     "bb2": (6, 181.0, "asleep", 1, 193.6, None),
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
-    # (Asleep on the linen room's bottle shelf, the second rack's middle, since 2026-11-23: the user; he was on a heap of
-    # towels on its floor.)
-    "bb4": ("linen", 176, "asleep", 1, 226, None),
+    # (Asleep on the linen room's bottle shelf, the forward rack's middle, since 2026-11-23: the user; he was on a heap of
+    # towels on its floor. The room mirrored the same day: he bolts forward, into the shaft's mouth.)
+    "bb4": ("linen", 63, "asleep", -1, 13, None),
     "bb5": (11, 131.27, "bat", 1, 160, None),
     "bb6": (10, 31.15, "wash", -1, 29.2, None),
 }
@@ -260,12 +269,12 @@ BEATS = {
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
 BEAT_LIFT = {"bb4": 36, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
-# The linen room (tools/draw_linen.py): the vent high on its far wall (its middle, and its sill px
-# up), the chute's hatch by the door, where the laundry's cart stands under the chute's mouth; the cart's rim px up
-# (the generated laundry cart's since 2026-11-23, the user: it replaced the one drawn in code, whose rim was 36).
-# (The vent 20 x 18 since 2026-11-23, its opening 212 to 231, 44 to 61 px up; its cover the game's: `vent-cover` at
-# `cover`, its top left corner in the room's picture.)
-LINEN = dict(vent=222, sill=44, cover=(210, 65), chute=24, cart_top=32, laundry_cart=200)
+# The linen room (tools/draw_linen.py; mirrored 2026-11-23, the user: its door at its aft end, the shaft's mouth on its
+# forward wall, so that she pushes the cart, climbs in and crawls on all one way): the chute's hatch (its middle; it
+# stands straight over the laundry's cart on deck 4, `laundry_cart` in the laundry's picture, where she lands), the
+# cart's rim px up (the generated laundry cart's since 2026-11-23, the user: it replaced the one drawn in code, whose
+# rim was 36). The shaft's mouth is `SHAFT["mouth"]`, its floor at the rim's height.
+LINEN = dict(chute=129, cart_top=32, laundry_cart=200)
 
 # --- Things she pushes (the push verb, region 4) ----------------------------------------------------
 # id: (deck or room, m or x, how far it rolls (m or x), the atlas piece, flag set when it gets there,
@@ -283,7 +292,9 @@ PUSHABLES = {
     # vent (near-catch 4), and on under the vent, where she climbs onto it.
     # (The generated laundry cart, region 1's, since 2026-11-23: the drawn one's wheels were square and its sheets showed
     # through its rim, the user.)
-    "cart_linen": ("linen", 108, 216, "thing:laundry-cart", "cart_linen", "rim", -1),
+    # (Mirrored with the room, 2026-11-23: it starts in front of the chute's hatch, where such a cart is parked, and
+    # rolls forward to the shaft's mouth, its end against the mouth's, its rim level with the shaft's floor.)
+    "cart_linen": ("linen", 131, 48, "thing:laundry-cart", "cart_linen", "rim", 1),
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
@@ -592,8 +603,10 @@ PROPS = {
     # lobby's door.
     "prop_swan_cart": (8, 29.3, "towel-trolley", 0, {}),
     "prop_swan_cart_swan": (8, 29.3, "towel-swan", 28, {}),
-    "prop_grille_shut": (8, 66.1667, "@grille-shut", 120, dict(until="flag:duct", back=True)),
-    "prop_grille_open": (8, 66.1667, "@grille-open", 98, dict(after="flag:duct", back=True)),
+    # (The shaft's own pictures since its remake, 2026-11-23: the cover of its mouth again, tools/build_shaft.py; shut it
+    # lies in the ceiling over the way out, open it hangs from its hinge beside the opening.)
+    "prop_grille_shut": (8, 66.1667, "@shaft-hatch", 117, dict(until="flag:duct", back=True)),
+    "prop_grille_open": (8, 66.2604, "@shaft-hatch-open", 101, dict(after="flag:duct", back=True)),
     "prop_paws_8": (8, 70.05, "@paws", 0, dict(after="flag:duct")),
     "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
     # Region 6. The rack with the yoga mats, the socks on its top; two sunbathers on the loungers by

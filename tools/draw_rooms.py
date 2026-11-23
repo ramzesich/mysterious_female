@@ -1414,75 +1414,6 @@ def fort():
     return im
 
 
-def peeks():
-    """What shows under the duct's grilles as she crawls over them (population: `scn_duct`): the
-    midship lobby's chandelier, the atrium's glass dome, a cabin full of balloons, a passenger
-    snoring. Small pictures, assets/ship/peeks/<what>.png, each as if looked down into."""
-    out = ROOT / "assets" / "ship" / "peeks"
-    out.mkdir(parents=True, exist_ok=True)
-    W2, H2 = 64, 44
-
-    def card(bg):
-        im = Image.new("RGBA", (W2, H2), bg)
-        return im, ImageDraw.Draw(im)
-
-    # The lobby: warm light, the chandelier from above, the carpet's pattern, two heads going by.
-    im, d = card("#7a3045")
-    for x in range(-8, W2, 16):
-        d.polygon([(x, 30), (x + 8, 22), (x + 16, 30), (x + 8, 38)], outline="#ae2334")
-    d.ellipse([18, 4, 46, 26], fill="#f9c22b", outline=INK)
-    d.ellipse([23, 8, 41, 22], fill=TUBE)
-    for a in range(8):
-        x, y = 32 + round(12 * __import__("math").cos(a * 0.785)), 15 + round(9 * __import__("math").sin(a * 0.785))
-        d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=WHITE, outline="#d9a43b")
-    for x, c in ((10, "#3e3546"), (52, "#cd683d")):
-        d.ellipse([x - 4, 30, x + 4, 38], fill=c, outline=INK)
-        d.ellipse([x - 6, 36, x + 6, 46], fill=WHITE if x < 30 else "#4d9be6", outline=INK)
-    palettize(im).save(out / "lobby.png")
-
-    # The dome: the atrium's skylight from above its rim: blue glass ribs, the sun in it.
-    im, d = card("#323353")
-    d.ellipse([4, -20, 60, 40], fill="#4d9be6", outline=INK)
-    d.ellipse([10, -14, 54, 34], fill="#8fd3ff")
-    for x in (20, 32, 44):
-        d.line([(32, -14), (x - (32 - x) // 2, 36)], fill=WHITE)
-    for y in (4, 16, 28):
-        d.arc([10 - (y // 3), y - 14, 54 + (y // 3), y + 10], 20, 160, fill=WHITE)
-    d.ellipse([38, 2, 48, 12], fill=TUBE)
-    d.rectangle([0, 38, W2, H2], fill="#d9a43b")
-    d.rectangle([0, 38, W2, 38], fill=INK)
-    palettize(im).save(out / "dome.png")
-
-    # The party: a cabin's ceiling full of balloons, streamers, a paper garland.
-    im, d = card("#45293f")
-    for x, y, c in ((10, 12, RED), (24, 8, YELLOW), (38, 14, BLUE), (52, 9, GREEN), (16, 26, PINK), (32, 28, ORANGE), (48, 27, MAUVE)):
-        d.ellipse([x - 7, y - 8, x + 7, y + 8], fill=c, outline=INK)
-        d.ellipse([x - 4, y - 5, x - 1, y - 2], fill=WHITE)
-        d.line([(x, y + 8), (x + 1, y + 16)], fill=WHITE)
-    for x in range(0, W2, 8):
-        d.polygon([(x, 36), (x + 8, 36), (x + 4, 43)], fill=(YELLOW, RED, BLUE_LIGHT, GREEN)[(x // 8) % 4])
-    palettize(im).save(out / "balloons.png")
-
-    # The snorer: a bed from above the pillow: a round face, eyes shut, a big moustache, his mouth
-    # open; a z or two.
-    im, d = card("#323353")
-    d.rounded_rectangle([4, 8, 56, 44], radius=4, fill=WHITE, outline=INK)
-    d.rounded_rectangle([10, 3, 50, 20], radius=5, fill="#f2f6f6", outline=GREY)
-    d.rectangle([4, 28, 56, 44], fill="#4d65b4")
-    d.rectangle([4, 28, 56, 29], fill=WHITE)
-    d.ellipse([20, 5, 40, 27], fill="#e6904e", outline=INK)
-    d.line([(24, 13), (27, 13)], fill=INK)
-    d.line([(33, 13), (36, 13)], fill=INK)
-    d.rectangle([23, 18, 37, 19], fill="#7a4528")
-    d.rectangle([23, 20, 25, 20], fill="#7a4528")
-    d.rectangle([35, 20, 37, 20], fill="#7a4528")
-    d.ellipse([28, 20, 32, 24], fill=INK)
-    for x, y, k in ((44, 12, 3), (50, 6, 4), (57, 0, 5)):
-        d.line([(x, y), (x + k, y), (x, y + k), (x + k, y + k)], fill=TUBE)
-    palettize(im).save(out / "snore.png")
-    return ["lobby", "dome", "balloons", "snore"]
-
-
 DRAW = {"crewcabin": crewcabin, "laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
         "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
@@ -1501,8 +1432,6 @@ def main():
             continue
         done.append((name, fn(widths[name])))
         print("wrote", (OUT / f"{name}.png").relative_to(ROOT))
-    if not args:
-        print("wrote the duct's peeks:", ", ".join(peeks()))
     if preview:
         out = preview
         sheet = Image.new("RGBA", (max(im.width for _, im in done), H * len(done) + 4 * len(done)), "#1a141c")

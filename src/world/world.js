@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS, SHAFT } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -25,6 +25,7 @@ const ROOM = { height: 128, stop: 20 };
 // frame, his fist 15 to 20 px ahead of his middle and 29 to 36 px up (assets/source/people/husband/give/2.png-4.png).
 const GIVE_HANDS = { husband: { from: 2, at: [13, 39], out: 650 } };
 const OK = { ok: true };
+const approach = (value, target, step) => value < target ? Math.min(value + step, target) : Math.max(value - step, target);
 // The knitting lady in her armchair: the chair was drawn round her own seated pose (its picture's
 // left edge 16 px behind her middle, its foot on her floor), so she sits in it exactly.
 const KNIT_SIT = { dx: 16, up: 0 };
@@ -283,22 +284,8 @@ export class World {
             g.fillStyle(0xf28c28, 1).fillRect(12, 10, 6, 6);
             g.fillStyle(0x1ebc73, 1).fillRect(14, 9, 2, 1);
         });
-        // Region 5: the duct's grille in deck 8's ceiling, shut and hanging open; paw prints in dust;
+        // Region 5: paw prints in dust (the shaft's grille in deck 8's ceiling is its own picture, tools/build_shaft.py);
         // party balloons, one and a bunch on their strings; an open cabin with the sea in its window.
-        make('grille-shut', 32, 8, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 32, 8);
-            g.fillStyle(0x9babb2, 1).fillRect(1, 1, 30, 6);
-            g.fillStyle(0x3e3546, 1);
-            for (let x = 3; x < 30; x += 4) g.fillRect(x, 2, 2, 4);
-        });
-        make('grille-open', 34, 30, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 32, 8);
-            g.fillStyle(0x0d0b14, 1).fillRect(1, 1, 30, 6);
-            g.fillStyle(0x2e222f, 1).fillRect(27, 6, 7, 24);
-            g.fillStyle(0x9babb2, 1).fillRect(28, 7, 5, 22);
-            g.fillStyle(0x3e3546, 1);
-            for (let y = 9; y < 28; y += 4) g.fillRect(29, y, 3, 2);
-        });
         make('paws', 346, 5, g => {
             g.fillStyle(0x625565, 0.85);
             for (let x = 4, n = 0; x < 340; x += 13, n++) {
@@ -754,166 +741,291 @@ export class World {
         s.addCheckpoint('cp_funnel', f.x0 + 60, f.y, { door: 'door-crew' }).items.forEach(i => i.setDepth(D.exterior + 0.08));
     }
 
-    // --- The duct (population §6.5) -------------------------------------------------------------
-    // A crawl space at deck 9's floor, from the linen room's vent forward to a grille over deck 8's
-    // corridor. It shows in the deck's place, dimmed round it, like a room.
+    // --- The shaft (population §6.5; docs/shaft-remake-log.md) ------------------------------------
+    // A ventilation shaft from the linen room's forward wall to a grille over deck 8's forward corridor, at its true
+    // place and length on the ship (the user's remake, 2026-11-23: it had been a strip drawn shorter than its way, laid
+    // over the atrium, entered by a fade that turned her round). One picture with the linen room: she crawls from the
+    // laundry cart's rim into its mouth, facing forward as she pushed the cart, and the view goes with her. Behind the
+    // wall it slopes down into the slab between decks 9 and 8 and runs forward there; the ship round it is dark, as
+    // round a room, but under each grille in its floor, where deck 8 shows: what is really below (the midship lift
+    // hall, the atrium, the forward lift hall, the door with the party's balloons). The last grille gives way under
+    // her, and she drops into deck 8's forward corridor where the shaft ends.
+    // (The art: tools/build_shaft.py, `assets/ship/shaft/`; its places: the builder's `shaft_geometry()`, `data.duct`.)
 
     buildDuct() {
-        const s = this.scene, D = s.DEPTH, d = this.data.duct;
-        const W = d.x1 - d.x0, H = 60;
-        if (!s.textures.exists('room-duct')) {
-            const tex = s.textures.createCanvas('room-duct', W, H);
-            const ctx = tex.getContext();
-            const rect = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
-            rect(0, 0, W, H, '#1a141c');
-            // Its steel: a lit band along the top, a shadow along the floor, a flange at each joint
-            // with its rivets, a hanger up to the deck above at every other one.
-            rect(0, 12, W, 34, '#4a4458');
-            rect(0, 12, W, 2, '#7f708a');
-            rect(0, 14, W, 1, '#625565');
-            rect(0, 40, W, 6, '#3e3546');
-            rect(0, 44, W, 2, '#625565');
-            for (let x = 0, n = 0; x < W; x += 64, n++) {
-                rect(x, 12, 3, 34, '#3e3546');
-                rect(x + 3, 12, 1, 34, '#625565');
-                for (const y of [17, 27, 37]) rect(x + 1, y, 1, 1, '#9babb2');
-                if (n % 2) rect(x + 1, 0, 1, 12, '#3e3546');
+        const s = this.scene, D = s.DEPTH, d = this.data.duct, L = s.cache.json.get('shaft');
+        const base = D.exterior + 0.12;        // a room's picture; a room's things are at + 0.01 and up
+        // The dark round it: the ship dimmed as round a room, but for a cone of light under each grille, down to deck
+        // 8's floor. One canvas over the shaft's whole way, four panels beyond it; a shade over each cone, lifted while
+        // she is over its grille.
+        const far = 4000, pad = 320, cone = SHAFT.cone;
+        const X0 = d.x0 - pad, Y0 = d.upper - d.height - pad, W = d.x1 + pad - X0, H = d.dropY + 40 - Y0;
+        const coneKey = 'shaft-cone', top = d.lower + 2, ch = d.dropY + 10 - top;
+        if (!s.textures.exists(coneKey)) {
+            // (A cone's own picture: the dark's colour, strongest at its middle, soft at its sides and its foot.)
+            const tex = s.textures.createCanvas(coneKey, cone.foot, ch), ctx = tex.getContext();
+            const img = ctx.createImageData(cone.foot, ch);
+            for (let y = 0; y < ch; y++) {
+                const half = (cone.top + (cone.foot - cone.top) * y / ch) / 2;
+                for (let x = 0; x < cone.foot; x++) {
+                    const side = Phaser.Math.Clamp((half - Math.abs(x + 0.5 - cone.foot / 2)) / cone.soft, 0, 1);
+                    const foot = Phaser.Math.Clamp((ch - y) / cone.soft, 0, 1);
+                    const k = side * side * (3 - 2 * side) * foot, i = (y * cone.foot + x) * 4;
+                    img.data[i] = 0x0d; img.data[i + 1] = 0x0b; img.data[i + 2] = 0x14; img.data[i + 3] = Math.round(255 * k);
+                }
             }
-            // Dust along the floor, cobwebs in a few corners, and his paw prints going forward.
-            for (let x = 5; x < W; x += 11) rect(x + (x * 7) % 5, 43, 2, 1, '#7f708a');
-            ctx.strokeStyle = '#9babb2';
-            ctx.lineWidth = 1;
-            for (const x of [196.5, 452.5, 772.5, 1028.5]) {
-                ctx.beginPath();
-                ctx.moveTo(x, 14.5); ctx.lineTo(x + 9, 14.5);
-                ctx.moveTo(x, 14.5); ctx.lineTo(x, 23.5);
-                ctx.moveTo(x, 20.5); ctx.quadraticCurveTo(x + 4, 19.5, x + 6, 14.5);
-                ctx.moveTo(x, 17.5); ctx.quadraticCurveTo(x + 2, 17, x + 3, 14.5);
-                ctx.stroke();
-            }
-            for (let x = W - 40, n = 0; x > 90; x -= 21, n++) {
-                const y = n % 2 ? 42 : 40;
-                rect(x, y, 3, 2, '#2e222f');
-                rect(x - 1, y - 1, 1, 1, '#2e222f');
-                rect(x + 1, y - 2, 1, 1, '#2e222f');
-                rect(x + 3, y - 1, 1, 1, '#2e222f');
-            }
-            // A branch going up, with a fan in it (too small for her; a draught).
-            rect(672, 0, 30, 13, '#4a4458');
-            rect(672, 0, 1, 13, '#3e3546');
-            rect(701, 0, 1, 13, '#3e3546');
-            rect(676, 3, 22, 2, '#2e222f');
-            rect(676, 7, 22, 2, '#2e222f');
-            // Grilles in its floor, the light of what is below coming up through them.
-            const light = { lobby: '#fff1c9', dome: '#8fd3ff', balloons: '#f68181', snore: '#b9a98a', exit: '#fff1c9' };
-            for (const g of [...d.grilles, { x: d.exitX, what: 'exit' }]) {
-                const x = g.x - d.x0;
-                rect(x - 15, 43, 30, 4, '#2e222f');
-                rect(x - 14, 44, 28, 3, light[g.what]);
-                ctx.globalAlpha = 0.22;
-                ctx.fillStyle = light[g.what];
-                ctx.beginPath();
-                ctx.moveTo(x - 13, 44); ctx.lineTo(x + 13, 44); ctx.lineTo(x + 9, 14); ctx.lineTo(x - 9, 14);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-                for (let k = -12; k < 14; k += 5) rect(x + k, 44, 1, 3, '#2e222f');
-            }
+            ctx.putImageData(img, 0, 0);
             tex.refresh();
         }
-        const img = s.add.image(d.x0, d.floor - 46, 'room-duct').setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
-        const dim = s.roomDim(img);
-        this.add([dim, img]);
-        const room = { route: 'duct', door: -9999, floor: d.floor, room: img, dim, inDeck: true, doors: [] };
-        s.rooms.push(room);
-        this.ductFloor = s.add.zone(d.x0, d.floor, W, 16).setOrigin(0);
-        s.physics.add.existing(this.ductFloor, true);
-        s.addRouteWall(d.x0 + 24, -1, d.floor, 'duct');
-        s.addRouteWall(d.x1 - 24, 1, d.floor, 'duct');
-        // What is under each grille (tools/draw_rooms.py `peeks`): a framed look down, shown while
-        // she is over it; and what comes up through it.
-        this.peeks = d.grilles.filter(g => s.textures.exists(`peek-${g.what}`)).map(g => {
-            const frame = s.add.rectangle(g.x, d.floor + 20, 68, 48, 0x2e222f).setOrigin(0.5, 0).setDepth(D.exterior + 0.124);
-            const pic = s.add.image(g.x, d.floor + 22, `peek-${g.what}`).setOrigin(0.5, 0).setDepth(D.exterior + 0.125);
-            const beam = s.add.triangle(0, 0, g.x - 13, d.floor + 1, g.x + 13, d.floor + 1, g.x, d.floor + 20, 0xfff1c9, 0.35)
-                .setOrigin(0).setDepth(D.exterior + 0.123);
-            const items = [frame, pic, beam];
-            items.forEach(i => i.setAlpha(0));
-            this.add(items);
-            return { ...g, items, shown: 0 };
+        if (!s.textures.exists('shaft-dark')) {
+            const tex = s.textures.createCanvas('shaft-dark', W, H), ctx = tex.getContext();
+            ctx.fillStyle = `rgba(13, 11, 20, ${SHAFT.dim})`;
+            ctx.fillRect(0, 0, W, H);
+            ctx.globalCompositeOperation = 'destination-out';
+            const c = s.textures.get(coneKey).getSourceImage();
+            for (const g of [...d.grilles, { x: d.exitX }]) ctx.drawImage(c, g.x - cone.foot / 2 - X0, top - Y0);
+            ctx.globalCompositeOperation = 'source-over';
+            tex.refresh();
+        }
+        const dark = s.add.container(0, 0).setDepth(base - 0.008).setAlpha(0).setVisible(false);
+        const panel = (x, y, w, h) => s.add.rectangle(x, y, w, h, 0x0d0b14, SHAFT.dim).setOrigin(0);
+        dark.add([s.add.image(X0, Y0, 'shaft-dark').setOrigin(0),
+            panel(X0 - far, Y0 - far, W + 2 * far, far), panel(X0 - far, Y0 + H, W + 2 * far, far),
+            panel(X0 - far, Y0, far, H), panel(X0 + W, Y0, far, H)]);
+        this.cones = [...d.grilles, { x: d.exitX, what: 'exit' }].map(g => {
+            const shade = s.add.image(g.x - cone.foot / 2, top, coneKey).setOrigin(0).setAlpha(SHAFT.dim);
+            dark.add(shade);
+            return { ...g, shade, lit: 0 };
         });
-        // The fan in the branch: two blades turning.
-        this.ductFan = s.add.rectangle(d.x0 + 687, d.floor - 40, 20, 2, 0x9babb2).setDepth(D.exterior + 0.125).setVisible(false);
-        // His eyes in the dark ahead of her (the first time through): two green points that keep
-        // their distance, and are gone at the far grille.
-        this.ductEyes = s.add.graphics().setDepth(D.exterior + 0.126).setVisible(false);
+        // The shaft itself, cut open: its inside behind her, the near halves of its joints in front of her.
+        const strip = s.add.image(L.strip[0], L.strip[1], 'shaft-strip').setOrigin(0).setDepth(base + 0.002).setAlpha(0).setVisible(false);
+        const front = s.add.image(L.strip[0], L.strip[1], 'shaft-front').setOrigin(0).setDepth(D.player + 0.05).setAlpha(0).setVisible(false);
+        // Its mouth in the linen room, closed along its near side while she is not in it; the cover on its end until
+        // Bumbot knocks it off (near-catch 4, src/world/story.js), then leaning by the wall under it.
+        const mouth = s.add.image(L.mouth[0], L.mouth[1], 'shaft-mouth').setOrigin(0).setDepth(base + 0.004);
+        const cover = s.add.image(L.cover[0], L.cover[1], 'shaft-cover').setOrigin(0).setDepth(base + 0.006);
+        const down = s.add.image(L.coverDown[0], L.coverDown[1], 'shaft-cover-down').setOrigin(0).setDepth(base + 0.006);
+        this.add([dark, strip, front, mouth, cover, down]);
+        this.things.push({ id: 'shaft_mouth', x: L.mouth[0], y: d.upper, route: 'linen', items: [mouth] });
+        this.things.push({ id: 'vent_cover', x: L.cover[0], y: d.upper, route: 'linen', items: [cover], until: 'flag:bb4' });
+        this.things.push({ id: 'vent_cover_down', x: L.coverDown[0], y: L.coverDown[1], route: 'linen', items: [down], after: 'flag:bb4' });
+        this.shaft = { dark, strip, front, mouth, cover, down, shown: 0, look: 0 };
+        // Her slide down the slope: one clip of her made on the shaft's own picture (tools/build_shaft.py `--slide`,
+        // assets/source/her/shaft-slide/), played where it was made: from her crawl at the slope's lip to her crawl at
+        // its foot.
+        if (L.slide && s.textures.exists('shaft-slide')) {
+            if (!s.anims.exists('shaft-slide')) {
+                s.anims.create({ key: 'shaft-slide', frames: s.anims.generateFrameNames('shaft-slide', { start: 0, end: L.slide.n - 1 }), frameRate: L.slide.fps });
+            }
+            this.shaft.slide = s.add.sprite(L.slide.x, L.slide.y, 'shaft-slide', '0').setOrigin(0).setDepth(D.player).setVisible(false);
+            this.add([this.shaft.slide]);
+        }
+        // (For the ship scene the shaft is a room in the deck's own place: the deck stays cut open. Its pictures are
+        // shown and faded here, not by the scene.)
+        const none = { setVisible() {} };
+        s.rooms.push({ route: 'duct', door: -9999, floor: d.lower, room: none, dim: none, inDeck: true, doors: [] });
+        // Her floor: the mouth's and the parked cart's rim, level; the run's, down the slope. Its two ends.
+        const zone = (x0, x1, y) => { const z = s.add.zone(x0, y, x1 - x0, 16).setOrigin(0); s.physics.add.existing(z, true); return z; };
+        this.ductFloors = [zone(d.slopeTop, d.x1, d.upper), zone(d.x0, d.slopeFoot, d.lower)];
+        this.ductFloor = this.ductFloors[1];         // (a loose tangerine's floor: `LooseTangerines`)
+        s.addRouteWall(d.x0 + 22, -1, d.lower, 'duct');
+        s.addRouteWall(d.x1 - 4, 1, d.upper, 'duct');
+        s.addRouteWall(d.slopeFoot + 2, 1, d.lower, 'duct');       // (the slope's foot: no way back up it)
+        // His eyes in the dark ahead of her (the first time through): two green points that keep their distance,
+        // and are gone at the last grille, which claps shut behind him.
+        this.ductEyes = s.add.graphics().setDepth(base + 0.003).setVisible(false);
         this.ductEyes.fillStyle(0xb9e04c, 1).fillRect(-4, -1, 2, 2).fillRect(2, -1, 2, 2);
         this.ductEyes.fillStyle(0xffffff, 1).fillRect(-4, -1, 1, 1).fillRect(2, -1, 1, 1);
-        this.add([this.ductFan, this.ductEyes]);
+        this.add([this.ductEyes]);
     }
 
-    // The linen room's laundry cart, once it stands under the vent; and whether she is on it.
+    // The linen room's laundry cart, once it stands at the shaft's mouth; and whether she is on it.
     onLinenCart() {
         const s = this.scene, p = s.player, cart = this.pushables.find(t => t.id === 'cart_linen');
-        if (!cart || s.route !== 'linen' || cart.x < cart.max) return null;
+        if (!cart || (s.route !== 'linen' && s.route !== 'duct') || cart.x !== cart.goal) return null;
         const onFloor = p.body.blocked.down || p.body.touching.down;
         return onFloor && Math.abs(p.x - cart.x) < 18 && Math.abs(p.y - (cart.y - cart.rim)) < 4 ? cart : null;
     }
 
-    updateDuct(input, time) {
-        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress;
+    updateDuct(input, time, dt) {
+        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress, sh = this.shaft;
         const inDuct = s.route === 'duct';
-        // (The duct runs where the atrium's walk is: its glass railing, drawn in front of her, hides.)
         if (inDuct !== this.wasInDuct) {
             this.wasInDuct = inDuct;
+            // (Deck 9's side walk across the atrium has its glass railing drawn in front of her: not over the shaft.)
             for (const f of s.deckFronts ?? []) f.gfx.setVisible(!inDuct);
+            // (The linen room's own things stay in view from the shaft: the cart she came off, the cover on the floor.)
+            this.peek = inDuct ? 'linen' : this.peek === 'linen' ? null : this.peek;
+            this.refresh();
+            // (From the linen room, and back into it, the dark round the room is the dark round the shaft: no moment
+            // without either. Only out of its far end does it lift slowly.)
+            sh.viaRoom = inDuct || s.route === 'linen';
+            if (sh.viaRoom) sh.dark.setAlpha(inDuct ? 1 : 0);
         }
-        // The fan, the peeks, his eyes.
-        this.ductFan.setVisible(inDuct);
-        if (inDuct) this.ductFan.setAngle((time / 3) % 360);
-        for (const k of this.peeks) {
-            const want = inDuct && Math.abs(p.x - k.x) < 34 ? 1 : 0;
-            if (want !== k.shown) {
-                k.shown = want;
-                s.tweens.add({ targets: k.items, alpha: want, duration: 260 });
-                if (want && k.what === 'balloons') sfx.at(k.x, d.floor).toot();
-            }
-            // (The sleeper under the grille snores on for as long as she looks down at him.)
-            if (k.shown && k.what === 'snore' && time > (k.snoreAt ?? 0)) {
-                k.snoreAt = time + 2600;
-                sfx.at(k.x, d.floor).snore();
-            }
+        // The shaft's pictures come and go with her (no cut: she crawls in, and drops out of its end), the deck below
+        // opens under it, and the view looks a little down, at what the grilles show.
+        const was = sh.shown;
+        sh.shown = approach(sh.shown, inDuct ? 1 : 0, dt * 1000 / SHAFT.fadeMs);
+        if (sh.shown !== was || inDuct) {
+            const on = sh.shown > 0 && !sh.away;
+            if (!sh.viaRoom) sh.dark.setAlpha(sh.shown);
+            sh.dark.setVisible(on && sh.dark.alpha > 0);
+            sh.strip.setVisible(on).setAlpha(sh.shown);
+            sh.front.setVisible(on).setAlpha(sh.shown);
+            sh.mouth.setAlpha(1 - sh.shown);
+            const open = this.lookOpen ??= {};
+            if (inDuct) open[d.dropDeck] = sh.shown;
+            else delete open[d.dropDeck];
+            const cam = s.cameras.main;
+            if (cam._follow === p) cam.setFollowOffset(0, PLAYER.height / 2 - SHAFT.look * (inDuct ? sh.shown : 0));
+        }
+        for (const c of this.cones) {
+            // (Far from her a grille's light is faint; over it, what is below shows clear.)
+            const want = !inDuct ? 0 : Math.abs(p.x - c.x) < SHAFT.over ? 1 : SHAFT.faint;
+            c.lit = approach(c.lit, want, dt * 3);
+            c.shade.setAlpha(SHAFT.dim * (1 - c.lit));
         }
         const eyes = this.ductEyes;
-        if (inDuct && !P.has('duct') && !this.eyesGone) {
+        if (inDuct && !P.has('duct') && !this.eyesGone && p.x < d.slopeFoot) {
             this.eyesX = Math.min(this.eyesX ?? p.x - 170, p.x - 150);
             if (this.eyesX <= d.exitX + 6) {
                 this.eyesGone = true;
                 eyes.setVisible(false);
-                sfx.at(this.eyesX, d.floor).mrrp();
+                sfx.at(d.exitX, d.lower).rattle();
+                sfx.at(d.exitX, d.lower).mrrp();
             } else {
-                eyes.setVisible(Math.floor(time / 2600) % 5 !== 4 || (time % 2600) > 160).setPosition(this.eyesX, d.floor - 9);
+                eyes.setVisible(Math.floor(time / 2600) % 5 !== 4 || (time % 2600) > 160).setPosition(this.eyesX, d.lower - 9);
             }
         } else {
             eyes.setVisible(false);
         }
+        // (The party's beat comes up through its grille: src/world/story.js `party`.)
+        if (inDuct) this.story.party?.(time, true);
         if (s.mode !== 'play') return;
-        // In: on the laundry cart under the vent, down on hands and knees. Out: back the same way,
-        // or down through the far grille. (A key held through a way in or out would carry her
-        // straight back: it must be let go once.)
-        if (!input.right) this.ductLatch = false;
-        if (!input.down) this.ventLatch = false;
         const cart = this.onLinenCart();
-        if (cart && s.crawling && !this.ventLatch) {
-            this.ductLatch = this.ventLatch = true;
-            s.travel(d.x1 - 60, d.floor, 'duct', () => p.setFlipX(true));
-        } else if (inDuct && input.right && !this.ductLatch && p.x >= d.x1 - 44) {
-            this.ductLatch = this.ventLatch = true;
-            const back = this.pushables.find(t => t.id === 'cart_linen'), linen = this.rooms.linen;
-            s.travel(back.x, linen.floor - back.rim - 1, 'linen', () => p.setFlipX(true));
-        } else if (inDuct && input.downPressed && Math.abs(p.x - d.exitX) < 30) {
-            sfx.clang();
-            s.travel(d.dropX, d.floor + 30, 'inside', () => P.setFlag('duct'));
+        if (s.route === 'linen') {
+            // In: on hands and knees on the laundry cart's rim at the mouth, on forward into it. The room's wall is
+            // the shaft's now; nothing is cut, she just crawls on.
+            if (cart && s.crawling && P.has('bb4') && input.left && p.x <= d.mouthX + SHAFT.reach) {
+                s.route = 'duct';
+                p.setFlipX(true);
+            }
+            return;
         }
+        if (!inDuct) return;
+        if (p.y <= d.upper + 2 && p.x > d.mouthX + SHAFT.reach + 8 && cart) {
+            // Out again, back onto the cart, the way she came.
+            s.route = 'linen';
+        } else if (p.y <= d.upper + 2 && p.x <= d.slopeTop + SHAFT.lip) {
+            this.shaftSlide();
+        } else if (p.y >= d.lower - 2 && Math.abs(p.x - d.exitX) < SHAFT.trap) {
+            this.shaftDrop();
+        }
+    }
+
+    // The ship's outside view (O) and the views from afar show every deck closed: the shaft's pictures and its dark are
+    // put away for them (the ship scene's cut-away says so each frame, as it does for the rooms; this world's own
+    // update does not run there).
+    shaftAway(away) {
+        const sh = this.shaft;
+        if (!sh || sh.away === away) return;
+        sh.away = away;
+        const on = sh.shown > 0 && !away;
+        sh.dark.setVisible(on && sh.dark.alpha > 0);
+        sh.strip.setVisible(on);
+        sh.front.setVisible(on);
+        this.ductEyes.setVisible(false);
+    }
+
+    // Behind the linen room's wall the shaft slopes down into the slab between the decks: over its lip she slides
+    // down it on her front, and is on her hands and knees again at its foot.
+    shaftSlide() {
+        const s = this.scene, p = s.player, d = this.data.duct;
+        s.mode = 'scripted';
+        s.script = null;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.setFlipX(true);
+        // (Her own picture gives way to the clip's, which has her from the lip to the foot; she herself goes down the
+        // slope's line unseen, for the view to go with her.)
+        const sl = this.shaft.slide, L = s.cache.json.get('shaft').slide;
+        const ms = sl ? L.n / L.fps * 1000 : SHAFT.slideMs;
+        if (sl) {
+            p.setVisible(false);
+            sl.setVisible(true).play('shaft-slide');
+        } else p.anims.pause();
+        sfx.at(p.x, p.y).slide();
+        const to = { x: d.slopeFoot - SHAFT.land, y: d.lower };
+        const from = { x: p.x, y: p.y }, k = { v: 0 };
+        s.tweens.add({ targets: k, v: 1, duration: ms, ease: 'Sine.easeInOut',
+            onUpdate: () => {
+                // (Along the lip, then the slope's own line, then out along the run.)
+                const x = Phaser.Math.Linear(from.x, to.x, k.v);
+                const t = Phaser.Math.Clamp((d.slopeTop - x) / (d.slopeTop - d.slopeFoot), 0, 1);
+                p.setPosition(x, Phaser.Math.Linear(d.upper, d.lower, t));
+            },
+            onComplete: () => {
+                sl?.setVisible(false);
+                p.setVisible(true);
+                p.body.enable = true;
+                p.body.reset(to.x, to.y);
+                s.takeoffY = to.y;
+                // (On hands and knees again, in the pose the clip ends on.)
+                if (s.anims.exists('her-crawl')) {
+                    p.anims.play('her-crawl', true);
+                    p.anims.pause(p.anims.currentAnim.frames[L?.endsOn ?? 0]);
+                }
+                sfx.at(to.x, to.y).land('duct');
+                s.mode = 'play';
+            } });
+    }
+
+    // The last grille, over deck 8's forward corridor: sprung shut behind Bumbot, it gives way under her. She drops
+    // out of the shaft's floor feet first, the corridor's ceiling cutting her off above it, and lands where the shaft
+    // ends: no cut, the dark round the shaft lifting as she falls.
+    shaftDrop() {
+        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress;
+        const first = !P.has('duct');
+        this.cut(async () => {
+            p.body.enable = false;
+            p.setPosition(d.exitX, d.lower);
+            s.poseCrawl(0);
+            if (first) {
+                // (It holds a moment: a creak, a sag under her hands.)
+                p.anims.pause();
+                sfx.at(d.exitX, d.lower).creak();
+                rumble('bolt');
+                for (const dy of [1, 0, 1, 2]) { p.y = d.lower + dy; await this.wait(110); }
+                sfx.at(d.exitX, d.lower).clang();
+                P.setFlag('duct');
+            }
+            // Down through the opening: on deck 8 from here on, its side open as she falls.
+            s.setCrawl(false);
+            s.crawling = false;
+            s.route = 'inside';
+            // (The deck she drops into, open from the first moment of the fall and held so until she lands: by her
+            // height alone the cut-away would stay with deck 9 for the first half of it.)
+            s.viewDeck = s.viewOverride = d.dropDeck;
+            s.pose('fall');
+            p.setFlipX(true);
+            const ceiling = d.lower + 2, cell = PLAYER.cell;
+            const crop = () => {
+                // (Her picture's rows above the ceiling's line are in the shaft still: not drawn over the corridor.)
+                const hidden = Phaser.Math.Clamp(ceiling - (p.y + PLAYER.sink - cell), 0, cell);
+                p.setCrop(0, hidden, cell, cell - hidden);
+            };
+            p.setPosition(d.exitX, ceiling + SHAFT.out);
+            crop();
+            const fall = d.dropY - p.y;
+            await this.tween({ targets: p, y: d.dropY, duration: Math.sqrt(2 * fall / PLAYER.gravity) * 1000, ease: 'Quad.easeIn', onUpdate: crop });
+            p.setCrop();
+            s.viewOverride = null;
+            p.body.enable = true;
+            p.body.reset(d.exitX, d.dropY);
+            s.takeoffY = d.dropY;
+            s.grounded = false;
+            sfx.at(d.exitX, d.dropY).land('carpet');
+        });
     }
 
     // --- Things in place ------------------------------------------------------------------------
@@ -1338,7 +1450,8 @@ export class World {
                 const img = this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
                 this.add([img]);
                 const done = () => !e.flag || this.progress.has(e.flag);
-                const x = done() ? e.max : e.x;
+                const goal = e.goal ?? e.max;       // (the end it is pushed to: the linen room's rolls forward, to its `min`)
+                const x = done() ? goal : e.x;
                 // (`tall`: jammed in a doorway, it fills it until it is free; "top": it stands by the
                 // wall, she walks past it, and only its rim holds her when she jumps onto it; "rim": in her way, solid, she
                 // stands on its rim, the linen room's laundry cart.)
@@ -1351,10 +1464,10 @@ export class World {
                 // way: the steward's trolley, the user, 2026-11-17.)
                 const aside = () => { zone.body.enable = false; img.setDepth(D.decor + 0.11); };
                 if (e.tall === true && done()) aside();
-                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, sides: e.sides ?? 0, top, block, rim,
+                const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, goal, sides: e.sides ?? 0, top, block, rim,
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
-                        if (to >= e.max && e.flag && !this.progress.has(e.flag)) {
+                        if (to === goal && e.flag && !this.progress.has(e.flag)) {
                             // Free of the doorway: it stands in the corridor, low enough to hop; a
                             // tall one stands back against the wall.
                             zone.setSize(img.width - 4, rim);
@@ -2323,7 +2436,7 @@ export class World {
             s.route = p.y <= L.y1 + 2 ? L.routeTop : L.routeBottom;
             this.onLadder = null;
         }
-        this.updateDuct(input, time);
+        this.updateDuct(input, time, dt);
         this.updateSpecials(time);
         if (s.route !== this.lastRoute) this.refresh();
         this.people.update(dt, time);
@@ -2526,7 +2639,7 @@ export class World {
                 && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
         s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);
-        s.physics.add.collider(p, this.ductFloor, null, () => s.route === 'duct');
+        for (const z of this.ductFloors) s.physics.add.collider(p, z, null, () => s.route === 'duct');
         for (const t of this.pushables) {
             s.physics.add.collider(p, t.zone, null, () => t.route === s.route
                 && (!t.top || (t.block && s.pushing !== t) || (p.body.velocity.y >= 0 && p.body.bottom <= t.zone.body.top + 10 && s.pushing !== t)));

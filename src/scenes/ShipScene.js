@@ -53,7 +53,7 @@ const CABIN = { width: 240, doorX: 59, height: 128, stop: 20, bed: [138, 236], b
                 towel: [28, 79], slide: 18 };     // her towel hung on its handle; how far the door slides open
 // The linen room's drawing (tools/draw_linen.py), the same way; and the heap of towels (its middle
 // and its top over the floor, from the room's left edge), and the vent (its opening's ends).
-const LINEN = { width: 240, doorX: 59, height: 128, stop: 20, heap: [150, 6], vent: [222, 236] };
+const LINEN = { width: 240, doorX: 180, height: 128, stop: 20 };
 // The Chapel's drawing (tools/draw_chapel.py, deck 12), the same way.
 const CHAPEL = { width: 312, doorX: 59, height: 128, stop: 20 };
 const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
@@ -1175,7 +1175,8 @@ export class ShipScene extends Phaser.Scene {
         const room = this.add.image(x0, o.y - LINEN.height, 'linen-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(room);
         this.worldLayer.add([door, plate, dim, room]);
-        const linen = { route: 'linen', door: o.x, floor: o.y, room, dim, inDeck: true };
+        // (`also`: the room stays in view from the shaft that opens off it, one picture with it: src/world/world.js.)
+        const linen = { route: 'linen', also: 'duct', door: o.x, floor: o.y, room, dim, inDeck: true };
         this.rooms.push(linen);
         // Its crew door shut until she has the Housekeeping card (§6.1.5).
         const shut = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.01).setVisible(false);
@@ -3725,6 +3726,8 @@ export class ShipScene extends Phaser.Scene {
         else if (!inDeck || outdoors || this.overview || this.fromAfar || p.y <= this.world.roofY + 2) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
+        // (In the shaft, in the slab between two decks: the deck it sets out from, the one below opened by `world.lookOpen`.)
+        else if (this.route === 'duct') target = this.world.data.duct.deck;
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell
         else if (this.mode === 'play' && !(p.body.blocked.down || p.body.touching.down)) target = this.viewDeck;  // in the air
         // (And falling from a scare in the air, as she was: the decks she drops past stay closed; cut open
@@ -3773,10 +3776,11 @@ export class ShipScene extends Phaser.Scene {
         // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
         this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);
         for (const r of this.rooms) {
-            r.room.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
+            r.room.setVisible((this.route === r.route || this.route === r.also) && !this.overview && !this.fromAfar);
             r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
             r.front?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
         }
+        this.world?.shaftAway?.(!!this.overview || !!this.fromAfar);
         // Inside a boat (the lifeboat, a room entered from outside), the boat's own picture and its hatch, drawn in
         // front of her outside, are not drawn over its inside (the user, 2026-11-21: "the inside of the boat is now
         // not shown").
