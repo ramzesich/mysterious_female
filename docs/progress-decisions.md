@@ -4273,3 +4273,24 @@ valuable."
   Atrium Café's table in book 1's old place.
 - **Cost:** about 45 generations (his gestures 23, hers about 15, the photo 7). Tests: `boot`, `region6`, `region9` pass;
   `tools/check_overlaps.py` 0. Not run: the rest.
+
+## The Great Outdoors refined (the user, 2026-11-23)
+
+- **Her hop with a load** ("the ice cream is just hanging in the air"): her sheet's `carry-rise`, `carry-apex`,
+  `carry-fall`, her own jump's poses with her carrying arms ("that doesn't look like a jump at all" of a hop with straight
+  legs), the load by her fists in each (`HOP_HOLDS` in `src/world/carry.js`); height and timing unchanged.
+  `assets/source/her/carry-jump/README.md`.
+- **The machine:** she steps to its side (the side she came from, `SWIRL.aside` 18 px) and faces the cone filling.
+- **The gull** (`gull_go`): no shadow; its hover 600 ms (950 before; the pool's gulls too); its perch 210.9 m, away from
+  the machine; with her cone it flies off the screen, stays away 5 s and flies back, each leg placed by the time since it
+  began (`FLIGHT` in `src/world/hazards.js`): the birds are updated only while she is near, and one left mid-flight had
+  stayed in the air.
+- **Feeding him every time** while he is at his table (his book the first time only); a cone she eats herself
+  (`sec_cone`) only from the catch to the day after; `region6` checks a second meal, no second book.
+- **The kiss** (E with her hands empty once he has been fed; before, his wave and his bubble): he stands facing us (his
+  front view; his chair's near arm and far leg hidden: the people's `coverPics`), she steps up 6 px to his right with
+  her back to us, they embrace (his `embrace`, hers, his near hand drawn over her: `hug-hand-*`; her forearms behind her
+  hair: "She is hugging herself, not him"), seven hearts, the embrace backwards, he sits; she faces the way she was going.
+  `assets/source/her/embrace/README.md`, `assets/source/people/husband-raw/README.md`.
+- **Cost:** about 13 generations (her hop 8.4, the embrace 4.2). Tests: `boot`, `region6`, `region8`, `region9` pass. Not
+  run: the rest.

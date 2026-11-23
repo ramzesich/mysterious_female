@@ -23,6 +23,7 @@ olive, his skin pink, his eye red).
 | `eat-cone/still-s1.png` | **Used**: `edit_image_pro_flash` of his seated frame (`sit-idle-2/east/2`): a soft serve in his near hand at his mouth. Its cone's pixels are hers too at the table (`assets/source/her/sit-cone/bake.py`) | `a92b3d81-8a2a-46b7-937e-a4861fbf64b8` (seed 1) | 5 |
 | `eat-cone/still-s7.png` | The other seed: its orange top read as a torch. Not used | `e5d86be0-da35-4588-b28b-98e2231c3ba6` (seed 7) | 5 |
 | `eat-cone/e1/` | **Used**, `eat` (the table scene, looped): PixMiniMax from `still-s1`, the cone to his mouth and a lick, his head dipping to meet it | `27f6965d-28ad-40b8-b80c-a01c7bc30ef2` | 1 |
+| `embrace/` | **Used**, `embrace` (the kiss, once he has been fed): his front view with the bear (`../hud/husband/short/south-bear.png`, 96 px canvas) moved into his arms round her waist, played backwards to let go; `hand.py` cuts his near hand (skin and its outline at his waist) into `assets/sprites/hug-hand-1.png`, `-2.png`, laid out as the sheet places his frame, drawn over her | `animate_with_skeleton_v3`, job `0e950cd5-517b-4e87-a3f8-fe95dc14516b` | 2 |
 | `standin/` | The stand-in he replaces: the linen-shirted diner's character `89dfbeac-8d4c-4a89-a578-8dbc95ba16fc`, in his own chair | | |
 
 `make.py` writes `out/` (not kept in the repo): every clip gets the idle's legs and loses its far leg; the idle keeps one

@@ -12,7 +12,10 @@ import { soakRide, runFrame } from './movers.js';
 
 const M = 48;
 // The swirl: how long a full one takes (ms), and where it is a stub, perfect, or too much.
-const SWIRL = { ms: 2400, none: 0.14, perfect: 0.58, over: 0.84, max: 1.08 };
+// (`aside`: px from the spout she stands at while it fills, to one side, so the cone shows: the user, 2026-11-23.)
+const SWIRL = { ms: 2400, none: 0.14, perfect: 0.58, over: 0.84, max: 1.08, aside: 18 };
+// The kiss at his table: her place from his middle (px), how many hearts, ms between them.
+const KISS = { dx: 6, hearts: 7, every: 450 };
 const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000, fruit: 15000 };
 
 export const lido = {
@@ -593,15 +596,25 @@ export const lido = {
             if (h) w.nudge(h);
             return true;
         }
-        // The swirl: hers to time.
+        // The swirl: hers to time. She steps to the machine's side (the side she came from), clear of its spout, and faces
+        // the cone filling under it (the user, 2026-11-23: in front of it she hid the cone).
         s.mode = 'scripted';
         s.script = null;
         her.body.setVelocity(0, 0);
-        her.setFlipX(L.machineX + 3 < her.x);
-        if (s.anims.exists('her-push')) {
-            her.anims.play('her-push');
-            her.anims.pause();
-        } else s.pose('stand');
+        const spout = L.machineX + 3, side = her.x < spout ? -1 : 1, stand = spout + side * SWIRL.aside;
+        her.setFlipX(stand > spout);
+        const face = () => {
+            her.setFlipX(stand > spout);
+            if (s.anims.exists('her-push')) {
+                her.anims.play('her-push');
+                her.anims.pause();
+            } else s.pose('stand');
+        };
+        if (Math.abs(her.x - stand) > 1) {
+            s.pose('run', 0.6);
+            her.setFlipX(stand < her.x);
+            s.tweens.add({ targets: her, x: stand, duration: Math.abs(stand - her.x) * 9 + 40, onComplete: face });
+        } else face();
         this.swirl = { k: 0 };
         return true;
     },
@@ -659,8 +672,9 @@ export const lido = {
         this.lastSwirl = kind;
         if (kind === 'toppled') return this.toppled(cx, cy);
         if (kind === 'cone') sfx.done();
-        // With every errand done, it is hers: she eats it where she stands (population: `sec_cone`).
-        if (this.P.has('table')) return this.forHerself(kind);
+        // With every errand done and him away from his table (from the catch to the day after), it is hers: she eats it
+        // where she stands (population: `sec_cone`). While he is at his table every cone can be his (the user, 2026-11-23).
+        if (this.P.has('table') && this.P.has('catch') && !this.P.has('home')) return this.forHerself(kind);
         this.world.carryBox.take(kind);
     },
 
@@ -708,16 +722,25 @@ export const lido = {
         const h = this.near('npc_husband', 50), w = this.world, s = this.scene, P = this.P;
         if (!h) return false;
         const kind = w.carry?.kind;
-        if (P.has('table')) {
-            if (w.carry) return false;
-            this.people.play(h, 'wave');
-            return true;
-        }
+        // A perfect cone: she sits down with him, every time while he is at his table (the user, 2026-11-23: "Feeding the
+        // husband should work every time"); his book only the first time.
         if (kind === 'cone' && P.has('refilled')) {
             this.tableScene(h);
             return true;
         }
+        if (P.has('table')) {
+            if (!w.carry) {
+                this.kiss(h);
+                return true;
+            }
+            if (kind !== 'stub') return false;
+            this.people.play(h, 'laugh');
+            sfx.at(h.x, h.y).laugh();
+            return true;
+        }
         if (w.carry && kind !== 'stub' && kind !== 'cone') return false;
+        // Not fed yet, her hands empty: he waves (the user, 2026-11-23), and his bubble shows what he wants.
+        if (!w.carry) this.people.play(h, 'wave');
         // Not yet, or not that one: he shows again what is wanted (once the machine has run empty).
         if (kind === 'stub' && P.has('refilled')) {
             this.people.play(h, 'laugh');
@@ -725,6 +748,59 @@ export const lido = {
         }
         w.nudge(h);
         return true;
+    },
+
+    // Once he has been fed, E with her hands empty (the user, 2026-11-23): he stands up from his chair facing us (his front
+    // view; the chair's near arm and his far leg away meanwhile), she steps up a few px to his right with her back to us,
+    // in front of him, and they kiss: hearts rise, more than at the meal; he sits back down, and she is hers again,
+    // facing the way she was going.
+    kiss(h) {
+        const s = this.scene, w = this.world, L = this.L, her = s.player, P = this.people;
+        const facing = her.flipX;
+        w.cut(async () => {
+            h.state = 'acting';
+            h.sprite.anims.stop();
+            h.sprite.setFrame(h.meta.front ?? h.meta.stand).setFlipX(false);
+            h.underPic?.setVisible(false);
+            h.coverPics.forEach(c => c.setVisible(false));
+            const spot = Math.round(h.x) + KISS.dx;
+            s.pose('run', 0.6);
+            her.setFlipX(spot < her.x);
+            her.body.enable = false;
+            await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 11 + 60 });
+            s.pose('back');
+            // The embrace: her arms up round his neck, his round her, his near hand on her back (drawn over her).
+            const hug = h.meta.anims.embrace && s.anims.exists('her-embrace');
+            let hand = null;
+            if (hug) {
+                her.anims.play('her-embrace');
+                await P.play(h, 'embrace', { stay: true });
+                hand = s.add.image(h.sprite.x, h.sprite.y, 'hug-hand-2').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.02);
+                w.add([hand]);
+            }
+            for (let i = 0; i < KISS.hearts; i++) {
+                await w.wait(KISS.every);
+                const heart = s.add.text(spot - 3 + (i % 3) * 3, L.y - 66, '♥', { fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: '#e83b3b', resolution: 4 })
+                    .setOrigin(0.5).setDepth(s.DEPTH.fx);
+                w.add([heart]);
+                sfx.heart();
+                s.tweens.add({ targets: heart, y: heart.y - 26, x: heart.x + (i % 2 ? 4 : -4), alpha: 0, duration: 1200, onComplete: () => heart.destroy() });
+            }
+            await w.wait(700);
+            if (hug) {
+                hand.destroy();
+                her.anims.playReverse('her-embrace');
+                h.sprite.anims.playReverse(`people-${h.who}-embrace`);
+                await w.wait(420);
+            }
+            h.underPic?.setVisible(true);
+            h.coverPics.forEach(c => c.setVisible(true));
+            P.idle(h);
+            her.setFlipX(facing);
+            s.pose('stand');
+            her.body.enable = true;
+            her.body.reset(her.x, L.y);
+        });
     },
 
     // A proper cone of her own, and she sits down with him: they eat, looking at the wake; the
@@ -774,7 +850,8 @@ export const lido = {
             sfx.done();
             await w.wait(700);
             this.people.idle(h);
-            await w.handOver(h, '@book-1', () => w.giveBook(1));
+            // (His book the first time only.)
+            if (!this.P.save.books?.['1']) await w.handOver(h, '@book-1', () => w.giveBook(1));
             if (sat) {
                 her.anims.play('her-sit-up');
                 await new Promise(r => her.once('animationcomplete', r));

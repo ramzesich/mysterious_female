@@ -805,7 +805,9 @@ WETS = {"haz_wet": (11, 150.9, 152.9, 153.0)}
 # Gulls that dive at food carried in the open (`gull_pool`, `gull_go`): id: (deck, from m, to m,
 # how many, where they wait: "circle" overhead or a perch (m, px up), the flag that keeps them off).
 FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
-             "gull_go": (11, 210.6, 219.2, 1, (213.9, 46), None)}
+             # (The Great Outdoors' on the rail's forward end, over the café's menu board: at 213.9 m it sat by the
+             # soft serve machine, "make it less obvious", the user, 2026-11-23.)
+             "gull_go": (11, 210.6, 219.2, 1, (210.9, 46), None)}
 # The buffet queue (`haz_queue`): id: (deck, from m, to m, m/s, who). They shuffle toward the
 # counter (forward) in threes, solid bodies that shove her back; for crew with a tray they turn aside.
 QUEUES = {"haz_queue": (11, 162.5, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}

@@ -162,7 +162,7 @@ CAST = {
     # bear (the user's), one row of his forehead out (`assets/source/hud/husband/short/`), seated in the patio chair
     # (skeleton-v3 clips made by hand: `assets/source/people/husband-raw/`; `far` his far leg, drawn behind the table).
     # (The stand-in, the linen-shirted diner, kept in `husband-raw/standin/`.)
-    "husband": ("5b85cf25-df58-47e2-b592-affd32aff145", {"idle": 4, "wave": 6, "laugh": 8, "give": 6, "eat": 5}, {"own_colours": True}),
+    "husband": ("5b85cf25-df58-47e2-b592-affd32aff145", {"idle": 4, "wave": 6, "laugh": 8, "give": 6, "eat": 5, "embrace": 8}, {"own_colours": True}),
     "fan_a": ("dc207d50-0515-4a17-b85e-03130517536d", {"cheer": 9}, {}),
     "fan_b": ("76e60a27-a813-4456-8d85-e7830eb21730", {"cheer": 9}, {}),
     "fan_c": ("beeb5d2c-2cc0-4145-98d0-b570504269aa", {"cheer": 7}, {}),

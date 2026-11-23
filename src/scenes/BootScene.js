@@ -36,6 +36,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
         this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
         this.load.image('cabin-8206-bed', 'assets/ship/cabin-8206-bed.png');   // (the bed again, over her husband on the sofa)
+        // (Her husband's near hand drawn again over her as they embrace at his table: `husband-raw/embrace/hand.py`.)
+        for (const n of [1, 2]) this.load.image(`hug-hand-${n}`, `assets/sprites/hug-hand-${n}.png`);
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.image('linen-room', 'assets/ship/linen-room.png');
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
@@ -241,6 +243,8 @@ export class BootScene extends Phaser.Scene {
             this.anims.create({ key: 'her-sat', frames: frames('sat') });
             this.anims.create({ key: 'her-sit-up', frames: frames('sit-up'), frameRate: 10 });
         }
+        // Her arms up round his neck as they kiss (back to us), and down again (played backwards).
+        if (meta.anims.embrace) this.anims.create({ key: 'her-embrace', frames: frames('embrace'), frameRate: 8 });
         // Region 8: the horn's cord pulled, held at its lowest; a shot at the hoop; hanging from the
         // open parasol's handle.
         if (meta.anims.pull) this.anims.create({ key: 'her-pull', frames: frames('pull', [0, 1, 2, 3, 4]), frameRate: 10 });

@@ -72,9 +72,12 @@ export class People {
             p.items.push(p.underPic);
         }
         // Built furniture they stand behind, drawn again in front of them (a bar's counter).
+        // (Kept as `coverPics`: a scene that gets them up hides them, her husband standing up from his chair.)
+        p.coverPics = [];
         for (const c of def.cover ?? []) {
             const img = s.add.image(c.x, def.y - (c.dy ?? 0), 'shipart', c.frame).setOrigin(0.5, 1).setDepth(depth + 0.005);
             this.world.add([img]);
+            p.coverPics.push(img);
         }
         // Their wish: a thought cloud with its picture, over their head (src/popup.js). `bubbleItems`
         // keeps the calls made on the old bubble and its icon: shown or not, its picture changed
