@@ -758,7 +758,15 @@ LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2)}
 # 1, the Stardust balcony's far end at its rail (244 m), the stage seen from above: the camera eases aft and down to
 # frame the stage under her, deck 6 opened under deck 7 (`world.lookOpen`, the ship scene's cut-away).
 # (3, deck 5's forward end, a porthole on the bow wave: dropped, the user, 2026-11-23.)
-LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], {"drop": (244, 256, 6)})}
+# 5, the Great Outdoors' stern rail (deck 11): aft at her height over the open sea and the islands, she at the rail at
+# the frame's left; at sunset the sun beside her with its path (the sun holds its place on the screen: at 160 px it
+# stood on her head). Not down to the wake: the user, 2026-11-23, "Ease aft, not down". And zoomed out as it goes (the
+# user: "Showing a bit less than rear half of the ship"): `frame`, the metres shown across at its end, the ship closed
+# as from outside, the far background held at its size on the screen, its horizon down onto the waterline. Then moved
+# aft "until only half of the ship shown here remains in view" (the user): from 142-266 m to 197.6-321.6 m, the stern's
+# half on the left, the sea and the sky aft of it on the right (along the user's arrow, up too, the sea left the frame).
+LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], {"drop": (244, 256, 6)}),
+            "look_outdoors": (11, 243.52, 0.5, (200, 0), [], {"frame": (197.6, 321.6)})}
 # Look-out 2 is a porthole she looks out of by E (the user, 2026-11-23, turning down a wait that eased the camera out of
 # the ship to the wake): she turns her back to us at it, and the outside view (O) shows, the whole ship from outside;
 # any movement key (or O, Esc) brings her back. The corridor's brass porthole, the live sea in its glass, in the place

@@ -2304,6 +2304,17 @@ export class ShipScene extends Phaser.Scene {
         });
     }
 
+    // The far background laid out for the camera as it stands. (A look-out's zoom out, `world.lookFar`, 0 to 1: the
+    // horizon goes down onto the waterline with it, and the far background keeps its size on the screen, as in play.)
+    layBackdrop(flow) {
+        const cam = this.cameras.main, far = this.world?.lookFar ?? 0, outside = !!this.overview || this.fromAfar;
+        const horizon = far > 0 && !outside && this.horizonOnScreen !== undefined
+            ? this.horizonOnScreen + ((this.waterY - cam.scrollY - cam.height / 2) * cam.zoom + cam.height / 2 - this.horizonOnScreen) * far
+            : this.horizonOnScreen;
+        const keep = far > 0 && !outside ? VIEW.zoom / cam.zoom : 1;
+        this.backdrop.update(flow, outside, horizon, this.fromAfar ? this.intro?.look : null, keep);
+    }
+
     // --- The outside view (the user, 2026-11-07) ------------------------------------------------
     // O: the camera draws back to show the whole ship from outside, every deck's side closed, her
     // hidden and the game paused; +/- zoom on the middle, the mouse wheel toward the pointer; the
@@ -3003,7 +3014,7 @@ export class ShipScene extends Phaser.Scene {
         // (In the intro's wide views the far background holds still: its drift aft is how it looks
         // from the ship under way, and that camera is not on the ship. The user saw the islands
         // and clouds slide past a sun that stood still.)
-        this.backdrop.update(this.fromAfar ? 0 : flow, !!this.overview || this.fromAfar, this.horizonOnScreen, this.fromAfar ? this.intro?.look : null);
+        this.layBackdrop(this.fromAfar ? 0 : flow);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
         for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
@@ -3025,6 +3036,9 @@ export class ShipScene extends Phaser.Scene {
 
         this.updateVacuums(dt);
         this.world.update(dt, time, input);
+        // (A look-out's zoom moves the camera in the world's update: the far background laid again for it, or it lags a
+        // frame behind the zoom and its edges show.)
+        if (this.world.lookFar > 0) this.layBackdrop(0);
         this.loose.update(dt);
         if (this.mode === 'play') this.updatePlay(input, dt, time);
         else if (this.mode === 'push') this.updatePush(input, dt, time);
@@ -3703,6 +3717,8 @@ export class ShipScene extends Phaser.Scene {
         const inDeck = this.route === 'inside' || this.rooms.some(r => r.route === this.route && r.inDeck);
         // (`viewOverride`: the camera is away from her, looking at a deck: the horn's scene.)
         if (this.viewOverride != null) target = this.viewOverride;
+        // (A look-out's zoom out shows the ship from outside: every deck closed, as in the outside view.)
+        else if (this.world?.lookFar > 0) target = null;
         else if (!inDeck || outdoors || this.overview || this.fromAfar || p.y <= this.world.roofY + 2) target = null;
         else if (moving) target = this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);

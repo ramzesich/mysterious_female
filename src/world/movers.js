@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER, CRY, GAGS } from '../config.js';
+import { PLAYER, CRY, GAGS, VIEW } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -2045,6 +2045,23 @@ export class Lookout {
         this.drop = 0;
         this.from = null;
         for (const deck of [...this.def.open, ...(this.def.drop?.decks ?? [])]) delete this.world.lookOpen?.[deck];
+        if (this.def.frame) this.unzoom();
+    }
+
+    // (A zoomed look-out gives the camera back as it found it: play's zoom, its bounds.)
+    unzoom() {
+        const cam = this.scene.cameras.main;
+        this.world.lookFar = 0;
+        cam.setZoom(VIEW.zoom);
+        cam.setBounds(...this.bounds);
+    }
+
+    // Where a zoomed look-out's frame stands: its x from and to, the waterline at 77% down it (as the outside view, the
+    // ship low, the sky over it).
+    framed() {
+        const s = this.scene, [x0, x1] = this.def.frame, zoom = s.cameras.main.width / (x1 - x0);
+        const h = s.cameras.main.height / zoom;
+        return { x: (x0 + x1) / 2, y: s.waterY - h * 0.27, zoom };
     }
 
     onFloor() {
@@ -2093,19 +2110,34 @@ export class Lookout {
             const her = { x: p.x, y: p.y - PLAYER.height / 2 };
             if (this.k === 0) {
                 this.from = { x: cam.midPoint.x, y: cam.midPoint.y };
-                this.view = { x: her.x + d.dx, y: her.y + d.dy };
+                this.view = d.frame ? this.framed() : { x: her.x + d.dx, y: her.y + d.dy };
                 cam.stopFollow();
+                if (d.frame) {
+                    const b = cam.getBounds();
+                    this.bounds = [b.x, b.y, b.width, b.height];
+                    cam.removeBounds();
+                }
             }
             this.k = goal > this.k ? Math.min(1, this.k + dt / LOOK.out) : Math.max(0, this.k - dt / LOOK.back);
             const f = 1 - Math.pow(0.85, dt * 60);
             this.from.x += (her.x - this.from.x) * f;
             this.from.y += (her.y - this.from.y) * f;
             if (this.k === 0) {
+                if (d.frame) this.unzoom();
                 cam.startFollow(p, true, 0.15, 0.15);
                 cam.setFollowOffset(0, PLAYER.height / 2);
             } else {
                 const e = ease(this.k);
-                cam.centerOn(Math.round(this.from.x + (this.view.x - this.from.x) * e), Math.round(this.from.y + (this.view.y - this.from.y) * e));
+                // (Zoomed: the zoom goes by its ratio, so the shrinking is even; the middle by the screen's share of the
+                // way, so the frame closes on the view as the zoom does.)
+                let m = e;
+                if (d.frame) {
+                    const z = VIEW.zoom * (this.view.zoom / VIEW.zoom) ** e;
+                    cam.setZoom(z);
+                    this.world.lookFar = e;
+                    m = (1 / z - 1 / VIEW.zoom) / (1 / this.view.zoom - 1 / VIEW.zoom);
+                }
+                cam.centerOn(Math.round(this.from.x + (this.view.x - this.from.x) * m), Math.round(this.from.y + (this.view.y - this.from.y) * m));
             }
         }
         // The decks opened: the view's by the camera's way, the drop's by its own.

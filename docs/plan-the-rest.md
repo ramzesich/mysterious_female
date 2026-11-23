@@ -498,7 +498,7 @@ still and comes back when she moves. Nothing is counted.
 | 2 | Deck 4, the stern end, a porthole (250 m) | ~~The wake from just above the waterline~~ **By E (the user, 2026-11-23): she turns her back to us at the porthole, and the outside view (O) shows; a movement key brings her back** |
 | ~~3~~ | ~~Deck 5, the forward end, a porthole (20 m)~~ | ~~The bow wave~~ **Dropped (the user, 2026-11-23)** |
 | 4 | ~~Deck 9, the officers' corridor's forward end, the front windows~~ **Deck 12, the Spinnaker's balcony** (§7f, P2: she drawn in front of its glass) | Forward over the bow, from the top of the ship |
-| 5 | Deck 11, the Great Outdoors, the stern rail | Down and aft over the wake; at sunset the sun's path |
+| 5 | Deck 11, the Great Outdoors, the stern rail | ~~Down and aft over the wake; at sunset the sun's path~~ **Aft, not down, zoomed out to the stern's half of the ship and the sea past it (197.6 to 321.6 m), every deck closed as from outside (the user, 2026-11-23)** |
 
 - **The Stardust's first, shown to the user running** (motion is judged by eye), then the other
   four. A porthole piece and a window piece, generated.
@@ -506,7 +506,11 @@ still and comes back when she moves. Nothing is counted.
   1.8 s and back in 0.7 s; both decks open, crossfaded from the hull dimmed, never undimmed; its drop off the rail keeps
   both open as she falls (`LOOKOUTS`' `drop`). **2 built 2026-11-23**, by E, after the user turned down both wait-and-ease
   views out of the ship (2 the wake, 3 the bow wave: "I don't like either of those"): the corridor's brass porthole
-  from the atlas, its glass the live sea (`PORTHOLES`, `world.lookOutOf`); **3 dropped**. 4 and 5 to come.
+  from the atlas, its glass the live sea (`PORTHOLES`, `world.lookOutOf`); **3 dropped**. **5 built 2026-11-23:** half a
+  second still zooms out aft (the user's "Ease aft, not down", then "zoom out", then the frame moved aft "until only
+  half of the ship shown here remains"): `frame` in `LOOKOUTS`, the far background held at its size on the screen
+  (`keep` in `src/background.js`), its horizon down onto the waterline. At sunset the sun, fixed near the screen's
+  left, is behind the ship; its glow and lit clouds show aft. 4 to come.
 - `Lookout` in `src/world/movers.js`, `LOOKOUTS` in the data, the camera in the ship scene (the
   intro's camera work is the model); a case each in the regions' scenarios.
 - Spot 1 is where the diary lies (2.1): look at it with both in place. (Spot 5 had his spoon until the t-shirt took

@@ -245,6 +245,8 @@ def build_world():
         if "drop" in opts:
             a, b, under = opts["drop"]
             e["drop"] = dict(x0=B.exact_x(a), x1=B.exact_x(b), floor=B.floor_y(under), decks=[deck, under])
+        if "frame" in opts:
+            e["frame"] = [B.exact_x(opts["frame"][0]), B.exact_x(opts["frame"][1])]
         ents.append(e)
     for pid, (deck, m, up) in PORTHOLES.items():
         ents.append(dict(kind="porthole", id=pid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", up=up))

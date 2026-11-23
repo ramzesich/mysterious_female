@@ -753,6 +753,7 @@ are on the stairs).
 | 210-222 | the climb | The service station's roof (2 m), the first table's parasol top (2.6 m), a wall jump off deck 12's end wall at 220 onto the sun cover's low end at 222, up the cover to the aft terrace | The socks | Built cover |
 | 225, 235 | `gull_go` | Perched gulls | Dive at food within 4 m; a cone as bait; a swoop otherwise when she lingers | **As built (2026-11-23):** one, on the Great Outdoors' rail at 210.9 m (its forward end, away from the machine), over 210.6 to 219.2 m: it hangs 600 ms over where she will be, no shadow, then dives; with her cone it flies off the screen, is away 5 s and flies back to its rail (each leg placed by the clock: `FLIGHT` in `src/world/hazards.js`) |
 | 230-240 | `amb_tables_go` | Two tables of guests | | |
+| 243.5 | `look_outdoors` | Look-out 5 at the stern rail: still half a second, the camera zooms out aft to the stern's half of the ship and the sea past it (built 2026-11-23) | `LOOKOUTS` | |
 
 ### Deck 12 (regions 8, 9)
 

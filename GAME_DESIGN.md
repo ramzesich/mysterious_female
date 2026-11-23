@@ -2662,8 +2662,10 @@ drop off that rail keeps both decks open as she falls (the user's). On the way: 
 the theatre; the lighting booth's photo, lost from the data on 2026-11-21, back. **Look-out 2 built, 3 dropped (2026-11-23, the user's):** deck 4's aft porthole
 (the corridor's brass one, the live sea in its glass) is used by E: she turns her back to us at it and the outside view
 shows the whole ship; a movement key brings her back. Deck 5's porthole on the bow wave is dropped; the camera easing out
-of the ship to a view by the water was turned down for both. **Next: §5, part 3 (look-outs 5 and 4,
-then the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+of the ship to a view by the water was turned down for both. **Look-out 5 built (2026-11-23, the user's):** at the Great
+Outdoors' stern rail, half a second still zooms the camera out aft to the stern's half of the ship from outside and the
+sea past it, the far sky held at its size on the screen; back to her when she moves. **Next: §5, part 3 (look-out 4,
+the Spinnaker's balcony with part 11's P2; then the deliveries, books 12 and 13);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

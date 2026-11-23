@@ -4374,3 +4374,23 @@ valuable."
   `balcony`, `region3` with both cases pass; `tools/check_overlaps.py` 0. Not run: the rest.
 - No generations spent. Next: look-out 5 (the Great Outdoors' stern rail), then 4 (the Spinnaker's balcony, with
   part 11's P2: her drawn in front of its glass).
+
+## §5 3.1: look-out 5, the Great Outdoors' stern rail zoomed out (the user, 2026-11-23)
+
+- **Its form asked first** (after 2 and 3's views out of the ship were turned down): the user chose "Ease aft, not
+  down" over the porthole's E and dropping it. Stills of the view 200 px aft at her height, by day and at sunset (the
+  sun keeps its place on the screen: at 160 px it stood on her head), approved; built as the Stardust's.
+- **Then "zoom out during this lookout. Showing a bit less than rear half of the ship"**, and moved aft "until only half
+  of the ship shown here remains in view": `frame` in `LOOKOUTS` (197.6 to 321.6 m across at its end; the waterline
+  77% down). The zoom goes by its ratio, the middle by the screen's share of the way; the camera's bounds off while it
+  is out. Every deck closed while it is (`world.lookFar`, the cut-away's target none), as in the outside view.
+- **The far background under the zoom:** the intro switches between play's layout and the outside view's at a zoom of
+  0.6, which would make the islands and clouds jump; instead play's layout is drawn `keep` times bigger
+  (`VIEW.zoom / zoom`, `src/background.js`), so it keeps its size on the screen, and its horizon glides down onto the
+  waterline with the way out (`layBackdrop()` in the ship scene). It is laid again after the world's update while the
+  zoom runs: laid before it, it lagged a frame and its edges showed black.
+- Along the user's arrow (aft and up) the sea left the frame: straight aft, shown side by side, approved.
+- **At sunset the sun is behind the ship** (it stands near the screen's left in play's layout); its glow and lit clouds
+  show aft of the stern. Said to the user; left so.
+- Playtest case `region6.lookout`. Tests: `boot`, `intro`, `finale`, `region6`, `region3`, `deck4` with their cases pass.
+  Not run: the rest. No generations spent. Next: look-out 4 (the Spinnaker's balcony, with part 11's P2).

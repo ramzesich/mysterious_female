@@ -6095,6 +6095,29 @@ def scenario_region3__lookout(b):
     return ok
 
 
+def scenario_region6__lookout(b):
+    """Look-out 5 (the user, 2026-11-23): at the Great Outdoors' stern rail, half a second standing still zooms the camera
+    out aft to the stern's half of the ship and the sea past it, every deck closed as from outside; a step and it is back
+    with her, at play's zoom, its bounds as they were."""
+    S = "window.__ship"
+    L = f"{S}.world.movers.find(m => m.def?.id === 'look_outdoors')"
+    b.open("?reset&play&at=diner")
+    wait(0.4)
+    x = b.eval(f"{L}.def.x")
+    b.teleport(x, D11)
+    ok = check(b.eval(f"{S}.cameras.main.zoom") == 2, "on the spot, at first: play's zoom")
+    wait(2.8)
+    v = b.eval(f"[{L}.k, {S}.cameras.main.zoom, {S}.cameras.main.worldView.x, {S}.cameras.main.worldView.right, {S}.viewDeck, {S}.cameras.main.useBounds]")
+    x0, x1 = b.eval(f"{L}.def.frame")
+    ok &= check(v[0] == 1 and v[1] < 0.2 and abs(v[2] - x0) < 2 and abs(v[3] - x1) < 2 and v[4] is None and not v[5],
+                "standing still: zoomed out to its frame, every deck closed", v)
+    b.key("left", True); wait(0.3); b.key("left", False)
+    wait(1.2)
+    v = b.eval(f"[{L}.k, {S}.cameras.main.zoom, !!{S}.cameras.main._follow, {S}.cameras.main.useBounds, {S}.world.lookFar]")
+    ok &= check(v == [0, 2, True, True, 0], "a step: back with her, play's zoom and bounds", v)
+    return ok
+
+
 def scenario_deck4__porthole(b):
     """Look-out 2 (the user, 2026-11-23): deck 4's aft porthole by E: she turns her back to us at it, and the outside
     view (O) shows; a movement key brings the camera back to her."""

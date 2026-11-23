@@ -394,8 +394,10 @@ export class Backdrop {
 
     // Lay it all out for this frame, fixed to the camera: the horizon `horizonOnScreen` px from the
     // top of the screen, or in the outside view (`outside`) on the waterline. `far`: the outside
-    // view's sizes for this one (the intro's wide views: `{ islands }`, world px to a pixel).
-    update(dt, outside = false, horizonOnScreen = 0, far = null) {
+    // view's sizes for this one (the intro's wide views: `{ islands }`, world px to a pixel). `keep`: in play, how much
+    // bigger than a pixel to a pixel everything is drawn, so that under a zoom out (a look-out's, `VIEW.zoom / zoom`) the
+    // far background keeps the size it has on the screen in play, only its horizon moving.
+    update(dt, outside = false, horizonOnScreen = 0, far = null, keep = 1) {
         this.time += dt;
         const cam = this.scene.cameras.main;
         const z = cam.zoom, W = cam.width, H = cam.height, cx = W / 2, cy = H / 2;
@@ -407,20 +409,20 @@ export class Backdrop {
         const hy = Math.round(wy(horizonOnScreen));
 
         // From outside the sky deepens over a fixed stretch of the world, not into a thin line.
-        const fade = outside ? OUTSIDE_SKY : SKY_FADE;
+        const fade = outside ? OUTSIDE_SKY : SKY_FADE * keep, seaFade = SEA_FADE * (outside ? 1 : keep);
         this.sky.setPosition(left, hy - fade).setDisplaySize(width, fade);
         this.skyTop.setPosition(left, top).setSize(width, Math.max(0, hy - fade - top));
-        this.sea.setPosition(left, hy).setDisplaySize(width, SEA_FADE);
-        this.seaDeep.setPosition(left, hy + SEA_FADE).setSize(width, Math.max(0, bottom - hy - SEA_FADE));
+        this.sea.setPosition(left, hy).setDisplaySize(width, seaFade);
+        this.seaDeep.setPosition(left, hy + seaFade).setSize(width, Math.max(0, bottom - hy - seaFade));
         if (this.dusk > 0) {
             // (Its bands keep their height in play; zoomed right out they stretch with the day's sky.)
-            const bands = outside ? fade : DUSK_BAND * DUSK_SKY.length;
+            const bands = outside ? fade : DUSK_BAND * DUSK_SKY.length * keep;
             this.duskSky.setPosition(left, hy - bands).setDisplaySize(width, bands);
             this.duskTop.setPosition(left, top).setSize(width, Math.max(0, hy - bands - top));
-            this.duskSea.setPosition(left, hy).setDisplaySize(width, SEA_FADE);
-            this.duskDeep.setPosition(left, hy + SEA_FADE).setSize(width, Math.max(0, bottom - hy - SEA_FADE));
+            this.duskSea.setPosition(left, hy).setDisplaySize(width, seaFade);
+            this.duskDeep.setPosition(left, hy + seaFade).setSize(width, Math.max(0, bottom - hy - seaFade));
             // The sun ahead of the bow, half sunk; its path of light on the water under it.
-            const k = outside ? OUTSIDE_SIZE.islands : 1;
+            const k = outside ? OUTSIDE_SIZE.islands : keep;
             const sx = Math.round(left + width * SUN.at), sy = hy - SUN.up * k, L = this.duskLayout;
             this.sun.setScale(k).setPosition(sx, sy);
             this.sunGlow.setScale(k / 2).setPosition(sx, sy);
@@ -440,11 +442,11 @@ export class Backdrop {
         // the world: `shown` is the world x of the screen's left edge, which each strip starts
         // from. In play they are fixed to the screen and only shift a little as she runs, and the
         // clouds stand well up in the sky (the user, 2026-11-08).
-        const sc = outside ? OUTSIDE_SIZE.clouds : 1, si = outside ? far?.islands ?? OUTSIDE_SIZE.islands : 1;
-        const shown = run + left;
-        this.ripples.setPosition(left, hy).setSize(width, RIPPLES_H);
-        this.ripples.tilePositionX = Math.round((outside ? shown : run * 0.05) - this.time * 8);
-        const cloudFoot = outside ? hy - OUTSIDE_CLOUDS.at(-1)[0] : hy - 40;
+        const sc = outside ? OUTSIDE_SIZE.clouds : keep, si = outside ? far?.islands ?? OUTSIDE_SIZE.islands : keep;
+        const shown = run + left, sr = outside ? 1 : keep;
+        this.ripples.setScale(sr).setPosition(left, hy).setSize(width / sr, RIPPLES_H);
+        this.ripples.tilePositionX = Math.round((outside ? shown : run * 0.05) / sr - this.time * 8);
+        const cloudFoot = outside ? hy - OUTSIDE_CLOUDS.at(-1)[0] : hy - 40 * keep;
         this.clouds.setScale(sc).setPosition(left, cloudFoot - 60 * sc).setSize(width / sc, 60);
         this.clouds.tilePositionX = Math.round((outside ? shown : run * 0.01) / sc - this.time * 1.2);
         this.duskStrip.setScale(sc).setPosition(this.clouds.x, this.clouds.y).setSize(width / sc, 60);
