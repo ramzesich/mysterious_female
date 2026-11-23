@@ -4294,3 +4294,5 @@ valuable."
   `assets/source/her/embrace/README.md`, `assets/source/people/husband-raw/README.md`.
 - **Cost:** about 13 generations (her hop 8.4, the embrace 4.2). Tests: `boot`, `region6`, `region8`, `region9` pass. Not
   run: the rest.
+- **Merged:** `main` fast-forwarded to `three-uses` (e4f719c: the table scene, the photo, the Great Outdoors refined) and
+  pushed, on the user's word (2026-11-23).
