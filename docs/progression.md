@@ -8,7 +8,8 @@ Drawn from `GAME_DESIGN.md` §6.1, `docs/population.md` (the later word where th
 (2026-11-23). The maps: `docs/ship-regions.png` (the ship's ten regions) and `docs/ship-unlock-order.png` (the
 order, step by step). Some captions in those maps are older than the build: step 2's "the forward stairs' fire
 door" (it is the midships crew trunk), step 1's "the dash" (it is the lunge), step 4's "Bumbot in the towels"
-(he is on the bottle shelf now).
+(he is on the bottle shelf now), and the linen room's door, drawn at 112 m (it is one cabin door aft, at 115.4 m,
+since 2026-11-23).
 
 ## The story in one line
 
@@ -48,11 +49,13 @@ up from Bliss, into housekeeping country.
 rather not be disturbed. At its far end a steward has his trolley wedged across the corridor. She puts her shoulder to
 it and pushes it free (a new trick), and he gives her his Housekeeping card. The card opens the linen room, and there,
 asleep on a shelf among the bottles, is Bumbot. A laundry cart stands between them. She pushes it toward him as quietly
-as she can, and just as it is about to touch him he springs at the vent cover on the wall, sends it clanging to the
-floor and slips into the dark opening. She pushes the cart under the vent, climbs up and crawls in after him.
+as she can, and just as it is about to touch him he springs at the cover on the mouth of a ventilation shaft, sends it
+clanging to the floor and slips into the dark opening. She pushes the cart on up to the mouth, climbs onto it and
+crawls in after him.
 
-**Home, unexpectedly.** The duct winds forward and down and drops her into a calm corridor on deck 8, and among its
-doors is cabin 8206: her own cabin from the real cruise, the surprise she was never told about. It is her place to
+**Home, unexpectedly.** The shaft tips her down a slope into the space between two decks and runs forward there, over
+the lift halls and the atrium, the ship showing below through its grilles. The last grille gives way under her and
+drops her into a calm corridor on deck 8, and among its doors is cabin 8206: her own cabin from the real cruise, the surprise she was never told about. It is her place to
 come back to from now on. At the end of the corridor she sees the tip of a black tail vanish up the forward stairs.
 
 **The Lido.** The stairs lead all the way up to deck 11, into the sun. In the gym she finds a pair of grip socks, and
@@ -98,9 +101,9 @@ next day he is still asleep there, and the ship is hers to wander.
 | Region 1 | **The lunge** (D), learned at her first sight of Bumbot | Never required: it breaks shortcuts and tames hazards |
 | Region 1 | **Deck card** (blue), from the gangway officer | The midships crew trunk up into region 2 |
 | Region 3 | **Entertainment card** (red), from the stage manager | The crew trunk from Bliss up to deck 9 (region 4) |
-| Region 4 | **Pushing**, at the steward's jammed trolley | Carts, the laundry cart under the vent |
+| Region 4 | **Pushing**, at the steward's jammed trolley | Carts, the laundry cart up to the shaft's mouth |
 | Region 4 | **Housekeeping card** (green), from the steward | The linen room's door |
-| Region 4 | **Crawling**, at the linen room's vent | The duct down to deck 8 (region 5) |
+| Region 4 | **Crawling**, at the mouth of the linen room's ventilation shaft | The shaft down to deck 8 (region 5) |
 | Region 6 | **Grip socks** (wall jumps), on the gym's rack | The climb from deck 11 to deck 12 (region 8) |
 | Region 8 | **Officer's card** (gold), dropped by the security officer at the horn | The gold doors down the bow to the bridge (region 9) |
 | Region 8 | **The parasol** (a glide), left at the old lady's sunbed at the horn | The glide to the bow (region 10) |
@@ -148,14 +151,17 @@ cleaner, a rehearsal rope, a photographer.
 12. She goes down the whole corridor, past its hazards, to **the steward**, whose trolley is jammed across its aft
     end. E at the trolley's end and walking: **pushing**. She frees it, and he tosses her the **Housekeeping
     card**.
-13. Back to **the linen room** (green door). Bumbot is asleep on a shelf. The laundry cart stands in her way and
-    she can't walk past it: she pushes it. **Near-catch 4:** the moment she or the cart all but touches him, he
-    leaps at the vent's cover, knocks it to the floor and squeezes into the vent.
-14. She pushes the cart under the vent, climbs onto it and crawls in (↓): **crawling**. **The duct** runs forward
-    and down and drops her into deck 8's forward corridor, past its shut lobby door.
+13. Back to **the linen room** (green door; its door at the room's aft end, the room forward of it). Bumbot is
+    asleep on a shelf. The laundry cart stands in her way and she can't walk past it: she pushes it forward.
+    **Near-catch 4:** the moment she or the cart all but touches him, he leaps at the cover on the mouth of the
+    ventilation shaft on the forward wall, knocks it to the floor and squeezes in.
+14. She pushes the cart on to the mouth, jumps onto it, and from its rim goes in on hands and knees (↓, then ←):
+    **crawling**. **The shaft** slides her down a slope behind the wall and runs forward between decks 9 and 8, at
+    its true length, to a grille over deck 8's forward corridor that gives way under her: she drops in past the
+    corridor's shut lobby door. One way.
 
-*This sequence is being rebuilt by the design session (the linen room mirrored, a new shaft and crawl), so its
-details will change; the progression (the cart, near-catch 4, the crawl to deck 8) stays.*
+*This sequence was remade on 2026-11-23 (the linen room mirrored and its door one cabin door aft, the shaft at its
+true place, deck 8 itself showing under its grilles): `docs/shaft-remake-log.md`.*
 
 ### Region 5: deck 8 forward
 
@@ -227,7 +233,7 @@ Not needed for the finale: the balconies, the boat walkway and the hallways are 
 ## The chain in short
 
 Lunch → **Deck card** → Bliss → Library (Bumbot opens the aft door) → theatre → pills → **Entertainment card** →
-deck 9 → steward's trolley (**push**, **Housekeeping card**) → linen room (Bumbot into the vent; **crawl**) →
+deck 9 → steward's trolley (**push**, **Housekeeping card**) → linen room (Bumbot into the shaft; **crawl**) →
 deck 8 forward → forward stairs → deck 11: **grip socks** → the climb to deck 12 → engineer's coffee → the horn
 (**Officer's card**, **parasol**) → the wedding cake → the bridge (the alarm, the hatch) → the sunset glide → the
 catch → home to cabin 8206.
