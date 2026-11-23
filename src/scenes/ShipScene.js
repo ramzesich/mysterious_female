@@ -19,6 +19,7 @@ import { Intro } from '../intro.js';
 import { Popups } from '../popup.js';
 import { Hud } from '../hud.js';
 import { sign } from '../signs.js';
+import { Highlight } from '../highlight.js';
 
 // Tile ids from the tileset (see tools/build_slice_map.py).
 const LADDER_TOP = 3;
@@ -232,6 +233,8 @@ export class ShipScene extends Phaser.Scene {
             }
         }
         this.deckFloors = JSON.parse(props.deckFloors);
+        // What she can use pulses where E would act on it (src/highlight.js), washed as the props round it are.
+        this.highlight = new Highlight(this, props.washLevels ? JSON.parse(props.washLevels) : null);
         const cut = this.cutIds = new Set(String(props.exteriorCut).split(',').map(Number));
         this.shellTiles = {};
         this.shellAlpha = {};

@@ -306,3 +306,33 @@ Bumbot. `tryMirror` in the ship scene, in the E chain after the shower and befor
 count in `standStill` (`mirrorLooks`) is gone. The `intro` playtest's mirror checks rewritten (standing does
 nothing, E once a press, E away from it nothing); `intro` and `deck3` passed. GAME_DESIGN.md's line on the mirror
 (§7.1 item 11) updated to match, on the user's word.
+
+## What she can use pulses where E would act (2026-11-23, approved; plan-the-rest §7c, part 8)
+
+The user looked at every interactable (213 of them, sheets of each kind) and chose a mechanic over a colour rule:
+while she stands where E would act on a thing, the thing's colours pulse between its own state and the other, and
+settle back when she leaves (1.6 s a pulse, 0.27 s back). Mocked up as GIFs of every kind first, then built.
+
+- **Full-colour things** (doors, lifts, trunk doors, pickups, books, key cards, the reading chairs, carts, room
+  fixtures) pulse down to the wash of the props round them (the nearest washed map piece's level, else the place's
+  from the map's `washLevels`) and back. **Muted map pieces** (the soft serve machine, the pool bar, the jackpot
+  pair, the captain's door, the ice swan, the massage tables, the piano, the slide, the hot tub, the coffee and
+  lunch stations, the odd book's bookcase) show their full twin, the wash pulsing off it.
+- **Never:** people and Bumbot ("People shall not change tones at all"), the arrows over a trunk's door, the
+  MONEY JACKPOT sign; a pickup's glint stays as it was.
+- **The casino's slot machines are washed 12%, not 20%** ("too washed out"): `PIECES` in `tools/wash_levels.py`.
+- **Her crew cabin's door pulses to 40%** from both sides (white on deck 3, it hardly changed at 20%: "40%, but
+  only for this door here"); her mirror and cabin 8206's shower door to 40%, other room things to the room's 30%.
+- **Things drawn into a room's picture** (the mirror, the shower door, the chute, a room's own door seen from
+  inside, cabin 8206's desk) pulse by their own pixels only: the box's wall flooded out from its edge (the user saw
+  the mirror's box pulse as a frame), or by the shapes it is drawn with (the desk: its top and body only, the bin in
+  it cut out, not the TV or the shelf column: the user circled it). Washed ones are worked back to full colour.
+- **Only where E would act**, asked as the ship scene's E chain asks it (the pool bar before region 8: nothing).
+
+`src/highlight.js` (new), two lines in `src/scenes/ShipScene.js`, the map's `washLevels` (`tools/wash_levels.py`'s
+`table()`, written by `tools/build_ship_map.py`), `maps/ship.json` rebuilt, the `highlight` playtest. Runs: highlight,
+boot, deck3, intro, region4, region6, region9, cabin, linen, lift, trunk, mishaps passed; check_overlaps 0. `region5`
+("two tangerines in the welcome basket") fails with and without this change: from main. Not done: the nook's armchair
+and the funnel horn (drawn inside larger pictures). A slip: some runs wrote into the shared `bumbusik-playtest`
+temp folder (TEMP set from TMP before it changed); the shared `last.json`'s failed list was overwritten and only
+my entry taken back out.

@@ -22,6 +22,9 @@ PLACES = [
 ]
 # The balconies outside decks 8 to 10 (the outside route).
 BALCONIES = 20
+# Pieces with a level of their own wherever they stand: the casino's slot machines, washed less than the casino
+# round them (the user, 2026-11-23, with the highlight of what she can use: "too washed out").
+PIECES = {"slot-pair": 12}
 SUFFIX = {35: "-bg", 20: "-w20", 12: "-lt"}
 KEEP = ("door", "railing")
 
@@ -39,4 +42,12 @@ def frame(name, deck, m=None, balcony=False):
     """The twin of a `-bg` piece for its place; anything else as it is."""
     if not isinstance(name, str) or not name.endswith("-bg") or name.startswith(KEEP):
         return name
-    return name[:-3] + SUFFIX[level(deck, m, balcony)]
+    base = name[:-3]
+    return base + SUFFIX[PIECES.get(base) or level(deck, m, balcony)]
+
+
+def table(to_x):
+    """The levels for the game (the map's `washLevels`; src/highlight.js): what a thing she can use in full colour
+    pulses down to, as the props round it are washed. `to_x`: metres to px."""
+    return {"decks": DECKS, "places": [[d, to_x(a), to_x(b), lv] for d, a, b, lv in PLACES], "balconies": BALCONIES,
+            "default": 35}

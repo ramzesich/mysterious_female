@@ -5840,6 +5840,82 @@ def scenario_mishaps__gulls(b):
 # A scenario's cases (docs/plan-fast-tests.md §3.5): `scenario_region4__towels` is `region4.towels`, a
 # function that starts from a prepared state (`enter_regionN`, `?at=`) and checks one thing. A new
 # check goes in as a case of its own; `region4` runs the old scenario and every case of it.
+def scenario_highlight(b):
+    """What she can use pulses where E would act on it (src/highlight.js; the user, 2026-11-23): a thing in full colour
+    down to the wash of the props round it and back, a muted map piece up to its full twin and back, settling back
+    when she leaves; people never; the casino's slot machines at 12%."""
+    S = "window.__ship"
+    b.open("?reset&play", start=None)
+    wait(0.5)
+    b.eval(f"(s => {{ s.scareContact = () => null; s.mishap = () => {{}}; }})({S})")      # (no hits on the way)
+    H = f"{S}.highlight"
+    thing = lambda i: b.eval(f"(t => [t.x, t.y])({S}.world.things.find(t => t.id === '{i}'))")
+    def at(x, y, route="inside", settle=0.9):
+        b.teleport(x, y - 2, route)
+        wait(settle)
+        return b.eval(f"{H}.state()")
+    ok = True
+    # A door she uses (the laundry's, full colour): down to deck 4's 20% and back.
+    door = b.eval(f"{S}.rooms.find(r => r.route === 'laundry').door")
+    st = at(door + 4, D4)
+    ok &= check(len(st) == 1 and st[0]["key"].startswith("door:") and st[0]["parts"][0]["mode"] == "full"
+                and abs(st[0]["parts"][0]["k"] - 0.2) < 1e-6 and st[0]["parts"][0]["frame"] == "door-crew",
+                "at the laundry's door: the door pulses from full colour toward deck 4's wash (20%)", st)
+    seen = set()
+    for _ in range(20):
+        wait(0.08)
+        seen.add(round(b.eval(f"{H}.state()[0].parts[0].alpha"), 2))
+    ok &= check(max(seen) > 0.15 and min(seen) < 0.05, "and back, again and again while she stands there", sorted(seen))
+    # Her crew cabin's door, white on deck 3, pulses deeper: 40% (the user: "only for this door here").
+    st = at(SPAWN_X - 6, D3)
+    ok &= check(bool(st) and st[0]["key"].startswith("door:") and abs(st[0]["parts"][0]["k"] - 0.4) < 1e-6,
+                "her crew cabin's door: down to 40%", st)
+    # Her mirror, drawn into the room's picture: only its own pixels pulse (the wall round it taken out).
+    mirror = b.eval(f"{S}.world.rooms.crewcabin.mirror")
+    st = at(mirror + 2, D3, route="crewcabin")
+    ok &= check(bool(st) and st[0]["key"] == "mirror" and abs(st[0]["parts"][0]["k"] - 0.4) < 1e-6 and b.eval(f"(c => c.width < 30)({H}.on.get('mirror').parts[0].over)"),
+                "her mirror pulses on its own, to 40%", st)
+    # From inside, the way out is the door drawn in the room's picture: it pulses there (the user: "the doors are not
+    # pulsing" inside her crew cabin and cabin 8206).
+    st = at(SPAWN_X + 6, D3, route="crewcabin")
+    ok &= check(bool(st) and st[0]["key"].startswith("door:") and b.eval(f"{H}.on.get('{st[0]['key']}').parts[0].o.texture.key") == "room-crewcabin",
+                "inside her crew cabin: its door, in the room's picture, pulses", st)
+    # A muted piece (the ice swan): its full twin while she is there, its muted one again once she has gone.
+    x, y = thing("sec_swan")
+    st = at(x - 10, y)
+    ok &= check(bool(st) and st[0]["key"] == "thing:sec_swan" and st[0]["parts"][0]["mode"] == "muted" and st[0]["parts"][0]["frame"] == "ice-swan",
+                "at the ice swan: shown by its full twin, the wash pulsing off it", st)
+    at(x - 160, y, settle=0.8)
+    ok &= check(b.eval(f"{H}.state()") == [] and b.eval(f"{H}.find(o => o.frame.name === 'ice-swan-w20').length") == 1,
+                "away from it: muted again, nothing left over", b.eval(f"{H}.state()"))
+    # Only where E would act: the pool bar's mojito is region 8's, so before it nothing pulses there.
+    x, y = thing("src_cocktail")
+    at(x - 10, y)
+    ok &= check(b.eval(f"{H}.state()") == [], "at the pool bar before region 8 (E does nothing there yet): nothing", b.eval(f"{H}.state()"))
+    # The casino's slot machines are washed 12%, and the jackpot pair pulses up from that.
+    x, y = thing("sec_jackpot")
+    ok &= check(b.eval(f"{H}.find(o => o.frame.name === 'slot-pair-w20').length") == 0 and b.eval(f"{H}.find(o => o.frame.name === 'slot-pair-lt').length") >= 6,
+                "the casino's slot machines at 12%")
+    st = at(x - 8, y)
+    ok &= check(bool(st) and st[0]["key"] == "thing:sec_jackpot" and len(st[0]["parts"]) == 1 and abs(st[0]["parts"][0]["k"] - 0.12) < 1e-6,
+                "the jackpot pair pulses, its sign does not", st)
+    # A trunk's door: the door only, never the arrows over it.
+    tx, ty = b.eval(f"(t => [t.x, t.doors[0].y])({S}.trunks.find(t => t.doors.length === 2))")
+    st = at(tx - 4, ty)
+    ok &= check(bool(st) and st[0]["key"].startswith("trunk:") and [q["frame"] for q in st[0]["parts"]] == ["door-crew"],
+                "a trunk's door pulses, its arrows do not", st)
+    # People never change: by the sushi chef, nothing.
+    cx, cy = b.eval(f"(p => [p.sprite.x, {D12}])({S}.world.people.byId.amb_sushi_chef)")
+    at(cx - 30, cy, settle=0.8)
+    ok &= check(b.eval(f"{H}.state()") == [], "by the sushi chef: nothing changes", b.eval(f"{H}.state()"))
+    # A pickup: the pickup itself, from its full colours, its glint as it was.
+    x, y = thing("book_1")
+    st = at(x - 12, y)
+    ok &= check(bool(st) and st[0]["key"] == "thing:book_1" and st[0]["parts"][0]["mode"] == "full", "by book 1: the book pulses", st)
+    ok &= check(b.errors == [], "no errors", b.errors)
+    return ok
+
+
 SCENARIOS = {name[len("scenario_"):].replace("__", "."): fn for name, fn in globals().items() if name.startswith("scenario_")}
 
 

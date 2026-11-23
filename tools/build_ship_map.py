@@ -16,7 +16,7 @@ import struct
 import zlib
 from pathlib import Path
 from population import PEOPLE, LIBRARY
-from wash_levels import frame as wash_frame
+from wash_levels import frame as wash_frame, table as wash_table
 
 # Where the theatre's audience sit, per deck (m): their pictures have their own seats, so none is set there.
 AUDIENCE = {d: [p["at"][1] for p in PEOPLE.values() if str(p.get("who", "")).startswith("aud_") and p["at"][0] == d] for d in (6, 7)}
@@ -2091,6 +2091,8 @@ def build_map():
             {"name": "hullMaxX", "type": "int", "value": col(EXTENT[4][1]) * TILE},
             {"name": "waterY", "type": "int", "value": WATER_ROW * TILE},
             {"name": "deckFloors", "type": "string", "value": json.dumps({d: FLOOR_ROW[d] for d in DECKS})},
+            # (Each place's wash, for the pulse of what she can use: src/highlight.js.)
+            {"name": "washLevels", "type": "string", "value": json.dumps(wash_table(exact_x))},
             {"name": "exteriorCut", "type": "string", "value": ",".join(str(t) for t in cut_ids)},
             {"name": "shellSlopes", "type": "string", "value": json.dumps(slopes)},
             {"name": "stemMarks", "type": "string", "value": json.dumps(shell_paint.marks(picture, extra == 1))},
