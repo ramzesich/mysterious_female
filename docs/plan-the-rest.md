@@ -61,6 +61,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
 | 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
 | 12 (§7g) | "Washie, washie, happy, happy!": the crewman with the sanitizer at the Garden Café's door by the aft lifts (deck 11), the user's and his wife's own joke: a first meeting that cannot be missed, their duet, foamy paw prints past him, a tangerine washed and tossed back, the song stuck in her head (added 2026-11-21) | The user's word | Medium | About 25 to 30 (the design session's guess) |
+| 13 (§7h) | The balconies' doors: the five ajar balcony doors (decks 8 to 10, region 7) do not look like doors at all; made to read as doors (added 2026-11-23) | The user's word | Small to medium | A few (a picture of a balcony door) |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -1099,6 +1100,24 @@ the 27th, and the slow end past New Year's Eve unless something gives. The user 
 built before part 11's P2, P1, 14 and 10,** and if the date presses, the balloons (14) and the ladder (P1) are dropped
 before any of his five pieces (the design session's ranking, said to the user with the proposal: their own joke is
 worth more to the gift than either).
+
+## 7h. Part 13: the balconies' doors (small to medium; added 2026-11-23)
+
+The user, 2026-11-23, shown the balconies while every other door she can use was made a secret (washed like its
+neighbours, revealed by the pulse, `src/highlight.js`): "Leave them as they are, but they don't look like doors at all.
+When we're done with this update, remind me to work on the balcony doors."
+
+- **What there is:** five balconies whose cabin she enters from outside (`balcabin8m`, `balcabin8a`, `balcabin9`,
+  `balcabin9a`, `guest10`: rooms with a `balcony` door in `tools/population.py`). From the balcony the way in is
+  `balcony-ajar`, drawn in code in `src/world/outside.js` (`make('balcony-ajar', 34, 98, ...)`: the glass slid aside on
+  the lit cabin), with a curtain blowing out (`balcony-curtain`); the balconies round it show the ship's side, dark
+  shut glass in its tiles, not doors. E there takes her in (the ship scene's `routeDoorAt`). Left out of the doors'
+  wash at rest and still pulsing as a full-colour thing (`SKIP_DOORS` in `src/highlight.js`).
+- **First, for the user:** the balcony and its neighbours as they are, and mock-ups of a balcony door that reads as one
+  (by `CLAUDE.md`'s art rule a picture is generated, not drawn in code), composed over a real shot of the spot at the
+  game's pixels; the user chooses. Then whether it is washed like what stands round it, as the other doors are.
+- **Then:** the picture placed for all five (and its pairing with the cabin's own door picture inside, `Room.full`),
+  `tools/check_overlaps.py`, the `highlight` playtest, and a look at each balcony in the running game.
 
 ## 8. Optional, each only on the user's word
 
