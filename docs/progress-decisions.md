@@ -4296,3 +4296,29 @@ valuable."
   run: the rest.
 - **Merged:** `main` fast-forwarded to `three-uses` (e4f719c: the table scene, the photo, the Great Outdoors refined) and
   pushed, on the user's word (2026-11-23).
+
+## `main` taken in, 2.5 the `keeps` playtest, book 6 moved (2026-11-23)
+
+- **`main` into `three-uses`:** the Refinement session's §7c (`src/highlight.js`: what she can use pulses where E would act;
+  doors washed at rest), part 13 planned (§7h). A fast-forward to cd03df3, no conflicts; the maps rebuilt identical.
+- **2.5, the `keeps` playtest** (`python tools/playtest.py keeps`): one game with the close-ups shown (the other scenarios
+  skip them). Nothing counted at the start; the first of each kind (the wool, her flag, book 6, his t-shirt) shown close,
+  its count off while it shows and on once a key closes it, in the order found; a second find and a book given (9) up by
+  one only once closed; his four places empty before his table scene and each holding its thing after; cabin 8206's desk
+  seen close with two found and with all eight, Bumbot's bed the same: each found thing's box differs from the bare
+  picture, every other box is bare. **Decided:** the shelf's close view of 2.5's text went with 2.3.4 (dropped); "each
+  region's scenario ... the cover closed" is this one scenario, not close-ups turned on in every region's (they would
+  each need a key press per find).
+- **A book's count waits for its cover** (found by the test): a found thing's count came on as its close-up closed, a
+  book's while its cover still showed. Now both the same (`world.take`, `giveBook`: `hud.expect('book')`, released by
+  `cover(n, then)`).
+- **Book 6 moved** (the user: "why doesn't the book pulsate?"): at the Atrium Café's table its pulse, 20% toward the wall
+  as the café's props are washed, barely changed its near-black cover, and from where E reaches it her body stood in front
+  of it. The user asked whether it is progress or a collectible (a collectible: the fourteen open the nook, nothing else
+  waits on it), was shown the shore excursions' desk (two ends of it read as a second screen), Four Seasons' table and the
+  brochure stand's top, and chose the stand's bottom row, the middle pocket: at 134 m, 4 px up, the stand's lowest five
+  rows drawn again in front of its foot (`cover`). It hides the middle brochure and most of its neighbours (a brochure is
+  4 px wide, the book 10): shown so, approved.
+- **The pulse itself** (`src/highlight.js`, the Refinement session's) is unchanged: a dark pickup pulses faintly wherever
+  it lies. Offered: pickups pulsing deeper (about 50%); not decided.
+- Tests: `keeps`, `highlight`, `region1`, `region2`, `region6` pass. Not run: the rest.

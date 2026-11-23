@@ -180,8 +180,10 @@ ITEMS = {
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     # (Book 6, Harry Potter and the Philosopher's Stone, since 2026-11-23: her husband gives her book 1, Atomic Habits,
-    # at his table, the user's swap; this was book 1's place.)
-    "book_6": (5, 85.5, "book:6", None, 23),
+    # at his table, the user's swap. In the shore excursions' brochure stand at 134 m, in the bottom row's middle pocket,
+    # its foot behind the pocket's lip (the stand's lowest five rows drawn again in front of it): the user, 2026-11-23,
+    # the Atrium Café's table, book 1's old place, turned down.)
+    "book_6": (5, 134 - 1 / 48, "book:6", None, 4, "", {"cover": ("brochure-stand-w20", 134, 5)}),
     "book_2": ("lifeboat", 46, "book:2", None, 17),      # (on the bench left of the ladder, where a vest hung, midway between the flare box and the water can: the user, 2026-11-21)
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),

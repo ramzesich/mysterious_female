@@ -1339,9 +1339,11 @@ export class World {
             this.progress.learn(name);
             this.closeup(name);
         } else if (type === 'book') {
+            // (The books' count shows, or goes up, as its cover closes, as a found thing's does.)
+            s.hud?.expect('book');
             this.library.got(name);
             this.sparkle(thing.x, thing.pick.y - 6, 0xf68181);
-            this.cover(name);
+            this.cover(name, () => s.hud?.release('book'));
         } else if (type === 'keep') {
             // (Its kind's count shows, or goes up, as its close-up closes: src/hud.js.)
             const kind = thing.what.split(':')[1];
@@ -1440,18 +1442,20 @@ export class World {
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.
     giveBook(n) {
+        this.scene.hud?.expect('book');
         this.library.got(n);
         writeSave(this.save);
         this.refresh();
-        this.cover(n);
+        this.cover(n, () => this.scene.hud?.release('book'));
     }
 
     // A book she has just got, its cover seen close (plan-the-rest §2.3; the user, 2026-11-18: "the screen is dimmed
     // slightly, a generated book cover is shown in the center of the screen with the title and author"): her own
     // copy's cover (tools/build_covers.py) at 2x over a lighter dim than a found thing's, with the same warm light
     // behind it (the user's B of two, 2026-11-22), until any key. A book is got once, so each cover shows once.
-    cover(n) {
-        this.closeup(undefined, null, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
+    // (`then`: as it starts to close, the HUD's count let on.)
+    cover(n, then = null) {
+        this.closeup(undefined, then, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
     }
 
     // Cabin 8206 seen close (the user, 2026-11-22), at 2x over the dim, until any key: `desk`, the bare desk and on it

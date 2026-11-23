@@ -75,7 +75,7 @@ last column is what the drawn pages hinted at until then.
 
 | Id | Region | Where | How she gets it | Its page hints at |
 |---|---|---|---|---|
-| `book_6` | 6 | Deck 5, 96, a table at the Atrium Café, by a half-drunk coffee (book 1's place until 2026-11-23: the user swapped them) | Pickup, before she knows what it is for | The galley's crate behind the Seven Seas' crew door |
+| `book_6` | 6 | Deck 5, 134, in the shore excursions' brochure stand, the bottom row's middle pocket (the user, 2026-11-23; book 1's place at the Atrium Café's table till then) | Pickup, before she knows what it is for | The galley's crate behind the Seven Seas' crew door |
 | `book_2` | 2 | The lifeboat at 143 on the boat walkway, on the bench left of its ladder (since 2026-11-21) | Pickup inside `room_lifeboat` | The trap door in the stage |
 | `book_3` | 3 | Deck 6, 254, the dressing room's make-up table | Pickup inside `room_dressing` (the stage door, red) | The jackpot machine's glint |
 | `book_4` | 4 | Deck 9, 134, the honeymoon couple | Their thanks for their picture | The pantry passage between the kitchens |
@@ -353,10 +353,11 @@ character, built in step 1 (the user, 2026-11-13).
 | 86 | `blk_photographer` | The photographer and his backdrop at the curving stairs' foot | `block(region 3)`; he poses passengers (`amb_posers`, a couple) | Three characters |
 | 88-100 | `amb_trio` | A string trio on the atrium floor (optional) | `static`, a play loop | Three characters |
 | 90 | `tan_5_cafe` | The café's fruit bowl | | |
-| 96 | `book_6` | The book on a café table (book 1's place till 2026-11-23) | `pickup` | A book |
 | 92 | `sec_lift_glimpse` | The glass elevator at deck 5: the car's panel lights 5 only | | Built |
 
-**Shore excursions, reservations 110-150.** Decor; `amb_agent` at the desk.
+**Shore excursions, reservations 110-150.** Decor; `amb_agent` at the desk. `book_6` (134 m): the book in the
+brochure stand's bottom row, the middle pocket, its foot behind the pocket's lip (the user, 2026-11-23; till then on a
+table at the Atrium Café, book 1's place).
 
 **La Cucina 150-168.** `amb_cucina_diners` (two at a table); `rdr_pantry_5a` at 167.
 

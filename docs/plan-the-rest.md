@@ -461,16 +461,27 @@ at 12%): not part of this item.
   own front view ("my lower body isn't visible anyway"), the bed drawn again over him. **Done 2026-11-23:** his `wave`,
   `laugh`, `give` (his book from his fist) and `eat` (a soft serve), seated; Bumbusik sits down across from him in the
   patio chair with her cone, eats it (his cone's look, her own face held) and gets up after the book; he gives
-  *Atomic Habits* (book 1; book 6 to the Atrium Café's table); their photo from La Cucina (the user's) on La Cucina's
+  *Atomic Habits* (book 1; book 6 to the Atrium Café's table, then the shore excursions' brochure stand); their photo from La Cucina (the user's) on La Cucina's
   wall (`slot_cucina`), no longer on his table; the crates moved off the cone's way (232.8 m).
 
-### 2.5 The `keeps` playtest (medium; no art)
+### 2.5 The `keeps` playtest (medium; no art) — **done 2026-11-23**
 
 New: each of his places empty before the table scene and holding its thing after; each thing on
 the cabin's desk once found; each count appearing with its first find. With it `region2` (the
 cover on the first pick-up, closed by a key; the shelf's close view with one book back and
 thirteen gaps), and each region's scenario where something is placed or a book is taken (the
 cover closed before it goes on).
+
+**Built 2026-11-23:** `python tools/playtest.py keeps`, one game with the close-ups shown: nothing counted at the start;
+the wool, her flag, book 6 and his t-shirt each shown close, its count off while it shows and on once a key closes it,
+in the order found; a second find (the feather) and a book given (9) up by one only once closed; his four places empty
+before the table scene and each holding its thing after (by the story: the sleep mask's balcony draws its things only
+while she is out there); the desk seen close with two found and all eight, Bumbot's bed with two and all eight, each
+found thing's box differing from the bare picture and the rest bare. The other scenarios keep skipping the close-ups
+(`region2` shows book 2's cover); the shelf's close view went with 2.3.4. Found on the way: **a book's count went up
+under its cover**; it now waits for the cover to close (`world.take`, `giveBook`, `cover(n, then)`). **Book 6 moved**
+(the user: its pulse hardly showed at the Atrium Café's table, her body in front of it) into the shore excursions'
+brochure stand at 134 m, the bottom row's middle pocket, its foot behind the pocket's lip (`cover`).
 
 ## 5. Part 3: the look-outs and the deliveries
 

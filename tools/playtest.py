@@ -5937,6 +5937,126 @@ def scenario_highlight(b):
     return ok
 
 
+def scenario_keeps(b):
+    """The things to find, kept (plan-the-rest §4 2.5): nothing counted at the start; each kind's count comes with its
+    first find, once its close-up is closed (and the second goes up); a book's cover the same; her husband's four places
+    empty before his table scene and holding their things after; each of her things and his on cabin 8206's desk once
+    found, and Bumbot's on his bed. (The other scenarios skip the close-ups; this one shows them.)"""
+    S = "window.__ship"
+    W = f"{S}.world"
+    def thing(tid):
+        # (Whether it lies there by the story, wherever she is: a balcony's things are drawn only while she is out there.)
+        return b.eval(f"(w => (t => t && [t.x, !t.done && w.met(t.needs) && (!t.after || w.cond(t.after)) && !(t.until && w.cond(t.until)),"
+                      f" t.pick ? Math.round(t.pick.y) : null])(w.things.find(t => t.id === '{tid}')))({W})")
+    def hud():
+        h = b.eval(f"{S}.hud.state()")
+        return {k: h[k] for k in ("cat", "her", "him", "book")} | {"order": h["order"]}
+    shown = (f"(() => {{ const p = {S}.uiLayer.list.find(o => o.active && o.texture && (o.texture.key === 'closeups' || o.texture.key.startsWith('cover-')));"
+             " return p ? (p.texture.key === 'closeups' ? p.frame.name : p.texture.key) : null; })()")
+
+    b.open("?reset&play&at=atrium")
+    b.eval("window.__skipCloseups = false")
+    wait(0.4)
+    ok = check(hud() == {"cat": "", "her": "", "him": "", "book": "", "order": []}, "at the start nothing is counted", hud())
+
+    # The first of each kind (and a second): its close-up, the count not yet on; a key closes it, the count comes on.
+    first = (("keep_wool", D5, "wool", "cat", "1/8"), ("keep_flag", D5, "flag", "her", "1/4"), ("book_6", D5, "cover-6", "book", "1/14"))
+    order = []
+    for tid, y, pic, kind, count in first:
+        x, vis, _ = thing(tid)
+        b.teleport(x, y)
+        b.tap("e")
+        ok &= check(wait_js(b, f"{S}.viewing", 2) and b.eval(shown) == pic, f"{tid}: E shows it close", b.eval(shown))
+        wait(0.3)
+        ok &= check(hud()[kind] == "", f"  its count not on while it shows", hud())
+        b.shot(f"keeps-{pic}")
+        wait(0.4)
+        b.tap("e")
+        ok &= check(wait_js(b, f"!{S}.viewing", 2), "  a key closes it")
+        wait(0.4)
+        order.append(kind)
+        got = hud()
+        ok &= check(got[kind] == count and got["order"] == order, f"  and its count comes on: {count}", got)
+    x, _, _ = thing("keep_feather")
+    b.teleport(x, D4)
+    b.eval(f"{W}.take({W}.things.find(t => t.id === 'keep_feather'))")      # (from the climb's shelf: taken as E would)
+    wait_js(b, f"{S}.viewing", 2)
+    ok &= check(hud()["cat"] == "1/8", "a second find: the count as it was while it shows", hud())
+    wait(0.5)
+    b.tap("e")
+    wait_js(b, f"!{S}.viewing", 2)
+    wait(0.4)
+    ok &= check(hud()["cat"] == "2/8", "  and up by one once it is closed", hud())
+    b.eval(f"{W}.giveBook(9)")                # (a book handed to her: the engineer's, as from his hand)
+    ok &= check(wait_js(b, f"{S}.viewing", 2) and b.eval(shown) == "cover-9", "a book given: its cover shows", b.eval(shown))
+    wait(0.5)
+    ok &= check(hud()["book"] == "1/14", "  the books' count as it was while it shows", hud())
+    b.tap("e")
+    wait_js(b, f"!{S}.viewing", 2)
+    wait(0.4)
+    ok &= check(hud()["book"] == "2/14", "  and up by one once it is closed", hud())
+
+    # His four (§4 2.1): nowhere before his table scene; each in its place after it.
+    his = ("keep_tshirt", "keep_sleepmask", "keep_handheld", "keep_pick")
+    before = {t: thing(t)[1] for t in his}
+    ok &= check(not any(before.values()), "his four places empty before the table scene", before)
+    b.eval(f"{S}.progress.setFlag('table')")
+    wait(0.3)
+    after = {t: thing(t)[1] for t in his}
+    ok &= check(all(after.values()), "and each holding its thing after it", after)
+    x, _, _ = thing("keep_tshirt")
+    b.teleport(x, D12)
+    b.tap("e")
+    ok &= check(wait_js(b, f"{S}.viewing", 2) and b.eval(shown) == "tshirt", "his t-shirt: E shows it close", b.eval(shown))
+    wait(0.7)
+    ok &= check(hud()["him"] == "", "  his count not on while it shows", hud())
+    b.tap("e")
+    wait_js(b, f"!{S}.viewing", 2)
+    wait(0.4)
+    got = hud()
+    ok &= check(got["him"] == "1/4" and got["order"] == ["cat", "her", "book", "him"], "  and his count comes on, last in the row", got)
+    b.shot("keeps-hud")
+
+    # The desk and the bed seen close: each found thing's box differs from the bare picture, each other one is bare.
+    compare = ("((scene, list) => { const s = window.__ship, L = s.cache.json.get(scene + '-layout');"
+               " const px = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;"
+               " const x = c.getContext('2d'); x.drawImage(img, 0, 0); return x; };"
+               " const seen = px(s.textures.get(scene + '-seen').getSourceImage()), bare = px(s.textures.get(scene + '-bare').getSourceImage());"
+               " const out = {}; for (const k of list) { const t = s.textures.get(scene + '-' + k).getSourceImage();"
+               " const a = seen.getImageData(L[k][0], L[k][1], t.width, t.height).data, z = bare.getImageData(L[k][0], L[k][1], t.width, t.height).data;"
+               " out[k] = a.some((v, i) => v !== z[i]); } return out; })")
+    desk = ["flag", "plant", "bookmark", "diary", "tshirt", "sleepmask", "handheld", "pick"]
+    bed = ["massage", "car", "bell", "feather", "snack", "ball", "wool", "sardines"]
+    own = b.eval(f"(r => [r.door, r.floor])({S}.rooms.find(r => r.route === 'cabin'))")
+    def seen(scene, things, found):
+        if scene == "desk":
+            b.teleport(own[0] + 51, own[1], route="cabin")
+        else:
+            b.teleport(b.eval(f"{W}.data.finale.home.catX") - 6, own[1], route="cabin")
+        b.tap("e")
+        wait_js(b, f"{S}.viewing", 2)
+        got = b.eval(f"{compare}('{scene}', {json.dumps(things)})")
+        res = check(got == {k: k in found for k in things}, f"the {scene} seen close: {len(found)} found, each there, the rest bare", got)
+        b.shot(f"keeps-{scene}-{len(found)}")
+        wait(0.5)
+        b.tap("e")
+        wait_js(b, f"!{S}.viewing", 2)
+        wait(0.3)
+        return res
+    ok &= seen("desk", desk, ["flag", "tshirt"])                       # (what she found above)
+    b.eval(f"(s => {{ for (const k of {json.dumps(desk)}) {{ const w = 'keep:' + (['tshirt', 'sleepmask', 'handheld', 'pick'].includes(k) ? 'him' : 'her') + ':' + k;"
+           " if (!s.save.keeps.includes(w)) s.save.keeps.push(w); } })(window.__ship)")
+    ok &= seen("desk", desk, desk)
+    ok &= check(b.errors == [], "no errors", b.errors)
+    # Bumbot's bed, on the day after (book 5, on the bed, taken first).
+    for q, found in (("ball,car", ["ball", "car"]), ("bed", bed)):
+        b.open(f"?reset&play&at=cabin&did=catch,home&books=5&keeps={q}")
+        b.eval("window.__skipCloseups = false")
+        ok &= seen("bed", bed, found)
+    ok &= check(b.errors == [], "no errors", b.errors)
+    return ok
+
+
 SCENARIOS = {name[len("scenario_"):].replace("__", "."): fn for name, fn in globals().items() if name.startswith("scenario_")}
 
 
