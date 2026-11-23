@@ -14,16 +14,27 @@ import numpy as np
 from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CLIPS = {"sit-idle-2": "idle"}
+# folder: (clip, its frames in order, the donor's head pasted in). The gestures keep their own heads (his face acts:
+# the laugh tips it back, the cone meets his mouth); every clip gets the donor's legs and loses its far leg.
+CLIPS = {
+    "sit-idle-2/east": ("idle", range(8), True),
+    "sit-wave-2/east": ("wave", range(7), False),      # its 8th frame came out thinner and upright: the idle follows
+    "sit-laugh/east": ("laugh", range(7), False),
+    "sit-give/east": ("give", range(7), False),
+    "eat-cone/e1": ("eat", range(8), False),          # PixMiniMax from eat-cone/still-s1.png; 0 is that still, 8 ~ 0
+}
 DONOR = 2
+# A frame's head taken from another frame of the same clip in the same pose: the give's held frames (one pose) redrew
+# his brow dark, a stern look as he hands her the book; the first held frame's face in all three.
+FACE_FROM = {"sit-give/east": {3: 2, 4: 2}}
 HEAD = (18, 40)
 LEGS = (66, 80)
 # The first column of the far leg in each row (the near leg's outline is the column before it).
 FAR_FROM = {66: 59, 67: 57, 68: 57, 69: 57, 70: 56, 71: 55, 72: 55, 73: 54, 74: 56, 75: 58, 76: 58, 77: 58}
 
 
-def load(clip, i):
-    return np.array(Image.open(os.path.join(HERE, clip, "east", f"{i}.png")).convert("RGBA"))
+def load(folder, i):
+    return np.array(Image.open(os.path.join(HERE, folder, f"{i}.png")).convert("RGBA"))
 
 
 def save(a, *p):
@@ -33,12 +44,14 @@ def save(a, *p):
 
 
 far = None
-for clip, name in CLIPS.items():
-    donor = load(clip, DONOR)
-    n = len(os.listdir(os.path.join(HERE, clip, "east")))
-    for i in range(n):
-        a = load(clip, i)
-        a[HEAD[0]:HEAD[1]] = donor[HEAD[0]:HEAD[1]]
+donor = load("sit-idle-2/east", DONOR)
+for folder, (name, frames, head) in CLIPS.items():
+    for k, i in enumerate(frames):
+        a = load(folder, i)
+        if head:
+            a[HEAD[0]:HEAD[1]] = donor[HEAD[0]:HEAD[1]]
+        elif i in FACE_FROM.get(folder, {}):
+            a[HEAD[0]:HEAD[1]] = load(folder, FACE_FROM[folder][i])[HEAD[0]:HEAD[1]]
         a[LEGS[0]:LEGS[1]] = donor[LEGS[0]:LEGS[1]]
         if far is None:
             far = np.zeros_like(a)
@@ -46,6 +59,6 @@ for clip, name in CLIPS.items():
                 far[y, x0:] = a[y, x0:]
         for y, x0 in FAR_FROM.items():
             a[y, x0:] = 0
-        save(a, name, f"{i}.png")
+        save(a, name, f"{k}.png")
 save(far, "far", "0.png")
 print("ok")

@@ -4246,3 +4246,30 @@ valuable."
 
 - **Merged:** `main` fast-forwarded to `three-uses` (3fb257b: his table and his cabin seat) and pushed, on the user's
   word (2026-11-22).
+
+## §4 2.4's rest: his gestures and the table scene (the user, 2026-11-23)
+
+- **His four gestures**, seated, skeleton-v3 poses on his character from the idle's pose, through `make.py` (his legs held,
+  his far leg behind the table): `wave` (his near hand raised forward toward her; the first try's hand crossed his face),
+  `laugh`, `give` (the held frames' stern brow given the first held frame's face), `eat` (an edit of his seated frame with
+  a soft serve, then PixMiniMax). The book is in his fist while his arm is out, from the clip's third frame
+  (`GIVE_HANDS` in `src/world/world.js`). Ids in `assets/source/people/husband-raw/README.md`.
+- **The crates** on deck 11 stood between the soft serve machine and his table: no cone could pass ("Do we need that
+  obstacle here at all?"). Moved aft of his table between the Garden Café's palms (232.8 m), off every carrying route,
+  their two tangerines with them.
+- **Bumbusik at the table** ("what does Bumbusik do, while seated?"; "not seating properly in the chair"): her old
+  `sit-eat` had empty hands, made on another chair. Remade on her skeleton (the `sit_seat` move, her near hand at her
+  chest, then small head dips), the generated chair taken out, set 7 px further back into the patio chair than first
+  composed (the user's 7 of 2 to 8), the chair's near arm over her lap; her face held (her standing sprite's head:
+  "Her face is distorted while she's eating"); her cone her husband's cone's own pixels ("too big, let it match his";
+  the carried cone stays as it is: the user's "only at the table"). Clips `sit-cone`, `lick-cone`, `sat`, `sit-up`;
+  `assets/source/her/sit-cone/README.md`.
+- **Only the book after eating** ("two things appearing at once"): the photo slot left his table for La Cucina's wall on
+  deck 5 (`slot_cucina`, 154.25 m, "between the entrance and the first window"; the user's choice of place), with the
+  user's own photo of the two of them at La Cucina's window table (sent whole, his *vyshyvanka* kept; tries at 108 x 144
+  "too pixellated", try 4 of 168 x 224 chosen; a 20 x 26 redraw framed small on the wall: `tools/frame_nook_thumb.py
+  cucina`); the preview shows it at 2x (its margin 76 px). A start place at La Cucina's entrance, `cucina`.
+- **The book he gives** is *Atomic Habits* (book 1, "switch the book to the Atomic Habits one"); book 6 lies on the
+  Atrium Café's table in book 1's old place.
+- **Cost:** about 45 generations (his gestures 23, hers about 15, the photo 7). Tests: `boot`, `region6`, `region9` pass;
+  `tools/check_overlaps.py` 0. Not run: the rest.

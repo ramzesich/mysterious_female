@@ -147,7 +147,7 @@ TANGERINES = {
     "tan_11_spa": (11, 35.3, 1, 40, None),
     "tan_11_topsiders": (11, 156.35, 1, 30, None),
     "tan_11_fruit": (11, 176.8, 2, "table", None),
-    "tan_11_crates": (11, 217.9, 2, 0, "broken:haz_crates_11"),
+    "tan_11_crates": (11, 232.8, 2, 0, "broken:haz_crates_11"),
     # On the hot tub's canopy: up by a wall jump off one of its posts, from under it.
     "tan_11_canopy": (11, 132.5, 1, 90, None),
     "tan_10_tray": (10, 129.8, 1, 0, "flag:trays_10m"),
@@ -179,7 +179,9 @@ ITEMS = {
     # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
     "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
-    "book_1": (5, 85.5, "book:1", None, 23),
+    # (Book 6, Harry Potter and the Philosopher's Stone, since 2026-11-23: her husband gives her book 1, Atomic Habits,
+    # at his table, the user's swap; this was book 1's place.)
+    "book_6": (5, 85.5, "book:6", None, 23),
     "book_2": ("lifeboat", 46, "book:2", None, 17),      # (on the bench left of the ladder, where a vest hung, midway between the flare box and the water can: the user, 2026-11-21)
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
@@ -648,8 +650,9 @@ BREAKABLES = {
     # Delivered luggage, stacked to the ceiling outside a cabin: no hopping it.
     "haz_luggage_9": (9, 180, [("suitcases", 0, 0), ("suitcases", 3, 25), ("suitcases", -2, 50), ("suitcases", 2, 75),
                                ("suitcases", -1, 100)]),
-    # Crates of cones and syrup behind the Great Outdoors' service station.
-    "haz_crates_11": (11, 217.9, [("@crate-big", 0, 0), ("@crate-big", 1, 26)]),
+    # Crates of cones and syrup, stacked between the Garden Café's two palms aft of her husband's table (the user, 2026-11-23:
+    # at 217.9 m they stood between the soft serve machine and his table, and a cone cannot go over or through them).
+    "haz_crates_11": (11, 232.8, [("@crate-big", 0, 0), ("@crate-big", 1, 26)]),
     # Los Lobos' pinata (`sec_pinata`), hung on a string at head height across the way (`hang`: px
     # up to its foot): under it on hands and knees, or the dash through it: its tangerines.
     "sec_pinata": (12, 210.75, [("pinata", 0, 40)], dict(hang=40, string=True)),
@@ -721,7 +724,11 @@ GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "
 SLOTS = {"slot_lifeboat": ("lifeboat", 228, 50),     # (where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21) "slot_lighting": ("lighting", 446, 62),
          # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
          "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 152, 70),
-         "slot_table": (11, 220.0, 33, "flag:table"),  # (3 px into the patio table's top, as what stands on it)
+         # (The photo of the two of them at his table: on La Cucina's wall between its entrance and its first window,
+         # once the table scene is done; it stood on his table and came at the same moment as his book, the user,
+         # 2026-11-23: "I would leave only the book. The picture has to move somewhere else"; "La Cucina wall. I will
+         # also provide a photo for that"; "between the entrance and the first window".)
+         "slot_cucina": (5, 154.25, 52, "flag:table"),
          # On the wall of deck 8's first balcony of all, at the forward end of the row (the plan's
          # `slot_stern`: the stern's terraces are out of sight behind its plating).
          "slot_balcony": ("b8", 74.9, 62)}

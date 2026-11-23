@@ -144,7 +144,12 @@ HER = {
         # her cabin's mirror she runs a hand over her hair.
         "badge": [(f"badge/{i}.png", "feet") for i in range(8)],
         "hair": [(f"hair/{i}.png", "feet") for i in range(8)],
-        "sit-eat": [(f"sit-eat-clean/{i}.png", "feet") for i in (0, 1, 3, 4, 5, 6, 7)],
+        # At her husband's table (the user, 2026-11-23; `sit-cone/`, its README): she sits down in the patio chair with
+        # the cone she carried (the game's own `load-cone` in her fist, `bake.py`), licks it, and gets up after the book.
+        "sit-cone": [(f"sit-cone/cone/sit3/{i}.png", "feet") for i in range(10)],
+        "lick-cone": [(f"sit-cone/cone/sit3/{i}.png", "feet") for i in range(9, 15)],
+        "sat": [("sit-cone/faced/9.png", "feet")],
+        "sit-up": [(f"sit-cone/faced/{i}.png", "feet") for i in range(9, -1, -1)],
         # Region 8 (skeleton-v3, custom poses): both hands up to the horn's cord and down with her
         # weight; a two-handed shot at the court's hoop; under the open parasol she hangs from its
         # handle by both hands (the pull's first frames: a "hover" clip kept her hands down).

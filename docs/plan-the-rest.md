@@ -457,8 +457,11 @@ at 12%): not part of this item.
   (`idle`), in the stand-in's place**, in the Great Outdoors' new patio chair (its near arm in front of him, his far leg
   behind the table); the Great Outdoors' and the Garden Café's tables and chairs remade side-on and beige (what stands on
   them 3 px into the top). **In cabin 8206** (the user's): on the sofa under the window, behind the bed, facing us, in his
-  own front view ("my lower body isn't visible anyway"), the bed drawn again over him. Still to do: `wave`, `laugh`, `eat`,
-  `give`.
+  own front view ("my lower body isn't visible anyway"), the bed drawn again over him. **Done 2026-11-23:** his `wave`,
+  `laugh`, `give` (his book from his fist) and `eat` (a soft serve), seated; Bumbusik sits down across from him in the
+  patio chair with her cone, eats it (his cone's look, her own face held) and gets up after the book; he gives
+  *Atomic Habits* (book 1; book 6 to the Atrium Café's table); their photo from La Cucina (the user's) on La Cucina's
+  wall (`slot_cucina`), no longer on his table; the crates moved off the cone's way (232.8 m).
 
 ### 2.5 The `keeps` playtest (medium; no art)
 
@@ -1108,7 +1111,7 @@ worth more to the gift than either).
 | # | What is owed | Then |
 |---|---|---|
 | U1 | A photo of her husband (or a description in words) | His own character and clips (sit with a cone, eat, wave, laugh, give, a pose for the cabin) in place of the stand-in |
-| U2 | The pictures for five photo slots (the lifeboat, the lighting bridge, deck 8's first balcony, the chapel, the table); "once the game is tested and verified" | Pixel art from a cutout, candidates shown; today a heart in a frame |
+| U2 | The pictures for five photo slots (the lifeboat, the lighting bridge, deck 8's first balcony, the chapel, ~~the table~~ La Cucina's wall: **done 2026-11-23**, the user's photo at La Cucina's window table, `assets/source/photos/cucina/`); "once the game is tested and verified" | Pixel art from a cutout, candidates shown; today a heart in a frame |
 | U3 | The win screen's own message, in both languages | `WIN_MESSAGE` in `src/config.js` (empty) |
 | U4 | The names on the crew doors (BOSUN, PURSER, DJ, STAGE MGR stand in) and on the captain's | Lines of data |
 | U5 | Whether the chapel's wedding is anyone in particular; whether the rival has a name | As answered |

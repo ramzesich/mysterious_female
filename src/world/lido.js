@@ -732,17 +732,25 @@ export const lido = {
     tableScene(h) {
         const s = this.scene, w = this.world, L = this.L, her = s.player;
         w.cut(async () => {
-            const seat = L.tableX + 23;
+            // (She stands 12 px past the table's middle, facing him, and sits back into the patio chair across from
+            // him: her clip lands her back on its backrest, 7 px further back than first placed, the user, 2026-11-23;
+            // the chair's near arm is drawn again over her lap, as over his. Her cone is the one she carried, in her
+            // fist in every frame: `assets/source/her/sit-cone/`.)
+            const seat = L.tableX + 12;
             s.pose('run', 0.6);
             her.setFlipX(seat < her.x);
             her.body.enable = false;
             await w.tween({ targets: her, x: seat, duration: Math.abs(seat - her.x) * 11 + 60 });
             her.setFlipX(true);
-            const sat = s.anims.exists('her-sit-eat');
+            const sat = s.anims.exists('her-sit-cone');
+            let arm = null;
             if (sat) {
                 w.carryBox.give();
-                her.anims.play('her-sit-eat');
-                her.anims.chain('her-eat-sat');
+                arm = s.add.image(2 * L.tableX - (h.cover?.[0]?.x ?? L.tableX - 17), L.y, 'shipart', 'patio-chair-arm-w20').setOrigin(0.5, 1).setFlipX(true)
+                    .setDepth(s.DEPTH.player + 0.01);
+                w.add([arm]);
+                her.anims.play('her-sit-cone');
+                her.anims.chain('her-lick-cone');
             } else if (s.anims.exists('her-read')) {
                 her.anims.play('her-read');
                 her.anims.pause();
@@ -759,13 +767,19 @@ export const lido = {
             }
             await w.wait(500);
             if (w.carry) w.carryBox.give();
-            // The picture, on the table between them.
+            // (Both cones eaten.)
+            if (sat) her.anims.play('her-sat');
+            // Done: their photo is up on La Cucina's wall from now on (`slot_cucina`, deck 5); here only his book follows.
             this.P.setFlag('table');
-            w.sparkle(L.tableX, L.y - 40);
             sfx.done();
             await w.wait(700);
             this.people.idle(h);
-            await w.handOver(h, '@book-6', () => w.giveBook(6));
+            await w.handOver(h, '@book-1', () => w.giveBook(1));
+            if (sat) {
+                her.anims.play('her-sit-up');
+                await new Promise(r => her.once('animationcomplete', r));
+                arm.destroy();
+            }
             s.pose('stand');
             her.body.enable = true;
             her.body.reset(her.x, L.y);

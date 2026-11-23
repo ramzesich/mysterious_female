@@ -3887,8 +3887,8 @@ def scenario_region6(b):
     wait(3.0)
     b.shot("region6-table")
     ok &= check(wait_flag(b, "table", 12), "E with it: she sits down with him, and they eat looking at the wake", flags(b))
-    ok &= check(js(b, f"{S}.save.books['6']") == "held", "he gives her the sixth book")
-    ok &= check(js(b, f"{thing('slot_table')}.items[0].visible"), "their picture stands on the table")
+    ok &= check(js(b, f"{S}.save.books['1']") == "held", "he gives her the first book, Atomic Habits")
+    ok &= check(js(b, f"{thing('slot_cucina')}.items[0].visible"), "their photo is on La Cucina's wall now")
     b.shot("region6-picture")
     # With no errand left, a cone is hers.
     swirl(1.75)

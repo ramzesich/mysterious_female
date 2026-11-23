@@ -484,7 +484,8 @@ export class Library {
             // (A photo slot's picture in its gold frame, as the small one on the wall: the user, 2026-11-22.)
             const framed = exists && key.startsWith('photo-');
             const pic = s.add.image(VIEW.width / 2, VIEW.height / 2, framed ? this.framed(key) : exists ? key : 'photo-frame');
-            pic.setScale(scale || Math.max(1, Math.floor(Math.min((VIEW.width - 160) / pic.width, (VIEW.height - (framed ? 80 : 100)) / pic.height))));
+            // (A framed photo leaves 38 px over and under it: La Cucina's, 176 x 232 framed, then shows at 2x, the nook's at 3x.)
+            pic.setScale(scale || Math.max(1, Math.floor(Math.min((VIEW.width - 160) / pic.width, (VIEW.height - (framed ? 76 : 100)) / pic.height))));
             s.uiLayer.add([dim, pic]);
             s.tweens.add({ targets: [dim, pic], alpha: { from: 0, to: 1 }, duration: 220 });
             sfx.page();
