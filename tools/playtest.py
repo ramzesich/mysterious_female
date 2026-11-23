@@ -5855,21 +5855,27 @@ def scenario_highlight(b):
         wait(settle)
         return b.eval(f"{H}.state()")
     ok = True
-    # A door she uses (the laundry's, full colour): down to deck 4's 20% and back.
+    # Doors are secrets too: at rest washed like the background doors beside them; at the laundry's (between guest
+    # cabin doors, 35%) the wash pulses off it, up to full colour, and back.
+    ok &= check(b.eval(f"{H}.rest.size") >= 60 and b.eval(f"{H}.restBox.size") >= 15 and b.eval(f"{H}.skipped.length") == 0,
+                "every door she can use is washed at rest, none without a tone", (b.eval(f"{H}.rest.size"), b.eval(f"{H}.restBox.size"), b.eval(f"{H}.skipped")))
     door = b.eval(f"{S}.rooms.find(r => r.route === 'laundry').door")
     st = at(door + 4, D4)
-    ok &= check(len(st) == 1 and st[0]["key"].startswith("door:") and st[0]["parts"][0]["mode"] == "full"
-                and abs(st[0]["parts"][0]["k"] - 0.2) < 1e-6 and st[0]["parts"][0]["frame"] == "door-crew",
-                "at the laundry's door: the door pulses from full colour toward deck 4's wash (20%)", st)
+    ok &= check(len(st) == 1 and st[0]["key"].startswith("door:") and st[0]["parts"][0]["mode"] == "rest"
+                and abs(st[0]["parts"][0]["k"] - 0.35) < 1e-6 and st[0]["parts"][0]["frame"] == "door-crew",
+                "at the laundry's door: washed 35% like the cabin doors beside it, the wash pulsing off", st)
     seen = set()
     for _ in range(20):
         wait(0.08)
         seen.add(round(b.eval(f"{H}.state()[0].parts[0].alpha"), 2))
-    ok &= check(max(seen) > 0.15 and min(seen) < 0.05, "and back, again and again while she stands there", sorted(seen))
-    # Her crew cabin's door, white on deck 3, pulses deeper: 40% (the user: "only for this door here").
+    ok &= check(max(seen) > 0.3 and min(seen) < 0.05, "and back, again and again while she stands there", sorted(seen))
+    at(door + 200, D4, settle=0.8)
+    ok &= check(abs(b.eval(f"(o => {H}.rest.get(o).over.alpha)({H}.find(o => o.frame.name === 'door-crew' && Math.abs(o.x - {door}) < 20 && Math.abs(o.y - {D4}) < 4)[0])") - 0.35) < 1e-6,
+                "away from it: washed again")
+    # Her crew cabin's door: washed like the crew door beside it (the Medical Center's, 35%).
     st = at(SPAWN_X - 6, D3)
-    ok &= check(bool(st) and st[0]["key"].startswith("door:") and abs(st[0]["parts"][0]["k"] - 0.4) < 1e-6,
-                "her crew cabin's door: down to 40%", st)
+    ok &= check(bool(st) and st[0]["key"].startswith("door:") and st[0]["parts"][0]["mode"] == "rest" and abs(st[0]["parts"][0]["k"] - 0.35) < 1e-6,
+                "her crew cabin's door: washed 35% at rest, up to full colour", st)
     # Her mirror, drawn into the room's picture: only its own pixels pulse (the wall round it taken out).
     mirror = b.eval(f"{S}.world.rooms.crewcabin.mirror")
     st = at(mirror + 2, D3, route="crewcabin")
@@ -5878,8 +5884,9 @@ def scenario_highlight(b):
     # From inside, the way out is the door drawn in the room's picture: it pulses there (the user: "the doors are not
     # pulsing" inside her crew cabin and cabin 8206).
     st = at(SPAWN_X + 6, D3, route="crewcabin")
-    ok &= check(bool(st) and st[0]["key"].startswith("door:") and b.eval(f"{H}.on.get('{st[0]['key']}').parts[0].o.texture.key") == "room-crewcabin",
-                "inside her crew cabin: its door, in the room's picture, pulses", st)
+    ok &= check(bool(st) and st[0]["key"].startswith("door:") and b.eval(f"{H}.on.get('{st[0]['key']}').parts[0].o.texture.key") == "room-crewcabin"
+                and st[0]["parts"][0]["mode"] == "rest" and abs(st[0]["parts"][0]["k"] - 0.3) < 1e-6,
+                "inside her crew cabin: its door, in the room's picture, washed 30% like the room, pulses up", st)
     # A muted piece (the ice swan): its full twin while she is there, its muted one again once she has gone.
     x, y = thing("sec_swan")
     st = at(x - 10, y)

@@ -60,6 +60,7 @@ DUMP = """(() => { const s = window.__ship, out = [];
   const walk = list => { for (const o of list) {
     if (o.type === 'Container' || o.type === 'Layer') { walk(o.list); continue; }
     if (!o.visible || o.alpha === 0 || !o.getBounds || !['Image', 'Sprite', 'Text'].includes(o.type)) continue;
+    if (o.hlCopy) continue;      // (a wash laid over a thing by src/highlight.js: its door's own copy, not a piece)
     const b = o.getBounds();
     // (A sign of src/signs.js is a picture that says what it reads: counted as text.)
     out.push({ t: o.signText != null ? 'Text' : o.type, k: o.texture ? o.texture.key : '', f: String(o.frame ? o.frame.name : ''), text: o.signText ?? o.text ?? '',

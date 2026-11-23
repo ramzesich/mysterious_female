@@ -11,6 +11,13 @@
 // over it at the wash's strength (the same sum, colour by colour), so nothing new is drawn and nothing is built;
 // a muted map piece is shown by its full twin with that copy over it at rest, which is the muted twin exactly.
 //
+// **Doors are secrets too** (the user, 2026-11-23: "make all doors look like their background neighboring doors. Or,
+// like other background things around them, if there are no doors"): at rest every door she can use is washed as the
+// background doors beside it are (the guest cabins' 35%), or as the props round it, or inside a room as the room
+// (30% toward its wall); a trunk's door with nothing round it 20% (the user). The pulse brings it up to full colour.
+// Left as they are (the user): the lifts, the glass doors across the deck, deck 11's lone steel one, the balconies'
+// doors, the lifeboat's roof hatch, the shower's door; the captain's door and the nook's bookcase are muted already. `restDoors`, once the world is built.
+//
 // Which thing is the one E would act on is asked as the ship scene asks it (`ShipScene.update`'s E chain: the
 // world's things and carts, a key card, the shower, the mirror, a route's door, a door across the deck, a lift, a
 // trunk's door), in that order, the first one only. The story's E with people is theirs and shows nothing.
@@ -22,9 +29,10 @@ const SETTLE = 270;         // ms, from the deepest pulse back to its own state 
 const WALL = 0xe9dfcc;      // the corridor wall the props are washed toward (tools/build_ship_art.py's WALL)
 const ROOM_WASH = 0.3;      // a room's wash toward its own wall (tools/draw_rooms.py, draw_cabin.py, draw_linen.py)
 const SUFFIX = { '-bg': 0.35, '-w20': 0.20, '-lt': 0.12 };
-// Doors that pulse deeper than their place's wash, from the corridor and from inside: her crew cabin's white door on
-// deck 3 hardly changed at 20% (the user, 2026-11-23, of three strengths: "40%, but only for this door here").
-const DEEPER = { crewcabin: 0.4 };
+// (Her crew cabin's door pulsed down to 40% once, "only for this door here"; muted at rest since, it pulses up.)
+const TRUNK_ALONE = 0.2;    // a trunk's door with no background door and no prop round it (the user, 2026-11-23)
+const SKIP_DOORS = /^(roof|balcony|bookcase)$/;   // a room's doors left as they are: the lifeboat's hatch, the
+                                                  // balconies' (the user: to be worked on), the nook's bookcase (muted)
 const ROOM_WALLS = { 'cabin-8206': 0xece3cf, 'linen-room': 0xdfe8e2 };   // (draw_cabin.py's, draw_linen.py's WALL)
 // Figures never change (the user: "People shall not change tones at all"), nor Bumbot.
 const FIGURES = /^(people|bumbot|her|court|reading|drill|gags|towels)/;
@@ -54,12 +62,27 @@ const IN_ROOM = {
     chute: { key: 'linen-room', box: [7, 82, 35, 37], full: true },           // tools/draw_linen.py: the chute's hatch (kept)
 };
 
+// A copy cut as its picture is (a door's leaf drawn in front of her as she steps out of it is the door's picture
+// cut to the leaf: copied whole, the doorway's part of the copy lay over her).
+function sameCut(o, c) {
+    const k = o._crop;
+    if (o.isCropped && k) {
+        if (!c.isCropped || c._crop.x !== k.x || c._crop.y !== k.y || c._crop.width !== k.width || c._crop.height !== k.height) {
+            c.setCrop(k.x, k.y, k.width, k.height);
+        }
+    } else if (c.isCropped) c.setCrop();
+}
+
 export class Highlight {
     constructor(scene, levels) {
         this.s = scene;
         this.levels = levels;
         this.on = new Map();        // key -> { parts, p, since, base, k }
         this.walls = {};
+        this.rest = new Map();      // a door's picture -> its wash at rest { over, k }; `restDoors`
+        this.restBox = new Map();   // a room door drawn in its room's picture, by its box -> { over, k }
+        this.skipped = [];          // doors with nothing to take a tone from (for the tests and the log)
+        this.restOff = false;       // (for pictures of before and after: the doors' wash at rest not drawn)
         scene.events.on('postupdate', (time, delta) => this.update(time, delta));
     }
 
@@ -100,7 +123,7 @@ export class Highlight {
         const door = s.routeDoorAt(p.x, p.y);
         if (door) {
             const x = door.d ? (door.leaving ? door.d.x : door.d.outX) : (door.room ? door.room.door : door.x);
-            return { key: `door:${x}:${Math.round(p.y)}`, door: { x, y: p.y }, deeper: DEEPER[door.room?.def?.id ?? door.room?.route] };
+            return { key: `door:${x}:${Math.round(p.y)}`, door: { x, y: p.y } };
         }
         if (s.route === 'inside') {
             const b = s.bulkheads.find(b => !b.open && Math.abs(p.y - b.floor) <= 4 && Math.abs(p.x - b.x) <= 24);
@@ -154,11 +177,7 @@ export class Highlight {
             // Inside a room, its way out is drawn in the room's own picture (in full colour, `Room.full`): the door's
             // box there, the wall round it taken out (the corridor's door picture is behind the room's, unseen).
             const obj = this.find(o => o.visible && o.texture.key === this.roomKey())[0];
-            if (obj) {
-                const tl = obj.getTopLeft(), dx = Math.round(tg.door.x - tl.x), fy = Math.round(tg.door.y - tl.y);
-                const x0 = Math.max(0, dx - 17), y0 = Math.max(0, fy - 84);
-                add(obj, { box: [x0, y0, Math.min(obj.width, dx + 18) - x0, fy - y0], full: true, room: this.roomKey() });
-            }
+            if (obj) add(obj, { box: this.doorBox(obj, tg.door.x, tg.door.y), full: true, room: this.roomKey() });
         } else if (tg.door) {
             const { x, y } = tg.door;
             const o = this.find(o => (o.type === 'Image' || o.type === 'Sprite') && o.visible
@@ -174,6 +193,89 @@ export class Highlight {
             add(this.shutPicture(tg.bulkhead));
         }
         return pics;
+    }
+
+    // A room door's box in its room's picture: 17 px either side of its middle, 84 up from the floor.
+    doorBox(obj, x, y) {
+        const tl = obj.getTopLeft(), dx = Math.round(x - tl.x), fy = Math.round(y - tl.y);
+        const x0 = Math.max(0, dx - 17), y0 = Math.max(0, fy - 84);
+        return [x0, y0, Math.min(obj.width, dx + 18) - x0, fy - y0];
+    }
+
+    // --- Doors at rest, washed like what stands round them ------------------------------------------------------
+    restDoors() {
+        const s = this.s, w = s.world;
+        const all = this.find(o => o.getBounds && (o.type === 'Image' || o.type === 'Sprite'));
+        const B = o => o.getBounds();
+        const muted = o => /-(bg|w20|lt)$/.test(String(o.frame.name));
+        const isDoor = o => /door/.test(o.texture.key) || /door/.test(String(o.frame.name));
+        // The level round a door: the background doors beside it, else the props round it.
+        const level = (x, y) => {
+            const nb = all.filter(o => isDoor(o) && muted(o) && Math.abs(B(o).bottom - y) < 10 && Math.abs(B(o).centerX - x) > 24
+                && Math.abs(B(o).centerX - x) < 420).sort((a, b) => Math.abs(B(a).centerX - x) - Math.abs(B(b).centerX - x))[0];
+            const pr = nb ?? all.filter(o => o.texture.key === 'shipart' && muted(o) && !/^(door|railing)/.test(o.frame.name)
+                && Math.abs(B(o).bottom - y) < 12 && Math.abs(B(o).centerX - x) < 160).sort((a, b) => Math.abs(B(a).centerX - x) - Math.abs(B(b).centerX - x))[0];
+            return pr ? SUFFIX[Object.keys(SUFFIX).find(k => pr.frame.name.endsWith(k))] : null;
+        };
+        const at = (x, y) => all.filter(o => isDoor(o) && !muted(o) && !FIGURES.test(o.texture.key)
+            && Math.abs(B(o).centerX - x) < 20 && Math.abs(B(o).bottom - y) < 10);
+        const wash = (pics, k, what) => {
+            if (k == null) { this.skipped.push(what); return; }
+            for (const o of pics) if (o && !this.rest.has(o)) {
+                const over = this.copy(o, WALL);
+                this.rest.set(o, { over, k });
+            }
+        };
+        const roomPic = route => all.find(o => o.texture.key === (route === 'cabin' ? 'cabin-8206' : route === 'linen' ? 'linen-room'
+            : route === 'chapel' ? 'chapel-room' : `room-${route}`));
+        const inside = (route, x, y) => {
+            const obj = roomPic(route);
+            if (!obj) return;
+            const box = this.doorBox(obj, x, y), key = `${obj.texture.key}:${box.join(',')}`;
+            if (this.restBox.has(key)) return;
+            const over = this.boxPicture(obj, { box }, 'full', ROOM_WASH, this.wallOf(obj.texture.key));
+            this.restBox.set(key, { over, k: ROOM_WASH, o: obj });
+        };
+        for (const r of s.rooms) {
+            const doors = r.doors ?? [{ x: r.door, outX: r.door, outY: r.floor, outRoute: 'inside' }];
+            for (const d of doors) {
+                if (SKIP_DOORS.test(d.kind ?? '') || r.hidden) continue;
+                if (d.outRoute === 'inside' || d.outRoute === 'promenade') wash(at(d.outX, d.outY), level(d.outX, d.outY), `room ${r.route} at ${d.outX}`);
+                inside(r.route, d.x, r.floor);
+            }
+        }
+        if (s.promenade) for (const x of s.promenade.doors) wash(at(x, s.promenade.floor), level(x, s.promenade.floor), `promenade door at ${x}`);
+        // The doors across the deck: the glass ones (one-way ones too) stay as they are (the user: "Leave all the glass
+        // doors as they are now"), and a steel one with nothing round it (deck 11's, by the lido): only the steel ones
+        // by something take its tone.
+        for (const b of s.bulkheads) {
+            const glass = b.shut.type !== 'Graphics' || b.shut.commandBuffer?.includes(0xbfe6f5);
+            const k = level(b.x, b.floor);
+            if (glass || k == null) continue;
+            wash([this.shutPicture(b), b.openDoor].filter(o => o?.texture), k, `door across deck at ${b.x},${b.floor}`);
+        }
+        for (const t of s.trunks) for (const d of t.doors) wash([d.sprite], level(t.x, d.y) ?? TRUNK_ALONE, `trunk at ${t.x},${d.y}`);
+        for (const t of w.things) if (/^haz_dnd/.test(t.id)) wash(at(t.x, t.y), level(t.x, t.y), `${t.id}`);
+        this.restDone = true;
+    }
+
+    // The washes at rest follow their doors (a door opened, shut, slid, shown or hidden); one pulsing is the pulse's.
+    restSync() {
+        for (const [o, r] of this.rest) {
+            const c = r.over;
+            if (!o.scene || !c.scene) continue;
+            if (c.texture.key !== o.texture.key || c.frame.name !== o.frame.name) c.setTexture(o.texture.key, o.frame.name);
+            c.setPosition(o.x, o.y).setOrigin(o.originX, o.originY).setFlip(o.flipX, o.flipY).setScale(o.scaleX, o.scaleY);
+            sameCut(o, c);
+            const g = o.hlOver;
+            c.setVisible((g ? g.visible : o.visible) && !this.restOff);
+            if (!r.pulsing) c.setAlpha(r.k * (g ? g.alpha : o.alpha));
+        }
+        for (const r of this.restBox.values()) {
+            if (!r.over.scene) continue;
+            r.over.setVisible(r.o.visible && !this.restOff);
+            if (!r.pulsing) r.over.setAlpha(r.k * r.o.alpha);
+        }
     }
 
     // Every picture of the scene that passes `test` (in layers too).
@@ -254,6 +356,13 @@ export class Highlight {
         const s = this.s, parts = [];
         for (const pic of this.parts(tg)) {
             const o = pic.obj;
+            const rest = pic.box ? this.restBox.get(`${o.texture.key}:${pic.box.join(',')}`) : this.rest.get(o);
+            if (rest) {
+                // A door washed at rest: its own wash pulses off it.
+                rest.pulsing = true;
+                parts.push({ o, over: rest.over, mode: 'rest', k: rest.k, rest, box: pic.box });
+                continue;
+            }
             const suffix = Object.keys(SUFFIX).find(x => String(o.frame.name).endsWith(x));
             const inRoom = s.route !== 'inside' && s.route !== 'promenade';
             let mode, k, wash, frame = null;
@@ -266,7 +375,7 @@ export class Highlight {
                 o.setFrame(frame.slice(0, -suffix.length));
             } else {
                 mode = 'full'; wash = pic.box || inRoom ? this.wallOf(pic.room ?? this.roomKey()) : WALL;
-                k = pic.depth ?? tg.deeper ?? (pic.box || inRoom ? ROOM_WASH : this.placeLevel(o.x, s.player.y));
+                k = pic.depth ?? (pic.box || inRoom ? ROOM_WASH : this.placeLevel(o.x, s.player.y));
             }
             const over = pic.box ? this.boxPicture(o, pic, mode, k, wash) : this.copy(o, wash);
             parts.push({ o, over, mode, k, frame, box: pic.box });
@@ -346,12 +455,15 @@ export class Highlight {
 
     end(e) {
         for (const part of e.parts) {
+            if (part.rest) { part.rest.pulsing = false; continue; }    // (its wash at rest stays)
             if (part.frame && part.o.scene) part.o.setFrame(part.frame);
             part.over.destroy();
         }
     }
 
     update(time, delta) {
+        if (!this.restDone && this.s.world && this.s.rooms?.length) this.restDoors();
+        this.restSync();
         const tg = this.target();
         const key = tg?.key ?? null;
         if (key && !this.on.has(key)) this.on.set(key, this.start(tg, time));
@@ -368,10 +480,11 @@ export class Highlight {
             for (const part of e.parts) {
                 const o = part.o, c = part.over;
                 if (!o.scene || !c.scene) continue;          // (taken away meanwhile: a pickup picked up)
-                const a = part.mode === 'muted' ? part.k * (1 - e.p) : part.mode === 'full' ? part.k * e.p : e.p;
+                const a = part.mode === 'muted' || part.mode === 'rest' ? part.k * (1 - e.p) : part.mode === 'full' ? part.k * e.p : e.p;
                 if (!part.box) {
                     c.setTexture(o.texture.key, o.frame.name).setPosition(o.x, o.y).setOrigin(o.originX, o.originY)
                         .setFlip(o.flipX, o.flipY).setScale(o.scaleX, o.scaleY);
+                    sameCut(o, c);
                 }
                 c.setVisible(o.hlOver ? o.hlOver.visible : o.visible).setAlpha(a * (o.hlOver ? 1 : o.alpha));
             }

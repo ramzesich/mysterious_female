@@ -336,3 +336,20 @@ boot, deck3, intro, region4, region6, region9, cabin, linen, lift, trunk, mishap
 and the funnel horn (drawn inside larger pictures). A slip: some runs wrote into the shared `bumbusik-playtest`
 temp folder (TEMP set from TMP before it changed); the shared `last.json`'s failed list was overwritten and only
 my entry taken back out.
+
+## Doors are secrets too (2026-11-23, approved)
+
+The user: "make all doors look like their background neighboring doors. Or, like other background things around
+them, if there are no doors. Meaning, they will work like secrets". Every door she can use (208, in 48 kinds, looked
+at in sheets) is washed at rest by `restDoors` in `src/highlight.js`: as the background doors beside it (the guest
+cabins' 35%), else as the props round it (20% or 12%), inside a room as the room (30% toward its wall); the pulse takes
+the wash off, up to full colour, and back. A wash copy follows its door (opened, slid, cut to its leaf as she steps
+out of her cabin in the intro: `sameCut`).
+
+The user's answers, one by one: the lifeboat's roof hatch excluded ("already implemented properly"); **every lift
+stays as it is**; a trunk's door with nothing round it 20%; **all the glass doors across the deck stay as they are**
+(72, the one-way ones too), and deck 11's lone steel one; the balcony doors left as they are ("they don't look like
+doors at all": to be worked on next); cabin 8206's shower door stays full. Her crew cabin's door is now washed 35% like
+the crew door beside it (its 40% pulse down is gone). `tools/check_overlaps.py` skips the wash copies (`hlCopy`).
+Runs: highlight, boot, deck3, intro, region4, region6-9, cabin, linen, trunk, lift, stairs, atrium, promenade, balcony,
+bridge passed; check_overlaps 0; region5 fails as on main.
