@@ -696,11 +696,19 @@ SOURCES = {
     "src_vase": (8, 193.0, "vase", None,
                  [("thing:tray-stand", 0), ("tray-18", 24), ("thing:delivery-vase", 27), ("sign:card:8215", 23)], None,
                  "flag:dlv_vase"),
+    # 2, the pot of tea (deck 10 midships; the user, 2026-11-23): on the same low table, by the forward lobby door
+    # between cabins 10211 and 10212, the other way from the vase's; a shorter, thinner tray (22 px, 3 tall) on the
+    # table's top, the teapot and its cup on it (26: the tray's top row less one), its tag 10230.
+    "src_tea": (10, 113.2, "tea", None,
+                [("thing:tray-stand", 0), ("tray-22", 24), ("thing:delivery-teapot", 26), ("sign:card:10230", 23)], None,
+                "flag:dlv_tea"),
 }
 # The deliveries' cabins (plan-the-rest §5 3.2): id: (deck, m of its door, what she brings, the flag once delivered, the
 # book it pays or None, its number, px up to the number's plate on the door). The number is the corridor's own count
 # (`cabins-8-360`: 8214 at its first door, 111.6 m).
-DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48)}
+DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48),
+              # (`cabins-10-360`: 10211 at its first door, 111.2 m.)
+              "dlv_tea": (10, 187.6, "tea", "dlv_tea", 13, "10230", 48)}
 # Signs: id: (deck, m, text, style, dy px up, options). The style is a look of src/signs.js (notice, bulletin,
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {

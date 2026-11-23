@@ -18,7 +18,7 @@ export const LOADS = {
     lunch: { draw: 'cloche' },
     cone: { draw: 'cone', ms: 45000, bare: true },
     stub: { draw: 'stub', ms: 45000, bare: true },
-    coffee: { frame: 'coffee-cup', ms: 50000 },
+    coffee: { frame: 'coffee-cup', ms: 50000, hot: true },
     cocktail: { frame: 'umbrella-cocktail' },
     cake: { thing: 'wedding-cake', fragile: true },
     canister: { draw: 'canister', heavy: true, bare: true },
@@ -26,6 +26,10 @@ export const LOADS = {
     // narrower tray (`tray`, px; the user, 2026-11-23), the bouquet before her face, and round the screen the flowers
     // she sees the hallway through (`view`, the user's frame: `assets/source/things/delivery/`).
     vase: { thing: 'delivery-vase', tray: 18, view: 'flower-frame' },
+    // 2, the pot of tea (deck 10 midships): it cools as the coffee does, the HUD's meter orange to blue, steam from its
+    // spout; a tray 22 px long and 3 tall (the user, 2026-11-23: "a bit thinner"); the pot drawn by hand
+    // (`assets/source/things/delivery/draw_teapot.py`), its spout the way she faces.
+    tea: { thing: 'delivery-teapot', tray: 22, ms: 45000, hot: true, spout: [9, 7] },
 };
 
 // Her hop with a load (`carry-rise`, `carry-apex`, `carry-fall` in her sheet): where the load stands in each, [px ahead of
@@ -62,6 +66,12 @@ export class Carry {
         make('tray-18', 18, 4, g => {
             g.fillStyle(0x2e222f, 1).fillRect(1, 0, 16, 4);
             g.fillStyle(0xc7dcd0, 1).fillRect(2, 1, 14, 2);
+            g.fillStyle(0xffffff, 1).fillRect(3, 1, 6, 1);
+        });
+        // (The teapot's: as long as the pot and its cup, a row thinner.)
+        make('tray-22', 22, 3, g => {
+            g.fillStyle(0x2e222f, 1).fillRect(1, 0, 20, 3);
+            g.fillStyle(0xc7dcd0, 1).fillRect(2, 1, 18, 1);
             g.fillStyle(0xffffff, 1).fillRect(3, 1, 6, 1);
         });
         make('load-cloche', 18, 12, g => {
@@ -197,18 +207,34 @@ export class Carry {
         // (In her hop's three poses the load is where her fists are in that frame, px ahead of her middle and up:
         // tucked, her hands come nearer her feet; `assets/source/her/carry-jump/`.)
         const hold = HOP_HOLDS.find(([pose]) => s.herFrames?.[pose] === p.frame.name);
-        const [dx, up] = hold ? hold[1] : [14, 31];
+        // (Turned to face us, in the lift and the like, the load is at her middle in front of her; her back to us, at her
+        // middle behind her; in profile again, at her hands. The user, 2026-11-23.)
+        const fr = p.texture.key === 'her' ? Number(p.frame.name) : NaN;
+        const F = s.herFrames ?? {};
+        const facing = fr === F['carry-front'] || fr === F.front ? 1 : fr === F['carry-back'] || fr === F.back ? -1 : 0;
+        const [dx, up] = facing ? [0, 31] : hold ? hold[1] : [14, 31];
         const x = Math.round(p.x + front * dx), y = Math.round(p.y - up + (s.grounded ? 0 : -1));
         let top = y;
+        // (Drawn as she is, one step nearer us, the tray under its load: her depth wherever she is, behind a flight's wall or a
+        // deck's floor on the stairs, in a pool, and her blink after a scare. The user, 2026-11-23: the vase was drawn over
+        // the decks while she went up the stairs behind them. Her back to us, one step behind her, the load still over its
+        // tray.)
+        const n = this.items.length;
+        const near = (img, k) => img.setDepth(p.depth + 0.001 * (facing < 0 ? k - n : k + 1)).setAlpha(p.alpha);
+        this.items.forEach(near);
         for (const img of this.items) {
-            img.setPosition(x, top).setVisible(p.visible && s.mode !== 'lift');
-            top -= img.texture.key.startsWith('tray') ? 3 : 0;
+            // (Turned the way she faces: the teapot's spout ahead of her.)
+            img.setPosition(x, top).setFlipX(p.flipX).setVisible(p.visible);
+            // (What is on a tray stands on its top row.)
+            top -= img.texture.key.startsWith('tray') ? img.height - 1 : 0;
         }
         if (LOADS[this.kind].fragile && this.sway(x)) return;
-        // A hot cup steams (less as it cools).
-        if (this.kind === 'coffee' && p.visible && s.time.now > (this.steamAt ?? 0)) {
+        // A hot cup or pot steams (less as it cools): a pot from its spout's tip (`spout`, px ahead of its middle and up).
+        const load = LOADS[this.kind];
+        if (load.hot && p.visible && s.time.now > (this.steamAt ?? 0)) {
             this.steamAt = s.time.now + 260 + (1 - (this.left() ?? 1)) * 700;
-            const wisp = s.add.rectangle(x + Phaser.Math.Between(-1, 1), top - 6, 1, 3, 0xffffff, 0.8).setDepth(s.DEPTH.player + 0.013);
+            const [sx, sy] = load.spout ?? [0, 6];
+            const wisp = s.add.rectangle(x + front * sx + Phaser.Math.Between(-1, 1), top - sy - 2, 1, 3, 0xffffff, 0.8).setDepth(this.items.at(-1).depth + 0.0005);
             this.world.add([wisp]);
             s.tweens.add({ targets: wisp, y: wisp.y - 12, x: wisp.x + Phaser.Math.Between(-3, 3), alpha: 0, duration: 700, onComplete: () => wisp.destroy() });
         }

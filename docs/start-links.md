@@ -82,6 +82,7 @@ new one added there should be added here too.
 |---|---|
 | `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all> |
 | `hall8`: deck 8's midships hallway near its aft lobby door (delivery 1: the vase on its table by that door) | <http://localhost:8000/?play&at=hall8&tangerines=infinite> |
+| `hall10`: deck 10's midships hallway near its forward lobby door (delivery 2: the pot of tea on its table there) | <http://localhost:8000/?play&at=hall10&tangerines=infinite> |
 | `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all> |
 | `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
 | `mask10`: outside, deck 10's first balcony, aft of its long lounger (his sleep mask on it after the table scene, 14) | <http://localhost:8000/?play&at=mask10&did=table> |

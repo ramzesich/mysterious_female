@@ -658,7 +658,9 @@ view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
 | 145 | `haz_swing_10m` | A swinging door | `reactive(3, 0.6)` | |
 | 154 | `sign_wet_10m` + `haz_sprinkler_10m` | The sign and the sprinkler at 156 | `timed(5, 2)` | |
 | 170 | `haz_dnd_10m2` | A second "Do Not Disturb" door | E only | |
+| 113.2 | `src_tea` | Delivery 2: the pot of tea and its cup on a 22 px tray on the vase's low table by the forward lobby door, its tag 10230; gone from the table while she carries it | `SOURCES` (2026-11-23) | Generated, set by hand |
 | 182 | `tan_10_mid` | A tray | | |
+| 187.6 | `dlv_tea` | Cabin 10230, delivery 2's door: its number on a steel plate beside it; E with the tea (still warm: 45 s), a hand takes it, book 13 | `DELIVERIES` (2026-11-23) | |
 
 **The aft hallway 202-247 (region 7), "the balcony guest's".**
 

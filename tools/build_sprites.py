@@ -90,6 +90,10 @@ HER = {
         "carry-rise": [("carry-jump/raw3/0.png", "feet")],
         "carry-apex": [("carry-jump/raw3/1.png", "feet")],
         "carry-fall": [("carry-jump/raw3/2.png", "feet")],
+        # Turned to us or away with a load (the user, 2026-11-23: "adjust her hands accordingly"): her front and back views
+        # with her forearms raised to the tray at her middle (`carry-turn/`, its README), framed as `rotations/`.
+        "carry-front": [("carry-turn/front.png", "keep")],
+        "carry-back": [("carry-turn/back.png", "keep")],
         # A start: she recoils from what bumped her (skeleton-v3's hit move), before she runs off.
         "hit": [(f"hit/{i}.png", "feet") for i in range(6)],
         # Her falls (the user, 2026-11-16; skeleton-v3 poses): a slip onto her bottom and a trip flat on

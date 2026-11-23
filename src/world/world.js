@@ -10,7 +10,7 @@ import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { People } from './people.js';
-import { Carry } from './carry.js';
+import { Carry, LOADS } from './carry.js';
 import { Story } from './story.js';
 import { Library, BOOK_COLOURS, BOOK_ACCENTS } from './library.js';
 import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
@@ -1096,7 +1096,11 @@ export class World {
                     }
                     this.add(items);
                 }
-                this.things.push({ ...e, items, reach: 22, interact: () => {
+                // (A delivery's tray and its load are gone from the table while they are in her hands, back as a fresh one
+                // if she spills it or it goes cold: the user, 2026-11-23. Its table and its tag stay.)
+                const lifted = e.until?.startsWith('flag:dlv_')
+                    ? items.filter(i => i.texture.key.startsWith('tray') || i.frame?.name === LOADS[e.gives]?.thing) : null;
+                this.things.push({ ...e, items, lifted, reach: 22, interact: () => {
                     // (`when`: there to see, but hers to take only then.)
                     if (this.carry || (e.when && !this.cond(e.when))) return false;
                     this.carryBox.take(e.gives);
@@ -1172,7 +1176,7 @@ export class World {
                     if (this.carry?.kind !== e.load || this.delivering) return false;
                     this.delivering = true;
                     const held = this.carryBox.items.map(i => this.image(i.x, i.y, i.texture.key === 'things' ? `thing:${i.frame.name}`
-                        : `@${i.texture.key}`).setOrigin(0.5, 1).setDepth(i.depth));
+                        : `@${i.texture.key}`).setOrigin(0.5, 1).setDepth(i.depth).setFlipX(i.flipX));
                     this.add(held);
                     this.carryBox.give();
                     sfx.at(e.x, e.y).knock();
@@ -2455,6 +2459,7 @@ export class World {
         for (const t of this.things) {
             const on = this.shown(t);
             for (const i of t.items) i.setVisible(on);
+            if (t.lifted && this.carry?.kind === t.gives) t.lifted.forEach(i => i.setVisible(false));
             if (t.zone?.body && (t.until || t.after)) t.zone.body.enable = on;
         }
         this.people.refresh();
@@ -2569,8 +2574,8 @@ export class World {
         const left = this.carryBox.left();
         this.hudCarry.back.setVisible(left !== null);
         this.hudCarry.bar.setVisible(left !== null);
-        // (A cone melts: blue, red when nearly gone. A cup cools: orange while hot, blue when nearly cold.)
-        const hot = this.carry?.kind === 'coffee';
+        // (A cone melts: blue, red when nearly gone. A cup or a pot of tea cools: orange while hot, blue when nearly cold.)
+        const hot = !!this.carry?.hot;
         if (left !== null) this.hudCarry.bar.setSize(100 * left, 6).setFillStyle(hot ? (left > 0.35 ? 0xf79617 : 0x4d9be6) : left > 0.35 ? 0x8fd3ff : 0xe83b3b);
     }
 

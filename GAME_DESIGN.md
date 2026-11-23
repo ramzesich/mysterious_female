@@ -2676,8 +2676,11 @@ blue again (it had gone lavender-grey). **Look-out 4 (2026-11-23):** on the Spin
 zooms out forward over the bow (5's mirror); the windscreen left in front of her; its rail's gulls over her, making way
 from a jump; the far clouds higher; the livery's bow band evened. The look-outs are done. **Delivery 1 (2026-11-23):** the
 vase of flowers from deck 8 midships' aft lobby door to cabin 8215, a flower frame round the screen while she carries it,
-book 12; the ice bucket's tray a trap; a floor tray spills a load and plays its ride. **Next: §5, part 3 (deliveries 2 and
-3: the tea, book 13; the pillows);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+book 12; the ice bucket's tray a trap; a floor tray spills a load and plays its ride. **Delivery 2 (2026-11-23):** the pot
+of tea from deck 10 midships' forward lobby door to cabin 10230, cooling on the HUD's meter (45 s), steam from its spout,
+book 13; the teapot generated and its pixels set by hand; a delivery's tray and load leave the table while she carries them;
+whatever she carries is drawn at her depth, in the lifts too, and turned to us or away it is at her middle in front of her or
+behind her, her hands raised to it (her `carry-front`, `carry-back`). **Next: §5, part 3 (delivery 3: the pillows);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

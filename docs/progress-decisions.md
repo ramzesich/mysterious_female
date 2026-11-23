@@ -4502,3 +4502,34 @@ valuable."
   9 sprinkler (16): **broken since cefcf4c** (the Refinement session's "doors are secrets too"; passes at e621d5b; the door
   burst's gag plays instead), not looked into. `tools/check_overlaps.py`: 0. Corridors: deck 8 40.1 m without a beat,
   104.3 m without a reward (the delivery is not counted).
+
+## Delivery 2, the pot of tea (plan-the-rest §5 3.2; 2026-11-23)
+
+- **Proposed and taken ("Go ahead"):** the vase's other way round: on the vase's low table by deck 10 midships' forward
+  lobby door (113.2 m, between cabins 10211 and 10212), to cabin 10230 (187.6 m) near the aft one, past the cart, the
+  floor trays (a trap), the swinging door (from this side it never hits her), the sprinkler and the "Do Not Disturb" door.
+  It cools as the coffee does (45 s against the coffee's 50; her plain walk takes about 27 s), the meter orange to blue,
+  steam from the spout; cold, it is lost, a fresh pot on the table.
+- **The teapot:** five map objects (32 x 32); generated size covered her face. **Try 4** (white, a navy band, a cup;
+  the user's choice) with **"the tray a little bit shorter"** (22 px). Shrunk by majority colour its outline broke, so
+  PixelLab redrew it at its size (`image_to_pixelart`, 20 x 11); **"Fix the teapot's pixels"**: set by hand px by px
+  (`assets/source/things/delivery/draw_teapot.py`: four colours, a closed outline, a foot line, the cup's rim and handle).
+  **"Make it a bit thinner; place it on top of the table, not built into the table"**: the tray 3 px tall; things on a tray
+  stand on its top row (`img.height - 1`). 7 generations.
+- **The user's play, for every load:**
+  - **"The item with the tray should disappear from their tables when picked up ... but reappear if we fail to deliver"**:
+    a delivery source's tray and load (`lifted`) are hidden while that load is in her hands; a spill or a cold pot shows a
+    fresh one; the table and its tag stay.
+  - **"Proper layer handling ... treated as the player (but one point closer to the screen)"**: what she carries takes her
+    depth each frame, +0.001 a piece (it was drawn over the decks while she climbed the stairs behind them), her alpha too.
+  - **"Disappears if I interact with elevators"**: it had been hidden in the lift so as not to draw over its doors; at her
+    depth now it shows.
+  - **Turned to us, it moves to her middle in front of her; her back to us, to her middle behind her; in profile again,
+    at her hands.** The pot's spout faces the way she does (every load turns with her).
+  - **"We also have to adjust her hands accordingly"**: her `carry-front` and `carry-back`, her front and back views
+    animated (skeleton-v3, the elbows and wrists only: the rest the same pixels) with her forearms raised to the load
+    (`assets/source/her/carry-turn/`, 4.2 generations); `pose()` takes them by name. All nine loads shown in profile,
+    front and back: "they all look fine"; the cone facing us sits a few px above her hands, "not worth tinkering".
+- Tests: `deliveries` (the tea added), `boot`, `region4` to `region9`, `lift` pass. `tools/check_overlaps.py`: 0. Corridors:
+  deck 10 51.6 m without a beat (62 to 113), 92.3 m without a reward (38 to 130; the delivery is not counted). Start
+  place `hall10`.

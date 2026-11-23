@@ -3942,7 +3942,7 @@ def scenario_deliveries(b):
     """The deliveries (plan-the-rest §5 3.2). 1, the vase (deck 8 midships, the user, 2026-11-23): on its table by the aft
     lobby door from the start; E, in her hands on its narrow tray, the flower frame round the screen; gone at once in the
     outside view; a floor tray on the way spills it and plays its ride all the same; E at cabin 8215's door: a hand takes
-    it, book 12 hers, the table and its tag gone."""
+    it, book 12 hers, the table and its tag gone. 2, the tea (deck 10 midships): see below."""
     S = "window.__ship"
     W = f"{S}.world"
     src = f"{W}.things.find(t => t.id === 'src_vase')"
@@ -3984,6 +3984,38 @@ def scenario_deliveries(b):
     wait(3.0)
     v = b.eval(f"[{S}.save.flags.includes('dlv_vase'), {S}.save.books?.['12'], {W}.carry, {W}.shown({src})]")
     ok &= check(v[0] and v[1] == "held" and v[2] is None and not v[3], "E at 8215: taken in, book 12 hers, the table gone", v)
+    # 2, the pot of tea (deck 10 midships, the user, 2026-11-23): by the forward lobby door; in her hands its tray and pot
+    # leave the table (back on it when it is lost), the HUD's meter orange, steam; turned to us it is at her middle in
+    # front of her (her `carry-front`), her back to us behind her (`carry-back`); cold, it is gone; E at 10230: book 13.
+    src = f"{W}.things.find(t => t.id === 'src_tea')"
+    b.open("?reset&play&at=hall10")
+    wait(0.4)
+    x = b.eval(f"{src}.x")
+    b.teleport(x - 14, D10)
+    wait(0.3)
+    b.tap("e")
+    wait(0.5)
+    v = b.eval(f"[{W}.carry?.kind, {W}.carryBox.items[0]?.texture.key, {src}.lifted.map(i => i.visible), {W}.carry?.hot]")
+    ok &= check(v[0] == "tea" and v[1] == "tray-22" and v[2] == [False, False] and v[3], "E: the tea on its tray, gone from the table", v)
+    v = b.eval(f"(() => {{ const s = {S}, p = s.player; s.mode = 'scripted'; s.pose('front'); {W}.carryBox.update();"
+               f" const a = [p.frame.name == s.herFrames['carry-front'], {W}.carryBox.items.every(i => i.x === Math.round(p.x) && i.depth > p.depth)];"
+               f" s.pose('back'); {W}.carryBox.update();"
+               f" a.push(p.frame.name == s.herFrames['carry-back'], {W}.carryBox.items.every(i => i.x === Math.round(p.x) && i.depth < p.depth));"
+               f" s.pose('stand'); s.mode = 'play'; return a; }})()")
+    ok &= check(v == [True, True, True, True], "turned to us: at her middle in front, her hands raised; her back to us: behind her", v)
+    b.eval(f"{W}.carryBox.until = {S}.time.now")
+    wait(0.4)
+    v = b.eval(f"[{W}.carry, {src}.lifted.map(i => i.visible)]")
+    ok &= check(v[0] is None and v[1] == [True, True], "gone cold: lost, a fresh pot on the table", v)
+    b.tap("e")
+    wait(0.4)
+    door = b.eval(f"{W}.things.find(t => t.id === 'dlv_tea').x")
+    b.teleport(door + 6, D10)
+    wait(0.3)
+    b.tap("e")
+    wait(3.0)
+    v = b.eval(f"[{S}.save.flags.includes('dlv_tea'), {S}.save.books?.['13'], {W}.carry, {W}.shown({src})]")
+    ok &= check(v[0] and v[1] == "held" and v[2] is None and not v[3], "E at 10230: taken in, book 13 hers, the table gone", v)
     return ok
 
 

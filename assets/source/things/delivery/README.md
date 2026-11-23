@@ -16,3 +16,17 @@
 
 The tray is the game's own (`tray-18` in `src/world/carry.js`, narrower than the 26 px one: the user), the tag and the
 door's plate are `src/signs.js` looks (`card`, `steel`). About 200 generations, most of them the frame.
+
+## 2, the pot of tea (deck 10 midships; the user, 2026-11-23)
+
+| File | What | PixelLab |
+|---|---|---|
+| `../delivery-teapot.png` | The teapot and its cup, 20 x 11, in its own colours (`OWN_COLOURS`): written by `draw_teapot.py`, px by px over PixelLab's redraw of try 4 at its size (the user: "Fix the teapot's pixels": a closed outline and a foot line, four colours, the stray greys gone) | |
+| `tries/tea-4-small.png` | Try 4 redrawn at 28 x 16 from itself enlarged (`image_to_pixelart`, its ground cut away: 20 x 11); shrinking it by majority colour had broken its outline | `eb42d13e-9b36-481d-b64d-e8deeb4b28d7` |
+| `tries/tea-4-small-faithful.png` | The same, `faithful`: noisy | `74f4efb8-9edf-4a3d-b4fe-54114c1536bb` |
+| `tries/tea-4.png` | **The user's choice of five**: a white pot with a navy band and a cup (`create_map_object`, side, 32 x 32) | `a389c124-8519-4258-a9bc-42f11a09a181` |
+| `tries/tea-1.png`, `tea-2.png`, `tea-3.png`, `tea-5.png` | The others: white with two cups, gold-rimmed with two cups, blue on a saucer, a teal pot | `8bccc3c6-c012-4f60-a6ba-4b8e80bbc963`, `5e09403e-0f81-44a4-a61e-d92c977a4bd9`, `16cd1d2c-ce4c-466c-83f1-d171c5a74f89`, `7f8398ba-9484-4dd0-b5da-b4c1f3c936eb` |
+
+Its tray is the game's own, 22 px long and 3 tall (`tray-22` in `src/world/carry.js`: "a little bit shorter", then "a bit
+thinner"), on the vase's low table. 7 generations for the pot; her front and back with a load, 4.2 more
+(`assets/source/her/carry-turn/`).
