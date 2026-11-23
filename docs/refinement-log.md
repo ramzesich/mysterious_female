@@ -353,3 +353,13 @@ doors at all": to be worked on next); cabin 8206's shower door stays full. Her c
 the crew door beside it (its 40% pulse down is gone). `tools/check_overlaps.py` skips the wash copies (`hlCopy`).
 Runs: highlight, boot, deck3, intro, region4, region6-9, cabin, linen, trunk, lift, stairs, atrium, promenade, balcony,
 bridge passed; check_overlaps 0; region5 fails as on main.
+
+## Merged with main and the docs written (2026-11-23, the user's word)
+
+`main` (the Implementation session's table scene and Great Outdoors, `82521bd`) merged into `refinement` (`529475d`;
+`maps/ship.json` rebuilt, not merged by hand). The `highlight` playtest's book moved from book 1 to book 6 (book 1 now
+comes from her husband's hand). On the user's word ("Yes, update both"): `docs/plan-the-rest.md` §7c marked built by
+this session, `CLAUDE.md` a row for `src/highlight.js`, the door rule rewritten (doors washed at rest, the pulse reveals
+them; it replaces 2026-11-15's full-colour doors), the casino's slots in the wash rule. Runs after the merge: highlight,
+boot, deck3, intro, region4, region6, region9, cabin, linen, trunk, lift, stairs, promenade, balcony, lang passed;
+check_overlaps 0; region5's basket check fails as on main.

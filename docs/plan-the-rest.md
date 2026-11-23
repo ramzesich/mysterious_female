@@ -56,7 +56,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
 | 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19). **Built 2026-11-20 by the Refinement session** (branch `refinement`, `4eb23d8`, `504be54`), the sunset's sky with it: not to be built again | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess); 160 spent |
-| 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19) | The user's word | Small to medium | None expected |
+| 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19). **Built 2026-11-23 by the Refinement session** (branch `refinement`, `e621d5b`, `cefcf4c`): the pulse where E would act, and doors washed like their neighbours: not to be built again | The user's word | Small to medium | None |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
 | 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
 | 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
@@ -641,7 +641,20 @@ the same recipe as the game's cloud strip, see-through).
 6. `intro`, `boot`, `lang`, `deck3`; if the user widens it to the game's background, `finale`
    and the whole ship rendered as well.
 
-## 7c. Part 8: what she can use, does it stand out? (small to medium; added 2026-11-19)
+## 7c. Part 8: what she can use, does it stand out? (small to medium; added 2026-11-19) **BUILT 2026-11-23 by the Refinement session**
+
+**Built** (`src/highlight.js`; `docs/refinement-log.md` on `refinement` has the steps): the user looked at every thing
+she can use (213, on sheets) and chose a mechanic over a colour rule: while she stands where E would act, the thing
+pulses between its own colours and the other state, full-colour things down to the props' wash, muted pieces up to
+their full twin (the soft serve machine, the jackpot pair, the hot tub and the rest of the nine below, the massage
+tables, the piano, the odd book's bookcase); people never. The casino's slot machines are washed 12%. Then **doors as
+secrets**: every door she can use washed at rest like the background doors beside it, the pulse revealing it; the
+lifts, the glass doors across the deck and the balconies' doors left as they are (the balconies' doors are the user's
+next point: "they don't look like doors at all"). `CLAUDE.md`'s table and rules have it. Not done: the nook's armchair
+and the funnel's horn, drawn inside larger pictures, do not pulse.
+
+What follows is the plan as written before it was built.
+
 
 The user, 2026-11-19, of the soft serve machine on deck 11: "Since the ice cream machine is interactable, it should have
 a bit more contrast to it"; and, shown nine such things muted and in full colours: "In order to answer the contrast

@@ -5929,9 +5929,10 @@ def scenario_highlight(b):
     at(cx - 30, cy, settle=0.8)
     ok &= check(b.eval(f"{H}.state()") == [], "by the sushi chef: nothing changes", b.eval(f"{H}.state()"))
     # A pickup: the pickup itself, from its full colours, its glint as it was.
-    x, y = thing("book_1")
+    # (Book 6 on the Atrium Café's table since 2026-11-23: book 1 comes from her husband's hand.)
+    x, y = thing("book_6")
     st = at(x - 12, y)
-    ok &= check(bool(st) and st[0]["key"] == "thing:book_1" and st[0]["parts"][0]["mode"] == "full", "by book 1: the book pulses", st)
+    ok &= check(bool(st) and st[0]["key"] == "thing:book_6" and st[0]["parts"][0]["mode"] == "full", "by book 6: the book pulses", st)
     ok &= check(b.errors == [], "no errors", b.errors)
     return ok
 
