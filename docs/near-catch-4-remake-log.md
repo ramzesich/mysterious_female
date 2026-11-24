@@ -64,6 +64,66 @@ hop) and he went in on his belly (`bumbot-crawl`, 420 ms); the flag `bb4` (crawl
 The whole room is one screen (240 px of 480), he, the cart and the mouth all in view from the door: nothing is at
 the screen's edge. From the door to him 117 px; the cart starts 29 px from his body.
 
+## The structure, settled with the user (2026-11-24)
+
+Offered: a scene held for about 3.5 s (he wakes, they look at each other, she climbs the cart and grabs for him, he is
+off by the cover, she shrugs), with three questions (her grab or only a look; a hint for crawling; the cover left or
+shoved by the cart). The user's answer, word for word:
+
+> From your list of faults, let's address only the following:
+> 4, 8
+> As for the cover, let it just lie lower on the floor, but the cart and the player are still obscure it as now.
+> Let's make the scene play like this:
+> 1. The laundry cart has stack of pillows on top of it. We cannot jump past it, or on top of it.
+> 2. We only have to push it.
+> 3. When we push it, Bumbot jumps (like now), the pillows scatter, and we are able to jump on top of the cart and enter the vent
+
+And, on seeing nothing yet but while the stack was being roughed on the cart with its towels:
+
+> Use this cart, but empty. Don't put the pillows on top of the cart linen
+
 ## Decisions
 
-(None yet: the structure is with the user.)
+1. **Only faults 4 and 8 are mended** (the user): the order at the vent, and crawling explained. The scene stays as
+   short as it was and she is not held: he never wakes first, she does not react, her cry does not wake him, the line
+   is still a touch. Those are the user's to leave.
+2. **A stack of pillows in the cart, too tall to hop** (the user): four plump hotel pillows, their top 76 px over the
+   floor (her jump's 68), and the cart's body a wall to the ceiling while they are on it, as the steward's jammed
+   trolley is. So she cannot reach him on foot, and fault 5 (running through him, the cover across her feet) cannot
+   happen any more.
+3. **The cart is the empty one** (the user: "Use this cart, but empty"): `thing:laundry-cart-empty`, in the atlas
+   since the pillows' delivery, the same cart without its towels. The pillows sit in its tub, their bottom 3 px under
+   its rim.
+4. **His leap as now, and it scatters the pillows** (the user: "Bumbot jumps (like now), the pillows scatter"): as he
+   springs up off the shelf beside the stack the top two pillows are knocked off and fly aft in a high arc, over her
+   and past the door, to land one on the other in front of the aft rack; the lower two ride the cart 0.7 s more and
+   slide off behind it, to lie low on the floor. All of them are behind her as she walks. Mine: the cause is his spring
+   beside the stack, the first pillows moving 70 ms after he does.
+5. **Where they lie, and why not one heap:** a single heap of four (two tries, 31 px tall) lay straight in front of
+   the laundry chute's hatch and hid its lower half, handle and all, and its aft end ran across the door's frame. So
+   they are scattered: two low under the hatch (17 px at most; the hatch's foot is 11 px up, its handle 19), the door's
+   whole span clear, two at the room's aft end; nothing of them past the aft wall.
+6. **The cover lies 4 px lower** (the user: "let it just lie lower on the floor, but the cart and the player are still
+   obscure it as now"): on the floor's own strip, not at the wall's foot; still behind the cart and her.
+7. **The order at the vent (fault 4):** the cover begins its fall as his fore paws reach it (140 ms into his leap), not
+   as he is already in the mouth; he goes in over it as it drops away under him. (A 120 ms hang at the lip was tried
+   on the storyboard: it stood him on nothing.) Its fall itself is the user's of that morning, untouched.
+7a. **The cart bumps his shelf** (mine, for the pillows' places): he goes with the cart's front 6 px past his nose, not
+   2 px short of it, 0.2 s later than before; the pillows then land 8 px further forward, clear of the door.
+7b. **The pillows in the cart move with the game's own cart, those in the air stay where the room has them:** the clip
+   is cut into two layers, and paced (14.3 frames a second) so that the cart, pushed at her 40 px a second, is where
+   the clip's own cart stood as the last two pillows leave it.
+8. **Crawling explained once (fault 8):** a plate over her as he is gone, "↓ to crawl" (`hint.crawl`, both languages,
+   the controller's too), as "D to dash" ends near-catch 1.
+
+## The art (to the preview stop)
+
+About 80 generations. Kept in the scratch folder until the build (`out/gen/`), then in `assets/source/linen-pillows/`.
+
+| What | How | Jobs |
+|---|---|---|
+| The stack on the cart | a flat rough in the room's own picture, redrawn (`edit_image_pro_flash`, 128 px), cut by what differs | `dab040e7` (used), `2e423939` |
+| A heap behind the cart, three takes | roughs on a green set with the cart flat blue, redrawn | `7f95232e`, `907487b5`, `3a7998a7`, `fb97dfe8`, `5a35d40d` (none used: the heap hid the hatch) |
+| The topple into a heap | PixMiniMax, both ends pinned, 16 frames | `462fa164`, `8884861f`, `59f34787`, `6d1a54ff`, `a696287d`, `2923c0bf`, `a0c4d41a`, `ed8ac397`, `285859da`, `d85db23e`, `547c27de` (none used) |
+| The pillows scattered (the end picture) | a rough on a 208 px green set, redrawn | `3dcda9e2` (used), `4edf67df` |
+| The scatter | PixMiniMax toward it, 16 frames, 208 x 128 | `c4bcc5b4` (used; its smeared frame 1 left out), `22c32592`, `4d5f20ae`, `5e71d393` |
