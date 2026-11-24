@@ -128,18 +128,25 @@ export const stage = {
         const x0 = p.x;
 
         // The rival: out of the wing at a run, his clip from where its first frame has him; its frames by the clock.
-        const frameMs = 1000 / STAGE.clipFps, clipX = st.x + L.snag.x + L.snag.start;
+        const clipX = st.x + L.snag.x + L.snag.start;
         const clipAt = STAGE.rivalAt + (clipX - st.wingX) / STAGE.rivalSpeed * 1000;
-        const openAt = clipAt + L.snag.open * frameMs, goneAt = clipAt + (L.snag.frames - 1) * frameMs;
-        // Bumbot: up from his washing, a leap into the loop, the catch; then the loop goes up as the lamp comes down.
-        const upFrames = s.anims.get('bumbot-stand-up').frames.length - STAGE.upFrom;
-        const leapAt = STAGE.catUp + upFrames / STAGE.upFps * 1000, ropeAt = leapAt + STAGE.leapMs;
+        // (His clip's steps: each a frame and how long it is shown; `at[i]` when step i begins, from the clip's start.)
+        const clip = STAGE.clip, at = [0];
+        for (const [, ms] of clip) at.push(at.at(-1) + ms);
+        const stepOf = (t) => { let i = 0; while (i < clip.length - 1 && t >= at[i + 1]) i++; return i; };
+        const first = (f) => at[clip.findIndex(c => c[0] === f)];
+        const openAt = clipAt + first(L.snag.open), goneAt = clipAt + at.at(-1);
+        // Bumbot: up from his washing at the shout; a leap into the loop as the rival comes out, the catch; then the
+        // loop goes up as the lamp comes down.
+        const leapAt = STAGE.rivalAt + STAGE.leapAfter, ropeAt = leapAt + STAGE.leapMs;
         const hangX = st.ropeX - ROPE_CAT.x, hangY = q.up + ROPE_CAT.y;
         const lens0 = L.snag.lens[0][1], fall = light ? light.def.long - light.def.short : L.snag.lens[L.snag.open][1] - lens0;
-        const drop = (f) => (f < 0 ? 0 : f >= L.snag.open ? fall : L.snag.lens[f][1] - lens0);
+        const drop = (f) => (f >= L.snag.open ? fall : L.snag.lens[f][1] - lens0);
         const lensAt = (f) => ({ x: st.x + L.snag.x + L.snag.lens[f][0] + 1, y: st.top + L.snag.lens[f][1] });
+        const backAt = STAGE.rivalAt + STAGE.backAfter, lookAt = goneAt + STAGE.lookAfter, shrugAt = lookAt + STAGE.shrugAfter;
+        const sneezeAt = goneAt + STAGE.sneezeAfter;
 
-        let T = 0, herDone = false, steps = 0, rival = null, frame = -1;
+        let T = 0, herDone = false, steps = 0, rival = null, step = -1;
         const did = {};
         const once = (key, at, fn) => { if (!did[key] && T >= at) { did[key] = true; fn(); } };
         const end = () => {
@@ -153,7 +160,7 @@ export const stage = {
             k.setCrop();
             q.snag.setVisible(false);
             s.mode = 'play';
-            this.sneezeAt = s.time.now + Math.max(0, STAGE.sneezeAt + STAGE.sneezeEvery - T);
+            this.sneezeAt = s.time.now + Math.max(0, sneezeAt + STAGE.sneezeEvery - T);
             this.P.setFlag('bb3');          // (the hatch open, the lamp swinging, his pills wanted: `stageAfter`)
         };
 
@@ -178,7 +185,7 @@ export const stage = {
                     this.people.play(d, 'startle', { stay: true }).then(() => { d.idle = 'idle'; this.people.idle(d); });
                 }
             });
-            once('sneeze', STAGE.sneezeAt, () => {
+            once('sneeze', sneezeAt, () => {
                 if (!sm?.on) return;
                 sfx.at(sm.x, sm.y).sneeze();
                 this.people.play(sm, 'sneeze');
@@ -189,13 +196,15 @@ export const stage = {
                 p.x = x0 + STAGE.tipFps * STAGE.tipPx * T / 1000;
                 if (T >= steps * 4 / STAGE.tipFps * 1000) { steps++; sfx.tiptoe(); }
             }
-            once('back', STAGE.tipMs, () => {
+            // (The shout stops her mid-step; the rival out of the wing ahead of her, she starts back.)
+            once('freeze', STAGE.tipMs, () => { if (creep) p.anims.pause(); });
+            once('back', backAt, () => {
                 if (!hands) return;
                 p.anims.play('her-start-back');
                 sfx.gasp();
             });
-            once('look', STAGE.lookAt, () => { if (hands) p.anims.play('her-look-up'); });
-            once('front', STAGE.shrugAt, () => {
+            once('look', lookAt, () => { if (hands) p.anims.play('her-look-up'); });
+            once('front', shrugAt, () => {
                 // (Turned to us, she shrugs, as after every near-catch. With her hands full she only looks on.)
                 const after = () => s.time.delayedCall(STAGE.afterMs, () => { herDone = true; });
                 if (!hands || !s.anims.exists('her-shrug')) return after();
@@ -229,16 +238,19 @@ export const stage = {
                 q.snag.setFrame(0).setVisible(true);
             });
             if (T >= clipAt) {
-                const f = Math.min(L.snag.frames - 1, Math.floor((T - clipAt) / frameMs));
-                if (f !== frame) {
-                    frame = f;
+                const i = stepOf(T - clipAt);
+                if (i !== step) {
+                    const f = clip[i][0], again = clip.slice(0, i).some(c => c[0] === f);
+                    step = i;
                     q.snag.setFrame(f);
                     // (The lamp is the game's own, behind his net: where each frame's was measured, until he lets go.)
                     if (light && f >= 1 && f < L.snag.open) light.hold(lensAt(f));
+                    if (f === STAGE.swishFrame) sfx.at(clipX, F).swish();
+                    if (f === STAGE.hookFrame) s.cameras.main.shake(120, 0.002);
+                    // (The lamp's cable takes his weight, and again each time he swings back on it.)
+                    if (f === STAGE.hookFrame || (again && f === STAGE.hookFrame + 1)) sfx.at(clipX, F).creak();
                 }
             }
-            once('leapt', clipAt + STAGE.swishFrame * frameMs, () => sfx.at(clipX, F).swish());
-            once('hooked', clipAt + STAGE.hookFrame * frameMs, () => { sfx.at(clipX, F).creak(); s.cameras.main.shake(120, 0.002); });
             once('open', openAt, () => {
                 q.shut.setVisible(false);
                 q.open.setVisible(true);
@@ -270,7 +282,8 @@ export const stage = {
             });
             if (T >= clipAt && !q.cat.away) {
                 // (The loop's rise for the lamp's drop, between his clip's frames too: one line, its two ends.)
-                const ft = (T - clipAt) / frameMs, f0 = Math.floor(ft), d = drop(f0) + (drop(f0 + 1) - drop(f0)) * (ft - f0);
+                const t = T - clipAt, i = stepOf(t), j = Math.min(clip.length - 1, i + 1);
+                const d = drop(clip[i][0]) + (drop(clip[j][0]) - drop(clip[i][0])) * Math.min(1, (t - at[i]) / clip[i][1]);
                 const endY = q.up - STAGE.ropeGain * d;
                 if (endY !== q.ropeEnd) {
                     if (!did.whisk && d > 1) { did.whisk = true; sfx.at(st.ropeX, F).whip(); }
@@ -281,7 +294,7 @@ export const stage = {
                     // (Nothing of him over the stage's top: he is behind its valance, then gone into the flies.)
                     const cut = Math.max(0, st.top - (k.y - k.height));
                     if (cut > 0) k.setCrop(0, cut, k.width, k.height - cut);
-                    if (ft >= L.snag.open + 1) {
+                    if (t >= first(L.snag.open + 1)) {
                         q.cat.away = true;
                         k.setVisible(false).stop();
                     }

@@ -3055,6 +3055,12 @@ def scenario_region3__stage(b):
     ok = check(b.eval(f"{S}.worldLayer.list.some(o => o.texture?.key === 'stage-back' && o.x === {x0} && o.y === {F})"), "the stage is its own picture")
     ok &= check(not b.eval(f"{S}.worldLayer.list.some(o => /^(grand-piano|guitar|mic-stand|drum-kit)/.test(o.frame?.name || '') && Math.abs(o.y - {F}) < 2 && o.x > {x0} && o.x < {x0} + 320)"),
                 "no piano, guitar or mic stand on it (the drum kit is in its picture)")
+    # (The user, 2026-11-24: the stage "pops out too much": the theatre's pieces washed 6%, they were at 12%; the
+    # stage's picture 12%, it was in full colour.)
+    names = b.eval(f"[...new Set({S}.worldLayer.list.filter(o => o.texture?.key === 'shipart' && Math.abs(o.y - {F}) < 2 && o.x > {x0} - 1900 && o.x < {x0}).map(o => String(o.frame.name)).filter(n => /^(theatre-seat|audience|speaker-stack)/.test(n)).map(n => n.replace(/^.*-/, '')))]")
+    ok &= check(names == ["w6"], "the theatre's seats, its audience and its speakers washed 6%", names)
+    px = b.eval(f"(t => {{ const c = document.createElement('canvas'); c.width = 4; c.height = 4; const g = c.getContext('2d'); g.drawImage(t.getSourceImage(), 80, 60, 4, 4, 0, 0, 4, 4); return [...g.getImageData(0, 0, 1, 1).data]; }})({S}.textures.get('stage-back'))")
+    ok &= check(px[0] > 35 and px[1] > 35, "the stage's picture washed toward the wall: its star cloth is not near black", px)
     ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash" and abs(cx - (x0 + 158)) <= 2, "Bumbot washes at centre stage", cx - x0)
     ok &= check(abs(st["ropeX"] - 16.5 - cx) <= 1 and b.eval(f"{q}.ropeEnd") == F - 40, "the rope's loop over him, 40 px up", (st["ropeX"] - cx, F - b.eval(f"{q}.ropeEnd")))
     ok &= check(abs(st["spotX"] - cx) < 30, "under a lantern of the lighting bar", st["spotX"] - cx)
@@ -3081,8 +3087,14 @@ def scenario_region3__stage(b):
     ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(her) == "her-creep-tiptoe", "she starts toward him on tiptoe", b.eval(her))
     b.wait(0.15)
     ok &= check("notice" in b.eval(clip(sm)) and b.eval(f"{sm}.dir") == -1, "the stage manager turns and starts at the cat", (b.eval(clip(sm)), b.eval(f"{sm}.dir")))
+    # (One thing after another, the user, 2026-11-24: the shout stops her mid-step; Bumbot looks up; then the rival.)
+    b.wait(0.3)
+    ok &= check(b.eval(her) == "her-creep-tiptoe" and b.eval(f"{S}.player.anims.isPaused") and b.eval(f"!{P}['riv_stage']"),
+                "the shout stops her mid-step, before anyone else has come", b.eval(her))
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-stand-up" and b.eval(f"{cat}.sprite.y") == cf, "Bumbot has looked up from his washing, and stands")
     riv = f"{P}['riv_stage']"
     b.wait_for(f"{riv} && {riv}.on", timeout=2)
+    tr = b.eval(f"{S}.time.now") - t0
     ok &= check(b.eval(f"{riv}.x") >= st["wingX"] and b.eval(f"{riv}.sprite.isCropped"), "the rival comes out from behind the proscenium's edge")
     ahead, back = True, None
     end = now() + 2
@@ -3094,7 +3106,8 @@ def scenario_region3__stage(b):
             back = b.eval(f"{S}.time.now") - t0
         wait(0.02)
     ok &= check(ahead, "ahead of her all the way: never across her")
-    ok &= check(back is not None and 360 <= back <= 480 and b.state()["x"] - hx < 16, "she starts back as he bursts out, a few steps in", (back, b.state()["x"] - hx))
+    ok &= check(back is not None and 0 <= back - tr <= 160 and b.state()["x"] - hx < 16, "she starts back as he bursts out, a few steps in", (tr, back, b.state()["x"] - hx))
+    ok &= check(tr >= 700, "and he comes only once the stage manager's start has been seen", tr)
     ok &= check(b.eval(f"{dh}.dir === -1 && {dm}.dir === -1") and not b.eval(clip(dh)).endswith("-dance"), "the dancers have stopped and turned", b.eval(clip(dh)))
     view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
     b.wait_for(f"{q}.snag.frame.name >= 5", timeout=2)
@@ -3105,10 +3118,16 @@ def scenario_region3__stage(b):
     b.shot("stage-snag")
     # The lamp down, the loop up: one line.
     pairs = []
-    end = now() + 2
+    t5 = b.eval(f"{S}.time.now")
+    end = now() + 3
     while now() < end and not b.eval(f"{q}.open.visible"):
-        pairs.append(b.eval(f"[{lamp}.lamp.y, {q}.ropeEnd, {q}.snag.frame.name]"))
+        pairs.append(b.eval(f"[{lamp}.lamp.y, {q}.ropeEnd, {q}.snag.frame.name, {S}.time.now]"))
         wait(0.02)
+    hung = next((t for y, r, f, t in pairs if f >= 8), t5) - t5
+    ok &= check(hung >= 500, "he dangles on the lamp half a second and more before it gives", round(hung))
+    fell = pairs[-1][3] - next((t for y, r, f, t in pairs if f >= 8), t5)
+    ok &= check(fell >= 400, "and it comes down slowly enough to be followed, the loop going up with it", round(fell))
+    pairs = [x[:3] for x in pairs]
     lamp0, rope0 = top + b.eval(f"{lamp}.def.short"), F - 40
     worst = max(abs((rope0 - r) - 1.7 * (y - lamp0)) for y, r, f in pairs)
     ok &= check(max(y for y, r, f in pairs) - lamp0 > 25 and worst < 30, "the loop goes up as the lamp comes down, 1.7 px for each of its px", (round(max(y for y, r, f in pairs) - lamp0), round(worst)))
@@ -3125,7 +3144,7 @@ def scenario_region3__stage(b):
     b.wait_for(f"{her} === 'her-shrug'", timeout=2)
     b.wait_for(f"{S}.mode === 'play'", timeout=4)
     held = (b.eval(f"{S}.time.now") - t0) / 1000
-    ok &= check(held < 3.0, "she is held under 3 s (it was 4.75)", round(held, 2))
+    ok &= check(3.6 <= held <= 4.8, "she is held about 4.3 s: at 2.65 s it was too fast to follow (the user); it was 4.75 before the remake", round(held, 2))
     b.shot("stage-after")
     ok &= check("bb3" in flags(b) and b.eval(f"!{dh}.on && {P}['amb_dancer_her_off'].on && {P}['amb_dancer_her_off'].x === {places[2]} && {P}['amb_dancer_him_off'].x === {places[3]}"),
                 "the beat is set; the dancers stand where they rehearsed")

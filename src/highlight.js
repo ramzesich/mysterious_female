@@ -31,7 +31,7 @@ const ROOM_WASH = 0.3;      // a room's wash toward its own wall (tools/draw_roo
 // A room's door back out washed less than that, by its route (the linen room's: "a bit more full color, also
 // proportionally affecting its pulse range", the user, 2026-11-23; its pulse from there to full colour).
 const ROOM_DOOR_WASH = { linen: 0.2 };
-const SUFFIX = { '-bg': 0.35, '-w20': 0.20, '-lt': 0.12 };
+const SUFFIX = { '-bg': 0.35, '-w20': 0.20, '-lt': 0.12, '-w6': 0.06 };      // (`-w6`: the theatre's own pieces, 2026-11-24)
 // (Her crew cabin's door pulsed down to 40% once, "only for this door here"; muted at rest since, it pulses up.)
 const TRUNK_ALONE = 0.2;    // a trunk's door with no background door and no prop round it (the user, 2026-11-23)
 const SKIP_DOORS = /^(roof|balcony|bookcase)$/;   // a room's doors left as they are: the lifeboat's hatch, the

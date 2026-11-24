@@ -72,24 +72,32 @@ export const STAGE = {
     sight: 154,             // she is taken this far from him: in front of the forward curtain, the wing ahead of her
     ahead: 93, aheadMs: 700,        // the picture goes this far ahead of her, in this long: the whole stage in it
     airUp: 200,             // in the air across that line, up to this high over his floor: in a jump, or off the balcony's front over the stage (she comes straight down in front of the curtain)
-    tipFps: 18, tipPx: 1.6, tipMs: 400,     // her tiptoe (near-catch 2's clip and pace) until the rival is out
-    backFps: 14,            // her start back; held
-    lookAt: 1500, lookFps: 16,      // she straightens and looks up after him
-    shrugAt: 2000, afterMs: 100,    // turned to us, her shrug; then this long
-    noticeAt: 120,          // the stage manager turns, starts back, thrusts his clipboard at the cat
-    sneezeAt: 1750, sneezeEvery: 5000,      // his first sneeze, Bumbot gone; then one this often, until his pills
-    danceStop: 330,         // the dancers stop
+    // The scene's beats, one after another (the user, 2026-11-24: at 2.65 s it "plays too fast in the game and it's
+    // hard to grasp what just happened ... a bit slower and with some delays, but in proper places"). Each hold is
+    // where someone would hold: she freezes as the stage manager shouts, Bumbot looks up before he leaps, the rival
+    // dangles from the lamp before it gives, a breath after he is gone.
+    tipFps: 18, tipPx: 1.6, tipMs: 350,     // her tiptoe (near-catch 2's clip and pace), until she freezes mid-step
+    noticeAt: 150,          // the stage manager turns, starts back, thrusts his clipboard at the cat
+    catUp: 400, upFrom: 2, upFps: 30,       // Bumbot up from his washing, at the shout: when, from which frame of `stand-up`, how fast; he stands and looks
+    danceStop: 450,         // the dancers stop
     // The rival out of the wing: when; px/s, his clip's own pace in its first frames (11 px a frame at 16 a second);
     // his run's frames a second, by its planted foot (7 px back a frame); the proscenium's edge in the stage's picture.
-    rivalAt: 380, rivalSpeed: 180, runFps: 25, wingEdge: 36,
-    clipFps: 16,            // his clip: the leap, the net on the lamp, the swing, the drop
-    swishFrame: 4, hookFrame: 5,    // its frames that sound: the net through the air, the lamp taking his weight
-    catUp: 420, upFrom: 2, upFps: 30,       // Bumbot up from his washing: when, from which frame of `stand-up`, how fast
-    leapMs: 240, ropeFrom: 2, ropeFps: 14,  // his leap into the loop; his clip on the rope
+    rivalAt: 750, rivalSpeed: 180, runFps: 25, wingEdge: 36,
+    backAfter: 60, backFps: 14,     // she starts back this long after he is out; held
+    leapAfter: 60, leapMs: 240, ropeFrom: 2, ropeFps: 14,       // Bumbot leaps for the loop this long after the rival is out; his clip on the rope
+    // The rival's clip, step by step: [frame, ms]. Its run at its own pace (it must flow from his run before it);
+    // the net up, the leap; then he dangles on the lamp, legs kicking (its frames 6 and 7, twice over): the hold;
+    // then the lamp gives, slowly, and the loop goes up; the hatch, and down.
+    clip: [[0, 62], [1, 62], [2, 62], [3, 62], [4, 90], [5, 130], [6, 150], [7, 150], [6, 150], [7, 150],
+           [8, 100], [9, 100], [10, 100], [11, 100], [12, 110], [13, 110], [14, 80], [15, 80], [16, 80]],
+    swishFrame: 4, hookFrame: 5,    // its frames that sound: the net through the air, the lamp taking his weight (and again as he dangles)
     loop: 40,               // the loop's top over the floor
     ropeGain: 1.7,          // the loop's rise for the lamp's drop: the lamp stops at her head's height, he must be behind the valance
     kickMs: 350,            // let go, the lamp is dragged out aft this long, and swings from there
-    puffFps: 14,            // the flour out of the hatch
+    puffFps: 12,            // the flour out of the hatch
+    lookAfter: 130, lookFps: 14,    // once he is gone down the hatch, this long, and she straightens and looks up after Bumbot
+    sneezeAfter: 250, sneezeEvery: 5000,    // the stage manager's first sneeze, this long after; then one this often, until his pills
+    shrugAfter: 620, afterMs: 100,  // this long looking up, then turned to us, her shrug; then this long
     settleMs: 300,          // she is not freed before the rival has been gone this long
     spot: { half: 24, cone: 0.16, pool: 0.18 },     // Bumbot's spotlight: its half width on the boards, how strong
 };

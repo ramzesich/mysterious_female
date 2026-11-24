@@ -110,6 +110,24 @@ its first half played behind her back.
 16. **In the air across the line at any height** (mine): the balcony's front on deck 7 is over the stage's forward
     end, and she can hop it before the scene; taken as she crosses the line, she comes straight down in front of the
     curtain. Taken only near the floor she landed under the lamp, and it struck her as she was freed.
+17. **The stage and the theatre round it brought together** (the user, on playing it: "Overall, I like it. ... The
+    stages pops out too much. We need to remove a bit of a wash of the props that surround it, and add a bit of a
+    wash to the stage, so that everything meets in the middle"): the theatre's own pieces (its seats, its audience,
+    its speakers) washed 6%, a twin of their own, `-w6` (they were at 12%; the doors beside them follow, by the
+    highlight's rule); the stage's picture, its valance and its hatch washed 12% toward the same wall colour
+    (`STAGE_WASH` in `tools/build_stage.py`; it was in full colour). The lamp, the people, the rival's clip and the
+    flour are not washed. Six strengths were drawn in the running game (`wash-options.png` in the scratch folder: now,
+    6/6, 6/12, 0/12, 6/18, 0/20); 6/12 is in (mine), the others shown to the user by letter.
+18. **Slower, with holds where a hold is natural** (the user: "The scene plays too fast in the game and it's hard to
+    grasp what just happened. Perhaps, this is the case where things have to be a bit slower and with some delays,
+    but in proper places, not to break transitions, where they should be flowing"): 4.35 s (it was 2.65 s). One
+    thing after another: the stage manager's start (0.15 s) stops her mid-step (0.35 s) and brings Bumbot's head up
+    (0.4 s); the dancers stop (0.45 s); only then the rival (0.75 s), she starts back, Bumbot leaps for the loop;
+    the rival's clip on a schedule of its own steps (`STAGE.clip`): its run and its leap at their own pace, then he
+    dangles on the lamp, legs kicking, for 0.6 s (its frames 6 and 7, twice over), then the lamp comes down in 0.5 s
+    (it was 0.3 s) with the loop going up; the hatch and his fall as they were; a breath, and she looks up 0.6 s
+    before her shrug. What flows was left flowing: his run into his clip, the clip's own leap, the lamp's let-go
+    into its swing, the fall.
 
 ## How it is built
 
@@ -128,7 +146,7 @@ its first half played behind her back.
 ## What changes for the player
 
 - The stage looks like a stage; Bumbot is seen from the house, in a spotlight at its centre.
-- She is taken as she comes to the stage, not 60 px from him, and held 2.65 s (it was 4.75 s).
+- She is taken as she comes to the stage, not 60 px from him, and held 4.35 s (it was 4.75 s), every part of it seen.
 - The stage manager no longer sneezes before she has been there.
 - The dancers and the stage manager stand elsewhere; the dancers stay on the stage afterwards.
 - The trap door is 13 px further aft; the piano, the guitar and the mic stand are gone.
@@ -136,7 +154,8 @@ its first half played behind her back.
 
 ## Checks
 
-- `region3.stage` (new, 42 checks): the stage's picture and what is not on it, his place, the loop, the lantern, the
+- `region3.stage` (new, 49 checks: with the theatre's wash, her stop mid-step, Bumbot up before the rival, the rival's
+  dangle and the lamp's slow drop): the stage's picture and what is not on it, his place, the loop, the lantern, the
   hatch, the lamp, the people's places, no sneeze before; the 154 px line, her tiptoe, the stage manager's start, the
   rival out from the proscenium's edge and ahead of her, her start back, the dancers stopped, the whole stage in the
   picture, Bumbot in the loop before the net is on the lamp, the lamp held behind the net, the loop's rise against

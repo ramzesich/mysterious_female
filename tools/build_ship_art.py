@@ -501,9 +501,19 @@ def muted(img, k=MUTE):
     return out
 
 
+# "<name>-w6", 6%, for the theatre's own pieces (the user, 2026-11-24, near-catch 3's new stage: it "pops out too
+# much. We need to remove a bit of a wash of the props that surround it, and add a bit of a wash to the stage, so that
+# everything meets in the middle"; the stage's picture is washed 12%, `STAGE_WASH` in tools/build_stage.py).
+MUTE_W6 = 0.06
+THEATRE = {"theatre-seat-side", "speaker-stack"} | {f"audience-{k}" for k in range(10)}
+
+
 def twins(pieces, name):
     """The lighter twins of a piece: "-lt" (12%) and "-w20" (20%), which `tools/wash_levels.py` gives each place
-    in the map and the world (the user's levels, 2026-11-20), but for doors and railings, which keep "-bg"."""
+    in the map and the world (the user's levels, 2026-11-20), but for doors and railings, which keep "-bg"; and
+    "-w6" for the theatre's."""
+    if name in THEATRE:
+        pieces[f"{name}-w6"] = muted(pieces[name], MUTE_W6)
     if name in LIGHT or not name.startswith(WASH_KEEP):
         pieces[f"{name}-lt"] = muted(pieces[name], MUTE_LIGHT)
     if not name.startswith(WASH_KEEP):

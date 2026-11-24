@@ -3,7 +3,8 @@ docs/near-catch-3-remake-log.md), from assets/source/stage/gen/ (its README has 
 
     python tools/build_stage.py
 
-- `stage.png` (320 x 128, its left column the stage's forward end, its last row the row over the floor's line): the
+- `stage.png` (320 x 128, its left column the stage's forward end, its last row the row over the floor's line; washed
+  12% toward the corridor wall, `STAGE_WASH`, as are the valance and the hatch's two pictures): the
   stage's left half as PixelLab redrew it from a flat rough (curtain, valance, lighting bar, star cloth, boards), its
   right half that half mirrored, and the drum kit, redrawn in the stage's own light from the game's own piece where it
   stands, pasted in by its box.
@@ -41,6 +42,11 @@ LENS = [(42, 33.5)] * 5 + [(44, 33.5), (46, 33.5), (49.1, 33.5), (50, 34.5), (52
                            (54, 65.5), (50, 74.5), (47, 77.5), (44, 77.5), (42, 77.5)]
 PUFF_BOX, PUFF_FRAMES = (92, 64), range(2, 11)
 LANTERNS = [48, 139]                # the lighting bar's lanterns in the left half (their lenses at row 31)
+# The stage's picture is washed this far toward the corridor wall, as every background prop is toward it by its place's
+# level (tools/build_ship_art.py's `WALL`): the user, 2026-11-24, of the stage in full colour: it "pops out too much
+# ... add a bit of a wash to the stage"; the theatre's props round it came down from 12% to 6% (`-w6`) to meet it.
+# The lamp, the people, the rival's clip and the flour are not washed: nothing she meets or watches is.
+STAGE_WASH, WALL = 0.12, (0xE9, 0xDF, 0xCC)
 
 
 def dist(a, b):
@@ -53,6 +59,17 @@ def red(c):
 
 def green(c):
     return c[1] > 120 and c[1] > c[0] * 1.6 and c[1] > c[2] * 1.6
+
+
+def washed(im):
+    out = im.convert("RGBA")
+    px = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = px[x, y]
+            if a:
+                px[x, y] = (*(round(c + (w - c) * STAGE_WASH) for c, w in zip((r, g, b), WALL)), a)
+    return out
 
 
 def stage():
@@ -221,14 +238,14 @@ def puff():
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     st = stage()
-    st.save(OUT / "stage.png")
-    fronts(st).save(OUT / "valance.png")
+    washed(st).convert("RGB").save(OUT / "stage.png")
+    washed(fronts(st)).save(OUT / "valance.png")
     lamp = Image.open(SRC / "lamp-s4.png").convert("RGBA")
     lamp = lamp.crop(lamp.getbbox())
     lamp.save(OUT / "lamp.png")
     op, shut = trap(st)
-    op.save(OUT / "trap-open.png")
-    shut.save(OUT / "trap-shut.png")
+    washed(op).save(OUT / "trap-open.png")
+    washed(shut).save(OUT / "trap-shut.png")
     sn = snag(st)
     sn.save(OUT / "snag.png")
     pf = puff()

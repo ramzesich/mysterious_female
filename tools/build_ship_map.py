@@ -1526,25 +1526,26 @@ def build_objects():
         # (Not beside the balcony's lighting booth door, 206.1 m: its plate is at a sitter's head.)
         if deck == 7 and m is not None and abs(m - 206.1) < 1.2:
             last[deck] = None
-            return "theatre-seat-side-lt"
+            return "theatre-seat-side-w6"
         if fill.random() >= 0.55:
             last[deck] = None
-            return "theatre-seat-side-lt"
+            return "theatre-seat-side-w6"
         who = fill.randrange(10)
         if who == last.get(deck):
             who = (who + 1 + other.randrange(9)) % 10
         last[deck] = who
-        return f"audience-{who}-lt"
+        return f"audience-{who}-w6"
     # (The user, 2026-11-19: the seats are the empty side-on seat the audience sit in, not the half-turned
     # one, none where one of them sits (their picture has its own); the stage's and the seats' pieces only
-    # lightly washed, `-lt`.)
+    # lightly washed, `-lt`. Since 2026-11-24 at 6%, `-w6`, the new stage's picture at 12%: the user, "everything
+    # meets in the middle".)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
         if all(abs(m - s) > 0.3 for s in AUDIENCE[6]):
             put(6, m, seat(6, k))
     # (The stage's own things are in its picture since 2026-11-24, tools/build_stage.py: the drum kit redrawn in its
     # light; the mic stand, the guitar and the grand piano gone, the user: "remove the piano".)
-    put(6, 243.2, "speaker-stack-lt")
+    put(6, 243.2, "speaker-stack-w6")
 
     # Deck 7, after NCL's plan and the user's photos (§5.3). Clear of the Hotel trunk's door (118).
     def plaque(name, m, text):
