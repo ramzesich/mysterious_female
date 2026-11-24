@@ -101,3 +101,28 @@ its left part redrawn to x 212. The fort: three, **3 chosen**.
 | `fort-1.png`, `fort-2.png` | the fort described in words | `76e04480…`, `c93e4aa8…` | 10 |
 
 **This round: about 260 generations.**
+
+# The stage manager's cabin, the dressing room and the cold room (2026-11-24)
+
+The user: "1-3" of seven offered. Three looks of each, "Keep every shape in this picture exactly where it is and the same
+size, nothing added or moved: [the room, its pieces named], flat side view. Change only the finish, as detailed polished
+pixel art: [the look]" (seeds 5, 13, 27: A its own colours, B lived-in or worn, C clean modern or grand). **Chosen: the
+stage manager's cabin C, the dressing room A, the cold room A.**
+
+## Used
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `smcabin-C.png` | the stage manager's cabin, clean modern: light grey panels, pale birch, navy blankets (seed 27) | `cb33b93e-7bb0-462f-a6a5-e04ad2b1e0da` | 9 |
+| `dressing-A.png` | the dressing room, its own colours, the bulbs glowing (seed 5) | `454c0859-e409-499a-8135-2e12512df600` | 9 |
+| `coldroom-A.png` | the cold room, icy panels with frost, labelled tubs (seed 5) | `bacb4349-1343-4a27-bf28-e3af225c0dc8` | 9 |
+
+## Tries (`tries/`)
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `smcabin-A.png`, `smcabin-B.png` | its own colours; lived-in steel | `692246d1…`, `356531a7…` | 18 |
+| `dressing-B.png`, `dressing-C.png` | dusty rose, worn; plum and gold (both drew a glossy floor) | `b66fa118…`, `14342a97…` | 18 |
+| `coldroom-B.png`, `coldroom-C.png` | a worn freezer; clean modern white | `b162d59f…`, `1eaf526f…` | 18 |
+
+**These three: 81 generations** (and the canister, 15: `assets/source/things/tries/README.md`).

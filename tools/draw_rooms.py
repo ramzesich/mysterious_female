@@ -354,7 +354,7 @@ def smcabin(width):
     r(220, FLOOR - 42, 221, FLOOR - 3, GREY)
     for y in range(FLOOR - 38, FLOOR - 4, 8):
         r(214, y, 221, y, GREY)
-    return R.save("smcabin")
+    return redecorated("smcabin", R)
 
 
 def crewcabin(width):
@@ -839,7 +839,7 @@ def dressing(width):
         r(x - 1, 42, x + 1, 44, WOOD_LIGHT)
     d.polygon([(214, 22), (217, 29), (224, 29), (219, 34), (221, 41), (214, 37), (207, 41), (209, 34), (204, 29), (211, 29)], fill=YELLOW, outline=ORANGE)
     R.poster(20, 34, 22, 30, [RED, YELLOW, WHITE])
-    return R.save("dressing")
+    return redecorated("dressing", R)
 
 
 def nook(width):
@@ -1401,10 +1401,12 @@ def coldroom(width):
     R.d.rounded_rectangle([12, 44, 30, 78], radius=3, fill=NAVY, outline=INK)
     for y in range(50, 76, 6):
         R.r(13, y, 29, y, BLUE)
-    # Cold air along the floor.
+    # Cold air along the floor (not across the door's frame: the door goes back over the redrawn room as drawn here).
     for x in range(4, width, 13):
+        if x + 7 >= DOOR_X - 16 and x <= DOOR_X + 16:
+            continue
         R.r(x, FLOOR - 7 - (x * 3) % 3, x + 7, FLOOR - 6 - (x * 3) % 3, FROST)
-    return R.save("coldroom")
+    return redecorated("coldroom", R)
 
 
 def fort():

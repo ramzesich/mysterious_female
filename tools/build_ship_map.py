@@ -1806,8 +1806,9 @@ def build_objects():
         put(11, m, "coffee-cup-bg", height("cafe-wood-table-bg"))
     around(11, 179.4, "cafe-wood-table-bg", "cafe-blue-chair-bg", sides=(False, True))
     put(11, 179.4, "fish-lemon-bg", height("cafe-wood-table-bg"))
-    at11(183.0, "ice-cream-counter")
-    at11(183.0, "ice-cream-sign", 56)
+    # (30 px forward of where it stood, the cold room's door aft of it, both between the windows: the user, 2026-11-24.)
+    at11(182.375, "ice-cream-counter")
+    at11(182.375, "ice-cream-sign", 56)
     for m in (187.2, 190.8):
         around(11, m, "patio-table-bg", "patio-chair-bg")
         put(11, m, "orange-juice-bg", height("patio-table-bg") - ON_PATIO_TABLE)

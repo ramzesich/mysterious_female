@@ -112,3 +112,14 @@ In `library/`, `create_map_object`, side view, 1 generation each (the user chose
 | trolley3 | a cart full of books, three-quarters (dropped) | 4a8d890d-58d3-460a-8afb-552c2a899101 |
 | shelf1 | a dark board seen from above | 6eaa6034-2cac-406b-8c05-466917f30601 |
 | shelf2 | **Used**: a thin warm plank, its middle lengthened to 125 px (`assets/sprites/book-shelf.png`) | 1f7439dd-79fc-436c-a588-2d1ba56d0364 |
+
+## The ice cream mix's canister (2026-11-24)
+
+The user: the canister drawn in code "worth generating properly". `create_image_pro_flash` at its size, 20 x 24, 5
+generations each. **Used: 3** (`assets/source/things/canister.png`, its own colours: `OWN_COLOURS`).
+
+| Try | What | Job |
+|---|---|---|
+| canister/canister-1 | a slim steel canister, a patterned pink band | c8298995-af5e-4b56-9ecd-699d3f6dffab |
+| canister/canister-2 | the same, darker, a plain pink band | c5eca56a-6af9-4c99-9050-3716e51769fb |
+| 3 | **Used**: a steel churn with side grips, a pink label with a cone on it | 123d6d8c-f619-4b15-a22f-5b1c247913c0 |

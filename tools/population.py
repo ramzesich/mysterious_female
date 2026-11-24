@@ -72,7 +72,8 @@ ROOMS = [
          doors=[dict(x=262, to="outside", deck=10, door="balcony")]),
     dict(id="guest10", deck=10, m=235, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
          doors=[dict(x=262, to="outside", deck=10, door="balcony", lock=("flag", "guest"))]),
-    dict(id="coldroom", deck=11, m=185, width=240, look="coldroom", door="crew", plate="COLD ROOM",
+    # (Between the café's two last windows, its plate over the door: at 185 m it stood in a window, the user, 2026-11-24.)
+    dict(id="coldroom", deck=11, m=183.542, width=240, look="coldroom", door="crew", plate="COLD ROOM", plate_up=True,
          lock=("card", "hk", 0)),
 ]
 
@@ -721,8 +722,9 @@ SOURCES = {
     # 50 s), the old lady's mojito from Topsiders' bar.
     "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),
     "src_cocktail": (11, 155.38, "cocktail", "region:8", [("umbrella-cocktail", 30)], None, "flag:lady"),
-    # The ice cream mix, on the cold room's shelf: taken once the machine has run empty.
-    "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
+    # The ice cream mix, on the cold room's shelf: taken once the machine has run empty. (One canister: off the shelf
+    # while she carries it, as the lunch's tray, 2026-11-24.)
+    "item_canister": ("coldroom", 150, "canister", None, [("thing:canister", 30)], "flag:kid_fed", "flag:refilled", {"lift": True}),
     # Region 9: the wedding cake on its table by the pastry chef, hers to take once the planner
     # has shown what she wants, until the wedding has it.
     # (On the round side table: its 21 px less 2, as everything on it, the user, 2026-11-22.)
@@ -761,9 +763,11 @@ DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48),
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {
     "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "notice", 56, {}),
-    "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
-    "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
-    "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),
+    # (Each 3 px clear of its door's frame, as the stage manager's plate is: BOSUN touched it, PURSER lay over it, the
+    # user, 2026-11-24.)
+    "sign_name_1": (4, 224.27, "BOSUN", "plate", 52, {}),
+    "sign_name_2": (4, 228.29, "PURSER", "plate", 52, {}),
+    "sign_name_3": (4, 236.12, "DJ", "plate", 52, {}),
     # The promenade's two lanes, painted on its wall: the track by the rail, the walk by the wall.
     "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "plaque", 58, {}),
     "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall ↑", "painted", 58, {}),

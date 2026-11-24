@@ -21,7 +21,7 @@ export const LOADS = {
     coffee: { frame: 'coffee-cup', ms: 50000, hot: true },
     cocktail: { frame: 'umbrella-cocktail' },
     cake: { thing: 'wedding-cake', fragile: true },
-    canister: { draw: 'canister', heavy: true, bare: true },
+    canister: { thing: 'canister', heavy: true, bare: true },
     // The deliveries (plan-the-rest §5 3.2), each a tray with its own rule. 1, the vase of flowers (deck 8 midships): a
     // narrower tray (`tray`, px; the user, 2026-11-23), the bouquet before her face, and round the screen the flowers
     // she sees the hallway through (`view`, the user's frame: `assets/source/things/delivery/`).
@@ -110,12 +110,7 @@ export class Carry {
             g.fillStyle(0xab6f3a, 1).fillRect(3, 5, 1, 1).fillRect(5, 6, 1, 1).fillRect(4, 8, 1, 1);
             g.fillStyle(0xffffff, 1).fillRect(3, 2, 3, 2);
         });
-        make('load-canister', 16, 22, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 2, 16, 20).fillRect(4, 0, 8, 3);
-            g.fillStyle(0xc7dcd0, 1).fillRect(1, 3, 14, 18);
-            g.fillStyle(0xf68181, 1).fillRect(1, 9, 14, 6);
-            g.fillStyle(0xffffff, 1).fillRect(3, 4, 2, 16);
-        });
+        // (The ice cream mix's canister is generated: `things`' `canister`, the user's choice of three, 2026-11-24.)
     }
 
     // E at a source: the thing is in her hands.

@@ -222,7 +222,40 @@ CABINS = {
     "makeup10": dict(parts=[("makeup10-w", 0)], cuts=[], door=None, pieces=[("towel-trolley", 136, 0)]),
     "adjoin": dict(parts=[("adjoin-p1", 0), ("adjoin-p2", 200), ("adjoin-p3", 244)], cuts=[211, 363], door=None,
                    pieces=[("luggage-rack", 128, 0), ("suitcases", 128, 20)], boxes=[(358, 47, 388, 124)]),   # its 2nd door
+    # Three more the same way (the user, 2026-11-24: the stage manager's cabin C, the dressing room A, the cold room A).
+    # Their doors by their own pixels, not a box: a box carried the old wall's colour round the door, and the old frost.
+    "smcabin": dict(parts=[("smcabin-C", 0)], cuts=[], door=None, doorbox=None,
+                    pieces=[("door-cabin", 59, 0)], rim=[("door-cabin", 59, 0)]),     # (its chair the redraw's: ours over
+                                                                                       # it left the redraw's edges round it)
+    "dressing": dict(parts=[("dressing-A", 0)], cuts=[], door=None, doorbox=None,
+                     pieces=[("door-crew", 59, 0), ("velvet-stool", 164, 0), ("dress-rack", 206, 0)]),
+    "coldroom": dict(parts=[("coldroom-A", 0)], cuts=[], door=None, doorbox=None, pieces=[("door-crew", 59, 0)]),
 }
+
+
+def grow(m, n):
+    for _ in range(n):
+        m = m | np.roll(m, 1, 0) | np.roll(m, -1, 0)
+        m = m | np.roll(m, 1, 1) | np.roll(m, -1, 1)
+    return m
+
+
+def rim_fill(a, m, n=2):
+    """Where the redraw drew a piece a little bigger than the piece pasted back, its edge shows round it: the n px round
+    the piece take the wall's colour from just beyond them (left, right, over or under it)."""
+    H, W = m.shape
+    ring, far = grow(m, n) & ~m, grow(m, n)
+    inside = lambda y, x: 0 <= y < H and 0 <= x < W
+    for y, x in zip(*np.nonzero(ring)):
+        for dy, dx in ((0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)):
+            if not any(inside(y - k * dy, x - k * dx) and m[y - k * dy, x - k * dx] for k in range(1, n + 1)):
+                continue
+            yy, xx = y, x
+            while inside(yy, xx) and far[yy, xx]:
+                yy, xx = yy + dy, xx + dx
+            if inside(yy, xx):
+                a[y, x] = a[yy, xx]
+                break
 
 
 def cabin(name, base):
@@ -234,10 +267,13 @@ def cabin(name, base):
         im = join(im, Image.open(SRC / f"{part}.png"), cut, x)
     im = im.convert("RGBA")
     assert im.size == base.size, (name, im.size, base.size)
-    paste_boxes(im, base, [CABIN_DOOR, floor(base)] + spec.get("boxes", []))
+    door = spec.get("doorbox", CABIN_DOOR)
+    paste_boxes(im, base, ([door] if door else []) + [floor(base)] + spec.get("boxes", []))
     a, b = np.array(im), np.array(base)
     m = pieces_mask(base.size, spec["pieces"])
     a[m] = b[m]
+    if spec.get("rim"):
+        rim_fill(a, pieces_mask(base.size, spec["rim"]))
     im = Image.fromarray(a)
     return balcony_glass(im, base, spec["door"]) if spec["door"] else im
 

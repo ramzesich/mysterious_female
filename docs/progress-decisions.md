@@ -4897,3 +4897,27 @@ The user: "More rooms. Now we have more than enough generations".
   is in a room (`balcony` on their `shellSlopes`).
 - About 260 generations this round (`assets/source/ship/redeco/README.md`). `boot`, `region1`, `region2`, `region4`,
   `region7`, `region9`, `finale`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The stage manager's cabin, the dressing room and the cold room redecorated; the cold room's door, the canister (2026-11-24)
+
+The user: "What other rooms can we redecorate?"; of seven (the stage manager's cabin, the nook, the dressing room, the cold
+room, the chapel, the lighting booth, the lifeboat), "1-3".
+
+- **Three looks of each** (`edit_image_pro_flash`, "keep every shape ..., change only the finish": A its own colours,
+  B lived-in or worn, C clean modern or grand); **the user's: the stage manager's cabin C (light grey panels, pale birch,
+  navy blankets), the dressing room A (peach, the bulbs glowing), the cold room A (icy panels, labelled tubs).** In
+  `CABINS` as the guest cabins: their doors pasted back by their own pixels (a box carried a strip of the old wall's
+  colour and the old frost round them); the cabin's door was drawn a little bigger by the redraw, its rim filled from the
+  wall beyond (`rim_fill`); the dressing room's stool and rail by their pixels. **The cabin's chair is the redraw's** (the
+  user: ours over it "looks too distorted"; the redraw's edges showed round it). The cold room's floor frost is no longer
+  drawn across its door's frame (the user: "clean the white strips").
+- **The cold room's door between the café's last two windows** (the user: "its location is off ... out of the window"):
+  185 m to 183.542, its plate over the door (the wall there is 116 px: the counter, the reader, the door); the Ice Cream
+  Bar's counter and cone sign 30 px forward, 5 px clear of the window's frame.
+- **The deck 4 officers' plates clear of their doors' frames** (the user: BOSUN and PURSER "overlap the doorframes"): BOSUN,
+  PURSER and DJ each 3 px clear, as the stage manager's plate is.
+- **The ice cream mix's canister generated** (the user: "what is it on the table, drawn in code? ... worth generating
+  properly"; the last of three, a steel churn with a pink label and a cone on it), in its own colours (on the palette
+  its steel would go green), on the shelf, in her hands and poured; **one canister**, off the shelf while she carries it
+  (`lift`, as the lunch's tray).
+- 96 generations (81 + 15). `boot`, `region2`, `region3`, `region6`, `keeps`, `highlight` pass; `check_overlaps` 0.

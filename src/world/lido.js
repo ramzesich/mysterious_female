@@ -705,7 +705,7 @@ export const lido = {
                 if (s.anims.exists('her-pour')) her.anims.play('her-pour');
                 await w.wait(350);
                 w.carryBox.give();
-                const can = s.add.image(L.machineX - 2, L.y - 58, 'load-canister').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05).setAngle(150);
+                const can = s.add.image(L.machineX - 2, L.y - 58, 'things', 'canister').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05).setAngle(150);
                 w.add([can]);
                 sfx.pour();
                 s.time.delayedCall(650, () => sfx.pour());
