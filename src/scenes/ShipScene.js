@@ -3922,8 +3922,14 @@ export class ShipScene extends Phaser.Scene {
             if (t.route !== 'inside' && t.sprite.active) [t.sprite, t.glint].forEach(s => s.setVisible(t.route === this.route));
         }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
-        for (const { deck, gfx, always } of this.shellSlopes) {
-            gfx.setAlpha(always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+        // (Inside a room on a deck with balconies, that deck's balcony fronts and partitions, drawn over her, are not drawn
+        // across the room: they ran over the balcony cabins' insides, the user, 2026-11-24. Round the room the dim hides
+        // them anyway.)
+        const roomIn = this.rooms.find(r => r.route === this.route && r.room?.visible);
+        const roomDeck = roomIn ? this.deckOfY(p.y) : null;
+        for (const { deck, gfx, always, balcony } of this.shellSlopes) {
+            gfx.setAlpha(balcony && deck === roomDeck ? 0
+                : always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
         }
         // (The deck she stands on, or last stood on while she is in the air or falling from a scare: gliding
         // down past the bow, the decks' leaning railings at their forward ends showed on the closed side one

@@ -548,7 +548,7 @@ export class World {
         }
         for (const [deck, g] of Object.entries(fronts)) {
             this.add([g]);
-            s.shellSlopes.push({ deck: Number(deck), gfx: g });
+            s.shellSlopes.push({ deck: Number(deck), gfx: g, balcony: true });
         }
         // The ship's side drawn again over her where her picture reaches past her body (the user, 2026-11-21: it
         // showed through a partition and through the hull past a row's end): each partition's panel (its colours as
@@ -568,11 +568,11 @@ export class World {
             }
             // (A row's end is not drawn again: windows and lamps on the side there are not its tiles, and a copy hid
             // them. Her picture is cut at it instead, at any height, the wall running floor to ceiling: `balconyRoom`.)
-            parts.forEach(gfx => s.shellSlopes.push({ deck: c.deck, gfx }));
+            parts.forEach(gfx => s.shellSlopes.push({ deck: c.deck, gfx, balcony: true }));
         }
         for (const [deck, g] of Object.entries(panels)) {
             this.add([g]);
-            s.shellSlopes.push({ deck: Number(deck), gfx: g });
+            s.shellSlopes.push({ deck: Number(deck), gfx: g, balcony: true });
         }
         // Ladders between routes: the lifeboat station's, from the promenade's gate up its column.
         this.ladders = this.data.ladders.map(L => {

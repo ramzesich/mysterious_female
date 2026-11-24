@@ -50,6 +50,17 @@ def atlas(frame):
     return img.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))
 
 
+def redecorated(name, R):
+    """A room as drawn here, then redecorated (the user's choices of 2026-11-24): tools/redecorate_rooms.py lays the
+    generated look over it, keeping its doors, floor and generated pieces as drawn here (the guest cabins, take 3, their
+    balcony doors' glass cleared for the live view; the pantry, B)."""
+    import redecorate_rooms as Rd
+    base = R.save(name)
+    im = Rd.pantry(base) if name == "pantry" else Rd.cabin(name, base)
+    im.save(OUT / f"{name}.png")
+    return im
+
+
 def stand(im, frame, x, dy=0, flip=False):
     """A piece standing at x (its middle), its foot `dy` px over the floor."""
     piece = atlas(frame)
@@ -557,7 +568,7 @@ def pantry(width):
         R.r(x, 13, x, 20, WOOD)
         for k in range(4):
             R.d.ellipse([x - 2, 20 + k * 5, x + 2, 24 + k * 5], fill=c)
-    return R.save("pantry")
+    return redecorated("pantry", R)
 
 
 def galley(width):
@@ -1067,7 +1078,7 @@ def makeup10(width):
     stand(R.im, "towel-trolley", 136)
     bed(R, 186, 236)
     wall_lamp(R, 222, FLOOR - 70)
-    return R.save("makeup10")
+    return redecorated("makeup10", R)
 
 
 def cleanup(width):
@@ -1098,7 +1109,7 @@ def cleanup(width):
     for k in range(3):                                                    # the pillows, piled on the bed's head
         d.rounded_rectangle([210 - k, FLOOR - 33 - k * 6, 228 - k, FLOOR - 27 - k * 6], radius=3, fill=WHITE, outline=GREY)
     wall_lamp(R, 222, FLOOR - 70)
-    return R.save("cleanup")
+    return redecorated("cleanup", R)
 
 
 def balcabin9(width):
@@ -1145,7 +1156,7 @@ def balcabin9(width):
     for x0 in (236, 281):
         box(x0, FLOOR - 88, x0 + 6, FLOOR - 3, "#7f708a", SLATE)
         r(x0 + 3, FLOOR - 86, x0 + 3, FLOOR - 5, SLATE)
-    return R.save("balcabin9")
+    return redecorated("balcabin9", R)
 
 
 def balcony_door(R, ajar, curtain="#7f708a"):
@@ -1211,7 +1222,7 @@ def balcabin8m(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 204, 34, 26, 20, (BLUE_LIGHT, BLUE, WHITE))
     balcony_door(R, True, "#4d9be6")
-    return R.save("balcabin8m")
+    return redecorated("balcabin8m", R)
 
 
 def balcabin8a(width):
@@ -1226,7 +1237,7 @@ def balcabin8a(width):
     wall_lamp(R, 196, FLOOR - 70)
     picture(R, 206, 34, 26, 20, (PINK, MAUVE, YELLOW))
     balcony_door(R, True, "#ae2334")
-    return R.save("balcabin8a")
+    return redecorated("balcabin8a", R)
 
 
 def balcabin9a(width):
@@ -1244,7 +1255,7 @@ def balcabin9a(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 132, 36, 30, 20, (YELLOW, GREEN, WHITE))
     balcony_door(R, True, "#1ebc73")
-    return R.save("balcabin9a")
+    return redecorated("balcabin9a", R)
 
 
 def balcabin10a(width):
@@ -1261,7 +1272,7 @@ def balcabin10a(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 204, 34, 26, 20, (NAVY, BLUE, YELLOW))
     balcony_door(R, True, "#905ea9")
-    return R.save("balcabin10a")
+    return redecorated("balcabin10a", R)
 
 
 def guest10(width):
@@ -1286,7 +1297,7 @@ def guest10(width):
     wall_lamp(R, 196, FLOOR - 70)
     picture(R, 206, 34, 26, 20, (BLUE_LIGHT, GREEN, WHITE))
     balcony_door(R, False, "#0b5e65")
-    return R.save("guest10")
+    return redecorated("guest10", R)
 
 
 def atlas_names():
@@ -1330,7 +1341,7 @@ def adjoin(width):
     r(407, FLOOR - 31, 410, FLOOR - 30, ORANGE)
     # (The blanket fort across the way through is a picture of its own, in front of her: `fort()`.)
     fort()
-    return R.save("adjoin")
+    return redecorated("adjoin", R)
 
 
 # --- Region 6's room (deck 11) ---------------------------------------------------------------------
@@ -1435,6 +1446,10 @@ def fort():
     d.line([(18, B2 - 34), (28, B2 - 34)], fill=RED)
     d.line([(18, B2 - 31), (25, B2 - 31)], fill=RED)
     palettize(im).save(OUT / "adjoin-fort.png")
+    # Redrawn in place (the user's choice of 2026-11-24, 3): tools/redecorate_rooms.py's fort, its outline as drawn here.
+    from redecorate_rooms import fort as redecorate
+    im = redecorate()
+    im.save(OUT / "adjoin-fort.png")
     return im
 
 

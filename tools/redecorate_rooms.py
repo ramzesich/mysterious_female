@@ -147,11 +147,119 @@ def clear_glass(im, room):
     return Image.fromarray(a)
 
 
+# --- The guest cabins (take 3: their own colours, the finish only), the pantry (B) and the blanket fort (3), 2026-11-24 ---
+
+def join(L, R, cut, over0):
+    """Two redrawn parts of one room: R (laid from room x over0) brought to L's colours row by row where they overlap,
+    then L up to `cut` and R from it."""
+    L = np.array(L.convert("RGBA")); Rf = np.array(R.convert("RGB")).astype(float)
+    Lf = L[:, :, :3].astype(float)
+    n = L.shape[1] - over0
+    diff = (Lf[:, over0:] - Rf[:, :n]).mean(1)
+    k9 = np.ones(9) / 9
+    off = np.stack([np.convolve(np.pad(diff[:, c], 4, mode="edge"), k9, mode="valid") for c in range(3)], 1)
+    Rf = np.clip(Rf + off[:, None, :], 0, 255)
+    out = np.zeros((L.shape[0], over0 + Rf.shape[1], 4), np.uint8)
+    out[:, :, 3] = 255
+    out[:, :cut, :3] = Lf[:, :cut]
+    out[:, cut:, :3] = Rf[:, cut - over0:]
+    return Image.fromarray(out)
+
+
+def pieces_mask(size, placed):
+    """The pixels of atlas pieces stood in a room as draw_rooms' stand() stands them (its middle at x, its foot dy up)."""
+    from draw_rooms import atlas
+    m = np.zeros((size[1], size[0]), bool)
+    for frame, x, dy in placed:
+        a = np.array(atlas(frame))[:, :, 3] > 0
+        x0, y0 = x - a.shape[1] // 2, FLOOR - dy - a.shape[0]
+        m[y0:y0 + a.shape[0], x0:x0 + a.shape[1]] |= a
+    return m
+
+
+# The balcony door's glass (draw_rooms' balcony_door): its panes cleared for the live sea and sky, but for what stands in
+# front of the view, the builder's own pixels: the balcony's rail and balusters, the handle; and the curtain blown in
+# through a door slid open. (`windows` on the room in tools/population.py are these panes, for the game's mask.)
+RAIL = [(243, 94, 38, 2)] + [(x, 95, 1, 32) for x in range(246, 282, 9)]
+BALCONY_SHUT = dict(panes=[(243, 45, 18, 82), (263, 45, 18, 82)], bars=RAIL + [(258, 82, 2, 9)], curtain=None)
+BALCONY_AJAR = dict(panes=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], bars=RAIL + [(269, 82, 2, 9)],
+                    curtain=[(236, 40), (242, 40), (251, 98), (247, 120), (240, 114)])
+
+
+def balcony_glass(im, base, door):
+    from PIL import ImageDraw
+    a, b = np.array(im), np.array(base)
+    keep = Image.new("L", im.size, 0)
+    if door["curtain"]:
+        ImageDraw.Draw(keep).polygon(door["curtain"], fill=255, outline=255)
+    k = np.array(keep) > 0
+    k |= np.roll(k, 1, 1) | np.roll(k, -1, 1)
+    for x, y, w, h in door["panes"]:
+        sub = a[y:y + h, x:x + w]
+        sub[~k[y:y + h, x:x + w], 3] = 0
+    for x, y, w, h in door["bars"]:
+        a[y:y + h, x:x + w] = b[y:y + h, x:x + w]
+    return Image.fromarray(a)
+
+
+CABIN_DOOR = (44, 47, 74, 124)          # draw_rooms' cabin_door at DOOR_X, a px round it
+# Each cabin: its redrawn parts (file, the room x it is laid from), where each joins the one before, its balcony door,
+# the generated pieces stood in it (pasted back by their own pixels), and boxes kept as the builder drew them.
+CABINS = {
+    "balcabin9": dict(parts=[("balcabin9-l2-T3", 0), ("balcabin9-r2-T3", 112)], cuts=[177], door=BALCONY_SHUT,
+                      pieces=[("towel-swan", 220, 32)]),
+    "balcabin8m": dict(parts=[("balcabin8m-l", 0), ("balcabin8m-r", 112)], cuts=[180], door=BALCONY_AJAR,
+                       pieces=[("towel-trolley", 160, 0)]),
+    "balcabin8a": dict(parts=[("balcabin8a-l", 0), ("balcabin8a-r", 112)], cuts=[182], door=BALCONY_AJAR,
+                       pieces=[("rose-glass", 152, 26)]),
+    "balcabin9a": dict(parts=[("balcabin9a-l", 0), ("balcabin9a-r", 112)], cuts=[177], door=BALCONY_AJAR,
+                       pieces=[("bucket-spade", 118, 0), ("orange-juice", 150, 26), ("beach-bag", 222, 32), ("swim-ring", 204, 32)]),
+    "balcabin10a": dict(parts=[("balcabin10a-l", 0), ("balcabin10a-r", 112)], cuts=[178], door=BALCONY_AJAR,
+                        pieces=[("wine-glasses", 146, 26), ("cake-slice", 164, 26), ("champagne-bucket", 116, 0)]),
+    "guest10": dict(parts=[("guest10-l", 0), ("guest10-r", 112)], cuts=[181], door=BALCONY_SHUT, pieces=[("table-lamp", 152, 26)]),
+    "cleanup": dict(parts=[("cleanup-w", 0)], cuts=[], door=None, pieces=[("towel-trolley", 132, 0)],
+                    boxes=[(21, 119, 39, 127)]),                     # the robot vacuum's dock
+    "makeup10": dict(parts=[("makeup10-w", 0)], cuts=[], door=None, pieces=[("towel-trolley", 136, 0)]),
+    "adjoin": dict(parts=[("adjoin-p1", 0), ("adjoin-p2", 200), ("adjoin-p3", 244)], cuts=[211, 363], door=None,
+                   pieces=[("luggage-rack", 128, 0), ("suitcases", 128, 20)], boxes=[(358, 47, 388, 124)]),   # its 2nd door
+}
+
+
+def cabin(name, base):
+    """A guest cabin: its parts joined, its doors, floor and generated pieces the builder's, its balcony's glass clear."""
+    spec = CABINS[name]
+    (first, _), *rest = spec["parts"]
+    im = Image.open(SRC / f"{first}.png")
+    for (part, x), cut in zip(rest, spec["cuts"]):
+        im = join(im, Image.open(SRC / f"{part}.png"), cut, x)
+    im = im.convert("RGBA")
+    assert im.size == base.size, (name, im.size, base.size)
+    paste_boxes(im, base, [CABIN_DOOR, floor(base)] + spec.get("boxes", []))
+    a, b = np.array(im), np.array(base)
+    m = pieces_mask(base.size, spec["pieces"])
+    a[m] = b[m]
+    im = Image.fromarray(a)
+    return balcony_glass(im, base, spec["door"]) if spec["door"] else im
+
+
+def pantry(base):
+    """The pantry (B): its left part to x 212, past the shelf's right post, its right from x 100; doors and floor kept."""
+    im = join(Image.open(SRC / "pantry-L212-B.png"), Image.open(SRC / "pantry-right-B.png"), 212, 100)
+    paste_boxes(im, base, [CREW_DOOR, tuple(v + (236 - 59 if i % 2 == 0 else 0) for i, v in enumerate(CREW_DOOR)), floor(base)])
+    return im
+
+
+def fort():
+    """The blanket fort drawn in front of her in the adjoining cabins (3): redrawn in place, its outline as it was."""
+    return Image.open(SRC / "fort-3.png").convert("RGBA")
+
+
 def main():
-    for name, lay in (("laundry", laundry), ("store", store), ("galley", galley), ("maid6", maid6)):
+    for name, lay in [("laundry", laundry), ("store", store), ("galley", galley), ("maid6", maid6), ("pantry", pantry)] +             [(n, (lambda n: lambda base: cabin(n, base))(n)) for n in CABINS]:
         p = GAME / "rooms" / f"{name}.png"
         lay(Image.open(p).convert("RGBA")).save(p)
         print("wrote", p.relative_to(ROOT))
+    fort().save(GAME / "rooms" / "adjoin-fort.png")
     print("(the linen room: run tools/draw_linen.py; the maid's cabin's swan over her: tools/draw_rooms.py maid6)")
 
 

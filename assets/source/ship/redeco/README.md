@@ -63,3 +63,41 @@ B clean modern, C warm; the maid's cabin's A a classic cruise cabin, B Scandinav
 | `galley-heal-A.png` | `inpaint_image_pro_flash` of the strip over a join at x 181: a flat grey pillar, not used | `5a80da0e…` | 9 |
 
 **These three: 99 generations.**
+
+# The guest cabins, the pantry and the blanket fort (2026-11-24)
+
+The user: "More rooms". A pilot on deck 9's balcony cabin: C1 to C3 with cabin 8206 (or the maid's cabin) as the style
+reference (they moved the furniture and drew a second bed: `tries/balcabin9-left/right-C*`), then T1 to T3 described in
+words, parts cut at plain wall; **take 3 chosen**: "Keep every shape in this picture exactly where it is and the same
+size, nothing added or moved: part of a passenger cabin on a cruise ship [with a glass door onto the balcony], flat side
+view. Change only the finish, as detailed polished pixel art: cream wall panels with thin seams, warm orange-brown wood
+with a little grain, [soft folds in the bedding and curtains,] soft gentle shading, the same colours." (seed 5), then
+the same for each cabin. The pantry: three looks (A worn, B clean modern, C warm, the store's wording), **B chosen**,
+its left part redrawn to x 212. The fort: three, **3 chosen**.
+
+## Used
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `balcabin9-l2-T3.png`, `-r2-T3.png` | deck 9's balcony cabin, x 0..180 and 112..288 | `8302e910…`, `3a3bfb45…` | 12 |
+| `balcabin8m-l/r.png` | deck 8 midships' (x 0..184, 112..288) | `822489ae…`, `28edd55c…` | 12 |
+| `balcabin8a-l/r.png` | deck 8 aft's | `9f8d3538…`, `5a38995c…` | 12 |
+| `balcabin9a-l/r.png` | deck 9 aft's | `91317524…`, `28e405ac…` | 12 |
+| `balcabin10a-l/r.png` | deck 10 aft's | `f6c9fd30…`, `e33b2513…` | 12 |
+| `guest10-l/r.png` | the balcony guest's, deck 10 | `d08458df…`, `cd8afa8c…` | 12 |
+| `cleanup-w.png` | the cabin mid-cleanup, deck 9 | `5b77ee46-5431-4e7a-8615-fe41ad78854e` | 9 |
+| `makeup10-w.png` | the cabin being made up, deck 10 | `9143ce18-4b77-4502-9524-c423cd3b9bef` | 9 |
+| `adjoin-p1/p2/p3.png` | the adjoining cabins, x 0..212, 200..388, 244..432 | `093e5302…`, `d55b7c7a…`, `2a3fe6ff…` | 21 |
+| `pantry-L212-B.png`, `pantry-right-B.png` | the pantry B, x 0..212 and 100..288 | `ca8afcda…`, `8458fe00…` | 15 |
+| `fort-3.png` | the blanket fort, its outline kept ("change only the finish") | `25522bff-df2e-4d9a-9eb8-10f9796ae370` | 5 |
+
+## Tries (`tries/`)
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `balcabin9-left/right-C1..C3.png` | cabin 8206 / the maid's cabin as the style reference: furniture moved, a second bed | `846cd1ab…`, `0d1018bc…`, `59196549…`, `d454c92a…`, `76da5117…`, `ca391b31…` | 36 |
+| `balcabin9-l2/r2-T1, T2.png` | richer wood; warm glow | `c6f68965…`, `78955e4a…`, `a161f40c…`, `8aadc357…` | 24 |
+| `pantry-left/right-A, C.png`, `pantry-left-B.png` | worn; warm; B's first left half (cut through the shelves) | `30a6addf…`, `fb802b12…`, `16b9d9b4…`, `6c0a6f8a…`, `8545ee0d…` | 30 |
+| `fort-1.png`, `fort-2.png` | the fort described in words | `76e04480…`, `c93e4aa8…` | 10 |
+
+**This round: about 260 generations.**

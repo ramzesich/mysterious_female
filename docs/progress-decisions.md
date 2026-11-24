@@ -4871,3 +4871,29 @@ candidates by how flat they are, how much she is in them and what they cost: the
   near-catch.
 - The user upgraded PixelLab to Tier 3 the same day: 10,000 generations a cycle, refilled on 2026-12-24 (CLAUDE.md).
 - `boot`, `region1`, `region2`, `region3`, `keeps`, `highlight` pass.
+
+## The guest cabins and the pantry redecorated, the balconies' railing out of the rooms (2026-11-24)
+
+The user: "More rooms. Now we have more than enough generations".
+
+- **The nine guest cabins** (the six balcony cabins, the clean-up and make-up cabins, the adjoining cabins): a pilot of
+  three takes on deck 9's balcony cabin, the user's **take 3** (their own colours, only the finish: cream panels with
+  thin seams, warm wood with a little grain, soft folds; "keep every shape ..., change only the finish"), then each
+  cabin the same way. Cabin 8206 as a style reference moved the furniture and drew a second bed: dropped (`tries/`).
+  Cut where the wall is plain (x 0..184 and 112..288, the cut between the desk and the bed; the adjoining cabins in
+  three parts, cut at 211 and inside the second door at 363). Kept as drawn: the doors, the floor, the vacuum's dock;
+  the generated pieces by their own pixels (the swans, trolleys, rose, bucket and spade, juice, beach bag, swim ring,
+  glasses, cake, champagne, lamp, luggage).
+- **Every balcony door shows the live outside** (the user: the guest cabins' windows "as we redecorate them"): its
+  panes cleared (`balcony_glass`: shut or slid open), the rail, balusters, handle and the curtain blown in kept; the
+  panes are the room's `windows` for the game's view. (The committed `balcabin9.png` still had the swan's old beak:
+  8 px now as the atlas has it.)
+- **The blanket fort redrawn in place** (the user: "The fort also have to be regenerated"; 3 of three): its outline
+  as it was, so her crawl behind it is the same.
+- **The pantry B** (clean modern; of three): its left part redrawn to x 212, past the shelf's right post, so the cut
+  falls on plain wall (cut through the shelves, their rows did not meet).
+- **The balconies' fronts and partitions are not drawn across a room she is in** (found in the balcony cabin, an
+  existing fault; the user: "fix the railing"): the ship scene's cut-away sets them to nothing on her deck while she
+  is in a room (`balcony` on their `shellSlopes`).
+- About 260 generations this round (`assets/source/ship/redeco/README.md`). `boot`, `region1`, `region2`, `region4`,
+  `region7`, `region9`, `finale`, `keeps`, `highlight` pass; `check_overlaps` 0.
