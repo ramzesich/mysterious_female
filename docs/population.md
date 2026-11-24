@@ -102,7 +102,7 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | 4 | 165 | `tan_4_store` | Crates in the dry store (`room_store`) | 2 |
 | 5 | 90 | `tan_5_cafe` | The Atrium Café's fruit bowl | 1 |
 | 5 | 190 | `tan_5_dessert` | The Four Seasons' dessert cart | 1 |
-| 5 | 247 | `tan_5_bowl` | The Seven Seas' fruit bowl, knocked over by Bumbot | 3 |
+| 5 | 244-245 | `tan_5_bowl_1` to `_3` | Out of the Seven Seas' fruit bowl as Bumbot knocks it off the pass's counter: each where it rolls to rest (2026-11-24) | 3 |
 | 5 | 253 | `tan_5_galley` | The crate in the galley (`room_galley`), breakable | 2 |
 | 6 | 26 | `tan_6_high` | The fire-hose cabinet's top, reached from the delivery robot's roof | 1 |
 | 6 | 142 | `tan_6_windjammer` | The Windjammer's bar | 1 |
@@ -380,8 +380,8 @@ a shortcut past the waiter; built as a short room. Drawn by hand.
 |---|---|---|---|---|
 | 203 | `amb_host` | The host at the welcome counter | `static` | A character |
 | 210-240 | `amb_diners_7s` | Three tables of diners | `static` | Characters |
-| 247 | `tan_5_bowl` | The fruit bowl, knocked over by Bumbot | Three tangerines roll to 244-246 after `bb_1` | |
-| 250 | `src_lunch` | The pass by the crew door: the officer's lunch tray | `source(lunch)` after `bb_1` | A tray |
+| 247.2 | `prop_bowl_7s`, `tan_5_bowl_1` to `_3` | The fruit bowl on the pass's counter's forward end, knocked off it by Bumbot | Its clip of the fall; three tangerines roll to 244.1, 244.7 and 245.3 during `bb_1` | |
+| 249.4 | `src_lunch` | The pass's counter by the galley's door (246.8 to 249.6 m): the officer's lunch under its cloche, there from the start | `source(lunch)` hers after `bb_1`; off the counter while she carries it, a fresh one if she is left without it, none after `lunch` | A tray |
 | 250 | `bb_1` | Bumbot eating the lunch on the counter | `scene` §9.1 | His `eating` |
 | 253 | `room_galley` | The galley behind the crew door: the pass, a chef (`amb_chef_7s`), `tan_5_galley` in a breakable crate, the trap door's landing at 248 (`scn_trapdoor`) | `room` | Drawn by hand |
 
@@ -897,11 +897,12 @@ swoop, glide) and a per-instance rule from the tables.
 
 Input locked unless said; each sets its save flag.
 
-1. **`bb_1` near-catch 1 (deck 5, 250):** she comes within 3 m of the pass; Bumbot eats on the
-   counter; she walks up and bends, the scream bubble "Кісюнічка!!!"; he leaps west along the
-   counter, the fruit bowl topples (three tangerines roll to 244-246), he runs out of the Seven Seas
-   westward and is gone at the aft lobby; she straightens, turns to us; play resumes; the D glyph
-   shows as she takes the first tangerine; `src_lunch` is now a source. Once, later, as she reaches
+1. **`bb_1` near-catch 1 (deck 5, 248.4; remade 2026-11-24, `docs/near-catch-1-remake-log.md`):** Bumbot eats at a
+   plate on the pass's counter, his back to her; 110 px from him (a jump across that line ends there) she stops,
+   the scream bubble "Кісюнічка!!!"; he looks back over his shoulder; 0.4 s later she dashes at him (the dash's own
+   trail and sound); he turns and bolts forward along the counter behind her, into the fruit bowl, which falls off
+   the counter's end (three tangerines roll to 244.1-245.3), leaps down and runs off the screen forward; she turns
+   after him, turns to us, shrugs; play resumes after 2.4 s with one plate, "D to dash"; `src_lunch` is hers to take. Once, later, as she reaches
    the midships crew trunk with the card: `bb_glimpse_stairs`, a tail up the forward stairs right
    past `riv_rope`, who doesn't notice.
 2. **`bb_lift` the glass elevator (deck 6's atrium walk):** the first time she stands within 10 m of

@@ -2,7 +2,8 @@
 
 How a sequence of the game is remade from start to finish. Written 2026-11-24 from the two remakes done that way
 (the linen room's shaft, `docs/shaft-remake-log.md`, 2026-11-23; the pool's scene, `docs/pool-remake-log.md`,
-2026-11-24), from the user's two prompts and from every correction the user made before each was merged. The user,
+2026-11-24; **used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
+of correction and three checks to it**), from the user's two prompts and from every correction the user made before each was merged. The user,
 2026-11-24: "save this plan. We will start using it right away."
 
 **It is used whenever the user asks for a sequence to be remade or refined as a whole.** Each remake gets its own
@@ -22,6 +23,8 @@ made and what it cost goes into the log and is said at each stop.
      deck).
    - Go through the frames at the game's pixel size and list every fault, not only the ones named.
    - List what hangs on the scene: its flags, locks, rewards, tests, and what the plan says must be kept.
+   - **For every piece the remake takes out, grep what names it** (near-catch 1: the lunch's pulse was the old
+     cabinet's, and went with it unnoticed).
 3. **Settle the structure with the user before anything is drawn.**
    - Lay out the constraints: where the route must lead, what cannot move, which way she faces coming in.
    - Ask only the decisions that are the user's (a direction, a room mirrored, a thing dropped), each with a
@@ -47,12 +50,16 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the nine kinds of correction** (below) before the user sees it:
+8. **Check it against the kinds of correction** (below; twelve now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
    - Look at the deck above and below, and at the outside view.
    - Go through a second time, and reload after the scene.
+   - Look at the whole screen at the moment the scene takes over: its subject well inside the picture, not at its
+     edge (measure the camera's view).
+   - Stand where E acts on each thing the scene leaves her: it pulses; and once taken it is gone from its place.
+   - Cross every line that starts the scene in a jump as well as on foot.
    - Run the scenarios touched, with a new check for each decision, and the overlap check.
 9. **Play stop.** The user gets the link, the strip and a GIF, with a plain note that motion and sound are theirs to
    judge.
@@ -65,10 +72,11 @@ made and what it cost goes into the log and is said at each stop.
 
 For scale: the shaft took 92 generations, the pool 60.
 
-## The nine kinds of correction
+## The kinds of correction
 
-Nearly every correction the user made on playing the two remakes is one of these. None shows in a still or a test;
-all can be looked for before the user plays (step 8).
+Nearly every correction the user made on playing the remakes is one of these. None shows in a still or a test;
+all can be looked for before the user plays (step 8). The first nine came of the shaft and the pool, the last three
+of near-catch 1.
 
 | Kind | The shaft | The pool |
 |---|---|---|
@@ -81,6 +89,9 @@ all can be looked for before the user plays (step 8).
 | A stand-in where the beat needed its own clip | the cover's fall "too plain" | her reach up from the water |
 | A pause or a fade in a hand-over | "no delays", no fade going in | no fade into deck 10 |
 | Another deck's things leaking in | the dark over the outside view | the laundry line |
+| The subject at the screen's edge as the scene takes over | (near-catch 1: "we can barely see Bumbot and what he is actually doing", the scene began 200 px from him) | |
+| A thing she can use that does not pulse, or stays where it stood once taken | (near-catch 1: "the tray is a pickable object, it should pulsate"; "when pick up tray, it should stop being on the counter") | |
+| Two things at once that the player must tell apart | (near-catch 1: "make her cry, and then dash, with a little pause in between") | |
 
 ## What the two prompts had in common
 
@@ -110,6 +121,12 @@ preview stop is wanted (it caught the lever before it was built).
 
 The pool went better for three reasons: the record of the old scene, the preview stop, and the shaft's lessons
 already applied.
+
+- **Near-catch 1** (the first by this plan): the old scene recorded (eleven faults, an 8.3 s lock among them);
+  three structural questions answered by the user in one message; the pieces and a storyboard over the real room
+  approved as shown ("Build like it is here, I like it"); then four corrections in three short rounds of play (the
+  pause before the dash, the lunch's pulse, the nearer start, the tray off the counter), and "Approved" the same
+  afternoon. 31 generations. None of the four was one of the nine kinds: they are the last three rows above.
 
 ## The two prompts, word for word
 

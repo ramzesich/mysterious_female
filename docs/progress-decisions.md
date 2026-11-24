@@ -4811,3 +4811,13 @@ continue with the next item on the plan: Bumbot made again." `docs/plan-the-rest
   `check_overlaps` 0. The whole suite not run. Each near-catch but the first was recorded from the running game and
   looked at frame by frame.
 - 114 generations (65 the look, 49 the clips).
+
+## Near-catch 1 remade (2026-11-24, the design session, a worktree of its own)
+
+The user: "Let's fix the first Bumbot near-catch sequence in the game. Right now it is very much broken, both visually
+and in terms of gameplay: there are delays and glitches. Apply the plan and let's go". The plan is
+`docs/sequence-remake-plan.md`, saved the same day; everything found, decided and built is in
+**`docs/near-catch-1-remake-log.md`** (22 decisions, the user's among them: the counter, "she cries and dashes at
+him", "D to dash", then on playing it the pause before the dash, the lunch's pulse, the nearer start, the tray off
+the counter). The Seven Seas' pass became a generated serving counter; the scene is `src/world/pass.js`, one clock;
+she is held 2.4 s where it was 8.3. 31 generations.

@@ -118,8 +118,9 @@ next day he is still asleep there, and the ship is hers to wander.
 2. **The gangway officer** stands at the shell door on deck 4 and can't leave his post. His bubble shows a tray:
    he wants his lunch.
 3. **The lunch** waits at the Seven Seas' pass (deck 5 aft), and **Bumbot is on the counter eating it.**
-   **Near-catch 1:** at the sight of him she screams «Кісюнічка!!!» and lunges. He bolts along the counter and
-   knocks the fruit bowl over. From then on D is **the lunge**.
+   **Near-catch 1:** at the sight of him she stops and screams «Кісюнічка!!!», and a moment later dashes at him. He
+   bolts along the counter behind her and knocks the fruit bowl off its end. From then on D is **the dash** (a plate
+   says so once: "D to dash").
 4. She takes a fresh tray and carries it to the gangway: the first carry, with a tray's rules (a low hop, no
    ladders, a bump spills it). The officer eats and hands her the **Deck card**.
 5. **The way on:** the midships crew trunk's blue reader (decks 4 and 5), up into Bliss on deck 6.

@@ -604,10 +604,13 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
   1. ~~His coat in her arms~~ **Settled 2026-11-24:** the sheet's drawing is as it was (the user likes it), her
      skin's shade mended, and he is in his new coat there, a tone darker than its main one (the user, of two seen in
      the game at the bow: "B it is"; a remap in `HER_CAT`). The trial flag `?coat=` and its sheets are gone.
-  2. The clips made and not placed: the standing idle, walk, look back, stretch, the loaf. The user chooses where.
+  2. The clips made and not placed: the standing idle, walk, stretch, the loaf (his look back is in near-catch 1 since its remake). The user chooses where.
   3. **The near-catch scenes are the user's** (2026-11-24: "there are a lot of issues with the near-catch scenes in
      general, I will fix them separately, when doing general QA"): nothing in them is changed until that list comes.
      One known to them already: at near-catch 2 (deck 6) he sleeps over the reading table's lamp.
+     **Near-catch 1 is remade** (2026-11-24, on the user's word, by `docs/sequence-remake-plan.md`:
+     `docs/near-catch-1-remake-log.md`); 2 to 6 wait as before (3 to 5 have scenes of their own; 2 and 6 still play
+     the ship scene's plain `nearCatch`).
   4. The run's pace (24 frames a second) and the rounds' pauses are by rule, not by eye: the user's to say in play.
 
 The steps as planned:

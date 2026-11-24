@@ -153,6 +153,10 @@ After the user's play (2026-11-24):
 - **`python tools/check_overlaps.py`:** 0 overlaps.
 - **Not judged by me:** how it feels in motion (her stop at the dash's end above all), and how it sounds (no new
   effect: `cry`, `lunge`, `lungeEnd`, `mrrp`, `scramble`, `plop`, `crash`, `roll`).
+- **Approved by the user in play, 2026-11-24** ("Approved"), after decisions 19 to 22. The shared documents were
+  brought to it then: GAME_DESIGN's region 1, its beats' table, Bumbot's clips and the work record; population.md;
+  progression.md; plan-the-rest's §7a; progress-decisions.md; CLAUDE.md (a row and the lessons);
+  `docs/sequence-remake-plan.md` (three kinds of correction and three checks more).
 
 ## 7. Generations (PixelLab job ids)
 
