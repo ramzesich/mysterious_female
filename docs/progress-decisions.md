@@ -4605,3 +4605,12 @@ right edge: decisions 28 and 29 of `docs/shaft-remake-log.md`. No generations. `
   those on the balcony where he swipes at the gull, and the wet trail aft from the pool; the `paws` picture and its
   playtest checks with them; part 12's foamy prints (plan-the-rest §7g item 3) struck out. The generated tries stay in
   `assets/source/things/paws/` (3 generations).
+
+## Her crawl at its own pace; the shaft's joints over her (the user's, 2026-11-24)
+
+- **Her crawl sometimes played very slowly** (after the shaft's slide, "not every time"): her run's clip is played at
+  her speed (`pose('run', |vx| / runSpeed)`), a fraction of itself as she slows to a stop, and the crawl never set a
+  speed of its own, so it kept whatever the run had left. `poseCrawl` (and the slide's end) set it to 1: checked with the
+  run's left at 0.1 just before she crouched.
+- **The shaft's joints over her their whole height** ("let's make the entire line cover us"), not only their top and
+  foot (`compose` in `tools/build_shaft.py`, `front.png`).

@@ -57,6 +57,10 @@ export const verbs = {
         this.idle = null;
         this.idleAt = this.time.now + 4000;
         if (this.anims.exists('her-crawl')) {
+            // (At its own pace: her run's clip is played at her speed, `pose('run', |vx| / runSpeed)`, and what it was
+            // last set to stayed, a fraction of it if she had been slowing down: the crawl then played "very slow",
+            // the user, 2026-11-24, after the shaft's slide and not every time.)
+            p.anims.timeScale = 1;
             if (Math.abs(vx) > 5) p.anims.play('her-crawl', true);
             else { p.anims.play('her-crawl', true); p.anims.pause(); }
             return;

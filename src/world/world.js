@@ -1023,6 +1023,7 @@ export class World {
                 s.takeoffY = to.y;
                 // (On hands and knees again, in the pose the clip ends on.)
                 if (s.anims.exists('her-crawl')) {
+                    p.anims.timeScale = 1;
                     p.anims.play('her-crawl', true);
                     p.anims.pause(p.anims.currentAnim.frames[L?.endsOn ?? 0]);
                 }
