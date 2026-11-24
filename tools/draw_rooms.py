@@ -296,7 +296,12 @@ def store(width):
     # A low crate standing out from the shelves, its top 40 px up... no: the tangerines rest on the
     # 40 px shelf between the sacks and the crate.
     R.poster(20, 40, 22, 28, [WHITE, "#f3ecdd", SLATE])
-    return R.save("store")
+    # Redecorated (the user's choice of 2026-11-24, A): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door and the floor as drawn here.
+    from redecorate_rooms import store as redecorate
+    im = redecorate(R.save("store"))
+    im.save(OUT / "store.png")
+    return im
 
 
 def smcabin(width):
@@ -609,7 +614,12 @@ def galley(width):
     # Its door is at its aft end (the deck's last metres are structure): the whole room is mirrored.
     R.im = R.im.transpose(Image.FLIP_LEFT_RIGHT)
     R.full = [(width - 1 - x1, y0, width - 1 - x0, y1) for x0, y0, x1, y1 in R.full]
-    return R.save("galley")
+    # Redecorated (the user's choice of 2026-11-24, A): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door and the floor as drawn here.
+    from redecorate_rooms import galley as redecorate
+    im = redecorate(R.save("galley"))
+    im.save(OUT / "galley.png")
+    return im
 
 
 # --- Region 2's rooms (deck 6, the boat walkway) ----------------------------------------------------
@@ -658,7 +668,11 @@ def maid6(width):
         r(x, FLOOR - 13, x + 1, FLOOR - 1, WOOD_DARK)
     for k in range(3):
         d.rounded_rectangle([128, FLOOR - 21 - k * 4, 140, FLOOR - 17 - k * 4], radius=1, fill=(WHITE, BLUE_LIGHT, WHITE)[k], outline=GREY)
-    out = R.save("maid6")
+    # Redecorated (the user's choice of 2026-11-24, C): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door, the floor and the generated pieces as drawn here.
+    from redecorate_rooms import maid6 as redecorate
+    out = redecorate(R.save("maid6"))
+    out.save(OUT / "maid6.png")
     # The swan again, alone, drawn over her while she stands on the bed (the user, 2026-11-20: on the bed
     # the swan is in front of her; on the floor she is in front of it).
     on_bed(out, "towel-swan", 190, 21, "maid6-onbed")

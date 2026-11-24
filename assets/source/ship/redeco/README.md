@@ -36,3 +36,30 @@ ones over the builders' pictures and pastes back what play and the clips rest on
 | `heal-A/B.png` | the join healed, A and B | `d4983869…`, `e96d3675…` | 18 |
 
 **All of it: about 216 generations.**
+
+# Three more (2026-11-24): the dry store, the galley, the maid's cabin
+
+The user: "In the same manner as we redecorated the linen room and the laundry room, I want to continue with other
+rooms" (the crew cabin on deck 3 and cabin 8206 left as they are). Three looks of each, the same wording as above (A worn,
+B clean modern, C warm; the maid's cabin's A a classic cruise cabin, B Scandinavian, C cabin 8206 as a reference).
+**Chosen: store A, galley A, maid's cabin C.** The galley's halves are cut at x 178 with no inpaint.
+
+## Used
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `store-A.png` | the dry store, worn painted steel, its goods redrawn as a food store (seed 3) | `46d007ab-3b23-49d6-8499-94df66e2a9c8` | 9 |
+| `galley-left-A.png` | the galley's x 0..188, a worn working stainless galley (seed 3) | `2f0c5b21-0f70-4d65-aedd-53816fb643ee` | 6 |
+| `galley-right-A.png` | the galley's x 148..336 (seed 3) | `da53a7ad-84d5-4c5e-97db-72df78aba0d2` | 6 |
+| `maid6-C.png` | the maid's cabin, `method: reference` with cabin 8206's picture (seed 27) | `4cac2596-ab5f-41f7-a910-d5e0a54a7bd3` | 9 |
+
+## Tries (`tries/`)
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `store-B/C.png` | clean modern; warm | `0e8f6a5e…`, `a4354147…` | 18 |
+| `maid6-A/B.png` | classic cruise cabin (cherry, brass); bright Scandinavian | `33336b18…`, `6d519ee5…` | 18 |
+| `galley-left-B/C.png`, `galley-right-B/C.png` | gleaming new (bare panels on the right); warm (a tall cabinet by the door read as a second door) | `cd738bc2…`, `f58ac2d9…`, `b3a8a9c1…`, `04b42247…` | 24 |
+| `galley-heal-A.png` | `inpaint_image_pro_flash` of the strip over a join at x 181: a flat grey pillar, not used | `5a80da0e…` | 9 |
+
+**These three: 99 generations.**

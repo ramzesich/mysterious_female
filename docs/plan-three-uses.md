@@ -70,7 +70,8 @@ Read from the code for this plan, so that the steps name real places:
 - Her husband sits at the first table of the Great Outdoors (deck 11, about 220 m) from region
   6; the table scene is `tableScene` in `src/world/lido.js` and sets the flag `table`.
 - PixelLab: 4,939 generations left on 2026-11-16 (the user upgraded the subscription; the
-  allowance refills on 2026-12-16). There were 540 on 2026-11-15.
+  allowance refills on 2026-12-16). There were 540 on 2026-11-15. (Since 2026-11-24: Tier 3, 10,000 a cycle,
+  refilled on 2026-12-24.)
 
 ---
 

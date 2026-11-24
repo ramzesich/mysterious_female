@@ -1293,7 +1293,8 @@ pool's 5 have scenes of their own since 2026-11-23 and earlier). Found broken wh
 - `KEY_CARDS.required` is `true`; `src/progression.js` knows no `locked`.
 - `DEV_FRESH` is `true`; `WIN_MESSAGE` is empty.
 - `main` and `three-uses` hold the same files (`0c99e7d` is the merge).
-- PixelLab: 4,388 generations left, Tier 2, the cycle ends 2026-12-16.
+- PixelLab: 4,388 generations left, Tier 2, the cycle ends 2026-12-16. (Since 2026-11-24: Tier 3, 10,000 a cycle,
+  refilled on 2026-12-24, the user's upgrade.)
 
 Not checked by hand, taken from the readers: each row of `docs/population.md` against the game
 (363 ids by script, about sixty looked at); where the cabin numbers are drawn (§6 says to find

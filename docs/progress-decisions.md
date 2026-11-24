@@ -4843,3 +4843,24 @@ and in terms of gameplay: there are delays and glitches. Apply the plan and let'
 him", "D to dash", then on playing it the pause before the dash, the lunch's pulse, the nearer start, the tray off
 the counter). The Seven Seas' pass became a generated serving counter; the scene is `src/world/pass.js`, one clock;
 she is held 2.4 s where it was 8.3. 31 generations.
+
+## Three more rooms redecorated (2026-11-24)
+
+The user: "In the same manner as we redecorated the linen room and the laundry room, I want to continue with other
+rooms. Crew cabin on deck 3 and room 8206 are looking well, so we leave them alone." Of the twenty rooms left, the best
+candidates by how flat they are, how much she is in them and what they cost: the galley, the dry store, the maid's cabin
+(also the cheapest way to settle a look for the guest cabins); the user: "Let's start with 1 to 3".
+
+- Three looks each (A worn working, B clean modern, C warm; the maid's cabin's C asked to match cabin 8206 as a
+  reference, and came back almost as it was). **Chosen: store A, galley A, maid's cabin C** (the user).
+- **Kept pixel for pixel:** the doors and floors; the maid's cabin's luggage rack and suitcase, sea picture and towel
+  swan by boxes round them (by their own pixels the redraw's copies left faint traces), so the swan drawn over her on the
+  bed is the same picture. The store's shelf for the tangerines and the snack tube came back on its row (88), its middle
+  empty; the galley's flour sacks, range and pass where they were.
+- **The galley in halves** (336 px): matched row by row and cut at x 178, between the range and the pass, where the tile
+  rows meet and the cut reads as a grout line. An inpaint of the strip came back a flat grey pillar: kept in `tries/`,
+  not used.
+- `tools/redecorate_rooms.py` has the three; `tools/draw_rooms.py`'s `store`, `galley` and `maid6` call it. 99
+  generations (`assets/source/ship/redeco/README.md`).
+- The user upgraded PixelLab to Tier 3 the same day: 10,000 generations a cycle, refilled on 2026-12-24 (CLAUDE.md).
+- `boot`, `region1`, `region2`, `region3`, `keeps`, `highlight` pass.
