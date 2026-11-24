@@ -36,7 +36,8 @@ ROOMS = [
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
          plate_side=-1, plate_lift=10),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
-    dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
+    dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open",
+         windows=[(181, 35, 19, 37), (202, 35, 20, 37)]),
     dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
     # (At 242.5 m its door and its plate lay on the speaker stack by the stage: the user, 2026-11-14.)
     dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR", plate_style="navy",

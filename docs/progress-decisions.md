@@ -4862,5 +4862,12 @@ candidates by how flat they are, how much she is in them and what they cost: the
   not used.
 - `tools/redecorate_rooms.py` has the three; `tools/draw_rooms.py`'s `store`, `galley` and `maid6` call it. 99
   generations (`assets/source/ship/redeco/README.md`).
+- **The maid's cabin's window shows the live outside** (the user, asked whether it ever had: it was always painted; "Yes,
+  and we'll do the others, as we redecorate them"): its panes are cleared in its picture (`windows` on the room in
+  `tools/population.py`, `clear_glass` in `tools/redecorate_rooms.py`) and one window view for every such room is drawn
+  behind them (the ship scene's `roomView`, made by `world.buildRooms`), shown while she is in the room, as cabin 8206's.
+  The guest cabins get theirs as they are redecorated. `region2`, `keeps`, `cabin`, `boot` pass.
+- The galley's door is at deck 5's aft end past the pass (the user did not find it): from `?at=pass5`, aft past the
+  near-catch.
 - The user upgraded PixelLab to Tier 3 the same day: 10,000 generations a cycle, refilled on 2026-12-24 (CLAUDE.md).
 - `boot`, `region1`, `region2`, `region3`, `keeps`, `highlight` pass.

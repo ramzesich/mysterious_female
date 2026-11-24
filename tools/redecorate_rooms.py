@@ -134,7 +134,17 @@ def maid6(base):
     im = Image.open(SRC / "maid6-C.png").convert("RGBA")
     assert im.size == base.size, (im.size, base.size)
     paste_boxes(im, base, MAID6_KEEP + [floor(base)])
-    return im
+    return clear_glass(im, "maid6")
+
+
+def clear_glass(im, room):
+    """A room's window panes (`windows` in tools/population.py's ROOMS) cleared: the game shows the live sea and sky behind
+    them, as in cabin 8206 (the user, 2026-11-24)."""
+    from population import ROOMS
+    a = np.array(im)
+    for x, y, w, h in next(r for r in ROOMS if r["id"] == room).get("windows", ()):
+        a[y:y + h, x:x + w, 3] = 0
+    return Image.fromarray(a)
 
 
 def main():

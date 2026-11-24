@@ -2973,7 +2973,7 @@ export class ShipScene extends Phaser.Scene {
         this.dusk = k;
         this.backdrop.setDusk(k);
         this.seaView.setDusk(k);
-        for (const w of [this.windowView, this.cabinView]) w?.backdrop.setDusk(k);
+        for (const w of [this.windowView, this.cabinView, this.roomView]) w?.backdrop.setDusk(k);
         const [r, g, b] = DUSK_LIGHT.map(v => Math.round(255 * (1 + (v - 1) * k)));
         this.duskWash?.setFillStyle((r << 16) | (g << 8) | b).setVisible(k > 0);
     }
@@ -3116,7 +3116,7 @@ export class ShipScene extends Phaser.Scene {
         this.layBackdrop(this.fromAfar ? 0 : flow);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
-        for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
+        for (const w of [this.windowView, this.cabinView, this.roomView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
         // (What she sees a load through, the vase's flowers, every frame: the outside view holds the world still, and the
         // frame must be gone in it at once.)
         this.world?.carryBox.showView();
@@ -3913,6 +3913,7 @@ export class ShipScene extends Phaser.Scene {
         this.walkRail?.setDepth(boatRoom ? DEPTH.exterior + 0.06 : WALK_RAIL_DEPTH);
         this.updateRoofGlow(dt);
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
+        this.roomView?.view.setVisible(!this.overview && !!this.rooms.find(r => r.route === this.route)?.windows);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
         for (const cat of this.cats) {
             if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away && !cat.hidden);

@@ -376,6 +376,12 @@ export class World {
             const img = s.add.image(def.x0, def.floor - ROOM.height, key).setOrigin(0).setDepth(D.exterior + 0.12).setVisible(false);
             const dim = s.roomDim(img);
             this.add([dim, img]);
+            // (Its window panes clear in its picture: the live sea and sky behind them while she is in it, as in cabin 8206;
+            // the user, 2026-11-24. One view for every such room, its mask a rectangle a pane.)
+            if (def.windows) {
+                s.roomView ??= s.addWindowView(D.exterior + 0.115);
+                for (const [x, y, w, h] of def.windows) s.roomView.mask.fillRect(def.x0 + x, def.floor - ROOM.height + y, w, h);
+            }
             // (Its pixels in front of the things that lie in it, over its tangerines: tools/draw_rooms.py.)
             const front = def.front ? s.add.image(def.x0, def.floor - ROOM.height, `room-${def.id}-front`).setOrigin(0)
                 .setDepth(D.exterior + 0.135).setVisible(false) : null;
@@ -384,7 +390,7 @@ export class World {
             // is not cut open, the user, 2026-11-21: "The cut away must show the outside of the hull".)
             const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front,
                            inDeck: !def.doors.some(d => d.outRoute === OUTSIDE),
-                           doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
+                           doors: def.doors, def, needs: def.needs, hidden: false, outside: [], windows: !!def.windows };
             for (const d of def.doors) {
                 d.lockSpec = parseLock(d.lock);
                 const out = d.outRoute === OUTSIDE;
