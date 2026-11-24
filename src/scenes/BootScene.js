@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -258,6 +258,8 @@ export class BootScene extends Phaser.Scene {
         if (meta.anims.knock) this.anims.create({ key: 'her-knock', frames: frames('knock'), frameRate: 9 });
         // At her cabin's mirror: a hand over her hair (the intro plays her `badge` clip frame by frame).
         if (meta.anims.hair) this.anims.create({ key: 'her-hair', frames: frames('hair'), frameRate: 8 });
+        // Facing us, a shrug: a way she cannot go, a near-catch missed (SHRUG).
+        if (meta.anims.shrug) this.anims.create({ key: 'her-shrug', frames: frames('shrug'), frameRate: SHRUG.fps });
         // At her husband's table: down into the patio chair with her cone, licking it, getting up after the book.
         if (meta.anims['sit-cone']) {
             this.anims.create({ key: 'her-sit-cone', frames: frames('sit-cone'), frameRate: 8 });

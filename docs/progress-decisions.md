@@ -4695,3 +4695,27 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
   20 px under deck 11's floor, where nothing covers it. It is cut at the floor each frame he is in the tub (`updateLido`);
   above it the tub's near wall hides him as before. `region6` passes.
 
+## Popups off the screen; a blocked way is a shrug (the user's, 2026-11-24)
+
+- **Her popup goes off the screen with her during a scare** (from her hit to her respawn, `scareFrom`): a gag or a fall
+  that carries her out of the view no longer leaves her word at the screen's edge. Anywhere else, and for anyone else's
+  popup, it stays inside the view as before (the user: "only when the player moves off the screen before the respawn").
+- **A way roped or chained off says nothing over her** (it repeated the sign): she turns to us and shrugs, and the sign
+  lights up once (its own picture added over it, in and out over 0.6 s). The user chose shrug A (her character's
+  skeleton, custom poses; 3 generations; B, pixminimax, and a v3 try, 1 each, kept in `assets/source/her/shrug/tries/`)
+  and flash 2 (brighten; white and a blink were the others). A lock with only a padlock keeps it over her, and she
+  shrugs too; card locks are unchanged. The same shrug where she turned to us after a near-catch. `SHRUG` in the config.
+  - The shrug is played as an idle is: a fresh step or jump cuts it short, a key held against the rope does not; not
+    again within 2.5 s; not with her hands full, crawling, in the towel or in the air.
+  - **Its clock is its own:** her stand is a still frame, so the run's last slowing (`timeScale`, 0.14 after a stop)
+    stayed on and the shrug took 4 s ("very much slow"). It plays at 1 and gives the old pace back after: her idles stay
+    slowed on purpose (the user: quicker they "looked like twitching").
+  - The ladders' chain signs are text drawn at 4x: a copy of their texture lit only the top left corner. The glow is made
+    from their canvas.
+- **`?at=pass5`**: deck 5 aft by the Seven Seas' pass (near-catch 1). The corridor from La Cucina is walled off at 167 m:
+  I had sent the user there from `cucina`, and Bumbot was not to be reached.
+- The playtests that read a sign's words from her bubble read `lastBlocked` (`blocked(b)`); `stairs` checks the shrug
+  and that nothing is over her. `stairs`, `golden`, `region1`, `region2`, `region3`, `region6`, `region8`, `lang`,
+  `mishaps`, `region4`, `boot` pass (`mishaps.things`' sprinkler case failed before this, as it does now: a door's gag
+  reaches her first).
+

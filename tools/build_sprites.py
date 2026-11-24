@@ -164,6 +164,9 @@ HER = {
         # her cabin's mirror she runs a hand over her hair.
         "badge": [(f"badge/{i}.png", "feet") for i in range(8)],
         "hair": [(f"hair/{i}.png", "feet") for i in range(8)],
+        # A way she cannot go, and a near-catch missed: she turns to us and shrugs (the user, 2026-11-24; `shrug/`, its
+        # README: skeleton-v3, custom poses).
+        "shrug": [(f"shrug/{i}.png", "feet") for i in range(8)],
         # At her husband's table (the user, 2026-11-23; `sit-cone/`, its README): she sits down in the patio chair with
         # the cone she carried (the game's own `load-cone` in her fist, `bake.py`), licks it, and gets up after the book.
         "sit-cone": [(f"sit-cone/cone/sit3/{i}.png", "feet") for i in range(10)],

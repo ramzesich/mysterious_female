@@ -55,9 +55,15 @@ export const BUMBOT = {
     startleMs: 280,     // into her reach, when he hears her and leaps
     leapMs: 160,        // the leap before he runs
     holdMs: 450,        // she stays bent, reaching at nothing
-    frontMs: 600,       // then turns to us before play goes on
+    frontMs: 600,       // then turns to us and shrugs (her `shrug`, the user, 2026-11-24), this long after it, before play goes on
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
+
+// A way she cannot go (the user, 2026-11-24): where a sign already says why (a rope's card, a ladder's chain) she says
+// nothing, turns to us and shrugs (her `shrug` clip, `fps` frames a second: at 9 "very slowly", the user), and the sign lights up a moment (`flashMs`,
+// its own colours added over it at most `glow`); a lock with nothing to read keeps its padlock over her and she shrugs.
+// Not again before `againMs`, held against it or not.
+export const SHRUG = { fps: 14, againMs: 2500, flashMs: 600, glow: 0.55, signReach: 90 };
 
 // Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it this long, she bounces on it
 // for joy, in place, hopping from one foot to the other, her arms waving up and down: one cycle

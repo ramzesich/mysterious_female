@@ -675,7 +675,8 @@ export class World {
         if (this.carry) return true;
         const gate = this.gates.find(g => Math.abs(x - g.x) < 9 && y >= g.y0 - 6 && y <= g.y1 + 6 && !this.progress.flagSet(g.needs));
         if (gate?.sign) {
-            this.scene.showLocked(null, `🚧 ${gate.sign.replace('\n', ': ')}`);
+            // (Its sign on the chain says it already: she shrugs and it lights up; a hidden hatch's has none to show.)
+            this.scene.blockedBy(gate.extra?.[1]?.visible ? gate.extra[1] : null, `🚧 ${gate.sign.replace('\n', ': ')}`);
             this.story.onBlocked(gate.needs);
         }
         return !!gate;

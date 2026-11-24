@@ -755,10 +755,13 @@ def scenario_stairs(b):
     wait(3.0)
     s = b.state()
     ok = check(s["mode"] == "play" and s["y"] == D5, "holding up climbs to deck 5", s)
-    locked = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
+    locked = blocked(b)
+    said = b.eval("window.__ship.alert.visible && window.__ship.alert.text")
+    shrug = b.eval("(() => { const s = window.__ship; return s.time.now - (s.shrugAt ?? -1e9) < 3000; })()")
     b.shot("stairs-locked")
     b.key("up", False)
     ok &= check(bool(locked) and "SEARCH" in locked, "and stops there: the flight up is roped off", locked)
+    ok &= check(shrug and not said, "nothing over her: she turns to us and shrugs, the sign lit", (shrug, said))
     b.hold("down", 3.0)
     s = b.state()
     ok &= check(s["mode"] == "play" and s["y"] == D4, "holding down carries her back to deck 4", s)
@@ -1973,6 +1976,12 @@ def alert(b):
     return b.eval("window.__ship.alert.visible && window.__ship.alert.text") or ""
 
 
+# A way roped or chained off says nothing over her: she shrugs and its sign lights up (the user, 2026-11-24). What
+# stopped her in the last 3 s: the sign's words (`lastBlocked` in the ship scene), else "".
+def blocked(b):
+    return b.eval("(() => { const s = window.__ship, l = s.lastBlocked; return l && s.time.now - l.at < 3000 ? l.text : ''; })()") or ""
+
+
 def flight_feet(name):
     """A core flight's foot and top as (x, y): `stairs-<core>-<d>-<d+1>`."""
     _, core, d, _ = name.split("-")
@@ -2080,7 +2089,7 @@ def scenario_golden(b):
                save_list(b, "regions"))
     # Region 1: the guest stairs up are roped off; the crew trunk wants the Deck card.
     s = climb(b, "stairs-forward-5-6", 0.6)
-    ok &= check(s["y"] == D5 and "SEARCH" in alert(b), "the forward stairs 5-6 are roped off for the search", alert(b))
+    ok &= check(s["y"] == D5 and "SEARCH" in blocked(b), "the forward stairs 5-6 are roped off for the search", blocked(b))
     go(b, 4, 125)
     # (A lock's message is not shown again within 0.9 s, `lockedUntil`: the stairs' was just shown.)
     b.wait_for("window.__ship.time.now >= (window.__ship.lockedUntil || 0)", 2)
@@ -2105,7 +2114,7 @@ def scenario_golden(b):
     ok &= check(s["mode"] == "stairs", "and the forward stairs' rope is gone", s)
     # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2).
     shut = not use_door(b, 6, 194, -1)
-    ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off", alert(b))
+    ok &= check(shut and "QUIET" in blocked(b), "the Library's aft door is roped off", blocked(b))
     go(b, 6, 177)
     b.hold("right", 1.5)
     ok &= check(wait_flag(b, "bb2"), "near-catch 2 at the reading table", flags(b))
@@ -2222,7 +2231,7 @@ def scenario_golden(b):
     # wind, the top, the horn.
     b.teleport(LADDER_X, D12)
     b.hold("up", 0.6)
-    ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in alert(b), "the technical ladder is chained off: the engineer wants his coffee", alert(b))
+    ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in blocked(b), "the technical ladder is chained off: the engineer wants his coffee", blocked(b))
     wait(1.0)
     ok &= check(coffee_for_the_engineer(b), "a hot coffee carried up past Teppanyaki's flares: he drinks it and goes up", flags(b)[-3:])
     wait(0.4)
@@ -2401,7 +2410,7 @@ def scenario_region1(b):
     ok &= check(b.state()["x"] < exact_x(90), "and is hopped", b.state())
     # The way on: the crew trunk opens with his card; the guest stairs stay roped.
     s = climb(b, "stairs-midship-5-6", 0.5)
-    ok &= check(s["y"] == D5 and "WET FLOOR" in alert(b), "the midship stairs: the cleaner's wet floor", alert(b))
+    ok &= check(s["y"] == D5 and "WET FLOOR" in blocked(b), "the midship stairs: the cleaner's wet floor", blocked(b))
     go(b, 4, 125)
     b.tap("e")
     b.hold("up", 5.0)
@@ -2685,7 +2694,7 @@ def scenario_region2(b):
     ok &= check(person(b, "npc_librarian")["state"] == "acting", "she runs past the desk: the librarian's finger goes to her lips", person(b, "npc_librarian"))
     # Near-catch 2: asleep on the reading table; he knocks the rope stand into the aft door.
     shut = not use_door(b, 6, 194, -1)
-    ok &= check(shut and "QUIET" in alert(b), "the Library's aft door is roped off: QUIET PLEASE", alert(b))
+    ok &= check(shut and "QUIET" in blocked(b), "the Library's aft door is roped off: QUIET PLEASE", blocked(b))
     go(b, 6, 177)
     b.hold("right", 1.5)
     ok &= check(wait_flag(b, "bb2"), "near-catch 2: he bolts from the reading table", flags(b))
@@ -2703,7 +2712,7 @@ def scenario_region2(b):
         f = js(b, f"(f => [f.bottom.x, f.bottom.y])(window.__ship.flights.find(g => g.name === 'stairs-{core}-7-8'))")
         b.teleport(f[0], f[1])
         b.hold("up", 0.5)
-        ok &= check(b.state()["y"] == f[1] and sign in alert(b), f"deck 7, the {core} flight up: {sign}", alert(b))
+        ok &= check(b.state()["y"] == f[1] and sign in blocked(b), f"deck 7, the {core} flight up: {sign}", blocked(b))
     ok &= check(person(b, "blk_fitter")["on"], "the carpet fitter is at his roll")
     b.shot("region2-carpet")
     return ok
@@ -3663,7 +3672,7 @@ def scenario_region6(b):
     ok &= check("cp_gym" in save_list(b, "activated"), "the gym's crew door: a checkpoint")
     ok &= check(person(b, "amb_treadmill")["on"] and person(b, "amb_weights")["on"], "the gym's two: a runner on a treadmill, a man with dumbbells")
     s = climb(b, "stairs-midship-11-12", 0.6)
-    ok &= check(s["y"] == D11 and "WET PAINT" in alert(b) and person(b, "blk_painter")["on"], "the midship flight up: wet paint, and the painter", alert(b))
+    ok &= check(s["y"] == D11 and "WET PAINT" in blocked(b) and person(b, "blk_painter")["on"], "the midship flight up: wet paint, and the painter", blocked(b))
     ok &= check(js(b, f"{S}.progress.blockLifted('towels')") and not js(b, f"{thing('prop_towels_table')}.items[0].visible"),
                 "the towel animals are gone from the midship flight below")
     b.shot("region6-painter")
@@ -3922,7 +3931,7 @@ def scenario_region6(b):
     wait(1.0)
     # The aft lobby: the fans on the stairs.
     s = climb(b, "stairs-aft-11-12", 0.6)
-    ok &= check(s["y"] == D11 and "BIG GAME" in alert(b) and person(b, "blk_fan_a")["on"], "the aft flight up: the Sports Bar's fans", alert(b))
+    ok &= check(s["y"] == D11 and "BIG GAME" in blocked(b) and person(b, "blk_fan_a")["on"], "the aft flight up: the Sports Bar's fans", blocked(b))
     b.shot("region6-fans")
     wait(0.6)
     # The Great Outdoors: the machine. A short swirl, too long a one, and a proper one.
@@ -4577,7 +4586,7 @@ def scenario_region8(b):
     b.hold("right", 0.3)
     ok = check("cp_garden" in lit(), "the Garden Cafe's service door is lit on the way", lit())
     s = climb(b, "stairs-aft-11-12", 0.8)
-    ok &= check(s["y"] == D11 and "BIG GAME" in alert(b), "the aft flight up to deck 12 is roped off: the fans", alert(b))
+    ok &= check(s["y"] == D11 and "BIG GAME" in blocked(b), "the aft flight up to deck 12 is roped off: the fans", blocked(b))
     wait(1.0)
     src = b.eval(f"{W}.things.find(t => t.id === 'src_coffee').x")
     b.teleport(src - 6, D11)
@@ -4701,7 +4710,7 @@ def scenario_region8(b):
     F = b.eval(f"{T}.funnel")
     b.teleport(F["ladderX"], D12)
     b.hold("up", 0.6)
-    ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in alert(b), "the technical ladder is chained off", alert(b))
+    ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in blocked(b), "the technical ladder is chained off", blocked(b))
     wait(1.0)
     b.eval(f"{W}.carryBox.take('coffee'); {W}.carryBox.until = {NOW} + 1200")
     wait(1.8)

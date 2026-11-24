@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING, SHRUG } from '../config.js';
 import { wire } from '../wire.js';
 import { Controls } from '../controls.js';
 import { scenario } from '../world/mishaps.js';
@@ -3208,6 +3208,11 @@ export class ShipScene extends Phaser.Scene {
         const speed = crawling ? VERBS.crawlSpeed : PLAYER.runSpeed * (lunging ? LUNGE.speed : 1) * (this.wading ? 0.5 : 1)
             * (this.holding ? HOLDING.speed : 1);
         let dir = aside ? 0 : (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        // (Her shrug at a block is cut short by a fresh step or a jump, not by a key held against the block: `shrug`.)
+        if (this.idle === 'shrug' && (input.leftPressed || input.rightPressed || input.jumpPressed)) {
+            this.idle = null;
+            this.shrugDone();
+        }
         // (The lunge carries her on the way she faces whether a way is held or not.)
         if (lunging && !dir && !aside) dir = p.flipX ? -1 : 1;
         if (time < this.kickUntil) dir = this.kickDir;      // a wall kick carries her off the wall a moment
@@ -3507,6 +3512,16 @@ export class ShipScene extends Phaser.Scene {
     standStill(time, dir) {
         const p = this.player;
         // (Her hair at her cabin's mirror plays on E: `tryMirror`.)
+        // (Her shrug at a block plays on with a key held against it, facing us; then she faces the way she did.)
+        if (this.idle === 'shrug') {
+            if (p.anims.isPlaying && p.anims.currentAnim?.key === 'her-shrug') {
+                p.setFlipX(false);
+                return;
+            }
+            // (Cut short by her run, the run's own pace is hers now: nothing to give back.)
+            if (p.anims.currentAnim?.key !== 'her-shrug') this.shrugScale = undefined;
+            this.shrugDone(dir ? dir < 0 : this.shrugFacing);
+        }
         if (this.idle) {
             if (p.anims.isPlaying && !dir) return;
             this.idle = null;
@@ -4274,10 +4289,98 @@ export class ShipScene extends Phaser.Scene {
         return this.progress.hasCard(card);
     }
 
-    // A lock she can't pass: the card it needs, a block's sign, or just the lock.
+    // A lock she can't pass: the card it needs over her; a block whose sign stands by says it already (she shrugs, it
+    // lights up); just the lock: its padlock over her, and she shrugs (the user, 2026-11-24).
     showLock(res) {
         if (res.card) return this.showLocked(res.card);
-        return this.showLocked(null, res.sign ? `🚧 ${res.sign}` : '🔒');
+        return this.blockedBy(res.sign ? this.signNear(this.player.x, this.player.y) : null, res.sign ? `🚧 ${res.sign}` : '🔒');
+    }
+
+    // A way she can't go: with a `sign` in sight that says why, no words, a shrug and the sign lit a moment; with none,
+    // `text` over her (the old way), and the shrug.
+    blockedBy(sign, text) {
+        if (!sign) {
+            if (this.time.now >= (this.lockedUntil || 0)) this.shrug();
+            return this.showLocked(null, text);
+        }
+        if (this.time.now < (this.lockedUntil || 0)) return false;
+        this.lockedUntil = this.time.now + 900;
+        sfx.rattle();
+        this.flashSign(sign);
+        // (What stopped her, for the playtests: the sign's words, and whether she shrugged.)
+        this.lastBlocked = { text: sign.signText ?? sign.text ?? '', at: this.time.now, shrug: this.shrug() };
+        return false;
+    }
+
+    // The sign of a block nearest her, in sight: a rope's card (src/progression.js), a ladder's chain (src/world/world.js).
+    signNear(x, y) {
+        const signs = [...(this.progress.blockDrawings ?? []).map(d => d.items[1]), ...(this.world.gates ?? []).map(g => g.extra?.[1])];
+        let best = null, bestD = Infinity;
+        for (const o of signs) {
+            if (!o?.visible || Math.abs(o.y - y) > 100) continue;
+            const d = Math.abs(o.x - x);
+            if (d < SHRUG.signReach && d < bestD) { best = o; bestD = d; }
+        }
+        return best;
+    }
+
+    // The sign lights up a moment: its own picture added over it, in and out (SHRUG). (In its layer at its depth, a
+    // hair over it, not on top of everything: she may stand in front of it.)
+    flashSign(sign) {
+        if (sign.flashing) return;
+        // (A text sign, the ladders' chains, is drawn at 4x its size: a picture of its own made from its canvas, or
+        // only its top left corner lit, the user saw.)
+        let key = sign.texture.key, frame = sign.frame.name;
+        if (sign.type === 'Text') {
+            key = `glow:${sign.text}`;
+            frame = undefined;
+            if (!this.textures.exists(key)) {
+                const c = document.createElement('canvas');
+                c.width = sign.canvas.width;
+                c.height = sign.canvas.height;
+                c.getContext('2d').drawImage(sign.canvas, 0, 0);
+                this.textures.addCanvas(key, c);
+            }
+        }
+        const glow = this.add.image(sign.x, sign.y, key, frame).setOrigin(sign.originX, sign.originY)
+            .setDisplaySize(sign.displayWidth, sign.displayHeight).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0);
+        glow.setDepth(sign.depth + 0.001);
+        if (this.worldLayer.list.includes(sign)) this.worldLayer.add(glow);
+        sign.flashing = true;
+        this.tweens.add({
+            targets: glow, alpha: SHRUG.glow, duration: SHRUG.flashMs / 2, yoyo: true, ease: 'Sine.easeInOut',
+            onComplete: () => { glow.destroy(); sign.flashing = false; },
+        });
+    }
+
+    // She turns to us and shrugs, once (her `shrug`), where she stands; then back the way she faced. Played as an idle
+    // is (`standStill`): a fresh step or a jump cuts it short, a key held against the block does not. Not with her
+    // hands full, in the towel, crawling, in the air, or again before `SHRUG.againMs`.
+    shrug() {
+        const p = this.player;
+        if (this.mode !== 'play' || this.holding || this.world.carry || this.towel || this.crawling || !this.anims.exists('her-shrug')) return false;
+        // (On her feet: off the stairs onto a roped-off landing her body has not met the floor in the first frame.)
+        if (this.grounded === false || this.time.now < (this.shrugAgain ?? 0)) return false;
+        this.shrugAgain = this.time.now + SHRUG.againMs;
+        this.shrugAt = this.time.now;
+        this.shrugFacing = p.flipX;
+        this.idle = 'shrug';
+        p.setFlipX(false);
+        // (On a clock of its own: her stand is a still frame, which leaves her run's last slowing as it was, and the shrug
+        // played at that, "very much slow", the user. Her idles keep playing at that pace, on purpose (the user:
+        // quicker they "looked like twitching"), so it is given back when the shrug ends: `shrugDone`.)
+        this.shrugScale = p.anims.timeScale;
+        p.anims.timeScale = 1;
+        p.anims.play('her-shrug');
+        return true;
+    }
+
+    // The shrug over or cut short: her facing and her clips' pace as they were before it.
+    shrugDone(facing = this.shrugFacing) {
+        const p = this.player;
+        if (this.shrugScale !== undefined) p.anims.timeScale = this.shrugScale;
+        this.shrugScale = undefined;
+        if (facing !== undefined) p.setFlipX(facing);
     }
 
     // A flight up that her cards don't open: the card it needs shows above her for a moment.
@@ -4649,8 +4752,20 @@ export class ShipScene extends Phaser.Scene {
                     this.time.delayedCall(BUMBOT.holdMs, () => {
                         p.anims.play('her-straighten');
                         p.once('animationcomplete-her-straighten', () => {
-                            this.pose('front');
-                            this.time.delayedCall(BUMBOT.frontMs, () => { herDone = true; finish(); });
+                            // (Turned to us, she shrugs: the user, 2026-11-24. Then back the way she faced.)
+                            const facing = p.flipX, pace = p.anims.timeScale;
+                            const done = () => this.time.delayedCall(BUMBOT.frontMs, () => { p.setFlipX(facing); p.anims.timeScale = pace; herDone = true; finish(); });
+                            if (!this.anims.exists('her-shrug')) {
+                                this.pose('front');
+                                return done();
+                            }
+                            p.setFlipX(false);
+                            p.anims.timeScale = 1;
+                            p.anims.play('her-shrug');
+                            p.once('animationcomplete-her-shrug', () => {
+                                this.pose('front');
+                                done();
+                            });
                         });
                     });
                 });
@@ -5624,6 +5739,7 @@ export class ShipScene extends Phaser.Scene {
                 this.spawnAt(target, { emerge: true });
                 this.tweens.add({ targets: this.fade, alpha: 0, duration: 260 });
                 this.respawning = false;
+                this.scareFrom = null;               // (no scare under way: src/popup.js keeps her popups in the view again)
             },
         });
     }

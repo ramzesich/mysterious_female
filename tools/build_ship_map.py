@@ -1064,6 +1064,8 @@ def build_objects():
     for name, deck, m in [("store4", 4, 161.5), ("maid6", 6, 46.5), ("knit5", 5, 28.0), ("shore5", 5, 136.0), ("cucina", 5, 152.6),
                           ("balcony7", 7, 236.0)]:
         add(point(name, "place", exact_x(m), floor_y(deck)))
+    # (Near-catch 1, Bumbot at the Seven Seas' pass, deck 5 aft: walled off from La Cucina's side; 2026-11-24.)
+    add(point("pass5", "place", x_of(238), floor_y(5)))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):

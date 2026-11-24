@@ -298,10 +298,16 @@ class Popup {
         // arms, his head under her chin, would have it down across her face.)
         const side = this.from === 'bumbot' ? (this.s.player.flipX ? -1 : 1) : 0;
         let x = Math.round(head.x - W / 2 + side * (W / 2 + 2)), y = Math.round(head.top - lift - H);
-        // Inside the view, then clear of those already placed: aside, the shorter way, then up.
-        const clampX = v => Math.max(view.x + MARGIN, Math.min(view.right - MARGIN - W, v));
+        // Inside the view, then clear of those already placed: aside, the shorter way, then up. But while a scare
+        // of hers is under way (her hit until her respawn, `scareFrom`), never pushed off her head: a gag or a fall
+        // that carries her out of the view takes her popup out with her (the user, 2026-11-24: it stayed on the
+        // screen without her; "only when the player moves off the screen before the respawn").
+        const x0 = x, reach = Math.max(0, Math.floor(W / 2) - 4), loose = this.rank === 0 && this.s.scareFrom && !this.from;
+        const inView = v => Math.max(view.x + MARGIN, Math.min(view.right - MARGIN - W, v));
+        const clampX = loose ? v => Math.max(x0 - reach, Math.min(x0 + reach, inView(v))) : inView;
         x = clampX(x);
         y = Math.max(view.y + MARGIN, y);
+        if (loose) y = Math.min(y, Math.round(head.top) - 2 - H);
         for (let k = 0; k < 4; k++) {
             const hit = placed.find(q => q.box && x < q.box.x + q.box.w + 2 && x + W + 2 > q.box.x && y < q.box.y + q.box.h + 2 && y + H + 2 > q.box.y);
             if (!hit) break;
