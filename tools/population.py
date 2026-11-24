@@ -709,11 +709,13 @@ QUIRKS = {
     # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
     "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
 }
-# Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there, when hers to take, until).
+# Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there, when hers to take, until, options).
+# `lift`: it is one tray, gone from its place while she carries it (back as a fresh one if she spills it).
 SOURCES = {
     # (On the pass's counter from the start, hers to take once Bumbot has been at it: it popped in with the flag
-    # before; near-catch 1 remade, 2026-11-24.)
-    "src_lunch": (5, 249.3542, "lunch", None, [("tray", 33), ("load-cloche", 36)], "flag:bb1"),
+    # before; near-catch 1 remade, 2026-11-24. Off the counter while she has it, and for good once the officer has his
+    # lunch: the user, 2026-11-24, "when pick up tray, it should stop being on the counter".)
+    "src_lunch": (5, 249.3542, "lunch", None, [("tray", 33), ("load-cloche", 36)], "flag:bb1", "flag:lunch", {"lift": True}),
     # Region 8's two errands: the engineer's coffee from the Great Outdoors' coffee station (hot for
     # 50 s), the old lady's mojito from Topsiders' bar.
     "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),

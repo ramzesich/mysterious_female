@@ -2528,11 +2528,14 @@ def scenario_region1__pass(b):
     ok &= check(b.eval(f"{q}.bowl.img.visible && {q}.bowl.img.x < {cat}.sprite.x - 40 && !{q}.fall.visible"), "the fruit bowl stands on the counter's forward end")
     ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl')).length") == 0, "none of its tangerines out yet")
     ok &= check(b.eval(f"{S}.alert.visible") is not True or "dash" not in alert(b), "no hint yet")
-    # Walking in: the scene starts 200 px out: she stops and cries, and after a little pause dashes (the user).
+    # Walking in: the scene starts 110 px out, he well in the picture: she stops and cries, and after a little pause
+    # dashes (the user).
     hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=8)
     t0 = b.eval(f"{S}.time.now")
     x0 = b.state()["x"]
-    ok &= check(190 <= cx - x0 <= 204, "the scene begins as she comes within 200 px of him", cx - x0)
+    ok &= check(100 <= cx - x0 <= 112, "the scene begins as she comes within 110 px of him", cx - x0)
+    view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
+    ok &= check(view[1] - (cx + 20) >= 60, "he is well inside the picture then, 60 px or more from its edge", view[1] - (cx + 20))
     ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(f"{S}.bubbleUntil > {S}.time.now"), "her cry at once")
     b.wait(0.3)
     ok &= check(abs(b.state()["x"] - x0) < 1, "a little pause: 0.3 s after the cry she has not moved", b.state()["x"] - x0)
@@ -2566,17 +2569,27 @@ def scenario_region1__pass(b):
     hl = b.eval(f"{S}.highlight.state().filter(e => e.key === 'thing:src_lunch').map(e => e.parts.length)")
     ok &= check(hl == [2], "at the lunch, its tray and its cloche pulse", b.eval(f"JSON.stringify({S}.highlight.state())"))
     ok &= check(take_lunch(b), "the lunch on the counter is hers now")
+    lunch = f"{S}.world.things.find(t => t.id === 'src_lunch')"
+    ok &= check(b.eval(f"{lunch}.items.every(i => !i.visible)"), "and is off the counter while she carries it")
+    b.eval(f"{S}.world.carryBox.give(); {S}.world.refresh()")
+    ok &= check(b.eval(f"{lunch}.items.every(i => i.visible)"), "a fresh one stands there if she is left without it")
+    b.eval(f"{S}.progress.setFlag('lunch')")
+    ok &= check(b.eval(f"{lunch}.items.every(i => !i.visible)"), "and none once the officer has had his")
 
-    # Arriving in a jump: the scene waits for her landing, and she is on the floor through it.
+    # Arriving in a jump across his line of sight: she comes straight down where she crossed it, and the scene begins
+    # as she lands; he is never jumped over.
     b.open("?reset&play&at=pass5")
-    hold_until(b, "right", lambda st: cx - st["x"] < 245, timeout=8)
+    hold_until(b, "right", lambda st: cx - st["x"] < 160, timeout=8)
     b.key("right", True)
     b.key("space", True)
     b.wait_for(f"{cat}.gone", timeout=4)
     b.key("space", False)
     b.key("right", False)
     st = b.state()
-    ok &= check(abs(st["y"] - cf) < 1 and 0 < cx - st["x"] <= 200, "in a jump, the scene begins as she lands, short of him", (cx - st["x"], st["y"] - cf))
+    ok &= check(cf - st["y"] > 4 and 100 <= cx - st["x"] <= 112, "in a jump, she is taken as she crosses his line of sight, in the air", (cx - st["x"], cf - st["y"]))
+    b.wait_for(f"{S}.bubbleUntil > {S}.time.now", timeout=3)
+    st2 = b.state()
+    ok &= check(abs(st2["y"] - cf) < 1 and abs(st2["x"] - st["x"]) < 2, "comes straight down, and cries as she lands, short of him", (st2["x"] - st["x"], st2["y"] - cf))
     b.wait_for(f"{S}.mode === 'play'", timeout=6)
     ok &= check(abs(b.state()["y"] - cf) < 1 and "bb1" in flags(b), "and ends with her on the floor", b.state()["y"] - cf)
 

@@ -105,6 +105,17 @@ After the user's play (2026-11-24):
     should pulsate"): its tray and its cloche. Its pulse had been the cabinet of plates it stood on (`PIECES` in
     `src/highlight.js`), which this remake took away: with the cabinet gone it had nothing to pulse, and no test
     looked. `region1.pass` checks it now.
+21. **She comes closer before it begins: 110 px from him, not 200** (the user: "Make her come closer before the dash.
+    Now, we can barely see Bumbot and what he is actually doing"). At 200 px he stood at the very edge of the
+    picture, cut by it, as the scene took over; at 110 the whole pass is in it (he 100 px inside its edge, the
+    counter, the bowl, the galley's door), and he has been seen eating for two thirds of a second of her walk up. She
+    stops 33 px short of the counter's end; her dash is 104 px. This replaces decision 8's 200 px. **A jump across
+    that line** ends there: she comes straight down where she crossed it and the scene begins as she lands (from 110
+    px a jump would have carried her over him).
+22. **The lunch is one tray: off the counter while she carries it** (the user: "when pick up tray, it should stop being
+    on the counter"), a fresh one there again if she spills it or is left without it, and none once the officer
+    has had his (`until` the flag `lunch`; `lift` on the source, `lifted` in the world as the deliveries' trays are).
+    It stood there for good before ("the pass always has more").
 
 ## 4. How it is built
 
@@ -137,7 +148,7 @@ After the user's play (2026-11-24):
   no pause between the cry and the dash; nothing of it from other decks.
 - **`python tools/playtest.py -j 6 boot region1 golden throw lang highlight sound region2 mishaps`:** pass, but
   `mishaps.things`' deck 9 sprinkler (it fails on `main` too) and, six at a time, `sound`'s footsteps once (it
-  passes run by itself). `region1.pass` is new: 29 checks of the scene step by step (the pause and the lunch's pulse among them, after the user's play; `boot`, `region1`, `golden`, `throw`, `highlight`, `lang` run again then, all pass). `highlight` failed first on the
+  passes run by itself). `region1.pass` is new: 29 checks of the scene step by step (the pause and the lunch's pulse among them, after the user's play; `boot`, `region1`, `golden`, `throw`, `highlight`, `lang` run again then, all pass; and once more after decisions 21 and 22, with `deliveries` and `region8`, whose trays share the code: 14 scenarios pass, 0 overlaps). `highlight` failed first on the
   galley's door (no tone to take): mended as above.
 - **`python tools/check_overlaps.py`:** 0 overlaps.
 - **Not judged by me:** how it feels in motion (her stop at the dash's end above all), and how it sounds (no new

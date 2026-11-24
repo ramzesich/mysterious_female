@@ -1306,8 +1306,10 @@ export class World {
                 }
                 // (A delivery's tray and its load are gone from the table while they are in her hands, back as a fresh one
                 // if she spills it or it goes cold: the user, 2026-11-23. Its table and its tag stay.)
+                // (`lift`: all of it is the one tray: the lunch on the Seven Seas' pass, the user, 2026-11-24.)
                 const lifted = e.until?.startsWith('flag:dlv_')
-                    ? items.filter(i => i.texture.key.startsWith('tray') || [LOADS[e.gives]?.thing, ...(LOADS[e.gives]?.stack ?? [])].includes(i.frame?.name)) : null;
+                    ? items.filter(i => i.texture.key.startsWith('tray') || [LOADS[e.gives]?.thing, ...(LOADS[e.gives]?.stack ?? [])].includes(i.frame?.name))
+                    : e.lift ? items.slice() : null;
                 this.things.push({ ...e, items, lifted, reach: 22, interact: () => {
                     // (`when`: there to see, but hers to take only then.)
                     if (this.carry || (e.when && !this.cond(e.when))) return false;

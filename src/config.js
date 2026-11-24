@@ -70,7 +70,9 @@ export const BUMBOT = {
 export const PASS = {
     counter: -77,           // the counter's forward end (its picture's left edge)
     plate: 22,              // the plate's middle: under his mouth as he eats
-    sight: 200,             // she sees him from here, on her feet: she stops and cries
+    sight: 110,             // she stops and cries this far from him: he is well in the picture by then, eating (the user: at 200
+                            // "we can barely see Bumbot and what he is actually doing")
+    airUp: 80,              // crossing that line in a jump, up to this high over his floor: she comes straight down there first
     pause: 400,             // then her dash, this long after the cry (the user: "a little pause in between")
     stop: -6,               // where her dash ends: where he was
     minMs: 420,             // from nearer than a dash this long, the dash that much later still

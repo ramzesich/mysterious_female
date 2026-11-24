@@ -44,14 +44,30 @@ export const pass = {
         q.cat.sprite.setVisible(false);
     },
 
-    // She comes within sight of him, on her feet on his floor: the scene. (In the air it waits for her landing: he
-    // could be jumped over before, and the scene then began behind him with her hung over the floor.)
+    // She comes within `sight` of him on his floor: the scene. In a jump across that line she comes straight down
+    // where she crossed it, and the scene begins as she lands: he cannot be jumped over (he could before, and the
+    // scene then began behind him with her hung over the floor).
     updatePass() {
         const q = this.pass, s = this.scene;
         if (!q || q.cat.gone || q.cat.hidden || s.mode !== 'play' || s.route !== 'inside') return;
         const p = s.player, dx = q.cat.sprite.x - p.x;
-        if (dx > PASS.sight || dx < -PASS.sight || Math.abs(p.y - q.F) > 1 || !(p.body.blocked.down || p.body.touching.down)) return;
-        this.passBeat();
+        if (Math.abs(dx) > PASS.sight || p.y > q.F + 1 || p.y < q.F - PASS.airUp) return;
+        if (p.body.blocked.down || p.body.touching.down) {
+            if (Math.abs(p.y - q.F) <= 1) this.passBeat();
+            return;
+        }
+        q.cat.gone = true;
+        s.mode = 'scripted';
+        p.body.setVelocityX(0);
+        p.body.setAccelerationX(0);
+        s.script = () => {
+            if (p.body.blocked.down || p.body.touching.down || p.y >= q.F) {
+                s.script = null;
+                this.passBeat();
+            } else {
+                s.pose(p.body.velocity.y < 0 ? 'rise' : 'fall');
+            }
+        };
     },
 
     passBeat() {

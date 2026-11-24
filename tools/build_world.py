@@ -222,7 +222,7 @@ def build_world():
         x, y, route = spot(where, at)
         # (`when`: it is there to see, but hers to take only then; `until`: gone after.)
         ents.append(dict(kind="source", id=sid, x=x, y=y, route=route, gives=gives, after=after or "", show=show,
-                         when=rest[0] if rest else "", until=rest[1] if len(rest) > 1 else ""))
+                         when=rest[0] if rest else "", until=rest[1] if len(rest) > 1 else "", **(rest[2] if len(rest) > 2 else {})))
     for did, (deck, m, load, flag, book, number, up, *opts) in DELIVERIES.items():
         # (At the cabin door's own middle: the corridor's doors stand every 192 px.)
         x, y, route = slot_x(deck, m), B.floor_y(deck), "inside"
