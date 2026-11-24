@@ -72,6 +72,11 @@ const ROOM_DIM = 0.88; // how dark the world round a room she is in goes
 // dim's together are the dimmed hull's, mixed with the inside, at every step (`(1 - t)` dimmed hull + `t` inside: the
 // hull's alpha `(1-t)(1-r) / ((1-t)(1-r) + t)`, its dim `1 - t`, here from the alpha).
 const lookDim = a => 1 - (1 - ROOM_DIM) * (1 - a) / (1 - ROOM_DIM + a * ROOM_DIM);
+// The room doors' plates washed toward the background (`washPlates`; the user, 2026-11-24, all ten, at 20%: their doors'
+// own 35% was "too strong"), and the wall they are washed toward (src/highlight.js's WALL, the doors' too).
+const WASHED_PLATES = ['LINEN', 'LAUNDRY', 'DRY STORE', 'STAGE MGR', 'PANTRY', 'GALLEY', 'COLD ROOM', 'STAGE DOOR', 'LIGHTING'];
+const PLATE_WASH = 0.2;
+const PLATE_WALL = [0xe9, 0xdf, 0xcc];
 const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
 const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
 const WALK_LIFT = 2;
@@ -256,6 +261,13 @@ export class ShipScene extends Phaser.Scene {
         this.deckFloors = JSON.parse(props.deckFloors);
         // What she can use pulses where E would act on it (src/highlight.js), washed as the props round it are.
         this.highlight = new Highlight(this, props.washLevels ? JSON.parse(props.washLevels) : null);
+        // (Once the doors' washes at rest are worked out, their plates take them: `washPlates`.)
+        const plates = () => {
+            if (!this.highlight.restDone) return;
+            this.events.off('postupdate', plates);
+            this.washPlates();
+        };
+        this.events.on('postupdate', plates);
         const cut = this.cutIds = new Set(String(props.exteriorCut).split(',').map(Number));
         this.shellTiles = {};
         this.shellAlpha = {};
@@ -1186,14 +1198,15 @@ export class ShipScene extends Phaser.Scene {
 
     // --- The linen room (§4, §5.3) --------------------------------------------------------------
     // Housekeeping's linen room on deck 9, off the cabin corridor (the user, 2026-11-06: she can go
-    // in): its crew door held open, a plate beside it. E at the door and she is inside: the room
+    // in): a regular crew door, shut (the user, 2026-11-24: it was held open, the room seen through it), pulsing when she is
+    // at it as every door she can use (src/highlight.js), a plate beside it. E at the door and she is inside: the room
     // shows where the corridor was, the deck still cut open, everything round it dimmed almost to
     // black. Racks of folded towels, a heap of them on the floor, a vent. (Bumbot slept there until
     // his spots were taken out, 2026-11-07, §4.)
 
     buildLinenRoom(o, prop) {
         const x0 = o.x - LINEN.doorX;
-        const door = this.add.image(o.x, o.y, 'linen-door-open').setOrigin(0.5, 1).setDepth(DEPTH.props);
+        const door = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props);
         const plate = sign(this, o.x + 20, o.y - 50, 'LINEN', 'steel').setOrigin(0, 0.5).setDepth(DEPTH.props);
         const room = this.add.image(x0, o.y - LINEN.height, 'linen-room').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(room);
@@ -1201,15 +1214,38 @@ export class ShipScene extends Phaser.Scene {
         // (`also`: the room stays in view from the shaft that opens off it, one picture with it: src/world/world.js.)
         const linen = { route: 'linen', also: 'duct', door: o.x, floor: o.y, room, dim, inDeck: true };
         this.rooms.push(linen);
-        // Its crew door shut until she has the Housekeeping card (§6.1.5).
-        const shut = this.add.image(o.x, o.y, 'shipart', 'door-crew').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.01).setVisible(false);
-        this.worldLayer.add(shut);
+        // Locked until she has the Housekeeping card (§6.1.5): the same shut door either way, so nothing is shown for it.
+        const shut = { setVisible: () => shut };
         this.progress.roomDoor(linen, prop(o, 'lock', ''), shut, o.x, o.y);
         // (Forward, the end of the shaft's mouth is her wall, at every height: standing she is too tall to go into it or
         // under it. With the room's own stop, 6 px further forward, she ran off the parked cart's end and dropped into
         // the gap under the mouth: the user, 2026-11-23. On hands and knees on the cart she goes in: `updateDuct`.)
         this.addRouteWall(x0 + LINEN.mouth + PLAYER.bodyWidth / 2, -1, o.y, 'linen');
         this.addRouteWall(x0 + LINEN.width - LINEN.stop, 1, o.y, 'linen');
+    }
+
+    // A room door's plate toned down toward the background (the user, 2026-11-24: "the plates same background'ish tone as
+    // the doors"): the doors she can use are washed at rest like the background doors beside them (src/highlight.js's
+    // `restDoors`), and their plates stood out at full contrast. Each plate named in `WASHED_PLATES` gets its own picture
+    // washed by `PLATE_WASH`, every pixel toward the corridor wall (the doors' own sum), as a texture of its own; nothing
+    // pulses with it. Once, after the doors' washes are worked out.
+    washPlates() {
+        const seen = new Set();
+        for (const o of [...this.worldLayer.list, ...this.children.list]) {
+            const m = /^sign:[a-z]+:(.*)$/.exec(String(o.texture?.key ?? ''));
+            if (!m || seen.has(o) || !WASHED_PLATES.includes(m[1])) continue;
+            seen.add(o);
+            const key = `${o.texture.key}:w${Math.round(PLATE_WASH * 100)}`;
+            if (!this.textures.exists(key)) {
+                const src = o.texture.getSourceImage(), tex = this.textures.createCanvas(key, src.width, src.height), ctx = tex.getContext();
+                ctx.drawImage(src, 0, 0);
+                ctx.globalCompositeOperation = 'source-atop';
+                ctx.fillStyle = `rgba(${PLATE_WALL.join(',')},${PLATE_WASH})`;
+                ctx.fillRect(0, 0, src.width, src.height);
+                tex.refresh();
+            }
+            o.setTexture(key);
+        }
     }
 
     // --- The Chapel (§5.3) ---------------------------------------------------------------------

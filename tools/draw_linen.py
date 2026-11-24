@@ -1,6 +1,6 @@
 """Draws the housekeeping linen room by hand (GAME_DESIGN.md §5.3, deck 9), a room she can go into
 (Bumbot slept in its towels until his spots were taken out, 2026-11-07; §4). Inside, it shows in the corridor's place, the deck around it dimmed
-(not cut into the ship's side as cabin 8206 is). A crew room behind a crew door held open: pale
+(not cut into the ship's side as cabin 8206 is). A crew room behind a crew door: pale
 painted steel, a fluorescent tube, grey vinyl. The laundry chute's hatch low in the wall by the door,
 the door back out, chrome wire racks stacked with folded towels, sheets and pillows (Bumbot asleep on the
 toiletries' shelf, the game's), and on the forward wall the mouth of a ventilation shaft behind its cover (the game's,
@@ -8,11 +8,12 @@ tools/build_shaft.py), where he gets away: she pushes the laundry cart up to it 
 (docs/population.md `scn_duct`; docs/shaft-remake-log.md). The laundry cart she pushes is the generated one in the
 things atlas (`laundry-cart`; the one drawn here until 2026-11-23 is retired, the user).
 
-Also the open door seen from the corridor: a white crew door's frame, its leaf swung in, the racks
-beyond it.
+**Redecorated 2026-11-24** (the user's choice, linen A): what this draws is the plan the generated look is laid over,
+`tools/redecorate_rooms.py`, which keeps its door and hatch. The door seen from the corridor is the ship's regular crew
+door, shut (the user, 2026-11-24; the open door with the room seen through it, drawn here until then, is retired).
 
-Writes assets/source/ship/linen/interior.png and door-open.png and the game's copies,
-assets/ship/linen-room.png and assets/ship/linen-door-open.png. Run from the repo root:
+Writes assets/source/ship/linen/interior-plain.png (as drawn), interior.png and the game's copy,
+assets/ship/linen-room.png (redecorated). Run from the repo root:
     python tools/draw_linen.py [--preview out.png]
 """
 
@@ -187,55 +188,18 @@ def interior():
     return im
 
 
-def open_door():
-    """The crew door, propped open, from the corridor: its frame from the atlas's crew door, the leaf
-    swung in against the left, the room beyond: the wall, a rack of towels, the vinyl floor."""
-    atlas = Image.open(GAME / "ship.png").convert("RGBA")
-    frames = __import__("json").loads((GAME / "ship.json").read_text(encoding="utf-8"))["frames"]
-    f = frames["door-crew"]["frame"]
-    door = atlas.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))
-    w, h = door.size
-    px = door.load()
-    # The leaf: the door's white inside its frame (the frame's own white is at its edges).
-    leaf = [(x, y) for y in range(h) for x in range(4, w - 4) if px[x, y][:3] == (0xff, 0xff, 0xff) and y > 4]
-    x0 = min(x for x, _ in leaf); x1 = max(x for x, _ in leaf)
-    y0 = min(y for _, y in leaf)
-    d = ImageDraw.Draw(door)
-    r = lambda a, b, c, e, col: d.rectangle([a, b, c, e], fill=col)
-    r(x0, y0, x1, h - 1, WALL)
-    r(x0, y0, x1, y0 + 2, CEILING)
-    r(x0 + 3, y0 + 1, x1, y0 + 2, TUBE)                           # the tube's light
-    r(x0 + 8, y0 + 10, x0 + 8, h - 4, CHROME_DARK)                # a rack's upright and shelves
-    for y in range(y0 + 18, h - 6, 14):
-        r(x0 + 8, y, x1, y, CHROME_DARK)
-        for x in range(x0 + 9, x1 - 2, 6):
-            r(x, y - 4, x + 4, y - 1, WHITE)
-            r(x, y - 1, x + 4, y - 1, PALE)
-    r(x0, h - 3, x1, h - 1, VINYL)
-    # The leaf, swung in: a narrow strip at the hinge, seen edge-on, greyer toward the room.
-    for y in range(y0, h):
-        r(x0, y, x0 + 4, y, GREY)
-        r(x0 + 1, y, x0 + 2, y, WHITE)
-    # The light falling out of the room onto the frame's inner edge.
-    r(x1, y0, x1, h - 1, TUBE)
-    # (The room reaches forward of its door since it was mirrored, 2026-11-23: the leaf against the right, the rack to
-    # the left; the frame is the same either way.)
-    opening = door.crop((x0, y0, x1 + 1, h)).transpose(Image.FLIP_LEFT_RIGHT)
-    door.paste(opening, (x0, y0))
-    return door
-
-
 if __name__ == "__main__":
     SOURCE.mkdir(parents=True, exist_ok=True)
-    room, door = interior(), open_door()
+    room = interior()
+    room.save(SOURCE / "interior-plain.png")
+    # (Redecorated, the user's choice of 2026-11-24: tools/redecorate_rooms.py lays the generated look over it.)
+    from redecorate_rooms import linen
+    room = linen(room)
     room.save(SOURCE / "interior.png")
-    door.save(SOURCE / "door-open.png")
     room.save(GAME / "linen-room.png")
-    door.save(GAME / "linen-door-open.png")
     if "--preview" in sys.argv:
         out = Path(sys.argv[sys.argv.index("--preview") + 1])
-        sheet = Image.new("RGBA", (W + 50, H), "#2e222f")
+        sheet = Image.new("RGBA", (W, H), "#2e222f")
         sheet.paste(room, (0, 0))
-        sheet.paste(door, (W + 8, H - door.height))
         sheet.resize((sheet.width * 3, sheet.height * 3), Image.NEAREST).save(out)
-    print("wrote", (GAME / "linen-room.png").relative_to(ROOT), (GAME / "linen-door-open.png").relative_to(ROOT))
+    print("wrote", (GAME / "linen-room.png").relative_to(ROOT))

@@ -99,6 +99,7 @@ new one added there should be added here too.
 |---|---|
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all> |
+| `laundry`: inside the laundry, deck 4 (by its washers, the chute's cart ahead) | <http://localhost:8000/?play&at=laundry> |
 | `linen`, Bumbot gone and the cart at the shaft's mouth: jump on the cart, ↓, ← | <http://localhost:8000/?play&at=linen&did=bb4,cart_linen> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all> |
 | `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
