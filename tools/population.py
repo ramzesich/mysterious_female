@@ -73,6 +73,10 @@ ROOMS = [
     dict(id="guest10", deck=10, m=235, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
          doors=[dict(x=262, to="outside", deck=10, door="balcony", lock=("flag", "guest"))]),
     # (Between the café's two last windows, its plate over the door: at 185 m it stood in a window, the user, 2026-11-24.)
+    # The restrooms by the Chapel (the user, 2026-11-24: "make it entreable to a small restroom cabin, not too wide"):
+    # 124 px between the checkpoint's crew door and the glass doors, its door where it stood, 70 px in; a mirror at its
+    # forward wall where she fixes her hair (`mirror`, as in her crew cabin).
+    dict(id="restroom", deck=12, m=72.6, width=124, door_x=70, look="restroom", door="restroom", mirror=28),
     dict(id="coldroom", deck=11, m=183.542, width=240, look="coldroom", door="crew", plate="COLD ROOM", plate_up=True,
          lock=("card", "hk", 0)),
 ]
@@ -182,7 +186,9 @@ TANGERINES = {
     # (On the bar: 54 m is the grand piano.)
     "tan_12_spinnaker": (12, 55.45, 2, 32, None),
     "tan_12_lady": (12, 127.25, 2, 0, "lady"),
-    "tan_12_cagneys": (12, 172.9, 1, 34, None),
+    # (Cagney's, balanced on its steel trolley's dome (plan-the-rest §7d, 7), moved to the restrooms' counter by the
+    # Chapel, right of the tap: the user, 2026-11-24, "Place a tangerine here. Move some other tangerine here".)
+    "tan_12_restroom": ("restroom", 44, 1, 33, None),
     "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
     "tan_funnel": ("funnel", 189.2, 1, 13, None),
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
@@ -710,6 +716,12 @@ QUIRKS = {
     # An open cabin, the sea in its window: E, she steps in and bounces on its bed
     # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
     "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
+    # The restrooms' hand dryer (deck 12, the user, 2026-11-24): E switches it on, its roar and a puff of warm air under
+    # its nozzle for its `ms`; she is not held. (Its reach kept clear of the mirror's, 14 to 42, and the door's, 54 to 86.)
+    "sec_dryer": ("restroom", 49, "E", None, 2400, dict(reach=5, gag="dryer", nozzle=48)),
+    # Its stall, shut, someone in it (their shoes under its door, their humming): E, she knocks; "Occupied!" from over its
+    # top (`top` px up); her embarrassed gag (23) and her checkpoint (the user, 2026-11-25).
+    "sec_stall": ("restroom", 104, "E", None, 0, dict(reach=12, gag="stall", top=74)),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there, when hers to take, until, options).
 # `lift`: it is one tray, gone from its place while she carries it (back as a fresh one if she spills it).

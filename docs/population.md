@@ -123,7 +123,7 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | 11 | 232.8 | `tan_11_crates` | Behind stacked crates between the Garden Café's two palms, aft of her husband's table, breakable (at 209, then 217.9 by the build, they stood on the cone's way to him: moved 2026-11-23, the user) | 2 |
 | 12 | 54 | `tan_12_spinnaker` | The Spinnaker's bar | 2 |
 | 12 | 128 | `tan_12_lady` | The old lady's thanks for her cocktail | 2 |
-| 12 | 166 | `tan_12_cagneys` | Cagney's bread basket | 1 |
+| 12 | 72.6 | `tan_12_restroom` | The restrooms' counter by the Chapel, right of the tap (was `tan_12_cagneys`, balanced on Cagney's trolley; moved 2026-11-24, the user) | 1 |
 | 12 | 211 | `tan_12_pinata` | Los Lobos' piñata, broken by the lunge | 2 |
 | The funnel | 186 | `tan_funnel` | The engineer's lunch box | 1 |
 | | | | **Total** | **41** |

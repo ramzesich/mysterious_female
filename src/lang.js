@@ -56,7 +56,7 @@ const TEXTS = {
         'fright.bumpy': 'Ow-ow-ow!',   // bumped down the funnel's stairway on her bottom (21)
         'fright.whoa': 'Whoa-whoa-whoa!',   // her parasol blown inside out, she drops (22)
         // What she and the others say in a word.
-        'say.thanks': 'Thank you!', 'say.oops': 'Oops!', 'say.ohno': 'Oh no, no, no!', 'say.whoa': 'Whoa!', 'say.hey': 'Hey!', 'say.meow': 'Meow!',
+        'say.thanks': 'Thank you!', 'say.occupied': 'Occupied!', 'say.oops': 'Oops!', 'say.ohno': 'Oh no, no, no!', 'say.whoa': 'Whoa!', 'say.hey': 'Hey!', 'say.meow': 'Meow!',
         'say.knock': 'knock',
     },
     ua: {
@@ -86,7 +86,7 @@ const TEXTS = {
         'fright.ride': 'Уіііііііі!',
         'fright.bumpy': 'Ай-ай-ай!',
         'fright.whoa': 'Ой-ой-ой!',
-        'say.thanks': 'Дякую!', 'say.oops': 'Ой!', 'say.ohno': 'Ой-ой-ой!', 'say.whoa': 'Ой-йой!', 'say.hey': 'Гей!', 'say.meow': 'Мяу!',
+        'say.thanks': 'Дякую!', 'say.occupied': 'Зайнято!', 'say.oops': 'Ой!', 'say.ohno': 'Ой-ой-ой!', 'say.whoa': 'Ой-йой!', 'say.hey': 'Гей!', 'say.meow': 'Мяу!',
         'say.knock': 'тук',
     },
 };

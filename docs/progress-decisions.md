@@ -4940,3 +4940,33 @@ sconces).
 - **The lighting booth:** its door as drawn, its chair the redraw's; cut inside the steel post between the booth and
   the catwalk.
 - 243 generations (189 + 54). `boot`, `region3`, `region9`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The restrooms by the Chapel (deck 12): its own door, a room to enter (2026-11-24 and 25)
+
+The user: "Let's generate a proper door for the restrooms" (it was a cabin door, card lock and number plate); then
+"make it entreable to a small restroom cabin, not too wide as not to overlap the glass doors on the right and the
+checkpoint door on the left"; "Do as you suggest"; then rounds of play.
+
+- **Its door** (`door-restroom`): try 2 of three, redrawn from the cabin door's own picture (its size and frame), pale oak,
+  a long pull handle, a kick plate; its square sign's man and woman drawn by hand (generated, a smudge); in its own colours.
+- **The room** (`restroom` in `ROOMS`): 124 px between the checkpoint's crew door and the glass doors, its door where it
+  stood (70 px in); drawn flat by `tools/draw_rooms.py`'s `restroom`, redrawn in place (C of three: modern, pale grey
+  stone, brushed steel) through `CABINS`, its door pasted back. Then, by rule (`moves`, `patches`, `lines` in
+  `redecorate_rooms.py`): **its mirror 18 px lower**, at her face ("Lower the mirror"), the wall it left filled from the
+  wall beside it; **the dryer's right outline** drawn one column in (the door's frame covered it); **someone in the stall**:
+  a gap under its door and their dark shoes (inpainted, 3 of three: "they worked better"), the ankles covered by the
+  door's rail.
+- **E at the mirror:** her hair, as in her crew cabin (`mirror`). **E at the dryer** (`sec_dryer`): its roar 2.4 s
+  (`sfx.dryer`) and its warm air as the sauna's steam, small circles falling and spreading, behind her, white and a steel
+  grey (white alone was lost on the pale wall). **The stall:** a muffled hum now and then (`sfx.stallHum`, a room's place in
+  `src/world/soundscape.js`) and a note rising over its top for each note sung (the user, sound off: "I just imagined
+  there would be notes coming up from the stall"); **E at it** (`sec_stall`): she knocks, "Occupied!" from over its top
+  (`say.occupied`), then the "Do Not Disturb" gag (23), which here tiptoes her to the mirror and stops there
+  (`sorryStop`: "let her always go to the mirror, stop there, and then respawn"), then her checkpoint.
+- **A tangerine on its counter**, right of the tap (the user circled it): `tan_12_restroom`, moved from Cagney's
+  (`tan_12_cagneys`, balanced on its steel trolley's dome, plan-the-rest §7d's seventh). The total stays 56; deck 12's
+  longest stretch without a reward is now 48.4 m (129 to 178).
+- The mirror and the dryer pulse (`IN_ROOM` in `src/highlight.js`, the user's leave).
+- 51 generations (doors 15, room 18, feet 18). `boot`, `region2`, `region4`, `region7`, `region8`, `region9`,
+  `highlight`, `deck3`, `keeps`, `lang`, `sound` pass; `check_overlaps` 0. `mishaps.things` fails at deck 9's sprinkler
+  (the swinging door's gag first), on fcca25e too: not this work, not looked into.

@@ -5180,7 +5180,10 @@ export class ShipScene extends Phaser.Scene {
         s.once('animationcomplete-gags-dnd-cover', () => {
             if (this.gagEnd === null) return;
             s.setFlipX(away < 0).play('gags-dnd-tiptoe');
-            const wall = this.partitionShort(s.x, this.stopShort(s.x, s.x + away * 4800, y, 12), y, 12);
+            // (`sorryStop`: where a scene wants her to stop instead, the restrooms' mirror after the stall's knock; the
+            // user, 2026-11-25: "let her always go to the mirror, stop there, and then respawn".)
+            const wall = this.sorryStop ?? this.partitionShort(s.x, this.stopShort(s.x, s.x + away * 4800, y, 12), y, 12);
+            this.sorryStop = null;
             this.script = (dt) => {
                 s.x += away * g.speed * dt;
                 const view = this.cameras.main.worldView;

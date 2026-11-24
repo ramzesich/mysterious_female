@@ -10,11 +10,20 @@ import { OUTSIDE } from './world.js';
 const M = 48;
 // Places with a sound of their own, heard only near them: where (px), within what reach, what, and
 // how often (seconds, from..to).
+// The stall's four phrases, as src/sfx.js's `stallHum` sings them (its notes' count draws as many notes over the stall).
+const STALL_TUNES = [[67, 69, 71, 67], [72, 71, 69, 67, 69], [64, 67, 69, 67], [71, 72, 74, 72, 71]];
+
 const PLACES = [
     // The casino on deck 7: chips somewhere, a machine paying out.
     { deck: 7, x: 480 + 161 * M, reach: 13 * M, every: [1.8, 5], play: (x, y) => (Math.random() < 0.6 ? sfx.at(x, y).chips() : sfx.at(x, y).slot()), spread: 9 * M },
     // The bridge on deck 10: the radar's sweep.
     { deck: 10, x: 2040, reach: 8 * M, every: [3.6, 3.6], play: (x, y) => sfx.at(x, y).ping() },
+    // The restrooms by the Chapel (deck 12): someone in the shut stall humming a phrase now and then, heard only inside
+    // (`room`: its route; `at`: px from its left edge, the stall's middle); a note rises over the stall's top for each
+    // note sung (`notes`: px up, how many, s apart; the party's notes' look), so it shows with the sound off too (the
+    // user, 2026-11-25: "I just imagined there would be notes coming up from the stall").
+    { room: 'restroom', at: 104, every: [3, 6.5], notes: { up: 76, gap: 0.32 },
+      play: (x, y) => { const n = Math.floor(Math.random() * 4); sfx.at(x, y).stallHum(n); return STALL_TUNES[n % 4].length; } },
 ];
 
 export class Soundscape {
@@ -143,17 +152,38 @@ export class Soundscape {
         }
     }
 
+    // Notes rising over a place that sings (the restrooms' stall): one a sung note, at its time, the party's look.
+    notes(place, count) {
+        const s = this.scene, room = s.world.rooms[place.room], top = room.def.floor - place.notes.up;
+        for (let i = 0; i < count; i++) {
+            s.time.delayedCall(i * place.notes.gap * 1000, () => {
+                if (s.route !== place.room) return;
+                const note = s.add.text(place.x + Phaser.Math.Between(-10, 10), top, ['♪', '♫', '♪'][i % 3], {
+                    fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: ['#e83b3b', '#4d9be6', '#905ea9'][i % 3], resolution: 4,
+                }).setOrigin(0.5).setDepth(s.DEPTH.fx);
+                s.world.add([note]);
+                s.tweens.add({ targets: note, y: top - 30, x: note.x + Phaser.Math.Between(-10, 10), alpha: 0, duration: 1400,
+                    ease: 'Sine.easeOut', onComplete: () => note.destroy() });
+            });
+        }
+    }
+
     places(dt) {
         const s = this.scene, p = s.player;
-        if (s.route !== 'inside') return;
-        const deck = s.deckOfY(p.y);
+        const deck = s.route === 'inside' ? s.deckOfY(p.y) : null;
         PLACES.forEach((place, i) => {
-            if (place.deck !== deck || Math.abs(p.x - place.x) > place.reach + SOUND.far) return;
+            // (A room's: while she is in it, wherever she stands.)
+            if (place.room) {
+                const room = s.world?.rooms?.[place.room];
+                if (s.route !== place.room || !room?.def) return;
+                place.x = room.def.x0 + place.at;
+            } else if (s.route !== 'inside' || place.deck !== deck || Math.abs(p.x - place.x) > place.reach + SOUND.far) return;
             this.placeAt[i] -= dt;
             if (this.placeAt[i] > 0) return;
             const [a, b] = place.every;
             this.placeAt[i] = a + Math.random() * (b - a);
-            place.play(place.x + (Math.random() - 0.5) * 2 * (place.spread ?? 0), p.y - 30);
+            const sung = place.play(place.x + (Math.random() - 0.5) * 2 * (place.spread ?? 0), p.y - 30);
+            if (place.notes && sung) this.notes(place, sung);
         });
     }
 }

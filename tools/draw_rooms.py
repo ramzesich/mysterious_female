@@ -1345,6 +1345,73 @@ def adjoin(width):
 
 
 # --- Region 6's room (deck 11) ---------------------------------------------------------------------
+def restroom(width):
+    """The restrooms by the Chapel, deck 12 (the user, 2026-11-24: "entreable to a small restroom cabin, not too wide",
+    between the checkpoint's crew door and the glass doors; 124 px, its door 70 in): tiles to waist height, at the forward
+    wall a tall mirror where she fixes her hair (`mirror`, as in her crew cabin), a washbasin in a stone counter with a
+    small plant and a print over it, a hand dryer on the wall that E switches on (`sec_dryer`), a bin; aft of the door a
+    stall, shut, its lock red (someone hums in it: the soundscape's `PLACES`)."""
+    TILE, GROUT, PAINT = "#f4f4ee", "#c7cfcc", "#dfe6e2"
+    R = Room(width, PAINT, "#cdd6d2", ceiling=WHITE, skirting=GREY, floor="#9babb2", fleck=SLATE, pitch=240)
+    r, box, d = R.r, R.box, R.d
+    R.tube(30, 28)
+    R.tube(92, 22)
+    # Tiles to waist height, a band of blue ones along their top.
+    r(0, FLOOR - 46, width - 1, FLOOR - 5, TILE)
+    for y in range(FLOOR - 46, FLOOR - 4, 7):
+        r(0, y, width - 1, y, GROUT)
+    for x in range(3, width, 7):
+        r(x, FLOOR - 46, x, FLOOR - 5, GROUT)
+    r(0, FLOOR - 48, width - 1, FLOOR - 46, BLUE)
+    # The end walls.
+    for x0, x1 in ((0, 2), (width - 3, width - 1)):
+        r(x0, 9, x1, FLOOR - 1, "#b8c3bf")
+    # The mirror at the forward wall, turned to the room (her crew cabin's, hung on the wall): chrome frame, glass.
+    top, foot = 54, FLOOR - 22                # (18 px lower than at first, at her face: the user, 2026-11-25)
+    d.polygon([(6, top), (20, top + 2), (20, foot - 2), (6, foot)], fill=GREY, outline=SLATE)
+    d.polygon([(8, top + 3), (18, top + 4), (18, foot - 4), (8, foot - 3)], fill="#bfe3f2")
+    d.line([(10, top + 26), (15, top + 10)], fill=WHITE)
+    d.line([(10, top + 38), (14, top + 28)], fill=WHITE)
+    R.full.append((5, top - 1, 21, foot + 1))
+    # (The look laid over this keeps its own mirror, moved down by tools/redecorate_rooms.py to the same place.)
+    # The washbasin in its stone counter, a cabinet under it; the tap, the soap; a small plant; a print over it.
+    box(24, FLOOR - 32, 47, FLOOR - 28, "#e6e1d6", SLATE)
+    d.ellipse([29, FLOOR - 33, 41, FLOOR - 29], fill=WHITE, outline=GREY)
+    r(34, FLOOR - 38, 35, FLOOR - 33, GREY)
+    r(34, FLOOR - 38, 38, FLOOR - 37, GREY)
+    box(25, FLOOR - 27, 46, FLOOR - 2, "#d9cfc0", SLATE)
+    r(35, FLOOR - 26, 35, FLOOR - 3, SLATE)
+    r(32, FLOOR - 16, 33, FLOOR - 13, GREY)
+    r(37, FLOOR - 16, 38, FLOOR - 13, GREY)
+    box(42, FLOOR - 44, 45, FLOOR - 38, WHITE, GREY)
+    box(25, FLOOR - 37, 28, FLOOR - 33, "#cd683d", WOOD_DARK)
+    for x, y in ((24, FLOOR - 40), (26, FLOOR - 42), (28, FLOOR - 40), (27, FLOOR - 39), (25, FLOOR - 38)):
+        r(x, y, x + 1, y + 1, GREEN)
+    box(28, 48, 40, 62, WHITE, SLATE)
+    r(30, 50, 38, 60, "#8fd3ff")
+    r(30, 56, 38, 60, "#4d9be6")
+    r(33, 52, 35, 53, WHITE)
+    # The hand dryer on the wall, its nozzle down; a bin under it.
+    box(44, FLOOR - 64, 54, FLOOR - 52, WHITE, SLATE)
+    r(46, FLOOR - 61, 52, FLOOR - 60, PALE)
+    box(47, FLOOR - 52, 51, FLOOR - 49, GREY, SLATE)
+    R.full.append((43, FLOOR - 65, 55, FLOOR - 48))
+    box(48, FLOOR - 11, 54, FLOOR - 1, GREY, SLATE)
+    r(48, FLOOR - 11, 54, FLOOR - 10, SLATE)
+    # Its door (the corridor's own, from inside).
+    R.door(70, frame="door-restroom")
+    # The stall aft of the door: a laminate partition on steel feet, its door shut, its lock showing red.
+    box(87, FLOOR - 72, 120, FLOOR - 6, "#c9b8a6", SLATE)
+    r(87, FLOOR - 73, 120, FLOOR - 72, GREY)
+    box(91, FLOOR - 69, 116, FLOOR - 7, "#d8c7b4", SLATE)
+    for x in (88, 118):
+        r(x, FLOOR - 6, x + 1, FLOOR - 1, GREY)
+    box(110, FLOOR - 40, 113, FLOOR - 37, RED, INK)
+    r(93, FLOOR - 44, 94, FLOOR - 40, GREY)
+    # Redecorated (the user's choice of 2026-11-24, C: modern, pale grey stone, brushed steel): tools/redecorate_rooms.py.
+    return redecorated("restroom", R)
+
+
 def coldroom(width):
     """The Garden Cafe's cold room (`room_coldroom`): insulated panels with frost along their seams,
     the cooler's unit on the ceiling with icicles under it, shelves of tubs and boxes, and on the low
@@ -1457,7 +1524,7 @@ def fort():
 
 DRAW = {"crewcabin": crewcabin, "laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
-        "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
+        "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom, "restroom": restroom,
         "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,
         "guest10": guest10, "nook": nook}
 

@@ -39,7 +39,7 @@ const LOOKS = {
     coldroom: [0xcfeaf5, 0x8fd3ff, 0x9babb2],
 };
 const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the user, 2026-11-14; it was the gangway's)
-const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight' };
+const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight', restroom: 'door-restroom' };
 // The lifeboat's roof hatch (tools/build_hatch.py): its two pieces' top lefts from the walkway's floor under the hatch's
 // middle (the boat's column 112, where E takes her in; the back at its column 91 and row 26, the lip at 90 and 37, the
 // floor at its row 120).
@@ -2295,6 +2295,8 @@ export class World {
     quirk(thing) {
         const s = this.scene, p = s.player;
         if (thing.gag === 'bed') return this.peekBed(thing);
+        if (thing.gag === 'dryer') return this.dryer(thing);
+        if (thing.gag === 'stall') return this.stallKnock(thing);
         if (this.carry || !s.anims.exists(`her-${thing.clip}`)) return false;
         this.cut(async () => {
             p.setFlipX(thing.face ? thing.face < 0 : thing.x < p.x);
@@ -2326,6 +2328,80 @@ export class World {
     // bed, seen through the door: cut to its opening (her head under the lintel at each bounce), washed
     // 30% toward the wall as the room is ("she's in the background"); out again, she straightens her
     // badge. Any key ends the bouncing.
+    // The restrooms' hand dryer (`sec_dryer`): its roar and warm air out of its nozzle (`nozzle` px up) for its `ms`; once
+    // at a time, and she is free the whole while.
+    dryer(thing) {
+        const s = this.scene, now = s.time.now;
+        if (now < (thing.runsUntil ?? 0)) return true;
+        thing.runsUntil = now + thing.ms;          // (not `until`: that is a thing's condition to go)
+        sfx.at(thing.x, thing.y).dryer(thing.ms / 1000);
+        // (Its warm air as the sauna's steam is drawn (src/world/bow.js's `Steam`), smaller: soft round puffs out of the
+        // nozzle, each drifting out to its own side as it falls and thinning; behind her, as the dryer is. The user,
+        // 2026-11-25: "using the steam from the sauna, just smaller circles, a bit dispersing".)
+        const top = thing.y - thing.nozzle, t0 = now, g = s.add.graphics().setDepth(s.DEPTH.player - 0.1);
+        this.add([g]);
+        const draw = (time) => {
+            const k = (time - t0) / thing.ms;
+            g.clear();
+            if (k >= 1 || s.route !== thing.route) {
+                s.events.off('update', draw);
+                g.destroy();
+                return;
+            }
+            const env = k < 0.12 ? k / 0.12 : k > 0.8 ? (1 - k) / 0.2 : 1;
+            for (let i = 0; i < 18; i++) {
+                const f = (i * 0.618 + (time - t0) / 650) % 1;          // how far down this puff is, 0 at the nozzle
+                const side = ((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1 * 2 - 1;
+                const x = thing.x + side * Math.sqrt(f) * 22 + Math.sin(time / 180 + i * 1.3) * (1 + f * 2);
+                const y = top + 2 + f * 30;
+                const r = 1 + f * 2.5 + ((i * 7) % 2) * 0.5;
+                // (White and a steel grey: on the pale wall and tiles the sauna's white and pale green did not show.)
+                g.fillStyle(i % 2 ? 0xffffff : 0x9babb2, (0.95 - f * 0.7) * env).fillCircle(x, y, r);
+            }
+        };
+        s.events.on('update', draw);
+        return true;
+    }
+
+    // The restrooms' stall (`sec_stall`): she knocks at its shut door; from inside, an irritated "Occupied!" over its
+    // top; then her embarrassed gag, the "Do Not Disturb" door's (23: her hands over her eyes, she tiptoes off), and her
+    // checkpoint (the user, 2026-11-25).
+    stallKnock(thing) {
+        const s = this.scene, her = s.player;
+        if (this.carry || s.holding || this.knockingStall) return false;
+        this.knockingStall = true;
+        this.cut(async () => {
+            her.setFlipX(thing.x < her.x);
+            if (s.anims.exists('her-knock')) her.anims.play('her-knock');
+            else s.pose('back');
+            for (let i = 0; i < 2; i++) {
+                await this.wait(i ? 230 : 300);
+                sfx.knock();
+                const knock = s.add.text(thing.x - 4 + i * 6, thing.y - 50 - i * 4, t('say.knock'), { fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 2, resolution: 4 })
+                    .setOrigin(0.5).setDepth(s.DEPTH.fx);
+                this.add([knock]);
+                s.tweens.add({ targets: knock, y: knock.y - 10, alpha: 0, duration: 700, onComplete: () => knock.destroy() });
+            }
+            await this.wait(450);
+            // (From inside: over the stall's top, the voice's popup with no head under it but the stall.)
+            const top = thing.y - thing.top;
+            this.stallPop ??= s.popups.make('speech', () => ({ x: thing.x, y: top + 8, top }), 1);
+            this.stallPop.setText(t('say.occupied')).setVisible(true);
+            sfx.at(thing.x, thing.y).grumble();
+            await this.wait(700);
+            s.pose('stand');
+            s.time.delayedCall(1100, () => this.stallPop.setVisible(false));
+            this.knockingStall = false;
+            // (After the cut has given her back: the gag is a fright, which plays only in play.)
+            // (She tiptoes to the mirror and stops there, never off the screen: `sorryStop`.)
+            s.time.delayedCall(0, () => {
+                s.sorryStop = this.rooms[thing.route]?.mirror ?? null;
+                s.scareContact(thing.x, 'dnd', { force: true });
+            });
+        });
+        return true;
+    }
+
     peekBed(thing) {
         const s = this.scene, p = s.player, door = this.things.find(t => t.id === thing.door);
         if (!door || this.carry || s.holding || s.towel) return false;

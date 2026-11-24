@@ -152,3 +152,19 @@ the nook B, the lighting booth A; the lifeboat left as it is;** the chapel: "Rem
 | `chapel-p1/p2-A.png`, `-C.png` | without its chairs: its own colours; warmer, ivory damask | `88a15269…`, `fcb42e28…`, `c85954dc…`, `814c1521…` | 36 |
 
 **These: 243 generations.**
+
+# The restrooms by the Chapel (deck 12), 2026-11-24 and 25
+
+The user: "make it entreable to a small restroom cabin". Drawn flat (`tries/restroom-drawn.png`), three looks with the
+same wording as the other rooms ("Keep every shape ..., change only the finish"; seeds 5, 13, 27), **C chosen**. Then
+someone in the stall: `inpaint_image_pro_flash` of the room's foot of the stall door (x 90..117, y 112..127), three
+seeds, **3 chosen** ("they worked better"), its ankles covered by the rail by rule.
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `restroom-C.png` | modern: pale grey stone, white counter, brushed steel, a sea blue band (seed 27) | `6cf9dffb-e593-418d-acb9-ae0a1013a0a9` | 6 |
+| `restroom-feet.png` | the gap under the stall's door, dark shoes (seed 27) | `f9cf8c32-b7c9-490a-b45f-7c436ed2a335` | 6 |
+| `tries/restroom-A.png`, `-B.png` | its own colours; elegant beige stone and brass | `d3c0b415…`, `116fa36c…` | 12 |
+| `tries/restroom-feet-1.png`, `-2.png` | blue trainers with ankles; nothing drawn | `dd4e9fe1…`, `1ae4a38d…` | 12 |
+
+**The room: 36 generations** (its door, 15: `assets/source/ship/door-restroom/README.md`).

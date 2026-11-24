@@ -65,6 +65,10 @@ const IN_ROOM = {
         keep: [[92, 88, 128, 92], [94, 93, 126, 123]], cut: [[105, 104, 119, 123]] },
     sec_bed: { key: 'cabin-8206', box: [137, 57, 101, 71], full: false },     // her bed (ShipScene's CABIN.bed)
     chute: { key: 'linen-room', box: [112, 82, 35, 37], full: true },           // tools/draw_linen.py: the chute's hatch (kept)
+    // The restrooms by the Chapel (tools/draw_rooms.py's `restroom`, the user, 2026-11-24): its mirror, as her crew
+    // cabin's, and its hand dryer (`sec_dryer`).
+    'mirror:restroom': { key: 'room-restroom', box: [4, 52, 19, 57], full: true, depth: 0.4 },   // (18 px lower, 2026-11-25)
+    sec_dryer: { key: 'room-restroom', box: [43, 62, 13, 19], full: true },
 };
 
 // A copy cut as its picture is (a door's leaf drawn in front of her as she steps out of it is the door's picture
@@ -124,7 +128,10 @@ export class Highlight {
             }
         }
         const mirror = w.rooms[s.route]?.mirror;
-        if (mirror !== undefined && !s.holding && !w.carry && Math.abs(p.x - mirror) <= 14) return { key: 'mirror', room: 'mirror' };
+        if (mirror !== undefined && !s.holding && !w.carry && Math.abs(p.x - mirror) <= 14) {
+            const room = IN_ROOM[`mirror:${s.route}`] ? `mirror:${s.route}` : 'mirror';
+            return { key: room, room };
+        }
         const door = s.routeDoorAt(p.x, p.y);
         if (door) {
             const x = door.d ? (door.leaving ? door.d.x : door.d.outX) : (door.room ? door.room.door : door.x);

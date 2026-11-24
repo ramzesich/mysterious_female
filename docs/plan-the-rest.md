@@ -766,7 +766,7 @@ game; over 60 the count means nothing. No tangerine is added or dropped; one pai
 | 4 | `tan_11_fruit` (two) | On a bare side table inside the buffet queue's line (`haz_queue`, 162.5 to 181.5 m; the pair at 176.8): the queue covers it, and standing there she is pushed onto it | A fruit stand (prop B on a counter piece) just aft of the queue's end, about 183 m, set against what is built there |
 | 5 | `tan_5_dessert` | Balanced on the tips of the dessert cart's two glass domes | A plate on the cart with room for it (prop C) |
 | 6 | `tan_9_cart` | Balanced on the dome's knob of the room-service trolley | A side plate by the dome (prop C) |
-| 7 | `tan_12_cagneys` | The same, on Cagney's steel trolley | The same (prop C) |
+| 7 | ~~`tan_12_cagneys`~~ | The same, on Cagney's steel trolley | **Moved (2026-11-24, the user):** to the restrooms' counter by the Chapel, `tan_12_restroom`; Cagney's trolley needs no plate |
 | 8 | `tan_10_mid` | `prop_tray_10` (`@tray`) is drawn through the bare table's legs | One piece: the tray on its stand (prop A) |
 | 9 | `tan_4_30` | The bare table stands against a fire extinguisher | Prop A, clear of it |
 | 10 | `tan_8_aft` | The same | Prop A, clear of it |

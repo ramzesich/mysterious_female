@@ -247,6 +247,21 @@ CABINS = {
     # tools/draw_chapel.py: its amber glass doors by their box, the altar's flowers and candle and the flowers' stands as
     # drawn; its two parts faded one into the other over the plain wall between the doors and the stands (cut hard, the
     # parts' light differed).
+    # The restrooms by the Chapel (C, modern: the user, 2026-11-24), drawn for it by tools/draw_rooms.py's `restroom`:
+    # its door as drawn (the corridor's).
+    # Its mirror 18 px lower than drawn, at her face (the user, 2026-11-25: "Lower the mirror"): the redraw's own mirror
+    # cut by its outline and moved, the wall it leaves taken from the plain wall over the dryer (x 44 on, the same rows).
+    "restroom": dict(parts=[("restroom-C", 0)], cuts=[], door=None, doorbox=None, pieces=[("door-restroom", 70, 0)],
+                     moves=[dict(outline=[(5, 35), (21, 37), (21, 88), (5, 90)], dy=18, wall_x=44)],
+                     # (Someone in the stall: a gap under its door and their trainers in it, inpainted into the room
+                     # (3 of three, dark shoes: "they worked better"; 1, blue trainers, in tries/; the user, 2026-11-25: "Both feet and notes"; the notes are the soundscape's.)
+                     patches=[("restroom-feet", (90, 112, 117, 127))],
+                     # (The dryer's right outline was at x 54, under the door's frame pasted back: drawn one column in, in
+                     # its own outline colour; the user, 2026-11-25.)
+                     lines=[((53, 64, 53, 76), (0x62, 0x67, 0x74)),
+                            # (The occupant's ankles over the shoes covered by the door's bottom rail, its two rows' own
+                            # colours: only the shoes show under it; the user, 2026-11-25.)
+                            ((96, 121, 112, 121), (0xa0, 0xa9, 0xb4)), ((96, 122, 112, 122), (0x88, 0x90, 0x9b))]),
     "chapel": dict(parts=[("chapel-p1-B", 0), ("chapel-p2-B", 56)], cuts=[116], blend=80, door=None,
                    pieces=[("flower-pedestal", 170, 0), ("flower-pedestal", 238, 0), ("bouquet", 196, 30),
                            ("pillar-candle", 216, 30)]),
@@ -278,6 +293,25 @@ def rim_fill(a, m, n=2):
                 break
 
 
+def move_piece(im, outline, dy, wall_x):
+    """A piece of a redraw moved down `dy` px (cut by its `outline`, a polygon in the picture): the rows it leaves are
+    filled from the wall at `wall_x` on, in the same rows."""
+    from PIL import ImageDraw
+    a = np.array(im.convert("RGBA"))
+    mask = Image.new("L", im.size, 0)
+    ImageDraw.Draw(mask).polygon(outline, fill=255, outline=255)
+    m = np.array(mask) > 0
+    piece = a.copy()
+    ys, xs = np.nonzero(m)
+    x0, x1, y0, y1 = xs.min(), xs.max() + 1, ys.min(), ys.max() + 1
+    w = x1 - x0
+    a[y0:y1, x0:x1][m[y0:y1, x0:x1]] = a[y0:y1, wall_x:wall_x + w][m[y0:y1, x0:x1]]
+    moved = np.zeros_like(m)
+    moved[y0 + dy:y1 + dy, x0:x1] = m[y0:y1, x0:x1]
+    a[moved] = piece[np.roll(moved, -dy, 0)]
+    return Image.fromarray(a)
+
+
 def cabin(name, base):
     """A guest cabin: its parts joined, its doors, floor and generated pieces the builder's, its balcony's glass clear."""
     spec = CABINS[name]
@@ -289,6 +323,14 @@ def cabin(name, base):
     assert im.size == base.size, (name, im.size, base.size)
     door = spec.get("doorbox", CABIN_DOOR)
     paste_boxes(im, base, ([door] if door else []) + [floor(base)] + spec.get("boxes", []))
+    for mv in spec.get("moves", []):
+        im = move_piece(im, **mv)
+    for part, box in spec.get("patches", []):
+        paste_boxes(im, Image.open(SRC / f"{part}.png").convert("RGBA"), [box])
+    for (x0, y0, x1, y1), rgb in spec.get("lines", []):
+        a = np.array(im)
+        a[y0:y1 + 1, x0:x1 + 1, :3] = rgb
+        im = Image.fromarray(a)
     a, b = np.array(im), np.array(base)
     m = pieces_mask(base.size, spec["pieces"])
     a[m] = b[m]

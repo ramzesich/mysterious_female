@@ -1906,7 +1906,7 @@ def build_objects():
     add(point("chapel", "place", exact_x(CHAPEL["m"]), floor_y(12), [prop("route", "chapel")]))
     at12(69.75, "side-table")       # (clear of the lobby's crew door at 70.7 m)
     at12(69.75, "rose-glass", height("side-table-bg") - ON_SIDE_TABLE)
-    at12(72.6, "door-cabin")
+    # (The restrooms' door is the room's, `restroom` in tools/population.py: the user, 2026-11-24.)
     add(point("sign-restrooms", "sign", exact_x(72.6), floor_y(12) - 84, [prop("text", "Restrooms"), prop("style", "plaque")]))
     # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
     # high tables by the windows.

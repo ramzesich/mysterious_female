@@ -78,7 +78,7 @@ MUTE_W20 = 0.20
 SHADE = {"sunlounger-long": 0.7}
 # Pieces kept off the palette (on it Champs' brown leather went a grey mauve, and lighter a pink), and pieces made
 # lighter before their twins, every colour times this (the sofa: "make it lighter", the user, 2026-11-21).
-OWN = {"sofa-champs", "patio-chair", "patio-table", "patio-chair-arm"}  # (the patio set: on the palette its teak went olive, 2026-11-22)
+OWN = {"door-restroom", "sofa-champs", "patio-chair", "patio-table", "patio-chair-arm"}  # (the patio set: on the palette its teak went olive, 2026-11-22)
 BRIGHTEN = {"sofa-champs": 1.9}
 RECOLOUR = {"towel-swan": {"fb6b1d": "ffffff", "f79617": "ffffff", "cd683d": "c7dcd0", "9e4539": "9babb2"}}
 LIGHT = {"theatre-seat-side", "drum-kit", "mic-stand", "guitar", "grand-piano", "speaker-stack", "basketball"} | {f"audience-{k}" for k in range(10)}
@@ -187,6 +187,10 @@ for i, name in enumerate(TALL_1):
     if name:
         PIECES[name] = ("tall-1", i, None, {})
 PIECES["theatre-seat"] = ("theatre-seat", 0, None, {})
+# The restrooms' door by the Chapel (deck 12; the user, 2026-11-24, "generate a proper door for the restrooms"): try 2 of
+# three, redrawn from the cabin door's own picture (its size and frame), a pale oak leaf with a pull handle and a kick
+# plate; its sign's man and woman drawn by hand (generated, they were a smudge). In its own colours (`door-restroom/`).
+PIECES["door-restroom"] = ("door-restroom", 0, None, {})
 # Deck 12's sun deck lounger (the user, 2026-11-21): a generated piece at its own size (`sunlounger-long/README.md`).
 PIECES["sunlounger-long"] = ("sunlounger-long", 0, None, {})
 # Champs Bar's sofa (deck 12, in the aft high table's place; his handheld, 15, on it): try 3 of four at its own size,
