@@ -191,6 +191,10 @@ export const SWIM = {
 export const SHAFT = {
     dim: 1, roomDim: 0.88, cone: { top: 56, foot: 170, soft: 14 }, over: 40, fadeMs: 260, look: 42,
     reach: 22, lip: 22, land: 18, slideMs: 520, trap: 6, out: 22,
+    // The drop out of its far end (the user, 2026-11-24): she falls on hands and knees until her feet are `dropCrawlH`
+    // px under the ceiling, then upright, her picture's middle kept (her feet `dropShift` px lower; her head then no
+    // higher than the shaft's top, 36 px over its floor).
+    dropCrawlH: 10, dropShift: 13,
 };
 
 export const VERBS = {

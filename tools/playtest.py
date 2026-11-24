@@ -3380,7 +3380,7 @@ def scenario_region4(b):
     ok &= check(wait_flag(b, "bb4", 12), "the cart all but touching him: near-catch 4, Bumbot leaps into the shaft's mouth", flags(b))
     wait(0.5)
     ok &= check(js(b, f"{W}.things.find(t => t.id === 'vent_cover_down').items[0].visible")
-                and not js(b, f"{W}.things.find(t => t.id === 'vent_cover').items[0].visible"), "its cover knocked off, by the wall under it")
+                and not js(b, f"{W}.things.find(t => t.id === 'vent_cover').items[0].visible"), "its cover knocked off, flat on the floor in front of the mouth")
     ok &= check("crawl" in save_list(b, "verbs"), "crawling is learned")
     b.shot("region4-vent")
     # The cart on to the mouth, onto its rim, down on hands and knees, and in: no cut, the room still in view.
@@ -3441,7 +3441,9 @@ def scenario_region4(b):
     s = through_the_shaft(b)
     ok &= check(route(b) == "inside" and s["y"] == D8 and abs(s["x"] - duct["exitX"]) < 40 and 5 in save_list(b, "regions"),
                 "the last grille gives way: she drops into deck 8 forward where the shaft ends: region 5", s)
-    ok &= check("duct" in flags(b) and js(b, f"{W}.things.find(t => t.id === 'prop_grille_open').items[0].visible"), "the grille hanging open after her")
+    wait(0.6)
+    ok &= check("duct" in flags(b) and js(b, f"(t => t.items[0].visible && t.items[0].alpha === 1)({W}.things.find(t => t.id === 'shaft_exit_hang'))"),
+                "the grille hanging open after her, by its right edge")
     ok &= check(js(b, f"{W}.ductEyes === undefined"), "nothing of Bumbot in the shaft: he is long gone")
     b.shot("region4-dropped")
     # Now that she crawls: the fort, and what is in it.
@@ -3527,8 +3529,8 @@ def scenario_region5(b):
     duct = js(b, f"{W}.data.duct")
     b.teleport(duct["dropX"], D8)
     wait(0.5)
-    ok &= check(js(b, f"{thing('prop_grille_open')}.items[0].visible") and not js(b, f"{thing('prop_grille_shut')}.items[0].visible"),
-                "the grille she dropped out of hangs open in the ceiling")
+    ok &= check(js(b, f"{thing('shaft_exit_hang')}.items[0].visible") and js(b, f"{thing('shaft_exit_hole')}.items[0].visible"),
+                "the grille she dropped out of hangs open by the slot it left in the ceiling")
     ok &= check(js(b, f"{thing('prop_paws_8')}.items[0].visible"), "paw prints in the dust, toward the lobby's door")
     b.shot("region5-grille")
     # The party.

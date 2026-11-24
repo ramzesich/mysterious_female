@@ -157,6 +157,58 @@ def flat(g):
     return im
 
 
+# The way out's grille once it has given way (the user, 2026-11-24: "when it opens, it shouldn't be lit. Also, instead of
+# falling down, make it hang by its right edge, as previously"; of three pictures, B): no longer lit from the shaft, it
+# swings down on its right edge and hangs under the slot, its face seen a little, the same slats at the same pitch in
+# unlit steel (`exit-hang.png`, 8 x 32, its top left at the hinge). The swing: the grille's own profile turned, unlit, a
+# quarter about the hinge in frames (at eight times its size, read back at each 8 x 8's middle), then the hanging face.
+SWING_CELL = (48, 40)                # each frame's box; the hinge at SWING_PIVOT in it
+SWING_PIVOT = (36, 2)                # the grille's right end, a pixel under its top row: where the hanging face's top left is
+SWING_ANGLES = (0, 18, 36, 54, 72)   # degrees turned, then the hanging face as the last frame
+
+
+def exit_swing(grille):
+    """`exit-hang.png` and `exit-swing.png` (a strip of SWING_CELL frames) from the way out's grille as the strip draws it."""
+    p = grille.load()
+    unlit = grille.copy()
+    u = unlit.load()
+    for y in range(grille.height):
+        for x in range(grille.width):
+            r, g_, b, a = p[x, y]
+            if a and r + g_ + b > 300:
+                u[x, y] = rgb(VOID) + (255,)
+    hang = Image.new("RGBA", (8, GRILLE + 2), (0, 0, 0, 0))
+    d = ImageDraw.Draw(hang)
+    d.rectangle([0, 0, 7, GRILLE + 1], fill=VOID, outline=INK)
+    for y in range(2, GRILLE + 1, 4):
+        d.line([(1, y), (6, y)], fill=LIT)
+        d.line([(1, y + 1), (6, y + 1)], fill=STEEL)
+    d.line([(1, 1), (1, GRILLE)], fill=MID)
+    hang.save(GAME / "exit-hang.png")
+    W, H = SWING_CELL
+    k = 8
+    px, py = SWING_PIVOT
+    at = (px - grille.width + 1, py - 2)          # the closed grille in its frame: its right end at the hinge
+    big = Image.new("RGBA", (W * k, H * k), (0, 0, 0, 0))
+    big.paste(unlit.resize((unlit.width * k, unlit.height * k), Image.NEAREST), (at[0] * k, at[1] * k))
+    strip = Image.new("RGBA", (W * (len(SWING_ANGLES) + 1), H), (0, 0, 0, 0))
+    for i, ang in enumerate(SWING_ANGLES):
+        fr = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        if ang == 0:
+            fr.paste(unlit, at)
+        else:
+            turned = big.rotate(ang, resample=Image.NEAREST, center=((px + 1) * k, py * k))
+            tp, fp = turned.load(), fr.load()
+            for y in range(H):
+                for x in range(W):
+                    fp[x, y] = tp[x * k + k // 2, y * k + k // 2]
+        strip.paste(fr, (i * W, 0))
+    last = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    last.paste(hang, SWING_PIVOT)
+    strip.paste(last, (len(SWING_ANGLES) * W, 0))
+    strip.save(GAME / "exit-swing.png")
+
+
 def piece_boxes(g):
     """Each piece's box in the strip (x0, y0, x1, y1): the plain lengths' (two to a picture, and 32 px of the lengths
     either side so that the redraw sees what it runs on into), a grille's, the dead end's, the entry's."""
@@ -268,15 +320,14 @@ def compose(g):
     # The grilles, by rule, wherever each stands along a length (since 2026-11-23 they are placed over what is worth
     # seeing below, not at a length's middle, and the two generated lengths with a grille in them are not used): a
     # slot through the floor's sheet in a dark frame, lit slats across it. The way out: a clear opening.
-    for gr in g["grilles"]:
+    # (The way out is a grille like the rest, the user, 2026-11-24: "It should look visually like any other peek cover
+    # before it in the shaft"; it is cut out below, to give way under her.)
+    for gr in g["grilles"] + [dict(x=g["exitX"])]:
         a, b = gr["x"] - GRILLE // 2 - g["ox"], gr["x"] + GRILLE // 2 - 1 - g["ox"]
         for x in range(a - 1, b + 2):
             for y in range(bot - 2, bot + SHEET):
                 frame = x in (a - 1, b + 1) or y == bot - 2 or (x - a) % 4 == 3
                 px[x, y] = rgb(INK) + (255,) if frame else WARM + (255,)
-    for x in range(g["exitX"] - GRILLE // 2, g["exitX"] + GRILLE // 2):
-        for y in range(bot - 1, bot + SHEET + 1):
-            px[x - g["ox"], y] = (0, 0, 0, 0)
     # The light, by rule: warm up through each grille and the way out, strongest at the slot, gone 44 px off; the linen
     # room's cool light into the mouth, gone at the wall.
     def light(cx, cy, colour, reach, most):
@@ -298,6 +349,20 @@ def compose(g):
         for y in range(up - H, up):
             r, gr_, b, a = px[x - g["ox"], y]
             px[x - g["ox"], y] = (round(r + (COOL[0] - r) * k), round(gr_ + (COOL[1] - gr_) * k), round(b + (COOL[2] - b) * k), a)
+    # The way out's grille, lit as the others are, cut out of the strip as a piece of its own (`exit-grille.png`, its top
+    # left `EXIT_AT` px from the strip's): it gives way under her and falls with her (`shaftDrop` in src/world/world.js).
+    # Under it the shaft's floor is open, and once it has fallen deck 8's ceiling shows the slot (`exit-hole.png`).
+    ex = g["exitX"] - GRILLE // 2 - 1 - g["ox"]
+    box = (ex, bot - 2, ex + GRILLE + 2, bot + SHEET)
+    strip.crop(box).save(GAME / "exit-grille.png")
+    for x in range(box[0], box[2]):
+        for y in range(box[1], box[3]):
+            px[x, y] = (0, 0, 0, 0)
+    hole = Image.new("RGBA", (box[2] - box[0], box[3] - box[1]), (0, 0, 0, 0))
+    ImageDraw.Draw(hole).rectangle([0, 0, hole.width - 1, hole.height - 1], fill=VOID, outline=INK)
+    hole.save(GAME / "exit-hole.png")
+    g["exitAt"] = [box[0] + g["ox"], box[1] + g["oy"]]
+    exit_swing(Image.open(GAME / "exit-grille.png").convert("RGBA"))      # (the grille as cut, before its place was cleared)
     # The joints' near halves: the flange's top and foot again, over her.
     front = Image.new("RGBA", strip.size, (0, 0, 0, 0))
     topy = g["lower"] - H - g["oy"]
@@ -346,7 +411,8 @@ def mouth_pieces(g):
 
 
 MOUTH_SHORTEN = (7, 20)              # the mouth's columns cut out (from, to): 13 of its 28
-MOUTH_STRUT = (7, 39)                # the top of the strut under the mouth, in the uncut picture: moved a column in
+MOUTH_STRUT = (7, 39)
+MOUTH_FAR = 12                       # the half-deep mouth's columns from this one on: its inside and its far rim                # the top of the strut under the mouth, in the uncut picture: moved a column in
 # The cover's fall, knocked off by Bumbot from the room's side (the user, 2026-11-24: "let it fall flat on the ground,
 # rotating while falling"): turned a quarter toward the wall as it drops, frame by frame at the game's pixels (each
 # drawn from the cover enlarged eight times, turned, and read back a pixel at the middle of each 8 x 8; the first and
@@ -493,6 +559,15 @@ def main():
         for name, (im, (x, y)) in pieces.items():
             if name == "cover-down":
                 continue
+            if name == "mouth":
+                # Its near side and its far one (the user, 2026-11-24: on hands and knees at it she is "inside of it, not
+                # behind it ... behind its wall that is closest to the screen, but obscuring its farther wall"): the
+                # inside seen through its open end and the end's far rim (`MOUTH_FAR` on) are drawn behind her.
+                far = Image.new("RGBA", im.size, (0, 0, 0, 0))
+                far.paste(im.crop((MOUTH_FAR, 0, im.width, im.height)), (MOUTH_FAR, 0))
+                far.save(GAME / "mouth-far.png")
+                im = im.copy()
+                im.paste(Image.new("RGBA", (im.width - MOUTH_FAR, im.height), (0, 0, 0, 0)), (MOUTH_FAR, 0))
             im.save(GAME / f"{name}.png")
             where[name] = [x0 + x, y0 + y]
             print("cut", name, im.size, "at", x, y)
@@ -512,22 +587,14 @@ def main():
                              end=[down[0] - fx, down[1] - fy])
         print("fall", strip.size, "flat", flat.size, "at", down)
         (GAME / "mouth.json").write_text(json.dumps(where), encoding="utf-8")
-        # The grille at the shaft's other end, in deck 8's ceiling (the world's props `prop_grille_shut`, `_open`): the
-        # mouth's own cover again, the same pixels turned: lying in the ceiling, shut; hanging from its hinge by the
-        # opening, once it has given way under her.
-        cover = Image.open(GAME / "cover.png").convert("RGBA")
-        shut = cover.transpose(Image.ROTATE_270)
-        shut.save(GAME / "hatch.png")
-        hung = Image.new("RGBA", (GRILLE + 2 + cover.width - 1, cover.height + 3), (0, 0, 0, 0))
-        ImageDraw.Draw(hung).rectangle([0, 0, GRILLE + 1, 3], fill=VOID, outline=INK)
-        hung.alpha_composite(cover, (GRILLE + 1, 2))
-        hung.save(GAME / "hatch-open.png")
-        print("hatch", shut.size, "hatch-open", hung.size)
+        # (The grille at the shaft's other end was the mouth's cover turned, in deck 8's ceiling, until 2026-11-24: it is a
+        # grille of the shaft's own now, cut from the strip, `compose`.)
     strip, front = compose(g)
     strip.save(GAME / "strip.png")
     front.save(GAME / "front.png")
     H = g["height"]
-    layout = dict(strip=[g["ox"], g["oy"]], grille=GRILLE)
+    layout = dict(strip=[g["ox"], g["oy"]], grille=GRILLE, exit=g["exitAt"],
+                  swing=dict(cell=list(SWING_CELL), pivot=list(SWING_PIVOT), frames=len(SWING_ANGLES) + 1))
     cut = GAME / "mouth.json"
     if cut.exists():
         # (The room's pieces cut from the generated corner, `--mouth` below: where each stands.)

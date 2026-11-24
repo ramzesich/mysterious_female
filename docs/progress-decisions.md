@@ -4584,3 +4584,9 @@ mouth she is behind its near side; only the grille she is over opens; one grille
 
 The mouth cut to half its depth from its own picture, and the cover's fall made a quarter turn landing flat on the
 floor: decisions 26 and 27 of `docs/shaft-remake-log.md`. No generations. `region4`, `linen`, `golden` pass.
+
+## The shaft's mouth and its way out (the user's, 2026-11-24)
+
+She is in the mouth on hands and knees (its far side behind her, nothing of her past the room's wall until the view is
+the shaft's); the way out a grille like the rest, that drops her the moment she is on it and swings down unlit on its
+right edge: decisions 28 and 29 of `docs/shaft-remake-log.md`. No generations. `region4`, `linen`, `golden` pass.

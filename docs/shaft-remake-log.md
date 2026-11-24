@@ -233,3 +233,21 @@ open, one to a place):**
     at first; a clang, a 2 px bounce tipped back a frame, and it lies flat in front of the mouth, behind the parked
     cart (`coverFalls` in `src/world/story.js`). The generated cover leaning by the wall (`gen/mouth-down2.png`) is no
     longer used. Approved by the user from the recording.
+28. **At the mouth on hands and knees she is in it** (the user: "inside of it, not behind it ... behind its wall that is
+    closest to the screen, but obscuring its farther wall"): the mouth's picture split into its near side (the panel
+    and the near flange, over her as before) and its far one (the inside seen through its open end and the far rim,
+    `mouth-far.png`, `MOUTH_FAR`), always behind her. **And nothing of her past the room's wall until the view has gone
+    over to the shaft** ("How is it right, when her head sticks out behind it"; "She should be shown inside only when
+    the camera transitioned to the shaft"): her picture cut at the room's forward wall while she is in the room or
+    going in and the shaft is not yet fully shown (`world.herCut`, the ship scene's cut at a balcony's partition).
+29. **The way out is a grille like the rest** ("It should look visually like any other peek cover before it in the
+    shaft"): drawn by the same rule in the strip and cut out of it as a piece (`exit-grille.png`). **No moment before
+    the drop** ("No delays before that animation sequence starts. The transition should be seamless"): the frame she is
+    over it she drops, in the crawl's frame she was in, upright as she comes through the ceiling (her picture's middle
+    kept: `dropCrawlH`, `dropShift` in `SHAFT`); the creak, the sag and her teleport below the ceiling are gone.
+    **Once open it is unlit and hangs by its right edge** ("when it opens, it shouldn't be lit. Also, instead of falling
+    down, make it hang by its right edge, as previously"; B of three pictures): it swings down on its hinge (the
+    grille's own profile turned, unlit, in frames made at the game's pixels: `exit-swing.png`), clangs, sways back once,
+    and hangs as its face seen a little, the same slats in unlit steel (`exit-hang.png`) beside the slot it leaves in
+    deck 8's ceiling (`exit-hole.png`). The hatch made of the mouth's cover turned (`hatch.png`, `hatch-open.png`, the
+    props `prop_grille_shut`, `_open`) is retired.

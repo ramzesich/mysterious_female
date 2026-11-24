@@ -613,8 +613,9 @@ PROPS = {
     "prop_swan_cart_swan": (8, 29.3, "towel-swan", 28, {}),
     # (The shaft's own pictures since its remake, 2026-11-23: the cover of its mouth again, tools/build_shaft.py; shut it
     # lies in the ceiling over the way out, open it hangs from its hinge beside the opening.)
-    "prop_grille_shut": (8, 66.1667, "@shaft-hatch", 117, dict(until="flag:duct", back=True)),
-    "prop_grille_open": (8, 66.2604, "@shaft-hatch-open", 101, dict(after="flag:duct", back=True)),
+    # (The shaft's way out, the hatch in deck 8's ceiling shut and then hanging open, is the shaft's own since 2026-11-24:
+    # a grille like the others, that falls with her and lies on the corridor's floor, the slot left in the ceiling; built
+    # by `buildDuct` in src/world/world.js from tools/build_shaft.py's pieces.)
     "prop_paws_8": (8, 70.05, "@paws", 0, dict(after="flag:duct")),
     "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
     # Region 6. The rack with the yoga mats, the socks on its top; two sunbathers on the loungers by

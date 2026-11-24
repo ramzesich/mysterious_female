@@ -3841,7 +3841,11 @@ export class ShipScene extends Phaser.Scene {
         // her is drawn, turned by its scale, which crops true, and her own picture is cropped to nothing.)
         // (And on the boat walkway at its two ends, where it meets the ship's side: the user, 2026-11-21, "the same way
         // we fixed this issue on the balconies".)
-        const balc = !onProm && this.route === OUTSIDE && p.visible ? this.world.balconyRoom(p.x, p.y) ?? (onWalk ? [pr.x0, pr.x1] : null) : null;
+        // (And at the linen room's shaft, until the view has gone over to the shaft: nothing of her past the room's wall
+        // while the room is what is shown; the user, 2026-11-24: "She should be shown inside only when the camera
+        // transitioned to the shaft". `world.herCut`.)
+        const balc = !onProm && p.visible ? (this.route === OUTSIDE ? this.world.balconyRoom(p.x, p.y) ?? (onWalk ? [pr.x0, pr.x1] : null)
+            : this.world.herCut?.() ?? null) : null;
         const pic = this.balconyPic;
         if (balc) {
             const left = p.x - p.displayOriginX, rw = p.width;

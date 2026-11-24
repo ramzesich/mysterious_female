@@ -838,13 +838,24 @@ export class World {
         // Bumbot knocks it off (near-catch 4, src/world/story.js), then lying flat on the floor in front of it, where its
         // fall (`L.fall`, the frames turning it a quarter as it drops) ends.
         const mouth = s.add.image(L.mouth[0], L.mouth[1], 'shaft-mouth').setOrigin(0).setDepth(base + 0.004);
+        // (Its far side, the inside seen through its open end and the end's far rim: always behind her, so that at the
+        // mouth on hands and knees she is in it, its near side over her and its far one behind.)
+        const mouthFar = s.add.image(L.mouth[0], L.mouth[1], 'shaft-mouth-far').setOrigin(0).setDepth(base + 0.004);
         const cover = s.add.image(L.cover[0], L.cover[1], 'shaft-cover').setOrigin(0).setDepth(base + 0.006);
         const down = s.add.image(L.coverDown[0], L.coverDown[1], 'shaft-cover-down').setOrigin(0).setDepth(base + 0.006);
-        this.add([dark, strip, front, mouth, cover, down]);
-        this.things.push({ id: 'shaft_mouth', x: L.mouth[0], y: d.upper, route: 'linen', items: [mouth] });
+        // The way out: a grille in the shaft's floor like the others (shown with the shaft, until it has given way), and
+        // once it has, the slot it leaves in deck 8's ceiling and the grille hanging open from the slot's right edge.
+        const exit = s.add.image(L.exit[0], L.exit[1], 'shaft-exit-grille').setOrigin(0).setDepth(base + 0.003).setAlpha(0).setVisible(false);
+        const hole = s.add.image(L.exit[0], L.exit[1], 'shaft-exit-hole').setOrigin(0).setDepth(D.props);
+        const SW = L.swing, hingeX = L.exit[0] + exit.width - 1, hingeY = L.exit[1] + SW.pivot[1];
+        const hang = s.add.image(hingeX, hingeY, 'shaft-exit-hang').setOrigin(0).setDepth(D.props + 0.001);
+        this.add([dark, strip, front, mouthFar, mouth, cover, down, exit, hole, hang]);
+        this.things.push({ id: 'shaft_exit_hole', x: L.exit[0], y: L.exit[1], route: 'inside', items: [hole], after: 'flag:duct' });
+        this.things.push({ id: 'shaft_exit_hang', x: hingeX, y: hingeY, route: 'inside', items: [hang], after: 'flag:duct' });
+        this.things.push({ id: 'shaft_mouth', x: L.mouth[0], y: d.upper, route: 'linen', items: [mouth, mouthFar] });
         this.things.push({ id: 'vent_cover', x: L.cover[0], y: d.upper, route: 'linen', items: [cover], until: 'flag:bb4' });
         this.things.push({ id: 'vent_cover_down', x: L.coverDown[0], y: L.coverDown[1], route: 'linen', items: [down], after: 'flag:bb4' });
-        this.shaft = { dark, strip, front, mouth, cover, down, fall: L.fall, shown: 0, look: 0, mouthDepth: mouth.depth };
+        this.shaft = { dark, strip, front, mouth, cover, down, fall: L.fall, exit, hole, hang, hinge: [hingeX, hingeY], shown: 0, look: 0, mouthDepth: mouth.depth };
         // Her slide down the slope: one clip of her made on the shaft's own picture (tools/build_shaft.py `--slide`,
         // assets/source/her/shaft-slide/), played where it was made: from her crawl at the slope's lip to her crawl at
         // its foot.
@@ -902,6 +913,7 @@ export class World {
             sh.dark.setVisible(on && sh.dark.alpha > 0);
             sh.strip.setVisible(on).setAlpha(sh.shown);
             sh.front.setVisible(on).setAlpha(sh.shown);
+            if (!sh.exitFalling) sh.exit.setVisible(on && !P.has('duct')).setAlpha(sh.shown);
             const open = this.lookOpen ??= {};
             if (inDuct) open[d.dropDeck] = sh.shown;
             else delete open[d.dropDeck];
@@ -956,6 +968,15 @@ export class World {
         }
     }
 
+    // Where her picture is cut at the shaft's mouth (the ship scene's crop, as at a balcony's partition): while she is in
+    // the linen room or going into the shaft and the view has not yet gone over to it, nothing of her past the room's
+    // forward wall (her head had stuck out beyond the mouth into the dark there).
+    herCut() {
+        const s = this.scene, sh = this.shaft, d = this.data.duct;
+        if (!sh || (s.route !== 'linen' && s.route !== 'duct') || sh.shown >= 1) return null;
+        return [d.wallX, Infinity];
+    }
+
     // The ship's outside view (O) and the views from afar show every deck closed: the shaft's pictures and its dark are
     // put away for them (the ship scene's cut-away says so each frame, as it does for the rooms; this world's own
     // update does not run there).
@@ -967,6 +988,7 @@ export class World {
         sh.dark.setVisible(on && sh.dark.alpha > 0);
         sh.strip.setVisible(on);
         sh.front.setVisible(on);
+        if (!sh.exitFalling) sh.exit.setVisible(on && !this.progress.has('duct'));
     }
 
     // Behind the linen room's wall the shaft slopes down into the slab between the decks: over its lip she slides
@@ -1012,52 +1034,87 @@ export class World {
             } });
     }
 
-    // The last grille, over deck 8's forward corridor: sprung shut behind Bumbot, it gives way under her. She drops
-    // out of the shaft's floor feet first, the corridor's ceiling cutting her off above it, and lands where the shaft
-    // ends: no cut, the dark round the shaft lifting as she falls.
+    // The last grille, over deck 8's forward corridor, like every other in the shaft's floor: the moment she is over it,
+    // it gives way, swings down on its right edge, and she drops through the slot to the corridor's floor (the user,
+    // 2026-11-24: "When we're above it, the lid breaks and falls down, and we fall down with it. No delays before that
+    // animation sequence starts. The transition should be seamless"; then "instead of falling down, make it hang by its
+    // right edge, as previously", unlit; it had held her a moment, creaking, and she had been put below the ceiling in
+    // her fall's pose). She goes on hands and knees in the frame she was in, as she was, and turns upright in the air as
+    // she comes through the ceiling (her picture's middle kept).
     shaftDrop() {
-        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress;
-        const first = !P.has('duct');
-        this.cut(async () => {
-            p.body.enable = false;
-            p.setPosition(d.exitX, d.lower);
-            s.poseCrawl(0);
-            if (first) {
-                // (It holds a moment: a creak, a sag under her hands.)
-                p.anims.pause();
-                sfx.at(d.exitX, d.lower).creak();
-                rumble('bolt');
-                for (const dy of [1, 0, 1, 2]) { p.y = d.lower + dy; await this.wait(110); }
-                sfx.at(d.exitX, d.lower).clang();
-                P.setFlag('duct');
-            }
-            // Down through the opening: on deck 8 from here on, its side open as she falls.
-            s.setCrawl(false);
-            s.crawling = false;
-            s.route = 'inside';
-            // (The deck she drops into, open from the first moment of the fall and held so until she lands: by her
-            // height alone the cut-away would stay with deck 9 for the first half of it.)
-            s.viewDeck = s.viewOverride = d.dropDeck;
-            s.pose('fall');
-            p.setFlipX(true);
-            const ceiling = d.lower + 2, cell = PLAYER.cell;
-            const crop = () => {
-                // (Her picture's rows above the ceiling's line are in the shaft still: not drawn over the corridor.)
-                const hidden = Phaser.Math.Clamp(ceiling - (p.y + PLAYER.sink - cell), 0, cell);
-                p.setCrop(0, hidden, cell, cell - hidden);
-            };
-            p.setPosition(d.exitX, ceiling + SHAFT.out);
-            crop();
-            const fall = d.dropY - p.y;
-            await this.tween({ targets: p, y: d.dropY, duration: Math.sqrt(2 * fall / PLAYER.gravity) * 1000, ease: 'Quad.easeIn', onUpdate: crop });
-            p.setCrop();
+        const s = this.scene, p = s.player, d = this.data.duct, P = this.progress, sh = this.shaft;
+        s.mode = 'scripted';
+        s.script = null;
+        this.cuts = (this.cuts ?? 0) + 1;
+        p.body.setVelocity(0, 0);
+        p.body.enable = false;
+        p.anims.pause();
+        const x = p.x, y0 = p.y, g = PLAYER.gravity;
+        if (!P.has('duct')) {
+            P.setFlag('duct');
+            sh.hang.setAlpha(0);
+            this.grilleSwings(x);
+        }
+        // Down through the opening: on deck 8 from here on, its side open as she falls. (The deck she drops into is
+        // open from the first moment and held so until she lands: by her height alone the cut-away would keep deck 9.)
+        s.route = 'inside';
+        s.viewDeck = s.viewOverride = d.dropDeck;
+        const ceiling = d.lower + 2, crawlH = SHAFT.dropCrawlH, shift = SHAFT.dropShift;
+        let upright = false;
+        const t = { v: 0 };
+        const fall = d.dropY - y0 - shift;
+        const ms = Math.sqrt(2 * fall / g) * 1000;
+        this.tween({ targets: t, v: 1, duration: ms, ease: 'Linear',
+            onUpdate: () => {
+                const dy = fall * t.v * t.v;
+                if (!upright && y0 + dy >= ceiling + crawlH) {
+                    upright = true;
+                    s.setCrawl(false);
+                    s.crawling = false;
+                    s.pose('fall');
+                    p.setFlipX(true);
+                }
+                p.setPosition(x, y0 + dy + (upright ? shift : 0));
+            } }).then(() => {
             s.viewOverride = null;
+            if (!upright) { s.setCrawl(false); s.crawling = false; }
             p.body.enable = true;
-            p.body.reset(d.exitX, d.dropY);
+            p.body.reset(x, d.dropY);
             s.takeoffY = d.dropY;
             s.grounded = false;
-            sfx.at(d.exitX, d.dropY).land('carpet');
+            sfx.at(x, d.dropY).land('carpet');
+            this.cuts--;
+            if (s.mode === 'scripted' && !this.cuts) s.mode = 'play';
+            this.refresh();
         });
+    }
+
+    // The way out's grille gives way under her (`shaftDrop`): unlit at once, it swings down on its hinge at the slot's
+    // right edge as a thing hinged falls (slow at first), a clang as it reaches the bottom, one sway back, and then it is
+    // the world's grille hanging there.
+    grilleSwings(x) {
+        const s = this.scene, sh = this.shaft, W = s.cache.json.get('shaft').swing;
+        sh.exitFalling = true;
+        sh.exit.setVisible(false);
+        const last = W.frames - 1;
+        const sp = s.add.sprite(sh.hinge[0] - W.pivot[0], sh.hinge[1] - W.pivot[1], 'shaft-exit-swing', 0)
+            .setOrigin(0).setDepth(s.DEPTH.player - 0.01);
+        this.add([sp]);
+        sfx.at(x, sh.hinge[1]).creak();
+        rumble('bolt');
+        const t = { v: 0 };
+        this.tween({ targets: t, v: 1, duration: 260, ease: 'Linear', onUpdate: () => sp.setFrame(Math.min(last, Math.floor(t.v * t.v * W.frames))) })
+            .then(() => {
+                sfx.at(x, sh.hinge[1]).clang();
+                const b = { v: 0 };
+                return this.tween({ targets: b, v: 1, duration: 240, ease: 'Linear',
+                    onUpdate: () => sp.setFrame(b.v < 0.25 || b.v > 0.75 ? last : last - 1) });
+            })
+            .then(() => {
+                sp.destroy();
+                sh.exitFalling = false;
+                sh.hang.setAlpha(1);
+            });
     }
 
     // --- Things in place ------------------------------------------------------------------------
