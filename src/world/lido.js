@@ -131,6 +131,13 @@ export const lido = {
         if (!near) return;
         // (The tub's near wall drawn again is only for the kid in it: it does not pulse with the tub.)
         this.tubFront?.setVisible(!!this.who('npc_kid_tub')?.on);
+        // (Right down in the tub his legs reach under the deck: his picture is cut at its floor, or they hang through
+        // deck 10's ceiling; the user, 2026-11-24. Above the floor the tub's near wall hides him.)
+        const kid = this.who('npc_kid_tub');
+        if (kid?.on) {
+            const sp = kid.sprite, fh = sp.frame.height, top = sp.y - fh * sp.originY;
+            sp.setCrop(0, 0, sp.frame.width, Math.max(0, Math.min(fh, L.y - top)));
+        }
         this.poolWatch(time);
         this.kidInTub(time);
         this.kidOnDeck(dt, time);

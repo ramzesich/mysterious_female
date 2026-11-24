@@ -4691,4 +4691,7 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
 - Deck 6's corridor is short and hangs three of its four (the compass-rose chart is not seen).
 - `boot`, `stairs`, `lift` pass; `tools/check_overlaps.py` 0. The whole ship's render not made: nothing is drawn
   outside the corridors' walls.
+- **The kid's legs through deck 10's ceiling** (the user, after part 4): right down in the hot tub his picture reached
+  20 px under deck 11's floor, where nothing covers it. It is cut at the floor each frame he is in the tub (`updateLido`);
+  above it the tub's near wall hides him as before. `region6` passes.
 
