@@ -4640,3 +4640,24 @@ right edge: decisions 28 and 29 of `docs/shaft-remake-log.md`. No generations. `
   off"); the cart drawn in code replaced by the generated laundry cart heaped with towels ("a proper stack of laundry").
 - 65 generations (`assets/source/ship/laundry-chute/README.md`). `region4` (the chute's new checks), `linen`, `golden`
   pass; `tools/check_overlaps.py` 0.
+
+## The pool's scene remade (the user's own request, outside the plan; 2026-11-24)
+
+The user asked the design session to remake near-catch 5 at the pool "from start to finish (Bumbot, kid, the lever,
+the pool drain)" by the shaft's rules, in a worktree of its own (`../mysterious_female-pool`, branch `pool-scene`), so
+as not to cross the building session's work. It closes plan-the-rest §9's U17. **The whole record, decision by
+decision with the user's words, is `docs/pool-remake-log.md`**; in short:
+
+- **The scene:** her reach up out of the water at the rim (a generated clip of hers); the kid in the hot tub, his
+  pistol green; Bumbot over her head into the pool, in sight under it, back past her, out, onto the drain lever's
+  grip, thrown across the tub. From the deck she dives at him and ends in the pool under him.
+- **The pieces, generated** (`tools/build_pool.py`, 58 generations; her clip 2): the lever (knee-high, the user's
+  size), the hatch on the tank's floor (128.5 m, was 125: in view as the water leaves her), the drain's grate, deck
+  10's ceiling panel.
+- **The drain and the way down:** the water down the grate, a funnel in its surface, puddles at the last; the
+  hatch's lid heaved up, its ladder, the ceiling panel, no fade.
+- **Changed besides, on the user's play:** her picture 5 px lower in the dry tank; the pools' water to the foot of
+  the tank's wall; the pool ladders down to the floor; deck 10's laundry line not shown from deck 11; the paw
+  prints heading aft on the planks (dropped again in the merge into `three-uses`, the user: every print of his
+  goes); the hot tub 22 px aft.
+- **Left:** `docs/ship-regions.png` still draws the hatch's way at the pool's middle; Bumbot's own clips are part 6's.

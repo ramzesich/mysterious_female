@@ -2191,12 +2191,11 @@ def scenario_golden(b):
     ok &= check("drain" in flags(b), "and the pool drains")
     s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] == D11 + 32, 8)
     ok &= check(s["mode"] == "play" and s["y"] == D11 + 32, "she is left standing in the empty tank", s)
-    b.teleport(x_of(125), D11 + 32)
+    b.teleport(js(b, "window.__ship.world.data.hatchPool.x"), D11 + 32)
     wait(0.3)
     b.tap("e")
-    wait(1.6)
-    s = b.state()
-    ok &= check(s["y"] == D10, "the hatch in its floor drops her into deck 10's hallway", s)
+    s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] == D10, 8)
+    ok &= check(s["y"] == D10, "the hatch in its floor: down its ladder, and out of deck 10's hallway's ceiling", s)
     # Region 8: with the socks, up the sun cover's post at the Great Outdoors, along it to deck 12.
     b.teleport(exact_x(233) + 13, D11)
     b.key("space", True)
@@ -3675,26 +3674,64 @@ def scenario_region6(b):
     b.shot("region6-chess")
     # Near-catch 5: she comes to him swimming; the kid in the hot tub; the pool drains with her in it.
     ok &= check(person(b, "npc_kid_tub")["on"] and not person(b, "npc_kid")["on"], "the kid is in the hot tub, his cap over its rim")
+    # (The pool's scene remade, 2026-11-24, docs/pool-remake-log.md.)
+    tubpic = f"{W}.mapPiece('hot-tub', {L['tubX']}, {D11})"
+    v = js(b, f"[{who('npc_kid_tub')}.sprite.depth, {tubpic}.depth, {W}.story.tubFront.depth, {W}.story.tubFront.visible, {who('npc_kid_tub')}.sprite.y]")
+    ok &= check(v[1] < v[0] < v[2] and v[3] and v[4] > D11 + 15, "he is in it: before its far rim and its water, behind its near wall, right down", v)
+    hx = js(b, f"{W}.data.hatchPool.x")
+    v = js(b, f"[{W}.pool.shut.obj.visible, {W}.pool.back.obj.visible, {W}.pool.drain.obj.visible, {W}.pool.shut.obj.depth, {S}.DEPTH.poolTank, {S}.DEPTH.poolWater, {W}.story.lever.frame.name]")
+    ok &= check(v[0] and not v[1] and v[2] and v[4] < v[3] < v[5] and v[6] == 0,
+                "the hatch (shut) and the drain's grate lie on the tank's floor under the water; the lever is armed", v)
+    ok &= check(0 < pool1["x1"] - hx < 200 and pool1["x0"] < L["drainX"] < pool1["x1"], "the hatch within view of the aft rim, the grate in the tank", (hx, L["drainX"], pool1))
+    v = js(b, f"[{W}.pool.shut.obj.alpha, {W}.pool.drain.obj.alpha, {W}.pool.shutWash.obj.alpha, {W}.pool.drainWash.obj.alpha, {W}.pool.shutWash.obj.visible, {W}.pool.drainWash.obj.visible]")
+    ok &= check(v[:2] == [1, 1] and min(v[2:4]) > 0.6 and v[4] and v[5], "under the water both are washed out toward the floor's tiles, not seen through", v)
+    line = f"{W}.movers.find(m => m.def && m.def.id === 'haz_line_10a')"
+    b.teleport(pool1["x1"] - 230, D11)
+    wait(0.5)
+    ok &= check(js(b, f"{line}.items.every(i => !i.visible)"), "from deck 11 the laundry line of the balcony under the pool is not shown")
     b.teleport(pool1["x1"] - 230, D11)
     wait(0.8)
     ok &= check(b.state()["mode"] == "swim", "the first pool fills the deck: she swims", b.state())
     hold_until(b, "right", lambda s: s["mode"] == "scripted", 6)
-    wait(2.2)
+    cat = f"{W}.story.poolCat.sprite"
+    ok &= check(wait_js(b, f"['her-swim-reach', 'her-swim-strain'].includes({S}.player.anims.currentAnim && {S}.player.anims.currentAnim.key)", 4),
+                "under him at the rim she looks up out of the water and reaches for him")
+    b.shot("region6-reach")
+    ok &= check(wait_js(b, f"{who('npc_kid_tub')}.sprite.y < {D11 - 5}", 5), "the kid stands up in the hot tub")
     b.shot("region6-beat")
-    ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14), "near-catch 5: the kid squirts him, he falls in, climbs out over the lever and is gone aft", flags(b))
-    ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.texture.key") == "lever-down", "the drain's lever is down")
+    ok &= check(wait_js(b, f"{cat}.visible && {cat}.depth < {S}.DEPTH.swimmer && {cat}.y > {D11 + 8} && {cat}.x < {pool1['x1']}", 5),
+                "squirted into the pool, Bumbot paddles back for the rim, his legs under the water")
+    ok &= check(wait_js(b, f"{W}.story.lever.frame.name > 0 && Math.abs({cat}.x - {L['leverX']}) < 40 && {cat}.y < {D11 - 20}", 6),
+                "out, shaken dry, and up onto the lever's grip: it goes over under him")
+    b.shot("region6-lever")
+    ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14), "near-catch 5: thrown across the hot tub, he is gone aft", flags(b))
+    last = js(b, f"{W}.story.leverLay.frames") - 1
+    ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.frame.name") == last, "the drain's lever is thrown")
+    ok &= check(wait_js(b, f"{S}.pools.length === 3 && {S}.pools[0].y > {D11 + 8}", 4), "the water sinks", js(b, f"{S}.pools.map(p => p.y)"))
+    ok &= check(js(b, f"{W}.pool.puddles.obj.alpha") == 0, "no puddles yet: they show only as the last of it goes", js(b, f"{W}.pool.puddles.obj.alpha"))
     ok &= check(b.state()["mode"] == "swim", "she is still in the water as it starts to sink", b.state())
     ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())
+    wait(0.2)
+    ok &= check(js(b, f"{S}.herDropPx()") == 6, "her picture 5 px lower there, on the floor's strip of tiles", js(b, f"{S}.herDropPx()"))
+    # (Her feet find the floor while the last of the water is still going.)
+    ok &= check(wait_js(b, f"!{W}.pool.shutWash.obj.visible && !{W}.pool.drainWash.obj.visible && {W}.pool.shut.obj.alpha === 1", 5), "the last water gone, the hatch and the grate are clear")
     b.shot("region6-drained")
     ok &= check(not person(b, "npc_kid_tub")["on"] and person(b, "npc_kid")["on"], "the kid has left the hot tub for the aft pool deck")
     # The hatch in the tank's floor; deck 10's hallway: the trays outside a "Do Not Disturb" door.
-    hx = js(b, f"{W}.data.hatchPool.x")
-    b.teleport(hx, D11 + 32)
+    b.teleport(hx - 40, D11 + 32)
     wait(0.3)
+    hold_until(b, "right", lambda s: abs(s["x"] - hx) < 12, 3)
+    wait(0.2)
+    ok &= check("thing:hatch_pool" in js(b, f"JSON.stringify({S}.highlight.state())"), "at the hatch it pulses", js(b, f"JSON.stringify({S}.highlight.state())"))
     b.tap("e")
-    wait(1.6)
-    s = b.state()
-    ok &= check(s["y"] == D10 and abs(s["x"] - hx) < 4, "the hatch drops her into deck 10's hallway", s)
+    ok &= check(wait_js(b, f"{W}.pool.back.obj.visible && !{W}.pool.shut.obj.visible && {S}.save.flags.includes('pool_hatch')", 3),
+                "E: she heaves its lid up against the tank's wall")
+    ok &= check(wait_js(b, f"{S}.player.isCropped && {S}.player.y > {D11 + 40} && {W}.pool.lip.obj.depth > {S}.player.depth && {W}.pool.back.obj.depth < {S}.player.depth", 4),
+                "and goes down its ladder: before the lid, behind the hatch's near edge")
+    b.shot("region6-hatch")
+    s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] == D10, 8)
+    ok &= check(s["y"] == D10 and abs(s["x"] - hx) < 4 and js(b, f"{W}.pool.ceilOpen.visible && !{W}.pool.ceilShut.visible && !{S}.player.isCropped && {S}.herDropPx() === 1"),
+                "out of the hallway's ceiling panel, onto deck 10's carpet, her picture where it always is", s)
     trays = js(b, f"{W}.data.ents.find(e => e.kind === 'trays')")
     # (2026-11-18: one tray, run onto, ridden off down the hallway (3); the door opens after on the
     # guest looking after her.)
@@ -3744,7 +3781,8 @@ def scenario_region6(b):
     s = b.state()
     ok &= check(s["y"] == D11 - 90, "a kick off the canopy's post takes her up onto its roof", s)
     b.shot("region6-canopy")
-    hold_until(b, "right" if s["x"] < L["tubX"] else "left", lambda s: abs(s["x"] - L["tubX"]) < 6, 3)
+    fruit = exact_x(132.5)       # (the tangerine on the canopy: `tan_11_canopy`)
+    hold_until(b, "right" if s["x"] < fruit else "left", lambda s: abs(s["x"] - fruit) < 6, 3)
     wait(0.2)
     ok &= check(len(save_list(b, "collected")) == had + 1, "and to the tangerine on it")
     # The hot tub.
@@ -6292,6 +6330,26 @@ def scenario_region3__lookout(b):
     wait(1.5)
     v = b.eval(f"[{S}.player.y, JSON.stringify({S}.world.lookOpen), {S}.shellAlpha[6], {S}.shellAlpha[7]]")
     ok &= check(v[0] == D6 and v[1] == "{}" and v[2] == 0 and v[3] == 1, "landed: the stage hers, deck 7 closed again", v)
+    return ok
+
+
+def scenario_region6__deck(b):
+    """Near-catch 5 from the deck between the pools (docs/pool-remake-log.md): she dives at him, he hops over her dive,
+    and she is in the pool under him; the scene goes on from there as from the water."""
+    S, W = "window.__ship", "window.__ship.world"
+    b.open("?reset&play&at=pool&cards=all")
+    wait(0.4)
+    L = js(b, f"{W}.data.lido")
+    rim = L["pools"][0]["x1"]
+    b.eval(f"{W}.story.poolCat.gone = true")
+    b.teleport(L["leverX"] + 40, D11)
+    b.eval(f"{W}.story.poolCat.gone = false")
+    ok = check(wait_js(b, f"{S}.mode === 'scripted'", 2), "on the deck beside him: the scene starts")
+    ok &= check(wait_js(b, f"{S}.player.depth === {S}.DEPTH.swimmer && {S}.player.x < {rim}", 5), "her dive at him ends in the pool", b.state())
+    ok &= check(wait_js(b, f"{W}.story.poolCat.sprite.y === {D11} && Math.abs({S}.player.x - {rim - 23}) < 2", 4),
+                "he is back at the rim where he sat, she in the water under him", b.state())
+    ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14) and b.state()["mode"] == "swim", "and the rest as from the water: she is swimming as the pool drains", b.state())
+    ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())
     return ok
 
 

@@ -441,7 +441,7 @@ PEOPLE = {
     "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
                           cover=[("treadmill-lt", 86.6, 0)]),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
-    "npc_kid_tub": dict(hear="own", at=(11, 132.5), who="kid", face=-1, layer="behind", until="flag:bb5"),
+    "npc_kid_tub": dict(hear="own", at=(11, 132.96), who="kid", face=-1, layer="behind", until="flag:bb5"),
     "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
                     bubble=("softserve", "!flag:kid_fed", None, 5)),
     "riv_loungers": dict(at=(11, 143.95), who="rival", face=1, idle="peek", layer="back", after="region:6", until="region:8"),
@@ -622,7 +622,7 @@ PROPS = {
     "prop_yoga_rack": (11, 95.75, "yoga-rack", 0, {}),
     "amb_sun_1": (11, 115.9, "thing:sunbather-1", 0, dict(back=True)),
     "amb_sun_2": (11, 117.6, "thing:sunbather-2", 0, dict(back=True)),
-    "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -12, dict(back=True, flip=True)),
+    "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -15, dict(back=True, flip=True)),
     "prop_pool_hut": (11, 140.6, "@pool-hut", 0, dict(back=True)),
     "sign_wet_11": (11, 150.55, "wet-floor-sign-bg", 0, dict(back=True)),
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
@@ -887,8 +887,12 @@ PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90),
 # The pool's beat (`bb5`, src/world/lido.js): the drain lever's housing on the first pool's aft rim,
 # the ladder Bumbot comes out by, the hot tub the kid squirts from, the kid's beat on the aft pool
 # deck after (from m, to m), the lounger the security officer peers under, the chess set.
-LIDO = dict(deck=11, lever=131.68, ladder=130.5, tub=132.5, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
-            machine=214.6, husband=219.52, table=220.0)
+# (The pool's scene remade, the user, 2026-11-24, docs/pool-remake-log.md: the hot tub 22 px further aft, so that the
+# drain's lever has room to be thrown over toward it; `lever`, where its stand is bolted to the deck; `drain`, the grate
+# in the tank's floor at its aft end, where the water goes; `hatch`, the maintenance hatch in the tank's floor, near
+# enough to the aft rim to be in view as the water leaves it, and clear of the tray on deck 10's floor under it.)
+LIDO = dict(deck=11, lever=131.73, ladder=130.5, tub=132.96, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
+            machine=214.6, husband=219.52, table=220.0, drain=129.8125, hatch=128.5)
 # A wet patch she slides on without the socks, the pool shower over it running, and a deck chair that
 # stands at its aft end, its front legs in the puddle (`haz_wet`, `haz_deckchair`): id: (deck, from m,
 # to m, where the chair stands (m)). (The chair stands still since 2026-11-19, the user: one sliding

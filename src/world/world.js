@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS, SHAFT } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS, SHAFT, POOL } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -1752,11 +1752,7 @@ export class World {
     // room's chute.
     buildSpecials() {
         const s = this.scene, D = s.DEPTH;
-        const h = this.data.hatchPool;
-        const lid = s.add.image(h.x, h.y + 32, 'hatch-lid').setOrigin(0.5, 1).setDepth(D.poolTank + 0.005);
-        this.add([lid]);
-        this.things.push({ id: 'hatch_pool', x: h.x, y: h.y + 32, route: 'inside', needs: 'drain', items: [lid], reach: 16,
-            interact: () => { sfx.hatch(); s.travel(h.x, h.y + 32 + 16 + PLAYER.bodyHeight + 2, 'inside', null, 10); return true; } });
+        this.buildPoolPieces();
         const linen = this.rooms.linen;
         if (linen) {
             // (Her own cabin's door is a checkpoint: population §2.5, `cp_8206`.)
@@ -1772,6 +1768,186 @@ export class World {
             this.things.push({ id: 'chute', x: this.data.linen.chuteX, y: linen.floor, route: 'linen', items: [], reach: 16,
                 interact: () => this.story.chute() });
         }
+    }
+
+    // A map piece by its name (without its wash's suffix), where it stands.
+    mapPiece(name, x, y, reach = 40) {
+        return this.mapPieces(name, y).find(o => Math.abs(o.x - x) < reach) ?? null;
+    }
+
+    // Every map piece of a name standing by a deck's floor line.
+    mapPieces(name, y) {
+        const found = [];
+        const walk = list => {
+            for (const o of list) {
+                if (o.list) walk(o.list);
+                else if (o.texture?.key === 'shipart' && String(o.frame.name).replace(/-(bg|w20|lt)$/, '') === name && Math.abs(o.y - y) < 48) found.push(o);
+            }
+        };
+        walk(this.scene.children.list);
+        return found;
+    }
+
+    // The first pool's own pieces (tools/build_pool.py, docs/pool-remake-log.md; the user, 2026-11-24: "The opening on
+    // the pool floor I couldn't find at all"). On the tank's wall and floor, under the water and seen through it from the
+    // start: the ladder on down to the floor (the map's ladder ends at the water), the drain's grate at the aft end,
+    // where the water goes, and the maintenance hatch in the floor, seen a little from above as the floor's own strip
+    // of tiles is, near enough to the aft rim to be in view as the water leaves it. Open, its lid stands up behind
+    // her against the tank's wall and its near edge is drawn over her as she goes down its ladder. Under it, in deck
+    // 10's hallway's ceiling, the panel she drops out of, hanging open after.
+    buildPoolPieces() {
+        const s = this.scene, D = s.DEPTH, h = this.data.hatchPool, lido = this.data.lido, L = s.cache.json.get('pool-layout');
+        const tank = lido.tankY, under = D.poolTank + 0.004;
+        this.poolPieces = [];
+        const piece = (key, x, y, depth, want = true) => {
+            const obj = s.add.image(x, y, key).setOrigin(0).setDepth(depth);
+            this.add([obj]);
+            const e = { obj, want, deck: lido.deck ?? 11 };
+            this.poolPieces.push(e);
+            return e;
+        };
+        const P = this.pool = { x: h.x, tank, lipY: tank + L['hatch-lip'][1] + 1, ceilY: h.toY - POOL.ceiling };
+        // (Every ladder of the deck's two pools: the second pool's shows through its water.)
+        for (const lad of this.mapPieces('pool-ladder', lido.y)) {
+            piece('pool-ladder-low', lad.x, lido.y + L['ladder-low'].dy, under).obj.setOrigin(lad.originX, 0).setFlipX(lad.flipX);
+        }
+        P.drain = piece('pool-drain', lido.drainX + L.drain.dx, tank + L.drain.dy, under);
+        P.shut = piece('pool-hatch-shut', h.x + L['hatch-shut'][0], tank + L['hatch-shut'][1], under);
+        // (Under the water the two are washed out, not seen through: over each a copy of itself filled with the floor's
+        // own pale tile colour, as the ship's washes are made. Made half transparent, the floor's tile lines showed
+        // through them: the user, 2026-11-24, "they cannot show a pool's floor through them".)
+        const wash = e => {
+            const w = piece(e.obj.texture.key, e.obj.x, e.obj.y, under + 0.0005);
+            w.obj.setTint(POOL.floorTile).setTintMode(Phaser.TintModes.FILL);
+            return w;
+        };
+        P.shutWash = wash(P.shut);
+        P.drainWash = wash(P.drain);
+        P.back = piece('pool-hatch-back', h.x + L['hatch-back'][0], tank + L['hatch-back'][1], under, false);
+        P.lip = piece('pool-hatch-lip', h.x + L['hatch-lip'][0], tank + L['hatch-lip'][1], D.player + 0.03, false);
+        // (The wall wet above the sinking water, and the puddles it leaves on the floor: drawn by `drainPool`.)
+        for (const k of ['wet', 'puddles']) {
+            const obj = s.add.graphics().setDepth(D.poolTank + (k === 'wet' ? 0.002 : 0.003));
+            this.add([obj]);
+            P[k] = { obj, want: true, deck: lido.deck ?? 11 };
+            this.poolPieces.push(P[k]);
+        }
+        const ceil = key => {
+            const obj = s.add.image(h.x + L[key][0], P.ceilY + L[key][1], `pool-${key}`).setOrigin(0).setDepth(D.decor + 0.3);
+            this.add([obj]);
+            return obj;
+        };
+        P.ceilShut = ceil('ceiling-shut');
+        P.ceilOpen = ceil('ceiling-open');
+        this.things.push({ id: 'hatch_pool', x: h.x, y: tank, route: 'inside', needs: 'drain', items: [], reach: 18,
+            interact: () => this.hatchDown() });
+        // (Under the water the hatch and the grate hardly show; clear as it goes: `drainPool`.)
+        this.poolClear(0);
+    }
+
+    // How clear the hatch and the drain's grate are: 0 under the water (washed out toward the floor's tiles, `POOL.under`
+    // of themselves left), 1 in the dry tank (no wash: its copies put away, so that only the hatch itself pulses).
+    poolClear(k) {
+        const P = this.pool, a = (1 - POOL.under) * (1 - k);
+        this.poolWash = a;
+        for (const w of [P.shutWash, P.drainWash]) w.obj.setAlpha(a);
+        this.poolHatch();
+    }
+
+    // In the first pool's dry tank her picture is drawn `POOL.floor` px lower than her body, on the floor's strip of
+    // tiles; eased in over the last px of her way down into it, and out as she jumps out of it.
+    tankDrop(p) {
+        const s = this.scene, lido = this.data.lido, pool = lido.pools[0];
+        if (!this.progress.has('drain') || s.route !== 'inside' || s.pools.some(w => w.x0 === pool.x0 && w.deck === (lido.deck ?? 11))) return 0;
+        if (p.x < pool.x0 - 8 || p.x > pool.x1 + 8 || p.y > lido.tankY + 4) return 0;
+        return Math.round(POOL.floor * Phaser.Math.Clamp((p.y - lido.y - 8) / 12, 0, 1));
+    }
+
+    // The hatch and the panel under it as they stand: shut until she has opened it (`pool_hatch`).
+    poolHatch() {
+        const P = this.pool, open = this.progress.has('pool_hatch');
+        if (!P) return;
+        P.shut.want = !open;
+        P.shutWash.want = !open && this.poolWash > 0.001;
+        P.drainWash.want = this.poolWash > 0.001;
+        P.back.want = P.lip.want = open;
+        P.ceilShut.setVisible(!open);
+        P.ceilOpen.setVisible(open);
+        this.scene.poolsHidden = null;      // (the ship scene shows the tank's pieces again, by what is wanted)
+    }
+
+    // E at the hatch in the drained tank. The first time she steps beside it, bends to its ring and heaves the lid up
+    // against the wall. Then onto its ladder, her back to us, and down: in front of the lid, behind the hatch's near
+    // edge. Under the tank she comes out of the hallway's ceiling panel and drops to deck 10's carpet (one way).
+    hatchDown() {
+        const s = this.scene, p = s.player, h = this.data.hatchPool, P = this.pool, G = this.progress, cell = PLAYER.cell;
+        const lidoDeck = this.data.lido.deck ?? 11;
+        if (this.carry) return false;
+        this.cut(async () => {
+            p.body.enable = false;
+            // (The pool deck stays in view until she is out of sight in the hatch: by her height alone the cut-away
+            // would open deck 10 while she is still on the ladder.)
+            s.viewOverride = lidoDeck;
+            const walk = async x => {
+                if (Math.abs(x - p.x) < 1) return;
+                p.setFlipX(x < p.x);
+                s.pose('run', 0.6);
+                await this.tween({ targets: p, x, duration: Math.abs(x - p.x) * 9 + 40 });
+            };
+            if (!G.has('pool_hatch')) {
+                const side = p.x <= h.x ? -1 : 1;
+                await walk(h.x + side * POOL.hatch.beside);
+                p.setFlipX(side > 0);
+                if (s.anims.exists('her-reach')) {
+                    p.anims.play('her-reach');
+                    await this.wait(380);
+                } else s.pose('stand');
+                sfx.at(h.x, P.tank).hatch();
+                rumble('bolt');
+                G.setFlag('pool_hatch');
+                this.poolHatch();
+                await this.wait(320);
+            }
+            await walk(h.x);
+            // Down the ladder: her picture's rows under the hatch's near edge are in the opening, not drawn.
+            s.pose('back');
+            if (s.anims.exists('her-climb')) p.anims.play('her-climb', true);
+            const down = () => {
+                const top = p.y + s.herDropPx() - cell;
+                p.setCrop(0, 0, cell, Phaser.Math.Clamp(P.lipY - top, 0, cell));
+            };
+            sfx.at(h.x, P.tank).rung();
+            await this.tween({ targets: p, y: P.tank + POOL.hatch.down, duration: POOL.hatch.downMs, onUpdate: down });
+            // Out of the ceiling under it: deck 10 from here on. Its side opens first, she out of sight in the tank's
+            // floor meanwhile (drawn at once, her legs hung over the closed hull for a moment).
+            p.setVisible(false);
+            s.herDrop(0);
+            s.viewDeck = s.viewOverride = lidoDeck - 1;
+            s.dimHeld = true;
+            await this.wait(POOL.hatch.through);
+            p.setVisible(true);
+            s.pose('fall');
+            const ceiling = P.ceilY + 2;
+            const out = () => {
+                const hidden = Phaser.Math.Clamp(ceiling - (p.y + PLAYER.sink - cell), 0, cell);
+                p.setCrop(0, hidden, cell, cell - hidden);
+            };
+            p.setPosition(h.x, ceiling + POOL.out);
+            out();
+            sfx.at(h.x, ceiling).hatch();
+            const fall = h.toY - p.y;
+            await this.tween({ targets: p, y: h.toY, duration: Math.sqrt(2 * fall / PLAYER.gravity) * 1000, ease: 'Quad.easeIn', onUpdate: out });
+            p.setCrop();
+            s.viewOverride = null;
+            s.dimHeld = false;
+            p.body.enable = true;
+            p.body.reset(h.x, h.toY);
+            s.takeoffY = h.toY;
+            s.grounded = false;
+            s.pose('stand');
+            sfx.at(h.x, h.toY).land('carpet');
+        });
+        return true;
     }
 
     updateSpecials(time) {
@@ -2629,10 +2805,11 @@ export class World {
         this.refresh();
     }
 
-    // The first pool drains (population §6.7): its water goes, and with it the swimming; the hatch
-    // in the tank's floor shows.
+    // The first pool drains (population §6.7; remade 2026-11-24, docs/pool-remake-log.md): its water goes down the
+    // drain's grate at the tank's aft end, a funnel in its surface over the grate, and with it the swimming; the
+    // tank's wall is wet for a while where the water stood, and puddles lie on its floor.
     drainPool(atOnce) {
-        const s = this.scene, h = this.data.hatchPool;
+        const s = this.scene, h = this.data.hatchPool, lido = this.data.lido, P = this.pool;
         const pool = s.pools.find(w => h.x > w.x0 && h.x < w.x1 && w.deck === 11);
         if (!pool) return;
         const out = () => {
@@ -2649,35 +2826,83 @@ export class World {
             }
             [pool.water, pool.ripples].forEach(o => o.setVisible(false));
             pool.gurgle?.destroy();
+            this.poolClear(1);
         };
         if (atOnce) return out();
-        // Over five seconds its surface sinks to the tank's floor, and she sinks with it; a whirl
-        // of bubbles over the drain.
-        const top = pool.y, depth = pool.bottom - pool.y;
+        // (The water is drawn down to the wall's foot, a few px under the floor she stands on: `pool.foot`.)
+        const top = pool.y, foot = pool.foot ?? pool.bottom, depth = foot - pool.y, x0 = pool.x0, x1 = pool.x1, dx = lido.drainX;
         pool.gurgle = s.add.graphics().setDepth(s.DEPTH.poolWater + 0.02);
         this.add([pool.gurgle]);
-        sfx.at(h.x, top).drain(5);
+        sfx.at(dx, top).drain(POOL.drainMs / 1000);
         rumble('drain');
+        const wet = P.wet.obj, puddles = P.puddles.obj;
+        // (The puddles: where on the floor's strip, how wide, each a little later to go than the last.)
+        const spots = [[x1 - 150, 26], [x1 - 236, 18], [x1 - 318, 30], [x1 - 420, 20], [x0 + 60, 24], [dx + 2, 16]];
+        const drawPuddles = k => {
+            puddles.clear();
+            spots.forEach(([x, w], i) => {
+                const left = Phaser.Math.Clamp(1.15 - k - i * 0.03, 0, 1), half = Math.round(w / 2 * Math.min(1, left * 1.6));
+                if (half < 2) return;
+                // (On the floor's face, as if seen a little from above: a darker rim, a glint. The wet patch's look.)
+                puddles.fillStyle(0x4d9be6, 0.75).fillRect(x - half, pool.bottom + 5, half * 2, 3);
+                puddles.fillStyle(0x4d9be6, 0.75).fillRect(x - half + 2, pool.bottom + 4, half * 2 - 4, 5);
+                puddles.fillStyle(0xffffff, 0.8).fillRect(x - half + 3, pool.bottom + 5, Math.max(1, Math.round(half / 3)), 1);
+            });
+        };
         s.tweens.addCounter({
-            from: 0, to: 1, duration: 5000,
+            from: 0, to: 1, duration: POOL.drainMs,
             onUpdate: tw => {
-                const k = tw.getValue(), y = top + depth * k;
+                // (A slow start, as the valve opens; then steadily down.)
+                const k = tw.getValue(), e = k < 0.15 ? (k / 0.15) ** 2 * 0.05 : 0.05 + (k - 0.15) / 0.85 * 0.95;
+                const y = top + depth * e, left = foot - y;
                 pool.y = y;
-                pool.water.clear().fillStyle(0x4d9be6, 0.55).fillRect(pool.x0, y, pool.x1 - pool.x0, pool.bottom - y);
-                pool.water.fillStyle(0x8fd3ff, 0.9).fillRect(pool.x0, y, pool.x1 - pool.x0, 1);
-                pool.ripples.y = y + 1;
-                const g = pool.gurgle.clear(), t = s.time.now;
-                for (let i = 0; i < 5; i++) {
-                    const a = t / 140 + i * 1.26, r = 9 - i * 1.4;
-                    g.fillStyle(0xffffff, 0.8).fillRect(h.x + Math.cos(a) * r, Math.min(pool.bottom - 2, y + 2 + i), 2, 1);
+                // The water, its surface drawn down into a funnel over the grate.
+                const dip = Math.min(left, 3 + 9 * Math.sin(Math.PI * Math.min(1, k * 1.25))), half = 7 + dip * 1.3;
+                const g = pool.water.clear().fillStyle(0x4d9be6, 0.55);
+                g.fillPoints([{ x: x0, y }, { x: dx - half, y }, { x: dx, y: y + dip }, { x: dx + half, y }, { x: x1, y },
+                    { x: x1, y: foot }, { x: x0, y: foot }], true);
+                g.fillStyle(0x8fd3ff, 0.9).fillRect(x0, y, dx - half - x0, 1).fillRect(dx + half, y, x1 - dx - half, 1);
+                for (let i = 0; i <= dip; i++) {
+                    const off = Math.round(half * (1 - i / Math.max(1, dip)));
+                    g.fillRect(dx - off, y + i, 1, 1).fillRect(dx + off, y + i, 1, 1);
                 }
+                pool.ripples.y = y + 1;
+                pool.ripples.setAlpha(0.5 * (1 - k));
+                // The whirl in it, and bubbles coming up over the grate.
+                const w = pool.gurgle.clear(), t = s.time.now;
+                for (let i = 0; i < 6; i++) {
+                    const a = t / 90 + i * 1.05, r = half * (1 - i / 6.5);
+                    w.fillStyle(0xffffff, 0.85).fillRect(Math.round(dx + Math.cos(a) * r), Math.round(y + (i / 6) * dip), 2, 1);
+                }
+                for (let i = 0; i < 4; i++) {
+                    const f = ((t / 420 + i * 0.27) % 1), by = foot - 2 - f * Math.max(0, left - dip - 2);
+                    if (left > 6) w.fillStyle(0xc7e7ff, 0.9 * (1 - f)).fillRect(Math.round(dx + Math.sin(i * 2.3 + t / 300) * 5), Math.round(by), 1, 1);
+                }
+                // The wall above the water, wet; drops run down it.
+                wet.clear().fillStyle(0x1a2a5c, 0.2).fillRect(x0, top, x1 - x0, y - top);
+                for (let i = 0; i < 9; i++) {
+                    const x = x0 + 30 + i * ((x1 - x0 - 60) / 8) + (i % 3) * 7, f = ((t / 900 + i * 0.37) % 1);
+                    const yy = top + f * (y - top);
+                    if (y - top > 6) wet.fillStyle(0xc7e7ff, 0.75 * (1 - f)).fillRect(Math.round(x), Math.round(yy), 1, 2);
+                }
+                // (The puddles only as the last of the water goes: under it they lay on the floor from the start.)
+                puddles.setAlpha(Phaser.Math.Clamp((k - POOL.puddlesFrom) / (1 - POOL.puddlesFrom), 0, 1));
+                if (k >= POOL.puddlesFrom) drawPuddles(0);
+                else puddles.clear();
+                this.poolClear(e);
                 if (s.mode === 'swim' && s.pool === pool) {
                     // (Too shallow to swim: her feet find the floor.)
                     if (pool.bottom - y < 16) out();
                     else s.player.y = Math.min(y + SWIM.float, pool.bottom);
                 }
             },
-            onComplete: out,
+            onComplete: () => {
+                out();
+                // (The wall dries; the puddles go, the one over the grate last.)
+                s.tweens.addCounter({ from: 0, to: 1, duration: POOL.wetMs, onUpdate: tw => wet.setAlpha(1 - tw.getValue()), onComplete: () => wet.clear().setAlpha(1) });
+                puddles.setAlpha(1);
+                s.tweens.addCounter({ from: 0, to: 1.15, duration: POOL.puddleMs, onUpdate: tw => drawPuddles(tw.getValue()), onComplete: () => puddles.clear() });
+            },
         });
     }
 

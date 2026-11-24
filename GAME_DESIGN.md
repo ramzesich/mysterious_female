@@ -1291,19 +1291,34 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 - **Grip socks:** on the rack by the yoga mats in the gym (a glyph: jump at a wall). From now she
   wall-jumps: up the atrium's pillars from deck 5 to 10 in the open shaft; up the stern tiers outside;
   up the balcony partitions; off deck 12's end wall. Wet tiles no longer slide her.
-- **Bumbot:** **fishing at the pool's edge** (batting at the water); the kid squirts him; he falls in
-  (a splash), scrambles up the pool ladder onto the drain's lever, shakes himself (a new clip) and bolts
-  aft. The lever drops: **the pool drains** over five seconds, gurgling, and **a maintenance hatch
-  shows in the tank's floor**: E and she drops into deck 10's corridor at 135 m (one-way); its lobby
+- **Bumbot:** **fishing at the pool's edge** (batting at the water). **The scene as remade (the user, 2026-11-24;
+  the whole record: `docs/pool-remake-log.md`):** she swims to the rim under him, looks up out of the water and
+  stretches an arm up after him (her own generated clip, `swim-reach`), her hand a few px short of him; the kid stands
+  up in the hot tub behind him (he is in it, behind its near wall, his cap peeking over it before) and squirts him in
+  the back with his water pistol (light green with blue lines: golden, it was "hard to distinguish from his ice
+  cream"); out over her head he goes and into the water behind her, in sight under it, tinted as she is; he paddles
+  back past her to the rim, hops out, shakes himself dry, and is away aft by the nearest high thing: up onto the grip
+  of **the drain's lever** (a generated valve on a stand, knee-high, by the rim), which goes over under him toward
+  the hot tub and throws him across it; he runs off along the second pool's far side (~~wet prints after him, heading
+  aft, on the planks~~: dropped in the merge, the user, 2026-11-24, every print of his goes). **The pool drains** over five seconds down a grate in the tank's floor at its aft end: a funnel
+  in its surface, the tank's wall wet above it, puddles as the last of it goes. **A maintenance hatch lies on the
+  tank's floor**, seen a little from above, 2.5 m from the aft rim (128.5 m): there from the start, washed out under
+  the water, in view as the water leaves her. E: she bends to its ring and heaves the lid up against the tank's
+  wall, goes down its ladder (before the lid, behind the hatch's near edge), and drops out of a ceiling panel in
+  deck 10's hallway (one-way, no fade); its lobby
   doors open from inside, so deck 10 midships is the first hallway, the early taste of region 7.
+  In the dry tank her picture is drawn 5 px lower than her body, on the floor's strip of pale tiles; the pools' water
+  is drawn down to the foot of the tank's wall; the pool ladders reach the tanks' floors; deck 10's laundry line is
+  not shown from deck 11.
   **The hatch is the only way into that hallway** (checked 2026-11-23): its lobby doors are shut from the lobbies'
   side until she has walked out through each, and none of its balcony doors is ajar. So everything in it hangs on
   this beat: delivery 2 (the tea, book 13), its hazards and its tangerines. Not on the way to the finale, but not a
   mere shortcut either. The lifts stop at deck 10's lobbies from region 4 on, at the hallway's shut doors.
   **The kid hangs on it too:** he stays in the hot tub until the beat and patrols the aft pool deck only after it, so
   his cone errand and the machine's chain after it start there.
-  **Near-catch 5** is at the pool's edge before he falls: she lunges, he leaps, she topples into the
-  pool (a splash, a swim out, no scare).
+  **Near-catch 5** is at the pool's edge before he falls: from the deck beside him she dives at him flat, he hops
+  over her dive and comes down where he sat, and she is in the pool (a splash, no scare); she comes up under him
+  and the scene goes on as from the water.
 - **The Great Outdoors' entrance, his place:** **her husband** (the user; his sprite from his photo,
   as hers was) sits at the first table by the self-service station, in holiday clothes, a cone in
   hand, looking at the wake. **The ice cream machine** is worked by her (§6.1.2: the swirl). The first
@@ -1621,7 +1636,7 @@ background glimpses of §4 (a tail round a corner, a shape past a window) go on.
 | 3 | The stage | Washing in the spotlight (`washing`) | Near-catch 3, the rival trips | Up a fly rope to the lighting bridge (new clip: hanging on a rope) |
 | 4 | The linen room | Asleep on the bottle shelf (`asleep`; in the towels until 2026-11-23) | Near-catch 4: off as she or the cart all but touches him | Into the shaft's mouth, its cover knocked off (a squeeze); nothing of him in the shaft after |
 | 5 | Deck 8's forward lobby | | A glimpse | A tail up the stairs |
-| 6 | The pool's edge | Fishing (`batting` over the rim) | Near-catch 5; the kid squirts him | Into the pool, up the ladder (new clip: the wet shake), the drain lever |
+| 6 | The pool's edge | Fishing (`batting` over the rim) | Near-catch 5; the kid squirts him | Into the pool over her head, a paddle back to the rim, out, the wet shake, up onto the drain lever's grip, thrown across the hot tub |
 | 7 | A balcony rail | Swiping at a gull (`batting`) | A glimpse | Inside; his door is ajar |
 | 8 | The funnel's lattice | Sitting | A glimpse; the horn | Down the lattice, forward along the roof |
 | 9 | The bridge's console | Sitting, then a run across it | Near-catch 6; the rival's net hits the alarm | Up the hatch's ladder |
@@ -2738,7 +2753,13 @@ a duct's end seen from the side, level with the cart's rim, its near side drawn 
 behind the wall; the shaft at its true place and length in the slab between decks 9 and 8, black round it, six grilles
 each over a landmark of deck 8 (the lift halls' DECK 8 plaques, the stairs' exit signs, the atrium's lift and staircase,
 the party's door), each opening its view only while she is over it; the last grille giving way; nothing of Bumbot in it.
-92 generations (`tools/build_shaft.py`). **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+92 generations (`tools/build_shaft.py`). **The pool's scene remade (2026-11-24, the user's, by the design session in
+a worktree of its own; the whole record is `docs/pool-remake-log.md`; §9's U17 closed by it):** the kid in the hot tub
+and his pistol green; Bumbot over her head into the pool, in sight under the water, back to the rim, onto the drain
+lever's grip, thrown across the tub; her reach up out of the water (a generated clip); the lever a generated valve,
+knee-high; the water down a grate, a funnel in its surface; the hatch on the tank's floor in view, its lid heaved up,
+its ladder, a ceiling panel on deck 10, no fade; her picture 5 px lower in the dry tank; the water to the wall's foot;
+the ladders to the floor; the prints heading aft. 60 generations (`tools/build_pool.py`). **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

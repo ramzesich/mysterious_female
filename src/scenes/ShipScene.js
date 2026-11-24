@@ -64,6 +64,9 @@ const lookDim = a => 1 - (1 - ROOM_DIM) * (1 - a) / (1 - ROOM_DIM + a * ROOM_DIM
 const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
 const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
 const WALK_LIFT = 2;
+// A pool's tank: its wall's foot, px under the pool's floor (the tank's tiles are drawn in rows of 8 from 4 px under the
+// deck: `poolTanks`); the water is drawn down to it.
+const TANK_FOOT = 4;
 // Her climb into the lifeboat's roof hatch (`roofSteps`): the hatch's far rim and near lip, px over the walkway's floor
 // (tools/build_hatch.py's pieces: the boat's rows 26 and 37, its floor at 120); each frame's ms (her front frame and her
 // back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
@@ -448,7 +451,9 @@ export class ShipScene extends Phaser.Scene {
         // (the user, 2026-11-08).
         const open = this.viewDeck !== null
             && !this.exteriorLayer.getTileAt(Math.floor(p.x / 16), this.deckFloors[Math.round(this.viewDeck)] - 4);
-        const on = this.route === 'inside' && this.viewDeck !== null && !open && this.viewOverride == null ? 1 : 0;
+        // (`dimHeld`: a scripted way from one deck into another that holds the view by `viewOverride` and is still hers:
+        // down the pool's hatch, the decks dimmed as they are for her.)
+        const on = this.route === 'inside' && this.viewDeck !== null && !open && (this.viewOverride == null || this.dimHeld) ? 1 : 0;
         const smooth = dt > 0 && this.route === 'inside';
         // (`dimOverride`: the intro brings the dark on with the opening of deck 3's side.)
         d.shown = this.dimOverride != null ? this.dimOverride : smooth ? approach(d.shown, on, dt * 6) : on;
@@ -457,7 +462,9 @@ export class ShipScene extends Phaser.Scene {
             // (Her head counts in the deck above only past its floor, not in the ceiling under it:
             // jumping on deck 4's climb shelf, her head touched the ceiling and deck 5's dim lifted
             // and came back each jump, the user, 2026-11-17. A piece reaches 16 px under its floor.)
-            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16;
+            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16
+                // (Dropping out of the pool's hatch her head is still at the deck above's height: that deck is not hers.)
+                && (!this.dimHeld || c.keys.some(k => parseInt(k, 10) === Math.round(this.viewDeck)));
             // (A deck a look-out opens is dimmed as its hull still shows, hers or not, so that the hull and its dim fade
             // together: `world.lookOpen`, the cut-away.)
             const look = this.world?.lookOpen, looked = look && c.keys.some(k => look[k]);
@@ -2678,11 +2685,14 @@ export class ShipScene extends Phaser.Scene {
 
     buildPool(o, deck) {
         const water = this.add.graphics().setDepth(DEPTH.poolWater);
-        water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
+        // (Drawn down to the foot of the tank's wall, `TANK_FOOT` px under the pool's own floor: the wall's last row of
+        // tiles ends there, and a strip of it showed dry under the water: the user, 2026-11-24, "The water in the pool
+        // isn't all the way down".)
+        water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height + TANK_FOOT);
         water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
         const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.poolWater + 0.01);
         this.worldLayer.add([water, ripples]);
-        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples, water, deck });
+        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, foot: o.y + o.height + TANK_FOOT, ripples, water, deck });
     }
 
     // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of
@@ -3775,6 +3785,8 @@ export class ShipScene extends Phaser.Scene {
             for (const t of this.poolTiles) t.alpha = this.underPools(t.poolDeck) ? 0 : 1;
             for (const [deck, g] of Object.entries(this.poolTanks)) g.setVisible(!this.underPools(Number(deck)));
             for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!this.underPools(pool.deck)));
+            // (What the world draws in a tank, the first pool's ladder, grate and hatch: `world.poolPieces`.)
+            for (const e of this.world?.poolPieces ?? []) e.obj.setVisible(e.want && !this.underPools(e.deck));
         }
         // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
         this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);
@@ -3840,6 +3852,10 @@ export class ShipScene extends Phaser.Scene {
             const px = this.herDropPx() - PLAYER.sink;
             if (onWalk && px !== -WALK_LIFT) this.herDrop(-WALK_LIFT);
             else if (!onWalk && px === -WALK_LIFT) this.herDrop(0);
+            // (And in the first pool's dry tank a few px lower, on its floor's strip of tiles: `world.tankDrop`.)
+            const tank = onWalk ? 0 : this.world.tankDrop?.(p) ?? 0;
+            if (!onWalk && (tank || this.tankDropped) && px !== tank) this.herDrop(tank);
+            this.tankDropped = tank > 0;
         }
         // On a balcony her picture is cut at its partitions and at a row's end (`balconyRoom`): what reached past
         // one showed on the next balcony or over the ship's side (the user, 2026-11-21). (Phaser 4 crops a picture

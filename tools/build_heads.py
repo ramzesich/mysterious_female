@@ -41,6 +41,11 @@ BUMBOT_BY_HAND = {("front", 0): (46.5, 43, 39), ("back", 0): (53, 44, 40)}      
 # stairway's rail in a gust (`cling-up`), her head bowed under her blown hair, the estimate swinging
 # 7 px frame to frame (a tail would flicker): held where its frames 3 and 4 have it.
 BY_HAND = {"her": {("cling-up", k): (48.8, 46.9, 37) for k in (5, 6, 7, 8)}}
+# (Her reach up out of the water, `swim-reach`: its first frame is her swim's first, with that frame's estimate; her
+# head then lifts and tips back about 5 px each way, by her hair's and her face's own pixels. Her raised hand is the
+# frames' top, not her head.)
+BY_HAND["her"].update({("swim-reach", 0): (61.6, 59.9, 51), ("swim-reach", 1): (60.6, 57.9, 49), ("swim-reach", 2): (58.6, 56.0, 47),
+                       **{("swim-reach", k): (57.5, 54.5, 46) for k in range(3, 9)}})
 # The people estimated: those with a wish (a popup over them) whose top rows are not their head.
 PEOPLE_ESTIMATED = {"steward"}
 # Her upright frames (standing to her full height, 54 px or more: standing, running, in the air) by

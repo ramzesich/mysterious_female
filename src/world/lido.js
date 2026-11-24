@@ -17,6 +17,13 @@ const SWIRL = { ms: 2400, none: 0.14, perfect: 0.58, over: 0.84, max: 1.08, asid
 // The kiss at his table: her place from his middle (px), how many hearts, ms between them.
 const KISS = { dx: 6, hearts: 7, every: 450 };
 const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 480, hide: 10000, fruit: 15000 };
+// Near-catch 5's scene (docs/pool-remake-log.md). The hot tub: the rows of its picture from `rim` down are its near
+// wall, drawn again in front of whoever is in it; the kid stands in it `in` px over the deck, `duck` px lower right
+// down out of sight, `peek` px lower with his cap showing over the near rim; his pistol's muzzle from his feet.
+const TUB = { rim: 15, in: 12, duck: 34, peek: 24, muzzle: [-21, -27] };
+// Bumbot in it: how far into the pool from her he lands (px), how deep he swims (his feet under the surface, so that
+// his head and back show over it), how deep he goes as he plunges in (his feet, all of him under), his paddle (px/s), where his paws are from the lever's grip, how he is thrown.
+const CAT = { in: 44, swim: 12, under: 27, paddle: 52, paw: 2, over: 38, lands: 42, short: 5 };
 
 export const lido = {
     setupLido() {
@@ -31,10 +38,23 @@ export const lido = {
             cat.sprite.setFlipX(true);
         }
         this.poolCat = cat;
-        // The drain's lever on its housing, by the rim.
-        this.lever = s.add.image(L.leverX, L.y, P.has('drain') ? 'lever-down' : 'lever-up').setOrigin(0.5, 1).setDepth(D.props - 0.03);
-        // The kid's jets of water; the chess pawn she moves. (No wet paw prints after Bumbot since 2026-11-24: the user
-        // dropped his prints everywhere.)
+        // The drain's lever on its stand, by the rim (tools/build_pool.py: armed, its swing, thrown).
+        const lay = this.leverLay = s.cache.json.get('pool-layout').lever;
+        const strip = s.textures.get('pool-lever-strip');
+        for (let i = 0; i < lay.frames; i++) if (!strip.has(i)) strip.add(i, 0, i * lay.w, 0, lay.w, lay.h);
+        this.lever = s.add.image(L.leverX + lay.dx, L.y + lay.dy, 'pool-lever-strip', P.has('drain') ? lay.frames - 1 : 0).setOrigin(0)
+            .setDepth(D.props - 0.03);
+        // The kid is in the hot tub, not behind it: in front of its far rim and its water, behind its near wall (the
+        // tub's own picture drawn again from its near rim down).
+        const tubPic = w.mapPiece('hot-tub', L.tubX, L.y), kidIn = this.who('npc_kid_tub');
+        if (tubPic && kidIn) {
+            this.tubFront = s.add.image(tubPic.x, tubPic.y, 'shipart', tubPic.frame.name).setOrigin(tubPic.originX, tubPic.originY)
+                .setDepth(tubPic.depth + 0.004).setCrop(0, TUB.rim, tubPic.width, tubPic.height - TUB.rim);
+            w.add([this.tubFront]);
+            kidIn.sprite.setDepth(tubPic.depth + 0.002).setY(this.tubBase());
+        }
+        // The kid's jets of water; the chess pawn she moves. (No wet paw prints after Bumbot: the user dropped his
+        // prints everywhere, 2026-11-24.)
         this.jetG = s.add.graphics().setDepth(D.player + 0.2);
         this.pawn = s.add.image(L.chessX + 14, L.y - 2, 'chess-pawn').setOrigin(0.5, 1).setDepth(D.decor + 0.3);
         if (this.P.save.seen.includes('sec_chess')) this.pawn.x += 16;
@@ -42,7 +62,26 @@ export const lido = {
         this.mLight = s.add.rectangle(L.machineX + 9, L.y - 39, 3, 2, 0x1ebc73).setDepth(D.decor + 0.3);
         this.mCone = s.add.graphics().setDepth(D.props + 0.04).setVisible(false);
         this.mMeter = s.add.graphics().setDepth(D.fx + 0.4).setVisible(false);
-        w.add([this.lever, this.jetG, this.pawn, this.mLight, this.mCone, this.mMeter]);
+        this.catG = s.add.graphics().setDepth(D.poolWater + 0.03);
+        // (His jump's frames carry a rise of their own: how far his lowest paw is over each frame's foot, so that a leap
+        // can be placed by his paws.)
+        this.jumpGap = {};
+        const jump = s.anims.get('bumbot-jump');
+        if (jump) {
+            const src = s.textures.get('bumbot').getSourceImage();
+            const cv = document.createElement('canvas'), cx = cv.getContext('2d', { willReadFrequently: true });
+            for (const { frame: f } of jump.frames) {
+                cv.width = f.cutWidth;
+                cv.height = f.cutHeight;
+                cx.clearRect(0, 0, cv.width, cv.height);
+                cx.drawImage(src, f.cutX, f.cutY, f.cutWidth, f.cutHeight, 0, 0, f.cutWidth, f.cutHeight);
+                const d = cx.getImageData(0, 0, cv.width, cv.height).data;
+                let last = cv.height - 1;
+                scan: for (; last > 0; last--) for (let x = 0; x < cv.width; x++) if (d[(last * cv.width + x) * 4 + 3] > 0) break scan;
+                this.jumpGap[f.name] = cv.height - 1 - last;
+            }
+        }
+        w.add([this.lever, this.jetG, this.catG, this.pawn, this.mLight, this.mCone, this.mMeter]);
         w.things.push({ id: 'src_icecream', x: L.machineX, y: L.y, route: 'inside', items: [], reach: 22, interact: () => this.machine() });
         w.things.push({ id: 'sec_chess', x: L.chessX, y: L.y, route: 'inside', items: [], reach: 26, interact: () => this.chess() });
         w.things.push({ id: 'sec_hottub', x: L.tubX, y: L.y, route: 'inside', needs: 'bb5', items: [], reach: 22, interact: () => this.hotTub() });
@@ -66,25 +105,6 @@ export const lido = {
             g.generateTexture(key, w, h);
             g.destroy();
         };
-        const housing = g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 14, 16, 12);
-            g.fillStyle(0x9babb2, 1).fillRect(1, 15, 14, 10);
-            g.fillStyle(0xf9c22b, 1).fillRect(1, 21, 14, 2);
-            g.fillStyle(0x2e222f, 1).fillRect(3, 21, 2, 2).fillRect(7, 21, 2, 2).fillRect(11, 21, 2, 2);
-            g.fillStyle(0x625565, 1).fillRect(6, 15, 4, 2);
-        };
-        make('lever-up', 16, 26, g => {
-            housing(g);
-            g.fillStyle(0x2e222f, 1).fillRect(6, 3, 4, 13).fillRect(5, 0, 6, 5);
-            g.fillStyle(0xc7dcd0, 1).fillRect(7, 5, 2, 10);
-            g.fillStyle(0xe83b3b, 1).fillRect(6, 1, 4, 3);
-        });
-        make('lever-down', 16, 26, g => {
-            housing(g);
-            g.fillStyle(0x2e222f, 1).fillRect(8, 10, 8, 4).fillRect(12, 9, 4, 6);
-            g.fillStyle(0xc7dcd0, 1).fillRect(8, 11, 5, 2);
-            g.fillStyle(0xe83b3b, 1).fillRect(13, 10, 2, 4);
-        });
         make('chess-pawn', 12, 20, g => {
             g.fillStyle(0x625565, 1).fillRect(0, 18, 12, 2);
             g.fillStyle(0x2e222f, 1).fillRect(1, 16, 10, 2).fillRect(3, 8, 6, 8).fillCircle(6, 5, 4);
@@ -95,7 +115,8 @@ export const lido = {
     refreshLido() {
         const P = this.P, L = this.L;
         if (!L) return;
-        this.lever?.setTexture(P.has('drain') ? 'lever-down' : 'lever-up');
+        if (this.lever && !this.tubBusy) this.lever.setFrame(P.has('drain') ? this.leverLay.frames - 1 : 0);
+
         const empty = P.has('kid_fed') && !P.has('refilled');
         this.mLight?.setFillStyle(empty ? 0xe83b3b : 0x1ebc73);
         const h = this.who('npc_husband');
@@ -108,6 +129,8 @@ export const lido = {
         const her = s.player;
         const near = Math.abs(her.y - L.y) < 300;
         if (!near) return;
+        // (The tub's near wall drawn again is only for the kid in it: it does not pulse with the tub.)
+        this.tubFront?.setVisible(!!this.who('npc_kid_tub')?.on);
         this.poolWatch(time);
         this.kidInTub(time);
         this.kidOnDeck(dt, time);
@@ -129,95 +152,211 @@ export const lido = {
         if (swimming || onDeck) this.poolBeat(swimming);
     },
 
+    // The scene (remade 2026-11-24, docs/pool-remake-log.md). From the deck beside him she dives at him, he hops over
+    // her dive, and she is in the pool; from here on it is the same as when she comes to him swimming: under him at
+    // the rim, nose to nose. The kid stands up in the hot tub behind him and squirts him in the back: out over her head
+    // he goes, into the water behind her. He paddles back past her to the rim, his head and back over the surface, hops
+    // out, shakes himself dry; then away aft, by the nearest high thing: up onto the drain lever's grip, which goes over
+    // under him toward the hot tub and throws him across it; the kid ducks. The lever thrown, the pool drains.
     async poolBeat(swimming) {
-        const s = this.scene, w = this.world, L = this.L, cat = this.poolCat, her = s.player;
+        const s = this.scene, w = this.world, L = this.L, cat = this.poolCat, her = s.player, D = s.DEPTH;
         const pool = s.pools.find(q => q.x1 === L.pools[0].x1), c = cat.sprite;
-        const tub = this.who('npc_kid_tub');
+        const tub = this.who('npc_kid_tub'), lay = this.leverLay;
         cat.gone = true;
         s.mode = 'scripted';
         s.script = null;
         her.body.setVelocity(0, 0);
-        const surface = pool ? pool.y : L.y + 4;
+        // (Her place in the water under him: a little short of the rim, so that her hand, stretched up, is a few px short
+        // of him: at the rim itself it lay on his chest.)
+        const surface = pool ? pool.y : L.y + 4, rim = L.pools[0].x1, home = c.x, spot = rim - SWIM.margin - CAT.short;
+        // (Him in a leap along an arc: his paws from where they are to a place, `lift` px over the straight line at its
+        // middle; his jump's clip from frame `from`, paced to last the leap, its own rise taken out frame by frame.)
+        const gap = () => this.jumpGap[c.frame.name] ?? 0;
+        const paws = { x: c.x, y: c.y };
+        const hop = (x1, y1, ms, lift, from = 1) => {
+            const n = s.anims.get('bumbot-jump').frames.length;
+            c.play({ key: 'bumbot-jump', startFrame: from });
+            c.anims.timeScale = (n - from) / 12 * 1000 / ms;
+            const x0 = paws.x, y0 = paws.y, k = { v: 0 };
+            return w.tween({ targets: k, v: 1, duration: ms, onUpdate: () => {
+                paws.x = x0 + (x1 - x0) * k.v;
+                paws.y = y0 + (y1 - y0) * k.v - lift * 4 * k.v * (1 - k.v);
+                c.setPosition(paws.x, paws.y + gap());
+            } }).then(() => { c.anims.timeScale = 1; });
+        };
+        // (Crouched as he lands, his paws at a place: the jump's last frame, held.)
+        const crouch = (x, y) => {
+            const fr = s.anims.get('bumbot-jump').frames;
+            c.play('bumbot-jump');
+            c.anims.pause(fr.at(-1));
+            paws.x = x;
+            paws.y = y;
+            c.setPosition(x, y + gap());
+        };
+        const sit = () => { c.play('bumbot-sit'); c.anims.setCurrentFrame(c.anims.currentAnim.frames.at(-1)); c.anims.pause(); };
+        // (Under him at the rim she looks up out of the water and stretches an arm up after him, and holds it there,
+        // straining, still lying in the water as she swims: her own clip, generated from her swim's first frame; the
+        // user, 2026-11-24.)
+        const reach = () => {
+            if (!s.anims.exists('her-swim-reach')) return s.pose('swim', 0);
+            her.anims.timeScale = 1;
+            her.anims.play('her-swim-reach');
+            her.anims.chain('her-swim-strain');
+        };
+        s.tweens.killTweensOf(c);
+        c.setScale(1);
         if (swimming) {
             // To the rim under him, her chin on it.
             s.pose('swim', 0.8);
             her.setFlipX(false);
-            await w.tween({ targets: her, x: pool.x1 - SWIM.margin, duration: Math.abs(pool.x1 - SWIM.margin - her.x) * 12 });
-            s.pose('swim', 0);
+            await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
+            c.setFlipX(true);
+            sit();
+            reach();
+            await w.wait(450);
+            // (Her cry is over before the kid stands up: its popup is where he and Bumbot are.)
+            s.bubbleUntil = s.time.now + 900;
+            sfx.cry();
+            await w.wait(1000);
         } else {
             her.setFlipX(c.x < her.x);
             s.pose('stand');
+            await w.wait(200);
+            s.bubbleUntil = s.time.now + 1200;
+            sfx.cry();
+            await w.wait(380);
+            if (pool) {
+                her.body.enable = false;
+                // He hops straight up out of her hands and comes down where he sat.
+                sfx.at(c.x, c.y).meow();
+                const up = hop(home, L.y, 560, 46);
+                if (her.x >= c.x) {
+                    // From aft of him: a flat dive under his hop, off the rim and in.
+                    if (s.anims.exists('her-tripfall')) her.anims.play('her-tripfall');
+                    else s.pose('fall');
+                    await w.tween({ targets: her, x: rim + 6, duration: Math.abs(her.x - rim - 6) * 3.4 + 80 });
+                } else {
+                    // On the rim's edge already: a grab at the air, a step back, and off it.
+                    if (s.anims.exists('her-reach')) her.anims.play('her-reach');
+                    await w.wait(260);
+                    s.pose('fall');
+                }
+                await w.tween({ targets: her, x: rim - 34, y: surface + SWIM.float, duration: 280, ease: 'Quad.easeIn' });
+                s.splash(her.x, surface);
+                sfx.splash();
+                her.setDepth(D.swimmer);
+                s.pose('swim', 0);
+                await up;
+                c.setFlipX(true);
+                sit();
+                await w.wait(350);
+                // She comes up under him.
+                her.setFlipX(false);
+                s.pose('swim', 0.8);
+                await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
+                reach();
+                swimming = true;
+                await w.wait(700);
+            }
         }
-        await w.wait(250);
-        s.bubbleUntil = s.time.now + 1500;
-        sfx.cry();
-        await w.wait(700);
-        // The kid comes up out of the hot tub behind him, and lets fly.
+        // The kid stands up in the hot tub behind him, and lets fly.
         this.tubBusy = true;
+        const tubUp = this.tubBase() - TUB.duck;
         if (tub) {
+            // (A peek of his under way would take him down again.)
+            s.tweens.killTweensOf(tub.sprite);
             tub.dir = -1;
             this.people.place(tub);
             sfx.at(tub.x, tub.y).giggle();
-            await w.tween({ targets: tub.sprite, y: this.tubBase() - 17, duration: 240, ease: 'Back.easeOut' });
-            this.people.play(tub, 'squirt');
+            await w.tween({ targets: tub.sprite, y: tubUp, duration: 240, ease: 'Back.easeOut' });
+            this.people.play(tub, 'squirt', { stay: true });
         }
         await w.wait(300);
-        sfx.at(L.tubX - 15, L.y - 44).jet();
-        this.jet(L.tubX - 15, L.y - 44, c.x + 5, L.y - 15, 420);
+        const mx = L.tubX + TUB.muzzle[0], my = tubUp + TUB.muzzle[1];
+        sfx.at(mx, my).jet();
+        this.jet(mx, my, c.x + 7, L.y - 13, 420);
         await w.wait(200);
-        // Hit: he goes straight up, and comes down in the pool.
-        s.tweens.killTweensOf(c);
-        c.setScale(1).setFlipX(true).play('bumbot-jump');
+        // Hit in the back: out over the water he goes, over her head, and in behind her; her arm comes down.
+        if (swimming) s.pose('swim', 0);
+        c.setFlipX(true);
         sfx.at(c.x, c.y).meow();
-        const inX = Math.max(L.pools[0].x0 + 30, L.pools[0].x1 - 84);
-        await w.tween({ targets: c, x: (c.x + inX) / 2 + 6, y: L.y - 56, duration: 300, ease: 'Quad.easeOut' });
-        await w.tween({ targets: c, x: inX, y: surface + 6, duration: 260, ease: 'Quad.easeIn' });
+        const inX = Math.max(L.pools[0].x0 + 30, spot - CAT.in);
+        await hop(inX, surface + 8, 520, 30, 2);
         s.splash(inX, surface);
+        s.splash(inX + 5, surface - 2);
         sfx.at(inX, surface).splash();
-        c.setVisible(false);
-        if (!swimming && pool) {
-            // And she, reaching after him, goes in too.
-            s.pose('fall');
-            her.body.enable = false;
-            await w.tween({ targets: her, x: pool.x1 - 30, y: surface + SWIM.float, duration: 320, ease: 'Quad.easeIn' });
-            s.splash(her.x, surface);
-            sfx.splash();
-            her.setDepth(s.DEPTH.swimmer);
-            s.pose('swim', 0);
-            swimming = true;
-        } else {
-            her.setFlipX(true);
-        }
-        if (tub) s.tweens.add({ targets: tub.sprite, y: this.tubBase(), duration: 400, delay: 500, ease: 'Sine.easeIn' });
-        await w.wait(650);
-        // Up the ladder beside her, dripping, onto the lever's housing; he shakes himself dry.
-        c.setVisible(true).setFlipX(false).setPosition(L.ladderX, surface + 12).play('bumbot-run');
-        sfx.at(L.ladderX, surface).splashSmall();
-        await w.tween({ targets: c, y: L.y, duration: 420 });
-        if (swimming) her.setFlipX(false);
-        c.play('bumbot-jump');
-        await w.tween({ targets: c, x: L.leverX - 2, y: L.y - 26, duration: 240, ease: 'Quad.easeOut' });
+        if (swimming) her.setFlipX(true);
+        // Under he goes, in sight through the water as she is (the user, 2026-11-24: he was gone from the picture
+        // until he came up), turns, and comes up paddling for the rim, past her, his head and back over the water.
+        c.setDepth(D.swimmer - 0.001).play('bumbot-run');
+        c.anims.timeScale = 0.75;
+        c.setPosition(inX, surface + 8);
+        await w.tween({ targets: c, y: Math.min(surface + CAT.under, L.tankY + 4), duration: 240, ease: 'Quad.easeOut' });
+        c.setFlipX(false);
+        await w.tween({ targets: c, y: surface + CAT.swim, duration: 300, ease: 'Sine.easeInOut' });
+        sfx.at(inX, surface).splashSmall();
+        const wake = this.catG;
+        await w.tween({ targets: c, x: rim - 9, duration: (rim - 9 - inX) / CAT.paddle * 1000, onUpdate: () => {
+            if (swimming && c.x > her.x - 4) her.setFlipX(false);
+            // (The water he pushes: a few light strokes at his chest and behind him.)
+            const t = s.time.now;
+            wake.clear();
+            for (let i = 0; i < 4; i++) {
+                const bx = c.x - 12 + i * 8 + Math.round(Math.sin(t / 90 + i * 1.7) * 2);
+                wake.fillStyle(i % 2 ? 0xffffff : 0xc7e7ff, 0.9).fillRect(Math.round(bx), surface - (i % 2), 3, 1);
+            }
+        } });
+        wake.clear();
+        // Out over the rim, streaming, and he shakes himself dry.
+        c.anims.timeScale = 1;
+        c.setDepth(D.props);
+        sfx.at(rim, surface).splashSmall();
+        paws.x = c.x;
+        paws.y = surface + 2;
+        await hop(home, L.y, 300, 12, 2);
         if (s.anims.exists('bumbot-shake')) c.play('bumbot-shake');
-        else s.tweens.add({ targets: c, scaleX: { from: 0.86, to: 1.12 }, duration: 70, yoyo: true, repeat: 5 });
         for (let i = 0; i < 16; i++) {
-            const d = s.add.image(c.x, c.y - 12, 'dot').setTint(i % 3 ? 0x8fd3ff : 0xffffff).setDepth(s.DEPTH.fx);
+            const d = s.add.image(c.x, c.y - 12, 'dot').setTint(i % 3 ? 0x8fd3ff : 0xffffff).setDepth(D.fx);
             w.add([d]);
             const a = Math.PI * (1 + i / 15);
             s.tweens.add({ targets: d, x: d.x + Math.cos(a) * Phaser.Math.Between(16, 40), y: d.y + Math.sin(a) * Phaser.Math.Between(8, 26) + 14,
-                alpha: 0, duration: 520, delay: i * 30, onComplete: () => d.destroy() });
+                alpha: 0, duration: 520, delay: 180 + i * 30, onComplete: () => d.destroy() });
         }
         sfx.at(c.x, c.y).splashSmall();
         await w.wait(820);
-        c.setScale(1);
-        // His jump off it throws the lever. Then aft along the pools' far side, and gone.
-        c.play('bumbot-jump').setFlipX(false);
-        this.lever.setTexture('lever-down');
+        // Away aft, by the nearest high thing: up onto the lever's grip.
+        c.setFlipX(false);
+        const grip = i => [L.leverX + lay.grips[i][0], L.y + lay.grips[i][1] + CAT.paw];
+        paws.x = c.x;
+        paws.y = L.y;
+        await hop(...grip(0), 260, 10);
+        crouch(...grip(0));
+        await w.wait(90);
+        // It goes over under him, toward the hot tub: he rides it down.
+        sfx.at(L.leverX, L.y).creak();
+        const thrown = lay.frames - 3;
+        for (let i = 1; i <= thrown; i++) {
+            this.lever.setFrame(i);
+            crouch(...grip(i));
+            await w.wait(60);
+        }
         sfx.at(L.leverX, L.y).lever();
+        sfx.at(L.leverX, L.y).clang();
         s.cameras.main.shake(180, 0.003);
-        await w.tween({ targets: c, x: L.leverX + 30, y: L.y, duration: 200, ease: 'Quad.easeIn' });
-        c.play('bumbot-run').setDepth(s.DEPTH.decor + 0.05);
-        sfx.at(c.x, c.y).scramble();
+        // And is thrown off it across the tub; the kid ducks.
+        if (tub) s.tweens.add({ targets: tub.sprite, y: this.tubBase(), duration: 170, ease: 'Quad.easeIn' });
         sfx.at(c.x, c.y).mrrp();
+        const landX = L.tubX + CAT.lands;
+        const flung = hop(landX, L.y, 460, CAT.over, 2);
+        // (The lever's bounce on its stop.)
+        await w.wait(70);
+        this.lever.setFrame(lay.frames - 2);
+        await w.wait(70);
+        this.lever.setFrame(lay.frames - 1);
+        await flung;
+        // Aft along the second pool's far side, and gone.
+        c.play('bumbot-run').setDepth(D.decor + 0.05);
+        sfx.at(c.x, c.y).scramble();
         const view = s.cameras.main.worldView;
         await w.tween({ targets: c, x: view.right + 60, duration: ((view.right + 60 - c.x) / 300) * 1000 });
         cat.away = true;
@@ -228,16 +367,16 @@ export const lido = {
             s.mode = 'swim';
             s.pool = pool;
             her.body.enable = false;
-            her.setDepth(s.DEPTH.swimmer);
+            her.setDepth(D.swimmer);
         } else {
             s.mode = 'play';
         }
         this.P.setFlag('bb5');
     },
 
+    // Where the kid's feet are while he is right down in the tub, out of sight behind its near wall.
     tubBase() {
-        const tub = this.who('npc_kid_tub');
-        return tub ? tub.y - (tub.dy ?? 0) : 0;
+        return this.L.y - TUB.in + TUB.duck;
     },
 
     // Before the beat: now and then his eyes come up over the hot tub's rim, and go down again.
@@ -246,7 +385,7 @@ export const lido = {
         if (!tub?.on || this.tubBusy || time < (this.tubAt ?? 0)) return;
         if (Math.abs(s.player.x - tub.x) > 700) return;
         this.tubAt = time + 3600;
-        s.tweens.add({ targets: tub.sprite, y: this.tubBase() - 9, duration: 320, yoyo: true, hold: 700, ease: 'Sine.easeInOut' });
+        s.tweens.add({ targets: tub.sprite, y: this.tubBase() - (TUB.duck - TUB.peek), duration: 320, yoyo: true, hold: 700, ease: 'Sine.easeInOut' });
     },
 
     // A jet from a water pistol: drops along a line for a moment.
