@@ -244,7 +244,10 @@ HER_CAT = {
     "blouse": True,
     "name": "her-cat",
     "cell": 84,
-    "remap": HER["remap"],
+    # (This state's skin shade lands on the palette's tan, not on her peach: tan patches on her face, arms and legs
+    # in every frame; put on her own. Four lone pink pixels in her hair in the front view, two of them circled by the
+    # user, are mended in the source itself, `rotations/south.png`; PixelLab's own is `south-raw.png`. 2026-11-24.)
+    "remap": {**HER["remap"], "ab947a": "fca790"},
     "frames": {
         "stand": [("rotations/east.png", "keep")],
         "run": [(f"walk/{i}.png", "feet") for i in range(6)],
