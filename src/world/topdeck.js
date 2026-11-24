@@ -944,6 +944,7 @@ export const topdeck = {
             L.state = 'acting';
             for (let i = 0; i < 2; i++) {
                 await w.tween({ targets: glass, y: L.y - 43, angle: -28, duration: 260 });
+                sfx.at(L.x, L.y).sip();
                 await w.wait(420);
                 await w.tween({ targets: glass, y: L.y - 34, angle: 0, duration: 220 });
                 await w.wait(240);

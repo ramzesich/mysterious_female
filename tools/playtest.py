@@ -4013,7 +4013,10 @@ def scenario_region6(b):
         wait(0.35)
         return js(b, f"{W}.story.lastSwirl")
 
+    c0 = b.eval("(c => [c.whirr ?? 0, c.whirrDown ?? 0])(window.__sfx.counts)")
     ok &= check(swirl(0.9) == "stub" and carrying(b) == "stub", "E let go early: a stub", carrying(b))
+    c1 = b.eval("(c => [c.whirr ?? 0, c.whirrDown ?? 0])(window.__sfx.counts)")
+    ok &= check(c1[0] - c0[0] == 1 and c1[1] - c0[1] == 1, "its motor one held sound while E is held, and its run-down at the let-go", (c0, c1))
     b.eval(f"{kid}.x = {L['kidA'] + 120}; {kid}.mode = 'patrol'")
     b.teleport(L["kidA"] + 90, D11)
     wait(0.5)
@@ -5719,13 +5722,27 @@ def scenario_sound(b):
     # Every effect the code names is one that exists.
     names = set(sum(b.eval(f"Object.values({S}.groups)"), []))
     api = {"at", "listen", "ambience", "toggle", "unlock", "render", "counts", "log", "groups", "layers", "demos", "muted",
-           "enabled", "running"}
+           "enabled", "running", "hold"}
     used = {}
     for path in (ROOT / "src").rglob("*.js"):
         if path.name == "sfx.js":
             continue
-        for m in re.finditer(r"\bsfx(?:\.at\((?:[^()]|\([^()]*\))*\))?\s*\??\.(\w+)\s*(?:\?\.)?\(", path.read_text(encoding="utf-8")):
+        text = path.read_text(encoding="utf-8")
+        for m in re.finditer(r"\bsfx(?:\.at\((?:[^()]|\([^()]*\))*\))?\s*\??\.(\w+)\s*(?:\?\.)?\(", text):
             used.setdefault(m.group(1), path.name)
+        # (A held one by its name, `sfx.hold('whirr')`; and the tables of sounds on clips' frames and at the intro's
+        # moments, each entry's effect named last: `[4, 'sip']`, `['dive', 0.3, 'swell']`.)
+        for m in re.finditer(r"\.hold\('(\w+)'", text):
+            used.setdefault(m.group(1), path.name)
+        for m in re.finditer(r"\b(?:CLIP_SOUNDS|HER_SOUNDS|CUES)\s*=\s*\{", text):
+            depth, i = 0, m.end() - 1
+            while True:
+                depth += {"{": 1, "}": -1}.get(text[i], 0)
+                i += 1
+                if depth == 0:
+                    break
+            for n in re.finditer(r",\s*'(\w+)'\s*\]", text[m.end():i]):
+                used.setdefault(n.group(1), path.name)
     unknown = {n: f for n, f in used.items() if n not in names and n not in api}
     ok = check(not unknown, "every effect the game asks for exists", unknown)
     spare = sorted(names - set(used))

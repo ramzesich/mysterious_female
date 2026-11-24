@@ -4740,3 +4740,23 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
 - **V8** (her word's box with no outline) was settled by the popups' remake (a dark outline). **V10** (the party cabin's
   notes at the wall's depth), the user's yes: drawn above the world as every other small mark.
 - `throw`, `region8`, `finale`, `region4`, `region5` pass.
+
+## Part 5, the sound leftovers (2026-11-24, approved by the user on listening)
+
+- **Held sounds:** `sfx.hold(name, ...)` (and `sfx.at(x, y).hold(...)`) plays an effect whose first argument is its
+  length as 30 s long and returns `{ stop(fade) }`, which fades it and ends its voices (they are kept as they are made:
+  `cur.sources`). The soft serve's motor is one held `whirr` for as long as E pours, and `whirrDown` (its pitch falling)
+  when it stops, on every way out of the swirl; it was 0.4 s pieces begun again every 280 ms.
+- **Eating and drinking:** `sip` (a slurp and a swallow), `lick`, Bumbot's `nom`. Sounds on people's clips' own frames
+  (`CLIP_SOUNDS` in `src/world/people.js`, frames read from their strips where the cup or cone is at the mouth): the
+  engineer's coffee (4), the wedding guest's glass (7, his idle), her husband's cone (4); hers on her own clips
+  (`HER_SOUNDS` in the ship scene: `her-lick-cone`, 3); the old lady's two sips at her glass's tilt; Bumbot eating at a
+  spot (`addCat`, each round of his clip).
+- **The intro:** `CUES` in `src/intro.js`, each once as the clock passes it (none while held or sought): gulls four times
+  over the wide views, `swell` (a rush of air rising over 2 s) into the dive, `cloth` at her badge; `choose`, a tick, when
+  the menu's choice moves or the language switches.
+- `tools/check_sound.py` all within bounds (the tick and the lick raised from its floor). The `sound` playtest reads held
+  sounds and the frame tables (`CLIP_SOUNDS`, `HER_SOUNDS`, `CUES`) as used; `region6` checks the motor is one held sound
+  and its run-down. `sound`, `region6`, `region8`, `region9`, `boot`, `deck3` pass.
+- **Part 5 is done.**
+

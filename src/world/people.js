@@ -24,6 +24,13 @@ const BITES = ['tangerine', 'tangerine-bit1', 'tangerine-bit2'];
 const BUBBLE = { w: 22, h: 20, rise: 8 };
 
 // A clip's frames a second: an idle clip on the idles' own clock (`PEOPLE_IDLE`), any other its sheet's.
+// Sounds on a clip's own frames (`<who>-<clip>`: [frame from 0, effect]), heard from where they are: a sip where the cup
+// is at the mouth, a lick where the cone is (part 5: eating and drinking were silent).
+const CLIP_SOUNDS = {
+    'engineer-drink': [[4, 'sip']],
+    'wed_guest_a-sip': [[7, 'sip']],
+    'husband-eat': [[4, 'lick']],
+};
 const clipFps = (p, clip) => (/^idle\d*$/.test(clip) ? PEOPLE_IDLE.fps : p.meta.fps[clip] ?? 8);
 
 export class People {
@@ -51,6 +58,10 @@ export class People {
         // (`pose`: turned to us at a rail ("front"), or away, reading a wall ("back").)
         const sprite = s.add.sprite(def.x, def.y - (def.dy ?? 0), 'people', meta[def.pose] ?? meta.stand).setOrigin(0.5, 1).setDepth(depth);
         sprite.setFlipX((def.face ?? 1) < 0);
+        sprite.on('animationupdate', (anim, frame) => {
+            const at = CLIP_SOUNDS[anim.key.slice(7)]?.find(([i]) => i === frame.index - 1);
+            if (at && sprite.visible) sfx.at(sprite.x, sprite.y)[at[1]]();
+        });
         this.world.add([sprite]);
         const p = { ...def, sprite, meta, items: [sprite], dir: def.face ?? 1, x: def.x, pausedUntil: 0, attached: [], state: 'idle' };
         // What goes along with them (the porter's cart): pieces of the ship's atlas, in front or behind.

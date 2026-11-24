@@ -756,18 +756,23 @@ export const lido = {
     swirling(dt, time, input) {
         const sw = this.swirl, s = this.scene, L = this.L;
         if (!sw) return;
+        // (Its motor runs for as long as it pours, one held sound, and runs down when it stops.)
+        const motorOff = () => {
+            if (!sw.motor) return;
+            sw.motor.stop(0.08);
+            sw.motor = null;
+            sfx.at(L.machineX, L.y).whirrDown();
+        };
         if (s.mode !== 'scripted') {
+            motorOff();
             this.swirl = null;
             this.mCone.setVisible(false);
             this.mMeter.setVisible(false);
             return;
         }
         if (input.activate && sw.k < SWIRL.max) sw.k += (dt * 1000) / SWIRL.ms;
-        // (Its motor, for as long as it runs: a stretch of it, begun again as the last one ends.)
-        if (input.activate && sw.k < SWIRL.max && time >= (sw.soundAt ?? 0)) {
-            sw.soundAt = time + 280;
-            sfx.at(L.machineX, L.y).whirr(0.4);
-        }
+        if (input.activate && sw.k < SWIRL.max) sw.motor ??= sfx.at(L.machineX, L.y).hold('whirr');
+        else motorOff();
         const k = sw.k;
         // The cone under the spout, its swirl rising; and the meter: grey, green, red.
         const cx = L.machineX + 3, cy = L.y - 21, h = Math.round(k * 13);

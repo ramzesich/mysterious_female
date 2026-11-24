@@ -453,7 +453,10 @@ Lessons learned (2026-11-14, step 12, sound):
   nothing else: the soundboard, the checker and the `sound` playtest (which fails on a name that
   does not exist) read the groups themselves.
 - **Never a sound each frame:** a state that lasts re-triggers on a timer of its own; a sound
-  that takes a length gets the real one in seconds.
+  that takes a length gets the real one in seconds; one that lasts as long as something runs (a motor
+  while a key is held) is held, `sfx.hold(name)`, and stopped (`handle.stop()`) on every way out.
+- **Sounds on a clip's frames go in a table, never by a timer:** `CLIP_SOUNDS` (the people), `HER_SOUNDS` (hers),
+  `GAGS[...].sounds` (the gags), the intro's `CUES`; the `sound` playtest reads the tables as used.
 - **Work that is the same judgment many times over in files that do not touch** (which effect
   fits each of 250 moments in eleven files) goes well to helpers in parallel from one written
   brief that names what they may not do (no browser, no tools, no other files); read their

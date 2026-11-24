@@ -4,6 +4,8 @@
 //   sfx.at(x, y).door()        the same from a place in the world: fainter with distance (a deck up
 //                              or down counts for more than the same way along), a little to its
 //                              side, silent out of earshot. For anything on a clock of its own.
+//   sfx.hold('whirr')          an effect held for as long as something runs (a motor while a key is
+//                              held): returns `{ stop() }`, which fades it out; `sfx.at(x, y).hold(...)` too
 //   sfx.listen(x, y)           where her ears are (the ship scene, each frame)
 //   sfx.ambience({ sea, ... }) how loud each layer of the ambience should be now (0 to 1)
 //   sfx.toggle()               mute on and off (M in the game), remembered in the browser
@@ -71,14 +73,17 @@ function audio() {
 }
 for (const e of ['keydown', 'pointerdown']) window.addEventListener(e, () => audio(), { passive: true });
 
-function play(name, args) {
+// (`held`: its voices are made `HOLD` s long and kept, for `stop()` to fade out and end: a handle is returned.)
+const HOLD = 30;
+const NONE = { stop() {} };
+function play(name, args, held = false) {
     const pos = nextPos;
     nextPos = null;
     counts[name] = (counts[name] || 0) + 1;
     log.push(name);
     if (log.length > 300) log.shift();
     const a = audio();
-    if (!a || (muted && !a.offline)) return;
+    if (!a || (muted && !a.offline)) return held ? NONE : undefined;
     const now = a.ctx.currentTime;
     let dest = a.fx;
     if (!a.offline) {
@@ -88,9 +93,9 @@ function play(name, args) {
             dx = pos.x - ear.x;
             const d = Math.hypot(dx, (pos.y - ear.y) * SOUND.deckWeight);
             level = d <= SOUND.near ? 1 : 1 - (d - SOUND.near) / (SOUND.far - SOUND.near);
-            if (level <= 0.03) return;
+            if (level <= 0.03) return held ? NONE : undefined;
         }
-        if (now - (lastAt[name] ?? -1) < GAP) return;
+        if (!held && now - (lastAt[name] ?? -1) < GAP) return;
         lastAt[name] = now;
         if (pos && ear.set) {
             const g = a.ctx.createGain();
@@ -103,12 +108,30 @@ function play(name, args) {
             dest = g;
         }
     }
-    cur = { c: a.ctx, a, dest, t: now + 0.005 };
+    let hold = null;
+    if (held) {
+        hold = a.ctx.createGain();
+        hold.connect(dest);
+        dest = hold;
+    }
+    const sources = [];
+    cur = { c: a.ctx, a, dest, t: now + 0.005, sources };
     try {
-        SOUNDS[name](...args);
+        SOUNDS[name](...(held ? [HOLD, ...args] : args));
     } finally {
         cur = null;
     }
+    if (!held) return;
+    let done = false;
+    return {
+        stop(fade = 0.12) {
+            if (done) return;
+            done = true;
+            const t = a.ctx.currentTime;
+            hold.gain.setTargetAtTime(0, t, fade / 4);
+            for (const src of sources) try { src.stop(t + fade + 0.05); } catch { /* already over */ }
+        },
+    };
 }
 
 // --- The voices every effect is made of -------------------------------------------------------------
@@ -159,6 +182,7 @@ function finish(node, t0, dur, o) {
         l.connect(d).connect(g.gain);
         l.start(t0);
         l.stop(t0 + dur + 0.05);
+        cur.sources.push(l);
         last.connect(g);
         last = g;
     }
@@ -182,10 +206,12 @@ function tone(freq, dur, o = {}) {
         l.connect(d).connect(osc.frequency);
         l.start(t0);
         l.stop(t0 + dur + 0.05);
+        cur.sources.push(l);
     }
     finish(osc, t0, dur, o);
     osc.start(t0);
     osc.stop(t0 + dur + 0.04);
+    cur.sources.push(osc);
 }
 
 // Noise through one filter: `lo` (low-pass), `band` or `hp` (high-pass), each a value over its
@@ -203,6 +229,7 @@ function noise(dur, o = {}) {
     finish(f, t0, dur, { ...o, lp: null });
     src.start(t0, Math.random() * 1.5);
     src.stop(t0 + dur + 0.04);
+    cur.sources.push(src);
 }
 
 const r = (a, b) => a + Math.random() * (b - a);
@@ -428,6 +455,10 @@ const finds = {
     ding: () => { bell(988, 0.4, 0.07); bell(784, 0.6, 0.07, 0.14); },
     // Air moved by something quick, generic.
     whoosh: () => noise(0.35, { band: [500, 1300], q: 0.8, vol: 0.14, attack: 0.1 }),
+    // The welcome screen: a plate chosen with the arrows, or the language switched.
+    choose: () => tone(2000, 0.035, { type: 'square', vol: 0.09, lp: 5000 }),
+    // The intro's camera diving down from the sky into the ship: a soft rush of air, swelling.
+    swell: () => noise(2.2, { band: [300, 1400], q: 0.7, vol: 0.09, attack: 1.5, release: 0.35 }),
     // Sound switched on again (M).
     soundOn: () => run([660, 990], 0.07, { vol: 0.08 }),
 };
@@ -442,6 +473,8 @@ const cat = {
         noise(s, { lo: 210, vol: 0.3, shape: shape(n, (k, i) => (1 - ((i / 16) % 1)) * breath(k)) });
         tone(54, s, { type: 'sawtooth', vol: 0.07, lp: 320, shape: shape(n, (k, i) => (1 - ((i / 16) % 1)) * breath(k)) });
     },
+    // His small quick bites, eating off the floor.
+    nom: () => [0, 0.11, 0.22].forEach(t => noise(0.04, { lo: [2400, 900], vol: 0.08, t, attack: 0.01 })),
     scramble: () => { for (let i = 0; i < 6; i++) noise(0.018, { hp: 2800, vol: 0.09, t: i * 0.045 + r(0, 0.01) }); },
 };
 
@@ -467,6 +500,9 @@ const people = {
     sneeze: () => { voice([[0, 420], [1, 520]], 0.16, 0.05, 0, { lp: [[0, 700], [1, 1400]] }); noise(0.2, { hp: [1800, 3200], vol: 0.09, t: 0.17, attack: 0.01 }); voice([[0, 600], [1, 330]], 0.16, 0.07, 0.17); },
     shush: () => noise(0.45, { band: [3600, 4600], q: 1.2, vol: 0.07, attack: 0.08, release: 0.12 }),
     munch: () => [0, 0.17, 0.34].forEach(t => noise(0.07, { lo: [1300, 500], vol: 0.14, t, attack: 0.015 })),
+    // A sip from a cup or a glass, and its swallow; a lick of an ice cream cone.
+    sip: () => { noise(0.24, { band: [1100, 2600], q: 2.5, vol: 0.08, attack: 0.05, trem: [38, 0.5] }); tone(240, 0.09, { type: 'sine', to: 150, vol: 0.05, t: 0.32 }); },
+    lick: () => noise(0.16, { band: [2600, 1700], q: 1.8, vol: 0.11, attack: 0.04 }),
     laugh: () => [0, 0.13, 0.26, 0.39].forEach((t, i) => voice([[0, 300 - i * 18], [1, 240 - i * 14]], 0.1, 0.07 - i * 0.01, t, { vib: [0, 0] })),
     // Knuckles on a door, once.
     knock: () => { thud(210, 0.06, 0.2); noise(0.02, { band: 900, vol: 0.12 }); },
@@ -522,8 +558,10 @@ const things = {
         for (let i = 0, n = Math.round(s * 9); i < n; i++) bloop(r(160, 420) * (1 - 0.4 * i / n), 0.07, (i + r(0, 0.8)) * s / n);
         tone(300, 0.4, { type: 'sine', to: 90, vol: 0.1, t: s - 0.3 });
     },
-    // The soft serve machine: its motor for `s` seconds; a cough when it is empty.
+    // The soft serve machine: its motor for `s` seconds (held while she holds E: `sfx.hold('whirr')`), its
+    // running down when she lets go; a cough when it is empty.
     whirr: (s = 1) => tone(118, s, { type: 'sawtooth', vol: 0.06, lp: 520, attack: 0.08, release: 0.12, trem: [31, 0.4] }),
+    whirrDown: () => tone(118, 0.35, { type: 'sawtooth', to: 62, vol: 0.05, lp: [520, 300], trem: [24, 0.4] }),
     cough: () => [0, 0.16].forEach(t => noise(0.1, { lo: [900, 350], vol: 0.26, t })),
     // A drink poured, glass on glass, a cup put down.
     pour: () => { for (let i = 0; i < 9; i++) bloop(r(500, 900) + i * 40, 0.035, i * 0.07 + r(0, 0.03)); noise(0.7, { band: 2400, q: 1.5, vol: 0.05, attack: 0.1 }); },
@@ -670,6 +708,8 @@ function ambience(levels) {
 
 export const sfx = {
     unlock: () => audio(),
+    // (Only for an effect whose first argument is its length in seconds.)
+    hold: (name, ...args) => play(name, args, true),
     at(x, y) {
         nextPos = { x, y };
         return sfx;

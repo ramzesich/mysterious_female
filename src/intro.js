@@ -46,6 +46,13 @@ export const PARTS = {
            ['corridor', 1.0], ['step', 0.4], ['walk', 0], ['badge', 2.4], ['turn', 0.6]],
     back: [['focus', 2.0], ['sky', 0.5], ['down', 3.2], ['sea', 0.4], ['right', 4.6], ['ship', 0.8], ['near', 2.4]],
 };
+// Sounds at moments of the clock, [part, how far into it, effect], each once as the clock passes it (none while held
+// at a moment or sought): the gulls over the sea in the wide views, the rush of the dive into the ship, a rustle at her
+// badge (part 5: the intro had a checkpoint's chime, a door and her steps). The sea and the wind are the ambience's.
+const CUES = {
+    full: [['sky', 0.4, 'gull'], ['down', 0.55, 'gull'], ['right', 0.35, 'gull'], ['right', 0.8, 'gull'], ['dive', 0.3, 'swell'], ['badge', 0.2, 'cloth']],
+    back: [['sky', 0.3, 'gull'], ['right', 0.5, 'gull'], ['near', 0.05, 'swell']],
+};
 const DIM = 0.36;                 // the welcome screen's shade over the sky
 // The menu: where the name and the two plates stand on the screen, and the lettering's colours
 // from the top of a letter down (the name's: the sun livery's; a plate's: cream, gold when chosen). The whole menu
@@ -219,6 +226,7 @@ export class Intro {
     select(i) {
         if (this.stage !== 'welcome' || i === this.selected) return;
         this.selected = i;
+        sfx.choose();
         this.refreshMenu();
     }
 
@@ -227,6 +235,7 @@ export class Intro {
         sfx.unlock();
         if (this.buttons[this.selected].id === 'language') {
             nextLanguage();
+            sfx.choose();
             this.refreshMenu();
             return;
         }
@@ -267,7 +276,12 @@ export class Intro {
             if (input.upPressed || input.downPressed) this.select(1 - this.selected);
             if (input.startPressed || input.activatePressed) this.press();
         } else {
+            const was = this.T;
             if (!this.held) this.T += dt;
+            for (const [name, k, fx] of CUES[this.full ? 'full' : 'back']) {
+                const part = this.parts.find(q => q.name === name), at = part && part.from + part.len * k;
+                if (part && was < at && this.T >= at) sfx[fx]();
+            }
             if (input.escapePressed || this.T >= this.length) {
                 this.finish(input.escapePressed || !this.full);
                 return;

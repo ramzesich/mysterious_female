@@ -569,7 +569,7 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 - A tint only if a deck still looks like its neighbour: one deck tried and shown beside itself.
 - The whole ship rendered and looked at; `boot`, `stairs`, `lift`, `tools/check_overlaps.py`.
 
-## 7. Part 5: small faults and leftovers (small each)
+## 7. Part 5: small faults and leftovers (small each) **DONE 2026-11-24**
 
 - ~~**Never tried in the game:** a thrown tangerine at the funnel's gulls, and at Bumbot at the
   tip. Try both; a case each in `throw` or `finale`.~~ **Done 2026-11-24:** both had a fault, mended (the stairway's
@@ -583,9 +583,13 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 - ~~**V8** (her word's white box has no outline) and **V10** (the party cabin's music notes drawn
   at the wall's depth): left out "unless the user asks". Ask once; a few lines each.~~ **Done 2026-11-24:** V8 settled by
   the popups' remake; V10 on the user's yes, the notes above the world.
-- **Sound, the engine's leftovers** (the user hears, the builder cannot): a held sound that can
+- ~~**Sound, the engine's leftovers** (the user hears, the builder cannot): a held sound that can
   be stopped (the soft serve's motor is short pieces end to end); eating and drinking are mostly
-  silent; the intro has a checkpoint's chime and a door and no more.
+  silent; the intro has a checkpoint's chime and a door and no more.~~ **Done 2026-11-24** (approved on listening):
+  `sfx.hold`, the motor held; sips, licks, Bumbot's nibbles on their clips' frames; the intro's gulls, its rush into
+  the ship, her badge's rustle, the menu's tick.
+
+**Part 5 is done (2026-11-24).**
 
 ## 7a. Part 6: Bumbot made again (large; about 90 generations, a guess)
 

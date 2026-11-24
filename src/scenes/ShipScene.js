@@ -1172,6 +1172,8 @@ export class ShipScene extends Phaser.Scene {
             this.tweens.add({ targets: sprite, scaleY: 1.06, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
         } else {
             sprite.play(`bumbot-${activity}`);
+            // (Eating off the floor: his small bites as his head goes down, each round of the clip; part 5.)
+            if (activity === 'eat') sprite.on('animationupdate', (a, f) => { if (f.index === 1 && sprite.visible) sfx.at(sprite.x, sprite.y).nom(); });
         }
         if (route !== 'inside') sprite.setVisible(false);
         this.worldLayer.add(sprite);
@@ -2819,6 +2821,12 @@ export class ShipScene extends Phaser.Scene {
         p.body.setMaxVelocity(10000, PLAYER.maxFall);
         this.worldLayer.add(p);
         this.player = p;
+        // Her own clips' sounds on their frames (frame from 0): her lick of the cone at his table (part 5).
+        const HER_SOUNDS = { 'her-lick-cone': [[3, 'lick']] };
+        p.on('animationupdate', (anim, frame) => {
+            const at = HER_SOUNDS[anim.key]?.find(([i]) => i === frame.index - 1);
+            if (at) sfx[at[1]]();
+        });
 
         // The pools are sunk below their deck's floor, into the ceiling of the deck under it: from
         // there (seen from it, or jumping in it) they are not there (the user, 2026-11-06).
