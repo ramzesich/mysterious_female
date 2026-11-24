@@ -503,7 +503,7 @@ def muted(img, k=MUTE):
 
 # "<name>-w6", 6%, for the theatre's own pieces (the user, 2026-11-24, near-catch 3's new stage: it "pops out too
 # much. We need to remove a bit of a wash of the props that surround it, and add a bit of a wash to the stage, so that
-# everything meets in the middle"; the stage's picture is washed 12%, `STAGE_WASH` in tools/build_stage.py).
+# everything meets in the middle"; the stage's picture is washed 18%, `STAGE_WASH` in tools/build_stage.py).
 MUTE_W6 = 0.06
 THEATRE = {"theatre-seat-side", "speaker-stack"} | {f"audience-{k}" for k in range(10)}
 

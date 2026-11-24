@@ -128,6 +128,9 @@ its first half played behind her back.
     (it was 0.3 s) with the loop going up; the hatch and his fall as they were; a breath, and she looks up 0.6 s
     before her shrug. What flows was left flowing: his run into his clip, the clip's own leap, the lamp's let-go
     into its swing, the fall.
+19. **The stage at 18%** (the user, of the six strengths, the game then at 6/12 and the dancers' choice still open
+    beside it: "D"): read as the wash's D, the props 6%, the stage 18%; the male dancer is D too, and stays.
+    `STAGE_WASH` 0.18.
 
 ## How it is built
 
