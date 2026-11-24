@@ -115,6 +115,10 @@ And, on seeing nothing yet but while the stack was being roughed on the cart wit
    the clip's own cart stood as the last two pillows leave it.
 8. **Crawling explained once (fault 8):** a plate over her as he is gone, "↓ to crawl" (`hint.crawl`, both languages,
    the controller's too), as "D to dash" ends near-catch 1.
+9. **His leap's end and his crawl 6 px higher** (the user, at the preview: "Shift Bumbot's crawl higher, it is shown
+   from below the entrance"): his belly was at 816, the shaft's floor for her, while the mouth as drawn opens from 779
+   to 811 and its box ends at 814: he showed under the box, his paws out below it at the wall. At 811 he is inside the
+   opening. (So it was in the game before this remake too.)
 
 ## The art (to the preview stop)
 
