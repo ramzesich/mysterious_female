@@ -58,8 +58,10 @@ export const lido = {
         this.paws = s.add.graphics().setDepth(D.props - 0.04).setAlpha(0);
         this.paws.fillStyle(0x4d65b4, 0.8);
         for (let x = L.pawsA, n = 0; x < L.pawsB; x += 14, n++) {
-            const y = L.y - (n % 2 ? 2 : 4);
-            this.paws.fillRect(x, y, 3, 2).fillRect(x - 1, y - 1, 1, 1).fillRect(x + 1, y - 2, 1, 1).fillRect(x + 3, y - 1, 1, 1);
+            // (Each print heads aft, the way he ran: its pad, its three toes to the right of it; on the deck's planks, 4 px
+            // lower than at first. The user, 2026-11-24: they pointed up, and stood over the deck's line.)
+            const y = L.y - (n % 2 ? 2 : 4) + 3;
+            this.paws.fillRect(x - 1, y, 2, 3).fillRect(x + 1, y - 1, 1, 1).fillRect(x + 2, y + 1, 1, 1).fillRect(x + 1, y + 3, 1, 1);
         }
         this.pawn = s.add.image(L.chessX + 14, L.y - 2, 'chess-pawn').setOrigin(0.5, 1).setDepth(D.decor + 0.3);
         if (this.P.save.seen.includes('sec_chess')) this.pawn.x += 16;

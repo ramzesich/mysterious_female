@@ -155,6 +155,11 @@ must be kept is kept (section 4).
     swim's first to the pixel. She stops 5 px short of the rim for it, so that her hand is a few px short of him: at
     the rim it lay on his chest. This replaces decision 2's "none of her".
 
+30. **His wet paw prints head aft and lie on the deck's planks** (the user: "Turn Bumbot's prints to be facing right, not
+    up. Shift them down 4 pixels"): each a pad with its three toes to the right of it, 4 px lower than they were,
+    where they had pointed up and stood over the deck's line. (U17's "the wet paw prints: untouched" was true until
+    this.)
+
 ## 4. What U17 said to keep, and what became of it
 
 - **The hatch is the only way into deck 10's midships hallway:** kept (`hatch_pool`, needs `drain`). It lands her
