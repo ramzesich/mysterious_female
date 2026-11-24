@@ -131,6 +131,9 @@ its first half played behind her back.
 19. **The stage at 18%** (the user, of the six strengths, the game then at 6/12 and the dancers' choice still open
     beside it: "D"): read as the wash's D, the props 6%, the stage 18%; the male dancer is D too, and stays.
     `STAGE_WASH` 0.18.
+20. **The stage back at 12%; the male dancer is D** (the user, told the wash had been read from the "D": "No"; asked
+    which wash: "Back to 12% (B)"): the "D" was the dancer's letter. The props 6%, the stage 12%, as in decision 17.
+    (Mine to learn: two open choices must not share their letters.)
 
 ## How it is built
 

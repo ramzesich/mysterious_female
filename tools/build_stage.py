@@ -4,7 +4,7 @@ docs/near-catch-3-remake-log.md), from assets/source/stage/gen/ (its README has 
     python tools/build_stage.py
 
 - `stage.png` (320 x 128, its left column the stage's forward end, its last row the row over the floor's line; washed
-  18% toward the corridor wall, `STAGE_WASH`, as are the valance and the hatch's two pictures): the
+  12% toward the corridor wall, `STAGE_WASH`, as are the valance and the hatch's two pictures): the
   stage's left half as PixelLab redrew it from a flat rough (curtain, valance, lighting bar, star cloth, boards), its
   right half that half mirrored, and the drum kit, redrawn in the stage's own light from the game's own piece where it
   stands, pasted in by its box.
@@ -45,9 +45,10 @@ LANTERNS = [48, 139]                # the lighting bar's lanterns in the left ha
 # The stage's picture is washed this far toward the corridor wall, as every background prop is toward it by its place's
 # level (tools/build_ship_art.py's `WALL`): the user, 2026-11-24, of the stage in full colour: it "pops out too much
 # ... add a bit of a wash to the stage"; the theatre's props round it came down from 12% to 6% (`-w6`) to meet it. Of six
-# strengths drawn in the running game the user chose "D": the props 6%, the stage 18% (12% was tried first).
+# strengths drawn in the running game, the props 6% and the stage 12% (18% was in for a moment, on a "D" that was
+# the male dancer's letter: the user, asked, "Back to 12%").
 # The lamp, the people, the rival's clip and the flour are not washed: nothing she meets or watches is.
-STAGE_WASH, WALL = 0.18, (0xE9, 0xDF, 0xCC)
+STAGE_WASH, WALL = 0.12, (0xE9, 0xDF, 0xCC)
 
 
 def dist(a, b):

@@ -3056,7 +3056,7 @@ def scenario_region3__stage(b):
     ok &= check(not b.eval(f"{S}.worldLayer.list.some(o => /^(grand-piano|guitar|mic-stand|drum-kit)/.test(o.frame?.name || '') && Math.abs(o.y - {F}) < 2 && o.x > {x0} && o.x < {x0} + 320)"),
                 "no piano, guitar or mic stand on it (the drum kit is in its picture)")
     # (The user, 2026-11-24: the stage "pops out too much": the theatre's pieces washed 6%, they were at 12%; the
-    # stage's picture 18% (12% first; the user chose "D" of six strengths), it was in full colour.)
+    # stage's picture 12%, it was in full colour.)
     names = b.eval(f"[...new Set({S}.worldLayer.list.filter(o => o.texture?.key === 'shipart' && Math.abs(o.y - {F}) < 2 && o.x > {x0} - 1900 && o.x < {x0}).map(o => String(o.frame.name)).filter(n => /^(theatre-seat|audience|speaker-stack)/.test(n)).map(n => n.replace(/^.*-/, '')))]")
     ok &= check(names == ["w6"], "the theatre's seats, its audience and its speakers washed 6%", names)
     px = b.eval(f"(t => {{ const c = document.createElement('canvas'); c.width = 4; c.height = 4; const g = c.getContext('2d'); g.drawImage(t.getSourceImage(), 80, 60, 4, 4, 0, 0, 4, 4); return [...g.getImageData(0, 0, 1, 1).data]; }})({S}.textures.get('stage-back'))")

@@ -1537,7 +1537,7 @@ def build_objects():
         return f"audience-{who}-w6"
     # (The user, 2026-11-19: the seats are the empty side-on seat the audience sit in, not the half-turned
     # one, none where one of them sits (their picture has its own); the stage's and the seats' pieces only
-    # lightly washed, `-lt`. Since 2026-11-24 at 6%, `-w6`, the new stage's picture at 18%: the user, "everything
+    # lightly washed, `-lt`. Since 2026-11-24 at 6%, `-w6`, the new stage's picture at 12%: the user, "everything
     # meets in the middle".)
     for k in range(int((238.4 - 206.6) / 0.95) + 1):
         m = 206.6 + k * 0.95
