@@ -363,13 +363,14 @@ def compose(g):
     hole.save(GAME / "exit-hole.png")
     g["exitAt"] = [box[0] + g["ox"], box[1] + g["oy"]]
     exit_swing(Image.open(GAME / "exit-grille.png").convert("RGBA"))      # (the grille as cut, before its place was cleared)
-    # The joints' near halves: the flange's top and foot again, over her.
+    # The joints' near halves: each flange again, over her, its whole height (the user, 2026-11-24: "let's make the
+    # entire line cover us, that would look better"; only its top and foot had been, the foot over her shoes).
     front = Image.new("RGBA", strip.size, (0, 0, 0, 0))
     topy = g["lower"] - H - g["oy"]
     for j in g["joints"]:
         ix = j - g["ox"]
-        for box in ((ix, topy - SHEET - 1, ix + FLANGE, topy + 3), (ix, bot - 4, ix + FLANGE, bot + SHEET + 1)):
-            front.paste(strip.crop(box), box[:2])
+        box = (ix, topy - SHEET - 1, ix + FLANGE, bot + SHEET + 1)
+        front.paste(strip.crop(box), box[:2])
     return strip, front
 
 
