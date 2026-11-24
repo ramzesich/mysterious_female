@@ -1424,8 +1424,11 @@ export class ShipScene extends Phaser.Scene {
 
     // The world round a room she is in (cabin 8206, the linen room), dimmed almost to black: four
     // dark panels framing it.
+    // (Over everything she is under, the balconies' railings and partitions on the decks round the room included: under
+    // them, they showed undimmed over it, the user, 2026-11-24, at the linen room. It frames the room, so neither the room
+    // nor she is under it.)
     roomDim(room) {
-        const dim = this.add.graphics().setDepth(DEPTH.exterior + 0.11).setVisible(false);
+        const dim = this.add.graphics().setDepth(DEPTH.player + 0.35).setVisible(false);
         const far = 4000, { x, y, width, height } = room;
         dim.fillStyle(0x0d0b14, ROOM_DIM);
         dim.fillRect(x - far, y - far, width + 2 * far, far);

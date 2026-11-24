@@ -385,9 +385,6 @@ export class World {
             const room = { id: def.id, route: def.id, door: def.doors[0].outX, floor: def.floor, room: img, dim, front,
                            inDeck: !def.doors.some(d => d.outRoute === OUTSIDE),
                            doors: def.doors, def, needs: def.needs, hidden: false, outside: [] };
-            // (Its dim then goes over what the outside draws in front of her too, the balconies' fronts: they showed
-            // undimmed over it. It frames the room, so neither the room nor she is under it.)
-            if (!room.inDeck) dim.setDepth(D.player + 0.35);
             for (const d of def.doors) {
                 d.lockSpec = parseLock(d.lock);
                 const out = d.outRoute === OUTSIDE;

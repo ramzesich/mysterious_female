@@ -3469,8 +3469,19 @@ def scenario_region4(b):
     ok &= check(js(b, f"!!{W}.story.hat"), "and it stays there while she stands")
     ok &= check(person(b, "riv_laundry")["on"], "the security officer in a towel, his uniform in the wash")
     b.shot("region4-laundry")
+    ok &= check(js(b, "window.__ship.viewOverride") is None, "the view no longer held on deck 4 once she is out (the corridor's decks dimmed)")
+    ok &= check(js(b, "(() => { const s = window.__ship, d = s.rooms.find(r => r.route === 'laundry').dim; return d.depth > s.DEPTH.player; })()"),
+                "the room's dim over the balconies' railings round it, as over all she is under")
     b.hold("left", 0.2)
     ok &= check(not js(b, f"!!{W}.story.hat"), "the towel slides off her head the moment she moves")
+    ok &= check(js(b, f"!!{W}.story.towelDown"), "and lies on the laundry's floor")
+    door = js(b, f"{W}.rooms.laundry.door")
+    b.teleport(door, D4, "laundry")
+    wait(0.2)
+    b.tap("e")
+    ok &= check(wait_js(b, "window.__ship.route === 'inside'", 2) and not js(b, f"!!{W}.story.towelDown"),
+                "out in the corridor at once: the towel on the laundry's floor is not there", route(b))
+    ok &= check(wait_js(b, "window.__ship.deckDim.shown > 0.9", 2), "the decks round the corridor dimmed", js(b, "window.__ship.deckDim.shown"))
     return ok
 
 

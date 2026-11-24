@@ -628,13 +628,17 @@ export class Story {
         }
         // Out of the chute with a towel on her head: it slides off the moment she moves or jumps (the user, 2026-11-24: "Let
         // the towel fall down from our head as soon as we move or jump"; it had stayed a few steps).
+        // (Watched only once she has stood on the floor in play: in the first frame after the climb out her body was not
+        // yet on it, read as a jump, and the towel fell by itself, the user, 2026-11-24. Out of the room, the towel and the
+        // one lying on its floor are the room's, and go: "If we exit into the corridor immediately, the towel is there".)
         if (this.hat) {
-            const body = her.body;
-            const moved = s.mode === 'play' && body.enable && (Math.abs(body.velocity.x) > 5 || body.velocity.y < -5
-                || !(body.blocked.down || body.touching.down));
-            const off = moved || time > this.hatUntil || s.route !== 'laundry';
-            if (off && !this.hatGoing) this.hatOff();
+            const body = her.body, play = s.mode === 'play' && body.enable, down = body.blocked.down || body.touching.down;
+            if (!this.hatArmed && play && down) this.hatArmed = true;
+            const moved = this.hatArmed && play && (Math.abs(body.velocity.x) > 5 || body.velocity.y < -5 || !down);
+            if (s.route !== 'laundry') this.hatAway();
+            else if (moved && !this.hatGoing) this.hatOff();
         }
+        if (this.towelDown && s.route !== 'laundry') this.hatAway();
         this.glimpseBalcony();
     }
 
@@ -956,7 +960,7 @@ export class Story {
             s.events.on('postupdate', this.hatFollow);
         }
         this.hatGoing = false;
-        this.hatUntil = s.time.now + 60000;
+        this.hatArmed = false;
         this.placeHat();
         await w.wait(CHUTE.lieMs);
         await w.tween({ targets: her, y: floor - CHUTE.sink, duration: CHUTE.riseMs, ease: 'Back.easeOut' });
@@ -973,6 +977,9 @@ export class Story {
         her.body.enable = true;
         her.body.reset(her.x, floor);
         s.takeoffY = floor;
+        // (The view no longer held on the laundry's deck: held, the corridor's decks round it were left undimmed once she
+        // went out, the user, 2026-11-24.)
+        s.viewOverride = null;
         this.chuting = false;
         this.P.setFlag('chute');
     }
@@ -994,7 +1001,7 @@ export class Story {
             s.anims.create({ key: 'chute-towel-fall', frames: s.anims.generateFrameNumbers('chute-towel-fall'), frameRate: 11 });
         }
         // (In front of her as it slides off her head, as it lay on it; on the floor, behind her as she walks past it.)
-        const sp = s.add.sprite(x, y0, 'chute-towel-fall', 0).setOrigin(0).setFlipX(flip).setDepth(s.DEPTH.player + 0.06);
+        const sp = this.towelDown = s.add.sprite(x, y0, 'chute-towel-fall', 0).setOrigin(0).setFlipX(flip).setDepth(s.DEPTH.player + 0.06);
         w.add([sp]);
         // (The clip's own fall is a few px short of her floor or past it: made up over its frames.)
         const n = F.frames - 1;
@@ -1002,8 +1009,23 @@ export class Story {
         sp.play('chute-towel-fall');
         sp.once('animationcomplete', () => {
             sp.setY(y1).setDepth(s.DEPTH.player - 0.02);
-            s.tweens.add({ targets: sp, alpha: 0, duration: 1500, delay: 2500, onComplete: () => sp.destroy() });
+            s.tweens.add({ targets: sp, alpha: 0, duration: 1500, delay: 2500, onComplete: () => {
+                sp.destroy();
+                if (this.towelDown === sp) this.towelDown = null;
+            } });
         });
+    }
+
+    // The towel gone at once, on her head or on the floor: she has left the laundry.
+    hatAway() {
+        const s = this.scene;
+        this.hat?.destroy();
+        this.hat = null;
+        if (this.towelDown) {
+            s.tweens.killTweensOf(this.towelDown);
+            this.towelDown.destroy();
+            this.towelDown = null;
+        }
     }
 
     // The towel on her head, where it lies on her picture (`towel` in assets/ship/chute/chute.json: from her feet and her

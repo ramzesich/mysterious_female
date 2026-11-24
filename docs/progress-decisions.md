@@ -4661,3 +4661,16 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
   prints heading aft on the planks (dropped again in the merge into `three-uses`, the user: every print of his
   goes); the hot tub 22 px aft.
 - **Left:** `docs/ship-regions.png` still draws the hatch's way at the pool's middle; Bumbot's own clips are part 6's.
+
+## The chute's dims and towel after the user's play (the user's, 2026-11-24)
+
+- **The linen room showed the balconies round it undimmed** (decks 8 and 10's railings, partitions, a gull): a room's
+  dim lay under what the outside draws in front of her. Every room's dim is now over her depth (`roomDim`), as the
+  lifeboat's already was; it frames the room, so neither the room nor she is under it.
+- **Out of the laundry, the corridor's decks were undimmed:** the drop held the view on deck 4 (`viewOverride`) after she
+  had landed, and the decks' dim is off while the view is held. Let go as she climbs out.
+- **The towel fell by itself as she climbed out:** in the first frame of play her body was not yet on the floor, read as
+  a jump. It is watched only once she has stood in play; the 4.5 s that took it off her while she stood went too.
+- **Out into the corridor at once, the towel lay there fading:** the towel, on her head or on the floor, is the
+  laundry's and goes the moment she leaves (`hatAway`).
+- `region4` checks each; `region4`, `linen`, `golden`, `cabin`, `region7` pass.
