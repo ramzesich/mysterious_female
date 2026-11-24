@@ -672,6 +672,7 @@ Lessons learned (2026-11-23, the shaft remade):
   ("the shaft should obscure us, to give us a feeling that we are getting inside of it"). Standing by it she stays in
   front, as of anything on the wall.
 - **Never stage a file in the shared folder before the commit:** the index is shared with the other sessions.
+- **A room's dim is over her depth** (`roomDim`): under it, what the outside draws in front of her (the balconies' railings on the decks round the linen room) showed undimmed. **And a scene that holds the view (`viewOverride`) lets go when she is hers again:** held, the decks' dim stays off (out of the laundry, the corridor's decks were bright).
 
 Lessons learned (2026-11-24, the pool's scene remade):
 
