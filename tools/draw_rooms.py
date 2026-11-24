@@ -50,6 +50,17 @@ def atlas(frame):
     return img.crop((f["x"], f["y"], f["x"] + f["w"], f["y"] + f["h"]))
 
 
+def redecorated(name, R):
+    """A room as drawn here, then redecorated (the user's choices of 2026-11-24): tools/redecorate_rooms.py lays the
+    generated look over it, keeping its doors, floor and generated pieces as drawn here (the guest cabins, take 3, their
+    balcony doors' glass cleared for the live view; the pantry, B)."""
+    import redecorate_rooms as Rd
+    base = R.save(name)
+    im = Rd.pantry(base) if name == "pantry" else Rd.cabin(name, base)
+    im.save(OUT / f"{name}.png")
+    return im
+
+
 def stand(im, frame, x, dy=0, flip=False):
     """A piece standing at x (its middle), its foot `dy` px over the floor."""
     piece = atlas(frame)
@@ -296,7 +307,12 @@ def store(width):
     # A low crate standing out from the shelves, its top 40 px up... no: the tangerines rest on the
     # 40 px shelf between the sacks and the crate.
     R.poster(20, 40, 22, 28, [WHITE, "#f3ecdd", SLATE])
-    return R.save("store")
+    # Redecorated (the user's choice of 2026-11-24, A): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door and the floor as drawn here.
+    from redecorate_rooms import store as redecorate
+    im = redecorate(R.save("store"))
+    im.save(OUT / "store.png")
+    return im
 
 
 def smcabin(width):
@@ -338,7 +354,7 @@ def smcabin(width):
     r(220, FLOOR - 42, 221, FLOOR - 3, GREY)
     for y in range(FLOOR - 38, FLOOR - 4, 8):
         r(214, y, 221, y, GREY)
-    return R.save("smcabin")
+    return redecorated("smcabin", R)
 
 
 def crewcabin(width):
@@ -552,7 +568,7 @@ def pantry(width):
         R.r(x, 13, x, 20, WOOD)
         for k in range(4):
             R.d.ellipse([x - 2, 20 + k * 5, x + 2, 24 + k * 5], fill=c)
-    return R.save("pantry")
+    return redecorated("pantry", R)
 
 
 def galley(width):
@@ -609,7 +625,12 @@ def galley(width):
     # Its door is at its aft end (the deck's last metres are structure): the whole room is mirrored.
     R.im = R.im.transpose(Image.FLIP_LEFT_RIGHT)
     R.full = [(width - 1 - x1, y0, width - 1 - x0, y1) for x0, y0, x1, y1 in R.full]
-    return R.save("galley")
+    # Redecorated (the user's choice of 2026-11-24, A): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door and the floor as drawn here.
+    from redecorate_rooms import galley as redecorate
+    im = redecorate(R.save("galley"))
+    im.save(OUT / "galley.png")
+    return im
 
 
 # --- Region 2's rooms (deck 6, the boat walkway) ----------------------------------------------------
@@ -658,7 +679,11 @@ def maid6(width):
         r(x, FLOOR - 13, x + 1, FLOOR - 1, WOOD_DARK)
     for k in range(3):
         d.rounded_rectangle([128, FLOOR - 21 - k * 4, 140, FLOOR - 17 - k * 4], radius=1, fill=(WHITE, BLUE_LIGHT, WHITE)[k], outline=GREY)
-    out = R.save("maid6")
+    # Redecorated (the user's choice of 2026-11-24, C): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door, the floor and the generated pieces as drawn here.
+    from redecorate_rooms import maid6 as redecorate
+    out = redecorate(R.save("maid6"))
+    out.save(OUT / "maid6.png")
     # The swan again, alone, drawn over her while she stands on the bed (the user, 2026-11-20: on the bed
     # the swan is in front of her; on the floor she is in front of it).
     on_bed(out, "towel-swan", 190, 21, "maid6-onbed")
@@ -814,7 +839,7 @@ def dressing(width):
         r(x - 1, 42, x + 1, 44, WOOD_LIGHT)
     d.polygon([(214, 22), (217, 29), (224, 29), (219, 34), (221, 41), (214, 37), (207, 41), (209, 34), (204, 29), (211, 29)], fill=YELLOW, outline=ORANGE)
     R.poster(20, 34, 22, 30, [RED, YELLOW, WHITE])
-    return R.save("dressing")
+    return redecorated("dressing", R)
 
 
 def nook(width):
@@ -865,7 +890,7 @@ def nook(width):
     R.im.alpha_composite(cat, (23 - cat.width // 2, 38))
     box(110, 18, 118, 24, YELLOW, ORANGE)
     r(112, 24, 116, 26, TUBE)
-    return R.save("nook")
+    return redecorated("nook", R)
 
 
 def lighting(width):
@@ -935,7 +960,7 @@ def lighting(width):
     r(430, 9, 432, 30, SLATE)
     r(416, 13, 416, 46, WOOD)
     d.ellipse([413, 46, 419, 54], outline=WOOD)
-    return R.save("lighting")
+    return redecorated("lighting", R)
 
 
 # --- Region 4's rooms (deck 9's cabins) --------------------------------------------------------------
@@ -1053,7 +1078,7 @@ def makeup10(width):
     stand(R.im, "towel-trolley", 136)
     bed(R, 186, 236)
     wall_lamp(R, 222, FLOOR - 70)
-    return R.save("makeup10")
+    return redecorated("makeup10", R)
 
 
 def cleanup(width):
@@ -1084,7 +1109,7 @@ def cleanup(width):
     for k in range(3):                                                    # the pillows, piled on the bed's head
         d.rounded_rectangle([210 - k, FLOOR - 33 - k * 6, 228 - k, FLOOR - 27 - k * 6], radius=3, fill=WHITE, outline=GREY)
     wall_lamp(R, 222, FLOOR - 70)
-    return R.save("cleanup")
+    return redecorated("cleanup", R)
 
 
 def balcabin9(width):
@@ -1131,7 +1156,7 @@ def balcabin9(width):
     for x0 in (236, 281):
         box(x0, FLOOR - 88, x0 + 6, FLOOR - 3, "#7f708a", SLATE)
         r(x0 + 3, FLOOR - 86, x0 + 3, FLOOR - 5, SLATE)
-    return R.save("balcabin9")
+    return redecorated("balcabin9", R)
 
 
 def balcony_door(R, ajar, curtain="#7f708a"):
@@ -1197,7 +1222,7 @@ def balcabin8m(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 204, 34, 26, 20, (BLUE_LIGHT, BLUE, WHITE))
     balcony_door(R, True, "#4d9be6")
-    return R.save("balcabin8m")
+    return redecorated("balcabin8m", R)
 
 
 def balcabin8a(width):
@@ -1212,7 +1237,7 @@ def balcabin8a(width):
     wall_lamp(R, 196, FLOOR - 70)
     picture(R, 206, 34, 26, 20, (PINK, MAUVE, YELLOW))
     balcony_door(R, True, "#ae2334")
-    return R.save("balcabin8a")
+    return redecorated("balcabin8a", R)
 
 
 def balcabin9a(width):
@@ -1230,7 +1255,7 @@ def balcabin9a(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 132, 36, 30, 20, (YELLOW, GREEN, WHITE))
     balcony_door(R, True, "#1ebc73")
-    return R.save("balcabin9a")
+    return redecorated("balcabin9a", R)
 
 
 def balcabin10a(width):
@@ -1247,7 +1272,7 @@ def balcabin10a(width):
     wall_lamp(R, 194, FLOOR - 70)
     picture(R, 204, 34, 26, 20, (NAVY, BLUE, YELLOW))
     balcony_door(R, True, "#905ea9")
-    return R.save("balcabin10a")
+    return redecorated("balcabin10a", R)
 
 
 def guest10(width):
@@ -1272,7 +1297,7 @@ def guest10(width):
     wall_lamp(R, 196, FLOOR - 70)
     picture(R, 206, 34, 26, 20, (BLUE_LIGHT, GREEN, WHITE))
     balcony_door(R, False, "#0b5e65")
-    return R.save("guest10")
+    return redecorated("guest10", R)
 
 
 def atlas_names():
@@ -1316,10 +1341,77 @@ def adjoin(width):
     r(407, FLOOR - 31, 410, FLOOR - 30, ORANGE)
     # (The blanket fort across the way through is a picture of its own, in front of her: `fort()`.)
     fort()
-    return R.save("adjoin")
+    return redecorated("adjoin", R)
 
 
 # --- Region 6's room (deck 11) ---------------------------------------------------------------------
+def restroom(width):
+    """The restrooms by the Chapel, deck 12 (the user, 2026-11-24: "entreable to a small restroom cabin, not too wide",
+    between the checkpoint's crew door and the glass doors; 124 px, its door 70 in): tiles to waist height, at the forward
+    wall a tall mirror where she fixes her hair (`mirror`, as in her crew cabin), a washbasin in a stone counter with a
+    small plant and a print over it, a hand dryer on the wall that E switches on (`sec_dryer`), a bin; aft of the door a
+    stall, shut, its lock red (someone hums in it: the soundscape's `PLACES`)."""
+    TILE, GROUT, PAINT = "#f4f4ee", "#c7cfcc", "#dfe6e2"
+    R = Room(width, PAINT, "#cdd6d2", ceiling=WHITE, skirting=GREY, floor="#9babb2", fleck=SLATE, pitch=240)
+    r, box, d = R.r, R.box, R.d
+    R.tube(30, 28)
+    R.tube(92, 22)
+    # Tiles to waist height, a band of blue ones along their top.
+    r(0, FLOOR - 46, width - 1, FLOOR - 5, TILE)
+    for y in range(FLOOR - 46, FLOOR - 4, 7):
+        r(0, y, width - 1, y, GROUT)
+    for x in range(3, width, 7):
+        r(x, FLOOR - 46, x, FLOOR - 5, GROUT)
+    r(0, FLOOR - 48, width - 1, FLOOR - 46, BLUE)
+    # The end walls.
+    for x0, x1 in ((0, 2), (width - 3, width - 1)):
+        r(x0, 9, x1, FLOOR - 1, "#b8c3bf")
+    # The mirror at the forward wall, turned to the room (her crew cabin's, hung on the wall): chrome frame, glass.
+    top, foot = 54, FLOOR - 22                # (18 px lower than at first, at her face: the user, 2026-11-25)
+    d.polygon([(6, top), (20, top + 2), (20, foot - 2), (6, foot)], fill=GREY, outline=SLATE)
+    d.polygon([(8, top + 3), (18, top + 4), (18, foot - 4), (8, foot - 3)], fill="#bfe3f2")
+    d.line([(10, top + 26), (15, top + 10)], fill=WHITE)
+    d.line([(10, top + 38), (14, top + 28)], fill=WHITE)
+    R.full.append((5, top - 1, 21, foot + 1))
+    # (The look laid over this keeps its own mirror, moved down by tools/redecorate_rooms.py to the same place.)
+    # The washbasin in its stone counter, a cabinet under it; the tap, the soap; a small plant; a print over it.
+    box(24, FLOOR - 32, 47, FLOOR - 28, "#e6e1d6", SLATE)
+    d.ellipse([29, FLOOR - 33, 41, FLOOR - 29], fill=WHITE, outline=GREY)
+    r(34, FLOOR - 38, 35, FLOOR - 33, GREY)
+    r(34, FLOOR - 38, 38, FLOOR - 37, GREY)
+    box(25, FLOOR - 27, 46, FLOOR - 2, "#d9cfc0", SLATE)
+    r(35, FLOOR - 26, 35, FLOOR - 3, SLATE)
+    r(32, FLOOR - 16, 33, FLOOR - 13, GREY)
+    r(37, FLOOR - 16, 38, FLOOR - 13, GREY)
+    box(42, FLOOR - 44, 45, FLOOR - 38, WHITE, GREY)
+    box(25, FLOOR - 37, 28, FLOOR - 33, "#cd683d", WOOD_DARK)
+    for x, y in ((24, FLOOR - 40), (26, FLOOR - 42), (28, FLOOR - 40), (27, FLOOR - 39), (25, FLOOR - 38)):
+        r(x, y, x + 1, y + 1, GREEN)
+    box(28, 48, 40, 62, WHITE, SLATE)
+    r(30, 50, 38, 60, "#8fd3ff")
+    r(30, 56, 38, 60, "#4d9be6")
+    r(33, 52, 35, 53, WHITE)
+    # The hand dryer on the wall, its nozzle down; a bin under it.
+    box(44, FLOOR - 64, 54, FLOOR - 52, WHITE, SLATE)
+    r(46, FLOOR - 61, 52, FLOOR - 60, PALE)
+    box(47, FLOOR - 52, 51, FLOOR - 49, GREY, SLATE)
+    R.full.append((43, FLOOR - 65, 55, FLOOR - 48))
+    box(48, FLOOR - 11, 54, FLOOR - 1, GREY, SLATE)
+    r(48, FLOOR - 11, 54, FLOOR - 10, SLATE)
+    # Its door (the corridor's own, from inside).
+    R.door(70, frame="door-restroom")
+    # The stall aft of the door: a laminate partition on steel feet, its door shut, its lock showing red.
+    box(87, FLOOR - 72, 120, FLOOR - 6, "#c9b8a6", SLATE)
+    r(87, FLOOR - 73, 120, FLOOR - 72, GREY)
+    box(91, FLOOR - 69, 116, FLOOR - 7, "#d8c7b4", SLATE)
+    for x in (88, 118):
+        r(x, FLOOR - 6, x + 1, FLOOR - 1, GREY)
+    box(110, FLOOR - 40, 113, FLOOR - 37, RED, INK)
+    r(93, FLOOR - 44, 94, FLOOR - 40, GREY)
+    # Redecorated (the user's choice of 2026-11-24, C: modern, pale grey stone, brushed steel): tools/redecorate_rooms.py.
+    return redecorated("restroom", R)
+
+
 def coldroom(width):
     """The Garden Cafe's cold room (`room_coldroom`): insulated panels with frost along their seams,
     the cooler's unit on the ceiling with icicles under it, shelves of tubs and boxes, and on the low
@@ -1376,10 +1468,12 @@ def coldroom(width):
     R.d.rounded_rectangle([12, 44, 30, 78], radius=3, fill=NAVY, outline=INK)
     for y in range(50, 76, 6):
         R.r(13, y, 29, y, BLUE)
-    # Cold air along the floor.
+    # Cold air along the floor (not across the door's frame: the door goes back over the redrawn room as drawn here).
     for x in range(4, width, 13):
+        if x + 7 >= DOOR_X - 16 and x <= DOOR_X + 16:
+            continue
         R.r(x, FLOOR - 7 - (x * 3) % 3, x + 7, FLOOR - 6 - (x * 3) % 3, FROST)
-    return R.save("coldroom")
+    return redecorated("coldroom", R)
 
 
 def fort():
@@ -1421,12 +1515,16 @@ def fort():
     d.line([(18, B2 - 34), (28, B2 - 34)], fill=RED)
     d.line([(18, B2 - 31), (25, B2 - 31)], fill=RED)
     palettize(im).save(OUT / "adjoin-fort.png")
+    # Redrawn in place (the user's choice of 2026-11-24, 3): tools/redecorate_rooms.py's fort, its outline as drawn here.
+    from redecorate_rooms import fort as redecorate
+    im = redecorate()
+    im.save(OUT / "adjoin-fort.png")
     return im
 
 
 DRAW = {"crewcabin": crewcabin, "laundry": laundry, "store": store, "smcabin": smcabin, "pantry": pantry, "galley": galley,
         "maid6": maid6, "lifeboat": lifeboat, "dressing": dressing, "lighting": lighting,
-        "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom,
+        "cleanup": cleanup, "makeup10": makeup10, "balcabin9": balcabin9, "adjoin": adjoin, "coldroom": coldroom, "restroom": restroom,
         "balcabin8m": balcabin8m, "balcabin8a": balcabin8a, "balcabin9a": balcabin9a, "balcabin10a": balcabin10a,
         "guest10": guest10, "nook": nook}
 

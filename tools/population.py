@@ -36,7 +36,8 @@ ROOMS = [
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
          plate_side=-1, plate_lift=10),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
-    dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
+    dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open",
+         windows=[(181, 35, 19, 37), (202, 35, 20, 37)]),
     dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
     # (At 242.5 m its door and its plate lay on the speaker stack by the stage: the user, 2026-11-14.)
     dict(id="dressing", deck=6, m=241.3, width=240, look="dressing", door="crew", plate="STAGE DOOR", plate_style="navy",
@@ -52,26 +53,31 @@ ROOMS = [
     # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
     # sprinkler (156 m) and the "Do Not Disturb" door (171.6 m).
     dict(id="makeup10", deck=10, m=164, slot=True, width=240, look="cabin", door="open"),
-    dict(id="balcabin9", deck=9, m=150, slot=True, width=288, look="balcabin", door="cabin",
+    dict(id="balcabin9", deck=9, m=150, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin",
          lock=("card", "hk", 0), checkpoint="cp_balcabin",
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
     dict(id="adjoin", deck=9, m=176, slot=True, width=432, look="adjoin", door="cabin",
          doors=[dict(x=432 - 59, to="inside", deck=9, m=184, slot=True, door="cabin")]),
-    dict(id="balcabin8m", deck=8, m=159, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+    dict(id="balcabin8m", deck=8, m=159, slot=True, width=288, windows=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], look="balcabin", door="cabin", lock=("oneway", 1),
          checkpoint="cp_hall_8m",
          doors=[dict(x=262, to="outside", deck=8, door="balcony")]),
-    dict(id="balcabin8a", deck=8, m=230, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+    dict(id="balcabin8a", deck=8, m=230, slot=True, width=288, windows=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], look="balcabin", door="cabin", lock=("oneway", 1),
          checkpoint="cp_hall_8a",
          doors=[dict(x=262, to="outside", deck=8, door="balcony")]),
-    dict(id="balcabin9a", deck=9, m=225, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+    dict(id="balcabin9a", deck=9, m=225, slot=True, width=288, windows=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], look="balcabin", door="cabin", lock=("oneway", 1),
          checkpoint="cp_hall_9a",
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
-    dict(id="balcabin10a", deck=10, m=215, slot=True, width=288, look="balcabin", door="cabin", lock=("oneway", 1),
+    dict(id="balcabin10a", deck=10, m=215, slot=True, width=288, windows=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], look="balcabin", door="cabin", lock=("oneway", 1),
          checkpoint="cp_hall_10a",
          doors=[dict(x=262, to="outside", deck=10, door="balcony")]),
-    dict(id="guest10", deck=10, m=235, slot=True, width=288, look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
+    dict(id="guest10", deck=10, m=235, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
          doors=[dict(x=262, to="outside", deck=10, door="balcony", lock=("flag", "guest"))]),
-    dict(id="coldroom", deck=11, m=185, width=240, look="coldroom", door="crew", plate="COLD ROOM",
+    # (Between the café's two last windows, its plate over the door: at 185 m it stood in a window, the user, 2026-11-24.)
+    # The restrooms by the Chapel (the user, 2026-11-24: "make it entreable to a small restroom cabin, not too wide"):
+    # 124 px between the checkpoint's crew door and the glass doors, its door where it stood, 70 px in; a mirror at its
+    # forward wall where she fixes her hair (`mirror`, as in her crew cabin).
+    dict(id="restroom", deck=12, m=72.6, width=124, door_x=70, look="restroom", door="restroom", mirror=28),
+    dict(id="coldroom", deck=11, m=183.542, width=240, look="coldroom", door="crew", plate="COLD ROOM", plate_up=True,
          lock=("card", "hk", 0)),
 ]
 
@@ -180,7 +186,9 @@ TANGERINES = {
     # (On the bar: 54 m is the grand piano.)
     "tan_12_spinnaker": (12, 55.45, 2, 32, None),
     "tan_12_lady": (12, 127.25, 2, 0, "lady"),
-    "tan_12_cagneys": (12, 172.9, 1, 34, None),
+    # (Cagney's, balanced on its steel trolley's dome (plan-the-rest §7d, 7), moved to the restrooms' counter by the
+    # Chapel, right of the tap: the user, 2026-11-24, "Place a tangerine here. Move some other tangerine here".)
+    "tan_12_restroom": ("restroom", 44, 1, 33, None),
     "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
     "tan_funnel": ("funnel", 189.2, 1, 13, None),
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
@@ -728,6 +736,12 @@ QUIRKS = {
     # An open cabin, the sea in its window: E, she steps in and bounces on its bed
     # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
     "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
+    # The restrooms' hand dryer (deck 12, the user, 2026-11-24): E switches it on, its roar and a puff of warm air under
+    # its nozzle for its `ms`; she is not held. (Its reach kept clear of the mirror's, 14 to 42, and the door's, 54 to 86.)
+    "sec_dryer": ("restroom", 49, "E", None, 2400, dict(reach=5, gag="dryer", nozzle=48)),
+    # Its stall, shut, someone in it (their shoes under its door, their humming): E, she knocks; "Occupied!" from over its
+    # top (`top` px up); her embarrassed gag (23) and her checkpoint (the user, 2026-11-25).
+    "sec_stall": ("restroom", 104, "E", None, 0, dict(reach=12, gag="stall", top=74)),
 }
 # Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there, when hers to take, until, options).
 # `lift`: it is one tray, gone from its place while she carries it (back as a fresh one if she spills it).
@@ -740,8 +754,9 @@ SOURCES = {
     # 50 s), the old lady's mojito from Topsiders' bar.
     "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),
     "src_cocktail": (11, 155.38, "cocktail", "region:8", [("umbrella-cocktail", 30)], None, "flag:lady"),
-    # The ice cream mix, on the cold room's shelf: taken once the machine has run empty.
-    "item_canister": ("coldroom", 150, "canister", None, [("load-canister", 30)], "flag:kid_fed", "flag:refilled"),
+    # The ice cream mix, on the cold room's shelf: taken once the machine has run empty. (One canister: off the shelf
+    # while she carries it, as the lunch's tray, 2026-11-24.)
+    "item_canister": ("coldroom", 150, "canister", None, [("thing:canister", 30)], "flag:kid_fed", "flag:refilled", {"lift": True}),
     # Region 9: the wedding cake on its table by the pastry chef, hers to take once the planner
     # has shown what she wants, until the wedding has it.
     # (On the round side table: its 21 px less 2, as everything on it, the user, 2026-11-22.)
@@ -780,9 +795,11 @@ DELIVERIES = {"dlv_vase": (8, 115.6, "vase", "dlv_vase", 12, "8215", 48),
 # plaque, painted, card: the user's, 2026-11-21), or `plate`, a brass name plate (options: size, wrap).
 SIGNS = {
     "sign_lockdown_1": (4, 56, "SEARCH\nIN PROGRESS", "notice", 56, {}),
-    "sign_name_1": (4, 224.2, "BOSUN", "plate", 52, {}),
-    "sign_name_2": (4, 228.2, "PURSER", "plate", 52, {}),
-    "sign_name_3": (4, 236.1, "DJ", "plate", 52, {}),
+    # (Each 3 px clear of its door's frame, as the stage manager's plate is: BOSUN touched it, PURSER lay over it, the
+    # user, 2026-11-24.)
+    "sign_name_1": (4, 224.27, "BOSUN", "plate", 52, {}),
+    "sign_name_2": (4, 228.29, "PURSER", "plate", 52, {}),
+    "sign_name_3": (4, 236.12, "DJ", "plate", 52, {}),
     # The promenade's two lanes, painted on its wall: the track by the rail, the walk by the wall.
     "sign_lane_1": ("prom", 114.2, "JOGGING TRACK\nby the rail", "plaque", 58, {}),
     "sign_lane_2": ("prom", 119.4, "WALKERS:\nkeep to the wall ↑", "painted", 58, {}),

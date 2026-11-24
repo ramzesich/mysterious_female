@@ -4844,6 +4844,133 @@ him", "D to dash", then on playing it the pause before the dash, the lunch's pul
 the counter). The Seven Seas' pass became a generated serving counter; the scene is `src/world/pass.js`, one clock;
 she is held 2.4 s where it was 8.3. 31 generations.
 
+## Three more rooms redecorated (2026-11-24)
+
+The user: "In the same manner as we redecorated the linen room and the laundry room, I want to continue with other
+rooms. Crew cabin on deck 3 and room 8206 are looking well, so we leave them alone." Of the twenty rooms left, the best
+candidates by how flat they are, how much she is in them and what they cost: the galley, the dry store, the maid's cabin
+(also the cheapest way to settle a look for the guest cabins); the user: "Let's start with 1 to 3".
+
+- Three looks each (A worn working, B clean modern, C warm; the maid's cabin's C asked to match cabin 8206 as a
+  reference, and came back almost as it was). **Chosen: store A, galley A, maid's cabin C** (the user).
+- **Kept pixel for pixel:** the doors and floors; the maid's cabin's luggage rack and suitcase, sea picture and towel
+  swan by boxes round them (by their own pixels the redraw's copies left faint traces), so the swan drawn over her on the
+  bed is the same picture. The store's shelf for the tangerines and the snack tube came back on its row (88), its middle
+  empty; the galley's flour sacks, range and pass where they were.
+- **The galley in halves** (336 px): matched row by row and cut at x 178, between the range and the pass, where the tile
+  rows meet and the cut reads as a grout line. An inpaint of the strip came back a flat grey pillar: kept in `tries/`,
+  not used.
+- `tools/redecorate_rooms.py` has the three; `tools/draw_rooms.py`'s `store`, `galley` and `maid6` call it. 99
+  generations (`assets/source/ship/redeco/README.md`).
+- **The maid's cabin's window shows the live outside** (the user, asked whether it ever had: it was always painted; "Yes,
+  and we'll do the others, as we redecorate them"): its panes are cleared in its picture (`windows` on the room in
+  `tools/population.py`, `clear_glass` in `tools/redecorate_rooms.py`) and one window view for every such room is drawn
+  behind them (the ship scene's `roomView`, made by `world.buildRooms`), shown while she is in the room, as cabin 8206's.
+  The guest cabins get theirs as they are redecorated. `region2`, `keeps`, `cabin`, `boot` pass.
+- The galley's door is at deck 5's aft end past the pass (the user did not find it): from `?at=pass5`, aft past the
+  near-catch.
+- The user upgraded PixelLab to Tier 3 the same day: 10,000 generations a cycle, refilled on 2026-12-24 (CLAUDE.md).
+- `boot`, `region1`, `region2`, `region3`, `keeps`, `highlight` pass.
+
+## The guest cabins and the pantry redecorated, the balconies' railing out of the rooms (2026-11-24)
+
+The user: "More rooms. Now we have more than enough generations".
+
+- **The nine guest cabins** (the six balcony cabins, the clean-up and make-up cabins, the adjoining cabins): a pilot of
+  three takes on deck 9's balcony cabin, the user's **take 3** (their own colours, only the finish: cream panels with
+  thin seams, warm wood with a little grain, soft folds; "keep every shape ..., change only the finish"), then each
+  cabin the same way. Cabin 8206 as a style reference moved the furniture and drew a second bed: dropped (`tries/`).
+  Cut where the wall is plain (x 0..184 and 112..288, the cut between the desk and the bed; the adjoining cabins in
+  three parts, cut at 211 and inside the second door at 363). Kept as drawn: the doors, the floor, the vacuum's dock;
+  the generated pieces by their own pixels (the swans, trolleys, rose, bucket and spade, juice, beach bag, swim ring,
+  glasses, cake, champagne, lamp, luggage).
+- **Every balcony door shows the live outside** (the user: the guest cabins' windows "as we redecorate them"): its
+  panes cleared (`balcony_glass`: shut or slid open), the rail, balusters, handle and the curtain blown in kept; the
+  panes are the room's `windows` for the game's view. (The committed `balcabin9.png` still had the swan's old beak:
+  8 px now as the atlas has it.)
+- **The blanket fort redrawn in place** (the user: "The fort also have to be regenerated"; 3 of three): its outline
+  as it was, so her crawl behind it is the same.
+- **The pantry B** (clean modern; of three): its left part redrawn to x 212, past the shelf's right post, so the cut
+  falls on plain wall (cut through the shelves, their rows did not meet).
+- **The balconies' fronts and partitions are not drawn across a room she is in** (found in the balcony cabin, an
+  existing fault; the user: "fix the railing"): the ship scene's cut-away sets them to nothing on her deck while she
+  is in a room (`balcony` on their `shellSlopes`).
+- About 260 generations this round (`assets/source/ship/redeco/README.md`). `boot`, `region1`, `region2`, `region4`,
+  `region7`, `region9`, `finale`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The stage manager's cabin, the dressing room and the cold room redecorated; the cold room's door, the canister (2026-11-24)
+
+The user: "What other rooms can we redecorate?"; of seven (the stage manager's cabin, the nook, the dressing room, the cold
+room, the chapel, the lighting booth, the lifeboat), "1-3".
+
+- **Three looks of each** (`edit_image_pro_flash`, "keep every shape ..., change only the finish": A its own colours,
+  B lived-in or worn, C clean modern or grand); **the user's: the stage manager's cabin C (light grey panels, pale birch,
+  navy blankets), the dressing room A (peach, the bulbs glowing), the cold room A (icy panels, labelled tubs).** In
+  `CABINS` as the guest cabins: their doors pasted back by their own pixels (a box carried a strip of the old wall's
+  colour and the old frost round them); the cabin's door was drawn a little bigger by the redraw, its rim filled from the
+  wall beyond (`rim_fill`); the dressing room's stool and rail by their pixels. **The cabin's chair is the redraw's** (the
+  user: ours over it "looks too distorted"; the redraw's edges showed round it). The cold room's floor frost is no longer
+  drawn across its door's frame (the user: "clean the white strips").
+- **The cold room's door between the café's last two windows** (the user: "its location is off ... out of the window"):
+  185 m to 183.542, its plate over the door (the wall there is 116 px: the counter, the reader, the door); the Ice Cream
+  Bar's counter and cone sign 30 px forward, 5 px clear of the window's frame.
+- **The deck 4 officers' plates clear of their doors' frames** (the user: BOSUN and PURSER "overlap the doorframes"): BOSUN,
+  PURSER and DJ each 3 px clear, as the stage manager's plate is.
+- **The ice cream mix's canister generated** (the user: "what is it on the table, drawn in code? ... worth generating
+  properly"; the last of three, a steel churn with a pink label and a cone on it), in its own colours (on the palette
+  its steel would go green), on the shelf, in her hands and poured; **one canister**, off the shelf while she carries it
+  (`lift`, as the lunch's tray).
+- 96 generations (81 + 15). `boot`, `region2`, `region3`, `region6`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The nook, the lighting booth and the chapel redecorated; the chapel's chairs out (2026-11-24)
+
+The user: "The remaining rooms" (the nook, the chapel, the lighting booth, the lifeboat), three looks of each (the
+three wider ones in two parts): **the nook B** (an old library: dark green walls, walnut panelling, brass), **the
+lighting booth A** (its own dark grey-purple, panel seams, worn steel), **the lifeboat left as it is** (its tries kept),
+and the chapel: **"Remove the chairs and regenerate"**, then **B** (its own colours, a soft glow from the downlights and
+sconces).
+
+- **The chapel's cane chairs and their bows are gone** (nothing in the code used them; the ceremony's guests stood in
+  them, and now stand on the open carpet). Its two redrawn parts lit the wall differently, so they are faded one into
+  the other over 80 px of plain wall between the doors and the flowers' stands (`blend` in `CABINS`), not cut.
+  `tools/draw_chapel.py` calls the redecoration; its doors by their box, the flowers, their stands and the candle as
+  drawn.
+- **The nook:** its way out, the armchair she reads in (her clip was cut over it) and the cat's picture as drawn; its
+  lamp, table, candle, bookcase and books the redraw's (ours, washed toward the old red wall, were pinkish on the green).
+- **The lighting booth:** its door as drawn, its chair the redraw's; cut inside the steel post between the booth and
+  the catwalk.
+- 243 generations (189 + 54). `boot`, `region3`, `region9`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The restrooms by the Chapel (deck 12): its own door, a room to enter (2026-11-24 and 25)
+
+The user: "Let's generate a proper door for the restrooms" (it was a cabin door, card lock and number plate); then
+"make it entreable to a small restroom cabin, not too wide as not to overlap the glass doors on the right and the
+checkpoint door on the left"; "Do as you suggest"; then rounds of play.
+
+- **Its door** (`door-restroom`): try 2 of three, redrawn from the cabin door's own picture (its size and frame), pale oak,
+  a long pull handle, a kick plate; its square sign's man and woman drawn by hand (generated, a smudge); in its own colours.
+- **The room** (`restroom` in `ROOMS`): 124 px between the checkpoint's crew door and the glass doors, its door where it
+  stood (70 px in); drawn flat by `tools/draw_rooms.py`'s `restroom`, redrawn in place (C of three: modern, pale grey
+  stone, brushed steel) through `CABINS`, its door pasted back. Then, by rule (`moves`, `patches`, `lines` in
+  `redecorate_rooms.py`): **its mirror 18 px lower**, at her face ("Lower the mirror"), the wall it left filled from the
+  wall beside it; **the dryer's right outline** drawn one column in (the door's frame covered it); **someone in the stall**:
+  a gap under its door and their dark shoes (inpainted, 3 of three: "they worked better"), the ankles covered by the
+  door's rail.
+- **E at the mirror:** her hair, as in her crew cabin (`mirror`). **E at the dryer** (`sec_dryer`): its roar 2.4 s
+  (`sfx.dryer`) and its warm air as the sauna's steam, small circles falling and spreading, behind her, white and a steel
+  grey (white alone was lost on the pale wall). **The stall:** a muffled hum now and then (`sfx.stallHum`, a room's place in
+  `src/world/soundscape.js`) and a note rising over its top for each note sung (the user, sound off: "I just imagined
+  there would be notes coming up from the stall"); **E at it** (`sec_stall`): she knocks, "Occupied!" from over its top
+  (`say.occupied`), then the "Do Not Disturb" gag (23), which here tiptoes her to the mirror and stops there
+  (`sorryStop`: "let her always go to the mirror, stop there, and then respawn"), then her checkpoint.
+- **A tangerine on its counter**, right of the tap (the user circled it): `tan_12_restroom`, moved from Cagney's
+  (`tan_12_cagneys`, balanced on its steel trolley's dome, plan-the-rest §7d's seventh). The total stays 56; deck 12's
+  longest stretch without a reward is now 48.4 m (129 to 178).
+- The mirror and the dryer pulse (`IN_ROOM` in `src/highlight.js`, the user's leave).
+- 51 generations (doors 15, room 18, feet 18). `boot`, `region2`, `region4`, `region7`, `region8`, `region9`,
+  `highlight`, `deck3`, `keeps`, `lang`, `sound` pass; `check_overlaps` 0. `mishaps.things` fails at deck 9's sprinkler
+  (the swinging door's gag first), on fcca25e too: not this work, not looked into.
+
 ## Near-catch 2 remade (2026-11-24, the Design session)
 
 The user, right after near-catch 1 was merged: "In this same manner, let's work on the second near-catch". By

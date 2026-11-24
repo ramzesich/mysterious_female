@@ -2963,7 +2963,7 @@ export class ShipScene extends Phaser.Scene {
         this.dusk = k;
         this.backdrop.setDusk(k);
         this.seaView.setDusk(k);
-        for (const w of [this.windowView, this.cabinView]) w?.backdrop.setDusk(k);
+        for (const w of [this.windowView, this.cabinView, this.roomView]) w?.backdrop.setDusk(k);
         const [r, g, b] = DUSK_LIGHT.map(v => Math.round(255 * (1 + (v - 1) * k)));
         this.duskWash?.setFillStyle((r << 16) | (g << 8) | b).setVisible(k > 0);
     }
@@ -3106,7 +3106,7 @@ export class ShipScene extends Phaser.Scene {
         this.layBackdrop(this.fromAfar ? 0 : flow);
         this.soundscape.update(dt);
         if (input.mutePressed) this.showSoundSign(sfx.toggle());
-        for (const w of [this.windowView, this.cabinView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
+        for (const w of [this.windowView, this.cabinView, this.roomView]) if (w?.view.visible) w.backdrop.update(dt, false, this.horizonOnScreen);
         // (What she sees a load through, the vase's flowers, every frame: the outside view holds the world still, and the
         // frame must be gone in it at once.)
         this.world?.carryBox.showView();
@@ -3903,6 +3903,7 @@ export class ShipScene extends Phaser.Scene {
         this.walkRail?.setDepth(boatRoom ? DEPTH.exterior + 0.06 : WALK_RAIL_DEPTH);
         this.updateRoofGlow(dt);
         this.cabin?.view.setVisible(this.route === 'cabin' && !this.overview);
+        this.roomView?.view.setVisible(!this.overview && !!this.rooms.find(r => r.route === this.route)?.windows);
         this.cabin?.towel.setVisible(this.route === 'cabin' && !this.overview && !!this.save.towelHung);
         for (const cat of this.cats) {
             if (cat.route !== 'inside') cat.sprite.setVisible(cat.route === this.route && !cat.away && !cat.hidden);
@@ -3911,8 +3912,14 @@ export class ShipScene extends Phaser.Scene {
             if (t.route !== 'inside' && t.sprite.active) [t.sprite, t.glint].forEach(s => s.setVisible(t.route === this.route));
         }
         const shown = deck => deck === null ? 1 : this.shellAlpha[deck] ?? 1;
-        for (const { deck, gfx, always } of this.shellSlopes) {
-            gfx.setAlpha(always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
+        // (Inside a room on a deck with balconies, that deck's balcony fronts and partitions, drawn over her, are not drawn
+        // across the room: they ran over the balcony cabins' insides, the user, 2026-11-24. Round the room the dim hides
+        // them anyway.)
+        const roomIn = this.rooms.find(r => r.route === this.route && r.room?.visible);
+        const roomDeck = roomIn ? this.deckOfY(p.y) : null;
+        for (const { deck, gfx, always, balcony } of this.shellSlopes) {
+            gfx.setAlpha(balcony && deck === roomDeck ? 0
+                : always ? 1 : Array.isArray(deck) ? Math.min(...deck.map(shown)) : shown(deck));
         }
         // (The deck she stands on, or last stood on while she is in the air or falling from a scare: gliding
         // down past the bow, the decks' leaning railings at their forward ends showed on the closed side one
@@ -5163,7 +5170,10 @@ export class ShipScene extends Phaser.Scene {
         s.once('animationcomplete-gags-dnd-cover', () => {
             if (this.gagEnd === null) return;
             s.setFlipX(away < 0).play('gags-dnd-tiptoe');
-            const wall = this.partitionShort(s.x, this.stopShort(s.x, s.x + away * 4800, y, 12), y, 12);
+            // (`sorryStop`: where a scene wants her to stop instead, the restrooms' mirror after the stall's knock; the
+            // user, 2026-11-25: "let her always go to the mirror, stop there, and then respawn".)
+            const wall = this.sorryStop ?? this.partitionShort(s.x, this.stopShort(s.x, s.x + away * 4800, y, 12), y, 12);
+            this.sorryStop = null;
             this.script = (dt) => {
                 s.x += away * g.speed * dt;
                 const view = this.cameras.main.worldView;

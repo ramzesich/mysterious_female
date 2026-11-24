@@ -562,9 +562,49 @@
     "h": 73
    }
   },
-  "wine-cabinet": {
+  "door-restroom": {
    "frame": {
     "x": 384,
+    "y": 200,
+    "w": 32,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 72
+   }
+  },
+  "door-restroom-bg": {
+   "frame": {
+    "x": 417,
+    "y": 200,
+    "w": 32,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 72
+   }
+  },
+  "wine-cabinet": {
+   "frame": {
+    "x": 450,
     "y": 200,
     "w": 57,
     "h": 66
@@ -584,26 +624,6 @@
   },
   "wine-cabinet-bg": {
    "frame": {
-    "x": 442,
-    "y": 200,
-    "w": 57,
-    "h": 66
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 57,
-    "h": 66
-   },
-   "sourceSize": {
-    "w": 57,
-    "h": 66
-   }
-  },
-  "wine-cabinet-lt": {
-   "frame": {
     "x": 0,
     "y": 275,
     "w": 57,
@@ -622,7 +642,7 @@
     "h": 66
    }
   },
-  "wine-cabinet-w20": {
+  "wine-cabinet-lt": {
    "frame": {
     "x": 58,
     "y": 275,
@@ -642,9 +662,29 @@
     "h": 66
    }
   },
-  "door-watertight": {
+  "wine-cabinet-w20": {
    "frame": {
     "x": 116,
+    "y": 275,
+    "w": 57,
+    "h": 66
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 57,
+    "h": 66
+   },
+   "sourceSize": {
+    "w": 57,
+    "h": 66
+   }
+  },
+  "door-watertight": {
+   "frame": {
+    "x": 174,
     "y": 275,
     "w": 43,
     "h": 65
@@ -664,7 +704,7 @@
   },
   "door-watertight-bg": {
    "frame": {
-    "x": 160,
+    "x": 218,
     "y": 275,
     "w": 43,
     "h": 65
@@ -684,7 +724,7 @@
   },
   "trophy-cabinet": {
    "frame": {
-    "x": 204,
+    "x": 262,
     "y": 275,
     "w": 56,
     "h": 64
@@ -704,7 +744,7 @@
   },
   "trophy-cabinet-bg": {
    "frame": {
-    "x": 261,
+    "x": 319,
     "y": 275,
     "w": 56,
     "h": 64
@@ -724,7 +764,7 @@
   },
   "trophy-cabinet-lt": {
    "frame": {
-    "x": 318,
+    "x": 376,
     "y": 275,
     "w": 56,
     "h": 64
@@ -744,7 +784,7 @@
   },
   "trophy-cabinet-w20": {
    "frame": {
-    "x": 375,
+    "x": 433,
     "y": 275,
     "w": 56,
     "h": 64
@@ -764,26 +804,6 @@
   },
   "mushroom-fountain": {
    "frame": {
-    "x": 432,
-    "y": 275,
-    "w": 58,
-    "h": 62
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 58,
-    "h": 62
-   },
-   "sourceSize": {
-    "w": 58,
-    "h": 62
-   }
-  },
-  "mushroom-fountain-bg": {
-   "frame": {
     "x": 0,
     "y": 342,
     "w": 58,
@@ -802,7 +822,7 @@
     "h": 62
    }
   },
-  "mushroom-fountain-lt": {
+  "mushroom-fountain-bg": {
    "frame": {
     "x": 59,
     "y": 342,
@@ -822,7 +842,7 @@
     "h": 62
    }
   },
-  "mushroom-fountain-w20": {
+  "mushroom-fountain-lt": {
    "frame": {
     "x": 118,
     "y": 342,
@@ -842,9 +862,29 @@
     "h": 62
    }
   },
-  "shoji-screen": {
+  "mushroom-fountain-w20": {
    "frame": {
     "x": 177,
+    "y": 342,
+    "w": 58,
+    "h": 62
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 58,
+    "h": 62
+   },
+   "sourceSize": {
+    "w": 58,
+    "h": 62
+   }
+  },
+  "shoji-screen": {
+   "frame": {
+    "x": 236,
     "y": 342,
     "w": 56,
     "h": 62
@@ -864,7 +904,7 @@
   },
   "shoji-screen-bg": {
    "frame": {
-    "x": 234,
+    "x": 293,
     "y": 342,
     "w": 56,
     "h": 62
@@ -884,7 +924,7 @@
   },
   "shoji-screen-lt": {
    "frame": {
-    "x": 291,
+    "x": 350,
     "y": 342,
     "w": 56,
     "h": 62
@@ -904,7 +944,7 @@
   },
   "shoji-screen-w20": {
    "frame": {
-    "x": 348,
+    "x": 407,
     "y": 342,
     "w": 56,
     "h": 62
@@ -924,26 +964,6 @@
   },
   "grand-piano": {
    "frame": {
-    "x": 405,
-    "y": 342,
-    "w": 60,
-    "h": 61
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 60,
-    "h": 61
-   },
-   "sourceSize": {
-    "w": 60,
-    "h": 61
-   }
-  },
-  "grand-piano-bg": {
-   "frame": {
     "x": 0,
     "y": 405,
     "w": 60,
@@ -962,7 +982,7 @@
     "h": 61
    }
   },
-  "grand-piano-lt": {
+  "grand-piano-bg": {
    "frame": {
     "x": 61,
     "y": 405,
@@ -982,7 +1002,7 @@
     "h": 61
    }
   },
-  "grand-piano-w20": {
+  "grand-piano-lt": {
    "frame": {
     "x": 122,
     "y": 405,
@@ -1002,7 +1022,7 @@
     "h": 61
    }
   },
-  "speaker-stack": {
+  "grand-piano-w20": {
    "frame": {
     "x": 183,
     "y": 405,
@@ -1022,7 +1042,7 @@
     "h": 61
    }
   },
-  "speaker-stack-bg": {
+  "speaker-stack": {
    "frame": {
     "x": 244,
     "y": 405,
@@ -1042,7 +1062,7 @@
     "h": 61
    }
   },
-  "speaker-stack-w6": {
+  "speaker-stack-bg": {
    "frame": {
     "x": 305,
     "y": 405,
@@ -1062,7 +1082,7 @@
     "h": 61
    }
   },
-  "speaker-stack-lt": {
+  "speaker-stack-w6": {
    "frame": {
     "x": 366,
     "y": 405,
@@ -1082,7 +1102,7 @@
     "h": 61
    }
   },
-  "speaker-stack-w20": {
+  "speaker-stack-lt": {
    "frame": {
     "x": 427,
     "y": 405,
@@ -1102,9 +1122,29 @@
     "h": 61
    }
   },
-  "palm-tall": {
+  "speaker-stack-w20": {
    "frame": {
     "x": 0,
+    "y": 467,
+    "w": 60,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 60,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 60,
+    "h": 61
+   }
+  },
+  "palm-tall": {
+   "frame": {
+    "x": 61,
     "y": 467,
     "w": 48,
     "h": 61
@@ -1124,7 +1164,7 @@
   },
   "palm-tall-bg": {
    "frame": {
-    "x": 49,
+    "x": 110,
     "y": 467,
     "w": 48,
     "h": 61
@@ -1144,7 +1184,7 @@
   },
   "palm-tall-lt": {
    "frame": {
-    "x": 98,
+    "x": 159,
     "y": 467,
     "w": 48,
     "h": 61
@@ -1164,7 +1204,7 @@
   },
   "palm-tall-w20": {
    "frame": {
-    "x": 147,
+    "x": 208,
     "y": 467,
     "w": 48,
     "h": 61
@@ -1184,7 +1224,7 @@
   },
   "slot-side": {
    "frame": {
-    "x": 196,
+    "x": 257,
     "y": 467,
     "w": 24,
     "h": 61
@@ -1204,7 +1244,7 @@
   },
   "slot-side-bg": {
    "frame": {
-    "x": 221,
+    "x": 282,
     "y": 467,
     "w": 24,
     "h": 61
@@ -1224,7 +1264,7 @@
   },
   "slot-side-lt": {
    "frame": {
-    "x": 246,
+    "x": 307,
     "y": 467,
     "w": 24,
     "h": 61
@@ -1244,7 +1284,7 @@
   },
   "slot-side-w20": {
    "frame": {
-    "x": 271,
+    "x": 332,
     "y": 467,
     "w": 24,
     "h": 61
@@ -1264,7 +1304,7 @@
   },
   "slot-pair": {
    "frame": {
-    "x": 296,
+    "x": 357,
     "y": 467,
     "w": 56,
     "h": 61
@@ -1284,7 +1324,7 @@
   },
   "slot-pair-bg": {
    "frame": {
-    "x": 353,
+    "x": 414,
     "y": 467,
     "w": 56,
     "h": 61
@@ -1304,8 +1344,8 @@
   },
   "slot-pair-lt": {
    "frame": {
-    "x": 410,
-    "y": 467,
+    "x": 0,
+    "y": 529,
     "w": 56,
     "h": 61
    },
@@ -1324,7 +1364,7 @@
   },
   "slot-pair-w20": {
    "frame": {
-    "x": 0,
+    "x": 57,
     "y": 529,
     "w": 56,
     "h": 61
@@ -1344,7 +1384,7 @@
   },
   "pinball": {
    "frame": {
-    "x": 57,
+    "x": 114,
     "y": 529,
     "w": 49,
     "h": 61
@@ -1364,7 +1404,7 @@
   },
   "pinball-bg": {
    "frame": {
-    "x": 107,
+    "x": 164,
     "y": 529,
     "w": 49,
     "h": 61
@@ -1384,7 +1424,7 @@
   },
   "pinball-lt": {
    "frame": {
-    "x": 157,
+    "x": 214,
     "y": 529,
     "w": 49,
     "h": 61
@@ -1404,7 +1444,7 @@
   },
   "pinball-w20": {
    "frame": {
-    "x": 207,
+    "x": 264,
     "y": 529,
     "w": 49,
     "h": 61
@@ -1424,7 +1464,7 @@
   },
   "atm": {
    "frame": {
-    "x": 257,
+    "x": 314,
     "y": 529,
     "w": 38,
     "h": 61
@@ -1444,7 +1484,7 @@
   },
   "atm-bg": {
    "frame": {
-    "x": 296,
+    "x": 353,
     "y": 529,
     "w": 38,
     "h": 61
@@ -1464,7 +1504,7 @@
   },
   "atm-lt": {
    "frame": {
-    "x": 335,
+    "x": 392,
     "y": 529,
     "w": 38,
     "h": 61
@@ -1484,7 +1524,7 @@
   },
   "atm-w20": {
    "frame": {
-    "x": 374,
+    "x": 431,
     "y": 529,
     "w": 38,
     "h": 61
@@ -1504,7 +1544,7 @@
   },
   "easel-painting": {
    "frame": {
-    "x": 413,
+    "x": 470,
     "y": 529,
     "w": 36,
     "h": 61
@@ -1524,26 +1564,6 @@
   },
   "easel-painting-bg": {
    "frame": {
-    "x": 450,
-    "y": 529,
-    "w": 36,
-    "h": 61
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 36,
-    "h": 61
-   },
-   "sourceSize": {
-    "w": 36,
-    "h": 61
-   }
-  },
-  "easel-painting-lt": {
-   "frame": {
     "x": 0,
     "y": 591,
     "w": 36,
@@ -1562,7 +1582,7 @@
     "h": 61
    }
   },
-  "easel-painting-w20": {
+  "easel-painting-lt": {
    "frame": {
     "x": 37,
     "y": 591,
@@ -1582,9 +1602,29 @@
     "h": 61
    }
   },
-  "dancer-statue": {
+  "easel-painting-w20": {
    "frame": {
     "x": 74,
+    "y": 591,
+    "w": 36,
+    "h": 61
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 61
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 61
+   }
+  },
+  "dancer-statue": {
+   "frame": {
+    "x": 111,
     "y": 591,
     "w": 27,
     "h": 61
@@ -1604,7 +1644,7 @@
   },
   "dancer-statue-bg": {
    "frame": {
-    "x": 102,
+    "x": 139,
     "y": 591,
     "w": 27,
     "h": 61
@@ -1624,7 +1664,7 @@
   },
   "dancer-statue-lt": {
    "frame": {
-    "x": 130,
+    "x": 167,
     "y": 591,
     "w": 27,
     "h": 61
@@ -1644,7 +1684,7 @@
   },
   "dancer-statue-w20": {
    "frame": {
-    "x": 158,
+    "x": 195,
     "y": 591,
     "w": 27,
     "h": 61
@@ -1664,7 +1704,7 @@
   },
   "back-bar": {
    "frame": {
-    "x": 186,
+    "x": 223,
     "y": 591,
     "w": 62,
     "h": 60
@@ -1684,7 +1724,7 @@
   },
   "back-bar-bg": {
    "frame": {
-    "x": 249,
+    "x": 286,
     "y": 591,
     "w": 62,
     "h": 60
@@ -1704,7 +1744,7 @@
   },
   "back-bar-lt": {
    "frame": {
-    "x": 312,
+    "x": 349,
     "y": 591,
     "w": 62,
     "h": 60
@@ -1724,7 +1764,7 @@
   },
   "back-bar-w20": {
    "frame": {
-    "x": 375,
+    "x": 412,
     "y": 591,
     "w": 62,
     "h": 60
@@ -1744,7 +1784,7 @@
   },
   "arcade-cabinet": {
    "frame": {
-    "x": 438,
+    "x": 475,
     "y": 591,
     "w": 37,
     "h": 60

@@ -479,6 +479,13 @@ const cat = {
 };
 
 const people = {
+    // Someone humming in a shut stall (the restrooms by the Chapel): a phrase of a tune through the door, muffled (n: which).
+    stallHum: (n = 0) => {
+        // (Louder than at first and its door a little less thick: the user could not hear anyone, 2026-11-25. Its phrases
+        // are src/world/soundscape.js's STALL_TUNES, which draws a note over the stall for each.)
+        const tunes = [[67, 69, 71, 67], [72, 71, 69, 67, 69], [64, 67, 69, 67], [71, 72, 74, 72, 71]];
+        tunes[n % 4].forEach((m, i) => voice([[0, hz(m - 12)], [1, hz(m - 12) * 1.01]], 0.3, 0.1, i * 0.32, { lp: [[0, 600], [0.5, 950], [1, 700]] }));
+    },
     // Voices without words. A shout at her ("Гей!"), a startled "oh", a kid's giggle, a man's yelp
     // as his feet go, a grumble, a pleased "aah".
     hey: () => voice([[0, 300], [0.3, 440], [1, 380]], 0.24, 0.1),
@@ -560,6 +567,12 @@ const things = {
     },
     // The soft serve machine: its motor for `s` seconds (held while she holds E: `sfx.hold('whirr')`), its
     // running down when she lets go; a cough when it is empty.
+    // The restrooms' hand dryer for `s` seconds: a blower's rush and its motor under it.
+    dryer: (s = 2.4) => {
+        noise(s, { band: 900, q: 0.6, vol: 0.16, attack: 0.15, release: 0.35 });
+        noise(s, { hp: 2400, vol: 0.05, attack: 0.15, release: 0.35 });
+        tone(210, s, { type: 'sawtooth', vol: 0.03, lp: 700, attack: 0.15, release: 0.3, trem: [37, 0.3] });
+    },
     whirr: (s = 1) => tone(118, s, { type: 'sawtooth', vol: 0.06, lp: 520, attack: 0.08, release: 0.12, trem: [31, 0.4] }),
     whirrDown: () => tone(118, 0.35, { type: 'sawtooth', to: 62, vol: 0.05, lp: [520, 300], trem: [24, 0.4] }),
     cough: () => [0, 0.16].forEach(t => noise(0.1, { lo: [900, 350], vol: 0.26, t })),

@@ -136,15 +136,7 @@ def interior():
     stand = piece("flower-pedestal")
     for x in (cx - 34, cx + 34):
         im.alpha_composite(stand, (x - stand.width // 2, FLOOR - stand.height))
-    # The cane-back chairs in rows facing the altar: two on the door's side, one on the far side.
-    chair = piece("cane-chair")                          # drawn facing right (east)
-    left = chair.transpose(Image.FLIP_LEFT_RIGHT)
-    bow = piece("pew-bow")
-    for x in (106, 152):
-        im.alpha_composite(chair, (x - chair.width // 2, FLOOR - chair.height))
-        im.alpha_composite(bow, (x - chair.width // 2 - 2, FLOOR - chair.height + 2))
-    for x in (262,):
-        im.alpha_composite(left, (x - chair.width // 2, FLOOR - chair.height))
+    # (No chairs since 2026-11-24, the user: "Remove the chairs"; the ceremony's guests stood in them.)
 
     # The room opens where the deck was, the deck around it dimmed by the game: the ceiling's shadow,
     # and its two end walls, cream.
@@ -194,6 +186,10 @@ if __name__ == "__main__":
     room, door = interior(), open_door()
     room.save(SOURCE / "interior.png")
     door.save(SOURCE / "door-open.png")
+    # Redecorated (the user's choice of 2026-11-24, B): tools/redecorate_rooms.py lays the generated look over the drawing,
+    # its doors, flowers and candle as drawn here.
+    from redecorate_rooms import cabin
+    room = cabin("chapel", room)
     room.save(GAME / "chapel-room.png")
     door.save(GAME / "chapel-door-open.png")
     if "--preview" in sys.argv:

@@ -131,7 +131,10 @@ def build_world():
                           art=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}.png").exists(),
                           front=(B.ROOT / "assets" / "ship" / "rooms" / f"{r['id']}-front.png").exists(),
                           needs=r.get("needs", ""), checkpoint=r.get("checkpoint", ""), doors=doors,
-                          **({"mirror": r["mirror"]} if "mirror" in r else {})))
+                          **({"mirror": r["mirror"]} if "mirror" in r else {}),
+                          # (Its window panes, x y w h in its picture: their glass is clear there and the live sea and sky
+                          # show behind it, as in cabin 8206; the user, 2026-11-24.)
+                          **({"windows": [list(w) for w in r["windows"]]} if "windows" in r else {})))
 
     # The shaft, at its true place and length (the user, 2026-11-23: it was drawn shorter than its way, over the atrium).
     duct = shaft_geometry()
