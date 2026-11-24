@@ -2829,7 +2829,10 @@ export class World {
                     const yy = top + f * (y - top);
                     if (y - top > 6) wet.fillStyle(0xc7e7ff, 0.75 * (1 - f)).fillRect(Math.round(x), Math.round(yy), 1, 2);
                 }
-                drawPuddles(0);
+                // (The puddles only as the last of the water goes: under it they lay on the floor from the start.)
+                puddles.setAlpha(Phaser.Math.Clamp((k - POOL.puddlesFrom) / (1 - POOL.puddlesFrom), 0, 1));
+                if (k >= POOL.puddlesFrom) drawPuddles(0);
+                else puddles.clear();
                 this.poolClear(e);
                 if (s.mode === 'swim' && s.pool === pool) {
                     // (Too shallow to swim: her feet find the floor.)
@@ -2841,6 +2844,7 @@ export class World {
                 out();
                 // (The wall dries; the puddles go, the one over the grate last.)
                 s.tweens.addCounter({ from: 0, to: 1, duration: POOL.wetMs, onUpdate: tw => wet.setAlpha(1 - tw.getValue()), onComplete: () => wet.clear().setAlpha(1) });
+                puddles.setAlpha(1);
                 s.tweens.addCounter({ from: 0, to: 1.15, duration: POOL.puddleMs, onUpdate: tw => drawPuddles(tw.getValue()), onComplete: () => puddles.clear() });
             },
         });

@@ -3688,6 +3688,9 @@ def scenario_region6(b):
     ok &= check(b.state()["mode"] == "swim", "the first pool fills the deck: she swims", b.state())
     hold_until(b, "right", lambda s: s["mode"] == "scripted", 6)
     cat = f"{W}.story.poolCat.sprite"
+    ok &= check(wait_js(b, f"['her-swim-reach', 'her-swim-strain'].includes({S}.player.anims.currentAnim && {S}.player.anims.currentAnim.key)", 4),
+                "under him at the rim she looks up out of the water and reaches for him")
+    b.shot("region6-reach")
     ok &= check(wait_js(b, f"{who('npc_kid_tub')}.sprite.y < {D11 - 5}", 5), "the kid stands up in the hot tub")
     b.shot("region6-beat")
     ok &= check(wait_js(b, f"{cat}.visible && {cat}.depth < {S}.DEPTH.swimmer && {cat}.y > {D11 + 8} && {cat}.x < {pool1['x1']}", 5),
@@ -3699,11 +3702,12 @@ def scenario_region6(b):
     last = js(b, f"{W}.story.leverLay.frames") - 1
     ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.frame.name") == last, "the drain's lever is thrown")
     ok &= check(wait_js(b, f"{S}.pools.length === 3 && {S}.pools[0].y > {D11 + 8}", 4), "the water sinks", js(b, f"{S}.pools.map(p => p.y)"))
+    ok &= check(js(b, f"{W}.pool.puddles.obj.alpha") == 0, "no puddles yet: they show only as the last of it goes", js(b, f"{W}.pool.puddles.obj.alpha"))
     ok &= check(wait_js(b, f"{W}.story.paws.alpha > 0.3", 2), "wet paw prints lead aft")
     ok &= check(b.state()["mode"] == "swim", "she is still in the water as it starts to sink", b.state())
     ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())
     wait(0.2)
-    ok &= check(js(b, f"{S}.herDropPx()") == 4, "her picture 3 px lower there, on the floor's strip of tiles", js(b, f"{S}.herDropPx()"))
+    ok &= check(js(b, f"{S}.herDropPx()") == 6, "her picture 5 px lower there, on the floor's strip of tiles", js(b, f"{S}.herDropPx()"))
     # (Her feet find the floor while the last of the water is still going.)
     ok &= check(wait_js(b, f"!{W}.pool.shutWash.obj.visible && !{W}.pool.drainWash.obj.visible && {W}.pool.shut.obj.alpha === 1", 5), "the last water gone, the hatch and the grate are clear")
     b.shot("region6-drained")
@@ -6337,7 +6341,7 @@ def scenario_region6__deck(b):
     b.eval(f"{W}.story.poolCat.gone = false")
     ok = check(wait_js(b, f"{S}.mode === 'scripted'", 2), "on the deck beside him: the scene starts")
     ok &= check(wait_js(b, f"{S}.player.depth === {S}.DEPTH.swimmer && {S}.player.x < {rim}", 5), "her dive at him ends in the pool", b.state())
-    ok &= check(wait_js(b, f"{W}.story.poolCat.sprite.y === {D11} && Math.abs({S}.player.x - {rim - 18}) < 2", 4),
+    ok &= check(wait_js(b, f"{W}.story.poolCat.sprite.y === {D11} && Math.abs({S}.player.x - {rim - 23}) < 2", 4),
                 "he is back at the rim where he sat, she in the water under him", b.state())
     ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14) and b.state()["mode"] == "swim", "and the rest as from the water: she is swimming as the pool drains", b.state())
     ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())

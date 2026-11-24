@@ -70,6 +70,12 @@ HER = {
         # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A
         # front crawl was made first and is kept in swim-crawl/.)
         "swim": [(f"swim-breaststroke/{i}.png", "keep") for i in range(7)],
+        # At the pool's rim under Bumbot (near-catch 5; the user, 2026-11-24: "she has to look up from the water and try
+        # and reach him, while in the swimming pose. That has to be generated"): PixMiniMax from her swim's first frame
+        # on a green ground, she cut out by colour (assets/source/her/swim-reach/cut.py); its first frame is her
+        # swim's first to the pixel: set by the row her swim's frames are set by (65, the lowest her kick reaches),
+        # not by its own lowest, which is 2 px higher.
+        "swim-reach": [(f"swim-reach/{i}.png", 65) for i in range(9)],
         "back": [("rotations/north.png", "keep")],
         # Bending down with her arms out to pick Bumbot up (a near-catch, GAME_DESIGN.md §4). Her
         # back foot stays planted, so each frame's lowest pixel goes on the floor.
@@ -414,7 +420,7 @@ def grey_top(im, rows):
 
 # Her clips with water on her (the user, 2026-11-23: "when she's wet, a lot of water pixels were turned to grey"): the
 # water's own blue kept (`water_blue`), told from the blouse's pale blue by its tint.
-WET = {"swim", "shower", "shiver", "splutter"}
+WET = {"swim", "swim-reach", "shower", "shiver", "splutter"}
 
 
 def build(spec):

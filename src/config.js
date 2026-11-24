@@ -175,11 +175,12 @@ export const PROMENADE = {
 // sight between the tank's floor and the hallway's ceiling while deck 10's side opens (ms). `ceiling`: deck
 // 10's hallway's ceiling line, px over its floor; `out`: how far under it she is as she drops out. `floor`: in the dry
 // tank her picture is drawn this many px lower than her body, on the floor's strip of pale tiles (the user,
-// 2026-11-24: at the wall's foot "she looks floating in the air"); `under`: how much of the hatch and the drain's grate
+// 2026-11-24: at the wall's foot "she looks floating in the air"; 3 px at first, then "two more pixels down");
+// `puddlesFrom`: how far through the drain the puddles begin to show ("only ... at the very last moment"); `under`: how much of the hatch and the drain's grate
 // is left under the water ("much less visible when in the water"), the rest washed toward `floorTile`, the tank's
 // floor's own pale tile colour (ShipScene's `poolTanks`).
 export const POOL = {
-    drainMs: 5000, wetMs: 7000, puddleMs: 12000, floor: 3, under: 0.3, floorTile: 0x8fd3ff,
+    drainMs: 5000, wetMs: 7000, puddleMs: 12000, puddlesFrom: 0.93, floor: 5, under: 0.3, floorTile: 0x8fd3ff,
     hatch: { beside: 30, downMs: 950, down: 76, through: 280 },
     ceiling: 129, out: 20,
 };

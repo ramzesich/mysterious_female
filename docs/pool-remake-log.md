@@ -143,6 +143,18 @@ must be kept is kept (section 4).
     floor's own pale tile colour at 70%, as the ship's washes are made; the copy thins as the water goes and is put
     away in the dry tank. Made 28% opaque they had let the floor's tile lines through.
 
+27. **In the dry tank her picture is 5 px lower than her body** (the user: "two more pixels down"; decision 21's 3).
+28. **The puddles show only as the last of the water goes** (the user: "only to show at the very last moment of the
+    water drain"): from 93% of the drain on, fading in; then they dry as before. They had lain on the floor's strip
+    under the water from the drain's first moment.
+29. **Under him at the rim she looks up out of the water and reaches for him, lying as she swims** (the user: "That
+    has to be generated"): a clip of her own, `swim-reach`, PixMiniMax from her swim's first frame on a green ground,
+    she cut out by colour (`assets/source/her/swim-reach/`, two tries, 2 generations; seed 4 used). Her head lifts,
+    one arm stretches up after him, the other stays on the water; it is held, straining, until the kid's jet sends
+    him over her head, and then her arm comes down. Played in both ways into the scene. Its first frame is her
+    swim's first to the pixel. She stops 5 px short of the rim for it, so that her hand is a few px short of him: at
+    the rim it lay on his chest. This replaces decision 2's "none of her".
+
 ## 4. What U17 said to keep, and what became of it
 
 - **The hatch is the only way into deck 10's midships hallway:** kept (`hatch_pool`, needs `drain`). It lands her
@@ -169,7 +181,7 @@ must be kept is kept (section 4).
 
 ## 6. Generations
 
-58 (`assets/source/pool/README.md` has every job): the first seven pictures 40, the first lever's stand 6, the
+60: her reach up out of the water 2 (`assets/source/her/swim-reach/README.md`), and 58 (`assets/source/pool/README.md` has every job): the first seven pictures 40, the first lever's stand 6, the
 knee-high lever twice 12.
 
 ## 7. Checked

@@ -23,7 +23,7 @@ const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 48
 const TUB = { rim: 15, in: 12, duck: 34, peek: 24, muzzle: [-21, -27] };
 // Bumbot in it: how far into the pool from her he lands (px), how deep he swims (his feet under the surface, so that
 // his head and back show over it), how deep he goes as he plunges in (his feet, all of him under), his paddle (px/s), where his paws are from the lever's grip, how he is thrown.
-const CAT = { in: 44, swim: 12, under: 27, paddle: 52, paw: 2, over: 38, lands: 42 };
+const CAT = { in: 44, swim: 12, under: 27, paddle: 52, paw: 2, over: 38, lands: 42, short: 5 };
 
 export const lido = {
     setupLido() {
@@ -177,7 +177,9 @@ export const lido = {
         s.mode = 'scripted';
         s.script = null;
         her.body.setVelocity(0, 0);
-        const surface = pool ? pool.y : L.y + 4, rim = L.pools[0].x1, home = c.x, spot = rim - SWIM.margin;
+        // (Her place in the water under him: a little short of the rim, so that her hand, stretched up, is a few px short
+        // of him: at the rim itself it lay on his chest.)
+        const surface = pool ? pool.y : L.y + 4, rim = L.pools[0].x1, home = c.x, spot = rim - SWIM.margin - CAT.short;
         // (Him in a leap along an arc: his paws from where they are to a place, `lift` px over the straight line at its
         // middle; his jump's clip from frame `from`, paced to last the leap, its own rise taken out frame by frame.)
         const gap = () => this.jumpGap[c.frame.name] ?? 0;
@@ -203,6 +205,15 @@ export const lido = {
             c.setPosition(x, y + gap());
         };
         const sit = () => { c.play('bumbot-sit'); c.anims.setCurrentFrame(c.anims.currentAnim.frames.at(-1)); c.anims.pause(); };
+        // (Under him at the rim she looks up out of the water and stretches an arm up after him, and holds it there,
+        // straining, still lying in the water as she swims: her own clip, generated from her swim's first frame; the
+        // user, 2026-11-24.)
+        const reach = () => {
+            if (!s.anims.exists('her-swim-reach')) return s.pose('swim', 0);
+            her.anims.timeScale = 1;
+            her.anims.play('her-swim-reach');
+            her.anims.chain('her-swim-strain');
+        };
         s.tweens.killTweensOf(c);
         c.setScale(1);
         if (swimming) {
@@ -210,10 +221,10 @@ export const lido = {
             s.pose('swim', 0.8);
             her.setFlipX(false);
             await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
-            s.pose('swim', 0);
             c.setFlipX(true);
             sit();
-            await w.wait(250);
+            reach();
+            await w.wait(450);
             // (Her cry is over before the kid stands up: its popup is where he and Bumbot are.)
             s.bubbleUntil = s.time.now + 900;
             sfx.cry();
@@ -254,9 +265,9 @@ export const lido = {
                 her.setFlipX(false);
                 s.pose('swim', 0.8);
                 await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
-                s.pose('swim', 0);
+                reach();
                 swimming = true;
-                await w.wait(300);
+                await w.wait(700);
             }
         }
         // The kid stands up in the hot tub behind him, and lets fly.
@@ -276,7 +287,8 @@ export const lido = {
         sfx.at(mx, my).jet();
         this.jet(mx, my, c.x + 7, L.y - 13, 420);
         await w.wait(200);
-        // Hit in the back: out over the water he goes, over her head, and in behind her.
+        // Hit in the back: out over the water he goes, over her head, and in behind her; her arm comes down.
+        if (swimming) s.pose('swim', 0);
         c.setFlipX(true);
         sfx.at(c.x, c.y).meow();
         const inX = Math.max(L.pools[0].x0 + 30, spot - CAT.in);

@@ -278,6 +278,11 @@ export class BootScene extends Phaser.Scene {
         this.anims.create({ key: 'her-bed-joy', frames: frames('bed-joy'), frameRate: 9, repeat: -1 });
         // Breaststroke in a pool.
         this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
+        // (At the pool's rim under Bumbot: her head up and an arm up out of the water after him, then held, straining.)
+        if (meta.anims['swim-reach']) {
+            this.anims.create({ key: 'her-swim-reach', frames: frames('swim-reach').slice(0, 5), frameRate: 9 });
+            this.anims.create({ key: 'her-swim-strain', frames: frames('swim-reach').slice(4), frameRate: 6, repeat: -1 });
+        }
         // Washing her hair in cabin 8206's shower, behind its frosted door: from her chin down only
         // the shape of her, in one soft body colour with a slightly darker edge, never her clothes
         // (the user, 2026-11-08), under the door's thick frosting.
