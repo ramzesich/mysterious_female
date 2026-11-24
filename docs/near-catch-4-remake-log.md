@@ -124,10 +124,22 @@ And, on seeing nothing yet but while the stack was being roughed on the cart wit
     outline, where the wall shows through; one of them, at 5855, 806, is at his height, and he showed through it in
     29 of the crawl's 44 moments. Each is filled with what the room shows there, so nothing changes at rest and
     nothing behind the box shows through it, her neither (`tools/build_shaft.py`).
+11. **"Build it"** (the user, on the preview with the crawl raised and the hole mended).
+12. **The hint only when she is up on the cart** (the user, as the build ran: "The tooltip has to show (after the
+    Bumbot's escape) only when we jump on top of the cart"): the first time she stands on the cart once he is gone,
+    wherever it stands, and never again (the flag `hint_crawl`). Decision 8's moment, as he goes, is dropped.
+13. **The push goes on by itself for 0.7 s** (mine): from his leap until the last two pillows are off the cart, whatever
+    the keys (`pushHeld`), so that they land where they were made to; she is in her push all through, as before.
+14. **A game loaded after the beat, the cart not yet at the mouth** (found in the self-check): the cart stood back at
+    its start, on top of the two pillows on the floor. It stands where the last pillows left it.
+15. **The shaft's mouth is cut against the room as it was** (found building): `tools/build_shaft.py --mouth` cut its
+    pieces by what differs from the room's own picture, which was redecorated after they were made; run now, every
+    piece came out another shape. The old corner is kept beside the pictures (`assets/source/shaft/gen/room-corner.png`)
+    and the build is exact again; the holes' fill and the cover's place are in it.
 
 ## The art (to the preview stop)
 
-About 80 generations. Kept in the scratch folder until the build (`out/gen/`), then in `assets/source/linen-pillows/`.
+About 80 generations. In `assets/source/linen-pillows/` (its README has every job).
 
 | What | How | Jobs |
 |---|---|---|
@@ -136,3 +148,30 @@ About 80 generations. Kept in the scratch folder until the build (`out/gen/`), t
 | The topple into a heap | PixMiniMax, both ends pinned, 16 frames | `462fa164`, `8884861f`, `59f34787`, `6d1a54ff`, `a696287d`, `2923c0bf`, `a0c4d41a`, `ed8ac397`, `285859da`, `d85db23e`, `547c27de` (none used) |
 | The pillows scattered (the end picture) | a rough on a 208 px green set, redrawn | `3dcda9e2` (used), `4edf67df` |
 | The scatter | PixMiniMax toward it, 16 frames, 208 x 128 | `c4bcc5b4` (used; its smeared frame 1 left out), `22c32592`, `4d5f20ae`, `5e71d393` |
+
+## How it is built
+
+- **The pillows:** `tools/build_linen_pillows.py` cuts the clip into `assets/ship/linen-pillows/`: `ride.png` (the
+  pillows still in the cart, 10 frames, in the cart's own px), `free.png` (those in the air and on the floor, 16
+  frames, in the room's px), `near.png` and `far.png` (as they lie), `pillows.json`. In their own colours.
+- **The scene:** `src/world/linen.js`, mixed into the Story (`setupLinen`, `updateLinen`, `linenGoes`, `linenScene`,
+  `linenHint`, `coverFalls`); `PILLOWS` in `src/config.js`. One clock from the moment he goes: his leap and crawl
+  by it (they were tweens), the cover's fall begun at 140 ms, the clip's frame by it at 14.3 a second.
+- **The cart:** `thing:laundry-cart-empty`; `PUSH_WALL` in `tools/population.py` makes it a wall to the ceiling until
+  `bb4` (`wall` on the pushable, `unwall()` in `src/world/world.js`); the stack is one of its pictures while it is on
+  it (shown, pulsing and moved with it).
+- **The vent:** `tools/build_shaft.py`: `COVER_LOW` 4, the near side's holes filled, the room's old corner.
+- **The words:** `hint.crawl`, `hint.crawl.pad` in both languages.
+
+## Checks
+
+`region4.pillows` (40 checks, one for each decision: the empty cart, the stack, its height, the wall, three jumps at
+it, the bump, the cover before he is in, his height in the mouth, the first pillows, the riding ones on the cart
+exactly, the push held, where the four lie against the door and the hatch, the cover 4 px lower, no hole in the mouth,
+the cart hers after, the hint on the cart and only once, ten seconds still, a load after the beat). Run with it:
+`boot`, `region4`, `golden`, `linen`, `highlight`, `lang`, `deliveries`, `region1`, `sound`: all pass;
+`tools/check_overlaps.py`: 0. The whole suite was not run.
+
+Looked at enlarged in the game: the pulse at the cart (the stack pulses with it); the end from the door; her on the
+cart with the hint; her on hands and knees into the mouth, before and after (the same, less the dot of her that
+showed through the box); the room loaded after the beat; the corridor outside.

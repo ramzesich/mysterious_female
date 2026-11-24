@@ -57,6 +57,11 @@ export class BootScene extends Phaser.Scene {
         // (The way out's grille swinging down on its hinge: `swing` in shaft.json.)
         this.load.spritesheet('shaft-exit-swing', 'assets/ship/shaft/exit-swing.png', { frameWidth: 48, frameHeight: 40 });
         this.load.atlas('shaft-slide', 'assets/ship/shaft/slide.png', 'assets/ship/shaft/slide.json');
+        // The linen room's pillows (near-catch 4; tools/build_linen_pillows.py): the stack in the cart and its scatter, in two
+        // layers (those still in the cart, those in the air), and the four as they lie after; the frames' cells are in
+        // their layout, cut by src/world/linen.js.
+        for (const what of ['ride', 'free', 'near', 'far']) this.load.image(`linen-pillows-${what}`, `assets/ship/linen-pillows/${what}.png`);
+        this.load.json('linen-pillows', 'assets/ship/linen-pillows/pillows.json');
         // The pool's scene (tools/build_pool.py): the drain's lever, the hatch in the tank's floor, the drain's grate, the
         // ladder's lower part, the ceiling panel in deck 10's hallway; where each stands.
         this.load.json('pool-layout', 'assets/ship/pool/pool.json');

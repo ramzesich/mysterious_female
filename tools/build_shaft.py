@@ -380,8 +380,9 @@ def mouth_pieces(g):
     the cover knocked off and leaning by the wall): each piece is what differs from the room's own picture inside its
     box. **The duct's end is one picture, the open one's, in every state**: the cover is cut from the shut picture by
     its own columns and laid over that end, so nothing of the duct changes as the cover comes off."""
-    room = Image.open(ROOT / "assets" / "ship" / "linen-room.png").convert("RGB")
-    bare = room.crop(MOUTH_CORNER)
+    # (The room's corner as it was when those pictures were made, kept beside them: `gen/room-corner.png`. The room's own
+    # picture has been redecorated since, 2026-11-24, and cut against that every piece came out another shape.)
+    bare = Image.open(SOURCE / "gen" / "room-corner.png").convert("RGB")
 
     def cut(name, box):
         im = Image.open(SOURCE / "gen" / f"mouth-{name}.png").convert("RGB")
@@ -421,6 +422,8 @@ MOUTH_FAR = 12                       # the half-deep mouth's columns from this o
 FALL_FRAMES = 13                     # 0 to 90 degrees, 7.5 apart
 FALL_CELL = 42                       # each frame's square, the cover's middle at its middle
 FALL_OUT = 14                        # px its middle moves out from the wall as it falls (its foot kicked out)
+COVER_LOW = 4                        # it lies this far down the floor's strip, not at the wall's foot (the user, 2026-11-24: "let it
+                                     # just lie lower on the floor, but the cart and the player are still obscure it as now")
 
 
 def fall_frames(cover):
@@ -569,6 +572,20 @@ def main():
                 far.save(GAME / "mouth-far.png")
                 im = im.copy()
                 im.paste(Image.new("RGBA", (im.width - MOUTH_FAR, im.height), (0, 0, 0, 0)), (MOUTH_FAR, 0))
+                # Its near side has no holes (the user, 2026-11-24: as Bumbot crawled in, "a black pixel shows"): the cut
+                # leaves empty every pixel that was the wall's own colour, 17 of them inside the box's outline, and
+                # whoever was behind the box showed through them. Each is filled with what the room shows there now.
+                room = Image.open(ROOT / "assets" / "ship" / "linen-room.png").convert("RGB")
+                ip, filled = im.load(), 0
+                for py in range(im.height):
+                    for px in range(MOUTH_FAR):
+                        if ip[px, py][3]:
+                            continue
+                        if (any(ip[i, py][3] for i in range(px)) and any(ip[i, py][3] for i in range(px + 1, MOUTH_FAR))
+                                and any(ip[px, j][3] for j in range(py)) and any(ip[px, j][3] for j in range(py + 1, im.height))):
+                            ip[px, py] = room.getpixel((MOUTH_CORNER[0] + x + px, MOUTH_CORNER[1] + y + py)) + (255,)
+                            filled += 1
+                print("mouth: holes filled", filled)
             im.save(GAME / f"{name}.png")
             where[name] = [x0 + x, y0 + y]
             print("cut", name, im.size, "at", x, y)
@@ -580,7 +597,7 @@ def main():
         flat.save(GAME / "cover-down.png")
         mid0 = (x0 + cx + cover.width / 2, y0 + cy + cover.height / 2)
         floor = B.floor_y(g["deck"])
-        down = [round(mid0[0] + FALL_OUT - flat.width / 2), floor - flat.height]
+        down = [round(mid0[0] + FALL_OUT - flat.width / 2), floor - flat.height + COVER_LOW]
         where["coverDown"] = down
         # (Where the falling frames' squares stand: first on the cover as it hangs, last on the cover lying flat.)
         where["fall"] = dict(cell=FALL_CELL, frames=FALL_FRAMES,

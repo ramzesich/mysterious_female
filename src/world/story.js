@@ -15,15 +15,13 @@ import { spa } from './spa.js';
 import { pass } from './pass.js';
 import { quiet } from './quiet.js';
 import { stage } from './stage.js';
+import { linen } from './linen.js';
 
 const M = 48;
 
 // The steward and his jammed trolley (region 4): his `tug` is a picture of the two, drawn with the
 // trolley's middle this far behind his frame's middle; let go of it, he stands this far from it.
 const STEWARD_TUG = 17, STEWARD_FREE = 35;
-// Near-catch 4 (the linen room): his body's columns in his asleep frame (of 64), and how near she or the laundry cart comes
-// before he is off (the user, 2026-11-23: "she almost touches him, or the cart almost touches him, by a couple of pixels").
-const BB4_SPAN = [19, 49], BB4_GAP = 2;
 // (His head in that picture, px aft of its middle: his bubble over it.)
 const STEWARD_HEAD = 22;
 // His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
@@ -479,12 +477,11 @@ export class Story {
     // at the laundry cart, the steward at his jammed cart, the uniform in the laundry's washer.
     setupHousekeeping() {
         const s = this.scene, w = this.world, L = w.data.linen;
-        // (Near-catch 4 is a scene of its own since 2026-11-23, the user's: asleep on the bottle shelf, he is off into the
-        // vent the moment she, or the laundry cart she pushes, all but touches him; her walk-up and reach are not played.)
-        const bb4 = s.cats.find(c => c.flag === 'bb4');
-        if (bb4) { bb4.custom = true; this.bb4 = bb4; }
-        // (The cover on the shaft's mouth until he knocks it off, and where it lies after: the world's, `buildDuct`.)
+        // (Near-catch 4 is a scene of its own since 2026-11-23, the user's; remade 2026-11-24 with the pillows in the
+        // cart: src/world/linen.js. The cover on the shaft's mouth until he knocks it off, and where it lies after, are
+        // the world's, `buildDuct`.)
         this.linenCart = w.pushables.find(t => t.id === 'cart_linen');
+        this.setupLinen();
         this.stewardCart = w.pushables.find(t => t.id === 'cart_steward');
         // The security officer's uniform, going round in the laundry's third washer while he waits.
         const laundry = w.rooms.laundry;
@@ -501,7 +498,7 @@ export class Story {
 
     updateHousekeeping(dt, time) {
         const s = this.scene, w = this.world, P = this.P, her = s.player;
-        this.bb4Wakes();
+        this.updateLinen(time);
         // The steward pulls at his trolley's handle, and goes along with it as she pushes: one picture
         // of the two (his `tug`, the world's trolley hidden meanwhile), set by the trolley's middle
         // (`STEWARD_TUG`); free, he stands back from it (`STEWARD_FREE`).
@@ -547,91 +544,6 @@ export class Story {
         }
         if (this.towelDown && s.route !== 'laundry') this.hatAway();
         this.glimpseBalcony();
-    }
-
-    // Near-catch 4: she, or the cart she pushes, within `BB4_GAP` px of him asleep on the shelf (his body's own columns
-    // in his frame, `BB4_SPAN`), and he is off into the vent. The beat's flag (crawling learned) once he is in.
-    bb4Wakes() {
-        const s = this.scene, w = this.world, cat = this.bb4, p = s.player;
-        if (!cat || cat.gone || cat.hidden || s.route !== 'linen' || this.P.has('bb4')) return;
-        const sp = cat.sprite, left = sp.x - 32 + (sp.flipX ? 64 - BB4_SPAN[1] : BB4_SPAN[0]), right = left + BB4_SPAN[1] - BB4_SPAN[0];
-        const near = (a, b) => a <= right + BB4_GAP && b >= left - BB4_GAP;
-        const cart = this.linenCart, half = cart ? cart.items[0].width / 2 : 0;
-        if (!near(p.body.left, p.body.right) && !(cart && near(cart.x - half, cart.x + half))) return;
-        cat.gone = true;
-        s.tweens.killTweensOf(sp);
-        sp.setScale(1);
-        rumble('bolt');
-        sfx.mrrp();
-        this.intoTheVent(sp, () => {
-            cat.away = true;
-            sp.setVisible(false).stop();
-            this.P.setFlag('bb4');
-        });
-    }
-
-    // Bumbot's way out of the linen room: a leap from the shelf at the cover on the shaft's mouth, forward of him, which
-    // comes off, turns a quarter toward the wall as it drops, its foot kicked out, and lands flat on the floor in front of
-    // the mouth with a clang and a small bounce (the user, 2026-11-24: "let it fall flat on the ground, rotating while
-    // falling"; it had slid down to lean by the wall); and he is in, and gone down the shaft the way it leads, toward the
-    // bow. (The mouth's near side is drawn over him: he goes into it, not across it.)
-    intoTheVent(sprite, done) {
-        const s = this.scene, w = this.world, d = w.data.duct, floor = w.rooms.linen.floor, sh = w.shaft;
-        sprite.setFlipX(d.mouthX < sprite.x).play('bumbot-leap');
-        s.tweens.add({
-            targets: sprite, x: d.mouthX + 12, y: d.upper + 1, duration: 320, ease: 'Quad.easeOut',
-            onComplete: () => {
-                if (sh.cover.visible) this.coverFalls();
-                sfx.at(sprite.x, floor).scramble();
-                const depth = sprite.depth;
-                // (In on his belly, flat and long: his crawl since he was made again, 2026-11-24; he was squeezed
-                // narrow by a scale.)
-                // Nothing of him past the room's forward wall, as of her (`world.herCut`): his picture is cut there as he
-                // goes in. (Turned by its scale for that: Phaser 4 crops a picture turned by `flipX` wrong.)
-                const flip = sprite.flipX, turn = flip ? -1 : 1;
-                sprite.setDepth(sh.mouth.depth - 0.001).play('bumbot-crawl').setFlipX(false).setScale(turn, 1);
-                const cut = () => {
-                    const keep = Phaser.Math.Clamp(Math.round(turn < 0 ? sprite.x + 32 - d.wallX : 64), 0, 64);
-                    sprite.setCrop(0, 0, keep, 64);
-                };
-                cut();
-                s.tweens.add({
-                    targets: sprite, x: d.mouthX - 34, duration: 420, ease: 'Sine.easeIn', onUpdate: cut,
-                    onComplete: () => { sprite.setCrop().setScale(1).setFlipX(flip).setDepth(depth); done(); },
-                });
-            },
-        });
-    }
-
-    // The cover's fall (`fall` in assets/ship/shaft/shaft.json, tools/build_shaft.py): its frames' squares from where it
-    // hung to where it lies, dropping as a thing falls (slow at first) while it turns, frame by frame, a quarter toward
-    // the wall; on the floor a clang, a hop of 2 px tipped back a frame, and it settles; then the world's flat cover.
-    coverFalls() {
-        const s = this.scene, sh = this.world.shaft, F = sh.fall, c = sh.cover, down = sh.down, half = F.cell / 2;
-        const last = F.frames - 1;
-        const sp = s.add.sprite(F.start[0] + half, F.start[1] + half, 'shaft-cover-fall', 0).setDepth(c.depth);
-        this.world.add([sp]);
-        c.setVisible(false);
-        // (The flat one is shown by the world as the beat's flag is set, which comes before it lands: kept clear till then.)
-        down.setAlpha(0);
-        const t = { k: 0 };
-        const place = (k, lift = 0) => sp.setPosition(Math.round(F.start[0] + half + (F.end[0] - F.start[0]) * k),
-                                                      Math.round(F.start[1] + half + (F.end[1] - F.start[1]) * k * k) - lift);
-        s.tweens.add({
-            targets: t, k: 1, duration: 420, ease: 'Linear',
-            onUpdate: () => { place(t.k); sp.setFrame(Math.min(last, Math.round(t.k * last))); },
-            onComplete: () => {
-                place(1);
-                sp.setFrame(last);
-                sfx.at(sp.x, sp.y).clang();
-                const hop = { h: 0 };
-                s.tweens.add({
-                    targets: hop, h: 1, duration: 200, ease: 'Linear',
-                    onUpdate: () => { const u = Math.sin(hop.h * Math.PI); place(1, Math.round(2 * u)); sp.setFrame(u > 0.5 ? last - 1 : last); },
-                    onComplete: () => { sp.destroy(); down.setVisible(true).setAlpha(1); },
-                });
-            },
-        });
     }
 
     // The steward (population: `npc_steward`, `scn_card_hk`): his cart is free; he mops his brow,
@@ -1034,3 +946,4 @@ Object.assign(Story.prototype, spa);
 Object.assign(Story.prototype, pass);
 Object.assign(Story.prototype, quiet);
 Object.assign(Story.prototype, stage);
+Object.assign(Story.prototype, linen);

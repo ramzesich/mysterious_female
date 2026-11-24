@@ -3517,6 +3517,145 @@ def restack(b, stk):
           f" t.pic.anims.stop(); t.stack.setVisible(true).setAngle(0); t.stool.setVisible(true); t.pic.setVisible(false); }})({stk})")
 
 
+def scenario_region4__pillows(b):
+    """Near-catch 4 in the linen room, as remade on the user's own structure (docs/near-catch-4-remake-log.md): a stack
+    of pillows in the emptied cart, too tall to hop and no way past it; pushed, the cart bumps Bumbot's shelf and he is
+    off; the cover falls as his paws reach it, before he is in; he goes in at the opening's height; the top pillows fly
+    aft, the lower two ride the cart on and slide off; where they lie (clear of the door, low under the chute's hatch);
+    the cover lower on the floor; the hint for crawling, once; the cart hers to stand on after; a load with the beat done."""
+    S = "window.__ship"
+    q = f"{S}.world.story.linen"
+    cat = f"{S}.cats.find(c => c.flag === 'bb4')"
+    lc = f"{S}.world.pushables.find(t => t.id === 'cart_linen')"
+    sh = f"{S}.world.shaft"
+    shown = lambda o: b.eval(f"{o}.visible && {o}.alpha > 0.5")
+    b.open("?reset&play&at=linen")
+    L = b.eval(f"{q}.L")
+    floor, duct = b.eval(f"{q}.floor"), b.eval(f"{S}.world.data.duct")
+    ok = check(b.eval(f"{lc}.items[0].frame.name") == "laundry-cart-empty", "the cart is the empty one", b.eval(f"{lc}.items[0].frame.name"))
+    ok &= check(shown(f"{q}.ride") and b.eval(f"{q}.ride.frame.name") == 0 and b.eval(f"{q}.ride.x === {lc}.x"), "a stack of pillows in it")
+    top = L["top"]
+    ok &= check(top > 68 and L["ride"]["y"] + L["ride"]["cell"][1] > -32, "its top over her jump's height, its foot in the tub under the rim", (top, L["ride"]))
+    ok &= check(b.eval(f"{lc}.zone.body.height") == 128, "the cart with it is a wall to the ceiling", b.eval(f"{lc}.zone.body.height"))
+    ok &= check(not shown(f"{q}.near") and not shown(f"{q}.far") and b.eval(f"{sh}.cover.visible"), "no pillows on the floor yet; the cover on the mouth")
+    # (We cannot jump past it, or on top of it: three jumps at it, her highest and her furthest forward.)
+    cx = b.eval(f"{lc}.x")
+    b.key("left", True)
+    wait(0.4)
+    high, fwd = floor, 1e9
+    for _ in range(3):
+        b.key("space", True)
+        end = now() + 0.75
+        while now() < end:
+            wait(0.03)
+            st = b.state()
+            high, fwd = min(high, st["y"]), min(fwd, st["x"])
+        b.key("space", False)
+        wait(0.1)
+    st = b.state()
+    ok &= check(st["y"] == floor and fwd > cx + 20 and b.eval(f"{lc}.x") == cx, "jumping at it: neither onto it nor past it, and it does not move", (st, fwd, high))
+    ok &= check(not b.eval(f"{cat}.gone"), "he sleeps on", b.eval(f"{cat}.sprite.anims.currentAnim.key"))
+    # Pushed: the cart's front past his body's aft end, a bump, and he goes.
+    b.tap("e")
+    ok &= check(b.state()["mode"] == "push", "E at its end: she takes hold", b.state())
+    aft = b.eval(f"{cat}.sprite.x - 32 + 49")
+    ok &= check(wait_js(b, f"{cat}.gone", 6), "pushed up to his shelf: he is off")
+    t0 = b.eval(f"{q}.T")
+    front = b.eval(f"{lc}.x - 22.5")
+    ok &= check(aft - 7 <= front <= aft - 5, "as the cart bumps his shelf: its front 6 px past his nose", front - aft)
+    b.key("left", False)              # (she lets go as he goes: the push still goes on until the last pillows are off)
+    seen = dict(cover=None, lip=None, inside=None, ride=[], flew=None, mode=set(), walled=None)
+    end = now() + 3
+    while now() < end and not (b.eval(f"!!{q}.over")):
+        T = b.eval(f"{S}.time.now - {q}.T")
+        v = b.eval(f"[{sh}.cover.visible, {cat}.sprite.x, {cat}.sprite.y, {cat}.sprite.anims.currentAnim.key, {q}.ride.visible && {q}.ride.alpha > 0, {q}.ride.x, {lc}.x, {q}.frame, {S}.mode, {lc}.zone.body.height, {cat}.away]")
+        if not v[0] and seen["cover"] is None:
+            seen["cover"] = (T, v[1], v[3])
+        if v[3] == "bumbot-crawl" and seen["inside"] is None:
+            seen["inside"] = (T, v[0], v[2])
+        if v[4]:
+            seen["ride"].append(abs(v[5] - v[6]))
+        if v[7] >= 1 and seen["flew"] is None:
+            seen["flew"] = T
+        if T < 650:
+            seen["mode"].add(v[8])
+        if v[9] < 128 and seen["walled"] is None:
+            seen["walled"] = (T, v[7])
+        wait(1 / 60)
+    ok &= check(seen["cover"] and seen["cover"][2] == "bumbot-leap" and seen["cover"][0] < 220 and seen["cover"][1] > duct["mouthX"] + 14,
+                "the cover begins its fall while he is still in the air, as his paws reach it", seen["cover"])
+    ok &= check(seen["inside"] and not seen["inside"][1] and seen["inside"][0] >= 300, "he goes into the mouth with its cover already off", seen["inside"])
+    ok &= check(seen["inside"] and seen["inside"][2] == duct["upper"] - 5, "in at the opening's height, 5 px over the shaft's floor for her", (seen["inside"], duct["upper"]))
+    ok &= check(seen["flew"] is not None and seen["flew"] < 120, "the top pillows are knocked off as he springs", seen["flew"])
+    ok &= check(seen["ride"] and max(seen["ride"]) == 0, "the pillows still in the cart move with it exactly", max(seen["ride"] or [9]))
+    ok &= check(seen["mode"] == {"push"}, "the push goes on by itself until the last pillows are off, her keys let go", seen["mode"])
+    ok &= check(seen["walled"] and seen["walled"][1] >= L["release"], "the cart a wall until the last two leave it", seen["walled"])
+    ok &= check("crawl" in save_list(b, "verbs") and "bb4" in flags(b), "he is gone: crawling is hers")
+    ok &= check(alert(b) == "", "no words over her as he goes", alert(b))
+    b.shot("region4-pillows")
+    wait(0.6)
+    at = b.eval(f"{lc}.x")
+    wait(0.3)
+    ok &= check(b.state()["mode"] == "push" and b.eval(f"{lc}.x") == at, "and the cart is hers again: it stands where the push ended, her hands on it", (b.state(), at))
+    # Where they lie: two low behind where the cart stood, two at the aft rack; the door and the hatch's handle clear.
+    box = lambda o: b.eval(f"(o => [o.x, o.y, o.x + o.width, o.y + o.height])({o})")
+    near, far = box(f"{q}.near"), box(f"{q}.far")
+    ok &= check(shown(f"{q}.near") and shown(f"{q}.far") and not shown(f"{q}.free") and not shown(f"{q}.ride"), "the four lie on the floor, the clip's own pictures put away")
+    door = b.eval(f"{S}.rooms.find(r => r.route === 'linen').door")
+    ok &= check(near[2] <= door - 21 and far[0] >= door + 16, "the room's door clear of them: its frame runs 21 px forward of its middle, 16 aft", (near, far, door))
+    hatch = b.eval(f"{S}.world.data.linen.chuteX")
+    ok &= check(near[0] < hatch < near[2] and floor - near[1] <= 18, "the two under the chute's hatch lie low: its handle, 19 px up, is over them", (near, floor - near[1]))
+    ok &= check(far[2] <= b.eval(f"{S}.world.rooms.linen.def?.x1 ?? {far[2]}") and far[3] == floor and near[3] == floor, "on the floor, inside the room", (near, far))
+    ok &= check(b.eval(f"{q}.near.depth < {lc}.items[0].depth && {q}.near.depth < {S}.player.depth"), "behind the cart and her")
+    down = box(f"{sh}.down")
+    ok &= check(wait_js(b, f"{sh}.down.visible && {sh}.down.alpha === 1", 2) and down[3] == floor + 4,
+                "the cover flat on the floor, 4 px lower than the wall's foot", (down, floor))
+    ok &= check(b.eval(f"{sh}.down.depth < {lc}.items[0].depth"), "and still behind the cart")
+    # The mouth's near side has no hole for whoever is behind it to show through.
+    holes = b.eval(f"""(t => {{ const im = t.getSourceImage(), c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+        const g = c.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, im.width, im.height).data, a = (x, y) => d[(y * im.width + x) * 4 + 3];
+        let n = 0; for (let y = 0; y < im.height; y++) for (let x = 0; x < 12; x++) {{ if (a(x, y)) continue;
+            let l = 0, r = 0, u = 0, w = 0; for (let i = 0; i < x; i++) l |= a(i, y); for (let i = x + 1; i < 12; i++) r |= a(i, y);
+            for (let j = 0; j < y; j++) u |= a(x, j); for (let j = y + 1; j < im.height; j++) w |= a(x, j); if (l && r && u && w) n++; }} return n; }})({S}.textures.get('shaft-mouth'))""")
+    ok &= check(holes == 0, "the mouth's near side has no empty pixel inside its outline", holes)
+    # The cart is hers again: pushed on to the mouth, and she can stand on it.
+    b.key("left", True)
+    ok &= check(wait_flag(b, "cart_linen", 8), "the cart, empty, pushed on to the shaft's mouth", flags(b))
+    b.key("left", False)
+    ok &= check(b.eval(f"{lc}.zone.body.height") == b.eval(f"{S}.world.data.linen.cartTop"), "it is its rim's height again", b.eval(f"{lc}.zone.body.height"))
+    wait(0.3)
+    b.hold(["left", "space"], 0.4)
+    wait(0.5)
+    st = b.state()
+    ok &= check(st["y"] == duct["upper"], "she jumps onto it, level with the shaft's floor", st)
+    # (The user, 2026-11-24: "The tooltip has to show (after the Bumbot's escape) only when we jump on top of the cart".)
+    wait(0.2)
+    words = alert(b)
+    ok &= check("crawl" in words, "up on the cart: the hint over her, how to crawl", words)
+    b.shot("region4-pillows-on-cart")
+    # Ten seconds standing there: nothing touches her; down and up again, the hint is not said twice.
+    wait(10)
+    ok &= check(b.state()["mode"] == "play" and alert(b) == "", "ten seconds on: still hers, the words gone", (b.state(), alert(b)))
+    b.hold("right", 0.5)
+    wait(0.4)
+    ok &= check(b.state()["y"] == floor, "down off it", b.state())
+    b.hold(["left", "space"], 0.4)
+    wait(0.6)
+    ok &= check(b.state()["y"] == duct["upper"] and alert(b) == "", "and up on it again: no hint a second time", (b.state(), alert(b)))
+    # A game loaded with the beat done: no stack, the pillows lying, the cover down, the cart its rim's height.
+    b.open("?reset&play&at=linen&did=bb4")
+    ok &= check(not shown(f"{q}.ride") and shown(f"{q}.near") and shown(f"{q}.far") and not shown(f"{q}.free"), "loaded after the beat: the pillows lie on the floor, none in the cart")
+    ok &= check(b.eval(f"{lc}.zone.body.height") == b.eval(f"{S}.world.data.linen.cartTop") and b.eval(f"{sh}.down.visible && !{sh}.cover.visible"),
+                "the cart its rim's height, the cover down")
+    ok &= check(not b.eval(f"{cat}.sprite.visible"), "and no Bumbot on the shelf")
+    ok &= check(alert(b) == "", "standing on the floor there: no hint", alert(b))
+    near = box(f"{q}.near")
+    ok &= check(b.eval(f"{lc}.x + 22.5") <= near[0] and b.eval(f"{lc}.zone.x === {lc}.x"), "the cart where the last pillows left it, forward of the two on the floor",
+                (b.eval(f"{lc}.x"), near))
+    b.shot("region4-pillows-after")
+    return ok
+
+
 def scenario_region4(b):
     """Region 4 (docs/build-plan.md, step 4): Housekeeping, deck 9's corridor: the steward's cart and
     his card, the honeymooners' picture and the fourth book, the vacuum that darts out, the towel

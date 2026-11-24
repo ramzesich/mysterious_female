@@ -1531,7 +1531,10 @@ export class World {
                 // stands on its rim, the linen room's laundry cart.)
                 const top = e.tall === 'top' || e.tall === 'rim', block = e.tall === 'rim';
                 const rim = top ? (this.data.linen?.cartTop ?? 36) : img.height - 4;
-                const zone = s.add.zone(x, e.y, img.width - 4, e.tall === true && !done() ? 128 : rim).setOrigin(0.5, 1);
+                // (`wall`: a wall to the ceiling until that flag is set, whatever its kind: the linen room's cart with its
+                // stack of pillows, "We cannot jump past it, or on top of it", the user, 2026-11-24.)
+                const walled = !!e.wall && !this.progress.has(e.wall);
+                const zone = s.add.zone(x, e.y, img.width - 4, (e.tall === true && !done()) || walled ? 128 : rim).setOrigin(0.5, 1);
                 s.physics.add.existing(zone, true);
                 img.x = x;
                 // (A tall one, free: too tall to hop, it stands back against the wall, out of her
@@ -1539,6 +1542,7 @@ export class World {
                 const aside = () => { zone.body.enable = false; img.setDepth(D.decor + 0.11); };
                 if (e.tall === true && done()) aside();
                 const thing = { ...e, x, items: [img], zone, width: img.width - 4, min: e.min, max: e.max, goal, sides: e.sides ?? 0, top, block, rim,
+                    unwall: () => { zone.setSize(img.width - 4, rim); zone.body.updateFromGameObject(); },
                     moveTo: to => {
                         thing.x = img.x = zone.x = to;
                         if (to === goal && e.flag && !this.progress.has(e.flag)) {

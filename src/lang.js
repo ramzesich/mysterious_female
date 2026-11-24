@@ -32,6 +32,9 @@ const TEXTS = {
         'hint.interact': 'E to interact',
         'hint.dash': 'D to dash',
         'hint.dash.pad': 'B to dash',
+        // (Crawling, as Bumbot is gone into the linen room's vent: near-catch 4, 2026-11-24.)
+        'hint.crawl': '↓ to crawl',
+        'hint.crawl.pad': 'Left stick down to crawl',
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
         'hint.read': '← and → to choose, E to read, Esc to get up',
         'hint.read.pad': 'Left stick to choose, X to read, B to get up',
@@ -69,6 +72,8 @@ const TEXTS = {
         'hint.interact': 'E — взаємодіяти',
         'hint.dash': 'D — ривок',
         'hint.dash.pad': 'B — ривок',
+        'hint.crawl': '↓ — повзти',
+        'hint.crawl.pad': 'Лівий стік униз — повзти',
         'hint.read': '← і → — вибрати, E — читати, Esc — встати',
         'hint.read.pad': 'Лівий стік — вибрати, X — читати, B — встати',
         'hint.return': '← і → — вибрати, E — повернути, Esc — залишити решту',

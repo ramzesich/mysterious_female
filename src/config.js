@@ -314,6 +314,19 @@ export const SHAFT = {
 // The laundry chute from the linen room down to the laundry (src/world/story.js `chute`; the user, 2026-11-24): the
 // crossfades between a room and the hull, the drop from the hatch to the outlet's mouth (about 2 s, "Let's try 2s"), how
 // long before she shows the laundry is fully in, and how deep she lands in the cart's towels (her feet over the floor).
+// Near-catch 4, the linen room (remade 2026-11-24 on the user's structure: docs/near-catch-4-remake-log.md,
+// src/world/linen.js). `gap`: the cart's front from his body's aft end as he goes, px (minus: past it, the cart bumps his
+// shelf; it was 2 px short of him: the pillows then lay across the door's frame). His leap to the mouth's lip, `leapMs`,
+// `up` px over the shaft's floor for her (the mouth as drawn opens 5 px higher than that floor: he "is shown from below
+// the entrance", the user), the cover knocked `coverAt` ms into it, as his fore paws reach it (it fell only once he was
+// in the mouth); in on his belly, `crawlMs`. `fps`: the pillows' clip, paced so that the cart, pushed at her 40 px a
+// second, is where the clip's own cart stood as the last two leave it (28 px on, frame 10). `hintMs`: "↓ to crawl" over
+// her, the first time she stands on the cart once he is gone. `sounds`: on the clip's frames (frame, effect, which of the lying pairs it comes from).
+export const PILLOWS = {
+    gap: -6, leapMs: 320, up: 5, coverAt: 140, crawlMs: 420, fps: 14.3, hintMs: 3000,
+    sounds: [[10, 'towelFlump', 'far'], [13, 'towelFlump', 'near']],
+};
+
 export const CHUTE = { fadeMs: 150, dropMs: 2000, leadMs: 60, sink: 30, goneFrame: 12,
     // (Out of it: she dives head first until her head is `binFloor` px over the floor (under it: so that her feet are
     // under the heap's top, all of her in it, the cart drawn over her through the floor's slab); lies there

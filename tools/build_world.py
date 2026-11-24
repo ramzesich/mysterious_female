@@ -16,7 +16,7 @@ from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
-                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
                         SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
@@ -355,7 +355,7 @@ def build_world():
         # (`goal`: the end it is pushed to, either way: the linen room's cart rolls forward, toward the bow.)
         goal = spot(where, to)[0]
         ents.append(dict(kind="push", id=pid, x=x, y=y, route=route, min=min(x, goal), max=max(x, goal), goal=goal, frame=frame,
-                         flag=flag or "", tall=tall, sides=sides, needs=needs[0] if needs else ""))
+                         flag=flag or "", tall=tall, sides=sides, needs=needs[0] if needs else "", wall=PUSH_WALL.get(pid, "")))
 
     for sid, (where, at, flag, needs, label) in SWITCHES.items():
         x, y, route = spot(where, at)

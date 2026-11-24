@@ -184,12 +184,15 @@ export const verbs = {
 
     updatePush(input, dt, time) {
         const p = this.player, body = p.body, t = this.pushing;
-        const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+        // (`pushHeld`: until then the push goes on by itself, whatever the keys: the linen room's cart rolls on from under
+        // its pillows as Bumbot scatters them, 0.7 s, src/world/linen.js.)
+        const held = time < (this.pushHeld ?? 0);
+        const dir = held ? -this.pushSide : (input.right ? 1 : 0) - (input.left ? 1 : 0);
         const onFloor = body.blocked.down || body.touching.down;
         // Letting go: E again, a jump, stepping back from it, or the floor going from under her.
         // (Not in the first moment: stepping up to its end, her body has not met the floor again yet.)
         const fresh = time - this.pushSince < 200;
-        if (!fresh && (input.activatePressed || input.jumpPressed || dir === this.pushSide || !onFloor)) {
+        if (!fresh && !held && (input.activatePressed || input.jumpPressed || dir === this.pushSide || !onFloor)) {
             this.pushing = null;
             this.mode = 'play';
             return;

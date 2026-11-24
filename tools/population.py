@@ -314,8 +314,14 @@ PUSHABLES = {
     # (Mirrored with the room, 2026-11-23: it starts in front of the chute's hatch, where such a cart is parked, and
     # rolls forward to the shaft's mouth, its end against the mouth's, its rim level with the shaft's floor.)
     # (Its end against the mouth's: 13 px further in since the mouth was made half as deep, 2026-11-24.)
-    "cart_linen": ("linen", 131, 35, "thing:laundry-cart", "cart_linen", "rim", 1),
+    # (The empty cart since 2026-11-24, a stack of pillows in it until Bumbot scatters them, `PUSH_WALL`: the user, "The
+    # laundry cart has stack of pillows on top of it. We cannot jump past it, or on top of it"; "Use this cart, but empty.
+    # Don't put the pillows on top of the cart linen".)
+    "cart_linen": ("linen", 131, 35, "thing:laundry-cart-empty", "cart_linen", "rim", 1),
 }
+# A pushable that is a wall to the ceiling until a flag is set, whatever its kind after: the linen room's cart under its
+# pillows (tools/build_linen_pillows.py, src/world/linen.js).
+PUSH_WALL = {"cart_linen": "bb4"}
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
 # (The trap door 246.3 until 2026-11-24: where its new picture has the hole, tools/build_stage.py.)
