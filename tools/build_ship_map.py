@@ -1051,6 +1051,9 @@ def build_objects():
     # Inside the reading nook behind the Library's bookcase (deck 6; its room's x0 9512, by its armchair): with
     # `&did=books_all,nook` it is open (the user, 2026-11-22).
     add(point("nook", "place", 9512 + 150, floor_y(6), [prop("route", "nook")]))
+    # Inside the laundry (deck 4; its door at 5837, the room's x0 5778), by its washers, facing its cart (the user,
+    # 2026-11-24, its redecoration: the corridor's hazards stand between it and every other start).
+    add(point("laundry", "place", 5778 + 120, floor_y(4), [prop("route", "laundry")]))
     # (§3 1.3, 2026-11-19: a start by each hazard whose gags had none: the casino's slots, 1, run aft
     # onto a spill; the kid's jet, 11a/11b, `&did=bb5`, at the pool attendant's hut (his checkpoint), walk aft at him; the stage's swinging light,
     # 12a/12b, `&did=bb3`, walk aft under it; the towel stack, 18, aft of it (forward of it the darting vacuum comes first), run forward past it; the drill's boat,

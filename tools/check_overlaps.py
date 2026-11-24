@@ -31,7 +31,6 @@ from build_ship_map import PLAYABLE, floor_y
 ALLOWED = [
     ("rope-barrier", "text:"),              # a block's sign hangs on its rope
     ("pool-hut", "door-crew"),              # the pool attendant's hut: the door is the hut's own
-    ("linen-door-open", "door-crew"),       # the linen room's door, shut and open: one place
     # Housekeeping's carts and delivered luggage stand at cabin doors: what they are for.
     ("service-cart", "door-cabin"), ("towel-trolley", "door-cabin"), ("suitcases", "door-cabin"),
     # Deck 11's midship lobby has the 10-11 flight's sign and the 11-12 flight's: the first is gone

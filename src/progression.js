@@ -121,7 +121,9 @@ export class Progression {
     roomDoor(room, lockText, shutImage, x, floor) {
         room.lockSpec = parseLock(lockText);
         if (!room.lockSpec) return;
-        if (room.lockSpec.kind === 'card') this.reader(x + 22, floor, room.lockSpec.card);
+        // (Its reader on the door's left, its plate on the right, as every room's door has them, the laundry's: the user,
+        // 2026-11-24; it was squeezed in by the plate.)
+        if (room.lockSpec.kind === 'card') this.reader(x - 22, floor, room.lockSpec.card);
         this.roomDoors.push({ room, shutImage });
         this.refresh();
     }

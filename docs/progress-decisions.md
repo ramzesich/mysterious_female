@@ -4811,3 +4811,26 @@ continue with the next item on the plan: Bumbot made again." `docs/plan-the-rest
   `check_overlaps` 0. The whole suite not run. Each near-catch but the first was recorded from the running game and
   looked at frame by frame.
 - 114 generations (65 the look, 49 the clips).
+
+## The linen room and the laundry redecorated; the room doors' plates (the user's, 2026-11-24)
+
+- **Both rooms redrawn in place by PixelLab**, every shape kept where it was (the user: "keeping the exact dimensions and
+  the layout of the current props, so that we wouldn't affect gameplay"); three looks of each, worn steel, clean modern,
+  warm. **Linen A** (worn steel; the shelves' linen redrawn varied: towels white, blue and sage, rolled navy-striped pool
+  towels, sheets, blankets, bathrobes, the user: "more like linen", "add variety") and **laundry C** (warm; its own floor
+  put back, the redraw's glossy one "way out of the rest of the ship's theme"). `tools/redecorate_rooms.py`, called by
+  both builders, lays them over what the builders draw and pastes back, pixel for pixel, the doors, the linen room's chute
+  hatch (her `chute-in` clip was made on it), the laundry's outlet and towel cart and its floor. The laundry is wider than
+  one redraw: two halves, matched row by row, the join inpainted. About 216 generations with the tries
+  (`assets/source/ship/redeco/README.md`).
+- **The linen room's door from the corridor is the ship's regular crew door, shut**, washed at rest and pulsing like every
+  door she uses (the user); the open door with the room seen through it is retired (`linen-door-open`). Its card reader
+  on the door's left and its plate on the right, as the laundry's (it was squeezed in by the plate).
+- **The room doors' plates in a background tone** (the user: "the plates same background'ish tone as the doors"): the ten
+  `sign()` plates beside doors washed at rest (LINEN, LAUNDRY, DRY STORE, STAGE MGR, both PANTRYs, GALLEY, COLD ROOM, STAGE
+  DOOR, LIGHTING) washed 20% toward the corridor wall ("35 too strong"), their readers and the pulse left as they are
+  (`washPlates`, `WASHED_PLATES` in the ship scene). The captain's brass plate (text) was shown and left.
+- `?at=laundry`: inside the laundry (deck 4's corridor hazards stand between it and every other start).
+- The laundress at her folding table stands in front of the laundry's tangerine on the detergent shelf, as before: part 9.
+- `linen`, `region1`, `region4`, `highlight`, `boot` pass; `tools/check_overlaps.py` 0.
+

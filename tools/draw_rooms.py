@@ -265,7 +265,12 @@ def laundry(width):
         for k in range(n):
             d.rounded_rectangle([x, FLOOR - 35 - k * 4, x + 11, FLOOR - 31 - k * 4], radius=1,
                                 fill=(WHITE, BLUE_LIGHT)[(x + k) % 2], outline=GREY)
-    return R.save("laundry")
+    # Redecorated (the user's choice of 2026-11-24): tools/redecorate_rooms.py lays the generated look over all this,
+    # keeping the door, the outlet, the cart and the floor as drawn here.
+    from redecorate_rooms import laundry as redecorate
+    im = redecorate(R.save("laundry"))
+    im.save(OUT / "laundry.png")
+    return im
 
 
 def store(width):
