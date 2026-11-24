@@ -73,7 +73,10 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('her-towel', 'assets/sprites/her-towel.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-towel-meta', 'assets/sprites/her-towel.json');
         // With Bumbot in her arms (the way home, §6.1.9).
-        this.load.spritesheet('her-cat', 'assets/sprites/her-cat.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        // (`?coat=a`, `?coat=b`: him in her arms in his new coat, two tones, for the user to choose in the game,
+        // 2026-11-24; to be taken out once chosen.)
+        const coat = new URLSearchParams(location.search).get('coat');
+        this.load.spritesheet('her-cat', `assets/sprites/her-cat${['a', 'b'].includes(coat) ? `-${coat}` : ''}.png`, { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-cat-meta', 'assets/sprites/her-cat.json');
         // Her mishap gags, each one picture of her with the thing (docs/plan-three-uses.md §1.6).
         this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
@@ -388,19 +391,50 @@ export class BootScene extends Phaser.Scene {
             this.anims.create({ key: 'gags-dnd-cover', frames: gf('dnd-cover', 1), frameRate: 1000 / 90 });
             this.anims.create({ key: 'gags-dnd-tiptoe', frames: gf('dnd-tiptoe', 1), frameRate: 1000 / 26, repeat: -1 });
         }
-        // Bumbot: his spot activities loop until she comes close; the run is his escape.
+        // Bumbot, made again (plan-the-rest §7a, 2026-11-24; tools/build_sprites.py's `BUMBOT`): every clip from the one
+        // picture the user chose. What he does at a spot loops with a pause between rounds; the run is his escape.
         const cat = this.cache.json.get('bumbot-meta');
         const catFrames = (name, order = cat.anims[name].map((_, i) => i)) =>
             order.map(i => ({ key: 'bumbot', frame: cat.anims[name][i] }));
-        for (const [name, fps, repeat] of [['run', 16, -1], ['wash', 7, -1], ['sit', 6, 0], ['eat', 7, -1], ['jump', 12, 0]]) {
-            this.anims.create({ key: `bumbot-${name}`, frames: catFrames(name), frameRate: fps, repeat });
-        }
-        // Catching a fly at the pool: the leap, over and over, with a pause on the ground.
-        this.anims.create({ key: 'bumbot-fly', frames: catFrames('jump'), frameRate: 12, repeat: -1, repeatDelay: 900 });
-        // Batting: seated, paw down and up. Its frames 6 and 8 drew stray blobs, so they are skipped.
-        this.anims.create({ key: 'bumbot-bat', frames: catFrames('bat', [4, 5, 7, 5]), frameRate: 6, repeat: -1 });
-        // Wet from the pool, he shakes himself dry.
-        if (cat.anims.shake) this.anims.create({ key: 'bumbot-shake', frames: catFrames('shake', [1, 2, 3, 4, 5, 6]), frameRate: 8 });
+        const span = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+        const clip = (key, name, fps, { order, repeat = 0, delay = 0 } = {}) =>
+            this.anims.create({ key: `bumbot-${key}`, frames: catFrames(name, order), frameRate: fps, repeat, repeatDelay: delay });
+        // On his feet.
+        clip('idle', 'idle', 8, { repeat: -1, delay: 1600 });
+        clip('walk', 'walk', 10, { repeat: -1 });
+        clip('run', 'run', BUMBOT.runFps, { repeat: -1 });
+        clip('look-back', 'look-back', 10);
+        clip('turn', 'turn', 12);
+        clip('stretch', 'stretch', 8);
+        clip('shake', 'shake', 12);
+        // (Eating: his head is down from the fourth frame on; the bites loop.)
+        clip('eat', 'eat', 8, { order: span(3, 16), repeat: -1 });
+        clip('crawl', 'crawl', 12, { order: span(7, 16), repeat: -1 });
+        // His jump, three ways. `jump`: from the crouch to the crouch he lands in, each frame set on its own lowest
+        // pixel (the pool's scene places him by his paws and paces it, at 12 a second: src/world/lido.js). `leap`: up and
+        // through the air, held on its last frame, for a leap the game moves him through. `startle`: straight up on
+        // the spot with the clip's own rise, to his front paws coming down (a near-catch: ShipScene's `nearCatch`).
+        clip('jump', 'leap', 12, { order: span(1, 12) });
+        clip('leap', 'leap', 22, { order: span(3, 9) });
+        clip('startle', 'jump', BUMBOT.startleFps, { order: span(3, 10) });
+        clip('land', 'jump', 16, { order: span(10, 16) });
+        // Sitting.
+        clip('sit', 'sit', 10);
+        clip('sat', 'sat', 8, { repeat: -1, delay: 2200 });
+        clip('stand-up', 'stand-up', 12);
+        clip('wash', 'wash', 9, { repeat: -1, delay: 500 });
+        clip('bat', 'bat', 11, { repeat: -1, delay: 350 });
+        // (At the first pool's rim, a paw down at the water: its frames reach under his floor, `BUMBOT.under` px.)
+        clip('fish', 'fish', 10, { repeat: -1, delay: 900 });
+        // Lying.
+        clip('loaf', 'loaf', 10);
+        clip('loaf-rest', 'loaf-rest', 6, { repeat: -1, delay: 1800 });
+        clip('loaf-up', 'loaf-up', 12);
+        clip('lie-down', 'lie-down', 10);
+        clip('asleep', 'asleep', 5, { repeat: -1 });
+        clip('wake', 'wake', 12);
+        // (On the stage's fly rope: the catch, then holding on. Its frames reach under his floor too.)
+        clip('rope', 'rope', 14);
         // (The welcome screen and the intro are the ship scene's own: src/intro.js.)
         this.scene.start('ship');
     }

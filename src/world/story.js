@@ -4,7 +4,7 @@
 // region, in the order of docs/build-plan.md.
 
 import { sfx } from '../sfx.js';
-import { PLAYER, CHUTE } from '../config.js';
+import { PLAYER, CHUTE, BUMBOT } from '../config.js';
 import { rumble } from '../rumble.js';
 import { lido } from './lido.js';
 import { outside } from './outside.js';
@@ -20,7 +20,9 @@ const M = 48;
 const STEWARD_TUG = 17, STEWARD_FREE = 35;
 // Near-catch 4 (the linen room): his body's columns in his asleep frame (of 64), and how near she or the laundry cart comes
 // before he is off (the user, 2026-11-23: "she almost touches him, or the cart almost touches him, by a couple of pixels").
-const BB4_SPAN = [10, 49], BB4_GAP = 2;
+const BB4_SPAN = [19, 49], BB4_GAP = 2;
+// (On the stage's fly rope: where the rope stands in his clip's frames, px before his middle.)
+const ROPE_CAT = { x: 16.5 };
 // (His head in that picture, px aft of its middle: his bubble over it.)
 const STEWARD_HEAD = 22;
 // His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
@@ -235,10 +237,13 @@ export class Story {
         if (!t.thrown) return false;
         for (const cat of s.cats) {
             const c = cat.sprite;
-            if (cat.gone || cat.hidden || cat.batting || !c.visible || !c.anims.isPlaying
+            // (Not asleep: he sleeps through it, as he did when his sleep was one still. Fishing, his frames stand
+            // `BUMBOT.under` px low: back on his floor for the bat, and down again after.)
+            if (cat.gone || cat.hidden || cat.batting || !c.visible || !c.anims.isPlaying || cat.activity === 'asleep'
                 || !s.loose.near(t, c.x, c.y, 14, 24, cat.route)) continue;
             cat.batting = true;
-            const back = her.x < c.x ? -1 : 1, was = c.anims.currentAnim.key, flip = c.flipX;
+            const back = her.x < c.x ? -1 : 1, was = c.anims.currentAnim.key, flip = c.flipX, low = cat.activity === 'fish' ? BUMBOT.under : 0;
+            c.y -= low;
             c.setFlipX(back < 0).play('bumbot-bat');
             t.thrown = false;
             t.pickableAt = s.time.now + 300;
@@ -251,7 +256,7 @@ export class Story {
             });
             s.time.delayedCall(1700, () => {
                 cat.batting = false;
-                if (!cat.gone) c.setFlipX(flip).play(was);
+                if (!cat.gone) { c.setFlipX(flip).play(was); c.y += low; }
             });
             return true;
         }
@@ -498,11 +503,16 @@ export class Story {
     // Bumbot's way out: a leap onto the fly rope's loop, and up with it into the flies.
     upTheRope(sprite, done) {
         const s = this.scene, st = this.world.data.stage;
-        sprite.setFlipX(st.ropeX < sprite.x).play('bumbot-jump');
+        // (On the rope he has a clip of his own since he was made again, 2026-11-24: the catch with his front paws, his
+        // hind paws into the loop, a look back down. Made with the rope in its picture and the rope taken out: the
+        // game's own is behind him. The rope stands `ROPE_CAT.x` px before his middle in those frames, and they keep
+        // `BUMBOT.under` px under his floor.)
+        const west = st.ropeX < sprite.x, at = st.ropeX + (west ? 1 : -1) * ROPE_CAT.x;
+        sprite.setFlipX(west).play('bumbot-leap');
         s.tweens.add({
-            targets: sprite, x: st.ropeX, y: st.floor - 30, duration: 240, ease: 'Quad.easeOut',
+            targets: sprite, x: at, y: st.floor - 30, duration: 240, ease: 'Quad.easeOut',
             onComplete: () => {
-                sprite.anims.pause();
+                sprite.setDepth(this.rope.depth + 0.001).play({ key: 'bumbot-rope', startFrame: 2 });
                 sfx.at(st.ropeX, st.floor).whip();
                 const from = this.ropeEnd, to = st.top + 34;
                 s.tweens.addCounter({
@@ -670,17 +680,27 @@ export class Story {
     // bow. (The mouth's near side is drawn over him: he goes into it, not across it.)
     intoTheVent(sprite, done) {
         const s = this.scene, w = this.world, d = w.data.duct, floor = w.rooms.linen.floor, sh = w.shaft;
-        sprite.setFlipX(d.mouthX < sprite.x).play('bumbot-jump');
+        sprite.setFlipX(d.mouthX < sprite.x).play('bumbot-leap');
         s.tweens.add({
             targets: sprite, x: d.mouthX + 12, y: d.upper + 1, duration: 320, ease: 'Quad.easeOut',
             onComplete: () => {
                 if (sh.cover.visible) this.coverFalls();
                 sfx.at(sprite.x, floor).scramble();
                 const depth = sprite.depth;
-                sprite.setDepth(sh.mouth.depth - 0.001);
+                // (In on his belly, flat and long: his crawl since he was made again, 2026-11-24; he was squeezed
+                // narrow by a scale.)
+                // Nothing of him past the room's forward wall, as of her (`world.herCut`): his picture is cut there as he
+                // goes in. (Turned by its scale for that: Phaser 4 crops a picture turned by `flipX` wrong.)
+                const flip = sprite.flipX, turn = flip ? -1 : 1;
+                sprite.setDepth(sh.mouth.depth - 0.001).play('bumbot-crawl').setFlipX(false).setScale(turn, 1);
+                const cut = () => {
+                    const keep = Phaser.Math.Clamp(Math.round(turn < 0 ? sprite.x + 32 - d.wallX : 64), 0, 64);
+                    sprite.setCrop(0, 0, keep, 64);
+                };
+                cut();
                 s.tweens.add({
-                    targets: sprite, x: d.mouthX - 8, scaleX: 0.4, duration: 300, ease: 'Sine.easeIn',
-                    onComplete: () => { sprite.setDepth(depth).setScale(1); done(); },
+                    targets: sprite, x: d.mouthX - 34, duration: 420, ease: 'Sine.easeIn', onUpdate: cut,
+                    onComplete: () => { sprite.setCrop().setScale(1).setFlipX(flip).setDepth(depth); done(); },
                 });
             },
         });
@@ -1064,7 +1084,7 @@ export class Story {
         this.world.add([cat]);
         s.time.delayedCall(1500, () => {
             sfx.at(cat.x, g.y).mrrp();
-            cat.play('bumbot-jump');
+            cat.play('bumbot-leap');
             s.tweens.add({ targets: cat, x: cat.x + 26, y: g.topY - 70, duration: 420, ease: 'Quad.easeOut',
                 onComplete: () => s.tweens.add({ targets: cat, alpha: 0, y: g.topY - 84, duration: 160, onComplete: () => cat.destroy() }) });
         });

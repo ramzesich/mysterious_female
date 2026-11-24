@@ -4760,3 +4760,52 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
   and its run-down. `sound`, `region6`, `region8`, `region9`, `boot`, `deck3` pass.
 - **Part 5 is done.**
 
+## Part 6: Bumbot made again (2026-11-24, the design session in the default folder)
+
+The user: the building session "merged all its work to main and is idle now. I want us to take over for now and
+continue with the next item on the plan: Bumbot made again." `docs/plan-the-rest.md` §7a; all the art and its jobs in
+`assets/source/bumbot/remake/README.md`.
+
+- **Asked first** (§7a's step 1). The user: "Head and his face look disproportional to me"; keep his size; realistic or
+  stylised, "Let's try both and show me to decide"; every clip again and all the new ones, "make also the existing
+  animations a bit smoother. We might not end up using all of them in the game, but I want to choose what's proper";
+  him in her arms "is the only thing that I actually like", but for pink pixels in its front view; no new photos.
+- **His look.** Edits of the old sprite came back blurred and in its lanky shape. `create_image_pro_flash` at the
+  game's size (48 x 32, then 52 x 36), with his HUD face as the style image, drew a proper cat each time; thirteen
+  tries, seven shown. **The user chose 1, the first realistic one, its coat as it came.** He stands 26 px, not 28:
+  the chosen picture is kept as it is, not redrawn. **His own colours** (`own` in `tools/build_sprites.py`): on the
+  palette he was a flat purple silhouette.
+- **His clips.** `animate_image_pixminimax` from that one picture on a 64 px canvas, on transparency, 1 or 2
+  generations each; it held his head, ears, eye and coat in every frame. Poses a clip ends in start the next ones
+  (sitting, asleep, the loaf). The run three times (the one kept is an exact eight-frame stride, made on green and
+  keyed). The rope's clip was made with the stage's rope in its picture and the rope taken out; the fishing with a
+  floor's edge and water under it, the cat cut out by colour. Cleaned by rule (`remake/cut.py`): loose specks off,
+  the shake's drops in water colours (the user: "black droplets, maybe those should be light grey/blue").
+  **"All Bumbot animations are approved."**
+- **In the game.**
+  - `BootScene.js`: his animations' table. The jump three ways: `bumbot-jump` (crouch to crouch, each frame on its own
+    lowest pixel: the pool's scene paces it and places him by his paws), `bumbot-leap` (through the air, for a leap
+    the game moves him through), `bumbot-startle` (straight up on the spot with the clip's own rise).
+  - `nearCatch`: out of what he was doing first (`BUMBOT.getUp`: awake and up from asleep, up off his haunches from
+    sitting, quick), then the leap, 0.44 s (`leapMs`; it was 0.16 s, two frames of a crouch), then his run.
+  - Asleep he breathes in the clip (one still stretched by a tween before); a tangerine thrown at him asleep is
+    still slept through.
+  - The stage: he catches the rope, in front of it, and rides it up. The linen room: in on his belly, his picture
+    cut at the room's forward wall as hers is (turned by its scale for the crop). Cabin 8206: he turns round, lies
+    down, sleeps.
+  - **The pool** (the user: "He doesn't bat at the level, he is with his back to it. That's why it looks so weird"):
+    his activity is `fish`, a paw down over the rim at the water. My reading of the user's words, shown and approved
+    with the rest. Its frames, and the rope's, keep 8 px under his floor (`BUMBOT.under`).
+- **Her with him in her arms** (`fcb870e`): in that sheet her skin's shade landed on the palette's tan (patches on her
+  face, arms and legs in every frame): a remap puts it on her peach; four lone pink pixels in her hair in the front
+  view mended in the source (the user circled two). His coat there: "Let's try to recolor. If I don't like, we keep
+  the current version"; shown as pictures, then "need to see in game": `?coat=a`, `?coat=b` (two extra sheets, to be
+  taken out once chosen).
+- **Not done, the user's word:** "there are a lot of issues with the near-catch scenes in general, I will fix them
+  separately, when doing general QA". One I told them of: at near-catch 2 he sleeps over the reading table's lamp
+  (`BEAT_LIFT` takes the piece's whole height).
+- **Tests:** `boot`, `region1` to `region9`, `golden`, `throw`, `sound`, `deck3`, `highlight` pass; `finale` passed
+  alone three times and failed one wind check once six at a time (cause not found; no cat in that check);
+  `check_overlaps` 0. The whole suite not run. Each near-catch but the first was recorded from the running game and
+  looked at frame by frame.
+- 114 generations (65 the look, 49 the clips).

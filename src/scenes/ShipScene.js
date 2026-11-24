@@ -118,6 +118,9 @@ const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
 // of her fall on (the frames where she is down), so that she lies on the carpet, not over it.
 const LIE_DROP = { px: 2, frame: 3 };
 
+// What Bumbot does at a spot sitting down: he gets up off his haunches before he leaps (`BUMBOT.getUp`).
+const SITTING = new Set(['wash', 'bat', 'sit', 'sat']);
+
 export class ShipScene extends Phaser.Scene {
     constructor() {
         super('ship');
@@ -1166,18 +1169,17 @@ export class ShipScene extends Phaser.Scene {
     addCat(name, x, y, activity, escape, { route = 'inside', lift = 0, exitX = null } = {}) {
         const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.13;
         const sprite = this.add.sprite(x, y - lift, 'bumbot').setOrigin(0.5, 1).setDepth(depth);
-        if (activity === 'asleep') {
-            // One still pose that breathes, slowly.
-            sprite.setFrame(this.cache.json.get('bumbot-meta').frames.asleep);
-            this.tweens.add({ targets: sprite, scaleY: 1.06, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-        } else {
-            sprite.play(`bumbot-${activity}`);
-            // (Eating off the floor: his small bites as his head goes down, each round of the clip; part 5.)
-            if (activity === 'eat') sprite.on('animationupdate', (a, f) => { if (f.index === 1 && sprite.visible) sfx.at(sprite.x, sprite.y).nom(); });
-        }
+        // (Asleep he breathes in his clip's own frames since his sprites were made again, 2026-11-24: it was one still
+        // stretched by a tween. Sat down, he goes on sitting: his tail, an ear, a blink.)
+        sprite.play(`bumbot-${activity}`);
+        if (activity === 'sit') sprite.anims.chain('bumbot-sat');
+        // (Fishing at a rim, his paw goes down past his floor: that clip's frames keep `BUMBOT.under` px under it.)
+        if (activity === 'fish') sprite.y += BUMBOT.under;
+        // (Eating off the floor: his small bites as his head goes down, each round of the clip; part 5.)
+        if (activity === 'eat') sprite.on('animationupdate', (a, f) => { if (f.index === 1 && sprite.visible) sfx.at(sprite.x, sprite.y).nom(); });
         if (route !== 'inside') sprite.setVisible(false);
         this.worldLayer.add(sprite);
-        const cat = { name, sprite, escape, gone: false, away: false, route, floor: y, exitX };
+        const cat = { name, sprite, escape, gone: false, away: false, route, floor: y, exitX, activity };
         this.cats.push(cat);
         return cat;
     }
@@ -4755,9 +4757,15 @@ export class ShipScene extends Phaser.Scene {
                 this.time.delayedCall(BUMBOT.startleMs, async () => {
                     if (cat.before) await cat.before();
                     this.tweens.killTweensOf(s);
+                    // (Out of what he was doing first, quick: awake and up, or up off his haunches; then the leap.)
+                    const up = BUMBOT.getUp[cat.activity === 'asleep' ? 'asleep' : SITTING.has(cat.activity) ? 'sat' : ''];
+                    if (up) {
+                        s.setScale(1).play({ key: `bumbot-${up[0]}`, startFrame: up[1], frameRate: up[2] });
+                        await new Promise(resolve => s.once('animationcomplete', resolve));
+                    }
                     cat.onLeap?.();
                     rumble('bolt');
-                    s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-jump');
+                    s.setScale(1).setFlipX(cat.escape < 0).play('bumbot-startle');
                     leapt = true;
                     onLeapt?.();
                     this.time.delayedCall(BUMBOT.leapMs, () => {

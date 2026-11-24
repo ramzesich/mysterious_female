@@ -171,7 +171,7 @@ export const finale = {
         // (On our side of the deck's railing, on its very edge, where he can be seen: the railing is
         // drawn in front of her. At the catch he comes through it to her: §6.1.9.)
         this.tipCat = s.add.sprite(Mo.catX, Mo.y, 'bumbot').setOrigin(0.5, 1).setDepth(D.player + 0.06).setFlipX(true);
-        this.tipCat.play('bumbot-sit');
+        this.tipCat.play('bumbot-sit').anims.chain('bumbot-sat');
         w.add([this.tipCat]);
         w.things.push({ id: 'bb_tip', x: Mo.catX, y: Mo.y, route: 'inside', items: [this.tipCat], after: 'flag:sunset', until: 'flag:catch' });
         this.tip = { still: 0, hearts: 0, spooks: 0, busy: false, coming: false };
@@ -181,7 +181,7 @@ export const finale = {
         // on the bed E is her reading (her seat is 18 px from him; the user: "she still has to have access to the bed's
         // reading spot").
         const H = F.home;
-        this.bedCat = s.add.sprite(H.catX, H.y - BED_TOP, 'bumbot', s.cache.json.get('bumbot-meta').frames.asleep).setOrigin(0.5, 1).setDepth(w.depthFor('cabin') + 0.02);
+        this.bedCat = s.add.sprite(H.catX, H.y - BED_TOP, 'bumbot').setOrigin(0.5, 1).setDepth(w.depthFor('cabin') + 0.02).play('bumbot-asleep');
         w.add([this.bedCat]);
         w.things.push({ id: 'bb_home', x: H.catX, y: H.y, route: 'cabin', items: [this.bedCat], after: 'flag:home', reach: 26,
             interact: () => { if (s.viewing) return false; this.purr(); return w.seenClose('bed'); } });
@@ -363,7 +363,7 @@ export const finale = {
             s.tweens.add({ targets: cat, x: to, duration: Math.abs(to - cat.x) / 0.3, onComplete: settle });
         } else {
             const to = Phaser.Math.Clamp(her.x - dir * TIP.dart, Mo.x0 + 30, Mo.x1 - 30);
-            cat.setFlipX(dir > 0).play('bumbot-jump');
+            cat.setFlipX(dir > 0).play({ key: 'bumbot-leap', startFrame: 2 });
             sfx.at(cat.x, cat.y).scramble();
             s.time.delayedCall(140, () => cat.play('bumbot-run'));
             s.tweens.add({ targets: cat, x: to, duration: Math.abs(to - cat.x) / 0.32, onComplete: settle });
@@ -396,7 +396,7 @@ export const finale = {
             her.setFlipX(side < 0);
             her.anims.play('her-reach');
             await w.wait(520);
-            cat.play('bumbot-jump');
+            cat.play('bumbot-leap');
             await w.tween({ targets: cat, x: her.x + side * 9, y: her.y - 22, duration: 230, ease: 'Quad.easeOut' });
             cat.setVisible(false).setY(Mo.y);
             s.holding = true;
@@ -484,21 +484,18 @@ export const finale = {
             s.pose('stand');
             await w.wait(600);
             // Out of her arms, onto the bed; round once, and down in a ball.
-            cat.setVisible(true).setPosition(her.x - 10, her.y - 24).setFlipX(true).play('bumbot-jump');
+            cat.setVisible(true).setPosition(her.x - 10, her.y - 24).setFlipX(true).play({ key: 'bumbot-leap', startFrame: 3 });
             sfx.at(cat.x, cat.y).mrrp();
             s.holding = false;
             s.pose('stand');
             await w.tween({ targets: cat, x: H.catX, y: top, duration: 320, ease: 'Quad.easeIn' });
-            cat.play('bumbot-run');
-            cat.anims.timeScale = 0.4;
-            await w.wait(350);
-            cat.setFlipX(false);
-            await w.wait(350);
-            cat.setFlipX(true);
-            await w.wait(250);
-            cat.anims.stop();
-            cat.anims.timeScale = 1;
-            cat.setFrame(s.cache.json.get('bumbot-meta').frames.asleep);
+            // (His own clips since he was made again, 2026-11-24: he turns round on the spot, lies down and sleeps,
+            // breathing; it was his run slowed and mirrored twice, then one still.)
+            cat.play('bumbot-turn');
+            await new Promise(resolve => cat.once('animationcomplete', resolve));
+            cat.setFlipX(false).play({ key: 'bumbot-lie-down', frameRate: 14 });
+            await new Promise(resolve => cat.once('animationcomplete', resolve));
+            cat.play('bumbot-asleep');
             sfx.at(cat.x, cat.y).purr(2.9);
             // She sits down by him, her legs over the bed's side.
             if (s.anims.exists('her-read')) {

@@ -228,9 +228,12 @@ meant five).
 - Her PixelLab character (all animations come from it): **"Bumbusik (final)"**,
   id `ebd5dadc-1318-4717-b0c0-6f429a7a58f0`, 4 directions, 64px. Earlier tries are kept on PixelLab
   for comparison; don't animate those.
-- Bumbot's PixelLab character: **"Bumbot (final)"**, id `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855`, 4
-  directions, 48px canvas: our hand-shrunk sprite imported, not generated. The 48px candidate it
-  came from (`assets/source/bumbot/pixellab/`) and the other tries are kept for comparison.
+- **Bumbot is one picture, not a PixelLab character** (made again 2026-11-24, the user's choice of seven looks):
+  `assets/source/bumbot/remake/still.png`, 36 x 26 px on a 64 px canvas, **in his own colours, never palettized**. Every
+  clip of his is `animate_image_pixminimax` from it, or from a pose an earlier clip ended in (its README has the
+  jobs; `cut.py` cleans the raw frames into `clips/`; `BUMBOT` in `tools/build_sprites.py` builds the sheet). A new
+  clip of his is made the same way. His old character "Bumbot (final)", `81f4c718-6c1b-43aa-b3e0-da0cfdd7c855`, and
+  its sources (`assets/source/bumbot/rotations/`, `run/` and the rest) are kept for comparison, no longer built.
 
 Lessons learned (2026-10-31):
 
@@ -718,6 +721,26 @@ Lessons learned (2026-11-24, the shrug and the popups):
   canvas into a texture of its own.
 - **A start link is walked before it is given:** deck 5's corridor from La Cucina ends in a wall at 167 m, and the user
   walked it looking for Bumbot at 244 m.
+
+Lessons learned (2026-11-24, Bumbot made again):
+
+- **A small figure is generated at its size, with a picture of the same subject as the style:** `create_image_pro_flash`
+  on a 48 x 32 canvas with his HUD face as the style image drew a whole proper cat 26 px tall, first try. Editing the
+  old sprite (`edit_image_pro_flash`) kept its wrong shape and came back blurred.
+- **Look at a figure on the palette before promising the palette:** his dark browns all fell on one purple, a flat
+  silhouette. A figure of a few close dark tones keeps its own colours (`own` in `tools/build_sprites.py`).
+- **PixMiniMax from one still holds a quadruped through twenty clips** (64 px canvas, on transparency, 1 or 2
+  generations each). A clip that must loop is pinned with its start as its last frame; a clip into a pose is not
+  pinned, and the pose it reaches starts the next clips. A run: ask twice; one try gave an exact repeating stride.
+  At most ten jobs run at once.
+- **A clip's own rise and a leap the game moves are not added together:** his jump is built twice, with its rise
+  (a leap on the spot) and each frame set on its lowest pixel (a leap along a tween).
+- **A clip that reaches under the floor keeps rows under it in its frames**, and the game stands it that much lower
+  (`BUMBOT.under`: his paw into the pool, the rope's loop under his feet).
+- **A patch that replaces a block of a file by its first and last line takes what stood between with it:** the sprite
+  build lost three helpers; read the block before cutting it.
+- **What he does must act on something in front of him:** batting the air at a rim with a lever behind him read as
+  "scratching a pole". A pose's reason is in the picture (the clip made with the rim and the water in it).
 
 Lessons learned (2026-11-24, part 5's throws):
 

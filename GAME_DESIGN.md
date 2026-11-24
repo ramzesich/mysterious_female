@@ -309,7 +309,23 @@ and escape direction).
   smaller redraws lost his look, so we shrank it ourselves (box resampling to 2/3, snapped back to
   Resurrect 64): about **28px tall standing**, a little above her knee. Faint grey streaks from
   each ear to the outer corner of the eye were added by hand, as on the real cat.
-- **His animations (Decided):** run (his escape), washing, a leap, sitting down and staying sat,
+- **His sprite, made again (Decided, the user, 2026-11-24; plan-the-rest §7a):** the one above "doesn't look like
+  him": "Head and his face look disproportional to me". Of seven looks generated at the game's size, realistic and
+  stylised, the user chose the realistic one and its warm brown-black coat as it came. He stands 26 px tall and 36
+  long, **in his own colours, not the palette's** (on it he is a flat purple silhouette). In her arms he is as he
+  was (the user: "the only thing that I actually like"); a recolour to the new coat waits for the user's look in the
+  game (`?coat=a`, `?coat=b`).
+- **His animations, made again (Decided, 2026-11-24):** every clip animated from that one picture, all approved: a
+  standing idle (tail, ear, blink), walk, run, his jump with its landing, a look back over his shoulder, a turn
+  round, a stretch with a yawn, a shake (its drops in water colours), eating, a flat crawl (into the vent), the
+  catch of the stage's fly rope; sitting down, sitting (tail sweep, ear, blink), up again, washing, batting, fishing
+  with a paw over a rim (the pool: he batted the air with the lever behind him, and it read as scratching a pole);
+  down into a loaf, the loaf at rest, up out of it; lying down, asleep (breathing in its own frames), waking. Placed
+  so far: what his scenes already asked of him, plus the rope, the crawl, the fishing, the sleep and the waking. The
+  standing idle, walk, look back, stretch and loaf are made and not yet placed. **The near-catch scenes themselves
+  are the user's to go over in the general QA** ("there are a lot of issues with the near-catch scenes in general, I
+  will fix them separately").
+- **His animations as first decided:** run (his escape), washing, a leap, sitting down and staying sat,
   eating, batting with a paw, and asleep, which breathes in code.
   Asleep is side-on, lying down with eyes closed and the tail out behind. A curled-up "bagel" was
   dropped: from the side it barely reads, and PixelLab drew it as a ball seen from above.
@@ -2759,7 +2775,7 @@ and his pistol green; Bumbot over her head into the pool, in sight under the wat
 lever's grip, thrown across the tub; her reach up out of the water (a generated clip); the lever a generated valve,
 knee-high; the water down a grate, a funnel in its surface; the hatch on the tank's floor in view, its lid heaved up,
 its ladder, a ceiling panel on deck 10, no fade; her picture 5 px lower in the dry tank; the water to the wall's foot;
-the ladders to the floor; ~~the prints heading aft~~ (dropped in the merge, the user). 60 generations (`tools/build_pool.py`). **§5 part 3 is done. Part 4 (§6, each deck's own look) is done (2026-11-24):** each cabin deck hangs its own generated framed pictures between its doors (4 safety posters, 5 paintings of the ship, 6 old charts, 8 seascapes, 9 botanical prints, 10 old liners' posters; 38 generations); the plaques' coloured band dropped (the user: the doors stay as they are) and no tint. Then (the user's, 2026-11-24): her popup goes off the screen with her during a scare; a way roped or chained off has no words over her, she turns to us and shrugs (generated, 3 generations) and its sign lights up; the same shrug after a near-catch; `?at=pass5`. **Part 5 (§7) begun (2026-11-24):** a tangerine thrown at the funnel's gulls bounces down the stairway's treads and a gull takes it from a step; Bumbot at the tip backs off only from one coming at him; the old `deck4` flakes not reproduced, closed; V8 settled, V10 the party's notes above the world; the sound's leftovers (a held sound, the soft serve's motor held; sips, licks, Bumbot's nibbles; the intro's gulls, its rush into the ship, the badge's rustle, the menu's tick). **Part 5 is done. Next: part 6 (§7a, Bumbot made again);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+the ladders to the floor; ~~the prints heading aft~~ (dropped in the merge, the user). 60 generations (`tools/build_pool.py`). **§5 part 3 is done. Part 4 (§6, each deck's own look) is done (2026-11-24):** each cabin deck hangs its own generated framed pictures between its doors (4 safety posters, 5 paintings of the ship, 6 old charts, 8 seascapes, 9 botanical prints, 10 old liners' posters; 38 generations); the plaques' coloured band dropped (the user: the doors stay as they are) and no tint. Then (the user's, 2026-11-24): her popup goes off the screen with her during a scare; a way roped or chained off has no words over her, she turns to us and shrugs (generated, 3 generations) and its sign lights up; the same shrug after a near-catch; `?at=pass5`. **Part 5 (§7) begun (2026-11-24):** a tangerine thrown at the funnel's gulls bounces down the stairway's treads and a gull takes it from a step; Bumbot at the tip backs off only from one coming at him; the old `deck4` flakes not reproduced, closed; V8 settled, V10 the party's notes above the world; the sound's leftovers (a held sound, the soft serve's motor held; sips, licks, Bumbot's nibbles; the intro's gulls, its rush into the ship, the badge's rustle, the menu's tick). **Part 5 is done. Part 6 (§7a, Bumbot made again) is built (2026-11-24, by the design session, the user's choices):** his look chosen of seven, 23 clips from it, his own colours, the scenes moved onto them (the near-catch's leap a real one, the rope, the vent's crawl, the pool's fishing, his sleep breathing); her skin's shade mended in her sheet with him in her arms; 114 generations. Left of it: his coat in her arms (the user's look in the game), the clips not yet placed, the near-catch scenes in the user's QA. **Next: part 9 (§7d, the tangerines' seats);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

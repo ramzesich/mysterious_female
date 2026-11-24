@@ -936,8 +936,7 @@ Input locked unless said; each sets its save flag.
    `hatOff` in `src/world/story.js`; `CHUTE` in `src/config.js`; `tools/build_laundry_chute.py`).
 6. **`scn_card_hk`:** the cart pushed to 130; the steward walks to her, thanks, the card.
    **`scn_photo`:** E at the honeymooners: she raises their camera, the flash, they kiss, the book.
-7. **`bb_5` near-catch 5 (the pool, 131; remade 2026-11-24, `docs/pool-remake-log.md`):** he bats at the water on
-   the rim. From the water she glides to the rim under him, looks up and reaches for him (her `swim-reach`); from
+7. **`bb_5` near-catch 5 (the pool, 131; remade 2026-11-24, `docs/pool-remake-log.md`):** he fishes on the rim, a paw down at the water (his `fish` clip, 2026-11-24). From the water she glides to the rim under him, looks up and reaches for him (her `swim-reach`); from
    the deck beside him she dives at him, he hops over her, she is in the pool and comes up under him. The kid stands
    up in the hot tub at 133 and squirts him in the back; over her head he goes and into the water behind her,
    paddles back past her, hops out, shakes (the wet shake), leaps onto the drain lever's grip at 131.7, which goes

@@ -269,7 +269,7 @@ BEATS = {
     # (Asleep on the linen room's bottle shelf, the forward rack's middle, since 2026-11-23: the user; he was on a heap of
     # towels on its floor. The room mirrored the same day: he bolts forward, into the shaft's mouth.)
     "bb4": ("linen", 63, "asleep", -1, 13, None),
-    "bb5": (11, 131.27, "bat", 1, 160, None),
+    "bb5": (11, 131.27, "fish", 1, 160, None),
     "bb6": (10, 31.15, "wash", -1, 29.2, None),
 }
 # What a flag gives besides itself: a verb learned at a beat.

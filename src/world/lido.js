@@ -31,7 +31,9 @@ export const lido = {
         if (!L) return;
         this.L = L;
         this.lidoTextures();
-        // Near-catch 5 has its own scene: he fishes at the first pool's aft rim, facing the water.
+        // Near-catch 5 has its own scene: he fishes at the first pool's aft rim, facing the water (his `fish` clip since
+        // he was made again, 2026-11-24: a paw down over the rim at the water; he batted at the air, the lever behind him,
+        // and the user read it as scratching a pole).
         const cat = s.cats.find(c => c.flag === 'bb5');
         if (cat) {
             cat.custom = true;
@@ -212,6 +214,9 @@ export const lido = {
         };
         s.tweens.killTweensOf(c);
         c.setScale(1);
+        // (From his fishing, whose frames stand `BUMBOT.under` px low, back onto the deck, sitting.)
+        c.y = paws.y = cat.floor;
+        sit();
         if (swimming) {
             // To the rim under him, her chin on it.
             s.pose('swim', 0.8);

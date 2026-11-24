@@ -844,7 +844,7 @@ export const topdeck = {
         // Bumbot on the horn's bracket, out of reach, against the sky (population:
         // `bb_glimpse_funnel`) until it sounds under him.
         this.hornCat = s.add.sprite(hx + 4, top - 94, 'bumbot').setOrigin(0.5, 1).setDepth(D.exterior + 0.09).setFlipX(true);
-        this.hornCat.play('bumbot-sit');
+        this.hornCat.play('bumbot-sit').anims.chain('bumbot-sat');
         w.add([this.hornCat]);
         this.refreshTopdeck();
     },
@@ -1345,7 +1345,7 @@ export const topdeck = {
         if (!cat?.visible) return;
         this.hornCatGone = true;
         sfx.at(cat.x, cat.y).meow();
-        cat.play('bumbot-jump');
+        cat.play('bumbot-leap');
         s.tweens.chain({
             targets: cat,
             tweens: [

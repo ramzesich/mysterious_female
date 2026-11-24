@@ -371,27 +371,36 @@ def seq(char, folder, anchor="keep"):
     return [(f"{folder}/{i}.png", anchor) for i in range(n)]
 
 
-# Bumbot. Sources face east. His rotations are our own 2/3 shrink of PixelLab's 48px design
-# (GAME_DESIGN.md §4); the animations are PixelLab's, made from that shrunk sprite.
+# Bumbot, made again (plan-the-rest §7a, 2026-11-24): the look the user chose of seven generated at the game's size, and
+# every clip animated from that one picture (assets/source/bumbot/remake/: its README has the jobs, `cut.py` makes
+# `clips/` from the raw frames). **His colours are his own** (`own`): on the palette he is a flat purple silhouette.
+# Every frame is on one floor line, row 55 of its 64 px canvas. `leap` is the jump's frames each set on its own lowest
+# pixel, for the leaps the game moves him through itself (the clip's own rise taken out); `fish` and `rope` reach
+# under his floor and keep the canvas whole (`BUMBOT_UNDER` px under his feet: the game stands those frames lower).
+# The old sprite and clips are kept beside the new, in assets/source/bumbot/ (`rotations/`, `run/` and the rest).
+BUMBOT_FLOOR, BUMBOT_UNDER = 55, 8
+
+
+def cat_clip(name, anchor=BUMBOT_FLOOR):
+    n = len(list((ROOT / "assets" / "source" / "bumbot" / "remake" / "clips" / name).glob("*.png")))
+    return [(f"remake/clips/{name}/{i}.png", anchor) for i in range(n)]
+
+
 BUMBOT = {
     "name": "bumbot",
     "cell": 64,
+    "own": True,
     "remap": {},
     "frames": {
-        "stand": [("rotations/east.png", "keep")],
-        "run": seq("bumbot", "run"),
-        "wash": seq("bumbot", "wash", "feet"),
-        "jump": seq("bumbot", "jump"),
-        "sit": seq("bumbot", "sit", "feet"),
-        "eat": seq("bumbot", "eat", "feet"),
-        "bat": seq("bumbot", "bat", "feet"),
-        # Out of the pool (near-catch 5): he shakes himself dry, water flying off him (v3).
-        "shake": seq("bumbot", "shake", "feet"),
-        # Asleep: the last frame of a v3 "lies down and curls up". The pro "curled up" state drew a
-        # featureless ball as tall as he stands, so it is kept in assets/source but not used.
-        "asleep": [("curl-up/8.png", "feet")],
+        "stand": [("remake/still.png", BUMBOT_FLOOR)],
+        **{name: cat_clip(name) for name in ("idle", "walk", "run", "jump", "look-back", "turn", "stretch", "shake", "eat",
+                                             "crawl", "sit", "sat", "stand-up", "wash", "bat", "loaf", "loaf-rest",
+                                             "loaf-up", "lie-down", "asleep", "wake")},
+        "leap": [(path, "feet") for path, _ in cat_clip("jump")],
+        "fish": cat_clip("fish", BUMBOT_FLOOR + BUMBOT_UNDER),
+        "rope": cat_clip("rope", BUMBOT_FLOOR + BUMBOT_UNDER),
     },
-    "baseline": "rotations/east.png",
+    "baseline": "remake/still.png",
 }
 
 
@@ -430,7 +439,7 @@ WET = {"swim", "swim-reach", "shower", "shiver", "splutter"}
 
 
 def build(spec):
-    src_dir = ROOT / "assets" / "source" / spec["name"]
+    src_dir = ROOT / "assets" / "source" / spec.get("source", spec["name"])
     cell = spec["cell"]
     remap = {hex_rgb(a): hex_rgb(b) for a, b in spec["remap"].items()}
     baseline = {}  # per source canvas size, the y of the standing feet
@@ -446,8 +455,11 @@ def build(spec):
     for anim, sources in spec["frames"].items():
         indices = []
         paper = anim.startswith(spec.get("paper", ())) if spec.get("paper") else False
-        images = [(palettize(paper_greys(Image.open(src_dir / path)) if paper else Image.open(src_dir / path), remap), anchor)
-                  for path, anchor in sources]
+        if spec.get("own"):
+            images = [(Image.open(src_dir / path).convert("RGBA"), anchor) for path, anchor in sources]
+        else:
+            images = [(palettize(paper_greys(Image.open(src_dir / path)) if paper else Image.open(src_dir / path), remap), anchor)
+                      for path, anchor in sources]
         if spec.get("grey_top"):
             images = [(grey_top(img, spec["grey_top"]), anchor) for img, anchor in images]
         if spec.get("blouse"):
@@ -506,5 +518,10 @@ if __name__ == "__main__":
     build(HER)
     build(HER_TOWEL)
     build(HER_CAT)
+    # (For the user to choose in the game, `?coat=a` and `?coat=b`, 2026-11-24: him in her arms in his new coat's main
+    # tone, and a tone darker; the sheet as it is stays the default. To be taken out once chosen.)
+    for letter, coat in (("a", {"313638": "271f21", "374e4a": "39343a", "a2a947": "ede985"}),
+                         ("b", {"313638": "1f1919", "374e4a": "2d262a", "a2a947": "ede985"})):
+        build({**HER_CAT, "name": f"her-cat-{letter}", "source": "her-cat", "remap": {**HER_CAT["remap"], **coat}})
     build(HER_MISHAPS)
     build(BUMBOT)

@@ -53,7 +53,13 @@ export const BUMBOT = {
     noticeReach: 60,    // she goes to pick him up once she is this close on his deck
     reachGap: 34,       // where she stops: her hands, bent down, just short of him
     startleMs: 280,     // into her reach, when he hears her and leaps
-    leapMs: 160,        // the leap before he runs
+    // (His clips made again, 2026-11-24: the leap is a real one now, straight up out of her hands, eight frames of it
+    // at `startleFps` a second, and he runs as his front paws come down; `getUp`: what he plays first, out of what he
+    // was doing, and at how many frames a second: quick. `under`: the rows under his floor that the frames of `fish`
+    // and `rope` keep, so those are stood this much lower. `runFps`: his run's eight frames to a stride.)
+    leapMs: 440, startleFps: 18,
+    getUp: { asleep: ['wake', 5, 30], sat: ['stand-up', 2, 30] },
+    under: 8, runFps: 24,
     holdMs: 450,        // she stays bent, reaching at nothing
     frontMs: 600,       // then turns to us and shrugs (her `shrug`, the user, 2026-11-24), this long after it, before play goes on
     runSpeed: 300,      // his escape, px/s: faster than she can ever run

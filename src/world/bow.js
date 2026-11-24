@@ -774,13 +774,13 @@ export const bow = {
         }
         const ladderX = gate?.x ?? R.x0 + 20, top = gate?.y0 ?? R.y - 144;
         sfx.at(ladderX, top).hatch();
-        sprite.setFlipX(true).play('bumbot-jump');
+        sprite.setFlipX(true).play('bumbot-leap');
         s.tweens.chain({
             targets: sprite,
             tweens: [
                 { x: R.helmX, y: R.y - 44, duration: 260, ease: 'Quad.easeOut' },
                 { x: R.consoleX, y: R.y - 46, duration: 240, onStart: () => { sprite.play('bumbot-run'); sfx.at(sprite.x, sprite.y).scramble(); } },
-                { x: ladderX, y: R.y - 60, duration: 200, ease: 'Quad.easeOut', onStart: () => sprite.play('bumbot-jump') },
+                { x: ladderX, y: R.y - 60, duration: 200, ease: 'Quad.easeOut', onStart: () => sprite.play('bumbot-leap') },
                 { y: top - 6, duration: 620, onStart: () => sfx.at(sprite.x, sprite.y).scramble(), onComplete: () => sprite.setAlpha(0) },
             ],
             onComplete: () => {

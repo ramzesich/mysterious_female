@@ -54,7 +54,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 3 (§5) | The look-outs; the deliveries | Step 6 | Large | About 15 |
 | 4 (§6) | Each deck its own look | Step 7 | Medium | About 20 |
 | 5 (§7) | Small faults and leftovers | The log, the audit | Small each | None |
-| 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19) | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
+| 6 (§7a) | Bumbot made again: his look, then every clip of his, richer and tuned (added 2026-11-19). **Built 2026-11-24** by the design session (114 generations): what is left of it is at the head of §7a | The user's word; `GAME_DESIGN.md` §4 | Large | About 90 (the design session's guess) |
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19). **Built 2026-11-20 by the Refinement session** (branch `refinement`, `4eb23d8`, `504be54`), the sunset's sky with it: not to be built again | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess); 160 spent |
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19). **Built 2026-11-23 by the Refinement session** (branch `refinement`, `e621d5b`, `cefcf4c`): the pulse where E would act, and doors washed like their neighbours: not to be built again | The user's word | Small to medium | None |
 | 9 (§7d) | The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
@@ -592,6 +592,26 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 **Part 5 is done (2026-11-24).**
 
 ## 7a. Part 6: Bumbot made again (large; about 90 generations, a guess)
+
+**Built 2026-11-24 by the design session, in the default folder (the building session idle), on the user's choices;
+114 generations.** All of it: `assets/source/bumbot/remake/README.md`; the log's entry of that day.
+- **His look:** the user chose the realistic one of seven, its coat as it came; 26 px tall; his own colours.
+- **His clips:** 23, all approved ("All Bumbot animations are approved"): the old ones again and smoother, and idle,
+  walk, look back, turn, stretch, loaf, lie down and wake, the crawl, the rope, fishing.
+- **In the game:** every scene that shows him plays the new clips (steps 5 and 7 below as far as the tests and a
+  recording of each near-catch go).
+- **Left:**
+  1. His coat in her arms: the sheet is as it was (the user likes it), mended (her skin's shade); two recolours can be
+     seen in the game with `?coat=a` and `?coat=b` (<http://localhost:8000/?play&at=home&cards=all&did=catch&coat=a>);
+     once the user has chosen, the flag and the sheet not chosen are taken out (`tools/build_sprites.py`'s end,
+     `BootScene.js`).
+  2. The clips made and not placed: the standing idle, walk, look back, stretch, the loaf. The user chooses where.
+  3. **The near-catch scenes are the user's** (2026-11-24: "there are a lot of issues with the near-catch scenes in
+     general, I will fix them separately, when doing general QA"): nothing in them is changed until that list comes.
+     One known to them already: at near-catch 2 (deck 6) he sleeps over the reading table's lamp.
+  4. The run's pace (24 frames a second) and the rounds' pauses are by rule, not by eye: the user's to say in play.
+
+The steps as planned:
 
 Added 2026-11-19 on the user's word: "regenerate all Bumbot's sprites. Now it doesn't look like
 him, and also his animations must be enriched and fine-tuned." It is numbered 7a so that no
