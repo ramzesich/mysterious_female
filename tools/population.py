@@ -32,8 +32,9 @@ ROOMS = [
     dict(id="pantry", deck=5, m=166, width=288, look="pantry", door="crew", plate="PANTRY", plate_style="navy", lock=("card", "hk", 0),
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
     # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
+    # (`plate_lift`: its plate 10 px higher, over the pass's covered lunch: near-catch 1 remade, 2026-11-24.)
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
-         plate_side=-1),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
+         plate_side=-1, plate_lift=10),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open"),
     dict(id="nook", deck=6, m=189.4, width=240, look="nook", door="bookcase", needs="nook"),
@@ -138,7 +139,11 @@ TANGERINES = {
     "tan_4_store": ("store", 150, 2, 40, None),
     "tan_5_cafe": (5, 83.6, 1, 28, None),
     "tan_5_dessert": (5, 186.4, 1, 26, None),
-    "tan_5_bowl": (5, 245, 3, 0, "bb1"),
+    # (Out of the Seven Seas' fruit bowl as Bumbot knocks it off the pass: each where it comes to rest, forward of the
+    # spilled fruit; the game rolls them there, `passSpill` in src/world/pass.js. 2026-11-24.)
+    "tan_5_bowl_1": (5, 245.25, 1, 0, "bb1"),
+    "tan_5_bowl_2": (5, 244.7083, 1, 0, "bb1"),
+    "tan_5_bowl_3": (5, 244.0833, 1, 0, "bb1"),
     "tan_5_galley": ("galley", 36, 2, 0, "broken:haz_crate_galley"),
     "tan_6_high": (6, 26.94, 1, 118, None),
     "tan_6_windjammer": (6, 142.2, 1, 32, None),
@@ -263,7 +268,9 @@ KEEPS = {"cat": 8, "her": 4, "him": 4}
 # id: (deck or room, m or x, what he is doing, which way he bolts, where he is gone (m or x), needs).
 # Each sets its own flag when he is away. Step 0: his built near-catch, no choreography yet.
 BEATS = {
-    "bb1": (5, 248.8, "eat", -1, 203, None),
+    # (Near-catch 1 remade, 2026-11-24, docs/near-catch-1-remake-log.md: on the pass's counter, at a plate of the lunch;
+    # everything else of the pass stands from his spot, `PASS` in src/config.js.)
+    "bb1": (5, 248.4167, "eat", -1, 203, None),
     "bb2": (6, 181.0, "asleep", 1, 193.6, None),
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
     # (Asleep on the linen room's bottle shelf, the forward rack's middle, since 2026-11-23: the user; he was on a heap of
@@ -275,7 +282,7 @@ BEATS = {
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
-BEAT_LIFT = {"bb4": 36, "bb1": "service-station-bg", "bb2": "reading-table-bg"}      # px, or the piece he is on
+BEAT_LIFT = {"bb4": 36, "bb1": 33, "bb2": "reading-table-bg"}      # px, or the piece he is on
 # The linen room (tools/draw_linen.py; mirrored 2026-11-23, the user: its door at its aft end, the shaft's mouth on its
 # forward wall, so that she pushes the cart, climbs in and crawls on all one way): the chute's hatch (its middle; it
 # stands straight over the laundry's cart on deck 4, `laundry_cart` in the laundry's picture, where she lands), the
@@ -576,7 +583,7 @@ PROPS = {
     "prop_wetfloor": (5, 109.2, "wet-floor-sign", 0, dict(until="region:3")),
     "prop_coffee_cafe": (5, 85.72, "coffee-cup", 23, {}),
     "prop_bowl_cafe": (5, 83.6, "fruit-bowl-2", 23, {}),
-    "prop_bowl_7s": (5, 247.0, "fruit-bowl", 27, {}),
+    "prop_bowl_7s": (5, 247.1875, "fruit-bowl", 33, {}),      # (on the pass's counter's forward end, 33 px up)
     "prop_board": (4, 190.6, "notice-board", 40, dict(back=True)),
     # Region 2. The fire-hose cabinet high on the wall (a tangerine on its top), the photo with a
     # black tail leaving the frame (`sec_cat_photo`), the rope stand Bumbot knocked over.
@@ -702,9 +709,11 @@ QUIRKS = {
     # (the user, 2026-11-18: standing still there played only her look-around, and "nothing happened").
     "sec_peek_sea": (8, 55.27, "E", "bed-joy", 0, dict(reach=20, gag="bed", door="amb_peek_sea")),
 }
-# Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there).
+# Trays to take: id: (deck or room, m or x, what, after, [(texture, dy)] shown there, when hers to take, until).
 SOURCES = {
-    "src_lunch": (5, 248.8, "lunch", "flag:bb1", [("tray", 24), ("load-cloche", 27)]),
+    # (On the pass's counter from the start, hers to take once Bumbot has been at it: it popped in with the flag
+    # before; near-catch 1 remade, 2026-11-24.)
+    "src_lunch": (5, 249.3542, "lunch", None, [("tray", 33), ("load-cloche", 36)], "flag:bb1"),
     # Region 8's two errands: the engineer's coffee from the Great Outdoors' coffee station (hot for
     # 50 s), the old lady's mojito from Topsiders' bar.
     "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),

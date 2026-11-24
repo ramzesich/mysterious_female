@@ -66,6 +66,12 @@ export class BootScene extends Phaser.Scene {
         for (const what of ['hatch-shut', 'hatch-back', 'hatch-lip', 'drain', 'ceiling-shut', 'ceiling-open', 'ladder-low']) {
             this.load.image(`pool-${what}`, `assets/ship/pool/${what}.png`);
         }
+        // The Seven Seas' pass, near-catch 1 (tools/build_pass.py): its counter, the plate of the lunch, the fruit bowl's
+        // fall off the counter's end (frames of 96 x 64; where they stand: pass.json).
+        this.load.json('pass-layout', 'assets/ship/pass/pass.json');
+        this.load.image('pass-counter', 'assets/ship/pass/counter.png');
+        this.load.image('pass-plate', 'assets/ship/pass/plate.png');
+        this.load.spritesheet('pass-bowl-fall', 'assets/ship/pass/bowl-fall.png', { frameWidth: 96, frameHeight: 64 });
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });

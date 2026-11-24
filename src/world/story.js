@@ -12,6 +12,7 @@ import { topdeck } from './topdeck.js';
 import { bow } from './bow.js';
 import { finale } from './finale.js';
 import { spa } from './spa.js';
+import { pass } from './pass.js';
 
 const M = 48;
 
@@ -49,12 +50,8 @@ export class Story {
     setup() {
         const s = this.scene;
         const cat = flag => s.cats.find(c => c.flag === flag);
-        const bb1 = cat('bb1');
-        if (bb1) {
-            // Near-catch 1 (population §6.1): the scream that becomes her battle cry; the fruit bowl goes over.
-            bb1.onReach = () => { s.bubbleUntil = s.time.now + 1700; sfx.cry(); };
-            bb1.onLeap = () => this.world.topple('prop_bowl_7s');
-        }
+        // Near-catch 1 has its own scene (src/world/pass.js): the Seven Seas' pass.
+        this.setupPass();
         const bb2 = cat('bb2');
         if (bb2) bb2.onAway = () => this.ropeIntoDoor();
         // The Library's aft door, once he has knocked the rope stand into it: ajar for good.
@@ -78,6 +75,7 @@ export class Story {
     }
 
     update(dt, time, input) {
+        this.updatePass();
         this.updateLido(dt, time, input);
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
@@ -95,6 +93,7 @@ export class Story {
     }
 
     onFlag(name) {
+        if (name === 'bb1') this.passAfter();
         if (name === 'bb3') this.showTrap();
         if (name === 'cart_free') this.stewardThanks();
         if (name === 'duct') this.outOfTheDuct();
@@ -1134,3 +1133,4 @@ Object.assign(Story.prototype, topdeck);
 Object.assign(Story.prototype, bow);
 Object.assign(Story.prototype, finale);
 Object.assign(Story.prototype, spa);
+Object.assign(Story.prototype, pass);

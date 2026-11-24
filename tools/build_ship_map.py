@@ -1417,11 +1417,12 @@ def build_objects():
     decor("seas-windows", "dinewindows", x_of(205), x_of(252), xs=",".join(str(x_of(m)) for m in seas), style="sheers")
     decor("seas-panel", "wavepanel", x_of(230) - 80, x_of(230) + 80)
     decor("seas-columns", "pillars", x_of(205), x_of(252), xs=",".join(str(x_of(m)) for m in (227.6, 232.4)), style="white")
-    for i, m in enumerate(seas):
+    # (Under the last window stands the pass, not a table: near-catch 1 remade, 2026-11-24, the user. Its counter is
+    # the game's own piece, `PASS` in src/config.js, tools/build_pass.py; the cabinet of plates that stood for it is gone.)
+    for i, m in enumerate(seas[:-1]):
         dinner(m, ("table-flowers-bg", "table-dinner-bg")[i % 2], "dining-chair-bg")
     put(5, 225.2, "palm-bg")
     put(5, 234.8, "palm-bg")
-    put(5, 248.8, "service-station-bg")
     # Warm downlights along the public rooms' ceilings.
     for a, b in ((110, 150), (150, 194), (202, 252)):
         decor(f"downlights-5-{a}", "downlights", x_of(a), x_of(b))

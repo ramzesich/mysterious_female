@@ -1176,7 +1176,7 @@ export class ShipScene extends Phaser.Scene {
         // (Fishing at a rim, his paw goes down past his floor: that clip's frames keep `BUMBOT.under` px under it.)
         if (activity === 'fish') sprite.y += BUMBOT.under;
         // (Eating off the floor: his small bites as his head goes down, each round of the clip; part 5.)
-        if (activity === 'eat') sprite.on('animationupdate', (a, f) => { if (f.index === 1 && sprite.visible) sfx.at(sprite.x, sprite.y).nom(); });
+        if (activity === 'eat') sprite.on('animationupdate', (a, f) => { if (a.key === 'bumbot-eat' && f.index === 1 && sprite.visible) sfx.at(sprite.x, sprite.y).nom(); });
         if (route !== 'inside') sprite.setVisible(false);
         this.worldLayer.add(sprite);
         const cat = { name, sprite, escape, gone: false, away: false, route, floor: y, exitX, activity };

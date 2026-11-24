@@ -65,6 +65,29 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
+// Near-catch 1 at the Seven Seas' pass (src/world/pass.js; remade 2026-11-24, docs/near-catch-1-remake-log.md). Places
+// in px from Bumbot's spot on the counter (`BEATS` in tools/population.py), times in ms.
+export const PASS = {
+    counter: -77,           // the counter's forward end (its picture's left edge)
+    plate: 22,              // the plate's middle: under his mouth as he eats
+    sight: 200,             // she sees him from here, on her feet: the cry and the dash
+    stop: -6,               // where her dash ends: where he was
+    minMs: 420,             // from nearer than a dash this long, the cry first and the dash that much later
+    lookAt: 60, lookMs: 200, lookFrames: 6,     // his look back over his shoulder: when, how long, how many of its frames
+    turnMs: 220,            // his turn round
+    boltBefore: 100,        // he is off this long before she is there
+    hit: -27,               // where he is as his nose meets the bowl
+    leap: -54, land: -154, leapMs: 340, arc: 18,    // off the counter's end: from, to (on the floor), how long, how high over a straight line
+    slide: 12, slideMs: 66,                     // the bowl pushed along the top before its own clip takes over
+    fallFps: 12, landFrame: 2,                  // the bowl's fall: its pace, the frame it hits the floor in
+    mouth: [-11, -34],      // where its tangerines come out, from the counter's end on the floor's line
+    air: 280, roll: [34, 8], rollMs: 520, bounce: 5, bounceMs: 180,     // a tangerine: in the air, how far short of its rest it lands (and more for each next one), its roll, its one bounce
+    turnHer: 220,           // she turns after him this long after the bowl goes
+    watchMs: 800,           // and to us this long after she is there
+    afterMs: 250,           // after her shrug, before she is free
+    hintMs: 3000,           // "D to dash" over her
+};
+
 // A way she cannot go (the user, 2026-11-24): where a sign already says why (a rope's card, a ladder's chain) she says
 // nothing, turns to us and shrugs (her `shrug` clip, `fps` frames a second: at 9 "very slowly", the user), and the sign lights up a moment (`flashMs`,
 // its own colours added over it at most `glow`); a lock with nothing to read keeps its padlock over her and she shrugs.

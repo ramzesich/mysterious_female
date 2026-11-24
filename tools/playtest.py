@@ -1552,7 +1552,8 @@ def scenario_throw(b):
     # Bumbot at his first spot: he bats it straight back to her, and his beat is what it was.
     cat = f"{S}.cats.find(c => c.name === 'bb1')"
     cx, cf = b.eval(f"[{cat}.sprite.x, {cat}.floor]")
-    throw(cx - 150, cf)
+    # (From outside his sight, 200 px: nearer, the near-catch begins. A lob, up onto the pass's counter where he is.)
+    throw(cx - 216, cf, lob=True)
     b.wait_for(f"{cat}.batting", timeout=5)
     vx = b.eval(f"(t => t ? t.img.body.velocity.x : 0)({S}.loose.all[0])")
     b.shot("throw-bumbot")
@@ -2376,7 +2377,7 @@ def person(b, pid):
 
 def take_lunch(b):
     """A tray of lunch from the Seven Seas' pass."""
-    b.teleport(exact_x(248.8) - 12, D5)
+    b.teleport(exact_x(249.3542) - 12, D5)
     b.tap("e")
     wait(0.2)
     return carrying(b) == "lunch"
@@ -2388,10 +2389,9 @@ def scenario_region1(b):
     b.open("?reset&play")
     ok = check(person(b, "npc_officer")["on"] and b.eval("window.__ship.world.people.byId.npc_officer.bubbleItems[0].visible"),
                "the gangway officer shows what he wants: a tray")
-    # The Seven Seas' pass has no tray to take until Bumbot has been at it.
-    b.teleport(exact_x(248.8) - 70, D5)
-    ok &= check(not take_lunch(b), "no lunch at the pass before the beat")
-    b.open("?reset&play")
+    # The Seven Seas' pass: the lunch stands on its counter from the start, hers to take only once Bumbot has been at it.
+    lunch = "window.__ship.world.things.find(t => t.id === 'src_lunch')"
+    ok &= check(b.eval(f"{lunch}.items.every(i => i.visible) && !{lunch}.interact()"), "the lunch on the pass to see, not hers before the beat")
     go(b, 5, 244)
     b.hold("right", 1.6)
     ok &= check(wait_flag(b, "bb1"), "near-catch 1: he bolts from the pass")
@@ -2511,6 +2511,75 @@ def enter_region2(b):
 
 def js(b, text):
     return b.eval(text)
+
+
+def scenario_region1__pass(b):
+    """Near-catch 1 at the Seven Seas' pass, as remade (docs/near-catch-1-remake-log.md): the counter and what stands
+    on it, the cry and the dash at once, his way along the counter into the bowl, the bowl's fall and its three
+    tangerines, how long she is held, the hint, the lunch; arriving in a jump; a reload after."""
+    S = "window.__ship"
+    cat = f"{S}.cats.find(c => c.name === 'bb1')"
+    q = f"{S}.world.story.pass"
+    b.open("?reset&play&at=pass5")
+    cx, cf, top = b.eval(f"[{cat}.sprite.x, {cat}.floor, {cat}.sprite.y]")
+    ok = check(cf - top == 33 and b.eval(f"{q}.counter.height") == 33, "he is on the pass's counter, 33 px over the floor", (cf - top))
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-eat" and b.eval(f"Math.abs({q}.plate.x - ({cat}.sprite.x + 22)) < 1"),
+                "eating, the plate under his mouth")
+    ok &= check(b.eval(f"{q}.bowl.img.visible && {q}.bowl.img.x < {cat}.sprite.x - 40 && !{q}.fall.visible"), "the fruit bowl stands on the counter's forward end")
+    ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl')).length") == 0, "none of its tangerines out yet")
+    ok &= check(b.eval(f"{S}.alert.visible") is not True or "dash" not in alert(b), "no hint yet")
+    # Walking in: the scene starts 200 px out, with no stop: the cry's popup and her dash at once.
+    hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=8)
+    t0 = b.eval(f"{S}.time.now")
+    x0 = b.state()["x"]
+    ok &= check(190 <= cx - x0 <= 204, "the scene begins as she comes within 200 px of him", cx - x0)
+    ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(f"{S}.bubbleUntil > {S}.time.now"), "her cry at once")
+    b.wait(0.2)
+    ok &= check(b.state()["x"] - x0 > 40, "and her dash with it, no stop", b.state()["x"] - x0)
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-look-back", "he looks back over his shoulder")
+    b.wait_for(f"{cat}.sprite.anims.currentAnim.key === 'bumbot-run'", timeout=3)
+    ok &= check(b.eval(f"{cat}.sprite.flipX && {cat}.sprite.y === {top}"), "he bolts forward along the counter's top")
+    ok &= check(b.eval(f"{cat}.sprite.depth < {S}.player.depth"), "behind her dash")
+    b.wait_for(f"{q}.fall.visible", timeout=3)
+    b.shot("pass-bowl")
+    ok &= check(b.eval(f"!{q}.bowl.img.visible && {cat}.sprite.x < {q}.bowl.x + 40"), "the bowl goes off the end as he reaches it",
+                b.eval(f"[{cat}.sprite.x, {q}.bowl.x]"))
+    ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl') && t.sprite.visible).length") == 3, "three tangerines out of it")
+    ok &= check(abs(b.state()["x"] - (cx - 6)) < 2, "she is where he was", b.state()["x"] - cx)
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    held = (b.eval(f"{S}.time.now") - t0) / 1000
+    ok &= check(held < 3.0, "she is held under 3 s (it was 8.3)", round(held, 2))
+    b.shot("pass-after")
+    ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible"), "he is away, off the screen")
+    ok &= check("bb1" in flags(b) and "dash" in save_list(b, "verbs"), "the beat is set, the dash is hers", flags(b))
+    ok &= check(alert(b) == "D to dash", "one plate over her: D to dash", alert(b))
+    st = b.state()
+    ok &= check(abs(st["y"] - cf) < 1 and b.eval(f"{S}.player.body.enable"), "she stands on the floor, hers again", st["y"] - cf)
+    rest = b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl')).map(t => [Math.round(t.sprite.x - {q}.x0), Math.round(t.sprite.y - {cf})])")
+    ok &= check(len(rest) == 3 and all(y == 0 and x < -64 for x, y in rest), "the three tangerines at rest on the floor, forward of the spilled fruit", rest)
+    ok &= check(b.eval(f"{q}.fall.visible && {q}.fall.frame.name === {q}.L.fall.frames - 1"), "the bowl lies on the floor, its fruit spilled")
+    ok &= check(take_lunch(b), "the lunch on the counter is hers now")
+
+    # Arriving in a jump: the scene waits for her landing, and she is on the floor through it.
+    b.open("?reset&play&at=pass5")
+    hold_until(b, "right", lambda st: cx - st["x"] < 245, timeout=8)
+    b.key("right", True)
+    b.key("space", True)
+    b.wait_for(f"{cat}.gone", timeout=4)
+    b.key("space", False)
+    b.key("right", False)
+    st = b.state()
+    ok &= check(abs(st["y"] - cf) < 1 and 0 < cx - st["x"] <= 200, "in a jump, the scene begins as she lands, short of him", (cx - st["x"], st["y"] - cf))
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    ok &= check(abs(b.state()["y"] - cf) < 1 and "bb1" in flags(b), "and ends with her on the floor", b.state()["y"] - cf)
+
+    # A reload after it: he is gone, the bowl on the floor, its tangerines where they came to rest.
+    b.open("?play&at=pass5")
+    ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible && {q}.fall.visible && !{q}.bowl.img.visible"), "after a reload: he is gone, the bowl lies fallen")
+    ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl') && t.sprite.visible).length") == 3, "and its three tangerines lie there")
+    hold_until(b, "right", lambda st: st["x"] > cx - 40, timeout=8)
+    ok &= check(b.eval(f"{S}.mode") == "play", "and nothing starts when she walks up")
+    return ok
 
 
 def scenario_region2(b):

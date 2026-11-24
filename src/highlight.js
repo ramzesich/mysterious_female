@@ -223,6 +223,13 @@ export class Highlight {
                 && Math.abs(B(o).bottom - y) < 12 && Math.abs(B(o).centerX - x) < 160).sort((a, b) => Math.abs(B(a).centerX - x) - Math.abs(B(b).centerX - x))[0];
             return pr ? SUFFIX[Object.keys(SUFFIX).find(k => pr.frame.name.endsWith(k))] : null;
         };
+        // (A place's own level, tools/wash_levels.py's table: for a room's door with nothing washed near it.)
+        const placed = (x, y) => {
+            const L = this.levels;
+            if (!L) return null;
+            const deck = Math.round(s.deckAt(y - 2)), place = L.places.find(([d, a, b]) => d === deck && x >= a && x < b);
+            return (place ? place[3] : (L.decks[deck] ?? L.default)) / 100;
+        };
         const at = (x, y) => all.filter(o => isDoor(o) && !muted(o) && !FIGURES.test(o.texture.key)
             && Math.abs(B(o).centerX - x) < 20 && Math.abs(B(o).bottom - y) < 10);
         const wash = (pics, k, what) => {
@@ -247,7 +254,9 @@ export class Highlight {
             const doors = r.doors ?? [{ x: r.door, outX: r.door, outY: r.floor, outRoute: 'inside' }];
             for (const d of doors) {
                 if (SKIP_DOORS.test(d.kind ?? '') || r.hidden) continue;
-                if (d.outRoute === 'inside' || d.outRoute === 'promenade') wash(at(d.outX, d.outY), level(d.outX, d.outY), `room ${r.route} at ${d.outX}`);
+                // (With nothing washed near it, its place's level: the galley's door, since the pass's counter, a piece of
+                // the game's own in its own colours, took the place of the cabinet by it. 2026-11-24.)
+                if (d.outRoute === 'inside' || d.outRoute === 'promenade') wash(at(d.outX, d.outY), level(d.outX, d.outY) ?? placed(d.outX, d.outY), `room ${r.route} at ${d.outX}`);
                 inside(r.route, d.x, r.floor);
             }
         }

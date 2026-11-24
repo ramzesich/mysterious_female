@@ -428,8 +428,8 @@ export class World {
                     // (Aft of its door, or forward of it where the deck ends just aft: `plateSide`.)
                     // (`plateUp`: a sign over the door, above a checkpoint's lamp: her crew cabin's.)
                     const side = d.plateSide ?? 1;
-                    // (Brushed steel; navy on a dark wall, `plateStyle`: src/signs.js.)
-                    const plate = sign(s, d.plateUp ? d.outX : d.outX + 20 * side, d.outY - (d.plateUp ? 93 : 50), d.plate, d.plateStyle ?? 'steel')
+                    // (Brushed steel; navy on a dark wall, `plateStyle`: src/signs.js. `plateLift`: px higher, over what stands under it.)
+                    const plate = sign(s, d.plateUp ? d.outX : d.outX + 20 * side, d.outY - (d.plateUp ? 93 : 50) - (d.plateLift ?? 0), d.plate, d.plateStyle ?? 'steel')
                         .setOrigin(d.plateUp ? 0.5 : side > 0 ? 0 : 1, 0.5).setDepth(D.props);
                     this.add([plate]);
                     room.outside.push(plate);
@@ -2281,15 +2281,6 @@ export class World {
         await this.tween({ targets: img, y: img.y - 14, alpha: 0, duration: 380 });
         img.destroy();
         then?.();
-    }
-
-    // A prop knocked over (the Seven Seas' fruit bowl, by Bumbot).
-    topple(id) {
-        const t = this.things.find(x => x.id === id);
-        if (!t?.img || t.toppled) return;
-        t.toppled = true;
-        this.scene.tweens.add({ targets: t.img, angle: -100, x: t.img.x - 10, y: t.img.y + 4, duration: 260, ease: 'Quad.easeIn' });
-        sfx.at(t.x, t.y).crash();
     }
 
     // One of her quirks: she turns to the thing and does her bit; any key after a moment ends it.
