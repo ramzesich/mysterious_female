@@ -207,7 +207,7 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 | `rdr_coldroom` | Deck 11, 185, the Garden Café's cold room | Green | `room_coldroom` |
 | `blk_spa` | Deck 11, 74, the spa's door | A rope, "CLOSED" | Region 9 opens |
 | `rdr_bridge` | Deck 10, 40, the bridge's door | Gold | The bridge |
-| `door_library_aft` | Deck 6, 194 | Shut by `blk_quiet` (a rope, "QUIET PLEASE") | Bumbot knocks the rope into it (`bb_2`) |
+| `door_library_aft` | Deck 6, 194 | Shut by `blk_quiet` (a rope, "QUIET PLEASE"); it swings aft, into the stair lobby (2026-11-24) | Bumbot knocks the rope stand into it (`bb_2`): open for good, the stand lying in its doorway |
 | `door_8_fwd_lobby` | Deck 8, 74 | `oneway(the corridor)` | The duct drops her inside |
 | `door_8_mid_lobbies`, `door_8_aft_lobbies`, `door_9_aft_lobbies`, `door_10_mid_lobbies`, `door_10_aft_lobbies` | Each hallway's doors at its lobby ends. **Each has a push bar on its free side and a plain face on the other (built 2026-11-18; docs/plan-three-uses.md, step 4a): it swings away from its free side, and once she has come through it stays propped open** | `oneway(the corridor)` | A balcony door, or the pool's hatch |
 | `door_theatre_trunk` | Deck 4, 240 | `oneway(deck 6)` | The theatre's trunk, as built |
@@ -426,7 +426,7 @@ leaving the frame (a wink, no trigger).
 | 164 | `npc_librarian` | The librarian at her desk | `static`; bubble (a book and the gapped shelf) within 4 m while any book is out; shelves each book (`scn_shelve`); a finger to her lips when she runs past | Shelve, idle, shush |
 | 167 | `src_trolley` | The return trolley, "RETURN" | E with a book: returned | A trolley |
 | 172 | `sec_chair` | The red reading chair by the window (and `sec_chair_1` to `_6`, the armchairs at the three reading tables; `sec_bed`, her bed) | E: she sits facing us, the books she carries in a row, she chooses one and its first page shows (§2.2, 2026-11-21) | Her two reading clips, fourteen pages |
-| 178 | `bb_2` | Bumbot asleep on the open book on the reading table | `scene` §9.3 | His `asleep` |
+| 191 | `bb_2` | Bumbot asleep on top of the return trolley (2026-11-24, the user; he was on the reading table at 181) | `scene` §9.3 | His `asleep` |
 | 184-190 | `sec_ladder` | The rolling ladder on the bookcase | Pushed along 170-192 (the push verb); climbable (ladder) | Drawn |
 | 186 | decor | The chess table, the globe | | Built |
 | 188 | `sec_oddbook` | The odd book on the top shelf | E with all fourteen shelved: the bookcase slides aside (`scn_nook`) | |
@@ -909,9 +909,13 @@ Input locked unless said; each sets its save flag.
    the glass elevator, the car waits at deck 6 with Bumbot sitting in it, doors open; when she is
    within 4 m the doors close and the car rises to deck 9, seen through the glass, and comes back
    empty. Input stays free.
-3. **`bb_2` near-catch 2 (the library, 178):** he is asleep on the open book on the reading table;
-   she bends; he leaps east, runs to 194, the rope stand topples into the door, which swings ajar and
-   stays so (`door_library_aft` open); she turns to us.
+3. **`bb_2` near-catch 2 (the library, 191.04; remade 2026-11-24, `docs/near-catch-2-remake-log.md`):** he is
+   asleep on top of the return trolley, 34 px up. 64 px from him, on her feet (a jump across that line comes straight
+   down there), she is taken; the librarian's finger goes to her lips; she creeps to 39 px on tiptoe and reaches at
+   his height; he wakes as she reaches, leaps to the floor 50 px aft as her hands arrive, and bolts through the rope
+   stand at 193.1: its own fall into the door at 194, which opens (aft) and stays so (`door_library_aft` open), the
+   stand lying in the doorway, its card flat; the librarian starts and looks at the door; she straightens, turns to
+   us, shrugs: free 2.6 s after she was taken. `src/world/quiet.js`, `QUIET` in `src/config.js`.
 4. **`bb_3` near-catch 3 (the stage, 249):** triggered when she first stands on the stage; he washes
    in the spotlight; the stage manager at 246 flaps; she bends; the rival runs in from the wing at
    254, trips on the cable at 251 and tumbles off the stage's front into the pit at 242; the lights

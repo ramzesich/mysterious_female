@@ -3,7 +3,8 @@
 How a sequence of the game is remade from start to finish. Written 2026-11-24 from the two remakes done that way
 (the linen room's shaft, `docs/shaft-remake-log.md`, 2026-11-23; the pool's scene, `docs/pool-remake-log.md`,
 2026-11-24; **used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
-of correction and three checks to it**), from the user's two prompts and from every correction the user made before each was merged. The user,
+of correction and three checks to it; then for near-catch 2, `docs/near-catch-2-remake-log.md`, approved on its
+first play**), from the user's two prompts and from every correction the user made before each was merged. The user,
 2026-11-24: "save this plan. We will start using it right away."
 
 **It is used whenever the user asks for a sequence to be remade or refined as a whole.** Each remake gets its own
@@ -23,6 +24,8 @@ made and what it cost goes into the log and is said at each stop.
      deck).
    - Go through the frames at the game's pixel size and list every fault, not only the ones named.
    - List what hangs on the scene: its flags, locks, rewards, tests, and what the plan says must be kept.
+   - Measure the scene's whole reach against one screen (480 px, 220 of it ahead of her): where it starts, where its
+     point is seen (near-catch 2: the door he opened was 460 px past the screen's edge).
    - **For every piece the remake takes out, grep what names it** (near-catch 1: the lunch's pulse was the old
      cabinet's, and went with it unnoticed).
 3. **Settle the structure with the user before anything is drawn.**
@@ -32,7 +35,7 @@ made and what it cost goes into the log and is said at each stop.
 4. **Write the sequence beat by beat**, each beat held to these rules:
    - One continuous space at its true place and length, with no fade or teleport.
    - Her direction of travel is kept from entry to exit.
-   - Every effect has a cause she can see.
+   - Every effect has a cause she can see, and the cause could do it (a door knocked open swings away from the knock).
    - Going into a thing, she is behind its near side and in front of its far side.
    - Only what really exists is shown, and Bumbot is where the story has him.
    - Whoever is on screen stays visible throughout.
@@ -42,6 +45,8 @@ made and what it cost goes into the log and is said at each stop.
    - Each new piece is roughed at its size beside her in a real screenshot, then generated with PixelLab (as many
      tries as it takes to read) and checked frame by frame.
    - The user sees one picture per piece and a storyboard strip. Size, colour and readability are settled here.
+   - The storyboard is composed over shots of the real room, and put on its clock as a GIF (near-catch 2: the
+     clock written for the GIF became the scene's own).
 6. **Make the art, generated wherever it can be.**
    - Nothing is drawn in code or put together from other scenes' props to save generations; code drawing stays
      for what is flat by nature and for thin or turning parts, in the picture's tones.
@@ -70,7 +75,7 @@ made and what it cost goes into the log and is said at each stop.
     job ids among them), commit, take `main` into the branch, merge and push on the user's word, remove the
     worktree.
 
-For scale: the shaft took 92 generations, the pool 60.
+For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15.
 
 ## The kinds of correction
 
@@ -127,6 +132,11 @@ already applied.
   approved as shown ("Build like it is here, I like it"); then four corrections in three short rounds of play (the
   pause before the dash, the lunch's pulse, the nearer start, the tray off the counter), and "Approved" the same
   afternoon. 31 generations. None of the four was one of the nine kinds: they are the last three rows above.
+- **Near-catch 2** (the second): the old scene recorded (nine faults, the chief one structural: its point 460 px
+  off the screen); two questions with one picture, answered in two lines (the user's own place for him, not one of
+  the three offered); the pieces, a storyboard and its GIF approved ("Go ahead"); built; the self-check found two
+  things the storyboard had wrong (the door at the screen's edge, him behind the stand's card); **approved on its
+  first play, no correction.** 15 generations.
 
 ## The two prompts, word for word
 

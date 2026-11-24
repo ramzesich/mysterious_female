@@ -4843,3 +4843,13 @@ and in terms of gameplay: there are delays and glitches. Apply the plan and let'
 him", "D to dash", then on playing it the pause before the dash, the lunch's pulse, the nearer start, the tray off
 the counter). The Seven Seas' pass became a generated serving counter; the scene is `src/world/pass.js`, one clock;
 she is held 2.4 s where it was 8.3. 31 generations.
+
+## Near-catch 2 remade (2026-11-24, the Design session)
+
+The user, right after near-catch 1 was merged: "In this same manner, let's work on the second near-catch". By
+`docs/sequence-remake-plan.md` again; everything found, decided and built is in
+**`docs/near-catch-2-remake-log.md`** (14 decisions; the user's: "He sleeps on top of the book return basket,
+everything else derived from A", and "a", her tiptoe and her reach at his height; "Go ahead" on the storyboard;
+"Approved" on playing it, with no correction). His spot moved from the last reading table to the return trolley, so
+that the rope and the door are in the picture; the scene is `src/world/quiet.js`, one clock; the Library's aft door
+swings aft now; she is held 2.6 s where it was 3.5. 15 generations.

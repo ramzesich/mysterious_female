@@ -34,8 +34,8 @@ card opens the crew trunk, and up she goes.
 
 **Among the guests.** Deck 6 is a different world: the atrium's glass and brass, the shops, the promenade, the sea
 beyond the windows. She catches sight of Bumbot riding the glass elevator up to decks she can't reach yet, as if he
-were showing her the way. She finds him again in the Library, curled up asleep on the very book she wanted to read.
-She creeps up, he wakes, and he bolts through the roped-off door at the back, knocking the "QUIET PLEASE" stand over
+were showing her the way. She finds him again in the Library, curled up asleep on top of the book return trolley.
+She creeps up on tiptoe, he wakes, and he bolts through the roped-off door at the back, knocking the "QUIET PLEASE" stand over
 so that the door stays ajar behind him.
 
 **The show must go on.** Behind that door is the theatre, mid-rehearsal, with the dancers on stage and the cat
@@ -133,9 +133,9 @@ cleaner, a rehearsal rope, a photographer.
 6. Deck 6 opens: the atrium, the shops, the promenade, the Library. The security officer's rope on the forward
    stairs lifts: those stairs are a shortcut now. In the atrium Bumbot rides the glass elevator up where she can't
    follow.
-7. **Near-catch 2, in the Library:** Bumbot is asleep on the open book on the reading table. She comes at him; he
-   bolts aft and knocks the "QUIET PLEASE" rope into the Library's aft door, which stays ajar. That is the way into
-   region 3.
+7. **Near-catch 2, in the Library:** Bumbot is asleep on top of the return trolley, by the librarian's desk. She
+   creeps up on tiptoe and reaches for him; he leaps off, bolts aft and knocks the "QUIET PLEASE" rope stand over into
+   the Library's aft door, which swings open and stays so. That is the way into region 3.
 
 ### Region 3: Showtime (the theatre, deck 7 aft and middle)
 

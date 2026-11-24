@@ -88,6 +88,8 @@ bookcases by the desk; the return trolley.
 13. **With something in her hands she does not reach** (mine): she stops where she is, he wakes and bolts all the same,
     and she looks after him without the shrug.
 14. **A start place of its own, `?at=quiet`** (mine): 6 m short of the trolley; the Library's own start is 31 m from it.
+15. **The play stop:** the link, a strip of twelve moments and a GIF from the running game. The user: "Approved", with
+    no correction.
 
 ## How it is built
 
