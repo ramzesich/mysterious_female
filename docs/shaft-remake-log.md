@@ -217,3 +217,19 @@ open, one to a place):**
   more; nothing of Bumbot is in the shaft; the grille hangs open after her.
 - `python tools/check_overlaps.py`: 0 overlaps.
 - The same two things are not judged by me: how it feels in motion, and how it sounds.
+
+## After the user's next play (2026-11-24, the building session)
+
+26. **The mouth half as deep** (the user: "make the shaft entrance twice as short, now it's protruding too much"): 13 of
+    its 28 columns cut out of the generated picture, the plain duct between the bolts by the wall and the end's flange
+    (`MOUTH_SHORTEN` in `tools/build_shaft.py`; the strut under it kept whole, its top pixel moved a column in). No new
+    generation. `SHAFT["mouth"]` is (4, 13), the cover moved in with the end, and the laundry cart stops 13 px further in
+    (`cart_linen` to 35), its end against the mouth's still.
+27. **The cover falls flat, turning as it falls** (the user: "The shaft cover fall animation is too plain. Let it fall
+    flat on the ground, rotating while falling"): 13 frames of a quarter turn toward the wall, its foot kicked out
+    into the room, made at the game's pixels from the cover's own (each turned at eight times its size and read back
+    a pixel at the middle of each 8 x 8; the first and the last its own pixels, upright and turned exactly:
+    `fall_frames`, `assets/ship/shaft/cover-fall.png`, `fall` in `shaft.json`); 0.42 s from hanging to the floor, slow
+    at first; a clang, a 2 px bounce tipped back a frame, and it lies flat in front of the mouth, behind the parked
+    cart (`coverFalls` in `src/world/story.js`). The generated cover leaning by the wall (`gen/mouth-down2.png`) is no
+    longer used. Approved by the user from the recording.

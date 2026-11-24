@@ -329,7 +329,61 @@ def mouth_pieces(g):
         bb = out.getbbox()
         return out.crop(bb), (x0 + bb[0], y0 + bb[1])
 
-    return {name: cut(src, box) for name, (src, box) in MOUTH_CUTS.items()}
+    pieces = {name: cut(src, box) for name, (src, box) in MOUTH_CUTS.items()}
+    # Half as deep as it was drawn (the user, 2026-11-24: "make the shaft entrance twice as short, now it's protruding too
+    # much"): the columns of plain duct between the bolts by the wall and the end's flange cut out, the wall's strut under
+    # it kept whole (its top pixel moved in to meet the duct), and the cover moved in with the end.
+    (im, (x, y)), (a, b) = pieces["mouth"], MOUTH_SHORTEN
+    short = Image.new("RGBA", (im.width - (b - a), im.height), (0, 0, 0, 0))
+    short.paste(im.crop((0, 0, a, im.height)), (0, 0))
+    short.paste(im.crop((b, 0, im.width, im.height)), (a, 0))
+    sx, sy = MOUTH_STRUT
+    short.putpixel((sx - 1, sy), im.getpixel((sx, sy)))
+    pieces["mouth"] = (short, (x, y))
+    cover, (cx, cy) = pieces["cover"]
+    pieces["cover"] = (cover, (cx - (b - a), cy))
+    return pieces
+
+
+MOUTH_SHORTEN = (7, 20)              # the mouth's columns cut out (from, to): 13 of its 28
+MOUTH_STRUT = (7, 39)                # the top of the strut under the mouth, in the uncut picture: moved a column in
+# The cover's fall, knocked off by Bumbot from the room's side (the user, 2026-11-24: "let it fall flat on the ground,
+# rotating while falling"): turned a quarter toward the wall as it drops, frame by frame at the game's pixels (each
+# drawn from the cover enlarged eight times, turned, and read back a pixel at the middle of each 8 x 8; the first and
+# the last are its own pixels, upright and turned exactly), and lying flat on the floor in front of the mouth.
+FALL_FRAMES = 13                     # 0 to 90 degrees, 7.5 apart
+FALL_CELL = 42                       # each frame's square, the cover's middle at its middle
+FALL_OUT = 14                        # px its middle moves out from the wall as it falls (its foot kicked out)
+
+
+def fall_frames(cover):
+    """The cover's fall: a strip of FALL_FRAMES squares; and where the last one's picture (the cover lying flat, its own
+    pixels turned) stands in its square."""
+    C, k = FALL_CELL, 8
+    ox, oy = (C - cover.width) // 2, (C - cover.height) // 2
+    big = Image.new("RGBA", (C * k, C * k), (0, 0, 0, 0))
+    big.paste(cover.resize((cover.width * k, cover.height * k), Image.NEAREST), (ox * k, oy * k))
+    strip = Image.new("RGBA", (C * FALL_FRAMES, C), (0, 0, 0, 0))
+    flat = cover.transpose(Image.ROTATE_90)
+    for i in range(FALL_FRAMES):
+        ang = 90 * i / (FALL_FRAMES - 1)
+        if i == 0:
+            fr = Image.new("RGBA", (C, C), (0, 0, 0, 0))
+            fr.paste(cover, (ox, oy))
+        else:
+            turned = big.rotate(ang, resample=Image.NEAREST, center=(C * k / 2, C * k / 2))
+            fr = Image.new("RGBA", (C, C), (0, 0, 0, 0))
+            tp, fp = turned.load(), fr.load()
+            for y in range(C):
+                for x in range(C):
+                    fp[x, y] = tp[x * k + k // 2, y * k + k // 2]
+            if i == FALL_FRAMES - 1:
+                bb = fr.getbbox()
+                fr = Image.new("RGBA", (C, C), (0, 0, 0, 0))
+                fr.paste(flat, (bb[0], bb[1]))
+                flat_at = (bb[0], bb[1])
+        strip.paste(fr, (i * C, 0))
+    return strip, flat, flat_at
 
 
 MOUTH_CORNER = (0, 32, 96, 128)      # the room's forward corner, in its picture: the box the mouth's pictures are made in
@@ -435,10 +489,28 @@ def main():
         # The room's pieces, and where each stands in the world (its top left corner).
         x0, y0 = g["roomX"] + MOUTH_CORNER[0], B.floor_y(g["deck"]) - 128 + MOUTH_CORNER[1]
         where = {}
-        for name, (im, (x, y)) in mouth_pieces(g).items():
+        pieces = mouth_pieces(g)
+        for name, (im, (x, y)) in pieces.items():
+            if name == "cover-down":
+                continue
             im.save(GAME / f"{name}.png")
-            where[{"cover-down": "coverDown"}.get(name, name)] = [x0 + x, y0 + y]
+            where[name] = [x0 + x, y0 + y]
             print("cut", name, im.size, "at", x, y)
+        # The cover's fall, and the cover lying flat where it lands: its middle FALL_OUT px out from where it hung, on
+        # the room's floor (the generated `mouth-down2` cover, leaning by the wall, retired 2026-11-24).
+        cover, (cx, cy) = pieces["cover"]
+        strip, flat, (fx, fy) = fall_frames(cover)
+        strip.save(GAME / "cover-fall.png")
+        flat.save(GAME / "cover-down.png")
+        mid0 = (x0 + cx + cover.width / 2, y0 + cy + cover.height / 2)
+        floor = B.floor_y(g["deck"])
+        down = [round(mid0[0] + FALL_OUT - flat.width / 2), floor - flat.height]
+        where["coverDown"] = down
+        # (Where the falling frames' squares stand: first on the cover as it hangs, last on the cover lying flat.)
+        where["fall"] = dict(cell=FALL_CELL, frames=FALL_FRAMES,
+                             start=[x0 + cx - (FALL_CELL - cover.width) // 2, y0 + cy - (FALL_CELL - cover.height) // 2],
+                             end=[down[0] - fx, down[1] - fy])
+        print("fall", strip.size, "flat", flat.size, "at", down)
         (GAME / "mouth.json").write_text(json.dumps(where), encoding="utf-8")
         # The grille at the shaft's other end, in deck 8's ceiling (the world's props `prop_grille_shut`, `_open`): the
         # mouth's own cover again, the same pixels turned: lying in the ceiling, shut; hanging from its hinge by the

@@ -47,6 +47,8 @@ export class BootScene extends Phaser.Scene {
         // The shaft from the linen room to deck 8 forward (tools/build_shaft.py), where each of its pictures stands.
         for (const what of ['strip', 'front', 'mouth', 'cover', 'cover-down', 'hatch', 'hatch-open']) this.load.image(`shaft-${what}`, `assets/ship/shaft/${what}.png`);
         this.load.json('shaft', 'assets/ship/shaft/shaft.json');
+        // (The cover's fall off the mouth: a quarter turn in 13 squares of 42 px, `fall` in shaft.json.)
+        this.load.spritesheet('shaft-cover-fall', 'assets/ship/shaft/cover-fall.png', { frameWidth: 42, frameHeight: 42 });
         this.load.atlas('shaft-slide', 'assets/ship/shaft/slide.png', 'assets/ship/shaft/slide.json');
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');

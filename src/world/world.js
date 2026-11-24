@@ -835,7 +835,8 @@ export class World {
         const strip = s.add.image(L.strip[0], L.strip[1], 'shaft-strip').setOrigin(0).setDepth(base + 0.002).setAlpha(0).setVisible(false);
         const front = s.add.image(L.strip[0], L.strip[1], 'shaft-front').setOrigin(0).setDepth(D.player + 0.05).setAlpha(0).setVisible(false);
         // Its mouth in the linen room, closed along its near side while she is not in it; the cover on its end until
-        // Bumbot knocks it off (near-catch 4, src/world/story.js), then leaning by the wall under it.
+        // Bumbot knocks it off (near-catch 4, src/world/story.js), then lying flat on the floor in front of it, where its
+        // fall (`L.fall`, the frames turning it a quarter as it drops) ends.
         const mouth = s.add.image(L.mouth[0], L.mouth[1], 'shaft-mouth').setOrigin(0).setDepth(base + 0.004);
         const cover = s.add.image(L.cover[0], L.cover[1], 'shaft-cover').setOrigin(0).setDepth(base + 0.006);
         const down = s.add.image(L.coverDown[0], L.coverDown[1], 'shaft-cover-down').setOrigin(0).setDepth(base + 0.006);
@@ -843,7 +844,7 @@ export class World {
         this.things.push({ id: 'shaft_mouth', x: L.mouth[0], y: d.upper, route: 'linen', items: [mouth] });
         this.things.push({ id: 'vent_cover', x: L.cover[0], y: d.upper, route: 'linen', items: [cover], until: 'flag:bb4' });
         this.things.push({ id: 'vent_cover_down', x: L.coverDown[0], y: L.coverDown[1], route: 'linen', items: [down], after: 'flag:bb4' });
-        this.shaft = { dark, strip, front, mouth, cover, down, shown: 0, look: 0, mouthDepth: mouth.depth };
+        this.shaft = { dark, strip, front, mouth, cover, down, fall: L.fall, shown: 0, look: 0, mouthDepth: mouth.depth };
         // Her slide down the slope: one clip of her made on the shaft's own picture (tools/build_shaft.py `--slide`,
         // assets/source/her/shaft-slide/), played where it was made: from her crawl at the slope's lip to her crawl at
         // its foot.

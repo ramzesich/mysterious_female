@@ -83,7 +83,7 @@ ROOMS = [
 # is really under them (m from the bow, a name for the tests); the last one gives way under her.
 # px in the linen room's picture: the mouth's ends, the slope's top and foot (from the room's left edge, forward of it
 # negative); `height` the shaft's inside, `drop` how far the slope takes her down; `end` the dead end past the way out.
-SHAFT = dict(deck=9, drop_deck=8, m_out=66.1667, mouth=(4, 26), slope=(-6, -62), height=36, drop=48, end=64,
+SHAFT = dict(deck=9, drop_deck=8, m_out=66.1667, mouth=(4, 13), slope=(-6, -62), height=36, drop=48, end=64,
              # (Each straight over a thing that says where on deck 8 she is: a sign, a staircase, a door; the user,
              # 2026-11-23: over bare wall the looks "show nothing, only empty corridors". One to a place, well apart:
              # two close together "look weird" (the user; the atrium had two, the forward lift hall two, the forward
@@ -301,7 +301,8 @@ PUSHABLES = {
     # through its rim, the user.)
     # (Mirrored with the room, 2026-11-23: it starts in front of the chute's hatch, where such a cart is parked, and
     # rolls forward to the shaft's mouth, its end against the mouth's, its rim level with the shaft's floor.)
-    "cart_linen": ("linen", 131, 48, "thing:laundry-cart", "cart_linen", "rim", 1),
+    # (Its end against the mouth's: 13 px further in since the mouth was made half as deep, 2026-11-24.)
+    "cart_linen": ("linen", 131, 35, "thing:laundry-cart", "cart_linen", "rim", 1),
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.

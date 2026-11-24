@@ -4579,3 +4579,8 @@ itself under its grilles, no cut going in or out. Every decision, what was gener
 (two eyes kept ahead of her "move in sync with the player"; "Bumbot is long gone"); standing on the cart she is stopped
 at the mouth; everything round the shaft black and each grille over a landmark of deck 8; on hands and knees at the
 mouth she is behind its near side; only the grille she is over opens; one grille to a place, six in all.
+
+## The shaft's mouth half as deep, its cover's fall (the user's, 2026-11-24)
+
+The mouth cut to half its depth from its own picture, and the cover's fall made a quarter turn landing flat on the
+floor: decisions 26 and 27 of `docs/shaft-remake-log.md`. No generations. `region4`, `linen`, `golden` pass.

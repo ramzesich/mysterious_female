@@ -663,29 +663,54 @@ export class Story {
     }
 
     // Bumbot's way out of the linen room: a leap from the shelf at the cover on the shaft's mouth, forward of him, which
-    // drops to the floor with a clang and comes to lean by the wall under the mouth; and he is in, and gone down the
-    // shaft the way it leads, toward the bow. (The mouth's near side is drawn over him: he goes into it, not across it.)
+    // comes off, turns a quarter toward the wall as it drops, its foot kicked out, and lands flat on the floor in front of
+    // the mouth with a clang and a small bounce (the user, 2026-11-24: "let it fall flat on the ground, rotating while
+    // falling"; it had slid down to lean by the wall); and he is in, and gone down the shaft the way it leads, toward the
+    // bow. (The mouth's near side is drawn over him: he goes into it, not across it.)
     intoTheVent(sprite, done) {
         const s = this.scene, w = this.world, d = w.data.duct, floor = w.rooms.linen.floor, sh = w.shaft;
         sprite.setFlipX(d.mouthX < sprite.x).play('bumbot-jump');
         s.tweens.add({
             targets: sprite, x: d.mouthX + 12, y: d.upper + 1, duration: 320, ease: 'Quad.easeOut',
             onComplete: () => {
-                const c = sh.cover, down = sh.down;
-                if (c.visible) {
-                    const at = { x: c.x, y: c.y };
-                    s.tweens.add({ targets: c, x: down.x + 4, y: floor - c.height, angle: -8, duration: 340, ease: 'Quad.easeIn', onComplete: () => {
-                        sfx.at(c.x, floor).clang();
-                        c.setVisible(false).setPosition(at.x, at.y).setAngle(0);
-                        down.setVisible(true);
-                    } });
-                }
+                if (sh.cover.visible) this.coverFalls();
                 sfx.at(sprite.x, floor).scramble();
                 const depth = sprite.depth;
                 sprite.setDepth(sh.mouth.depth - 0.001);
                 s.tweens.add({
                     targets: sprite, x: d.mouthX - 8, scaleX: 0.4, duration: 300, ease: 'Sine.easeIn',
                     onComplete: () => { sprite.setDepth(depth).setScale(1); done(); },
+                });
+            },
+        });
+    }
+
+    // The cover's fall (`fall` in assets/ship/shaft/shaft.json, tools/build_shaft.py): its frames' squares from where it
+    // hung to where it lies, dropping as a thing falls (slow at first) while it turns, frame by frame, a quarter toward
+    // the wall; on the floor a clang, a hop of 2 px tipped back a frame, and it settles; then the world's flat cover.
+    coverFalls() {
+        const s = this.scene, sh = this.world.shaft, F = sh.fall, c = sh.cover, down = sh.down, half = F.cell / 2;
+        const last = F.frames - 1;
+        const sp = s.add.sprite(F.start[0] + half, F.start[1] + half, 'shaft-cover-fall', 0).setDepth(c.depth);
+        this.world.add([sp]);
+        c.setVisible(false);
+        // (The flat one is shown by the world as the beat's flag is set, which comes before it lands: kept clear till then.)
+        down.setAlpha(0);
+        const t = { k: 0 };
+        const place = (k, lift = 0) => sp.setPosition(Math.round(F.start[0] + half + (F.end[0] - F.start[0]) * k),
+                                                      Math.round(F.start[1] + half + (F.end[1] - F.start[1]) * k * k) - lift);
+        s.tweens.add({
+            targets: t, k: 1, duration: 420, ease: 'Linear',
+            onUpdate: () => { place(t.k); sp.setFrame(Math.min(last, Math.round(t.k * last))); },
+            onComplete: () => {
+                place(1);
+                sp.setFrame(last);
+                sfx.at(sp.x, sp.y).clang();
+                const hop = { h: 0 };
+                s.tweens.add({
+                    targets: hop, h: 1, duration: 200, ease: 'Linear',
+                    onUpdate: () => { const u = Math.sin(hop.h * Math.PI); place(1, Math.round(2 * u)); sp.setFrame(u > 0.5 ? last - 1 : last); },
+                    onComplete: () => { sp.destroy(); down.setVisible(true).setAlpha(1); },
                 });
             },
         });
