@@ -247,7 +247,10 @@ HER_CAT = {
     # (This state's skin shade lands on the palette's tan, not on her peach: tan patches on her face, arms and legs
     # in every frame; put on her own. Four lone pink pixels in her hair in the front view, two of them circled by the
     # user, are mended in the source itself, `rotations/south.png`; PixelLab's own is `south-raw.png`. 2026-11-24.)
-    "remap": {**HER["remap"], "ab947a": "fca790"},
+    # **Him in his new coat** (he was made again, 2026-11-24): the state drew him in the old sprite's grey-green; his two
+    # tones and his eyes are put on his new picture's own colours, off the palette as he is everywhere, a tone darker
+    # than its main one (the user's choice of two, seen in the game at the bow: "B it is").)
+    "remap": {**HER["remap"], "ab947a": "fca790", "313638": "1f1919", "374e4a": "2d262a", "a2a947": "ede985"},
     "frames": {
         "stand": [("rotations/east.png", "keep")],
         "run": [(f"walk/{i}.png", "feet") for i in range(6)],
@@ -439,7 +442,7 @@ WET = {"swim", "swim-reach", "shower", "shiver", "splutter"}
 
 
 def build(spec):
-    src_dir = ROOT / "assets" / "source" / spec.get("source", spec["name"])
+    src_dir = ROOT / "assets" / "source" / spec["name"]
     cell = spec["cell"]
     remap = {hex_rgb(a): hex_rgb(b) for a, b in spec["remap"].items()}
     baseline = {}  # per source canvas size, the y of the standing feet
@@ -518,10 +521,5 @@ if __name__ == "__main__":
     build(HER)
     build(HER_TOWEL)
     build(HER_CAT)
-    # (For the user to choose in the game, `?coat=a` and `?coat=b`, 2026-11-24: him in her arms in his new coat's main
-    # tone, and a tone darker; the sheet as it is stays the default. To be taken out once chosen.)
-    for letter, coat in (("a", {"313638": "271f21", "374e4a": "39343a", "a2a947": "ede985"}),
-                         ("b", {"313638": "1f1919", "374e4a": "2d262a", "a2a947": "ede985"})):
-        build({**HER_CAT, "name": f"her-cat-{letter}", "source": "her-cat", "remap": {**HER_CAT["remap"], **coat}})
     build(HER_MISHAPS)
     build(BUMBOT)

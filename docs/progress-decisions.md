@@ -4799,8 +4799,10 @@ continue with the next item on the plan: Bumbot made again." `docs/plan-the-rest
 - **Her with him in her arms** (`fcb870e`): in that sheet her skin's shade landed on the palette's tan (patches on her
   face, arms and legs in every frame): a remap puts it on her peach; four lone pink pixels in her hair in the front
   view mended in the source (the user circled two). His coat there: "Let's try to recolor. If I don't like, we keep
-  the current version"; shown as pictures, then "need to see in game": `?coat=a`, `?coat=b` (two extra sheets, to be
-  taken out once chosen).
+  the current version"; shown as pictures, then "need to see in game": two trial sheets behind `?coat=a` and
+  `?coat=b`, and a link that starts before the catch at the bow ("Show me B before the catch at the bow"); **"Ok, B it
+  is"**: his two tones and his eyes there on his new picture's colours, a tone darker than its main one (a remap in
+  `HER_CAT`, off the palette as he is everywhere); the flag and the trial sheets taken out.
 - **Not done, the user's word:** "there are a lot of issues with the near-catch scenes in general, I will fix them
   separately, when doing general QA". One I told them of: at near-catch 2 he sleeps over the reading table's lamp
   (`BEAT_LIFT` takes the piece's whole height).

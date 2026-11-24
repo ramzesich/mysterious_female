@@ -601,10 +601,9 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 - **In the game:** every scene that shows him plays the new clips (steps 5 and 7 below as far as the tests and a
   recording of each near-catch go).
 - **Left:**
-  1. His coat in her arms: the sheet is as it was (the user likes it), mended (her skin's shade); two recolours can be
-     seen in the game with `?coat=a` and `?coat=b` (<http://localhost:8000/?play&at=home&cards=all&did=catch&coat=a>);
-     once the user has chosen, the flag and the sheet not chosen are taken out (`tools/build_sprites.py`'s end,
-     `BootScene.js`).
+  1. ~~His coat in her arms~~ **Settled 2026-11-24:** the sheet's drawing is as it was (the user likes it), her
+     skin's shade mended, and he is in his new coat there, a tone darker than its main one (the user, of two seen in
+     the game at the bow: "B it is"; a remap in `HER_CAT`). The trial flag `?coat=` and its sheets are gone.
   2. The clips made and not placed: the standing idle, walk, look back, stretch, the loaf. The user chooses where.
   3. **The near-catch scenes are the user's** (2026-11-24: "there are a lot of issues with the near-catch scenes in
      general, I will fix them separately, when doing general QA"): nothing in them is changed until that list comes.

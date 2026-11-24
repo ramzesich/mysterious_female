@@ -73,10 +73,7 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('her-towel', 'assets/sprites/her-towel.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-towel-meta', 'assets/sprites/her-towel.json');
         // With Bumbot in her arms (the way home, §6.1.9).
-        // (`?coat=a`, `?coat=b`: him in her arms in his new coat, two tones, for the user to choose in the game,
-        // 2026-11-24; to be taken out once chosen.)
-        const coat = new URLSearchParams(location.search).get('coat');
-        this.load.spritesheet('her-cat', `assets/sprites/her-cat${['a', 'b'].includes(coat) ? `-${coat}` : ''}.png`, { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        this.load.spritesheet('her-cat', 'assets/sprites/her-cat.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-cat-meta', 'assets/sprites/her-cat.json');
         // Her mishap gags, each one picture of her with the thing (docs/plan-three-uses.md §1.6).
         this.load.spritesheet('her-mishaps', 'assets/sprites/her-mishaps.png', { frameWidth: GAG_CELL, frameHeight: GAG_CELL });
