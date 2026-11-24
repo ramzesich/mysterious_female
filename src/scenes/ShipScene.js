@@ -4837,10 +4837,9 @@ export class ShipScene extends Phaser.Scene {
                             p.setFlipX(false);
                             p.anims.timeScale = 1;
                             p.anims.play('her-shrug');
-                            p.once('animationcomplete-her-shrug', () => {
-                                this.pose('front');
-                                done();
-                            });
+                            // (Her shrug's last frame is held: it is her facing us already; her front still is not
+                            // shown after it. The user, 2026-11-24.)
+                            p.once('animationcomplete-her-shrug', () => done());
                         });
                     });
                 });

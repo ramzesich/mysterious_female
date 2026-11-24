@@ -174,7 +174,8 @@ export const pass = {
                 if (!s.anims.exists('her-shrug')) { s.pose('front'); return after(); }
                 p.anims.timeScale = 1;
                 p.anims.play('her-shrug');
-                p.once('animationcomplete-her-shrug', () => { s.pose('front'); after(); });
+                // (Her shrug's last frame is held: her front still is not shown after it. The user, 2026-11-24.)
+                p.once('animationcomplete-her-shrug', () => after());
             });
 
             // --- He ---

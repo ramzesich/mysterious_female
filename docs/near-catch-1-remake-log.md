@@ -116,6 +116,14 @@ After the user's play (2026-11-24):
     on the counter"), a fresh one there again if she spills it or is left without it, and none once the officer
     has had his (`until` the flag `lunch`; `lift` on the source, `lifted` in the world as the deliveries' trays are).
     It stood there for good before ("the pass always has more").
+23. **Her shrug ends on its own last frame, and her front still stands on the floor row** (the user, after the
+    approval: "there is a frame where she stands up taller a little bit"; shown the frames: "adjust the front still,
+    and also drop it from the shrug animation"). The shrug's eight frames were level; the front still shown after
+    them stood a row off the floor in her sheet (kept as it came, where every clip of hers that faces us is stood
+    by its feet), so she rose 1 px as one gave way to the other. The still is stood by its lowest row
+    (`tools/build_sprites.py`), which also ends the same 1 px step after her badge, wave and the rest; and after a
+    shrug at a near-catch (this scene's and the ship scene's `nearCatch`) it is no longer shown. Her back still and
+    her two carry-turn stills still stand a row high: not touched, told to the user.
 
 ## 4. How it is built
 

@@ -47,7 +47,9 @@ HER = {
         # skeleton-v3 climb (PixelLab's built-in climb move): hands reach up in turn. The first,
         # text-described climb moved both hands together.
         "climb": [(f"climb-alternating/{i}.png", "keep") for i in range(8)],
-        "front": [("rotations/south.png", "keep")],
+        # (Stood by its lowest row: kept as it came it stood a row off the floor, and she rose 1 px as her shrug gave
+        # way to it. The user, 2026-11-24.)
+        "front": [("rotations/south.png", "feet")],
         # Waving to us from the life ring, overboard (GAME_DESIGN.md §5.6): skeleton-v3's wave
         # move, facing the camera. Frames 1-5 have the hand up; the game loops those.
         "wave": [(f"wave/{i}.png", "feet") for i in range(8)],
