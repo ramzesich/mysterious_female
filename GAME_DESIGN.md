@@ -2759,7 +2759,7 @@ and his pistol green; Bumbot over her head into the pool, in sight under the wat
 lever's grip, thrown across the tub; her reach up out of the water (a generated clip); the lever a generated valve,
 knee-high; the water down a grate, a funnel in its surface; the hatch on the tank's floor in view, its lid heaved up,
 its ladder, a ceiling panel on deck 10, no fade; her picture 5 px lower in the dry tank; the water to the wall's foot;
-the ladders to the floor; the prints heading aft. 60 generations (`tools/build_pool.py`). **§5 part 3 is done. Next: part 4 (§6, each deck's own look);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
+the ladders to the floor; ~~the prints heading aft~~ (dropped in the merge, the user). 60 generations (`tools/build_pool.py`). **§5 part 3 is done. Part 4 (§6, each deck's own look) is done (2026-11-24):** each cabin deck hangs its own generated framed pictures between its doors (4 safety posters, 5 paintings of the ship, 6 old charts, 8 seascapes, 9 botanical prints, 10 old liners' posters; 38 generations); the plaques' coloured band dropped (the user: the doors stay as they are) and no tint. **Next: part 5 (§7, small faults and leftovers);** part 8 (§7c, what she uses: muted or not) at the end. Waiting with it: the books' covers and
       the shelf seen close (§6.1.2, given 2026-11-18). **Then step 5** (the rest of the
       twenty; pictures made freely now, people drawn with their things: `CLAUDE.md`, "Art").
       Known: one `deck4` check (the breakfast round moving on after a delivery) failed once in

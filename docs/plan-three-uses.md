@@ -582,6 +582,8 @@ Deck 8 aft keeps its six trays and its tangerine and gets no delivery.
 
 ### 4.5 Each deck its own look (C2)
 
+**Built 2026-11-24** (plan-the-rest §6): the pictures by deck; the plaques' band dropped by the user.
+
 - **A coloured band on each deck's cabin number plaques:** deck 4 grey-blue, 5 warm yellow, 8
   blue, 9 green, 10 terracotta.
 - **Each deck its own framed pictures between the doors, generated** (revised 2026-11-16: they were to be drawn in code; step 7's revision)**:** deck 4 safety posters

@@ -546,7 +546,15 @@ cabin's number on its tag, carried under tray rules; a hand takes it at the door
 - New scenario `deliveries`; `region3`, `region5`, `region7`, `region4`, `region9`;
   `tools/check_corridors.py`'s numbers again.
 
-## 6. Part 4: each deck its own look (medium; about 20 generations)
+## 6. Part 4: each deck its own look (medium; about 20 generations) **BUILT 2026-11-24**
+
+**Built:** the framed pictures, six sets generated (38 generations with the re-rolls; deck 4 five, the rest four;
+`assets/source/ship/deck-pictures/`, `DECK_PICTURES` in `tools/build_ship_art.py` and `src/scenes/ShipScene.js`), at the
+cabin corridors' 35%. **Dropped by the user:** the plaques' band ("Leave the doors as they are now, drop the plate
+idea"; the number is a 4 x 2 px plate in the door's own art) and so its colours; no tint was asked for. Deck 4's first
+safety sign (green, a running man) was "an exit sign, does not make any sense": the first aid and lifeboat posters
+in its place, chosen of nine. Deck 6's short corridor hangs three of its four.
+
 
 Design: `docs/plan-three-uses.md` §4.5 and step 7.
 

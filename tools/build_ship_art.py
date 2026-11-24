@@ -343,6 +343,16 @@ PROPS_7 = [
 ]
 for i, (name, h) in enumerate(PROPS_7):
     PIECES[name] = ("props-7", i, None, {"height": h})
+# Each cabin deck's own framed pictures between its doors (plan-the-rest §6, the user's choice, 2026-11-24): PixelLab
+# map objects, one each, cut to their frames by `assets/source/ship/deck-pictures/clean.py` (its NAMES, this order).
+DECK_PICTURES = {4: ["roster", "lifejacket", "escape-plan", "firstaid", "lifeboat"],
+                 5: ["ship-sea", "ship-harbour", "ship-islands", "ship-bow"],
+                 6: ["chart-harbour", "port-town", "islands", "chart-rose"],
+                 8: ["waves", "lighthouse", "sailboat", "sunset"],
+                 9: ["fern", "flower", "lemon", "monstera"],
+                 10: ["liner", "bow", "night", "funnels"]}
+for i, name in enumerate(f"picture-d{d}-{n}" for d, ns in DECK_PICTURES.items() for n in ns):
+    PIECES[name] = ("deck-pictures", i, None, {})
 # The hot tub was drawn with its bottom curving up as if seen from above: it stands flat on the deck
 # (the user saw it hang in the air).
 PIECES["hot-tub"][3]["flat"] = True

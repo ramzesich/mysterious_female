@@ -41,6 +41,17 @@ const approach = (value, target, step) =>
 const GAG_SHEETS = new Set(['gags', 'her-mishaps', 'towels', 'drill']);   // the sheets whose clips have a gag's sounds
 const HALF = PLAYER.height / 2;
 const LAMP_RISE = 81; // the checkpoint lamp sits just above the 74px door
+// Each cabin deck's framed pictures between its doors, in the order they hang (their art: `DECK_PICTURES` in
+// tools/build_ship_art.py). Deck 4 safety posters, 5 paintings of the ship, 6 old charts and port maps, 8 seascapes,
+// 9 botanical prints, 10 old liners' posters.
+const DECK_PICTURES = {
+    4: ['roster', 'lifejacket', 'escape-plan', 'firstaid', 'lifeboat'].map(n => `d4-${n}`),
+    5: ['ship-sea', 'ship-harbour', 'ship-islands', 'ship-bow'].map(n => `d5-${n}`),
+    6: ['chart-harbour', 'port-town', 'islands', 'chart-rose'].map(n => `d6-${n}`),
+    8: ['waves', 'lighthouse', 'sailboat', 'sunset'].map(n => `d8-${n}`),
+    9: ['fern', 'flower', 'lemon', 'monstera'].map(n => `d9-${n}`),
+    10: ['liner', 'bow', 'night', 'funnels'].map(n => `d10-${n}`),
+};
 const DOOR = { width: 28, height: 74 };
 const LEAF = 18; // each of an elevator's two sliding door leaves
 // Cabin 8206's drawing (tools/draw_cabin.py): its width, where its door is, the ceiling's height
@@ -2499,7 +2510,9 @@ export class ShipScene extends Phaser.Scene {
         g.fillStyle(0xc49a80, 1);
         g.fillRect(o.x, o.y - 31, o.width, 1);
 
-        const pictures = ['picture-sea-bg', 'picture-ship-bg', 'picture-art-bg'];
+        // Each cabin deck its own framed pictures (plan-the-rest §6, the user's sets, 2026-11-24; `DECK_PICTURES` in
+        // tools/build_ship_art.py): any other corridor keeps the old three.
+        const pictures = (DECK_PICTURES[this.deckOfY(o.y)] ?? ['sea', 'ship', 'art']).map(n => `picture-${n}-bg`);
         const parts = [];
         // (A picture is not hung behind a tall thing of the plan's world that stands against the wall,
         // the towel stack, or anywhere a tall trolley is pushed along: it goes to the nearest gap with

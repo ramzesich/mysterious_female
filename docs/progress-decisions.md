@@ -4674,3 +4674,21 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
 - **Out into the corridor at once, the towel lay there fading:** the towel, on her head or on the floor, is the
   laundry's and goes the moment she leaves (`hatAway`).
 - `region4` checks each; `region4`, `linen`, `golden`, `cabin`, `region7` pass.
+
+## Part 4: each deck its own look (plan-the-rest §6, 2026-11-24)
+
+- **The cabin numbers are part of the door's art:** a brass plate 6 x 4 px with a 4 x 2 face. A band on it (1 px) hardly
+  showed; the face in the deck's colour read. **The user dropped the idea:** "Leave the doors as they are now"; with it the
+  deck colours, which were the plates' only.
+- **The framed pictures:** 24 generated (map objects, side view, "filling the whole picture ... completely flat front
+  elevation"), then five re-rolled (three drawn without a frame, one too faint, a palm that read as a bush) and, on the
+  user's word, deck 4's green muster sign ("an exit sign, does not make any sense") replaced: three tries, then six more;
+  the user took the first aid and lifeboat posters, so deck 4 hangs five. 38 generations. Cut to their frames (hanging
+  wires and hooks off, a stray red mark) by `assets/source/ship/deck-pictures/clean.py`, built as `picture-d<deck>-<name>`
+  with the usual twins; hung by deck in `drawCabinDoors` (`DECK_PICTURES`), any other corridor keeping the old three.
+- **Wash:** the standard rule (the user): the guest cabin corridors stay at 35%.
+- **No tint:** not asked for once the pictures were seen.
+- Deck 6's corridor is short and hangs three of its four (the compass-rose chart is not seen).
+- `boot`, `stairs`, `lift` pass; `tools/check_overlaps.py` 0. The whole ship's render not made: nothing is drawn
+  outside the corridors' walls.
+
