@@ -930,10 +930,15 @@ Input locked unless said; each sets its save flag.
    to us, shrugs: free 4.35 s after she was taken, in front of the curtain, where the lamp does not reach; the stage
    manager's first sneeze; his bubble turns to the pill bottle. `src/world/stage.js`, `STAGE` in `src/config.js`. Then `scn_card_ent` when she brings
    them: he takes them, sneezes once more, hands the card.
-5. **`bb_4` near-catch 4 (the linen room):** he sleeps on the bottle shelf; the moment she or the laundry cart she pushes
-   all but touches him (2 px) he leaps forward at the cover on the shaft's mouth, which drops to the floor with a clang,
-   and squeezes in (the user, 2026-11-23; he slept in a towel heap and she bent for him). The cart stands in her way
-   between the door and him. **`scn_duct` (remade 2026-11-23, `docs/shaft-remake-log.md`):** the cart pushed to the
+5. **`bb_4` near-catch 4 (the linen room; remade 2026-11-24, `docs/near-catch-4-remake-log.md`):** he sleeps on the
+   bottle shelf. The laundry cart, the empty one, stands in her way between the door and him with a stack of four
+   pillows in it, 76 px tall (her jump is 68), a wall to the ceiling while they are on it: she can only push it. As its
+   front bumps his shelf (6 px past his nose) he leaps forward at the cover on the shaft's mouth, which begins its fall
+   as his paws reach it, drops to the floor with a clang, and he goes in over it, 5 px over the shaft's floor for her.
+   His spring scatters the pillows: two fly aft over her to the aft rack, two ride the cart 0.7 s more and slide off
+   behind it (17 px at most under the chute's hatch, the door's whole span clear). She is not held; the push only goes
+   on by itself until the last pillows are off. The hint "↓ to crawl" the first time she stands on the cart after it.
+   (Until then: off as she or the cart all but touched him, 2 px, in 0.8 s; he slept in a towel heap before 2026-11-23.) **`scn_duct` (remade 2026-11-23, `docs/shaft-remake-log.md`):** the cart pushed to the
    mouth, ↓ on its rim and ←: she crawls in, the room still in view; behind the wall she slides down a slope into
    the slab between decks 9 and 8 and crawls forward at the shaft's true length, about 25 seconds, in the black, with
    six grilles, one to a place, each straight over a landmark of deck 8, shown in a cone of light only while she is

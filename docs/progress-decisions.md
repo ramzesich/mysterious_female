@@ -4993,3 +4993,17 @@ and "The scene plays too fast in the game"; then "Approved"). The stage is one g
 (`tools/build_stage.py`); the scene is `src/world/stage.js`, one clock; the lamp and the fly rope's loop are the two
 ends of one line, so the rival's weight on the lamp is what takes Bumbot up; she is held 4.35 s where it was 4.75,
 and all of it is in front of her. 156 generations.
+
+## Near-catch 4 remade (2026-11-24, the Design session)
+
+The fourth by `docs/sequence-remake-plan.md`, on branch `near-catch-4` (made from `near-catch-3`). Its whole record:
+**`docs/near-catch-4-remake-log.md`** (16 decisions). The old scene was recorded (nine faults); a held scene of 3.5 s
+was offered and turned down: the user chose two faults to mend and gave the scene themselves ("From your list of
+faults, let's address only the following: 4, 8 ... The laundry cart has stack of pillows on top of it. We cannot jump
+past it, or on top of it. We only have to push it. When we push it, Bumbot jumps (like now), the pillows scatter, and
+we are able to jump on top of the cart and enter the vent"; "Use this cart, but empty"; at the preview, "Shift
+Bumbot's crawl higher, it is shown from below the entrance", "a black pixel shows"; "Build it"; during the build, "The
+tooltip has to show (after the Bumbot's escape) only when we jump on top of the cart"; then "Approved"). The pillows
+are one generated clip in two layers (`tools/build_linen_pillows.py`); the scene is `src/world/linen.js`, one clock;
+`tools/build_shaft.py` fills the mouth's holes and lowers the fallen cover, and cuts the mouth against the room's
+corner as it was when its pictures were made. About 80 generations.

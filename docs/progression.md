@@ -156,11 +156,12 @@ cleaner, a rehearsal rope, a photographer.
     end. E at the trolley's end and walking: **pushing**. She frees it, and he tosses her the **Housekeeping
     card**.
 13. Back to **the linen room** (green door; its door at the room's aft end, the room forward of it). Bumbot is
-    asleep on a shelf. The laundry cart stands in her way and she can't walk past it: she pushes it forward.
-    **Near-catch 4:** the moment she or the cart all but touches him, he leaps at the cover on the mouth of the
-    ventilation shaft on the forward wall, knocks it to the floor and squeezes in.
-14. She pushes the cart on to the mouth, jumps onto it, and from its rim goes in on hands and knees (↓, then ←):
-    **crawling**. **The shaft** slides her down a slope behind the wall and runs forward between decks 9 and 8, at
+    asleep on a shelf. The laundry cart stands in her way with a stack of pillows in it, too tall to hop: she can
+    only push it forward. **Near-catch 4** (remade 2026-11-24): as the cart bumps his shelf he leaps at the cover on
+    the mouth of the ventilation shaft on the forward wall, knocks it to the floor and goes in; his spring scatters
+    the pillows, and the cart is empty.
+14. She pushes the cart on to the mouth and jumps onto it (the first time she stands on it, the hint "↓ to crawl"),
+    and from its rim goes in on hands and knees (↓, then ←): **crawling**. **The shaft** slides her down a slope behind the wall and runs forward between decks 9 and 8, at
     its true length, to a grille over deck 8's forward corridor that gives way under her: she drops in past the
     corridor's shut lobby door. One way.
 

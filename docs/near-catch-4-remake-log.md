@@ -136,6 +136,8 @@ And, on seeing nothing yet but while the stack was being roughed on the cart wit
     pieces by what differs from the room's own picture, which was redecorated after they were made; run now, every
     piece came out another shape. The old corner is kept beside the pictures (`assets/source/shaft/gen/room-corner.png`)
     and the build is exact again; the holes' fill and the cover's place are in it.
+16. **Approved** (the user, on playing it: "Approved"). `main` had moved meanwhile (`5a1081c`: the rooms
+    redecorated, the restrooms, the plan's part 14) and was taken into the branch before the close.
 
 ## The art (to the preview stop)
 

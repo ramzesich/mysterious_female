@@ -4,7 +4,8 @@ How a sequence of the game is remade from start to finish. Written 2026-11-24 fr
 (the linen room's shaft, `docs/shaft-remake-log.md`, 2026-11-23; the pool's scene, `docs/pool-remake-log.md`,
 2026-11-24; **used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
 of correction and three checks to it; then for near-catch 2, `docs/near-catch-2-remake-log.md`, approved on its
-first play; then for near-catch 3, `docs/near-catch-3-remake-log.md`, which added two kinds more**), from the user's
+first play; then for near-catch 3, `docs/near-catch-3-remake-log.md`, which added two kinds more; then for near-catch
+4, `docs/near-catch-4-remake-log.md`, whose scene the user gave themselves, and which added two more**), from the user's
 two prompts and from every correction the user made before each was merged. The user,
 2026-11-24: "save this plan. We will start using it right away."
 
@@ -33,6 +34,10 @@ made and what it cost goes into the log and is said at each stop.
    - Lay out the constraints: where the route must lead, what cannot move, which way she faces coming in.
    - Ask only the decisions that are the user's (a direction, a room mirrored, a thing dropped), each with a
      picture.
+   - The faults are given numbered: the user may choose which to mend, and may give the scene themselves (near-catch
+     4: two of nine, and a structure of three lines). Then that is what is built.
+   - Before a thing that lands is drawn, measure where it can lie: every door and everything E acts on along that
+     floor, its span and its foot's height (near-catch 4: a heap hid the chute's hatch and crossed the door's frame).
 4. **Write the sequence beat by beat**, each beat held to these rules:
    - One continuous space at its true place and length, with no fade or teleport.
    - Her direction of travel is kept from entry to exit.
@@ -58,7 +63,7 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the kinds of correction** (below; fourteen now) before the user sees it:
+8. **Check it against the kinds of correction** (below; sixteen now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
@@ -74,6 +79,11 @@ made and what it cost goes into the log and is said at each stop.
      3: the stage in full colour among props washed 12%)?
    - Count what happens in each second, and who does it: one thing at a time, with a hold where someone would hold
      (near-catch 3: three people's beats in 2.65 s could not be followed).
+   - Whoever goes into or behind a picture: its rows against the opening as drawn, and the picture looked at for
+     holes they would show through (near-catch 4: Bumbot under the vent's box, and a black pixel of him through it).
+   - Each hint: is it shown at the first moment she can use it (near-catch 4: "only when we jump on top of the cart")?
+   - Run the builders that made the pieces touched and see that they give back what is committed, before changing
+     them (near-catch 4: the vent's pieces no longer rebuilt as they were).
    - Run the scenarios touched, with a new check for each decision, and the overlap check.
 9. **Play stop.** The user gets the link, the strip and a GIF, with a plain note that motion and sound are theirs to
    judge.
@@ -81,17 +91,18 @@ made and what it cost goes into the log and is said at each stop.
     a one-off nudge, a check in the test, and a look for the rest of its kind. Where a fix is better made by a new
     picture or clip than by a patch, it is generated.
 11. **Close on the user's approval.** Update the documents and the lessons (the log's table of generations and their
-    job ids among them), commit, take `main` into the branch, merge and push on the user's word, remove the
-    worktree.
+    job ids among them), commit, take `main` into the branch (fetch it: it may have moved), merge and push on the
+    user's word, remove the worktree.
 
 For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
-whole stage, two dancers twice over, a key clip of its own).
+whole stage, two dancers twice over, a key clip of its own), near-catch 4 about 80 (a stack and one clip, but
+eleven clips toward a heap that could not lie where it fell).
 
 ## The kinds of correction
 
 Nearly every correction the user made on playing the remakes is one of these. None shows in a still or a test;
 all can be looked for before the user plays (step 8). The first nine came of the shaft and the pool, the next three
-of near-catch 1, the last two of near-catch 3.
+of near-catch 1, two of near-catch 3, the last two of near-catch 4 (seen on its preview).
 
 | Kind | The shaft | The pool |
 |---|---|---|
@@ -109,6 +120,8 @@ of near-catch 1, the last two of near-catch 3.
 | Two things at once that the player must tell apart | (near-catch 1: "make her cry, and then dash, with a little pause in between") | |
 | A new picture that stands out of its place | (near-catch 3: "The stages pops out too much ... remove a bit of a wash of the props that surround it, and add a bit of a wash to the stage, so that everything meets in the middle") | |
 | Too fast to follow | (near-catch 3: "plays too fast in the game and it's hard to grasp what just happened ... a bit slower and with some delays, but in proper places, not to break transitions, where they should be flowing") | |
+| Someone shown outside or through the thing they go into | (near-catch 4: "Shift Bumbot's crawl higher, it is shown from below the entrance"; "when Bumbot crawls inside, a black pixel shows") | |
+| A hint before the moment it can be used | (near-catch 4: "The tooltip has to show (after the Bumbot's escape) only when we jump on top of the cart") | |
 
 ## What the two prompts had in common
 
@@ -155,6 +168,12 @@ already applied.
   the stage manager's part); a preview stop that changed three things (a dancer, the piano, two places); built; the
   self-check found the balcony's way in; on playing it, "Overall, I like it" and two corrections of kinds not on the
   list (the last two rows above); a letter misread; "Approved" the same evening. 156 generations.
+- **Near-catch 4** (the fourth): a scene the user had designed two days before. The old scene recorded (nine
+  faults); a held scene of 3.5 s offered with a rough and three questions; **turned down for the user's own:** two
+  faults to mend and a structure in three lines (pillows in the cart, push only, his leap scatters them), then "Use
+  this cart, but empty". The preview took the longest: a heap that could not lie where it fell, eleven clips unused,
+  then a scatter. Two corrections on the preview (his crawl's height, a black pixel), "Build it", one more during the
+  build (when the hint shows), and **approved on its first play.** About 80 generations.
 
 ## The two prompts, word for word
 
