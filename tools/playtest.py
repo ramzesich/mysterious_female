@@ -2528,15 +2528,17 @@ def scenario_region1__pass(b):
     ok &= check(b.eval(f"{q}.bowl.img.visible && {q}.bowl.img.x < {cat}.sprite.x - 40 && !{q}.fall.visible"), "the fruit bowl stands on the counter's forward end")
     ok &= check(b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl')).length") == 0, "none of its tangerines out yet")
     ok &= check(b.eval(f"{S}.alert.visible") is not True or "dash" not in alert(b), "no hint yet")
-    # Walking in: the scene starts 200 px out, with no stop: the cry's popup and her dash at once.
+    # Walking in: the scene starts 200 px out: she stops and cries, and after a little pause dashes (the user).
     hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=8)
     t0 = b.eval(f"{S}.time.now")
     x0 = b.state()["x"]
     ok &= check(190 <= cx - x0 <= 204, "the scene begins as she comes within 200 px of him", cx - x0)
     ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(f"{S}.bubbleUntil > {S}.time.now"), "her cry at once")
-    b.wait(0.2)
-    ok &= check(b.state()["x"] - x0 > 40, "and her dash with it, no stop", b.state()["x"] - x0)
+    b.wait(0.3)
+    ok &= check(abs(b.state()["x"] - x0) < 1, "a little pause: 0.3 s after the cry she has not moved", b.state()["x"] - x0)
     ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-look-back", "he looks back over his shoulder")
+    b.wait(0.3)
+    ok &= check(b.state()["x"] - x0 > 30, "then her dash", b.state()["x"] - x0)
     b.wait_for(f"{cat}.sprite.anims.currentAnim.key === 'bumbot-run'", timeout=3)
     ok &= check(b.eval(f"{cat}.sprite.flipX && {cat}.sprite.y === {top}"), "he bolts forward along the counter's top")
     ok &= check(b.eval(f"{cat}.sprite.depth < {S}.player.depth"), "behind her dash")
@@ -2548,7 +2550,7 @@ def scenario_region1__pass(b):
     ok &= check(abs(b.state()["x"] - (cx - 6)) < 2, "she is where he was", b.state()["x"] - cx)
     b.wait_for(f"{S}.mode === 'play'", timeout=6)
     held = (b.eval(f"{S}.time.now") - t0) / 1000
-    ok &= check(held < 3.0, "she is held under 3 s (it was 8.3)", round(held, 2))
+    ok &= check(held < 3.3, "she is held under 3.3 s (it was 8.3)", round(held, 2))
     b.shot("pass-after")
     ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible"), "he is away, off the screen")
     ok &= check("bb1" in flags(b) and "dash" in save_list(b, "verbs"), "the beat is set, the dash is hers", flags(b))
@@ -2558,6 +2560,11 @@ def scenario_region1__pass(b):
     rest = b.eval(f"{S}.tangerines.filter(t => t.id.startsWith('tan_5_bowl')).map(t => [Math.round(t.sprite.x - {q}.x0), Math.round(t.sprite.y - {cf})])")
     ok &= check(len(rest) == 3 and all(y == 0 and x < -64 for x, y in rest), "the three tangerines at rest on the floor, forward of the spilled fruit", rest)
     ok &= check(b.eval(f"{q}.fall.visible && {q}.fall.frame.name === {q}.L.fall.frames - 1"), "the bowl lies on the floor, its fruit spilled")
+    # (The lunch pulses where E would take it, by its own pictures: its pulse was the old cabinet's.)
+    b.teleport(exact_x(249.3542) - 12, D5)
+    b.wait(0.5)
+    hl = b.eval(f"{S}.highlight.state().filter(e => e.key === 'thing:src_lunch').map(e => e.parts.length)")
+    ok &= check(hl == [2], "at the lunch, its tray and its cloche pulse", b.eval(f"JSON.stringify({S}.highlight.state())"))
     ok &= check(take_lunch(b), "the lunch on the counter is hers now")
 
     # Arriving in a jump: the scene waits for her landing, and she is on the floor through it.

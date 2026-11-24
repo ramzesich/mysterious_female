@@ -70,9 +70,10 @@ export const BUMBOT = {
 export const PASS = {
     counter: -77,           // the counter's forward end (its picture's left edge)
     plate: 22,              // the plate's middle: under his mouth as he eats
-    sight: 200,             // she sees him from here, on her feet: the cry and the dash
+    sight: 200,             // she sees him from here, on her feet: she stops and cries
+    pause: 400,             // then her dash, this long after the cry (the user: "a little pause in between")
     stop: -6,               // where her dash ends: where he was
-    minMs: 420,             // from nearer than a dash this long, the cry first and the dash that much later
+    minMs: 420,             // from nearer than a dash this long, the dash that much later still
     lookAt: 60, lookMs: 200, lookFrames: 6,     // his look back over his shoulder: when, how long, how many of its frames
     turnMs: 220,            // his turn round
     boltBefore: 100,        // he is off this long before she is there

@@ -1,7 +1,8 @@
 // Near-catch 1 (GAME_DESIGN.md §6.1, region 1; remade 2026-11-24, docs/near-catch-1-remake-log.md), mixed into the
-// Story: the Seven Seas' pass on deck 5 aft. Bumbot on its counter at the officer's lunch; at the sight of him her cry
-// and her dash at once, as D does in play (the user: "She has to learn the dash here, so I suggest she cries and
-// dashes at him"); he looks back, turns and bolts forward along the counter behind her, into the fruit bowl, which
+// Story: the Seven Seas' pass on deck 5 aft. Bumbot on its counter at the officer's lunch; at the sight of him she
+// stops and cries, and after a little pause dashes at him (the user: "She has to learn the dash here, so I suggest she
+// cries and dashes at him"; then, on playing it: "make her cry, and then dash, with a little pause in between"; in
+// play D gives both at once); he looks back, turns and bolts forward along the counter behind her, into the fruit bowl, which
 // goes off the counter's end (its clip, tools/build_pass.py), three tangerines out of it; he leaps down and is off
 // through the restaurant; she turns after him, turns to us, shrugs, and is free: "D to dash".
 //
@@ -64,10 +65,11 @@ export const pass = {
         if (s.crawling) s.crawling = false;
         p.setFlipX(false);
 
-        // Her dash: from where she is to his spot, at the lunge's speed. (From nearer than a dash worth seeing, the
-        // cry first and the dash a moment later, so that he is off before she is in front of him.)
+        // Her dash: from where she is to his spot, at the lunge's speed, `pause` ms after her cry (the user: "a little
+        // pause in between"; only here). (From nearer than a dash worth seeing, later still, so that he is off before
+        // she is in front of him.)
         const x0 = p.x, stop = Math.max(x0, k0 + PASS.stop), v = PLAYER.runSpeed * LUNGE.speed;
-        const dashMs = (stop - x0) / v * 1000, dashAt = Math.max(0, PASS.minMs - dashMs), arrive = dashAt + dashMs;
+        const dashMs = (stop - x0) / v * 1000, dashAt = Math.max(PASS.pause, PASS.minMs - dashMs), arrive = dashAt + dashMs;
         // His part, by her arrival: a look back over his shoulder, a turn, and off as she is `boltBefore` ms short.
         const runAt = Math.max(PASS.lookAt + PASS.lookMs + PASS.turnMs, arrive - PASS.boltBefore), turnAt = runAt - PASS.turnMs;
         const hitAt = runAt + (-PASS.hit) / BUMBOT.runSpeed * 1000;             // his nose at the bowl
@@ -129,7 +131,8 @@ export const pass = {
             w.say(t(s.controls.device === 'pad' ? 'hint.dash.pad' : 'hint.dash'), PASS.hintMs, { kind: 'plate' });
         };
 
-        // The cry and the dash's own sound and rumble at once, as D gives them.
+        // She stops where she is and cries; the dash, with its own sound and rumble, comes after the pause.
+        s.pose('stand');
         s.bubbleUntil = s.time.now + CRY.bubbleMs;
         sfx.cry();
         s.script = (dt) => {

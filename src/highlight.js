@@ -41,8 +41,10 @@ const ROOM_WALLS = { 'cabin-8206': 0xece3cf, 'linen-room': 0xdfe8e2 };   // (dra
 const FIGURES = /^(people|bumbot|her|court|reading|drill|gags|towels)/;
 // Things whose picture is a map piece (their own `items` hold none, or a small thing on it): the piece's name
 // without its wash's suffix (or a texture's key), found where the thing stands.
+// (The lunch at the Seven Seas' pass pulses by its own pictures, the tray and its cloche: it was the cabinet of plates
+// it stood on, gone with near-catch 1's remake, 2026-11-24. The user: "the tray is a pickable object, it should pulsate".)
 const PIECES = {
-    src_icecream: 'ice-cream-machine', src_coffee: 'coffee-station', src_cocktail: 'pool-bar', src_lunch: 'service-station',
+    src_icecream: 'ice-cream-machine', src_coffee: 'coffee-station', src_cocktail: 'pool-bar',
     sec_swan: 'ice-swan', sec_jackpot: 'slot-pair', sec_hottub: 'hot-tub', sec_slide: 'kids-slide', sec_piano: 'grand-piano',
     sec_captain: 'door-cabin', sec_telescope: 'telescope', sec_chess: 'chess-pawn', sec_peek_sea: 'peek-sea',
     sec_oddbook: 'bookcase', sec_chair: 'reading-chair', hatch_pool: ['pool-hatch-shut', 'pool-hatch-back'],

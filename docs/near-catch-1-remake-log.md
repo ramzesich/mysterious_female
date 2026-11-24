@@ -94,6 +94,18 @@ Mine:
     after. The plate he ate from stays.
 18. **The GALLEY plate 10 px higher** (`plate_lift` on the room): the cloche stood under it.
 
+After the user's play (2026-11-24):
+
+19. **She cries, and then dashes, with a little pause in between** (the user: "Make her dash later. Only in this
+    scene: make her cry, and then dash, with a little pause in between"). She stops where she is at the sight of
+    him and cries; her dash begins 0.4 s later (`PASS.pause`); he looks back at the cry and holds the look until she
+    is nearly there. In play D still gives the cry and the dash at once. This replaces decision 10's "no stop". Held
+    2.7 s.
+20. **The lunch pulses where E would take it, by its own pictures** (the user: "the tray is a pickable object, it
+    should pulsate"): its tray and its cloche. Its pulse had been the cabinet of plates it stood on (`PIECES` in
+    `src/highlight.js`), which this remake took away: with the cabinet gone it had nothing to pulse, and no test
+    looked. `region1.pass` checks it now.
+
 ## 4. How it is built
 
 - **Art:** `tools/build_pass.py` from `assets/source/pass/gen/` (its README has the jobs) into `assets/ship/pass/`:
@@ -125,7 +137,7 @@ Mine:
   no pause between the cry and the dash; nothing of it from other decks.
 - **`python tools/playtest.py -j 6 boot region1 golden throw lang highlight sound region2 mishaps`:** pass, but
   `mishaps.things`' deck 9 sprinkler (it fails on `main` too) and, six at a time, `sound`'s footsteps once (it
-  passes run by itself). `region1.pass` is new: 27 checks of the scene step by step. `highlight` failed first on the
+  passes run by itself). `region1.pass` is new: 29 checks of the scene step by step (the pause and the lunch's pulse among them, after the user's play; `boot`, `region1`, `golden`, `throw`, `highlight`, `lang` run again then, all pass). `highlight` failed first on the
   galley's door (no tone to take): mended as above.
 - **`python tools/check_overlaps.py`:** 0 overlaps.
 - **Not judged by me:** how it feels in motion (her stop at the dash's end above all), and how it sounds (no new
