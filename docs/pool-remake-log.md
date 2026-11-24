@@ -131,6 +131,12 @@ must be kept is kept (section 4).
 24. **She goes 10 px further down the hatch before the view changes** (found measuring 20 and 21): the top of her
     head was still over the near edge.
 
+25. **The pools' water is drawn down to the foot of the tank's wall** (the user: "The water in the pool isn't all the way
+    down"): the wall's last row of tiles ends 4 px under the floor she swims over and stands on, and that strip of
+    it showed dry under the water, in all three pools and since they were first drawn. The water's picture only
+    (`TANK_FOOT`, `pool.foot`); the drain sinks it from there. It also says why she seemed to float at the wall's
+    foot (decision 21): the floor's strip starts at that same line.
+
 ## 4. What U17 said to keep, and what became of it
 
 - **The hatch is the only way into deck 10's midships hallway:** kept (`hatch_pool`, needs `drain`). It lands her

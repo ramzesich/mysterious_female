@@ -64,6 +64,9 @@ const lookDim = a => 1 - (1 - ROOM_DIM) * (1 - a) / (1 - ROOM_DIM + a * ROOM_DIM
 const BOAT_DEPTH = DEPTH.player + 0.06;   // the boats hanging on the walkway, in front of her (the drill's too)
 const WALK_RAIL_DEPTH = DEPTH.player + 0.04;   // the walkway's railing, over her (behind a boat's inside while she is in it)
 const WALK_LIFT = 2;
+// A pool's tank: its wall's foot, px under the pool's floor (the tank's tiles are drawn in rows of 8 from 4 px under the
+// deck: `poolTanks`); the water is drawn down to it.
+const TANK_FOOT = 4;
 // Her climb into the lifeboat's roof hatch (`roofSteps`): the hatch's far rim and near lip, px over the walkway's floor
 // (tools/build_hatch.py's pieces: the boat's rows 26 and 37, its floor at 120); each frame's ms (her front frame and her
 // back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
@@ -2682,11 +2685,14 @@ export class ShipScene extends Phaser.Scene {
 
     buildPool(o, deck) {
         const water = this.add.graphics().setDepth(DEPTH.poolWater);
-        water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height);
+        // (Drawn down to the foot of the tank's wall, `TANK_FOOT` px under the pool's own floor: the wall's last row of
+        // tiles ends there, and a strip of it showed dry under the water: the user, 2026-11-24, "The water in the pool
+        // isn't all the way down".)
+        water.fillStyle(0x4d9be6, 0.55).fillRect(o.x, o.y, o.width, o.height + TANK_FOOT);
         water.fillStyle(0x8fd3ff, 0.9).fillRect(o.x, o.y, o.width, 1);
         const ripples = this.add.tileSprite(o.x, o.y + 1, o.width, 2, 'sea').setOrigin(0).setAlpha(0.5).setDepth(DEPTH.poolWater + 0.01);
         this.worldLayer.add([water, ripples]);
-        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, ripples, water, deck });
+        this.pools.push({ x0: o.x, x1: o.x + o.width, y: o.y, bottom: o.y + o.height, foot: o.y + o.height + TANK_FOOT, ripples, water, deck });
     }
 
     // An elevator (§5.1). A core one has landing doors on every deck and a car that travels out of

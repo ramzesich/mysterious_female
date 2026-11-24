@@ -2760,7 +2760,8 @@ export class World {
             this.poolClear(1);
         };
         if (atOnce) return out();
-        const top = pool.y, depth = pool.bottom - pool.y, x0 = pool.x0, x1 = pool.x1, dx = lido.drainX;
+        // (The water is drawn down to the wall's foot, a few px under the floor she stands on: `pool.foot`.)
+        const top = pool.y, foot = pool.foot ?? pool.bottom, depth = foot - pool.y, x0 = pool.x0, x1 = pool.x1, dx = lido.drainX;
         pool.gurgle = s.add.graphics().setDepth(s.DEPTH.poolWater + 0.02);
         this.add([pool.gurgle]);
         sfx.at(dx, top).drain(POOL.drainMs / 1000);
@@ -2784,13 +2785,13 @@ export class World {
             onUpdate: tw => {
                 // (A slow start, as the valve opens; then steadily down.)
                 const k = tw.getValue(), e = k < 0.15 ? (k / 0.15) ** 2 * 0.05 : 0.05 + (k - 0.15) / 0.85 * 0.95;
-                const y = top + depth * e, left = pool.bottom - y;
+                const y = top + depth * e, left = foot - y;
                 pool.y = y;
                 // The water, its surface drawn down into a funnel over the grate.
                 const dip = Math.min(left, 3 + 9 * Math.sin(Math.PI * Math.min(1, k * 1.25))), half = 7 + dip * 1.3;
                 const g = pool.water.clear().fillStyle(0x4d9be6, 0.55);
                 g.fillPoints([{ x: x0, y }, { x: dx - half, y }, { x: dx, y: y + dip }, { x: dx + half, y }, { x: x1, y },
-                    { x: x1, y: pool.bottom }, { x: x0, y: pool.bottom }], true);
+                    { x: x1, y: foot }, { x: x0, y: foot }], true);
                 g.fillStyle(0x8fd3ff, 0.9).fillRect(x0, y, dx - half - x0, 1).fillRect(dx + half, y, x1 - dx - half, 1);
                 for (let i = 0; i <= dip; i++) {
                     const off = Math.round(half * (1 - i / Math.max(1, dip)));
@@ -2805,7 +2806,7 @@ export class World {
                     w.fillStyle(0xffffff, 0.85).fillRect(Math.round(dx + Math.cos(a) * r), Math.round(y + (i / 6) * dip), 2, 1);
                 }
                 for (let i = 0; i < 4; i++) {
-                    const f = ((t / 420 + i * 0.27) % 1), by = pool.bottom - 2 - f * Math.max(0, left - dip - 2);
+                    const f = ((t / 420 + i * 0.27) % 1), by = foot - 2 - f * Math.max(0, left - dip - 2);
                     if (left > 6) w.fillStyle(0xc7e7ff, 0.9 * (1 - f)).fillRect(Math.round(dx + Math.sin(i * 2.3 + t / 300) * 5), Math.round(by), 1, 1);
                 }
                 // The wall above the water, wet; drops run down it.
