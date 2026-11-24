@@ -315,7 +315,7 @@ stairs and no lift come down to it.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 112 | `room_laundry` | The laundry behind a green crew door (`rdr_laundry`, `cp_laundry`): washers, dryers, carts, steam, the chute's mouth in the ceiling, `tan_4_laundry` on a shelf, `amb_folder` folding towels | `room`; she lands here from the chute (`scn_chute`) | Drawn by hand |
+| 112 | `room_laundry` | The laundry behind a green crew door (`rdr_laundry`, `cp_laundry`): washers, dryers, carts, steam, the chute's outlet coming down out of the ceiling over the cart heaped with towels (both generated, 2026-11-24), `tan_4_laundry` on a shelf, `amb_folder` folding towels | `room`; she lands here from the chute (`scn_chute`) | Drawn by hand |
 | 118-150 | `haz_vacuum_4` | The robot vacuum (built) | `loop(118, 150, 1.2)`; contact "Іііі!"; the dash shoves it spinning into a doorway for 6 s | Built |
 | 130 | `amb_robe` | A passenger in a bathrobe looking for the spa | `static`, turns a map | A character |
 | 156-162 | decor | Doors with vacation stickers (built) | | |
@@ -927,8 +927,12 @@ Input locked unless said; each sets its save flag.
    glass lift and staircase, 92.7; the forward lift hall's plaque, 80.7; the forward stairs' exit sign, 75.7; the
    party's door, 71.6); nothing of Bumbot in it; the last grille (66) gives way under her and she drops into deck 8 where the shaft
    ends. **`scn_chute`:** E at the hatch
-   with the green card: a whoosh in the dark, and she lands in the laundry's cart of towels with a
-   towel on her head (a gag frame), on deck 4.
+   with the green card: ~~a whoosh in the dark, and she lands in the laundry's cart of towels with a
+   towel on her head (a gag frame), on deck 4.~~ **As built 2026-11-24 (the user's):** her back to us, she pushes the
+   flap in and slides in head first; the hull and a 2 s drop down it, nothing of her shown; head first out of the
+   laundry's ceiling outlet into the cart of towels and gone in it; up again with a towel on her head, out over the
+   side; the towel off the moment she moves, falling like cloth to lie flat (`chute`, `chuteDrop`, `outOfTheChute`,
+   `hatOff` in `src/world/story.js`; `CHUTE` in `src/config.js`; `tools/build_laundry_chute.py`).
 6. **`scn_card_hk`:** the cart pushed to 130; the steward walks to her, thanks, the card.
    **`scn_photo`:** E at the honeymooners: she raises their camera, the flash, they kiss, the book.
 7. **`bb_5` near-catch 5 (the pool, 131):** he bats at the water on the rim; within 3 m she bends;

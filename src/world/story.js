@@ -4,6 +4,7 @@
 // region, in the order of docs/build-plan.md.
 
 import { sfx } from '../sfx.js';
+import { PLAYER, CHUTE } from '../config.js';
 import { rumble } from '../rumble.js';
 import { lido } from './lido.js';
 import { outside } from './outside.js';
@@ -625,18 +626,14 @@ export class Story {
             if (free && !P.save.cards.includes('hk') && s.mode === 'play' && s.route === 'inside'
                 && Math.abs(her.y - st.y) < 4 && Math.abs(her.x - st.x) < 110) this.stewardThanks();
         }
-        // Out of the chute with a towel on her head: it stays a few steps, then slides off.
+        // Out of the chute with a towel on her head: it slides off the moment she moves or jumps (the user, 2026-11-24: "Let
+        // the towel fall down from our head as soon as we move or jump"; it had stayed a few steps).
         if (this.hat) {
-            const off = time > this.hatUntil || s.route !== 'laundry';
-            this.hat.setPosition(her.x, her.y - 57);
-            if (off && !this.hatGoing) {
-                this.hatGoing = true;
-                const hat = this.hat;
-                sfx.cloth();
-                s.tweens.add({ targets: hat, y: her.y - 2, x: her.x - 12, angle: -80, alpha: 0.9, duration: 420, ease: 'Quad.easeIn',
-                    onComplete: () => s.tweens.add({ targets: hat, alpha: 0, duration: 1500, delay: 2500, onComplete: () => hat.destroy() }) });
-                this.hat = null;
-            }
+            const body = her.body;
+            const moved = s.mode === 'play' && body.enable && (Math.abs(body.velocity.x) > 5 || body.velocity.y < -5
+                || !(body.blocked.down || body.touching.down));
+            const off = moved || time > this.hatUntil || s.route !== 'laundry';
+            if (off && !this.hatGoing) this.hatOff();
         }
         this.glimpseBalcony();
     }
@@ -822,57 +819,200 @@ export class Story {
         return true;
     }
 
-    // The linen room's chute (population: `scn_chute`): a whoosh in the dark, and she lands in the
-    // laundry's cart of towels on deck 4, a towel on her head.
+    // The linen room's chute (population: `scn_chute`; the user, 2026-11-24): E at its hatch, low in the wall. She steps
+    // to it, turns her back to us, crouches, pushes the flap in and slides in head first (one generated clip of her on the
+    // room's own picture of the hatch, `chute-in`, tools/build_laundry_chute.py). The moment she is gone the room fades
+    // into the ship's closed side (0.15 s) and the view drops with her, five decks in 2 s, nothing of her shown; just
+    // before she comes out the laundry fades in round the chute's outlet, and she drops out of it into the cart of towels.
     chute() {
-        const s = this.scene, w = this.world, to = w.rooms.laundry, L = w.data.linen;
-        if (!to || w.carry) return false;
-        sfx.chute();
-        s.travel(L.laundryCartX, to.floor - 60, 'laundry', () => this.outOfTheChute());
+        const s = this.scene, w = this.world, to = w.rooms.laundry, L = w.data.linen, lin = w.rooms.linen;
+        if (!to || w.carry || this.chuting) return false;
+        const C = s.cache.json.get('chute'), her = s.player, x = L.chuteX;
+        this.chuting = true;
+        w.cut(async () => {
+            her.body.enable = false;
+            her.body.setVelocity(0, 0);
+            // To the hatch's middle, and her back to us.
+            if (Math.abs(her.x - x) > 1) {
+                her.setFlipX(x < her.x);
+                s.pose('run', 0.6);
+                await w.tween({ targets: her, x, duration: Math.abs(her.x - x) / 70 * 1000 });
+            }
+            s.pose('back');
+            await w.wait(120);
+            const clip = s.add.sprite(lin.room.x + C.in.at[0], lin.room.y + C.in.at[1] + 1, 'chute-in', 0).setOrigin(0)
+                .setDepth(s.DEPTH.player + 0.01);
+            w.add([clip]);
+            her.setVisible(false);
+            if (!s.anims.exists('chute-in')) s.anims.create({ key: 'chute-in', frames: s.anims.generateFrameNumbers('chute-in'), frameRate: 12 });
+            clip.on('animationupdate', (a, f) => {
+                if (f.index === 6) sfx.at(x, lin.floor).hatch();
+                if (f.index === 9) sfx.at(x, lin.floor).chute();
+            });
+            clip.play('chute-in');
+            // (Down the moment her feet are in, with no hold on the empty hatch: the clip's frame 13 of 16.)
+            await new Promise(done => {
+                const gone = (a, f) => { if (f.index >= CHUTE.goneFrame) { clip.off('animationupdate', gone); done(); } };
+                clip.on('animationupdate', gone);
+                clip.once('animationcomplete', done);
+            });
+            await this.chuteDrop(clip);
+        });
         return true;
     }
 
-    outOfTheChute() {
-        const s = this.scene, w = this.world, to = w.rooms.laundry, x = w.data.linen.laundryCartX, floor = to.floor;
-        const her = s.player;
-        her.body.enable = false;
-        her.setPosition(x, floor - 92);
-        w.cut(async () => {
-            her.body.enable = false;
-            // The cart's front, over her: she drops in behind it.
-            const cover = s.add.image(to.room.x, to.room.y, to.room.texture.key).setOrigin(0).setDepth(s.DEPTH.player + 0.05)
-                .setCrop(x - to.def.x0 - 24, 98, 48, 30);
-            w.add([cover]);
-            s.pose('fall');
-            await w.tween({ targets: her, y: floor - 16, duration: 300, ease: 'Quad.easeIn' });
-            sfx.flump();
-            for (let i = 0; i < 7; i++) {
-                const t = s.add.rectangle(x + Phaser.Math.Between(-12, 12), floor - 34, 7, 4, i % 3 ? 0xffffff : 0x8fd3ff).setDepth(s.DEPTH.fx);
-                w.add([t]);
-                s.tweens.add({ targets: t, x: t.x + Phaser.Math.Between(-22, 22), y: { from: t.y, to: t.y - Phaser.Math.Between(18, 40) }, angle: Phaser.Math.Between(-90, 90),
-                    alpha: 0, duration: 700, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
-            }
-            s.pose('stand');
-            this.hat = s.add.image(her.x, her.y - 57, this.hatTexture()).setDepth(s.DEPTH.player + 0.06);
-            w.add([this.hat]);
-            this.hatGoing = false;
-            this.hatUntil = s.time.now + 60000;
-            const follow = s.time.addEvent({ delay: 16, loop: true, callback: () => this.hat?.setPosition(her.x, her.y - 57) });
-            await w.wait(1100);
-            // Out over its side.
-            s.pose('rise');
-            her.setFlipX(true);
-            await w.tween({ targets: her, x: x - 20, y: floor - 46, duration: 220, ease: 'Quad.easeOut' });
-            s.pose('fall');
-            await w.tween({ targets: her, x: x - 40, y: floor, duration: 220, ease: 'Quad.easeIn' });
-            follow.remove();
-            cover.destroy();
-            her.body.enable = true;
-            her.body.reset(x - 40, floor);
-            s.takeoffY = floor;
-            this.hatUntil = s.time.now + 4500;
-            this.P.setFlag('chute');
+    // The way down: the linen room fades into the hull, the view falls with her (she is not drawn) from the hatch to the
+    // laundry's outlet in `SHAFT`-like real time, the laundry fades in a moment before she shows, and she drops out of
+    // the outlet, her picture cut at its mouth, into the cart of towels.
+    async chuteDrop(clip) {
+        const s = this.scene, w = this.world, to = w.rooms.laundry, lin = w.rooms.linen, her = s.player;
+        const C = s.cache.json.get('chute'), x = w.data.linen.chuteX;
+        const mouth = to.room.y + C.outlet.y + C.outlet.h;            // the outlet's mouth, its lowest row
+        const fade = CHUTE.fadeMs;
+        // Into the hull: the hatch's room fading out over the closed side, the view starting down.
+        s.roomFade = { linen: 1, laundry: 0 };
+        s.route = 'chute';
+        // (The view held on her the whole way down: following at its usual ease it trailed 70 px behind her by the end,
+        // and her dive out of the outlet happened under the screen's edge.)
+        s.cameras.main.setLerp(0.15, 1);
+        s.viewDeck = null;
+        her.setPosition(x, lin.floor);
+        const y0 = lin.floor, y1 = mouth;
+        const start = s.time.now;
+        let shown = false;
+        await new Promise(done => {
+            const step = () => {
+                const t = s.time.now - start;
+                const k = Math.min(1, t / CHUTE.dropMs);
+                // (Slow at first, as down a steep chute: her feet's way from the hatch's floor to the outlet's mouth.)
+                her.setPosition(x, y0 + (y1 - y0) * k * k);
+                s.roomFade.linen = Math.max(0, 1 - t / fade);
+                clip.setAlpha(s.roomFade.linen).setVisible(t <= fade);
+                s.roomFade.laundry = Phaser.Math.Clamp((t - (CHUTE.dropMs - fade - CHUTE.leadMs)) / fade, 0, 1);
+                if (s.roomFade.laundry >= 1 && !shown) {
+                    shown = true;
+                    s.route = 'laundry';
+                    // (Its own deck open behind it until she lands: by her height, still high in the room, the cut-away
+                    // would open the deck above.)
+                    s.viewDeck = s.viewOverride = Math.round(s.deckAt(to.floor));
+                    w.refresh();
+                }
+                if (k >= 1) {
+                    s.events.off('update', step);
+                    done();
+                }
+            };
+            s.events.on('update', step);
         });
+        clip.destroy();
+        s.roomFade = null;
+        if (s.route !== 'laundry') { s.route = 'laundry'; w.refresh(); }
+        await this.outOfTheChute(mouth);
+    }
+
+    // Out of the outlet and into the cart (the user, 2026-11-24): she falls head first out of its mouth (her picture of the
+    // dive, cut at the mouth) and into the heap of towels, the cart drawn over her, until she is all in; then she stands
+    // up in it, the towel on her head, and climbs out over the cart's side. The towel slides off a few steps on
+    // (`hatOff`).
+    async outOfTheChute(mouth) {
+        const s = this.scene, w = this.world, to = w.rooms.laundry, x = w.data.linen.laundryCartX, floor = to.floor;
+        const her = s.player, C = s.cache.json.get('chute');
+        her.body.enable = false;
+        her.setVisible(false);
+        her.setFlipX(false);
+        // (The cart over her: its own pixels in the room's picture, from the heap's top down through the floor's slab,
+        // so that nothing of her shows in it or under it.)
+        const top = floor - C.cart.h, half = Math.ceil(C.cart.w / 2);
+        const cover = s.add.image(to.room.x, to.room.y, to.room.texture.key).setOrigin(0).setDepth(s.DEPTH.player + 0.05)
+            .setCrop(x - to.room.x - half, top - to.room.y, 2 * half, to.room.height - (top - to.room.y));
+        w.add([cover]);
+        // Head first out of the mouth: her dive's top (her feet) starts in the outlet, its foot (her head) at the mouth.
+        const D = C.dive;
+        const dive = s.add.image(x, mouth - D.h, 'chute-dive').setOrigin(0.5, 0).setDepth(s.DEPTH.player);
+        w.add([dive]);
+        const cut = () => {
+            const hidden = Phaser.Math.Clamp(mouth - dive.y, 0, D.h);
+            dive.setCrop(0, hidden, D.w, D.h - hidden);
+        };
+        cut();
+        // (Falling on at the speed she came down the chute at, under gravity, until her head is at the cart's floor.)
+        const v0 = 2 * (mouth - w.rooms.linen.floor) / (CHUTE.dropMs / 1000);
+        const way = (floor - CHUTE.binFloor) - (mouth);           // her head from the mouth to the cart's floor
+        const t = (Math.sqrt(v0 * v0 + 2 * PLAYER.gravity * way) - v0) / PLAYER.gravity;
+        await w.tween({ targets: dive, y: dive.y + way, duration: t * 1000, ease: 'Quad.easeIn', onUpdate: cut });
+        dive.destroy();
+        sfx.flump();
+        s.cameras.main.setLerp(0.15, 0.15);
+        // She stands up in it, the towel on her head, from under the heap to knee-deep in it.
+        s.pose('stand');
+        her.setPosition(x, floor + CHUTE.under);
+        her.setVisible(true);
+        this.hat = s.add.image(0, 0, 'chute-towel').setOrigin(0).setDepth(s.DEPTH.player + 0.04);
+        w.add([this.hat]);
+        // (Placed after the physics has moved her, each frame: placed before it, in the update, it trailed her by a
+        // frame's way and slid off the back of her head as she ran, the user, 2026-11-24.)
+        if (!this.hatFollow) {
+            this.hatFollow = () => this.placeHat();
+            s.events.on('postupdate', this.hatFollow);
+        }
+        this.hatGoing = false;
+        this.hatUntil = s.time.now + 60000;
+        this.placeHat();
+        await w.wait(CHUTE.lieMs);
+        await w.tween({ targets: her, y: floor - CHUTE.sink, duration: CHUTE.riseMs, ease: 'Back.easeOut' });
+        // (Over the heap now: in front of the cart again, as she climbs out.)
+        this.hat.setDepth(s.DEPTH.player + 0.06);
+        await w.wait(700);
+        // Out over its side.
+        s.pose('rise');
+        her.setFlipX(true);
+        await w.tween({ targets: her, x: x - 20, y: top - 12, duration: 240, ease: 'Quad.easeOut' });
+        s.pose('fall');
+        await w.tween({ targets: her, x: x - half - 22, y: floor, duration: 260, ease: 'Quad.easeIn' });
+        cover.destroy();
+        her.body.enable = true;
+        her.body.reset(her.x, floor);
+        s.takeoffY = floor;
+        this.chuting = false;
+        this.P.setFlag('chute');
+    }
+
+    // The towel slides off her head and falls like cloth (the user, 2026-11-24: "it has to behave like a towel, not like
+    // a brick, and lay down flat as a towel, before it disappears"): its generated fall from where it lay on her head,
+    // opening and fluttering down to lie flat on the floor where it slid off; a while there, then gone.
+    hatOff() {
+        const s = this.scene, w = this.world, her = s.player, hat = this.hat, F = s.cache.json.get('chute').fall;
+        this.hat = null;
+        sfx.cloth();
+        const flip = hat.flipX;
+        // (Its first frame is the towel as it lay on her head: placed on it; the floor under it is her floor.)
+        const x = flip ? hat.x + hat.width - (F.cell - F.towel[0]) : hat.x - F.towel[0];
+        const y0 = hat.y - F.towel[1], floor = her.y + PLAYER.sink;
+        const y1 = floor - F.foot;
+        hat.destroy();
+        if (!s.anims.exists('chute-towel-fall')) {
+            s.anims.create({ key: 'chute-towel-fall', frames: s.anims.generateFrameNumbers('chute-towel-fall'), frameRate: 11 });
+        }
+        // (In front of her as it slides off her head, as it lay on it; on the floor, behind her as she walks past it.)
+        const sp = s.add.sprite(x, y0, 'chute-towel-fall', 0).setOrigin(0).setFlipX(flip).setDepth(s.DEPTH.player + 0.06);
+        w.add([sp]);
+        // (The clip's own fall is a few px short of her floor or past it: made up over its frames.)
+        const n = F.frames - 1;
+        sp.on('animationupdate', (a, f) => sp.setY(Math.round(y0 + (y1 - y0) * (f.index - 1) / n)));
+        sp.play('chute-towel-fall');
+        sp.once('animationcomplete', () => {
+            sp.setY(y1).setDepth(s.DEPTH.player - 0.02);
+            s.tweens.add({ targets: sp, alpha: 0, duration: 1500, delay: 2500, onComplete: () => sp.destroy() });
+        });
+    }
+
+    // The towel on her head, where it lies on her picture (`towel` in assets/ship/chute/chute.json: from her feet and her
+    // middle), turned the way she faces.
+    placeHat() {
+        const her = this.scene.player, T = this.scene.cache.json.get('chute').towel, hat = this.hat;
+        if (!hat || this.hatGoing) return;
+        const flip = her.flipX;
+        hat.setFlipX(flip).setPosition(her.x + (flip ? -T.dx - T.w : T.dx), her.y + PLAYER.sink + T.dy);
     }
 
     hatTexture() {

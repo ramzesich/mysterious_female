@@ -1220,7 +1220,13 @@ Positions are in metres from the bow and approximate; the build sets them exactl
     good (region 5). It hangs open after.
 - **Also here:** **the laundry chute** (a hatch in the linen room's wall, green): a slide down to the
   **laundry** on deck 4 (a new crew room at 112 m: machines, carts, steam; she lands in a cart of
-  towels; its door opens onto deck 4's corridor). One-way, down. **The pantries** (green crew doors
+  towels; its door opens onto deck 4's corridor). One-way, down. **Built as a scene, 2026-11-24 (the user's):** E at
+  the hatch: she turns her back to us, crouches, pushes the flap in and slides in head first (a generated clip on the
+  room's own hatch); the room fades into the ship's closed side (0.15 s) and the view drops with her down the hull for
+  2 s, nothing of her shown; the laundry fades in a moment before she shows, she falls head first out of the chute's
+  outlet in its ceiling (generated, joined to the ceiling, straight over the cart) into the cart heaped with towels
+  (generated) and is gone in it; she stands up in it with a towel on her head and climbs out over its side; the towel
+  slides off the moment she moves or jumps and falls like cloth to lie flat (a generated fall), then fades. **The pantries** (green crew doors
   by the restaurants on decks 4 and 5): small rooms with tangerine crates, one of them a passage
   between La Cucina's and the Four Seasons' kitchens, a shortcut past the waiter.
 - **Blocks:** the lobbies' doors into the corridors of decks 8 and 10, and deck 9's aft one (2026-11-18) (shut from the lobby side); the

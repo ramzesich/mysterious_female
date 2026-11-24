@@ -197,6 +197,15 @@ export const SHAFT = {
     dropCrawlH: 10, dropShift: 13,
 };
 
+// The laundry chute from the linen room down to the laundry (src/world/story.js `chute`; the user, 2026-11-24): the
+// crossfades between a room and the hull, the drop from the hatch to the outlet's mouth (about 2 s, "Let's try 2s"), how
+// long before she shows the laundry is fully in, and how deep she lands in the cart's towels (her feet over the floor).
+export const CHUTE = { fadeMs: 150, dropMs: 2000, leadMs: 60, sink: 30, goneFrame: 12,
+    // (Out of it: she dives head first until her head is `binFloor` px over the floor (under it: so that her feet are
+    // under the heap's top, all of her in it, the cart drawn over her through the floor's slab); lies there
+    // `lieMs`, her feet `under` px under the floor, and stands up in it in `riseMs`.)
+    binFloor: -12, lieMs: 260, under: 10, riseMs: 380 };   // (`goneFrame`: her going-in clip's frame, from 1, by which she is all in the hatch)
+
 export const VERBS = {
     crawlSpeed: 88,
     crawlHeight: 26,

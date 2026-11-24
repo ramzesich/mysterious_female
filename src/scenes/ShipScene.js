@@ -3779,9 +3779,15 @@ export class ShipScene extends Phaser.Scene {
         // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
         this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);
         for (const r of this.rooms) {
-            r.room.setVisible((this.route === r.route || this.route === r.also) && !this.overview && !this.fromAfar);
-            r.dim?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
-            r.front?.setVisible(this.route === r.route && !this.overview && !this.fromAfar);
+            // (`roomFade`: a room's picture and its dim held at an alpha of their own, whatever her route, while a scene
+            // crossfades it with the hull: the laundry chute, src/world/story.js.)
+            const f = this.roomFade?.[r.route];
+            const on = f !== undefined ? f > 0 : this.route === r.route;
+            for (const [o, show] of [[r.room, on || (f === undefined && this.route === r.also)], [r.dim, on], [r.front, on]]) {
+                if (!o) continue;
+                o.setVisible(show && !this.overview && !this.fromAfar);
+                o.alpha = f ?? 1;
+            }
         }
         this.world?.shaftAway?.(!!this.overview || !!this.fromAfar);
         // Inside a boat (the lifeboat, a room entered from outside), the boat's own picture and its hatch, drawn in

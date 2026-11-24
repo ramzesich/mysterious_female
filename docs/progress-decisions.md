@@ -4614,3 +4614,29 @@ right edge: decisions 28 and 29 of `docs/shaft-remake-log.md`. No generations. `
   run's left at 0.1 just before she crouched.
 - **The shaft's joints over her their whole height** ("let's make the entire line cover us"), not only their top and
   foot (`compose` in `tools/build_shaft.py`, `front.png`).
+
+## The laundry chute as a scene (the user's, 2026-11-24)
+
+- **The way down, as the user described it:** E at the linen room's hatch: she steps to it, turns her back to us,
+  crouches, pushes the flap in and slides in head first (clip B of two, `animate_image_pixminimax` on the room's own
+  hatch, its wall turned green to cut her out; the room's hatch shows through the clip while the flap is shut, so
+  nothing jumps). The moment her feet are in (frame 12 of 16, no hold on the empty hatch) the room fades into the ship's
+  closed side in 0.15 s (her route `chute`: no room, every deck closed; the rooms' pictures and dims held at an alpha of
+  their own, the ship scene's `roomFade`) and the view drops five decks with her in 2 s ("Let's try 2s"), slow at
+  first, nothing of her shown ("we're shown the hull"); the laundry fades in round the outlet just before she shows,
+  its own deck held open behind it (by her height the cut-away had opened the deck above for a moment).
+- **Out of it** ("she should be shown briefly falling out head-first of the outlet and into the bin (the bin obscures
+  her). Then, she stands up in the bin with the towel"): her dive (try 1 of 2) cut at the outlet's mouth, falling on at
+  the chute's speed until all of her is under the heap's top, the cart's picture drawn over her down through the floor's
+  slab; the camera held on her down the drop (at its usual ease it trailed 70 px and the dive happened under the
+  screen's edge), eased again once she is in. She stands up knee-deep with the towel (try 1 of 3) and climbs out.
+- **The towel:** placed after the physics each frame ("When we run with towel, it shifts behind us"); off the moment she
+  moves or jumps ("as soon as we move or jump"); it falls like cloth, a generated fall from the towel as it lay on her
+  head to a generated flat towel ("it has to behave like a towel, not like a brick, and lay down flat"), in front of
+  her as it slides, behind her on the floor, then fades.
+- **The laundry's picture:** the outlet drawn in code (a box hanging under the ceiling) replaced by outlet 4 of four
+  (the user's; try 2 had a hole and a shadow block), joined to the ceiling, straight over the cart, in its own colours;
+  its duct made solid where the cut had left rows empty and its pale highlight a steel one ("The white strip looks
+  off"); the cart drawn in code replaced by the generated laundry cart heaped with towels ("a proper stack of laundry").
+- 65 generations (`assets/source/ship/laundry-chute/README.md`). `region4` (the chute's new checks), `linen`, `golden`
+  pass; `tools/check_overlaps.py` 0.

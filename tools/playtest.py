@@ -3461,12 +3461,17 @@ def scenario_region4(b):
     b.teleport(js(b, f"{W}.data.linen.chuteX"), D9, "linen")
     wait(0.4)
     b.tap("e")
-    wait(1.5)
+    ok &= check(wait_js(b, "window.__ship.route === 'chute'", 4), "E at the chute's hatch: she goes in, and the view drops down the hull")
     b.shot("region4-chute")
-    ok &= check(wait_flag(b, "chute", 8) and route(b) == "laundry", "E at the chute's hatch: down to the laundry on deck 4", route(b))
+    ok &= check(wait_js(b, "window.__ship.route === 'laundry'", 4), "the laundry fades in round the outlet")
+    ok &= check(wait_flag(b, "chute", 8) and route(b) == "laundry", "out of it into the cart of towels and out over its side: on deck 4", route(b))
     ok &= check(js(b, f"!!{W}.story.hat"), "a towel on her head")
+    wait(0.5)
+    ok &= check(js(b, f"!!{W}.story.hat"), "and it stays there while she stands")
     ok &= check(person(b, "riv_laundry")["on"], "the security officer in a towel, his uniform in the wash")
     b.shot("region4-laundry")
+    b.hold("left", 0.2)
+    ok &= check(not js(b, f"!!{W}.story.hat"), "the towel slides off her head the moment she moves")
     return ok
 
 

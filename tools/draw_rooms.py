@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw
 
 from palettize import palettize
 from draw_lifeboat import PORTHOLES
-from population import ROOMS
+from population import ROOMS, LINEN
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "ship" / "rooms"
@@ -235,18 +235,23 @@ def laundry(width):
     # Steam from a pipe joint over them.
     for x, y in ((120, 22), (124, 18), (130, 21), (152, 20), (156, 17)):
         d.ellipse([x, y, x + 5, y + 4], fill=WHITE)
-    # The chute's mouth in the ceiling, a square steel hood, and under it a canvas cart heaped with towels.
-    box(184, 8, 216, 22, GREY)
-    r(187, 20, 213, 22, DARK)
-    for k in range(4):
-        r(188 + k * 7, 10, 190 + k * 7, 18, STEEL_SHADE)
-    box(178, FLOOR - 26, 222, FLOOR - 6, "#b2ba90")
-    for x in range(184, 222, 8):
-        r(x, FLOOR - 24, x, FLOOR - 8, "#92a984")
-    for x in (182, 214):
-        d.ellipse([x, FLOOR - 6, x + 5, FLOOR - 1], fill=DARK)
-    for x, y, c in ((180, 33, WHITE), (192, 37, BLUE_LIGHT), (203, 34, WHITE), (211, 31, PALE), (186, 30, PALE)):
-        d.rounded_rectangle([x, FLOOR - y, x + 12, FLOOR - y + 8], radius=2, fill=c, outline=GREY)
+    # The chute's outlet coming down out of the ceiling, and under it the laundry cart heaped with towels: both generated
+    # (the user, 2026-11-24, "Regenerate the shaft exit in the laundry room and position it properly against the level
+    # of the ceiling", "Regenerate a proper stack of laundry"; drawn here in code until then): cut by
+    # tools/build_laundry_chute.py, laid in where `assets/ship/chute/chute.json` says, the cart straight under it.
+    chute = json.loads((ROOT / "assets" / "ship" / "chute" / "chute.json").read_text(encoding="utf-8"))
+    src = ROOT / "assets" / "source" / "ship" / "laundry-chute"
+    o = chute["outlet"]
+    piece = Image.open(src / "outlet.png").convert("RGBA")
+    R.im.alpha_composite(piece, (o["x"], o["y"]))
+    # (In its own colours and unwashed, its own pixels only: put on the palette and washed toward the wall, its steel
+    # duct went as white as the ceiling it comes out of.)
+    pp = piece.load()
+    own = {pp[x, y][:3] for y in range(piece.height) for x in range(piece.width) if pp[x, y][3] > 128}
+    R.keep = list(getattr(R, "keep", ())) + ["#%02x%02x%02x" % c for c in own]
+    R.full_px |= {(o["x"] + x, o["y"] + y) for y in range(piece.height) for x in range(piece.width) if pp[x, y][3] > 128}
+    cart = Image.open(src / "cart.png").convert("RGBA")
+    R.im.alpha_composite(cart, (LINEN["laundry_cart"] - cart.width // 2, FLOOR - cart.height))
     # A shelf of detergent on the wall (the tangerine sits on it, 46 px up), and the folding table.
     r(236, FLOOR - 46, 268, FLOOR - 44, GREY)
     r(236, FLOOR - 44, 268, FLOOR - 44, SLATE)

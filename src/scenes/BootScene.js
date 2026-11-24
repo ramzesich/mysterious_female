@@ -40,6 +40,13 @@ export class BootScene extends Phaser.Scene {
         for (const n of [1, 2]) this.load.image(`hug-hand-${n}`, `assets/sprites/hug-hand-${n}.png`);
         this.load.image('cabin-door-open', 'assets/ship/cabin-door-open.png');
         this.load.image('linen-room', 'assets/ship/linen-room.png');
+        // The laundry chute (tools/build_laundry_chute.py): her going in at the linen room's hatch, the towel she comes
+        // out of it with, and where each is.
+        this.load.spritesheet('chute-in', 'assets/ship/chute/in.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.image('chute-towel', 'assets/ship/chute/towel.png');
+        this.load.image('chute-dive', 'assets/ship/chute/dive.png');
+        this.load.spritesheet('chute-towel-fall', 'assets/ship/chute/towel-fall.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.json('chute', 'assets/ship/chute/chute.json');
         this.load.image('linen-door-open', 'assets/ship/linen-door-open.png');
         // The linen room's laundry cart (she pushes it), the adjoining cabins' blanket fort (in front
         // of her), and what shows under the duct's grilles (tools/draw_rooms.py).
