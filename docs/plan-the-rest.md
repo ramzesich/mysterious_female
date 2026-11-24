@@ -62,6 +62,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
 | 12 (§7g) | "Washie, washie, happy, happy!": the crewman with the sanitizer at the Garden Café's door by the aft lifts (deck 11), the user's and his wife's own joke: a first meeting that cannot be missed, their duet, foamy paw prints past him, a tangerine washed and tossed back, the song stuck in her head (added 2026-11-21) | The user's word | Medium | About 25 to 30 (the design session's guess) |
 | 13 (§7h) | The balconies' doors: the five ajar balcony doors (decks 8 to 10, region 7) do not look like doors at all; made to read as doors (added 2026-11-23) | The user's word | Small to medium | A few (a picture of a balcony door) |
+| 14 (§7i) | What is still drawn in code, generated: the small placeholder props, the bubbles' pictograms, the venues' furniture and fittings, the decks' walls and carpets, the last three rooms, and last the architecture (added 2026-11-25) | The user's word; the building session's survey of the code | Large | About 3,100 with fixes (the building session's estimate from its history), the architecture's 450 of it last and the least certain |
 | (§8) | Optional things | The log, the spec | Small each | A few each |
 
 The order is the three-uses plan's own, and the one the building session had named ("21 ...
@@ -1188,6 +1189,48 @@ When we're done with this update, remind me to work on the balcony doors."
   game's pixels; the user chooses. Then whether it is washed like what stands round it, as the other doors are.
 - **Then:** the picture placed for all five (and its pairing with the cabin's own door picture inside, `Room.full`),
   `tools/check_overlaps.py`, the `highlight` playtest, and a look at each balcony in the running game.
+
+## 7i. Part 14: what is still drawn in code, generated (large; about 3,100 generations with fixes; added 2026-11-25)
+
+The user, 2026-11-25, after the rooms were redecorated and the cold room's canister generated: "What else is there drawn
+in code in the game?", then "Estimate the cost in PixelLab generations if we do all of those. Based on our history",
+then the decks' walls and carpets added, and "Include them in the plan, placing the current group 4 last".
+
+**The rule it follows** (`CLAUDE.md`, "Art"): art is generated, not drawn in code; code stays for what is flat by nature
+(a band of colour, a wash, a rope's line, water, steam). **Left in code for good:** the sea, the sky's gradient, the far
+background (its clouds are generated already), the decks' dims, the effects (steam, the dryer's air, notes, sparkles,
+confetti), the signs (`src/signs.js`, a pixel font by rule, the user's), the popups' frames (generated already).
+
+**How each piece is made** (what worked this month): a small thing generated at its size (`create_image_pro_flash`,
+5 generations a try, three tries; the canister, the restrooms' door); a thing the game already draws is redrawn from the
+game's own picture of it (`edit_image_pro_flash`, "keep every shape ..., change only the finish"), so it keeps its size
+and place; a piece in its spot is inpainted into the game's own picture of it and cut out by what changed. Raw tries in
+the chat first, then the piece placed in a real shot at the game's pixels, the user's word, then the game. A thing she
+or someone holds in a clip keeps matching that clip (the cone, the cloche): look at the clips before replacing it.
+
+**The estimate's basis:** a small prop 15 (three tries at 5); a picture up to 256 px 27 (three takes at 9), wider in
+parts; fixes and second rounds about a third more (the chapel 54 on 189; the restroom 51 on a planned 33), half more for
+the architecture.
+
+| Group | What (the code's names) | Pieces | Base | With fixes |
+|---|---|---|---|---|
+| 1 | **The small placeholder props** (`src/world/world.js`'s "small pictures drawn here until the real ones are made" and the others like them): the pool attendant's hut (`pool-hut`), the painter's bucket (`paint-bucket`), the switch box (`switch-box`), the big crate and the crate (`crate-big`; `crate` in `src/textures.js`), the party balloons (`balloon`, `balloons`), deck 12's sunbed (`sunbed`), the engineer's toolbox (`toolbox`), the windsock (`windsock`), the theatre's scenery flats (`flat-palm`, `flat-sun`), the stage's microphone cable (`cable`), the gallery's cat painting on its easel (`easel-cat`) and its cat photo (`photo-cat`), the Library's rope stand knocked down (`rope-down`), a towel on a balcony's rail (`rail-towel`), the two looks through doors (`peek-sea`, `peek-knit`), the chess pawn (`chess-pawn`), the hatch's lid (`hatch-lid`), the trays and their loads (`tray`, `tray-18`, `tray-22`, `load-cloche`, `load-cone`, `load-stub` in `src/world/carry.js`), the checkpoints' lamps off and on and the crew doors' card readers (`src/textures.js`). (The balcony door ajar and its curtain are part 13's; the little side table, `sidetable`, part 9's.) | about 26, some in pairs or states | about 400 | **about 540** |
+| 2 | **The bubbles' pictograms** (`world.icon()`): tray, pills, book, cart, soft serve, canister, door, camera, cocktail, coffee, cake, horn; one style for all twelve, 16 px | 12 | about 120 | **about 145** |
+| 3 | **The venues' furniture and fittings drawn by the ship scene and by hand**: the dining room's reservations desk (`drawReservationsDesk`), the stage (`drawStage`), the basketball court (`drawCourt`), the shuffleboard (`drawShuffleboard`), the chess board (`drawChess`), the sauna's stove (`drawSauna`), the funnel's top (`buildFunnel`), the pergola, the canopies and the sun cover, the bunting, the gangway, the portico, the wave and burl panels, the deck directory, the marquee; the casino's roulette and blackjack tables and its balcony's parapet (`tools/draw_casino.py`); the boats: the lifeboats, the tender, the rescue boat (`tools/draw_lifeboat.py`, with the lifeboat's hatch pieces matching) | about 23, several wide, in parts | about 700 | **about 950** |
+| 4 | **The decks' walls and floors** (16 px tiles painted by `draw_tile` in `tools/build_ship_map.py`): about 28 walls (the cabin corridors' cream wallpaper with its lattice, the crew corridors' steel, each venue's own, the end walls) and about 20 floors (the cabin corridors' blue-grey carpet, the lobby, dining, theatre, library, casino, kids', arcade, café, Spinnaker and Bliss carpets, wood, the gym, the bridge, the cantina, deck paint, pool tiles). Each venue's wall and carpet together, redrawn in place from a strip of the real corridor and cut into a seamless repeat, about 27 a venue. **The builder lays a repeat of 64 or 128 px** (each column its slice of the period; a 16 px repeat of a generated texture reads as a stamp), and whatever the game draws as wall in front of her matches it, as the ship's side's tiles did in step 11. **A pilot first: the cabin corridors' wallpaper and carpet** (about 30 to 40), shown at the game's size and zoomed out over a whole deck (a busy repeat reads as a pattern over 250 m) | about 25 venues | about 675 | **about 900** |
+| 5 | **The last three rooms**, the same way as the others (`tools/redecorate_rooms.py`): her crew cabin (her mirror and bed kept as drawn), cabin 8206 (the shower, the desk and the bed, which close-ups and clips rest on, kept), the lifeboat's inside (its parts' join made to agree) | 3 | about 85 | **about 115** |
+| 6 | **Last: the architecture**, laid by rule along whole decks: the stairs (`drawStairs`), the lifts (`buildLift`), the escape trunks (`buildTrunk`), the atrium (`buildAtrium`), the pools (`buildPool`), the corridors' windows, downlights and coffers. Each a system of repeated pieces, tiled as the walls are; only where something looks clearly wrong, on the user's word, piece by piece | about 8 systems | about 300 | **about 450** |
+| | **Total** | | **about 2,280** | **about 3,100** |
+
+**What could push it up:** the things carried in clips (the cone and its stub in the kid's and her clips, the cloche):
+a new picture may need those clips made again, about 50 to 100 more. Group 4's builder work (two or three sessions with
+the user's review) and group 6's tiling are the uncertain parts. **The time is the real cost, not the generations**
+(9,135 left on 2026-11-25, the cycle refilled 2026-12-24): groups 1, 2 and 5 are cheap and safe against the New Year;
+group 3 is what she walks past; group 4 after its pilot; group 6 last.
+
+**Then, for each group:** the pieces' data where they are placed, `tools/check_overlaps.py`, the scenarios that touch
+them (by name: `grep` the playtests for each piece's key before it changes), `boot`; the art and its jobs in a README
+beside it; the progress log.
 
 ## 8. Optional, each only on the user's word
 
