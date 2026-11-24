@@ -181,8 +181,10 @@ must be kept is kept (section 4).
 - **Sound:** the effects there were (`cry`, `giggle`, `jet`, `meow`, `splash`, `lever`, `drain`, `hatch`) and three
   more of the game's own at new moments (`creak` as the lever goes, `clang` at its stop, `rung` on the ladder). I
   cannot hear them: whether they sit right is the user's to say.
-- **The shared documents** (GAME_DESIGN, population.md, CLAUDE.md, progression.md, plan-the-rest's U17) are not
-  brought to this yet: on the user's word, with the merge.
+- **`docs/ship-regions.png`** still draws the hatch's way at the pool's middle (`tools/draw_regions.py`).
+- The shared documents were brought to this on the user's "All approved" (2026-11-24): GAME_DESIGN's region 6 and
+  its work log, population.md, progression.md, plan-the-rest's U17 (closed), CLAUDE.md (a row and the lessons),
+  progress-decisions.md.
 
 ## 6. Generations
 
@@ -190,6 +192,8 @@ must be kept is kept (section 4).
 knee-high lever twice 12.
 
 ## 7. Checked
+
+(All of it approved by the user in play, 2026-11-24: "All approved".)
 
 - Recorded with real keys and looked at, at the game's pixel size and enlarged: the whole scene from the water (150
   frames at a tenth of a second), from the deck aft of him, from the rim's edge; the drain every 0.4 s; the hatch

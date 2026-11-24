@@ -60,8 +60,9 @@ come back to from now on. At the end of the corridor she sees the tip of a black
 
 **The Lido.** The stairs lead all the way up to deck 11, into the sun. In the gym she finds a pair of grip socks, and
 suddenly walls are something to climb. By the pool, Bumbot is fishing at the water's edge. He slips away from her
-once more, but a boy with a water pistol is less forgiving: one squirt and the cat is in the pool, scrambling out over
-the drain's lever, and the pool empties behind him. In the bare tank a maintenance hatch shows, a way she doesn't need
+once more, but a boy with a water pistol is less forgiving: one squirt and the cat is in the pool, scrambling out and
+over the drain's lever, which goes over under him, and the pool empties behind him. In the bare tank lies a maintenance
+hatch, a way she doesn't need
 but may take: it drops her into deck 10's midships hallway, a corridor of guest cabins closed off until now, where a pot
 of tea is waiting to be delivered. Once she has walked out through its lobby doors they stay open behind her. Aft, at the Great Outdoors, her husband sits at his table by the
 ice cream machine, looking at the wake. Right beside him is her way up: a climb off the service station's roof and a
@@ -174,8 +175,9 @@ true place, deck 8 itself showing under its grilles): `docs/shaft-remake-log.md`
 
 17. **Grip socks** on the gym's rack: **wall jumps**.
 18. **Near-catch 5, at the pool:** Bumbot is fishing at the pool's edge, and he gets away from her. The kid with
-    the water pistol squirts him into the pool; he scrambles out onto the drain's lever and bolts, and the pool
-    drains. A hatch in its floor drops into deck 10's midships hallway. That is not needed for the finale, but it
+    the water pistol squirts him into the pool; he scrambles out, leaps onto the drain's lever, which goes over
+    under him, and bolts, and the pool drains. A hatch on its floor (down its ladder, out of a ceiling panel) drops
+    into deck 10's midships hallway. That is not needed for the finale, but it
     is the only way into that optional hallway (delivery 2 is there); its lobby doors then stay open once she has
     walked out through them.
 19. **The way on:** at the Great Outdoors, by her husband's table and the ice cream machine, a climb with the

@@ -214,7 +214,7 @@ atrium 82-102. The build's lists are in `tools/ship_layout.py` (`FLIGHT_LOCKS`, 
 | `door_midships_trunk_6` | Deck 6, 125 | `oneway(deck 6)` | Opens from Bliss first |
 | `door_mooring` | Deck 7, 21.4 | Shut; opens from the mooring deck after the catch | The way home |
 | `door_hatch_bridge` | Deck 10, 27, the ceiling | Shut until the alarm (`scn_alarm`) | The ladder drops |
-| `door_hatch_pool` | Deck 11, 125, the pool's floor | Hidden until the pool drains (`scn_drain`) | A drop into deck 10 |
+| `door_hatch_pool` | Deck 11, 128.5, the pool's floor | There from the start, washed out under the water; used once the pool is drained (`scn_drain`) | Down its ladder, out of deck 10's ceiling panel |
 
 ### 2.7 The glass elevator's panel and the cores' panels
 
@@ -654,7 +654,7 @@ view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
 |---|---|---|---|---|
 | 110, 194 | `door_10_mid_lobbies` | The lobby doors | `oneway(the corridor)` | |
 | 118 | `haz_cart_10_118` | A standing cart | Hop | |
-| 125 | landing | Where the pool's hatch drops her (`door_hatch_pool`) | | |
+| 128.5 | landing | Where the pool's hatch drops her (`door_hatch_pool`), out of a ceiling panel, a metre short of the tray on the floor | | |
 | 128-131 | `haz_trays_10m` | Trays on the floor | `trap`, opening `haz_dnd_10m` at 130 | |
 | 130 | `haz_dnd_10m` | A "Do Not Disturb" door | As deck 8's | |
 | 145 | `haz_swing_10m` | A swinging door | `reactive(3, 0.6)` | |
@@ -719,12 +719,13 @@ lobby doors on 9 and 10 are the gold ones).
 | 112 | `sec_chess` | The giant chess set | `quirk(E)`: she moves a piece | |
 | 119-131, 134-140 | the pools | Built; the first drains in `scn_drain` | | |
 | 123-128 | `gull_pool` | Two gulls circling over the gap where deck 12 is open above the pool | Dive at food within 4 m (the shadow 1 s before); a cone held up takes one away 20 s; gone while the kid is an ally | Gulls |
-| 125 | `door_hatch_pool` | The maintenance hatch in the drained tank's floor | E: a drop into deck 10 at 125 | Drawn |
-| 128 | `haz_lever` | The drain lever on its housing | Thrown by Bumbot | Drawn |
-| 130 | the pool ladder | Built | | |
+| 128.5 | `door_hatch_pool` | The maintenance hatch on the tank's floor, seen a little from above (washed out under the water) | E in the dry tank: its lid up, down its ladder, out of deck 10's ceiling at 128.5 | Generated (`tools/build_pool.py`) |
+| 129.8 | the drain's grate | In the tank's floor at its aft end: where the water goes | Decor | Generated |
+| 131.7 | `haz_lever` | The drain's lever, a valve on a stand, knee-high, by the first pool's aft rim | Thrown by Bumbot: it goes over under him | Generated (`tools/build_pool.py`) |
+| 130 | the pool ladder | Built; down to the tank's floor (every ladder of the two pools) | | |
 | 131 | `bb_5` | Bumbot fishing at the first pool's aft rim | `scene` §9.7 | |
 | 131-213 | `sec_pawprints` | Wet paw prints along the deck aft to the ice cream machine, fading over 60 s after `bb_5` | Decor | Drawn |
-| 132 | `sec_hottub` | The hot tub | `quirk(E)`: she sits in it, steam | A clip |
+| 133 | `sec_hottub` | The hot tub (22 px aft of where it first stood); the kid in it until `bb_5`, his cap over its near rim | `quirk(E)`: she sits in it, steam | A clip |
 | 136-160 | `npc_kid` | The kid with the water pistol | `patrol(136, 160, 1.0, squirt)`: squirts when she is within 4 m in front, every 2.5 s, the jet 3 m: "Splashed" (the wet gag, 16's, since 2026-11-19, whatever she carries); a jump clears him; the dash: he runs to 160 and hides 10 s; with a cone in her hand he waits, bubble (a soft serve); a stub: he takes it, frowns, resumes in 3 s; perfect: he eats, ally for good: `patrol(135, 160)` squirting gulls | Walk, squirt, run, eat |
 | 142 | `riv_loungers` | The rival on his knees looking under a lounger; the kid squirts him now and then | `glimpse(region 6)`, a loop | |
 | 145 | `src_cocktail` + `tan_11_topsiders` | Topsiders' bar: the mojito for the old lady (`source(cocktail)` once her errand is open), the barman (`amb_barman_top`), a tangerine | | |
@@ -931,12 +932,14 @@ Input locked unless said; each sets its save flag.
    towel on her head (a gag frame), on deck 4.
 6. **`scn_card_hk`:** the cart pushed to 130; the steward walks to her, thanks, the card.
    **`scn_photo`:** E at the honeymooners: she raises their camera, the flash, they kiss, the book.
-7. **`bb_5` near-catch 5 (the pool, 131):** he bats at the water on the rim; within 3 m she bends;
-   the kid at 136 squirts, the jet hits him; he leaps and falls in with a splash; she topples in too
-   (play resumes in the water: she swims out); he scrambles up the ladder at 130 onto the lever's
-   housing at 128, shakes (the wet shake) and bolts aft, wet paw prints after him; **`scn_drain`:**
-   the lever drops, the water sinks over 5 s with a gurgle, the hatch at 125 shows in the tank's
-   floor. **`scn_machine`:** the first cone at `src_icecream` empties it (a sad sputter); her
+7. **`bb_5` near-catch 5 (the pool, 131; remade 2026-11-24, `docs/pool-remake-log.md`):** he bats at the water on
+   the rim. From the water she glides to the rim under him, looks up and reaches for him (her `swim-reach`); from
+   the deck beside him she dives at him, he hops over her, she is in the pool and comes up under him. The kid stands
+   up in the hot tub at 133 and squirts him in the back; over her head he goes and into the water behind her,
+   paddles back past her, hops out, shakes (the wet shake), leaps onto the drain lever's grip at 131.7, which goes
+   over under him and throws him across the tub; he bolts aft along the second pool's far side, wet paw prints
+   after him; **`scn_drain`:** the lever thrown, the water sinks over 5 s down the grate at 129.8 with a gurgle, a
+   funnel in its surface; the hatch at 128.5 on the tank's floor is clear of the water. **`scn_machine`:** the first cone at `src_icecream` empties it (a sad sputter); her
    husband's bubble shows the canister; `room_coldroom` has it; E at the machine with the canister:
    she pours, it hums, it never empties again; his bubble shows a cone once the kid is fed.
    **`scn_table`:** E at her husband with a perfect cone: she sits down across from him in the patio

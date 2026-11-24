@@ -1190,11 +1190,14 @@ When we're done with this update, remind me to work on the balcony doors."
 | U14 | The real Xbox controller through the whole route (the mapping and rumble are built, the test drives a fake one); with the controller alone the game may stay silent until a key or click | The user's own run |
 | U15 | The user's own touches to the livery (`assets/source/livery/livery-by-hand.png`) | The user's own |
 | U16 | Fine placement of everything, and the numbers, in play: the cry and the lunge, ~~the pocket's roll~~ (gone with 1.2a: now how often a hit sends her back, and how far), how often she runs dry, each gag's length, the glide, the checkpoints' spacing | Her playtest and the user's |
-| U17 | **The pool's sequence, near-catch 5, fixed by the user** (2026-11-23: "it plays and looks very broken"; kept, not removed) | Notes below |
+| ~~U17~~ | ~~**The pool's sequence, near-catch 5, fixed by the user**~~ (2026-11-23: "it plays and looks very broken"; kept, not removed). **Done 2026-11-24:** remade by the design session on the user's word and approved by them in play; the record is `docs/pool-remake-log.md` | Closed |
 | U18 | **The near-catches' walk-up, reach and crouch, fixed by the user** (2026-11-23, "especially her crouching sequence after Bumbot escapes") | Notes below |
 
 **U17, the pool's sequence (`bb5`; `poolWatch`, `poolBeat` in `src/world/lido.js`; the drain in `src/world/world.js`,
-`drainPool`).** What it must keep, and what was found round it on 2026-11-23:
+`drainPool`).** **Remade and approved 2026-11-24** (`docs/pool-remake-log.md`: what each note below became is its
+section 4; the hatch is at 128.5 m now, the paw prints head aft on the planks, part 6's new clips of Bumbot are
+played by name as they come, and the scene has a clip of her own, `swim-reach`). What it had to keep, and what was
+found round it on 2026-11-23:
 
 - **It is not on the way to the finale, but it opens an optional area.** The hatch in the drained tank's floor is the
   only way into deck 10's midships hallway: its lobby doors open only from inside (each stays propped open once she has
