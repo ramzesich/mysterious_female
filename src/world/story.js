@@ -13,6 +13,7 @@ import { bow } from './bow.js';
 import { finale } from './finale.js';
 import { spa } from './spa.js';
 import { pass } from './pass.js';
+import { quiet } from './quiet.js';
 
 const M = 48;
 
@@ -52,9 +53,9 @@ export class Story {
         const cat = flag => s.cats.find(c => c.flag === flag);
         // Near-catch 1 has its own scene (src/world/pass.js): the Seven Seas' pass.
         this.setupPass();
-        const bb2 = cat('bb2');
-        if (bb2) bb2.onAway = () => this.ropeIntoDoor();
-        // The Library's aft door, once he has knocked the rope stand into it: ajar for good.
+        // Near-catch 2 too (src/world/quiet.js): the Library's aft end. (Its door, once he has knocked the rope stand
+        // into it, is ajar for good: `leaveAjar`, by `quietAfter` and here for a build without the scene's art.)
+        this.setupQuiet();
         if (this.P.has('bb2')) this.leaveAjar();
         this.setupLift();
         this.setupStage();
@@ -76,6 +77,7 @@ export class Story {
 
     update(dt, time, input) {
         this.updatePass();
+        this.updateQuiet();
         this.updateLido(dt, time, input);
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
@@ -94,6 +96,7 @@ export class Story {
 
     onFlag(name) {
         if (name === 'bb1') this.passAfter();
+        if (name === 'bb2') this.quietAfter();
         if (name === 'bb3') this.showTrap();
         if (name === 'cart_free') this.stewardThanks();
         if (name === 'duct') this.outOfTheDuct();
@@ -173,17 +176,8 @@ export class Story {
 
     // --- Region 2 -----------------------------------------------------------------------------
 
-    // Near-catch 2 (population §6.3): bolting out of the Library he knocks the "QUIET PLEASE" rope
-    // stand into its aft door, which swings ajar and stays so. (The flag opens the door; the rope
-    // lies where it fell: a prop that comes with the flag.)
-    ropeIntoDoor() {
-        const s = this.scene;
-        const rope = this.P.blockDrawings.filter(d => d.id === 'flag:bb2').flatMap(d => d.items);
-        sfx.whip();
-        s.tweens.add({ targets: rope, angle: 90, x: '+=14', duration: 220, ease: 'Quad.easeIn' });
-        this.leaveAjar();
-    }
-
+    // Near-catch 2 (src/world/quiet.js): bolting out of the Library he knocks the "QUIET PLEASE" rope stand into its
+    // aft door, which swings open and stays so.
     leaveAjar() {
         const s = this.scene;
         const door = s.bulkheads.find(b => b.id === 'part-door-6-194');
@@ -211,7 +205,8 @@ export class Story {
         // Bumbot at one of his spots: ears up, a look at her for half a second; the beat is what it was.
         for (const cat of s.cats) {
             const c = cat.sprite;
-            if (cat.gone || cat.hidden || !c.visible || !w.hears(c.x, cat.floor, cat.route)) continue;
+            // (Asleep he sleeps on, as he does through a thrown tangerine: he was turned round in his sleep.)
+            if (cat.gone || cat.hidden || !c.visible || cat.activity === 'asleep' || !w.hears(c.x, cat.floor, cat.route)) continue;
             const was = c.flipX;
             c.setFlipX(her.x < c.x);
             s.tweens.add({ targets: c, y: c.y - 2, duration: 90, yoyo: true });
@@ -1134,3 +1129,4 @@ Object.assign(Story.prototype, bow);
 Object.assign(Story.prototype, finale);
 Object.assign(Story.prototype, spa);
 Object.assign(Story.prototype, pass);
+Object.assign(Story.prototype, quiet);

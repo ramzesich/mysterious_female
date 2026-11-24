@@ -271,7 +271,10 @@ BEATS = {
     # (Near-catch 1 remade, 2026-11-24, docs/near-catch-1-remake-log.md: on the pass's counter, at a plate of the lunch;
     # everything else of the pass stands from his spot, `PASS` in src/config.js.)
     "bb1": (5, 248.4167, "eat", -1, 203, None),
-    "bb2": (6, 181.0, "asleep", 1, 193.6, None),
+    # (Near-catch 2 remade, 2026-11-24, docs/near-catch-2-remake-log.md: asleep on top of the Library's return trolley
+    # (the user: "He sleeps on top of the book return basket"), `LIBRARY["trolley"]`, so that he, the rope and the aft
+    # door are in one picture; he was on the last reading table, 12.6 m from the door. `QUIET` in src/config.js.)
+    "bb2": (6, 191.04, "asleep", 1, 195.0, None),
     "bb3": (6, 248.75, "wash", 1, 250.6, None),
     # (Asleep on the linen room's bottle shelf, the forward rack's middle, since 2026-11-23: the user; he was on a heap of
     # towels on its floor. The room mirrored the same day: he bolts forward, into the shaft's mouth.)
@@ -282,7 +285,7 @@ BEATS = {
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
-BEAT_LIFT = {"bb4": 36, "bb1": 33, "bb2": "reading-table-bg"}      # px, or the piece he is on
+BEAT_LIFT = {"bb4": 36, "bb1": 33, "bb2": 34}      # px, or the piece he is on (bb2: the return trolley's top)
 # The linen room (tools/draw_linen.py; mirrored 2026-11-23, the user: its door at its aft end, the shaft's mouth on its
 # forward wall, so that she pushes the cart, climbs in and crawls on all one way): the chute's hatch (its middle; it
 # stands straight over the laundry's cart on deck 4, `laundry_cart` in the laundry's picture, where she lands), the
@@ -589,7 +592,8 @@ PROPS = {
     # black tail leaving the frame (`sec_cat_photo`), the rope stand Bumbot knocked over.
     "prop_hose": (6, 26.94, "hose-cabinet", 91, dict(back=True)),
     "sec_cat_photo": (6, 157.4, "@photo-cat", 72, dict(back=True)),
-    "prop_rope_down": (6, 193.1, "@rope-down", 0, dict(after="flag:bb2")),
+    # (The Library's fallen rope stand, `prop_rope_down`, went with near-catch 2's remake, 2026-11-24: what lies in the
+    # doorway is the last frame of the stand's own fall, src/world/quiet.js.)
     # What stands in the way on deck 7's flights up: the carpet's roll, the florist's flowers for
     # the wedding, the auction's crates and a canvas.
     "prop_carpet": (7, 88.75, "carpet-end", 0, dict(until="region:4")),

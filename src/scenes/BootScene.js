@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG, QUIET } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -65,6 +65,10 @@ export class BootScene extends Phaser.Scene {
         for (const what of ['hatch-shut', 'hatch-back', 'hatch-lip', 'drain', 'ceiling-shut', 'ceiling-open', 'ladder-low']) {
             this.load.image(`pool-${what}`, `assets/ship/pool/${what}.png`);
         }
+        // The Library's rope stand going over, near-catch 2 (tools/build_quiet.py): frames of 96 x 64; where they stand:
+        // quiet.json.
+        this.load.json('quiet-layout', 'assets/ship/quiet/quiet.json');
+        this.load.spritesheet('quiet-stand-fall', 'assets/ship/quiet/stand-fall.png', { frameWidth: 96, frameHeight: 64 });
         // The Seven Seas' pass, near-catch 1 (tools/build_pass.py): its counter, the plate of the lunch, the fruit bowl's
         // fall off the counter's end (frames of 96 x 64; where they stand: pass.json).
         this.load.json('pass-layout', 'assets/ship/pass/pass.json');
@@ -287,6 +291,12 @@ export class BootScene extends Phaser.Scene {
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
         this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
+        // Near-catch 2 (src/world/quiet.js): creeping up on tiptoe, reaching for him at his height, straightening.
+        if (meta.anims['creep-tiptoe']) this.anims.create({ key: 'her-creep-tiptoe', frames: frames('creep-tiptoe'), frameRate: QUIET.tipFps, repeat: -1 });
+        if (meta.anims['creep-reach']) {
+            this.anims.create({ key: 'her-creep-reach', frames: frames('creep-reach'), frameRate: QUIET.reachFps });
+            this.anims.create({ key: 'her-creep-back', frames: frames('creep-reach').slice(0, QUIET.backFrames).reverse(), frameRate: QUIET.backFps });
+        }
         // Waving from the life ring, overboard: the frames with her hand up, back and forth.
         this.anims.create({ key: 'her-wave', frames: frames('wave', [1, 2, 3, 4, 5, 4, 3, 2]), frameRate: 9, repeat: -1 });
         // At the bow: arms spread wide into the wind, held (the bow view).

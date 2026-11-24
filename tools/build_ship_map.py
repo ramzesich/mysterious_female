@@ -167,6 +167,9 @@ def deck_parts(deck):
 
 # Boundaries that have their own wall and door already: the bridge's, the spa's.
 OWN_DOORS = {(10, BRIDGE_WALL_M), (11, SPA_WALL_M)}
+# A door that swings its own way. The Library's aft door, into the stair lobby: Bumbot knocks the rope stand into it
+# from the Library's side and it swings away from the knock (near-catch 2 remade, 2026-11-24).
+OWN_SWING = {(6, 194): 1}
 
 
 def part_doors():
@@ -187,6 +190,7 @@ def part_doors():
             lock = DOOR_LOCKS.get((deck, m))
             if lock and lock[0] == "oneway":
                 swing = -lock[1]
+            swing = OWN_SWING.get((deck, m), swing)
             doors.append((deck, m, swing))
     return doors
 
@@ -1069,6 +1073,8 @@ def build_objects():
         add(point(name, "place", exact_x(m), floor_y(deck)))
     # (Near-catch 1, Bumbot at the Seven Seas' pass, deck 5 aft: walled off from La Cucina's side; 2026-11-24.)
     add(point("pass5", "place", x_of(238), floor_y(5)))
+    # The Library, 6 m short of its return trolley: near-catch 2 (walk aft; remade 2026-11-24, docs/near-catch-2-remake-log.md).
+    add(point("quiet", "place", exact_x(185), floor_y(6)))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):
@@ -1345,7 +1351,8 @@ def build_objects():
         for deck in PLAYABLE:
             if deck not in (8, 9, 10):
                 # (By the spa's wall on deck 11, clear of its sign.)
-                shift = 78 if deck == 11 and a == SPA_WALL_M else 30
+                # (And clear of the leaf of a door that swings into the lobby: the Library's, deck 6.)
+                shift = 78 if deck == 11 and a == SPA_WALL_M else 48 if OWN_SWING.get((deck, a)) == 1 else 30
                 put(deck, 0, ("picture-art-bg", "picture-sea-bg")[deck % 2], 46, x=col(a) * TILE + shift)
 
     # Deck 5, furnished from the user's photos (§5.3): the atrium café and Guest Services, the shore

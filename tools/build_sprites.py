@@ -82,6 +82,12 @@ HER = {
         # Bending down with her arms out to pick Bumbot up (a near-catch, GAME_DESIGN.md §4). Her
         # back foot stays planted, so each frame's lowest pixel goes on the floor.
         "reach": [(f"reach/{i}.png", "feet") for i in range(5)],
+        # Near-catch 2 in the Library (remade 2026-11-24, docs/near-catch-2-remake-log.md; the user: she creeps up on
+        # tiptoe and reaches at his height): two small steps on her toes, her hands held in front, a loop; both arms
+        # out at chest height, leaning in on her toes (played back to straighten). Her character's own, skeleton-v3 by
+        # poses (assets/source/her/creep-tiptoe/README.md). Each frame on its lowest pixel: her planted toes.
+        "creep-tiptoe": [(f"creep-tiptoe/{i}.png", "feet") for i in range(8)],
+        "creep-reach": [(f"creep-reach/{i}.png", "feet") for i in range(8)],
         # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
         # height, a knee coming up. The game picks the frame by how far she has risen.
         "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],

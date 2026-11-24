@@ -65,6 +65,29 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
+// Near-catch 2 at the Library's aft end (src/world/quiet.js; remade 2026-11-24, docs/near-catch-2-remake-log.md). Places
+// in px from Bumbot's spot on the return trolley (`BEATS` in tools/population.py), times in ms.
+export const QUIET = {
+    sight: 64,              // she is taken this far from him: he and the rope are in the picture, the door at its edge
+    ahead: 40, aheadMs: 700,        // the picture goes this far ahead of her as she creeps, in this long: the door well inside
+    airUp: 80,              // in a jump across that line: up to this high over his floor
+    gap: 39,                // where her creep stops: her hands, reaching, 2 px short of him
+    tipFps: 18, tipPx: 1.6, // her tiptoe: frames a second, and the px her planted toes slide back a frame (her pace: 29 px/s)
+    reachFps: 14,           // her reach: both arms out by its fifth frame
+    backFps: 16, backFrames: 5,     // straightening: the reach's first five frames back
+    backAfter: 150,         // after he has landed
+    shushAt: 60,            // the librarian's finger to her lips, if she has not just given it
+    wakeAt: 40, wakeFrom: 5, wakeFps: 30,   // he wakes this long into her reach: his `wake` from its sixth frame, quick
+    leapMs: 340, land: 50, arc: 16,         // off the trolley: to the floor this far aft, this much rise in the leap
+    nose: 18,               // his nose ahead of his middle, running
+    plough: 200,            // px/s through the stand, until the door is open before him
+    fallMs: 50,             // the stand's fall, a frame
+    card: [8, 0], cardMs: 300,      // its card: this far aft as it goes down and turns face up
+    lookMs: 1200,           // the librarian looks at the door
+    watchMs: 500,           // with her hands full: she looks after him this long
+    afterMs: 100,           // after her shrug
+};
+
 // Near-catch 1 at the Seven Seas' pass (src/world/pass.js; remade 2026-11-24, docs/near-catch-1-remake-log.md). Places
 // in px from Bumbot's spot on the counter (`BEATS` in tools/population.py), times in ms.
 export const PASS = {

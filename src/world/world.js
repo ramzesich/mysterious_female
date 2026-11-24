@@ -229,19 +229,6 @@ export class World {
             g.fillStyle(0xab947a, 1).fillRect(3, 16, 20, 1).fillRect(3, 19, 20, 1);
             g.fillStyle(0x2e222f, 1).fillRect(20, 14, 3, 6).fillRect(18, 9, 2, 6).fillRect(19, 8, 2, 2).fillRect(19, 13, 3, 2);
         });
-        // The Library's "QUIET PLEASE" rope stand as Bumbot left it: both posts down, the rope slack
-        // between them, the sign face up on the floor.
-        make('rope-down', 46, 9, g => {
-            const ink = 0x2e222f, gold = 0xd9a43b, pale = 0xf9c22b;
-            for (const x of [0, 26]) {
-                g.fillStyle(ink, 1).fillRect(x, 1, 4, 8).fillRect(x + 3, 3, 16, 4).fillRect(x + 18, 2, 3, 6);
-                g.fillStyle(gold, 1).fillRect(x + 1, 2, 2, 6).fillRect(x + 4, 4, 14, 2);
-                g.fillStyle(pale, 1).fillRect(x + 19, 3, 1, 4).fillRect(x + 4, 4, 14, 1);
-            }
-            g.fillStyle(0xae2334, 1).fillRect(17, 7, 4, 1).fillRect(20, 8, 8, 1).fillRect(27, 7, 3, 1);
-            g.fillStyle(ink, 1).fillRect(8, 0, 13, 3);
-            g.fillStyle(0xf3ecdd, 1).fillRect(9, 0, 11, 2);
-        });
         // The stage: the microphone's cable, coiled on the boards.
         make('cable', 24, 5, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 3, 24, 2).fillRect(8, 1, 9, 2).fillRect(6, 2, 2, 2).fillRect(17, 2, 2, 2);

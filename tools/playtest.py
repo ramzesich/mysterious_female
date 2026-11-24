@@ -2183,9 +2183,9 @@ def scenario_golden(b):
     # The Library's aft door stays shut until Bumbot bolts through it (near-catch 2).
     shut = not use_door(b, 6, 194, -1)
     ok &= check(shut and "QUIET" in blocked(b), "the Library's aft door is roped off", blocked(b))
-    go(b, 6, 177)
+    go(b, 6, 188.5)
     b.hold("right", 1.5)
-    ok &= check(wait_flag(b, "bb2"), "near-catch 2 at the reading table", flags(b))
+    ok &= check(wait_flag(b, "bb2"), "near-catch 2 at the return trolley", flags(b))
     ok &= check(use_door(b, 6, 194, -1), "then the aft door opens")
     b.hold("right", 1.2)
     ok &= check(3 in save_list(b, "regions"), "region 3 beyond it", b.state())
@@ -2602,6 +2602,111 @@ def scenario_region1__pass(b):
     return ok
 
 
+def scenario_region2__quiet(b):
+    """Near-catch 2 at the Library's aft end, as remade (docs/near-catch-2-remake-log.md): he asleep on the return
+    trolley, the scene 64 px from him, the librarian's shush, her tiptoe and her reach at his height, his leap and his
+    way through the rope stand, the stand's fall into the door, the door open for good, how long she is held; arriving
+    in a jump; a reload after; every lock open."""
+    S = "window.__ship"
+    cat = f"{S}.cats.find(c => c.name === 'bb2')"
+    q = f"{S}.world.story.quiet"
+    lib = f"{S}.world.people.byId['npc_librarian']"
+    her = f"{S}.player.anims.currentAnim?.key"
+    b.open("?reset&play&at=library")
+    cx, cf, top = b.eval(f"[{cat}.sprite.x, {cat}.floor, {cat}.sprite.y]")
+    trolley = b.eval(f"(t => [t.x, t.items[0].height])({S}.world.things.find(t => t.id === 'src_trolley'))")
+    ok = check(cx == trolley[0] and cf - top == trolley[1] == 34, "he is on top of the return trolley, 34 px over the floor", (cx, cf - top, trolley))
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-asleep", "asleep")
+    door = b.eval(f"{q}.door.x")
+    ok &= check(b.eval(f"{q}.stand.visible && {q}.card.visible && !{q}.fall.visible && !{q}.door.open"), "the rope stands before the shut aft door")
+    ok &= check(0 < b.eval(f"{q}.stand.x") - cx < 130 and 0 < door - cx < 160, "the rope and the door within 160 px of him", (b.eval(f"{q}.stand.x") - cx, door - cx))
+    # Walking in: taken 64 px from him; the librarian's finger at her lips; on tiptoe to arm's length.
+    b.teleport(cx - 190, cf)
+    hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=8)
+    t0 = b.eval(f"{S}.time.now")
+    x0 = b.state()["x"]
+    ok &= check(58 <= cx - x0 <= 66, "the scene begins as she comes within 64 px of him", cx - x0)
+    view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
+    ok &= check(view[1] - (cx + 17) >= 100, "he is well inside the picture then", view[1] - (cx + 17))
+    b.wait(0.1)
+    ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(her) == "her-creep-tiptoe", "she goes on tiptoe", b.eval(her))
+    ok &= check(b.eval(f"{lib}.state") == "acting" and "shush" in b.eval(f"{lib}.sprite.anims.currentAnim.key"), "the librarian's finger is at her lips")
+    b.wait(0.3)
+    crept = b.state()["x"] - x0
+    ok &= check(5 < crept < 16, "slowly: some 12 px in 0.4 s", crept)
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-asleep", "he sleeps on")
+    b.wait_for(f"{her} === 'her-creep-reach'", timeout=3)
+    ok &= check(abs(cx - b.state()["x"] - 39) < 1, "she stops at arm's length, 39 px from him", cx - b.state()["x"])
+    b.wait_for(f"{cat}.sprite.anims.currentAnim.key === 'bumbot-wake'", timeout=2)
+    ok &= check(b.eval(f"{S}.player.anims.currentFrame.index") <= 3, "he wakes as she reaches", b.eval(f"{S}.player.anims.currentFrame.index"))
+    b.wait_for(f"{cat}.sprite.anims.currentAnim.key === 'bumbot-leap'", timeout=2)
+    ok &= check(b.eval(f"{S}.player.anims.currentFrame.index") >= 4, "and leaps as her hands arrive", b.eval(f"{S}.player.anims.currentFrame.index"))
+    b.wait_for(f"{cat}.sprite.anims.currentAnim.key === 'bumbot-run'", timeout=2)
+    ok &= check(b.eval(f"{cat}.sprite.y === {cf} && {cat}.sprite.x > {cx} + 40 && !{cat}.sprite.flipX"), "he lands aft of the trolley and bolts aft")
+    ok &= check(b.eval(f"{cat}.sprite.depth > {q}.card.depth && {cat}.sprite.depth < {S}.player.depth"), "on our side of the stand")
+    b.wait_for(f"{q}.fall.visible", timeout=2)
+    ok &= check(b.eval(f"!{q}.stand.visible && !{q}.card.visible && {q}.drop.visible"), "his nose at the stand: it goes over, its card with it")
+    ok &= check(not b.eval(f"{q}.door.open"), "the door still shut")
+    b.wait_for(f"{q}.door.open", timeout=2)
+    b.shot("quiet-crash")
+    at = b.eval(f"[{cat}.sprite.x, {q}.fall.frame.name, {q}.L.door]")
+    ok &= check(at[1] >= at[2] and at[0] + 18 <= door + 4, "the door opens as the stand's aft post is into it, and before his nose is there", at)
+    view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
+    ok &= check(view[1] - (door + 34) >= 30, "the open door well inside the picture, 30 px or more from its edge", view[1] - (door + 34))
+    b.wait_for(f"({lib}.sprite.anims.currentAnim?.key || '').includes('flinch')", timeout=2)
+    ok &= check(True, "the librarian starts at the crash")
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    held = (b.eval(f"{S}.time.now") - t0) / 1000
+    ok &= check(held < 3.0, "she is held under 3 s (it was 3.5, and nothing of it was seen)", round(held, 2))
+    b.shot("quiet-after")
+    ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible") and "bb2" in flags(b), "he is away, the beat is set", flags(b))
+    ok &= check(b.eval(f"{q}.fall.visible && {q}.fall.frame.name === {q}.L.frames - 1 && {q}.flat.visible && !{q}.drop.visible && !{q}.stand.visible && !{q}.card.visible"),
+                "the stand lies in the doorway, its card flat on the floor")
+    ok &= check(b.eval(f"{q}.door.open && {q}.door.ajar"), "the door open for good")
+    st = b.state()
+    ok &= check(abs(st["y"] - cf) < 1 and b.eval(f"{S}.player.body.enable && !{S}.player.flipX && {S}.cameras.main.followOffset.x === 0"),
+                "she stands on the floor, hers again, facing the way he went", st["y"] - cf)
+    b.wait(2.5)
+    ok &= check(b.eval(f"{q}.door.open") and b.eval(f"{lib}.dir") == -1, "the door stays open; the librarian is back at her desk's work")
+    hold_until(b, "right", lambda st: st["x"] > door + 60, timeout=6)
+    ok &= check(b.state()["x"] > door + 60 and 3 in save_list(b, "regions"), "she walks over the stand and through: region 3", b.state()["x"] - door)
+
+    # Arriving in a jump across his line of sight: she comes straight down where she crossed it, and the scene begins
+    # as she lands.
+    b.open("?reset&play&at=library")
+    b.teleport(cx - 190, cf)
+    hold_until(b, "right", lambda st: cx - st["x"] < 105, timeout=8)
+    b.key("right", True)
+    b.key("space", True)
+    b.wait_for(f"{cat}.gone", timeout=4)
+    b.key("space", False)
+    b.key("right", False)
+    st = b.state()
+    ok &= check(cf - st["y"] > 4 and 56 <= cx - st["x"] <= 66, "in a jump, she is taken as she crosses his line of sight, in the air", (cx - st["x"], cf - st["y"]))
+    b.wait_for(f"{her} === 'her-creep-tiptoe' || {her} === 'her-creep-reach'", timeout=3)
+    st2 = b.state()
+    ok &= check(abs(st2["y"] - cf) < 1 and abs(st2["x"] - st["x"]) < 3, "comes straight down, and creeps on from there", (st2["x"] - st["x"], st2["y"] - cf))
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    ok &= check(abs(b.state()["y"] - cf) < 1 and "bb2" in flags(b), "and ends with her on the floor", b.state()["y"] - cf)
+
+    # A reload after it: he is gone, the stand lies in the open door.
+    b.open("?play&at=library")
+    ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible && {q}.fall.visible && {q}.flat.visible && !{q}.stand.visible && {q}.door.open"),
+                "after a reload: he is gone, the stand lies fallen, the door is open")
+    b.teleport(cx - 100, cf)
+    hold_until(b, "right", lambda st: st["x"] > cx - 20, timeout=8)
+    ok &= check(b.eval(f"{S}.mode") == "play", "and nothing starts when she walks up")
+
+    # Every lock open (no rope was ever there): he bolts through the door all the same.
+    b.open("?reset&play&at=library&cards=all")
+    b.teleport(cx - 100, cf)
+    hold_until(b, "right", lambda st: b.eval(f"{cat}.gone"), timeout=8)
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    ok &= check("bb2" in flags(b) and b.eval(f"{cat}.away && !{q}.fall.visible && !{q}.flat.visible && {q}.door.open"),
+                "with every lock open: no stand to fall, the door open after him", flags(b))
+    return ok
+
+
 def scenario_region2(b):
     """Region 2 (docs/build-plan.md, step 2): deck 6 from the bow to the Library, the promenade and
     the boat walkway's foothold, deck 7's lobbies: the robot, the flash, the jogger, the gulls, the
@@ -2777,6 +2882,15 @@ def scenario_region2(b):
     b.key("up", False)
     ok &= check(out and wait_js(b, "window.__ship.mode === 'play'", 7) and b.state()["y"] == boat["floor"],
                 "up the ladder past its top, out of the hatch and down behind the boat onto the walkway again", (route(b), b.state()))
+    # The Library. Bumbot is asleep on its return trolley, so near-catch 2 comes first (its own case: `region2.quiet`): asleep on the return trolley; he knocks the rope stand into the aft door.
+    shut = not use_door(b, 6, 194, -1)
+    ok &= check(shut and "QUIET" in blocked(b), "the Library's aft door is roped off: QUIET PLEASE", blocked(b))
+    # Running up to her desk: a finger to her lips (and the scene, 64 px from him).
+    b.teleport(exact_x(188.5), D6)
+    b.hold("right", 0.7)
+    ok &= check(person(b, "npc_librarian")["state"] == "acting", "she runs past the desk: the librarian's finger goes to her lips", person(b, "npc_librarian"))
+    ok &= check(wait_flag(b, "bb2"), "near-catch 2: he bolts from the return trolley", flags(b))
+    wait(3.0)                   # (the librarian's start at the crash and her look at the door)
     # The Library: her bubble while a book is out, the trolley, the shelf, the chair.
     lib = js(b, "window.__ship.world.data.library")
     b.teleport(lib["trolley"]["x"] - 40, D6)
@@ -2844,20 +2958,11 @@ def scenario_region2(b):
                 js(b, f"{L}.readingPic && {L}.readingPic.x"))
     b.tap("escape")
     wait_js(b, f"!{L}.reading && window.__ship.mode === 'play'", 3)
-    # Running past her desk: a finger to her lips.
-    b.teleport(exact_x(188.5), D6)
-    b.hold("right", 0.7)
-    ok &= check(person(b, "npc_librarian")["state"] == "acting", "she runs past the desk: the librarian's finger goes to her lips", person(b, "npc_librarian"))
-    # Near-catch 2: asleep on the reading table; he knocks the rope stand into the aft door.
-    shut = not use_door(b, 6, 194, -1)
-    ok &= check(shut and "QUIET" in blocked(b), "the Library's aft door is roped off: QUIET PLEASE", blocked(b))
-    go(b, 6, 177)
-    b.hold("right", 1.5)
-    ok &= check(wait_flag(b, "bb2"), "near-catch 2: he bolts from the reading table", flags(b))
+    # (Near-catch 2 was at her first coming to the trolley, above.)
     b.teleport(exact_x(191), D6)
     wait(0.5)
-    ok &= check(door_open(b, "part-door-6-194") and js(b, "window.__ship.world.things.find(t => t.id === 'prop_rope_down').img.visible"),
-                "the rope stand lies where he knocked it; the door stands ajar")
+    ok &= check(door_open(b, "part-door-6-194") and js(b, "(q => q.fall.visible && q.fall.frame.name === q.L.frames - 1)(window.__ship.world.story.quiet)"),
+                "the rope stand lies where he knocked it; the door stands open")
     b.shot("region2-door")
     wait(2.0)
     ok &= check(door_open(b, "part-door-6-194"), "and stays so")

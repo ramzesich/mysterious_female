@@ -87,7 +87,7 @@ CAST = {
     "diner_teal": ("f2700aec-2d7f-48b8-8025-4313be63f2ce", {}, {"scale": 0.8}),
     "diner_linen": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
     # Region 2.
-    "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6}, {}),
+    "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6, "flinch": 12}, {}),
     "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12, "sorry": 10, "scratch": 5},
                # (9b, 9c: "sorry", his far arm up to scratch the back of his head, then "scratch" back and forth;
                # made in assets/source/her-mishaps/batch-4a/starts/jog9/sorry/, 2026-11-19.)
