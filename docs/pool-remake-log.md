@@ -137,6 +137,12 @@ must be kept is kept (section 4).
     (`TANK_FOOT`, `pool.foot`); the drain sinks it from there. It also says why she seemed to float at the wall's
     foot (decision 21): the floor's strip starts at that same line.
 
+26. **Under the water the hatch and the grate are washed out, not seen through** (the user, of decision 19's way:
+    "they cannot be transparent, they cannot show a pool's floor through them. But they still have to be less
+    visible (washed out) when under water"). Each is drawn whole, and over it a copy of itself filled with the
+    floor's own pale tile colour at 70%, as the ship's washes are made; the copy thins as the water goes and is put
+    away in the dry tank. Made 28% opaque they had let the floor's tile lines through.
+
 ## 4. What U17 said to keep, and what became of it
 
 - **The hatch is the only way into deck 10's midships hallway:** kept (`hatch_pool`, needs `drain`). It lands her

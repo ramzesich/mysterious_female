@@ -3677,8 +3677,8 @@ def scenario_region6(b):
     ok &= check(v[0] and not v[1] and v[2] and v[4] < v[3] < v[5] and v[6] == 0,
                 "the hatch (shut) and the drain's grate lie on the tank's floor under the water; the lever is armed", v)
     ok &= check(0 < pool1["x1"] - hx < 200 and pool1["x0"] < L["drainX"] < pool1["x1"], "the hatch within view of the aft rim, the grate in the tank", (hx, L["drainX"], pool1))
-    v = js(b, f"[{W}.pool.shut.obj.alpha, {W}.pool.drain.obj.alpha]")
-    ok &= check(max(v) < 0.4, "both hardly show through the water", v)
+    v = js(b, f"[{W}.pool.shut.obj.alpha, {W}.pool.drain.obj.alpha, {W}.pool.shutWash.obj.alpha, {W}.pool.drainWash.obj.alpha, {W}.pool.shutWash.obj.visible, {W}.pool.drainWash.obj.visible]")
+    ok &= check(v[:2] == [1, 1] and min(v[2:4]) > 0.6 and v[4] and v[5], "under the water both are washed out toward the floor's tiles, not seen through", v)
     line = f"{W}.movers.find(m => m.def && m.def.id === 'haz_line_10a')"
     b.teleport(pool1["x1"] - 230, D11)
     wait(0.5)
@@ -3705,7 +3705,7 @@ def scenario_region6(b):
     wait(0.2)
     ok &= check(js(b, f"{S}.herDropPx()") == 4, "her picture 3 px lower there, on the floor's strip of tiles", js(b, f"{S}.herDropPx()"))
     # (Her feet find the floor while the last of the water is still going.)
-    ok &= check(wait_js(b, f"{W}.pool.shut.obj.alpha === 1 && {W}.pool.drain.obj.alpha === 1", 5), "the last water gone, the hatch and the grate are clear")
+    ok &= check(wait_js(b, f"!{W}.pool.shutWash.obj.visible && !{W}.pool.drainWash.obj.visible && {W}.pool.shut.obj.alpha === 1", 5), "the last water gone, the hatch and the grate are clear")
     b.shot("region6-drained")
     ok &= check(not person(b, "npc_kid_tub")["on"] and person(b, "npc_kid")["on"], "the kid has left the hot tub for the aft pool deck")
     # The hatch in the tank's floor; deck 10's hallway: the trays outside a "Do Not Disturb" door.

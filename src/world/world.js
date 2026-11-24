@@ -1757,6 +1757,16 @@ export class World {
         }
         P.drain = piece('pool-drain', lido.drainX + L.drain.dx, tank + L.drain.dy, under);
         P.shut = piece('pool-hatch-shut', h.x + L['hatch-shut'][0], tank + L['hatch-shut'][1], under);
+        // (Under the water the two are washed out, not seen through: over each a copy of itself filled with the floor's
+        // own pale tile colour, as the ship's washes are made. Made half transparent, the floor's tile lines showed
+        // through them: the user, 2026-11-24, "they cannot show a pool's floor through them".)
+        const wash = e => {
+            const w = piece(e.obj.texture.key, e.obj.x, e.obj.y, under + 0.0005);
+            w.obj.setTint(POOL.floorTile).setTintMode(Phaser.TintModes.FILL);
+            return w;
+        };
+        P.shutWash = wash(P.shut);
+        P.drainWash = wash(P.drain);
         P.back = piece('pool-hatch-back', h.x + L['hatch-back'][0], tank + L['hatch-back'][1], under, false);
         P.lip = piece('pool-hatch-lip', h.x + L['hatch-lip'][0], tank + L['hatch-lip'][1], D.player + 0.03, false);
         // (The wall wet above the sinking water, and the puddles it leaves on the floor: drawn by `drainPool`.)
@@ -1777,14 +1787,15 @@ export class World {
             interact: () => this.hatchDown() });
         // (Under the water the hatch and the grate hardly show; clear as it goes: `drainPool`.)
         this.poolClear(0);
-        this.poolHatch();
     }
 
-    // How clear the hatch and the drain's grate are: 0 under the water, 1 in the dry tank.
+    // How clear the hatch and the drain's grate are: 0 under the water (washed out toward the floor's tiles, `POOL.under`
+    // of themselves left), 1 in the dry tank (no wash: its copies put away, so that only the hatch itself pulses).
     poolClear(k) {
-        const a = POOL.under + (1 - POOL.under) * k;
-        this.pool.shut.obj.setAlpha(a);
-        this.pool.drain.obj.setAlpha(a);
+        const P = this.pool, a = (1 - POOL.under) * (1 - k);
+        this.poolWash = a;
+        for (const w of [P.shutWash, P.drainWash]) w.obj.setAlpha(a);
+        this.poolHatch();
     }
 
     // In the first pool's dry tank her picture is drawn `POOL.floor` px lower than her body, on the floor's strip of
@@ -1801,6 +1812,8 @@ export class World {
         const P = this.pool, open = this.progress.has('pool_hatch');
         if (!P) return;
         P.shut.want = !open;
+        P.shutWash.want = !open && this.poolWash > 0.001;
+        P.drainWash.want = this.poolWash > 0.001;
         P.back.want = P.lip.want = open;
         P.ceilShut.setVisible(!open);
         P.ceilOpen.setVisible(open);
