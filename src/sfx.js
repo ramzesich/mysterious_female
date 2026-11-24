@@ -11,7 +11,7 @@
 //   sfx.toggle()               mute on and off (M in the game), remembered in the browser
 //
 // Sound is on with SOUND.on (src/config.js); `?sound=off` in the URL silences it for a session,
-// `?sound` turns it on where SOUND.on is false. The context starts on the first key or click.
+// (A bare `?sound` turned it on while SOUND.on was false: gone, 2026-11-24.) The context starts on the first key or click.
 // What was played is counted in `sfx.counts` and listed in `sfx.log` whether it was heard or not
 // (the playtests read them). `tools/soundboard.html` plays every one of them by a button;
 // `python tools/check_sound.py` renders them all and measures them.
@@ -20,7 +20,7 @@ import { SOUND } from './config.js';
 
 const params = new URLSearchParams(location.search);
 const KEY = 'bumbusik-sound';
-const enabled = params.get('sound') !== 'off' && (SOUND.on || params.has('sound'));
+const enabled = SOUND.on && params.get('sound') !== 'off';
 let muted = localStorage.getItem(KEY) === 'off';
 let live = null;        // the page's context and its chain
 let off = null;         // an offline one, while a tool renders

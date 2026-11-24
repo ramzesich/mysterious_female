@@ -649,7 +649,7 @@ a swinging door; the cabin's bowl full and empty.
 | File | Change |
 |---|---|
 | `src/world/tangerine.js` (new) | `Loose`: an arcade body 8 px across, bounce 0.35, drag on a floor, colliding with the solid layer, the walks, the solids and the breakables; off the hull: a splash, gone; in a pool: it floats. At rest it becomes an ordinary tangerine on the floor, kept in the save (`save.loose`). Each frame it offers itself to what is near (`world.offered(t)`): the first to take it has it |
-| `src/scenes/ShipScene.js` | `pocket(fromX, kind)`: with one on her and `?pocket=off` not set: one less, a `Loose` thrown the way she is pushed, the flinch (`flinchUntil`), `safeUntil`, the blink. Called at the top of `scareContact`; a hit inside `safeUntil` is ignored |
+| `src/scenes/ShipScene.js` | `pocket(fromX, kind)`: with one on her and `?pocket=off` not set (that switch went with 1.2a, 2026-11-19: a hit is its gag whatever she carries): one less, a `Loose` thrown the way she is pushed, the flinch (`flinchUntil`), `safeUntil`, the blink. Called at the top of `scareContact`; a hit inside `safeUntil` is ignored |
 | `src/world/carry.js` | `spill(fromX, own)`: the pocket first, unless it is her own doing (`sway`, a melted cone) |
 | `src/save.js` | `loose: []` in the empty save (old saves take the default; no new key) |
 | `src/sfx.js`, `src/rumble.js` | `pocket`, `roll`, `plop`; the spill's light tick reused, no eleventh rumble |

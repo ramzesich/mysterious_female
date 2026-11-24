@@ -29,7 +29,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     b = Browser(stepped="--real" not in sys.argv)
     try:
-        b.open("?play&tangerines=infinite")
+        b.open("?play")
         b.wait(1.0)
         W, H = b.eval("[window.__ship.map.widthInPixels, window.__ship.map.heightInPixels]")
         # The game's own outside view (O): every deck's side closed, her and the HUD hidden, the game

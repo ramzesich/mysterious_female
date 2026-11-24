@@ -1,13 +1,17 @@
 # Start links
 
 Every place the game can be started at on this computer, for testing. Run `python tools/serve.py`
-first. Each link skips the welcome screen and the intro (`?play`), opens every lock and gives her every verb (`cards=all`).
+first. Each link skips the welcome screen and the intro (`?play`). **A link carries only what its row needs** (the
+user, 2026-11-19 and 2026-11-24): a place to look round from opens every lock and gives her every verb (`cards=all`),
+since most places lie behind a lock; a link to one thing has `cards=all`, `did=` or `tangerines=infinite` only where
+that thing needs it.
 
 Useful additions to any link:
 
 - `&tangerines=infinite`: a tangerine is never used up (the cry, the lunge, the throw; a gull still
   swoops at her, and takes one rather than playing its gag).
-- `&reset` clears the saved progress first.
+- `&real` keeps the save between loads. **For now nothing is saved**, so every link is a new game without it; with
+  it, `&reset` clears the saved progress first.
 - `&lang=ua` shows the game in Ukrainian for that session (`&lang=en` for English).
 - `&sound=off` silences it.
 - `&did=<flags>` starts with parts of the story already done (the list is in `README.md`).
@@ -19,11 +23,11 @@ new one added there should be added here too.
 
 | Place | Link |
 |---|---|
-| Where the game starts: deck 3, her crew cabin's door (with a fresh save) | <http://localhost:8000/?play&reset&cards=all> |
-| The welcome screen, then the whole intro (a new game: the save is cleared) | <http://localhost:8000/?reset> |
-| The welcome screen with the save kept (a game under way gets the short way in) | <http://localhost:8000/?tangerines=infinite> |
-| The intro from the whole ship in view | <http://localhost:8000/?reset&intro=ship> |
-| The intro from the corridor, just before her door opens | <http://localhost:8000/?reset&intro=corridor> |
+| Where the game starts: deck 3, her crew cabin's door | <http://localhost:8000/?play> |
+| The welcome screen, then the whole intro (a new game, as every load is for now) | <http://localhost:8000/> |
+| The welcome screen with the save kept (a game under way gets the short way in) | <http://localhost:8000/?real> |
+| The intro from the whole ship in view | <http://localhost:8000/?intro=ship> |
+| The intro from the corridor, just before her door opens | <http://localhost:8000/?intro=corridor> |
 
 ## Deck 3
 
@@ -82,9 +86,9 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `cabin`: inside cabin 8206 | <http://localhost:8000/?play&at=cabin&cards=all> |
-| `hall8`: deck 8's midships hallway near its aft lobby door (delivery 1: the vase on its table by that door) | <http://localhost:8000/?play&at=hall8&tangerines=infinite> |
-| `hall10`: deck 10's midships hallway near its forward lobby door (delivery 2: the pot of tea on its table there) | <http://localhost:8000/?play&at=hall10&tangerines=infinite> |
-| `hall9a`: deck 9's aft hallway near its forward lobby door (delivery 3: the pillows on the laundry cart there) | <http://localhost:8000/?play&at=hall9a&tangerines=infinite> |
+| `hall8`: deck 8's midships hallway near its aft lobby door (delivery 1: the vase on its table by that door) | <http://localhost:8000/?play&at=hall8> |
+| `hall10`: deck 10's midships hallway near its forward lobby door (delivery 2: the pot of tea on its table there) | <http://localhost:8000/?play&at=hall10> |
+| `hall9a`: deck 9's aft hallway near its forward lobby door (delivery 3: the pillows on the laundry cart there) | <http://localhost:8000/?play&at=hall9a> |
 | `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all> |
 | `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
 | `mask10`: outside, deck 10's first balcony, aft of its long lounger (his sleep mask on it after the table scene, 14) | <http://localhost:8000/?play&at=mask10&did=table> |
@@ -95,7 +99,7 @@ new one added there should be added here too.
 |---|---|
 | `captain`: the captain's door | <http://localhost:8000/?play&at=captain&cards=all> |
 | `linen`: inside the linen room | <http://localhost:8000/?play&at=linen&cards=all> |
-| `linen`, Bumbot gone and the cart at the shaft's mouth: jump on the cart, ↓, ← | <http://localhost:8000/?play&at=linen&cards=all&did=bb4,cart_linen> |
+| `linen`, Bumbot gone and the cart at the shaft's mouth: jump on the cart, ↓, ← | <http://localhost:8000/?play&at=linen&did=bb4,cart_linen> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all> |
 | `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
 | `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward> |
