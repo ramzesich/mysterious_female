@@ -4590,3 +4590,18 @@ floor: decisions 26 and 27 of `docs/shaft-remake-log.md`. No generations. `regio
 She is in the mouth on hands and knees (its far side behind her, nothing of her past the room's wall until the view is
 the shaft's); the way out a grille like the rest, that drops her the moment she is on it and swings down unlit on its
 right edge: decisions 28 and 29 of `docs/shaft-remake-log.md`. No generations. `region4`, `linen`, `golden` pass.
+
+## The shaft's seams; Bumbot's paw prints dropped (the user's, 2026-11-24)
+
+- **Thin vertical lines of light while she crawls in** (the user: "very brief ... really hard to catch on a
+  screenshot"): the dark round the shaft is one picture with a clear box for each "window" (the dark round neighbouring
+  grilles' views, redrawn as one opens), the windows laid in those boxes; where one picture's texels ended at the other's
+  edge, a camera between pixels showed a column of deck 8 through the seam. Found by recording her way in at the canvas's
+  full size, the camera nudged by fractions of a pixel each frame, and searching every frame for one-pixel bright
+  columns (a 272 px line); each box is now cleared a pixel short all round, the great dark under the window's own dark
+  edge. The same search over the whole crawl (720 frames) finds none.
+- **Bumbot's paw prints, dropped** (the user, shown four light-grey candidates from three generated pictures: "None of
+  those looks like his prints. Let's drop the prints entirely"): the dusty prints on deck 8 under the shaft's way out,
+  those on the balcony where he swipes at the gull, and the wet trail aft from the pool; the `paws` picture and its
+  playtest checks with them; part 12's foamy prints (plan-the-rest §7g item 3) struck out. The generated tries stay in
+  `assets/source/things/paws/` (3 generations).

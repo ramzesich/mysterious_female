@@ -497,7 +497,7 @@ def build_world():
     lido = dict(y=ly, leverX=B.exact_x(LIDO["lever"]), ladderX=B.exact_x(LIDO["ladder"]), tubX=B.exact_x(LIDO["tub"]),
                 kidA=B.exact_x(LIDO["kid"][0]), kidB=B.exact_x(LIDO["kid"][1]), loungerX=B.exact_x(LIDO["lounger"]),
                 chessX=B.exact_x(LIDO["chess"]), machineX=B.exact_x(LIDO["machine"]), husbandX=B.exact_x(LIDO["husband"]),
-                tableX=B.exact_x(LIDO["table"]), pawsA=B.exact_x(LIDO["paws"][0]), pawsB=B.exact_x(LIDO["paws"][1]),
+                tableX=B.exact_x(LIDO["table"]),
                 pools=pools, tankY=ly + B.POOL_DEPTH)
 
     # Region 8's (src/world/topdeck.js): the old lady's sunbed, the court's balls, the flares, the

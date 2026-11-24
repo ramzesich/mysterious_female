@@ -606,9 +606,8 @@ PROPS = {
     "prop_towels_swan": (10, 104.85, "towel-swan", 25, dict(until="region:6")),
     "prop_towels_elephant": (10, 106.3, "thing:towel-elephant", 0, dict(until="region:6")),
     "prop_towels_monkey": (10, 105.6, "thing:towel-monkey", 0, dict(until="region:6")),
-    # Region 5. A steward's cart with a towel swan on it; the duct's grille in the ceiling where she
-    # drops out (shut until then, hanging open after), and his dusty paw prints from under it to the
-    # lobby's door.
+    # Region 5. A steward's cart with a towel swan on it. (The shaft's way out is the shaft's own; Bumbot's dusty paw
+    # prints from under it to the lobby's door were dropped, 2026-11-24, the user: "Let's drop the prints entirely".)
     "prop_swan_cart": (8, 29.3, "towel-trolley", 0, {}),
     "prop_swan_cart_swan": (8, 29.3, "towel-swan", 28, {}),
     # (The shaft's own pictures since its remake, 2026-11-23: the cover of its mouth again, tools/build_shaft.py; shut it
@@ -616,7 +615,6 @@ PROPS = {
     # (The shaft's way out, the hatch in deck 8's ceiling shut and then hanging open, is the shaft's own since 2026-11-24:
     # a grille like the others, that falls with her and lies on the corridor's floor, the slot left in the ceiling; built
     # by `buildDuct` in src/world/world.js from tools/build_shaft.py's pieces.)
-    "prop_paws_8": (8, 70.05, "@paws", 0, dict(after="flag:duct")),
     "prop_towels_rabbit": (10, 106.95, "thing:towel-rabbit", 0, dict(until="region:6", flip=True)),
     # Region 6. The rack with the yoga mats, the socks on its top; two sunbathers on the loungers by
     # the first pool; that pool's second ladder, at the end where Bumbot fishes; the attendant's hut
@@ -643,8 +641,6 @@ PROPS = {
     # The console table at the end of deck 9's officers' corridor, between its end wall and the captain's door (book 14 on
     # it): generated, the user's choice of four (2026-11-21, a half-moon one), 1 px down (the user's placing).
     "prop_console_9": (9, 27 + 30 / 48, "thing:console-table", -1, {}),
-    # Bumbot's paw prints on the balcony where he swiped at the gull (a tangerine on its table).
-    "prop_paws_10": ("b10", 161.6, "@paws", 0, {}),
     # Region 8. Two more sunbathers on the sun deck's loungers (the security officer looks under
     # them); the old lady's parasol leaning on her sunbed while she is there (hers to take after).
     "amb_sun_12a": (12, 136.7, "thing:sunbather-3", 0, dict(back=True)),
@@ -892,7 +888,7 @@ PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90),
 # the ladder Bumbot comes out by, the hot tub the kid squirts from, the kid's beat on the aft pool
 # deck after (from m, to m), the lounger the security officer peers under, the chess set.
 LIDO = dict(deck=11, lever=131.68, ladder=130.5, tub=132.5, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
-            machine=214.6, husband=219.52, table=220.0, paws=(141.2, 213.6))
+            machine=214.6, husband=219.52, table=220.0)
 # A wet patch she slides on without the socks, the pool shower over it running, and a deck chair that
 # stands at its aft end, its front legs in the puddle (`haz_wet`, `haz_deckchair`): id: (deck, from m,
 # to m, where the chair stands (m)). (The chair stands still since 2026-11-19, the user: one sliding

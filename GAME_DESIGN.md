@@ -845,8 +845,9 @@ The word is **"scare"**, never "death", on screen and in the code alike.
   face, black hair. Standard waiter crew uniform." Not an obstacle. Five pieces, "All five": the first meeting holds
   her about three seconds (he squirts, she rubs her hands, and both sing the whole line, the user: "they should both
   do 'Washie, washie, happy, happy!'"); after that he never holds her, and with her hands full he only sings and
-  waves her through; Bumbot's paw prints turn foamy past him (from near-catch 5 until the table scene; only this
-  stretch of prints is built); a tangerine thrown to him comes back washed, the count unchanged; and once she has met
+  waves her through; ~~Bumbot's paw prints turn foamy past him (from near-catch 5 until the table scene; only this
+  stretch of prints is built)~~ (dropped 2026-11-24 with every paw print: the user, "None of those looks like his prints.
+  Let's drop the prints entirely"); a tangerine thrown to him comes back washed, the count unchanged; and once she has met
   him, now and then an idle of hers comes with "♪ washie, washie…" over her. The words are the same in both
   languages. No melody ("No tune, he was just singing those words").
 - **Secrets** exist: §6.1.11. (Bumbot's SUSHI sign had leaked in from the Bumbot game; dropped, the
@@ -2480,7 +2481,7 @@ Nothing blocks the start of the build. These get settled along the way:
       animals on the flight up from deck 10. Her crawl, push and camera clips; ten more people.
       Playtest `region4`
 - [x] **Step 5, region 5: deck 8 forward** (done 2026-11-13, branch `the-build`): out of the
-      duct's grille (it hangs open in the ceiling after; paw prints lead to the lobby's door); the
+      duct's grille (it hangs open in the ceiling after; ~~paw prints lead to the lobby's door~~, dropped 2026-11-24); the
       birthday party's door with its balloons and music; an open cabin with the sea in its window;
       cabin 8206: a checkpoint, the fifth book on the bed (standing still on the bed with it she
       sits and reads it there), the basket's tangerines; the swan's cart; the forward stairs on up

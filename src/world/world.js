@@ -284,15 +284,9 @@ export class World {
             g.fillStyle(0xf28c28, 1).fillRect(12, 10, 6, 6);
             g.fillStyle(0x1ebc73, 1).fillRect(14, 9, 2, 1);
         });
-        // Region 5: paw prints in dust (the shaft's grille in deck 8's ceiling is its own picture, tools/build_shaft.py);
-        // party balloons, one and a bunch on their strings; an open cabin with the sea in its window.
-        make('paws', 346, 5, g => {
-            g.fillStyle(0x625565, 0.85);
-            for (let x = 4, n = 0; x < 340; x += 13, n++) {
-                const y = n % 2 ? 3 : 1;
-                g.fillRect(x, y, 3, 2).fillRect(x - 1, y - 1, 1, 1).fillRect(x + 1, y - 1, 1, 1).fillRect(x + 3, y - 1, 1, 1);
-            }
-        });
+        // Region 5: party balloons, one and a bunch on their strings; an open cabin with the sea in its window. (Bumbot's
+        // paw prints, drawn here until 2026-11-24, are gone: the user, "None of those looks like his prints. Let's drop
+        // the prints entirely.")
         make('balloon', 16, 20, g => {
             g.fillStyle(0x2e222f, 1).fillEllipse(8, 9, 16, 18).fillTriangle(6, 17, 10, 17, 8, 20);
             g.fillStyle(0xffffff, 1).fillEllipse(8, 9, 14, 16);
@@ -799,7 +793,10 @@ export class World {
             const tex = s.textures.createCanvas('shaft-dark', W, H), ctx = tex.getContext();
             ctx.fillStyle = `rgba(13, 11, 20, ${SHAFT.dim})`;
             ctx.fillRect(0, 0, W, H);
-            for (const w of windows) ctx.clearRect(w.x - X0, top - Y0, w.w, ch);
+            // (Each window's box cleared a pixel short all round, the great dark under the window's own dark edge: cleared
+            // to the window's edge, where one picture's texels ended at the other's edge, a camera between pixels showed
+            // a column of the deck through the seam, "thin vertical lines of light", the user, 2026-11-24.)
+            for (const w of windows) ctx.clearRect(w.x - X0 + 1, top - Y0 + 1, w.w - 2, ch - 2);
             tex.refresh();
         }
         const dark = s.add.container(0, 0).setDepth(base - 0.008).setAlpha(0).setVisible(false);

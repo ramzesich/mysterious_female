@@ -1073,7 +1073,9 @@ game, two fine puffs, as the kid's jet is.
    plays the duet again, and any move key ends it at once. **With her hands full** (a tray, the cone, the canister,
    the coffee, Bumbot in her arms) he sings and waves her through and no scene starts: the cone's 45 s and the
    coffee's 50 s are untouched.
-3. **The cat paid too.** From near-catch 5 (`bb5`) until she has eaten with her husband (`table`): a few wet paw
+3. ~~**The cat paid too.**~~ **Dropped 2026-11-24** (the user, shown generated prints: "None of those looks like his
+   prints. Let's drop the prints entirely": every paw print of his is gone from the game, the dust on deck 8, the balcony's,
+   the wet trail from the pool). What it was: from near-catch 5 (`bb5`) until she has eaten with her husband (`table`): a few wet paw
    prints on the floor up to his spot from forward (about 3 m), and past him about 4 m of foamy ones, small heaps of
    suds that glint now and then. No words. **These prints are built here:** ~~the population spec's `sec_pawprints`
    (wet prints from the pool at 131 m aft to the machine at 213 m) was never built and is in no part of this plan;
@@ -1108,22 +1110,22 @@ squirt's two puffs (the design session's addition; the user hears it on the soun
 
 **Art, about 25 to 30 generations** (a guess): his character 10; `sing`, `squirt`, `wiggle` about 3 each; `wash`
 about 5; her clip 2 to 4; the stand 1 or 2 (the atlas has a `sanitizer` of 12 x 26 px that was never placed: looked at
-beside her first); the heads' estimates about 2. The prints are a few px each: made at their size by hand, wet and
-foamy, and shown enlarged on the café's and the lobby's real floors (the lobby's is patterned blue). Everything shown
+beside her first); the heads' estimates about 2. ~~The prints are a few px each: made at their size by hand, wet and
+foamy, and shown enlarged on the café's and the lobby's real floors (the lobby's is patterned blue).~~ (No prints: item
+3 dropped, 2026-11-24.) Everything shown
 to the user in the chat before it is placed, the clips composed over a real shot of the spot.
 
-**Open for the build:** his uniform (the user's description, above); where exactly he and the stand fit (above); whether the foamy prints read on the lobby's
-floor; the duet's two popups; that the first meeting's stop does not start while she is in the air or sliding.
+**Open for the build:** his uniform (the user's description, above); where exactly he and the stand fit (above); ~~whether the foamy prints read on the lobby's
+floor;~~ the duet's two popups; that the first meeting's stop does not start while she is in the air or sliding.
 
 **Tests:** a case `region6.washie`: the first coming with free hands plays the scene, sets `washie`, and she can move
 again within 3.5 s; the second coming does not hold her; with the cone in her hand no scene starts and her speed
-across 190 to 196 m is unchanged; a tangerine thrown to him comes back and the count is the same; the prints are there
-with `bb5` and gone with `table`; the hum shows only after `washie` (the idles' draw seeded). `region6` whole (the
+across 190 to 196 m is unchanged; a tangerine thrown to him comes back and the count is the same; ~~the prints are there
+with `bb5` and gone with `table`;~~ the hum shows only after `washie` (the idles' draw seeded). `region6` whole (the
 cone's run to the kid, the canister), `lang`, `boot`; `python tools/shoot_people.py washie`;
 `tools/check_overlaps.py` lists nothing. The start place `?at=buffet` is 23 m forward of him.
 
-**The documents, as it is built:** `docs/population.md` (deck 11's rows; `sec_pawprints` marked as built only by
-him), `GAME_DESIGN.md` §6.1's region 6, `CLAUDE.md`'s row for `src/world/lido.js`, `tools/cast.py`.
+**The documents, as it is built:** `docs/population.md` (deck 11's rows), `GAME_DESIGN.md` §6.1's region 6, `CLAUDE.md`'s row for `src/world/lido.js`, `tools/cast.py`.
 
 **When, and the date.** About a day and a half by the design session's guess (him and pieces 1 and 2 a day; 3 to 5
 half a day). Part 11 had used the spare days, so this moves the likely end from near the 25th of December to about
@@ -1203,13 +1205,13 @@ When we're done with this update, remind me to work on the balcony doors."
   changes nothing in them. Keep the hatch working (`door_hatch_pool`; the drain finds its pool by the hatch's place).
 - **The kid hangs on it:** `npc_kid_tub` until `bb5`, `npc_kid` on patrol after; his cone errand, and through it the
   machine's chain (the canister, her husband's cone), start only after the beat.
-- **The wet paw prints** (`paws` in `src/world/lido.js`, 141.2 to 213.6 m, 90 s) were built with it; part 12's own prints
-  by him (§7g item 3) must be reconciled with them.
+- ~~**The wet paw prints** (`paws` in `src/world/lido.js`, 141.2 to 213.6 m, 90 s) were built with it; part 12's own prints
+  by him (§7g item 3) must be reconciled with them.~~ Every paw print was dropped, 2026-11-24 (the user).
 - **His exit:** he runs off the screen along the pools, 24 m short of deck 11's door; the scene ignores his `exitX`
   (approved as it was in 2026-11-17's door review). Decide where he really goes.
 - **Part 6 (Bumbot made again, §7a)** remakes his `bat` and `shake`, which this scene plays: a fix made first is timed
   again once his clips change.
-- Tests: `region6` (the near-catch from the water, the drain, the lever, the prints, the hatch), `golden`, and the
+- Tests: `region6` (the near-catch from the water, the drain, the lever, the hatch), `golden`, and the
   `?did=bb5` cases (`jet11`).
 
 **U18, the near-catches' shared scene (`nearCatch` in `src/scenes/ShipScene.js`).** Her walk up to him, her reach and

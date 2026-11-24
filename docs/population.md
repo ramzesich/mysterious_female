@@ -723,7 +723,7 @@ lobby doors on 9 and 10 are the gold ones).
 | 128 | `haz_lever` | The drain lever on its housing | Thrown by Bumbot | Drawn |
 | 130 | the pool ladder | Built | | |
 | 131 | `bb_5` | Bumbot fishing at the first pool's aft rim | `scene` §9.7 | |
-| 131-213 | `sec_pawprints` | Wet paw prints along the deck aft to the ice cream machine, fading over 60 s after `bb_5` | Decor | Drawn |
+| ~~131-213~~ | ~~`sec_pawprints`~~ | ~~Wet paw prints along the deck aft to the ice cream machine, fading over 60 s after `bb_5`~~ **Dropped 2026-11-24** with every paw print of his (the user: "None of those looks like his prints. Let's drop the prints entirely") | | |
 | 132 | `sec_hottub` | The hot tub | `quirk(E)`: she sits in it, steam | A clip |
 | 136-160 | `npc_kid` | The kid with the water pistol | `patrol(136, 160, 1.0, squirt)`: squirts when she is within 4 m in front, every 2.5 s, the jet 3 m: "Splashed" (the wet gag, 16's, since 2026-11-19, whatever she carries); a jump clears him; the dash: he runs to 160 and hides 10 s; with a cone in her hand he waits, bubble (a soft serve); a stub: he takes it, frowns, resumes in 3 s; perfect: he eats, ally for good: `patrol(135, 160)` squirting gulls | Walk, squirt, run, eat |
 | 142 | `riv_loungers` | The rival on his knees looking under a lounger; the kid squirts him now and then | `glimpse(region 6)`, a loop | |
@@ -934,7 +934,7 @@ Input locked unless said; each sets its save flag.
 7. **`bb_5` near-catch 5 (the pool, 131):** he bats at the water on the rim; within 3 m she bends;
    the kid at 136 squirts, the jet hits him; he leaps and falls in with a splash; she topples in too
    (play resumes in the water: she swims out); he scrambles up the ladder at 130 onto the lever's
-   housing at 128, shakes (the wet shake) and bolts aft, wet paw prints after him; **`scn_drain`:**
+   housing at 128, shakes (the wet shake) and bolts aft (~~wet paw prints after him~~, dropped 2026-11-24); **`scn_drain`:**
    the lever drops, the water sinks over 5 s with a gurgle, the hatch at 125 shows in the tank's
    floor. **`scn_machine`:** the first cone at `src_icecream` empties it (a sad sputter); her
    husband's bubble shows the canister; `room_coldroom` has it; E at the machine with the canister:

@@ -2,7 +2,7 @@
 // 7), mixed into the Story: Bumbot fishing at the pool and what the kid's water pistol does about it,
 // the pool draining; the kid on the aft pool deck (a hazard, then an ally); the soft serve machine
 // and its swirl; the cone for the kid, the canister, the table with her husband; the chess set, the
-// hot tub; the wet paw prints aft. Places come from maps/world.json (`lido`).
+// hot tub. Places come from maps/world.json (`lido`).
 
 import { PLAYER, SWIM } from '../config.js';
 import { sfx } from '../sfx.js';
@@ -33,21 +33,16 @@ export const lido = {
         this.poolCat = cat;
         // The drain's lever on its housing, by the rim.
         this.lever = s.add.image(L.leverX, L.y, P.has('drain') ? 'lever-down' : 'lever-up').setOrigin(0.5, 1).setDepth(D.props - 0.03);
-        // The kid's jets of water; the wet paw prints aft; the chess pawn she moves.
+        // The kid's jets of water; the chess pawn she moves. (No wet paw prints after Bumbot since 2026-11-24: the user
+        // dropped his prints everywhere.)
         this.jetG = s.add.graphics().setDepth(D.player + 0.2);
-        this.paws = s.add.graphics().setDepth(D.props - 0.04).setAlpha(0);
-        this.paws.fillStyle(0x4d65b4, 0.8);
-        for (let x = L.pawsA, n = 0; x < L.pawsB; x += 14, n++) {
-            const y = L.y - (n % 2 ? 2 : 4);
-            this.paws.fillRect(x, y, 3, 2).fillRect(x - 1, y - 1, 1, 1).fillRect(x + 1, y - 2, 1, 1).fillRect(x + 3, y - 1, 1, 1);
-        }
         this.pawn = s.add.image(L.chessX + 14, L.y - 2, 'chess-pawn').setOrigin(0.5, 1).setDepth(D.decor + 0.3);
         if (this.P.save.seen.includes('sec_chess')) this.pawn.x += 16;
         // The machine: its light (green: it has mix), the cone under its spout, the swirl's meter.
         this.mLight = s.add.rectangle(L.machineX + 9, L.y - 39, 3, 2, 0x1ebc73).setDepth(D.decor + 0.3);
         this.mCone = s.add.graphics().setDepth(D.props + 0.04).setVisible(false);
         this.mMeter = s.add.graphics().setDepth(D.fx + 0.4).setVisible(false);
-        w.add([this.lever, this.jetG, this.paws, this.pawn, this.mLight, this.mCone, this.mMeter]);
+        w.add([this.lever, this.jetG, this.pawn, this.mLight, this.mCone, this.mMeter]);
         w.things.push({ id: 'src_icecream', x: L.machineX, y: L.y, route: 'inside', items: [], reach: 22, interact: () => this.machine() });
         w.things.push({ id: 'sec_chess', x: L.chessX, y: L.y, route: 'inside', items: [], reach: 26, interact: () => this.chess() });
         w.things.push({ id: 'sec_hottub', x: L.tubX, y: L.y, route: 'inside', needs: 'bb5', items: [], reach: 22, interact: () => this.hotTub() });
@@ -119,12 +114,6 @@ export const lido = {
         this.swirling(dt, time, input);
         if (this.soaking && time > this.soaking.from && (input.jumpPressed || input.activatePressed || input.leftPressed || input.rightPressed
             || input.upPressed || input.downPressed)) this.soaking.out = true;
-        // The paw prints dry.
-        if (this.pawsAt) {
-            const k = 1 - (time - this.pawsAt) / 90000;
-            this.paws.setAlpha(Phaser.Math.Clamp(k * 1.6, 0, 0.85));
-            if (k <= 0) this.pawsAt = 0;
-        }
     },
 
     // --- Near-catch 5 (population §6.7) ---------------------------------------------------------
@@ -234,7 +223,6 @@ export const lido = {
         cat.away = true;
         c.setVisible(false).stop();
         this.tubBusy = false;
-        this.pawsAt = s.time.now;
         // Play goes on, in the water if that is where she is; the flag pulls the plug (`drain`).
         if (swimming && pool) {
             s.mode = 'swim';

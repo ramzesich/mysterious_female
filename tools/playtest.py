@@ -3531,7 +3531,6 @@ def scenario_region5(b):
     wait(0.5)
     ok &= check(js(b, f"{thing('shaft_exit_hang')}.items[0].visible") and js(b, f"{thing('shaft_exit_hole')}.items[0].visible"),
                 "the grille she dropped out of hangs open by the slot it left in the ceiling")
-    ok &= check(js(b, f"{thing('prop_paws_8')}.items[0].visible"), "paw prints in the dust, toward the lobby's door")
     b.shot("region5-grille")
     # The party.
     px = js(b, f"{thing('amb_party')}.x")
@@ -3679,7 +3678,6 @@ def scenario_region6(b):
     b.shot("region6-beat")
     ok &= check(wait_js(b, f"{S}.save.flags.includes('bb5')", 14), "near-catch 5: the kid squirts him, he falls in, climbs out over the lever and is gone aft", flags(b))
     ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.texture.key") == "lever-down", "the drain's lever is down")
-    ok &= check(wait_js(b, f"{W}.story.paws.alpha > 0.3", 2), "wet paw prints lead aft")
     ok &= check(b.state()["mode"] == "swim", "she is still in the water as it starts to sink", b.state())
     ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())
     b.shot("region6-drained")
