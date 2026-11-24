@@ -119,6 +119,11 @@ And, on seeing nothing yet but while the stack was being roughed on the cart wit
    from below the entrance"): his belly was at 816, the shaft's floor for her, while the mouth as drawn opens from 779
    to 811 and its box ends at 814: he showed under the box, his paws out below it at the wall. At 811 he is inside the
    opening. (So it was in the game before this remake too.)
+10. **The holes in the mouth's near side are filled** (the user, at the preview: "in some frames, on the entrance,
+    when Bumbot crawls inside, a black pixel shows"): the near side's picture has 17 px that are empty inside its
+    outline, where the wall shows through; one of them, at 5855, 806, is at his height, and he showed through it in
+    29 of the crawl's 44 moments. Each is filled with what the room shows there, so nothing changes at rest and
+    nothing behind the box shows through it, her neither (`tools/build_shaft.py`).
 
 ## The art (to the preview stop)
 
