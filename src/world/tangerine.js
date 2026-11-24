@@ -37,6 +37,8 @@ export class LooseTangerines {
         add(s.routeWalls || [], (o, zone) => zone.route === route(o));
         for (const b of s.bulkheads) add(b.zone, o => !b.open && route(o) === 'inside');
         add(s.railingStops || []);
+        // (On the funnel's stairway it is out over the ship's side, in front of it as she is there.)
+        add(s.treads || [], o => route(o) === 'inside' && !!o.setDepth(s.DEPTH.exterior + 0.13));
         if (s.cabin) add(s.cabin.bed, (o, bed) => route(o) === 'cabin' && o.body.velocity.y >= 0 && o.body.bottom <= bed.body.top + 6);
         // (A side walk, a balcony's floor: from above only.)
         add(s.walkGroup, (o, zone) => route(o) === 'inside' && o.body.velocity.y >= 0 && o.body.bottom <= zone.body.top + 6);

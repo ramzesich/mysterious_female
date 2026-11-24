@@ -571,15 +571,18 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
 
 ## 7. Part 5: small faults and leftovers (small each)
 
-- **Never tried in the game:** a thrown tangerine at the funnel's gulls, and at Bumbot at the
-  tip. Try both; a case each in `throw` or `finale`.
-- **Two `deck4` checks failed now and then before the stepped clock:** the breakfast round
+- ~~**Never tried in the game:** a thrown tangerine at the funnel's gulls, and at Bumbot at the
+  tip. Try both; a case each in `throw` or `finale`.~~ **Done 2026-11-24:** both had a fault, mended (the stairway's
+  treads for a tangerine, a gull only to one lying still; Bumbot only from one coming at him); `throw.funnel`, `throw.tip`.
+- ~~**Two `deck4` checks failed now and then before the stepped clock:** the breakfast round
   moving on (once in three runs), and the lob onto the climb's shelf not knocking the feather
-  down (once in four, cause not found). See whether they still do (`--seed`), and find the cause.
+  down (once in four, cause not found). See whether they still do (`--seed`), and find the cause.~~ **Closed
+  2026-11-24:** 20 stepped runs (seeds 1 to 20) and 3 real ones pass; not reproduced.
 - ~~**"Standing still with a book she reads where she stands"** (`GAME_DESIGN.md` §6.1.2) has no
   code: she reads only in the chair and on her bed. Her reading clips exist.~~ **Dropped 2026-11-22** (the user).
-- **V8** (her word's white box has no outline) and **V10** (the party cabin's music notes drawn
-  at the wall's depth): left out "unless the user asks". Ask once; a few lines each.
+- ~~**V8** (her word's white box has no outline) and **V10** (the party cabin's music notes drawn
+  at the wall's depth): left out "unless the user asks". Ask once; a few lines each.~~ **Done 2026-11-24:** V8 settled by
+  the popups' remake; V10 on the user's yes, the notes above the world.
 - **Sound, the engine's leftovers** (the user hears, the builder cannot): a held sound that can
   be stopped (the soft serve's motor is short pieces end to end); eating and drinking are mostly
   silent; the intro has a checkpoint's chime and a door and no more.

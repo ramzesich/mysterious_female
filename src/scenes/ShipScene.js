@@ -582,6 +582,7 @@ export class ShipScene extends Phaser.Scene {
                         const [fg, fr] = [this.add.graphics().setDepth(DEPTH.exterior + 0.06), this.add.graphics().setDepth(DEPTH.player + 0.3)];
                         this.worldLayer.add([fg, fr]);
                         this.drawStairs(fg, fr, flight);
+                        this.stairTreads(flight);
                     } else if (flight.front) this.drawStairs(stairsGfx.front, stairsGfx.frontRail, flight);
                     else this.drawStairs(stairsGfx.back, stairsGfx.backRail, flight);
                     break;
@@ -1699,6 +1700,28 @@ export class ShipScene extends Phaser.Scene {
     // How many steps a flight is drawn with: one each 8 px of its rise. Step i's corner is at `i / steps`.
     stairSteps(f) {
         return Math.max(2, Math.round((f.bottom.y - f.top.y) / 8));
+    }
+
+    // The funnel's stairway, out over the open air, has treads for a tangerine to land on: one thrown off
+    // the funnel's top bounces down it step by step (it fell straight through them, part 5). She walks
+    // its flights by their line; these are only the fruit's (`LooseTangerines.addColliders`).
+    stairTreads(f) {
+        const steps = this.stairSteps(f), at = t => {
+            const q = this.stairPoint(f, t);
+            return { x: Math.round(q.x), y: Math.round(q.y) };
+        };
+        for (let i = 0; i < steps; i++) {
+            const p0 = at(i / steps), p1 = at((i + 1) / steps);
+            const x = Math.min(p0.x, p1.x), w = Math.max(1, Math.abs(p1.x - p0.x)), h = Math.max(2, p0.y - p1.y);
+            const z = this.add.zone(x, p1.y, w, h).setOrigin(0);
+            this.physics.add.existing(z, true);
+            (this.treads ||= []).push(z);
+        }
+    }
+
+    // The top of the funnel stairway's tread at x, if there is one there.
+    treadTop(x) {
+        return this.treads?.find(z => x >= z.x && x < z.x + z.width)?.y ?? null;
     }
 
     flightLength(f) {

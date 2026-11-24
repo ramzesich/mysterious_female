@@ -4719,3 +4719,24 @@ decision with the user's words, is `docs/pool-remake-log.md`**; in short:
   `mishaps`, `region4`, `boot` pass (`mishaps.things`' sprinkler case failed before this, as it does now: a door's gag
   reaches her first).
 
+## Part 5, the small faults: the throws at the funnel and the tip, the deck 4 checks, V8 and V10 (2026-11-24)
+
+- **A tangerine thrown at the funnel's gulls** (tried in the game for the first time): rolled toward the stairway it went
+  off the funnel's top and fell straight through the steps, and a gull came down to it in the air and stood on nothing.
+  The stairway now has treads for a tangerine only (`stairTreads`, `treads` in the ship scene; she still walks it by its
+  line): it bounces down step by step and lies on one, hers again as she walks the flight. A funnel gull comes only to one
+  lying on something, on the stairway only once it lies still, and stands on its tread (or the one under it, looking up a
+  step), never in the step above (`gullTakes(..., { side, footAt })`). Thrown the other way it lies on the top, out of
+  their reach. On a tread it is drawn at the stairway's depth, in front of the ship's side.
+- **A tangerine thrown at Bumbot at the tip:** a roll at him sends him back along the deck and, cornered, past her, as
+  built. A lob from close went over his head, landed behind him and rolled away, and he went after it: he now answers
+  only one coming at him, and backs away from it (`tipOffered`).
+- New cases `throw.funnel`, `throw.tip`. `throw` had failed since e4f719c: it waited for the pool gull's `fed`, gone with
+  its flight's rework (the gull took the fruit as it should); the check waits for its flight off with it.
+- **The two `deck4` checks that failed now and then before the stepped clock** (the breakfast round moving on, the lob onto
+  the climb's shelf): 20 runs stepped under seeds 1 to 20 and 3 in real time at once all pass. Not reproduced, so no
+  cause named; most likely real time's uneven frames (the lob's arc to a narrow shelf) and the breakfast round's rework
+  since. Closed.
+- **V8** (her word's box with no outline) was settled by the popups' remake (a dark outline). **V10** (the party cabin's
+  notes at the wall's depth), the user's yes: drawn above the world as every other small mark.
+- `throw`, `region8`, `finale`, `region4`, `region5` pass.

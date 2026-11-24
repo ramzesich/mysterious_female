@@ -1097,9 +1097,11 @@ export class Story {
         // Its beat through the door, and now and then a party horn.
         sfx.at(d.x, d.y).thump();
         if (Math.floor(time / 520) % 12 === 0) sfx.at(d.x, d.y).toot();
+        // (Above the world as every other small mark, so that no one at the door covers them (V10, the user,
+        // 2026-11-24); heard from the shaft over it they stay at the wall's depth, under the shaft's dark.)
         const note = s.add.text(d.x + Phaser.Math.Between(-8, 14), d.y - 50, ['♪', '♫', '♪'][Math.floor(time / 520) % 3], {
             fontFamily: 'Verdana, sans-serif', fontSize: '9px', color: ['#e83b3b', '#4d9be6', '#905ea9'][Math.floor(time / 520) % 3], resolution: 4,
-        }).setOrigin(0.5).setDepth(s.DEPTH.decor + 0.3);
+        }).setOrigin(0.5).setDepth(above ? s.DEPTH.decor + 0.3 : s.DEPTH.fx);
         w.add([note]);
         s.tweens.add({ targets: note, y: note.y - 34, x: note.x + Phaser.Math.Between(-14, 14), alpha: 0, duration: 1500, ease: 'Sine.easeOut', onComplete: () => note.destroy() });
     }

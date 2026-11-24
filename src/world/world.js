@@ -2574,10 +2574,12 @@ export class World {
     // A gull comes down to a tangerine, pecks at it and flies off with it in its beak
     // (docs/plan-three-uses.md §2). The bird's sprite is the caller's: left hidden at the end, its
     // origin as it was, for the caller to bring back; `done()` then.
-    gullTakes(sprite, t, done) {
+    gullTakes(sprite, t, done, { side, footAt } = {}) {
         const s = this.scene, img = s.loose.claim(t);
         const ox = sprite.originX, oy = sprite.originY;
-        const x = img.x, foot = img.y + 3, off = x < sprite.x ? -1 : 1;
+        // (`side`: which side of it the bird stands, -1 to its right; `footAt(x)`: the floor under the bird
+        // where it is not the fruit's, a stair's tread.)
+        const x = img.x, off = side ?? (x < sprite.x ? -1 : 1), foot = footAt?.(x - off * 6) ?? img.y + 3;
         const down = s.textures.get('things').has('gull-down');
         img.setDepth(sprite.depth - 0.001);
         sprite.setOrigin(0.5, 1).setVisible(true).setAlpha(1).setFlipX(off < 0);

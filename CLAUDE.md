@@ -716,6 +716,16 @@ Lessons learned (2026-11-24, the shrug and the popups):
 - **A start link is walked before it is given:** deck 5's corridor from La Cucina ends in a wall at 167 m, and the user
   walked it looking for Bumbot at 244 m.
 
+Lessons learned (2026-11-24, part 5's throws):
+
+- **A thing that moves by physics meets only what has a body for it:** her stairs are a line she is moved along, so a
+  tangerine fell straight through the funnel's steps. A new kind of floor she walks by script needs bodies for the loose
+  things too (`treads`).
+- **A taker that comes to a thing comes to it where it lies:** a gull came down to a tangerine still in the air and stood
+  on nothing. Offer a thing to takers once it is on something, and stand the taker on its own floor.
+- **A check that waits for a field fails silently when the field is renamed:** `throw` waited for a gull's `fed`, gone a
+  week before, and timed out while the game worked. When a mover's fields change, grep the playtests for them.
+
 ## Working with the user
 
 - **Start each session from `docs/plan-the-rest.md`** (what is left, in the order to build it).

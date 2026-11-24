@@ -1529,11 +1529,12 @@ def scenario_throw(b):
     # (From the deck past them, facing back: short of them is the pool.)
     gx1 = b.eval(f"{g}.def.x1")
     throw(gx1 + 150, D11, face=-1)
-    b.wait_for(f"{g}.fed || {g}.fruit", timeout=6)
-    ok &= check(b.eval(f"!!({g}.fruit || {g}.fed)"), "a gull at the pool comes down for it", b.eval(f"{g}.state"))
+    # (Its fruit is the one it took; `up` is its flight off with it: there is no `fed` since e4f719c.)
+    b.wait_for(f"{g}.fruit", timeout=6)
+    ok &= check(b.eval(f"!!{g}.fruit"), "a gull at the pool comes down for it", b.eval(f"{g}.state"))
     wait(0.5)
     b.shot("throw-gull")
-    b.wait_for(f"{g}.fed", timeout=5)
+    b.wait_for(f"!{g}.fruit && {g}.state === 'up' && {g}.loot.visible", timeout=5)
     ok &= check(not loose() and b.state()["tangerines"] == 2, "and goes off with it", loose())
 
     # The piñata, by a lob from under it (it hangs in a small room past a wall): down it comes, three
@@ -1670,6 +1671,72 @@ def scenario_throw__sardines(b):
     b.tap("e")
     wait(0.4)
     ok &= check("keep:cat:sardines" in b.eval(f"{S}.save.keeps"), "and E takes it", b.eval(f"{S}.save.keeps"))
+    return ok
+
+
+def scenario_throw__funnel(b):
+    """A tangerine thrown at the funnel's gulls (part 5): rolled off the funnel's top it bounces down the stairway's
+    treads (it fell straight through them before) and lies on one; a gull comes down to it only once it lies still,
+    stands on its tread, and goes off with it; thrown the other way, out of their reach, it lies on the top."""
+    S = "window.__ship"
+    W = f"{S}.world.story.funnelWind"
+    b.open("?reset&play&at=funnel")
+    wait(0.5)
+    b.eval(f"{W}.taker = {{}}")     # (the gulls held off at first: where does it go by itself?)
+    b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud(); {S}.player.setFlipX(true)")
+    b.tap("f")
+    b.wait_for(f"{S}.loose.all[0]?.resting", timeout=8)
+    t = b.eval(f"(t => [t.img.x, t.img.y + 3])({S}.loose.all[0])")
+    top = b.eval(f"{S}.treadTop({t[0]})")
+    ok = check(top is not None and abs(t[1] - top) <= 3 and t[1] < D12 - 100, "off the top, it bounces down the stairway and lies on a tread", (t, top))
+    b.eval(f"{W}.taker = null")
+    ok &= check(wait_js(b, f"!!{W}.taker", 4), "a gull comes down to it")
+    b.wait_for(f"{W}.taker?.sprite.frame.name === 'gull-perched'", timeout=4)
+    g = b.eval(f"(g => [g.sprite.x, g.sprite.y])({W}.taker)")
+    ok &= check(abs(g[1] - b.eval(f"{S}.treadTop({g[0]})")) <= 2, "and stands on a tread, not in a step", g)
+    b.shot("throw-funnel-gull")
+    ok &= check(wait_js(b, f"!{W}.taker && !{S}.loose.all.length", 6), "and goes off with it")
+    # The other way, out of their reach: it lies on the funnel's top.
+    b.eval(f"{W}.quietUntil = 0; {S}.player.setFlipX(false)")
+    b.tap("f")
+    b.wait_for(f"{S}.loose.all[0]?.resting", timeout=8)
+    wait(1.0)
+    ok &= check(b.eval(f"{S}.loose.all.length") == 1 and not b.eval(f"!!{W}.taker"), "thrown away from them, it lies on the top, untouched")
+    return ok
+
+
+def scenario_throw__tip(b):
+    """A tangerine thrown at Bumbot on the tip of the bow (part 5): one rolling at him sends him back along the deck,
+    away from it, and once he is cornered at the tip it sends him darting past her; a lob over his head that lands
+    behind him and rolls away does nothing (he went after it before)."""
+    S = "window.__ship"
+    T = f"{S}.world.story"
+    b.open("?reset&play&at=bow&did=sunset")
+    wait(0.5)
+    Mo = b.eval(f"{S}.world.data.finale.mooring")
+    cat = lambda: b.eval(f"Math.round({T}.tipCat.x)")
+    b.teleport(Mo["catX"] + 250, Mo["y"])
+    wait(0.3)
+    her = b.state()["x"]
+    b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud(); {S}.player.setFlipX(true)")
+    b.tap("f")
+    ok = check(wait_js(b, f"{T}.tip.spooks >= 1", 3), "a roll at him: he backs off")
+    b.wait_for(f"!{T}.tip.busy", timeout=3)
+    ok &= check(cat() < Mo["catX"] - 40, "along the deck, away from it", cat())
+    ok &= check(wait_js(b, f"{T}.tip.spooks >= 2", 3), "it rolls on at him, cornered")
+    wait(1.5)
+    ok &= check(cat() > her + 60, "he darts past her", (cat(), her))
+    b.open("?reset&play&at=bow&did=sunset")
+    wait(0.5)
+    b.teleport(Mo["catX"] + 150, Mo["y"])
+    wait(0.3)
+    b.eval(f"{S}.save.tangerines = 3; {S}.refreshHud(); {S}.player.setFlipX(true)")
+    b.key("up", True)
+    b.tap("f")
+    b.key("up", False)
+    b.wait_for(f"{S}.loose.all[0]?.resting", timeout=4)
+    ok &= check(b.eval(f"{S}.loose.all[0].img.x") < cat() and b.eval(f"{T}.tip.spooks") == 0,
+                "a lob over his head, landing behind him: he takes no notice", (b.eval(f"{S}.loose.all[0].img.x"), cat()))
     return ok
 
 

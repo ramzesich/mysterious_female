@@ -548,12 +548,22 @@ export class FunnelWind {
     offered(t) {
         const c = this.centre, s = this.scene;
         if (this.state !== 'circle' || this.taker || Math.abs(t.img.x - c.x) > 300 || t.img.y < c.y - 100 || t.img.y > c.y + 400) return false;
-        const b = this.taker = this.gulls[(this.turn + 1) % this.gulls.length];
+        // (Only on something: a gull came down to one in the air and stood on nothing, part 5.)
+        const on = t.img.body && (t.img.body.blocked.down || t.img.body.touching.down);
+        if (!t.resting && !on) return false;
+        const b = this.gulls[(this.turn + 1) % this.gulls.length];
+        // (On the stairway it waits until the fruit lies still, and stands on the fruit's tread, or on the
+        // one under it looking up a step; never in the step above.)
+        const foot = t.img.y + 3, tread = x => s.treadTop(x) ?? 1e9;
+        if (Math.abs(tread(t.img.x) - foot) <= 4 && !t.resting) return false;
+        const downhill = tread(t.img.x - 6) > tread(t.img.x + 6) ? 1 : -1;
+        const side = Math.abs(tread(t.img.x - 6) - foot) <= 4 ? 1 : Math.abs(tread(t.img.x + 6) - foot) <= 4 ? -1 : downhill;
+        this.taker = b;
         this.quietUntil = s.time.now + 10000;
         this.world.gullTakes(b.sprite, t, () => {
             this.taker = null;
             b.sprite.setVisible(true);
-        });
+        }, { side, footAt: x => s.treadTop(x) });
         return true;
     }
 
