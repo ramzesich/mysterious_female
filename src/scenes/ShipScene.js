@@ -448,7 +448,9 @@ export class ShipScene extends Phaser.Scene {
         // (the user, 2026-11-08).
         const open = this.viewDeck !== null
             && !this.exteriorLayer.getTileAt(Math.floor(p.x / 16), this.deckFloors[Math.round(this.viewDeck)] - 4);
-        const on = this.route === 'inside' && this.viewDeck !== null && !open && this.viewOverride == null ? 1 : 0;
+        // (`dimHeld`: a scripted way from one deck into another that holds the view by `viewOverride` and is still hers:
+        // down the pool's hatch, the decks dimmed as they are for her.)
+        const on = this.route === 'inside' && this.viewDeck !== null && !open && (this.viewOverride == null || this.dimHeld) ? 1 : 0;
         const smooth = dt > 0 && this.route === 'inside';
         // (`dimOverride`: the intro brings the dark on with the opening of deck 3's side.)
         d.shown = this.dimOverride != null ? this.dimOverride : smooth ? approach(d.shown, on, dt * 6) : on;
@@ -457,7 +459,9 @@ export class ShipScene extends Phaser.Scene {
             // (Her head counts in the deck above only past its floor, not in the ceiling under it:
             // jumping on deck 4's climb shelf, her head touched the ceiling and deck 5's dim lifted
             // and came back each jump, the user, 2026-11-17. A piece reaches 16 px under its floor.)
-            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16;
+            const hers = p.x >= c.x0 && p.x < c.x1 && p.y > c.y0 && p.y - PLAYER.height < c.y1 - 16
+                // (Dropping out of the pool's hatch her head is still at the deck above's height: that deck is not hers.)
+                && (!this.dimHeld || c.keys.some(k => parseInt(k, 10) === Math.round(this.viewDeck)));
             // (A deck a look-out opens is dimmed as its hull still shows, hers or not, so that the hull and its dim fade
             // together: `world.lookOpen`, the cut-away.)
             const look = this.world?.lookOpen, looked = look && c.keys.some(k => look[k]);
@@ -3775,6 +3779,8 @@ export class ShipScene extends Phaser.Scene {
             for (const t of this.poolTiles) t.alpha = this.underPools(t.poolDeck) ? 0 : 1;
             for (const [deck, g] of Object.entries(this.poolTanks)) g.setVisible(!this.underPools(Number(deck)));
             for (const pool of this.pools) [pool.water, pool.ripples].forEach(s => s.setVisible(!this.underPools(pool.deck)));
+            // (What the world draws in a tank, the first pool's ladder, grate and hatch: `world.poolPieces`.)
+            for (const e of this.world?.poolPieces ?? []) e.obj.setVisible(e.want && !this.underPools(e.deck));
         }
         // (The strips of the ship's wall drawn over her at a deck's ends: not over a room she is in.)
         this.endCoverGfx.setVisible(this.route === 'inside' || this.route === OUTSIDE);

@@ -45,7 +45,7 @@ const PIECES = {
     src_icecream: 'ice-cream-machine', src_coffee: 'coffee-station', src_cocktail: 'pool-bar', src_lunch: 'service-station',
     sec_swan: 'ice-swan', sec_jackpot: 'slot-pair', sec_hottub: 'hot-tub', sec_slide: 'kids-slide', sec_piano: 'grand-piano',
     sec_captain: 'door-cabin', sec_telescope: 'telescope', sec_chess: 'chess-pawn', sec_peek_sea: 'peek-sea',
-    sec_oddbook: 'bookcase', sec_chair: 'reading-chair',
+    sec_oddbook: 'bookcase', sec_chair: 'reading-chair', hatch_pool: ['pool-hatch-shut', 'pool-hatch-back'],
 };
 // Things drawn into a room's picture: the room's picture, a box [x, y, w, h] in it a px wider than the thing all
 // round but at its foot (the wall round it is found from the box's edge: `boxPicture`), and whether the thing is
@@ -169,8 +169,11 @@ export class Highlight {
             const t = tg.thing, name = PIECES[t.id] ?? (t.id.startsWith('sec_chair_') ? 'reading-chair' : null)
                 ?? (t.id.startsWith('haz_dnd') ? 'door-cabin-dnd' : null);
             if (name) {
-                const o = this.piece(name, t.x, t.level ?? t.y, (t.reach ?? 18) + 16);
-                if (o) add(o);
+                // (A thing with a picture for each of its states names them all: the first one showing.)
+                for (const n of [].concat(name)) {
+                    const o = this.piece(n, t.x, t.level ?? t.y, (t.reach ?? 18) + 16);
+                    if (o) { add(o); break; }
+                }
             } else {
                 for (const i of t.items ?? []) if (i?.type === 'Image' || i?.type === 'Sprite') add(i);
             }

@@ -48,6 +48,13 @@ export class BootScene extends Phaser.Scene {
         for (const what of ['strip', 'front', 'mouth', 'cover', 'cover-down', 'hatch', 'hatch-open']) this.load.image(`shaft-${what}`, `assets/ship/shaft/${what}.png`);
         this.load.json('shaft', 'assets/ship/shaft/shaft.json');
         this.load.atlas('shaft-slide', 'assets/ship/shaft/slide.png', 'assets/ship/shaft/slide.json');
+        // The pool's scene (tools/build_pool.py): the drain's lever, the hatch in the tank's floor, the drain's grate, the
+        // ladder's lower part, the ceiling panel in deck 10's hallway; where each stands.
+        this.load.json('pool-layout', 'assets/ship/pool/pool.json');
+        this.load.image('pool-lever-strip', 'assets/ship/pool/lever.png');
+        for (const what of ['hatch-shut', 'hatch-back', 'hatch-lip', 'drain', 'ceiling-shut', 'ceiling-open', 'ladder-low']) {
+            this.load.image(`pool-${what}`, `assets/ship/pool/${what}.png`);
+        }
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });

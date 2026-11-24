@@ -498,7 +498,7 @@ def build_world():
                 kidA=B.exact_x(LIDO["kid"][0]), kidB=B.exact_x(LIDO["kid"][1]), loungerX=B.exact_x(LIDO["lounger"]),
                 chessX=B.exact_x(LIDO["chess"]), machineX=B.exact_x(LIDO["machine"]), husbandX=B.exact_x(LIDO["husband"]),
                 tableX=B.exact_x(LIDO["table"]), pawsA=B.exact_x(LIDO["paws"][0]), pawsB=B.exact_x(LIDO["paws"][1]),
-                pools=pools, tankY=ly + B.POOL_DEPTH)
+                pools=pools, tankY=ly + B.POOL_DEPTH, drainX=B.exact_x(LIDO["drain"]))
 
     # Region 8's (src/world/topdeck.js): the old lady's sunbed, the court's balls, the flares, the
     # pinata, the aft terrace's gusts and gull, the funnel's wind, gulls and top, the bow's flocks.
@@ -578,7 +578,7 @@ def build_world():
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
                 outside=dict(platforms=platforms, walls=walls, glass=glass, covers=covers, partition=PARTITION_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
-                hatchPool=dict(x=B.x_of(125), y=B.floor_y(11), toY=B.floor_y(10)),
+                hatchPool=dict(x=B.exact_x(LIDO["hatch"]), y=B.floor_y(11), toY=B.floor_y(10)),
                 trapdoor=dict(x=B.exact_x(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],
                               landX=room_x0[TRAPDOOR_LANDS[0]] + TRAPDOOR_LANDS[1]),
                 catch=dict(x=B.x_of(CATCH_M), y=B.floor_y(7)),

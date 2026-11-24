@@ -6,6 +6,7 @@ Every frame is converted to Resurrect 64 (tools/palettize.py).
     python tools/build_people.py
 """
 
+import colorsys
 import json
 from pathlib import Path
 
@@ -85,6 +86,95 @@ def kept(done, raw, colours):
     return out
 
 
+# --- The kid's water pistol, light green with blue lines (the user, 2026-11-24: it was golden orange, "hard to
+# distinguish from his ice cream") ---------------------------------------------------------------------------------
+# Found in each of his source frames by its colour and repainted there, before the frame is made smaller and put on
+# the palette (a cast's `"repaint": "pistol"`): the strong yellows and oranges below his cap that hang together, with
+# the darkest shade and the pale lights joined to them. Not his skin (paler), not his shirt's stripes (pale and thin),
+# not his cap (redder, higher), not the cone of his eating clip (in front of him: the pistol is tucked in at his back
+# there). Its handle's tip stays orange, as a toy's does. Looked at in all 41 frames.
+H0, H1, SAT, VAL, MIN = 17, 64, 0.66, 0.45, 12     # its hues from, to; at least this saturated, this light; a part's least size
+DEEP = 6                         # its darkest shade: hue from here up to H0 (his cap's red is below, and never joined to it)
+PALE = (33, 66, 0.28, 0.85)      # its lights: hue from, to; at least this saturated, this light
+
+
+def hsv(c):
+    hh, s, v = colorsys.rgb_to_hsv(c[0] / 255, c[1] / 255, c[2] / 255)
+    return hh * 360, s, v
+
+
+def pistol(im, clip):
+    """The pixels of the kid's water pistol in one of his source frames."""
+    p = im.load()
+    w, hgt = im.size
+    m, pale, deep = set(), set(), set()
+    box = im.getbbox()
+    low = box[1] + (box[3] - box[1]) * 0.36          # (nothing of it is as high as his cap)
+    for y in range(hgt):
+        for x in range(w):
+            c = p[x, y]
+            if c[3] < 128:
+                continue
+            hh, s, v = hsv(c)
+            if H0 <= hh <= H1 and s >= SAT and v >= VAL:
+                m.add((x, y))
+            elif DEEP <= hh < H0 and s >= SAT and v >= VAL and y > low:
+                deep.add((x, y))
+            elif PALE[0] <= hh <= PALE[1] and s >= PALE[2] and v >= PALE[3]:
+                pale.add((x, y))
+    seen, gun = set(), set()
+    for s0 in m:
+        if s0 in seen:
+            continue
+        comp, todo = [], [s0]
+        seen.add(s0)
+        while todo:
+            x, y = todo.pop()
+            comp.append((x, y))
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    q = (x + dx, y + dy)
+                    if q in m and q not in seen:
+                        seen.add(q)
+                        todo.append(q)
+        if len(comp) < (4 if clip == "eat" else MIN):
+            continue
+        if clip == "eat":
+            # (His cone is in front of him, by his mouth; the pistol is tucked in at his back.)
+            cx = sum(x for x, _ in comp) / len(comp)
+            bb = im.getbbox()
+            if cx > (bb[0] + bb[2]) / 2 - 1:
+                continue
+        gun.update(comp)
+    for _ in range(3):
+        gun |= {q for q in deep if q not in gun and any((q[0] + dx, q[1] + dy) in gun for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+    # its lights: pale yellow joined to it (a shirt's pale stripe is taken only where it touches the pistol)
+    for _ in range(2):
+        gun |= {q for q in pale if q not in gun and sum((q[0] + dx, q[1] + dy) in gun for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))) >= 2}
+    return gun
+
+
+def turn(c):
+    """Its yellows to light green; its oranges, the shade along it and its lines, to blue."""
+    hh, s, v = hsv(c)
+    if hh >= 33:
+        nh, ns, nv = 100, min(0.52, s * 0.62), v
+    elif hh >= 17:
+        nh, ns, nv = 207, 0.6, min(1.0, v * 1.02)
+    else:
+        nh, ns, nv = 222, 0.62, min(1.0, v * 1.0)
+    r, g, b = colorsys.hsv_to_rgb(nh / 360, ns, nv)
+    return (round(r * 255), round(g * 255), round(b * 255), c[3])
+
+
+def repainted(im, clip):
+    out = im.copy()
+    p = out.load()
+    for (x, y) in pistol(im, clip):
+        p[x, y] = turn(p[x, y])
+    return out
+
+
 def cell_of(img, feet, flip):
     """The frame in a cell: centred as its canvas is, the row `feet` on the cell's bottom row."""
     if flip:
@@ -108,6 +198,10 @@ def build():
         flip = opts.get("flip", False)
         scale = opts.get("scale")
         load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale)) if scale else (lambda path: palettize(Image.open(path)))
+        if opts.get("repaint") == "pistol":
+            plain_load = load
+            raw_load = (lambda path: shrunk(palettize(repainted(Image.open(path).convert("RGBA"), path.parent.name if path.parent != src else "")), scale)) if scale                 else (lambda path: palettize(repainted(Image.open(path).convert("RGBA"), path.parent.name if path.parent != src else "")))
+            load = lambda path, src=src, raw_load=raw_load: raw_load(path)
         if opts.get("own_colours"):
             # (All of a figure kept in its own colours: her husband, whose hair went olive, skin pink and eye red on
             # the palette, 2026-11-22.)

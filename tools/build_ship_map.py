@@ -1773,7 +1773,7 @@ def build_objects():
     for m in (141.4, 144.6, 147.8):
         at11(m, "sunlounger")
     at11(143.0, "parasol")
-    at11(132.5, "hot-tub")
+    at11(132.96, "hot-tub")      # (22 px aft of where it first stood: the drain lever's throw, tools/population.py `LIDO`)
     decor("hot-tub-canopy", "canopy", exact_x(131.1), exact_x(133.9), deck=11)
     for m, flip in ((119.5, False), (139.5, True)):
         at11(m, "pool-ladder", -12, flip=flip)   # feet in the water, within deck 11's slab (not into deck 10)

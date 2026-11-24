@@ -169,6 +169,17 @@ export const PROMENADE = {
     endStop: 10,      // px past the end pier's inner edge where she stops at the promenade's ends
 };
 
+// The first pool's scene (deck 11, near-catch 5; docs/pool-remake-log.md). The drain: how long the water takes (ms), how
+// long the wall stays wet and the floor's puddles last after it (ms). The hatch: her place beside it as she opens it (px
+// from its middle), how long she takes down its ladder (ms), how far down she goes out of sight (px), how long she is out of
+// sight between the tank's floor and the hallway's ceiling while deck 10's side opens (ms). `ceiling`: deck
+// 10's hallway's ceiling line, px over its floor; `out`: how far under it she is as she drops out.
+export const POOL = {
+    drainMs: 5000, wetMs: 7000, puddleMs: 12000,
+    hatch: { beside: 30, downMs: 900, down: 66, through: 280 },
+    ceiling: 129, out: 20,
+};
+
 export const SWIM = {
     speed: 70,
     entry: 6,
