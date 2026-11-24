@@ -4,7 +4,8 @@ How a sequence of the game is remade from start to finish. Written 2026-11-24 fr
 (the linen room's shaft, `docs/shaft-remake-log.md`, 2026-11-23; the pool's scene, `docs/pool-remake-log.md`,
 2026-11-24; **used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
 of correction and three checks to it; then for near-catch 2, `docs/near-catch-2-remake-log.md`, approved on its
-first play**), from the user's two prompts and from every correction the user made before each was merged. The user,
+first play; then for near-catch 3, `docs/near-catch-3-remake-log.md`, which added two kinds more**), from the user's
+two prompts and from every correction the user made before each was merged. The user,
 2026-11-24: "save this plan. We will start using it right away."
 
 **It is used whenever the user asks for a sequence to be remade or refined as a whole.** Each remake gets its own
@@ -47,6 +48,8 @@ made and what it cost goes into the log and is said at each stop.
    - The user sees one picture per piece and a storyboard strip. Size, colour and readability are settled here.
    - The storyboard is composed over shots of the real room, and put on its clock as a GIF (near-catch 2: the
      clock written for the GIF became the scene's own).
+   - Choices open at the same stop never share their letters (near-catch 3: a "D" was both a dancer and a wash, and
+     the wrong one was built).
 6. **Make the art, generated wherever it can be.**
    - Nothing is drawn in code or put together from other scenes' props to save generations; code drawing stays
      for what is flat by nature and for thin or turning parts, in the picture's tones.
@@ -55,7 +58,7 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the kinds of correction** (below; twelve now) before the user sees it:
+8. **Check it against the kinds of correction** (below; fourteen now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
@@ -64,7 +67,13 @@ made and what it cost goes into the log and is said at each stop.
    - Look at the whole screen at the moment the scene takes over: its subject well inside the picture, not at its
      edge (measure the camera's view).
    - Stand where E acts on each thing the scene leaves her: it pulses; and once taken it is gone from its place.
-   - Cross every line that starts the scene in a jump as well as on foot.
+   - Cross every line that starts the scene in a jump as well as on foot, and from the deck above where she can
+     drop from it; stand ten seconds where each arrival leaves her (near-catch 3: off the balcony she landed under
+     the lamp the scene lets down).
+   - Set a new picture beside what stands round it, at the game's size: does it stand out of its place (near-catch
+     3: the stage in full colour among props washed 12%)?
+   - Count what happens in each second, and who does it: one thing at a time, with a hold where someone would hold
+     (near-catch 3: three people's beats in 2.65 s could not be followed).
    - Run the scenarios touched, with a new check for each decision, and the overlap check.
 9. **Play stop.** The user gets the link, the strip and a GIF, with a plain note that motion and sound are theirs to
    judge.
@@ -75,13 +84,14 @@ made and what it cost goes into the log and is said at each stop.
     job ids among them), commit, take `main` into the branch, merge and push on the user's word, remove the
     worktree.
 
-For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15.
+For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
+whole stage, two dancers twice over, a key clip of its own).
 
 ## The kinds of correction
 
 Nearly every correction the user made on playing the remakes is one of these. None shows in a still or a test;
-all can be looked for before the user plays (step 8). The first nine came of the shaft and the pool, the last three
-of near-catch 1.
+all can be looked for before the user plays (step 8). The first nine came of the shaft and the pool, the next three
+of near-catch 1, the last two of near-catch 3.
 
 | Kind | The shaft | The pool |
 |---|---|---|
@@ -97,6 +107,8 @@ of near-catch 1.
 | The subject at the screen's edge as the scene takes over | (near-catch 1: "we can barely see Bumbot and what he is actually doing", the scene began 200 px from him) | |
 | A thing she can use that does not pulse, or stays where it stood once taken | (near-catch 1: "the tray is a pickable object, it should pulsate"; "when pick up tray, it should stop being on the counter") | |
 | Two things at once that the player must tell apart | (near-catch 1: "make her cry, and then dash, with a little pause in between") | |
+| A new picture that stands out of its place | (near-catch 3: "The stages pops out too much ... remove a bit of a wash of the props that surround it, and add a bit of a wash to the stage, so that everything meets in the middle") | |
+| Too fast to follow | (near-catch 3: "plays too fast in the game and it's hard to grasp what just happened ... a bit slower and with some delays, but in proper places, not to break transitions, where they should be flowing") | |
 
 ## What the two prompts had in common
 
@@ -137,6 +149,12 @@ already applied.
   the three offered); the pieces, a storyboard and its GIF approved ("Go ahead"); built; the self-check found two
   things the storyboard had wrong (the door at the screen's edge, him behind the stand's card); **approved on its
   first play, no correction.** 15 generations.
+- **Near-catch 3** (the third): the old scene recorded (twelve faults: Bumbot unseen against the piano, the rival
+  out of nothing behind her back, a rope that rose by itself); one proposal with a picture and two choices,
+  answered "Do as you planned and recommend", with more asked for (the stage, its props and its people made again;
+  the stage manager's part); a preview stop that changed three things (a dancer, the piano, two places); built; the
+  self-check found the balcony's way in; on playing it, "Overall, I like it" and two corrections of kinds not on the
+  list (the last two rows above); a letter misread; "Approved" the same evening. 156 generations.
 
 ## The two prompts, word for word
 

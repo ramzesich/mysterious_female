@@ -134,6 +134,8 @@ its first half played behind her back.
 20. **The stage back at 12%; the male dancer is D** (the user, told the wash had been read from the "D": "No"; asked
     which wash: "Back to 12% (B)"): the "D" was the dancer's letter. The props 6%, the stage 12%, as in decision 17.
     (Mine to learn: two open choices must not share their letters.)
+21. **Approved** (the user, on playing it at 4.35 s with the stage at 12%: "Approved"). The documents and the
+    lessons are brought to it; merged only on the user's word.
 
 ## How it is built
 

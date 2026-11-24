@@ -610,8 +610,9 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
      ~~One known to them already: at near-catch 2 (deck 6) he sleeps over the reading table's lamp.~~
      **Near-catch 1 is remade** (2026-11-24, on the user's word, by `docs/sequence-remake-plan.md`:
      `docs/near-catch-1-remake-log.md`), **and near-catch 2** (the same day: `docs/near-catch-2-remake-log.md`; he
-     sleeps on the Library's return trolley now); 3 to 6 wait as before (3 to 5 have scenes of their own; 6 still
-     plays the ship scene's plain `nearCatch`).
+     sleeps on the Library's return trolley now), **and near-catch 3** (the same day:
+     `docs/near-catch-3-remake-log.md`; the stage one generated picture, the rival on the hanging lamp); 4 to 6 wait
+     as before (4 and 5 have scenes of their own; 6 still plays the ship scene's plain `nearCatch`).
   4. The run's pace (24 frames a second) and the rounds' pauses are by rule, not by eye: the user's to say in play.
 
 The steps as planned:

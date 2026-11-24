@@ -440,14 +440,14 @@ leaving the frame (a wink, no trigger).
 |---|---|---|---|---|
 | 200 | `cp_foyer` | The foyer's crew door | Checkpoint | |
 | 206-240 | decor | Rows of seats (built); `amb_audience` three seated | | |
-| 242 | `haz_pit` | The orchestra pit in front of the stage | A one-deck drop for the rival only (she can hop it) | Drawn |
-| 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` (as built: one, at 245.9 over the drum kit since 2026-11-19, the user's swap with the stage manager) | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
-| 246 | `npc_stagemanager` | The stage manager (as built: at 250.4, in front of the stage's aft curtain, facing it, since 2026-11-19) | `static`; sneezes every 5 s; bubble (a pill bottle) after `bb_3`; E with the pills: `item_card_ent` (`scn_card_ent`) | Sneeze, flap, talk |
-| 248 | `haz_trapdoor` | The trap door, a square seam | `trap`: standing on it drops her into `room_galley` (one deck, no scare) | Drawn |
+| 242 | `haz_pit` | The orchestra pit in front of the stage (not built: the rival goes down the stage's hatch) | A one-deck drop for the rival only (she can hop it) | Drawn |
+| 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` (as built: one, at 245.9 over the drum kit since 2026-11-19, the user's swap with the stage manager; a generated lantern since 2026-11-24, let down by the rival's weight on it in `bb_3`) | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
+| 246 | `npc_stagemanager` | The stage manager (as built: at 248.5, aft of centre stage, turned to his dancers, his back to the cat, since 2026-11-24: the user, "switch places: the stage manager and the dancers"; turned to the hole after `bb_3`) | `static`; sneezes every 5 s from his first sneeze in `bb_3` (not before: the user); bubble (a pill bottle) after `bb_3`; E with the pills: `item_card_ent` (`scn_card_ent`) | Sneeze, flap, talk |
+| 248 | `haz_trapdoor` | The trap door, a square seam (as built: at 246.56, its picture made again in the new stage's boards, 2026-11-24) | `trap`: standing on it drops her into `room_galley` (one deck, no scare) | Drawn |
 | 249 | `sec_spotlight` | Centre stage | `quirk(still 3)`: she bows | A clip |
-| 249 | `bb_3` | Bumbot washing in the spotlight | `scene` §9.4 | His `washing` |
-| 250 | decor | The fly rope he rides | | Drawn |
-| 251 | `amb_dancers` | Two dancers rehearsing | A loop until `bb_3`, then they sit on the edge | Two characters |
+| 249 | `bb_3` | Bumbot washing in a spotlight of his own (as built: at 247.29, centre stage, where she bows afterwards) | `scene` §9.4 | His `wash`, `stand-up`, `leap`, `rope` |
+| 250 | decor | The fly rope he rides (as built: at 247.63, its loop over his spot; the other end of the hanging lamp's line) | | Drawn |
+| 251 | `amb_dancers` | Two dancers rehearsing (as built: at 249.33 and 250.25, at the aft curtain; made again 2026-11-24, she in a silver dress with blue feathers, he in a silver shirt with a blue sash) | A loop until `bb_3`; they stop at the rival's entrance and stay where they stood, turned to the hole | Two characters: `dance`, `startle`, `idle` |
 | 254 | `rdr_stagedoor` + `room_dressing` | The stage door (red) and the dressing room: a make-up table with bulbs, costumes on a rail, `book_3` | `room` | Drawn by hand |
 | 240 | trunk `theatre` | The one-way trunk's upper door | As built | |
 
@@ -916,11 +916,19 @@ Input locked unless said; each sets its save flag.
    stand at 193.1: its own fall into the door at 194, which opens (aft) and stays so (`door_library_aft` open), the
    stand lying in the doorway, its card flat; the librarian starts and looks at the door; she straightens, turns to
    us, shrugs: free 2.6 s after she was taken. `src/world/quiet.js`, `QUIET` in `src/config.js`.
-4. **`bb_3` near-catch 3 (the stage, 249):** triggered when she first stands on the stage; he washes
-   in the spotlight; the stage manager at 246 flaps; she bends; the rival runs in from the wing at
-   254, trips on the cable at 251 and tumbles off the stage's front into the pit at 242; the lights
-   start to swing (`haz_lights` on for good); Bumbot leaps onto the fly rope at 250 and rides up out
-   of view; the stage manager's bubble turns to the pill bottle. Then `scn_card_ent` when she brings
+4. **`bb_3` near-catch 3 (the stage; remade 2026-11-24, `docs/near-catch-3-remake-log.md`):** he washes at centre
+   stage (247.29 m) in a spotlight, the fly rope's loop over him; the stage manager (248.5) is turned to his dancers
+   (249.3, 250.25), his back to him. 154 px from him, in front of the forward curtain, on her feet (in the air
+   across that line, in a jump or off the balcony's front, she comes straight down there), she is taken and starts on
+   tiptoe; 0.15 s: the stage manager turns, starts back and thrusts his clipboard at the cat (`notice`), which stops
+   her mid-step and brings Bumbot's head up; the dancers stop (`startle`); 0.75 s: the rival runs out from behind
+   the proscenium's edge, ahead of her (`charge`), she starts back (her `start-back`), Bumbot leaps into the loop
+   (`rope`); the rival's own clip (`tools/build_stage.py`): two steps, a leap under the hanging lamp (245.9), his
+   net's hoop over it; he dangles 0.6 s; the lamp comes down 44 px in 0.5 s and the loop goes up 1.7 times that,
+   Bumbot with it, behind the valance; he drops onto the hatch (246.56), it opens, he is gone, flour comes up; the
+   lamp, let go, is dragged out aft and swings (`haz_lights` on for good, from then); she looks up (`look-up`), turns
+   to us, shrugs: free 4.35 s after she was taken, in front of the curtain, where the lamp does not reach; the stage
+   manager's first sneeze; his bubble turns to the pill bottle. `src/world/stage.js`, `STAGE` in `src/config.js`. Then `scn_card_ent` when she brings
    them: he takes them, sneezes once more, hands the card.
 5. **`bb_4` near-catch 4 (the linen room):** he sleeps on the bottle shelf; the moment she or the laundry cart she pushes
    all but touches him (2 px) he leaps forward at the cover on the shaft's mouth, which drops to the floor with a clang,

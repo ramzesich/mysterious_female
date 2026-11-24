@@ -39,9 +39,10 @@ She creeps up on tiptoe, he wakes, and he bolts through the roped-off door at th
 so that the door stays ajar behind him.
 
 **The show must go on.** Behind that door is the theatre, mid-rehearsal, with the dancers on stage and the cat
-sitting in the spotlight washing himself as though the show were his. She lunges; the security officer, who has had
-the same idea, charges in from the wings and trips over a cable, the lights swing, and Bumbot rides a fly rope up into
-the dark above the stage. Left behind is a stage manager sneezing helplessly, allergic to cats, whose pills are down
+sitting in the spotlight washing himself as though the show were his. She creeps up; the security officer, who has had
+the same idea, charges out of the wings, leaps at the cat with his net and catches the stage's hanging lamp instead:
+down he comes with it, through the stage's trap door, and up goes Bumbot on the fly rope at the other end of its line,
+into the dark above the stage. Left behind is a stage manager sneezing helplessly, allergic to cats, whose pills are down
 in his cabin on deck 4. She runs down for them, and he thanks her with the Entertainment card. It opens the crew way
 up from Bliss, into housekeeping country.
 
@@ -139,8 +140,9 @@ cleaner, a rehearsal rope, a photographer.
 
 ### Region 3: Showtime (the theatre, deck 7 aft and middle)
 
-8. **Near-catch 3, on the stage:** Bumbot washes himself in the spotlight during the rehearsal. She lunges; the
-   security officer barges in from the wings and trips over a cable; Bumbot rides a fly rope up out of reach.
+8. **Near-catch 3, on the stage:** Bumbot washes himself in the spotlight during the rehearsal. She creeps up; the
+   security officer bursts out of the wings and leaps at him, his net catches the hanging lamp, and his weight on it
+   sends Bumbot up on the fly rope out of reach; he drops through the stage's trap door.
 9. **The stage manager** sneezes (he is allergic to cats): his bubble shows a pill bottle. His pills are in his
    cabin on deck 4 aft. She goes down the theatre's one-way trunk to deck 4, takes them, and comes back up the aft
    stairs (open now). He gives her the **Entertainment card**.

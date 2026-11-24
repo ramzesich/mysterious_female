@@ -4853,3 +4853,16 @@ everything else derived from A", and "a", her tiptoe and her reach at his height
 "Approved" on playing it, with no correction). His spot moved from the last reading table to the return trolley, so
 that the rope and the door are in the picture; the scene is `src/world/quiet.js`, one clock; the Library's aft door
 swings aft now; she is held 2.6 s where it was 3.5. 15 generations.
+
+## Near-catch 3 remade (2026-11-24, the Design session)
+
+The user, with near-catch 2 approved: "Let's work on the next near-catch, same approach". By
+`docs/sequence-remake-plan.md` a third time; everything found, decided and built is in
+**`docs/near-catch-3-remake-log.md`** (21 decisions; the user's: "Do as you planned and recommend", "regenerate both
+the stage, the props and the people here", "The stage manager has to react somehow to Bumbot and then start
+sneezing"; at the preview stop, of the dancers, "the male dancer looks like a waiter, the female one is approved",
+"remove the piano; switch places: the stage manager and the dancers"; on playing it, "The stages pops out too much"
+and "The scene plays too fast in the game"; then "Approved"). The stage is one generated picture
+(`tools/build_stage.py`); the scene is `src/world/stage.js`, one clock; the lamp and the fly rope's loop are the two
+ends of one line, so the rival's weight on the lamp is what takes Bumbot up; she is held 4.35 s where it was 4.75,
+and all of it is in front of her. 156 generations.
