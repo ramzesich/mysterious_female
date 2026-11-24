@@ -26,7 +26,6 @@ drop about 2 s; "Regenerate a proper stack of laundry and the towel. Now it look
 | `her-towel-3.png` | the same, "a crumpled white towel sitting on top of her head like a soft lump, one corner flopping down over her forehead" (seed 31) | `f697e7a7-b93e-4613-abb1-d2b223b55dee` | 5 |
 | `climb-a/0-16.png` | `animate_image_pixminimax` from `hatch-start.png` to `hatch-end.png`, 16 frames: she kneels, pushes the flap in, slides in head first (seed 7) | `02658994-dbca-411c-a629-2f35ebf23382` | 2 |
 | `climb-b/0-16.png` | the same, "crouches down ... presses its flap open inward ... slides in head first" (seed 21) | `e6f64927-90b5-4170-a4b9-0e6802d7b365` | 2 |
-
 | `outlet-3.png`, `outlet-4.png` | the same, shorter (rows 0 to 30), "solid metal ... no holes, no shadow" (seeds 17, 44); **4 used** (the user) | `065e7210-fe1f-46ea-9845-7adb4a3a3477`, `9dd811b6-2e44-43f6-82bb-c75fd34d3641` | 10 |
 | `dive-1.png`, `dive-2.png` | `edit_image_pro_flash` on `her-east.png`, upside down diving head first (seeds 5, 23); **1 used** | `414435c0-f2a4-49ae-b934-d01b52747a88`, `5ba5994a-ae24-42ab-8a2d-c0642356aba8` | 10 |
 | `towel-flat-1.png`, `towel-flat-2.png` | `edit_image_pro_flash` on `towel-in.png` (the towel as cut, on a 64 px canvas), fallen and lying flat (seeds 9, 41); **1 used** (2 left a ghost of the towel) | `5b65f976-035b-4ad1-b793-b8833d77ac54`, `648656e0-b83c-4758-9a97-a06f2008c11c` | 10 |
