@@ -126,3 +126,29 @@ stage manager's cabin C, the dressing room A, the cold room A.**
 | `coldroom-B.png`, `coldroom-C.png` | a worn freezer; clean modern white | `b162d59f…`, `1eaf526f…` | 18 |
 
 **These three: 81 generations** (and the canister, 15: `assets/source/things/tries/README.md`).
+
+# The nook, the lighting booth, the chapel (and the lifeboat's tries), 2026-11-24
+
+The user: "The remaining rooms". Three looks of each, the same wording (A its own colours, B and C others; seeds 5, 13,
+27); the chapel, the lighting booth and the lifeboat in two parts (256 px each, from x 0 and from x 56, 224, 152). **Chosen:
+the nook B, the lighting booth A; the lifeboat left as it is;** the chapel: "Remove the chairs and regenerate", then **B**.
+
+## Used
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `nook-B.png` | the nook, an old library: dark green, walnut, brass (seed 13) | `6bceacbd-b26f-45c7-8a0b-1da42577c797` | 9 |
+| `lighting-p1-A.png`, `lighting-p2-A.png` | the booth (x 0..256) and the catwalk (x 224..480), its own colours (seed 5) | `9fac4fcc-fbd2-4a1f-8e2f-996800493cab`, `6bee7105-c7e4-4576-a811-fe987680199d` | 18 |
+| `chapel-p1-B.png`, `chapel-p2-B.png` | the chapel without its chairs (x 0..256, 56..312), softly lit (seed 13) | `80ffed95-6dc0-4f5f-8530-3171982d2d8e`, `1beca215-c254-4e7b-810a-3f5d43da2173` | 18 |
+
+## Tries (`tries/`)
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `nook-A.png`, `nook-C.png` | its own red; honey oak and cream | `e99bbe35…`, `246623db…` | 18 |
+| `lighting-p1/p2-B.png`, `-C.png` | black backstage with tape; deep navy with coloured haze | `7aa97c7f…`, `d9d25638…`, `f540a6b2…`, `ed580fda…` | 36 |
+| `lifeboat-p1/p2-A/B/C.png` | its own orange; worn; new and glossy (their parts' portholes and benches did not agree) | `99a67ad1…`, `19118281…`, `a258fd22…`, `aa7af770…`, `c304c409…`, `ca3f9f39…` | 54 |
+| `chapel-chairs-p1/p2-A/B/C.png` | the chapel with its chairs, A B C | `86e76afe…`, `f7ad3b43…`, `3c5b3c1f…`, `ce7b0b24…`, `9946649a…`, `0e0da83c…` | 54 |
+| `chapel-p1/p2-A.png`, `-C.png` | without its chairs: its own colours; warmer, ivory damask | `88a15269…`, `fcb42e28…`, `c85954dc…`, `814c1521…` | 36 |
+
+**These: 243 generations.**

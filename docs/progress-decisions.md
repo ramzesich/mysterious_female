@@ -4921,3 +4921,22 @@ room, the chapel, the lighting booth, the lifeboat), "1-3".
   its steel would go green), on the shelf, in her hands and poured; **one canister**, off the shelf while she carries it
   (`lift`, as the lunch's tray).
 - 96 generations (81 + 15). `boot`, `region2`, `region3`, `region6`, `keeps`, `highlight` pass; `check_overlaps` 0.
+
+## The nook, the lighting booth and the chapel redecorated; the chapel's chairs out (2026-11-24)
+
+The user: "The remaining rooms" (the nook, the chapel, the lighting booth, the lifeboat), three looks of each (the
+three wider ones in two parts): **the nook B** (an old library: dark green walls, walnut panelling, brass), **the
+lighting booth A** (its own dark grey-purple, panel seams, worn steel), **the lifeboat left as it is** (its tries kept),
+and the chapel: **"Remove the chairs and regenerate"**, then **B** (its own colours, a soft glow from the downlights and
+sconces).
+
+- **The chapel's cane chairs and their bows are gone** (nothing in the code used them; the ceremony's guests stood in
+  them, and now stand on the open carpet). Its two redrawn parts lit the wall differently, so they are faded one into
+  the other over 80 px of plain wall between the doors and the flowers' stands (`blend` in `CABINS`), not cut.
+  `tools/draw_chapel.py` calls the redecoration; its doors by their box, the flowers, their stands and the candle as
+  drawn.
+- **The nook:** its way out, the armchair she reads in (her clip was cut over it) and the cat's picture as drawn; its
+  lamp, table, candle, bookcase and books the redraw's (ours, washed toward the old red wall, were pinkish on the green).
+- **The lighting booth:** its door as drawn, its chair the redraw's; cut inside the steel post between the booth and
+  the catwalk.
+- 243 generations (189 + 54). `boot`, `region3`, `region9`, `keeps`, `highlight` pass; `check_overlaps` 0.

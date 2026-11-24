@@ -149,9 +149,10 @@ def clear_glass(im, room):
 
 # --- The guest cabins (take 3: their own colours, the finish only), the pantry (B) and the blanket fort (3), 2026-11-24 ---
 
-def join(L, R, cut, over0):
+def join(L, R, cut, over0, blend=0):
     """Two redrawn parts of one room: R (laid from room x over0) brought to L's colours row by row where they overlap,
-    then L up to `cut` and R from it."""
+    then L up to `cut` and R from it; or, with `blend`, faded from one to the other over that many px round the cut (a
+    wall the two parts lit differently: the chapel's)."""
     L = np.array(L.convert("RGBA")); Rf = np.array(R.convert("RGB")).astype(float)
     Lf = L[:, :, :3].astype(float)
     n = L.shape[1] - over0
@@ -163,6 +164,10 @@ def join(L, R, cut, over0):
     out[:, :, 3] = 255
     out[:, :cut, :3] = Lf[:, :cut]
     out[:, cut:, :3] = Rf[:, cut - over0:]
+    if blend:
+        a0 = cut - blend // 2
+        t = ((np.arange(blend) + 0.5) / blend)[None, :, None]
+        out[:, a0:a0 + blend, :3] = np.clip(Lf[:, a0:a0 + blend] * (1 - t) + Rf[:, a0 - over0:a0 - over0 + blend] * t, 0, 255)
     return Image.fromarray(out)
 
 
@@ -230,6 +235,21 @@ CABINS = {
     "dressing": dict(parts=[("dressing-A", 0)], cuts=[], door=None, doorbox=None,
                      pieces=[("door-crew", 59, 0), ("velvet-stool", 164, 0), ("dress-rack", 206, 0)]),
     "coldroom": dict(parts=[("coldroom-A", 0)], cuts=[], door=None, doorbox=None, pieces=[("door-crew", 59, 0)]),
+    # The last of them (the user, 2026-11-24: the nook B, the lighting booth A; the lifeboat left as it is). The nook's way
+    # out (the gap the bookcase left) by its box, its chair (she reads in it: her clip was cut over it) and the cat's
+    # picture as drawn; its lamp, table, candle, bookcase and books the redraw's (ours were washed toward the old red wall).
+    "nook": dict(parts=[("nook-B", 0)], cuts=[], door=None, doorbox=(41, 66, 79, 127),
+                 pieces=[("reading-chair", 124, 0)], boxes=[(12, 38, 34, 60)]),
+    # The booth and the catwalk, cut inside the steel post of the frame between them (x 228); its chair the redraw's.
+    "lighting": dict(parts=[("lighting-p1-A", 0), ("lighting-p2-A", 224)], cuts=[228], door=None, doorbox=None,
+                     pieces=[("door-crew", 59, 0)]),
+    # The Chapel (B, its chairs taken out first: the user, 2026-11-24, "Remove the chairs and regenerate"), called by
+    # tools/draw_chapel.py: its amber glass doors by their box, the altar's flowers and candle and the flowers' stands as
+    # drawn; its two parts faded one into the other over the plain wall between the doors and the stands (cut hard, the
+    # parts' light differed).
+    "chapel": dict(parts=[("chapel-p1-B", 0), ("chapel-p2-B", 56)], cuts=[116], blend=80, door=None,
+                   pieces=[("flower-pedestal", 170, 0), ("flower-pedestal", 238, 0), ("bouquet", 196, 30),
+                           ("pillar-candle", 216, 30)]),
 }
 
 
@@ -264,7 +284,7 @@ def cabin(name, base):
     (first, _), *rest = spec["parts"]
     im = Image.open(SRC / f"{first}.png")
     for (part, x), cut in zip(rest, spec["cuts"]):
-        im = join(im, Image.open(SRC / f"{part}.png"), cut, x)
+        im = join(im, Image.open(SRC / f"{part}.png"), cut, x, spec.get("blend", 0))
     im = im.convert("RGBA")
     assert im.size == base.size, (name, im.size, base.size)
     door = spec.get("doorbox", CABIN_DOOR)
@@ -292,7 +312,7 @@ def fort():
 
 def main():
     for name, lay in [("laundry", laundry), ("store", store), ("galley", galley), ("maid6", maid6), ("pantry", pantry)] +             [(n, (lambda n: lambda base: cabin(n, base))(n)) for n in CABINS]:
-        p = GAME / "rooms" / f"{name}.png"
+        p = GAME / "chapel-room.png" if name == "chapel" else GAME / "rooms" / f"{name}.png"
         lay(Image.open(p).convert("RGBA")).save(p)
         print("wrote", p.relative_to(ROOT))
     fort().save(GAME / "rooms" / "adjoin-fort.png")

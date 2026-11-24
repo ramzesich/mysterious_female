@@ -890,7 +890,7 @@ def nook(width):
     R.im.alpha_composite(cat, (23 - cat.width // 2, 38))
     box(110, 18, 118, 24, YELLOW, ORANGE)
     r(112, 24, 116, 26, TUBE)
-    return R.save("nook")
+    return redecorated("nook", R)
 
 
 def lighting(width):
@@ -960,7 +960,7 @@ def lighting(width):
     r(430, 9, 432, 30, SLATE)
     r(416, 13, 416, 46, WOOD)
     d.ellipse([413, 46, 419, 54], outline=WOOD)
-    return R.save("lighting")
+    return redecorated("lighting", R)
 
 
 # --- Region 4's rooms (deck 9's cabins) --------------------------------------------------------------
