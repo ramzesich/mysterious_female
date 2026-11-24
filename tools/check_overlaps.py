@@ -39,6 +39,7 @@ ALLOWED = [
     ("door-crew", "life-ring"),             # the ring hangs on the promenade's rail, outside the foyer's wall
     ("parasol-", "sundae-"),                # a sundae on a table under its parasol
     ("laundry-cart-empty", "delivery-pillow-"),  # delivery 3's pillows on the cart's rim, within its handle's box
+    ("stage-back", "stage-valance"),        # the stage's valance laid again over its own picture: Bumbot goes up the rope behind it
 ]
 # Things that move, lie flat on the floor or rest on furniture: no fault where they pass or lie.
 SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-",

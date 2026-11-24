@@ -1961,25 +1961,15 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(label);
     }
 
-    // The Stardust Lounge's stage: a low wooden front, the dark back, red curtains drawn to the
-    // sides under a red valance, spotlights in the flies.
+    // The Stardust Lounge's stage: one picture (tools/build_stage.py; it was rectangles drawn here until 2026-11-24):
+    // velvet curtains under a swagged valance, a lighting bar, a star cloth, the boards, the band's drum kit. Its
+    // boards run 6 px forward of the curtain: the picture's own first columns, mirrored.
     drawStage(g, o) {
-        const x0 = o.x, x1 = o.x + o.width, y = o.y, top = y - this.deckPitch + 16;
-        g.fillStyle(0x1b1828, 1).fillRect(x0, top, x1 - x0, y - top);
-        g.fillStyle(0x5e3d2c, 1).fillRect(x0 - 6, y - 8, x1 - x0 + 6, 8);
-        g.fillStyle(0x74503a, 1).fillRect(x0 - 6, y - 8, x1 - x0 + 6, 2);
-        for (const [a, dir] of [[x0, 1], [x1 - 34, -1]]) {
-            g.fillStyle(0xae2334, 1).fillRect(a, top + 8, 34, y - top - 16);
-            for (let k = 4; k < 34; k += 7) g.fillStyle(0x831c5d, 1).fillRect(a + k, top + 8, 2, y - top - 16);
-            g.fillStyle(0xd9a43b, 1).fillRect(dir > 0 ? a + 28 : a + 2, y - 64, 4, 3);
-        }
-        g.fillStyle(0xc32454, 1).fillRect(x0, top, x1 - x0, 12);
-        for (let x = x0; x < x1; x += 12) g.fillStyle(0xae2334, 1).fillTriangle(x, top + 12, x + 12, top + 12, x + 6, top + 18);
-        for (let x = x0 + 40; x < x1 - 30; x += 50) {
-            g.fillStyle(0x3e3546, 1).fillRect(x - 4, top + 12, 8, 6);
-            g.fillStyle(0xfbff86, 1).fillRect(x - 2, top + 18, 4, 1);
-            g.fillStyle(0xfbff86, 0.22).fillEllipse(x + 10, y - 9, 34, 4);   // its pool of light on the boards
-        }
+        if (!this.textures.exists('stage-back')) return;
+        const back = this.add.image(o.x, o.y, 'stage-back').setOrigin(0, 1).setDepth(DEPTH.decor + 0.005);
+        const lip = this.add.image(o.x, o.y, 'stage-back').setOrigin(0, 1).setDepth(DEPTH.decor + 0.005);
+        lip.setCrop(0, lip.height - 10, 6, 10).setScale(-1, 1);
+        this.worldLayer.add([back, lip]);
     }
 
     // A room open off a corridor: a light wood post where the corridor's wall ends, the room's brass

@@ -275,7 +275,9 @@ BEATS = {
     # (the user: "He sleeps on top of the book return basket"), `LIBRARY["trolley"]`, so that he, the rope and the aft
     # door are in one picture; he was on the last reading table, 12.6 m from the door. `QUIET` in src/config.js.)
     "bb2": (6, 191.04, "asleep", 1, 195.0, None),
-    "bb3": (6, 248.75, "wash", 1, 250.6, None),
+    # (Near-catch 3 remade, 2026-11-24, docs/near-catch-3-remake-log.md: centre stage, in a spotlight of his own, the
+    # fly rope's loop over him; he sat at the piano's foot, black on black. `STAGE` here and in src/config.js.)
+    "bb3": (6, 247.2917, "wash", 1, 250.6, None),
     # (Asleep on the linen room's bottle shelf, the forward rack's middle, since 2026-11-23: the user; he was on a heap of
     # towels on its floor. The room mirrored the same day: he bolts forward, into the shaft's mouth.)
     "bb4": ("linen", 63, "asleep", -1, 13, None),
@@ -316,11 +318,14 @@ PUSHABLES = {
 }
 
 # The trap door in the stage and the tip of the bow (m), where the catch is.
-TRAPDOOR_M = 246.3
+# (The trap door 246.3 until 2026-11-24: where its new picture has the hole, tools/build_stage.py.)
+TRAPDOOR_M = 246.5625
 TRAPDOOR_LANDS = ("galley", 86)     # on the flour sacks
-# The stage as built (deck 6, 244-250.67 m): where the rival runs in, the cable he trips on, the fly
-# rope Bumbot rides up. (The trap door is TRAPDOOR_M; the swinging light is in LIGHTS.)
-STAGE = dict(deck=6, wing=244.3, cable=245.75, rope=249.7)
+# The stage (deck 6, 244-250.67 m; its picture and near-catch 3's pieces: tools/build_stage.py): `wing`, where the
+# rival stands hidden behind the forward curtain; `rope`, the fly rope Bumbot rides up, its loop over his spot;
+# `spot`, the lantern of the lighting bar that lights him. (The trap door is TRAPDOOR_M; the swinging light is in
+# LIGHTS.)
+STAGE = dict(deck=6, wing=244.4167, rope=247.625, spot=246.8958)
 CATCH_M = 6
 
 # --- Switches: E on a thing sets a flag (step 0's stand-ins for scenes) ----------------------------
@@ -417,14 +422,19 @@ PEOPLE = {
     # he to the stage's aft curtain, facing it.)
     # (Each of those who clap her home is away from their own place while they stand outside 8206, the evening of the
     # catch till she is home; back after: never in two places, the user, 2026-11-23.)
-    "npc_stagemanager": dict(at=(6, 250.4), who="stagemanager", face=-1, idle="idle", until="flag:catch&!flag:home",
+    # (Near-catch 3 remade, 2026-11-24, the user: "switch places: the stage manager and the dancers": he between
+    # Bumbot's spot and the dancers, turned to them, his back to the cat until the scene; they at the aft curtain.
+    # After it he faces the hole: the Story turns him, `stageAfter`.)
+    "npc_stagemanager": dict(at=(6, 248.5), who="stagemanager", face=1, idle="idle", until="flag:catch&!flag:home",
                              bubble=("pills", "flag:bb3", "card:ent", 4)),
-    "amb_dancer_her": dict(at=(6, 245.9), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
-    "amb_dancer_him": dict(at=(6, 247.15), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
+    "amb_dancer_her": dict(at=(6, 249.3333), who="dancer_her", face=1, idle="dance", until="flag:bb3"),
+    "amb_dancer_him": dict(at=(6, 250.25), who="dancer_him", face=-1, idle="dance", until="flag:bb3"),
     # (Off the stage they stand by the front row, talking. They sat on the floor there at first: the
     # user, 2026-11-14: "What are they doing? They look weird and out of place.")
-    "amb_dancer_her_off": dict(at=(6, 238.55), who="dancer_her", face=1, idle="idle", after="flag:bb3", layer="back"),
-    "amb_dancer_him_off": dict(at=(6, 239.33), who="dancer_him", face=-1, idle="idle", after="flag:bb3", layer="back"),
+    # (Since 2026-11-24 they stay where they rehearsed, stopped, turned to the hole in the stage: they vanished from
+    # it in one frame and stood by the front row.)
+    "amb_dancer_her_off": dict(at=(6, 249.3333), who="dancer_her", face=-1, idle="idle", after="flag:bb3"),
+    "amb_dancer_him_off": dict(at=(6, 250.25), who="dancer_him", face=-1, idle="idle", after="flag:bb3"),
     "riv_galley": dict(at=("galley", 62), who="rival", face=1, still="sit", after="flag:bb3", until="region:4"),
     "amb_audience_1": dict(at=(6, 212.29), who="aud_gent", face=1, layer="back"),
     # Region 4 (Housekeeping). The steward at his jammed cart (the story moves him with it), the

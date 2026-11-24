@@ -65,6 +65,35 @@ export const BUMBOT = {
     runSpeed: 300,      // his escape, px/s: faster than she can ever run
 };
 
+// Near-catch 3 on the Stardust's stage (src/world/stage.js; remade 2026-11-24, docs/near-catch-3-remake-log.md). Times
+// in ms of the scene's clock, places in px; where things stand: `STAGE` in tools/population.py, and the pieces' own
+// layout, assets/ship/stage/stage.json.
+export const STAGE = {
+    sight: 154,             // she is taken this far from him: in front of the forward curtain, the wing ahead of her
+    ahead: 93, aheadMs: 700,        // the picture goes this far ahead of her, in this long: the whole stage in it
+    airUp: 200,             // in the air across that line, up to this high over his floor: in a jump, or off the balcony's front over the stage (she comes straight down in front of the curtain)
+    tipFps: 18, tipPx: 1.6, tipMs: 400,     // her tiptoe (near-catch 2's clip and pace) until the rival is out
+    backFps: 14,            // her start back; held
+    lookAt: 1500, lookFps: 16,      // she straightens and looks up after him
+    shrugAt: 2000, afterMs: 100,    // turned to us, her shrug; then this long
+    noticeAt: 120,          // the stage manager turns, starts back, thrusts his clipboard at the cat
+    sneezeAt: 1750, sneezeEvery: 5000,      // his first sneeze, Bumbot gone; then one this often, until his pills
+    danceStop: 330,         // the dancers stop
+    // The rival out of the wing: when; px/s, his clip's own pace in its first frames (11 px a frame at 16 a second);
+    // his run's frames a second, by its planted foot (7 px back a frame); the proscenium's edge in the stage's picture.
+    rivalAt: 380, rivalSpeed: 180, runFps: 25, wingEdge: 36,
+    clipFps: 16,            // his clip: the leap, the net on the lamp, the swing, the drop
+    swishFrame: 4, hookFrame: 5,    // its frames that sound: the net through the air, the lamp taking his weight
+    catUp: 420, upFrom: 2, upFps: 30,       // Bumbot up from his washing: when, from which frame of `stand-up`, how fast
+    leapMs: 240, ropeFrom: 2, ropeFps: 14,  // his leap into the loop; his clip on the rope
+    loop: 40,               // the loop's top over the floor
+    ropeGain: 1.7,          // the loop's rise for the lamp's drop: the lamp stops at her head's height, he must be behind the valance
+    kickMs: 350,            // let go, the lamp is dragged out aft this long, and swings from there
+    puffFps: 14,            // the flour out of the hatch
+    settleMs: 300,          // she is not freed before the rival has been gone this long
+    spot: { half: 24, cone: 0.16, pool: 0.18 },     // Bumbot's spotlight: its half width on the boards, how strong
+};
+
 // Near-catch 2 at the Library's aft end (src/world/quiet.js; remade 2026-11-24, docs/near-catch-2-remake-log.md). Places
 // in px from Bumbot's spot on the return trolley (`BEATS` in tools/population.py), times in ms.
 export const QUIET = {

@@ -12,3 +12,5 @@ in code as a black box and a stick) and chose a generated open trap door.
 | `cut.py` | Its own pixels only (not where the mic stand was taken out), 7 px left onto the drop, the ladder's right rail made its left's (the user); to `assets/ship/trapdoor-open.png`, its column 15 the drop, its last row the stage floor's | |
 
 The game's mic stand moved 0.25 m aft (246.95 m, `tools/build_ship_map.py`), clear of the opening. 10 generations.
+
+**Retired 2026-11-24:** the stage is a generated picture now and its open hatch was made again in it (`assets/source/stage/`, `tools/build_stage.py`); `assets/ship/trapdoor-open.png` is gone.

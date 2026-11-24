@@ -1075,6 +1075,8 @@ def build_objects():
     add(point("pass5", "place", x_of(238), floor_y(5)))
     # The Library, 6 m short of its return trolley: near-catch 2 (walk aft; remade 2026-11-24, docs/near-catch-2-remake-log.md).
     add(point("quiet", "place", exact_x(185), floor_y(6)))
+    # (Near-catch 3, the stage: by the stage door, 1.5 m short of the stage's forward curtain, where she is taken.)
+    add(point("stage", "place", exact_x(242.5), floor_y(6)))
     # Region 8's: the aft terrace she climbs to, the sun deck by the old lady, the technical ladder's
     # foot, the funnel's top.
     for name, m in (("terrace", 217), ("sundeck", 123), ("technical", 164.6), ("teppanyaki", 183)):
@@ -1540,10 +1542,8 @@ def build_objects():
         m = 206.6 + k * 0.95
         if all(abs(m - s) > 0.3 for s in AUDIENCE[6]):
             put(6, m, seat(6, k))
-    put(6, 245.2, "drum-kit-lt")
-    put(6, 246.95, "mic-stand-lt")    # (246.7 until 2026-11-19: it stood in the open trap door's new picture)
-    put(6, 247.6, "guitar-lt")
-    put(6, 249.0, "grand-piano-lt", flip=True)
+    # (The stage's own things are in its picture since 2026-11-24, tools/build_stage.py: the drum kit redrawn in its
+    # light; the mic stand, the guitar and the grand piano gone, the user: "remove the piano".)
     put(6, 243.2, "speaker-stack-lt")
 
     # Deck 7, after NCL's plan and the user's photos (§5.3). Clear of the Hotel trunk's door (118).

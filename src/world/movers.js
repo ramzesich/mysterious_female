@@ -298,8 +298,12 @@ export class BellGull {
 }
 
 // A stage light on its cable (population: `haz_lights`). Until its flag it is hauled up short and
-// lights its spot; after (the rival's crash shook the rig) it hangs low and swings like a
-// pendulum: at the bottom of its arc it is at her head's height, "Bonked"; at the ends it is over it.
+// lights its spot; after (near-catch 3: the rival hung on it by his net, src/world/stage.js) it hangs low and swings
+// like a pendulum: at the bottom of its arc it is at her head's height, "Bonked"; at the ends it is over it.
+// Its picture is generated (tools/build_stage.py; a circle drawn here until 2026-11-24), hung by its top from the
+// cable's end and turned as the cable hangs. A scene can hold it (`hold`: its lens at a place) and let it go
+// (`release`: dragged out to its swing's end from there, then swinging).
+const LAMP = { top: 19, lens: 3.5 };        // its picture's top over its middle on the cable, its lens's middle under it
 export class SwingLight {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -308,10 +312,26 @@ export class SwingLight {
         this.def = def;             // { x, top, floor, flag, short, long, amp (degrees), period (s) }
         this.cone = s.add.graphics().setDepth(D.decor + 0.3);
         this.g = s.add.graphics().setDepth(D.player + 0.3);
-        world.add([this.cone, this.g]);
+        this.pic = s.textures.exists('stage-lamp') ? s.add.image(def.x, def.top, 'stage-lamp').setOrigin(0.5, 0).setDepth(D.player + 0.3) : null;
+        world.add([this.cone, this.g, ...(this.pic ? [this.pic] : [])]);
         this.wasOn = world.progress.has(def.flag);
         this.t0 = null;
         this.lamp = { x: def.x, y: def.top + def.short };
+    }
+
+    // Held by a scene: its lens's middle at a place in the world (what holds it is the scene's to draw).
+    hold(lens) {
+        const d = this.def, dx = lens.x - d.x, dy = lens.y - d.top;
+        this.held = { len: Math.hypot(dx, dy) - LAMP.lens, angle: Phaser.Math.RadToDeg(Math.atan2(dx, dy)) };
+    }
+
+    // Let go from where it was held (or from `lens`): dragged out to its swing's end in `ms`, then swinging for good.
+    release(lens, ms) {
+        if (lens) this.hold(lens);
+        this.kick = { from: this.held?.angle ?? 0, ms };
+        this.held = null;
+        this.freed = true;
+        this.t0 = this.scene.time.now;
     }
 
     update(dt, time) {
@@ -321,13 +341,16 @@ export class SwingLight {
         const near = Math.abs(p.x - d.x) < 800 && s.route === 'inside' && Math.abs(p.y - d.floor) < 72;
         this.g.setVisible(near);
         this.cone.setVisible(near);
+        this.pic?.setVisible(near);
         if (!near) return;
-        const on = this.world.progress.has(d.flag);
+        const on = this.freed || this.world.progress.has(d.flag);
         // (Already swinging when the game was loaded; or it starts now, dropping out to one side.)
         if (on && this.t0 === null) this.t0 = this.wasOn ? time - 60000 : time;
-        const DROP = 900;
+        const DROP = this.kick ? this.kick.ms : 900;
         let len = d.short, angle = 0;
-        if (on) {
+        if (this.held) {
+            ({ len, angle } = this.held);
+        } else if (on) {
             const e = time - this.t0;
             // (Its cable creaks as it drops out, and once each swing.)
             const turn = e < DROP ? -1 : Math.floor((e - DROP) / (d.period * 1000));
@@ -335,7 +358,10 @@ export class SwingLight {
                 this.turn = turn;
                 sfx.at(d.x, d.floor).creak();
             }
-            if (e < DROP) {
+            if (e < DROP && this.kick) {
+                len = d.long;
+                angle = this.kick.from + (d.amp - this.kick.from) * Phaser.Math.Easing.Quadratic.Out(e / DROP);
+            } else if (e < DROP) {
                 const k = Phaser.Math.Easing.Sine.InOut(e / DROP);
                 len = d.short + (d.long - d.short) * k;
                 angle = d.amp * k;
@@ -345,21 +371,27 @@ export class SwingLight {
             }
         }
         const a = Phaser.Math.DegToRad(angle);
-        const x = d.x + len * Math.sin(a), y = d.top + len * Math.cos(a);
+        const ux = Math.sin(a), uy = Math.cos(a);
+        const x = d.x + len * ux, y = d.top + len * uy;
         this.lamp = { x, y, swinging: on };
         const g = this.g.clear();
-        g.lineStyle(1, 0x2e222f, 1).lineBetween(d.x, d.top, x, y - 5);
         g.fillStyle(0x2e222f, 1).fillRect(d.x - 3, d.top - 1, 6, 3);
-        // The lamp: a black can with a warm lens, turned the way its cable hangs.
-        const ux = Math.sin(a), uy = Math.cos(a);
-        g.fillStyle(0x2e222f, 1).fillCircle(x, y, 7);
-        g.fillStyle(0x625565, 1).fillCircle(x - ux * 2, y - uy * 2, 4);
-        g.fillStyle(0xfbff86, 1).fillCircle(x + ux * 4, y + uy * 4, 3.5);
+        if (this.pic) {
+            // (The cable to its picture's top; the picture hangs on from there, turned as the cable hangs.)
+            const tx = d.x + (len - LAMP.top) * ux, ty = d.top + (len - LAMP.top) * uy;
+            g.lineStyle(1, 0x2e222f, 1).lineBetween(d.x, d.top, tx, ty);
+            this.pic.setPosition(tx, ty).setRotation(-a);
+        } else {
+            g.lineStyle(1, 0x2e222f, 1).lineBetween(d.x, d.top, x, y - 5);
+            g.fillStyle(0x2e222f, 1).fillCircle(x, y, 7);
+            g.fillStyle(0x625565, 1).fillCircle(x - ux * 2, y - uy * 2, 4);
+            g.fillStyle(0xfbff86, 1).fillCircle(x + ux * 4, y + uy * 4, 3.5);
+        }
         // Its light on the stage.
         const fx = x + (d.floor - y) * Math.tan(a) * 0.6;
         this.cone.clear().fillStyle(0xfbff86, 0.1).fillTriangle(x, y, fx - 20, d.floor, fx + 20, d.floor);
         this.cone.fillStyle(0xfbff86, 0.12).fillEllipse(fx, d.floor - 1, 40, 5);
-        if (!on || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
+        if (!on || this.held || time - this.t0 < DROP || s.mode !== 'play' || s.route !== 'inside') return;
         if (Math.abs(p.x - x) < 7 + PLAYER.bodyWidth / 2 && p.y - PLAYER.bodyHeight < y + 6 && p.y > y - 6) {
             if (this.world.carry) this.world.carryBox.spill(x, false, 'light');
             else if (s.lungeSafe()) this.world.lunged('light', x);

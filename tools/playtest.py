@@ -2190,8 +2190,8 @@ def scenario_golden(b):
     b.hold("right", 1.2)
     ok &= check(3 in save_list(b, "regions"), "region 3 beyond it", b.state())
     # Region 3: the stage, near-catch 3; the card; the trunk from Bliss up to deck 9.
-    go(b, 6, 246.9)
-    b.hold("right", 0.5)
+    go(b, 6, 242.5)
+    hold_until(b, "right", lambda s: s["mode"] == "scripted", 6)
     ok &= check(wait_flag(b, "bb3", 16), "near-catch 3 on the stage", flags(b))
     ok &= check(pills_for_the_stage_manager(b), "his pills from his cabin on deck 4: the Entertainment card")
     go(b, 6, 118)
@@ -3025,14 +3025,161 @@ def pills_for_the_stage_manager(b):
     b.tap("e")
     hold_until(b, "up", lambda s: s["y"] == D6, 8)
     b.hold("left", 0.4)
-    # (He stands at the stage's aft curtain since 2026-11-19, the swinging light where he was.)
-    b.teleport(exact_x(249.6), D6)
+    # (He stands aft of centre stage since 2026-11-24, the dancers at the aft curtain: near-catch 3 remade.)
+    b.teleport(exact_x(248.5) + 26, D6)
     b.tap("e")
     end = now() + 12
     while now() < end and "ent" not in save_list(b, "cards"):
         wait(0.2)
     wait(0.8)
     return "ent" in save_list(b, "cards") and b.state()["mode"] == "play"
+
+
+def scenario_region3__stage(b):
+    """Near-catch 3 on the Stardust's stage, as remade (docs/near-catch-3-remake-log.md): the stage one picture, Bumbot
+    at centre stage in his spotlight under the rope's loop, the stage manager with his back to him and not sneezing,
+    the dancers at the aft curtain; the scene 154 px from him, the rival out of the wing ahead of her, the net on the
+    lamp, the lamp down as the loop goes up, the hatch, the flour, his first sneeze, how long she is held; where it
+    leaves her against the swinging lamp; arriving in a jump, off the balcony; a reload after."""
+    S = "window.__ship"
+    cat = f"{S}.cats.find(c => c.flag === 'bb3')"
+    q = f"{S}.world.story.stage"
+    P = f"{S}.world.people.byId"
+    sm, dh, dm = f"{P}['npc_stagemanager']", f"{P}['amb_dancer_her']", f"{P}['amb_dancer_him']"
+    her = f"{S}.player.anims.currentAnim?.key"
+    clip = lambda who: f"({who}.sprite.anims.currentAnim?.key || '')"
+    b.open("?reset&play&at=stage")
+    st = b.eval(f"{S}.world.data.stage")
+    cx, cf = b.eval(f"[{cat}.sprite.x, {cat}.floor]")
+    F, top, x0 = st["floor"], st["top"], st["x"]
+    ok = check(b.eval(f"{S}.worldLayer.list.some(o => o.texture?.key === 'stage-back' && o.x === {x0} && o.y === {F})"), "the stage is its own picture")
+    ok &= check(not b.eval(f"{S}.worldLayer.list.some(o => /^(grand-piano|guitar|mic-stand|drum-kit)/.test(o.frame?.name || '') && Math.abs(o.y - {F}) < 2 && o.x > {x0} && o.x < {x0} + 320)"),
+                "no piano, guitar or mic stand on it (the drum kit is in its picture)")
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-wash" and abs(cx - (x0 + 158)) <= 2, "Bumbot washes at centre stage", cx - x0)
+    ok &= check(abs(st["ropeX"] - 16.5 - cx) <= 1 and b.eval(f"{q}.ropeEnd") == F - 40, "the rope's loop over him, 40 px up", (st["ropeX"] - cx, F - b.eval(f"{q}.ropeEnd")))
+    ok &= check(abs(st["spotX"] - cx) < 30, "under a lantern of the lighting bar", st["spotX"] - cx)
+    ok &= check(b.eval(f"{q}.shut.visible && !{q}.open.visible"), "the hatch is shut")
+    lamp = f"{q}.light"
+    ok &= check(b.eval(f"!{lamp}.lamp.swinging && Math.abs({lamp}.lamp.y - ({top} + {lamp}.def.short)) < 1"), "the lamp hauled up, still")
+    places = b.eval(f"[{sm}.x, {sm}.dir, {dh}.x, {dm}.x]")
+    ok &= check(cx < places[0] < places[2] < places[3] and places[1] == 1, "the stage manager between Bumbot and his dancers, turned to them: his back to the cat", places)
+    ok &= check(b.eval(clip(dh)).endswith("-dance") and b.eval(clip(dm)).endswith("-dance"), "the dancers rehearsing at the aft curtain")
+    b.teleport(cx - 215, cf)
+    sneezed = False
+    end = now() + 6
+    while now() < end:
+        sneezed = sneezed or "sneeze" in b.eval(clip(sm))
+        wait(0.1)
+    ok &= check(not sneezed, "he does not sneeze before he has seen the cat")
+
+    # Walking in: taken 154 px from him, in front of the forward curtain; the whole stage in the picture.
+    hold_until(b, "right", lambda s: b.eval(f"{cat}.gone"), timeout=8)
+    t0 = b.eval(f"{S}.time.now")
+    hx = b.state()["x"]
+    ok &= check(146 <= cx - hx <= 156 and hx < x0 + 36, "the scene begins 154 px from him, she in front of the forward curtain", (cx - hx, hx - x0))
+    b.wait(0.1)
+    ok &= check(b.eval(f"{S}.mode") == "scripted" and b.eval(her) == "her-creep-tiptoe", "she starts toward him on tiptoe", b.eval(her))
+    b.wait(0.15)
+    ok &= check("notice" in b.eval(clip(sm)) and b.eval(f"{sm}.dir") == -1, "the stage manager turns and starts at the cat", (b.eval(clip(sm)), b.eval(f"{sm}.dir")))
+    riv = f"{P}['riv_stage']"
+    b.wait_for(f"{riv} && {riv}.on", timeout=2)
+    ok &= check(b.eval(f"{riv}.x") >= st["wingX"] and b.eval(f"{riv}.sprite.isCropped"), "the rival comes out from behind the proscenium's edge")
+    ahead, back = True, None
+    end = now() + 2
+    while now() < end and not b.eval(f"{q}.snag.visible"):
+        r = b.eval(f"{riv}.on ? [{riv}.x, {riv}.sprite.frame.cutX + {riv}.sprite.x - 40] : null")
+        if r and b.eval(f"{riv}.x") - 18 > x0 + 36:
+            ahead = ahead and r[0] - 18 > b.state()["x"] + 8
+        if b.eval(her) == "her-start-back" and back is None:
+            back = b.eval(f"{S}.time.now") - t0
+        wait(0.02)
+    ok &= check(ahead, "ahead of her all the way: never across her")
+    ok &= check(back is not None and 360 <= back <= 480 and b.state()["x"] - hx < 16, "she starts back as he bursts out, a few steps in", (back, b.state()["x"] - hx))
+    ok &= check(b.eval(f"{dh}.dir === -1 && {dm}.dir === -1") and not b.eval(clip(dh)).endswith("-dance"), "the dancers have stopped and turned", b.eval(clip(dh)))
+    view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
+    b.wait_for(f"{q}.snag.frame.name >= 5", timeout=2)
+    view = b.eval(f"(v => [v.x, v.right])({S}.cameras.main.worldView)")
+    ok &= check(view[0] <= hx - 20 and view[1] >= x0 + 320, "she and the whole stage, to its aft curtain, in the picture", (hx - view[0], view[1] - x0 - 320))
+    ok &= check(b.eval(f"{cat}.sprite.anims.currentAnim.key") == "bumbot-rope" and b.eval(f"!{riv}.on"), "Bumbot is in the loop as the net catches the lamp")
+    ok &= check(b.eval(f"!!{lamp}.held && {q}.snag.depth > {lamp}.pic.depth"), "the lamp held by his net, behind it")
+    b.shot("stage-snag")
+    # The lamp down, the loop up: one line.
+    pairs = []
+    end = now() + 2
+    while now() < end and not b.eval(f"{q}.open.visible"):
+        pairs.append(b.eval(f"[{lamp}.lamp.y, {q}.ropeEnd, {q}.snag.frame.name]"))
+        wait(0.02)
+    lamp0, rope0 = top + b.eval(f"{lamp}.def.short"), F - 40
+    worst = max(abs((rope0 - r) - 1.7 * (y - lamp0)) for y, r, f in pairs)
+    ok &= check(max(y for y, r, f in pairs) - lamp0 > 25 and worst < 30, "the loop goes up as the lamp comes down, 1.7 px for each of its px", (round(max(y for y, r, f in pairs) - lamp0), round(worst)))
+    ok &= check(b.eval(f"{q}.open.visible && !{q}.shut.visible"), "he drops onto the hatch: it gives way")
+    b.wait(0.12)
+    ok &= check(b.eval(f"{lamp}.lamp.swinging && !{lamp}.held"), "let go, the lamp swings")
+    seen = b.eval(f"(k => k.visible ? k.y - k.height + (k.isCropped ? k._crop.y : 0) : null)({cat}.sprite)")
+    ok &= check(seen is None or seen >= top, "nothing of Bumbot over the stage's top", seen)
+    b.wait_for(f"{q}.puff.visible", timeout=2)
+    ok &= check(b.eval(f"!{q}.snag.visible && {cat}.away && !{cat}.sprite.visible"), "the rival is gone down it, Bumbot up into the flies; flour comes up")
+    b.shot("stage-flour")
+    b.wait_for(f"{clip(sm)}.includes('sneeze')", timeout=2)
+    ok &= check(b.eval(f"{S}.mode") == "scripted", "the stage manager's first sneeze, before she is freed")
+    b.wait_for(f"{her} === 'her-shrug'", timeout=2)
+    b.wait_for(f"{S}.mode === 'play'", timeout=4)
+    held = (b.eval(f"{S}.time.now") - t0) / 1000
+    ok &= check(held < 3.0, "she is held under 3 s (it was 4.75)", round(held, 2))
+    b.shot("stage-after")
+    ok &= check("bb3" in flags(b) and b.eval(f"!{dh}.on && {P}['amb_dancer_her_off'].on && {P}['amb_dancer_her_off'].x === {places[2]} && {P}['amb_dancer_him_off'].x === {places[3]}"),
+                "the beat is set; the dancers stand where they rehearsed")
+    ok &= check(b.eval(f"{q}.ropeEnd") < top + 20 and b.eval(f"{sm}.dir") == -1, "the loop is up behind the valance; the stage manager faces the hole", b.eval(f"{q}.ropeEnd") - top)
+    s0 = b.state()
+    ok &= check(abs(s0["y"] - cf) < 1 and b.eval(f"{S}.player.body.enable && !{S}.player.flipX && {S}.cameras.main.followOffset.x === 0"), "she stands on the floor, hers again, facing aft")
+    # Where it leaves her, the swinging lamp does not reach; and he sneezes on.
+    sneezed, hit = False, False
+    end = now() + 9
+    while now() < end:
+        sneezed = sneezed or "sneeze" in b.eval(clip(sm))
+        hit = hit or b.eval(f"{S}.mode") != "play"
+        wait(0.1)
+    ok &= check(not hit, "nine seconds standing where it left her: the lamp does not reach her")
+    ok &= check(sneezed, "and the stage manager sneezes again")
+    ok &= check(b.eval(f"{sm}.bubbleItems[0].visible") is False, "his pills' bubble only when she is near")
+
+    # Arriving in a jump across his line of sight: straight down where she crossed it, and the scene from there.
+    b.open("?reset&play&at=stage")
+    hold_until(b, "right", lambda s: cx - s["x"] < 195, timeout=8)
+    b.key("right", True)
+    b.key("space", True)
+    b.wait_for(f"{cat}.gone", timeout=4)
+    b.key("space", False)
+    b.key("right", False)
+    s1 = b.state()
+    ok &= check(cf - s1["y"] > 4 and 140 <= cx - s1["x"] <= 156, "in a jump, she is taken as she crosses his line of sight, in the air", (cx - s1["x"], cf - s1["y"]))
+    b.wait_for(f"{her} === 'her-creep-tiptoe' || {her} === 'her-start-back'", timeout=3)
+    s2 = b.state()
+    ok &= check(abs(s2["y"] - cf) < 1 and abs(s2["x"] - s1["x"]) < 6, "comes straight down, and the scene from there", (s2["x"] - s1["x"], s2["y"] - cf))
+    b.wait_for(f"{S}.mode === 'play'", timeout=6)
+    ok &= check(abs(b.state()["y"] - cf) < 1 and "bb3" in flags(b), "and ends with her on the floor")
+
+    # Off the balcony's front onto the stage (every lock open): the scene where she lands.
+    b.open("?reset&play&at=stage&cards=all")
+    b.teleport(exact_x(243.0), D7)
+    hold_until(b, ["right", "space"], lambda s: s["y"] == D6 or b.eval(f"{cat}.gone"), 5)
+    b.wait_for(f"{cat}.gone", timeout=4)
+    b.wait_for(f"{S}.mode === 'play'", timeout=8)
+    s3 = b.state()
+    ok &= check(abs(s3["y"] - cf) < 1 and "bb3" in flags(b) and b.eval(f"{q}.open.visible && !{q}.snag.visible"), "off the balcony onto the stage: the scene, and she on the floor after", s3)
+    ok &= check(s3["x"] < x0 + 44, "she came straight down in front of the curtain, clear of the lamp", s3["x"] - x0)
+    b.wait(6)
+    ok &= check(b.state()["mode"] == "play" and abs(b.state()["x"] - s3["x"]) < 2, "where the lamp does not reach her", b.state())
+
+    # A reload after it.
+    b.open("?play&at=stage&did=bb3")
+    ok &= check(b.eval(f"{cat}.away && !{cat}.sprite.visible && {q}.open.visible && !{q}.shut.visible && {q}.ropeEnd < {top} + 20 && {sm}.dir === -1 && {P}['amb_dancer_her_off'].on"),
+                "after a reload: he is gone, the hatch open, the loop up, the dancers stopped")
+    b.wait(1.5)
+    ok &= check(b.eval(f"{lamp}.lamp.swinging"), "and the lamp swings")
+    hold_until(b, "right", lambda s: s["x"] > cx - 150, timeout=8)
+    ok &= check(b.eval(f"{S}.mode") == "play", "nothing starts when she walks up")
+    return ok
 
 
 def scenario_region3(b):
@@ -3093,38 +3240,37 @@ def scenario_region3(b):
     ok &= check(route(b) == "inside" and "Entertainment" in alert(b), "the lighting booth wants the Entertainment card", alert(b))
     # Off the balcony's end, down onto the stage: no scare.
     st = js(b, "window.__ship.world.data.stage")
+    # (Before the beat, from in front of the stage: 154 px from Bumbot she is taken, near-catch 3 as remade,
+    # `region3.stage`; so the stage is looked at from the house, and its hatch cannot be stood on yet.)
+    b.teleport(exact_x(242.5), D6)
+    wait(0.4)
+    ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_off")["on"],
+                "the stage manager with his dancers, rehearsing")
+    b.shot("region3-stage")
+    stage = "window.__ship.world.story.stage"
+    ok &= check(js(b, f"{stage}.shut.visible") and not js(b, f"{stage}.open.visible"), "the stage's hatch is shut before the beat")
     b.teleport(exact_x(243.0), D7)
     b.hold("right", 0.8)
     ok &= check(b.state()["y"] == D7, "the balcony's front holds her", b.state())
     hold_until(b, ["right", "space"], lambda s: s["y"] == D6, 4)
     wait(0.3)
     s = b.state()
-    ok &= check(s["y"] == D6 and s["mode"] == "play", "hopped, she drops onto the stage: no scare", s)
-    b.teleport(exact_x(244.4), D6)
-    wait(0.4)
-    ok &= check(person(b, "npc_stagemanager")["on"] and person(b, "amb_dancer_her")["on"] and not person(b, "amb_dancer_her_off")["on"],
-                "the stage manager at the curtain, the dancers rehearsing")
-    b.shot("region3-stage")
-    b.teleport(st["trapX"], D6)
-    wait(0.5)
-    ok &= check(b.state()["y"] == D6 and route(b) == "inside", "the trap door holds before the beat", b.state())
-    # Near-catch 3.
-    b.teleport(exact_x(246.9), D6)
-    b.hold("right", 0.5)
-    wait(1.5)
+    ok &= check(s["y"] == D6 and s["mode"] in ("play", "scripted"), "hopped, she drops onto the stage: no scare", s)
+    # Near-catch 3 (where she landed, or as she walks on).
+    hold_until(b, "right", lambda s: s["mode"] == "scripted" or "bb3" in flags(b), 4)
+    wait(1.0)
     b.shot("region3-rival")
     ok &= check(wait_flag(b, "bb3", 16), "near-catch 3: the rival goes down the trap door, Bumbot up the fly rope", flags(b))
-    ok &= check(js(b, "window.__ship.world.story.trapHole.visible") and not js(b, "window.__ship.world.story.trapSeam.visible"),
-                "the trap door stays open")
-    ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_off")["on"], "the dancers wait by the front row")
+    ok &= check(js(b, f"{stage}.open.visible") and not js(b, f"{stage}.shut.visible"), "the trap door stays open")
+    ok &= check(not person(b, "amb_dancer_her")["on"] and person(b, "amb_dancer_her_off")["on"], "the dancers stand where they rehearsed, stopped")
     light = "window.__ship.world.movers.find(m => m.lamp)"
     wait(1.2)
     ok &= check(js(b, f"{light}.lamp.swinging"), "and the stage light swings")
     wait(4.0)
     ok &= check(b.state()["mode"] == "play", "where the scene left her it does not reach her", b.state())
     b.shot("region3-after")
-    # He wants his pills; she has none yet. (At the stage's aft curtain since 2026-11-19.)
-    b.teleport(exact_x(249.6), D6)
+    # He wants his pills; she has none yet. (Aft of centre stage since 2026-11-24.)
+    b.teleport(exact_x(248.5) + 26, D6)
     wait(0.4)
     ok &= check(js(b, "window.__ship.world.people.byId.npc_stagemanager.bubbleItems[0].visible"), "the stage manager shows a pill bottle")
     b.tap("e")

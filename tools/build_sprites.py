@@ -88,6 +88,11 @@ HER = {
         # poses (assets/source/her/creep-tiptoe/README.md). Each frame on its lowest pixel: her planted toes.
         "creep-tiptoe": [(f"creep-tiptoe/{i}.png", "feet") for i in range(8)],
         "creep-reach": [(f"creep-reach/{i}.png", "feet") for i in range(8)],
+        # (Near-catch 3 remade, 2026-11-24: out of her tiptoe she starts back, hands up, as the rival bursts out of
+        # the wing; then straightens and looks up after Bumbot gone up the fly rope. Her own character's, by poses:
+        # assets/source/her/start-back/README.md.)
+        "start-back": [(f"start-back/{i}.png", "feet") for i in range(8)],
+        "look-up": [(f"look-up/{i}.png", "feet") for i in range(8)],
         # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
         # height, a knee coming up. The game picks the frame by how far she has risen.
         "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],

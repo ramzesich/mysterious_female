@@ -63,6 +63,7 @@ new one added there should be added here too.
 | `bar`: Bliss Ultra Lounge | <http://localhost:8000/?play&at=bar&cards=all> |
 | `library`: inside the Library | <http://localhost:8000/?play&at=library&cards=all> |
 | `quiet`: the Library, 6 m short of its return trolley (walk aft: Bumbot asleep on it, near-catch 2) | <http://localhost:8000/?play&at=quiet> |
+| `stage`: the Stardust Lounge, by the stage door, 1.5 m short of the stage (walk aft: near-catch 3) | <http://localhost:8000/?play&at=stage> |
 | `library` carrying three books (reading: any armchair, E) | <http://localhost:8000/?play&at=library&books=3,8,11> |
 | `nook`: inside the reading nook, open (its armchair: all fourteen books; its frame: her armchair at home) | <http://localhost:8000/?play&at=nook&did=books_all,nook> |
 | `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |

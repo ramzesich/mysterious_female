@@ -14,6 +14,7 @@ import { finale } from './finale.js';
 import { spa } from './spa.js';
 import { pass } from './pass.js';
 import { quiet } from './quiet.js';
+import { stage } from './stage.js';
 
 const M = 48;
 
@@ -23,8 +24,6 @@ const STEWARD_TUG = 17, STEWARD_FREE = 35;
 // Near-catch 4 (the linen room): his body's columns in his asleep frame (of 64), and how near she or the laundry cart comes
 // before he is off (the user, 2026-11-23: "she almost touches him, or the cart almost touches him, by a couple of pixels").
 const BB4_SPAN = [19, 49], BB4_GAP = 2;
-// (On the stage's fly rope: where the rope stands in his clip's frames, px before his middle.)
-const ROPE_CAT = { x: 16.5 };
 // (His head in that picture, px aft of its middle: his bubble over it.)
 const STEWARD_HEAD = 22;
 // His card tossed to her, his `toss` clip (frames 0 to 7): in his fingers at his pocket in frames 3
@@ -78,6 +77,7 @@ export class Story {
     update(dt, time, input) {
         this.updatePass();
         this.updateQuiet();
+        this.updateStage();
         this.updateLido(dt, time, input);
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
@@ -97,7 +97,7 @@ export class Story {
     onFlag(name) {
         if (name === 'bb1') this.passAfter();
         if (name === 'bb2') this.quietAfter();
-        if (name === 'bb3') this.showTrap();
+        if (name === 'bb3') this.stageAfter();
         if (name === 'cart_free') this.stewardThanks();
         if (name === 'duct') this.outOfTheDuct();
         if (name === 'guest') this.guestIn();
@@ -422,111 +422,14 @@ export class Story {
 
     // --- Region 3 -----------------------------------------------------------------------------
 
-    // The stage (population §6.4, as built: `world.data.stage`): the trap door's seam, the fly rope,
-    // and near-catch 3's own way of going: the rival bursts in, trips, and goes down the trap door;
-    // Bumbot rides the fly rope up into the flies.
-    setupStage() {
-        const s = this.scene, st = this.world.data.stage, D = s.DEPTH;
-        if (!st) return;
-        // The trap door: a seam in the stage's front until it has given way, then a hole, its lid up.
-        this.trapSeam = s.add.graphics().setDepth(D.decor + 0.3);
-        this.trapSeam.lineStyle(1, 0x3b2a20, 1).strokeRect(st.trapX - 12.5, st.floor - 7.5, 25, 7);
-        this.trapSeam.fillStyle(0xd9a43b, 1).fillRect(st.trapX - 2, st.floor - 5, 4, 2);
-        // (Open: its own picture, the lid up on its hinge, a ladder's top in the opening, its middle the drop's:
-        // `assets/source/ship/trapdoor/`, 2026-11-19; it was a black box and a stick, "that black rectangle".)
-        this.trapHole = s.add.image(st.trapX - 15, st.floor + 1, 'trapdoor-open').setOrigin(0, 1).setDepth(D.decor + 0.3);
-        // The fly rope, a loop at its end: he rides it up, and it stays hauled up after.
-        this.rope = s.add.graphics().setDepth(D.props + 0.02);
-        this.world.add([this.trapSeam, this.trapHole, this.rope]);
-        this.drawRope(this.P.has('bb3') ? st.top + 34 : st.floor - 40);
-        this.showTrap();
-        const bb3 = s.cats.find(c => c.flag === 'bb3');
-        if (bb3) {
-            bb3.before = () => this.rivalTrips();
-            bb3.flee = (sprite, done) => this.upTheRope(sprite, done);
-        }
-    }
-
-    showTrap() {
-        const open = this.P.has('bb3') || this.trapOpen;
-        this.trapSeam?.setVisible(!open);
-        this.trapHole?.setVisible(!!open);
-    }
-
-    drawRope(endY) {
-        const st = this.world.data.stage, g = this.rope.clear();
-        g.fillStyle(0x7a4528, 1).fillRect(st.ropeX - 1, st.top + 12, 2, endY - st.top - 12);
-        g.fillStyle(0xab947a, 1);
-        for (let y = st.top + 14; y < endY; y += 4) g.fillRect(st.ropeX - 1, y, 1, 2);
-        g.lineStyle(2, 0x7a4528, 1).strokeEllipse(st.ropeX, endY + 5, 8, 10);
-        this.ropeEnd = endY;
-    }
-
-    // The rival runs in through the curtain behind her with his net, trips on the microphone's
-    // cable, and goes head first onto the trap door, which gives way under him.
-    async rivalTrips() {
-        const s = this.scene, w = this.world, st = w.data.stage;
-        const sm = this.who('npc_stagemanager');
-        if (sm?.on) this.people.play(sm, 'flap', { times: 2 });
-        const r = this.people.add({ id: 'riv_stage', who: 'rival', x: st.wingX, y: st.floor, route: 'inside', face: 1, owned: true });
-        if (!r) return;
-        r.on = true;
-        const place = () => this.people.place(r);
-        this.people.anim(r, 'walk', { speed: 2.4 });
-        await w.tween({ targets: r, x: st.cableX, duration: (Math.abs(st.cableX - st.wingX) / 230) * 1000, onUpdate: place });
-        this.people.play(r, 'trip');
-        sfx.at(r.x, r.y).yelp();
-        await w.tween({ targets: r, x: st.trapX - 4, duration: 440, ease: 'Quad.easeOut', onUpdate: place });
-        this.trapOpen = true;
-        this.showTrap();
-        sfx.at(st.trapX, st.floor).trapdoor();
-        s.cameras.main.shake(200, 0.004);
-        await w.tween({ targets: r.sprite, y: st.floor + 56, alpha: 0, duration: 340, ease: 'Quad.easeIn' });
-        sfx.at(st.trapX, st.floor).flump();
-        r.gone = true;
-        r.items.forEach(i => i.setVisible(false));
-        // Flour comes up out of the hole: he has found the galley's sacks.
-        for (let i = 0; i < 12; i++) {
-            const dot = s.add.image(st.trapX + Phaser.Math.Between(-9, 9), st.floor - 4, 'dot').setTint(0xf3ecdd).setDepth(s.DEPTH.fx).setScale(2);
-            w.add([dot]);
-            s.tweens.add({ targets: dot, y: dot.y - Phaser.Math.Between(16, 40), x: dot.x + Phaser.Math.Between(-10, 10), alpha: 0, duration: 700, delay: i * 25, onComplete: () => dot.destroy() });
-        }
-        await w.wait(420);
-    }
-
-    // Bumbot's way out: a leap onto the fly rope's loop, and up with it into the flies.
-    upTheRope(sprite, done) {
-        const s = this.scene, st = this.world.data.stage;
-        // (On the rope he has a clip of his own since he was made again, 2026-11-24: the catch with his front paws, his
-        // hind paws into the loop, a look back down. Made with the rope in its picture and the rope taken out: the
-        // game's own is behind him. The rope stands `ROPE_CAT.x` px before his middle in those frames, and they keep
-        // `BUMBOT.under` px under his floor.)
-        const west = st.ropeX < sprite.x, at = st.ropeX + (west ? 1 : -1) * ROPE_CAT.x;
-        sprite.setFlipX(west).play('bumbot-leap');
-        s.tweens.add({
-            targets: sprite, x: at, y: st.floor - 30, duration: 240, ease: 'Quad.easeOut',
-            onComplete: () => {
-                sprite.setDepth(this.rope.depth + 0.001).play({ key: 'bumbot-rope', startFrame: 2 });
-                sfx.at(st.ropeX, st.floor).whip();
-                const from = this.ropeEnd, to = st.top + 34;
-                s.tweens.addCounter({
-                    from: 0, to: 1, duration: 950, ease: 'Sine.easeIn',
-                    onUpdate: tw => {
-                        const k = tw.getValue();
-                        this.drawRope(from + (to - from) * k);
-                        sprite.y = this.ropeEnd + 10;
-                        sprite.setAlpha(k > 0.8 ? (1 - k) * 5 : 1);
-                    },
-                    onComplete: () => { sprite.setAlpha(1); done(); },
-                });
-            },
-        });
-    }
+    // (The stage and near-catch 3: src/world/stage.js, `setupStage`, `stageBeat`, `stageAfter`.)
 
     // The stage manager (population: `npc_stagemanager`): allergic to the cat on his stage, he
-    // sneezes every few seconds until he has his pills.
+    // sneezes every few seconds until he has his pills. (From his first sneeze, in near-catch 3's scene, once he has
+    // seen the cat: the user, 2026-11-24, "react somehow to Bumbot and then start sneezing". He sneezed before it.)
     sneezes(time) {
         const m = this.who('npc_stagemanager'), s = this.scene;
+        if (!this.P.has('bb3')) return;
         if (!m?.on || m.state === 'acting' || this.P.save.cards.includes('ent') || s.mode !== 'play') return;
         if (Math.abs(s.player.x - m.x) > 700 || Math.abs(s.player.y - m.y) > 200) return;
         this.sneezeAt ??= time + 2500;
@@ -1130,3 +1033,4 @@ Object.assign(Story.prototype, finale);
 Object.assign(Story.prototype, spa);
 Object.assign(Story.prototype, pass);
 Object.assign(Story.prototype, quiet);
+Object.assign(Story.prototype, stage);

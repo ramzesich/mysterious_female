@@ -61,7 +61,7 @@ CAST = {
                  {"cut": {"flick": ("skim", [3, 4, 5, 5, 6, 7])}}),
     # (On the bridge, region 9: "swing" is the net brought down, cut from "swat"; a first try,
     # "lunge", ran with the net over his shoulder.)
-    "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5, "swing": 10},
+    "rival": ("c76f8ffa-277f-405f-ae3b-0268a53e2fb4", {"trip": 12, "peek": 5, "swing": 10, "charge": 16},
               {"cut": {"swing": ("swat", [2, 3, 4, 5, 7, 8])}}),
     # (His `bite`: a tangerine to his mouth, a bite, the hand down, chewing: src/world/people.js `eat`.)
     # (`tip`: his hand from the cart's handle to his cap's brim, a nod, and back: 8c, she sat on his
@@ -115,10 +115,14 @@ CAST = {
     # that hold his clipboard.)
     # ("applaud", cut from "clap": he and the planner clap her home, step 10: src/world/finale.js.
     # Each claps against the clipboard in the other hand.)
-    "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4, "applaud": 9},
+    "stagemanager": ("e6153c00-599b-41a5-8c3a-4d3f562b1ad1", {"sneeze": 9, "flap": 10, "idle": 4, "applaud": 9, "notice": 12},
                      {"cut": {"flap": ("flap2", [1, 2, 3, 4, 5, 6]), "applaud": ("clap", [3, 4, 5, 6, 7, 6, 5, 4])}}),
-    "dancer_her": ("24692747-5dde-4578-9a6e-c3ac1adc9df8", {"dance": 9, "idle": 4}, {}),
-    "dancer_him": ("b14c307c-c551-4381-85e9-74b5610b95cd", {"dance": 9, "idle": 4}, {}),
+    # (The two dancers made again, 2026-11-24, near-catch 3 remade: the user chose her of three pairs, in her show
+    # costume, and turned down his in a white tailcoat, "looks like a waiter"; he is the Latin dancer of three more.
+    # `dance`: a salsa basic; `startle`: a hop back; the old pair were 24692747-5dde-4578-9a6e-c3ac1adc9df8 and
+    # b14c307c-c551-4381-85e9-74b5610b95cd. The tries: assets/source/stage/dancers/.)
+    "dancer_her": ("9baa6f8b-6aa3-40a8-907d-4d3daf0c6313", {"dance": 9, "idle": 4, "startle": 12}, {}),
+    "dancer_him": ("319870d1-ce90-41d9-b074-5c8039a85f04", {"dance": 9, "idle": 4, "startle": 12}, {}),
     "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
     "cowboy": ("9aa4a55c-aea0-46aa-80fb-8642f6d13c99", {}, {}),
     "barman": ("ac5b9c77-3083-4b2b-9615-e7a3a98dc860", {"idle": 4}, {}),

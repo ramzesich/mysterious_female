@@ -484,8 +484,8 @@ def build_world():
     window = dict(x=B.exact_x(GLIMPSE_WINDOW[0]), y=B.floor_y(6) - GLIMPSE_WINDOW[1], floor=B.floor_y(6))
 
     stage_y = B.floor_y(STAGE["deck"])
-    stage = dict(floor=stage_y, top=stage_y - 128, wingX=B.exact_x(STAGE["wing"]), cableX=B.exact_x(STAGE["cable"]),
-                 trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]))
+    stage = dict(floor=stage_y, top=stage_y - 128, x=B.col(B.STAGE) * B.TILE, wingX=B.exact_x(STAGE["wing"]),
+                 trapX=B.exact_x(TRAPDOOR_M), ropeX=B.exact_x(STAGE["rope"]), spotX=B.exact_x(STAGE["spot"]))
 
     linen = dict(x0=room_x0["linen"], chuteX=room_x0["linen"] + LINEN["chute"],
                  cartTop=LINEN["cart_top"], laundryCartX=room_x0["laundry"] + LINEN["laundry_cart"])

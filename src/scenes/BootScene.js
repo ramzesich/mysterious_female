@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG, QUIET } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG, QUIET, STAGE } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -24,7 +24,6 @@ export class BootScene extends Phaser.Scene {
         this.load.atlas('livery', 'assets/ship/livery.png', 'assets/ship/livery.json');
         // A one-way glass door's open leaf, its push bar across it (assets/source/ship/pushbar/).
         this.load.image('door-glass-pushbar', 'assets/ship/door-glass-pushbar.png');
-        this.load.image('trapdoor-open', 'assets/ship/trapdoor-open.png');
         this.load.image('door-glass-oneway-edge', 'assets/ship/door-glass-oneway-edge.png');
         // (A "Do Not Disturb" door shut with its sign on the lever's mount, and the sign alone, on the balconies'
         // partitions: `assets/source/ship/dnd-hanger/`.)
@@ -68,6 +67,16 @@ export class BootScene extends Phaser.Scene {
         // The Library's rope stand going over, near-catch 2 (tools/build_quiet.py): frames of 96 x 64; where they stand:
         // quiet.json.
         this.load.json('quiet-layout', 'assets/ship/quiet/quiet.json');
+        // The Stardust's stage and near-catch 3's pieces (tools/build_stage.py): the stage's own picture, its valance
+        // again, the hanging lamp, the hatch shut and open, the rival's clip (128 px frames), the flour (64 px).
+        this.load.json('stage-layout', 'assets/ship/stage/stage.json');
+        this.load.image('stage-back', 'assets/ship/stage/stage.png');
+        this.load.image('stage-valance', 'assets/ship/stage/valance.png');
+        this.load.image('stage-lamp', 'assets/ship/stage/lamp.png');
+        this.load.image('stage-trap-shut', 'assets/ship/stage/trap-shut.png');
+        this.load.image('stage-trap-open', 'assets/ship/stage/trap-open.png');
+        this.load.spritesheet('stage-snag', 'assets/ship/stage/snag.png', { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('stage-puff', 'assets/ship/stage/puff.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('quiet-stand-fall', 'assets/ship/quiet/stand-fall.png', { frameWidth: 96, frameHeight: 64 });
         // The Seven Seas' pass, near-catch 1 (tools/build_pass.py): its counter, the plate of the lunch, the fruit bowl's
         // fall off the counter's end (frames of 96 x 64; where they stand: pass.json).
@@ -291,6 +300,10 @@ export class BootScene extends Phaser.Scene {
         // Bending down to pick Bumbot up (a near-catch), and straightening up again.
         this.anims.create({ key: 'her-reach', frames: frames('reach'), frameRate: 10 });
         this.anims.create({ key: 'her-straighten', frames: frames('reach').reverse(), frameRate: 12 });
+        // Near-catch 3 (src/world/stage.js): starting back as the rival bursts out of the wing; looking up after Bumbot.
+        if (meta.anims['start-back']) this.anims.create({ key: 'her-start-back', frames: frames('start-back'), frameRate: STAGE.backFps });
+        if (meta.anims['look-up']) this.anims.create({ key: 'her-look-up', frames: frames('look-up'), frameRate: STAGE.lookFps });
+        if (this.textures.exists('stage-puff')) this.anims.create({ key: 'stage-puff', frames: this.anims.generateFrameNumbers('stage-puff'), frameRate: STAGE.puffFps });
         // Near-catch 2 (src/world/quiet.js): creeping up on tiptoe, reaching for him at his height, straightening.
         if (meta.anims['creep-tiptoe']) this.anims.create({ key: 'her-creep-tiptoe', frames: frames('creep-tiptoe'), frameRate: QUIET.tipFps, repeat: -1 });
         if (meta.anims['creep-reach']) {
