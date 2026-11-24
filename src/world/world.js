@@ -1775,7 +1775,25 @@ export class World {
         P.ceilOpen = ceil('ceiling-open');
         this.things.push({ id: 'hatch_pool', x: h.x, y: tank, route: 'inside', needs: 'drain', items: [], reach: 18,
             interact: () => this.hatchDown() });
+        // (Under the water the hatch and the grate hardly show; clear as it goes: `drainPool`.)
+        this.poolClear(0);
         this.poolHatch();
+    }
+
+    // How clear the hatch and the drain's grate are: 0 under the water, 1 in the dry tank.
+    poolClear(k) {
+        const a = POOL.under + (1 - POOL.under) * k;
+        this.pool.shut.obj.setAlpha(a);
+        this.pool.drain.obj.setAlpha(a);
+    }
+
+    // In the first pool's dry tank her picture is drawn `POOL.floor` px lower than her body, on the floor's strip of
+    // tiles; eased in over the last px of her way down into it, and out as she jumps out of it.
+    tankDrop(p) {
+        const s = this.scene, lido = this.data.lido, pool = lido.pools[0];
+        if (!this.progress.has('drain') || s.route !== 'inside' || s.pools.some(w => w.x0 === pool.x0 && w.deck === (lido.deck ?? 11))) return 0;
+        if (p.x < pool.x0 - 8 || p.x > pool.x1 + 8 || p.y > lido.tankY + 4) return 0;
+        return Math.round(POOL.floor * Phaser.Math.Clamp((p.y - lido.y - 8) / 12, 0, 1));
     }
 
     // The hatch and the panel under it as they stand: shut until she has opened it (`pool_hatch`).
@@ -1826,7 +1844,7 @@ export class World {
             s.pose('back');
             if (s.anims.exists('her-climb')) p.anims.play('her-climb', true);
             const down = () => {
-                const top = p.y + PLAYER.sink - cell;
+                const top = p.y + s.herDropPx() - cell;
                 p.setCrop(0, 0, cell, Phaser.Math.Clamp(P.lipY - top, 0, cell));
             };
             sfx.at(h.x, P.tank).rung();
@@ -1834,6 +1852,7 @@ export class World {
             // Out of the ceiling under it: deck 10 from here on. Its side opens first, she out of sight in the tank's
             // floor meanwhile (drawn at once, her legs hung over the closed hull for a moment).
             p.setVisible(false);
+            s.herDrop(0);
             s.viewDeck = s.viewOverride = lidoDeck - 1;
             s.dimHeld = true;
             await this.wait(POOL.hatch.through);
@@ -2738,6 +2757,7 @@ export class World {
             }
             [pool.water, pool.ripples].forEach(o => o.setVisible(false));
             pool.gurgle?.destroy();
+            this.poolClear(1);
         };
         if (atOnce) return out();
         const top = pool.y, depth = pool.bottom - pool.y, x0 = pool.x0, x1 = pool.x1, dx = lido.drainX;
@@ -2796,6 +2816,7 @@ export class World {
                     if (y - top > 6) wet.fillStyle(0xc7e7ff, 0.75 * (1 - f)).fillRect(Math.round(x), Math.round(yy), 1, 2);
                 }
                 drawPuddles(0);
+                this.poolClear(e);
                 if (s.mode === 'swim' && s.pool === pool) {
                     // (Too shallow to swim: her feet find the floor.)
                     if (pool.bottom - y < 16) out();

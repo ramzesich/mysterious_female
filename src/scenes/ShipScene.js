@@ -3840,6 +3840,10 @@ export class ShipScene extends Phaser.Scene {
             const px = this.herDropPx() - PLAYER.sink;
             if (onWalk && px !== -WALK_LIFT) this.herDrop(-WALK_LIFT);
             else if (!onWalk && px === -WALK_LIFT) this.herDrop(0);
+            // (And in the first pool's dry tank a few px lower, on its floor's strip of tiles: `world.tankDrop`.)
+            const tank = onWalk ? 0 : this.world.tankDrop?.(p) ?? 0;
+            if (!onWalk && (tank || this.tankDropped) && px !== tank) this.herDrop(tank);
+            this.tankDropped = tank > 0;
         }
         // On a balcony her picture is cut at its partitions and at a row's end (`balconyRoom`): what reached past
         // one showed on the next balcony or over the ship's side (the user, 2026-11-21). (Phaser 4 crops a picture

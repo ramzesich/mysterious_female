@@ -1776,7 +1776,7 @@ def build_objects():
     at11(132.96, "hot-tub")      # (22 px aft of where it first stood: the drain lever's throw, tools/population.py `LIDO`)
     decor("hot-tub-canopy", "canopy", exact_x(131.1), exact_x(133.9), deck=11)
     for m, flip in ((119.5, False), (139.5, True)):
-        at11(m, "pool-ladder", -12, flip=flip)   # feet in the water, within deck 11's slab (not into deck 10)
+        at11(m, "pool-ladder", -15, flip=flip)   # feet in the water, within deck 11's slab (not into deck 10); 3 px lower than at first (the user, 2026-11-24)
     at11(150.0, "towel-cart")
     at11(151.8, "pool-shower")
     decor("shower-box", "showerbox", exact_x(151.1), exact_x(152.5), deck=11)

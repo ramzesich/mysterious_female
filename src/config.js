@@ -173,10 +173,13 @@ export const PROMENADE = {
 // long the wall stays wet and the floor's puddles last after it (ms). The hatch: her place beside it as she opens it (px
 // from its middle), how long she takes down its ladder (ms), how far down she goes out of sight (px), how long she is out of
 // sight between the tank's floor and the hallway's ceiling while deck 10's side opens (ms). `ceiling`: deck
-// 10's hallway's ceiling line, px over its floor; `out`: how far under it she is as she drops out.
+// 10's hallway's ceiling line, px over its floor; `out`: how far under it she is as she drops out. `floor`: in the dry
+// tank her picture is drawn this many px lower than her body, on the floor's strip of pale tiles (the user,
+// 2026-11-24: at the wall's foot "she looks floating in the air"); `under`: how much of the hatch and the drain's grate
+// shows through the water ("much less visible when in the water").
 export const POOL = {
-    drainMs: 5000, wetMs: 7000, puddleMs: 12000,
-    hatch: { beside: 30, downMs: 900, down: 66, through: 280 },
+    drainMs: 5000, wetMs: 7000, puddleMs: 12000, floor: 3, under: 0.28,
+    hatch: { beside: 30, downMs: 950, down: 76, through: 280 },
     ceiling: 129, out: 20,
 };
 

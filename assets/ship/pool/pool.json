@@ -42,20 +42,20 @@
  },
  "hatch-shut": [
   -23,
-  0
+  3
  ],
  "hatch-back": [
   -23,
-  -28
+  -25
  ],
  "hatch-lip": [
   -23,
-  13
+  16
  ],
  "drain": {
   "x": 6711,
   "dx": -11,
-  "dy": 3
+  "dy": 5
  },
  "ceiling-shut": [
   -20,

@@ -36,6 +36,10 @@ DIFF = 24                 # a pixel is the piece's when it is this far (r + g + 
 # Where each thing stands in the world its rough was drawn in (px; `LIDO` in tools/population.py gives the same):
 # the lever's stand, the hatch's middle, deck 11's floor, the tank's floor, the hallway's ceiling line.
 LEVER_X, HATCH_X, DECK_Y, TANK_Y, CEILING_Y = 6803, 6648, 560, 592, 575
+# The user's own placing of them, seen in play (2026-11-24): the tank's floor reads as its strip of pale tiles, so
+# the hatch lies 3 px lower than its rough was drawn, the grate 2, and the ladders stand 3 px lower (the atlas's
+# ladder hangs LADDER_UNDER px under the deck's line: `at11` in tools/build_ship_map.py, `prop_ladder_aft`).
+HATCH_DOWN, DRAIN_DOWN, FLOOR_DOWN, LADDER_UNDER = 3, 2, 3, 15
 # Each piece: the generated picture, the base it is compared with, its box in that picture.
 BOXES = {"lever": ("lever-up", "lever-base", (41, 72, 61, 96)), "hatch-shut": ("hatch-shut", "hatch-base", (30, 60, 84, 82)),
          "hatch-open": ("hatch-open", "hatch-base", (30, 26, 84, 82)), "drain": ("aft", "aft-base", (24, 62, 54, 80)),
@@ -229,7 +233,7 @@ def hatch():
     opened, at = trim(short, (at[0], at[1] + (b - a)))
     lip = opened.crop((0, opened.height - LIP_ROWS, opened.width, opened.height))
     back = opened.crop((0, 0, opened.width, opened.height - LIP_ROWS))
-    rel = lambda p: [p[0] - HATCH_X, p[1] - TANK_Y]
+    rel = lambda p: [p[0] - HATCH_X, p[1] - TANK_Y + HATCH_DOWN]
     return {"hatch-shut": (shut, rel(at_shut)), "hatch-back": (back, rel(at)), "hatch-lip": (lip, rel((at[0], at[1] + opened.height - LIP_ROWS)))}
 
 
@@ -261,15 +265,15 @@ def main():
     img, at = trim(*cut("drain"))
     img.save(OUT / "drain.png")
     # (The grate's own anchor: its middle on the tank's floor line; `drain` in `LIDO` is that metre.)
-    info["drain"] = dict(x=at[0] + img.width // 2, dx=-(img.width // 2), dy=at[1] - TANK_Y)
+    info["drain"] = dict(x=at[0] + img.width // 2, dx=-(img.width // 2), dy=at[1] - TANK_Y + DRAIN_DOWN)
     for name in ("ceiling-shut", "ceiling-open"):
         img, at = trim(*cut(name))
         img.save(OUT / f"{name}.png")
         info[name] = [at[0] - HATCH_X, at[1] - CEILING_Y]
     piece, cell, rungs, period = ladder_low()
     # from the tank's top edge (4 px under the deck) to its floor: the atlas piece hangs 12 px into the deck
-    top_row = 17 + 4          # the piece's row at the tank's top edge (its row 17 is the deck's line: 29 rows, 12 under)
-    rows = TANK_Y - (DECK_Y + 4)
+    top_row = piece.height - LADDER_UNDER + 4      # the piece's row at the tank's top edge, 4 px under the deck's line
+    rows = TANK_Y + FLOOR_DOWN - (DECK_Y + 4)
     low = Image.new("RGBA", (piece.width, rows), (0, 0, 0, 0))
     for y in range(rows):
         src_row = rungs[0] + ((top_row + y - rungs[0]) % period)

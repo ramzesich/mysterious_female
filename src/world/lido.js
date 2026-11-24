@@ -22,8 +22,8 @@ const KID = { walk: 46, run: 150, sees: 4 * M, jet: 3 * M, every: 2500, tell: 48
 // down out of sight, `peek` px lower with his cap showing over the near rim; his pistol's muzzle from his feet.
 const TUB = { rim: 15, in: 12, duck: 34, peek: 24, muzzle: [-21, -27] };
 // Bumbot in it: how far into the pool from her he lands (px), how deep he swims (his feet under the surface, so that
-// his head and back show over it), his paddle (px/s), where his paws are from the lever's grip, how he is thrown.
-const CAT = { in: 44, swim: 13, paddle: 52, paw: 2, over: 38, lands: 42 };
+// his head and back show over it), how deep he goes as he plunges in (his feet, all of him under), his paddle (px/s), where his paws are from the lever's grip, how he is thrown.
+const CAT = { in: 44, swim: 12, under: 27, paddle: 52, paw: 2, over: 38, lands: 42 };
 
 export const lido = {
     setupLido() {
@@ -284,12 +284,15 @@ export const lido = {
         s.splash(inX, surface);
         s.splash(inX + 5, surface - 2);
         sfx.at(inX, surface).splash();
-        c.setVisible(false);
         if (swimming) her.setFlipX(true);
-        await w.wait(520);
-        // He comes up and paddles for the rim, past her, his head and back over the water.
-        c.setVisible(true).setFlipX(false).setDepth(D.swimmer - 0.001).setPosition(inX, surface + CAT.swim).play('bumbot-run');
+        // Under he goes, in sight through the water as she is (the user, 2026-11-24: he was gone from the picture
+        // until he came up), turns, and comes up paddling for the rim, past her, his head and back over the water.
+        c.setDepth(D.swimmer - 0.001).play('bumbot-run');
         c.anims.timeScale = 0.75;
+        c.setPosition(inX, surface + 8);
+        await w.tween({ targets: c, y: Math.min(surface + CAT.under, L.tankY + 4), duration: 240, ease: 'Quad.easeOut' });
+        c.setFlipX(false);
+        await w.tween({ targets: c, y: surface + CAT.swim, duration: 300, ease: 'Sine.easeInOut' });
         sfx.at(inX, surface).splashSmall();
         const wake = this.catG;
         await w.tween({ targets: c, x: rim - 9, duration: (rim - 9 - inX) / CAT.paddle * 1000, onUpdate: () => {

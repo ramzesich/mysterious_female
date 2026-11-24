@@ -20,6 +20,17 @@ And, on the first previews:
 > 1. Can we repaint the kids gun to be light green with blue lines? Now it's hard to distinguish it from his ice cream
 > 2. The lever is way too big. It should be at least half a height.
 
+And on playing it ("Much better than how it was"), seven fixes, decisions 18 to 24:
+
+> 1. Let's make the laundry line (with the laundry) not visible when we're on deck 11.
+> 2. Both the hatch and the drain should be much less visible when in the water.
+> 3. Shift the hatch 3 pixels down.
+> 4. Shift the drain 2 pixels down.
+> 5. When the pool is drained, shift the player's ground level 3 pixels down. Now she looks floating in the air.
+> 6. Shift the pool ladder down 3 pixels as well (both pools, always).
+> 7. When Bumbot is sprayed and jumps into the pool, he is not visible when he is in. Make him visible in the water
+>    (same color effect applied as to the player)
+
 `docs/plan-the-rest.md` had the scene waiting for the user as U17 ("it plays and looks very broken"); what U17 says
 must be kept is kept (section 4).
 
@@ -101,6 +112,25 @@ must be kept is kept (section 4).
     stays orange.
 17. **Her cry is over before the kid stands up:** its popup is where he and Bumbot are.
 
+18. **A laundry line is not shown while she is inside on the deck over it** (the user): deck 10's washing, on the
+    balcony under the pool, hung across the tank's floor. By her height (the open decks have no deck "in view"), and
+    held while she goes down the hatch. On the balconies themselves it is as it was.
+19. **The hatch and the drain's grate hardly show through the water** (the user: "much less visible when in the
+    water"): 28% of themselves under it, clearing as the water goes, whole in the dry tank. They lie on the floor's
+    strip of tiles, which the water's blue is not drawn over: that is why they showed whole.
+20. **The tank's floor reads as its strip of pale tiles, 3 px under the wall's foot** (the user's four shifts): the
+    hatch lies 3 px lower than its rough was drawn, the grate 2 px lower.
+21. **In the dry tank her picture is drawn 3 px lower than her body** (the user: at the wall's foot "she looks floating
+    in the air"), eased in and out over the last px of a jump into or out of it; her body, and so every rule and
+    test of where she stands, is where it was (`world.tankDrop`, the ship scene's `herDrop`).
+22. **The pool ladders stand 3 px lower** (the user: "both pools, always"): 15 px under the deck's line where they
+    were 12 (the map's `at11`, `prop_ladder_aft`), their lower parts down to the floor's strip.
+23. **Bumbot is in sight all the while he is in the water** (the user): after the splash he goes under, all of him
+    below the surface and tinted by the water as she is, turns, and comes up paddling. He was taken out of the
+    picture for half a second.
+24. **She goes 10 px further down the hatch before the view changes** (found measuring 20 and 21): the top of her
+    head was still over the near edge.
+
 ## 4. What U17 said to keep, and what became of it
 
 - **The hatch is the only way into deck 10's midships hallway:** kept (`hatch_pool`, needs `drain`). It lands her
@@ -150,3 +180,10 @@ knee-high lever twice 12.
   the rest as from the water.
 - `python tools/check_overlaps.py`: 0 overlaps.
 - Not judged by me: how it feels in motion, and how it sounds.
+
+**After the user's play (decisions 18 to 24):** recorded again from the water and looked at: the pool with its water
+(the hatch and the grate faint, no laundry line, the ladders lower), Bumbot under the water and coming up, her in the
+dry tank on the floor's strip by the hatch, her going down it. `python tools/playtest.py -j 5 boot region6 golden
+highlight region7` pass; `region6` checks besides: both pieces under 0.4 of themselves through the water and whole
+once the last of it is gone; deck 10's laundry line not shown from deck 11; her picture 3 px lower in the dry tank
+and where it always is on deck 10's carpet. `python tools/check_overlaps.py`: 0 overlaps.

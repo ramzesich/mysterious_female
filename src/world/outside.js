@@ -338,6 +338,9 @@ export class Laundry {
         });
         world.add(items);
         items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
+        this.items = items;
+        this.deck = deck;
+        this.scene = s;
         // Above her on hands and knees it is solid.
         const zone = s.add.zone(x, y - 30, 30, 98).setOrigin(0.5, 1);
         s.physics.add.existing(zone, true);
@@ -345,7 +348,16 @@ export class Laundry {
         world.lows.push({ id: def.id, route: OUT, zone, items: [] });
     }
 
-    update() {}
+    // Not shown while she is inside on the deck over it (the user, 2026-11-24: from deck 11's pool the washing of the
+    // balcony under it hung across the tank's floor).
+    update() {
+        // (By her height: the open decks have no deck "in view". Held by `viewOverride` while she goes down the pool's hatch.)
+        const s = this.scene, top = this.def.y - 144, y = s.player.y;
+        const over = s.route === 'inside' && (s.viewOverride === this.deck + 1 || (y > top - 140 && y <= top + 40));
+        if (over === this.over) return;
+        this.over = over;
+        this.items.forEach(i => i.setVisible(!over));
+    }
 }
 
 // A balcony with someone on it, a "Do Not Disturb" sign on each of its partitions (population:

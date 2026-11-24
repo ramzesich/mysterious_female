@@ -622,7 +622,7 @@ PROPS = {
     "prop_yoga_rack": (11, 95.75, "yoga-rack", 0, {}),
     "amb_sun_1": (11, 115.9, "thing:sunbather-1", 0, dict(back=True)),
     "amb_sun_2": (11, 117.6, "thing:sunbather-2", 0, dict(back=True)),
-    "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -12, dict(back=True, flip=True)),
+    "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -15, dict(back=True, flip=True)),
     "prop_pool_hut": (11, 140.6, "@pool-hut", 0, dict(back=True)),
     "sign_wet_11": (11, 150.55, "wet-floor-sign-bg", 0, dict(back=True)),
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
