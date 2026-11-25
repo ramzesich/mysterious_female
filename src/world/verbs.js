@@ -19,6 +19,15 @@ export const verbs = {
         this.stairWind = false;
         this.stairCling = null;
         this.overRail = false;
+        this.outRail = false;
+        if (this.bal) {
+            this.bal = null;
+            this.script = null;
+            this.player.body.setAllowGravity(true);
+            this.player.setVisible(true);
+        }
+        this.balLow?.setVisible(false);
+        this.balHigh?.setVisible(false);
         this.pushing = null;
         this.aside = false;
         if (this.crawling) this.setCrawl(false);
@@ -38,7 +47,8 @@ export const verbs = {
         // (↓ still held from climbing down a ladder or stairs does not put her down: it must be let go first, the
         // user, 2026-11-21: "when the climb down finishes, she automatically crouches".)
         if (!input.down) this.downLatch = false;
-        const want = low || (input.down && !this.downLatch && can && (onFloor || this.crawling));
+        // (Nor where ↓ and Space is her way down a balcony's partition or a column: src/world/balcony.js.)
+        const want = low || (input.down && !this.downLatch && can && (onFloor || this.crawling) && !this.balconyWayDown());
         if (want !== this.crawling) this.setCrawl(want);
         return this.crawling;
     },
@@ -71,8 +81,9 @@ export const verbs = {
     },
 
     // --- The wall jump: grip socks (region 6) -----------------------------------------------------
-    // In the air beside a grip (a balcony's partition, a pillar, plating marked for it), jump kicks
-    // her up and away; she can steer back and kick again, so one wall is enough to climb.
+    // In the air beside a grip (a pillar, a column, plating marked for it), jump kicks her up and away; she can steer
+    // back and kick again, so one wall is enough to climb. (Not on the balconies: a partition is no wall to kick off;
+    // her moves there are her own, src/world/balcony.js.)
     tryWallJump(input, time) {
         const p = this.player, body = p.body;
         if (!this.progress.knows('socks') || this.world.carry || this.holding) return false;
@@ -84,14 +95,6 @@ export const verbs = {
             body.velocity.y = -PLAYER.jumpVelocity * VERBS.kickUp;
             body.velocity.x = 0;
             this.kickDir = 0;
-        } else if (grip.over) {
-            // A balcony's partition: up and over its panel, the way she is going.
-            if (p.y < grip.top + 8) return false;       // over its top already
-            const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0) || (p.flipX ? -1 : 1);
-            const rise = p.y - grip.top + VERBS.vaultClear;
-            body.velocity.y = -Math.max(Math.sqrt(2 * PLAYER.gravity * rise), VERBS.vaultMin);
-            body.velocity.x = dir * PLAYER.runSpeed;
-            this.kickDir = dir;
         } else {
             const away = grip.away || (p.flipX ? 1 : -1);
             body.velocity.y = -PLAYER.jumpVelocity * VERBS.kickUp;
@@ -113,7 +116,6 @@ export const verbs = {
         if (!this.progress.knows('socks') || this.world.carry || this.holding || body.velocity.y <= 0 || !dir) return false;
         const grip = this.world.gripAt(p);
         if (!grip || (grip.away && grip.away !== -dir)) return false;
-        if (grip.over && p.y < grip.top) return false;      // over a partition's panel there is only its pole
         body.velocity.y = Math.min(body.velocity.y, VERBS.slideFall);
         this.takeoffY = p.y;
         return true;

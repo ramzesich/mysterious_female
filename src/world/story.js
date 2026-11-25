@@ -882,24 +882,42 @@ export class Story {
         return key;
     }
 
-    // From the balcony cabin's balcony (population: `bb_glimpse_balcony`): Bumbot sits on top of the
-    // partition at its aft end, washing; he looks at her, and is gone up to the balcony above. Once.
-    // (A deck up, as the plan had him, is out of her view.)
+    // From the balcony cabin's balcony (population: `bb_glimpse_balcony`): Bumbot on the rail of the next balcony aft,
+    // a gull beside him on it. He swipes at it, it flaps off, and he runs on along the rails out of the picture. Once.
+    // (No fade, and nothing gone into thin air: he sat on a partition's top and faded out over it. A deck up, as the
+    // plan had him, is out of her view.)
     glimpseBalcony() {
         const s = this.scene, g = this.world.data.glimpseBalcony, P = this.P;
         if (!g || P.has('glimpse_balcony') || s.route !== 'promenade' || s.mode !== 'play') return;
         const her = s.player;
         if (Math.abs(her.y - g.y) > 4 || her.x < g.x0 || her.x > g.x1) return;
         P.setFlag('glimpse_balcony');
-        const cat = s.add.sprite(g.x1 + 3, g.topY + 1, 'bumbot').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.35).setFlipX(true);
+        const depth = s.DEPTH.player + 0.35, y = g.railY, x = g.x1 + 46;
+        const cat = s.add.sprite(x, y + 1, 'bumbot').setOrigin(0.5, 1).setDepth(depth);
+        const gull = s.add.image(x + 26, y, 'things', 'gull-perched').setOrigin(0.5, 1).setDepth(depth).setFlipX(true);
         cat.play('bumbot-wash');
-        this.world.add([cat]);
-        s.time.delayedCall(1500, () => {
-            sfx.at(cat.x, g.y).mrrp();
-            cat.play('bumbot-leap');
-            s.tweens.add({ targets: cat, x: cat.x + 26, y: g.topY - 70, duration: 420, ease: 'Quad.easeOut',
-                onComplete: () => s.tweens.add({ targets: cat, alpha: 0, y: g.topY - 84, duration: 160, onComplete: () => cat.destroy() }) });
-        });
+        this.world.add([cat, gull]);
+        const frames = s.textures.get('things');
+        let t = 0, step = 0;
+        this.world.movers.push({ update: (dt, time) => {
+            if (step > 3) return;
+            t += dt;
+            const view = s.cameras.main.worldView;
+            if (step === 0 && t > 1.3) { step = 1; cat.play('bumbot-bat'); sfx.at(cat.x, g.y).mrrp(); }
+            if (step === 1 && t > 1.65) { step = 2; gull.setFlipX(false); }
+            if (step >= 2 && gull.active) {
+                // (the gull off the rail, up and aft)
+                gull.setFrame(Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up');
+                gull.x += 150 * dt;
+                gull.y -= 90 * dt;
+                if (gull.x > view.right + 30 || gull.y < view.y - 30) gull.destroy();
+            }
+            if (step === 2 && t > 2.2) { step = 3; cat.play('bumbot-run'); }
+            if (step === 3) {
+                cat.x += 170 * dt;
+                if (cat.x > view.right + 40) { cat.destroy(); if (gull.active) gull.destroy(); step = 4; }
+            }
+        } });
     }
 
     // --- Region 5 -----------------------------------------------------------------------------

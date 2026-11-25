@@ -532,11 +532,24 @@ export class World {
             g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - R + 2, gl.x1 - gl.x0, R - 10);
             g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - R + 10, gl.x1 - gl.x0, 1);
             g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - R, gl.x1 - gl.x0, 3);
+            // (its posts, one every 30 px as the ship's side draws them)
+            if (gl.x1 - gl.x0 > 30) for (let x = gl.x0 + 29; x < gl.x1; x += 30) g.fillStyle(0xdfeaee, 0.6).fillRect(x, gl.y - R + 3, 1, R - 11);
             g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8 + PLAYER.sink);
         }
         for (const [deck, g] of Object.entries(fronts)) {
             this.add([g]);
             s.shellSlopes.push({ deck: Number(deck), gfx: g, balcony: true });
+        }
+        // Each balcony's recess over its rail: the back wall with the cabin's sliding glass door (generated:
+        // tools/build_balconies.py), over the flat one the ship's side draws; every other one mirrored, as cabins are.
+        const U = s.cache.json.get('balcony-layout').unit;
+        this.balconyUnits = {};
+        for (const u of out.units ?? []) {
+            const img = s.add.image(u.x + U.x, u.y - out.partition, 'balcony-unit').setOrigin(0, 0).setDepth(D.exterior + 0.05)
+                .setFlipX((u.x / out.unit + u.deck) % 2 === 1);
+            this.add([img]);
+            s.shellSlopes.push({ deck: u.deck, gfx: img });
+            this.balconyUnits[`${u.x}:${u.y}`] = img;
         }
         // The ship's side drawn again over her where her picture reaches past her body (the user, 2026-11-21: it
         // showed through a partition and through the hull past a row's end): each partition's panel (its colours as
@@ -630,6 +643,16 @@ export class World {
         return null;
     }
 
+    // The balcony whose floor is at her feet, if any.
+    balconyFloor(x, y) {
+        return this.platZones.find(z => z.plat.drop && x >= z.plat.x0 && x <= z.plat.x1 && Math.abs(y - z.plat.y) < 2)?.plat ?? null;
+    }
+
+    // Someone on a balcony has seen her at their rail (src/world/balcony.js): their start, here.
+    balconySeen(def) {
+        this.movers.find(m => m.def === def)?.seen?.();
+    }
+
     // A balcony's floor at her feet that she can drop through: only where a floor of the route lies one deck under
     // her to land on (a balcony, the walkway), or with the parasol, any floor of it under her to float down to (the
     // user, 2026-11-21: "she shouldn't jump down" where no balcony is underneath; it had been the long fall).
@@ -687,8 +710,7 @@ export class World {
             const dx = p.x - g.x;
             if (Math.abs(dx) - (g.w / 2 + half) > 5) continue;
             if (g.side && Math.sign(dx) !== g.side) continue;
-            // (`over`: a balcony's partition: its panel's top, which a kick vaults.)
-            return { away: Math.abs(dx) < 3 ? 0 : Math.sign(dx), over: !!g.over, top: g.y1 - (g.panel ?? 0), x: g.x };
+            return { away: Math.abs(dx) < 3 ? 0 : Math.sign(dx), x: g.x };
         }
         return null;
     }
@@ -3025,7 +3047,8 @@ export class World {
     addColliders(p) {
         const s = this.scene;
         s.physics.add.collider(p, this.platZones, null, (_, z) => s.route === OUTSIDE
-            && (z.plat.solid || (s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
+            // (Out over a balcony's rail, `outRail`, she is outside the ship's side: only the promenade's deck is under her.)
+            && (z.plat.solid || (!s.outRail && s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
                 && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
         s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);

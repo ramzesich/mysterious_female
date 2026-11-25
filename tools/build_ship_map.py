@@ -915,6 +915,8 @@ def shell_details(ext, solid):
                     rect(own, x + 6, floor - BALCONY_RAIL_H + 2, unit - 6, BALCONY_RAIL_H - 10, "#a3c4d4")
                     rect(own, x + 6, floor - BALCONY_RAIL_H + 10, unit - 6, 1, "#c7e4ef")
                     rect(own, x + 6, floor - BALCONY_RAIL_H, unit - 6, 3, "#f4f4f4")
+                    for post in range(x + 6 + 29, x + unit, 30):
+                        rect(own, post, floor - BALCONY_RAIL_H + 3, 1, BALCONY_RAIL_H - 11, "#dfeaee")
                     # The partition: a panel seen edge on, from the floor to the ceiling (it stopped at 88 px, a
                     # post with open air over it that did not read as a wall); the way past it is outside the
                     # rail, round its outer edge. The game's outside route reads the units.
@@ -1042,7 +1044,7 @@ def build_objects():
         add(point(name, "place", x_of(m), floor_y(deck)))
     add(point("promenade", "place", x_of(160), floor_y(6), [prop("route", "promenade")]))
     # Region 7's: the balcony of deck 9's balcony cabin, the boat walkway by its station locker.
-    add(point("balcony", "place", 7815, floor_y(9), [prop("route", "promenade")]))
+    add(point("balcony", "place", 7839, floor_y(9), [prop("route", "promenade")]))
     # Step 4a's first gags, to try each (2026-11-18): aft of deck 9's swinging door (13a: walk forward
     # at it), forward of deck 10's trays (3: run aft onto them), aft of the pool's wet patch and its
     # deck chair (7b: walk forward past the chair onto the patch), and on the balcony with deck 9's

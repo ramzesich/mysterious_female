@@ -376,14 +376,22 @@ export const CHUTE = { fadeMs: 150, dropMs: 2000, leadMs: 60, sink: 30, goneFram
     // `lieMs`, her feet `under` px under the floor, and stands up in it in `riseMs`.)
     binFloor: -12, lieMs: 260, under: 10, riseMs: 380 };   // (`goneFrame`: her going-in clip's frame, from 1, by which she is all in the hatch)
 
+// Her moves on the balconies (src/world/balcony.js; tools/build_balconies.py): within `reach` px of a partition's
+// middle Space starts one; the clips' paces (ms a frame); `stand`: her middle from the partition's where a move sets her
+// down, `drop` px over the floor after the crossing; `front`: over her depth, the part of her that is in front of the
+// balcony's glass, rail and partition; `peek`: the crossing's frame at which she sees who is on the next balcony, held
+// `peekMs` before she goes back; `hintMs`: each move's hint over her, the second no sooner than `hintGap` after the
+// first. At a column of the boat walkway (the same climb): `lift`, her picture's px up on the walkway; over it on deck 8
+// she hops onto and off the rail, her feet `hop` px up for `hopMs`.
+export const BALCONY = { reach: 22, stand: 11, drop: 5, front: 0.36, mountMs: 45, climbMs: 50, alongMs: 50, peek: 6, peekMs: 600, hintMs: 3200,
+    hop: 16, hopMs: 80, lift: 2, hintGap: 6000 };
+
 export const VERBS = {
     crawlSpeed: 88,
     crawlHeight: 26,
     kickUp: 0.96,
     kickAway: 120,
     kickMs: 110,
-    vaultClear: 16,       // a kick off a balcony's partition carries her feet this far over its panel
-    vaultMin: 210,        // and is never weaker than this (px/s up)
     slideFall: 50,
     gripReach: 5,
     glideFall: 55,

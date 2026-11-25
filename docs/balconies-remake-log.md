@@ -253,7 +253,80 @@ in front of the glass with her feet under the rail.
   along clip already crossed above the rail (35 to 36 px); only its layering was wrong.
 - **The socks' close-up:** S3 with a row of nubs under each sole (`tries/socks/try7.png`).
 
-*(Shown to the user again.)*
+Then, on the close-up and the frames (2026-11-25):
+
+> In the game, the barbs are white.
+> Make the barbs white on the close up, make less of them (more distance between each other), and cover the entire sole with them in this way on both socks. Show me preview
+
+> The barb placement is correct now. But they looks less like barbs, more like square pixels
+
+> Socks approved.
+> Now, the gif frames.
+> Frame 9 has to be fixed: the leg that is behind and up: its placement is unnatural. Lower it behind the level of the balcony's edge. Show me the frames to prevoew
+
+> All approved
+
+- **The nubs** are set by rule along each sock's lower outline, by its own length (`assets/source/closeups/tries/socks/
+  nubs.py`): round studs about 5 px across, lit from the upper left, square to the sole, one every 9 px, seven on each.
+- **The mount's frame 3** (the arrival's frame 9, the same picture played backwards): her rear leg, bent up so that its
+  foot showed over the rail while she still stood on the floor, is taken out and the frame before's rear leg put in its
+  place, under the rail's top (`assets/source/balconies/mend.py`, `tries/mount-2m/`).
+
+## 6. The build
+
+- **The art** (`tools/build_balconies.py`, `assets/ship/balconies/`): the recess over the rail with the door shut and
+  ajar (119 x 84, crisp), the washing, her moves' 51 frames in one sheet of 43 x 68 cells with each frame's place from
+  the partition's middle and the floor (`balconies.json`), and **her whole sheet in the socks** (`assets/sprites/
+  her-socks.png`, the same cells as `her.png`, 506 frames changed). The crossing's frames came with dark socks: there
+  her feet are the lowest six rows of her, painted by rule.
+- **The data** (`tools/build_ship_map.py`, `tools/build_world.py`): the rail 32 px, the partition 116 px with its fin up
+  the slab, the front's posts every 30 px; `outside.partitions` (each partition's middle and where a balcony is for her:
+  fore, aft, up and down on each side), `outside.columns` (the walkway's columns: ways up and down by the same climb,
+  no longer grips for the kick), `outside.units`; the balcony doors' place at the middle of the open doorway (24 px aft
+  of where they were); furniture and towels kept between 30 and 95 px of a balcony's 125, and none by rule on a balcony
+  over a column.
+- **The moves** (`src/world/balcony.js`, `BALCONY` in `src/config.js`): Space at a partition (round it, the way she
+  goes), with ↑ (up its fin), with ↓ (down it); at a column of the walkway ↑ and Space, over one on deck 8 ↓ and Space.
+  One clock; two pictures of each frame, cut at the rail's top of the balcony she is inside of (the lower at her own
+  depth, under the fronts and panels; the upper over them); her body moved unseen for the camera, which holds its
+  height through a crossing. A gust while she is on the fin holds the clock. ↓ held where a way down is does not put
+  her on her hands and knees.
+- **Gone:** the partitions' grips and the kick's vault (`tryWallJump`'s `over` branch, `VERBS.vaultClear`/`vaultMin`),
+  the drop through a balcony's floor, the code-drawn doors and curtains (their images), the washing's flat bars.
+- **The rest:** her socks on a balcony (the stand-in's texture, `updateOverlays`); the hints `hint.round` and
+  `hint.climb` in both languages, each the first time she can use it, the second no sooner than 6 s after the first and
+  only after a crossing; someone on the balcony she makes for is seen from the rail (the crossing's frame 6, or the
+  perch above or below), their start, and she goes back and plays gag 24 from her own balcony; the parasol: ↓ and Space
+  away from a partition is a hop out over the rail (`outRail`), in front of the ship's side down to the promenade;
+  the washing a hurdle she hops (its poles are 35 px, its clear height 14: the crawl is 26); Bumbot's glimpse on the
+  next balcony's rail beside a gull, his swipe, the gull off, his run along the rails out of the picture, no fade; the
+  grip socks' close-up and world sprite rebuilt in their own colours.
+
+## 7. The self-check
+
+In the running game, recordings at the game's px:
+
+- The three moves, both ways, at a partition and at a column: where each leaves her (her middle 11 px from the
+  partition's, on the floor), the layering in the game's own frames as in the storyboard.
+- The rows' forward ends on all three decks: three jumps at each leave her on her balcony.
+- An occupied balcony: her furthest x stays short of it; the gag after.
+- The washing stops her walking; a jump clears it. The glide: in front of the balconies and the boats, down to the
+  promenade. The glimpse: flag set, both gone out of the picture.
+- The whole ship rendered from outside (`tools/render_ship.py`): the balconies as approved.
+- `tools/check_overlaps.py`: the people on a balcony against its new back wall, listed as meant; 0.
+- Tests: `region7` rewritten for the moves (the clips' feet against the rail, the layers seen while a move runs, the
+  camera's height, the gust's hold, the row's end, the occupied balcony from the rail, the washing, the columns);
+  `region7.mask` and `mishaps.balcony` brought to it. Run: `boot`, `region7`, `mishaps`, `highlight`, `keeps`, `throw`,
+  `region8`, `finale`, `golden`, `sound`, `lang`: all pass but `mishaps.things`, deck 9's sprinkler, which fails on
+  `main` too. The whole suite was not run.
+- **A test's fixed wait found by the way:** the perched gull's second swoop was awaited by a time that the lower rail
+  shortened; it now waits for the gull to be back on its rail.
+
+**Not done, said to the user:** her gags on a balcony (the gull on her head, 20; her tiptoe, 24) still show her shoes;
+the balcony doors are still left out of the doors' wash and pulse (`SKIP_DOORS`); without the socks ↓ and Space no
+longer drops her from the balcony cabin's balcony (region 4): that balcony is a dead end until the socks.
+
+*(At the play stop.)*
 
 ## Decisions
 
@@ -281,10 +354,18 @@ in front of the glass with her feet under the rail.
 12. The climb is the mount, the swing and the climb from perch to perch; up and down are the same three clips, the
     mount and the swing played backwards to come in.
 13. The socks' close-up is S3 with nubs under the soles (the user; S1's sole covered in dots "doesn't make any sense").
+14. The washing is a hurdle she hops, not something she crawls under: the approved piece stands 35 px high.
+15. The walkway's columns are ways up and down by the fin's climb; over a column, on deck 8, she hops onto and off the
+    rail (no partition stands there to hold).
+16. Someone on the balcony she makes for is seen from the rail; she goes back, and gag 24 with its checkpoint is played
+    from her own balcony (the rule that a hit is its gag and her checkpoint is kept).
+17. The socks are worn the whole time she is on a balcony (the same frames of her sheet), not only in the moves.
+18. Without the socks the balconies give no way down: region 4's drop from the balcony cabin's balcony is gone with the
+    drop through a floor.
 
 ## Generations
 
-62 so far (8,931 to 8,869).
+62 (8,931 to 8,869). The build spent none.
 
 | What | Tool | Job or object | Cost |
 |---|---|---|---|

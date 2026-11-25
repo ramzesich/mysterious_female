@@ -306,9 +306,8 @@ export class PerchGull {
 }
 
 // A laundry line (population: `haz_line`): two balconies made one, the partition between them
-// folded back against the wall, and a line of washing strung across the gap from the ceiling's
-// edge. No vault there (nothing to kick off): she goes under it on hands and knees. It flaps
-// before a gust.
+// folded back against the wall, and a line of washing on two poles standing across the gap.
+// Nothing to climb round there: she hops it.
 export class Laundry {
     constructor(world, def, gusts) {
         const s = world.scene, D = s.DEPTH, x = def.x, y = def.y;
@@ -324,28 +323,17 @@ export class Laundry {
         g.fillStyle(0xf4f4f4, 1).fillRect(x - 3, y - R, 6, 3);
         g.fillStyle(0xf4f4f4, 1).fillRect(x + 3, y - 106, 9, 2).fillRect(x + 10, y - 104, 2, 57);
         g.fillStyle(0xc7dcd0, 1).fillRect(x + 12, y - 104, 1, 57);
-        // The line, from hook to hook under the ceiling's edge, sagging.
-        const line = s.add.graphics().setDepth(D.player + 0.05);
-        const sag = dx => y - 110 + Math.round(9 * (1 - (dx / 54) ** 2));
-        line.fillStyle(0xf4f4f4, 1).fillRect(x - 56, y - 112, 3, 3).fillRect(x + 53, y - 112, 3, 3);
-        for (let dx = -54; dx <= 54; dx++) line.fillStyle(0x625565, 1).fillRect(x + dx, sag(dx), 1, 1);
-        const items = [g, line];
-        // The washing: long things in the middle (down to her knees), small ones at the ends.
-        const wash = [['cloth-sock', -46], ['cloth-tee', -33], ['cloth-towel', -13], ['cloth-dress', 7], ['cloth-towel-b', 27], ['cloth-shorts', 45]];
-        wash.forEach(([key, dx], i) => {
-            const img = s.add.image(x + dx, sag(dx), key).setOrigin(0.5, 0).setDepth(D.player + 0.05 + i * 0.001);
-            items.push(img);
-            gusts.flappers.push({ img, k: 0.45, i: i + def.x });
-        });
+        // The washing: a line between two poles that stand on the floor (generated, tools/build_balconies.py; it was
+        // flat bars of colour hung from the ceiling's edge). A hurdle across the two balconies made one: she hops it.
+        const img = s.add.image(x, y, 'balcony-washing').setOrigin(0.5, 1).setDepth(D.exterior + 0.1);
+        const items = [g, img];
         world.add(items);
         items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
         this.items = items;
         this.deck = deck;
         this.scene = s;
-        // Above her on hands and knees it is solid.
-        const zone = s.add.zone(x, y - 30, 30, 98).setOrigin(0.5, 1);
+        const zone = s.add.zone(x, y, img.width - 36, 24).setOrigin(0.5, 1);
         s.physics.add.existing(zone, true);
-        world.low.push({ route: OUT, x0: x - 15 - 18, x1: x + 15 + 18, y });
         world.lows.push({ id: def.id, route: OUT, zone, items: [] });
     }
 
@@ -383,6 +371,15 @@ export class Occupied {
         items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
         this.d = { x: img.x, y: def.y };
         this.hit = false;
+    }
+
+    // Seen from the rail (src/world/balcony.js): their start, without her setting foot on it.
+    seen() {
+        if (this.hit) return;
+        this.hit = true;
+        this.bang.setVisible(true);
+        this.scene.time.delayedCall(1300, () => this.bang.setVisible(false));
+        sfx.at(this.d.x, this.d.y).hey();
     }
 
     update() {
@@ -742,13 +739,16 @@ export const outside = {
         for (const room of Object.values(w.rooms)) {
             for (const d of room.doors ?? []) {
                 if (d.kind !== 'balcony') continue;
-                const door = s.add.image(d.outX, d.outY - 8, 'balcony-ajar').setOrigin(0.5, 1).setDepth(D.exterior + 0.07);
-                const curtain = s.add.image(d.outX + 10, d.outY - 100, 'balcony-curtain').setOrigin(0.5, 0).setDepth(D.exterior + 0.075);
-                w.add([door, curtain]);
-                const deck = deckOf(B, d.outY);
-                s.shellSlopes.push({ deck, gfx: door }, { deck, gfx: curtain });
-                this.gusts.flappers.push({ img: curtain, k: 0.5, i: d.outX });
-                this.ajar[room.id] = [door, curtain];
+                // (The balcony's own picture with its sliding door open on the lit cabin, a sheer curtain in the doorway:
+                // generated, tools/build_balconies.py. It was a pale rectangle and a curtain drawn here, which "don't look
+                // like doors at all", the user, 2026-11-23.)
+                const out = w.data.outside, U = s.cache.json.get('balcony-layout').unit;
+                const u = out.units.find(u => u.y === d.outY && d.outX >= u.x && d.outX < u.x + out.unit);
+                w.balconyUnits[`${u.x}:${u.y}`]?.setFlipX(false);
+                const door = s.add.image(u.x + U.x, u.y - out.partition, 'balcony-unit-ajar').setOrigin(0, 0).setDepth(D.exterior + 0.055);
+                w.add([door]);
+                s.shellSlopes.push({ deck: u.deck, gfx: door });
+                this.ajar[room.id] = [door];
             }
         }
         this.refreshOutside();

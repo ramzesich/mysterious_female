@@ -4795,45 +4795,78 @@ def scenario_region7(b):
                 (save_list(b, "regions"), lit()))
     home = b.state()["x"]
     unit = home - home % UNIT - (3500 % UNIT)
-    # A vault: at the partition, jump and jump again.
+    # Her three moves there (the remake of 2026-11-25, docs/balconies-remake-log.md; src/world/balcony.js).
+    S = "window.__ship"
+    AT, BAL = f"!!{S}.partitionAt()", f"{S}.bal"
+    CAM = f"{S}.cameras.main.worldView.y"
+    lay = js(b, f"{S}.cache.json.get('balcony-layout')")
+    clips, rail = lay["moves"]["clips"], lay["rail"]
+    ok &= check(all(a[2] >= rail for k in ("swing", "climb") for a in clips[k]["at"]),
+                "the clips: on the partition's fin her feet are never under the rail's top", [min(a[2] for a in clips[k]["at"]) for k in ("swing", "climb")])
+    ok &= check(js(b, f"{S}.balconyPic.visible && {S}.balconyPic.texture.key === 'her-socks'"), "out on a balcony she wears the grip socks")
+
+    def go(keys, limit=8):
+        """At the partition: the keys with Space; what was seen while the move ran."""
+        for k in keys: b.key(k, True)
+        b.tap("space")
+        for k in keys: b.key(k, False)
+        seen = dict(started=js(b, f"!!{BAL}"), cam=[], low=False, front=False, split=False)
+        t0 = now()
+        while js(b, f"!!{BAL}") and now() - t0 < limit:
+            seen["cam"].append(js(b, CAM))
+            st = js(b, f"(() => {{ const q = {S}, s = q.bal.steps[q.bal.i]; return [s[4], q.balLow.visible, q.balHigh.visible, q.balHigh.depth > q.DEPTH.player + 0.3, q.balLow.depth === q.DEPTH.player, q.player.visible]; }})()")
+            inside, low, high, front, under, her = st
+            if inside is None: seen["front"] |= high and front and not low and not her
+            else: seen["low"] |= low and under
+            seen["split"] |= low and high
+            wait(0.03)
+        wait(0.4)
+        return seen
+
+    # Along: one press at the partition, and she is on the next balcony; the picture's height held.
     calm()
     b.key("right", True)
-    hold_until(b, [], lambda s: s["x"] > unit + 92, 3)
-    tap2()
-    wait(1.0)
+    hold_until(b, [], lambda s: js(b, AT), 3)
+    part = js(b, f"{S}.partitionAt().P")
+    y0 = js(b, CAM)
+    seen = go([])
     b.key("right", False)
     s = b.state()
-    ok &= check(s["y"] == D9 and unit + UNIT < s["x"] < unit + 2 * UNIT, "a kick off the partition vaults it onto the next balcony", s)
-    b.shot("region7-vault")
-    # Up its pole to deck 10, with up held.
+    ok &= check(seen["started"] and s["mode"] == "play" and s["y"] == D9 and part["x"] < s["x"] < part["x"] + UNIT, "Space at a partition: round it, onto the next balcony", s)
+    ok &= check(max(abs(c - y0) for c in seen["cam"]) < 2, "the picture holds its height through it", (y0, min(seen["cam"]), max(seen["cam"])))
+    ok &= check("did_round" in flags(b), "and it is remembered (the climb's hint comes after it)", flags(b)[-3:])
+    b.shot("region7-round")
+    # Up: at the partition, ↑ and Space; under the rail's top she is behind the glass, on the fin in front of everything.
     calm()
-    b.hold("left", 0.9)
-    b.key("up", True)
-    for _ in range(4):
-        b.key("space", True); wait(0.08); b.key("space", False)
-        wait(0.27)
-    wait(0.9)
-    b.key("up", False)
+    b.key("left", True)
+    hold_until(b, [], lambda s: js(b, AT), 3)
+    b.key("left", False)
+    seen = go(["up"])
     s = b.state()
-    ok &= check(s["y"] == D10, "kicks with up held climb the pole to the balcony above", s)
-    # A gust: in the air she is carried aft.
-    b.teleport(unit + UNIT + 60, D10, "promenade")
-    wait_js(b, f"{GUST} === 'blow'", 9)
-    wait(0.1)
-    x0 = b.state()["x"]
-    b.key("space", True); wait(0.45); b.key("space", False)
-    wait(0.6)
+    ok &= check(seen["started"] and s["mode"] == "play" and s["y"] == D10 and abs(s["x"] - part["x"]) < 14, "↑ and Space: up the partition's fin to the balcony above", s)
+    ok &= check(seen["low"] and seen["front"] and seen["split"],
+                "her picture's layers: behind the glass under the rail's top, in front of everything on the fin, cut at the rail between", seen | dict(cam=None))
+    b.shot("region7-up")
+    # A gust while she is on the fin: she holds on until it drops.
+    wait_js(b, f"{GUST} === 'tell'", 9)
+    b.key("down", True); b.tap("space"); b.key("down", False)
+    held = wait_js(b, f"{BAL} && {BAL}.steps[{BAL}.i][4] == null && {GUST} === 'blow'", 4)
+    i0 = js(b, f"{BAL} ? {BAL}.i : -1")
+    wait(0.5)
+    ok &= check(held and js(b, f"{BAL} ? {BAL}.i : -2") == i0, "a gust on the fin: she holds on, the climb waits", (held, i0))
+    hold_until(b, [], lambda s: s["mode"] == "play", 8)
+    wait(0.3)
+    ok &= check(b.state()["y"] == D9, "↓ and Space: down it again", b.state())
+    # A row's forward end: nothing takes her out of it.
+    b.teleport(js(b, f"Math.min(...{W}.data.outside.units.filter(u => u.y === {D9}).map(u => u.x))") + 40, D9, "promenade")
+    wait(0.3)
+    b.key("left", True); wait(0.6)
+    for _ in range(3):
+        b.tap("space"); wait(0.3)
+    wait(1.2)
+    b.key("left", False)
     s = b.state()
-    ok &= check(s["x"] - x0 > 20 and s["mode"] == "play", "a gust carries her aft in the air", (x0, s))
-    b.shot("region7-gust")
-    # Down a deck: down and jump.
-    calm(1.5)
-    b.key("down", True); wait(0.1)
-    b.key("space", True); wait(0.08); b.key("space", False)
-    wait(0.2)
-    b.key("down", False)
-    wait(0.9)
-    ok &= check(b.state()["y"] == D9, "down and jump drops her to the balcony below", b.state())
+    ok &= check(s["mode"] == "play" and s["y"] == D9, "at the row's forward end the jumps leave her on her balcony", s)
     # The balcony where Bumbot swiped at the gull: a tangerine.
     n = len(save_list(b, "collected"))
     t = js(b, "window.__ship.tangerines.find(t => t.id === 'tan_10_balc').sprite.x")
@@ -4845,12 +4878,17 @@ def scenario_region7(b):
     b.teleport(o["x0"] - 50, o["y"], "promenade")
     calm(1.2)
     b.key("right", True)
-    hold_until(b, [], lambda s: s["x"] > o["x0"] - 30, 3)
-    tap2()
+    hold_until(b, [], lambda s: js(b, AT), 3)
+    b.tap("space")
+    far = 0
+    t0 = now()
+    while js(b, f"!!{BAL}") and now() - t0 < 4:
+        far = max(far, b.state()["x"]); wait(0.05)
+    ok &= check(far < o["x0"] + 6, "seen from the rail, she never sets foot on it", (far, o["x0"]))
     got = scared(b, "sorry", 2.5)
     b.shot("region7-occupied")
     b.key("right", False)
-    ok &= check(got, "vaulting onto the breakfast couple's balcony: startled", (b.state(), alert(b)))
+    ok &= check(got, "at the breakfast couple's balcony: startled, and back", (b.state(), alert(b)))
     s = hold_until(b, [], lambda s: s["mode"] == "play", 6)
     ok &= check(s["mode"] == "play" and abs(s["x"] - home) < 3 and s["y"] == D9, "she comes to at the balcony cabin's door", s)
     pocket = b.state()["tangerines"]
@@ -4863,7 +4901,10 @@ def scenario_region7(b):
     b.hold("left", 0.45)
     wait(1.6)
     ok &= check(b.state()["mode"] == "play", "a step aside and it comes down on nothing", (b.state(), alert(b)))
-    wait(3.2)
+    # (Out of its reach until it is back on its rail: its next rise is then over her where she stands. A fixed wait
+    # here once let it rise over the spot she had stepped aside to.)
+    b.teleport(g["x0"] - 200, g["floor"], "promenade")
+    wait_js(b, f"{W}.movers.some(m => m.def && m.def.id === 'gull_10_2' && m.state === 'perched')", 9)
     b.teleport(g["x0"] + 50, g["floor"], "promenade")
     wait_js(b, marked, 6)
     got = scared(b, "Shoo", 3.0)
@@ -4873,17 +4914,15 @@ def scenario_region7(b):
     b.eval(f"window.__ship.save.tangerines = {pocket}; window.__ship.refreshHud()")
     # A laundry line across a folded partition: under it on hands and knees.
     lx = js(b, f"{W}.data.balcony.lines.find(l => l.id === 'haz_line_10b').x")
-    b.teleport(lx - 70, D10, "promenade")
-    b.hold("right", 0.9)
-    b.hold(["right", "space"], 0.7)
-    ok &= check(b.state()["x"] < lx - 15, "the washing on the line stops her, walking or jumping", (b.state()["x"], lx))
-    b.key("down", True); wait(0.15)
-    b.key("right", True); wait(0.5)
+    b.teleport(lx - 80, D10, "promenade")
+    b.hold("right", 1.0)
+    ok &= check(b.state()["x"] < lx - 15, "the washing on its line stops her walking", (b.state()["x"], lx))
     b.shot("region7-line")
+    b.key("right", True)
+    b.key("space", True); wait(0.3); b.key("space", False)
     wait(0.9)
-    b.key("right", False); b.key("down", False)
-    wait(0.3)
-    ok &= check(b.state()["x"] > lx + 30, "she crawls under it", (b.state()["x"], lx))
+    b.key("right", False)
+    ok &= check(b.state()["x"] > lx + 20, "she hops it", (b.state()["x"], lx))
     # The guest locked out on his balcony: he waves, his bubble a door; his door is shut from outside.
     gr = room(b, "guest10")
     gx = gr["doors"][1]["outX"]
@@ -5009,23 +5048,17 @@ def scenario_region7(b):
     ok &= check(b.state()["mode"] == "play" and "slot_balcony" in save_list(b, "seen"), "and closes on a key", b.state())
     # Down to the boat walkway, and up one of its columns again.
     col_x = exact_x(142.3)
-    b.teleport(col_x - 40, D8, "promenade")
+    b.teleport(col_x - 12, D8, "promenade")
     calm(1.0)
-    b.key("down", True); wait(0.1)
-    b.key("space", True); wait(0.08); b.key("space", False)
-    wait(0.2)
-    b.key("down", False)
-    wait(1.0)
+    b.key("down", True); b.tap("space"); b.key("down", False)
+    hold_until(b, [], lambda s: s["mode"] == "play", 8)
+    wait(0.3)
     s = b.state()
-    ok &= check(s["y"] == D7 and s["mode"] == "play", "from deck 8's balcony a drop to the boat walkway", s)
-    b.hold("right", 0.2)
-    b.key("up", True)
-    for _ in range(4):
-        b.key("space", True); wait(0.08); b.key("space", False)
-        wait(0.27)
-    wait(1.0)
-    b.key("up", False)
-    ok &= check(b.state()["y"] == D8, "and up a white column again, kick after kick", b.state())
+    ok &= check(s["y"] == D7 and s["mode"] == "play", "over a column of the walkway, ↓ and Space: down its outside to the boat walkway", s)
+    b.key("up", True); b.tap("space"); b.key("up", False)
+    hold_until(b, [], lambda s: s["mode"] == "play", 8)
+    wait(0.8)
+    ok &= check(b.state()["y"] == D8, "and up the column again, onto deck 8's balcony", b.state())
     # The drill: just hoisted, she runs under it (the lull); running at it after, she sets it off and it
     # comes down on her well under it (15: on all fours, the boat down to her back, she crawls out); and the security
     # officer at the tender.
@@ -5122,13 +5155,15 @@ def scenario_region7__mask(b):
     b.key("down", True); b.tap("space"); b.key("down", False)
     wait(1.5)
     s = b.state()
-    ok &= check(s["y"] == D10 and s["mode"] == "play", "no drop where no balcony is under her", s)
-    b.teleport(3700, D10, route="promenade")
+    ok &= check(s["y"] == D10 and s["mode"] == "play", "no way down where no balcony is under her", s)
+    b.eval("window.__ship.progress.learn('socks')")       # (her moves on the balconies are the grip socks')
+    b.teleport(3640, D10, route="promenade")
     wait(0.3)
     b.key("down", True); b.tap("space"); b.key("down", False)
-    wait(1.5)
+    s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] != D10, 8)
+    wait(0.3)
     s = b.state()
-    ok &= check(s["y"] == D9, "the next balcony's floor drops her onto deck 9's", s)
+    ok &= check(s["y"] == D9, "aft of that partition a balcony is under her: down its fin to deck 9's", s)
     # Her picture cut at the partition: walking aft into it, the stand-in reaches no further than the panel.
     b.teleport(3600, D10, route="promenade")
     wait(0.2)
@@ -6717,7 +6752,7 @@ def scenario_mishaps__things(b):
 
 
 def scenario_mishaps__balcony(b):
-    """Vaulting onto the sunbather's balcony (deck 8): 24, her tiptoe, none on her or two."""
+    """At the sunbather's balcony (deck 8), seen from the rail: 24, her tiptoe, none on her or two."""
     b.open("?play&at=occupied8&cards=all")
     spot = b.state()
 
@@ -6725,12 +6760,12 @@ def scenario_mishaps__balcony(b):
         b.teleport(spot["x"], spot["y"], "promenade")
         wait(0.4)
         b.key("left", True)
-        hold_until(b, [], lambda s: s["x"] < spot["x"] - 20, 3)
-        b.key("space", True); wait(0.08); b.key("space", False)
-        wait(0.2)
-        b.key("space", True); wait(0.08); b.key("space", False)
+        hold_until(b, [], lambda s: js(b, "!!window.__ship.partitionAt()"), 3)
+        b.tap("space")
         hold_until(b, [], lambda s: s["mode"] != "play", 3)
         b.key("left", False)
+        # (She sees him from the rail and goes back; the gag is hers from her own balcony.)
+        hold_until(b, [], lambda s: not js(b, "!!window.__ship.bal"), 4)
 
     return both(b, "the sunbather's balcony (24)", vault, "24", "^gags-dnd-tiptoe", within=4)
 

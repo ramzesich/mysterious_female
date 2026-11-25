@@ -15,6 +15,7 @@ import { Soundscape } from '../world/soundscape.js';
 import { LooseTangerines } from '../world/tangerine.js';
 import { runFrame } from '../world/movers.js';
 import { verbs } from '../world/verbs.js';
+import { balcony } from '../world/balcony.js';
 import { Intro } from '../intro.js';
 import { Popups } from '../popup.js';
 import { Hud } from '../hud.js';
@@ -1405,15 +1406,16 @@ export class ShipScene extends Phaser.Scene {
         return to;
     }
 
-    // ... and short of a balcony's partition on her route (a grip with `over`, which only she vaults):
+    // ... and short of a balcony's partition on her route (which only she goes round):
     // what runs off her along the balconies stops at the next one (the gull on her head, 20; her
     // tiptoe away from an occupied balcony, 24). One she already stands by stops it where it is.
     partitionShort(x, to, y, half = 0, gap = 2) {
         const dir = Math.sign(to - x);
         if (!dir) return to;
-        for (const g of this.world.grips) {
-            if (g.route !== this.route || !g.over || Math.abs(g.y1 - y) > 6 || (g.x - x) * dir <= 0) continue;
-            const stop = g.x - dir * (g.w / 2 + half + gap);
+        if (this.route !== OUTSIDE) return to;
+        for (const g of this.world.data.outside.partitions ?? []) {
+            if (Math.abs(g.y - y) > 6 || (g.x - x) * dir <= 0) continue;
+            const stop = g.x - dir * (3 + half + gap);
             const at = (stop - x) * dir > 0 ? stop : x;
             if ((to - at) * dir > 0) to = at;
         }
@@ -3194,6 +3196,7 @@ export class ShipScene extends Phaser.Scene {
             // (Not in the hop's first moment: her body can still report the floor she has just left.)
             if (this.overRail && time - this.overRailAt > 250) {
                 this.overRail = false;
+                this.outRail = false;
                 p.setDepth(DEPTH.player);
             }
             if (this.gliding) {
@@ -3253,8 +3256,16 @@ export class ShipScene extends Phaser.Scene {
         if (hands && (input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
         // With the parasol: over an atrium walk's railing with ↓ and jump, to float down the atrium.
         if (onFloor && inside && input.down && input.jumpPressed && this.overTheRail()) return;
-        // Through a side walk with ↓; through a balcony's floor outside with ↓ and jump (↓ alone crawls).
-        if (onFloor && (this.route === OUTSIDE ? input.down && input.jumpPressed : input.downPressed) && this.dropThroughWalk()) return;
+        // On the balconies, in the grip socks, Space at a partition is one of her three moves there (round it, up its
+        // fin with ↑, down it with ↓: src/world/balcony.js); with the parasol, ↓ and Space anywhere else on a balcony is
+        // a hop out over its rail.
+        if (this.route === OUTSIDE) {
+            this.balconyHints();
+            if (hands && input.jumpPressed && this.tryBalcony(input)) return;
+            if (hands && onFloor && input.down && input.jumpPressed && this.overBalconyRail()) return;
+        }
+        // Through a side walk with ↓ (inside: deck 12's walk over the pools).
+        if (onFloor && this.route !== OUTSIDE && input.downPressed && this.dropThroughWalk()) return;
 
         if (input.dashPressed) this.tryCry(time);
         if (input.throwPressed && this.tryThrow(input, time, onFloor) && onFloor) return;
@@ -4051,8 +4062,12 @@ export class ShipScene extends Phaser.Scene {
         // (And at the linen room's shaft, until the view has gone over to the shaft: nothing of her past the room's wall
         // while the room is what is shown; the user, 2026-11-24: "She should be shown inside only when the camera
         // transitioned to the shaft". `world.herCut`.)
-        const balc = !onProm && p.visible ? (this.route === OUTSIDE ? this.world.balconyRoom(p.x, p.y) ?? (onWalk ? [pr.x0, pr.x1] : null)
+        // (Out over a balcony's rail, `outRail`, she is in front of the ship's side, whole.)
+        const onBalcony = !onProm && p.visible && !this.outRail && this.route === OUTSIDE ? this.world.balconyRoom(p.x, p.y) : null;
+        const balc = !onProm && p.visible && !this.outRail ? (this.route === OUTSIDE ? onBalcony ?? (onWalk ? [pr.x0, pr.x1] : null)
             : this.world.herCut?.() ?? null) : null;
+        // (On a balcony, once the grip socks are hers, she wears them: the same frames of her sheet in the socks.)
+        const key = onBalcony && p.texture.key === 'her' && this.progress.knows('socks') ? 'her-socks' : p.texture.key;
         const pic = this.balconyPic;
         if (balc) {
             const left = p.x - p.displayOriginX, rw = p.width;
@@ -4060,7 +4075,7 @@ export class ShipScene extends Phaser.Scene {
             const q = this.balconyPic ??= this.add.image(0, 0, p.texture.key);
             if (!this.worldLayer.list.includes(q)) this.worldLayer.add(q);
             // (Scaled by -1 a picture turns about its origin; `flipX` keeps it in place: x moved to match.)
-            q.setTexture(p.texture.key, p.frame.name).setDisplayOrigin(p.displayOriginX, p.displayOriginY)
+            q.setTexture(key, p.frame.name).setDisplayOrigin(p.displayOriginX, p.displayOriginY)
                 .setPosition(p.flipX ? p.x - 2 * p.displayOriginX + rw : p.x, p.y).setScale(p.flipX ? -1 : 1, 1)
                 .setAlpha(p.alpha).setDepth(p.depth).setVisible(b > a);
             for (const k of ['tint', 'tint2', 'tintMode', 'tintTopLeft', 'tintTopRight', 'tintBottomLeft', 'tintBottomRight']) {
@@ -5924,4 +5939,4 @@ export class ShipScene extends Phaser.Scene {
 }
 
 // Crawling, the wall jump, the glide, pushing (src/world/verbs.js).
-Object.assign(ShipScene.prototype, verbs);
+Object.assign(ShipScene.prototype, verbs, balcony);

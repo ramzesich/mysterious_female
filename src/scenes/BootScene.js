@@ -104,6 +104,14 @@ export class BootScene extends Phaser.Scene {
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        // (Her sheet in the grip socks, the same cells: worn out on the balconies. And the balconies' own art, her three
+        // moves there among it: tools/build_balconies.py.)
+        this.load.spritesheet('her-socks', 'assets/sprites/her-socks.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
+        this.load.json('balcony-layout', 'assets/ship/balconies/balconies.json');
+        this.load.image('balcony-unit', 'assets/ship/balconies/unit.png');
+        this.load.image('balcony-unit-ajar', 'assets/ship/balconies/unit-ajar.png');
+        this.load.image('balcony-washing', 'assets/ship/balconies/washing.png');
+        this.load.image('balcony-moves', 'assets/ship/balconies/moves.png');
         this.load.json('her-meta', 'assets/sprites/her.json');
         this.load.spritesheet('her-towel', 'assets/sprites/her-towel.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });
         this.load.json('her-towel-meta', 'assets/sprites/her-towel.json');
@@ -231,6 +239,9 @@ export class BootScene extends Phaser.Scene {
         // Her looping animations; single poses (stand, rise, apex, fall, front, back, climb-out)
         // are set as frames.
         const meta = this.cache.json.get('her-meta');
+        // (The balcony moves' cells, by the builder's own layout.)
+        const bm = this.cache.json.get('balcony-layout').moves, bt = this.textures.get('balcony-moves');
+        for (let n = 0; n < bm.count; n++) bt.add(n, 0, (n % bm.row) * bm.cell[0], Math.floor(n / bm.row) * bm.cell[1], bm.cell[0], bm.cell[1]);
         const frames = (name, order = meta.anims[name].map((_, i) => i)) =>
             order.map(i => ({ key: 'her', frame: meta.anims[name][i] }));
         for (const [name, fps] of [['run', 14], ['climb', 10]]) {

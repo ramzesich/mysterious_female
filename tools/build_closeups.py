@@ -28,7 +28,8 @@ OUT = ROOT / "assets" / "sprites"
 # (The sardines keep their own blue silver too, the user's "as it is", 2026-11-20: on the palette they went purple.)
 # (His navy t-shirt (13) and its logo too, the photo's own inks (the user, 2026-11-21): on the palette the navy went
 # purple and the lilac a grey green.)
-OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld", "pick"}
+# (The grip socks, made again 2026-11-25, the user's choice of seven with white nubs under the soles: tries/socks/.)
+OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld", "pick", "socks"}
 # Not close-ups: the t-shirt's logo alone, built and the user's own edit of it (`tools/draw_tshirt_logo.py`).
 NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the
@@ -36,10 +37,7 @@ NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand"}
 RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
             # The parasol came maroon: the world parasol's red and white (`parasol-closed`).
             "parasol": {"ae2334": "e83b3b", "6e2727": "ae2334", "966c6c": "c7dcd0", "fdcbb0": "ffffff",
-                        "f68181": "ffffff"},
-            # The socks in the world's stronger pink, their shading a shade deeper (the user, 2026-11-20:
-            # "more similar to that in the game").
-            "socks": {"eaaded": "ed8099", "ed8099": "cf657f", "cf657f": "a24b6f"}}
+                        "f68181": "ffffff"}}
 # Pixels set by hand after the palette (x, y in the trimmed picture -> colour): the parasol's handle had a
 # band of the cloth's red across it (the user, 2026-11-20: "remove the red pixel from the parasol's
 # handle"), now the pole's own two colours.

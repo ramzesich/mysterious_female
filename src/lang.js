@@ -34,6 +34,10 @@ const TEXTS = {
         'hint.dash.pad': 'B to dash',
         // (Crawling, as Bumbot is gone into the linen room's vent: near-catch 4, 2026-11-24.)
         'hint.crawl': '↓ to crawl',
+        'hint.round': 'Space at a partition to climb round it',
+        'hint.round.pad': 'A at a partition to climb round it',
+        'hint.climb': '↑ or ↓ with Space to climb up or down',
+        'hint.climb.pad': 'Left stick up or down with A to climb',
         'hint.crawl.pad': 'Left stick down to crawl',
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
         'hint.read': '← and → to choose, E to read, Esc to get up',
@@ -73,6 +77,10 @@ const TEXTS = {
         'hint.dash': 'D — ривок',
         'hint.dash.pad': 'B — ривок',
         'hint.crawl': '↓ — повзти',
+        'hint.round': 'Пробіл біля перегородки — перелізти',
+        'hint.round.pad': 'A біля перегородки — перелізти',
+        'hint.climb': '↑ чи ↓ з пробілом — лізти вгору чи вниз',
+        'hint.climb.pad': 'Лівий стік угору чи вниз з A — лізти',
         'hint.crawl.pad': 'Лівий стік униз — повзти',
         'hint.read': '← і → — вибрати, E — читати, Esc — встати',
         'hint.read.pad': 'Лівий стік — вибрати, X — читати, B — встати',

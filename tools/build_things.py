@@ -104,8 +104,6 @@ RECOLOUR = {
     "flag-se": {"484a77": "4d65b4", "8fd3ff": "4d65b4", "d5e04b": "f9c22b", "a2a947": "f9c22b"},
     # The car's two rubbery wheels came a dull teal on the palette: its brightest cyans (the user: "cyan").
     "rc-car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
-    # The socks shrunk were all one pale pink, a blob on the gym's white wall: the stronger pink (the user).
-    "grip-socks": {"eaaded": "ed8099", "ed8099": "cf657f"},
 }
 # Rows taken out of a piece (its own rows, top to bottom, after trimming) rather than shrinking it,
 # which would blur its stripes: the old lady's parasol came as long as she is tall, open and furled.
@@ -139,7 +137,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # washed picture, kept so.
 # (Delivery 1's vase of flowers and the low table it waits on, §5 3.2: in their own colours, as the user approved them;
 # `delivery/`, its README.)
-OWN_COLOURS = {"canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
+OWN_COLOURS = {"grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
