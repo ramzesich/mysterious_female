@@ -38,6 +38,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from draw_lifeboat import PORTHOLES
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "source" / "ship" / "redeco"
 GAME = ROOT / "assets" / "ship"
@@ -171,6 +173,32 @@ def join(L, R, cut, over0, blend=0):
     return Image.fromarray(out)
 
 
+def cutouts_mask(b, boxes, wall):
+    """The builder's pixels in each box that are not the wall's own colours (those found in the `wall` box, a stretch of
+    bare wall from the ceiling to the skirting): a piece drawn in code pasted back by its own shape, not its box (a box
+    carries the old wall round it)."""
+    m = np.zeros(b.shape[:2], bool)
+    if not boxes:
+        return m
+    walls = set()
+    for x0, y0, x1, y1 in ([wall] if isinstance(wall[0], int) else wall):       # one box of bare wall, or several
+        walls |= {tuple(c) for c in b[y0:y1 + 1, x0:x1 + 1, :3].reshape(-1, 3)}
+    for x0, y0, x1, y1 in boxes:
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1):
+                m[y, x] = tuple(b[y, x, :3]) not in walls
+    return m
+
+
+def ellipses_mask(size, boxes):
+    """Round things pasted back by their circles (the lifeboat's portholes, sent to the generator without them)."""
+    from PIL import ImageDraw
+    mask = Image.new("L", size, 0)
+    for box in boxes:
+        ImageDraw.Draw(mask).ellipse(box, fill=255, outline=255)
+    return np.array(mask) > 0
+
+
 def pieces_mask(size, placed):
     """The pixels of atlas pieces stood in a room as draw_rooms' stand() stands them (its middle at x, its foot dy up)."""
     from draw_rooms import atlas
@@ -265,6 +293,33 @@ CABINS = {
     "chapel": dict(parts=[("chapel-p1-B", 0), ("chapel-p2-B", 56)], cuts=[116], blend=80, door=None,
                    pieces=[("flower-pedestal", 170, 0), ("flower-pedestal", 238, 0), ("bouquet", 196, 30),
                            ("pillar-candle", 216, 30)]),
+    # Part 14's first group (the user, 2026-11-25: "1. A, but let's regenerate without Bumbot's picture and reapply it 2. A
+    # 3. A"). Her crew cabin: redrawn from the room with his picture taken out (the wallpaper carried through), so the
+    # picture from his photo goes back on a wall that never had the redraw's copy of it; her door, her mirror, her bed (its
+    # suitcase, her slippers), the bowl her three tangerines lie in, the flag and his picture as drawn.
+    "crewcabin": dict(parts=[("crewcabin-A", 0)], cuts=[], door=None, doorbox=None, pieces=[("door-crew", 59, 0)],
+                      wall=(143, 9, 159, 127),
+                      cutouts=[(3, 58, 25, 127), (158, 84, 236, 127), (116, 92, 133, 97), (196, 42, 199, 46)],
+                      boxes=[(107, 34, 138, 55), (172, 46, 223, 73)]),
+    # Cabin 8206 (tools/draw_cabin.py): its shower room's door (the shower scene's pieces are drawn on it), the door back
+    # out with its sign, the desk and its pouf (the desk seen close, the tangerines on it), the bed (she reads on it, he sits
+    # behind it: its own front, cabin-8206-bed.png, is its shape), the lobster drawing from her photo; the window's glass
+    # clear again for the live sea (the redraw was given a pale sky there).
+    "cabin8206": dict(parts=[("cabin8206-A", 0)], cuts=[], door=None, doorbox=None, pieces=[], clear=True,
+                      wall=(74, 9, 79, 123), cutouts=[(44, 46, 78, 124), (92, 82, 128, 123)],
+                      boxes=[(6, 44, 40, 123), (197, 32, 228, 73)],
+                      images=[("assets/ship/cabin-8206-bed.png", 0, 0)]),
+    # The lifeboat's inside: sent to the generator without its portholes, the hull drawn on through them (its takes of
+    # 2026-11-24 drew them differently in each part); the portholes pasted back on exactly their pixels, with the ladder
+    # and the hatch (the way out), the generated oars and boathook.
+    # (Its two parts faded into each other over x 195..255, between the ribs: cut hard at a rib, the right part's hull
+    # and canopy showed brighter. The ladder and hatch by their own shape: a box carried the old flat orange beside it.)
+    "lifeboat": dict(parts=[("lifeboat-p1-A", 0), ("lifeboat-p2-A", 152)], cuts=[225], blend=60, door=None,
+                     doorbox=None, pieces=[], wall=[(130, 0, 152, 13), (130, 15, 152, 56)],
+                     cutouts=[(100, 0, 124, 110), (105, 111, 119, 127)],
+                     ellipses=[(x - 9, 34, x + 9, 52) for x in PORTHOLES],
+                     images=[("assets/source/ship/lifeboat-oar.png", 126, 57), ("assets/source/ship/lifeboat-oar.png", 264, 57),
+                             ("assets/source/ship/lifeboat-boathook.png", 12, 59)]),
 }
 
 
@@ -333,9 +388,16 @@ def cabin(name, base):
         im = Image.fromarray(a)
     a, b = np.array(im), np.array(base)
     m = pieces_mask(base.size, spec["pieces"])
+    m |= cutouts_mask(b, spec.get("cutouts", []), spec.get("wall"))
+    m |= ellipses_mask(base.size, spec.get("ellipses", []))
+    for path, x, y in spec.get("images", []):
+        p = np.array(Image.open(ROOT / path).convert("RGBA"))[:, :, 3] > 0
+        m[y:y + p.shape[0], x:x + p.shape[1]] |= p
     a[m] = b[m]
     if spec.get("rim"):
         rim_fill(a, pieces_mask(base.size, spec["rim"]))
+    if spec.get("clear"):
+        a[b[:, :, 3] == 0] = 0                 # glass the game shows the live outside through (cabin 8206's window)
     im = Image.fromarray(a)
     return balcony_glass(im, base, spec["door"]) if spec["door"] else im
 
@@ -354,7 +416,7 @@ def fort():
 
 def main():
     for name, lay in [("laundry", laundry), ("store", store), ("galley", galley), ("maid6", maid6), ("pantry", pantry)] +             [(n, (lambda n: lambda base: cabin(n, base))(n)) for n in CABINS]:
-        p = GAME / "chapel-room.png" if name == "chapel" else GAME / "rooms" / f"{name}.png"
+        p = {"chapel": GAME / "chapel-room.png", "cabin8206": GAME / "cabin-8206.png"}.get(name, GAME / "rooms" / f"{name}.png")
         lay(Image.open(p).convert("RGBA")).save(p)
         print("wrote", p.relative_to(ROOT))
     fort().save(GAME / "rooms" / "adjoin-fort.png")

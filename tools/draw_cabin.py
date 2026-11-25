@@ -349,6 +349,8 @@ if __name__ == "__main__":
     room, door = interior(), open_door()
     room.save(SOURCE / "interior.png")
     door.save(SOURCE / "door-open.png")
+    import redecorate_rooms                 # (A, the user's, 2026-11-25: the shower, the doors, the desk, the bed and the
+    room = redecorate_rooms.cabin("cabin8206", room)    # drawing kept as drawn here; its window clear)
     room.save(GAME / "cabin-8206.png")
     bed_front(room).save(GAME / "cabin-8206-bed.png")
     door.save(GAME / "cabin-door-open.png")

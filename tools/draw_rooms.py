@@ -14,6 +14,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw
 
 from palettize import palettize
@@ -367,10 +368,9 @@ def crewcabin(width):
     (the porthole that was between them is gone: the user); over the bed a picture of Bumbot by a bowl of fruit. The wallpaper has a small pattern (the user: "add
     some texture"): pinstripes and sprigs, a shade off the wall each way."""
     WALL, STRIPE, SPRIG = "#c7dcd0", "#bbd2c5", "#d6e7dd"
-    # (The flag's blue and gold, each a third of the way to the wall's colour.)
-    GLASS, FLAG_BLUE, FLAG_YELLOW = "#b7dff2", "#4580bd", "#ead05c"
+    GLASS = "#b7dff2"
     R = Room(width, WALL, "#b8c9bf", ceiling=CREAM, skirting=GREY, floor="#7c93a0", fleck="#625565", pitch=240)
-    R.keep = (WALL, STRIPE, SPRIG, GLASS, FLAG_BLUE, FLAG_YELLOW, BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
+    R.keep = (WALL, STRIPE, SPRIG, GLASS, BUMBOT_EYES, BUMBOT_GROUND, *TANGERINE_COLOURS.values())
     R.washed = True
     R.full += [(3, FLOOR - 70, 24, FLOOR - 1)]           # her mirror (`mirror` in tools/population.py)
     r, box, d = R.r, R.box, R.d
@@ -419,18 +419,16 @@ def crewcabin(width):
     # The desk: over it Ukraine's flag with the trident, pinned flat to the wall; a lamp, a bowl
     # of tangerines, a mug; the chair pushed in.
     fx, fy = 107, 34
-    R.full.append((fx, fy, fx + 31, fy + 21))          # the flag, muted already (above)
-    box(fx, fy, fx + 31, fy + 21, FLAG_BLUE, SLATE)
-    r(fx + 1, fy + 11, fx + 30, fy + 20, FLAG_YELLOW)
-    # (The small coat of arms in its middle: a blue shield edged in gold, the gold trident on it.)
-    for j, row in enumerate(["ggggggggggg", "gbbbbbbbbbg", "gbgbbgbbgbg", "gbgbbgbbgbg", "gbgbgggbgbg", "gbggbgbggbg",
-                             "gbgggggggbg", "gbbgbgbgbbg", "gbbbgggbbbg", ".gbbbgbbbg.", "..gbbbbbg..", "...ggggg..."]):
-        for i, ch in enumerate(row):
-            if ch != ".":
-                colour = FLAG_YELLOW if ch == "g" else FLAG_BLUE
-                d.point((fx + 11 + i, fy + 5 + j), fill=colour)
-    for x in (fx + 1, fx + 30):
-        d.point((x, fy + 1), fill=GREY)                        # its pins
+    R.full.append((fx, fy, fx + 31, fy + 21))
+    # (Generated on its own, the user, 2026-11-25: "Please regenerate the Ukrainian flag separately ... We need a UA flag
+    # with the trident in the middle"; try 3 of three, `assets/source/ship/redeco/tries/flag/`, its blue made a row deeper
+    # so that the line is at half height, "the separation between blue and yellow must be in the middle", the shield
+    # centred on it (`flag-3-even.png`); muted a third toward the wall as the drawn one was, the user's choice.)
+    flag = Image.open(ROOT / "assets" / "source" / "ship" / "redeco" / "flag-3-even.png").convert("RGBA")
+    wall = tuple(int(WALL[k:k + 2], 16) for k in (1, 3, 5))
+    flag = Image.fromarray(np.uint8(np.array(flag).astype(float) * [2 / 3, 2 / 3, 2 / 3, 1] + [*(c / 3 for c in wall), 0]))
+    R.im.alpha_composite(flag, (fx, fy))
+    R.keep = (*R.keep, *{"#%02x%02x%02x" % tuple(c) for c in np.array(flag)[:, :, :3].reshape(-1, 3)})      # (in its own colours, not the palette's)
     box(104, FLOOR - 30, 142, FLOOR - 27, WOOD, WOOD_DARK)
     for x in (106, 139):
         r(x, FLOOR - 26, x + 1, FLOOR - 1, WOOD_DARK)
@@ -480,7 +478,7 @@ def crewcabin(width):
     r(180, FLOOR - 13, 183, FLOOR - 12, INK)
     for x in (200, 207):
         r(x, FLOOR - 2, x + 4, FLOOR - 1, PINK)
-    return R.save("crewcabin")
+    return redecorated("crewcabin", R)       # (A, redrawn without his picture: tools/redecorate_rooms.py)
 
 
 BUMBOT_EYES, BUMBOT_GROUND = "#cdd38a", "#f3ecdd"
@@ -786,7 +784,7 @@ def lifeboat(width):
     for x in (204, 252):
         box(x, FLOOR - 27, x + 10, FLOOR - 17, BLUE)
         r(x + 3, FLOOR - 30, x + 7, FLOOR - 27, WHITE)
-    return R.save("lifeboat")
+    return redecorated("lifeboat", R)        # (A, its portholes pasted back: tools/redecorate_rooms.py)
 
 
 # --- Region 3's rooms (the theatre) ------------------------------------------------------------------

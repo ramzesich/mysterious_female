@@ -134,7 +134,7 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 
 | Id | Where | Needs |
 |---|---|---|
-| `slot_lifeboat` | Inside the lifeboat at 143, under its forward oar (2026-11-21) | `room_lifeboat` |
+| `slot_lifeboat` | Inside the lifeboat at 143, standing on its bench aft (336 px in; 2026-11-25, the user's "I ❤ BAT YAM") | `room_lifeboat` |
 | `slot_lighting` | The lighting bridge's end, over the stage | `room_lighting` (red) |
 | `slot_stern` | Deck 7's stern strip, 253, on the stern structure | A drop from deck 8's stern terrace; the socks to climb back |
 | `slot_chapel` | The chapel, on its wall | After the cake |
@@ -520,7 +520,7 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | 125 | ladder top | From `rdr_gate` | | |
 | 128 | `cp_station` | The station locker | Checkpoint | A locker |
 | 104-230 every 9 | boats | The lifeboats, tenders, rescue boat (built) | | |
-| 143 | `room_lifeboat` | The one lifeboat she enters (2026-11-21, the user's): through a hatch on its roof, climbing up behind the boat (E at it, a faint glow); inside the whole boat, a ladder down from the hatch, benches, oars and a boathook, nine portholes (round windows outside at the same columns), `book_2`, `slot_lifeboat` | `room`, `door: roof`; out up the ladder | Drawn by hand, its oars and boathook and the hatch generated |
+| 143 | `room_lifeboat` | The one lifeboat she enters (2026-11-21, the user's): through a hatch on its roof, climbing up behind the boat (E at it, a faint glow); inside the whole boat, a ladder down from the hatch, benches, oars and a boathook, nine portholes (round windows outside at the same columns), `book_2`, `slot_lifeboat` | `room`, `door: roof`; out up the ladder | Drawn by hand and redecorated (A, 2026-11-25), its oars and boathook and the hatch generated |
 | 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign (2026-11-21: the winch and its crewman one generated clip turning with the boat, a wire rope up from its drum, a generated warning light; down, the boat a floor she can stand in; 15 remade: on all fours, she crawls away) | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped". **As built:** lowered onto the walkway and hoisted, its falls from the davit's arms to the boat's posts; running at it she sets it off (the lamp first, `DRILL` in `src/config.js`, 2026-11-19); under it as it comes down, 15: stiff onto her back (14a's), the boat down over her until her checkpoint. The winch and its crewman at 184.6 m (from 184.9, 2026-11-19: she lies clear of it) | Two characters, the boat's swing |
 | 210 | `riv_walkway` | The rival looking into a boat | `glimpse(region 7, once)` | |
 | 110-231 | the wall | The recess's wall: wall jumps up to deck 8's balconies (the socks) | | |

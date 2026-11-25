@@ -6,8 +6,10 @@ frame with a dark outline: `assets/ship/photos/thumb-slot_<name>.png` (26 x 32).
   orange/yellow much less prominent").
 - `cucina`: the two of them at La Cucina's window table (`assets/source/photos/cucina/thumb.png`, from try 4, the user's
   choice, 2026-11-23), as it came.
+- `lifeboat`: "I ❤ BAT YAM" on its beach promenade (`assets/source/photos/lifeboat/thumb.png`, from try 1, the user's
+  choice, 2026-11-25), as it came.
 
-    python tools/frame_nook_thumb.py [nook|cucina ...]      (all of them by default)
+    python tools/frame_nook_thumb.py [nook|cucina|lifeboat ...]      (all of them by default)
 """
 import colorsys
 from pathlib import Path
@@ -18,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PAPER = (226, 222, 214)
 # name: (its small redraw, how much of the oranges' and yellows' colour is left, how far every colour goes toward the
 # print's paper)
-SLOTS = {"nook": ("thumb2.png", 0.25, 0.35), "cucina": ("thumb.png", 1.0, 0.0)}
+SLOTS = {"nook": ("thumb2.png", 0.25, 0.35), "cucina": ("thumb.png", 1.0, 0.0), "lifeboat": ("thumb.png", 1.0, 0.0)}
 
 
 def frame(name):
