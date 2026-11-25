@@ -5050,3 +5050,15 @@ on the pool's floor with her head out, rings in the surface, the stroke's splash
 starts when Bumbot and the hot tub behind him are both in the picture, she stops, comes up, calls and watches, he
 plunging in front of her, and she is never moved. `swimShow`, `swimY`, `swimRings` in the ship scene; `poolWatch`,
 `poolBeat` in `src/world/lido.js`; `SWIM`, `POOL` in the config. 12 generations.
+
+## Near-catch 6 remade (2026-11-25, the Design session)
+
+The fifth by `docs/sequence-remake-plan.md`, on branch `near-catch-6` (made from `near-catch-5`). Its whole record:
+**`docs/near-catch-6-remake-log.md`** (15 decisions). The old scene was recorded (fifteen faults: the net never touched
+the alarm, there was no hatch to see, her way out left her legs on the ship's side); the user chose the structure
+proposed, with one condition ("Just don't use the cry as a call"); two corrections on the preview's GIF ("Bumbot's
+position is in the air between the consoles"; "it is not visually clear that the button is actually pressed"); approved
+on its first play ("All approved"), with one thing more at the bow ("place Bumbot behind the railings on the bow. The
+railings have to obscure him"). `src/world/bridge.js`, `BRIDGE` in the config, `tools/build_bridge.py`,
+`assets/source/bridge/`; her clips `call`, `call-loop`, `call-up`; the popup `call.kitty`, the sound `pspsps`.
+40 generations. `region9.bridge`, `region9.bridge_jump` new.

@@ -118,7 +118,7 @@ new one added there should be added here too.
 
 | Place | Link |
 |---|---|
-| `bridge`: the bridge | <http://localhost:8000/?play&at=bridge&cards=all> |
+| `bridge`: the bridge (near-catch 6: walk forward; with `cards=all` its hatch stands open from the start, so for the scene as she meets it: <http://localhost:8000/?play&at=bridge&did=horn>) | <http://localhost:8000/?play&at=bridge&cards=all> |
 | `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10> |
 
 ## Deck 11

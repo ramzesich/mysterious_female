@@ -168,9 +168,11 @@ export const finale = {
 
         // Bumbot at the tip of the bow, looking out at the sea ahead, from the sunset on.
         const Mo = F.mooring;
-        // (On our side of the deck's railing, on its very edge, where he can be seen: the railing is
-        // drawn in front of her. At the catch he comes through it to her: §6.1.9.)
-        this.tipCat = s.add.sprite(Mo.catX, Mo.y, 'bumbot').setOrigin(0.5, 1).setDepth(D.player + 0.06).setFlipX(true);
+        // (Behind the deck's railing, as she is: it is drawn over them both (the user, 2026-11-25: "place Bumbot behind
+        // the railings on the bow. The railings have to obscure him"; he sat on our side of it, on the deck's very
+        // edge, since step 10, when his old small sprite could hardly be seen through it). In front of her, though:
+        // at the catch he comes to her feet.)
+        this.tipCat = s.add.sprite(Mo.catX, Mo.y, 'bumbot').setOrigin(0.5, 1).setDepth(D.player + 0.02).setFlipX(true);
         this.tipCat.play('bumbot-sit').anims.chain('bumbot-sat');
         w.add([this.tipCat]);
         w.things.push({ id: 'bb_tip', x: Mo.catX, y: Mo.y, route: 'inside', items: [this.tipCat], after: 'flag:sunset', until: 'flag:catch' });

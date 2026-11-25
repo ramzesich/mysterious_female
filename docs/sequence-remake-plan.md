@@ -2,7 +2,7 @@
 
 How a sequence of the game is remade from start to finish. Written 2026-11-24 from the two remakes done that way
 (the linen room's shaft, `docs/shaft-remake-log.md`, 2026-11-23; the pool's scene, `docs/pool-remake-log.md`,
-2026-11-24; **used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
+2026-11-24; **used last for near-catch 6, 2026-11-25, `docs/near-catch-6-remake-log.md`, which added two kinds of correction more; used first for near-catch 1 the same day, `docs/near-catch-1-remake-log.md`, which added three kinds
 of correction and three checks to it; then for near-catch 2, `docs/near-catch-2-remake-log.md`, approved on its
 first play; then for near-catch 3, `docs/near-catch-3-remake-log.md`, which added two kinds more; then for near-catch
 4, `docs/near-catch-4-remake-log.md`, whose scene the user gave themselves, and which added two more**), from the user's
@@ -63,7 +63,7 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the kinds of correction** (below; sixteen now) before the user sees it:
+8. **Check it against the kinds of correction** (below; eighteen now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
@@ -84,6 +84,11 @@ made and what it cost goes into the log and is said at each stop.
    - Each hint: is it shown at the first moment she can use it (near-catch 4: "only when we jump on top of the cart")?
    - Run the builders that made the pieces touched and see that they give back what is committed, before changing
      them (near-catch 4: the vent's pieces no longer rebuilt as they were).
+   - Whoever lands: on what, and does it read as a support at the game's size (near-catch 6: a black cat on a dark
+     cap was "in the air")?
+   - Whatever is struck, pressed or knocked: measure the striking thing against it, px by px, and see that it changes
+     in that frame (near-catch 6: the hoop came down 8 px under the button it was to press).
+   - Record the old scene as she meets it: `?did=` only, never `?cards=all`, which opens what a flag gates.
    - Run the scenarios touched, with a new check for each decision, and the overlap check.
 9. **Play stop.** The user gets the link, the strip and a GIF, with a plain note that motion and sound are theirs to
    judge.
@@ -96,7 +101,8 @@ made and what it cost goes into the log and is said at each stop.
 
 For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
 whole stage, two dancers twice over, a key clip of its own), near-catch 4 about 80 (a stack and one clip, but
-eleven clips toward a heap that could not lie where it fell).
+eleven clips toward a heap that could not lie where it fell), near-catch 6 40 (two pieces, nine clips, nearly all
+first tries: each start picture was a sheet's own frame, each key clip pinned to an end).
 
 ## The kinds of correction
 
@@ -122,6 +128,8 @@ of near-catch 1, two of near-catch 3, the last two of near-catch 4 (seen on its 
 | Too fast to follow | (near-catch 3: "plays too fast in the game and it's hard to grasp what just happened ... a bit slower and with some delays, but in proper places, not to break transitions, where they should be flowing") | |
 | Someone shown outside or through the thing they go into | (near-catch 4: "Shift Bumbot's crawl higher, it is shown from below the entrance"; "when Bumbot crawls inside, a black pixel shows") | |
 | A hint before the moment it can be used | (near-catch 4: "The tooltip has to show (after the Bumbot's escape) only when we jump on top of the cart") | |
+| Someone standing on what does not read as a support | (near-catch 6, at the preview: "After the first jump, Bumbot's position is in the air between the consoles": he had landed on the officer's cap) | |
+| A cause that happens but is not seen to | (near-catch 6, at the preview: "When the officer swings, it is not visually clear that the button is actually pressed") | |
 
 ## What the two prompts had in common
 
@@ -174,6 +182,14 @@ already applied.
   this cart, but empty". The preview took the longest: a heap that could not lie where it fell, eleven clips unused,
   then a scatter. Two corrections on the preview (his crawl's height, a black pixel), "Build it", one more during the
   build (when the hint shows), and **approved on its first play.** About 80 generations.
+
+- **Near-catch 6** (the fifth by the plan): the old scene recorded (fifteen faults, one of them her way out up the
+  hatch, found only by recording past the scene's end); one proposal with a rough set up in the running game and
+  three questions, answered in three lines, with one condition of the user's own ("Just don't use the cry as a
+  call"); the pieces, the clips and a storyboard on its clock in one stretch; two corrections on the preview's GIF
+  (the two last rows above), mended before the build; the storyboard's clock became the scene's, which ran right the
+  first time; the self-check found the take-over's screen and one overlap; **approved on its first play**, with one
+  thing more outside the scene (Bumbot behind the bow's railing). 40 generations.
 
 ## The two prompts, word for word
 

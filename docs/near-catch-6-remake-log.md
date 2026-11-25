@@ -222,7 +222,21 @@ Against the plan's list, in the running game (recordings at the game's px, 70 ms
   funnel's ladder with and without this work (checked by stashing it): not this scene's. Once, with five browsers at
   a time, `region9.bridge` timed out on its connection; alone and three at a time it passes.
 
-*(At the play stop: the link, the strip and the GIF given to the user.)*
+## 8. The play, and the close
+
+The user, on playing it (2026-11-25):
+
+> All approved. The only fix is to place Bumbot behind the railings on the bow. The railings have to obscure him
+
+No correction to the scene. **Bumbot at the bow** (the sunset's scene and the catch, `src/world/finale.js`): he sat on
+our side of the mooring deck's railing since step 10, when his old sprite could hardly be seen through it; he is
+behind it now, as she is, in front of her (decision 15). `finale`, `golden`, `boot` pass.
+
+The documents brought to it: `GAME_DESIGN.md` (region 9's text, the beats' table, the work record), `docs/population.md`
+(the bridge's rows, the scene as built), `docs/progression.md` (the bridge, step 27), `docs/plan-the-rest.md` §7a (all
+six near-catches have scenes of their own), `docs/progress-decisions.md`, `docs/start-links.md`, `CLAUDE.md` (the
+bridge's row, eight lessons), `docs/sequence-remake-plan.md` (three checks more in its step 8, two kinds of correction
+more, how this one went, its scale).
 
 
 ## Decisions
@@ -252,8 +266,11 @@ Against the plan's list, in the running game (recordings at the game's px, 70 ms
 14. Her way out is mended by cutting her picture between the hatch's mouth and the balcony's floor and holding the
     bridge's deck open, with nothing new drawn on deck 11.
 
+15. Bumbot at the bow behind the mooring deck's railing, which is drawn over him (the user on playing it: "The
+    railings have to obscure him").
+
 ## Generations
 
-40 so far (`assets/source/bridge/README.md` has every job): the hatch 6, the station 5, her call 4 (three clips, one
+40 (`assets/source/bridge/README.md` has every job): the hatch 6, the station 5, her call 4 (three clips, one
 try unused), the officer 23 (his stalk 2, its loop 1, his creep 1, the end picture twice 12, his main clip twice 6,
 his sigh 1; three of those tries unused), Bumbot's climb 2.

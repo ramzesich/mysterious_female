@@ -636,9 +636,9 @@ view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 27 | `door_hatch_bridge` | The emergency hatch in the ceiling and its ladder (drops at the alarm) | `scn_alarm` | Drawn |
-| 29 | `haz_alarm_panel` | The alarm panel on the wall (built piece, moved here) | Hit by the rival's net | Built |
-| 30 | `bb_6` | Bumbot on the main console | `scene` §9.9 | |
-| 26 | `riv_bridge` | The rival creeping with the net | Part of `bb_6` | |
+| 31 | `haz_alarm_panel` | The alarm station at the console's aft end: one big red button, a beacon (the scene's own piece, `tools/build_bridge.py`; the old panel's cabinet is gone) | The officer's hoop comes down on its button | Built |
+| 30.5 | `bb_6` | Bumbot washing on the console's aft end | `scene` §9.9, `src/world/bridge.js` | |
+| 29.7 | `riv_bridge` | The security officer frozen mid-creep, his net raised (the scene's own, not one of the people; sat under his net after) | Part of `bb_6` | |
 | 33 | decor | The captain's chair (the rival slumps in it after) | | Built |
 | 38 | `book_10` | On the chart table | `pickup` | |
 | 40 | `rdr_bridge` + `cp_bridge` | The bridge's door (gold) and its crew door checkpoint | | Built door |
@@ -979,11 +979,8 @@ Input locked unless said; each sets its save flag.
    door after: the ceremony seen from the back for 5 s, `slot_chapel` on the wall.
    **`scn_guest`:** E at the balcony guest's balcony door from inside: he comes in, thanks,
    `book_7`; his balcony door is an entry for good.
-10. **`bb_6` near-catch 6 (the bridge):** she enters at 40; he sits on the console at 30; the rival
-    at 26 creeps east with the net; when she is within 3 m she bends and the rival lunges; the cat
-    leaps; the net hits the alarm panel at 29: the alarm sounds (lights, a klaxon once sound is on),
-    the hatch at 27 releases and its ladder drops; Bumbot runs along the console and up it; the rival,
-    tangled, slumps in the captain's chair and waves her on.
+10. **`bb_6` near-catch 6 (the bridge; remade 2026-11-25, `docs/near-catch-6-remake-log.md`):** she enters at 40. He washes on the console's aft end, the alarm station beside him (one big red button, a beacon); behind him, in front of the console, the security officer, who ran up here at the horn, frozen mid-creep with his net raised; under the ceiling at the forward end the escape hatch, shut. At the sight of them she is taken: she goes down on her heels, holds out a hand and calls him softly ("Pss-pss-pss", never her cry); he gets up and hops onto the station, over its button, toward her hand; the officer hurries after him on tiptoe and swings; Bumbot springs, and **the hoop comes down on the alarm's button**: it goes down, the beacon lights, the alarm. The hatch's lid drops and its ladder comes down; Bumbot, back on the console behind the officer, runs, leaps onto the ladder and climbs it into the hatch. The officer tugs his net free and goes over backward, the net over his own head; he sits so until the end. She looks up after him and is hers after 6.3 s, facing the ladder. In a jump across the line she comes straight down there. Her way out: up the ladder into the hatch (the bridge kept open, her picture cut at the hatch's mouth) onto the balcony forward of the spa.
+    *It was: he sat on the floor, she bent to him, the net came down beside him and the alarm went off behind her back; the officer sat on the floor.*
 11. **`scn_sunset` and `scn_catch` (§6.1.9):** out of the hatch the sky turns; the camera slides to
     the tip of the bow and back; the glide with `gust_finale` (every 4 s) and two gulls crossing the
     path; a miss is the overboard scare and `cp_bridge`; at the tip, standing still 3 s: the

@@ -614,10 +614,12 @@ Design: `docs/plan-three-uses.md` §4.5 and step 7.
      sleeps on the Library's return trolley now), **and near-catch 3** (the same day:
      `docs/near-catch-3-remake-log.md`; the stage one generated picture, the rival on the hanging lamp), **and
      near-catch 4** (the same day, on the user's own structure: `docs/near-catch-4-remake-log.md`; a stack of pillows
-     in the emptied cart, his leap scatters them, the vent's order mended, crawling explained on the cart); 5 and 6
-     wait as before (5 has the pool's scene, remade 2026-11-24, and since 2026-11-25, on the user's two asks, is
-     watched from the water where he and the hot tub first show, with her swimming enriched: `docs/pool-remake-log.md`
-     §8; 6 still plays the ship scene's plain `nearCatch`).
+     in the emptied cart, his leap scatters them, the vent's order mended, crawling explained on the cart), **and
+     near-catch 6** (2026-11-25: `docs/near-catch-6-remake-log.md`; on the bridge she calls him softly and he starts
+     to come, the officer's net on the alarm's button, the escape hatch and its ladder). 5 has the pool's scene, remade
+     2026-11-24, and since 2026-11-25, on the user's two asks, is watched from the water where he and the hot tub first
+     show, with her swimming enriched (`docs/pool-remake-log.md` §8). **All six have scenes of their own:** the ship
+     scene's plain `nearCatch` is played by none of the plan's beats now.
   4. The run's pace (24 frames a second) and the rounds' pauses are by rule, not by eye: the user's to say in play.
 
 The steps as planned:

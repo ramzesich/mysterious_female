@@ -81,8 +81,9 @@ missing one thing: the cake. Bumbusik carries it all the way from the kitchen af
 past bouncing basketballs and through Champs, and hands it over. The party moves into the chapel and the way forward
 is clear. With the officer's card every gold door opens, down to the bridge.
 
-**The bridge.** Bumbot sits on the ship's console. From the other side the security officer creeps toward him with
-his net. They lunge together, the cat leaps, and the net lands on the alarm panel instead. Bells ring, the emergency
+**The bridge.** Bumbot sits on the ship's console. Behind him the security officer is frozen mid-creep with his net.
+She crouches and calls him softly, and he starts to come to her hand; the officer swings, the cat springs, and the net
+comes down on the alarm's big red button instead. Bells ring, the emergency
 hatch in the ceiling drops open, and Bumbot shoots up its ladder and out.
 
 **Sunset.** Through the hatch she comes out onto a small balcony over the bow, and the sun is going down; the whole
@@ -218,8 +219,8 @@ Not needed for the finale: the balconies, the boat walkway and the hallways are 
     party goes into the chapel, and the lobby clears.
 26. The **Officer's card** opens the gold doors: down the forward stairs to deck 10's officers' corridor and the
     bridge's door.
-27. **Near-catch 6, on the bridge:** Bumbot sits on the console. The security officer creeps at him with his net
-    from the other side. They both lunge, the cat leaps, and **the net hits the alarm panel**. The emergency hatch
+27. **Near-catch 6, on the bridge:** Bumbot sits on the console. She calls him softly and he comes toward her hand; the
+    security officer, creeping up behind him with his net, swings; the cat springs, and **the net hits the alarm's button**. The emergency hatch
     in the ceiling opens, and Bumbot shoots up its ladder.
 
 ### Region 10: the sunset and the finale
