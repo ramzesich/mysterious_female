@@ -5077,3 +5077,49 @@ as the old drop: gone; the hints never shown under `cards=all`; down only at a p
 balcony; the rail towels in a cabin; a wait on the fin in a gust: gone), and "All approved". `src/world/balcony.js`,
 `BALCONY` in the config, `tools/build_balconies.py`, `assets/source/balconies/`, `assets/ship/balconies/`,
 `assets/sprites/her-socks.png`. 62 generations. `region7` rewritten, `region7.link` new.
+
+## Part 9: the tangerines' seats; the delivery robot seen from the side, its ride mended (2026-11-25)
+
+The user: "Next step in our plan is tangerines' placement, no?" (plan-the-rest §7d), then "Yes" to the audit made again
+and the raw tries. Every spot of the plan's twelve looked at again with her beside it (the renderer's own frame): all
+still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (moved 2026-11-24).
+
+- **The props, generated** (`assets/source/things/tangerine-seats/`, its README has the jobs; 90 generations):
+  **A**, a room-service tray on a stand. The first two looks stood on a wooden X like the deliveries' stand; the user:
+  "Make a fitting stand": a slim chrome stand with straight legs, two loads (a dome and a glass, `roomtray-dome`; a cup
+  and a milk jug, `roomtray-cup`), the tangerine 1 px into the tray's free end ("Shift the tangerine down one pixel").
+  **B**, `B-s5`, a low bowl of grapes, a green apple and a banana (nothing orange), the tangerine in the apple's place
+  ("It should cover the green apple there"; the second of a pair on the grapes). **C**, each trolley an inpaint of the
+  game's own piece: the dessert cart's right dome taken out for a plate (`dessert-trolley-plate`), the room-service
+  cart's plate by its dome (`service-cart-plate`, the tangerine 3 px in from its end: "two pixels left", "one more
+  pixel to the left"; the generator twice kept the dome whole). All in their own colours, in the ship's atlas
+  (`tools/build_ship_art.py`) with their washed twins.
+- **The seats as data:** `SEAT_SPOTS` (where a tangerine lies in each piece's picture) and `SEATS` (each spot's piece,
+  metre, offset, height, and whether the world puts the piece there) in `tools/population.py`; `tools/build_world.py`
+  emits the piece (`seat_<id>`, washed by its place) and the tangerines on it. The tray stands replace the early side
+  table at all five of its spots (deck 4's at 31 m and deck 8 aft's 14 px aft, clear of the extinguisher; deck 8
+  forward's until part 11 moves it; deck 10's loose `prop_tray_10` gone). The bowl on the spa's desk, on Topsiders'
+  counter aft of the barmaid (first over her: moved), and on the Garden Café's patio table at 187.2 m beside its juice
+  (moved to the table's forward end), the pair out of the queue and clear of the cold room's door (the plan's 183 m is
+  the ice cream counter and that door; the user: "Ok"). The dessert cart's and deck 9's cart's tangerines on their plates.
+- **The shifts:** the Windjammer's and the Spinnaker's along their counters to the aft ends; the laundress moved 22 px
+  aft to the folding table (the tangerine on the wall shelf where it was).
+- **The user's review of all 56 placements** (an enumerated sheet asked for): the Atrium Café's down onto the table
+  beside its little bowl ("touch the table, not the bowl"); the pantry's 1 px up; deck 9 aft's onto the towel
+  trolley's folded towels ("on top the white plate to the right", `SEATS` with the map's own piece); the crates' "all
+  good"; the fire-hose cabinet's asked about ("is it reachable there?": from the delivery robot's top, as `region2`
+  checks).
+- **The delivery robot:** shown riding it ("Show me a gif of her riding the delivery robot"), her ride was broken since
+  step 2: it moved her picture and her body, the physics moved her picture again, and she slid off its front to hang
+  on its corner (the test only measured her height and a distance). Moving her body only held in the stepped clock but
+  not in play ("She slowly slides off him while he moves": a frame with no physics step lost the move); now its step
+  is added to her picture and body together after the physics (`postupdate`), steady in real time and stepped. The
+  robot made again seen from the side (the user: "regenerate the delivery robot, to has a view more from its side"):
+  four map objects, **try 4**, turned to face the way it drives, four plain rows cut to its old 52 px, in its own
+  colours (on the palette its greys went purple), 2 px into the floor ("its level on the floor should be lowered by two
+  pixels", `ROBOT_SINK`), her top with it. The same two-line carry is in a few other movers (`outside.js`,
+  `hazards.js`, `world.js`): offered to the user, not touched.
+- `check_overlaps` 0 (the bowl on the spa's desk and on the pool bar allowed); `check_corridors`: deck 11 47.2 / 53.7 m
+  (was 47.4 / 53.9), deck 4's longest without a reward 68.0 m (was 68.4). `boot`, `region1`, `region2`, `region3`,
+  `region4`, `region6`, `region9` pass; `mishaps` fails only on deck 9's sprinkler, as on the committed tree.
+- 90 generations for the seats, 4 robot tries; the balance went from 8,869 to 8,695.

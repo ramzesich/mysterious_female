@@ -107,7 +107,10 @@ RECOLOUR = {
 }
 # Rows taken out of a piece (its own rows, top to bottom, after trimming) rather than shrinking it,
 # which would blur its stripes: the old lady's parasol came as long as she is tall, open and furled.
-CUT_ROWS = {"parasol-open": [(30, 44)], "parasol-closed": [(16, 28), (45, 50)]}
+CUT_ROWS = {"parasol-open": [(30, 44)], "parasol-closed": [(16, 28), (45, 50)],
+            # (The delivery robot seen from the side, the user's try 4 of four, 2026-11-25, turned to face the way it
+            # drives: 56 px, four rows of its plain body out to its old 52; `tries/robot-side/`.)
+            "robot": [(36, 40)]}
 # A piece leaning (nothing stands by itself on a crook handle): its rows pushed sideways, one px
 # for every so many rows up from its foot, to the left. The furled parasol leans on the sunbed.
 LEAN = {"parasol-closed": 3}
@@ -137,7 +140,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # washed picture, kept so.
 # (Delivery 1's vase of flowers and the low table it waits on, §5 3.2: in their own colours, as the user approved them;
 # `delivery/`, its README.)
-OWN_COLOURS = {"grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
+OWN_COLOURS = {"robot", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}

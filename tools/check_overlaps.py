@@ -40,6 +40,8 @@ ALLOWED = [
     ("parasol-", "sundae-"),                # a sundae on a table under its parasol
     ("laundry-cart-empty", "delivery-pillow-"),  # delivery 3's pillows on the cart's rim, within its handle's box
     ("stage-back", "stage-valance"),        # the stage's valance laid again over its own picture: Bumbot goes up the rope behind it
+    # The tangerines' green fruit bowl stands on the spa's desk and on the Topsiders bar's counter (plan-the-rest §7d).
+    ("spa-desk", "fruit-bowl-green"), ("pool-bar", "fruit-bowl-green"),
     ("bridge-lid", "bridge-ladder"),        # the bridge's hatch: its lid hangs beside its ladder; the lid's frame is the square it turns in
     ("balcony-unit", "balc-"),              # the people on a balcony sit in front of its back wall and sliding door
 ]

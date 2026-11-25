@@ -143,7 +143,8 @@ TANGERINES = {
     "tan_4_30": (4, 31.2, 1, "table", None),
     "tan_4_laundry": ("laundry", 250, 1, 46, None),
     "tan_4_store": ("store", 150, 2, 40, None),
-    "tan_5_cafe": (5, 83.6, 1, 28, None),
+    # (Down onto the table's top beside its little fruit bowl, not on the bowl: the user, 2026-11-25.)
+    "tan_5_cafe": (5, 83.6, 1, 23, None),
     "tan_5_dessert": (5, 186.4, 1, 26, None),
     # (Out of the Seven Seas' fruit bowl as Bumbot knocks it off the pass: each where it comes to rest, forward of the
     # spilled fruit; the game rolls them there, `passSpill` in src/world/pass.js. 2026-11-24.)
@@ -152,7 +153,8 @@ TANGERINES = {
     "tan_5_bowl_3": (5, 244.0833, 1, 0, "bb1"),
     "tan_5_galley": ("galley", 36, 2, 0, "broken:haz_crate_galley"),
     "tan_6_high": (6, 26.94, 1, 118, None),
-    "tan_6_windjammer": (6, 142.2, 1, 32, None),
+    # (Along the bar's counter to its aft end, off the barmaid's hands: plan-the-rest §7d.)
+    "tan_6_windjammer": (6, 143.0208, 1, 32, None),
     "tan_7_jackpot": (7, 153.1, 2, 0, "jackpot"),
     "tan_7_tradewinds": (7, 182.21, 1, 20, None),
     # (Cabin 8206's two on its desk's top, 40 px up (tools/draw_cabin.py), right of the phone and the daily
@@ -162,7 +164,7 @@ TANGERINES = {
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
     "tan_8_balc_aft": (8, 245, 1, "out", None),
-    "tan_5_pantry": ("pantry", 190, 1, 22, None),
+    "tan_5_pantry": ("pantry", 190, 1, 23, None),      # (1 px up: the user, 2026-11-25)
     "tan_9_balcabin": ("balcabin9", 150, 1, 30, None),
     "tan_9_cart": (9, 172.6, 1, 28, None),
     "tan_9_luggage": (9, 181.5, 1, "table", None),
@@ -173,7 +175,9 @@ TANGERINES = {
     # (On the reception's desk: 32 m, the spec's place, is inside the deck's front wall.)
     "tan_11_spa": (11, 35.3, 1, 40, None),
     "tan_11_topsiders": (11, 156.35, 1, 30, None),
-    "tan_11_fruit": (11, 176.8, 2, "table", None),
+    # (Off the bare side table inside the buffet queue (plan-the-rest §7d, 4): in the green fruit bowl on the patio table at
+    # 187.2 m, past the queue and the cold room's door; the user, 2026-11-25. Its place in the bowl: `SEATS`.)
+    "tan_11_fruit": (11, 187.2, 2, 0, None),
     "tan_11_crates": (11, 232.8, 2, 0, "broken:haz_crates_11"),
     # On the hot tub's canopy: up by a wall jump off one of its posts, from under it.
     "tan_11_canopy": (11, 132.5, 1, 90, None),
@@ -184,7 +188,8 @@ TANGERINES = {
     "tan_9_aft": (9, 230, 1, 28, None),
     "tan_10_balc": (10, 160.6, 1, "out", None),
     # (On the bar: 54 m is the grand piano.)
-    "tan_12_spinnaker": (12, 55.45, 2, 32, None),
+    # (The pair along the counter to its aft end, off the barman's chest: plan-the-rest §7d.)
+    "tan_12_spinnaker": (12, 56.1458, 2, 32, None),
     "tan_12_lady": (12, 127.25, 2, 0, "lady"),
     # (Cagney's, balanced on its steel trolley's dome (plan-the-rest §7d, 7), moved to the restrooms' counter by the
     # Chapel, right of the tap: the user, 2026-11-24, "Place a tangerine here. Move some other tangerine here".)
@@ -195,6 +200,38 @@ TANGERINES = {
     # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
     "tan_7_splash": (7, 41.2, 1, 20, None),
     "tan_7_ballpit": (7, 52.4, 1, 0, None),
+}
+
+# What a tangerine lies on (plan-the-rest §7d, the user's choices of 2026-11-25; the rule: on food service or in a fruit
+# bowl, never on bare furniture, balanced on a thing, in the air or behind someone). `SEAT_SPOTS`: where in each piece's
+# picture a tangerine lies, (px from the piece's middle, px over its foot), one per tangerine of the spot, measured on the
+# approved mock-ups (`assets/source/things/tangerine-seats/`). `SEATS`: id: (piece, m, px along from that metre, px up the
+# piece stands, whether the world puts the piece there). A tangerine's own `on` and metre are then the seat's.
+SEAT_SPOTS = {
+    "roomtray-dome": [(8, 19)],            # (at the tray's free end, 2 px into its top: the user)
+    "roomtray-cup": [(8, 18)],
+    "fruit-bowl-green": [(2, 10), (-7, 9)],   # (the first in the green apple's place, the user; the second on the grapes)
+    "dessert-trolley-plate": [(7, 17)],    # (on the plate where its right dome was)
+    "service-cart-plate": [(9, 20)],       # (on the plate by the dome, 3 px in from the cart's end: the user)
+    "towel-trolley": [(6, 28)],            # (on the folded towels on its top, right of its handle: the user, 2026-11-25)
+}
+SEATS = {
+    # A room-service tray on its chrome stand, in the early side table's place, the two loads in turn.
+    # (`tan_4_30`, `tan_8_aft`: 14 px aft, clear of the corridor's extinguisher.)
+    "tan_4_30": ("roomtray-dome", 31.2, 14, 0, True),
+    "tan_8_fwd": ("roomtray-cup", 49.3, 0, 0, True),
+    "tan_8_aft": ("roomtray-dome", 246, 14, 0, True),
+    "tan_9_luggage": ("roomtray-cup", 181.5, 0, 0, True),
+    "tan_10_mid": ("roomtray-dome", 182, 0, 0, True),
+    # The green bowl: on the spa's reception desk (its top 26 px up), on the Topsiders bar's counter between its
+    # canopy's posts, and on the Garden Café's patio table beside its juice (`tools/build_ship_map.py`).
+    "tan_11_spa": ("fruit-bowl-green", 35.3, 7, 26, True),
+    "tan_11_topsiders": ("fruit-bowl-green", 156.35, -11, 26, True),      # (aft of the barmaid, before its aft post)
+    "tan_11_fruit": ("fruit-bowl-green", 187.2, 2, 24, True),
+    # The two trolleys, each the map's own piece with its plate.
+    "tan_5_dessert": ("dessert-trolley-plate", 186.4, 0, 0, False),
+    "tan_9_cart": ("service-cart-plate", 172.6, 0, 0, False),
+    "tan_9_aft": ("towel-trolley", 230, 0, 0, False),
 }
 
 # --- Pickups ---------------------------------------------------------------------------------------
@@ -388,7 +425,8 @@ PEOPLE = {
     # (In her way, no longer behind her: running into her, she bounces off and sits, as off the
     # breakfast stewardess, 10f; the user, 2026-11-17.)
     "amb_robe": dict(hear="♥", at=(4, 130), who="robe", face=-1, idle="idle", touch=("scare", 14, 40, "robe")),
-    "amb_folder": dict(at=("laundry", 258), who="folder", face=1, idle="idle"),
+    # (At the folding table, 22 px aft of the wall shelf: in front of it she hid its tangerine; plan-the-rest §7d.)
+    "amb_folder": dict(at=("laundry", 280), who="folder", face=1, idle="idle"),
     # Region 1, deck 5.
     "riv_rope": dict(at=(5, 81.05), who="rival", face=-1, idle="idle", until="region:2"),
     "amb_reception": dict(at=(5, 99.55), who="receptionist", face=-1, idle="idle", layer="behind"),
@@ -664,7 +702,6 @@ PROPS = {
     "sign_wet_11": (11, 150.55, "wet-floor-sign-bg", 0, dict(back=True)),
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
     "sign_wet_10m": (10, 154.2, "wet-floor-sign", 0, {}),
-    "prop_tray_10": (10, 182, "@tray", 12, {}),
     # Region 7's hallways: the wet-floor signs under the sprinklers. (Deck 8's ice bucket and glasses on their tray are a
     # trap since 2026-11-23: `haz_trays_8ice`.)
     "sign_wet_8m": (8, 146.2, "wet-floor-sign", 0, {}),
@@ -705,7 +742,7 @@ SOLIDS = {
     "haz_cart_4_182": (4, 182, "towel-trolley"),
     "haz_cart_4_220": (4, 220, "service-cart"),
     "haz_cart_5_30": (5, 30, "towel-trolley"),
-    "haz_cart_9_172": (9, 172.6, "service-cart"),
+    "haz_cart_9_172": (9, 172.6, "service-cart-plate"),      # (a plate by its dome, its tangerine on it: `SEATS`)
     "haz_cart_10_118": (10, 118, "towel-trolley"),
     "haz_cart_8_186": (8, 186, "service-cart"),
     "haz_cart_9_230": (9, 230, "towel-trolley"),
