@@ -17,7 +17,7 @@ from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
-                        SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
+                        SEAT_SPOTS, SEATS, SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
@@ -173,6 +173,20 @@ def build_world():
         if outside:
             x = nearest_balcony(where, x) + 40
             route = OUTSIDE
+        if tid in SEATS:
+            # On its seat (`SEATS`): the piece, put there by the world or already the map's, and each tangerine where the
+            # piece's picture has room for it.
+            piece, m, dx, up, own = SEATS[tid]
+            px = B.exact_x(m) + dx
+            spots = SEAT_SPOTS[piece]
+            assert len(spots) >= count, tid
+            if own:
+                ents.append(dict(kind="prop", id=f"seat_{tid}", x=px, y=y, route=route, frame=f"{piece}-bg", dy=up))
+            for k in range(count):
+                sx, sy = spots[k]
+                ents.append(dict(kind="tangerine", id=tid if count == 1 else f"{tid}#{k}", x=px + sx, y=y, route=route,
+                                 on=up + sy, needs=needs or "", first=k == 0))
+            continue
         for k in range(count):
             ents.append(dict(kind="tangerine", id=tid if count == 1 else f"{tid}#{k}", x=x + k * 9 - (count - 1) * 4, y=y,
                              route=route, on="table" if on in ("table", "out") else int(on), needs=needs or "",

@@ -12,6 +12,8 @@ const M = 48;
 // The delivery robot (deck 6's forward cabins): a tall tray-carrying robot that trundles the
 // corridor. It stops and beeps while she is in its way; she hops onto its top and it carries her
 // along. Never a scare.
+const ROBOT_SINK = 2;
+
 export class Robot {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -21,9 +23,11 @@ export class Robot {
         this.x = def.x;
         this.dir = 1;
         this.pausedUntil = 0;
-        this.sprite = s.add.image(def.x, def.y, 'things', 'robot').setOrigin(0.5, 1).setDepth(D.props + 0.04);
+        // (Seen from the side since 2026-11-25, standing 2 px into the floor, `ROBOT_SINK`: the user. Her top is its
+        // picture's, so the ride's platform is that much lower too.)
+        this.sprite = s.add.image(def.x, def.y + ROBOT_SINK, 'things', 'robot').setOrigin(0.5, 1).setDepth(D.props + 0.04);
         this.w = this.sprite.width + 6;
-        this.h = this.sprite.height - 1;
+        this.h = this.sprite.height - 1 - ROBOT_SINK;
         this.zone = s.add.zone(def.x, def.y, this.w, this.h).setOrigin(0.5, 1);
         s.physics.add.existing(this.zone, true);
         // (Its run short of any door or wall across the deck: ShipScene `stopShort`.)
@@ -34,6 +38,21 @@ export class Robot {
             fontFamily: 'Verdana, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#0b5e65', resolution: 4,
         }).setOrigin(0.5, 1).setDepth(D.fx).setVisible(false);
         world.add([this.sprite, this.beep]);
+        // She rides along on its top: its step since the last frame added to her picture and her body together once
+        // the physics has run (the scene's post-update), so the two never part. (Moved in its update, her body only,
+        // she slid off it in play: on a frame with no physics step her body's move was lost; both, she rode at twice
+        // its speed; 2026-11-25.)
+        this.carry = 0;
+        this.onPost = () => {
+            const p = s.player;
+            if (this.carry && p?.body) {
+                p.x += this.carry;
+                p.body.x += this.carry;
+            }
+            this.carry = 0;
+        };
+        s.events.on('postupdate', this.onPost);
+        s.events.once('shutdown', () => s.events.off('postupdate', this.onPost));
     }
 
     addCollider(p) {
@@ -83,11 +102,7 @@ export class Robot {
         this.sprite.x = this.zone.x = to;
         this.sprite.setFlipX(this.dir < 0);
         this.zone.body.updateFromGameObject();
-        // She rides along on its top.
-        if (riding && s.mode === 'play') {
-            p.x += dx;
-            p.body.x += dx;
-        }
+        if (riding && s.mode === 'play') this.carry += dx;
     }
 }
 

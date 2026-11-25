@@ -304,6 +304,13 @@ PIECES["side-table"] = ("side-table-2", 0, None, {})
 PIECES["patio-chair"] = ("patio-chair", 0, None, {})
 PIECES["patio-table"] = ("patio-table", 0, None, {})
 PIECES["patio-chair-arm"] = ("patio-chair-arm", 0, None, {})   # (drawn in front of him: `patio-chair-arm/`)
+# The tangerines' seats (plan-the-rest §7d, the user's choices of 2026-11-25; `assets/source/things/tangerine-seats/`,
+# its README has the jobs): a room-service tray on a slim chrome stand in two loads, in the early side table's place; a
+# low bowl of grapes, a green apple and a banana; the dessert cart with a plate for its right dome and the room-service
+# cart with a plate by its dome, each an inpaint of the game's own piece. In their own colours.
+for _seat in ("roomtray-dome", "roomtray-cup", "fruit-bowl-green", "dessert-trolley-plate", "service-cart-plate"):
+    PIECES[_seat] = (_seat, 0, None, {})
+    OWN.add(_seat)
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22

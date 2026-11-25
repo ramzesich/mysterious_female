@@ -1433,7 +1433,7 @@ def build_objects():
         put(5, m, "chandelier-bg", DECK_PITCH - TILE - height("chandelier-bg"))
     put(5, 168.9, "sideboard-bg")
     put(5, 177.6, "ice-swan-bg")
-    put(5, 186.4, "dessert-trolley-bg")
+    put(5, 186.4, "dessert-trolley-plate-bg")      # (a plate for its right dome, its tangerine on it: population `SEATS`)
     put(5, 192.6, "service-station-bg")
     # The Seven Seas: its backlit wave panel between white columns (the user's photo from the inner
     # balcony), white-cloth tables either side under sheer curtains.
@@ -1838,7 +1838,9 @@ def build_objects():
     at11(182.375, "ice-cream-sign", 56)
     for m in (187.2, 190.8):
         around(11, m, "patio-table-bg", "patio-chair-bg")
-        put(11, m, "orange-juice-bg", height("patio-table-bg") - ON_PATIO_TABLE)
+        # (At 187.2 its juice to the table's forward end: the green fruit bowl with two tangerines beside it, population
+        # `SEATS`; plan-the-rest §7d, the user, 2026-11-25.)
+        put(11, m, "orange-juice-bg", height("patio-table-bg") - ON_PATIO_TABLE, x=exact_x(m) - (12 if m == 187.2 else 0))
     decor("downlights-11-cafe", "downlights", x_of(160), x_of(194), deck=11)
     decor("downlights-11-gym", "downlights", x_of(82), x_of(102), deck=11)
     # The Sports Bar, inside by the aft lobby: the back bar and its counter, stools, a TV, darts.

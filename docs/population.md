@@ -97,11 +97,11 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | Deck | m | Id | On what | Count |
 |---|---|---|---|---|
 | 3 | 90 | `tan_3_bowl_1` to `_3` | The bowl on her crew cabin's desk, each where it was painted (the user, 2026-11-15) | 3 |
-| 4 | 30 | `tan_4_30` | Behind the breakable luggage stack | 1 |
-| 4 | 112 | `tan_4_laundry` | A shelf in the laundry (`room_laundry`) | 1 |
+| 4 | 30 | `tan_4_30` | On a room-service tray on its stand, by the luggage stack (2026-11-25, plan-the-rest §7d) | 1 |
+| 4 | 112 | `tan_4_laundry` | A shelf in the laundry (`room_laundry`), the laundress at her table clear of it | 1 |
 | 4 | 165 | `tan_4_store` | Crates in the dry store (`room_store`) | 2 |
-| 5 | 90 | `tan_5_cafe` | The Atrium Café's fruit bowl | 1 |
-| 5 | 190 | `tan_5_dessert` | The Four Seasons' dessert cart | 1 |
+| 5 | 90 | `tan_5_cafe` | On the Atrium Café's table beside its fruit bowl (the user, 2026-11-25) | 1 |
+| 5 | 190 | `tan_5_dessert` | The Four Seasons' dessert cart, on its plate | 1 |
 | 5 | 244-245 | `tan_5_bowl_1` to `_3` | Out of the Seven Seas' fruit bowl as Bumbot knocks it off the pass's counter: each where it rolls to rest (2026-11-24) | 3 |
 | 5 | 253 | `tan_5_galley` | The crate in the galley (`room_galley`), breakable | 2 |
 | 6 | 26 | `tan_6_high` | The fire-hose cabinet's top, reached from the delivery robot's roof | 1 |
@@ -109,17 +109,17 @@ three in her crew cabin's bowl, 56. Every press of D costs one: GAME_DESIGN.md �
 | 7 | 160 | `tan_7_jackpot` | The jackpot machine (`sec_jackpot`) | 2 |
 | 7 | 180 | `tan_7_tradewinds` | A gift basket in Tradewinds | 1 |
 | 8 | 41.4 | `tan_8_8206` | On cabin 8206's desk, right of the phone (the welcome basket: prop B, §7d); still there on the day after if not picked up (the user, 2026-11-22) | 2 |
-| 8 | 246 | `tan_8_aft` | A room-service tray by a door, deck 8 aft | 1 |
+| 8 | 246 | `tan_8_aft` | A room-service tray on its stand, deck 8 aft | 1 |
 | 8 (out) | 100 | `tan_8_balc_fwd` | A balcony table | 1 |
 | 8 (out) | 245 | `tan_8_balc_aft` | A balcony table | 1 |
 | 9 | 150 | `tan_9_balcabin` | The balcony cabin's basket | 1 |
-| 9 | 172 | `tan_9_cart` | A standing cart | 1 |
-| 9 | 180 | `tan_9_luggage` | Behind the luggage stack, breakable | 1 |
+| 9 | 172 | `tan_9_cart` | A standing room-service cart, on its plate | 1 |
+| 9 | 180 | `tan_9_luggage` | On a room-service tray on its stand, behind the luggage stack, breakable | 1 |
 | 9 (out) | 240 | `tan_9_balc` | A balcony table | 1 |
-| 10 | 182 | `tan_10_mid` | A room-service tray | 1 |
-| 11 | 32 | `tan_11_spa` | The spa reception's fruit bowl | 1 |
-| 11 | 145 | `tan_11_topsiders` | Topsiders' bar | 1 |
-| 11 | 176 | `tan_11_fruit` | The Garden Café's fruit counter | 2 |
+| 10 | 182 | `tan_10_mid` | A room-service tray on its stand | 1 |
+| 11 | 32 | `tan_11_spa` | The green fruit bowl on the spa reception's desk | 1 |
+| 11 | 145 | `tan_11_topsiders` | The green fruit bowl on Topsiders' counter | 1 |
+| 11 | 187.2 | `tan_11_fruit` | The green fruit bowl on the Garden Café's patio table, past the queue (2026-11-25) | 2 |
 | 11 | 232.8 | `tan_11_crates` | Behind stacked crates between the Garden Café's two palms, aft of her husband's table, breakable (at 209, then 217.9 by the build, they stood on the cone's way to him: moved 2026-11-23, the user) | 2 |
 | 12 | 54 | `tan_12_spinnaker` | The Spinnaker's bar | 2 |
 | 12 | 128 | `tan_12_lady` | The old lady's thanks for her cocktail | 2 |
