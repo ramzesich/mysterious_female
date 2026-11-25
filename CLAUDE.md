@@ -204,7 +204,10 @@ bounds in the running game; what is meant is listed in its `ALLOWED`, each with 
 in a close-up taken to check the stage manager, and was missed. Composing sprites offline with PIL at
 the game's offsets is exact and needs no browser. When one instance of a fault is found, look
 for the rest of its kind at once (one chibi figure meant twenty-four; one seated figure too big
-meant five).
+meant five). **And measure it, every one:** the twenty-four were found by eye, and nine more big heads
+were still in the game twelve days later (2026-11-25), six of them passed by that look, three placed
+after it unchecked. `python tools/check_people.py --heads` with every new or redrawn figure's name
+before its clips are made, and its head against the ruler, not a glance at the sheet.
 
 ## Art: PixelLab (MCP)
 

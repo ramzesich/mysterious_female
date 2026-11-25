@@ -1606,7 +1606,13 @@ lifts at region 3) and the spa's door ("CLOSED", lifts at region 9).
 **Decided (the user, 2026-11-13): everyone is drawn to her proportions**, about three and a half
 heads tall (a head of 14 to 20 px on a figure about 60 px; hers is 17 of 59), seated figures
 shrunk so that a seated head comes to her shoulder. Twenty-four of the first 113 were redrawn for
-it; how it is kept and checked is in `tools/cast.py` and `tools/check_people.py`.
+it; how it is kept and checked is in `tools/cast.py` and `tools/check_people.py`. **Nine more on
+2026-11-25** (the user saw big heads in the game again): six that review had passed (the lost tourist,
+the Windjammer's barmaid, the model ship's guest, the casino's cowboy, the spa guest behind deck 9's
+"Do Not Disturb" door, deck 8 aft's door guest) and three placed after it without the check (the two
+in the step class, deck 10's officer). The model ship's guest no longer wears a captain's cap and
+blazer ("looks like a captain to me"); deck 8 aft's door guest is an elderly lady woken in her
+nightgown (she was a lady in a sun hat and a beach dress, "out of place").
 
 Crew are friendly and never scare her; passengers and machinery are the obstacles. Nobody appears
 twice in the same role. Every person needs new character art (a PixelLab character and a few clips

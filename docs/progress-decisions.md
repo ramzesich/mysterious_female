@@ -5127,3 +5127,31 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   had not: the Topsiders link given for this part carried `&cards=all`, which gives her every verb, the grip socks too,
   and in the socks the wet tiles hold. Walked from `?at=wet7a` with it she passed the chair; without it she slid into it
   and the gag played. No link of this round needed the flag (the user's rule: only where a lock must open).
+
+## Nine more people to her proportions (2026-11-25, the Refinement session)
+
+The user: "I remember we regenerated people that had large heads. Now I see some of those in the game again. Is that a
+new bug, or something we missed previously?"
+
+- **Not a regression:** the twenty-four redrawn on 2026-11-13 (`312fe103`) still have their redrawn characters and
+  standing pictures. Every one of the 140 people laid beside her (`tools/check_people.py`), the doubtful ones' heads
+  against the ruler (`--heads`).
+- **The user named nine:** the lost tourist, the Windjammer's barmaid, the model ship's guest, the casino's cowboy, the
+  spa guest behind deck 9's "Do Not Disturb" door, deck 8 aft's door guest (`swing_sunhat`), the two in the step class,
+  deck 10's officer. Six had been in the game at the first review and passed it; the steppers and the officer were
+  placed the next day without the check.
+- **Redrawn** in PixelLab's pro mode with the style characters that hold the proportions (the drill's officer for the
+  men, the cabin maid for the women), from their own descriptions, and every clip the game plays of them made again on
+  the new figure: the idles and the officer's walk on its own skeleton (skeleton-v3 with the template: the size kept),
+  the shriek and the steps by v3. **The user's two changes:** the model ship's guest an elderly gentleman with no cap,
+  in a polo shirt and chinos ("looks like a captain to me"); deck 8 aft's door guest an elderly lady woken in her
+  nightgown, round glasses, slippers ("looks out of place at all"). The old characters' ids are kept in
+  `tools/cast.py`.
+- **Checked frame by frame:** the door guest's idle came with a breath's puff in front of her mouth, taken out of its
+  four frames (each frame's smaller pieces); her frames are kept by hand now (`BY_HAND` in `tools/fetch_people.py`).
+  Nothing else loose; every head at its standing size in every frame. Shot in place in the game beside her; the
+  steppers stand beside their boards as the old ones did.
+- **Found and offered, not done:** six seated diners never redrawn read a little chibi (`docs/plan-the-rest.md` §9,
+  U14).
+- 108 generations (90 the figures, 18 the clips). boot, region1, region2, region3, region4, region6, region7, region9
+  pass; check_overlaps 0; the whole suite not run.
