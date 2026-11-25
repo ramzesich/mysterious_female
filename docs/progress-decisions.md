@@ -5123,3 +5123,7 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   (was 47.4 / 53.9), deck 4's longest without a reward 68.0 m (was 68.4). `boot`, `region1`, `region2`, `region3`,
   `region4`, `region6`, `region9` pass; `mishaps` fails only on deck 9's sprinkler, as on the committed tree.
 - 90 generations for the seats, 4 robot tries; the balance went from 8,869 to 8,695.
+- **Asked after the commit:** "Why did the gag stop working here?" (the wet patch and the deck chair by Topsiders, 7a). It
+  had not: the Topsiders link given for this part carried `&cards=all`, which gives her every verb, the grip socks too,
+  and in the socks the wet tiles hold. Walked from `?at=wet7a` with it she passed the chair; without it she slid into it
+  and the gag played. No link of this round needed the flag (the user's rule: only where a lock must open).
