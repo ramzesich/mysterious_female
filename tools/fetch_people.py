@@ -52,7 +52,10 @@ BY_HAND = {"dog", "dogowner", "steward",
            # (The massage scene's two, 2026-11-22: frames cleaned by hand, `masseur-raw/`, `massage_guest-raw/`.)
            "masseur", "massage_guest",
            # (Her husband, 2026-11-22: one face, one pair of legs, his far leg apart, `husband-raw/make.py`.)
-           "husband"}
+           "husband",
+           # (Deck 8 aft's door guest in her nightgown, 2026-11-25: the generator drew a breath's puff in front of
+           # her mouth in her idle; taken out, the frames' smaller pieces.)
+           "swing_sunhat"}
 
 
 def main():
