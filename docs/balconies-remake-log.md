@@ -225,7 +225,35 @@ from her sheet's own frames in the socks, each pinned to its end):
 real picture with the new look; her picture behind the glass where she stands inside (the glass's tint and the rail's
 cap over her), in front of everything while she is outside.
 
-*(Shown to the user; waiting for the word to build.)*
+The user, on the preview (2026-11-25):
+
+> Almost all good.
+> Look carefully how she transitions from behind the balcony glass to in front of it. I see in some frames that makes less sense
+
+> Socks close up S3, add barbs to the soles (visible only on the bottom)
+> On S1 one of the socks covered in barbs entirely, that doesn't make any sense
+
+**The transitions, measured** (her lowest row over the floor and her middle from the partition, frame by frame): in
+the first climb she stood on the partition's line with her feet still on the balcony's floor (frame 4), then rose
+through 13, 16, 21, 29 px, under the rail's 32, drawn in front of the glass; at the top she came onto deck 10's floor at
+the floor's height, through its rail. The storyboard had also drawn the along clip's first and last frames in the air
+in front of the glass with her feet under the rail.
+
+**Mended** (decisions 11 and 12):
+
+- **One rule for the layering:** what of her is under the top of the rail of the balcony she is inside of is behind
+  its glass (the tint), behind its rail's cap and its sill, and behind its partition; what is over a rail's top is in
+  front of the partition and its fin. She is inside the lower balcony until her feet are on its rail, outside on the
+  fin, inside the upper one from the moment she leaves its rail.
+- **The climb in parts, so that the rule is true of every frame:** the *mount* (8 frames: she takes the partition's
+  edge and gets up onto the rail on her own side, her middle 10 to 12 px short of the partition all the way, her feet
+  from 0 to 33 px), the *swing* (4 frames: from the rail onto the fin, a foot on the rail each side of it, her feet at
+  33 px throughout), the *climb* (24 frames, from that perch on deck 9's rail to the same perch on deck 10's). Up is
+  mount, swing, climb, then the swing and the mount backwards on the deck above; down is the same the other way. The
+  along clip already crossed above the rail (35 to 36 px); only its layering was wrong.
+- **The socks' close-up:** S3 with a row of nubs under each sole (`tries/socks/try7.png`).
+
+*(Shown to the user again.)*
 
 ## Decisions
 
@@ -247,10 +275,16 @@ cap over her), in front of everything while she is outside.
 9. The doors' glass is plain, no reflected sky (the user: "they repeat on each window").
 10. The partition is a panel to the ceiling and has a fin up the slab: the climb needs a hold in every frame (the
     user's rule of 2026-11-21, and "she still climbs with her hands up in the air" of the roughs).
+11. Her picture's layer at a balcony is a rule of the rail's top (under it: behind the glass, the rail and the partition
+    of the balcony she is inside of; over it: in front), never a switch at a frame (the user: "Look carefully how she
+    transitions from behind the balcony glass to in front of it").
+12. The climb is the mount, the swing and the climb from perch to perch; up and down are the same three clips, the
+    mount and the swing played backwards to come in.
+13. The socks' close-up is S3 with nubs under the soles (the user; S1's sole covered in dots "doesn't make any sense").
 
 ## Generations
 
-51 so far (8,931 to 8,880).
+62 so far (8,931 to 8,869).
 
 | What | Tool | Job or object | Cost |
 |---|---|---|---|
@@ -265,3 +299,8 @@ cap over her), in front of everything while she is outside.
 | up, down, try 2 | `animate_image_pixminimax` | `3ca4ae79-354b-4a28-9190-dbd997f24526`, `9b7f9914-a4a7-4420-8881-214d0f16182f` | 6 |
 | along, try 4 | `animate_image_pixminimax` | `0a7bc7f8-46b5-40df-8a88-58d81044e459` | 2 |
 | The washing, tries 1 and 2 | `create_map_object` | `ba46b768`, `613961b8` | 2 |
+| The mount, try 1 (on the partition's line before her feet were on the rail) | `animate_image_pixminimax` | `e116100f-e814-4620-a5f4-e6750ae215b9` | 1 |
+| The climb from perch to perch | `animate_image_pixminimax` | `731be123-bacd-4ed2-9aef-684041b10de2` | 2 |
+| The mount, try 2: onto the rail on her own side | `animate_image_pixminimax` | `47a55585-518f-4c09-a306-db0ab9895720` | 1 |
+| The swing from the rail onto the fin | `animate_image_pixminimax` | `8b788abb-bd73-4c6b-ac16-f036e3881c7f` | 1 |
+| Socks' close-up, try 7: S3 with nubs under the soles | `edit_image_pro_flash` | `305b0865-4413-4445-9c03-780890f15d18` | 6 |
