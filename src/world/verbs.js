@@ -19,7 +19,6 @@ export const verbs = {
         this.stairWind = false;
         this.stairCling = null;
         this.overRail = false;
-        this.outRail = false;
         if (this.bal) {
             this.bal = null;
             this.script = null;

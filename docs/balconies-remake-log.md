@@ -326,7 +326,31 @@ In the running game, recordings at the game's px:
 the balcony doors are still left out of the doors' wash and pulse (`SKIP_DOORS`); without the socks ↓ and Space no
 longer drops her from the balcony cabin's balcony (region 4): that balcony is a dead end until the socks.
 
-*(At the play stop.)*
+## 8. The play
+
+The user, on playing it from `?play&at=balcony&cards=all` (2026-11-25):
+
+> Issues:
+> 1. The old drop through the floor is still there (on down + jump in the middle of the balcony). It should be gone.
+> 2. Tooltip never shown.
+> 3. Didn't understand how I had to get down
+
+1. **It was the parasol's hop out over the rail,** which the build had added (decision 6's "the parasol") and which
+   `cards=all` switches on with every other verb: ↓ and Space in a balcony's middle sent her out and down the ship's
+   side, as the old drop looked. Taken out: nothing takes her through a balcony's floor or out over its rail
+   (decision 19; the glide from the balconies to the promenade goes with it).
+2. **The hints asked `flagSet`,** which answers yes to every flag under `cards=all`: with the link given no hint could
+   ever show. They ask `has` now, what has really happened. The self-check had run with the socks given by `learn`,
+   never from the link itself: the lesson of 2026-11-24, "a start link is walked before it is given", not kept.
+   `region7.link` now plays from that link.
+3. **Down worked only standing at a partition.** ↑ or ↓ with Space now works from anywhere on a balcony: she runs to
+   its nearest partition with that way (on deck 8, to the walkway's column under it) and climbs (decision 20;
+   `balconyWay`, `walkToBalcony`). ↓ held there does not put her on her hands and knees.
+
+Tests after it: `region7` with `region7.link` (new) and `region7.mask`, `boot`, `mishaps.balcony`, `region8`,
+`golden`, `finale`, `throw`, `lang` pass; `check_overlaps` 0.
+
+*(Shown to the user again.)*
 
 ## Decisions
 
@@ -362,6 +386,11 @@ longer drops her from the balcony cabin's balcony (region 4): that balcony is a 
 17. The socks are worn the whole time she is on a balcony (the same frames of her sheet), not only in the moves.
 18. Without the socks the balconies give no way down: region 4's drop from the balcony cabin's balcony is gone with the
     drop through a floor.
+19. Nothing takes her out over a balcony's rail: the parasol's hop is gone (the user: "It should be gone"), and with it
+    the glide from the balconies down to the promenade.
+20. ↑ or ↓ with Space works from anywhere on a balcony: she goes to its nearest partition with that way and climbs (the
+    user: "Didn't understand how I had to get down").
+21. A hint's flag is asked by `has`, never `flagSet`.
 
 ## Generations
 

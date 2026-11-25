@@ -5133,6 +5133,58 @@ def coffee_for_the_engineer(b):
     return wait_flag(b, "engineer", 16)
 
 
+def scenario_region7__link(b):
+    """The balconies from the start link itself, `?at=balcony&cards=all` (the user's play of 2026-11-25: "Tooltip never
+    shown", "The old drop through the floor is still there", "Didn't understand how I had to get down"): the hints show
+    under `cards=all` too; ↓ and Space in a balcony's middle takes her to its partition and down its fin, never through
+    the floor; ↑ and Space from the middle the same way up."""
+    S = "window.__ship"
+    b.open("?reset&play&at=balcony&cards=all")
+    wait(0.8)
+    home = b.state()
+    # ↓ and Space where she stands, in the balcony's middle: to the partition, and down it.
+    b.key("down", True); wait(0.1)
+    ok = check(not js(b, f"{S}.crawling"), "↓ held where a way down is: she stays on her feet", js(b, f"{S}.crawling"))
+    b.tap("space")
+    b.key("down", False)
+    through = False
+    t0 = now()
+    while now() - t0 < 8:
+        st = b.state()
+        part = js(b, f"{S}.bal ? {S}.bal.P.x : null")
+        # (Between the floors she is at a partition, in a move: never falling in play.)
+        if D9 + 2 < st["y"] < D8 - 2 and (st["mode"] == "play" or part is None or abs(st["x"] - part) > 14): through = True
+        if st["y"] == D8 and st["mode"] == "play": break
+        wait(0.04)
+    s = b.state()
+    ok &= check(s["y"] == D8 and s["mode"] == "play" and not through, "↓ and Space in the balcony's middle: to its partition and down its fin, not through the floor", (s, through))
+    # The hints, under `cards=all` as in play: the first at a partition; the second there after a crossing.
+    ok &= check(wait_js(b, f"{S}.alert.visible && {S}.alert.text === 'Space at a partition to climb round it'", 2), "at a partition: the hint how to go round it", alert(b))
+    wait(4.2)
+    side = js(b, f"{S}.partitionAt().side")
+    key = "right" if side < 0 else "left"
+    b.key(key, True)
+    b.tap("space")
+    hold_until(b, [], lambda s: s["mode"] == "play", 3)
+    hold_until(b, [], lambda s: js(b, f"!!{S}.partitionAt()"), 4)
+    b.key(key, False)
+    ok &= check(wait_js(b, f"{S}.alert.visible && {S}.alert.text.includes('with Space to climb up or down')", 2), "after a crossing, at a partition: the hint how to climb up and down", alert(b))
+    # ↑ and Space from a balcony's middle.
+    b.hold("left" if key == "right" else "right", 0.35)
+    wait(0.2)
+    b.key("up", True); b.tap("space"); b.key("up", False)
+    s = hold_until(b, [], lambda s: s["mode"] == "play" and s["y"] == D9, 8)
+    ok &= check(s["y"] == D9 and s["mode"] == "play", "↑ and Space from the middle: to the partition and up it", s)
+    # Space alone in the middle is her jump, as anywhere.
+    mid = js(b, f"(u => u.x + 62)({S}.world.data.outside.units.find(u => u.y === {D9} && u.x <= {S}.player.x && {S}.player.x < u.x + 125))")
+    b.teleport(mid, D9, "promenade")
+    wait(0.3)
+    b.tap("space")
+    wait(0.25)
+    ok &= check(b.state()["y"] < D9 and not js(b, f"!!{S}.bal"), "Space alone in the middle: her jump", b.state())
+    return ok
+
+
 def scenario_region7__mask(b):
     """His sleep mask (§4 2.1, thing 14; deck 10's first balcony, the plan's §7f P3): not there before the table scene;
     after it, on the slats of deck 12's long lounger set on that balcony (the user's placing), and E takes it. The

@@ -3196,7 +3196,6 @@ export class ShipScene extends Phaser.Scene {
             // (Not in the hop's first moment: her body can still report the floor she has just left.)
             if (this.overRail && time - this.overRailAt > 250) {
                 this.overRail = false;
-                this.outRail = false;
                 p.setDepth(DEPTH.player);
             }
             if (this.gliding) {
@@ -3256,13 +3255,12 @@ export class ShipScene extends Phaser.Scene {
         if (hands && (input.up || input.down) && this.world.tryLadder(input, onFloor)) return;
         // With the parasol: over an atrium walk's railing with ↓ and jump, to float down the atrium.
         if (onFloor && inside && input.down && input.jumpPressed && this.overTheRail()) return;
-        // On the balconies, in the grip socks, Space at a partition is one of her three moves there (round it, up its
-        // fin with ↑, down it with ↓: src/world/balcony.js); with the parasol, ↓ and Space anywhere else on a balcony is
-        // a hop out over its rail.
+        // On the balconies, in the grip socks, Space at a partition is one of her three moves there (round it; with ↑ or
+        // ↓, from anywhere on a balcony, up or down a partition's fin: src/world/balcony.js). Nothing takes her through
+        // a balcony's floor or out over its rail.
         if (this.route === OUTSIDE) {
             this.balconyHints();
             if (hands && input.jumpPressed && this.tryBalcony(input)) return;
-            if (hands && onFloor && input.down && input.jumpPressed && this.overBalconyRail()) return;
         }
         // Through a side walk with ↓ (inside: deck 12's walk over the pools).
         if (onFloor && this.route !== OUTSIDE && input.downPressed && this.dropThroughWalk()) return;
@@ -4062,9 +4060,8 @@ export class ShipScene extends Phaser.Scene {
         // (And at the linen room's shaft, until the view has gone over to the shaft: nothing of her past the room's wall
         // while the room is what is shown; the user, 2026-11-24: "She should be shown inside only when the camera
         // transitioned to the shaft". `world.herCut`.)
-        // (Out over a balcony's rail, `outRail`, she is in front of the ship's side, whole.)
-        const onBalcony = !onProm && p.visible && !this.outRail && this.route === OUTSIDE ? this.world.balconyRoom(p.x, p.y) : null;
-        const balc = !onProm && p.visible && !this.outRail ? (this.route === OUTSIDE ? onBalcony ?? (onWalk ? [pr.x0, pr.x1] : null)
+        const onBalcony = !onProm && p.visible && this.route === OUTSIDE ? this.world.balconyRoom(p.x, p.y) : null;
+        const balc = !onProm && p.visible ? (this.route === OUTSIDE ? onBalcony ?? (onWalk ? [pr.x0, pr.x1] : null)
             : this.world.herCut?.() ?? null) : null;
         // (On a balcony, once the grip socks are hers, she wears them: the same frames of her sheet in the socks.)
         const key = onBalcony && p.texture.key === 'her' && this.progress.knows('socks') ? 'her-socks' : p.texture.key;

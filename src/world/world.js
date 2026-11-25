@@ -3047,8 +3047,7 @@ export class World {
     addColliders(p) {
         const s = this.scene;
         s.physics.add.collider(p, this.platZones, null, (_, z) => s.route === OUTSIDE
-            // (Out over a balcony's rail, `outRail`, she is outside the ship's side: only the promenade's deck is under her.)
-            && (z.plat.solid || (!s.outRail && s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
+            && (z.plat.solid || (s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
                 && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
         s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);

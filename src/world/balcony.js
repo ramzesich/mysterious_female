@@ -57,7 +57,51 @@ export const balcony = {
         const at = this.partitionAt();
         if (at && (at.side < 0 ? at.P.downFore : at.P.downAft)) return true;
         const c = this.columnAt();
-        return !!c && !c.foot;
+        return (!!c && !c.foot) || !!this.balconyWay(false);
+    },
+
+    // The nearest way up or down from the balcony she stands on: one of its two partitions (she is aft of its forward
+    // one, forward of its aft one), or, down from deck 8, a column of the walkway under it.
+    balconyWay(up) {
+        const p = this.player, plat = this.world.balconyFloor(p.x, p.y), out = this.world.data.outside;
+        if (!plat) return null;
+        const ways = [];
+        for (const P of out.partitions ?? []) {
+            if (P.y !== plat.y) continue;
+            if (P.x === plat.x0 + 3 && (up ? P.upAft : P.downAft)) ways.push({ P, side: 1, x: P.x + BALCONY.stand });
+            if (P.x === plat.x1 + 3 && (up ? P.upFore : P.downFore)) ways.push({ P, side: -1, x: P.x - BALCONY.stand });
+        }
+        if (!up) for (const C of out.columns ?? []) {
+            if (C.top !== plat.y || C.x < plat.x0 + 20 || C.x > plat.x1 - 14) continue;
+            const side = p.x < C.x ? -1 : 1;
+            ways.push({ C, side, x: C.x + side * BALCONY.stand });
+        }
+        ways.sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x));
+        return ways[0] ?? null;
+    },
+
+    // She runs to it along her balcony, and the move begins there.
+    walkToBalcony(way, up) {
+        const p = this.player;
+        if (this.crawling) this.setCrawl(false);
+        this.jumpBufferedAt = -Infinity;
+        this.mode = 'scripted';
+        this.script = () => {
+            const d = way.x - p.x;
+            if (Math.abs(d) > 2) {
+                p.body.setVelocityX(Math.sign(d) * PLAYER.runSpeed);
+                p.setFlipX(d < 0);
+                this.pose('run', 1);
+                return;
+            }
+            p.body.setVelocityX(0);
+            if (way.C) {
+                const C = way.C;
+                this.startBalcony({ x: C.x, y: C.top, column: C }, 0, 'down', way.side, C.y - BALCONY.lift);
+            } else {
+                this.startBalcony(way.P, way.side, up ? 'up' : 'down', way.side, way.P.y + (up ? -1 : 1) * this.deckPitch);
+            }
+        };
     },
 
     // Whether someone is on the balcony forward (-1) or aft (1) of a partition, on the floor y.
@@ -78,6 +122,15 @@ export const balcony = {
             return true;
         }
         const at = this.partitionAt();
+        // (Not at one: ↑ or ↓ with Space anywhere on a balcony takes her to its nearest partition with that way, or to
+        // the column under it, and on up or down it. The user, of ↓ and Space in a balcony's middle: "Didn't
+        // understand how I had to get down".)
+        if ((input.up || input.down) && !(at && (input.up ? (at.side < 0 ? at.P.upFore : at.P.upAft) : (at.side < 0 ? at.P.downFore : at.P.downAft)))) {
+            const way = this.balconyWay(input.up);
+            if (!way) return false;
+            this.walkToBalcony(way, input.up);
+            return true;
+        }
         if (!at) return false;
         const { P, side } = at, pitch = this.deckPitch;
         let kind, to = side, floor = P.y;
@@ -227,30 +280,13 @@ export const balcony = {
         if (back && b.taken) this.scareContact(b.taken.x0 + this.world.data.outside.unit / 2, 'balcony');
     },
 
-    // With the parasol, ↓ and Space on a balcony away from its partitions: a hop out over its rail. Out there she is in
-    // front of the ship's side all the way down, past the balconies and the boat walkway under her, to the promenade.
-    overBalconyRail() {
-        const p = this.player;
-        if (!this.progress.knows('parasol') || this.world.carry || this.holding) return false;
-        if (!this.world.balconyFloor(p.x, p.y)) return false;
-        if (this.crawling) this.setCrawl(false);
-        this.overRail = true;
-        this.outRail = true;
-        this.overRailAt = this.time.now;
-        p.setDepth(this.DEPTH.fx - 0.5);
-        p.body.velocity.y = -PLAYER.jumpVelocity * 0.6;
-        this.jumpBufferedAt = -Infinity;
-        this.lastGroundedAt = -Infinity;
-        sfx.jump();
-        return true;
-    },
-
     // The moves' hints, each once, the first time she can use it: at a partition she can go round; and, once she has
     // gone round one, at a partition with a way up or down.
     balconyHints() {
         const P = this.progress;
         if (this.route !== OUT || !P.knows('socks') || this.world.carry || this.holding) return;
-        const round = P.flagSet('hint_round'), climb = P.flagSet('hint_climb');
+        // (`has`, what has really happened: `flagSet` says yes to every flag under ?cards=all, and no hint ever showed.)
+        const round = P.has('hint_round'), climb = P.has('hint_climb');
         if (round && climb) return;
         const at = this.partitionAt();
         if (!at || !(this.player.body.blocked.down || this.player.body.touching.down)) return;
@@ -261,7 +297,7 @@ export const balcony = {
             P.setFlag('hint_round');
             this.hintRoundAt = this.time.now;
             this.world.say(t(`hint.round${pad}`), BALCONY.hintMs, { kind: 'plate' });
-        } else if (P.flagSet('did_round') && this.time.now - (this.hintRoundAt ?? -Infinity) > BALCONY.hintGap
+        } else if (P.has('did_round') && this.time.now - (this.hintRoundAt ?? -Infinity) > BALCONY.hintGap
             && (side < 0 ? part.upFore || part.downFore : part.upAft || part.downAft)) {
             P.setFlag('hint_climb');
             this.world.say(t(`hint.climb${pad}`), BALCONY.hintMs, { kind: 'plate' });
