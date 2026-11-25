@@ -396,6 +396,10 @@ her balcony cabin with Bumbot and a gull across it):
    the pool deck over deck 10, the boat walkway under deck 8, the kids' club on deck 7; a balcony on each deck; the
    whole ship from outside. Two checks more in `region7.link`.
 
+The user, 2026-11-25: "Update all the relevant documents, commit, merge and push." `GAME_DESIGN.md`'s work record and its
+list of glides, and plan-the-rest's table (part 13 built), brought to it; merged into `main` as a fast-forward and
+pushed; the worktree and the branch removed.
+
 Left open, said to the user: her gags on a balcony (20, 24) still show her shoes; the balcony doors out of the doors'
 wash and pulse; a deck 8 balcony with no column under it gives no answer to ↓ and Space.
 
