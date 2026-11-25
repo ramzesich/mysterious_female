@@ -361,6 +361,13 @@ Then, with two screenshots from inside deck 8's balcony cabin:
    rail) and marked `balcony`, which the ship scene hides across a room on that deck. Looked for the rest of the kind:
    no other `50` of the rail is left in `src/world/outside.js`. A check in `region7.link`.
 
+Then:
+
+> One more issue. When I press down (or up) with jump, she goes onto the partition and waits. Then, she climbes by herself either down or up. It plays weird and misleading. Either the controls have to be returned to the player when they are on the partition, or she has to climb immediately. Since the finer controls are not implemented here, I suppose, the solution is to drop the delay on the partition (only when moving up or down)
+
+5. **The wait was the gust's hold** (the build's "a gust while she is on the fin: she holds on until it drops", up to
+   1.5 s of every 7): taken out, decision 22. The climb runs through in its clips' own time, about 2.3 s.
+
 *(Shown to the user again.)*
 
 ## Decisions
@@ -402,6 +409,8 @@ Then, with two screenshots from inside deck 8's balcony cabin:
 20. ↑ or ↓ with Space works from anywhere on a balcony: she goes to its nearest partition with that way and climbs (the
     user: "Didn't understand how I had to get down").
 21. A hint's flag is asked by `has`, never `flagSet`.
+22. No hold on the fin in a gust: a climb once begun runs through (the user). The beat at an occupied balcony's rail,
+    0.6 s before she turns back, stays.
 
 ## Generations
 

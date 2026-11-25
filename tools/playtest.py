@@ -4847,14 +4847,17 @@ def scenario_region7(b):
     ok &= check(seen["low"] and seen["front"] and seen["split"],
                 "her picture's layers: behind the glass under the rail's top, in front of everything on the fin, cut at the rail between", seen | dict(cam=None))
     b.shot("region7-up")
-    # A gust while she is on the fin: she holds on until it drops.
+    # A gust while she is on the fin does not hold her there (the user: she "goes onto the partition and waits. Then,
+    # she climbes by herself", "weird and misleading"): once begun, the climb runs through, in its clips' own time.
     wait_js(b, f"{GUST} === 'tell'", 9)
+    t0 = now()
     b.key("down", True); b.tap("space"); b.key("down", False)
-    held = wait_js(b, f"{BAL} && {BAL}.steps[{BAL}.i][4] == null && {GUST} === 'blow'", 4)
+    blown = wait_js(b, f"{BAL} && {BAL}.steps[{BAL}.i][4] == null && {GUST} === 'blow'", 4)
     i0 = js(b, f"{BAL} ? {BAL}.i : -1")
-    wait(0.5)
-    ok &= check(held and js(b, f"{BAL} ? {BAL}.i : -2") == i0, "a gust on the fin: she holds on, the climb waits", (held, i0))
+    wait(0.3)
+    ok &= check(blown and js(b, f"{BAL} ? {BAL}.i : 99") > i0 + 3, "a gust while she is on the fin: she climbs on", (blown, i0))
     hold_until(b, [], lambda s: s["mode"] == "play", 8)
+    ok &= check(now() - t0 < 2.9, "the whole way down in its clips' own time, no wait", round(now() - t0, 2))
     wait(0.3)
     ok &= check(b.state()["y"] == D9, "↓ and Space: down it again", b.state())
     # A row's forward end: nothing takes her out of it.

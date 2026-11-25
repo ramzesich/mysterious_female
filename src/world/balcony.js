@@ -164,13 +164,13 @@ export const balcony = {
         // (The climb's cells are placed from the lower floor of the two.)
         const low = Math.max(y, floor);
         // (At a column: the mount and the swing only at the walkway's rail; on deck 8 a hop, her own sheet's frames.)
-        if (column && kind === 'up') return [...run('mount', B.mountMs, y, y, false, 1), ...run('swing', B.mountMs, y, y),
+        if (column && kind === 'up') return [...run('mount', B.mountMs, y, y, false, 1), ...run('swing', B.swingMs, y, y),
             ...run('climb', B.climbMs, low, null, false, 1), ['her', A.fall[0], B.hopMs, floor, floor]];
         if (column) return [['her', A.rise[0], B.hopMs, y, y], ...run('climb', B.climbMs, low, null, true),
-            ...run('swing', B.mountMs, floor, floor, true, 1), ...run('mount', B.mountMs, floor, floor, true)];
-        return [...run('mount', B.mountMs, y, y, false, 1), ...run('swing', B.mountMs, y, y),
+            ...run('swing', B.swingMs, floor, floor, true, 1), ...run('mount', B.mountMs, floor, floor, true)];
+        return [...run('mount', B.mountMs, y, y, false, 1), ...run('swing', B.swingMs, y, y),
             ...run('climb', B.climbMs, low, null, kind === 'down', 1),
-            ...run('swing', B.mountMs, floor, floor, true, 1), ...run('mount', B.mountMs, floor, floor, true)];
+            ...run('swing', B.swingMs, floor, floor, true, 1), ...run('mount', B.mountMs, floor, floor, true)];
     },
 
     startBalcony(P, side, kind, to, floor) {
@@ -233,11 +233,10 @@ export const balcony = {
     updateBalcony(dt, time) {
         const b = this.bal, p = this.player;
         if (!b) return;
-        const step = b.steps[b.i];
-        // (A gust while she is out on the fin: she holds on until it drops.)
-        const out = step[4] == null && this.world.gusts?.phase(time) === 'blow';
+        // (No wait on the fin: she held on there through a gust, up to a second and a half, and then climbed on by herself,
+        // which "plays weird and misleading", the user, 2026-11-25. Once begun, a climb runs through.)
         if (b.held > 0) b.held -= dt * 1000;
-        else if (!out) b.t += dt * 1000;
+        else b.t += dt * 1000;
         while (b.t >= b.steps[b.i][2]) {
             b.t -= b.steps[b.i][2];
             if (!b.back && b.i === b.peek) {

@@ -383,7 +383,7 @@ export const CHUTE = { fadeMs: 150, dropMs: 2000, leadMs: 60, sink: 30, goneFram
 // `peekMs` before she goes back; `hintMs`: each move's hint over her, the second no sooner than `hintGap` after the
 // first. At a column of the boat walkway (the same climb): `lift`, her picture's px up on the walkway; over it on deck 8
 // she hops onto and off the rail, her feet `hop` px up for `hopMs`.
-export const BALCONY = { reach: 22, stand: 11, drop: 5, front: 0.36, mountMs: 45, climbMs: 50, alongMs: 50, peek: 6, peekMs: 600, hintMs: 3200,
+export const BALCONY = { reach: 22, stand: 11, drop: 5, front: 0.36, mountMs: 45, swingMs: 35, climbMs: 50, alongMs: 50, peek: 6, peekMs: 600, hintMs: 3200,
     hop: 16, hopMs: 80, lift: 2, hintGap: 3800 };
 
 export const VERBS = {
