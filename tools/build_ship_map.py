@@ -924,10 +924,17 @@ def shell_details(ext, solid):
                     rect(own, x + 5, floor - PARTITION_H + 6, 1, PARTITION_H - 14, "#c7dcd0")
                     # Its fin runs on up the slab's face to the balcony over it (where there is one): one white post
                     # deck over deck, the hold for her climb between the decks.
+                    # **Each part of it is its own deck's:** the deck above is cut open down to 16 px under its floor,
+                    # and what of the fin lies in that (8 px over the floor above, 16 under it) goes with that deck's
+                    # side; the 12 px under it with this one's. (All of it this deck's, it stood as white stubs along
+                    # the floor of the corridor above: the user, 2026-11-25.)
                     if deck < 10 and metres(c) >= BALCONY_FROM[deck + 1]:
-                        rect(own, x, floor - PARTITION_H - 36, 6, 36, "#f4f4f4")
-                        rect(own, x + 5, floor - PARTITION_H - 36, 1, 36, "#c7dcd0")
-                        rect(own, x - 1, floor - PARTITION_H - 28, 1, 28, "#dfe3e6")
+                        top, split = floor - PARTITION_H - 36, floor - 144 + 16
+                        up = owner_at(c, mid_row - 144 // TILE, deck + 1) or own
+                        for o, y0, y1 in ((up, top, split), (own, split, floor - PARTITION_H)):
+                            rect(o, x, y0, 6, y1 - y0, "#f4f4f4")
+                            rect(o, x + 5, y0, 1, y1 - y0, "#c7dcd0")
+                            rect(o, x - 1, max(y0, top + 8), 1, y1 - max(y0, top + 8), "#dfe3e6")
                     BALCONY_UNITS.append((deck, x))
         # The open decks up top: a white bulwark with a glass windscreen above it, all along (deck
         # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:

@@ -897,6 +897,11 @@ export class Story {
         const gull = s.add.image(x + 26, y, 'things', 'gull-perched').setOrigin(0.5, 1).setDepth(depth).setFlipX(true);
         cat.play('bumbot-wash');
         this.world.add([cat, gull]);
+        // (Drawn over her, on deck 9's balconies: theirs to hide with that deck's side and across a cabin she is in.
+        // She walked into her cabin as he ran, and he and the gull crossed its picture: the user, 2026-11-25.)
+        const slopes = [cat, gull].map(gfx => ({ deck: s.deckOfY(g.y), gfx, balcony: true }));
+        s.shellSlopes.push(...slopes);
+        const gone = o => { o.destroy(); const i = s.shellSlopes.findIndex(e => e.gfx === o); if (i >= 0) s.shellSlopes.splice(i, 1); };
         const frames = s.textures.get('things');
         let t = 0, step = 0;
         this.world.movers.push({ update: (dt, time) => {
@@ -910,12 +915,12 @@ export class Story {
                 gull.setFrame(Math.floor(time / 130) % 2 && frames.has('gull-down') ? 'gull-down' : 'gull-up');
                 gull.x += 150 * dt;
                 gull.y -= 90 * dt;
-                if (gull.x > view.right + 30 || gull.y < view.y - 30) gull.destroy();
+                if (gull.x > view.right + 30 || gull.y < view.y - 30) gone(gull);
             }
             if (step === 2 && t > 2.2) { step = 3; cat.play('bumbot-run'); }
             if (step === 3) {
                 cat.x += 170 * dt;
-                if (cat.x > view.right + 40) { cat.destroy(); if (gull.active) gull.destroy(); step = 4; }
+                if (cat.x > view.right + 40) { gone(cat); if (gull.active) gone(gull); step = 4; }
             }
         } });
     }

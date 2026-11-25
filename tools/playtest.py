@@ -5198,6 +5198,29 @@ def scenario_region7__link(b):
     ok &= check(js(b, f"{S}.rooms.some(r => r.room && r.room.visible)") and js(b, f"{S}.shellSlopes.filter(e => e.balcony && e.deck === 8).every(e => e.gfx.alpha === 0)"),
                 "in the cabin: nothing of deck 8's balconies is drawn across it", b.state())
     b.shot("region7-cabin-in")
+    # Into her own balcony cabin the moment the game loads, Bumbot's glimpse still running on the next rail: he and the
+    # gull are the balconies' too (the user: they crossed the cabin's picture).
+    b.open("?reset&play&at=balcony&cards=all")
+    wait(0.3)
+    b.tap("e")
+    wait(0.9)
+    over = js(b, f"{S}.shellSlopes.filter(e => e.balcony && e.deck === 9 && e.gfx.texture && ['bumbot', 'things'].includes(e.gfx.texture.key) && e.gfx.active).map(e => [e.gfx.texture.key, e.gfx.alpha])")
+    ok &= check(js(b, f"{S}.rooms.some(r => r.room && r.room.visible)") and any(k == "bumbot" for k, _ in over) and all(a == 0 for _, a in over),
+                "in her cabin at once: Bumbot and the gull on the next rail are not drawn across it", over)
+    b.shot("region7-cabin-glimpse")
+    # A partition's fin is in two parts, each its own deck's side: what lies in the cut-away of the deck above (8 px over
+    # its floor, 16 under) goes with that deck (the user: white stubs along the corridor's floor).
+    details = json.loads(next(q["value"] for q in json.loads((ROOT / "maps" / "ship.json").read_text(encoding="utf8"))["properties"] if q["name"] == "shellDetails"))
+    x = js(b, f"{S}.world.data.outside.partitions.find(q => q.y === {D8} && q.upAft).x") - 3
+    parts = sorted((sh[2], sh[4], owner) for owner, shapes in details.items() for sh in shapes if sh[0] == "r" and sh[1] == x and sh[3] == 6 and D9 - 8 <= sh[2] < D8 - 116 and sh[5] == "#f4f4f4")
+    ok &= check(len(parts) == 2 and parts[0][:2] == (D9 - 8, 24) and parts[1][:2] == (D9 + 16, 12) and parts[0][2].split(":")[0] == "9" and parts[1][2].split(":")[0] == "8",
+                "the fin over a deck 8 partition: 24 px with deck 9's side, 12 px with deck 8's", parts)
+    b.teleport(x, D9, "inside")
+    wait(1.2)
+    owner = parts[0][2] if parts else ""
+    shown = js(b, f"{S}.shellSlopes.filter(e => String(e.deck) === {json.dumps(owner)} && e.gfx.type === 'Graphics' && !e.balcony && !e.always && !e.foot && e.gfx.alpha > 0).length")
+    ok &= check(js(b, f"{S}.viewDeck") == 9 and shown == 0, "in deck 9's corridor behind it: the ship's side's details of deck 9, that part among them, are put away", (owner, shown, js(b, f"{S}.viewDeck")))
+    b.shot("region7-corridor9")
     return ok
 
 

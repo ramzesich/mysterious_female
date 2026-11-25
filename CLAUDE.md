@@ -957,6 +957,12 @@ Lessons learned (2026-11-25, the balconies remade):
 - **A number written where a name should be breaks when the thing changes:** the towels' deck was their height plus
   50, the old rail; at 32 they belonged to the deck below and showed inside a cabin. When a dimension changes, grep the
   number.
+- **A piece that crosses from one deck's space into another's is cut at the line and each part given to its own
+  deck's side:** the fins, all the lower deck's, stood as white stubs along the corridor above when that deck was cut
+  open (a deck's cut-away reaches 16 px under its floor). And **whatever a scene draws over her on a deck is put on
+  that deck's list** (`shellSlopes`, `balcony: true` on the balconies): the towels, the gulls, and the glimpse's own
+  Bumbot were not, and crossed a cabin she was in. After adding anything over her depth, walk into the rooms and the
+  corridors behind it and look.
 - **A rule that recolours her by colour is looked at whole:** the socks' rule, checked on her legs only, had also
   tinted specks by her eye and in her hair (her shoe's lighter grey is there too), and two clips were generated from
   frames with a pink speck on her head. Look at the whole figure, every clip, before a rule's output is used as a

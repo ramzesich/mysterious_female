@@ -378,6 +378,24 @@ parasol's glide gone), `README.md`'s controls, `docs/start-links.md`, `docs/popu
 lessons), `docs/sequence-remake-plan.md` (three checks more in its step 8, four kinds of correction more, how this one
 went). `main` fetched: unchanged since the branch was cut.
 
+**After the close, the same day,** with two more screenshots (a corridor of deck 9 with white stubs along its floor;
+her balcony cabin with Bumbot and a gull across it):
+
+> More visual issues: a view in the deck's corridor, and a view in the cabin (I enter it immediately when the game loads with your link)
+> Please fix the visual overlays carefully, and check all the cases after your fix
+
+6. **The fins' stubs.** A partition's fin crosses the slab into the cut-away of the deck above (8 px over that deck's
+   floor, 16 under it), and all of it was given to the lower deck's side: with the upper deck cut open it stood along
+   the corridor's floor. Each fin is now two pieces, each its own deck's side (`tools/build_ship_map.py`).
+7. **Bumbot's glimpse** (the build's own sprites, over her depth) was on no list: he and the gull are the balconies'
+   now, hidden with deck 9's side and across a cabin she is in, and taken off the list as they go.
+8. **The check of all cases** (`audit.py` among the scratch scripts; one sheet of 26 whole screens): the corridors
+   behind the balconies on decks 8, 9 and 10 at three places each (no white px in the floor's band); each of the six
+   balcony cabins from inside, the first entered the moment the game loads, then 1.5 s on and in a gust (nothing of
+   the balconies drawn over the room; a scan of everything over her depth that overlaps the room finds nothing but her);
+   the pool deck over deck 10, the boat walkway under deck 8, the kids' club on deck 7; a balcony on each deck; the
+   whole ship from outside. Two checks more in `region7.link`.
+
 Left open, said to the user: her gags on a balcony (20, 24) still show her shoes; the balcony doors out of the doors'
 wash and pulse; a deck 8 balcony with no column under it gives no answer to ↓ and Space.
 
