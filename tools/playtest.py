@@ -2868,7 +2868,7 @@ def scenario_region2(b):
     wait(0.5)
     ok &= check(shown and not js(b, "window.__ship.viewing"), "its cover shows over the screen as she takes it, and a key closes it", shown)
     js(b, "window.__skipCloseups = true")
-    b.teleport(boat["x0"] + 228, boat["floor"], "lifeboat")
+    b.teleport(boat["x0"] + 336, boat["floor"], "lifeboat")
     b.tap("e")
     wait(0.9)
     ok &= check(b.state()["mode"] == "scripted", "the photo in its frame opens over the screen", b.state())

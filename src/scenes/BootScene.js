@@ -114,7 +114,7 @@ export class BootScene extends Phaser.Scene {
         for (const k of BED_THINGS) this.load.image(`bed-${k}`, `assets/ship/bed/${k}.png`);
         // The photo slots' pictures (§6.1.11; E at a slot's frame opens its picture over the screen: world.js's `slot`):
         // the reading nook's, her armchair at home (the user's photo, cut out, redrawn by PixelLab, recoloured to her greys).
-        for (const id of ['slot_nook', 'slot_cucina']) {
+        for (const id of ['slot_nook', 'slot_cucina', 'slot_lifeboat']) {
             this.load.image(`photo-${id}`, `assets/ship/photos/${id}.png`);
             this.load.image(`thumb-${id}`, `assets/ship/photos/thumb-${id}.png`);     // (on the wall: small, framed)
         }

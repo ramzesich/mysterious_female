@@ -63,7 +63,11 @@ const IN_ROOM = {
     // the programme on its top left out (above its top's row).
     sec_desk: { key: 'cabin-8206', box: [92, 88, 37, 36], full: false,
         keep: [[92, 88, 128, 92], [94, 93, 126, 123]], cut: [[105, 104, 119, 123]] },
-    sec_bed: { key: 'cabin-8206', box: [137, 57, 101, 71], full: false },     // her bed (ShipScene's CABIN.bed)
+    // Her bed (ShipScene's CABIN.bed) by its shapes, tools/draw_cabin.py's: the mattress and its sheets, the two pillows
+    // (the top left corner of the front one, rounded, is the sofa's). The sofa behind it pulsed with it once the room was
+    // redecorated (the user, 2026-11-25: "the sofa is pulsing, where only the bed has to").
+    sec_bed: { key: 'cabin-8206', box: [137, 57, 101, 71], full: false,
+        keep: [[138, 96, 236, 127], [212, 86, 236, 99], [200, 90, 222, 100]], cut: [[200, 90, 201, 91]] },
     chute: { key: 'linen-room', box: [112, 82, 35, 37], full: true },           // tools/draw_linen.py: the chute's hatch (kept)
     // The restrooms by the Chapel (tools/draw_rooms.py's `restroom`, the user, 2026-11-24): its mirror, as her crew
     // cabin's, and its hand dryer (`sec_dryer`).
@@ -92,6 +96,8 @@ export class Highlight {
         this.restBox = new Map();   // a room door drawn in its room's picture, by its box -> { over, k }
         this.skipped = [];          // doors with nothing to take a tone from (for the tests and the log)
         this.restOff = false;       // (for pictures of before and after: the doors' wash at rest not drawn)
+        this.last = null;           // what pulsed in the frame before
+        this.used = null;           // what E has just acted on: no pulse until she is free and at something else
         scene.events.on('postupdate', (time, delta) => this.update(time, delta));
     }
 
@@ -490,7 +496,20 @@ export class Highlight {
         if (!this.restDone && this.s.world && this.s.rooms?.length) this.restDoors();
         this.restSync();
         const tg = this.target();
-        const key = tg?.key ?? null;
+        let key = tg?.key ?? null;
+        // The pulse stops the moment E acts on the thing (the user, 2026-11-25: "the pulse has to stop as soon as we
+        // activate an interaction with E"): gone at once, not settled, and not again while she stays at it; it comes back
+        // once she is free and at something else, or leaves and comes back.
+        const s = this.s;
+        if (s.controls?.state?.activatePressed && this.last) {
+            this.used = this.last;
+            const e = this.on.get(this.last);
+            if (e) { this.end(e); this.on.delete(this.last); }
+        }
+        const free = s.mode === 'play' && !s.script && !s.viewing && !s.intro;
+        if (this.used && free && key !== this.used) this.used = null;
+        if (key && key === this.used) key = null;
+        this.last = key;
         if (key && !this.on.has(key)) this.on.set(key, this.start(tg, time));
         for (const [k, e] of this.on) {
             if (k === key) {

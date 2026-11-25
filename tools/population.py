@@ -829,9 +829,12 @@ BELL_GULL = dict(at=("prom", 140.6), up=90, item="keep_bell", flag="bell_dropped
 # Gulls perched on a rail (`gull_prom`): id: (where, m, px up to the rail's top).
 GULLS = {"gull_prom_1": ("prom", 150.5, 31), "gull_prom_2": ("prom", 175, 31), "gull_prom_3": ("prom", 200, 31)}
 # Photo slots (population §2.4): id: (where, m or x, px up).
-# (The lifeboat's: where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21. The lighting
+# (The lifeboat's: where the forward oar's blade was, its top just under the oar's shaft: the user, 2026-11-21; 2 px lower,
+# 2026-11-25, "shift the picture two pixels down"; then, with its photo, standing on the bench under it, its foot on the
+# bench's top row (17 px up): "Shift the photo down, place it on the lifeboat's shelf"; and aft along it, where the user
+# stood her ("Move it here, behind the player"), between the aft life jacket and the next harness. The lighting
 # booth's had gone into that comment's line from then till 2026-11-23, and was not in the game: `region3` found it.)
-SLOTS = {"slot_lifeboat": ("lifeboat", 228, 50), "slot_lighting": ("lighting", 446, 62),
+SLOTS = {"slot_lifeboat": ("lifeboat", 336, 32), "slot_lighting": ("lighting", 446, 62),
          # Region 9: on the chapel's wall once the ceremony has been seen; in the reading nook.
          "slot_chapel": ("chapel", 112, 92, "flag:ceremony"), "slot_nook": ("nook", 152, 70),
          # (The photo of the two of them at his table: on La Cucina's wall between its entrance and its first window,

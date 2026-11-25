@@ -5008,6 +5008,40 @@ are one generated clip in two layers (`tools/build_linen_pillows.py`); the scene
 `tools/build_shaft.py` fills the mouth's holes and lowers the fallen cover, and cuts the mouth against the room's
 corner as it was when its pictures were made. About 80 generations.
 
+## Part 14, group 1: the last three rooms redecorated; the lifeboat's photo; the pulse stops on E (2026-11-25)
+
+The user: "Yes, let's do group 1" (plan-the-rest §7i). Three looks of each room, the other rooms' wording (A its own
+colours, B lived-in, C clean modern; seeds 5, 13, 27); the user: "1. I like A, but let's regenerate without Bumbot's
+picture and reapply it 2. A 3. A".
+
+- **Her crew cabin (A):** redrawn from the room with his picture taken out (the wallpaper carried through, its 16 px
+  repeat), so his picture from their photo goes back on a wall that never had the redraw's copy of it. Her door, her
+  mirror, her bed (its suitcase, her slippers), the bowl her three tangerines lie in and his picture are as drawn, cut
+  out by what is not the wall's colours (`cutouts`, `wall` in `tools/redecorate_rooms.py`: a box would carry the old wall).
+- **Ukraine's flag, generated on its own** (the user: "Please regenerate the Ukrainian flag separately, not based on
+  your drawn picture. We need a UA flag with the trident in the middle"): three tries at 32 x 24, **3** chosen; its blue
+  was 10 rows of 24, so a row of its own blue was added and two of yellow taken off: 11 over 11 in its 22 px slot, the
+  shield centred on the line ("the separation between blue and yellow must be in the middle"); muted a third toward
+  the wall as the drawn one was (the user's choice); in its own colours, not the palette's.
+- **Cabin 8206 (A):** its shower room's door, the door back out with its sign, the desk and its pouf, the bed and the
+  lobster drawing as drawn; the window's glass clear again for the live sea (`clear`; the redraw was given a pale sky
+  there). **Its bed pulses alone** (`keep` by its shapes in `src/highlight.js`): the redrawn sofa behind it pulsed with
+  it ("the sofa is pulsing, where only the bed has to").
+- **The lifeboat's inside (A):** sent without its portholes (`tries/lifeboat-noports-drawn.png`), both parts with the
+  same wording and seed; the nine portholes pasted back by their circles (`ellipses`), the ladder and hatch by their
+  shape, the generated oars and boathook by their own outline (`images`); its parts faded into each other over x
+  195..255 (cut hard at a rib, the right part showed brighter).
+- **The lifeboat's photo** (plan-the-rest §9 U2): the user's own, "I ❤ BAT YAM" on its beach promenade
+  (`reference/photos/`, git-ignored), redrawn by PixelLab at 168 x 224, **try 1** of four; small and framed
+  (`tools/frame_nook_thumb.py lifeboat`). Its frame first 2 px lower ("shift the picture two pixels down"), then
+  standing on the bench ("place it on the lifeboat's shelf"), then aft along it where the user stood her ("Move it
+  here, behind the player"): `slot_lifeboat` at 336, 32 px up.
+- **The pulse stops the moment E acts** (the user: "In general in the game: the pulse has to stop as soon as we
+  activate an interaction with E"; `src/highlight.js`, the Refinement session's file, on the user's word): gone at once,
+  not settled, and not again while she stays at the thing; back once she is free and at something else.
+- 137 generations (the rooms 117, the flags 15, the photo 5). `boot`, `region2`, `deck3`, `highlight`, `keeps` pass;
+  `check_overlaps` 0.
+
 ## Near-catch 5 from the water, her swimming enriched (2026-11-25, the Design session)
 
 The user's two asks, not by the remake plan ("no need to apply our remake plan"); approved in play. The record is

@@ -168,3 +168,31 @@ seeds, **3 chosen** ("they worked better"), its ankles covered by the rail by ru
 | `tries/restroom-feet-1.png`, `-2.png` | blue trainers with ankles; nothing drawn | `dd4e9fe1…`, `1ae4a38d…` | 12 |
 
 **The room: 36 generations** (its door, 15: `assets/source/ship/door-restroom/README.md`).
+
+# Part 14's first group: her crew cabin, cabin 8206, the lifeboat's inside (2026-11-25)
+
+The user: "Yes, let's do group 1". Three looks of each, "Keep every shape in this picture exactly where it is and the same
+size, nothing added or moved: [the room, its pieces named], flat side view. Change only the finish, as detailed polished
+pixel art: [the look]" (seeds 5, 13, 27: A its own colours, B lived-in or worn, C clean modern). **Chosen: A, A, A**, the
+crew cabin's "regenerate without Bumbot's picture and reapply it": redrawn from `tries/crewcabin-nocat-drawn.png`. The
+lifeboat in two parts (x 0..256, 152..408) from `tries/lifeboat-noports-drawn.png`, the room without its portholes.
+
+## Used
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `crewcabin-A.png` | her crew cabin, its own mint, without his picture (seed 5) | `c5d8972a-e860-4fc7-a12c-c65d3256f6cc` | 9 |
+| `cabin8206-A.png` | cabin 8206, its own colours (seed 5) | `502d246e-d1be-4912-bdfb-7f4e8bcceb87` | 9 |
+| `lifeboat-p1-A.png`, `lifeboat-p2-A.png` | the lifeboat without portholes, its own orange (seed 5) | `a5603469-88eb-4b42-bc37-ab1a922b1efc`, `96e0be0f-e0fa-4407-9d2e-506a2eeb3896` | 18 |
+| `flag-3-even.png` | Ukraine's flag, try 3 (`tries/flag/flag-3.png`, `create_image_pro_flash` 32 x 24, seed 27), a blue row added and two yellow taken off: the line at half height | `82a300fd-d203-4ac0-a461-7bc307721ac4` | 5 |
+
+## Tries (`tries/`)
+
+| Picture | What | Job | Generations |
+|---|---|---|---|
+| `g1-crewcabin-A/B/C.png` | with his picture: its own; lived-in (sunbeams in a cabin with no window); white panels | `4cbb53db…`, `4e5322ff…`, `ab6ffc95…` | 27 |
+| `g1-cabin8206-B/C.png` (A is the one used) | warm, a plant and a lamp added; light oak | `1ef6b84a…`, `e843183f…` | 18 |
+| `g1-lifeboat-p1/p2-B/C.png` (A used) | worn and grimy; clean, pale grey benches | `bcee1129…`, `f5258b03…`, `75997355…`, `512b0a08…` | 36 |
+| `flag/flag-1.png`, `-2.png` | the flag, seeds 5 and 13 (2: green smears in its shield) | `7751e2fa…`, `801ab411…` | 10 |
+
+**These: 132 generations** (the photo, 5: `assets/source/photos/lifeboat/README.md`).
