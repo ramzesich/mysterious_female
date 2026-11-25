@@ -5182,6 +5182,19 @@ def scenario_region7__link(b):
     b.tap("space")
     wait(0.25)
     ok &= check(b.state()["y"] < D9 and not js(b, f"!!{S}.bal"), "Space alone in the middle: her jump", b.state())
+    # Inside a balcony cabin, what its deck's balconies draw over her is put away (the user: "The towels are shown through
+    # the player and through the cabin's wall"): the rail towels, the perched gulls, the fronts, the partitions.
+    d = room(b, "balcabin8m")["doors"][1]
+    b.teleport(d["outX"], D8, "promenade")
+    wait(0.4)
+    towels = f"{S}.shellSlopes.filter(e => e.balcony && e.gfx.texture && e.gfx.texture.key === 'rail-towel')"
+    ok &= check(js(b, f"{towels}.length") > 50 and js(b, f"{towels}.filter(e => e.deck === 8).every(e => Math.abs(e.gfx.y - ({D8} - {S}.world.data.outside.rail)) < 1)"),
+                "the rail towels are their own deck's", js(b, f"{towels}.length"))
+    b.tap("e")
+    wait(1.2)
+    ok &= check(js(b, f"{S}.rooms.some(r => r.room && r.room.visible)") and js(b, f"{S}.shellSlopes.filter(e => e.balcony && e.deck === 8).every(e => e.gfx.alpha === 0)"),
+                "in the cabin: nothing of deck 8's balconies is drawn across it", b.state())
+    b.shot("region7-cabin-in")
     return ok
 
 

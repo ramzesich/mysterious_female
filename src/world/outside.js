@@ -45,7 +45,10 @@ export class Gusts {
             const img = s.add.image(t.x, t.y, 'rail-towel').setOrigin(0.5, 0).setTint(TOWELS[t.tint % TOWELS.length])
                 .setDepth(this.route === OUT ? D.player + 0.31 : D.props + 0.04);
             world.add([img]);
-            if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(def, t.y + 50), gfx: img });
+            // (Its deck by its rail's height over the floor, the data's own: a `+ 50` here, the old rail's, gave the deck
+            // below once the rail was lowered. `balcony`: drawn over her, so not across a room she is in on that deck:
+            // the user, 2026-11-25, "The towels are shown through the player and through the cabin's wall".)
+            if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(def, t.y + world.data.outside.rail), gfx: img, balcony: true });
             this.flappers.push({ img, k: 1, i });
         });
         this.streaks = s.add.graphics().setDepth(D.player + 0.45);
@@ -122,7 +125,7 @@ export class PerchGull {
         // (A tangerine it takes stays in its beak until it is out of sight: `world.snatch`.)
         this.sprite.snatchMs = 8000;
         world.add([this.sprite]);
-        if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(world.data.balcony, def.floor), gfx: this.sprite });
+        if (this.route === OUT) s.shellSlopes.push({ deck: deckOf(world.data.balcony, def.floor), gfx: this.sprite, balcony: true });
         this.state = 'perched';
         this.linger = 0;
         this.at = 0;
@@ -368,7 +371,7 @@ export class Occupied {
         }).setOrigin(0.5, 1).setDepth(D.fx).setVisible(false);
         world.add([...items, this.bang]);
         const deck = deckOf(world.data.balcony, def.y);
-        items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
+        items.forEach(i => s.shellSlopes.push({ deck, gfx: i, balcony: i !== img }));     // (its partitions' signs hang over her)
         this.d = { x: img.x, y: def.y };
         this.hit = false;
     }

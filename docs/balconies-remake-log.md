@@ -350,6 +350,17 @@ The user, on playing it from `?play&at=balcony&cards=all` (2026-11-25):
 Tests after it: `region7` with `region7.link` (new) and `region7.mask`, `boot`, `mishaps.balcony`, `region8`,
 `golden`, `finale`, `throw`, `lang` pass; `check_overlaps` 0.
 
+Then, with two screenshots from inside deck 8's balcony cabin:
+
+> Visual glitches. Entered a cabin one deck below. The towels are shown through the player and through the cabin's wall
+
+4. **The rail towels were given the wrong deck:** their deck was worked out from their height plus 50, the old rail's
+   height written as a number; with the rail at 32 that is the deck below, so they did not go with their own deck.
+   And nothing but the fronts and the partitions was put away across a room she is in: the towels, the perched gulls
+   and the occupied balconies' signs are drawn over her too. All of them are now their own deck's (by the data's
+   rail) and marked `balcony`, which the ship scene hides across a room on that deck. Looked for the rest of the kind:
+   no other `50` of the rail is left in `src/world/outside.js`. A check in `region7.link`.
+
 *(Shown to the user again.)*
 
 ## Decisions
