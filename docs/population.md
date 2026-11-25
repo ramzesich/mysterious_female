@@ -269,7 +269,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The funnel's gulls | the roof | 21 | on her bottom down the stairway; with one, it takes it | `gullDive`, `land` | `region8`, `mishaps.gulls` |
 | The crossing gulls | the finale | 22 | the parasol inside out, she drops; with one, it takes it | `gull`, `parasolShut` | `finale`, `mishaps.gulls` |
 | "Do Not Disturb" doors (`haz_dnd_*`) | 8 to 10 | 23 | hands over her eyes, she tiptoes off | `knock`, `door`, `oh`, `tiptoe` | `region4`, `pocket` |
-| The occupied balconies (`haz_sunbather`, `haz_breakfast`) | 8, 10 | 24 | as 23, to the partition | `hey`, `tiptoe` | `region7`, `mishaps.balcony` |
+| The occupied balconies (`haz_sunbather`, `haz_breakfast`), seen from the rail since 2026-11-25: she goes back and the gag is hers on her own balcony | 8, 10 | 24 | as 23, to the partition | `hey`, `tiptoe` | `region7`, `mishaps.balcony` |
 
 ## 3. The decks, bow to stern
 
@@ -577,7 +577,7 @@ cabin at 150 or from the lobbies once opened.
 | all | `gust_balc` | Gusts along the ship's side | Every 7 s, 1.5 s, a push aft of 1 m while airborne; the towels on the rails flap 0.7 s before, then a line of spray | Code, a towel sprite |
 | 100, 245 | `tan_8_balc_fwd`, `tan_8_balc_aft` | Balcony tables | | |
 | 120, 160, 200, 240 | `gull_8` | Perched gulls | A swoop when she lingers more than 2 s within 3 m; it hangs over her 1 s before (no shadow since 2026-11-19, the user); contact "Swooped" (with a tangerine on her it takes one and flies off with it, out of sight); a cone held up takes it away | Gulls |
-| 135, 215 | `haz_line_8` | Laundry lines across the balcony | Crawl under | Drawn |
+| 135, 215 | `haz_line_8` | Laundry lines on two poles across two balconies made one | Hop them (crawled under until 2026-11-25) | Generated |
 | 150, 230 | balcony doors | The ajar doors of `room_balcabin_8m`, `room_balcabin_8a` | In | |
 | 180 | `haz_sunbather` | A sunbather behind a "Do Not Disturb" sign on his balcony | Entering it: "Startled" (she backs out) | A character |
 
@@ -627,7 +627,7 @@ offset 2.5 s): a rhythm to run; 225 `room_balcabin_9a` (the ajar door, the way i
 
 **Deck 9's balconies (outside).** As deck 8's: `gust_balc`; `gull_9` at 130, 170, 210; `haz_line_9`
 at 195; `tan_9_balc` at 240; the ajar door at 225; the balcony cabin's own balcony at 150 (region 4's
-view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
+view: from it, `bb_glimpse_balcony` on the next balcony's rail aft, beside a gull: as built since 2026-11-25).
 
 ### Deck 10 (regions 4, 6, 7, 9)
 
@@ -676,7 +676,7 @@ view: from it, `bb_glimpse_balcony` on deck 10's rail at 160, a deck up).
 | 240 | `haz_cart_10_240` | A standing cart | Hop | |
 
 **Deck 10's balconies (outside).** `gust_balc`; `gull_10` at 150, 190, 230; `haz_line_10` at 125,
-245; `bb_glimpse_balcony` at 160 (Bumbot swiping at a gull on the rail: `batting`, the gull flaps
+245; ~~`bb_glimpse_balcony` at 160~~ (as planned; built on deck 9's rail, above) (Bumbot swiping at a gull on the rail: `batting`, the gull flaps
 off; `glimpse(region 4, once)`, seen from deck 9's balcony cabin); the ajar door at 215;
 `npc_balcony_guest` at 235 on his balcony (`static`, waves, a bubble with a door within 4 m, until
 let in). **The first balcony of the row (62.9 m, its forward end; §7f P3):** `keep_sleepmask` at 64.42, his sleep

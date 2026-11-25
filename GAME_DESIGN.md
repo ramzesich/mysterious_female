@@ -1422,25 +1422,33 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   deck 8 midships (110-194) and aft (202-251.5), deck 9 aft (202-249.5), deck 10 aft (202-247); the
   decks' aft terraces, reached through the aft hallways; deck 7's stern strip (a secret, with the
   socks).
-- **The way in:** the socks, out through the balcony cabin on deck 9, or up from the boat walkway (a
-  wall jump up the recess's wall onto deck 8's balconies).
-- **The climb:** the partitions between balconies are solid, taller than a jump and run to the
-  rail, so every move needs the socks: along a deck, a wall jump off the partition onto the next
-  balcony, between gusts; up a deck, a wall jump up the partition onto the balcony above. Down is a
-  drop (↓ and jump): one deck lands on the balcony or the walkway below. **Only where such a floor lies
-  one deck under her** (the user, 2026-11-21: "That shouldn't happen if there is no balcony underneath";
-  it had been the long-fall scare at a row's end, or overboard from deck 8): elsewhere ↓ and jump does
-  nothing; with the parasol she floats down only where some floor of the route is under her. (So in
-  region 4 the balcony cabin's balcony is a true dead end, and a drop from it only leads down.) **Her
-  picture stays on her balcony:** each partition's panel is drawn over her, and her picture is cut at a
-  partition (under its panel's top) and at a row's end (at any height): parts of her had shown on the next
-  balcony and over the ship's side (the user, 2026-11-21).
+- **The way in:** the socks, out through the balcony cabin on deck 9, or up from the boat walkway by one of its
+  white columns between the boats (↑ and Space at its foot: the same climb as a partition's, below).
+- **The climb** (remade 2026-11-25, `docs/balconies-remake-log.md`, `src/world/balcony.js`; the user: "I feel like
+  things are broken there"): a balcony has no wall to kick off, and the only way from one to another is outside its
+  rail. A partition is a panel from the floor to the ceiling, seen edge on, with a fin that runs on up the slab to
+  the balcony above. In the socks, three moves of her own, each drawn: **Space at a partition** takes her round its
+  outer edge onto the next balcony (0.6 s); **↑ or ↓ with Space**, from anywhere on a balcony, takes her to its
+  nearest partition with that way, onto the rail on her own side, onto the fin, and up or down it to the rail of the
+  next balcony and in off it (about 2.3 s; once begun it runs through). Between deck 8 and the boat walkway the
+  ways are the walkway's columns, climbed the same way. **Her picture's layer is a rule of the rail's top:** what of
+  her is under the top of the rail of the balcony she is inside of is behind its glass, its rail and its partition;
+  what is over it, and all of her on the fin, is in front. Nothing takes her through a balcony's floor or out over
+  its rail (the kick's vault, the climb up a "pole" that was not drawn and the drop through the floor are gone, and
+  with the drop the parasol's glide from the balconies). At a row's end there is no way on. Without the socks a
+  balcony is a dead end. **She wears the grip socks while she is on a balcony** (the user: "it is very unclear that
+  she actually uses them here"): her sheet's own frames in the socks, by rule (`assets/sprites/her-socks.png`). One
+  hint each, the first time she can use it: "Space at a partition to climb round it", then, after a crossing,
+  "↑ or ↓ with Space to climb up or down". **The look:** the rail at her waist (32 px, as every other railing; it was
+  at her eyes), each recess with its cabin's sliding glass door (plain glass), the doors she can use the same door
+  slid open on the lit cabin.
 - **The hallways:** on each corridor stretch **one balcony door stands ajar**, housekeeping airing the
   cabin: in through the cabin, out its corridor door, and the hallway's lobby doors open from inside
   for good. With all of them open, decks 8-10 are the fast way fore and aft, through the cores' green
   doors.
-- **Bumbot:** a glimpse: **swiping at a gull on a rail** a deck up (the gull flaps off), then gone
-  inside; when she reaches that balcony its door is ajar: his door is one of the hallway entries.
+- **Bumbot:** a glimpse, from the balcony cabin's balcony: **on the next balcony's rail, swiping at a gull beside
+  him** (the gull flaps off), then off along the rails out of the picture. No fade (he sat on a partition's top and
+  faded out over it until 2026-11-25).
 - **People:** **a guest locked out on his own balcony** (deck 10 aft; his bubble: a door): she enters
   the hallway by another balcony, comes to his cabin door inside and opens it with the green card;
   his balcony door becomes an entry too, and his thanks is **the book** he was reading out there. A
@@ -1451,11 +1459,11 @@ Positions are in metres from the bow and approximate; the build sets them exactl
 - **Hazards:** **gusts** (every few seconds a gust sweeps aft along the ship's side: the towels on the
   rails flap first, then a line of spray; in the air she is pushed aft about a metre: jump between
   gusts); **gulls** perched on the rails, a swoop when she lingers (it rising over her tells; the shadow on the floor removed 2026-11-19); **laundry
-  lines** strung across some balconies (crawl under); **room-service trays** left on the hallways'
+  lines** on two poles across some balconies, two made one (she hops them; she crawled under flat bars hung from the ceiling until 2026-11-25); **room-service trays** left on the hallways'
   floors (step on one and it clatters, and the nearest "Do Not Disturb" door opens on a startled
   guest: hop them, or walk); the drop.
 - **Shortcuts opened:** the hallways; the boat walkway's ladder both ways once she has come down to
-  it; with the parasol, a glide from any balcony down to the promenade.
+  it. (The parasol's glide from the balconies went with the drop through their floors, 2026-11-25.)
 - **Checkpoints:** the balcony cabin (deck 9); the station locker on the boat walkway (deck 7's height).
 - **The book:** the balcony guest's (above).
 - **Secrets:** the lifeboat (region 2); **deck 7's stern strip** (dropping from deck 8's stern terrace,
@@ -2571,7 +2579,8 @@ Nothing blocks the start of the build. These get settled along the way:
       the framed picture; the chess set, the hot tub, a cone for herself. Playtest `region6`.
       **Open:** her husband's own character waits for the user's photo (a stand-in sits there)
 - [x] **Step 7, region 7: Outside** (done 2026-11-13, branch `the-build`): the balconies of decks
-      8-10 in the grip socks (jump twice at a partition to vault it, ↑ held to climb its pole; gusts,
+      8-10 in the grip socks (as built then: jump twice at a partition to vault it, ↑ held to climb its pole; remade
+      2026-11-25, `docs/balconies-remake-log.md`: three drawn moves outside the rail; gusts,
       perched gulls, laundry lines to crawl under, two balconies with someone on them); six ajar
       balcony doors, each a checkpoint; the four hallways (trays and "Do Not Disturb" doors, doors
       that fly open, sprinklers, the steward on his rounds); the guest locked out on his balcony

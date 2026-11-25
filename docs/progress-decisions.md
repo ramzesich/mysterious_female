@@ -5062,3 +5062,18 @@ on its first play ("All approved"), with one thing more at the bow ("place Bumbo
 railings have to obscure him"). `src/world/bridge.js`, `BRIDGE` in the config, `tools/build_bridge.py`,
 `assets/source/bridge/`; her clips `call`, `call-loop`, `call-up`; the popup `call.kitty`, the sound `pspsps`.
 40 generations. `region9.bridge`, `region9.bridge_jump` new.
+
+## The balconies remade (2026-11-25; `docs/balconies-remake-log.md`, the sixth by `docs/sequence-remake-plan.md`)
+
+The user: "I need you to analyze the path through the balconies, start to finish ... I feel like things are broken
+there." Recorded with real keys: twenty faults, most of one cause (the balconies had been given the wall jump, and a
+balcony has no wall: she climbed through floors, skipped 40 px across a partition, was cut in half at one, and at each
+row's forward end a kick took her out of the ship). Settled with the user: three drawn moves outside the rail (round a
+partition; up and down its fin), the rail at 32 px, the pieces generated, the grip socks worn and made again. Three
+preview rounds (the reflections out of the doors' glass; "Look carefully how she transitions from behind the balcony
+glass to in front of it": the layering made a rule of the rail's top and the climb remade in parts; one frame's leg;
+the socks' close-up with white nubs), then the build, then four corrections on play (a hop out over the rail that read
+as the old drop: gone; the hints never shown under `cards=all`; down only at a partition: now from anywhere on a
+balcony; the rail towels in a cabin; a wait on the fin in a gust: gone), and "All approved". `src/world/balcony.js`,
+`BALCONY` in the config, `tools/build_balconies.py`, `assets/source/balconies/`, `assets/ship/balconies/`,
+`assets/sprites/her-socks.png`. 62 generations. `region7` rewritten, `region7.link` new.

@@ -63,7 +63,7 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the kinds of correction** (below; eighteen now) before the user sees it:
+8. **Check it against the kinds of correction** (below; twenty-two now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
@@ -89,6 +89,12 @@ made and what it cost goes into the log and is said at each stop.
    - Whatever is struck, pressed or knocked: measure the striking thing against it, px by px, and see that it changes
      in that frame (near-catch 6: the hoop came down 8 px under the button it was to press).
    - Record the old scene as she meets it: `?did=` only, never `?cards=all`, which opens what a flag gates.
+   - **Walk the very link the user will be given,** with its flags as given (the balconies: with `cards=all` no hint
+     could show and a verb the build never meant was on; the checks had run with the socks given by hand).
+   - Whoever crosses from behind a thing to in front of it: measure her against its edge in every frame, and layer
+     her by a rule of that edge, never by a switch at a frame (the balconies: her feet under the rail's top while
+     drawn in front of the glass).
+   - Grep for every number the remake changed (the balconies: the rail's old `50` put the towels on the deck below).
    - Run the scenarios touched, with a new check for each decision, and the overlap check.
 9. **Play stop.** The user gets the link, the strip and a GIF, with a plain note that motion and sound are theirs to
    judge.
@@ -99,7 +105,7 @@ made and what it cost goes into the log and is said at each stop.
     job ids among them), commit, take `main` into the branch (fetch it: it may have moved), merge and push on the
     user's word, remove the worktree.
 
-For scale: the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
+For scale (the balconies, a whole path with its look, three moves and the socks: 62): the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
 whole stage, two dancers twice over, a key clip of its own), near-catch 4 about 80 (a stack and one clip, but
 eleven clips toward a heap that could not lie where it fell), near-catch 6 40 (two pieces, nine clips, nearly all
 first tries: each start picture was a sheet's own frame, each key clip pinned to an end).
@@ -130,6 +136,10 @@ of near-catch 1, two of near-catch 3, the last two of near-catch 4 (seen on its 
 | A hint before the moment it can be used | (near-catch 4: "The tooltip has to show (after the Bumbot's escape) only when we jump on top of the cart") | |
 | Someone standing on what does not read as a support | (near-catch 6, at the preview: "After the first jump, Bumbot's position is in the air between the consoles": he had landed on the officer's cap) | |
 | A cause that happens but is not seen to | (near-catch 6, at the preview: "When the officer swings, it is not visually clear that the button is actually pressed") | |
+| A layer that changes at a frame, not at the thing's edge | (the balconies, at the preview: "Look carefully how she transitions from behind the balcony glass to in front of it. I see in some frames that makes less sense") | |
+| A repeated texture on a repeated piece | (the balconies: "I don't like the reflections, because they repeat on each window") | |
+| A move that waits, or that works only at one spot, with nothing saying so | (the balconies, on play: "she goes onto the partition and waits ... weird and misleading"; "Didn't understand how I had to get down") | |
+| Something the build added that the user had not seen | (the balconies, on play: the parasol's hop out over the rail read as "The old drop through the floor is still there") | |
 
 ## What the two prompts had in common
 
@@ -190,6 +200,14 @@ already applied.
   (the two last rows above), mended before the build; the storyboard's clock became the scene's, which ran right the
   first time; the self-check found the take-over's screen and one overlap; **approved on its first play**, with one
   thing more outside the scene (Bumbot behind the bow's railing). 40 generations.
+
+- **The balconies** (the sixth; a path, not a scene): asked first whether the part is optional, then for the analysis.
+  The record found twenty faults with one cause; one proposal with roughs and five questions, answered in five lines
+  plus one of the user's own (the socks worn). The preview went four rounds, each on one thing (the glass's
+  reflections; her way from behind the glass to in front of it, which sent the climb back to be made in parts; the
+  socks' nubs, twice; one frame's leg). The build ran right in its own tests and failed on the user's first play for
+  three reasons no test had: the link given was never walked as given, an added move had not been shown, and a move
+  worked only at one spot. Four corrections on play in three rounds, "All approved" the same day. 62 generations.
 
 ## The two prompts, word for word
 

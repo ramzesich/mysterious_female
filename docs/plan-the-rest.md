@@ -1182,6 +1182,11 @@ worth more to the gift than either).
 
 ## 7h. Part 13: the balconies' doors (small to medium; added 2026-11-23)
 
+**Built 2026-11-25, in the balconies' remake** (`docs/balconies-remake-log.md`): each balcony's recess has its cabin's
+sliding glass door (generated, plain glass), and the six she can use show the same door slid open on the lit cabin with
+a sheer curtain in the doorway (`assets/ship/balconies/unit.png`, `unit-ajar.png`, `tools/build_balconies.py`). Left as
+they were: out of the doors' wash and pulse (`SKIP_DOORS`).
+
 The user, 2026-11-23, shown the balconies while every other door she can use was made a secret (washed like its
 neighbours, revealed by the pulse, `src/highlight.js`): "Leave them as they are, but they don't look like doors at all.
 When we're done with this update, remind me to work on the balcony doors."
@@ -1199,6 +1204,10 @@ When we're done with this update, remind me to work on the balcony doors."
   `tools/check_overlaps.py`, the `highlight` playtest, and a look at each balcony in the running game.
 
 ## 7i. Part 14: what is still drawn in code, generated (large; about 3,100 generations with fixes; added 2026-11-25)
+
+**Of the balconies, done 2026-11-25 in their remake** (`docs/balconies-remake-log.md`): the recesses and their doors,
+the washing (a line on two poles). Still by rule there, flat by nature: the glass fronts, their rails and posts, the
+partitions' edges and fins, the rail towels.
 
 The user, 2026-11-25, after the rooms were redecorated and the cold room's canister generated: "What else is there drawn
 in code in the game?", then "Estimate the cost in PixelLab generations if we do all of those. Based on our history",

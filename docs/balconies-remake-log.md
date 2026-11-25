@@ -368,7 +368,18 @@ Then:
 5. **The wait was the gust's hold** (the build's "a gust while she is on the fin: she holds on until it drops", up to
    1.5 s of every 7): taken out, decision 22. The climb runs through in its clips' own time, about 2.3 s.
 
-*(Shown to the user again.)*
+The user, 2026-11-25: "All approved".
+
+## 9. The close
+
+The documents brought to it: `GAME_DESIGN.md` (region 7: the way in, the climb, Bumbot's glimpse, the washing, the
+parasol's glide gone), `README.md`'s controls, `docs/start-links.md`, `docs/population.md`, `docs/plan-the-rest.md`
+(§7h built here; the balconies' share of §7i), `docs/progress-decisions.md`, `CLAUDE.md` (the balconies' row, ten
+lessons), `docs/sequence-remake-plan.md` (three checks more in its step 8, four kinds of correction more, how this one
+went). `main` fetched: unchanged since the branch was cut.
+
+Left open, said to the user: her gags on a balcony (20, 24) still show her shoes; the balcony doors out of the doors'
+wash and pulse; a deck 8 balcony with no column under it gives no answer to ↓ and Space.
 
 ## Decisions
 

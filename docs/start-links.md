@@ -92,7 +92,7 @@ new one added there should be added here too.
 | `hall10`: deck 10's midships hallway near its forward lobby door (delivery 2: the pot of tea on its table there) | <http://localhost:8000/?play&at=hall10> |
 | `hall9a`: deck 9's aft hallway near its forward lobby door (delivery 3: the pillows on the laundry cart there) | <http://localhost:8000/?play&at=hall9a> |
 | `home`: the corridor, a few doors from cabin 8206 | <http://localhost:8000/?play&at=home&cards=all> |
-| `occupied8`: outside, on the balcony aft of the sunbather's (hold ←, jump and jump again beside the partition to vault onto his: 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
+| `occupied8`: outside, on the balcony aft of the sunbather's (hold ← and press Space at the partition: she sees him from the rail and goes back, 24, no tangerine on her; `cards=all` for the grip socks) | <http://localhost:8000/?play&at=occupied8&cards=all> |
 | `mask10`: outside, deck 10's first balcony, aft of its long lounger (his sleep mask on it after the table scene, 14) | <http://localhost:8000/?play&at=mask10&did=table> |
 
 ## Deck 9
