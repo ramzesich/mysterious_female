@@ -3913,7 +3913,9 @@ export class ShipScene extends Phaser.Scene {
         // (A look-out's zoom out shows the ship from outside: every deck closed, as in the outside view.)
         else if (this.world?.lookFar > 0) target = null;
         else if (!inDeck || outdoors || this.overview || this.fromAfar || p.y <= this.world.roofY + 2) target = null;
-        else if (moving) target = this.deckAt(p.y);
+        // (`world.deckHeld`: up the bridge's hatch the bridge stays open until she is out on the balcony over it; by her
+        // height its side closed over her legs half way up.)
+        else if (moving) target = this.world?.deckHeld?.() ?? this.deckAt(p.y);
         else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
         // (In the shaft, in the slab between two decks: the deck it sets out from, the one below opened by `world.lookOpen`.)
         else if (this.route === 'duct') target = this.world.data.duct.deck;
@@ -4064,7 +4066,9 @@ export class ShipScene extends Phaser.Scene {
             for (const k of ['tint', 'tint2', 'tintMode', 'tintTopLeft', 'tintTopRight', 'tintBottomLeft', 'tintBottomRight']) {
                 if (k in p && q[k] !== p[k]) q[k] = p[k];
             }
-            q.setCrop(p.flipX ? rw - b : a, 0, Math.max(0, b - a), p.height);
+            // (A third number: a row of the world over which nothing of her is drawn, the bridge's hatch's mouth.)
+            const top = balc[2] == null ? 0 : Phaser.Math.Clamp(Math.round(balc[2] - (p.y - p.displayOriginY)), 0, p.height);
+            q.setCrop(p.flipX ? rw - b : a, top, Math.max(0, b - a), p.height - top);
             Phaser.Utils.Array.MoveAbove(this.worldLayer.list, q, p);
             p.setCrop(0, 0, 0, 0);
         } else if (this.balconyCrop) {

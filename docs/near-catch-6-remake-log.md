@@ -159,7 +159,71 @@ Self-review of the storyboard changed three things: Bumbot sits at the console's
 officer's hands were in front of him); he hops to the station before the officer moves (they overlapped); the
 officer's creep is one loop of 8 frames, so he starts 42 px from where he swings.
 
-*(Shown to the user; waiting for the word to build.)*
+The user, on the GIF (2026-11-25):
+
+> I looked at your gif.
+> After the first jump, Bumbot's position is in the air between the consoles.
+> When the officer swings, it is not visually clear that the button is actually pressed.
+> Everything else looks good to me.
+
+Both mended before the build (decisions 10 and 11):
+
+- **His landing.** After his spring he came down on the officer's cap, which nothing in the picture said: a black cat
+  on a dark cap read as a cat in the air between the console and the station. He now goes up off the station and back
+  over the officer in one long arc, onto the console's top behind him, where his climb's clip starts; he waits there,
+  his head to the hatch, as it opens.
+- **The button.** The hoop came down in front of the station, 8 px under its button and 5 px aft of it; the button
+  stood untouched above the rim. The station is now 7 px shorter (rows out of its body's plain parts) and stands 4 px
+  further aft, so the hoop's rim lies across the button's foot; the button has two states, and at the blow it goes
+  down behind the rim (4 px, a little darker) with two sparks, the beacon lit in the same frame (it lit 0.1 s after).
+  It stays down when the net is pulled off it.
+
+## 6. The build
+
+- **The pieces** (`tools/build_bridge.py`, `assets/ship/bridge/`): the station up and down, its beacon lit; the collar,
+  the lid's four frames, the ladder; all washed 20% as the bridge's pieces are, the button's red and the stripes kept.
+  The officer's four clips as strips in his sheet's colours (the net's mesh over the green ground taken off its green
+  first), Bumbot's climb mirrored, in his own colours.
+- **Her clips** in her sheet: `call`, `call-loop`, `call-up` (`tools/build_sprites.py`; every other clip of hers the
+  same to the pixel; the first of `call` is her stand to the pixel, the last of `call-up` is not quite, so the game
+  shows her stand after its eighth frame); her head in each for the popup, by her face's pixels
+  (`tools/build_heads.py`).
+- **The map and the data:** the console at 1930, the helm at 2030, the old alarm panel out (`tools/build_ship_map.py`);
+  Bumbot's spot on the console's aft end, 38 px up; the officer's two people out of the people's list (he is the
+  scene's own); the hatch's gate marked `art` (its tiles stay unseen, its old 5 px lid is not made).
+- **The scene** (`src/world/bridge.js`, `BRIDGE` in `src/config.js`): one clock, the storyboard's, every frame of her,
+  of Bumbot and of the officer set from it; the alarm's light and sound moved here from the bow's module; the popup
+  `call.kitty` in both languages; the sound `pspsps`.
+- **Her way out:** on the hatch's ladder the cut-away keeps the bridge's deck (`world.deckHeld`, `hatchDeck`); her
+  picture is cut at the hatch's mouth (`world.herCut` with a row, `hatchCut`), and what of her is over the balcony's
+  floor is drawn from there up, behind its bulwark.
+
+## 7. The self-check
+
+Against the plan's list, in the running game (recordings at the game's px, 70 ms a frame):
+
+- **Bumbot's spring crossed the officer's raised net** for a frame: he goes straight up first now.
+- **At the take-over the officer and the hatch were at the screen's edge**, the picture going ahead only from then:
+  it now goes ahead of her over her last 150 px up to the line, and is there when she is taken (decision 12).
+- Her feet, the officer's and Bumbot's paws against the floor's line and the tops they stand on: as measured.
+- Depth at every beat: Bumbot in front of the officer only while he is in the air over him.
+- The line crossed in a jump: taken in the air, straight down, the scene from there (`region9.bridge_jump`).
+- Ten seconds where it leaves her: nothing. A reload after it: the button down, the hatch open, the ladder down, the
+  officer under his net, Bumbot gone.
+- The deck below (9), the deck above (the spa) and the outside view: nothing of the scene shows.
+- Her way out: no part of her on the ship's side; the bridge open until she stands on the balcony.
+- The new pieces beside the bridge's own: the same wash.
+- What happens in each second: one thing at a time but the officer's creep behind Bumbot's hop, which is the point.
+- `tools/build_bridge.py` and `assets/source/bridge/cut.py` run again give the same files.
+- `tools/check_overlaps.py`: the lid's square frame against the ladder, listed as meant; 0. `tools/check_sound.py`:
+  all within bounds (the new effect is the user's to judge by ear).
+- Tests: `region9.bridge` (26 checks) and `region9.bridge_jump` new; `region9` and `golden` brought to it; `boot`,
+  `region9` with its cases, `golden`, `finale`, `highlight`, `lang`, `sound`, `bridge` pass. `ladder` fails at the
+  funnel's ladder with and without this work (checked by stashing it): not this scene's. Once, with five browsers at
+  a time, `region9.bridge` timed out on its connection; alone and three at a time it passes.
+
+*(At the play stop: the link, the strip and the GIF given to the user.)*
+
 
 ## Decisions
 
@@ -176,6 +240,17 @@ officer's creep is one loop of 8 frames, so he starts 42 px from where he swings
    key beat), played on a schedule: frames 4 to 6 over and over while Bumbot is on his cap.
 9. Bumbot's way forward is over the officer's cap: the officer stands between him and the hatch, in front of the
    console Bumbot must run along.
+
+10. Bumbot lands back on the console behind the officer, not on his cap (the user at the preview: "in the air between
+    the consoles"). Decision 9 is dropped.
+11. The station 7 px shorter and 4 px further aft, its button with two states, the beacon lit at the blow (the user at
+    the preview: "it is not visually clear that the button is actually pressed").
+12. The picture goes ahead of her by how near she is to the line, not from the take-over.
+13. The officer on the bridge is the scene's own sprite, not one of the people: `riv_bridge` and `riv_bridge_sat` are
+    gone from the data. He stands there whenever Bumbot has not been caught (before the horn she cannot be on the
+    bridge).
+14. Her way out is mended by cutting her picture between the hatch's mouth and the balcony's floor and holding the
+    bridge's deck open, with nothing new drawn on deck 11.
 
 ## Generations
 

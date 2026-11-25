@@ -89,6 +89,18 @@ export class BootScene extends Phaser.Scene {
         this.load.image('pass-counter', 'assets/ship/pass/counter.png');
         this.load.image('pass-plate', 'assets/ship/pass/plate.png');
         this.load.spritesheet('pass-bowl-fall', 'assets/ship/pass/bowl-fall.png', { frameWidth: 96, frameHeight: 64 });
+        // The bridge's forward end, near-catch 6 (tools/build_bridge.py): the alarm station (its button up and down, its
+        // beacon lit), the escape hatch (collar, lid's frames, ladder), the officer's clips and Bumbot's climb, each a strip
+        // of its pictures' whole canvases (where they stand: bridge.json).
+        this.load.json('bridge-layout', 'assets/ship/bridge/bridge.json');
+        this.load.image('bridge-station', 'assets/ship/bridge/station.png');
+        this.load.image('bridge-station-down', 'assets/ship/bridge/station-down.png');
+        this.load.image('bridge-beacon', 'assets/ship/bridge/beacon.png');
+        this.load.image('bridge-collar', 'assets/ship/bridge/collar.png');
+        this.load.image('bridge-ladder', 'assets/ship/bridge/ladder.png');
+        this.load.spritesheet('bridge-lid', 'assets/ship/bridge/lid.png', { frameWidth: 42, frameHeight: 42 });
+        for (const k of ['stalk', 'creep', 'net', 'netted']) this.load.spritesheet(`bridge-${k}`, `assets/ship/bridge/${k}.png`, { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet('bridge-climb', 'assets/ship/bridge/climb.png', { frameWidth: 128, frameHeight: 144 });
         this.load.image('chapel-room', 'assets/ship/chapel-room.png');
         this.load.image('chapel-door-open', 'assets/ship/chapel-door-open.png');
         this.load.spritesheet('her', 'assets/sprites/her.png', { frameWidth: PLAYER.cell, frameHeight: PLAYER.cell });

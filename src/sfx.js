@@ -506,6 +506,8 @@ const people = {
     // A sneeze, a "shh", someone chewing, a man's short laugh.
     sneeze: () => { voice([[0, 420], [1, 520]], 0.16, 0.05, 0, { lp: [[0, 700], [1, 1400]] }); noise(0.2, { hp: [1800, 3200], vol: 0.09, t: 0.17, attack: 0.01 }); voice([[0, 600], [1, 330]], 0.16, 0.07, 0.17); },
     shush: () => noise(0.45, { band: [3600, 4600], q: 1.2, vol: 0.07, attack: 0.08, release: 0.12 }),
+    // Her soft call to Bumbot on the bridge (near-catch 6): three short hisses, "pss-pss-pss".
+    pspsps: () => [0, 0.17, 0.34].forEach(t => noise(0.1, { band: [5200, 6800], q: 1.4, vol: 0.07, t, attack: 0.012, release: 0.05 })),
     munch: () => [0, 0.17, 0.34].forEach(t => noise(0.07, { lo: [1300, 500], vol: 0.14, t, attack: 0.015 })),
     // A sip from a cup or a glass, and its swallow; a lick of an ice cream cone.
     sip: () => { noise(0.24, { band: [1100, 2600], q: 2.5, vol: 0.08, attack: 0.05, trem: [38, 0.5] }); tone(240, 0.09, { type: 'sine', to: 150, vol: 0.05, t: 0.32 }); },

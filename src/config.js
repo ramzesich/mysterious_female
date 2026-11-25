@@ -277,6 +277,38 @@ export const PROMENADE = {
 // `puddlesFrom`: how far through the drain the puddles begin to show ("only ... at the very last moment"); `under`: how much of the hatch and the drain's grate
 // is left under the water ("much less visible when in the water"), the rest washed toward `floorTile`, the tank's
 // floor's own pale tile colour (ShipScene's `poolTanks`).
+// Near-catch 6 on the bridge (src/world/bridge.js; remade 2026-11-25, docs/near-catch-6-remake-log.md). Places in px
+// from the alarm station's middle (`BOW["bridge"]` in tools/population.py), times in ms from the take-over: the
+// storyboard's clock (assets/source/bridge/storyboard.py).
+export const BRIDGE = {
+    sight: 61,              // she is taken this far aft of the station: Bumbot, the officer and the hatch in the picture
+    airUp: 80,              // in a jump across that line: up to this high over the floor
+    ahead: 59, leadIn: 150, aheadMs: 700, aheadBack: 600,   // the picture goes this far ahead of her, over her last `leadIn` px up to the line (or in this long, from a jump); given back so
+    officer0: -86,          // the officer frozen mid-creep: one round of his creep (42 px) from where he swings
+    netX: 65,               // where he swings from: his x in his net's clip (px from its pictures' left)
+    back: -69,              // Bumbot back on the console, forward: where his climb's clip starts
+    onConsole: 38, onStation: 37,       // his paws, px over the floor
+    crouchAt: 150, crouchMs: 100,       // she goes down on her heels: a frame
+    callAt: 950, callMs: 1400, beckonMs: 125,   // her call's popup; her beckoning, a frame
+    washMs: 110, lookAt: 1000, upAt: 1300, standMs: 50,     // he washes; looks at her; gets up
+    hopAt: 1900, thereAt: 2300, hopUp: 14,      // onto the station's top, over its button
+    creepAt: 1850, creepFps: 8.7,       // the officer after him: 8 frames, his planted foot sliding 5.3 px a frame
+    swingAt: 2770, swingFps: 14,        // his swing: the hoop is down two frames on
+    springAt: 2790, springUp: 52, landAt: 3380, // Bumbot off the station, over him, onto the console behind him
+    startAfter: 30, upMs: 80,           // she starts up onto her feet, a frame
+    whoopAfter: 150, loudMs: 7000,      // the alarm's first whoop after the clang; whoop after whoop for this long
+    stuck: [4, 5, 6, 5], stuckMs: 170,  // his net stuck on the station: these pictures over and over
+    lidAt: 3450, lidMs: 70,             // the hatch's lid drops, a frame
+    ladderAt: 3700, downAt: 4300, ratchets: 6,  // its ladder lets down
+    climbAt: 4350, climbFps: 14, rungFrom: 4,   // Bumbot's climb; his claws on the rungs from this picture
+    tugAt: 4450, tugFrom: 7, tugFps: 10,        // the officer tugs, upright
+    fallAt: 5550, fallFrom: 18, fallFps: 12,    // the net free: he goes over backward, it comes down over his head
+    lookUpAt: 5000, lookMs: 90,         // she looks up after Bumbot
+    freeAt: 6300,
+    wobbleMs: 160,          // the officer frozen: a frame of his wobble
+    sighEvery: 5000, sighMs: 200,       // sat under his net: a sigh this often, a frame
+};
+
 export const POOL = {
     drainMs: 5000, wetMs: 7000, puddleMs: 12000, puddlesFrom: 0.93, floor: 5, under: 0.3, floorTile: 0x8fd3ff,
     hatch: { beside: 30, downMs: 950, down: 76, through: 280 },

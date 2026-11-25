@@ -2349,8 +2349,9 @@ def scenario_golden(b):
     b.tap("e")
     wait(0.2)
     ok &= check(door_open(b, "bridge-door"), "and the bridge's door")
-    b.hold("left", 3.0)
-    ok &= check(wait_flag(b, "bb6"), "near-catch 6 on the bridge", flags(b))
+    hold_until(b, "left", lambda s: s["mode"] == "scripted", 8)
+    b.key("left", False)
+    ok &= check(wait_flag(b, "bb6", 20), "near-catch 6 on the bridge", flags(b))
     ok &= check("alarm" in flags(b), "the alarm")
     # Region 10 and the end: the hatch, the sunset, the glide down to the bow, the catch, home.
     ok &= check(out_of_the_hatch(b) and 10 in save_list(b, "regions"), "up the hatch's ladder to the balcony forward of the spa: the sunset", b.state())
@@ -5761,19 +5762,23 @@ def scenario_region9(b):
     b.teleport(cp + 40, D10)
     hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
     ok &= check("cp_officer" in save_list(b, "activated"), "an officer's cabin door: a checkpoint")
-    ok &= check(person(b, "riv_bridge")["on"], "on the bridge the security officer is creeping up on him", person(b, "riv_bridge"))
+    # (Near-catch 6 as remade, 2026-11-25: src/world/bridge.js; its own checks are the case `region9.bridge`.)
+    Q = f"{W}.story.bridge"
+    ok &= check(js(b, f"{Q}.officer.visible && {Q}.officer.texture.key === 'bridge-stalk'"), "on the bridge the security officer is frozen mid-creep behind Bumbot")
     b.teleport(exact_x(40) + 16, D10)
     b.tap("e")
     wait(0.2)
     ok &= check(door_open(b, "bridge-door"), "the bridge's door")
     b.hold("left", 1.2)
     b.shot("region9-bridge")
-    b.hold("left", 2.0)
-    wait(1.6)
+    hold_until(b, "left", lambda s: s["mode"] == "scripted", 6)
+    b.key("left", False)
+    wait_js(b, f"{Q}.alarm", 6)
+    wait(0.4)
     b.shot("region9-alarm")
-    ok &= check(wait_flag(b, "bb6", 20), "near-catch 6: his net comes down on the alarm panel", flags(b)[-3:])
-    ok &= check("alarm" in flags(b) and b.eval(f"{W}.gates.find(g => g.needs === 'alarm').tiles.every(t => t.alpha === 1)"), "the alarm; the hatch's ladder is down")
-    ok &= check(person(b, "riv_bridge_sat")["on"] and not person(b, "riv_bridge")["on"], "the security officer sits on the floor, done for the day")
+    ok &= check(wait_flag(b, "bb6", 20), "near-catch 6: his net comes down on the alarm's button", flags(b)[-3:])
+    ok &= check("alarm" in flags(b) and js(b, f"{Q}.ladder.visible && {Q}.lid.frame.name === {Q}.L.lid.frames - 1"), "the alarm; the hatch is open, its ladder down")
+    ok &= check(js(b, f"{Q}.officer.visible && {Q}.officer.texture.key === 'bridge-netted'"), "the security officer sits under his own net, done for the day")
     b.teleport(exact_x(37.5) + 4, D10)
     wait(0.3)
     b.tap("e")
@@ -5875,6 +5880,91 @@ def scenario_region9(b):
     b.tap("escape")
     wait(1.5)
     ok &= check(not b.errors, "no errors", b.errors[:3])
+    return ok
+
+
+def scenario_region9__bridge(b):
+    """Near-catch 6 as remade (2026-11-25, docs/near-catch-6-remake-log.md): the bridge's forward end. Bumbot on the
+    console, the officer frozen mid-creep behind him, the escape hatch shut; she is taken, goes down on her heels and
+    calls him softly; he comes to the alarm station's top; the officer's net comes down on its button as he springs;
+    the hatch opens, its ladder comes down, he is up it; the officer sat under his own net; her way out up the hatch."""
+    S, W = "window.__ship", "window.__ship.world"
+    Q = f"{W}.story.bridge"
+    b.open("?reset&play&at=bridge&did=horn")
+    wait(0.5)
+    R = js(b, f"{W}.data.bow.bridge")
+    F, st, hatch = R["y"], R["stationX"], R["hatchX"]
+    cat = f"{Q}.cat.sprite"
+    frame = f"{S}.player.frame.name"
+    A = js(b, f"{S}.cache.json.get('her-meta').anims")
+    ok = check(js(b, f"{Q}.lid.frame.name === 0 && !{Q}.ladder.visible && {Q}.station.texture.key === 'bridge-station' && {W}.gates.find(g => g.needs === 'alarm').tiles.every(t => t.alpha === 0)"),
+               "before: the hatch shut under the ceiling, no ladder, the alarm's button up")
+    c0 = js(b, f"[{cat}.x, {cat}.y, {cat}.visible]")
+    ok &= check(c0[2] and R["consoleX"] < c0[0] < st - 20 and c0[1] == F - 38, "Bumbot on the console's aft end", c0)
+    o0 = js(b, f"[{Q}.officer.x + 64, {Q}.officer.texture.key, {Q}.officer.depth > {cat}.depth]")
+    ok &= check(o0[1] == "bridge-stalk" and hatch + 20 < o0[0] < c0[0] - 30 and o0[2], "the officer frozen mid-creep behind him, in front of the console", o0)
+    hold_until(b, "left", lambda s: s["mode"] == "scripted", 6)
+    b.key("left", False)
+    x0 = b.state()["x"]
+    ok &= check(st + 50 <= x0 <= st + 62 and b.state()["y"] == F, "she is taken 60 px aft of the station", (x0, st))
+    ok &= check(js(b, f"{S}.cameras.main.worldView.x") <= hatch - 55 and js(b, f"{S}.player.flipX"), "the picture has gone ahead of her on her way: the hatch well inside it as she is taken",
+                js(b, f"{S}.cameras.main.worldView.x"))
+    ok &= check(wait_js(b, f"{json.dumps(A['call-loop'])}.includes({frame})", 2), "down on her heels, a hand held out, beckoning", js(b, frame))
+    ok &= check(wait_js(b, f"{S}.alert.visible && {S}.alert.text === 'Pss-pss-pss'", 1), "her soft call over her (not her cry)", js(b, f"{S}.alert.text"))
+    b.shot("region9-bridge-call")
+    ok &= check(wait_js(b, f"{cat}.x === {st} && {cat}.y === {F} - 37", 3), "he comes: onto the station's top, over its button")
+    ok &= check(js(b, f"{Q}.station.texture.key") == "bridge-station" and not js(b, f"{Q}.alarm"), "the button still up")
+    ok &= check(wait_js(b, f"{Q}.officer.texture.key === 'bridge-net'", 2), "the officer, come up behind him on tiptoe, swings")
+    ok &= check(wait_js(b, f"{Q}.station.texture.key === 'bridge-station-down' && {Q}.alarm", 1) and js(b, f"{cat}.y") < F - 60,
+                "the hoop comes down on the button as he springs clear: the button goes down, the alarm", js(b, f"{cat}.y"))
+    b.shot("region9-bridge-clang")
+    ok &= check(wait_js(b, f"{Q}.lamp.visible && {Q}.wash.fillAlpha > 0", 1), "the beacon lit, the red light")
+    ok &= check(wait_js(b, f"{cat}.x < {R['consoleX']} && {cat}.y === {F} - 38 && {cat}.depth < {Q}.officer.depth && {cat}.flipX", 2),
+                "Bumbot lands back on the console, forward of the officer, his head to the hatch", js(b, f"[{cat}.x, {cat}.y]"))
+    ok &= check(wait_js(b, f"{Q}.lid.frame.name === {Q}.L.lid.frames - 1", 2), "the hatch's lid drops open")
+    ok &= check(wait_js(b, f"{Q}.ladder.visible && {Q}.ladder.y === {R['ceil']} + {Q}.L.ladder.top", 2), "its ladder comes down, to the floor")
+    ok &= check(wait_js(b, f"{Q}.climb.visible && !{cat}.visible", 1), "he runs for it: his climb")
+    b.shot("region9-bridge-climb")
+    ok &= check(wait_js(b, f"{json.dumps(A['look-up'])}.includes({frame})", 2), "she looks up after him")
+    ok &= check(wait_js(b, f"{S}.mode === 'play'", 4) and b.state()["x"] == x0, "she is hers again where she stopped", b.state())
+    ok &= check({"bb6", "alarm"} <= set(flags(b)) and js(b, f"{S}.player.flipX && !{Q}.climb.visible && !{cat}.visible"), "facing the ladder; Bumbot gone up the hatch", flags(b)[-3:])
+    ok &= check(js(b, f"{Q}.officer.texture.key") == "bridge-netted" and js(b, f"{Q}.station.texture.key") == "bridge-station-down", "the officer sat under his own net; the button stays down")
+    wait(1.0)
+    ok &= check(js(b, f"{S}.cameras.main.followOffset.x") == 0, "the picture given back to her", js(b, f"{S}.cameras.main.followOffset.x"))
+    wait(9)
+    ok &= check(b.state()["mode"] == "play" and b.state()["x"] == x0, "ten seconds on: nothing more happens to her there", b.state())
+    b.shot("region9-bridge-after")
+    # Her way out: up the ladder into the hatch, the bridge kept open until she is out on the balcony.
+    hold_until(b, "left", lambda s: s["x"] < hatch + 4, 4)
+    b.key("left", False)
+    b.key("up", True)
+    ok &= check(wait_js(b, f"{S}.mode === 'ladder' && {S}.player.y < {R['ceil']} + 40", 4), "she climbs it", b.state())
+    ok &= check(js(b, f"{S}.viewDeck") == 10 and js(b, f"{W}.herCut()")[2] == js(b, f"{Q}.mouth") and js(b, f"{Q}.top.visible"),
+                "into the hatch: the bridge still open, her picture cut at the hatch's mouth, her head over the balcony's floor", js(b, f"[{S}.viewDeck, {W}.herCut()]"))
+    b.shot("region9-bridge-out")
+    ok &= check(wait_js(b, f"{S}.player.y === {R['ceil']} - 16", 3) and not js(b, f"{Q}.top.visible") and js(b, f"{W}.herCut()") is None, "out on the balcony forward of the spa, whole", b.state())
+    b.key("up", False)
+    return ok
+
+
+def scenario_region9__bridge_jump(b):
+    """Near-catch 6's line crossed in a jump: she comes straight down there and the scene begins as she lands."""
+    S, W = "window.__ship", "window.__ship.world"
+    Q = f"{W}.story.bridge"
+    b.open("?reset&play&at=bridge&did=horn")
+    wait(0.5)
+    R = js(b, f"{W}.data.bow.bridge")
+    b.teleport(R["stationX"] + 61 + 34, R["y"])
+    wait(0.2)
+    b.key("left", True)
+    wait(0.12)
+    b.tap("space")
+    ok = check(wait_js(b, f"{S}.mode === 'scripted' && {S}.player.y < {R['y']} - 8", 2), "taken in the air across the line", b.state())
+    b.key("left", False)
+    x = b.state()["x"]
+    ok &= check(wait_js(b, f"{Q}.playing", 2) and b.state()["x"] == x and b.state()["y"] == R["y"] and x > R["stationX"] + 40,
+                "she comes straight down there, and the scene begins", (b.state(), x))
+    ok &= check(wait_flag(b, "bb6", 12) and b.state()["x"] == x, "and runs to its end", flags(b)[-3:])
     return ok
 
 

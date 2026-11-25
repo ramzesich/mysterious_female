@@ -15,6 +15,7 @@ import { spa } from './spa.js';
 import { pass } from './pass.js';
 import { quiet } from './quiet.js';
 import { stage } from './stage.js';
+import { bridge } from './bridge.js';
 import { linen } from './linen.js';
 
 const M = 48;
@@ -61,6 +62,7 @@ export class Story {
         this.setupOutside();
         this.setupTopdeck();
         this.setupBow();
+        this.setupBridge();
         this.setupFinale();
         this.setupSpa();
     }
@@ -80,6 +82,7 @@ export class Story {
         this.updateOutside(dt, time, input);
         this.updateTopdeck(dt, time, input);
         this.updateBow(dt, time, input);
+        this.updateBridge(dt, time);
         this.updateFinale(dt, time, input);
         this.glimpseStairs(time);
         this.glimpseLift(time);
@@ -946,4 +949,5 @@ Object.assign(Story.prototype, spa);
 Object.assign(Story.prototype, pass);
 Object.assign(Story.prototype, quiet);
 Object.assign(Story.prototype, stage);
+Object.assign(Story.prototype, bridge);
 Object.assign(Story.prototype, linen);

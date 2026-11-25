@@ -29,7 +29,16 @@ SOURCE = ROOT / "assets" / "source" / "bridge"
 OUT = ROOT / "assets" / "ship" / "bridge"
 DIFF = 30                 # a pixel is the piece's when it is this far (r + g + b) from the place's own
 WASH, WALL = 0.2, (214, 222, 226)        # the bridge's pieces are washed 20% toward its wall (`-w20`)
-D10, CEIL, LADDER_X, STATION_X = 704, 576, 1864, 1985
+D10, CEIL, LADDER_X, STATION_X = 704, 576, 1864, 1989
+# The station as the hoop meets it (the user at the preview, 2026-11-25: "When the officer swings, it is not visually
+# clear that the button is actually pressed": the hoop came down in front of the station, 8 px under its button and
+# 5 px aft of it, the button untouched above it). So the station is 7 px shorter (rows cut out of its body's plain
+# parts: the generated picture's rows, from its top) and stands 4 px further aft: the hoop's rim lies across the
+# button's foot. And the button has two states: up, and down (its dome's box moved `BUTTON_DOWN` px down behind the
+# rim, a little darker). The beacon's lamp lit, laid over the station by the game: its box.
+STATION_CUT = [34, 35, 44, 45, 46, 47, 48]
+BUTTON, BUTTON_DOWN, BUTTON_DARK = (11, 8, 23, 15), 4, 0.86
+LAMP = (27, 0, 33, 6)
 # Each piece: the generated picture, the base it is compared with, its box in that picture.
 BOXES = {"station": ("station-s1", "station-base", (24, 14, 66, 80)),
          "hatch": ("hatch-s1", "hatch-base", None)}
@@ -141,6 +150,81 @@ def yellow(c):
     return c[0] > 180 and c[1] > 130 and c[2] < 110
 
 
+def his_colours():
+    """The colours of the officer's own frames in the people's sheet (on the palette): his clips are set to them, so that
+    he is the same man here as everywhere else on the ship (as on the stage: tools/build_stage.py)."""
+    m = json.loads((ROOT / "assets" / "sprites" / "people.json").read_text(encoding="utf8"))
+    sheet = Image.open(ROOT / "assets" / "sprites" / "people.png").convert("RGBA")
+    cell, cols, who = m["cell"], m["cols"], m["people"]["rival"]
+    found = set()
+    for clip in ("idle", "walk", "charge", "lunge", "trip", "sit", "swing"):
+        for f in who["anims"].get(clip, []):
+            box = ((f % cols) * cell, (f // cols) * cell, (f % cols) * cell + cell, (f // cols) * cell + cell)
+            for c in sheet.crop(box).getdata():
+                if c[3]:
+                    found.add(c[:3])
+    return sorted(found)
+
+
+def own(im, colours):
+    out = im.copy()
+    px, memo = out.load(), {}
+    for y in range(im.height):
+        for x in range(im.width):
+            c = px[x, y]
+            if not c[3]:
+                continue
+            k = c[:3]
+            if k not in memo:
+                memo[k] = min(colours, key=lambda q: (q[0] - k[0]) ** 2 + (q[1] - k[1]) ** 2 + (q[2] - k[2]) ** 2)
+            px[x, y] = memo[k] + (255,)
+    return out
+
+
+# The clips (assets/source/bridge/clips/, cut by its cut.py): the officer's four as strips of their whole canvases, in
+# his sheet's colours; Bumbot's climb in his own colours, mirrored (it was made facing east, and he goes forward).
+# A strip's frame lies in the world by `x`/`floor` (the column that is the figure's x, the row under which is the
+# floor) or by `x0`/`y0` (its corner).
+STRIPS = {"stalk": ("rival-stalk", True, False), "creep": ("rival-creep", True, False), "net": ("rival-net", True, False),
+          "netted": ("rival-netted", True, False), "climb": ("bumbot-climb", False, True)}
+
+
+def ungreen(im):
+    """The net's mesh over the green ground came out greenish: such a pixel (its green leading its red and its blue)
+    is the grey of its own lightness. Nothing of his is green."""
+    out = im.copy()
+    p = out.load()
+    for y in range(out.height):
+        for x in range(out.width):
+            r, g, b, a = p[x, y]
+            if a and g > r + 8 and g > b + 8:
+                v = round((r + b) / 2 + (g - (r + b) / 2) * 0.35)
+                p[x, y] = (v, v, min(255, v + 6), a)
+    return out
+
+
+def clips():
+    src = json.loads((SOURCE / "clips" / "clips.json").read_text(encoding="utf8"))
+    colours = his_colours()
+    out = {}
+    for name, (clip, his, mirror) in STRIPS.items():
+        c = src[clip]
+        w, h = c["size"]
+        strip = Image.new("RGBA", (w * c["frames"], h), (0, 0, 0, 0))
+        for i in range(c["frames"]):
+            f = Image.open(SOURCE / "clips" / clip / f"{i}.png").convert("RGBA")
+            if his:
+                f = own(ungreen(f), colours)
+            if mirror:
+                f = f.transpose(Image.FLIP_LEFT_RIGHT)
+            strip.paste(f, (i * w, 0))
+        strip.save(OUT / f"{name}.png")
+        lie = {"x": c["x"], "floor": c["floor"]} if "x" in c else {"x0": c["x0"] - (w - 1 if mirror else 0), "y0": c["y0"]}
+        out[name] = {"frames": c["frames"], "w": w, "h": h, **lie}
+        print(name, strip.size, lie)
+    return out
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     org = origins()
@@ -155,9 +239,42 @@ def main():
     filled = fill_enclosed(st, g, box)
     st, bb = trim(st)
     x0, y0 = org["station"][0] + box[0] + bb[0], org["station"][1] + box[1] + bb[1]
-    st.save(OUT / "station-full.png")
-    wash(st, red).save(OUT / "station.png")
-    meta["station"] = {"dx": x0 - STATION_X, "dy": y0 - D10, "w": st.width, "h": st.height}
+    st.save(OUT / "station-full.png")                     # (as generated: the green sets were made with it)
+    low = Image.new("RGBA", (st.width, st.height - len(STATION_CUT)), (0, 0, 0, 0))
+    y = 0
+    for row in range(st.height):
+        if row not in STATION_CUT:
+            low.paste(st.crop((0, row, st.width, row + 1)), (0, y))
+            y += 1
+    up = wash(low, red)
+    up.save(OUT / "station.png")
+    down = low.copy()
+    bx0, by0, bx1, by1 = BUTTON
+    dome = low.crop(BUTTON)
+    dp = dome.load()
+    for yy in range(dome.height):
+        for xx in range(dome.width):
+            r, g, b, a = dp[xx, yy]
+            if a:
+                dp[xx, yy] = (round(r * BUTTON_DARK), round(g * BUTTON_DARK), round(b * BUTTON_DARK), a)
+    down.paste((0, 0, 0, 0), (bx0, by0, bx1, by0 + BUTTON_DOWN))
+    down.alpha_composite(dome, (bx0, by0 + BUTTON_DOWN))
+    wash(down, red).save(OUT / "station-down.png")
+    lamp = Image.new("RGBA", (LAMP[2] - LAMP[0] + 4, LAMP[3] - LAMP[1] + 4), (0, 0, 0, 0))
+    lp, sp = lamp.load(), low.load()
+    for yy in range(LAMP[1], LAMP[3]):
+        for xx in range(LAMP[0], LAMP[2]):
+            if red(sp[xx, yy][:3]) and sp[xx, yy][3]:
+                lp[xx - LAMP[0] + 2, yy - LAMP[1] + 2] = (255, 96, 80, 255)
+    core = [(x, y) for y in range(lamp.height) for x in range(lamp.width) if lp[x, y][3]]
+    cx, cy = sum(x for x, _ in core) / len(core), sum(y for _, y in core) / len(core)
+    for x, y in core:
+        if abs(x - cx) < 1.6 and abs(y - cy) < 1.6:
+            lp[x, y] = (251, 255, 134, 255)
+    lamp.save(OUT / "beacon.png")
+    top = D10 - low.height
+    meta["station"] = {"dx": x0 - 1985, "dy": top - D10, "w": low.width, "h": low.height,
+                       "lamp": [LAMP[0] - 2, LAMP[1] - 2], "button": [(bx0 + bx1) // 2, by0]}
     print("station", st.size, "from", (x0, y0), "specks dropped", dropped, "enclosed filled", filled)
 
     # --- the hatch: its collar, its lid, its ladder -----------------------------------------------------------------------
@@ -221,6 +338,7 @@ def main():
     wash(strip).save(OUT / "lid.png")
     meta["lid"] = {"frame": size, "hinge": [pad, pad], "dx": hx - LADDER_X, "dy": hy - CEIL, "frames": len(LID_ANGLES)}
     print("collar", col.size, "ladder", lad.size, "lid", strip.size)
+    meta["clips"] = clips()
     (OUT / "bridge.json").write_text(json.dumps(meta, indent=1), encoding="utf8")
 
 

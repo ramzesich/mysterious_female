@@ -31,6 +31,7 @@ CLIPS = {
     "bumbot-climb": ("climb-s4", list(range(17)), {"x0": 1960, "y0": 560, "mirror": True}),
 }
 LEAST = 6
+HERS = {"her-call": "call", "her-call-loop": "call-loop", "her-call-up": "call-up"}     # into assets/source/her/call/
 
 
 def parts(cells):
@@ -81,6 +82,13 @@ def main():
             dropped += k
             f.save(d / f"{i}.png")
             boxes.append(f.getbbox())
+        if clip in HERS:
+            # (Hers go into her sheet: each frame on her sources' 96 px canvas, where her stand's frame is: 16 columns and
+            # 32 rows off the picture's, her 84 px cell being at (22, 14) of it.)
+            hd = HERE.parent / "her" / "call" / HERS[clip]
+            hd.mkdir(parents=True, exist_ok=True)
+            for i in range(len(frames)):
+                Image.open(d / f"{i}.png").crop((16, 32, 112, 128)).save(hd / f"{i}.png")
         size = Image.open(TRIES / f"{name}-{frames[0]}.png").size
         meta[clip] = {"frames": len(frames), "size": list(size), **lie, "boxes": boxes}
         print(f"{clip}: {len(frames)} frames, specks dropped {dropped} px, first {boxes[0]}, last {boxes[-1]}")

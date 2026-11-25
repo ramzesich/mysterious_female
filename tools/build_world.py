@@ -464,7 +464,8 @@ def build_world():
     ladders = [dict(id="gate", x=B.x_of(125), y0=B.floor_y(6), y1=B.floor_y(7), routeBottom=OUTSIDE, routeTop=OUTSIDE,
                     lock="card:deck:1", gate=True)]
     # Ladders on the map that open on a flag (the bridge's hatch, after the alarm).
-    gates = [dict(x=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2, y0=B.floor_y(11), y1=B.floor_y(10), needs="alarm", hide=True)]
+    # (`art`: its ladder and its lid are the scene's own pictures, not the map's tiles: src/world/bridge.js.)
+    gates = [dict(x=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2, y0=B.floor_y(11), y1=B.floor_y(10), needs="alarm", hide=True, art="bridge")]
     # The technical ladder at Cagney's, up to the roof: chained off until the engineer has had his
     # coffee and gone up it (population: `scn_engineer`).
     ladder_x = B.funnel_ladder_col() * B.TILE + B.TILE // 2
@@ -554,9 +555,9 @@ def build_world():
         pit=dict(id="haz_ballpit", x0=B.exact_x(pit["a"]), x1=B.exact_x(pit["b"]), y=B.floor_y(pit["deck"]),
                  tangerine=pit["tangerine"],
                  tanX=next(e["x"] for e in ents if e["id"] == pit["tangerine"])),
-        bridge=dict(y=B.floor_y(br["deck"]), swatX=B.exact_x(br["swat"]), panelX=B.exact_x(br["panel"]),
-                    sitX=B.exact_x(br["sit"]), x0=B.exact_x(br["a"]), x1=B.exact_x(br["b"]),
-                    helmX=B.exact_x(30.55), consoleX=B.exact_x(29.3)))
+        bridge=dict(y=B.floor_y(br["deck"]), ceil=B.floor_y(br["deck"]) - 128, x0=B.exact_x(br["a"]), x1=B.exact_x(br["b"]),
+                    consoleX=B.exact_x(br["console"]), stationX=B.exact_x(br["station"]), helmX=B.exact_x(br["helm"]),
+                    hatchX=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2))
 
     # Region 10 (src/world/finale.js): the sunset's balcony, the air down to the mooring deck, the
     # catch, the cabin.

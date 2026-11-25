@@ -3,7 +3,7 @@
 // step class's boards, the bridge's alarm) and its part of the story, mixed into the Story: the
 // wedding planner and the cake (carried from Cagney's: a fragile load, src/world/carry.js), the
 // party filing into the chapel and the ceremony there, the Spinnaker's piano, the kids' pool's
-// slide, the captain's door, near-catch 6 on the bridge (the security officer's net comes down on
+// slide, the captain's door, near-catch 6 on the bridge (its own module since its remake, src/world/bridge.js; it was: the security officer's net comes down on
 // the alarm panel, the hatch's ladder drops, Bumbot is up it), and the Library's odd book, which
 // opens the reading nook once all fourteen books are back. Places come from maps/world.json (`bow`).
 
@@ -312,16 +312,7 @@ export const bow = {
         w.add([this.oddBook, this.oddGlint, this.nookWay]);
         w.things.push({ id: 'sec_oddbook', x: N.x + 9, y: N.y, route: 'inside', items: [], reach: 18, until: 'flag:nook', interact: () => this.oddBookPull() });
 
-        // The bridge's alarm: a red wash over the bridge and the panel's beacon, once it has gone off.
-        const R = B.bridge;
-        this.alarmWash = s.add.rectangle(R.x0, R.y - 128, R.x1 - R.x0, 128, 0xe83b3b, 0).setOrigin(0).setDepth(D.player + 0.3);
-        this.alarmBeam = s.add.graphics().setDepth(D.player + 0.31);
-        w.add([this.alarmWash, this.alarmBeam]);
-        const bb6 = s.cats.find(c => c.flag === 'bb6');
-        if (bb6) {
-            bb6.before = () => this.netOnTheAlarm();
-            bb6.flee = (sprite, done) => this.upTheHatch(sprite, done);
-        }
+        // (The bridge's alarm and near-catch 6: src/world/bridge.js, `setupBridge`.)
         this.refreshBow();
     },
 
@@ -401,28 +392,6 @@ export const bow = {
         }
         // In the chapel, the first time after the party has gone in: the ceremony.
         if (play && s.route === 'chapel' && P.has('wedding') && !P.has('ceremony') && !this.inCeremony) this.ceremony();
-        // The alarm, from near-catch 6 until Bumbot is caught.
-        // (Seen only from deck 10 itself: from the balcony above, the bridge is behind the ship's side.)
-        const R = B.bridge;
-        const on = (this.alarmOn || P.has('alarm')) && !P.has('catch') && her.y > R.y - 132 && her.y <= R.y + 2;
-        if (on && near(s, (R.x0 + R.x1) / 2, R.y, 900, 200)) {
-            const k = (Math.sin(time / 260) + 1) / 2;
-            // (Whoop after whoop for its first seconds; after that, and whenever she comes back to
-            // the bridge, only now and then: it would wear.)
-            if (time > (this.alarmSoundAt ?? 0)) {
-                this.alarmLoudUntil ??= time + (this.alarmOn ? 7000 : 0);
-                this.alarmSoundAt = time + (time < this.alarmLoudUntil ? 1000 : 6000);
-                sfx.at(R.panelX, R.y).alarm(2);
-            }
-            this.alarmWash.setFillStyle(0xe83b3b, 0.05 + 0.13 * k);
-            const g = this.alarmBeam.clear(), bx = R.panelX, by = R.y - 62, a = time / 300;
-            g.fillStyle(0xfbff86, 0.9).fillCircle(bx, by, 2 + k);
-            g.fillStyle(0xe83b3b, 0.35).fillTriangle(bx, by, bx + Math.cos(a) * 60 - 8, by + Math.sin(a) * 14 - 6, bx + Math.cos(a) * 60 + 8, by + Math.sin(a) * 14 + 6);
-            g.fillStyle(0xe83b3b, 0.35).fillTriangle(bx, by, bx - Math.cos(a) * 60 - 8, by - Math.sin(a) * 14 - 6, bx - Math.cos(a) * 60 + 8, by - Math.sin(a) * 14 + 6);
-        } else if (this.alarmWash.fillAlpha) {
-            this.alarmWash.setFillStyle(0xe83b3b, 0);
-            this.alarmBeam.clear();
-        }
     },
 
     // E at the wedding planner (population: `npc_planner`, `scn_wedding`): the cake from Cagney's.
@@ -733,67 +702,4 @@ export const bow = {
         return true;
     },
 
-    // Near-catch 6, before Bumbot leaps (population §6.10): the security officer, who has been
-    // creeping up on him from the forward end, swings his net: it comes down on the alarm panel.
-    // Red light, and the emergency hatch lets its ladder down.
-    async netOnTheAlarm() {
-        const s = this.scene, w = this.world, R = this.B.bridge;
-        const r = this.who('riv_bridge');
-        if (r?.on) {
-            r.state = 'acting';
-            r.dir = 1;
-            this.people.anim(r, 'walk', { speed: 1.8 });
-            await w.tween({ targets: r, x: R.swatX, duration: Math.abs(R.swatX - r.x) * 7 + 60, onUpdate: () => this.people.place(r) });
-            sfx.at(r.x, r.y).hey();
-            s.time.delayedCall(340, () => sfx.at(r.x, r.y).net());
-            this.people.play(r, 'swing', { hold: 60000 });
-            await w.wait(520);
-        }
-        // The net on the panel.
-        sfx.at(R.panelX, R.y).clang();
-        s.cameras.main.shake(260, 0.006);
-        w.sparkle(R.panelX - 14, R.y - 22, 0xfbff86);
-        this.alarmOn = true;
-        rumble('alarm');
-        this.alarmSoundAt = s.time.now + 1000;
-        sfx.at(R.panelX, R.y).alarm(2);
-        await w.wait(250);
-    },
-
-    // His way out: over the security officer's head onto the helm, along the console, and up the
-    // ladder the hatch has just let down.
-    upTheHatch(sprite, done) {
-        const s = this.scene, w = this.world, R = this.B.bridge;
-        const gate = w.gates.find(g => g.needs === 'alarm');
-        // The hatch: its lid swings away, its ladder comes down rung by rung.
-        this.P.setFlag('alarm');
-        if (gate) {
-            const tiles = [...gate.tiles].sort((a, b) => a.pixelY - b.pixelY);
-            tiles.forEach(t => t.setAlpha(0));
-            tiles.forEach((t, i) => s.time.delayedCall(60 + i * 55, () => { t.setAlpha(1); if (i % 2 === 0) sfx.at(ladderX, top).ratchet(); }));
-        }
-        const ladderX = gate?.x ?? R.x0 + 20, top = gate?.y0 ?? R.y - 144;
-        sfx.at(ladderX, top).hatch();
-        sprite.setFlipX(true).play('bumbot-leap');
-        s.tweens.chain({
-            targets: sprite,
-            tweens: [
-                { x: R.helmX, y: R.y - 44, duration: 260, ease: 'Quad.easeOut' },
-                { x: R.consoleX, y: R.y - 46, duration: 240, onStart: () => { sprite.play('bumbot-run'); sfx.at(sprite.x, sprite.y).scramble(); } },
-                { x: ladderX, y: R.y - 60, duration: 200, ease: 'Quad.easeOut', onStart: () => sprite.play('bumbot-leap') },
-                { y: top - 6, duration: 620, onStart: () => sfx.at(sprite.x, sprite.y).scramble(), onComplete: () => sprite.setAlpha(0) },
-            ],
-            onComplete: () => {
-                sprite.setAlpha(1);
-                // The officer: on the floor by the helm, done for the day.
-                const r = this.who('riv_bridge');
-                if (r?.on) {
-                    this.people.play(r, 'sit', { hold: 60000 });
-                    sfx.at(r.x, r.y).grumble();
-                    s.tweens.add({ targets: r, x: R.sitX, duration: 300, onUpdate: () => this.people.place(r) });
-                }
-                s.time.delayedCall(700, done);
-            },
-        });
-    },
 };

@@ -597,6 +597,8 @@ export class World {
                 this.add([chain, sign]);
                 return { ...g, tiles, extra: [chain, sign] };
             }
+            // (`art`: the hatch's lid and ladder are a scene's own pictures: the bridge's, src/world/bridge.js.)
+            if (g.art) return { ...g, tiles };
             const lid = s.add.image(g.x, g.y0 + 16, 'hatch-lid').setOrigin(0.5, 0).setDepth(D.props);
             this.add([lid]);
             return { ...g, tiles, lid };
@@ -961,8 +963,15 @@ export class World {
     // forward wall (her head had stuck out beyond the mouth into the dark there).
     herCut() {
         const s = this.scene, sh = this.shaft, d = this.data.duct;
-        if (!sh || (s.route !== 'linen' && s.route !== 'duct') || sh.shown >= 1) return null;
+        // (And on the bridge's hatch ladder, at the hatch's mouth: a third number, the row over which nothing of her is
+        // drawn: src/world/bridge.js.)
+        if (!sh || (s.route !== 'linen' && s.route !== 'duct') || sh.shown >= 1) return this.story?.hatchCut?.() ?? null;
         return [d.wallX, Infinity];
+    }
+
+    // A deck the cut-away keeps while she is on a ladder between two (the bridge's, up its hatch: src/world/bridge.js).
+    deckHeld() {
+        return this.story?.hatchDeck?.() ?? null;
     }
 
     // The ship's outside view (O) and the views from afar show every deck closed: the shaft's pictures and its dark are
@@ -3004,7 +3013,7 @@ export class World {
         }
         for (const g of this.gates || []) {
             const open = P.flagSet(g.needs);
-            if (g.hide) g.tiles.forEach(t => t.setAlpha(open ? 1 : 0));
+            if (g.hide) g.tiles.forEach(t => t.setAlpha(open && !g.art ? 1 : 0));
             g.lid?.setVisible(!open);
             g.extra?.forEach(i => i.setVisible(!open));
         }

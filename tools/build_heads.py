@@ -55,6 +55,13 @@ BY_HAND["her"].update({
     **{("swim-tread", k): h for k, h in enumerate([(38.4, 43.9, 37), (39.4, 43.9, 37), (40.4, 43.9, 37), (41.4, 43.9, 37), (42.4, 43.9, 37), (41.4, 43.9, 37), (40.4, 43.9, 37), (39.4, 43.9, 37)])},
     **{("swim-cry", k): h for k, h in enumerate([(38.4, 43.9, 37), (39.4, 43.2, 36), (50.8, 43.9, 37), (50.8, 44.2, 37), (50.8, 44.4, 37), (50.9, 44.5, 37), (50.9, 44.5, 37), (50.7, 44.5, 37), (38.4, 43.9, 37)])},
 })
+# (Her soft call on the bridge, near-catch 6, 2026-11-25: down onto her heels, beckoning, up again. By her face's own
+# pixels, as her swimming's; the first of `call` is her stand, with its estimate.)
+BY_HAND["her"].update({
+    **{("call", k): h for k, h in enumerate([(46.1, 35.1, 25), (48.2, 44.8, 35), (49.3, 52.4, 43), (50.3, 56.6, 47), (50.1, 56.9, 47), (50.0, 57.2, 47), (50.0, 57.2, 47), (50.0, 57.2, 47), (50.0, 57.2, 47)])},
+    **{("call-loop", k): (50.0, 57.2, 47) for k in range(8)},
+    **{("call-up", k): h for k, h in enumerate([(50.0, 57.2, 47), (49.2, 56.7, 47), (50.2, 55.8, 46), (50.2, 50.8, 41), (48.9, 43.6, 33), (47.7, 38.6, 28), (46.2, 35.0, 25), (46.1, 35.1, 25), (46.1, 35.1, 25)])},
+})
 # The people estimated: those with a wish (a popup over them) whose top rows are not their head.
 PEOPLE_ESTIMATED = {"steward"}
 # Her upright frames (standing to her full height, 54 px or more: standing, running, in the air) by

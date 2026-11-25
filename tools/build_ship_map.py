@@ -1708,9 +1708,10 @@ def build_objects():
     # officer's chair, the compass binnacle, the radar and the chart display, the chart table and
     # the alarm panel; screens and the clock with its barometer on the wall under the side windows.
     # (Its inside starts about 28.5 m: the deck's front 3 m are the ship's structure.)
-    # (The alarm panel stands by the helm, where the net comes down on it in near-catch 6; the
-    # engine telegraph took its place aft.)
-    for m, frame in ((29.3, "bridge-console"), (30.55, "helm-console"), (31.85, "alarm-panel"),
+    # (Near-catch 6 remade, 2026-11-25, docs/near-catch-6-remake-log.md: the console 44 px aft of where it stood, clear
+    # of the escape hatch's ladder; the helm 84 px aft, where she is taken; the alarm panel's cabinet gone: the alarm
+    # station that stands for it, hard against the console's aft end, is the game's own piece, tools/build_bridge.py.)
+    for m, frame in ((30.216667, "bridge-console"), (32.3, "helm-console"),
                      (33.4, "captain-chair"), (34.5, "binnacle"), (35.5, "radar-pedestal"),
                      (36.5, "ecdis-stand"), (37.8, "chart-table"), (38.95, "engine-telegraph")):
         put(10, m, frame + "-bg")

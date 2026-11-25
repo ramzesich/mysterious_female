@@ -290,12 +290,14 @@ BEATS = {
     # towels on its floor. The room mirrored the same day: he bolts forward, into the shaft's mouth.)
     "bb4": ("linen", 63, "asleep", -1, 13, None),
     "bb5": (11, 131.27, "fish", 1, 160, None),
-    "bb6": (10, 31.15, "wash", -1, 29.2, None),
+    # (Near-catch 6 remade, 2026-11-25, docs/near-catch-6-remake-log.md: washing on the console's aft end, the alarm
+    # station beside him; he sat on the floor between the helm and the old panel. `BRIDGE` in src/config.js.)
+    "bb6": (10, 30.508333, "wash", -1, 29.2, None),
 }
 # What a flag gives besides itself: a verb learned at a beat.
 FLAG_GIVES = {"bb1": ["verb:dash"], "bb4": ["verb:crawl"], "bb5": ["flag:drain"], "bb6": ["flag:alarm"]}
 # He lies this many px up (on the towels, on a counter).
-BEAT_LIFT = {"bb4": 36, "bb1": 33, "bb2": 34}      # px, or the piece he is on (bb2: the return trolley's top)
+BEAT_LIFT = {"bb4": 36, "bb1": 33, "bb2": 34, "bb6": 38}      # px, or the piece he is on (bb2: the return trolley's top)
 # The linen room (tools/draw_linen.py; mirrored 2026-11-23, the user: its door at its aft end, the shaft's mouth on its
 # forward wall, so that she pushes the cart, climbs in and crawls on all one way): the chute's hatch (its middle; it
 # stands straight over the laundry's cart on deck 4, `laundry_cart` in the laundry's picture, where she lands), the
@@ -598,8 +600,8 @@ PEOPLE = {
     "amb_officer_10": dict(at=(10, 60), who="officer_10", face=1, walk=(50, 70, 1.0), end_ms=1500, layer="back"),
     "amb_officer_9": dict(at=(9, 55), who="officer_9", face=-1, walk=(40, 70, 1.0), end_ms=1500, layer="back"),
     "amb_counsellor": dict(at=(7, 30.15), who="counsellor", face=-1, idle="cheer", layer="back"),
-    "riv_bridge": dict(at=(10, 28.9), who="rival", face=1, idle="idle", after="flag:horn", until="flag:bb6"),
-    "riv_bridge_sat": dict(at=(10, 30.7), who="rival", face=1, still="sit", after="flag:bb6", until="flag:catch"),
+    # (On the bridge the security officer is the scene's own, in clips made there: frozen mid-creep behind Bumbot until
+    # `bb6`, sat under his own net after it until `catch`: src/world/bridge.js, near-catch 6 as remade 2026-11-25.)
 }
 
 # --- Things the plan adds to the decks -------------------------------------------------------------
@@ -1086,15 +1088,15 @@ FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 
 # m) inside the sauna (its walls at `walls`), every `every` s for `on` s after a tell of `tell` s, a column `half` m either
 # side of the stove's middle, spreading under the ceiling; a timing obstacle to pass, as the sprinkler.
 # The step class's boards (m, in front of each stepper). The ball pit (`haz_ballpit`: from, to).
-# The bridge's beat (`bb_6`): where the security officer swings from, the alarm panel his net
-# lands on, where he sits after.
+# The bridge's beat (`bb_6`, remade 2026-11-25: src/world/bridge.js): the console, the alarm station hard against its
+# aft end, the helm (m; the map builder places the console and the helm by the same numbers); the bridge's ends.
 BOW = dict(
     wedding=dict(deck=12, planner=83.25, chapel=68.6, look=76.6),
     piano=(12, 53.02), slide=dict(deck=12), captain=(9, 30), nook=dict(deck=6, m=189.4, up=44),
     steam=dict(deck=11, stove=51.7, walls=(47.9, 52.9), half=0.3, every=4.6, on=1.6, tell=0.8),
     steps=[(11, 68.2), (11, 69.8)],
     pit=dict(deck=7, a=49.3, b=53.7, tangerine="tan_7_ballpit"),
-    bridge=dict(deck=10, swat=30.55, panel=31.85, sit=30.7, a=28.4, b=40.0),
+    bridge=dict(deck=10, console=30.216667, station=31.445833, helm=32.3, a=28.4, b=40.0),
 )
 
 # --- Region 10: the sunset, the glide, the catch, the way home (docs/population.md §6.11;

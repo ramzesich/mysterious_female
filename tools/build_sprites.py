@@ -104,6 +104,14 @@ HER = {
         # assets/source/her/start-back/README.md.)
         "start-back": [(f"start-back/{i}.png", "feet") for i in range(8)],
         "look-up": [(f"look-up/{i}.png", "feet") for i in range(8)],
+        # (Near-catch 6 remade, 2026-11-25, docs/near-catch-6-remake-log.md: on the bridge she calls Bumbot softly (the
+        # user: "Just don't use the cry as a call"): down onto her heels with a hand held out palm up; beckoning, her
+        # fingers rubbing, a loop; and, startled by the net on the alarm, up onto her feet. PixMiniMax from her stand's
+        # frame on a green ground, she cut out by colour (assets/source/bridge/cut.py; the jobs in its README). Her feet
+        # stay planted: each frame on its lowest pixel; the first of `call` and the last of `call-up` are her stand.)
+        "call": [(f"call/call/{i}.png", "feet") for i in range(9)],
+        "call-loop": [(f"call/call-loop/{i}.png", "feet") for i in range(8)],
+        "call-up": [(f"call/call-up/{i}.png", "feet") for i in range(9)],
         # Climbing out of a hatch, from behind: hands on the rim at head, shoulder, then waist
         # height, a knee coming up. The game picks the frame by how far she has risen.
         "climb-out": [(f"climb-out/{i}.png", "keep") for i in range(3)],
