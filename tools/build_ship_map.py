@@ -687,7 +687,8 @@ def shell_owner(deck, c):
 # Each balcony drawn on the shell, (deck, x of its forward partition): the outside route's floors and
 # partitions (tools/build_world.py). The partitions' height over the balcony's floor.
 BALCONY_UNITS = []
-PARTITION_H = 88
+PARTITION_H = 116          # to the recess's ceiling
+BALCONY_RAIL_H = 32        # the front's rail over the balcony's floor
 
 
 def shell_details(ext, solid):
@@ -909,14 +910,22 @@ def shell_details(ext, solid):
                     rect(own, x, floor - 111, unit, 1, "#c7dcd0")
                     rect(own, x, floor - 110, unit, 3, "#506178")     # the slab's shade on the back wall (step 11)
                     rect(own, x, floor - 107, unit, 2, "#566880")
-                    rect(own, x + 6, floor - 48, unit - 6, 40, "#a3c4d4")
-                    rect(own, x + 6, floor - 36, unit - 6, 1, "#c7e4ef")
-                    rect(own, x + 6, floor - 50, unit - 6, 3, "#f4f4f4")
-                    # The partition: taller than her jump, short of the ceiling (a wall jump gets
-                    # over it, §6.1.3, region 7); the game's outside route reads the units.
+                    # (The front: a rail at the height of every other railing on the ship, 32 px, her waist; it was
+                    # 50, at her eyes: the user, 2026-11-25, docs/balconies-remake-log.md.)
+                    rect(own, x + 6, floor - BALCONY_RAIL_H + 2, unit - 6, BALCONY_RAIL_H - 10, "#a3c4d4")
+                    rect(own, x + 6, floor - BALCONY_RAIL_H + 10, unit - 6, 1, "#c7e4ef")
+                    rect(own, x + 6, floor - BALCONY_RAIL_H, unit - 6, 3, "#f4f4f4")
+                    # The partition: a panel seen edge on, from the floor to the ceiling (it stopped at 88 px, a
+                    # post with open air over it that did not read as a wall); the way past it is outside the
+                    # rail, round its outer edge. The game's outside route reads the units.
                     rect(own, x, floor - PARTITION_H, 6, PARTITION_H - 8, "#f4f4f4")
-                    rect(own, x + 5, floor - PARTITION_H, 1, PARTITION_H - 8, "#c7dcd0")
-                    rect(own, x, floor - PARTITION_H, 6, 1, "#c7dcd0")
+                    rect(own, x + 5, floor - PARTITION_H + 6, 1, PARTITION_H - 14, "#c7dcd0")
+                    # Its fin runs on up the slab's face to the balcony over it (where there is one): one white post
+                    # deck over deck, the hold for her climb between the decks.
+                    if deck < 10 and metres(c) >= BALCONY_FROM[deck + 1]:
+                        rect(own, x, floor - PARTITION_H - 36, 6, 36, "#f4f4f4")
+                        rect(own, x + 5, floor - PARTITION_H - 36, 1, 36, "#c7dcd0")
+                        rect(own, x - 1, floor - PARTITION_H - 28, 1, 28, "#dfe3e6")
                     BALCONY_UNITS.append((deck, x))
         # The open decks up top: a white bulwark with a glass windscreen above it, all along (deck
         # 12, and deck 11's Great Outdoors; its pool deck has tall glass walls, built by the game:

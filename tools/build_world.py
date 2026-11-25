@@ -22,7 +22,8 @@ from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE
 
 OUTSIDE = "promenade"       # the game's name for the outside route (deck 6's promenade came first)
 ROOM_DOOR_X = 59            # a room's door, in from its left edge (the drawings agree)
-PARTITION_H = 88            # a balcony partition: taller than her jump (68)
+PARTITION_H = B.PARTITION_H  # a balcony partition: a panel to the recess's ceiling
+RAIL_H = B.BALCONY_RAIL_H     # the front's rail over the balcony's floor
 POLE_H = 140                # the pole on a partition's top, up to the balcony above
 UNIT = 125                  # a balcony, px
 END_COVER = 40              # the side drawn over her past a row of balconies' end, px (her picture reaches past her body)
@@ -418,7 +419,7 @@ def build_world():
     def unit_at(deck, m):
         return nearest_balcony(deck, B.exact_x(m))
 
-    perch = [dict(id=gid, x=unit_at(deck, m) + 88, y=B.floor_y(deck) - 50, floor=B.floor_y(deck), x0=unit_at(deck, m))
+    perch = [dict(id=gid, x=unit_at(deck, m) + 88, y=B.floor_y(deck) - RAIL_H, floor=B.floor_y(deck), x0=unit_at(deck, m))
              for gid, (deck, m) in PERCH.items()]
     occupied = [dict(id=oid, x0=unit_at(deck, m), x1=unit_at(deck, m) + UNIT, y=B.floor_y(deck), frame=frame)
                 for oid, (deck, m, frame) in OCCUPIED.items()]
@@ -441,9 +442,9 @@ def build_world():
         own = own_sets.get((deck, ux), {})
         if "towel" in own:
             if own["towel"]:
-                towels.append(dict(x=ux + own["towel"][0], y=y - 50, tint=own["towel"][1]))
+                towels.append(dict(x=ux + own["towel"][0], y=y - RAIL_H, tint=own["towel"][1]))
         elif h % 10 < 3:
-            towels.append(dict(x=ux + 28 + h % 67, y=y - 50, tint=h % 5))
+            towels.append(dict(x=ux + 28 + h % 67, y=y - RAIL_H, tint=h % 5))
         if "furniture" in own:
             for frame, dx, flip in own["furniture"]:
                 furniture.append(dict(x=ux + dx, y=y, frame=frame, flip=flip))
@@ -581,7 +582,7 @@ def build_world():
                 topdeck=topdeck, bow=bow, finale=finale,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
-                outside=dict(platforms=platforms, walls=walls, glass=glass, covers=covers, partition=PARTITION_H),
+                outside=dict(platforms=platforms, walls=walls, glass=glass, covers=covers, partition=PARTITION_H, rail=RAIL_H),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.exact_x(LIDO["hatch"]), y=B.floor_y(11), toY=B.floor_y(10)),
                 trapdoor=dict(x=B.exact_x(TRAPDOOR_M), y=B.floor_y(6), room=TRAPDOOR_LANDS[0],

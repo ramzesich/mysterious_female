@@ -317,10 +317,11 @@ export class Laundry {
         // Over the partition the ship's side has drawn there: the recess's wall and the glass
         // front run on; the panel, folded flat against the wall.
         const g = s.add.graphics().setDepth(D.exterior + 0.06);
-        g.fillStyle(0x5d6f86, 1).fillRect(x - 3, y - 89, 6, 42);
-        g.fillStyle(0xa3c4d4, 1).fillRect(x - 3, y - 48, 6, 40);
-        g.fillStyle(0xc7e4ef, 1).fillRect(x - 3, y - 36, 6, 1);
-        g.fillStyle(0xf4f4f4, 1).fillRect(x - 3, y - 50, 6, 3);
+        g.fillStyle(0x5d6f86, 1).fillRect(x - 3, y - 105, 6, 105 - world.data.outside.rail);
+        const R = world.data.outside.rail;
+        g.fillStyle(0xa3c4d4, 1).fillRect(x - 3, y - R + 2, 6, R - 10);
+        g.fillStyle(0xc7e4ef, 1).fillRect(x - 3, y - R + 10, 6, 1);
+        g.fillStyle(0xf4f4f4, 1).fillRect(x - 3, y - R, 6, 3);
         g.fillStyle(0xf4f4f4, 1).fillRect(x + 3, y - 106, 9, 2).fillRect(x + 10, y - 104, 2, 57);
         g.fillStyle(0xc7dcd0, 1).fillRect(x + 12, y - 104, 1, 57);
         // The line, from hook to hook under the ceiling's edge, sagging.

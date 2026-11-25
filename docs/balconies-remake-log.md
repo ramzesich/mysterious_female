@@ -151,7 +151,81 @@ stand-ins: `rough-along.png`, `rough-updown.png`):
 Out there she is in front of the glass, the slab and the partition, whole; in again she is behind the glass. No
 floor is passed, nothing cuts her, the picture holds its height in A and follows her once in B and C.
 
-*(Shown to the user; waiting for the answers.)*
+Five questions went with it (the moves; the rail's height; the pieces generated now; the smaller mends; the rows'
+length). The user, 2026-11-25:
+
+> 1. As proposed. Take care of visuals. For example, the ladder frames work poorly when the balcony's glass wall finishes, but she still climbs with her hands up in the air.
+> 2. As recommended
+> 3. Yes
+> 4. Ok
+> 5. Yes
+> Also, she is supposed to use grip socks, but it is very unclear that she actually uses them here. Maybe, during the relevant animations/scenes the grip socks have to be actually worn
+
+and, while the preview was being made:
+
+> The current socks also don't look like grip socks.
+> We could regenerate all of the sock sprites and the close up
+
+> I don't like the reflections, because they repeat on each window, the reflection should be continuous, if it is there.
+> Perhaps, it is better to generate windows without reflected clouds
+
+So: the three moves as proposed (decision 3); the rail at 32 px (4); the pieces generated (5); the smaller mends, all
+(6); the layout left as it is (7); the socks worn out on the balconies and made again as grip socks (8); the doors'
+glass plain (9).
+
+## 4. The beats
+
+| Move | Key | What is seen | Held |
+|---|---|---|---|
+| A, along | Space at a partition, on the floor or in a jump | she jumps to the partition's edge, crosses in front of it with her hands on it and her socks on the wall, drops on its other side and runs on | 0.6 s |
+| B, up | ↑ and Space at a partition | she turns to the partition's fin, climbs it hand over hand, her socks on the wall either side, past the slab, over the rail above, turns | about 2 s |
+| C, down | ↓ and Space at a partition | over the rail, down the fin the same way, in over the rail below | about 1.6 s |
+
+Each on the rules of the plan's step 4: one continuous space; her direction kept (A ends running the way she went, B and
+C end facing as she stood); a cause for every hold (the fin is drawn, deck over deck); outside the rail she is in front
+of the glass, the slab and the partition, inside it behind the glass; nothing waits for a second press. A gust while
+she is on the fin: she holds on until it drops. The camera holds its height through A and follows her once through B
+and C.
+
+## 5. The preview
+
+**The geometry** (in the builders, for the mock-ups; `BALCONY_RAIL_H`, `PARTITION_H` in `tools/build_ship_map.py`,
+`RAIL_H` in `tools/build_world.py`, `data.outside.rail`): the front's rail 32 px over the floor (it was 50); the
+partition a panel from the floor to the recess's ceiling, 116 px (it was 88, with open air over it); its fin run on
+across the slab's face to the balcony above, so that one white post stands deck over deck and her hands have a hold all
+the way. The whole ship rendered before and after (`tools/render_ship.py`). **The branch is not playable on the
+balconies in this state:** the old kicks meet the new partition; the moves come with the build.
+
+**The pieces:**
+
+- **The recess with the cabin's sliding door,** drawn flat by rule (`assets/source/balconies/roughs.py`: a frame, two
+  panes, a handle, curtains drawn back inside; the door's glass now runs to the floor, the lower rail shows it) and
+  redrawn in place by PixelLab; a second redraw with plain dark glass after the user's word on the reflections
+  (`tries/unit-2.png`); the same door slid open on the lit cabin with a sheer curtain in the doorway
+  (`tries/unit-ajar-1.png`), which takes the place of the code-drawn `balcony-ajar` and its curtain (plan-the-rest §7h).
+  Every other balcony mirrored, as real cabins are.
+- **The grip socks' close-up:** six tries (`assets/source/closeups/tries/socks/`); S1 (`try6.png`) is the approved pair
+  redrawn with one sole up, rows of white grip dots on it, and a dotted sole's edge on the other.
+- **The socks on her:** by rule, in every frame of her sheet (her shoes found as the small navy pieces with the shoe's
+  own colour at a leg's end; pink, a lighter cuff over the ankle, the sole's edge dotted white). Worn while she is out
+  on the balconies. (The rule's first form also tinted specks by her eye and in her hair, which a check of her legs
+  alone had missed: found before anything was shown, the clips made again from clean frames.)
+- **The washing:** two tries; the first, a line between two poles that stand on the floor, reads.
+
+**The clips** (PixMiniMax on a green copy of the game's own picture of two balconies, `assets/source/balconies/sets.py`,
+from her sheet's own frames in the socks, each pinned to its end):
+
+- **up** and **down**, 32 frames each on a 128 x 256 canvas, first try: she holds the fin in every frame, her socks on
+  the wall either side of it, and steps over the rail at each end.
+- **along**, 12 frames on 128 x 128, four tries: the first two put her behind the partition for part of the way; "seen
+  from behind ... climbs sideways across the front of the post" kept her in front of it. Her socks came out dark red in
+  most of its frames: to be brought to the pink by rule or by one more try in the build.
+
+**The storyboard** on its clock, the whole screen at the game's px (`story.gif`, 7 s: up, down, along), composed over the
+real picture with the new look; her picture behind the glass where she stands inside (the glass's tint and the rail's
+cap over her), in front of everything while she is outside.
+
+*(Shown to the user; waiting for the word to build.)*
 
 ## Decisions
 
@@ -159,6 +233,35 @@ floor is passed, nothing cuts her, the picture holds its height in A and follows
 2. The record gives her the socks and the crawl by `P.learn`, as play does, and no `?cards=all` (near-catch 6's
    lesson).
 
+3. The three moves are hers alone and drawn, outside the rail; the wall jump's kick stays everywhere else (the user: "As
+   proposed. Take care of visuals").
+4. The rail 32 px, as every other railing; the ship's side changes on all 202 balconies (the user: "As recommended").
+5. The balconies' pieces are generated now: plan-the-rest §7h (part 13) and the balconies' share of §7i (part 14) are
+   taken in here.
+6. The smaller mends are all done with it (the rows' ends, a hint a move, the camera, the walkway's columns, the parasol,
+   the occupied balcony, Bumbot's glimpse, the furniture, the gusts).
+7. The rows' layout and what lies on them stay.
+8. The socks are worn out on the balconies, in every frame, and made again as grip socks: the close-up, the world's
+   sprite, her feet (the user: "it is very unclear that she actually uses them here"; "The current socks also don't look
+   like grip socks").
+9. The doors' glass is plain, no reflected sky (the user: "they repeat on each window").
+10. The partition is a panel to the ceiling and has a fin up the slab: the climb needs a hold in every frame (the
+    user's rule of 2026-11-21, and "she still climbs with her hands up in the air" of the roughs).
+
 ## Generations
 
-None yet.
+51 so far (8,931 to 8,880).
+
+| What | Tool | Job or object | Cost |
+|---|---|---|---|
+| Socks' close-up, tries 1 to 3 | `create_map_object` | `7546324e`, `1cd1c32e`, `d8901a36` | 3 |
+| Socks' close-up, tries 4 and 5 | `create_map_object` | `41b9caa5`, `24f1af54` | 2 |
+| Socks' close-up, try 6: the approved pair redrawn (S1) | `edit_image_pro_flash` | `2c2fec19-2466-45d9-b513-9ceb864361b8` | 6 |
+| The recess and its door, redrawn (reflected clouds: turned down) | `edit_image_pro_flash` | `54811945-289e-4ea6-9323-2831f50d1e25` | 6 |
+| The door ajar | `edit_image_pro_flash` | `6e9fa3d4-2158-47f1-8023-5a894dcacc5b` | 6 |
+| The recess and its door, plain glass | `edit_image_pro_flash` | `4d4e1caf-f06e-42ed-8ccd-66dfc65d630c` | 6 |
+| along, tries 1 to 3 | `animate_image_pixminimax` | `cfec45f9`, `98d52cfd`, `937e2068` | 6 |
+| up, down, try 1 (a pink speck on her head in the start frames) | `animate_image_pixminimax` | `10ff347b`, `cdd58140` | 6 |
+| up, down, try 2 | `animate_image_pixminimax` | `3ca4ae79-354b-4a28-9190-dbd997f24526`, `9b7f9914-a4a7-4420-8881-214d0f16182f` | 6 |
+| along, try 4 | `animate_image_pixminimax` | `0a7bc7f8-46b5-40df-8a88-58d81044e459` | 2 |
+| The washing, tries 1 and 2 | `create_map_object` | `ba46b768`, `613961b8` | 2 |

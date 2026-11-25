@@ -528,9 +528,10 @@ export class World {
         for (const gl of out.glass) {
             const g = fronts[gl.deck] ??= s.add.graphics().setDepth(D.player + 0.3);
             // (Thin: the fronts are drawn to the ship's scale and come up to her eyes.)
-            g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - 48, gl.x1 - gl.x0, 40);
-            g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - 36, gl.x1 - gl.x0, 1);
-            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 50, gl.x1 - gl.x0, 3);
+            const R = out.rail;
+            g.fillStyle(0xa3c4d4, 0.28).fillRect(gl.x0, gl.y - R + 2, gl.x1 - gl.x0, R - 10);
+            g.fillStyle(0xc7e4ef, 0.5).fillRect(gl.x0, gl.y - R + 10, gl.x1 - gl.x0, 1);
+            g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - R, gl.x1 - gl.x0, 3);
             g.fillStyle(0xf4f4f4, 1).fillRect(gl.x0, gl.y - 8, gl.x1 - gl.x0, 8 + PLAYER.sink);
         }
         for (const [deck, g] of Object.entries(fronts)) {
