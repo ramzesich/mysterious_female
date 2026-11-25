@@ -2888,6 +2888,8 @@ export class World {
                 s.player.body.enable = true;
                 s.player.body.reset(s.player.x, pool.bottom);
                 s.takeoffY = pool.bottom;
+                s.swimUp = 0;
+                s.swimG?.clear();
                 s.pose('stand');
             }
             [pool.water, pool.ripples].forEach(o => o.setVisible(false));
@@ -2959,7 +2961,7 @@ export class World {
                 if (s.mode === 'swim' && s.pool === pool) {
                     // (Too shallow to swim: her feet find the floor.)
                     if (pool.bottom - y < 16) out();
-                    else s.player.y = Math.min(y + SWIM.float, pool.bottom);
+                    else s.player.y = s.swimY();
                 }
             },
             onComplete: () => {

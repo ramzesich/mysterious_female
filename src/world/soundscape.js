@@ -126,8 +126,7 @@ export class Soundscape {
             this.walked += Math.hypot(dx, dy);
             if (this.walked >= stride) { this.walked = 0; sfx.step(s.flight?.outside ? 'metal' : 'stair'); }
         } else if (s.mode === 'swim') {
-            this.walked += dx;
-            if (this.walked >= 44) { this.walked = 0; sfx.stroke(); }
+            // (Her stroke's splash is on its clip's own frame: `HER_SOUNDS` in the ship scene.)
         } else if (s.mode === 'push') {
             this.walked += dx;
             this.rolled += dx;

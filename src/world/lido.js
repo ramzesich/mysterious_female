@@ -4,7 +4,7 @@
 // and its swirl; the cone for the kid, the canister, the table with her husband; the chess set, the
 // hot tub. Places come from maps/world.json (`lido`).
 
-import { PLAYER, SWIM } from '../config.js';
+import { PLAYER, SWIM, POOL } from '../config.js';
 import { sfx } from '../sfx.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
@@ -55,6 +55,8 @@ export const lido = {
             w.add([this.tubFront]);
             kidIn.sprite.setDepth(tubPic.depth + 0.002).setY(this.tubBase());
         }
+        // (The tub's aft side: the scene starts once it is in the picture.)
+        this.tubAft = tubPic ? tubPic.x + tubPic.width * (1 - tubPic.originX) : L.tubX + 26;
         // The kid's jets of water; the chess pawn she moves. (No wet paw prints after Bumbot: the user dropped his
         // prints everywhere, 2026-11-24.)
         this.jetG = s.add.graphics().setDepth(D.player + 0.2);
@@ -141,6 +143,8 @@ export const lido = {
             sp.setCrop(0, 0, sp.frame.width, Math.max(0, Math.min(fh, L.y - top)));
         }
         this.poolWatch(time);
+        // (Upright in the water through the scene: her picture is the ship scene's, asked for each frame.)
+        if (this.poolUp && s.mode === 'scripted' && s.pool) s.swimShow(dt, true, false);
         this.kidInTub(time);
         this.kidOnDeck(dt, time);
         this.swirling(dt, time, input);
@@ -150,12 +154,16 @@ export const lido = {
 
     // --- Near-catch 5 (population §6.7) ---------------------------------------------------------
 
-    // She comes to him swimming (the pool fills the deck from side to side), or along the rim.
+    // She comes to him swimming (the pool fills the deck from side to side), or along the rim. From the water the
+    // scene starts where she first has both of them in the picture, him and the hot tub behind him (the user,
+    // 2026-11-25: "When Bumbot and the bubble bath behind him are visible, I want the sequence to start"; it started
+    // 112 px short of the rim, the tub cut by the picture's edge, and swam her on to the rim).
     poolWatch() {
         const s = this.scene, L = this.L, cat = this.poolCat, her = s.player;
         if (!cat || cat.gone || cat.hidden || this.P.has('bb5') || s.route !== 'inside') return;
-        const pool = L.pools[0];
-        const swimming = s.mode === 'swim' && s.pool && s.pool.x1 === pool.x1 && her.x > pool.x1 - 112;
+        const pool = L.pools[0], view = s.cameras.main.worldView;
+        const seen = cat.sprite.x - 24 >= view.x && this.tubAft + POOL.seen <= view.right;
+        const swimming = s.mode === 'swim' && s.pool && s.pool.x1 === pool.x1 && her.x > pool.x1 - 260 && seen;
         const onFloor = her.body.enable && (her.body.blocked.down || her.body.touching.down);
         const onDeck = s.mode === 'play' && onFloor && Math.abs(her.y - L.y) < 4 && Math.abs(her.x - cat.sprite.x) < 76;
         if (swimming || onDeck) this.poolBeat(swimming);
@@ -167,10 +175,16 @@ export const lido = {
     // he goes, into the water behind her. He paddles back past her to the rim, his head and back over the surface, hops
     // out, shakes himself dry; then away aft, by the nearest high thing: up onto the drain lever's grip, which goes over
     // under him toward the hot tub and throws him across it; the kid ducks. The lever thrown, the pool drains.
+    // **From the water it is watched** (the user, 2026-11-25: "She stops, peeks out of the water, cries; the kid and
+    // Bumbot start their scene; she watches it until Bumbot escapes, then the controls are returned"): she stops where
+    // she is, comes upright with her head out of the water and calls; he sits up from his fishing; the kid, the jet;
+    // he comes down in the water in front of her and paddles back to the rim; the rest the same. She is not moved.
     async poolBeat(swimming) {
         const s = this.scene, w = this.world, L = this.L, cat = this.poolCat, her = s.player, D = s.DEPTH;
         const pool = s.pools.find(q => q.x1 === L.pools[0].x1), c = cat.sprite;
         const tub = this.who('npc_kid_tub'), lay = this.leverLay;
+        const watching = swimming;
+        const until = async (fn, ms = 4000) => { const t0 = s.time.now; while (!fn() && s.time.now - t0 < ms) await w.wait(16); };
         cat.gone = true;
         s.mode = 'scripted';
         s.script = null;
@@ -215,22 +229,22 @@ export const lido = {
         s.tweens.killTweensOf(c);
         c.setScale(1);
         // (From his fishing, whose frames stand `BUMBOT.under` px low, back onto the deck, sitting.)
-        c.y = paws.y = cat.floor;
-        sit();
-        if (swimming) {
-            // To the rim under him, her chin on it.
-            s.pose('swim', 0.8);
+        const sitUp = () => { c.y = paws.y = cat.floor; c.setFlipX(true); sit(); };
+        if (watching) {
+            // She stops, comes up out of the water and calls; he goes on fishing until he hears her.
             her.setFlipX(false);
-            await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
-            c.setFlipX(true);
-            sit();
-            reach();
-            await w.wait(450);
-            // (Her cry is over before the kid stands up: its popup is where he and Bumbot are.)
-            s.bubbleUntil = s.time.now + 900;
+            this.poolUp = true;
+            await until(() => s.swimUp >= 1);
+            her.anims.play('her-swim-cry');
+            her.anims.timeScale = 1;
+            await w.wait(POOL.callAt);
+            s.bubbleUntil = s.time.now + POOL.callMs;
             sfx.cry();
-            await w.wait(1000);
+            await w.wait(180);
+            sitUp();
+            await w.wait(POOL.callMs);
         } else {
+            sitUp();
             her.setFlipX(c.x < her.x);
             s.pose('stand');
             await w.wait(200);
@@ -268,6 +282,7 @@ export const lido = {
                 await w.tween({ targets: her, x: spot, duration: Math.abs(spot - her.x) * 12 });
                 reach();
                 swimming = true;
+                s.swimUp = 0;
                 await w.wait(700);
             }
         }
@@ -289,15 +304,16 @@ export const lido = {
         this.jet(mx, my, c.x + 7, L.y - 13, 420);
         await w.wait(200);
         // Hit in the back: out over the water he goes, over her head, and in behind her; her arm comes down.
-        if (swimming) s.pose('swim', 0);
+        if (swimming && !watching) s.pose('swim', 0);
         c.setFlipX(true);
         sfx.at(c.x, c.y).meow();
-        const inX = Math.max(L.pools[0].x0 + 30, spot - CAT.in);
+        // (Watched from the water he comes down in front of her; with her under him at the rim, behind her.)
+        const inX = watching ? Math.min(rim - 36, her.x + POOL.plunge) : Math.max(L.pools[0].x0 + 30, spot - CAT.in);
         await hop(inX, surface + 8, 520, 30, 2);
         s.splash(inX, surface);
         s.splash(inX + 5, surface - 2);
         sfx.at(inX, surface).splash();
-        if (swimming) her.setFlipX(true);
+        if (swimming && !watching) her.setFlipX(true);
         // Under he goes, in sight through the water as she is (the user, 2026-11-24: he was gone from the picture
         // until he came up), turns, and comes up paddling for the rim, past her, his head and back over the water.
         c.setDepth(D.swimmer - 0.001).play('bumbot-run');
@@ -309,7 +325,7 @@ export const lido = {
         sfx.at(inX, surface).splashSmall();
         const wake = this.catG;
         await w.tween({ targets: c, x: rim - 9, duration: (rim - 9 - inX) / CAT.paddle * 1000, onUpdate: () => {
-            if (swimming && c.x > her.x - 4) her.setFlipX(false);
+            if (swimming && !watching && c.x > her.x - 4) her.setFlipX(false);
             // (The water he pushes: a few light strokes at his chest and behind him.)
             const t = s.time.now;
             wake.clear();
@@ -376,6 +392,9 @@ export const lido = {
         this.tubBusy = false;
         // Play goes on, in the water if that is where she is; the flag pulls the plug (`drain`).
         if (swimming && pool) {
+            // (Hers again as she is: upright in the water if she watched it, until she moves.)
+            s.swimRest = watching ? SWIM.restMs : 0;
+            this.poolUp = false;
             s.mode = 'swim';
             s.pool = pool;
             her.body.enable = false;

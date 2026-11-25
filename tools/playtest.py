@@ -4277,15 +4277,28 @@ def scenario_region6(b):
     b.teleport(pool1["x1"] - 230, D11)
     wait(0.8)
     ok &= check(b.state()["mode"] == "swim", "the first pool fills the deck: she swims", b.state())
+    # (From the water it is watched, the user, 2026-11-25: it starts where Bumbot and the hot tub behind him are both in
+    # the picture; she stops there, comes up out of the water, calls, and is not moved until he is gone.)
     hold_until(b, "right", lambda s: s["mode"] == "scripted", 6)
+    b.key("right", False)
     cat = f"{W}.story.poolCat.sprite"
-    ok &= check(wait_js(b, f"['her-swim-reach', 'her-swim-strain'].includes({S}.player.anims.currentAnim && {S}.player.anims.currentAnim.key)", 4),
-                "under him at the rim she looks up out of the water and reaches for him")
-    b.shot("region6-reach")
+    anim = f"({S}.player.anims.currentAnim && {S}.player.anims.currentAnim.key)"
+    x0 = b.state()["x"]
+    v = js(b, f"[{S}.cameras.main.worldView.x, {S}.cameras.main.worldView.right, {cat}.x, {W}.story.tubAft]")
+    ok &= check(v[0] <= v[2] - 24 and v[3] + 12 <= v[1] and x0 < pool1["x1"] - 60,
+                "it starts with Bumbot and the whole hot tub behind him in the picture, she well short of the rim", (v, x0))
+    ok &= check(js(b, f"{cat}.anims.currentAnim.key") == "bumbot-fish", "he fishes on as she stops", js(b, f"{cat}.anims.currentAnim.key"))
+    ok &= check(wait_js(b, f"{S}.swimUp >= 1", 2) and b.state()["y"] == js(b, f"{S}.pool.bottom"),
+                "she comes upright, kneeling on the pool's floor, her head out of the water", b.state())
+    ok &= check(wait_js(b, f"{anim} === 'her-swim-cry'", 1), "and calls, a hand by her mouth")
+    ok &= check(wait_js(b, f"{S}.bubbleUntil > {S}.time.now && {cat}.anims.currentAnim.key === 'bumbot-sit'", 1), "her cry over her; he sits up from his fishing")
+    b.shot("region6-call")
     ok &= check(wait_js(b, f"{who('npc_kid_tub')}.sprite.y < {D11 - 5}", 5), "the kid stands up in the hot tub")
+    ok &= check(js(b, f"{anim}") == "her-swim-tread", "she watches, bobbing where she is", js(b, f"{anim}"))
     b.shot("region6-beat")
     ok &= check(wait_js(b, f"{cat}.visible && {cat}.depth < {S}.DEPTH.swimmer && {cat}.y > {D11 + 8} && {cat}.x < {pool1['x1']}", 5),
                 "squirted into the pool, Bumbot paddles back for the rim, his legs under the water")
+    ok &= check(js(b, f"{cat}.x") >= x0 + 36, "he came down in front of her, clear of her arms", (js(b, f"{cat}.x"), x0))
     ok &= check(wait_js(b, f"{W}.story.lever.frame.name > 0 && Math.abs({cat}.x - {L['leverX']}) < 40 && {cat}.y < {D11 - 20}", 6),
                 "out, shaken dry, and up onto the lever's grip: it goes over under him")
     b.shot("region6-lever")
@@ -4294,7 +4307,9 @@ def scenario_region6(b):
     ok &= check("drain" in flags(b) and js(b, f"{W}.story.lever.frame.name") == last, "the drain's lever is thrown")
     ok &= check(wait_js(b, f"{S}.pools.length === 3 && {S}.pools[0].y > {D11 + 8}", 4), "the water sinks", js(b, f"{S}.pools.map(p => p.y)"))
     ok &= check(js(b, f"{W}.pool.puddles.obj.alpha") == 0, "no puddles yet: they show only as the last of it goes", js(b, f"{W}.pool.puddles.obj.alpha"))
-    ok &= check(b.state()["mode"] == "swim", "she is still in the water as it starts to sink", b.state())
+    st = b.state()
+    ok &= check(st["mode"] == "swim" and st["x"] == x0 and js(b, f"{S}.swimUp") == 1 and js(b, f"{anim}") == "her-swim-tread",
+                "she is hers again where she stopped, still upright in the water as it starts to sink", (st, x0))
     ok &= check(wait_js(b, f"{S}.mode === 'play' && {S}.player.y === {D11 + 32}", 8), "the water gone, she stands in the empty tank", b.state())
     wait(0.2)
     ok &= check(js(b, f"{S}.herDropPx()") == 6, "her picture 5 px lower there, on the floor's strip of tiles", js(b, f"{S}.herDropPx()"))
@@ -6932,6 +6947,52 @@ def scenario_region3__lookout(b):
     wait(1.5)
     v = b.eval(f"[{S}.player.y, JSON.stringify({S}.world.lookOpen), {S}.shellAlpha[6], {S}.shellAlpha[7]]")
     ok &= check(v[0] == D6 and v[1] == "{}" and v[2] == 0 and v[3] == 1, "landed: the stage hers, deck 7 closed again", v)
+    return ok
+
+
+def scenario_region6__swim(b):
+    """Her swimming, enriched (the user, 2026-11-25): a full stroke while she moves; at rest the stroke runs out to its
+    glide and she comes upright, kneeling on the pool's floor with her head out, bobbing; a way pressed, she is back in
+    her stroke; out of the water by a jump from upright too."""
+    S, W = "window.__ship", "window.__ship.world"
+    b.open("?reset&play&at=pool&cards=all")
+    wait(0.4)
+    L = js(b, f"{W}.data.lido")
+    pool = L["pools"][0]
+    anim = f"({S}.player.anims.currentAnim && {S}.player.anims.currentAnim.key)"
+    b.teleport(pool["x0"] + 120, D11)
+    ok = check(wait_js(b, f"{S}.mode === 'swim'", 2), "in the first pool: she swims", b.state())
+    surface, bottom = js(b, f"{S}.pool.y"), js(b, f"{S}.pool.bottom")
+    x0 = b.state()["x"]
+    b.key("right", True)
+    seen = set()
+    end = now() + 1.4
+    while now() < end:
+        wait(1 / 30)
+        seen.add(js(b, f"{S}.player.anims.currentFrame.index"))
+    st = b.state()
+    ok &= check(js(b, f"{anim}") == "her-swim" and len(seen) == 16 and st["y"] == surface + 21 and 80 < st["x"] - x0 < 110,
+                "her stroke: all sixteen frames of it, the waterline at her shoulders, 70 px a second", (len(seen), st, x0))
+    ok &= check(js(b, f"{S}.swimG.visible && {S}.swimG.depth > {S}.DEPTH.poolWater"), "rings in the surface where she breaks it")
+    b.key("right", False)
+    x1 = b.state()["x"]
+    ok &= check(wait_js(b, f"{S}.swimUp >= 1 && {anim} === 'her-swim-tread'", 3), "at rest she comes upright and bobs there", js(b, f"[{S}.swimUp, {anim}]"))
+    st = b.state()
+    ok &= check(st["y"] == bottom and st["x"] == x1, "kneeling on the pool's floor, where she stopped", (st, bottom, x1))
+    b.shot("region6-swim-up")
+    wait(3)
+    ok &= check(js(b, f"{anim}") == "her-swim-tread" and b.state()["y"] == bottom, "and stays so for as long as she rests")
+    b.key("left", True)
+    ok &= check(wait_js(b, f"{S}.swimUp === 0 && {anim} === 'her-swim'", 1), "a way pressed: back down into her stroke", js(b, f"[{S}.swimUp, {anim}]"))
+    wait(0.5)
+    st = b.state()
+    ok &= check(st["x"] < x1 - 20 and st["y"] == surface + 21 and js(b, f"{S}.player.flipX"), "and she swims the other way", st)
+    b.key("left", False)
+    ok &= check(wait_js(b, f"{S}.swimUp >= 1", 3), "at rest again: upright")
+    b.tap("space")
+    ok &= check(wait_js(b, f"{S}.mode === 'play'", 1) and js(b, f"{S}.swimUp") == 0, "a jump takes her out of the water from upright too", b.state())
+    ok &= check(wait_js(b, f"{S}.mode === 'swim'", 2) and js(b, f"{anim}") == "her-swim" and js(b, f"{S}.swimUp") == 0,
+                "and back in it she is in her stroke", (b.state(), js(b, f"{anim}")))
     return ok
 
 

@@ -222,3 +222,57 @@ dry tank on the floor's strip by the hatch, her going down it. `python tools/pla
 highlight region7` pass; `region6` checks besides: both pieces under 0.4 of themselves through the water and whole
 once the last of it is gone; deck 10's laundry line not shown from deck 11; her picture 3 px lower in the dry tank
 and where it always is on deck 10's carpet. `python tools/check_overlaps.py`: 0 overlaps.
+
+## 8. From the water, watched; her swimming enriched (2026-11-25)
+
+Not by the remake plan (the user: "I want to update a few things in near catch 5, no need to apply our remake plan"):
+
+> 1. I want her swimming animation enriched.
+> 2. When Bumbot and the bubble bath behind him are visible, I want the sequence to start:
+>    a) She stops, peeks out of the water, cries
+>    b) The kid and Bumbot start their scene
+>    c) She watches it until Bumbot escapes, then the controls are returned
+
+Built, shown as recordings from the game, and approved by the user in play ("Approved").
+
+**What was found first.** Her stroke (seven frames) moved one arm; her legs never kicked; at rest it was the same
+stroke slowed. The scene started 112 px short of the rim, where the picture's right edge cut the hot tub 17 px short
+of its aft side, and then swam her on to the rim.
+
+**Decisions.**
+
+30. **The stroke made again:** sixteen frames from her old stroke's first frame on a green ground, pinned to end
+    where it starts: the arms pull in, the knees draw up, the kick, the glide. 14 frames a second at 70 px/s. Her head
+    goes back 9 px in the tuck and forward in the kick, so the stroke surges by its own frames; her speed is steady.
+31. **At rest she comes upright:** the stroke runs out to its glide and holds there; 0.45 s on she comes up in 0.52 s
+    through the rise's frames (`swimUp` from 0 to 1) and bobs, kneeling on the pool's floor, her head out. The pool is
+    28 px deep and she is 59 tall: standing she would be out to her hips, and kneeling her knees are on the floor and
+    the waterline is at her neck (her picture 7 px lower than in her stroke, `swimY`). A way pressed: back down the
+    same frames in 0.3 s, at less than her stroke's speed until she is down. From the frames where her knees are drawn
+    up she comes up from there (the rise's third frame is nearly that pose); from the others the stroke finishes
+    first, faster. In every pool. It is what hands her back to the player after the scene with no jump.
+32. **Rings in the surface** where she breaks it (two going out, 1.3 s each), and a short trail behind her while she
+    moves: drawn by rule on the water's top row.
+33. **The stroke's splash on the kick's frame** (`HER_SOUNDS`), not every 44 px swum; a small splash as she comes up.
+34. **Where it starts:** when his sprite and the tub's aft side, 12 px inside the picture's edge, are both in the
+    camera's view (`poolWatch`, `POOL.seen`): she is at 6687, 81 px short of the rim.
+35. **She stops, peeks out, cries:** her rise; then her call, one hand by her mouth, her face seen (`swim-cry`: two
+    tries with both hands cupped hid her face behind hands as big as it); «Кісюнічка!!!» 220 ms into it. He fishes on
+    until then and sits up 180 ms after the cry begins.
+36. **He comes down in front of her,** 42 px ahead, clear of her arms, and paddles back to the rim from there. With
+    her under him at the rim he went over her head and in behind her; from 81 px that would be a 126 px flight.
+    Offered back to the user; not asked for.
+37. **She watches and is not moved:** her bob until he is gone; 6.75 s from her stop to the controls; hers again
+    upright, until a key.
+38. **From the deck beside him nothing is changed:** her dive, the reach up at the rim, he over her head.
+
+**Art:** `assets/source/her/swim-rich/` (its README has the jobs): 12 generations.
+
+**Checked.** The built sheet against the one before: every other clip of hers the same pixels; each new clip's first
+frame the frame it follows, to the pixel. The scene and the swim recorded from the game with real keys, 50 ms a frame,
+and looked at enlarged: her rise, her call under its popup, his plunge clear of her arm, the end as she is hers, the
+first stroke away with the water already sinking. `python tools/playtest.py boot region6 pool golden region9 highlight
+sound` pass (`region6` checks the start with both in the picture, her upright on the floor, the call, him sitting up,
+her bob, him down in front of her, her hers where she stopped; `region6.swim` is new: all sixteen frames, the rings,
+upright at rest and staying so, down again on a key, out by a jump from upright); the whole suite was not run.
+`mishaps.things` fails on deck 9's sprinkler as it does on `main`. Not judged by me: the pace, and the sounds.

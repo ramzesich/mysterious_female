@@ -2850,7 +2850,8 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(p);
         this.player = p;
         // Her own clips' sounds on their frames (frame from 0): her lick of the cone at his table (part 5).
-        const HER_SOUNDS = { 'her-lick-cone': [[3, 'lick']] };
+        // (And her stroke's splash, on the frame her kick begins.)
+        const HER_SOUNDS = { 'her-lick-cone': [[3, 'lick']], 'her-swim': [[SWIM.strokeAt, 'stroke']] };
         p.on('animationupdate', (anim, frame) => {
             const at = HER_SOUNDS[anim.key]?.find(([i]) => i === frame.index - 1);
             if (at) sfx[at[1]]();
@@ -3715,11 +3716,92 @@ export class ShipScene extends Phaser.Scene {
         this.pool = pool;
         p.body.setVelocity(0, 0);
         p.body.enable = false;
+        this.swimUp = 0;
+        this.swimRest = 0;
         p.y = pool.y + SWIM.float;
         p.setDepth(DEPTH.swimmer);
         sfx.splash();
         this.splash(p.x, pool.y);
         this.pose('swim');
+    }
+
+    // Her height in the water: lying in her stroke the waterline is at her shoulders; upright she kneels on the pool's
+    // floor, her head out (never lower than its floor as the water goes down the drain).
+    swimY() {
+        const pool = this.pool, lying = pool.y + SWIM.float, k = this.swimUp ?? 0;
+        return Math.min(pool.bottom, lying + (pool.bottom - lying) * k * k * (3 - 2 * k));
+    }
+
+    // Her picture in the water, the one place it is set (the user, 2026-11-25: "I want her swimming animation
+    // enriched"): her stroke while she moves; at rest the stroke runs out to its glide and holds there, and when she
+    // is to come up (`wantUp`: she has rested `SWIM.restMs`, or a scene says so) she comes upright, `swimUp` from 0 to
+    // 1 through her rise's frames, and bobs there; moving again, back down through the same frames. A scene's own
+    // clip of her upright (her call) is left to play.
+    swimShow(dt, wantUp, moving) {
+        const p = this.player, A = p.anims;
+        if (this.holding || this.towel || !this.anims.exists('her-swim-peek')) {
+            this.swimUp = 0;
+            this.pose('swim', moving ? 1 : 0.4);
+            p.y = this.swimY();
+            return;
+        }
+        let up = this.swimUp ?? 0;
+        const key = A.currentAnim?.key;
+        if (up <= 0) {
+            if (key !== 'her-swim') this.pose('swim');
+            const i = (A.currentFrame?.index ?? 1) - 1;
+            A.timeScale = moving ? 1 : i === 0 ? 0 : wantUp ? SWIM.settle : 1;
+            if (wantUp && !moving) {
+                if (i === 0) up = 0.001;
+                else if (SWIM.tucked.includes(i)) up = SWIM.tuckedAt;
+                if (up > 0) sfx.splashSmall();
+            }
+        } else {
+            up = Phaser.Math.Clamp(up + dt * 1000 * (wantUp && !moving ? 1 / SWIM.riseMs : -1 / SWIM.diveMs), 0, 1);
+        }
+        if (up >= 1) {
+            if (key !== 'her-swim-tread' && !(key === 'her-swim-cry' && A.isPlaying)) {
+                A.play('her-swim-tread');
+                A.timeScale = 1;
+            }
+        } else if (up > 0) {
+            const frames = this.anims.get('her-swim-peek').frames, n = Math.round(up * (frames.length - 1));
+            if (key !== 'her-swim-peek' || A.currentFrame !== frames[n]) {
+                A.play('her-swim-peek');
+                A.pause(frames[n]);
+            }
+        } else if (this.swimUp > 0) {
+            // (Back in her stroke, from its first frame.)
+            A.play('her-swim');
+            A.timeScale = moving ? 1 : 0;
+        }
+        this.swimUp = up;
+        p.y = this.swimY();
+        this.swimRings(moving);
+    }
+
+    // The water she disturbs: rings going out along the surface from where she breaks it (her shoulders in her
+    // stroke, her neck upright), and the water she leaves behind her while she moves.
+    swimRings(moving) {
+        const p = this.player, pool = this.pool;
+        if (!this.swimG) {
+            this.swimG = this.add.graphics().setDepth(DEPTH.poolWater + 0.02);
+            this.worldLayer.add(this.swimG);
+        }
+        const g = this.swimG.clear();
+        if (!pool || pool.bottom - pool.y < 16) return;
+        const t = this.time.now, y = Math.round(pool.y), f = p.flipX ? -1 : 1, up = this.swimUp ?? 0;
+        const cx = p.x + f * 14 * (1 - up), half = 9 - 4 * up;
+        for (let i = 0; i < 2; i++) {
+            const k = (t / SWIM.ringMs + i * 0.5) % 1, r = half + 2 + k * 12, w = 3 + Math.round(k * 3);
+            g.fillStyle(0xffffff, 0.85 * (1 - k)).fillRect(Math.round(cx - r - w), y, w, 1).fillRect(Math.round(cx + r), y, w, 1);
+        }
+        if (moving) {
+            for (let i = 0; i < 3; i++) {
+                const k = (t / 420 + i / 3) % 1;
+                g.fillStyle(0xc7e7ff, 0.8 * (1 - k)).fillRect(Math.round(cx - f * (half + 8 + k * 26)) - 2, y + (i % 2), 4, 1);
+            }
+        }
     }
 
     // ←/→ swims along the pool; jump climbs out, onto the deck at its edge or back in the water.
@@ -3728,10 +3810,14 @@ export class ShipScene extends Phaser.Scene {
         const pool = this.pool;
         const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
         if (dir) p.setFlipX(dir < 0);
-        p.x = Phaser.Math.Clamp(p.x + dir * SWIM.speed * dt, pool.x0 + SWIM.margin, pool.x1 - SWIM.margin);
-        this.pose('swim', dir ? 1 : 0.4);
+        // (Coming down from upright she is not yet at her stroke's speed.)
+        p.x = Phaser.Math.Clamp(p.x + dir * SWIM.speed * (1 - (this.swimUp ?? 0)) * dt, pool.x0 + SWIM.margin, pool.x1 - SWIM.margin);
+        this.swimRest = dir ? 0 : (this.swimRest ?? 0) + dt * 1000;
+        this.swimShow(dt, !dir && this.swimRest >= SWIM.restMs, !!dir);
         if (input.jumpPressed) {
             this.mode = 'play';
+            this.swimUp = 0;
+            this.swimG?.clear();
             this.pool = null;
             p.setDepth(DEPTH.player);
             p.y = pool.y - 2;

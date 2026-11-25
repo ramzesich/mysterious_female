@@ -281,13 +281,24 @@ export const POOL = {
     drainMs: 5000, wetMs: 7000, puddleMs: 12000, puddlesFrom: 0.93, floor: 5, under: 0.3, floorTile: 0x8fd3ff,
     hatch: { beside: 30, downMs: 950, down: 76, through: 280 },
     ceiling: 129, out: 20,
+    // (Near-catch 5 from the water, the user, 2026-11-25: it starts when Bumbot and the hot tub behind him are in the
+    // picture, the tub's aft side `seen` px inside it; hit by the jet he comes down in the water `plunge` px in front
+    // of her; her call starts `callAt` ms into her clip of it and he sits up from his fishing; `callMs` to the kid.)
+    seen: 12, plunge: 42, callAt: 220, callMs: 900,
 };
 
+// (Enriched 2026-11-25, the user: a full stroke of sixteen frames, `fps` of them a second, its splash on frame
+// `strokeAt`. At rest she lets the stroke run out to its glide (`settle` times as fast once she is to come up; from the
+// frames where her knees are drawn up, `tucked`, she comes up from there, at `tuckedAt` of the rise) and, `restMs` on,
+// comes upright in `riseMs`, kneeling on the pool's floor with her head out of the water; a way pressed, she is back
+// in her stroke in `diveMs`. The rings she makes in the surface: one every `ringMs`.)
 export const SWIM = {
     speed: 70,
     entry: 6,
     float: 21,          // the waterline at her shoulders, head above it
     margin: 18,
+    fps: 14, strokeAt: 10, settle: 1.8, tucked: [5, 6, 7, 8, 9], tuckedAt: 3 / 8,
+    restMs: 450, riseMs: 520, diveMs: 300, ringMs: 1300,
 };
 
 // The verbs of §6.1.2 (src/world/verbs.js). Crawling: her speed and her height on all fours. The

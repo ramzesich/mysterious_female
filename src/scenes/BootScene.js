@@ -1,4 +1,4 @@
-import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG, QUIET, STAGE } from '../config.js';
+import { PLAYER, BUMBOT, THROW, GAG_CELL, BOOKS, DESK_THINGS, BED_THINGS, SHRUG, QUIET, STAGE, SWIM } from '../config.js';
 import { makeTextures } from '../textures.js';
 
 export class BootScene extends Phaser.Scene {
@@ -323,7 +323,13 @@ export class BootScene extends Phaser.Scene {
         // game steps through its frames itself, in time with her hops.
         this.anims.create({ key: 'her-bed-joy', frames: frames('bed-joy'), frameRate: 9, repeat: -1 });
         // Breaststroke in a pool.
-        this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: 8, repeat: -1 });
+        this.anims.create({ key: 'her-swim', frames: frames('swim'), frameRate: SWIM.fps, repeat: -1 });
+        // (At rest in the water: up onto her knees on the pool's floor, her head out; her bob there; her call.)
+        if (meta.anims['swim-peek']) {
+            this.anims.create({ key: 'her-swim-peek', frames: frames('swim-peek'), frameRate: 12 });
+            this.anims.create({ key: 'her-swim-tread', frames: frames('swim-tread'), frameRate: 6, repeat: -1 });
+            this.anims.create({ key: 'her-swim-cry', frames: frames('swim-cry').slice(0, 8), frameRate: 9 });
+        }
         // (At the pool's rim under Bumbot: her head up and an arm up out of the water after him, then held, straining.)
         if (meta.anims['swim-reach']) {
             this.anims.create({ key: 'her-swim-reach', frames: frames('swim-reach').slice(0, 5), frameRate: 9 });

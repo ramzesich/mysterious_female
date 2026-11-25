@@ -46,6 +46,15 @@ BY_HAND = {"her": {("cling-up", k): (48.8, 46.9, 37) for k in (5, 6, 7, 8)}}
 # frames' top, not her head.)
 BY_HAND["her"].update({("swim-reach", 0): (61.6, 59.9, 51), ("swim-reach", 1): (60.6, 57.9, 49), ("swim-reach", 2): (58.6, 56.0, 47),
                        **{("swim-reach", k): (57.5, 54.5, 46) for k in range(3, 9)}})
+# (Her richer swimming, 2026-11-25: the stroke, her rise to upright in the water, her bob there and her call. By her
+# face's own pixels: the middle of her skin in the figure's top 13 rows, moved by what puts her stroke's first frame
+# at its estimate. The stroke's old estimates, kept by frame number, are of the old seven frames.)
+BY_HAND["her"].update({
+    **{("swim", k): h for k, h in enumerate([(61.6, 59.9, 51), (62.0, 59.8, 51), (60.3, 59.1, 50), (59.1, 58.1, 49), (57.2, 57.1, 48), (54.7, 56.2, 47), (53.6, 55.2, 46), (52.7, 54.2, 45), (52.1, 54.2, 45), (55.2, 54.4, 45), (56.3, 55.1, 46), (57.3, 56.5, 47), (59.3, 58.1, 49), (60.5, 59.0, 50), (61.6, 59.7, 51), (61.6, 59.9, 51)])},
+    **{("swim-peek", k): h for k, h in enumerate([(61.6, 59.9, 51), (59.8, 57.7, 49), (57.8, 56.0, 47), (52.0, 50.2, 42), (44.5, 45.2, 37), (39.8, 44.0, 37), (38.4, 43.9, 37), (38.4, 43.9, 37), (38.4, 43.9, 37)])},
+    **{("swim-tread", k): h for k, h in enumerate([(38.4, 43.9, 37), (39.4, 43.9, 37), (40.4, 43.9, 37), (41.4, 43.9, 37), (42.4, 43.9, 37), (41.4, 43.9, 37), (40.4, 43.9, 37), (39.4, 43.9, 37)])},
+    **{("swim-cry", k): h for k, h in enumerate([(38.4, 43.9, 37), (39.4, 43.2, 36), (50.8, 43.9, 37), (50.8, 44.2, 37), (50.8, 44.4, 37), (50.9, 44.5, 37), (50.9, 44.5, 37), (50.7, 44.5, 37), (38.4, 43.9, 37)])},
+})
 # The people estimated: those with a wish (a popup over them) whose top rows are not their head.
 PEOPLE_ESTIMATED = {"steward"}
 # Her upright frames (standing to her full height, 54 px or more: standing, running, in the air) by

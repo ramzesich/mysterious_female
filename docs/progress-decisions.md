@@ -5007,3 +5007,12 @@ tooltip has to show (after the Bumbot's escape) only when we jump on top of the 
 are one generated clip in two layers (`tools/build_linen_pillows.py`); the scene is `src/world/linen.js`, one clock;
 `tools/build_shaft.py` fills the mouth's holes and lowers the fallen cover, and cuts the mouth against the room's
 corner as it was when its pictures were made. About 80 generations.
+
+## Near-catch 5 from the water, her swimming enriched (2026-11-25, the Design session)
+
+The user's two asks, not by the remake plan ("no need to apply our remake plan"); approved in play. The record is
+`docs/pool-remake-log.md` §8 (decisions 30 to 38). Her stroke made again (sixteen frames with a kick), upright at rest
+on the pool's floor with her head out, rings in the surface, the stroke's splash on its frame; from the water the scene
+starts when Bumbot and the hot tub behind him are both in the picture, she stops, comes up, calls and watches, he
+plunging in front of her, and she is never moved. `swimShow`, `swimY`, `swimRings` in the ship scene; `poolWatch`,
+`poolBeat` in `src/world/lido.js`; `SWIM`, `POOL` in the config. 12 generations.

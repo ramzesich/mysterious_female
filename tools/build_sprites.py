@@ -71,7 +71,18 @@ HER = {
         # skeleton-v3 custom poses. Each frame keeps its place on the canvas: lining them up by their
         # lowest pixel made her jump as her legs kicked. Frame 7, a tilted odd one, is left out. (A
         # front crawl was made first and is kept in swim-crawl/.)
-        "swim": [(f"swim-breaststroke/{i}.png", "keep") for i in range(7)],
+        # (Enriched 2026-11-25, the user: "I want her swimming animation enriched": that first stroke moved one arm and
+        # her legs never kicked; it is kept in swim-breaststroke/. Now a full stroke of sixteen frames, her arms pulling in,
+        # her knees drawn up, the kick and the glide: PixMiniMax from that stroke's first frame on a green ground, pinned
+        # to end where it starts, she cut out by colour (assets/source/her/swim-rich/cut.py, its README has the jobs).
+        # Set by the row the old frames were set by (65), so its first frame is the old first frame to the pixel.)
+        "swim": [(f"swim-rich/swim-stroke/{i}.png", 65) for i in range(16)],
+        # At rest in the water she comes upright, kneeling on the pool's floor with her head out of the water (the same
+        # start; near-catch 5: "She stops, peeks out of the water, cries"): the rise (played backwards she goes back to
+        # her stroke), a small bob with her arms sculling for as long as she rests, and her call with a hand by her mouth.
+        "swim-peek": [(f"swim-rich/swim-peek/{i}.png", 65) for i in range(9)],
+        "swim-tread": [(f"swim-rich/swim-tread/{i}.png", 65) for i in range(8)],
+        "swim-cry": [(f"swim-rich/swim-cry/{i}.png", 65) for i in range(9)],
         # At the pool's rim under Bumbot (near-catch 5; the user, 2026-11-24: "she has to look up from the water and try
         # and reach him, while in the swimming pose. That has to be generated"): PixMiniMax from her swim's first frame
         # on a green ground, she cut out by colour (assets/source/her/swim-reach/cut.py); its first frame is her
@@ -451,7 +462,7 @@ def grey_top(im, rows):
 
 # Her clips with water on her (the user, 2026-11-23: "when she's wet, a lot of water pixels were turned to grey"): the
 # water's own blue kept (`water_blue`), told from the blouse's pale blue by its tint.
-WET = {"swim", "swim-reach", "shower", "shiver", "splutter"}
+WET = {"swim", "swim-reach", "swim-peek", "swim-tread", "swim-cry", "shower", "shiver", "splutter"}
 
 
 def build(spec):
