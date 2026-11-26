@@ -448,14 +448,25 @@ PEOPLE = {
     "amb_host": dict(at=(5, 205.3), who="maitre", face=-1, idle="idle", layer="back"),
     "amb_chef_7s": dict(at=("galley", 182), who="chef", face=-1, idle="idle"),
     # Diners (drawn seated, each on a chair of their own, in a dining chair's place at a table).
-    "amb_cucina_her": dict(at=(5, 159.8 - 0.17), who="diner_teal", face=1, layer="back"),
-    "amb_cucina_him": dict(at=(5, 164.1 + 0.17), who="diner_linen", face=-1, layer="back"),
-    "amb_7s_her": dict(at=(5, 213.0 - 0.17), who="diner_red", face=1, layer="back"),
-    "amb_7s_him": dict(at=(5, 221.8 + 0.17), who="diner_suit", face=-1, layer="back"),
+    # (The diners on the restaurants' own chairs, 2026-11-26, sat as her husband sits at his table: the back 1 px in front
+    # of the backrest's inner edge, the thighs on the seat, the knees under the table; on the Seven Seas' chairs redrawn
+    # side-on (each chair's place: `around()` in
+    # tools/build_ship_map.py, a px is 1/48 m). They had chairs of their own drawn over the room's, the user, 2026-11-26.)
+    "amb_cucina_her": dict(at=(5, 159.8 - 16 / 48), who="cucina_lilac", face=1, layer="back",
+                           cover=[("cucina-table", 159.8, 0)]),
+    "amb_cucina_him": dict(at=(5, 164.1 + 16 / 48), who="cucina_mustard", face=-1, layer="back",
+                           cover=[("cucina-table", 164.1, 0)]),
+    "amb_7s_her": dict(at=(5, 213.0 - 16 / 48), who="seas_navy", face=1, layer="back",
+                       cover=[("seas-table-dinner-w20", 213.0, 0)]),
+    "amb_7s_him": dict(at=(5, 221.8 + 17 / 48), who="seas_white", face=-1, layer="back",
+                      cover=[("seas-table-dinner-w20", 221.8, 0)]),
     # Region 2, deck 6: the cabins, the Internet Cafe, the atrium walk, Bliss, the shops, the Windjammer.
     # (Twice her bed-making, then she stretches her back, in a loop: `cycle`, the user, 2026-11-20.)
     "amb_maid": dict(at=("maid6", 150), who="maid", face=1, idle="make", cycle=[("make", 2), ("stretch", 1)]),
-    "amb_surfer": dict(hear="shh", at=(6, 67.45), who="surfer", face=1, layer="back"),
+    # (On the café's office chair at its middle terminal, an ergonomic one side-on, its armrest drawn again over her;
+    # 4 px up and 2 back, the user's, her feet on a footrest, the desk's legs drawn again over them. The Seven Seas' two have their table drawn again in front of them, `cover`, as her husband his chair's arm.)
+    "amb_surfer": dict(hear="shh", at=(6, 67.6 + 8 / 48), who="surfer_braids", face=1, layer="back", dy=4,
+                       cover=[("office-chair-arm-w20", 67.6 + 2 / 48, 19), ("cafe-desk-under-w20", 68.15, 0)]),
     "amb_couple_6_her": dict(at=(6, 84.3), who="atriumwoman", pose="front", layer="back"),
     "amb_couple_6_him": dict(at=(6, 85.2), who="railman", pose="front", layer="back"),
     "amb_dj": dict(at=(6, 121.3), who="dj", face=-1, idle="bob", layer="behind"),
@@ -560,8 +571,11 @@ PEOPLE = {
     # boat walkway (a glimpse: the story takes him away); the boat drill's two.
     "npc_balcony_guest": dict(at=("b10", 236.2), who="balcony_guest", face=-1, idle="idle", until="flag:guest",
                               bubble=("door", None, "flag:guest", 5)),
-    "npc_guest_in": dict(at=("guest10", 196), who="balcony_guest", face=-1, idle="idle", after="flag:guest"),
-    "riv_walkway": dict(at=("walkway", 207.6), who="rival", face=1, idle="peek", after="region:7", until="flag:riv_walkway"),
+    # (In, 16 px aft of where he stood: the wall lamp sat on his head, the user, 2026-11-26.)
+    "npc_guest_in": dict(at=("guest10", 212), who="balcony_guest", face=-1, idle="idle", after="flag:guest"),
+    # (In the gap between two tenders, turned to the stern of the one he looks into: at 207.6 m he stood half behind its
+    # hull, the user, 2026-11-26.)
+    "riv_walkway": dict(at=("walkway", 208.35), who="rival", face=-1, idle="peek", after="region:7", until="flag:riv_walkway"),
     # (The winch's crewman is the drill's own since 2026-11-21: one picture of him and his winch, `DRILL["winch"]`.)
     "amb_drill_officer": dict(at=("walkway", 192.6), who="drill_officer", face=-1, idle="idle", layer="back"),
     # Region 8 (deck 12 from Champs aft, the funnel). Champs' three at the TVs; the old lady on her
@@ -588,13 +602,14 @@ PEOPLE = {
                               until="flag:horn", bubble=("horn", None, "flag:horn", 5)),
     "npc_engineer_read": dict(at=("funnel", 188.0), who="engineer", face=-1, idle="reading", after="flag:horn", until="flag:catch&!flag:home",
                               bubble=("book", "!flag:book9", None, 4)),
-    "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_her", face=1, layer="back"),
-    "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_him", face=-1, layer="back"),
+    "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_pearl", face=1, layer="back"),
+    "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_tweed", face=-1, layer="back"),
     # (His cloud shows a tangerine once she is near, until he has one: the tin of sardines is his for it, 7.)
     "amb_sushi_chef": dict(at=(12, 178.0), who="sushi_chef", face=-1, idle="slice", layer="behind",
                            bubble=("tangerine", None, "flag:sushi", 3)),
-    "amb_sushi_a": dict(at=(12, 176.71), who="sushi_a", face=1, layer="back"),
-    "amb_sushi_b": dict(at=(12, 179.29), who="sushi_b", face=-1, layer="back"),
+    # (On the bar's stools, redrawn side-on and moved in to the counter, 2026-11-26: tools/build_ship_map.py.)
+    "amb_sushi_a": dict(at=(12, 178.0 - 34 / 48), who="sushi_teal", face=1, layer="back", dy=1),
+    "amb_sushi_b": dict(at=(12, 178.0 + 37 / 48), who="sushi_green", face=-1, layer="back"),
     "amb_teppan_chef_a": dict(at=(12, 185.4), who="teppan_chef_a", face=1, idle="idle", layer="behind"),
     "amb_teppan_chef_b": dict(at=(12, 190.4), who="teppan_chef_b", face=-1, idle="idle", layer="behind"),
     "amb_teppan_1": dict(at=(12, 184.88 - 0.17), who="teppan_1", face=1, layer="back"),
@@ -615,8 +630,9 @@ PEOPLE = {
     # up on Bumbot from the forward end, and sat on its floor after.
     "npc_planner": dict(at=(12, 83.25), who="planner", face=1, idle="idle", until="flag:wedding",
                         bubble=("cake", None, "flag:wedding", 4.5)),
-    "amb_wed_groom": dict(at=(12, 80.4), who="wed_groom", face=1, idle="fuss", until="flag:wedding"),
-    "amb_wed_bride": dict(at=(12, 81.2), who="wed_bride", face=-1, idle="idle", until="flag:wedding"),
+    # (The couple clear of the stairway's door, 79.6 to 80.4 m: the groom stood in it, the user, 2026-11-26.)
+    "amb_wed_groom": dict(at=(12, 80.65), who="wed_groom", face=1, idle="fuss", until="flag:wedding"),
+    "amb_wed_bride": dict(at=(12, 81.35), who="wed_bride", face=-1, idle="idle", until="flag:wedding"),
     "amb_wed_a": dict(at=(12, 79.1), who="wed_guest_a", face=-1, idle="sip", until="flag:wedding"),
     "amb_wed_b": dict(at=(12, 78.3), who="wed_guest_b", face=1, until="flag:wedding"),
     "amb_wed_c": dict(at=(12, 77.2), who="wed_guest_c", face=-1, until="flag:wedding"),
@@ -640,8 +656,8 @@ PEOPLE = {
     "amb_masseur": dict(at=(11, 45.45), who="masseur", face=1, idle="mf-knead", layer="behind"),
     "amb_massage_guest": dict(at=(11, 45.45), who="massage_guest", face=1, layer="back"),
     "amb_stylist": dict(at=(11, 59.2), who="stylist", face=1, idle="work", layer="back"),
-    "amb_stepper_a": dict(at=(11, 67.7), who="stepper_a", face=1, idle="steps", layer="back"),
-    "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="steps", layer="back"),
+    "amb_stepper_a": dict(at=(11, 67.7), who="stepper_a", face=1, idle="board", layer="back"),
+    "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="board", layer="back"),
     "amb_officer_10": dict(at=(10, 60), who="officer_10", face=1, walk=(50, 70, 1.0), end_ms=1500, layer="back"),
     "amb_officer_9": dict(at=(9, 55), who="officer_9", face=-1, walk=(40, 70, 1.0), end_ms=1500, layer="back"),
     "amb_counsellor": dict(at=(7, 30.15), who="counsellor", face=-1, idle="cheer", layer="back"),
@@ -1005,7 +1021,7 @@ FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
              "gull_go": (11, 210.6, 219.2, 1, (210.9, 46), None)}
 # The buffet queue (`haz_queue`): id: (deck, from m, to m, m/s, who). They shuffle toward the
 # counter (forward) in threes, solid bodies that shove her back; for crew with a tray they turn aside.
-QUEUES = {"haz_queue": (11, 162.5, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
+QUEUES = {"haz_queue": (11, 168.4, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
 # Room-service trays left on a hallway's floor (`haz_trays`): id: (deck, from m, to m, the "Do Not
 # Disturb" door their clatter opens, the flag set by the first clatter). Under two metres: a jump clears them.
 TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),
@@ -1169,14 +1185,13 @@ FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 
 # The sauna's steam (`haz_steam`; the user, 2026-11-22: no longer out of its aft door): up from the stove's coals (`stove`,
 # m) inside the sauna (its walls at `walls`), every `every` s for `on` s after a tell of `tell` s, a column `half` m either
 # side of the stove's middle, spreading under the ceiling; a timing obstacle to pass, as the sprinkler.
-# The step class's boards (m, in front of each stepper). The ball pit (`haz_ballpit`: from, to).
+# The ball pit (`haz_ballpit`: from, to).
 # The bridge's beat (`bb_6`, remade 2026-11-25: src/world/bridge.js): the console, the alarm station hard against its
 # aft end, the helm (m; the map builder places the console and the helm by the same numbers); the bridge's ends.
 BOW = dict(
     wedding=dict(deck=12, planner=83.25, chapel=68.6, look=76.6),
     piano=(12, 53.02), slide=dict(deck=12), captain=(9, 30), nook=dict(deck=6, m=189.4, up=44),
     steam=dict(deck=11, stove=51.7, walls=(47.9, 52.9), half=0.3, every=4.6, on=1.6, tell=0.8),
-    steps=[(11, 68.2), (11, 69.8)],
     pit=dict(deck=7, a=49.3, b=53.7, tangerine="tan_7_ballpit"),
     bridge=dict(deck=10, console=30.216667, station=31.445833, helm=32.3, a=28.4, b=40.0),
 )

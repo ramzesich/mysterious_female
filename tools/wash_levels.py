@@ -21,6 +21,10 @@ PLACES = [
     (11, 202, 210, 12),     # the Sports Bar, its dark green wall
     (6, 110, 124, 0),       # Bliss, the dark lounge with the DJ: its props in their own colours (the user, 2026-11-26, of 20%, 12%
                             # and their own colours shown in place: "3")
+    (5, 150, 168, 0),       # La Cucina in its own colours (the user, 2026-11-26)
+    # Cagney's in its own colours (the user, 2026-11-26: "Make all background props in Cagney's their original color
+    # tone"), aft of the door at its forward end (164.8 to 165.2 m), which keeps the wash of the props forward of it.
+    (12, 165.3, 174, 0),
 ]
 # The balconies outside decks 8 to 10 (the outside route).
 BALCONIES = 20

@@ -49,10 +49,16 @@ BY_HAND = {"dog", "dogowner", "steward",
            "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny",
            # (Champs' second seated fan, an edit of the first's frame, 2026-11-21.)
            "champs_d",
+           # (The diners, the surfer and the sushi bar's two, new people with no chair of their own, 2026-11-26.)
+           "cucina_lilac", "cucina_mustard", "seas_navy", "seas_white", "surfer_braids", "cagneys_pearl", "cagneys_tweed",
+           "sushi_teal", "sushi_green",
            # (The massage scene's two, 2026-11-22: frames cleaned by hand, `masseur-raw/`, `massage_guest-raw/`.)
            "masseur", "massage_guest",
            # (Her husband, 2026-11-22: one face, one pair of legs, his far leg apart, `husband-raw/make.py`.)
-           "husband"}
+           "husband",
+           # (Deck 8 aft's door guest in her nightgown, 2026-11-25: the generator drew a breath's puff in front of
+           # her mouth in her idle; taken out, the frames' smaller pieces.)
+           "swing_sunhat"}
 
 
 def main():

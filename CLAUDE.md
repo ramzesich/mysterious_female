@@ -206,7 +206,10 @@ bounds in the running game; what is meant is listed in its `ALLOWED`, each with 
 in a close-up taken to check the stage manager, and was missed. Composing sprites offline with PIL at
 the game's offsets is exact and needs no browser. When one instance of a fault is found, look
 for the rest of its kind at once (one chibi figure meant twenty-four; one seated figure too big
-meant five).
+meant five). **And measure it, every one:** the twenty-four were found by eye, and nine more big heads
+were still in the game twelve days later (2026-11-25), six of them passed by that look, three placed
+after it unchecked. `python tools/check_people.py --heads` with every new or redrawn figure's name
+before its clips are made, and its head against the ruler, not a glance at the sheet.
 
 ## Art: PixelLab (MCP)
 
@@ -993,6 +996,24 @@ Lessons learned (2026-11-25, the balconies remade):
 - **PixMiniMax climbs well when the set gives it something to climb:** with a fin drawn deck over deck in the green
   set, "climbs straight up it hand over hand like a fire pole, seen from behind" came right first try, twice; "seen
   from behind ... across the front of the post" kept her in front of it where "swings round" had put her behind.
+
+Lessons learned (2026-11-26, every placed person checked):
+
+- **A seated person sits in the room's chair, as her husband sits at his table** (the user's reference): the chair
+  side-on, the back 1 to 2 px in front of its backrest's inner edge (measured from the chair's columns and the figure's, not by eye), the thighs
+  on the seat, and what is nearer us drawn again over them (`cover`: the table, an armrest, a desk's legs). A figure
+  generated with a chair of its own was drawn over the room's: two chairs at one place. A new person in the approved
+  one's pose with no chair is one `edit_image_pro_flash` ("a different person in exactly the same sitting pose ...
+  remove the chair", 5 generations), and keeps the approved one's proportions.
+- **Furniture drawn from the front or at three-quarters cannot be sat in from the side:** redraw it side-on from a flat
+  rough at the sitters' seat height. A piece shared by rooms gets a new name where only one room changes.
+- **Look at every person in place, not a wide shot:** a script that hides her, makes her untouchable
+  (`scareContact`), and shoots each in the game's full view found twelve placements a wide pass had missed. Forced
+  visible, people of states that never meet and faces of doors that open only in a gag show too: check their
+  conditions before calling an overlap.
+- **A scene can set itself off while a shot is taken:** the walkway's rival, 2.3 m from her, ran off behind a boat in
+  the picture. Stand her outside a person's trigger.
+- **The user's numbers follow the order of the last list shown**, not the labels on its pictures.
 
 ## Working with the user
 

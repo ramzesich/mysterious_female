@@ -5266,3 +5266,58 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   (`towelDepth`, 3.11, under the deck's door at 8) and muted (`colours`: a pale blue, a sand). Then, asked what a gust
   should do on the deck (it is no obstacle on foot): **"Keep as is"**: dressing, the hop's drift and the cake's wobble.
 - **Tests:** `region8`, `region9`, `boot` pass; `check_overlaps` 0. No generations.
+
+## Nine more people to her proportions (2026-11-25, the Refinement session)
+
+The user: "I remember we regenerated people that had large heads. Now I see some of those in the game again. Is that a
+new bug, or something we missed previously?"
+
+- **Not a regression:** the twenty-four redrawn on 2026-11-13 (`312fe103`) still have their redrawn characters and
+  standing pictures. Every one of the 140 people laid beside her (`tools/check_people.py`), the doubtful ones' heads
+  against the ruler (`--heads`).
+- **The user named nine:** the lost tourist, the Windjammer's barmaid, the model ship's guest, the casino's cowboy, the
+  spa guest behind deck 9's "Do Not Disturb" door, deck 8 aft's door guest (`swing_sunhat`), the two in the step class,
+  deck 10's officer. Six had been in the game at the first review and passed it; the steppers and the officer were
+  placed the next day without the check.
+- **Redrawn** in PixelLab's pro mode with the style characters that hold the proportions (the drill's officer for the
+  men, the cabin maid for the women), from their own descriptions, and every clip the game plays of them made again on
+  the new figure: the idles and the officer's walk on its own skeleton (skeleton-v3 with the template: the size kept),
+  the shriek and the steps by v3. **The user's two changes:** the model ship's guest an elderly gentleman with no cap,
+  in a polo shirt and chinos ("looks like a captain to me"); deck 8 aft's door guest an elderly lady woken in her
+  nightgown, round glasses, slippers ("looks out of place at all"). The old characters' ids are kept in
+  `tools/cast.py`.
+- **Checked frame by frame:** the door guest's idle came with a breath's puff in front of her mouth, taken out of its
+  four frames (each frame's smaller pieces); her frames are kept by hand now (`BY_HAND` in `tools/fetch_people.py`).
+  Nothing else loose; every head at its standing size in every frame. Shot in place in the game beside her; the
+  steppers stand beside their boards as the old ones did.
+- **Found and offered, not done:** six seated diners never redrawn read a little chibi (`docs/plan-the-rest.md` §9,
+  U14).
+- 108 generations (90 the figures, 18 the clips). boot, region1, region2, region3, region4, region6, region7, region9
+  pass; check_overlaps 0; the whole suite not run.
+
+## Every placed person checked, twelve placements tuned (2026-11-26, the Refinement session)
+
+The user: "do a visual check over every placed NPC in game. I want to detect NPC's that look out of place, that are
+visually overlapped with anything ... An example: an NPC is drawn with their own chair, but is placed on top of some
+other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from main 4045cef.
+
+- **The check:** all 163 placed people shot in place (her hidden and untouchable, every story state shown), every
+  suspect enlarged, each finding shown in the game's full view: twelve. Not faults: the theatre's seats, the kid passing
+  the rival by the pool, the door gags' faces, the chapel's crowd.
+- **The fixes (the user's rounds, seven):**
+  - La Cucina, the Seven Seas, Cagney's: the diners are new people with no chair of their own (edits of the approved
+    stills), seated by the husband's rule; La Cucina's tables and chairs and the Seven Seas' (and the Four Seasons')
+    redrawn side-on and bigger, La Cucina's tables in its chairs' walnut; the tables drawn again over the diners
+    (`cover`); La Cucina and Cagney's unwashed (`tools/wash_levels.py`, level 0); Cagney's booths 2 px into the floor
+    (`around(chair_dy=)`), the lady's dress navy (by a hue rule, the wine kept red).
+  - The step class: a clip of each stepping up onto the board and down (PixMiniMax, the board by rule in the frame);
+    the boards drawn in code are gone.
+  - The Garden Café: its tables at the forward end, the buffet along the queue's stretch (`QUEUES` 168.4 to 181.5 m).
+  - The wedding party clear of deck 12's stairway door; the trophy cabinet and beer fridge swapped behind the planner;
+    the walkway's rival in the gap between two tenders; the guest in his cabin 16 px aft of his wall lamp.
+  - The Internet Café: side-on desks 30% higher, ergonomic office chairs, the girl's armrest and the desk's legs over her,
+    a footrest under her feet. The Sushi Bar: side-on stools in at the counter, its two diners new (half of U14).
+  - The engineer by Cagney's wine cabinet is left to part 10 on `three-uses` (the cabinet is gone there).
+- 132 generations (the nine people 45, the furniture and footrest 80, the step clips 2, the board 5). check_overlaps
+  0; boot, region1, region2, region5, region6, region7, region8, region9, highlight pass; mishaps fails only on deck 9's
+  sprinkler, as on main. The whole suite not run.

@@ -17,6 +17,12 @@ mode="pro" with style_character_id** = a figure that has it (the drill's officer
 for women), size 64, view "side": ten generations each, a strict side view. Check a new figure
 with `python tools/check_people.py` before placing it. The first characters of those, kept on
 PixelLab: rival 68ef5f08, porter 3ad54560, lady 45a8f48c, stagemanager 0c00142e, steward f2cc7401, groom 0c16e385, queue_d 4ae6c188, sleeper 071b5059, curlers 2ad7be74, teppan_chef_b 0ed63716, champs_b 81fa22b4, photographer 89836c72, fan_a 91c28911, fan_b 23af878f, runner c63d9718, cleaner 47c5aa91, dj d1ef2972, fan_c 25aa68a6, receptionist b0851098, librarian 10f3bef9, queue_b ec3c837c, teppan_chef_a 9190cb8c, lobos_waiter 64db2435, champs_a 5f10becb.
+**A second round (the user, 2026-11-25): nine more** that the first review passed or that came after it
+(the tourist, the Windjammer's barmaid, the model ship's guest, the casino's cowboy, the spa guest behind the
+"Do Not Disturb" door, deck 8 aft's door guest, the two steppers, deck 10's officer), redrawn the same way. The
+model ship's guest lost his captain's cap and blazer ("looks like a captain to me"); deck 8 aft's door guest is
+an elderly lady woken up in her nightgown (she was a lady in a sun hat and a beach dress, "out of place"). Their
+first characters, kept on PixelLab: tourist 5d966249, barmaid a0121f2c, modelguest d15bae3f, cowboy 9aa4a55c, spaguest d816e0d8, swing_sunhat 657f90b7, stepper_a b360c69a, stepper_b 6be4ce88, officer_10 3c827584.
 
 A template clip (breathing-idle, walking) redraws the figure and can shrink it by half a head: for a
 figure that is seen both standing and in the clip, make it with mode="skeleton-v3" and the same
@@ -68,7 +74,7 @@ CAST = {
     # bags; v3 from his pushing frame, 2026-11-17.)
     "porter": ("00c30095-76c1-4898-a423-34f740532970", {"bite": 6, "tip": 8}, {}),
     "waiter": ("3423e6b8-f2d5-423f-86ee-b9c77809194c", {}, {}),
-    "tourist": ("5d966249-7a4c-42ab-9ba8-d1384fae259a", {}, {}),
+    "tourist": ("05cf58ce-22b8-4652-acbf-33d8882082c7", {}, {}),
     "robe": ("9d68ff5f-80b7-4187-86a9-7cd9eff01bed", {}, {}),
     "stewardess": ("29866bd3-ce11-4319-8e99-7d6de7ffaef8", {}, {}),
     "receptionist": ("8adf75c5-2558-4a05-aa70-b0f9749f1348", {}, {}),
@@ -80,12 +86,19 @@ CAST = {
     "maitre": ("8336eefc-5d4f-452c-b70d-d3ca545505c8", {}, {}),
     "chef": ("6ca50f05-0ef1-4094-af3c-9ec00846cd36", {}, {}),
     "folder": ("fe49270a-7cd3-4f5d-84ee-3e47316bc16f", {}, {}),
-    # Diners, drawn seated on their own dining chairs (they stand in a chair's place at a table),
-    # shrunk like every seated figure: PixelLab draws a seated one as tall as a standing one.
-    "diner_red": ("6dc96ff4-58fc-4a8d-b5c7-1bb111a772fc", {}, {"scale": 0.8}),
-    "diner_suit": ("126b575d-bac9-4369-a721-7aa957e0bb5f", {}, {"scale": 0.8}),
-    "diner_teal": ("f2700aec-2d7f-48b8-8025-4313be63f2ce", {}, {"scale": 0.8}),
-    "diner_linen": ("89dfbeac-8d4c-4a89-a578-8dbc95ba16fc", {}, {"scale": 0.8}),
+    # Diners, seated on the restaurants' own chairs, shrunk like every seated figure: PixelLab draws a seated one as
+    # tall as a standing one.
+    # (2026-11-26, the user: "Fix all of them ... add more variety to people": the diners sat in chairs of their own
+    # drawn over the restaurants' chairs. Each is now a new person in the approved one's pose with no chair
+    # (edit_image_pro_flash of the old still, "a different person in exactly the same sitting pose ... remove the
+    # chair"; the edit's image id stands for the character), sitting on the game's own chair. Kept by hand:
+    # fetch_people.py's `BY_HAND`. The old ones' characters, kept on PixelLab: diner_red 6dc96ff4, diner_suit 126b575d,
+    # diner_teal f2700aec, diner_linen 89dfbeac, surfer 33bd2921, cagneys_her c3fb03be, cagneys_him cbf3d679,
+    # sushi_a ab3f381b, sushi_b e0b56bbe.)
+    "cucina_lilac": ("f33e61b3-9bd2-590e-b6ff-9032baee82ad", {}, {"scale": 0.8}),
+    "cucina_mustard": ("9736d722-a4f7-5635-8bc5-759c3a83ad48", {}, {"scale": 0.8}),
+    "seas_navy": ("838401ac-f9b9-580a-9dc1-a6bbecd645c8", {}, {"scale": 0.8}),
+    "seas_white": ("7672e5cd-9721-5a0d-a32c-ff13cf817580", {}, {"scale": 0.8}),
     # Region 2.
     "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6, "flinch": 12}, {}),
     "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12, "sorry": 10, "scratch": 5},
@@ -94,19 +107,19 @@ CAST = {
                {"cut": {"scratch": ("sorry", [4, 5, 6, 5])}}),
     "fitter": ("e0de11f2-246a-40cc-b9e6-3f374eb03d66", {"work": 6}, {}),
     "dj": ("68e66eb2-4d14-48c8-9acc-37bb6d1001aa", {"bob": 9}, {}),
-    "barmaid": ("a0121f2c-c4ee-4b9f-a230-c20e513d118f", {}, {}),
+    "barmaid": ("ac7f59fe-d0ee-4962-86ae-89b4b025b051", {}, {}),
     "studio": ("c8b8807b-8583-4513-9db2-c3066f6d172e", {}, {}),
     # (Drawn leaning back on a rail of her own, a life ring behind her: for an open deck, where the
     # rail is behind the people. Not placed yet.)
     "railwoman": ("123c4f2e-bcb8-4651-a3b7-0c4910048c62", {}, {}),
-    # Seated on his own office chair, at one of the Internet Cafe's terminals. (A first one,
+    # On the Internet Cafe's own office chair at its middle terminal (the diners' note above). (A first surfer,
     # 2c479d41-d01d-46ea-90c3-36cb855461c8, came out a grey figure with a monitor in the air.)
-    "surfer": ("33bd2921-f3b1-4b59-b2ce-1f8892bd9eee", {}, {"scale": 0.8}),
+    "surfer_braids": ("cb667334-c2c7-58a5-b78f-3f60f37e3d51", {}, {"scale": 0.8}),
     "atriumwoman": ("7a2ebdab-d174-463f-8636-6f915cfe60e8", {}, {}),
     "railman": ("0c8faf8c-a4f6-4920-8785-658c177af315", {}, {}),
     # (`stretch` after her bed-making, in a loop: the user, 2026-11-20; as generated: `maid-raw/`.)
     "maid": ("4677d8f1-5586-41e1-b13e-53d9bdd49ffc", {"make": 6, "stretch": 8}, {}),
-    "modelguest": ("d15bae3f-7372-455a-82fc-f4ce9bab224e", {}, {}),
+    "modelguest": ("a921be9c-4988-4405-8daa-71727ff85fe2", {}, {}),
     # A couple reading the ports' plaques on deck 7, their backs to us.
     "plaquewoman": ("da2e0888-a560-4557-9f72-ad92e4f5e772", {}, {}),
     "plaqueman": ("e41a23e9-edd4-4784-8de8-33b29d2de61e", {}, {}),
@@ -124,7 +137,7 @@ CAST = {
     "dancer_her": ("9baa6f8b-6aa3-40a8-907d-4d3daf0c6313", {"dance": 9, "idle": 4, "startle": 12}, {}),
     "dancer_him": ("319870d1-ce90-41d9-b074-5c8039a85f04", {"dance": 9, "idle": 4, "startle": 12}, {}),
     "croupier": ("935328d2-d98f-44de-889a-bf04e9e86b6d", {}, {}),
-    "cowboy": ("9aa4a55c-aea0-46aa-80fb-8642f6d13c99", {}, {}),
+    "cowboy": ("a381231b-4fde-43e6-b9fd-f90f6a6b51f0", {}, {}),
     "barman": ("ac5b9c77-3083-4b2b-9615-e7a3a98dc860", {"idle": 4}, {}),
     "shopper": ("21e8d182-fdfa-41ac-ba94-f7f0ef3df251", {"idle": 4}, {}),
     "teen": ("f761c927-d14c-4e1a-b0a8-ed090f28ae99", {}, {}),
@@ -143,7 +156,7 @@ CAST = {
     "steward": ("88741662-8a90-437a-bca4-c996663761ff", {"idle": 4, "tug": 6, "tugwalk": 8, "walk": 9, "thanks": 8, "toss": 8}, {}),
     "bride": ("70b0bc20-aef9-46aa-bd9d-35f56c4c0008", {"idle": 4, "kiss": 7}, {}),
     "groom": ("146b63d6-6f03-4675-9b0a-5d79914315ba", {"idle": 4, "kiss": 7}, {}),
-    "spaguest": ("d816e0d8-b223-4288-9a66-257d4cc2466b", {"shriek": 10}, {}),
+    "spaguest": ("1f5e5ce8-8dc1-4a1a-8d25-12a80ecab7a1", {"shriek": 10}, {}),
     # The kid with the water pistol (the pool's, region 6): first seen at his cabin's door.
     "kid": ("59b5cce6-5f2e-45c3-8334-7b2f1eec96c4", {"idle": 4, "walk": 8, "squirt": 11, "eat": 7}, {"scale": 0.72, "repaint": "pistol"}),
     "bedmaker": ("76a0ee8f-2daf-428c-8a0f-c83445dfbd73", {"make": 4}, {}),     # (8 read frantic: the user, 2026-11-20)
@@ -195,7 +208,7 @@ CAST = {
     "dnd_boxers": ("d20a96a6-3001-461c-bf8c-b15a994e4480", {"shriek": 10}, {}),
     "dnd_toothbrush": ("6f8bcf6b-b35d-4157-a071-c10ce0985344", {"shriek": 10}, {}),
     "swing_hawaiian": ("528d7ec8-5ea6-4b74-955c-28036873ee2c", {"idle": 4}, {}),
-    "swing_sunhat": ("657f90b7-b6f6-4409-aaf9-2793bedcfd9f", {"idle": 4}, {}),
+    "swing_sunhat": ("6c095fb3-7011-47af-81b7-6264d43e6a12", {"idle": 4}, {}),
     "swing_ring": ("659ad453-9baa-4b17-9fd1-6e9fbbfad3f8", {"idle": 4}, {"scale": 0.8}),
     "swing_suit": ("c7651c6c-5c1d-46ed-9efa-74678b21a45b", {"idle": 4}, {}),
     "steward_rounds": ("a36e1cc2-cfb0-4200-abee-a448648fd052", {"push": 8}, {}),
@@ -227,10 +240,11 @@ CAST = {
     # (A second seated fan, an edit of champs_c's first frame, "a different person in exactly the same pose" on his
     # stool (edit_image_pro_flash 0d2de307-d910-5109-955a-c851f27158f2, try 2 of three; `champs_d/tries/`); a still.)
     "champs_d": ("0d2de307-d910-5109-955a-c851f27158f2", {}, {"scale": 0.8}),
-    "cagneys_her": ("c3fb03be-54f7-4b0e-aade-1d7134d3b66f", {}, {"scale": 0.8}),
-    "cagneys_him": ("cbf3d679-01a3-4ab8-9be2-b4c56be18426", {}, {"scale": 0.8}),
-    "sushi_a": ("ab3f381b-f5ba-4c2b-8568-a20a81ed36f3", {}, {"scale": 0.8}),
-    "sushi_b": ("e0b56bbe-4964-45bf-94ef-8c8d36c2fd2e", {}, {"scale": 0.8}),
+    # (Cagney's two in its booths and the Sushi Bar's two on its stools: the diners' note above.)
+    "cagneys_pearl": ("85d702a0-3d77-5c4d-9bc8-6e58706f41ac", {}, {"scale": 0.8}),
+    "cagneys_tweed": ("5608b643-1b11-585a-b2ad-08752db150f9", {}, {"scale": 0.8}),
+    "sushi_teal": ("b184b9dd-281a-59dc-87a2-ca5fa4ddc989", {}, {"scale": 0.8}),
+    "sushi_green": ("9ea2e599-aa07-5330-a559-f00ca5c1cb08", {}, {"scale": 0.8}),
     "bistro_her": ("566ef581-e206-4bc1-a9e5-918e67ac899d", {}, {"scale": 0.8}),
     "bistro_him": ("5c3df12a-4623-482f-adeb-053a4ba12f6c", {}, {"scale": 0.8}),
     "teppan_1": ("5b40cf7b-a23f-41f6-b508-0c35c43fcf42", {}, {"scale": 0.72}),
@@ -274,10 +288,14 @@ CAST = {
                       # sauna's bench: her sitting down backwards.)
                       {"cut": {"lie": ("up", list(range(16, -1, -1))), "sit-up": ("sit", list(range(7, -1, -1)))}}),
     "stylist": ("42d60ae5-b735-40b6-b118-5cb62efa8577", {"work": 6}, {"cut": {"work": ("snip", [0, 1, 2, 3, 2, 1])}}),
-    "stepper_a": ("b360c69a-412b-45aa-a318-38495b31dde9", {"steps": 9}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
-    "stepper_b": ("6be4ce88-e432-45d4-9efe-84d79ad27e4e", {"steps": 8}, {"cut": {"steps": ("step", [2, 3, 4, 5, 6, 7, 8])}}),
+    # (Their step onto the board and down, 2026-11-26: they marched on the spot beside boards drawn in code, the user.
+    # `board`: PixMiniMax from each one's first `step` frame with the board in front of them, pinned to it as its end
+    # (4aa0baa6, cf0173dc, 1 generation each); the generator's board taken out of every frame and the one board (a
+    # flat thing, drawn by rule: `stepper_a-raw/board.png`) put back under them, the raw frames in `<name>-raw/board-tries/`.)
+    "stepper_a": ("77a7afbd-e6ed-4c77-93e5-61db1b687298", {"board": 8}, {}),
+    "stepper_b": ("b5d5016f-e273-4c20-b11f-264ec4534ce1", {"board": 8}, {}),
     "officer_9": ("62e25632-167d-4c88-b585-04d3e606dd4e", {"walk": 8}, {}),
-    "officer_10": ("3c827584-0209-4260-8e66-2982801bb0d9", {"walk": 8}, {}),
+    "officer_10": ("38a6dad3-4a22-46ef-902d-b6acc1a11204", {"walk": 8}, {}),
     "counsellor": ("2a5a0882-b53f-4069-af2a-92b877c3305a", {"cheer": 9}, {"cut": {"cheer": ("clap", [3, 4, 5, 6, 7, 8, 7, 6, 5, 4])}}),
     "poolkid_a": ("7638cecb-28a1-4d16-b1ca-f32388314e3b", {"hop": 9}, {"scale": 0.62, "cut": {"hop": ("jump", [3, 4, 5, 6, 7, 8])}}),
     "poolkid_b": ("8c73e72a-ca99-49ed-861f-12b4314638de", {"hop": 9}, {"scale": 0.66, "cut": {"hop": ("bounce", [3, 4, 5, 6, 7, 8])}}),
