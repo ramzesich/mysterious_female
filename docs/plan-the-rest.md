@@ -58,7 +58,7 @@ findings that decide something were checked again by hand (the list in §11).
 | 7 (§7b) | The intro's scene tuned: a more real sun and reflections, clouds more varied and with volume (added 2026-11-19). **Built 2026-11-20 by the Refinement session** (branch `refinement`, `4eb23d8`, `504be54`), the sunset's sky with it: not to be built again | The user's word; `docs/intro.md` | Medium | About 30 (the design session's guess); 160 spent |
 | 8 (§7c) | What she can use: does it stand out? A comparison across the game, then the user's rule (added 2026-11-19). **Built 2026-11-23 by the Refinement session** (branch `refinement`, `e621d5b`, `cefcf4c`): the pulse where E would act, and doors washed like their neighbours: not to be built again | The user's word | Small to medium | None |
 | 9 (§7d) | **Built 2026-11-25** (90 generations; the robot made again with it). The tangerines' seats: twelve placements that make no sense mended, three props for them; the total stays 56 (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 to 25 (the design session's guess) |
-| 10 (§7e) | The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
+| 10 (§7e) | **Built 2026-11-26** (20 generations; the four door tries all used, the user's). The checkpoints: 19 places from 26 (23 from 32 as the game counts them), six doors that stand wrong mended, two door props, never back behind a shut door (added 2026-11-19) | The user's word; the design session's audit | Medium | About 20 (the design session's guess) |
 | 11 (§7f) | The empty stretches: sixteen obstacles on the walks where nothing can catch her, twelve of them things already built, placed anew; six ends given a purpose, so that every long run has both; the rule "nothing is used twice" dropped (added 2026-11-21, two rounds) | The user's word; the design session's audits | Large | About 80 (the design session's guess) |
 | 12 (§7g) | "Washie, washie, happy, happy!": the crewman with the sanitizer at the Garden Café's door by the aft lifts (deck 11), the user's and his wife's own joke: a first meeting that cannot be missed, their duet, foamy paw prints past him, a tangerine washed and tossed back, the song stuck in her head (added 2026-11-21) | The user's word | Medium | About 25 to 30 (the design session's guess) |
 | 13 (§7h) | **Built 2026-11-25, in the balconies' remake (`docs/balconies-remake-log.md`).** The balconies' doors: the five ajar balcony doors (decks 8 to 10, region 7) do not look like doors at all; made to read as doors (added 2026-11-23) | The user's word | Small to medium | A few (a picture of a balcony door) |
@@ -812,6 +812,13 @@ The audit's pictures were made by a script outside the repo (her teleported besi
 `maps/world.json`, `Browser.close_up` on it); they are not kept. Make them again the same way before and after.
 
 ## 7e. Part 10: the checkpoints, nineteen places (medium; about 20 generations, a guess; added 2026-11-19)
+
+**Built 2026-11-26, approved in play** (`docs/progress-decisions.md`, "Part 10"). Where the build differs from what
+follows: the user's four tries of the two props all used, B1 burgundy at the foyer, B2 navy at the Arcade, C1 walnut at
+the Library, C2 mahogany at Cagney's (`tools/build_checkpoint_doors.py`; the theatre doors' windows ovals on the ajar
+leaf); the Library's door at 160.9 m (the panelling's middle, measured); Cagney's wine cabinet gone, no room aft; the
+Arcade's claw machine, pinball and last cabinet 0.9 m aft; the café's last window run ends at 191.0 m, its table at
+189.8 m.
 
 The user, 2026-11-19: "I've seen a few places myself where doors are stuck at weird places or misplaced"; asked for an
 audit of every checkpoint: placements that make no sense, new props for more variety of doors, the best total for the

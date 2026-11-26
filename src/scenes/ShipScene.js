@@ -1492,8 +1492,9 @@ export class ShipScene extends Phaser.Scene {
         return dim;
     }
 
-    // A checkpoint (§5.5): a crew door with its lamp, on a deck or outside (the boat walkway's station
-    // locker). `door: null`: at a door that is drawn already (a room's, cabin 8206's): the lamp only.
+    // A checkpoint (§5.5): a door with its lamp, on a deck or on a balcony. `door`: its picture, the white crew door
+    // or a place's own (the theatre's padded ones, the panelled rooms' wood ones: plan-the-rest §7e), lit as its
+    // `-ajar` twin; `door: null`: at a door that is drawn already (a room's, cabin 8206's, a trunk's): the lamp only.
     addCheckpoint(id, x, y, { route = 'inside', door = 'door-crew', rise = LAMP_RISE } = {}) {
         const depth = route === 'inside' ? DEPTH.props : DEPTH.exterior + 0.1;
         const items = [];
@@ -1503,7 +1504,7 @@ export class ShipScene extends Phaser.Scene {
         const lamp = this.add.image(x, y - rise, 'lamp').setDepth(depth);
         items.push(glow, lamp);
         this.worldLayer.add(items);
-        const cp = { id, x, y, route, door: sprite, lamp, glow, active: false, items };
+        const cp = { id, x, y, route, door: sprite, frame: door, rise, lamp, glow, active: false, items };
         this.checkpoints.push(cp);
         if (this.save.activated.includes(id)) this.lightCheckpoint(cp, false);
         return cp;
@@ -3021,11 +3022,28 @@ export class ShipScene extends Phaser.Scene {
 
     // She always comes back at the activated checkpoint closest to where she was: same deck
     // first, then the nearest deck, then the nearest along the deck (§5.5).
+    // She never comes back behind a door shut to her (plan-the-rest §7e): one on her deck with a wall across it between
+    // the checkpoint and where she was, whose door would not open to her coming from the checkpoint's side (a one-way
+    // door not yet come through, a card or a flag she lacks), is left out; with none left, the rule gives way.
     closestCheckpoint(x, y) {
+        return this.nearestCheckpoint(x, y, true) || this.nearestCheckpoint(x, y, false) || this.spawnPoint;
+    }
+
+    // Whether a wall across the deck between the checkpoint c and x would keep her from coming back to x from it.
+    shutBetween(c, x) {
+        if (c.route !== 'inside' || this.route !== 'inside') return false;
+        const lo = Math.min(c.x, x), hi = Math.max(c.x, x), side = c.x < x ? -1 : 1;
+        const walls = [...this.bulkheads.map(b => ({ x: b.x, floor: b.floor, lock: b.lockSpec, id: b.id })),
+            ...this.progress.barriers.map(w => ({ x: w.x, floor: w.zone.y + this.deckPitch / 2 - 8, lock: w.lock, id: w.id }))];
+        return walls.some(w => w.lock && Math.abs(w.floor - c.y) <= 4 && w.x > lo && w.x < hi && !this.progress.passes(w.lock, side, w.id).ok);
+    }
+
+    nearestCheckpoint(x, y, ruled) {
         let best = null;
         let bestScore = Infinity;
         for (const c of this.checkpoints) {
             if (!c.active) continue;
+            if (ruled && Math.round(Math.abs(c.y - y) / this.deckPitch) === 0 && this.shutBetween(c, x)) continue;
             // (One on the route she is on, a hallway's or a balcony's, before any other.)
             const score = Math.round(Math.abs(c.y - y) / this.deckPitch) * 1e6 + Math.abs(c.x - x)
                 + (c.route !== this.route && (this.route === 'inside' || this.route === OUTSIDE) ? 3e6 : 0);
@@ -3034,7 +3052,7 @@ export class ShipScene extends Phaser.Scene {
                 bestScore = score;
             }
         }
-        return best || this.spawnPoint;
+        return best;
     }
 
     spawnAt(point, { emerge = false } = {}) {
@@ -4743,7 +4761,7 @@ export class ShipScene extends Phaser.Scene {
     // light on, and a green lamp above it glows.
     lightCheckpoint(c, celebrate) {
         c.active = true;
-        if (c.door) this.setDoorArt(c.door, 'door-crew-ajar');
+        if (c.door) this.setDoorArt(c.door, `${c.frame}-ajar`);
         c.lamp.setTexture('lamp-on');
         c.glow.setVisible(true).setAlpha(0.55);
         this.tweens.add({ targets: c.glow, alpha: 0.25, scale: 0.8, duration: 1100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
@@ -4752,10 +4770,10 @@ export class ShipScene extends Phaser.Scene {
         this.tweens.add({ targets: c.lamp, scale: 1.8, duration: 160, yoyo: true, ease: 'Quad.easeOut' });
         for (let i = 0; i < 14; i++) {
             const angle = (Math.PI * 2 * i) / 14;
-            const spark = this.add.image(c.x, c.y - LAMP_RISE, 'dot').setTint(0x7dffa0).setDepth(DEPTH.fx);
+            const spark = this.add.image(c.x, c.y - c.rise, 'dot').setTint(0x7dffa0).setDepth(DEPTH.fx);
             this.worldLayer.add(spark);
             this.tweens.add({
-                targets: spark, x: c.x + Math.cos(angle) * 22, y: c.y - LAMP_RISE + Math.sin(angle) * 22, alpha: 0,
+                targets: spark, x: c.x + Math.cos(angle) * 22, y: c.y - c.rise + Math.sin(angle) * 22, alpha: 0,
                 duration: 500, ease: 'Quad.easeOut', onComplete: () => spark.destroy(),
             });
         }

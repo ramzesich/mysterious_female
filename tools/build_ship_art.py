@@ -311,6 +311,15 @@ PIECES["patio-chair-arm"] = ("patio-chair-arm", 0, None, {})   # (drawn in front
 for _seat in ("roomtray-dome", "roomtray-cup", "fruit-bowl-green", "dessert-trolley-plate", "service-cart-plate"):
     PIECES[_seat] = (_seat, 0, None, {})
     OWN.add(_seat)
+# The checkpoints' own doors (plan-the-rest §7e, the user, 2026-11-26: all four tries, "let's use all"): two padded
+# theatre doors and two dark wood ones, each on the crew door's frame with its lit twin swung ajar by the same rule
+# (`tools/build_checkpoint_doors.py`; `assets/source/ship/checkpoint-doors/`, its README has the jobs). In their own
+# colours; the ajar ones reach 3 px under the floor, as `door-crew-ajar`.
+CHECKPOINT_DOORS = ("door-theatre-red", "door-theatre-navy", "door-walnut", "door-mahogany")
+for _door in CHECKPOINT_DOORS:
+    for _n in (_door, f"{_door}-ajar"):
+        PIECES[_n] = (_n, 0, None, {})
+        OWN.add(_n)
 # The main console runs on into the helm's frame (the user saw its end cut off): joined whole.
 PIECES["bridge-console"][3]["join"] = (0, 18)
 PIECES["helm-console"][3]["from_x"] = 22
@@ -586,7 +595,7 @@ def reframe(img, closed, opening, inner, wider):
     return out
 
 
-FEET = {}           # pieces that reach under the floor line, and by how many px (the atlas's `foot`)
+FEET = {f"{d}-ajar": 3 for d in CHECKPOINT_DOORS}   # pieces that reach under the floor line, and by how many px (the atlas's `foot`)
 
 
 def build():

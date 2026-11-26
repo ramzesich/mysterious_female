@@ -141,31 +141,34 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 | `slot_nook` | The reading nook's wall, over its table | All fourteen books, the odd book (her armchair at home, the user's photo) |
 | `slot_cucina` | La Cucina's wall, deck 5, 154.25 m, between its entrance and its first window | A perfect cone for him: the photo of the two of them at La Cucina's window table (the user's), up once the table scene is done (it stood on his table till 2026-11-23: "I would leave only the book") |
 
-### 2.5 The checkpoints (17)
+### 2.5 The checkpoints (19 places, 23 as the game counts them)
 
-Crew doors (§5.5), except the two cabins named. "Closest activated" per §5.5.
+Since 2026-11-26 (`docs/plan-the-rest.md` §7e, the user's nineteen of 2026-11-19, built and approved in play): a
+checkpoint stays only if a scare sends her back to it and taking it away would cost her hazards to do again. "Closest
+activated" per §5.5, never behind a door shut to her. Each door is its place's own; the green lamp over it says
+checkpoint. In the code: `CHECKPOINTS`, the rooms' `checkpoint`, `BALCONY_CPS` in `tools/population.py`.
 
 | Id | Deck | m | Door | Region |
 |---|---|---|---|---|
 | `cp_crew` | 3 | 90 | Her crew cabin's door, deck 3's crew corridor (the start, lit from the start: the user, 2026-11-14) | 1 |
 | `cp_gangway` | 4 | 72 | The gangway lobby's crew door (the start until 2026-11-14) | 1 |
-| `cp_4_aft` | 4 | 212 | A crew cabin door by the aft lobby | 1 |
-| `cp_laundry` | 4 | 112 | The laundry's door | 4 |
-| `cp_6_fwd` | 6 | 40 | A crew door among the forward cabins | 2 |
-| `cp_library` | 6 | 193 | The Library's crew door (exists) | 2 |
-| `cp_foyer` | 6 | 200 | The theatre foyer's crew door | 3 |
-| `cp_7_aft` | 7 | 196 | The aft lobby's crew door | 3 |
-| `cp_station` | Boat walkway | 128 | The station locker's steel door | 7 |
+| `cp_laundry` | 4 | 111.6 | The lamp over the laundry's door | 4 |
+| `cp_library` | 6 | 160.9 | A walnut door, centred in the Library's panelling beside its promenade door | 2 |
+| `cp_foyer` | 6 | 205.3 | A burgundy padded theatre door, a metre aft of the Stardust Lounge's marquee | 3 |
+| `cp_7_aft` | 7 | 189.15 | A navy padded theatre door in the Arcade, a clear metre each side | 3 |
+| `cp_8206` | 8 | 43.3 | The lamp over cabin 8206's door | 5 |
+| `cp_9_arrive` | 9 | 118 | The lamp over the crew trunk's own door, above its arrows; lit as she steps out | 4 |
 | `cp_9_mid` | 9 | 190 | A crew door at the corridor's aft end | 4 |
-| `cp_balcabin` | 9 | 150 | The balcony cabin's door (a cabin, the exception) | 7 |
-| `cp_8206` | 8 | 41.4 | Cabin 8206's door (the exception) | 5 |
-| `cp_gym` | 11 | 80 | The forward lobby's crew door by the gym | 6 |
-| `cp_garden` | 11 | 192 | The Garden Café's service door | 6 |
-| `cp_technical` | 12 | 165 | The technical door, the roof ladder's foot | 8 |
-| `cp_funnel` | The funnel's top | 178 | The engineer's locker | 8 |
-| `cp_officer` | 10 | 60 | An officer's cabin door | 9 |
-| `cp_chapel` | 12 | 72 | The chapel lobby's crew door by the restrooms | 9 |
-| `cp_bridge` | 10 | 40 | The bridge's crew door (the finale's retry) | 10 |
+| `cp_bridge` | 10 | 43 | The crew door by the bridge (the finale's retry) | 10 |
+| `cp_gym` | 11 | 82.7 | The crew door between the forward lobby and the gym's windows | 6 |
+| `cp_pool` | 11 | 140.6 | The pool attendant's hut | 6 |
+| `cp_garden` | 11 | 192 | The Garden Café's service door, its window run ending short of it | 6 |
+| `cp_technical` | 12 | 165 | A mahogany door at Cagney's forward end, the roof ladder's foot | 8 |
+| `cp_balc_9` | 9 (out) | 150 | The balcony cabin, its balcony door only | 7 |
+| `cp_hall_8m`/`cp_balc_8m`, `cp_hall_8a`/`cp_balc_8a`, `cp_hall_9a`/`cp_balc_9a`, `cp_hall_10a`/`cp_balc_10a` | 8, 9, 10 | | The four hallways' cabins with an ajar balcony door, both sides | 7 |
+
+Gone (§7e): `cp_6_fwd`, `cp_4_aft`, `cp_station`, `cp_officer`, `cp_hall_guest`/`cp_balc_guest`, `cp_chapel`,
+`cp_funnel` (a scare on its stairway or its top comes back at the technical door), `cp_balcabin`.
 
 ### 2.6 The locks
 
@@ -327,7 +330,6 @@ stairs and no lift come down to it.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 212 | `cp_4_aft` | A crew cabin door | Checkpoint | Built door |
 | 220 | `haz_cart_4_220` | A standing cart | Hop | Built |
 | 224-236 | `sign_names` | Crew cabin name plates (the user's in-jokes, §6.1.15) | Decor | Plates |
 | 232 | `room_sm_cabin` | The stage manager's cabin: a bunk, show posters, a shelf; `item_pills` on the shelf once he has asked | `room`; E at the shelf takes the pills | Drawn by hand |
@@ -393,7 +395,6 @@ a shortcut past the waiter; built as a short room. Drawn by hand.
 |---|---|---|---|---|
 | 24-60 | `haz_robot` | The delivery robot, a tall tray-carrying robot | `platform(24, 60, 0.8)`; its roof is 1.4 m up: a hop onto it; it carries her; it stops and beeps while she is within 2 m ahead on the floor | An object, two frames |
 | 26 | `tan_6_high` | On the fire-hose cabinet's top, 2.2 m up | Reached from the robot's roof | |
-| 40 | `cp_6_fwd` | A crew door | Checkpoint | |
 | 48 | `amb_maid` | A cabin being made up, its door open, a stewardess inside | A peek | A character |
 
 **The Internet Café 64-74.** `amb_surfer` at a terminal.
@@ -431,14 +432,14 @@ leaving the frame (a wink, no trigger).
 | 186 | decor | The chess table, the globe | | Built |
 | 188 | `sec_oddbook` | The odd book on the top shelf | E with all fourteen shelved: the bookcase slides aside (`scn_nook`) | |
 | 186-192 | `room_nook` | The reading nook behind the bookcase: an armchair, a lamp, a porthole on the sea, `slot_nook`; the reading idle | `room` after `scn_nook` | Drawn by hand |
-| 193 | `cp_library` | The crew door | Checkpoint | Built |
+| 160.9 | `cp_library` | The walnut door beside the promenade door | Checkpoint | Built |
 | 194 | `door_library_aft` + `blk_quiet` | The aft door and its rope stand | Shut until `bb_2` | A rope stand |
 
 **The theatre 202-255 (region 3).**
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 200 | `cp_foyer` | The foyer's crew door | Checkpoint | |
+| 205.3 | `cp_foyer` | The foyer's burgundy padded door | Checkpoint | Built |
 | 206-240 | decor | Rows of seats (built); `amb_audience` three seated | | |
 | 242 | `haz_pit` | The orchestra pit in front of the stage (not built: the rival goes down the stage's hatch) | A one-deck drop for the rival only (she can hop it) | Drawn |
 | 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` (as built: one, at 245.9 over the drum kit since 2026-11-19, the user's swap with the stage manager; a generated lantern since 2026-11-24, let down by the rival's weight on it in `bb_3`) | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
@@ -497,9 +498,9 @@ easel, which she looks at twice if she stands still (a 1 s double-take; no rewar
 
 **Tradewinds 172-186.** `tan_7_tradewinds` at 180 in a gift basket; `amb_shopper`.
 
-**The Arcade 186-194.** Decor (the claw machine); `amb_teen`.
+**The Arcade 186-194.** Decor (the claw machine); `amb_teen`; `cp_7_aft` at 189.15 (since 2026-11-26).
 
-**The aft lobby 194-202.** `cp_7_aft` at 196.
+**The aft lobby 194-202.**
 
 **The Stardust balcony 202-254.**
 
@@ -518,7 +519,6 @@ In: a drop from deck 8's stern terrace. Out: a wall jump up the stern plating (t
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 125 | ladder top | From `rdr_gate` | | |
-| 128 | `cp_station` | The station locker | Checkpoint | A locker |
 | 104-230 every 9 | boats | The lifeboats, tenders, rescue boat (built) | | |
 | 143 | `room_lifeboat` | The one lifeboat she enters (2026-11-21, the user's): through a hatch on its roof, climbing up behind the boat (E at it, a faint glow); inside the whole boat, a ladder down from the hatch, benches, oars and a boathook, nine portholes (round windows outside at the same columns), `book_2`, `slot_lifeboat` | `room`, `door: roof`; out up the ladder | Drawn by hand and redecorated (A, 2026-11-25), its oars and boathook and the hatch generated |
 | 185-194 | `haz_drill` | The boat drill: two crew at the davit winch, a rope and a "DRILL" sign (2026-11-21: the winch and its crewman one generated clip turning with the boat, a wire rope up from its drum, a generated warning light; down, the boat a floor she can stand in; 15 remade: on all fours, she crawls away) | `timed(10, 3, 185-194)`: the boat swings out across the walkway and back; contact "Bumped". **As built:** lowered onto the walkway and hoisted, its falls from the davit's arms to the boat's posts; running at it she sets it off (the lamp first, `DRILL` in `src/config.js`, 2026-11-19); under it as it comes down, 15: stiff onto her back (14a's), the boat down over her until her checkpoint. The winch and its crewman at 184.6 m (from 184.9, 2026-11-19: she lies clear of it) | Two characters, the boat's swing |
@@ -602,7 +602,7 @@ the corridor at 118, not here.
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |
 | 141.6 | `haz_towels_9` | The towel stack by the doorway (once fallen it stays fallen, kept with what she broke, so that the way back from the steward crosses its heap: 2026-11-18), midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
 | 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched"; whatever she carries, 16: soaked, a sneeze, back the way she came | |
-| 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); `cp_balcabin` | `room` | Drawn by hand |
+| 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); its checkpoint on the balcony side only, `cp_balc_9` | `room` | Drawn by hand |
 | 158 | `haz_swing_9` | A cabin door that swings open | `reactive(3, 0.6)`; "Bonked" | |
 | 166 | `haz_dnd_9` | A "Do Not Disturb" door | E: "Startled"; otherwise nothing | |
 | 172 | `haz_cart_9_172` + `tan_9_cart` | A standing cart with a tangerine | Hop | |
@@ -643,8 +643,8 @@ view: from it, `bb_glimpse_balcony` on the next balcony's rail aft, beside a gul
 | 38 | `book_10` | On the chart table | `pickup` | |
 | 40 | `rdr_bridge` + `cp_bridge` | The bridge's door (gold) and its crew door checkpoint | | Built door |
 
-**The officers' corridor 40-74 (region 9).** 50-70 `amb_officer_10` (`loop`, friendly); 60
-`cp_officer`; the lobby's gold doors at 74 and 82 (`rdr_fwd_10_lobby`).
+**The officers' corridor 40-74 (region 9).** 50-70 `amb_officer_10` (`loop`, friendly); (60
+`cp_officer` went, §2.5); the lobby's gold doors at 74 and 82 (`rdr_fwd_10_lobby`).
 
 **The midship lobby and the atrium walk 82-110 (region 4).** Open over the atrium (built).
 
@@ -778,7 +778,7 @@ pushes through before the horn; the way through is then the pool itself, swimmin
 `amb_kids_pool` two kids.
 
 **The chapel lobby 67-74.** 68.6 the chapel (built): `scn_ceremony` after the cake, `slot_chapel`
-inside; 72 `cp_chapel`; `blk_wedding`: the planner at 76, four guests at 70-80 across the lobbies.
+inside; (72 `cp_chapel` went, §2.5); `blk_wedding`: the planner at 76, four guests at 70-80 across the lobbies.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
@@ -844,7 +844,6 @@ down to the Great Outdoors (built); `gull_terrace` at 218 perched.
 | The roof, 166-169 | the ladder's top, a walk to the stairway's foot | Built ladder, moved to 166 | | |
 | The stairway, 169 up to 177 | `gust_funnel` + `gull_funnel` | Gusts every 5 s: **while one blows she crouches and holds on to the rail and cannot move** (2026-11-18; it slid her back down the flight before). Two gulls circling; **every 2.5 to 5.5 s, between gusts, one dives straight at her from wherever it is in its flight** (2026-11-18; it hovered over her and marked her spot before): "Swooped" (with a tangerine: she ducks and it carries the tangerine off in its beak; with none: gag 21, "Ow-ow-ow!", she bumps down the flight on her bottom to the foot and sits dizzy, butterflies over her head; built 2026-11-18). Walked into at either end she steps onto it (2026-11-18). The stairway stands 12 px out from the lattice, the funnel's white base and navy frame carried out under it | | |
 | The lattice, 175 | `bb_glimpse_funnel` | Bumbot sitting on the lattice as she climbs; at the horn he shoots down it and forward along the roof | `glimpse(region 8)` | |
-| The top, 178 | `cp_funnel` | The engineer's locker | Checkpoint | |
 | 180 | `npc_engineer` (after) | The engineer on his break, reading | After the horn: E, he lends `book_9` | |
 | 184 | `sec_horn` | The horn's cord | E once he is up: `scn_horn` (the pull clip, the shake, the smoke, the cascade) | A cord, a clip |
 | 186 | `tan_funnel` | His lunch box | | |

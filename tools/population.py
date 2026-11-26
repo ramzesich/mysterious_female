@@ -54,7 +54,7 @@ ROOMS = [
     # sprinkler (156 m) and the "Do Not Disturb" door (171.6 m).
     dict(id="makeup10", deck=10, m=164, slot=True, width=240, look="cabin", door="open"),
     dict(id="balcabin9", deck=9, m=150, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin",
-         lock=("card", "hk", 0), checkpoint="cp_balcabin",
+         lock=("card", "hk", 0),
          doors=[dict(x=262, to="outside", deck=9, door="balcony")]),
     dict(id="adjoin", deck=9, m=176, slot=True, width=432, look="adjoin", door="cabin",
          doors=[dict(x=432 - 59, to="inside", deck=9, m=184, slot=True, door="cabin")]),
@@ -70,7 +70,7 @@ ROOMS = [
     dict(id="balcabin10a", deck=10, m=215, slot=True, width=288, windows=[(243, 45, 19, 82), (264, 45, 8, 82), (274, 45, 7, 82)], look="balcabin", door="cabin", lock=("oneway", 1),
          checkpoint="cp_hall_10a",
          doors=[dict(x=262, to="outside", deck=10, door="balcony")]),
-    dict(id="guest10", deck=10, m=235, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin", lock=("card", "hk", 0), checkpoint="cp_hall_guest",
+    dict(id="guest10", deck=10, m=235, slot=True, width=288, windows=[(243, 45, 18, 82), (263, 45, 18, 82)], look="balcabin", door="cabin", lock=("card", "hk", 0),
          doors=[dict(x=262, to="outside", deck=10, door="balcony", lock=("flag", "guest"))]),
     # (Between the café's two last windows, its plate over the door: at 185 m it stood in a window, the user, 2026-11-24.)
     # The restrooms by the Chapel (the user, 2026-11-24: "make it entreable to a small restroom cabin, not too wide"):
@@ -103,31 +103,37 @@ SHAFT = dict(deck=9, drop_deck=8, m_out=66.1667, mouth=(4, 13), slope=(-6, -62),
                       (75.6667, "stairs_fwd"),   # the forward stairs: their exit sign, the deck's directory
                       (71.625, "party")])        # the door with the party's balloons       # the door with the party's balloons
 
-# --- Checkpoints (population §2.5) -----------------------------------------------------------------
-# id: (deck, m, route, slot). Crew doors; `slot` takes a cabin door's place. The rooms' own doors
-# (`checkpoint` above), cabin 8206's and the funnel's locker are made by the game. Moved against the
-# spec where a lobby has no wall free between its stairs and its elevator (progress-decisions).
+# --- Checkpoints (population §2.5; plan-the-rest §7e, the user, 2026-11-19: "Yes, let's try those 19") -----------
+# id: (deck, m, route, slot, door). Crew doors; `slot` takes a cabin door's place; `door` the door's picture where it is
+# not the white crew door (the theatre's padded ones and the panelled rooms' wood ones, the user's four of 2026-11-26,
+# `tools/build_checkpoint_doors.py`), or "trunk:<name>": the lamp over that trunk's own door, no door of its own. The
+# rooms' own doors (`checkpoint` above), cabin 8206's and the balcony cabins' (`BALCONY_CPS`) are made by the game.
+# A checkpoint stays only if a scare sends her back to it and taking it away would cost her hazards to do again; the
+# nine that went (§7e): deck 6 forward, deck 4 aft, the boat walkway's station, the officers' corridor, deck 10's guest
+# cabin both sides, the Chapel's lobby, the funnel's top, deck 9's balcony cabin's corridor side.
 CHECKPOINTS = {
-    "cp_gangway": (4, 72, "inside", False),
-    "cp_4_aft": (4, 212, "inside", True),
-    "cp_6_fwd": (6, 40, "inside", True),
-    "cp_library": (6, 160.85, "inside", False),
-    "cp_foyer": (6, 204.4, "inside", False),
-    # (In the Arcade, between its cabinets and the claw machine: at 191.6 m it stood on the pinball table.)
-    "cp_7_aft": (7, 189.15, "inside", False),
-    "cp_station": (7, 128, "outside", False),
-    "cp_9_arrive": (9, 119.6, "inside", True),
-    "cp_9_mid": (9, 190, "inside", True),
+    "cp_gangway": (4, 72, "inside", False, None),
+    # (Centred in the panelling between its pillar and the promenade door, which it stays beside: the promenade's
+    # scares come back here.)
+    "cp_library": (6, 160.9, "inside", False, "door-walnut"),
+    # (A metre aft of the Stardust Lounge marquee's gold post, clear of its first seat.)
+    "cp_foyer": (6, 205.3, "inside", False, "door-theatre-red"),
+    # (In the Arcade, a clear metre each side: its second cabinet out, the claw machine and the rest a metre aft.)
+    "cp_7_aft": (7, 189.15, "inside", False, "door-theatre-navy"),
+    # (Deck 9's arrival: the lamp over the crew trunk's own door, the one she comes out of; its white twin 1.4 m aft
+    # is gone.)
+    "cp_9_arrive": (9, 118, "inside", False, "trunk:magnums"),
+    "cp_9_mid": (9, 190, "inside", True, None),
     # (On the strip of wall between the lobby's door and the gym's windows: at 84 m it stood on a
     # treadmill, in the windows.)
-    "cp_gym": (11, 82.72, "inside", False),
+    "cp_gym": (11, 82.72, "inside", False, None),
     # (The pool attendant's hut on pool 2's aft rim: the kid's and the wet patch's frights come back here.)
-    "cp_pool": (11, 140.6, "inside", False),
-    "cp_garden": (11, 192, "inside", False),
-    "cp_technical": (12, 165, "inside", False),
-    "cp_officer": (10, 60, "inside", True),
-    "cp_chapel": (12, 70.7, "inside", False),
-    "cp_bridge": (10, 43, "inside", True),
+    "cp_pool": (11, 140.6, "inside", False, None),
+    # (Out of the café's window: its run ends short of it, its last table a metre forward.)
+    "cp_garden": (11, 192, "inside", False, None),
+    # (Half a metre clear of the wall across the deck; the wine cabinet beside it is gone.)
+    "cp_technical": (12, 165, "inside", False, "door-mahogany"),
+    "cp_bridge": (10, 43, "inside", True, None),
 }
 
 # --- Tangerines (population §2.3) ------------------------------------------------------------------
@@ -545,7 +551,7 @@ PEOPLE = {
     "amb_player_lady": dict(at=(7, 157.29), who="casinolady", face=1, layer="back"),
     "amb_player_cowboy": dict(at=(7, 162.4), who="cowboy", pose="back", layer="back"),
     "amb_shopper": dict(hear="♥", at=(7, 177.4), who="shopper", face=1, idle="idle", layer="back"),
-    "amb_teen": dict(at=(7, 188.29), who="teen", pose="back", layer="back"),
+    "amb_teen": dict(at=(7, 187.39), who="teen", pose="back", layer="back"),
     "amb_balcony_1": dict(at=(7, 220.35), who="aud_girl", face=1, layer="back"),
     "amb_balcony_2": dict(hear="♥", at=(7, 232.71), who="aud_granny", face=1, layer="back"),
     # Region 7 (Outside). The guest locked out on his own balcony, deck 10 aft (in his cabin once
@@ -1035,7 +1041,7 @@ BALCONY_SET = {(10, 62.9): dict(furniture=[("sunlounger-long-bg", 60, False)], t
 OCCUPIED = {"haz_sunbather": (8, 181.4, "thing:balc-sunbather"), "haz_breakfast": (10, 178.8, "thing:balc-breakfast")}
 # Checkpoints on balconies, each at an ajar balcony door (a lamp over it): id: the room.
 BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a": "balcabin8a",
-               "cp_balc_9a": "balcabin9a", "cp_balc_10a": "balcabin10a", "cp_balc_guest": "guest10"}
+               "cp_balc_9a": "balcabin9a", "cp_balc_10a": "balcabin10a"}
 # The boat drill on the walkway (`haz_drill`): a rescue boat on its falls in the gap between the
 # boats, its forward end (m); it hangs high (she walks under it), and every `period` s the crew
 # lower it onto the walkway for `down` s: under it as it comes: "Bumped".

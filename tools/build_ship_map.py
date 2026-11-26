@@ -1679,11 +1679,12 @@ def build_objects():
     put(7, 185.0, "chocolates-bg")
     # The Arcade: night blue, cabinets, a claw machine, pinball.
     decor("arcade-doorway", "doorway", exact_x(186), exact_x(186), deck=7, text="Arcade")
+    # (The aft checkpoint's door stands at 189.15 m, a clear metre each side: its second cabinet out, the claw
+    # machine and the rest a metre aft; plan-the-rest §7e.)
     put(7, 187.4, "arcade-cabinet-bg")
-    put(7, 188.3, "arcade-cabinet-bg")
-    put(7, 190.0, "claw-machine-bg")      # (the aft checkpoint's crew door stands at 189.15 m)
-    put(7, 191.4, "pinball-bg")
-    put(7, 192.9, "arcade-cabinet-bg")
+    put(7, 190.9, "claw-machine-bg")
+    put(7, 192.3, "pinball-bg")
+    put(7, 193.8, "arcade-cabinet-bg")
     # The Stardust Lounge's balcony: rows of red seats down to the railing over the stage.
     decor("balcony-doorway", "doorway", exact_x(202), exact_x(202), deck=7, text="Stardust Lounge Balcony")
     for k in range(int((STAGE - 1.6 - 204.2) / 0.95) + 1):
@@ -1821,7 +1822,8 @@ def build_objects():
     # chairs, a painting between the windows, the Ice Cream Bar, window seats at round white tables
     # in beige armchairs, a fish on one of the tables.
     decor("cafe-doorway", "doorway", exact_x(160), exact_x(160), deck=11, text="Garden Café")
-    for a, b in ((160.8, 170.2), (172.8, 181.8), (184.2, 193.4)):
+    # (The last run ends short of the checkpoint's crew door at 192 m, five panes: plan-the-rest §7e.)
+    for a, b in ((160.8, 170.2), (172.8, 181.8), (184.2, 191.0)):
         add(area(f"cafe-windows-{a}", "decor", exact_x(a), floor_y(11) - 104, exact_x(b) - exact_x(a), 56,
                  [prop("kind", "bridgewindows")]))
     at11(171.5, "painting-abstract", 66)
@@ -1836,7 +1838,8 @@ def build_objects():
     # (30 px forward of where it stood, the cold room's door aft of it, both between the windows: the user, 2026-11-24.)
     at11(182.375, "ice-cream-counter")
     at11(182.375, "ice-cream-sign", 56)
-    for m in (187.2, 190.8):
+    # (The last a metre forward, out of the checkpoint's door: plan-the-rest §7e.)
+    for m in (187.2, 189.8):
         around(11, m, "patio-table-bg", "patio-chair-bg")
         # (At 187.2 its juice to the table's forward end: the green fruit bowl with two tangerines beside it, population
         # `SEATS`; plan-the-rest §7d, the user, 2026-11-25.)
@@ -1980,7 +1983,8 @@ def build_objects():
     # Cagney's Steakhouse: dark wood, the wine cabinet, booths at a white-cloth table, the carving
     # trolley. (The funnel's technical ladder comes down at 167.2.)
     add(point("sign-cagneys", "sign", exact_x(165.0), floor_y(12) - 96, [prop("text", "Cagney's"), prop("style", "plaque")]))
-    at12(165.9, "wine-cabinet")
+    # (The wine cabinet is gone (plan-the-rest §7e): it stood under the technical door's lit leaf, and aft of it the
+    # ladder, the cake's table, the pastry chef and the booth leave no room.)
     around(12, 170.0, "table-dinner-bg", "steak-booth-bg", on_top="steak-plate-bg")
     at12(172.9, "carving-trolley")
     decor("downlights-12-cagneys", "downlights", x_of(164), x_of(174), deck=12)

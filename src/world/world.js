@@ -38,6 +38,8 @@ const LOOKS = {
     cabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], balcabin: [0xefe6d2, 0xd8b29a, 0x4d65b4], adjoin: [0xefe6d2, 0xd8b29a, 0x4d65b4],
     coldroom: [0xcfeaf5, 0x8fd3ff, 0x9babb2],
 };
+// A checkpoint over a crew trunk's door (deck 9's arrival, plan-the-rest §7e): its lamp above the door's ▲/▼ lamps.
+const TRUNK_LAMP_RISE = 92;
 const START_CHECKPOINT = 'cp_crew';     // her crew cabin's door on deck 3 (the user, 2026-11-14; it was the gangway's)
 const DOOR_ART = { crew: 'door-crew', cabin: 'door-cabin', open: 'door-cabin-ajar', hatch: 'door-watertight', restroom: 'door-restroom' };
 // The lifeboat's roof hatch (tools/build_hatch.py): its two pieces' top lefts from the walkway's floor under the hatch's
@@ -747,8 +749,6 @@ export class World {
         const stop = s.add.zone(f.x1 + 4, f.y - 40, 8, 80);
         s.physics.add.existing(stop, true);
         (s.railingStops ||= []).push(stop);
-        // The engineer's locker, the top's checkpoint (population §2.5).
-        s.addCheckpoint('cp_funnel', f.x0 + 60, f.y, { door: 'door-crew' }).items.forEach(i => i.setDepth(D.exterior + 0.08));
     }
 
     // --- The shaft (population §6.5; docs/shaft-remake-log.md) ------------------------------------
@@ -1145,9 +1145,11 @@ export class World {
         const depth = this.depthFor(e.route);
         switch (e.kind) {
             case 'checkpoint': {
-                // (`bare`: on a balcony, at an ajar balcony door: only the lamp, over the door.)
+                // (`bare`: on a balcony, at an ajar balcony door: only the lamp, over the door. `trunk`: over a crew
+                // trunk's own door, above its arrows (deck 9's arrival). `door`: a place's own door, not the crew's.)
                 const cp = e.bare ? s.addCheckpoint(e.id, e.x, e.y, { route: e.route, door: null, rise: 112 })
-                    : s.addCheckpoint(e.id, e.x, e.y, { route: e.route });
+                    : e.trunk ? s.addCheckpoint(e.id, e.x, e.y, { route: e.route, door: null, rise: TRUNK_LAMP_RISE })
+                    : s.addCheckpoint(e.id, e.x, e.y, { route: e.route, door: e.door || 'door-crew' });
                 const deck = e.bare ? s.deckOfY(e.y) : [6, 7];
                 if (e.route === OUTSIDE) cp.items.forEach(i => s.shellSlopes.push({ deck, gfx: i }));
                 break;

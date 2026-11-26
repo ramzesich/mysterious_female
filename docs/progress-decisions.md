@@ -5127,3 +5127,43 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   had not: the Topsiders link given for this part carried `&cards=all`, which gives her every verb, the grip socks too,
   and in the socks the wet tiles hold. Walked from `?at=wet7a` with it she passed the chair; without it she slid into it
   and the gag played. No link of this round needed the flag (the user's rule: only where a lock must open).
+
+## Part 10: the checkpoints, nineteen places (2026-11-26; `docs/plan-the-rest.md` §7e)
+
+- **The doors (the user's choices):** four tries of the plan's two props (B, a padded theatre door; C, a dark wood service
+  door), `edit_image_pro_flash` of the crew door padded to 40 x 80, 5 generations each. The leaves came 23 x 69 with no
+  surround: each is set into a doorcase on the crew door's own frame (29 x 74, its outline, the leaf where the crew
+  door's is, a flat band of dark wood by rule). The user: "I like all of them, let's use all. Find a fitting place for
+  each": burgundy padded (B1) for the theatre's foyer (the Stardust's red and gold), navy padded (B2) for the Arcade's
+  night blue walls, walnut panels (C1) for the Library, mahogany with a wide brass kick plate (C2) for Cagney's.
+- **The lit twins, by rule** (`tools/build_checkpoint_doors.py`): the crew door's ajar geometry (29 x 79, the leaf 18 px
+  wide on its right-hand hinges, its free edge 2 px over the frame and 3 under the floor, the room's light in the gap),
+  the leaf mapped onto it column by column (lines across it slant a step at a time). The user: the portholes on the
+  opened doors were "distorted" (warped with the leaf): each is now cleared from the warped leaf and laid back whole from
+  its own pixels where the leaf's middle carries it; then "shrink them a little bit, making them less wide (but same
+  height as now, thus creating ovals). And keep them centered still": a column either side of the middle left out, so
+  the rim stays a ring (13 to 11 px, 12 to 10).
+- **Placed:** each checkpoint's door is a name in `CHECKPOINTS` (a fifth field; `trunk:<name>` for a lamp over a trunk's
+  own door), `lightCheckpoint` sets the door's own `-ajar` twin. The foyer's door a metre aft (205.3 m). The Arcade's
+  second cabinet out, the teen at the first, the claw machine, the pinball and the last cabinet 0.9 m aft. **The
+  Library's door at 160.9 m, not the plan's 161.1:** measured in the shot, 161.1 left 36 px of panelling on its left and
+  17 on its right; 160.9 is the gap's middle. **Cagney's wine cabinet is gone, not moved:** aft of the technical door
+  stand the ladder (167.2), the cake's table (167.75), the pastry chef (168.5) and the booth; no room is left. The
+  Garden Café's last window run ends at 191.0 m (five panes), its last table at 189.8 m. Deck 9's arrival is the lamp
+  over the trunk's own door (`TRUNK_LAMP_RISE`, 92 px: above its ▲/▼ lamps); its white twin door is gone.
+- **Out:** `cp_6_fwd`, `cp_4_aft`, `cp_station`, `cp_officer`, `cp_chapel`, the guest's cabin both sides, `cp_funnel`,
+  `cp_balcabin`. The three that held a cabin door's slot gave it back by the corridor's rule (looked at: deck 4 aft,
+  deck 6 forward, deck 10's officer at a cabin door again). **The funnel (the user asked, then approved):** with every
+  checkpoint lit, a scare at the top's forward end, middle or aft end brings her back at the technical door; offered if
+  it plays too harsh: a lamp with no door at the top, or one of the design session's four steel lockers.
+- **The rule** (`closestCheckpoint`, `shutBetween`): on her deck, a checkpoint with a wall across the deck between it and
+  where she was, whose door (or end wall) would not pass her from the checkpoint's side, is left out; with none at all
+  the rule gives way. `region7.shut` checks it at deck 9's aft swinging door: the hallway's cabin, then another deck,
+  then 190 m once the one-way door at 202 m is opened.
+- **Tests:** `check_overlaps` 0. `boot`, `region1` to `region4`, `region6` to `region9` (with the new case), `finale`
+  pass; `mishaps` fails only on deck 9's sprinkler, as before. The checks that named a checkpoint that went now check it
+  is gone; `region4`'s two returns moved with the plan (the trunk's own door; the corridor's aft end where the balcony
+  cabin's corridor side was).
+- **Links walked as given** (E at the doors, a hop at the queue, as a player would): `library`, `theatre`, `balcony7`,
+  `technical`, `diner`, `deck9-aft`, `jet11`. `chips7` is not one for the Arcade: its spill of chips takes her.
+- 20 generations; the balance went from 8,667 to 8,647.

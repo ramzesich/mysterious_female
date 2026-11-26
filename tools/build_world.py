@@ -159,9 +159,15 @@ def build_world():
             return room_x0[where] + at, room_floor[where], where
         return B.exact_x(at), B.floor_y(where), "inside"
 
-    for cid, (deck, m, route, slot) in CHECKPOINTS.items():
+    for cid, (deck, m, route, slot, door) in CHECKPOINTS.items():
         x = slot_x(deck, m) if slot else B.exact_x(m)
-        ents.append(dict(kind="checkpoint", id=cid, x=x, y=B.floor_y(deck), route=route_of(route)))
+        cp = dict(kind="checkpoint", id=cid, x=x, y=B.floor_y(deck), route=route_of(route))
+        if door and door.startswith("trunk:"):
+            # (Over a trunk's own door, at its x: the lamp only, above its arrows.)
+            cp.update(x=B.x_of(m), trunk=door[6:])
+        elif door:
+            cp["door"] = door
+        ents.append(cp)
     # On the balconies: at each ajar balcony door, a lamp over it.
     for cid, rid in BALCONY_CPS.items():
         d = next(d for r in rooms if r["id"] == rid for d in r["doors"] if d["kind"] == "balcony")

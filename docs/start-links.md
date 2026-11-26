@@ -78,7 +78,7 @@ new one added there should be added here too.
 | `bow`: the mooring deck | <http://localhost:8000/?play&at=bow&cards=all> |
 | `kids`: Splash Academy | <http://localhost:8000/?play&at=kids&cards=all> |
 | `atrium`: the atrium's walk | <http://localhost:8000/?play&at=atrium&cards=all> |
-| `walkway`: outside, the boat walkway over the promenade, at the station locker | <http://localhost:8000/?play&at=walkway&cards=all> |
+| `walkway`: outside, the boat walkway over the promenade, by its middle (the station's checkpoint went, plan-the-rest §7e) | <http://localhost:8000/?play&at=walkway&cards=all> |
 | `chips7`: deck 7, at the casino's door, forward of the slot machines (run aft onto a spill of chips: 1) | <http://localhost:8000/?play&at=chips7> |
 | `drill7`: outside, on the boat walkway 5.5 m forward of the drill's boat (once it is hoisted again, run aft at it: 15) | <http://localhost:8000/?play&at=drill7&cards=all> |
 | `balcony7`: deck 7, the Stardust balcony near its far end (her diary on the last seat by the railing, 11) | <http://localhost:8000/?play&at=balcony7> |

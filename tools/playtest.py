@@ -3746,8 +3746,8 @@ def scenario_region4(b):
     ok &= check(hit and js(b, "window.__ship.lastMishap?.id") == "5a" and not js(b, f"{vac}.sprite.visible"),
                 "running at the doorway: it darts out at her, and she rides it off (5a)", (alert(b), js(b, "window.__ship.lastMishap?.id")))
     wait_js(b, "window.__ship.mode === 'play'", 8)
-    ok &= check(abs(b.state()["x"] - exact_x(119.6)) < 30 and js(b, f"{vac}.state === 'in' && {vac}.sprite.visible"),
-                "and she is back at the crew door by the trunk, the vacuum in its doorway", b.state())
+    ok &= check(abs(b.state()["x"] - x_of(118)) < 30 and js(b, f"{vac}.state === 'in' && {vac}.sprite.visible"),
+                "and she is back at the trunk's own door (its lamp over it, plan-the-rest §7e), the vacuum in its doorway", b.state())
     # A jump as it rattles clears it.
     b.teleport(vx - 160, D9)
     wait_js(b, f"{vac}.state === 'in' && {vac}.armed", 6)
@@ -3830,7 +3830,8 @@ def scenario_region4(b):
     wait(0.2)
     b.tap("e")
     wait(0.9)
-    ok &= check(route(b) == "balcabin9" and "cp_balcabin" in save_list(b, "activated"), "the balcony cabin opens with the card: a checkpoint", route(b))
+    ok &= check(route(b) == "balcabin9", "the balcony cabin opens with the card", route(b))
+    ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_balcabin')"), "(its corridor side has no checkpoint since plan-the-rest §7e: only its balcony's)")
     b.teleport(bc["x0"] + 150, D9, "balcabin9")
     wait(0.4)
     b.shot("region4-balcabin")
@@ -3862,7 +3863,8 @@ def scenario_region4(b):
     ok &= check(person(b, "haz_swing_9_who")["on"], "the kid with the water pistol looks out")
     wait_js(b, "window.__ship.mode === 'play'", 8)
     wait(0.6)
-    ok &= check(abs(b.state()["x"] - bc["doors"][0]["outX"]) < 30, "back at the balcony cabin's door", b.state())
+    mid = js(b, "window.__ship.checkpoints.find(c => c.id === 'cp_9_mid').x")
+    ok &= check(abs(b.state()["x"] - mid) < 30, "back at the corridor's aft crew door (the balcony cabin's corridor side is no checkpoint since plan-the-rest §7e)", b.state())
     wait_js(b, f"{sw}.state === 'shut' && {sw}.armed", 6)
     b.teleport(wx + 200, D9)
     b.key("left", True)
@@ -4938,7 +4940,7 @@ def scenario_region7(b):
     b.tap("e")
     wait(0.6)
     ok &= check(route(b) == "promenade" and "guest" not in flags(b), "his balcony door doesn't open from outside", route(b))
-    ok &= check("cp_balc_guest" in lit(), "(a checkpoint all the same)", lit())
+    ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_balc_guest')"), "(his cabin has no checkpoint since plan-the-rest §7e)")
     # The ajar balcony cabin on deck 10 aft: in, and out of its corridor door into the hallway.
     ar = room(b, "balcabin10a")
     b.teleport(ar["doors"][1]["outX"], D10, "promenade")
@@ -5221,6 +5223,30 @@ def scenario_region7__link(b):
     shown = js(b, f"{S}.shellSlopes.filter(e => String(e.deck) === {json.dumps(owner)} && e.gfx.type === 'Graphics' && !e.balcony && !e.always && !e.foot && e.gfx.alpha > 0).length")
     ok &= check(js(b, f"{S}.viewDeck") == 9 and shown == 0, "in deck 9's corridor behind it: the ship's side's details of deck 9, that part among them, are put away", (owner, shown, js(b, f"{S}.viewDeck")))
     b.shot("region7-corridor9")
+    return ok
+
+
+def scenario_region7__shut(b):
+    """Never back behind a door shut to her (plan-the-rest §7e): hit in deck 9's aft hallway on her first way forward
+    from the balcony cabin, she does not come back at the crew door at 190 m (`cp_9_mid`), behind the one-way door at
+    202 m shut from its side, but at the hallway's own cabin; with none on her deck, on another deck; once she has come
+    through that door, at the crew door again."""
+    S = "window.__ship"
+    b.open("?reset&play")
+    wait(0.5)
+    x, y = exact_x(207.6), b.eval(f"{S}.world.data.ents.find(e => e.id === 'cp_9_mid').y")
+    light = lambda cid: b.eval(f"(s => {{ const c = s.checkpoints.find(c => c.id === '{cid}'); if (!c.active) s.lightCheckpoint(c, false); }})({S})")
+    back = lambda: b.eval(f"(c => [c.id, c.y])({S}.closestCheckpoint({x}, {y}))")
+    light("cp_9_mid")
+    light("cp_hall_9a")
+    got = back()
+    ok = check(got[0] == "cp_hall_9a", "hit at the swinging door (207.6 m): back at the hallway's cabin, not behind the shut door", got)
+    b.eval(f"{S}.checkpoints.find(c => c.id === 'cp_hall_9a').active = false")
+    got = back()
+    ok &= check(got[0] != "cp_9_mid" and got[1] != y, "with none on her deck past the door: another deck's", got)
+    b.eval(f"{S}.progress.markOpened('part-door-9-202')")
+    got = back()
+    ok &= check(got[0] == "cp_9_mid", "once she has come through the door: the crew door at 190 m", got)
     return ok
 
 
@@ -5552,7 +5578,7 @@ def scenario_region8(b):
     s = b.state()
     ok &= check(s["y"] == fn["y"] and s["mode"] == "play", "climbing in the lulls she reaches the funnel's top", s)
     b.hold("right", 0.9)
-    ok &= check("cp_funnel" in lit(), "the engineer's locker is lit", lit())
+    ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_funnel')"), "(no checkpoint on the top since plan-the-rest §7e)")
     ok &= check(person(b, "npc_engineer_cord")["on"], "he is up there, by the cord", person(b, "npc_engineer_cord"))
     # The horn, and what it sets off.
     b.teleport(F["hornX"] - 4, fn["y"])
@@ -5819,10 +5845,7 @@ def scenario_region9(b):
     b.hold("left", 1.0)
     ok &= check(9 in save_list(b, "regions"), "region 9: deck 12's forward lobby", b.state())
     # The chapel: the ceremony, the first time she looks in; then a frame on its wall.
-    cp = b.eval(f"{S}.checkpoints.find(c => c.id === 'cp_chapel').x")
-    b.teleport(cp + 40, D12)
-    hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
-    ok &= check("cp_chapel" in save_list(b, "activated"), "the chapel lobby's crew door: a checkpoint")
+    ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_chapel')"), "(the chapel's lobby has no checkpoint since plan-the-rest §7e)")
     b.teleport(B["wedding"]["chapelX"], D12)
     wait(0.3)
     b.tap("e")
@@ -5884,10 +5907,7 @@ def scenario_region9(b):
     go(b, 10, 78)
     ok &= check(use_door(b, 10, 74, 1), "the Officer's card opens the officers' corridor on deck 10")
     ok &= check(person(b, "amb_officer_10")["on"], "an officer walks it", person(b, "amb_officer_10"))
-    cp = b.eval(f"{S}.checkpoints.find(c => c.id === 'cp_officer').x")
-    b.teleport(cp + 40, D10)
-    hold_until(b, "left", lambda s: s["x"] < cp - 20, 3)
-    ok &= check("cp_officer" in save_list(b, "activated"), "an officer's cabin door: a checkpoint")
+    ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_officer')"), "(the officers' corridor has no checkpoint since plan-the-rest §7e)")
     # (Near-catch 6 as remade, 2026-11-25: src/world/bridge.js; its own checks are the case `region9.bridge`.)
     Q = f"{W}.story.bridge"
     ok &= check(js(b, f"{Q}.officer.visible && {Q}.officer.texture.key === 'bridge-stalk'"), "on the bridge the security officer is frozen mid-creep behind Bumbot")
