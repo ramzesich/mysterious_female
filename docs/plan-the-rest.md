@@ -996,6 +996,10 @@ palm sway; on foot a gust does nothing, the user's "Keep as is" (the hop drifts,
 rack, 96.3 to 99.3 m), 24 px, generated, their lines turning by rule with the light still; at her front she trips
 forward onto her belly (25a), at her back she sits (25b) (the user). With it her sit-down 2 px lower everywhere and the
 gym's runner in front of her treadmill (the user).
+**9 built 2026-11-26:** his door at 45.6 m, the last before the bridge, his tray just aft of it (the user; the plan's
+53.6 m is in the officer's trolley walk); the night watch in his uniform shirt over pyjama trousers (the user's choice
+of two; the first read as deck 10's sleeper). With it the bridge's sign 2 px up and the corridors' carts under the
+walkers (the user).
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

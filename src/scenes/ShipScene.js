@@ -756,7 +756,7 @@ export class ShipScene extends Phaser.Scene {
                     this.buildBulkhead(o, prop(o, 'x0', o.x - 600), prop(o, 'key', ''), prop(o, 'text', ''),
                         prop(o, 'sub', ''), prop(o, 'leaf', 'door-crew'), prop(o, 'colour', '#ae2334'),
                         { width: prop(o, 'width', BULKHEAD.width), swing: prop(o, 'swing', -1), wall: prop(o, 'wall', ''), frame: prop(o, 'frame', ''),
-                          lock: prop(o, 'lock', '') });
+                          lock: prop(o, 'lock', ''), signUp: prop(o, 'sign_up', 0) });
                     break;
 
                 // Outdoors with no way in (deck 7's stern strip, §5.3; the aft terraces behind decks
@@ -1152,7 +1152,7 @@ export class ShipScene extends Phaser.Scene {
             fontFamily: 'Verdana, sans-serif', fontSize: '6px', fontStyle: 'bold', color: '#45293f',
             backgroundColor: '#d9a43b', padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
         }).setOrigin(0, 0.5).setDepth(DEPTH.props);
-        const cart = this.add.image(o.x - 36, o.y, 'shipart', 'towel-trolley-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15);
+        const cart = this.add.image(o.x - 36, o.y, 'shipart', 'towel-trolley-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.115);
         c.room = this.add.image(x0, o.y - CABIN.height, 'cabin-8206').setOrigin(0).setDepth(DEPTH.exterior + 0.12).setVisible(false);
         const dim = this.roomDim(c.room);
         this.worldLayer.add([door, plate, cart, dim, c.room]);
@@ -1277,7 +1277,7 @@ export class ShipScene extends Phaser.Scene {
     // deck 11: `key`), from outside it is out of sight and inside it only it is cut open (the user,
     // 2026-11-06). The sauna's two ends are such walls too, cedar, with glass doors.
 
-    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '', frame = '', lock = '' } = {}) {
+    buildBulkhead(o, x0, key, text, sub, leaf, colour, { width = BULKHEAD.width, swing = -1, wall = '', frame = '', lock = '', signUp = 0 } = {}) {
         const x = o.x, floor = o.y, w = width;
         const ceiling = floor - this.deckPitch + 16;
         const head = floor - DOOR.height - 2;
@@ -1331,7 +1331,7 @@ export class ShipScene extends Phaser.Scene {
         const parts = [g, shut, open];
         // Its sign on the outer side.
         if (text) {
-            parts.push(this.add.text(x + w / 2 + 6, floor - 52, sub ? `${text}\n${sub}` : text, {
+            parts.push(this.add.text(x + w / 2 + 6, floor - 52 - signUp, sub ? `${text}\n${sub}` : text, {
                 fontFamily: 'Verdana, sans-serif', fontSize: '5px', fontStyle: 'bold', color: '#ffffff', align: 'center',
                 backgroundColor: colour, padding: { left: 2, right: 2, top: 1, bottom: 1 }, resolution: 4,
             }).setOrigin(0, 0.5).setDepth(DEPTH.props));
@@ -2618,7 +2618,9 @@ export class ShipScene extends Phaser.Scene {
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
             // (None where a tall trolley of the plan's world is pushed: the steward's, 2026-11-18.)
-            if (cart && x + 64 < o.x + o.width && !ents.some(e => rolls(e, x + 48, 50))) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.15));
+            if (cart && x + 64 < o.x + o.width && !ents.some(e => rolls(e, x + 48, 50))) parts.push(this.add.image(x + 48, o.y, 'shipart', cart).setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.115));
+            // (Over the doors and the wall, under whoever walks past it, `back`'s 0.12: deck 10's officer went behind it, the
+            // user, 2026-11-26: "should obscure the trolley, not be behind it".)
         }
         for (const m of moved) {
             const free = gaps.filter(q => !q.taken).sort((a, b) => Math.abs(a.gap - m.gap) - Math.abs(b.gap - m.gap))[0];

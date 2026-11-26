@@ -120,6 +120,7 @@ new one added there should be added here too.
 | Place | Link |
 |---|---|
 | `bridge`: the bridge (near-catch 6: walk forward; with `cards=all` its hatch stands open from the start, so for the scene as she meets it: <http://localhost:8000/?play&at=bridge&did=horn>) | <http://localhost:8000/?play&at=bridge&cards=all> |
+| `officers10`: deck 10's officers' corridor, its aft end by the stairs (walk forward: the officer's trolley, the night watch's tray and his "Do Not Disturb" door at 45.6 m, §7f) | <http://localhost:8000/?play&at=officers10&cards=all> |
 | `trays10`: deck 10, forward of the room-service tray (run aft onto it: 3) | <http://localhost:8000/?play&at=trays10> |
 
 ## Deck 11

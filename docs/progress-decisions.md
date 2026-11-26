@@ -5347,3 +5347,24 @@ other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from 
 - **Tests:** `mishaps.stretches` (the balls' cases: 25a and 25b with none on her and two, a hop over the blue, both
   turning), `mishaps.porter`, `region6`, `boot` pass; `check_overlaps` 0; `check_corridors` deck 11: 47.2 m without a beat
   (36 to 83), 53.7 without a reward. 3 generations.
+
+## Part 11, item 9: the night watch's "Do Not Disturb" door and tray; deck 10's bridge sign; the corridors' carts (2026-11-26)
+
+- **The place** (the user, of two: "1"): his door is the last cabin of deck 10's officers' corridor before the bridge,
+  45.6 m (`haz_dnd_10f`), his tray from the night just aft of it, 47.0 to 48.4 m (`haz_trays_10f`, its clatter opens his
+  door). The plan's 53.6 m is inside the officer's trolley walk (50 to 70 m). Going forward to the bridge: the officer, the
+  tray (hop it; gag 3), the door (E or her cry; gag 23); a tangerine in the tray brings him to look out, no fright.
+- **The night watch** (`dnd_nightwatch`, a pro character in the drill officer's style): the first, all in striped pyjamas
+  with a black mask, was nearly deck 10's sleeper and his mask was lost on his hair; the user chose the redraw: his white
+  uniform shirt with gold epaulettes, half-buttoned, over striped pyjama trousers, barefoot, a pale blue mask pushed up.
+  His `shriek` (v3, as the other door guests'), its teal undershirt put in his skin's tones; approved over his doorway.
+  `assets/source/people/dnd_nightwatch-raw/README.md` has the ids.
+- **`?at=officers10`** (72 m, the corridor's aft end by the stairs), walked as given: past the officer, a hop over the
+  tray, at his door, nothing hit.
+- **The bridge's "BRIDGE / CREW ONLY" sign 2 px higher** (the user; `sign_up` on its wall, `signUp` in `buildBulkhead`).
+- **The carts the corridors leave by a door** (`drawCabinDoors`; and the towel trolley at cabin 8206's door) are under
+  whoever walks past, decor 0.115 from 0.15 (the user, of deck 10's officer passing behind one: "This guy should obscure
+  the trolley, not be behind it").
+- **Tests:** `mishaps.stretches` (his tray, 3, and his door, 23, none on her and two; him shrieking in his doorway; the
+  tray's clatter opening his door), `boot` pass; `check_overlaps` 0; `check_corridors` deck 10: 53.2 m without a beat
+  (60 to 113), 92.3 without a reward (38 to 130). 21 generations.

@@ -1044,7 +1044,7 @@ def build_objects():
     # Named places to start at, for testing: ?at=<name> (README).
     add(point("crew", "place", exact_x(CREW_DECK["cabin"]), floor_y(crew)))
     for name, deck, m in [("gangway", 4, 67), ("deck4", 4, 49), ("deck4-aft", 4, 112), ("deck5", 5, 50), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
-                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37),
+                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37), ("officers10", 10, 72),
                           ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 88), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117), ("deck9-aft", 9, 134), ("steward", 9, 183.4),
                           ("spinnaker", 12, 52), ("champs", 12, 92), ("court", 12, 150), ("sushi", 12, 178),
                           ("bistro", 12, 205), ("wake4", 4, 246.5), ("hall8", 8, 188), ("hall10", 10, 116), ("hall9a", 9, 204)]:
@@ -1748,7 +1748,8 @@ def build_objects():
         prop("leaf", "door-deck"), prop("colour", "#0b5e65"), prop("lock", lock_text(DOOR_LOCKS.get((11, SPA_WALL_M))))]))
     add(point("bridge-door", "bulkhead", exact_x(BRIDGE_WALL_M), floor_y(10), [
         prop("x0", col(EXTENT[10][0]) * TILE, "int"), prop("key", "10:bridge"), prop("text", "BRIDGE"),
-        prop("sub", "CREW ONLY"), prop("lock", lock_text(DOOR_LOCKS.get((10, BRIDGE_WALL_M))))]))
+        prop("sub", "CREW ONLY"), prop("lock", lock_text(DOOR_LOCKS.get((10, BRIDGE_WALL_M)))),
+        prop("sign_up", 2, "int")]))   # (its sign 2 px higher, the user, 2026-11-26)
 
     # Deck 11, after NCL's plan and the user's photos (2026-11-06; three PixelLab sheets, tall-3,
     # tall-4 and props-6, 30 generations). Bow to stern.

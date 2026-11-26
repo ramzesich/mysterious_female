@@ -976,7 +976,10 @@ SWINGDOORS = {"haz_swing_9": (9, 159.6, 3.0, 0.6, "kid"), "haz_swing_10m": (10, 
 # "Do Not Disturb" doors (`haz_dnd`): id: (deck, m of the door, who is in). E at one: "Startled".
 DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"), "haz_dnd_10m2": (10, 171.6, "curlers"),
        "haz_dnd_8m": (8, 127.6, "dnd_shaver"), "haz_dnd_8a1": (8, 211.6, "dnd_facemask"),
-       "haz_dnd_8a2": (8, 223.6, "dnd_boxers"), "haz_dnd_10a": (10, 207.6, "dnd_toothbrush")}
+       "haz_dnd_8a2": (8, 223.6, "dnd_boxers"), "haz_dnd_10a": (10, 207.6, "dnd_toothbrush"),
+       # Part 11 (plan-the-rest §7f, 9): the night watch asleep after his watch, the last cabin of deck 10's officers'
+       # corridor before the bridge (the user, 2026-11-26: here, not the plan's 53.6 m, where the officer's trolley walks).
+       "haz_dnd_10f": (10, 45.6, "dnd_nightwatch")}
 # Things she must crawl under or through: id: (deck or room, from, to (m or x), a picture drawn
 # in front of her or None).
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
@@ -1031,6 +1034,8 @@ TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),
          "haz_trays_8a3": (8, 212.4, 213.8, "haz_dnd_8a1", ""), "haz_trays_8a4": (8, 216.9, 218.3, "haz_dnd_8a2", ""),
          "haz_trays_8a5": (8, 221.4, 222.8, "haz_dnd_8a2", ""), "haz_trays_8a6": (8, 224.4, 225.8, "haz_dnd_8a2", ""),
          "haz_trays_10a1": (10, 205.4, 206.8, "haz_dnd_10a", ""), "haz_trays_10a2": (10, 208.4, 209.8, "haz_dnd_10a", ""),
+         # (Part 11, §7f, 9: the night watch's tray from the night, just aft of his door, between it and the next.)
+         "haz_trays_10f": (10, 47.0, 48.4, "haz_dnd_10f", ""),
          # Deck 8 midships' ice bucket and two glasses on a tray outside a door, a trap as the rest since 2026-11-23 (the
          # user: "should this tray be a gag? We just walk past it"); no door its clatter opens. Its own dishes: (the ship's
          # atlas piece, px from the tray's middle), on the trays' base.

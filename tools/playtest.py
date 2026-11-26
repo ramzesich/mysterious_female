@@ -6902,6 +6902,30 @@ def scenario_mishaps__stretches(b):
     back = lambda: (b.eval(f"{GB}.phase = Math.PI / 2 - 0.5"),
                     at(b.eval(f"{GB}.mid - {GB}.half * Math.cos(Math.PI / 2 - 0.5)") + 30, D11, False))
     ok &= both(b, "the gym's ball, at her back (25b)", want="25b", act=back, clip=None, within=6, fresh=lambda: b.open("?play&reset&at=gym"))
+    # (The night watch (9), deck 10's officers' corridor: his tray, run into going forward to the bridge (3), its clatter
+    # opening his door; his door, E at it (23), he in its doorway, shrieking.)
+    DN = f"{W}.movers.find(m => m.def?.id === 'haz_dnd_10f')"
+    nw_tray = lambda: at(exact_x(48.4) + 60, D10, True)
+    ok &= both(b, "the night watch's tray (3)", want="3", **run("", "left", nw_tray), clip="^gags-tray-ride", within=6)
+    def nw_door():
+        dx = b.eval(f"{DN}.def.x")
+        at(dx + 10, D10, True)
+        wait(0.3)
+        b.tap("e")
+    ok &= both(b, "the night watch's door (23)", want="23", act=nw_door, clip="^gags-dnd", within=4, fresh=lambda: b.open("?play&reset"))
+    b.open("?play&reset")
+    nw_door()
+    wait(0.4)
+    ok &= check(b.eval(f"(w => !w.gone && w.sprite.visible && /shriek/.test(w.sprite.anims.currentAnim?.key || ''))({DN}.who)"),
+                "the night watch in his doorway, shrieking", b.eval(f"(w => [w.gone, w.sprite.visible, w.sprite.anims.currentAnim?.key])({DN}.who)"))
+    # (His tray's clatter opens his door: run into it with nothing in her hands.)
+    b.open("?play&reset")
+    b.eval(f"{MS}.safeUntil = 0")
+    nw_tray()
+    b.key("left", True)
+    opened = wait_js(b, f"{DN}.busy", 4)
+    b.key("left", False)
+    ok &= check(opened, "his tray's clatter opens his door")
     # (A hop clears a ball: held still in its lane's middle, she runs at the blue one and jumps 40 px short of it.)
     b.open("?play&reset&at=gym")
     GB2 = f"{W}.movers.find(m => m.def?.id === 'haz_gymball_2')"

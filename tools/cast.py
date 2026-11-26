@@ -207,6 +207,9 @@ CAST = {
     "dnd_facemask": ("396c998d-0109-453e-81fe-b7b5a8f438c6", {"shriek": 10}, {}),
     "dnd_boxers": ("d20a96a6-3001-461c-bf8c-b15a994e4480", {"shriek": 10}, {}),
     "dnd_toothbrush": ("6f8bcf6b-b35d-4157-a071-c10ce0985344", {"shriek": 10}, {}),
+    # Part 11 (plan-the-rest §7f, 9): behind deck 10's officers' corridor's "Do Not Disturb" door (45.6 m), the night
+    # watch asleep after his watch, in striped pyjamas, his sleep mask pushed up (pro, the drill officer's style).
+    "dnd_nightwatch": ("ede8b997-087f-4a4b-a538-93bc41be7388", {"shriek": 10}, {}),   # (his first try, all in pyjamas, read as deck 10's sleeper again: 14bce0ef-a55e-4e28-bf4c-6cea0b88bacb, dnd_nightwatch-raw/first/)
     "swing_hawaiian": ("528d7ec8-5ea6-4b74-955c-28036873ee2c", {"idle": 4}, {}),
     "swing_sunhat": ("6c095fb3-7011-47af-81b7-6264d43e6a12", {"idle": 4}, {}),
     "swing_ring": ("659ad453-9baa-4b17-9fd1-6e9fbbfad3f8", {"idle": 4}, {"scale": 0.8}),

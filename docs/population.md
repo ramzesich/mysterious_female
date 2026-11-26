@@ -255,6 +255,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The papers (`haz_papers_5`, `5b`) | 5 | 4a, 4b | her leg up behind (belly) / in front (bottom) | `paperSlide` | `deck4`, `pocket` |
 | The robot vacuums (`haz_vacuum_4`, `_9`; deck 4's second, `vacuum-2`, 225.5 to 239 m, §7f) | 4, 9 | 5a, 5b | she rides it off | `vacRev`, `vacDart`, `thump` | `vacuum`, `region4`, `mishaps.stretches` |
 | The suitcases (`haz_suitcase_4`; `haz_suitcase_5`, red, deck 5's atrium 93.4 to 97 m once the lunch is delivered, §7f) | 4, 5 | 6a, 6b, 6c | she rides it, tipped off (the red one's own red clips) | `creak` | `deck4`, `mishaps.stretches` |
+| The night watch's door and tray (`haz_dnd_10f`, 45.6 m; `haz_trays_10f`, 47.0 to 48.4 m; §7f) | 10 | 3, 23 | his tray ridden off; his door, he shrieks in its doorway, she tiptoes off | | `mishaps.stretches` |
 | The gym's balls (`haz_gymball_1`, purple, 90.6 to 94.2 m; `haz_gymball_2`, blue, 96.3 to 99.3 m; §7f) | 11 | 25a, 25b | at her front she trips forward onto her belly; at her back she sits (the built falls) | | `mishaps.stretches` |
 | The deck chair (`haz_deckchair`, `haz_wet`) | 11 | 7a; **7b unreachable** (it stands still) | face first onto it, she sleds on it | `scrape`, `creak`, `thump` | `region6` |
 | The porter's cart (`haz_porter`) | 4 | 8a, 8b, 8c, 8d | over the cart, pushed, sat on it, bounced off his back | `cartBump`, `thump` | `region1`, `mishaps.porter` |
