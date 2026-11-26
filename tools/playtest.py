@@ -3001,42 +3001,80 @@ def enter_region4(b):
 
 
 def pills_for_the_stage_manager(b):
-    """The second errand, start to end (the golden path's): down the theatre's trunk to deck 4, his
-    pills from his cabin, back up, into his hands: the Entertainment card."""
+    """The second errand, start to end (the golden path's): down the theatre's trunk to deck 4, his pills from the shelf
+    in his cabin, in her hands (a load since 2026-11-26: the user), not back up the trunk but by the aft stairs, into his
+    hands: the Entertainment card."""
     tx = trunk_x("theatre")
+    S = "window.__ship"
     # (Deck 4's second vacuum patrols the pocket by the trunk's door, the pills' test in play (plan-the-rest §7f, 2): held
     # still here, whose walk is blind; its hit is `mishaps.stretches`'.)
-    b.eval(f"window.__ship.vacuums.filter(v => Math.abs(v.sprite.x - {tx}) < 20 * 48).forEach(v => {{ v.asideUntil = window.__ship.time.now + 600000; }})")
+    b.eval(f"{S}.vacuums.filter(v => Math.abs(v.sprite.x - {tx}) < 20 * 48).forEach(v => {{ v.asideUntil = {S}.time.now + 600000; }})")
     b.teleport(tx, D6)
     b.tap("e")
     s = hold_until(b, "down", lambda s: s["y"] == D4, 8)
     b.hold("left", 0.5)
     if b.state()["y"] != D4 or b.state()["mode"] != "play":
-        return False
+        return check(False, "down the theatre's trunk to deck 4", b.state())
     cabin = room(b, "smcabin")
     b.teleport(cabin["doors"][0]["outX"], D4)
     b.tap("e")
     wait(0.9)
-    b.teleport(cabin["x0"] + 172, D4, "smcabin")
+    b.teleport(cabin["x0"] + 174, D4, "smcabin")
     b.tap("e")
     wait(0.4)
-    if "pills" not in save_list(b, "items"):
+    if not check(carrying(b) == "pills", "the bottle from his shelf, in her hands", carrying(b)):
         return False
+    shelf = f"{S}.world.things.find(t => t.id === 'item_pills')"
+    ok = check(b.eval(f"!{shelf}.items.some(i => i.visible)"), "off the shelf while she has it")
     b.teleport(cabin["doors"][0]["x"], D4, "smcabin")
     b.tap("e")
     wait(0.9)
+    # Not up the ladder with her hands full.
     b.teleport(tx, D4)
     b.tap("e")
-    hold_until(b, "up", lambda s: s["y"] == D6, 8)
-    b.hold("left", 0.4)
+    b.hold("up", 0.6)
+    ok &= check(b.state()["y"] == D4 and b.state()["mode"] == "play" and carrying(b) == "pills", "the trunk will not take her with it",
+                (b.state()["mode"], carrying(b)))
+    # (The aft stairs, 4 to 6, are walked by `region3`'s own case; here she is set by him.)
     # (He stands aft of centre stage since 2026-11-24, the dancers at the aft curtain: near-catch 3 remade.)
     b.teleport(exact_x(248.5) + 26, D6)
+    wait(0.3)
     b.tap("e")
     end = now() + 12
     while now() < end and "ent" not in save_list(b, "cards"):
         wait(0.2)
     wait(0.8)
-    return "ent" in save_list(b, "cards") and b.state()["mode"] == "play"
+    ok &= check(carrying(b) is None, "the bottle out of her hands", carrying(b))
+    return ok and "ent" in save_list(b, "cards") and b.state()["mode"] == "play"
+
+
+def scenario_region3__pills_spill(b):
+    """Deck 4's second vacuum meets her with his pills in her hands (the user, 2026-11-26: "the game glitches and hangs"):
+    the bottle spills with no error (the vacuum's hit had no height, and the spill's sound threw every frame), and it is
+    back on his shelf, hers to take again."""
+    S = "window.__ship"
+    b.open("?play&reset&did=bb1,lunch,bb_lift,bb2,riv_prom,glimpse1,glimpse_window,bb3")
+    cabin = room(b, "smcabin")
+    b.teleport(cabin["x0"] + 174, D4, "smcabin")
+    b.tap("e")
+    wait(0.4)
+    ok = check(carrying(b) == "pills", "the bottle in her hands", carrying(b))
+    b.teleport(cabin["doors"][0]["x"], D4, "smcabin")
+    b.tap("e")
+    wait(1.0)
+    vx = b.eval(f"{S}.vacuums[1].sprite.x")
+    b.eval(f"(v => {{ v.minX = v.maxX = {vx}; v.speed = 0; }})({S}.vacuums[1])")
+    errors = len(b.errors)
+    b.teleport(vx - 60, D4)
+    b.hold("right", 1.0)
+    wait(2.5)
+    ok &= check(carrying(b) is None and len(b.errors) == errors, "the vacuum spills it, the game runs on", (carrying(b), b.errors[errors:][:1]))
+    b.teleport(cabin["x0"] + 174, D4, "smcabin")
+    wait(0.6)
+    b.tap("e")
+    wait(0.4)
+    ok &= check(carrying(b) == "pills", "a fresh one on his shelf, hers again", carrying(b))
+    return ok
 
 
 def scenario_region3__stage(b):

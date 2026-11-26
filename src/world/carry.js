@@ -22,6 +22,8 @@ export const LOADS = {
     cocktail: { frame: 'umbrella-cocktail' },
     cake: { thing: 'wedding-cake', fragile: true },
     canister: { thing: 'canister', heavy: true, bare: true },
+    // The stage manager's pills (region 3): the bottle alone in her hands (the user, 2026-11-26), up the aft stairs to him.
+    pills: { thing: 'pills-bottle', bare: true },
     // The deliveries (plan-the-rest §5 3.2), each a tray with its own rule. 1, the vase of flowers (deck 8 midships): a
     // narrower tray (`tray`, px; the user, 2026-11-23), the bouquet before her face, and round the screen the flowers
     // she sees the hallway through (`view`, the user's frame: `assets/source/things/delivery/`).
@@ -168,6 +170,7 @@ export class Carry {
         rumble('spill');
         // (The steel canister rings; pillows land soft; anything else is crockery, or lands like it.)
         if (this.kind === 'canister') sfx.clang();
+        else if (this.kind === 'pills') sfx.rattle();
         else if (LOADS[kind].soft) sfx.flump();
         else if (['cake', 'cone', 'stub'].includes(this.kind)) sfx.splat();
         else sfx.crash();

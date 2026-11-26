@@ -616,8 +616,9 @@ export class ShipScene extends Phaser.Scene {
                 case 'vacuum': {
                     // (The one she rides in her gag, 5b: cut from that picture, tools/build_things.py.
                     // Set 2 px down into the carpet's top line, and her ride with it, `ride.y`: the
-                    // user, 2026-11-17.)
-                    const sprite = this.add.image(o.x, o.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props);
+                    // user, 2026-11-17.) In front of the doors it passes (at `DEPTH.props` too, added after it: the stage
+                    // manager's door hid it, the user, 2026-11-26).
+                    const sprite = this.add.image(o.x, o.y + 2, 'things', 'robot-vacuum').setOrigin(0.5, 1).setDepth(DEPTH.props + 0.01);
                     this.worldLayer.add(sprite);
                     this.vacuums.push({
                         sprite, alive: true, dir: 1,
@@ -4842,7 +4843,9 @@ export class ShipScene extends Phaser.Scene {
                 s.setAlpha(0.6);
                 this.tweens.add({ targets: s, angle: 720, duration: 900, ease: 'Quad.easeOut' });
             } else if (this.world.carry) {
-                this.world.touched({ x: s.x, touch: { kind: 'spill' } });
+                // (Its place with its height: without `y` the spill's sound had no distance, threw every frame, and the game
+                // hung, the user, 2026-11-26, carrying the pills.)
+                this.world.touched({ x: s.x, y: s.y, touch: { kind: 'spill' } });
             } else {
                 // (From behind she rides it off down the corridor, 5b: it is hidden meanwhile.)
                 const ride = { x: s.x, y: s.y, dir: v.dir, v: v.speed,

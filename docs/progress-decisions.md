@@ -5345,3 +5345,27 @@ e13eb438.
   the suite not run.
 - **Next:** the pills, her one pocket item, shown while she carries them (the user: after the utilities).
 
+## The stage manager's pills carried in her hands (2026-11-26, the Refinement session)
+
+The user: "Analyze the route she has to make in order to bring him the pills and let see if we can turn this item to be
+another deliverable (not in our pocket)". On branch `refine`, after the HUD's utilities.
+
+- **The route as it was:** down the theatre's trunk (240 m) to deck 4, 8 m to his door (232 m), the bottle, back up the
+  trunk: about 16 m. **As a load** (no ladders with her hands full): forward about 30 m on deck 4 past the second vacuum
+  and the cart at 220 m, the aft stairs 4 to 6, about 46 m aft through the foyer and the stalls, onto the stage under
+  the swinging lamp.
+- **The user's choices:** the bottle alone in her hands (of the bottle, a tray with a glass of water, a pharmacy bag);
+  the lamp kept as the last test; the cart checked first (her low hop with a load clears it both ways, a walk stops
+  17 px short: it stays).
+- **Built:** `pills` in `LOADS` (`src/world/carry.js`, bare, a rattle when it spills); `item_pills` a source on his
+  shelf (`tools/population.py`, `lift`: one bottle, a fresh one after a spill), on view only once near-catch 3 is over
+  (as the pickup was: the user asked why it showed from the start; it had come from the canister's pattern), 1 px up
+  and 2 right (the user); `pills()` in `src/world/story.js` takes it from her hands. No close-up for it now.
+- **Found in play by the user:** the deck 4 vacuum hid behind the stage manager's door (both at `DEPTH.props`): it is
+  drawn just in front of the doors now; and a vacuum hit with the bottle hung the game: the vacuum's hit had no height
+  (`world.touched` without `y`), the spill's sound threw every frame. It reports its height now; a hit spills the bottle,
+  plays gag 5a and sends her to her checkpoint.
+- **Checks:** `region3` and `golden` check the bottle in her hands, off the shelf, the trunk refusing her, his card;
+  `region3.pills_spill` (new) the vacuum's hit with it; boot, region1, deck4, vacuum, highlight pass; mishaps fails only
+  on deck 9's sprinkler, as on main. No generations.
+
