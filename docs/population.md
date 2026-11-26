@@ -268,7 +268,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The sauna's steam; Bliss's fog machine (`haz_fog`, deck 6 at the DJ booth, §7f) | 11, 6 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9`, `mishaps.stretches` |
 | The towel stacks (`haz_towels_9`; `haz_towels_4`, 169.6 m, §7f) | 4, 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things`, `mishaps.stretches` |
 | Teppanyaki's flares | 12 | 19 | sooty, blinking, a cough | `flare`, `yelpHot`, `herCough` | `region8` |
-| The gulls on the rails | balconies, 12 | 20 | on her head; with a tangerine, it takes one | `gullDive`, `flap` | `region7`, `region8`, `pocket`, `mishaps.gulls` |
+| The gulls on the rails (the boat walkway's two, `WALKWAY_PERCH`, go up the moment she is near, §7f) | balconies, the walkway, 12 | 20 | on her head; with a tangerine, it takes one | `gullDive`, `flap` | `region7`, `region8`, `pocket`, `mishaps.gulls`, `mishaps.stretches` |
 | The funnel's gulls | the roof | 21 | on her bottom down the stairway; with one, it takes it | `gullDive`, `land` | `region8`, `mishaps.gulls` |
 | The crossing gulls | the finale | 22 | the parasol inside out, she drops; with one, it takes it | `gull`, `parasolShut` | `finale`, `mishaps.gulls` |
 | "Do Not Disturb" doors (`haz_dnd_*`) | 8 to 10 | 23 | hands over her eyes, she tiptoes off | `knock`, `door`, `oh`, `tiptoe` | `region4`, `pocket` |

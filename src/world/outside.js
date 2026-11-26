@@ -114,6 +114,8 @@ export class Gusts {
 // she carries food, the food is gone). Keeping on the move is the way. (No shadow on the floor since
 // 2026-11-19, the user.) With a tangerine on her it takes one and flies off with it, out of sight,
 // and is back once she is past (`flee`).
+// An eager gull's (the walkway's) look before its dive, ms: up off the rail and over where she will be.
+const EAGER = { markMs: 380, reach: 1.6 * M };   // (`reach`: the furthest from its rail it dives, px)
 export class PerchGull {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -226,9 +228,22 @@ export class PerchGull {
         if (this.state === 'perched' && away) this.state = 'back';
         if (this.state === 'perched') {
             this.linger = near ? this.linger + dt : Math.max(0, this.linger - dt * 2);
-            this.sprite.setFrame('gull-perched').setPosition(d.x, d.y - (this.linger > 1.2 ? Math.floor(time / 110) % 2 : 0));
+            // (Its hop on the rail before it goes, the balconies' gulls only: an eager one goes at once.)
+            this.sprite.setFrame('gull-perched').setPosition(d.x, d.y - (!d.eager && this.linger > 1.2 ? Math.floor(time / 110) % 2 : 0));
             if (near) this.sprite.setFlipX(p.x < d.x);
-            if (this.linger > 2 && time > this.at) {
+            // (An `eager` one, the boat walkway's: the moment she is within reach, straight up, no hop on the rail first, at where
+            // her speed puts her by the dive: a runner past it gets it, one who stops short as it squawks does not. The user,
+            // 2026-11-26: lingering only, "I can run past them without even realizing they would move"; then "remove the
+            // starting sequence, when the gull is preparing. Make it just fly up straight away".)
+            const vx = p.body?.velocity.x ?? 0;
+            if (d.eager && near && time > this.at) {
+                this.state = 'mark';
+                this.at = time + EAGER.markMs;
+                // (Never further from its rail than `reach`: aimed at a runner's way it chased her across the screen, the user,
+                // 2026-11-26: "There has to be some max range for them". Out of that stretch she is safe.)
+                this.targetX = Phaser.Math.Clamp(p.x + vx * (EAGER.markMs + 230) / 1000, d.x - EAGER.reach, d.x + EAGER.reach);
+                sfx.at(d.x, d.y).gull();
+            } else if (this.linger > 2 && time > this.at) {
                 this.state = 'mark';
                 this.at = time + 1000;
                 this.targetX = p.x;

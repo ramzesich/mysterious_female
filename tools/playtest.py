@@ -6897,6 +6897,18 @@ def scenario_mishaps__stretches(b):
     FG = f"{W}.movers.find(m => m.def?.id === 'haz_fog')"
     fog = lambda: (wait_js(b, f"(p => p[0] === 'on' && p[1] > 0.2)({FG}.phase({MS}.time.now))", 8), at(exact_x(118.45), D6, False))
     ok &= both(b, "Bliss's fog machine (17)", want="17", **run("", "right", fog), clip="^gags-steam", within=8)
+    # (The boat walkway's gull by the drill (6): she lingers by it; with none on her its gag (20), with two it takes one.)
+    walk_gull = lambda: (b.teleport(exact_x(181.0) + 20, D7, "promenade"), b.eval(f"{MS}.player.setFlipX(true)"))
+    ok &= mishap_hit(b, "the walkway's gull (20)", 0, walk_gull, "20", "^gags-gull", within=14, fresh=lambda: b.open("?play&reset"))
+    b.open("?play&reset")
+    b.eval(f"{MS}.save.tangerines = 2; {MS}.refreshHud(); {MS}.lastMishap = null; {MS}.safeUntil = 0")
+    b.eval(WATCH)
+    walk_gull()
+    took = wait_js(b, f"{MS}.lastMishap?.id === '20'", 14)
+    wait(0.3)
+    s = b.state()
+    ok &= check(took and s["tangerines"] == 1 and b.eval("window.__respawns") == 0 and b.eval(f"{MS}.loose.all.length") == 0,
+                "the walkway's gull, two on her: it takes one, her place kept", (b.eval(f"{MS}.lastMishap?.id"), s))
     # Before the lunch: the trays there, the suitcase not; after it, the other way round.
     b.open("?play&reset&at=pass5")
     T = f"{W}.movers.filter(m => /^haz_trays_5/.test(m.def?.id || ''))"

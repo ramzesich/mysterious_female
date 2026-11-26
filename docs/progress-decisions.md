@@ -5233,3 +5233,24 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   at level 0 rests as a lone trunk door (20%) and pulses up (`placed`, `own`).
 - **Tests:** `mishaps.stretches` (the fog's case added: walked into its puff, none on her and two), `region2`, `region3`,
   `highlight`, `boot` pass; `check_overlaps` 0. 13 generations.
+
+## Part 11, item 6: the boat walkway's gulls; the lifeboat she enters moved (2026-11-26)
+
+- **Two gulls on the walkway's rail, no gusts** (the user, of a mock-up with a line of signal flags as the gusts' tell:
+  "Yes, those two", "No gusts there"): `WALKWAY_PERCH` in `tools/population.py`, at 165.4 m (between two lifeboats: at the
+  plan's 160 m a boat, drawn in front of her and the rail, hid it) and 181 m (5 m forward of the drill), on the rail's top
+  (30 px, measured). **They answer her coming** (`eager` on a `PerchGull`): the balconies' wait for her to linger two
+  seconds, and the user "can run past them without even realizing they would move"; then "remove the starting sequence,
+  when the gull is preparing. Make it just fly up straight away": the moment she is within 2.6 m, no hop on the rail, it
+  goes up (0.38 s) and dives at where her speed puts her; then "the gull shoots at me even when I'm more than half a
+  screen away. There has to be some max range": the dive is kept within 1.6 m of its rail (`EAGER.reach`). The way past:
+  bait it from just outside, let it miss, run through while it flies back (2.6 s). A runner straight past gets gag 20; with
+  tangerines on her it takes one. The balconies' gulls are as they were.
+- **`?at=drill7` moved to 184.3 m:** at 180.5 the gull dove on her as the page loaded (the drill's case in
+  `mishaps.things` starts there too; it passes).
+- **The lifeboat she enters is the second red one, 155.6 m** (the user: "switch between the two red boats, making the
+  second one enterable instead of the first one"): `lifeboat-round` and the room's `m` moved from 143 m (two lines of
+  data; inside, all is in the room's own px).
+- **Tests:** `mishaps.stretches` (the walkway gull's case added: lingering by it with none on her, its gag; with two, it
+  takes one), `region2` (the hatch, the book, the photo), `region7` pass; `mishaps.things` fails only on deck 9's
+  sprinkler, as before; `check_overlaps` 0. No generations.

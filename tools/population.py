@@ -45,9 +45,9 @@ ROOMS = [
     dict(id="lighting", deck=7, m=206.1, width=480, look="lighting", door="crew", plate="LIGHTING", plate_style="navy",
          lock=("card", "ent", 0)),
     # (As long as the boat it is in, the user, 2026-11-21; in through its roof hatch, whose middle is 112 px from the boat's
-    # forward end at 143 m, she climbing up behind the boat into it (`roof`: tools/build_hatch.py), a ladder there inside;
-    # `door_x` is draw_rooms.py's LIFEBOAT_DOOR.)
-    dict(id="lifeboat", deck=7, m=143 + 112 / 48, route="outside", width=408, door_x=112, look="lifeboat", door="roof"),
+    # forward end at 155.6 m (143 m until 2026-11-26, the user: "switch between the two red boats"), she climbing up behind
+    # the boat into it (`roof`: tools/build_hatch.py), a ladder there inside; `door_x` is draw_rooms.py's LIFEBOAT_DOOR.)
+    dict(id="lifeboat", deck=7, m=155.6 + 112 / 48, route="outside", width=408, door_x=112, look="lifeboat", door="roof"),
     dict(id="cleanup", deck=9, m=140, slot=True, width=240, look="cabin", door="open"),
     # A guest cabin being made up on deck 10's midships hallway, its door held open, the bedmaker in it
     # (the user, 2026-11-20: out of the cabin being cleaned, whose bed has her bookmark), between the
@@ -1034,6 +1034,14 @@ GUSTS = dict(every=7.0, blow=1.5, tell=0.7, drift=60)
 PERCH = {"gull_8_1": (8, 120), "gull_8_2": (8, 166), "gull_8_3": (8, 200), "gull_8_4": (8, 240),
          "gull_9_1": (9, 130), "gull_9_2": (9, 170), "gull_9_3": (9, 210),
          "gull_10_1": (10, 150), "gull_10_2": (10, 190), "gull_10_3": (10, 231)}
+# Gulls on the boat walkway's rail (plan-the-rest §7f, 6; the user, 2026-11-26, "Yes, those two"; its gusts dropped, "No
+# gusts there"): id: m. In the gaps between the boats, which are drawn in front of her and of the rail (at the plan's 160 m
+# one hid it): between two lifeboats, and 5 m forward of the boat drill, where waiting out the boat is what it punishes.
+# They answer her coming (the user: "triggered too late, I can run past them without even realizing they would move"):
+# the moment she is within reach one goes straight up, no hop on the rail first ("Make it just fly up straight away"), and
+# dives at where her speed puts her (`eager`, `PerchGull`).
+WALKWAY_PERCH = {"gull_walk_1": 165.4, "gull_walk_2": 181.0}
+WALKWAY_RAIL = 30           # px, the walkway rail's top over its floor (measured)
 # Laundry lines (`haz_line`): id: (deck, m): the partition nearest is folded open (a family's two
 # balconies made one) and a line of washing hangs across the gap: no vault there, she crawls under.
 LINES = {"haz_line_8a": (8, 135), "haz_line_8b": (8, 215), "haz_line_9": (9, 195.7), "haz_line_10a": (10, 125.4),

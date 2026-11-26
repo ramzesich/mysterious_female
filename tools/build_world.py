@@ -11,7 +11,7 @@ import build_ship_map as B
 from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOG, FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
-from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
+from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS, WALKWAY_PERCH, WALKWAY_RAIL
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
@@ -476,6 +476,8 @@ def build_world():
 
     perch = [dict(id=gid, x=unit_at(deck, m) + 88, y=B.floor_y(deck) - RAIL_H, floor=B.floor_y(deck), x0=unit_at(deck, m))
              for gid, (deck, m) in PERCH.items()]
+    perch += [dict(id=gid, x=B.exact_x(m), y=B.floor_y(7) - WALKWAY_RAIL, floor=B.floor_y(7), route=OUTSIDE, eager=True)
+              for gid, m in WALKWAY_PERCH.items()]
     occupied = [dict(id=oid, x0=unit_at(deck, m), x1=unit_at(deck, m) + UNIT, y=B.floor_y(deck), frame=frame)
                 for oid, (deck, m, frame) in OCCUPIED.items()]
     busy = {(B.floor_y(deck), ux) for (deck, ux) in lines} | {(B.floor_y(deck), ux - UNIT) for (deck, ux) in lines}
