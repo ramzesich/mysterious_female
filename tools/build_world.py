@@ -12,7 +12,7 @@ from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOG, FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS, WALKWAY_PERCH, WALKWAY_RAIL
-from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
+from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, SUNDECK, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
@@ -583,6 +583,10 @@ def build_world():
                      top=y12 - 260, bottom=B.floor_y(11), y=y12,
                      towels=[dict(x=B.exact_x(m), y=y12 - up, tint=i + 1) for i, (m, up) in enumerate(TERRACE["towels"])],
                      gull=dict(id="gull_terrace", x=B.exact_x(TERRACE["gull"][0]), y=y12 - TERRACE["gull"][1], floor=y12)),
+        sundeck=dict(gust=SUNDECK["gust"], x0=B.exact_x(SUNDECK["span"][0]), x1=B.exact_x(SUNDECK["span"][1]),
+                     top=y12 - 200, bottom=y12, y=y12,
+                     towels=[dict(x=B.exact_x(m), y=y12 - up, tint=i + 2, colour=SUNDECK["colours"][i]) for i, (m, up) in enumerate(SUNDECK["towels"])],
+                     towelDepth=3.11),
         funnel=dict(gust=FUNNEL_TOP["gust"], gulls=FUNNEL_TOP["gulls"], swoop=FUNNEL_TOP["swoop"],
                     hornX=B.exact_x(FUNNEL_TOP["horn"]), toolboxX=B.exact_x(FUNNEL_TOP["toolbox"]),
                     telescopeX=B.exact_x(FUNNEL_TOP["telescope"]), y=ft["y"], roofY=ft["foot"][1], ladderX=ladder_x,

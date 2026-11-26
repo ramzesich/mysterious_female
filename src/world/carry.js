@@ -53,7 +53,8 @@ const HOP_HOLDS = [['carry-rise', [7, 28]], ['carry-apex', [10, 19]], ['carry-fa
 
 // A fragile load's sway: what each start or stop, turn on the move and landing adds (1: it goes
 // over), and how much settles in a second.
-export const SWAY = { startStop: 0.26, turn: 0.42, landing: 0.5, settle: 0.24 };
+// `gust`: a second of moving in a gust's blow (the sun deck's, plan-the-rest §7f, 7: standing still in it adds nothing).
+export const SWAY = { startStop: 0.26, turn: 0.42, landing: 0.5, settle: 0.24, gust: 0.45 };
 
 export class Carry {
     constructor(world) {
@@ -350,6 +351,8 @@ export class Carry {
                 st.dir = dir;
                 this.wobble += SWAY.turn;
             }
+            // (In a gust's blow, every moment she moves; standing still, nothing.)
+            if (moving && this.world.winds.some(g => g.phase(s.time.now) === 'blow' && g.out())) this.wobble += SWAY.gust * dt;
             if (!s.grounded) st.air += dt;
             else {
                 if (st.air > 0.12) this.wobble += SWAY.landing;

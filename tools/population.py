@@ -1141,6 +1141,14 @@ FLARES = {"haz_flare_a": (12, 185.4, 0.8, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
 # the end rail.
 TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 225),
                towels=[(215.85, 24), (217.65, 24)], gull=(220.0, 40))
+# The sun deck (`gust_sundeck`; plan-the-rest §7f, 7): gusts as the aft terrace's over its open part, from the stair core to
+# the court (m), so that the hop over the old lady's sunbed is timed and the cake (after the horn) wobbles in them unless
+# she stands still (`SWAY.gust` in src/world/carry.js); towels over the two loungers' backrests the tell (m, px up: the
+# backrest's top, 33 px forward of the lounger's middle). The palm is left still (turned, its pot would tip with it).
+SUNDECK = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(110.5, 144.0),
+               towels=[(111.02 - 33 / 48, 32), (112.9 - 33 / 48, 32)],
+               # (Muted, and drawn just over the loungers, under the deck's door: the user, 2026-11-26.)
+               colours=[0xa9c4d6, 0xdccba6])
 # The funnel (`gust_funnel`, `gull_funnel`, `sec_horn`, `sec_telescope`): gusts on the roof and the
 # stairway (climbing in one she slips back down the flight), two gulls circling (one comes down at
 # her every `swoop` s, in a lull); on the top (m): the horn's post and cord, the engineer's toolbox

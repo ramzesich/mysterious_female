@@ -5254,3 +5254,15 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
 - **Tests:** `mishaps.stretches` (the walkway gull's case added: lingering by it with none on her, its gag; with two, it
   takes one), `region2` (the hatch, the book, the photo), `region7` pass; `mishaps.things` fails only on deck 9's
   sprinkler, as before; `check_overlaps` 0. No generations.
+
+## Part 11, item 7: the sun deck's gusts (2026-11-26)
+
+- **Gusts over the sun deck** (`SUNDECK` in `tools/population.py`, the topdeck's `sundeckGusts`, a `Gusts` as the aft
+  terrace's): every 7 s over 110.5 to 144 m, a tell of 0.7 s, a blow of 1.5 s; towels over the two loungers' backrests
+  (111.02 and 112.9 m) the tell; the palm left still (turned, its pot would tip). In the air she drifts aft; **the cake
+  wobbles while she moves in a blow** (`SWAY.gust`, 0.45 a second, in `src/world/carry.js`; standing still, nothing:
+  measured 0 and 0.55 over a blow).
+- **The user:** "The towel is visible through the door. Make the towels less colorful": the towels at the loungers' depth
+  (`towelDepth`, 3.11, under the deck's door at 8) and muted (`colours`: a pale blue, a sand). Then, asked what a gust
+  should do on the deck (it is no obstacle on foot): **"Keep as is"**: dressing, the hop's drift and the cake's wobble.
+- **Tests:** `region8`, `region9`, `boot` pass; `check_overlaps` 0. No generations.

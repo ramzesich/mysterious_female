@@ -789,6 +789,12 @@ export const topdeck = {
         w.movers.push(this.terraceGusts);
         w.winds.push(this.terraceGusts);
         w.movers.push(new PerchGull(w, { ...tr.gull, route: 'inside' }));
+        // The sun deck (plan-the-rest §7f, 7): gusts over it as over the terrace, towels over the loungers' backrests the tell.
+        if (T.sundeck) {
+            this.sundeckGusts = new Gusts(w, { ...T.sundeck, route: 'inside' });
+            w.movers.push(this.sundeckGusts);
+            w.winds.push(this.sundeckGusts);
+        }
 
         // The funnel: the wind on the roof, the stairway and the top, its windsocks; the gulls.
         const F = T.funnel, f = w.data.funnel;

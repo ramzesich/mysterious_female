@@ -990,6 +990,8 @@ props in their own colours (the user), its doors still pulsing (`src/highlight.j
 **6 built 2026-11-26:** the two gulls at 165.4 and 181 m (in the gaps between the boats), going up the moment she is within
 reach and diving within 1.6 m of their rail (the user); **no gusts on the walkway** (the user: "No gusts there"). With it,
 the lifeboat she enters moved to the second red boat (155.6 m; the user).
+**7 built 2026-11-26:** the sun deck's gusts as planned, the towels muted and under the stair core's door (the user); no
+palm sway; on foot a gust does nothing, the user's "Keep as is" (the hop drifts, the cake wobbles while she moves).
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

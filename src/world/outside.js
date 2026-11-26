@@ -42,8 +42,10 @@ export class Gusts {
         this.route = def.route ?? OUT;
         this.flappers = [];         // what the wind moves: { img, k: how freely, i }
         def.towels.forEach((t, i) => {
-            const img = s.add.image(t.x, t.y, 'rail-towel').setOrigin(0.5, 0).setTint(TOWELS[t.tint % TOWELS.length])
-                .setDepth(this.route === OUT ? D.player + 0.31 : D.props + 0.04);
+            // (`t.colour`, `def.towelDepth`: a stretch's own, the sun deck's muted towels just over their loungers, under the
+            // deck's door, the user, 2026-11-26: "The towel is visible through the door. Make the towels less colorful".)
+            const img = s.add.image(t.x, t.y, 'rail-towel').setOrigin(0.5, 0).setTint(t.colour ?? TOWELS[t.tint % TOWELS.length])
+                .setDepth(def.towelDepth ?? (this.route === OUT ? D.player + 0.31 : D.props + 0.04));
             world.add([img]);
             // (Its deck by its rail's height over the floor, the data's own: a `+ 50` here, the old rail's, gave the deck
             // below once the rail was lowered. `balcony`: drawn over her, so not across a room she is in on that deck:
