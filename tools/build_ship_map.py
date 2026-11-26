@@ -1294,16 +1294,17 @@ def build_objects():
             props.append(prop("front", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else exact_x(m), floor_y(deck), props))
 
-    def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True)):
+    def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True), chair_dy=0):
         """A table (or anything) with a chair at each side, facing it, the same distance away (the
         user, 2026-11-03): by default each chair's seat tucked a little under the table's edge.
-        `faces_left`: the chair was drawn facing left; `sides`: which of the two chairs to put."""
+        `faces_left`: the chair was drawn facing left; `sides`: which of the two chairs to put; `chair_dy`: the chairs
+        that much lower (negative), the floor's tiles drawn over what goes under it."""
         cx = exact_x(m)
         off = gap if gap is not None else (width(middle) + width(chair)) // 2 - 5
         if sides[0]:
-            put(deck, 0, chair, flip=faces_left, x=cx - off)
+            put(deck, 0, chair, chair_dy, flip=faces_left, x=cx - off)
         if sides[1]:
-            put(deck, 0, chair, flip=not faces_left, x=cx + off)
+            put(deck, 0, chair, chair_dy, flip=not faces_left, x=cx + off)
         put(deck, 0, middle, x=cx)
         if on_top:
             put(deck, 0, on_top, height(middle), x=cx)
@@ -1419,7 +1420,7 @@ def build_objects():
     cucina = [155.5, 159.8, 164.1]
     decor("cucina-windows", "dinewindows", x_of(150), x_of(168), xs=",".join(str(x_of(m)) for m in cucina), style="drapes")
     for m in cucina:
-        dinner(m, "dark-table-lamp-bg", "dark-chair-bg")
+        dinner(m, "cucina-table-bg", "cucina-chair-bg")      # (bigger, 2026-11-26: tools/build_ship_art.py)
     put(5, 157.65, "wine-barrel-bg")
     put(5, 161.95, "olive-tree-bg")
     put(5, 166.7, "wine-trolley-bg")      # (clear of the pantry's crew door at 166 m)
@@ -1429,7 +1430,7 @@ def build_objects():
     decor("seasons-windows", "dinewindows", x_of(168), x_of(194), xs=",".join(str(x_of(m)) for m in seasons), style="sheers")
     decor("seasons-pillars", "pillars", x_of(168), x_of(194), xs=",".join(str(x_of(m)) for m in (173.2, 182.0, 190.8)), style="burl")
     for i, m in enumerate(seasons):
-        dinner(m, ("table-dinner-bg", "table-flowers-bg")[i % 2], "dining-chair-bg")
+        dinner(m, ("seas-table-dinner-bg", "seas-table-flowers-bg")[i % 2], "dining-chair-side-bg")
         put(5, m, "chandelier-bg", DECK_PITCH - TILE - height("chandelier-bg"))
     put(5, 168.9, "sideboard-bg")
     put(5, 177.6, "ice-swan-bg")
@@ -1450,7 +1451,8 @@ def build_objects():
     # (Under the last window stands the pass, not a table: near-catch 1 remade, 2026-11-24, the user. Its counter is
     # the game's own piece, `PASS` in src/config.js, tools/build_pass.py; the cabinet of plates that stood for it is gone.)
     for i, m in enumerate(seas[:-1]):
-        dinner(m, ("table-flowers-bg", "table-dinner-bg")[i % 2], "dining-chair-bg")
+        # (Side-on chairs since 2026-11-26, the Four Seasons' too: tools/build_ship_art.py.)
+        dinner(m, ("seas-table-flowers-bg", "seas-table-dinner-bg")[i % 2], "dining-chair-side-bg")
     put(5, 225.2, "palm-bg")
     put(5, 234.8, "palm-bg")
     # Warm downlights along the public rooms' ceilings.
@@ -1462,8 +1464,10 @@ def build_objects():
     # The Internet Café, at the end of the cabin corridor by the forward lobby.
     decor("cafe-doorway", "doorway", x_of(64) - 8, x_of(64) - 8, deck=6, text="Internet Café")
     for m in (65.6, 67.6, 69.6):
-        put(6, m, "office-chair-bg")
-        put(6, m + 0.55, "computer-desk-bg")
+        put(6, m, "office-chair-side-bg")
+        put(6, m + 0.55, "cafe-desk-bg")
+    # (A footrest under the middle desk, under the feet of the girl at it: the desk drawn again over both, her `cover`.)
+    put(6, 67.6 + 19 / 48, "footrest-bg")
     put(6, 71.6, "printer-bg")
     put(6, 72.8, "fern-bg")
     # The Bliss Ultra Lounge: near-black walls, a dotted carpet, a wooden dance floor under a disco
@@ -1825,14 +1829,17 @@ def build_objects():
         add(area(f"cafe-windows-{a}", "decor", exact_x(a), floor_y(11) - 104, exact_x(b) - exact_x(a), 56,
                  [prop("kind", "bridgewindows")]))
     at11(171.5, "painting-abstract", 66)
-    at11(162.0, "buffet-hot")
-    at11(164.1, "buffet-salad")
-    at11(166.2, "juice-station")
-    for m in (170.0, 174.2):
+    # (The tables at its forward end and the buffet along the queue's stretch, 2026-11-26: the queue walked through
+    # the tables, its people standing in their chairs, the user. Now it goes along the buffet's counters, out from
+    # behind the first, to the ice cream counter: population `QUEUES`.)
+    for m in (162.0, 164.6):
         around(11, m, "cafe-wood-table-bg", "cafe-blue-chair-bg")
         put(11, m, "coffee-cup-bg", height("cafe-wood-table-bg"))
-    around(11, 179.4, "cafe-wood-table-bg", "cafe-blue-chair-bg", sides=(False, True))
-    put(11, 179.4, "fish-lemon-bg", height("cafe-wood-table-bg"))
+    around(11, 167.0, "cafe-wood-table-bg", "cafe-blue-chair-bg", sides=(False, True))
+    put(11, 167.0, "fish-lemon-bg", height("cafe-wood-table-bg"))
+    at11(169.4, "buffet-hot")
+    at11(171.5, "buffet-salad")
+    at11(173.6, "juice-station")
     # (30 px forward of where it stood, the cold room's door aft of it, both between the windows: the user, 2026-11-24.)
     at11(182.375, "ice-cream-counter")
     at11(182.375, "ice-cream-sign", 56)
@@ -1940,8 +1947,9 @@ def build_objects():
     # Champs Bar over the atrium's dome: the bar and its stools, sports on the TVs, the trophies,
     # high tables by the windows.
     decor("champs-doorway", "doorway", exact_x(82), exact_x(82), deck=12, text="Champs Bar")
-    at12(83.65, "trophy-cabinet")      # (clear of the wedding's rope at the door)
-    at12(84.8, "beer-fridge")
+    # (The fridge by the planner and the cabinet aft of it, 2026-11-26: she stood in front of the cabinet, the user.)
+    at12(84.0, "beer-fridge")
+    at12(85.1, "trophy-cabinet")
     for a, b in ((86.2, 90.4), (95.6, 101.0)):
         add(area(f"champs-windows-{a}", "decor", exact_x(a), floor_y(12) - 104, exact_x(b) - exact_x(a), 56,
                  [prop("kind", "bridgewindows")]))
@@ -1981,7 +1989,8 @@ def build_objects():
     # trolley. (The funnel's technical ladder comes down at 167.2.)
     add(point("sign-cagneys", "sign", exact_x(165.0), floor_y(12) - 96, [prop("text", "Cagney's"), prop("style", "plaque")]))
     at12(165.9, "wine-cabinet")
-    around(12, 170.0, "table-dinner-bg", "steak-booth-bg", on_top="steak-plate-bg")
+    # (Its booths 2 px into the floor, the floor over them: the user, 2026-11-26.)
+    around(12, 170.0, "table-dinner-bg", "steak-booth-bg", on_top="steak-plate-bg", chair_dy=-2)
     at12(172.9, "carving-trolley")
     decor("downlights-12-cagneys", "downlights", x_of(164), x_of(174), deck=12)
     # The Sushi Bar: shoji screens, the counter with its fish, stools, red lanterns, a bonsai.
@@ -1992,8 +2001,10 @@ def build_objects():
     # sardines, 7; the user, 2026-11-20.)
     at12(178.3, "nigiri", height("sushi-counter-bg"))
     at12(178.5, "sake-set", height("sushi-counter-bg"))
-    at12(176.7, "bar-stool")
-    at12(179.3, "bar-stool", flip=True)
+    # (Its two diners sit on these stools, in at the counter, 2026-11-26: at 1.3 m from its middle they ate
+    # with their chopsticks in the air, the user.)
+    at12(178.0 - 0.78, "sushi-stool")
+    at12(178.0 + 0.78, "sushi-stool", flip=True)
     for m in (176.5, 179.5):
         hang12(m, "paper-lantern")
     at12(181.0, "side-table")

@@ -279,15 +279,7 @@ export const bow = {
         w.movers.push(new Steam(w, B.steam));
         w.movers.push(this.pit = new BallPit(w, B.pit));
 
-        // The step class's boards, one in front of each of its two.
-        const boards = s.add.graphics().setDepth(D.decor + 0.115);
-        for (const b of B.steps) {
-            boards.fillStyle(0x2e222f, 1).fillRect(b.x - 14, b.y - 7, 28, 7);
-            boards.fillStyle(0x4d9be6, 1).fillRect(b.x - 13, b.y - 6, 26, 3);
-            boards.fillStyle(0x8fd3ff, 1).fillRect(b.x - 13, b.y - 6, 26, 1);
-            boards.fillStyle(0x625565, 1).fillRect(b.x - 12, b.y - 3, 5, 3).fillRect(b.x + 7, b.y - 3, 5, 3);
-        }
-        w.add([boards]);
+        // (The step class's boards are in its two's own clip since 2026-11-26: they step up onto them, tools/cast.py.)
 
         // What E does here: the piano, the slide's ladder, the captain's door, the odd book.
         w.things.push({ id: 'sec_piano', x: B.piano.x, y: B.piano.y, route: 'inside', items: [], reach: 14, interact: () => this.piano() });

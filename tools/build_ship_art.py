@@ -304,6 +304,13 @@ PIECES["side-table"] = ("side-table-2", 0, None, {})
 PIECES["patio-chair"] = ("patio-chair", 0, None, {})
 PIECES["patio-table"] = ("patio-table", 0, None, {})
 PIECES["patio-chair-arm"] = ("patio-chair-arm", 0, None, {})   # (drawn in front of him: `patio-chair-arm/`)
+# The chairs the diners sit on, redrawn side-on (the user, 2026-11-26: the old ones "facing wrong direction"; their
+# README): the Seven Seas' and the Four Seasons' dining chair, the Internet Café's office chair, the Sushi Bar's stool.
+for _side in ("dining-chair-side", "office-chair-side", "sushi-stool"):
+    PIECES[_side] = (_side, 0, None, {})
+# And their tables and La Cucina's chairs, bigger (the user, 2026-11-26: "too low and too small"; `cucina-table/README.md`).
+for _big in ("cucina-chair", "cucina-table", "seas-table-flowers", "seas-table-dinner", "cafe-desk", "office-chair-arm", "footrest", "cafe-desk-under"):
+    PIECES[_big] = (_big, 0, None, {})
 # The tangerines' seats (plan-the-rest §7d, the user's choices of 2026-11-25; `assets/source/things/tangerine-seats/`,
 # its README has the jobs): a room-service tray on a slim chrome stand in two loads, in the early side table's place; a
 # low bowl of grapes, a green apple and a banana; the dessert cart with a plate for its right dome and the room-service

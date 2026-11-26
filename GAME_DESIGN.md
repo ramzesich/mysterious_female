@@ -1613,6 +1613,17 @@ the Windjammer's barmaid, the model ship's guest, the casino's cowboy, the spa g
 in the step class, deck 10's officer). The model ship's guest no longer wears a captain's cap and
 blazer ("looks like a captain to me"); deck 8 aft's door guest is an elderly lady woken in her
 nightgown (she was a lady in a sun hat and a beach dress, "out of place").
+**Decided (the user, 2026-11-26): a seated person sits in the room's own chair, as her husband sits at his table
+in the Great Outdoors** (the user's reference): the chair drawn side-on, the back 1 to 2 px in front of its
+backrest, the thighs on its seat, and what is nearer us drawn again over them (his chair's arm; the diners' tables at
+La Cucina and the Seven Seas, the office chair's armrest and the desk's legs at the Internet Café). A check of every
+placed person (163) found twelve placements to tune; all done that day. The diners who had chairs of their own drawn
+over the room's are new people (an elderly East Asian woman and a young bearded man at La Cucina, a plump red-haired
+woman in navy and a young man in a white dinner jacket at the Seven Seas, a silver-haired woman, her dress navy, and a
+bald man in tweed in Cagney's booths, a girl in braids and headphones at the Internet Café, a young man with a bun and
+an older Japanese woman at the Sushi Bar). La Cucina's, the Seven Seas' (and the Four Seasons'), the Internet Café's and
+the Sushi Bar's furniture is redrawn side-on and bigger; La Cucina and Cagney's are unwashed (their own colours); the
+step class steps up onto its boards; the Garden Café's queue goes along the buffet, its tables at the forward end.
 
 Crew are friendly and never scare her; passengers and machinery are the obstacles. Nobody appears
 twice in the same role. Every person needs new character art (a PixelLab character and a few clips

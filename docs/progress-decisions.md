@@ -5155,3 +5155,30 @@ new bug, or something we missed previously?"
   U14).
 - 108 generations (90 the figures, 18 the clips). boot, region1, region2, region3, region4, region6, region7, region9
   pass; check_overlaps 0; the whole suite not run.
+
+## Every placed person checked, twelve placements tuned (2026-11-26, the Refinement session)
+
+The user: "do a visual check over every placed NPC in game. I want to detect NPC's that look out of place, that are
+visually overlapped with anything ... An example: an NPC is drawn with their own chair, but is placed on top of some
+other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from main 4045cef.
+
+- **The check:** all 163 placed people shot in place (her hidden and untouchable, every story state shown), every
+  suspect enlarged, each finding shown in the game's full view: twelve. Not faults: the theatre's seats, the kid passing
+  the rival by the pool, the door gags' faces, the chapel's crowd.
+- **The fixes (the user's rounds, seven):**
+  - La Cucina, the Seven Seas, Cagney's: the diners are new people with no chair of their own (edits of the approved
+    stills), seated by the husband's rule; La Cucina's tables and chairs and the Seven Seas' (and the Four Seasons')
+    redrawn side-on and bigger, La Cucina's tables in its chairs' walnut; the tables drawn again over the diners
+    (`cover`); La Cucina and Cagney's unwashed (`tools/wash_levels.py`, level 0); Cagney's booths 2 px into the floor
+    (`around(chair_dy=)`), the lady's dress navy (by a hue rule, the wine kept red).
+  - The step class: a clip of each stepping up onto the board and down (PixMiniMax, the board by rule in the frame);
+    the boards drawn in code are gone.
+  - The Garden Café: its tables at the forward end, the buffet along the queue's stretch (`QUEUES` 168.4 to 181.5 m).
+  - The wedding party clear of deck 12's stairway door; the trophy cabinet and beer fridge swapped behind the planner;
+    the walkway's rival in the gap between two tenders; the guest in his cabin 16 px aft of his wall lamp.
+  - The Internet Café: side-on desks 30% higher, ergonomic office chairs, the girl's armrest and the desk's legs over her,
+    a footrest under her feet. The Sushi Bar: side-on stools in at the counter, its two diners new (half of U14).
+  - The engineer by Cagney's wine cabinet is left to part 10 on `three-uses` (the cabinet is gone there).
+- 132 generations (the nine people 45, the furniture and footrest 80, the step clips 2, the board 5). check_overlaps
+  0; boot, region1, region2, region5, region6, region7, region8, region9, highlight pass; mishaps fails only on deck 9's
+  sprinkler, as on main. The whole suite not run.

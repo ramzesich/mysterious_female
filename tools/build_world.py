@@ -578,7 +578,6 @@ def build_world():
         steam=dict(id="haz_steam", x=B.exact_x(st["stove"]), y=B.floor_y(st["deck"]), half=round(st["half"] * B.PER_M * B.TILE),
                    x0=B.exact_x(st["walls"][0]) + 6, x1=B.exact_x(st["walls"][1]) - 6, top=B.floor_y(st["deck"]) - 122,
                    coals=26, period=st["every"], on=st["on"], tell=st["tell"]),
-        steps=[dict(x=B.exact_x(m), y=B.floor_y(deck)) for deck, m in BOW["steps"]],
         pit=dict(id="haz_ballpit", x0=B.exact_x(pit["a"]), x1=B.exact_x(pit["b"]), y=B.floor_y(pit["deck"]),
                  tangerine=pit["tangerine"],
                  tanX=next(e["x"] for e in ents if e["id"] == pit["tangerine"])),

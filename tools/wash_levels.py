@@ -19,13 +19,17 @@ PLACES = [
     (6, 160, 194, 12),      # the Library
     (7, 110, 130, 12),      # Magnum's, the dark wood bar
     (11, 202, 210, 12),     # the Sports Bar, its dark green wall
+    (5, 150, 168, 0),       # La Cucina in its own colours (the user, 2026-11-26)
+    # Cagney's in its own colours (the user, 2026-11-26: "Make all background props in Cagney's their original color
+    # tone"), aft of the door at its forward end (164.8 to 165.2 m), which keeps the wash of the props forward of it.
+    (12, 165.3, 174, 0),
 ]
 # The balconies outside decks 8 to 10 (the outside route).
 BALCONIES = 20
 # Pieces with a level of their own wherever they stand: the casino's slot machines, washed less than the casino
 # round them (the user, 2026-11-23, with the highlight of what she can use: "too washed out").
 PIECES = {"slot-pair": 12}
-SUFFIX = {35: "-bg", 20: "-w20", 12: "-lt"}
+SUFFIX = {35: "-bg", 20: "-w20", 12: "-lt", 0: ""}
 KEEP = ("door", "railing")
 
 
