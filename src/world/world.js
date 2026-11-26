@@ -16,6 +16,7 @@ import { Library, BOOK_COLOURS, BOOK_ACCENTS } from './library.js';
 import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
+import { Fog } from './bow.js';
 import { sign, SIGN_LOOKS } from '../signs.js';
 import { t } from '../lang.js';
 
@@ -1377,6 +1378,9 @@ export class World {
                 break;
             case 'trays':
                 this.movers.push(new Trays(this, e));
+                break;
+            case 'fog':
+                this.movers.push(new Fog(this, e));
                 break;
             case 'rounds':
                 this.movers.push(new Rounds(this, e));

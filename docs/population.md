@@ -265,7 +265,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The court's basketballs | 12 | 14a, 14b | stiff onto her back / her face, lying dazed | `bounce`, `headBonk`, `bellyFlop` | `region8`, `mishaps.ball` |
 | The boat drill (`haz_drill`) | 7 | 15 | Ouch!: onto all fours, dizzy, the boat down to her back, she crawls away through the fade (since 2026-11-21) | `boatThump` | `region7`, `mishaps.things` |
 | The sprinklers | 8 to 10 | 16 | soaked, a sneeze, she squelches back | `herSneeze`, `splashSmall` | `region4`, `mishaps.things` |
-| The sauna's steam | 11 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9` |
+| The sauna's steam; Bliss's fog machine (`haz_fog`, deck 6 at the DJ booth, §7f) | 11, 6 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9`, `mishaps.stretches` |
 | The towel stacks (`haz_towels_9`; `haz_towels_4`, 169.6 m, §7f) | 4, 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things`, `mishaps.stretches` |
 | Teppanyaki's flares | 12 | 19 | sooty, blinking, a cough | `flare`, `yelpHot`, `herCough` | `region8` |
 | The gulls on the rails | balconies, 12 | 20 | on her head; with a tangerine, it takes one | `gullDive`, `flap` | `region7`, `region8`, `pocket`, `mishaps.gulls` |

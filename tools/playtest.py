@@ -6867,7 +6867,7 @@ def scenario_mishaps__things(b):
 
 def scenario_mishaps__stretches(b):
     """Part 11's things placed anew (plan-the-rest §7f, 1 to 4), each met in play: deck 4's towel stack (18) and second
-    vacuum (5a), deck 5's red suitcase in the atrium once the lunch is delivered (6a, run into: its own red clips), the Seven Seas'
+    vacuum (5a), deck 5's red suitcase in the atrium once the lunch is delivered (6a, run into: its own red clips), Bliss's fog (17), the Seven Seas'
     trays before it (3); then the trays gone and the suitcase there once the lunch is delivered."""
     ok = True
     W = f"{MS}.world"
@@ -6893,6 +6893,10 @@ def scenario_mishaps__stretches(b):
     ok &= both(b, "deck 4's second vacuum (5a)", want="5a", **run("&at=deck4-aft", "right", vac), clip="^gag-vacuum", within=6)
     ok &= both(b, "deck 5's red suitcase (6a)", want="6a", **run("&did=lunch&at=atrium-floor", "left", case), clip="^gag-redcase", within=6)
     ok &= both(b, "the Seven Seas' trays (3)", want="3", **run("&at=pass5", "left", trays), clip="^gags-tray-ride", within=6)
+    # (Bliss's fog machine (5): she walks into its puff from the trunk's door, set off at its tell.)
+    FG = f"{W}.movers.find(m => m.def?.id === 'haz_fog')"
+    fog = lambda: (wait_js(b, f"(p => p[0] === 'on' && p[1] > 0.2)({FG}.phase({MS}.time.now))", 8), at(exact_x(118.45), D6, False))
+    ok &= both(b, "Bliss's fog machine (17)", want="17", **run("", "right", fog), clip="^gags-steam", within=8)
     # Before the lunch: the trays there, the suitcase not; after it, the other way round.
     b.open("?play&reset&at=pass5")
     T = f"{W}.movers.filter(m => /^haz_trays_5/.test(m.def?.id || ''))"

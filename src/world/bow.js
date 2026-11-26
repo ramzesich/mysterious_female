@@ -175,6 +175,90 @@ export class Steam {
     }
 }
 
+// The DJ's fog machine at Bliss (population: `FOG`, `haz_fog`; plan-the-rest §7f, 5, the user's choices, 2026-11-26): a
+// small machine on the floor at the DJ booth's front, its nozzle forward. On the sauna's clock: the tell (its light
+// blinks red, wisps leave the nozzle, a hiss), then a low puff rolls forward along the floor under the disco ball, rising
+// a little as it goes, and thins. Caught in it, under its top (a hop over its low front clears it): gag 17, as the sauna's
+// steam (`Steam.ride`, its cloud kept inside Bliss's walls). Drawn only while she is inside on deck 6.
+// The machine's picture (`fog-machine`, 31 x 17, tools/build_things.py): its light at px 10 to 13 of rows 3 and 4, its
+// nozzle's mouth at its left end, row 11.
+const FOG_PIC = { w: 31, h: 17, light: [10, 3, 4, 2], nozzle: 11 };
+export class Fog extends Steam {
+    constructor(world, def) {
+        super(world, def);
+        const s = world.scene, D = s.DEPTH;
+        this.machine = s.add.image(def.x, def.y, 'things', 'fog-machine').setOrigin(0.5, 1).setDepth(D.props);
+        this.lamp = s.add.graphics().setDepth(D.props + 0.01);
+        world.add([this.machine, this.lamp]);
+        // (Solid, as the standing carts: she hops it, never walks through it.)
+        const zone = s.add.zone(def.x, def.y, FOG_PIC.w - 6, FOG_PIC.h - 3).setOrigin(0.5, 1);
+        s.physics.add.existing(zone, true);
+        world.solids.push({ id: def.id, route: 'inside', zone });
+        this.left = def.x - Math.round(FOG_PIC.w / 2);
+        this.mouth = { x: this.left, y: def.y - FOG_PIC.h + FOG_PIC.nozzle };
+    }
+
+    // The puff's top over the floor at `x` (px up), and how far forward it has rolled (0 to 1) at `k` of its time.
+    reachAt(k) { return Math.min(1, k / 0.3); }
+    topAt(x) { const f = Math.max(0, Math.min(1, (this.mouth.x - x) / this.def.reach)); return 9 + f * 17; }
+
+    // (A puff of the machine's, never past the trunk's door's frame, `stop`. The gag's cloud round her is not cut there: cut,
+    // it ended in a hard edge down the door; it drifts in front of it inside Bliss's walls, as the sauna's.)
+    fogPuff(g, x, y, r, colour, alpha) {
+        this.puff(g, x, y, Math.min(r, x - this.def.stop), colour, alpha);
+    }
+
+    update(dt, time) {
+        const s = this.scene, d = this.def, p = s.player, g = this.g.clear();
+        this.lamp.clear();
+        this.drawBurst(g);
+        if (!near(s, d.x, d.y, 700, 200) || s.route !== 'inside' || Math.abs(p.y - d.y) > 72) return;
+        const [phase, k] = this.phase(time), m = this.mouth;
+        if (phase === 'calm') {
+            this.told = false;
+            this.blown = false;
+            return;
+        }
+        if (phase === 'tell') {
+            if (!this.told) {
+                this.told = true;
+                sfx.at(m.x, d.y).steam(0.3);
+            }
+            // Its light blinks red; wisps curl out of the nozzle.
+            const [lx, ly, lw, lh] = FOG_PIC.light;
+            if (Math.floor(time / 150) % 2 === 0) this.lamp.fillStyle(0xe83b3b, 1).fillRect(this.left + lx, d.y - FOG_PIC.h + ly, lw * 2, lh);
+            for (let i = 0; i < 4; i++) {
+                const a = (time / 380 + i * 0.25) % 1;
+                this.fogPuff(g, m.x - 2 - a * 16, m.y - a * 6 + Math.sin(time / 150 + i * 2) * 1.5, 1.5 + a * 2.5, 0xffffff, 0.7 * (1 - a) * k);
+            }
+            return;
+        }
+        if (!this.blown) {
+            this.blown = true;
+            sfx.at(m.x, d.y).steam(Math.max(0.3, d.on));
+        }
+        const env = k < 0.12 ? k / 0.12 : k > 0.7 ? Math.max(0, (1 - k) / 0.3) : 1;
+        const out = this.reachAt(k) * d.reach;
+        // The puff: rolling forward low along the floor from the nozzle, rising and swelling as it goes; its rolls turn.
+        for (let i = 0; i < 30; i++) {
+            const f = (i * 0.618 + time / 900) % 1;
+            if (f * d.reach > out) continue;
+            const x = m.x - f * d.reach + Math.sin(time / 240 + i * 1.7) * (1 + f * 3);
+            const r = 3 + f * 7 + ((i * 13) % 3);
+            const y = Math.min(d.y - r * 0.6, m.y - f * 9 + Math.sin(time / 300 + i) * 1.5);
+            this.fogPuff(g, x, y, r, i % 3 ? 0xffffff : 0xc7dcd0, (0.5 - f * 0.2) * env);
+        }
+        // Caught in it: under its top where she stands, inside its reach.
+        if (env < 0.6 || s.mode !== 'play' || s.route !== 'inside' || time < this.hitAt) return;
+        const body = PLAYER.bodyWidth / 2;
+        if (p.x + body < m.x - out || p.x - body > m.x + 2 || Math.abs(p.y - d.y) > 80) return;
+        if (p.y < d.y - this.topAt(Math.min(m.x, p.x + body))) return;
+        this.hitAt = time + 1500;
+        if (this.world.carry) this.world.carryBox.spill(p.x, false, 'steam');
+        else s.scareContact(m.x, 'steam', { ride: this.ride() });
+    }
+}
+
 // The ball pit across Entourage (population: `haz_ballpit`): a padded box of coloured balls,
 // waist deep. Over its end wall with a hop, and she wades through it at half her speed, the balls
 // in front of her to the waist, popping up round her. No fright. One ball in it is a tangerine.

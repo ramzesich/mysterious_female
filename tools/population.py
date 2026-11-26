@@ -1059,6 +1059,14 @@ DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0,
              winch=184.6)
 # The steward on his rounds (`haz_steward_rounds`): id: (deck, from m, to m, m/s, the doors he
 # pulls his cart into (m), for s, who). Across the hallway he is a body that holds her back.
+# The DJ's fog machine at Bliss (`haz_fog`; plan-the-rest §7f, 5, the user's choice of three tries and of three places,
+# 2026-11-26: "at the DJ booth", a few px aft): on the floor at the booth's front, its nozzle forward, under the disco
+# ball. Every `every` s, after a tell of `tell` s (its light blinks red, wisps, a hiss), a low puff rolls `reach` m forward
+# along the floor for `on` s: caught in it, gag 17 (as the sauna's steam). Short of the trunk's door (118 m). The room's
+# walls (m): what the puff and the gag's cloud are kept inside; `stop`, the trunk's door (m): no puff reaches its frame
+# (at 1.05 m it rolled over its foot).
+FOG = dict(deck=6, m=120.054, every=3.8, on=1.6, tell=0.9, reach=0.8, walls=(110.0, 124.0), stop=118.0)
+
 # --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------
 # A suitcase on its wheels rolling to and fro with the ship's slow roll: id: (deck, m from, m to, m/s).
 # (1.6 m/s at its fastest, from 1.1: the user, 2026-11-17, with her ride on it made quicker.)

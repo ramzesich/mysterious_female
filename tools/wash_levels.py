@@ -19,13 +19,15 @@ PLACES = [
     (6, 160, 194, 12),      # the Library
     (7, 110, 130, 12),      # Magnum's, the dark wood bar
     (11, 202, 210, 12),     # the Sports Bar, its dark green wall
+    (6, 110, 124, 0),       # Bliss, the dark lounge with the DJ: its props in their own colours (the user, 2026-11-26, of 20%, 12%
+                            # and their own colours shown in place: "3")
 ]
 # The balconies outside decks 8 to 10 (the outside route).
 BALCONIES = 20
 # Pieces with a level of their own wherever they stand: the casino's slot machines, washed less than the casino
 # round them (the user, 2026-11-23, with the highlight of what she can use: "too washed out").
 PIECES = {"slot-pair": 12}
-SUFFIX = {35: "-bg", 20: "-w20", 12: "-lt"}
+SUFFIX = {35: "-bg", 20: "-w20", 12: "-lt", 0: ""}
 KEEP = ("door", "railing")
 
 

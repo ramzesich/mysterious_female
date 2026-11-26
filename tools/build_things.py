@@ -140,7 +140,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # washed picture, kept so.
 # (Delivery 1's vase of flowers and the low table it waits on, §5 3.2: in their own colours, as the user approved them;
 # `delivery/`, its README.)
-OWN_COLOURS = {"robot", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
+OWN_COLOURS = {"robot", "fog-machine", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}

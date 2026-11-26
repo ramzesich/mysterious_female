@@ -984,6 +984,9 @@ towel stack 8 px nearer to it and its heap over them (the user: it read as "obsc
 deck 5's atrium (93.4 to 97 m, by Guest Services), only once the lunch is delivered, and red** (a tray's low hop does not
 clear it, the lunch's way is the whole deck; the user: a suitcase belongs in a cabin corridor or the atrium; "Make two
 suitcases different colors"); 4 as planned, at 219.4, 226.8 and 236.4 m.
+**5 built 2026-11-26:** at the DJ booth's front (120.05 m; the plan's spot is the lounge's table), the user's choice of
+place and of the machine (a generated side view), every 3.8 s, a puff of 0.8 m short of the trunk's door; and Bliss's
+props in their own colours (the user), its doors still pulsing (`src/highlight.js`).
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

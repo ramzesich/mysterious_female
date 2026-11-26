@@ -10,7 +10,7 @@ import json
 import build_ship_map as B
 from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
-from population import FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
+from population import FOG, FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS
 from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, TERRACE
 from population import BELL_GULL, BOW, FINALE
@@ -384,6 +384,12 @@ def build_world():
         opts = next((r for r in rest if isinstance(r, dict)), {})
         ents.append(dict(kind="trays", id=tid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
                          door=door, flag=flag, route="inside", **({"dishes": dishes[0]} if dishes else {}), **opts))
+    # The DJ's fog machine at Bliss (plan-the-rest §7f, 5; src/world/bow.js `Fog`): its middle on the floor, the room's
+    # inner walls and ceiling for the puffs.
+    ents.append(dict(kind="fog", id="haz_fog", x=B.exact_x(FOG["m"]), y=B.floor_y(FOG["deck"]), route="inside",
+                     reach=round(FOG["reach"] * 48), x0=B.exact_x(FOG["walls"][0]) + 6, x1=B.exact_x(FOG["walls"][1]) - 6,
+                     top=B.floor_y(FOG["deck"]) - 122, period=FOG["every"], on=FOG["on"], tell=FOG["tell"], half=0,
+                     stop=B.exact_x(FOG["stop"]) + 18))
     # Region 7's (src/world/outside.js).
     for rid, (deck, a, b, v, stops, wait, who) in ROUNDS.items():
         ents.append(dict(kind="rounds", id=rid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,

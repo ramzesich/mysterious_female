@@ -5210,3 +5210,26 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
 - **Tests:** `mishaps.stretches` new (each of the four with none on her and with two; the trays before the lunch, the red
   suitcase after); `deck4`, `vacuum`, `region1`, `region3`, `region4`, `highlight`, `golden`, `boot` pass; `mishaps.things`
   fails only on deck 9's sprinkler, as before. Not run: the rest.
+
+## Part 11, item 5: the DJ's fog machine at Bliss; Bliss in its props' own colours (2026-11-26)
+
+- **The place:** the plan's 113.2 to 114.8 m is the lounge's table and stools, and the DJ stands at 121.3 m, not there.
+  The user, shown three tries (map objects) and two redraws of try 2 in strict side profile: "Use A, don't redraw"; then
+  "Show me the entire scene" (a panorama of Bliss from the renderer, stitched by world position) and, of three places
+  with the puff's reach marked, "2, and shift it a few pixels to the right": on the floor at the DJ booth's front
+  (120.054 m), its nozzle forward under the disco ball.
+- **The machine:** A cut to 31 x 17 (plain rows and columns out, never resampled), its own colours; solid as the carts
+  (she hops it). **The hazard** (`Fog` in `src/world/bow.js`, a `Steam`; `FOG` in `tools/population.py`, `haz_fog`):
+  the sauna's clock, ~~every 5.2 s~~ **every 3.8 s (the user: "Reduce the delay between the steam cycles")**, a tell of
+  0.9 s (its light blinks red, wisps from the nozzle, the hiss), a low puff of 1.6 s rolling 0.8 m forward along the
+  floor; caught under its top, gag 17 (`Steam.ride`, its cloud inside Bliss's walls); a hop over its low front, or
+  standing on the machine, clears it. Drawn only while she is inside on deck 6. **Looked at:** the first puff (1.05 m,
+  opaque) rolled over the trunk's door's foot and read as a blob: 0.8 m, thinner, smaller, and the machine's puffs never
+  past the door's frame (`stop`); the gag's cloud cut there ended in a hard edge down the door, so it is not cut.
+- **Bliss's props in their own colours** (the user: "make the background props less washed out. Show me a screenshot
+  with them placed there with their original color tones first"; of 20%, 12% and their own: "3"): a place at level 0
+  in `tools/wash_levels.py` (`SUFFIX[0]` is no suffix). Its promenade door then rested in full colour with an invisible
+  pulse; the user chose to change `src/highlight.js` (the Refinement session's code, asked first): a door in a place
+  at level 0 rests as a lone trunk door (20%) and pulses up (`placed`, `own`).
+- **Tests:** `mishaps.stretches` (the fog's case added: walked into its puff, none on her and two), `region2`, `region3`,
+  `highlight`, `boot` pass; `check_overlaps` 0. 13 generations.

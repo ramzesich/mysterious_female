@@ -243,8 +243,12 @@ export class Highlight {
             const L = this.levels;
             if (!L) return null;
             const deck = Math.round(s.deckAt(y - 2)), place = L.places.find(([d, a, b]) => d === deck && x >= a && x < b);
+            // (A place whose props are in their own colours, Bliss: its doors rest as a lone trunk door does, so that they
+            // still pulse up to full colour. The user, 2026-11-26.)
+            if (place && place[3] === 0) return TRUNK_ALONE;
             return (place ? place[3] : (L.decks[deck] ?? L.default)) / 100;
         };
+        const own = (x, y) => (this.levels?.places.some(([d, a, b, lv]) => lv === 0 && d === Math.round(s.deckAt(y - 2)) && x >= a && x < b) ? TRUNK_ALONE : null);
         const at = (x, y) => all.filter(o => isDoor(o) && !muted(o) && !FIGURES.test(o.texture.key)
             && Math.abs(B(o).centerX - x) < 20 && Math.abs(B(o).bottom - y) < 10);
         const wash = (pics, k, what) => {
@@ -275,7 +279,7 @@ export class Highlight {
                 inside(r.route, d.x, r.floor);
             }
         }
-        if (s.promenade) for (const x of s.promenade.doors) wash(at(x, s.promenade.floor), level(x, s.promenade.floor), `promenade door at ${x}`);
+        if (s.promenade) for (const x of s.promenade.doors) wash(at(x, s.promenade.floor), level(x, s.promenade.floor) ?? own(x, s.promenade.floor), `promenade door at ${x}`);
         // The doors across the deck: the glass ones (one-way ones too) stay as they are (the user: "Leave all the glass
         // doors as they are now"), and a steel one with nothing round it (deck 11's, by the lido): only the steel ones
         // by something take its tone.

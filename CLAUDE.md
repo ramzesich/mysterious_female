@@ -144,7 +144,7 @@ back to us, the outside view, back on a movement key); a door's hand that takes 
   **How much is the place's** (the user, 2026-11-20, chosen deck by deck): a background prop is placed with
   its `-bg` name and `tools/wash_levels.py` gives it its place's twin, `-bg` (35%), `-w20` (20%) or `-lt`
   (12%), in the map builder's `put()` and the world builder's last pass. Most decks are at 20%, the Library,
-  Magnum's and the Sports Bar at 12%; **the guest cabin corridors stay at 35%** on every deck (their props are
+  Magnum's and the Sports Bar at 12%, Bliss in its props' own colours (2026-11-26; its doors still rest at 20%); **the guest cabin corridors stay at 35%** on every deck (their props are
   laid by the ship scene itself), as do decks 8 and 9 inside, doors she cannot use and railings; the casino's
   slot machines at 12% wherever they stand (`PIECES`, the user, 2026-11-23). A new venue or a change of level
   goes into that table, never a new suffix by hand.
