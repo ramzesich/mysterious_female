@@ -1641,8 +1641,10 @@ export class World {
         const s = this.scene;
         const [type, name] = thing.what.split(':');
         if (type === 'verb') {
+            // (The grip socks and the parasol show at the HUD's top right as their close-up closes: src/hud.js.)
+            s.hud?.expect(name);
             this.progress.learn(name);
-            this.closeup(name);
+            this.closeup(name, () => s.hud?.release(name));
         } else if (type === 'book') {
             // (The books' count shows, or goes up, as its cover closes, as a found thing's does.)
             s.hud?.expect('book');

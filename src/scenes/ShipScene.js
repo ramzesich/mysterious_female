@@ -2953,8 +2953,9 @@ export class ShipScene extends Phaser.Scene {
         this.uiLayer.add([this.fade, this.debugText, this.soundSign]);
     }
 
+    // (Under the HUD's top right, where her utilities stand since 2026-11-26: src/hud.js.)
     showSoundSign(muted) {
-        const g = this.soundSign, x = VIEW.width - 64, y = 26;
+        const g = this.soundSign, x = VIEW.width - 64, y = 88;
         g.clear();
         g.fillStyle(0x1d2b53, 0.85).fillRoundedRect(x - 12, y - 10, 62, 44, 6);
         g.fillStyle(0xffffff, 1).fillRect(x, y + 6, 10, 12);

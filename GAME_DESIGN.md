@@ -1883,6 +1883,12 @@ Tier 1 month renews on 2026-11-30 (§8). Rough counts; the build prices each bat
 - **The finale:** the sunset sky and sea; her holding him; her husband in the cabin.
 - **HUD:** the card slots, the carried thing with its melt or heat meter, the books' count,
   the pictogram bubbles. (The key glyphs were taken out with every hint, 2026-11-14: §7.1.)
+  **Decided (the user, 2026-11-26): her two utilities, the grip socks and the parasol, show at the HUD's top right
+  once hers**, on the counts' line, 11 px in from the right edge (as the tangerine's rim from the left), from the
+  right in the order she gets them, each with the counts' pop as its close-up closes. Their pictures are the user's
+  own Paint files (`assets/source/hud/socks-by-hand.png`, `parasol-by-hand.png`): the socks a pair made from a
+  generated sock with white grip dots on a dark sole (the dots must read), the parasol open (furled it was a red
+  stick at that size). The sound's sign (M) flashes under them now. The pills, her one pocket item, are next.
 
 #### 6.1.13 How we proceed: the build order
 

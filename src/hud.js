@@ -6,6 +6,8 @@
 //   books, from left to right in the order she first finds them; each keeps the width of its
 //   largest count, so nothing moves once placed.
 // - Under it the four key cards, each in its own place: a faint outline until it is hers.
+// - At the top right, on the row's line, her two utilities once hers, the grip socks and the parasol (the user,
+//   2026-11-26): from the right edge in the order she gets them, each as its close-up closes.
 // - The first tangerine flies from where it was to its slot, and the count shows as it lands; a
 //   card flies out from behind its close-up as that closes; a kind's count shows as its close-up
 //   closes, a little bigger, settling to its size. A count going up bumps its picture.
@@ -24,6 +26,9 @@ const APART = 10;               // from a number to the next picture
 const CARDS_Y = 42, CARD_STEP = 15;
 const CARD_ORDER = ['deck', 'ent', 'hk', 'off'];
 const KINDS = ['cat', 'her', 'him', 'book'];
+const TOOLS = ['socks', 'parasol'];     // her verbs shown as a picture (`verb:<name>`, the user's Paint files)
+const RIGHT = 11;                       // their rims' right edge from the screen's, as the tangerine's rim on the left
+const TOOL_GAP = 6;                     // between two utilities
 const NAVY = '#1d2b53';
 // Letters the lettering lacks, drawn for the HUD (`tools/build_hud.py`, in the `hud` atlas): the ∞.
 const OWN = { 0x221e: 12 };
@@ -41,6 +46,7 @@ export class Hud {
             order: KINDS.filter(k => this.count(k) > 0),
             cards: save.cards.length > 0,
         };
+        save.hud.tools ??= TOOLS.filter(t => save.verbs.includes(t));
         this.pending = new Set();         // kinds and cards waiting for their close-up to close
         this.items = {};
         this.slotX = {};
@@ -49,6 +55,8 @@ export class Hud {
         this.start = LEFT + this.items.tangerine.width;
         // The kinds: their places are given in the order they are found.
         for (const k of KINDS) this.items[k] = this.counter(k, k === 'book' ? `${BOOKS}/${BOOKS}` : '8/8', 0);
+        // Her utilities.
+        this.tools = Object.fromEntries(TOOLS.map(t => [t, this.tool(t)]));
         // The cards.
         this.cards = CARD_ORDER.map((card, i) => {
             const x = (LEFT + i * CARD_STEP) * S, y = CARDS_Y * S;
@@ -58,6 +66,14 @@ export class Hud {
             return { card, ghost, img };
         });
         this.refresh(true);
+    }
+
+    // A utility's picture (with its rim), hidden.
+    tool(key) {
+        const f = this.s.textures.getFrame('hud', key);
+        const icon = this.s.add.image(0, 0, 'hud', key).setScale(S).setVisible(false);
+        this.s.uiLayer.add(icon);
+        return { key, w: f.cutWidth, h: f.cutHeight, icon, shown: false };
     }
 
     // A picture and its number, at `x` (the picture's left, in HUD px), hidden.
@@ -136,7 +152,7 @@ export class Hud {
     show(c, quiet) {
         c.shown = true;
         c.icon.setVisible(true);
-        c.text.setVisible(true);
+        c.text?.setVisible(true);
         if (quiet) return;
         this.s.tweens.killTweensOf(c.icon);
         c.icon.setScale(S * POP.from);
@@ -173,6 +189,18 @@ export class Hud {
             this.write(c, str);
             if (!c.shown) this.show(c, quiet);
             else if (grew && !quiet) this.bump(c);
+        }
+        // Her utilities: a new one takes the next place leftward (unless its close-up is still open).
+        for (const t of TOOLS) {
+            if (s.save.verbs.includes(t) && !H.tools.includes(t) && !this.pending.has(t)) H.tools.push(t);
+        }
+        let right = s.scale.gameSize.width / S - RIGHT;
+        for (const t of H.tools) {
+            const c = this.tools[t];
+            // (Its rimmed picture's lowest row on the row's line, as the counts' pictures.)
+            c.icon.setPosition((right - c.w / 2) * S, (ROW + 1 - c.h / 2) * S);
+            right -= c.w + TOOL_GAP;
+            if (!c.shown) this.show(c, quiet);
         }
         // The cards: the row from the first card that has arrived; each held one once it has.
         if (!H.cards && save.cards.some(c => !this.pending.has(`card:${c}`))) H.cards = true;
@@ -259,6 +287,7 @@ export class Hud {
     state() {
         const out = {};
         for (const [k, c] of Object.entries(this.items)) out[k] = c.shown ? c.value : '';
+        out.tools = (this.s.save.hud.tools ?? []).filter(t => this.tools[t].shown);
         out.cards = this.cards.filter(c => c.img.visible).map(c => c.card);
         out.order = [...this.s.save.hud.order];
         return out;

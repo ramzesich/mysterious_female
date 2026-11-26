@@ -5321,3 +5321,27 @@ other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from 
 - 132 generations (the nine people 45, the furniture and footrest 80, the step clips 2, the board 5). check_overlaps
   0; boot, region1, region2, region5, region6, region7, region8, region9, highlight pass; mishaps fails only on deck 9's
   sprinkler, as on main. The whole suite not run.
+
+## The HUD's utilities: the grip socks and the parasol (2026-11-26, the Refinement session)
+
+The user: "both the parasol and the grip socks are not shown in any way on the HUD, once collected"; "We need to
+show both utilities on HUD, once collected". On branch `refine` (worktree `../mysterious_female-refine`), from main
+e13eb438.
+
+- **Where:** of four places mocked up over a real shot (after the cards, top right, bottom left, a row under the
+  cards), the user chose the top right: on the counts' line, 11 px in from the right edge (the tangerine's rim is
+  11 px in from the left), from the right in the order she gets them (the socks come first in the story).
+- **The pictures, the user's own:** the socks regenerated so that the grip dots read (8 tries, 40 generations,
+  `assets/source/hud/tries/socks/README.md`): the user took try 7 (one sock, white dots on a dark sole), mirrored, a
+  copy behind it 4 px left and 3 px up, and edited the pair in Paint; the parasol the game's open one shrunk by
+  majority and outlined, edited in Paint (furled it lost its shaft). Both files `assets/source/hud/*-by-hand.png`,
+  magenta empty (both pictures have pure white), read by `tools/build_hud.py` (which reproduced the committed atlas
+  before the change), never written; the dark outline is in the picture, the light rim the build's.
+- **In the game:** `src/hud.js` (`TOOLS`, `tool()`, `save.hud.tools`, `state().tools`); `world.take()` holds a verb's
+  picture until its close-up closes (`hud.expect(name)`, `release`), as a kind's count. The sound's sign (M) moved
+  62 px down, under them (`showSoundSign`).
+- **Checks:** in the running game each picture shows only once its close-up is closed, socks then parasol, no
+  errors; `region6` and `region8` check each picture after its pickup (new); boot, keeps, highlight pass. The rest of
+  the suite not run.
+- **Next:** the pills, her one pocket item, shown while she carries them (the user: after the utilities).
+

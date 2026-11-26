@@ -4254,6 +4254,8 @@ def scenario_region6(b):
     b.tap("e")
     wait(0.3)
     ok &= check("socks" in save_list(b, "verbs"), "the grip socks, on the free treadmill's belt")
+    ok &= check("socks" in b.eval("window.__ship.hud.state().tools"), "their picture at the HUD's top right (close-ups skipped)",
+                b.eval("window.__ship.hud.state().tools"))
     wait(3.2)
     # The chess set.
     b.teleport(L["chessX"] - 20, D11)
@@ -5628,6 +5630,8 @@ def scenario_region8(b):
     b.tap("e")
     wait(0.3)
     ok &= check("parasol" in save_list(b, "verbs"), "her parasol, left leaning on the sunbed", save_list(b, "verbs"))
+    ok &= check("parasol" in b.eval("window.__ship.hud.state().tools"), "its picture at the HUD's top right (close-ups skipped)",
+                b.eval("window.__ship.hud.state().tools"))
     b.shot("region8-parasol")
     b.eval("window.__ship.lockedUntil = 0")
     s = hold_until(b, "left", lambda s: s["x"] < L["x"] - 14, 3)
