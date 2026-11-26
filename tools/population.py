@@ -528,10 +528,10 @@ PEOPLE = {
     # Bumbot's beat and on the aft pool deck after (the story moves him: src/world/lido.js); the
     # security officer on his knees at a lounger; Topsiders' barman; the painter and the fans on the
     # flights up; her husband at the first table by the ice cream machine; guests at the far tables.
-    # (The treadmills' consoles are at their forward ends: she faces it, on the belt behind it, and
-    # the machine is drawn again in front of her, its near handrail across her.)
-    "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=7,
-                          cover=[("treadmill-lt", 86.6, 0)]),
+    # (The treadmills' consoles are at their forward ends: she faces it, on the belt behind it; in front of the machine
+    # and 2 px higher on its belt since 2026-11-26 (the user: "shift her 2 pixels up, and change her depth to obscure the
+    # treadmill"); its near handrail was drawn again across her until then.)
+    "amb_treadmill": dict(at=(11, 86.6 + 0.21), who="runner", face=-1, idle="run", layer="back", dy=9),
     "amb_weights": dict(at=(11, 99.95), who="lifter", face=-1, idle="curl", layer="back"),
     "npc_kid_tub": dict(hear="own", at=(11, 132.96), who="kid", face=-1, layer="behind", until="flag:bb5"),
     "npc_kid": dict(hear="own", at=(11, 146.0), who="kid", face=-1, idle="idle", after="flag:bb5",
@@ -1101,7 +1101,13 @@ ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6),
            # delivered (the user: a tray's low hop, 26 px, does not clear its 30, and the lunch's way runs the whole
            # deck), as the Seven Seas' plates go. Red (the user: "Make two suitcases different colors"; red of four tries):
            # tools/recolour_suitcase.py.
-           "haz_suitcase_5": (5, 93.4, 97.0, 1.6, {"after": "flag:lunch", "look": "red"})}
+           "haz_suitcase_5": (5, 93.4, 97.0, 1.6, {"after": "flag:lunch", "look": "red"}),
+           # Part 11 (plan-the-rest §7f, 8): the gym's two balls rolling with the ship (`thing`: a ball, its own pictures,
+           # tools/build_gym_ball.py; the user, 2026-11-26: "both blue and purple"): the purple in front of the two bikes,
+           # clear of the socks on the treadmill (89.2 m) and short of the cross trainer; the blue aft of the yoga rack, in
+           # front of the rower and the bench, short of the trainer (100 m). A hit is "Bumped", her sit-down (25).
+           "haz_gymball_1": (11, 90.6, 94.2, 1.4, {"thing": "gymball", "look": "purple"}),
+           "haz_gymball_2": (11, 96.3, 99.3, 1.4, {"thing": "gymball", "look": "blue"})}
 # A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
 # the lead's reach in m, what the owner gives after three fetches).
 DOGS = {"haz_dog_4": (4, 99.6, "dogowner", 4.0, "keep:cat:ball")}

@@ -120,8 +120,9 @@ const SIDEWALK_LOOKS = {
 // What she cries at a hit (a scenario's `word`).
 const fright = w => has(`fright.${w}`) ? t(`fright.${w}`) : '!';
 
-// Lying flat on her belly after a trip (scareDown): her picture this many px lower, from this frame
-// of her fall on (the frames where she is down), so that she lies on the carpet, not over it.
+// Down after a trip or a slip (scareDown), flat on her belly or on her bottom: her picture this many px lower, from this
+// frame of her fall on (the frames where she is down), so that she lies or sits on the carpet, not over it (the sit too
+// since 2026-11-26, the user: "shifted down by two pixels. In all the occasions").
 const LIE_DROP = { px: 2, frame: 3 };
 
 // What Bumbot does at a spot sitting down: he gets up off his haunches before he leaps (`BUMBOT.getUp`).
@@ -5682,7 +5683,7 @@ export class ShipScene extends Phaser.Scene {
                 s.setVisible(false);
                 p.x = s.x + face * (x1 - x0);
                 p.setVisible(true);
-                if (g.dazed === 'lie') this.herDrop(LIE_DROP.px);
+                this.herDrop(LIE_DROP.px);
                 this.herClip(`her-dazed-${g.dazed}`);
             }
             end();
@@ -5753,10 +5754,10 @@ export class ShipScene extends Phaser.Scene {
             return;
         }
         this.herClip(clip);
-        // Flat on her belly she is drawn 2 px lower, from the fall's first frame on the floor until she
-        // is back at her checkpoint (the user, 2026-11-17: she lay a px or two over the carpet; her
-        // cell ends at her lowest px, her hand under her chin, so it is done here, not in the art).
-        if (!slip) {
+        // Down, flat on her belly or on her bottom, she is drawn 2 px lower, from the fall's first frame on the floor
+        // until she is back at her checkpoint (the user, 2026-11-17: she lay a px or two over the carpet; 2026-11-26, the
+        // sit the same; her cell ends at her lowest px, her hand under her chin, so it is done here, not in the art).
+        {
             const down = () => {
                 if (p.anims.currentAnim?.key !== clip || (p.anims.currentFrame?.index ?? 1) - 1 >= LIE_DROP.frame) {
                     this.herDrop(LIE_DROP.px);

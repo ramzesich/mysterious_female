@@ -6866,7 +6866,7 @@ def scenario_mishaps__things(b):
 
 
 def scenario_mishaps__stretches(b):
-    """Part 11's things placed anew (plan-the-rest §7f, 1 to 4), each met in play: deck 4's towel stack (18) and second
+    """Part 11's things placed anew (plan-the-rest §7f, 1 to 8), each met in play: the gym's balls (25, and a hop over one); deck 4's towel stack (18) and second
     vacuum (5a), deck 5's red suitcase in the atrium once the lunch is delivered (6a, run into: its own red clips), Bliss's fog (17), the Seven Seas'
     trays before it (3); then the trays gone and the suitcase there once the lunch is delivered."""
     ok = True
@@ -6893,6 +6893,39 @@ def scenario_mishaps__stretches(b):
     ok &= both(b, "deck 4's second vacuum (5a)", want="5a", **run("&at=deck4-aft", "right", vac), clip="^gag-vacuum", within=6)
     ok &= both(b, "deck 5's red suitcase (6a)", want="6a", **run("&did=lunch&at=atrium-floor", "left", case), clip="^gag-redcase", within=6)
     ok &= both(b, "the Seven Seas' trays (3)", want="3", **run("&at=pass5", "left", trays), clip="^gags-tray-ride", within=6)
+    # (The gym's purple ball (8), run into as it rolls aft at her: at her front, she trips forward onto her belly, 25a.)
+    GB = f"{W}.movers.find(m => m.def?.id === 'haz_gymball_1')"
+    gym = lambda: (b.eval(f"{GB}.phase = Math.PI / 2 - 0.5"),
+                   at(b.eval(f"{GB}.mid - {GB}.half * Math.cos(Math.PI / 2 - 0.5)") + 46, D11, True))
+    ok &= both(b, "the gym's ball, at her front (25a)", want="25a", **run("&at=gym", "left", gym), clip=None, within=6)
+    # (Rolled into her back as she stands facing aft, ahead of it: on her bottom, 25b.)
+    back = lambda: (b.eval(f"{GB}.phase = Math.PI / 2 - 0.5"),
+                    at(b.eval(f"{GB}.mid - {GB}.half * Math.cos(Math.PI / 2 - 0.5)") + 30, D11, False))
+    ok &= both(b, "the gym's ball, at her back (25b)", want="25b", act=back, clip=None, within=6, fresh=lambda: b.open("?play&reset&at=gym"))
+    # (A hop clears a ball: held still in its lane's middle, she runs at the blue one and jumps 40 px short of it.)
+    b.open("?play&reset&at=gym")
+    GB2 = f"{W}.movers.find(m => m.def?.id === 'haz_gymball_2')"
+    b.eval(f"(m => {{ m.parked = true; m.x = m.mid; m.sprite.setX(m.mid); }})({GB2})")
+    bx = b.eval(f"{GB2}.x")
+    at(bx + 90, D11, True)
+    b.eval(f"{MS}.lastMishap = null")
+    b.key("left", True)
+    hold_until(b, [], lambda st: st["x"] < bx + 40, 3)
+    b.key("space", True)
+    wait(0.35)
+    b.key("space", False)
+    hold_until(b, [], lambda st: st["x"] < bx - 50, 3)
+    b.key("left", False)
+    st = b.state()
+    ok &= check(st["x"] < bx - 50 and st["mode"] == "play" and not b.eval(f"{MS}.lastMishap"),
+                "the gym's blue ball: a hop clears it", (bx, st, b.eval(f"{MS}.lastMishap?.id")))
+    # (Both in their own colours, each turning: its picture changes as it rolls.)
+    b.eval(f"{GB2}.parked = false")
+    f0 = b.eval(f"[{GB}.sprite.frame.name, {GB2}.sprite.frame.name]")
+    wait(0.5)
+    f1 = b.eval(f"[{GB}.sprite.frame.name, {GB2}.sprite.frame.name]")
+    ok &= check(f0[0].startswith("gym-ball-purple-") and f0[1].startswith("gym-ball-blue-") and f0[0] != f1[0] and f0[1] != f1[1],
+                "the gym's balls: purple and blue, each turning as it rolls", (f0, f1))
     # (Bliss's fog machine (5): she walks into its puff from the trunk's door, set off at its tell.)
     FG = f"{W}.movers.find(m => m.def?.id === 'haz_fog')"
     fog = lambda: (wait_js(b, f"(p => p[0] === 'on' && p[1] > 0.2)({FG}.phase({MS}.time.now))", 8), at(exact_x(118.45), D6, False))

@@ -992,6 +992,10 @@ reach and diving within 1.6 m of their rail (the user); **no gusts on the walkwa
 the lifeboat she enters moved to the second red boat (155.6 m; the user).
 **7 built 2026-11-26:** the sun deck's gusts as planned, the towels muted and under the stair core's door (the user); no
 palm sway; on foot a gust does nothing, the user's "Keep as is" (the hop drifts, the cake wobbles while she moves).
+**8 built 2026-11-26:** two balls, not one (the user: purple in front of the bikes, 90.6 to 94.2 m; blue aft of the yoga
+rack, 96.3 to 99.3 m), 24 px, generated, their lines turning by rule with the light still; at her front she trips
+forward onto her belly (25a), at her back she sits (25b) (the user). With it her sit-down 2 px lower everywhere and the
+gym's runner in front of her treadmill (the user).
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

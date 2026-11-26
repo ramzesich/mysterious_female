@@ -46,6 +46,8 @@ const PICK = {
     crossgull: () => '22',
     dnd: () => '23',
     balcony: () => '24',
+    // A gym ball: at her front she trips over it, forward; at her back it bumps her onto her bottom (the user).
+    gymball: f => f.front ? '25a' : '25b',
 };
 
 export function scenario(what, f) {

@@ -5321,3 +5321,29 @@ other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from 
 - 132 generations (the nine people 45, the furniture and footrest 80, the step clips 2, the board 5). check_overlaps
   0; boot, region1, region2, region5, region6, region7, region8, region9, highlight pass; mishaps fails only on deck 9's
   sprinkler, as on main. The whole suite not run.
+
+## Part 11, item 8: the gym's two balls; the sit-down lower; the runner on her treadmill (2026-11-26)
+
+- **Two balls rolling with the ship** (`haz_gymball_1`, `_2` in `ROLLERS`, `thing: "gymball"`; a `Roller` with its own
+  pictures, height and hit, `Roller.BALL` in `src/world/movers.js`). Of three generated tries the user took two ("If there
+  is enough space for two of them in the gym, then both blue and purple"): the purple in front of the two bikes, 90.6 to
+  94.2 m (clear of the socks on the treadmill, 89.2 m, and short of the cross trainer), the blue aft of the yoga rack in
+  front of the rower and the bench, 96.3 to 99.3 m (short of the trainer, 100 m); 1.4 m/s at their fastest. **They turn,
+  their light still** (the user: "The balls have lines, so they should turn. The light has to stay still. If that needs an
+  animation(s), generate"): a ball rolling in a side view turns in the picture's plane, so `tools/build_gym_ball.py` draws
+  a seam and two ribs by rule on the sphere at 32 angles over the try's own shading (the highlight kept clear of them; a
+  whole turn, since the lines' axis leans toward us and half a turn bows them the other way); the blue is the same
+  picture in try 1's blue. Each frame by the px rolled over its radius. 24 px: a hop clears it.
+- **Its hit** (`MISHAPS.gymball`), first one scenario, "Bumped" and the sit-down; then the user: "If she is hit from the
+  front, she trips over the ball, use the tripping and falling forward gag. If she is hit from behind, keep the current
+  gag": **25a** at her front (tripped, the built trip onto her belly), **25b** at her back (bumped, on her bottom). Her dash
+  sends a ball rolling to its end of the room.
+- **`?at=gym` moved from 92 to 88 m:** 92 was in the purple ball's lane.
+- **Her sit-down 2 px lower, everywhere** (the user: "The gag where she sits on the floor has to be shifted down by two
+  pixels. In all the occasions"): `scareDown` drops her from her fall's first frame on the floor for the sit as for the
+  belly (`LIE_DROP`), and a gag that ends in the dazed sit too.
+- **The gym's runner** (the user: "shift her 2 pixels up, and change her depth to obscure the treadmill"): `dy` 7 to 9 and
+  no `cover` (the treadmill's handrail was drawn again across her).
+- **Tests:** `mishaps.stretches` (the balls' cases: 25a and 25b with none on her and two, a hop over the blue, both
+  turning), `mishaps.porter`, `region6`, `boot` pass; `check_overlaps` 0; `check_corridors` deck 11: 47.2 m without a beat
+  (36 to 83), 53.7 without a reward. 3 generations.

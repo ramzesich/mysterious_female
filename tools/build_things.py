@@ -142,6 +142,8 @@ SEAM = {"tennis-ball": "a2a947"}
 # `delivery/`, its README.)
 OWN_COLOURS = {"robot", "fog-machine", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
+# (The gym's balls, every frame of their roll: tools/build_gym_ball.py.)
+OWN_COLOURS |= {f"gym-ball-{c}-{i:02d}" for c in ("purple", "blue") for i in range(32)}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
 # Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->

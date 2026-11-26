@@ -463,6 +463,7 @@ export const MISHAPS = {
     crossgull: {},          // the gulls across her glide to the bow
     dnd: {},                // a "Do Not Disturb" door
     balcony: {},            // the occupied balcony
+    gymball: {},            // the gym's balls rolling with the ship (deck 11)
 };
 
 // The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
@@ -528,6 +529,10 @@ export const MISHAP_SCENES = {
     '22': { word: 'swooped', react: 'duck', pocket: true, gag: 'parasol' },                     // a gull across her glide
     '23': { word: 'startled', react: 'apology', gag: 'sorry' },   // a "Do Not Disturb" door: her hands over her eyes, she tiptoes off (the ship scene's `sorryGag`)
     '24': { word: 'startled', react: 'apology', gag: 'sorry' },   // the occupied balcony: as 23, she tiptoes off to the partition
+    // A gym ball (plan-the-rest §7f, 8; the user, 2026-11-26): at her front she trips over it and falls forward, flat on her
+    // belly (the built trip, as the dog's lead); at her back it bumps her onto her bottom. No gag of its own.
+    '25a': { word: 'tripped', react: 'stumble', down: 'belly' },
+    '25b': { word: 'bumped', react: 'reel', down: 'sit' },
 };
 
 // Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,

@@ -1185,11 +1185,16 @@ export class Roller {
         this.world = world;
         this.scene = s;
         // (Its roll short of any door or wall across the deck: ShipScene `stopShort`.)
-        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, Roller.HALF);
+        // (`thing`: a gym ball instead of the suitcase, `Roller.BALL`: its own pictures, height and hit.)
+        this.ball = def.thing === 'gymball';
+        this.halfW = this.ball ? Roller.BALL.half : Roller.HALF;
+        this.hop = this.ball ? Roller.BALL.hop : Roller.HOP;
+        const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, this.halfW);
         this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s, its fastest) }
         // (Its handle pulled up: the one she rides in her gag, 6b, cut from that picture.)
         // (`look`: another colour of it, its world picture and her gags with it: deck 5's red, tools/recolour_suitcase.py.)
-        this.sprite = s.add.image(def.x0, def.y, 'things', def.look ? `suitcase-rolling-${def.look}` : 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
+        this.sprite = s.add.image(def.x0, def.y, 'things', this.ball ? Roller.ballFrame(def.look, 0)
+                                  : def.look ? `suitcase-rolling-${def.look}` : 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         world.add([this.sprite]);
         this.mid = (def.x0 + def.x1) / 2;
         this.half = (def.x1 - def.x0) / 2;
@@ -1214,21 +1219,38 @@ export class Roller {
         const was = Math.sin(this.phase);
         this.phase += dt * 2 * Math.PI / this.period;
         this.x = this.mid - this.half * Math.cos(this.phase);
-        // (At an end: the creak, as it stops and comes back.)
-        if (Math.sign(Math.sin(this.phase)) !== Math.sign(was)) sfx.at(this.x, d.y).creak();
-        this.sprite.setX(this.x).setAngle(Math.sin(this.phase) * 4);
+        if (this.ball) {
+            // (A ball turns as it rolls, its light still: its picture by how far it has come from its forward end.)
+            this.sprite.setX(this.x).setFrame(Roller.ballFrame(d.look, this.x - d.x0));
+        } else {
+            // (At an end: the creak, as it stops and comes back.)
+            if (Math.sign(Math.sin(this.phase)) !== Math.sign(was)) sfx.at(this.x, d.y).creak();
+            this.sprite.setX(this.x).setAngle(Math.sin(this.phase) * 4);
+        }
         // Her against it (its height is a hop's).
-        if (!here(s, d) || Math.abs(p.x - this.x) > PLAYER.bodyWidth / 2 + 8 || p.y <= d.y - Roller.HOP || p.y - PLAYER.bodyHeight >= d.y) return;
+        if (!here(s, d) || Math.abs(p.x - this.x) > PLAYER.bodyWidth / 2 + this.halfW - 4 || p.y <= d.y - this.hop || p.y - PLAYER.bodyHeight >= d.y) return;
         if (s.isLunging()) {
             // Sent rolling to the corridor's end, the way she was going; it stays there.
             this.parked = true;
             const away = p.body.velocity.x < 0 ? -1 : 1;
             s.smash(this.x, d.y - 16, false);
+            if (this.ball) {
+                // (A ball rolls off to its end of the room, turning as it goes.)
+                const to = s.stopShort(this.x, away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, d.y, this.halfW), from = this.x;
+                s.tweens.addCounter({ from: 0, to: 1, duration: 1400, ease: 'Quad.easeOut', onUpdate: tw => {
+                    const x = from + (to - from) * tw.getValue();
+                    this.sprite.setX(x).setFrame(Roller.ballFrame(d.look, x - d.x0));
+                } });
+                return;
+            }
             sfx.at(this.x, d.y).creak();
             s.tweens.add({ targets: this.sprite, x: s.stopShort(this.x, away > 0 ? d.x1 + 3 * M : d.x0 - 3 * M, d.y, Roller.HALF), angle: away * 12, duration: 1400, ease: 'Quad.easeOut',
                 onComplete: () => this.sprite.setAngle(0) });
         } else if (this.world.carry) {
-            this.world.carryBox.spill(this.x, false, 'suitcase', { vx: Math.sin(this.phase) * 50 });
+            this.world.carryBox.spill(this.x, false, this.ball ? 'gymball' : 'suitcase', { vx: Math.sin(this.phase) * 50 });
+        } else if (this.ball) {
+            // (No gag of its own: at her front a trip forward onto her belly, 25a; at her back on her bottom, 25b.)
+            s.scareContact(this.x, 'gymball', { vx: Math.sin(this.phase) * this.half * 2 * Math.PI / this.period });
         } else {
             // (Rolled into her back, she rides it to the end of its roll, 6b: it waits meanwhile.)
             // (Standing at an end of its roll, it sets off for the other end with her.)
@@ -1244,6 +1266,13 @@ export class Roller {
 // Her feet over this, she clears it: its body (the handle is a thin rail she passes).
 Roller.HOP = 30;
 Roller.HALF = 12;               // px from its middle to its front
+// The gym's balls (plan-the-rest §7f, 8): 24 px across, a hop clears them; 32 pictures over a whole turn, its light
+// still (tools/build_gym_ball.py), the turn by the px rolled over its radius, clockwise rolling aft.
+Roller.BALL = { half: 12, hop: 24, r: 12, frames: 32 };
+Roller.ballFrame = (look, rolled) => {
+    const B = Roller.BALL, i = ((Math.round(rolled / B.r / (2 * Math.PI) * B.frames) % B.frames) + B.frames) % B.frames;
+    return `gym-ball-${look}-${String(i).padStart(2, '0')}`;
+};
 
 // The dog's lead (the dog and its owner made together, the user, 2026-11-17: "the lady and the dog
 // are loosely connected, the leash looks weird and glitches on its connecting ends"): where it
