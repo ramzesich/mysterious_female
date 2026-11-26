@@ -251,7 +251,6 @@ ITEMS = {
     "item_socks": (11, 89.19, "verb:socks", None, 8, "thing:grip-socks"),
     # Left at the old lady's sunbed when the horn sends her off: her parasol, leaning on it, and her book.
     "item_parasol": (12, 129.12, "verb:parasol", "horn", 0, "thing:parasol-closed"),
-    "item_pills": ("smcabin", 172, "item:pills", "bb3", 50, "thing:pills-bottle"),
     # (Book 6, Harry Potter and the Philosopher's Stone, since 2026-11-23: her husband gives her book 1, Atomic Habits,
     # at his table, the user's swap. In the shore excursions' brochure stand at 134 m, in the bottom row's middle pocket,
     # its foot behind the pocket's lip (the stand's lowest five rows drawn again in front of it): the user, 2026-11-23,
@@ -818,6 +817,11 @@ SOURCES = {
     "src_cocktail": (11, 155.38, "cocktail", "region:8", [("umbrella-cocktail", 30)], None, "flag:lady"),
     # The ice cream mix, on the cold room's shelf: taken once the machine has run empty. (One canister: off the shelf
     # while she carries it, as the lunch's tray, 2026-11-24.)
+    # The stage manager's pills (region 3), on the shelf in his cabin on deck 4, carried up to him in her hands since
+    # 2026-11-26 (the user: "another deliverable, not in our pocket"): so not up the theatre's trunk but by the aft
+    # stairs, past the second vacuum and under the stage's swinging lamp. One bottle, off the shelf while she has it; on
+    # the shelf only once near-catch 3 is over, as the pickup was (the user, 2026-11-26).
+    "item_pills": ("smcabin", 174, "pills", "flag:bb3", [("thing:pills-bottle", 51)], None, "flag:pills", {"lift": True}),
     "item_canister": ("coldroom", 150, "canister", None, [("thing:canister", 30)], "flag:kid_fed", "flag:refilled", {"lift": True}),
     # Region 9: the wedding cake on its table by the pastry chef, hers to take once the planner
     # has shown what she wants, until the wedding has it.

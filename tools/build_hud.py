@@ -12,6 +12,11 @@
 - `card-<card>`: the popups' key card (cut from its close-up), the slot at its top filled white
   (the user: "fix the triangular cuts"); `card-<card>-ghost`: its outline, faint, for a card not held.
 
+- `socks`, `parasol`: her two utilities, shown at the top right once hers (the user, 2026-11-26): **the user's own
+  Paint files, `assets/source/hud/socks-by-hand.png` and `parasol-by-hand.png`, never written by a tool**, magenta
+  (#FF00FF) empty (white is the socks' grip dots and the parasol's stripes). The socks began as generated try 7
+  (`assets/source/hud/tries/socks/`, its README), mirrored, a copy behind it 4 px left and 3 px up; the parasol as the
+  game's open parasol shrunk by majority (`tools/build_things.py`), outlined.
 - `g8734`: an ∞ for `?tangerines=infinite` (the lettering has none): two of the font's loops crossing
   in the middle, as tall as the x and on its rows, in a glyph's frame (white; `src/hud.js` outlines it).
 
@@ -76,6 +81,13 @@ INFINITY = [".###...###.",
 INFINITY_TOP = 7            # its top row in a glyph's frame: the x's rows, 7 to 12 (the user: "center it against the X")
 
 
+def by_hand(name):
+    """A picture the user edits in Paint: magenta is empty, cut to what is drawn."""
+    a = rgba(SRC / "hud" / f"{name}-by-hand.png")
+    a[(a[:, :, 0] == 255) & (a[:, :, 1] == 0) & (a[:, :, 2] == 255)] = 0
+    return crop(a)
+
+
 def infinity():
     a = np.zeros((14, len(INFINITY[0]) + 1, 4), np.uint8)
     for y, row in enumerate(INFINITY):
@@ -98,6 +110,7 @@ def main():
         for x, y in SLOT:
             a[y, x] = (255, 255, 255, 255)
         pieces += [(f"card-{c}", a), (f"card-{c}-ghost", ghost(a))]
+    pieces += [(n, rim(by_hand(n))) for n in ("socks", "parasol")]
     pieces.append(("g8734", infinity()))
     sheet, places = pack(pieces)
     Image.fromarray(sheet).save(OUT / "hud.png")

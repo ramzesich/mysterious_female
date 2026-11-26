@@ -5368,3 +5368,50 @@ other chair". On branch `npc-check` (worktree `../mysterious_female-npc`), from 
 - **Tests:** `mishaps.stretches` (his tray, 3, and his door, 23, none on her and two; him shrieking in his doorway; the
   tray's clatter opening his door), `boot` pass; `check_overlaps` 0; `check_corridors` deck 10: 53.2 m without a beat
   (60 to 113), 92.3 without a reward (38 to 130). 21 generations.
+## The HUD's utilities: the grip socks and the parasol (2026-11-26, the Refinement session)
+
+The user: "both the parasol and the grip socks are not shown in any way on the HUD, once collected"; "We need to
+show both utilities on HUD, once collected". On branch `refine` (worktree `../mysterious_female-refine`), from main
+e13eb438.
+
+- **Where:** of four places mocked up over a real shot (after the cards, top right, bottom left, a row under the
+  cards), the user chose the top right: on the counts' line, 11 px in from the right edge (the tangerine's rim is
+  11 px in from the left), from the right in the order she gets them (the socks come first in the story).
+- **The pictures, the user's own:** the socks regenerated so that the grip dots read (8 tries, 40 generations,
+  `assets/source/hud/tries/socks/README.md`): the user took try 7 (one sock, white dots on a dark sole), mirrored, a
+  copy behind it 4 px left and 3 px up, and edited the pair in Paint; the parasol the game's open one shrunk by
+  majority and outlined, edited in Paint (furled it lost its shaft). Both files `assets/source/hud/*-by-hand.png`,
+  magenta empty (both pictures have pure white), read by `tools/build_hud.py` (which reproduced the committed atlas
+  before the change), never written; the dark outline is in the picture, the light rim the build's.
+- **In the game:** `src/hud.js` (`TOOLS`, `tool()`, `save.hud.tools`, `state().tools`); `world.take()` holds a verb's
+  picture until its close-up closes (`hud.expect(name)`, `release`), as a kind's count. The sound's sign (M) moved
+  62 px down, under them (`showSoundSign`).
+- **Checks:** in the running game each picture shows only once its close-up is closed, socks then parasol, no
+  errors; `region6` and `region8` check each picture after its pickup (new); boot, keeps, highlight pass. The rest of
+  the suite not run.
+- **Next:** the pills, her one pocket item, shown while she carries them (the user: after the utilities).
+
+## The stage manager's pills carried in her hands (2026-11-26, the Refinement session)
+
+The user: "Analyze the route she has to make in order to bring him the pills and let see if we can turn this item to be
+another deliverable (not in our pocket)". On branch `refine`, after the HUD's utilities.
+
+- **The route as it was:** down the theatre's trunk (240 m) to deck 4, 8 m to his door (232 m), the bottle, back up the
+  trunk: about 16 m. **As a load** (no ladders with her hands full): forward about 30 m on deck 4 past the second vacuum
+  and the cart at 220 m, the aft stairs 4 to 6, about 46 m aft through the foyer and the stalls, onto the stage under
+  the swinging lamp.
+- **The user's choices:** the bottle alone in her hands (of the bottle, a tray with a glass of water, a pharmacy bag);
+  the lamp kept as the last test; the cart checked first (her low hop with a load clears it both ways, a walk stops
+  17 px short: it stays).
+- **Built:** `pills` in `LOADS` (`src/world/carry.js`, bare, a rattle when it spills); `item_pills` a source on his
+  shelf (`tools/population.py`, `lift`: one bottle, a fresh one after a spill), on view only once near-catch 3 is over
+  (as the pickup was: the user asked why it showed from the start; it had come from the canister's pattern), 1 px up
+  and 2 right (the user); `pills()` in `src/world/story.js` takes it from her hands. No close-up for it now.
+- **Found in play by the user:** the deck 4 vacuum hid behind the stage manager's door (both at `DEPTH.props`): it is
+  drawn just in front of the doors now; and a vacuum hit with the bottle hung the game: the vacuum's hit had no height
+  (`world.touched` without `y`), the spill's sound threw every frame. It reports its height now; a hit spills the bottle,
+  plays gag 5a and sends her to her checkpoint.
+- **Checks:** `region3` and `golden` check the bottle in her hands, off the shelf, the trunk refusing her, his card;
+  `region3.pills_spill` (new) the vacuum's hit with it; boot, region1, deck4, vacuum, highlight pass; mishaps fails only
+  on deck 9's sprinkler, as on main. No generations.
+

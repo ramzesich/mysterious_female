@@ -440,12 +440,13 @@ export class Story {
         this.people.play(m, 'sneeze');
     }
 
-    // E at him after the beat: his pills from his cabin on deck 4, then his card (`scn_card_ent`).
+    // E at him after the beat: his pills from his cabin on deck 4, carried up in her hands (`item_pills`, a load since
+    // 2026-11-26), then his card (`scn_card_ent`).
     pills() {
         const m = this.near('npc_stagemanager', 44);
         if (!m || !this.P.has('bb3') || this.P.save.cards.includes('ent')) return false;
-        const w = this.world, s = this.scene, save = this.P.save;
-        if (!save.items.includes('pills')) {
+        const w = this.world, s = this.scene;
+        if (w.carry?.kind !== 'pills') {
             w.nudge(m);
             return true;
         }
@@ -455,13 +456,14 @@ export class Story {
             m.dir = her.x < m.x ? -1 : 1;
             this.people.place(m);
             await w.wait(250);
-            // The bottle crosses from her hands to his.
-            const bottle = s.add.image(her.x, her.y - 34, 'things', 'pills-bottle').setDepth(s.DEPTH.player + 0.05);
+            // The bottle crosses from her hands to his (from where she holds it).
+            const held = w.carryBox.items[0];
+            const bottle = s.add.image(held.x, held.y, 'things', 'pills-bottle').setOrigin(0.5, 1).setDepth(s.DEPTH.player + 0.05);
+            w.carryBox.give();
             w.add([bottle]);
             sfx.give();
-            await w.tween({ targets: bottle, x: m.x + m.dir * 10, y: m.y - 36, duration: 380, ease: 'Sine.easeInOut' });
+            await w.tween({ targets: bottle, x: m.x + m.dir * 10, y: m.y - 30, duration: 380, ease: 'Sine.easeInOut' });
             bottle.destroy();
-            save.items = save.items.filter(i => i !== 'pills');
             // One more sneeze, the last; then his card: she is running his errands now.
             sfx.at(m.x, m.y).sneeze();
             await this.people.play(m, 'sneeze');

@@ -940,8 +940,9 @@ region 6). At the very end he is in the cabin when she brings the cat home.
 | **Bumbot changes the ship** | A scripted scene | The doors he leaves open, the pool he drains, the alarm he trips (§6.1.8) |
 | **People and the ship's routine** | A person, a crowd or a thing on a flight, with a rope and a sign | A cleaner mopping, a photographer, a carpet being relaid, a table of towel animals, a painter, a crowd of fans, a wedding party. Each block lifts on an event: the next region opening, or an errand done. The flight then stays open: that is how the guest stairs become shortcuts (§6.1.4) |
 
-**Carrying.** Two classes of thing. **Pocket items** (cards, pills, books) have no rules. **Trays**
-(a lunch, a cone, a coffee, a cocktail, a cake box, the ice cream mix's canister) follow tray rules:
+**Carrying.** Two classes of thing. **Pocket items** (cards, books) have no rules. **Trays**
+(a lunch, a cone, a coffee, a cocktail, a cake box, the ice cream mix's canister, the stage manager's pills since
+2026-11-26, the bottle alone in her hands) follow tray rules:
 **stairs and elevators only** (no ladders, trunks, wall jumps, crawling, swimming or the dash), **a low
 hop instead of a jump**, and **a bump from a hazard or a person spills it** with a clatter, never a
 scare: she fetches another from the same place, which always has more. Some trays **melt or cool** (a
@@ -1178,7 +1179,10 @@ Positions are in metres from the bow and approximate; the build sets them exactl
   cat), and his bubble shows a pill bottle. **The errand:** the pills are in his cabin on deck 4 aft
   (a crew cabin door with his name plate, 232 m): down the theatre's trunk (she comes down it, so it
   works both ways after) or the aft stairs 5-6, which open now, the rehearsal stopped; back with the
-  pills (a pocket item; the vacuum on deck 4 is the test). He hands her the **Entertainment card**
+  pills. **Decided (the user, 2026-11-26): the pills are a load, the bottle alone in her hands**, on his shelf once
+  near-catch 3 is over: not up the trunk's ladder with them (her hands full), so back by the aft stairs, 4 to 6, past
+  deck 4's second vacuum (a hit spills the bottle, her gag and her checkpoint, a fresh one on his shelf) and under
+  the stage's swinging lamp, which stays the last test (the user: "Keep it"). He hands her the **Entertainment card**
   (he is cruise staff).
 - **Then:** the aft stairs 6-7 (open) to the balcony; forward through the Arcade, Tradewinds, the
   casino, the Art Gallery, Magnum's; the midship lobby's red door opens with her card: the shortcut
@@ -1883,6 +1887,12 @@ Tier 1 month renews on 2026-11-30 (§8). Rough counts; the build prices each bat
 - **The finale:** the sunset sky and sea; her holding him; her husband in the cabin.
 - **HUD:** the card slots, the carried thing with its melt or heat meter, the books' count,
   the pictogram bubbles. (The key glyphs were taken out with every hint, 2026-11-14: §7.1.)
+  **Decided (the user, 2026-11-26): her two utilities, the grip socks and the parasol, show at the HUD's top right
+  once hers**, on the counts' line, 11 px in from the right edge (as the tangerine's rim from the left), from the
+  right in the order she gets them, each with the counts' pop as its close-up closes. Their pictures are the user's
+  own Paint files (`assets/source/hud/socks-by-hand.png`, `parasol-by-hand.png`): the socks a pair made from a
+  generated sock with white grip dots on a dark sole (the dots must read), the parasol open (furled it was a red
+  stick at that size). The sound's sign (M) flashes under them now. **The pills are carried, not pocketed (the user, 2026-11-26):** the bottle in her hands (the errand below).
 
 #### 6.1.13 How we proceed: the build order
 

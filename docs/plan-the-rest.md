@@ -1008,7 +1008,7 @@ the suitcase (moving), the waiter (walker), the plates (hop).
 **Where a hit sends her back, with §7e's nineteen** (the user: "As decided"; no checkpoint is added or kept for these):
 
 - 1 and 2: the gangway's door (72 m), about 100 and 155 m back, past the dog and the first vacuum; from region 4 the
-  laundry's door (112 m). In region 3 a hit by the second vacuum is the long walk aft again with the pills. This is
+  laundry's door (112 m). In region 3 a hit by the second vacuum is the long walk aft again with the pills (since 2026-11-26 a load in her hands: the hit spills the bottle and a fresh one waits on his shelf). This is
   the cost the user took.
 - 3: the gangway's door, a deck down and up the forward stairs, about 65 m; once it is lit, the Library's.
 - 4: with the lunch in her hands, a spill and the pass, at most 35 m; without, the gangway.
