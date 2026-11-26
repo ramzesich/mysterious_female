@@ -2577,7 +2577,8 @@ export class ShipScene extends Phaser.Scene {
         // nothing on its wall and nothing of the world in front of it; the user, 2026-11-18. `gaps`:
         // each gap and whether its wall is taken.)
         const ents = (this.cache.json.get('world')?.ents ?? []).filter(e => e.y === o.y && e.route === 'inside');
-        const rolls = (e, x, by) => e.kind === 'push' && e.tall === true && x > e.min - by && x < e.max + by;
+        const rolls = (e, x, by) => (e.kind === 'push' && e.tall === true && x > e.min - by && x < e.max + by)
+            || (e.kind === 'robot' && x > e.x0 - by && x < e.x1 + by);   // (and a delivery robot's run, §7f 15)
         const tall = (gap) => ents.some(e => (e.kind === 'stack' && Math.abs(e.x - gap) < 40) || rolls(e, gap, 40));
         const gaps = [], moved = [];
         for (let x = o.x + 60, n = Math.round(o.x / 192); x + 30 < o.x + o.width; x += 192, n++) {

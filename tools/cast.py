@@ -172,8 +172,13 @@ CAST = {
     "queue_a": ("7f5590e5-ce63-4740-a8fa-b5b0ddb79795", {"walk": 6}, {}),
     "queue_b": ("84bf7071-becd-4d3a-8f93-686affe25c02", {"walk": 6}, {}),
     "queue_c": ("25221bc8-5291-46c9-b1fe-a3ef2dfd5ba9", {"walk": 6}, {}),
+    # (Part 11, §7f, 11: three of them in the Photo Gallery a day earlier, their plates edited out, a walk each by
+    # PixMiniMax from that: by hand, `BY_HAND` in tools/fetch_people.py; assets/source/people/gallery_*-raw/README.md.)
+    "gallery_a": ("7f5590e5-ce63-4740-a8fa-b5b0ddb79795", {"walk": 7}, {}),
+    "gallery_b": ("84bf7071-becd-4d3a-8f93-686affe25c02", {"walk": 7}, {}),
     "queue_d": ("709fc84f-77bc-4693-bb48-4a1de35ba6e5", {"walk": 6}, {}),
     "queue_e": ("7d1f88c4-005b-4752-aad5-c86958b996bb", {"walk": 6}, {}),
+    "gallery_e": ("7d1f88c4-005b-4752-aad5-c86958b996bb", {"walk": 7}, {}),   # (§7f 11, as gallery_a above)
     "queue_f": ("096244bc-9c59-49bc-8d8d-e0d0483d5c60", {"walk": 6}, {}),
     # Her husband, at the first table of the Great Outdoors: his own character from his photo, in his pyjamas with the
     # bear (the user's), one row of his forehead out (`assets/source/hud/husband/short/`), seated in the patio chair

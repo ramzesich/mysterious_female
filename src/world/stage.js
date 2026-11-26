@@ -43,7 +43,7 @@ export const stage = {
         const snag = s.add.sprite(st.x + L.snag.x, st.top, 'stage-snag', 0).setOrigin(0).setDepth(D.player + 0.31).setVisible(false);
         const puff = s.add.sprite(st.x + L.puff.x, st.top + L.puff.y, 'stage-puff', 0).setOrigin(0).setDepth(D.props + 0.2).setVisible(false);
         w.add([shut, open, spot, rope, valance, snag, puff]);
-        const light = w.movers.find(m => m.def?.flag === 'bb3' && m.hold);
+        const light = w.movers.find(m => m.def?.id === 'haz_light');
         this.stage = { cat, L, st, shut, open, rope, snag, puff, light, up: st.floor - STAGE.loop };
         if (cat) cat.custom = true;              // (its own scene: not the ship scene's `nearCatch`)
         if (this.P.has('bb3')) this.stageAfter();

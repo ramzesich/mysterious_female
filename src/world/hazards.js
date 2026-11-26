@@ -390,10 +390,20 @@ export class Queue {
         this.scene = s;
         this.def = def;             // { x0, x1, y, v (m/s), who: [...] }
         this.len = def.x1 - def.x0;
-        const offsets = [0, 46, 92, 300, 346, 392];
+        // (`gaps`: their own spacing, px along the line: the gallery's three browsers, spread along its photo wall.)
+        const offsets = def.gaps ?? [0, 46, 92, 300, 346, 392];
         this.people = def.who.map((who, i) => {
-            const p = world.people.add({ id: `${def.id}_${i + 1}`, who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true });
+            const p = world.people.add({ id: `${def.id}_${i + 1}`, who, x: def.x0, y: def.y, route: 'inside', face: 1, owned: true, dy: def.dy ?? 0 });
             if (p) p.along = (this.len * 0.2 + offsets[i % offsets.length] + Math.floor(i / offsets.length) * 520) % this.len;
+            // (`roam`: each walks to and fro over a stretch of their own, [from, to, m/s], px along the line, at their own
+            // pace, stopping now and then and at the ends: the gallery's browsers, the user, 2026-11-26: "They just
+            // disappear, that doesn't make any sense. Let them walk back and forth. Also, not in sync.")
+            if (p && def.roam) {
+                const [a, b, v] = def.roam[i % def.roam.length];
+                Object.assign(p, { lo: def.x0 + a, hi: def.x0 + b, v, along: offsets[i % offsets.length], dir: i % 2 ? -1 : 1,
+                                   waitUntil: 0, walkUntil: 0 });
+                p.x = Phaser.Math.Clamp(def.x0 + p.along, p.lo, p.hi);
+            }
             return p;
         }).filter(Boolean);
         this.span = 392;
@@ -408,6 +418,7 @@ export class Queue {
     update(dt, time) {
         const s = this.scene, her = s.player, d = this.def, P = this.world.people;
         if (!nearby(s, d)) return;
+        if (d.roam) return this.roam(dt, time);
         // A shuffle: a few steps, a wait. While anyone has turned aside for her, the whole line stands still (the user,
         // 2026-11-19: turned away, they slid on forward).
         const tray = !!this.world.carry;
@@ -438,8 +449,61 @@ export class Queue {
             p.sprite.setAlpha(Phaser.Math.Clamp(edge / 26, 0, 1));
             P.place(p);
             p.blocking = !hidden && !p.aside;
-            if (!p.blocking || !here(s, d)) continue;
-            // In her way: she is held at their side (over their heads she is clear).
+            this.hold(p, time);
+        }
+    }
+
+    // To and fro, each over their own stretch (`roam`): a few seconds' walk, a stop at a photo, a turn at an end.
+    roam(dt, time) {
+        const s = this.scene, her = s.player, d = this.def, P = this.world.people;
+        const tray = !!this.world.carry;
+        for (const p of this.people) {
+            const yields = (tray && here(s, d) && Math.abs(her.y - d.y) < 60 && Math.abs(her.x - p.x) < 62) || time < (this.criedUntil ?? 0);
+            if (yields !== p.aside) {
+                p.aside = yields;
+                if (yields) {
+                    p.sprite.anims.stop();
+                    p.sprite.setFrame(p.meta.back ?? p.meta.stand);
+                }
+            }
+            let walking = false;
+            if (!p.aside && time >= p.waitUntil) {
+                if (time >= p.walkUntil && p.walkUntil) {
+                    // A stop at a photo, then on, a few seconds' walk.
+                    p.walkUntil = 0;
+                    p.waitUntil = time + Phaser.Math.Between(1600, 3400);
+                } else {
+                    if (!p.walkUntil) p.walkUntil = time + Phaser.Math.Between(2200, 5200);
+                    const to = p.x + p.dir * p.v * M * dt;
+                    if (to > p.hi || to < p.lo) {
+                        // At an end of their stretch: a pause, and back the other way.
+                        p.x = Phaser.Math.Clamp(to, p.lo, p.hi);
+                        p.dir = -p.dir;
+                        p.walkUntil = 0;
+                        p.waitUntil = time + Phaser.Math.Between(900, 2000);
+                    } else {
+                        p.x = to;
+                        walking = true;
+                    }
+                }
+            }
+            if (!p.aside) {
+                if (!(walking && P.anim(p, 'walk'))) {
+                    p.sprite.anims.stop();
+                    p.sprite.setFrame(p.meta.stand);
+                }
+            }
+            P.place(p);
+            p.blocking = !p.aside;
+            this.hold(p, time);
+        }
+    }
+
+    // In her way: she is held at their side (over their heads she is clear).
+    hold(p, time) {
+        const s = this.scene, her = s.player, d = this.def;
+        {
+            if (!p.blocking || !here(s, d)) return;
             const dx = her.x - p.x, reach = PLAYER.bodyWidth / 2 + 8;
             if (Math.abs(dx) < reach && her.y > d.y - 42 && Math.abs(her.y - d.y) < 60) {
                 const side = dx === 0 ? (her.flipX ? 1 : -1) : Math.sign(dx);

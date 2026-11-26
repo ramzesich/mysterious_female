@@ -45,6 +45,8 @@ def fetch(name, facing="east"):
 # (The steward's `tug` is a picture of him with his jammed trolley, made by hand from PixMiniMax:
 # assets/source/people/steward-raw/README.md.)
 BY_HAND = {"dog", "dogowner", "steward",
+           # (The Photo Gallery's three, the buffet queue's with their plates edited out, 2026-11-26.)
+           "gallery_a", "gallery_b", "gallery_e",
            # (The theatre's audience, 2026-11-19: in the one theatre seat, `assets/source/people/audience-seated/`.)
            "aud_popcorn", "aud_gent", "aud_lady", "aud_girl", "aud_granny",
            # (Champs' second seated fan, an edit of the first's frame, 2026-11-21.)

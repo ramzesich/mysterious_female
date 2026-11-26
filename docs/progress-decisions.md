@@ -5415,3 +5415,29 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   `region3.pills_spill` (new) the vacuum's hit with it; boot, region1, deck4, vacuum, highlight pass; mishaps fails only
   on deck 9's sprinkler, as on main. No generations.
 
+
+## Part 11, the second round's first batch (2026-11-26) — IN PROGRESS, committed as work in progress
+
+Where it stopped (the user: "We'll continue next day. Save our progress"):
+
+- **Approved by the user:** item 11, the Photo Gallery's three browsers (`haz_gallery`: the buffet queue's `queue_a`, `_b`,
+  `_e` with their plates edited out, `gallery_*`; each walks to and fro over a stretch of their own, out of step, `roam`
+  on a `Queue`; 1 px lower, `dy`; "Galley approved"); item 13, a second stage lamp over the Stardust balcony's aisle
+  (`haz_light_7`, 224.8 m, after `bb3`; the stage finds its own lamp by id now); item 15, deck 9's second robot
+  (`haz_robot_9`, 30.5 to 50 m; the officer walks 54 to 70 m; parked carts keep clear of a robot's run); P4 (`tan_9_aft`
+  on a tray stand by cabin 9245, 244.4 m; `?at=deck9-end`); P5 (`tan_8_fwd` in a green bowl on a patio table on deck 8's
+  forward terrace, 23.4 m). Item 16 (the kids' pool towels) **dropped** by the user (no room).
+- **Done, not yet seen by the user:** P6's tangerine on the kids' table behind the fort, 2 px lower (`on` 18); **her crawl
+  1 px lower everywhere** (`VERBS.crawlDrop`, `setCrawl` in `src/world/verbs.js`; region9, region4, linen, boot pass).
+- **In progress: Splash Academy's new fort.** The user approved a side-view fort (two cushion stacks, a striped blanket
+  roof, seed 23), then asked for its openings to be clear, "in profile ... how the shaft in the linen room is
+  implemented ... behind the stack of pillows, on both sides". Now in the game: `mouths-s12` (a short fabric tunnel past
+  each stack ending in a hemmed rim, its dark slot), cut by `assets/source/things/tries/pillow-fort-2/mouths.py split`
+  into `pillow-fort.png` (in front of her) and `pillow-fort-back.png` (the slots, behind her: `world.js`'s `low` adds a
+  `<thing>-back` picture); `haz_fort_7` widened to 30.48 to 34.72 m so the solid part reaches the mouths' rims. **To do
+  next:** the things build trims `pillow-fort-back` to its drawn part (203 x 34, not 204 x 64): give it its full canvas
+  (or place it by its trim) so it lines up with the front; shoot her crawling into a mouth and through, show the user;
+  region9 (the fort test) and finale (the fort's place on the way home).
+- **Then:** record and commit the batch; item 12 (the popcorn), P1 (the ladder), 14 (the balloons), 10 last; and remind
+  the user to rethink the walking/standing NPCs' role once part 11 is approved (their ask).
+- Generations this batch: 18 (the gallery's three) + 66 (the fort) = 84.

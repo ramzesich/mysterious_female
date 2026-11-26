@@ -167,7 +167,7 @@ TANGERINES = {
     # (Cabin 8206's two on its desk's top, 40 px up (tools/draw_cabin.py), right of the phone and the daily
     # programme: at 104 and 33 px they hung 7 px low in front of its edge, one over the phone; the user, 2026-11-22.)
     "tan_8_8206": ("cabin", 118, 2, 40, None),
-    "tan_8_fwd": (8, 49.3, 1, "table", None),
+    "tan_8_fwd": (8, 23.4, 1, "table", None),
     "tan_8_aft": (8, 246, 1, "table", None),
     "tan_8_balc_fwd": (8, 100, 1, "out", None),
     "tan_8_balc_aft": (8, 245, 1, "out", None),
@@ -192,7 +192,7 @@ TANGERINES = {
     # Region 7: in the ice bucket's tray on deck 8 (the steward's rounds go by it), on deck 9 aft's
     # cart, and on the balcony where Bumbot swiped at the gull.
     "tan_8_mid": (8, 178.0 - 6 / 48, 1, 10, None),      # (in the ice bucket, over its rim: `haz_trays_8ice`)
-    "tan_9_aft": (9, 230, 1, 28, None),
+    "tan_9_aft": (9, 244.4, 1, 28, None),
     "tan_10_balc": (10, 160.6, 1, "out", None),
     # (On the bar: 54 m is the grand piano.)
     # (The pair along the counter to its aft end, off the barman's chest: plan-the-rest §7d.)
@@ -205,7 +205,7 @@ TANGERINES = {
     "tan_funnel": ("funnel", 189.2, 1, 13, None),
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
     # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
-    "tan_7_splash": (7, 41.2, 1, 20, None),
+    "tan_7_splash": (7, 29.0, 1, 18, None),   # (P6, §7f: behind the pillow fort, on its own kids' table; at 41.2 m until 2026-11-26)
     "tan_7_ballpit": (7, 52.4, 1, 0, None),
 }
 
@@ -226,7 +226,8 @@ SEATS = {
     # A room-service tray on its chrome stand, in the early side table's place, the two loads in turn.
     # (`tan_4_30`, `tan_8_aft`: 14 px aft, clear of the corridor's extinguisher.)
     "tan_4_30": ("roomtray-dome", 31.2, 14, 0, True),
-    "tan_8_fwd": ("roomtray-cup", 49.3, 0, 0, True),
+    # (P5, §7f: from the corridor at 49.3 m to the forward terrace, in a green bowl on a patio table by its door.)
+    "tan_8_fwd": ("fruit-bowl-green", 23.4, 2, 24, True),
     "tan_8_aft": ("roomtray-dome", 246, 14, 0, True),
     "tan_9_luggage": ("roomtray-cup", 181.5, 0, 0, True),
     "tan_10_mid": ("roomtray-dome", 182, 0, 0, True),
@@ -238,7 +239,8 @@ SEATS = {
     # The two trolleys, each the map's own piece with its plate.
     "tan_5_dessert": ("dessert-trolley-plate", 186.4, 0, 0, False),
     "tan_9_cart": ("service-cart-plate", 172.6, 0, 0, False),
-    "tan_9_aft": ("towel-trolley", 230, 0, 0, False),
+    # (P4, §7f: from the towel trolley at 230 m, which stays, to a tray on its stand by the last cabin, 9245.)
+    "tan_9_aft": ("roomtray-dome", 244.4, 0, 0, True),
 }
 
 # --- Pickups ---------------------------------------------------------------------------------------
@@ -658,7 +660,7 @@ PEOPLE = {
     "amb_stepper_a": dict(at=(11, 67.7), who="stepper_a", face=1, idle="board", layer="back"),
     "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="board", layer="back"),
     "amb_officer_10": dict(at=(10, 60), who="officer_10", face=1, walk=(50, 70, 1.0), end_ms=1500, layer="back"),
-    "amb_officer_9": dict(at=(9, 55), who="officer_9", face=-1, walk=(40, 70, 1.0), end_ms=1500, layer="back"),
+    "amb_officer_9": dict(at=(9, 60), who="officer_9", face=-1, walk=(54, 70, 1.0), end_ms=1500, layer="back"),   # (40 to 70 until the robot, §7f 15)
     "amb_counsellor": dict(at=(7, 30.15), who="counsellor", face=-1, idle="cheer", layer="back"),
     # (On the bridge the security officer is the scene's own, in clips made there: frozen mid-creep behind Bumbot until
     # `bb6`, sat under his own net after it until `catch`: src/world/bridge.js, near-catch 6 as remade 2026-11-25.)
@@ -668,6 +670,8 @@ PEOPLE = {
 # Props: id: (deck or room, m or x, atlas piece, dy px up, options: until/after a condition, front,
 # back (behind furniture), flip).
 PROPS = {
+    # (P5, §7f: the forward terrace's patio table, by its door, clear of its stairs; tan_8_fwd's bowl on it.)
+    "prop_table_terrace8": (8, 23.4, "patio-table", 0, {}),
     "prop_backdrop": (5, 90.9, "photo-backdrop", 0, dict(until="region:3")),
     "prop_wetfloor": (5, 109.2, "wet-floor-sign", 0, dict(until="region:3")),
     "prop_coffee_cafe": (5, 85.72, "coffee-cup", 23, {}),
@@ -885,7 +889,10 @@ SIGNS = {
 # the red reading chair; the three reading tables (m), an armchair each side, every one a seat she reads in (§2.3b).
 LIBRARY = dict(deck=6, shelf=(189.4, 190.7, 62), trolley=191.04, chair=166.75, tables=(168.0, 174.9, 181.0))
 # The delivery robot (`haz_robot`): id: (deck, from m, to m, m/s). She rides on its top.
-ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8)}
+ROBOTS = {"haz_robot": (6, 24.6, 60, 0.8),
+          # Part 11 (plan-the-rest §7f, 15): the officers' coffee, deck 9's officers' corridor from the captain's door's
+          # end; the officer walks aft of it since (the user, 2026-11-26: 54 to 70 m).
+          "haz_robot_9": (9, 30.5, 50, 0.8)}
 # The gull with Bumbot's collar bell (§4 2.1, thing 4; the user, 2026-11-20): on the round wall light at
 # 140.6 m (`prop_lamp_prom_3`), between door 138 and the column; where it stands (m), its feet px up (the
 # light's hood), the thing it holds (ITEMS) and the flag of its drop. It keeps its place when she comes; her
@@ -922,7 +929,11 @@ GLIMPSE_WINDOW = (168.3, 72)
 # (At 249.1 m by the piano until 2026-11-19; the user: it and the stage manager change places. At his
 # 244.42 m it swung out over the wings' speakers, its cable across the curtain: 1.5 m in, over the drums,
 # its whole swing on the stage.)
-LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2)}
+LIGHTS = {"haz_light": (6, 245.9, "bb3", 30, 74, 55, 3.2),
+          # Part 11 (plan-the-rest §7f, 13): a second lamp of the stage's rig, over the Stardust balcony's aisle, swinging
+          # once near-catch 3 has been, out of step with the stage's; over the run of empty seats 223.5 to 226 m, clear of
+          # the seated guests and the diary's seat (242.2 m).
+          "haz_light_7": (7, 224.8, "bb3", 30, 74, 55, 3.7)}
 # The look-outs (plan-the-rest §5 3.1, docs/plan-three-uses.md §4.3): standing still two seconds on the spot eases the
 # camera from her to the view; it holds while she is still and comes back when she moves. Nothing is counted.
 # id: (deck, m, reach m either side, the view's middle from her middle in px (x, y), decks opened while she looks,
@@ -989,7 +1000,10 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
         # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long). (Taken
         # down for the night on the evening of the catch: with Bumbot in her arms she cannot crawl.)
-        "haz_fort_7": (7, 31.0, 34.2, "thing:pillow-fort", "flag:catch")}
+        # (Since 2026-11-26 a new fort in profile, its tunnel mouth at each end, the linen room's shaft's way: 25 px wider
+        # each side than its stacks, so the solid part reaches the mouths' rims; the user, of the old one: "it's 3D, while we
+        # just crawl in profile". assets/source/things/tries/pillow-fort-2/README.md.)
+        "haz_fort_7": (7, 30.48, 34.72, "thing:pillow-fort", "flag:catch")}
 # --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
 # Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
 # door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window
@@ -1028,7 +1042,14 @@ FOODGULLS = {"gull_pool": (11, 140.9, 145.6, 2, "circle", "kid_fed"),
              "gull_go": (11, 210.6, 219.2, 1, (210.9, 46), None)}
 # The buffet queue (`haz_queue`): id: (deck, from m, to m, m/s, who). They shuffle toward the
 # counter (forward) in threes, solid bodies that shove her back; for crew with a tray they turn aside.
-QUEUES = {"haz_queue": (11, 168.4, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"])}
+QUEUES = {"haz_queue": (11, 168.4, 181.5, 0.4, ["queue_a", "queue_b", "queue_c", "queue_d", "queue_e", "queue_f"]),
+          # Part 11 (plan-the-rest §7f, 11): the Photo Gallery (deck 6, between its two wall pillars, 150 to 159 m), three
+          # of the buffet queue's own passengers a day earlier, their plates edited out (the user, 2026-11-26: "a"),
+          # browsing to and fro along the photo wall looking for their pictures: bodies to hop at the gaps.
+          # (Each walks to and fro over a stretch of their own, side by side so they never pass through each other, out of step: `roam`, [from, to, m/s] px along; 1 px lower
+          # than the sheet stands them, `dy`; the user, 2026-11-26.)
+          "haz_gallery": (6, 150.3, 158.8, 0.3, ["gallery_a", "gallery_b", "gallery_e"],
+                          {"gaps": [60, 200, 340], "roam": [[12, 135, 0.32], [150, 262, 0.26], [278, 396, 0.36]], "dy": -1})}
 # Room-service trays left on a hallway's floor (`haz_trays`): id: (deck, from m, to m, the "Do Not
 # Disturb" door their clatter opens, the flag set by the first clatter). Under two metres: a jump clears them.
 TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),

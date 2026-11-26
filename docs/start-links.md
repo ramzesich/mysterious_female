@@ -106,6 +106,7 @@ new one added there should be added here too.
 | `linen`, Bumbot gone and the cart at the shaft's mouth: jump on the cart, ↓, ← | <http://localhost:8000/?play&at=linen&did=bb4,cart_linen> |
 | `housekeeping`: the corridor where the red trunk comes up | <http://localhost:8000/?play&at=housekeeping&cards=all> |
 | `deck9-aft`: deck 9's corridor, a few steps short of the darting vacuum | <http://localhost:8000/?play&at=deck9-aft&cards=all> |
+| `deck9-end`: deck 9 aft at 240 m, the last cabins (walk aft: cabin 9245, its tray on a stand with a tangerine, §7f P4) | <http://localhost:8000/?play&at=deck9-end&cards=all> |
 | `steward`: deck 9's corridor at its aft end, just forward of the steward's jammed trolley | <http://localhost:8000/?play&at=steward> |
 | `door9`: deck 9, aft of its swinging door (walk forward at it: 13a) | <http://localhost:8000/?play&at=door9> |
 | `gull9`: deck 9's balconies, by a perched gull (stand by it: 20) | <http://localhost:8000/?play&at=gull9> |

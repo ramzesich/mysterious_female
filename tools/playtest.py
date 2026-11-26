@@ -6033,9 +6033,9 @@ def scenario_region9(b):
     s = hold_until(b, ["down", "left"], lambda s: s["x"] < fort["x0"] - 24, 8)
     b.shot("region9-fort")
     ok &= check(s["x"] < fort["x0"], "on hands and knees she is through it", s["x"] - fort["x0"])
-    b.teleport(exact_x(41.2) + 30, D7)
-    hold_until(b, "left", lambda s: s["x"] < exact_x(41.2) - 10, 3)
-    ok &= check(got("tan_7_splash"), "a tangerine on the kids' table", save_list(b, "collected")[-3:])
+    # (Behind the fort since §7f P6: on through from the crawl to its kids' table, 29 m.)
+    hold_until(b, "left", lambda s: s["x"] < exact_x(29.0) - 10, 4)
+    ok &= check(got("tan_7_splash"), "a tangerine on the kids' table behind the fort", save_list(b, "collected")[-3:])
     ok &= check(person(b, "amb_counsellor")["on"], "the counsellor cheers the toddlers on")
     # The Library's odd book: stuck while there are gaps on the shelf; with all fourteen back, the nook.
     N = B["nook"]
@@ -6968,6 +6968,33 @@ def scenario_mishaps__stretches(b):
     opened = wait_js(b, f"{DN}.busy", 4)
     b.key("left", False)
     ok &= check(opened, "his tray's clatter opens his door")
+    # (The second round, §7f 11, 13, 15.) The Stardust balcony's lamp, swinging once near-catch 3 has been: under it she
+    # is struck (12a or 12b by her side), none on her and two.
+    LA = f"{W}.movers.find(m => m.def?.id === 'haz_light_7')"
+    for n in (0, 2):
+        b.open("?play&reset&did=bb3")
+        b.eval(f"{MS}.save.tangerines = {n}; {MS}.refreshHud(); {MS}.lastMishap = null; {MS}.safeUntil = 0")
+        b.eval(WATCH)
+        at(b.eval(f"{LA}.def.x"), D7, True)
+        hit = wait_js(b, f"['12a', '12b'].includes({MS}.lastMishap?.id)", 8)
+        back = wait_js(b, f"{MS}.mode === 'play' && window.__respawns > 0", 15)
+        ok &= check(hit and back and b.state()["tangerines"] == n, f"the balcony's lamp, {n} on her: struck (12a/12b), her checkpoint",
+                    (b.eval(f"{MS}.lastMishap?.id"), b.state()))
+    # The Photo Gallery's three browsers: in the gallery, shuffling, in her way.
+    b.open("?play&reset")
+    at(exact_x(149.0), D6, False)
+    wait(1.5)
+    G = b.eval(f"{W}.people.list.filter(p => p.id.startsWith('haz_gallery')).map(p => [p.who, Math.round(p.x), p.blocking])")
+    ok &= check(len(G) == 3 and all(exact_x(150.3) <= x <= exact_x(158.8) for _, x, _ in G) and any(bl for *_, bl in G),
+                "the gallery's three browsers, between its pillars, in her way", G)
+    # Deck 9's second robot runs 30.5 to 50 m, the officer aft of it, 54 to 70.
+    b.teleport(exact_x(40), D9)
+    wait(1.0)
+    RB = f"{W}.movers.find(m => m.def?.id === 'haz_robot_9')"
+    span = b.eval(f"[{RB}.x0, {RB}.x1]")
+    walk = b.eval(f"{W}.people.byId.amb_officer_9.walk")
+    ok &= check(abs(span[0] - exact_x(30.5)) < 30 and span[1] <= exact_x(50) and walk["a"] >= exact_x(54) - 1,
+                "deck 9's robot (30.5 to 50 m) and the officer's walk aft of it", (span, walk))
     # (A hop clears a ball: held still in its lane's middle, she runs at the blue one and jumps 40 px short of it.)
     b.open("?play&reset&at=gym")
     GB2 = f"{W}.movers.find(m => m.def?.id === 'haz_gymball_2')"

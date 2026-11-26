@@ -1496,6 +1496,11 @@ export class World {
                 s.physics.add.existing(zone, true);
                 this.low.push({ route: e.route, x0: e.x0 - 18, x1: e.x1 + 18, y: e.y });
                 const items = e.frame ? [s.withFoot(this.image(e.x, e.y, e.frame).setOrigin(0.5, 1).setDepth(D.player + 0.04))] : [];
+                // (Its picture's far parts behind her, `<thing>-back` where the atlas has one: the fort's tunnel mouths'
+                // dark slots, so that at a mouth she is in it, as at the linen room's shaft; the user, 2026-11-26.)
+                const back = e.frame?.startsWith('thing:') ? `${e.frame.slice(6)}-back` : '';
+                if (back && s.textures.get('things').has(back))
+                    items.push(s.withFoot(s.add.image(e.x, e.y, 'things', back).setOrigin(0.5, 1).setDepth(D.player - 0.02)));
                 this.add(items);
                 const thing = { ...e, items, zone };
                 this.lows.push(thing);

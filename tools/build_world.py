@@ -375,9 +375,9 @@ def build_world():
         if wait != "circle":
             e["perch"] = dict(x=B.exact_x(wait[0]), y=B.floor_y(deck) - wait[1])
         ents.append(e)
-    for qid, (deck, a, b, v, who) in QUEUES.items():
+    for qid, (deck, a, b, v, who, *opts) in QUEUES.items():
         ents.append(dict(kind="queue", id=qid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,
-                         who=who, route="inside"))
+                         who=who, route="inside", **(opts[0] if opts else {})))
     for tid, (deck, a, b, door, flag, *rest) in TRAYS.items():
         # (A list: its own dishes; a dict: options, `until` a condition after which it is gone.)
         dishes = [r for r in rest if isinstance(r, list)]

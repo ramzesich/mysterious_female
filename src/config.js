@@ -389,6 +389,7 @@ export const BALCONY = { reach: 22, stand: 11, drop: 5, front: 0.36, mountMs: 45
 export const VERBS = {
     crawlSpeed: 88,
     crawlHeight: 26,
+    crawlDrop: 1,         // px her picture is drawn under her body on hands and knees (the user, 2026-11-26), `setCrawl`
     kickUp: 0.96,
     kickAway: 120,
     kickMs: 110,

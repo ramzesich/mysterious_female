@@ -1044,7 +1044,7 @@ def build_objects():
     # Named places to start at, for testing: ?at=<name> (README).
     add(point("crew", "place", exact_x(CREW_DECK["cabin"]), floor_y(crew)))
     for name, deck, m in [("gangway", 4, 67), ("deck4", 4, 49), ("deck4-aft", 4, 112), ("deck5", 5, 50), ("pool", 11, 116), ("deck12", 12, 113), ("atrium", 7, 80), ("atrium-floor", 5, 84),
-                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37), ("officers10", 10, 72),
+                          ("library", 6, 160), ("bar", 6, 112), ("theatre", 6, 215), ("bridge", 10, 37), ("officers10", 10, 72), ("deck9-end", 9, 240),
                           ("buffet", 11, 170), ("diner", 11, 220), ("spa", 11, 34), ("gym", 11, 88), ("bow", 7, 12), ("stern", 9, 247), ("housekeeping", 9, 117), ("deck9-aft", 9, 134), ("steward", 9, 183.4),
                           ("spinnaker", 12, 52), ("champs", 12, 92), ("court", 12, 150), ("sushi", 12, 178),
                           ("bistro", 12, 205), ("wake4", 4, 246.5), ("hall8", 8, 188), ("hall10", 10, 116), ("hall9a", 9, 204)]:

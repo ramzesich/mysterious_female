@@ -53,11 +53,15 @@ export const verbs = {
     },
 
     setCrawl(on) {
-        const body = this.player.body;
+        const p = this.player, body = p.body;
         const h = on ? VERBS.crawlHeight : PLAYER.bodyHeight;
         const w = on ? 30 : PLAYER.bodyWidth;
+        // (On hands and knees her picture is `VERBS.crawlDrop` px lower than her body, as `herDrop` sets it: the user,
+        // 2026-11-26, "shift her crawl one pixel down, everywhere in the game".)
+        const down = PLAYER.sink + (on ? VERBS.crawlDrop : 0);
+        if (on || this.crawling) p.setDisplayOrigin(p.width / 2, p.height - down);
         body.setSize(w, h);
-        body.setOffset((PLAYER.cell - w) / 2, PLAYER.cell - h - PLAYER.sink);
+        body.setOffset((PLAYER.cell - w) / 2, PLAYER.cell - h - down);
         this.crawling = on;
     },
 
