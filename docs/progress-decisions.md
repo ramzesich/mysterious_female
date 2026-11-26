@@ -5167,3 +5167,9 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
 - **Links walked as given** (E at the doors, a hop at the queue, as a player would): `library`, `theatre`, `balcony7`,
   `technical`, `diner`, `deck9-aft`, `jet11`. `chips7` is not one for the Arcade: its spill of chips takes her.
 - 20 generations; the balance went from 8,667 to 8,647.
+- **After the commit, in play (the user):** "Remove the chair to the right of the checkpoint, and shift this entire
+  checkpoint to the right, so that it entirely stands on the wooden floor": the pool attendant's hut stood 9 px over the
+  pool's tiled rim; the hut, its door and its lamp 10 px aft (140.6 to 140.8125 m), the lounger at 141.4 m out. Then
+  "Place this chair in the middle between the officer and the checkpoint": the lounger at 144.6 m to the middle of the
+  free space between the hut's edge and the security officer's back (`riv_loungers`), 4 px forward of it so that its
+  foot clears the parasol's base: 142.45 m (`LIDO["lounger"]` with it). `check_overlaps` 0; `region6` passes.

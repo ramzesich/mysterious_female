@@ -161,7 +161,7 @@ checkpoint. In the code: `CHECKPOINTS`, the rooms' `checkpoint`, `BALCONY_CPS` i
 | `cp_9_mid` | 9 | 190 | A crew door at the corridor's aft end | 4 |
 | `cp_bridge` | 10 | 43 | The crew door by the bridge (the finale's retry) | 10 |
 | `cp_gym` | 11 | 82.7 | The crew door between the forward lobby and the gym's windows | 6 |
-| `cp_pool` | 11 | 140.6 | The pool attendant's hut | 6 |
+| `cp_pool` | 11 | 140.81 | The pool attendant's hut, wholly on the deck's wood (10 px aft, the user, 2026-11-26) | 6 |
 | `cp_garden` | 11 | 192 | The Garden Café's service door, its window run ending short of it | 6 |
 | `cp_technical` | 12 | 165 | A mahogany door at Cagney's forward end, the roof ladder's foot | 8 |
 | `cp_balc_9` | 9 (out) | 150 | The balcony cabin, its balcony door only | 7 |

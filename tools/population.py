@@ -127,8 +127,9 @@ CHECKPOINTS = {
     # (On the strip of wall between the lobby's door and the gym's windows: at 84 m it stood on a
     # treadmill, in the windows.)
     "cp_gym": (11, 82.72, "inside", False, None),
-    # (The pool attendant's hut on pool 2's aft rim: the kid's and the wet patch's frights come back here.)
-    "cp_pool": (11, 140.6, "inside", False, None),
+    # (The pool attendant's hut aft of pool 2's rim: the kid's and the wet patch's frights come back here. 10 px aft of
+    # where it stood, the whole hut on the deck's wood, the lounger beside it gone: the user, 2026-11-26.)
+    "cp_pool": (11, 140.8125, "inside", False, None),
     # (Out of the café's window: its run ends short of it, its last table a metre forward.)
     "cp_garden": (11, 192, "inside", False, None),
     # (Half a metre clear of the wall across the deck; the wine cabinet beside it is gone.)
@@ -704,7 +705,7 @@ PROPS = {
     "amb_sun_1": (11, 115.9, "thing:sunbather-1", 0, dict(back=True)),
     "amb_sun_2": (11, 117.6, "thing:sunbather-2", 0, dict(back=True)),
     "prop_ladder_aft": (11, 130.5, "pool-ladder-bg", -15, dict(back=True, flip=True)),
-    "prop_pool_hut": (11, 140.6, "@pool-hut", 0, dict(back=True)),
+    "prop_pool_hut": (11, 140.8125, "@pool-hut", 0, dict(back=True)),
     "sign_wet_11": (11, 150.55, "wet-floor-sign-bg", 0, dict(back=True)),
     "prop_paint_bucket": (11, 107.45, "@paint-bucket", 0, dict(until="region:8")),
     "sign_wet_10m": (10, 154.2, "wet-floor-sign", 0, {}),
@@ -987,7 +988,7 @@ PLATFORMS = {"plat_canopy": (11, 130.92, 134.03, 90),
 # drain's lever has room to be thrown over toward it; `lever`, where its stand is bolted to the deck; `drain`, the grate
 # in the tank's floor at its aft end, where the water goes; `hatch`, the maintenance hatch in the tank's floor, near
 # enough to the aft rim to be in view as the water leaves it, and clear of the tray on deck 10's floor under it.)
-LIDO = dict(deck=11, lever=131.73, ladder=130.5, tub=132.96, kid=(142.6, 149.3), lounger=144.6, chess=112.4,
+LIDO = dict(deck=11, lever=131.73, ladder=130.5, tub=132.96, kid=(142.6, 149.3), lounger=142.45, chess=112.4,
             machine=214.6, husband=219.52, table=220.0, drain=129.8125, hatch=128.5)
 # A wet patch she slides on without the socks, the pool shower over it running, and a deck chair that
 # stands at its aft end, its front legs in the puddle (`haz_wet`, `haz_deckchair`): id: (deck, from m,

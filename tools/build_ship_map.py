@@ -1804,7 +1804,9 @@ def build_objects():
     # Over it, white pipes on tall blue posts (the user's photo from deck 12).
     decor("pergola-11", "pergola", exact_x(110.1), exact_x(114.9), deck=11)
     # (By the first pool, at 115.9 and 117.6, two sunbathers lie on loungers of their own: population.)
-    for m in (141.4, 144.6, 147.8):
+    # (The one at 141.4 m went: the pool attendant's hut moved aft onto the wood; the one at 144.6 to the middle of the
+    # gap between the hut and the security officer, the parasol over it: the user, 2026-11-26.)
+    for m in (142.45, 147.8):
         at11(m, "sunlounger")
     at11(143.0, "parasol")
     at11(132.96, "hot-tub")      # (22 px aft of where it first stood: the drain lever's throw, tools/population.py `LIDO`)
