@@ -322,6 +322,12 @@ HER_MISHAPS = {
         # her own dazed clip), to the same; her eyes open throughout (a try had her blink). Its
         # canvas and edges are the tip's last frame's, so it is placed as the tip is (`shift_as`).
         "suitcase-dazed": [(f"suitcase-dazed/{i}.png", "feet") for i in range(1, 9)],
+        # The same four in red, for deck 5's second suitcase (tools/recolour_suitcase.py; the user, 2026-11-26), each
+        # placed exactly as its slate clip (`shift_as`).
+        "redcase-sit": [(f"redcase-sit/{i}.png", "feet") for i in range(1, 7)],
+        "redcase-ride": [(f"redcase-ride/{i}.png", "feet") for i in range(1, 9)],
+        "redcase-tip": [(f"redcase-tip/{i}.png", "feet") for i in range(0, 9)],
+        "redcase-dazed": [(f"redcase-dazed/{i}.png", "feet") for i in range(1, 9)],
         # The papers (the user's brief, 2026-11-16; picked 2026-11-17), each from her standing on the
         # sliding newspaper (`paper-start/start2-*.png`), its first frame (her still standing) left out
         # so that the push carries straight into the fall. 4b, from behind: her heel taken forward and
@@ -368,7 +374,8 @@ HER_MISHAPS = {
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
     # Moved sideways as another clip is, which it carries on from.
-    "shift_as": {"suitcase-dazed": "suitcase-tip"},
+    "shift_as": {"suitcase-dazed": "suitcase-tip", "redcase-sit": "suitcase-sit", "redcase-ride": "suitcase-ride",
+                 "redcase-tip": "suitcase-tip", "redcase-dazed": "suitcase-tip"},
     # A gag with no thing to place it by: her middle in its frames (her own sprite's, in the start
     # picture) on the cell's middle.
     # The cart's: its middle (8a, 8c), or 18 px behind hers (8b, 8d: her middle is column 86, room

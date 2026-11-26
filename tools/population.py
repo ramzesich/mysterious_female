@@ -944,7 +944,9 @@ JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 DARTERS = {"haz_vacuum_9": (9, 139.6, 2.0, 2.0)}
 # A stack of towels that topples (`haz_towels_9`): id: (deck, m). A jump landed beside it, or the
 # dash, brings it down on her.
-STACKS = {"haz_towels_9": (9, 141.6)}   # midway between the cabin doors either side (the user, 2026-11-18: its heap had fallen over the open one): the heap reaches 90 px out the way it falls, the doors' frames are 159 px apart, so its last towel's tip touches a frame by 10 px
+STACKS = {"haz_towels_9": (9, 141.6),
+          # Part 11 (plan-the-rest §7f, 1): deck 4 aft, alone, midway between the cabin doors at 167.6 and 171.6 m.
+          "haz_towels_4": (4, 169.6)}   # midway between the cabin doors either side (the user, 2026-11-18: its heap had fallen over the open one): the heap reaches 90 px out the way it falls, the doors' frames are 159 px apart, so its last towel's tip touches a frame by 10 px
 # Sprinklers (`haz_sprinkler`): id: (deck, m, half its rain's width (m), every s, for s, offset s).
 SPRINKLERS = {"haz_sprinkler_9": (9, 148.0, 1.0, 5, 2, 0), "haz_sprinkler_10m": (10, 156.0, 1.0, 5, 2, 1.5),
               # Region 7: deck 8 midships' one; deck 9 aft's two, out of phase: a rhythm to run.
@@ -1016,7 +1018,12 @@ TRAYS = {"haz_trays_10m": (10, 128.9, 130.7, "haz_dnd_10m", "trays_10m"),
          # Deck 8 midships' ice bucket and two glasses on a tray outside a door, a trap as the rest since 2026-11-23 (the
          # user: "should this tray be a gag? We just walk past it"); no door its clatter opens. Its own dishes: (the ship's
          # atlas piece, px from the tray's middle), on the trays' base.
-         "haz_trays_8ice": (8, 177.3, 178.7, "", "", [("ice-bucket", -6), ("wine-glasses", 4)])}
+         "haz_trays_8ice": (8, 177.3, 178.7, "", "", [("ice-bucket", -6), ("wine-glasses", 4)]),
+         # Part 11 (plan-the-rest §7f, 4): the Seven Seas' plates and trays Bumbot knocked down on his way in to the lunch,
+         # three lots between its tables, there from the start until the lunch is delivered (`until`); no door behind them.
+         "haz_trays_5a": (5, 218.7, 220.1, "", "", {"until": "flag:lunch"}),
+         "haz_trays_5b": (5, 226.1, 227.5, "", "", {"until": "flag:lunch"}),
+         "haz_trays_5c": (5, 235.7, 237.1, "", "", {"until": "flag:lunch"})}
 
 # --- Region 7's own things (docs/population.md: the outside; src/world/outside.js) ------------------
 # Gusts along the ship's side, on the balconies: every s, for s, the tell before (s: the towels on
@@ -1055,7 +1062,14 @@ DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0,
 # --- Region 1's decks filled (docs/plan-three-uses.md §4.2; step 4, 2026-11-16) -----------------
 # A suitcase on its wheels rolling to and fro with the ship's slow roll: id: (deck, m from, m to, m/s).
 # (1.6 m/s at its fastest, from 1.1: the user, 2026-11-17, with her ride on it made quicker.)
-ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6)}
+ROLLERS = {"haz_suitcase_4": (4, 38.5, 45.5, 1.6),
+           # Part 11 (plan-the-rest §7f, 3): deck 5's atrium, a guest's case by Guest Services (the user, 2026-11-26: a
+           # suitcase belongs in a cabin corridor or the atrium where guests check in; the plan had Shore excursions),
+           # between the glass lift (92.9 m) and the palm before the desk (97.4 m). There only once the lunch is
+           # delivered (the user: a tray's low hop, 26 px, does not clear its 30, and the lunch's way runs the whole
+           # deck), as the Seven Seas' plates go. Red (the user: "Make two suitcases different colors"; red of four tries):
+           # tools/recolour_suitcase.py.
+           "haz_suitcase_5": (5, 93.4, 97.0, 1.6, {"after": "flag:lunch", "look": "red"})}
 # A small dog on a long lead, its owner in her cabin's doorway: id: (deck, the door's m, owner,
 # the lead's reach in m, what the owner gives after three fetches).
 DOGS = {"haz_dog_4": (4, 99.6, "dogowner", 4.0, "keep:cat:ball")}

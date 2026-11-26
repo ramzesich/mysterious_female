@@ -979,6 +979,12 @@ first** (the lesson of 2026-11-14), looked at enlarged beside her, and shown to 
 | 9 | Deck 10, the officers' corridor, about 52 to 56 m, a cabin door's slot | **The night watch asleep: a "Do Not Disturb" door with his tray outside** (`DND`, `TRAYS`, gags 23 and 3) | Decks 8 to 10 | Both gags on the way to the bridge. Needs one person, an officer in pyjamas, a sleep mask pushed up (a pro character in the cast's style, the drill's officer; about 15 with what the other `dnd_*` people have). Clear of the officer's walk (`amb_officer_10`, about 60 m) and of the cabin door `cp_officer` gives back (§7e) |
 | 10 | Deck 7, the Art Gallery, 132 to 148 m | **New: two handlers carrying a large framed painting to and fro** | None | Region 3's one walker. They carry it along her lane and set it against the wall at each end for a few seconds, wiping their brows: then the way is free. Her cry sets it down at once. Run into while they walk: **she goes through the canvas**, head and arms out of the picture, the frame round her; she staggers and sits; they look at each other. Then her checkpoint; they fetch another. About 50 generations, a guess (the two with the painting made together, their walk, setting down and picking up, their look; her gag). **Built last, a plain version first:** a rough of the shot over a real screenshot and the walk with stand-in art are shown to the user before any art is made (the intro's lesson) |
 
+**Built 2026-11-26 (1 to 4, approved in play; `docs/progress-decisions.md`):** 1 as planned, the cabin doors beside a
+towel stack 8 px nearer to it and its heap over them (the user: it read as "obscured by the door"); 2 as planned; **3 in
+deck 5's atrium (93.4 to 97 m, by Guest Services), only once the lunch is delivered, and red** (a tray's low hop does not
+clear it, the lunch's way is the whole deck; the user: a suitcase belongs in a cabin corridor or the atrium; "Make two
+suitcases different colors"); 4 as planned, at 219.4, 226.8 and 236.4 m.
+
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:
 the suitcase (moving), the waiter (walker), the plates (hop).

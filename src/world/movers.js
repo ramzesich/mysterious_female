@@ -648,7 +648,10 @@ export class Darter {
 // longer than her run (140 px/s) takes from there to past it; stopped short, she waits the wobble
 // out and it falls in front of her. Its sway eases as she comes level with it (`settle`, px), so that
 // it is near upright when a clip, which starts upright, takes over. The frame it lands on (`lands`).
-const TOWELS = { reach: 100, wobbleMs: 1100, passed: 6, under: [4, 74], lastFrame: 6, lands: 7, settle: 60, emergeAfterMs: 450 };
+// `heapDepth`: the falling and fallen heap over the doors it lies across (a cabin door ajar is drawn at the props' depth
+// and cut the heap off at its frame: the user, 2026-11-26, "obscured by the door"); under the vacuum resting in its
+// doorway (8.02: the user's "correct order of depth"), the people (8.05), the ship's closed side (`exterior`) and her.
+const TOWELS = { reach: 100, wobbleMs: 1100, passed: 6, under: [4, 74], lastFrame: 6, lands: 7, settle: 60, emergeAfterMs: 450, heapDepth: 0.01 };
 export class TowelStack {
     constructor(world, def) {
         const s = world.scene, D = s.DEPTH;
@@ -668,7 +671,7 @@ export class TowelStack {
         // steward, 2026-11-18. Kept with what she has broken, the way it fell with it.)
         if (world.save.broken.includes(def.id)) {
             this.dir = world.save.heaps?.[def.id] ?? 1;
-            this.show(this.dir, D.props - 0.02);
+            this.show(this.dir, D.props + TOWELS.heapDepth);
             this.pic.setFrame(m.anims.fall[m.anims.fall.length - 1]);
             this.state = 'down';
         }
@@ -749,7 +752,7 @@ export class TowelStack {
         this.state = 'falling';
         this.dir = dir;
         this.tried = this.landed = false;
-        this.show(dir, s.DEPTH.props - 0.02);
+        this.show(dir, s.DEPTH.props + TOWELS.heapDepth);
         this.fallen();
         this.pic.play('towels-fall');
         this.pic.once('animationcomplete-towels-fall', () => {
@@ -786,7 +789,7 @@ export class TowelStack {
             },
             show: () => {
                 this.pic.anims.stop();
-                this.pic.setFrame(m.anims.bury[8]).setDepth(s.DEPTH.props - 0.02);   // behind her, as the fall's
+                this.pic.setFrame(m.anims.bury[8]).setDepth(s.DEPTH.props + TOWELS.heapDepth);   // behind her, as the fall's
                 this.state = 'down';
             },
         };
@@ -1185,7 +1188,8 @@ export class Roller {
         const span = s.spanOn((def.x0 + def.x1) / 2, def.x0, def.x1, def.y, Roller.HALF);
         this.def = def = { ...def, x0: span.lo, x1: span.hi };   // { x0, x1, y, v (m/s, its fastest) }
         // (Its handle pulled up: the one she rides in her gag, 6b, cut from that picture.)
-        this.sprite = s.add.image(def.x0, def.y, 'things', 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
+        // (`look`: another colour of it, its world picture and her gags with it: deck 5's red, tools/recolour_suitcase.py.)
+        this.sprite = s.add.image(def.x0, def.y, 'things', def.look ? `suitcase-rolling-${def.look}` : 'suitcase-rolling').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         world.add([this.sprite]);
         this.mid = (def.x0 + def.x1) / 2;
         this.half = (def.x1 - def.x0) / 2;
@@ -1193,10 +1197,19 @@ export class Roller {
         this.x = def.x0;
         this.phase = 0;
         this.parked = false;
+        // (`after`: not there until it holds: deck 5's, once the lunch is delivered, off the lunch's way, the user,
+        // 2026-11-26: a tray's low hop does not clear it.)
+        this.away = !!def.after && !world.cond(def.after);
+        this.sprite.setVisible(!this.away);
     }
 
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
+        if (this.away) {
+            if (!this.world.cond(d.after)) return;
+            this.away = false;
+            this.sprite.setVisible(true);
+        }
         if (!nearby(s, d) || this.parked) return;
         const was = Math.sin(this.phase);
         this.phase += dt * 2 * Math.PI / this.period;
@@ -1221,7 +1234,7 @@ export class Roller {
             // (Standing at an end of its roll, it sets off for the other end with her.)
             const vx = Math.sin(this.phase) * this.half * 2 * Math.PI / this.period;
             const dir = Math.abs(vx) > 5 ? Math.sign(vx) : this.x < this.mid ? 1 : -1;
-            const ride = { x: this.x, y: d.y, dir, v: vx, endX: dir > 0 ? d.x1 : d.x0,
+            const ride = { x: this.x, y: d.y, dir, v: vx, endX: dir > 0 ? d.x1 : d.x0, look: d.look,
                            hide: () => { this.parked = true; this.sprite.setVisible(false); },
                            show: () => { this.parked = false; this.sprite.setVisible(true).setAngle(0); } };
             s.scareContact(this.x, 'suitcase', { vx, ride });

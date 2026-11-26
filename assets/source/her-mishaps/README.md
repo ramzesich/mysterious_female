@@ -72,3 +72,9 @@ feet on her floor) to the same: the dog licks her face. `butterflies.py` puts he
 her yellow (the generator drew some purple and teal) and writes `dog-lick/0.png` to `7.png`. In the
 sheet as `dog-lick`, on her row 74 as her dazed clip is; played by the dog (`LICK` in
 src/world/movers.js).
+
+## The red suitcase's clips (2026-11-26, plan-the-rest §7f, 3)
+
+`redcase-sit/`, `redcase-ride/`, `redcase-tip/`, `redcase-dazed/`: the `suitcase-*` clips' frames with the case turned
+burgundy by `tools/recolour_suitcase.py` (the user: "Make two suitcases different colors"; red of four tries: red, teal,
+mustard, green), with `assets/source/things/suitcase-rolling-red.png`. No generations; written by the tool, never by hand.

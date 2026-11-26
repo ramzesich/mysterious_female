@@ -3004,6 +3004,9 @@ def pills_for_the_stage_manager(b):
     """The second errand, start to end (the golden path's): down the theatre's trunk to deck 4, his
     pills from his cabin, back up, into his hands: the Entertainment card."""
     tx = trunk_x("theatre")
+    # (Deck 4's second vacuum patrols the pocket by the trunk's door, the pills' test in play (plan-the-rest §7f, 2): held
+    # still here, whose walk is blind; its hit is `mishaps.stretches`'.)
+    b.eval(f"window.__ship.vacuums.filter(v => Math.abs(v.sprite.x - {tx}) < 20 * 48).forEach(v => {{ v.asideUntil = window.__ship.time.now + 600000; }})")
     b.teleport(tx, D6)
     b.tap("e")
     s = hold_until(b, "down", lambda s: s["y"] == D4, 8)
@@ -6859,6 +6862,47 @@ def scenario_mishaps__things(b):
     ok &= both(b, "the drill's boat (15)", want="15", **run("drill7", "right", "&cards=all", lull), clip="^drill-drop", within=8)
     ok &= both(b, "deck 9's sprinkler (16)", want="16", **run("sprinkler9", "right", first=rain), clip="^gags-sprinkler", within=8)
     ok &= both(b, "the towel stack (18)", want="18", **run("towels9", "left"), clip="^towels-(run|bury)", within=6)
+    return ok
+
+
+def scenario_mishaps__stretches(b):
+    """Part 11's things placed anew (plan-the-rest §7f, 1 to 4), each met in play: deck 4's towel stack (18) and second
+    vacuum (5a), deck 5's red suitcase in the atrium once the lunch is delivered (6a, run into: its own red clips), the Seven Seas'
+    trays before it (3); then the trays gone and the suitcase there once the lunch is delivered."""
+    ok = True
+    W = f"{MS}.world"
+
+    def run(query, key, first):
+        def act():
+            first()
+            hold_until(b, key, lambda s: s["mode"] != "play", 8)
+            b.key(key, False)
+        return dict(act=act, fresh=lambda: b.open(f"?play&reset{query}"))
+
+    def at(x, y, west):
+        b.teleport(x, y)
+        b.eval(f"{MS}.player.setFlipX({'true' if west else 'false'})")
+    stack = lambda: at(exact_x(169.6) + 150, D4, True)
+    # (The second vacuum, coming forward at her.)
+    vac = lambda: (b.eval(f"(v => {{ v.sprite.x = {exact_x(237)}; v.dir = -1; }})({MS}.vacuums[1])"), at(exact_x(229), D4, False))
+    R = f"{W}.movers.find(m => m.def?.id === 'haz_suitcase_5')"
+    case = lambda: (b.eval(f"{R}.phase = Math.PI / 2 - 0.5"),
+                    at(b.eval(f"{R}.mid - {R}.half * Math.cos(Math.PI / 2 - 0.5)") + 46, D5, True))
+    trays = lambda: at(exact_x(236.4) + 120, D5, True)
+    ok &= both(b, "deck 4's towel stack (18)", want="18", **run("&at=deck4-aft", "left", stack), clip="^towels-(run|bury)", within=6)
+    ok &= both(b, "deck 4's second vacuum (5a)", want="5a", **run("&at=deck4-aft", "right", vac), clip="^gag-vacuum", within=6)
+    ok &= both(b, "deck 5's red suitcase (6a)", want="6a", **run("&did=lunch&at=atrium-floor", "left", case), clip="^gag-redcase", within=6)
+    ok &= both(b, "the Seven Seas' trays (3)", want="3", **run("&at=pass5", "left", trays), clip="^gags-tray-ride", within=6)
+    # Before the lunch: the trays there, the suitcase not; after it, the other way round.
+    b.open("?play&reset&at=pass5")
+    T = f"{W}.movers.filter(m => /^haz_trays_5/.test(m.def?.id || ''))"
+    ok &= check(b.eval(f"{T}.every(m => !m.gone && m.items[0].visible) && {R}.away && !{R}.sprite.visible"),
+                "before the lunch: the Seven Seas' trays lie there, the atrium's suitcase is not there")
+    b.eval(f"{MS}.progress.setFlag('lunch')")
+    wait(0.3)
+    ok &= check(b.eval(f"{T}.every(m => m.gone && !m.items[0].visible) && !{R}.away && {R}.sprite.visible"),
+                "once the lunch is delivered: the trays gone, the suitcase rolling")
+    ok &= check(b.eval(f"{R}.sprite.frame.name") == "suitcase-rolling-red", "and it is the red one")
     return ok
 
 

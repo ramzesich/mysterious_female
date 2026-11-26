@@ -2064,6 +2064,10 @@ def build_objects():
     # docs/plan-three-uses.md §4.2).
     add(point("vacuum-1", "vacuum", x_of(130), floor_y(4), [
         prop("minX", x_of(118), "float"), prop("maxX", x_of(143), "float"), prop("speed", 58, "float")]))
+    # A second one (plan-the-rest §7f, 2): the pocket aft with the stage manager's door (232.5 m), the test of the
+    # pills (region 3); it turns short of the trunk's door (240.6 m) and of the prop cart (224 m).
+    add(point("vacuum-2", "vacuum", x_of(232), floor_y(4), [
+        prop("minX", x_of(225.5), "float"), prop("maxX", x_of(239), "float"), prop("speed", 58, "float")]))
 
     return objs
 

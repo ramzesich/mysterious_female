@@ -30,6 +30,18 @@ UNIT = 125                  # a balcony, px
 END_COVER = 40              # the side drawn over her past a row of balconies' end, px (her picture reaches past her body)
 
 
+STACK_DOOR_NUDGE, STACK_DOOR_REACH = 8, 100
+
+
+def nudged(deck, x):
+    """A cabin door's x, moved toward a towel stack within `STACK_DOOR_REACH` px of it."""
+    for sdeck, m in STACKS.values():
+        sx = B.exact_x(m)
+        if sdeck == deck and abs(sx - x) < STACK_DOOR_REACH:
+            return x + (STACK_DOOR_NUDGE if sx > x else -STACK_DOOR_NUDGE)
+    return x
+
+
 def cabin_slots(deck):
     """Every cabin door's x on a deck's corridors (the builder's own layout: one every 192 px)."""
     xs = []
@@ -46,6 +58,10 @@ def cabin_slots(deck):
                 runs.append([c, c + 1])
         for c0, c1 in runs:
             xs += [x + 17 for x in range(c0 * B.TILE + 60, c1 * B.TILE - 30, 192)]
+    # (A cabin door beside a towel stack stands `STACK_DOOR_NUDGE` px nearer to it, so that the fallen heap lies plainly
+    # across its frame's foot: at the rhythm's place its top towels ended on the frame's edge and read as behind the door,
+    # the user, 2026-11-26. The ship scene's `drawCabinDoors` keeps the same rule.)
+    xs = [nudged(deck, x) for x in xs]
     return xs
 
 
@@ -315,9 +331,9 @@ def build_world():
         ents.append(dict(kind="opendoor", id=oid, x=slot_x(deck, m), y=B.floor_y(deck), route="inside", what=what))
 
     # Region 1's decks filled (docs/plan-three-uses.md §4.2; src/world/movers.js).
-    for rid, (deck, a, b, v) in ROLLERS.items():
+    for rid, (deck, a, b, v, *opts) in ROLLERS.items():
         ents.append(dict(kind="roller", id=rid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
-                         v=v, route="inside"))
+                         v=v, route="inside", **(opts[0] if opts else {})))
     for did, (deck, m, who, reach, gives) in DOGS.items():
         ents.append(dict(kind="dog", id=did, x=slot_x(deck, m), y=B.floor_y(deck), who=who, reach=round(reach * 48),
                          gives=gives, route="inside"))
@@ -362,9 +378,12 @@ def build_world():
     for qid, (deck, a, b, v, who) in QUEUES.items():
         ents.append(dict(kind="queue", id=qid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,
                          who=who, route="inside"))
-    for tid, (deck, a, b, door, flag, *dishes) in TRAYS.items():
+    for tid, (deck, a, b, door, flag, *rest) in TRAYS.items():
+        # (A list: its own dishes; a dict: options, `until` a condition after which it is gone.)
+        dishes = [r for r in rest if isinstance(r, list)]
+        opts = next((r for r in rest if isinstance(r, dict)), {})
         ents.append(dict(kind="trays", id=tid, x=B.exact_x((a + b) / 2), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck),
-                         door=door, flag=flag, route="inside", **({"dishes": dishes[0]} if dishes else {})))
+                         door=door, flag=flag, route="inside", **({"dishes": dishes[0]} if dishes else {}), **opts))
     # Region 7's (src/world/outside.js).
     for rid, (deck, a, b, v, stops, wait, who) in ROUNDS.items():
         ents.append(dict(kind="rounds", id=rid, x=B.exact_x(a), x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck), v=v,

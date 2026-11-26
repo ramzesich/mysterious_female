@@ -2602,12 +2602,18 @@ export class ShipScene extends Phaser.Scene {
             if (n % 8 === 5 && gap + 20 < o.x + o.width) parts.push(this.add.image(gap, o.y - 100, 'shipart', 'exit-sign-bg').setOrigin(0.5, 1).setDepth(DEPTH.decor + 0.1));
             // No cabin door right beside a trunk's or a crew door (the user, 2026-11-03).
             if (this.doorSpots.some(t => t.y === o.y && Math.abs(x + 15 - t.x) < CABIN_DOOR_CLEAR)) continue;
-            if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) continue;
+            // (Beside a towel stack a door stands 8 px nearer to it, its fallen heap plainly across the frame's foot: the
+            // user, 2026-11-26; the same rule as `nudged()` in tools/build_world.py, for the doors placed in its slots.)
+            const stack = ents.find(e => e.kind === 'stack' && Math.abs(e.x - (x + 17)) < 100);
+            const x0 = x;
+            if (stack) x += stack.x > x + 17 ? 8 : -8;
+            if (this.openCabinDoors.some(t => t.y === o.y && Math.abs(x + 17 - t.x) < 4)) { x = x0; continue; }
             // Most doors are plain; about one in six has stickers, each its own.
             const frame = (n * 7) % 6 === 0 ? `door-cabin-stickers-${1 + (n % 3)}-bg` : 'door-cabin-bg';
             // (Kept: the doors there are, for those who go door to door: the paper rounds, breakfast.)
             (this.cabinDoorsDrawn ??= []).push({ x: x + 17, y: o.y });
             parts.push(this.add.image(x, o.y, 'shipart', frame).setOrigin(0, 1).setDepth(DEPTH.decor + 0.1));
+            x = x0;
             // Now and then a housekeeping trolley or a room-service cart left by a door.
             const cart = n % 9 === 4 ? 'towel-trolley-bg' : n % 11 === 7 ? 'service-cart-bg' : null;
             // (None where a tall trolley of the plan's world is pushed: the steward's, 2026-11-18.)
@@ -5318,7 +5324,8 @@ export class ShipScene extends Phaser.Scene {
     // hidden until she comes out of her door. `ride`: { x, y: the thing's middle and its floor, dir: the way it
     // carries her, v: its speed, px/s; endX: where its roll ends (the suitcase); hide(), show() }.
     rideGag(sc, ride) {
-        const p = this.player, g = GAGS[sc.gag], dir = ride.dir;
+        // (A thing of another colour plays its own clips, `GAGS['<gag>-<look>']` over the gag's: deck 5's red suitcase.)
+        const p = this.player, g = ride.look ? { ...GAGS[sc.gag], ...GAGS[`${sc.gag}-${ride.look}`] } : GAGS[sc.gag], dir = ride.dir;
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         sfx.scare();

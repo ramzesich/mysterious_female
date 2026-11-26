@@ -381,6 +381,7 @@ export class BootScene extends Phaser.Scene {
         const gag = this.cache.json.get('her-mishaps-meta');
         for (const [name, fps, repeat] of [['vacuum-sit', 11, 0], ['vacuum-ride', 10, -1],
                                            ['suitcase-sit', 11, 0], ['suitcase-ride', 8.8, -1], ['suitcase-tip', 11, 0], ['suitcase-dazed', 11, -1],
+                                           ['redcase-sit', 11, 0], ['redcase-ride', 8.8, -1], ['redcase-tip', 11, 0], ['redcase-dazed', 11, -1],
                                            ['paper-behind', 10, 0], ['paper-front', 10, 0],
                                            ['cart-drape', 10, 0], ['cart-kick', 4, -1], ['cart-sit', 10, 0], ['cart-push', 10, 0], ['cart-bounce', 10, 0],
                                            ['tray-sit', 10, 0], ['trolley-trip', 10, 0],

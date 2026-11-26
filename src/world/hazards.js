@@ -508,7 +508,7 @@ export class Trays {
     // cross while the guest looks about (docs/plan-three-uses.md §2). It lies there, hers again.
     offered(t) {
         const s = this.scene, d = this.def;
-        if (!this.armed || this.scattered || t.route !== 'inside' || t.img.x < d.x0 || t.img.x > d.x1 || Math.abs(t.img.y + 3 - d.y) > 10) return false;
+        if (this.gone || !this.armed || this.scattered || t.route !== 'inside' || t.img.x < d.x0 || t.img.x > d.x1 || Math.abs(t.img.y + 3 - d.y) > 10) return false;
         this.armed = false;
         sfx.at(t.img.x, d.y).crash();
         this.rattle();
@@ -558,6 +558,11 @@ export class Trays {
     update(dt, time) {
         const s = this.scene, p = s.player, d = this.def;
         if (this.riding) return;
+        // (`until`: gone for good once it holds: the Seven Seas' once the lunch is delivered, plan-the-rest §7f.)
+        if (this.gone || (d.until && this.world.cond(d.until))) {
+            if (!this.gone) { this.gone = true; this.armed = false; this.items.forEach(img => img.setVisible(false)); }
+            return;
+        }
         // (Far off, at a checkpoint after a ride: ready again.)
         if (!nearby(s, d)) {
             this.armed = true;

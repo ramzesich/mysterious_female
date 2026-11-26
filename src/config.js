@@ -558,6 +558,8 @@ export const GAGS = {
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
     paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000 },
     suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', dazed: 'gag-suitcase-dazed', top: 80, slow: 1.4, least: 16, pace: 1.1, rideS: 3.3, holdMs: 1180 },
+    // (The red one, deck 5's: the same clips recoloured, tools/recolour_suitcase.py; the user, 2026-11-26.)
+    'suitcase-red': { sit: 'gag-redcase-sit', ride: 'gag-redcase-ride', tip: 'gag-redcase-tip', dazed: 'gag-redcase-dazed' },
     // The porter's cart (8a to 8d; the ship scene's `cartGag`). `cart`: the clip has the cart in it
     // and is set down where she stands, the cart's middle `cartAt` px ahead of hers (behind, less
     // than 0), the porter brought up to it and his own cart hidden; else it is her alone, set down

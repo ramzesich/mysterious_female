@@ -136,7 +136,12 @@ def on_her(f, h):
     return any(p[3] and tuple(int(v) for v in p[:3]) in HAIR_SKIN for p in box)
 
 
+# A clip that is another recoloured takes that clip's estimates (deck 5's red suitcase: tools/recolour_suitcase.py).
+SAME_AS = {"her-mishaps": {f"redcase-{c}": f"suitcase-{c}" for c in ("sit", "ride", "tip", "dazed")}}
+
+
 def her_head(sheet, clip, k, f, estimates, cell):
+    clip = SAME_AS.get(sheet, {}).get(clip, clip)
     if (clip, k) in BY_HAND.get(sheet, {}):
         return list(BY_HAND[sheet][(clip, k)])
     if not f[:, :, 3].any():
@@ -152,6 +157,7 @@ def her_head(sheet, clip, k, f, estimates, cell):
 
 def needs_estimate(sheet, clip, k, f, estimates):
     """A frame of hers with her in it, no estimate, and not upright (or in a gag)."""
+    clip = SAME_AS.get(sheet, {}).get(clip, clip)
     if not f[:, :, 3].any() or str(k) in estimates.get(sheet, {}).get(clip, {}):
         return False
     if sheet in HER_UPRIGHT and tall(f):

@@ -5173,3 +5173,40 @@ still as the audit found them but 8206's desk (moved 2026-11-22) and Cagney's (m
   "Place this chair in the middle between the officer and the checkpoint": the lounger at 144.6 m to the middle of the
   free space between the hut's edge and the security officer's back (`riv_loungers`), 4 px forward of it so that its
   foot clears the parasol's base: 142.45 m (`LIDO["lounger"]` with it). `check_overlaps` 0; `region6` passes.
+
+## Part 11, first group: items 1 to 4 (2026-11-26; `docs/plan-the-rest.md` §7f)
+
+- **1, the towel stack on deck 4 at 169.6 m** (`STACKS`), midway between the cabin doors at 167.6 and 171.6 m; the
+  corridor's picture moves out of its way by its rule. **The user, checking its fall both ways and deck 9's: "they don't
+  cover the foot of the cabin door, but are obscured by the door. If visually they would obscure the door, then it would
+  make sense"**. Two causes. (a) The heap's top towels ended at 77 to 79 px from the stack, the frame's outer edge at
+  79: drawn in front, it read as tucked behind. **A cabin door within 100 px of a towel stack stands 8 px nearer to it**
+  (`nudged()` and `STACK_DOOR_NUDGE` in `tools/build_world.py` for every door placed in a slot, the same rule in the ship
+  scene's `drawCabinDoors`), so the towels lie plainly across the frame onto the leaf; deck 9's open cabin (the darting
+  vacuum's) moves with it. (b) Deck 9's ajar door (depth 8.0) was over the heap (7.98): **the falling and fallen heap at
+  `props + TOWELS.heapDepth` (0.01)**, over the ajar doors, under the vacuum resting in the doorway (8.02, the user's
+  "correct order of depth", after a try at 8.04 over it), the people (8.05), the ship's closed side (8.6) and her.
+  **Checked on the user's word ("dimming, when on decks above or below, the hull, outside")** by the heap at the old
+  depth, the new and hidden, in its own rectangle: its own corridor (changes only at the doors), the deck above and below
+  (not seen: deck 9 is behind the closed side there; only the balconies' towels flap), the outside view (hidden), inside
+  the open cabin (hidden). `check_overlaps` 0.
+- **2, a second vacuum on deck 4, 225.5 to 239 m** (`vacuum-2` in the map), past the stage manager's door, turning short
+  of the theatre trunk's door: the pills' test in region 3. `pills_for_the_stage_manager` in the playtests holds it still
+  for its blind walk; its hit is `mishaps.stretches`'.
+- **3, a second runaway suitcase: not at Shore excursions, but deck 5's atrium, 93.4 to 97 m, and only once the lunch is
+  delivered** (`after: flag:lunch`). Measured: a tray's low hop peaks at 26 px (350 x 0.62, gravity 900), the case needs
+  30, and the lunch's way runs the whole of deck 5 (the pass at 249 m to the forward stairs, 75 m); the forward cabins
+  (20 to 74 m) are full. The user chose "off the way", then "same spot, after lunch", then (in review) "a suitcase is
+  supposed to be in a corridor with the guest rooms, or in the atrium deck 5, where guests are checked in": a guest's
+  case by Guest Services, between the glass lift and the palm before its desk; nothing else is planned there. Then
+  **"Make two suitcases different colors": the new one red** (the user's choice of red, teal, mustard, green), its world
+  picture and every frame of her gags with it (6a to 6c) turned by `tools/recolour_suitcase.py` (the case's own mid tones
+  only, pieces of a dozen px or more, the handle's greys and the tag kept), each red clip placed exactly as its slate one
+  (`shift_as`) with its heads (`SAME_AS` in `tools/build_heads.py`); the game plays `GAGS['suitcase-red']`'s clips for a
+  roller with `look: 'red'` (`rideGag`). No generations.
+- **4, Bumbot's trays in the Seven Seas** (`TRAYS`), three lots at 218.7 to 220.1, 226.1 to 227.5 (off the column) and
+  235.7 to 237.1 m, between its tables and palms, no door behind them, there from the start until the lunch is delivered
+  (`until`, a new option of a `TRAYS` entry: a dict). Carrying the lunch, a low hop clears each (measured).
+- **Tests:** `mishaps.stretches` new (each of the four with none on her and with two; the trays before the lunch, the red
+  suitcase after); `deck4`, `vacuum`, `region1`, `region3`, `region4`, `highlight`, `golden`, `boot` pass; `mishaps.things`
+  fails only on deck 9's sprinkler, as before. Not run: the rest.

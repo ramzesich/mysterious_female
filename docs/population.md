@@ -251,10 +251,10 @@ with two). A start place by each: `docs/start-links.md`.
 |---|---|---|---|---|---|
 | `haz_chips` (the slots' spills) | 7 | 1 | none: the built fall (sit) | `slip` | `region3` |
 | The dog's lead (`haz_dog_4`) | 4 | 2 | the built fall, then the dog's lick | `bark` | `deck4` |
-| Room-service trays (`haz_trays_*`) | 8, 10 | 3 | her ride on a tray | `crash` | `region6`, `region7`, `mishaps.things` |
+| Room-service trays (`haz_trays_*`; the Seven Seas' `haz_trays_5a` to `5c` until the lunch, §7f) | 5, 8, 10 | 3 | her ride on a tray | `crash` | `region6`, `region7`, `mishaps.things`, `mishaps.stretches` |
 | The papers (`haz_papers_5`, `5b`) | 5 | 4a, 4b | her leg up behind (belly) / in front (bottom) | `paperSlide` | `deck4`, `pocket` |
-| The robot vacuums (`haz_vacuum_4`, `_9`) | 4, 9 | 5a, 5b | she rides it off | `vacRev`, `vacDart`, `thump` | `vacuum`, `region4` |
-| The suitcase (`haz_suitcase_4`) | 4 | 6a, 6b, 6c | she rides it, tipped off | `creak` | `deck4` |
+| The robot vacuums (`haz_vacuum_4`, `_9`; deck 4's second, `vacuum-2`, 225.5 to 239 m, §7f) | 4, 9 | 5a, 5b | she rides it off | `vacRev`, `vacDart`, `thump` | `vacuum`, `region4`, `mishaps.stretches` |
+| The suitcases (`haz_suitcase_4`; `haz_suitcase_5`, red, deck 5's atrium 93.4 to 97 m once the lunch is delivered, §7f) | 4, 5 | 6a, 6b, 6c | she rides it, tipped off (the red one's own red clips) | `creak` | `deck4`, `mishaps.stretches` |
 | The deck chair (`haz_deckchair`, `haz_wet`) | 11 | 7a; **7b unreachable** (it stands still) | face first onto it, she sleds on it | `scrape`, `creak`, `thump` | `region6` |
 | The porter's cart (`haz_porter`) | 4 | 8a, 8b, 8c, 8d | over the cart, pushed, sat on it, bounced off his back | `cartBump`, `thump` | `region1`, `mishaps.porter` |
 | The jogger (`haz_jogger`) | 6 | 9a, 9b, 9c, 9d | spun like a top, bowled back, shoved onto her belly, bounced off his back | `spin`, `thump`, `bellyFlop` | `region2`, `mishaps.jogger` |
@@ -266,7 +266,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The boat drill (`haz_drill`) | 7 | 15 | Ouch!: onto all fours, dizzy, the boat down to her back, she crawls away through the fade (since 2026-11-21) | `boatThump` | `region7`, `mishaps.things` |
 | The sprinklers | 8 to 10 | 16 | soaked, a sneeze, she squelches back | `herSneeze`, `splashSmall` | `region4`, `mishaps.things` |
 | The sauna's steam | 11 | 17 | her hair a puff, she fans herself and swoons | `steam`, `plop`, `herCough` | `region9` |
-| The towel stack (`haz_towels_9`) | 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things` |
+| The towel stacks (`haz_towels_9`; `haz_towels_4`, 169.6 m, §7f) | 4, 9 | 18 | buried, up in a towel turban | `towelFall`, `cloth`, `towelFlump` | `region4`, `mishaps.things`, `mishaps.stretches` |
 | Teppanyaki's flares | 12 | 19 | sooty, blinking, a cough | `flare`, `yelpHot`, `herCough` | `region8` |
 | The gulls on the rails | balconies, 12 | 20 | on her head; with a tangerine, it takes one | `gullDive`, `flap` | `region7`, `region8`, `pocket`, `mishaps.gulls` |
 | The funnel's gulls | the roof | 21 | on her bottom down the stairway; with one, it takes it | `gullDive`, `land` | `region8`, `mishaps.gulls` |
@@ -314,7 +314,7 @@ stairs and no lift come down to it.
 
 **Cabins 82-102, under the atrium.** Quiet; one cart to hop at 90 (`haz_cart_4_90`, standing).
 
-**Cabins 110-194, "the service deck".**
+**Cabins 110-194, "the service deck".** (Part 11, §7f, 2026-11-26: the towel stack `haz_towels_4` at 169.6 m, midway between the cabin doors at 167.6 and 171.6, which stand 8 px nearer to it, alone as the lesson: stop short and it falls in front of her; it stays fallen.) 
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
@@ -326,7 +326,7 @@ stairs and no lift come down to it.
 | 182 | `haz_cart_4_182` | A standing room-service cart | Hop | Built |
 | 188 | `sign_board` | The crew notice board: rosters, a lost-cat notice with no picture | Decor, a wink | A sign |
 
-**Cabins 202-255, "crew quarters".**
+**Cabins 202-255, "crew quarters".** (Part 11, §7f, 2026-11-26: a second robot vacuum, `vacuum-2` in the map, 225.5 to 239 m, past the stage manager's door, turning short of the theatre trunk's door: the pills' test.) 
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
@@ -348,7 +348,7 @@ the rope he stood in front of the lift's door; the user, 2026-11-15) (`static`; 
 flight; no bubble); gone once region 2 opens (`riv_prom` is his next appearance). Needs the rival's
 character, built in step 1 (the user, 2026-11-13).
 
-**The atrium floor 82-102.**
+**The atrium floor 82-102.** (Part 11, §7f, 2026-11-26: the second runaway suitcase, `haz_suitcase_5`, red, a guest's case by Guest Services between the glass lift and the palm, 93.4 to 97 m, only once the lunch is delivered: a tray's low hop does not clear it.) 
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
@@ -376,7 +376,7 @@ a shortcut past the waiter; built as a short room. Drawn by hand.
 | 180 | `sec_swan` | The ice swan | `quirk(E)`: she shivers | A clip |
 | 190 | `tan_5_dessert` | The dessert cart | | |
 
-**The Seven Seas 202-255.**
+**The Seven Seas 202-255.** (Part 11, §7f, 2026-11-26: Bumbot's knocked-down trays, `haz_trays_5a` to `5c`, at 219.4, 226.8 and 236.4 m between the tables and palms, from the start until the lunch is delivered; no door behind them; a low hop with the lunch clears each.) 
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
@@ -600,7 +600,7 @@ the corridor at 118, not here.
 | 134 | `npc_honeymooners` | The honeymoon couple at their door, a camera held out | `static`; bubble (a camera) within 3 m; E: she takes their picture (a clip, the flash, they kiss), `book_4`; then they go in | Two characters |
 | 140 | `room_cleanup` | The cabin mid-cleanup, its door open: the bed stripped, a cart inside | `room` (nothing to find; the hazards are at its door) | The inside cabin, drawn by hand |
 | 140 | `haz_vacuum_9` | The vacuum inside the cabin | `reactive(2, 0.3)`: it darts 2 m out of the doorway and back; contact "Іііі!" | Built |
-| 141.6 | `haz_towels_9` | The towel stack by the doorway (once fallen it stays fallen, kept with what she broke, so that the way back from the steward crosses its heap: 2026-11-18), midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
+| 141.6 | `haz_towels_9` | (The cabin doors beside it 8 px nearer to it and its heap drawn over them, the vacuum's open cabin with them: 2026-11-26, §7f.) The towel stack by the doorway (once fallen it stays fallen, kept with what she broke, so that the way back from the steward crosses its heap: 2026-11-18), midway between two cabin doors (2026-11-18: its heap reaches 90 px the way it falls; the doors' frames are 159 px apart) | Coming at it (100 px, middle to middle) it wobbles hard; the moment she is past it, it falls on her as she runs on: "Buried", her head up in a towel turban with a towel swan; she gets past by stopping as it wobbles and waiting (at most 1.1 s) while it falls in front of her, then crossing the heap, which is behind her (the user, 2026-11-17 and 18; `TOWELS` in movers.js); a jump landed beside it or the dash brings it down too. The corridor's picture that it hid hangs in the nearest empty gap | Built, generated |
 | 146 | `sign_wet_9` + `haz_sprinkler_9` | The wet-floor sign and the sprinkler at 148 | `timed(5, 2, 147-149)`; "Drenched"; whatever she carries, 16: soaked, a sneeze, back the way she came | |
 | 150 | `rdr_balcabin` + `room_balcabin_9` | The balcony cabin (green, the card's first use): the generic balcony cabin; `tan_9_balcabin` in its basket; its balcony door out onto the balcony (a dead end until the socks: the partitions); its checkpoint on the balcony side only, `cp_balc_9` | `room` | Drawn by hand |
 | 158 | `haz_swing_9` | A cabin door that swings open | `reactive(3, 0.6)`; "Bonked" | |

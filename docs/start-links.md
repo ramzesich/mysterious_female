@@ -55,6 +55,7 @@ new one added there should be added here too.
 | `pass5`: deck 5 aft, 6 m short of the Seven Seas' pass (walk aft: Bumbot there, near-catch 1; the corridor from La Cucina is walled off at 167 m) | <http://localhost:8000/?play&at=pass5> |
 | `shore5`: deck 5, forward of Shore excursions' desk (her flag among the little flags at its far end, 9) | <http://localhost:8000/?play&at=shore5> |
 | `atrium-floor`: the atrium's floor, by the café | <http://localhost:8000/?play&at=atrium-floor&cards=all> |
+| `atrium-floor` once the lunch is delivered: deck 5's red suitcase rolling by Guest Services (walk aft, right, to the lift; part 11) | <http://localhost:8000/?play&at=atrium-floor&did=lunch> |
 
 ## Deck 6
 
