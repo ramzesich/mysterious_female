@@ -19,10 +19,12 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 1. **Deck 12's forward pool's tank covers deck 11's windows.** The kids' pool (x 3290 to 3490, about 58.5 to 62.7 m)
    is drawn as a tile block 416 to 466, under deck 12's floor; deck 11's window row starts at 448, so ~18 px of five
    windows' tops are behind it, in every state (closed, open, dimmed). `c-fwdpool.png`, `z-pooltile.png`.
-2. **Swimming in that pool flips the deck below.** In the water she is at y 448, under deck 12's floor (416): deck
-   11's dim goes off, its band turns to the bright closed hull with faint grey ghosts of deck 11's furniture tops
-   in the white plating under the windows (still there after 6 s); out of the pool it is dark again.
-   `zz-ghost2.png` (top: swimming; bottom: standing by the pool).
+2. **Corrected (2026-11-27):** deck 11 going bright under the kids' pool is the rule, not a fault: out in the open
+   nothing is dimmed (GAME_DESIGN.md §5.3, the user, 2026-11-08), and standing on the open pool deck gives the same.
+   The real fault is smaller and in all three pools: swimming sets the cut-away's deck to `deckAt(pool.y)`, a
+   fraction (11.97 for the kids' pool, 10.97 for deck 11's), so the pool's own deck keeps 3% of its hull over it and
+   the deck below shows 3% of its inside through its hull (the faint ghosts). Fix offered: while swimming, her deck is
+   the pool's own (`pool.deck`), in `updateCutaway` (`src/scenes/ShipScene.js`). `zz-ghost2.png`, `zz-pools.png`.
 3. **The Great Outdoors' gull stands on air** (`gull_go`, `FOODGULLS` in `tools/population.py`, `FoodGulls` in
    `src/world/hazards.js`): made in its `gull-perched` picture at its stretch's middle (x 10795, 214.9 m) at
    `def.y - 112` = 448, under deck 12's terrace, and only flies to its perch (10603, 514, the rail's forward end)
@@ -47,6 +49,23 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
    the handrail across it (`sock()` in `src/world/topdeck.js`). `z-funneltop.png`.
 10. **The bow's gulls look copied:** two rows of three, one picture, evenly spaced, on the forward glass screen
     (x 2060 to 2521, y 320) and on the pool's rim (x 3248 to 3519, y 416). `csheet-0.png`.
+
+11. **(Found 2026-11-27, with 1.) Deck 10's balcony fins rise into deck 11's pools' tanks:** the white posts of the
+    balcony partitions under the Oasis pools run about 24 px up over the tanks' bottom rows, in the closed view and
+    while she swims. Fix offered: the fins stop where a pool's tank begins (the map builder knows both). `zz-fins.png`.
+12. **(Found 2026-11-27, checking the dim.) At the `stern` start she is not seen at all:** `?at=stern` puts her on
+    deck 9's aft terrace (x 12344, y 848), an outdoors area whose cover (the stern's sloped plating) is drawn in
+    front of her; only a padlock's thought popup over her shows. `stern-at.png`.
+
+## The dim checked everywhere (2026-11-27, the user: "check that the dim works everywhere as we agreed")
+
+The rule (GAME_DESIGN.md §5.3): the dim only where she is in an enclosed part of the ship; out in the open none.
+Swept: on every deck 3 to 12, every metre she can stand on (2,087 spots), placed there, the dim read and compared
+with the map's own `indoor()` (`tools/build_ship_map.py`): **no difference anywhere**. The outside route
+(promenade, boat walkway, balconies), the mooring deck, the stern terraces, the pool deck, the Great Outdoors, the
+aft terrace, the roof by the funnel's stairway and the funnel's top: off; the Stardust balcony (inside the theatre):
+on. `spots.png`. Rooms behind doors keep their own dim (`ROOM_DIM`), not swept. Scripts: `docs/audit-hull-top/`
+(`sweep.py`, `compare.py`, `spots.py`).
 
 ## Checked and fine
 
