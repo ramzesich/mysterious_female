@@ -5508,3 +5508,13 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   players). Two things shown to the user and left as they are (the user): the aft terrace's end post seen through the
   glass as a lower rail, and a pickup's glint (the parasol's) twinkling through it from mid-story.
 - **Checks:** boot, region8, region9 pass. Not merged.
+
+## Deck 12's side walk over the pools left as it is (the Refinement session, 2026-11-27; the hull's top review, 6)
+
+- **What the finding was:** deck 12's rail and floor change at about 115 m. Looked into: by design. From 115 to 145 m
+  deck 12 is open over deck 11's pools (`POOL_OPENING` in `tools/build_ship_map.py`) and she crosses on the side walk,
+  where ↓ drops her into a pool (GAME_DESIGN §5.3). The walk has a thin white slab and a glass rail in front of her
+  (a drop); the solid deck either side (110 to 115 m by the stair core, the court from 145 m) has the grey slab and no
+  near rail, as deck 12's other open parts. From outside the floor band and the glass screen run on unbroken.
+- **Offered:** A leave it; B carry the rail on to the core's wall and the court; C give the walk the deck's floor.
+- **The user: A.** Nothing changed. Pictures and scripts: `docs/audit-hull-top/walk/`.

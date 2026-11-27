@@ -38,7 +38,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
    bumps: people's hair (the court's players, the sun deck's people), a palm's fronds aft, the kids' splash
    mushroom's red cap. The forward terrace's screen shows its palms through it: the two do not match.
    `z-heads.png`, `z-dome.png`.
-6. **The rail and the floor change at about 115 m on deck 12** (the `deck12` start, by the stair core): from about
+6. **Left as it is 2026-11-27** (by design: the side walk over deck 11's pools, 115 to 145 m, its thin floor and rail for the drop; the user's A; `walk/`). **The rail and the floor change at about 115 m on deck 12** (the `deck12` start, by the stair core): from about
    112 to 115 m no near rail and a thicker grey floor; aft of it a rail and a thin white floor slab. `zz-d12.png`.
    (Lower confidence: may be how the part over the pools is built.)
 7. **The forward sun deck stays closed while she walks on it** (about 31 to 44 m): she is seen faintly through the
