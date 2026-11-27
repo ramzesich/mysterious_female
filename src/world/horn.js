@@ -12,8 +12,8 @@
 //   - the sun deck: quiet, the officer on his knees at the loungers, the old lady reading. Bumbot comes through: past
 //     the officer, who is off his knees into the air, his card out of his pocket; over the sunbed, and the old lady is
 //     up and away, everything of hers left; the officer after him, over the sunbed in his stride;
-//   - the bow: the kids' pool's gulls come over, driven ahead of him; he runs along the windscreen's rail and its
-//     six go up one by one as he reaches them;
+//   - the bow: he runs by the kids' pool, straight across at the deck's height as the old scene had him (the user's
+//     choice of three ways), and its six gulls go up one by one as he reaches them;
 //   - back to her: she shrugs, and is hers.
 // After that the cord gives a toot.
 import { PLAYER, HORN, HORN_FISTS, HORN_REST } from '../config.js';
@@ -124,8 +124,8 @@ export const horn = {
         const seat = { x: cat.x, y: cat.y }, landX = Math.min(x0, this.cordAt.x) - H.cat.land;
         const floor = L.y, sunX = (L.x + L.rivalX) / 2, half = cam.worldView.width / 2;
         const flocks = ['gull_bow_a', 'gull_bow_b'].map(id => this.flocks.find(f => f.def.id === id));
-        const perch = flocks[1]?.birds.map(b => b.x) ?? [2072, 2508];
-        const bowX = (Math.min(...perch) + Math.max(...perch)) / 2, railY = flocks[1]?.birds[0]?.y ?? floor - 96;
+        const perch = flocks[0]?.birds.map(b => b.x) ?? [3246, 3597];
+        const bowX = (Math.min(...perch) + Math.max(...perch)) / 2;
         const rx = rival?.x ?? L.rivalX, lx = lady?.x ?? L.x;
         // The clock's marks, each from the one before: Bumbot's run through the sun deck sets them.
         const in0 = sunX + half + 24, catAt = H.sunAt + H.panSun + H.sunCalm;
@@ -239,8 +239,8 @@ export const horn = {
                 r.setPosition(x, floor - up).setDepth(s.DEPTH.props + 0.09).setVisible(x > sunX - half - 40);
             } else if (T >= runAt && T < backAt) {
                 catFrame(r, 'run', Math.floor((T - runAt) / H.cat.runMs) % cats.run.length);
-                // (Along the windscreen's rail, where the gulls sit: under it he would be behind the bulwark.)
-                r.setPosition(in1 - (T - runAt) / 1000 * H.catRun, railY).setDepth(s.DEPTH.player + 0.06).setVisible(true);
+                // (By the kids' pool, across it at the deck's height: the user, of the windscreen's rail I had put him on.)
+                r.setPosition(in1 - (T - runAt) / 1000 * H.catRun, floor).setDepth(s.DEPTH.props + 0.09).setVisible(true);
             } else r.setVisible(false);
             once('scramble', catAt, () => sfx.scramble());
             once('scramble2', runAt, () => sfx.scramble());
@@ -304,11 +304,11 @@ export const horn = {
             }
             once('oh', ladyAt + 3 * H.boltMs, () => sfx.oh());
 
-            // --- The bow: the kids' pool's six come over, driven ahead of him; the windscreen's six go up one by one as he
-            // runs along their rail.
-            once('fly', bowThere - H.flyBefore, () => flocks[0]?.liftOff((b, i) => ({ x: bowX - 520 - i * 40, y: floor - 96 - (i * 29) % 56, ms: H.flyMs + i * 60 })));
-            once('lift', runAt, () => flocks[1]?.liftOff((b, i) => ({ x: b.x - 260 - i * 36, y: b.y - 250 - (i * 53) % 90, ms: 1900 + i * 90,
+            // --- The bow: the kids' pool's six go up one by one as he reaches each; the windscreen's six, forward of the
+            // picture, a moment later, unseen.
+            once('lift', runAt, () => flocks[0]?.liftOff((b, i) => ({ x: b.x - 260 - i * 36, y: b.y - 250 - (i * 53) % 90, ms: 1900 + i * 90,
                 delay: Math.max(0, (in1 - b.x - H.liftBefore) / H.catRun * 1000) })));
+            once('lift2', runAt + H.bowHold - 200, () => flocks[1]?.liftOff());
 
             if (T >= endAt) end();
         };

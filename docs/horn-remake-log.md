@@ -252,3 +252,22 @@ cord: 13.0 s from E (the old scene: 12.3).
 
 `region8` with `region8.horn` (the camera's way: top, sun deck, bow, top, a pan each; five things at the sunbed),
 `golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.
+
+## 10. The play stop, round 3 (2026-11-27)
+
+**The user:** "Wait, why Bumbot doesn't run by the pool?" I had moved the bow's picture from the kids' pool to the
+windscreen's rail myself (in the old scene he ran across the pool at the deck's height, over the open water: fault 4),
+and had not said so. Three ways offered with a picture of him at five spots along the pool (one long leap over the
+water; straight across as the old scene; the rail as built). **The user: "2".** And: "the rival jumps a bit late,
+Bumbot is already past him, or so it seems at least".
+
+**Decisions:**
+
+17. **At the bow Bumbot runs by the kids' pool, straight across at the deck's height, as the old scene had him** (the
+    user's choice). The picture is the pool's (all six of its gulls in it); each gull goes up as he is 30 px from it;
+    the windscreen's six, forward of the picture, go up a moment later, unseen. What the user is not asked about is not
+    moved: a place in a scene is the user's, and a change of it is a question with a picture before it is built.
+18. **The officer is off his knees as Bumbot is still 100 px aft of him** (it was 14): he leaves the floor as Bumbot
+    reaches him and is in the air with him directly under; looked at frame by frame at 20 frames a second.
+
+`region8` with `region8.horn`, `golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.

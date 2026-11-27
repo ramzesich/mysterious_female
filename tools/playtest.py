@@ -5769,10 +5769,12 @@ def scenario_region8__horn(b):
     her = b.state()["x"]
     L = js(b, f"{W}.data.topdeck.lady")
     sun, places = (L["x"] + L["rivalX"]) / 2, []
+    pool = js(b, f"{W}.story.flocks.find(f => f.def.id === 'gull_bow_a').birds.map(q => q.x)")
+    bow = (min(pool) + max(pool)) / 2        # (the kids' pool: the user, 2026-11-27, of the windscreen's rail)
     while now() < t0 + 16 and not (b.state()["mode"] == "play" and "horn" in flags(b)):
         wait(0.1)
         c = js(b, f"(c => Math.round(c.worldView.centerX))({S}.cameras.main)")
-        place = "top" if abs(c - her) < 80 else "sun" if abs(c - sun) < 3 else "bow" if c < 3000 else "between"
+        place = "top" if abs(c - her) < 80 else "sun" if abs(c - sun) < 3 else "bow" if abs(c - bow) < 3 else "between"
         if not places or places[-1] != place:
             places.append(place)
     took = now() - t0

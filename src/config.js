@@ -738,7 +738,9 @@ export const HORN = {
     // His leap over the sunbed and what stands at its foot: off the floor this far aft of its middle, down this far
     // forward of it, this high.
     catLeap: [70, 52, 30],
-    startBefore: 14, startMs: 90,       // the officer off his knees as Bumbot is this far from him
+    // (The officer is off his knees as Bumbot is still this far aft of him, so that he is rising as Bumbot passes under
+    // him: the user, 2026-11-27, of 14 px: "the rival jumps a bit late, Bumbot is already past him".)
+    startBefore: 100, startMs: 90,
     cardFrame: 3, cardMs: 520, cardUp: 16,
     // (The old lady starts as Bumbot is this far aft of her: her book goes up, her start's fifth frame, as he is in the
     // air over her.)
@@ -747,8 +749,7 @@ export const HORN = {
     turnMs: 140, chargeAfter: 420, charge: 340, chargeMs: 62,
     hurdle: [74, 60, 250],              // off the floor this far aft of the sunbed's middle, down this far forward; px/s over it
     sunHold: 250, panBow: 1700,         // the sun deck as they left it; the pan to the bow
-    flyBefore: 1500, flyMs: 2400,       // the kids' pool's gulls set off this long before the camera is at the bow, to cross it
-    bowCalm: 200, liftBefore: 30,       // Bumbot into the bow's shot along the windscreen's rail; each gull up as he is this far from it
+    bowCalm: 200, liftBefore: 30,       // Bumbot into the bow's picture, by the kids' pool; each gull up as he is this far from it
     bowHold: 1350, panBack: 1900,       // from his coming to the pan back to her
     endHold: 120,
 };
