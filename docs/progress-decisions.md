@@ -5492,3 +5492,19 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   its feet on the frond's top (219.15 m, 59 px up; `TERRACE` in `tools/population.py`). The palm's crown shows over the
   glass screen from outside, so the gull stands on it in both views.
 - **Checks:** region8 (lingering by it: its swoop onto her, 20) and mishaps.gulls pass. Not merged.
+
+## Deck 12's glass screen see-through from outside (the Refinement session, 2026-11-27; the hull's top review, 5)
+
+- **What was wrong:** in the outside view (and wherever deck 12's side is closed), the glass screen along its open deck
+  was painted solid, so what stood behind it showed only over its top: people's hair, a palm's fronds, the kids' splash
+  mushroom's cap. The forward terrace's screen (the game's `bulwark`) was see-through.
+- **Built (the user's A):** the screen's glass painted at the forward terrace's strength, 0.45 (a shape over the shell
+  may carry its own alpha now: `rect(..., alpha)` in `shell_details`, `s[6]` where the ship scene draws them). Its
+  white band under the glass still hides them from the knees down.
+- **Checked (the user: "check carefully surrounding decks in various states"):** the outside view along deck 12 at the
+  start, mid-story and at the sunset, play from deck 11 under each stretch and from deck 10, and deck 12's rooms, each
+  before and after, compared by pixel: only the three stretches of glass changed, and what shows through them stands
+  there (kids, slide, mushroom, tub, palms, the old lady, the sun deck's rival, the court's players, the shuffleboard
+  players). Two things shown to the user and left as they are (the user): the aft terrace's end post seen through the
+  glass as a lower rail, and a pickup's glint (the parasol's) twinkling through it from mid-story.
+- **Checks:** boot, region8, region9 pass. Not merged.

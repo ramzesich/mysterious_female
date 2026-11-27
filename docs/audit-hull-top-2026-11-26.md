@@ -34,7 +34,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
    feet at 376). Closed: past the glass screen's end, feet ~8 px under its top bar (366). Open: ~8 px over the end
    post's top (384), on its edge. The two rails differ too: the screen 50 px, the end post 32 px.
    `zz-postout.png` (closed), `zz-post.png` (open, the post).
-5. **The closed view's deck 12 glass screen is solid light blue**, so what stands taller than it pokes over its top as
+5. **DONE 2026-11-27** (see-through, as the forward terrace's; the end post and a glint seen through it left, the user). **The closed view's deck 12 glass screen is solid light blue**, so what stands taller than it pokes over its top as
    bumps: people's hair (the court's players, the sun deck's people), a palm's fronds aft, the kids' splash
    mushroom's red cap. The forward terrace's screen shows its palms through it: the two do not match.
    `z-heads.png`, `z-dome.png`.

@@ -366,7 +366,7 @@ export class ShipScene extends Phaser.Scene {
         for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
             const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
             for (const s of shapes) {
-                if (s[0] === 'r') g.fillStyle(colour(s[5]), 1).fillRect(s[1], s[2], s[3], s[4]);
+                if (s[0] === 'r') g.fillStyle(colour(s[5]), s[6] ?? 1).fillRect(s[1], s[2], s[3], s[4]);   // (s[6]: see-through glass)
                 else if (s[0] === 'c') g.fillStyle(colour(s[4]), 1).fillCircle(s[1], s[2], s[3]);
                 else g.fillStyle(colour(s[2]), 1).fillPoints(s[1].map(([x, y]) => ({ x, y })), true);
             }
