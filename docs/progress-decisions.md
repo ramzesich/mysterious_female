@@ -5717,3 +5717,21 @@ gulls kept (they fly off in the horn's shot, take a thrown tangerine, lift at he
 - **Not built, found in the plan:** `docs/population.md` had the pool's gulls as a block ("Swooped" if she pushes through);
   it never was. Left as it is (noted there).
 - **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/gulls/`. Not merged.
+
+## The horn's scene remade (2026-11-27, branch `horn-scene`)
+
+The seventh sequence by `docs/sequence-remake-plan.md`; the whole record is `docs/horn-remake-log.md` (the user's words,
+eleven faults of the old scene, twenty decisions, four rounds of play). What changed in the plan:
+
+- **The engineer is no longer on the funnel's top** (the user). He takes his coffee at the technical door, hands her
+  book 9 there, unhooks the ladder's chain and stays (`npc_engineer_break`). His horn cloud, his reading on the top and
+  `engineerBook` are gone.
+- **The pull is her own:** Bumbot on the horn's bar, the cord pulsing; the scene is a near-catch of its own.
+- **Bumbot, not the horn, sets off the sun deck and the bow** (the user); the blast is 1.5 s as it was.
+- **The camera pans to the sun deck, on to the bow and back**, as the old scene did (a live panel under the top, and
+  then cuts, were built and turned down).
+- **The old lady's bags and towel stay at her sunbed for good**, generated anew (the user's choice of three sets).
+- **At the bow Bumbot runs by the kids' pool, across it at the deck's height, as before** (the user's choice, knowing
+  it); its gulls go up one by one, each from where it sat.
+- Code: `src/world/horn.js`, `HORN` in `src/config.js`, `tools/build_horn.py`, `assets/ship/horn/`,
+  `assets/source/horn/`; `Flock.liftOff` takes a place and a wait for each gull. Checks: `region8.horn`.

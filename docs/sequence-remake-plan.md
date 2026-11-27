@@ -63,7 +63,7 @@ made and what it cost goes into the log and is said at each stop.
    - Her clips start from her built sheet's frame, on a green copy of the set.
    - A key beat gets a generated clip of its own, never a stand-in.
 7. **Build** it in the data, the config and the scene code, on the game's clock.
-8. **Check it against the kinds of correction** (below; twenty-two now) before the user sees it:
+8. **Check it against the kinds of correction** (below; twenty-six now) before the user sees it:
    - Measure feet and things against the floor's strip, pixel by pixel.
    - Check the depth at every beat.
    - Try every wall standing, crawling and jumping.
@@ -105,7 +105,7 @@ made and what it cost goes into the log and is said at each stop.
     job ids among them), commit, take `main` into the branch (fetch it: it may have moved), merge and push on the
     user's word, remove the worktree.
 
-For scale (the balconies, a whole path with its look, three moves and the socks: 62): the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
+For scale (the horn: five clips and four props, 13; the balconies, a whole path with its look, three moves and the socks: 62): the shaft took 92 generations, the pool 60, near-catch 1 31, near-catch 2 15, near-catch 3 156 (a
 whole stage, two dancers twice over, a key clip of its own), near-catch 4 about 80 (a stack and one clip, but
 eleven clips toward a heap that could not lie where it fell), near-catch 6 40 (two pieces, nine clips, nearly all
 first tries: each start picture was a sheet's own frame, each key clip pinned to an end).
@@ -140,6 +140,10 @@ of near-catch 1, two of near-catch 3, the last two of near-catch 4 (seen on its 
 | A repeated texture on a repeated piece | (the balconies: "I don't like the reflections, because they repeat on each window") | |
 | A move that waits, or that works only at one spot, with nothing saying so | (the balconies, on play: "she goes onto the partition and waits ... weird and misleading"; "Didn't understand how I had to get down") | |
 | Something the build added that the user had not seen | (the balconies, on play: the parasol's hop out over the rail read as "The old drop through the floor is still there") | |
+| A new way of showing the scene, built before it was seen | (the horn: a live panel under the top, built whole on "Let's try to implement your recommendation and see how it works in game": "Ok, I don't like the panels. Let's revert to the view") | |
+| A place in the scene moved unasked | (the horn: "Wait, why Bumbot doesn't run by the pool?": his run had been moved to the windscreen's rail to mend a fault the user then chose to keep) | |
+| A reaction that starts after its cause has passed | (the horn: "the rival jumps a bit late, Bumbot is already past him") | |
+| A change of pose shown before its moment, or a picture that drops as it changes | (the horn: the gulls "already are in their flight position when the scene shows ... They also start a bit lower than the water level") | |
 
 ## What the two prompts had in common
 
@@ -208,6 +212,14 @@ already applied.
   socks' nubs, twice; one frame's leg). The build ran right in its own tests and failed on the user's first play for
   three reasons no test had: the link given was never walked as given, an added move had not been shown, and a move
   worked only at one spot. Four corrections on play in three rounds, "All approved" the same day. 62 generations.
+
+- **The horn** (the seventh; a scene with three places): asked first what the idea had been and why the engineer does
+  not blow it himself (no document said). The record found eleven faults; four questions with a rough, answered in
+  four lines, the first with a structure of the user's own (the engineer off the top, Bumbot on the horn, the pull
+  hers). The build went straight to play on the user's word, with a live panel under the top, and was turned down at
+  first sight for the panel; rebuilt as the camera's own shots with cuts, and the pans asked back; then three short
+  rounds on one thing each (Bumbot's place at the bow, moved unasked; the officer's start, late; the gulls' take-off).
+  "Approved" the same day. 13 generations: every clip a first or second try from a sheet's own frame.
 
 ## The two prompts, word for word
 

@@ -290,3 +290,26 @@ gull lower than the sitting one, hung by its feet, so the two afloat sank under 
     was on the gull before it had left the water), and never before he is 12 px inside the picture.
 
 `region8` with `region8.horn`, `golden`, `region9`, `boot` pass.
+
+## 12. The close (2026-11-27)
+
+**The user: "Approved".**
+
+The documents brought to it: `GAME_DESIGN.md` (region 8, §6.1.10, the people's table, the work record),
+`docs/population.md` (the engineer, the rival, the old lady, Bumbot's glimpse, the cord, book 9, `scn_engineer` and
+`scn_horn`), `docs/progression.md`, `docs/plan-the-rest.md` (the cord pulses), `docs/progress-decisions.md`,
+`CLAUDE.md` (the scene's row, ten lessons), `docs/sequence-remake-plan.md` (four kinds of correction more, how this one
+went). `main` fetched: `203fd0f6`, unchanged since the branch was cut.
+
+### The generations (13; `assets/source/horn/README.md` has the jobs)
+
+| What | Generations |
+|---|---|
+| Her hands over her ears, two tries | 2 |
+| Bumbot's fright, two tries | 2 |
+| The officer's start; his hurdle | 2 |
+| The old lady's hurried walk | 1 |
+| Six bag and towel candidates (four used) | 6 |
+
+Left as it is, said to the user: the Officer's card is the world's own 8 px card (a sparkle where it lands); the old
+lady's second book appears on the sunbed with the flag, at the scene's end.

@@ -83,7 +83,7 @@ last column is what the drawn pages hinted at until then.
 | `book_1` | 1 | Deck 11, 216, her husband (*Atomic Habits*, since 2026-11-23, the user: "switch the book to the Atomic Habits one"; from his fist, his `give` clip) | His thanks for a perfect cone | Los Lobos' piñata |
 | `book_7` | 7 | Deck 10, 235, the balcony guest | His thanks for his door | The telescope on the funnel |
 | `book_8` | 8 | Deck 12, 129, the old lady's sunbed, after the horn | Pickup | The lighting bridge over the stage |
-| `book_9` | 8 | The funnel's top, 180, the engineer | He lends it after the horn | The chapel's moment |
+| `book_9` | 8 | Deck 12, 166, the engineer at the technical door | He hands it over with his thanks for the coffee (since 2026-11-27; he lent it on the funnel's top after the horn) | The chapel's moment |
 | `book_10` | 9 | Deck 10, 38, the bridge's chart table | Pickup | The odd book on the library's top shelf |
 | `book_11` | 11 | Deck 7, the boat walkway's aft end, past the drill, on the lid of a life-jacket box (`prop_lifejacket_box`, 2026-11-21) | Pickup | (no hint: every page its book's opening since 2026-11-21) |
 | `book_14` | 14 | Deck 9, the officers' corridor's forward end (27.6 m), between its end wall and the captain's door, on a half-moon console table (`prop_console_9`, 2026-11-21) | Pickup | (no hint) |
@@ -807,8 +807,8 @@ the 11-12 flight (the painter, "WET PAINT").
 |---|---|---|---|---|
 | 111.25 | `keep_tshirt` | His navy t-shirt (13), folded on the first of two loungers (`sunlounger-long`, 111.0 and 112.8, the user's: longer, no armrests) | `pickup` after the table scene (`flag:table`); E; its close-up | |
 | 119-140 | the walk | ↓ drops her through into the pool below (built) | | |
-| 126-131 | `npc_oldlady` | The old lady on her sunbed across the walk, bags and towels, a book in her hands | `static`; glares within 4 m; a full block (jump the sunbed from the rail side, or ↓ into the pool); bubble (a cocktail glass) within 3 m; E with the mojito: she dozes (`tan_12_lady` from her bag), still a block; at the horn (`scn_horn`) she bolts forward and is gone: `item_parasol` at 130, `book_8` at 129 | Sit, read, glare, doze, bolt |
-| 138 | `riv_sundeck` | The rival searching under the loungers | `glimpse(region 8)` until the horn; at the horn he jumps, drops `item_card_off` at 136, runs forward | |
+| 126-131 | `npc_oldlady` | The old lady on her sunbed across the walk, bags and towels, a book in her hands | `static`; glares within 4 m; a full block (jump the sunbed from the rail side, or ↓ into the pool); bubble (a cocktail glass) within 3 m; E with the mojito: she dozes (`tan_12_lady` from her bag), still a block; in the horn's scene (`scn_horn`), as Bumbot leaps her sunbed, she is up and hurries off forward with her book: `item_parasol` at 130, `book_8` at 129; her canvas bag, her handbag, her towel over the bed's foot and her duffel stay (generated, 2026-11-27) | Sit, read, glare, doze, bolt |
+| 138 | `riv_sundeck` | The rival searching under the loungers | `glimpse(region 8)` until the horn's scene; as Bumbot shoots under him he is off his knees into the air, `item_card_off` out of his pocket to 134; then after him, over the sunbed | |
 | 140 | `amb_sunbathers` | Two on loungers | | |
 
 **Sports 146-164.** 148-160 the court's cage; `haz_balls` at 150 and 158: `timed(4, 2, 2 m out)`
@@ -828,7 +828,7 @@ asked; `amb_cagneys` diners.
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 165 | `npc_engineer` | The engineer at the technical door | `static`; bubble (a steaming cup) within 4 m; E with the hot coffee: he drinks, waves her up, climbs the ladder (`scn_engineer`); afterwards he is at the top | Idle, drink, climb, wave, read |
+| 165 | `npc_engineer` | The engineer at the technical door | `static`; bubble (a steaming cup) within 4 m; E with the hot coffee: he drinks, hands her `book_9`, waves her up, unhooks the ladder's chain and goes back to his door (`scn_engineer`); he stays there (`npc_engineer_break`; since 2026-11-27, the user: "Remove the engineer from there") | Idle, drink, wave, walk |
 
 **The Sushi Bar 174-182.** `amb_sushi_chef` behind the counter; two diners. (No sign secret: dropped.) His cloud shows a tangerine once she is near: Bumbot's tin of sardines (7) is his for one, by E or a throw that reaches him (then on his case, `keep_sardines`; 2026-11-20). The nigiri stand behind him, by the sake set.
 
@@ -852,9 +852,8 @@ down to the Great Outdoors (built); `gull_terrace` at 218 perched.
 |---|---|---|---|---|
 | The roof, 166-169 | the ladder's top, a walk to the stairway's foot | Built ladder, moved to 166 | | |
 | The stairway, 169 up to 177 | `gust_funnel` + `gull_funnel` | Gusts every 5 s: **while one blows she crouches and holds on to the rail and cannot move** (2026-11-18; it slid her back down the flight before). Two gulls circling; **every 2.5 to 5.5 s, between gusts, one dives straight at her from wherever it is in its flight** (2026-11-18; it hovered over her and marked her spot before): "Swooped" (with a tangerine: she ducks and it carries the tangerine off in its beak; with none: gag 21, "Ow-ow-ow!", she bumps down the flight on her bottom to the foot and sits dizzy, butterflies over her head; built 2026-11-18). Walked into at either end she steps onto it (2026-11-18). The stairway stands 12 px out from the lattice, the funnel's white base and navy frame carried out under it | | |
-| The lattice, 175 | `bb_glimpse_funnel` | Bumbot sitting on the lattice as she climbs; at the horn he shoots down it and forward along the roof | `glimpse(region 8)` | |
-| 180 | `npc_engineer` (after) | The engineer on his break, reading | After the horn: E, he lends `book_9` | |
-| 184 | `sec_horn` | The horn's cord | E once he is up: `scn_horn` (the pull clip, the shake, the smoke, the cascade) | A cord, a clip |
+| The horn, 185 | `bb_glimpse_funnel` | Bumbot sitting on the horn's top bar as she comes up; at the blast he shoots straight up, lands on the platform forward of her and is gone down the stairway | `glimpse(region 8)` | |
+| 184 | `sec_horn` | The horn's cord (its rope and handle pulse where E would pull) | E: `scn_horn` the first time (below), a toot after | A cord, a clip |
 | 186 | `tan_funnel` | His lunch box | | |
 | 188 | `sec_telescope` | The lookout telescope | `quirk(E)`: the view swings to deck 7's stern strip for 3 s and back | A telescope |
 
@@ -976,12 +975,14 @@ Input locked unless said; each sets its save flag.
    `assets/source/her/sit-cone/`); he hands her `book_1` (*Atomic Habits*) from his fist; she gets up.
    Their photo is on La Cucina's wall from then on (`slot_cucina`, deck 5; till 2026-11-23 a frame
    that came on the table at the same moment as the book).
-8. **`scn_engineer`:** E at the technical door with the hot coffee: he drinks, waves her up, climbs
-   the ladder out of sight; from then on he is at the top. **`scn_horn`:** E at the cord: the pull
-   clip, the screen shakes, the smoke puffs; the camera pans to the sun deck: the rival jumps, the
-   card drops at 136, he runs forward; the old lady bolts, the parasol and the book stay; then to the
-   bow: the gulls lift off the kids' pool and the windscreen in a cloud; back to her. Flags: the
-   card lies there, the sunbed is free, the gulls are gone, the engineer reads.
+8. **`scn_engineer`:** E at the technical door with the hot coffee: he drinks, hands her `book_9`, waves
+   her up, unhooks the ladder's chain and goes back to his door. **`scn_horn`** (remade 2026-11-27,
+   `docs/horn-remake-log.md`; `src/world/horn.js`, `HORN` in the config): E at the cord, nobody else on the top: the
+   pull, a blast of 1.5 s (the shake, the smoke, her hands over her ears), Bumbot off the horn's bar in a fright and
+   away; the camera pans to the sun deck: Bumbot through, the rival off his knees into the air and his card out of his
+   pocket, the old lady up and away as he leaps her sunbed, the rival after him over it; on to the bow: he runs by the
+   kids' pool and its gulls go up one by one; back to her: she shrugs. Flags: the card lies there, the sunbed is no
+   block (her things stay), the gulls are gone.
 9. **`scn_wedding`:** E at the planner with the cake box: she takes it, the party walks into the
    chapel over 5 s, the lobbies clear, `blk_wedding` lifts; **`scn_ceremony`:** E at the chapel's
    door after: the ceremony seen from the back for 5 s, `slot_chapel` on the wall.

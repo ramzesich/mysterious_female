@@ -725,7 +725,7 @@ tables, the piano, the odd book's bookcase); people never. The casino's slot mac
 secrets**: every door she can use washed at rest like the background doors beside it, the pulse revealing it; the
 lifts, the glass doors across the deck and the balconies' doors left as they are (the balconies' doors are the user's
 next point: "they don't look like doors at all"). `CLAUDE.md`'s table and rules have it. Not done: the nook's armchair
-and the funnel's horn, drawn inside larger pictures, do not pulse.
+and the funnel's horn, drawn inside larger pictures, do not pulse. (Since 2026-11-27 the horn's cord does: its rope and handle are pictures of their own, the horn's scene remade.)
 
 What follows is the plan as written before it was built.
 

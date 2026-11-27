@@ -70,11 +70,12 @@ ice cream machine, looking at the wake. Right beside him is her way up: a climb 
 wall jump onto the sun cover, up to the top deck.
 
 **The horn.** Up on deck 12 an engineer is waiting for a coffee he can't leave his post to get. She brings him one,
-still hot, past the Teppanyaki chef's flames, and in return he takes her up the funnel, to the very top of the ship.
-Bumbot is sitting up there on the funnel's frame, and the engineer lets her pull the horn's cord. The blast shakes the
-ship: the cat shoots down the funnel and races toward the bow; the security officer leaps out of his skin, drops his
-master card and runs for the bridge; the old lady on the sun deck flees her sunbed and leaves her parasol behind; the
-gulls rise off the bow in a cloud. Bumbusik picks up the card and the parasol.
+still hot, past the Teppanyaki chef's flames; he gives her the book he was reading and unhooks the chain on the ladder
+to the funnel. At the very top of the ship Bumbot is sitting on the horn, out of reach, and its cord hangs right beside
+her. She pulls. The blast sends the cat straight up and off down the funnel, and everything after is his doing: he
+shoots under the security officer on the sun deck, who leaps out of his skin, loses his master card and gives chase;
+he jumps the old lady's sunbed, and she flees, leaving her parasol and her bags behind; at the bow the gulls rise
+around him in a cloud. Bumbusik picks up the card and the parasol.
 
 **A wedding in the way.** At the front of the top deck a wedding party fills the lobby, and the wedding planner is
 missing one thing: the cake. Bumbusik carries it all the way from the kitchen aft, three tiers swaying at every step,
@@ -200,13 +201,12 @@ Not needed for the finale: the balconies, the boat walkway and the hallways are 
 
 20. **The engineer** at the technical door wants a coffee. It comes from the machines by the ice cream on deck 11:
     a hot tray that cools. She carries it up the aft stairs and through Teppanyaki, past the chef's flare.
-21. He drinks, waves her up and climbs the ladder. She follows: the roof, the stairway up the funnel's front
-    (gusts, gulls), its top. Bumbot sits up there on the funnel's lattice.
-22. **The horn:** E at the cord. The blast sets off a cascade:
-    - Bumbot shoots down the funnel and runs forward toward the bow;
-    - the security officer jumps, **drops his card** on the sun deck and runs for the bridge;
-    - the old lady bolts from her sunbed and leaves **her parasol** behind;
-    - the gulls lift off the bow.
+21. He drinks, hands her his book, waves her up and unhooks the ladder's chain; he stays at his door. She climbs: the
+    roof, the stairway up the funnel's front (gusts, gulls), its top. Bumbot sits up there on the horn's bar.
+22. **The horn:** E at the cord, her own idea. The blast sends Bumbot off, and he sets off the rest:
+    - on the sun deck the security officer jumps as the cat shoots under him, **drops his card**, and runs after him;
+    - the old lady flees her sunbed as he leaps it and leaves **her parasol** behind;
+    - at the bow the gulls lift off around him.
 23. She picks up the **Officer's card** and **the parasol** (it opens only while jump is held after a press made
     in the air, and lets her glide).
 
