@@ -3248,6 +3248,9 @@ export class ShipScene extends Phaser.Scene {
             const g = this.gagPending;
             this.gagPending = null;
             this.flinchUntil = 0;
+            // (On the frame she lands her body is on the floor and her picture not yet: it was left floating 3 px over it,
+            // the user, 2026-11-27. Her picture's foot is her body's bottom.)
+            p.y = p.body.bottom;
             this.mishap(g.sc, g.fromX, g.ride);
             return;
         }
@@ -5414,13 +5417,42 @@ export class ShipScene extends Phaser.Scene {
         const face = (p.flipX ? -1 : 1) * (g.turn ? -1 : 1), at = g.at ?? g.paper;
         const x = ride?.x !== undefined && at !== undefined ? ride.x - face * at : p.x - face * (g.her ?? 0);
         // (`turn`: hit from behind, she turns round to face it, the clip drawn to her other side.)
-        const s = this.add.sprite(x, ride?.y ?? p.y, 'her-mishaps').setOrigin(0.5, 1)
+        // (`sink`: drawn that much under her foot, as the built sit is: her 1 px and its 2.)
+        const s = this.add.sprite(x, (ride?.y ?? p.y) + (g.sink ?? 0), 'her-mishaps').setOrigin(0.5, 1)
             .setFlipX(g.turn ? !p.flipX : p.flipX).setDepth(p.depth);
         this.worldLayer.add(s);
         p.setVisible(false);
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
         s.play(g.fall);
-        s.once(`animationcomplete-${g.fall}`, () => this.time.delayedCall(g.holdMs, () => this.respawn()));
+        s.once(`animationcomplete-${g.fall}`, () => {
+            // (`sit`: then her own dazed sit, where the clip's last frame is hers exactly, and `hat` on her head.)
+            if (g.sit && this.anims.exists(g.sit)) {
+                s.setVisible(false);
+                p.setVisible(true);
+                this.herDrop(LIE_DROP.px);
+                this.herClip(g.sit);
+                const off = g.hat ? this.wearHat(g.hat) : () => {};
+                const end = this.gagEnd;
+                this.gagEnd = () => { off(); end(); };
+            }
+            this.time.delayedCall(g.holdMs, () => this.respawn());
+        });
+    }
+
+    // A thing of the world on her head, on her head's top frame by frame (her heads, as the popups have them): Splash
+    // Academy's pillow after its gag. Returns what takes it off.
+    wearHat(frame) {
+        const p = this.player;
+        const hat = this.add.image(p.x, p.y, 'things', frame).setOrigin(0.5, 1);
+        this.worldLayer.add(hat);
+        const place = () => {
+            const h = this.popups.headOf(p);
+            hat.setVisible(!!h && p.visible);
+            if (h) hat.setPosition(Math.round(h.x), Math.round(h.top) + 2).setFlipX(p.flipX).setDepth(p.depth + 0.001);
+        };
+        place();
+        this.events.on('postupdate', place);
+        return () => { this.events.off('postupdate', place); hat.destroy(); };
     }
 
     // A gag the thing plays itself, one picture of it with her (the towel stack, 18: `TowelStack.ride`
@@ -5778,7 +5810,8 @@ export class ShipScene extends Phaser.Scene {
         const down = this.down = { holds: [] };
         // (`downMs`: dazed a shorter while than the stand-in's.)
         p.once(`animationcomplete-${clip}`, () => {
-            const dazed = slip ? 'her-dazed-sit' : 'her-dazed-lie';
+            // (`dazed`: another dazed clip of hers: without the butterflies, Splash Academy's kids, the user, 2026-11-27.)
+            const dazed = sc.dazed ?? (slip ? 'her-dazed-sit' : 'her-dazed-lie');
             if (this.anims.exists(dazed)) this.herClip(dazed);
             this.time.delayedCall(sc.downMs ?? 2100, () => Promise.all(down.holds).then(() => {
                 if (this.down === down) this.respawn();

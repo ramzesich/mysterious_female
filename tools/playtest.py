@@ -5997,6 +5997,9 @@ def scenario_region9(b):
     # Deck 7: the kids' clubs behind the lobby's gold door: the ball pit, the fort.
     go(b, 7, 78)
     ok &= check(use_door(b, 7, 74, 1), "the Officer's card opens the kids' clubs")
+    # (Splash Academy's siege and tag held still while this walks the room: their hits are `mishaps.stretches`' cases.)
+    b.eval(f"(w => {{ const g = w.movers.find(m => m.def?.id === 'haz_siege'), t = w.movers.find(m => m.def?.id === 'haz_tag');"
+           f" if (g) {{ g.lost = true; g.fly = null; }} if (t) t.frozenUntil = w.scene.time.now + 1e7; }})({S}.world)")
     pit = B["pit"]
     b.teleport(pit["x1"] + 40, D7)
     wait(0.3)
@@ -6036,8 +6039,14 @@ def scenario_region9(b):
     # (Behind the fort since §7f P6: on through from the crawl to its kids' table, 29 m.)
     hold_until(b, "left", lambda s: s["x"] < exact_x(29.0) - 10, 4)
     ok &= check(got("tan_7_splash"), "a tangerine on the kids' table behind the fort", save_list(b, "collected")[-3:])
-    ok &= check(person(b, "amb_counsellor")["on"], "the counsellor cheers the toddlers on")
-    # The Library's odd book: stuck while there are gaps on the shelf; with all fourteen back, the nook.
+    # The fifteenth book, on top of Splash Academy's bookshelf (the user, 2026-11-27): E from the floor under it.
+    bk = b.eval(f"(t => t && [t.x, t.y])({S}.world.things.find(t => t.id === 'book_15'))")
+    b.teleport(bk[0], bk[1])
+    wait(0.3)
+    b.tap("e")
+    wait_js(b, f"{S}.save.books['15'] === 'held'", 4)
+    ok &= check(b.eval(f"{S}.save.books['15']") == "held", "the fifteenth book, on Splash Academy's bookshelf", b.eval(f"{S}.save.books"))
+    # The Library's odd book: stuck while there are gaps on the shelf; with all fifteen back, the nook.
     N = B["nook"]
     b.teleport(N["x"] + 16, D6)
     wait(0.4)
@@ -6046,11 +6055,11 @@ def scenario_region9(b):
     pulled = b.state()["mode"] == "scripted"
     wait(1.6)
     ok &= check(pulled and "nook" not in flags(b) and b.state()["mode"] == "play", "the odd book on the Library's bookcase: she pulls, it is stuck", (pulled, flags(b)[-2:]))
-    b.eval("(s => { for (let n = 1; n <= 14; n++) s.save.books[n] = 'returned'; s.world.library.refresh(); s.progress.setFlag('books_all'); })(window.__ship)")
+    b.eval("(s => { for (let n = 1; n <= 15; n++) s.save.books[n] = 'returned'; s.world.library.refresh(); s.progress.setFlag('books_all'); })(window.__ship)")
     wait(0.4)
     b.tap("e")
     b.shot("region9-oddbook")
-    ok &= check(wait_flag(b, "nook", 8), "with all fourteen books back: it tips, and the bookcase slides aside", flags(b)[-2:])
+    ok &= check(wait_flag(b, "nook", 8), "with all fifteen books back: it tips, and the bookcase slides aside", flags(b)[-2:])
     case = b.eval(f"(c => c && c.slide.x - c.home)({S}.world.story.cases)")
     ok &= check(case is not None and case > 50, "behind the other bookcase, the entrance open where it stood", case)
     b.teleport(N["x"], D6)
@@ -6067,7 +6076,7 @@ def scenario_region9(b):
     b.tap("e")
     wait_js(b, f"!!{W}.library.choosing", 4)
     row = b.eval(f"{W}.library.choosing && {W}.library.choosing.books.length")
-    ok &= check(row == 14, "in its armchair, all fourteen books in the row", row)
+    ok &= check(row == 15, "in its armchair, all fifteen books in the row", row)
     b.tap("escape")
     wait(1.5)
     ok &= check(not b.errors, "no errors", b.errors[:3])
@@ -6422,7 +6431,6 @@ def scenario_finale(b):
     b.eval("window.__ship.lockedUntil = 0")
     s = hold_until(b, "right", lambda s: s["x"] > exact_x(27), 16)
     ok &= check(s["x"] > exact_x(27) and s["y"] == D7, "through the mooring deck's door into deck 7", s)
-    ok &= check(not b.eval(f"{W}.things.find(t => t.id === 'amb_toddler_blocks').items[0].visible"), "the toddlers have gone to bed")
     s = hold_until(b, "right", lambda s: s["x"] > exact_x(35), 10)
     ok &= check(s["x"] > exact_x(35), "the pillow fort is put away: she walks through where it was", s)
     b.shot("finale-kids")
@@ -7045,6 +7053,52 @@ def scenario_mishaps__stretches(b):
     ok &= check(b.eval(f"{T}.every(m => m.gone && !m.items[0].visible) && !{R}.away && {R}.sprite.visible"),
                 "once the lunch is delivered: the trays gone, the suitcase rolling")
     ok &= check(b.eval(f"{R}.sprite.frame.name") == "suitcase-rolling-red", "and it is the red one")
+    # Splash Academy's kids (the user's "1 and 2", 2026-11-27). The pillow siege: standing at the king's toes, the
+    # knight's lob comes down on her head (26, her gag with the pillow on it), none on her and two.
+    SG = f"{W}.movers.find(m => m.def?.id === 'haz_siege')"
+    def siege():
+        b.eval(f"(m => {{ m.holder = 0; m.phase = 'wait'; m.k = 0; m.fly = null; m.lost = false; }})({SG})")
+        at(b.eval(f"{SG}.kids[1].x - 14"), D7, True)
+    ok &= both(b, "Splash Academy's pillow (26)", want="26", act=siege, clip="^gag-pillow-sit", within=6, fresh=lambda: b.open("?play&reset"))
+    # Tag: in the lane, where the one ahead is running, she is run into (27, the built sit-down).
+    TG = f"{W}.movers.find(m => m.def?.id === 'haz_tag')"
+    def tag():
+        b.eval(f"(m => {{ m.phase = 'chase'; m.frozenUntil = 0; m.hitAt = 0; m.lead = 0; m.kids[0].x = {exact_x(42.0)}; m.kids[0].dir = 1;"
+               f" m.kids[1].x = {exact_x(41.5)}; m.kids[1].dir = 1; }})({TG})")
+        at(exact_x(43.0), D7, True)
+    ok &= both(b, "Splash Academy's tag (27)", want="27", act=tag, clip=None, within=4, fresh=lambda: b.open("?play&reset"))
+    # A hop clears a kid: running at the one ahead as he runs at her, she jumps 60 px short of him (the user, 2026-11-27:
+    # over one, "it's like I'm hitting some wall above them").
+    b.open("?play&reset")
+    b.eval(f"(m => {{ m.phase = 'chase'; m.frozenUntil = 0; m.lead = 0; const L = m.kids[0], C = m.kids[1]; L.x = {exact_x(41.9)}; L.dir = 1;"
+           f" C.x = {exact_x(41.4)}; C.dir = 1; }})({TG})")
+    at(exact_x(44.5), D7, True)
+    b.eval(f"{MS}.lastMishap = null")
+    b.key("left", True)
+    hold_until(b, [], lambda st: st["x"] - b.eval(f"{TG}.kids[0].x") < 60, 3)
+    b.key("space", True)
+    wait(0.35)
+    b.key("space", False)
+    hold_until(b, [], lambda st: st["x"] < b.eval(f"{TG}.kids[0].x") - 40 or st["mode"] != "play", 3)
+    b.key("left", False)
+    ok &= check(b.eval(f"{MS}.lastMishap?.id ?? null") is None, "a hop clears a tag kid running at her", b.eval(f"{MS}.lastMishap"))
+    # Her cry near them: tag's two freeze; the siege's nearer one ducks.
+    b.open("?play&reset")
+    at(exact_x(43.0), D7, True)
+    wait(0.5)
+    b.eval(f"{MS}.world.shout({MS}.player.x, {MS}.player.y, 'inside')")
+    wait(0.2)
+    ok &= check(b.eval(f"{TG}.frozenUntil > {MS}.time.now && {TG}.kids.every(p => /freeze/.test(p.sprite.anims.currentAnim?.key || ''))"),
+                "her cry by the tag: both freeze like statues")
+    at(b.eval(f"{SG}.kids[1].x + 40"), D7, True)
+    wait(0.3)
+    b.eval(f"{MS}.world.shout({MS}.player.x, {MS}.player.y, 'inside')")
+    wait(0.2)
+    ok &= check(b.eval(f"{SG}.kids[1].ducking"), "her cry by the king: he ducks")
+    # The evening of the catch: all four gone to bed.
+    b.eval(f"{MS}.progress.setFlag('catch')")
+    wait(0.5)
+    ok &= check(b.eval(f"[...{SG}.kids, ...{TG}.kids].every(p => !p.on && !p.sprite.visible)"), "after the catch, all four have gone to bed")
     return ok
 
 
@@ -7237,7 +7291,7 @@ def scenario_keeps(b):
     ok = check(hud() == {"cat": "", "her": "", "him": "", "book": "", "order": []}, "at the start nothing is counted", hud())
 
     # The first of each kind (and a second): its close-up, the count not yet on; a key closes it, the count comes on.
-    first = (("keep_wool", D5, "wool", "cat", "1/8"), ("keep_flag", D5, "flag", "her", "1/4"), ("book_6", D5, "cover-6", "book", "1/14"))
+    first = (("keep_wool", D5, "wool", "cat", "1/8"), ("keep_flag", D5, "flag", "her", "1/4"), ("book_6", D5, "cover-6", "book", "1/15"))
     order = []
     for tid, y, pic, kind, count in first:
         x, vis, _ = thing(tid)
@@ -7267,11 +7321,11 @@ def scenario_keeps(b):
     b.eval(f"{W}.giveBook(9)")                # (a book handed to her: the engineer's, as from his hand)
     ok &= check(wait_js(b, f"{S}.viewing", 2) and b.eval(shown) == "cover-9", "a book given: its cover shows", b.eval(shown))
     wait(0.5)
-    ok &= check(hud()["book"] == "1/14", "  the books' count as it was while it shows", hud())
+    ok &= check(hud()["book"] == "1/15", "  the books' count as it was while it shows", hud())
     b.tap("e")
     wait_js(b, f"!{S}.viewing", 2)
     wait(0.4)
-    ok &= check(hud()["book"] == "2/14", "  and up by one once it is closed", hud())
+    ok &= check(hud()["book"] == "2/15", "  and up by one once it is closed", hud())
 
     # His four (§4 2.1): nowhere before his table scene; each in its place after it.
     his = ("keep_tshirt", "keep_sleepmask", "keep_handheld", "keep_pick")

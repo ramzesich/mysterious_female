@@ -13,9 +13,11 @@ import { sfx } from '../sfx.js';
 // Each book's colours, its small picture's and its spine's, from its cover (tools/build_covers.py, plan-the-rest §2.3):
 // the cover's ground (its commonest colour but the outlines') and its title's colour, for the label.
 export const BOOK_COLOURS = [0xf7f5ef, 0x009e3a, 0x004ca3, 0xe6edd2, 0x363b1e, 0x000815, 0xede9d0, 0x0a0c14, 0x878787,
-    0xf6e7b6, 0x7cefff, 0xc72c02, 0x020207, 0x4ebefb];
+    0xf6e7b6, 0x7cefff, 0xc72c02, 0x020207, 0x4ebefb,
+    0x5d6ab3];      // (15: a placeholder until the user's cover, 2026-11-27)
 export const BOOK_ACCENTS = [0xb09256, 0xe2f4e2, 0xfebe04, 0xb21c28, 0xf0f0e8, 0x60dead, 0xc41c24, 0x96c4de, 0xfafafa,
-    0x1e1814, 0x7a1e22, 0x96d6ee, 0xd6a85c, 0xc92a0f];
+    0x1e1814, 0x7a1e22, 0x96d6ee, 0xd6a85c, 0xc92a0f,
+    0xf3ecdd];
 // The stamp on a given-back book's small cover in the row: a green disc 11 px across with a white check mark in it
 // (the user, 2026-11-22), at the cover's column 4 and row 10.
 const STAMP = [
@@ -297,14 +299,17 @@ export class Library {
         const s = this.scene, S = 3;
         return new Promise(resolve => {
             const n = books.length, bw = 18 * S, room = VIEW.width - 120;
-            let gap = n > 1 ? Math.min(8 * S, Math.floor((room - n * bw) / (n - 1))) : 0;
+            // (Never less than one px between two: with fifteen books the room left none, 2026-11-27.)
+            let gap = n > 1 ? Math.max(S, Math.min(8 * S, Math.floor((room - n * bw) / (n - 1)))) : 0;
             gap -= gap % S;
             const roww = n * bw + (n - 1) * gap;
             let titleW = Math.max(...books.map(k => s.textures.get(`book-title-${k}`).getSourceImage().width)) * S;
             const stamp = books.some(greyed) ? this.stamp() : null;
             if (stamp) titleW += 2 * (stamp.w + 12);
             const pad = 4 * S, top = 8, lift = 4 * S, titleH = 16 * S;
-            const bw2 = Math.max(roww, titleW) + 2 * pad, bh = pad + lift + 24 * S + 2 * S + titleH + pad;
+            // (Its sides wider by what the gaps lost: with fifteen books they came tight, the user, 2026-11-27.)
+            const padX = pad + 2 * Math.max(0, 2 * S - gap);
+            const bw2 = Math.max(roww, titleW) + 2 * padX, bh = pad + lift + 24 * S + 2 * S + titleH + pad;
             const x0 = Math.round((VIEW.width - bw2) / 2);
             const back = s.add.image(x0 - 8, top - 8, this.backdrop(bw2, bh)).setOrigin(0);
             const items = [back];

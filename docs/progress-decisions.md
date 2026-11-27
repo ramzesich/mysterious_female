@@ -5467,3 +5467,47 @@ Where it stopped (the user: "We'll continue next day. Save our progress"):
   `region4`, `linen` pass; `check_overlaps` 0; `check_corridors`: deck 6 68.3 m without a beat (49 to 117), deck 7 82.1,
   deck 9 58.2, deck 10 53.2. Generations: 18 (the browsers), 66 (the first fort), 60 (the castle): 144.
 - Offered, unanswered: the counsellor (30.15 m) half a metre forward, clear of the fort's forward mouth.
+
+## Splash Academy's kids: the pillow siege and tag; the fifteenth book (2026-11-27)
+
+- **The toddlers and the counsellor out** (the user: "remove all of kids plus the counselor there. I want to think of an
+  appropriate obstacle theme there"); the counsellor's clap on the way home went with her. Of four themes offered the
+  user took "1 and 2", kids 6 to 9: four pro characters in the pool kid's style (`assets/source/people/splash_king-raw/`).
+- **The pillow siege** (`haz_siege`, `PillowSiege` in `src/world/splash.js`, `SIEGE` in `src/config.js`): the knight
+  between the play kitchen and the kids' table (27.7 m) and the king by the teddy (38.4 m) lob one pillow over the castle
+  to each other in turns; the holder picks it up from their toes and throws (a PixMiniMax clip from the pillow lying at
+  their toes back to their stand: the first, v3, ended mid-lunge); the game's pillow flies from the frame it leaves the
+  hands, a quarter turn at a time, peaking 112 px over the floor, down onto the other's toes. The king first stood by
+  the beanbags, 1.2 m from the castle, and the lob came down through the aft tower (found in my own recording): every
+  frame of both lobs now clears the towers and their flags. Her cry or her dash near one: the nearer ducks.
+- **The pillow on her head (26):** her gag (a PixMiniMax clip: the pillow drops, she plops down), then her own dazed sit
+  with the pillow on her head. The user's rounds: "still not on the ground" (it stood on her foot line; the built sit is
+  3 px under it, `sink`); "the same exact pose, as when hit by a running kid. Only with the pillow on her head" (I first
+  replaced the gag with her built fall and the pillow laid on by the game: "not what I meant", the gag is kept and its
+  ending made her sit); then frame by frame: 8 and 9 her bottom on the floor, 10 and 11 the kid's hit's own frame with
+  the pillow (0 px differing under the pillow), the generator's last frame out.
+- **Tag** (`haz_tag`, `Tag`): the two run laps, the tagged one counts and chases back; a kid into her: on her bottom
+  (27), dazed with no butterflies (`her-dazed-sit-plain`, `assets/source/her/dazed-sit-plain/make.py`; the user: "When
+  she is hit by a running kid, remove the butterflies"), both freeze, giggling; her cry or her dash: both freeze 3 s.
+  The user: "couldn't jump over the kids ... like I'm hitting some wall above them": a kid touched her within 13 px of
+  their middle with her feet under 34 px (they are 37 and 44 tall); now 9 px and her feet under their shoulders, 26
+  (`TAG.reach`, `TAG.clear`; a sweep: a hop from 40 to 100 px before one running at her clears). Then "nearly impossible
+  to clear": 1.6 and 1.8 m/s from 2.1 and 2.4, the lane 41.3 to 44.6 m (its forward end 2 m aft). Approved.
+- **A hit in the air played on landing floated her 3 px** (her body on the floor a frame before her picture, and the hit
+  froze that frame): her picture is set on her body's foot first (the ship scene's `gagPending`). Every hazard's.
+- **`?at=kids`** at 45.8 m from 43 (it was in the tag lane).
+- **The fifteenth book** (the user: on top of Splash Academy's dark bookshelf, "Increase the total number of books to 15";
+  title, author, text and cover to come from them): `BOOKS` 15, `book_15` (7, 24.0 m, 57 px up, taken with E from the
+  floor); placeholders (a title page "Book fifteen", a plain cover and small cover, plain colours); the reel never less
+  than a px between covers, its sides wider by what the gaps lost ("so that the edges will have similar padding as they
+  did with 14"); the Library's shelf holds the fifteen. Approved.
+- **Tests:** `mishaps.stretches` (26 and 27, none on her and two; a hop over a tag kid; her cry freezing tag and ducking
+  the king; all four gone with the catch), `region9` (book 15; the siege and tag held still while it walks the room: a
+  pillow hit its walk), `keeps` and the nook's checks count fifteen; `region2`, `boot`, `finale` pass; `mishaps.things`
+  fails only on deck 9's sprinkler, the test's timing mended on `refine` (4c4c22f9). `check_overlaps` 0;
+  `check_corridors` deck 7: 82.1 m without a beat (58 to 140). Generations: 40 (the kids) + 22 (their clips) + 2 (her
+  gag) + 2.4 (head estimates): about 66.
+- **The finale and Splash Academy:** the user raised how this scene affects the finale; laid out (the room reached in
+  region 9 through the staff door at 74 m, a dead end until the catch; the way home through it after the catch, empty);
+  not decided. The finale's gust check failed once in a run of six browsers and passed alone; the user: "Disregard the
+  test meanwhile".

@@ -12,6 +12,7 @@ import { sfx } from '../sfx.js';
 import { rumble } from '../rumble.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
+import { PillowSiege, Tag } from './splash.js';
 
 const M = 48;
 const HALF = PLAYER.height / 2;
@@ -362,6 +363,9 @@ export const bow = {
         this.B = B;
         w.movers.push(new Steam(w, B.steam));
         w.movers.push(this.pit = new BallPit(w, B.pit));
+        // Splash Academy's kids: the pillow siege over the castle, and tag aft of it (src/world/splash.js).
+        if (B.siege) w.movers.push(new PillowSiege(w, B.siege));
+        if (B.tag) w.movers.push(new Tag(w, B.tag));
 
         // (The step class's boards are in its two's own clip since 2026-11-26: they step up onto them, tools/cast.py.)
 

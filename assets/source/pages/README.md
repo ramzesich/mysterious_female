@@ -1,5 +1,8 @@
 # The books' pages (2026-11-21)
 
+**Book 15** (2026-11-27): no `15.txt` yet; its page is a title page ("Book fifteen", `tools/draw_pages.py`'s `BOOKS`)
+until the user gives its title, author and text.
+
 Each of the fourteen books shows its first page when she reads it (the Library's red chair; book 5 on her bed):
 the opening of the real book, readable, in its own language and script, set by `tools/draw_pages.py` into
 `assets/ship/pages/page-<n>.png`. The user, 2026-11-21: "Text only for all the books"; the ten drawn hint pages

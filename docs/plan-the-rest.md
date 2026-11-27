@@ -1005,6 +1005,9 @@ with their plates edited out, each walking to and fro, out of step); 13, the bal
 robot 30.5 to 50 m, the officer moved aft; **16 dropped** (no room by the kids' pool, the user); P4 by cabin 9245, P5 on the
 forward terrace, P6 on the kids' table behind the fort; Splash Academy's fort made again as a pillow castle with a
 crawl tube through each tower, its openings layered as the shaft's mouth (the user's four rounds). Next: 12, P1, 14, 10.
+**Splash Academy's kids made again 2026-11-27 (approved):** the toddlers and the counsellor out; the pillow siege over
+the castle (the knight and the king; gag 26 with the pillow on her head) and tag aft of it (27, no butterflies).
+**The fifteenth book** on Splash Academy's bookshelf (`BOOKS` 15): its title, author, text and cover the user's, to come.
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

@@ -151,6 +151,8 @@ HER = {
         **{c: [(f"{c}/{i}.png", "feet") for i in range(6)] for c in ("reel", "rubnose", "splutter", "arch", "yelp", "duck", "apology")},
         # Dazed where she fell, butterflies circling over her head, drawn with her (the user's rule).
         "dazed-sit": [(f"dazed-sit/{i}.png", "feet") for i in range(6)],
+        # (The same with the butterflies taken out, `dazed-sit-plain/make.py`: Splash Academy's kids' hits, the user, 2026-11-27.)
+        "dazed-sit-plain": [(f"dazed-sit-plain/{i}.png", "feet") for i in range(6)],
         "dazed-lie": [(f"dazed-lie/{i}.png", "feet") for i in range(6)],
         # Her quirks (§6.1.11). The Four Seasons' ice swan: she shivers, hugging herself.
         "shiver": [(f"shiver/{i}.png", "feet") for i in range(8)],
@@ -371,6 +373,17 @@ HER_MISHAPS = {
         # turned to her: `dog-lick/raw/start.png`); her body as in that frame, so on its row 74
         # (her hand under her chin) as her own clip has it, and drawn 2 px lower as she is (LIE_DROP).
         "dog-lick": [(f"dog-lick/{i}.png", 74) for i in range(8)],
+        # Splash Academy's pillow on her head (26; 2026-11-27): PixMiniMax from her stand with the world's pillow over her
+        # head (`pillow-sit/start.png`) to her dazed sit's first frame with it on her head where the game sets it
+        # (`end.png`, from her built sheet and her heads). On the start's floor, row 83, but (the user, 2026-11-27, frame
+        # by frame) 8 and 9 with her bottom on the floor (their lowest row, as her sit's), and 10 and 11 the kid's hit's
+        # frame itself with the pillow (`end.png`), the generator's own last frame left out: the game then hands over to
+        # her own dazed sit with no change. (The first try, toward a sit of its own and a smaller pillow, `pillow-sit/first/`.)
+        # (8 two px higher than its lowest row on the floor, the user; 10 and 11 the swaying sit's own first frame, the one a
+        # kid's hit shows, with the pillow where the game sets it on her head, `sit.png`: `end.png`, the sit the dazed clip
+        # starts from, was not it.)
+        "pillow-sit": [(f"pillow-sit/raw/{i}.png", 83) for i in range(1, 8)] + [("pillow-sit/raw/8.png", 80), ("pillow-sit/raw/9.png", "feet")]
+                      + [("pillow-sit/sit.png", 83)] * 2,
     },
     "props": {"vacuum-": "robot-vacuum", "suitcase-": "suitcase-rolling"},
     # Moved sideways as another clip is, which it carries on from.
@@ -385,7 +398,9 @@ HER_MISHAPS = {
                "tray-sit": 108, "trolley-trip": 96,
                # (Her middle is column 48, as in her dazed clip; the dog reaches to 105: the cell's
                # middle 16 px in front of hers, `GAGS` none: the dog's own `LICK` in movers.js.)
-               "dog-lick": 64},
+               "dog-lick": 64,
+               # (Column 42 of her own 84 px cells, her sprite's middle: the gag and her sit after it the same px.)
+               "pillow-sit": 42},
     # Clips with white paper in them: its greys put on the palette as paper (`paper_greys`).
     "paper": ("paper-",),
     "baseline": "ride-vacuum/east.png",

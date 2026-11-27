@@ -268,6 +268,8 @@ ITEMS = {
     # (§4 2.1, 20: on the console table at the end of deck 9's officers' corridor, left of the captain's door: the user's
     # choice of four, 2026-11-21; on its top row, the table 1 px down.)
     "book_14": (9, 27 + 30 / 48, "book:14", None, 27),
+    # (The fifteenth, on top of Splash Academy's bookshelf (58 px tall, at 24.0 m): the user, 2026-11-27.)
+    "book_15": (7, 24.0, "book:15", None, 57),
     # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
     # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
     "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
@@ -661,7 +663,7 @@ PEOPLE = {
     "amb_stepper_b": dict(at=(11, 69.3), who="stepper_b", face=1, idle="board", layer="back"),
     "amb_officer_10": dict(at=(10, 60), who="officer_10", face=1, walk=(50, 70, 1.0), end_ms=1500, layer="back"),
     "amb_officer_9": dict(at=(9, 60), who="officer_9", face=-1, walk=(54, 70, 1.0), end_ms=1500, layer="back"),   # (40 to 70 until the robot, §7f 15)
-    "amb_counsellor": dict(at=(7, 30.15), who="counsellor", face=-1, idle="cheer", layer="back"),
+    # (Splash Academy's counsellor taken out with its toddlers, 2026-11-27, the user.)
     # (On the bridge the security officer is the scene's own, in clips made there: frozen mid-creep behind Bumbot until
     # `bb6`, sat under his own net after it until `catch`: src/world/bridge.js, near-catch 6 as remade 2026-11-25.)
 }
@@ -756,11 +758,8 @@ PROPS = {
     "amb_lounge_him": (12, 52.1, "thing:lounge-him", -2, dict(back=True)),
     "prop_bench_12": (12, 37.0, "gallery-bench", 0, dict(back=True)),
     "amb_salon_client": (11, 59.95, "thing:salon-client", 0, dict(back=True)),
-    # (Gone to bed on the evening of the catch: she comes through with Bumbot in her arms. The evening goes on after
-    # the ending, the user, 2026-11-23.)
-    "amb_toddler_blocks": (7, 25.15, "thing:toddler-blocks", 0, dict(back=True, until="flag:catch")),
-    "amb_toddler_cook": (7, 27.35, "thing:toddler-cook", 0, dict(back=True, until="flag:catch")),
-    "amb_toddler_crawl": (7, 28.05, "thing:toddler-crawl", 0, dict(back=True, until="flag:catch")),
+    # (Splash Academy's three toddlers at the play kitchen taken out, 2026-11-27, the user: its kids to be made again
+    # with the room's obstacle.)
 }
 # Things standing in the way that she hops: id: (deck, m, atlas piece).
 SOLIDS = {
@@ -1231,6 +1230,13 @@ BOW = dict(
     piano=(12, 53.02), slide=dict(deck=12), captain=(9, 30), nook=dict(deck=6, m=189.4, up=44),
     steam=dict(deck=11, stove=51.7, walls=(47.9, 52.9), half=0.3, every=4.6, on=1.6, tell=0.8),
     pit=dict(deck=7, a=49.3, b=53.7, tangerine="tan_7_ballpit"),
+    # Splash Academy's kids (plan-the-rest §7f; the user, 2026-11-27: "1 and 2", tag "between the entrance from the
+    # corridor and the fort"): the pillow siege's knight between the play kitchen and the kids' table, its king by the
+    # teddy, each facing the castle (`haz_siege`, m; 2.5 and 3.7 m from its towers, so that the lob clears them and their
+    # flags all the way: by the beanbags, 1.2 m from it, it came down through the aft tower); tag over 41.3 to 44.6 m
+    # (`haz_tag`; its forward end 2 m aft, the user, 2026-11-27: "nearly impossible to clear"). Gone to bed with the catch.
+    siege=dict(deck=7, knight=27.7, king=38.4),
+    tag=dict(deck=7, a=41.3, b=44.6),
     bridge=dict(deck=10, console=30.216667, station=31.445833, helm=32.3, a=28.4, b=40.0),
 )
 

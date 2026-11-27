@@ -365,6 +365,27 @@ export const SHAFT = {
 // in the mouth); in on his belly, `crawlMs`. `fps`: the pillows' clip, paced so that the cart, pushed at her 40 px a
 // second, is where the clip's own cart stood as the last two leave it (28 px on, frame 10). `hintMs`: "↓ to crawl" over
 // her, the first time she stands on the cart once he is gone. `sounds`: on the clip's frames (frame, effect, which of the lying pairs it comes from).
+// Splash Academy's pillow siege (src/world/splash.js; plan-the-rest §7f, the user, 2026-11-27): the knight forward of the
+// castle and the king aft of it lob one pillow over it to each other. The holder stands over it lying at their toes `wait`
+// s, picks it up and throws (`throw`, `fps`); it leaves their hands at `release` [frame, px ahead of their feet, px up]
+// and flies `flight` s in a lob peaking `peak` px over the floor (clear of the flags, 95, and under the ceiling, 128), turning a quarter at a time,
+// down onto the other's toes (`lie`: px ahead of their feet, `lieUp` its middle over the floor). A hit: her gag 26 and
+// the thrower cheers `cheerS` s. Her cry or her dash near one: the nearer ducks `duckS` s (holding the pillow back).
+export const SIEGE = {
+    wait: 0.9, fps: 10, flight: 1.5, peak: 112, lie: 14, lieUp: 5, cheerS: 1.8, duckS: 1.0,
+    release: { splash_king: [12, 24, 39], splash_knight: [13, 17, 37] },
+};
+
+// Splash Academy's tag (src/world/splash.js): two kids run laps over their stretch, the one ahead at `lead` m/s, the one
+// chasing at `chase`; at an end the one ahead turns, they meet, `tagS` s of giggles, and the tagged one counts `countS` s
+// and chases the other the other way. Into her: on her bottom (27), and both freeze, giggling. Her cry or her dash near
+// them: both freeze like statues `freezeS` s.
+// A kid touches her within `reach` px of their middle with her feet under `clear` px over the floor (their shoulders: they
+// are 37 and 44 px tall; at 34 px and 13 px a hop over one still counted, the user, 2026-11-27).
+// (Slower, the user, 2026-11-27: at 2.1 and 2.4 it was "nearly impossible to clear". Their run's clip is played at
+// `pace` m/s to its 12 frames a second, slower in step with them.)
+export const TAG = { lead: 1.6, chase: 1.8, pace: 2.1, tagS: 0.6, countS: 0.8, freezeS: 3, fps: 12, reach: 9, clear: 26 };
+
 export const PILLOWS = {
     gap: -6, leapMs: 320, up: 5, coverAt: 140, crawlMs: 420, fps: 14.3, hintMs: 3000,
     sounds: [[10, 'towelFlump', 'far'], [13, 'towelFlump', 'near']],
@@ -465,6 +486,8 @@ export const MISHAPS = {
     dnd: {},                // a "Do Not Disturb" door
     balcony: {},            // the occupied balcony
     gymball: {},            // the gym's balls rolling with the ship (deck 11)
+    pillow: {},             // Splash Academy's pillow siege (deck 7)
+    kid: {},                // Splash Academy's two playing tag (deck 7)
 };
 
 // The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
@@ -534,6 +557,11 @@ export const MISHAP_SCENES = {
     // belly (the built trip, as the dog's lead); at her back it bumps her onto her bottom. No gag of its own.
     '25a': { word: 'tripped', react: 'stumble', down: 'belly' },
     '25b': { word: 'bumped', react: 'reel', down: 'sit' },
+    // Splash Academy's kids (plan-the-rest §7f; the user, 2026-11-27): a kid playing tag runs into her: on her bottom, the
+    // built sit, dazed without the butterflies (`dazed`); a pillow lobbed over the castle comes down on her head: her gag
+    // (`GAGS.pillow`), ending in that same dazed sit with the pillow on her head.
+    '26': { word: 'bonked', react: 'duck', down: 'sit', gag: 'pillow', dazed: 'her-dazed-sit-plain' },
+    '27': { word: 'bumped', react: 'reel', down: 'sit', dazed: 'her-dazed-sit-plain' },
 };
 
 // Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,
@@ -560,6 +588,11 @@ const SPIN = onClips(['gags-jog-spin-stand', 'gags-jog-spin1', 'gags-jog-spin3',
 const STIFF = (first, prefix) => ({ [`${prefix}-stand`]: { 1: first, 7: 'bellyFlop' }, [`${prefix}1`]: { 1: first, 8: 'bellyFlop' }, [`${prefix}3`]: { 1: first, 8: 'bellyFlop' },
     [`${prefix}5`]: { 1: first, 8: 'bellyFlop' }, [`${prefix}7`]: { 1: first, 8: 'bellyFlop' } });
 export const GAGS = {
+    // Splash Academy's pillow (26; the user, 2026-11-27): it drops on her head and she plops down (PixMiniMax from her stand
+    // with the world's pillow over her head to her dazed sit's first frame with it on her head, that frame exactly its last:
+    // `assets/source/her-mishaps/pillow-sit/`), drawn `sink` px under her foot as the built sit is; then her own dazed sit
+    // without the butterflies (`sit`), the pillow on her head (`hat`), as a kid's hit leaves her.
+    pillow: { fall: 'gag-pillow-sit', holdMs: 1800, sink: 3, sit: 'her-dazed-sit-plain', hat: 'splash-pillow' },
     vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
     paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000 },
@@ -683,9 +716,10 @@ export const DRILL = { lowerS: 1.1, hoistS: 1.6, lullMs: 1500, nearK: 0.6, inPx:
 // Handing a tangerine over (§1.6, 23 and 24): her apology's clip, the tangerine in her held-out
 // hands from its `frame` on (behind her, her hands over it: `dx` px ahead of her, `dy` up), taken
 // by the hand at the door `giveMs` in; she stands for `ms`.
-// The Library's books (GAME_DESIGN.md §6.1.2, docs/plan-three-uses.md §4.1): fourteen out on the ship; the
-// shelf's gaps, the nook's `books_all`, the HUD's count and the pages all go by this.
-export const BOOKS = 14;
+// The Library's books (GAME_DESIGN.md §6.1.2, docs/plan-three-uses.md §4.1): fifteen out on the ship (the fifteenth on
+// Splash Academy's bookshelf since 2026-11-27, the user's; its title, text and cover to come from them); the shelf's
+// gaps, the nook's `books_all`, the HUD's count and the pages all go by this.
+export const BOOKS = 15;
 
 export const HAND_OVER = { dx: 18, dy: 33, frame: 2, giveMs: 950, ms: 1400 };
 

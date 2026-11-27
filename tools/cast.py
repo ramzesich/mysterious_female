@@ -307,4 +307,14 @@ CAST = {
     "counsellor": ("2a5a0882-b53f-4069-af2a-92b877c3305a", {"cheer": 9}, {"cut": {"cheer": ("clap", [3, 4, 5, 6, 7, 8, 7, 6, 5, 4])}}),
     "poolkid_a": ("7638cecb-28a1-4d16-b1ca-f32388314e3b", {"hop": 9}, {"scale": 0.62, "cut": {"hop": ("jump", [3, 4, 5, 6, 7, 8])}}),
     "poolkid_b": ("8c73e72a-ca99-49ed-861f-12b4314638de", {"hop": 9}, {"scale": 0.66, "cut": {"hop": ("bounce", [3, 4, 5, 6, 7, 8])}}),
+    # Splash Academy's kids (plan-the-rest §7f, the user, 2026-11-27: the toddlers and the counsellor out, "1 and 2"):
+    # the pillow siege's king (aft of the castle) and knight (forward of it), and the two playing tag between the doorway
+    # and the king; pro characters in the pool kid's style, ages 6 to 9 (`assets/source/people/splash_*-raw/README.md`).
+    # (Their `throw` from the pillow lying at their toes back to their stand, PixMiniMax, cut by
+    # `splash_king-raw/throw2/cut.py`; the v3 throw that ended mid-lunge kept in `<name>-raw/first-throw/`. One scale for
+    # the two, so that the pillow they throw to each other is one size.)
+    "splash_king": ("bca491aa-ae9e-404b-8756-b3b4adf17d88", {"throw": 10, "duck": 10, "cheer": 10}, {"scale": 0.68, "canvas": True}),
+    "splash_knight": ("3b9cc743-4249-432d-964c-90ded062d9c6", {"throw": 10, "duck": 10, "cheer": 10}, {"scale": 0.68, "canvas": True}),
+    "splash_chaser": ("422068f9-c163-4304-8776-cb8e8b4984ce", {"run": 12, "freeze": 8}, {"scale": 0.64, "canvas": True}),
+    "splash_runner": ("46e5e7a8-ce29-4f92-823b-ff7bfb953977", {"run": 12, "freeze": 8}, {"scale": 0.72, "canvas": True}),
 }

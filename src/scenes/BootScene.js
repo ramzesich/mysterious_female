@@ -266,7 +266,7 @@ export class BootScene extends Phaser.Scene {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name, [0, 1, 2, 3]), frameRate: 10 });
         }
         // (Their first frame is the pose they start from, without the butterflies: left out.)
-        for (const name of ['dazed-sit', 'dazed-lie']) {
+        for (const name of ['dazed-sit', 'dazed-lie', 'dazed-sit-plain']) {
             if (meta.anims[name]) this.anims.create({ key: `her-${name}`, frames: frames(name, [1, 2, 3, 4, 5]), frameRate: 6, repeat: -1 });
         }
         if (meta.anims.slipback) this.anims.create({ key: 'her-slipback', frames: frames('slipback'), frameRate: 9 });
@@ -385,7 +385,7 @@ export class BootScene extends Phaser.Scene {
                                            ['paper-behind', 10, 0], ['paper-front', 10, 0],
                                            ['cart-drape', 10, 0], ['cart-kick', 4, -1], ['cart-sit', 10, 0], ['cart-push', 10, 0], ['cart-bounce', 10, 0],
                                            ['tray-sit', 10, 0], ['trolley-trip', 10, 0],
-                                           ['dog-lick', 8, 1]]) {
+                                           ['dog-lick', 8, 1], ['pillow-sit', 10, 0]]) {
             if (!gag.anims[name]) continue;
             // (The papers' first three frames quicker: the paper's push carried into the fall.)
             const fast = name.startsWith('paper-') ? 3 : 0;

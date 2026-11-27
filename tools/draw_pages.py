@@ -51,6 +51,8 @@ BOOKS = {
     12: ("Poczwarka", "Dorota Terakowska"),
     13: ("Daughters of Warsaw", "Maria Frances"),
     14: ("Pachinko", "Min Jin Lee"),
+    # (On Splash Academy's bookshelf, 2026-11-27: its title, author, text and cover are the user's, to come.)
+    15: ("Book fifteen", "(to come)"),
 }
 HEBREW = re.compile(r"[֐-׿]")
 DASH_ON = re.compile(r"[—–-]\s*[^\sA-ZА-ЯЁҐЄІЇ]")    # "— принимая находку": the sentence goes on

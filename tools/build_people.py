@@ -42,11 +42,15 @@ def lowest_row(img):
     return (box[3] - 1) if box else img.height - 1
 
 
-def shrunk(img, scale):
-    """A figure drawn too big next to the others, smaller: box-resampled, hard-edged, on the palette again."""
+def shrunk(img, scale, canvas=False):
+    """A figure drawn too big next to the others, smaller: box-resampled, hard-edged, on the palette again.
+    `canvas`: the whole canvas shrunk about its middle column and its bottom row, so that every frame of a clip on it
+    moves the same (by its outline's middle, a thing beside the figure (a pillow at its toes) moved the figure)."""
     box = img.getbbox()
     if not box:
         return img
+    if canvas:
+        box = (0, 0, img.width, img.height)
     part = img.crop(box)
     small = part.resize((max(1, round(part.width * scale)), max(1, round(part.height * scale))), Image.BOX)
     px = small.load()
@@ -197,7 +201,9 @@ def build():
             continue
         flip = opts.get("flip", False)
         scale = opts.get("scale")
-        load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale)) if scale else (lambda path: palettize(Image.open(path)))
+        # (`canvas`: shrunk whole, every frame alike: Splash Academy's kids, 2026-11-27.)
+        whole = opts.get("canvas", False)
+        load = (lambda path: shrunk(palettize(Image.open(path).convert("RGBA")), scale, whole)) if scale else (lambda path: palettize(Image.open(path)))
         if opts.get("repaint") == "pistol":
             plain_load = load
             raw_load = (lambda path: shrunk(palettize(repainted(Image.open(path).convert("RGBA"), path.parent.name if path.parent != src else "")), scale)) if scale                 else (lambda path: palettize(repainted(Image.open(path).convert("RGBA"), path.parent.name if path.parent != src else "")))

@@ -423,16 +423,15 @@ export const finale = {
     // The way home: those she helped stand outside her cabin; each claps her in as she comes by.
     updateWelcome(time) {
         const s = this.scene, her = s.player;
-        for (const [id, clip] of [['amb_home_steward', 'thanks'], ['amb_home_manager', 'applaud'], ['amb_home_engineer', 'wave'], ['amb_home_planner', 'applaud'], ['amb_counsellor', 'cheer']]) {
+        for (const [id, clip] of [['amb_home_steward', 'thanks'], ['amb_home_manager', 'applaud'], ['amb_home_engineer', 'wave'], ['amb_home_planner', 'applaud']]) {
             const p = this.who(id);
             if (!p?.on || s.route !== p.route || Math.abs(her.y - p.y) > 8) continue;
             const d = Math.abs(her.x - p.x);
-            if (p.walk || id === 'amb_counsellor') {
-                // (The counsellor claps all day; for these two she has a heart as well.)
+            if (p.walk) {
+                // (For these she has a heart as well.)
                 if (d < 2 * M && !p.hearted) {
                     p.hearted = true;
                     this.heart(p.x, p.y - PLAYER.height - 4);
-                    if (id === 'amb_counsellor') sfx.at(p.x, p.y).cheer(2.2);
                 }
                 continue;
             }

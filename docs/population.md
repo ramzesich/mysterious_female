@@ -256,6 +256,8 @@ with two). A start place by each: `docs/start-links.md`.
 | The robot vacuums (`haz_vacuum_4`, `_9`; deck 4's second, `vacuum-2`, 225.5 to 239 m, §7f) | 4, 9 | 5a, 5b | she rides it off | `vacRev`, `vacDart`, `thump` | `vacuum`, `region4`, `mishaps.stretches` |
 | The suitcases (`haz_suitcase_4`; `haz_suitcase_5`, red, deck 5's atrium 93.4 to 97 m once the lunch is delivered, §7f) | 4, 5 | 6a, 6b, 6c | she rides it, tipped off (the red one's own red clips) | `creak` | `deck4`, `mishaps.stretches` |
 | The night watch's door and tray (`haz_dnd_10f`, 45.6 m; `haz_trays_10f`, 47.0 to 48.4 m; §7f) | 10 | 3, 23 | his tray ridden off; his door, he shrieks in its doorway, she tiptoes off | | `mishaps.stretches` |
+| Splash Academy's pillow (`haz_siege`, 2026-11-27) | 7 | 26 | her gag: it drops on her head, she plops down, her dazed sit (no butterflies) with it on her head | | `mishaps.stretches` |
+| Splash Academy's tag (`haz_tag`) | 7 | 27 | the built sit, dazed with no butterflies | | `mishaps.stretches` |
 | The gym's balls (`haz_gymball_1`, purple, 90.6 to 94.2 m; `haz_gymball_2`, blue, 96.3 to 99.3 m; §7f) | 11 | 25a, 25b | at her front she trips forward onto her belly; at her back she sits (the built falls) | | `mishaps.stretches` |
 | The deck chair (`haz_deckchair`, `haz_wet`) | 11 | 7a; **7b unreachable** (it stands still) | face first onto it, she sleds on it | `scrape`, `creak`, `thump` | `region6` |
 | The porter's cart (`haz_porter`) | 4 | 8a, 8b, 8c, 8d | over the cart, pushed, sat on it, bounced off his back | `cartBump`, `thump` | `region1`, `mishaps.porter` |
@@ -474,9 +476,10 @@ leaving the frame (a wink, no trigger).
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
-| 24-27 | `amb_toddlers` | Three toddlers at the play kitchen | `static` | Characters |
+| 24.0 | `book_15` | The fifteenth book, on top of the dark bookshelf (2026-11-27; its title, text and cover to come) | E from the floor | |
+| 27.7, 38.4 | `haz_siege` | The pillow siege (2026-11-27, the toddlers and the counsellor out): the knight by the kids' table and the king by the teddy lob one pillow over the castle to each other | It comes down on her: 26, her gag with the pillow on her head; her cry or dash: the nearer ducks | `splash_knight`, `splash_king` |
 | 30.54-34.66 | `haz_fort_7` | A pillow castle across the room (since 2026-11-27, §7f P6): two cushion towers, a quilt, a red crawl tube through each tower's foot | Crawl through (the crawl verb); the openings layered as the shaft's mouth | Generated, `assets/source/things/tries/pillow-fort-3/` |
-| 38 | `amb_nanny` | The youth counsellor | `static` | A character |
+| 41.3-44.6 | `haz_tag` | Two kids playing tag: laps, the tagged one counting and chasing back | Into her: 27, on her bottom (no butterflies); a hop clears them; her cry or dash: they freeze 3 s | `splash_chaser`, `splash_runner` |
 | 60 (Entourage) | `haz_ballpit` | The ball pit, 50-58, across Entourage | She sinks to the waist and wades at half speed; no scare; a jump gets her out at its ends | Drawn |
 | 70 | decor | The arcade cabinet, foosball (built) | | |
 | 74 | `rdr_entourage` | The door to the forward lobby | Gold | |

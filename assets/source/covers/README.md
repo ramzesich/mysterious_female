@@ -1,5 +1,8 @@
 # The books' covers (plan-the-rest §2.3)
 
+**Book 15** (on Splash Academy's bookshelf, 2026-11-27): `assets/ship/covers/cover-15.png` and `mini-15.png` are plain
+placeholders, until the user's photo of the cover (and its title and author) comes.
+
 Each her own copy's cover: the user photographed them (2026-11-22, `reference/books/`, git-ignored, never committed),
 each was straightened (its four corners found by GrabCut, warped flat), its words painted out (OpenCV inpaint over the
 letters, boxes per cover), then redrawn by PixelLab `image_to_pixelart` at 120 x 180, the default (redrawn) mode,

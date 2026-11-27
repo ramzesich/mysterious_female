@@ -137,7 +137,9 @@ def on_her(f, h):
 
 
 # A clip that is another recoloured takes that clip's estimates (deck 5's red suitcase: tools/recolour_suitcase.py).
-SAME_AS = {"her-mishaps": {f"redcase-{c}": f"suitcase-{c}" for c in ("sit", "ride", "tip", "dazed")}}
+SAME_AS = {"her-mishaps": {f"redcase-{c}": f"suitcase-{c}" for c in ("sit", "ride", "tip", "dazed")},
+           # (Her dazed sit with its butterflies taken out: her head where it was, Splash Academy's, 2026-11-27.)
+           "her": {"dazed-sit-plain": "dazed-sit"}}
 
 
 def her_head(sheet, clip, k, f, estimates, cell):

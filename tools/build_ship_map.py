@@ -1103,7 +1103,8 @@ def build_objects():
         add(point(name, "place", exact_x(m), floor_y(12)))
     # Region 9's: by the wedding cake in Cagney's, in Splash Academy, at the captain's door.
     add(point("cagneys", "place", exact_x(168.9), floor_y(12)))
-    add(point("kids", "place", exact_x(43), floor_y(7)))
+    # (Just past Splash Academy's doorway from Entourage: 43 m was in the tag kids' lane, 2026-11-27.)
+    add(point("kids", "place", exact_x(45.8), floor_y(7)))
     add(point("captain", "place", exact_x(30.4), floor_y(9)))
     # Region 10's: the balcony forward of the spa (the hatch's top), deck 8 a few doors from
     # cabin 8206 ("home"; "cabin" is inside it). (The mooring deck is "bow".)
