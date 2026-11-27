@@ -888,6 +888,11 @@ Lessons learned (2026-11-24, the two rooms redecorated):
   round an axis leaning toward us bow the other way after half a turn: the loop is a whole turn. (2026-11-26, part 11.)
 - **A start place (`?at=`) is looked at after a mover is placed near it:** the gym's stood in the new ball's lane, as
   `drill7` stood under the gull's dive.
+- **An opening she crawls into, seen in profile, is layered as the shaft's mouth:** from the opening's inner edge
+  outward (its dark, its ring, its outline) behind her, as one band; the thing's body inward of it in front. Cutting only
+  the dark out of the picture in front left holes in the near wall she showed through; the whole thing in front put her
+  "behind" it; cut open, it was "worse" (the user, 2026-11-27, Splash Academy's castle). A thing she cannot get on top
+  of is drawn taller than her jump (her feet rise 65 px).
 - **What the outside draws in front of her is not drawn across a room she is in:** the balconies' fronts ran over the
   balcony cabins' insides (a room entered from its balcony is not `inDeck`, so a test on that missed them).
 

@@ -5441,3 +5441,29 @@ Where it stopped (the user: "We'll continue next day. Save our progress"):
 - **Then:** record and commit the batch; item 12 (the popcorn), P1 (the ladder), 14 (the balloons), 10 last; and remind
   the user to rethink the walking/standing NPCs' role once part 11 is approved (their ask).
 - Generations this batch: 18 (the gallery's three) + 66 (the fort) = 84.
+
+## Part 11, the second round's first batch, finished and approved (2026-11-27)
+
+(The entry above, "IN PROGRESS", is where it stood on the 26th.)
+
+- **Item 11, the Photo Gallery's three browsers** (deck 6, 150.3 to 158.8 m, `haz_gallery`): three of the buffet queue's
+  passengers with their plates edited out (`gallery_a`, `_b`, `_e`); first a looping queue fading at the pillars, then
+  (the user: "They just disappear, that doesn't make any sense. Let them walk back and forth. Also, not in sync. Shift
+  every one of them one pixel down") each to and fro over a stretch of their own, side by side, stopping at the photos
+  (`roam` on a `Queue`, `dy`). "Galley approved".
+- **Item 13**, the balcony's lamp; **15**, deck 9's second robot (the officer 54 to 70 m); **P4**, **P5**: approved as
+  shown on the 26th. **Item 16 dropped** (the user).
+- **P6 and Splash Academy's fort:** the tangerine on the kids' table behind the fort, 2 px lower (the user). The fort, in
+  four rounds: a side-view blanket fort (seed 23, approved), its openings "unclear", then tunnel mouths in profile; the
+  user: "I don't like how the entire fort looks like ... generate different forts. They also have to be higher" (her
+  jump's feet rise 65 px); of four new forts a **pillow castle** (106 px drawn, 95 px tall), and of two redraws with a
+  red crawl tube through each tower's foot, seed 44. Its layering, by the user's corrections: at each of the four
+  openings everything from the dark ellipse's inner edge outward (the dark, its ring, its outline) is behind her, the
+  tube's body in front, so she goes into the opening and is hidden once past the near wall (the shaft's mouth); 1 px
+  lower (`dy` on the low); a missing outline px filled. "Great! The fort is approved."
+  `assets/source/things/tries/pillow-fort-3/README.md`. `haz_fort_7` 30.54 to 34.66 m.
+- **Her crawl 1 px lower everywhere** (`VERBS.crawlDrop`, `setCrawl`; the user).
+- **Tests:** `mishaps.stretches` (the gallery, the lamp, the robot's cases), `region9`, `finale`, `boot`, `region3`,
+  `region4`, `linen` pass; `check_overlaps` 0; `check_corridors`: deck 6 68.3 m without a beat (49 to 117), deck 7 82.1,
+  deck 9 58.2, deck 10 53.2. Generations: 18 (the browsers), 66 (the first fort), 60 (the castle): 144.
+- Offered, unanswered: the counsellor (30.15 m) half a metre forward, clear of the fort's forward mouth.

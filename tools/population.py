@@ -1000,10 +1000,12 @@ DND = {"haz_dnd_9": (9, 167.6, "spaguest"), "haz_dnd_10m": (10, 131.6, "sleeper"
 LOWS = {"haz_fort_9": ("adjoin", 236, 300, "@fort"),
         # Region 9: the pillow fort across Splash Academy (a PixelLab piece, 169 px long). (Taken
         # down for the night on the evening of the catch: with Bumbot in her arms she cannot crawl.)
-        # (Since 2026-11-26 a new fort in profile, its tunnel mouth at each end, the linen room's shaft's way: 25 px wider
-        # each side than its stacks, so the solid part reaches the mouths' rims; the user, of the old one: "it's 3D, while we
-        # just crawl in profile". assets/source/things/tries/pillow-fort-2/README.md.)
-        "haz_fort_7": (7, 30.48, 34.72, "thing:pillow-fort", "flag:catch")}
+        # (Since 2026-11-27 a pillow castle, the user's choice of four new forts, 95 px tall so that not getting on top
+        # reads right (her jump's feet rise 65): two cushion towers, a quilt between them; a red crawl tube through each
+        # tower's foot, its openings at both ends in profile (the linen room's shaft's way: the tube in front of her, its
+        # dark behind her), so she shows crawling under the quilt between; 198 px, centred where the old fort was.
+        # assets/source/things/tries/pillow-fort-3/README.md.)
+        "haz_fort_7": (7, 30.54, 34.66, "thing:pillow-fort", "flag:catch", {"dy": 1})}   # (1 px lower: the user, 2026-11-27)
 # --- Region 5's own things (docs/population.md, deck 8 forward) --------------------------------------
 # Cabin doors standing open, each in a cabin door's place: id: (deck, m, what shows: "party" the
 # door with the balloons (`amb_party`), "sea" a made-up cabin with the sea in its window

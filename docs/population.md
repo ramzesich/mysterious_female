@@ -475,7 +475,7 @@ leaving the frame (a wink, no trigger).
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 24-27 | `amb_toddlers` | Three toddlers at the play kitchen | `static` | Characters |
-| 28-34 | `haz_fort` | A pillow fort across the room | Crawl through (the crawl verb) | Drawn |
+| 30.54-34.66 | `haz_fort_7` | A pillow castle across the room (since 2026-11-27, §7f P6): two cushion towers, a quilt, a red crawl tube through each tower's foot | Crawl through (the crawl verb); the openings layered as the shaft's mouth | Generated, `assets/source/things/tries/pillow-fort-3/` |
 | 38 | `amb_nanny` | The youth counsellor | `static` | A character |
 | 60 (Entourage) | `haz_ballpit` | The ball pit, 50-58, across Entourage | She sinks to the waist and wades at half speed; no scare; a jump gets her out at its ends | Drawn |
 | 70 | decor | The arcade cabinet, foosball (built) | | |
@@ -740,6 +740,7 @@ lobby doors on 9 and 10 are the gold ones).
 
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
+| 150.3-158.8 (deck 6) | `haz_gallery` | The Photo Gallery's three browsers (§7f 11): the queue's passengers a day earlier, no plates, each to and fro over a stretch of their own (`roam`) | Bodies that hold her back; hop at a gap | `gallery_*` |
 | 162-180 | `haz_queue` | The buffet queue: six passengers with trays shuffling along the counter | `loop(162, 180, 0.4)` as a snake with a gap after every third; a full block that pushes her back; hop it at a gap | Shared bodies |
 | 176 | `tan_11_fruit` | The fruit counter | | |
 | 185 | `rdr_coldroom` + `room_coldroom` | The cold room (green): frost, shelves, `item_canister` (the ice cream mix, a heavy tray: no jumps at all) | `room`; E at the canister | Drawn by hand |

@@ -1000,6 +1000,11 @@ gym's runner in front of her treadmill (the user).
 53.6 m is in the officer's trolley walk); the night watch in his uniform shirt over pyjama trousers (the user's choice
 of two; the first read as deck 10's sleeper). With it the bridge's sign 2 px up and the corridors' carts under the
 walkers (the user).
+**The second round's first batch built 2026-11-27 (approved):** 11, the gallery's three browsers (the queue's passengers
+with their plates edited out, each walking to and fro, out of step); 13, the balcony's lamp at 224.8 m; 15, deck 9's
+robot 30.5 to 50 m, the officer moved aft; **16 dropped** (no room by the kids' pool, the user); P4 by cabin 9245, P5 on the
+forward terrace, P6 on the kids' table behind the fort; Splash Academy's fort made again as a pillow castle with a
+crawl tube through each tower, its openings layered as the shaft's mouth (the user's four rounds). Next: 12, P1, 14, 10.
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

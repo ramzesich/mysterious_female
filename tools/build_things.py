@@ -144,6 +144,9 @@ OWN_COLOURS = {"robot", "fog-machine", "grip-socks", "canister", "delivery-vase"
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # (The gym's balls, every frame of their roll: tools/build_gym_ball.py.)
 OWN_COLOURS |= {f"gym-ball-{c}-{i:02d}" for c in ("purple", "blue") for i in range(32)}
+# Pictures kept on their whole canvas, not trimmed to what is drawn: the half of a thing drawn behind her that must stand
+# where its front half stands (the fort's tunnel openings' dark, `pillow-fort-back`, and the fort itself, cut to one box: 2026-11-27).
+KEEP_CANVAS = {"pillow-fort", "pillow-fort-back"}
 # A thing's twin with its light off: name -> (the lit thing, how far its reds are darkened toward a dull red).
 DIM = {"warning-light-off": ("warning-light", 0.75)}
 # Background things washed toward the wall behind them, as tools/wash_levels.py washes the ship's pieces: name ->
@@ -224,7 +227,8 @@ def majority_shrink(img, w, h):
 def piece(path, name=None):
     name = name or path.stem
     img = Image.open(path).convert("RGBA")
-    img = img.crop(img.getbbox())
+    if name not in KEEP_CANVAS:
+        img = img.crop(img.getbbox())
     path = Path(name + ".png")       # (the options below go by the thing's name, wherever its picture is)
     if path.stem in CROP:
         img = img.crop(CROP[path.stem])

@@ -356,10 +356,12 @@ def build_world():
         ents.append(dict(kind="breakfast", id=bid, x=xs[0], y=B.floor_y(deck), doors=xs, who=who, route="inside"))
     ents.append(dict(kind="deskflags", id="deskflags", x=B.exact_x(DESK_FLAGS["m"]), y=B.floor_y(DESK_FLAGS["deck"]),
                      on=DESK_FLAGS["on"], flags=DESK_FLAGS["flags"], route="inside"))
-    for lid, (where, a, b, frame, *until) in LOWS.items():
+    for lid, (where, a, b, frame, *rest) in LOWS.items():
         x0, y, route = spot(where, a)
+        until = [r for r in rest if isinstance(r, str)]
+        opts = next((r for r in rest if isinstance(r, dict)), {})      # (`dy`: its pictures that many px lower)
         ents.append(dict(kind="low", id=lid, x=(x0 + spot(where, b)[0]) // 2, x0=x0, x1=spot(where, b)[0], y=y, route=route,
-                         frame=frame or "", until=until[0] if until else ""))
+                         frame=frame or "", until=until[0] if until else "", **opts))
 
     # Region 6's (src/world/movers.js, src/world/lido.js).
     for pid, (deck, a, b, up, *front) in PLATFORMS.items():
