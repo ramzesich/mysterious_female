@@ -25,7 +25,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
    fraction (11.97 for the kids' pool, 10.97 for deck 11's), so the pool's own deck keeps 3% of its hull over it and
    the deck below shows 3% of its inside through its hull (the faint ghosts). Fix offered: while swimming, her deck is
    the pool's own (`pool.deck`), in `updateCutaway` (`src/scenes/ShipScene.js`). `zz-ghost2.png`, `zz-pools.png`.
-3. **The Great Outdoors' gull stands on air** (`gull_go`, `FOODGULLS` in `tools/population.py`, `FoodGulls` in
+3. **DONE 2026-11-27** (made on its perch). **The Great Outdoors' gull stands on air** (`gull_go`, `FOODGULLS` in `tools/population.py`, `FoodGulls` in
    `src/world/hazards.js`): made in its `gull-perched` picture at its stretch's middle (x 10795, 214.9 m) at
    `def.y - 112` = 448, under deck 12's terrace, and only flies to its perch (10603, 514, the rail's forward end)
    once its update runs near her. From afar (the outside view, the intro) it is a sitting gull in mid-air.

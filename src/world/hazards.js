@@ -198,9 +198,12 @@ export class FoodGulls {
         this.top = this.high ? def.y - 206 : def.y - 112;
         this.band = def.y - 128;
         this.birds = [];
+        // (A perched one starts on its perch: from the circling ones' start it stood on air over the stretch until she came
+        // near, seen from afar, in the outside view and the intro; the user, 2026-11-27.)
+        const x = def.perch?.x ?? def.x, y = def.perch?.y ?? this.top;
         for (let i = 0; i < def.count; i++) {
-            const sprite = s.add.image(def.x, this.top, 'things', def.perch ? 'gull-perched' : 'gull-up').setOrigin(0.5, 1).setDepth(D.player + 0.34);
-            this.birds.push({ sprite, phase: i * Math.PI, x: def.x, y: this.top });
+            const sprite = s.add.image(x, y, 'things', def.perch ? 'gull-perched' : 'gull-up').setOrigin(0.5, 1).setDepth(D.player + 0.34);
+            this.birds.push({ sprite, phase: i * Math.PI, x, y });
         }
         this.loot = s.add.image(0, 0, 'load-cone').setOrigin(0.5, 1).setDepth(D.player + 0.35).setVisible(false);
         world.add([...this.birds.map(b => b.sprite), this.loot]);

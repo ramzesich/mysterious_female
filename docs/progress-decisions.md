@@ -5445,3 +5445,13 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   of decks 3, 4, 5, 8, 9 and 10, deck 12, the pool deck and the outside view all the same (the only pixels that differ
   are things in motion: gusts, gulls, towels, Bumbot running, the sea's glints). region6, region7, region9, deck3,
   highlight pass. Not merged to main (the user: no merges until they say so).
+
+## The Great Outdoors' gull on its rail from the start (the Refinement session, 2026-11-27; the hull's top review, 3)
+
+- **What was wrong:** `FoodGulls` made every bird at the circling gulls' start, over its stretch's middle; the Great
+  Outdoors' (`gull_go`), the one with a perch, stood there on air in its sitting picture until she came within 19 m, so
+  the outside view and the intro showed a gull hanging under deck 12's terrace (in play it was always on its rail by the
+  time it was on the screen).
+- **Built (the user: "why is it not just placed on its perch from the beginning?"):** a gull with a perch is made on it;
+  the pool's circling gulls start where they did.
+- **Checks:** region6 (its dive at her cone) passes; mishaps fails only on deck 9's sprinkler, as on main. Not merged.
