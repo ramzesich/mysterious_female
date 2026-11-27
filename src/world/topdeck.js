@@ -49,7 +49,8 @@ export class OldLady {
         this.world = world;
         this.scene = s;
         this.def = def;
-        // The sunbed stays when she has gone; her bags and her towel go with her.
+        // The sunbed stays when she has gone, and her bags and her towel with it: she leaves everything (the horn's scene
+        // remade, 2026-11-27: they slid along the floor beside her).
         const bed = s.add.image(def.x, def.y, 'sunbed').setOrigin(0.5, 1).setDepth(D.props + 0.03);
         const bag = s.add.image(def.x - 39, def.y, 'shipart', 'beach-bag').setOrigin(0.5, 1).setDepth(D.props + 0.06);
         // (Clear of the bed's foot, beside her parasol, not under the bed: the audit, 2026-11-15.)
@@ -58,8 +59,8 @@ export class OldLady {
         world.add([bed, bag, duffel, towel]);
         const zone = s.add.zone(def.x, def.y, def.half * 2, def.tall).setOrigin(0.5, 1);
         s.physics.add.existing(zone, true);
-        world.things.push({ id: 'prop_sunbed', x: def.x, y: def.y, route: 'inside', items: [bed] });
-        const block = { id: 'blk_oldlady', x: def.x, y: def.y, route: 'inside', items: [bag, duffel, towel], zone, until: 'flag:horn' };
+        world.things.push({ id: 'prop_sunbed', x: def.x, y: def.y, route: 'inside', items: [bed, bag, duffel, towel] });
+        const block = { id: 'blk_oldlady', x: def.x, y: def.y, route: 'inside', items: [], zone, until: 'flag:horn' };
         world.things.push(block);
         world.solids.push(block);
         this.zone = zone;
@@ -760,7 +761,9 @@ export class Flock {
     }
 
     // Up and away over the bow, all at once. Resolves when the sky is clear.
-    liftOff() {
+    // (`to`: where each flies and how long, `(bird, i) => ({ x, y, ms })`: the horn's scene sends the windscreen's
+    // six aft across the bow's picture.)
+    liftOff(to = null) {
         const s = this.scene, d = this.def;
         this.gone = true;
         sfx.gull();
@@ -769,8 +772,10 @@ export class Flock {
             b.up = true;
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
             b.sprite.setOrigin(0.5, 0.5).setFrame('gull-up').setFlipX(true).setDepth(s.DEPTH.fx - 0.1);
+            const at = to?.(b, i) ?? { x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), ms: 2100 + i * 90 };
+            if (at.x > b.x) b.sprite.setFlipX(false);
             s.tweens.add({
-                targets: b.sprite, x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), duration: 2100 + i * 90, delay: i * 70, ease: 'Sine.easeIn',
+                targets: b.sprite, x: at.x, y: at.y, duration: at.ms, delay: i * 70, ease: 'Sine.easeIn',
                 onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
             });
         })));
@@ -853,7 +858,8 @@ export const topdeck = {
         const box = s.add.image(F.toolboxX - B.spot, top, 'funnel-toolbox').setOrigin(0, 1).setDepth(D.exterior + 0.08);
         const scope = s.add.image(F.telescopeX, top, 'shipart', 'telescope').setOrigin(0.5, 1).setFlipX(true).setDepth(D.exterior + 0.08);
         w.add([post, this.cordRope, this.cordHandle, box, scope]);
-        w.things.push({ id: 'sec_horn', x: this.cordAt.x, y: top, route: 'inside', items: [], reach: 20, interact: () => this.horn() });
+        // (Its rope and handle are its pictures: they pulse where E would pull, as everything she can use does.)
+        w.things.push({ id: 'sec_horn', x: this.cordAt.x, y: top, route: 'inside', items: [this.cordRope, this.cordHandle], reach: 20, interact: () => this.horn() });
         w.things.push({ id: 'sec_telescope', x: F.telescopeX, y: top, route: 'inside', items: [], reach: 18, interact: () => this.telescope() });
 
         // Bumbot on the horn's top bar, out of reach, against the sky (population:
@@ -916,17 +922,9 @@ export const topdeck = {
     updateTopdeck(dt, time) {
         const s = this.scene, w = this.world, her = s.player, T = this.T;
         if (!T) return;
+        this.inset?.update(dt);
         if (this.pulling) this.cordInFist();
         const L = T.lady;
-        // The engineer on his break turns to her.
-        const e = this.who('npc_engineer_read');
-        if (e?.on && e.state !== 'acting' && Math.abs(her.y - e.y) < 8 && Math.abs(her.x - e.x) < 3 * M) {
-            const dir = her.x < e.x ? -1 : 1;
-            if (dir !== e.dir) {
-                e.dir = dir;
-                this.people.place(e);
-            }
-        }
     },
 
     // E at the old lady (population: `npc_oldlady`): her mojito from Topsiders' bar. She drinks it
@@ -979,7 +977,7 @@ export const topdeck = {
     },
 
     // E at the engineer with his coffee, still hot (population: `scn_engineer`): he drinks, waves
-    // her up, unhooks the chain and climbs the ladder to the roof. From then on he is on the top.
+    // her up, unhooks the ladder's chain and goes back to his door, where he stays.
     engineerCoffee() {
         const e = this.near('npc_engineer', 46), w = this.world, s = this.scene, F = this.T.funnel;
         if (!e || this.P.has('engineer')) return false;
@@ -1012,21 +1010,20 @@ export const topdeck = {
             sfx.done();
             await this.people.play(e, 'wave');
             e.state = 'acting';
-            // The chain off its hook, and up he goes.
-            const gate = w.gates.find(g => g.needs === 'engineer');
+            // The chain off its hook, and back to his door (he stays down here: the user, 2026-11-27).
+            const gate = w.gates.find(g => g.needs === 'engineer'), home = e.x, dir0 = e.face ?? 1;
             e.dir = F.ladderX < e.x ? -1 : 1;
             this.people.place(e);
             this.people.anim(e, 'walk');
             await w.tween({ targets: e, x: F.ladderX - e.dir * 10, duration: Math.abs(F.ladderX - e.x) * 12 + 80, onUpdate: () => this.people.place(e) });
             sfx.at(F.ladderX, e.y).ratchet();
             if (gate?.extra) await w.tween({ targets: gate.extra, alpha: 0, duration: 260 });
-            e.x = F.ladderX;
+            e.dir = home < e.x ? -1 : 1;
             this.people.place(e);
-            if (!this.people.anim(e, 'climb')) this.people.anim(e, 'walk');
-            s.time.addEvent({ delay: 280, repeat: 5, callback: () => sfx.at(e.x, e.sprite.y).rung() });
-            await w.tween({ targets: e.sprite, y: e.y - 150, duration: 1700 });
-            await w.tween({ targets: e.sprite, alpha: 0, duration: 200 });
-            e.gone = true;
+            await w.tween({ targets: e, x: home, duration: Math.abs(home - e.x) * 12 + 80, onUpdate: () => this.people.place(e) });
+            e.dir = dir0;
+            this.people.place(e);
+            this.people.idle(e);
             // (The technical door beside it is hers to come back to from now on: population `cp_technical`.)
             const cp = s.checkpoints.find(c => c.id === 'cp_technical');
             if (cp && !cp.active) {
@@ -1178,27 +1175,6 @@ export const topdeck = {
         return tin;
     },
 
-    // E at the engineer on his break, after the horn: he lends her what he is reading, the ninth book.
-    engineerBook() {
-        const e = this.near('npc_engineer_read', 40), w = this.world, s = this.scene;
-        if (!e || this.P.has('book9') || w.carry) return false;
-        e.state = 'acting';
-        w.cut(async () => {
-            const her = s.player;
-            her.setFlipX(e.x < her.x);
-            e.dir = her.x < e.x ? -1 : 1;
-            this.people.place(e);
-            e.sprite.anims.stop();
-            e.sprite.setFrame(e.meta.stand);
-            await w.wait(350);
-            await w.handOver(e, '@book-9', () => w.giveBook(9));
-            e.idle = 'idle';
-            this.people.idle(e);
-            this.P.setFlag('book9');
-        });
-        return true;
-    },
-
     // E at the ball by the court (population: `sec_court`): she shoots, and scores.
     court() {
         const s = this.scene, w = this.world, C = this.T.court, her = s.player, ball = this.courtBall;
@@ -1311,170 +1287,5 @@ export const topdeck = {
     pullX(left) {
         const her = this.scene.player, C = 84, off = her.x - her.getTopLeft().x, gx = HORN_FISTS[0][0] - 1;
         return this.cordAt.x - (left ? C - 1 - gx : gx) + off;
-    },
-
-    // E at the horn's cord (population: `scn_horn`). The first time, with the engineer's leave:
-    // the blast, and what it sets off, shown from up here by the camera. After that, a toot.
-    horn() {
-        const s = this.scene, w = this.world, P = this.P, her = s.player, F = this.T.funnel;
-        if (w.carry) return false;
-        if (!P.has('engineer') && !P.openAll) return false;
-        const first = !P.has('horn');
-        w.cut(async () => {
-            // (Beside the cord, facing it, where her fist in the pull's first frame closes on the handle: a step or two
-            // there first.)
-            const left = this.cordAt.x < her.x, x = this.pullX(left);
-            her.setFlipX(left);
-            if (Math.abs(her.x - x) > 1) {
-                s.pose('run', 0.6);
-                await w.tween({ targets: her, x, duration: Math.min(400, Math.abs(her.x - x) * 16) });
-                her.setFlipX(left);
-            }
-            her.x = x;
-            her.anims.play('her-pull');
-            this.pulling = true;
-            await w.wait(320);
-            this.blast(first ? 1500 : 500);
-            if (first) this.catOffTheHorn();
-            await w.wait(first ? 1300 : 450);
-            // (She lets go: the handle swings back up to where it hangs.)
-            this.pulling = false;
-            const from = this.cordHandle.y, rest = this.world.data.funnel.y - HORN_REST;
-            s.tweens.addCounter({ from, to: rest, duration: 260, ease: 'Sine.easeOut', onUpdate: tw => this.drawCord(0, tw.getValue()) });
-            s.pose('stand');
-            if (!first) return;
-            await this.cascade();
-            P.setFlag('horn');
-        });
-        return true;
-    },
-
-    // The blast: the top shakes, rings of sound leave the trumpets, the pipes cough smoke.
-    blast(ms) {
-        const s = this.scene, w = this.world, F = this.T.funnel, top = w.data.funnel.y;
-        sfx.horn(ms / 1000);
-        rumble('horn', ms);
-        s.cameras.main.shake(ms, 0.006);
-        for (let i = 0; i * 170 < ms; i++) {
-            s.time.delayedCall(i * 170, () => {
-                const ring = s.add.ellipse(F.hornX - 44, top - 96, 8, 16).setStrokeStyle(2, 0xffffff, 0.9).setDepth(s.DEPTH.fx);
-                w.add([ring]);
-                s.tweens.add({ targets: ring, x: ring.x - 150, scaleX: 5, scaleY: 7, alpha: 0, duration: 700, ease: 'Quad.easeOut', onComplete: () => ring.destroy() });
-            });
-        }
-        // (The pipes cough: a thick burst of their own smoke as long as the blast, the user, 2026-11-27; it was flat discs.)
-        s.smokeBurst(ms);
-    },
-
-    // Bumbot, on the horn when it sounds: straight up, then down the lattice's front and away
-    // forward along the roof.
-    catOffTheHorn() {
-        const s = this.scene, w = this.world, cat = this.hornCat, f = w.data.funnel;
-        if (!cat?.visible) return;
-        this.hornCatGone = true;
-        sfx.at(cat.x, cat.y).meow();
-        cat.play('bumbot-leap');
-        s.tweens.chain({
-            targets: cat,
-            tweens: [
-                { y: cat.y - 34, duration: 200, ease: 'Quad.easeOut' },
-                { x: f.head[0] + 4, y: f.head[1], duration: 280, ease: 'Quad.easeIn', onComplete: () => { cat.play('bumbot-run'); sfx.at(cat.x, cat.y).scramble(); } },
-                { x: f.shoulder[0], y: f.shoulder[1], duration: 620 },
-                { x: f.foot[0], y: f.foot[1], duration: 240 },
-                { x: f.foot[0] - 260, duration: 520, onComplete: () => cat.setVisible(false) },
-            ],
-        });
-    },
-
-    // What the horn sets off (population: `scn_horn`): the camera goes to the sun deck, where the
-    // security officer jumps, drops his card and runs for the bridge, and the old lady bolts,
-    // leaving her parasol and her book; then to the bow, where the gulls go up in a cloud; and back.
-    async cascade() {
-        const s = this.scene, w = this.world, cam = s.cameras.main, T = this.T, her = s.player, D = s.DEPTH;
-        const pan = (x, y, ms) => new Promise(resolve => cam.pan(x, y, ms, 'Sine.easeInOut', true, (_, k) => { if (k === 1) resolve(); }));
-        const streak = (fromX, toX, y, ms, delay = 0) => {
-            const cat = s.add.sprite(fromX, y, 'bumbot').setOrigin(0.5, 1).setDepth(D.player + 0.05).setFlipX(toX < fromX);
-            cat.play('bumbot-run');
-            w.add([cat]);
-            s.tweens.add({ targets: cat, x: toX, duration: ms, delay, onStart: () => sfx.scramble(), onComplete: () => cat.destroy() });
-        };
-        const L = T.lady, lady = this.who('npc_oldlady'), rival = this.who('riv_sundeck');
-        cam.stopFollow();
-        s.viewOverride = 12;
-        await pan((L.x + L.rivalX) / 2, L.y - HALF - 20, 1500);
-        // He shoots through, forward; the officer jumps out of his skin, and his card out of his pocket.
-        streak(L.rivalX + 420, L.x - 520, L.y, 1500, 150);
-        const acts = [];
-        if (rival?.on) {
-            acts.push((async () => {
-                rival.state = 'acting';
-                rival.sprite.anims.stop();
-                rival.sprite.setFrame(rival.meta.stand);
-                await w.wait(350);
-                const card = s.add.image(rival.x + 6, rival.y - 30, 'shipart', 'key-card').setScale(0.5).setTint(0xfbe38a).setDepth(D.props + 0.09);
-                w.add([card]);
-                sfx.yelp();
-                await w.tween({ targets: rival.sprite, y: rival.y - 22, duration: 170, ease: 'Quad.easeOut', yoyo: true });
-                s.tweens.add({ targets: card, x: L.cardX, y: L.y - 5, angle: 360, duration: 520, ease: 'Quad.easeIn', onComplete: () => sfx.sparkle() });
-                this.dropped = card;
-                await w.wait(300);
-                rival.dir = -1;
-                this.people.place(rival);
-                this.people.anim(rival, 'walk', { speed: 2.3 });
-                // (Over the sunbed in his stride.)
-                const hop = s.time.addEvent({ delay: 16, loop: true, callback: () => {
-                    const d = Math.abs(rival.x - L.x);
-                    rival.sprite.y = rival.y - (d < 60 ? (1 - (d / 60) ** 2) * 42 : 0);
-                } });
-                await w.tween({ targets: rival, x: L.x - 560, duration: 2500, onUpdate: () => this.people.place(rival) });
-                hop.remove();
-                rival.gone = true;
-                rival.items.forEach(i => i.setVisible(false));
-            })());
-        }
-        if (lady?.on) {
-            acts.push((async () => {
-                lady.state = 'acting';
-                lady.still = '';
-                this.oldLady.glaring = false;
-                await w.wait(250);
-                const bang = s.add.text(lady.x, lady.y - 70, '!', { fontFamily: 'Verdana, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#2e222f', stroke: '#ffffff', strokeThickness: 3, resolution: 4 })
-                    .setOrigin(0.5, 1).setDepth(D.fx);
-                w.add([bang]);
-                sfx.oh();
-                s.tweens.add({ targets: bang, alpha: 0, delay: 500, duration: 200, onComplete: () => bang.destroy() });
-                await w.tween({ targets: lady.sprite, y: lady.sprite.y - 12, duration: 150, ease: 'Quad.easeOut', yoyo: true });
-                // Her bags under her arm, and off, forward.
-                const bags = w.things.find(t => t.id === 'blk_oldlady')?.items ?? [];
-                sfx.scrape();
-                await this.people.play(lady, 'bolt');
-                lady.state = 'acting';
-                lady.sprite.y = lady.y;
-                if (!this.people.anim(lady, 'fleeing')) this.people.anim(lady, 'read');
-                s.tweens.add({ targets: [...bags, this.ladyGlass].filter(Boolean), x: '-=560', alpha: { from: 1, to: 0.9 }, duration: 2300 });
-                await w.tween({ targets: lady, x: lady.x - 560, duration: 2300, onUpdate: () => this.people.place(lady) });
-                lady.gone = true;
-                lady.items.forEach(i => i.setVisible(false));
-                [...bags, this.ladyGlass].filter(Boolean).forEach(i => i.setVisible(false));
-            })());
-        }
-        await w.wait(2700);
-        // The bow: he streaks across, and the gulls are gone.
-        const [a, b] = [this.flocks.find(f => f.def.id === 'gull_bow_a'), this.flocks.find(f => f.def.id === 'gull_bow_b')];
-        const bowX = a ? (a.def.x0 + a.def.x1) / 2 - 90 : 3300;
-        await pan(bowX, L.y - HALF - 34, 1700);
-        streak(bowX + 380, bowX - 420, L.y, 1300, 100);
-        await w.wait(350);
-        a?.liftOff();
-        await w.wait(450);
-        b?.liftOff();
-        await w.wait(1900);
-        await Promise.all(acts);
-        await pan(her.x, her.y - HALF, 1900);
-        s.viewOverride = null;
-        cam.startFollow(her, true, 0.15, 0.15);
-        cam.setFollowOffset(0, HALF);
-        this.dropped?.destroy();
-        this.dropped = null;
     },
 };

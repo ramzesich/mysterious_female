@@ -262,6 +262,9 @@ ITEMS = {
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
+    # (The engineer's, on the funnel's top: stood against the forward end of his toolbox since he is no longer up there
+    # to lend it, 2026-11-27.)
+    "book_9": ("funnel", 189.2 - 24 / 48, "book:9", None, 0),
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
     # (§4 2.1, 17: on the life-jacket box's lid at the boat walkway's aft end, its foot 2 px into the lid: the user.)
     "book_11": ("walkway", 230 + 2 / 48, "book:11", None, 30),
@@ -602,10 +605,9 @@ PEOPLE = {
     "amb_shuffle_b": dict(at=(12, 159.25), who="shuffle_b", face=-1, idle="idle", layer="back"),
     "npc_engineer": dict(at=(12, 166.2), who="engineer", face=1, idle="idle", until="flag:engineer",
                          bubble=("coffee", None, "flag:engineer", 4)),
-    "npc_engineer_cord": dict(at=("funnel", 187.25), who="engineer", face=-1, idle="idle", after="flag:engineer",
-                              until="flag:horn", bubble=("horn", None, "flag:horn", 5)),
-    "npc_engineer_read": dict(at=("funnel", 188.0), who="engineer", face=-1, idle="reading", after="flag:horn", until="flag:catch&!flag:home",
-                              bubble=("book", "!flag:book9", None, 4)),
+    # (He stays at his door once he has had his coffee: the user, 2026-11-27, the horn's scene remade, "Remove the
+    # engineer from there". He stood by the cord with a cloud of a horn, and read on the top after it.)
+    "npc_engineer_break": dict(at=(12, 166.2), who="engineer", face=1, idle="idle", after="flag:engineer", until="flag:catch&!flag:home"),
     "amb_cagneys_her": dict(at=(12, 169.4), who="cagneys_pearl", face=1, layer="back"),
     "amb_cagneys_him": dict(at=(12, 170.6), who="cagneys_tweed", face=-1, layer="back"),
     # (His cloud shows a tangerine once she is near, until he has one: the tin of sardines is his for it, 7.)

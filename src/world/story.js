@@ -16,6 +16,7 @@ import { pass } from './pass.js';
 import { quiet } from './quiet.js';
 import { stage } from './stage.js';
 import { bridge } from './bridge.js';
+import { horn } from './horn.js';
 import { linen } from './linen.js';
 
 const M = 48;
@@ -70,7 +71,7 @@ export class Story {
     // E. True if something here took it.
     interact() {
         return this.officer() || this.pills() || this.photo() || this.feedKid() || this.husband()
-            || this.oldLadyDrink() || this.engineerCoffee() || this.engineerBook() || this.plannerCake() || this.sushi()
+            || this.oldLadyDrink() || this.engineerCoffee() || this.plannerCake() || this.sushi()
             || this.massage();
     }
 
@@ -975,4 +976,5 @@ Object.assign(Story.prototype, pass);
 Object.assign(Story.prototype, quiet);
 Object.assign(Story.prototype, stage);
 Object.assign(Story.prototype, bridge);
+Object.assign(Story.prototype, horn);
 Object.assign(Story.prototype, linen);

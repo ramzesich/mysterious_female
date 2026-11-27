@@ -2301,7 +2301,7 @@ def scenario_golden(b):
     b.hold("up", 0.6)
     ok &= check(b.state()["mode"] == "play" and "CREW ONLY" in blocked(b), "the technical ladder is chained off: the engineer wants his coffee", blocked(b))
     wait(1.0)
-    ok &= check(coffee_for_the_engineer(b), "a hot coffee carried up past Teppanyaki's flares: he drinks it and goes up", flags(b)[-3:])
+    ok &= check(coffee_for_the_engineer(b), "a hot coffee carried up past Teppanyaki's flares: he drinks it and unhooks the ladder's chain", flags(b)[-3:])
     wait(0.4)
     b.teleport(LADDER_X, D12)
     b.hold("up", 3.0)
@@ -5623,36 +5623,36 @@ def scenario_region8(b):
     ok &= check(s["y"] == fn["y"] and s["mode"] == "play", "climbing in the lulls she reaches the funnel's top", s)
     b.hold("right", 0.9)
     ok &= check(not b.eval("window.__ship.checkpoints.some(c => c.id === 'cp_funnel')"), "(no checkpoint on the top since plan-the-rest §7e)")
-    ok &= check(person(b, "npc_engineer_cord")["on"], "he is up there, by the cord", person(b, "npc_engineer_cord"))
-    # The horn, and what it sets off.
+    # (The engineer stays at his door: the user, 2026-11-27, "Remove the engineer from there".)
+    ok &= check(person(b, "npc_engineer_break")["on"] and not b.eval(f"{W}.people.list.some(q => q.on && q.y < {fn['y']} + 8)"),
+                "the engineer stays at his door: nobody is on the top", person(b, "npc_engineer_break"))
+    # The horn, and what it sets off (remade 2026-11-27: `region8.horn` has the scene's own checks).
     b.teleport(F["hornX"] - 4, fn["y"])
     wait(0.4)
     b.shot("region8-horn-before")
     b.tap("e")
     wait(0.5)
     ok &= check(b.state()["mode"] == "scripted", "E at the cord: she pulls it", b.state())
-    wait(3.6)
+    wait(2.2)
     b.shot("region8-sundeck")
-    wait(5.2)
+    wait(3.0)
     b.shot("region8-bow")
-    ok &= check(wait_flag(b, "horn", 16), "the horn has sounded; the view comes back to her", flags(b)[-3:])
-    cam = b.eval("(c => [c.worldView.centerX, c.worldView.centerY])(window.__ship.cameras.main)")
-    ok &= check(abs(cam[0] - b.state()["x"]) < 60, "the camera is on her again", (cam, b.state()))
+    ok &= check(wait_flag(b, "horn", 16), "the horn has sounded; she is hers again", flags(b)[-3:])
     ok &= check(not person(b, "npc_oldlady")["on"] and not person(b, "riv_sundeck")["on"], "the old lady and the security officer are gone",
                 (person(b, "npc_oldlady"), person(b, "riv_sundeck")))
     gone = b.eval(f"{W}.things.filter(t => t.id.startsWith('gull_bow')).every(t => !{W}.shown(t))")
     ok &= check(gone, "the gulls have left the bow")
+    wait(1.2)
     b.tap("e")
     wait(1.6)
     ok &= check(b.state()["mode"] == "play" and "horn" in flags(b), "the cord again: a toot, no more", b.state())
-    # His book; the telescope.
-    e = person(b, "npc_engineer_read")
-    ok &= check(e["on"], "the engineer is on his break, reading", e)
-    b.teleport(e["x"] - 30, fn["y"])
+    # The engineer's book, stood against his toolbox; the telescope.
+    bk = b.eval(f"(t => t && [t.x, t.y])({W}.things.find(t => t.id === 'book_9'))")
+    b.teleport(bk[0] - 6, fn["y"])
     wait(0.4)
     b.tap("e")
-    wait(2.6)
-    ok &= check(b.eval("window.__ship.save.books['9']") == "held", "E: he lends her his book, the ninth", b.eval("window.__ship.save.books"))
+    wait(1.2)
+    ok &= check(b.eval("window.__ship.save.books['9']") == "held", "E at the engineer's book by his toolbox: the ninth", b.eval("window.__ship.save.books"))
     b.teleport(F["telescopeX"] - 4, fn["y"])
     wait(0.3)
     b.tap("e")
@@ -5745,6 +5745,75 @@ def enter_region9(b):
     b.teleport(exact_x(95), D12)
     wait(0.4)
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
+
+
+def scenario_region8__horn(b):
+    """The horn's scene as remade (docs/horn-remake-log.md, the user, 2026-11-27): nobody on the top but Bumbot on the
+    horn's bar; the cord pulses where E would pull; E from either side; the camera never leaves her: what the blast
+    sets off shows in a live panel under the top while the horn sounds (the sun deck, then the bow); the officer's
+    card lies where it will lie; the old lady's things stay; she is hers in under nine seconds; the cord after: a
+    toot."""
+    S, W = "window.__ship", "window.__ship.world"
+    b.open("?reset&play&at=funnel&did=engineer")
+    wait(0.8)
+    top = js(b, f"{W}.data.funnel.y")
+    cord = js(b, f"{W}.story.cordAt.x")
+    ok = check(js(b, f"{W}.story.hornCat.visible") and not js(b, f"{W}.people.list.some(q => q.on && q.y < {top} + 8)"),
+               "on the top: Bumbot on the horn's bar, and nobody else")
+    b.eval(f"(w => {{ w.def.swoop = 1000; w.nextAt = Infinity; }})({W}.story.funnelWind)")
+    hold_until(b, "right", lambda s: abs(s["x"] - cord) < 14, 6)
+    wait(0.5)
+    hl = js(b, f"{S}.highlight.state()")
+    ok &= check(any("sec_horn" in q["key"] and len(q["parts"]) == 2 for q in hl), "at the cord its rope and handle pulse", hl)
+    # E in the air does nothing.
+    b.key("space", True); wait(0.12); b.tap("e"); b.key("space", False); wait(0.9)
+    ok &= check(b.state()["mode"] == "play", "E in the air: nothing", b.state())
+    t0 = now()
+    b.tap("e")
+    wait(0.3)
+    ok &= check(b.state()["mode"] == "scripted", "E at the cord: the scene", b.state())
+    her = b.state()["x"]
+    far, shown, looks, low = 0, 0, set(), []
+    card = lady = None
+    while now() < t0 + 12 and not (b.state()["mode"] == "play" and "horn" in flags(b)):
+        wait(0.1)
+        c = js(b, f"(c => c.worldView.centerX)({S}.cameras.main)")
+        far = max(far, abs(c - b.state()["x"]))
+        v = js(b, f"(i => i && i.shown ? [Math.round(i.view.centerX), i.cam.visible] : null)({W}.story.inset)")
+        if v:
+            shown += 1
+            looks.add(v[0])
+            if card is None:
+                card = js(b, f"(c => c && c.items[0].visible ? [c.items[0].x, c.items[0].y] : null)({S}.progress.cards.find(c => c.card === 'off'))")
+        low.append(js(b, f"{S}.player.anims.isPlaying"))
+    took = now() - t0
+    L = js(b, f"{W}.data.topdeck.lady")
+    ok &= check(took < 9.0, "she is hers again in under nine seconds", round(took, 2))
+    ok &= check(far < 60, "the camera never left her", round(far))
+    ok &= check(shown >= 30 and len(looks) == 2 and any(abs(x - (L["x"] + L["rivalX"]) / 2) < 3 for x in looks) and any(x < 4000 for x in looks),
+                "the panel showed the sun deck, then the bow", (shown, sorted(looks)))
+    ok &= check(not js(b, f"{W}.story.inset.shown") or wait_js(b, f"!{W}.story.inset.shown", 2), "and is shut")
+    ok &= check(abs(b.state()["x"] - her) < 12 and b.state()["y"] == top, "she stands where she pulled", b.state())
+    c = js(b, f"(c => [c.items[0].visible, c.items[0].x, c.x])({S}.progress.cards.find(c => c.card === 'off'))")
+    ok &= check(c[0] and abs(c[1] - c[2]) < 12, "the Officer's card lies at its place on the sun deck", c)
+    bags = js(b, f"(t => t.items.length >= 4 && t.items.every(i => i.visible) && {W}.shown(t))({W}.things.find(t => t.id === 'prop_sunbed'))")
+    ok &= check(bags, "the sunbed, her bags and her towel stay where they were")
+    ok &= check(not js(b, f"{W}.solids.some(q => q.id === 'blk_oldlady' && {W}.shown(q))"), "and are no block")
+    ok &= check(not js(b, f"{W}.story.hornCat.visible"), "Bumbot is off the horn")
+    ok &= check(js(b, f"{S}.viewOverride") is None, "the decks are shown as she sees them again")
+    b.shot("region8-horn-after")
+    # From the cord's aft side, in a new game: the same scene, facing forward.
+    b.open("?reset&play&at=funnel&did=engineer")
+    wait(0.6)
+    b.eval(f"(w => {{ w.def.swoop = 1000; w.nextAt = Infinity; }})({W}.story.funnelWind)")
+    b.teleport(cord + 40, top)
+    wait(0.4)
+    b.hold("left", 0.25)
+    wait(0.2)
+    b.tap("e")
+    ok &= check(wait_flag(b, "horn", 12) and wait_js(b, f"{S}.mode === 'play'", 3), "from the cord's aft side: the same scene", b.state())
+    ok &= check(not b.errors, "no errors", b.errors[-2:])
+    return ok
 
 
 def scenario_region8__tshirt(b):
@@ -6460,7 +6529,7 @@ def scenario_finale(b):
     ok &= check(all(person(b, p) and person(b, p)["on"] for p in ("amb_home_steward", "amb_home_manager", "amb_home_engineer", "amb_home_planner")),
                 "four of those she helped wait outside her cabin")
     # (Placed by the story, wherever she is: the planner's place is in the chapel, shown only while she is in it.)
-    own = ("npc_steward", "npc_stagemanager", "npc_engineer_read", "amb_cer_planner")
+    own = ("npc_steward", "npc_stagemanager", "npc_engineer_break", "amb_cer_planner")
     placed = lambda pid: b.eval(f"(p => !!p && !p.gone && !(p.until && {W}.cond(p.until)) && !(p.after && !{W}.cond(p.after)))({W}.people.byId['{pid}'])")
     ok &= check(not any(placed(p) for p in own), "and none of them is at their own place meanwhile", [(p, placed(p)) for p in own])
     hold_until(b, "left", lambda s: s["x"] < exact_x(47.2), 8)

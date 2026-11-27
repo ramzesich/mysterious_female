@@ -96,7 +96,90 @@ toot.
 The sun deck's two are 53 m forward of the cord and 13 m under it; the bow's gulls 72 m further forward. Nothing the
 blast sets off can be on her screen. Under the top's floor the screen's lower 105 px is the funnel's dark side.
 
-## 3. The structure (proposed to the user, 2026-11-27)
+## 3. The structure
 
-See the reply of that date: the pull's reason (three ways), the cascade shown in panels under the top while the horn
-sounds (`rough-insets.png`) or by cuts, what the bow's part is worth. To be filled in with the user's answers.
+Proposed 2026-11-27 with four questions: (1) why she pulls (her own idea with Bumbot on the horn; a valve it takes two
+to work; a treat he waves her to), (2) the cascade in a live panel under the top while the horn sounds, or by cuts,
+(3) whether the bow's part is kept, (4) which faults are mended. Asked first: "Is this scene optional? How do we get
+there?" (it is not: the Officer's card, the parasol and the sunbed's block all hang on it).
+
+**The user's answers, word for word:**
+
+> 1. Remove the engineer from there. Is this path is not optional, that means that one way or the other we will
+> eventually end up there on the funnel. Let her just see Bumbot on top of the horn, the cord, and the move is quite
+> obvious from there. This makes the scene like a near catch, and I think it fits.
+> 2. Let's try to implement your recommendation and see how it works in game. Make it well.
+> 3. Do as you would.
+> 4. Ok
+
+## 4. The beats (the scene's clock, `HORN` in `src/config.js`; ms from her fist closing on the handle)
+
+| At | What |
+|---|---|
+| before | Nobody on the top. Bumbot sits on the horn's top bar; the cord's rope and handle pulse where E would pull |
+| 0 | She pulls (her `pull`, the handle in her fist) |
+| 320 | The horn: one prolonged blast of 6.3 s. The top shakes hard for 0.45 s, then trembles; rings; the pipes cough |
+| 320 to 1,200 | Bumbot shoots up off the bar 34 px and 22 px forward (`fright`), comes down on the platform 58 px forward of her, crouches, runs off down the stairway |
+| 560 | She lets go and claps her hands over her ears (`ears`), hunched, until it stops; the handle swings back up |
+| 1,300 | The panel opens under the top: the sun deck, live |
+| 1,600 | The officer, on his knees at the loungers, is off them into the air (`start`); at its top his card leaves his pocket and comes down where it will lie (the world's own card, shown from now), a sparkle |
+| 2,000 | The old lady starts (`bolt`), is up, and hurries off forward with her book (`hurry`); her sunbed, parasol, bags and towel stay |
+| 3,100 | Bumbot comes through from aft, past the officer, over the sunbed and what stands at its foot |
+| 3,430, 3,750 | The officer turns after him; charges; over the sunbed in his stride (`hurdle`); gone forward |
+| 4,700 | (Unseen: the windscreen's six gulls set off aft) |
+| 5,100 | The panel shuts and opens on the bow: the kids' pool |
+| 5,560 | Its six gulls go up; the windscreen's six cross the picture's sky |
+| 6,460 | The panel shuts; 6,620 the horn stops |
+| 6,770 | Her hands come down; she looks up at the empty bar |
+| about 7,960 | She is hers (the flag `horn`), and shrugs |
+
+8.1 s from E (it was 12.3).
+
+## 5. The decisions
+
+1. **The engineer is off the top** (the user). He stays at his door once he has had his coffee: he unhooks the
+   ladder's chain and walks back to it (`npc_engineer_break`); `npc_engineer_cord`, `npc_engineer_read`, his horn
+   cloud and `engineerBook` are gone. **His book (9) stands against the forward end of his toolbox on the top**, a
+   pickup: mine to place, since nobody is up there to lend it. To be confirmed by the user.
+2. **The pull is hers.** E at the cord from the first moment she is up; the cord pulses (its rope and handle are the
+   thing's pictures now).
+3. **The cascade in a live panel** (`src/inset.js`): a second camera on the same world at the game's own pixel size,
+   with a sky of its own laid out for it (the backdrop takes a camera), a frame of a light rim and a dark edge, opening
+   from its middle row. Under the top's floor, where the screen is the funnel's dark side: it covers nothing. Deck 12 is
+   held open for it (`viewOverride`), which changes nothing on the top.
+4. **One prolonged blast as long as the scene** (6.3 s), so that everything it sets off happens while it sounds; she
+   holds her ears through it, which is why she does not go after Bumbot.
+5. **Bumbot ties the places together and gives the officer his reason:** off the horn; through the sun deck, where
+   the officer goes after him (he is on the bridge after him in near-catch 6). He is not shown at the bow: he is not
+   there yet.
+6. **The old lady leaves everything** (the sunbed, the parasol, her bags and towel): they slid along the floor beside
+   her. They stay for good, behind her as the sunbed is, and are no block. Mine; to be confirmed by the user.
+7. **The bow's part kept, short** (the user: "Do as you would"): one shot of the kids' pool; the windscreen's six,
+   1,000 px forward of it, are sent aft across its sky.
+8. **The shake** no longer shows past the sky's edge: the sky is laid out 8 px wider than the screen all round.
+9. **The officer's and the old lady's clips are a strip of their own** (`assets/ship/horn/clips.png`), each in the
+   colours of its own built sheet; hers and Bumbot's go into their sheets.
+
+## 6. The art
+
+`assets/source/horn/README.md` has the jobs: five clips, each from the built sheet's own frame on green, each the
+first or second try. 7 generations (8,104 left before them). Checked frame by frame: the officer's start had dust
+strokes under him and the hurdle a hurdle drawn in, both cut off as loose pieces; the old lady's steps drifted 1 to 3
+px and are set on their lowest pixel; one ears try covered her face.
+
+## 7. The self-check (before the user saw it)
+
+- **The officer's head left the panel's top** in his start and in his hurdle: half and 0.7 of each clip's own rise is
+  kept, and the panel shows 85 px over the floor (the floor 7 px over its bottom edge).
+- **Bumbot's fall crossed the trumpets' bells:** he goes 22 px forward as he goes up.
+- **Bumbot on the sun deck was drawn in front of its railing,** the people behind it: he is on their layer.
+- **He and the officer took off inside the bags at the sunbed's foot:** both leave the floor aft of them (70 and 74 px
+  from the sunbed's middle).
+- **The old lady's last two frames stood 11 px in the air** (she sits that much over the floor): set down in them.
+- **The bow's picture had no water in it** with the floor so low: it looks 22 px lower.
+- Walked: `?play&at=funnel&did=engineer` from the stairway's side and from the cord's aft side; E in the air (nothing);
+  the cord again (a toot). `region8` with its new case `region8.horn`, `golden`, `finale`, `region9`, `lang`,
+  `highlight`, `keeps`, `boot`, `sound` pass; `check_overlaps` 0. The whole suite was not run.
+
+Not mended: the card is the world's own 8 px card (a sparkle and its glint mark it); fault 11's book is not shown in
+the scene (it appears with the flag, as the pickups do).

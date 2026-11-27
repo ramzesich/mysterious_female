@@ -109,6 +109,9 @@ HER = {
         # fingers rubbing, a loop; and, startled by the net on the alarm, up onto her feet. PixMiniMax from her stand's
         # frame on a green ground, she cut out by colour (assets/source/bridge/cut.py; the jobs in its README). Her feet
         # stay planted: each frame on its lowest pixel; the first of `call` and the last of `call-up` are her stand.)
+        # (The horn's scene remade, 2026-11-27: her hands over her ears, hunched, while the horn sounds over her head;
+        # PixMiniMax from her stand on green, tools/build_horn.py. Played back for her hands coming down.)
+        "ears": [(f"ears/{i}.png", "feet") for i in range(9)],
         "call": [(f"call/call/{i}.png", "feet") for i in range(9)],
         "call-loop": [(f"call/call-loop/{i}.png", "feet") for i in range(8)],
         "call-up": [(f"call/call-up/{i}.png", "feet") for i in range(9)],
@@ -454,6 +457,9 @@ BUMBOT = {
                                              "crawl", "sit", "sat", "stand-up", "wash", "bat", "loaf", "loaf-rest",
                                              "loaf-up", "lie-down", "asleep", "wake")},
         "leap": [(path, "feet") for path, _ in cat_clip("jump")],
+        # (The horn's scene remade, 2026-11-27, docs/horn-remake-log.md: off his seat in a fright, back arched, tail
+        # puffed; each frame on its lowest pixel, the game moves him: tools/build_horn.py.)
+        "fright": [(path, "feet") for path, _ in cat_clip("fright")],
         "fish": cat_clip("fish", BUMBOT_FLOOR + BUMBOT_UNDER),
         "rope": cat_clip("rope", BUMBOT_FLOOR + BUMBOT_UNDER),
     },

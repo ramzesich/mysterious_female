@@ -35,6 +35,7 @@ const DUSK_TINTS = { clouds: '#ff9c9c', ripples: '#ffb08a', islands: '#7a5f86', 
 const DUSK_BAND = 14;                       // px a colour of DUSK_SKY (blended)
 const SUN = { at: 0.2, up: 5 };             // how far across the view, its middle over the horizon
 export const HORIZON_ABOVE = 58;
+const PAD = 8;
 export const HORIZON_SETTLE = 1.0;
 // The outside view (O) is laid out in the world, not on the screen (the user, 2026-11-14: a picture
 // of the whole ship stitched from many views had a strip of sky and a row of clouds for each row
@@ -337,9 +338,11 @@ function makeTextures(scene) {
 }
 
 export class Backdrop {
-    constructor(scene, { waterY, depth, gulls = null }) {
+    // (`cam`: the camera it is laid out for, the main one unless given: an inset's, `src/inset.js`.)
+    constructor(scene, { waterY, depth, gulls = null, cam = null }) {
         makeTextures(scene);
         this.scene = scene;
+        this.cam = cam;
         this.waterY = waterY;
         this.gulls = gulls;
         const fixed = o => o.setOrigin(0).setScrollFactor(0);
@@ -404,12 +407,13 @@ export class Backdrop {
     // far background keeps the size it has on the screen in play, only its horizon moving.
     update(dt, outside = false, horizonOnScreen = 0, far = null, keep = 1) {
         this.time += dt;
-        const cam = this.scene.cameras.main;
+        const cam = this.cam ?? this.scene.cameras.main;
         const z = cam.zoom, W = cam.width, H = cam.height, cx = W / 2, cy = H / 2;
         // A scroll-factor-0 object at (x, y) shows at the screen's centre plus (x - centre) x zoom:
         // the world spot for a screen spot, and the screen's size in world pixels.
         const wx = sx => cx + (sx - cx) / z, wy = sy => cy + (sy - cy) / z;
-        const left = wx(0), top = wy(0), width = W / z, bottom = wy(H);
+        // (`PAD` px past the screen's edge all round: a shake of the picture, the horn's, moves it that far.)
+        const left = wx(0) - PAD, top = wy(0) - PAD, width = W / z + 2 * PAD, bottom = wy(H) + PAD;
         if (outside) horizonOnScreen = (this.waterY - cam.scrollY - cy) * z + cy;
         const hy = Math.round(wy(horizonOnScreen));
 
