@@ -262,9 +262,6 @@ ITEMS = {
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
     "book_8": (12, 128.2, "book:8", "horn", 13),
-    # (The engineer's, on the funnel's top: stood against the forward end of his toolbox since he is no longer up there
-    # to lend it, 2026-11-27.)
-    "book_9": ("funnel", 189.2 - 24 / 48, "book:9", None, 0),
     "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
     # (§4 2.1, 17: on the life-jacket box's lid at the boat walkway's aft end, its foot 2 px into the lid: the user.)
     "book_11": ("walkway", 230 + 2 / 48, "book:11", None, 30),

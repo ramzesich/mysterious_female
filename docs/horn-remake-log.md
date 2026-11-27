@@ -183,3 +183,48 @@ px and are set on their lowest pixel; one ears try covered her face.
 
 Not mended: the card is the world's own 8 px card (a sparkle and its glint mark it); fault 11's book is not shown in
 the scene (it appears with the flag, as the pickups do).
+
+## 8. The play stop, round 1 (2026-11-27)
+
+**The user, word for word:**
+
+> Ok, I don't like the panels.
+> Let's revert to the view. Keep the new animations
+> 1. Keep the moved engineer that still wants his coffee.
+> 2. The new book location is fine.
+> 3. Regenerate the bags and show me the candidates (also on screenshots in game).
+> I want the old sequence view, but polished. It is fine that the horn blow ends. What moves things around is running
+> Bumbot, not the horn (that's why the old lady's bags stay in place).
+> Let's see what we can improve
+
+And, while it was being rebuilt: "Wait. If the engineer still wants his coffee, then let him give us his book when we
+bring him the coffee. Because a lot of books are picked up."
+
+**Decisions:**
+
+10. **No panel** (the user). `src/inset.js` and the backdrop's own camera are gone. The scene is three shots of the
+    camera itself: the top, the sun deck, the bow, and back to her.
+11. **The shots are cut to, not panned to** (mine: the old pans crossed 12,000 px in 5.1 s, twice through empty sea
+    and sky). Each shot's floor is where the top's own floor is on the screen, so the horizon holds across a cut. To be
+    judged by the user in play.
+12. **Bumbot is the cause of everything** (the user). The blast is 1.5 s and is over before the first cut. On the sun
+    deck all is quiet for 0.3 s; then he comes through: the officer is off his knees as he shoots past, the old lady's
+    book goes up as he is in the air over her, the officer goes after him. At the bow the kids' pool's gulls come over
+    ahead of him, and the windscreen's six go up one by one as he runs along their rail (under it he was behind the
+    bulwark: unseen).
+13. **The engineer hands her his book with his thanks for the coffee** (the user), before he waves her up; the pickup
+    by his toolbox, a few hours old, is gone again.
+14. **The old lady's bags stay** (the user confirmed the reason: Bumbot moves things, the horn does not). **They are to
+    be generated anew:** six candidates made as map objects at 32 px and brought to the game's size by each pixel's
+    commonest colour (a straw tote, a canvas bag with a flower, a burgundy handbag, a teal duffel, a stack of towels,
+    a striped towel hung over the sunbed's foot), shown alone beside her and in the running game in three sets. 6
+    generations. Awaiting the user's choice; the game still has the old ones.
+
+**The clock now** (ms from her fist on the handle): 320 the blast (1.5 s); Bumbot off the bar and away by about 1,500;
+her hands down at 1,970, she turns the way he went; 2,550 the cut to the sun deck; 2,870 Bumbot in; about 3,050 the
+officer's start and his card; about 3,390 the old lady's start; about 4,400 the officer's charge, 5,070 his hurdle; the
+deck as they left it for 0.4 s; about 6,300 the cut to the bow; 6,600 Bumbot along the rail; about 8,150 the cut back
+to her; she shrugs. 8.8 s from E (the first build: 8.1; the old scene: 12.3).
+
+`region8` with `region8.horn` (its checks now: the four shots in order, each a cut; the camera follows her again),
+`golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.

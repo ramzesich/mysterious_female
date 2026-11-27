@@ -761,8 +761,8 @@ export class Flock {
     }
 
     // Up and away over the bow, all at once. Resolves when the sky is clear.
-    // (`to`: where each flies and how long, `(bird, i) => ({ x, y, ms })`: the horn's scene sends the windscreen's
-    // six aft across the bow's picture.)
+    // (`to`: where each flies, how long, and after what wait, `(bird, i) => ({ x, y, ms, delay })`: the horn's scene
+    // sends the kids' pool's six across the bow's shot, and the windscreen's up one by one as Bumbot reaches each.)
     liftOff(to = null) {
         const s = this.scene, d = this.def;
         this.gone = true;
@@ -775,7 +775,7 @@ export class Flock {
             const at = to?.(b, i) ?? { x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), ms: 2100 + i * 90 };
             if (at.x > b.x) b.sprite.setFlipX(false);
             s.tweens.add({
-                targets: b.sprite, x: at.x, y: at.y, duration: at.ms, delay: i * 70, ease: 'Sine.easeIn',
+                targets: b.sprite, x: at.x, y: at.y, duration: at.ms, delay: at.delay ?? i * 70, ease: 'Sine.easeIn',
                 onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
             });
         })));
@@ -922,7 +922,6 @@ export const topdeck = {
     updateTopdeck(dt, time) {
         const s = this.scene, w = this.world, her = s.player, T = this.T;
         if (!T) return;
-        this.inset?.update(dt);
         if (this.pulling) this.cordInFist();
         const L = T.lady;
     },
@@ -977,7 +976,7 @@ export const topdeck = {
     },
 
     // E at the engineer with his coffee, still hot (population: `scn_engineer`): he drinks, waves
-    // her up, unhooks the ladder's chain and goes back to his door, where he stays.
+    // gives her his book, waves her up, unhooks the ladder's chain and goes back to his door, where he stays.
     engineerCoffee() {
         const e = this.near('npc_engineer', 46), w = this.world, s = this.scene, F = this.T.funnel;
         if (!e || this.P.has('engineer')) return false;
@@ -1007,6 +1006,13 @@ export const topdeck = {
             sfx.at(e.x, e.y).aah();
             s.tweens.add({ targets: steam, y: steam.y - 14, alpha: 0, duration: 900, onComplete: () => steam.destroy() });
             await w.wait(300);
+            // His thanks: the book he has been reading, the ninth (the user, 2026-11-27: "let him give us his book when we
+            // bring him the coffee"; he lent it on the funnel's top, after the horn).
+            if (!this.P.has('book9')) {
+                await w.handOver(e, '@book-9', () => w.giveBook(9));
+                this.P.setFlag('book9');
+                e.state = 'acting';
+            }
             sfx.done();
             await this.people.play(e, 'wave');
             e.state = 'acting';

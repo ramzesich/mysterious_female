@@ -718,34 +718,39 @@ export const FUNNEL_SMOKE = { puffs: 44, lifeMs: 3000, rise: 55, drift: 100, r0:
 export const HORN_FISTS = [[50, 31], [51, 30], [52, 35], [53, 45], [53, 39]];
 export const HORN_REST = 56;
 // The horn's scene (src/world/horn.js; the user's remake, 2026-11-27, docs/horn-remake-log.md): one clock, in ms from
-// the moment her fist closes on the handle. `panel`: the live picture under the top (the screen's px; the floor it
-// looks at `foot` px over its bottom edge).
+// the moment her fist closes on the handle. The camera's three shots (the top, the sun deck, the bow) are cut to, each as
+// Bumbot comes into it: he is what sets everyone off (the user: "What moves things around is running Bumbot, not the
+// horn").
 export const HORN = {
     stepSpeed: 62,                      // px/s: her step or two to the cord
     pullMs: 70,                         // a frame of her pull
-    blastAt: 320, blastMs: 6300,        // one prolonged blast
-    shake: 0.006, shakeMs: 450, tremble: 0.0012, ringMs: 260,
+    blastAt: 320, blastMs: 1500,        // the blast
+    shake: 0.006, ringMs: 170,
     letGo: 560, cordMs: 260,            // she lets go of the handle; it swings back up
     earsMs: 70, trembleMs: 110,         // her hands to her ears, a frame; hunched, a frame
-    downAfter: 150, lookMs: 90, endHold: 120,
-    // Bumbot off the bar: px up, in ms, a hang; his fall to the platform `land` px forward of her; a crouch; away.
-    // (`drift`: forward as he goes up, so that he comes down clear of the trumpets' bells.)
+    downAfter: 150, turnAfter: 260,     // her hands down once it stops; she turns the way he went
+    // Bumbot off the bar: px up and forward (clear of the trumpets' bells), in ms, a hang; his fall to the platform
+    // `land` px forward of her; a crouch; away.
     cat: { up: 34, drift: 22, upMs: 240, hang: 120, fallMs: 400, land: 58, crouch: 110, run: 620, frameMs: 70, runMs: 55 },
-    panel: { x: 22, y: 172, w: 436, h: 92, foot: 7 },
-    sunAt: 1300,                        // the panel opens on the sun deck
-    startAt: 1600, startMs: 90,         // the officer off his knees
-    // (How much of each clip's own rise is kept: all of it took his head out of the panel's top.)
-    startRise: 0.5, hurdleRise: 0.7,
+    floorAt: 164,                       // a shot's floor on the screen, px from its top (where the top's own floor is)
+    sunAt: 2550, sunCalm: 320,          // the cut to the sun deck; nothing yet
+    catRun: 520,                        // px/s: Bumbot through a shot
+    // His leap over the sunbed and what stands at its foot: off the floor this far aft of its middle, down this far
+    // forward of it, this high.
+    catLeap: [70, 52, 30],
+    startBefore: 14, startMs: 90,       // the officer off his knees as Bumbot is this far from him
     cardFrame: 3, cardMs: 520, cardUp: 16,
-    ladyAt: 2000, boltMs: 91, ladyStep: 6, hurry: 88, hurryMs: 50,
-    // (His leap over the sunbed and what stands at its foot: off the floor this far aft of its middle, down this far
-    // forward of it, this high.)
-    catAt: 3100, catRun: 520, catLeap: [70, 52, 30],
-    turnMs: 140, chargeAfter: 320, charge: 340, chargeMs: 62,
+    // (The old lady starts as Bumbot is this far aft of her: her book goes up, her start's fifth frame, as he is in the
+    // air over her.)
+    boltBefore: 205, boltMs: 91,
+    ladyStep: 6, hurry: 100, hurryMs: 45,
+    turnMs: 140, chargeAfter: 420, charge: 340, chargeMs: 62,
     hurdle: [74, 60, 250],              // off the floor this far aft of the sunbed's middle, down this far forward; px/s over it
-    flyAt: 4700, flyMs: 1700,           // the windscreen's gulls set off, to cross the bow's picture
-    bowAt: 5100, liftAt: 5560, bowFoot: 22,     // (the bow's picture a little lower: the kids' pool's water in it)
-    shutBefore: 160,                    // the panel shuts this long before the horn stops
+    sunHold: 420,                       // the sun deck as they left it, before the cut
+    flyBefore: 1500, flyMs: 2400,       // the kids' pool's gulls set off this long before the cut to the bow, to cross it
+    bowCalm: 300, liftBefore: 30,       // Bumbot into the bow's shot along the windscreen's rail; each gull up as he is this far from it
+    bowHold: 1550,                      // from his coming to the cut back to her
+    endHold: 250,
 };
 export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, nearK: 0.65 };
 

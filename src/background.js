@@ -338,11 +338,9 @@ function makeTextures(scene) {
 }
 
 export class Backdrop {
-    // (`cam`: the camera it is laid out for, the main one unless given: an inset's, `src/inset.js`.)
-    constructor(scene, { waterY, depth, gulls = null, cam = null }) {
+    constructor(scene, { waterY, depth, gulls = null }) {
         makeTextures(scene);
         this.scene = scene;
-        this.cam = cam;
         this.waterY = waterY;
         this.gulls = gulls;
         const fixed = o => o.setOrigin(0).setScrollFactor(0);
@@ -407,7 +405,7 @@ export class Backdrop {
     // far background keeps the size it has on the screen in play, only its horizon moving.
     update(dt, outside = false, horizonOnScreen = 0, far = null, keep = 1) {
         this.time += dt;
-        const cam = this.cam ?? this.scene.cameras.main;
+        const cam = this.scene.cameras.main;
         const z = cam.zoom, W = cam.width, H = cam.height, cx = W / 2, cy = H / 2;
         // A scroll-factor-0 object at (x, y) shows at the screen's centre plus (x - centre) x zoom:
         // the world spot for a screen spot, and the screen's size in world pixels.
