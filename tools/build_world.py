@@ -225,6 +225,8 @@ def build_world():
         cover = opts.get("cover")
         ents.append(dict(kind="item", id=iid, x=x, y=y, route=route, what=what, needs=needs or "",
                          on=on[0] if on else None, frame=on[1] if len(on) > 1 else "", **({"from": opts["from"]} if "from" in opts else {}),
+                         # (`holding`: E takes it with Bumbot in her arms too: book 15, on the way home, the user.)
+                         **({"holding": True} if opts.get("holding") else {}),
                          cover=dict(frame=cover[0], x=B.exact_x(cover[1]), rows=cover[2]) if cover else None))
 
     for pid, d in PEOPLE.items():

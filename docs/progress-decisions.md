@@ -5511,3 +5511,17 @@ Where it stopped (the user: "We'll continue next day. Save our progress"):
   region 9 through the staff door at 74 m, a dead end until the catch; the way home through it after the catch, empty);
   not decided. The finale's gust check failed once in a run of six browsers and passed alone; the user: "Disregard the
   test meanwhile".
+
+## Splash Academy on the way home; its tables, its teddy and its toy box (2026-11-27)
+
+- **The ending's Splash Academy** (the user: "We still didn't address the ending and the splash academy"), the four
+  answers: (1) the castle taken down where it stood, from its own pieces (the user's try 1 with try 2's tube openings set
+  in at both ends, their own instruction); (2) the king and the knight asleep on it, under its quilt, one picture with the
+  pile, washed 20% into the background; the tag kids in their cabins (not shown); the two first came at their source
+  size ("The kids look enormous"): the picture shrunk to 65% (the user's choice of four sizes); (3) she takes the
+  tangerine there with Bumbot in her arms (by walking over it, as always) and, now, book 15 with E (`holding` on the
+  pickup); (4) the lights as they are. `assets/source/things/tries/pillow-pile-2/README.md`.
+- **The user, from the previews:** both kids' tables and their chairs 2 px lower (with the tangerine: `around(..., dy)`),
+  the pile and the teddy 1 px lower; the toy box made again seen from the side (of four tries, a red painted chest,
+  `assets/source/ship/tries/toy-box-side/`, `toy-box-chest` in `tools/build_ship_art.py`), at its generated size.
+- **Tests:** `mishaps.stretches` (book 15 on the way home), `region9`, `boot` pass; `check_overlaps` 0. 40 generations.

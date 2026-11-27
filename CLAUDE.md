@@ -904,6 +904,9 @@ Lessons learned (2026-11-24, the two rooms redecorated):
   her body's foot before the hit plays (`gagPending`), or the gag floats.
 - **A gag that ends in a pose of hers ends on her own frame, compared px by px** (the user, frame by frame: "the same
   exact pose"); and the game's dazed loops leave out their clip's first frame (it is the pose before them).
+- **Figures added to a picture by an edit come at the size of what describes them:** the king and the knight drawn into
+  the pile from their 64 px pictures had heads bigger than hers ("enormous"). Give the game's size (a rough of them at
+  it), or shrink the whole and compare the heads with hers (17 px) before showing it.
 - **"Fix it" is the clip fixed, not the clip replaced:** I swapped the pillow gag for the built fall and was told "It's
   not what I meant"; when a fix could be either, say which before doing it.
 - **What the outside draws in front of her is not drawn across a room she is in:** the balconies' fronts ran over the

@@ -225,6 +225,9 @@ PROPS_5 = [
 for i, name in enumerate(PROPS_5):
     if name:
         PIECES[name] = ("props-5", i, None, {})
+# (Splash Academy's toy box seen from the side, the user's choice of four, 2026-11-27: a red painted chest, lid open,
+# `create_map_object` e1926736, 1 generation; the four in `toy-box-side/` of `tries/`. The sheet's was at three-quarters.)
+PIECES["toy-box"] = ("toy-box-chest", 0, None, {})
 TALL_2 = [
     "slot-side", "slot-pair", None, None, "arcade-cabinet", "claw-machine", "pinball", "foosball",
     "air-hockey", "atm", "easel-painting", "tv-console", "play-kitchen", "dancer-statue",

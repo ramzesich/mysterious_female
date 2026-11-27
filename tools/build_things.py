@@ -153,7 +153,10 @@ DIM = {"warning-light-off": ("warning-light", 0.75)}
 # (how far, the wall's colour). The walkway's recess wall is ShipScene's 0xc9ced3; decks 6 and 7 are at 20%.
 WASH = {"lifejacket-box": (0.20, (0xc9, 0xce, 0xd3)),
         # (Deck 9 inside is at 35%, toward the corridor's wall, tools/build_ship_art.py's WALL.)
-        "console-table": (0.35, (0xE9, 0xDF, 0xCC))}
+        "console-table": (0.35, (0xE9, 0xDF, 0xCC)),
+        # (Splash Academy's castle taken down for the night, in the background (the user, 2026-11-27): 20%, deck 7's,
+        # toward the room's sunny wall, #fbe9a6.)
+        "pillow-castle-down": (0.20, (0xfb, 0xe9, 0xa6))}
 # Pictures the user drew by hand in Paint, on a white ground (white is empty): name -> its file's stem. **Never written
 # by a tool** (CLAUDE.md): his handheld (15), the user's own pixel edit of my 24 x 11, 2026-11-21.
 BY_HAND = {"handheld": "handheld-by-hand"}

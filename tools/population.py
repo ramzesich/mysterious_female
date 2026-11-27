@@ -205,7 +205,7 @@ TANGERINES = {
     "tan_funnel": ("funnel", 189.2, 1, 13, None),
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
     # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
-    "tan_7_splash": (7, 29.0, 1, 18, None),   # (P6, §7f: behind the pillow fort, on its own kids' table; at 41.2 m until 2026-11-26)
+    "tan_7_splash": (7, 29.0, 1, 16, None),   # (P6, §7f: behind the pillow fort, on its own kids' table; at 41.2 m until 2026-11-26)
     "tan_7_ballpit": (7, 52.4, 1, 0, None),
 }
 
@@ -268,8 +268,9 @@ ITEMS = {
     # (§4 2.1, 20: on the console table at the end of deck 9's officers' corridor, left of the captain's door: the user's
     # choice of four, 2026-11-21; on its top row, the table 1 px down.)
     "book_14": (9, 27 + 30 / 48, "book:14", None, 27),
-    # (The fifteenth, on top of Splash Academy's bookshelf (58 px tall, at 24.0 m): the user, 2026-11-27.)
-    "book_15": (7, 24.0, "book:15", None, 57),
+    # (The fifteenth, on top of Splash Academy's bookshelf (58 px tall, at 24.0 m): the user, 2026-11-27. On the way home
+    # too, with Bumbot in her arms (`holding`, the user: "Let her also be able to pick up the book on her way").)
+    "book_15": (7, 24.0, "book:15", None, 57, "", {"holding": True}),
     # The things to find (docs/plan-three-uses.md §4.1): `what` is "keep:<whose>:<name>", whose
     # being cat (Bumbot's), her or him. The tennis ball is the dog's owner's to give (DOGS).
     "keep_feather": (4, 146.37, "keep:cat:feather", None, 66, "thing:feather-toy"),   # on the climb's shelf
@@ -1283,5 +1284,7 @@ PROPS.update({f"prop_lamp_prom_{i + 1}": ("prom", m, "thing:lamp-round" if k == 
                                           (181.5, "r"), (190, "o"), (198.5, "r"), (206.5, "o")])})
 PROPS.update({
     # The kids' club's fort, taken down for the night.
-    "prop_pillow_pile": (7, 33.4, "thing:pillow-pile", 0, dict(back=True, after="flag:catch")),
+    # (Since 2026-11-27 the pillow castle taken down where it stood, its middle: try 1 of three with try 2's tube openings
+    # set in, `assets/source/things/tries/pillow-pile-2/`; washed 20% into the background, the user.)
+    "prop_pillow_pile": (7, 32.6, "thing:pillow-castle-down", -1, dict(back=True, after="flag:catch")),   # (1 px lower: the user)
 })

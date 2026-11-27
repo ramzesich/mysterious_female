@@ -479,6 +479,7 @@ leaving the frame (a wink, no trigger).
 | 24.0 | `book_15` | The fifteenth book, on top of the dark bookshelf (2026-11-27; its title, text and cover to come) | E from the floor | |
 | 27.7, 38.4 | `haz_siege` | The pillow siege (2026-11-27, the toddlers and the counsellor out): the knight by the kids' table and the king by the teddy lob one pillow over the castle to each other | It comes down on her: 26, her gag with the pillow on her head; her cry or dash: the nearer ducks | `splash_knight`, `splash_king` |
 | 30.54-34.66 | `haz_fort_7` | A pillow castle across the room (since 2026-11-27, §7f P6): two cushion towers, a quilt, a red crawl tube through each tower's foot | Crawl through (the crawl verb); the openings layered as the shaft's mouth | Generated, `assets/source/things/tries/pillow-fort-3/` |
+| 32.6 | `prop_pillow_pile` | After the catch: the castle taken down, the king and the knight asleep on it under its quilt (one picture, 65%, washed 20%; 2026-11-27) | | Generated, `assets/source/things/tries/pillow-pile-2/` |
 | 41.3-44.6 | `haz_tag` | Two kids playing tag: laps, the tagged one counting and chasing back | Into her: 27, on her bottom (no butterflies); a hop clears them; her cry or dash: they freeze 3 s | `splash_chaser`, `splash_runner` |
 | 60 (Entourage) | `haz_ballpit` | The ball pit, 50-58, across Entourage | She sinks to the waist and wades at half speed; no scare; a jump gets her out at its ends | Drawn |
 | 70 | decor | The arcade cabinet, foosball (built) | | |

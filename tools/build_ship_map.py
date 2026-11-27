@@ -1297,20 +1297,20 @@ def build_objects():
             props.append(prop("front", True, "bool"))
         add(point(f"prop-{len(objs)}", "prop", x if x is not None else exact_x(m), floor_y(deck), props))
 
-    def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True), chair_dy=0):
+    def around(deck, m, middle, chair, on_top=None, gap=None, faces_left=False, sides=(True, True), chair_dy=0, dy=0):
         """A table (or anything) with a chair at each side, facing it, the same distance away (the
         user, 2026-11-03): by default each chair's seat tucked a little under the table's edge.
         `faces_left`: the chair was drawn facing left; `sides`: which of the two chairs to put; `chair_dy`: the chairs
-        that much lower (negative), the floor's tiles drawn over what goes under it."""
+        that much lower (negative), the floor's tiles drawn over what goes under it; `dy`: the table and its chairs together."""
         cx = exact_x(m)
         off = gap if gap is not None else (width(middle) + width(chair)) // 2 - 5
         if sides[0]:
-            put(deck, 0, chair, chair_dy, flip=faces_left, x=cx - off)
+            put(deck, 0, chair, chair_dy + dy, flip=faces_left, x=cx - off)
         if sides[1]:
-            put(deck, 0, chair, chair_dy, flip=not faces_left, x=cx + off)
-        put(deck, 0, middle, x=cx)
+            put(deck, 0, chair, chair_dy + dy, flip=not faces_left, x=cx + off)
+        put(deck, 0, middle, dy, x=cx)
         if on_top:
-            put(deck, 0, on_top, height(middle), x=cx)
+            put(deck, 0, on_top, height(middle) + dy, x=cx)
 
     # The bow (§5.3): the sun painted on its hull, and the mooring deck's bollards and cleats.
     lx0, ly0, lx1, ly1 = livery_box()
@@ -1601,7 +1601,8 @@ def build_objects():
     put(7, 24.0, "kids-bookshelf-bg")
     put(7, 26.4, "play-kitchen-bg")
     for m in (29.0, 41.2):
-        around(7, m, "kids-table-bg", "kids-chair-bg")
+        # (Both 2 px lower: the user, 2026-11-27.)
+        around(7, m, "kids-table-bg", "kids-chair-bg", dy=-2)
         put(7, m, "kids-drawing-bg", 52)
     # (The pillow fort is across the room at 30.8-34.4 m, tools/population.py: the rocking horse,
     # the toy box and the blocks moved out of its way.)
@@ -1610,7 +1611,7 @@ def build_objects():
     put(7, 37.15, "toy-blocks-bg")
     put(7, 36.0, "beanbags-bg")
     put(7, 36.0, "pin-map-bg", 54)
-    put(7, 38.0, "teddy-bg")
+    put(7, 38.0, "teddy-bg", -1)          # (1 px lower: the user, 2026-11-27)
     put(7, 39.2, "toy-train-bg")
     put(7, 43.6, "cactus-bg")
     # Entourage, the teen club: deep teal, a dark carpet with neon specks, games.

@@ -7099,6 +7099,16 @@ def scenario_mishaps__stretches(b):
     b.eval(f"{MS}.progress.setFlag('catch')")
     wait(0.5)
     ok &= check(b.eval(f"[...{SG}.kids, ...{TG}.kids].every(p => !p.on && !p.sprite.visible)"), "after the catch, all four have gone to bed")
+    # On the way home, Bumbot in her arms (a game started at the catch): book 15 is hers with E.
+    b.open("?play&reset&did=catch")
+    wait(0.5)
+    bk = b.eval(f"(t => t && [t.x, t.y])({W}.things.find(t => t.id === 'book_15'))")
+    at(bk[0], D7, True)
+    wait(0.3)
+    b.tap("e")
+    wait_js(b, f"{MS}.save.books['15'] === 'held'", 4)
+    ok &= check(b.eval(f"{MS}.holding") and b.eval(f"{MS}.save.books['15']") == "held", "with Bumbot in her arms, book 15 is hers with E",
+                (b.eval(f"{MS}.holding"), b.eval(f"{MS}.save.books")))
     return ok
 
 

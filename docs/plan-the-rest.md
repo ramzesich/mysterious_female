@@ -1008,6 +1008,8 @@ crawl tube through each tower, its openings layered as the shaft's mouth (the us
 **Splash Academy's kids made again 2026-11-27 (approved):** the toddlers and the counsellor out; the pillow siege over
 the castle (the knight and the king; gag 26 with the pillow on her head) and tag aft of it (27, no butterflies).
 **The fifteenth book** on Splash Academy's bookshelf (`BOOKS` 15): its title, author, text and cover the user's, to come.
+On the way home (the user's): the castle taken down with the king and the knight asleep on it, book 15 hers with Bumbot
+in her arms; the room's tables, teddy and toy box (seen from the side) mended.
 
 **The moves in the order she meets them, where two or more stand on one walk:** deck 4 going aft: the lead (hop), the
 first vacuum (moving), the towels (stop), the cart (hop), the stairs, the second vacuum (moving). Deck 5 going aft:

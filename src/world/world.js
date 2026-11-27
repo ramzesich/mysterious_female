@@ -2870,7 +2870,8 @@ export class World {
             if (Math.abs(Math.abs(p.x - t.x) - end) < 10) return s.startPush(t);
         }
         for (const t of this.things) {
-            if (!t.interact || t.done || !this.shown(t) || (s.holding && !t.look)) continue;
+            // (`holding`: a thing she can take with Bumbot in her arms: book 15 on the way home.)
+            if (!t.interact || t.done || !this.shown(t) || (s.holding && !t.look && !t.holding)) continue;
             if (Math.abs(p.x - t.x) > (t.reach ?? 18)) continue;
             // (`from`: taken only standing that high, the plant from the maid's bed; else from the floor or up there.)
             if (t.from != null ? Math.abs(p.y - (t.y - t.from)) > 4 : (Math.abs(p.y - t.y) > 8 && Math.abs(p.y - (t.level ?? t.y)) > 8)) continue;
