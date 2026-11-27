@@ -649,17 +649,16 @@ export class Flock {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { id, x0, x1, y, n }
-        this.birds = Array.from({ length: def.n }, (_, i) => {
-            // (About the two ends of the stretch: a pool's two rims, a windscreen's length.)
-            const k = def.n > 1 ? i / (def.n - 1) : 0.5;
-            const x = Math.round(def.x0 + (def.x1 - def.x0) * (k < 0.5 ? k * 0.36 : 1 - (1 - k) * 0.36) + ((i * 37) % 9) - 4);
+        this.def = def;             // { id, x0, x1, y, n, front, birds: [{ x, y, pose, flip, float }] }
+        // (Each gull where the data puts it, in its own pose and facing: the hull's top review's 10, the user, 2026-11-27,
+        // "they look copied". Its `y` is what it stands, sits or floats on.)
+        this.birds = def.birds.map((g, i) => {
             // (On the windscreen's rail, `front`, they are nearer to us than she is: over her as she jumps by, and over
             // the windscreen drawn over her; the user, 2026-11-23.)
-            const sprite = s.add.image(x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setFlipX(i % 2 === 0)
+            const sprite = s.add.image(g.x, g.y, 'things', `gull-${g.pose}`).setOrigin(0.5, 1).setFlipX(g.flip)
                 .setDepth(def.front ? D.player + 0.05 : D.props + 0.06);
             world.add([sprite]);
-            return { sprite, x, i };
+            return { sprite, x: g.x, y: g.y, i, pose: g.pose, flip: g.flip, float: g.float };
         });
         world.things.push({ id: def.id, x: (def.x0 + def.x1) / 2, y: def.y, route: 'inside', items: this.birds.map(b => b.sprite), until: 'flag:horn' });
     }
@@ -668,12 +667,28 @@ export class Flock {
         const s = this.scene, d = this.def;
         if (this.gone || !near(s, (d.x0 + d.x1) / 2, d.y, 800, 300)) return;
         if (d.front) this.dodge(dt, time);
-        // Now and then one shuffles, or stretches a wing.
         for (const b of this.birds) {
             if (b.up) continue;
+            if (b.float) {
+                // (Afloat: a slow bob with the water.)
+                b.sprite.y = b.y + (Math.sin(time / 650 + b.i * 2.1) > 0.35 ? 1 : 0);
+                continue;
+            }
+            // Now and then one shuffles; and each standing gull, on a round of its own (7 to 13 s), spends 2.4 s in
+            // another pose: looking back or preening (back to standing if that is its own), or turned round. The
+            // dozing and the sitting stay as they are.
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
-            b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
+            b.sprite.y = b.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
+            if (b.pose === 'doze' || b.pose === 'sit') continue;
+            const round = 7000 + b.i * 1300, away = (time + b.i * 2311) % round < 2400;
+            const turn = b.i % 3 === 0, alt = b.pose === 'perched' ? (b.i % 2 ? 'look' : 'preen') : 'perched';
+            b.sprite.setFrame(`gull-${away && !turn ? alt : b.pose}`).setFlipX(away && turn ? !b.flip : b.flip);
         }
+    }
+
+    // A gull back at its place, as it sat (after a flight).
+    settle(b) {
+        b.sprite.setFrame(`gull-${b.pose}`).setFlipX(b.flip).setPosition(b.x, b.y);
     }
 
     // A jump at the gulls on the windscreen's rail (the user, 2026-11-23): the one her head comes up at takes off a little,
@@ -687,7 +702,7 @@ export class Flock {
             if (b.up && !b.dodge) continue;
             if (!b.dodge) {
                 if (s.mode === 'play' && s.route === 'inside' && !onFloor && Math.abs(p.x - b.x) < 24
-                    && head < d.y + 8 && p.y > d.y - 40) {
+                    && head < b.y + 8 && p.y > b.y - 40) {
                     b.up = true;
                     b.dodge = { k: 0, side: Math.sign(b.x - p.x) || 1, landed: 0 };
                     sfx.at(b.x, d.y).flap();
@@ -701,29 +716,30 @@ export class Flock {
             D.k = up ? Math.min(1, D.k + dt / 0.22) : Math.max(0, D.k - dt / 0.4);
             const e = Math.sin(D.k * Math.PI / 2);
             if (D.k === 0 && !up) {
-                b.sprite.setFrame('gull-perched').setPosition(b.x, d.y);
+                this.settle(b);
                 b.dodge = null;
                 b.up = false;
                 continue;
             }
             b.sprite.setFrame(Math.floor(time / 110) % 2 ? 'gull-up' : 'gull-down')
-                .setPosition(Math.round(b.x + D.side * 10 * e), Math.round(d.y - 34 * e));
+                .setPosition(Math.round(b.x + D.side * 10 * e), Math.round(b.y - 34 * e));
         }
     }
 
     // A tangerine by the flock: the nearest goes after it, and flies back (docs/plan-three-uses.md §2).
     offered(t) {
         const s = this.scene, d = this.def;
-        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60 || Math.abs(t.img.y + 3 - d.y) > 12) return false;
-        const free = this.birds.filter(b => !b.up);
+        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60) return false;
+        // (A gull on what the tangerine lies on, or near it: each sits at a height of its own.)
+        const free = this.birds.filter(b => !b.up && Math.abs(t.img.y + 3 - b.y) <= 12 && Math.abs(t.img.x - b.x) < 60);
         if (!free.length) return false;
         const b = free.reduce((a, c) => Math.abs(c.x - t.img.x) < Math.abs(a.x - t.img.x) ? c : a);
         b.up = true;
         this.world.gullTakes(b.sprite, t, () => {
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
-            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, d.y - 110);
-            s.tweens.add({ targets: b.sprite, x: b.x, y: d.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
-                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched'); b.up = false; } });
+            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, b.y - 110);
+            s.tweens.add({ targets: b.sprite, x: b.x, y: b.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
+                onComplete: () => { flap.remove(); this.settle(b); b.up = false; } });
         });
         return true;
     }
@@ -731,15 +747,15 @@ export class Flock {
     // Her cry: the flock lifts a little, all at once, and settles again.
     heard() {
         const s = this.scene, d = this.def;
-        if (this.gone || !this.birds.some(b => this.world.hears(b.x, d.y))) return;
+        if (this.gone || !this.birds.some(b => this.world.hears(b.x, b.y))) return;
         sfx.at((d.x0 + d.x1) / 2, d.y).flap();
         this.birds.forEach((b, i) => {
             if (b.up) return;
             b.up = true;
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
             b.sprite.setFrame('gull-up');
-            s.tweens.add({ targets: b.sprite, y: d.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
-                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched').setY(d.y); b.up = false; } });
+            s.tweens.add({ targets: b.sprite, y: b.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
+                onComplete: () => { flap.remove(); this.settle(b); b.up = false; } });
         });
     }
 
@@ -754,7 +770,7 @@ export class Flock {
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
             b.sprite.setOrigin(0.5, 0.5).setFrame('gull-up').setFlipX(true).setDepth(s.DEPTH.fx - 0.1);
             s.tweens.add({
-                targets: b.sprite, x: b.x - 260 - i * 36, y: d.y - 250 - ((i * 53) % 90), duration: 2100 + i * 90, delay: i * 70, ease: 'Sine.easeIn',
+                targets: b.sprite, x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), duration: 2100 + i * 90, delay: i * 70, ease: 'Sine.easeIn',
                 onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
             });
         })));

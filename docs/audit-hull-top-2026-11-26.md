@@ -47,7 +47,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 8. **DONE 2026-11-27** (drawn as the DJ's fog machine, out of each pipe, more and less by turns; the user's; `smoke/`). **The funnel's smoke at sunset reads as extra suns:** flat pale discs beside the setting sun. `d-funnel.png`.
 9. **DONE 2026-11-27** (generated, limp, half filled and full by the wind, the ring on the pole's top; the foot's sock forward of the ladder; the bow's two the same; the user's; `socks/`). **The windsocks hang straight down between gusts** and read as striped posts; the one at the stairway's foot has
    the handrail across it (`sock()` in `src/world/topdeck.js`). `z-funneltop.png`.
-10. **The bow's gulls look copied:** two rows of three, one picture, evenly spaced, on the forward glass screen
+10. **DONE 2026-11-27** (four generated poses, each gull placed and posed in the data, now and then changing; the pool's clear of the kid, his bucket and the slide; the user's; `gulls/`). **The bow's gulls look copied:** two rows of three, one picture, evenly spaced, on the forward glass screen
     (x 2060 to 2521, y 320) and on the pool's rim (x 3248 to 3519, y 416). `csheet-0.png`.
 
 11. **DONE 2026-11-27** (the dividers start at the tank's foot; deck 11's tanks kept). **(Found 2026-11-27, with 1.) Deck 10's balcony fins rise into deck 11's pools' tanks:** the white posts of the

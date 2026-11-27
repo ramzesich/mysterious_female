@@ -1079,6 +1079,9 @@ Lessons learned (2026-11-27, the hull's top and the pools' tanks):
   looked for as "grey", took in its white stripes, and its ring came off the pole by a few px in every state (the user:
   "It has to be connected to the pole with its ring in all positions"). Measure the point in each picture, then check
   it at the pole's top in every state and angle, enlarged.
+- **A crowd of one picture reads as copies:** twelve gulls of one pose, every other mirrored, at even gaps were "copied".
+  A few poses edited from the same picture (the same bird), each placed by hand where such a bird would sit (a rail, a
+  slide's top, a fountain's cap, the water) and changing pose now and then on a round of its own.
 
 ## Working with the user
 

@@ -5589,3 +5589,22 @@ bow's two finale socks the same (change).
   (`FINALE["socks"]`, 24.475 m; the user's choice of four places; it stays behind the balcony's glass, as before).
 - **Checks:** boot, region8, finale pass. Pictures and scripts: `docs/audit-hull-top/socks/` (`built-stairway` shows the
   foot's sock at its first place; `forward.png` the last). Not merged.
+
+## The hull's top review, finding 10: the bow's gulls (the Refinement session, 2026-11-27)
+
+Both flocks were one picture twelve times (every other one mirrored), two even groups of three a flock, barely moving;
+on the kids' pool's rims they stood over the kid, his bucket and the slide. The user: new poses (A, all four); the pool's
+gulls kept (they fly off in the horn's shot, take a thrown tangerine, lift at her cry), moved clear.
+
+- **Generated:** preening, sitting, looking back, dozing, each an edit of the perched gull's own picture (the same bird),
+  20 generations (`assets/source/things/tries/gull-poses/`, its README); in the things atlas at the perched one's scale.
+- **Placed** (`FLOCK_BIRDS` in `tools/population.py`, each gull's metre, height, pose, facing, afloat; the layout mocked in
+  the running game and approved): the windscreen's six at uneven gaps; the pool's on the forward rim before the kid, on
+  the slide's top, two on the splash mushroom's cap, two afloat (the rims have some 18 px free a side). A flock's
+  stretch is now from its first gull to its last (the horn's pan follows it).
+- **Their life** (`Flock` in `src/world/topdeck.js`): each standing gull on a round of its own (7 to 13 s) spends 2.4 s
+  looking back, preening or turned round; the afloat bob; the dozing and sitting stay. Her cry, a tangerine, a jump at the
+  rail and the horn go from each gull's own place.
+- **Not built, found in the plan:** `docs/population.md` had the pool's gulls as a block ("Swooped" if she pushes through);
+  it never was. Left as it is (noted there).
+- **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/gulls/`. Not merged.

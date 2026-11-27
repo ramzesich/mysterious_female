@@ -1189,8 +1189,21 @@ SUNDECK = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span
 FUNNEL_TOP = dict(gust=dict(every=5.0, blow=1.2, tell=0.7, drift=60), gulls=2, swoop=10.0,
                   horn=185.0, toolbox=189.2, telescope=192.3, look="slot_balcony")
 # Flocks of gulls on the bow until the horn sends them off (`gull_bow_a`, `gull_bow_b`): id: (deck,
-# from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen).
+# from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen). (Since 2026-11-27 each
+# gull's own place is `FLOCK_BIRDS`; the stretch and the count here are the world builder's no more, only the deck and
+# the height the flock answers at.)
 FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 6, 96)}
+# Each flock's gulls (the hull's top review's 10, the user, 2026-11-27: "they look copied"; the poses generated, the
+# layout approved in the running game): id: [(m, px up from the deck's floor, pose, facing aft, afloat)]. The pose is
+# `gull-<pose>` among the things; most face forward (left) unflipped. The windscreen's six at uneven gaps along its
+# rail; the kids' pool's clear of the kid, his bucket and the slide (its rims are some 18 px free each side): one on
+# the forward rim, one on the slide's top, two on the splash mushroom's cap, two afloat.
+FLOCK_BIRDS = {
+    "gull_bow_b": [(33.1667, 96, "look", 0, 0), (33.7083, 96, "perched", 1, 0), (34.1875, 96, "preen", 0, 0),
+                   (37.9167, 96, "doze", 1, 0), (40.8542, 96, "perched", 0, 0), (42.25, 96, "sit", 1, 0)],
+    "gull_bow_a": [(57.625, 0, "look", 0, 0), (63.3542, 43, "perched", 0, 0), (64.5208, 60, "doze", 1, 0),
+                   (64.9375, 60, "preen", 0, 0), (59.6875, -4, "sit", 1, 1), (61.25, -4, "sit", 0, 1)],
+}
 
 # --- Region 9's own things (docs/population.md: deck 12 forward, the spa, the officers' corridors,
 # the bridge, the kids' clubs; src/world/bow.js) -----------------------------------------------------
