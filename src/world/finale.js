@@ -12,7 +12,7 @@ import { sfx } from '../sfx.js';
 import { rumble } from '../rumble.js';
 import { t, pick } from '../lang.js';
 import { writeSave } from '../save.js';
-import { Gusts } from './outside.js';
+import { Gusts, windsock } from './outside.js';
 
 const M = 48;
 const HALF = PLAYER.height / 2;
@@ -37,13 +37,8 @@ export class FinaleWind extends Gusts {
         super(world, { gust: F.gust, towels: [], x0: F.mooring.x0 - 200, x1: F.balcony.x1, top: F.balcony.y - 60, bottom: F.mooring.y, route: 'inside' });
         const s = this.scene, D = s.DEPTH;
         this.F = F;
-        F.socks.forEach((k, i) => {
-            const pole = s.add.rectangle(k.x, k.y, 2, 46, 0xe8eaec).setOrigin(0.5, 1).setDepth(D.props + 0.03);
-            const cap = s.add.rectangle(k.x, k.y - 46, 4, 2, 0x9babb2).setOrigin(0.5, 1).setDepth(D.props + 0.03);
-            const img = s.add.image(k.x + 1, k.y - 45, 'windsock').setOrigin(0.5, 0).setDepth(D.props + 0.035);
-            world.add([pole, cap, img]);
-            this.flappers.push({ img, k: 3.6, i });
-        });
+        // (The generated windsock, its eye on the pole's top: the pole's grey cap went with the drawn sock, 2026-11-27.)
+        F.socks.forEach((k, i) => this.flappers.push(windsock(world, k.x, k.y, 46, D.props + 0.03, i)));
     }
 
     active() {

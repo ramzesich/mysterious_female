@@ -683,8 +683,11 @@ export const lido = {
             }
             await w.tween({ targets: img, y: k.y - 1, x: img.x + k.dir * 8, angle: 100, duration: 300, ease: 'Quad.easeIn' });
             sfx.at(img.x, k.y).plop();
-            s.tweens.add({ targets: img, alpha: 0, delay: 900, duration: 500, onComplete: () => img.destroy() });
-            w.foodGulls?.gull_pool?.pounce(img.x);
+            // (A pool gull is down for it and off with it, as the Great Outdoors' with a cone; the user, 2026-11-27. It had sat
+            // on it and pecked while it faded.)
+            if (!w.foodGulls?.gull_pool?.grab(img, 'stub', k.y, 400)) {
+                s.tweens.add({ targets: img, alpha: 0, delay: 900, duration: 500, onComplete: () => img.destroy() });
+            }
             k.state = state === 'acting' ? 'idle' : state;
             k.pose = null;
             k.nextSquirt = s.time.now + 3000;
@@ -842,7 +845,8 @@ export const lido = {
         this.world.carryBox.take(kind);
     },
 
-    // Too much: it goes over, onto the deck, and a gull is on it at once.
+    // Too much: it goes over, onto the deck, and the gull is down for it at once and off with it (`grab`); if it is away,
+    // the cone fades where it lies.
     toppled(x, y) {
         const s = this.scene, w = this.world, L = this.L;
         const img = s.add.image(x, y + 8, 'load-cone').setOrigin(0.5, 1).setDepth(s.DEPTH.props + 0.05);
@@ -850,7 +854,7 @@ export const lido = {
         w.say(t('say.oops'), 700);
         s.tweens.add({ targets: img, x: x - 16, y: L.y, angle: -110, duration: 380, ease: 'Quad.easeIn', onComplete: () => {
             sfx.at(img.x, L.y).plop();
-            w.foodGulls?.gull_go?.pounce(img.x - 4);
+            if (w.foodGulls?.gull_go?.grab(img, 'cone')) return;
             s.tweens.add({ targets: img, alpha: 0, delay: 1700, duration: 700, onComplete: () => img.destroy() });
         } });
     },

@@ -565,9 +565,12 @@ export class World {
             const depth = D.player + 0.3, parts = [];
             if (c.kind === 'panel') {
                 const g = panels[c.deck] ??= s.add.graphics().setDepth(depth);
-                const h = c.y - 8 - c.y0;
-                g.fillStyle(0xf4f4f4, 1).fillRect(c.x0, c.y0, c.x1 - c.x0, h);
-                g.fillStyle(0xc7dcd0, 1).fillRect(c.x1 - 1, c.y0, 1, h).fillRect(c.x0, c.y0, c.x1 - c.x0, 1);
+                // (Under a pool's tank it starts at the tank's foot: drawn to the recess's ceiling it ran up over the tank,
+                // which hangs into the slab there.)
+                const y0 = s.tankFoot(c.x0, c.x1, c.y0) ?? c.y0, h = c.y - 8 - y0;
+                g.fillStyle(0xf4f4f4, 1).fillRect(c.x0, y0, c.x1 - c.x0, h);
+                g.fillStyle(0xc7dcd0, 1).fillRect(c.x1 - 1, y0, 1, h);
+                if (y0 === c.y0) g.fillRect(c.x0, y0, c.x1 - c.x0, 1);
                 parts.push(s.plateCopy(c.x0, c.y - 8, c.x1 - c.x0, 8 + PLAYER.sink, depth));
             }
             // (A row's end is not drawn again: windows and lamps on the side there are not its tiles, and a copy hid
@@ -729,25 +732,31 @@ export class World {
         const s = this.scene, D = s.DEPTH, f = this.data.funnel;
         const x0 = f.x0 - 18, w = f.x1 - x0;
         const back = s.add.graphics().setDepth(D.exterior + 0.07);
+        // (The far railing in front of her too, just under the near one (the user, 2026-11-27: "make both of the
+        // horizontal white lines obscure her, not only the lower one"): at this size the two read as one railing.)
+        const far = s.add.graphics().setDepth(D.player + 0.29);
         const front = s.add.graphics().setDepth(D.player + 0.3);
-        // A steel grating along the lattice's top, white rails behind and in front.
+        // A steel grating along the lattice's top, white rails on the far side and the near.
         back.fillStyle(0x7f708a, 1).fillRect(x0, f.y, w, 5);
         back.fillStyle(0x9babb2, 1).fillRect(x0, f.y, w, 2);
         for (let x = x0 + 2; x < f.x1; x += 4) back.fillStyle(0x3e3546, 1).fillRect(x, f.y + 2, 1, 2);
-        for (const g of [back, front]) {
-            const top = g === back ? f.y - 34 : f.y - 30;
+        for (const g of [far, front]) {
+            const top = g === far ? f.y - 34 : f.y - 30, h = f.y - top + (g === front ? PLAYER.sink : 0);
             g.fillStyle(0xe8eaec, 1).fillRect(f.x0 + 14, top, f.x1 - f.x0 - 14, 2).fillRect(f.x0 + 14, top + 14, f.x1 - f.x0 - 14, 1);
-            for (let x = f.x0 + 14; x <= f.x1; x += 44) g.fillRect(Math.min(x, f.x1 - 2), top, 2, f.y - top + (g === front ? PLAYER.sink : 0));
+            for (let x = f.x0 + 14; x < f.x1 - 2; x += 44) g.fillRect(x, top, 2, h);
+            // (A post at the very end, the railing's corner: the rails ended in the air 20 px past the last post, and she
+            // stood over the open end (the user, 2026-11-27).)
+            g.fillRect(f.x1 - 2, top, 2, h);
         }
-        this.add([back, front]);
+        this.add([back, far, front]);
         const walk = { x0, x1: f.x1, y: f.y, dropThrough: false };
         walk.zone = s.add.zone(x0, f.y, w, 6).setOrigin(0);
         walk.zone.walk = walk;
         s.physics.add.existing(walk.zone, true);
         s.walkGroup.add(walk.zone);
         s.walks.push(walk);
-        // She stops at its aft end's rail.
-        const stop = s.add.zone(f.x1 + 4, f.y - 40, 8, 80);
+        // She stops short of its aft end's post.
+        const stop = s.add.zone(f.x1 - 4, f.y - 40, 8, 80);
         s.physics.add.existing(stop, true);
         (s.railingStops ||= []).push(stop);
     }

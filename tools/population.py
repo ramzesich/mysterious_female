@@ -202,7 +202,7 @@ TANGERINES = {
     # Chapel, right of the tap: the user, 2026-11-24, "Place a tangerine here. Move some other tangerine here".)
     "tan_12_restroom": ("restroom", 44, 1, 33, None),
     "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
-    "tan_funnel": ("funnel", 189.2, 1, 13, None),
+    "tan_funnel": ("funnel", 189.2, 1, 15, None),     # (on the generated toolbox's lid, 15 px up: 2026-11-27)
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
     # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
     "tan_7_splash": (7, 29.0, 1, 16, None),   # (P6, §7f: behind the pillow fort, on its own kids' table; at 41.2 m until 2026-11-26)
@@ -1194,7 +1194,9 @@ FLARES = {"haz_flare_a": (12, 185.4, 0.8, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
 # no further aft than the towels can be seen from), towels on its deck chairs (the tell), a gull on
 # the end rail.
 TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 225),
-               towels=[(215.85, 24), (217.65, 24)], gull=(220.0, 40))
+               # (The gull on the planter palm's aft frond, its feet on the frond's top: at 220.0 m, 40 px up, it stood on
+               # nothing, past the glass screen's end closed and over the end post open; the user, 2026-11-27.)
+               towels=[(215.85, 24), (217.65, 24)], gull=(219.15, 59))
 # The sun deck (`gust_sundeck`; plan-the-rest §7f, 7): gusts as the aft terrace's over its open part, from the stair core to
 # the court (m), so that the hop over the old lady's sunbed is timed and the cake (after the horn) wobbles in them unless
 # she stands still (`SWAY.gust` in src/world/carry.js); towels over the two loungers' backrests the tell (m, px up: the
@@ -1210,8 +1212,21 @@ SUNDECK = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span
 FUNNEL_TOP = dict(gust=dict(every=5.0, blow=1.2, tell=0.7, drift=60), gulls=2, swoop=10.0,
                   horn=185.0, toolbox=189.2, telescope=192.3, look="slot_balcony")
 # Flocks of gulls on the bow until the horn sends them off (`gull_bow_a`, `gull_bow_b`): id: (deck,
-# from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen).
+# from m, to m, how many, px up: the kids' pool's rims, the Spinnaker balcony's windscreen). (Since 2026-11-27 each
+# gull's own place is `FLOCK_BIRDS`; the stretch and the count here are the world builder's no more, only the deck and
+# the height the flock answers at.)
 FLOCKS = {"gull_bow_a": (12, 57.75, 63.3, 6, 0), "gull_bow_b": (12, 33.0, 42.5, 6, 96)}
+# Each flock's gulls (the hull's top review's 10, the user, 2026-11-27: "they look copied"; the poses generated, the
+# layout approved in the running game): id: [(m, px up from the deck's floor, pose, facing aft, afloat)]. The pose is
+# `gull-<pose>` among the things; most face forward (left) unflipped. The windscreen's six at uneven gaps along its
+# rail; the kids' pool's clear of the kid, his bucket and the slide (its rims are some 18 px free each side): one on
+# the forward rim, one on the slide's top, two on the splash mushroom's cap, two afloat.
+FLOCK_BIRDS = {
+    "gull_bow_b": [(33.1667, 96, "look", 0, 0), (33.7083, 96, "perched", 1, 0), (34.1875, 96, "preen", 0, 0),
+                   (37.9167, 96, "doze", 1, 0), (40.8542, 96, "perched", 0, 0), (42.25, 96, "sit", 1, 0)],
+    "gull_bow_a": [(57.625, 0, "look", 0, 0), (63.3542, 43, "perched", 0, 0), (64.5208, 60, "doze", 1, 0),
+                   (64.9375, 60, "preen", 0, 0), (59.6875, -4, "sit", 1, 1), (61.25, -4, "sit", 0, 1)],
+}
 
 # --- Region 9's own things (docs/population.md: deck 12 forward, the spa, the officers' corridors,
 # the bridge, the kids' clubs; src/world/bow.js) -----------------------------------------------------
@@ -1257,7 +1272,7 @@ FINALE = dict(
     # (`drift`: as on the balconies, she is carried about twice this many px a second: here, back
     # by two metres a gust if she does not steer, and still forward, slowly, if she does.)
     gust=dict(every=4.0, tell=0.7, blow=1.1, drift=48),
-    socks=[(11, 25.1), (7, 1.05)],
+    socks=[(11, 24.475), (7, 1.05)],     # (the balcony's 30 px forward of 25.1 m: the user, 2026-11-27)
     gulls=[dict(drop=190, a=9.0, b=23.2, v=2.3), dict(drop=395, a=2.5, b=19.5, v=2.0)],
     mooring=dict(deck=7, a=1.4, b=20.4, cat=4.0, wall=21.4),
     home=dict(step=128, sit=206, cat=178, husband=160),

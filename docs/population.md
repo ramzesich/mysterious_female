@@ -780,8 +780,10 @@ second, the camera zooms out forward over the bow (-63.4 to 60.6 m, every deck c
 at the bar, `amb_barman_sp`; `amb_lounge` two in armchairs.
 
 **The kids' pool 57.5-67.** 60 `sec_slide` (`quirk`: walk onto the slide's top: she rides it into
-the pool); `gull_bow_a` six gulls on the rim until the horn (they flap in her face: "Swooped" if she
-pushes through before the horn; the way through is then the pool itself, swimming under them);
+the pool); `gull_bow_a` six gulls about the pool until the horn (the block planned here, "they flap in her face:
+Swooped if she pushes through before the horn; the way through is then the pool itself", was never built; since
+2026-11-27 one on the forward rim, one on the slide's top, two on the splash mushroom's cap, two afloat, in poses of
+their own: `FLOCK_BIRDS`);
 `amb_kids_pool` two kids.
 
 **The chapel lobby 67-74.** 68.6 the chapel (built): `scn_ceremony` after the cake, `slot_chapel`

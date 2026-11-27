@@ -5525,3 +5525,195 @@ Where it stopped (the user: "We'll continue next day. Save our progress"):
   the pile and the teddy 1 px lower; the toy box made again seen from the side (of four tries, a red painted chest,
   `assets/source/ship/tries/toy-box-side/`, `toy-box-chest` in `tools/build_ship_art.py`), at its generated size.
 - **Tests:** `mishaps.stretches` (book 15 on the way home), `region9`, `boot` pass; `check_overlaps` 0. 40 generations.
+## The pools' tanks over the decks under them (the Refinement session, 2026-11-27; the hull's top review, 1 and 11)
+
+- **What was wrong** (`docs/audit-hull-top-2026-11-26.md`): the tanks are drawn over the ship's side on purpose (their
+  floor seen from their deck, the user). Deck 12's kids' pool reached 20 px into deck 11's window row; under deck 11's
+  pools, deck 10's balcony dividers (the panels the game draws over her) ran up over the tanks' last rows.
+- **The kids' pool:** its tank drawn a tile thinner, walls and bottom (8 px each, `TANK_WALL` in the ship scene), so
+  that it reaches 12 px into the windows; the windows as they were (the user: "Don't change the windows"). The map's
+  tiles stay (play is the same); only the walls' top tiles at the deck's floor are the deck's own floor tile, or their
+  outer half showed beside the rim (`tools/build_ship_map.py`). The water and her swimming are as they were.
+- **Deck 11's pools keep their two tiles** (the user, after seeing them thinner: the drain's hatch and grate are drawn
+  for that floor and hung under a thinner one). **Deck 10's dividers under them start at the tank's foot**, where the
+  doors' glass shows from under it (`tankFoot()`, the panels in `src/world/world.js`); elsewhere they still reach the
+  balcony's ceiling. A tank's rows run from 4 px under its floor: its foot is 4 px past the walls' thickness.
+- **Not done yet:** the 3% ghosts while she swims (finding 2, the fractional deck; "not now, at first the two above").
+  Finding 12 (hidden at the `stern` start) is by design (the user).
+- **Checks:** region6, region7, region9 pass (14 cases). No generations.
+
+## The ghosts while she swims (the Refinement session, 2026-11-27; the hull's top review, 2)
+
+- **What was wrong:** swimming set the cut-away's deck to `deckAt(pool.y)`, a fraction (11.97 in the kids' pool, 10.97
+  in deck 11's), so the pool's deck kept 3% of its hull over it and the deck below showed 3% of its inside through its
+  side, faint ghosts of its furniture (at most 6 brightness steps; the user: "I don't understand what changed", shown
+  with the contrast raised).
+- **Built:** in the water her deck is the pool's own, whole (`this.pool.deck` in `updateCutaway`).
+- **Checked (the user: "check carefully that this fix didn't break anything else"):** fifteen places shot with and
+  without it, the cut-away's state and the pictures compared: balconies, cabin 8206, the maid's cabin, the corridors
+  of decks 3, 4, 5, 8, 9 and 10, deck 12, the pool deck and the outside view all the same (the only pixels that differ
+  are things in motion: gusts, gulls, towels, Bumbot running, the sea's glints). region6, region7, region9, deck3,
+  highlight pass. Not merged to main (the user: no merges until they say so).
+
+## The Great Outdoors' gull on its rail from the start (the Refinement session, 2026-11-27; the hull's top review, 3)
+
+- **What was wrong:** `FoodGulls` made every bird at the circling gulls' start, over its stretch's middle; the Great
+  Outdoors' (`gull_go`), the one with a perch, stood there on air in its sitting picture until she came within 19 m, so
+  the outside view and the intro showed a gull hanging under deck 12's terrace (in play it was always on its rail by the
+  time it was on the screen).
+- **Built (the user: "why is it not just placed on its perch from the beginning?"):** a gull with a perch is made on it;
+  the pool's circling gulls start where they did.
+- **Checks:** region6 (its dive at her cone) passes; mishaps fails only on deck 9's sprinkler, as on main. Not merged.
+
+## The gulls take a cone lying on the deck (the Refinement session, 2026-11-27; with the hull's top review, 3)
+
+- **The user:** "When we drop the cone for whatever reason (for example, on the red line, when filling the cone at the ice
+  cream machine), the gull sits on top of it and eats it. That doesn't look good the way it is done right now. Let the
+  gull steal the cone in any case: either when it successfully dives at us with the cone in our hands, or when the cone
+  is on the ground. Same mechanic of flying away, and then returning back after a short while." And the pool's gull with
+  the kid's turned-down stub: "Yes, it should that too".
+- **Built:** `grab()` in `FoodGulls` (`src/world/hazards.js`): from its perch or round, from hanging over her, from the dive
+  or on its way home (not while off with something, nor down for a tangerine, nor once the kid has sent the pool's off),
+  a swoop down to the cone (`gull-down`), the cone gone from the deck and in its beak, off the screen, back after the
+  steal's own times (`FLIGHT`). Called by the cone gone over at the machine (`toppled`, `src/world/lido.js`), a cone or
+  stub out of her hands in the Great Outdoors' stretch (`spill`, `src/world/carry.js`; nothing there knocks one out in
+  play today), and the kid's stub on the pool's rim (the pool's gull, wherever he walks it). If the gull is away, a
+  dropped cone fades where it lies, as before. The old peck on a cone is gone; on a tangerine it stays.
+- **Checks:** region6 (the toppled cone taken, the gull back on its rail; the kid's stub taken by a pool gull),
+  deliveries pass; mishaps only deck 9's sprinkler, as on main. Not merged.
+
+## The sprinkler's playtest mended (the Refinement session, 2026-11-27)
+
+- **The user:** "What is about that failing test, and why do we accept it as normal?" `mishaps.things`' deck 9 sprinkler
+  (16) had failed since at least 2026-11-25, written down each time as "fails on main too" and never looked into.
+- **Found:** the game is right; the test waited for the sprinkler to be raining, and caught the rain's last moment as
+  often as not (the page's load time sets the sprinkler's phase at the takeover). She set off, the rain stopped, she
+  came under it dry and ran on into the swinging door at 159.6 m (13a), which is what the failure showed.
+- **Mended (the test only):** it waits for the rain to be off, then on, so that she sets off as it starts. Three runs of
+  `mishaps.things` and the whole `mishaps` (10 scenarios) pass. CLAUDE.md's lesson that called it "fails on main too"
+  says what it was. Not merged.
+
+## The aft terrace's gull on the palm (the Refinement session, 2026-11-27; the hull's top review, 4)
+
+- **What was wrong:** `gull_terrace` stood at 220.0 m, 40 px up, on nothing: past the glass screen's end (50 px) in the
+  closed view, 8 px over the end post (32 px) on its edge in play.
+- **The user:** "Place it on the palm tree, let me see how it looks", then "Approved": on the planter palm's aft frond,
+  its feet on the frond's top (219.15 m, 59 px up; `TERRACE` in `tools/population.py`). The palm's crown shows over the
+  glass screen from outside, so the gull stands on it in both views.
+- **Checks:** region8 (lingering by it: its swoop onto her, 20) and mishaps.gulls pass. Not merged.
+
+## Deck 12's glass screen see-through from outside (the Refinement session, 2026-11-27; the hull's top review, 5)
+
+- **What was wrong:** in the outside view (and wherever deck 12's side is closed), the glass screen along its open deck
+  was painted solid, so what stood behind it showed only over its top: people's hair, a palm's fronds, the kids' splash
+  mushroom's cap. The forward terrace's screen (the game's `bulwark`) was see-through.
+- **Built (the user's A):** the screen's glass painted at the forward terrace's strength, 0.45 (a shape over the shell
+  may carry its own alpha now: `rect(..., alpha)` in `shell_details`, `s[6]` where the ship scene draws them). Its
+  white band under the glass still hides them from the knees down.
+- **Checked (the user: "check carefully surrounding decks in various states"):** the outside view along deck 12 at the
+  start, mid-story and at the sunset, play from deck 11 under each stretch and from deck 10, and deck 12's rooms, each
+  before and after, compared by pixel: only the three stretches of glass changed, and what shows through them stands
+  there (kids, slide, mushroom, tub, palms, the old lady, the sun deck's rival, the court's players, the shuffleboard
+  players). Two things shown to the user and left as they are (the user): the aft terrace's end post seen through the
+  glass as a lower rail, and a pickup's glint (the parasol's) twinkling through it from mid-story.
+- **Checks:** boot, region8, region9 pass. Not merged.
+
+## Deck 12's side walk over the pools left as it is (the Refinement session, 2026-11-27; the hull's top review, 6)
+
+- **What the finding was:** deck 12's rail and floor change at about 115 m. Looked into: by design. From 115 to 145 m
+  deck 12 is open over deck 11's pools (`POOL_OPENING` in `tools/build_ship_map.py`) and she crosses on the side walk,
+  where ↓ drops her into a pool (GAME_DESIGN §5.3). The walk has a thin white slab and a glass rail in front of her
+  (a drop); the solid deck either side (110 to 115 m by the stair core, the court from 145 m) has the grey slab and no
+  near rail, as deck 12's other open parts. From outside the floor band and the glass screen run on unbroken.
+- **Offered:** A leave it; B carry the rail on to the core's wall and the court; C give the walk the deck's floor.
+- **The user: A.** Nothing changed. Pictures and scripts: `docs/audit-hull-top/walk/`.
+
+## Deck 12's open front left as it is (the Refinement session, 2026-11-27; the hull's top review, 7)
+
+- **What the finding was:** the forward sun deck (the Spinnaker balcony, 31 to 44 m) stays closed while she walks on it:
+  seen faintly through the glass, a 24 px white band hiding her from the hem down. Looked into: the user's own choice of
+  2026-11-07, the same as deck 11's front (`bulwark` in the ship scene: in front of her, "hidden behind the white, seen
+  through the glass"); deck 12's windscreen tall since it must be too tall to jump (§6.1.9), so all of her is behind it.
+- **Offered:** A leave it; B lighter glass while she is on it; C a lower white band; D both.
+- **The user: A.** Nothing changed. Pictures and script: `docs/audit-hull-top/front/`.
+
+## The funnel's smoke drawn as the fog machine's (the Refinement session, 2026-11-27; the hull's top review, 8)
+
+- **What was wrong:** the funnel's smoke was flat white discs (`puff`) swelling to 166 px; by day bubbles, at sunset,
+  tinted by the evening light beside the setting sun, more suns.
+- **Tried and turned down (the user):** two generated puffs in the sky clouds' style ("neither of those look like smoke
+  going out of the pipe, not even close"), then plumes inpainted into the game's picture of the stacks on a green sky
+  ("neither ... fit our pipes"). 28 generations, kept in `assets/source/smoke/tries/` (its README).
+- **Built (the user: "the approach we did with the DJ's smoke machine. Just less volume. Out of each pipe. Random
+  cycles of more and less amount of smoke"):** `drawSmoke` in the ship scene, `FUNNEL_SMOKE` in the config: per pipe 44
+  small soft puffs in white and pale grey, each with its own age and place across the pipe's mouth, rising 55 px and
+  bending 100 px aft over 3 s, growing and thinning; each pipe gives more and less by turns (two slow swells out of
+  step, its own phase), a puff born only while its pipe gives enough, so a lull drifts up the plume. Drawn on the
+  sea's clock: on in the outside view, held for a still picture. The pipes' rims over its first puffs. The horn's
+  cough keeps the old `puff` discs. Approved by the user.
+- **Checks:** boot, region8 pass. Pictures: `docs/audit-hull-top/smoke/`. Not merged.
+
+## The funnel's top mended (the Refinement session, 2026-11-27; the user's, after the hull's top review's 8)
+
+The user, at the funnel's top: "let's fix the other stuff on the funnel", one thing at a time, committed together ("The
+funnel is finished").
+
+- **The railing's end:** the rails stopped in the air 20 px past their last post, and she was held at the edge by an
+  invisible wall ("visually it looks like can just go through and fall"). A post at the very end of both rails (the
+  corner, as a railing turning across its end reads from the side); her stop 8 px back, short of it.
+- **Both rails over her** (the user: "make both of the horizontal white lines obscure her, not only the lower one"): the
+  far railing drawn just under the near one, in front of her (and so of the horn's post, the toolbox and the telescope,
+  which stood in front of it before; said to the user).
+- **The horn, its cord, the toolbox generated** (the user: "generate proper horns and the horn cable. Also, generate the
+  boxes there, that the tangerine is placed on"): two tries of each but the cord, placed in the running game; the user
+  chose horn B and toolbox A. `tools/build_funnel_top.py`, `assets/ship/funnel-top/`, in their own colours (the palette
+  turned the pole green and the lunch box purple). Bumbot on the horn's top bar at the height he sat; the tangerine on
+  the lid between the handle and the lunch box, 15 px up (13; the map data changed in that alone). 27 generations.
+- **Her hands on the cord** (found recording the pull, the user: yes): she had always pulled at the air, the handle
+  behind her. Her fist measured in each frame of `her-pull` (`HORN_FISTS`); she steps beside the cord, facing it, and
+  the handle follows her fist (its knot over her fingers, her fist over its wood), swinging back up as she lets go; at
+  rest it hangs where her first frame takes it (`HORN_REST`, 7 px higher). From either side.
+- **The blast's smoke** (the user: yes): the horn's cough was eight of the old flat discs; now every pipe gives a
+  thicker burst of the drawn smoke for the blast's length (`smokeBurst`, `FUNNEL_SMOKE.burst`). The disc picture is gone.
+- **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/funnel/`. Not merged.
+
+## The hull's top review, finding 9: the windsocks (the Refinement session, 2026-11-27)
+
+The funnel's three windsocks hung straight down between gusts (3.1 s of every 5) and read as striped posts; in a gust
+the whole bar turned stiffly; the one at the stairway's foot had the handrail across it (recorded: `rec-*.gif`). The
+user: a generated sock (A), drooping and swaying at rest (yes), the foot's sock moved forward clear of the rail (a), the
+bow's two finale socks the same (change).
+
+- **Generated:** three tries, each the same sock in three states (limp, half filled, full) side by side, the funnel's
+  toolbox as the style; the user chose B from the tries moving in the running game (`anim-sheet.png`). Its ring first
+  came off the pole ("its horizontal position moves forward, and looks disconnected from its pole. It has to be
+  connected to the pole with its ring in all positions"): the eye had been found by its grey, and the sock's white
+  stripes passed for grey. Measured by hand, the same spot in all three states; it is put on the pole's top and the sock
+  turns round it. 15 generations (`assets/source/windsock/tries/`, its README).
+- **Built:** `tools/build_windsock.py` into `assets/ship/windsock/` with `windsock.json` (each state's eye);
+  `windsock()` in `src/world/outside.js` (a pole and its sock, a Gusts' flapper): limp with a slow sway in a lull, half
+  filled in a gust's tell, full and fluttering in its blow. The code-drawn sock is gone, and the bow poles' grey cap.
+- **Moved:** the stairway foot's sock forward of the ladder, 30 px from the roof's front edge (first 46 px forward, then
+  the user: "in front of where she is standing", forward of her spot); the Spinnaker balcony's sock 30 px forward
+  (`FINALE["socks"]`, 24.475 m; the user's choice of four places; it stays behind the balcony's glass, as before).
+- **Checks:** boot, region8, finale pass. Pictures and scripts: `docs/audit-hull-top/socks/` (`built-stairway` shows the
+  foot's sock at its first place; `forward.png` the last). Not merged.
+
+## The hull's top review, finding 10: the bow's gulls (the Refinement session, 2026-11-27)
+
+Both flocks were one picture twelve times (every other one mirrored), two even groups of three a flock, barely moving;
+on the kids' pool's rims they stood over the kid, his bucket and the slide. The user: new poses (A, all four); the pool's
+gulls kept (they fly off in the horn's shot, take a thrown tangerine, lift at her cry), moved clear.
+
+- **Generated:** preening, sitting, looking back, dozing, each an edit of the perched gull's own picture (the same bird),
+  20 generations (`assets/source/things/tries/gull-poses/`, its README); in the things atlas at the perched one's scale.
+- **Placed** (`FLOCK_BIRDS` in `tools/population.py`, each gull's metre, height, pose, facing, afloat; the layout mocked in
+  the running game and approved): the windscreen's six at uneven gaps; the pool's on the forward rim before the kid, on
+  the slide's top, two on the splash mushroom's cap, two afloat (the rims have some 18 px free a side). A flock's
+  stretch is now from its first gull to its last (the horn's pan follows it).
+- **Their life** (`Flock` in `src/world/topdeck.js`): each standing gull on a round of its own (7 to 13 s) spends 2.4 s
+  looking back, preening or turned round; the afloat bob; the dozing and sitting stay. Her cry, a tangerine, a jump at the
+  rail and the horn go from each gull's own place.
+- **Not built, found in the plan:** `docs/population.md` had the pool's gulls as a block ("Swooped" if she pushes through);
+  it never was. Left as it is (noted there).
+- **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/gulls/`. Not merged.

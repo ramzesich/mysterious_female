@@ -496,6 +496,10 @@ def build_layers():
         fill(solid, col(a) - 1, col(a) - 1, top, bottom, POOL_TILE)
         fill(solid, col(b), col(b), top, bottom, POOL_TILE)
         fill(solid, col(a), col(b) - 1, bottom, bottom, POOL_TILE)
+        # (Deck 12's kids' pool is drawn a tile thinner, `TANK_WALL` in the ship scene: the outer half of its walls' top
+        # tiles shows, at the deck's floor, the floor it is sunk into; the user, 2026-11-27.)
+        if deck == 12:
+            solid[top][col(a) - 1], solid[top][col(b)] = solid[top][col(a) - 2], solid[top][col(b) + 1]
 
     # Funnel and mast, standing on the roof.
     # (Solid but drawn by the game's shell: the navy funnel and the white mast, §5.3.)
@@ -709,8 +713,8 @@ def shell_details(ext, solid):
             return shell_owner(deck, c)
         return "fixed" if t else None
 
-    def rect(owner, x, y, w, h, colour):
-        put(owner, ["r", round(x), round(y), round(w), round(h), colour])
+    def rect(owner, x, y, w, h, colour, alpha=None):
+        put(owner, ["r", round(x), round(y), round(w), round(h), colour] + ([alpha] if alpha is not None else []))
 
     def span_owner(x0, x1, r, deck):
         """Whose wall a detail from x0 to x1 is on, or None if it would straddle the edge of the cut
@@ -947,7 +951,9 @@ def shell_details(ext, solid):
                 if indoor(deck, m) or in_core(m) or on_front_bulwark(deck, x) or any(a <= x < b for a, b in walled):
                     continue
                 rect(deck, x, floor - 24, TILE, 24, "#e8eaec")
-                rect(deck, x, floor - 48, TILE, 24, "#bfe6f5")
+                # (Its glass see-through, as the forward terrace's (0.45, the `bulwark` the game draws): solid, whatever stood
+                # behind it showed only over its top, the people's hair, a palm's fronds; the user, 2026-11-27.)
+                rect(deck, x, floor - 48, TILE, 24, "#bfe6f5", 0.45)
                 rect(deck, x, floor - 50, TILE, 2, "#cd683d")
             for x in range(x0, x1, 48):
                 if not indoor(deck, metres(x // TILE)) and not in_core(metres(x // TILE)) and not on_front_bulwark(deck, x)                         and not any(a <= x < b for a, b in walled):

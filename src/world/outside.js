@@ -30,6 +30,18 @@ const TOWELS = [0xf68181, 0x8fd3ff, 0xfbb954, 0xb9e04c, 0xffffff];
 const nearby = (s, d) => Math.abs(s.player.x - d.x) < 900 && Math.abs(s.player.y - d.y) < 320;
 const deckOf = (def, y) => 8 + Math.round((def.bottom - y) / 144);
 
+// A windsock on its pole (the hull's top review, finding 9; the user, 2026-11-27: generated, try B): its pole `h` px up
+// from `foot` at `x`, the sock's swivel eye on the pole's top in every state, turned round it (`tools/build_windsock.py`):
+// limp in a lull, half filled in a gust's tell, full in its blow. A Gusts' flapper (`sock: true`); `i` sets its phase.
+export function windsock(world, x, foot, h, depth, i) {
+    const s = world.scene;
+    const pole = s.add.rectangle(x, foot, 2, h, 0xe8eaec).setOrigin(0.5, 1).setDepth(depth);
+    const sock = s.cache.json.get('windsock'), p = sock.limp;
+    const img = s.add.image(x, foot - h, 'windsock-limp').setOrigin(p.eye[0] / p.w, p.eye[1] / p.h).setDepth(depth + 0.005);
+    world.add([pole, img]);
+    return { img, sock, i, pole };
+}
+
 // Gusts along the ship's side (population: `gust_balc`): every few seconds the towels on the rails
 // and the laundry flap (the tell), then the wind blows aft for a moment: in the air on the balconies
 // she is carried aft with it. A vault aft goes further; a vault forward, or a climb, falls short.
@@ -74,6 +86,15 @@ export class Gusts {
         const force = phase === 'blow' ? 1 : phase === 'tell' ? 0.5 : 0;
         for (const f of this.flappers) {
             if (f.img.x < view.x - 60 || f.img.x > view.right + 60) continue;
+            if (f.sock) {
+                // (A windsock: its state by the wind, its eye on the pole's top; a slow sway limp, a quicker one half
+                // filled, a flutter full.)
+                const k = phase === 'blow' ? 'full' : phase === 'tell' ? 'half' : 'limp', p = f.sock[k];
+                if (f.img.texture.key !== `windsock-${k}`) f.img.setTexture(`windsock-${k}`).setOrigin(p.eye[0] / p.w, p.eye[1] / p.h);
+                const [ms, deg] = k === 'full' ? [55, 3] : k === 'half' ? [260, 5] : [900, 4];
+                f.img.setAngle(Math.sin(time / ms + f.i * 1.7) * deg);
+                continue;
+            }
             // (Hung by its top: blown aft, its foot swings aft and it flutters.)
             const flutter = Math.sin(time / (force ? 55 : 700) + f.i * 1.7);
             f.img.setAngle(force ? -f.k * force * (16 + flutter * 9) : flutter * 1.5 * f.k);

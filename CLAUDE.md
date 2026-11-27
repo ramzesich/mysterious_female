@@ -71,6 +71,8 @@ truth**: read the relevant section before any design or content work, and record
 | `tools/build_laundry_chute.py`, `assets/source/ship/laundry-chute/` | **The laundry chute** (the user's, 2026-11-24; its README has the jobs, 65 generations): from the tries the user chose, the laundry's ceiling outlet (cut from its try by what differs from the room, its duct made solid through the ceiling) and the cart heaped with towels, both laid into the laundry's picture by `tools/draw_rooms.py`; her going in at the linen room's hatch (`chute-in`: a clip on the room's own hatch turned green, cut out, on her palette, the room's hatch showing through while the flap is shut), her dive out of the outlet (`chute-dive`), the towel on her head (`chute-towel`) and its fall like cloth to lie flat (`chute-towel-fall`), into `assets/ship/chute/` with `chute.json`. In the game: `chute`, `chuteDrop` (the rooms crossfaded with the closed hull by the ship scene's `roomFade`, the camera held on her down the 2 s drop), `outOfTheChute`, `placeHat` (after the physics, each frame), `hatOff` in `src/world/story.js`; `CHUTE` in `src/config.js` |
 | `tools/build_checkpoint_doors.py`, `assets/source/ship/checkpoint-doors/` | **The checkpoints' own doors** (plan-the-rest §7e, the user's four tries all used, 2026-11-26): burgundy and navy padded theatre doors (the foyer, the Arcade), walnut and mahogany (the Library, Cagney's), each leaf set into a doorcase on the crew door's frame and its lit `-ajar` twin made by the crew door's ajar geometry (round windows laid back whole as ovals), into `assets/source/ship/<name>/`; run `tools/build_ship_art.py` after. A checkpoint's door is the fifth field of `CHECKPOINTS` in `tools/population.py` (`trunk:<name>`: the lamp over a trunk's own door); `lightCheckpoint` shows its own twin. Nineteen places (23 as the game counts them); **she never comes back behind a door shut to her** (`closestCheckpoint`, `shutBetween` in the ship scene; `region7.shut`) |
 | `tools/recolour_suitcase.py` | **Deck 5's red suitcase** (plan-the-rest §7f, 3; the user, 2026-11-26: "Make two suitcases different colors", red of four): deck 4's slate case turned burgundy in its world picture (`suitcase-rolling-red`) and in every frame of her gags with it (`redcase-*` in `her-mishaps`, placed as the slate ones by `shift_as`, their heads by `SAME_AS` in `tools/build_heads.py`); only the case's own mid tones, in pieces of a dozen px or more. A roller's `look` picks its picture and `GAGS['suitcase-<look>']`'s clips (`rideGag`). Run before `tools/build_things.py` and `tools/build_sprites.py` |
+| `tools/build_funnel_top.py`, `assets/source/funnel-top/` | **The funnel's top** (the hull's top review, the user, 2026-11-27): the generated horn on its post (horn B), its cord (a rope strip the game crops to the pull, and the red handle) and the engineer's toolbox with its lunch box (A), in their own colours, into `assets/ship/funnel-top/` with `funnel-top.json` (the pole's column, Bumbot's seat, where the cord hangs, the lid's free spot for the tangerine, 15 px up). In the game (`src/world/topdeck.js`): her pull at the cord from beside it, facing it, the handle in her fist frame by frame (`HORN_FISTS`, `HORN_REST` in the config, `cordInFist`); the horn's blast a thicker burst of the funnel's drawn smoke (`smokeBurst`; the smoke itself `drawSmoke`, `FUNNEL_SMOKE`, as the DJ's fog machine). The top's railing: both rails over her, a post at its aft end (`buildFunnel` in `src/world/world.js`) |
+| `tools/build_windsock.py`, `assets/source/windsock/` | **The windsocks** (the hull's top review's 9, the user, 2026-11-27): one generated try (B) with the same sock limp, half filled and full, in its own colours, into `assets/ship/windsock/` with `windsock.json` (each state's swivel eye, measured by hand). `windsock()` in `src/world/outside.js` stands a pole and hangs the sock by its eye on the pole's top, a Gusts' flapper: limp swaying in a lull, half filled in the tell, full fluttering in the blow. The funnel's three (`src/world/topdeck.js`) and the bow's two in the finale (`src/world/finale.js`, `FINALE["socks"]`) |
 | `tools/build_gym_ball.py` | **The gym's two balls** (plan-the-rest §7f, 8; the user, 2026-11-26: purple and blue; "The balls have lines, so they should turn. The light has to stay still"): a generated ball's own shading (`assets/source/things/tries/gym-ball/`, its README has the ids) in every frame, a seam and two ribs drawn by rule on the sphere at 32 angles of a whole turn (a ball rolling in a side view turns in the picture's plane), the blue the same picture in another try's hue; into `assets/source/things/gym-ball-<colour>-<nn>.png`, in their own colours. Played by `Roller` with `thing: "gymball"` (`Roller.BALL`, `ballFrame`: by the px rolled). Run before `tools/build_things.py` |
 | `src/world/splash.js` | **Splash Academy's kids** (deck 7; the user, 2026-11-27): `PillowSiege` (the knight and the king lob one pillow over the castle to each other: their `throw` from the pillow at their toes to their stand, the game's pillow from the frame it leaves the hands; on her head, gag 26: `GAGS.pillow`, then her `her-dazed-sit-plain` with the pillow on her head, `wearHat` in the ship scene; `SIEGE` in the config) and `Tag` (two kids' laps; into her, 27; `TAG`, its `reach` and `clear` the hop's fairness); both gone with the catch. Their sources `assets/source/people/splash_*-raw/` |
 | `tools/draw_casino.py` | The casino's roulette and blackjack tables and the Stardust balcony's parapet, drawn by hand in strict side view (PixelLab kept drawing them at three-quarters): `assets/source/ship/casino-drawn/` |
@@ -959,7 +961,11 @@ Lessons learned (2026-11-25, her swimming and near-catch 5 from the water):
   mouth, "her face still visible", read at once.
 - **A real-time scenario fails under six browsers at once:** `sound`'s footsteps failed in `-j 6` and passed alone.
   And a failure outside the change is run on the tree without the change before it is called anyone's (`git stash`):
-  deck 9's sprinkler in `mishaps.things` fails on `main` too.
+  deck 9's sprinkler in `mishaps.things` failed on `main` too. **But "fails on main too" is not an answer:** that one was
+  then repeated as "known" for two days, until the user asked why it was accepted (2026-11-27). It was the test: it
+  waited for "raining" and caught the rain's last moment as often as not, by how long the page took to load, and she
+  came under the sprinkler dry and ran on into the next door. Find the cause of a failing check the first time it is
+  seen, or say plainly that it is not known.
 
 Lessons learned (2026-11-25, near-catch 6 remade):
 
@@ -1066,6 +1072,37 @@ Lessons learned (2026-11-26, the pills made a load):
 - **A hit reported for a thing that is not a person carries its height** (`world.touched({ x, y, ... })`): the deck 4
   vacuums gave only `x`, the spill's sound had no distance, threw every frame, and the game hung; no load had ever met
   them until the pills. A new path through old code is tested with each hazard on it, not only the new code.
+
+Lessons learned (2026-11-27, the hull's top and the pools' tanks):
+
+- **A finding is checked against the documented rules before it is reported:** deck 11 going bright under the kids'
+  pool was the rule (out in the open nothing is dimmed), and was reported as a fault; the user caught it. Read the
+  rule's section (GAME_DESIGN.md §5.3 for the dim) before calling a view wrong; a sweep of the rule (her placed at every
+  metre, the state read and compared with the map's own `indoor()`) settles it at once.
+- **A drawn thing thinner than its map tiles shows the tiles' other half:** the kids' pool's walls drawn 8 px where its
+  tiles are 16 left the tiles' outer half beside the rim; give those tiles the look of what is round them (the floor).
+- **A piece made for a surface is looked at when the surface changes:** the drain's hatch and grate were drawn for the
+  tank's 16 px floor and hung under an 8 px one. List what lies on a thing before resizing it.
+- **Where a drawing ends is measured from how it is drawn:** the tanks' rows run from 4 px under the floor, so their
+  foot is 4 px past the walls' thickness; a foot worked out from the thickness alone put the dividers 4 px into the tank.
+- **`render_ship.py` starts at the world's top (y 0):** what stands above it (the funnel's top, its stacks, the horn,
+  the radar mast's tip) is shot with the outside view at zoom 1 and a negative scroll.
+- **Smoke out of a pipe is not a generated picture:** two small puffs styled on the sky's clouds read as clouds sat on
+  the stacks, and plumes inpainted into the game's own picture "don't fit our pipes" (28 generations, none used). Drawn
+  as the DJ's fog machine is (many small soft circles each frame, each with its own age and way out, born only while
+  its pipe gives enough), it was approved at once. A flat disc scaled up reads as a sun at sunset.
+- **A pull is checked for the hands too:** her pull at the horn's cord had always been her reaching at the air, the
+  handle hanging behind her; the new cord made it plain. Measure the fist in each frame of the clip (the front-most skin
+  pixels in her cell), stand her where the first frame's fist closes on the thing, and move the thing with the fist.
+- **A rail that ends in the air reads as a way off:** the funnel's railing stopped 20 px past its last post, and she was
+  held at the edge by an invisible wall; a post at the very end closed it.
+- **A thing hung from a point is hung by that point measured by hand, never found by colour:** the windsock's swivel eye,
+  looked for as "grey", took in its white stripes, and its ring came off the pole by a few px in every state (the user:
+  "It has to be connected to the pole with its ring in all positions"). Measure the point in each picture, then check
+  it at the pole's top in every state and angle, enlarged.
+- **A crowd of one picture reads as copies:** twelve gulls of one pose, every other mirrored, at even gaps were "copied".
+  A few poses edited from the same picture (the same bird), each placed by hand where such a bird would sit (a rail, a
+  slide's top, a fountain's cap, the water) and changing pose now and then on a round of its own.
 
 ## Working with the user
 

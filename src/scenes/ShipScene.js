@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING, SHRUG } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING, SHRUG, FUNNEL_SMOKE } from '../config.js';
 import { wire } from '../wire.js';
 import { Controls } from '../controls.js';
 import { scenario } from '../world/mishaps.js';
@@ -84,6 +84,10 @@ const WALK_LIFT = 2;
 // A pool's tank: its wall's foot, px under the pool's floor (the tank's tiles are drawn in rows of 8 from 4 px under the
 // deck: `poolTanks`); the water is drawn down to it.
 const TANK_FOOT = 4;
+// How thick a tank's walls and bottom are drawn, px, by the pool's deck: deck 12's kids' pool a drawn tile thinner than
+// deck 11's, so that it reaches less far down over deck 11's windows (the user, 2026-11-27); deck 11's keep two tiles, the
+// drain's hatch and grate lying on that floor ("leave the floor and the walls as they were"). The map's tiles stay.
+const TANK_WALL = { 11: 16, 12: 8 };
 // Her climb into the lifeboat's roof hatch (`roofSteps`): the hatch's far rim and near lip, px over the walkway's floor
 // (tools/build_hatch.py's pieces: the boat's rows 26 and 37, its floor at 120); each frame's ms (her front frame and her
 // back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
@@ -252,8 +256,12 @@ export class ShipScene extends Phaser.Scene {
         for (const [a, b, deck] of spans) {
             const g = this.poolTanks[deck] ??= this.add.graphics().setDepth(DEPTH.poolTank);
             const top = floors[deck] * 16;
-            for (let x = a; x < b; x += 8) {
-                for (let y = top + 4; y < top + 48; y += 8) {
+            const wall = TANK_WALL[deck] ?? 16, x0 = a + 16 - wall, x1 = b - 16 + wall;
+            // (Where each tank's foot is: what the deck under it draws over the shell stops there, `tankFoot`.)
+            // (Its rows of 8 run from 4 px under the floor: the last ends 4 px past the wall's own thickness.)
+            (this.tankFeet ||= []).push({ x0, x1, foot: top + 4 + Math.ceil((28 + wall) / 8) * 8 });
+            for (let x = x0; x < x1; x += 8) {
+                for (let y = top + 4; y < top + 32 + wall; y += 8) {
                     const edge = x < a + 16 || x >= b - 16 || y >= top + 32;
                     g.fillStyle(edge ? 0x8fd3ff : 0x4d9be6, 1).fillRect(x, y, 8, 8);
                     g.fillStyle(edge ? 0xe3f4fb : 0x8fd3ff, 1).fillRect(x, y, 8, 1).fillRect(x, y, 1, 8);
@@ -358,7 +366,7 @@ export class ShipScene extends Phaser.Scene {
         for (const [owner, shapes] of Object.entries(JSON.parse(props.shellDetails || '{}'))) {
             const g = this.add.graphics().setDepth(DEPTH.exterior + 0.05);
             for (const s of shapes) {
-                if (s[0] === 'r') g.fillStyle(colour(s[5]), 1).fillRect(s[1], s[2], s[3], s[4]);
+                if (s[0] === 'r') g.fillStyle(colour(s[5]), s[6] ?? 1).fillRect(s[1], s[2], s[3], s[4]);   // (s[6]: see-through glass)
                 else if (s[0] === 'c') g.fillStyle(colour(s[4]), 1).fillCircle(s[1], s[2], s[3]);
                 else g.fillStyle(colour(s[2]), 1).fillPoints(s[1].map(([x, y]) => ({ x, y })), true);
             }
@@ -2363,28 +2371,51 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0x7a6e66, 1).fillRect(x, top - h, w, h);
             g.fillStyle(0x9b8e84, 1).fillRect(x + 4, top - h, 6, h);
             g.fillStyle(0x3e3546, 1).fillRect(x, top - h, w, 6);
-            pipes.push({ x: x + w / 2, y: top - h });
+            pipes.push({ x: x + w / 2, y: top - h, w });
         }
         this.worldLayer.add([g, ncl]);
-        // A bit of white smoke: puffs rising from the pipes, drifting aft, swelling and fading.
-        if (!this.textures.exists('puff')) {
-            const pg = this.make.graphics({ x: 0, y: 0 }, false);
-            pg.fillStyle(0xffffff, 1).fillCircle(32, 32, 32);
-            pg.generateTexture('puff', 64, 64);
-            pg.destroy();
-        }
-        this.smoke = [];
-        pipes.forEach((p, i) => {
-            for (let k = 0; k < 3; k++) {
-                const puff = this.add.image(p.x, p.y, 'puff').setDepth(DEPTH.exterior + 0.03).setAlpha(0);
-                this.worldLayer.add(puff);
-                const tween = this.tweens.add({
-                    targets: puff, x: p.x + 260, y: p.y - 200, scale: { from: 0.5, to: 2.6 }, alpha: { from: 0.8, to: 0 },
-                    duration: 4200, delay: i * 500 + k * 1400, repeat: -1, ease: 'Sine.easeOut',
-                });
-                this.smoke.push(tween);
+        // The smoke out of each pipe, as the DJ's fog machine (`drawSmoke`, `FUNNEL_SMOKE` in the config; the user, 2026-11-27:
+        // the flat white discs it was read as more suns at sunset); the horn's cough a burst of it (`smokeBurst`).
+        this.smokeG = this.add.graphics().setDepth(DEPTH.exterior + 0.03);
+        this.worldLayer.add(this.smokeG);
+        this.funnelPipes = pipes;
+        this.smokeClock = 0;
+    }
+
+    // The funnel's smoke, each frame (`dt` the sea's: on in the outside view, held for a still picture): per pipe a stream of
+    // puffs, each with its own age, place across the mouth and way out (scattered, not in step, or they line up in one
+    // curve); a puff is born only if its pipe gives enough at its birth, so the more and the less drift up the plume.
+    drawSmoke(dt) {
+        const g = this.smokeG, pipes = this.funnelPipes, S = FUNNEL_SMOKE;
+        if (!g) return;
+        const t = (this.smokeClock += dt * 1000);
+        g.clear();
+        const v = this.cameras.main.worldView;
+        if (pipes[0].x - 40 > v.right || pipes[pipes.length - 1].x + S.drift + 40 < v.x || pipes[0].y - S.rise - 40 > v.bottom) return;
+        const rnd = n => ((Math.sin(n * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1;
+        const gives = (j, at) => Math.max(S.least, Math.min(1,
+            0.55 + 0.3 * Math.sin(at / S.swellMs[0] + j * 2.4) + 0.25 * Math.sin(at / S.swellMs[1] + j * 4.1 + 1)));
+        // (A puff born while the horn blows is thicker and every one is born: `smokeBurst`.)
+        const [b0, b1] = this.smokeBurstAt || [0, -1], burst = at => at >= b0 && at <= b1;
+        pipes.forEach((p, j) => {
+            for (let i = 0; i < S.puffs; i++) {
+                const n = j * 97 + i, f = (i / S.puffs + rnd(n) * 0.5 + t / S.lifeMs) % 1, born = t - f * S.lifeMs;
+                const thick = burst(born);
+                if (!thick && rnd(n + 0.5) > gives(j, born)) continue;
+                const side = rnd(n + 0.25) * 2 - 1;
+                const x = p.x + side * p.w * 0.3 + S.drift * Math.pow(f, 1.6) + side * f * 8 + Math.sin(t / 260 + i * 1.3) * (0.5 + f * 2.5);
+                const r = S.r0 + f * S.grow + (i % 3) * 0.5 + (thick ? S.burst.r : 0);
+                const y = p.y - r * 0.6 - S.rise * (1 - (1 - f) * (1 - f)) + Math.sin(t / 310 + i) * f * 2;
+                const a = Math.min(0.85, S.alpha * (thick ? S.burst.alpha : 1)) * (1 - f) * Math.min(1, f / 0.04);
+                if (a > 0.02) g.fillStyle(i % 3 ? 0xffffff : 0xc9ced3, a).fillCircle(x, y, r);
             }
         });
+    }
+
+    // The horn's blast (src/world/topdeck.js): every pipe gives all it has, thicker, for `ms`; the burst drifts off up
+    // the plumes as one.
+    smokeBurst(ms) {
+        this.smokeBurstAt = [this.smokeClock, this.smokeClock + ms];
     }
 
     // The far background laid out for the camera as it stands. (A look-out's zoom out, `world.lookFar`, 0 to 1: the
@@ -2411,7 +2442,6 @@ export class ShipScene extends Phaser.Scene {
         this.physics.pause();
         this.time.paused = true;
         this.tweens.pauseAll();
-        for (const t of this.smoke || []) t.resume();       // the funnel's smoke keeps drifting
         this.player.setVisible(false);
         this.uiCam.setVisible(false);
         // (A bubble over someone by her would hang on the closed side: away; the game brings it back.)
@@ -2762,6 +2792,13 @@ export class ShipScene extends Phaser.Scene {
     // A pool on deck 11 or 12 (§5.3): water she can jump into and swim in. Its front is drawn over
     // her, a little see-through, so she is in it rather than on it.
     // From the deck under a pool's or lower, it is out of sight and out of the way.
+    // The foot of a pool's tank over the span x0 to x1 that reaches under y, or null: a balcony's panel under deck 11's
+    // pools starts there, where the doors' glass shows from under the tank, not up over the tank (the user, 2026-11-27).
+    tankFoot(x0, x1, y) {
+        const t = (this.tankFeet || []).find(t => x0 < t.x1 && x1 > t.x0 && t.foot > y);
+        return t ? t.foot : null;
+    }
+
     underPools(deck = 11) {
         return this.viewDeck !== null && Math.round(this.viewDeck) < deck;
     }
@@ -3133,6 +3170,7 @@ export class ShipScene extends Phaser.Scene {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
         this.farGulls.update(flow);
+        this.drawSmoke(flow);
         // (In the intro's wide views the far background holds still: its drift aft is how it looks
         // from the ship under way, and that camera is not on the ship. The user saw the islands
         // and clouds slide past a sun that stood still.)
@@ -3958,7 +3996,9 @@ export class ShipScene extends Phaser.Scene {
         // (`world.deckHeld`: up the bridge's hatch the bridge stays open until she is out on the balcony over it; by her
         // height its side closed over her legs half way up.)
         else if (moving) target = this.world?.deckHeld?.() ?? this.deckAt(p.y);
-        else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
+        // (In the water, the pool's own deck, whole: `deckAt` of its surface, 4 px under the floor, was 97% of the way up to
+        // it, and the deck below showed 3% of its inside through its side as faint ghosts; the user, 2026-11-27.)
+        else if (this.mode === 'swim') target = this.pool.deck;
         // (In the shaft, in the slab between two decks: the deck it sets out from, the one below opened by `world.lookOpen`.)
         else if (this.route === 'duct') target = this.world.data.duct.deck;
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell

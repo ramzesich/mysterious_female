@@ -12,7 +12,7 @@ from wash_levels import frame as wash_frame
 from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, SPRINKLERS, STACKS, SWINGDOORS)
 from population import FOG, FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS, WALKWAY_PERCH, WALKWAY_RAIL
-from population import BALLS, COURT, FLARES, FLOCKS, FUNNEL_TOP, LADY, SUNDECK, TERRACE
+from population import BALLS, COURT, FLARES, FLOCK_BIRDS, FLOCKS, FUNNEL_TOP, LADY, SUNDECK, TERRACE
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
@@ -597,7 +597,12 @@ def build_world():
                     x0=ladder_x - 60, x1=ft["x1"] + 40,
                     look=dict(x=look["x"], y=look["y"] - look["dy"], id=look["id"])),
         # (`front`: a flock on the windscreen's rail, nearer to us than she is on the balcony, the user, 2026-11-23.)
-        flocks=[dict(id=fid, x0=B.exact_x(a), x1=B.exact_x(b), y=B.floor_y(deck) - up, n=n, front=up > 0)
+        # (`birds`: each gull's place, pose, facing and whether it floats, FLOCK_BIRDS.)
+        # (`x0`, `x1`: from its first gull to its last.)
+        flocks=[dict(id=fid, x0=min(B.exact_x(g[0]) for g in FLOCK_BIRDS[fid]), x1=max(B.exact_x(g[0]) for g in FLOCK_BIRDS[fid]),
+                     y=B.floor_y(deck) - up, n=len(FLOCK_BIRDS[fid]), front=up > 0,
+                     birds=[dict(x=B.exact_x(m), y=B.floor_y(deck) - bu, pose=pose, flip=bool(fl), float=bool(fa))
+                            for m, bu, pose, fl, fa in FLOCK_BIRDS[fid]])
                 for fid, (deck, a, b, n, up) in FLOCKS.items()])
 
     # Region 9's (src/world/bow.js).

@@ -7,12 +7,12 @@
 // her book, the gulls leave the bow, Bumbot runs for it), the engineer's book, the court's quirk.
 // Places come from maps/world.json (`topdeck`).
 
-import { PLAYER, GAGS, FLARE, HAND_OVER } from '../config.js';
+import { PLAYER, GAGS, FLARE, HAND_OVER, HORN_FISTS, HORN_REST } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
-import { Gusts, PerchGull } from './outside.js';
+import { Gusts, PerchGull, windsock } from './outside.js';
 
 const M = 48;
 const HALF = PLAYER.height / 2;
@@ -649,17 +649,16 @@ export class Flock {
         const s = world.scene, D = s.DEPTH;
         this.world = world;
         this.scene = s;
-        this.def = def;             // { id, x0, x1, y, n }
-        this.birds = Array.from({ length: def.n }, (_, i) => {
-            // (About the two ends of the stretch: a pool's two rims, a windscreen's length.)
-            const k = def.n > 1 ? i / (def.n - 1) : 0.5;
-            const x = Math.round(def.x0 + (def.x1 - def.x0) * (k < 0.5 ? k * 0.36 : 1 - (1 - k) * 0.36) + ((i * 37) % 9) - 4);
+        this.def = def;             // { id, x0, x1, y, n, front, birds: [{ x, y, pose, flip, float }] }
+        // (Each gull where the data puts it, in its own pose and facing: the hull's top review's 10, the user, 2026-11-27,
+        // "they look copied". Its `y` is what it stands, sits or floats on.)
+        this.birds = def.birds.map((g, i) => {
             // (On the windscreen's rail, `front`, they are nearer to us than she is: over her as she jumps by, and over
             // the windscreen drawn over her; the user, 2026-11-23.)
-            const sprite = s.add.image(x, def.y, 'things', 'gull-perched').setOrigin(0.5, 1).setFlipX(i % 2 === 0)
+            const sprite = s.add.image(g.x, g.y, 'things', `gull-${g.pose}`).setOrigin(0.5, 1).setFlipX(g.flip)
                 .setDepth(def.front ? D.player + 0.05 : D.props + 0.06);
             world.add([sprite]);
-            return { sprite, x, i };
+            return { sprite, x: g.x, y: g.y, i, pose: g.pose, flip: g.flip, float: g.float };
         });
         world.things.push({ id: def.id, x: (def.x0 + def.x1) / 2, y: def.y, route: 'inside', items: this.birds.map(b => b.sprite), until: 'flag:horn' });
     }
@@ -668,12 +667,28 @@ export class Flock {
         const s = this.scene, d = this.def;
         if (this.gone || !near(s, (d.x0 + d.x1) / 2, d.y, 800, 300)) return;
         if (d.front) this.dodge(dt, time);
-        // Now and then one shuffles, or stretches a wing.
         for (const b of this.birds) {
             if (b.up) continue;
+            if (b.float) {
+                // (Afloat: a slow bob with the water.)
+                b.sprite.y = b.y + (Math.sin(time / 650 + b.i * 2.1) > 0.35 ? 1 : 0);
+                continue;
+            }
+            // Now and then one shuffles; and each standing gull, on a round of its own (7 to 13 s), spends 2.4 s in
+            // another pose: looking back or preening (back to standing if that is its own), or turned round. The
+            // dozing and the sitting stay as they are.
             const beat = Math.floor(time / 900 + b.i * 1.7) % 7 === 0;
-            b.sprite.y = d.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
+            b.sprite.y = b.y - (beat && Math.floor(time / 110) % 2 ? 1 : 0);
+            if (b.pose === 'doze' || b.pose === 'sit') continue;
+            const round = 7000 + b.i * 1300, away = (time + b.i * 2311) % round < 2400;
+            const turn = b.i % 3 === 0, alt = b.pose === 'perched' ? (b.i % 2 ? 'look' : 'preen') : 'perched';
+            b.sprite.setFrame(`gull-${away && !turn ? alt : b.pose}`).setFlipX(away && turn ? !b.flip : b.flip);
         }
+    }
+
+    // A gull back at its place, as it sat (after a flight).
+    settle(b) {
+        b.sprite.setFrame(`gull-${b.pose}`).setFlipX(b.flip).setPosition(b.x, b.y);
     }
 
     // A jump at the gulls on the windscreen's rail (the user, 2026-11-23): the one her head comes up at takes off a little,
@@ -687,7 +702,7 @@ export class Flock {
             if (b.up && !b.dodge) continue;
             if (!b.dodge) {
                 if (s.mode === 'play' && s.route === 'inside' && !onFloor && Math.abs(p.x - b.x) < 24
-                    && head < d.y + 8 && p.y > d.y - 40) {
+                    && head < b.y + 8 && p.y > b.y - 40) {
                     b.up = true;
                     b.dodge = { k: 0, side: Math.sign(b.x - p.x) || 1, landed: 0 };
                     sfx.at(b.x, d.y).flap();
@@ -701,29 +716,30 @@ export class Flock {
             D.k = up ? Math.min(1, D.k + dt / 0.22) : Math.max(0, D.k - dt / 0.4);
             const e = Math.sin(D.k * Math.PI / 2);
             if (D.k === 0 && !up) {
-                b.sprite.setFrame('gull-perched').setPosition(b.x, d.y);
+                this.settle(b);
                 b.dodge = null;
                 b.up = false;
                 continue;
             }
             b.sprite.setFrame(Math.floor(time / 110) % 2 ? 'gull-up' : 'gull-down')
-                .setPosition(Math.round(b.x + D.side * 10 * e), Math.round(d.y - 34 * e));
+                .setPosition(Math.round(b.x + D.side * 10 * e), Math.round(b.y - 34 * e));
         }
     }
 
     // A tangerine by the flock: the nearest goes after it, and flies back (docs/plan-three-uses.md §2).
     offered(t) {
         const s = this.scene, d = this.def;
-        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60 || Math.abs(t.img.y + 3 - d.y) > 12) return false;
-        const free = this.birds.filter(b => !b.up);
+        if (this.gone || t.route !== 'inside' || t.img.x < d.x0 - 60 || t.img.x > d.x1 + 60) return false;
+        // (A gull on what the tangerine lies on, or near it: each sits at a height of its own.)
+        const free = this.birds.filter(b => !b.up && Math.abs(t.img.y + 3 - b.y) <= 12 && Math.abs(t.img.x - b.x) < 60);
         if (!free.length) return false;
         const b = free.reduce((a, c) => Math.abs(c.x - t.img.x) < Math.abs(a.x - t.img.x) ? c : a);
         b.up = true;
         this.world.gullTakes(b.sprite, t, () => {
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
-            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, d.y - 110);
-            s.tweens.add({ targets: b.sprite, x: b.x, y: d.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
-                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched'); b.up = false; } });
+            b.sprite.setVisible(true).setFrame('gull-up').setPosition(b.x + 70, b.y - 110);
+            s.tweens.add({ targets: b.sprite, x: b.x, y: b.y, duration: 1100, delay: 2500, ease: 'Sine.easeOut',
+                onComplete: () => { flap.remove(); this.settle(b); b.up = false; } });
         });
         return true;
     }
@@ -731,15 +747,15 @@ export class Flock {
     // Her cry: the flock lifts a little, all at once, and settles again.
     heard() {
         const s = this.scene, d = this.def;
-        if (this.gone || !this.birds.some(b => this.world.hears(b.x, d.y))) return;
+        if (this.gone || !this.birds.some(b => this.world.hears(b.x, b.y))) return;
         sfx.at((d.x0 + d.x1) / 2, d.y).flap();
         this.birds.forEach((b, i) => {
             if (b.up) return;
             b.up = true;
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
             b.sprite.setFrame('gull-up');
-            s.tweens.add({ targets: b.sprite, y: d.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
-                onComplete: () => { flap.remove(); b.sprite.setFrame('gull-perched').setY(d.y); b.up = false; } });
+            s.tweens.add({ targets: b.sprite, y: b.y - 30 - (i % 3) * 8, duration: 420, delay: i * 40, ease: 'Quad.easeOut', yoyo: true, hold: 500,
+                onComplete: () => { flap.remove(); this.settle(b); b.up = false; } });
         });
     }
 
@@ -754,7 +770,7 @@ export class Flock {
             const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
             b.sprite.setOrigin(0.5, 0.5).setFrame('gull-up').setFlipX(true).setDepth(s.DEPTH.fx - 0.1);
             s.tweens.add({
-                targets: b.sprite, x: b.x - 260 - i * 36, y: d.y - 250 - ((i * 53) % 90), duration: 2100 + i * 90, delay: i * 70, ease: 'Sine.easeIn',
+                targets: b.sprite, x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), duration: 2100 + i * 90, delay: i * 70, ease: 'Sine.easeIn',
                 onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
             });
         })));
@@ -801,12 +817,7 @@ export const topdeck = {
         this.funnelGusts = new Gusts(w, { gust: F.gust, towels: [], x0: F.x0, x1: F.x1, top: F.y - 60, bottom: F.roofY, route: 'inside' });
         w.movers.push(this.funnelGusts);
         w.winds.push(this.funnelGusts);
-        const sock = (x, y, i) => {
-            const pole = s.add.rectangle(x, y, 2, 40, 0xe8eaec).setOrigin(0.5, 1).setDepth(D.exterior + 0.075);
-            const img = s.add.image(x + 1, y - 39, 'windsock').setOrigin(0.5, 0).setDepth(D.exterior + 0.08);
-            w.add([pole, img]);
-            this.funnelGusts.flappers.push({ img, k: 3.6, i });
-        };
+        const sock = (x, y, i) => this.funnelGusts.flappers.push(windsock(w, x, y, 40, D.exterior + 0.075, i));
         // The funnel's white base carried on under the stairway's lower flight, out to its foot (the user,
         // 2026-11-18: moved out 12 px from the lattice, the flight's foot stood past the base, the sky
         // showing under its steps): as far up as the white goes, 64 px; the casing takes over above.
@@ -823,33 +834,31 @@ export const topdeck = {
         w.add([frame]);
         sock(f.shoulder[0] - 44, f.shoulder[1], 1);
         sock(f.x1 - 10, f.y - 30, 2);
-        sock(f.foot[0] + 8, F.roofY, 3);           // (by the stairway's foot, wherever it stands)
+        // (Forward of the stairway's foot, wherever it stands, toward the roof's forward edge: clear of the rail, full too
+        // (the user, 2026-11-27: the rail crossed it 8 px aft of the foot; then "ahead of her", forward of the ladder).)
+        sock(f.foot[0] - 138, F.roofY, 3);
         w.movers.push(this.funnelWind = new FunnelWind(w, F, this.funnelGusts));
 
         // On the top: the horn on its post, its cord; the engineer's toolbox and lunch box; the
         // lookout telescope at the aft rail.
-        const top = f.y, hx = F.hornX;
-        const post = s.add.graphics().setDepth(D.exterior + 0.076);
-        post.fillStyle(0x9babb2, 1).fillRect(hx - 2, top - 104, 4, 104);
-        post.fillStyle(0xe8eaec, 1).fillRect(hx - 2, top - 104, 1, 104).fillRect(hx - 12, top - 94, 22, 3);
-        // (Two brass trumpets, their bells forward.)
-        for (const [dy, len] of [[-103, 30], [-90, 22]]) {
-            post.fillStyle(0x2e222f, 1).fillRect(hx - len - 3, top + dy - 1, len + 4, 8).fillTriangle(hx - len - 3, top + dy + 3, hx - len - 13, top + dy - 6, hx - len - 13, top + dy + 12);
-            post.fillStyle(0xf9c22b, 1).fillRect(hx - len - 2, top + dy, len + 2, 6).fillTriangle(hx - len - 2, top + dy + 3, hx - len - 12, top + dy - 4, hx - len - 12, top + dy + 10);
-            post.fillStyle(0xfbff86, 1).fillRect(hx - len - 2, top + dy + 1, len, 1);
-            post.fillStyle(0xd9a43b, 1).fillRect(hx - len - 12, top + dy - 4, 1, 14);
-        }
-        this.cord = s.add.graphics().setDepth(D.exterior + 0.077);
+        // (Generated, the user's choice of tries, 2026-11-27: tools/build_funnel_top.py; they were drawn in code.)
+        const top = f.y, hx = F.hornX, FT = s.cache.json.get('funnel-top'), H = FT.horn;
+        const post = s.add.image(hx - H.pole, top, 'funnel-horn').setOrigin(0, 1).setDepth(D.exterior + 0.076);
+        // The cord: from under the horn's top bar, its rope cropped to its length, the handle at its end.
+        this.cordAt = { x: hx - H.pole + H.hang[0], y: top - H.h + H.hang[1] };
+        this.cordRope = s.add.image(this.cordAt.x - 1, this.cordAt.y, 'funnel-cord-rope').setOrigin(0, 0).setDepth(D.exterior + 0.077);
+        this.cordHandle = s.add.image(this.cordAt.x - 2, 0, 'funnel-cord-handle').setOrigin(0, 0).setDepth(D.exterior + 0.077);
         this.drawCord(0);
-        const box = s.add.image(F.toolboxX, top, 'toolbox').setOrigin(0.5, 1).setDepth(D.exterior + 0.08);
+        const B = FT.toolbox;
+        const box = s.add.image(F.toolboxX - B.spot, top, 'funnel-toolbox').setOrigin(0, 1).setDepth(D.exterior + 0.08);
         const scope = s.add.image(F.telescopeX, top, 'shipart', 'telescope').setOrigin(0.5, 1).setFlipX(true).setDepth(D.exterior + 0.08);
-        w.add([post, this.cord, box, scope]);
-        w.things.push({ id: 'sec_horn', x: hx + 8, y: top, route: 'inside', items: [], reach: 20, interact: () => this.horn() });
+        w.add([post, this.cordRope, this.cordHandle, box, scope]);
+        w.things.push({ id: 'sec_horn', x: this.cordAt.x, y: top, route: 'inside', items: [], reach: 20, interact: () => this.horn() });
         w.things.push({ id: 'sec_telescope', x: F.telescopeX, y: top, route: 'inside', items: [], reach: 18, interact: () => this.telescope() });
 
-        // Bumbot on the horn's bracket, out of reach, against the sky (population:
+        // Bumbot on the horn's top bar, out of reach, against the sky (population:
         // `bb_glimpse_funnel`) until it sounds under him.
-        this.hornCat = s.add.sprite(hx + 4, top - 94, 'bumbot').setOrigin(0.5, 1).setDepth(D.exterior + 0.09).setFlipX(true);
+        this.hornCat = s.add.sprite(hx + 4, top - H.h + H.seat, 'bumbot').setOrigin(0.5, 1).setDepth(D.exterior + 0.09).setFlipX(true);
         this.hornCat.play('bumbot-sit').anims.chain('bumbot-sat');
         w.add([this.hornCat]);
         this.refreshTopdeck();
@@ -875,30 +884,27 @@ export const topdeck = {
             g.fillStyle(0x4d9be6, 1).fillPoints([{ x: 2, y: 3 }, { x: 5, y: 2 }, { x: 13, y: 12 }, { x: 13, y: 16 }, { x: 10, y: 16 }], true);
             g.fillStyle(0xffffff, 1).fillPoints([{ x: 5, y: 6 }, { x: 7, y: 5 }, { x: 10, y: 9 }, { x: 8, y: 10 }], true);
         });
-        // The engineer's toolbox, his lunch box open on it.
-        make('toolbox', 34, 22, g => {
-            const ink = 0x2e222f;
-            g.fillStyle(ink, 1).fillRect(0, 9, 34, 13).fillRect(11, 5, 12, 5);
-            g.fillStyle(0xe83b3b, 1).fillRect(1, 10, 32, 11);
-            g.fillStyle(0xae2334, 1).fillRect(1, 18, 32, 3).fillRect(1, 13, 32, 1);
-            g.fillStyle(0xc7dcd0, 1).fillRect(14, 12, 6, 3).fillRect(12, 6, 10, 1).fillRect(12, 6, 1, 4).fillRect(21, 6, 1, 4);
-            g.fillStyle(ink, 1).fillRect(20, 3, 13, 7);
-            g.fillStyle(0x4d9be6, 1).fillRect(21, 4, 11, 5);
-            g.fillStyle(0xffffff, 1).fillRect(22, 5, 4, 2);
-        });
-        // A windsock, hanging limp from its pole's top (the wind lifts it).
-        make('windsock', 8, 26, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 8, 26);
-            for (let i = 0; i < 5; i++) g.fillStyle(i % 2 ? 0xffffff : 0xe83b3b, 1).fillRect(1 + (i > 2 ? 1 : 0), 1 + i * 5, 6 - (i > 2 ? 2 : 0), 5);
-        });
+        // (The windsock drawn here until 2026-11-27 is generated now: `windsock()` in src/world/outside.js.)
         this.world.icon('cocktail');
     },
 
-    drawCord(pull) {
-        const F = this.T.funnel, top = this.world.data.funnel.y, x = F.hornX + 8, g = this.cord.clear();
-        g.fillStyle(0xab947a, 1).fillRect(x, top - 93, 1, 44 + pull);
-        g.fillStyle(0x2e222f, 1).fillRect(x - 2, top - 49 + pull, 5, 8);
-        g.fillStyle(0xe83b3b, 1).fillRect(x - 1, top - 48 + pull, 3, 6);
+    // The cord pulled `pull` px: its rope that much longer (cropped from the strip, its pattern two rows), the handle
+    // hanging at rest where her first frame of the pull takes it (`HORN_FISTS`); or with its top at `at`, in her fist.
+    drawCord(pull, at = null) {
+        const top = this.world.data.funnel.y, y = Math.round(at ?? top - HORN_REST + pull), c = this.cordAt;
+        this.cordRope.setCrop(0, 0, 3, Math.max(1, y - c.y + 1));
+        this.cordHandle.y = y;
+    },
+
+    // Her fist on the handle through her pull (the user, 2026-11-27: her hands held nothing, the handle hung behind her):
+    // the handle's top 4 px over her fist's top in the frame shown (its knot over her fingers, its wood in her fist, the
+    // fist drawn over it), its middle under her fist, so the rope stays straight.
+    cordInFist() {
+        const her = this.scene.player, i = her.anims.currentAnim?.key === 'her-pull' ? her.anims.currentFrame.index - 1 : -1;
+        if (i < 0) return false;
+        const tl = her.getTopLeft(), [, fy] = HORN_FISTS[i];
+        this.drawCord(0, tl.y + fy - 4);
+        return true;
     },
 
     refreshTopdeck() {
@@ -910,6 +916,7 @@ export const topdeck = {
     updateTopdeck(dt, time) {
         const s = this.scene, w = this.world, her = s.player, T = this.T;
         if (!T) return;
+        if (this.pulling) this.cordInFist();
         const L = T.lady;
         // The engineer on his break turns to her.
         const e = this.who('npc_engineer_read');
@@ -1299,6 +1306,13 @@ export const topdeck = {
         return true;
     },
 
+    // Where she stands to pull, facing left or right: her fist's middle (a px behind its front, `HORN_FISTS`) in the
+    // pull's first frame over the rope.
+    pullX(left) {
+        const her = this.scene.player, C = 84, off = her.x - her.getTopLeft().x, gx = HORN_FISTS[0][0] - 1;
+        return this.cordAt.x - (left ? C - 1 - gx : gx) + off;
+    },
+
     // E at the horn's cord (population: `scn_horn`). The first time, with the engineer's leave:
     // the blast, and what it sets off, shown from up here by the camera. After that, a toot.
     horn() {
@@ -1307,15 +1321,26 @@ export const topdeck = {
         if (!P.has('engineer') && !P.openAll) return false;
         const first = !P.has('horn');
         w.cut(async () => {
-            her.setFlipX(F.hornX + 8 < her.x);
-            if (s.anims.exists('her-pull')) her.anims.play('her-pull');
-            else s.pose('rise');
-            await w.wait(260);
-            await new Promise(resolve => s.tweens.addCounter({ from: 0, to: 9, duration: 160, onUpdate: tw => this.drawCord(tw.getValue()), onComplete: resolve }));
+            // (Beside the cord, facing it, where her fist in the pull's first frame closes on the handle: a step or two
+            // there first.)
+            const left = this.cordAt.x < her.x, x = this.pullX(left);
+            her.setFlipX(left);
+            if (Math.abs(her.x - x) > 1) {
+                s.pose('run', 0.6);
+                await w.tween({ targets: her, x, duration: Math.min(400, Math.abs(her.x - x) * 16) });
+                her.setFlipX(left);
+            }
+            her.x = x;
+            her.anims.play('her-pull');
+            this.pulling = true;
+            await w.wait(320);
             this.blast(first ? 1500 : 500);
             if (first) this.catOffTheHorn();
             await w.wait(first ? 1300 : 450);
-            s.tweens.addCounter({ from: 9, to: 0, duration: 260, onUpdate: tw => this.drawCord(tw.getValue()) });
+            // (She lets go: the handle swings back up to where it hangs.)
+            this.pulling = false;
+            const from = this.cordHandle.y, rest = this.world.data.funnel.y - HORN_REST;
+            s.tweens.addCounter({ from, to: rest, duration: 260, ease: 'Sine.easeOut', onUpdate: tw => this.drawCord(0, tw.getValue()) });
             s.pose('stand');
             if (!first) return;
             await this.cascade();
@@ -1337,11 +1362,8 @@ export const topdeck = {
                 s.tweens.add({ targets: ring, x: ring.x - 150, scaleX: 5, scaleY: 7, alpha: 0, duration: 700, ease: 'Quad.easeOut', onComplete: () => ring.destroy() });
             });
         }
-        for (let i = 0; i < 8; i++) {
-            const puff = s.add.image(F.hornX - 180 + i * 46 + (i % 2) * 14, top - 96, 'puff').setDepth(s.DEPTH.exterior + 0.03).setScale(0.3).setAlpha(0.9);
-            w.add([puff]);
-            s.tweens.add({ targets: puff, x: puff.x + 120, y: puff.y - 150 - (i % 3) * 30, scale: 2.2, alpha: 0, duration: 1500 + i * 60, delay: i * 50, onComplete: () => puff.destroy() });
-        }
+        // (The pipes cough: a thick burst of their own smoke as long as the blast, the user, 2026-11-27; it was flat discs.)
+        s.smokeBurst(ms);
     },
 
     // Bumbot, on the horn when it sounds: straight up, then down the lattice's front and away

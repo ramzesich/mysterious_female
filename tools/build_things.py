@@ -23,6 +23,9 @@ OUT = ROOT / "assets" / "sprites"
 
 # Heights in the game, px (she is 59): a herring gull stands about knee-high.
 SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
+         # The bow's flocks' other poses (the hull's top review's 10, the user, 2026-11-27: edits of the perched gull,
+         # `tries/gull-poses/`), each at the perched one's scale: preening, sitting, looking back, dozing.
+         "gull-preen": 19, "gull-sit": 13, "gull-look": 20, "gull-doze": 17,
          # The towel animals on their table (deck 10's midship flight): a swan's size.
          "towel-elephant": 19, "towel-monkey": 27, "towel-rabbit": 27,
          # Two sunbathers, each on a lounger of their own (the pool deck, by the first pool).
