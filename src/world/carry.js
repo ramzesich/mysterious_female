@@ -191,7 +191,12 @@ export class Carry {
             s.tweens.add({ targets: img, x: img.x + away * far, angle: away * (soft ? turn * (k % 2 ? 1 : 2) : turn), duration: soft ? 560 + k * 90 : 520 });
             s.tweens.add({ targets: img, y: img.y - rise, duration: 180, ease: 'Quad.easeOut', yoyo: false,
                 onComplete: () => s.tweens.add({ targets: img, y: floor - half, duration: 300, ease: 'Quad.easeIn',
-                    onComplete: () => s.tweens.add({ targets: img, alpha: 0, delay: 700, duration: 300, onComplete: () => img.destroy() }) }) });
+                    onComplete: () => {
+                        // (A cone out of her hands in the Great Outdoors' gull's stretch: it is down for it and off with it,
+                        // the user, 2026-11-27; `grab` in src/world/hazards.js. Measured from the floor, as the cone lies.)
+                        if ((kind === 'cone' || kind === 'stub') && this.world.foodGulls?.gull_go?.grab(img, kind, floor)) return;
+                        s.tweens.add({ targets: img, alpha: 0, delay: 700, duration: 300, onComplete: () => img.destroy() });
+                    } }) });
         });
         s.smash(p.x + away * 20, p.y - 8, false);      // (its own sound is above)
         // A start, no more: she is knocked back a step. (`still`: a hit that plays its own gag as well, the trays.)

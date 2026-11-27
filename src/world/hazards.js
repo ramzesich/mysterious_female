@@ -268,7 +268,30 @@ export class FoodGulls {
         this.leg = { t0: time, from: { x: b.x, y: b.y }, rearm };
     }
 
-    // A cone dropped on the deck: one comes down for it, stays a moment, and goes.
+    // Her cone on the deck under it (gone over at the machine, or out of her hands in its stretch): down for it and off
+    // the screen with it, back to its perch after a while, as with one taken from her hands (the user, 2026-11-27: "Let
+    // the gull steal the cone in any case"; it had sat on it and pecked while it faded). False if it is not its to take.
+    // (`floor`: the floor it lies on, where its picture is not stood on its bottom: a spill's are turned about their middle.
+    // `reach`: how far past its stretch it goes for it; the pool's for the kid's stub wherever he walks the rim.)
+    grab(img, kind, floor = img.y, reach = 40) {
+        const d = this.def, s = this.scene, b = this.diver;
+        // (From its perch or its round, from hanging over her for a dive, from the dive itself or on its way home; not while
+        // it is off with something, nor down for a tangerine, nor once the kid has sent them off for good.)
+        if (!['idle', 'mark', 'dive', 'back'].includes(this.state) || this.off() || img.x < d.x0 - reach || img.x > d.x1 + reach
+            || Math.abs(floor - d.y) > 16) return false;
+        b.sprite.setVisible(true);
+        this.state = 'swoop';
+        this.prize = { img, kind };
+        this.from = { x: b.x, y: b.y };
+        this.targetX = img.x;
+        this.swoopMs = Phaser.Math.Clamp(Math.hypot(img.x - b.x, d.y - b.y) * 2.2, 260, 560);
+        this.at = s.time.now + this.swoopMs;
+        b.sprite.setFlipX(img.x < b.x);
+        sfx.at(img.x, d.y).gullDive();
+        return true;
+    }
+
+    // A tangerine on the deck: one comes down for it, stays a moment, and goes (with it: `offered`).
     pounce(x) {
         if (this.state !== 'idle') return;
         this.state = 'pounce';
@@ -359,6 +382,21 @@ export class FoodGulls {
             if (k >= 1) {
                 this.state = 'idle';
                 this.at = time + L.rearm;
+            }
+        } else if (this.state === 'swoop') {
+            // Down onto the cone, its beak to it, and straight up and away with it.
+            const k = 1 - Math.max(0, this.at - time) / this.swoopMs, e = k * (2 - k);
+            b.x = this.from.x + (this.targetX - this.from.x) * k;
+            b.y = this.from.y + (d.y - 2 - this.from.y) * e;
+            b.sprite.setFrame('gull-down').setPosition(b.x, b.y);
+            if (time > this.at) {
+                const { img, kind } = this.prize;
+                this.prize = null;
+                img.destroy();
+                this.loot.setTexture(kind === 'stub' ? 'load-stub' : 'load-cone').setAngle(0).setVisible(true);
+                this.grabbed = (this.grabbed ?? 0) + 1;
+                sfx.at(b.x, d.y).flap();
+                this.flyOff(time, 2800);
             }
         } else if (this.state === 'pounce') {
             // Down beside the mess on the deck; a few pecks; away.

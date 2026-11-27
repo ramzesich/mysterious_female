@@ -5455,3 +5455,20 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
 - **Built (the user: "why is it not just placed on its perch from the beginning?"):** a gull with a perch is made on it;
   the pool's circling gulls start where they did.
 - **Checks:** region6 (its dive at her cone) passes; mishaps fails only on deck 9's sprinkler, as on main. Not merged.
+
+## The gulls take a cone lying on the deck (the Refinement session, 2026-11-27; with the hull's top review, 3)
+
+- **The user:** "When we drop the cone for whatever reason (for example, on the red line, when filling the cone at the ice
+  cream machine), the gull sits on top of it and eats it. That doesn't look good the way it is done right now. Let the
+  gull steal the cone in any case: either when it successfully dives at us with the cone in our hands, or when the cone
+  is on the ground. Same mechanic of flying away, and then returning back after a short while." And the pool's gull with
+  the kid's turned-down stub: "Yes, it should that too".
+- **Built:** `grab()` in `FoodGulls` (`src/world/hazards.js`): from its perch or round, from hanging over her, from the dive
+  or on its way home (not while off with something, nor down for a tangerine, nor once the kid has sent the pool's off),
+  a swoop down to the cone (`gull-down`), the cone gone from the deck and in its beak, off the screen, back after the
+  steal's own times (`FLIGHT`). Called by the cone gone over at the machine (`toppled`, `src/world/lido.js`), a cone or
+  stub out of her hands in the Great Outdoors' stretch (`spill`, `src/world/carry.js`; nothing there knocks one out in
+  play today), and the kid's stub on the pool's rim (the pool's gull, wherever he walks it). If the gull is away, a
+  dropped cone fades where it lies, as before. The old peck on a cone is gone; on a tangerine it stays.
+- **Checks:** region6 (the toppled cone taken, the gull back on its rail; the kid's stub taken by a pool gull),
+  deliveries pass; mishaps only deck 9's sprinkler, as on main. Not merged.
