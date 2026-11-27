@@ -749,7 +749,10 @@ export const HORN = {
     turnMs: 140, chargeAfter: 420, charge: 340, chargeMs: 62,
     hurdle: [74, 60, 250],              // off the floor this far aft of the sunbed's middle, down this far forward; px/s over it
     sunHold: 250, panBow: 1700,         // the sun deck as they left it; the pan to the bow
-    bowCalm: 200, liftBefore: 30,       // Bumbot into the bow's picture, by the kids' pool; each gull up as he is this far from it
+    // Bumbot into the bow's picture, by the kids' pool; each gull is off as he is still this far from it, with a burst
+    // (it was 30 px and a slow start: he was on the gull before it had left the water).
+    // (`liftSeen`: never before he is this far inside the picture.)
+    bowCalm: 200, liftBefore: 80, liftMs: 2300, liftSeen: 12,
     bowHold: 1350, panBack: 1900,       // from his coming to the pan back to her
     endHold: 120,
 };

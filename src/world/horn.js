@@ -306,8 +306,8 @@ export const horn = {
 
             // --- The bow: the kids' pool's six go up one by one as he reaches each; the windscreen's six, forward of the
             // picture, a moment later, unseen.
-            once('lift', runAt, () => flocks[0]?.liftOff((b, i) => ({ x: b.x - 260 - i * 36, y: b.y - 250 - (i * 53) % 90, ms: 1900 + i * 90,
-                delay: Math.max(0, (in1 - b.x - H.liftBefore) / H.catRun * 1000) })));
+            once('lift', runAt, () => flocks[0]?.liftOff((b, i) => ({ x: b.x - 260 - i * 36, y: b.y - 250 - (i * 53) % 90, ms: H.liftMs + i * 90,
+                ease: 'Quad.easeOut', delay: Math.max(24 + H.liftSeen, in1 - b.x - H.liftBefore) / H.catRun * 1000 })));
             once('lift2', runAt + H.bowHold - 200, () => flocks[1]?.liftOff());
 
             if (T >= endAt) end();

@@ -765,22 +765,28 @@ export class Flock {
     }
 
     // Up and away over the bow, all at once. Resolves when the sky is clear.
-    // (`to`: where each flies, how long, and after what wait, `(bird, i) => ({ x, y, ms, delay })`: the horn's scene
-    // sends the kids' pool's six across the bow's shot, and the windscreen's up one by one as Bumbot reaches each.)
+    // (`to`: where each flies, how long, after what wait and how eased, `(bird, i) => ({ x, y, ms, delay, ease })`: the
+    // horn's scene sends the kids' pool's six up one by one as Bumbot comes at each.)
     liftOff(to = null) {
         const s = this.scene, d = this.def;
         this.gone = true;
         sfx.gull();
         sfx.flap();
         return Promise.all(this.birds.map((b, i) => new Promise(resolve => {
-            b.up = true;
-            const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
-            b.sprite.setOrigin(0.5, 0.5).setFrame('gull-up').setFlipX(true).setDepth(s.DEPTH.fx - 0.1);
             const at = to?.(b, i) ?? { x: b.x - 260 - i * 36, y: b.y - 250 - ((i * 53) % 90), ms: 2100 + i * 90 };
-            if (at.x > b.x) b.sprite.setFlipX(false);
-            s.tweens.add({
-                targets: b.sprite, x: at.x, y: at.y, duration: at.ms, delay: at.delay ?? i * 70, ease: 'Sine.easeIn',
-                onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
+            // (Each sits as it sat until its own turn, and takes off from where it sat: the user, 2026-11-27, of the horn's
+            // scene, "They already are in their flight position when the scene shows ... They also start a bit lower than
+            // the water level". All six went to their flying pictures at once, flapping on the spot through their waits,
+            // and the flying picture, hung by its middle, stood half a gull lower than the sitting one, hung by its feet.)
+            s.time.delayedCall(at.delay ?? i * 70, () => {
+                b.up = true;
+                const mid = b.sprite.y - b.sprite.height / 2;
+                const flap = s.time.addEvent({ delay: 110, loop: true, callback: () => b.sprite.setFrame(b.sprite.frame.name === 'gull-up' ? 'gull-down' : 'gull-up') });
+                b.sprite.setOrigin(0.5, 0.5).setFrame('gull-up').setFlipX(at.x <= b.x).setDepth(s.DEPTH.fx - 0.1).setY(mid);
+                s.tweens.add({
+                    targets: b.sprite, x: at.x, y: at.y, duration: at.ms, ease: at.ease ?? 'Sine.easeIn',
+                    onComplete: () => { flap.remove(); b.sprite.setVisible(false); resolve(); },
+                });
             });
         })));
     }

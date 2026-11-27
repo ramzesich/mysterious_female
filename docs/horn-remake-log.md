@@ -271,3 +271,22 @@ Bumbot is already past him, or so it seems at least".
     reaches him and is in the air with him directly under; looked at frame by frame at 20 frames a second.
 
 `region8` with `region8.horn`, `golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.
+
+## 11. The play stop, round 4 (2026-11-27)
+
+**The user:** "Better. Inspect the gulls taking off by the pool. They already are in their flight position when the
+scene shows. Doesn't look natural. They also start a bit lower than the water level."
+
+Found in the frames (`gulls-before.png`): the moment Bumbot came into the picture all six gulls went to their flying
+pictures at once and flapped on the spot through their waits; and the flying picture, hung by its middle, stood half a
+gull lower than the sitting one, hung by its feet, so the two afloat sank under the water's line.
+
+**Decisions:**
+
+19. **A gull sits as it sat until its own turn, and takes off from where it sat** (`Flock.liftOff`): its flying picture
+    is put on only at its turn, its middle where the sitting picture's middle was. The same for every lift-off, the
+    windscreen's too.
+20. **Each of the pool's gulls is off with a burst as Bumbot is still 80 px from it** (it was 30 px and a slow start: he
+    was on the gull before it had left the water), and never before he is 12 px inside the picture.
+
+`region8` with `region8.horn`, `golden`, `region9`, `boot` pass.
