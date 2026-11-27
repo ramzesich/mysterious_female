@@ -5432,3 +5432,16 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
 - **Not done yet:** the 3% ghosts while she swims (finding 2, the fractional deck; "not now, at first the two above").
   Finding 12 (hidden at the `stern` start) is by design (the user).
 - **Checks:** region6, region7, region9 pass (14 cases). No generations.
+
+## The ghosts while she swims (the Refinement session, 2026-11-27; the hull's top review, 2)
+
+- **What was wrong:** swimming set the cut-away's deck to `deckAt(pool.y)`, a fraction (11.97 in the kids' pool, 10.97
+  in deck 11's), so the pool's deck kept 3% of its hull over it and the deck below showed 3% of its inside through its
+  side, faint ghosts of its furniture (at most 6 brightness steps; the user: "I don't understand what changed", shown
+  with the contrast raised).
+- **Built:** in the water her deck is the pool's own, whole (`this.pool.deck` in `updateCutaway`).
+- **Checked (the user: "check carefully that this fix didn't break anything else"):** fifteen places shot with and
+  without it, the cut-away's state and the pictures compared: balconies, cabin 8206, the maid's cabin, the corridors
+  of decks 3, 4, 5, 8, 9 and 10, deck 12, the pool deck and the outside view all the same (the only pixels that differ
+  are things in motion: gusts, gulls, towels, Bumbot running, the sea's glints). region6, region7, region9, deck3,
+  highlight pass. Not merged to main (the user: no merges until they say so).

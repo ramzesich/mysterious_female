@@ -3969,7 +3969,9 @@ export class ShipScene extends Phaser.Scene {
         // (`world.deckHeld`: up the bridge's hatch the bridge stays open until she is out on the balcony over it; by her
         // height its side closed over her legs half way up.)
         else if (moving) target = this.world?.deckHeld?.() ?? this.deckAt(p.y);
-        else if (this.mode === 'swim') target = this.deckAt(this.pool.y);
+        // (In the water, the pool's own deck, whole: `deckAt` of its surface, 4 px under the floor, was 97% of the way up to
+        // it, and the deck below showed 3% of its inside through its side as faint ghosts; the user, 2026-11-27.)
+        else if (this.mode === 'swim') target = this.pool.deck;
         // (In the shaft, in the slab between two decks: the deck it sets out from, the one below opened by `world.lookOpen`.)
         else if (this.route === 'duct') target = this.world.data.duct.deck;
         else if (this.mode === 'scripted' && p.y >= this.waterY - 4) target = null;  // overboard: all shell

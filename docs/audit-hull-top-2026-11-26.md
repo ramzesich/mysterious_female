@@ -19,7 +19,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 1. **DONE 2026-11-27** (the tank drawn a tile thinner; see `docs/progress-decisions.md`). **Deck 12's forward pool's tank covers deck 11's windows.** The kids' pool (x 3290 to 3490, about 58.5 to 62.7 m)
    is drawn as a tile block 416 to 466, under deck 12's floor; deck 11's window row starts at 448, so ~18 px of five
    windows' tops are behind it, in every state (closed, open, dimmed). `c-fwdpool.png`, `z-pooltile.png`.
-2. **Next, on the user's word** ("not now, at first the two above"). **Corrected (2026-11-27):** deck 11 going bright under the kids' pool is the rule, not a fault: out in the open
+2. **DONE 2026-11-27** (her deck in the water is the pool's own). **Corrected (2026-11-27):** deck 11 going bright under the kids' pool is the rule, not a fault: out in the open
    nothing is dimmed (GAME_DESIGN.md §5.3, the user, 2026-11-08), and standing on the open pool deck gives the same.
    The real fault is smaller and in all three pools: swimming sets the cut-away's deck to `deckAt(pool.y)`, a
    fraction (11.97 for the kids' pool, 10.97 for deck 11's), so the pool's own deck keeps 3% of its hull over it and
