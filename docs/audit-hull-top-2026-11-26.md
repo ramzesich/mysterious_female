@@ -81,4 +81,4 @@ funnel's top platform (y about -228), its stacks, the horn and the radar mast's 
 
 ## Next
 
-The user's word on which to fix and how; nothing is built.
+All twelve answered (2026-11-27): 1 to 5, 8 to 11 done, 6, 7 left as they are, 12 by design; with the funnel's top mended on the way. On branch `refine`, not merged into main (the user's word awaited).
