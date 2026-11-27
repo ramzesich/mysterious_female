@@ -965,6 +965,9 @@ LOOKOUTS = {"look_stardust": (7, 243.45, 0.5, (180, 44), [6], {"drop": (244, 256
 PORTHOLES = {"look_wake": (4, 249.96, 52)}
 # Slot machines that pay out over the floor (`haz_chips`): id: (deck, m, half the spill's width m).
 CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_chips_3": (7, 166.79, 0.9)}
+# The theatre's popcorn (part 11's item 12, 2026-11-27): the man with the tub tips it now and then, and it lies on the
+# aisle's floor ahead of him (`Popcorn` in src/world/movers.js). id: (deck, m of the man, his person's id).
+POPCORN = {"haz_popcorn": (6, 226.54, "amb_audience_3")}
 # The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).
 JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 

@@ -16,7 +16,7 @@ from population import BALLS, COURT, FLARES, FLOCK_BIRDS, FLOCKS, FUNNEL_TOP, LA
 from population import BELL_GULL, BOW, FINALE
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
-                        GRIPS, GULLS, ITEMS, JACKPOTS, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, POPCORN, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
                         SEAT_SPOTS, SEATS, SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
@@ -312,6 +312,8 @@ def build_world():
         ents.append(dict(kind="porthole", id=pid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", up=up))
     for cid, (deck, m, half) in CHIPS.items():
         ents.append(dict(kind="spill", id=cid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", half=round(half * 48), top=64))
+    for pid, (deck, m, who) in POPCORN.items():
+        ents.append(dict(kind="popcorn", id=pid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", who=who))
     for jid, (deck, m, flag, up) in JACKPOTS.items():
         ents.append(dict(kind="jackpot", id=jid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", flag=flag, dy=up))
 

@@ -5735,3 +5735,22 @@ eleven faults of the old scene, twenty decisions, four rounds of play). What cha
   it); its gulls go up one by one, each from where it sat.
 - Code: `src/world/horn.js`, `HORN` in `src/config.js`, `tools/build_horn.py`, `assets/ship/horn/`,
   `assets/source/horn/`; `Flock.liftOff` takes a place and a wait for each gull. Checks: `region8.horn`.
+
+## Part 11's item 12: the theatre's popcorn; a slide before the slip's fall (2026-11-27)
+
+- **The popcorn** (plan-the-rest §7f, 12): the man with the tub in the stalls (`amb_audience_3`, deck 6, 226.54 m) tips it
+  now and then and it lies on the aisle's floor ahead of him, 17 to 79 px past his middle: running onto it is the chips'
+  slip (scenario 1, "Slipped"); standing on it or a hop over it, nothing. His clip (PixMiniMax from his game picture on
+  green, 2 generations, seed 1 of two; approved composed over his seat first): the tub tips over his knees (the tell, 1 s,
+  with a rustle), the popcorn pours, he rights it and is back in his own picture. The game's seat put back split round him
+  in every frame; two frames left out where the generator's seat moved; the lying popcorn a strip of its own
+  (`assets/ship/popcorn.png`, `tools/build_popcorn.py`) shown frame by frame with his clip, then 4 s, blinking out. Not
+  `Spill`: a `Popcorn` mover (`src/world/movers.js`, `POPCORN` in the config) that sets his frames from one clock (Phaser's
+  per-frame durations were ignored: the clip ran in 0.93 s, not 1.56). Sounds `popcornRustle`, `popcornSpill` (measured,
+  within bounds; the user listens). `?at=popcorn6`; `mishaps.popcorn`. 4 generations.
+- **The user, in play: "Let her slide a little bit forward before the fall. Same on the casino chips."** Scenario 1 has a
+  `slide` (0.3 s): in her slip (the wet patch's clip) she slides on from her speed to a stop (about 21 px at a run), short
+  of any wall or door, then sits from the fall's second frame, which leans back as her slip does (`scareDown`, `sitDown`
+  in the ship scene). (Built first with `PLAYER.speed`, which does not exist: no slide at all; found by logging her
+  clips frame by frame, it is `runSpeed`.)
+- **Tests:** `mishaps.popcorn` (new), `region3`, `boot` pass; `check_overlaps` 0; the rest not run.

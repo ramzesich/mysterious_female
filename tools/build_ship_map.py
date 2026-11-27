@@ -1086,7 +1086,7 @@ def build_objects():
     # onto a spill; the kid's jet, 11a/11b, `&did=bb5`, at the pool attendant's hut (his checkpoint), walk aft at him; the stage's swinging light,
     # 12a/12b, `&did=bb3`, walk aft under it; the towel stack, 18, aft of it (forward of it the darting vacuum comes first), run forward past it; the drill's boat,
     # 15, run aft at it once it is hoisted.)
-    for name, deck, m in [("chips7", 7, 148.5), ("jet11", 11, 140.8), ("light6", 6, 241.5), ("towels9", 9, 144.5)]:
+    for name, deck, m in [("chips7", 7, 148.5), ("jet11", 11, 140.8), ("light6", 6, 241.5), ("popcorn6", 6, 222.0), ("towels9", 9, 144.5)]:
         add(point(name, "place", exact_x(m), floor_y(deck)))
     # (At 184.3 m since 2026-11-26: at 180.5 the walkway's gull, 181 m (plan-the-rest §7f, 6), dove on her as the page loaded;
     # 0.7 m aft of its reach, 1.7 m forward of the drill's boat.)

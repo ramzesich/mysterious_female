@@ -5821,6 +5821,8 @@ export class ShipScene extends Phaser.Scene {
     // then back at her checkpoint.
     scareDown(sc) {
         const p = this.player, slip = sc.down === 'sit';
+        // (Her speed as she was hit, for a slide: read before `beginScare` stops her body.)
+        const vx = sc.slide ? Phaser.Math.Clamp(p.body.velocity.x, -PLAYER.runSpeed, PLAYER.runSpeed) : 0;
         this.beginScare();
         this.scareFrom = { x: p.x, y: p.y };
         sfx.scare();
@@ -5832,7 +5834,33 @@ export class ShipScene extends Phaser.Scene {
             this.time.delayedCall(1600, () => this.respawn());
             return;
         }
-        this.herClip(clip);
+        // (`slide`: on the chips or the popcorn she slides on a little in her slip, from her speed to a stop in `slide` s,
+        // short of any wall or door, then sits down from the fall's second frame, where it leans back as her slip does:
+        // the user, 2026-11-27.)
+        if (vx && Math.abs(vx) > 20) {
+            const dir = Math.sign(vx), T = sc.slide, x0 = p.x, dist = Math.abs(vx) * T / 2;
+            const wall = this.stopShort(p.x, p.x + dir * 4800, p.y, 12);
+            let t = 0;
+            p.setFlipX(dir < 0);
+            if (this.anims.exists('her-slip')) this.herClip('her-slip');
+            this.script = dt => {
+                t = Math.min(T, t + dt);
+                const x = x0 + dir * dist * (1 - (1 - t / T) ** 2);
+                p.x = dir > 0 ? Math.min(x, wall) : Math.max(x, wall);
+                if (t < T) return;
+                this.script = null;
+                this.sitDown(sc, clip, slip, 1);
+            };
+            return;
+        }
+        this.sitDown(sc, clip, slip, 0);
+    }
+
+    // The built fall's clip from `from` (its frame), then dazed, then her checkpoint.
+    sitDown(sc, clip, slip, from) {
+        const p = this.player;
+        p.anims.timeScale = 1;
+        p.anims.play({ key: clip, startFrame: from });
         // Down, flat on her belly or on her bottom, she is drawn 2 px lower, from the fall's first frame on the floor
         // until she is back at her checkpoint (the user, 2026-11-17: she lay a px or two over the carpet; 2026-11-26, the
         // sit the same; her cell ends at her lowest px, her hand under her chin, so it is done here, not in the art).

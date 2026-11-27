@@ -149,7 +149,7 @@ CAST = {
     # PixelLab ones in their own chairs kept as `stand-own-chair.png`.)
     "aud_gent": ("7a1005bb-985f-4463-87e0-a07a75b1da48", {}, {"wash": 0.12}),
     "aud_lady": ("5b1a8280-b981-4f70-9520-fece33d9532b", {}, {"wash": 0.12}),
-    "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {}, {"wash": 0.12}),
+    "aud_popcorn": ("5839b55a-2580-4cfc-866c-da9207cb2a8e", {"tip": 10}, {"wash": 0.12}),
     "aud_girl": ("f88758dd-1a25-4b42-91db-96898f49701e", {}, {"wash": 0.12}),
     "aud_granny": ("93caa538-db58-45db-98df-eb42a7277afa", {}, {"wash": 0.12}),
     # Region 4 (Housekeeping): deck 9's corridor, the atrium walks, the laundry.

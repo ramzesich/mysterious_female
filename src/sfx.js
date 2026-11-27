@@ -591,6 +591,9 @@ const things = {
     flashCharge: (s = 0.7) => tone(1800, s, { type: 'sine', to: 5200, vol: 0.02, attack: s * 0.6 }),
     // The casino: chips, and a machine's little win.
     chips: () => { for (let i = 0; i < 7; i++) tone(r(2600, 4200), 0.025, { vol: 0.056, t: r(0, 0.22) }); },
+    // The theatre's popcorn: the tub's rustle as it tips (the tell), and the popcorn pattering onto the carpet.
+    popcornRustle: () => { for (let i = 0; i < 6; i++) noise(0.05, { band: r(2200, 3400), q: 1.4, vol: 0.09, attack: 0.01, t: i * 0.11 + r(0, 0.04) }); },
+    popcornSpill: () => { for (let i = 0; i < 10; i++) noise(0.02, { band: r(1500, 2600), q: 2, vol: 0.1, t: r(0, 0.35) }); },
     slot: () => run([hz(84), hz(88), hz(91), hz(96)].sort(() => Math.random() - 0.5), 0.07, { vol: 0.0455, len: 1.8 }),
     // The court: a ball on the deck, through the air, through the net.
     bounce: () => { thud(165, 0.1, 0.26); noise(0.025, { band: 650, q: 2, vol: 0.14 }); tone(420, 0.06, { type: 'sine', vol: 0.03, t: 0.01 }); },

@@ -249,7 +249,8 @@ with two). A start place by each: `docs/start-links.md`.
 
 | Hazard | Where | Scenarios | Gag | Sounds | Checked in |
 |---|---|---|---|---|---|
-| `haz_chips` (the slots' spills) | 7 | 1 | none: the built fall (sit) | `slip` | `region3` |
+| `haz_chips` (the slots' spills) | 7 | 1 | none: her slide, then the built fall (sit) | `slip` | `region3` |
+| `haz_popcorn` (the man with the tub's spills, 2026-11-27) | 6 | 1 | none: her slide, then the built fall (sit) | `popcornRustle`, `popcornSpill`, `slip` | `mishaps.popcorn` |
 | The dog's lead (`haz_dog_4`) | 4 | 2 | the built fall, then the dog's lick | `bark` | `deck4` |
 | Room-service trays (`haz_trays_*`; the Seven Seas' `haz_trays_5a` to `5c` until the lunch, §7f) | 5, 8, 10 | 3 | her ride on a tray | `crash` | `region6`, `region7`, `mishaps.things`, `mishaps.stretches` |
 | The papers (`haz_papers_5`, `5b`) | 5 | 4a, 4b | her leg up behind (belly) / in front (bottom) | `paperSlide` | `deck4`, `pocket` |
@@ -445,6 +446,7 @@ leaving the frame (a wink, no trigger).
 |---|---|---|---|---|
 | 205.3 | `cp_foyer` | The foyer's burgundy padded door | Checkpoint | Built |
 | 206-240 | decor | Rows of seats (built); `amb_audience` three seated | | |
+| 226.54 | `haz_popcorn` | The man with the popcorn tub (`amb_audience_3`) tips it (part 11, §7f 12, 2026-11-27) | `random(8-14 s)`: his tub tips 1 s with a rustle (the tell), the popcorn pours and lies 17 to 79 px ahead of him for 4 s: a slip ("Slipped"), her slide first | His clip `tip`, generated; `assets/source/people/aud_popcorn-raw/tip/` |
 | 242 | `haz_pit` | The orchestra pit in front of the stage (not built: the rival goes down the stage's hatch) | A one-deck drop for the rival only (she can hop it) | Drawn |
 | 244-254 | `haz_lights` | The stage lights, swinging after `bb_3` (as built: one, at 245.9 over the drum kit since 2026-11-19, the user's swap with the stage manager; a generated lantern since 2026-11-24, let down by the rival's weight on it in `bb_3`) | `timed(4, 1.2, 244-254)` over the stage, two lights alternating; contact "Bonked" | Drawn |
 | 246 | `npc_stagemanager` | The stage manager (as built: at 248.5, aft of centre stage, turned to his dancers, his back to the cat, since 2026-11-24: the user, "switch places: the stage manager and the dancers"; turned to the hole after `bb_3`) | `static`; sneezes every 5 s from his first sneeze in `bb_3` (not before: the user); bubble (a pill bottle) after `bb_3`; E with the pills: `item_card_ent` (`scn_card_ent`) | Sneeze, flap, talk |

@@ -8,6 +8,7 @@
 // floor (a paper); crowded: someone stands just past it (the trolley's stewardess) }. Returns the scenario's number, as in the plan's tables.
 const PICK = {
     chips: () => '1',
+    popcorn: () => '1',
     lead: () => '2',
     trays: () => '3',
     // A paper (the user, 2026-11-16): at her front, sliding at her or lying where she steps, her

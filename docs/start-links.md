@@ -69,6 +69,7 @@ new one added there should be added here too.
 | `nook`: inside the reading nook, open (its armchair: all fourteen books; its frame: her armchair at home) | <http://localhost:8000/?play&at=nook&did=books_all,nook> |
 | `theatre`: the Stardust Lounge | <http://localhost:8000/?play&at=theatre&cards=all> |
 | `promenade`: outside, on the promenade | <http://localhost:8000/?play&at=promenade&cards=all> |
+| `popcorn6`: deck 6, in the theatre's stalls, 4.5 m forward of the man with the popcorn tub (walk aft: his spill, 1) | <http://localhost:8000/?play&at=popcorn6> |
 | `light6`: deck 6, by the stage door, forward of the stage's swinging light (walk aft under it as it swings: 12a from in front of it, 12b at her back; it swings once near-catch 3 is done, `did=bb3`) | <http://localhost:8000/?play&at=light6&did=bb3> |
 | `maid6`: deck 6, by the maid's cabin's open door (E in; her plant on the windowsill, 12) | <http://localhost:8000/?play&at=maid6> |
 

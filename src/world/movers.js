@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER, CRY, GAGS, VIEW } from '../config.js';
+import { PLAYER, CRY, GAGS, VIEW, POPCORN } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -485,6 +485,91 @@ export class Spill {
             g.fillStyle(0x2e222f, 1).fillRect(x - 3, d.y - 3 - up, 7, 3);
             g.fillStyle(colours[i % colours.length], 1).fillRect(x - 2, d.y - 3 - up, 5, 2);
             g.fillStyle(0xffffff, 0.7).fillRect(x - 1, d.y - 3 - up, 2, 1);
+        }
+    }
+}
+// The theatre's popcorn (part 11's item 12, the user, 2026-11-27): the man with the tub (`def.who`, a person) tips it;
+// the popcorn pours out in his own clip and lies on the aisle's floor ahead of him, frame by frame from his clip's frame
+// (`assets/ship/popcorn.png`, tools/build_popcorn.py), then for `POPCORN.lie`; running on it, the chips' slip.
+// Standing on it or hopped, nothing. { x: his middle, y: the floor, who }.
+export class Popcorn {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        this.popcorn = true;
+        this.meta = s.cache.json.get('popcorn-meta');
+        const [a, b] = this.meta.span;
+        this.def = { ...def, x: def.x + (a + b) / 2, half: (b - a) / 2, man: def.x };
+        this.state = 'idle';
+        this.at = null;
+        this.lying = s.add.sprite(def.x + this.meta.dx, def.y - this.meta.dy, 'popcorn', 0).setOrigin(0, 1)
+            .setDepth(D.props + 0.1).setVisible(false);
+        world.add([this.lying]);
+    }
+
+    get man() { return this.world.people.byId[this.def.who]; }
+
+    // His clip's frame at `t` ms from its start (the tell's frames slowed by `POPCORN.slow`), or -1 once it is over: one
+    // clock, his sheet's frames set from it.
+    frameAt(t) {
+        for (let k = 0, end = 0; k < this.meta.clip; k++) {
+            end += 100 + (k < POPCORN.tell ? POPCORN.slow : 0);
+            if (t < end) return k;
+        }
+        return -1;
+    }
+
+    update(dt, time) {
+        const s = this.scene, her = s.player, d = this.def, m = this.man;
+        if (!m) return;
+        if (this.state === 'idle') {
+            if (Math.abs(her.x - d.x) > 800 || Math.abs(her.y - d.y) > 200) return;
+            this.at ??= time + Phaser.Math.Between(...POPCORN.first);
+            if (time < this.at || m.state !== 'idle' || m.busy) return;
+            this.state = 'tell';
+            this.t0 = time;
+            m.state = 'acting';
+            m.sprite.anims.stop();
+            sfx.at(d.man, d.y).popcornRustle();
+            return;
+        }
+        if (this.state === 'tell' || this.state === 'pour') {
+            const at = this.frameAt(time - this.t0), playing = at >= 0, k = playing ? at : this.meta.clip - 1;
+            if (playing) m.sprite.setFrame(m.meta.anims.tip[k]);
+            // (The lying popcorn of the last of its frames the clip has reached.)
+            const n = this.meta.frames.findLastIndex(f => f <= k);
+            if (n >= 0) this.lying.setFrame(n).setVisible(true).setAlpha(1);
+            if (this.state === 'tell' && k >= POPCORN.live) {
+                this.state = 'pour';
+                sfx.at(d.x, d.y).popcornSpill();
+            }
+            if (!playing) {
+                this.world.people.idle(m);
+                this.state = 'spilled';
+                this.at = time + POPCORN.lie;
+            }
+        } else if (this.state === 'spilled') {
+            const left = this.at - time;
+            this.lying.setAlpha(left < 700 && Math.floor(time / 90) % 2 ? 0.35 : 1);
+            if (left <= 0) {
+                this.state = 'idle';
+                this.at = time + Phaser.Math.Between(...POPCORN.again);
+                this.lying.setVisible(false);
+                return;
+            }
+        }
+        // (Live from the clip's `live` frame on: in `pour` and `spilled`.)
+        if (this.state === 'tell') return;
+        const onFloor = her.body.blocked.down || her.body.touching.down;
+        if (s.mode === 'play' && s.route === 'inside' && onFloor && Math.abs(her.y - d.y) < 3 && Math.abs(her.x - d.x) < d.half
+            && Math.abs(her.body.velocity.x) > 20) {
+            if (this.world.carry) this.world.carryBox.spill(d.x, false, 'popcorn');
+            else if (s.lungeSafe()) this.world.lunged('popcorn', d.x);
+            else {
+                sfx.slip();
+                s.scareContact(her.x - Math.sign(her.body.velocity.x) * 10, 'popcorn');
+            }
         }
     }
 }

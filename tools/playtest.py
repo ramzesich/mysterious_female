@@ -7175,6 +7175,43 @@ def scenario_mishaps__stretches(b):
     return ok
 
 
+def scenario_mishaps__popcorn(b):
+    """The theatre's popcorn (part 11's item 12, 2026-11-27): the man with the tub tips it (his clip, the tell), it lies
+    on the aisle's floor ahead of him; standing on it or a running jump over it is nothing; running onto it, 1 (the built
+    fall), none on her or two."""
+    ok = True
+    PC = f"{MS}.world.movers.find(m => m.popcorn)"
+    b.open("?play&reset&at=popcorn6")
+    x, half = js(b, f"{PC}.def.x"), js(b, f"{PC}.def.half")
+    y = b.state()["y"]
+    spill = lambda: js(b, f"(m => {{ m.state = 'idle'; m.at = 0; }})({PC})")
+    spill()
+    wait(0.3)
+    ok &= check(js(b, f"[{PC}.state, {MS}.world.people.byId.amb_audience_3.state]") == ["tell", "acting"],
+                "he tips his tub: the tell", js(b, f"{PC}.state"))
+    ok &= check(wait_js(b, f"{PC}.state === 'spilled'", 3) and js(b, f"{PC}.lying.visible")
+                and js(b, f"{MS}.world.people.byId.amb_audience_3.state") == "idle",
+                "then the popcorn lies on the floor, he back in his seat")
+    b.shot("mishaps-popcorn")
+    b.teleport(x, y)
+    wait(0.5)
+    ok &= check(b.state()["mode"] == "play", "standing on it is nothing", b.state())
+    spill()
+    wait_js(b, f"{PC}.state === 'spilled'", 3)
+    b.teleport(x - half - 60, y)
+    wait(0.3)
+    hold_until(b, "right", lambda s: s["x"] >= x - half - 14, 3)
+    b.hold(["right", "space"], 0.85)
+    ok &= check(b.state()["mode"] == "play" and b.state()["x"] > x + half, "nor is a running jump over it", b.state())
+
+    def run_on():
+        b.teleport(x - half - 60, y)
+        js(b, f"(m => {{ m.state = 'spilled'; m.at = {MS}.time.now + 4000; m.lying.setVisible(true); }})({PC})")
+        hold_until(b, "right", lambda s: s["mode"] != "play", 3)
+        b.key("right", False)
+    return ok & both(b, "the theatre's popcorn (1)", run_on, "1", None, within=4)
+
+
 def scenario_mishaps__balcony(b):
     """At the sunbather's balcony (deck 8), seen from the rail: 24, her tiptoe, none on her or two."""
     b.open("?play&at=occupied8&cards=all")

@@ -13,7 +13,7 @@ import { People } from './people.js';
 import { Carry, LOADS } from './carry.js';
 import { Story } from './story.js';
 import { Library, BOOK_COLOURS, BOOK_ACCENTS } from './library.js';
-import { Robot, Gull, BellGull, SwingLight, Spill, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
+import { Robot, Gull, BellGull, SwingLight, Spill, Popcorn, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 import { Fog } from './bow.js';
@@ -1459,6 +1459,9 @@ export class World {
             }
             case 'spill':
                 this.movers.push(new Spill(this, e));
+                break;
+            case 'popcorn':
+                this.movers.push(new Popcorn(this, e));
                 break;
             case 'darter':
                 this.movers.push(new Darter(this, e));

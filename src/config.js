@@ -371,6 +371,13 @@ export const SHAFT = {
 // and flies `flight` s in a lob peaking `peak` px over the floor (clear of the flags, 95, and under the ceiling, 128), turning a quarter at a time,
 // down onto the other's toes (`lie`: px ahead of their feet, `lieUp` its middle over the floor). A hit: her gag 26 and
 // the thrower cheers `cheerS` s. Her cry or her dash near one: the nearer ducks `duckS` s (holding the pillow back).
+// The theatre's popcorn (part 11's item 12, the user, 2026-11-27): the man with the tub (`amb_audience_3`) tips it now
+// and then (his clip `tip`, tools/build_popcorn.py) and it lies on the aisle's floor ahead of him: the chips' slip. ms;
+// `slow`: added to each of the clip's first `tell` frames (his tub tipping, with its rustle); `live`: the clip's frame
+// from which the popcorn lies (the slip is on from then); `lie`: how long it lies after the clip, the last 700 ms
+// blinking; the first spill and the next ones after so long (between the two numbers) while she is near.
+export const POPCORN = { slow: 60, tell: 6, live: 8, lie: 4000, first: [3000, 9000], again: [8000, 14000] };
+
 export const SIEGE = {
     wait: 0.9, fps: 10, flight: 1.5, peak: 112, lie: 14, lieUp: 5, cheerS: 1.8, duckS: 1.0,
     release: { splash_king: [12, 24, 39], splash_knight: [13, 17, 37] },
@@ -459,6 +466,7 @@ export const LUNGE = {
 // by the side of her it is on and who was moving: src/world/mishaps.js.
 export const MISHAPS = {
     chips: {},              // the casino's spilled chips
+    popcorn: {},            // the theatre's spilled popcorn (deck 6)
     lead: {},               // the dog's lead (deck 4)
     trays: {},              // trays on the floor by a "Do Not Disturb" door
     papers: {},             // the paper rounds' papers (deck 5)
@@ -504,7 +512,8 @@ export const MISHAPS = {
 // thing that hit her says how it carries her (`ride` in `scareContact`); `down` is kept for a hit
 // that cannot (a tray in her hands spilled, a hit in the air).
 export const MISHAP_SCENES = {
-    '1': { word: 'slipped', react: 'slipback', down: 'sit' },     // she runs onto the chips
+    // (`slide`: s she slides on in her slip, from her speed to a stop, before she sits down: the user, 2026-11-27.)
+    '1': { word: 'slipped', react: 'slipback', down: 'sit', slide: 0.3 },     // she runs onto the chips, the popcorn
     '2': { word: 'tripped', down: 'belly' },     // into the dog's lead: down whatever she carries
     '3': { word: 'tripped', react: 'stumble', down: 'belly', gag: 'tray' },  // onto the trays: she rides one off (`Trays.ride`)
     '4a': { word: 'slipped', react: 'stumble', down: 'belly', gag: 'paperFront' },   // a paper at her front: her leg up behind, on her belly
