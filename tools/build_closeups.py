@@ -45,8 +45,10 @@ MEND = {"parasol": {(9, 98): "cd683d", (10, 98): "4c3e24", (9, 99): "cd683d", (1
         # The pills' white label: a dark title, lines of print, a dark mark (the user, 2026-11-20:
         # "something that resembles a text on its white label"; text in art is ours to draw).
         "pills": {(3, 30): "3e3546", (4, 30): "3e3546", (5, 30): "3e3546", (6, 30): "3e3546", (7, 30): "3e3546", (8, 30): "3e3546", (9, 30): "3e3546", (10, 30): "3e3546", (11, 30): "3e3546", (12, 30): "3e3546", (13, 30): "3e3546", (14, 30): "3e3546", (15, 30): "3e3546", (3, 31): "3e3546", (4, 31): "3e3546", (5, 31): "3e3546", (6, 31): "3e3546", (7, 31): "3e3546", (8, 31): "3e3546", (9, 31): "3e3546", (10, 31): "3e3546", (11, 31): "3e3546", (12, 31): "3e3546", (13, 31): "3e3546", (14, 31): "3e3546", (15, 31): "3e3546", (3, 35): "9babb2", (4, 35): "9babb2", (5, 35): "9babb2", (6, 35): "9babb2", (7, 35): "9babb2", (8, 35): "9babb2", (9, 35): "9babb2", (10, 35): "9babb2", (11, 35): "9babb2", (12, 35): "9babb2", (13, 35): "9babb2", (14, 35): "9babb2", (15, 35): "9babb2", (16, 35): "9babb2", (17, 35): "9babb2", (18, 35): "9babb2", (19, 35): "9babb2", (3, 38): "9babb2", (4, 38): "9babb2", (5, 38): "9babb2", (6, 38): "9babb2", (7, 38): "9babb2", (8, 38): "9babb2", (9, 38): "9babb2", (10, 38): "9babb2", (11, 38): "9babb2", (12, 38): "9babb2", (13, 38): "9babb2", (14, 38): "9babb2", (15, 38): "9babb2", (16, 38): "9babb2", (17, 38): "9babb2", (3, 41): "9babb2", (4, 41): "9babb2", (5, 41): "9babb2", (6, 41): "9babb2", (7, 41): "9babb2", (8, 41): "9babb2", (9, 41): "9babb2", (10, 41): "9babb2", (11, 41): "9babb2", (12, 41): "9babb2", (13, 41): "9babb2", (14, 41): "9babb2", (15, 41): "9babb2", (16, 41): "9babb2", (17, 41): "9babb2", (18, 41): "9babb2", (19, 41): "9babb2", (3, 44): "9babb2", (4, 44): "9babb2", (5, 44): "9babb2", (6, 44): "9babb2", (7, 44): "9babb2", (8, 44): "9babb2", (9, 44): "9babb2", (10, 44): "9babb2", (11, 44): "9babb2", (12, 44): "9babb2", (3, 48): "3e3546", (4, 48): "3e3546", (5, 48): "3e3546", (6, 48): "3e3546", (3, 49): "3e3546", (4, 49): "3e3546", (5, 49): "3e3546", (6, 49): "3e3546", (9, 49): "9babb2", (10, 49): "9babb2", (11, 49): "9babb2", (12, 49): "9babb2", (13, 49): "9babb2", (14, 49): "9babb2", (15, 49): "9babb2", (16, 49): "9babb2", (17, 49): "9babb2", (18, 49): "9babb2", (19, 49): "9babb2"}}
-# The four cards: one picture, its stripe (the generated blue, on the palette) in each card's colour,
-# the colours of `CARD_COLOURS` in src/progression.js.
+# The four cards: one picture, the whole card in each card's colour and its stripe (the generated blue, on
+# the palette) a white band (the user, 2026-11-27, with the world's cards of `tools/draw_key_cards.py`; it was
+# white with the stripe in the colour), the colours of `CARD_COLOURS` in src/progression.js. (The swap is
+# one pass: each pixel by its own old colour. The card's white is its only white.)
 CARD_STRIPE = "4d65b4"
 CARDS = {"deck": "4d9be6", "ent": "e83b3b", "hk": "1ebc73", "off": "f9c22b"}
 
@@ -80,7 +82,7 @@ def build():
             continue
         img = picture(p)
         if p.stem == "key-card":
-            pieces += [(f"card-{card}", recolour(img.copy(), {CARD_STRIPE: c})) for card, c in CARDS.items()]
+            pieces += [(f"card-{card}", recolour(img.copy(), {CARD_STRIPE: "ffffff", "ffffff": c})) for card, c in CARDS.items()]
         else:
             pieces.append((p.stem, img))
     width = sum(im.width + 2 for _, im in pieces)

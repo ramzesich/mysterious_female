@@ -5754,3 +5754,27 @@ eleven faults of the old scene, twenty decisions, four rounds of play). What cha
   in the ship scene). (Built first with `PLAYER.speed`, which does not exist: no slide at all; found by logging her
   clips frame by frame, it is `runSpeed`.)
 - **Tests:** `mishaps.popcorn` (new), `region3`, `boot` pass; `check_overlaps` 0; the rest not run.
+
+## The key cards redesigned (2026-11-27, branch `refine`, the Refinement session)
+
+The user: "Let's redesign the access cards, their icons in the game world." Found: the world's card was an old map
+piece (a landscape badge on a coiled lanyard) with a bar of the card's colour laid over it in code, running past its
+edge; on the sun deck it lay at half size, about 13 x 10 px, and read as a tangle; handed over it was the same picture,
+untinted (deck) or tinted whole (ent, hk). The close-ups, the HUD and the lock popup's icon were another design (a white
+portrait card with a coloured stripe). The plan's "the world's picture its close-up shrunk" had never reached the cards.
+The user's answers: (1) the world's card; (2) A, brought to the close-up's design; (3) shown versions, then:
+
+- **One design, the whole card in its colour** (the user's version 5 of five, then "b": the close-ups and the HUD the
+  same): a white band where the stripe was, the chip, the clip, the outline. The close-ups recoloured by rule
+  (`tools/build_closeups.py`: the stripe white, the white the card's colour), the HUD's and the popups' icons follow
+  (they are its shrink); the HUD fills its slot pixels in the card's colour now. **The close-ups keep their long V
+  lanyard** (the user: "don't change their loops").
+- **The world's card, two pictures of it** (`tools/draw_key_cards.py`, by rule, no generations; 8 x 12 px, a little
+  bigger than life, as the other finds): upright, hung from a small closed loop of the lanyard over its clip (the user's
+  loop A of three: "give the upright version a similar belt loop, as the lying version has"), for the cards given to her
+  (the gangway officer, the stage manager, the steward's toss; no tint now); lying flat, seen a little from above, its
+  lanyard in a loop beside it, for the Officer's card dropped on the sun deck in the horn's scene (and the side table's
+  case, unused). The old `key-card` piece stays in the ship-art atlas, unused (not rebuilt for it).
+- **Noticed, not touched:** the gangway officer and the stage manager have no giving hand (`GIVE_HANDS`), so their card
+  shows in the air before their chest, as the old one did. Offered to the user separately.
+- **Checks:** boot, region1, region2, region4, region8, trunk pass. Pictures and scripts: `docs/key-cards/`. Not merged.

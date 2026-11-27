@@ -9,7 +9,7 @@
 - `him`: her husband's, from his approved front view with the bear (`assets/source/hud/husband/
   south-bear.png`), one row of his forehead taken out (the user: "making my icon shorter");
 - `book`: the popups' book icon (the same generated try);
-- `card-<card>`: the popups' key card (cut from its close-up), the slot at its top filled white
+- `card-<card>`: the popups' key card (cut from its close-up), the slot at its top filled in the card's colour
   (the user: "fix the triangular cuts"); `card-<card>-ghost`: its outline, faint, for a card not held.
 
 - `socks`, `parasol`: her two utilities, shown at the top right once hers (the user, 2026-11-26): **the user's own
@@ -107,8 +107,8 @@ def main():
     pieces = [("tangerine", rim(tangerine())), ("cat", rim(cat)), ("her", rim(her)), ("him", rim(him)), ("book", rim(book))]
     for c in CARDS:
         a = card(c)
-        for x, y in SLOT:
-            a[y, x] = (255, 255, 255, 255)
+        for x, y in SLOT:     # (in the card's own colour since the cards are coloured whole, 2026-11-27)
+            a[y, x] = a[a.shape[0] // 2, a.shape[1] // 2]
         pieces += [(f"card-{c}", a), (f"card-{c}-ghost", ghost(a))]
     pieces += [(n, rim(by_hand(n))) for n in ("socks", "parasol")]
     pieces.append(("g8734", infinity()))

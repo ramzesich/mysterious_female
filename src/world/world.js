@@ -2327,7 +2327,7 @@ export class World {
     // A thing handed or tossed to her has reached her: a sparkle, and it is hers.
     async received(img, frame, then) {
         const s = this.scene;
-        if (frame === 'key-card') sfx.card();
+        if (frame.startsWith('thing:key-card')) sfx.card();
         else sfx.take();
         for (let i = 0; i < 10; i++) {
             const a = (Math.PI * 2 * i) / 10;
