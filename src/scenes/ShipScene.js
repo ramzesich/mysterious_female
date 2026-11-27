@@ -2375,13 +2375,7 @@ export class ShipScene extends Phaser.Scene {
         }
         this.worldLayer.add([g, ncl]);
         // The smoke out of each pipe, as the DJ's fog machine (`drawSmoke`, `FUNNEL_SMOKE` in the config; the user, 2026-11-27:
-        // the flat white discs it was read as more suns at sunset). The horn's cough still uses `puff`.
-        if (!this.textures.exists('puff')) {
-            const pg = this.make.graphics({ x: 0, y: 0 }, false);
-            pg.fillStyle(0xffffff, 1).fillCircle(32, 32, 32);
-            pg.generateTexture('puff', 64, 64);
-            pg.destroy();
-        }
+        // the flat white discs it was read as more suns at sunset); the horn's cough a burst of it (`smokeBurst`).
         this.smokeG = this.add.graphics().setDepth(DEPTH.exterior + 0.03);
         this.worldLayer.add(this.smokeG);
         this.funnelPipes = pipes;
@@ -2401,18 +2395,27 @@ export class ShipScene extends Phaser.Scene {
         const rnd = n => ((Math.sin(n * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1;
         const gives = (j, at) => Math.max(S.least, Math.min(1,
             0.55 + 0.3 * Math.sin(at / S.swellMs[0] + j * 2.4) + 0.25 * Math.sin(at / S.swellMs[1] + j * 4.1 + 1)));
+        // (A puff born while the horn blows is thicker and every one is born: `smokeBurst`.)
+        const [b0, b1] = this.smokeBurstAt || [0, -1], burst = at => at >= b0 && at <= b1;
         pipes.forEach((p, j) => {
             for (let i = 0; i < S.puffs; i++) {
-                const n = j * 97 + i, f = (i / S.puffs + rnd(n) * 0.5 + t / S.lifeMs) % 1;
-                if (rnd(n + 0.5) > gives(j, t - f * S.lifeMs)) continue;
+                const n = j * 97 + i, f = (i / S.puffs + rnd(n) * 0.5 + t / S.lifeMs) % 1, born = t - f * S.lifeMs;
+                const thick = burst(born);
+                if (!thick && rnd(n + 0.5) > gives(j, born)) continue;
                 const side = rnd(n + 0.25) * 2 - 1;
                 const x = p.x + side * p.w * 0.3 + S.drift * Math.pow(f, 1.6) + side * f * 8 + Math.sin(t / 260 + i * 1.3) * (0.5 + f * 2.5);
-                const r = S.r0 + f * S.grow + (i % 3) * 0.5;
+                const r = S.r0 + f * S.grow + (i % 3) * 0.5 + (thick ? S.burst.r : 0);
                 const y = p.y - r * 0.6 - S.rise * (1 - (1 - f) * (1 - f)) + Math.sin(t / 310 + i) * f * 2;
-                const a = S.alpha * (1 - f) * Math.min(1, f / 0.04);
+                const a = Math.min(0.85, S.alpha * (thick ? S.burst.alpha : 1)) * (1 - f) * Math.min(1, f / 0.04);
                 if (a > 0.02) g.fillStyle(i % 3 ? 0xffffff : 0xc9ced3, a).fillCircle(x, y, r);
             }
         });
+    }
+
+    // The horn's blast (src/world/topdeck.js): every pipe gives all it has, thicker, for `ms`; the burst drifts off up
+    // the plumes as one.
+    smokeBurst(ms) {
+        this.smokeBurstAt = [this.smokeClock, this.smokeClock + ms];
     }
 
     // The far background laid out for the camera as it stands. (A look-out's zoom out, `world.lookFar`, 0 to 1: the

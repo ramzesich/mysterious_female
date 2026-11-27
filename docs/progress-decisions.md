@@ -5543,3 +5543,27 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   sea's clock: on in the outside view, held for a still picture. The pipes' rims over its first puffs. The horn's
   cough keeps the old `puff` discs. Approved by the user.
 - **Checks:** boot, region8 pass. Pictures: `docs/audit-hull-top/smoke/`. Not merged.
+
+## The funnel's top mended (the Refinement session, 2026-11-27; the user's, after the hull's top review's 8)
+
+The user, at the funnel's top: "let's fix the other stuff on the funnel", one thing at a time, committed together ("The
+funnel is finished").
+
+- **The railing's end:** the rails stopped in the air 20 px past their last post, and she was held at the edge by an
+  invisible wall ("visually it looks like can just go through and fall"). A post at the very end of both rails (the
+  corner, as a railing turning across its end reads from the side); her stop 8 px back, short of it.
+- **Both rails over her** (the user: "make both of the horizontal white lines obscure her, not only the lower one"): the
+  far railing drawn just under the near one, in front of her (and so of the horn's post, the toolbox and the telescope,
+  which stood in front of it before; said to the user).
+- **The horn, its cord, the toolbox generated** (the user: "generate proper horns and the horn cable. Also, generate the
+  boxes there, that the tangerine is placed on"): two tries of each but the cord, placed in the running game; the user
+  chose horn B and toolbox A. `tools/build_funnel_top.py`, `assets/ship/funnel-top/`, in their own colours (the palette
+  turned the pole green and the lunch box purple). Bumbot on the horn's top bar at the height he sat; the tangerine on
+  the lid between the handle and the lunch box, 15 px up (13; the map data changed in that alone). 27 generations.
+- **Her hands on the cord** (found recording the pull, the user: yes): she had always pulled at the air, the handle
+  behind her. Her fist measured in each frame of `her-pull` (`HORN_FISTS`); she steps beside the cord, facing it, and
+  the handle follows her fist (its knot over her fingers, her fist over its wood), swinging back up as she lets go; at
+  rest it hangs where her first frame takes it (`HORN_REST`, 7 px higher). From either side.
+- **The blast's smoke** (the user: yes): the horn's cough was eight of the old flat discs; now every pipe gives a
+  thicker burst of the drawn smoke for the blast's length (`smokeBurst`, `FUNNEL_SMOKE.burst`). The disc picture is gone.
+- **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/funnel/`. Not merged.

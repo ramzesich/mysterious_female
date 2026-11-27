@@ -33,6 +33,9 @@ export class BootScene extends Phaser.Scene {
         this.load.image('lifeboat-round', 'assets/ship/lifeboat-round.png');   // (the one she goes into, round windows)
         this.load.image('tender', 'assets/ship/tender.png');
         this.load.image('rescue-boat', 'assets/ship/rescue-boat.png');
+        // The funnel's top: the horn on its post, its cord, the engineer's toolbox (tools/build_funnel_top.py).
+        for (const n of ['horn', 'cord-rope', 'cord-handle', 'toolbox']) this.load.image(`funnel-${n}`, `assets/ship/funnel-top/${n}.png`);
+        this.load.json('funnel-top', 'assets/ship/funnel-top/funnel-top.json');
         this.load.image('cabin-8206', 'assets/ship/cabin-8206.png');
         this.load.image('cabin-8206-bed', 'assets/ship/cabin-8206-bed.png');   // (the bed again, over her husband on the sofa)
         // (Her husband's near hand drawn again over her as they embrace at his table: `husband-raw/embrace/hand.py`.)

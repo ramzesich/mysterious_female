@@ -202,7 +202,7 @@ TANGERINES = {
     # Chapel, right of the tap: the user, 2026-11-24, "Place a tangerine here. Move some other tangerine here".)
     "tan_12_restroom": ("restroom", 44, 1, 33, None),
     "tan_12_pinata": (12, 210.75, 3, 0, "broken:sec_pinata"),
-    "tan_funnel": ("funnel", 189.2, 1, 13, None),
+    "tan_funnel": ("funnel", 189.2, 1, 15, None),     # (on the generated toolbox's lid, 15 px up: 2026-11-27)
     # Region 9: on Splash Academy's low table (the plan's snack table), and one among the ball
     # pit's balls (src/world/bow.js shows it as the one orange ball with a leaf).
     "tan_7_splash": (7, 41.2, 1, 20, None),

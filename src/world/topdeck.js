@@ -7,7 +7,7 @@
 // her book, the gulls leave the bow, Bumbot runs for it), the engineer's book, the court's quirk.
 // Places come from maps/world.json (`topdeck`).
 
-import { PLAYER, GAGS, FLARE, HAND_OVER } from '../config.js';
+import { PLAYER, GAGS, FLARE, HAND_OVER, HORN_FISTS, HORN_REST } from '../config.js';
 import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
@@ -828,28 +828,24 @@ export const topdeck = {
 
         // On the top: the horn on its post, its cord; the engineer's toolbox and lunch box; the
         // lookout telescope at the aft rail.
-        const top = f.y, hx = F.hornX;
-        const post = s.add.graphics().setDepth(D.exterior + 0.076);
-        post.fillStyle(0x9babb2, 1).fillRect(hx - 2, top - 104, 4, 104);
-        post.fillStyle(0xe8eaec, 1).fillRect(hx - 2, top - 104, 1, 104).fillRect(hx - 12, top - 94, 22, 3);
-        // (Two brass trumpets, their bells forward.)
-        for (const [dy, len] of [[-103, 30], [-90, 22]]) {
-            post.fillStyle(0x2e222f, 1).fillRect(hx - len - 3, top + dy - 1, len + 4, 8).fillTriangle(hx - len - 3, top + dy + 3, hx - len - 13, top + dy - 6, hx - len - 13, top + dy + 12);
-            post.fillStyle(0xf9c22b, 1).fillRect(hx - len - 2, top + dy, len + 2, 6).fillTriangle(hx - len - 2, top + dy + 3, hx - len - 12, top + dy - 4, hx - len - 12, top + dy + 10);
-            post.fillStyle(0xfbff86, 1).fillRect(hx - len - 2, top + dy + 1, len, 1);
-            post.fillStyle(0xd9a43b, 1).fillRect(hx - len - 12, top + dy - 4, 1, 14);
-        }
-        this.cord = s.add.graphics().setDepth(D.exterior + 0.077);
+        // (Generated, the user's choice of tries, 2026-11-27: tools/build_funnel_top.py; they were drawn in code.)
+        const top = f.y, hx = F.hornX, FT = s.cache.json.get('funnel-top'), H = FT.horn;
+        const post = s.add.image(hx - H.pole, top, 'funnel-horn').setOrigin(0, 1).setDepth(D.exterior + 0.076);
+        // The cord: from under the horn's top bar, its rope cropped to its length, the handle at its end.
+        this.cordAt = { x: hx - H.pole + H.hang[0], y: top - H.h + H.hang[1] };
+        this.cordRope = s.add.image(this.cordAt.x - 1, this.cordAt.y, 'funnel-cord-rope').setOrigin(0, 0).setDepth(D.exterior + 0.077);
+        this.cordHandle = s.add.image(this.cordAt.x - 2, 0, 'funnel-cord-handle').setOrigin(0, 0).setDepth(D.exterior + 0.077);
         this.drawCord(0);
-        const box = s.add.image(F.toolboxX, top, 'toolbox').setOrigin(0.5, 1).setDepth(D.exterior + 0.08);
+        const B = FT.toolbox;
+        const box = s.add.image(F.toolboxX - B.spot, top, 'funnel-toolbox').setOrigin(0, 1).setDepth(D.exterior + 0.08);
         const scope = s.add.image(F.telescopeX, top, 'shipart', 'telescope').setOrigin(0.5, 1).setFlipX(true).setDepth(D.exterior + 0.08);
-        w.add([post, this.cord, box, scope]);
-        w.things.push({ id: 'sec_horn', x: hx + 8, y: top, route: 'inside', items: [], reach: 20, interact: () => this.horn() });
+        w.add([post, this.cordRope, this.cordHandle, box, scope]);
+        w.things.push({ id: 'sec_horn', x: this.cordAt.x, y: top, route: 'inside', items: [], reach: 20, interact: () => this.horn() });
         w.things.push({ id: 'sec_telescope', x: F.telescopeX, y: top, route: 'inside', items: [], reach: 18, interact: () => this.telescope() });
 
-        // Bumbot on the horn's bracket, out of reach, against the sky (population:
+        // Bumbot on the horn's top bar, out of reach, against the sky (population:
         // `bb_glimpse_funnel`) until it sounds under him.
-        this.hornCat = s.add.sprite(hx + 4, top - 94, 'bumbot').setOrigin(0.5, 1).setDepth(D.exterior + 0.09).setFlipX(true);
+        this.hornCat = s.add.sprite(hx + 4, top - H.h + H.seat, 'bumbot').setOrigin(0.5, 1).setDepth(D.exterior + 0.09).setFlipX(true);
         this.hornCat.play('bumbot-sit').anims.chain('bumbot-sat');
         w.add([this.hornCat]);
         this.refreshTopdeck();
@@ -875,17 +871,6 @@ export const topdeck = {
             g.fillStyle(0x4d9be6, 1).fillPoints([{ x: 2, y: 3 }, { x: 5, y: 2 }, { x: 13, y: 12 }, { x: 13, y: 16 }, { x: 10, y: 16 }], true);
             g.fillStyle(0xffffff, 1).fillPoints([{ x: 5, y: 6 }, { x: 7, y: 5 }, { x: 10, y: 9 }, { x: 8, y: 10 }], true);
         });
-        // The engineer's toolbox, his lunch box open on it.
-        make('toolbox', 34, 22, g => {
-            const ink = 0x2e222f;
-            g.fillStyle(ink, 1).fillRect(0, 9, 34, 13).fillRect(11, 5, 12, 5);
-            g.fillStyle(0xe83b3b, 1).fillRect(1, 10, 32, 11);
-            g.fillStyle(0xae2334, 1).fillRect(1, 18, 32, 3).fillRect(1, 13, 32, 1);
-            g.fillStyle(0xc7dcd0, 1).fillRect(14, 12, 6, 3).fillRect(12, 6, 10, 1).fillRect(12, 6, 1, 4).fillRect(21, 6, 1, 4);
-            g.fillStyle(ink, 1).fillRect(20, 3, 13, 7);
-            g.fillStyle(0x4d9be6, 1).fillRect(21, 4, 11, 5);
-            g.fillStyle(0xffffff, 1).fillRect(22, 5, 4, 2);
-        });
         // A windsock, hanging limp from its pole's top (the wind lifts it).
         make('windsock', 8, 26, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 8, 26);
@@ -894,11 +879,23 @@ export const topdeck = {
         this.world.icon('cocktail');
     },
 
-    drawCord(pull) {
-        const F = this.T.funnel, top = this.world.data.funnel.y, x = F.hornX + 8, g = this.cord.clear();
-        g.fillStyle(0xab947a, 1).fillRect(x, top - 93, 1, 44 + pull);
-        g.fillStyle(0x2e222f, 1).fillRect(x - 2, top - 49 + pull, 5, 8);
-        g.fillStyle(0xe83b3b, 1).fillRect(x - 1, top - 48 + pull, 3, 6);
+    // The cord pulled `pull` px: its rope that much longer (cropped from the strip, its pattern two rows), the handle
+    // hanging at rest where her first frame of the pull takes it (`HORN_FISTS`); or with its top at `at`, in her fist.
+    drawCord(pull, at = null) {
+        const top = this.world.data.funnel.y, y = Math.round(at ?? top - HORN_REST + pull), c = this.cordAt;
+        this.cordRope.setCrop(0, 0, 3, Math.max(1, y - c.y + 1));
+        this.cordHandle.y = y;
+    },
+
+    // Her fist on the handle through her pull (the user, 2026-11-27: her hands held nothing, the handle hung behind her):
+    // the handle's top 4 px over her fist's top in the frame shown (its knot over her fingers, its wood in her fist, the
+    // fist drawn over it), its middle under her fist, so the rope stays straight.
+    cordInFist() {
+        const her = this.scene.player, i = her.anims.currentAnim?.key === 'her-pull' ? her.anims.currentFrame.index - 1 : -1;
+        if (i < 0) return false;
+        const tl = her.getTopLeft(), [, fy] = HORN_FISTS[i];
+        this.drawCord(0, tl.y + fy - 4);
+        return true;
     },
 
     refreshTopdeck() {
@@ -910,6 +907,7 @@ export const topdeck = {
     updateTopdeck(dt, time) {
         const s = this.scene, w = this.world, her = s.player, T = this.T;
         if (!T) return;
+        if (this.pulling) this.cordInFist();
         const L = T.lady;
         // The engineer on his break turns to her.
         const e = this.who('npc_engineer_read');
@@ -1299,6 +1297,13 @@ export const topdeck = {
         return true;
     },
 
+    // Where she stands to pull, facing left or right: her fist's middle (a px behind its front, `HORN_FISTS`) in the
+    // pull's first frame over the rope.
+    pullX(left) {
+        const her = this.scene.player, C = 84, off = her.x - her.getTopLeft().x, gx = HORN_FISTS[0][0] - 1;
+        return this.cordAt.x - (left ? C - 1 - gx : gx) + off;
+    },
+
     // E at the horn's cord (population: `scn_horn`). The first time, with the engineer's leave:
     // the blast, and what it sets off, shown from up here by the camera. After that, a toot.
     horn() {
@@ -1307,15 +1312,26 @@ export const topdeck = {
         if (!P.has('engineer') && !P.openAll) return false;
         const first = !P.has('horn');
         w.cut(async () => {
-            her.setFlipX(F.hornX + 8 < her.x);
-            if (s.anims.exists('her-pull')) her.anims.play('her-pull');
-            else s.pose('rise');
-            await w.wait(260);
-            await new Promise(resolve => s.tweens.addCounter({ from: 0, to: 9, duration: 160, onUpdate: tw => this.drawCord(tw.getValue()), onComplete: resolve }));
+            // (Beside the cord, facing it, where her fist in the pull's first frame closes on the handle: a step or two
+            // there first.)
+            const left = this.cordAt.x < her.x, x = this.pullX(left);
+            her.setFlipX(left);
+            if (Math.abs(her.x - x) > 1) {
+                s.pose('run', 0.6);
+                await w.tween({ targets: her, x, duration: Math.min(400, Math.abs(her.x - x) * 16) });
+                her.setFlipX(left);
+            }
+            her.x = x;
+            her.anims.play('her-pull');
+            this.pulling = true;
+            await w.wait(320);
             this.blast(first ? 1500 : 500);
             if (first) this.catOffTheHorn();
             await w.wait(first ? 1300 : 450);
-            s.tweens.addCounter({ from: 9, to: 0, duration: 260, onUpdate: tw => this.drawCord(tw.getValue()) });
+            // (She lets go: the handle swings back up to where it hangs.)
+            this.pulling = false;
+            const from = this.cordHandle.y, rest = this.world.data.funnel.y - HORN_REST;
+            s.tweens.addCounter({ from, to: rest, duration: 260, ease: 'Sine.easeOut', onUpdate: tw => this.drawCord(0, tw.getValue()) });
             s.pose('stand');
             if (!first) return;
             await this.cascade();
@@ -1337,11 +1353,8 @@ export const topdeck = {
                 s.tweens.add({ targets: ring, x: ring.x - 150, scaleX: 5, scaleY: 7, alpha: 0, duration: 700, ease: 'Quad.easeOut', onComplete: () => ring.destroy() });
             });
         }
-        for (let i = 0; i < 8; i++) {
-            const puff = s.add.image(F.hornX - 180 + i * 46 + (i % 2) * 14, top - 96, 'puff').setDepth(s.DEPTH.exterior + 0.03).setScale(0.3).setAlpha(0.9);
-            w.add([puff]);
-            s.tweens.add({ targets: puff, x: puff.x + 120, y: puff.y - 150 - (i % 3) * 30, scale: 2.2, alpha: 0, duration: 1500 + i * 60, delay: i * 50, onComplete: () => puff.destroy() });
-        }
+        // (The pipes cough: a thick burst of their own smoke as long as the blast, the user, 2026-11-27; it was flat discs.)
+        s.smokeBurst(ms);
     },
 
     // Bumbot, on the horn when it sounds: straight up, then down the lattice's front and away

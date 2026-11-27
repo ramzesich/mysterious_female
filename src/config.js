@@ -676,7 +676,13 @@ export const GAGS = {
 // `swellMs`, its own phase), at least `least`; a puff born while its pipe gives little is never born, so a lull drifts off
 // up the plume as one.
 export const FUNNEL_SMOKE = { puffs: 44, lifeMs: 3000, rise: 55, drift: 100, r0: 3.5, grow: 7, alpha: 0.45, least: 0.15,
-    swellMs: [2300, 1300] };
+    swellMs: [2300, 1300], burst: { r: 3, alpha: 1.6 } };   // (`burst`: the horn's blast, `smokeBurst`)
+// Her fists in her pull at the horn's cord (`her-pull`, frames 0 to 4 of her sheet's `pull`; the user, 2026-11-27: her hands
+// held nothing): [the fist's front column, its top row] in her 84 px cell, facing right, measured from the front-most skin
+// pixels. The handle follows them; at rest its top hangs `HORN_REST` px over the funnel's top, where the first frame
+// takes it.
+export const HORN_FISTS = [[50, 31], [51, 30], [52, 35], [53, 45], [53, 39]];
+export const HORN_REST = 56;
 export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, nearK: 0.65 };
 
 // The drill's boat (`DrillBoat`, src/world/outside.js; the user, 2026-11-19: "the drill starts too late, I can
