@@ -1229,7 +1229,7 @@ FINALE = dict(
     # (`drift`: as on the balconies, she is carried about twice this many px a second: here, back
     # by two metres a gust if she does not steer, and still forward, slowly, if she does.)
     gust=dict(every=4.0, tell=0.7, blow=1.1, drift=48),
-    socks=[(11, 25.1), (7, 1.05)],
+    socks=[(11, 24.475), (7, 1.05)],     # (the balcony's 30 px forward of 25.1 m: the user, 2026-11-27)
     gulls=[dict(drop=190, a=9.0, b=23.2, v=2.3), dict(drop=395, a=2.5, b=19.5, v=2.0)],
     mooring=dict(deck=7, a=1.4, b=20.4, cat=4.0, wall=21.4),
     home=dict(step=128, sit=206, cat=178, husband=160),

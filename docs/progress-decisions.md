@@ -5567,3 +5567,25 @@ funnel is finished").
 - **The blast's smoke** (the user: yes): the horn's cough was eight of the old flat discs; now every pipe gives a
   thicker burst of the drawn smoke for the blast's length (`smokeBurst`, `FUNNEL_SMOKE.burst`). The disc picture is gone.
 - **Checks:** boot, region8 pass. Pictures and scripts: `docs/audit-hull-top/funnel/`. Not merged.
+
+## The hull's top review, finding 9: the windsocks (the Refinement session, 2026-11-27)
+
+The funnel's three windsocks hung straight down between gusts (3.1 s of every 5) and read as striped posts; in a gust
+the whole bar turned stiffly; the one at the stairway's foot had the handrail across it (recorded: `rec-*.gif`). The
+user: a generated sock (A), drooping and swaying at rest (yes), the foot's sock moved forward clear of the rail (a), the
+bow's two finale socks the same (change).
+
+- **Generated:** three tries, each the same sock in three states (limp, half filled, full) side by side, the funnel's
+  toolbox as the style; the user chose B from the tries moving in the running game (`anim-sheet.png`). Its ring first
+  came off the pole ("its horizontal position moves forward, and looks disconnected from its pole. It has to be
+  connected to the pole with its ring in all positions"): the eye had been found by its grey, and the sock's white
+  stripes passed for grey. Measured by hand, the same spot in all three states; it is put on the pole's top and the sock
+  turns round it. 15 generations (`assets/source/windsock/tries/`, its README).
+- **Built:** `tools/build_windsock.py` into `assets/ship/windsock/` with `windsock.json` (each state's eye);
+  `windsock()` in `src/world/outside.js` (a pole and its sock, a Gusts' flapper): limp with a slow sway in a lull, half
+  filled in a gust's tell, full and fluttering in its blow. The code-drawn sock is gone, and the bow poles' grey cap.
+- **Moved:** the stairway foot's sock forward of the ladder, 30 px from the roof's front edge (first 46 px forward, then
+  the user: "in front of where she is standing", forward of her spot); the Spinnaker balcony's sock 30 px forward
+  (`FINALE["socks"]`, 24.475 m; the user's choice of four places; it stays behind the balcony's glass, as before).
+- **Checks:** boot, region8, finale pass. Pictures and scripts: `docs/audit-hull-top/socks/` (`built-stairway` shows the
+  foot's sock at its first place; `forward.png` the last). Not merged.

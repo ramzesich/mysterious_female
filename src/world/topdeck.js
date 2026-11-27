@@ -12,7 +12,7 @@ import { sfx } from '../sfx.js';
 import { rumble, rumbleNow } from '../rumble.js';
 import { t } from '../lang.js';
 import { writeSave } from '../save.js';
-import { Gusts, PerchGull } from './outside.js';
+import { Gusts, PerchGull, windsock } from './outside.js';
 
 const M = 48;
 const HALF = PLAYER.height / 2;
@@ -801,12 +801,7 @@ export const topdeck = {
         this.funnelGusts = new Gusts(w, { gust: F.gust, towels: [], x0: F.x0, x1: F.x1, top: F.y - 60, bottom: F.roofY, route: 'inside' });
         w.movers.push(this.funnelGusts);
         w.winds.push(this.funnelGusts);
-        const sock = (x, y, i) => {
-            const pole = s.add.rectangle(x, y, 2, 40, 0xe8eaec).setOrigin(0.5, 1).setDepth(D.exterior + 0.075);
-            const img = s.add.image(x + 1, y - 39, 'windsock').setOrigin(0.5, 0).setDepth(D.exterior + 0.08);
-            w.add([pole, img]);
-            this.funnelGusts.flappers.push({ img, k: 3.6, i });
-        };
+        const sock = (x, y, i) => this.funnelGusts.flappers.push(windsock(w, x, y, 40, D.exterior + 0.075, i));
         // The funnel's white base carried on under the stairway's lower flight, out to its foot (the user,
         // 2026-11-18: moved out 12 px from the lattice, the flight's foot stood past the base, the sky
         // showing under its steps): as far up as the white goes, 64 px; the casing takes over above.
@@ -823,7 +818,9 @@ export const topdeck = {
         w.add([frame]);
         sock(f.shoulder[0] - 44, f.shoulder[1], 1);
         sock(f.x1 - 10, f.y - 30, 2);
-        sock(f.foot[0] + 8, F.roofY, 3);           // (by the stairway's foot, wherever it stands)
+        // (Forward of the stairway's foot, wherever it stands, toward the roof's forward edge: clear of the rail, full too
+        // (the user, 2026-11-27: the rail crossed it 8 px aft of the foot; then "ahead of her", forward of the ladder).)
+        sock(f.foot[0] - 138, F.roofY, 3);
         w.movers.push(this.funnelWind = new FunnelWind(w, F, this.funnelGusts));
 
         // On the top: the horn on its post, its cord; the engineer's toolbox and lunch box; the
@@ -871,11 +868,7 @@ export const topdeck = {
             g.fillStyle(0x4d9be6, 1).fillPoints([{ x: 2, y: 3 }, { x: 5, y: 2 }, { x: 13, y: 12 }, { x: 13, y: 16 }, { x: 10, y: 16 }], true);
             g.fillStyle(0xffffff, 1).fillPoints([{ x: 5, y: 6 }, { x: 7, y: 5 }, { x: 10, y: 9 }, { x: 8, y: 10 }], true);
         });
-        // A windsock, hanging limp from its pole's top (the wind lifts it).
-        make('windsock', 8, 26, g => {
-            g.fillStyle(0x2e222f, 1).fillRect(0, 0, 8, 26);
-            for (let i = 0; i < 5; i++) g.fillStyle(i % 2 ? 0xffffff : 0xe83b3b, 1).fillRect(1 + (i > 2 ? 1 : 0), 1 + i * 5, 6 - (i > 2 ? 2 : 0), 5);
-        });
+        // (The windsock drawn here until 2026-11-27 is generated now: `windsock()` in src/world/outside.js.)
         this.world.icon('cocktail');
     },
 
