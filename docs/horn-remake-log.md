@@ -228,3 +228,27 @@ to her; she shrugs. 8.8 s from E (the first build: 8.1; the old scene: 12.3).
 
 `region8` with `region8.horn` (its checks now: the four shots in order, each a cut; the camera follows her again),
 `golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.
+
+## 9. The play stop, round 2 (2026-11-27)
+
+**The user:** "1. Set 2  2. I liked the pans". And, while it was being built: "How long was the horn blow
+previously?" (1.5 s in the old scene, 0.5 s the toot; 6.3 s in the panel's build; 1.5 s again now.)
+
+**Decisions:**
+
+15. **The camera pans between the places again** (the user: "I liked the pans"; decision 11's cuts are out), as long as
+    the old scene's did: 1.5 s to the sun deck, 1.7 s on to the bow, 1.9 s back to her, eased in and out, by the
+    scene's clock. It is at each place 0.2 s before Bumbot comes into it. On its way to the bow it passes the officer,
+    still running; Bumbot, ahead of it, is not shown on the way.
+16. **The old lady's things are set 2** (the user's choice of three): her canvas bag with the flower at the sunbed's
+    head, her burgundy handbag beyond it, her striped towel hung over the bed's foot, her teal duffel. The handbag
+    stands 21 px further forward than in the picture shown, so that her two tangerines (after her mojito) lie between
+    the two bags, not under one. Built by `tools/build_horn.py` (`BAGS`) into `assets/ship/horn/lady-*.png`; the
+    wicker basket, the green duffel and the code-drawn towel are out of her sunbed.
+
+**The clock now:** 2,100 the pan to the sun deck; 3,800 Bumbot in; about 6,850 the officer out of the picture; 7,100 the
+pan to the bow; 9,000 Bumbot along the rail; 10,350 the pan back; she is hers at about 12,400 plus her step to the
+cord: 13.0 s from E (the old scene: 12.3).
+
+`region8` with `region8.horn` (the camera's way: top, sun deck, bow, top, a pan each; five things at the sunbed),
+`golden`, `finale`, `highlight`, `boot` pass; `check_overlaps` 0.

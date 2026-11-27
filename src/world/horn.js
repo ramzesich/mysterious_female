@@ -3,8 +3,9 @@
 // Nobody sends her to the cord: Bumbot sits on the horn's top bar out of her reach, the cord hangs beside her, and the
 // pull is her own try at getting him down (the user: "Let her just see Bumbot on top of the horn, the cord, and the
 // move is quite obvious from there. This makes the scene like a near catch"). One clock (`HORN` in src/config.js),
-// everything a function of it, in three shots the camera cuts between (the user, of a live panel under the top: "I
-// don't like the panels. Let's revert to the view ... What moves things around is running Bumbot, not the horn"):
+// everything a function of it, in three places the camera pans between (the user, of a live panel under the top: "I
+// don't like the panels. Let's revert to the view ... What moves things around is running Bumbot, not the horn"; of
+// cuts: "I liked the pans"):
 //   - the top: she pulls; the horn sounds over her head and she claps her hands over her ears; Bumbot shoots straight
 //     up off the bar in a fright, comes down on the platform forward of her and is gone down the stairway; it stops, she
 //     takes her hands down and turns the way he went;
@@ -103,8 +104,21 @@ export const horn = {
         const herFrame = (clip, i) => p.setFrame(her[clip][Math.max(0, Math.min(her[clip].length - 1, i))]);
         const catFrame = (sp, clip, i) => sp.setFrame(cats[clip][Math.max(0, Math.min(cats[clip].length - 1, i))]);
         const clipFrame = (sp, clip, i) => sp.setFrame(clips[clip].row * CLIP_COLS + Math.max(0, Math.min(clips[clip].frames - 1, i)));
-        // A shot: the camera at a place, its floor where the top's own is on the screen (so the horizon holds).
-        const shot = x => { cam.stopFollow(); cam.centerOn(Math.round(x), floor + cam.worldView.height / 2 - H.floorAt); };
+        // A place the camera goes to: its floor where the top's own is on the screen (so the horizon holds). A pan: from
+        // where the camera is at its start, eased in and out, by the clock.
+        const place = x => ({ x: Math.round(x), y: floor + cam.worldView.height / 2 - H.floorAt });
+        let from = null;
+        const pan = (key, at, ms, to) => {
+            if (T < at || did[key + 'Done']) return;
+            if (!did[key]) {
+                did[key] = true;
+                cam.stopFollow();
+                from = { x: cam.worldView.centerX, y: cam.worldView.centerY };
+            }
+            const k = Math.min(1, (T - at) / ms), e = 0.5 - Math.cos(k * Math.PI) / 2;
+            cam.centerOn(from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e);
+            if (k === 1) did[key + 'Done'] = true;
+        };
 
         // --- Where everyone is.
         const seat = { x: cat.x, y: cat.y }, landX = Math.min(x0, this.cordAt.x) - H.cat.land;
@@ -114,7 +128,7 @@ export const horn = {
         const bowX = (Math.min(...perch) + Math.max(...perch)) / 2, railY = flocks[1]?.birds[0]?.y ?? floor - 96;
         const rx = rival?.x ?? L.rivalX, lx = lady?.x ?? L.x;
         // The clock's marks, each from the one before: Bumbot's run through the sun deck sets them.
-        const in0 = sunX + half + 24, catAt = H.sunAt + H.sunCalm;
+        const in0 = sunX + half + 24, catAt = H.sunAt + H.panSun + H.sunCalm;
         const catT = at => catAt + (in0 - at) / H.catRun * 1000;                // when he is at a spot on the sun deck
         const leap0 = L.x + H.catLeap[0], leap1 = L.x - H.catLeap[1];
         const startAt = catT(rx + H.startBefore), turnAt = startAt + 9 * H.startMs + H.turnMs, chargeAt = turnAt + H.chargeAfter;
@@ -122,8 +136,8 @@ export const horn = {
         const off0 = L.x + H.hurdle[0], off1 = L.x - H.hurdle[1];
         const hurdleAt = chargeAt + (rx - off0) / H.charge * 1000, hurdleMs = (off0 - off1) / H.hurdle[2] * 1000;
         const goneAt = hurdleAt + hurdleMs + (off1 - (sunX - half) + 40) / H.charge * 1000;        // the officer out of the shot
-        const bowAt = goneAt + H.sunHold, runAt = bowAt + H.bowCalm, in1 = bowX + half + 24;
-        const backAt = runAt + H.bowHold, endAt = backAt + H.endHold;
+        const bowAt = goneAt + H.sunHold, bowThere = bowAt + H.panBow, runAt = bowThere + H.bowCalm, in1 = bowX + half + 24;
+        const backAt = runAt + H.bowHold, endAt = backAt + H.panBack + H.endHold;
         const hornEnd = H.blastAt + H.blastMs, downAt = hornEnd + H.downAfter, turnHer = downAt + 5 * H.earsMs + H.turnAfter;
 
         let T = -1, did = {}, fistY = null, card = null;
@@ -206,11 +220,11 @@ export const horn = {
             once('meow', c0, () => sfx.meow());
             once('landed', c3, () => sfx.scramble());
 
-            // --- The cuts.
-            once('sun', H.sunAt, () => shot(sunX));
-            once('bow', bowAt, () => shot(bowX));
-            once('back', backAt, () => {
-                cam.centerOn(p.x, p.y - HALF);
+            // --- The camera: to the sun deck, on to the bow, back to her.
+            pan('sun', H.sunAt, H.panSun, place(sunX));
+            pan('bow', bowAt, H.panBow, place(bowX));
+            pan('back', backAt, H.panBack, { x: p.x, y: p.y - HALF });
+            once('follow', backAt + H.panBack, () => {
                 cam.startFollow(p, true, 0.15, 0.15);
                 cam.setFollowOffset(0, HALF);
             });
@@ -233,7 +247,8 @@ export const horn = {
 
             // --- The officer: off his knees into the air as Bumbot shoots past him, his card out of his pocket; a look
             // after him; after him, over the sunbed.
-            if (rival && T >= startAt && T < bowAt) {
+            // (He goes on forward as the camera passes him on its way to the bow.)
+            if (rival && T >= startAt && T < bowThere) {
                 const o = own.officer, mine = on => { o.setVisible(on); rival.sprite.setVisible(!on); };
                 if (T < startAt + 9 * H.startMs) {
                     mine(true);
@@ -254,7 +269,7 @@ export const horn = {
                     o.setPosition(off0 + (off1 - off0) * k, floor).setFlipX(true);
                 }
             }
-            once('officerOff', bowAt, () => { own.officer.setVisible(false); rival?.sprite.setVisible(false); own.lady.setVisible(false); });
+            once('officerOff', bowThere, () => { own.officer.setVisible(false); rival?.sprite.setVisible(false); own.lady.setVisible(false); });
             once('yelp', startAt + H.startMs, () => sfx.yelp());
             // (His card: out of his pocket at the top of his start, over his shoulder, down to where it will lie. The
             // world's own card, the one that will lie there: shown from now, moved to its place.)
@@ -274,7 +289,7 @@ export const horn = {
 
             // --- The old lady: Bumbot over her sunbed, and she is up off it and away, her book in her hand; everything
             // else of hers stays.
-            if (lady && T >= ladyAt && T < bowAt) {
+            if (lady && T >= ladyAt && T < bowThere) {
                 const o = own.lady;
                 if (T < boltEnd) {
                     // (Off the sunbed onto the floor in her last two frames: she sits `dy` px over it.)
@@ -291,7 +306,7 @@ export const horn = {
 
             // --- The bow: the kids' pool's six come over, driven ahead of him; the windscreen's six go up one by one as he
             // runs along their rail.
-            once('fly', bowAt - H.flyBefore, () => flocks[0]?.liftOff((b, i) => ({ x: bowX - 520 - i * 40, y: floor - 96 - (i * 29) % 56, ms: H.flyMs + i * 60 })));
+            once('fly', bowThere - H.flyBefore, () => flocks[0]?.liftOff((b, i) => ({ x: bowX - 520 - i * 40, y: floor - 96 - (i * 29) % 56, ms: H.flyMs + i * 60 })));
             once('lift', runAt, () => flocks[1]?.liftOff((b, i) => ({ x: b.x - 260 - i * 36, y: b.y - 250 - (i * 53) % 90, ms: 1900 + i * 90,
                 delay: Math.max(0, (in1 - b.x - H.liftBefore) / H.catRun * 1000) })));
 

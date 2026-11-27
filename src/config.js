@@ -718,9 +718,9 @@ export const FUNNEL_SMOKE = { puffs: 44, lifeMs: 3000, rise: 55, drift: 100, r0:
 export const HORN_FISTS = [[50, 31], [51, 30], [52, 35], [53, 45], [53, 39]];
 export const HORN_REST = 56;
 // The horn's scene (src/world/horn.js; the user's remake, 2026-11-27, docs/horn-remake-log.md): one clock, in ms from
-// the moment her fist closes on the handle. The camera's three shots (the top, the sun deck, the bow) are cut to, each as
-// Bumbot comes into it: he is what sets everyone off (the user: "What moves things around is running Bumbot, not the
-// horn").
+// the moment her fist closes on the handle. The camera pans from the top to the sun deck, on to the bow and back to her
+// (the user: "I liked the pans"; as long as the old scene's), and is at each place a moment before Bumbot comes into
+// it: he is what sets everyone off (the user: "What moves things around is running Bumbot, not the horn").
 export const HORN = {
     stepSpeed: 62,                      // px/s: her step or two to the cord
     pullMs: 70,                         // a frame of her pull
@@ -733,7 +733,7 @@ export const HORN = {
     // `land` px forward of her; a crouch; away.
     cat: { up: 34, drift: 22, upMs: 240, hang: 120, fallMs: 400, land: 58, crouch: 110, run: 620, frameMs: 70, runMs: 55 },
     floorAt: 164,                       // a shot's floor on the screen, px from its top (where the top's own floor is)
-    sunAt: 2550, sunCalm: 320,          // the cut to the sun deck; nothing yet
+    sunAt: 2100, panSun: 1500, sunCalm: 200,    // the pan to the sun deck; nothing there yet
     catRun: 520,                        // px/s: Bumbot through a shot
     // His leap over the sunbed and what stands at its foot: off the floor this far aft of its middle, down this far
     // forward of it, this high.
@@ -746,11 +746,11 @@ export const HORN = {
     ladyStep: 6, hurry: 100, hurryMs: 45,
     turnMs: 140, chargeAfter: 420, charge: 340, chargeMs: 62,
     hurdle: [74, 60, 250],              // off the floor this far aft of the sunbed's middle, down this far forward; px/s over it
-    sunHold: 420,                       // the sun deck as they left it, before the cut
-    flyBefore: 1500, flyMs: 2400,       // the kids' pool's gulls set off this long before the cut to the bow, to cross it
-    bowCalm: 300, liftBefore: 30,       // Bumbot into the bow's shot along the windscreen's rail; each gull up as he is this far from it
-    bowHold: 1550,                      // from his coming to the cut back to her
-    endHold: 250,
+    sunHold: 250, panBow: 1700,         // the sun deck as they left it; the pan to the bow
+    flyBefore: 1500, flyMs: 2400,       // the kids' pool's gulls set off this long before the camera is at the bow, to cross it
+    bowCalm: 200, liftBefore: 30,       // Bumbot into the bow's shot along the windscreen's rail; each gull up as he is this far from it
+    bowHold: 1350, panBack: 1900,       // from his coming to the pan back to her
+    endHold: 120,
 };
 export const FLARE = { tellS: 0.9, riseS: 0.13, coolMs: 2500, lateMs: 1500, nearK: 0.65 };
 

@@ -39,6 +39,7 @@ export class BootScene extends Phaser.Scene {
         // (The horn's scene remade, 2026-11-27: the officer's and the old lady's own clips, tools/build_horn.py.)
         this.load.spritesheet('horn-clips', 'assets/ship/horn/clips.png', { frameWidth: 96, frameHeight: 112 });
         this.load.json('horn-clips-meta', 'assets/ship/horn/clips.json');
+        for (const n of ['bag', 'handbag', 'duffel', 'towel']) this.load.image(`lady-${n}`, `assets/ship/horn/lady-${n}.png`);
         // The windsocks, limp, half filled and full (tools/build_windsock.py).
         for (const n of ['limp', 'half', 'full']) this.load.image(`windsock-${n}`, `assets/ship/windsock/${n}.png`);
         this.load.json('windsock', 'assets/ship/windsock/windsock.json');

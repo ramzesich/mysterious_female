@@ -5744,9 +5744,9 @@ def enter_region9(b):
 
 def scenario_region8__horn(b):
     """The horn's scene as remade (docs/horn-remake-log.md, the user, 2026-11-27): nobody on the top but Bumbot on the
-    horn's bar; the cord pulses where E would pull; E from either side; three shots the camera cuts between (the top,
-    the sun deck, the bow) and back to her; the officer's card lies where it will lie; the old lady's things stay; she
-    is hers in under ten seconds."""
+    horn's bar; the cord pulses where E would pull; E from either side; the camera pans from the top to the sun deck, on
+    to the bow and back to her; the officer's card lies where it will lie; the old lady's things stay; she is hers in
+    under fourteen seconds."""
     S, W = "window.__ship", "window.__ship.world"
     b.open("?reset&play&at=funnel&did=engineer")
     wait(0.8)
@@ -5769,23 +5769,23 @@ def scenario_region8__horn(b):
     her = b.state()["x"]
     L = js(b, f"{W}.data.topdeck.lady")
     sun, places = (L["x"] + L["rivalX"]) / 2, []
-    while now() < t0 + 13 and not (b.state()["mode"] == "play" and "horn" in flags(b)):
+    while now() < t0 + 16 and not (b.state()["mode"] == "play" and "horn" in flags(b)):
         wait(0.1)
         c = js(b, f"(c => Math.round(c.worldView.centerX))({S}.cameras.main)")
         place = "top" if abs(c - her) < 80 else "sun" if abs(c - sun) < 3 else "bow" if c < 3000 else "between"
         if not places or places[-1] != place:
             places.append(place)
     took = now() - t0
-    ok &= check(took < 10.0, "she is hers again in under ten seconds", round(took, 2))
-    ok &= check(places == ["top", "sun", "bow", "top"], "the camera's shots: the top, the sun deck, the bow, and back to her, each a cut", places)
+    ok &= check(took < 14.0, "she is hers again in under fourteen seconds", round(took, 2))
+    ok &= check(places == ["top", "between", "sun", "between", "bow", "between", "top"], "the camera: from the top to the sun deck, on to the bow, and back to her, a pan each", places)
     wait(0.5)
     c = js(b, f"(c => [c.worldView.centerX, !!c._follow])({S}.cameras.main)")
     ok &= check(abs(c[0] - b.state()["x"]) < 60 and c[1], "the camera is on her again, and follows her", c)
     ok &= check(abs(b.state()["x"] - her) < 12 and b.state()["y"] == top, "she stands where she pulled", b.state())
     c = js(b, f"(c => [c.items[0].visible, c.items[0].x, c.x])({S}.progress.cards.find(c => c.card === 'off'))")
     ok &= check(c[0] and abs(c[1] - c[2]) < 12, "the Officer's card lies at its place on the sun deck", c)
-    bags = js(b, f"(t => t.items.length >= 4 && t.items.every(i => i.visible) && {W}.shown(t))({W}.things.find(t => t.id === 'prop_sunbed'))")
-    ok &= check(bags, "the sunbed, her bags and her towel stay where they were")
+    bags = js(b, f"(t => t.items.length === 5 && t.items.every(i => i.visible) && {W}.shown(t))({W}.things.find(t => t.id === 'prop_sunbed'))")
+    ok &= check(bags, "the sunbed, her two bags, her duffel and her towel stay where they were")
     ok &= check(not js(b, f"{W}.solids.some(q => q.id === 'blk_oldlady' && {W}.shown(q))"), "and are no block")
     ok &= check(not js(b, f"{W}.story.hornCat.visible"), "Bumbot is off the horn")
     ok &= check(js(b, f"{S}.viewOverride") is None, "the decks are shown as she sees them again")
@@ -5799,7 +5799,7 @@ def scenario_region8__horn(b):
     b.hold("left", 0.25)
     wait(0.2)
     b.tap("e")
-    ok &= check(wait_flag(b, "horn", 12) and wait_js(b, f"{S}.mode === 'play'", 3), "from the cord's aft side: the same scene", b.state())
+    ok &= check(wait_flag(b, "horn", 17) and wait_js(b, f"{S}.mode === 'play'", 3), "from the cord's aft side: the same scene", b.state())
     ok &= check(not b.errors, "no errors", b.errors[-2:])
     return ok
 

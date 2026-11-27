@@ -52,14 +52,18 @@ export class OldLady {
         // The sunbed stays when she has gone, and her bags and her towel with it: she leaves everything (the horn's scene
         // remade, 2026-11-27: they slid along the floor beside her).
         const bed = s.add.image(def.x, def.y, 'sunbed').setOrigin(0.5, 1).setDepth(D.props + 0.03);
-        const bag = s.add.image(def.x - 39, def.y, 'shipart', 'beach-bag').setOrigin(0.5, 1).setDepth(D.props + 0.06);
-        // (Clear of the bed's foot, beside her parasol, not under the bed: the audit, 2026-11-15.)
-        const duffel = s.add.image(def.x + 46, def.y, 'shipart', 'duffel-bag').setOrigin(0.5, 1).setDepth(D.props + 0.02);
-        const towel = s.add.image(def.x + 22, def.y - 11, 'rail-towel').setOrigin(0.5, 0).setTint(0xfbb954).setAngle(-90).setDepth(D.props + 0.04);
-        world.add([bed, bag, duffel, towel]);
+        // (Generated, the user's choice of three sets, 2026-11-27: her canvas bag with the flower at the bed's head, her
+        // burgundy handbag beyond it (her two tangerines lie between them), her striped towel hung over the bed's foot,
+        // her teal duffel clear of her parasol's foot. tools/build_horn.py. They were a wicker basket, a green duffel
+        // and a code-drawn towel.)
+        const bag = s.add.image(def.x - 40, def.y, 'lady-bag').setOrigin(0.5, 1).setDepth(D.props + 0.06);
+        const handbag = s.add.image(def.x - 79, def.y, 'lady-handbag').setOrigin(0.5, 1).setDepth(D.props + 0.06);
+        const duffel = s.add.image(def.x + 58, def.y, 'lady-duffel').setOrigin(0.5, 1).setDepth(D.props + 0.02);
+        const towel = s.add.image(def.x + 25, def.y - 1, 'lady-towel').setOrigin(0.5, 1).setDepth(D.props + 0.04);
+        world.add([bed, bag, handbag, duffel, towel]);
         const zone = s.add.zone(def.x, def.y, def.half * 2, def.tall).setOrigin(0.5, 1);
         s.physics.add.existing(zone, true);
-        world.things.push({ id: 'prop_sunbed', x: def.x, y: def.y, route: 'inside', items: [bed, bag, duffel, towel] });
+        world.things.push({ id: 'prop_sunbed', x: def.x, y: def.y, route: 'inside', items: [bed, bag, handbag, duffel, towel] });
         const block = { id: 'blk_oldlady', x: def.x, y: def.y, route: 'inside', items: [], zone, until: 'flag:horn' };
         world.things.push(block);
         world.solids.push(block);

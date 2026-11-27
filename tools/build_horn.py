@@ -9,8 +9,12 @@ returned (assets/source/horn/tries/, the jobs in its README).
   stride) and **the old lady's** (`hurry`: quick short steps, her book in her hand) into one strip of their own,
   `assets/ship/horn/clips.png` with `clips.json`: cells of 96 x 112, the figure's x at column 48, its floor under the
   bottom row, each figure in the colours of its own built sheet.
+- **The old lady's bags and towel** (the user's choice of three sets, 2026-11-27): `assets/source/horn/bags/`, map
+  objects of 32 px, brought to the game's size by each pixel's commonest colour (`BAGS`: the height each stands), in
+  their own colours, into `assets/ship/horn/lady-<name>.png`. The towel's rail, which the generator drew, is cut off.
 """
 import json
+from collections import Counter
 from pathlib import Path
 from PIL import Image
 
@@ -31,6 +35,8 @@ STRIP = {
 HERS = {"ears": ("ears-s17", list(range(9)))}
 CATS = {"fright": ("fright-s3", list(range(9)))}
 PLANTED = {"hurry"}            # a walk: each frame set on its lowest pixel (the generator's frames drift 1 to 3 px)
+# her things at the sunbed: name -> (the source, its height in the game)
+BAGS = {"bag": ("bag-floral", 22), "handbag": ("handbag-burgundy", 17), "duffel": ("duffel-teal", 16), "towel": ("towel-draped", 19)}
 LEAST = 10                      # a loose piece smaller than this is a speck (the start's dust strokes)
 
 
@@ -94,8 +100,42 @@ def recolour(im, colours):
     return im
 
 
+def shrink(im, h):
+    """A picture brought to `h` px high: each pixel the commonest colour of the source pixels it covers."""
+    im = im.crop(im.getbbox())
+    w = max(1, round(im.width * h / im.height))
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    src, op = im.load(), out.load()
+    for y in range(h):
+        for x in range(w):
+            x0, x1 = int(x * im.width / w), max(int(x * im.width / w) + 1, int((x + 1) * im.width / w))
+            y0, y1 = int(y * im.height / h), max(int(y * im.height / h) + 1, int((y + 1) * im.height / h))
+            px = [src[i, j] for j in range(y0, y1) for i in range(x0, x1)]
+            solid = [q for q in px if q[3] > 127]
+            if len(solid) * 2 >= len(px):
+                op[x, y] = Counter(solid).most_common(1)[0][0][:3] + (255,)
+    return out
+
+
+def bags():
+    for name, (source, h) in BAGS.items():
+        im = Image.open(SRC / "bags" / f"{source}.png").convert("RGBA")
+        if source == "towel-draped":
+            # (The rail it was drawn hanging on: the dark pixels of its top rows.)
+            px = im.load()
+            for y in range(8):
+                for x in range(im.width):
+                    r, g, b, a = px[x, y]
+                    if a and max(r, g, b) < 110:
+                        px[x, y] = (0, 0, 0, 0)
+        out = shrink(im, h)
+        out.save(OUT / f"lady-{name}.png")
+        print(f"lady-{name}: {out.size}")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    bags()
     meta = {"cell": list(CELL), "x": 48, "clips": {}}
     rows = []
     for clip, (name, frames, who, largest) in STRIP.items():
