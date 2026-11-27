@@ -52,23 +52,23 @@ export class Progression {
                 break;
             case 'card': {
                 const card = prop(o, 'card', '');
+                // Lying flat, its lanyard in a loop beside it (`key-card-<card>-lying`, tools/draw_key_cards.py; the
+                // user, 2026-11-27): the card's own middle over its spot (6 px of the picture's 20).
+                const lie = (y) => s.add.image(o.x, y, 'things', `key-card-${card}-lying`).setOrigin(0.3, 1).setDepth(3.1);
                 if (prop(o, 'floor', false)) {
                     // Dropped on the deck (the Officer's card, at the horn): lying there, a glint on it.
-                    const img = s.add.image(o.x, o.y, 'shipart', 'key-card').setOrigin(0.5, 1).setScale(0.5).setDepth(3.1);
-                    const band = s.add.rectangle(o.x - 3, o.y - 5, 7, 2, CARD_COLOURS[card]).setOrigin(0).setDepth(3.11);
-                    s.worldLayer.add([img, band]);
+                    const img = lie(o.y);
+                    s.worldLayer.add([img]);
                     // (Its twinkle, as every pickup's: `world.glint`, once the world is built.)
-                    this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img, band] });
+                    this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img] });
                     break;
                 }
                 // On a small side table: nothing floats (§6.3).
                 const table = s.add.image(o.x, o.y, 'sidetable').setOrigin(0.5, 1).setDepth(3);
-                const top = o.y - table.height;
-                const img = s.add.image(o.x, top, 'shipart', 'key-card').setOrigin(0.5, 1).setDepth(3.1);
-                const band = s.add.rectangle(o.x - 6, top - 9, 13, 3, CARD_COLOURS[card]).setOrigin(0).setDepth(3.11);
-                s.worldLayer.add([table, img, band]);
+                const img = lie(o.y - table.height);
+                s.worldLayer.add([table, img]);
                 // The table stays when the card is taken.
-                this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img, band] });
+                this.cards.push({ card, x: o.x, y: o.y, needs: prop(o, 'needs', ''), items: [img] });
                 break;
             }
             case 'trigger':

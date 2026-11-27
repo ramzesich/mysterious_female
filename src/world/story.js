@@ -145,7 +145,7 @@ export class Story {
             plate.forEach(i => i.destroy());
             await w.wait(200);
             // His card: she is doing his rounds now.
-            await w.handOver(o, 'key-card', () => this.P.open('cards', 'deck'));
+            await w.handOver(o, 'thing:key-card-deck', () => this.P.open('cards', 'deck'));
             this.P.setFlag('lunch');
             sfx.done();
         });
@@ -469,7 +469,7 @@ export class Story {
             sfx.at(m.x, m.y).sneeze();
             await this.people.play(m, 'sneeze');
             await w.wait(250);
-            await w.handOver(m, 'key-card', () => this.P.open('cards', 'ent'), 0xff7a7a);
+            await w.handOver(m, 'thing:key-card-ent', () => this.P.open('cards', 'ent'));
             this.P.setFlag('pills');
             sfx.done();
         });
@@ -581,7 +581,7 @@ export class Story {
             sfx.at(st.x, st.y).aah();
             await this.people.play(st, 'thanks', { speed: 1.8 });
             // (Out of his shirt pocket and tossed to her: `STEWARD_TOSS`.)
-            await w.tossOver(st, 'key-card', () => this.P.open('cards', 'hk'), w.cardColour('hk'), STEWARD_TOSS);
+            await w.tossOver(st, 'thing:key-card-hk', () => this.P.open('cards', 'hk'), null, STEWARD_TOSS);
             this.P.setFlag('steward');
             sfx.done();
             this.thanking = false;
