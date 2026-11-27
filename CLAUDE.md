@@ -938,7 +938,11 @@ Lessons learned (2026-11-25, her swimming and near-catch 5 from the water):
   mouth, "her face still visible", read at once.
 - **A real-time scenario fails under six browsers at once:** `sound`'s footsteps failed in `-j 6` and passed alone.
   And a failure outside the change is run on the tree without the change before it is called anyone's (`git stash`):
-  deck 9's sprinkler in `mishaps.things` fails on `main` too.
+  deck 9's sprinkler in `mishaps.things` failed on `main` too. **But "fails on main too" is not an answer:** that one was
+  then repeated as "known" for two days, until the user asked why it was accepted (2026-11-27). It was the test: it
+  waited for "raining" and caught the rain's last moment as often as not, by how long the page took to load, and she
+  came under the sprinkler dry and ran on into the next door. Find the cause of a failing check the first time it is
+  seen, or say plainly that it is not known.
 
 Lessons learned (2026-11-25, near-catch 6 remade):
 

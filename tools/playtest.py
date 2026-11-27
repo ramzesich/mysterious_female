@@ -6898,9 +6898,12 @@ def scenario_mishaps__things(b):
 
     DR = f"{MS}.world.story.drill"
     lull = lambda: wait_js(b, f"(a => a.idle && a.t > 8.3)({DR}.at({MS}.time.now))", 14)
-    # (Deck 9's sprinkler: she sets off once it rains.)
+    # (Deck 9's sprinkler: she sets off as it starts to rain. Waiting for "raining" alone caught the rain's last moment
+    # as often as not, by how long the page took to load (its clock sets the sprinkler's phase); she came under it dry
+    # and ran on into the swinging door at 159.6 m, 13a: off first, then on, a whole round's room each.)
     SP = f"{MS}.world.movers.filter(m => m.constructor.name === 'Sprinkler').sort((a, c) => Math.abs(a.def.x - {MS}.player.x) - Math.abs(c.def.x - {MS}.player.x))[0]"
-    rain = lambda: wait_js(b, f"(m => m.phase({MS}.time.now) === 'on')({SP})", 14)
+    rain = lambda: (wait_js(b, f"(m => m.phase({MS}.time.now) !== 'on')({SP})", 6)
+                    and wait_js(b, f"(m => m.phase({MS}.time.now) === 'on')({SP})", 6))
     ok &= both(b, "the room-service tray (3)", want="3", **run("trays10", "right"), clip="^gags-tray-ride", within=6)
     ok &= both(b, "the drill's boat (15)", want="15", **run("drill7", "right", "&cards=all", lull), clip="^drill-drop", within=8)
     ok &= both(b, "deck 9's sprinkler (16)", want="16", **run("sprinkler9", "right", first=rain), clip="^gags-sprinkler", within=8)

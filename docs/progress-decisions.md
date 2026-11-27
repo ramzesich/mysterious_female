@@ -5472,3 +5472,14 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   dropped cone fades where it lies, as before. The old peck on a cone is gone; on a tangerine it stays.
 - **Checks:** region6 (the toppled cone taken, the gull back on its rail; the kid's stub taken by a pool gull),
   deliveries pass; mishaps only deck 9's sprinkler, as on main. Not merged.
+
+## The sprinkler's playtest mended (the Refinement session, 2026-11-27)
+
+- **The user:** "What is about that failing test, and why do we accept it as normal?" `mishaps.things`' deck 9 sprinkler
+  (16) had failed since at least 2026-11-25, written down each time as "fails on main too" and never looked into.
+- **Found:** the game is right; the test waited for the sprinkler to be raining, and caught the rain's last moment as
+  often as not (the page's load time sets the sprinkler's phase at the takeover). She set off, the rain stopped, she
+  came under it dry and ran on into the swinging door at 159.6 m (13a), which is what the failure showed.
+- **Mended (the test only):** it waits for the rain to be off, then on, so that she sets off as it starts. Three runs of
+  `mishaps.things` and the whole `mishaps` (10 scenarios) pass. CLAUDE.md's lesson that called it "fails on main too"
+  says what it was. Not merged.
