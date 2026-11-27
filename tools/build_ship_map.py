@@ -496,6 +496,10 @@ def build_layers():
         fill(solid, col(a) - 1, col(a) - 1, top, bottom, POOL_TILE)
         fill(solid, col(b), col(b), top, bottom, POOL_TILE)
         fill(solid, col(a), col(b) - 1, bottom, bottom, POOL_TILE)
+        # (Deck 12's kids' pool is drawn a tile thinner, `TANK_WALL` in the ship scene: the outer half of its walls' top
+        # tiles shows, at the deck's floor, the floor it is sunk into; the user, 2026-11-27.)
+        if deck == 12:
+            solid[top][col(a) - 1], solid[top][col(b)] = solid[top][col(a) - 2], solid[top][col(b) + 1]
 
     # Funnel and mast, standing on the roof.
     # (Solid but drawn by the game's shell: the navy funnel and the white mast, §5.3.)

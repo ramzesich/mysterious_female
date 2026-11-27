@@ -565,9 +565,12 @@ export class World {
             const depth = D.player + 0.3, parts = [];
             if (c.kind === 'panel') {
                 const g = panels[c.deck] ??= s.add.graphics().setDepth(depth);
-                const h = c.y - 8 - c.y0;
-                g.fillStyle(0xf4f4f4, 1).fillRect(c.x0, c.y0, c.x1 - c.x0, h);
-                g.fillStyle(0xc7dcd0, 1).fillRect(c.x1 - 1, c.y0, 1, h).fillRect(c.x0, c.y0, c.x1 - c.x0, 1);
+                // (Under a pool's tank it starts at the tank's foot: drawn to the recess's ceiling it ran up over the tank,
+                // which hangs into the slab there.)
+                const y0 = s.tankFoot(c.x0, c.x1, c.y0) ?? c.y0, h = c.y - 8 - y0;
+                g.fillStyle(0xf4f4f4, 1).fillRect(c.x0, y0, c.x1 - c.x0, h);
+                g.fillStyle(0xc7dcd0, 1).fillRect(c.x1 - 1, y0, 1, h);
+                if (y0 === c.y0) g.fillRect(c.x0, y0, c.x1 - c.x0, 1);
                 parts.push(s.plateCopy(c.x0, c.y - 8, c.x1 - c.x0, 8 + PLAYER.sink, depth));
             }
             // (A row's end is not drawn again: windows and lamps on the side there are not its tiles, and a copy hid

@@ -1046,6 +1046,21 @@ Lessons learned (2026-11-26, the pills made a load):
   vacuums gave only `x`, the spill's sound had no distance, threw every frame, and the game hung; no load had ever met
   them until the pills. A new path through old code is tested with each hazard on it, not only the new code.
 
+Lessons learned (2026-11-27, the hull's top and the pools' tanks):
+
+- **A finding is checked against the documented rules before it is reported:** deck 11 going bright under the kids'
+  pool was the rule (out in the open nothing is dimmed), and was reported as a fault; the user caught it. Read the
+  rule's section (GAME_DESIGN.md §5.3 for the dim) before calling a view wrong; a sweep of the rule (her placed at every
+  metre, the state read and compared with the map's own `indoor()`) settles it at once.
+- **A drawn thing thinner than its map tiles shows the tiles' other half:** the kids' pool's walls drawn 8 px where its
+  tiles are 16 left the tiles' outer half beside the rim; give those tiles the look of what is round them (the floor).
+- **A piece made for a surface is looked at when the surface changes:** the drain's hatch and grate were drawn for the
+  tank's 16 px floor and hung under an 8 px one. List what lies on a thing before resizing it.
+- **Where a drawing ends is measured from how it is drawn:** the tanks' rows run from 4 px under the floor, so their
+  foot is 4 px past the walls' thickness; a foot worked out from the thickness alone put the dividers 4 px into the tank.
+- **`render_ship.py` starts at the world's top (y 0):** what stands above it (the funnel's top, its stacks, the horn,
+  the radar mast's tip) is shot with the outside view at zoom 1 and a negative scroll.
+
 ## Working with the user
 
 - **Start each session from `docs/plan-the-rest.md`** (what is left, in the order to build it).

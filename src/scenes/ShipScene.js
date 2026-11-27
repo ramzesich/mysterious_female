@@ -84,6 +84,10 @@ const WALK_LIFT = 2;
 // A pool's tank: its wall's foot, px under the pool's floor (the tank's tiles are drawn in rows of 8 from 4 px under the
 // deck: `poolTanks`); the water is drawn down to it.
 const TANK_FOOT = 4;
+// How thick a tank's walls and bottom are drawn, px, by the pool's deck: deck 12's kids' pool a drawn tile thinner than
+// deck 11's, so that it reaches less far down over deck 11's windows (the user, 2026-11-27); deck 11's keep two tiles, the
+// drain's hatch and grate lying on that floor ("leave the floor and the walls as they were"). The map's tiles stay.
+const TANK_WALL = { 11: 16, 12: 8 };
 // Her climb into the lifeboat's roof hatch (`roofSteps`): the hatch's far rim and near lip, px over the walkway's floor
 // (tools/build_hatch.py's pieces: the boat's rows 26 and 37, its floor at 120); each frame's ms (her front frame and her
 // back frame on the roof held longer); how far down her back frame stands in the opening; her `climb-out` frames sinking
@@ -252,8 +256,12 @@ export class ShipScene extends Phaser.Scene {
         for (const [a, b, deck] of spans) {
             const g = this.poolTanks[deck] ??= this.add.graphics().setDepth(DEPTH.poolTank);
             const top = floors[deck] * 16;
-            for (let x = a; x < b; x += 8) {
-                for (let y = top + 4; y < top + 48; y += 8) {
+            const wall = TANK_WALL[deck] ?? 16, x0 = a + 16 - wall, x1 = b - 16 + wall;
+            // (Where each tank's foot is: what the deck under it draws over the shell stops there, `tankFoot`.)
+            // (Its rows of 8 run from 4 px under the floor: the last ends 4 px past the wall's own thickness.)
+            (this.tankFeet ||= []).push({ x0, x1, foot: top + 4 + Math.ceil((28 + wall) / 8) * 8 });
+            for (let x = x0; x < x1; x += 8) {
+                for (let y = top + 4; y < top + 32 + wall; y += 8) {
                     const edge = x < a + 16 || x >= b - 16 || y >= top + 32;
                     g.fillStyle(edge ? 0x8fd3ff : 0x4d9be6, 1).fillRect(x, y, 8, 8);
                     g.fillStyle(edge ? 0xe3f4fb : 0x8fd3ff, 1).fillRect(x, y, 8, 1).fillRect(x, y, 1, 8);
@@ -2761,6 +2769,13 @@ export class ShipScene extends Phaser.Scene {
     // A pool on deck 11 or 12 (§5.3): water she can jump into and swim in. Its front is drawn over
     // her, a little see-through, so she is in it rather than on it.
     // From the deck under a pool's or lower, it is out of sight and out of the way.
+    // The foot of a pool's tank over the span x0 to x1 that reaches under y, or null: a balcony's panel under deck 11's
+    // pools starts there, where the doors' glass shows from under the tank, not up over the tank (the user, 2026-11-27).
+    tankFoot(x0, x1, y) {
+        const t = (this.tankFeet || []).find(t => x0 < t.x1 && x1 > t.x0 && t.foot > y);
+        return t ? t.foot : null;
+    }
+
     underPools(deck = 11) {
         return this.viewDeck !== null && Math.round(this.viewDeck) < deck;
     }

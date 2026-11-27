@@ -16,10 +16,10 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 
 ## Findings (most serious first)
 
-1. **Deck 12's forward pool's tank covers deck 11's windows.** The kids' pool (x 3290 to 3490, about 58.5 to 62.7 m)
+1. **DONE 2026-11-27** (the tank drawn a tile thinner; see `docs/progress-decisions.md`). **Deck 12's forward pool's tank covers deck 11's windows.** The kids' pool (x 3290 to 3490, about 58.5 to 62.7 m)
    is drawn as a tile block 416 to 466, under deck 12's floor; deck 11's window row starts at 448, so ~18 px of five
    windows' tops are behind it, in every state (closed, open, dimmed). `c-fwdpool.png`, `z-pooltile.png`.
-2. **Corrected (2026-11-27):** deck 11 going bright under the kids' pool is the rule, not a fault: out in the open
+2. **Next, on the user's word** ("not now, at first the two above"). **Corrected (2026-11-27):** deck 11 going bright under the kids' pool is the rule, not a fault: out in the open
    nothing is dimmed (GAME_DESIGN.md §5.3, the user, 2026-11-08), and standing on the open pool deck gives the same.
    The real fault is smaller and in all three pools: swimming sets the cut-away's deck to `deckAt(pool.y)`, a
    fraction (11.97 for the kids' pool, 10.97 for deck 11's), so the pool's own deck keeps 3% of its hull over it and
@@ -50,10 +50,10 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 10. **The bow's gulls look copied:** two rows of three, one picture, evenly spaced, on the forward glass screen
     (x 2060 to 2521, y 320) and on the pool's rim (x 3248 to 3519, y 416). `csheet-0.png`.
 
-11. **(Found 2026-11-27, with 1.) Deck 10's balcony fins rise into deck 11's pools' tanks:** the white posts of the
+11. **DONE 2026-11-27** (the dividers start at the tank's foot; deck 11's tanks kept). **(Found 2026-11-27, with 1.) Deck 10's balcony fins rise into deck 11's pools' tanks:** the white posts of the
     balcony partitions under the Oasis pools run about 24 px up over the tanks' bottom rows, in the closed view and
     while she swims. Fix offered: the fins stop where a pool's tank begins (the map builder knows both). `zz-fins.png`.
-12. **(Found 2026-11-27, checking the dim.) At the `stern` start she is not seen at all:** `?at=stern` puts her on
+12. **By design (the user, 2026-11-27).** **(Found 2026-11-27, checking the dim.) At the `stern` start she is not seen at all:** `?at=stern` puts her on
     deck 9's aft terrace (x 12344, y 848), an outdoors area whose cover (the stern's sloped plating) is drawn in
     front of her; only a padlock's thought popup over her shows. `stern-at.png`.
 

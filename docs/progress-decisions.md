@@ -5415,3 +5415,20 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   `region3.pills_spill` (new) the vacuum's hit with it; boot, region1, deck4, vacuum, highlight pass; mishaps fails only
   on deck 9's sprinkler, as on main. No generations.
 
+
+## The pools' tanks over the decks under them (the Refinement session, 2026-11-27; the hull's top review, 1 and 11)
+
+- **What was wrong** (`docs/audit-hull-top-2026-11-26.md`): the tanks are drawn over the ship's side on purpose (their
+  floor seen from their deck, the user). Deck 12's kids' pool reached 20 px into deck 11's window row; under deck 11's
+  pools, deck 10's balcony dividers (the panels the game draws over her) ran up over the tanks' last rows.
+- **The kids' pool:** its tank drawn a tile thinner, walls and bottom (8 px each, `TANK_WALL` in the ship scene), so
+  that it reaches 12 px into the windows; the windows as they were (the user: "Don't change the windows"). The map's
+  tiles stay (play is the same); only the walls' top tiles at the deck's floor are the deck's own floor tile, or their
+  outer half showed beside the rim (`tools/build_ship_map.py`). The water and her swimming are as they were.
+- **Deck 11's pools keep their two tiles** (the user, after seeing them thinner: the drain's hatch and grate are drawn
+  for that floor and hung under a thinner one). **Deck 10's dividers under them start at the tank's foot**, where the
+  doors' glass shows from under it (`tankFoot()`, the panels in `src/world/world.js`); elsewhere they still reach the
+  balcony's ceiling. A tank's rows run from 4 px under its floor: its foot is 4 px past the walls' thickness.
+- **Not done yet:** the 3% ghosts while she swims (finding 2, the fractional deck; "not now, at first the two above").
+  Finding 12 (hidden at the `stern` start) is by design (the user).
+- **Checks:** region6, region7, region9 pass (14 cases). No generations.
