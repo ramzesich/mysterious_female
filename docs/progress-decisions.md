@@ -5527,3 +5527,19 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   through the glass"); deck 12's windscreen tall since it must be too tall to jump (§6.1.9), so all of her is behind it.
 - **Offered:** A leave it; B lighter glass while she is on it; C a lower white band; D both.
 - **The user: A.** Nothing changed. Pictures and script: `docs/audit-hull-top/front/`.
+
+## The funnel's smoke drawn as the fog machine's (the Refinement session, 2026-11-27; the hull's top review, 8)
+
+- **What was wrong:** the funnel's smoke was flat white discs (`puff`) swelling to 166 px; by day bubbles, at sunset,
+  tinted by the evening light beside the setting sun, more suns.
+- **Tried and turned down (the user):** two generated puffs in the sky clouds' style ("neither of those look like smoke
+  going out of the pipe, not even close"), then plumes inpainted into the game's picture of the stacks on a green sky
+  ("neither ... fit our pipes"). 28 generations, kept in `assets/source/smoke/tries/` (its README).
+- **Built (the user: "the approach we did with the DJ's smoke machine. Just less volume. Out of each pipe. Random
+  cycles of more and less amount of smoke"):** `drawSmoke` in the ship scene, `FUNNEL_SMOKE` in the config: per pipe 44
+  small soft puffs in white and pale grey, each with its own age and place across the pipe's mouth, rising 55 px and
+  bending 100 px aft over 3 s, growing and thinning; each pipe gives more and less by turns (two slow swells out of
+  step, its own phase), a puff born only while its pipe gives enough, so a lull drifts up the plume. Drawn on the
+  sea's clock: on in the outside view, held for a still picture. The pipes' rims over its first puffs. The horn's
+  cough keeps the old `puff` discs. Approved by the user.
+- **Checks:** boot, region8 pass. Pictures: `docs/audit-hull-top/smoke/`. Not merged.

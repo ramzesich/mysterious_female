@@ -1,4 +1,4 @@
-import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING, SHRUG } from '../config.js';
+import { VIEW, PLAYER, CRY, LUNGE, POCKET, MISHAP_SCENES, GAGS, HAND_OVER, TALLY, THROW, IDLE, BUMBOT, LIFT, SIDEWALK, SWIM, BED_JOY, PROMENADE, CUT_SHADOW, LOCKED_PARTS, LONG_FALL_MARGIN, SHOWER, VERBS, HOLDING, SHRUG, FUNNEL_SMOKE } from '../config.js';
 import { wire } from '../wire.js';
 import { Controls } from '../controls.js';
 import { scenario } from '../world/mishaps.js';
@@ -2371,26 +2371,46 @@ export class ShipScene extends Phaser.Scene {
             g.fillStyle(0x7a6e66, 1).fillRect(x, top - h, w, h);
             g.fillStyle(0x9b8e84, 1).fillRect(x + 4, top - h, 6, h);
             g.fillStyle(0x3e3546, 1).fillRect(x, top - h, w, 6);
-            pipes.push({ x: x + w / 2, y: top - h });
+            pipes.push({ x: x + w / 2, y: top - h, w });
         }
         this.worldLayer.add([g, ncl]);
-        // A bit of white smoke: puffs rising from the pipes, drifting aft, swelling and fading.
+        // The smoke out of each pipe, as the DJ's fog machine (`drawSmoke`, `FUNNEL_SMOKE` in the config; the user, 2026-11-27:
+        // the flat white discs it was read as more suns at sunset). The horn's cough still uses `puff`.
         if (!this.textures.exists('puff')) {
             const pg = this.make.graphics({ x: 0, y: 0 }, false);
             pg.fillStyle(0xffffff, 1).fillCircle(32, 32, 32);
             pg.generateTexture('puff', 64, 64);
             pg.destroy();
         }
-        this.smoke = [];
-        pipes.forEach((p, i) => {
-            for (let k = 0; k < 3; k++) {
-                const puff = this.add.image(p.x, p.y, 'puff').setDepth(DEPTH.exterior + 0.03).setAlpha(0);
-                this.worldLayer.add(puff);
-                const tween = this.tweens.add({
-                    targets: puff, x: p.x + 260, y: p.y - 200, scale: { from: 0.5, to: 2.6 }, alpha: { from: 0.8, to: 0 },
-                    duration: 4200, delay: i * 500 + k * 1400, repeat: -1, ease: 'Sine.easeOut',
-                });
-                this.smoke.push(tween);
+        this.smokeG = this.add.graphics().setDepth(DEPTH.exterior + 0.03);
+        this.worldLayer.add(this.smokeG);
+        this.funnelPipes = pipes;
+        this.smokeClock = 0;
+    }
+
+    // The funnel's smoke, each frame (`dt` the sea's: on in the outside view, held for a still picture): per pipe a stream of
+    // puffs, each with its own age, place across the mouth and way out (scattered, not in step, or they line up in one
+    // curve); a puff is born only if its pipe gives enough at its birth, so the more and the less drift up the plume.
+    drawSmoke(dt) {
+        const g = this.smokeG, pipes = this.funnelPipes, S = FUNNEL_SMOKE;
+        if (!g) return;
+        const t = (this.smokeClock += dt * 1000);
+        g.clear();
+        const v = this.cameras.main.worldView;
+        if (pipes[0].x - 40 > v.right || pipes[pipes.length - 1].x + S.drift + 40 < v.x || pipes[0].y - S.rise - 40 > v.bottom) return;
+        const rnd = n => ((Math.sin(n * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1;
+        const gives = (j, at) => Math.max(S.least, Math.min(1,
+            0.55 + 0.3 * Math.sin(at / S.swellMs[0] + j * 2.4) + 0.25 * Math.sin(at / S.swellMs[1] + j * 4.1 + 1)));
+        pipes.forEach((p, j) => {
+            for (let i = 0; i < S.puffs; i++) {
+                const n = j * 97 + i, f = (i / S.puffs + rnd(n) * 0.5 + t / S.lifeMs) % 1;
+                if (rnd(n + 0.5) > gives(j, t - f * S.lifeMs)) continue;
+                const side = rnd(n + 0.25) * 2 - 1;
+                const x = p.x + side * p.w * 0.3 + S.drift * Math.pow(f, 1.6) + side * f * 8 + Math.sin(t / 260 + i * 1.3) * (0.5 + f * 2.5);
+                const r = S.r0 + f * S.grow + (i % 3) * 0.5;
+                const y = p.y - r * 0.6 - S.rise * (1 - (1 - f) * (1 - f)) + Math.sin(t / 310 + i) * f * 2;
+                const a = S.alpha * (1 - f) * Math.min(1, f / 0.04);
+                if (a > 0.02) g.fillStyle(i % 3 ? 0xffffff : 0xc9ced3, a).fillCircle(x, y, r);
             }
         });
     }
@@ -2419,7 +2439,6 @@ export class ShipScene extends Phaser.Scene {
         this.physics.pause();
         this.time.paused = true;
         this.tweens.pauseAll();
-        for (const t of this.smoke || []) t.resume();       // the funnel's smoke keeps drifting
         this.player.setVisible(false);
         this.uiCam.setVisible(false);
         // (A bubble over someone by her would hang on the closed side: away; the game brings it back.)
@@ -3147,6 +3166,7 @@ export class ShipScene extends Phaser.Scene {
             this.horizonOnScreen += (target - this.horizonOnScreen) * (1 - Math.exp(-dt / HORIZON_SETTLE));
         }
         this.farGulls.update(flow);
+        this.drawSmoke(flow);
         // (In the intro's wide views the far background holds still: its drift aft is how it looks
         // from the ship under way, and that camera is not on the ship. The user saw the islands
         // and clouds slide past a sun that stood still.)

@@ -44,7 +44,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 7. **Left as it is 2026-11-27** (the user's own choice of 2026-11-07, as deck 11's front; the user's A; `front/`). **The forward sun deck stays closed while she walks on it** (about 31 to 44 m): she is seen faintly through the
    glass and a 24 px white band (392 to 416) hides her from the thighs down; reads as wading. May be meant (an open
    terrace keeping the side closed); ask. `csheet-1.png` (top).
-8. **The funnel's smoke at sunset reads as extra suns:** flat pale discs beside the setting sun. `d-funnel.png`.
+8. **DONE 2026-11-27** (drawn as the DJ's fog machine, out of each pipe, more and less by turns; the user's; `smoke/`). **The funnel's smoke at sunset reads as extra suns:** flat pale discs beside the setting sun. `d-funnel.png`.
 9. **The windsocks hang straight down between gusts** and read as striped posts; the one at the stairway's foot has
    the handrail across it (`sock()` in `src/world/topdeck.js`). `z-funneltop.png`.
 10. **The bow's gulls look copied:** two rows of three, one picture, evenly spaced, on the forward glass screen

@@ -1064,6 +1064,10 @@ Lessons learned (2026-11-27, the hull's top and the pools' tanks):
   foot is 4 px past the walls' thickness; a foot worked out from the thickness alone put the dividers 4 px into the tank.
 - **`render_ship.py` starts at the world's top (y 0):** what stands above it (the funnel's top, its stacks, the horn,
   the radar mast's tip) is shot with the outside view at zoom 1 and a negative scroll.
+- **Smoke out of a pipe is not a generated picture:** two small puffs styled on the sky's clouds read as clouds sat on
+  the stacks, and plumes inpainted into the game's own picture "don't fit our pipes" (28 generations, none used). Drawn
+  as the DJ's fog machine is (many small soft circles each frame, each with its own age and way out, born only while
+  its pipe gives enough), it was approved at once. A flat disc scaled up reads as a sun at sunset.
 
 ## Working with the user
 
