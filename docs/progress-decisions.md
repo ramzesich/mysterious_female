@@ -5518,3 +5518,12 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
   near rail, as deck 12's other open parts. From outside the floor band and the glass screen run on unbroken.
 - **Offered:** A leave it; B carry the rail on to the core's wall and the court; C give the walk the deck's floor.
 - **The user: A.** Nothing changed. Pictures and scripts: `docs/audit-hull-top/walk/`.
+
+## Deck 12's open front left as it is (the Refinement session, 2026-11-27; the hull's top review, 7)
+
+- **What the finding was:** the forward sun deck (the Spinnaker balcony, 31 to 44 m) stays closed while she walks on it:
+  seen faintly through the glass, a 24 px white band hiding her from the hem down. Looked into: the user's own choice of
+  2026-11-07, the same as deck 11's front (`bulwark` in the ship scene: in front of her, "hidden behind the white, seen
+  through the glass"); deck 12's windscreen tall since it must be too tall to jump (§6.1.9), so all of her is behind it.
+- **Offered:** A leave it; B lighter glass while she is on it; C a lower white band; D both.
+- **The user: A.** Nothing changed. Pictures and script: `docs/audit-hull-top/front/`.

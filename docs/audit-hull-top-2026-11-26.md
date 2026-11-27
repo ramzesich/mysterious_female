@@ -41,7 +41,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
 6. **Left as it is 2026-11-27** (by design: the side walk over deck 11's pools, 115 to 145 m, its thin floor and rail for the drop; the user's A; `walk/`). **The rail and the floor change at about 115 m on deck 12** (the `deck12` start, by the stair core): from about
    112 to 115 m no near rail and a thicker grey floor; aft of it a rail and a thin white floor slab. `zz-d12.png`.
    (Lower confidence: may be how the part over the pools is built.)
-7. **The forward sun deck stays closed while she walks on it** (about 31 to 44 m): she is seen faintly through the
+7. **Left as it is 2026-11-27** (the user's own choice of 2026-11-07, as deck 11's front; the user's A; `front/`). **The forward sun deck stays closed while she walks on it** (about 31 to 44 m): she is seen faintly through the
    glass and a 24 px white band (392 to 416) hides her from the thighs down; reads as wading. May be meant (an open
    terrace keeping the side closed); ask. `csheet-1.png` (top).
 8. **The funnel's smoke at sunset reads as extra suns:** flat pale discs beside the setting sun. `d-funnel.png`.
