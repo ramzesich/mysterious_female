@@ -1171,7 +1171,9 @@ FLARES = {"haz_flare_a": (12, 185.4, 0.8, 6.0, 1.0, 0.0, "amb_teppan_chef_a"),
 # no further aft than the towels can be seen from), towels on its deck chairs (the tell), a gull on
 # the end rail.
 TERRACE = dict(deck=12, gust=dict(every=7.0, blow=1.5, tell=0.7, drift=60), span=(214.5, 225),
-               towels=[(215.85, 24), (217.65, 24)], gull=(220.0, 40))
+               # (The gull on the planter palm's aft frond, its feet on the frond's top: at 220.0 m, 40 px up, it stood on
+               # nothing, past the glass screen's end closed and over the end post open; the user, 2026-11-27.)
+               towels=[(215.85, 24), (217.65, 24)], gull=(219.15, 59))
 # The sun deck (`gust_sundeck`; plan-the-rest §7f, 7): gusts as the aft terrace's over its open part, from the stair core to
 # the court (m), so that the hop over the old lady's sunbed is timed and the cake (after the horn) wobbles in them unless
 # she stands still (`SWAY.gust` in src/world/carry.js); towels over the two loungers' backrests the tell (m, px up: the

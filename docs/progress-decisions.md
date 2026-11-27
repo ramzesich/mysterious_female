@@ -5483,3 +5483,12 @@ another deliverable (not in our pocket)". On branch `refine`, after the HUD's ut
 - **Mended (the test only):** it waits for the rain to be off, then on, so that she sets off as it starts. Three runs of
   `mishaps.things` and the whole `mishaps` (10 scenarios) pass. CLAUDE.md's lesson that called it "fails on main too"
   says what it was. Not merged.
+
+## The aft terrace's gull on the palm (the Refinement session, 2026-11-27; the hull's top review, 4)
+
+- **What was wrong:** `gull_terrace` stood at 220.0 m, 40 px up, on nothing: past the glass screen's end (50 px) in the
+  closed view, 8 px over the end post (32 px) on its edge in play.
+- **The user:** "Place it on the palm tree, let me see how it looks", then "Approved": on the planter palm's aft frond,
+  its feet on the frond's top (219.15 m, 59 px up; `TERRACE` in `tools/population.py`). The palm's crown shows over the
+  glass screen from outside, so the gull stands on it in both views.
+- **Checks:** region8 (lingering by it: its swoop onto her, 20) and mishaps.gulls pass. Not merged.

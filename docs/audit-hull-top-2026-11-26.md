@@ -30,7 +30,7 @@ with the scratch scripts that made them (they write to `%LOCALAPPDATA%/Temp/bumb
    `def.y - 112` = 448, under deck 12's terrace, and only flies to its perch (10603, 514, the rail's forward end)
    once its update runs near her. From afar (the outside view, the intro) it is a sitting gull in mid-air.
    `z-aftgull.png` (bottom left).
-4. **The aft terrace's end gull fits neither state** (`gull_terrace`, `TERRACE["gull"] = (220.0, 40)`, x 11040,
+4. **DONE 2026-11-27** (on the palm's aft frond, the user's choice). **The aft terrace's end gull fits neither state** (`gull_terrace`, `TERRACE["gull"] = (220.0, 40)`, x 11040,
    feet at 376). Closed: past the glass screen's end, feet ~8 px under its top bar (366). Open: ~8 px over the end
    post's top (384), on its edge. The two rails differ too: the screen 50 px, the end post 32 px.
    `zz-postout.png` (closed), `zz-post.png` (open, the post).
