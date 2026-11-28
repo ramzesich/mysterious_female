@@ -152,12 +152,12 @@ Reference photos never enter the repo.
 | Jump (hold for full height, tap for a hop) | Space | A |
 | Climb ladders | ↑ / ↓ | Left stick / D-pad up/down |
 | "Кісюнічка!!!": the cry, and the lunge with it once learned (§3.2); one tangerine each press | D (Shift until 2026-11-06) | B |
-| Throw a tangerine (§3.2): a roll; with ↑ held, a lob | F, ↑ + F | Y, ↑ + Y |
+| Throw a tangerine (§3.2): a roll; with ↑ held, a lob | F, ↑ + F | RT, ↑ + RT (Y until 2026-11-28) |
 | Activate: doors, buttons, card readers, whatever we add as we build | E | X |
 | The welcome menu: choose, press | ↑ / ↓, Enter or Space | Left stick / D-pad, A or Menu |
 | Skip the intro | Esc | Menu or B |
 | The whole ship from outside (§5.3) | O; Esc leaves it | Right stick click; again or B leaves it |
-| Zoom in that view | + / − | RT / LT |
+| Zoom in that view | + / − | RB / LB (the triggers until 2026-11-28) |
 | Sound off and on | M | (keyboard only, the user, 2026-11-15) |
 
 Activate has its own key rather than ↑, so standing at a ladder next to a door is never ambiguous.
@@ -190,7 +190,7 @@ it is her battle cry here.
 
 **Decided (the user, 2026-11-15; `docs/plan-three-uses.md` §1 and §2, which has what each
 person, animal and hazard does): a tangerine has three uses**, and the ten-second dash is gone.
-D (B on the controller) is the first, the pocket the second (step 2), the throw (F, Y on the
+D (B on the controller) is the first, the pocket the second (step 2), the throw (F, RT on the
 controller) the third (step 3). **Built (step 1, 2026-11-15):**
 
 - **Every D costs one tangerine, whatever it does.** With none on her nothing happens, and the
@@ -263,7 +263,9 @@ always confused me").
   metres. **With ↑ held, a lob**, high and short: its top is about 2.3 m ahead, a hand under a
   corridor's ceiling. On her feet only, hands free (not with a tray, crawling, gliding, in a lunge
   or with Bumbot); with none on her the count blinks. She stands for half a second while she
-  throws (her `toss` clip, the tangerine in her fist until it leaves her hand).
+  throws (her `toss` clip, the tangerine in her fist until it leaves her hand). **Its hint** (the user, 2026-11-28),
+  once, the first time a tangerine is hers: "F to throw a tangerine, ↑ + F to lob" (RT with the controller, since
+  2026-11-28 the throw's button: Y is free, the zoom of the whole ship's view on the bumpers).
 - **What it meets answers it** (`plan-three-uses.md` §2's fourth column, every one built today):
   the porter stops for it and peels it by the wall (10 s clear), the waiter pockets it, the
   jogger hops it; the steward on his rounds puts it on his cart, hers again with E; the kid

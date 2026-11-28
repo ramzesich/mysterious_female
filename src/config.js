@@ -4,7 +4,7 @@
 export const VIEW = { width: 960, height: 540, zoom: 2 };
 // What cabin 8206's desk shows seen close, each from its find (`keep:her:<name>`, `keep:him:<name>`; §4 2.4): drawn
 // in this order, the back row first (tools/build_desk.py).
-export const DESK_THINGS = ['flag', 'plant', 'bookmark', 'diary', 'tshirt', 'sleepmask', 'handheld', 'pick'];
+export const DESK_THINGS = ['flag', 'plant', 'bookmark', 'pad', 'tshirt', 'sleepmask', 'handheld', 'pick'];
 // What Bumbot's bed shows seen close on the day after, each from its find (`keep:cat:<name>`; §4 2.4, the user's).
 export const BED_THINGS = ['massage', 'car', 'bell', 'feather', 'snack', 'ball', 'wool', 'sardines'];
 
@@ -833,7 +833,7 @@ export const LOOSE = {
     hardAt: 260,        // px/s down that is a hard landing
 };
 
-// F (Y on the controller): the throw (docs/plan-three-uses.md §1.2), one tangerine, underarm from
+// F (RT on the controller): the throw (docs/plan-three-uses.md §1.2), one tangerine, underarm from
 // her hand (`hand` px ahead of her middle, `handY` over her feet). The roll: low, it bounces once
 // and rolls about six metres. With ↑, the lob: high and short, its top about 2.3 m ahead and just
 // under a corridor's ceiling. She stands for `ms` while she throws; it leaves her hand at `releaseMs`.
@@ -857,6 +857,7 @@ export const THROW = {
     airFps: 20,
     airReleaseMs: 150,
     carry: 0.5,
+    hintMs: 3500,       // "F to throw a tangerine, ↑ + F to lob" over her, the first time one is hers
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus

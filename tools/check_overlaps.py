@@ -49,7 +49,7 @@ ALLOWED = [
 # Things that move, lie flat on the floor or rest on furniture: no fault where they pass or lie.
 SKIP_NAMES = ("robot", "vacuum", "paws", "book-", "icon-", "gull-", "rail-towel", "lift-", "tray", "load-",
               # (The things to find and the other pickups, lying on a table, a seat, a shelf: 2026-11-20.)
-              "rc-car", "diary", "massage-gun", "snack-tube", "bookmark-book", "plant-pot", "grip-socks",
+              "rc-car", "massage-pad", "massage-gun", "snack-tube", "bookmark-book", "plant-pot", "grip-socks",
               "pills-bottle", "wool", "flag-ua", "feather-toy", "tennis-ball",
               "lifeboat-hatch")       # (on its boat's roof, as the boat: 2026-11-21)
 

@@ -44,9 +44,10 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
          # user, "A and C". The wool: a small picture of its own, its strand over the basket's rim.)
          "tennis-ball": 10, "wool": 10, "flag-ua": 16,
          # §4 2.1's things to find, each its close-up shrunk (the user approved each in place): Bumbot's
-         # snack tube, massage gun and remote-controlled car; her diary. (Her bookmark in its book and
-         # her plant are kept finished, mended by hand: the bookmark's cat head, the plant's stem.)
-         "snack-tube": 6, "massage-gun": 16, "rc-car": 10, "diary": 13,
+         # snack tube, massage gun and remote-controlled car; her massage pad (her diary until 2026-11-28); her plant, an Albuca bracteata since
+         # 2026-11-28 (the user's), its pot as wide as the sapling's was. (Her bookmark in its book is kept finished,
+         # mended by hand: its cat head.)
+         "snack-tube": 6, "massage-gun": 16, "rc-car": 10, "massage-pad": 6, "plant-pot": 15,
          # Her other pickups (2026-11-20, part of 2.1): the grip socks, the stage manager's pills.
          "grip-socks": 10, "pills-bottle": 12,
          # Bumbot's collar bell (4), lying on the promenade's deck once the gull has dropped it: its
@@ -76,15 +77,24 @@ SCALE = {"gull-perched": 20, "gull-up": 22, "gull-down": 10, "robot": 52,
 # C", 2026-11-19): the world's sprite is the close-up shrunk, so the two are one picture.
 CLOSEUPS = SRC.parent / "closeups"
 FROM_CLOSEUP = {"tennis-ball": "ball", "feather-toy": "feather", "flag-ua": "flag", "snack-tube": "snack",
-                "massage-gun": "massage", "rc-car": "car", "diary": "diary", "grip-socks": "socks",
-                "pills-bottle": "pills", "collar-bell": "bell"}
+                "massage-gun": "massage", "rc-car": "car", "massage-pad": "pad", "grip-socks": "socks",
+                "pills-bottle": "pills", "collar-bell": "bell", "plant-pot": "plant"}
 # A slight outline round a picture, in one of its own darker colours (the user, 2026-11-20: the socks
 # and the pills, "give them a slight outline"): name -> its colour.
 OUTLINE = {"grip-socks": "cf657f", "pills-bottle": "cd683d"}
 # Pixels set by hand at the end (x, y in the finished sprite -> colour): the pills' label, a dark title
 # and two lines of print, as on its close-up; its top row the cap's white ridges, as on the close-up, and
 # its foot made even, a band of yellow and rounded corners (the user, 2026-11-20).
-MEND = {"pills-bottle": {(1, 7): "3e3546", (2, 7): "3e3546", (3, 7): "3e3546", (4, 7): "3e3546", (1, 9): "9babb2", (2, 9): "9babb2", (3, 9): "9babb2", (4, 9): "9babb2", (1, 11): "9babb2", (2, 11): "9babb2", (3, 11): "9babb2", (1, 0): "c7dcd0", (2, 0): "ffffff", (3, 0): "c7dcd0", (4, 0): "ffffff", (5, 0): "c7dcd0", (0, 12): "cd683d", (1, 12): "f9c22b", (1, 13): "cd683d"}}
+# Her massage pad's rosettes in a regular rhythm (the user, 2026-11-28, A, the lower rows a px up): row 0 the crowns
+# along its top on every other px, row 1 the middle row on the odd px, rows 2 and 3 the bottom row's two lines on the
+# even px, row 4 plain fabric; its ends and its bottom row as shrunk.
+PAD_ROWS = {0: ("0b2879", range(2, 15, 2)), 1: ("051e64", range(3, 14, 2)), 2: ("031b60", range(2, 13, 2)),
+            3: ("031b60", range(4, 11, 2)), 4: ("031859", ())}
+PAD_MEND = {(x, y): ("faf4e3" if x in whites else fabric) for y, (fabric, whites) in PAD_ROWS.items() for x in range(1, 16)}
+# Bumbot's massage gun: a bump under its nozzle as over it, a massage head's (the user, 2026-11-28).
+MEND = {"massage-pad": PAD_MEND,
+        "massage-gun": {(1, 4): "00020c", (2, 4): "090e17"},
+        "pills-bottle": {(1, 7): "3e3546", (2, 7): "3e3546", (3, 7): "3e3546", (4, 7): "3e3546", (1, 9): "9babb2", (2, 9): "9babb2", (3, 9): "9babb2", (4, 9): "9babb2", (1, 11): "9babb2", (2, 11): "9babb2", (3, 11): "9babb2", (1, 0): "c7dcd0", (2, 0): "ffffff", (3, 0): "c7dcd0", (4, 0): "ffffff", (5, 0): "c7dcd0", (0, 12): "cd683d", (1, 12): "f9c22b", (1, 13): "cd683d"}}
 
 # Generated, paid for, and not used: the folded newspaper came drawn tilted, a smudge at the 3 px
 # of a paper on the carpet; the paper round's papers are drawn in code (the user, 2026-11-16).
@@ -123,7 +133,7 @@ CROP = {}
 # averaged with its dark outline came out dull (the Ukrainian flag had too, in the game since
 # step 4): the four other desk flags and hers (the art rule looked back over, 2026-11-17).
 BY_MAJORITY = {"flag-se", "flag-fi", "flag-ee", "flag-dk", "flag-ua", "feather-toy", "wool", "snack-tube",
-               "massage-gun", "rc-car", "diary", "grip-socks", "pills-bottle", "collar-bell", "lamp-round", "lamp-oval"}
+               "massage-gun", "plant-pot", "rc-car", "massage-pad", "grip-socks", "pills-bottle", "collar-bell", "lamp-round", "lamp-oval"}
 # Shrunk keeping a thin white line that reads it, then outlined: the tennis ball's seam (by majority
 # it was lost, a plain yellow dot; the user: "has to look like a tennis ball", and chose an olive
 # outline, 2026-11-17). name -> the outline's colour.
@@ -143,7 +153,7 @@ SEAM = {"tennis-ball": "a2a947"}
 # washed picture, kept so.
 # (Delivery 1's vase of flowers and the low table it waits on, §5 3.2: in their own colours, as the user approved them;
 # `delivery/`, its README.)
-OWN_COLOURS = {"robot", "splash-pillow", "fog-machine", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
+OWN_COLOURS = {"massage-gun", "plant-pot", "massage-pad", "robot", "splash-pillow", "fog-machine", "grip-socks", "canister", "delivery-vase", "delivery-teapot", "delivery-pillow-bottom", "delivery-pillow-mid", "delivery-pillow-top", "tray-stand", "sardine-tin", "tshirt-folded", "sleepmask", "guitar-pick", "lifejacket-box", "warning-light", "console-table",
                "lifeboat-hatch-back", "lifeboat-hatch-front"}
 # (The gym's balls, every frame of their roll: tools/build_gym_ball.py.)
 OWN_COLOURS |= {f"gym-ball-{c}-{i:02d}" for c in ("purple", "blue") for i in range(32)}
@@ -233,6 +243,8 @@ def majority_shrink(img, w, h):
 def piece(path, name=None):
     name = name or path.stem
     img = Image.open(path).convert("RGBA")
+    if path.stem.endswith("-by-hand") and path.parent == CLOSEUPS:
+        img.putdata([(0, 0, 0, 0) if p[:3] == (255, 0, 255) else p for p in img.get_flattened_data()])
     if name not in KEEP_CANVAS:
         img = img.crop(img.getbbox())
     path = Path(name + ".png")       # (the options below go by the thing's name, wherever its picture is)
@@ -308,7 +320,9 @@ def outlined(img, colour):
 def build():
     pieces = [(p.stem, piece(p)) for p in sorted(SRC.glob("*.png")) if p.stem not in SKIP and p.stem not in BY_HAND.values()]
     pieces += [(name, by_hand(SRC / f"{stem}.png")) for name, stem in BY_HAND.items()]
-    pieces += [(name, piece(CLOSEUPS / f"{src}.png", name)) for name, src in FROM_CLOSEUP.items()]
+    # (A close-up the user finished by hand is read from their file, magenta empty: her massage pad's.)
+    pieces += [(name, piece(CLOSEUPS / f"{src}.png" if (CLOSEUPS / f"{src}.png").exists() else CLOSEUPS / f"{src}-by-hand.png", name))
+               for name, src in FROM_CLOSEUP.items()]
     lit = dict(pieces)
     for name, (src, k) in DIM.items():
         off = lit[src].copy()

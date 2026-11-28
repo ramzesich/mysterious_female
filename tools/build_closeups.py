@@ -29,9 +29,9 @@ OUT = ROOT / "assets" / "sprites"
 # (His navy t-shirt (13) and its logo too, the photo's own inks (the user, 2026-11-21): on the palette the navy went
 # purple and the lilac a grey green.)
 # (The grip socks, made again 2026-11-25, the user's choice of seven with white nubs under the soles: tries/socks/.)
-OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld", "pick", "socks"}
+OWN_COLOURS = {"ball", "sardines", "tshirt", "sleepmask", "handheld", "pick", "socks", "massage", "plant", "pad"}   # (the gun: its blacks fell on two colours; her Albuca: its pot went red; her massage pad)
 # Not close-ups: the t-shirt's logo alone, built and the user's own edit of it (`tools/draw_tshirt_logo.py`).
-NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand"}
+NOT_CLOSEUPS = {"tshirt-logo", "tshirt-logo-by-hand", "pad-by-hand"}
 # Colours changed after the palette, as in tools/build_things.py: the car's rubbery wheels to the
 # palette's brightest cyans (the user: "two big rubbery cyan wheels").
 RECOLOUR = {"car": {"0b8a8f": "0eaf9b", "0b5e65": "0b8a8f"},
@@ -64,8 +64,21 @@ def recolour(img, swaps):
     return img
 
 
+# Close-ups the user finishes by hand in Paint (magenta #FF00FF empty; never written by a tool): name -> its file.
+# Her massage pad (2026-11-28): PixelLab's try 3 from her photo, its rosettes moved and added by rule
+# (`tries/pad/rows.py`), its blue at 65%, then the user's own touches.
+BY_HAND = {"pad": "pad-by-hand"}
+
+
 def picture(path):
     img = Image.open(path).convert("RGBA")
+    if path.stem in BY_HAND.values():
+        a = img.load()
+        for y in range(img.height):
+            for x in range(img.width):
+                if a[x, y][:3] == (255, 0, 255):
+                    a[x, y] = (0, 0, 0, 0)
+        path = path.with_name(next(k for k, v in BY_HAND.items() if v == path.stem) + ".png")
     img = img.crop(img.getbbox())
     if path.stem not in OWN_COLOURS:
         img = palettize(img)
@@ -78,13 +91,13 @@ def picture(path):
 def build():
     pieces = []
     for p in sorted(SRC.glob("*.png")):
-        if p.stem in NOT_CLOSEUPS:
+        if p.stem in NOT_CLOSEUPS and p.stem not in BY_HAND.values():
             continue
         img = picture(p)
         if p.stem == "key-card":
             pieces += [(f"card-{card}", recolour(img.copy(), {CARD_STRIPE: "ffffff", "ffffff": c})) for card, c in CARDS.items()]
         else:
-            pieces.append((p.stem, img))
+            pieces.append((next((k for k, v in BY_HAND.items() if v == p.stem), p.stem), img))
     width = sum(im.width + 2 for _, im in pieces)
     height = max(im.height for _, im in pieces)
     sheet = Image.new("RGBA", (width, height), (0, 0, 0, 0))

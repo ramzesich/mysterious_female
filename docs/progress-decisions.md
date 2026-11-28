@@ -5900,3 +5900,75 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
   `?at=gallery7`. About 175 generations (the framing gag's about 50 of them, unused). **Tests:** `region3.painting` (new:
   the ends, the cry, the run-in, the hop down onto it, the clean hop); `boot`, `region3`, `sound` pass; `check_overlaps` 0;
   the rest not run. **Part 11 (§7f) is done.**
+## The controller's hints in arrows (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked for every hint and popup text in both languages (shown as tables: the welcome screen, the hints, the
+lock's popup, her frights, the words spoken, the win screen, and what is not translated on purpose), then whether the
+D-pad works where the hints say "left stick" (it does: every direction is read in `src/controls.js` as the arrow, the
+D-pad or the stick). The user: "what I want is directions only showing arrows both for keyboard and controller. It is
+concise and clear." The five controller hints (`hint.move.pad`, `hint.crawl.pad`, `hint.climb.pad`, `hint.read.pad`,
+`hint.return.pad`) now give their directions as ← → ↑ ↓, in both languages; only their buttons differ from the
+keyboard's (A, X, B). The translations as they stand and the arrows approved. `intro` (its check of the move hint's
+words updated), `lang` and `gamepad` pass.
+
+## The controller's throw on RT, the zoom on the bumpers, the throw's hint (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked what the triggers and the bumpers do (the triggers only zoomed the whole ship's view, the bumpers nothing),
+then: "let's put the zoom to the bumpers, freeing the triggers. Then, remove the throw from Y and put it on the right
+trigger." RB zooms in and LB out (as RT and LT did); RT throws (pulled half way, as the zoom counted it), ↑ + RT lobs;
+Y and LT do nothing now. `src/controls.js`; the controls tables in `GAME_DESIGN.md` §3.1 and `README.md` (the README's
+whole-ship row given its controller column); `gamepad` checks "Y throws nothing", "RT throws a tangerine", RB and LB.
+(`docs/plan-three-uses.md` keeps its "Y" as the plan was.) Tried by the user on their controller: "all works" (their
+first try was on a server of the shared folder, which still had Y).
+
+The throw had no hint, against the rule that every new mechanic is explained once; the user: "let's add the tangerine
+hint as you suggested ... Show it first time she picks up a tangerine." `hint.throw` "F to throw a tangerine, ↑ + F to
+lob" / "F — кинути мандаринку, ↑ + F — підкинути", `hint.throw.pad` with RT, on a plate over her for 3.5 s
+(`THROW.hintMs`) the first time a tangerine is hers (`gainTangerine`, the flag `hint_throw`, asked with `has` so that
+`?cards=all` keeps it). Shots in `docs/throw-hint/`. `lang`, `throw`, `intro`, `gamepad` pass. Approved.
+
+## The books lying in the world: two moved, all washed a little (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked to see every book she can pick up, numbered: nine lie in the world (2, 3, 5, 6, 8, 10, 11, 14, 15), the
+other six are handed to her (1 her husband, 4 the honeymooners, 7 the balcony guest, 9 the engineer, 12 and 13 the
+deliveries' thanks). The user: "5. Move two pixels to the right. 6. Move one pixel down. Let's give all of them a little
+bit of wash." Book 8 (the old lady's sunbed) 2 px aft, book 10 one px lower, standing on the chart table now (it was a px
+above it): `tools/population.py`, `maps/world.json` rebuilt (only those two changed). The nine rest washed 15% toward the
+wall where each lies (the corridors' cream, or the room's own wall), their pulse coming up from it to full colour as a
+door's does (`BOOK_REST`, `restBooks` in `src/highlight.js`; a book placed later, book 8 after the horn, too); a book
+taken takes its wash with it. The other pickups keep their full colours. `highlight`'s book 6 check now expects the pulse
+from the wash; `boot`, `keeps`, `region8`, `region9`, `highlight` pass. Shots: `docs/books-in-world/` (all nine,
+before and after at 4x). Approved.
+
+## Three of the things to find made again (2026-11-28, branch `refine`, the Refinement session)
+
+The user: "I want to update a few collectibles, what they are and how they look like. Let's do them one by one. Commit,
+when we finish all of them." (`docs/collectibles/` has the shots and scripts.)
+
+- **Bumbot's massage gun (6): his own**, from the user's photo (`reference/bumbot_massage_gun.heic`): cut out (GrabCut by
+  its darkness), three tries (the redrawn one chosen), its ground cut away; in its own colours (on the palette its blacks
+  fell on two colours). Its world picture the close-up shrunk, 16 x 16, its nozzle given a bump under it as over it (the
+  user: "that will look more like the massage gun nozzle"). The masseur's toss unchanged (the user: his grip "fine").
+  Bumbot's bed seen close: the new gun laid into the bed's redraw, its box fitted to it (an inpaint drew the whole bed into
+  the box and was dropped). 14 generations.
+- **Her plant (12): an Albuca bracteata** (the user's; a photo they found, "the bulb is almost entirely inside the dirt"):
+  her close-up edited with the photo as reference (try 2 of three), the plant moved 5 px right (the bulb over the pot's
+  middle) and 5 down behind the picture's own soil and pot (the user: "don't add the dirt by yourself"; the gap where the
+  bulb stood left), in its own colours (on the palette the pot went red). Its world picture the close-up shrunk, 15 x 15,
+  on the maid's cabin's sill (the hand-mended sapling `things/plant-pot.png` gone). On the desk seen close: laid in at the
+  old pot's size, 8 px right and 1 up (clear of the flag). 18 generations.
+- **His sleep mask on the desk seen close 3 px left** (the user): `moves` in `tools/build_desk.py`, the game's placing only.
+  (The t-shirt's desk piece had carried a row of the old pot's shadow; gone with the new pot.)
+- **Her diary (11) is her massage pad now** (the user: "replace the diary with the massage pad"): from the user's photo
+  (`reference/her_massage_pad.heic`), three tries (pro flash chosen), its rosettes 4 px left and one more on the top and the
+  middle rows (7, 8, 7 as hers), its blue at 65%, then the user's own touches in Paint (`assets/source/closeups/pad-by-hand.png`,
+  magenta empty, never written by a tool). Its world picture 17 x 6, its rows set by rule (the user's A, the lower rows a px
+  up); it lies on the near arm of the theatre seat where the diary was (the user: "on top of the handle ... the one closer to
+  the screen"), 2 px right of the arm's middle, nothing over it. On the desk seen close: upright at the right end, 22 x 64
+  (the user tried it lying flattened, then upright at 80 px, turned, and kept this). The key renamed `diary` to `pad`
+  everywhere (`DESK_THINGS`, the world's data `keep_pad`, the builders, `check_overlaps`, the `keeps` playtest); the diary's
+  pictures gone. 8 generations.
+- **Tests:** `keeps` (its desk check now compares each thing's own px, not its box: the mask's moved box reaches into the
+  t-shirt's), `boot`, `highlight`, `region9`, `lang` pass; `check_overlaps` 0. In all 40 generations.
+- Not touched: `docs/plan-the-rest.md`'s table of the finds (the other session's plan) still names the diary and the old
+  plant.

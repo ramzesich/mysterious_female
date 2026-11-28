@@ -613,7 +613,7 @@ def scenario_intro(b):
     b.shot("intro-play")
     b.eval(f"{S}.controls.device = 'pad'")
     wait(0.1)
-    ok &= check(alert(b) == "Left stick to move, A to jump", "with the controller in use, in its buttons", alert(b))
+    ok &= check(alert(b) == "← and → to move, A to jump", "with the controller in use, in its buttons", alert(b))
     b.shot("intro-play-pad")
     b.eval(f"{S}.controls.device = 'keys'")
     wait(0.1)
@@ -6874,17 +6874,24 @@ def scenario_gamepad(b):
         ok &= check([260, 1] in [r[1:3] for r in b.eval("window.__rumbles")[n:]], "a scare's fall rumbles hard",
                     b.eval("window.__rumbles")[n:])
         wait(3.0)
+        # The throw is the right trigger (the user, 2026-11-28); Y does nothing now.
+        b.eval("window.__ship.save.tangerines = 3; window.__ship.throwing = null")
+        b.pad_tap("Y")
+        ok &= check(not b.eval("!!window.__ship.throwing") and b.eval("window.__ship.save.tangerines") == 3, "Y throws nothing")
+        b.pad_tap("RT")
+        ok &= check(bool(b.eval("!!window.__ship.throwing")), "RT throws a tangerine")
+        wait(1.0)
         wait(0.4)
         b.pad_tap("RS")
         wait(0.4)
         ok &= check(bool(b.eval("!!window.__ship.overview")), "the right stick's click shows the whole ship")
         z0 = b.eval("window.__ship.cameras.main.zoom")
-        b.pad_tap("RT")
+        b.pad_tap("RB")
         wait(0.3)
-        ok &= check(b.eval("window.__ship.cameras.main.zoom") > z0, "RT zooms in")
-        b.pad_tap("LT")
+        ok &= check(b.eval("window.__ship.cameras.main.zoom") > z0, "RB zooms in")
+        b.pad_tap("LB")
         wait(0.3)
-        ok &= check(b.eval("window.__ship.cameras.main.zoom") < z0 * 1.2, "LT zooms out")
+        ok &= check(b.eval("window.__ship.cameras.main.zoom") < z0 * 1.2, "LB zooms out")
         b.pad_tap("B")
         wait(0.4)
         ok &= check(not b.eval("!!window.__ship.overview"), "B leaves it")
@@ -7524,11 +7531,13 @@ def scenario_highlight(b):
     cx, cy = b.eval(f"(p => [p.sprite.x, {D12}])({S}.world.people.byId.amb_sushi_chef)")
     at(cx - 30, cy, settle=0.8)
     ok &= check(b.eval(f"{H}.state()") == [], "by the sushi chef: nothing changes", b.eval(f"{H}.state()"))
-    # A pickup: the pickup itself, from its full colours, its glint as it was.
-    # (Book 6 on the Atrium Café's table since 2026-11-23: book 1 comes from her husband's hand.)
+    # A pickup: the pickup itself, its glint as it was. A book rests a little washed (the user, 2026-11-28) and pulses
+    # from that wash up to its full colours, as a door does.
+    # (Book 6 in the shore excursions' brochure stand since 2026-11-23: book 1 comes from her husband's hand.)
     x, y = thing("book_6")
     st = at(x - 12, y)
-    ok &= check(bool(st) and st[0]["key"] == "thing:book_6" and st[0]["parts"][0]["mode"] == "full", "by book 6: the book pulses", st)
+    ok &= check(bool(st) and st[0]["key"] == "thing:book_6" and st[0]["parts"][0]["mode"] == "rest" and st[0]["parts"][0]["k"] == 0.15,
+                "by book 6: the book pulses, from its wash at rest", st)
     ok &= check(b.errors == [], "no errors", b.errors)
     return ok
 
@@ -7613,15 +7622,17 @@ def scenario_keeps(b):
     ok &= check(got["him"] == "1/4" and got["order"] == ["cat", "her", "book", "him"], "  and his count comes on, last in the row", got)
     b.shot("keeps-hud")
 
-    # The desk and the bed seen close: each found thing's box differs from the bare picture, each other one is bare.
+    # The desk and the bed seen close: each found thing's own px differ from the bare picture, each other one's are bare.
+    # (Its own px, not its box: a box may reach into a neighbour's, the sleep mask's moved 3 px left into the t-shirt's.)
     compare = ("((scene, list) => { const s = window.__ship, L = s.cache.json.get(scene + '-layout');"
                " const px = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;"
                " const x = c.getContext('2d'); x.drawImage(img, 0, 0); return x; };"
                " const seen = px(s.textures.get(scene + '-seen').getSourceImage()), bare = px(s.textures.get(scene + '-bare').getSourceImage());"
                " const out = {}; for (const k of list) { const t = s.textures.get(scene + '-' + k).getSourceImage();"
-               " const a = seen.getImageData(L[k][0], L[k][1], t.width, t.height).data, z = bare.getImageData(L[k][0], L[k][1], t.width, t.height).data;"
-               " out[k] = a.some((v, i) => v !== z[i]); } return out; })")
-    desk = ["flag", "plant", "bookmark", "diary", "tshirt", "sleepmask", "handheld", "pick"]
+               " const a = seen.getImageData(L[k][0], L[k][1], t.width, t.height).data, z = bare.getImageData(L[k][0], L[k][1], t.width, t.height).data,"
+               " own = px(t).getImageData(0, 0, t.width, t.height).data;"
+               " out[k] = a.some((v, i) => own[i - i % 4 + 3] > 0 && v !== z[i]); } return out; })")
+    desk = ["flag", "plant", "bookmark", "pad", "tshirt", "sleepmask", "handheld", "pick"]
     bed = ["massage", "car", "bell", "feather", "snack", "ball", "wool", "sardines"]
     own = b.eval(f"(r => [r.door, r.floor])({S}.rooms.find(r => r.route === 'cabin'))")
     def seen(scene, things, found):

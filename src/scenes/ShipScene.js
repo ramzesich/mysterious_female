@@ -3032,6 +3032,12 @@ export class ShipScene extends Phaser.Scene {
     gainTangerine(x, y) {
         this.save.tangerines += 1;
         sfx.tangerine();
+        // The throw's one hint (every new mechanic explained once), the first time a tangerine is hers (the user,
+        // 2026-11-28); `has`, not `flagSet`, so that `?cards=all` does not take it away.
+        if (!this.progress.has('hint_throw')) {
+            this.progress.setFlag('hint_throw');
+            this.world.say(t(this.controls.device === 'pad' ? 'hint.throw.pad' : 'hint.throw'), THROW.hintMs, { kind: 'plate' });
+        }
         const cam = this.cameras.main, view = cam.worldView, time = this.time.now;
         const from = { x: (x - view.x) * cam.zoom, y: (y - view.y) * cam.zoom };
         const to = this.hud.tangerineTarget();

@@ -61,16 +61,16 @@ export class Controls {
             down: k.down.isDown || (pad && (pad.down || (upright && stick.y > STICK_DEADZONE))),
             jump: k.jump.isDown || button('A'),
             dash: k.dash.isDown || button('B'),   // D for now (the user, 2026-11-06; it was Shift)
-            throw: k.throw.isDown || button('Y'),   // the throw (docs/plan-three-uses.md §1.2)
+            throw: k.throw.isDown || trigger('RT'),   // the throw (docs/plan-three-uses.md §1.2): the right trigger (the user, 2026-11-28; it was Y)
             activate: k.activate.isDown || button('X'),
             start: k.start.isDown || k.jump.isDown || button('A') || button('MENU'),
             // The outside view of the whole ship (O, or the right stick's click; Esc or B leaves it
-            // too), and its zoom (+/-, or the triggers). Esc, Menu or B skip the intro.
+            // too), and its zoom (+/-, or the bumpers, RB in and LB out: the user, 2026-11-28, freeing the triggers). Esc, Menu or B skip the intro.
             outside: k.outside.isDown || button('RS'),
             escape: k.escape.isDown || button('MENU') || button('B'),
             mute: k.mute.isDown,        // the sound, off and on: the keyboard only (the user, 2026-11-15)
-            zoomIn: k.zoomIn.isDown || k.zoomInPad.isDown || trigger('RT'),
-            zoomOut: k.zoomOut.isDown || k.zoomOutPad.isDown || trigger('LT'),
+            zoomIn: k.zoomIn.isDown || k.zoomInPad.isDown || button('RB'),
+            zoomOut: k.zoomOut.isDown || k.zoomOutPad.isDown || button('LB'),
         };
 
         const state = {};

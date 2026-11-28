@@ -33,6 +33,9 @@ const ROOM_WASH = 0.3;      // a room's wash toward its own wall (tools/draw_roo
 const ROOM_DOOR_WASH = { linen: 0.2 };
 const SUFFIX = { '-bg': 0.35, '-w20': 0.20, '-lt': 0.12, '-w6': 0.06 };      // (`-w6`: the theatre's own pieces, 2026-11-24)
 // (Her crew cabin's door pulsed down to 40% once, "only for this door here"; muted at rest since, it pulses up.)
+// The books lying in the world rest a little washed toward the wall where they lie (the corridor's, or their room's), and
+// pulse up to full colour (the user, 2026-11-28: "give all of them a little bit of wash"); `restBooks`.
+const BOOK_REST = 0.15;
 const TRUNK_ALONE = 0.2;    // a trunk's door with no background door and no prop round it (the user, 2026-11-23)
 const SKIP_DOORS = /^(roof|balcony|bookcase)$/;   // a room's doors left as they are: the lifeboat's hatch, the
                                                   // balconies' (the user: to be worked on), the nook's bookcase (muted)
@@ -294,11 +297,25 @@ export class Highlight {
         this.restDone = true;
     }
 
+    // The books lying in the world, each as it is placed (one may come later: book 8 after the horn): washed at rest.
+    restBooks() {
+        const s = this.s;
+        for (const t of s.world.things) {
+            const o = t.pick;
+            if (!/^book_/.test(t.id) || !o?.scene || this.rest.has(o)) continue;
+            const key = t.route === 'cabin' ? 'cabin-8206' : t.route === 'linen' ? 'linen-room' : t.route === 'chapel' ? 'chapel-room'
+                : `room-${t.route}`;
+            this.rest.set(o, { over: this.copy(o, s.textures.exists(key) ? this.wallOf(key) : WALL), k: BOOK_REST });
+        }
+    }
+
     // The washes at rest follow their doors (a door opened, shut, slid, shown or hidden); one pulsing is the pulse's.
+    // A picture taken away (a book picked up) takes its wash with it.
     restSync() {
         for (const [o, r] of this.rest) {
             const c = r.over;
-            if (!o.scene || !c.scene) continue;
+            if (!o.scene) { if (c.scene) c.destroy(); this.rest.delete(o); continue; }
+            if (!c.scene) continue;
             if (c.texture.key !== o.texture.key || c.frame.name !== o.frame.name) c.setTexture(o.texture.key, o.frame.name);
             c.setPosition(o.x, o.y).setOrigin(o.originX, o.originY).setFlip(o.flipX, o.flipY).setScale(o.scaleX, o.scaleY);
             sameCut(o, c);
@@ -498,6 +515,7 @@ export class Highlight {
 
     update(time, delta) {
         if (!this.restDone && this.s.world && this.s.rooms?.length) this.restDoors();
+        if (this.restDone) this.restBooks();
         this.restSync();
         const tg = this.target();
         let key = tg?.key ?? null;

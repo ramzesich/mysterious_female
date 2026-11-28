@@ -26,9 +26,10 @@ const TEXTS = {
         'menu.language': 'LANGUAGE',
         // The two hints (the user asked for each): how to move and jump, over her once as the intro
         // hands her over (2026-11-20; with the controller in use, its own buttons); what E is for,
-        // the first time she walks past her door (2026-11-14).
+        // the first time she walks past her door (2026-11-14). Directions are arrows for the keyboard and the
+        // controller alike (the user, 2026-11-28: "concise and clear"; its D-pad and left stick both give them).
         'hint.move': '← and → to move, Space to jump',
-        'hint.move.pad': 'Left stick to move, A to jump',
+        'hint.move.pad': '← and → to move, A to jump',
         'hint.interact': 'E to interact',
         'hint.dash': 'D to dash',
         'hint.dash.pad': 'B to dash',
@@ -37,14 +38,17 @@ const TEXTS = {
         'hint.round': 'Space at a partition to climb round it',
         'hint.round.pad': 'A at a partition to climb round it',
         'hint.climb': '↑ or ↓ with Space to climb up or down',
-        'hint.climb.pad': 'Left stick up or down with A to climb',
-        'hint.crawl.pad': 'Left stick down to crawl',
+        'hint.climb.pad': '↑ or ↓ with A to climb up or down',
+        'hint.crawl.pad': '↓ to crawl',
+        // The throw, the first time a tangerine is hers (the user, 2026-11-28).
+        'hint.throw': 'F to throw a tangerine, ↑ + F to lob',
+        'hint.throw.pad': 'RT to throw a tangerine, ↑ + RT to lob',
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
         'hint.read': '← and → to choose, ↓ to see the cover, E to read, Esc to get up',
-        'hint.read.pad': 'Left stick to choose, down to see the cover, X to read, B to get up',
+        'hint.read.pad': '← and → to choose, ↓ to see the cover, X to read, B to get up',
         // Giving books back at the Library's trolley with more than one on her (the first time the row shows there).
         'hint.return': '← and → to choose, E to give it back, Esc to keep the rest',
-        'hint.return.pad': 'Left stick to choose, X to give it back, B to keep the rest',
+        'hint.return.pad': '← and → to choose, X to give it back, B to keep the rest',
         // Stamped beside a given-back book's title in the row (the menu's plate lettering: capitals).
         'book.returned': 'RETURNED',
         // The win screen (§6.4).
@@ -72,7 +76,7 @@ const TEXTS = {
         'menu.play': 'ГРАТИ',
         'menu.language': 'МОВА',
         'hint.move': '← і → — рухатися, пробіл — стрибати',
-        'hint.move.pad': 'Лівий стік — рухатися, A — стрибати',
+        'hint.move.pad': '← і → — рухатися, A — стрибати',
         'hint.interact': 'E — взаємодіяти',
         'hint.dash': 'D — ривок',
         'hint.dash.pad': 'B — ривок',
@@ -80,12 +84,14 @@ const TEXTS = {
         'hint.round': 'Пробіл біля перегородки — перелізти',
         'hint.round.pad': 'A біля перегородки — перелізти',
         'hint.climb': '↑ чи ↓ з пробілом — лізти вгору чи вниз',
-        'hint.climb.pad': 'Лівий стік угору чи вниз з A — лізти',
-        'hint.crawl.pad': 'Лівий стік униз — повзти',
+        'hint.climb.pad': '↑ чи ↓ з A — лізти вгору чи вниз',
+        'hint.crawl.pad': '↓ — повзти',
+        'hint.throw': 'F — кинути мандаринку, ↑ + F — підкинути',
+        'hint.throw.pad': 'RT — кинути мандаринку, ↑ + RT — підкинути',
         'hint.read': '← і → — вибрати, ↓ — обкладинка, E — читати, Esc — встати',
-        'hint.read.pad': 'Лівий стік — вибрати, вниз — обкладинка, X — читати, B — встати',
+        'hint.read.pad': '← і → — вибрати, ↓ — обкладинка, X — читати, B — встати',
         'hint.return': '← і → — вибрати, E — повернути, Esc — залишити решту',
-        'hint.return.pad': 'Лівий стік — вибрати, X — повернути, B — залишити решту',
+        'hint.return.pad': '← і → — вибрати, X — повернути, B — залишити решту',
         'book.returned': 'ПОВЕРНЕНО',
         'win.line': 'Бумбот удома.',
         'win.tally': (found, tangerines, books, photos, slots, shelf) =>
