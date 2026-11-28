@@ -261,8 +261,8 @@ ITEMS = {
     "book_2": ("lifeboat", 46, "book:2", None, 17),      # (on the bench left of the ladder, where a vest hung, midway between the flare box and the water can: the user, 2026-11-21)
     "book_3": ("dressing", 118, "book:3", None, 31),
     "book_5": ("cabin", 186, "book:5", None, 32),
-    "book_8": (12, 128.2, "book:8", "horn", 13),
-    "book_10": (10, 37.5, "book:10", None, 34),       # on the chart table
+    "book_8": (12, 128.2 + 2 / 48, "book:8", "horn", 13),     # (2 px aft: the user, 2026-11-28)
+    "book_10": (10, 37.5, "book:10", None, 33),       # on the chart table (1 px lower: the user, 2026-11-28)
     # (§4 2.1, 17: on the life-jacket box's lid at the boat walkway's aft end, its foot 2 px into the lid: the user.)
     "book_11": ("walkway", 230 + 2 / 48, "book:11", None, 30),
     # (§4 2.1, 20: on the console table at the end of deck 9's officers' corridor, left of the captain's door: the user's

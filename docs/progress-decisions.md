@@ -5834,3 +5834,16 @@ hint as you suggested ... Show it first time she picks up a tangerine." `hint.th
 lob" / "F — кинути мандаринку, ↑ + F — підкинути", `hint.throw.pad` with RT, on a plate over her for 3.5 s
 (`THROW.hintMs`) the first time a tangerine is hers (`gainTangerine`, the flag `hint_throw`, asked with `has` so that
 `?cards=all` keeps it). Shots in `docs/throw-hint/`. `lang`, `throw`, `intro`, `gamepad` pass. Approved.
+
+## The books lying in the world: two moved, all washed a little (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked to see every book she can pick up, numbered: nine lie in the world (2, 3, 5, 6, 8, 10, 11, 14, 15), the
+other six are handed to her (1 her husband, 4 the honeymooners, 7 the balcony guest, 9 the engineer, 12 and 13 the
+deliveries' thanks). The user: "5. Move two pixels to the right. 6. Move one pixel down. Let's give all of them a little
+bit of wash." Book 8 (the old lady's sunbed) 2 px aft, book 10 one px lower, standing on the chart table now (it was a px
+above it): `tools/population.py`, `maps/world.json` rebuilt (only those two changed). The nine rest washed 15% toward the
+wall where each lies (the corridors' cream, or the room's own wall), their pulse coming up from it to full colour as a
+door's does (`BOOK_REST`, `restBooks` in `src/highlight.js`; a book placed later, book 8 after the horn, too); a book
+taken takes its wash with it. The other pickups keep their full colours. `highlight`'s book 6 check now expects the pulse
+from the wash; `boot`, `keeps`, `region8`, `region9`, `highlight` pass. Shots: `docs/books-in-world/` (all nine,
+before and after at 4x). Approved.
