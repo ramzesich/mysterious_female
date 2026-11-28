@@ -968,6 +968,14 @@ CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_c
 # The theatre's popcorn (part 11's item 12, 2026-11-27): the man with the tub tips it now and then, and it lies on the
 # aisle's floor ahead of him (`Popcorn` in src/world/movers.js). id: (deck, m of the man, his person's id).
 POPCORN = {"haz_popcorn": (6, 226.54, "amb_audience_3")}
+# The party's balloons drifted across deck 8's corridor by its door (part 11's item 14, the user's, 2026-11-28; `Balloons`,
+# `BALLOONS` in src/config.js): (colour, pose: `u` upright, `l`/`r` lying with its knot that way, m, px up, in front of
+# her?). Eleven from 70 to 73 m round the party's door (71.6 m), the birthday girl among them; one on top of two.
+BALLOON_DRIFT = dict(deck=8, items=[
+    ("red", "l", 70.15, 0, 0), ("blue", "u", 70.55, 0, 0), ("yellow", "r", 70.95, 0, 0), ("pink", "l", 72.55, 0, 0),
+    ("green", "u", 72.9, 0, 0),
+    ("yellow", "r", 70.3, 0, 1), ("pink", "l", 70.75, 0, 1), ("green", "r", 71.2, 0, 1), ("blue", "l", 70.55, 14, 1),
+    ("red", "u", 72.35, 0, 1), ("blue", "r", 72.75, 0, 1)])
 # The machine with a glint (`sec_jackpot`): id: (deck, m, flag it sets, px up to its glint).
 JACKPOTS = {"sec_jackpot": (7, 153.1, "jackpot", 44)}
 

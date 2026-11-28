@@ -16,7 +16,7 @@ from population import BALLS, COURT, FLARES, FLOCK_BIRDS, FLOCKS, FUNNEL_TOP, LA
 from population import BELL_GULL, BOW, FINALE, PROM_AFT
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
-                        GRIPS, GULLS, ITEMS, JACKPOTS, POPCORN, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
+                        GRIPS, GULLS, ITEMS, JACKPOTS, POPCORN, BALLOON_DRIFT, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
                         SEAT_SPOTS, SEATS, SLOTS, SOLIDS, SOURCES, STAGE, SWITCHES, TANGERINES, TRAPDOOR_LANDS, TRAPDOOR_M)
 from ship_layout import CHAPEL, EXTENT, FUNNEL, LINEN_ROOM, OUR_CABIN, PROMENADE, VENUES
 
@@ -314,6 +314,12 @@ def build_world():
         ents.append(dict(kind="spill", id=cid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", half=round(half * 48), top=64))
     for pid, (deck, m, who) in POPCORN.items():
         ents.append(dict(kind="popcorn", id=pid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", who=who))
+    # The party's balloons on deck 8 (part 11's item 14): each its frame in assets/ship/balloons.png (tools/build_balloons.py).
+    BC, BP = ["red", "yellow", "blue", "green", "pink"], ["u", "l", "r"]
+    items = [dict(colour=c, frame=BC.index(c) * 3 + BP.index(k), x=B.exact_x(m), up=up, front=bool(f))
+             for c, k, m, up, f in BALLOON_DRIFT["items"]]
+    ents.append(dict(kind="balloons", id="amb_balloons", x=min(i["x"] for i in items), y=B.floor_y(BALLOON_DRIFT["deck"]),
+                     route="inside", items=items, x0=min(i["x"] for i in items) - 8, x1=max(i["x"] for i in items) + 8))
     for jid, (deck, m, flag, up) in JACKPOTS.items():
         ents.append(dict(kind="jackpot", id=jid, x=B.exact_x(m), y=B.floor_y(deck), route="inside", flag=flag, dy=up))
 

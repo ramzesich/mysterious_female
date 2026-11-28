@@ -5848,3 +5848,25 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
   card is 52 px now, wider than the 48 px between two railing posts: a post crosses its first letter and her run's lean
   touches its end where she stops; moved 3 px forward, stopped 8 px further out and drawn over the railing, it was shown
   and the user chose the first version, as it is.
+
+## Part 11's item 14: the party's balloons on deck 8 (2026-11-28)
+
+- **The drift** (plan-the-rest §7f, 14; the user approved the mock-up in the running game, "All ok"): eleven generated
+  balloons lying on deck 8's corridor floor round the party's door, 70 to 73 m, six in front of her and five behind, one
+  on two (`BALLOON_DRIFT` in `tools/population.py`). Within 4 px of one still lying she wades at half her speed (the
+  ball pit's `wading`; the user, in play: "When I popped all of the balloons, she still walked slowly ... Only the
+  existing balloons on the floor should slow her down"); one beside her rolls up to 7 px away and back with a squeak; a
+  landing on them pops the one under her (a crack, a slap and a thump, louder on the user's word; its scraps to the
+  floor); no fright. Gone by the evening of the catch. `Balloons` in `src/world/movers.js`, `BALLOONS` in the config;
+  the sounds `balloonSqueak`, `balloonPop` (measured within bounds; the user listens).
+- **The art:** five balloons generated (the user's choice of two looks), then again at the game's size with that look's
+  red as the style (taking a third of the rows out made diamonds); in their own colours. `tools/build_balloons.py`:
+  the sheet (upright, lying either way by quarter turns), and **every other balloon of the party in the same art** (the
+  user: "all of the balloons should match"): the bunch on its door, the five on strings drawn by rule, tied to the door
+  handle's lever (its pixels laid back over the strings, its mount behind them: the user, "not the door handle mount"),
+  2 px left of the lever's middle (the user's placing), swaying about the knot; the two against the ceiling, each with a
+  string. The drawn balloons are gone (`world.js`), and the two drawn on the floor with them.
+- **Not in the world's things:** its refresh shows a thing's pictures again, popped ones too; the mover keeps their
+  showing.
+- `?at=party8`. **Tests:** `region5.balloons` (new); `boot`, `region4`, `region5`, `sound` pass; `check_overlaps` 0 (the
+  drift across the party's open door's foot allowed: tumbled out of it); the rest not run. 22 generations.

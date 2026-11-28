@@ -13,7 +13,7 @@ import { People } from './people.js';
 import { Carry, LOADS } from './carry.js';
 import { Story } from './story.js';
 import { Library, BOOK_COLOURS, BOOK_ACCENTS } from './library.js';
-import { Robot, Gull, BellGull, SwingLight, Spill, Popcorn, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
+import { Robot, Gull, BellGull, SwingLight, Spill, Popcorn, Balloons, Darter, TowelStack, Sprinkler, SwingDoor, DndDoor, Roller, Fetcher, Skimmer, Breakfast, Lookout } from './movers.js';
 import { WetPatch, FoodGulls, Queue, Trays } from './hazards.js';
 import { Rounds } from './outside.js';
 import { Fog } from './bow.js';
@@ -274,24 +274,9 @@ export class World {
             g.fillStyle(0xf28c28, 1).fillRect(12, 10, 6, 6);
             g.fillStyle(0x1ebc73, 1).fillRect(14, 9, 2, 1);
         });
-        // Region 5: party balloons, one and a bunch on their strings; an open cabin with the sea in its window. (Bumbot's
-        // paw prints, drawn here until 2026-11-24, are gone: the user, "None of those looks like his prints. Let's drop
-        // the prints entirely.")
-        make('balloon', 16, 20, g => {
-            g.fillStyle(0x2e222f, 1).fillEllipse(8, 9, 16, 18).fillTriangle(6, 17, 10, 17, 8, 20);
-            g.fillStyle(0xffffff, 1).fillEllipse(8, 9, 14, 16);
-            g.fillStyle(0xffffff, 1).fillTriangle(7, 17, 9, 17, 8, 19);
-        });
-        make('balloons', 48, 58, g => {
-            const bunch = [[10, 13, 0xe83b3b], [24, 9, 0xf9c22b], [38, 14, 0x4d9be6], [16, 27, 0xf68181], [32, 26, 0x1ebc73], [24, 39, 0xf28c28]];
-            g.lineStyle(1, 0xf3ecdd, 1);
-            for (const [x, y] of bunch) g.lineBetween(x, y + 8, 24, 57);
-            for (const [x, y, c] of bunch) {
-                g.fillStyle(0x2e222f, 1).fillEllipse(x, y, 17, 19);
-                g.fillStyle(c, 1).fillEllipse(x, y, 15, 17);
-                g.fillStyle(0xffffff, 0.8).fillRect(x - 4, y - 5, 2, 3);
-            }
-        });
+        // Region 5: an open cabin with the sea in its window. (The party's balloons, drawn here until 2026-11-28, are the
+        // generated ones now, all of them alike: tools/build_balloons.py. Bumbot's paw prints, drawn here until
+        // 2026-11-24, are gone: the user, "None of those looks like his prints. Let's drop the prints entirely.")
         make('peek-sea', 34, 74, g => {
             g.fillStyle(0x2e222f, 1).fillRect(0, 0, 34, 74);
             g.fillStyle(0xece3cf, 1).fillRect(2, 2, 30, 72);
@@ -1517,6 +1502,9 @@ export class World {
             case 'popcorn':
                 this.movers.push(new Popcorn(this, e));
                 break;
+            case 'balloons':
+                this.movers.push(new Balloons(this, e));
+                break;
             case 'darter':
                 this.movers.push(new Darter(this, e));
                 break;
@@ -1543,12 +1531,18 @@ export class World {
                     items.push(s.add.image(e.x, e.y, 'peek-knit').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
                 } else {
                     items.push(s.add.image(e.x, e.y, 'shipart', 'door-cabin-ajar').setOrigin(0.5, 1).setDepth(D.decor + 0.1));
-                    const tied = s.add.image(e.x + 9, e.y - 34, 'balloons').setOrigin(0.5, 1).setDepth(D.decor + 0.15);
-                    s.tweens.add({ targets: tied, y: tied.y - 2, angle: { from: -2, to: 2 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-                    items.push(tied);
-                    // Loose ones: two on the floor, one up against the ceiling.
-                    for (const [dx, dy, tint] of [[-27, 0, 0xf68181], [-41, 0, 0x4d9be6], [-22, 108, 0xf9c22b], [52, 108, 0xb9e04c]]) {
-                        items.push(s.add.image(e.x + dx, e.y - dy, 'balloon').setOrigin(0.5, 1).setTint(tint).setDepth(D.decor + 0.14));
+                    // (The generated balloons, as the drift on the floor is, `Balloons` in src/world/movers.js: the user, 2026-11-28,
+                    // "all of the balloons should match".)
+                    // Its bunch tied to the door handle's lever, the lever over its strings, its mount behind them (the user,
+                    // 2026-11-28); it sways about the knot, on the lever: (11, 38) in the door's picture, 34 x 74 stood by its
+                    // foot's middle (tools/build_balloons.py's `HANDLE`; 2 px left of its middle, the user's placing).
+                    const tied = s.add.image(e.x - 6, e.y - 35, 'balloon-bunch').setOrigin(0.5, 1).setDepth(D.decor + 0.15);
+                    s.tweens.add({ targets: tied, angle: { from: -2, to: 2 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+                    const handle = s.add.image(e.x - 17 + 10, e.y - 74 + 37, 'balloon-handle').setOrigin(0, 0).setDepth(D.decor + 0.16);
+                    items.push(tied, handle);
+                    // Two loose ones up against the ceiling, their strings hanging.
+                    for (const [dx, c] of [[-22, 'yellow'], [52, 'green']]) {
+                        items.push(s.add.image(e.x + dx, e.y - 128, `balloon-float-${c}`).setOrigin(0.5, 0).setDepth(D.decor + 0.14));
                     }
                 }
                 this.add(items);

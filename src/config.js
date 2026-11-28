@@ -379,6 +379,11 @@ export const SHAFT = {
 // `slow`: added to each of the clip's first `tell` frames (his tub tipping, with its rustle); `live`: the clip's frame
 // from which the popcorn lies (the slip is on from then); `lie`: how long it lies after the clip, the last 700 ms
 // blinking; the first spill and the next ones after so long (between the two numbers) while she is near.
+// The party's balloons drifted across deck 8's corridor (part 11's item 14, `Balloons` in src/world/movers.js): within
+// `wade` px of one still lying she wades at half her speed (the ball pit's `wading`); one within `reach` px of her middle rolls away from her, up
+// to `give` px, easing `ease` of the way a frame, and back once she has gone; a landing on them from a jump pops the one
+// under her (`pop`: px of her middle to its); gone by the evening of the catch (`until`).
+export const BALLOONS = { wade: 4, reach: 14, give: 7, ease: 0.2, pop: 9, until: 'catch' };
 export const POPCORN = { slow: 60, tell: 6, live: 8, lie: 4000, first: [3000, 9000], again: [8000, 14000] };
 
 export const SIEGE = {

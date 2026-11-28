@@ -4195,6 +4195,51 @@ def enter_region8(b):
     b.eval("window.__ship.lockedUntil = 0; window.__ship.alert.setVisible(false)")
 
 
+def scenario_region5__balloons(b):
+    """The party's balloons drifted across deck 8's corridor by its door (part 11's item 14): among them she wades at half
+    her speed, the one beside her rolls aside, a hop onto them pops one and nothing happens to her; with every one popped
+    she walks as anywhere; after the catch they are gone and do not slow her."""
+    S = "window.__ship"
+    M = f"{S}.world.movers.find(m => m.balloons)"
+
+    def walk(frames=30):
+        b.teleport(exact_x(69.0), D8, "inside"); wait(0.4)
+        b.key("right", True)
+        xs, wading, rolled = [], 0, 0
+        for _ in range(frames):
+            wait(1 / 15)
+            xs.append(b.state()["x"])
+            wading += bool(b.eval(f"{S}.wading"))
+            rolled = max(rolled, b.eval(f"Math.max(...{M}.balloons.map(q => Math.abs(q.off)))") or 0)
+        b.key("right", False)
+        steps = [xs[i + 1] - xs[i] for i in range(len(xs) - 1)]
+        return steps, wading, rolled
+
+    b.open("?reset&play&at=party8")
+    n = b.eval(f"{M}.balloons.length")
+    ok = check(n == 11, "eleven balloons on deck 8's floor by the party's door", n)
+    steps, wading, rolled = walk()
+    fast, slow = max(steps), min(s for s in steps if s > 0)
+    ok &= check(wading > 5 and slow * 2 <= fast + 1, "among them she wades at half her speed", (steps, wading))
+    ok &= check(rolled >= 3, "the ones beside her roll aside", rolled)
+    # A hop onto them pops the one under her, and nothing happens to her.
+    b.teleport(exact_x(69.2), D8, "inside"); wait(0.4)
+    b.key("right", True); b.tap("space", 0.15); wait(0.9); b.key("right", False)
+    popped = b.eval(f"{M}.balloons.filter(q => q.popped).length")
+    ok &= check(popped == 1 and b.state()["mode"] == "play", "a hop onto them pops one, and she plays on", (popped, b.state()))
+    # Every one popped: she walks as anywhere.
+    b.eval(f"{M}.balloons.forEach(q => q.popped || {M}.pop(q))"); wait(0.3)
+    steps, wading, _ = walk()
+    ok &= check(wading == 0, "with every one popped she is not slowed there", (steps, wading))
+    # After the catch: gone, and the walk home is not slowed.
+    b.open("?reset&play&at=party8&did=catch")
+    wait(0.5)
+    shown = b.eval(f"{M}.balloons.filter(q => q.img.visible).length")
+    steps, wading, _ = walk()
+    ok &= check(shown == 0 and wading == 0, "after the catch they are gone and do not slow her", (shown, wading))
+    return ok
+
+
 def scenario_region5(b):
     """Region 5 (docs/build-plan.md, step 5): deck 8 forward, a breather: out of the duct's grille,
     the party's door, the cabin with the sea in its window, her own cabin (a checkpoint, the fifth

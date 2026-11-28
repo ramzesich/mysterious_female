@@ -85,6 +85,7 @@ new one added there should be added here too.
 | `drill7`: outside, on the boat walkway 1.7 m forward of the drill's boat, just aft of the walkway's gull (once the boat is hoisted again, run aft at it: 15; walk forward for the gull) | <http://localhost:8000/?play&at=drill7&cards=all> |
 | `walkway_aft`: outside, on the boat walkway past the drill, a step forward of its last column (219.23 m, under deck 8's partition; with the grip socks ↑ and Space there climbs to deck 8 aft's balconies); book 11 on its box 12 m aft | <http://localhost:8000/?play&at=walkway_aft&cards=all> |
 | `promaft`: outside, on the promenade 3 m forward of the ladder up to the walkway past the drill (208.7 m: folded up until she has come down it from above; from `walkway_aft`, 10 m forward and ↓); the rope across the promenade 6 m aft (211.7 m) | <http://localhost:8000/?play&at=promaft> |
+| `party8`: deck 8 forward, 2.5 m forward of the party's balloons drifted across the corridor (70 to 73 m; walk aft: she wades at half speed, they roll aside; a jump onto them pops one; gone after the catch) | <http://localhost:8000/?play&at=party8> |
 | `balcony7`: deck 7, the Stardust balcony near its far end (her diary on the last seat by the railing, 11) | <http://localhost:8000/?play&at=balcony7> |
 
 ## Deck 8

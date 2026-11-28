@@ -596,6 +596,9 @@ const things = {
     chips: () => { for (let i = 0; i < 7; i++) tone(r(2600, 4200), 0.025, { vol: 0.056, t: r(0, 0.22) }); },
     // The theatre's popcorn: the tub's rustle as it tips (the tell), and the popcorn pattering onto the carpet.
     popcornRustle: () => { for (let i = 0; i < 6; i++) noise(0.05, { band: r(2200, 3400), q: 1.4, vol: 0.09, attack: 0.01, t: i * 0.11 + r(0, 0.04) }); },
+    // The party's balloons on deck 8: one rolled aside by her (a rubbery squeak), one popped by her landing.
+    balloonSqueak: () => { const f = r(760, 880); tone(f, 0.13, { type: 'sawtooth', path: [[0, f], [0.5, f * 1.25], [1, f * 0.9]], vol: 0.09, lp: 2600 }); },
+    balloonPop: () => { noise(0.012, { vol: 0.9 }); noise(0.07, { lo: 2600, vol: 0.5, t: 0.004 }); thud(110, 0.09, 0.4); },
     popcornSpill: () => { for (let i = 0; i < 10; i++) noise(0.02, { band: r(1500, 2600), q: 2, vol: 0.1, t: r(0, 0.35) }); },
     slot: () => run([hz(84), hz(88), hz(91), hz(96)].sort(() => Math.random() - 0.5), 0.07, { vol: 0.0455, len: 1.8 }),
     // The court: a ball on the deck, through the air, through the net.

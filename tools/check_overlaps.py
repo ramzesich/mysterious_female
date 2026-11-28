@@ -30,6 +30,7 @@ from build_ship_map import PLAYABLE, floor_y
 # Pairs that are meant: (a frame or text's start, another's), in either order.
 ALLOWED = [
     ("rope-barrier", "text:"),              # a block's sign hangs on its rope
+    ("balloons", "door-cabin-ajar"),        # the party's balloons lie across its open door's foot, tumbled out of it (item 14, the user's)
     ("pool-hut", "door-crew"),              # the pool attendant's hut: the door is the hut's own
     # Housekeeping's carts and delivered luggage stand at cabin doors: what they are for.
     ("service-cart", "door-cabin"), ("towel-trolley", "door-cabin"), ("suitcases", "door-cabin"),

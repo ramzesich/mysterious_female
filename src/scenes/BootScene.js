@@ -187,6 +187,13 @@ export class BootScene extends Phaser.Scene {
         // The theatre's popcorn lying on the aisle's floor, frame by frame (tools/build_popcorn.py).
         this.load.spritesheet('popcorn', 'assets/ship/popcorn.png', { frameWidth: 80, frameHeight: 8 });
         this.load.json('popcorn-meta', 'assets/ship/popcorn.json');
+        // The party's balloons on deck 8, all generated (tools/build_balloons.py): the drift's, the bunch on its door, the two
+        // against the ceiling.
+        this.load.spritesheet('balloons', 'assets/ship/balloons.png', { frameWidth: 22, frameHeight: 22 });
+        this.load.json('balloons-meta', 'assets/ship/balloons.json');
+        this.load.image('balloon-bunch', 'assets/ship/balloon-bunch.png');
+        this.load.image('balloon-handle', 'assets/ship/balloon-handle.png');
+        for (const c of ['yellow', 'green']) this.load.image(`balloon-float-${c}`, `assets/ship/balloon-float-${c}.png`);
         this.load.json('drill-meta', 'assets/sprites/drill.json');
         // Her pull-up over the lifeboat's roof hatch, facing us (tools/build_hatch.py).
         this.load.spritesheet('mantle-front', 'assets/sprites/mantle-front.png', { frameWidth: 96, frameHeight: 96 });

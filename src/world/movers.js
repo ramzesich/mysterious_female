@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER, CRY, GAGS, VIEW, POPCORN } from '../config.js';
+import { PLAYER, CRY, GAGS, VIEW, POPCORN, BALLOONS } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -2328,3 +2328,88 @@ export class Lookout {
     }
 }
 const ease = k => k * k * (3 - 2 * k);
+
+// The party's balloons drifted across deck 8's corridor by its door (part 11's item 14, the user, 2026-11-28; population:
+// `BALLOONS`): generated, each lying or upright on the floor, in front of her or behind. Among them she wades at half her
+// speed (`wading`, as in the ball pit); the ones by her roll aside and back; a landing on them pops one. No fright. Gone by
+// the evening of the catch, so the walk home is not slowed.
+const BALLOON_HUES = { red: 0xe83b3b, yellow: 0xf9c22b, blue: 0x4d9be6, green: 0x1ebc73, pink: 0xf68181 };
+export class Balloons {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        this.def = def;             // { y, items: [{ colour, frame, x, up, front }], x0, x1 }
+        this.balloons = def.items.map(b => {
+            const img = s.add.image(b.x, def.y - b.up + (b.front ? PLAYER.sink : 0), 'balloons', b.frame).setOrigin(0.5, 1)
+                .setDepth(b.front ? D.player + 0.04 : D.decor + 0.14);
+            return { ...b, img, off: 0, popped: false };
+        });
+        world.add(this.balloons.map(b => b.img));
+        // (Not in the world's things: its refresh shows a thing's pictures again, popped ones too; their showing is kept here.)
+        this.inside = false;
+        this.air = false;
+    }
+
+    get gone() { return this.world.progress.has(BALLOONS.until); }
+
+    update(dt, time) {
+        const s = this.scene, d = this.def, p = s.player;
+        if (this.gone) {
+            if (!this.cleared) {
+                this.cleared = true;
+                for (const b of this.balloons) b.img.setVisible(false);
+                if (this.inside) s.wading = this.inside = false;
+            }
+            return;
+        }
+        for (const b of this.balloons) b.img.setVisible(!b.popped);
+        const near = s.route === 'inside' && s.mode === 'play' && Math.abs(p.y - d.y) < 40;
+        // (Wading only where one still lies: by a popped one she walks as anywhere, the user, 2026-11-28.)
+        const inside = near && Math.abs(p.y - d.y) < 4
+            && this.balloons.some(b => !b.popped && Math.abs(b.img.x - p.x) < b.img.width / 2 + BALLOONS.wade);
+        if (inside !== this.inside) {
+            this.inside = inside;
+            s.wading = inside;
+        }
+        // A landing on them pops the one under her (one a landing).
+        const onFloor = p.body.blocked.down || p.body.touching.down;
+        if (near && onFloor && this.air && p.x > d.x0 && p.x < d.x1) {
+            const under = this.balloons.filter(b => !b.popped && Math.abs(b.img.x - p.x) < BALLOONS.pop)
+                .sort((a, b) => Math.abs(a.img.x - p.x) - Math.abs(b.img.x - p.x))[0];
+            if (under) this.pop(under);
+        }
+        this.air = !onFloor;
+        // The ones by her roll away from her and back; a squeak as one starts to go.
+        const moving = Math.abs(p.body.velocity.x) > 10;
+        for (const b of this.balloons) {
+            if (b.popped) continue;
+            const dx = b.x - p.x;
+            const want = near && Math.abs(dx) < BALLOONS.reach && Math.abs(p.y - d.y) < 30
+                ? Math.sign(dx || 1) * Math.min(BALLOONS.give, (BALLOONS.reach - Math.abs(dx)) * 0.7) : 0;
+            if (want && !b.pushed && moving && time > (this.squeakAt ?? 0)) {
+                this.squeakAt = time + 380;
+                sfx.at(b.x, d.y).balloonSqueak();
+            }
+            b.pushed = !!want;
+            b.off += (want - b.off) * BALLOONS.ease;
+            if (Math.abs(b.off - want) < 0.05) b.off = want;
+            b.img.x = Math.round(b.x + b.off);
+        }
+    }
+
+    pop(b) {
+        const s = this.scene;
+        b.popped = true;
+        b.img.setVisible(false);
+        sfx.at(b.img.x, this.def.y).balloonPop();
+        // A few scraps of it, down to the floor.
+        for (let i = 0; i < 4; i++) {
+            const g = s.add.rectangle(b.img.x + Phaser.Math.Between(-5, 5), b.img.y - 10, 2, 1, BALLOON_HUES[b.colour] ?? 0xe83b3b)
+                .setDepth(s.DEPTH.player + 0.05);
+            this.world.add([g]);
+            s.tweens.add({ targets: g, x: g.x + Phaser.Math.Between(-10, 10), y: this.def.y - 1, angle: Phaser.Math.Between(-90, 90),
+                duration: Phaser.Math.Between(260, 420), ease: 'Quad.easeIn', onComplete: () => s.time.delayedCall(1500, () => g.destroy()) });
+        }
+    }
+}
