@@ -295,7 +295,9 @@ ITEMS = {
     # Bumbot's collar bell, in the beak of the gull on the promenade's wall light (`BELL_GULL`): on the deck
     # under its beak once a lob has made it drop it (the game sets it there, 9 px aft of the gull).
     "keep_bell": ("prom", 140.6, "keep:cat:bell", "flag:bell_dropped", 0, "thing:collar-bell"),
-    "keep_diary": (7, 242.25, "keep:her:diary", None, 19, "thing:diary", {"cover": ("theatre-seat-side-lt", 242.2, 21)}),
+    # (Her massage pad in the diary's place, the user's, 2026-11-28: lying on the seat's near arm (its top outline 21 px
+    # up, columns 9 to 31 of the seat's picture), along its middle, nothing over it.)
+    "keep_pad": (7, 242.25 - 2 / 48, "keep:her:pad", None, 21, "thing:massage-pad"),     # (2 px right of the arm's middle: the user)
     # Bumbot's tin of sardines (7), the sushi chef's for a tangerine: handed to her across the counter (E with one;
     # `sushi()` in src/world/topdeck.js), or, for a tangerine thrown at him, set on his glass case's top at his
     # front, where his hand held it, for her to take (the user, 2026-11-20).

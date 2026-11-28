@@ -147,7 +147,8 @@ back to us, the outside view, back on a movement key); a door's hand that takes 
   `assets/source/hud/socks-by-hand.png` and `parasol-by-hand.png` (magenta #FF00FF empty: both have pure white in
   them; read by `tools/build_hud.py`) and
   `assets/source/things/handheld-by-hand.png` (his handheld's world picture, the user's Paint edit on white, white
-  being empty: `BY_HAND` in `tools/build_things.py`). When the user
+  being empty: `BY_HAND` in `tools/build_things.py`) and `assets/source/closeups/pad-by-hand.png` (her massage pad's
+  close-up, magenta empty: `BY_HAND` in `tools/build_closeups.py`; its world picture and desk piece are made from it). When the user
   is given a file to edit, a build must not write that file on its next run.
 - Sprites face east; west is `flipX`. Background props are muted so they never read as interactive.
   **How much is the place's** (the user, 2026-11-20, chosen deck by deck): a background prop is placed with

@@ -120,7 +120,7 @@ export class World {
         const keeps = (new URLSearchParams(location.search).get('keeps') ?? '').split(',')
             .flatMap(k => k === 'desk' ? DESK_THINGS : k === 'bed' ? BED_THINGS : [k]);
         for (const k of keeps) {
-            const whose = BED_THINGS.includes(k) ? 'cat' : ['flag', 'plant', 'bookmark', 'diary'].includes(k) ? 'her' : 'him';
+            const whose = BED_THINGS.includes(k) ? 'cat' : ['flag', 'plant', 'bookmark', 'pad'].includes(k) ? 'her' : 'him';
             const what = `keep:${whose}:${k}`;
             if ((DESK_THINGS.includes(k) || BED_THINGS.includes(k)) && !this.save.keeps.includes(what)) this.save.keeps.push(what);
         }
@@ -1184,7 +1184,7 @@ export class World {
                 const img = (e.frame ? this.image(e.x, y, e.frame) : s.add.image(e.x, y, key)).setOrigin(0.5, 1).setDepth(depth + 0.01);
                 this.glint(img);
                 // The near part of the furniture it is in, drawn again in front of it (`cover`: the seat's
-                // near arm over the diary's foot). It stays when the thing is taken: the same pixels.
+                // near arm over the end of her massage pad). It stays when the thing is taken: the same pixels.
                 if (e.cover) {
                     const c = s.add.image(e.cover.x, e.y, 'shipart', e.cover.frame).setOrigin(0.5, 1).setDepth(depth + 0.02);
                     c.setCrop(0, c.height - e.cover.rows, c.width, e.cover.rows);

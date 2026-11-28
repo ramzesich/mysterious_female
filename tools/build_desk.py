@@ -76,28 +76,29 @@ def mend_bed(im):
 
 SCENES = {
     "desk": dict(
-        tries="try1.png", mend=mend_desk,
+        tries="try1-pad.png", mend=mend_desk,
+        moves={"sleepmask": (-3, 0)},     # (his sleep mask 3 px left, the user, 2026-11-28)
         # Each thing's box on the canvas (x0, y0, x1, y1, inclusive), measured on full.png by its pixels that are none
         # of the surface's (the wall, the desk's back edge, its top, edge and front); where two touch, the line
-        # between them (the plant's pot and the t-shirt's collar: row 128/129; the book and the diary: column
+        # between them (the plant's pot and the t-shirt's collar: row 128/129; the book and the old diary: column
         # 324/325; the mask and the handheld: by colour, `pieces`).
         boxes={
             "flag": (35, 64, 82, 132),
-            "plant": (84, 63, 120, 128),
+            "plant": (84, 63, 140, 128),     # (her Albuca laid in, 2026-11-28: the sapling's box and the new plant's, 87-139 x 76-127)
             "tshirt": (45, 129, 146, 173),
             "sleepmask": (145, 120, 205, 152),
             "handheld": (196, 128, 275, 171),
             "pick": (287, 144, 312, 171),
             "bookmark": (266, 69, 324, 135),
-            "diary": (325, 69, 365, 135),
+            "pad": (348, 100, 369, 163),     # (her massage pad in the diary's place, laid in upright at its right end, the user, 2026-11-28)
         }),
     "bed": dict(
-        tries="try-photo2-v3.png", mend=mend_bed, bits=True, bare=bare_bed,
+        tries="try-photo2-v3-gun.png", mend=mend_bed, bits=True, bare=bare_bed,
         # Each of his eight, measured on full.png the same way (the bed's top and front, the runner, the cushions,
         # the pillow, the wall), and 2 px more all round (their light rims are the bed's colours): none touches
         # another or him.
         boxes={k: (x0 - 2, y0 - 2, x1 + 2, y1 + 2) for k, (x0, y0, x1, y1) in {
-            "massage": (18, 99, 78, 164),
+            "massage": (15, 100, 79, 167),     # (the user's own gun, 2026-11-28: its box fitted to it)
             "car": (272, 145, 306, 168),
             "bell": (321, 147, 349, 168),
             "feather": (150, 154, 198, 168),
@@ -203,7 +204,10 @@ def build(scene, cfg):
     Image.fromarray(bare).save(out / "bare.png")
     for name, (x, y, w, h) in layout.items():
         Image.open(src / f"{name}.png").crop((x, y, x + w, y + h)).save(out / f"{name}.png")
-    (out / "layout.json").write_text(json.dumps(layout))
+    # (A piece moved from where the redraw has it, in the game only: `moves`, px right and down.)
+    placed = {n: [x + cfg.get("moves", {}).get(n, (0, 0))[0], y + cfg.get("moves", {}).get(n, (0, 0))[1], w, h]
+              for n, (x, y, w, h) in layout.items()}
+    (out / "layout.json").write_text(json.dumps(placed))
     print(f"{scene}: wrote full.png, bare.png, the {len(layout)} pieces and layout.json in", src.relative_to(ROOT))
 
 

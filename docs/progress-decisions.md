@@ -5847,3 +5847,36 @@ door's does (`BOOK_REST`, `restBooks` in `src/highlight.js`; a book placed later
 taken takes its wash with it. The other pickups keep their full colours. `highlight`'s book 6 check now expects the pulse
 from the wash; `boot`, `keeps`, `region8`, `region9`, `highlight` pass. Shots: `docs/books-in-world/` (all nine,
 before and after at 4x). Approved.
+
+## Three of the things to find made again (2026-11-28, branch `refine`, the Refinement session)
+
+The user: "I want to update a few collectibles, what they are and how they look like. Let's do them one by one. Commit,
+when we finish all of them." (`docs/collectibles/` has the shots and scripts.)
+
+- **Bumbot's massage gun (6): his own**, from the user's photo (`reference/bumbot_massage_gun.heic`): cut out (GrabCut by
+  its darkness), three tries (the redrawn one chosen), its ground cut away; in its own colours (on the palette its blacks
+  fell on two colours). Its world picture the close-up shrunk, 16 x 16, its nozzle given a bump under it as over it (the
+  user: "that will look more like the massage gun nozzle"). The masseur's toss unchanged (the user: his grip "fine").
+  Bumbot's bed seen close: the new gun laid into the bed's redraw, its box fitted to it (an inpaint drew the whole bed into
+  the box and was dropped). 14 generations.
+- **Her plant (12): an Albuca bracteata** (the user's; a photo they found, "the bulb is almost entirely inside the dirt"):
+  her close-up edited with the photo as reference (try 2 of three), the plant moved 5 px right (the bulb over the pot's
+  middle) and 5 down behind the picture's own soil and pot (the user: "don't add the dirt by yourself"; the gap where the
+  bulb stood left), in its own colours (on the palette the pot went red). Its world picture the close-up shrunk, 15 x 15,
+  on the maid's cabin's sill (the hand-mended sapling `things/plant-pot.png` gone). On the desk seen close: laid in at the
+  old pot's size, 8 px right and 1 up (clear of the flag). 18 generations.
+- **His sleep mask on the desk seen close 3 px left** (the user): `moves` in `tools/build_desk.py`, the game's placing only.
+  (The t-shirt's desk piece had carried a row of the old pot's shadow; gone with the new pot.)
+- **Her diary (11) is her massage pad now** (the user: "replace the diary with the massage pad"): from the user's photo
+  (`reference/her_massage_pad.heic`), three tries (pro flash chosen), its rosettes 4 px left and one more on the top and the
+  middle rows (7, 8, 7 as hers), its blue at 65%, then the user's own touches in Paint (`assets/source/closeups/pad-by-hand.png`,
+  magenta empty, never written by a tool). Its world picture 17 x 6, its rows set by rule (the user's A, the lower rows a px
+  up); it lies on the near arm of the theatre seat where the diary was (the user: "on top of the handle ... the one closer to
+  the screen"), 2 px right of the arm's middle, nothing over it. On the desk seen close: upright at the right end, 22 x 64
+  (the user tried it lying flattened, then upright at 80 px, turned, and kept this). The key renamed `diary` to `pad`
+  everywhere (`DESK_THINGS`, the world's data `keep_pad`, the builders, `check_overlaps`, the `keeps` playtest); the diary's
+  pictures gone. 8 generations.
+- **Tests:** `keeps` (its desk check now compares each thing's own px, not its box: the mask's moved box reaches into the
+  t-shirt's), `boot`, `highlight`, `region9`, `lang` pass; `check_overlaps` 0. In all 40 generations.
+- Not touched: `docs/plan-the-rest.md`'s table of the finds (the other session's plan) still names the diary and the old
+  plant.

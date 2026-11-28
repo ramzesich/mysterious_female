@@ -7467,15 +7467,17 @@ def scenario_keeps(b):
     ok &= check(got["him"] == "1/4" and got["order"] == ["cat", "her", "book", "him"], "  and his count comes on, last in the row", got)
     b.shot("keeps-hud")
 
-    # The desk and the bed seen close: each found thing's box differs from the bare picture, each other one is bare.
+    # The desk and the bed seen close: each found thing's own px differ from the bare picture, each other one's are bare.
+    # (Its own px, not its box: a box may reach into a neighbour's, the sleep mask's moved 3 px left into the t-shirt's.)
     compare = ("((scene, list) => { const s = window.__ship, L = s.cache.json.get(scene + '-layout');"
                " const px = img => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height;"
                " const x = c.getContext('2d'); x.drawImage(img, 0, 0); return x; };"
                " const seen = px(s.textures.get(scene + '-seen').getSourceImage()), bare = px(s.textures.get(scene + '-bare').getSourceImage());"
                " const out = {}; for (const k of list) { const t = s.textures.get(scene + '-' + k).getSourceImage();"
-               " const a = seen.getImageData(L[k][0], L[k][1], t.width, t.height).data, z = bare.getImageData(L[k][0], L[k][1], t.width, t.height).data;"
-               " out[k] = a.some((v, i) => v !== z[i]); } return out; })")
-    desk = ["flag", "plant", "bookmark", "diary", "tshirt", "sleepmask", "handheld", "pick"]
+               " const a = seen.getImageData(L[k][0], L[k][1], t.width, t.height).data, z = bare.getImageData(L[k][0], L[k][1], t.width, t.height).data,"
+               " own = px(t).getImageData(0, 0, t.width, t.height).data;"
+               " out[k] = a.some((v, i) => own[i - i % 4 + 3] > 0 && v !== z[i]); } return out; })")
+    desk = ["flag", "plant", "bookmark", "pad", "tshirt", "sleepmask", "handheld", "pick"]
     bed = ["massage", "car", "bell", "feather", "snack", "ball", "wool", "sardines"]
     own = b.eval(f"(r => [r.door, r.floor])({S}.rooms.find(r => r.route === 'cabin'))")
     def seen(scene, things, found):

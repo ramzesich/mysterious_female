@@ -4,7 +4,7 @@
 export const VIEW = { width: 960, height: 540, zoom: 2 };
 // What cabin 8206's desk shows seen close, each from its find (`keep:her:<name>`, `keep:him:<name>`; §4 2.4): drawn
 // in this order, the back row first (tools/build_desk.py).
-export const DESK_THINGS = ['flag', 'plant', 'bookmark', 'diary', 'tshirt', 'sleepmask', 'handheld', 'pick'];
+export const DESK_THINGS = ['flag', 'plant', 'bookmark', 'pad', 'tshirt', 'sleepmask', 'handheld', 'pick'];
 // What Bumbot's bed shows seen close on the day after, each from its find (`keep:cat:<name>`; §4 2.4, the user's).
 export const BED_THINGS = ['massage', 'car', 'bell', 'feather', 'snack', 'ball', 'wool', 'sardines'];
 
