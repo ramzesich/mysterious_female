@@ -5821,7 +5821,7 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
   `src/world/world.js`; `PROM_AFT` in `tools/population.py`, the ladder's `latch` in `tools/build_world.py`).
   No generations.
 - **The rope:** the promenade's last 19 m, its enclosed aft end, where she was hidden behind the ship's side (the
-  audit's V5), roped off with a "CREW ONLY" card (the rope barrier and a `rope` sign, in front of the railing as the
+  audit's V5), roped off with a "MAINTENANCE" card (at first "CREW ONLY", below) (the rope barrier and a `rope` sign, in front of the railing as the
   ladders are), at 211.67 m, not the plan's 212: the enclosed end's wall starts at 212.2 m and a rope at 212.6 stood
   behind it, unseen (the first mock-up). A wall from it up to under the walkway, its face 10 px forward of the post
   (her run leans past her body); pushed into, she shrugs and the card lights up (`blockedBy`, the outside's wall
@@ -5842,3 +5842,9 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
   her short of its post with its card, no jump over it, the jogger's turn short of it); `boot`, `region2`, `region7`,
   `sound` pass; `check_overlaps` 0; the rest not run. (A Phaser object on a ladder's fields made `region2`'s whole read of
   `ladders[0]` come back empty: the picture is a non-enumerable field now.)
+- **The rope's card: "MAINTENANCE"** (the user: "the player is the crew. So I want the signs that block progress to
+  make sense"; their choice of three). The game's two other "CREW ONLY" signs stay: the user reads them "Technical crew
+  only" (the funnel's technical ladder at Cagney's) and "Bridge crew only" (the bridge's door), and she is neither. The
+  card is 52 px now, wider than the 48 px between two railing posts: a post crosses its first letter and her run's lean
+  touches its end where she stops; moved 3 px forward, stopped 8 px further out and drawn over the railing, it was shown
+  and the user chose the first version, as it is.

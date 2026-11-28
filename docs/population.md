@@ -466,7 +466,7 @@ leaving the frame (a wink, no trigger).
 | 116-210.6 | `haz_jogger` | The jogger on the JOGGING lane | `loop(116, 210.6, 2.2)` (turning short of the rope since 2026-11-28); a bump "Bumped"; hop him, or stand on the WALKING lane by the wall as he passes (a 1 m strip where he never runs) | Run clip |
 | 125 | `rdr_gate` | The lifeboat station's gate in the railing and its ladder up the column to the boat walkway | Blue; the ladder free from above | A gate |
 | 208.7 | `ladders.aft` | A ladder up to the boat walkway past the drill (part 11's P1, 2026-11-28) | Its lower part folded up over her head: ↑ under it, a shrug; ↓ at its top from the walkway lets it down for good (`ladder_aft`), then both ways | Drawn by rule |
-| 211.67 | `ropes` | A rope across the promenade, "CREW ONLY", short of the enclosed aft end (212-231: she was hidden behind the side, V5) | A wall to under the walkway; pushed into, a shrug and the card lit | The rope barrier |
+| 211.67 | `ropes` | A rope across the promenade, "MAINTENANCE", short of the enclosed aft end (212-231: she was hidden behind the side, V5) | A wall to under the walkway; pushed into, a shrug and the card lit | The rope barrier |
 | 150, 175, 200 | `gull_prom` | Gulls perched on the railing | Flap up when she is within 3 m, settle again; harmless | Gulls |
 | 190 | `riv_prom` | The rival peering up under a boat with his net | `glimpse(region 2, once)` | The rival |
 | 150 | `bb_glimpse_window` | A black shape passing behind a promenade window | `glimpse(region 2, once)` | A silhouette |

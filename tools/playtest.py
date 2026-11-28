@@ -2636,7 +2636,7 @@ def scenario_region2__aftladder(b):
     s = b.state()
     blocked = b.eval(f"{S}.lastBlocked")
     b.key("right", False)
-    ok &= check(s["y"] == R["y"] and R["x"] - 40 < s["x"] < R["x"] - 25 and (blocked or {}).get("text") == "CREW ONLY",
+    ok &= check(s["y"] == R["y"] and R["x"] - 40 < s["x"] < R["x"] - 25 and (blocked or {}).get("text") == "MAINTENANCE",
                 "run aft into the rope: she stops short of its post, and its card is what stops her", (s, R, blocked))
     # Nor over it: a jump against it lands her back on her side.
     b.key("right", True); b.tap("space", 0.2); wait(1.2); b.key("right", False)

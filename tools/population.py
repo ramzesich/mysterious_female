@@ -1116,7 +1116,8 @@ BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a
 # down from above (`latch`, the flag, kept; then both ways): once she has passed the drill, the way round it. The
 # promenade roped off at the enclosed end's face, 212.2 m (the last 19 m hid her behind the ship's side, the audit's
 # V5; a rope at 212 stood behind that wall): its forward post 211.36 m, the jogger turning at 210.6 m, short of it.
-PROM_AFT = dict(ladder=208.7, latch="ladder_aft", rope=211.67, sign="CREW ONLY")
+# (Its card says why the deck is closed: she is crew, "CREW ONLY" made no sense for her; the user, 2026-11-28.)
+PROM_AFT = dict(ladder=208.7, latch="ladder_aft", rope=211.67, sign="MAINTENANCE")
 DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0,
              # The winch and its crewman, one generated picture of the two (the user, 2026-11-21: "a single generated
              # animation of a worker turning the valve"; tools/build_drill.py): his middle's metre, where he stood.
