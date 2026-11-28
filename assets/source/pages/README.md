@@ -1,9 +1,9 @@
 # The books' pages (2026-11-21)
 
-**Book 15** (2026-11-27): no `15.txt` yet; its page is a title page ("Book fifteen", `tools/draw_pages.py`'s `BOOKS`)
-until the user gives its title, author and text.
+**Book 15**, Diary of a Wimpy Kid (2026-11-28): `15.txt` is the user's own text from her copy, as given, its diary's
+headings (the month, the day) and the drawing's words (SISSY!, PUNCH) lines of their own (the user: "Text is approved").
 
-Each of the fourteen books shows its first page when she reads it (the Library's red chair; book 5 on her bed):
+Each of the fifteen books shows its first page when she reads it (the Library's red chair; book 5 on her bed):
 the opening of the real book, readable, in its own language and script, set by `tools/draw_pages.py` into
 `assets/ship/pages/page-<n>.png`. The user, 2026-11-21: "Text only for all the books"; the ten drawn hint pages
 of step 2 are gone. Whole sentences from the start, as many as fit ("Don't break sentences"), covering the page.
@@ -33,5 +33,6 @@ of step 2 are gone. Whole sentences from the start, as many as fit ("Don't break
 | 12 | Poczwarka | The novel's start as quoted on zpe.gov.pl (Kraków 2004, p. 8) | Set |
 | 13 | Daughters of Warsaw | The user's text (chapter 1, "Seattle, Present Day") | Set |
 | 14 | Pachinko | **Her copy** (the user typed it, 2026-11-22): "Yeongdo, Busan, Korea", from its first line (its drop cap H restored, "century" and the em dash mended) | Done |
+| 15 | Diary of a Wimpy Kid | **Her copy** (the user typed it, 2026-11-28): "September, Tuesday", from its first page, as given | Done |
 
 Each is to be checked against her copy (the user).

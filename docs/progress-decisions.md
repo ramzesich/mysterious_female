@@ -5778,3 +5778,32 @@ The user's answers: (1) the world's card; (2) A, brought to the close-up's desig
 - **Noticed, not touched:** the gangway officer and the stage manager have no giving hand (`GIVE_HANDS`), so their card
   shows in the air before their chest, as the old one did. Offered to the user separately.
 - **Checks:** boot, region1, region2, region4, region8, trunk pass. Pictures and scripts: `docs/key-cards/`. Not merged.
+
+## Book 15 and its cover seen again (2026-11-28, branch `refine`, the Refinement session)
+
+The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of her copy: the cover, the first page), and
+"We do it here" (the book had been placed by the building session on 2026-11-27 with a title page and plain covers).
+
+- **Its cover, as all the others** (the user: "We do this books as all others"): the photo straightened (GrabCut, a
+  warp), its words painted out (OpenCV inpaint; the label's patch filled with the paper's own colour and its ruled lines
+  carried across, column by column, the paper being crumpled), redrawn by PixelLab at 120 x 180, seed 7: the redrawn try
+  (a) chosen over the faithful one (b); its lettering set back in Pixelzone where her copy has it (DIARY in gold, "of a"
+  and "Wimpy Kid" blue with a white rim, the pen's words on the paper); the "INTERNATIONAL BESTSELLER" label left off,
+  wider than the paper at this size. Its small cover for the row a 16 x 22 redraw; its spine the cover's red, DIARY's
+  gold for its label (`BOOK_COLOURS`, `BOOK_ACCENTS`). 3 generations.
+- **Its page: the user's own text** (`assets/source/pages/15.txt`, as given: "I will provide you the text by myself";
+  the month and the day are its diary's headings, part of the text; the drawing's words SISSY! and PUNCH lines of their
+  own). Nine lines fit: from "SEPTEMBER" to "SISSY!". The page's last lines, which never show, are kept as typed (the
+  user: "they don't show on the page, what does it matter?").
+- **Her covers seen again** (the user: "how we can give her another chance to see the covers, after the book is already
+  picked"): offered A (E shows the cover, E again opens it), B (a key of its own) and C (the cover shown with the row,
+  mocked up two ways: under the row over her, beside her). The user: "Neither. Let's try B. Only, the cover is with the
+  down key, and it is shown then as when the book is picked up, with no book reel. Then, either direction, or Esc (B on
+  controller) returns us to the reel with this selected book." Built so: ↓ in the reading row (not the trolley's) hides
+  the row and shows the chosen book's cover in the pickup's close-up (`Library.COVER`, `world.showCloseup` split out of
+  `world.closeup`, which wraps it in a cut: her reading is one already), closed by ←, →, ↑, ↓ or Esc/B, the row back on
+  the same book; E there does nothing; given-back books show theirs too, in colour. The row's hint says it, both
+  languages and the controller's (`hint.read`, `hint.read.pad`).
+- **Checks:** driven headlessly with real keys (sit, ←, ↓ the cover, → back on the same book, ↓, Esc back without
+  standing up, E reads); the start link `?play&at=kids&did=catch` takes book 15 with E. Pictures and scripts:
+  `docs/book-15/`.

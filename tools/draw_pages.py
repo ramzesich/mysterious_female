@@ -1,4 +1,4 @@
-"""Sets the fourteen books' pages (GAME_DESIGN.md §6.1.2): read in the Library's red chair (book 5 on her bed
+"""Sets the fifteen books' pages (GAME_DESIGN.md §6.1.2): read in the Library's red chair (book 5 on her bed
 in cabin 8206), each book shows its own first page: the opening of the real book, in its own language and
 script, readable (the user, 2026-11-21: "Text only for all the books"; the drawn hint pages are gone).
 
@@ -51,8 +51,7 @@ BOOKS = {
     12: ("Poczwarka", "Dorota Terakowska"),
     13: ("Daughters of Warsaw", "Maria Frances"),
     14: ("Pachinko", "Min Jin Lee"),
-    # (On Splash Academy's bookshelf, 2026-11-27: its title, author, text and cover are the user's, to come.)
-    15: ("Book fifteen", "(to come)"),
+    15: ("Diary of a Wimpy Kid", "Jeff Kinney"),       # (on Splash Academy's bookshelf; the user's copy, 2026-11-28)
 }
 HEBREW = re.compile(r"[֐-׿]")
 DASH_ON = re.compile(r"[—–-]\s*[^\sA-ZА-ЯЁҐЄІЇ]")    # "— принимая находку": the sentence goes on

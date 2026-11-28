@@ -1,7 +1,8 @@
 # The books' covers (plan-the-rest §2.3)
 
-**Book 15** (on Splash Academy's bookshelf, 2026-11-27): `assets/ship/covers/cover-15.png` and `mini-15.png` are plain
-placeholders, until the user's photo of the cover (and its title and author) comes.
+**Book 15**, Diary of a Wimpy Kid (on Splash Academy's bookshelf, 2026-11-27): the user's copy photographed 2026-11-28
+(`reference/photos/Books/`), made the same way (the scripts and pictures of its making in `docs/book-15/`); the user chose
+the redrawn try (a). Its "INTERNATIONAL BESTSELLER" label is left off (wider than the paper at this size).
 
 Each her own copy's cover: the user photographed them (2026-11-22, `reference/books/`, git-ignored, never committed),
 each was straightened (its four corners found by GrabCut, warped flat), its words painted out (OpenCV inpaint over the
@@ -27,6 +28,8 @@ Titles and authors are set back in by `tools/build_covers.py` (Pixelzone), never
 | 13 Daughters of Warsaw | `tries/13-a.png` (**used**) | 79516333-dbe1-47e7-96d1-5403e03bd1a9 |
 | 14 Pachinko | `tries/14-a.png` (**used**) | 0a0734cb-f35f-4a72-a082-d01037267494 |
 | 14 | `tries/14-b.png` (faithful) | 43bf574b-bea7-46cd-bd9e-7b307bcd2226 |
+| 15 Diary of a Wimpy Kid | `tries/15-a.png` (**used**) | c8a9430c-e93d-46ab-9fe2-e5ffdcd747d5 |
+| 15 | `tries/15-b.png` (faithful) | 0993d752-69a7-41cb-baf0-167226849e3c |
 
 Book 1 (Atomic Habits) is lettering on white with gold dust and nothing else: no try, drawn by the build.
 Books 2 and 6 are her Slytherin house editions (Bloomsbury), photographed later the same day.
@@ -35,5 +38,5 @@ Books 2 and 6 are her Slytherin house editions (Bloomsbury), photographed later 
 
 The row she chooses from shows each book small: PixelLab `image_to_pixelart` at 16 x 22 (seed 7, 1 generation each) from
 each cover's picture without its lettering (the try with its mends; book 1 the white with its dust), framed by
-`tools/build_covers.py` into `assets/ship/covers/mini-<n>.png`. Three first tries from the lettered covers are kept in
+`tools/build_covers.py` into `assets/ship/covers/mini-<n>.png`. Book 15's: `03bcfdb3-58b6-4ed3-a932-5c6f84ff8d09`. Three first tries from the lettered covers are kept in
 `mini/first/` (set aside: the user, "Use the covers without the text").

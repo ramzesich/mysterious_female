@@ -14,10 +14,10 @@ import { sfx } from '../sfx.js';
 // the cover's ground (its commonest colour but the outlines') and its title's colour, for the label.
 export const BOOK_COLOURS = [0xf7f5ef, 0x009e3a, 0x004ca3, 0xe6edd2, 0x363b1e, 0x000815, 0xede9d0, 0x0a0c14, 0x878787,
     0xf6e7b6, 0x7cefff, 0xc72c02, 0x020207, 0x4ebefb,
-    0x5d6ab3];      // (15: a placeholder until the user's cover, 2026-11-27)
+    0xa11907];
 export const BOOK_ACCENTS = [0xb09256, 0xe2f4e2, 0xfebe04, 0xb21c28, 0xf0f0e8, 0x60dead, 0xc41c24, 0x96c4de, 0xfafafa,
     0x1e1814, 0x7a1e22, 0x96d6ee, 0xd6a85c, 0xc92a0f,
-    0xf3ecdd];
+    0xf0c040];
 // The stamp on a given-back book's small cover in the row: a green disc 11 px across with a white check mark in it
 // (the user, 2026-11-22), at the cover's column 4 and row 10.
 const STAMP = [
@@ -44,6 +44,9 @@ const washed = c => [16, 8, 0].reduce((v, sh) => {
 }, 0);
 
 export class Library {
+    // A book's cover seen close (`world.cover`, as she gets it; again from the row with ↓): its options for the close-up.
+    static COVER = n => ({ texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
+
     constructor(world) {
         this.world = world;
         this.scene = world.scene;
@@ -191,7 +194,7 @@ export class Library {
     // Every place she reads (the user, 2026-11-21): the Library's seven armchairs (the red one by the lamp and the
     // two at each reading table, `data.chairs`) and her bed in cabin 8206. E there: she sits (her reading clips,
     // `tools/build_reading.py`), the books she carries show in a row (`choose()`), ← and → pick one, E reads it
-    // (she opens it, its first page shows), and back to the row; Esc, B or Space stand her up. Any book she carries,
+    // (she opens it, its first page shows), and back to the row; ↓ its cover seen close (`choose()`); Esc, B or Space stand her up. Any book she carries,
     // as often as she likes; none carried, she sits a moment and gets up. The row shows every book she has found
     // (the user, 2026-11-22), those given back greyed and stamped, not to be read; in the reading nook's armchair
     // (`kind: 'nook'`, open once all fourteen are back) all fourteen are hers to read again.
@@ -351,9 +354,22 @@ export class Library {
                 hud.forEach(([o, a]) => o.active && s.tweens.add({ targets: o, alpha: a, duration: 160 }));
                 resolve(v);
             };
+            // ↓ in the reading row: the chosen book's cover seen close, as when she got it, the row hidden; a direction or
+            // Esc (B) brings the row back with the same book chosen (the user, 2026-11-28; given back ones too).
+            let seeing = false;
+            const see = async () => {
+                seeing = true;
+                items.forEach(o => s.tweens.add({ targets: o, alpha: 0, duration: 140 }));
+                await this.world.showCloseup(undefined, null, { ...Library.COVER(books[at]), after: 120,
+                    closeOn: c => c.leftPressed || c.rightPressed || c.upPressed || c.downPressed || c.escapePressed });
+                items.forEach(o => s.tweens.add({ targets: o, alpha: greyed(books[covers.indexOf(o)]) ? 0.75 : 1, duration: 160 }));
+                seeing = false;
+            };
             const poll = () => {
+                if (seeing) return;
                 const i = s.controls.state;
-                if (i.leftPressed && at > 0) { at--; sfx.page(); show(); }
+                if (verb === 'read' && i.downPressed) see();
+                else if (i.leftPressed && at > 0) { at--; sfx.page(); show(); }
                 else if (i.rightPressed && at < n - 1) { at++; sfx.page(); show(); }
                 else if (i.activatePressed) {
                     if (greyed(books[at])) sfx.book();      // (given back: not hers to read now)

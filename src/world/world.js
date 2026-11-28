@@ -1713,13 +1713,21 @@ export class World {
     // as it starts to close (or at once, with none shown), with what lies lowest in it: the HUD's card
     // flies out from behind it.
     // (`texture`, `dim`, `shadow`, `glow`: a picture of its own, the dim's alpha, a faint shadow, the light's scale.)
-    closeup(frame, then = null, { texture = 'closeups', dim: dimAlpha = 0.62, shadow = false, glow: glowScale = 1 } = {}) {
-        const s = this.scene;
+    closeup(frame, then = null, opts = {}) {
+        const s = this.scene, texture = opts.texture ?? 'closeups';
         const pictured = texture === 'closeups' ? s.textures.get('closeups').has(frame) : s.textures.exists(texture);
         if (window.__skipCloseups || !pictured) {
             then?.();
             return;
         }
+        this.cut(() => this.showCloseup(frame, then, opts));
+    }
+
+    // The close-up itself, until a key closes it (a promise): by default any key after a moment; `closeOn(state)` and
+    // `after` (ms) for another set (a book's cover seen again from the row: a direction or Esc, `Library.choose()`).
+    showCloseup(frame, then = null, { texture = 'closeups', dim: dimAlpha = 0.62, shadow = false, glow: glowScale = 1,
+        closeOn = null, after = 450 } = {}) {
+        const s = this.scene;
         if (!s.textures.exists('closeup-glow')) {
             const size = 360, c = s.textures.createCanvas('closeup-glow', size, size), ctx = c.getContext();
             const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
@@ -1730,7 +1738,7 @@ export class World {
             ctx.fillRect(0, 0, size, size);
             c.refresh();
         }
-        this.cut(() => new Promise(resolve => {
+        return new Promise(resolve => {
             s.viewing = true;
             const cx = VIEW.width / 2, cy = VIEW.height / 2;
             const dim = s.add.rectangle(0, 0, VIEW.width, VIEW.height, 0x0d1422, dimAlpha).setOrigin(0);
@@ -1751,18 +1759,18 @@ export class World {
                 } });
             };
             // Any key, after a moment (so the E that took it does not close it at once).
-            s.time.delayedCall(450, () => {
+            const any = i => i.activatePressed || i.jumpPressed || i.leftPressed || i.rightPressed || i.escapePressed
+                || i.startPressed || i.dashPressed || i.throwPressed || i.upPressed || i.downPressed;
+            s.time.delayedCall(after, () => {
                 const poll = () => {
-                    const i = s.controls.state;
-                    if (i.activatePressed || i.jumpPressed || i.leftPressed || i.rightPressed || i.escapePressed || i.startPressed
-                        || i.dashPressed || i.throwPressed || i.upPressed || i.downPressed) {
+                    if ((closeOn ?? any)(s.controls.state)) {
                         s.events.off('postupdate', poll);
                         close();
                     }
                 };
                 s.events.on('postupdate', poll);
             });
-        }));
+        });
     }
 
     // A book given to her (the honeymooners' thanks): hers to carry to the Library.
@@ -1780,7 +1788,7 @@ export class World {
     // behind it (the user's B of two, 2026-11-22), until any key. A book is got once, so each cover shows once.
     // (`then`: as it starts to close, the HUD's count let on.)
     cover(n, then = null) {
-        this.closeup(undefined, then, { texture: `cover-${n}`, dim: 0.35, shadow: true, glow: 1.4 });
+        this.closeup(undefined, then, Library.COVER(n));
     }
 
     // Cabin 8206 seen close (the user, 2026-11-22), at 2x over the dim, until any key: `desk`, the bare desk and on it

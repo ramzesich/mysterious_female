@@ -956,7 +956,8 @@ is a pocket item; the HUD counts the ones she carries. **The library's return tr
 shows how far the collection is. **Reading (Decided, the user, 2026-11-21; built):** E at any of the
 Library's seven armchairs or on her bed in cabin 8206 sits her down (facing us in an armchair, up against the
 pillows on the bed); **the books she carries show in a row** over a soft dark backdrop, in the order she got them;
-← and → choose, E reads, Esc gets her up. **The page is the book's real first page**: its opening, readable, in its
+← and → choose, E reads, Esc gets her up; **↓ shows the chosen book's cover** as when she got it, the row hidden, and a
+direction or Esc brings the row back on the same book (the user, 2026-11-28; given back ones too). **The page is the book's real first page**: its opening, readable, in its
 own language and script, whole sentences covering the page ("Text only for all the books"; until 2026-11-21 a
 drawing that hinted at a hidden thing, §6.1.11, and the ten drawings are gone). Any book she carries, as often as
 she likes; a hint says how, once. **Since 2026-11-22 (the user): the row shows every book she has found**, a book she
@@ -1003,6 +1004,7 @@ Polish letters, Russian and Ukrainian Cyrillic, and Hebrew, right to left.
 | 12 | Poczwarka | Dorota Terakowska | Deck 8 midships, the thanks for the flowers |
 | 13 | Daughters of Warsaw | Maria Frances | Deck 10 midships, the thanks for the tea |
 | 14 | Pachinko | Min Jin Lee | Deck 9 forward, the end of the officers' corridor |
+| 15 | Diary of a Wimpy Kid | Jeff Kinney | Splash Academy's bookshelf, on the way home with Bumbot in her arms (2026-11-27; its cover and text the user's copy, 2026-11-28) |
 
 The fourteen titles and book 5's are the user's ("The order is random"). **Which title lies where
 is Decided** (proposed by what each name fits: the tango with the dancers, the sea with the captain,

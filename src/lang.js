@@ -40,8 +40,8 @@ const TEXTS = {
         'hint.climb.pad': 'Left stick up or down with A to climb',
         'hint.crawl.pad': 'Left stick down to crawl',
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
-        'hint.read': '← and → to choose, E to read, Esc to get up',
-        'hint.read.pad': 'Left stick to choose, X to read, B to get up',
+        'hint.read': '← and → to choose, ↓ to see the cover, E to read, Esc to get up',
+        'hint.read.pad': 'Left stick to choose, down to see the cover, X to read, B to get up',
         // Giving books back at the Library's trolley with more than one on her (the first time the row shows there).
         'hint.return': '← and → to choose, E to give it back, Esc to keep the rest',
         'hint.return.pad': 'Left stick to choose, X to give it back, B to keep the rest',
@@ -82,8 +82,8 @@ const TEXTS = {
         'hint.climb': '↑ чи ↓ з пробілом — лізти вгору чи вниз',
         'hint.climb.pad': 'Лівий стік угору чи вниз з A — лізти',
         'hint.crawl.pad': 'Лівий стік униз — повзти',
-        'hint.read': '← і → — вибрати, E — читати, Esc — встати',
-        'hint.read.pad': 'Лівий стік — вибрати, X — читати, B — встати',
+        'hint.read': '← і → — вибрати, ↓ — обкладинка, E — читати, Esc — встати',
+        'hint.read.pad': 'Лівий стік — вибрати, вниз — обкладинка, X — читати, B — встати',
         'hint.return': '← і → — вибрати, E — повернути, Esc — залишити решту',
         'hint.return.pad': 'Лівий стік — вибрати, X — повернути, B — залишити решту',
         'book.returned': 'ПОВЕРНЕНО',

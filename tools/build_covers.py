@@ -1,4 +1,4 @@
-"""The fourteen books' covers (plan-the-rest §2.3; GAME_DESIGN.md §6.1.2): each her own copy's cover, photographed by
+"""The fifteen books' covers (plan-the-rest §2.3; GAME_DESIGN.md §6.1.2): each her own copy's cover, photographed by
 the user (`reference/books/`, git-ignored), straightened, its words painted out, redrawn as pixel art by PixelLab
 (`image_to_pixelart`, 120 x 180, the redrawn mode: the user's choice of two, 2026-11-22), and its title and author set
 back in here, where the cover has them and in its colours, in Pixelzone (CC0, `assets/source/pages/`), the pages'
@@ -85,6 +85,11 @@ COVERS = {
     13: [L("DAUGHTERS", 60, 20, 3, (250, 250, 248)), L("of", 60, 50, 2, (226, 180, 100), outline=(52, 28, 18)),
          L("WARSAW", 60, 66, 3, (250, 250, 248)), L("MARIA FRANCES", 60, 152, 2, (214, 168, 92))],
     14: [L("PACHINKO", 42, 102, 2, (253, 240, 205)), L("MIN JIN LEE", 42, 126, colour=(253, 240, 205))],
+    # (her copy's "INTERNATIONAL BESTSELLER" label left off: wider than the paper at this size)
+    15: [L("DIARY", 60, 6, 2, (240, 192, 64)), L("of a", 60, 27, 1, (52, 84, 168), outline=(250, 250, 250)),
+         L("Wimpy Kid", 60, 38, 2, (52, 84, 168), outline=(250, 250, 250)),
+         L("a novel", 66, 104, colour=(40, 44, 80), align="l"), L("in cartoons", 62, 114, colour=(40, 44, 80), align="l"),
+         L("Jeff Kinney", 62, 145, colour=(40, 44, 80))],
 }
 
 
