@@ -259,6 +259,7 @@ with two). A start place by each: `docs/start-links.md`.
 | The night watch's door and tray (`haz_dnd_10f`, 45.6 m; `haz_trays_10f`, 47.0 to 48.4 m; §7f) | 10 | 3, 23 | his tray ridden off; his door, he shrieks in its doorway, she tiptoes off | | `mishaps.stretches` |
 | Splash Academy's pillow (`haz_siege`, 2026-11-27) | 7 | 26 | her gag: it drops on her head, she plops down, her dazed sit (no butterflies) with it on her head | | `mishaps.stretches` |
 | Splash Academy's tag (`haz_tag`) | 7 | 27 | the built sit, dazed with no butterflies | | `mishaps.stretches` |
+| The Art Gallery's painting (`haz_painting`, 2026-11-28) | 7 | 28 | the built sit, dizzy; they drop the painting | `frameDrop`, `frameDown` | `region3.painting` |
 | The gym's balls (`haz_gymball_1`, purple, 90.6 to 94.2 m; `haz_gymball_2`, blue, 96.3 to 99.3 m; §7f) | 11 | 25a, 25b | at her front she trips forward onto her belly; at her back she sits (the built falls) | | `mishaps.stretches` |
 | The deck chair (`haz_deckchair`, `haz_wet`) | 11 | 7a; **7b unreachable** (it stands still) | face first onto it, she sleds on it | `scrape`, `creak`, `thump` | `region6` |
 | The porter's cart (`haz_porter`) | 4 | 8a, 8b, 8c, 8d | over the cart, pushed, sat on it, bounced off his back | `cartBump`, `thump` | `region1`, `mishaps.porter` |
@@ -496,7 +497,10 @@ flight; `amb_couple_7` reading the ports' plaques.
 118 (the trunk's deck 7 door); `amb_barman_mag`, `amb_pianist` at the bar's piano.
 
 **The Art Gallery 130-150.** Decor; `sec_cat_painting` at 140: a painting of a black cat on an
-easel, which she looks at twice if she stands still (a 1 s double-take; no reward).
+easel, which she looks at twice if she stands still (a 1 s double-take; no reward). `haz_painting` (part 11's item 10,
+2026-11-28): two art handlers carry a lighthouse painting to and fro, 134.2 to 145.5 m, setting it down against the wall
+at each end (the way free); her cry or dash sets it down; bumped into or landed on while they carry it, they drop it and
+she sits dizzy (28); a well-timed hop clears it (`GalleryPainting`, `tools/build_painting.py`).
 
 **The casino 150-172.**
 

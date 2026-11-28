@@ -192,6 +192,10 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('balloons', 'assets/ship/balloons.png', { frameWidth: 22, frameHeight: 22 });
         this.load.json('balloons-meta', 'assets/ship/balloons.json');
         this.load.image('balloon-bunch', 'assets/ship/balloon-bunch.png');
+        // The Art Gallery's painting and its two handlers (tools/build_painting.py).
+        this.load.image('painting', 'assets/ship/painting.png');
+        this.load.spritesheet('handlers', 'assets/ship/handlers.png', { frameWidth: 128, frameHeight: 80 });
+        this.load.json('handlers-meta', 'assets/ship/handlers.json');
         this.load.image('balloon-handle', 'assets/ship/balloon-handle.png');
         for (const c of ['yellow', 'green']) this.load.image(`balloon-float-${c}`, `assets/ship/balloon-float-${c}.png`);
         this.load.json('drill-meta', 'assets/sprites/drill.json');

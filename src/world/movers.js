@@ -4,7 +4,7 @@
 // towel stack, the sprinkler, the door that flies open, the "Do Not Disturb" door. Pictures:
 // assets/sprites/things (tools/build_things.py).
 
-import { PLAYER, CRY, GAGS, VIEW, POPCORN, BALLOONS } from '../config.js';
+import { PLAYER, CRY, GAGS, VIEW, POPCORN, BALLOONS, PAINTING } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;
@@ -2411,5 +2411,122 @@ export class Balloons {
             s.tweens.add({ targets: g, x: g.x + Phaser.Math.Between(-10, 10), y: this.def.y - 1, angle: Phaser.Math.Between(-90, 90),
                 duration: Phaser.Math.Between(260, 420), ease: 'Quad.easeIn', onComplete: () => s.time.delayedCall(1500, () => g.destroy()) });
         }
+    }
+}
+
+// The Art Gallery's painting (part 11's item 10, the user, 2026-11-28; population: `GALLERY_PAINTING`;
+// tools/build_painting.py): two art handlers carry a large framed painting to and fro along her lane, one at each side
+// holding it, and at each end set it down against the wall, wipe their brows and pick it up the other way (the way is
+// free while it is down). Her cry, or her dash, sets it down where they are; they go on as they were going. She bumps
+// into the one on her side while they carry it, or comes down onto it from a hop: startled, they drop it (it falls to
+// the floor), and she plays her usual dizzy sit (scenario 28; the user, 2026-11-28: "Let them just drop the picture
+// when we either bump into them or jump onto them"). A hop near the top of her jump clears it (in the air only the
+// painting stops her). Their clips are one picture of them with the painting's place empty; the game draws its one
+// painting there, so it is the same in every frame.
+export class GalleryPainting {
+    constructor(world, def) {
+        const s = world.scene, D = s.DEPTH;
+        this.world = world;
+        this.scene = s;
+        this.def = def;             // { id, x0, x1: its middle's ends, y }
+        this.m = s.cache.json.get('handlers-meta');
+        const depth = D.decor + 0.12;                   // (where people walking behind her are)
+        this.pic = s.add.image(0, 0, 'painting').setOrigin(0, 0).setDepth(depth);
+        this.men = s.add.sprite(0, 0, 'handlers', 0).setOrigin(0, 0).setDepth(depth + 0.001);
+        world.add([this.pic, this.men]);
+        this.x = def.x0;
+        this.dir = 1;
+        this.state = 'carry';
+        this.play('walkE');
+        this.hitAt = 0;
+    }
+
+    // A clip from its start: `then` once it has played through.
+    play(clip, then = null) {
+        this.clip = clip;
+        this.t0 = this.scene.time.now;
+        this.then = then;
+    }
+
+    heard(cry) {
+        if (cry?.route === 'inside' && this.world.hears(this.x, this.def.y)) this.setDown(PAINTING.cryS, this.dir);
+    }
+
+    lunged(kind) {
+        if (kind !== 'painting') return false;
+        this.setDown(PAINTING.cryS, this.dir);
+        return true;
+    }
+
+    // Down against the wall (`how`: 'down', set down; 'drop', dropped), their rest (their brows wiped), then up toward
+    // `next`, `sec` s from the start.
+    setDown(sec, next, how = 'down') {
+        if (this.state !== 'carry') return;
+        const E = this.dir > 0 ? 'E' : 'W', clip = `${how}${E}`;
+        this.state = 'down';
+        if (how === 'drop') this.scene.time.delayedCall(PAINTING.landAt * 1000 / PAINTING.fps, () => sfx.at(this.x, this.def.y).frameDrop());
+        this.play(clip, () => {
+            if (how === 'down') sfx.at(this.x, this.def.y).frameDown();
+            this.state = 'rest';
+            this.play('wipe', () => {
+                this.clip = 'rest';
+                this.scene.time.delayedCall(Math.max(0, sec * 1000 - this.ms('wipe') - this.ms(clip)), () => {
+                    if (this.state !== 'rest') return;
+                    this.dir = next;
+                    this.state = 'up';
+                    this.play(next > 0 ? 'upE' : 'upW', () => {
+                        this.state = 'carry';
+                        this.play(next > 0 ? 'walkE' : 'walkW');
+                    });
+                });
+            });
+        });
+    }
+
+    ms(clip) {
+        return this.m.clips[clip].length * 1000 / PAINTING.fps;
+    }
+
+    // The frame of the clip now, in the sheet (a walk loops; the rest is the set-down's last frame, facing us).
+    frame(time) {
+        const C = this.m.clips;
+        if (this.clip === 'rest') return C.downE[C.downE.length - 1];
+        const list = C[this.clip], walk = this.clip.startsWith('walk');
+        const k = Math.floor((time - this.t0) * (walk ? PAINTING.walkFps : PAINTING.fps) / 1000);
+        if (walk) return list[k % list.length];
+        if (k >= list.length) {
+            const then = this.then;
+            this.then = null;
+            then?.();
+            return list[list.length - 1];
+        }
+        return list[k];
+    }
+
+    update(dt, time) {
+        const s = this.scene, d = this.def, P = PAINTING, her = s.player, m = this.m;
+        if (Math.abs(her.y - d.y) > 300 || Math.abs(her.x - this.x) > 900) return;
+        if (this.state === 'carry') {
+            this.x += this.dir * P.speed * 48 * dt;
+            if ((this.dir > 0 && this.x >= d.x1) || (this.dir < 0 && this.x <= d.x0)) {
+                this.x = Phaser.Math.Clamp(this.x, d.x0, d.x1);
+                this.setDown(P.restS, -this.dir);
+            }
+        }
+        const f = this.frame(time);
+        // (The painting's middle is the canvas's column 63.5: its left column at 41, 46 wide.)
+        const left = Math.round(this.x - 63.5), top = d.y - m.floor;
+        this.men.setPosition(left, top).setFrame(f);
+        this.pic.setPosition(left + m.panel[f][0], top + m.panel[f][1]);
+        // Into them while they carry it: on the floor, the one on her side; in the air, only the painting, and over its
+        // top she is clear.
+        if (this.state !== 'carry' || s.mode !== 'play' || s.route !== 'inside' || Math.abs(her.y - d.y) > 100 || time < this.hitAt) return;
+        const dx = her.x - this.x, up = d.y - her.y;
+        const hit = up < P.ground ? Math.abs(dx) <= P.reach : Math.abs(dx) < P.over && up < P.top - P.toe;
+        if (!hit) return;
+        this.hitAt = time + 1500;
+        this.setDown(P.cryS, this.dir, 'drop');
+        if (this.world.carry) this.world.carryBox.spill(this.x, false, 'painting');
+        else s.scareContact(this.x, 'painting', { vx: this.dir * P.speed * 48, dir: this.dir });
     }
 }

@@ -379,6 +379,14 @@ export const SHAFT = {
 // `slow`: added to each of the clip's first `tell` frames (his tub tipping, with its rustle); `live`: the clip's frame
 // from which the popcorn lies (the slip is on from then); `lie`: how long it lies after the clip, the last 700 ms
 // blinking; the first spill and the next ones after so long (between the two numbers) while she is near.
+// The Art Gallery's painting (part 11's item 10, `GalleryPainting` in src/world/movers.js, tools/build_painting.py):
+// carried at `speed` m/s (their walk at `walkFps`); set down on the wall at each end, `restS` s from setting it down to
+// lifting it (the way free); her cry sets it down where they are for `cryS` s. Their other clips at `fps` (a drop's
+// painting on the floor at its frame `landAt`). On the floor (`ground` px) she meets the one on her side, her middle
+// `reach` px from its; in the air only the painting, within `over` px of its middle, her feet more than `toe` px into its
+// top (`top` px up; a hop near the top of her jump clears it: the user, "a very well-timed hop"). Either way they drop it
+// and she sits dizzy (28).
+export const PAINTING = { speed: 0.8, restS: 3, cryS: 4, fps: 12, walkFps: 5, landAt: 3, ground: 4, reach: 52, over: 26, top: 54, toe: 6 };
 // The party's balloons drifted across deck 8's corridor (part 11's item 14, `Balloons` in src/world/movers.js): within
 // `wade` px of one still lying she wades at half her speed (the ball pit's `wading`); one within `reach` px of her middle rolls away from her, up
 // to `give` px, easing `ease` of the way a frame, and back once she has gone; a landing on them from a jump pops the one
@@ -504,6 +512,7 @@ export const MISHAPS = {
     gymball: {},            // the gym's balls rolling with the ship (deck 11)
     pillow: {},             // Splash Academy's pillow siege (deck 7)
     kid: {},                // Splash Academy's two playing tag (deck 7)
+    painting: {},           // the Art Gallery's painting carried by two handlers (deck 7)
 };
 
 // The scenarios of a hit, numbered as in the plan's tables (§1.6). `word`: what she cries
@@ -579,6 +588,9 @@ export const MISHAP_SCENES = {
     // (`GAGS.pillow`), ending in that same dazed sit with the pillow on her head.
     '26': { word: 'bonked', react: 'duck', down: 'sit', gag: 'pillow', dazed: 'her-dazed-sit-plain' },
     '27': { word: 'bumped', react: 'reel', down: 'sit', dazed: 'her-dazed-sit-plain' },
+    // The Art Gallery's painting, the two bumped into or landed on while they carry it (part 11's item 10): they drop it,
+    // she sits dizzy (the user, 2026-11-28: "we play our usual dizzy sitting on the floor gag").
+    '28': { word: 'bumped', react: 'reel', down: 'sit' },
 };
 
 // Her gags with a thing (§1.6): whichever side it hit her on, she rides it off (the user,

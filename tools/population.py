@@ -968,6 +968,12 @@ CHIPS = {"haz_chips_1": (7, 151.9, 0.9), "haz_chips_2": (7, 154.29, 0.9), "haz_c
 # The theatre's popcorn (part 11's item 12, 2026-11-27): the man with the tub tips it now and then, and it lies on the
 # aisle's floor ahead of him (`Popcorn` in src/world/movers.js). id: (deck, m of the man, his person's id).
 POPCORN = {"haz_popcorn": (6, 226.54, "amb_audience_3")}
+# The Art Gallery's painting (part 11's item 10, the user, 2026-11-28; `GalleryPainting` in src/world/movers.js,
+# `PAINTING` in src/config.js): two handlers carry a large framed painting to and fro along her lane, its middle from `a`
+# to `b` (m), where they lean it on the wall clear of the gallery's easels and benches (134.2: between the easel at 132.4
+# and the bench at 135.9; 145.5: between the bench at 143.7 and the easel at 147.4). The two and the painting:
+# tools/build_painting.py.
+GALLERY_PAINTING = dict(deck=7, a=134.2, b=145.5)
 # The party's balloons drifted across deck 8's corridor by its door (part 11's item 14, the user's, 2026-11-28; `Balloons`,
 # `BALLOONS` in src/config.js): (colour, pose: `u` upright, `l`/`r` lying with its knot that way, m, px up, in front of
 # her?). Eleven from 70 to 73 m round the party's door (71.6 m), the birthday girl among them; one on top of two.

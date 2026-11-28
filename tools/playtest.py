@@ -3288,6 +3288,71 @@ def scenario_region3__stage(b):
     return ok
 
 
+def scenario_region3__painting(b):
+    """The Art Gallery's painting (part 11's item 10): the two carry it to and fro and set it down at an end, rest and pick it
+    up the other way; her cry sets it down where they are; she bumps into them: they drop it and she sits dizzy (28), then
+    her checkpoint; a hop down onto it does the same; a full hop at the right moment clears it."""
+    S = "window.__ship"
+    M = f"{S}.world.movers.find(m => m.def?.id === 'haz_painting')"
+    st = lambda: b.eval(f"(m => [m.state, m.clip, Math.round(m.x), m.dir])({M})")
+
+    def carrying(x=None, d=1):
+        b.eval(f"(m => {{ m.state = 'carry'; m.dir = {d}; m.play({d} > 0 ? 'walkE' : 'walkW'); m.hitAt = 0; "
+               f"{'' if x is None else f'm.x = {x};'} }})({M})")
+
+    b.open("?reset&play&at=gallery7&tangerines=infinite")
+    d = b.eval(f"(m => [m.def.x0, m.def.x1, m.def.y])({M})")
+    ok = check(st()[0] == "carry", "the two carry the painting", st())
+    # To the aft end: set down, rest, picked up the other way.
+    carrying(d[1] - 20, 1)
+    ok &= check(wait_js(b, f"{M}.state === 'rest'", 4), "at the aft end they set it down and rest", st())
+    ok &= check(wait_js(b, f"{M}.state === 'carry' && {M}.dir < 0", 8), "then pick it up and carry it back", st())
+    # Her cry: set down where they are.
+    carrying(exact_x(139), 1)
+    b.teleport(exact_x(139) + 130, d[2], "inside"); wait(0.2)
+    b.tap("d", 0.1)
+    ok &= check(wait_js(b, f"{M}.state !== 'carry'", 2) and b.eval(f"{M}.clip").startswith("down"),
+                "her cry: they set it down where they are", st())
+    ok &= check(wait_js(b, f"{M}.state === 'carry' && {M}.dir > 0", 8), "and go on the way they were going", st())
+    # Bumping into them: dropped, her dizzy sit, her checkpoint.
+    carrying(exact_x(139), 1)
+    b.teleport(exact_x(139) + 100, d[2], "inside"); wait(0.05)
+    b.key("left", True)
+    dropped = wait_js(b, f"{M}.clip === 'dropE'", 3)
+    b.key("left", False)
+    ok &= check(dropped and b.state()["mode"] != "play", "running into them: they drop it, and she is down", (st(), b.state()))
+    ok &= check(wait_js(b, f"{S}.mode === 'play'", 10), "then her checkpoint", b.state())
+    # A hop down onto it: the same.
+    b.teleport(exact_x(139) + 120, d[2], "inside"); wait(0.3)
+    carrying(exact_x(139), 1)
+    b.teleport(exact_x(139) + 2, d[2] - 80, "inside")
+    ok &= check(wait_js(b, f"{M}.clip === 'dropE'", 2), "coming down onto it from a hop: they drop it", st())
+    # (A hit in the air plays as she lands: down, then her checkpoint.)
+    ok &= check(wait_js(b, f"{S}.mode !== 'play'", 3) and wait_js(b, f"{S}.mode === 'play'", 12) and b.state()["y"] != d[2],
+                "she sits dizzy as she lands, then her checkpoint", b.state())
+    # A full hop at the right moment clears it.
+    b.teleport(exact_x(139) + 260, d[2], "inside"); wait(0.5)
+    carrying(exact_x(139), 1)
+    b.key("left", True)
+    end, jumped, held, hit = now() + 4, False, 0, False
+    while now() < end:
+        wait(1 / 60)
+        dx = b.eval(f"{S}.player.x - {M}.x")
+        if not jumped and dx <= 70:
+            b.key("space", True); jumped = True
+        if jumped:
+            held += 1
+            if held == 30:
+                b.key("space", False)
+        if b.eval(f"{M}.clip").startswith("drop"):
+            hit = True; break
+        if dx < -80:
+            break
+    b.key("left", False); b.key("space", False)
+    ok &= check(not hit, "a full hop taken at the right moment clears it", st())
+    return ok
+
+
 def scenario_region3(b):
     """Region 3 (docs/build-plan.md, step 3): the theatre and deck 7 aft: the casino's chips, the
     jackpot, the drop onto the stage, near-catch 3 (the rival down the trap door, Bumbot up the fly

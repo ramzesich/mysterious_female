@@ -5870,3 +5870,33 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
   showing.
 - `?at=party8`. **Tests:** `region5.balloons` (new); `boot`, `region4`, `region5`, `sound` pass; `check_overlaps` 0 (the
   drift across the party's open door's foot allowed: tumbled out of it); the rest not run. 22 generations.
+
+## Part 11's item 10: the Art Gallery's painting carried by two handlers (2026-11-28); part 11 done
+
+- **The plain version first** (the plan's rule): stand-ins carried a framed rectangle to and fro, leaned it at the ends, her
+  cry set it down; the user: "the speed, the rest and the ways past feel right". The ends: 134.2 m (between the easel at
+  132.4 and the bench at 135.9) and 145.5 m (between the bench at 143.7 and the easel at 147.4).
+- **The art** (the user's choices at each step): the painting (a lighthouse at sunset, of two tries); two new art
+  handlers, pro characters to her proportions (heads about 15 px), an older man in a grey warehouse coat and a younger
+  one in a navy apron, white gloves; one picture of them carrying it by its sides (the user: "the previous carry
+  positions made much more sense", a handler at each end, "generated, because in your rough they didn't really hold the
+  picture"). **Every clip of theirs is made with the painting a flat magenta panel**, so the generator moves only them and
+  the game draws its one painting where the panel is, frame by frame (their hands over it): walk both ways, set down at an
+  end and turn to face us, wipe their brows, pick it up turning either way. The carry to the left was the hard one: edits
+  turned the younger man with his apron on his back (the user caught it) or changed the panel; it was composed from the
+  carry mirrored with who is who swapped (the leader), his own left view, and a short clip putting his hands on it. Their
+  walk at 5 frames a second (its stride against 0.8 m/s).
+- **The hit, first built as the framing gag** (her through the canvas, eight clips, the user's chosen end): turned down in
+  play: "she just snatches the picture from them and puts it on herself. Doesn't make any sense ... it also looks like
+  she's just trying to mess things up on purpose. This is not the spirit of the game ... let's simplify the gag. Let them
+  just drop the picture when we either bump into them or jump onto them. And we play our usual dizzy sitting on the floor
+  gag". **Built so:** bumped into (the one on her side, while they carry it) or landed on (only the painting, in the air),
+  they startle and drop it (their clip; its fall set by rule, straight to the floor: the generator tossed it up first;
+  specks it left cleared), a bang (`frameDrop`), she sits dizzy (scenario 28, the built sit), her checkpoint; they rest,
+  wipe their brows and go on as they were going. Her cry or her dash sets it down where they are (`frameDown`). A full hop
+  taken at the right moment clears it (a window of about a twelfth of a second with them walking toward her: the user, "a
+  very well-timed hop"); in the air only the painting stops her.
+- `GalleryPainting` (`src/world/movers.js`), `PAINTING` (config), `GALLERY_PAINTING` (population), `tools/build_painting.py`,
+  `?at=gallery7`. About 175 generations (the framing gag's about 50 of them, unused). **Tests:** `region3.painting` (new:
+  the ends, the cry, the run-in, the hop down onto it, the clean hop); `boot`, `region3`, `sound` pass; `check_overlaps` 0;
+  the rest not run. **Part 11 (§7f) is done.**

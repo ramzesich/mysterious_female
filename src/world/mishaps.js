@@ -51,6 +51,7 @@ const PICK = {
     gymball: f => f.front ? '25a' : '25b',
     pillow: () => '26',
     kid: () => '27',
+    painting: () => '28',
 };
 
 export function scenario(what, f) {

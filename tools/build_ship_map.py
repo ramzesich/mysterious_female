@@ -1097,6 +1097,8 @@ def build_objects():
     add(point("promaft", "place", exact_x(205.7), floor_y(6), [prop("route", "promenade")]))
     # Deck 8 forward, 2.5 m forward of the party's balloons on the floor (part 11's item 14).
     add(point("party8", "place", exact_x(67.5), floor_y(8), [prop("route", "inside")]))
+    # Deck 7, the Art Gallery's doorway: the painting carried to and fro aft of it (part 11's item 10).
+    add(point("gallery7", "place", exact_x(131.0), floor_y(7), [prop("route", "inside")]))
     # (§4 2.1, 2026-11-19: a start by each thing to find that had none near it, for the user to judge
     # where they lie: the dry store's door (deck 4), the maid's cabin's door (deck 6), the knitting lady's
     # (deck 5, aft of her basket), Shore excursions' desk (deck 5), the Stardust balcony's far end (deck 7).)

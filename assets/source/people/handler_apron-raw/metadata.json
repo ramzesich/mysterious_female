@@ -1,0 +1,36 @@
+{
+  "group_id": "406d3dc0-47b5-4848-80cf-468196cd07d7",
+  "states": [
+    {
+      "character": {
+        "id": "bbf65190-0a32-43ef-8bc2-8d45a396f422",
+        "name": "Idle",
+        "prompt": "An art gallery handler: a young man with short curly brown hair, wearing a navy blue work apron over a light blue shirt with its sleeves rolled up, dark trousers, white cotton gloves, brown shoes. Normal adult proportions, a small head, standing.",
+        "size": {
+          "width": 64,
+          "height": 64
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-11-28T11:46:26.965850+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-28T11:48:04.978992"
+}

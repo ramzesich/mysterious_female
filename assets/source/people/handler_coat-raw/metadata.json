@@ -1,0 +1,36 @@
+{
+  "group_id": "aca14d04-3074-45b4-b90e-e914732bf5ae",
+  "states": [
+    {
+      "character": {
+        "id": "53a2c062-e189-421b-b960-e01a4c3a975f",
+        "name": "Idle",
+        "prompt": "An art gallery handler: a slim middle-aged man with short grey hair and a neat grey moustache, wearing a long light grey warehouse work coat buttoned over dark trousers, white cotton gloves, black shoes. Normal adult proportions, a small head, standing.",
+        "size": {
+          "width": 64,
+          "height": 64
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "side",
+        "created_at": "2026-11-28T11:46:26.694013+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-11-28T11:48:04.277741"
+}
