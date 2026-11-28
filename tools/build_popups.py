@@ -110,6 +110,9 @@ def majority(a, w, h):
     return out
 
 
+TIGHT = set("ШЩшщМмЖжЫы")
+
+
 def glyphs(bold):
     f = ImageFont.truetype(str(FONT), SIZE)
     asc, desc = f.getmetrics()
@@ -123,7 +126,13 @@ def glyphs(bold):
         d.text((0, LIFT), ch, font=f, fill=255)
         a = np.array(im) > 127
         if bold:
-            a[:, 1:] |= a[:, :-1].copy()
+            # (In the letters whose stems stand a px apart, never into that px: Щ, ш, м were filled solid in her
+            # "Щоб вас дощ намочив!", 2026-11-28. The rest as they were, her cry's К and ю with them.)
+            src = a.copy()
+            gap = np.zeros_like(a)
+            if ch in TIGHT:
+                gap[:, 1:-1] = src[:, :-2] & ~src[:, 1:-1] & src[:, 2:]
+            a[:, 1:] |= src[:, :-1] & ~gap[:, 1:]
             adv += 1 if ch != " " else 0
         cols = np.nonzero(a.any(axis=0))[0]
         wide = max(adv, cols.max() + 1 if len(cols) else 0)

@@ -312,6 +312,11 @@ const her = {
         tone(620, 0.18, { type: 'sawtooth', to: 1250, vol: 0.09, lp: 3200 });
         [1000, 1250, 1000, 1400].forEach((f, i) => tone(f, 0.09, { type: 'square', vol: 0.06, t: 0.18 + i * 0.07, lp: 3600 }));
     },
+    // "Excuse me!" (D with a load in her hands, no dash): three syllables, lower and softer than the cry, the
+    // middle one up.
+    excuse: () => {
+        [[560, 0.08], [820, 0.12], [640, 0.1]].forEach(([f, d], i) => tone(f, d, { type: 'square', to: f * 0.94, vol: 0.05, t: i * 0.1, lp: 2600 }));
+    },
     // The lunge with it: a rush of air past her, and its end, a breath out.
     lunge: () => { noise(0.32, { band: [700, 2600], q: 0.8, vol: 0.16, attack: 0.04 }); thud(160, 0.05, 0.1, 0.1); },
     lungeEnd: () => tone(700, 0.16, { to: 400, vol: 0.112 }),

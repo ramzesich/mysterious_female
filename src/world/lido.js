@@ -238,8 +238,7 @@ export const lido = {
             her.anims.play('her-swim-cry');
             her.anims.timeScale = 1;
             await w.wait(POOL.callAt);
-            s.bubbleUntil = s.time.now + POOL.callMs;
-            sfx.cry();
+            s.cryOut(POOL.callMs);
             await w.wait(180);
             sitUp();
             await w.wait(POOL.callMs);
@@ -248,8 +247,7 @@ export const lido = {
             her.setFlipX(c.x < her.x);
             s.pose('stand');
             await w.wait(200);
-            s.bubbleUntil = s.time.now + 1200;
-            sfx.cry();
+            s.cryOut(1200);
             await w.wait(380);
             if (pool) {
                 her.body.enable = false;

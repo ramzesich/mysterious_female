@@ -149,8 +149,7 @@ export const pass = {
 
         // She stops where she is and cries; the dash, with its own sound and rumble, comes after the pause.
         s.pose('stand');
-        s.bubbleUntil = s.time.now + CRY.bubbleMs;
-        sfx.cry();
+        s.cryOut(CRY.bubbleMs);
         s.script = (dt) => {
             T += dt * 1000;
 

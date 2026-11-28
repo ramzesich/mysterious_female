@@ -5073,10 +5073,13 @@ export class ShipScene extends Phaser.Scene {
         return new URLSearchParams(location.search).get('tangerines') === 'infinite';
     }
 
-    // Every D costs one tangerine, whatever it does. The cry startles what is in her way; with the
-    // lunge learned (near-catch 1) and her hands free, the lunge goes with it. Not crawling, nor
-    // with Bumbot in her arms (ladders, stairs, the pool are modes of their own: no D there).
+    // D is hers only once the dash is learned (near-catch 1; the user, 2026-11-28: before it, nothing
+    // at all, no tangerine spent). Then every D costs one tangerine: her hands free, the cry
+    // "Кісюнічка!!!" with the dash; with a load in her hands, no dash, and "Excuse me!" in its place
+    // (`cry.excuse`: a cry with no dash "doesn't make much sense"), which startles the same. Not
+    // crawling, nor with Bumbot in her arms (ladders, stairs, the pool are modes of their own: no D there).
     tryCry(time) {
+        if (!this.progress.knows('dash')) return;
         if (this.crawling || this.holding || time < this.cryGapUntil || this.isLunging()) return;
         if (this.save.tangerines <= 0 && !this.infiniteTangerines()) {
             this.blinkCount();
@@ -5084,9 +5087,8 @@ export class ShipScene extends Phaser.Scene {
         }
         if (!this.infiniteTangerines()) this.save.tangerines -= 1;
         this.cryGapUntil = time + CRY.gapMs;
-        this.bubbleUntil = time + CRY.bubbleMs;
-        sfx.cry();
-        const lunge = this.progress.knows('dash') && !this.world.carry;
+        const lunge = !this.world.carry;
+        this.cryOut(CRY.bubbleMs, lunge ? CRY.shout : t('cry.excuse'));
         if (lunge) {
             this.lungeUntil = time + LUNGE.ms;
             sfx.lunge();
@@ -5095,6 +5097,14 @@ export class ShipScene extends Phaser.Scene {
         const p = this.player;
         this.world.shout(p.x, p.y, this.route);
         this.refreshHud();
+    }
+
+    // Her shout over her head for `ms`: her cry, or the words given (with a load, "Excuse me!"); its sound with it.
+    cryOut(ms, word = CRY.shout) {
+        this.bubble.setText(word);
+        this.bubbleUntil = this.time.now + ms;
+        if (word === CRY.shout) sfx.cry();
+        else sfx.excuse();
     }
 
     updateLunge(time) {

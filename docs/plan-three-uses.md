@@ -92,8 +92,11 @@ A tangerine can do three things, and one used well can come back.
     porter's cart: she is through. Each gives way in its own manner (§2);
   - **in the air it is a leap**: a jump taken in a lunge carries about 4.5 m against 2.3 m;
   - falls and the sea are what they are. Solid things stay solid (carts, the queue, walls, ropes).
-- **With a tray in her hands, and before the lunge is learned: the cry alone, still one
-  tangerine.** One rule, no exceptions.
+- ~~**With a tray in her hands, and before the lunge is learned: the cry alone, still one
+  tangerine.** One rule, no exceptions.~~ **Changed (the user, 2026-11-28):** before the dash is learned D does
+  nothing at all (no tangerine spent); with a load in her hands, no dash, and not her cry but "Excuse me!!!"
+  («Щоб вас дощ намочив!!!», `cry.excuse`), still one tangerine, heard by all that hear the cry. "Кісюнічка!!!"
+  comes with the dash only.
 - Not while she crawls, climbs, swims, or holds Bumbot.
 
 `CRY = { reach: 4.5 m, startleMs: 3000, deafMs: 8000 }`, `LUNGE = { ms: 1000, speed: 2,

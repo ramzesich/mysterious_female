@@ -5972,3 +5972,28 @@ when we finish all of them." (`docs/collectibles/` has the shots and scripts.)
   t-shirt's), `boot`, `highlight`, `region9`, `lang` pass; `check_overlaps` 0. In all 40 generations.
 - Not touched: `docs/plan-the-rest.md`'s table of the finds (the other session's plan) still names the diary and the old
   plant.
+
+## D before the dash, and with a load (2026-11-28)
+
+The user: "Until she learns the dash, she cannot cry. Also, the cry comes with the dash only, check everything in the game
+that this statement is correct." Checked: D gave the cry alone before the dash (region 1's papers, breakfast, dog,
+porter and walkers answered it; nothing there needs it, and the lunch is hers only after near-catch 1) and with a load
+(the walkers, the waiter, the steward's rounds, the pool deck's food gulls, the queue, the funnel's gulls, the bow's
+flock, the painting's handlers answer it; the "Do Not Disturb" doors come out at it). The only other cries are scripted
+(the pass scene's cry and dash, her call from the pool). The user: "Keep the load+tangerine mechanic, but crying
+«Кісюнічка!» without dashing doesn't make much sense ... Make her cry 'Excuse me!' («Щоб вас дощ намочив!») when carrying
+a load and not dashing. Before she learns the actual dash, she cannot do any of those at all"; then "Excuse me!!!" /
+«Щоб вас дощ намочив!!!».
+
+- `tryCry` in the ship scene returns at once unless `knows('dash')` (no tangerine, no blink of the count). With a load:
+  no lunge, the shout popup says `t('cry.excuse')`, the sound `sfx.excuse` (three notes, lower and softer than the cry;
+  unheard by me, on the soundboard); the same `world.shout`, so everything answers it as the cry. `cryOut(ms, word)`
+  sets the popup's words, its time and its sound; the pass scene and the pool's call use it with the cry, so a last
+  "Excuse me!!!" never stays on the popup.
+- The popups' bold lettering (`tools/build_popups.py`) filled Щ, щ and м solid (its widening by a px closed the one px
+  between their stems): in `TIGHT` (ШЩшщМмЖжЫы) the widening never goes into such a px. Other letters unchanged
+  (a general rule would have changed the cry's К and ю).
+- Tests: `dash` (nothing before the dash; with the tray "Excuse me!!!" for one, the porter aside and deaf to a second),
+  `golden` (D does nothing before near-catch 1), `region1` (the lunch: "Excuse me!!!"), `region3.painting` gives the
+  dash (region 3 is past it); `dash`, `golden`, `region1`, `region3`, `throw`, `deck4`, `lang`, `region4`, `region6`,
+  `region8`, `finale`, `gamepad`, `mishaps.stretches`, `sound` pass; `check_sound` all within bounds. No generations.

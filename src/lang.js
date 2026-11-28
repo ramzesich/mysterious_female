@@ -33,6 +33,8 @@ const TEXTS = {
         'hint.interact': 'E to interact',
         'hint.dash': 'D to dash',
         'hint.dash.pad': 'B to dash',
+        // Her D with a load in her hands: no dash, so not her cry but this (the user, 2026-11-28).
+        'cry.excuse': 'Excuse me!!!',
         // (Crawling, as Bumbot is gone into the linen room's vent: near-catch 4, 2026-11-24.)
         'hint.crawl': '↓ to crawl',
         'hint.round': 'Space at a partition to climb round it',
@@ -80,6 +82,7 @@ const TEXTS = {
         'hint.interact': 'E — взаємодіяти',
         'hint.dash': 'D — ривок',
         'hint.dash.pad': 'B — ривок',
+        'cry.excuse': 'Щоб вас дощ намочив!!!',
         'hint.crawl': '↓ — повзти',
         'hint.round': 'Пробіл біля перегородки — перелізти',
         'hint.round.pad': 'A біля перегородки — перелізти',
