@@ -155,6 +155,9 @@ export const PASS = {
 // nothing, turns to us and shrugs (her `shrug` clip, `fps` frames a second: at 9 "very slowly", the user), and the sign lights up a moment (`flashMs`,
 // its own colours added over it at most `glow`); a lock with nothing to read keeps its padlock over her and she shrugs.
 // Not again before `againMs`, held against it or not.
+// A ladder let down from above (part 11's P1, the promenade's aft end): its lower part folded up behind the upper by
+// `fold` px (a whole number of its 8 px rungs, so they lie on each other), slid down in `slideMs` as she starts down it.
+export const LADDER = { fold: 72, slideMs: 280 };
 export const SHRUG = { fps: 14, againMs: 2500, flashMs: 600, glow: 0.55, signReach: 90 };
 
 // Cabin 8206's bed (§5.3, the user, 2026-11-06): standing still on it this long, she bounces on it

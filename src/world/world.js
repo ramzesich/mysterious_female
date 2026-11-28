@@ -4,7 +4,7 @@
 // tangerines, pickups, Bumbot's beats, switches, carts to push. The ship scene asks it what is at
 // her feet (E, ladders, grips for a wall jump) and tells it what has happened (flags).
 
-import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS, SHAFT, POOL } from '../config.js';
+import { PLAYER, SWIM, CRY, MISHAPS, BED_JOY, VIEW, BOOKS, DESK_THINGS, BED_THINGS, SHAFT, POOL, LADDER } from '../config.js';
 import { parseLock } from '../progression.js';
 import { writeSave } from '../save.js';
 import { sfx } from '../sfx.js';
@@ -581,13 +581,14 @@ export class World {
             this.add([g]);
             s.shellSlopes.push({ deck: Number(deck), gfx: g, balcony: true });
         }
-        // Ladders between routes: the lifeboat station's, from the promenade's gate up its column.
+        // Ladders between routes: the lifeboat station's, from the promenade's gate up its column; and past the drill,
+        // one let down from above (`latch`: part 11's P1).
         this.ladders = this.data.ladders.map(L => {
             const g = s.add.graphics().setDepth(D.exterior + 0.09);
-            g.fillStyle(0xe8eaec, 1).fillRect(L.x - 7, L.y1 - 6, 2, L.y0 - L.y1 + 6).fillRect(L.x + 5, L.y1 - 6, 2, L.y0 - L.y1 + 6);
-            for (let y = L.y0 - 6; y > L.y1; y -= 8) g.fillStyle(0xc7dcd0, 1).fillRect(L.x - 6, y, 12, 2);
             this.add([g]);
             s.shellSlopes.push({ deck: [6, 7], gfx: g });
+            const down = !L.latch || this.progress.flagSet(L.latch) ? 1 : 0;
+            this.drawLadder(g, L, down);
             const lock = parseLock(L.lock);
             if (lock?.kind === 'card') {
                 const reader = s.add.image(L.x + 14, L.y0 - 40, 'reader').setDepth(D.exterior + 0.09);
@@ -595,7 +596,18 @@ export class World {
                 this.add([reader, light]);
                 s.shellSlopes.push({ deck: [6, 7], gfx: reader }, { deck: [6, 7], gfx: light });
             }
-            return { ...L, lockSpec: lock };
+            // (Its picture kept off the object's own fields: the playtests read a ladder whole.)
+            return Object.defineProperty({ ...L, lockSpec: lock, down }, 'gfx', { value: g });
+        });
+        // The rope across the promenade at its enclosed aft end (part 11's P1), in front of the railing as the ladders
+        // are; its wall is one of the outside's (`walls`), and pushing into it she shrugs and its card lights up.
+        this.ropes = (out.ropes ?? []).map(R => {
+            const img = s.add.image(R.x, R.y, 'shipart', 'rope-barrier').setOrigin(0.5, 1).setDepth(D.exterior + 0.09);
+            const card = sign(s, R.x, R.y - 15, R.text, 'rope').setOrigin(0.5).setDepth(D.exterior + 0.091);
+            this.add([img, card]);
+            s.shellSlopes.push({ deck: [6, 7], gfx: img }, { deck: [6, 7], gfx: card });
+            const zone = this.wallZones.find(z => Math.abs(z.x - R.x) < 1 && Math.abs(z.y + z.height / 2 - R.y) < 2);
+            return { ...R, img, card, zone };
         });
         // The bridge's hatch and its like: ladders on the map shut until something has happened.
         this.gates = this.data.ladderGates.map(g => {
@@ -670,6 +682,38 @@ export class World {
         return under ? at : null;
     }
 
+    // A ladder between routes, `down` from 0 (its lower part folded up behind the upper, its foot `LADDER.fold` px up)
+    // to 1 (to the floor). The two parts' rails lie on each other and so do their rungs (every 8 px from the foot), so
+    // folded it reads as one short ladder with a bar at its foot; the folded part's inner edges show a little.
+    drawLadder(g, L, down) {
+        const rails = (a, b) => g.fillStyle(0xe8eaec, 1).fillRect(L.x - 7, a, 2, b - a).fillRect(L.x + 5, a, 2, b - a);
+        const rungs = (a, b) => { for (let y = b - 6; y > a; y -= 8) g.fillStyle(0xc7dcd0, 1).fillRect(L.x - 6, y, 12, 2); };
+        g.clear();
+        if (!L.latch) {
+            rails(L.y1 - 6, L.y0);
+            rungs(L.y1, L.y0);
+            return;
+        }
+        const fold = LADDER.fold, foot = Math.round(L.y0 - fold * (1 - down)), lower = fold + 4;
+        // (The upper part to `fold` px over the floor, its rungs those of the whole ladder; the lower part from its foot.)
+        rails(L.y1 - 6, L.y0 - fold);
+        for (let y = L.y0 - 6; y > L.y1; y -= 8) if (y < L.y0 - fold) g.fillStyle(0xc7dcd0, 1).fillRect(L.x - 6, y, 12, 2);
+        rails(foot - lower, foot);
+        rungs(foot - lower, foot);
+        if (down < 1) g.fillStyle(0xb9c4c8, 1).fillRect(L.x - 5, foot - lower + 10, 1, lower - 12).fillRect(L.x + 4, foot - lower + 10, 1, lower - 12);
+        g.fillStyle(0xe8eaec, 1).fillRect(L.x - 7, foot - 2, 14, 2);
+    }
+
+    // A ladder let down: its lower part slides to the floor (`LADDER.slideMs`), from the moment she starts down it.
+    updateLadders(time) {
+        for (const L of this.ladders) {
+            if (L.sliding == null) continue;
+            L.down = Math.min(1, (time - L.sliding) / LADDER.slideMs);
+            this.drawLadder(L.gfx, L, L.down);
+            if (L.down >= 1) L.sliding = null;
+        }
+    }
+
     // ↑/↓ at a ladder between routes.
     tryLadder(input, onFloor) {
         const s = this.scene, p = s.player;
@@ -683,6 +727,16 @@ export class World {
             if (atFoot && L.lockSpec?.kind === 'card' && !this.progress.hasCard(L.lockSpec.card)) {
                 s.showLocked(L.lockSpec.card);
                 return true;
+            }
+            // Folded up out of her reach: from below a shrug (no words: she sees why); from above she lets it down, for good.
+            if (L.latch && L.down < 1 && L.sliding == null) {
+                if (atFoot) {
+                    s.shrug();
+                    return true;
+                }
+                this.progress.setFlag(L.latch);
+                L.sliding = s.time.now;
+                sfx.at(L.x, L.y0).ladderDrop();
             }
             this.onLadder = L;
             return s.enterLadder(L.x, L.y1, L.y0, L.out, L.ceil);
@@ -2832,6 +2886,7 @@ export class World {
             this.onLadder = null;
         }
         this.updateDuct(input, time, dt);
+        this.updateLadders(time);
         this.updateSpecials(time);
         if (s.route !== this.lastRoute) this.refresh();
         this.people.update(dt, time);
@@ -3085,7 +3140,11 @@ export class World {
             && (z.plat.solid || (s.droppingThrough !== z.plat && !(s.overRail && s.gliding && z.plat.drop)
                 && p.body.velocity.y >= 0 && p.body.bottom <= z.body.top + 10)));
         // (A partition is a wall, never a ledge: coming down on its top she slips off it.)
-        s.physics.add.collider(p, this.wallZones, null, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);
+        s.physics.add.collider(p, this.wallZones, (_, z) => {
+            // (The promenade's rope: pushed into, she shrugs and its card lights up, `blockedBy`.)
+            const R = this.ropes?.find(r => r.zone === z);
+            if (R && (p.body.blocked.right || p.body.blocked.left || p.body.touching.right || p.body.touching.left)) s.blockedBy(R.card);
+        }, (_, z) => s.route === OUTSIDE && p.body.bottom > z.body.top + 5);
         for (const z of this.ductFloors) s.physics.add.collider(p, z, null, () => s.route === 'duct');
         for (const t of this.pushables) {
             s.physics.add.collider(p, t.zone, null, () => t.route === s.route

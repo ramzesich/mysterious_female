@@ -2603,6 +2603,51 @@ def scenario_region1__pass(b):
     return ok
 
 
+def scenario_region2__aftladder(b):
+    """The promenade's aft end (part 11's P1, plan-the-rest §7f): the ladder up to the walkway past the drill, folded up
+    out of her reach (↑ under it: a shrug, no climb) until she comes down it from the walkway (its lower part slides to
+    the deck, the flag `ladder_aft`), then both ways; the rope across the promenade short of its enclosed end (she stops
+    clear of its post, shrugs, its card lights up); the jogger turns short of it. No lock open (`?cards=all` would show
+    the ladder down)."""
+    S = "window.__ship"
+    b.open("?reset&play&at=promaft")
+    L = b.eval(f"(L => ({{x: L.x, y0: L.y0, y1: L.y1, down: L.down}}))({S}.world.ladders.find(L => L.id === 'aft'))")
+    ok = check(L["down"] == 0, "the aft ladder starts folded up", L)
+    # Under it: ↑ is a shrug, and she stays on the promenade.
+    b.teleport(L["x"], L["y0"], "promenade")
+    b.key("up", True); wait(0.6)
+    s = b.state()
+    ok &= check(s["mode"] == "play" and s["y"] == L["y0"] and b.eval(f"{S}.idle") == "shrug",
+                "↑ under it: she shrugs and stays on the promenade", (s, b.eval(f"{S}.idle")))
+    b.key("up", False); wait(2.6)
+    # From the walkway: ↓ at its top lets it down and takes her down it.
+    b.teleport(L["x"], L["y1"], "promenade")
+    s = hold_until(b, "down", lambda s: s["y"] >= L["y0"] and s["mode"] == "play", 6)
+    down = b.eval(f"{S}.world.ladders.find(L => L.id === 'aft').down")
+    ok &= check(s["y"] == L["y0"] and down == 1 and b.eval(f"{S}.progress.has('ladder_aft')"),
+                "from the walkway, ↓: it is let down, the flag set, and she is down it on the promenade", (s, down))
+    # Then up it from the promenade.
+    s = hold_until(b, "up", lambda s: s["y"] <= L["y1"] and s["mode"] == "play", 6)
+    ok &= check(s["y"] == L["y1"] and route(b) == "promenade", "then up it from the promenade to the walkway", s)
+    # The rope: run aft into it.
+    R = b.eval(f"(R => ({{x: R.x, y: R.y}}))({S}.world.ropes[0])")
+    b.teleport(R["x"] - 140, R["y"], "promenade")
+    b.key("right", True); wait(2.0)
+    s = b.state()
+    blocked = b.eval(f"{S}.lastBlocked")
+    b.key("right", False)
+    ok &= check(s["y"] == R["y"] and R["x"] - 40 < s["x"] < R["x"] - 25 and (blocked or {}).get("text") == "CREW ONLY",
+                "run aft into the rope: she stops short of its post, and its card is what stops her", (s, R, blocked))
+    # Nor over it: a jump against it lands her back on her side.
+    b.key("right", True); b.tap("space", 0.2); wait(1.2); b.key("right", False)
+    s = b.state()
+    ok &= check(s["x"] < R["x"] - 15, "nor does a jump take her over it", s)
+    # The jogger turns short of it (his loop's aft end).
+    jx = b.eval(f"{S}.world.people.byId.haz_jogger.walk.b")
+    ok &= check(jx < R["x"] - 30, "the jogger turns short of the rope", (jx, R["x"]))
+    return ok
+
+
 def scenario_region2__quiet(b):
     """Near-catch 2 at the Library's aft end, as remade (docs/near-catch-2-remake-log.md): he asleep on the return
     trolley, the scene 64 px from him, the librarian's shush, her tiptoe and her reach at his height, his leap and his

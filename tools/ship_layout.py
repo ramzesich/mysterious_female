@@ -75,7 +75,9 @@ PROMENADE = {"deck": 6, "span": (100, 231), "enclosed": [(100, 116), (212, 231)]
              # It was the one at 143 m until 2026-11-26, the user: "switch between the two red boats".)
              "boats": [(100.8, "lifeboat"), (113.0, "rescue-boat"), (143.0, "lifeboat"), (155.6, "lifeboat-round"),
                        (166.6, "lifeboat"), (199.3, "tender"), (209.9, "tender"), (220.4, "lifeboat")],
-             "columns": [112.2, 122.8, 131.4, 142.3, 155.1, 178.9, 183.9, 196.0, 209.5, 220.1],
+             "columns": [112.2, 122.8, 131.4, 142.3, 155.1, 178.9, 183.9, 196.0, 209.5, 219.23],
+             # (219.23: straight under deck 8's partition over it, which she climbs on to from it; it was at 220.1, the user,
+             # 2026-11-28: "so that the climb would make more sense visually".)
              # Its back wall (the photo): round portholes on deck 6, a glazed bay two decks tall.
              "portholes": [105.5, 156.4, 158.6, 168.3, 193.6, 200.9, 203.3],    # (156.4, 158.6: clear of a plate butt, the user, 2026-11-20)
              "glazed": [(123.4, 131.0)]}

@@ -1091,6 +1091,10 @@ def build_objects():
     # (At 184.3 m since 2026-11-26: at 180.5 the walkway's gull, 181 m (plan-the-rest §7f, 6), dove on her as the page loaded;
     # 0.7 m aft of its reach, 1.7 m forward of the drill's boat.)
     add(point("drill7", "place", exact_x(184.3), floor_y(7), [prop("route", "promenade")]))
+    # The walkway past the drill, a step forward of its last column (219.23 m: the climb to deck 8 aft), book 11 aft of it.
+    add(point("walkway_aft", "place", exact_x(218.5), floor_y(7), [prop("route", "promenade")]))
+    # The promenade's aft end (part 11's P1): 3 m forward of the ladder let down from the walkway, the rope 6 m aft.
+    add(point("promaft", "place", exact_x(205.7), floor_y(6), [prop("route", "promenade")]))
     # (§4 2.1, 2026-11-19: a start by each thing to find that had none near it, for the user to judge
     # where they lie: the dry store's door (deck 4), the maid's cabin's door (deck 6), the knitting lady's
     # (deck 5, aft of her basket), Shore excursions' desk (deck 5), the Stardust balcony's far end (deck 7).)

@@ -13,7 +13,7 @@ from population import (DARTERS, DND, GLIMPSE_BALCONY, LINEN, LOWS, OPENDOORS, S
 from population import FOG, FOODGULLS, LIDO, PLATFORMS, QUEUES, TRAYS, WETS
 from population import BALCONY_CPS, BALCONY_SET, DRILL, GUSTS, LINES, OCCUPIED, PERCH, ROUNDS, WALKWAY_PERCH, WALKWAY_RAIL
 from population import BALLS, COURT, FLARES, FLOCK_BIRDS, FLOCKS, FUNNEL_TOP, LADY, SUNDECK, TERRACE
-from population import BELL_GULL, BOW, FINALE
+from population import BELL_GULL, BOW, FINALE, PROM_AFT
 from population import BREAKFASTS, CLIMB, DESK_FLAGS, DOGS, KEEPS, KNITTER, ROLLERS, SKIMMERS
 from population import (BEAT_LIFT, DELIVERIES, BEATS, BREAKABLES, CATCH_M, CHECKPOINTS, CHIPS, FLAG_GIVES, FLASH, GLIMPSE_WINDOW,
                         GRIPS, GULLS, ITEMS, JACKPOTS, POPCORN, LIBRARY, LIGHTS, LOOKOUTS, PEOPLE, PORTHOLES, PROPS, PUSHABLES, PUSH_WALL, QUIRKS, ROBOTS, ROOMS, SHAFT, SIGNS,
@@ -470,6 +470,11 @@ def build_world():
     for m, side in zip(PROMENADE["span"], (1, -1)):
         walls.append(dict(x=B.x_of(m), y0=B.floor_y(8), y1=B.floor_y(7), w=8))
     columns = [dict(x=B.exact_x(m), y=B.floor_y(7), top=B.floor_y(8)) for m in PROMENADE["columns"]]
+    # The rope across the promenade at its enclosed aft end (part 11's P1): a wall from its forward post up to under the
+    # walkway (she cannot hop it; on the walkway she is over it), its card the sign she is shown.
+    rx = B.exact_x(PROM_AFT["rope"])
+    ropes = [dict(x=rx, y=B.floor_y(6), text=PROM_AFT["sign"])]
+    walls.append(dict(x=rx, y0=B.floor_y(7) + 8, y1=B.floor_y(6), w=50))   # (its face 10 px forward of the post: her run leans past her body)
 
     # (No grips on the stern's tiers: on the aft terraces she is out of sight behind the stern's
     # plating, the user's rule, so the plan's climb up the stern is left out.)
@@ -528,7 +533,10 @@ def build_world():
 
     # Ladders between routes: the lifeboat station's on the promenade, up its column to the walkway.
     ladders = [dict(id="gate", x=B.x_of(125), y0=B.floor_y(6), y1=B.floor_y(7), routeBottom=OUTSIDE, routeTop=OUTSIDE,
-                    lock="card:deck:1", gate=True)]
+                    lock="card:deck:1", gate=True),
+               # The promenade's aft end's (part 11's P1): past the drill, let down from the walkway (`latch`).
+               dict(id="aft", x=B.x_of(PROM_AFT["ladder"]), y0=B.floor_y(6), y1=B.floor_y(7), routeBottom=OUTSIDE,
+                    routeTop=OUTSIDE, latch=PROM_AFT["latch"])]
     # Ladders on the map that open on a flag (the bridge's hatch, after the alarm).
     # (`art`: its ladder and its lid are the scene's own pictures, not the map's tiles: src/world/bridge.js.)
     gates = [dict(x=B.BRIDGE_HATCH_COL * B.TILE + B.TILE // 2, y0=B.floor_y(11), y1=B.floor_y(10), needs="alarm", hide=True, art="bridge")]
@@ -660,7 +668,7 @@ def build_world():
                 topdeck=topdeck, bow=bow, finale=finale,
                 glimpseBalcony=glimpse_balcony, balcony=balcony, drill=drill,
                 library=library, flash=flash, glimpseWindow=window, stage=stage,
-                outside=dict(platforms=platforms, walls=walls, glass=glass, covers=covers, partition=PARTITION_H, rail=RAIL_H, partitions=partitions, columns=columns,
+                outside=dict(platforms=platforms, walls=walls, ropes=ropes, glass=glass, covers=covers, partition=PARTITION_H, rail=RAIL_H, partitions=partitions, columns=columns,
                              unit=UNIT, units=[dict(x=ux, y=B.floor_y(deck), deck=deck) for deck, ux in units]),
                 grips=grips, ladders=ladders, ladderGates=gates,
                 hatchPool=dict(x=B.exact_x(LIDO["hatch"]), y=B.floor_y(11), toY=B.floor_y(10)),

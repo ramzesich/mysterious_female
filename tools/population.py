@@ -483,7 +483,7 @@ PEOPLE = {
                           bubble=("book", "books:held", None, 4)),
     # The promenade: the jogger's loop on the JOGGING lane (she hops him or stands aside, ↑), the
     # rival peering under a boat (a glimpse: the story takes him away).
-    "haz_jogger": dict(at=("prom", 150), who="jogger", face=1, walk=(116.5, 211.5, 2.2, "run"), end_ms=400,
+    "haz_jogger": dict(at=("prom", 150), who="jogger", face=1, walk=(116.5, 210.6, 2.2, "run"), end_ms=400,
                        touch=("scare", 14, 40, "jogger")),
     "riv_prom": dict(at=("prom", 190), who="rival", face=1, idle="idle", after="region:2", until="flag:riv_prom"),
     # Deck 7's lobbies and atrium walk: the carpet fitter on the 7-8 flight's foot, a couple at the plaques.
@@ -1111,6 +1111,12 @@ BALCONY_CPS = {"cp_balc_9": "balcabin9", "cp_balc_8m": "balcabin8m", "cp_balc_8a
 # The boat drill on the walkway (`haz_drill`): a rescue boat on its falls in the gap between the
 # boats, its forward end (m); it hangs high (she walks under it), and every `period` s the crew
 # lower it onto the walkway for `down` s: under it as it comes: "Bumped".
+# Part 11's P1 (plan-the-rest §7f; the user, 2026-11-28, "the way you suggested"): the promenade's aft end. A ladder up
+# to the walkway past the drill, between its two tenders, its lower part folded up out of her reach until she lets it
+# down from above (`latch`, the flag, kept; then both ways): once she has passed the drill, the way round it. The
+# promenade roped off at the enclosed end's face, 212.2 m (the last 19 m hid her behind the ship's side, the audit's
+# V5; a rope at 212 stood behind that wall): its forward post 211.36 m, the jogger turning at 210.6 m, short of it.
+PROM_AFT = dict(ladder=208.7, latch="ladder_aft", rope=211.67, sign="CREW ONLY")
 DRILL = dict(m=186.0, period=10.0, down=3.0, tell=1.0,
              # The winch and its crewman, one generated picture of the two (the user, 2026-11-21: "a single generated
              # animation of a worker turning the valve"; tools/build_drill.py): his middle's metre, where he stood.

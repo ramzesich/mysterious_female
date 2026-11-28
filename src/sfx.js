@@ -375,6 +375,9 @@ const ship = {
     // A card reader: yes, and no (also a rope or a sign in her way).
     beep: () => { tone(1320, 0.07, { type: 'square', vol: 0.04, lp: 4000 }); tone(1760, 0.11, { type: 'square', vol: 0.04, lp: 4000, t: 0.08 }); },
     deny: () => [0, 0.15].forEach(t => tone(185, 0.12, { type: 'square', vol: 0.07, lp: 1200, t })),
+    // A ladder's folded lower part let down from above (the promenade's aft end, part 11's P1): it slides down its
+    // rails, 0.28 s, and lands on the deck.
+    ladderDrop: () => { noise(0.26, { band: 2200, vol: 0.1 }); clank(380, 0.24, 0.13, 0.27); thud(110, 0.14, 0.16, 0.27); },
     // A hatch's steel lid.
     hatch: () => { clank(310, 0.3, 0.14); thud(90, 0.15, 0.14, 0.02); },
     // Any struck metal: a grille kicked out of the duct, a pan.

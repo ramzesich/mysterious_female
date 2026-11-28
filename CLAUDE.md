@@ -916,6 +916,10 @@ Lessons learned (2026-11-24, the two rooms redecorated):
   frames held longer is set frame by frame from one clock (`setFrame`), as the scenes are. **And a config name is
   grepped before it is used:** `PLAYER.speed` does not exist (`runSpeed`), the clamp gave NaN and the slide never ran,
   every check still green; a recording frame by frame found it.
+- **A thing placed on the promenade goes in its open part:** the enclosed ends' wall is drawn over her depth, and a rope
+  at the plan's metre stood behind it, unseen (2026-11-28). **A start link puts the thing to try on the screen:** the
+  ladder's top was 10 m from `walkway_aft`, past a tender she walks behind, and the user could not find it. **A field
+  the playtests read whole holds no Phaser object** (`js(b, "...ladders[0]")` came back empty): keep it non-enumerable.
 - **"Fix it" is the clip fixed, not the clip replaced:** I swapped the pillow gag for the built fall and was told "It's
   not what I meant"; when a fix could be either, say which before doing it.
 - **What the outside draws in front of her is not drawn across a room she is in:** the balconies' fronts ran over the

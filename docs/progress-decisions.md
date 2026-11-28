@@ -5807,3 +5807,38 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
 - **Checks:** driven headlessly with real keys (sit, ←, ↓ the cover, → back on the same book, ↓, Esc back without
   standing up, E reads); the start link `?play&at=kids&did=catch` takes book 15 with E. Pictures and scripts:
   `docs/book-15/`.
+
+## Part 11's P1: the promenade's aft end, a ladder let down from above and a rope (2026-11-28)
+
+- **The ladder** (plan-the-rest §7f, P1; approved as mocked up in the running game, "the way you suggested"): at 208.7 m,
+  between the walkway's two tenders, just forward of the column at 209.5 m, from the promenade up to the boat walkway
+  past the drill. Its lower part is folded up behind the upper (`LADDER.fold`, 72 px, so the rungs lie on each other):
+  from the promenade it hangs over her head, and ↑ under it is a shrug, no words. From the walkway, ↓ at its top: the
+  folded part slides to the deck (`LADDER.slideMs`, 0.28 s, the sound `ladderDrop`, measured within bounds; the user
+  listens) as she starts down, the flag `ladder_aft` (kept), and from then on it is a ladder both ways: once she has
+  passed the drill, the way round it (book 11 at the walkway's aft end; with the socks, the column up to deck 8 aft).
+  Drawn by rule as the lifeboat station's ladder at 125 m is (`drawLadder`, `updateLadders`, `tryLadder` in
+  `src/world/world.js`; `PROM_AFT` in `tools/population.py`, the ladder's `latch` in `tools/build_world.py`).
+  No generations.
+- **The rope:** the promenade's last 19 m, its enclosed aft end, where she was hidden behind the ship's side (the
+  audit's V5), roped off with a "CREW ONLY" card (the rope barrier and a `rope` sign, in front of the railing as the
+  ladders are), at 211.67 m, not the plan's 212: the enclosed end's wall starts at 212.2 m and a rope at 212.6 stood
+  behind it, unseen (the first mock-up). A wall from it up to under the walkway, its face 10 px forward of the post
+  (her run leans past her body); pushed into, she shrugs and the card lights up (`blockedBy`, the outside's wall
+  collider). Nothing lies past it (no door: none from the theatre, the user's of 2026-11-03); its "JOGGING TRACK" plaque
+  (213.6 m) stays on the wall past it. The jogger turns at 210.6 m now, not 211.5, short of the rope.
+- **The walkway's last column moved** (the user, shown the climb: "Move the column ... to be under the balcony window
+  separator ... so that the climb would make more sense visually"): 220.1 to 219.23 m, straight under deck 8's partition
+  it climbs onto; clear of the tender and the lifeboat by about 50 and 60 px.
+- **Two start places:** `walkway_aft` (the walkway past the drill, 218.5 m, a step forward of that column) and
+  `promaft` (the promenade 3 m forward of the ladder). The links for the ladder carry no `cards=all`, which would show it
+  down.
+- **Asked and answered on the way:** she gets onto the walkway in region 2, the socks only in region 6, so the column
+  climb is region 7's (as GAME_DESIGN.md has it); the promenade's forward end (100 to 116 m) is the same enclosed kind,
+  its door at 111 m, a dead end 11 m past it, no climb anywhere from the promenade's floor but the two ladders: left as
+  the plan has it. Offered and not asked for: grab rails over the ladder's top, moving the plaque, a rope at the forward
+  end.
+- **Tests:** `region2.aftladder` (new: folded, the shrug, let down from above with the flag, up again, the rope stops
+  her short of its post with its card, no jump over it, the jogger's turn short of it); `boot`, `region2`, `region7`,
+  `sound` pass; `check_overlaps` 0; the rest not run. (A Phaser object on a ladder's fields made `region2`'s whole read of
+  `ladders[0]` come back empty: the picture is a non-enumerable field now.)
