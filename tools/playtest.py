@@ -613,7 +613,7 @@ def scenario_intro(b):
     b.shot("intro-play")
     b.eval(f"{S}.controls.device = 'pad'")
     wait(0.1)
-    ok &= check(alert(b) == "Left stick to move, A to jump", "with the controller in use, in its buttons", alert(b))
+    ok &= check(alert(b) == "← and → to move, A to jump", "with the controller in use, in its buttons", alert(b))
     b.shot("intro-play-pad")
     b.eval(f"{S}.controls.device = 'keys'")
     wait(0.1)

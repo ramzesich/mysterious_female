@@ -5807,3 +5807,14 @@ The user: "I have added the 15-th book: Diary of a whimpy kid" (two photos of he
 - **Checks:** driven headlessly with real keys (sit, ←, ↓ the cover, → back on the same book, ↓, Esc back without
   standing up, E reads); the start link `?play&at=kids&did=catch` takes book 15 with E. Pictures and scripts:
   `docs/book-15/`.
+
+## The controller's hints in arrows (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked for every hint and popup text in both languages (shown as tables: the welcome screen, the hints, the
+lock's popup, her frights, the words spoken, the win screen, and what is not translated on purpose), then whether the
+D-pad works where the hints say "left stick" (it does: every direction is read in `src/controls.js` as the arrow, the
+D-pad or the stick). The user: "what I want is directions only showing arrows both for keyboard and controller. It is
+concise and clear." The five controller hints (`hint.move.pad`, `hint.crawl.pad`, `hint.climb.pad`, `hint.read.pad`,
+`hint.return.pad`) now give their directions as ← → ↑ ↓, in both languages; only their buttons differ from the
+keyboard's (A, X, B). The translations as they stand and the arrows approved. `intro` (its check of the move hint's
+words updated), `lang` and `gamepad` pass.
