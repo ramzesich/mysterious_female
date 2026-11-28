@@ -23,9 +23,10 @@ export const pass = {
         const L = s.cache.json.get('pass-layout');
         const x0 = cat.sprite.x + PASS.counter, F = cat.floor, top = F - L.counter.h;
         cat.custom = true;              // (its own scene: not the ship scene's `nearCatch`)
-        // The counter: behind everything that stands on it and behind her. The plate: in front of his nose.
+        // The counter: behind everything that stands on it and behind her. The plate: behind him, his face over the food
+        // (the user, 2026-11-28: "I want to see"; it was in front of his nose), over the counter and the bowl's fall.
         const counter = s.add.image(x0, F, 'pass-counter').setOrigin(0, 1).setDepth(D.props - 0.05);
-        const plate = s.add.image(cat.sprite.x + PASS.plate, top, 'pass-plate').setOrigin(0.5, 1).setDepth(D.props + 0.005);
+        const plate = s.add.image(cat.sprite.x + PASS.plate, top + 1, 'pass-plate').setOrigin(0.5, 1).setDepth(D.props - 0.005);
         // The bowl's fall: a frame stands with its column `x` at the counter's end, its row `y` on the floor's line.
         const fall = s.add.sprite(x0 - L.fall.x, F - L.fall.y, 'pass-bowl-fall', 0).setOrigin(0).setDepth(D.props - 0.01).setVisible(false);
         w.add([counter, plate, fall]);
@@ -143,6 +144,7 @@ export const pass = {
             p.setFlipX(true);               // (the way he went)
             s.mode = 'play';
             this.P.setFlag('bb1');          // (the lunge is hers, the lunch is hers to take: `flagGives`, `src_lunch`)
+            s.reachCheckpoint('cp_galley');  // (the galley's door behind the pass: the lunch's way starts here, 2026-11-28)
             // The one hint of a new move (the user: "D to dash", both languages, and the controller's button).
             w.say(t(s.controls.device === 'pad' ? 'hint.dash.pad' : 'hint.dash'), PASS.hintMs, { kind: 'plate' });
         };

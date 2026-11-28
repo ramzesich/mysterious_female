@@ -71,8 +71,10 @@ export class LooseTangerines {
         const outside = e.route !== 'inside';
         // (Its position is the fruit's middle, under its leaves, so that it turns about itself as
         // it rolls: src/textures.js.)
+        // (In her crew cabin over its plate's rim, `room-crewcabin-front` at + 0.135: that rim is in front of the three
+        // lying on the plate, not of one she throws; the user, 2026-11-28, that plate only.)
         const img = this.group.create(e.x, e.y, 'tangerine').setOrigin(0.5, 0.6)
-            .setDepth(outside ? s.DEPTH.exterior + 0.13 : s.DEPTH.props + 0.05);
+            .setDepth(e.route === 'crewcabin' ? s.DEPTH.exterior + 0.136 : outside ? s.DEPTH.exterior + 0.13 : s.DEPTH.props + 0.05);
         s.worldLayer.add(img);
         // (The fruit fills the picture's rows 2 to 9 and its ten columns; the body is the fruit,
         // a pixel in from its sides.)

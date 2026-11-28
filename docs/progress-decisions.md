@@ -5997,3 +5997,51 @@ a load and not dashing. Before she learns the actual dash, she cannot do any of 
   `golden` (D does nothing before near-catch 1), `region1` (the lunch: "Excuse me!!!"), `region3.painting` gives the
   dash (region 3 is past it); `dash`, `golden`, `region1`, `region3`, `throw`, `deck4`, `lang`, `region4`, `region6`,
   `region8`, `finale`, `gamepad`, `mishaps.stretches`, `sound` pass; `check_sound` all within bounds. No generations.
+
+## From the start to near-catch 1, the user's play (2026-11-28)
+
+The user played from the start to the first encounter with Bumbot and gave fixes one by one; each shown in the game and
+approved together.
+
+- **The porter (deck 4).** "When the sitting dazed gag played, she is now hovering": 8b's and 8d's seated frames end 2 px
+  over the floor (a shoe tip on it); `sits` in their GAGS (the frame she is down on her bottom from, px lower), as her
+  built sit is drawn (`LIE_DROP`), 9d with them. "It's very hard to jump over him. The gag where she ends up on top of the
+  luggage heap catches me in mid air": a sweep of full hops cleared 4 of 17 take-offs at him walking at her, none at him
+  standing, none from behind (he and his cart 45 px wide, the heap 54 tall, her hop over it for 56 px of her run); since
+  the cry no longer moves him before the dash, the hop is the way past. The user chose C of three (fewer bags, the bags a
+  platform, or the hop through the heap's top): in the air only her middle counts, against him to his shoulders (44) and
+  the heap to 36 px of its 54 (`touch_parts`); 9 of 17 at him walking at her, 5 standing, still none from behind (he
+  turns at his loop's end). A hop that meets them knocks her back 70 px/s, no higher than she was, the gag where she lands
+  (`knock`): she flew on stiff and he slid to her before.
+- **Her sits on the floor, the whole stretch** ("it's ground level is inconsistent ... like we just fixed"): every gag to
+  near-catch 1 that ends with her on her bottom measured by its seat row: the suitcase's tip and dazed sit 1 px high (slate
+  and red), the breakfast tray's sit and the paper behind her 2 px, the trolley's push and bounce (the cart's clips) 2 px;
+  all set to the built sit's 1 px under the floor line (`seated` in the ship scene). The vacuum's sit is her on it.
+- **The galley's door a checkpoint** ("If we spill it, we are sent back to the deck 4 middle"): the room's `checkpoint`,
+  lit as near-catch 1 ends (`reachCheckpoint`, also what passing one does), since she takes the lunch and goes forward,
+  never past it. Twenty places now, 24 as the game counts them.
+- **Her crew cabin's plate:** a loose tangerine there is drawn over its rim (`room-crewcabin-front`); the three on it as
+  before; that room only (the only one with a front picture).
+- **Bumbot at the pass:** the plate he eats from behind him, his face over the food ("I want to see"); it and the lunch's
+  tray and cloche 1 px lower, on the counter's top line (the user).
+- **The Seven Seas' waiter** ("his double dish looks out of place and purpose"): his still facing us has a dish drawn in,
+  under the game's tray. The user: serve tables with people, bump him as the bathrobe lady, his reaction as proposed, the
+  plate down at the flower's level. Two diners (edits of the approved pair, 10 generations); his serve: two PixMiniMax clips
+  on a green copy of table 2 from the game's own picture of him, through an edit with the cloche lifted, to that picture
+  with the plate on the cloth (9 generations; a first end 2 px high redone); cut by what differs from the set; one frame
+  with an arm behind his back left out, streaks by the far chair cleared; 6 px further from the diner than first placed
+  (his cloche over her face). Forward he serves table 2, aft table 4, the next visit clears it (the clip backwards); at a
+  table `busy`, she passes in front; at his loop's ends his walk's first frame (`hold`). Bumped: 10f, he stops 1.4 s, his
+  tray and cloche wobble; with her tray a spill, he steadies it too. Her sit there checked on the floor. A first try served
+  table 2 again and again (the step away from it counted as reaching it).
+- **Sounds from her deck only** ("sometimes I hear sounds from other decks ... the NPC's"): a placed sound plays only from
+  the deck her ears are on (`sfx.listen(x, y, deckOf)`; her ears the camera's while a scene shows elsewhere); distance as
+  before, the ambience untouched; checked in the game (the same sound a deck up and down silent, her own deck heard).
+  `sfx.played` lists what was played, for tests.
+- **A test mended, found failing:** `mishaps.ball` failed inside `mishaps` and passed alone: the court's round runs on the
+  game's clock, and placed whenever the page had loaded, the first ball to reach her was the rebound at her back as often
+  as not (14b for 14a). It waits for the round's start now.
+- **Tests:** `region1` (the waiter at a table: serving), `deck4`, `dash`, `golden`, `throw`, `pocket`, `deck3`, `boot`,
+  `lang`, `mishaps` (all its cases), `mishaps.porter`, `mishaps.breakfast`, `mishaps.jogger`, `sound`, `region8` pass;
+  `check_sound` all within bounds; `check_overlaps` 0. 19 generations.
+

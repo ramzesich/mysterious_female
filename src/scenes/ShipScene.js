@@ -3301,7 +3301,8 @@ export class ShipScene extends Phaser.Scene {
         // A gull's take: her duck (or a hit in the air, waiting for her landing).
         if (time < this.flinchUntil) {
             if (this.gagPending && GAGS[this.gagPending.sc.gag]?.drop) body.velocity.x = 0;
-            body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
+            // (Knocked back off what she met: she keeps that way until she lands, `knock`.)
+            if (!GAGS[this.gagPending?.sc.gag]?.knock) body.velocity.x = approach(body.velocity.x, 0, POCKET.slow * dt);
             return;
         }
         // (A throw in the air: off her hand on the swing, while she flies on.)
@@ -4798,15 +4799,23 @@ export class ShipScene extends Phaser.Scene {
             // (Past its door on its floor, or in a jump over that floor: out of the second pool she
             // comes down beyond the pool attendant's hut.)
             if (c.route !== this.route || Math.abs(p.x - c.x) > 8 || p.y > c.y + 6 || p.y < c.y - 70) continue;
-            if (!c.active) {
-                this.lightCheckpoint(c, true);
-                this.save.activated.push(c.id);
-            }
-            if (this.save.lastCheckpoint !== c.id || !c.saved) {
-                this.save.lastCheckpoint = c.id;
-                writeSave(this.save);
-                this.checkpoints.forEach(o => { o.saved = o === c; });
-            }
+            this.reachCheckpoint(c);
+        }
+    }
+
+    // A checkpoint is hers (lit the first time) and the last she reached: by passing it, or by the story (`c` or its id:
+    // the galley's as near-catch 1 ends).
+    reachCheckpoint(c) {
+        if (typeof c === 'string') c = this.checkpoints.find(o => o.id === c);
+        if (!c) return;
+        if (!c.active) {
+            this.lightCheckpoint(c, true);
+            this.save.activated.push(c.id);
+        }
+        if (this.save.lastCheckpoint !== c.id || !c.saved) {
+            this.save.lastCheckpoint = c.id;
+            writeSave(this.save);
+            this.checkpoints.forEach(o => { o.saved = o === c; });
         }
     }
 
@@ -5303,6 +5312,12 @@ export class ShipScene extends Phaser.Scene {
                 this.pose('stand');
                 this.alert.setText(fright(GAGS[sc.gag].word ?? sc.word)).setVisible(true);
             }
+            // (`knock`: px a second she is bounced back off it, no higher than she was, the gag where she lands; the
+            // porter's cart and his back: flown on past them the gag "caught me in mid air", the user, 2026-11-28.)
+            if (sc.gag && GAGS[sc.gag].knock) {
+                p.body.setVelocity((p.x >= fromX ? 1 : -1) * GAGS[sc.gag].knock, Math.max(0, p.body.velocity.y));
+                this.alert.setText(fright(GAGS[sc.gag].word ?? sc.word)).setVisible(true);
+            }
             return;
         }
         if (sc.gag && GAGS[sc.gag].crawl && this.anims.exists('drill-crawl')) return this.crawlGag(sc, fromX);
@@ -5404,6 +5419,7 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(s);
         p.setVisible(false);
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride.show(); };
+        this.seated(s, g);
         s.play(g.sit);
         s.once(`animationcomplete-${g.sit}`, () => s.play(g.ride));
         let v = Math.abs(ride.v), tipped = false, k = 1;
@@ -5479,6 +5495,7 @@ export class ShipScene extends Phaser.Scene {
         this.worldLayer.add(s);
         p.setVisible(false);
         this.gagEnd = () => { s.destroy(); p.setVisible(true); ride?.show?.(); };
+        this.seated(s, g);
         s.play(g.fall);
         s.once(`animationcomplete-${g.fall}`, () => {
             // (`sit`: then her own dazed sit, where the clip's last frame is hers exactly, and `hat` on her head.)
@@ -5648,6 +5665,7 @@ export class ShipScene extends Phaser.Scene {
             q.pausedUntil = this.time.now + 600;
         };
         const end = () => this.time.delayedCall(g.holdMs, () => this.respawn());
+        this.seated(s, g);
         s.play(g.clip);
         if (g.fronts) {
             // 8b: he pushes on, blind behind his bags, the cart's front at hers, till she is down.
@@ -5697,6 +5715,16 @@ export class ShipScene extends Phaser.Scene {
         }
     }
 
+    // A gag's picture of her that ends sat on the floor (`sits` in its GAGS: clip key: [frame from 0, px]): from that
+    // frame on drawn that much lower, her seat 1 px under the floor line as `sitDown` draws the built sit.
+    seated(s, g) {
+        if (!g.sits) return;
+        const y = s.y;
+        const at = (a, f) => { const w = g.sits[a.key]; s.y = y + (w && f.index - 1 >= w[0] ? w[1] : 0); };
+        s.on('animationupdate', at);
+        s.on('animationstart', (a) => at(a, a.frames[0]));
+    }
+
     // Her gags with the jogger (§1.6, 9a to 9d; `GAGS` jogSpin, jogBowled, jogShoved, jogBounce): her clip
     // where she stands (`gags` sheet, her middle at `jog.x` of its cell, or `jog[at]`'s first, its second
     // where she ends): 9b he runs into her standing facing him, bowled back onto her bottom; 9a head on, both
@@ -5725,6 +5753,7 @@ export class ShipScene extends Phaser.Scene {
             this.worldLayer.add(s);
             p.setVisible(false);
             this.gagEnd = () => { s.destroy(); p.setVisible(true); };
+            this.seated(s, g);
             s.play(g.clip);
             s.once(`animationcomplete-${g.clip}`, end);
             return;

@@ -242,12 +242,20 @@ def build_world():
         if "touch" in d:
             kind, w, h, *rest = d["touch"]
             e["touch"] = dict(kind=kind, w=w, h=h, fright=rest[0] if rest else "", dx=rest[1] if len(rest) > 1 else 0)
+            if "touch_parts" in d:
+                e["touch"]["parts"] = d["touch_parts"]
         if "carry" in d:
             e["carry"] = [dict(frame=f, dx=dx, dy=dy, front=front) for f, dx, dy, front in d["carry"]]
         if "cover" in d:
             e["cover"] = [dict(frame=f, x=spot(d["at"][0], m)[0], dy=dy) for f, m, dy in d["cover"]]
         if "under" in d:
             e["under"] = d["under"]
+        # (The waiter's tables: each table's middle and the way he faces it there; `hold`: the clip whose first frame he
+        # shows standing at his loop's ends.)
+        if "serve" in d:
+            e["serve"] = [dict(x=spot(d["at"][0], m)[0], dir=face) for m, face in d["serve"]]
+        if "hold" in d:
+            e["hold"] = d["hold"]
         if "bubble" in d:
             icon, when, unless, *rng = d["bubble"]
             e["bubble"] = dict(icon=icon, when=when or "", unless=unless or "", range=rng[0] if rng else 4)

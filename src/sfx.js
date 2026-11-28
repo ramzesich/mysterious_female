@@ -3,10 +3,11 @@
 //   sfx.door()                 an effect, heard at her ears
 //   sfx.at(x, y).door()        the same from a place in the world: fainter with distance (a deck up
 //                              or down counts for more than the same way along), a little to its
-//                              side, silent out of earshot. For anything on a clock of its own.
+//                              side, silent out of earshot, and silent from any deck but the one her
+//                              ears are on (the user, 2026-11-28). For anything on a clock of its own.
 //   sfx.hold('whirr')          an effect held for as long as something runs (a motor while a key is
 //                              held): returns `{ stop() }`, which fades it out; `sfx.at(x, y).hold(...)` too
-//   sfx.listen(x, y)           where her ears are (the ship scene, each frame)
+//   sfx.listen(x, y, deckOf)   where her ears are (the ship scene, each frame), and a place's deck by its y
 //   sfx.ambience({ sea, ... }) how loud each layer of the ambience should be now (0 to 1)
 //   sfx.toggle()               mute on and off (M in the game), remembered in the browser
 //
@@ -26,9 +27,11 @@ let live = null;        // the page's context and its chain
 let off = null;         // an offline one, while a tool renders
 let cur = null;         // the effect being built: its context, where it goes, when it starts
 let nextPos = null;
-const ear = { x: 0, y: 0, set: false };
+const ear = { x: 0, y: 0, set: false, deck: null, deckOf: null };
 const lastAt = {};
 const log = [], counts = {};
+// (What was played, not only asked for: out of earshot or on another deck it is asked and not played; for the tests.)
+const played = [];
 const GAP = 0.03;       // the same effect twice within this many seconds is one
 
 // Effects -> fx \
@@ -90,6 +93,10 @@ function play(name, args, held = false) {
         // (Out of earshot first: a far one must not take the turn of a near one in the same moment.)
         let level = 1, dx = 0;
         if (pos && ear.set) {
+            // (Only from the deck her ears are on: the people and things of the decks over and under her are not heard
+            // through the floor, the user, 2026-11-28. A place of no deck, the funnel's top, by distance alone.)
+            const deck = ear.deck !== null ? ear.deckOf(pos.y) : null;
+            if (deck !== null && deck !== ear.deck) return held ? NONE : undefined;
             dx = pos.x - ear.x;
             const d = Math.hypot(dx, (pos.y - ear.y) * SOUND.deckWeight);
             level = d <= SOUND.near ? 1 : 1 - (d - SOUND.near) / (SOUND.far - SOUND.near);
@@ -97,6 +104,8 @@ function play(name, args, held = false) {
         }
         if (!held && now - (lastAt[name] ?? -1) < GAP) return;
         lastAt[name] = now;
+        played.push(name);
+        if (played.length > 300) played.shift();
         if (pos && ear.set) {
             const g = a.ctx.createGain();
             g.gain.value = level * level;
@@ -746,10 +755,12 @@ export const sfx = {
         nextPos = { x, y };
         return sfx;
     },
-    listen(x, y) {
+    listen(x, y, deckOf = null) {
         ear.x = x;
         ear.y = y;
         ear.set = true;
+        ear.deckOf = deckOf;
+        ear.deck = deckOf ? deckOf(y) ?? null : null;
     },
     ambience,
     get muted() {
@@ -770,6 +781,7 @@ export const sfx = {
     },
     counts,
     log,
+    played,
     // For the tools: the effects by group, and one of them (or the ambience at some levels)
     // rendered to samples.
     groups: Object.fromEntries(Object.entries(GROUPS).map(([k, v]) => [k, Object.keys(v)])),

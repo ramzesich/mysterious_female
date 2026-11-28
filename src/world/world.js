@@ -2641,10 +2641,13 @@ export class World {
             this.touchCool = s.time.now + 1200;
             sfx.at(person.x, person.y).oh();
             this.carryBox.spill(person.x, false, t.fright || null, how);
+            if (t.fright === 'waiter') this.people.steady(person);
         } else if (t.kind === 'scare') {
             if (!s.holding) sfx.at(person.x, person.y).hey();
             // (The porter's cart: who is in it, for her gag with him, 8a to 8d; the jogger, for 9b.)
-            s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' || t.fright === 'jogger' ? { person } : null });
+            const id = s.scareContact(person.x, t.fright, { ...how, ride: t.fright === 'cart' || t.fright === 'jogger' ? { person } : null });
+            // (The waiter steadies his tray as she bounces off him.)
+            if (id && t.fright === 'waiter') this.people.steady(person);
         }
     }
 

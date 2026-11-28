@@ -4,7 +4,7 @@
 // may do something when she touches them: a fright, a spilled tray. Sprites: assets/sprites/people
 // (tools/cast.py, tools/build_people.py).
 
-import { PLAYER, CRY, PEOPLE_IDLE } from '../config.js';
+import { PLAYER, CRY, PEOPLE_IDLE, WAITER } from '../config.js';
 import { sfx } from '../sfx.js';
 
 const M = 48;                           // px per metre
@@ -90,6 +90,26 @@ export class People {
             this.world.add([img]);
             p.coverPics.push(img);
         }
+        // The waiter's tables (`serve`): his clip at a table, one picture of him with his tray, cloche and the plate
+        // (assets/ship/waiter/, assets/source/people/waiter-raw/serve/), and each table's plate once he has served it.
+        if (def.serve && s.textures.exists('waiter-serve')) {
+            const m = s.cache.json.get('waiter-serve-meta');
+            p.serveMeta = m;
+            p.serveSprite = s.add.sprite(def.x, def.y, 'waiter-serve', 0).setDepth(depth).setVisible(false);
+            this.world.add([p.serveSprite]);
+            const pw = s.textures.getFrame('waiter-plate').width;
+            p.tables = def.serve.map(t => {
+                // (He stands on the far side of the table's middle from the diner he faces; the plate where the clip
+                // leaves it, turned with him.)
+                const x = t.x - t.dir * WAITER.stand, flip = t.dir > 0;
+                const sx = flip ? m.cell[0] - 1 - m.stand[0] : m.stand[0];
+                const col = flip ? m.cell[0] - m.plate[0] - pw : m.plate[0];
+                const plate = s.add.image(x - sx + col, def.y - m.stand[1] + m.plate[1], 'waiter-plate').setOrigin(0)
+                    .setFlipX(flip).setDepth(D.props + 0.01).setVisible(false);
+                this.world.add([plate]);
+                return { x, dir: t.dir, plate, plated: false };
+            });
+        }
         // Their wish: a thought cloud with its picture, over their head (src/popup.js). `bubbleItems`
         // keeps the calls made on the old bubble and its icon: shown or not, its picture changed
         // (`setTexture` of a `world.icon()` key), a hop (`world.nudge`'s tween of `y`).
@@ -124,6 +144,12 @@ export class People {
         }
         // (`cycle`: clips in turn, each so many times, round and round: the maid's bed-making and her stretch.)
         if (p.cycle?.length) return this.cycleIdle(p, 0);
+        // (`hold`: standing as the first frame of that clip, the waiter with his tray up.)
+        if (p.hold && p.meta.anims[p.hold]) {
+            p.sprite.anims.stop();
+            p.sprite.setFrame(p.meta.anims[p.hold][0]);
+            return;
+        }
         if (!p.idle || !this.anim(p, p.idle)) {
             p.sprite.anims.stop();
             p.sprite.setFrame(p.meta[p.pose] ?? p.meta.stand);
@@ -212,6 +238,12 @@ export class People {
             p.on = on;
             for (const i of p.items) i.setVisible(on);
             if (!on) p.bubbleItems?.forEach(i => i.setVisible(false));
+            // (At a table the waiter is his clip's picture, his own and his tray's hidden.)
+            if (p.serving) {
+                p.sprite.setVisible(false);
+                for (const a of p.attached) a.img.setVisible(false);
+                p.serveSprite.setVisible(on);
+            }
         }
     }
 
@@ -271,6 +303,52 @@ export class People {
                     this.place(p);
                 });
             }
+        }
+    }
+
+    // At a table: his clip, forward to serve (the plate left on the table), backward to clear it (the plate taken up,
+    // under the cloche). Meanwhile he is at the table, out of her way (`busy`: no touch, no cry); she passes in front.
+    serveAt(p, t, time) {
+        const m = p.serveMeta;
+        p.busy = true;
+        p.serving = { t, t0: time, back: t.plated };
+        this.place(p);
+        const flip = t.dir > 0;
+        p.serveSprite.setFlipX(flip).setOrigin((flip ? m.cell[0] - 1 - m.stand[0] : m.stand[0]) / m.cell[0], m.stand[1] / m.cell[1])
+            .setPosition(p.x, p.y).setFrame(t.plated ? m.frames - 1 : 0).setVisible(true);
+        p.sprite.setVisible(false);
+        for (const i of p.attached) i.img.setVisible(false);
+        if (t.plated) t.plate.setVisible(false);
+    }
+
+    serving(p, time) {
+        const { t, t0, back } = p.serving, m = p.serveMeta;
+        const k = Math.floor((time - t0) / 1000 * WAITER.fps);
+        if (k < m.frames) {
+            p.serveSprite.setFrame(back ? m.frames - 1 - k : k);
+            return;
+        }
+        if (time - t0 < m.frames / WAITER.fps * 1000 + WAITER.afterMs) return;
+        t.plated = !back;
+        t.plate.setVisible(t.plated);
+        p.serving = null;
+        p.busy = false;
+        p.serveSprite.setVisible(false);
+        p.sprite.setVisible(true);
+        for (const i of p.attached) i.img.setVisible(true);
+        this.place(p);
+        this.anim(p, p.walk.clip ?? 'walk');
+    }
+
+    // Bumped into (the waiter, 10f): he stops and steadies his tray, a wobble of what he carries, then goes on.
+    steady(p) {
+        const s = this.scene, time = s.time.now;
+        p.pausedUntil = Math.max(p.pausedUntil, time + WAITER.steadyMs);
+        p.sprite.anims.pause();
+        for (const a of p.attached) {
+            s.tweens.killTweensOf(a.img);
+            s.tweens.add({ targets: a.img, angle: { from: -WAITER.wobble, to: WAITER.wobble }, duration: 90, yoyo: true, repeat: 3,
+                onComplete: () => a.img.setAngle(0) });
         }
     }
 
@@ -445,6 +523,7 @@ export class People {
     // tables: turned to the table he is out of the aisle, and she can slip past).
     walk(p, dt, time) {
         const w = p.walk;
+        if (p.serving) return this.serving(p, time);
         if (time < p.pausedUntil) return;
         if (p.aside) {
             p.aside = false;
@@ -463,6 +542,14 @@ export class People {
         // (Its own name for the clip, or "walk".)
         if (time < p.pausedUntil) this.idle(p);
         else if (!this.anim(p, w.clip ?? 'walk')) p.sprite.setFrame(p.meta.stand);
+        // The waiter's tables: each the way he faces it, served, then cleared on his next round there.
+        for (const t of p.tables ?? []) {
+            if (t.dir === p.dir && (before - t.x) * (p.x - t.x) <= 0 && before !== p.x && before !== t.x && time >= p.pausedUntil) {
+                p.x = t.x;
+                this.serveAt(p, t, time);
+                return;
+            }
+        }
         for (const stop of w.stops ?? []) {
             if ((before - stop) * (p.x - stop) <= 0 && before !== p.x && time >= p.pausedUntil) {
                 p.x = stop;
@@ -513,6 +600,14 @@ export class People {
     // `touch.dx` the way they face), `touch.h` tall; over it she is clear.
     touching(p, her) {
         const t = p.touch;
+        // (Her feet off the floor and the figure's parts known: only her middle among them counts, each part to its own
+        // height, so that a hop over them is fair by what is drawn: the porter and his heap of bags.)
+        if (t.parts && her.y < p.y - 6) {
+            return t.parts.some(([a, b, h]) => {
+                const x0 = p.x + p.dir * a, x1 = p.x + p.dir * b;
+                return her.x >= Math.min(x0, x1) && her.x <= Math.max(x0, x1) && her.y > p.y - h;
+            });
+        }
         const cx = p.x + p.dir * (t.dx ?? 0);
         if (Math.abs(her.x - cx) > t.w / 2 + PLAYER.bodyWidth / 2) return false;
         return her.y > p.y - t.h && her.y - PLAYER.bodyHeight < p.y;

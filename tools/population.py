@@ -33,8 +33,10 @@ ROOMS = [
          doors=[dict(x=236, to="inside", deck=5, m=191.5, door="crew", plate="PANTRY", lock=("card", "hk", 0))]),
     # (Its door is at its aft end: the deck's last metres are structure, so the room lies forward of it.)
     # (`plate_lift`: its plate 10 px higher, over the pass's covered lunch: near-catch 1 remade, 2026-11-24.)
+    # (A checkpoint since 2026-11-28, the user: with the lunch spilled she went back to deck 4's middle; lit as near-catch
+    # 1 ends, `reachCheckpoint` in the ship scene, since she takes the lunch and goes forward, never past its door.)
     dict(id="galley", deck=5, m=250.1, width=336, door_x=336 - 59, look="galley", door="crew", plate="GALLEY",
-         plate_side=-1, plate_lift=10),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
+         plate_side=-1, plate_lift=10, checkpoint="cp_galley"),     # (forward of its door: aft of it the plate was half behind the wall at the deck's end)
     # A cabin being made up, its door held open (population: `amb_maid`): a peek.
     dict(id="maid6", deck=6, m=48, slot=True, width=240, look="cabin", door="open",
          windows=[(181, 35, 19, 37), (202, 35, 20, 37)]),
@@ -432,6 +434,12 @@ PEOPLE = {
     "amb_lost": dict(at=(4, 24), who="tourist", face=1, idle="idle", layer="back"),
     "haz_porter": dict(at=(4, 58), who="porter", face=1, walk=(53.5, 64, 1.0, "cart"), end_ms=1500,
                        touch=("scare", 46, 44, "cart", 12),
+                       # (In the air only these, by her middle: him to under his shoulders, the bags' heap to 36 px of its
+                       # 54, a few px in from its ends, a hop passing through its top bags (the user's C, 2026-11-28: with
+                       # the whole box a hop over him was "very hard", caught in mid air); px from his middle the way he
+                       # faces, and px up. Swept: a full hop at him walking at her clears from 9 of 17 take-offs, 4
+                       # before; at him standing 5, none before; from behind none, he turns at his loop's end.)
+                       touch_parts=[(-4, 4, 44), (15, 34, 36)],
                        carry=[("luggage-trolley", 24, 0, False), ("suitcases", 24, 29, False)]),
     "npc_officer": dict(at=(4, 65.6), who="officer", face=1, idle="idle",
                         bubble=("tray", "!card:deck", None, 4)),
@@ -448,8 +456,13 @@ PEOPLE = {
     "amb_poser_her": dict(at=(5, 91.25), who="lady", face=-1, idle="idle", until="region:3"),
     "blk_cleaner": dict(at=(5, 106.1), who="cleaner", face=1, idle="mop", until="region:3"),
     "amb_agent": dict(at=(5, 115.3), who="agent", face=-1, idle="idle", layer="back"),
-    "haz_waiter": dict(at=(5, 172), who="waiter", face=1, walk=(170.2, 192.2, 1.5, "serve"), stops=[175.4, 184.2],
-                       stop_ms=2400, end_ms=900, touch=("spill", 22, 56),
+    # (He serves the two diners' tables, 2 and 4, and clears them on his next round, the way he faces each: forward
+    # at table 2, aft at table 4 (`serve`: the table's m, his facing; `WAITER` in src/config.js; his clip
+    # assets/ship/waiter/). Bumped into: she bounces off him and sits, as off the lady in her bathrobe, 10f, and he
+    # steadies his tray (the user, 2026-11-28; he only spilled her tray before). At his loop's ends he stands as he walks,
+    # his tray up (`hold`): his still facing us has a dish of its own drawn in, "a double dish".)
+    "haz_waiter": dict(at=(5, 172), who="waiter", face=1, walk=(170.2, 192.2, 1.5, "serve"), serve=[(175.4, -1), (184.2, 1)],
+                       hold="serve", end_ms=900, touch=("scare", 22, 56, "waiter"),
                        carry=[("@tray", 9, 42, True), ("@load-cloche", 9, 45, True)]),
     "amb_host": dict(at=(5, 205.3), who="maitre", face=-1, idle="idle", layer="back"),
     "amb_chef_7s": dict(at=("galley", 182), who="chef", face=-1, idle="idle"),
@@ -462,6 +475,11 @@ PEOPLE = {
                            cover=[("cucina-table", 159.8, 0)]),
     "amb_cucina_him": dict(at=(5, 164.1 + 16 / 48), who="cucina_mustard", face=-1, layer="back",
                            cover=[("cucina-table", 164.1, 0)]),
+    # (The waiter's two diners, tables 2 and 4 of the Seven Seas' forward part, sat as the two above: the user, 2026-11-28.)
+    "amb_7s_green": dict(at=(5, 175.4 - 16 / 48), who="seas_green", face=1, layer="back",
+                         cover=[("seas-table-flowers-w20", 175.4, 0)]),
+    "amb_7s_burgundy": dict(at=(5, 184.2 + 17 / 48), who="seas_burgundy", face=-1, layer="back",
+                            cover=[("seas-table-flowers-w20", 184.2, 0)]),
     "amb_7s_her": dict(at=(5, 213.0 - 16 / 48), who="seas_navy", face=1, layer="back",
                        cover=[("seas-table-dinner-w20", 213.0, 0)]),
     "amb_7s_him": dict(at=(5, 221.8 + 17 / 48), who="seas_white", face=-1, layer="back",
@@ -815,7 +833,8 @@ SOURCES = {
     # (On the pass's counter from the start, hers to take once Bumbot has been at it: it popped in with the flag
     # before; near-catch 1 remade, 2026-11-24. Off the counter while she has it, and for good once the officer has his
     # lunch: the user, 2026-11-24, "when pick up tray, it should stop being on the counter".)
-    "src_lunch": (5, 249.3542, "lunch", None, [("tray", 33), ("load-cloche", 36)], "flag:bb1", "flag:lunch", {"lift": True}),
+    # (A px lower than it stood, on the counter's top as the plate he eats from: the user, 2026-11-28.)
+    "src_lunch": (5, 249.3542, "lunch", None, [("tray", 32), ("load-cloche", 35)], "flag:bb1", "flag:lunch", {"lift": True}),
     # Region 8's two errands: the engineer's coffee from the Great Outdoors' coffee station (hot for
     # 50 s), the old lady's mojito from Topsiders' bar.
     "src_coffee": (11, 212.42, "coffee", "region:8", [("coffee-cup", 22)], None, "flag:engineer"),

@@ -2429,12 +2429,13 @@ def scenario_region1(b):
     wait(0.4)
     ok &= check(carrying(b) is None and b.state()["mode"] == "play", "the waiter bumps the tray out of her hands: a spill, no scare", b.state())
     b.shot("region1-spill")
-    # At a table he is out of the aisle: she slips past behind him.
+    # At a table, serving its diner, he is out of the aisle: she slips past in front of him (2026-11-28).
     ok &= check(take_lunch(b), "the pass has another")
     b.teleport(person(b, "haz_waiter")["x"] + 300, D5)       # (people only move near her)
-    b.eval("(p => { p.x = p.walk.stops[0] - 4; p.dir = 1; p.pausedUntil = 0; })(window.__ship.world.people.byId.haz_waiter)")
-    wait(0.4)
-    ok &= check(person(b, "haz_waiter")["aside"], "the waiter turns to a table", person(b, "haz_waiter"))
+    WT = "window.__ship.world.people.byId.haz_waiter"
+    b.eval(f"(p => {{ p.x = p.tables[0].x + 4; p.dir = -1; p.pausedUntil = 0; }})({WT})")
+    ok &= check(wait_js(b, f"!!{WT}.serving && {WT}.busy && {WT}.serveSprite.visible && !{WT}.sprite.visible", 2),
+                "the waiter serves a table's diner", person(b, "haz_waiter"))
     b.teleport(person(b, "haz_waiter")["x"] + 50, D5)
     b.hold("left", 0.9)
     ok &= check(carrying(b) == "lunch", "and she passes him with the tray")
@@ -7111,7 +7112,13 @@ def scenario_mishaps__ball(b):
     bl = b.eval(f"{MS}.world.data.topdeck.balls[0]")
     ok = True
 
+    # (The round runs on the game's clock: the shot passes her toward the hoop, the rebound hops back the other way. Placed
+    # whenever the page had loaded, the first ball at her was the rebound as often as not, at her back (14b for 14a,
+    # 2026-11-28): she is placed as the round starts, the ball still in the player's hands.)
+    BL = f"{MS}.world.movers.find(m => m.constructor.name === 'Balls' && m.def.x === {bl['x']})"
+
     def stand(face):
+        wait_js(b, f"(B => B.clock({MS}.time.now) < B.tR - 0.25)({BL})", bl["period"] + 1)
         b.teleport(bl["x"] + 80, D12)
         b.eval(f"{MS}.player.setFlipX({'true' if face < 0 else 'false'})")
 

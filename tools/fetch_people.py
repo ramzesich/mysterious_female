@@ -54,7 +54,7 @@ BY_HAND = {"dog", "dogowner", "steward",
            # (Champs' second seated fan, an edit of the first's frame, 2026-11-21.)
            "champs_d",
            # (The diners, the surfer and the sushi bar's two, new people with no chair of their own, 2026-11-26.)
-           "cucina_lilac", "cucina_mustard", "seas_navy", "seas_white", "surfer_braids", "cagneys_pearl", "cagneys_tweed",
+           "cucina_lilac", "cucina_mustard", "seas_navy", "seas_white", "seas_green", "seas_burgundy", "surfer_braids", "cagneys_pearl", "cagneys_tweed",
            "sushi_teal", "sushi_green",
            # (The massage scene's two, 2026-11-22: frames cleaned by hand, `masseur-raw/`, `massage_guest-raw/`.)
            "masseur", "massage_guest",

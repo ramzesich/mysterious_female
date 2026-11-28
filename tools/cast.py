@@ -99,6 +99,10 @@ CAST = {
     "cucina_mustard": ("9736d722-a4f7-5635-8bc5-759c3a83ad48", {}, {"scale": 0.8}),
     "seas_navy": ("838401ac-f9b9-580a-9dc1-a6bbecd645c8", {}, {"scale": 0.8}),
     "seas_white": ("7672e5cd-9721-5a0d-a32c-ff13cf817580", {}, {"scale": 0.8}),
+    # (The waiter's two diners at tables 2 and 4, the user, 2026-11-28: edits of the two above, "a different person in
+    # exactly the same sitting pose"; assets/source/people/waiter-raw/diners/.)
+    "seas_green": ("4496ae8c-ef80-5615-8418-356d27424f79", {}, {"scale": 0.8}),
+    "seas_burgundy": ("bdec6854-b10d-5e87-ac2d-741e228afe88", {}, {"scale": 0.8}),
     # Region 2.
     "librarian": ("c7f368e7-11e5-4d3b-b5dd-112c8f71a53a", {"shelve": 7, "idle": 4, "shush": 6, "flinch": 12}, {}),
     "jogger": ("26773aee-c797-4c20-950d-47db78465fda", {"run": 12, "sorry": 10, "scratch": 5},

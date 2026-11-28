@@ -141,12 +141,13 @@ A framed picture; E opens it full screen; the picture is the user's (§6.4).
 | `slot_nook` | The reading nook's wall, over its table | All fourteen books, the odd book (her armchair at home, the user's photo) |
 | `slot_cucina` | La Cucina's wall, deck 5, 154.25 m, between its entrance and its first window | A perfect cone for him: the photo of the two of them at La Cucina's window table (the user's), up once the table scene is done (it stood on his table till 2026-11-23: "I would leave only the book") |
 
-### 2.5 The checkpoints (19 places, 23 as the game counts them)
+### 2.5 The checkpoints (20 places, 24 as the game counts them)
 
 Since 2026-11-26 (`docs/plan-the-rest.md` §7e, the user's nineteen of 2026-11-19, built and approved in play): a
 checkpoint stays only if a scare sends her back to it and taking it away would cost her hazards to do again. "Closest
 activated" per §5.5, never behind a door shut to her. Each door is its place's own; the green lamp over it says
-checkpoint. In the code: `CHECKPOINTS`, the rooms' `checkpoint`, `BALCONY_CPS` in `tools/population.py`.
+checkpoint. In the code: `CHECKPOINTS`, the rooms' `checkpoint`, `BALCONY_CPS` in `tools/population.py`. (A twentieth, the user,
+2026-11-28: the galley's door behind the Seven Seas' pass, `cp_galley`, lit as near-catch 1 ends.)
 
 | Id | Deck | m | Door | Region |
 |---|---|---|---|---|
@@ -378,7 +379,8 @@ a shortcut past the waiter; built as a short room. Drawn by hand.
 | m | Id | What | Behaviour | Needs |
 |---|---|---|---|---|
 | 169 | `rdr_pantry_5b` | The pantry's other door | Green | |
-| 170-192 | `haz_waiter` | The waiter with a tray, the only one in the game | `loop(170, 192, 1.5)`; a bump spills her tray; hop him otherwise | Walk with tray |
+| 170-192 | `haz_waiter` | The waiter with a tray, the only one in the game | `loop(170, 192, 1.5)`; forward he serves table 2's diner, aft table 4's, the next visit clears it (2026-11-28); bumped into: 10f, he steadies his tray; with her tray a spill | Walk with tray, his serve clip |
+| 175.4, 184.2 | `amb_7s_green`, `amb_7s_burgundy` | The waiter's two diners (2026-11-28) | Seated, the table drawn again over them | |
 | 180 | `sec_swan` | The ice swan | `quirk(E)`: she shivers | A clip |
 | 190 | `tan_5_dessert` | The dessert cart | | |
 

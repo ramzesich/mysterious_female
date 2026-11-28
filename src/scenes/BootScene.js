@@ -192,6 +192,10 @@ export class BootScene extends Phaser.Scene {
         this.load.spritesheet('balloons', 'assets/ship/balloons.png', { frameWidth: 22, frameHeight: 22 });
         this.load.json('balloons-meta', 'assets/ship/balloons.json');
         this.load.image('balloon-bunch', 'assets/ship/balloon-bunch.png');
+        // The Seven Seas' waiter at his tables (assets/source/people/waiter-raw/serve/cut.py).
+        this.load.spritesheet('waiter-serve', 'assets/ship/waiter/serve.png', { frameWidth: 128, frameHeight: 96 });
+        this.load.json('waiter-serve-meta', 'assets/ship/waiter/serve.json');
+        this.load.image('waiter-plate', 'assets/ship/waiter/plate.png');
         // The Art Gallery's painting and its two handlers (tools/build_painting.py).
         this.load.image('painting', 'assets/ship/painting.png');
         this.load.spritesheet('handlers', 'assets/ship/handlers.png', { frameWidth: 128, frameHeight: 80 });

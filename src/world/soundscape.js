@@ -64,8 +64,10 @@ export class Soundscape {
         // through the telescope), where the camera is.
         const view = s.cameras.main.worldView;
         const away = Math.abs(view.centerX - p.x) > 300 || Math.abs(view.centerY - p.y) > 220;
-        if (away && !s.overview) sfx.listen(view.centerX, view.centerY + 40);
-        else sfx.listen(p.x, p.y - 30);
+        // (A sound placed in the world is heard only from the deck her ears are on: `deckOfY` of each.)
+        const deckOf = this.deckOf ??= (y => s.deckOfY(y));
+        if (away && !s.overview) sfx.listen(view.centerX, view.centerY + 40, deckOf);
+        else sfx.listen(p.x, p.y - 30, deckOf);
         if (this.clock >= this.levelsAt) {
             this.levelsAt = this.clock + 0.15;
             sfx.ambience(this.levels());

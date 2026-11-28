@@ -32,6 +32,8 @@ const PICK = {
     stewardess: () => '10f',
     // (The lady in her bathrobe, standing: she bounces off her as off the stewardess, 10f.)
     robe: () => '10f',
+    // (The Seven Seas' waiter, either way: she bounces off him as off her, the user, 2026-11-28.)
+    waiter: () => '10f',
     jet: f => f.front ? '11a' : '11b',
     light: f => f.front ? '12a' : '12b',
     // A door: opening in her face (she faces it), or catching her just past it.

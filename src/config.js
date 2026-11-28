@@ -386,6 +386,10 @@ export const SHAFT = {
 // `reach` px from its; in the air only the painting, within `over` px of its middle, her feet more than `toe` px into its
 // top (`top` px up; a hop near the top of her jump clears it: the user, "a very well-timed hop"). Either way they drop it
 // and she sits dizzy (28).
+// The Seven Seas' waiter at his tables (tools/population.py `haz_waiter`'s `serve`; his clip assets/ship/waiter/): `stand` px
+// from the table's middle, away from the diner he faces; his clip's frames a second, then `afterMs` before he walks on;
+// bumped into, he stops `steadyMs` and his tray wobbles `wobble` degrees.
+export const WAITER = { stand: 12, fps: 8, afterMs: 300, steadyMs: 1400, wobble: 6 };
 export const PAINTING = { speed: 0.8, restS: 3, cryS: 4, fps: 12, walkFps: 5, landAt: 3, ground: 4, reach: 52, over: 26, top: 54, toe: 6 };
 // The party's balloons drifted across deck 8's corridor (part 11's item 14, `Balloons` in src/world/movers.js): within
 // `wade` px of one still lying she wades at half her speed (the ball pit's `wading`); one within `reach` px of her middle rolls away from her, up
@@ -495,6 +499,7 @@ export const MISHAPS = {
     trolley: {},            // her room-service trolley, wheeled or parked at a door
     stewardess: {},         // the breakfast stewardess herself, her hands empty
     robe: {},               // the lady in her bathrobe, standing in the corridor (deck 4)
+    waiter: {},             // the Seven Seas' waiter on his round (deck 5)
     jet: {},                // the kid's water pistol (deck 11)
     light: {},              // the stage's swinging light
     door: {},               // a door that flies open
@@ -624,10 +629,10 @@ export const GAGS = {
     pillow: { fall: 'gag-pillow-sit', holdMs: 1800, sink: 3, sit: 'her-dazed-sit-plain', hat: 'splash-pillow' },
     vacuum: { word: 'ride', her: 18, sit: 'gag-vacuum-sit', ride: 'gag-vacuum-ride', speed: 230, accel: 240 },
     paperFront: { fall: 'gag-paper-front', paper: 8, holdMs: 2000 },
-    paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000 },
-    suitcase: { her: 20, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', dazed: 'gag-suitcase-dazed', top: 80, slow: 1.4, least: 16, pace: 1.1, rideS: 3.3, holdMs: 1180 },
+    paperBehind: { fall: 'gag-paper-behind', paper: -6, holdMs: 2000, sits: { 'gag-paper-behind': [5, 2] } },
+    suitcase: { her: 20, sits: { 'gag-suitcase-tip': [5, 1], 'gag-suitcase-dazed': [0, 1] }, sit: 'gag-suitcase-sit', ride: 'gag-suitcase-ride', tip: 'gag-suitcase-tip', dazed: 'gag-suitcase-dazed', top: 80, slow: 1.4, least: 16, pace: 1.1, rideS: 3.3, holdMs: 1180 },
     // (The red one, deck 5's: the same clips recoloured, tools/recolour_suitcase.py; the user, 2026-11-26.)
-    'suitcase-red': { sit: 'gag-redcase-sit', ride: 'gag-redcase-ride', tip: 'gag-redcase-tip', dazed: 'gag-redcase-dazed' },
+    'suitcase-red': { sits: { 'gag-redcase-tip': [5, 1], 'gag-redcase-dazed': [0, 1] }, sit: 'gag-redcase-sit', ride: 'gag-redcase-ride', tip: 'gag-redcase-tip', dazed: 'gag-redcase-dazed' },
     // The porter's cart (8a to 8d; the ship scene's `cartGag`). `cart`: the clip has the cart in it
     // and is set down where she stands, the cart's middle `cartAt` px ahead of hers (behind, less
     // than 0), the porter brought up to it and his own cart hidden; else it is her alone, set down
@@ -636,11 +641,13 @@ export const GAGS = {
     // kept at hers, `fronts`: px ahead of her middle in each frame of the clip) till she sits. 8c:
     // she sits into the bags; he wheels her `rideM` metres, sees her, tips his cap (`tip`, his
     // clip). 8d: she bounces off his back and sits; he walks on `walkOnMs`, then turns round to
-    // her. Then `holdMs`, her checkpoint.
-    cartDrape: { cart: true, cartAt: 26, clip: 'gag-cart-drape', loop: 'gag-cart-kick', holdMs: 1600, sounds: { 'gag-cart-drape': { 1: 'cartBump' } } },
-    cartPush: { clip: 'gag-cart-push', her: 18, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600, sounds: { 'gag-cart-push': { 1: 'cartBump', 7: 'thump' } } },
-    cartSit: { cart: true, cartAt: -26, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900, sounds: { 'gag-cart-sit': { 1: 'cartBump' } } },
-    cartBounce: { clip: 'gag-cart-bounce', her: 18, walkOnMs: 450, holdMs: 1600, sounds: { 'gag-cart-bounce': { 1: 'cartBump', 5: 'thump' } } },
+    // her. Then `holdMs`, her checkpoint. `sits`: for a clip of hers that ends sat on the floor, [its frame (from 0) where
+    // she is down on her bottom, px drawn lower from it], so that her seat is 1 px under the floor line as the built sit's
+    // is (`seated` in the ship scene; the user, 2026-11-28: "she is hovering", "it's ground level is inconsistent").
+    cartDrape: { cart: true, cartAt: 26, knock: 70, clip: 'gag-cart-drape', loop: 'gag-cart-kick', holdMs: 1600, sounds: { 'gag-cart-drape': { 1: 'cartBump' } } },
+    cartPush: { clip: 'gag-cart-push', knock: 70, her: 18, sits: { 'gag-cart-push': [6, 2] }, fronts: [11, 11, 8, 5, 0, -6, -7, -7], holdMs: 1600, sounds: { 'gag-cart-push': { 1: 'cartBump', 7: 'thump' } } },
+    cartSit: { cart: true, cartAt: -26, knock: 70, clip: 'gag-cart-sit', rideM: 2, tip: 'tip', holdMs: 900, sounds: { 'gag-cart-sit': { 1: 'cartBump' } } },
+    cartBounce: { clip: 'gag-cart-bounce', knock: 70, her: 18, sits: { 'gag-cart-bounce': [3, 2] }, walkOnMs: 450, holdMs: 1600, sounds: { 'gag-cart-bounce': { 1: 'cartBump', 5: 'thump' } } },
     // The jogger (9b; the ship scene's `jogGag`): her clip where she stands (`gags` sheet), he stops where
     // he met her and plays `sorry` (his far arm up to the back of his head), then `scratch` until her
     // checkpoint, `holdMs` after her clip ends.
@@ -650,7 +657,7 @@ export const GAGS = {
     // 9d: 8d's bounce off his back (her-mishaps sheet, `her` px behind her middle); he never notices.
     jogSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700, sounds: SPIN },
     jogShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', his: 'sorry', loop: 'scratch', holdMs: 1700, sounds: { 'gags-jog-shoved': { 15: 'bellyFlop' } } },
-    jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, holdMs: 1600, sounds: { 'gag-cart-bounce': { 5: 'thump' } } },
+    jogBounce: { clip: 'gag-cart-bounce', jog: true, bounce: true, her: 18, sits: { 'gag-cart-bounce': [3, 2] }, holdMs: 1600, sounds: { 'gag-cart-bounce': { 5: 'thump' } } },
     // The stage's light (12a, 12b; the user, 2026-11-19: reuse the jogger's): 9a's spin, 9c's belly-flop.
     lightSpin: { clips: 'gags-jog-spin', jog: true, at: 'spin', dazed: 'sit', holdMs: 1700, sounds: SPIN },
     lightShoved: { clip: 'gags-jog-shoved', jog: true, at: 'shove', dazed: 'lie', holdMs: 1700, sounds: { 'gags-jog-shoved': { 15: 'bellyFlop' } } },
@@ -673,15 +680,15 @@ export const GAGS = {
     // and the flower behind her ear. 10b: it meets her back: the same clip, and she turns round to
     // face it as she falls (`turn`: the clip flipped to her other side, on purpose; the user,
     // 2026-11-17, liked it so: a squirm on the spot looked wrong and the case is rare).
-    trayFront: { fall: 'gag-tray-sit', tray: true, holdMs: 1800 },
-    trayBack: { fall: 'gag-tray-sit', tray: true, turn: true, holdMs: 1800 },
+    trayFront: { fall: 'gag-tray-sit', tray: true, holdMs: 1800, sits: { 'gag-tray-sit': [4, 2] } },
+    trayBack: { fall: 'gag-tray-sit', tray: true, turn: true, holdMs: 1800, sits: { 'gag-tray-sit': [4, 2] } },
     // Her trolley (10c, 10d, 10f; `fallGag`): the trip over it (10c) is set down by the trolley's
     // middle (`at`: px from it to the clip's middle), the world's trolley drawn over her while it
     // plays (`ride.hide()`); bumped back off it (10d) and bounced off the stewardess (10f), her
     // alone, `her` px behind her middle, as 8b's and 8d's.
     trolleyTrip: { fall: 'gag-trolley-trip', at: -20, holdMs: 900, sounds: { 'gag-trolley-trip': { 1: 'trolleyRattle', 7: 'bellyFlop' } } },
-    trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000, sounds: { 'gag-cart-push': { 1: 'trolleyRattle', 7: 'thump' } } },
-    trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200, sounds: { 'gag-cart-bounce': { 1: 'trolleyRattle', 5: 'thump' } } },
+    trolleyPush: { fall: 'gag-cart-push', her: 18, holdMs: 1000, sits: { 'gag-cart-push': [6, 2] }, sounds: { 'gag-cart-push': { 1: 'trolleyRattle', 7: 'thump' } } },
+    trolleyBounce: { fall: 'gag-cart-bounce', her: 18, holdMs: 1200, sits: { 'gag-cart-bounce': [3, 2] }, sounds: { 'gag-cart-bounce': { 1: 'trolleyRattle', 5: 'thump' } } },
     // The towel stack (18): its own clips with her in them, played by the stack (`TowelStack.ride` in
     // src/world/movers.js, the ship scene's `thingGag`): buried, then her head up in a towel turban, a
     // towel swan on it; `holdMs` after, her checkpoint.
