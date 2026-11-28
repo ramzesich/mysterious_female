@@ -40,6 +40,9 @@ const TEXTS = {
         'hint.climb': '↑ or ↓ with Space to climb up or down',
         'hint.climb.pad': '↑ or ↓ with A to climb up or down',
         'hint.crawl.pad': '↓ to crawl',
+        // The throw, the first time a tangerine is hers (the user, 2026-11-28).
+        'hint.throw': 'F to throw a tangerine, ↑ + F to lob',
+        'hint.throw.pad': 'RT to throw a tangerine, ↑ + RT to lob',
         // Choosing a book to read, in an armchair or on her bed (the first time the row shows).
         'hint.read': '← and → to choose, ↓ to see the cover, E to read, Esc to get up',
         'hint.read.pad': '← and → to choose, ↓ to see the cover, X to read, B to get up',
@@ -83,6 +86,8 @@ const TEXTS = {
         'hint.climb': '↑ чи ↓ з пробілом — лізти вгору чи вниз',
         'hint.climb.pad': '↑ чи ↓ з A — лізти вгору чи вниз',
         'hint.crawl.pad': '↓ — повзти',
+        'hint.throw': 'F — кинути мандаринку, ↑ + F — підкинути',
+        'hint.throw.pad': 'RT — кинути мандаринку, ↑ + RT — підкинути',
         'hint.read': '← і → — вибрати, ↓ — обкладинка, E — читати, Esc — встати',
         'hint.read.pad': '← і → — вибрати, ↓ — обкладинка, X — читати, B — встати',
         'hint.return': '← і → — вибрати, E — повернути, Esc — залишити решту',

@@ -5818,3 +5818,19 @@ concise and clear." The five controller hints (`hint.move.pad`, `hint.crawl.pad`
 `hint.return.pad`) now give their directions as ← → ↑ ↓, in both languages; only their buttons differ from the
 keyboard's (A, X, B). The translations as they stand and the arrows approved. `intro` (its check of the move hint's
 words updated), `lang` and `gamepad` pass.
+
+## The controller's throw on RT, the zoom on the bumpers, the throw's hint (2026-11-28, branch `refine`, the Refinement session)
+
+The user asked what the triggers and the bumpers do (the triggers only zoomed the whole ship's view, the bumpers nothing),
+then: "let's put the zoom to the bumpers, freeing the triggers. Then, remove the throw from Y and put it on the right
+trigger." RB zooms in and LB out (as RT and LT did); RT throws (pulled half way, as the zoom counted it), ↑ + RT lobs;
+Y and LT do nothing now. `src/controls.js`; the controls tables in `GAME_DESIGN.md` §3.1 and `README.md` (the README's
+whole-ship row given its controller column); `gamepad` checks "Y throws nothing", "RT throws a tangerine", RB and LB.
+(`docs/plan-three-uses.md` keeps its "Y" as the plan was.) Tried by the user on their controller: "all works" (their
+first try was on a server of the shared folder, which still had Y).
+
+The throw had no hint, against the rule that every new mechanic is explained once; the user: "let's add the tangerine
+hint as you suggested ... Show it first time she picks up a tangerine." `hint.throw` "F to throw a tangerine, ↑ + F to
+lob" / "F — кинути мандаринку, ↑ + F — підкинути", `hint.throw.pad` with RT, on a plate over her for 3.5 s
+(`THROW.hintMs`) the first time a tangerine is hers (`gainTangerine`, the flag `hint_throw`, asked with `has` so that
+`?cards=all` keeps it). Shots in `docs/throw-hint/`. `lang`, `throw`, `intro`, `gamepad` pass. Approved.

@@ -1212,7 +1212,8 @@ Lessons learned (2026-11-27, the horn's scene remade):
   keys or the controller's buttons, whichever she plays with (`hint.*` in `src/lang.js`, both
   languages). Built so far: "← and → to move, Space to jump" as the intro hands her over
   (`hint.move`, `hint.move.pad`), and "E to interact" the first time she walks past her door
-  (`hint.interact`). Signs, plates and the people's pictogram bubbles are fine.
+  (`hint.interact`); "F to throw a tangerine, ↑ + F to lob" the first time a tangerine is hers (`hint.throw`). A controller's
+  hint gives its directions as arrows, as the keyboard's (the user, 2026-11-28). Signs, plates and the people's pictogram bubbles are fine.
 - Do only what was asked: when a request could reach further (another deck, a layout change),
   ask first rather than assume (the user, 2026-11-06).
 - The user circles things on screenshots and numbers them; fix each, show the result as

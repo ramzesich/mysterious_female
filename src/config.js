@@ -813,7 +813,7 @@ export const LOOSE = {
     hardAt: 260,        // px/s down that is a hard landing
 };
 
-// F (Y on the controller): the throw (docs/plan-three-uses.md §1.2), one tangerine, underarm from
+// F (RT on the controller): the throw (docs/plan-three-uses.md §1.2), one tangerine, underarm from
 // her hand (`hand` px ahead of her middle, `handY` over her feet). The roll: low, it bounces once
 // and rolls about six metres. With ↑, the lob: high and short, its top about 2.3 m ahead and just
 // under a corridor's ceiling. She stands for `ms` while she throws; it leaves her hand at `releaseMs`.
@@ -837,6 +837,7 @@ export const THROW = {
     airFps: 20,
     airReleaseMs: 150,
     carry: 0.5,
+    hintMs: 3500,       // "F to throw a tangerine, ↑ + F to lob" over her, the first time one is hers
 };
 
 // A fall longer than one deck is a scare (§5.6). The margin keeps an ordinary one-deck drop, plus

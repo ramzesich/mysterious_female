@@ -44,12 +44,12 @@ URL flags, combinable (`?play&debug`):
 | Jump (hold for higher) | Space | A |
 | Climb ladders, take stairs | ↑ / ↓ | Left stick / D-pad |
 | "Кісюнічка!!!": the cry, and the lunge once learned (one tangerine each) | D | B |
-| Throw a tangerine: a roll; with ↑, a lob | F, ↑ + F | Y, ↑ + Y |
+| Throw a tangerine: a roll; with ↑, a lob | F, ↑ + F | RT, ↑ + RT |
 | Activate: open doors, take and give things, talk | E | X |
 | In the grip socks, on a balcony: at a partition, round its outer edge onto the next balcony; up or down a partition's fin to the balcony above or below (from anywhere on the balcony; between deck 8 and the boat walkway, by a column) | Space; ↑ + Space, ↓ + Space | A; ↑ + A, ↓ + A |
 | In the grip socks, elsewhere: in the air beside a pillar, a post or marked plating, a kick up and away; with ↑ held, straight up | Space, ↑ + Space | A, ↑ + A |
 | With the parasol: glide (hold in the air); over an atrium walk's railing, then hold to float down | Space (held), ↓ + Space | A (held), ↓ + A |
-| The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | |
+| The whole ship from outside (the game pauses): +/− zoom, the mouse wheel zooms toward the pointer; O or Esc to go back | O | Right stick click; RB / LB zoom; the click again or B to go back |
 | On the welcome screen: choose, start | ↑ / ↓, Enter or Space | Left stick / D-pad, A or Menu |
 | End the intro at once | Esc | Menu or B |
 | Sound off and on | M | |
